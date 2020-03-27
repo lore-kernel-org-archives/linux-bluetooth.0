@@ -2,154 +2,168 @@ Return-Path: <SRS0=n6SA=5M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E827C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 12:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B19EC43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 13:18:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C9B720774
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 12:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D9852082E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 13:18:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b+pfWiIE"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="1cbjY7tf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgC0MTN (ORCPT
+        id S1726540AbgC0NSA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Mar 2020 08:19:13 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:52752 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbgC0MTM (ORCPT
+        Fri, 27 Mar 2020 09:18:00 -0400
+Received: from mail-wr1-f54.google.com ([209.85.221.54]:42259 "EHLO
+        mail-wr1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726275AbgC0NR7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Mar 2020 08:19:12 -0400
-Received: by mail-pf1-f202.google.com with SMTP id i1so8114887pfo.19
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Mar 2020 05:19:12 -0700 (PDT)
+        Fri, 27 Mar 2020 09:17:59 -0400
+Received: by mail-wr1-f54.google.com with SMTP id h15so11339434wrx.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Mar 2020 06:17:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=q1a8YaBudmCWyQKVzo/+dlJ8UTOIxIR0+8G5uSTT6gs=;
-        b=b+pfWiIE11Pke+7jEQ3Yo1DZe++TRhTk2wEhQQNAZjuTvtq0iAXBQiauTEIw6uDCcZ
-         nHCl8tZ2S42teYeU1deHo1OggWmbsPo8VnHKkiTgmzYIQs/EkzUpghG9FNY2dJ7lZ3Kp
-         HaYrW4NmmcJSpLY4puH0qFikyanPzup7A6Z7G9vMZVFYJI4VsKuCYyLNZpcQMDkVTkIq
-         OBrO5qHc5DrjvdpwtOzJcstBkvsk79g3zviyDEudGlgMBSqRbxZQHHosNsz8hCddhWMs
-         1aL/XeAFBdOCOMBd5rslU/zmik0d3nhEqcuWK10Bb3RfWU4wfFGesx3E71UpyaubCUgR
-         O/7g==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rsz4sm+F4MoieukzrqsUZ5OHpE5miA8UM9vEGMVkxxc=;
+        b=1cbjY7tfg67tu92FXFJ7epeBoQrgcCZ6wOIJOTxGWdTfja+ZssNLEqitVRbw13Jgrs
+         yYPPUMxAI5hdW6MRqyO4TNjt1XOOUBlF/87014iuovvcqQSz6VaHZTnTyWtqq6KViiXg
+         kkL6Q9Sp6JfuODIMRcvb0Y+C48bgTQOOafPwuQvJStZ27VPkH32JOcs91oTO7bpPh24j
+         dNpnemX/Ok2x8KI0JxqMCXipaq3WLO2Jxzpq50oWt6G5qYlR10+gj11OQht5a0jAoctT
+         GX4OZt9ziAB1+u0ncEtv/L1WqSlkZxCgFNjCEhRDf1bThmTKyNGz0OkReqW8sDDYpdIw
+         X/rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=q1a8YaBudmCWyQKVzo/+dlJ8UTOIxIR0+8G5uSTT6gs=;
-        b=sdKwYPdfvYYGMZ4yiUrpfHQesJifipglHCOdF4fQIb2usPrlRK8szsTs5y6zcwMje0
-         /VVLImN8cBb6KnV7BcDijBYLo4Cx3A03yvEp3csMV5QRx3pVU6yMvNXjpWIhXVUgEZp6
-         yhz+fkQ+wmIYrhmY+TVc4bNWyCzhsvQPkEfxThR8xEUBjTW1iLk8kPaXHwliSrx7prfh
-         hukkPEBve7S32fNFcJACFLcf7s08CIRZonfFIIk1iry9Zu8dcytjkmINwuGCgkGwTnQE
-         lGGHgJ8FmEWUmAZPPqnYxEjUHD40KFlwVBDuEe1/YeGqz5ZOJ7FJf9a0uFCAXA98Rbri
-         YJIQ==
-X-Gm-Message-State: ANhLgQ11BahdJVqKUSdzxGi0vCvajaC9hzfap2uDYw36BuKS0JzMUqId
-        zsY3LZZQ/OttHQqvFgxjVE3NGRYzg3/uA+DlMtVx4+wTuktw2ukv0mlXDsvU4BCbgk5vEt4JChh
-        pfHX+M1av2mauFNNuRqhf9K9j7jdE7bPq8gt6c2dUc5kjbUpUOdU/TSrxPgveMtGUoI5y39dbKv
-        lA
-X-Google-Smtp-Source: ADFU+vs8z/YRjN7Y7K7PWG2IuaxsvpzEqVbb/UXrSJjpT02L29LTZLa01xmUQgxNZVml/uW+T3SfVdYznnEl
-X-Received: by 2002:a63:d7:: with SMTP id 206mr13338783pga.366.1585311551473;
- Fri, 27 Mar 2020 05:19:11 -0700 (PDT)
-Date:   Fri, 27 Mar 2020 20:18:59 +0800
-Message-Id: <20200327201817.Bluez.v1.1.If919a39697a6506be273f879d752bd506e63b45b@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
-Subject: [Bluez PATCH v1] shared/att: Check the signature of att packets
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rsz4sm+F4MoieukzrqsUZ5OHpE5miA8UM9vEGMVkxxc=;
+        b=dhCpBvrw+ynclusb84c7ijGEAlmCpN8vTsXGswqrsqgk9cgn3b5mfEXoHMbOsy2A4c
+         0J9s9Hln57LpLuaKT86cuTj9MrbU2SC40EV82Hia1XHF7QDzAa9nwcp/bTERNHEn2J0n
+         mDe5G1Z4C6dk21+5izjR2cWvpiwnK0q+MlNJ3/7RXihQJsoAw3GVeq4yLbDsEcTWm0wc
+         JfNDJAOiCZY9CqEsjHSph6VkaqxfxQp+1L0rtmObPSvl2ULLmLw+GxIfw0JuCuzxe1vE
+         TSPFABgmorJwUYIfAoGRPzVdOnEqn6HyOBtu6XwSlH0K4qyPLYD481BTHCU1Khrej8No
+         nRQg==
+X-Gm-Message-State: ANhLgQ0XQ9R+vUKZTjtronLdwiCabxATkfl7e64bttxWOJrxMRQB5Hjt
+        Um0Vx6sV6rgaN/rG/M7M2FzfoedUBTj+kQ==
+X-Google-Smtp-Source: ADFU+vvPYyB+goVFibKb/m/3VCfzk2QX/hZ9/RXzntXypkSQWTx47DsgUeFGxNc8sU6n6CnbkBCfYw==
+X-Received: by 2002:a5d:6888:: with SMTP id h8mr14683207wru.159.1585315077647;
+        Fri, 27 Mar 2020 06:17:57 -0700 (PDT)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id w67sm7911446wmb.41.2020.03.27.06.17.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2020 06:17:56 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Przemys=C5=82aw=20Fierek?= 
+        <przemyslaw.fierek@silvair.com>
+Subject: [PATCH BlueZ] mesh: Add net key index to send_seg()
+Date:   Fri, 27 Mar 2020 14:18:00 +0100
+Message-Id: <20200327131800.7637-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+From: Przemysław Fierek <przemyslaw.fierek@silvair.com>
 
-According to bluetooth spec Ver 5.1, Vol 3, Part C (GAP), 10.4.2
-A device receiving signed data shall authenticate it by performing
-the Signing Algorithm. The signed data shall be authenticated by
-performing the Signing Algorithm where m is the Data PDU to be
-authenticated, k is the stored CSRK and the SignCounter is the
-received counter value. If the MAC computed by the Signing
-Algorithm does not match the received MAC, the verification fails
-and the Host shall ignore the received Data PDU.
-
-Currently bluez ignore the signature of received signed att
-packets, as the function bt_crypto_sign_att() only generates the
-signature, and not actually make any check about the genuineness
-of the signature itself.
-
-This patch also fix a wrong boolean condition which prevents
-handle_signed() to be called.
-
-Tested to pass these BT certification test
-SM/MAS/SIGN/BV-03-C
-SM/MAS/SIGN/BI-01-C
+This patch adds net key index to send_seg(). This fixes problem with
+using invalid network key to encrypt application messages.
 ---
+ mesh/net.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
- src/shared/att.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
-
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 948a5548b..0faac4d1d 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -886,6 +886,8 @@ static bool handle_signed(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- {
- 	uint8_t *signature;
- 	uint32_t sign_cnt;
-+	uint8_t *copy_pdu = NULL;
-+	uint8_t *generated_signature;
- 	struct sign_info *sign;
+diff --git a/mesh/net.c b/mesh/net.c
+index 0343c4c49..c9ab843fa 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -1528,7 +1528,8 @@ static void friend_ack_rxed(struct mesh_net *net, uint32_t iv_index,
+ 	l_queue_foreach(net->friends, enqueue_friend_pkt, &frnd_ack);
+ }
  
- 	/* Check if there is enough data for a signature */
-@@ -903,15 +905,29 @@ static bool handle_signed(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	if (!sign->counter(&sign_cnt, sign->user_data))
- 		goto fail;
+-static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t seg);
++static bool send_seg(struct mesh_net *net, uint16_t net_idx,
++					struct mesh_sar *msg, uint8_t seg);
  
--	/* Generate signature and verify it */
--	if (!bt_crypto_sign_att(att->crypto, sign->key, pdu,
--				pdu_len - BT_ATT_SIGNATURE_LEN, sign_cnt,
--				signature))
-+	/* Generate signature */
-+	copy_pdu = malloc(pdu_len + 1);
-+	if (!copy_pdu)
- 		goto fail;
+ static void send_frnd_ack(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 						uint32_t hdr, uint32_t flags)
+@@ -1684,6 +1685,7 @@ static void ack_received(struct mesh_net *net, bool timeout,
+ 	struct mesh_sar *outgoing;
+ 	uint32_t seg_flag = 0x00000001;
+ 	uint32_t ack_copy = ack_flag;
++	uint16_t net_idx;
+ 	uint16_t i;
  
-+	copy_pdu[0] = opcode;
-+	memcpy(copy_pdu + 1, pdu, pdu_len - BT_ATT_SIGNATURE_LEN);
-+	generated_signature = copy_pdu + pdu_len - BT_ATT_SIGNATURE_LEN + 1;
+ 	l_info("ACK Rxed (%x) (to:%d): %8.8x", seq0, timeout, ack_flag);
+@@ -1734,7 +1736,9 @@ static void ack_received(struct mesh_net *net, bool timeout,
+ 		l_info("Resend Seg %d net:%p dst:%x app_idx:%3.3x",
+ 				i, net, outgoing->remote, outgoing->app_idx);
+ 
+-		send_seg(net, outgoing, i);
++		net_idx = appkey_net_idx(net, outgoing->app_idx);
 +
-+	if (!bt_crypto_sign_att(att->crypto, sign->key, copy_pdu,
-+				pdu_len - BT_ATT_SIGNATURE_LEN + 1, sign_cnt,
-+				generated_signature))
-+		goto fail;
-+
-+	/* Verify received signature */
-+	if (memcmp(generated_signature, signature, BT_ATT_SIGNATURE_LEN))
-+		goto fail;
-+
-+	free(copy_pdu);
++		send_seg(net, net_idx, outgoing, i);
+ 	}
+ 
+ 	l_timeout_remove(outgoing->seg_timeout);
+@@ -3058,8 +3062,8 @@ bool mesh_net_flush(struct mesh_net *net)
  	return true;
+ }
  
- fail:
-+	free(copy_pdu);
- 	util_debug(att->debug_callback, att->debug_data,
- 			"ATT failed to verify signature: 0x%02x", opcode);
+-/* TODO: add net key index */
+-static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
++static bool send_seg(struct mesh_net *net, uint16_t net_idx,
++					struct mesh_sar *msg, uint8_t segO)
+ {
+ 	struct mesh_subnet *subnet;
+ 	uint8_t seg_len;
+@@ -3068,7 +3072,6 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+ 	uint8_t packet_len;
+ 	uint8_t segN = SEG_MAX(msg->segmented, msg->len);
+ 	uint16_t seg_off = SEG_OFF(segO);
+-	uint32_t key_id = 0;
+ 	uint32_t seq_num;
  
-@@ -925,7 +941,7 @@ static void handle_notify(struct bt_att_chan *chan, uint8_t opcode,
- 	const struct queue_entry *entry;
- 	bool found;
+ 	if (msg->segmented) {
+@@ -3109,10 +3112,13 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+ 	}
+ 	print_packet("Clr-Net Tx", packet + 1, packet_len);
  
--	if ((opcode & ATT_OP_SIGNED_MASK) && !att->crypto) {
-+	if ((opcode & ATT_OP_SIGNED_MASK) && att->crypto) {
- 		if (!handle_signed(att, opcode, pdu, pdu_len))
- 			return;
- 		pdu_len -= BT_ATT_SIGNATURE_LEN;
+-	subnet = get_primary_subnet(net);
+-	key_id = subnet->net_key_tx;
++	subnet = l_queue_find(net->subnets, match_key_index,
++							L_UINT_TO_PTR(net_idx));
++	if (!subnet)
++		return false;
+ 
+-	if (!net_key_encrypt(key_id, msg->iv_index, packet + 1, packet_len)) {
++	if (!net_key_encrypt(subnet->net_key_tx, msg->iv_index, packet + 1,
++							     packet_len)) {
+ 		l_error("Failed to encode packet");
+ 		return false;
+ 	}
+@@ -3272,11 +3278,11 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 
+ 		for (i = 0; i < 4; i++) {
+ 			for (seg = 0; seg <= seg_max && result; seg++)
+-				result = send_seg(net, payload, seg);
++				result = send_seg(net, net_idx, payload, seg);
+ 		}
+ 	} else {
+ 		for (seg = 0; seg <= seg_max && result; seg++)
+-			result = send_seg(net, payload, seg);
++			result = send_seg(net, net_idx, payload, seg);
+ 	}
+ 
+ 	/* Reliable: Cache; Unreliable: Flush*/
 -- 
-2.25.1.696.g5e7596f4ac-goog
+2.20.1
 
