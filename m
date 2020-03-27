@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659FFC2D0E5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C6A2C2D0EE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D74E2073B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F10020716
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727143AbgC0Sm7 (ORCPT
+        id S1727393AbgC0SnA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Mar 2020 14:42:59 -0400
+        Fri, 27 Mar 2020 14:43:00 -0400
 Received: from mga14.intel.com ([192.55.52.115]:39636 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726770AbgC0Sm7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Mar 2020 14:42:59 -0400
-IronPort-SDR: BovRQ3iQ+6WbsUD1AGNQKoCihej8GGMZsMuPjrrBNoc5dNqzW6ZkOIMfKX32rNg2jIczvyJPXq
- /kfveuhF4imw==
+        id S1726770AbgC0SnA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 27 Mar 2020 14:43:00 -0400
+IronPort-SDR: c6LK0uN4eb1ncGGOGht32uJJRHQejZdUPfQPqtfQg+icRfcIMzOQblzGjAqcRi0ccMKcq+J/Yz
+ I9qc6Le9IWaQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 11:42:59 -0700
-IronPort-SDR: TPTAC3odcwLMzjbnr4FAaj1MnAsgkti2Yi0xg9xMfSmXJaBanefaSr1ng4k6ZFgf+iYDmMHGCj
- wBAgYMlsqdcw==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 11:43:00 -0700
+IronPort-SDR: 9zHzxufKMdsTziwWA/mauqwy+9n5NJVVaiqZy8wVvrQlJwF18c8k3N5KHU1BA5eIZAQkGvEp2x
+ 83ej66l30Uhw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,313,1580803200"; 
-   d="scan'208";a="421193642"
+   d="scan'208";a="421193648"
 Received: from ingas-nuc1.sea.intel.com ([10.251.8.23])
   by orsmga005.jf.intel.com with ESMTP; 27 Mar 2020 11:42:59 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/4] doc/mesh-api: Forward compatibility modifications
-Date:   Fri, 27 Mar 2020 11:42:54 -0700
-Message-Id: <20200327184257.15042-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/4] mesh: Update UnprovisionedScan, AddNode & ScanResult
+Date:   Fri, 27 Mar 2020 11:42:55 -0700
+Message-Id: <20200327184257.15042-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200327184257.15042-1-inga.stotland@intel.com>
 References: <20200327184257.15042-1-inga.stotland@intel.com>
@@ -75,79 +75,104 @@ New: void ScanResult(int16 rssi, array{byte} data, dict options)
 
     The options parameter is currently an empty dictionary
 ---
- doc/mesh-api.txt | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+ mesh/manager.c | 39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 131de6bfd..cc351b635 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -455,14 +455,20 @@ Object path	/org/bluez/mesh/node<uuid>
- 		CreateNetwork() or Import()
+diff --git a/mesh/manager.c b/mesh/manager.c
+index 0909c7e16..8e948e47d 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -217,21 +217,22 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
+ 						void *user_data)
+ {
+ 	struct mesh_node *node = user_data;
+-	struct l_dbus_message_iter iter_uuid;
++	struct l_dbus_message_iter iter_uuid, options;
+ 	struct l_dbus_message *reply;
+ 	uint8_t *uuid;
+-	uint32_t n;
++	uint32_t n = 22;
  
- Methods:
--	void UnprovisionedScan(uint16 seconds)
-+	void UnprovisionedScan(dict options)
+ 	l_debug("AddNode request");
  
- 		This method is used by the application that supports
- 		org.bluez.mesh.Provisioner1 interface to start listening
--		(scanning) for unprovisioned devices in the area. Scanning
--		will continue for the specified number of seconds, or, if 0 is
--		specified, then continuously until UnprovisionedScanCancel() is
--		called or if AddNode() method is called.
-+		(scanning) for unprovisioned devices in the area.
+-	if (!l_dbus_message_get_arguments(msg, "ay", &iter_uuid))
++	if (!l_dbus_message_get_arguments(msg, "aya{sv}", &iter_uuid, &options))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid, &uuid, &n)
+-								|| n != 16)
++	    || n != 16) {
++		l_debug("n = %u", n);
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Bad device UUID");
+-
++	}
+ 	/* Allow AddNode to cancel Scanning if from the same node */
+ 	if (scan_node) {
+ 		if (scan_node != node)
+@@ -361,6 +362,9 @@ static void prov_beacon_recv(void *user_data, struct mesh_io_recv_info *info,
+ 	builder = l_dbus_message_builder_new(msg);
+ 	l_dbus_message_builder_append_basic(builder, 'n', &rssi);
+ 	dbus_append_byte_array(builder, data + 2, len -2);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++	/* TODO: populate with options when defined */
++	l_dbus_message_builder_leave_array(builder);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
+ 
+@@ -372,17 +376,34 @@ static struct l_dbus_message *start_scan_call(struct l_dbus *dbus,
+ 						void *user_data)
+ {
+ 	struct mesh_node *node = user_data;
+-	uint16_t duration;
++	uint16_t duration = 0;
+ 	struct mesh_io *io;
+ 	struct mesh_net *net;
++	const char *key;
++	struct l_dbus_message_iter options, var;
+ 	const char *sender = l_dbus_message_get_sender(msg);
+ 
+ 	if (strcmp(sender, node_get_owner(node)))
+ 		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+-	if (!l_dbus_message_get_arguments(msg, "q", &duration))
++	if (!l_dbus_message_get_arguments(msg, "a{sv}", &options))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+ 
++	while (l_dbus_message_iter_next_entry(&options, &key, &var)) {
++		bool failed = true;
 +
-+		The options parameter is a dictionary with the following keys
-+		defined:
++		if (!strcmp(key, "Seconds")) {
++			if (l_dbus_message_iter_get_variant(&var, "q",
++							    &duration)) {
++				failed = false;
++			}
++		}
 +
-+		uint16 Seconds
-+			Specifies number of seconds for scanning to be active.
-+			If set to 0 or if this key is not present, then the
-+			scanning will continue until UnprovisionedScanCancel()
-+			or AddNode() methods are called.
- 
- 		Each time a unique unprovisioned beacon is heard, the
- 		ScanResult() method on the app will be called with the result.
-@@ -482,7 +488,7 @@ Methods:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.NotAuthorized
- 
--	void AddNode(array{byte}[16] uuid)
-+	void AddNode(array{byte}[16] uuid, dict options)
- 
- 		This method is used by the application that supports
- 		org.bluez.mesh.Provisioner1 interface to add the
-@@ -491,6 +497,10 @@ Methods:
- 		The uuid parameter is a 16-byte array that contains Device UUID
- 		of the unprovisioned device to be added to the network.
- 
-+		The options parameter is a dictionary that may contain
-+		additional configuration info (currently an empty placeholder
-+		for forward compatibility).
++		if (failed)
++			return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
++							"Invalid options");
++	}
 +
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.NotAuthorized
-@@ -927,7 +937,7 @@ Service		unique name
- Interface	org.bluez.mesh.Provisioner1
- Object path	freely definable
+ 	if (scan_node && scan_node != node)
+ 		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
  
--	void ScanResult(int16 rssi, array{byte} data)
-+	void ScanResult(int16 rssi, array{byte} data, dict options)
- 
- 		The method is called from the bluetooth-meshd daemon when a
- 		unique UUID has been seen during UnprovisionedScan() for
-@@ -943,6 +953,10 @@ Object path	freely definable
- 		bit set in OOB mask). Whether these fields exist or not is a
- 		decision of the remote device.
- 
-+		The options parameter is a dictionary that may contain
-+		additional scan result info (currently an empty placeholder for
-+		forward compatibility).
-+
- 		If a beacon with a UUID that has already been reported is
- 		recieved by the daemon, it will be silently discarded unless it
- 		was recieved at a higher rssi power level.
+@@ -752,13 +773,13 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
+ static void setup_management_interface(struct l_dbus_interface *iface)
+ {
+ 	l_dbus_interface_method(iface, "AddNode", 0, add_node_call, "",
+-								"ay", "uuid");
++						"aya{sv}", "uuid", "options");
+ 	l_dbus_interface_method(iface, "ImportRemoteNode", 0, import_node_call,
+ 				"", "qyay", "primary", "count", "dev_key");
+ 	l_dbus_interface_method(iface, "DeleteRemoteNode", 0, delete_node_call,
+ 						"", "qy", "primary", "count");
+ 	l_dbus_interface_method(iface, "UnprovisionedScan", 0, start_scan_call,
+-							"", "q", "seconds");
++							"", "a{sv}", "options");
+ 	l_dbus_interface_method(iface, "UnprovisionedScanCancel", 0,
+ 						cancel_scan_call, "", "");
+ 	l_dbus_interface_method(iface, "CreateSubnet", 0, create_subnet_call,
 -- 
 2.21.1
 
