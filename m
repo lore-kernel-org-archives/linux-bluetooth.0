@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D4DC43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 07:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E84C43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 07:05:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0677A20774
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 07:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9008E20781
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 07:05:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ExilzM/D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g2bqqkdj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729150AbgC3HFg (ORCPT
+        id S1729089AbgC3HFk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 03:05:36 -0400
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:49000 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728957AbgC3HFg (ORCPT
+        Mon, 30 Mar 2020 03:05:40 -0400
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:47617 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728731AbgC3HFk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Mar 2020 03:05:36 -0400
-Received: by mail-pf1-f201.google.com with SMTP id d16so7501036pfo.15
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 00:05:34 -0700 (PDT)
+        Mon, 30 Mar 2020 03:05:40 -0400
+Received: by mail-pl1-f201.google.com with SMTP id l1so12274156pld.14
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 00:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=1A8ERe+jjCXUJhlc7waAuAvi0lXDAcxG3TaIXHLmUDs=;
-        b=ExilzM/DR+pArc4TRsrmIC9FTyqh4RW0IZ0N78AWhxduYu+Kfk6W5PQ5xXpY08kkbI
-         XwJpjUMGMDrrXlAxxM8faw185Vqlb3K1QcDwrDvk26Uk10i8x6HSn3wYWidD+xRxjzSK
-         ryijFeTOf7kMHS/pG8JfmNiMLmT0TdYa9YnC1vOlFZW9yFUrSYyHpKT1dmU7c3B60tcq
-         aiuslyjyUjWlm3hHAM2MlYBDEFDEV8EODf7XNYfsFMmkOw2sxAcxMEoCGIEYYRur0H82
-         8RdZzs+2ycrYuOd3Oe6uIyER7SF29Cvn4GABVd3/w+S6A3nlsKdpPVcGzzI0ENdiL9jB
-         dgwA==
+        bh=sRxvBt9CbHrEaWbg6j4fY+lBQ0TJ6ryxG2Jm/LbqOgg=;
+        b=g2bqqkdjudMNT02IE4EeyXbWWp3tAWdmRbnAuSj+zdL/5/cBgR5Ogh7+2Rp/3sh85M
+         YXhZ1fK0ejcXS9Io8TMr9itHrkewI2f+447X+B5P/ONbZUHFt8agW3BBCg16M8MahZ48
+         BB0lxJ6x20rhd9KuzQlKU268xNFR+dNjIZlBlo0+yAV5hZ91ycqDCtnhSPYPnF1WPU+S
+         UrDnyC4pIp/VRVvK/lL4x70FSYFKIfo6g0DEIepCINNqz62HR75+cpSZYVISBzJ96t93
+         lGyZLcDofST1lLsi8iNXEpgDFK9cVu90q6BjUKkMdWATQFBlKhfU9YhUQ4HOxMDqT2OY
+         8oWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=1A8ERe+jjCXUJhlc7waAuAvi0lXDAcxG3TaIXHLmUDs=;
-        b=IAf5+U5KnEpW/LE7tEfeiwcLfWKyEKdZ8Oe/Z4AMBa/13q7FzQkToozYcym8LnNMh+
-         9JsEv+YBGNrOwAWc8jlmD5Pp1HKJNITXzHjgD3QLUblWc1J3c5YUzZJHIZzvY0GVSfL5
-         HIpRGkMcSBuphMFxW3Y7IKbj5g3XQtL42QmuiUH1ibpMPfmum4sKocAPhZWLkWzl8Alb
-         gce2DRih3Mw4+XsjRmNALF51aq1CIN4B6tcCLr1va4UXsIoC6XJTLkTLHaQ7I/g9AQcH
-         rg71NQ7yXLbQxdB0FLd0tSry2S5nfbBDUOKfdRNPKEAFEtev1IivUPViAeeFNJzbGKdM
-         FVgQ==
-X-Gm-Message-State: ANhLgQ0Nvkf4bLiRj8VGpzEbnpe2PDjo6Frf3Y/2Ix2CBtsUFQ04tesa
-        xXSJZA9g0dtFGLdNxUsk3X8dacvfu3yEqF+LRmVuclPZeE4JyWFY930kNxS3NF0QadJi+viSnCO
-        FfUODBA5jkD3aLHCTFy9bhBbOHjegFv1f8jaR8XYO2mBopE3zXp04quV2RftKtdUsv2NhcbCryC
-        QroNZlVjqmoGc=
-X-Google-Smtp-Source: ADFU+vvxKAsicVDxXQbx5V5UGYl7sBBieBnKQRsQSW7VHyuggSePvq7RWTWMgAa0p73jdzRMAK572jZuct/dHDwnYg==
-X-Received: by 2002:a17:90a:3ad0:: with SMTP id b74mr14870076pjc.58.1585551933518;
- Mon, 30 Mar 2020 00:05:33 -0700 (PDT)
-Date:   Mon, 30 Mar 2020 15:04:36 +0800
+        bh=sRxvBt9CbHrEaWbg6j4fY+lBQ0TJ6ryxG2Jm/LbqOgg=;
+        b=Yv4dhbWPZJHUq6GdNXvDD02ty+Sp9SAzwuRH7mhAfKcW2Yq4zIp8ZoUaKh7vG2WUfW
+         4ssJKM9EStDYZVxzyQe5lLBV0r7ObETfWII89CBHOtxILqkKdREqUPcQh2T61Gi1vbxI
+         bxzmXLyFxQU82WTkklX09POaZS15MNC8oHw2s6k6qVMbFGFbyRCbggd4pf4ev+rE5oHF
+         2tsTFr7TGWqSgxI1Y1BmLIajY2LlHKZaT9Lm1WkVkCuYPUgZ50iatf09OcpIuDULfR6D
+         JvNWVsar1HwXvmV5rPtOe8zMO+nqYbM61NuLbOaDve8BR0cey4U9imbFXYwRE0qvvULz
+         XScw==
+X-Gm-Message-State: AGi0PuapDA0pCfo3+QMcACYOGQf6dR33UAKMZk3GkpACYBBjz/MkA98J
+        pJB4AHvgkrKxwt8ryRP1isTHKIRaHY8B9OlvSNMHh+0JCnmFb4UF55lzy6T9LgYD+pveFTgrGzX
+        qFmc6uSneetFu+9sijLAE4moMsxu8nRZqgx1Oq6u+gDnvd05FVGyLfWYeMryKR8iW0FiiKZ4L7E
+        jwjGvLQ1pDfXc=
+X-Google-Smtp-Source: APiQypJV8aSwyyhTAVElL8APbeWX7FnwdSF4Vecycg//QO4qUd8+wy5MaJZgya31Eg/igholOxkqWhxTViDOsiBRtA==
+X-Received: by 2002:a17:90b:1116:: with SMTP id gi22mr10026804pjb.134.1585551939036;
+ Mon, 30 Mar 2020 00:05:39 -0700 (PDT)
+Date:   Mon, 30 Mar 2020 15:04:37 +0800
 In-Reply-To: <20200330070438.37316-1-howardchung@google.com>
-Message-Id: <20200330150424.Bluez.v1.4.I0a98775e764e9f8dba1652853b6e7ba440f4c75b@changeid>
+Message-Id: <20200330150424.Bluez.v1.5.Ie551a8a414d17604f04e10cf8d9c514a2b170e31@changeid>
 Mime-Version: 1.0
 References: <20200330070438.37316-1-howardchung@google.com>
 X-Mailer: git-send-email 2.26.0.rc2.310.g2932bb562d-goog
-Subject: [Bluez PATCH v1 4/6] monitor: Add support for decoding LE Set
- Advertising Interval
+Subject: [Bluez PATCH v1 5/6] test: Add test for LE Set Advertising Interval
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -72,82 +71,95 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following lines will show in btmon:
-bluetoothd: Set Advertising Intervals: 0x0140, 0x0280
+Perform the following steps to verify advertising intervals.
+Open a terminal on the DUT, and execute
+$ btmon
 
-@ MGMT Command: LE Set Advertising Interval (0x0060) plen 4
-        Min advertising interval: 0x0140
-        Max advertising interval: 0x0280
-@ MGMT Event: Command Complete (0x0001) plen 7
-      LE Set Advertising Interval (0x0060) plen 4
-        Status: Success (0x00)
-        Current settings: 0x00040ad0
+Open another terminal on the DUT, and register an advertisement.
+$ ./example-advertisement
+
+Observe that the default intervals are 1280 msec in btmon log.
+    < HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15
+        Min advertising interval: 1280.000 msec (0x0800)
+        Max advertising interval: 1280.000 msec (0x0800)
+Press ctrl-c to terminate the advertisement.
+
+Set new intervals to 200 ms.
+$ ./example-advertising-intervals 200 200
+
+It would show the following line in btmon log.
+    = bluetoothd: Set Advertising Intervals: 0x0140, 0x0140
+
+Register an advertisement again.
+$ ./example-advertisement
+
+Observe that the new intervals bcome 200 msec in btmon log.
+    < HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15
+        Min advertising interval: 200.000 msec (0x0140)
+        Max advertising interval: 200.000 msec (0x0140)
+Press ctrl-c to terminate the advertisement.
 
 Signed-off-by: Howard Chung <howardchung@google.com>
 ---
 
- monitor/control.c |  1 +
- monitor/packet.c  | 21 +++++++++++++++++++++
- 2 files changed, 22 insertions(+)
+ test/example-advertising-intervals | 48 ++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+ create mode 100644 test/example-advertising-intervals
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 790890fb4..cbf8d41da 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -201,6 +201,7 @@ static const char *settings_str[] = {
- 	"bondable", "link-security", "ssp", "br/edr", "hs", "le",
- 	"advertising", "secure-conn", "debug-keys", "privacy",
- 	"configuration", "static-addr", "phy-configuration", "wide-band-speech",
-+	"advertising-intervals",
- };
- 
- static void mgmt_new_settings(uint16_t len, const void *buf)
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 3d32563e6..00825cbb4 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -11669,6 +11669,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
- 	{ 15, "Static Address"		},
- 	{ 16, "PHY Configuration"	},
- 	{ 17, "Wideband Speech"		},
-+	{ 18, "Advertising Intervals"	},
- 	{ }
- };
- 
-@@ -12988,6 +12989,23 @@ static void mgmt_set_phy_cmd(const void *data, uint16_t size)
- 	mgmt_print_phys("Selected PHYs", selected_phys);
- }
- 
-+static void mgmt_set_adv_interval_cmd(const void *data, uint16_t size)
-+{
-+	uint16_t min_adv_interval = get_le16(data);
-+	uint16_t max_adv_interval = get_le16(data+2);
+diff --git a/test/example-advertising-intervals b/test/example-advertising-intervals
+new file mode 100644
+index 000000000..8afc7225e
+--- /dev/null
++++ b/test/example-advertising-intervals
+@@ -0,0 +1,48 @@
++#!/usr/bin/python
 +
-+	print_field("Min advertising interval: 0x%4.4x", min_adv_interval);
-+	print_field("Max advertising interval: 0x%4.4x", max_adv_interval);
-+}
++"""A simple script to set advertising intervals through the dbus method.
 +
-+static void mgmt_set_adv_interval_rsp(const void *data, uint16_t size)
-+{
-+	uint32_t current_settings = get_le32(data);
++Usage:
++    $ ./example_advertising_intervals.py min_interval_ms max_interval_ms
 +
-+	print_field("Current settings: 0x%8.8x", current_settings);
-+}
++    Example:
++    # Set both min and max advertising intervals to 200 ms.
++    $ ./exampel_advertising_intervals.py 200 200
++"""
++
++import dbus
++import time
++import subprocess
++import sys
++
++argv = sys.argv
++argc = len(argv)
++prog = argv[0]
++if argc == 3:
++    min_interval_ms = int(argv[1])
++    max_interval_ms = int(argv[2])
++    print 'Set advertising intervals: [%d, %d]' % (min_interval_ms,
++                                                   max_interval_ms)
++else:
++    print 'Usage: python %s min_interval_ms max_interval_ms' % prog
++    print '       python %s 200 200' % prog
++    sys.exit(1)
 +
 +
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -13207,6 +13225,9 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x0045, "Set PHY Configuration",
- 				mgmt_set_phy_cmd, 4, true,
- 				mgmt_null_rsp, 0, true },
-+	{ 0x0060, "LE Set Advertising Interval",
-+				mgmt_set_adv_interval_cmd, 4, true,
-+				mgmt_set_adv_interval_rsp, 4, true},
- 	{ }
- };
- 
++# Set advertising intervals.
++bus = dbus.SystemBus()
++adapter = bus.get_object('org.bluez', '/org/bluez/hci0')
++adapter.SetAdvertisingIntervals(
++        min_interval_ms, max_interval_ms,
++        dbus_interface='org.bluez.LEAdvertisingManager1')
++
++
++# Wait a little while for dbus method to complete.
++time.sleep(0.2)
++
++
++# Check the current settings using btmgmt.
++btmgmt_cmd = 'btmgmt info'
++for line in subprocess.check_output(btmgmt_cmd.split()).splitlines():
++    if 'current settings' in line:
++        print line.strip()
 -- 
 2.26.0.rc2.310.g2932bb562d-goog
 
