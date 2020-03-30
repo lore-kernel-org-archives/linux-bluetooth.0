@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CA5C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB57C2D0F1
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 22:02:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34AAE206CC
+	by mail.kernel.org (Postfix) with ESMTP id 5F4D520771
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 22:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730815AbgC3WCi (ORCPT
+        id S1730816AbgC3WCj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 18:02:38 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54803 "EHLO
+        Mon, 30 Mar 2020 18:02:39 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59362 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730794AbgC3WCi (ORCPT
+        with ESMTP id S1730813AbgC3WCi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 30 Mar 2020 18:02:38 -0400
 Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 12B25CECA3
+        by mail.holtmann.org (Postfix) with ESMTPSA id 666A7CECBE
         for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 00:12:10 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Move debugfs configuration above the selftests
-Date:   Tue, 31 Mar 2020 00:02:30 +0200
-Message-Id: <20200330220232.397218-1-marcel@holtmann.org>
+Subject: [PATCH 3/3] Bluetooth: btusb: Enable MSFT extension for Intel ThunderPeak devices
+Date:   Tue, 31 Mar 2020 00:02:32 +0200
+Message-Id: <20200330220232.397218-3-marcel@holtmann.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -36,46 +36,59 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is just a cosmetic clean to move the selftests configuration option
-to the bottom of the list of options.
+From: Miao-chen Chou <mcchou@chromium.org>
 
+The Intel ThundePeak BT controllers support the Microsoft vendor
+extension and they are using 0xFC1E for VsMsftOpCode.
+
+< HCI Command: Vendor (0x3f|0x001e) plen 1
+        00
+> HCI Event: Command Complete (0x0e) plen 15
+      Vendor (0x3f|0x001e) ncmd 1
+        Status: Success (0x00)
+        00 3f 00 00 00 00 00 00 00 01 50
+
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/Kconfig | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/bluetooth/btusb.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 165148c7c4ce..77703216a2e3 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -93,6 +93,14 @@ config BT_LEDS
- 	  This option selects a few LED triggers for different
- 	  Bluetooth events.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3bdec42c9612..87603145e4bd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_CW6622		0x100000
+ #define BTUSB_MEDIATEK		0x200000
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
++#define BTUSB_MSFT_VND_EXT	0x800000
  
-+config BT_DEBUGFS
-+	bool "Export Bluetooth internals in debugfs"
-+	depends on BT && DEBUG_FS
-+	default y
-+	help
-+	  Provide extensive information about internal Bluetooth states
-+	  in debugfs.
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -335,7 +336,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_MSFT_VND_EXT },
+ 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+@@ -3800,6 +3802,12 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
 +
- config BT_SELFTEST
- 	bool "Bluetooth self testing support"
- 	depends on BT && DEBUG_KERNEL
-@@ -120,12 +128,4 @@ config BT_SELFTEST_SMP
- 	  Run test cases for SMP cryptographic functionality, including both
- 	  legacy SMP as well as the Secure Connections features.
++		/* All Intel controllers that support the Microsoft
++		 * vendor extension are using 0xFC1E for VsMsftOpCode.
++		 */
++		if (id->driver_info & BTUSB_MSFT_VND_EXT)
++			hci_set_msft_opcode(hdev, 0xFC1E);
+ 	}
  
--config BT_DEBUGFS
--	bool "Export Bluetooth internals in debugfs"
--	depends on BT && DEBUG_FS
--	default y
--	help
--	  Provide extensive information about internal Bluetooth states
--	  in debugfs.
--
- source "drivers/bluetooth/Kconfig"
+ 	if (id->driver_info & BTUSB_MARVELL)
 -- 
 2.25.1
 
