@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB155C43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 08:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A98E2C43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 08:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94A9420748
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 08:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E00F20748
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 08:04:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FXYNFLRh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFIbd/iQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729603AbgC3IEV (ORCPT
+        id S1729605AbgC3IE2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 04:04:21 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:49017 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729586AbgC3IEV (ORCPT
+        Mon, 30 Mar 2020 04:04:28 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:37704 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729586AbgC3IE2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Mar 2020 04:04:21 -0400
-Received: by mail-pl1-f202.google.com with SMTP id w3so12381423plz.15
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 01:04:20 -0700 (PDT)
+        Mon, 30 Mar 2020 04:04:28 -0400
+Received: by mail-pf1-f202.google.com with SMTP id n28so14731646pfq.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 01:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=oOIxK3ZqM6LAAqkV1X/+V85HxrPtsXuK8F3nIXKiwNw=;
-        b=FXYNFLRhaCq6XHrYgg4fWOre+j9fLqwuoc9GbelSkdVsYcXrUXg3xr+qiGG5XNlIAm
-         2Big+71X0uGHSXe6T0g4+zMYUxvAHOAwofHgPfMnrxIbjjgoJwiJyMpkimqLIbSMqB01
-         QLiuC/vWF8BtI8BjhsEFw15YXMBwULQfpBYCTM9xzGSE7WBoPVkveQE1MHEVRQnC7sGk
-         erbai/tjC/QsVlYY6r8nMO94BlsvYWRaegIlXfIfocUGhFPDV3qvCXw5ssccrMYRO0zz
-         9v3KsU6oTwtw0DD81qdjMEhaoaO9N89qT0xSzYT7Yu05p8HpzhB/91W636lIx+ZESQVm
-         Cibg==
+        bh=DK0WI8AjNOdJ0HpShf0kaJsDhms0l6HDXBAdYLD2yWg=;
+        b=fFIbd/iQfmusNX5pncc1J3JWwI9WNrQZY6XwVEx/F2N7GTGG3T3xchIUQU9+p43jaY
+         ZWtIOwxvLKDcbAwsFExbFD9W4tIz1dQn1pIceXnJ1cqH9ivo5uO/cTT2j0l4XAaETpGV
+         imBijkNXLc4M60Fy94ORltp/dmtT/4huBN5HwKGEOEVvyumhqBLtpWIbH0pEbutICHgb
+         l9WKxNCkt7BI6LJhisz/IcwLuEh4Cse9tBOCeE+8lxH+UPyEx9Tcqhh7JX5aP8HIKAoK
+         MAtp9adLsJpDYWrob1jSQYI6cg10VTJrZZDAzn/u6JGrucwqndNho+a2erkQ5vXz9vSx
+         8fiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=oOIxK3ZqM6LAAqkV1X/+V85HxrPtsXuK8F3nIXKiwNw=;
-        b=l2gRb54wpVkEFbiQL+vkXFNkqq52/0nb49TtalM2C4aG2ZKpgB+zk3iqLrXNAR1UlU
-         bphS1trBlEaTgvo5W7lYeZcpnTQTXHN2EVkuB6ZcpW4GhIpRG5Cn1A2Qerpt0y0o0364
-         F6QCuYUW2SVPazivCUXU3uixPA66dgepZ4czC9yoBvQxSFqcp1YbngMLV4XamjZ80rCR
-         0nmg/MQdkDznvm6D5Y9JCniidTZaklhC9+E+wVEGQZ4/0gIFQf8/Ow94Bjagjp5z1ikf
-         lEnnOzxjkTKYJek5IaTz5vP8V5yucNabkuPlWyo5mQ4Ni+LHCFmCLXi4CjBg1P60kGQA
-         OirA==
-X-Gm-Message-State: ANhLgQ1YTXBgeEBH1LHF7Q8zr+r+7D4lMmtzcJK6vsi5AHSOXJ0tIX1d
-        A48rIH9jzzYrQLDFCx/VPsdKBISDn8lFnfhhlBsJTbOdHlws4Cs9zh/y/noMxk8Mki/aElQuQb/
-        cHhFrI4LyTPooa3myEStsnPGRzjumU4sb2qLpuoV3wfQA99YCjc+tDA6uU4pIxje1bk4hGp8P23
-        Bzdhw5IlhSko0=
-X-Google-Smtp-Source: ADFU+vuVXlyYF1UEpqbgBbsSsKB7dcFdgPJqh+YYyV2fnIAQwDBSJqHLK8d+ll0N2iCcZg/Bw4mvRksr6o8iyJrOmg==
-X-Received: by 2002:a17:90b:3849:: with SMTP id nl9mr14060702pjb.86.1585555459981;
- Mon, 30 Mar 2020 01:04:19 -0700 (PDT)
-Date:   Mon, 30 Mar 2020 16:03:54 +0800
+        bh=DK0WI8AjNOdJ0HpShf0kaJsDhms0l6HDXBAdYLD2yWg=;
+        b=L+YIddl7Zb4frtVaRnDj8i5eQjpULU1slEEiVLb0AyL57jN6wu72Uy692JA5h5pxgy
+         L3kT2z7GGY4jApZC30B0FHP5CVe6c8PWxzolo1VCF+6lj1MVlHkChk8mXOaTSXijg19p
+         vMDcU0VgsnL0dGE6jCE41bXNW9a/ygolTTTGzDwFXI970MQ4pCciLEwzAPRa1SP7hKBB
+         JkUeVIyN2gs6LaGe/qpzssEiyzusG8oVKH4eJWX/pn9vttorLWLkZ9e+3JugSKHcwaY4
+         WI2XoULcGY/eZWgnmorvZIb67KZza7L1Gi+K+Uu3Iyyio8TiTzqO0Cbpz+KDpI6LsdbE
+         kpgw==
+X-Gm-Message-State: ANhLgQ1epwF8wv/qLo631ZnLf5dao2tm9ILlEY3szi0aVwQ6cqEO+yzy
+        LK6cAz9lQTzPc8Gaz5pdVws7uECy6q+XohtOfJg/3H3222Go0LxEtVejUqU4y5Yr4cGs4DF4geN
+        G0fi2UtrpdIpHU4HN5sVG/koRlq98TlJJEawAe4058clwja6EVR3gzMf7cnyzHPVYHRMy1ZAEZC
+        as0NrZ31oIx9U=
+X-Google-Smtp-Source: ADFU+vsgmP6FVXLRehP83QdCph8TdQ0tLd3SqQkx2uzuxuxn06s5YkevKEEz7EHCmOXDmltwsWpPoKis2BqxNNGk6g==
+X-Received: by 2002:a17:90b:1985:: with SMTP id mv5mr14650899pjb.69.1585555464803;
+ Mon, 30 Mar 2020 01:04:24 -0700 (PDT)
+Date:   Mon, 30 Mar 2020 16:03:55 +0800
 In-Reply-To: <20200330080357.96989-1-howardchung@google.com>
-Message-Id: <20200330160343.Bluez.v2.3.Ia74c1ab0a71d90f46f10b4e32743cab722a97bbb@changeid>
+Message-Id: <20200330160343.Bluez.v2.4.I0a98775e764e9f8dba1652853b6e7ba440f4c75b@changeid>
 Mime-Version: 1.0
 References: <20200330080357.96989-1-howardchung@google.com>
 X-Mailer: git-send-email 2.26.0.rc2.310.g2932bb562d-goog
-Subject: [Bluez PATCH v2 3/6] doc: Add documentation for LE Set Advertising Interval
+Subject: [Bluez PATCH v2 4/6] monitor: Add support for decoding LE Set
+ Advertising Interval
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -71,71 +72,84 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+The following lines will show in btmon:
+bluetoothd: Set Advertising Intervals: 0x0140, 0x0280
+
+@ MGMT Command: LE Set Advertising Interval (0x0060) plen 4
+        Min advertising interval: 0x0140
+        Max advertising interval: 0x0280
+@ MGMT Event: Command Complete (0x0001) plen 7
+      LE Set Advertising Interval (0x0060) plen 4
+        Status: Success (0x00)
+        Current settings: 0x00040ad0
+
 Signed-off-by: Howard Chung <howardchung@google.com>
 ---
 
 Changes in v2: None
 
- doc/advertising-api.txt | 13 +++++++++++++
- doc/mgmt-api.txt        | 25 +++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ monitor/control.c |  2 +-
+ monitor/packet.c  | 21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index b0565eab2..9264cdb27 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -209,3 +209,16 @@ Properties	byte ActiveInstances
- 			Possible values: "1M"
- 					 "2M"
- 					 "Coded"
-+
-+		void SetAdvertisingIntervals(uint16 min_interval_ms,
-+					     uint16 max_interval_ms)
-+
-+			This method sets the advertising intervals.
-+
-+			The parameters min_interval_ms and max_interval_ms
-+			are specified in milli-seconds. Valid values of
-+			the intervals must fall between 20 ms and 10,240 ms.
-+
-+			Possible errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.InvalidArguments
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 27a41f334..5eff87e24 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2925,6 +2925,31 @@ Read Extended Controller Information Command
- 				Invalid Index
+diff --git a/monitor/control.c b/monitor/control.c
+index 6dfefd05f..75457029e 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -200,7 +200,7 @@ static const char *settings_str[] = {
+ 	"powered", "connectable", "fast-connectable", "discoverable",
+ 	"bondable", "link-security", "ssp", "br/edr", "hs", "le",
+ 	"advertising", "secure-conn", "debug-keys", "privacy",
+-	"configuration", "static-addr", "phy", "wbs"
++	"configuration", "static-addr", "phy", "wbs" "advertising-intervals",
+ };
  
+ static void mgmt_new_settings(uint16_t len, const void *buf)
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 3d32563e6..00825cbb4 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -11669,6 +11669,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
+ 	{ 15, "Static Address"		},
+ 	{ 16, "PHY Configuration"	},
+ 	{ 17, "Wideband Speech"		},
++	{ 18, "Advertising Intervals"	},
+ 	{ }
+ };
  
-+Set Advertising Intervals Command
-+=================================
+@@ -12988,6 +12989,23 @@ static void mgmt_set_phy_cmd(const void *data, uint16_t size)
+ 	mgmt_print_phys("Selected PHYs", selected_phys);
+ }
+ 
++static void mgmt_set_adv_interval_cmd(const void *data, uint16_t size)
++{
++	uint16_t min_adv_interval = get_le16(data);
++	uint16_t max_adv_interval = get_le16(data+2);
 +
-+	Command Code:		0x0101
-+	Controller Index:	<controller id>
-+	Command Parameters:	Min_Interval     (2 Octets)
-+				Max_Interval     (2 Octets)
-+	Return Parameters:	Current_Settings (4 Octets)
++	print_field("Min advertising interval: 0x%4.4x", min_adv_interval);
++	print_field("Max advertising interval: 0x%4.4x", max_adv_interval);
++}
 +
-+	This command is used to set advertising intervals. The intervals
-+	are expressed in multiples of 0.625 ms. The default values of
-+	both intervals are 0x0800. Valid Min_Interval and Max_Interval
-+	values must fall between 0x0020 and 0x4000.
++static void mgmt_set_adv_interval_rsp(const void *data, uint16_t size)
++{
++	uint32_t current_settings = get_le32(data);
 +
-+	The advertising intervals are first kept in hdev struct. The values
-+	would be sent to the controller and take effect when advertising is
-+	actually enabled. If the advertising intervals are set when
-+	advertising is already on, the advertising would be disabled and
-+	re-enabled to make the intervals take effect.
-+
-+	Possible errors:	Busy
-+				Rejected
-+				Invalid Parameters
++	print_field("Current settings: 0x%8.8x", current_settings);
++}
 +
 +
- Set Appearance Command
- ======================
+ struct mgmt_data {
+ 	uint16_t opcode;
+ 	const char *str;
+@@ -13207,6 +13225,9 @@ static const struct mgmt_data mgmt_command_table[] = {
+ 	{ 0x0045, "Set PHY Configuration",
+ 				mgmt_set_phy_cmd, 4, true,
+ 				mgmt_null_rsp, 0, true },
++	{ 0x0060, "LE Set Advertising Interval",
++				mgmt_set_adv_interval_cmd, 4, true,
++				mgmt_set_adv_interval_rsp, 4, true},
+ 	{ }
+ };
  
 -- 
 2.26.0.rc2.310.g2932bb562d-goog
