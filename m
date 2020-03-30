@@ -2,72 +2,63 @@ Return-Path: <SRS0=mSPA=5P=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C193CC43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 09:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8002C2D0E9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 09:27:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 907D92072E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 09:25:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 806AD2072E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 09:27:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="ZO78c02k"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="rtt1Fb3A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728152AbgC3JZY (ORCPT
+        id S1728680AbgC3J1Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 05:25:24 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:46697 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727975AbgC3JZX (ORCPT
+        Mon, 30 Mar 2020 05:27:25 -0400
+Received: from mail-vs1-f46.google.com ([209.85.217.46]:41137 "EHLO
+        mail-vs1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728656AbgC3J1Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Mar 2020 05:25:23 -0400
-Received: by mail-lj1-f194.google.com with SMTP id r7so9595946ljg.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 02:25:22 -0700 (PDT)
+        Mon, 30 Mar 2020 05:27:24 -0400
+Received: by mail-vs1-f46.google.com with SMTP id a63so10526211vsa.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 02:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=iJ9C9dYiCLJdGePHBAtBsqoHOR7gP2km4zdJEPXWv48=;
-        b=ZO78c02kdGUnejHar4FAM1MpwQyJo5fk9xywjEDnuwfTDOcJe6EgcdWi54439fEOXU
-         1pPK2aJhSPuMKvCDq/A2PESadk6YNVy76BDbFZaJnEIac8saT56MKxp8Xd3bjN57kbdK
-         fWAJAv4TUX24hkbO5FCeenOrG2p/CAseJuGh1kA/52wOgU0OdX8bH1e0M5cwaBbO0aX0
-         USau8FFUhgAFQaoVk9AKUYWL3JwyO31DSs9wqh+0+dshyC0QQeXnQucT6o0I7gKCf4fr
-         bIjtpmCHjVEKEYM5IJEGFVMQoIlokjBZ5r2CN6BtG0an9oqwOrIJ3wcNB7wjhMKTtAhi
-         QUjw==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=g+MPuHyk7KP37PjrXpiyFYSQ8eUGQQaksY9hqdrrflE=;
+        b=rtt1Fb3AOPM+yzZ3sO0hOVb3tY2IZQW0hp8EfyidQSjOrbKNKuNTIqfw+bVptdNY7h
+         StAI+ND0LjIuwbF6wa1srr7vN5obmio2LGg7YDlBi/nPrIhSy418KWvi/um2ZIRwRHf3
+         TgxVzaBclkcERRztnRCPd49qewwp4ond3mBu+TAHo5c+lRa9uak1bzjGd1XoBqEnxfiP
+         gW591QeTnyF9hTXr+4XXQ3Kv2MKss7nK/F5FRyhB92WUeTf7JLBJFvuxCxgOUeBa+yq9
+         McaRDTA/mkxTTYkK05w8GNdO/t8fw7gF8zuXZQZqj1exZnymGu5+UySOVngCQG1qX16c
+         N0PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=iJ9C9dYiCLJdGePHBAtBsqoHOR7gP2km4zdJEPXWv48=;
-        b=D6DvsZBBlmWs+LYWmncptqIy422QaOw3kxhFy6YpMlbhGXmSbsbQZ63QtBZ7QUHCdr
-         7vBugW/QRerumC7YRsOo5q7uUHxCzMDMPMKeYoZ0sCWmFjnwSGHah7UL4mOk7WQfRATk
-         fBxiKoTn8VEDl7VGz3sf3uf5y+jhn/FlLNgFxWxg6TZaoWM7knZyd39QwDXmSEq0/DSu
-         aVtvCO4PqtyBjPrHSqU+g6BFPSsvP0UtGUJs9udOeqgznzxybFwkEG6weRZDFPpNObXM
-         zy3vh0Cl8KpuL+fm1oPfbOvDyz1cAX3pfiFPV7/PI1KrP3r04sLEodnS6TwNbqpMTw7N
-         0ruA==
-X-Gm-Message-State: AGi0PuZMqQtpyAivEtwO/47s2FCcxukCSX7EWA+/Jf/odd+yzkDMEv4o
-        bqncY/uA0eeAfsVgIPYoAonrQA==
-X-Google-Smtp-Source: APiQypIyWJYgHOhuAvbJ2jdL/QaeHA76kWeN/yfNqPzR3JD1/kfe0TN+pjLGBrnzLuDpQLhs6qO3GA==
-X-Received: by 2002:a2e:9dcf:: with SMTP id x15mr2316503ljj.106.1585560321453;
-        Mon, 30 Mar 2020 02:25:21 -0700 (PDT)
-Received: from ix.localnet (45-11-60-42.ip4.greenlan.pl. [45.11.60.42])
-        by smtp.gmail.com with ESMTPSA id v20sm6571987lfe.52.2020.03.30.02.25.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2020 02:25:20 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     Howard Chung <howardchung@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
-        chromeos-bluetooth-upstreaming@chromium.org
-Subject: Re: [Bluez PATCH v2 3/6] doc: Add documentation for LE Set Advertising Interval
-Date:   Mon, 30 Mar 2020 11:25:19 +0200
-Message-ID: <528530767.EP9f1MIPRH@ix>
-Organization: CODECOUP
-In-Reply-To: <20200330160343.Bluez.v2.3.Ia74c1ab0a71d90f46f10b4e32743cab722a97bbb@changeid>
-References: <20200330080357.96989-1-howardchung@google.com> <20200330160343.Bluez.v2.3.Ia74c1ab0a71d90f46f10b4e32743cab722a97bbb@changeid>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=g+MPuHyk7KP37PjrXpiyFYSQ8eUGQQaksY9hqdrrflE=;
+        b=MOaQQ80FllqzoYhqoKNGkYUjqL0bzKK+we1QoNlPpmIUjxFawocxTV/7I6qF6caK6o
+         Ij1uXfGsPJLnMrAwO6Wk8w/HMcgByI700nx7pdjCXblZDy3XrjUw+bYw06I9HYD1mlQO
+         gw6JfX8yrmAkdZ6shykIYjrSWD61pVf74sFrCIY+MkIMvCgbHqN3/z4il/M7rI6R0t6x
+         cf+wMkQC2dbMcbQJfh/i/Lcd7lyTwUty9NJcSXvdw6VlYvb+U7g305oE6v34Y6AAXMzs
+         kNa8poWpxPMi+KhFz+zVdX7QBho4UbhIrC6Lvy27iwWMf3znAaX7VMxYUyPGKXt3ZqZZ
+         W4Tg==
+X-Gm-Message-State: AGi0PuaIyGACFCOru7gMyGmsDZMeA0lWJ/B0+UNYONstxOUwm1i19x8p
+        zb24/qXb8ifOn8oeeSJq4X3spTlHQp5qK79cj1yRh8U1fnNbww==
+X-Google-Smtp-Source: APiQypK/3I3AMPc3d9xmmZwH/BnLegYF1B7nPNK7Wpy9F+Y7/Id3kXPO3P7oEkYcOz7I73TfAxWy4cGgVJ3lBjdS6a4=
+X-Received: by 2002:a67:f34b:: with SMTP id p11mr7226980vsm.14.1585560442393;
+ Mon, 30 Mar 2020 02:27:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+From:   =?UTF-8?B?UmFmYcWCIEdhamRh?= <rafal.gajda@silvair.com>
+Date:   Mon, 30 Mar 2020 11:27:11 +0200
+Message-ID: <CAFcXi1wcxdckvPhs_Rf-4dB4Ws6wvqiuMjXfc_zP2u+OK9ToPw@mail.gmail.com>
+Subject: Incorrect IV update behavior
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -75,89 +66,24 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Monday, 30 March 2020 10:03:54 CEST Howard Chung wrote:
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> 
-> Changes in v2: None
-> 
->  doc/advertising-api.txt | 13 +++++++++++++
->  doc/mgmt-api.txt        | 25 +++++++++++++++++++++++++
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index b0565eab2..9264cdb27 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -209,3 +209,16 @@ Properties	byte ActiveInstances
->  			Possible values: "1M"
->  					 "2M"
->  					 "Coded"
-> +
-> +		void SetAdvertisingIntervals(uint16 min_interval_ms,
-> +					     uint16 max_interval_ms)
-> +
-> +			This method sets the advertising intervals.
-> +
-> +			The parameters min_interval_ms and 
-max_interval_ms
-> +			are specified in milli-seconds. Valid values of
-> +			the intervals must fall between 20 ms and 10,240 
-ms.
-> +
-> +			Possible errors: org.bluez.Error.Failed
-> +					 org.bluez.Error.InProgress
-> +					 
-org.bluez.Error.InvalidArguments
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 27a41f334..5eff87e24 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -2925,6 +2925,31 @@ Read Extended Controller Information Command
->  				Invalid Index
-> 
-> 
-> +Set Advertising Intervals Command
-> +=================================
-> +
-> +	Command Code:		0x0101
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Min_Interval     (2 Octets)
-> +				Max_Interval     (2 Octets)
-> +	Return Parameters:	Current_Settings (4 Octets)
-> +
-> +	This command is used to set advertising intervals. The intervals
-> +	are expressed in multiples of 0.625 ms. The default values of
-> +	both intervals are 0x0800. Valid Min_Interval and Max_Interval
-> +	values must fall between 0x0020 and 0x4000.
-> +
-> +	The advertising intervals are first kept in hdev struct. The values
-> +	would be sent to the controller and take effect when advertising is
-> +	actually enabled. If the advertising intervals are set when
-> +	advertising is already on, the advertising would be disabled and
-> +	re-enabled to make the intervals take effect.
-> +
-> +	Possible errors:	Busy
-> +				Rejected
-> +				Invalid Parameters
-> +
-> +
->  Set Appearance Command
->  ======================
+It looks like there is a bug in daemon IV update procedure handling.
 
+When node with iv=3Dn and ivu=3DFalse receives beacon it should:
+a. beacon with IV=3Dn+1, IVU=3DTrue - set own IVU=3DTrue, send with IV=3Dn,
+don't reset sequence
+b. beacon with IV=3Dn+1, IVU=3DFalse - set own IV=3Dn+1, send with IV=3Dn+1
+and reset sequence
 
-I feel this should be per instance settings, and if we want this level of 
-finetuning we would probably need to have new command for adding advertising 
-sets (where we could fix more, eg not limit data to 255 bytes).
+Currently, when daemon receives beacon with IV=3Dn+1, IVU=3DFalse it will
+start sending messages with new IV and set sequence to 0.
+However if daemon receives another beacon with IV=3Dn+1, IVU=3DTrue it
+will go back to sending messages with old IV=3Dn (IVU will be set to
+True).
+Because sequence number has been reset those messages will be dropped
+by replay protection and node will lose communication.
 
-Other option would be to maybe have new flags in current Add Advertising that 
-would allow to choose from low,med,hi (eg based on GAP recommended values) 
-intervals, and then allow to finetune those via extra command or sysfs?
+Once IV is updated daemon should not go back to using the old value.
+--=20
+Rafa=C5=82 Gajda
 
-Just my two cents.
-
--- 
-pozdrawiam
-Szymon Janc
-
-
+Silvair Sp. z o.o.
