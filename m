@@ -2,100 +2,102 @@ Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BDCC2D0EE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF6EC2D0EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8AC820848
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44BA120787
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="RCLlCYZr"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="jFCb/SCT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726622AbgCaI2F (ORCPT
+        id S1729425AbgCaI2F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 31 Mar 2020 04:28:05 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52557 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgCaI2E (ORCPT
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37835 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726397AbgCaI2F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:28:04 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 11so348753wmi.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 01:28:03 -0700 (PDT)
+        Tue, 31 Mar 2020 04:28:05 -0400
+Received: by mail-wr1-f66.google.com with SMTP id w10so24832988wrm.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 01:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=qvkcZLb0lo48Z4SJcR3PUEwietXVioWin8LEMOg0uxg=;
-        b=RCLlCYZrtHnynHJdOb/3G/CL9LKdENl5ItXP9Q6QIhlLz4Qx2xtPwZ5YW8x3xynaXF
-         rQ4LAv9kwG9odDyPXWXBKm5UmfE2U1XVnksvvHLGKgTLtOGT5ExDEkinpejScE9tqbbP
-         kV6tJcR7OiyCIzTtyCx2lws2TPZfLFH801t1ze+5lBqH/980bu3EgRHlabn/iAFNYv2m
-         ghCcnq7zlsBUKLu36tD42/vy92aNpAcFjr+AkDe6S6oXu7dTeoWB7dc2/wj6tgKwJ4er
-         jFTWtUlsGTtLCvxPv6KJVaQoFm5QGKIw6Ltul9zj6LPwWeBim7WXljwkkktn1rdC+S6F
-         gnlA==
+        bh=NjfpDgfF85/BorhabETGyOLsEUZ0cTg/HDVqLdwRhoc=;
+        b=jFCb/SCTkw5VZRhK6XXne/gbHMd5b22AcRn3AIuvYkiWmdh7TL17i+BEdS2MV5Zseq
+         pBRNHCFByDRsKWRKKfjE0wf8cvWpskBC10WXJak+y7YoAPVZYRRIPUX/XXMtcIdlFQ1C
+         SMxN7IxaLA0+tNzh8/yo3/MfO9hePNym5mhfaxaU3g/nALAbupyXip4eJnYKcso7dcK0
+         qLal0/eIxH1CwlKq/po5zTgVQhm2rjnHpA9ugnfKL1YU8ZWHAC50GGFiQMT+xrXHXYOw
+         /BCxS7TCW4G0YcRfUQnsYZadvaqUZxoyekxeXRFO4j3mdi0d3OfwDtQMK6Ngv5lTYQbC
+         U19w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qvkcZLb0lo48Z4SJcR3PUEwietXVioWin8LEMOg0uxg=;
-        b=TOLbAj1PP0ZffaXnfXIC5f56eM2Q8+O3ed4mPgri1iaUtqk1B2XxFiiUS5LS6d+yh2
-         vpaqWOwzAilLBVu+4FyA8eCgWkEXXkQN4v3pFN2D1d2s9HfrvZ9SB47y3n1HlJwq9HKN
-         SGNhsx/6C/65UwPQ+r6RjBTdZMnxvuilUCFiR/K0Yf510NYzNsJmQfekkuei8D0ZnEtF
-         Qd5/x1WMPakX/a5yHhJWe4Kb1er0u5b3chvO7QAJh7v4mU2FmP1IQvIYwTpQCeTenRSF
-         RXxoBqnFwbU79qOatGsNGzRt1C8xqlWh/faobYRsjj4/zOmtcvTjqvEDlbSVaNHamBsX
-         k9Qg==
-X-Gm-Message-State: ANhLgQ3WgijH4fExAlu2K7Qlc4Rnz8gxtazH0gSKoy/G6kJ28sbMbnYA
-        qiwwdF5O5lZbuCep1cGNvTIxLaRfaLsFPA==
-X-Google-Smtp-Source: ADFU+vsmqF/Qb8SgppEvK5tFTk4jJBtD2EvjB00pdB4mqwGf1YqE7tbsQheUjNZx7WaNjWsr5ABf1A==
-X-Received: by 2002:a1c:b4d4:: with SMTP id d203mr2292987wmf.85.1585643282373;
-        Tue, 31 Mar 2020 01:28:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=NjfpDgfF85/BorhabETGyOLsEUZ0cTg/HDVqLdwRhoc=;
+        b=YylIGL0uVIXlLFJonXJ277GLojH3nFinLlrfjtQMkJe6LTbiHt1JCj8d11La0Tdwm4
+         jVUaz9mbJ9mWoF715FkkQIrF93bbaJwtBkD7PQzxjhSlE/jsIsq41BY35SOcALQIQ2R+
+         qU4AWgh1liRCGD9oesJcSGVZTmxMk/eqdg0caQK6oho3d9xaK6fdchFGyV7i8nMtEnUS
+         t+zfD6InwWEkjJ4LSHmOPgQcM4AmiLxMbvelWzwfH03s5uD+M12qYEhbUIWghLZrfjjL
+         g5BjgNU1WRS+dtnY9BW0p5MrR/dsv7QpzwXYdMB7dNm1y7SR+VtWomFFfgfcvHxeKTTY
+         3YQQ==
+X-Gm-Message-State: ANhLgQ19agJnwIT+T7s7skUkhzkIONGLSLgvZYh/Q/OVN6Ep1sE0jZRB
+        dz8IpEW971uubg+rUGFOiXME/gFD18Cm1g==
+X-Google-Smtp-Source: ADFU+vvTZrgKyJe/j9lYHEVwuja42dLNAmCmZNxG7saaARPX/7KmtB2CRj58kD76SRUfquW71LggFg==
+X-Received: by 2002:adf:aade:: with SMTP id i30mr19136700wrc.336.1585643283357;
+        Tue, 31 Mar 2020 01:28:03 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x16sm6172296wrn.71.2020.03.31.01.28.01
+        by smtp.gmail.com with ESMTPSA id x16sm6172296wrn.71.2020.03.31.01.28.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 01:28:01 -0700 (PDT)
+        Tue, 31 Mar 2020 01:28:02 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/6] Honor provisioner's capabilities during authentication
-Date:   Tue, 31 Mar 2020 10:28:04 +0200
-Message-Id: <20200331082810.10856-1-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ 1/6] tools/mesh-cfgclient: Display unprovisioned OOB data
+Date:   Tue, 31 Mar 2020 10:28:05 +0200
+Message-Id: <20200331082810.10856-2-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200331082810.10856-1-michal.lowas-rzechonek@silvair.com>
+References: <20200331082810.10856-1-michal.lowas-rzechonek@silvair.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds ability for the provisioner application to declare a set
-of supported authentication methods via ProvisionAgent1 API. The daemon
-will then select the most secure method available on both ends.
+---
+ tools/mesh-cfgclient.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-This fixes an issue where nodes declaring OOB public key availability
-could not be provisioned by applications lacking means to obtain such
-keys.
-
-Michał Lowas-Rzechonek (6):
-  tools/mesh-cfgclient: Display unprovisioned OOB data
-  mesh: Remove unused 'server' argument
-  mesh: Clean up naming of provisioning callbacks
-  mesh: Refresh provisioner's capabilities
-  mesh: Honor provisioner's capabilities
-  doc/mesh-api: OOB Information field is 16 bit, not 32
-
- doc/mesh-api.txt       |   2 +-
- mesh/agent.c           | 105 ++++++++++++++++++++++++-----
- mesh/agent.h           |   2 +
- mesh/manager.c         |  33 ++++++---
- mesh/prov-initiator.c  | 148 +++++++++++++++++++++++++++--------------
- mesh/provision.h       |   6 +-
- tools/mesh-cfgclient.c |  18 +++++
- 7 files changed, 234 insertions(+), 80 deletions(-)
-
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index ae13c4409..eafabf825 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -1533,6 +1533,17 @@ static struct l_dbus_message *scan_result_call(struct l_dbus *dbus,
+ 	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
+ 	l_free(str);
+ 
++	if (n >= 18) {
++		str = l_util_hexstring_upper(prov_data + 16, 2);
++		bt_shell_printf("\t" COLOR_GREEN "OOB = %s\n" COLOR_OFF, str);
++	}
++
++	if (n >= 22) {
++		str = l_util_hexstring_upper(prov_data + 18, 4);
++		bt_shell_printf("\t" COLOR_GREEN "URI Hash = %s\n" COLOR_OFF,
++									str);
++	}
++
+ 	/* TODO: Handle the rest of provisioning data if present */
+ 
+ 	dev = l_queue_find(devices, match_device_uuid, prov_data);
 -- 
 2.20.1
 
