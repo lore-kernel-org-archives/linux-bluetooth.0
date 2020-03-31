@@ -1,88 +1,313 @@
-Return-Path: <SRS0=mSPA=5P=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A587AC43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 23:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0A6C43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 00:00:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7236620784
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Mar 2020 23:14:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA1F720784
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 00:00:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Eky9+P5f"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AuEpdqJa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729060AbgC3XOh (ORCPT
+        id S1729197AbgCaAAr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 19:14:37 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:41692 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728876AbgC3XOh (ORCPT
+        Mon, 30 Mar 2020 20:00:47 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:40505 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727553AbgCaAAr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Mar 2020 19:14:37 -0400
-Received: by mail-oi1-f193.google.com with SMTP id k9so17300911oia.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 16:14:37 -0700 (PDT)
+        Mon, 30 Mar 2020 20:00:47 -0400
+Received: by mail-lf1-f67.google.com with SMTP id j17so15746376lfe.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 17:00:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4rknbqjutgBSTudD2Y4+sw3QTe4JdzLaehn0U2S3BNU=;
-        b=Eky9+P5fAHRPmWdrjwfWpXFS1ONOwkpHhTeqaekddHI1qjLMxFkWUzY6tkpPlJRVJE
-         5s2rzZDOi1/nVFVUI2Qz6hXgxLBkj2R8Wg3LcHvkpgY3efA9sZzkwWAopOPBb1gFVoqE
-         uoPu97ySj+lp0dkex3vm8AlH2cIcHYVrIw5pg=
+         :cc:content-transfer-encoding;
+        bh=GhTora22O/xRri2wav17l2dK9RxeL1NLGG+m07hxnBU=;
+        b=AuEpdqJaTlWMT5ovqDAxZ0mtk0Tx9FwsjiCkWtRs+sf1k1V5ektgE4HuZ3clEnJ9cw
+         28tmNb5R+Z9DN+25mkRmkZC7rT0evaKJix82ef9Pif1hH7PgdBbExReUW6Th5fANsVk/
+         vxl72Mk+QWUOoOXRpsmF/9a+nGS+i07kZdDys=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4rknbqjutgBSTudD2Y4+sw3QTe4JdzLaehn0U2S3BNU=;
-        b=BaosWipnoG3gcXSyrICfICMhCfVaXbL4kZG5hcRd/rar62uup8DuxKnYf2Q0mZ8pDa
-         zQWDbAlwcNzmnds0eSsonFukHTHbXzZpPd/5vdI/IBCJQVHpyr9hQ+kbbaxdsLtWcJ2F
-         YCVX8uScalAlJo87jlyTpYxycFeg+bAIpiQaN7r9ChmEgVYtbl8iJC55me7lUaonp6Ut
-         FzoiLIn3tE7EmOwsmT8ajK2nJbmriTaJvRqqp3z2fCr8ZqWPDEflpKv/m3OfF15vGEqu
-         tmypsSuGgPLkndliKRS5WWHDcKTx68kYXr01MXdWqPJyDCnd2mkgmhVwFw6Dw0GaOW3S
-         oIAA==
-X-Gm-Message-State: ANhLgQ3e3KN5cfvKy+XlTW/UUyjb3wRE0INEiU2jUwRILUIbw7HzueUY
-        jcVXhcTq8ZPnZRmdxCBBHoTPyXT1oAEvYpfxjklN8dtx
-X-Google-Smtp-Source: ADFU+vtukEEsROiZkHV64NMYREvY1ellCkjIjKNCOuoqmuptmhNbwfEdLRAzT2TiRSAEGaifb6BPWxNrB2rbLzQU0ow=
-X-Received: by 2002:aca:d10:: with SMTP id 16mr334707oin.142.1585610076831;
- Mon, 30 Mar 2020 16:14:36 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=GhTora22O/xRri2wav17l2dK9RxeL1NLGG+m07hxnBU=;
+        b=YvUu+SWr8KT+pd1C4GiwDWdfC0bceyLB22XCBT7+Z0HMyWrNCSPXD1c8l/RsbYUYG/
+         gcWf4PZmXtzawyoUNmQC6LkhcmizBDsqGsXx88WygXIAYhZ1WqePSDG8fiDI9gRbC+bd
+         wGD204HoFGvWfgYk1mR6zJhkeJdtePcAr4IYaGcb+EFHnMhTgdWr6ZL4RE0Mop8nD2RU
+         Q6oVhZFZXs6KqMfJHuFs6I6tnscr5g29oQ31HGQWizC6WC37B4cJV6rMXaU948P5TSKx
+         K18WDg/OeiVK8y9WbJ6iy8lxwUVNxYb/tQb95PMrbzN8DPHVv5XWbok3jZNwHwRSvwVf
+         rfFA==
+X-Gm-Message-State: AGi0PuaXG4xeZtN9uWkiGTpaztrFsvbbnfZ+/DecfKuOHA7P8IYq87hf
+        BouXipp38M9Sf58xoROYq4/Q5AASJi/SeEc7FE6lnw==
+X-Google-Smtp-Source: APiQypJufoxcibfjDOqnStaQybUmnyI2TWBJoKFqz3cpvebIREGAV+EAXQpeVvU4vf5AuoMMqlV1gCcLS1TZBMarq1M=
+X-Received: by 2002:a19:c752:: with SMTP id x79mr9351805lff.144.1585612843568;
+ Mon, 30 Mar 2020 17:00:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200328003423.14079-1-sonnysasaka@chromium.org> <CACE38CD-C394-4420-900A-3FF35932AE3D@holtmann.org>
-In-Reply-To: <CACE38CD-C394-4420-900A-3FF35932AE3D@holtmann.org>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Mon, 30 Mar 2020 16:14:24 -0700
-Message-ID: <CAOxioNk-XHEOLZXenaYOhid5t7d44vFm2C6sqmk=a_2PABHejw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Always request for user confirmation for Just Works
+References: <20200328074632.21907-1-mcchou@chromium.org> <20200328004507.v4.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+ <9CC14296-9A0E-4257-A388-B2F7C155CCE5@holtmann.org>
+In-Reply-To: <9CC14296-9A0E-4257-A388-B2F7C155CCE5@holtmann.org>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Mon, 30 Mar 2020 17:00:32 -0700
+Message-ID: <CABmPvSF=pcffe18iAKgbU8bwFvVDp-NKeAFGw8auKoVd1XAuTQ@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] Bluetooth: btusb: Indicate Microsoft vendor
+ extension for Intel 9460/9560 and 9160/9260
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Sonny Sasaka <sonnysasaka@gmail.com>
+        Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks, Marcel.
+Hi Marcel,
 
-On Mon, Mar 30, 2020 at 3:24 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Mar 30, 2020 at 3:06 PM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 >
-> Hi Sonny,
+> Hi Miao-chen,
 >
-> > To improve security, always give the user-space daemon a chance to
-> > accept or reject a Just Works pairing (LE). The daemon may decide to
-> > auto-accept based on the user's intent.
+> > This adds a bit mask of driver_info for Microsoft vendor extension and
+> > indicates the support for Intel 9460/9560 and 9160/9260. See
+> > https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+> > microsoft-defined-bluetooth-hci-commands-and-events for more informatio=
+n
+> > about the extension. This also add a kernel config, BT_MSFTEXT, and a
+> > source file to facilitate Microsoft vendor extension functions.
+> > This was verified with Intel ThunderPeak BT controller
+> > where msft_vnd_ext_opcode is 0xFC1E.
 > >
-> > Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> >
+> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 > > ---
-> > net/bluetooth/smp.c | 12 ++++++++++--
-> > 1 file changed, 10 insertions(+), 2 deletions(-)
+> >
+> > Changes in v4:
+> > - Introduce CONFIG_BT_MSFTEXT as a starting point of providing a
+> > framework to use Microsoft extension
+> > - Create include/net/bluetooth/msft.h and net/bluetooth/msft.c to
+> > facilitate functions of Microsoft extension.
+> >
+> > Changes in v3:
+> > - Create net/bluetooth/msft.c with struct msft_vnd_ext defined internal=
+ly
+> > and change the hdev->msft_ext field to void*.
+> > - Define and expose msft_vnd_ext_set_opcode() for btusb use.
+> > - Init hdev->msft_ext in hci_alloc_dev() and deinit it in hci_free_dev(=
+).
+> >
+> > Changes in v2:
+> > - Define struct msft_vnd_ext and add a field of this type to struct
+> > hci_dev to facilitate the support of Microsoft vendor extension.
+> >
+> > drivers/bluetooth/btusb.c        | 11 +++++++++--
+> > include/net/bluetooth/hci_core.h |  4 ++++
 >
-> patch has been applied to bluetooth-next tree.
+> so I don=E2=80=99t like the intermixing of core features and drivers unle=
+ss it is needed. In this case it is not needed since we can first introduce=
+ the core support and then enable the driver to use it.
+I will make btusb changes as a different commit in v5.
 >
-> Regards
+> > net/bluetooth/Kconfig            |  9 ++++++++-
+> > net/bluetooth/Makefile           |  1 +
+> > net/bluetooth/msft.c             | 16 ++++++++++++++++
+> > net/bluetooth/msft.h             | 19 +++++++++++++++++++
+> > 6 files changed, 57 insertions(+), 3 deletions(-)
+> > create mode 100644 net/bluetooth/msft.c
+> > create mode 100644 net/bluetooth/msft.h
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 3bdec42c9612..0fe47708d3c8 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -21,6 +21,7 @@
+> > #include <net/bluetooth/bluetooth.h>
+> > #include <net/bluetooth/hci_core.h>
+> >
+> > +#include "../../net/bluetooth/msft.h"
 >
-> Marcel
+> This was my bad. I didn=E2=80=99t realized that drivers need to the set t=
+he opcode and not the core. I updated the patches to fix this.
+I will move it to include/net/bluetooth/.
 >
+> > #include "btintel.h"
+> > #include "btbcm.h"
+> > #include "btrtl.h"
+> > @@ -58,6 +59,7 @@ static struct usb_driver btusb_driver;
+> > #define BTUSB_CW6622          0x100000
+> > #define BTUSB_MEDIATEK                0x200000
+> > #define BTUSB_WIDEBAND_SPEECH 0x400000
+> > +#define BTUSB_MSFT_VND_EXT   0x800000
+> >
+> > static const struct usb_device_id btusb_table[] =3D {
+> >       /* Generic Bluetooth USB device */
+> > @@ -335,7 +337,8 @@ static const struct usb_device_id blacklist_table[]=
+ =3D {
+> >
+> >       /* Intel Bluetooth devices */
+> >       { USB_DEVICE(0x8087, 0x0025), .driver_info =3D BTUSB_INTEL_NEW |
+> > -                                                  BTUSB_WIDEBAND_SPEEC=
+H },
+> > +                                                  BTUSB_WIDEBAND_SPEEC=
+H |
+> > +                                                  BTUSB_MSFT_VND_EXT }=
+,
+> >       { USB_DEVICE(0x8087, 0x0026), .driver_info =3D BTUSB_INTEL_NEW |
+> >                                                    BTUSB_WIDEBAND_SPEEC=
+H },
+> >       { USB_DEVICE(0x8087, 0x0029), .driver_info =3D BTUSB_INTEL_NEW |
+> > @@ -348,7 +351,8 @@ static const struct usb_device_id blacklist_table[]=
+ =3D {
+> >       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =3D BTUSB_INTEL |
+> >                                                    BTUSB_WIDEBAND_SPEEC=
+H },
+> >       { USB_DEVICE(0x8087, 0x0aaa), .driver_info =3D BTUSB_INTEL_NEW |
+> > -                                                  BTUSB_WIDEBAND_SPEEC=
+H },
+> > +                                                  BTUSB_WIDEBAND_SPEEC=
+H |
+> > +                                                  BTUSB_MSFT_VND_EXT }=
+,
+>
+> Lets start with ThunderPeak 0x0025 for now. We are looking into enabling =
+this in a more generic fashion, but for now lets just enable one card.
+Ack.
+>
+> >
+> >       /* Other Intel Bluetooth devices */
+> >       { USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+> > @@ -3800,6 +3804,9 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
+;
+> >               set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> >               set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> > +
+> > +             if (id->driver_info & BTUSB_MSFT_VND_EXT)
+> > +                     msft_set_opcode(hdev, 0xFC1E);
+> >       }
+> >
+> >       if (id->driver_info & BTUSB_MARVELL)
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
+ci_core.h
+> > index d4e28773d378..239cae2d9998 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -484,6 +484,10 @@ struct hci_dev {
+> >       struct led_trigger      *power_led;
+> > #endif
+> >
+> > +#if IS_ENABLED(CONFIG_BT_MSFTEXT)
+> > +     __u16                   msft_opcode;
+> > +#endif
+> > +
+> >       int (*open)(struct hci_dev *hdev);
+> >       int (*close)(struct hci_dev *hdev);
+> >       int (*flush)(struct hci_dev *hdev);
+> > diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> > index 165148c7c4ce..5929ccb02b39 100644
+> > --- a/net/bluetooth/Kconfig
+> > +++ b/net/bluetooth/Kconfig
+> > @@ -30,7 +30,7 @@ menuconfig BT
+> >               L2CAP (Logical Link Control and Adaptation Protocol)
+> >               SMP (Security Manager Protocol) on LE (Low Energy) links
+> >            HCI Device drivers (Interface to the hardware)
+> > -          RFCOMM Module (RFCOMM Protocol)
+> > +          RFCOMM Module (RFCOMM Protocol)
+>
+> Unrelated changes don=E2=80=99t belong here.
+This was probably done by my editor, I will recover it.
+>
+> >            BNEP Module (Bluetooth Network Encapsulation Protocol)
+> >            CMTP Module (CAPI Message Transport Protocol)
+> >            HIDP Module (Human Interface Device Protocol)
+> > @@ -93,6 +93,13 @@ config BT_LEDS
+> >         This option selects a few LED triggers for different
+> >         Bluetooth events.
+> >
+> > +config BT_MSFTEXT
+> > +     bool "Enable Microsoft extensions"
+> > +     depends on BT
+> > +     help
+> > +       This options enables support for the Microsoft defined HCI
+> > +       vendor extensions.
+> > +
+> > config BT_SELFTEST
+> >       bool "Bluetooth self testing support"
+> >       depends on BT && DEBUG_KERNEL
+> > diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> > index fda41c0b4781..41dd541a44a5 100644
+> > --- a/net/bluetooth/Makefile
+> > +++ b/net/bluetooth/Makefile
+> > @@ -19,5 +19,6 @@ bluetooth-y :=3D af_bluetooth.o hci_core.o hci_conn.o=
+ hci_event.o mgmt.o \
+> > bluetooth-$(CONFIG_BT_BREDR) +=3D sco.o
+> > bluetooth-$(CONFIG_BT_HS) +=3D a2mp.o amp.o
+> > bluetooth-$(CONFIG_BT_LEDS) +=3D leds.o
+> > +bluetooth-$(CONFIG_BT_MSFTEXT) +=3D msft.o
+> > bluetooth-$(CONFIG_BT_DEBUGFS) +=3D hci_debugfs.o
+> > bluetooth-$(CONFIG_BT_SELFTEST) +=3D selftest.o
+> > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> > new file mode 100644
+> > index 000000000000..7609932c48ca
+> > --- /dev/null
+> > +++ b/net/bluetooth/msft.c
+> > @@ -0,0 +1,16 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* Copyright (C) 2020 Google Corporation */
+> > +
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/hci_core.h>
+> > +
+> > +#include "msft.h"
+> > +
+> > +void msft_set_opcode(struct hci_dev *hdev, __u16 opcode)
+> > +{
+> > +     hdev->msft_opcode =3D opcode;
+> > +
+> > +     bt_dev_info(hdev, "Enabling MSFT extensions with opcode 0x%2.2x",
+> > +                 hdev->msft_opcode);
+> > +}
+> > +EXPORT_SYMBOL(msft_set_opcode);
+> > diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
+> > new file mode 100644
+> > index 000000000000..7218ea759dde
+> > --- /dev/null
+> > +++ b/net/bluetooth/msft.h
+> > @@ -0,0 +1,19 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +/* Copyright (C) 2020 Google Corporation */
+> > +
+> > +#ifndef __MSFT_H
+> > +#define __MSFT_H
+> > +
+> > +#include <net/bluetooth/hci_core.h>
+> > +
+> > +#if IS_ENABLED(CONFIG_BT_MSFTEXT)
+> > +
+> > +void msft_set_opcode(struct hci_dev *hdev, __u16 opcode);
+> > +
+> > +#else
+> > +
+> > +static inline void msft_set_opcode(struct hci_dev *hdev, __u16 opcode)=
+ {}
+> > +
+> > +#endif
+> > +
+> > +#endif /* __MSFT_H*/
+Thanks,
+Miao
