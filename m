@@ -2,118 +2,82 @@ Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA80C43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 17:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDEFC43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 17:36:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0193020BED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 17:22:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JWPpiWZX"
+	by mail.kernel.org (Postfix) with ESMTP id 1D5FC20CC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 17:36:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgCaRWt (ORCPT
+        id S1726315AbgCaRgD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Mar 2020 13:22:49 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:46646 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726028AbgCaRWt (ORCPT
+        Tue, 31 Mar 2020 13:36:03 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:34491 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726258AbgCaRgC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Mar 2020 13:22:49 -0400
-Received: by mail-oi1-f193.google.com with SMTP id q204so19556100oia.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 10:22:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AkFweVO6+fKbQ/CR3A2jIG2D72GQfDQ97HnpjS5ITLc=;
-        b=JWPpiWZXez24hu+a7A0dvLaFWBpSmMn/dAmRXBYfHG1q6PFKE78Vhc1SL4XM+TMXYi
-         R99+xb9BfjWzDLo53Pe47Oj7T9XU4jsKWFc6qUwnrQe0hL20MaLakyD9xZyf6AMH6j8T
-         KdMaUOkoOh3EHai6FNFPmCLPyyM/G6jfEzE+s=
+        Tue, 31 Mar 2020 13:36:02 -0400
+Received: by mail-io1-f71.google.com with SMTP id n26so19893049iop.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 10:36:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AkFweVO6+fKbQ/CR3A2jIG2D72GQfDQ97HnpjS5ITLc=;
-        b=muc2tTM2mX7quqScSMxtT+GOyrNExRHXA2uAulRF4B1mIrvLWzdSdCzHUC5i2kN/x3
-         x9fbYJfJ9C+XY1II1DsjUJ3R/l4AQszi9+y4nRKwkNubBP+O9ZLb41Qhtb+s3jHDB4IE
-         CmB2QWFxrrw+ewuWuB3lgNTCjfoSx9xPjz+j4CUsD5OzM5JqPm5ZUr4/XaPLw6SH+EN9
-         paeHtG8HEFYXDf+sIKBIiHGRTMeEC2eLn7Z/OIVOu6uC6jSlHiUMcwDQdalRjvWy35Qa
-         wLgcnQSd3mtJM6WMtAB3eWXW+QqR+xDTq1ebH0ppR3yvsbxT8P34u9xvzBx0EP2Co2iH
-         LG9w==
-X-Gm-Message-State: ANhLgQ2ROhlbbSts/R7WeKvRCBxOW/WIZorumS6fTtFPmoh81nwsKhQw
-        xgjYD/gtmgnurPBUw2ODPEtyMVP9q3jgkG6p01esvA==
-X-Google-Smtp-Source: ADFU+vutqA5kJa7KaR+nI4ZPf4qYUDEu0bA7fcVs0qomNCgjyjDkiBDqdtFUh2Ji/TUed3wzHriYkR+pwEbQDXhBI3k=
-X-Received: by 2002:aca:dd55:: with SMTP id u82mr2864806oig.27.1585675368666;
- Tue, 31 Mar 2020 10:22:48 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=EkBmF5uXCWrM6aOPYLh3R3gAH7wKc57Bigw1PTLooMY=;
+        b=BuH0HdpxSRgaEw9Fzvq1ua+1+ORZRaFieTXaE8+HNTr7LxBMwNN4vD4mf2xEUQDoYY
+         HtNceXvLXKK/YVohuNQLR9WWFX9jeyU1aWxC6BQWUQNr1u4pUrfuPg3TUQh1sDgLCK8T
+         tWFKLOBfsUSRw3xyDUw6MTa/I0f0XAiZTf8OpaCUj+9qX6u9By5mHkLzxlXmfoxJEdFb
+         HdvXuH6deiM4lgSrz7AoDpFTjhrn0dTLxbGBVDryhuQSaDMQkzxDybUUdzFm27id4PFw
+         soUGl4QS1KAv0PkN7A9JpOAoJqwWS8HLIcOwOr1uJV+9g/fllJBJ8EimzrUvU815AoTw
+         aopw==
+X-Gm-Message-State: ANhLgQ0gEtgIZntmHTIWeqM66bYEN4XepliI+enqque7bkuVpH2s1t0r
+        gjCOv/bWYjO/2PxJNLEW5qMCqygzvtddE58VIyIPyfuGb/Ch
+X-Google-Smtp-Source: ADFU+vvHwabh6/XT3HQsMvsns9bvDqN3/9G4mkXHM92526jZauR7yd6nL/ccsz/Mvu+hTOSZfNJXAFtWrHfa8tJOTfHuhC7B/BNp
 MIME-Version: 1.0
-References: <20200328003318.13937-1-sonnysasaka@chromium.org> <CABBYNZK=DSrS7MwrUm9LSPGwUmMzX7KJkf0r80hfduwoDC5KEA@mail.gmail.com>
-In-Reply-To: <CABBYNZK=DSrS7MwrUm9LSPGwUmMzX7KJkf0r80hfduwoDC5KEA@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Tue, 31 Mar 2020 10:22:36 -0700
-Message-ID: <CAOxioNnOj-MQQGZeesgJ3ozChO-4FZDXKdT9g9nkXO5kxwL7qQ@mail.gmail.com>
-Subject: Re: [PATCH] core/device: Handle Just-Works auto-accept
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+X-Received: by 2002:a5e:880e:: with SMTP id l14mr15608634ioj.8.1585676161841;
+ Tue, 31 Mar 2020 10:36:01 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 10:36:01 -0700
+In-Reply-To: <000000000000da6059059fcfdcf9@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005b022005a22a0050@google.com>
+Subject: Re: KASAN: use-after-free Read in skb_release_data (2)
+From:   syzbot <syzbot+a66a7c2e996797bb4acb@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, festevam@gmail.com,
+        gregkh@linuxfoundation.org, grundler@chromium.org,
+        hayeswang@realtek.com, johan.hedberg@gmail.com,
+        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-imx@nxp.com,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        marcel@holtmann.org, nishadkamdar@gmail.com, peter.chen@nxp.com,
+        pmalani@chromium.org, s.hauer@pengutronix.de, shawnguo@kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks, Luiz.
+syzbot suspects this bug was fixed by commit:
 
-On Mon, Mar 30, 2020 at 11:30 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sonny,
->
-> On Fri, Mar 27, 2020 at 5:36 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > The kernel starts to always request confirmation to BlueZ daemon for
-> > Just-Works pairing. In this patch the daemon does auto-accept if the
-> > client has clearly indicated a pairing intent by calling the Pair()
-> > D-Bus API.
-> > ---
-> >  src/device.c | 14 ++++++++++++--
-> >  1 file changed, 12 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/src/device.c b/src/device.c
-> > index 69f98e488..db14cc129 100644
-> > --- a/src/device.c
-> > +++ b/src/device.c
-> > @@ -6168,12 +6168,22 @@ int device_confirm_passkey(struct btd_device *device, uint8_t type,
-> >
-> >         auth->passkey = passkey;
-> >
-> > -       if (confirm_hint)
-> > +       if (confirm_hint) {
-> > +               if (device->bonding != NULL) {
-> > +                       /* We know the client has indicated the intent to pair
-> > +                        * with the peer device, so we can auto-accept. */
-> > +                       btd_adapter_confirm_reply(device->adapter,
-> > +                                                 &device->bdaddr,
-> > +                                                 type, TRUE);
-> > +                       return 0;
-> > +               }
-> > +
-> >                 err = agent_request_authorization(auth->agent, device,
-> >                                                 confirm_cb, auth, NULL);
-> > -       else
-> > +       } else {
-> >                 err = agent_request_confirmation(auth->agent, device, passkey,
-> >                                                 confirm_cb, auth, NULL);
-> > +       }
-> >
-> >         if (err < 0) {
-> >                 if (err == -EINPROGRESS) {
-> > --
-> > 2.17.1
-> >
-> Applied.
->
-> --
-> Luiz Augusto von Dentz
+commit d9958306d4be14f4c7466242b38ed3893a7b1386
+Author: Nishad Kamdar <nishadkamdar@gmail.com>
+Date:   Sun Mar 15 10:55:07 2020 +0000
+
+    USB: chipidea: Use the correct style for SPDX License Identifier
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16d4940be00000
+start commit:   63623fd4 Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5d2e033af114153f
+dashboard link: https://syzkaller.appspot.com/bug?extid=a66a7c2e996797bb4acb
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c25a81e00000
+
+If the result looks correct, please mark the bug fixed by replying with:
+
+#syz fix: USB: chipidea: Use the correct style for SPDX License Identifier
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
