@@ -2,179 +2,194 @@ Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 866B7C43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 19:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E15AC43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 21:29:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D27A212CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 19:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DD4E206CC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 21:29:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIs5M7yg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ra9k4Mri"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727575AbgCaTTV (ORCPT
+        id S1729647AbgCaV3c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Mar 2020 15:19:21 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:36266 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726295AbgCaTTU (ORCPT
+        Tue, 31 Mar 2020 17:29:32 -0400
+Received: from mail-pl1-f169.google.com ([209.85.214.169]:32844 "EHLO
+        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727852AbgCaV3b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Mar 2020 15:19:20 -0400
-Received: by mail-lj1-f195.google.com with SMTP id b1so2668042ljp.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 12:19:18 -0700 (PDT)
+        Tue, 31 Mar 2020 17:29:31 -0400
+Received: by mail-pl1-f169.google.com with SMTP id g18so8698067plq.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 14:29:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=y8b+fY+FSOhIQyquVtH2+ZFjRjsJrgUrVeSm/zV2Y8w=;
-        b=UIs5M7ygqRK67Ww+DhfEj7FEK3mJoDmLbYmOG91Q9EJbR0vYOQ1PmOOCLd7CRBeOQT
-         jju06ncbVeDi84TVOt91mVnYvJUt680+AUfAWvjPbzsdaXlHgdWVXnntCowwefgxzn9h
-         l9MuLypriLQ9QwWhZ+zLiOvO8vJnj+LqXJQHATWG/yIfYMjHKyrK+ZsPK9Dg1R/twJkP
-         ku4UKoKqXrjgoVgV/nYB4W/j3LyVcFWQHfXEJ/ZDEzE9690qegv0HM1aVOqdriyQ+tSY
-         22EBJRPh91oa8EPrcJTErJ9F7TnMdRvLxepqMhcN7nYF8Pc2gNLT0k50+5eFnr2ZWhQd
-         ltEQ==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QLJLWmVGTMBW82xLPX5zvRkUZCO6pGMz2MqR/j1wlUI=;
+        b=Ra9k4Mrikyr2LUTQoE59GLMr2+Ce2BjtK0Ai+zAH0JVXEdgxInlzO3V63bXN7DPUGW
+         cYuhESi53alVCAY1mORqPCsn4oTkizWRNqez20e0uZkx1Pyo7dmSr5iSmemDBHIZwQ4m
+         uqWIQ8nU0faA1X/flmUFXu74/G72RKXVjnW4QPmrb7NCBoU8AaQ3r6lixEuY5nU/JoHj
+         xfcFNWljWVPIvQSxRWGITrjYbr2R2uQniIN79v436UGmi+oHrl9p9EDRbyWE2M9f6kr/
+         pFAhfmEUWHEDXfoWIhyzcJhO54M0OEZoFAho92L1wvKJqLQOXjv7DLYeAilQwIs8usr8
+         omaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=y8b+fY+FSOhIQyquVtH2+ZFjRjsJrgUrVeSm/zV2Y8w=;
-        b=tmU34JaKivlOm/HZX0vzorIlo7hSr9c4Sg6UYKvVmAg4msOICr/hG1VegwsB+krwKw
-         hTodLnyy3WCE3/Y+Neu+tHH6+9w/pHJh7IjvodTl16HqulUQ1jLTVImiDRsvQLTdT+uw
-         0NcIVVMq0Rngbm/lJKBMiYVXnnzH0mmeo0Xw8vEevrhg2tbPFxZ5byOd5kBTn9X4jU4O
-         UIHk/ZQPOQ/hZtZsFiUVb/h//17nt4epMK2lVVZ9J+8Pd2b5/SUDLprb+5DI+yTpKPWo
-         QDup68UJ5lhI58o+EKzZoGI8bUC188Ode5eXnbxcRkVOHIdorklIHo7Nzeyy6/ANJ8G7
-         3VUQ==
-X-Gm-Message-State: AGi0PuY+qje9jeCrSf8IkPeYHMH/TM9Bv21OmPd8GfJ6RdWqBLc431f6
-        1eAXuV7mPAemx3vHZeZReqyvrWi1+n6JL/xvCaTGrMah
-X-Google-Smtp-Source: APiQypLZbh79652Jv6BtfmXUJDyqwQ7cbKYdQ/DmslVPaTdpIXkWIGz0KAs1q+9NbBHh5xfZ3ISVpN+ULhKQnzw7HSU=
-X-Received: by 2002:a2e:99c9:: with SMTP id l9mr11633826ljj.79.1585682357722;
- Tue, 31 Mar 2020 12:19:17 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QLJLWmVGTMBW82xLPX5zvRkUZCO6pGMz2MqR/j1wlUI=;
+        b=OnOc4nz6gMuXb9feUCnU3RLzDtyDIHAyI4iSMwJ5zBMK74ghpuTOZ+2bfZ+oKab3ff
+         Ia6bFSQ/0e3aKJszxKJ25ZW7czJTnceiqzDmywA5zlKbfCZ+y78qCDHUYTSnrMxbYkIT
+         4SunTJ12QmPCL9bbN0vZOK5KvZqLDKTxotHlD5aoyzG5e4y2jzm9aI1T/aa5AZXeBKXd
+         8Zrq9ha2Cr1A5Zd3sGQtr6UfNAYbxPogg4ydzK/CWpJgM2BY6SENlJ5h6sVdVekD92tw
+         TsQjfXv7+ZAi2pRug7EnczVKhgoi9HF61DqMHvFCUVfDes1IGaIi7YdkUiwUjOsZc+fm
+         bycg==
+X-Gm-Message-State: AGi0Pub5ABFiA2e/V1wVfiooiO5l96WbgmY4z2w9ruYgO9p9VdYAuQ+V
+        QI1RWJT0Af7SL0QAu0yz1evg5H/NpJk=
+X-Google-Smtp-Source: APiQypKtRJAy6SOqk7ZRONJExFbPGrnOJ9msO0B9GiyKAQd5PC/hz4nqPEJamxvY0Iqq5ibQyeHqwQ==
+X-Received: by 2002:a17:90b:254:: with SMTP id fz20mr985407pjb.27.1585690169722;
+        Tue, 31 Mar 2020 14:29:29 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id o11sm48300pjb.18.2020.03.31.14.29.28
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2020 14:29:29 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] gatt: Check error before retrying if Acquire* failed
+Date:   Tue, 31 Mar 2020 14:29:28 -0700
+Message-Id: <20200331212928.14123-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200331132831.443518-1-marcel@holtmann.org>
-In-Reply-To: <20200331132831.443518-1-marcel@holtmann.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 31 Mar 2020 15:19:06 -0400
-Message-ID: <CALWDO_WskBZnYwja=g-hfvUgAQgt9im7cK5U197cKhdGd+3Gng@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for Read Local Simple Pairing Options
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+If the method has timed out it probably means the application is not
+responding so a follow up method call might have the same result, also
+in case the application returns org.bluez.Error.Failed it indicates the
+operation has been attempted but failed which again most likely will
+have the same result if reattempted.
+---
+ src/gatt-database.c | 48 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 13 deletions(-)
 
-On Tue, Mar 31, 2020 at 9:28 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> With the Read Local Simple Pairing Options command it is possible to
-> retrieve the support for max encryption key size supported by the
-> controller and also if the controller correctly verifies the ECDH public
-> key during pairing.
->
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h      |  7 +++++++
->  include/net/bluetooth/hci_core.h |  2 ++
->  net/bluetooth/hci_core.c         |  4 ++++
->  net/bluetooth/hci_event.c        | 21 +++++++++++++++++++++
->  4 files changed, 34 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 5f60e135aeb6..a495964d5553 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1272,6 +1272,13 @@ struct hci_rp_read_data_block_size {
->
->  #define HCI_OP_READ_LOCAL_CODECS       0x100b
->
-> +#define HCI_OP_READ_LOCAL_PAIRING_OPTS 0x100c
-> +struct hci_rp_read_local_pairing_opts {
-> +       __u8     status;
-> +       __u8     pairing_opts;
-> +       __u8     max_key_size;
-> +} __packed;
-> +
->  #define HCI_OP_READ_PAGE_SCAN_ACTIVITY 0x0c1b
->  struct hci_rp_read_page_scan_activity {
->         __u8     status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index d4e28773d378..228b5021060c 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -312,6 +312,8 @@ struct hci_dev {
->         __u16           conn_info_max_age;
->         __u16           auth_payload_timeout;
->         __u8            min_enc_key_size;
-> +       __u8            max_enc_key_size;
-> +       __u8            pairing_opts;
->         __u8            ssp_debug_mode;
->         __u8            hw_error_code;
->         __u32           clock;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 2e7bc2da8371..331759878b3c 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -826,6 +826,10 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
->         if (hdev->commands[29] & 0x20)
->                 hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
->
-> +       /* Read local pairing options if the HCI command is supported */
-> +       if (hdev->commands[41] & 0x08)
-> +               hci_req_add(req, HCI_OP_READ_LOCAL_PAIRING_OPTS, 0, NULL);
-> +
->         /* Get MWS transport configuration if the HCI command is supported */
->         if (hdev->commands[30] & 0x08)
->                 hci_req_add(req, HCI_OP_GET_MWS_TRANSPORT_CONFIG, 0, NULL);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 0a591be8b0ae..ca7a00e9312a 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -746,6 +746,23 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
->                 bacpy(&hdev->setup_addr, &rp->bdaddr);
->  }
->
-> +static void hci_cc_read_local_pairing_opts(struct hci_dev *hdev,
-> +                                          struct sk_buff *skb)
-> +{
-> +       struct hci_rp_read_local_pairing_opts *rp = (void *) skb->data;
-> +
-> +       BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-> +
-> +       if (rp->status)
-> +               return;
-> +
-> +       if (hci_dev_test_flag(hdev, HCI_SETUP) ||
-> +           hci_dev_test_flag(hdev, HCI_CONFIG)) {
-> +               hdev->pairing_opts = rp->pairing_opts;
-> +               hdev->max_enc_key_size = rp->max_key_size;
-> +       }
-> +}
-> +
->  static void hci_cc_read_page_scan_activity(struct hci_dev *hdev,
->                                            struct sk_buff *skb)
->  {
-> @@ -3334,6 +3351,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
->                 hci_cc_read_bd_addr(hdev, skb);
->                 break;
->
-> +       case HCI_OP_READ_LOCAL_PAIRING_OPTS:
-> +               hci_cc_read_local_pairing_opts(hdev, skb);
-> +               break;
-> +
->         case HCI_OP_READ_PAGE_SCAN_ACTIVITY:
->                 hci_cc_read_page_scan_activity(hdev, skb);
->                 break;
-> --
-> 2.25.1
->
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 55fd28a54..11d886c56 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -53,6 +53,7 @@
+ #define GATT_SERVICE_IFACE	"org.bluez.GattService1"
+ #define GATT_CHRC_IFACE		"org.bluez.GattCharacteristic1"
+ #define GATT_DESC_IFACE		"org.bluez.GattDescriptor1"
++#define ERROR_FAILED		ERROR_INTERFACE ".Failed"
+ 
+ #define UUID_GAP	0x1800
+ #define UUID_GATT	0x1801
+@@ -2027,28 +2028,30 @@ static bool parse_handle(GDBusProxy *proxy, uint16_t *handle)
+ 	return true;
+ }
+ 
+-static uint8_t dbus_error_to_att_ecode(const char *error_name)
++static uint8_t dbus_error_to_att_ecode(const char *error_name, uint8_t perm_err)
+ {
+-
+-	if (strcmp(error_name, "org.bluez.Error.Failed") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".Failed") == 0)
+ 		return 0x80;  /* For now return this "application error" */
+ 
+-	if (strcmp(error_name, "org.bluez.Error.NotSupported") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".NotSupported") == 0)
+ 		return BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
+ 
+-	if (strcmp(error_name, "org.bluez.Error.NotAuthorized") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".NotAuthorized") == 0)
+ 		return BT_ATT_ERROR_AUTHORIZATION;
+ 
+-	if (strcmp(error_name, "org.bluez.Error.InvalidValueLength") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".InvalidValueLength") == 0)
+ 		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
+ 
+-	if (strcmp(error_name, "org.bluez.Error.InvalidOffset") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".InvalidOffset") == 0)
+ 		return BT_ATT_ERROR_INVALID_OFFSET;
+ 
+-	if (strcmp(error_name, "org.bluez.Error.InProgress") == 0)
++	if (strcmp(error_name, ERROR_INTERFACE ".InProgress") == 0)
+ 		return BT_ERROR_ALREADY_IN_PROGRESS;
+ 
+-	return 0;
++	if (strcmp(error_name, ERROR_INTERFACE ".NotPermitted") == 0)
++		return perm_err;
++
++	return BT_ATT_ERROR_UNLIKELY;
+ }
+ 
+ static void read_reply_cb(DBusMessage *message, void *user_data)
+@@ -2069,8 +2072,8 @@ static void read_reply_cb(DBusMessage *message, void *user_data)
+ 
+ 	if (dbus_set_error_from_message(&err, message) == TRUE) {
+ 		DBG("Failed to read value: %s: %s", err.name, err.message);
+-		ecode = dbus_error_to_att_ecode(err.name);
+-		ecode = ecode ? ecode : BT_ATT_ERROR_READ_NOT_PERMITTED;
++		ecode = dbus_error_to_att_ecode(err.name,
++					BT_ATT_ERROR_READ_NOT_PERMITTED);
+ 		dbus_error_free(&err);
+ 		goto done;
+ 	}
+@@ -2246,8 +2249,8 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
+ 
+ 	if (dbus_set_error_from_message(&err, message) == TRUE) {
+ 		DBG("Failed to write value: %s: %s", err.name, err.message);
+-		ecode = dbus_error_to_att_ecode(err.name);
+-		ecode = ecode ? ecode : BT_ATT_ERROR_WRITE_NOT_PERMITTED;
++		ecode = dbus_error_to_att_ecode(err.name,
++					BT_ATT_ERROR_WRITE_NOT_PERMITTED);
+ 		dbus_error_free(&err);
+ 		goto done;
+ 	}
+@@ -2414,8 +2417,20 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&err);
+ 
+ 	if (dbus_set_error_from_message(&err, message) == TRUE) {
++		uint8_t ecode;
++
+ 		error("Failed to acquire write: %s\n", err.name);
++
++		ecode = dbus_error_to_att_ecode(err.name,
++					BT_ATT_ERROR_WRITE_NOT_PERMITTED);
+ 		dbus_error_free(&err);
++
++		if (ecode != BT_ATT_ERROR_UNLIKELY) {
++			gatt_db_attribute_write_result(op->attrib, op->id,
++								ecode);
++			return;
++		}
++
+ 		goto retry;
+ 	}
+ 
+@@ -2501,6 +2516,13 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
+ 
+ 	if (dbus_set_error_from_message(&err, message) == TRUE) {
+ 		error("Failed to acquire notify: %s\n", err.name);
++
++		if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY) ||
++				dbus_error_has_name(&err, ERROR_FAILED)) {
++			dbus_error_free(&err);
++			return;
++		}
++
+ 		dbus_error_free(&err);
+ 		goto retry;
+ 	}
+-- 
+2.21.1
 
-LGTM.
-
-Thanks,
-Alain
