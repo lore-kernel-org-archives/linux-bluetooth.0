@@ -2,92 +2,121 @@ Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCF5C43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 03:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4ECC43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 06:05:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB79420714
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 03:16:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="URbDavb2"
+	by mail.kernel.org (Postfix) with ESMTP id 6FD4820757
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 06:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727655AbgCaDQx (ORCPT
+        id S1726420AbgCaGFU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Mar 2020 23:16:53 -0400
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:35347 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727464AbgCaDQw (ORCPT
+        Tue, 31 Mar 2020 02:05:20 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43900 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725809AbgCaGFU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Mar 2020 23:16:52 -0400
-Received: by mail-pf1-f201.google.com with SMTP id c82so17331391pfc.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2020 20:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=B+pFhislTERSJ+sPrY15wXajnJWO66yhO+DU6Mi065w=;
-        b=URbDavb2+tyHpxGAWUAYn9DjsWnwIPvEfQdOk3e+bt7aCgKaTzU0uJWgGPdoyix5aU
-         xfZ9zcaJ3kRoADMX+kuEWnPT67I4j+9gM3BAVMd0Mn+zgn4pgWwQDRXrvwX8TAR1/FNv
-         GRHM1zw8HRcTwjxYp+T253DC6fNV5SRLmA22yM/CGd4gVp/Hr75jXYZZCZPijyL+nKiE
-         rNH/Nic+PiDEi+YJvO2CUTnFTreUWM/rt0Ow5BmOQ7AeXOjZRWIb5sAe4zC4TK4XHYhF
-         LjzeZxmkqY5qnk0GIAgfLNOK3679QzaFoJ8LGKeWBRyKmR8q1izAslkx5bKRDXYSVdoh
-         k4+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=B+pFhislTERSJ+sPrY15wXajnJWO66yhO+DU6Mi065w=;
-        b=aBFl11woOaB+vu8brre7JCYpDVAtNVJmZiRpkckP2xWCuB+p7vTCiMXvZW9KgsFZon
-         DIgofiZ4UJMAivbj1CgZ0jBTGv0j1RUAnnuXdvCnePmkWg4crPFxQwB0RScJC3cpmkNR
-         TawNgqBxtk1i7emUc4VslvCOMfqJkV7cLB7ihZxfULeb+5hrwP4R6yPCREcZ8/GvtJOP
-         Pw4CY31m/c19dZzvTDxtv8js/sc2T1hPAoebipLuwTuXbYjcLuMAnxMNcLB/psIqqyGk
-         S0e1REuls0Nqse2XmiXVZnjib7hbbkXshO21i6Qf+BrQJx/fOmPv2nf7kGUWDC+ha4Bo
-         wtJA==
-X-Gm-Message-State: AGi0PuaqorE6j+Xs7TnNfnBPls+gAXWodEUqFIF+PPDXxCaFJCOHkcBR
-        nh5/ZsErN//ms0xHM7tKIDgdAIA6e7fwNZOa10GyFKA9MI3PEJicZo0GRsajpSCRC1EeQaSo36Q
-        0RnZDh6XTtYHxIm/+S6Ak/GhtYVpgVG3/FGDMRA+Dx47X9aACQU1+ni9wGDxZEE+QsueWjAowvb
-        PQd29FtL6J0aM=
-X-Google-Smtp-Source: APiQypIlO4lEq29C1h4jR8ue1NC2n+RtU9iXYEwJOuKBWof9gUpEPYEuWzmUt2m9MHWT8ZLBJYOJmXDdJFY73js84Q==
-X-Received: by 2002:a17:90a:82:: with SMTP id a2mr1469821pja.47.1585624610042;
- Mon, 30 Mar 2020 20:16:50 -0700 (PDT)
-Date:   Tue, 31 Mar 2020 11:16:43 +0800
-Message-Id: <20200331111631.Bluez.v2.1.I3621733fcf428d49c82b09bfc2bdc7d3b2f7894a@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.rc2.310.g2932bb562d-goog
-Subject: [Bluez PATCH v2] monitor: Fix missing setting string
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Howard Chung <howardchung@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 31 Mar 2020 02:05:20 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 62C91CECC4;
+        Tue, 31 Mar 2020 08:14:51 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v4 1/2] Bluetooth: btusb: Indicate Microsoft vendor
+ extension for Intel 9460/9560 and 9160/9260
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABmPvSF=pcffe18iAKgbU8bwFvVDp-NKeAFGw8auKoVd1XAuTQ@mail.gmail.com>
+Date:   Tue, 31 Mar 2020 08:05:18 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <852FDEFC-7AD1-4CB9-9C45-BBAB5B2A8D14@holtmann.org>
+References: <20200328074632.21907-1-mcchou@chromium.org>
+ <20200328004507.v4.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+ <9CC14296-9A0E-4257-A388-B2F7C155CCE5@holtmann.org>
+ <CABmPvSF=pcffe18iAKgbU8bwFvVDp-NKeAFGw8auKoVd1XAuTQ@mail.gmail.com>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add wideband speech to setting string
----
+Hi Miao-chen,
 
-Changes in v2:
-- resolve conflicts with Alain's change (aa2a5814)
+>>> This adds a bit mask of driver_info for Microsoft vendor extension and
+>>> indicates the support for Intel 9460/9560 and 9160/9260. See
+>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+>>> microsoft-defined-bluetooth-hci-commands-and-events for more information
+>>> about the extension. This also add a kernel config, BT_MSFTEXT, and a
+>>> source file to facilitate Microsoft vendor extension functions.
+>>> This was verified with Intel ThunderPeak BT controller
+>>> where msft_vnd_ext_opcode is 0xFC1E.
+>>> 
+>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>> 
+>>> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+>>> ---
+>>> 
+>>> Changes in v4:
+>>> - Introduce CONFIG_BT_MSFTEXT as a starting point of providing a
+>>> framework to use Microsoft extension
+>>> - Create include/net/bluetooth/msft.h and net/bluetooth/msft.c to
+>>> facilitate functions of Microsoft extension.
+>>> 
+>>> Changes in v3:
+>>> - Create net/bluetooth/msft.c with struct msft_vnd_ext defined internally
+>>> and change the hdev->msft_ext field to void*.
+>>> - Define and expose msft_vnd_ext_set_opcode() for btusb use.
+>>> - Init hdev->msft_ext in hci_alloc_dev() and deinit it in hci_free_dev().
+>>> 
+>>> Changes in v2:
+>>> - Define struct msft_vnd_ext and add a field of this type to struct
+>>> hci_dev to facilitate the support of Microsoft vendor extension.
+>>> 
+>>> drivers/bluetooth/btusb.c        | 11 +++++++++--
+>>> include/net/bluetooth/hci_core.h |  4 ++++
+>> 
+>> so I don’t like the intermixing of core features and drivers unless it is needed. In this case it is not needed since we can first introduce the core support and then enable the driver to use it.
+> I will make btusb changes as a different commit in v5.
 
- monitor/packet.c | 1 +
- 1 file changed, 1 insertion(+)
+check the series that I posted. I tested them on ThunderPeak and if it also works, we use that as a base and then go from there.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 994ae6341..3d32563e6 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -11668,6 +11668,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
- 	{ 14, "Controller Configuration"},
- 	{ 15, "Static Address"		},
- 	{ 16, "PHY Configuration"	},
-+	{ 17, "Wideband Speech"		},
- 	{ }
- };
- 
--- 
-2.26.0.rc2.310.g2932bb562d-goog
+>> 
+>>> net/bluetooth/Kconfig            |  9 ++++++++-
+>>> net/bluetooth/Makefile           |  1 +
+>>> net/bluetooth/msft.c             | 16 ++++++++++++++++
+>>> net/bluetooth/msft.h             | 19 +++++++++++++++++++
+>>> 6 files changed, 57 insertions(+), 3 deletions(-)
+>>> create mode 100644 net/bluetooth/msft.c
+>>> create mode 100644 net/bluetooth/msft.h
+>>> 
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>> index 3bdec42c9612..0fe47708d3c8 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -21,6 +21,7 @@
+>>> #include <net/bluetooth/bluetooth.h>
+>>> #include <net/bluetooth/hci_core.h>
+>>> 
+>>> +#include "../../net/bluetooth/msft.h"
+>> 
+>> This was my bad. I didn’t realized that drivers need to the set the opcode and not the core. I updated the patches to fix this.
+> I will move it to include/net/bluetooth/.
+
+I put it in hci_core.h since don’t want to add any extra needed include for driver. They are big enough already and adding more files doesn’t really help.
+
+Regards
+
+Marcel
 
