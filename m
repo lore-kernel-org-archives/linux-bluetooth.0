@@ -2,214 +2,100 @@ Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 826CFC43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BDCC2D0EE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D328206F6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8AC820848
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 08:28:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="teTG6rwt"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="RCLlCYZr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729958AbgCaIHy (ORCPT
+        id S1726622AbgCaI2F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Mar 2020 04:07:54 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:58713 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726528AbgCaIHy (ORCPT
+        Tue, 31 Mar 2020 04:28:05 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52557 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbgCaI2E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Mar 2020 04:07:54 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200331080751epoutp02699f40995f4f4974a50352ba6c85b5e3~BVRAqB6_U2586525865epoutp02x
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 08:07:51 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200331080751epoutp02699f40995f4f4974a50352ba6c85b5e3~BVRAqB6_U2586525865epoutp02x
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1585642071;
-        bh=NjlnHR3fhBKA0SAJqoz+Thf4YOwBmBCFjCmOwjiksXU=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=teTG6rwty97J5otIRKbQYsvnmDt5gptayMwuu2zA3otfOX4sMuUE0uxXi/WiXYU9v
-         ooJA22qIEYJWzckntDStyBBc4AZMABvNq7dNEM31o4WsaioXdcypS0E+sW+fWsWrqq
-         FI6m9DSKcE6PO0Avi4Sy+flZTmyG6dQhhKJE1Rus=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20200331080751epcas5p1e24e145fd56bb9efd21277fc55e64777~BVRAH6--O1706517065epcas5p1V;
-        Tue, 31 Mar 2020 08:07:51 +0000 (GMT)
-X-AuditID: b6c32a4a-353ff700000012aa-fc-5e82fa57194d
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        35.4D.04778.75AF28E5; Tue, 31 Mar 2020 17:07:51 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE: Re: RE: Re: Mesh Key Refreshment procedure from Config client
-Reply-To: anupam.r@samsung.com
-From:   Anupam Roy <anupam.r@samsung.com>
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-CC:     Dohyun Pyun <dh79.pyun@samsung.com>,
-        Semun Lee <semun.lee@samsung.com>,
-        Nitin Jhanwar <nitin.j@samsung.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        AMIT KUMAR JAISWAL <amit.jaiswal@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <f10ab3eeb9691d20544d0a65b08027fe2de3c26a.camel@intel.com>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20200331080503epcms5p58d933114e7cd69177727a293eef3ba5b@epcms5p5>
-Date:   Tue, 31 Mar 2020 13:35:03 +0530
-X-CMS-MailID: 20200331080503epcms5p58d933114e7cd69177727a293eef3ba5b
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnleLIzCtJLcpLzFFi42LZdlhTSzf8V1OcwZHpHBbvuqazWSz5/pHN
-        onnTKxaLOdf6mC22rWtntji26SmTA5vH4j0vmTz6tqxi9Pi8SS6AOYrLJiU1J7MstUjfLoEr
-        43PrJZaCo8oVC47vZm9g3CLdxcjJISFgIvFn9UamLkYuDiGB3YwSv84cZuxi5ODgFRCU+LtD
-        GKRGWMBLYuGRDnYQW0hATmLx1LVsICXCApoSNzemgITZBNQlfj3cwQJiiwjoSey4s5MRZCSz
-        wEtGicZ1h9khdvFKzGh/ygJhS0tsX76VEcTmFHCX2PLvOjNEXFTi5uq37DD2+2PzGSFsEYnW
-        e2ehagQlHvzczQgzZ+uCp8wgyyQEuhklXu9YzwThTGGU+HjxLRNElbnE/+63YB28Ar4SZ+8c
-        BbuCRUBV4tP0a6wQNS4S/bsOgdUzC8hLbH87hxnkS2agL9fv0ocokZWYemodVAmfRO/vJ0ww
-        j+2YB2MrSWy9Ph9qpIRE3+ZdUHEPia8ndrFAAno+i0RHXzP7BEaFWYiwnoVk8yyEzQsYmVcx
-        SqYWFOempxabFhjlpZbrFSfmFpfmpesl5+duYgQnEy2vHYzLzvkcYhTgYFTi4X1wtTFOiDWx
-        rLgy9xCjBAezkggvm39DnBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHeSaxXY4QE0hNLUrNTUwtS
-        i2CyTBycUg2MXjVJScuudoXzWLSaFt5e86AwqFH91AvF5A0VCh3v+1ctMd836evjW9MWGJ64
-        LF9+3Gf/LjWLhH8Cvgxcr+YUifdX7z5z69yDoMt/1vw8lXlpV6/jNolTeb/mfmK9dqU0/U8L
-        r4aTk+TXiyYbpU/MMuYJ+qKz2LP17sz6BCP9kDNbl59X/LQrX4mlOCPRUIu5qDgRAI7nKtAi
-        AwAA
-X-CMS-RootMailID: 20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b
-References: <f10ab3eeb9691d20544d0a65b08027fe2de3c26a.camel@intel.com>
-        <20200327053515epcms5p1cd532ff3b1ac4b97d375a6336e3ded50@epcms5p1>
-        <81d243b6c593e1edb6b36be87898fc57e1e5f0f2.camel@intel.com>
-        <20200326144743epcms5p401053700dae86ae93749df5fc77a2807@epcms5p4>
-        <20200304153920epcms5p47e26659f715177b0244f18c71e4b5fed@epcms5p4>
-        <20200326145252epcms5p2b9b6bded2e2a5d9c68e680e9de403662@epcms5p2>
-        <20200327134742epcms5p46a971a1f5653956a287898e01a296dee@epcms5p4>
-        <CGME20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b@epcms5p5>
+        Tue, 31 Mar 2020 04:28:04 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 11so348753wmi.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 01:28:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qvkcZLb0lo48Z4SJcR3PUEwietXVioWin8LEMOg0uxg=;
+        b=RCLlCYZrtHnynHJdOb/3G/CL9LKdENl5ItXP9Q6QIhlLz4Qx2xtPwZ5YW8x3xynaXF
+         rQ4LAv9kwG9odDyPXWXBKm5UmfE2U1XVnksvvHLGKgTLtOGT5ExDEkinpejScE9tqbbP
+         kV6tJcR7OiyCIzTtyCx2lws2TPZfLFH801t1ze+5lBqH/980bu3EgRHlabn/iAFNYv2m
+         ghCcnq7zlsBUKLu36tD42/vy92aNpAcFjr+AkDe6S6oXu7dTeoWB7dc2/wj6tgKwJ4er
+         jFTWtUlsGTtLCvxPv6KJVaQoFm5QGKIw6Ltul9zj6LPwWeBim7WXljwkkktn1rdC+S6F
+         gnlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qvkcZLb0lo48Z4SJcR3PUEwietXVioWin8LEMOg0uxg=;
+        b=TOLbAj1PP0ZffaXnfXIC5f56eM2Q8+O3ed4mPgri1iaUtqk1B2XxFiiUS5LS6d+yh2
+         vpaqWOwzAilLBVu+4FyA8eCgWkEXXkQN4v3pFN2D1d2s9HfrvZ9SB47y3n1HlJwq9HKN
+         SGNhsx/6C/65UwPQ+r6RjBTdZMnxvuilUCFiR/K0Yf510NYzNsJmQfekkuei8D0ZnEtF
+         Qd5/x1WMPakX/a5yHhJWe4Kb1er0u5b3chvO7QAJh7v4mU2FmP1IQvIYwTpQCeTenRSF
+         RXxoBqnFwbU79qOatGsNGzRt1C8xqlWh/faobYRsjj4/zOmtcvTjqvEDlbSVaNHamBsX
+         k9Qg==
+X-Gm-Message-State: ANhLgQ3WgijH4fExAlu2K7Qlc4Rnz8gxtazH0gSKoy/G6kJ28sbMbnYA
+        qiwwdF5O5lZbuCep1cGNvTIxLaRfaLsFPA==
+X-Google-Smtp-Source: ADFU+vsmqF/Qb8SgppEvK5tFTk4jJBtD2EvjB00pdB4mqwGf1YqE7tbsQheUjNZx7WaNjWsr5ABf1A==
+X-Received: by 2002:a1c:b4d4:: with SMTP id d203mr2292987wmf.85.1585643282373;
+        Tue, 31 Mar 2020 01:28:02 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id x16sm6172296wrn.71.2020.03.31.01.28.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2020 01:28:01 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 0/6] Honor provisioner's capabilities during authentication
+Date:   Tue, 31 Mar 2020 10:28:04 +0200
+Message-Id: <20200331082810.10856-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+This patch adds ability for the provisioner application to declare a set
+of supported authentication methods via ProvisionAgent1 API. The daemon
+will then select the most secure method available on both ends.
 
->--------- Original Message ---------
->Sender : Stotland, Inga <inga.stotland@intel.com>
->Date : 2020-03-30 11:35 (GMT+5:30)
->Title : Re: RE: Re: Mesh Key Refreshment procedure from Config client
-> 
->Hi Anupam,
-> 
->On Fri, 2020-03-27 at 19:17 +0530, Anupam Roy wrote:
->>  
->> Hi Inga,
->> 
->> > --------- Original Message ---------
->> > Sender : Anupam Roy <
->> > anupam.r@samsung.com
->> > > Staff Engineer/Application S/W Group /SRI-Delhi/Samsung
->> > Electronics
->> > Date : 2020-03-27 11:07 (GMT+5:30)
->> > Title : RE: Re: Mesh Key Refreshment procedure from Config client
->> > 
->> > Hi Inga,
->> > 
->> > > Hi Anupam,
->> > > 
->> > > On Thu, 2020-03-26 at 20:22 +0530, Anupam Roy wrote:
->> > > > Hi ,
->> > > >  Presently, I am trying to check *Key Refreshment Procedure*
->> > > > from Mesh Config client.
->> > > > 
->> > > > For checking the operation, I did following steps
->> > > >  - Create Subnet in Config client at Net index 1
->> > > >  - Add SubNetKey to Local Node at Net Index 1
->> > > >  - Add SubNetKey to Remote Node at Net Index 1
->> > > > 
->> > > 
->> > > Please try to add two steps more here:
->> > >   - Update Subnet 1 (subnet-update command in main menu)
->> > 
->> > I missed mentioning above step in my email. Actually, before
->> > updating netkey to remote, I did update local subnet.
->> > But yes, I missed out below step (Updating netkey to local node).
->> > Will give it a try now. Much thanks!
->> > 
->> 
->> After updating the Netkey to the local node(config client) and then
->> to the remote node, I monitored the beaconing key used by local
->> config client.
->> Please note that since, only two netkeys are at presently configured
->> in both the nodes, therefore, the key ID's are 1 (for primary netkey
->> at index 0), 2(For Netkey at index 1) & 3(For new NetKey at index 1).
->> 
->> After NetKey update, The KR phase in both sides are set to 1, but it
->> seems, the new key id (which is 3 in this case) is still *NOT used
->> for beaconing, by the 'Config Client node'
->> Config Client still keeps on beaconing with key ID 1 & 2. Sharing a
->> bit of logs for your reference.
->> 
->> During NetKey Update-
->> mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x8045 size 18
->> idx 000
->> key refresh phase 1: Key ID 3
->> 
->> Beacon Keys after NetKey update on remote Node -
->> mesh/net-keys.c:snb_timeout() beacon 2 for 1 nodes, period 30, obs 2,
->> exp 3
->> mesh/net-keys.c:snb_timeout() beacon 1 for 1 nodes, period 20, obs 2,
->> exp 2
->> 
->> Please share your opinion to check the issue further. Thank You
-> 
->Indeed, there's a missing functionality in mesh-cfgclient tool: key
->refresh phase commands.
->The patch set  that I posted today should address the issue:
->[PATCH BlueZ 1/2] tools/mesh-cfgclient: Save subnet key refresh phase
->[PATCH BlueZ 2/2] tools/mesh-cfgclient: Add commands for Key Refresh
->Phase
-> 
->The beaconing will start  updated network key once the Key Refresh
->procedure advances to phase 2:
->1. "subnet-set_phase <net_index> 2" from the main menu
->2. "kr_phase_set <net_index> 2" from  the config menu (sent to either
->local or remote node or both).
->     The transition to phase 2 can happen either as a result of a
->directly setting a phase on a node or by
->     detecting a beacon with KR bit set (which, of course assumes that
->at least one node got it's phase set
->    directly and that that node has beaconing enabled) .
-> 
->Similar steps to finish Key Refresh procedure: set phase 3 for subnet
->and send phase command to node(s)
-> 
-Sure, will try this. Thanks for the update & detailed response.
+This fixes an issue where nodes declaring OOB public key availability
+could not be provisioned by applications lacking means to obtain such
+keys.
 
-> 
->>  
->> > >   - Update NetKey 1 for a local node (switch to config menu)
->> > > 
->> > > >  - Update Netkey to remote Node in Net index 1
->> > > > 
->> > > > After updating the Netkey, I believe, config client has to
->> > > > either send out SNB with KeyRefreshment(KR) Flag=1 & secured
->> > > > with updated NetKey (i.e by subnet->net_key_upd id)
->> > > > or send out "Config Key Refresh Phase Set" with transition
->> > > > parameter, set to 2. I could not find the later provision in
->> > > > cfgclient menu.
->> > > > However, Config Client seems to be not sending out Secure
->> > > > Network Beacon as well. So KR procedure seems to be not
->> > > > progressing at my setup at present.
->> > > > 
->> > > > Any hint of what could be missing will be really helpful! Thank
->> > > > You.
->> > > > 
->> > > 
->> > > Best Regards,
->> > > Inga
->> 
->> BR,
->> -Anupam Roy
- 
+Michał Lowas-Rzechonek (6):
+  tools/mesh-cfgclient: Display unprovisioned OOB data
+  mesh: Remove unused 'server' argument
+  mesh: Clean up naming of provisioning callbacks
+  mesh: Refresh provisioner's capabilities
+  mesh: Honor provisioner's capabilities
+  doc/mesh-api: OOB Information field is 16 bit, not 32
+
+ doc/mesh-api.txt       |   2 +-
+ mesh/agent.c           | 105 ++++++++++++++++++++++++-----
+ mesh/agent.h           |   2 +
+ mesh/manager.c         |  33 ++++++---
+ mesh/prov-initiator.c  | 148 +++++++++++++++++++++++++++--------------
+ mesh/provision.h       |   6 +-
+ tools/mesh-cfgclient.c |  18 +++++
+ 7 files changed, 234 insertions(+), 80 deletions(-)
+
+-- 
+2.20.1
+
