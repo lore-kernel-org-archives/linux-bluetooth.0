@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773C4C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F7FC2D0F0
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 22:14:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AE3720678
+	by mail.kernel.org (Postfix) with ESMTP id 7CBA42078C
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 22:14:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bEe8xVXw"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PnCInX5H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733133AbgDAWOr (ORCPT
+        id S1733134AbgDAWOs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Apr 2020 18:14:47 -0400
-Received: from mail-pf1-f169.google.com ([209.85.210.169]:33584 "EHLO
-        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733095AbgDAWOr (ORCPT
+        Wed, 1 Apr 2020 18:14:48 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33214 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732385AbgDAWOr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 1 Apr 2020 18:14:47 -0400
-Received: by mail-pf1-f169.google.com with SMTP id c138so738676pfc.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2020 15:14:46 -0700 (PDT)
+Received: by mail-pl1-f195.google.com with SMTP id ay1so553467plb.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2020 15:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=1vu4h8YZdqPoNxMR4Bg7PsRKoy+xKrL2ziEBT8GCNdo=;
-        b=bEe8xVXwT0cFZijWgR2OK2XEB2fHWqF/gCDJFe3BPcCU/HRZP2VVeDBazTHTAcgZu8
-         XUA1++4hYITA/m2f6aOgugK5qB7qkcscdGTqFFcqBtTkB/Ab5F2e9pht4/nvi0KGeY19
-         dwkZOXsQ3vwS6tqmIkFFviKHdQcl61J4aIw0U=
+        bh=Cnr8sX96FwFefBpNfK1OURK+QmvGZXJ+UB3/+cWm9+0=;
+        b=PnCInX5HoKujI1CGrEwuDxvlEPW8Y06B8C3aR6HVi49EuJId51YTDlm+CuMz5le10O
+         hM5HKKiiLUyT13/l4iqb9uHPEAjCNkaI/svdwuz4p3ncmUPQlqRPM7nAlGAiF2o6eeKy
+         Ngbjk64uAXG8p+YuSgl0+CagYJX55O/WBKG8s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1vu4h8YZdqPoNxMR4Bg7PsRKoy+xKrL2ziEBT8GCNdo=;
-        b=FnvFNghdEzT7HuzYVGMZAwKVVR8bcR4jVwcNuNuwU0WU14/Zdwf+9BMs1awX5pnbWe
-         1vx/emlp0fmXThlHqpE35WH6fr4hNp4ShNdIaHIbEORVvCTyiRd8I9Qzko6VeWeJwloo
-         oaHs/qx2oO0O5Qan20bqGzJtHQlW8Gm1blQlZsC5j6sKVEzjfs+IGm413upqU1VzHWMb
-         jeluHcOgJ0IRju31dGLfzbuwDEFQaVUbeoBfUY5xDTNrRTarrC4g3HQC7XoW/KcSqtPX
-         D5t6fLSfDIVyeXOPb3jAaHQ4plZiWGjcDlxlATF3DPWfyKSeIq5Sm9nHSb0WhNPE3XdF
-         wCaw==
-X-Gm-Message-State: ANhLgQ1dzVI3+kufEK55AryBzpN1hIoTqTCFESJrNJvjrzmFII/PGupc
-        /j/oIJMzpAtSghLCmONaadS+VfQHDdY=
-X-Google-Smtp-Source: ADFU+vt3PuGZW+giDM6J0zSGWtAcLpwD6JaoCnLR557wETConD7OJL/MWK+VscHmvBcKAHqYzeSBzA==
-X-Received: by 2002:a62:3487:: with SMTP id b129mr25456150pfa.150.1585779285306;
-        Wed, 01 Apr 2020 15:14:45 -0700 (PDT)
+        bh=Cnr8sX96FwFefBpNfK1OURK+QmvGZXJ+UB3/+cWm9+0=;
+        b=qW3R1kFPeHGZ9NnyHhLG81U+mR7Ft9iarnlQJdoP3XOy6XWMyPWVlCTCU1OZV2libF
+         0THqSozEWrCbA7aHe2b6NgIiAxMwLK8Izsu6Urcg6h64ehyDenW1xbtnq46S3NNqyCDM
+         ffZHqFp6itpjpEBNjF4RQVphOQM2JawCoCE6/S9Pgba9Iu9IpeKRwpq5ic05hXeWI+X0
+         C3K0Rc0iUnoWxT/cq8q0vEzxU4gkVCCb8g8bvFEGGcnWMgFoCFf4jL5MxMtfNhrSSLtX
+         sneEqCdSaB/YaeYXJSFIrcIPasVUjZhJ6SSOfdOJa8dHdROIHvD1QZpweXOCCLwWC8lU
+         Mz3g==
+X-Gm-Message-State: AGi0PuZ5p3/ZdXcKTTgTkcwUkS210/4LluMTvtme+B9ZKBUe5rJ+apdq
+        2anBe5nLe4bGf5lcicOtBdD+3KUcDDc=
+X-Google-Smtp-Source: APiQypKz0YdyJREgPJdwLP0+Ed/rW2NWFt10xhWU+IeLOvcMeGLP91yVKlohlbZ3rrVNVgvKYw7HWA==
+X-Received: by 2002:a17:902:7583:: with SMTP id j3mr38895pll.196.1585779283933;
+        Wed, 01 Apr 2020 15:14:43 -0700 (PDT)
 Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:b7e2:9910:bd78:608d])
-        by smtp.gmail.com with ESMTPSA id z6sm2394666pjt.42.2020.04.01.15.14.44
+        by smtp.gmail.com with ESMTPSA id z6sm2394666pjt.42.2020.04.01.15.14.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 01 Apr 2020 15:14:44 -0700 (PDT)
+        Wed, 01 Apr 2020 15:14:43 -0700 (PDT)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Miao Chou <mcchou@chromium.org>
-Subject: [PATCH 3/5] Implement CreateServiceRecord method
-Date:   Wed,  1 Apr 2020 15:14:32 -0700
-Message-Id: <20200401221434.12185-3-sonnysasaka@chromium.org>
+Subject: [PATCH 2/5] Implement GetServiceRecords method
+Date:   Wed,  1 Apr 2020 15:14:31 -0700
+Message-Id: <20200401221434.12185-2-sonnysasaka@chromium.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200401221434.12185-1-sonnysasaka@chromium.org>
 References: <20200401221434.12185-1-sonnysasaka@chromium.org>
@@ -71,447 +71,344 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Miao Chou <mcchou@chromium.org>
 
-This implements the CreateServiceRecord method of org.bluez.Adapter1 interface.
+This implements the GetServiceRecords method of org.bluez.Device1 interface.
 ---
- src/adapter.c | 414 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 414 insertions(+)
+ lib/sdp.h    |  13 +++
+ src/device.c | 293 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 306 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 972d88772..c02aaf32b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -48,6 +48,7 @@
- #include "bluetooth/sdp_lib.h"
- #include "lib/uuid.h"
- #include "lib/mgmt.h"
-+#include "lib/sdp.h"
+diff --git a/lib/sdp.h b/lib/sdp.h
+index f586eb5eb..c6fdf3d3a 100644
+--- a/lib/sdp.h
++++ b/lib/sdp.h
+@@ -396,6 +396,19 @@ extern "C" {
+ #define SDP_URL_STR16		0x46
+ #define SDP_URL_STR32		0x47
  
- #include "gdbus/gdbus.h"
- 
-@@ -3424,6 +3425,415 @@ static DBusMessage *connect_device(DBusConnection *conn,
- 	return NULL;
++/*
++ * These are Chromium specific SDP data types which map the above SDP datatype
++ * but without specifying the sizes of types.
++ */
++#define SDP_VAL_TYPE_NIL	0x00
++#define SDP_VAL_TYPE_UINT	0x01
++#define SDP_VAL_TYPE_INT	0x02
++#define SDP_VAL_TYPE_UUID	0x03
++#define SDP_VAL_TYPE_STRING	0x04
++#define SDP_VAL_TYPE_BOOL	0x05
++#define SDP_VAL_TYPE_SEQUENCE	0x06
++#define SDP_VAL_TYPE_URL	0x07
++
+ /*
+  * The PDU identifiers of SDP packets between client and server
+  */
+diff --git a/src/device.c b/src/device.c
+index ace9c348c..1b5afc226 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2762,6 +2762,296 @@ static DBusMessage *cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static int parse_int_uint_variant(DBusMessageIter *iter, bool unsign,
-+					uint32_t size, void **val, uint8_t *dtd)
++static dbus_bool_t append_attr_value(sdp_data_t* val,
++					DBusMessageIter *val_entry)
 +{
-+	int dbus_type = DBUS_TYPE_INVALID;
-+	char arg[4];
++	DBusMessageIter val_struct;
++	DBusMessageIter val_variant;
++	DBusMessageIter val_seq_array;
 +
-+	switch(size) {
-+	case 1:
-+		if (unsign) {
-+			*val = malloc(sizeof(uint8_t));
-+			*dtd = SDP_UINT8;
-+		} else {
-+			*val = malloc(sizeof(int8_t));
-+			*dtd = SDP_INT8;
-+		}
-+		dbus_type = DBUS_TYPE_BYTE;
++	uint8_t value_type;
++	void* value = NULL;
++	uint32_t value_size = (uint32_t) val->unitSize;
++	sdp_data_t *data;
++	char *str = NULL;
++
++	int type;
++	const char *type_sig;
++
++	if (!dbus_message_iter_open_container(val_entry, DBUS_TYPE_STRUCT,
++						NULL, &val_struct))
++		return FALSE;
++
++	switch (val->dtd) {
++	case SDP_DATA_NIL:
++		goto val_nil;
++	case SDP_BOOL:
++		value_type = SDP_VAL_TYPE_BOOL;
++		value = &val->val.uint8;
++		value_size = sizeof(uint8_t);
++		type_sig = DBUS_TYPE_BOOLEAN_AS_STRING;
++		type = DBUS_TYPE_BOOLEAN;
 +		break;
-+	case 2:
-+		if (unsign) {
-+			*val = malloc(sizeof(uint16_t));
-+			*dtd = SDP_UINT16;
-+			dbus_type = DBUS_TYPE_UINT16;
-+		} else {
-+			*val = malloc(sizeof(int16_t));
-+			*dtd = SDP_INT16;
-+			dbus_type = DBUS_TYPE_INT16;
-+		}
++	case SDP_UINT8:
++		value_type = SDP_VAL_TYPE_UINT;
++		value = &val->val.uint8;
++		value_size = sizeof(uint8_t);
++		type_sig = DBUS_TYPE_BYTE_AS_STRING;
++		type = DBUS_TYPE_BYTE;
 +		break;
-+	case 4:
-+		if (unsign) {
-+			*val = malloc(sizeof(uint32_t));
-+			*dtd = SDP_UINT32;
-+			dbus_type = DBUS_TYPE_UINT32;
-+		} else {
-+			*val = malloc(sizeof(int32_t));
-+			*dtd = SDP_INT32;
-+			dbus_type = DBUS_TYPE_INT32;
-+		}
++	case SDP_UINT16:
++		value_type = SDP_VAL_TYPE_UINT;
++		value = &val->val.uint16;
++		value_size = sizeof(uint16_t);
++		type_sig = DBUS_TYPE_UINT16_AS_STRING;
++		type = DBUS_TYPE_UINT16;
 +		break;
-+	case 8:
-+		if (unsign) {
-+			*val = malloc(sizeof(uint64_t));
-+			*dtd = SDP_UINT64;
-+			dbus_type = DBUS_TYPE_UINT64;
-+		} else {
-+			*val = malloc(sizeof(int64_t));
-+			*dtd = SDP_INT64;
-+			dbus_type = DBUS_TYPE_INT64;
-+		}
++	case SDP_UINT32:
++		value_type = SDP_VAL_TYPE_UINT;
++		value = &val->val.uint32;
++		value_size = sizeof(uint32_t);
++		type_sig = DBUS_TYPE_UINT32_AS_STRING;
++		type = DBUS_TYPE_UINT32;
 +		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	if (!*val)
-+		return -1;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != dbus_type) {
-+		free(*val);
-+		return -EINVAL;
-+	}
-+	dbus_message_iter_get_basic(iter, arg);
-+
-+	memcpy(*val, arg, size);
-+
-+	return 0;
-+}
-+
-+static int parse_str_variant(DBusMessageIter *iter, void **val, int *str_len)
-+{
-+	const char *str;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return -EINVAL;
-+	dbus_message_iter_get_basic(iter, &str);
-+
-+	if (!str)
-+		return -1;
-+
-+	*str_len = strlen(str) + 1;
-+
-+	*val = calloc(*str_len, sizeof(char));
-+	if (!val)
-+		return -1;
-+
-+	strncpy(*val, str, *str_len - 1);
-+
-+	return 0;
-+}
-+
-+static int parse_attr_value(DBusMessageIter *val_struct,
-+					sdp_data_t **attr, sdp_record_t* rec)
-+{
-+	DBusMessageIter iter, val_variant;
-+	uint8_t val_type = SDP_VAL_TYPE_NIL;
-+	uint32_t val_size = 0;
-+
-+	uint8_t dtd;
-+	void *val = NULL;
-+	int str_len = 0;
-+	int ret = 0;
-+
-+	*attr = NULL;
-+
-+	if (dbus_message_iter_get_arg_type(val_struct) != DBUS_TYPE_STRUCT)
-+		return -EINVAL;
-+	dbus_message_iter_recurse(val_struct, &iter);
-+
-+	// Extract attribute value type.
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
-+		return -EINVAL;
-+	dbus_message_iter_get_basic(&iter, &val_type);
-+	if (!dbus_message_iter_next(&iter))
-+		return -ENODATA;
-+
-+	// Extract attribute value size.
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+		return -EINVAL;
-+	dbus_message_iter_get_basic(&iter, &val_size);
-+	if (!dbus_message_iter_next(&iter))
-+		return -ENODATA;
-+
-+	// Extract attribute value based on its type.
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return -EINVAL;
-+	dbus_message_iter_recurse(&iter, &val_variant);
-+
-+	switch(val_type) {
-+	case SDP_VAL_TYPE_NIL:
-+		dtd = SDP_DATA_NIL;
++	case SDP_UINT64:
++		value_type = SDP_VAL_TYPE_UINT;
++		value = &val->val.uint64;
++		value_size = sizeof(uint64_t);
++		type_sig = DBUS_TYPE_UINT64_AS_STRING;
++		type = DBUS_TYPE_UINT64;
 +		break;
-+	case SDP_VAL_TYPE_UINT: {
-+		ret = parse_int_uint_variant(&val_variant, true, val_size, &val,
-+						&dtd);
-+		if (ret < 0)
-+			return ret;
++	case SDP_INT8:
++		value_type = SDP_VAL_TYPE_INT;
++		value = &val->val.int8;
++		value_size = sizeof(int8_t);
++		type_sig = DBUS_TYPE_BYTE_AS_STRING;
++		type = DBUS_TYPE_BYTE;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_INT: {
-+		ret = parse_int_uint_variant(&val_variant, false, val_size, &val,
-+						&dtd);
-+		if (ret < 0)
-+			return ret;
++	case SDP_INT16:
++		value_type = SDP_VAL_TYPE_INT;
++		value = &val->val.int16;
++		value_size = sizeof(int16_t);
++		type_sig = DBUS_TYPE_INT16_AS_STRING;
++		type = DBUS_TYPE_INT16;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_UUID: {
-+		// The UUID string is in "%08x-%04x-%04x-%04x-%08x%04x" format.
-+		// Take Bluetooth base UUID for instance, the base UUID string
-+		// is "00000000-0000-1000-8000-00805F9B34FB". Extra action may
-+		// be needed to change the UUID type of a newly-created |uuid|
-+		// based on the |val_size| field.
-+		uuid_t *uuid = NULL;
-+		const char *uuid_str;
-+		void *arg = NULL;
-+
-+		if (dbus_message_iter_get_arg_type(&val_variant) !=
-+				DBUS_TYPE_STRING)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(&val_variant, &uuid_str);
-+
-+		if (!uuid_str)
-+			return -1;
-+
-+		uuid = (uuid_t *)malloc(sizeof(uuid_t));
-+		if (!uuid)
-+			return -1;
-+
-+		if (bt_string2uuid(uuid, uuid_str) < 0) {
-+			free(uuid);
-+			return -1;
-+		}
-+
-+		switch(val_size) {
-+		case 2:
-+			dtd = SDP_UUID16;
-+			if (!sdp_uuid128_to_uuid(uuid)) {
-+				free(uuid);
-+				return -1;
-+			}
-+			arg = &uuid->value.uuid16;
-+			break;
-+		case 4:
-+			dtd = SDP_UUID32;
-+			if (!sdp_uuid128_to_uuid(uuid)) {
-+				free(uuid);
-+				return -1;
-+			}
-+			arg = &uuid->value.uuid32;
-+			break;
-+		case 16:
-+			dtd = SDP_UUID128;
-+			arg = &uuid->value.uuid128;
-+			break;
-+		default:
-+			free(uuid);
-+			return -EINVAL;
-+		}
-+
-+		val = malloc(val_size);
-+		memcpy(val, arg, val_size);
-+
-+		// Insert the UUID into |rec|'s search pattern. The ownership
-+		// of |uuid| will NOT be transferred, so |uuid| should be freed
-+		// after use.
-+		sdp_pattern_add_uuid(rec, uuid);
-+
-+		free(uuid);
++	case SDP_INT32:
++		value_type = SDP_VAL_TYPE_INT;
++		value = &val->val.int32;
++		value_size = sizeof(int32_t);
++		type_sig = DBUS_TYPE_INT32_AS_STRING;
++		type = DBUS_TYPE_INT32;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_STRING: {
-+		dtd = SDP_TEXT_STR8;
-+		ret = parse_str_variant(&val_variant, &val, &str_len);
-+		if (ret < 0)
-+			return ret;
++	case SDP_INT64:
++		value_type = SDP_VAL_TYPE_INT;
++		value = &val->val.int64;
++		value_size = sizeof(int64_t);
++		type_sig = DBUS_TYPE_INT64_AS_STRING;
++		type = DBUS_TYPE_INT64;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_BOOL: {
-+		dbus_bool_t *arg = NULL;
-+
-+		dtd = SDP_BOOL;
-+
-+		if (dbus_message_iter_get_arg_type(&val_variant) !=
-+				DBUS_TYPE_BOOLEAN)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(&val_variant, arg);
-+
-+		if (!arg)
-+			return -1;
-+
-+		val = malloc(sizeof(bool));
-+		if (!val)
-+			return -1;
-+
-+		memcpy(val, arg, sizeof(bool));
++	case SDP_UUID16:
++	case SDP_UUID32:
++	case SDP_UUID128:
++		// Although a UUID is passed as a string in format
++		// "0000XXXX-0000-1000-8000-00805F9B34FB", |value_size|
++		// should hold the original length of a UUID. The length unit
++		// is byte, so a length can be 2, 4, 16.
++		if (val->dtd == SDP_UUID16)
++			value_size = sizeof(uint16_t);
++		else if (val->dtd == SDP_UUID32)
++			value_size = sizeof(uint32_t);
++		else
++			value_size = sizeof(uint128_t);
++		value_type = SDP_VAL_TYPE_UUID;
++		str = bt_uuid2string(&val->val.uuid);
++		value = &str;
++		type_sig = DBUS_TYPE_STRING_AS_STRING;
++		type = DBUS_TYPE_STRING;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_URL: {
-+		dtd = SDP_URL_STR8;
-+		ret = parse_str_variant(&val_variant, &val, &str_len);
-+		if (ret < 0)
-+			return ret;
++	case SDP_TEXT_STR8:
++	case SDP_TEXT_STR16:
++	case SDP_TEXT_STR32:
++		// TODO(chromium:633929): Distinguish string and data array by
++		// checking if the given string is in UTF-8 format or not. For
++		// now the binary case is skipped by setting |str| as a empty
++		// string.
++		str = val->val.str;
++		if (!dbus_validate_utf8(str, NULL))
++			str = "";
++		value_size = strlen(str);
++		value_type = SDP_VAL_TYPE_STRING;
++		value = &str;
++		type_sig = DBUS_TYPE_STRING_AS_STRING;
++		type = DBUS_TYPE_STRING;
 +		break;
-+	}
-+	case SDP_VAL_TYPE_SEQUENCE: {
-+		sdp_data_t *seq = NULL;
-+		DBusMessageIter seq_iter;
-+
-+		dtd = SDP_SEQ32;
-+
-+		if (dbus_message_iter_get_arg_type(&val_variant) !=
-+				DBUS_TYPE_ARRAY)
-+			return -EINVAL;
-+
-+		dbus_message_iter_recurse(&val_variant, &seq_iter);
-+
-+		// Recursively extract the value from each element of the
-+		// sequence.
-+		while (dbus_message_iter_get_arg_type(&seq_iter) ==
-+				DBUS_TYPE_STRUCT) {
-+			sdp_data_t *data;
-+
-+			ret = parse_attr_value(&seq_iter, &data, rec);
-+			if (!data || ret < 0) {
-+				if (data)
-+					sdp_data_free(data);
-+				if (seq)
-+					sdp_data_free(seq);
-+
-+				return ret;
-+			}
-+			seq = sdp_seq_append(seq, data);
-+
-+			dbus_message_iter_next(&seq_iter);
-+		}
-+
-+		val = seq;
++	case SDP_URL_STR8:
++	case SDP_URL_STR16:
++	case SDP_URL_STR32:
++		value_type = SDP_VAL_TYPE_URL;
++		str = val->val.str;
++		value_size = strlen(str);
++		value = &str;
++		type_sig = DBUS_TYPE_STRING_AS_STRING;
++		type = DBUS_TYPE_STRING;
 +		break;
++	case SDP_ALT8:
++	case SDP_ALT16:
++	case SDP_ALT32:
++	case SDP_SEQ8:
++	case SDP_SEQ16:
++	case SDP_SEQ32: {
++		uint32_t size = 0;
++
++		value_type = SDP_VAL_TYPE_SEQUENCE;
++
++		// Calculate the number of elements in the sequence.
++		for (data = val->val.dataseq; data; data = data->next)
++			size++;
++
++		if (!dbus_message_iter_append_basic(&val_struct,
++						DBUS_TYPE_BYTE, &value_type))
++			return FALSE;
++		if (!dbus_message_iter_append_basic(&val_struct,
++						DBUS_TYPE_UINT32, &size))
++			return FALSE;
++		if (!dbus_message_iter_open_container(&val_struct,
++				DBUS_TYPE_VARIANT, "a(yuv)", &val_variant))
++			return FALSE;
++		if (!dbus_message_iter_open_container(&val_variant,
++				DBUS_TYPE_ARRAY, "(yuv)", &val_seq_array))
++			return FALSE;
++
++		for (data = val->val.dataseq; data; data = data->next)
++			append_attr_value(data, &val_seq_array);
++
++		if (!dbus_message_iter_close_container(&val_variant,
++							&val_seq_array))
++			return FALSE;
++		if (!dbus_message_iter_close_container(&val_struct,
++							&val_variant))
++			return FALSE;
++		goto done;
 +	}
 +	default:
-+		return -EINVAL;
++		goto val_nil;
 +	}
 +
-+	*attr = sdp_data_alloc_with_length(dtd, val, str_len);
-+	if (!*attr) {
-+		ret = -1;
-+		goto error_alloc_attr;
-+	}
++	if (!dbus_message_iter_append_basic(&val_struct,
++						DBUS_TYPE_BYTE, &value_type))
++		goto failed_to_append;
++	if (!dbus_message_iter_append_basic(&val_struct,
++						DBUS_TYPE_UINT32, &value_size))
++		goto failed_to_append;
++	if (!dbus_message_iter_open_container(&val_struct, DBUS_TYPE_VARIANT,
++						type_sig, &val_variant))
++		goto failed_to_append;
++	if (!dbus_message_iter_append_basic(&val_variant, type, value))
++		goto failed_to_append;
 +
-+	return 0;
++	if (value_type == SDP_VAL_TYPE_UUID)
++		free(str);
 +
-+error_alloc_attr:
-+	if (!val)
-+		return ret;
++	if (!dbus_message_iter_close_container(&val_struct, &val_variant))
++		return FALSE;
 +
-+	if (val_type == SDP_VAL_TYPE_SEQUENCE)
-+		sdp_data_free((sdp_data_t *)val);
-+	else
-+		free(val);
++val_nil:
++done:
++	if (!dbus_message_iter_close_container(val_entry, &val_struct))
++		return FALSE;
++	return TRUE;
 +
-+	return ret;
++failed_to_append:
++	if (value_type == SDP_VAL_TYPE_UUID)
++		free(str);
++	return FALSE;
 +}
 +
-+static int parse_record(DBusMessageIter *rec_array,
-+				sdp_record_t *rec)
++static dbus_bool_t append_attr(sdp_data_t *attr, DBusMessageIter *attr_dict)
 +{
++	DBusMessageIter attr_entry;
++
++	if (!dbus_message_iter_open_container(attr_dict, DBUS_TYPE_DICT_ENTRY,
++				NULL, &attr_entry))
++		return FALSE;
++
++	if (!dbus_message_iter_append_basic(&attr_entry, DBUS_TYPE_UINT16,
++						&attr->attrId))
++		return FALSE;
++
++	if (!append_attr_value(attr, &attr_entry))
++		return FALSE;
++
++	if (!dbus_message_iter_close_container(attr_dict, &attr_entry))
++		return FALSE;
++
++	return TRUE;
++}
++
++static dbus_bool_t append_record(const sdp_record_t *rec,
++					DBusMessageIter *attr_array)
++{
++	sdp_list_t *seq;
 +	DBusMessageIter attr_dict;
-+	sdp_data_t *attr = NULL;
-+	int ret = 0;
 +
-+	if (dbus_message_iter_get_arg_type(rec_array) != DBUS_TYPE_ARRAY)
-+		return -EINVAL;
++	if (!dbus_message_iter_open_container(attr_array, DBUS_TYPE_ARRAY,
++						"{q(yuv)}", &attr_dict))
++		return FALSE;
 +
-+	dbus_message_iter_recurse(rec_array, &attr_dict);
-+
-+	while(dbus_message_iter_get_arg_type(&attr_dict) ==
-+							DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter entry;
-+		uint16_t attr_id;
-+
-+		dbus_message_iter_recurse(&attr_dict, &entry);
-+
-+		// Extract attribute ID.
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_UINT16)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(&entry, &attr_id);
-+		if (!dbus_message_iter_next(&entry))
-+			return -ENODATA;
-+
-+		// Extract attribute value structure.
-+		ret = parse_attr_value(&entry, &attr, rec);
-+		if (ret < 0)
-+			goto error_parse_attr;
-+
-+		// Add the new attribute to the record.
-+		if (sdp_attr_add(rec, attr_id, attr) < 0) {
-+			ret = -1;
-+			goto error_parse_attr;
-+		}
-+
-+		dbus_message_iter_next(&attr_dict);
++	for (seq = rec->attrlist; seq; seq = seq->next) {
++		sdp_data_t *attr = (sdp_data_t *) seq->data;
++		if (!append_attr(attr, &attr_dict))
++			return FALSE;
 +	}
 +
-+	return 0;
++	if (!dbus_message_iter_close_container(attr_array, &attr_dict))
++		return FALSE;
 +
-+error_parse_attr:
-+	if (attr)
-+		sdp_data_free(attr);
-+
-+	// Release the UUID pattern list.
-+	sdp_list_free(rec->pattern, free);
-+
-+	return ret;
++	return TRUE;
 +}
 +
-+static DBusMessage *create_service_record(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
++static DBusMessage *get_service_records(DBusConnection *conn,
++					DBusMessage *msg, void *data)
 +{
-+	struct btd_adapter *adapter = user_data;
++	struct btd_device *dev = data;
++	sdp_list_t *seq;
 +	DBusMessage *reply;
-+	sdp_record_t *rec;
-+	DBusMessageIter rec_array, iter;
-+	int ret = 0;
++	DBusMessageIter rec_array;
++	DBusMessageIter attr_array;
 +
-+	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
++	if (!btd_adapter_get_powered(dev->adapter))
 +		return btd_error_not_ready(msg);
 +
-+	if(!dbus_message_iter_init(msg, &rec_array))
-+		return btd_error_failed(msg, "Failed to read record argument");
++	if (!btd_device_is_connected(dev))
++		return btd_error_not_connected(msg);
 +
 +	reply = dbus_message_new_method_return(msg);
 +	if (!reply)
 +		return btd_error_failed(msg, "Failed to create method reply");
 +
-+	rec = sdp_record_alloc();
-+	if (!rec)
-+		goto failed_to_alloc;
++	/* Load records from storage if there is nothing in cache */
++	if (!dev->tmp_records)
++		return btd_error_failed(msg, "SDP record not found");
 +
-+	ret = parse_record(&rec_array, rec);
-+	if (ret < 0) {
-+		sdp_record_free(rec);
-+		if (ret == -EINVAL || ret == -ENODATA)
-+			return btd_error_invalid_args(msg);
-+		else
++	dbus_message_iter_init_append(reply, &rec_array);
++
++	if (!dbus_message_iter_open_container(&rec_array, DBUS_TYPE_ARRAY,
++						"a{q(yuv)}", &attr_array))
++		return FALSE;
++
++	for (seq = dev->tmp_records; seq; seq = seq->next) {
++		sdp_record_t *rec = (sdp_record_t *) seq->data;
++		if (!rec)
++			continue;
++		if (!append_record(rec, &attr_array))
 +			return btd_error_failed(msg,
-+					"Failed to parse record argument");
++						"SDP record attachment failed");
 +	}
 +
-+	ret = adapter_service_add(adapter, rec);
-+	if (ret < 0) {
-+		sdp_record_free(rec);
-+		if (ret == -EEXIST)
-+			return btd_error_already_exists(msg);
-+		else
-+			return btd_error_failed(msg, "Failed to add record");
-+	}
-+
-+	dbus_message_iter_init_append(reply, &iter);
-+	if (!dbus_message_iter_append_basic(
-+				&iter, DBUS_TYPE_UINT32, &rec->handle)) {
-+		sdp_record_free(rec);
-+		return btd_error_failed(msg, "Failed to append record handle");
-+	}
++	if (!dbus_message_iter_close_container(&rec_array, &attr_array))
++		return FALSE;
 +
 +	return reply;
-+
-+failed_to_alloc:
-+	return btd_error_failed(msg, "Failed to allocate SDP record");
 +}
 +
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
- 	{ GDBUS_METHOD("SetDiscoveryFilter",
-@@ -3438,6 +3848,10 @@ static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("ConnectDevice",
- 				GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
- 				connect_device) },
-+	{ GDBUS_METHOD("CreateServiceRecord",
-+			GDBUS_ARGS({"record", "a{q(yuv)}"}),
-+			GDBUS_ARGS({"handle", "u"}),
-+			create_service_record)},
+ static const GDBusMethodTable device_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+@@ -2771,6 +3061,9 @@ static const GDBusMethodTable device_methods[] = {
+ 						NULL, disconnect_profile) },
+ 	{ GDBUS_ASYNC_METHOD("Pair", NULL, NULL, pair_device) },
+ 	{ GDBUS_METHOD("CancelPairing", NULL, NULL, cancel_pairing) },
++	{ GDBUS_ASYNC_METHOD("GetServiceRecords", NULL,
++			GDBUS_ARGS({"records", "aa{q(yuv)}"}),
++			get_service_records) },
  	{ }
  };
  
