@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD328C43331
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 10:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A182C2D0E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 10:25:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DB4520678
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 10:25:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FB3A20678
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 10:25:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="EBl+/8Dt"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="bkVh2R2f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732158AbgDAKZE (ORCPT
+        id S1732169AbgDAKZE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 1 Apr 2020 06:25:04 -0400
-Received: from mail-lf1-f46.google.com ([209.85.167.46]:44734 "EHLO
-        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730720AbgDAKZE (ORCPT
+Received: from mail-lf1-f51.google.com ([209.85.167.51]:45111 "EHLO
+        mail-lf1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732154AbgDAKZE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 1 Apr 2020 06:25:04 -0400
-Received: by mail-lf1-f46.google.com with SMTP id 131so641467lfh.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2020 03:25:01 -0700 (PDT)
+Received: by mail-lf1-f51.google.com with SMTP id v4so19941866lfo.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2020 03:25:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=IecFyvJoyjkzMoYy3KC7YwYN0zPf+QMyEtAzUmAo0zQ=;
-        b=EBl+/8DtsUyp+9D615N96ACa7KorAmeeb12yAkvVpGta99Sy/xlAx3mJ80z7Q9CwwC
-         gKk48hx2LjDfcGmASVEj30EbkC1ypwAkxnZ1XiGNOchSzJmpzv4EJ4Qzjawe+DxqkI9n
-         OxqFZpopFPsB9fYHihw2E6u5oK5C/8a9JYmNe6ZbZxawNuyaMppz4o4DMEYjrow1JYHH
-         0K/hwGREcUsoEf0Nw7KW5othbuTYvRJu7gXyn1dGVEErGYLmL8sScP/qrGGQIW0k4UY3
-         0m2InofZKKKXxcggoq+Ukmhv7/iVDSk6dVHvAeArNZMZLBDMIzwt4HffUNo3wJHIRNFA
-         GbUQ==
+        bh=DygyTHIv6tTK38tMsaaq2FSgilJWE1kf4cxPQwtvpCU=;
+        b=bkVh2R2fccPBtzJCBgY2jAaP9PtIyXmNLNu9AVDdZ5EUnOOB0e86/HpySfBXzW+fFD
+         VRj7XgBagmHoADG6u4SMsjaYCL6J2jnU0szdZLWwaTaEpeHIkQG+5CjgTbq+Wu8zENIs
+         /D6yrtiN0t9rWhDNglG9vFGqT80Wqsazw6dbX+d4IIekbbPMiIZcBcpVV1HTRsU5dZAJ
+         dM7/aEu76W1ie37erph6vpVzVVDgrC/Wwa59VLbwvNJvfvpAtMYCgxj79avAv9/FVajz
+         8wk6lWjaDxqhruT80UXLKulcIbuadV/2y78+4t/NpF4O0iTIvUDGUN2JzUCEEdZdiKzI
+         S3zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IecFyvJoyjkzMoYy3KC7YwYN0zPf+QMyEtAzUmAo0zQ=;
-        b=bAfLRJayhg9M4l/aGL1or+Q5WvSnVWJYbc41bN9U03nNEfekupCSnU70gHJfVSMCCN
-         wOstwlbCnAw/07oP5PZbY4UQLNiWHhmqZ63HkQ+6fOBDTejBWVYKOJMjU4O+Y3mU/U7V
-         kl4atBFB2hGNB+NutsUwh+hJqabNCldz1PoFFYn5OOD7tVWO56WxMcSXefP07h5C9qfY
-         orh6NLhvPyXMq7nfX71cBXYH4Iw+UelA6CfKumm6FkuDnpeLc/3BrG2I7L6eO6VqqItS
-         A5TNSqAisLHYQqRb8VUJbhez5HUQv87muPW2uVivFVlk0vdq0oPG61oWqPjBGmilWVr1
-         Ei0w==
-X-Gm-Message-State: AGi0Puadtk/5z8RIHzSEvZ+thtAwJcRA4VsJjnmMrae25HdPHOuM+mVY
-        YapxapEzPqes+Fb4gB/dY6MA0qaKGlY=
-X-Google-Smtp-Source: APiQypIhHHllmxxXJ0eIGiFXzwSkV/tlyTTE5sCqvt/wG8DwM5vrEmblVF5Wg8RAxL7thfkXyWoVRQ==
-X-Received: by 2002:a19:6749:: with SMTP id e9mr13668122lfj.122.1585736699987;
-        Wed, 01 Apr 2020 03:24:59 -0700 (PDT)
+        bh=DygyTHIv6tTK38tMsaaq2FSgilJWE1kf4cxPQwtvpCU=;
+        b=Xipj62obMqIe/nbRtu4gio+T/MDz+rGrlXYpl2Yz07sX/438AQ1ptBP6OS12ku8lcM
+         8dqIPooceNhCdepVTXBmgboErwIFArrf1MW6Svk3/bHN3unifu7mj0lmUOJet/GDAmol
+         rARGpQGtslP1Ky614sfD+lUhUes24+WhfpziMtr9MPHIUq0pzOwb7p60uBMBd6odCEME
+         TyT1Ck+0tHW8d1nEdn0bTA+yeU028hKy5bjWnR+bbiAj9Pe31R2OJuvOn1rdsmQiV31z
+         w1VAREzRgLyTufRbSMlAh5T+NDn/lJlQiGeZre82brVRKjGprMs+BBT0kLkYwuBNjwLM
+         8Wmg==
+X-Gm-Message-State: AGi0Pua3jKoB8JoasTTW8wJlqzPkblXFGqXN7gq+oLSn1cCfys4n6u1v
+        byMgHuSxrezRpwbdi+llZHmY2Pv5/FA=
+X-Google-Smtp-Source: APiQypK/B86ixQM+rShyKe+ToEvSoq/o4xsQtxHvhJ3QYCD8r9eZ9IXG6bVuZJyxU8YM4trkfRdY8w==
+X-Received: by 2002:ac2:51de:: with SMTP id u30mr990793lfm.170.1585736700862;
+        Wed, 01 Apr 2020 03:25:00 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id r16sm922217ljj.40.2020.04.01.03.24.59
+        by smtp.gmail.com with ESMTPSA id r16sm922217ljj.40.2020.04.01.03.25.00
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2020 03:24:59 -0700 (PDT)
+        Wed, 01 Apr 2020 03:25:00 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/6] mesh: Refresh provisioner's capabilities
-Date:   Wed,  1 Apr 2020 12:25:00 +0200
-Message-Id: <20200401102502.746-5-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v2 5/6] mesh: Honor provisioner's capabilities
+Date:   Wed,  1 Apr 2020 12:25:01 +0200
+Message-Id: <20200401102502.746-6-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200401102502.746-1-michal.lowas-rzechonek@silvair.com>
 References: <20200401102502.746-1-michal.lowas-rzechonek@silvair.com>
@@ -72,376 +72,161 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-As provisioner's capabilities might change during application lifetime
-(e.g. no network link to download OOB key), let's query the agent again
-after application calls AddNode().
+This patch makes the daemon select authentication method based from
+capabilities supported by both provisioned node and provisioner
+application.
 ---
- mesh/agent.c          | 105 +++++++++++++++++++++++++++++++++++-------
- mesh/agent.h          |   2 +
- mesh/manager.c        |  33 +++++++++----
- mesh/prov-initiator.c |  47 +++++++++++++++----
- mesh/provision.h      |   3 ++
- 5 files changed, 154 insertions(+), 36 deletions(-)
+ mesh/prov-initiator.c  | 82 ++++++++++++++++++++++++++----------------
+ tools/mesh-cfgclient.c |  7 ++++
+ 2 files changed, 58 insertions(+), 31 deletions(-)
 
-diff --git a/mesh/agent.c b/mesh/agent.c
-index 3ab3893a1..02993738c 100644
---- a/mesh/agent.c
-+++ b/mesh/agent.c
-@@ -40,7 +40,8 @@ typedef enum {
- 	MESH_AGENT_REQUEST_IN_ALPHA,
- 	MESH_AGENT_REQUEST_STATIC_OOB,
- 	MESH_AGENT_REQUEST_PRIVATE_KEY,
--	MESH_AGENT_REQUEST_PUBLIC_KEY
-+	MESH_AGENT_REQUEST_PUBLIC_KEY,
-+	MESH_AGENT_REQUEST_CAPABILITIES,
- } agent_request_type_t;
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index 17bda6521..8d523e9c0 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -38,6 +38,8 @@
+ #include "mesh/agent.h"
+ #include "mesh/error.h"
  
- struct agent_request {
-@@ -158,6 +159,25 @@ static void parse_oob_info(struct mesh_agent_prov_caps *caps,
- 	}
++#define MIN(x, y) ((x) < (y) ? (x) : (y))
++
+ /* Quick size sanity check */
+ static const uint16_t expected_pdu_size[] = {
+ 	2,	/* PROV_INVITE */
+@@ -587,6 +589,44 @@ failure:
+ 	int_prov_close(prov, fail_code[1]);
  }
  
-+static void parse_properties(struct mesh_agent *agent,
-+					struct l_dbus_message_iter *properties)
++static void int_prov_start_auth(const struct mesh_agent_prov_caps *prov_caps,
++				const struct mesh_net_prov_caps *dev_caps,
++				struct prov_start *start)
 +{
-+	const char *key, *uri_string;
-+	struct l_dbus_message_iter variant;
++	uint8_t pub_type = prov_caps->pub_type & dev_caps->pub_type;
++	uint8_t static_type = prov_caps->static_type & dev_caps->static_type;
++	uint16_t output_action = prov_caps->output_action &
++							L_BE16_TO_CPU(dev_caps->output_action);
++	uint8_t output_size = MIN(prov_caps->output_size,
++							dev_caps->output_size);
++	uint16_t input_action = prov_caps->input_action &
++							L_BE16_TO_CPU(dev_caps->input_action);
++	uint8_t input_size = MIN(prov_caps->input_size, dev_caps->input_size);
 +
-+	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
-+		if (!strcmp(key, "Capabilities")) {
-+			parse_prov_caps(&agent->caps, &variant);
-+		} else if (!strcmp(key, "URI")) {
-+			l_dbus_message_iter_get_variant(&variant, "s",
-+								&uri_string);
-+			/* TODO: compute hash */
-+		} else if (!strcmp(key, "OutOfBandInfo")) {
-+			parse_oob_info(&agent->caps, &variant);
-+		}
-+	}
-+}
++	if (pub_type)
++		start->pub_key = 0x01;
 +
- static void agent_free(void *agent_data)
- {
- 	struct mesh_agent *agent = agent_data;
-@@ -193,6 +213,7 @@ static void agent_free(void *agent_data)
- 		case MESH_AGENT_REQUEST_VIBRATE:
- 		case MESH_AGENT_REQUEST_OUT_NUMERIC:
- 		case MESH_AGENT_REQUEST_OUT_ALPHA:
-+		case MESH_AGENT_REQUEST_CAPABILITIES:
- 			simple_cb = agent->req->cb;
- 			simple_cb(req->user_data, err);
- 		default:
-@@ -235,26 +256,13 @@ struct mesh_agent *mesh_agent_create(const char *path, const char *owner,
- 					struct l_dbus_message_iter *properties)
- {
- 	struct mesh_agent *agent;
--	const char *key, *uri_string;
--	struct l_dbus_message_iter variant;
- 
- 	agent = l_new(struct mesh_agent, 1);
--
--	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
--		if (!strcmp(key, "Capabilities")) {
--			parse_prov_caps(&agent->caps, &variant);
--		} else if (!strcmp(key, "URI")) {
--			l_dbus_message_iter_get_variant(&variant, "s",
--								&uri_string);
--			/* TODO: compute hash */
--		} else if (!strcmp(key, "OutOfBandInfo")) {
--			parse_oob_info(&agent->caps, &variant);
--		}
--	}
--
- 	agent->owner = l_strdup(owner);
- 	agent->path = l_strdup(path);
- 
-+	parse_properties(agent, properties);
-+
- 	l_queue_push_tail(agents, agent);
- 
- 	return agent;
-@@ -289,13 +297,76 @@ static int get_reply_error(struct l_dbus_message *reply)
- 	if (l_dbus_message_is_error(reply)) {
- 
- 		l_dbus_message_get_error(reply, &name, &desc);
--		l_error("Agent failed output action (%s), %s", name, desc);
-+		l_error("Agent failed (%s), %s", name, desc);
- 		return MESH_ERROR_FAILED;
- 	}
- 
- 	return MESH_ERROR_NONE;
- }
- 
-+static void properties_reply(struct l_dbus_message *reply, void *user_data)
-+{
-+	struct mesh_agent *agent = user_data;
-+	struct agent_request *req;
-+	mesh_agent_cb_t cb;
-+	struct l_dbus_message_iter properties;
-+	int err;
-+
-+	if (!l_queue_find(agents, simple_match, agent) || !agent->req)
++	/* Parse OOB Options, prefer static, then out, then in */
++	if (static_type) {
++		start->auth_method = 0x01;
 +		return;
-+
-+	req = agent->req;
-+
-+	err = get_reply_error(reply);
-+
-+	if (err != MESH_ERROR_NONE)
-+		goto fail;
-+
-+	if (!l_dbus_message_get_arguments(reply, "a{sv}", &properties)) {
-+		err = MESH_ERROR_FAILED;
-+		goto fail;
 +	}
 +
-+	parse_properties(agent, &properties);
-+fail:
-+	if (req->cb)
-+	{
-+		cb = req->cb;
-+		cb(req->user_data, err);
++	if(output_size && output_action) {
++		start->auth_method = 0x02;
++		start->auth_action = u16_high_bit(output_action);
++		start->auth_size = MIN(output_size, 8);
++		return;
 +	}
 +
-+	l_dbus_message_unref(req->msg);
-+	l_free(req);
-+	agent->req = NULL;
++	if (input_size && input_action) {
++		start->auth_method = 0x03;
++		start->auth_action = u16_high_bit(input_action);
++		start->auth_size = MIN(input_size, 8);
++		return;
++	}
 +}
 +
-+void mesh_agent_refresh(struct mesh_agent *agent, mesh_agent_cb_t cb,
-+							void *user_data)
-+{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message *msg;
-+	struct l_dbus_message_builder *builder;
-+
-+	agent->req = create_request(MESH_AGENT_REQUEST_CAPABILITIES, (void *)cb,
-+								user_data);
-+
-+	msg = l_dbus_message_new_method_call(dbus, agent->owner, agent->path,
-+						L_DBUS_INTERFACE_PROPERTIES,
-+						"GetAll");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	l_dbus_message_builder_append_basic(builder, 's',
-+						MESH_PROVISION_AGENT_INTERFACE);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	l_dbus_send_with_reply(dbus_get_bus(), msg, properties_reply, agent,
-+									NULL);
-+
-+	agent->req->msg = l_dbus_message_ref(msg);
-+}
-+
-+
- static void simple_reply(struct l_dbus_message *reply, void *user_data)
+ static void int_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
  {
- 	struct mesh_agent *agent = user_data;
-diff --git a/mesh/agent.h b/mesh/agent.h
-index 80333acd5..6cc3d0f71 100644
---- a/mesh/agent.h
-+++ b/mesh/agent.h
-@@ -42,6 +42,8 @@ void mesh_agent_init(void);
- void mesh_agent_cleanup(void);
- struct mesh_agent *mesh_agent_create(const char *path, const char *owner,
- 					struct l_dbus_message_iter *properties);
-+void mesh_agent_refresh(struct mesh_agent *agent, mesh_agent_cb_t cb,
-+							void *user_data);
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+@@ -638,43 +678,23 @@ static void int_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 			goto failure;
+ 		}
  
- void mesh_agent_remove(struct mesh_agent *agent);
- void mesh_agent_cancel(struct mesh_agent *agent);
-diff --git a/mesh/manager.c b/mesh/manager.c
-index a4c2f2d41..9ec4a1468 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -81,6 +81,9 @@ static void free_pending_add_call()
- 		l_dbus_remove_watch(dbus_get_bus(),
- 						add_pending->disc_watch);
- 
-+	if (add_pending->msg)
-+		l_dbus_message_unref(add_pending->msg);
+-		/* If Public Key available Out of Band, use it */
+-		if (prov->conf_inputs.caps.pub_type) {
+-			prov->conf_inputs.start.pub_key = 0x01;
++		/*
++		 * Select auth mechanism from methods supported by both
++		 * parties.
++		 */
++		int_prov_start_auth(mesh_agent_get_caps(prov->agent),
++						&prov->conf_inputs.caps,
++						&prov->conf_inputs.start);
 +
- 	l_free(add_pending);
- 	add_pending = NULL;
- }
-@@ -212,6 +215,23 @@ static bool add_data_get(void *user_data, uint8_t num_ele)
++		if (prov->conf_inputs.start.pub_key == 0x01) {
+ 			prov->expected = PROV_CONFIRM;
+ 			/* Prompt Agent for remote Public Key */
+ 			mesh_agent_request_public_key(prov->agent,
+ 							pub_key_cb, prov);
+-
+ 			/* Nothing else for us to do now */
+ 		} else
+ 			prov->expected = PROV_PUB_KEY;
+ 
+-		/* Parse OOB Options, prefer static, then out, then in */
+-		if (prov->conf_inputs.caps.static_type) {
+-
+-			prov->conf_inputs.start.auth_method = 0x01;
+-
+-		} else if (prov->conf_inputs.caps.output_size &&
+-				prov->conf_inputs.caps.output_action) {
+-
+-			prov->conf_inputs.start.auth_method = 0x02;
+-			prov->conf_inputs.start.auth_action =
+-					u16_high_bit(l_get_be16(data + 6));
+-			prov->conf_inputs.start.auth_size =
+-						(data[5] > 8 ? 8 : data[5]);
+-
+-		} else if (prov->conf_inputs.caps.input_size &&
+-				prov->conf_inputs.caps.input_action) {
+-
+-			prov->conf_inputs.start.auth_method = 0x03;
+-			prov->conf_inputs.start.auth_action =
+-					u16_high_bit(l_get_be16(data + 9));
+-			prov->conf_inputs.start.auth_size =
+-						(data[8] > 8 ? 8 : data[8]);
+-
+-		}
+-
+ 		out = l_malloc(1 + sizeof(prov->conf_inputs.start));
+ 		out[0] = PROV_START;
+ 		memcpy(out + 1, &prov->conf_inputs.start,
+@@ -789,7 +809,7 @@ static void int_prov_ack(void *user_data, uint8_t msg_num)
+ 	switch (prov->state) {
+ 	case INT_PROV_START_SENT:
+ 		prov->state = INT_PROV_START_ACKED;
+-		if (prov->conf_inputs.caps.pub_type == 0)
++		if (!prov->conf_inputs.start.pub_key)
+ 			send_pub_key(prov);
+ 		break;
+ 
+@@ -798,7 +818,7 @@ static void int_prov_ack(void *user_data, uint8_t msg_num)
+ 		break;
+ 
+ 	case INT_PROV_KEY_SENT:
+-		if (prov->conf_inputs.caps.pub_type == 1)
++		if (prov->conf_inputs.start.pub_key)
+ 			int_prov_auth();
+ 		break;
+ 
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index 43588852b..6083b2b1f 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -617,6 +617,13 @@ static bool register_agent(void)
+ 		return false;
+ 	}
+ 
++	if (!l_dbus_object_add_interface(dbus, app.agent_path,
++					 L_DBUS_INTERFACE_PROPERTIES, NULL)) {
++		l_error("Failed to add interface %s",
++					L_DBUS_INTERFACE_PROPERTIES);
++		return false;
++	}
++
  	return true;
  }
  
-+static void add_start(void *user_data, int err)
-+{
-+	struct l_dbus_message *reply;
-+
-+	l_info("Start callback");
-+
-+	if (err == MESH_ERROR_NONE)
-+		reply = l_dbus_message_new_method_return(add_pending->msg);
-+	else
-+		reply = dbus_error(add_pending->msg, MESH_ERROR_FAILED,
-+				"Failed to start provisioning initiator");
-+
-+	l_dbus_send(dbus_get_bus(), reply);
-+
-+	add_pending->msg = NULL;
-+}
-+
- static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -243,6 +263,7 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 	/* Invoke Prov Initiator */
- 
- 	add_pending = l_new(struct add_data, 1);
-+	add_pending->msg = l_dbus_message_ref(msg);
- 	memcpy(add_pending->uuid, uuid, 16);
- 	add_pending->node = node;
- 	add_pending->agent = node_get_agent(node);
-@@ -255,20 +276,14 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 		goto fail;
- 	}
- 
--
--	if (!initiator_start(PB_ADV, uuid, 99, 60, add_pending->agent,
--				add_data_get, add_cmplt, node, add_pending)) {
--		reply = dbus_error(msg, MESH_ERROR_FAILED,
--				"Failed to start provisioning initiator");
--		goto fail;
--	}
-+	initiator_start(PB_ADV, uuid, 99, 60, add_pending->agent, add_start,
-+				add_data_get, add_cmplt, node, add_pending);
- 
- 	add_pending->disc_watch = l_dbus_add_disconnect_watch(dbus,
- 						node_get_owner(node),
- 						prov_disc_cb, NULL, NULL);
- 
--	return l_dbus_message_new_method_return(msg);
--
-+	return NULL;
- fail:
- 	l_free(add_pending);
- 	add_pending = NULL;
-diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
-index f2ebff69e..17bda6521 100644
---- a/mesh/prov-initiator.c
-+++ b/mesh/prov-initiator.c
-@@ -36,6 +36,7 @@
- #include "mesh/pb-adv.h"
- #include "mesh/mesh.h"
- #include "mesh/agent.h"
-+#include "mesh/error.h"
- 
- /* Quick size sanity check */
- static const uint16_t expected_pdu_size[] = {
-@@ -77,6 +78,7 @@ enum int_state {
- #define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
- 
- struct mesh_prov_initiator {
-+	mesh_prov_initiator_start_func_t start_cb;
- 	mesh_prov_initiator_complete_func_t complete_cb;
- 	mesh_prov_initiator_data_req_func_t data_req_cb;
- 	prov_trans_tx_t trans_tx;
-@@ -102,6 +104,7 @@ struct mesh_prov_initiator {
- 	uint8_t private_key[32];
- 	uint8_t secret[32];
- 	uint8_t rand_auth_workspace[48];
-+	uint8_t uuid[16];
- };
- 
- static struct mesh_prov_initiator *prov = NULL;
-@@ -814,17 +817,45 @@ static void int_prov_ack(void *user_data, uint8_t msg_num)
- 	}
- }
- 
-+static void initiator_open_cb(void *user_data, int err)
-+{
-+	bool result;
-+
-+	if (!prov)
-+		return;
-+
-+	if (err != MESH_ERROR_NONE)
-+		goto fail;
-+
-+	/* Always register for PB-ADV */
-+	result = pb_adv_reg(true, int_prov_open, int_prov_close, int_prov_rx,
-+						int_prov_ack, prov->uuid, prov);
-+
-+	if (!result) {
-+		err = MESH_ERROR_FAILED;
-+		goto fail;
-+	}
-+
-+	if (!prov)
-+		return;
-+
-+	prov->start_cb(prov->caller_data, MESH_ERROR_NONE);
-+	return;
-+fail:
-+	prov->start_cb(prov->caller_data, err);
-+	initiator_free();
-+}
-+
- bool initiator_start(enum trans_type transport,
- 		uint8_t uuid[16],
- 		uint16_t max_ele,
- 		uint32_t timeout, /* in seconds from mesh.conf */
- 		struct mesh_agent *agent,
-+		mesh_prov_initiator_start_func_t start_cb,
- 		mesh_prov_initiator_data_req_func_t data_req_cb,
- 		mesh_prov_initiator_complete_func_t complete_cb,
- 		void *node, void *caller_data)
- {
--	bool result;
--
- 	/* Invoked from Add() method in mesh-api.txt, to add a
- 	 * remote unprovisioned device network.
- 	 */
-@@ -837,19 +868,15 @@ bool initiator_start(enum trans_type transport,
- 	prov->node = node;
- 	prov->agent = agent;
- 	prov->complete_cb = complete_cb;
-+	prov->start_cb = start_cb;
- 	prov->data_req_cb = data_req_cb;
- 	prov->caller_data = caller_data;
- 	prov->previous = -1;
-+	memcpy(prov->uuid, uuid, 16);
- 
--	/* Always register for PB-ADV */
--	result = pb_adv_reg(true, int_prov_open, int_prov_close, int_prov_rx,
--						int_prov_ack, uuid, prov);
--
--	if (result)
--		return true;
-+	mesh_agent_refresh(prov->agent, initiator_open_cb, prov);
- 
--	initiator_free();
--	return false;
-+	return true;
- }
- 
- void initiator_cancel(void *user_data)
-diff --git a/mesh/provision.h b/mesh/provision.h
-index 43f53f935..1d78ed8e2 100644
---- a/mesh/provision.h
-+++ b/mesh/provision.h
-@@ -100,6 +100,8 @@ typedef bool (*mesh_prov_acceptor_complete_func_t)(void *user_data,
- 					uint8_t status,
- 					struct mesh_prov_node_info *info);
- 
-+typedef void (*mesh_prov_initiator_start_func_t)(void *user_data, int err);
-+
- typedef bool (*mesh_prov_initiator_data_req_func_t)(void *user_data,
- 							uint8_t num_elem);
- 
-@@ -120,6 +122,7 @@ bool initiator_start(enum trans_type transport,
- 		uint16_t max_ele,
- 		uint32_t timeout, /* in seconds from mesh.conf */
- 		struct mesh_agent *agent,
-+		mesh_prov_initiator_start_func_t start_cb,
- 		mesh_prov_initiator_data_req_func_t data_req_cb,
- 		mesh_prov_initiator_complete_func_t complete_cb,
- 		void *node, void *caller_data);
 -- 
 2.20.1
 
