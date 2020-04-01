@@ -1,195 +1,318 @@
-Return-Path: <SRS0=zBKN=5Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=i/J9=5R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E15AC43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 21:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C288EC43331
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 07:51:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6DD4E206CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Mar 2020 21:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F2E720714
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Apr 2020 07:51:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ra9k4Mri"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="YuyuhRF1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729647AbgCaV3c (ORCPT
+        id S1732013AbgDAHvY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Mar 2020 17:29:32 -0400
-Received: from mail-pl1-f169.google.com ([209.85.214.169]:32844 "EHLO
-        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727852AbgCaV3b (ORCPT
+        Wed, 1 Apr 2020 03:51:24 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:33931 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731680AbgDAHvY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Mar 2020 17:29:31 -0400
-Received: by mail-pl1-f169.google.com with SMTP id g18so8698067plq.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2020 14:29:30 -0700 (PDT)
+        Wed, 1 Apr 2020 03:51:24 -0400
+Received: by mail-lf1-f65.google.com with SMTP id e7so19630301lfq.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2020 00:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QLJLWmVGTMBW82xLPX5zvRkUZCO6pGMz2MqR/j1wlUI=;
-        b=Ra9k4Mrikyr2LUTQoE59GLMr2+Ce2BjtK0Ai+zAH0JVXEdgxInlzO3V63bXN7DPUGW
-         cYuhESi53alVCAY1mORqPCsn4oTkizWRNqez20e0uZkx1Pyo7dmSr5iSmemDBHIZwQ4m
-         uqWIQ8nU0faA1X/flmUFXu74/G72RKXVjnW4QPmrb7NCBoU8AaQ3r6lixEuY5nU/JoHj
-         xfcFNWljWVPIvQSxRWGITrjYbr2R2uQniIN79v436UGmi+oHrl9p9EDRbyWE2M9f6kr/
-         pFAhfmEUWHEDXfoWIhyzcJhO54M0OEZoFAho92L1wvKJqLQOXjv7DLYeAilQwIs8usr8
-         omaA==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=404v5IEOHpJiL6R3YV0ECvl8o0TmXxk3g8erqaXZDrk=;
+        b=YuyuhRF13R+6QAMXaYsmauNmm/NWr3dWacKzuC6kFqD/CN27V/+n3Ua+8gqQw1HxBQ
+         uQwFih5H1dfqmMnTBTv7vOftotGb+uWE/XCjuuwfJR3Lxf9a4UUuYv679KJrigf5pwUb
+         Oz6virM+x+EMP4NQxJBtCQCm3sV/PocnjRwuWCqfouF49VFQ47S7+voxEL9W1LqkJRcA
+         26VsCwm8s9y+j8bm/1KspuhQWFcHpyR9nDpWhpLyu07PWyd3eC+ub+vUbhBKoYPL+6Uv
+         m26WX2uq0moIFLa3ioTD7VA40y40Ecp1UPEUqYVYdj3iQK1MKOOBX4u+ptWjc8DcSmYl
+         AP7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QLJLWmVGTMBW82xLPX5zvRkUZCO6pGMz2MqR/j1wlUI=;
-        b=OnOc4nz6gMuXb9feUCnU3RLzDtyDIHAyI4iSMwJ5zBMK74ghpuTOZ+2bfZ+oKab3ff
-         Ia6bFSQ/0e3aKJszxKJ25ZW7czJTnceiqzDmywA5zlKbfCZ+y78qCDHUYTSnrMxbYkIT
-         4SunTJ12QmPCL9bbN0vZOK5KvZqLDKTxotHlD5aoyzG5e4y2jzm9aI1T/aa5AZXeBKXd
-         8Zrq9ha2Cr1A5Zd3sGQtr6UfNAYbxPogg4ydzK/CWpJgM2BY6SENlJ5h6sVdVekD92tw
-         TsQjfXv7+ZAi2pRug7EnczVKhgoi9HF61DqMHvFCUVfDes1IGaIi7YdkUiwUjOsZc+fm
-         bycg==
-X-Gm-Message-State: AGi0Pub5ABFiA2e/V1wVfiooiO5l96WbgmY4z2w9ruYgO9p9VdYAuQ+V
-        QI1RWJT0Af7SL0QAu0yz1evg5H/NpJk=
-X-Google-Smtp-Source: APiQypKtRJAy6SOqk7ZRONJExFbPGrnOJ9msO0B9GiyKAQd5PC/hz4nqPEJamxvY0Iqq5ibQyeHqwQ==
-X-Received: by 2002:a17:90b:254:: with SMTP id fz20mr985407pjb.27.1585690169722;
-        Tue, 31 Mar 2020 14:29:29 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id o11sm48300pjb.18.2020.03.31.14.29.28
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2020 14:29:29 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] gatt: Check error before retrying if Acquire* failed
-Date:   Tue, 31 Mar 2020 14:29:28 -0700
-Message-Id: <20200331212928.14123-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=404v5IEOHpJiL6R3YV0ECvl8o0TmXxk3g8erqaXZDrk=;
+        b=Qv8pyGzTCLBWItz6F8GHmWvP+IFhDLK6vDJlzs3UZbTErBaE4gMC+IT6HMxLGaV7LN
+         jIfSVfTKGSKX8E+htd/I5Wwbn9yOc96BzujfKYTpFkCCpz8nSUJyvmLeHnsVedEAwmUo
+         Rrk1H6VSVdxf0gSSgD8xBU+0ULTp4mAJHdgIYwZESq8Zn/SW/GAG7k19nsxXEfGqWKti
+         9/BGWoK9Xs5N3nA57+zlkPoa1dwdN+3n+XKxOKzAKhqsBL+L9APP+aI2GUuDHizDUg/B
+         5YPLSk08uoI+rh/kncWDc6BR8l9mMqFf7Nsw717IChRp8+YNFO+RJLSfuRKs+vdXcgSh
+         eHNQ==
+X-Gm-Message-State: AGi0PuYq6fcA/J4ESAkFpZZO6a05O4J1vFj/wNuFqyZfpCC4VDTnsbl6
+        +2lPbTZZwOp93o4gB2mhyLuFdg==
+X-Google-Smtp-Source: APiQypI9Rh2fFZjPOrbXTX2kw7Pu0IZFQCCwxE++lHsOHxjjhPrJpYPfk4YUL5Cp6N09rKTV7BqY9w==
+X-Received: by 2002:ac2:4113:: with SMTP id b19mr4293390lfi.70.1585727480102;
+        Wed, 01 Apr 2020 00:51:20 -0700 (PDT)
+Received: from [192.168.65.55] (174.60.citypartner.pl. [195.210.60.174])
+        by smtp.gmail.com with ESMTPSA id r10sm659675ljk.13.2020.04.01.00.51.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Apr 2020 00:51:19 -0700 (PDT)
+Subject: Re: [PATCH BlueZ v3] mesh: Add net key index to sar structure
+To:     Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, michal.lowas-rzechonek@silvair.com
+References: <20200331174606.18539-1-brian.gix@intel.com>
+From:   =?UTF-8?Q?Przemys=c5=82aw_Fierek?= <przemyslaw.fierek@silvair.com>
+Message-ID: <563cc1aa-c9c4-ee22-1dd9-e7dd1f7d2f63@silvair.com>
+Date:   Wed, 1 Apr 2020 09:51:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200331174606.18539-1-brian.gix@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Brian,
 
-If the method has timed out it probably means the application is not
-responding so a follow up method call might have the same result, also
-in case the application returns org.bluez.Error.Failed it indicates the
-operation has been attempted but failed which again most likely will
-have the same result if reattempted.
----
- src/gatt-database.c | 48 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 13 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 55fd28a54..11d886c56 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -53,6 +53,7 @@
- #define GATT_SERVICE_IFACE	"org.bluez.GattService1"
- #define GATT_CHRC_IFACE		"org.bluez.GattCharacteristic1"
- #define GATT_DESC_IFACE		"org.bluez.GattDescriptor1"
-+#define ERROR_FAILED		ERROR_INTERFACE ".Failed"
- 
- #define UUID_GAP	0x1800
- #define UUID_GATT	0x1801
-@@ -2027,28 +2028,30 @@ static bool parse_handle(GDBusProxy *proxy, uint16_t *handle)
- 	return true;
- }
- 
--static uint8_t dbus_error_to_att_ecode(const char *error_name)
-+static uint8_t dbus_error_to_att_ecode(const char *error_name, uint8_t perm_err)
- {
--
--	if (strcmp(error_name, "org.bluez.Error.Failed") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".Failed") == 0)
- 		return 0x80;  /* For now return this "application error" */
- 
--	if (strcmp(error_name, "org.bluez.Error.NotSupported") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".NotSupported") == 0)
- 		return BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
- 
--	if (strcmp(error_name, "org.bluez.Error.NotAuthorized") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".NotAuthorized") == 0)
- 		return BT_ATT_ERROR_AUTHORIZATION;
- 
--	if (strcmp(error_name, "org.bluez.Error.InvalidValueLength") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".InvalidValueLength") == 0)
- 		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
- 
--	if (strcmp(error_name, "org.bluez.Error.InvalidOffset") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".InvalidOffset") == 0)
- 		return BT_ATT_ERROR_INVALID_OFFSET;
- 
--	if (strcmp(error_name, "org.bluez.Error.InProgress") == 0)
-+	if (strcmp(error_name, ERROR_INTERFACE ".InProgress") == 0)
- 		return BT_ERROR_ALREADY_IN_PROGRESS;
- 
--	return 0;
-+	if (strcmp(error_name, ERROR_INTERFACE ".NotPermitted") == 0)
-+		return perm_err;
-+
-+	return BT_ATT_ERROR_UNLIKELY;
- }
- 
- static void read_reply_cb(DBusMessage *message, void *user_data)
-@@ -2069,8 +2072,8 @@ static void read_reply_cb(DBusMessage *message, void *user_data)
- 
- 	if (dbus_set_error_from_message(&err, message) == TRUE) {
- 		DBG("Failed to read value: %s: %s", err.name, err.message);
--		ecode = dbus_error_to_att_ecode(err.name);
--		ecode = ecode ? ecode : BT_ATT_ERROR_READ_NOT_PERMITTED;
-+		ecode = dbus_error_to_att_ecode(err.name,
-+					BT_ATT_ERROR_READ_NOT_PERMITTED);
- 		dbus_error_free(&err);
- 		goto done;
- 	}
-@@ -2246,8 +2249,8 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
- 
- 	if (dbus_set_error_from_message(&err, message) == TRUE) {
- 		DBG("Failed to write value: %s: %s", err.name, err.message);
--		ecode = dbus_error_to_att_ecode(err.name);
--		ecode = ecode ? ecode : BT_ATT_ERROR_WRITE_NOT_PERMITTED;
-+		ecode = dbus_error_to_att_ecode(err.name,
-+					BT_ATT_ERROR_WRITE_NOT_PERMITTED);
- 		dbus_error_free(&err);
- 		goto done;
- 	}
-@@ -2414,8 +2417,20 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&err);
- 
- 	if (dbus_set_error_from_message(&err, message) == TRUE) {
-+		uint8_t ecode;
-+
- 		error("Failed to acquire write: %s\n", err.name);
-+
-+		ecode = dbus_error_to_att_ecode(err.name,
-+					BT_ATT_ERROR_WRITE_NOT_PERMITTED);
- 		dbus_error_free(&err);
-+
-+		if (ecode != BT_ATT_ERROR_UNLIKELY) {
-+			gatt_db_attribute_write_result(op->attrib, op->id,
-+								ecode);
-+			return;
-+		}
-+
- 		goto retry;
- 	}
- 
-@@ -2501,6 +2516,13 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
- 
- 	if (dbus_set_error_from_message(&err, message) == TRUE) {
- 		error("Failed to acquire notify: %s\n", err.name);
-+
-+		if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY) ||
-+				dbus_error_has_name(&err, ERROR_FAILED)) {
-+			dbus_error_free(&err);
-+			return;
-+		}
-+
- 		dbus_error_free(&err);
- 		goto retry;
- 	}
--- 
-2.21.1
+Patch v3 looks good. Please apply it.
 
+
+Best Regards,
+
+Przemek Fierek
+
+On 31.03.2020 19:46, Brian Gix wrote:
+> ---
+>   mesh/friend.c | 16 ++++++++--------
+>   mesh/net.c    | 38 +++++++++++++++++++++++---------------
+>   mesh/net.h    |  7 ++++---
+>   3 files changed, 35 insertions(+), 26 deletions(-)
+>
+> diff --git a/mesh/friend.c b/mesh/friend.c
+> index 6d26de15b..d27da9592 100644
+> --- a/mesh/friend.c
+> +++ b/mesh/friend.c
+> @@ -97,7 +97,7 @@ static void response_delay(struct l_timeout *timeout, void *user_data)
+>   	n += 2;
+>   	seq = mesh_net_next_seq_num(neg->net);
+>   	print_packet("Tx-NET_OP_FRND_OFFER", msg, n);
+> -	mesh_net_transport_send(neg->net, key_id,
+> +	mesh_net_transport_send(neg->net, key_id, 0,
+>   			mesh_net_get_iv_index(neg->net), 0,
+>   			seq, 0, neg->lp_addr,
+>   			msg, n);
+> @@ -316,7 +316,7 @@ void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
+>   
+>   	l_put_be16(lpn, msg + 1);
+>   	l_put_be16(lpnCounter, msg + 3);
+> -	mesh_net_transport_send(net, 0,
+> +	mesh_net_transport_send(net, 0, 0,
+>   			mesh_net_get_iv_index(net), DEFAULT_TTL,
+>   			0, 0, src,
+>   			msg, sizeof(msg));
+> @@ -332,7 +332,7 @@ static void clear_retry(struct l_timeout *timeout, void *user_data)
+>   
+>   	l_put_be16(neg->lp_addr, msg + 1);
+>   	l_put_be16(neg->lp_cnt, msg + 3);
+> -	mesh_net_transport_send(neg->net, 0,
+> +	mesh_net_transport_send(neg->net, 0, 0,
+>   			mesh_net_get_iv_index(neg->net), DEFAULT_TTL,
+>   			0, 0, neg->old_friend,
+>   			msg, sizeof(msg));
+> @@ -398,7 +398,7 @@ static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
+>   					pkt->u.one[0].data, pkt->last_len);
+>   
+>   			pkt->u.one[0].sent = true;
+> -			mesh_net_transport_send(net, frnd->net_key_cur,
+> +			mesh_net_transport_send(net, frnd->net_key_cur, 0,
+>   					pkt->iv_index, pkt->ttl,
+>   					pkt->u.one[0].seq, pkt->src, pkt->dst,
+>   					pkt->u.one[0].data, pkt->last_len);
+> @@ -439,7 +439,7 @@ update:
+>   	l_put_be32(iv_index, upd + 2);
+>   	upd[6] = false; /* Queue is Empty */
+>   	print_packet("Update", upd, sizeof(upd));
+> -	mesh_net_transport_send(net, frnd->net_key_cur,
+> +	mesh_net_transport_send(net, frnd->net_key_cur, 0,
+>   			mesh_net_get_iv_index(net), 0,
+>   			net_seq, 0, frnd->lp_addr,
+>   			upd, sizeof(upd));
+> @@ -487,7 +487,7 @@ void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
+>   			neg->u.negotiate.clearing = true;
+>   			l_put_be16(neg->lp_addr, msg + 1);
+>   			l_put_be16(neg->lp_cnt, msg + 3);
+> -			mesh_net_transport_send(net, 0,
+> +			mesh_net_transport_send(net, 0, 0,
+>   					mesh_net_get_iv_index(net), DEFAULT_TTL,
+>   					0, 0, neg->old_friend,
+>   					msg, sizeof(msg));
+> @@ -596,7 +596,7 @@ void friend_sub_add(struct mesh_net *net, struct mesh_friend *frnd,
+>   
+>   	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
+>   	net_seq = mesh_net_get_seq_num(net);
+> -	mesh_net_transport_send(net, frnd->net_key_cur,
+> +	mesh_net_transport_send(net, frnd->net_key_cur, 0,
+>   			mesh_net_get_iv_index(net), 0,
+>   			net_seq, 0, frnd->lp_addr,
+>   			msg, sizeof(msg));
+> @@ -634,7 +634,7 @@ void friend_sub_del(struct mesh_net *net, struct mesh_friend *frnd,
+>   
+>   	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
+>   	net_seq = mesh_net_get_seq_num(net);
+> -	mesh_net_transport_send(net, frnd->net_key_cur,
+> +	mesh_net_transport_send(net, frnd->net_key_cur, 0,
+>   			mesh_net_get_iv_index(net), 0,
+>   			net_seq, 0, frnd->lp_addr,
+>   			msg, sizeof(msg));
+> diff --git a/mesh/net.c b/mesh/net.c
+> index 5f49034e4..9a56d2ee8 100644
+> --- a/mesh/net.c
+> +++ b/mesh/net.c
+> @@ -179,6 +179,7 @@ struct mesh_sar {
+>   	uint32_t seqAuth;
+>   	uint16_t seqZero;
+>   	uint16_t app_idx;
+> +	uint16_t net_idx;
+>   	uint16_t src;
+>   	uint16_t remote;
+>   	uint16_t len;
+> @@ -1566,7 +1567,7 @@ static void send_frnd_ack(struct mesh_net *net, uint16_t src, uint16_t dst,
+>   		friend_ack_rxed(net, mesh_net_get_iv_index(net),
+>   				mesh_net_next_seq_num(net), 0, dst, msg);
+>   	} else {
+> -		mesh_net_transport_send(net, 0,
+> +		mesh_net_transport_send(net, 0, 0,
+>   				mesh_net_get_iv_index(net), DEFAULT_TTL,
+>   				0, 0, dst, msg, sizeof(msg));
+>   	}
+> @@ -1601,9 +1602,10 @@ static void send_net_ack(struct mesh_net *net, struct mesh_sar *sar,
+>   		return;
+>   	}
+>   
+> -	mesh_net_transport_send(net, 0,
+> +	mesh_net_transport_send(net, 0, sar->net_idx,
+>   				mesh_net_get_iv_index(net), DEFAULT_TTL,
+> -				0, src, dst, msg, sizeof(msg));
+> +				0, src, dst, msg,
+> +				sizeof(msg));
+>   }
+>   
+>   static void inseg_to(struct l_timeout *seg_timeout, void *user_data)
+> @@ -2012,6 +2014,7 @@ static bool seg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
+>   		sar_in->key_aid = key_aid;
+>   		sar_in->len = len;
+>   		sar_in->last_seg = 0xff;
+> +		sar_in->net_idx = net_idx;
+>   		sar_in->msg_timeout = l_timeout_create(MSG_TO,
+>   					inmsg_to, net, NULL);
+>   
+> @@ -2208,7 +2211,7 @@ static bool ctl_received(struct mesh_net *net, uint16_t key_id,
+>   	}
+>   
+>   	if (n) {
+> -		mesh_net_transport_send(net, 0,
+> +		mesh_net_transport_send(net, 0, 0,
+>   				mesh_net_get_iv_index(net), rsp_ttl,
+>   				0, dst & 0x8000 ? 0 : dst, src,
+>   				msg, n);
+> @@ -3031,7 +3034,6 @@ bool mesh_net_flush(struct mesh_net *net)
+>   	return true;
+>   }
+>   
+> -/* TODO: add net key index */
+>   static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+>   {
+>   	struct mesh_subnet *subnet;
+> @@ -3041,7 +3043,6 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+>   	uint8_t packet_len;
+>   	uint8_t segN = SEG_MAX(msg->segmented, msg->len);
+>   	uint16_t seg_off = SEG_OFF(segO);
+> -	uint32_t key_id = 0;
+>   	uint32_t seq_num;
+>   
+>   	if (msg->segmented) {
+> @@ -3082,10 +3083,13 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+>   	}
+>   	print_packet("Clr-Net Tx", packet + 1, packet_len);
+>   
+> -	subnet = get_primary_subnet(net);
+> -	key_id = subnet->net_key_tx;
+> +	subnet = l_queue_find(net->subnets, match_key_index,
+> +						L_UINT_TO_PTR(msg->net_idx));
+> +	if (!subnet)
+> +		return false;
+>   
+> -	if (!net_key_encrypt(key_id, msg->iv_index, packet + 1, packet_len)) {
+> +	if (!net_key_encrypt(subnet->net_key_tx, msg->iv_index, packet + 1,
+> +							     packet_len)) {
+>   		l_error("Failed to encode packet");
+>   		return false;
+>   	}
+> @@ -3217,6 +3221,7 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+>   	payload->szmic = szmic;
+>   	payload->frnd_cred = frnd_cred;
+>   	payload->key_aid = key_aid;
+> +	payload->net_idx = net_idx;
+>   	payload->iv_index = mesh_net_get_iv_index(net);
+>   	payload->seqAuth = seq;
+>   	payload->segmented = segmented;
+> @@ -3321,11 +3326,11 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
+>   	l_free(str);
+>   }
+>   
+> -/* TODO: add net key index */
+>   void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
+> -				uint32_t iv_index, uint8_t ttl,
+> -				uint32_t seq, uint16_t src, uint16_t dst,
+> -				const uint8_t *msg, uint16_t msg_len)
+> +				uint16_t net_idx, uint32_t iv_index,
+> +				uint8_t ttl, uint32_t seq, uint16_t src,
+> +				uint16_t dst, const uint8_t *msg,
+> +				uint16_t msg_len)
+>   {
+>   	uint32_t use_seq = seq;
+>   	uint8_t pkt_len;
+> @@ -3373,7 +3378,10 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
+>   	}
+>   
+>   	if (!key_id) {
+> -		struct mesh_subnet *subnet = get_primary_subnet(net);
+> +		struct mesh_subnet *subnet = l_queue_find(net->subnets,
+> +				match_key_index, L_UINT_TO_PTR(net_idx));
+> +		if (!subnet)
+> +			return;
+>   
+>   		key_id = subnet->net_key_tx;
+>   		use_seq = mesh_net_next_seq_num(net);
+> @@ -3556,7 +3564,7 @@ void mesh_net_heartbeat_send(struct mesh_net *net)
+>   	l_put_be16(hb->features, msg + n);
+>   	n += 2;
+>   
+> -	mesh_net_transport_send(net, 0, mesh_net_get_iv_index(net),
+> +	mesh_net_transport_send(net, 0, 0, mesh_net_get_iv_index(net),
+>   				hb->pub_ttl, 0, 0, hb->pub_dst, msg, n);
+>   }
+>   
+> diff --git a/mesh/net.h b/mesh/net.h
+> index df4366b59..60396dbe7 100644
+> --- a/mesh/net.h
+> +++ b/mesh/net.h
+> @@ -305,9 +305,10 @@ struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
+>   
+>   bool mesh_net_flush(struct mesh_net *net);
+>   void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
+> -				uint32_t iv_index, uint8_t ttl,
+> -				uint32_t seq, uint16_t src, uint16_t dst,
+> -				const uint8_t *msg, uint16_t msg_len);
+> +				uint16_t net_idx, uint32_t iv_index,
+> +				uint8_t ttl, uint32_t seq, uint16_t src,
+> +				uint16_t dst, const uint8_t *msg,
+> +				uint16_t msg_len);
+>   
+>   bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+>   				uint16_t dst, uint8_t key_id, uint16_t net_idx,
+> -- 
