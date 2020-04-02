@@ -2,201 +2,158 @@ Return-Path: <SRS0=u1pM=5S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E53C43331
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Apr 2020 16:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2CCC43331
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Apr 2020 16:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFD4F2063A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Apr 2020 16:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36B6420737
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Apr 2020 16:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="vNGmarv5"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="X7k1ShCo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389681AbgDBQIW (ORCPT
+        id S2389735AbgDBQXV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Apr 2020 12:08:22 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:23329 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388972AbgDBQIW (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Apr 2020 12:08:22 -0400
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200402160820epoutp04658d91317bb76ffce05abba119f071e5~CDHGKmiGJ2098420984epoutp04M
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2020 16:08:20 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200402160820epoutp04658d91317bb76ffce05abba119f071e5~CDHGKmiGJ2098420984epoutp04M
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1585843700;
-        bh=POEl2r7JobfMB67H2cfm0UkHBjpYejU95TGk+z5mOqw=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=vNGmarv51n+phvLApiEHDIkGNntTZLHGBonS8d7fEIoIpYLA9MNPF0oJlM78N5X2u
-         lEaVLHoMsAFdq30vQQoC7v+kNixUKCxFjhjz/xHwkF0JT+VqEFjdC5GDlq+b+TxaZ2
-         0InDdAJPqlBrWLNtbnBRM3b9M9fpagnXkCQezkzs=
-Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20200402160819epcas5p22c58c57d77431479328e70fcb21f17a7~CDHFDCEPu1590715907epcas5p25;
-        Thu,  2 Apr 2020 16:08:19 +0000 (GMT)
-X-AuditID: b6c32a4b-ae3ff70000001280-dc-5e860df32250
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A0.F8.04736.3FD068E5; Fri,  3 Apr 2020 01:08:19 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE: Re: Re: [PATCH BlueZ] mesh: Add check for valid netkey index
-Reply-To: anupam.r@samsung.com
-From:   Anupam Roy <anupam.r@samsung.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-CC:     Semun Lee <semun.lee@samsung.com>,
-        Dohyun Pyun <dh79.pyun@samsung.com>,
-        Nitin Jhanwar <nitin.j@samsung.com>,
+        Thu, 2 Apr 2020 12:23:21 -0400
+Received: from mga18.intel.com ([134.134.136.126]:54281 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389598AbgDBQXV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Apr 2020 12:23:21 -0400
+IronPort-SDR: mwmiyjNBCM+ztr5Eyf8ox3GvvutMkI+FoIEIk0gD6E+Kdma7vl/wnYBAqvrmWDEzRL14sTFN7l
+ l2L+Pv2YBP6A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2020 09:23:20 -0700
+IronPort-SDR: sVHX1m/q7lB/qubxKp/k/65stqKJN2Pea9orDDoKdi1vRuU0vMtY32+VfIr3Xs4kclzg2YbgA8
+ 8dafHuZASQfQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,336,1580803200"; 
+   d="scan'208";a="284835400"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga002.fm.intel.com with ESMTP; 02 Apr 2020 09:23:20 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Apr 2020 09:23:19 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 2 Apr 2020 09:23:19 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 2 Apr 2020 09:23:18 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
+ edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 2 Apr 2020 09:23:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j6sCDcP9ChpaqAQORAr+8jg5lqWVAESHzimiitBmaIxtceNP/sky47DIzW/IZWJBEyWdRmEluLryJkgSBJFuu7ymMBk7wCuVLF3fUmQs/HTbG/KOxvOHSfo171CiRmW900cz2Dqf+CKZFQWusUxZJsK3YuI3SZoxSm1K6L1REmsTGlh9vYvtdu5zgF1Cz08h8VDQOzh9s22gQQ8Ti6Pz66BCJbwnrl2YhHbdb83uxu+6DunrxO1wiN9fLAA3ALsjNv1JFlM3WQ1nHXAbQzowDN4TdtdBVm1Zs3ha5+3RNrUFCPzOrT/DlarnLVKBEHpR1BN7ZtU7QAEF6bXetj3U2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IzVq6cAG6YVpKF9e80xkYrQXBT8IOZANSplT4RD1UHE=;
+ b=RxnddnPv5vz1V4G/ZvVG3r0TiEmzIq8MORWpV8WubiyB5mlM362PpYKjHggCGWr70VqbiV3BS1/iLgIzM6iN1mS5DOwab8BB09QVZT396wjPtucL8EzZ2aydbi8w4VWmbXVO3DH6abNyer2xgtN/T69H627F09kK7cAlxGVXlVf76hu2llgrJLOtEI7WZ1dx8UJm1dXfZjVwnMb/WmpAc7rttqntFwN4r6qLpTzpVxvgP5UjDVgQDBy5OFHjilJFqvML/KtRf96Y91cUAvk5LlWQcPkt0bSRTUvDBm6vKsWpD5NonU6RWJjKbUQOoLXisqV6k/vwiD0PPcULc5Wayw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IzVq6cAG6YVpKF9e80xkYrQXBT8IOZANSplT4RD1UHE=;
+ b=X7k1ShCoZowCbZ6HxxwMTqT3Do3dddHxj328+preSVb01DHREsZujlFVJ4Zb4E1EjjDlLMKOB1vaHmKdosj4Nzsw9fv17rRzv3w9INNrjdds6HEXZY2N4fSNAZP7ZFFciWwHgmUSDljn8MdY5r5SvtBYicruR7KT1V4kJCLZ1wA=
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
+ by MW3PR11MB4731.namprd11.prod.outlook.com (2603:10b6:303:2f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2856.20; Thu, 2 Apr
+ 2020 16:23:15 +0000
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::39a4:4e3:2bb2:dd3a]) by MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::39a4:4e3:2bb2:dd3a%3]) with mapi id 15.20.2856.019; Thu, 2 Apr 2020
+ 16:23:15 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "anupam.r@samsung.com" <anupam.r@samsung.com>
+CC:     "semun.lee@samsung.com" <semun.lee@samsung.com>,
+        "dh79.pyun@samsung.com" <dh79.pyun@samsung.com>,
+        "nitin.j@samsung.com" <nitin.j@samsung.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        AMIT KUMAR JAISWAL <amit.jaiswal@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <9038a2fe4daafd90def2444d71c8914c6a64a688.camel@intel.com>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20200402160037epcms5p5c94d5798e7611c11e795c51bc39b5a6b@epcms5p5>
-Date:   Thu, 02 Apr 2020 21:30:37 +0530
-X-CMS-MailID: 20200402160037epcms5p5c94d5798e7611c11e795c51bc39b5a6b
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnleLIzCtJLcpLzFFi42LZdlhTQ/czb1ucwbVJIhbvuqazWayYsZrN
-        Ysn3j2wWc671MVtsW9fObHFs01MmBzaPxXteMnn0bVnF6PF5k1wAcxSXTUpqTmZZapG+XQJX
-        xo1VK1gKfmhXTJn5n62BsVeti5GTQ0LAROLt8Sa2LkYuDiGB3YwSZ399Zuli5ODgFRCU+LtD
-        GKRGWMBTYt7zO+wgtpCAnMTiqWvZQEqEBTQlbm5MAQmzCahL/Hq4gwXEFhFQk7h4/QAzyEhm
-        gZeMEvOOLGeB2MUrMaP9KZQtLbF9+VZGEJtTwF3i2eM9UHFRiZur37LD2O+PzWeEsEUkWu+d
-        ZYawBSUe/NzNCDNn64KnYMskBLoZJV7vWM8E4UxhlPh48S0TRJW5xP/ut2AdvAK+ElPnbAXb
-        wCKgKvHy6COozS4S0+7uAIszC2hLLFv4mhnkS2agL9fv0ocokZWYemodE0QJn0Tv7ydMMI/t
-        mAdjK0lsvT6fFcKWkOjbvAsq7iFxcssvJkhAn2SSWHnwOdsERoVZiLCehWTzLITNCxiZVzFK
-        phYU56anFpsWGOellusVJ+YWl+al6yXn525iBCcTLe8djJvO+RxiFOBgVOLhZTzYGifEmlhW
-        XJl7iFGCg1lJhNdxBlCINyWxsiq1KD++qDQntfgQozQHi5I47yTWqzFCAumJJanZqakFqUUw
-        WSYOTqkGRuNHvX6l5q1r7y77+clp2buYmzWJIsnv+Oo5rtd57e7IfNMabldTbbabte0vr+zX
-        P+9Z/Dhs10UbXyvfeGLKPMPZV0ut+i6LrfBO1/CaPbv68a/0zjlujtp1/c0bPKqXaWjsjZn+
-        00Zaad0WTR77twmvam6F+ukLcLXzTmN0rmZWPcsyv261EktxRqKhFnNRcSIArXfmZSIDAAA=
-X-CMS-RootMailID: 20200401112015epcas5p10545143f69c22449f559818476845cc5
+        "amit.jaiswal@samsung.com" <amit.jaiswal@samsung.com>
+Subject: Re: [PATCH BlueZ] mesh: Add check for valid netkey index
+Thread-Topic: [PATCH BlueZ] mesh: Add check for valid netkey index
+Thread-Index: AQHWCQsD9XmerQcL8E6Qct/cmiZXzQ==
+Date:   Thu, 2 Apr 2020 16:23:15 +0000
+Message-ID: <3aa08d9a552ab02b0495b2a3970405ee082c85de.camel@intel.com>
 References: <9038a2fe4daafd90def2444d71c8914c6a64a688.camel@intel.com>
-        <82b707704e1863c43748adce03057d2252fea59a.camel@intel.com>
-        <1585740006-9569-1-git-send-email-anupam.r@samsung.com>
-        <20200402140519epcms5p3608d451804bf03eefc34ce77b04ab0aa@epcms5p3>
-        <CGME20200401112015epcas5p10545143f69c22449f559818476845cc5@epcms5p5>
+         <82b707704e1863c43748adce03057d2252fea59a.camel@intel.com>
+         <1585740006-9569-1-git-send-email-anupam.r@samsung.com>
+         <20200402140519epcms5p3608d451804bf03eefc34ce77b04ab0aa@epcms5p3>
+         <CGME20200401112015epcas5p10545143f69c22449f559818476845cc5@epcms5p5>
+         <20200402160037epcms5p5c94d5798e7611c11e795c51bc39b5a6b@epcms5p5>
+In-Reply-To: <20200402160037epcms5p5c94d5798e7611c11e795c51bc39b5a6b@epcms5p5>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.55.41]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 78206ba4-c60c-432a-fdc7-08d7d722258b
+x-ms-traffictypediagnostic: MW3PR11MB4731:
+x-microsoft-antispam-prvs: <MW3PR11MB4731046CCCB2C8DA38453DD8E1C60@MW3PR11MB4731.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4714;
+x-forefront-prvs: 0361212EA8
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(366004)(54906003)(81166006)(2906002)(8936002)(71200400001)(2616005)(81156014)(498600001)(6916009)(6512007)(64756008)(66446008)(91956017)(186003)(76116006)(6506007)(5660300002)(66556008)(36756003)(6486002)(26005)(8676002)(4326008)(66946007)(66476007)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 39hgTtQd5x/JPDrnn75yBvj8qUmWgaxo7wikXslYHQ/oGSZMRNoZTOT2Eg/5QAkqGSgDTSX3rWj6AXLvU+X5yEFLQOm0Q1cbIMGikfM6l3cOKGRn4xax7WMbxNS7fJg9VXuNO25utYV/uE0s/9uPlS0g1xlp4tuumEtZMbAFXdIFSj1l7/NkypjeHXg1Afa1XSVWOlwLgG7KX9FzQmy0ote11rcEySXezZKVHTLJLXs2LytJFuGHQZYqp6BzdTB5KJ4xxwzHurUjFXBbTnGseQ/3IiW1GH9c7wTnSzuQeR0+engkzTlYwE//R5+aushYRMLqwJUNTgGXQUNeVnI47dIaqC5Dr/hNyv543xIJBMQR9GO0WyklBgKQleTOXe5HFyWDMTiD3oi1MId6bE2tEXtgtwhMnwKH1M5fKYl9n14yZUJtJl4lJvi3+qedMPfa
+x-ms-exchange-antispam-messagedata: n1pVDYWW6K3+eTINtzgtScbbHuCtL06NYksqNtia5739dtslzu3mFLCn9toDZoPpVKKtljGgag7MgMzlMNL0FrxsP2Jcjr92aN9DmZAwco33ypRZdLTLhNx8ZxtBc03ov1OzXZF9/U77eTCNkrRLDA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <978512E34333FF4182A7763C97905217@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78206ba4-c60c-432a-fdc7-08d7d722258b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2020 16:23:15.4219
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 32//9cRd2exmlDJeoUfBQuilCSWtde1nyfKZT7/4siIPU9cwVETzkbDrUhKLJwRRLH/UuCBqz2ooWCfzHoAkew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4731
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
-
->Hi Anupam,
->On Thu, 2020-04-02 at 19:35 +0530, Anupam Roy wrote:
->> Hi Brian,
->>=20
->> > Hi Anupam,
->> > On Wed, 2020-04-01 at 16:50 +0530, Anupam Roy wrote:
->> > > This patch adds validation of net key index, which will be
->> > > used to send message to nodes. Return error in case net key index
->> > > is not valid. This avoids message encryption using device key
->> > > and further processing of the message.
->> > > ---
->> > >  mesh/model.c =7C 9 +++++++++
->> > >  1 file changed, 9 insertions(+)
->> > >=20
->> > > diff --git a/mesh/model.c b/mesh/model.c
->> > > index 9455833..6cc1dc5 100644
->> > > --- a/mesh/model.c
->> > > +++ b/mesh/model.c
->> > > =40=40 -546,6 +546,7 =40=40 static bool msg_send(struct mesh_node *n=
-ode, bool credential, uint16_t src,
->> > >  	uint8_t dev_key=5B16=5D;
->> > >  	uint32_t iv_index, seq_num;
->> > >  	const uint8_t *key;
->> > > +	struct keyring_net_key net_key;
->> > >  	uint8_t *out;
->> > >  	uint8_t key_aid =3D APP_AID_DEV;
->> > >  	bool szmic =3D false;
->> > > =40=40 -578,8 +579,16 =40=40 static bool msg_send(struct mesh_node *=
-node, bool credential, uint16_t src,
->> > >  		=7D
->> > > =20
->> > >  		net_idx =3D appkey_net_idx(node_get_net(node), app_idx);
->> > > +		if (net_idx =3D=3D NET_IDX_INVALID) =7B
->> > > +			l_debug(=22no net key for (%x)=22, net_idx);
->> > > +			return false;
->> > > +		=7D
->> >=20
->> > This *might* be a valid =22sanity=22 test...  Although an App Key shou=
-ld never be allowed to be added, or exist
->> > unless the bound netkey already exists.  I think the only way an App K=
-ey might exist without it's bound
->> > netkey
->> > is if the daemon private node.json file was hand edited, which is not =
-technically allowed.
->> >=20
-I think, this check is not required as explained.
->> > >  	=7D
->> > > =20
->> > > +	if (=21keyring_get_net_key(node, net_idx, &net_key)) =7B
->> > > +		l_debug(=22no net key for (%x)=22, net_idx);
->> > > +		return false;
->> > > +	=7D
->> >=20
->> > This check is invalid. Only an authorized Config Clients / Provisioner=
-s have Key Rings, which is used to
->> > send
->> > AddKey, UpdateKey and Provisioning data to remote nodes.  The keyring =
-is restricted to nodes which have
->> > full
->> > network configuration privleges....  Adding this would require *all* n=
-odes in the network to be privleged
->> > nodes, which would then allow them to make changes outside the Provisi=
-oner/ Config Client control.
->> >=20
->>  Thanks you for your input. The intention was to validate 'Net Key Index=
-' for DevKeySend messages, sent by
->> *Config client/Provisioner* app specifically.
->>  Actually, one observation I had is that, even though, Config client sup=
-plies the 'Net Key Index', & daemon
->> passes it all the way to msg_send(), eventually, it seems, it is ignored=
- & encryption key is picked up from
->> the primary subnet. Also, I noticed that Config client seems to allow de=
-leting a created subnet (subnet-
->> delete <net key index>) at present, at any point of time.
->
->You are correct in finding this bug...  It was found in paralell by Przemy=
-s=C5=82aw=20Fierek,=20and=20should=20be=20fixed=20as=0D=0A>of=20this=20comm=
-it:=0D=0A>=0D=0A>=20=20=20commit=2084a9b6ce4b66a2ba21cce8e4b0c3c6e097a5493a=
-=0D=0A>=20=20=20Author:=20Przemys=C5=82aw=20Fierek=20<przemyslaw.fierek=40s=
-ilvair.com>=0D=0A>=20=20=20Date:=20=20=20Tue=20Mar=2031=2014:09:08=202020=
-=20+0200=0D=0A>=0D=0A>=20=20=20=20=20=20=20mesh:=20Add=20net=20key=20index=
-=20to=20sar=20structure=0D=0A>=20=20=20=20=20=20=20=0D=0A>=20=20=20=20=20=
-=20=20This=20patch=20adds=20net=20key=20index=20to=20struct=20mesh_sar.=20T=
-his=20fixes=20problem=20with=0D=0A>=20=20=20=20=20=20=20using=20invalid=20n=
-etwork=20key=20to=20encrypt=20application=20messages.=0D=0A>=0D=0A>=0D=0A>I=
-f=20you=20check=20out=20the=20current=20tip,=20hopefully=20it=20will=20solv=
-e=20the=20problem=20you=20found=20where=20the=20incorrect=20(primary=0D=0A>=
-subnet)=20key=20was=20used=20instead=20of=20the=20requested=20net=20key.=0D=
-=0A>=0D=0AOkay,=20got=20it,=20thanks.=0D=0ASince=20we=20plan=20to=20use=20t=
-he=20net=20key=20index,=20will=20the=20below=20sanity=20check=20stand=20val=
-id(in=20case=20of=20app_idx=20=3D=3D=20APP_IDX_DEV_REMOTE)?=0D=0AAs=20it=20=
-may=20save=20some=20un-necesary=20processing=20of=20the=20message=20payload=
-=20in=20case=20net=20key=20index=20is=20*Not*=20valid=20or=20*subnet*=20is=
-=20deleted=20by=20Config=20Client.=20Please=20share=20your=20opinion.=20Tha=
-nks=0D=0A=0D=0A>>=20=20I=20am=20not=20sure=20if=20*Not=20using*=20the=20'Ne=
-t=20Key=20Index'=20by=20the=20daemon=20is=20by=20design.=0D=0A>>=20=0D=0A>>=
-=20Anyways,=20I=20got=20what=20you=20explained=20about=20*authorized=20apps=
-=20having=20Keyring=20access*.=20In=20such=20case,=20I=20think,=20the=0D=0A=
->>=20keyring=20check=20would=20make=20sense=20only=20in=20the=20following=
-=20condition.=20Please=20share=20your=20opinion.=20Thanks.=0D=0A>>=20=09=7D=
-=20else=20if=20(app_idx=20=3D=3D=20APP_IDX_DEV_REMOTE)=20=7B=0D=0A>>=20=20=
-=20=20=20=20=20=20=20if=20(=21keyring_get_remote_dev_key(node,=20dst,=20dev=
-_key))=0D=0A>>=20=20=20=20=20=20=20=20=20=20=20=20=20return=20false;=0D=0A>=
->=20=09=09=09=0D=0A>>=20=20=20=20=20=20=20=20=20key=20=3D=20dev_key;=0D=0A>=
->=20=09=09=09=0D=0A>>=20=09=09/**=20Add=20Key=20Ring=20Check=20for=20valid=
-=20Net=20Key=20Index=20**/=0D=0A>>=20=20=20=20=20=20=20=20=20=7D=0D=0A>>=20=
-=0D=0A>>=20>=20>=20=20=09l_debug(=22(%x)=20%p=22,=20app_idx,=20key);=0D=0A>=
->=20>=20>=20=20=09l_debug(=22net_idx=20%x=22,=20net_idx);=0D=0A>>=20>=20>
+T24gVGh1LCAyMDIwLTA0LTAyIGF0IDIxOjMwICswNTMwLCBBbnVwYW0gUm95IHdyb3RlOg0KPiBI
+aSBCcmlhbiwNCj4gDQo+ID4gWW91IGFyZSBjb3JyZWN0IGluIGZpbmRpbmcgdGhpcyBidWcuLi4g
+IEl0IHdhcyBmb3VuZCBpbiBwYXJhbGVsbCBieSBQcnplbXlzxYJhdyBGaWVyZWssIGFuZCBzaG91
+bGQgYmUgZml4ZWQNCj4gPiBhcw0KPiA+IG9mIHRoaXMgY29tbWl0Og0KPiA+IA0KPiA+ICAgY29t
+bWl0IDg0YTliNmNlNGI2NmEyYmEyMWNjZThlNGIwYzNjNmUwOTdhNTQ5M2ENCj4gPiAgIEF1dGhv
+cjogUHJ6ZW15c8WCYXcgRmllcmVrIDxwcnplbXlzbGF3LmZpZXJla0BzaWx2YWlyLmNvbT4NCj4g
+PiAgIERhdGU6ICAgVHVlIE1hciAzMSAxNDowOTowOCAyMDIwICswMjAwDQo+ID4gDQo+ID4gICAg
+ICAgbWVzaDogQWRkIG5ldCBrZXkgaW5kZXggdG8gc2FyIHN0cnVjdHVyZQ0KPiA+ICAgICAgIA0K
+PiA+ICAgICAgIFRoaXMgcGF0Y2ggYWRkcyBuZXQga2V5IGluZGV4IHRvIHN0cnVjdCBtZXNoX3Nh
+ci4gVGhpcyBmaXhlcyBwcm9ibGVtIHdpdGgNCj4gPiAgICAgICB1c2luZyBpbnZhbGlkIG5ldHdv
+cmsga2V5IHRvIGVuY3J5cHQgYXBwbGljYXRpb24gbWVzc2FnZXMuDQo+ID4gDQo+ID4gDQo+ID4g
+SWYgeW91IGNoZWNrIG91dCB0aGUgY3VycmVudCB0aXAsIGhvcGVmdWxseSBpdCB3aWxsIHNvbHZl
+IHRoZSBwcm9ibGVtIHlvdSBmb3VuZCB3aGVyZSB0aGUgaW5jb3JyZWN0DQo+ID4gKHByaW1hcnkN
+Cj4gPiBzdWJuZXQpIGtleSB3YXMgdXNlZCBpbnN0ZWFkIG9mIHRoZSByZXF1ZXN0ZWQgbmV0IGtl
+eS4NCj4gPiANCj4gT2theSwgZ290IGl0LCB0aGFua3MuDQo+IFNpbmNlIHdlIHBsYW4gdG8gdXNl
+IHRoZSBuZXQga2V5IGluZGV4LCB3aWxsIHRoZSBiZWxvdyBzYW5pdHkgY2hlY2sgc3RhbmQgdmFs
+aWQoaW4gY2FzZSBvZiBhcHBfaWR4ID09DQo+IEFQUF9JRFhfREVWX1JFTU9URSk/DQo+IEFzIGl0
+IG1heSBzYXZlIHNvbWUgdW4tbmVjZXNhcnkgcHJvY2Vzc2luZyBvZiB0aGUgbWVzc2FnZSBwYXls
+b2FkIGluIGNhc2UgbmV0IGtleSBpbmRleCBpcyAqTm90KiB2YWxpZCBvcg0KPiAqc3VibmV0KiBp
+cyBkZWxldGVkIGJ5IENvbmZpZyBDbGllbnQuIFBsZWFzZSBzaGFyZSB5b3VyIG9waW5pb24uIFRo
+YW5rcw0KDQpJZiB0aGUgQXBwIHVzZXMgRGV2S2V5U2VuZCgpIHdpdGggcmVtb3RlID09IHRydWUs
+IGJ1dCB0aGUgbm9kZSBkb2VzIG5vdCBoYXZlIHRoZSBkZXZpY2Uga2V5IGZvciB0aGF0IHJlbW90
+ZQ0Kbm9kZSBpbiBpdCdzIGtleXJpbmcsIHRoZSBtZXRob2Qgd2lsbCBzaWxlbnRseSBmYWlsLCBh
+bmQgbm8gbWVzc2FnZSB3aWxsIGJlIHNlbnQgT3Zlci10aGUtQWlyLg0KDQpJZiB0aGUgQXBwIHdh
+bnRzIHRvICpyZXNwb25kKiB0byBhbiBpbmNvbWluZyBjb21tYW5kIHJlY2VpdmVkIHdpdGggdGhl
+IGxvY2FsIG5vZGVzIGRldmljZSBrZXksIGl0IHNob3VsZA0KcmVzcG9uZCB1c2luZyBEZXZLZXlT
+ZW5kKCkgd2l0aCByZW1vdGU9PWZhbHNlLCBhbmQgbmV0X2luZGV4ID09IHRoZSBuZXRfaW5kZXgg
+ZnJvbSB0aGUgY29vcmVzcG9uZGluZw0KRGV2S2V5TWVzc2FnZVJlY2VpdmVkKCkuDQoNCg0K
