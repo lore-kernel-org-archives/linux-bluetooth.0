@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80B0C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CD1C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96F3720737
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:34:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5171D206F6
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D66f1K0U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBK2v2cS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbgDCVeN (ORCPT
+        id S1727867AbgDCVl5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 17:34:13 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:43677 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbgDCVeN (ORCPT
+        Fri, 3 Apr 2020 17:41:57 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:38148 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726460AbgDCVl5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 17:34:13 -0400
-Received: by mail-oi1-f195.google.com with SMTP id k5so7453167oiw.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 14:34:12 -0700 (PDT)
+        Fri, 3 Apr 2020 17:41:57 -0400
+Received: by mail-ot1-f66.google.com with SMTP id t28so8897831ott.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 14:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ctI9475A8sRuqLMfAJ9sQiA/zqDADVZwrDE+bSG2srs=;
-        b=D66f1K0UQreKZGNIgsvyUlhbYHGSZNHlvEPrj1IVpKYAF8w+4rmQK1rzXsFPB67/+U
-         CZq85DpIsu3yfDSJQcs3zPeD9DS9Md4NczEFmaGgeJmK3bBSqIdLkVJPvPYEytglWIk4
-         ghy2ScyY9AEeVK7eMGMS9IiN0daO+PG7jHNqHfkGq1j4wjHoNl3uO4+HNxGkewSnwWGF
-         rKU7XiVNUslYmzn3OIF7jX+FL1dTd3+XEvSpP+cmkthlTMVO0Rib6pzdrP3VqZmpWhJA
-         vx+/ICZac6o6fVkD7TI/7peFVEPPVoewK1kf4U8u3JpyAOeVRej4gIhW5g0arPwfmfKn
-         duHA==
+        bh=a+pTd8MnSsCum1ecuHS8sXQ0EgvSlsuHN6dM4YW5VNY=;
+        b=EBK2v2cS7JUXxpllab3f1I2lxYE+Br5Q7daAA4eKkOymV4WCpST4t3gj+/CF82KDfV
+         nJQIucPPYnqMSQ2NXlvApbNeAD6FY+bkrIaht9JYMdXB3SJtj6csS0kez/6P23CLzQBu
+         70Lq8o7ftclBJh1a0Xe7gWPI7nHa+Mulat7tLU3UuVHgwlFaPOrn/tA/pM1XxBVG9pec
+         tMaPChVrKNyJELtqCI+0J6P3bYjINrC36uMsLgU2ywcAV9RVEwf8UEB6TMErVb0IxYGP
+         aM2Nwvoh0YwnnZv3KwuTkRX7BZqk9RM12VrlOxgau4nU/1QxzHlHgEtzo4tf6jMkIVrZ
+         /5Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ctI9475A8sRuqLMfAJ9sQiA/zqDADVZwrDE+bSG2srs=;
-        b=j1mdPW/9Ug5XpOiHpQrBf62zUIf/EXmv0V2hzo+o7XZ56fIVK3HicHP4E0lL2ZBtGX
-         wsGpXrxC3De7KmXpLZpbU38FiQnRcqLKd/LG03gZcbBtBr5RB40Z7CkCqbb9g5++Whpy
-         Zjxupn57IFDdQOQvq46RE6FbxOW08g6k0YPseWpBXlKuIOSXFfoEnLKuwlkc/OSqxmDe
-         w+ZRhiNjw1YCfjof7da7NSICnaVMYLC0UrWkUbeN/zf+uLMoswamZa6qEmTdetZ5O6H2
-         DV6BYJ4dxAGZIdlTg9k/uc7/K/+M15Za0undP135QRsoc+SMDfm57lMNThJlnKN94XdA
-         a9Pg==
-X-Gm-Message-State: AGi0PuYNQHwHNwemcoM1EYkxEACti/ptyBCdyZ1/imQLwbn5U1rO4J7w
-        ii4t0n2FbhzTx3PO87VYuwZG9AlOErCuPBGmDi0=
-X-Google-Smtp-Source: APiQypIxVAGxCD3sjHd1y2PjIu2OtCyPPijKWpIJ7xACXrdVvyEwecbVYlAOMGaCO4FfXPmP9LjY31Op7NotgDSdbWE=
-X-Received: by 2002:aca:5345:: with SMTP id h66mr4891653oib.110.1585949652218;
- Fri, 03 Apr 2020 14:34:12 -0700 (PDT)
+        bh=a+pTd8MnSsCum1ecuHS8sXQ0EgvSlsuHN6dM4YW5VNY=;
+        b=O6uyFkQZIxZ5BqiV6Okwb+tW0ZBfHl7yIkfjnfAb7kL1/gCSikuMDg8XGoo485qqjf
+         b/AvzwBsjcF0/4qkS/FI6idxy22wNrQF3aHsG4lnku2WKe001YPJYzgLfuno2qo1mq18
+         NMBeiPhug44XtzBUDOVq4NpJCSUFSTS7OBbHse0sUnn26zB8KYFQEFDs+6wnjZkN71bL
+         l21bFZEdWr1+oiZ17y8EfX1t/1Si1CHaayhx2okXoyWNYWEgjbER6LSl0KEbKz4J+6tP
+         PFogrt1aGfqEpR99LcMfP0IDdbRaaZAONElI18Iuv2+7d865JmXfq5FIDncDGnTKlJ49
+         U4aw==
+X-Gm-Message-State: AGi0PualgPOuGUa0QV2aW8rcD5doutYp4AX2d/GoXFPhWFta9aKF5Mjb
+        3JjusNTDgHr5GZwXNcgDbRTnDZQEaKkRR4GEoK8=
+X-Google-Smtp-Source: APiQypK3rgMWz2HyoBrlUeieuW+vJI/q7KmH07Xs0ri30CkVMzBncHN2eNx59YZWQo6vRiGdT5Ywju7WFnEuK9mrgSU=
+X-Received: by 2002:a9d:67c6:: with SMTP id c6mr8211875otn.11.1585950116424;
+ Fri, 03 Apr 2020 14:41:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <1585899568-14564-1-git-send-email-thorsten.klein@bshg.com> <1585899568-14564-2-git-send-email-thorsten.klein@bshg.com>
-In-Reply-To: <1585899568-14564-2-git-send-email-thorsten.klein@bshg.com>
+References: <1585899591-14623-1-git-send-email-thorsten.klein@bshg.com> <1585899591-14623-2-git-send-email-thorsten.klein@bshg.com>
+In-Reply-To: <1585899591-14623-2-git-send-email-thorsten.klein@bshg.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 3 Apr 2020 14:34:00 -0700
-Message-ID: <CABBYNZKfkNGPqna6WZ9-11_CqoYZTsudHHBv=zqLjVnUSpe4kA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] fix dbus error code in case of invalid offset (org.bluez.Error.InvalidOffset)
+Date:   Fri, 3 Apr 2020 14:41:45 -0700
+Message-ID: <CABBYNZLOjT7bp=M+P1QDLh2pAB0rBwjnbG5zvfaVKh_ZqQkMkQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] ManufacturerData field added to ScanResponse
 To:     "Klein, Thorsten (BSH)" <kleinkastel@googlemail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Ryll, Jan (BSH)" <jan.ryll@bshg.com>
+        "Schachschal, Maximilian (BSH)" <maximilian.schachschal@bshg.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -70,37 +70,112 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Thorsten,
 
-You may want to fix the commit message to state that this is for the
-client, e.g.
-
-client: Fix not sending InvalidOffset
-
-...<some description why it is needed>
-
 On Fri, Apr 3, 2020 at 12:42 AM Klein, Thorsten (BSH)
 <kleinkastel@googlemail.com> wrote:
 >
-> From: "Ryll, Jan (BSH)" <jan.ryll@bshg.com>
+> From: "Schachschal, Maximilian (BSH)" <maximilian.schachschal@bshg.com>
 >
+> Keys are the Manufacturer ID to associate with the data.
 > ---
->  client/gatt.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  doc/advertising-api.txt |  6 ++++++
+>  src/advertising.c       | 25 +++++++++++++++++++------
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 >
-> diff --git a/client/gatt.c b/client/gatt.c
-> index 416eda9..cf2cb17 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -2276,6 +2276,10 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
->         if (prep_authorize)
->                 return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> index b0565ea..14ccae2 100644
+> --- a/doc/advertising-api.txt
+> +++ b/doc/advertising-api.txt
+> @@ -51,6 +51,12 @@ Properties   string Type
+>                         the Advertising Data.  Keys are the Manufacturer ID
+>                         to associate with the data.
 >
-> +    if (offset >= (chrc->max_val_len))
-> +        return g_dbus_create_error(msg,
-> +                               "org.bluez.Error.InvalidOffset", NULL);
+> +               dict ManufacturerDataScanResponse [Experimental]
 > +
->         if (write_value(&chrc->value_len, &chrc->value, value, value_len,
->                                                 offset, chrc->max_val_len))
->                 return g_dbus_create_error(msg,
+> +                       Manufactuer Data fields to include in
+> +                       the Scan Response.  Keys are the Manufacturer ID
+> +                       to associate with the data.
+> +
+
+Don't really like to do this, beside it seems to be optional to enter
+either on AD or on SRD so the scanner is really at fault here if it
+only able to parse the data if placed on SRD, that said we could have
+some logic that detects if manufacturer don't fit on the AD push it to
+SRD if that has more space if the advertisement is discoverable.
+
+>                 array{string} SolicitUUIDs
+>
+>                         Array of UUIDs to include in "Service Solicitation"
+> diff --git a/src/advertising.c b/src/advertising.c
+> index 45ff19f..0e1a3f1 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -328,12 +328,12 @@ fail:
+>  }
+>
+>  static bool parse_manufacturer_data(DBusMessageIter *iter,
+> -                                       struct btd_adv_client *client)
+> +                                       struct btd_ad *ad)
+>  {
+>         DBusMessageIter entries;
+>
+>         if (!iter) {
+> -               bt_ad_clear_manufacturer_data(client->data);
+> +               bt_ad_clear_manufacturer_data(ad);
+>                 return true;
+>         }
+>
+> @@ -342,7 +342,7 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+>
+>         dbus_message_iter_recurse(iter, &entries);
+>
+> -       bt_ad_clear_manufacturer_data(client->data);
+> +       bt_ad_clear_manufacturer_data(ad);
+>
+>         while (dbus_message_iter_get_arg_type(&entries)
+>                                                 == DBUS_TYPE_DICT_ENTRY) {
+> @@ -373,7 +373,7 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+>
+>                 DBG("Adding ManufacturerData for %04x", manuf_id);
+>
+> -               if (!bt_ad_add_manufacturer_data(client->data, manuf_id,
+> +               if (!bt_ad_add_manufacturer_data(ad, manuf_id,
+>                                                         manuf_data, len))
+>                         goto fail;
+>
+> @@ -383,10 +383,22 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+>         return true;
+>
+>  fail:
+> -       bt_ad_clear_manufacturer_data(client->data);
+> +       bt_ad_clear_manufacturer_data(ad);
+>         return false;
+>  }
+>
+> +static bool parse_manufacturer_data_adv(DBusMessageIter *iter,
+> +                                       struct btd_adv_client *client)
+> +{
+> +       return parse_manufacturer_data(iter, client->data);
+> +}
+> +
+> +static bool parse_manufacturer_data_scan(DBusMessageIter *iter,
+> +                                       struct btd_adv_client *client)
+> +{
+> +       return parse_manufacturer_data(iter, client->scan);
+> +}
+> +
+>  static bool parse_service_data(DBusMessageIter *iter,
+>                                         struct btd_adv_client *client)
+>  {
+> @@ -941,7 +953,8 @@ static struct adv_parser {
+>         { "Type", parse_type },
+>         { "ServiceUUIDs", parse_service_uuids },
+>         { "SolicitUUIDs", parse_solicit_uuids },
+> -       { "ManufacturerData", parse_manufacturer_data },
+> +       { "ManufacturerData", parse_manufacturer_data_adv },
+> +       { "ManufacturerDataScanResponse", parse_manufacturer_data_scan },
+>         { "ServiceData", parse_service_data },
+>         { "Includes", parse_includes },
+>         { "LocalName", parse_local_name },
 > --
 > 2.7.4
 >
