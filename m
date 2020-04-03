@@ -2,132 +2,176 @@ Return-Path: <SRS0=CkcR=5T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A349C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 23:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F9DC2BA18
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 23:19:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C2E1206CC
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 23:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DA4C20787
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 23:19:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnH4HwG4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbgDCXPF (ORCPT
+        id S1728521AbgDCXTF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 19:15:05 -0400
-Received: from jax4mhfb02.myregisteredsite.com ([64.69.218.95]:35384 "EHLO
-        jax4mhfb02.myregisteredsite.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727829AbgDCXPE (ORCPT
+        Fri, 3 Apr 2020 19:19:05 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:36974 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727958AbgDCXTF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 19:15:04 -0400
-X-Greylist: delayed 563 seconds by postgrey-1.27 at vger.kernel.org; Fri, 03 Apr 2020 19:15:03 EDT
-Received: from atl4mhob15.registeredsite.com (atl4mhob15.registeredsite.com [209.17.115.53])
-        by jax4mhfb02.myregisteredsite.com (8.14.4/8.14.4) with ESMTP id 033N5b5S014956
-        for <linux-bluetooth@vger.kernel.org>; Fri, 3 Apr 2020 19:05:38 -0400
-Received: from mailpod.hostingplatform.com (atl4qobmail01pod5.registeredsite.com [10.30.71.94])
-        by atl4mhob15.registeredsite.com (8.14.4/8.14.4) with ESMTP id 033N5asE014293
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 3 Apr 2020 19:05:36 -0400
-Received: (qmail 168384 invoked by uid 0); 3 Apr 2020 23:05:36 -0000
-X-TCPREMOTEIP: 208.85.15.155
-X-Authenticated-UID: sbrown@opensat.com
-Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
-  by 0 with ESMTPA; 3 Apr 2020 23:05:36 -0000
-Received: from localhost (localhost [127.0.0.1])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 1BD4E1540543
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2020 19:05:35 -0400 (EDT)
-X-Virus-Scanned: Debian amavisd-new at ewol.com
-Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
-        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id JFg6C4h89jId for <linux-bluetooth@vger.kernel.org>;
-        Fri,  3 Apr 2020 19:05:28 -0400 (EDT)
-Received: from w7.lan (w7.lan [192.168.1.9])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id DED1F1540459
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2020 19:05:28 -0400 (EDT)
-Message-ID: <65249ba1d4762186088e6b4496508510e0a06d93.camel@ewol.com>
-Subject: mesh: test/test-mesh fails to provision node
-From:   Steve Brown <sbrown@ewol.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Fri, 03 Apr 2020 19:05:28 -0400
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.1-2 
+        Fri, 3 Apr 2020 19:19:05 -0400
+Received: by mail-il1-f195.google.com with SMTP id a6so9090915ilr.4;
+        Fri, 03 Apr 2020 16:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=dPU5rDbRXNZR3mGxrVtgTT7qKCNIJzL3wX4Y2kmnrAI=;
+        b=PnH4HwG48u1Ut+Ivho3hvvqb5bhaAn4hSi8EHYGucTzs1wkC3b4hv1g19ShqB9AOhX
+         URcN/2rsL80NiwAX3sTZFmaeuvHiVq+d5ouj5aV6lBlZ7SuAG4GGoaKg6dp4hL1tqiQr
+         VdyMqjf0lOFut5bLlrm/v8h3QdrXjW/N9csK77csL48LcAj6JKr/GptmX9+9rgj7FQ3T
+         Mw58AU2tiMh7G56Pq7HU4egpWgB4YyFIcZNoBEClZfga29RMkKiCNOdajMHsheKPfEZ5
+         9t5bvKmj/oq9x3AwpXm5ysdVgBEUwxYsgg6fZ9xrf9S06kevIdf2Mv1KO5kfaByVFZI4
+         fNhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=dPU5rDbRXNZR3mGxrVtgTT7qKCNIJzL3wX4Y2kmnrAI=;
+        b=FbooZicPc+RoVA6ckCkh1Bhjj7q9HSPrdDoa92x2idgKAei4tBOFMCBBFU1w47OZMR
+         4rTaQwV2+7typtiVkeC5X2+1k50lwF8Fe5JccR1+7HLe6GYF2FzgJvng3ZBCo3tNmBI5
+         5KfXyzaE/T1445YAPpSwr6hK9cOxsnxzEWaz+xtA5/uwnh2nZ4pe8qJj4np5aylN5HUi
+         5xwewXn3F+82tLfERvpraQIu8MJ5YbUdsIO4LglNE+oCDMMjS+cMTAQ6Jw94Db05k4LJ
+         F39ZXeVzAhxJ0n7QfTUS8alVZG3lVwwm61n88To8+BbGAZArikOt8qnbtRgl50Ckb9b7
+         4y2A==
+X-Gm-Message-State: AGi0PuZMWLmtbV0CYzFnUpSlMIv+cqCvvviS5SbE7CePpyZZVuPfumMN
+        WHJZXLlJLTVOo/osAFRibMx/AJptwQo8gmkN1y0=
+X-Google-Smtp-Source: APiQypJH2cfMpfCnPZK+pA8s6rPIi/FSJMp/KP8TFfCWVsLY5vUTwL1Z/RTjJEpywJNpHvOm4Rhvp5j8LzkY7e9bcu0=
+X-Received: by 2002:a92:cf52:: with SMTP id c18mr10652807ilr.246.1585955944184;
+ Fri, 03 Apr 2020 16:19:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20200323194507.90944-1-abhishekpandit@chromium.org>
+ <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
+ <7FD50BDC-A4B5-4ED9-8DAB-887039735800@holtmann.org> <CANFp7mX=LvTzttCHcb14TRF8YukQt_WdMpYzJP5LP_ZXwzQTsQ@mail.gmail.com>
+In-Reply-To: <CANFp7mX=LvTzttCHcb14TRF8YukQt_WdMpYzJP5LP_ZXwzQTsQ@mail.gmail.com>
+From:   Dave Taht <dave.taht@gmail.com>
+Date:   Fri, 3 Apr 2020 16:18:53 -0700
+Message-ID: <CAA93jw5aSU6H=9yvtfXTDg1V_MXi42KNJ0imTiwFx6dLjBtBtg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] Bluetooth: Prioritize SCO traffic
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-test/test-mesh can no longer provision a node.
+On Fri, Apr 3, 2020 at 11:11 AM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
+>
+> Hi Marcel,
+>
+> Thanks for merging.
+>
+> I agree that the distinction between SCO/eSCO and ACL/LE is a bit
+> concerning for scheduling. I will make some time to revisit this as
+> part of Audio improvements we are making.
 
-mesh-cfgclient correctly provisions the same node.
-
-In poking around with d-feet, the interface
-org.freedesktop.DBus.Properties isn't created by test/test-mesh, but is
-by mesh-cfgclient.
-
-Steve
-
-================
-
-test/test-mesh fails with:
-
-create
-Creating with UUID 0e04050a0b090d0c0108060f0a020307
-Created mesh network with token bb0f18f8901f3587
-Attach mesh node to bluetooth-meshd daemon
-Mesh app registered: /org/bluez/mesh/node0e04050a0b090d0c0108060f0a020307
-scan
-Scanning...
-Scan procedure started
-ScanResult >> RSSI: -34 UUID: acda451feca3903e4560f6a3a25a437a OOB Data: 0000
-uuid
-Enter 32-digit hex remote UUID:
-acda451feca3903e4560f6a3a25a437a
-add
-Adding dev UUID acda451feca3903e4560f6a3a25a437a
-AddNode procedure failed  org.bluez.mesh.Error.Failed: Failed to start provisioning initiator
-
-=====================================
-
-syslog:
-
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]: mesh/manager.c:add_node_call() AddNode request
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]: mesh/manager.c:scan_cancel() scan_cancel
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]: Agent failed (org.freedesktop.DBus.Error.UnknownMethod), Traceback (most recent call last):
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]:   File "/usr/lib/python3/dist-packages/dbus/service.py", line 658, in _message_cb
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]:     (candidate_method, parent_method) = _method_lookup(self, method_name, interface_name)
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]:   File "/usr/lib/python3/dist-packages/dbus/service.py", line 248, in _method_lookup
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]:     raise UnknownMethodException('%s is not a valid method of interface %s' % (method_name, dbus_interface))
-Apr  3 18:41:10 mesh0 bluetooth-meshd[6648]: dbus.exceptions.UnknownMethodException: org.freedesktop.DBus.Error.UnknownMethod: Unknown method: GetAll is not a valid method of interface org.
-
-=============================================
-
-dbus-monitor log:
-
-method call time=1585918004.102388 sender=:1.409 -> destination=:1.301 serial=14 path=/org/bluez/mesh/node0a060d08020f03050b090c0a07010e04; interface=org.bluez.mesh.Management1; member=AddNode
-   array of bytes [
-      ac da 45 1f ec a3 90 3e 45 60 f6 a3 a2 5a 43 7a
-   ]
-   array [
-   ]
-method call time=1585918004.104726 sender=:1.301 -> destination=:1.409 serial=307 path=/mesh/test/agent; interface=org.freedesktop.DBus.Properties; member=GetAll
-   string "org.bluez.mesh.ProvisionAgent1"
-error time=1585918004.110353 sender=:1.409 -> destination=:1.301 error_name=org.freedesktop.DBus.Error.UnknownMethod reply_serial=307
-   string "Traceback (most recent call last):
-  File "/usr/lib/python3/dist-packages/dbus/service.py", line 658, in _message_cb
-    (candidate_method, parent_method) = _method_lookup(self, method_name, interface_name)
-  File "/usr/lib/python3/dist-packages/dbus/service.py", line 248, in _method_lookup
-    raise UnknownMethodException('%s is not a valid method of interface %s' % (method_name, dbus_interface))
-dbus.exceptions.UnknownMethodException: org.freedesktop.DBus.Error.UnknownMethod: Unknown method: GetAll is not a valid method of interface org.freedesktop.DBus.Properties
-"
-error time=1585918004.112011 sender=:1.301 -> destination=:1.409 error_name=org.bluez.mesh.Error.Failed reply_serial=14
-   string "Failed to start provisioning initiator"
+A) I know nothing of bluetooth.
+B) I am unfond of strict priority queues, as they can cause
+starvation. My immediate instinct is to reach for a drr++ derived
+solution
+to give fairness to all flows, and a bit of priority to the ones that
+matter most.
 
 
-signal time=1585918441.305863 sender=:1.2 -> destination=(null destination) serial=176 path=/org/freedesktop/timesync1; interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-   string "org.freedesktop.timesync1.Manager"
-   array [
-      dict entry(
+>
+> Thanks
+> Abhishek
+>
+> Abhishek
+>
+> On Thu, Apr 2, 2020 at 11:56 PM Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> >
+> > Hi Abhishek,
+> >
+> > > When scheduling TX packets, send all SCO/eSCO packets first, check fo=
+r
+> > > pending SCO/eSCO packets after every ACL/LE packet and send them if a=
+ny
+> > > are pending.  This is done to make sure that we can meet SCO deadline=
+s
+> > > on slow interfaces like UART.
+> > >
+> > > If we were to queue up multiple ACL packets without checking for a SC=
+O
+> > > packet, we might miss the SCO timing. For example:
+> > >
+> > > The time it takes to send a maximum size ACL packet (1024 bytes):
+> > > t =3D 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
+> > >        where 10/8 is uart overhead due to start/stop bits per byte
+> > >
+> > > Replace t =3D 3.75ms (SCO deadline), which gives us a baudrate of 273=
+0666.
+> > >
+> > > At a baudrate of 3000000, if we didn't check for SCO packets within 1=
+024
+> > > bytes, we would miss the 3.75ms timing window.
+> > >
+> > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > > ---
+> > >
+> > > Changes in v3:
+> > > * Removed hci_sched_sync
+> > >
+> > > Changes in v2:
+> > > * Refactor to check for SCO/eSCO after each ACL/LE packet sent
+> > > * Enabled SCO priority all the time and removed the sched_limit varia=
+ble
+> > >
+> > > net/bluetooth/hci_core.c | 106 +++++++++++++++++++++-----------------=
+-
+> > > 1 file changed, 57 insertions(+), 49 deletions(-)
+> >
+> > patch has been applied to bluetooth-next tree.
+> >
+> > However I have been a bit reluctant to apply this right away. I think w=
+hen this code was originally written, we only had ACL and SCO packets. The =
+world was pretty simple. And right now we also only have two packets types =
+(ignoring ISO packets for now), but we added LE and eSCO as separate schedu=
+ling and thus =E2=80=9Cfake=E2=80=9D packet types.
+> >
+> > I have the feeling that this serialized packet processing will get us i=
+nto trouble since we prioritize BR/EDR packets over LE packets and SCO over=
+ eSCO. I think we should have looked at all packets based on SO_PRIORITY an=
+d with ISO packets we have to most likely re-design this. Anyway, just some=
+thing to think about.
+> >
+> > Regards
+> >
+> > Marcel
+> >
 
 
+
+--=20
+Make Music, Not War
+
+Dave T=C3=A4ht
+CTO, TekLibre, LLC
+http://www.teklibre.com
+Tel: 1-831-435-0729
