@@ -6,79 +6,86 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 765BCC2D0E8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 06:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57934C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 06:56:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5765B20757
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 06:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F72820787
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 06:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388749AbgDCGld convert rfc822-to-8bit (ORCPT
+        id S1732862AbgDCG4E convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 02:41:33 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48113 "EHLO
+        Fri, 3 Apr 2020 02:56:04 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:37584 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388006AbgDCGlc (ORCPT
+        with ESMTP id S1729423AbgDCG4E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 02:41:32 -0400
+        Fri, 3 Apr 2020 02:56:04 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 133C4CECF9;
-        Fri,  3 Apr 2020 08:51:05 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7F820CECF9;
+        Fri,  3 Apr 2020 09:05:35 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 2/2] bluetooth: hci_bcm: fix freeing not-requested IRQ
+Subject: Re: [PATCH v3 1/1] Bluetooth: Prioritize SCO traffic
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b46b003a5984d1f178a851a5bb2f3463d695f199.1585831987.git.mirq-linux@rere.qmqm.pl>
-Date:   Fri, 3 Apr 2020 08:41:31 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Frederic Danis <frederic.danis@linux.intel.com>,
-        Guillaume La Roque <glaroque@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
+Date:   Fri, 3 Apr 2020 08:56:01 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <8D205F06-4D72-4FD0-AB49-BDFCDADAB9A1@holtmann.org>
-References: <d01cfc2df21f016ef6c790e1ed8f3ed933cf5ad3.1585831987.git.mirq-linux@rere.qmqm.pl>
- <b46b003a5984d1f178a851a5bb2f3463d695f199.1585831987.git.mirq-linux@rere.qmqm.pl>
-To:     =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
+Message-Id: <7FD50BDC-A4B5-4ED9-8DAB-887039735800@holtmann.org>
+References: <20200323194507.90944-1-abhishekpandit@chromium.org>
+ <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michal,
+Hi Abhishek,
 
-> When BT module can't be initialized, but it has an IRQ, unloading
-> the driver WARNs when trying to free not-yet-requested IRQ. Fix it by
-> noting whether the IRQ was requested.
+> When scheduling TX packets, send all SCO/eSCO packets first, check for
+> pending SCO/eSCO packets after every ACL/LE packet and send them if any
+> are pending.  This is done to make sure that we can meet SCO deadlines
+> on slow interfaces like UART.
 > 
-> WARNING: CPU: 2 PID: 214 at kernel/irq/devres.c:144 devm_free_irq+0x49/0x4ca
-> [...]
-> WARNING: CPU: 2 PID: 214 at kernel/irq/manage.c:1746 __free_irq+0x8b/0x27c
-> Trying to free already-free IRQ 264
-> Modules linked in: hci_uart(-) btbcm bluetooth ecdh_generic ecc libaes
-> CPU: 2 PID: 214 Comm: rmmod Tainted: G        W         5.6.1mq-00044-ga5f9ea098318-dirty #928
-> [...]
-> [<b016aefb>] (devm_free_irq) from [<af8ba1ff>] (bcm_close+0x97/0x118 [hci_uart])
-> [<af8ba1ff>] (bcm_close [hci_uart]) from [<af8b736f>] (hci_uart_unregister_device+0x33/0x3c [hci_uart])
-> [<af8b736f>] (hci_uart_unregister_device [hci_uart]) from [<b035930b>] (serdev_drv_remove+0x13/0x20)
-> [<b035930b>] (serdev_drv_remove) from [<b037093b>] (device_release_driver_internal+0x97/0x118)
-> [<b037093b>] (device_release_driver_internal) from [<b0370a0b>] (driver_detach+0x2f/0x58)
-> [<b0370a0b>] (driver_detach) from [<b036f855>] (bus_remove_driver+0x41/0x94)
-> [<b036f855>] (bus_remove_driver) from [<af8ba8db>] (bcm_deinit+0x1b/0x740 [hci_uart])
-> [<af8ba8db>] (bcm_deinit [hci_uart]) from [<af8ba86f>] (hci_uart_exit+0x13/0x30 [hci_uart])
-> [<af8ba86f>] (hci_uart_exit [hci_uart]) from [<b01900bd>] (sys_delete_module+0x109/0x1d0)
-> [<b01900bd>] (sys_delete_module) from [<b0101001>] (ret_fast_syscall+0x1/0x5a)
-> [...]
+> If we were to queue up multiple ACL packets without checking for a SCO
+> packet, we might miss the SCO timing. For example:
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 6cc4396c8829 ("Bluetooth: hci_bcm: Add wake-up capability")
-> Signed-off-by: Michał Mirosław <mirq-linux@rere.qmqm.pl>
+> The time it takes to send a maximum size ACL packet (1024 bytes):
+> t = 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
+>        where 10/8 is uart overhead due to start/stop bits per byte
+> 
+> Replace t = 3.75ms (SCO deadline), which gives us a baudrate of 2730666.
+> 
+> At a baudrate of 3000000, if we didn't check for SCO packets within 1024
+> bytes, we would miss the 3.75ms timing window.
+> 
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
-> drivers/bluetooth/hci_bcm.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> Changes in v3:
+> * Removed hci_sched_sync
+> 
+> Changes in v2:
+> * Refactor to check for SCO/eSCO after each ACL/LE packet sent
+> * Enabled SCO priority all the time and removed the sched_limit variable
+> 
+> net/bluetooth/hci_core.c | 106 +++++++++++++++++++++------------------
+> 1 file changed, 57 insertions(+), 49 deletions(-)
 
 patch has been applied to bluetooth-next tree.
+
+However I have been a bit reluctant to apply this right away. I think when this code was originally written, we only had ACL and SCO packets. The world was pretty simple. And right now we also only have two packets types (ignoring ISO packets for now), but we added LE and eSCO as separate scheduling and thus “fake” packet types.
+
+I have the feeling that this serialized packet processing will get us into trouble since we prioritize BR/EDR packets over LE packets and SCO over eSCO. I think we should have looked at all packets based on SO_PRIORITY and with ISO packets we have to most likely re-design this. Anyway, just something to think about.
 
 Regards
 
