@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEF1C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322C2C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:45:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0982F20737
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:43:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE03820737
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 21:45:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="urSXbc83"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFX2qFpc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728102AbgDCVnF (ORCPT
+        id S1727924AbgDCVpG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 17:43:05 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37486 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726460AbgDCVnF (ORCPT
+        Fri, 3 Apr 2020 17:45:06 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:42698 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726460AbgDCVpG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 17:43:05 -0400
-Received: by mail-ot1-f67.google.com with SMTP id g23so8923299otq.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 14:43:04 -0700 (PDT)
+        Fri, 3 Apr 2020 17:45:06 -0400
+Received: by mail-oi1-f193.google.com with SMTP id e4so7473788oig.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 14:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=XiW9J2LymjJhE0Kaf/UJ37O2+Pxs0/DGHfGu24vgrjQ=;
-        b=urSXbc83kDnQyZUJ6pfs3CYdljXhHrswf8p6IX1b8EHOyXdxfj11bFinqEkVbOOKMc
-         Yf7KsGscw2acsNUbhYc7Sfly6Oa+jRRopOHzlvF/0LECl/KAvaPPlz+uvfT2M8uawb1O
-         pkHS3x4cftBsDFfM/QF4MOLYo2vdm4rW8VIp+7/gWAqpf9ozTt57OV8xVEMqrS99oczS
-         Po5cLYR+fAtE6a4c+07Uav7x79rv08XjFbaJAhgPUIL2sounqweTdWTK14fOuIRoWZCU
-         voqMmgg55ZAXpEXY0/1lIsmCIllHvGj6jCeluBMaUiYebATHcZq2lVvVXndrZDa371pZ
-         xm7Q==
+        bh=+6AVOof6asm5hcDloaKNuyIUKdyCsywzyeOEfgn1Rrw=;
+        b=fFX2qFpcOeghqczgr5V3xKJkQCTP6XGnEhRX9nPM4JRWuNouMHsLzUTqJ8b4Ep9NMP
+         /dypDFgln39dIeFoqv6lFxLCyARSITA4Fb11o+CjNrlcT77hjEbjHBMX7DqHLJrOs+bN
+         KVkYK6Ft1BYq9slVKM3HbIm0LRJhE/Tew7nbGu46QUgwBoZ3YImOKR1Z4qN+tqWdN+i8
+         XGJEPDnoqtgCQ8aSMKYvS3atH3c9fXIUkKf0NWWytVFC20hjLW7BNf9knVp3NP6mLiRm
+         BeOhf/xwy6rFIyZU457kdpy5Po/I9XZRkkm5+SMm8q5/GMrx05Xp5q3sP7jLQdOH1Lfc
+         LQZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=XiW9J2LymjJhE0Kaf/UJ37O2+Pxs0/DGHfGu24vgrjQ=;
-        b=ssZHpNRTBZgZNHcFAvM1FiOy4SjpzzhcnqFBXwA4FlmRmOUX8acc5mef3/zBGL5f0Y
-         7YHa3DawGZlvCUfeeYLerjp5+m7RtmogYt/SHCT3hggmDu54s/zmRYHqK5zJ/Dc70Sa+
-         zqwH5yxVoRuJYXdzD1jnmN1ZmkGth8DS2Pc2bLzBS1m19fSgKz9UDxQzm5pxgsRisVye
-         XbK7fc2xze1Y/nwvS9hDfoXI0QAyN+xB8aAr6txYbk4T2f49UFJjQADTmF0jRD7JjclQ
-         xPX6kFYNc13ELVvsocpZnrs5uFPJlSZRmBgaOOSrRt/ICoDOotFtVHNT8XnRj82++bkg
-         sJmg==
-X-Gm-Message-State: AGi0PuaPKR/YgTs9R0Q5UsZxWx0Zg1uGb8xTeLm73oUeItUHsNEqjKDr
-        0wcFv2sWp/U0MNoPI4tb7rJeNOQVs+lX2alEnPk=
-X-Google-Smtp-Source: APiQypIafwzA55Mw8PCEzZDxkMifN5GRtuBwpdxvmNx1+D4VjTteIZdcE3+9fpq4R1GABlXBV+zbQcFpgo0lR9hvT34=
-X-Received: by 2002:a05:6830:19c7:: with SMTP id p7mr8699872otp.79.1585950184091;
- Fri, 03 Apr 2020 14:43:04 -0700 (PDT)
+        bh=+6AVOof6asm5hcDloaKNuyIUKdyCsywzyeOEfgn1Rrw=;
+        b=n0sBBJHQoBZ1mWTurBwbIBhK7YtcB/tcwWkfKnjERg7jPcM0EoJ4d9UfvQHLnkzHi0
+         F4hqqC7iqNEJO4LLtAnnrbIaa2Od5kMpV1oHy4m5GcLI3cHrUUADRnXCg1DWj7d8FV0a
+         9/M+AozYI/S5CW5Syv14KrzXo8QRKneuhSTf0fK88v36JZAoE/AW0YqT1ZH8Q30Tq8SR
+         5O6pZ8o6UZTKRsu4A3EOJaqcxNCC5hEoA+IBgpVX1sie9ARCdL26wMiDRtL/+fOeDDxq
+         jbC4+HRw5nIKG83hQp4Wam2FQ6Gt53BLgEwFHsV/TPUNt8iw3TSxtRaUtiGrHypf9Vd7
+         Y2BA==
+X-Gm-Message-State: AGi0PubyvNPH67ovXnGe/8hbVquNs3YnsK8B841+7TgbA25sucHyBiwX
+        HAyBON3lBUXIVNnO+0cVc4NBv/BzPxF4+h0IWbcdmBcN
+X-Google-Smtp-Source: APiQypJBmq2HrH7/BaZ3s0MsbZJbGUSjkkMOASDif93h6pM9x05y3U98TBS8UYml8BE+iSxPNBfjlkkvHII1xwshbCU=
+X-Received: by 2002:aca:5345:: with SMTP id h66mr4918669oib.110.1585950305594;
+ Fri, 03 Apr 2020 14:45:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <1585899568-14564-1-git-send-email-thorsten.klein@bshg.com>
-In-Reply-To: <1585899568-14564-1-git-send-email-thorsten.klein@bshg.com>
+References: <1585899591-14623-1-git-send-email-thorsten.klein@bshg.com>
+In-Reply-To: <1585899591-14623-1-git-send-email-thorsten.klein@bshg.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 3 Apr 2020 14:42:52 -0700
-Message-ID: <CABBYNZL25S=U3kF=oLygOc9ktvtFK94+BWzzqFujDDgF22HBwg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix error code in case of invalid offset
+Date:   Fri, 3 Apr 2020 14:44:53 -0700
+Message-ID: <CABBYNZLM63OXFcQvP-Z6M_rrYZMVrZyN_EjriaqejJTr5PUn9w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Added Manufacturer Data for Scan Response
 To:     "Klein, Thorsten (BSH)" <kleinkastel@googlemail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Klein, Thorsten (BSH)" <thorsten.klein@bshg.com>
@@ -73,20 +73,21 @@ Hi Thorsten,
 On Fri, Apr 3, 2020 at 12:43 AM Klein, Thorsten (BSH)
 <kleinkastel@googlemail.com> wrote:
 >
-> Fix dbus error code in case of invalid offset (org.bluez.Error.InvalidOffset).
+> A ManufacturerData field is added to the ScanResponse. Keys are the Manufacturer ID to associate with the data.
 >
-> Ryll, Jan (BSH) (1):
->   fix dbus error code in case of invalid offset
->     (org.bluez.Error.InvalidOffset)
+> Schachschal, Maximilian (BSH) (1):
+>   ManufacturerData field added to ScanResponse
 >
->  client/gatt.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  doc/advertising-api.txt |  6 ++++++
+>  src/advertising.c       | 25 +++++++++++++++++++------
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 >
 > --
 > 2.7.4
 
-Something is missing here.
-
+Was this suppose to be a cover letter? Imo it is pointless to send
+these for 1 patch set so please be more verbose on the actual patch
+description.
 
 -- 
 Luiz Augusto von Dentz
