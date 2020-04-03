@@ -2,100 +2,153 @@ Return-Path: <SRS0=CkcR=5T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9C8C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 17:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF8AC2BA12
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 17:51:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 139892080C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 17:18:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VeTuK82O"
+	by mail.kernel.org (Postfix) with ESMTP id 6FBA52080C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 17:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404225AbgDCRSw (ORCPT
+        id S1728276AbgDCRvp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 13:18:52 -0400
-Received: from mail-ot1-f47.google.com ([209.85.210.47]:33073 "EHLO
-        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728352AbgDCRSw (ORCPT
+        Fri, 3 Apr 2020 13:51:45 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49743 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727167AbgDCRvo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 13:18:52 -0400
-Received: by mail-ot1-f47.google.com with SMTP id 22so8105449otf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 10:18:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Mx26Rtzqf+cusG7rWEvDZRiUpFQb0BDrNNKWpw4tv5I=;
-        b=VeTuK82OiUJFRWT05NUEHcuXXKKJqr+iYp8tLnSGRNvIq9YDIuyKJp6OF2QTRf/Lr3
-         fARWBzFvBLlawWB4vP8rtk5/Abj+1gehOGSYobGYNHSY1BiQcJj73FLutdvaY25wiQIS
-         dn4JwE3A97sMhkh7DDZPVA9oH4cg3F0empdoE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Mx26Rtzqf+cusG7rWEvDZRiUpFQb0BDrNNKWpw4tv5I=;
-        b=P6k7z6z84Dj4H/7riUG+MsBwuWtJFeZmXZK5EQEAzxUpGFWwST0Uh5FsmsG4Mc86wp
-         atFvuVG9VbmJcRDQUDcQXobueV34enNGAmyPqEIZOPZKUQgSm1aIRc9PV8u++YPm9h+m
-         7u+KNjlw57YM73WcY1aQ0yyUL3dqd4JR+qNfr9H2RpR8u3DLThSKEHtabRnY+Fg347wy
-         ArcZ8y7XudPc5ru9ia6ocDR0U2qQyNPTWC6PV4vptFOPd19q/ttk2jMjXCt7QIo1KkLW
-         W6wROsQKbLBWLGcSx8Eo3xUvPwaL6clBlbGx16Dqc0ePYa5dbsjz4GDSPcTsJBGw70iF
-         3AxA==
-X-Gm-Message-State: AGi0Pual830dBsijN9HMxKd9FpMORzybmA+pk+qlR25AP4wWHW4kSdvo
-        z2vPFI2WJJrg5t2oESNhtmh4x3LdDUtlGgPbYm0+ew==
-X-Google-Smtp-Source: APiQypLqHHPn01f2c6swrQ8fXiNfGcy/Z+pF9OF1J6s6cBLog9xwJ4JjyT7XV9ACPYrDMr3i6tsx7/TNZZfZXglIh+Q=
-X-Received: by 2002:a9d:1b6d:: with SMTP id l100mr6792151otl.70.1585934331815;
- Fri, 03 Apr 2020 10:18:51 -0700 (PDT)
+        Fri, 3 Apr 2020 13:51:44 -0400
+Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5CCF1CED02
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2020 20:01:17 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v8 1/2] Bluetooth: add support to notify using SCO air mode
+Date:   Fri,  3 Apr 2020 19:51:38 +0200
+Message-Id: <20200403175139.749601-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200331003355.14614-1-sonnysasaka@chromium.org>
- <7CA6DAE1-09E7-4CEC-BA78-E8C4E104D92E@holtmann.org> <CAOxioNm27+wmWeCp+hoWCF-5W1=xm_gdvn3xWbDJVeYE=wmyiQ@mail.gmail.com>
- <CC80769E-941D-4AD9-AFB3-C24DD84E940D@holtmann.org>
-In-Reply-To: <CC80769E-941D-4AD9-AFB3-C24DD84E940D@holtmann.org>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Fri, 3 Apr 2020 10:18:40 -0700
-Message-ID: <CAOxioNnC-sC1SxcK-=VjMLQa8jmQ6DA-uKX3cLfGK=2zXN6PcA@mail.gmail.com>
-Subject: Re: [PATCH] tools/hciattach_ath3k: Load BT board data based on
- country code
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>, yixiang@google.com,
-        Zhifeng Cai <caiz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Sathish Narsimman <nsathish41@gmail.com>
 
-There is no need to apply the patch. I sent the patch because I didn't
-know of the deprecation plan. Thank you for the feedback.
+notifying using HCI_NOTIFY_CONN_ADD for SCO connection is generic in
+case of mSBC audio. To differntiate SCO air mode introducing
+HCI_NOTIFY_ENABLE_SCO_CVSD and HCI_NOTIFY_ENABLE_SCO_TRANSP.
 
-On Fri, Apr 3, 2020 at 9:56 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Sonny,
->
-> > Thanks for your feedback. I will take note of this deprecation plan.
-> > For now, Chromium OS can have a local patch to accomplish this and in
-> > the future we will migrate to serdev instead of hciattach.
->
-> I can apply the patch if you are still using it, but be aware of that fac=
-t that we are going to kill hciattach latest when we move to the 6.x major =
-version number.
->
-> Using serdev is a lot better, cleaner and simpler in the end. So I would =
-urge to make that change rather sooner than later.
->
-> In addition, I would really like to kill hci_uart.ko driver as well. That=
- one has become a beast with a bunch of hacks that will eventually backfire=
-. Since we have serdev now, I think each vendor should get their own driver=
-. I have posted examples to btuart.ko and bt3wire.ko drivers that could be =
-used as base.
->
-> Regards
->
-> Marcel
->
+Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |  3 +++
+ net/bluetooth/hci_conn.c    | 25 +++++++++++++++++++++----
+ net/bluetooth/hci_event.c   | 23 ++++++++++++++++++++++-
+ 3 files changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5f60e135aeb6..9ff2f7a9e131 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -53,6 +53,9 @@
+ #define HCI_NOTIFY_CONN_ADD		1
+ #define HCI_NOTIFY_CONN_DEL		2
+ #define HCI_NOTIFY_VOICE_SETTING	3
++#define HCI_NOTIFY_ENABLE_SCO_CVSD	4
++#define HCI_NOTIFY_ENABLE_SCO_TRANSP	5
++#define HCI_NOTIFY_DISABLE_SCO		6
+ 
+ /* HCI bus types */
+ #define HCI_VIRTUAL	0
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e245bc155cc2..07c34c55fc50 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -122,8 +122,18 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 
+ 	hci_conn_hash_del(hdev, conn);
+ 
+-	if (hdev->notify)
+-		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
++	if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
++		switch (conn->setting & SCO_AIRMODE_MASK) {
++		case SCO_AIRMODE_CVSD:
++		case SCO_AIRMODE_TRANSP:
++			if (hdev->notify)
++				hdev->notify(hdev, HCI_NOTIFY_DISABLE_SCO);
++			break;
++		}
++	} else {
++		if (hdev->notify)
++			hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
++	}
+ 
+ 	hci_conn_del_sysfs(conn);
+ 
+@@ -577,8 +587,15 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	hci_dev_hold(hdev);
+ 
+ 	hci_conn_hash_add(hdev, conn);
+-	if (hdev->notify)
+-		hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
++
++	/* The SCO and eSCO connections will only be notified when their
++	 * setup has been completed. This is different to ACL links which
++	 * can be notified right away.
++	 */
++	if (conn->type != SCO_LINK && conn->type != ESCO_LINK) {
++		if (hdev->notify)
++			hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
++	}
+ 
+ 	hci_conn_init_sysfs(conn);
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ddf77304aa8e..af396cb69602 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2607,8 +2607,16 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->status) {
+ 		hci_connect_cfm(conn, ev->status);
+ 		hci_conn_del(conn);
+-	} else if (ev->link_type != ACL_LINK)
++	} else if (ev->link_type == SCO_LINK) {
++		switch (conn->setting & SCO_AIRMODE_MASK) {
++		case SCO_AIRMODE_CVSD:
++			if (hdev->notify)
++				hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
++			break;
++		}
++
+ 		hci_connect_cfm(conn, ev->status);
++	}
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -4307,6 +4315,19 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		break;
+ 	}
+ 
++	bt_dev_dbg(hdev, "SCO connected with air mode: %02x", ev->air_mode);
++
++	switch (conn->setting & SCO_AIRMODE_MASK) {
++	case SCO_AIRMODE_CVSD:
++		if (hdev->notify)
++			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
++		break;
++	case SCO_AIRMODE_TRANSP:
++		if (hdev->notify)
++			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_TRANSP);
++		break;
++	}
++
+ 	hci_connect_cfm(conn, ev->status);
+ 	if (ev->status)
+ 		hci_conn_del(conn);
+-- 
+2.25.1
+
