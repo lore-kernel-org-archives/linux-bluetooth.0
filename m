@@ -2,92 +2,102 @@ Return-Path: <SRS0=CkcR=5T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3EBC43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 13:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8E6C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 13:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A8E7206E9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 13:49:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GZ7Mwf38"
+	by mail.kernel.org (Postfix) with ESMTP id 137ED206E9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 13:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgDCNtK (ORCPT
+        id S2390904AbgDCNtT convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Apr 2020 09:49:10 -0400
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:40975 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390830AbgDCNtK (ORCPT
+        Fri, 3 Apr 2020 09:49:19 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54400 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390830AbgDCNtT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Apr 2020 09:49:10 -0400
-Received: by mail-vs1-f68.google.com with SMTP id a63so4920700vsa.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2020 06:49:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lD+v0t1r+qpPIIVUOkHbdA6YGLILGl5eyQXlq4U7YA0=;
-        b=GZ7Mwf387jL+wdiMgTQcgYBdAw/jDXf76k/mRO5upAEnY6Y7b69kXQQD2HtPOgEUmM
-         k6QqfSC9S75/g7LzJQ0ZR4d4jPbSJBSxQGrg3Ze3vsOhaH5AM2zNypENyroenE1QSo7S
-         Gb9P0Qfk+8SM6I6GiDE2+ZPyCumKuDtDhO9nw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lD+v0t1r+qpPIIVUOkHbdA6YGLILGl5eyQXlq4U7YA0=;
-        b=epESqxPKcnGcoZPosinEOh9NeSD47UOn1E7Tv99IZS3vgLqpnIn2KwPhgD6g243ZgS
-         hw7kfufOay9Uvlxs3JXEsTVkmKeEkaNsc/IrLaAjzWnvK7NLaYPITLShAaYRnHTF5fuq
-         m/Tk6L7h68DzEb9k9ZCUD8/PhmD4xf7hb1d7m7LKVpZNbyo9ZdZiAUKbmtqSEM/o9/HO
-         yGrcZNFPSjA28Jg4YL23VnOcecZOpIUJqYx87EPhLxMXJAB1btQKoJsT0IUxFqgc9h3M
-         aVQxZLRPlOiqCJsFycQUUbJN1or5X6ksaMRz8kVH0MWz8bnQcnlgA8IgRpmW/axx9It6
-         exxQ==
-X-Gm-Message-State: AGi0PuaWYq24+4hM2ZZNP/c0lTS8MYfQ/T+cBiSZ4g/mcJbATTpshnGs
-        yp7lMZZ1PuRw5kfus9UZHM6r6mW8gZQ=
-X-Google-Smtp-Source: APiQypJurnnFoAiuXy8Uo4cWUNaOJGhhmZ0TEnXVzQJZBKwvTWZiFW9yeKYPxJp3zUJCvDpjowoSrg==
-X-Received: by 2002:a67:df86:: with SMTP id x6mr6306893vsk.60.1585921748589;
-        Fri, 03 Apr 2020 06:49:08 -0700 (PDT)
-Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
-        by smtp.gmail.com with ESMTPSA id k5sm2249037vkk.23.2020.04.03.06.49.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 06:49:07 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH] bluetooth:fixing minor typo in comment
-Date:   Fri,  3 Apr 2020 13:49:05 +0000
-Message-Id: <20200403134905.249261-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Fri, 3 Apr 2020 09:49:19 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 30CF3CECFF;
+        Fri,  3 Apr 2020 15:58:51 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v1] bluetooth:Adding driver and quirk defs for multi-role
+ LE
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200403133806.246918-1-alainm@chromium.org>
+Date:   Fri, 3 Apr 2020 15:49:17 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D3C05492-13B9-447C-982B-26B681C9EF8C@holtmann.org>
+References: <20200403133806.246918-1-alainm@chromium.org>
+To:     Alain Michaud <alainm@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This changes a simple typo in hci_event.c
+Hi Alain,
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+> This change adds the relevant driver and quirk to allow drivers to
+> report that concurrent roles are well supported by the controller.
+> 
+> This has historically been disabled as controllers did not reliably
+> support this. In particular, this will be used to relax this condition
+> for controllers that have been well tested and reliable.
+> 
+> 	/* Most controller will fail if we try to create new connections
+> 	 * while we have an existing one in slave role.
+> 	 */
+> 	if (hdev->conn_hash.le_num_slave > 0)
+> 		return NULL;
+> 
+> Signed-off-by: Alain Michaud <alainm@chromium.org>
+> ---
+> 
+> drivers/bluetooth/btusb.c   | 2 ++
+> include/net/bluetooth/hci.h | 8 ++++++++
+> 2 files changed, 10 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 3bdec42c9612..22e61a502d40 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -58,6 +58,8 @@ static struct usb_driver btusb_driver;
+> #define BTUSB_CW6622		0x100000
+> #define BTUSB_MEDIATEK		0x200000
+> #define BTUSB_WIDEBAND_SPEECH	0x400000
+> +#define BTUSB_LE_CONCURRENT_ROLES_SUPPORTED \
+> +				0x800000
+> 
+> static const struct usb_device_id btusb_table[] = {
+> 	/* Generic Bluetooth USB device */
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 5f60e135aeb6..b2c76cde7cd4 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -214,6 +214,14 @@ enum {
+> 	 * This quirk must be set before hci_register_dev is called.
+> 	 */
+> 	HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+> +
+> +	/* When this quirk is set, the controller has validated that
+> +	 * concurrent LE roles are supported.  This mechanism is necessary
+> +	 * as many controllers have been seen has having trouble initiating
+> +	 * a connectable advertisement after at least one connection in
+> +	 * central had already been established.
+> +	 */
+> +	HCI_QUIRK_LE_CONCURRENT_ROLES_SUPPORTED,
+> };
 
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+lets do this the other way around. Lets remove the limitation we have in our HCI core code. And then we see which controllers report errors. Trying to enable each controller individually is cumbersome. I rather later on blacklist the one or two historic controllers that don’t support it.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0a591be8b0ae..ddf77304aa8e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5269,7 +5269,7 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 		case HCI_AUTO_CONN_ALWAYS:
- 			/* Devices advertising with ADV_IND or ADV_DIRECT_IND
- 			 * are triggering a connection attempt. This means
--			 * that incoming connectioms from slave device are
-+			 * that incoming connections from slave device are
- 			 * accepted and also outgoing connections to slave
- 			 * devices are established when found.
- 			 */
--- 
-2.26.0.292.g33ef6b2f38-goog
+Regards
+
+Marcel
 
