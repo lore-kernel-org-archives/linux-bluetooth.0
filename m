@@ -2,262 +2,127 @@ Return-Path: <SRS0=CkcR=5T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAF9C2BA18
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 02:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23361C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 05:57:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79AE92077D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 02:16:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1DE1206E9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Apr 2020 05:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZBeXNkHy"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bGXlcxQ3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390219AbgDCCQ0 (ORCPT
+        id S1730550AbgDCF5t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Apr 2020 22:16:26 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:43322 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389108AbgDCCQ0 (ORCPT
+        Fri, 3 Apr 2020 01:57:49 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:25797 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729349AbgDCF5t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Apr 2020 22:16:26 -0400
-Received: by mail-vs1-f66.google.com with SMTP id w185so3979490vsw.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2020 19:16:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=64OPywlQgnmjCAJe4iab4kwGSIKCiDfuRZfFbaamGR8=;
-        b=ZBeXNkHyyBpxDAciI8v0n6KQ6TIrCy4+YjnQyZ79Il318TIpMzTN44Gy2XD+I0MAVg
-         yUfrPLrkhQsQ8HL/kxV8q7eml6lcvhpdRGn2BdRr3EOkSC3ULzPFV8/qwBW0fGNmR419
-         0kqov14s10zCUhb9s9xugada3IDhNajyvMVwg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=64OPywlQgnmjCAJe4iab4kwGSIKCiDfuRZfFbaamGR8=;
-        b=IN4kYgMCBFC4qT1olI8qjdxIVJIUr6yaip/OtUy5gqvV8VQXpjrq/TOWW7zQKBXmCP
-         9t4ZTv19MnFs3ThBm+Al1OtMqETq/4+vEFTIN+tTksDc9wNB/iCOX1WmKR1WIBFn76/G
-         fbfKGGV68kh31Ot7NYgzEQCdpxaY4Po8AoW2+yeD9KHhivoOmb0TiJW3v8t8pvizt0OH
-         pTS7VcRZQeaUvhiKxquyT/xLu5Sy1iyvI2salV1c+eCvQfmIRP5/EcyC7LYZ2d5cNW2u
-         GiBoGyCGTUPmfDMTo9gNBcnYeS5bwVmg5fxkMz3I0PmLwN+lkqOwAQvu7uRmZxOQ42Im
-         EoPw==
-X-Gm-Message-State: AGi0PuaybCsFi25Op5a3fgvtIboOUJ4y8FOXZNqW1CwVqvZdpFX+HeCH
-        jniUGD4T54ML3VMhnQU9htEn2Kr7V+Oye7pJ9H0iGg==
-X-Google-Smtp-Source: APiQypIXa44nB4RalY6sk42qNy+zgRVrtsa9/gMqL6cr2XgwUzEI+osnNuHYGHwb3azV09ono88vo7jVytKzOZ36N9g=
-X-Received: by 2002:a67:b60c:: with SMTP id d12mr4461805vsm.196.1585880183647;
- Thu, 02 Apr 2020 19:16:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200323194507.90944-1-abhishekpandit@chromium.org> <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
-In-Reply-To: <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Thu, 2 Apr 2020 19:16:12 -0700
-Message-ID: <CANFp7mV=ugPr4ZotxS9n=Dgy5ZTvKb-t9xbwUq-AJ5MoBiCDcA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/1] Bluetooth: Prioritize SCO traffic
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Cc:     ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 3 Apr 2020 01:57:49 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200403055745epoutp0413618a92acc17de43fbd048d9da3b059~CObRUtZ4q1220512205epoutp04h
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2020 05:57:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200403055745epoutp0413618a92acc17de43fbd048d9da3b059~CObRUtZ4q1220512205epoutp04h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1585893465;
+        bh=ZS2jsbsrkACA+0JYyXYdZZItbPAq+3ZvkTtsKfDP9As=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=bGXlcxQ38DdHNXtBStZ3FoXyh4F4mrtPtvnE+z+0DuDiqrtudHLPy4iDPPAiIf6a/
+         65p6+F25epiOkNrNaX03DoHTM/V6w45mHdOq1daLw1shyrd56WCN0osqWcGb33BM9Y
+         oRd113AyHsFYfx3GCMsdAi6Augste3zok17nt8vc=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20200403055745epcas5p49375a7f4d229497751f05b7e380e64b3~CObRKPKDN0867908679epcas5p4_;
+        Fri,  3 Apr 2020 05:57:45 +0000 (GMT)
+X-AuditID: b6c32a49-8b3ff700000012ae-71-5e86d0585b53
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        57.93.04782.850D68E5; Fri,  3 Apr 2020 14:57:44 +0900 (KST)
+Mime-Version: 1.0
+Subject: RE: Re: [PATCH BlueZ] mesh: Add check for valid netkey index
+Reply-To: anupam.r@samsung.com
+From:   Anupam Roy <anupam.r@samsung.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <3aa08d9a552ab02b0495b2a3970405ee082c85de.camel@intel.com>
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20200403052925epcms5p297a218e7780438e3db945d8007000b2f@epcms5p2>
+Date:   Fri, 03 Apr 2020 10:59:25 +0530
+X-CMS-MailID: 20200403052925epcms5p297a218e7780438e3db945d8007000b2f
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7bCmum7EhbY4g62LLC1WzFjNZjHnWh+z
+        A5PH4j0vmTw+b5ILYIrisklJzcksSy3St0vgytix9wlTwWLRis5p51kaGPeIdDFyckgImEjM
+        /tvH1MXIxSEksJtR4vCcx6xdjBwcvAKCEn93CIPUCAu4Skyf1MYCYgsJyEksnrqWDaREWEBT
+        4ubGFJAwm4C6xK+HO8BKRATUJC5eP8AMUsIs4C5x450QxCZeiRntT1kgbGmJ7cu3MoLYnEAl
+        2953MkHERSVurn7LDmO/PzafEcIWkWi9d5YZwhaUePBzNyPMnK0LnjKDXC8h0M0o8XrHeiYI
+        ZwqjxMeLb6Gmmkv8734L1sEr4Cvx/NRcsCtYBFQlPq3uhNrmIrHzVDcriM0soC2xbOFrqAc0
+        Jdbv0ocokZWYemodE0QJn0Tv7ydMMI/tmAdjK0lsvT6fFcKWkOjbvAsq7iFxcssvaDCfYpZ4
+        /2cvywRGhVmIkJ6FZPMshM0LGJlXMUqmFhTnpqcWmxYY5qWW6xUn5haX5qXrJefnbmIEpwUt
+        zx2Ms875HGIU4GBU4uFlONgaJ8SaWFZcmXuIUYKDWUmE13EGUIg3JbGyKrUoP76oNCe1+BCj
+        NAeLkjjvJNarMUIC6YklqdmpqQWpRTBZJg5OqQbGGJefVidnTP8r1OCw+Z1l3l6hpSYvOk/d
+        K+YpXB3xIvNYXJH2jwscB2YGM17coedks0La6Z99160dtz7sn3T0smT37rOWBkflJOd6v3QQ
+        jdOVPV0v4Pn+wZk18z+I3nEPfRl3/w1D7fvPq+NmrvvZ4sfj7+5a7R5hOa1kXbLs1btPL7i1
+        tTM6K7EUZyQaajEXFScCAOAP7a0HAwAA
+X-CMS-RootMailID: 20200401112015epcas5p10545143f69c22449f559818476845cc5
+References: <3aa08d9a552ab02b0495b2a3970405ee082c85de.camel@intel.com>
+        <9038a2fe4daafd90def2444d71c8914c6a64a688.camel@intel.com>
+        <82b707704e1863c43748adce03057d2252fea59a.camel@intel.com>
+        <1585740006-9569-1-git-send-email-anupam.r@samsung.com>
+        <20200402140519epcms5p3608d451804bf03eefc34ce77b04ab0aa@epcms5p3>
+        <20200402160037epcms5p5c94d5798e7611c11e795c51bc39b5a6b@epcms5p5>
+        <CGME20200401112015epcas5p10545143f69c22449f559818476845cc5@epcms5p2>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-
-Reminder to review this patch.
-
-Thanks,
-Abhishek
-
-On Mon, Mar 23, 2020 at 12:45 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> When scheduling TX packets, send all SCO/eSCO packets first, check for
-> pending SCO/eSCO packets after every ACL/LE packet and send them if any
-> are pending.  This is done to make sure that we can meet SCO deadlines
-> on slow interfaces like UART.
->
-> If we were to queue up multiple ACL packets without checking for a SCO
-> packet, we might miss the SCO timing. For example:
->
-> The time it takes to send a maximum size ACL packet (1024 bytes):
-> t = 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
->         where 10/8 is uart overhead due to start/stop bits per byte
->
-> Replace t = 3.75ms (SCO deadline), which gives us a baudrate of 2730666.
->
-> At a baudrate of 3000000, if we didn't check for SCO packets within 1024
-> bytes, we would miss the 3.75ms timing window.
->
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
->
-> Changes in v3:
-> * Removed hci_sched_sync
->
-> Changes in v2:
-> * Refactor to check for SCO/eSCO after each ACL/LE packet sent
-> * Enabled SCO priority all the time and removed the sched_limit variable
->
->  net/bluetooth/hci_core.c | 106 +++++++++++++++++++++------------------
->  1 file changed, 57 insertions(+), 49 deletions(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index dbd2ad3a26ed..9e5d7662a047 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -4239,6 +4239,54 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
->         }
->  }
->
-> +/* Schedule SCO */
-> +static void hci_sched_sco(struct hci_dev *hdev)
-> +{
-> +       struct hci_conn *conn;
-> +       struct sk_buff *skb;
-> +       int quote;
-> +
-> +       BT_DBG("%s", hdev->name);
-> +
-> +       if (!hci_conn_num(hdev, SCO_LINK))
-> +               return;
-> +
-> +       while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
-> +               while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-> +                       BT_DBG("skb %p len %d", skb, skb->len);
-> +                       hci_send_frame(hdev, skb);
-> +
-> +                       conn->sent++;
-> +                       if (conn->sent == ~0)
-> +                               conn->sent = 0;
-> +               }
-> +       }
-> +}
-> +
-> +static void hci_sched_esco(struct hci_dev *hdev)
-> +{
-> +       struct hci_conn *conn;
-> +       struct sk_buff *skb;
-> +       int quote;
-> +
-> +       BT_DBG("%s", hdev->name);
-> +
-> +       if (!hci_conn_num(hdev, ESCO_LINK))
-> +               return;
-> +
-> +       while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
-> +                                                    &quote))) {
-> +               while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-> +                       BT_DBG("skb %p len %d", skb, skb->len);
-> +                       hci_send_frame(hdev, skb);
-> +
-> +                       conn->sent++;
-> +                       if (conn->sent == ~0)
-> +                               conn->sent = 0;
-> +               }
-> +       }
-> +}
-> +
->  static void hci_sched_acl_pkt(struct hci_dev *hdev)
->  {
->         unsigned int cnt = hdev->acl_cnt;
-> @@ -4270,6 +4318,10 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
->                         hdev->acl_cnt--;
->                         chan->sent++;
->                         chan->conn->sent++;
-> +
-> +                       /* Send pending SCO packets right away */
-> +                       hci_sched_sco(hdev);
-> +                       hci_sched_esco(hdev);
->                 }
->         }
->
-> @@ -4354,54 +4406,6 @@ static void hci_sched_acl(struct hci_dev *hdev)
->         }
->  }
->
-> -/* Schedule SCO */
-> -static void hci_sched_sco(struct hci_dev *hdev)
-> -{
-> -       struct hci_conn *conn;
-> -       struct sk_buff *skb;
-> -       int quote;
-> -
-> -       BT_DBG("%s", hdev->name);
-> -
-> -       if (!hci_conn_num(hdev, SCO_LINK))
-> -               return;
-> -
-> -       while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
-> -               while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-> -                       BT_DBG("skb %p len %d", skb, skb->len);
-> -                       hci_send_frame(hdev, skb);
-> -
-> -                       conn->sent++;
-> -                       if (conn->sent == ~0)
-> -                               conn->sent = 0;
-> -               }
-> -       }
-> -}
-> -
-> -static void hci_sched_esco(struct hci_dev *hdev)
-> -{
-> -       struct hci_conn *conn;
-> -       struct sk_buff *skb;
-> -       int quote;
-> -
-> -       BT_DBG("%s", hdev->name);
-> -
-> -       if (!hci_conn_num(hdev, ESCO_LINK))
-> -               return;
-> -
-> -       while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
-> -                                                    &quote))) {
-> -               while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-> -                       BT_DBG("skb %p len %d", skb, skb->len);
-> -                       hci_send_frame(hdev, skb);
-> -
-> -                       conn->sent++;
-> -                       if (conn->sent == ~0)
-> -                               conn->sent = 0;
-> -               }
-> -       }
-> -}
-> -
->  static void hci_sched_le(struct hci_dev *hdev)
->  {
->         struct hci_chan *chan;
-> @@ -4436,6 +4440,10 @@ static void hci_sched_le(struct hci_dev *hdev)
->                         cnt--;
->                         chan->sent++;
->                         chan->conn->sent++;
-> +
-> +                       /* Send pending SCO packets right away */
-> +                       hci_sched_sco(hdev);
-> +                       hci_sched_esco(hdev);
->                 }
->         }
->
-> @@ -4458,9 +4466,9 @@ static void hci_tx_work(struct work_struct *work)
->
->         if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
->                 /* Schedule queues and send stuff to HCI driver */
-> -               hci_sched_acl(hdev);
->                 hci_sched_sco(hdev);
->                 hci_sched_esco(hdev);
-> +               hci_sched_acl(hdev);
->                 hci_sched_le(hdev);
->         }
->
-> --
-> 2.25.1.696.g5e7596f4ac-goog
->
+Hi Brian,
+>On Thu, 2020-04-02 at 21:30 +0530, Anupam Roy wrote:
+>> Hi Brian,
+>>=20
+>> > You are correct in finding this bug...  It was found in paralell by Pr=
+zemys=C5=82aw=20Fierek,=20and=20should=20be=20fixed=0D=0A>>=20>=20as=0D=0A>=
+>=20>=20of=20this=20commit:=0D=0A>>=20>=20=0D=0A>>=20>=20=20=20commit=2084a=
+9b6ce4b66a2ba21cce8e4b0c3c6e097a5493a=0D=0A>>=20>=20=20=20Author:=20Przemys=
+=C5=82aw=20Fierek=20<przemyslaw.fierek=40silvair.com>=0D=0A>>=20>=20=20=20D=
+ate:=20=20=20Tue=20Mar=2031=2014:09:08=202020=20+0200=0D=0A>>=20>=20=0D=0A>=
+>=20>=20=20=20=20=20=20=20mesh:=20Add=20net=20key=20index=20to=20sar=20stru=
+cture=0D=0A>>=20>=20=20=20=20=20=20=20=0D=0A>>=20>=20=20=20=20=20=20=20This=
+=20patch=20adds=20net=20key=20index=20to=20struct=20mesh_sar.=20This=20fixe=
+s=20problem=20with=0D=0A>>=20>=20=20=20=20=20=20=20using=20invalid=20networ=
+k=20key=20to=20encrypt=20application=20messages.=0D=0A>>=20>=20=0D=0A>>=20>=
+=20=0D=0A>>=20>=20If=20you=20check=20out=20the=20current=20tip,=20hopefully=
+=20it=20will=20solve=20the=20problem=20you=20found=20where=20the=20incorrec=
+t=0D=0A>>=20>=20(primary=0D=0A>>=20>=20subnet)=20key=20was=20used=20instead=
+=20of=20the=20requested=20net=20key.=0D=0A>>=20>=20=0D=0A>>=20Okay,=20got=
+=20it,=20thanks.=0D=0A>>=20Since=20we=20plan=20to=20use=20the=20net=20key=
+=20index,=20will=20the=20below=20sanity=20check=20stand=20valid(in=20case=
+=20of=20app_idx=20=3D=3D=0D=0A>>=20APP_IDX_DEV_REMOTE)?=0D=0A>>=20As=20it=
+=20may=20save=20some=20un-necesary=20processing=20of=20the=20message=20payl=
+oad=20in=20case=20net=20key=20index=20is=20*Not*=20valid=20or=0D=0A>>=20*su=
+bnet*=20is=20deleted=20by=20Config=20Client.=20Please=20share=20your=20opin=
+ion.=20Thanks=0D=0A>=0D=0A>If=20the=20App=20uses=20DevKeySend()=20with=20re=
+mote=20=3D=3D=20true,=20but=20the=20node=20does=20not=20have=20the=20device=
+=20key=20for=20that=20remote=0D=0A>node=20in=20it's=20keyring,=20the=20meth=
+od=20will=20silently=20fail,=20and=20no=20message=20will=20be=20sent=20Over=
+-the-Air.=0D=0A>=0D=0AOkay,=20I=20got=20that,=20deleting=20the=20keyring=20=
+(by=20subnet-delete=20<net=20idx>)=20should=20not=20have=20any=20effect=20f=
+or=20remote=20DevKeySend=20messages,=0D=0Aas=20net=20idx=20would=20be=20use=
+d=20just=20to=20pick=20up=20Network=20Encryption=20Key=20from=20the=20node-=
+>net->subnet.=20Thanks=20for=20clarification.=0D=0A=0D=0A>If=20the=20App=20=
+wants=20to=20*respond*=20to=20an=20incoming=20command=20received=20with=20t=
+he=20local=20nodes=20device=20key,=20it=20should=0D=0A>respond=20using=20De=
+vKeySend()=20with=20remote=3D=3Dfalse,=20and=20net_index=20=3D=3D=20the=20n=
+et_index=20from=20the=20cooresponding=0D=0A>DevKeyMessageReceived().
