@@ -2,87 +2,116 @@ Return-Path: <SRS0=77es=5W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B4DC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172C5C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 12:04:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54737206F8
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC3EE20678
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 12:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbgDFLwD convert rfc822-to-8bit (ORCPT
+        id S1727732AbgDFMEi convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 07:52:03 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:52327 "EHLO
+        Mon, 6 Apr 2020 08:04:38 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36513 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727376AbgDFLwC (ORCPT
+        with ESMTP id S1727614AbgDFMEi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 07:52:02 -0400
+        Mon, 6 Apr 2020 08:04:38 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AF7E2CECC4;
-        Mon,  6 Apr 2020 14:01:34 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 54F5DCECC3;
+        Mon,  6 Apr 2020 14:14:11 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v7 2/2] bluetooth:btusb: handle msbc audio over USB
- Endpoints
+Subject: Re: [PATCH] Bluetooth: Always request for user confirmation for Just
+ Works (LE SC)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAOVXEJJRvzsWjTL4Z7eLyqfjFPb7rMXmHnqp_Ux7ZvnyXMMEGg@mail.gmail.com>
-Date:   Mon, 6 Apr 2020 13:51:59 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Sathish Narasimman <sathish.narasimman@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Hsin-Yu Chao <hychao@chromium.org>,
-        Amit K Bag <amit.k.bag@intel.com>
+In-Reply-To: <20200404000439.12219-1-sonnysasaka@chromium.org>
+Date:   Mon, 6 Apr 2020 14:04:36 +0200
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <65A96C2C-C2A7-4B93-B015-EACB623A0B18@holtmann.org>
-References: <20200402152758.10363-1-sathish.narasimman@intel.com>
- <20200402152758.10363-2-sathish.narasimman@intel.com>
- <59EE263D-87B2-42E0-A5EA-9F261BAC29BC@holtmann.org>
- <CAOVXEJJRvzsWjTL4Z7eLyqfjFPb7rMXmHnqp_Ux7ZvnyXMMEGg@mail.gmail.com>
-To:     Sathish Narasimman <nsathish41@gmail.com>
+Message-Id: <DB9E4FAE-C54D-4158-ACE3-45B62C85E2CB@holtmann.org>
+References: <20200404000439.12219-1-sonnysasaka@chromium.org>
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+Hi Sonny,
 
->>> For msbc encoded audio stream over usb transport, btusb driver
->>> to be set to alternate settings 6 as per BT core spec 5.0. The
->>> type of air mode is used to differenting which alt setting to be
->>> used.
->>> The changes are made considering some discussion over the similar
->>> patch submitted earlier from Kuba Pawlak(link below)
->>> https://www.spinics.net/lists/linux-bluetooth/msg64577.html
->>> 
->>> Reported-by: kbuild test robot <lkp@intel.com>
->>> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
->>> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
->>> Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
->>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 155 +++++++++++++++++++++++++++++---------
->>> 1 file changed, 118 insertions(+), 37 deletions(-)
->> 
->> I decided to look at these to patches and fix up a few things.
->> 
->> 1) Use conn->setting & SCO_AIRMODE_MASK to select the option and with that also ensure that we don’t send this for ulaw and alaw air modes if they ever get established (even if unlikely).
->> 
->> 2) Fix a bunch of coding style violation
->> 
->> Please test these two patches if they still work according and then I can apply them.
->> 
->> Regards
->> 
->> Marcel
->> 
-> Tested these 2 patches and they are working fine
+> To improve security, always give the user-space daemon a chance to
+> accept or reject a Just Works pairing (LE). The daemon may decide to
+> auto-accept based on the user's intent.
+> 
+> This patch is similar to the previous patch but applies for LE Secure
+> Connections (SC).
+> 
+> Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> ---
+> net/bluetooth/smp.c | 14 +++++++++++++-
+> 1 file changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index d0b695ee49f6..daf03339dedd 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -2202,7 +2202,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+> 	if (err)
+> 		return SMP_UNSPECIFIED;
+> 
+> -	if (smp->method == JUST_WORKS || smp->method == REQ_OOB) {
+> +	if (smp->method == REQ_OOB) {
+> 		if (hcon->out) {
+> 			sc_dhkey_check(smp);
+> 			SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
+> @@ -2210,6 +2210,18 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+> 		return 0;
+> 	}
+> 
+> +	/* If Just Works, ask user-space for confirmation. */
+> +	if (smp->method == JUST_WORKS) {
+> +		err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
+> +				hcon->type, hcon->dst_type, passkey, 1);
+> +		if (err)
+> +			return SMP_UNSPECIFIED;
+> +
+> +		set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
+> +
+> +		return 0;
+> +	}
+> +
+> 	err = smp_g2(smp->tfm_cmac, pkax, pkbx, na, nb, &passkey);
+> 	if (err)
+> 		return SMP_UNSPECIFIED;
 
-good since Johan already applied them to bluetooth-next tree.
+@@ -2202,7 +2204,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+        if (err)
+                return SMP_UNSPECIFIED;
+ 
+-       if (smp->method == JUST_WORKS || smp->method == REQ_OOB) {
++       if (smp->method == REQ_OOB) {
+                if (hcon->out) {
+                        sc_dhkey_check(smp);
+                        SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
+@@ -2214,7 +2216,10 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+        if (err)
+                return SMP_UNSPECIFIED;
+ 
+-       confirm_hint = 0;
++       if (smp->method == JUST_WORKS)
++               confirm_hint = 0;
++       else
++               confirm_hint = 1;
+ 
+ confirm:
+        err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
+
+Isn’t this what you are actually doing (minus the required comment of course)?
 
 Regards
 
