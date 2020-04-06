@@ -2,128 +2,130 @@ Return-Path: <SRS0=77es=5W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB96DC2BA80
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 19:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2959BC2BA1A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 19:37:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D20320731
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 19:15:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 021252072A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 19:37:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MYMwPh61"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="EtuiulYd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgDFTPd (ORCPT
+        id S1726220AbgDFThl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 15:15:33 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:46165 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbgDFTPd (ORCPT
+        Mon, 6 Apr 2020 15:37:41 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:35859 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725933AbgDFThl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 15:15:33 -0400
-Received: by mail-oi1-f196.google.com with SMTP id q204so14063570oia.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 12:15:32 -0700 (PDT)
+        Mon, 6 Apr 2020 15:37:41 -0400
+Received: by mail-lj1-f195.google.com with SMTP id b1so1043438ljp.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 12:37:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=miv5n/k+feV617mYPhfbVUPV8D5MSyOCPj4Ac3CWtMw=;
-        b=MYMwPh61GsI6XsGu3waWGuBT+BFAV4nlTM+8bOVNOvORSLC9/gEEvCPUVQxfcBQJA8
-         XDodjyCNKYnd13iQN3dmjxvpJuq2OMKLUKHGYphGSTT7Zwzz7GecUfFA7WsIDkc16nvg
-         BdHfFTckVYMzUtMxG+9RBCpQlVZQidM84ypVI=
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Mi6+ei2itVXen0h2fqPCyaku2buJggpGicP6d9v9Z8A=;
+        b=EtuiulYdNipDuouWjtwKppGnCvjh7nYTQv4T0DjeJ3kNaJEj72jttAE0Fig9pNHOEW
+         kr+cEoCDCDKpHV2+SednSUZ40c6/WqY1LX+zYB4vB7nUooDoKHC6hR6zCJFPK+xz70l3
+         y2p8EaN/nYuFUCo4T4UFAkghtCT1RkiMXSRfD0dtxlyFZDVfhtcWp6itlMzb6ZPQMreR
+         dF7YG8Jy9jxVPkr7yz6QLf5tRfkcf6eHaMP7PmueiBRsLe/VAp4WsWu8u/LcleD7IwFA
+         29CBo2L2HK5pFfp4ZIK6oKYEh0VCDzV7SQZx5oA3a5kXTXqN4i7D1vIHOpsOV3UpBRM4
+         HjSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=miv5n/k+feV617mYPhfbVUPV8D5MSyOCPj4Ac3CWtMw=;
-        b=LPG8PTRtGbfYIVhtki/2tvznqNuz2xnS82MW573CfYYYHMfUoCIRU7UFTabeD9zY8G
-         QDtISYxrwYBebOLLhmmwjzcpCrS89oSjch4rzpQO80OfaKEf9uSsJgRRC36JZxf96+y4
-         ey9riDW+sc5ealJbJOuZ9hh4daxwg0viZfw7FQyQvLXaBCmKC4iZPCAmmp7MGmsFvSr2
-         EYEj2VtvG29dp4qHMyuyG3lRtzcqwHXfUbBMQFSed7gBrppUteY6mgjGYnY/9yfzB4rg
-         5kIznzSs7h20pwK/KT82JjkTpUBry3CflVMLKdHFsUSebtdZwhD1vCpR9j+rEFNn5C88
-         vGAQ==
-X-Gm-Message-State: AGi0PuZL12e/4uGsuJR88KLY8VcvZFUNR368j3pFJu32rQI5CcO3lKTC
-        bfkQcknTCzU8Y4GvwjJbRcxzwfuO1krdgG7X3wEuZQ==
-X-Google-Smtp-Source: APiQypJ3BCbS26CTzYSKqqpjGSJ6qpi4PpmHmXaX2aIsQQENucRJ+aKdcf/F2DLnCrFw5Bszx9oADxs91d3zg0ZKJ7A=
-X-Received: by 2002:aca:dd55:: with SMTP id u82mr618185oig.27.1586200532136;
- Mon, 06 Apr 2020 12:15:32 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=Mi6+ei2itVXen0h2fqPCyaku2buJggpGicP6d9v9Z8A=;
+        b=Z3n1rAPQp0X0z0W6t592Py3DC4N570DST1qMIJ7Sg4rBI9weIm45fDcsSThgQO3RGZ
+         hPopXuIBwJG2/0QTn9SQHBf8WO788qNHIzf5F7qU3dbny4vsyHgHlRgi6JJrAHMzpoc8
+         nvv+wj0VdDa9ajObb2GLp7DdxK+ki4s8RLFFcnmb5FM2Yp5+xQ+kMXMPTfa5dR59Yj4z
+         sJ+yINin9sOAGOSPG92BRaOCbPOS8xtnn1d5OSoFpvrnEFWTUSmK+lPcNVGwhMwQNi/z
+         9ewkwzByaTWEZoJon9PaeEukzO0/LIqc7/1AnldDSMO+/yTbQYecY6F8JxcMCBi7Y7qO
+         uuqw==
+X-Gm-Message-State: AGi0PubeNxytdNYmBfo0qoHhqz6u4MMh8b854pKrSTZy77hSWLJIaGdE
+        XBUbGKrXEekrHBLB5HlwGF3OPg==
+X-Google-Smtp-Source: APiQypKoFb7MfAR95Ham9PGInCSJhPrwWzJoy4D7Xe/Djn8SbITNuKuIeV7+2bv4eNgkMpjsqhhh7A==
+X-Received: by 2002:a2e:8084:: with SMTP id i4mr505044ljg.185.1586201856914;
+        Mon, 06 Apr 2020 12:37:36 -0700 (PDT)
+Received: from kynes (apn-37-7-76-34.dynamic.gprs.plus.pl. [37.7.76.34])
+        by smtp.gmail.com with ESMTPSA id g4sm6064454ljn.105.2020.04.06.12.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2020 12:37:36 -0700 (PDT)
+Date:   Mon, 6 Apr 2020 21:37:34 +0200
+From:   "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ RESEND] mesh: Remove redundant code from mesh/crypto
+Message-ID: <20200406193734.sf4s22b7uvcm4c7o@kynes>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20200326211705.18678-1-michal.lowas-rzechonek@silvair.com>
+ <27728473092a638d6c97520b14eac61656c56903.camel@intel.com>
 MIME-Version: 1.0
-References: <20200403150236.74232-1-linux@roeck-us.net>
-In-Reply-To: <20200403150236.74232-1-linux@roeck-us.net>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Mon, 6 Apr 2020 12:15:19 -0700
-Message-ID: <CAOxioNm6pu+WFwDS8oTcBiLaCjHH9QZx5R6rEjUtKPZjqN26+w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Simplify / fix return values from tk_request
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <27728473092a638d6c97520b14eac61656c56903.camel@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Hi Brian,
 
-On Fri, Apr 3, 2020 at 8:02 AM Guenter Roeck <linux@roeck-us.net> wrote:
->
-> Some static checker run by 0day reports a variableScope warning.
->
-> net/bluetooth/smp.c:870:6: warning:
->         The scope of the variable 'err' can be reduced. [variableScope]
->
-> There is no need for two separate variables holding return values.
-> Stick with the existing variable. While at it, don't pre-initialize
-> 'ret' because it is set in each code path.
->
-> tk_request() is supposed to return a negative error code on errors,
-> not a bluetooth return code. The calling code converts the return
-> value to SMP_UNSPECIFIED if needed.
->
-> Fixes: 92516cd97fd4 ("Bluetooth: Always request for user confirmation for Just Works")
-> Cc: Sonny Sasaka <sonnysasaka@chromium.org>
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
->  net/bluetooth/smp.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
->
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index d0b695ee49f6..30e8626dd553 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -854,8 +854,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
->         struct l2cap_chan *chan = conn->smp;
->         struct smp_chan *smp = chan->data;
->         u32 passkey = 0;
-> -       int ret = 0;
-> -       int err;
-> +       int ret;
->
->         /* Initialize key for JUST WORKS */
->         memset(smp->tk, 0, sizeof(smp->tk));
-> @@ -887,12 +886,12 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
->         /* If Just Works, Continue with Zero TK and ask user-space for
->          * confirmation */
->         if (smp->method == JUST_WORKS) {
-> -               err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
-> +               ret = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
->                                                 hcon->type,
->                                                 hcon->dst_type,
->                                                 passkey, 1);
-> -               if (err)
-> -                       return SMP_UNSPECIFIED;
-> +               if (ret)
-> +                       return ret;
->                 set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
->                 return 0;
->         }
-> --
-> 2.17.1
->
+On 04/05, Gix, Brian wrote:
+> I think this needs some more work, in that it no longer correctly
+> fails the mesh-test-crypto test when running:
+> 
+> make distcheck
+> 
+> It *almost* does in that it flags an error in red if a "verify" step
+> fails, but it does not exit with a fail code.  This is an important
+> step, particularily with the dependance on kernel based crypto
+> functions.
+> 
+> My test methodology was to flip a bit in one of the test payloads
+> (i.e., make it "not perfectly match" the specification sample data).
+> 
+> As best I can tell, it is otherwise functional, but the unit tests are
+> important.
+
+Agreed, but as of 14301cf0d42ba3fc4de99c3bdf183045be733e0c running
+unit/test-mesh-crypto with modified payloads, e.g.
+
+diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
+index 0043b0b10..a832b2000 100644
+--- a/unit/test-mesh-crypto.c
++++ b/unit/test-mesh-crypto.c
+@@ -591,7 +591,7 @@ static const struct mesh_crypto_test s8_3_11 = {
+ static const struct mesh_crypto_test s8_3_22 = {
+        .name           = "8.3.22 Message #22",
+ 
+-       .app_key        = "63964771734fbd76e3b40519d1d94a48",
++       .app_key        = "63964771735fbd76e3b40519d1d94a48",
+        .net_key        = "7dd7364cd842ad18c17c2b820c84c3d6",
+        .dev_key        = "9d6dd0e96eb25dc19a40ed9914f8f03f",
+        .iv_index       = 0x12345677,
+
+also does not cause it to exit non-zero return code, it just prints red
+"FAIL"s...
+
+I thought it was done on purpose, as mesh tests don't seem to use the
+src/shared/tester.h.
+
+Also, after applying the patch onto the mentioned commit, I'm getting
+all green runs. What system are you using? I'd like to try reproducing
+your results.
+
+regards
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
