@@ -2,68 +2,115 @@ Return-Path: <SRS0=77es=5W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CAFC2BA1E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 12:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C354C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 13:42:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFA7320CC7
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 12:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D0BD23370
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 13:42:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fw1oYlMD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727755AbgDFMIO convert rfc822-to-8bit (ORCPT
+        id S1728256AbgDFNmP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 08:08:14 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34267 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727666AbgDFMIO (ORCPT
+        Mon, 6 Apr 2020 09:42:15 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:38688 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728086AbgDFNmO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 08:08:14 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B2988CECC4;
-        Mon,  6 Apr 2020 14:17:46 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v1] Bluetooth: debugfs option to unset MITM flag
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJQfnxHUWCDVs5O-sJG8cqQKRrs9UvEjm3Yjv65SoyrzNNGV=Q@mail.gmail.com>
-Date:   Mon, 6 Apr 2020 14:08:12 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <39BBAF39-1552-48A2-AC0C-F6148987E804@holtmann.org>
-References: <20200406165542.v1.1.Ibfc500cbf0bf2dc8429b17f064e960e95bb228e9@changeid>
- <9673F164-A14E-4DD6-88FB-277694C50328@holtmann.org>
- <CAJQfnxHUWCDVs5O-sJG8cqQKRrs9UvEjm3Yjv65SoyrzNNGV=Q@mail.gmail.com>
-To:     Archie Pusaka <apusaka@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 6 Apr 2020 09:42:14 -0400
+Received: by mail-lf1-f68.google.com with SMTP id l11so4441117lfc.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 06:42:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=4AULzYkZUr4yq6skeCFwiU8j+Y6W9mnqqa0q8nQ9iUU=;
+        b=fw1oYlMDKdEjOECnyT5L9z7EKAqi8t0f2uHDRvb+0Vb8QQ6KqHSw/86xn9p5zuZbkM
+         keQyCCVLWXL1FUVWCP2Huzg7UORPITgVpP776P7ukX28DrulcHH2IlRBFUkk8Rznb6PT
+         UDQXK2Lw3tKFjBaezk1AIGcsiiBnfW4R7GR0e214L+c7cQ0Y7hOVbwvH9yYgaOANOK6y
+         V/3EUD3+pZQtbCSL04r+E28LoBceUJmabyHIZzstYrEr3gGONYrtkfEsVyKyvDe6zF1c
+         +w5B6PnNwpF08HAWcTZBvlWTyuEbkROnnaIAa9la7/787FUHBUiIndaJDrTfF2IYw94N
+         Y95g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=4AULzYkZUr4yq6skeCFwiU8j+Y6W9mnqqa0q8nQ9iUU=;
+        b=PIG6wKqjNp3j2nd+pEGjRP0tjdV5+M8qgYnDjhTB26rsfAdBUDijwDzeYKe6VYF9fD
+         aworxE9DJnNWVwr+rnupwqY5w61L7tOyOwTejOSFC1SSzsuKA+dAqIL/EsCZX3P/+8wi
+         M2ojyfdz0CBESjE/aEwOEOM2DLuYxgzJ4eqvY9svxBa9YdejzmkECh0n2RMFZdTe3FLX
+         3pz3iq0en9mHLyIH32jOgoal0AwYXkNi5WG5GQ5Xy30eWMOSfj4uAsJ8DZVqYZ3XSU6m
+         q65d9L+HzkIlzTpXmJKzm7o8wbBLmzj4zRV0mhQ0v4CP+4YnV73LWi73nykltU+N/ptT
+         Dx5Q==
+X-Gm-Message-State: AGi0PuYIhOXuWFFxamaHm2722SeyeEnBdXs/5JRnx74/1SxdM1GCorhF
+        WuRJzWOiZH/h2p5H1U/b0o4RLNHNkoyIK1DUS7ioxKoZ
+X-Google-Smtp-Source: APiQypKBFtyO0OlS57ylMIbVNz9STcd0rOSyo7zGKE8cveajvoqa+dV/2GICCTVJN0SSvUeIm0nCt4zGpL6i7rt8G6k=
+X-Received: by 2002:ac2:57cc:: with SMTP id k12mr12059999lfo.69.1586180532413;
+ Mon, 06 Apr 2020 06:42:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200403194407.784943-1-marcel@holtmann.org> <20200405115426.GA20858@yganon-mobl1.ger.corp.intel.com>
+In-Reply-To: <20200405115426.GA20858@yganon-mobl1.ger.corp.intel.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Mon, 6 Apr 2020 09:42:01 -0400
+Message-ID: <CALWDO_UrzCLehfAVD71PQCe=oa+iieJ4T36-UxPzy3RDyEQngg@mail.gmail.com>
+Subject: Re: [PATCH 00/10] List of pending patches
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Thanks Marcel and Johan!
 
-> The way I implemented it is, if HCI_ENFORCE_MITM_SMP is set (which it
-> is by default), then it will assume the default behavior.
-> However, if it is toggled to false, then it will not set the MITM flag
-> although the io capability supports that.
-> 
-> I am reluctant to use names with "no" on it, especially since it is a
-> boolean. But if it is OK then I shall update to HCI_FORCE_NO_MITM,
-> this way it will become more separable with the default behavior.
-> 
-> Sure, I will move that to hci_debugfs.c.
 
-I dislike setting a flag for default behavior. So we need the invert here. I want the “force” in front of it that it clearly indicates that it is not default behavior. Similar to the force_static_addr flag.
-
-Regards
-
-Marcel
-
+On Sun, Apr 5, 2020 at 7:54 AM Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>
+> Hi Marcel,
+>
+> On Fri, Apr 03, 2020, Marcel Holtmann wrote:
+> > This is the list of pending patches that are ready for bluetooth-next.
+> >
+> > Marcel Holtmann (6):
+> >   Bluetooth: Move debugfs configuration above the selftests
+> >   Bluetooth: btusb: Enable Intel events even if already in operational
+> >     mode
+> >   Bluetooth: Add support for Read Local Simple Pairing Options
+> >   Bluetooth: Add support for reading security information
+> >   Bluetooth: Increment management interface revision
+> >   Bluetooth: Add HCI device identifier for VIRTIO devices
+> >
+> > Miao-chen Chou (2):
+> >   Bluetooth: Add framework for Microsoft vendor extension
+> >   Bluetooth: btusb: Enable MSFT extension for Intel ThunderPeak devices
+> >
+> > Sathish Narasimman (1):
+> >   Bluetooth: btusb: handle mSBC audio over USB Endpoints
+> >
+> > Sathish Narsimman (1):
+> >   Bluetooth: add support to notify using SCO air mode
+> >
+> >  drivers/bluetooth/btusb.c        | 182 +++++++++++++++++++++++--------
+> >  include/net/bluetooth/hci.h      |  11 ++
+> >  include/net/bluetooth/hci_core.h |  15 +++
+> >  include/net/bluetooth/mgmt.h     |   7 ++
+> >  net/bluetooth/Kconfig            |  23 ++--
+> >  net/bluetooth/Makefile           |   1 +
+> >  net/bluetooth/hci_conn.c         |  25 ++++-
+> >  net/bluetooth/hci_core.c         |   9 ++
+> >  net/bluetooth/hci_event.c        |  49 ++++++++-
+> >  net/bluetooth/mgmt.c             |  55 +++++++++-
+> >  net/bluetooth/msft.c             | 141 ++++++++++++++++++++++++
+> >  net/bluetooth/msft.h             |  18 +++
+> >  12 files changed, 477 insertions(+), 59 deletions(-)
+> >  create mode 100644 net/bluetooth/msft.c
+> >  create mode 100644 net/bluetooth/msft.h
+>
+> All patches in this set have been applied to bluetooth-next. Thanks.
+>
+> Johan
