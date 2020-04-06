@@ -2,173 +2,116 @@ Return-Path: <SRS0=77es=5W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67448C2BA80
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F3AC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46193206F8
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:46:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E99D206F8
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 11:49:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F472nuT8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727738AbgDFLq2 convert rfc822-to-8bit (ORCPT
+        id S1727548AbgDFLtA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 07:46:28 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47057 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727476AbgDFLq2 (ORCPT
+        Mon, 6 Apr 2020 07:49:00 -0400
+Received: from mail-pj1-f74.google.com ([209.85.216.74]:38910 "EHLO
+        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727376AbgDFLtA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 07:46:28 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0E3E1CECC3;
-        Mon,  6 Apr 2020 13:56:01 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v1] Bluetooth: debugfs option to unset MITM flag
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200406165542.v1.1.Ibfc500cbf0bf2dc8429b17f064e960e95bb228e9@changeid>
-Date:   Mon, 6 Apr 2020 13:46:26 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <9673F164-A14E-4DD6-88FB-277694C50328@holtmann.org>
-References: <20200406165542.v1.1.Ibfc500cbf0bf2dc8429b17f064e960e95bb228e9@changeid>
-To:     Archie Pusaka <apusaka@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 6 Apr 2020 07:49:00 -0400
+Received: by mail-pj1-f74.google.com with SMTP id l12so14010495pjh.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 04:48:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=JFPo/1rvuFK+mgvdnctPIQYZT6lfRybB1suSP7skuPM=;
+        b=F472nuT8ic6aJCOEK9+M30kaU/tVB6jJlC3sUxzuuYH3ctW94TJVXrK5qcoHI8x950
+         MtuYE5CZqUGgYVPES3hkjPqsfbcLZE4glftla0c+wPoI27JvxqlqpJYMFdKl1jkRAkIc
+         3tIHkVQkRXKOG32JmYfgZZ7JfSXA+NONNe+biodRJktEzkt+Kx7c6hXBVGywXfSo6vC6
+         Vdp3GxT8JLfVTmVyuKlB7O/4fvMPpUDoB1aHLkeYkaprz84jeS6DpBPbOLC2LphGD/8H
+         fJLFLVjiCNh55mXdNqoYNJ4XgM2jXM9rGRHZ/7/VavMF7ixJQCeWAPKjsw2Pdk/7k210
+         662Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=JFPo/1rvuFK+mgvdnctPIQYZT6lfRybB1suSP7skuPM=;
+        b=baX161J8sYOWS5cr5Crau7GX61qRmr98TGSH1auv8qblezrmafqtvu+T+8TMIdZ9Gn
+         rgGynyIm5nKwk5vjo7/LzZO7pEWwpJN7L5Fz+U6+ac/NgRDL9Dxg5uEuN/nlGPxj130u
+         89zgCgHdIAt6yZ+0NUPDu+kkN2Fj+t/i1sMFyG0JwR1zGU5dsn7pJ2eq9NSbHQFCv7JX
+         RLjiDZniw0W75f2pJSupQjOO/IhpaL06/viYIvy8aBoY6UUreA7IbvB1p0IBzI95vtTY
+         luvpJfQkdTI7qyFappvZLt2mZI2qQ/X2VNV29P0P2ChuaMSIu2XQIKBqc3QYFkn4MuX+
+         ACVw==
+X-Gm-Message-State: AGi0PubvA1ihHPv5K6yChH+PJNd4zVo3iJv1THNqGW9DCfJ6m0v9SgoH
+        fIW8a65Ml+IujK3u+XGOifLwiSbt312LDpSoZMTGtMsX4NfAaCdBFGD0hP4J8VGVzkyRLYCkwsh
+        g2Kq0j1xend4jp0vIZwJG/IIg1CEYiTXPB3z5OhFwpx9+LfjMKUr6yBLg0GEowrKL04W56p7RLH
+        VH
+X-Google-Smtp-Source: APiQypIi3G+MNGTSGiImCp7GZTiz8jVzqTuwv02SK3HubHnzx0pvfxY1ySS17S5w0SUZsPuUD5ufg+Yknb1l
+X-Received: by 2002:a63:81c8:: with SMTP id t191mr21046750pgd.124.1586173737251;
+ Mon, 06 Apr 2020 04:48:57 -0700 (PDT)
+Date:   Mon,  6 Apr 2020 19:48:42 +0800
+Message-Id: <20200406114845.255532-1-apusaka@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+Subject: [Bluez PATCH v3 0/3] Check the signature of att packets
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+From: Archie Pusaka <apusaka@chromium.org>
 
-> The BT qualification test SM/MAS/PKE/BV-01-C needs us to turn off
-> the MITM flag when pairing, and at the same time also set the io
-> capability to something other than no input no output.
-> 
-> Currently the MITM flag is only unset when the io capability is set
-> to no input no output, therefore the test cannot be executed.
-> 
-> This patch introduces a debugfs option for controlling whether MITM
-> flag should be set based on io capability.
-> 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> ---
-> 
-> include/net/bluetooth/hci.h |  1 +
-> net/bluetooth/smp.c         | 52 ++++++++++++++++++++++++++++++++++++-
-> 2 files changed, 52 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 79de2a659dd69..5e183487c7479 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -298,6 +298,7 @@ enum {
-> 	HCI_FORCE_STATIC_ADDR,
-> 	HCI_LL_RPA_RESOLUTION,
-> 	HCI_CMD_PENDING,
-> +	HCI_ENFORCE_MITM_SMP,
+According to bluetooth spec Ver 5.1, Vol 3, Part C (GAP), 10.4.2
+A device receiving signed data shall authenticate it by performing
+the Signing Algorithm. The signed data shall be authenticated by
+performing the Signing Algorithm where m is the Data PDU to be
+authenticated, k is the stored CSRK and the SignCounter is the
+received counter value. If the MAC computed by the Signing
+Algorithm does not match the received MAC, the verification fails
+and the Host shall ignore the received Data PDU.
 
-actually don’t you mean HCI_FORCE_NO_MITM? From your description, you want a toggle that disables MITM no matter what.
+Currently bluez ignore the signature of received signed att
+packets, as the function bt_crypto_sign_att() only generates the
+signature, and not actually make any check about the genuineness
+of the signature itself.
 
-> 	__HCI_NUM_FLAGS,
-> };
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index d0b695ee49f63..4fa8b112fb607 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2396,7 +2396,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
-> 	/* Require MITM if IO Capability allows or the security level
-> 	 * requires it.
-> 	 */
-> -	if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
-> +	if ((hci_dev_test_flag(hcon->hdev, HCI_ENFORCE_MITM_SMP) &&
-> +	     hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT) ||
-> 	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
-> 		authreq |= SMP_AUTH_MITM;
+This patch also fix a wrong boolean condition which prevents
+handle_signed() to be called.
 
-	/* New comment for this case ..
-	if (!hci_dev_test_flag(hcon->hdev, HCI_FORCE_NO_MITM)) {
-		/* Move comment here ..
-		if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
-		    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
-			authreq |= SMP_AUTH_MITM;
-	}
+Tested to pass these BT certification test
+SM/MAS/SIGN/BV-03-C
+SM/MAS/SIGN/BI-01-C
 
-> 
-> @@ -3402,6 +3403,50 @@ static const struct file_operations force_bredr_smp_fops = {
-> 	.llseek		= default_llseek,
-> };
-> 
-> +static ssize_t enforce_mitm_smp_read(struct file *file,
-> +				     char __user *user_buf,
-> +				     size_t count, loff_t *ppos)
-> +{
-> +	struct hci_dev *hdev = file->private_data;
-> +	char buf[3];
-> +
-> +	buf[0] = hci_dev_test_flag(hdev, HCI_ENFORCE_MITM_SMP) ? 'Y' : 'N';
-> +	buf[1] = '\n';
-> +	buf[2] = '\0';
-> +	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
-> +
-> +static ssize_t enforce_mitm_smp_write(struct file *file,
-> +				      const char __user *user_buf,
-> +				      size_t count, loff_t *ppos)
-> +{
-> +	struct hci_dev *hdev = file->private_data;
-> +	char buf[32];
-> +	size_t buf_size = min(count, (sizeof(buf) - 1));
-> +	bool enable;
-> +
-> +	if (copy_from_user(buf, user_buf, buf_size))
-> +		return -EFAULT;
-> +
-> +	buf[buf_size] = '\0';
-> +	if (strtobool(buf, &enable))
-> +		return -EINVAL;
-> +
-> +	if (enable == hci_dev_test_flag(hdev, HCI_ENFORCE_MITM_SMP))
-> +		return -EALREADY;
-> +
-> +	hci_dev_change_flag(hdev, HCI_ENFORCE_MITM_SMP);
-> +
-> +	return count;
-> +}
-> +
-> +static const struct file_operations enforce_mitm_smp_fops = {
-> +	.open		= simple_open,
-> +	.read		= enforce_mitm_smp_read,
-> +	.write		= enforce_mitm_smp_write,
-> +	.llseek		= default_llseek,
-> +};
-> +
-> int smp_register(struct hci_dev *hdev)
-> {
-> 	struct l2cap_chan *chan;
-> @@ -3426,6 +3471,11 @@ int smp_register(struct hci_dev *hdev)
-> 
-> 	hdev->smp_data = chan;
-> 
-> +	/* Enforce the policy of determining MITM flag by io capabilities. */
-> +	hci_dev_set_flag(hdev, HCI_ENFORCE_MITM_SMP);
+Changes in v3:
+- Add check for the case where pdu_len < ATT_SIGN_LEN
+- Add unit test
+- Separate into three patches
 
-No. Lets keep the current behavior the default.
+Changes in v2:
+- Move the signature verification part to crypto.c
+- Attempt not to copy the whole pdu while verifying the signature
+  by not separating the opcode from the rest of pdu too early, so
+  we don't have to rejoin them later.
 
-> +	debugfs_create_file("enforce_mitm_smp", 0644, hdev->debugfs, hdev,
-> +			    &enforce_mitm_smp_fops);
-> +
+Archie Pusaka (3):
+  shared/crypto: Add bt_crypto_verify_att_sign
+  unit/test-crypto: test for bt_crypto_verify_att_sign
+  shared/att: Check the signature of att packets
 
-And this needs to move into hci_debugfs.c.
+ src/shared/att.c    | 25 +++++++++----------
+ src/shared/crypto.c | 28 +++++++++++++++++++--
+ src/shared/crypto.h |  2 ++
+ unit/test-crypto.c  | 59 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 99 insertions(+), 15 deletions(-)
 
-Regards
-
-Marcel
+-- 
+2.26.0.292.g33ef6b2f38-goog
 
