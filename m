@@ -2,133 +2,71 @@ Return-Path: <SRS0=KN4I=5X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A277FC2D0EC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 20:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C462EC2D0EC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 20:22:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56FE12074B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 20:07:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQsdKEsR"
+	by mail.kernel.org (Postfix) with ESMTP id 9900120748
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 20:22:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727045AbgDGUHl (ORCPT
+        id S1726760AbgDGUWy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 16:07:41 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:44801 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726759AbgDGUHk (ORCPT
+        Tue, 7 Apr 2020 16:22:54 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60168 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726712AbgDGUWy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 16:07:40 -0400
-Received: by mail-oi1-f196.google.com with SMTP id r21so2640416oij.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 13:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ep9fWO3BRQ0KpfAHRqbaVFsVeXfnPNyel0pmxBcb53c=;
-        b=KQsdKEsRv5k9lujY2/y3cENR3rNUB014DxQnIbG1ozH2SeQ0dg7yZl7rlsGastnmBZ
-         TJnDhaWqgjcJGJWLKubnhYYCG3KaiUhMAWIvKihI0Vm/wJHUXrpTqt7lCw54+EhUSNE8
-         T1jxUeCJlkzy5Hbmb94YIeN060/KzJMLsN7dn9jyuv1R15p7JM2kaq4rg7QdrtiUyyHx
-         YRlUnG2zBlaX6eBr9xzOuG/TCyXlpUgKxXbKcGJ4IKHE0j97bj1DLxN06uVoiRyv5P1k
-         GDvVWjxxh2wHN2VnL0MTNDlOfJE/qoe6JJaJniDyaTMj3hOJUYT8cK0h8MHao4/oprjo
-         6L0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ep9fWO3BRQ0KpfAHRqbaVFsVeXfnPNyel0pmxBcb53c=;
-        b=rFNj+f76RsBvQI8rAjS50AtYhKKMSXqOvmMYi1mMEWltcOlHolzLJiRHMLrtyccWrS
-         v5rwFVl7ueDZBs5wyLo+cIAQEET3xdA2SFdVVA0ad31AIHn1X/sUAsu5GiNaSskN4DzS
-         5ZOxHvup1O3wAjhlIv3ugkIRPKIkUzVghxrJI/XV7U5JdUxfpf5LAJdqP0/0QVEWMh70
-         /jAdLiT1umrC1eEwo0nD9mAC5lLDn+U++tC++XxRZxhZM4HygFkSaV8uXP+1/a9u03lK
-         I2OrTxGpQis/OmuNN17fNpfafwg0ueMS7p1J6KkBjxCUAmKzbhoLCKydkrUX98orEOIS
-         PnJw==
-X-Gm-Message-State: AGi0PuZiW7Or0jGbr+HPumUMpKygIIicpgeDXtP2u9AGP3E2qebtfkUJ
-        BW7EUNZrM7DMcNP+Ps4Pp9KxZs5+X+hK8jaj4G8f8zqv
-X-Google-Smtp-Source: APiQypJb/hDQxlHtM/Aegv/eom0jDGJ7brDarg7ZOUT8+loUu5PoyJwAwBZULLhop1jDsvDoXKls8IKw9kL2+/JpT7g=
-X-Received: by 2002:a54:4e13:: with SMTP id a19mr491486oiy.108.1586290059673;
- Tue, 07 Apr 2020 13:07:39 -0700 (PDT)
+        Tue, 7 Apr 2020 16:22:54 -0400
+Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 25F2DCECDC
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2020 22:32:27 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use extra variable to make code more readable
+Date:   Tue,  7 Apr 2020 22:22:48 +0200
+Message-Id: <20200407202248.994848-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-References: <20200407085610.231013-1-apusaka@google.com>
-In-Reply-To: <20200407085610.231013-1-apusaka@google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 7 Apr 2020 13:07:28 -0700
-Message-ID: <CABBYNZ+3SUbZbO+BJ7BX3uj5dds=KzWpe316SghncrOE8ikLBw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v4 0/4] Check the signature of att packets
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+When starting active scanning for discovery the whitelist is not needed
+to be used. So the filter_policy is 0x00. To make the core more readable
+use a variable name instead of just setting 0 as paramter.
 
-On Tue, Apr 7, 2020 at 1:56 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> According to bluetooth spec Ver 5.1, Vol 3, Part C (GAP), 10.4.2
-> A device receiving signed data shall authenticate it by performing
-> the Signing Algorithm. The signed data shall be authenticated by
-> performing the Signing Algorithm where m is the Data PDU to be
-> authenticated, k is the stored CSRK and the SignCounter is the
-> received counter value. If the MAC computed by the Signing
-> Algorithm does not match the received MAC, the verification fails
-> and the Host shall ignore the received Data PDU.
->
-> Currently bluez ignore the signature of received signed att
-> packets, as the function bt_crypto_sign_att() only generates the
-> signature, and not actually make any check about the genuineness
-> of the signature itself.
->
-> This patch also fix a wrong boolean condition which prevents
-> handle_signed() to be called.
->
-> Tested to pass these BT certification test
-> SM/MAS/SIGN/BV-03-C
-> SM/MAS/SIGN/BI-01-C
->
-> Changes in v4:
-> - Fix wrong variable assignment
-> - Fixing test-gatt.c
->
-> Changes in v3:
-> - Add check for the case where pdu_len < ATT_SIGN_LEN
-> - Add unit test
-> - Separate into three patches
->
-> Changes in v2:
-> - Move the signature verification part to crypto.c
-> - Attempt not to copy the whole pdu while verifying the signature
->   by not separating the opcode from the rest of pdu too early, so
->   we don't have to rejoin them later.
->
-> Archie Pusaka (4):
->   shared/crypto: Add bt_crypto_verify_att_sign
->   unit/test-crypto: test for bt_crypto_verify_att_sign
->   shared/att: Check the signature of att packets
->   unit/test-gatt: Fix unknown request with signed bit
->
->  src/shared/att.c    | 25 +++++++++----------
->  src/shared/crypto.c | 28 +++++++++++++++++++--
->  src/shared/crypto.h |  2 ++
->  unit/test-crypto.c  | 59 +++++++++++++++++++++++++++++++++++++++++++++
->  unit/test-gatt.c    | 32 ++++++++++++++++++++----
->  5 files changed, 126 insertions(+), 20 deletions(-)
->
-> --
-> 2.26.0.292.g33ef6b2f38-goog
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_request.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Ive applied 1-3 and reworked a little bit the third patch so we
-actually attempt to find a handler before we attempt to check the
-signature.
-
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 14cfa59ea9ed..619647a11b95 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -2735,6 +2735,8 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	uint16_t interval = opt;
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 own_addr_type;
++	/* White list is not used for discovery */
++	u8 filter_policy = 0x00;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -2756,7 +2758,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
+ 	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval, DISCOV_LE_SCAN_WIN,
+-			   own_addr_type, 0);
++			   own_addr_type, filter_policy);
+ 	return 0;
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+2.25.2
+
