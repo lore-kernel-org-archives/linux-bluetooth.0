@@ -2,204 +2,112 @@ Return-Path: <SRS0=KN4I=5X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E9CC2BA16
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 04:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6C3C2BABC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:58:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7FC120801
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 04:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 428AC20747
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vOoh/LI7"
+	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="pbDmPRo0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="1mMXAFlV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbgDGE0g (ORCPT
+        id S1726865AbgDGF6u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 00:26:36 -0400
-Received: from mail-pj1-f73.google.com ([209.85.216.73]:34076 "EHLO
-        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726657AbgDGE0g (ORCPT
+        Tue, 7 Apr 2020 01:58:50 -0400
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:33511 "EHLO
+        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726769AbgDGF6t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 00:26:36 -0400
-Received: by mail-pj1-f73.google.com with SMTP id d2so5333pje.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 21:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=QWUKDJQTRxWuVmOwgRvVPoWS0UavR+FekLqN1+lSVJ0=;
-        b=vOoh/LI74uP5oGTJtFVs6Wj0xTE8/y6MFdP3yrgFAKUCddTIF/l1UpDa8U199B88Ru
-         w9vQSEt0QtBFCZoQ2zSrGdEwEuiLUow0J7rStScAiPsb968sEU/qyfuiA0kYdaV+X3we
-         mdF+WBr/pbi0ZmjOdWtXyEW50KZW41qkvwyiJnX5NHvmTEKAJbN8SGS5DDX7v4lo/981
-         tWgMYlgRjMuDFYQgKoX43TZNCOmmHH9pWJ5iGZ+81QFYtqZYkBef/I4OntvBMmi7C3Vf
-         HeWvWUzmXa3/1sdg8OMFpEKJdYBwiT3Hw4PwYvyMAPagBmFgHZL95Tu+Ne+JOmFSVKGA
-         a8Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=QWUKDJQTRxWuVmOwgRvVPoWS0UavR+FekLqN1+lSVJ0=;
-        b=ror1S2OuMktIIdwugzzLKWj4BRV0zFq1jkkmRiCr8oMUNudRXv28h8v8P7jVN0XbeX
-         xl7zBx1sqqSBM897y/tIQbWJR3+fJzSPzptud2YVYtT9CIaDQPi1XkzhCjY1JjPlOpnZ
-         i5BJLujyZ3HCSedE+jo6Q9CreayyI9tpiuDJtO3CyLuZ27VzF+WuazAu404XZRziSmGY
-         0tgktGP3UaJYsg6q7pRH/l2lDvX7RYq97OC7oFpXuUhGWv0Jrb3hTjpSZEdRmvm00GGB
-         EHbNtkepto2ZdKVR3xjEeOKSGfBnKiZY/M+1XoXZAoUqBbzRjtjIjFeaufAfjyQlPKti
-         wP2g==
-X-Gm-Message-State: AGi0Pub4Wqvppi1K/fdA2xmHNZXcYqwOpI/399gSv5hyy7NiwT6BZ+vY
-        EurbBky5SZfyPvgvZoW0YqDlX4bYrbUz184EgmV2uNDLFYDsIP4sMWWyWJvQhYe3ED0yqV0hpiA
-        iykrndC9jwq6E6Png+Cq24VBBcN8pLSHjot27R+d9//jVPdPMsWr/yZrnOfTAk7GA8abO5PtLAA
-        H7
-X-Google-Smtp-Source: APiQypLJCnHPeQcXq6SQEnVok3DreXL6u5mQfQikHBJHO0xSMfffYfbLHPybQF8KmADEvQ/NI6B62Eye81jN
-X-Received: by 2002:a17:90b:909:: with SMTP id bo9mr432591pjb.125.1586233595138;
- Mon, 06 Apr 2020 21:26:35 -0700 (PDT)
-Date:   Tue,  7 Apr 2020 12:26:27 +0800
-Message-Id: <20200407122522.v2.1.Ibfc500cbf0bf2dc8429b17f064e960e95bb228e9@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
-Subject: [PATCH v2] Bluetooth: debugfs option to unset MITM flag
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 7 Apr 2020 01:58:49 -0400
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 655B1580306;
+        Tue,  7 Apr 2020 01:58:48 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Tue, 07 Apr 2020 01:58:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
+         h=from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding; s=fm3; bh=yrW9UFf8Ckuho
+        4dOnBWe9v/QNnRt/BB4F2Z5BywTppk=; b=pbDmPRo0ym6/FacDzog7IuQQ+aMoC
+        b9ykP8p8D7R5Yf3AgiJzAggmJMbm1vUcU8cR+gDEQniDhMB4KTlFlHRg0eJI+W4P
+        lnux0kZXDWGsm3vgBa4YKmlnxFF3W0QjRROgMxW94xr+oUArijRvkP8u3SenolWX
+        d2zTmBqZmz/S3pVJ12SZ3/G6xm4eSoS8I99zPLpLnuh9XylFPqf6Yo18UrNu/0Ux
+        Cz+5Bg9qRDrwNnUqD7B+2mwRebhBHERGhe44Za4HRAiejcSB38lQf1cZB6Y4azep
+        VozWQTaWVeNAJRhpAmzqzH5W4nxyoSobD2PFNzA2XWaicf04pPsJNi9CA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :in-reply-to:message-id:mime-version:references:subject:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; bh=yrW9UFf8Ckuho4dOnBWe9v/QNnRt/BB4F2Z5BywTppk=; b=1mMXAFlV
+        bF4nm/PRzu3OQ0jztQHgkiMxkneQpWjFJ+GamZoZNarbyVChgJP7ibgKNkDQ51HZ
+        XoLc1qhimvneS3KMfVjiXIEh1q/QPOBqTorHWxDpMWrtnznk9fW6+hYK1gaH1x3m
+        9f+Z59qGXB+TGScQyJVWb0N5udZW0uIZazSkpumAoPLxrmlitKBPaW8WqLGML5LT
+        zJaVx358v8WTxdej5Wg4fZYReMq6+ipwTimpImtESOpK8HgBOKx6taz4f93u8kvi
+        xqXoEBebAlTeLVKCY/bIy6nt0EScILwX5SLm9kdpcVAeF7/cGg2FSjFrWfWWcfLw
+        bYKk9QlHTt1a7w==
+X-ME-Sender: <xms:lhaMXiF0xTmTzPAltDY-_LopFKVzyq51zTXZsmVUB51jk5bqMBGEFA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudeggdellecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffojghfggfgsedtkeertd
+    ertddtnecuhfhrohhmpeetlhhishhtrghirhcuhfhrrghntghishcuoegrlhhishhtrghi
+    rhesrghlihhsthgrihhrvdefrdhmvgeqnecukfhppeejfedrleefrdekgedrvddtkeenuc
+    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishht
+    rghirhesrghlihhsthgrihhrvdefrdhmvg
+X-ME-Proxy: <xmx:lhaMXmh1p8jzifoTQ1JfckevUgSZ81BtokFfbvLPZ7Hqe2GGiwwv9w>
+    <xmx:lhaMXi-D1cf7EMmOMBK272Lo2ZvNGOBoSZC7N8WIRCa3uwKb7F4L5g>
+    <xmx:lhaMXhIyqjhAuB740QRplnIbtVaZbNjbDXkPCmOK6DtfdHF80ZMdXA>
+    <xmx:mBaMXoauhRxUANuAkuwlOwMd3GGeocLDdPi2e_SCAXNB-0KfvZhCFA>
+Received: from alistair-xps-14z.alistair23.me (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 00CFA328005E;
+        Tue,  7 Apr 2020 01:58:44 -0400 (EDT)
+From:   Alistair Francis <alistair@alistair23.me>
+To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, mripard@kernel.org, wens@csie.org
+Cc:     anarsoul@gmail.com, devicetree@vger.kernel.org,
+        alistair23@gmail.com, linux-arm-kernel@lists.infradead.org,
+        Alistair Francis <alistair@alistair23.me>
+Subject: [PATCH v2 2/3] Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
+Date:   Mon,  6 Apr 2020 22:58:36 -0700
+Message-Id: <20200407055837.3508017-2-alistair@alistair23.me>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200407055837.3508017-1-alistair@alistair23.me>
+References: <20200407055837.3508017-1-alistair@alistair23.me>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+From: Vasily Khoruzhick <anarsoul@gmail.com>
 
-The BT qualification test SM/MAS/PKE/BV-01-C needs us to turn off
-the MITM flag when pairing, and at the same time also set the io
-capability to something other than no input no output.
+RTL8723BS is often used in ARM boards, so add ability to bind it
+using device tree.
 
-Currently the MITM flag is only unset when the io capability is set
-to no input no output, therefore the test cannot be executed.
-
-This patch introduces a debugfs option to force MITM flag to be
-turned off.
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+Signed-off-by: Alistair Francis <alistair@alistair23.me>
 ---
+ drivers/bluetooth/hci_h5.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Changes in v2:
-- Rename flag to HCI_FORCE_NO_MITM
-- Move debugfs functions to hci_debugfs.c
-- Add comments on not setting SMP_AUTH_MITM
-
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_debugfs.c | 46 +++++++++++++++++++++++++++++++++++++
- net/bluetooth/smp.c         | 15 ++++++++----
- 3 files changed, 57 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 79de2a659dd69..f4e8e2a0b7c15 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -298,6 +298,7 @@ enum {
- 	HCI_FORCE_STATIC_ADDR,
- 	HCI_LL_RPA_RESOLUTION,
- 	HCI_CMD_PENDING,
-+	HCI_FORCE_NO_MITM,
- 
- 	__HCI_NUM_FLAGS,
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 106c110efe56..b0e25a7ca850 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -1019,6 +1019,8 @@ static const struct of_device_id rtl_bluetooth_of_match[] = {
+ 	{ .compatible = "realtek,rtl8822cs-bt",
+ 	  .data = (const void *)&rtl_vnd },
+ #endif
++	{ .compatible = "realtek,rtl8822bs-bt",
++	  .data = (const void *)&rtl_vnd },
+ 	{ },
  };
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 6b1314c738b8e..5e8af2658e44a 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -1075,6 +1075,50 @@ DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
- 			auth_payload_timeout_get,
- 			auth_payload_timeout_set, "%llu\n");
- 
-+static ssize_t force_no_mitm_read(struct file *file,
-+				  char __user *user_buf,
-+				  size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
-+
-+	buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM) ? 'Y' : 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
-+
-+static ssize_t force_no_mitm_write(struct file *file,
-+				   const char __user *user_buf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[32];
-+	size_t buf_size = min(count, (sizeof(buf) - 1));
-+	bool enable;
-+
-+	if (copy_from_user(buf, user_buf, buf_size))
-+		return -EFAULT;
-+
-+	buf[buf_size] = '\0';
-+	if (strtobool(buf, &enable))
-+		return -EINVAL;
-+
-+	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
-+		return -EALREADY;
-+
-+	hci_dev_change_flag(hdev, HCI_FORCE_NO_MITM);
-+
-+	return count;
-+}
-+
-+static const struct file_operations force_no_mitm_fops = {
-+	.open		= simple_open,
-+	.read		= force_no_mitm_read,
-+	.write		= force_no_mitm_write,
-+	.llseek		= default_llseek,
-+};
-+
- DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
- 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
- DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
-@@ -1134,6 +1178,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
- 			    &max_key_size_fops);
- 	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
- 			    &auth_payload_timeout_fops);
-+	debugfs_create_file("force_no_mitm", 0644, hdev->debugfs, hdev,
-+			    &force_no_mitm_fops);
- 
- 	debugfs_create_file("quirk_strict_duplicate_filter", 0644,
- 			    hdev->debugfs, hdev,
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index d0b695ee49f63..a85e3e49cd0da 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2393,12 +2393,17 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 			authreq |= SMP_AUTH_CT2;
- 	}
- 
--	/* Require MITM if IO Capability allows or the security level
--	 * requires it.
-+	/* Don't attempt to set MITM if setting is overridden by debugfs
-+	 * Needed to pass certification test SM/MAS/PKE/BV-01-C
- 	 */
--	if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
--	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
--		authreq |= SMP_AUTH_MITM;
-+	if (!hci_dev_test_flag(hcon->hdev, HCI_FORCE_NO_MITM)) {
-+		/* Require MITM if IO Capability allows or the security level
-+		 * requires it.
-+		 */
-+		if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
-+		    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
-+			authreq |= SMP_AUTH_MITM;
-+	}
- 
- 	if (hcon->role == HCI_ROLE_MASTER) {
- 		struct smp_cmd_pairing cp;
+ MODULE_DEVICE_TABLE(of, rtl_bluetooth_of_match);
 -- 
-2.26.0.292.g33ef6b2f38-goog
+2.25.1
 
