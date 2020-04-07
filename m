@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC02C2BA16
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45422C2BA1B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B12820748
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 194E220748
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ucUQYalJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MwSfnbxb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727958AbgDGI4i (ORCPT
+        id S1727923AbgDGI4m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 04:56:38 -0400
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:45515 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725883AbgDGI4h (ORCPT
+        Tue, 7 Apr 2020 04:56:42 -0400
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:41331 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbgDGI4m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 04:56:37 -0400
-Received: by mail-pg1-f202.google.com with SMTP id v29so1904832pgo.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 01:56:35 -0700 (PDT)
+        Tue, 7 Apr 2020 04:56:42 -0400
+Received: by mail-pl1-f201.google.com with SMTP id u16so134699plq.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 01:56:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Qeg3a+GT/t1CBST+N2dWD+HdLtuOyVVP4PFOkkE3kV0=;
-        b=ucUQYalJDVip2CzNCTR+kxrQn3bouuD1OPeAi994xT35k+WZcAKFoum97a2iQMrgvM
-         sX1KFhSy/5Vxu4aWb95AYr1ha5tc2CvUvCKGcEcQumw+5RqR0BmX1GPNE+0086L8fZdn
-         QwjXWJR9t38PfQ60V9rxVV+xZsYnFg2EGhmDHJxcYwYzRPZlvE6mPkpOclqkoIpfFh3S
-         6KlcGoWTA5GZSHTYDPq/RHChQ04bbagzYYeuzTcxatzjj7hCZZHepDpOwZnIZGJq/W50
-         qaZl0FfmMeYNrau/av0YmNpUi8NYX9r8n9r432i3IybBDD2OjsTlFVMNZwz5MpXMF6bk
-         jvFw==
+        bh=lM3d0cm86Nb/bkeV31ug0t8xTN773qSnytS58ID4fmU=;
+        b=MwSfnbxbtCi7NUeb2ybu+8+EpQNsj4n8o3YC4LBPOjQKdYub2Fa97PCNRAw1WCAXkK
+         kemZ7fmHPXqeXL4oxB9xumo+NdpNze+IHHvmXDkiauJNHdATDn/UMmhEsL1Jv+3oyWV/
+         8S7I7Ou/EOpJSyvDIs6CZGV07nAtIFxKADpvEc1MiQNRSpaQ3MeLjiRLoIFiQPV8zbrb
+         jf8y/7ZT5lhVuf9uACFmaKXJLFkjfR29DBEoCm/GfZA/Ij2CO4dcAE4e89MW4zHhvhBx
+         JE1HGhcc9Sj5cN9kvXHR+b4Xpr1+txc0A9jGoVaAsSkDJSQvoFJjX1oLBRTpwNe/IVaD
+         nf3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Qeg3a+GT/t1CBST+N2dWD+HdLtuOyVVP4PFOkkE3kV0=;
-        b=JNzynEOnoyCpdY0dndprkzINzsPH/TCMoAZH+qv8ICDIGTxE4+DKxrifEI2rBxF6Q6
-         kwf1/+U2PYX9VfFCJ2JVLyRMHFWEKFANx41J44QeTewGuD2gN/ZSv0jkn07Be+u8SOtP
-         wlSd2v+hGia7bRTw2XLm/si3SFzbSOPyhrTrgvogn1RveIila5MDpiihYiBddsOy3Zpg
-         1akOjuhd0zY9I+2ESOkeNYNSsVA8ScletfSmNPG+a1GuWoXDpSOqzMdrNGX3t51s2zk/
-         LPTaUX2vjdQCvajUvw3tgL7CAzODsAaRE2q186K0FH+fRnYlnbQK9vs7+RPUUC20bXoq
-         EY9Q==
-X-Gm-Message-State: AGi0PuZMkijm+Bh+2H8Fv87dcC+2RILkWX/sc6TcWo9CWRknUTkvpw1U
-        VAP+b1o9q8qdSxM3WW1Ogd53TePaALsSrBBHQ6Lmjl2IehquJ6ShlgVRhYLkpMrP/QQNYiJqIjO
-        jwbr3HJJ3KoPkwtqYQx4vwEBeDCMQBKZLk1TyAqkkh5yAfrukci0wd2G3gvHCIOltbgx2hg4iNt
-        E3
-X-Google-Smtp-Source: APiQypJutldv//2AmFQEKLU5PoCCOXflKXTelYmQV18FJsfii4bv/sbf9VGMG5K/Cmm7388gGkJGleyBe47I
-X-Received: by 2002:a63:dd0a:: with SMTP id t10mr1037234pgg.50.1586249794429;
- Tue, 07 Apr 2020 01:56:34 -0700 (PDT)
-Date:   Tue,  7 Apr 2020 16:56:09 +0800
+        bh=lM3d0cm86Nb/bkeV31ug0t8xTN773qSnytS58ID4fmU=;
+        b=rXwA5jwdL+x92nV+iq6ehOd38gN4805+jK0VKcOzmwj26RskBvtGxaYSU3iHhySTPJ
+         roWP45TY90Kwn+DUeUIiQstGHZnFiojsnFdCk40YKAZ9p5QAk219F/7wqpQwB9ARbmu6
+         Fqz1p6H6lL3Njj8oVZRLJjwhjaZ1yiEfofUh6/7yGF0U8tIDNkLhuzN4oNii6FVzuNRV
+         C9Lrk6bQlR24PMGEb3qWZxx46P9q8MvRjm3yHdy6m+ahqj9haxVKu67kEhbGXzJGweZP
+         mEXq2MZnEW2csqeZdqxEy+CFXzAy9ZLOJT3J/r8gByagD9dBQI06iN+E9XcChkpioJwS
+         KJNw==
+X-Gm-Message-State: AGi0PuZu3bqZNWHc0MrPWcEWaFhjwcEm3RL6YNEJSyS0P4PGS0dDYXFk
+        S6811B7IJKaZkX2VBo1pNXjuQIMu/B+5jtlEKoI3EjdiDk4504poQV59YKe0iAjaDzevI9/M3WK
+        bNEv35h3lrAlHC+NrczUkUtn5aECc5MR7kgWuQP/GRhSLlVngxKDuAHADJBFBEkKpwLHqKzTJ35
+        v4
+X-Google-Smtp-Source: APiQypIMMNrQYxg3ncPXrJqdquFwU2eK5R2mMCr7GxUSItIET64/n1qEE810PBDPO/NGfZio7TjeeCnpHLqj
+X-Received: by 2002:a17:90b:30f:: with SMTP id ay15mr1560079pjb.134.1586249799353;
+ Tue, 07 Apr 2020 01:56:39 -0700 (PDT)
+Date:   Tue,  7 Apr 2020 16:56:10 +0800
 In-Reply-To: <20200407085610.231013-1-apusaka@google.com>
-Message-Id: <20200407165521.Bluez.v4.3.I28a54f18ca82b58e44689a0c76663e735fefb6f1@changeid>
+Message-Id: <20200407165521.Bluez.v4.4.I6813a39e5d8499d24471d7b575c7ef6c493a046c@changeid>
 Mime-Version: 1.0
 References: <20200407085610.231013-1-apusaka@google.com>
 X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
-Subject: [Bluez PATCH v4 3/4] shared/att: Check the signature of att packets
+Subject: [Bluez PATCH v4 4/4] unit/test-gatt: Fix unknown request with signed bit
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -73,99 +73,85 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Tested to pass these BT certification test
-SM/MAS/SIGN/BV-03-C
-SM/MAS/SIGN/BI-01-C
+The BT spec doesn't make it explicit of what should happen when
+receiving a bad signed att request packet.
+
+According to BT core spec Vol 3, Part C, Sec 10.4.2:
+A device receiving signed data shall authenticate it by performing
+the Signing Algorithm. If the MAC computed by the Signing Algorithm
+does not match the received MAC, the verification fails and the Host
+shall ignore the received Data PDU.
+
+According to BT core spec Vol 3, Part F, Sec 3.3
+If a server receives a request that it does not support, then the
+server shall respond with the ATT_ERROR_RSP PDU with the error code
+Request Not Supported.
+
+This patch does this two things:
+(1) Removing the signed bit to the existing tests so they are not
+    in a conflicting state within the bluetooth spec, while still
+    keeping the original intent of the test.
+(2) Add another test that purposely fall within this grey area
+    with some comments.
 ---
 
-Changes in v4: None
-Changes in v3:
-- Separate into three patches
+Changes in v4:
+- Fixing test-gatt.c
 
-Changes in v2:
-- Move the signature verification part to crypto.c
-- Attempt not to copy the whole pdu while verifying the signature
-  by not separating the opcode from the rest of pdu too early, so
-  we don't have to rejoin them later.
+Changes in v3: None
+Changes in v2: None
 
- src/shared/att.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ unit/test-gatt.c | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 948a5548b..31c6901fb 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -881,15 +881,15 @@ static void respond_not_supported(struct bt_att *att, uint8_t opcode)
- 									NULL);
- }
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 36dd2847c..139a6fc72 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -4473,16 +4473,38 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
  
--static bool handle_signed(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
--								ssize_t pdu_len)
-+static bool handle_signed(struct bt_att *att, uint8_t *pdu, ssize_t pdu_len)
- {
- 	uint8_t *signature;
- 	uint32_t sign_cnt;
- 	struct sign_info *sign;
-+	uint8_t opcode = pdu[0];
+-	define_test_server("/robustness/unkown-request",
++	define_test_server("/robustness/unknown-request",
+ 			test_server, service_db_1, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
+-			raw_pdu(0xbf, 0x00),
+-			raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
++			raw_pdu(0x3f, 0x00),
++			raw_pdu(0x01, 0x3f, 0x00, 0x00, 0x06));
++
++	define_test_server("/robustness/unknown-command",
++			test_server, service_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x7f, 0x00),
++			raw_pdu());
  
- 	/* Check if there is enough data for a signature */
--	if (pdu_len < 2 + BT_ATT_SIGNATURE_LEN)
-+	if (pdu_len < 3 + BT_ATT_SIGNATURE_LEN)
- 		goto fail;
+-	define_test_server("/robustness/unkown-command",
++	/*
++	 * According to BT core spec Vol 3, Part C, Sec 10.4.2:
++	 * A device receiving signed data shall authenticate it by performing
++	 * the Signing Algorithm. If the MAC computed by the Signing Algorithm
++	 * does not match the received MAC, the verification fails and the Host
++	 * shall ignore the received Data PDU.
++	 *
++	 * However, according to BT core spec Vol 3, Part F, Sec 3.3
++	 * If a server receives a request that it does not support, then the
++	 * server shall respond with the ATT_ERROR_RSP PDU with the error code
++	 * Request Not Supported.
++	 *
++	 * Since there is no explicit instruction on what should be done in
++	 * case the server receives a bad signed unsupported request, here
++	 * we just ignore the received PDU.
++	 */
++	define_test_server("/robustness/signed-unknown-request",
+ 			test_server, service_db_1, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
+-			raw_pdu(0xff, 0x00),
++			raw_pdu(0xbf, 0x00),
+ 			raw_pdu());
  
- 	sign = att->remote_sign;
-@@ -903,10 +903,8 @@ static bool handle_signed(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	if (!sign->counter(&sign_cnt, sign->user_data))
- 		goto fail;
- 
--	/* Generate signature and verify it */
--	if (!bt_crypto_sign_att(att->crypto, sign->key, pdu,
--				pdu_len - BT_ATT_SIGNATURE_LEN, sign_cnt,
--				signature))
-+	/* Verify received signature */
-+	if (!bt_crypto_verify_att_sign(att->crypto, sign->key, pdu, pdu_len))
- 		goto fail;
- 
- 	return true;
-@@ -918,15 +916,16 @@ fail:
- 	return false;
- }
- 
--static void handle_notify(struct bt_att_chan *chan, uint8_t opcode,
--						uint8_t *pdu, ssize_t pdu_len)
-+static void handle_notify(struct bt_att_chan *chan, uint8_t *pdu,
-+							ssize_t pdu_len)
- {
- 	struct bt_att *att = chan->att;
- 	const struct queue_entry *entry;
- 	bool found;
-+	uint8_t opcode = pdu[0];
- 
--	if ((opcode & ATT_OP_SIGNED_MASK) && !att->crypto) {
--		if (!handle_signed(att, opcode, pdu, pdu_len))
-+	if ((opcode & ATT_OP_SIGNED_MASK) && att->crypto) {
-+		if (!handle_signed(att, pdu, pdu_len))
- 			return;
- 		pdu_len -= BT_ATT_SIGNATURE_LEN;
- 	}
-@@ -963,7 +962,7 @@ static void handle_notify(struct bt_att_chan *chan, uint8_t opcode,
- 		found = true;
- 
- 		if (notify->callback)
--			notify->callback(chan, opcode, pdu, pdu_len,
-+			notify->callback(chan, opcode, pdu + 1, pdu_len - 1,
- 							notify->user_data);
- 
- 		/* callback could remove all entries from notify list */
-@@ -1054,7 +1053,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		util_debug(att->debug_callback, att->debug_data,
- 					"(chan %p) ATT PDU received: 0x%02x",
- 					chan, opcode);
--		handle_notify(chan, opcode, pdu + 1, bytes_read - 1);
-+		handle_notify(chan, pdu, bytes_read);
- 		break;
- 	}
- 
+ 	return tester_run();
 -- 
 2.26.0.292.g33ef6b2f38-goog
 
