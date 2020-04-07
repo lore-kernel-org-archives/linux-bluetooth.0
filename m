@@ -5,159 +5,166 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B93AC2D0EC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 23:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B89C2D0EC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 23:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 327BA20730
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 23:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB70820678
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 23:17:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kw+8f9QR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WibKiUXa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726406AbgDGXAw (ORCPT
+        id S1726393AbgDGXRb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 19:00:52 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42255 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbgDGXAw (ORCPT
+        Tue, 7 Apr 2020 19:17:31 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:36930 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726380AbgDGXRb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 19:00:52 -0400
-Received: by mail-oi1-f194.google.com with SMTP id e4so3046302oig.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 16:00:52 -0700 (PDT)
+        Tue, 7 Apr 2020 19:17:31 -0400
+Received: by mail-ot1-f67.google.com with SMTP id g23so5002410otq.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 16:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/qV6TXQkzHkiRIUhyoCGqKTEynJsBU9vf8h9IEYjHuc=;
-        b=Kw+8f9QRHFNbmFZa+6MkO21fXqgZFhNv49+8aqUSMJQqX9Kgb8ayUZnfreiSB56bex
-         IXO1l9O675wOsEyrpcKzy2s7zrKhY2UY3kminemTaR2dqk1nqHMF8NABFLp6fnX/rVA8
-         uG2N2glicYL23PeB3wwQZ+NXagFgKX0OomyafyymGZySlqD872uAldFmsu5KL0zjAFAG
-         qc9A4oLgyPbpkjWFW9pJjcYc6Yrm0Tv5dUF7wcisluQA4yYU2hQ9cacQFnZEDwUHoQ2G
-         uZgn7gZL8OmeTK/VOgLskOTVnq5csmZmut1CJ8wmec47U0tEGNYmluF2iclKZ7GLceEw
-         jN0A==
+        bh=GCadkit8bpUVLc5OWrG/jj37kMu+iRkXQkS0nkK0458=;
+        b=WibKiUXawBCGiko0DvE2nsdbluT3dD8t/Tbh0DhOZUGl0wzB+U7yarvSielncR5pom
+         RSvZXFZcxKloi1qtn5A2v6dEV5J2pvuCrfdPF4iq76P0sXlbrhH4KnFVS1iYotOPoCWx
+         u8y8TFNP9IlxhEJxl2kogUV9Onla8zdC8zTuHUe1VH20oXUbNDlRLg2NetPCJp+JRSY9
+         0GXXUqFTKGxKq4QfS0knyX2pza2G/PGYRiiXasp3BF7JkgxMRGCSkiyfLS1N9xi+NeOM
+         cYOfE4xZqwZm3djb0l5c00KFLGfrfzpDztNyo6RwxTFaSR5N/DI5B4gtFoA9mhg3soKk
+         S98g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=/qV6TXQkzHkiRIUhyoCGqKTEynJsBU9vf8h9IEYjHuc=;
-        b=i17qRewJT+NspOySHLFV3tbI1v7sIIPAs3BLmI2D1f9PJ0dChml2g3hJ5fptUCT2HK
-         Nsp4KUWf6bJVXUDCaGk1qmOpE9jlT0V2nZ9ZXK3kxqU+DasPYSI+C6ySLq1SLwZPZfly
-         5Ka4TKu07KaaqrCXCu2D/dKIn8kympxgnvLUtXwXUC3uPUF7aLqUnt5ySuNBO/7jmih6
-         TU/yTxVeNZVNnMKBreIeTYAfI/T8Ayg/Q20SwwhAp/DsZO4M1FhfFV38j6+IE3+vS3hp
-         jY5jWdzZEmspYu3kAeXHusWKgDqkXrXiFEsXkDOGjUjLvypCiZHW+qczk6O7aNoy1+ss
-         HDOA==
-X-Gm-Message-State: AGi0PuYSFB9AqkOlvds573EvqbqkUeNGauFpigdHd7bgiDCnjnwvDMB8
-        ZiIMB45iisZjCUUVHANDZbADDm1SiSC2b9iQeHp0ZFpH
-X-Google-Smtp-Source: APiQypIFMxJWW9/nB+AKN5QJvgIg3ewGWpg74xffhAGg6yrmfDySI7abL3xEHTcSeoOy6E8wsN0aKklOqmmS1Nk7a7M=
-X-Received: by 2002:a54:4e13:: with SMTP id a19mr404997oiy.108.1586300451658;
- Tue, 07 Apr 2020 16:00:51 -0700 (PDT)
+        bh=GCadkit8bpUVLc5OWrG/jj37kMu+iRkXQkS0nkK0458=;
+        b=DUfzjX5GUANqI5OVruK8/i3oSwmXDuhjGiq++aMM86LwpXTNn3tre/DrVsqa8CyVzp
+         LLxTuINWmztGdJiI2l17aU++ztCOJQ4LWdM4+YjnkT6NQDza83fNTuIWZ64BSMiWKdY+
+         y8sIBEHOwUCO7+xI+Hf1Y++1oZSwwRGk6XH37LxSWpisnkU92MddhyTmqxVesPuLZjqY
+         2KlY2fb74NXLfGToTPs2iQz+B17BXfX2u9NYahl8IuBqm57OeX/xez39UmnKcr31QDtj
+         3tqk6tpntr6gPpq+11TU0av9U+nE//JHzkeCKRTxvyRfttHUwicPGKbENF6ZNMcHcWSA
+         jy6A==
+X-Gm-Message-State: AGi0PubCOMisTr9AiLkgJb1Wwm3EoLzcYM9OOt880o7k1JbGMrVySziN
+        ML9hvZJ1ruq1elRJX4y4xvkVQsmmII1xbFUFpA8=
+X-Google-Smtp-Source: APiQypI1jJI/7bTZohpqtGhGGjlN9Kyo7/CZgxxk0D7l0w8pmRFXrgaickNgDTIlkXmRRx1q7bTrpOx/UCY/mFioYLo=
+X-Received: by 2002:a9d:67c6:: with SMTP id c6mr3615646otn.11.1586301450169;
+ Tue, 07 Apr 2020 16:17:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200407205611.1002903-1-marcel@holtmann.org>
-In-Reply-To: <20200407205611.1002903-1-marcel@holtmann.org>
+References: <20200330080357.96989-1-howardchung@google.com>
+ <20200330160343.Bluez.v2.3.Ia74c1ab0a71d90f46f10b4e32743cab722a97bbb@changeid>
+ <528530767.EP9f1MIPRH@ix>
+In-Reply-To: <528530767.EP9f1MIPRH@ix>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 7 Apr 2020 16:00:40 -0700
-Message-ID: <CABBYNZKsT9Svp7kKPfQkQZWPo2+KeokM0yHet6de=LjeANumMQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Update resolving list when updating whitelist
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 7 Apr 2020 16:17:19 -0700
+Message-ID: <CABBYNZ+KvVoP_OMrzzUHFofJmDUiX2xCytbbv5FP2irWCp1tBg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2 3/6] doc: Add documentation for LE Set
+ Advertising Interval
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     Howard Chung <howardchung@google.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Szymon, Howard,
 
-On Tue, Apr 7, 2020 at 1:57 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Mar 30, 2020 at 2:27 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
 >
-> When the whitelist is updated, then also update the entries of the
-> resolving list for devices where IRKs are available.
+> Hi,
 >
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_request.c | 37 +++++++++++++++++++++++++++++++++++--
->  1 file changed, 35 insertions(+), 2 deletions(-)
+> On Monday, 30 March 2020 10:03:54 CEST Howard Chung wrote:
+> > Signed-off-by: Howard Chung <howardchung@google.com>
+> > ---
+> >
+> > Changes in v2: None
+> >
+> >  doc/advertising-api.txt | 13 +++++++++++++
+> >  doc/mgmt-api.txt        | 25 +++++++++++++++++++++++++
+> >  2 files changed, 38 insertions(+)
+> >
+> > diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> > index b0565eab2..9264cdb27 100644
+> > --- a/doc/advertising-api.txt
+> > +++ b/doc/advertising-api.txt
+> > @@ -209,3 +209,16 @@ Properties       byte ActiveInstances
+> >                       Possible values: "1M"
+> >                                        "2M"
+> >                                        "Coded"
+> > +
+> > +             void SetAdvertisingIntervals(uint16 min_interval_ms,
+> > +                                          uint16 max_interval_ms)
+> > +
+> > +                     This method sets the advertising intervals.
+> > +
+> > +                     The parameters min_interval_ms and
+> max_interval_ms
+> > +                     are specified in milli-seconds. Valid values of
+> > +                     the intervals must fall between 20 ms and 10,240
+> ms.
+> > +
+> > +                     Possible errors: org.bluez.Error.Failed
+> > +                                      org.bluez.Error.InProgress
+> > +
+> org.bluez.Error.InvalidArguments
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 27a41f334..5eff87e24 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -2925,6 +2925,31 @@ Read Extended Controller Information Command
+> >                               Invalid Index
+> >
+> >
+> > +Set Advertising Intervals Command
+> > +=================================
+> > +
+> > +     Command Code:           0x0101
+> > +     Controller Index:       <controller id>
+> > +     Command Parameters:     Min_Interval     (2 Octets)
+> > +                             Max_Interval     (2 Octets)
+> > +     Return Parameters:      Current_Settings (4 Octets)
+> > +
+> > +     This command is used to set advertising intervals. The intervals
+> > +     are expressed in multiples of 0.625 ms. The default values of
+> > +     both intervals are 0x0800. Valid Min_Interval and Max_Interval
+> > +     values must fall between 0x0020 and 0x4000.
+> > +
+> > +     The advertising intervals are first kept in hdev struct. The values
+> > +     would be sent to the controller and take effect when advertising is
+> > +     actually enabled. If the advertising intervals are set when
+> > +     advertising is already on, the advertising would be disabled and
+> > +     re-enabled to make the intervals take effect.
+> > +
+> > +     Possible errors:        Busy
+> > +                             Rejected
+> > +                             Invalid Parameters
+> > +
+> > +
+> >  Set Appearance Command
+> >  ======================
 >
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index efec2a0bb824..45fbda5323af 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -695,6 +695,21 @@ static void del_from_white_list(struct hci_request *req, bdaddr_t *bdaddr,
->         bt_dev_dbg(req->hdev, "Remove %pMR (0x%x) from whitelist", &cp.bdaddr,
->                    cp.bdaddr_type);
->         hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST, sizeof(cp), &cp);
-> +
-> +       if (use_ll_privacy(req->hdev)) {
-> +               struct smp_irk *irk;
-> +
-> +               irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
-> +               if (irk) {
-> +                       struct hci_cp_le_del_from_resolv_list cp;
-> +
-> +                       cp.bdaddr_type = bdaddr_type;
-> +                       bacpy(&cp.bdaddr, bdaddr);
-> +
-> +                       hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
-> +                                   sizeof(cp), &cp);
-> +               }
-> +       }
->  }
 >
->  /* Adds connection to white list if needed. On error, returns -1. */
-> @@ -715,7 +730,7 @@ static int add_to_white_list(struct hci_request *req,
->                 return -1;
+> I feel this should be per instance settings, and if we want this level of
+> finetuning we would probably need to have new command for adding advertising
+> sets (where we could fix more, eg not limit data to 255 bytes).
 >
->         /* White list can not be used with RPAs */
-> -       if (!allow_rpa &&
-> +       if (!allow_rpa && !use_ll_privacy(hdev) &&
->             hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
->                 return -1;
->         }
-> @@ -732,6 +747,24 @@ static int add_to_white_list(struct hci_request *req,
->                    cp.bdaddr_type);
->         hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
+> Other option would be to maybe have new flags in current Add Advertising that
+> would allow to choose from low,med,hi (eg based on GAP recommended values)
+> intervals, and then allow to finetune those via extra command or sysfs?
 >
-> +       if (use_ll_privacy(hdev)) {
-> +               struct smp_irk *irk;
-> +
-> +               irk = hci_find_irk_by_addr(hdev, &params->addr,
-> +                                          params->addr_type);
-> +               if (irk) {
-> +                       struct hci_cp_le_add_to_resolv_list cp;
-> +
-> +                       cp.bdaddr_type = params->addr_type;
-> +                       bacpy(&cp.bdaddr, &params->addr);
-> +                       memcpy(cp.peer_irk, irk->val, 16);
-> +                       memset(cp.local_irk, 0, 16);
-> +
-> +                       hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST,
-> +                                   sizeof(cp), &cp);
+> Just my two cents.
 
-Shouldn't we be checking if there is any space left in the list before
-trying to send the command? I wonder what would happen if there is too
-many IRKs, I guess that means we would still have to resolve them in
-the host.
-
-> +               }
-> +       }
-> +
->         return 0;
->  }
->
-> @@ -772,7 +805,7 @@ static u8 update_white_list(struct hci_request *req)
->                 }
->
->                 /* White list can not be used with RPAs */
-> -               if (!allow_rpa &&
-> +               if (!allow_rpa && !use_ll_privacy(hdev) &&
->                     hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
->                         return 0x00;
->                 }
-> --
-> 2.25.2
->
-
++1, since we need to accomodate for the case of having multiple
+application having their own instances having some presets might be
+easier to manage.
 
 -- 
 Luiz Augusto von Dentz
