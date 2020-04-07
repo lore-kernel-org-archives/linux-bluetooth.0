@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF2AC2BABC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3699C2BB54
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:59:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FA1F20747
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:59:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79B362074F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 05:59:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="iWAedFWI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HU2zYuIb"
+	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="fzFRDfdn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RZ3NC15S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgDGF67 (ORCPT
+        id S1726817AbgDGF6u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 01:58:59 -0400
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:38603 "EHLO
-        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725817AbgDGF6u (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 7 Apr 2020 01:58:50 -0400
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:47509 "EHLO
+        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726792AbgDGF6t (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Apr 2020 01:58:49 -0400
 Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 678CC580307;
+        by mailnew.nyi.internal (Postfix) with ESMTP id 6806B58030C;
         Tue,  7 Apr 2020 01:58:48 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
   by compute3.internal (MEProxy); Tue, 07 Apr 2020 01:58:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
-         h=from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm3; bh=luaDFvJ4QP7HzTgY7DFCyyfDI0
-        BXcg59edPeu9moQnE=; b=iWAedFWIY7AyUqXyEMCmfDoc8Nak2DLftjwUhJLLQk
-        KNRmOJFxDfJQelE4tQso8nqPqTCL31xTtxABsBPSsUcMfpIKe1bykpddaAqUbthw
-        /vl/Z9Jq9bNHA24yGTdB69hoCYVyLgtsVsk7fePlLWGZWDXCGTMZdXa8TOgiK85V
-        pd9dsCtIU1YBudJZhbVYYjac0Y5fLIArn6ezaAN9xQZ8SgqJ9uqFjcLMOMc8sYIz
-        pRYAU02EllzACZNByxAtfsQAs/LYL+tVt3ON7SLv7vLHKb1/P6OhdK+5WTx2v1+/
-        ZC3VWm3Fjv58Przl49QI2qupSTk3MVYS9A+WJ432J4eA==
+         h=from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding; s=fm3; bh=j0hiybRWpWmn4
+        RFlXkM4Nvl4eLWofEJym1lENDbvopU=; b=fzFRDfdn9v8eMnVl8iT7MynBqAS7Z
+        okMUoO2leumP0WFnxOmlJN0ax8p0/tDS/H/BeAKje4ULvIe6sfO6vVMY1TYLSONZ
+        BlQBJ5o+QXvNRU0UixXbFxKDf4oxpgPwmQ+RJ6wrkKi1T1Loo1FMiaY975GwutbO
+        C1fL+AWFxL3Ox7Bd+tdQaibXuLjvoM495YCZA4n0iZVWBNGti6c854Ik0d8uvKoi
+        AYMMiNff+1cHb4C7Qbpe3K5mqraDf2tnp5dxDxceKFHKB6kHw6cNHJDWX1sg26+E
+        29pCKYZcpMdVWJoIwnD1lUHF62RrCKCiRDwIuZ14ua7ig6suAX87PBocA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=luaDFvJ4QP7HzTgY7
-        DFCyyfDI0BXcg59edPeu9moQnE=; b=HU2zYuIb3dTywfn6VPUoR6iQ4DvjVfA6a
-        HM+TF/HO7pF27scVLRt1zH0A/0lI70UatZoD3GNQUy243gLrac3W2iCay50Ov+YT
-        K27RqrE9PzGeydBTzz+TX34aCWjfjGqUSjOQiuF3Yrf8V7jEkGczMYXQUOxhp6dF
-        /iBC2Hhu8aP65ZgX5Ldf7ZPKt3kIkaApsciNqonHlE920OwyE2Qfa78gcday7Qwp
-        YgfzosNZnOFO2keUO9YaeEk0bycSC7uosnwKgi/xES5kl3cwi1NmXCK05r9Zp5xc
-        7DftnpnfR8u1zPQkjZwM8FokfE80X/uvWlbHtWuIxC34zO2n7eDSQ==
-X-ME-Sender: <xms:lBaMXql_AK8NiqoqaaeLDZYYzQWffz2wIKyiEM7Yw5BBFWfrk_F9yA>
+        :in-reply-to:message-id:mime-version:references:subject:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; bh=j0hiybRWpWmn4RFlXkM4Nvl4eLWofEJym1lENDbvopU=; b=RZ3NC15S
+        6n2oFqaKn8j1/5yiru9oXGDSqQlt6pAoqUNX8YlDUL0eyiGG0qPkdeoHq1MEy0bK
+        8qE5uR3lIOHfWZq3zRProqQxvm2YphnnwtNxgsmdhGTNxYPciYTRM5xUBhrTFa7V
+        jCEtD0029ZuWAGTmzjOytKXs70lk5lrjnTLlFghTITzy27zkuptxYqCYX71Se030
+        qOc+gBbIaHdeCvb/GnEtflhJCTFY3NpNko/bBsIv3S59MsrBd2CTHuIehXwdB39l
+        oUnf5vpSIpGKCubiKYZaEk/+Rw+yy2KPzUE+LkVeLOV1uEFroMrINIlaJPLpbIvf
+        dOYN1j6MHQj0IQ==
+X-ME-Sender: <xms:lxaMXvsmFnSGvBb0DBILmQD_iruZgzBOoaorzpbJIwKkc7vXqGJI6g>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudeggdellecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffoggfgsedtkeertdertd
-    dtnecuhfhrohhmpeetlhhishhtrghirhcuhfhrrghntghishcuoegrlhhishhtrghirhes
-    rghlihhsthgrihhrvdefrdhmvgeqnecuffhomhgrihhnpeguvghvihgtvghtrhgvvgdroh
-    hrghenucfkphepjeefrdelfedrkeegrddvtdeknecuvehluhhsthgvrhfuihiivgeptden
-    ucfrrghrrghmpehmrghilhhfrhhomheprghlihhsthgrihhrsegrlhhishhtrghirhdvfe
-    drmhgv
-X-ME-Proxy: <xmx:lBaMXqBF7Q_unFFUXTNyMVF3JuktDwLWCQ_9obH00fUJqGWQx1og_w>
-    <xmx:lBaMXgsRucZ3VE9D9WFeHAiyxWkz-QH1boPQTPKGfsc80MYKdVyEsQ>
-    <xmx:lBaMXkuKECeRlmoFykZo8892QfqB5oSg-NiZ2_-VMXo7cF22NI8HZw>
-    <xmx:mBaMXnCjFgTFBSbWfIFyKYlmRZ3ZfVedIjjlZJfkBnVEJqixEVUmBA>
+    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffojghfggfgsedtkeertd
+    ertddtnecuhfhrohhmpeetlhhishhtrghirhcuhfhrrghntghishcuoegrlhhishhtrghi
+    rhesrghlihhsthgrihhrvdefrdhmvgeqnecukfhppeejfedrleefrdekgedrvddtkeenuc
+    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishht
+    rghirhesrghlihhsthgrihhrvdefrdhmvg
+X-ME-Proxy: <xmx:lxaMXjfRdmjaeSUQ-_foCoeQEjT2DUq9cH7API2izHpdw6phnOaPbA>
+    <xmx:lxaMXuaARqcMIIPBjAvGULjtqfWrXT3n9beNUjY97zebZmt0sKE1AQ>
+    <xmx:lxaMXs4QoxsT-W4VJYbB8KXl4oiHzjWccqlmTOLkCiWDinjxWS_2XA>
+    <xmx:mBaMXtFfF4rIiaxzDaVxIs6NYgvNgVVRa9caWph7Nazh_511BZ0W-Q>
 Received: from alistair-xps-14z.alistair23.me (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 869D6328005A;
-        Tue,  7 Apr 2020 01:58:43 -0400 (EDT)
+        by mail.messagingengine.com (Postfix) with ESMTPA id 738AC3280064;
+        Tue,  7 Apr 2020 01:58:46 -0400 (EDT)
 From:   Alistair Francis <alistair@alistair23.me>
 To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcel@holtmann.org, johan.hedberg@gmail.com,
@@ -71,10 +71,12 @@ To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 Cc:     anarsoul@gmail.com, devicetree@vger.kernel.org,
         alistair23@gmail.com, linux-arm-kernel@lists.infradead.org,
         Alistair Francis <alistair@alistair23.me>
-Subject: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
-Date:   Mon,  6 Apr 2020 22:58:35 -0700
-Message-Id: <20200407055837.3508017-1-alistair@alistair23.me>
+Subject: [PATCH v2 3/3] arm64: allwinner: Enable Bluetooth and WiFi on sopine baseboard
+Date:   Mon,  6 Apr 2020 22:58:37 -0700
+Message-Id: <20200407055837.3508017-3-alistair@alistair23.me>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200407055837.3508017-1-alistair@alistair23.me>
+References: <20200407055837.3508017-1-alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -82,85 +84,56 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Vasily Khoruzhick <anarsoul@gmail.com>
+The sopine board has an optional RTL8723BS WiFi + BT module that can be
+connected to UART1. Add this to the device tree so that it will work
+for users if connected.
 
-Add binding document for bluetooth part of RTL8723BS/RTL8723CS
-
-Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 ---
-v2:
- - Update bindings based on upstream feedback
- - Add RTL8822CS
- - Remove unused/unsupported fields
- - Remove firmware-postfix field
- - Small formatting changes
+ .../allwinner/sun50i-a64-sopine-baseboard.dts | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
- .../bindings/net/realtek,rtl8723bs-bt.yaml    | 55 +++++++++++++++++++
- 1 file changed, 55 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.yaml b/Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.yaml
-new file mode 100644
-index 000000000000..a03ce1bbc56f
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.yaml
-@@ -0,0 +1,55 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/realtek,rtl8723bs-bt.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+index 2f6ea9f3f6a2..f4be1bc56b07 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+@@ -103,6 +103,16 @@ ext_rgmii_phy: ethernet-phy@1 {
+ 	};
+ };
+ 
++&mmc1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mmc1_pins>;
++	vmmc-supply = <&reg_dldo4>;
++	vqmmc-supply = <&reg_eldo1>;
++	non-removable;
++	bus-width = <4>;
++	status = "okay";
++};
 +
-+title: RTL8723BS/RTL8723CS/RTL8822CS Bluetooth Device Tree Bindings
+ &mmc2 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&mmc2_pins>;
+@@ -174,6 +184,19 @@ &uart0 {
+ 	status = "okay";
+ };
+ 
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	uart-has-rtscts = <1>;
++	status = "okay";
 +
-+maintainers:
-+  - Vasily Khoruzhick <anarsoul@gmail.com>
-+  - Alistair Francis <alistair@alistair23.me>
++	bluetooth {
++		compatible = "realtek,rtl8723bs-bt";
++		device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
++		host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
++	};
++};
 +
-+description:
-+  RTL8723CS/RTL8723CS/RTL8822CS is WiFi + BT chip. WiFi part is connected over
-+  SDIO, while BT is connected over serial. It speaks H5 protocol with few
-+  extra commands to upload firmware and change module speed.
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - "realtek,rtl8723bs-bt"
-+      - "realtek,rtl8723cs-bt"
-+      - "realtek,rtl8822cs-bt"
-+
-+  device-wake-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO specifier, used to wakeup the BT module
-+
-+  enable-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO specifier, used to enable the BT module
-+
-+  host-wake-gpios:
-+    maxItems: 1
-+    desciption:
-+      GPIO specifier, used to wakeup the host processor
-+
-+required:
-+  - compatible
-+
-+examples:
-+  - |
-+    &uart1 {
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
-+        uart-has-rtscts = <1>;
-+
-+        bluetooth {
-+            compatible = "realtek,rtl8723bs-bt";
-+            device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
-+            host-wakeup-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-+        };
-+    };
+ /* On Pi-2 connector */
+ &uart2 {
+ 	pinctrl-names = "default";
 -- 
 2.25.1
 
