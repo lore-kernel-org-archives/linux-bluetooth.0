@@ -1,146 +1,115 @@
-Return-Path: <SRS0=77es=5W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=KN4I=5X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5401DC2BA1A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 23:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1DBC2BA1A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 00:16:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 272DB2072A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Apr 2020 23:04:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 300632072A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 00:16:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRw/oz0C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726287AbgDFXE3 (ORCPT
+        id S1726530AbgDGAQj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 19:04:29 -0400
-Received: from 12.mo7.mail-out.ovh.net ([178.33.107.167]:48876 "EHLO
-        12.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726225AbgDFXE3 (ORCPT
+        Mon, 6 Apr 2020 20:16:39 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37275 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbgDGAQj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 19:04:29 -0400
-X-Greylist: delayed 7199 seconds by postgrey-1.27 at vger.kernel.org; Mon, 06 Apr 2020 19:04:28 EDT
-Received: from player697.ha.ovh.net (unknown [10.108.42.176])
-        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 347AA15C52F
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2020 00:45:04 +0200 (CEST)
-Received: from labapart.com (i577BCB24.versanet.de [87.123.203.36])
-        (Authenticated sender: olivier@labapart.com)
-        by player697.ha.ovh.net (Postfix) with ESMTPSA id E6C3B112EE927
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2020 22:45:03 +0000 (UTC)
-Subject: btvirt with two virtual controllers: Cannot connect to GATT server
-References: <6cf0d3da-a7d0-c820-3343-3f3722bae9a4@labapart.com>
-To:     linux-bluetooth@vger.kernel.org
-From:   Olivier MARTIN <olivier@labapart.com>
-X-Forwarded-Message-Id: <6cf0d3da-a7d0-c820-3343-3f3722bae9a4@labapart.com>
-Message-ID: <638ce0f7-3075-c7d2-57c4-55392f8f5e0a@labapart.com>
-Date:   Tue, 7 Apr 2020 00:45:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Mon, 6 Apr 2020 20:16:39 -0400
+Received: by mail-ot1-f66.google.com with SMTP id g23so1341160otq.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 17:16:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3vH5WbHKuWBqtZnrxm5e0ptpN3/tK3bRHsJUE87/js8=;
+        b=ZRw/oz0CzTrV0KcXTLayHJhRpkuR0n0922ssGcZreHLg4Gk5kiR8l5JjMAZhzI1cw5
+         d+OdJqx9hnIqVdk+T2WJ4AAbFH6q9BYpj7pL4N72pOOmh1Bkezh8cxwix42eZhozG/rH
+         gAhQz55cA2quRiSxBV/NzSmYlWDgA8pOTn5wG1BVxKl1BLIUfkAl/L6eq/oGuQfBmiDV
+         zvqZSTVlQ7WQYbYYRp/Rs4XCoItWmlxzARyp2A9hZbwlQjZTaBYUG96riQr9ltciMiPV
+         kPhjoIb/pG8mAiXSGPqB8fHfMzGC8s/XmMqHEK5Khba4uk/ktKa008dpEcJwSHsi4NsK
+         n8Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3vH5WbHKuWBqtZnrxm5e0ptpN3/tK3bRHsJUE87/js8=;
+        b=ZQ1+uf/6h1188YaXAFMwrz4T188Vt7K7mm6rkvLLm7YlSFPDR/rbAqqsBUtD8BBjq+
+         Rgo8TKCwxyd1X4jqUS/TMDndwZnPBvp6WiHmTYab8YiLaOm4NYdfEtTor6a/vLi8w6AC
+         zrQARmQKoBTmggdNjXUtKj36yyz6rsaZoeQbvbv1bd9tdMfhkUP775IjIjbFL8nomqOa
+         Ap3LpFWoqvQz92qR8hLMj9ZOYdzGyH1JqIWhVwU4NvY7nvo2SQRlLAp8yfETEjVIoYos
+         VciFZFFtTbAGSOYZuwi/LhGZmQucXDDaWAVa5V5l0auQSs60wB1RO6/YaEqsOYF9n6nd
+         WDQA==
+X-Gm-Message-State: AGi0PubyBwHSmeR756/imcSDYd3kQWWKRFl5MPRdPSmu9QmLZM9xEoPP
+        Hu1uaZahfsD+OA34IaZjzRei8ZQjvWorobMbqfCO++qb
+X-Google-Smtp-Source: APiQypIfyUuNx6+BxwT73KqIqWmboDN9RAvaZU9W5XMDn4waN2oOZo/JnyXcFrtKWI9d3uwWunP1ynMEqOULgIK4Hwc=
+X-Received: by 2002:a4a:2cc6:: with SMTP id o189mr1476436ooo.20.1586218598763;
+ Mon, 06 Apr 2020 17:16:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6cf0d3da-a7d0-c820-3343-3f3722bae9a4@labapart.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Ovh-Tracer-Id: 12749690548979920460
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudeggdduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepufhfvffhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepqfhlihhvihgvrhcuofettffvkffpuceoohhlihhvihgvrheslhgrsggrphgrrhhtrdgtohhmqeenucfkpheptddrtddrtddrtddpkeejrdduvdefrddvtdefrdefieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepohhlihhvihgvrheslhgrsggrphgrrhhtrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+References: <20200406201410.11803-1-olivier@labapart.com>
+In-Reply-To: <20200406201410.11803-1-olivier@labapart.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 6 Apr 2020 17:16:27 -0700
+Message-ID: <CABBYNZLyP5HWLwC_-9XBv3E11U_ZOvkmmqR8a2BVp4v6L7jaew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] emulator: Fix command line parameters with optional argument
+To:     Olivier Martin <olivier@labapart.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi all,
+Hi Olivier,
 
-I am trying to test BLE connection between two virtual controllers 
-(created with 'btvirt'). But when trying to connect to the GATT server 
-running on the first virtual controller, I have the error 
-"src/device.c:att_connect_cb() connect error: Transport endpoint is not 
-connected (107)"
+On Mon, Apr 6, 2020 at 3:45 PM Olivier Martin <olivier@labapart.com> wrote:
+>
+> Some parameters were missing the indication that additional
+> argument could be expected.
+> ---
+>  emulator/main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/emulator/main.c b/emulator/main.c
+> index 68c53488e..3e32bf95d 100644
+> --- a/emulator/main.c
+> +++ b/emulator/main.c
+> @@ -58,8 +58,10 @@ static void usage(void)
+>                 "\t-s                    Create local server sockets\n"
+>                 "\t-l [num]              Number of local controllers\n"
+>                 "\t-L                    Create LE only controller\n"
+> +               "\t-U [num]              Number of test LE controllers\n"
+>                 "\t-B                    Create BR/EDR only controller\n"
+>                 "\t-A                    Create AMP controller\n"
+> +               "\t-T [num]              Number of test AMP controllers\n"
+>                 "\t-h, --help            Show help options\n");
+>  }
 
+Actually optional arguments cannot have spaces in between the option,
+that is why one need to do -L2 for example as -L 2 would ignore the
+number, perhaps we should actually document the long version with
+--le=2 which should probably be the prefered method.
 
-To test my test case, I am using the head of Bluez (2a7df9323e, Sunday 
-5th April).
-
-Here is the test case:
-
-1. Start btvirt for BLE: sudo ./emulator/btvirt -L -U2 (you will need my 
-patch to fix command line parsing I sent a couple of minutes ago)
-
-2. Start bluetoothctl to initialize the Virtual Controller that would 
-play the role of GATT Server:
-
-    $ bluetoothctl
-    [NEW] Controller DB:E3:2A:E8:90:C4 olivier-ThinkPad-T480 #2 [default]
-    [NEW] Device E3:01:36:88:4C:DE TestAdvertisement
-    [NEW] Controller E3:01:36:88:4C:DE olivier-ThinkPad-T480
-    [NEW] Device DB:E3:2A:E8:90:C4 TestAdvertisement
-
-    [bluetooth]# list
-    Controller DB:E3:2A:E8:90:C4 olivier-ThinkPad-T480 #2 [default]
-    Controller E3:01:36:88:4C:DE olivier-ThinkPad-T480
-
-    [bluetooth]# power on
-    Changing power on succeeded
-    [CHG] Controller DB:E3:2A:E8:90:C4 Powered: yes
-
-    [bluetooth]# discoverable on
-    Changing discoverable on succeeded
-    [CHG] Controller DB:E3:2A:E8:90:C4 Discoverable: yes
-
-    [bluetooth]# advertise on
-    [CHG] Controller DB:E3:2A:E8:90:C4 SupportedInstances: 0x04
-    [CHG] Controller DB:E3:2A:E8:90:C4 ActiveInstances: 0x01
-    Advertising object registered
-
-
-3. Use './test/example-gatt-server' to simulate GATT server. I confirm 
-the server is started on DB:E3:2A:E8:90:C4 (first virtual controller)
-
-4. Return to bluetoothctl to switch to second virtual controller and 
-connect to the first one
-
-    [bluetooth]# select E3:01:36:88:4C:DE
-    Controller E3:01:36:88:4C:DE olivier-ThinkPad-T480 [default]
-
-    [bluetooth]# power on
-    Changing power on succeeded
-    [CHG] Controller E3:01:36:88:4C:DE Powered: yes
-
-    [bluetooth]# scan on
-    Discovery started
-    [CHG] Controller E3:01:36:88:4C:DE Discovering: yes
-    [NEW] Device DB:E3:2A:E8:90:C4
-    [bluetooth]# scan off
-    Discovery stopped
-    [CHG] Controller E3:01:36:88:4C:DE Discovering: no
-
-    [bluetooth]# connect DB:E3:2A:E8:90:C4
-    Attempting to connect to DB:E3:2A:E8:90:C4
-    Failed to connect: org.bluez.Error.Failed
-    [CHG] Controller DB:E3:2A:E8:90:C4 Discoverable: no
+> @@ -97,7 +99,7 @@ int main(int argc, char *argv[])
+>         for (;;) {
+>                 int opt;
+>
+> -               opt = getopt_long(argc, argv, "Ssl::LBAUTvh",
+> +               opt = getopt_long(argc, argv, "Ssl::LBAU::T::vh",
+>                                                 main_options, NULL);
+>                 if (opt < 0)
+>                         break;
+> --
+> 2.17.1
+>
 
 
-And in the bluetoothd log:
-
-    bluetoothd[15175]: src/adapter.c:start_discovery() sender :1.6483
-    bluetoothd[15175]: src/adapter.c:update_discovery_filter()
-    bluetoothd[15175]: src/adapter.c:discovery_filter_to_mgmt_cp()
-    bluetoothd[15175]: src/adapter.c:trigger_start_discovery()
-    bluetoothd[15175]: src/adapter.c:cancel_passive_scanning()
-    bluetoothd[15175]: src/adapter.c:start_discovery_timeout()
-    bluetoothd[15175]: src/adapter.c:start_discovery_timeout() adapter->current_discovery_filter == 0
-    bluetoothd[15175]: src/adapter.c:start_discovery_complete() status 0x00
-    bluetoothd[15175]: src/adapter.c:discovering_callback() hci0 type 6 discovering 1 method 0
-    bluetoothd[15175]: src/adapter.c:device_found_callback() hci0 addr DB:E3:2A:E8:90:C4, rssi 0 flags 0x0000 eir_len 3
-    bluetoothd[15175]: src/device.c:device_set_legacy() legacy 0
-    bluetoothd[15175]: src/device.c:device_set_flags() flags 6
-    bluetoothd[15175]: src/adapter.c:stop_discovery() sender :1.6483
-    bluetoothd[15175]: src/adapter.c:stop_discovery_complete() status 0x00
-    bluetoothd[15175]: src/adapter.c:trigger_passive_scanning()
-    bluetoothd[15175]: src/adapter.c:discovery_remove() owner :1.6483
-    bluetoothd[15175]: src/adapter.c:discovering_callback() hci0 type 6 discovering 0 method 0
-    bluetoothd[15175]: src/device.c:device_connect_le() Connection attempt to: DB:E3:2A:E8:90:C4
-    bluetoothd[15175]: src/device.c:att_connect_cb() connect error: Transport endpoint is not connected (107)
-
+-- 
+Luiz Augusto von Dentz
