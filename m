@@ -2,109 +2,204 @@ Return-Path: <SRS0=KN4I=5X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B40CEC2BA1A
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 01:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E9CC2BA16
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 04:26:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5811620719
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 01:29:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7FC120801
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 04:26:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="mLI/z2ax"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vOoh/LI7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726312AbgDGB3M (ORCPT
+        id S1726687AbgDGE0g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Apr 2020 21:29:12 -0400
-Received: from mail-lf1-f41.google.com ([209.85.167.41]:36470 "EHLO
-        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbgDGB3M (ORCPT
+        Tue, 7 Apr 2020 00:26:36 -0400
+Received: from mail-pj1-f73.google.com ([209.85.216.73]:34076 "EHLO
+        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726657AbgDGE0g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Apr 2020 21:29:12 -0400
-Received: by mail-lf1-f41.google.com with SMTP id w145so1065937lff.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 18:29:11 -0700 (PDT)
+        Tue, 7 Apr 2020 00:26:36 -0400
+Received: by mail-pj1-f73.google.com with SMTP id d2so5333pje.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2020 21:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x3szywOcMtDHg15QiLa7lQMOVT2IEvzqqE6CTNlZ6bA=;
-        b=mLI/z2axfsXGQyWxfQtRlaUDk3j8zJh+8ibhFf+kWWwwc2Fga+60wJjuZqAPaLff2a
-         dHuuBlN9yzkrfSAnSDcfW0neCziCrQ/2FBdiSX8LwYa1/DvUfcxcdR7z74xlmvqYvokc
-         HRlaLTysnhRW6l+yIO3LJaoTT1B+gbI6ApnFT1OCRF00kJY+vkQVvMPA2mV/1KT7Eud+
-         YMpa7ydmrG6bdL4gU7P30x4kBlsZvt6jb5ln7j4Fnvc0FRlKZUxyGqMdKghnEOHOBjy5
-         WPp2oa/qJQjTb2WeGnU06AUP1wo02Wtv7NzFX/Y0cGp1qgyN06OerDwLbqgDwCDvaFaq
-         me6w==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=QWUKDJQTRxWuVmOwgRvVPoWS0UavR+FekLqN1+lSVJ0=;
+        b=vOoh/LI74uP5oGTJtFVs6Wj0xTE8/y6MFdP3yrgFAKUCddTIF/l1UpDa8U199B88Ru
+         w9vQSEt0QtBFCZoQ2zSrGdEwEuiLUow0J7rStScAiPsb968sEU/qyfuiA0kYdaV+X3we
+         mdF+WBr/pbi0ZmjOdWtXyEW50KZW41qkvwyiJnX5NHvmTEKAJbN8SGS5DDX7v4lo/981
+         tWgMYlgRjMuDFYQgKoX43TZNCOmmHH9pWJ5iGZ+81QFYtqZYkBef/I4OntvBMmi7C3Vf
+         HeWvWUzmXa3/1sdg8OMFpEKJdYBwiT3Hw4PwYvyMAPagBmFgHZL95Tu+Ne+JOmFSVKGA
+         a8Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x3szywOcMtDHg15QiLa7lQMOVT2IEvzqqE6CTNlZ6bA=;
-        b=WxVzXgK/fkQj6d+QNYWw21dN+GzxM0dFhq2y/T5ggX0Z/kWT6+AkaCjlCym8W7sJNZ
-         a3QDBqA3CfrxWIX5HW6eJY2rdj6anwEQQLUykJ/pzq6E0vq8LrQhnCbTQAoUZNTn+kG6
-         7NUw+Awp27NEV/2xzcfuNxt0BT3mLoBLpMOLctZY8nWmIZJkZRAhM73aOr9rphiHeXdt
-         nV1HpKiYhiyqxXT57ozQ5n4JgBiHw5I5Q+G2yunhdi0DiMdOW27Bl+XoVgC4/2KYNM5c
-         Lnf0FwfVjpKBHxFrfMxjmXlk2+VCHhF9J/LysD/oDUaVk1VS1HSs0harDLJ8YetCavJi
-         UQkQ==
-X-Gm-Message-State: AGi0PuZKy5BFULJ4R3aZMk/0FGU85Em0fJo+KHRDl8Q2HpeUHp7Be5lH
-        ObQI8AHvtW40ySlXueUuj6GuckGmW7E=
-X-Google-Smtp-Source: APiQypJrUn2iUBHHkx4hcS42Orm8V96EUxZjGrQIUHsTT3zDioprBKYebL9iaEqP3TfHbduf5SsRNQ==
-X-Received: by 2002:a05:6512:3b7:: with SMTP id v23mr14426342lfp.66.1586222950714;
-        Mon, 06 Apr 2020 18:29:10 -0700 (PDT)
-Received: from localhost.localdomain (45-11-60-42.ip4.greenlan.pl. [45.11.60.42])
-        by smtp.gmail.com with ESMTPSA id c2sm13006109lfb.43.2020.04.06.18.29.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2020 18:29:10 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] gatt: Fix AcquireWrite and AcquireNotify server support
-Date:   Tue,  7 Apr 2020 03:29:06 +0200
-Message-Id: <20200407012906.166736-1-szymon.janc@codecoup.pl>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=QWUKDJQTRxWuVmOwgRvVPoWS0UavR+FekLqN1+lSVJ0=;
+        b=ror1S2OuMktIIdwugzzLKWj4BRV0zFq1jkkmRiCr8oMUNudRXv28h8v8P7jVN0XbeX
+         xl7zBx1sqqSBM897y/tIQbWJR3+fJzSPzptud2YVYtT9CIaDQPi1XkzhCjY1JjPlOpnZ
+         i5BJLujyZ3HCSedE+jo6Q9CreayyI9tpiuDJtO3CyLuZ27VzF+WuazAu404XZRziSmGY
+         0tgktGP3UaJYsg6q7pRH/l2lDvX7RYq97OC7oFpXuUhGWv0Jrb3hTjpSZEdRmvm00GGB
+         EHbNtkepto2ZdKVR3xjEeOKSGfBnKiZY/M+1XoXZAoUqBbzRjtjIjFeaufAfjyQlPKti
+         wP2g==
+X-Gm-Message-State: AGi0Pub4Wqvppi1K/fdA2xmHNZXcYqwOpI/399gSv5hyy7NiwT6BZ+vY
+        EurbBky5SZfyPvgvZoW0YqDlX4bYrbUz184EgmV2uNDLFYDsIP4sMWWyWJvQhYe3ED0yqV0hpiA
+        iykrndC9jwq6E6Png+Cq24VBBcN8pLSHjot27R+d9//jVPdPMsWr/yZrnOfTAk7GA8abO5PtLAA
+        H7
+X-Google-Smtp-Source: APiQypLJCnHPeQcXq6SQEnVok3DreXL6u5mQfQikHBJHO0xSMfffYfbLHPybQF8KmADEvQ/NI6B62Eye81jN
+X-Received: by 2002:a17:90b:909:: with SMTP id bo9mr432591pjb.125.1586233595138;
+ Mon, 06 Apr 2020 21:26:35 -0700 (PDT)
+Date:   Tue,  7 Apr 2020 12:26:27 +0800
+Message-Id: <20200407122522.v2.1.Ibfc500cbf0bf2dc8429b17f064e960e95bb228e9@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
+Subject: [PATCH v2] Bluetooth: debugfs option to unset MITM flag
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Register read handler only for notify IO and handle socket
-disconnection in sock_io_read.
----
- src/gatt-database.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+From: Archie Pusaka <apusaka@chromium.org>
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 483c84341..92e24e5f7 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -2358,7 +2358,7 @@ static bool sock_io_read(struct io *io, void *user_data)
- 	ssize_t bytes_read;
+The BT qualification test SM/MAS/PKE/BV-01-C needs us to turn off
+the MITM flag when pairing, and at the same time also set the io
+capability to something other than no input no output.
+
+Currently the MITM flag is only unset when the io capability is set
+to no input no output, therefore the test cannot be executed.
+
+This patch introduces a debugfs option to force MITM flag to be
+turned off.
+
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+---
+
+Changes in v2:
+- Rename flag to HCI_FORCE_NO_MITM
+- Move debugfs functions to hci_debugfs.c
+- Add comments on not setting SMP_AUTH_MITM
+
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_debugfs.c | 46 +++++++++++++++++++++++++++++++++++++
+ net/bluetooth/smp.c         | 15 ++++++++----
+ 3 files changed, 57 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 79de2a659dd69..f4e8e2a0b7c15 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -298,6 +298,7 @@ enum {
+ 	HCI_FORCE_STATIC_ADDR,
+ 	HCI_LL_RPA_RESOLUTION,
+ 	HCI_CMD_PENDING,
++	HCI_FORCE_NO_MITM,
  
- 	bytes_read = read(fd, buf, sizeof(buf));
--	if (bytes_read < 0)
-+	if (bytes_read <= 0)
- 		return false;
+ 	__HCI_NUM_FLAGS,
+ };
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 6b1314c738b8e..5e8af2658e44a 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -1075,6 +1075,50 @@ DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
+ 			auth_payload_timeout_get,
+ 			auth_payload_timeout_set, "%llu\n");
  
- 	send_notification_to_devices(chrc->service->app->database,
-@@ -2379,8 +2379,6 @@ static struct io *sock_io_new(int fd, void *user_data)
++static ssize_t force_no_mitm_read(struct file *file,
++				  char __user *user_buf,
++				  size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
++
++	buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM) ? 'Y' : 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t force_no_mitm_write(struct file *file,
++				   const char __user *user_buf,
++				   size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf) - 1));
++	bool enable;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++	if (strtobool(buf, &enable))
++		return -EINVAL;
++
++	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
++		return -EALREADY;
++
++	hci_dev_change_flag(hdev, HCI_FORCE_NO_MITM);
++
++	return count;
++}
++
++static const struct file_operations force_no_mitm_fops = {
++	.open		= simple_open,
++	.read		= force_no_mitm_read,
++	.write		= force_no_mitm_write,
++	.llseek		= default_llseek,
++};
++
+ DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
+ 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
+ DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
+@@ -1134,6 +1178,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+ 			    &max_key_size_fops);
+ 	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
+ 			    &auth_payload_timeout_fops);
++	debugfs_create_file("force_no_mitm", 0644, hdev->debugfs, hdev,
++			    &force_no_mitm_fops);
  
- 	io_set_close_on_destroy(io, true);
+ 	debugfs_create_file("quirk_strict_duplicate_filter", 0644,
+ 			    hdev->debugfs, hdev,
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index d0b695ee49f63..a85e3e49cd0da 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2393,12 +2393,17 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 			authreq |= SMP_AUTH_CT2;
+ 	}
  
--	io_set_read_handler(io, sock_io_read, user_data, NULL);
--
- 	io_set_disconnect_handler(io, sock_hup, user_data, NULL);
+-	/* Require MITM if IO Capability allows or the security level
+-	 * requires it.
++	/* Don't attempt to set MITM if setting is overridden by debugfs
++	 * Needed to pass certification test SM/MAS/PKE/BV-01-C
+ 	 */
+-	if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
+-	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
+-		authreq |= SMP_AUTH_MITM;
++	if (!hci_dev_test_flag(hcon->hdev, HCI_FORCE_NO_MITM)) {
++		/* Require MITM if IO Capability allows or the security level
++		 * requires it.
++		 */
++		if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
++		    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
++			authreq |= SMP_AUTH_MITM;
++	}
  
- 	return io;
-@@ -2537,6 +2535,7 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
- 	DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
- 
- 	chrc->notify_io = sock_io_new(fd, chrc);
-+	io_set_read_handler(chrc->notify_io, sock_io_read, chrc, NULL);
- 
- 	__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
- 
+ 	if (hcon->role == HCI_ROLE_MASTER) {
+ 		struct smp_cmd_pairing cp;
 -- 
-2.25.1
+2.26.0.292.g33ef6b2f38-goog
 
