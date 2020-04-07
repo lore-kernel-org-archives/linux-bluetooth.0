@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DF4C2BA16
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7ABC2BA1B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C75E20748
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFB5D20748
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 08:56:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ib+pPA5F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kTq8XMV2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727923AbgDGI40 (ORCPT
+        id S1727952AbgDGI4c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 04:56:26 -0400
-Received: from mail-qk1-f202.google.com ([209.85.222.202]:55530 "EHLO
-        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725883AbgDGI40 (ORCPT
+        Tue, 7 Apr 2020 04:56:32 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:39799 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbgDGI4c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 04:56:26 -0400
-Received: by mail-qk1-f202.google.com with SMTP id h186so2438297qkc.22
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 01:56:24 -0700 (PDT)
+        Tue, 7 Apr 2020 04:56:32 -0400
+Received: by mail-pl1-f202.google.com with SMTP id d11so1864424pll.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 01:56:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ixePdWgFw7g7y9K8+PNzUptUWWtYVQio9P5eRJlOWfI=;
-        b=Ib+pPA5Far2EmK+YIW23DQtUF7TXviRk//RDVLoD4Zr1KTennPsvSDKCGTvs70lVRP
-         0tsya6iYtFeRIAn4yzOaEWBogEEdwK/oeFISCcO7imMSuv0CGuIlV3ejJu6tLotp1Osl
-         BlcedprkajcfNqwKMAucVFAOoLuZNG5nZRkHsfmPn+yZrP/jOWl2ENUX8yS47UARg/60
-         YVBqgeCABLVFUny76miAV/G1uo3hz5sLb9PBLzwVshj1kg6dJTijdY2rDo2KVCfoakI6
-         QGPVfgVrTObihhPT9/cNUsazwKtHfMhlrs6RlxP/qTMmARxJkXKBV/+wIk8wH47UcaQc
-         y3Pg==
+        bh=k1OfTEDDWoKD1wyJgxjBcp+qqrvnEMjWFoVpDUtkU1M=;
+        b=kTq8XMV2/n/Ie4gFML0a1XRufILkC6etTcwexxWnsdZcIRv2aksd7U0NOBuIORE+2D
+         UBdxisYCl9vxt8S0RmylrcZ2/QqfdlWsPR62O4dh6dAY8bw9n7IWDtcwsqeoRCmQGpfJ
+         ui2/WohJIHh97ei9HmpoTWyh6akFnhybKZAZLQFKv7zfdUPwRYMQaT4kOckSE/6B+QBl
+         pgn796RcxSY4+Q7tMrUvI3bQihjRtMK4WUFp3LsCVAfOGLxeXE+RhYst3bvfVW96o7ex
+         Y3e2q8FU9WHH8uCRl8vFnDOEY1XO6R5uAVYFeGpoWAqmRcJ81bO7aBXkYxRnStDUVZE+
+         bDNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ixePdWgFw7g7y9K8+PNzUptUWWtYVQio9P5eRJlOWfI=;
-        b=jQtvJgrWaCXWTzFrj3e/evcVu45r0fYyhW8jpMSemfvPP+ZqGdwLXpIRIotuCzVZM0
-         nIvCzPtxuoD6GZNPD3vWBM6zdps86SXzfYHF8xJIFyiXKs4nXkK42Kvr9Aho2PtUQtvN
-         LGMpBNBMM7Xk4ugAKDAnHoTCkCSKzCLAITLOjugADaGbvpwOk25c8p9X1YNu8mPvP/dU
-         ga9ua9/lTOGZX8vlh69eOiC58ByncpIKsIegdGn9OsOJQuy7q4zVmYVR4ySc7LoeiYTs
-         2AywZUIZ8JPyTBflD1SrJj2RXx3pe9lNpXZjg2sJ1ymnuAVput4acTWQNu/DmnYNNDd1
-         yfkA==
-X-Gm-Message-State: AGi0Pub9bJywMChMyk6d0Dpt+KuGm97H7YkXumDwkHq0idmC4o0HZJrQ
-        zDVE+9nawqdqVGVRiaxaORGB8q3H4+8R8aL6lNn7Zx1nSpPc7Y0Fuk309YaojWxBCjqTShDjJnk
-        vknjVTKX29YmoCZsyp+738ltv9CNcXj4Dgqyykji9XQYCkLSgCRfG446KUs6yD+Y2nm6uxIIH+v
-        Gm
-X-Google-Smtp-Source: APiQypJsRFhF1zyvxTU5lV5ZiJzefbJZCK1qaiXgagAdsNe2GESx9bGWQ3QSW5V5TUXZGDd2etzBbWOzMQEj
-X-Received: by 2002:a0c:b90e:: with SMTP id u14mr1110360qvf.177.1586249783485;
- Tue, 07 Apr 2020 01:56:23 -0700 (PDT)
-Date:   Tue,  7 Apr 2020 16:56:07 +0800
+        bh=k1OfTEDDWoKD1wyJgxjBcp+qqrvnEMjWFoVpDUtkU1M=;
+        b=LycMn2TPaX49EyZrEPurPUbIq5aHLBIc7O4D3i7hJ1e6RUCdIMomBErhF5ttnqQuab
+         oJXEPB7CXmnTJg0oWf+jMbkDvuAMEnKf2Mm8QYqIf2fVfIJ0fq4iA/DrSziSY4VQx20M
+         8lUEtqOdEYPwwBjym0EVfF+W/NDkYjPQPhhk8CANXrwKnJceNYI4lfnrFLsG3wrnu0h5
+         FnJpmQgJMF/h21IFONADMuLFG2/hEgdn9+dowDO14S9lR8JD4p1oVEFM6H8Fuxjps6yc
+         tQ8Mp2YZYTe31VnsI/PV8qytmFUqr7Toniyh9JMgJBEBA5ufJkqUaRrMlKRbWvhMOuy1
+         kiDw==
+X-Gm-Message-State: AGi0PubnjzY02mSJn6W8GV8jCwcO+ENemGFhInjPf+iisYuEBSGsLtyG
+        edcwKi3y2UqbmJtbVp6wmXEDDb6jU2H8yRqMvldlnhTrQHFtHapld7KXcWWzW9ajPvBZ68p1Ocw
+        fVV5ppKjyDl0CL4QATo6kAnAxRYrvF6vfL4skUOwI+6Vlfl4B5RNbAa1YSQ5noiBPLmYmNZm+IU
+        zT
+X-Google-Smtp-Source: APiQypKaOToMHUyYMrCBtqArjbNqDITE/aiYoubfZtAvS2U/HubcaIIPBspq6HElEhHIU+ucWVCVMy+JoxTO
+X-Received: by 2002:a17:90b:4d09:: with SMTP id mw9mr1539484pjb.101.1586249789501;
+ Tue, 07 Apr 2020 01:56:29 -0700 (PDT)
+Date:   Tue,  7 Apr 2020 16:56:08 +0800
 In-Reply-To: <20200407085610.231013-1-apusaka@google.com>
-Message-Id: <20200407165521.Bluez.v4.1.I6373c573d8c831d0c96974911469e2ac6bff1e42@changeid>
+Message-Id: <20200407165521.Bluez.v4.2.Ieda68013af7fbafbf53fbf7c8fd85ea295153e5e@changeid>
 Mime-Version: 1.0
 References: <20200407085610.231013-1-apusaka@google.com>
 X-Mailer: git-send-email 2.26.0.292.g33ef6b2f38-goog
-Subject: [Bluez PATCH v4 1/4] shared/crypto: Add bt_crypto_verify_att_sign
+Subject: [Bluez PATCH v4 2/4] unit/test-crypto: test for bt_crypto_verify_att_sign
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -73,87 +73,97 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-This is used to verify the signature of incoming ATT packets.
+Adding tests for verifying att signature
 ---
 
-Changes in v4: None
+Changes in v4:
+- Fix wrong variable assignment
+
 Changes in v3:
-- Add check for the case where pdu_len < ATT_SIGN_LEN
+- Add unit test
 
 Changes in v2: None
 
- src/shared/crypto.c | 28 ++++++++++++++++++++++++++--
- src/shared/crypto.h |  2 ++
- 2 files changed, 28 insertions(+), 2 deletions(-)
+ unit/test-crypto.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index 5c5e1217d..5cc88ce4a 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -75,6 +75,8 @@ struct af_alg_iv {
- /* Maximum message length that can be passed to aes_cmac */
- #define CMAC_MSG_MAX	80
- 
-+#define ATT_SIGN_LEN	12
-+
- struct bt_crypto {
- 	int ref_count;
- 	int ecb_aes;
-@@ -265,7 +267,8 @@ static inline void swap_buf(const uint8_t *src, uint8_t *dst, uint16_t len)
- 
- bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
- 				const uint8_t *m, uint16_t m_len,
--				uint32_t sign_cnt, uint8_t signature[12])
-+				uint32_t sign_cnt,
-+				uint8_t signature[ATT_SIGN_LEN])
- {
- 	int fd;
- 	int len;
-@@ -319,10 +322,31 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
- 	 * 12 octets
- 	 */
- 	swap_buf(out, tmp, 16);
--	memcpy(signature, tmp + 4, 12);
-+	memcpy(signature, tmp + 4, ATT_SIGN_LEN);
- 
- 	return true;
+diff --git a/unit/test-crypto.c b/unit/test-crypto.c
+index e20b2fa66..46c7c0e5c 100644
+--- a/unit/test-crypto.c
++++ b/unit/test-crypto.c
+@@ -272,6 +272,58 @@ static void test_gatt_hash(gconstpointer data)
+ 	tester_test_passed();
  }
+ 
++struct verify_sign_test_data {
++	const uint8_t *msg;
++	uint16_t msg_len;
++	const uint8_t *key;
++	bool match;
++};
 +
-+bool bt_crypto_verify_att_sign(struct bt_crypto *crypto, const uint8_t key[16],
-+				const uint8_t *pdu, uint16_t pdu_len)
++static const uint8_t msg_to_verify_pass[] = {
++	0xd2, 0x12, 0x00, 0x13, 0x37, 0x01, 0x00, 0x00, 0x00, 0xF1, 0x87, 0x1E,
++	0x93, 0x3C, 0x90, 0x0F, 0xf2
++};
++
++static const struct verify_sign_test_data verify_sign_pass_data = {
++	.msg = msg_to_verify_pass,
++	.msg_len = sizeof(msg_to_verify_pass),
++	.key = key_5,
++	.match = true,
++};
++
++static const uint8_t msg_to_verify_bad_sign[] = {
++	0xd2, 0x12, 0x00, 0x13, 0x37, 0x01, 0x00, 0x00, 0x00, 0xF1, 0x87, 0x1E,
++	0x93, 0x3C, 0x90, 0x0F, 0xf1
++};
++
++static const struct verify_sign_test_data verify_sign_bad_sign_data = {
++	.msg = msg_to_verify_bad_sign,
++	.msg_len = sizeof(msg_to_verify_bad_sign),
++	.key = key_5,
++	.match = false,
++};
++
++static const uint8_t msg_to_verify_too_short[] = {
++	0xd2, 0x12, 0x00, 0x13, 0x37
++};
++
++static const struct verify_sign_test_data verify_sign_too_short_data = {
++	.msg = msg_to_verify_too_short,
++	.msg_len = sizeof(msg_to_verify_too_short),
++	.key = key_5,
++	.match = false,
++};
++
++static void test_verify_sign(gconstpointer data)
 +{
-+	uint8_t generated_sign[ATT_SIGN_LEN];
-+	const uint8_t *sign;
-+	uint32_t sign_cnt;
++	const struct verify_sign_test_data *d = data;
++	bool result = bt_crypto_verify_att_sign(crypto, d->key, d->msg,
++						d->msg_len);
++	g_assert(result == d->match);
 +
-+	if (pdu_len < ATT_SIGN_LEN)
-+		return false;
-+
-+	sign = pdu + pdu_len - ATT_SIGN_LEN;
-+	sign_cnt = get_le32(sign);
-+
-+	if (!bt_crypto_sign_att(crypto, key, pdu, pdu_len - ATT_SIGN_LEN,
-+						sign_cnt, generated_sign))
-+		return false;
-+
-+	return memcmp(generated_sign, sign, ATT_SIGN_LEN) == 0;
++	tester_test_passed();
 +}
 +
- /*
-  * Security function e
-  *
-diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-index c58d2e104..d17daa835 100644
---- a/src/shared/crypto.h
-+++ b/src/shared/crypto.h
-@@ -62,5 +62,7 @@ bool bt_crypto_h6(struct bt_crypto *crypto, const uint8_t w[16],
- bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
- 				const uint8_t *m, uint16_t m_len,
- 				uint32_t sign_cnt, uint8_t signature[12]);
-+bool bt_crypto_verify_att_sign(struct bt_crypto *crypto, const uint8_t key[16],
-+				const uint8_t *pdu, uint16_t pdu_len);
- bool bt_crypto_gatt_hash(struct bt_crypto *crypto, struct iovec *iov,
- 				size_t iov_len, uint8_t res[16]);
+ int main(int argc, char *argv[])
+ {
+ 	int exit_status;
+@@ -292,6 +344,13 @@ int main(int argc, char *argv[])
+ 
+ 	tester_add("/crypto/gatt_hash", NULL, NULL, test_gatt_hash, NULL);
+ 
++	tester_add("/crypto/verify_sign_pass", &verify_sign_pass_data,
++						NULL, test_verify_sign, NULL);
++	tester_add("/crypto/verify_sign_bad_sign", &verify_sign_bad_sign_data,
++						NULL, test_verify_sign, NULL);
++	tester_add("/crypto/verify_sign_too_short", &verify_sign_too_short_data,
++						NULL, test_verify_sign, NULL);
++
+ 	exit_status = tester_run();
+ 
+ 	bt_crypto_unref(crypto);
 -- 
 2.26.0.292.g33ef6b2f38-goog
 
