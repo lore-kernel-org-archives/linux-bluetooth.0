@@ -2,173 +2,119 @@ Return-Path: <SRS0=KN4I=5X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78ABDC2BA1A
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 17:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E775AC2BA1A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 18:19:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FD50206BE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 17:56:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWZpK7a9"
+	by mail.kernel.org (Postfix) with ESMTP id BA0A02076E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Apr 2020 18:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbgDGR4J (ORCPT
+        id S1726380AbgDGSTH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Apr 2020 13:56:09 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:34034 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726277AbgDGR4J (ORCPT
+        Tue, 7 Apr 2020 14:19:07 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56631 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726277AbgDGSTH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Apr 2020 13:56:09 -0400
-Received: by mail-oi1-f196.google.com with SMTP id d3so2308998oic.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2020 10:56:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VvBZBeg+UAICc4TnwVAchLwbaRuVxAEhqftshhBGr5A=;
-        b=dWZpK7a9mp3GPEmXiQf7BdhdisaEMBypiJYf8f6C/VGOnIb27wlzLXhIhIE291tjQJ
-         6fGpk0kESh797k8mjPHhZhNY7TyNbk2SGuK26yBmLJoYrM4XSxQQYbZXJljtTZ8Uk9aa
-         hOZ/Ke7e5lDvhqHPeqRNexT6yRWpwSxpVtvBk+/5t0lAX/cXqSPxkNGO/Qqd+o/152NB
-         vUqEgDk/IVyBNsEyRF46MNcPgyDJP+AAr4HD6XYBp/7br2La+6yB+2OHLddo+97jujTp
-         VmAqjvJAxFC59gZ11fYmrrZngQhiJOKuH8j3zdx3yAe17F8F1EUQ3AaKFPp+E5QrEe/O
-         BarQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VvBZBeg+UAICc4TnwVAchLwbaRuVxAEhqftshhBGr5A=;
-        b=mXF0WkZsf1DITxJ/BFeLqkMIFLSJAKcM/WqqC8l5B/HHBqDYVLMBpnEGT/+0ptyrKb
-         pb9o3jhUJAyaHzaRRkxWrP4JU3G85z2yoAvqck5i5wWSLtckG6q4XbgkjANsgb95jgbH
-         BmiJL7hLVZcujcX1TiZU68lIwgXL7Gte7WqD5cCei1unmT3nIDCVO3/9yk+CC8Nnfci4
-         uefVXul5hRoFN2cFl+UKjvNZAdUMiDXsjql4/FXPfTXDOZC358QhnnobHrsh5NO8mmHg
-         L9DFRb3Oz6NoXDsaghH1ruPeR9fVIseLohcnlzUC7X83q1g7yfyqV5Du7fWayTe7jQLh
-         lLNQ==
-X-Gm-Message-State: AGi0PuZ7LXJGtfJsWWLC3u4sdyqTTcHEMSBMgFh2/0hPwYu2A3lI1/F/
-        yieORQweeK0p6JC+yHAJYNKvB0Y7H7J7HrS5dZs=
-X-Google-Smtp-Source: APiQypLYhz64uYFSoqWz9hkMv+sWT+ccvZyFsT3cYsNqBemT+ayW/5pSDwQWh72vkwxp5r7Wze4LRy4CsaWBDfYmvQI=
-X-Received: by 2002:a54:4e13:: with SMTP id a19mr39053oiy.108.1586282168065;
- Tue, 07 Apr 2020 10:56:08 -0700 (PDT)
+        Tue, 7 Apr 2020 14:19:07 -0400
+Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 83F17CECDA
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2020 20:28:40 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Configure controller address resolution if available
+Date:   Tue,  7 Apr 2020 20:19:01 +0200
+Message-Id: <20200407181901.976627-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-References: <20200407085610.231013-1-apusaka@google.com> <20200407165521.Bluez.v4.4.I6813a39e5d8499d24471d7b575c7ef6c493a046c@changeid>
-In-Reply-To: <20200407165521.Bluez.v4.4.I6813a39e5d8499d24471d7b575c7ef6c493a046c@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 7 Apr 2020 10:55:56 -0700
-Message-ID: <CABBYNZ++tW29c2DSjuJCp_F2NjLfSVUXkPL228hkEAR0Uxzbtg@mail.gmail.com>
-Subject: Re: [Bluez PATCH v4 4/4] unit/test-gatt: Fix unknown request with
- signed bit
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+When the LL Privacy support is available, then as part of enabling or
+disabling passive background scanning, it is required to set up the
+controller based address resolution as well.
 
-On Tue, Apr 7, 2020 at 1:56 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> The BT spec doesn't make it explicit of what should happen when
-> receiving a bad signed att request packet.
->
-> According to BT core spec Vol 3, Part C, Sec 10.4.2:
-> A device receiving signed data shall authenticate it by performing
-> the Signing Algorithm. If the MAC computed by the Signing Algorithm
-> does not match the received MAC, the verification fails and the Host
-> shall ignore the received Data PDU.
+Since only passive background scanning is utilizing the whitelist, the
+address resolution is now bound to the whitelist and passive background
+scanning. All other resolution can be easily done by the host stack.
 
-In my interpretation 'ignore the received Data PDU' may not supersed
-the followin statement:
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_request.c      | 12 ++++++++++++
+ 3 files changed, 17 insertions(+)
 
-> According to BT core spec Vol 3, Part F, Sec 3.3
-> If a server receives a request that it does not support, then the
-> server shall respond with the ATT_ERROR_RSP PDU with the error code
-> Request Not Supported.
-
-So what I think we should be doing is to ignore the received data,
-meaning it should not even be processed as a signed data since we
-don't understand the command, _and_ respond with ATT_ERROR_RSP,
-otherwise we risk having the 30 seconds timeout and disconnecting
-since the request is no responded.
-
-> This patch does this two things:
-> (1) Removing the signed bit to the existing tests so they are not
->     in a conflicting state within the bluetooth spec, while still
->     keeping the original intent of the test.
-> (2) Add another test that purposely fall within this grey area
->     with some comments.
-> ---
->
-> Changes in v4:
-> - Fixing test-gatt.c
->
-> Changes in v3: None
-> Changes in v2: None
->
->  unit/test-gatt.c | 32 +++++++++++++++++++++++++++-----
->  1 file changed, 27 insertions(+), 5 deletions(-)
->
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 36dd2847c..139a6fc72 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -4473,16 +4473,38 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x18, 0x01),
->                         raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
->
-> -       define_test_server("/robustness/unkown-request",
-> +       define_test_server("/robustness/unknown-request",
->                         test_server, service_db_1, NULL,
->                         raw_pdu(0x03, 0x00, 0x02),
-> -                       raw_pdu(0xbf, 0x00),
-> -                       raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
-> +                       raw_pdu(0x3f, 0x00),
-> +                       raw_pdu(0x01, 0x3f, 0x00, 0x00, 0x06));
-
-Afaik we used 0xbf because that was what PTS was using.
-
-> +       define_test_server("/robustness/unknown-command",
-> +                       test_server, service_db_1, NULL,
-> +                       raw_pdu(0x03, 0x00, 0x02),
-> +                       raw_pdu(0x7f, 0x00),
-> +                       raw_pdu());
->
-> -       define_test_server("/robustness/unkown-command",
-> +       /*
-> +        * According to BT core spec Vol 3, Part C, Sec 10.4.2:
-> +        * A device receiving signed data shall authenticate it by performing
-> +        * the Signing Algorithm. If the MAC computed by the Signing Algorithm
-> +        * does not match the received MAC, the verification fails and the Host
-> +        * shall ignore the received Data PDU.
-> +        *
-> +        * However, according to BT core spec Vol 3, Part F, Sec 3.3
-> +        * If a server receives a request that it does not support, then the
-> +        * server shall respond with the ATT_ERROR_RSP PDU with the error code
-> +        * Request Not Supported.
-> +        *
-> +        * Since there is no explicit instruction on what should be done in
-> +        * case the server receives a bad signed unsupported request, here
-> +        * we just ignore the received PDU.
-> +        */
-> +       define_test_server("/robustness/signed-unknown-request",
->                         test_server, service_db_1, NULL,
->                         raw_pdu(0x03, 0x00, 0x02),
-> -                       raw_pdu(0xff, 0x00),
-> +                       raw_pdu(0xbf, 0x00),
->                         raw_pdu());
->
->         return tester_run();
-> --
-> 2.26.0.292.g33ef6b2f38-goog
->
-
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5ef4547760db..58360538d42b 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -459,6 +459,7 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_LL_PRIVACY		0x40
+ #define HCI_LE_EXT_SCAN_POLICY		0x80
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2f3275f1d1c4..663ffde9bd1d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -645,6 +645,7 @@ extern struct mutex hci_cb_list_lock;
+ 	do {							\
+ 		hci_dev_clear_flag(hdev, HCI_LE_SCAN);		\
+ 		hci_dev_clear_flag(hdev, HCI_LE_ADV);		\
++		hci_dev_clear_flag(hdev, HCI_LL_RPA_RESOLUTION);\
+ 		hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);	\
+ 	} while (0)
+ 
+@@ -1277,6 +1278,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_CODED) || \
+ 			 ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
+ 
++/* Use LL Privacy based address resolution if supported */
++#define use_ll_privacy(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
++
+ /* Use ext scanning if set ext scan param and ext scan enable is supported */
+ #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
+ 			   ((dev)->commands[37] & 0x40))
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 649e1e5ed446..97ba343cd75e 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -676,6 +676,12 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 		cp.enable = LE_SCAN_DISABLE;
+ 		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+ 	}
++
++	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
++		__u8 enable = 0x00;
++		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
++	}
+ }
+ 
+ static void del_from_white_list(struct hci_request *req, bdaddr_t *bdaddr,
+@@ -926,6 +932,12 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
+ 		filter_policy |= 0x02;
+ 
++	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
++		__u8 enable = 0x01;
++		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
++	}
++
+ 	if (hdev->suspended) {
+ 		window = LE_SUSPEND_SCAN_WINDOW;
+ 		interval = LE_SUSPEND_SCAN_INTERVAL;
 -- 
-Luiz Augusto von Dentz
+2.25.2
+
