@@ -5,96 +5,274 @@ X-Spam-Level:
 X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DF6C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Apr 2020 18:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 035CFC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Apr 2020 18:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 364CA206E9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Apr 2020 18:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 967A6206F7
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Apr 2020 18:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtX3Rz5/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsG6S0Ia"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbgDIS3Y (ORCPT
+        id S1726595AbgDISf2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Apr 2020 14:29:24 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:41462 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726574AbgDIS3Y (ORCPT
+        Thu, 9 Apr 2020 14:35:28 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:36834 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726470AbgDISf2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Apr 2020 14:29:24 -0400
-Received: by mail-oi1-f196.google.com with SMTP id k9so698695oia.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2020 11:29:22 -0700 (PDT)
+        Thu, 9 Apr 2020 14:35:28 -0400
+Received: by mail-ot1-f66.google.com with SMTP id l23so11515463otf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2020 11:35:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vXEvyJEU4M+7ZN2pxt7VC+CwjuWU8Rr2NjYDwMUQU6A=;
-        b=FtX3Rz5/R0K4oBzZlF4P3KsDx/XcH5e8DRuzqWQbORvCsXwhkeIOhSa6BkJGmqVRp9
-         oLJwUqqxDJMrV84fsElYaZvI08Sl/rXzOdNe3bosTU7RhTC5zvMrMMlgOjMb8/AXUlly
-         SPJpmFQV2WKVh1cv+2yisVOskhQp4Kjzui9MxsSxDuuzJ8sjAOYg+uyZKfkS/B1edPYV
-         QYMTRylaZgyyucI9FPq/maG2sWMt1SY4jceSmC+zlOfX41P2ZNWS5zXJynzi4i/SWBos
-         0rY+ly3PwhOox0rj4M8EGg2H0JAr7FI08rSn7CkV1vcEYTW+slMB9QmYSrKZaELDbQP+
-         3FVQ==
+         :cc:content-transfer-encoding;
+        bh=U+ekVZOu9Fc7FgEbSUGjtDwsRA0E8YgDgqLUjeYg9j8=;
+        b=BsG6S0IaPZTz1VMqNulVVpUm1yEvcOCn9zsm3YKMV5J3zgSz0/pOJLZJLSGGFLv4WV
+         FCKaPfYEzl+NiV4Q9TpN7pNLA4D9WU4nNODDIp3XOEnZcpuVXWa67fxC2125JyKtrAPC
+         zyRlKxZ+CrArqH3aGnJd8zJMvEseswqMN7jJw8nbW8Tu4ja4VN7Q0v9A2tdfzTYY7ssQ
+         jneLxJu9MP2+ufll/XQb5NYyEaakCjOMunfU5lu6mAxQfJDlnIHoySzgSqZXWxfUSDYt
+         bHEULja9qhvt2vfMnmlh5TawjaBdE118afzfwZVdIPrwlH5K+tlpH0/6dLtb2eDpG+U/
+         O7uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vXEvyJEU4M+7ZN2pxt7VC+CwjuWU8Rr2NjYDwMUQU6A=;
-        b=ssLKgPeKKihjsHyKAw8i3+QzIlQbg1HORQ2If2p+nRgrP52jxwUe6hKf/3lVPueQhk
-         RbHacPWa/Eyz5JWtWOV3fzqMlIsPhzziM9xT62SETfXLsR80gSI3ByGedgnmIL1eZwiI
-         lQBaBpdQIMeLVLbHioOvGJDGsowKIKxYBFd6CRUL8Uegvqk9SMFnUHc2rXfRsVOJ05X0
-         mzrL1xDpvNDbSXyoU2G1FUHJ1wE+5EH5zlPc5qfevDpqqAPcZOqV3p4YpbyqyzEP1jxl
-         OKzQblHLXRBMwANJKqGNfiVziZnFO6vx+KG9LpIa+1pv1tz4swmkbKujmT6SYZ+dZLhX
-         Ye6w==
-X-Gm-Message-State: AGi0PuaDqxAFO15gPsmiH8vQ6r5jIRtpv1cgjLp2zOTgCaUEJuNcNXkR
-        3EEd89b8qwvOxoUAZv1GxRXuk+wcQkvyzYWChSnzWeTn
-X-Google-Smtp-Source: APiQypLj8NBJeGeLxuwhsi+errZHUiqmY6HwIxl9ag5bU3FiOwRq772/XxNJC1ftDMJyhEb2s1jdS0QRhixvnrJvHj0=
-X-Received: by 2002:aca:b602:: with SMTP id g2mr553708oif.82.1586456962053;
- Thu, 09 Apr 2020 11:29:22 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=U+ekVZOu9Fc7FgEbSUGjtDwsRA0E8YgDgqLUjeYg9j8=;
+        b=YIFWPrGb7WYbBk3i2FB9NHGQwYoHXFvkz2XoaSRKj3BxcWvnVq/0WIA7dKD8GA7mP7
+         Kwbx6FTkyJTMQHy+9t3L/w0vZRlQnu0TVxmhGZ6NBwh8J2s21isvs3vQN3IKFcO+isMp
+         PODEO3IcFryZLA1c7rx1qXVgQPVKKqpkwRaYF++IUFfGz0vte4ELSr0Ta9558nZAg3jj
+         WX/nPK5dZpTKi3xNQdBYI1o92McVROGYZH3BfJN/xKak9YjuOUjaH3iORiGR7EaCuBq+
+         0Qe4Epsi8Zb38EA+hyLcRFV4qcUZ8d577Znqz3V0k3EetFFVsIykq7Ki09ZgmNnaxdOH
+         dgeA==
+X-Gm-Message-State: AGi0PuawGsGW+H0rMfP7pDGu3T1v7Usb4K8LwUKZNt8LIrMWjZEgu5sR
+        9IjWBuuAbL/+4wRgT1c8QaJ4D8DVZ/tN5KsVPYM=
+X-Google-Smtp-Source: APiQypJ8D7alstx6jSrnVRGs3Q2wuxwHuenO3GBS5TwcKZWGeNmIHMqOVdPCF7/aQOFD7XOfwg/jeC25HpYnny78mcw=
+X-Received: by 2002:a4a:929b:: with SMTP id i27mr1083867ooh.95.1586457327575;
+ Thu, 09 Apr 2020 11:35:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200409103035.96589-1-szymon.janc@codecoup.pl>
-In-Reply-To: <20200409103035.96589-1-szymon.janc@codecoup.pl>
+References: <20200401221434.12185-1-sonnysasaka@chromium.org>
+ <ACB5D50F-BAD5-435A-AD1C-58A16878C310@holtmann.org> <CAOxioNnBq3J_F63RNHZfQzKOcwSmVy2igJ6zCfgBH+zcL1kaCw@mail.gmail.com>
+In-Reply-To: <CAOxioNnBq3J_F63RNHZfQzKOcwSmVy2igJ6zCfgBH+zcL1kaCw@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 9 Apr 2020 11:29:10 -0700
-Message-ID: <CABBYNZKj4kjCBtdads6ntBRs9F9hYiV9o8ACp4Fby3NSmv8M0g@mail.gmail.com>
-Subject: Re: [PATCH] test/example-advertisement: Fix advertising when discoverable
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 9 Apr 2020 11:35:14 -0700
+Message-ID: <CABBYNZKnoUoA=01o1fZL25=Pvmq-L8VZehPB80p9fErm=GF+Gg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] D-Bus API changes for managing SDP records
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Rahul Chaturvedi <rkc@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+Hi Sonny,
 
-On Thu, Apr 9, 2020 at 3:33 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
+On Thu, Apr 9, 2020 at 11:28 AM Sonny Sasaka <sonnysasaka@chromium.org> wro=
+te:
 >
-> If adapter is discoverable (or LE-only) advertising was failing due
-> to too big adv data being set. Make sure there is enough space left
-> for flags if needed.
-> ---
->  test/example-advertisement | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi Marcel,
 >
-> diff --git a/test/example-advertisement b/test/example-advertisement
-> index 88a27ab34..f116893b6 100755
-> --- a/test/example-advertisement
-> +++ b/test/example-advertisement
-> @@ -142,7 +142,7 @@ class TestAdvertisement(Advertisement):
->          Advertisement.__init__(self, bus, index, 'peripheral')
->          self.add_service_uuid('180D')
->          self.add_service_uuid('180F')
-> -        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
-> +        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03])
->          self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
->          self.add_local_name('TestAdvertisement')
->          self.include_tx_power = True
-> --
-> 2.25.2
+> This was needed to support emulation of Android apps's Bluetooth API
+> on top of BlueZ. Android expects to be able to access the SDP database
+> of a remote device via its HAL interface
+> (https://android.googlesource.com/platform/system/bt/+/master/include/har=
+dware/bt_sdp.h#38).
 
-Applied, thanks.
+I suppose you could read the cache directly, though there is no
+guarantee that we won't change the format of that, btw I suppose
+services handled by the daemon should not be exposed to the Android
+side otherwise you may have conflicts so going with Profile interface
+is probably the way to go, but you will need to know the UUIDs that
+would be handled by Android.
 
--- 
+> Thanks for the feedback, we will revisit this and see if a redesign
+> based on your suggestion is possible.
+>
+> On Thu, Apr 9, 2020 at 11:05 AM Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> >
+> > Hi Sonny,
+> >
+> > > This defines the DBus API that we'll use with BlueZ to create, remove
+> > > and get service records.
+> > > ---
+> > > doc/adapter-api.txt | 46 ++++++++++++++++++++++++++++++++++++++++++++=
++
+> > > doc/device-api.txt  | 37 ++++++++++++++++++++++++++++++++++++
+> > > 2 files changed, 83 insertions(+)
+> > >
+> > > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> > > index acae032d9..6e4c37fc9 100644
+> > > --- a/doc/adapter-api.txt
+> > > +++ b/doc/adapter-api.txt
+> > > @@ -204,6 +204,52 @@ Methods          void StartDiscovery()
+> > >                                        org.bluez.Error.NotReady
+> > >                                        org.bluez.Error.Failed
+> > >
+> > > +             uint32 CreateServiceRecord(dict record)
+> > > +
+> > > +                     This method creates an entry with the local SDP=
+ server
+> > > +                     for this adapter for the specified record. This=
+ method
+> > > +                     will only create the SDP record and not start l=
+istening
+> > > +                     on any ports. It is up to the caller of the met=
+hod to
+> > > +                     ensure the validity of the service record. This=
+ record
+> > > +                     will not be parsed for any validation but will =
+instead
+> > > +                     directly be inserted into the local SDP server=
+=E2=80=99s
+> > > +                     records.
+> > > +
+> > > +                     The return value from this method will be the 3=
+2 bit
+> > > +                     handle for the created service record.
+> > > +
+> > > +                     The record dictionary will have dictionary entr=
+ies of
+> > > +                     the format: {id : (type, size, value)}, where,
+> > > +
+> > > +                     uint16 id:      The 16 bit attribute ID for an
+> > > +                                     attribute.
+> > > +                     uint8 type:     This will contain the type of t=
+he
+> > > +                                     attribute value. Attribute type=
+ values
+> > > +                                     are defined in the Bluetooth sp=
+ec in
+> > > +                                     Volume 3, Part B, 3.2.
+> > > +                     uint32 size:    This is the size of the attribu=
+te
+> > > +                                     value.
+> > > +                     variant value:  This will contain the attribute=
+ value
+> > > +                                     for a given attribute_id. This =
+variant
+> > > +                                     can either contain a primitive =
+type, or
+> > > +                                     if type is SEQUENCE, an array o=
+f struct
+> > > +                                     of the signature (type, size, v=
+alue).
+> > > +
+> > > +                     Possible errors: org.bluez.Error.NotReady
+> > > +                                      org.bluez.Error.AlreadyExists
+> > > +                                      org.bluez.Error.Failed
+> > > +                                      org.bluez.Error.InvalidArgumen=
+ts
+> > > +
+> > > +             void RemoveServiceRecord(uint32 handle)
+> > > +
+> > > +                     This method removes the SDP record with the giv=
+en
+> > > +                     handle from the local SDP server.
+> > > +
+> > > +                     Possible errors: org.bluez.Error.NotReady
+> > > +                                      org.bluez.Error.DoesNotExist
+> > > +                                      org.bluez.Error.Failed
+> > > +                                      org.bluez.Error.InvalidArgumen=
+ts
+> > > +
+> >
+> > so when design the BlueZ 5.x APIs, we on purpose didn=E2=80=99t do this=
+. You are suppose to use doc/profile-api.txt for these kind of things.
+> >
+> > I am not in favor of dangling SDP records where we have no lifetime gua=
+rantee of the service behind it.
+> >
+> > If you look at profiles/iap/main.c then you see how you could write a v=
+endor profile just as easily. That one is the skeleton for iOS accessory pr=
+otocol over Bluetooth.
+> >
+> > > Properties    string Address [readonly]
+> > >
+> > >                       The Bluetooth device address.
+> > > diff --git a/doc/device-api.txt b/doc/device-api.txt
+> > > index ceb68d2f6..e8f2c670d 100644
+> > > --- a/doc/device-api.txt
+> > > +++ b/doc/device-api.txt
+> > > @@ -120,6 +120,43 @@ Methods          void Connect()
+> > >                       Possible errors: org.bluez.Error.DoesNotExist
+> > >                                        org.bluez.Error.Failed
+> > >
+> > > +             array{array{dict}} GetServiceRecords()
+> > > +
+> > > +                     This method returns the complete service record=
+s of all
+> > > +                     discovered BR/EDR services of the connected dev=
+ice till
+> > > +                     now. The return value will be an array of an ar=
+ray of
+> > > +                     dictionary entries. Each nested array of dictio=
+nary
+> > > +                     entries will contain one service record. Each p=
+air in
+> > > +                     the returned dictionary entries will represent =
+an
+> > > +                     attribute in the service record.
+> > > +
+> > > +                     The dictionary entries in the returned array of=
+ entries
+> > > +                     will be of the format: {id : (type, size, value=
+)} where,
+> > > +
+> > > +                     uint16 id:      The 16 bit attribute ID for an
+> > > +                                     attribute.
+> > > +                     uint8 type:     This will contain the type of t=
+he
+> > > +                                     attribute value. Attribute type=
+ values
+> > > +                                     are defined in the Bluetooth sp=
+ec in
+> > > +                                     Volume 3, Part B, 3.2.
+> > > +                     uint32 size:    This is the size of the attribu=
+te
+> > > +                                     value.
+> > > +                     variant value:  This will contain the attribute=
+ value
+> > > +                                     for a given attribute_id. This =
+variant
+> > > +                                     can either contain a primitive =
+type, or
+> > > +                                     if type is SEQUENCE, an array o=
+f struct
+> > > +                                     of the signature (type, size, v=
+alue).
+> > > +
+> > > +                     Since the service record contains the service U=
+UID and
+> > > +                     name, these fields do not need to be given sepa=
+rately.
+> > > +                     This method should be called after the ServiceR=
+esolved
+> > > +                     property for this object has been set to true o=
+therwise
+> > > +                     it may return a partial or stale cached list.
+> > > +
+> > > +                     Possible errors: org.bluez.Error.NotReady
+> > > +                                      org.bluez.Error.NotConnected
+> > > +                                      org.bluez.Error.Failed
+> > > +
+> >
+> > These two things are not related and do not belong in the same patch. H=
+owever what is your goal behind this API since even here we tried not to gi=
+ve raw SDP to the application. It is all baked into the Profile API.
+> >
+> > Regards
+> >
+> > Marcel
+> >
+
+
+
+--=20
 Luiz Augusto von Dentz
