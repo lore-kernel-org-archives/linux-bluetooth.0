@@ -2,136 +2,155 @@ Return-Path: <SRS0=Wpeu=53=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A127C2BB86
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 01:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB69C2BB1D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 01:34:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 530BC20769
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 01:19:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1629620787
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 01:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0o/5Q26"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoKzjQNf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbgDKBTx (ORCPT
+        id S1726825AbgDKBes (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Apr 2020 21:19:53 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:39789 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726701AbgDKBTx (ORCPT
+        Fri, 10 Apr 2020 21:34:48 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:37227 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726641AbgDKBer (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Apr 2020 21:19:53 -0400
-Received: by mail-pj1-f66.google.com with SMTP id o1so512744pjs.4;
-        Fri, 10 Apr 2020 18:19:53 -0700 (PDT)
+        Fri, 10 Apr 2020 21:34:47 -0400
+Received: by mail-pl1-f194.google.com with SMTP id m16so1221772pls.4;
+        Fri, 10 Apr 2020 18:34:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=q76ZSajaC/YJBLj5bVJ6v4ueopAFGHt7xFuqf9dHOiA=;
-        b=m0o/5Q26w51bz/i8QX0xLdmc8c3ZYgQccVoUadlaBxY5748EImtGd6leTW9Trq0L7O
-         T6OXGpCYgjCUaVDw8a89mvZE7VJIXkXjrFtBrmuxRophoecdwdlGtcKQpitmeAQgfyBK
-         b1DU3fYHeyvYuKUb2EKYjgxkzE6d4eeqGsLa4f6KGuG9Gw6aoPXzOAEFNakP9FTb/uRZ
-         Ho1V2iOo/MH/G/MvLUKobVlSBqIY+dNcL0CSE/UavvRdVZa8sEaUbHUnAeafwGKtc2mW
-         i4xU45QmCyUylww0kfcEO+yYjymJGqISK3NP1Schr/e2rUXOEHhIN3HSbvDz5CSuBwn3
-         jd3w==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=gBHPPwCq78xfwPO4a6aoSvQF9RjVjmF6Ed9dcBshSdA=;
+        b=IoKzjQNfjHm+WfS+8cWjjtPOszNAMydpftTTJ+WeqX/GK1TgHMC40CMLZRFHHW0vPO
+         3zmK0cSW0lotU3q26Ng3vEL7FtGw0mIkieTR53J/iG8C1ge7CTUEpImvEGUaj0DKdT4l
+         RxpXgd/aArieIQZ5BVJkhC4qoR3g1gVHc+nK3lRFeusXKgZc+BllrSiaC/T8KHLkrXta
+         acfhBFUGJ0YJtABRz5qdobQyc3EiImZLdCkZigl9MZMrzp+Od1ebqLoXv4hJg5kSr2le
+         aRWKfu0PmFxN56HV1reSabJopufIXhCcaj0tPZbku/qtrpT/AjHdcVJjhgQCuNSFetDY
+         4F7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=q76ZSajaC/YJBLj5bVJ6v4ueopAFGHt7xFuqf9dHOiA=;
-        b=CZj4SJ9PuBENuH6efh1xlsG3PUCg+MuevimkpzdbkkBu0TSVIzqwi6xhiHOuTE+UiZ
-         vysHyKVxXiC3pRHQWivXg/W3fzx1OTLwUWP31yehGW5Jx0ajPeD9Ra/GfAzEA+bUoLCR
-         QwHfYoKfpm1iA7V2bBqHMdbJJ6gnMY0HCqyHrCc4B9H4hA410A+JenKIy75s61ElquXs
-         vOg8Z1A2+oBGYsf9irUjkwNZnMfiTMvNI5wycK4CNbJj1OGatbuDdrSGGZ1ZiPI+7Tx1
-         fFNleDbhXxqjWLu3uszYv/+oklsmd3TAfshdRfkqhtHGeJJKHDrsjELcgzjko1PQ2HBK
-         UODQ==
-X-Gm-Message-State: AGi0PuYoWNZAJFXHEwBVTzIF4xTZfoMExT/Mi6bzmJAVd4PTK30n4jGc
-        0b1eRejl0Q+xAusL+R6BOuM=
-X-Google-Smtp-Source: APiQypLV+LFP74oTLjRpgu3lSxCWC5nNL7O5GpBPXhJclCHv0BTdgEhV3lV0B7jZupzjYMe591ttmA==
-X-Received: by 2002:a17:90b:90e:: with SMTP id bo14mr8406843pjb.104.1586567992343;
-        Fri, 10 Apr 2020 18:19:52 -0700 (PDT)
-Received: from i7.zsun.org ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id e187sm2879946pfe.50.2020.04.10.18.19.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Apr 2020 18:19:51 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] Bluetooth: btrtl: Add support for RTL8761B
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, icenowy@aosc.io
-References: <20200410145420.108868-1-sztsian@gmail.com>
- <20200410145420.108868-2-sztsian@gmail.com>
- <5CD9EBAA-44A6-4DFF-870E-4F862FB7A60E@holtmann.org>
-From:   Zamir SUN <sztsian@gmail.com>
-Message-ID: <bb48d88a-3b4f-dfa6-bbed-777a76d072ed@gmail.com>
-Date:   Sat, 11 Apr 2020 09:19:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=gBHPPwCq78xfwPO4a6aoSvQF9RjVjmF6Ed9dcBshSdA=;
+        b=di3iUPyHh9zCOz0fNKd3ZIoa0bGSX3mOezhwnOOOew3oZEaoy9XHo5rDFrZ8EHp/c+
+         o88fOIx87/mJHxBD58p7h11q0QB1qKHCdOWns6UKdcb/I53jQzgCYvWVASBTWzTtIw/1
+         nm/015Ao5cJNtSzVKw7eCLq3+JuWnnrJ2wzYDiKF/EjWhDf8c/czk1UvzR2tLs3yu2Uj
+         vCNeg6fDGXj6twvxvm+oqrLj9Zwu+Z0vvsm9s3oSlkzXTew0ZiK2JhqdkDIOiilVLivp
+         AwLDsweywO9uP35dufqOk4zzoDWDqdnPm+VvPh1Ns707cZ2/MPC4uox7a4RQTVVkAHqb
+         SIiA==
+X-Gm-Message-State: AGi0Puah8wVjTC1eoZ1PoPuJPN9sgMo2GX/1kC7Ck1GnLmrt5fyhrvMu
+        5DhlT1LWzUClehh7ES/4Jx0=
+X-Google-Smtp-Source: APiQypI77CljKvDt7/vaFIH1lureibakn9/s2eRumy5dVl7uiVKkCEWQzDFrIpRJ2mkurlPQLEdqhA==
+X-Received: by 2002:a17:90a:33c1:: with SMTP id n59mr8206521pjb.4.1586568887058;
+        Fri, 10 Apr 2020 18:34:47 -0700 (PDT)
+Received: from i7.zsun.org.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id mg20sm2808571pjb.12.2020.04.10.18.34.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2020 18:34:46 -0700 (PDT)
+From:   sztsian@gmail.com
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Cc:     sztsian@gmail.com, linux-kernel@vger.kernel.org, icenowy@aosc.io
+Subject: [PATCH v3 1/1] Bluetooth: btrtl: Add support for RTL8761B
+Date:   Sat, 11 Apr 2020 09:34:27 +0800
+Message-Id: <20200411013427.152103-2-sztsian@gmail.com>
+X-Mailer: git-send-email 2.25.2
+In-Reply-To: <20200411013427.152103-1-sztsian@gmail.com>
+References: <20200411013427.152103-1-sztsian@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5CD9EBAA-44A6-4DFF-870E-4F862FB7A60E@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: "Ziqian SUN (Zamir)" <sztsian@gmail.com>
 
+Add new compatible device RTL8761B. RTL8761B is a USB Bluetooth device,
+with support of BLE and BR/EDR. The USB info is
 
-On 4/11/20 1:36 AM, Marcel Holtmann wrote:
-> Hi Zamir,
-> 
->> Add new compatible device RTL8761B.
->>
->> Signed-off-by: Ziqian SUN (Zamir) <sztsian@gmail.com>
->> ---
->> drivers/bluetooth/btrtl.c | 10 +++++++++-
->> 1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> can you also please include the content of /sys/kernel/debug/usb/devices for this device in the commit message.
-> 
-> And if you run btmon before plugging it in, I like to see what LE Features of Bluetooth 5.0 this dongle really offers.
-> 
+T:  Bus=03 Lev=04 Prnt=04 Port=00 Cnt=01 Dev#= 29 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=8771 Rev= 2.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=XXXXXXXXXXXX
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Hi Marcel,
+Signed-off-by: Ziqian SUN (Zamir) <sztsian@gmail.com>
+---
 
-I think you want this section
+Changes since v2: Add USB info in commit message
+Changes since v1: Add the firmware info
 
-         Supported settings: 0x0001bfff
-           Powered
-           Connectable
-           Fast Connectable
-           Discoverable
-           Bondable
-           Link Security
-           Secure Simple Pairing
-           BR/EDR
-           High Speed
-           Low Energy
-           Advertising
-           Secure Connections
-           Debug Keys
-           Privacy
-           Static Address
-           PHY Configuration
+ drivers/bluetooth/btrtl.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Full log of btmon is available here, with the mac address masked 
-http://fars.ee/Lu85
-
-I'll send a v3 to include the usb info in the commit message shortly.
-
-> Regards
-> 
-> Marcel
-> 
-
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 67f4bc21e7c5..3a9afc905f24 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -130,12 +130,19 @@ static const struct id_table ic_id_table[] = {
+ 	  .cfg_name = "rtl_bt/rtl8821c_config" },
+ 
+ 	/* 8761A */
+-	{ IC_MATCH_FL_LMPSUBV, RTL_ROM_LMP_8761A, 0x0,
++	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8761a_config" },
+ 
++	/* 8761B */
++	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb),
++	  .config_needed = false,
++	  .has_rom_version = true,
++	  .fw_name  = "rtl_bt/rtl8761b_fw.bin",
++	  .cfg_name = "rtl_bt/rtl8761b_config" },
++
+ 	/* 8822C with UART interface */
+ 	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+ 			 IC_MATCH_FL_HCIBUS,
+@@ -267,6 +274,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 		{ RTL_ROM_LMP_8723B, 9 },	/* 8723D */
+ 		{ RTL_ROM_LMP_8821A, 10 },	/* 8821C */
+ 		{ RTL_ROM_LMP_8822B, 13 },	/* 8822C */
++		{ RTL_ROM_LMP_8761A, 14 },	/* 8761B */
+ 	};
+ 
+ 	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
 -- 
-Zamir SUN
-Fedora user
-GPG : 1D86 6D4A 49CE 4BBD 72CF FCF5 D856 6E11 F2A0 525E
+2.25.2
+
