@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39A3C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 138BFC352B6
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8420320757
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E26382166E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586646933;
-	bh=j/J7T8YddQ1GP3noX8Bur2iaAUFZ2iuLy0+IRzGiSN4=;
+	s=default; t=1586646940;
+	bh=aaN96EKa2gab1A+LXy1oLhJRXKsqyeX4QSCnfKoqnJ4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=d6/82cL3uXtEOzhXUkGojy9AjwXoXEFnyylKCZGy3QKiCyRgSo6SdxJlyuHaI9tPA
-	 VWI3BQi+9SfvNlPbO1v+e4/1+/4ULDrlxgyEtysnPFFBZrA/yV0wAAvTYdZo+aXd6P
-	 ec0g+4W3MEQjyZs+wL/coLQzBIG2qybzT9Al+otE=
+	b=z0YnGKdNhuOa1OYtges0RZ2cl1urK5MtDTuy8KPwaAZs9llnIMk3C4orpJIiRPyj1
+	 tGldit+XGBWQpGWWi+sVRT82QbARQVqy2PK9iCV3Nr74t/4hI5Dc0yvRfUCEYvGJUh
+	 KVdjFZe3JloTaWSxe4bXgk1WRjnlYANHQujjKBE4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730944AbgDKXPE (ORCPT
+        id S1730658AbgDKXPe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:15:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57330 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:15:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57150 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730574AbgDKXPD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:15:03 -0400
+        id S1730174AbgDKXPB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:15:01 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B716F216FD;
-        Sat, 11 Apr 2020 23:15:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7A8802166E;
+        Sat, 11 Apr 2020 23:15:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646903;
-        bh=j/J7T8YddQ1GP3noX8Bur2iaAUFZ2iuLy0+IRzGiSN4=;
+        s=default; t=1586646901;
+        bh=aaN96EKa2gab1A+LXy1oLhJRXKsqyeX4QSCnfKoqnJ4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZZ2gT/aBD3Grtbb5c7B6fnG4ZoTcAj6v3Nr9PulpwuByrjS5Ml1O6fInPrcAQpNL0
-         4ntH8U2wE69IyKwYsM34gWdlMwLUDV/DL0SVXs2JIy9xHE4tZvXpbPnE+2j4FjD4tX
-         hHigmy1oAmvef3/xOTd6kg1giObHcRBwD3YvBs1M=
+        b=pxJIbVoT77ZPq31LWCblRFkgSWfDa/7tvFRn8eQh7Y9f5NkQKcZPI2X+ZXnk+T8Se
+         lsZZ2lUU5ZWyxcyogiGc7CqF4MsWpkGEIuR1lsaWKJcpXiYqMIUzPbLYgwhu5K74KA
+         aOnPTohFsYkx1aeQe9bZC1iGX8BgFlOjMRoJZ8Oc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Qiujun Huang <hqjagain@gmail.com>,
-        syzbot+4496e82090657320efc6@syzkaller.appspotmail.com,
-        Hillf Danton <hdanton@sina.com>,
+Cc:     Sergey Shatunov <me@prok.pw>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 13/16] Bluetooth: RFCOMM: fix ODEBUG bug in rfcomm_dev_ioctl
-Date:   Sat, 11 Apr 2020 19:14:43 -0400
-Message-Id: <20200411231447.27182-13-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 11/16] Bluetooth: btusb: Add support for 13d3:3548 Realtek 8822CE device
+Date:   Sat, 11 Apr 2020 19:14:41 -0400
+Message-Id: <20200411231447.27182-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411231447.27182-1-sashal@kernel.org>
 References: <20200411231447.27182-1-sashal@kernel.org>
@@ -62,38 +60,63 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Qiujun Huang <hqjagain@gmail.com>
+From: Sergey Shatunov <me@prok.pw>
 
-[ Upstream commit 71811cac8532b2387b3414f7cd8fe9e497482864 ]
+[ Upstream commit eb3939e386ec8df6049697d388298590231ac79c ]
 
-Needn't call 'rfcomm_dlc_put' here, because 'rfcomm_dlc_exists' didn't
-increase dlc->refcnt.
+The ASUS FX505DV laptop contains RTL8822CE device with an
+associated BT chip using a USB ID of 13d3:3548.
+This patch add fw download support for it.
 
-Reported-by: syzbot+4496e82090657320efc6@syzkaller.appspotmail.com
-Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
-Suggested-by: Hillf Danton <hdanton@sina.com>
+T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3548 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Sergey Shatunov <me@prok.pw>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/rfcomm/tty.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 8e385a0ae60e0..939fbf7b352d4 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -413,10 +413,8 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
- 		dlc = rfcomm_dlc_exists(&req.src, &req.dst, req.channel);
- 		if (IS_ERR(dlc))
- 			return PTR_ERR(dlc);
--		else if (dlc) {
--			rfcomm_dlc_put(dlc);
-+		if (dlc)
- 			return -EBUSY;
--		}
- 		dlc = rfcomm_dlc_alloc(GFP_KERNEL);
- 		if (!dlc)
- 			return -ENOMEM;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7039a58a6a4ec..cc133863c7fce 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -355,6 +355,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Additional Realtek 8822CE Bluetooth devices */
+ 	{ USB_DEVICE(0x04ca, 0x4005), .driver_info = BTUSB_REALTEK },
++	{ USB_DEVICE(0x13d3, 0x3548), .driver_info = BTUSB_REALTEK },
+ 
+ 	/* Silicon Wave based devices */
+ 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
 -- 
 2.20.1
 
