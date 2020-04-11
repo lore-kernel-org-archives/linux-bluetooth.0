@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A697C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C793C352B6
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 621FC206E9
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BF552051A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648257;
-	bh=t7cIWUb42ZwzSGKMzGbVwz0yuANHChXgEkTj7EQFjCk=;
+	s=default; t=1586648347;
+	bh=Kizk2/Fv7hSjSy8fA563sh+njifOHYQfB2KVSk9Tlis=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=tBTUDrNf0IcYnSVm+xJWd+2V10Aqx4H3aCueCwxdmm3KgHui8P0JPOuYu5SQVnOqw
-	 MtSCRUwhIiVnTgkXo6Dz6YZhbY+LgEOri0QoPzBdNNna38ACJzbztWj/0CeMjzjLzS
-	 7AVCQmbr/WhUegIdS4lShTaU9jb+OUXkXWF/+D94=
+	b=mt5ZnSrgvaB+I4c3s4gfJgMvB7LtnfoXgMc3tfzkgFfCrePH8qDlj9VpxoKLgyMnc
+	 p+skcLfF/1blAF50+cWDnwTs+eiiMGoSLI5t/WsV8irlhzaKN7kszh5Y+0Ao6bzxQc
+	 c89dOFiax3J+u73oBmEdTykngag27H24G+iuepTM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728887AbgDKXIR (ORCPT
+        id S1728736AbgDKXHs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:08:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44888 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:07:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44052 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728879AbgDKXIP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:08:15 -0400
+        id S1728727AbgDKXHs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:07:48 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2B5A3214D8;
-        Sat, 11 Apr 2020 23:08:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 761F821D81;
+        Sat, 11 Apr 2020 23:07:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646495;
-        bh=t7cIWUb42ZwzSGKMzGbVwz0yuANHChXgEkTj7EQFjCk=;
+        s=default; t=1586646468;
+        bh=Kizk2/Fv7hSjSy8fA563sh+njifOHYQfB2KVSk9Tlis=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JFHEsb7T60TX5YL53/XYLfDp74U9VIheFRUMcpOKkmvuc+BBgrH1ybAVyvC3qgvFw
-         KUIhgB6qv115581I46EG1IobbidPaPYoLefK4ZfGlomu6X91gP8lLvXWFZ3/3WkhuO
-         160/clAvlY4HM8Dt31BM72iymVmoU24ngEMTVMWc=
+        b=aDFgbOjN6JR11Ltv9nKOats769awxRmPF6S7GP20FlPbTANO7aXbPg6CtTtff5CGi
+         g3Djs9A04YjmEJVhRPXg8qhl2yQaaBoepHycpDCiskkqJztyXhBXT1LGAgvMZhLEZx
+         G8+8iOG4frTwrn6R8fHQMrWmxTAd18/CuiieJOgU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sergey Shatunov <me@prok.pw>,
+Cc:     Alain Michaud <alainm@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 058/121] Bluetooth: btusb: Add support for 13d3:3548 Realtek 8822CE device
-Date:   Sat, 11 Apr 2020 19:06:03 -0400
-Message-Id: <20200411230706.23855-58-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 035/121] Bluetooth: guard against controllers sending zero'd events
+Date:   Sat, 11 Apr 2020 19:05:40 -0400
+Message-Id: <20200411230706.23855-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
 References: <20200411230706.23855-1-sashal@kernel.org>
@@ -60,63 +60,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sergey Shatunov <me@prok.pw>
+From: Alain Michaud <alainm@chromium.org>
 
-[ Upstream commit eb3939e386ec8df6049697d388298590231ac79c ]
+[ Upstream commit 08bb4da90150e2a225f35e0f642cdc463958d696 ]
 
-The ASUS FX505DV laptop contains RTL8822CE device with an
-associated BT chip using a USB ID of 13d3:3548.
-This patch add fw download support for it.
+Some controllers have been observed to send zero'd events under some
+conditions.  This change guards against this condition as well as adding
+a trace to facilitate diagnosability of this condition.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3548 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Sergey Shatunov <me@prok.pw>
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/hci_event.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a6dad2f6995ae..317167d0e5d6b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -386,6 +386,7 @@ static const struct usb_device_id blacklist_table[] = {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c1d3a303d97fb..34d312ae3c61d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5833,6 +5833,11 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	u8 status = 0, event = hdr->evt, req_evt = 0;
+ 	u16 opcode = HCI_OP_NOP;
  
- 	/* Additional Realtek 8822CE Bluetooth devices */
- 	{ USB_DEVICE(0x04ca, 0x4005), .driver_info = BTUSB_REALTEK },
-+	{ USB_DEVICE(0x13d3, 0x3548), .driver_info = BTUSB_REALTEK },
++	if (!event) {
++		bt_dev_warn(hdev, "Received unexpected HCI Event 00000000");
++		goto done;
++	}
++
+ 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
+ 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
+ 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+@@ -6044,6 +6049,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		req_complete_skb(hdev, status, opcode, orig_skb);
+ 	}
  
- 	/* Silicon Wave based devices */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
++done:
+ 	kfree_skb(orig_skb);
+ 	kfree_skb(skb);
+ 	hdev->stat.evt_rx++;
 -- 
 2.20.1
 
