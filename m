@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91ED4C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8BBC2BB86
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:49:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E1A6206F7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 372FD206F7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:49:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648924;
-	bh=y2WP1ZoPLBwcLxa4xv2pNeLO6sX+XIwR+YpQ2dz3WOc=;
+	s=default; t=1586648955;
+	bh=v0lhd/YQhcUoOo7GSiP6uhWG0La2CEW5ZEZ2AQfLXnQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cK+kZyyMwUSDcJnT5ptW8+OCxIwDZl+ysTNPQFhI62L+KB1urM8bQzJ/7Lno4Egzz
-	 xUL3PQp2NoAgBIis+34xPfwDDwKrrhO1zi8a7ylDHqjvFd9YSYVhkaiA6WZxNy3QiJ
-	 Skw7iXAviaKWoiCvZJKIySbYyuzxndkYXDNU1PgE=
+	b=lVvHqRjqkUoJw677/KN1H0xEbd5HV94glWho3U+/olGqYwdRUlp2OijmNcxsxgJUl
+	 TxUC6SBh3uR9deKRecbx2JYVNhxGeciXZC8D8mcyETWOHY1rJaWNwtXBFFb9hK8kd4
+	 Lggp1b6Oq4BUqX7ki+ru3HSmAkoAlPhL/lhbijdo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727234AbgDKXEd (ORCPT
+        id S1727171AbgDKXE1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:04:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37978 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:04:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37800 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727228AbgDKXEd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:04:33 -0400
+        id S1727146AbgDKXEZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:04:25 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A54EF20CC7;
-        Sat, 11 Apr 2020 23:04:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 618C82173E;
+        Sat, 11 Apr 2020 23:04:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646273;
-        bh=y2WP1ZoPLBwcLxa4xv2pNeLO6sX+XIwR+YpQ2dz3WOc=;
+        s=default; t=1586646265;
+        bh=v0lhd/YQhcUoOo7GSiP6uhWG0La2CEW5ZEZ2AQfLXnQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jB873pT2z3i69UbRW9sLHMS0mlNCMODSNdd8gSP+dHCnDRR0ZdMKxV9XOarZMzy30
-         DtUMDy5CUcVYf4QHqcsD7KEMxR6WL+bLNEGrsjpZD91Afx26dVRztqTi+QuYWUhZUv
-         7N/Aanb4wECv+eg83SJWJSPFzMRxT6z+1uG0HpRc=
+        b=DFFLNg8sbVgat7vOkARH//p6VY+udArgY7gC2wB5ICvlIKj3ywoFv5g5SM2Q6Wi0R
+         Fv3ooISFmEMveOh92SAw1I+aKhWRsFqssXcrM66oDVka4qQ7pYZnctHOBEY9+cFOW2
+         /Ivwdct7fnKI7cQEv3xH/l4ADqJ2K1nhuOfLBWIU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@intel.com>,
+Cc:     Howard Chung <howardchung@google.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 037/149] Bluetooth: Fix calculation of SCO handle for packet processing
-Date:   Sat, 11 Apr 2020 19:01:54 -0400
-Message-Id: <20200411230347.22371-37-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 030/149] Bluetooth: L2CAP: handle l2cap config request during open state
+Date:   Sat, 11 Apr 2020 19:01:47 -0400
+Message-Id: <20200411230347.22371-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
 References: <20200411230347.22371-1-sashal@kernel.org>
@@ -60,44 +60,173 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Howard Chung <howardchung@google.com>
 
-[ Upstream commit debdedf2eb5a2d9777cabff40900772be13cd9f9 ]
+[ Upstream commit 96298f640104e4cd9a913a6e50b0b981829b94ff ]
 
-When processing SCO packets, the handle is wrongly assumed as 16-bit
-value. The actual size is 12-bits and the other 4-bits are used for
-packet flags.
+According to Core Spec Version 5.2 | Vol 3, Part A 6.1.5,
+the incoming L2CAP_ConfigReq should be handled during
+OPEN state.
 
+The section below shows the btmon trace when running
+L2CAP/COS/CFD/BV-12-C before and after this change.
+
+=== Before ===
+...
+> ACL Data RX: Handle 256 flags 0x02 dlen 12                #22
+      L2CAP: Connection Request (0x02) ident 2 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+< ACL Data TX: Handle 256 flags 0x00 dlen 16                #23
+      L2CAP: Connection Response (0x03) ident 2 len 8
+        Destination CID: 64
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 256 flags 0x00 dlen 12                #24
+      L2CAP: Configure Request (0x04) ident 2 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5      #25
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5      #26
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 16                #27
+      L2CAP: Configure Request (0x04) ident 3 len 8
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00                                            ..
+< ACL Data TX: Handle 256 flags 0x00 dlen 18                #28
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+> HCI Event: Number of Completed Packets (0x13) plen 5      #29
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 14                #30
+      L2CAP: Configure Response (0x05) ident 2 len 6
+        Source CID: 64
+        Flags: 0x0000
+        Result: Success (0x0000)
+> ACL Data RX: Handle 256 flags 0x02 dlen 20                #31
+      L2CAP: Configure Request (0x04) ident 3 len 12
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00 91 02 11 11                                ......
+< ACL Data TX: Handle 256 flags 0x00 dlen 14                #32
+      L2CAP: Command Reject (0x01) ident 3 len 6
+        Reason: Invalid CID in request (0x0002)
+        Destination CID: 64
+        Source CID: 65
+> HCI Event: Number of Completed Packets (0x13) plen 5      #33
+        Num handles: 1
+        Handle: 256
+        Count: 1
+...
+=== After ===
+...
+> ACL Data RX: Handle 256 flags 0x02 dlen 12               #22
+      L2CAP: Connection Request (0x02) ident 2 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+< ACL Data TX: Handle 256 flags 0x00 dlen 16               #23
+      L2CAP: Connection Response (0x03) ident 2 len 8
+        Destination CID: 64
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 256 flags 0x00 dlen 12               #24
+      L2CAP: Configure Request (0x04) ident 2 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5     #25
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5     #26
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 16               #27
+      L2CAP: Configure Request (0x04) ident 3 len 8
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00                                            ..
+< ACL Data TX: Handle 256 flags 0x00 dlen 18               #28
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+> HCI Event: Number of Completed Packets (0x13) plen 5     #29
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 14               #30
+      L2CAP: Configure Response (0x05) ident 2 len 6
+        Source CID: 64
+        Flags: 0x0000
+        Result: Success (0x0000)
+> ACL Data RX: Handle 256 flags 0x02 dlen 20               #31
+      L2CAP: Configure Request (0x04) ident 3 len 12
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00 91 02 11 11                                .....
+< ACL Data TX: Handle 256 flags 0x00 dlen 18               #32
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+< ACL Data TX: Handle 256 flags 0x00 dlen 12               #33
+      L2CAP: Configure Request (0x04) ident 3 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5     #34
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5     #35
+        Num handles: 1
+        Handle: 256
+        Count: 1
+...
+
+Signed-off-by: Howard Chung <howardchung@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cbbc34a006d16..28b0ed6b10f66 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4387,13 +4387,16 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_sco_hdr *hdr = (void *) skb->data;
- 	struct hci_conn *conn;
--	__u16 handle;
-+	__u16 handle, flags;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 195459a1e53ef..4e3ce6273973b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4181,7 +4181,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		return 0;
+ 	}
  
- 	skb_pull(skb, HCI_SCO_HDR_SIZE);
- 
- 	handle = __le16_to_cpu(hdr->handle);
-+	flags  = hci_flags(handle);
-+	handle = hci_handle(handle);
- 
--	BT_DBG("%s len %d handle 0x%4.4x", hdev->name, skb->len, handle);
-+	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
-+	       handle, flags);
- 
- 	hdev->stat.sco_rx++;
- 
+-	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
++	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
++	    chan->state != BT_CONNECTED) {
+ 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
+ 				       chan->dcid);
+ 		goto unlock;
 -- 
 2.20.1
 
