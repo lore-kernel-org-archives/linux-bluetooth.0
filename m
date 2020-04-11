@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F098C2BBFD
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B39A3C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F2042166E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8420320757
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:15:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586646776;
-	bh=IvlAPJhpYEn2ikijRvMCZL3uzCia8LH0darRJog/0FA=;
+	s=default; t=1586646933;
+	bh=j/J7T8YddQ1GP3noX8Bur2iaAUFZ2iuLy0+IRzGiSN4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FmZhZ+u+EYA7oz3S+82VrxOhzrGDYr4GTFsGABNZxXnAKEo2LW11xc7INPnuyy0hq
-	 8MFWvfHTcZaO3lU5JS7hMMdvKMNKILizAi01NoTgVnAUhBdNt0zCWNnwxZOfASFKaf
-	 SkhLp0MHnscxP7UaQzxi8tbtlGnGfXYnGHU+2tVU=
+	b=d6/82cL3uXtEOzhXUkGojy9AjwXoXEFnyylKCZGy3QKiCyRgSo6SdxJlyuHaI9tPA
+	 VWI3BQi+9SfvNlPbO1v+e4/1+/4ULDrlxgyEtysnPFFBZrA/yV0wAAvTYdZo+aXd6P
+	 ec0g+4W3MEQjyZs+wL/coLQzBIG2qybzT9Al+otE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730278AbgDKXMy (ORCPT
+        id S1730944AbgDKXPE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:12:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53528 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:15:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57330 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730272AbgDKXMy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:12:54 -0400
+        id S1730574AbgDKXPD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:15:03 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3D5DA21835;
-        Sat, 11 Apr 2020 23:12:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B716F216FD;
+        Sat, 11 Apr 2020 23:15:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646774;
-        bh=IvlAPJhpYEn2ikijRvMCZL3uzCia8LH0darRJog/0FA=;
+        s=default; t=1586646903;
+        bh=j/J7T8YddQ1GP3noX8Bur2iaAUFZ2iuLy0+IRzGiSN4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gE2+f3FyaKfWUHyNItEXT2w0miSCkLaULwWmc0qtImKmNvX68TWogngKNz62Qrrnc
-         hI9H2jSQNp93n7Jcbo0Y9VYM5sEM8cMLk+6xvLTMz6o9WLc6G6T8Cf7wG0wEf4Zb0j
-         yIgrdEXdx1c3MyXVjoXbJus0GO7mgrmNI7GCf6lk=
+        b=ZZ2gT/aBD3Grtbb5c7B6fnG4ZoTcAj6v3Nr9PulpwuByrjS5Ml1O6fInPrcAQpNL0
+         4ntH8U2wE69IyKwYsM34gWdlMwLUDV/DL0SVXs2JIy9xHE4tZvXpbPnE+2j4FjD4tX
+         hHigmy1oAmvef3/xOTd6kg1giObHcRBwD3YvBs1M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Qiujun Huang <hqjagain@gmail.com>,
@@ -47,12 +47,12 @@ Cc:     Qiujun Huang <hqjagain@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 41/66] Bluetooth: RFCOMM: fix ODEBUG bug in rfcomm_dev_ioctl
-Date:   Sat, 11 Apr 2020 19:11:38 -0400
-Message-Id: <20200411231203.25933-41-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 13/16] Bluetooth: RFCOMM: fix ODEBUG bug in rfcomm_dev_ioctl
+Date:   Sat, 11 Apr 2020 19:14:43 -0400
+Message-Id: <20200411231447.27182-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411231203.25933-1-sashal@kernel.org>
-References: <20200411231203.25933-1-sashal@kernel.org>
+In-Reply-To: <20200411231447.27182-1-sashal@kernel.org>
+References: <20200411231447.27182-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -79,7 +79,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 5e44d842cc5d0..cf0ccd05329c7 100644
+index 8e385a0ae60e0..939fbf7b352d4 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
 @@ -413,10 +413,8 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
