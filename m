@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F47C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91ED4C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1AA74206F7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E1A6206F7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648912;
-	bh=S6TKNCCtj26VouFt79OMxAj/QJCUGWiEe3uRGuZdZhk=;
+	s=default; t=1586648924;
+	bh=y2WP1ZoPLBwcLxa4xv2pNeLO6sX+XIwR+YpQ2dz3WOc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jYjDZYvpSCr2G721/EqcbE7YZYHRwg+7mvIMVpgIjtgCd/LePJhNPLmARNbBEA9w+
-	 ONvAxqVkDucx/CTevHYywjtYDyw1Tf33mAShvwcZe43h5/k9+pyVcjiKrl45rCIp9f
-	 iomCm6wynwGCXuW7bO3ff+tiAlnYKqkrX9u+/aYw=
+	b=cK+kZyyMwUSDcJnT5ptW8+OCxIwDZl+ysTNPQFhI62L+KB1urM8bQzJ/7Lno4Egzz
+	 xUL3PQp2NoAgBIis+34xPfwDDwKrrhO1zi8a7ylDHqjvFd9YSYVhkaiA6WZxNy3QiJ
+	 Skw7iXAviaKWoiCvZJKIySbYyuzxndkYXDNU1PgE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbgDKXEl (ORCPT
+        id S1727234AbgDKXEd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:04:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38228 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:04:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37978 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727314AbgDKXEk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:04:40 -0400
+        id S1727228AbgDKXEd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:04:33 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 41C2621744;
-        Sat, 11 Apr 2020 23:04:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A54EF20CC7;
+        Sat, 11 Apr 2020 23:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646280;
-        bh=S6TKNCCtj26VouFt79OMxAj/QJCUGWiEe3uRGuZdZhk=;
+        s=default; t=1586646273;
+        bh=y2WP1ZoPLBwcLxa4xv2pNeLO6sX+XIwR+YpQ2dz3WOc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Lz8BnSDtGK6qw8soZ0jQLurvrRdMhV1JHmBdJlibBDJjy++nJmsOXkSio8U6/bCDH
-         KbpWYz0pFLWJy8vQb2kxKcMYWVVk8DKzOCWshlBWQ/pijvQ74ZiD0xnN3CcUKuMguZ
-         jlPvIukoRvp3/Oy3AUil14+pUsgbXirTjB7KEEHc=
+        b=jB873pT2z3i69UbRW9sLHMS0mlNCMODSNdd8gSP+dHCnDRR0ZdMKxV9XOarZMzy30
+         DtUMDy5CUcVYf4QHqcsD7KEMxR6WL+bLNEGrsjpZD91Afx26dVRztqTi+QuYWUhZUv
+         7N/Aanb4wECv+eg83SJWJSPFzMRxT6z+1uG0HpRc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Rocky Liao <rjliao@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@intel.com>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 043/149] Bluetooth: btqca: Fix the NVM baudrate tag offcet for wcn3991
-Date:   Sat, 11 Apr 2020 19:02:00 -0400
-Message-Id: <20200411230347.22371-43-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 037/149] Bluetooth: Fix calculation of SCO handle for packet processing
+Date:   Sat, 11 Apr 2020 19:01:54 -0400
+Message-Id: <20200411230347.22371-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
 References: <20200411230347.22371-1-sashal@kernel.org>
@@ -60,62 +60,44 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Rocky Liao <rjliao@codeaurora.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 
-[ Upstream commit b63882549b2bf2979cb1506bdf783edf8b45c613 ]
+[ Upstream commit debdedf2eb5a2d9777cabff40900772be13cd9f9 ]
 
-The baudrate set byte of wcn3991 in the NVM tag is byte 1, not byte 2.
-This patch will set correct byte for wcn3991.
+When processing SCO packets, the handle is wrongly assumed as 16-bit
+value. The actual size is 12-bits and the other 4-bits are used for
+packet flags.
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btqca.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index ec69e5dd7bd3e..a16845c0751d3 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -139,7 +139,7 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
- EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
- 
- static void qca_tlv_check_data(struct qca_fw_config *config,
--				const struct firmware *fw)
-+		const struct firmware *fw, enum qca_btsoc_type soc_type)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cbbc34a006d16..28b0ed6b10f66 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4387,13 +4387,16 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	const u8 *data;
- 	u32 type_len;
-@@ -148,6 +148,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
- 	struct tlv_type_hdr *tlv;
- 	struct tlv_type_patch *tlv_patch;
- 	struct tlv_type_nvm *tlv_nvm;
-+	uint8_t nvm_baud_rate = config->user_baud_rate;
+ 	struct hci_sco_hdr *hdr = (void *) skb->data;
+ 	struct hci_conn *conn;
+-	__u16 handle;
++	__u16 handle, flags;
  
- 	tlv = (struct tlv_type_hdr *)fw->data;
+ 	skb_pull(skb, HCI_SCO_HDR_SIZE);
  
-@@ -216,7 +217,10 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
- 				tlv_nvm->data[0] |= 0x80;
+ 	handle = __le16_to_cpu(hdr->handle);
++	flags  = hci_flags(handle);
++	handle = hci_handle(handle);
  
- 				/* UART Baud Rate */
--				tlv_nvm->data[2] = config->user_baud_rate;
-+				if (soc_type == QCA_WCN3991)
-+					tlv_nvm->data[1] = nvm_baud_rate;
-+				else
-+					tlv_nvm->data[2] = nvm_baud_rate;
+-	BT_DBG("%s len %d handle 0x%4.4x", hdev->name, skb->len, handle);
++	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
++	       handle, flags);
  
- 				break;
+ 	hdev->stat.sco_rx++;
  
-@@ -354,7 +358,7 @@ static int qca_download_firmware(struct hci_dev *hdev,
- 		return ret;
- 	}
- 
--	qca_tlv_check_data(config, fw);
-+	qca_tlv_check_data(config, fw, soc_type);
- 
- 	segment = fw->data;
- 	remain = fw->size;
 -- 
 2.20.1
 
