@@ -4,53 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62978C2BB86
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC25C2BB86
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:29:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32CF92084D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9DC6206E9
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:29:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586647486;
-	bh=xqdDMXafI/lJR1TnjvBCsxh6zD3S8/yOI985BQtRjFs=;
+	s=default; t=1586647759;
+	bh=dYxTGFLO18XEoHMGcD97ucFQmH0G9hApwYyAukMl4HE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=j+z+RIFvOvmEltuP2Mi62pJ3kHPPO4M9rhlm8b3kVrccgj2Nr89I3tWAKeLo6Lcxt
-	 5tuP+wrMyC/bctDw3KGHBAQUndf7zSI4UE3ygMV1FS4eWcWjFn+qcKuV1ntDIulU3F
-	 MM6C7OrQCjddW2b647bAsgwZIaZWBtcF3uUpdMUY=
+	b=lpvwnhPeQPSWMVonU8KwEBL5UXvUbprQ3vtj77TXBeHrOWbMA13BN9k5XmHnfheSd
+	 ISGIk7UI1iz961UjqGESqDkaSZ8b3H71ZnI1LRmtyJHOwDuEtCERwNAjXZLdGAXp1J
+	 P3HDJvLXIqSFd253EtRlfboyOWKJUs9qSPRUF1nc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730924AbgDKXYi (ORCPT
+        id S1729787AbgDKXLH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:24:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52662 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:11:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50396 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727365AbgDKXMa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:12:30 -0400
+        id S1728310AbgDKXLG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:11:06 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 89860216FD;
-        Sat, 11 Apr 2020 23:12:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CF1D421973;
+        Sat, 11 Apr 2020 23:11:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646750;
-        bh=xqdDMXafI/lJR1TnjvBCsxh6zD3S8/yOI985BQtRjFs=;
+        s=default; t=1586646666;
+        bh=dYxTGFLO18XEoHMGcD97ucFQmH0G9hApwYyAukMl4HE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Qa1PGx5gF67vJY5KXXp+HPOADof9kMgqkTfhdqPfs/bOu615mV9SCsKSolud51sVY
-         fYmyg7OIUt0QG5sEhBnhYENtpUhYbrjSfxR8ZaXWBNVMAoeIXU+MNIaXj0yvMohXQC
-         BFUmUhd1K3tiIm/akgwgLg6b/CIjIyeW3xW+kD40=
+        b=QYCUxNeLzbXpWhHCtJ8EsC/246vV0TtAzeE1RZQ2GuIvXNd14BJ1hXN6YUIMKN//g
+         2gxqJ12Fde8SAPceSmnxYOYJ8bNb2A/GyG2n1iAFbE0g0/D5lO16SVHnX0h7VeD89A
+         KSLCVqS/64SOpEWGZ6FhMFhD/mV2tRQbPtJ42L04=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
+Cc:     Qiujun Huang <hqjagain@gmail.com>,
+        syzbot+4496e82090657320efc6@syzkaller.appspotmail.com,
+        Hillf Danton <hdanton@sina.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 22/66] Bluetooth: guard against controllers sending zero'd events
-Date:   Sat, 11 Apr 2020 19:11:19 -0400
-Message-Id: <20200411231203.25933-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 066/108] Bluetooth: RFCOMM: fix ODEBUG bug in rfcomm_dev_ioctl
+Date:   Sat, 11 Apr 2020 19:09:01 -0400
+Message-Id: <20200411230943.24951-66-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411231203.25933-1-sashal@kernel.org>
-References: <20200411231203.25933-1-sashal@kernel.org>
+In-Reply-To: <20200411230943.24951-1-sashal@kernel.org>
+References: <20200411230943.24951-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,45 +62,38 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Alain Michaud <alainm@chromium.org>
+From: Qiujun Huang <hqjagain@gmail.com>
 
-[ Upstream commit 08bb4da90150e2a225f35e0f642cdc463958d696 ]
+[ Upstream commit 71811cac8532b2387b3414f7cd8fe9e497482864 ]
 
-Some controllers have been observed to send zero'd events under some
-conditions.  This change guards against this condition as well as adding
-a trace to facilitate diagnosability of this condition.
+Needn't call 'rfcomm_dlc_put' here, because 'rfcomm_dlc_exists' didn't
+increase dlc->refcnt.
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
+Reported-by: syzbot+4496e82090657320efc6@syzkaller.appspotmail.com
+Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
+Suggested-by: Hillf Danton <hdanton@sina.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/rfcomm/tty.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3e7badb3ac2d5..93d077328c6ab 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5718,6 +5718,11 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	u8 status = 0, event = hdr->evt, req_evt = 0;
- 	u16 opcode = HCI_OP_NOP;
- 
-+	if (!event) {
-+		bt_dev_warn(hdev, "Received unexpected HCI Event 00000000");
-+		goto done;
-+	}
-+
- 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
- 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
- 		opcode = __le16_to_cpu(cmd_hdr->opcode);
-@@ -5929,6 +5934,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		req_complete_skb(hdev, status, opcode, orig_skb);
- 	}
- 
-+done:
- 	kfree_skb(orig_skb);
- 	kfree_skb(skb);
- 	hdev->stat.evt_rx++;
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 0c7d31c6c18cc..a58584949a955 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -413,10 +413,8 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
+ 		dlc = rfcomm_dlc_exists(&req.src, &req.dst, req.channel);
+ 		if (IS_ERR(dlc))
+ 			return PTR_ERR(dlc);
+-		else if (dlc) {
+-			rfcomm_dlc_put(dlc);
++		if (dlc)
+ 			return -EBUSY;
+-		}
+ 		dlc = rfcomm_dlc_alloc(GFP_KERNEL);
+ 		if (!dlc)
+ 			return -ENOMEM;
 -- 
 2.20.1
 
