@@ -2,60 +2,132 @@ Return-Path: <SRS0=Wpeu=53=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC0CC2D0EC
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 02:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 211DAC2BB86
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 05:56:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02C382078E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 02:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00A5F20936
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 05:56:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbgDKCG3 convert rfc822-to-8bit (ORCPT
+        id S1725899AbgDKF4j convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Apr 2020 22:06:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44966 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726650AbgDKCG3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Apr 2020 22:06:29 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204765] debugfs: File 'le_min_key_size' in directory 'hci0'
- already present!
-Date:   Sat, 11 Apr 2020 02:06:29 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204765-62941-tn5CpViUDY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204765-62941@https.bugzilla.kernel.org/>
-References: <bug-204765-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 11 Apr 2020 01:56:39 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:34536 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbgDKF4j (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 01:56:39 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7699ECED16;
+        Sat, 11 Apr 2020 08:06:13 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2 1/1] Bluetooth: btrtl: Add support for RTL8761B
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <bb48d88a-3b4f-dfa6-bbed-777a76d072ed@gmail.com>
+Date:   Sat, 11 Apr 2020 07:56:37 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, icenowy@aosc.io
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+Message-Id: <3E2F3893-FA3E-4C58-AD0C-879C7A3DD30E@holtmann.org>
+References: <20200410145420.108868-1-sztsian@gmail.com>
+ <20200410145420.108868-2-sztsian@gmail.com>
+ <5CD9EBAA-44A6-4DFF-870E-4F862FB7A60E@holtmann.org>
+ <bb48d88a-3b4f-dfa6-bbed-777a76d072ed@gmail.com>
+To:     Zamir SUN <sztsian@gmail.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204765
+Hi Zamir,
 
---- Comment #7 from Artem S. Tashkinov (aros@gmx.com) ---
-The bug is reproducible in kernel 5.5.15.
+>>> Add new compatible device RTL8761B.
+>>> 
+>>> Signed-off-by: Ziqian SUN (Zamir) <sztsian@gmail.com>
+>>> ---
+>>> drivers/bluetooth/btrtl.c | 10 +++++++++-
+>>> 1 file changed, 9 insertions(+), 1 deletion(-)
+>> can you also please include the content of /sys/kernel/debug/usb/devices for this device in the commit message.
+>> And if you run btmon before plugging it in, I like to see what LE Features of Bluetooth 5.0 this dongle really offers.
+> 
+> Hi Marcel,
+> 
+> I think you want this section
+> 
+>        Supported settings: 0x0001bfff
+>          Powered
+>          Connectable
+>          Fast Connectable
+>          Discoverable
+>          Bondable
+>          Link Security
+>          Secure Simple Pairing
+>          BR/EDR
+>          High Speed
+>          Low Energy
+>          Advertising
+>          Secure Connections
+>          Debug Keys
+>          Privacy
+>          Static Address
+>          PHY Configuration
+> 
+> Full log of btmon is available here, with the mac address masked http://fars.ee/Lu85
+> 
+> I'll send a v3 to include the usb info in the commit message shortly.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+This hardware is funny. Before the firmware patching it says this:
+
+< HCI Command: Read Local Version In.. (0x04|0x0001) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      Read Local Version Information (0x04|0x0001) ncmd 2
+        Status: Success (0x00)
+        HCI version: Bluetooth 5.1 (0x0a) - Revision 11 (0x000b)
+        LMP version: Bluetooth 5.1 (0x0a) - Subversion 34657 (0x8761)
+        Manufacturer: Realtek Semiconductor Corporation (93)
+
+And after the firmware patching it downgrades to Bluetooth 5.0 standard:
+
+< HCI Command: Read Local Version... (0x04|0x0001) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      Read Local Version Information (0x04|0x0001) ncmd 2
+        Status: Success (0x00)
+        HCI version: Bluetooth 5.0 (0x09) - Revision 55448 (0xd898)
+        LMP version: Bluetooth 5.0 (0x09) - Subversion 50044 (0xc37c)
+        Manufacturer: Realtek Semiconductor Corporation (93)
+
+Anyway, I was after these LE Features:
+
+< HCI Command: LE Read Local Suppo.. (0x08|0x0003) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      LE Read Local Supported Features (0x08|0x0003) ncmd 2
+        Status: Success (0x00)
+        Features: 0xfd 0x5f 0x00 0x00 0x00 0x00 0x00 0x00
+          LE Encryption
+          Extended Reject Indication
+          Slave-initiated Features Exchange
+          LE Ping
+          LE Data Packet Length Extension
+          LL Privacy
+          Extended Scanner Filter Policies
+          LE 2M PHY
+          Stable Modulation Index - Transmitter
+          Stable Modulation Index - Receiver
+          LE Coded PHY
+          LE Extended Advertising
+          Channel Selection Algorithm #2
+
+This seems to be a genuine USB dongle with Bluetooth 5.0 features.
+
+Regards
+
+Marcel
+
