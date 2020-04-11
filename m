@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 747EEC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E82C2BB86
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:12:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40EDE217D8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECF3A20757
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586646471;
-	bh=S6TKNCCtj26VouFt79OMxAj/QJCUGWiEe3uRGuZdZhk=;
+	s=default; t=1586646742;
+	bh=3NYJ+t+WScwOe7+F8EHpFwhO7qrCTACyd3T6wmc/uhg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=0YIsEpk6jJCgbMWrTKmZ5IpA5xKVu6YTlnS8AgJ3Jb+4ffTl75NPhbBNMqrI85UlF
-	 rMtWlYjOmzlnfIhEQuHhLWGGGk+nuTdHT8/9Rbl2IXskjlMbYffLrDM3QaIV+eRPuV
-	 nCZdebi+qLHOTnYYEbph6mFjnH0w451NZays4C7Y=
+	b=rp96HfKNYy/rxmHAl0GWXZ5s1bODEM4miQLdMMXLX6Uahl1HRSPwk1gqaDuGIOPoj
+	 /tLt8mAv7hv35xUv3LyMleiZt2/lUsMhlCQoijB6a4I+3W+7s1bNnex4rKYZ1NYRrL
+	 2zSlOsPF1+yoPiRsMIgBI52KBvegaojK58FXstMQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728748AbgDKXHt (ORCPT
+        id S1727957AbgDKXMU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:07:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44072 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:12:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52338 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728740AbgDKXHt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:07:49 -0400
+        id S1727826AbgDKXMT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:12:19 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9DFC52173E;
-        Sat, 11 Apr 2020 23:07:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B27D620787;
+        Sat, 11 Apr 2020 23:12:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646469;
-        bh=S6TKNCCtj26VouFt79OMxAj/QJCUGWiEe3uRGuZdZhk=;
+        s=default; t=1586646739;
+        bh=3NYJ+t+WScwOe7+F8EHpFwhO7qrCTACyd3T6wmc/uhg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TFtCaI+Y1MasLkRxaLAbhRzWfeZAxyYm4mvPOAPgCYnDZupxQLqsmyh/D8Kr3K/Pd
-         +pjmkp7T7aaegKF8QYREAh+04KJHlBCCBH6TmeAnWSfmp5m3F4SlZAHJIeOjT1NDCk
-         7Th3X1+wXP0SxnNFLp4rRacNMVzCxuA+G+NkbSi0=
+        b=d302J2/k5RCpWNepT826fPpJtKiorlrSnNct1/y1nvId24RBwHlDXwjIZ4qBEn8w/
+         ypa+CKi8OvvRi+aM2dYo+hGhYaP7Yne3tNzQXvuzcMSkjqzag9474xofpOfjKfJ0Oa
+         prC+9yzr3Ix2dlhOIUsEtpcSCITUfuv+gwci/jJ4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Rocky Liao <rjliao@codeaurora.org>,
+Cc:     Howard Chung <howardchung@google.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 036/121] Bluetooth: btqca: Fix the NVM baudrate tag offcet for wcn3991
-Date:   Sat, 11 Apr 2020 19:05:41 -0400
-Message-Id: <20200411230706.23855-36-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 13/66] Bluetooth: L2CAP: handle l2cap config request during open state
+Date:   Sat, 11 Apr 2020 19:11:10 -0400
+Message-Id: <20200411231203.25933-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
-References: <20200411230706.23855-1-sashal@kernel.org>
+In-Reply-To: <20200411231203.25933-1-sashal@kernel.org>
+References: <20200411231203.25933-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,62 +60,173 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Rocky Liao <rjliao@codeaurora.org>
+From: Howard Chung <howardchung@google.com>
 
-[ Upstream commit b63882549b2bf2979cb1506bdf783edf8b45c613 ]
+[ Upstream commit 96298f640104e4cd9a913a6e50b0b981829b94ff ]
 
-The baudrate set byte of wcn3991 in the NVM tag is byte 1, not byte 2.
-This patch will set correct byte for wcn3991.
+According to Core Spec Version 5.2 | Vol 3, Part A 6.1.5,
+the incoming L2CAP_ConfigReq should be handled during
+OPEN state.
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+The section below shows the btmon trace when running
+L2CAP/COS/CFD/BV-12-C before and after this change.
+
+=== Before ===
+...
+> ACL Data RX: Handle 256 flags 0x02 dlen 12                #22
+      L2CAP: Connection Request (0x02) ident 2 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+< ACL Data TX: Handle 256 flags 0x00 dlen 16                #23
+      L2CAP: Connection Response (0x03) ident 2 len 8
+        Destination CID: 64
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 256 flags 0x00 dlen 12                #24
+      L2CAP: Configure Request (0x04) ident 2 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5      #25
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5      #26
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 16                #27
+      L2CAP: Configure Request (0x04) ident 3 len 8
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00                                            ..
+< ACL Data TX: Handle 256 flags 0x00 dlen 18                #28
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+> HCI Event: Number of Completed Packets (0x13) plen 5      #29
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 14                #30
+      L2CAP: Configure Response (0x05) ident 2 len 6
+        Source CID: 64
+        Flags: 0x0000
+        Result: Success (0x0000)
+> ACL Data RX: Handle 256 flags 0x02 dlen 20                #31
+      L2CAP: Configure Request (0x04) ident 3 len 12
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00 91 02 11 11                                ......
+< ACL Data TX: Handle 256 flags 0x00 dlen 14                #32
+      L2CAP: Command Reject (0x01) ident 3 len 6
+        Reason: Invalid CID in request (0x0002)
+        Destination CID: 64
+        Source CID: 65
+> HCI Event: Number of Completed Packets (0x13) plen 5      #33
+        Num handles: 1
+        Handle: 256
+        Count: 1
+...
+=== After ===
+...
+> ACL Data RX: Handle 256 flags 0x02 dlen 12               #22
+      L2CAP: Connection Request (0x02) ident 2 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+< ACL Data TX: Handle 256 flags 0x00 dlen 16               #23
+      L2CAP: Connection Response (0x03) ident 2 len 8
+        Destination CID: 64
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 256 flags 0x00 dlen 12               #24
+      L2CAP: Configure Request (0x04) ident 2 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5     #25
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5     #26
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 16               #27
+      L2CAP: Configure Request (0x04) ident 3 len 8
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00                                            ..
+< ACL Data TX: Handle 256 flags 0x00 dlen 18               #28
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+> HCI Event: Number of Completed Packets (0x13) plen 5     #29
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> ACL Data RX: Handle 256 flags 0x02 dlen 14               #30
+      L2CAP: Configure Response (0x05) ident 2 len 6
+        Source CID: 64
+        Flags: 0x0000
+        Result: Success (0x0000)
+> ACL Data RX: Handle 256 flags 0x02 dlen 20               #31
+      L2CAP: Configure Request (0x04) ident 3 len 12
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [hint]
+        01 00 91 02 11 11                                .....
+< ACL Data TX: Handle 256 flags 0x00 dlen 18               #32
+      L2CAP: Configure Response (0x05) ident 3 len 10
+        Source CID: 65
+        Flags: 0x0000
+        Result: Success (0x0000)
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 672
+< ACL Data TX: Handle 256 flags 0x00 dlen 12               #33
+      L2CAP: Configure Request (0x04) ident 3 len 4
+        Destination CID: 65
+        Flags: 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5     #34
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5     #35
+        Num handles: 1
+        Handle: 256
+        Count: 1
+...
+
+Signed-off-by: Howard Chung <howardchung@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btqca.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index ec69e5dd7bd3e..a16845c0751d3 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -139,7 +139,7 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
- EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
- 
- static void qca_tlv_check_data(struct qca_fw_config *config,
--				const struct firmware *fw)
-+		const struct firmware *fw, enum qca_btsoc_type soc_type)
- {
- 	const u8 *data;
- 	u32 type_len;
-@@ -148,6 +148,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
- 	struct tlv_type_hdr *tlv;
- 	struct tlv_type_patch *tlv_patch;
- 	struct tlv_type_nvm *tlv_nvm;
-+	uint8_t nvm_baud_rate = config->user_baud_rate;
- 
- 	tlv = (struct tlv_type_hdr *)fw->data;
- 
-@@ -216,7 +217,10 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
- 				tlv_nvm->data[0] |= 0x80;
- 
- 				/* UART Baud Rate */
--				tlv_nvm->data[2] = config->user_baud_rate;
-+				if (soc_type == QCA_WCN3991)
-+					tlv_nvm->data[1] = nvm_baud_rate;
-+				else
-+					tlv_nvm->data[2] = nvm_baud_rate;
- 
- 				break;
- 
-@@ -354,7 +358,7 @@ static int qca_download_firmware(struct hci_dev *hdev,
- 		return ret;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0d84d1f820d4c..3b9af4aba619b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4114,7 +4114,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		return 0;
  	}
  
--	qca_tlv_check_data(config, fw);
-+	qca_tlv_check_data(config, fw, soc_type);
- 
- 	segment = fw->data;
- 	remain = fw->size;
+-	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
++	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
++	    chan->state != BT_CONNECTED) {
+ 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
+ 				       chan->dcid);
+ 		goto unlock;
 -- 
 2.20.1
 
