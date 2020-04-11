@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C95FC2BB86
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C504EC2BBC7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C53B206F7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97498206F7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648900;
-	bh=A6KO02u9HP+jDAo+joquhsaqmcvlEcEHNFs8Fwa8mA0=;
+	s=default; t=1586648905;
+	bh=9V1+2+tpoFSGqbjR8KTBols0eFkDrZeatBM40643OrI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pEjszvuLU76+74L6d9XL/SyXi3CMQcot0628dnRf01RM9LdMQggxs5WOZmHoyH+su
-	 E1DwLHHdSDz6DyaDIfeXfW3uqKa7O8BWeViO5JLEe9WuGFaCHGZs+V7yt2j/ophxpj
-	 dCziewMoYm/BSuHqBqu/6wBuXlkATqWa/+O3F+N8=
+	b=K9PEJ/0exrwW9VVgQ+1mWp7d89ZgScyHLm24oqUL9B7sT4f0JitULWZVX/CWxKqqT
+	 4rFPWSRNsdtOCgNelrM+PRPVV+SJpeqRgPc/um4rCzbN4L0501vsDTWMRB39p4oub1
+	 CZNA67vhLWjLoyA4D9MalD7UC99pZMrRNttWKIrc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727377AbgDKXEn (ORCPT
+        id S1727350AbgDKXEm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:04:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38290 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:04:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38166 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727361AbgDKXEn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:04:43 -0400
+        id S1727300AbgDKXEi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:04:38 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 75C12214D8;
-        Sat, 11 Apr 2020 23:04:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9EE6C20787;
+        Sat, 11 Apr 2020 23:04:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646283;
-        bh=A6KO02u9HP+jDAo+joquhsaqmcvlEcEHNFs8Fwa8mA0=;
+        s=default; t=1586646278;
+        bh=9V1+2+tpoFSGqbjR8KTBols0eFkDrZeatBM40643OrI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VLH2/BqniR7QpE6CAhmjJTH22BNSrrzpVyfxtl0Kq98XaAphI16e9P5lqyHuhw37P
-         olLOtfZWrWW6QA4glKjZ4mHIwjVcNQrUwRnucDIgw6gjnmP6T6SoMmh9V3VrOnA/ox
-         vroaEzB0rHE9u+VafufOf+ge69FyjS7xPzuhzGE4=
+        b=0GhlKBM+nbdwx9O66qMhodHc7M5HWqeslJcEOFRD5Y/ilcBpN+4afB38C8Sxnn8vy
+         hLZDq1kgPSGqkv+vQ85NJR5+ap3fOAu1GFRjU8WA+YNEo8cwzOnLXHtMjLVF7xbY4V
+         rnNh1NMx6VHqygSlLKgxeylP2pITpU7EF8Y5+gRQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Rocky Liao <rjliao@codeaurora.org>,
+Cc:     Alain Michaud <alainm@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 045/149] Bluetooth: hci_qca: Not send vendor pre-shutdown command for QCA Rome
-Date:   Sat, 11 Apr 2020 19:02:02 -0400
-Message-Id: <20200411230347.22371-45-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 041/149] Bluetooth: guard against controllers sending zero'd events
+Date:   Sat, 11 Apr 2020 19:01:58 -0400
+Message-Id: <20200411230347.22371-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
 References: <20200411230347.22371-1-sashal@kernel.org>
@@ -60,39 +60,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Rocky Liao <rjliao@codeaurora.org>
+From: Alain Michaud <alainm@chromium.org>
 
-[ Upstream commit 4f9ed5bd63dc16d061cdeb00eeff9d56e86a6beb ]
+[ Upstream commit 08bb4da90150e2a225f35e0f642cdc463958d696 ]
 
-QCA Rome doesn't support the pre-shutdown vendor hci command, this patch
-will check the soc type in qca_power_off() and only send this command
-for wcn399x.
+Some controllers have been observed to send zero'd events under some
+conditions.  This change guards against this condition as well as adding
+a trace to facilitate diagnosability of this condition.
 
-Fixes: ae563183b647 ("Bluetooth: hci_qca: Enable power off/on support during hci down/up for QCA Rome")
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_qca.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index d6e0c99ee5eb1..7e5a097bd0ed8 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1726,9 +1726,11 @@ static int qca_power_off(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6ddc4a74a5e42..673351800ed3e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5858,6 +5858,11 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	u8 status = 0, event = hdr->evt, req_evt = 0;
+ 	u16 opcode = HCI_OP_NOP;
  
- 	/* Stop sending shutdown command if soc crashes. */
--	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
-+	if (qca_is_wcn399x(soc_type)
-+		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
- 		qca_send_pre_shutdown_cmd(hdev);
- 		usleep_range(8000, 10000);
++	if (!event) {
++		bt_dev_warn(hdev, "Received unexpected HCI Event 00000000");
++		goto done;
++	}
++
+ 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
+ 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
+ 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+@@ -6069,6 +6074,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		req_complete_skb(hdev, status, opcode, orig_skb);
  	}
+ 
++done:
+ 	kfree_skb(orig_skb);
+ 	kfree_skb(skb);
+ 	hdev->stat.evt_rx++;
 -- 
 2.20.1
 
