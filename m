@@ -1,232 +1,113 @@
-Return-Path: <SRS0=Wpeu=53=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=16Wn=54=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8BBC2BB86
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E40C2BB55
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Apr 2020 02:07:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 372FD206F7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Apr 2020 23:49:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648955;
-	bh=v0lhd/YQhcUoOo7GSiP6uhWG0La2CEW5ZEZ2AQfLXnQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lVvHqRjqkUoJw677/KN1H0xEbd5HV94glWho3U+/olGqYwdRUlp2OijmNcxsxgJUl
-	 TxUC6SBh3uR9deKRecbx2JYVNhxGeciXZC8D8mcyETWOHY1rJaWNwtXBFFb9hK8kd4
-	 Lggp1b6Oq4BUqX7ki+ru3HSmAkoAlPhL/lhbijdo=
+	by mail.kernel.org (Postfix) with ESMTP id 09CB3208FE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Apr 2020 02:07:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="Ped5lv+S";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RRv0xfOM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727171AbgDKXE1 (ORCPT
+        id S1726924AbgDLCGx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:04:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37800 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727146AbgDKXEZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:04:25 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 618C82173E;
-        Sat, 11 Apr 2020 23:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646265;
-        bh=v0lhd/YQhcUoOo7GSiP6uhWG0La2CEW5ZEZ2AQfLXnQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DFFLNg8sbVgat7vOkARH//p6VY+udArgY7gC2wB5ICvlIKj3ywoFv5g5SM2Q6Wi0R
-         Fv3ooISFmEMveOh92SAw1I+aKhWRsFqssXcrM66oDVka4qQ7pYZnctHOBEY9+cFOW2
-         /Ivwdct7fnKI7cQEv3xH/l4ADqJ2K1nhuOfLBWIU=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Howard Chung <howardchung@google.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 030/149] Bluetooth: L2CAP: handle l2cap config request during open state
-Date:   Sat, 11 Apr 2020 19:01:47 -0400
-Message-Id: <20200411230347.22371-30-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
-References: <20200411230347.22371-1-sashal@kernel.org>
+        Sat, 11 Apr 2020 22:06:53 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:48131 "EHLO
+        wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726884AbgDLCGx (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Apr 2020 22:06:53 -0400
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.west.internal (Postfix) with ESMTP id E70C87B7;
+        Sat, 11 Apr 2020 22:06:49 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Sat, 11 Apr 2020 22:06:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
+         h=from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding; s=fm3; bh=4NDaOwg5jepTh
+        MDWgHjK7GYLbHX6IFibl+r4ExTotBU=; b=Ped5lv+ST74HxjOy1nkjPyQSqkkmC
+        3GPJm5KmNJU5GaNlAg9z3DPzpzO2uQ0kl0eo51CdyF+ivgbEQvrFyXUmhYM0qIfV
+        RohmPP5kl4T/2NWebs1raDsk+RzEOp8ShsDpNG6omeafbxQKuNaRdYckTUqiohle
+        aPolSFXRr+zqXYZPXXwe7EtuK/tQNd76DeLF7vNblRqlUwt7VGiC5hOaV0aeyuEp
+        hX7B0T2ckIf6diL5Qwo6eYl8bR5G4UD3D+Si7QriZ6X16RZDhsF6D0xzejKChQp5
+        IpXIeojNhaudVMO01hl/b9sNeDe/bdrVZhalHdVJNp7+lYNmV+NYVAk8w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :in-reply-to:message-id:mime-version:references:subject:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; bh=4NDaOwg5jepThMDWgHjK7GYLbHX6IFibl+r4ExTotBU=; b=RRv0xfOM
+        kZXoOwg05LTADsX7dlDPCpuwMHfK2u1P6ew5qY71JJb99ioCy/FbwnldpCtiJjft
+        FNmFwTCSHbkUofGOx7InhVJ6QYlc2sLcUtpPIPBqWj10YErrh97SokPcAEeswMox
+        F1WViSAYLV4WSxPSqLTdlTk5aNHDsQyAvT2F3aveVR2gX9fRRBi0JCCx3mr84Bpx
+        IrnAoREhD0lHb9QNRglUSTMeOcZw1u1XquHyRXhcf0XkOl0Z57YC6KbUc/jZO10k
+        yrwC9ZAwXK5HL/HOjsMvQt8InSPOW9SU4tc5FM8fRLzhArfBBK6X6UAP1W+uRXZP
+        /Iejm3RU7kHoBQ==
+X-ME-Sender: <xms:uXeSXn3KN5oQ6xqlGoKmAwc5rEepd6I5I_JRAubL0yvYt6BXwmEWzg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrvdehgdehvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffojghfggfgsedtkeertd
+    ertddtnecuhfhrohhmpeetlhhishhtrghirhcuhfhrrghntghishcuoegrlhhishhtrghi
+    rhesrghlihhsthgrihhrvdefrdhmvgeqnecukfhppeejfedrleefrdekgedrvddtkeenuc
+    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishht
+    rghirhesrghlihhsthgrihhrvdefrdhmvg
+X-ME-Proxy: <xmx:uXeSXj7iVd-VsaScO_-izCbzAk2ZOOb4tE66bGCAX7H-4uXuo0zH2A>
+    <xmx:uXeSXoyH37Zp33PjtNDIs0v3THPdHGTMDZgtuGtwSt2kemWNLRQa9g>
+    <xmx:uXeSXnyF3GSWANtDhTI0LwzY6j4nVwmN75HOaKUAnLvbMQ5fj638lw>
+    <xmx:uXeSXjJsYh82Y_fRx45IsX1zKNbYewzuRNF-cj-lt_I8v7VOgqLmA4tjDc0>
+Received: from alistair-xps-14z.alistair23.me (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 4575E3280060;
+        Sat, 11 Apr 2020 22:06:48 -0400 (EDT)
+From:   Alistair Francis <alistair@alistair23.me>
+To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, mripard@kernel.org, wens@csie.org
+Cc:     anarsoul@gmail.com, devicetree@vger.kernel.org,
+        alistair23@gmail.com, linux-arm-kernel@lists.infradead.org,
+        Alistair Francis <alistair@alistair23.me>
+Subject: [PATCH v3 2/3] Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
+Date:   Sat, 11 Apr 2020 19:06:43 -0700
+Message-Id: <20200412020644.355142-2-alistair@alistair23.me>
+X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200412020644.355142-1-alistair@alistair23.me>
+References: <20200412020644.355142-1-alistair@alistair23.me>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Howard Chung <howardchung@google.com>
+From: Vasily Khoruzhick <anarsoul@gmail.com>
 
-[ Upstream commit 96298f640104e4cd9a913a6e50b0b981829b94ff ]
+RTL8723BS is often used in ARM boards, so add ability to bind it
+using device tree.
 
-According to Core Spec Version 5.2 | Vol 3, Part A 6.1.5,
-the incoming L2CAP_ConfigReq should be handled during
-OPEN state.
-
-The section below shows the btmon trace when running
-L2CAP/COS/CFD/BV-12-C before and after this change.
-
-=== Before ===
-...
-> ACL Data RX: Handle 256 flags 0x02 dlen 12                #22
-      L2CAP: Connection Request (0x02) ident 2 len 4
-        PSM: 1 (0x0001)
-        Source CID: 65
-< ACL Data TX: Handle 256 flags 0x00 dlen 16                #23
-      L2CAP: Connection Response (0x03) ident 2 len 8
-        Destination CID: 64
-        Source CID: 65
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12                #24
-      L2CAP: Configure Request (0x04) ident 2 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5      #25
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5      #26
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16                #27
-      L2CAP: Configure Request (0x04) ident 3 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00                                            ..
-< ACL Data TX: Handle 256 flags 0x00 dlen 18                #28
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-> HCI Event: Number of Completed Packets (0x13) plen 5      #29
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 14                #30
-      L2CAP: Configure Response (0x05) ident 2 len 6
-        Source CID: 64
-        Flags: 0x0000
-        Result: Success (0x0000)
-> ACL Data RX: Handle 256 flags 0x02 dlen 20                #31
-      L2CAP: Configure Request (0x04) ident 3 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00 91 02 11 11                                ......
-< ACL Data TX: Handle 256 flags 0x00 dlen 14                #32
-      L2CAP: Command Reject (0x01) ident 3 len 6
-        Reason: Invalid CID in request (0x0002)
-        Destination CID: 64
-        Source CID: 65
-> HCI Event: Number of Completed Packets (0x13) plen 5      #33
-        Num handles: 1
-        Handle: 256
-        Count: 1
-...
-=== After ===
-...
-> ACL Data RX: Handle 256 flags 0x02 dlen 12               #22
-      L2CAP: Connection Request (0x02) ident 2 len 4
-        PSM: 1 (0x0001)
-        Source CID: 65
-< ACL Data TX: Handle 256 flags 0x00 dlen 16               #23
-      L2CAP: Connection Response (0x03) ident 2 len 8
-        Destination CID: 64
-        Source CID: 65
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12               #24
-      L2CAP: Configure Request (0x04) ident 2 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5     #25
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5     #26
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16               #27
-      L2CAP: Configure Request (0x04) ident 3 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00                                            ..
-< ACL Data TX: Handle 256 flags 0x00 dlen 18               #28
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-> HCI Event: Number of Completed Packets (0x13) plen 5     #29
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 14               #30
-      L2CAP: Configure Response (0x05) ident 2 len 6
-        Source CID: 64
-        Flags: 0x0000
-        Result: Success (0x0000)
-> ACL Data RX: Handle 256 flags 0x02 dlen 20               #31
-      L2CAP: Configure Request (0x04) ident 3 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00 91 02 11 11                                .....
-< ACL Data TX: Handle 256 flags 0x00 dlen 18               #32
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-< ACL Data TX: Handle 256 flags 0x00 dlen 12               #33
-      L2CAP: Configure Request (0x04) ident 3 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5     #34
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5     #35
-        Num handles: 1
-        Handle: 256
-        Count: 1
-...
-
-Signed-off-by: Howard Chung <howardchung@google.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+Signed-off-by: Alistair Francis <alistair@alistair23.me>
 ---
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_h5.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 195459a1e53ef..4e3ce6273973b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4181,7 +4181,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		return 0;
- 	}
- 
--	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
-+	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
-+	    chan->state != BT_CONNECTED) {
- 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
- 				       chan->dcid);
- 		goto unlock;
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 106c110efe56..e60b2e0773db 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -1018,6 +1018,8 @@ static const struct of_device_id rtl_bluetooth_of_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
+ 	{ .compatible = "realtek,rtl8822cs-bt",
+ 	  .data = (const void *)&rtl_vnd },
++	{ .compatible = "realtek,rtl8723bs-bt",
++	  .data = (const void *)&rtl_vnd },
+ #endif
+ 	{ },
+ };
 -- 
-2.20.1
+2.26.0
 
