@@ -2,201 +2,186 @@ Return-Path: <SRS0=qzAF=55=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 132BDC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B8FC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:47:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF41B2063A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C3DE2063A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:47:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="afoNjtlp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387432AbgDMRqR (ORCPT
+        id S2387435AbgDMRrV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Apr 2020 13:46:17 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34773 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387424AbgDMRqQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Apr 2020 13:46:16 -0400
-IronPort-SDR: fZOBuP2yrbAqiu6Z731NImA1KOUaLiN0kM/bzhjtj1MbznU7ZrUFlJc2NAwJQKhNJCl+FD56dL
- Fwff19b0CF/Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 10:46:15 -0700
-IronPort-SDR: dYTebL6JME9Hwc6GZXzU1xK+0V28LjVjLGJT9AzxdKgAeseyGsgWwEs8FMwe+CxzOuuhhfhMMN
- YdZWuOm6KW1w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,378,1580803200"; 
-   d="scan'208";a="399680039"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.135.23.176])
-  by orsmga004.jf.intel.com with ESMTP; 13 Apr 2020 10:46:14 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com,
-        michal.lowas-rzechonek@silvair.com, przemyslaw.fierek@silvair.com
-Subject: [PATCH BlueZ v4 4/4] mesh: Add Time-outs to critical dbus send-with-replies
-Date:   Mon, 13 Apr 2020 10:45:35 -0700
-Message-Id: <20200413174535.21488-5-brian.gix@intel.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200413174535.21488-1-brian.gix@intel.com>
-References: <20200413174535.21488-1-brian.gix@intel.com>
+        Mon, 13 Apr 2020 13:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387424AbgDMRrS (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Apr 2020 13:47:18 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9826C0A3BDC
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2020 10:47:16 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id j4so3306970otr.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2020 10:47:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=cTVvfznWZCG9UrzYtecKyNvF3hD7rLA/2v4zd50ELdo=;
+        b=afoNjtlpxmujDaozcWlQAIBAosi2MNc2xpXmMoOwu09jVFYW9ERyVOkOVDqu85IJJt
+         NoTR6+uEt7CN5FISY2nOV9SZUo+F6KKo1LexhT7uYJkDQIK89KaXwI7eXmT+sARKiBjp
+         WsmZiXTBylyzD0momIb4xDUcmd5RFu6TWy+/WEZPA/mO11YJ103PjH6/wfK700WCwZ/e
+         DiZ7oxnGrg1j/sICHNfpSyy6DdUbaV2AN8pQTnSWGxiw7WdkYDcUJy2DKdyH7LOqsVoj
+         b23gfTkWihZjnxS357ZROQbt+1/6nQJIv3M1nrSrRz3+O2bsDf28waeaUrKTUYpgaqLR
+         jK9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=cTVvfznWZCG9UrzYtecKyNvF3hD7rLA/2v4zd50ELdo=;
+        b=GTPioPn2kUAfOgiXKQJhuwMrlLyXsG0/H1P7JCSQebtbKhZ9cC/oRj3ACR/ZzKXBht
+         523LLhndJd1BMHK+jq5W8r9cnl/RkLdcrHMk0M1jg9fdaLfJrWXTZw3TW5QubOMqMXlK
+         O4h0cKG/yPPBdyepS8FZFeVUu+QjLwSICkLUTJJp95y0qBm4NuVhs2kr83Z29jEMDyG/
+         R7hxqJap0hS7Hc5m+Aguv75Bk1sv6xXg9Tb7zEmWGeF1YCtuXO5etF9MWUMJpLSQOG46
+         7PHBl8n+oJL4QuGfQ7AyYz+PIFTsAS33T0XVsL4vvPHUdAXpoTWhUzJk15fQ9Dj92BD8
+         uZCg==
+X-Gm-Message-State: AGi0PuZpoceISF7qyP/6K469lDHO57ofEKn3agAfxvTkJgEywpiGxLPh
+        uu17tDwWsWoP/nDsYm4OAWT7k2v2ikkbERMaGkJIvx0AuIw=
+X-Google-Smtp-Source: APiQypJwbmvp9jUfneFG6LD2iO0IXxMToFbH533s6MIJTT/tDFvu7fx4/r9acJk8iSL0tTB5E7R0XNGUswFi6R00eug=
+X-Received: by 2002:a4a:be89:: with SMTP id o9mr8875656oop.20.1586800036070;
+ Mon, 13 Apr 2020 10:47:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200321195404.fvyku5hmcuqxt7sg@pali> <20200413162513.2221-1-pali@kernel.org>
+ <20200413162513.2221-2-pali@kernel.org> <CABBYNZKneybjWDEddrCXxtzJdGZSY__D7qtPuw25QMLDE9hg4Q@mail.gmail.com>
+ <20200413165206.xluhkwi76cfpiv7z@pali> <CABBYNZJYj=i4+SemOAST18Jn20Nn03C_NyfB+aBLc5L9Yg11_A@mail.gmail.com>
+ <20200413171722.ilawhisu67onrifn@pali>
+In-Reply-To: <20200413171722.ilawhisu67onrifn@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 13 Apr 2020 10:47:04 -0700
+Message-ID: <CABBYNZKFGjsnCnBPyw0WFr_aJ2zaYAjLj81t04S=fXaXD9ac+g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] src/profile: Distinguish between zero-set HFP AG
+ features and unset HFP AG features
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        David Heidelberg <david@ixit.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-JoinComplete() dbus method calls are the only time that node tokens are
-delivered to client Applications, so if the call fails for any reason
-(including time-outs) the daemon has a way to clean-up the stale unused
-node data.
----
- mesh/dbus.c | 40 ++++++++++++++++++++++++++++++++++++++++
- mesh/dbus.h |  6 ++++++
- mesh/mesh.c | 19 ++++++++++++-------
- 3 files changed, 58 insertions(+), 7 deletions(-)
+Hi Pali,
 
-diff --git a/mesh/dbus.c b/mesh/dbus.c
-index 6b9694ab7..bf0f73bd9 100644
---- a/mesh/dbus.c
-+++ b/mesh/dbus.c
-@@ -37,6 +37,14 @@ struct error_entry {
- 	const char *default_desc;
- };
- 
-+struct send_info {
-+	struct l_dbus *dbus;
-+	struct l_timeout *timeout;
-+	l_dbus_message_func_t cb;
-+	void *user_data;
-+	uint32_t serial;
-+};
-+
- /*
-  * Important: The entries in this table follow the order of
-  * enumerated values in mesh_error (file error.h)
-@@ -143,3 +151,35 @@ void dbus_append_dict_entry_basic(struct l_dbus_message_builder *builder,
- 	l_dbus_message_builder_leave_variant(builder);
- 	l_dbus_message_builder_leave_dict(builder);
- }
-+
-+static void send_reply(struct l_dbus_message *message, void *user_data)
-+{
-+	struct send_info *info = user_data;
-+
-+	l_timeout_remove(info->timeout);
-+	info->cb(message, info->user_data);
-+	l_free(info);
-+}
-+
-+static void send_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct send_info *info = user_data;
-+
-+	l_dbus_cancel(info->dbus, info->serial);
-+	send_reply(NULL, info);
-+}
-+
-+void dbus_send_with_timeout(struct l_dbus *dbus, struct l_dbus_message *msg,
-+						l_dbus_message_func_t cb,
-+						void *user_data,
-+						unsigned int seconds)
-+{
-+	struct send_info *info = l_new(struct send_info, 1);
-+
-+	info->dbus = dbus;
-+	info->cb = cb;
-+	info->user_data = user_data;
-+	info->serial = l_dbus_send_with_reply(dbus, msg, send_reply,
-+								info, NULL);
-+	info->timeout = l_timeout_create(seconds, send_timeout, info, NULL);
-+}
-diff --git a/mesh/dbus.h b/mesh/dbus.h
-index e7643a59d..aafb85f6b 100644
---- a/mesh/dbus.h
-+++ b/mesh/dbus.h
-@@ -20,6 +20,8 @@
- #define BLUEZ_MESH_PATH "/org/bluez/mesh"
- #define BLUEZ_MESH_SERVICE "org.bluez.mesh"
- 
-+#define DEFAULT_DBUS_TIMEOUT	30
-+
- bool dbus_init(struct l_dbus *dbus);
- struct l_dbus *dbus_get_bus(void);
- void dbus_append_byte_array(struct l_dbus_message_builder *builder,
-@@ -31,3 +33,7 @@ bool dbus_match_interface(struct l_dbus_message_iter *interfaces,
- 							const char *match);
- struct l_dbus_message *dbus_error(struct l_dbus_message *msg, int err,
- 						const char *description);
-+void dbus_send_with_timeout(struct l_dbus *dbus, struct l_dbus_message *msg,
-+						l_dbus_message_func_t cb,
-+						void *user_data,
-+						unsigned int seconds);
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 8c9aa9187..58a124313 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -430,9 +430,12 @@ static void send_join_failed(const char *owner, const char *path,
- }
- 
- static void prov_join_complete_reply_cb(struct l_dbus_message *message,
--								void *user_data)
-+                                                               void *user_data)
- {
--	bool failed = l_dbus_message_is_error(message);
-+	bool failed = false;
-+
-+	if (!message || l_dbus_message_is_error(message))
-+		failed = true;
- 
- 	if (!failed)
- 		node_attach_io(join_pending->node, mesh.io);
-@@ -468,13 +471,14 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
- 
- 	token = node_get_token(join_pending->node);
- 
-+	l_debug("Calling JoinComplete (prov)");
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
- 						MESH_APPLICATION_INTERFACE,
- 						"JoinComplete");
- 
- 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
--	l_dbus_send_with_reply(dbus, msg,
--				prov_join_complete_reply_cb, NULL, NULL);
-+	dbus_send_with_timeout(dbus, msg, prov_join_complete_reply_cb,
-+						NULL, DEFAULT_DBUS_TIMEOUT);
- 
- 	return true;
- }
-@@ -673,7 +677,7 @@ static void create_join_complete_reply_cb(struct l_dbus_message *message,
- {
- 	struct mesh_node *node = user_data;
- 
--	if (l_dbus_message_is_error(message)) {
-+	if (!message || l_dbus_message_is_error(message)) {
- 		node_remove(node);
- 		return;
- 	}
-@@ -713,13 +717,14 @@ static void create_node_ready_cb(void *user_data, int status,
- 	path = node_get_app_path(node);
- 	token = node_get_token(node);
- 
-+	l_debug("Calling JoinComplete (create)");
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
- 						MESH_APPLICATION_INTERFACE,
- 						"JoinComplete");
- 
- 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
--	l_dbus_send_with_reply(dbus, msg,
--				create_join_complete_reply_cb, node, NULL);
-+	dbus_send_with_timeout(dbus, msg, create_join_complete_reply_cb,
-+						node, DEFAULT_DBUS_TIMEOUT);
- }
- 
- static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
--- 
-2.21.1
+On Mon, Apr 13, 2020 at 10:17 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
+>
+> On Monday 13 April 2020 09:58:34 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> >
+> > On Mon, Apr 13, 2020 at 9:52 AM Pali Roh=C3=A1r <pali@kernel.org> wrote=
+:
+> > >
+> > > On Monday 13 April 2020 09:44:14 Luiz Augusto von Dentz wrote:
+> > > > On Mon, Apr 13, 2020 at 9:25 AM Pali Roh=C3=A1r <pali@kernel.org> w=
+rote:
+> > > > > @@ -1750,15 +1758,19 @@ static int ext_disconnect_dev(struct btd_=
+service *service)
+> > > > >  static char *get_hfp_hf_record(struct ext_profile *ext, struct e=
+xt_io *l2cap,
+> > > > >                                                         struct ex=
+t_io *rfcomm)
+> > > > >  {
+> > > > > +       /* HFP 1.7.2: By default features bitfield is 0b000000 */
+> > > > >         return g_strdup_printf(HFP_HF_RECORD, rfcomm->chan, ext->=
+version,
+> > > > > -                                               ext->name, ext->f=
+eatures);
+> > > > > +                               ext->name,
+> > > > > +                               ext->have_features ? ext->feature=
+s : 0x0);
+> > > > >  }
+> > > > >
+> > > > >  static char *get_hfp_ag_record(struct ext_profile *ext, struct e=
+xt_io *l2cap,
+> > > > >                                                         struct ex=
+t_io *rfcomm)
+> > > > >  {
+> > > > > +       /* HFP 1.7.2: By default features bitfield is 0b001001 */
+> > > > >         return g_strdup_printf(HFP_AG_RECORD, rfcomm->chan, ext->=
+version,
+> > > > > -                                               ext->name, ext->f=
+eatures);
+> > > > > +                               ext->name,
+> > > > > +                               ext->have_features ? ext->feature=
+s : 0x9);
+> > > >
+> > > > I wonder why you didn't just initialize the features wiht 0x9 inste=
+ad
+> > > > of adding a flag to track it, btw add a define with value 0x09 like
+> > > > HFP_DEFAULT_FEATURES that way it is clearer why we are doing this.
+> > >
+> > > This function get_hfp_ag_record() is for parsing local features. You =
+are
+> > > right that for local features we do not need a flag to track it.
+> > >
+> > > But flag for tracking is needed for parsing remote features. And to h=
+ave
+> > > unified code for storing local and remote features it is easier to ha=
+ve
+> > > always a flag for checking if features were provided or not.
+> >
+> > Im not following you about the remote features beinf different, I
+> > though both would be could be initialized in the same way and then if
+> > we read a different value from the SDP record we just overwrite it.
+>
+> But in this case we put these default remote features to HFP DBus agent
+> like if they were specified in SDP. Default value is specific for
+> profile version. And if e.g. new HFP version defines a new bit in
+> features with its own default value then HFP DBus agent would not be
+> able to distinguish between state when remote device did not specified
+> any value (as bluez will put there some defaults) and when remote device
+> specified same features as bluez has defined in its current default
+> value.
 
+Different version may have different defaults but we can initialize
+them correctly.
+
+> Before and also after this change remote features are not send to HFP
+> DBus agent when they were not specified by remote device.
+>
+> After your suggestion HFP DBus agent would not be able to check if
+> remote device provided features or not. And this is I think a
+> regression.
+
+I don't think we can consider a regression to always provide features,
+besides what would be the reason for the agent to know if the features
+were from the SDP record or they are auto initiliazed? I that was
+really necessary Id just dump the whole record as a ServiceRecord
+option and leave it up to the client to parse it.
+
+> > > I can put these default values in profile-role specific macros e.g.:
+> > >
+> > > #define HFP_AG_DEFAULT_FEATURES 0x09
+> > > #define HFP_HF_DEFAULT_FEATURES 0x00
+> > > #define HSP_HS_DEFAULT_VOLCNTRL "false"
+> >
+> > Don't bother with default that are 0x00/false, we can assume this is
+> > implicit when allocating the memory everything is set to 0 so these
+> > defines wouldn't be needed in the first place.
+> >
+> > > Or do you prefer different names?
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
