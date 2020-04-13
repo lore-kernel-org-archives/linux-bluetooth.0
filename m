@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C578C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C55CC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:46:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46AEF2063A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 572662063A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 17:46:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387426AbgDMRpy (ORCPT
+        id S2387428AbgDMRqC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Apr 2020 13:45:54 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34746 "EHLO mga04.intel.com"
+        Mon, 13 Apr 2020 13:46:02 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34758 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387424AbgDMRpy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Apr 2020 13:45:54 -0400
-IronPort-SDR: TjQZtp3mkjKwWeBak/n0J5c7iGVqgO9neJK/H4V2EOh0sbhHXhs1a+7eCulwXCPIrxUh7zkBVF
- No5bl4KCgS9A==
+        id S2387424AbgDMRqA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Apr 2020 13:46:00 -0400
+IronPort-SDR: x2lJfyS8nuauGG0DpsttShkRKc+mfCQ1GlvN8lq7igyq9a5lnXry1pqK5VuK6D5WA9WR3k9GjC
+ UFglfpkgnPvw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 10:45:51 -0700
-IronPort-SDR: 8w/5K/JM9pOmoUGafBsU/e7SXny4q7T94w+sdyZmWIALG9YaM2FvDHfi6ZJqaeWi6Fj4zw6rWT
- e1kuhy0/NaVg==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2020 10:46:00 -0700
+IronPort-SDR: gN2XZNHyDQCEQaTnlEsIeaaJbtet2KnPGf3WuHKiPw1aDiTPc0aUK57uTtqbT1EDfHxgrrSEgg
+ 0L/vFe0LvqhA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,378,1580803200"; 
-   d="scan'208";a="399679935"
+   d="scan'208";a="399679968"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.135.23.176])
-  by orsmga004.jf.intel.com with ESMTP; 13 Apr 2020 10:45:50 -0700
+  by orsmga004.jf.intel.com with ESMTP; 13 Apr 2020 10:45:59 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     inga.stotland@intel.com, brian.gix@intel.com,
         michal.lowas-rzechonek@silvair.com, przemyslaw.fierek@silvair.com
-Subject: [PATCH BlueZ v4 1/4] doc/mesh: Change API to deliver tokens via JoinComplete
-Date:   Mon, 13 Apr 2020 10:45:32 -0700
-Message-Id: <20200413174535.21488-2-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4 2/4] mesh: Change API to deliver tokens via JoinComplete
+Date:   Mon, 13 Apr 2020 10:45:33 -0700
+Message-Id: <20200413174535.21488-3-brian.gix@intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200413174535.21488-1-brian.gix@intel.com>
 References: <20200413174535.21488-1-brian.gix@intel.com>
@@ -50,83 +50,140 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+From: Przemysław Fierek <przemyslaw.fierek@silvair.com>
 
-If Application is not be able to reliably store the token, the daemon
-will end up with a uncontrollable node in its database.
-
-Let's fix the issue by always delivering tokens using JoinComplete call,
-and expecting a reply - if the application return an error, daemon will
-get rid of the node.
+This patch changes Import and CreateNetwork API to deliver tokens via
+the JoinComplete method call.  When application doesn't raise any error
+during handling JoinComplete then it is assumed that the token has been
+saved, otherwise when application replies with an error message then the
+node is removed.
 ---
- doc/mesh-api.txt | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ mesh/mesh.c | 63 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 48 insertions(+), 15 deletions(-)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 6ecb81650..0522d97dc 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -29,6 +29,10 @@ Methods:
- 		therefore attempting to call this function using already
- 		registered UUID results in an error.
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 34fe6881e..8c9aa9187 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -429,6 +429,17 @@ static void send_join_failed(const char *owner, const char *path,
+ 	free_pending_join_call(true);
+ }
  
-+		When provisioning finishes, the daemon will call either
-+		JoinComplete or JoinFailed method on object implementing
-+		org.bluez.mesh.Application1 interface.
++static void prov_join_complete_reply_cb(struct l_dbus_message *message,
++								void *user_data)
++{
++	bool failed = l_dbus_message_is_error(message);
 +
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.AlreadyExists,
-@@ -123,7 +127,7 @@ Methods:
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 
--	uint64 token CreateNetwork(object app_root, array{byte}[16] uuid)
-+	void CreateNetwork(object app_root, array{byte}[16] uuid)
- 
- 		This is the first method that an application calls to become
- 		a Provisioner node, and a Configuration Client on a newly
-@@ -155,11 +159,14 @@ Methods:
- 		unicast address (0x0001), and create and assign a net_key as the
- 		primary network net_index (0x000).
- 
-+		When creation finishes, the daemon will call JoinComplete method
-+		on object implementing org.bluez.mesh.Application1 interface.
++	if (!failed)
++		node_attach_io(join_pending->node, mesh.io);
 +
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.AlreadyExists,
- 
--	uint64 token Import(object app_root, array{byte}[16] uuid,
-+	void Import(object app_root, array{byte}[16] uuid,
- 				array{byte}[16] dev_key,
- 				array{byte}[16] net_key, uint16 net_index,
- 				dict flags, uint32 iv_index, uint16 unicast)
-@@ -204,11 +211,8 @@ Methods:
- 		The unicast parameter is the primary unicast address of the
- 		imported node.
- 
--		The returned token must be preserved by the application in
--		order to authenticate itself to the mesh daemon and attach to
--		the network as a mesh node by calling Attach() method or
--		permanently remove the identity of the mesh node by calling
--		Leave() method.
-+		When import finishes, the daemon will call JoinComplete method
-+		on object implementing org.bluez.mesh.Application1 interface.
- 
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments,
-@@ -758,6 +762,10 @@ Methods:
- 		permanently remove the identity of the mesh node by calling
- 		Leave() method.
- 
-+		If this method returns an error, the daemon will assume that the
-+		application failed to preserve the token, and will remove the
-+		freshly created node.
++	free_pending_join_call(failed);
++}
 +
- 	void JoinFailed(string reason)
+ static bool prov_complete_cb(void *user_data, uint8_t status,
+ 					struct mesh_prov_node_info *info)
+ {
+@@ -455,7 +466,6 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
+ 		return false;
+ 	}
  
- 		This method is called when the node provisioning initiated by
+-	node_attach_io(join_pending->node, mesh.io);
+ 	token = node_get_token(join_pending->node);
+ 
+ 	msg = l_dbus_message_new_method_call(dbus, owner, path,
+@@ -463,10 +473,8 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
+ 						"JoinComplete");
+ 
+ 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
+-
+-	l_dbus_send(dbus, msg);
+-
+-	free_pending_join_call(false);
++	l_dbus_send_with_reply(dbus, msg,
++				prov_join_complete_reply_cb, NULL, NULL);
+ 
+ 	return true;
+ }
+@@ -660,11 +668,28 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
+ 	return l_dbus_message_new_method_return(msg);
+ }
+ 
++static void create_join_complete_reply_cb(struct l_dbus_message *message,
++								void *user_data)
++{
++	struct mesh_node *node = user_data;
++
++	if (l_dbus_message_is_error(message)) {
++		node_remove(node);
++		return;
++	}
++
++	node_attach_io(node, mesh.io);
++}
++
+ static void create_node_ready_cb(void *user_data, int status,
+ 							struct mesh_node *node)
+ {
++	struct l_dbus *dbus = dbus_get_bus();
+ 	struct l_dbus_message *reply;
+ 	struct l_dbus_message *pending_msg;
++	struct l_dbus_message *msg;
++	const char *owner;
++	const char *path;
+ 	const uint8_t *token;
+ 
+ 	pending_msg = l_queue_find(pending_queue, simple_match, user_data);
+@@ -673,20 +698,28 @@ static void create_node_ready_cb(void *user_data, int status,
+ 
+ 	if (status != MESH_ERROR_NONE) {
+ 		reply = dbus_error(pending_msg, status, NULL);
+-		goto done;
+-	}
+ 
+-	node_attach_io(node, mesh.io);
++		l_dbus_send(dbus_get_bus(), reply);
++		l_queue_remove(pending_queue, pending_msg);
++		return;
++	}
+ 
+ 	reply = l_dbus_message_new_method_return(pending_msg);
++
++	l_dbus_send(dbus, reply);
++	l_queue_remove(pending_queue, pending_msg);
++
++	owner = l_dbus_message_get_sender(pending_msg);
++	path = node_get_app_path(node);
+ 	token = node_get_token(node);
+ 
+-	l_debug();
+-	l_dbus_message_set_arguments(reply, "t", l_get_be64(token));
++	msg = l_dbus_message_new_method_call(dbus, owner, path,
++						MESH_APPLICATION_INTERFACE,
++						"JoinComplete");
+ 
+-done:
+-	l_dbus_send(dbus_get_bus(), reply);
+-	l_queue_remove(pending_queue, pending_msg);
++	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
++	l_dbus_send_with_reply(dbus, msg,
++				create_join_complete_reply_cb, node, NULL);
+ }
+ 
+ static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
+@@ -840,11 +873,11 @@ static void setup_network_interface(struct l_dbus_interface *iface)
+ 								"token");
+ 
+ 	l_dbus_interface_method(iface, "CreateNetwork", 0, create_network_call,
+-					"t", "oay", "token", "app", "uuid");
++					"", "oay", "app", "uuid");
+ 
+ 	l_dbus_interface_method(iface, "Import", 0,
+ 					import_call,
+-					"t", "oayayayqa{sv}uq", "token",
++					"", "oayayayqa{sv}uq",
+ 					"app", "uuid", "dev_key", "net_key",
+ 					"net_index", "flags", "iv_index",
+ 					"unicast");
 -- 
 2.21.1
 
