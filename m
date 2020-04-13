@@ -2,217 +2,114 @@ Return-Path: <SRS0=qzAF=55=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98B6C2BB55
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 02:32:50 +0000 (UTC)
-Received: from vger.kernel.org (unknown [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79CCD206DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 02:32:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CCD206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
-Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AAFBC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 13:48:14 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id 520462075E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Apr 2020 13:48:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pMnkHfQS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728022AbgDMCct (ORCPT
+        id S1730147AbgDMNsN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 12 Apr 2020 22:32:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.18]:41110 "EHLO
+        Mon, 13 Apr 2020 09:48:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727520AbgDMCct (ORCPT
+        with ESMTP id S1730085AbgDMNsM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 12 Apr 2020 22:32:49 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2588AC0A3BE0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2020 19:32:49 -0700 (PDT)
-IronPort-SDR: +pQpDa9sFK3tjGQpoAX/+EClCG5Mc0LeJ4PpFyb5MPJ22kerb5Q3W4jiTIzU6hMFPqGz9/v11A
- 7eGRWKIxz9Jw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2020 19:32:48 -0700
-IronPort-SDR: Q0V06113X/wZTdo2Tm323OaSGGRjtDG2QHgEsqeLkHCe+7j5Y9OsCf5BvePlU75joV8pXFFvy2
- VoeqWXFBr5hg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,377,1580803200"; 
-   d="scan'208";a="454076309"
-Received: from sguggill-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.254.105.177])
-  by fmsmga006.fm.intel.com with ESMTP; 12 Apr 2020 19:32:47 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com,
-        michal.lowas-rzechonek@silvair.com, przemyslaw.fierek@silvair.com
-Subject: [PATCH BlueZ v3 4/4] mesh: Add Time-outs to critical dbus send-with-replies
-Date:   Sun, 12 Apr 2020 19:32:17 -0700
-Message-Id: <20200413023217.20472-5-brian.gix@intel.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200413023217.20472-1-brian.gix@intel.com>
-References: <20200413023217.20472-1-brian.gix@intel.com>
+        Mon, 13 Apr 2020 09:48:12 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C02FC0A3BDC
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2020 06:48:12 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id d17so3295895wrg.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2020 06:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ilaMHxzfZVxXfDLWtcZLBUj208g0dYwsTx+UXD78WzE=;
+        b=pMnkHfQSZDPADzT11CBpobJfBDOaZQt11Xu3L4Y69SBtPou5MwxHn7eJSFO4pHn3zX
+         SpHzG+LBkt9hZ9GI1B8q6gXexaZLVgxs+VCgMq7k2TwDeym3sdosTpqrYRJDTrCNwVr2
+         jDLnek2IjY1HiLjpcdFX6QgSybV4+8o8UZ8dStLIHQR+wP/DU0Uj+prOb+tkLdkUlcb+
+         ZOMVuUqjYS2pjTxePSYsFsytBVDcjiChmM8MqLNTz6Txb8s6B6+unzYWuNPopafPcrA9
+         QgKYUWQDYbQLmQrjygPrVSb8+qEkSyt/1EpYgDWx8JIYaWFAaxJYzmVIk9SqZSkkIDO5
+         rD4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ilaMHxzfZVxXfDLWtcZLBUj208g0dYwsTx+UXD78WzE=;
+        b=A0kpCpoV7Sk6PCqX3wVtrXlfrJBMKopHPpEOU6kq1eLSTBAmq694tpZDCxCB2DQDR+
+         0Z62yqhHzLi5+XfDmkFycqbgldv4lt0Diigo6oXnnFU4T4CmIQZaQwOvDC1IF+1WumvL
+         UUGzaKwuAEBeopbiDLPRpRaXjQ4ALEDXBIRSGrCRzixIPCX3eGrlpQlaMhOaCNucvEJ4
+         Z8rEmJ4oD6UaT7LR/kMSKIlOgp/VYIPn4yBE5V2uwBUXa2Rgu//HKcRhTqT9xFhl/qTj
+         3Rf3FAUjODAMjYUI6GGA4ZnhLr0G2iGx3AVBWgw49dh9oqaWHO9NeAw3uwwPRnYxySWN
+         y14A==
+X-Gm-Message-State: AGi0PuY8y1qUsQwycqypmjxNeQntAG02pkt10oU8ACiHmTdC6BIHnPrZ
+        ps8cAHKwFSn6oVqRjP7D4mThcHIaCNOev/Y3T+fSp7/sJwn1ng==
+X-Google-Smtp-Source: APiQypI+hVg3NAkqtaGOcTYbSfHMkiRAL0un0L85dw0cMLLL4F76kzrwgTePF6miPs30ZoPPlbGE6/ZZaWHAr53oN5M=
+X-Received: by 2002:adf:ec02:: with SMTP id x2mr18738818wrn.365.1586785690406;
+ Mon, 13 Apr 2020 06:48:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200316123914.Bluez.v1.1.I2c83372de789a015c1ee506690bb795ee0b0b0d9@changeid>
+ <CABBYNZL1D44M4z2c+4zbjLgZ=PMHsTwy1VpYZpsJbpFJ9POZug@mail.gmail.com>
+ <CAJQfnxEFM81DSvZb+ULG7+nwQuy-GWj26GWn4OP+Bp--24N1CQ@mail.gmail.com>
+ <CABBYNZ+=wMNuvjJ5VK2zpd6euqeEZ8JXbd67RmPgxDfdCgce9w@mail.gmail.com>
+ <14E46BF4-0688-4A0B-AE84-46C4426C5E9A@holtmann.org> <CAJQfnxELMMDa6nbxRUrW46VjEBj6Txfeym62PKi+R3iXHKU0CQ@mail.gmail.com>
+In-Reply-To: <CAJQfnxELMMDa6nbxRUrW46VjEBj6Txfeym62PKi+R3iXHKU0CQ@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Mon, 13 Apr 2020 21:47:59 +0800
+Message-ID: <CAJQfnxG_AnWArBg8_Pg3coAeFbRuG08KkXh1G==CuXWCvJpf5Q@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] input: disconnect intr channel before ctrl channel
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-JoinComplete() dbus method calls are the only time that node tokens are
-delivered to client Applications, so if the call fails for any reason
-(including time-outs) the daemon has a way to clean-up the stale unused
-node data.
----
- mesh/dbus.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- mesh/dbus.h |  6 ++++++
- mesh/mesh.c | 22 ++++++++++++----------
- 3 files changed, 61 insertions(+), 10 deletions(-)
+Hi Marcel, Luiz,
 
-diff --git a/mesh/dbus.c b/mesh/dbus.c
-index 6b9694ab7..2c9dd3ae0 100644
---- a/mesh/dbus.c
-+++ b/mesh/dbus.c
-@@ -37,6 +37,14 @@ struct error_entry {
- 	const char *default_desc;
- };
- 
-+struct send_info {
-+	struct l_dbus *dbus;
-+	struct l_timeout *timeout;
-+	dbus_send_with_to_func_t cb;
-+	void *user_data;
-+	uint32_t serial;
-+};
-+
- /*
-  * Important: The entries in this table follow the order of
-  * enumerated values in mesh_error (file error.h)
-@@ -143,3 +151,38 @@ void dbus_append_dict_entry_basic(struct l_dbus_message_builder *builder,
- 	l_dbus_message_builder_leave_variant(builder);
- 	l_dbus_message_builder_leave_dict(builder);
- }
-+
-+static void send_reply(struct l_dbus_message *message, void *user_data)
-+{
-+	struct send_info *info = user_data;
-+	bool failed = l_dbus_message_is_error(message);
-+
-+	l_timeout_remove(info->timeout);
-+	info->cb(failed, info->user_data);
-+	l_free(info);
-+}
-+
-+static void send_to(struct l_timeout *timeout, void *user_data)
-+{
-+	struct send_info *info = user_data;
-+
-+	l_dbus_cancel(info->dbus, info->serial);
-+	l_timeout_remove(info->timeout);
-+	info->cb(true, info->user_data);
-+	l_free(info);
-+}
-+
-+void dbus_send_with_timeout(struct l_dbus *dbus, struct l_dbus_message *msg,
-+						dbus_send_with_to_func_t cb,
-+						void *user_data,
-+						unsigned int seconds)
-+{
-+	struct send_info *info = l_new(struct send_info, 1);
-+
-+	info->dbus = dbus;
-+	info->cb = cb;
-+	info->user_data = user_data;
-+	info->serial = l_dbus_send_with_reply(dbus, msg, send_reply,
-+								info, NULL);
-+	info->timeout = l_timeout_create(seconds, send_to, info, NULL);
-+}
-diff --git a/mesh/dbus.h b/mesh/dbus.h
-index e7643a59d..31c174367 100644
---- a/mesh/dbus.h
-+++ b/mesh/dbus.h
-@@ -20,6 +20,8 @@
- #define BLUEZ_MESH_PATH "/org/bluez/mesh"
- #define BLUEZ_MESH_SERVICE "org.bluez.mesh"
- 
-+typedef void (*dbus_send_with_to_func_t) (bool failed, void *user_data);
-+
- bool dbus_init(struct l_dbus *dbus);
- struct l_dbus *dbus_get_bus(void);
- void dbus_append_byte_array(struct l_dbus_message_builder *builder,
-@@ -31,3 +33,7 @@ bool dbus_match_interface(struct l_dbus_message_iter *interfaces,
- 							const char *match);
- struct l_dbus_message *dbus_error(struct l_dbus_message *msg, int err,
- 						const char *description);
-+void dbus_send_with_timeout(struct l_dbus *dbus, struct l_dbus_message *msg,
-+						dbus_send_with_to_func_t cb,
-+						void *user_data,
-+						unsigned int seconds);
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 8c9aa9187..f46e676d9 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -429,10 +429,9 @@ static void send_join_failed(const char *owner, const char *path,
- 	free_pending_join_call(true);
- }
- 
--static void prov_join_complete_reply_cb(struct l_dbus_message *message,
--								void *user_data)
-+static void prov_join_complete_reply_cb(bool failed, void *user_data)
- {
--	bool failed = l_dbus_message_is_error(message);
-+	l_debug("prov_join_complete_reply_cb");
- 
- 	if (!failed)
- 		node_attach_io(join_pending->node, mesh.io);
-@@ -468,13 +467,14 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
- 
- 	token = node_get_token(join_pending->node);
- 
-+	l_debug("Calling JoinComplete (prov)");
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
- 						MESH_APPLICATION_INTERFACE,
- 						"JoinComplete");
- 
- 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
--	l_dbus_send_with_reply(dbus, msg,
--				prov_join_complete_reply_cb, NULL, NULL);
-+	dbus_send_with_timeout(dbus, msg, prov_join_complete_reply_cb,
-+								NULL, 30);
- 
- 	return true;
- }
-@@ -668,12 +668,13 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
--static void create_join_complete_reply_cb(struct l_dbus_message *message,
--								void *user_data)
-+static void create_join_complete_reply_cb(bool failed, void *user_data)
- {
- 	struct mesh_node *node = user_data;
- 
--	if (l_dbus_message_is_error(message)) {
-+	l_debug("create_join_complete_reply_cb");
-+
-+	if (failed) {
- 		node_remove(node);
- 		return;
- 	}
-@@ -713,13 +714,14 @@ static void create_node_ready_cb(void *user_data, int status,
- 	path = node_get_app_path(node);
- 	token = node_get_token(node);
- 
-+	l_debug("Calling JoinComplete (create)");
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
- 						MESH_APPLICATION_INTERFACE,
- 						"JoinComplete");
- 
- 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
--	l_dbus_send_with_reply(dbus, msg,
--				create_join_complete_reply_cb, node, NULL);
-+	dbus_send_with_timeout(dbus, msg, create_join_complete_reply_cb,
-+								node, 30);
- }
- 
- static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
--- 
-2.21.1
+I found out that shutdown second parameter is passed as the "how"
+parameter in l2cap_sock_shutdown() [1].
+Currently the value of the parameter is unused, but I think we can
+assign it to sk->sk_shutdown. Therefore, we can differentiate whether
+we are interested to wait for the disconnection reply or not, by
+supplying SHUT_RDWR and SHUT_WR, respectively.
 
+Do you think this is a sound idea?
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/l2cap_sock.c#n1267
+
+Thanks,
+Archie
+
+On Wed, 18 Mar 2020 at 20:41, Archie Pusaka <apusaka@google.com> wrote:
+>
+> > > I see, we shutdown the socket immediately since the socket API itself
+> > > don't seem to have a concept of disconnect syscall not sure if other
+> > > values could be passed to shutdown second parameter to indicate we
+> > > want to actually wait it to be disconnected.
+>
+> I don't think the second parameter matters, I tried every possible
+> valid values and intr_watch_cb is still called without waiting for the
+> response.
+>
+> >
+> > in a blocking synchronous system call world we have SO_LINGER for that. In the world of asynchronous IO handling (what we do), we need to check what is the right way of handling this.
+> >
+>
+> I spot this piece of code [1] which utilizes getsockopt to query
+> socket connection information from the kernel space to the user space.
+> We can use a similar method to query whether (sk->sk_state ==
+> BT_CLOSED), which is only true when we get the response.
+> What do you think?
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/l2cap_sock.c#n476
