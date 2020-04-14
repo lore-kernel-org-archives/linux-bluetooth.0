@@ -2,102 +2,171 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773DFC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 06:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CDEC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:09:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E30E20735
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 06:57:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78D662074D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:09:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mmXkF1Ti"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406175AbgDNG5p convert rfc822-to-8bit (ORCPT
+        id S2406993AbgDNIJP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 02:57:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41155 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406131AbgDNG5o (ORCPT
+        Tue, 14 Apr 2020 04:09:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2406985AbgDNIJE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 02:57:44 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8062ECECDB;
-        Tue, 14 Apr 2020 09:07:17 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 3/4] Bluetooth: Enable LE Enhanced Connection Complete
- event.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAOVXEJLTj0=SUyE2HtbR6iDSyiTvJCaj6+AVOAC=StOe_jz5bA@mail.gmail.com>
-Date:   Tue, 14 Apr 2020 08:57:40 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <9573B8CA-FE0B-4A9C-9773-0B21A2FA8D2E@holtmann.org>
-References: <cover.1586412226.git.marcel@holtmann.org>
- <6b6ecbf19559cb16793d7ef3e96c1181a32b4df5.1586412226.git.marcel@holtmann.org>
- <CAOVXEJLTj0=SUyE2HtbR6iDSyiTvJCaj6+AVOAC=StOe_jz5bA@mail.gmail.com>
-To:     Sathish Narasimman <nsathish41@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Tue, 14 Apr 2020 04:09:04 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200EFC008748
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:09:03 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id w3so9151434plz.15
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:09:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=NSjekJEL9dfitQBDMlYCs94wAxGHyeVP0lyLYkmsTXc=;
+        b=mmXkF1TiPnLArNENdITTbIK7PKEuRC0AWfk37LwCXOlAJi5whkVBaXbVlSthCWmVAp
+         gprYNFHBDQOKwlHBdcRMXZvSpOLbn4DSE/YkC+XaFlVLdQfiXqhsyr5PnsfeQFzyqdB2
+         ZkKZUhxsDmTr286OImNRkE5EVZRJuzd1Df6fqdbii8zhXu1WXcY0/OIFdDwpjUIn7KNi
+         jOoSbcvXclS2ileGlm4eHyvhEDOR8fnKc+umRQS9MgG+YQvk6TOfedJKHkubEPdqOB6W
+         bEqS/aaEsA2iYjWu2+7pKsxGiI0/gzpTZ+/PxnNljZV2PgZv+FJHYwyhYkZykwFk3AkU
+         AgUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=NSjekJEL9dfitQBDMlYCs94wAxGHyeVP0lyLYkmsTXc=;
+        b=OzsnozY52iVyBntTOQsSXgpYLM8daGKEjNM6qZwCpwYIIS3xv9217B7XW5UF7HtxLf
+         VYIOZIVw9H/LH9ORLMZ2AJkQd8UtUmImZu7j3a7wXd5dX782oqwOxRwbJZ1dq6Ghun7h
+         DcZaqquHYC4sPXjMOaFocx5r9NNc3fk9iLKWMwilkkoPvzAfPGHD7MgWh1LR/xxHNctN
+         C2xvFzzOBgCNTH3obHMWHWJtgrhlJkWkSXXaWwA4EGR4H+To4dVroe62FtwzzFwK+TqJ
+         5almnk4z4K8MmaqPN+FGExKEFD0PLtRCtmZ29XhFE6dmyroyJfRf4GNCierAoax/R2PW
+         pwNw==
+X-Gm-Message-State: AGi0Puayd4TDpYnluL7rWLNRCXmvXHB3mox46ufZ1i7nGnJzeY440iTh
+        4bcQtoBUk6a3IFPktrLGB5PEKnyHKgCaJ3VwwYrJz/fCVgRxHFkH1wda/uWUNlFLuwTqR2vReh+
+        ltuEM6/7c5a3zZ4tpqnj3o/yFlH/KM5NkUiXLxcjvWX1CBw0bd7xnqYfBggqQjjCY3Caavz+WdX
+        pX
+X-Google-Smtp-Source: APiQypI8baE5/Q7SqmnUzI3AwP72Y2H9nKVzkJ7fBqelS6PhL2rYS2Ti9BIkayNWGf2zD1m0exBOQ/IlWhvs
+X-Received: by 2002:a63:2901:: with SMTP id p1mr20524245pgp.444.1586851742111;
+ Tue, 14 Apr 2020 01:09:02 -0700 (PDT)
+Date:   Tue, 14 Apr 2020 16:08:40 +0800
+Message-Id: <20200414160758.v1.1.Idab9dcdc7da549ed1fd5c66341fb8baffaee8d10@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
+Subject: [PATCH v1] Bluetooth: L2CAP: add support for waiting disconnection resp
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+From: Archie Pusaka <apusaka@chromium.org>
 
->> In case LL Privacy is supported by the controller, it is also a good
->> idea to use the LE Enhanced Connection Complete event for getting all
->> information about the new connection and its addresses.
->> 
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> include/net/bluetooth/hci.h | 1 +
->> net/bluetooth/hci_core.c    | 8 ++++++++
->> 2 files changed, 9 insertions(+)
->> 
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index ff42d05b3e72..1da8cec8e210 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -460,6 +460,7 @@ enum {
->> #define HCI_LE_SLAVE_FEATURES          0x08
->> #define HCI_LE_PING                    0x10
->> #define HCI_LE_DATA_LEN_EXT            0x20
->> +#define HCI_LE_LL_PRIVACY              0x40
->> #define HCI_LE_EXT_SCAN_POLICY         0x80
->> #define HCI_LE_PHY_2M                  0x01
->> #define HCI_LE_PHY_CODED               0x08
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 589c4085499c..0d726d59a492 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -638,6 +638,14 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
->>                if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT)
->>                        events[0] |= 0x40;      /* LE Data Length Change */
->> 
->> +               /* If the controller supports LL Privacy feature, enable
->> +                * the corresponding event.
->> +                */
->> +               if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
->> +                       events[1] |= 0x02;      /* LE Enhanced Connection
->> +                                                * Complete
->> +                                                */
->> +
->>                /* If the controller supports Extended Scanner Filter
->>                 * Policies, enable the correspondig event.
->>                 */
->> --
->> 2.25.2
->> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_core.c#n717
-> 
-> I see LE Enhanced Connection complete event is enabled here.
+Whenever we disconnect a L2CAP connection, we would immediately
+report a disconnection event (EPOLLHUP) to the upper layer, without
+waiting for the response of the other device.
 
-I see. However LE Enhanced Connection complete event has been added for LL Privacy and not for Extended Advertising. The current setting of the event needs to be removed. If you look at the difference on what the event is adding compared to the legacy one, you see it is only about RPAs.
+This patch offers an option to wait until we receive a disconnection
+response before reporting disconnection event, by using the "how"
+parameter in l2cap_sock_shutdown(). Therefore, upper layer can opt
+to wait for disconnection response by shutdown(sock, SHUT_WR).
 
-Regards
+This can be used to enforce proper disconnection order in HID,
+where the disconnection of the interrupt channel must be complete
+before attempting to disconnect the control channel.
 
-Marcel
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+---
+
+ net/bluetooth/l2cap_sock.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1cea42ee1e922..a995d2c51fa7f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1271,14 +1271,21 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ 	struct l2cap_conn *conn;
+ 	int err = 0;
+ 
+-	BT_DBG("sock %p, sk %p", sock, sk);
++	BT_DBG("sock %p, sk %p, how %d", sock, sk, how);
++
++	/* 'how' parameter is mapped to sk_shutdown as follows:
++	 * SHUT_RD   (0) --> RCV_SHUTDOWN  (1)
++	 * SHUT_WR   (1) --> SEND_SHUTDOWN (2)
++	 * SHUT_RDWR (2) --> SHUTDOWN_MASK (3)
++	 */
++	how++;
+ 
+ 	if (!sk)
+ 		return 0;
+ 
+ 	lock_sock(sk);
+ 
+-	if (sk->sk_shutdown)
++	if ((sk->sk_shutdown & how) == how)
+ 		goto shutdown_already;
+ 
+ 	BT_DBG("Handling sock shutdown");
+@@ -1301,11 +1308,20 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ 		 * has already been actioned to close the L2CAP
+ 		 * link such as by l2cap_disconnection_req().
+ 		 */
+-		if (sk->sk_shutdown)
+-			goto has_shutdown;
++		if ((sk->sk_shutdown & how) == how)
++			goto shutdown_matched;
+ 	}
+ 
+-	sk->sk_shutdown = SHUTDOWN_MASK;
++	/* Try setting the RCV_SHUTDOWN bit, return early if SEND_SHUTDOWN
++	 * is already set
++	 */
++	if ((how & RCV_SHUTDOWN) && !(sk->sk_shutdown & RCV_SHUTDOWN)) {
++		sk->sk_shutdown |= RCV_SHUTDOWN;
++		if ((sk->sk_shutdown & how) == how)
++			goto shutdown_matched;
++	}
++
++	sk->sk_shutdown |= SEND_SHUTDOWN;
+ 	release_sock(sk);
+ 
+ 	l2cap_chan_lock(chan);
+@@ -1335,7 +1351,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ 		err = bt_sock_wait_state(sk, BT_CLOSED,
+ 					 sk->sk_lingertime);
+ 
+-has_shutdown:
++shutdown_matched:
+ 	l2cap_chan_put(chan);
+ 	sock_put(sk);
+ 
+@@ -1363,7 +1379,7 @@ static int l2cap_sock_release(struct socket *sock)
+ 
+ 	bt_sock_unlink(&l2cap_sk_list, sk);
+ 
+-	err = l2cap_sock_shutdown(sock, 2);
++	err = l2cap_sock_shutdown(sock, SHUT_RDWR);
+ 	chan = l2cap_pi(sk)->chan;
+ 
+ 	l2cap_chan_hold(chan);
+-- 
+2.26.0.110.g2183baf09c-goog
 
