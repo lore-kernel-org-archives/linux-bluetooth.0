@@ -4,219 +4,165 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D18EC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBD9C2BB85
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:55:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4522B206E9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D69D2074D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 08:55:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Vv8//iXZ"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="t4Ef3Yel"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437245AbgDNIzu (ORCPT
+        id S2437244AbgDNIzv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 04:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
+        Tue, 14 Apr 2020 04:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2437240AbgDNIzq (ORCPT
+        by vger.kernel.org with ESMTP id S2437239AbgDNIzp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 04:55:46 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD26DC008748
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:55:44 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id e26so12110029wmk.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:55:44 -0700 (PDT)
+        Tue, 14 Apr 2020 04:55:45 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB00EC0A3BE2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:55:43 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id u13so12886035wrp.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 01:55:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=o+E8MAsU/VToF7MpC+vzMgQnq8ejVDOjf7uiE778Eyo=;
-        b=Vv8//iXZb1dTLP7nhR8g73eLsbEC3YSbXIO0aizialkvv+12RGJpAc8NGuI2g11C7A
-         9NgWbxWh8QB45ife7hOl6PC+e10yycFMChb1Vv4gYEP7DJdnBFmteqXhc0QY6LbMnUHe
-         IflJULVsuxAVeQWJUoCdzW6wU+yoDWIjOKh0e4GMnjq5ZNBlMBUXsL7bGLf7Wy1guKWk
-         wJn3fvdQO8Gxx6Io2EjNLSCsLKKLZd+QNwZl6SQZ+7DmLRKCLvjUe5WCOOtlrzD9E4HS
-         3zVwIAbEJiN5rcHN+ZjXimgODnJPsJL3FT/k0+wNVBB97WDm8ihzS+drMqdb9moNbpv9
-         5RBA==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=L5GiMjQby01dqR0vl4XnhvCIDDKqRZfrlvKJr6NqcmM=;
+        b=t4Ef3YelFAJV5/TnpyUnDWfuYqHKEs1fQpYeBuqubEmt/hZUBNurIPyHgjqYC0UuBg
+         RA6W2XSJ7uAsdWIwXFEdPxcNPPV5bBfkuXlnQYeGC58lAjVw4IoeavuMQl5rJtwlpY2X
+         sGvACcL3iM2X1PJg+5JjXR4j5a6iFvb8LwK5GTnlxxftXPY2BThRw8TQrIxTR/Re6soD
+         W5ZIt18Wu/0x3kVkPgfY3ShG0gI3D9ojxZo5ofQFWZh6rX5JcPqxFjZSbenyegmJ9Fgk
+         r/LsRd7lBMQBdybvvlfRkLUak59YqNVWPWWJI719Ko/ZfAiDRLQQE/+L2QrcWyGOay+3
+         mMcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=o+E8MAsU/VToF7MpC+vzMgQnq8ejVDOjf7uiE778Eyo=;
-        b=UPhFdH9nmp3C+rBZofZJE/qE2rpks7yAX8E5tXeFFfTHKcqWL1haQtEVigcjq5Oqaq
-         M8r5iDGxWpGGcIBH50psZmHz27OOUGE+Iw6HaP/gnF73mqy5jY6kbnI6Wtg/LDIO5sjM
-         +tlasG2qmmz3hhrSSgiEpBXWaIzvCduFK8kdIeN/c68bEJn+X1RhwmzG1tAjPAFYxcbI
-         rpWa5dS7PRLO8cSIZuZWWYC7j4FsvZeMHcDVHfIrGninYiPV2+NeVpxaFCXdrWCjeVTo
-         aNzRXcTzG78/sVz/FPlPrH+bFbedRV6whsrM0/QWYcIsekgI8/VrgERHUXHCYFhqI6Z0
-         gkgQ==
-X-Gm-Message-State: AGi0Pubp3UhRVl1g2R+jbdDygXUpSu1pWdi6vp04djuns4xDY+1xgz6T
-        a3OriRKmvFbA36GyzEJm8VMX1aRCbSk=
-X-Google-Smtp-Source: APiQypKUM3hfqc+1Oh3thbNMM4ySEAQSXWXWOeji+r15Znnw0JnNcsltUfZJBRfWAIyJNNweacTJbw==
-X-Received: by 2002:a1c:8106:: with SMTP id c6mr22272032wmd.88.1586854543200;
-        Tue, 14 Apr 2020 01:55:43 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id w83sm18361553wmb.37.2020.04.14.01.55.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=L5GiMjQby01dqR0vl4XnhvCIDDKqRZfrlvKJr6NqcmM=;
+        b=LWbsIdg+y5qchor1U+B+zGFNxBj58ugm40p/xe1qhL8YTBTcqbpPe7tOYcJP8AlS/H
+         +PdYkb2FAE5gya+bWHpaKlQMHi6bQehX0e7C1vbIcbcU8wNfqRMxtIZzz7ms2xLG7mnz
+         wInxUcDiZBgWUeu3aaMv/xKbE7gflLwB122Uc9ZG+huk1Mzv80ZiNuVjCN3h0Zqh7Auc
+         rUmpQwrwkvWn5uf7jwZDdlL/qSPrqXEt8QUjXmB383aB5rPlVjKIH1K/cmJp2aSISFrI
+         aaSFaFIsQyZQecNuv20GZtW2qQOtskHPp9ZFQy72epNEVMTGOM3OPX0wuRGJsddaQwpD
+         qQfA==
+X-Gm-Message-State: AGi0Pub9G2fDv2WwE8Jagp+4nEIcBVbisZfyUPryxEAnZkZWWP2U7f5W
+        4bYg+X6LGmlGGUGiVo9Oeo9Qnl9olzs=
+X-Google-Smtp-Source: APiQypLY2OKsIsQnfQ+AGLf2idVF+j/ClFBvbFqutNUMy27dGMatF7hP4v9CyX68JELjrhjpmRjEEA==
+X-Received: by 2002:adf:cd8c:: with SMTP id q12mr24009725wrj.419.1586854542119;
         Tue, 14 Apr 2020 01:55:42 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id w83sm18361553wmb.37.2020.04.14.01.55.41
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2020 01:55:41 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?Przemys=C5=82aw=20Fierek?= 
-        <przemyslaw.fierek@silvair.com>
-Subject: [PATCH BlueZ v5 2/4] mesh: Change API to deliver tokens via JoinComplete
-Date:   Tue, 14 Apr 2020 10:55:55 +0200
-Message-Id: <20200414085557.23464-3-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v5 1/4] doc/mesh: Change API to deliver tokens via JoinComplete
+Date:   Tue, 14 Apr 2020 10:55:54 +0200
+Message-Id: <20200414085557.23464-2-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200414085557.23464-1-michal.lowas-rzechonek@silvair.com>
 References: <20200414085557.23464-1-michal.lowas-rzechonek@silvair.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Przemysław Fierek <przemyslaw.fierek@silvair.com>
+If Application is not be able to reliably store the token, the daemon
+will end up with a uncontrollable node in its database.
 
-This patch changes Import and CreateNetwork API to deliver tokens via
-the JoinComplete method call.  When application doesn't raise any error
-during handling JoinComplete then it is assumed that the token has been
-saved, otherwise when application replies with an error message then the
-node is removed.
+Let's fix the issue by always delivering tokens using JoinComplete call,
+and expecting a reply - if the application return an error, daemon will
+get rid of the node.
 ---
- mesh/mesh.c | 68 +++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 53 insertions(+), 15 deletions(-)
+ doc/mesh-api.txt | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 9b3768b69..01e39e916 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -430,6 +430,20 @@ static void send_join_failed(const char *owner, const char *path,
- 	free_pending_join_call(true);
- }
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index c7374703b..e38b8d1eb 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -29,6 +29,10 @@ Methods:
+ 		therefore attempting to call this function using already
+ 		registered UUID results in an error.
  
-+static void prov_join_complete_reply_cb(struct l_dbus_message *message,
-+								void *user_data)
-+{
-+	bool failed = false;
++		When provisioning finishes, the daemon will call either
++		JoinComplete or JoinFailed method on object implementing
++		org.bluez.mesh.Application1 interface.
 +
-+	if (!message || l_dbus_message_is_error(message))
-+		failed = true;
-+
-+	if (!failed)
-+		node_attach_io(join_pending->node, mesh.io);
-+
-+	free_pending_join_call(failed);
-+}
-+
- static bool prov_complete_cb(void *user_data, uint8_t status,
- 					struct mesh_prov_node_info *info)
- {
-@@ -456,18 +470,16 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
- 		return false;
- 	}
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists,
+@@ -123,7 +127,7 @@ Methods:
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
  
--	node_attach_io(join_pending->node, mesh.io);
- 	token = node_get_token(join_pending->node);
+-	uint64 token CreateNetwork(object app_root, array{byte}[16] uuid)
++	void CreateNetwork(object app_root, array{byte}[16] uuid)
  
-+	l_debug("Calling JoinComplete (prov)");
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
- 						MESH_APPLICATION_INTERFACE,
- 						"JoinComplete");
+ 		This is the first method that an application calls to become
+ 		a Provisioner node, and a Configuration Client on a newly
+@@ -144,22 +148,20 @@ Methods:
+ 		therefore attempting to call this function using already
+ 		registered UUID results in an error.
  
- 	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
+-		The returned token must be preserved by the application in
+-		order to authenticate itself to the mesh daemon and attach to
+-		the network as a mesh node by calling Attach() method or
+-		permanently remove the identity of the mesh node by calling
+-		Leave() method.
 -
--	l_dbus_send(dbus, msg);
--
--	free_pending_join_call(false);
-+	l_dbus_send_with_reply(dbus, msg,
-+				prov_join_complete_reply_cb, NULL, NULL);
+ 		The other information the bluetooth-meshd daemon will preserve
+ 		about the initial node, is to give it the initial primary
+ 		unicast address (0x0001), and create and assign a net_key as the
+ 		primary network net_index (0x000).
  
- 	return true;
- }
-@@ -662,11 +674,28 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static void create_join_complete_reply_cb(struct l_dbus_message *message,
-+								void *user_data)
-+{
-+	struct mesh_node *node = user_data;
++		Upon successful processing of Create() method, the daemon
++		will call JoinComplete method on object implementing
++		org.bluez.mesh.Application1.
 +
-+	if (!message || l_dbus_message_is_error(message)) {
-+		node_remove(node);
-+		return;
-+	}
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists,
+ 
+-	uint64 token Import(object app_root, array{byte}[16] uuid,
++	void Import(object app_root, array{byte}[16] uuid,
+ 				array{byte}[16] dev_key,
+ 				array{byte}[16] net_key, uint16 net_index,
+ 				dict flags, uint32 iv_index, uint16 unicast)
+@@ -204,11 +206,9 @@ Methods:
+ 		The unicast parameter is the primary unicast address of the
+ 		imported node.
+ 
+-		The returned token must be preserved by the application in
+-		order to authenticate itself to the mesh daemon and attach to
+-		the network as a mesh node by calling Attach() method or
+-		permanently remove the identity of the mesh node by calling
+-		Leave() method.
++		Upon successful processing of Import() method, the daemon will
++		call JoinComplete method on object implementing
++		org.bluez.mesh.Application1 interface.
+ 
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments,
+@@ -770,6 +770,10 @@ Methods:
+ 		permanently remove the identity of the mesh node by calling
+ 		Leave() method.
+ 
++		If this method returns an error, the daemon will assume that the
++		application failed to preserve the token, and will remove the
++		freshly created node.
 +
-+	node_attach_io(node, mesh.io);
-+}
-+
- static void create_node_ready_cb(void *user_data, int status,
- 							struct mesh_node *node)
- {
-+	struct l_dbus *dbus = dbus_get_bus();
- 	struct l_dbus_message *reply;
- 	struct l_dbus_message *pending_msg;
-+	struct l_dbus_message *msg;
-+	const char *owner;
-+	const char *path;
- 	const uint8_t *token;
+ 	void JoinFailed(string reason)
  
- 	pending_msg = l_queue_find(pending_queue, simple_match, user_data);
-@@ -675,20 +704,29 @@ static void create_node_ready_cb(void *user_data, int status,
- 
- 	if (status != MESH_ERROR_NONE) {
- 		reply = dbus_error(pending_msg, status, NULL);
--		goto done;
--	}
- 
--	node_attach_io(node, mesh.io);
-+		l_dbus_send(dbus_get_bus(), reply);
-+		l_queue_remove(pending_queue, pending_msg);
-+		return;
-+	}
- 
- 	reply = l_dbus_message_new_method_return(pending_msg);
-+
-+	l_dbus_send(dbus, reply);
-+	l_queue_remove(pending_queue, pending_msg);
-+
-+	owner = l_dbus_message_get_sender(pending_msg);
-+	path = node_get_app_path(node);
- 	token = node_get_token(node);
- 
--	l_debug();
--	l_dbus_message_set_arguments(reply, "t", l_get_be64(token));
-+	l_debug("Calling JoinComplete (create)");
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_APPLICATION_INTERFACE,
-+						"JoinComplete");
- 
--done:
--	l_dbus_send(dbus_get_bus(), reply);
--	l_queue_remove(pending_queue, pending_msg);
-+	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
-+	l_dbus_send_with_reply(dbus, msg,
-+				create_join_complete_reply_cb, node, NULL);
- }
- 
- static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
-@@ -842,11 +880,11 @@ static void setup_network_interface(struct l_dbus_interface *iface)
- 								"token");
- 
- 	l_dbus_interface_method(iface, "CreateNetwork", 0, create_network_call,
--					"t", "oay", "token", "app", "uuid");
-+					"", "oay", "app", "uuid");
- 
- 	l_dbus_interface_method(iface, "Import", 0,
- 					import_call,
--					"t", "oayayayqa{sv}uq", "token",
-+					"", "oayayayqa{sv}uq",
- 					"app", "uuid", "dev_key", "net_key",
- 					"net_index", "flags", "iv_index",
- 					"unicast");
+ 		This method is called when the node provisioning initiated by
 -- 
 2.20.1
 
