@@ -2,157 +2,97 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA59C2BB1D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 23:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81839C352BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 23:07:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48A672076C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 23:00:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 534C52072D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 23:07:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586905222;
-	bh=uiUJzrzgdt5YHngiROPE2ZTJnSefzm2oy99nLegeYOI=;
+	s=default; t=1586905632;
+	bh=ieD82P08YTfY/G82UOdtm/Vbiq6/iOjVevWPdZpen1U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=SMijHnMM8UG5fERsPYqjjOdot3Oc/PibIyQ4SEd4+XtK+C6PuScAO6trXGxguYJYJ
-	 xhsF7a+tbP0yBS86D01YvcsMzseiPajlwB1AnLGwotuF+vOSJKqYunvuhuCGbIb41n
-	 UCuhdE1LcqsIgCQ7YT1sL7mry0Mc/jap1WvGa78I=
+	b=Fj9wnSecwiSQhvLL+SHpFzkKJkRFj9DhLyIgxUlA1uJGg+NtUjKGDqbzyI4BSXSdx
+	 F33lmT+eMbL6V/2N4e9WclG21Iyt+hHyCB47dHgBxfd/lT+sYX676N9KoP98jSVPIM
+	 W9otOp4lsQ1SuxdO3j0m45AGFBAkAZnNPeSheA9c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2634334AbgDNXAV (ORCPT
+        id S2634352AbgDNXHK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 19:00:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53900 "EHLO mail.kernel.org"
+        Tue, 14 Apr 2020 19:07:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54562 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2634321AbgDNXAS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 19:00:18 -0400
+        id S1731133AbgDNXHI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Apr 2020 19:07:08 -0400
 Received: from pali.im (pali.im [31.31.79.79])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 79DA12051A;
-        Tue, 14 Apr 2020 23:00:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B622A2054F;
+        Tue, 14 Apr 2020 23:07:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586905217;
-        bh=uiUJzrzgdt5YHngiROPE2ZTJnSefzm2oy99nLegeYOI=;
+        s=default; t=1586905627;
+        bh=ieD82P08YTfY/G82UOdtm/Vbiq6/iOjVevWPdZpen1U=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LyL8FOq33Wz/g73qjt5s/81XskYFCZ0PVMCqH1us0xRtla6gSiVFH9z8YFxQ0qfB4
-         xvJf++tzwPETzd/wnAm9dfIMTvYUrKMvARSExjsugD73H1R7TiGRIVeB16NIwh9r4/
-         E++f4mMtct1guCHiNJwOm8dgxpnzz893f0GNoPRQ=
+        b=jIEc5R04gywZMMrc71uCHzSof2qGeQqpiHcGu13QWvSESY1BI7TBuBJfC0ahgMTYW
+         csxfDtnI4ssTNDV6nHRdtcSx8orGnIc9dfvvsCc84wUP4i53oEK3DYI6jlnQQ1W0t9
+         pZ7MKN2xc5D1mV0RKF+JhHiUTQ3SRBnhOJ+g+2nM=
 Received: by pali.im (Postfix)
-        id 7EB267DE; Wed, 15 Apr 2020 01:00:15 +0200 (CEST)
-Date:   Wed, 15 Apr 2020 01:00:15 +0200
+        id CA40F7DE; Wed, 15 Apr 2020 01:07:05 +0200 (CEST)
+Date:   Wed, 15 Apr 2020 01:07:05 +0200
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
+        David Heidelberg <david@ixit.cz>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20200414230015.5ndqz5k5kx5vakj4@pali>
-References: <20190130120631.usx67zjk4kmbhcla@pali>
- <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
- <20190201124353.GK32745@reaktio.net>
- <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
- <20190305122630.gwnaz3y7ckzqfjfq@pali>
- <20190410082924.exo2oihzd7w2oz3e@pali>
- <20190607130739.j25oqqj624anmcqr@pali>
- <20191014110746.n3pmoigtf3ewbmrq@pali>
- <20200209130532.4evozfyutikzwn4a@pali>
+Subject: Undocumented property "DelayReporting" (Was: Re: [PATCH BlueZ 1/4]
+ doc/media-api: Add RegisterApplication method)
+Message-ID: <20200414230705.7cwffdkal34efyag@pali>
+References: <20190721155522.3vqt7vsprhpxflqf@pali>
+ <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
+ <20190829125734.GH2840@reaktio.net>
+ <20190829200513.6xnta5jx3trbmgxp@pali>
+ <20191003181855.GF28704@reaktio.net>
+ <20191006100503.fsbttcschr6wgsdq@pali>
+ <CABBYNZLS4MMxJ=gQED-BVfn81D0bvx8aLw5OO3tNmXAnWeA57Q@mail.gmail.com>
+ <20191006120245.tkrooh45q7irtm6l@pali>
+ <20191009132040.tqnzfabp3llbg2g3@pali>
+ <20191114112753.4h7xifkvpjpzgm7x@pali>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200209130532.4evozfyutikzwn4a@pali>
+In-Reply-To: <20191114112753.4h7xifkvpjpzgm7x@pali>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sunday 09 February 2020 14:05:32 Pali Rohár wrote:
-> On Monday 14 October 2019 13:07:46 Pali Rohár wrote:
-> > On Friday 07 June 2019 15:07:39 Pali Rohár wrote:
-> > > On Wednesday 10 April 2019 10:29:24 Pali Rohár wrote:
-> > > > On Tuesday 05 March 2019 13:26:30 Pali Rohár wrote:
-> > > > > On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> > > > > > On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > > > > > > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > > > > > > Hi,
-> > > > > > > > 
-> > > > > > > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > > > > > > Hi Pali, Pasi,
-> > > > > > > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > > > > > > Hi Pali,
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > > > > > > {
-> > > > > > > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > > > > > > >                 return "aptX";
-> > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > > > > > > +               return "FastStream";
-> > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > > > > > > +               return "aptX HD";
-> > > > > > > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > > > > > > >                 return "LDAC";
-> > > > > > > > > > > > > >         return "Unknown???;
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > > > > > > >
-> > > > > > > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > > > > > > implemented this parsing.
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > > > > > > >
-> > > > > > > > > > Exactly, people still use hcidump...
-> > > > > > > > > 
-> > > > > > > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > > > > > > 6.x which we would like to do in the very next release, if that
-> > > > > > > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > > > > > > BlueZ 5.x release.
-> > > > > > > > > 
-> > > > > > > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > > > > > > start working on removing the deprecated tools/etc.
-> > > > > > > > > 
-> > > > > > > > 
-> > > > > > > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > > > > > > 
-> > > > > > > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > > > > > > release, can you take this patch?
-> > > > > > >
-> > > > > > 
-> > > > > > How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> > > > > > hcidump then gets removed later whenever the removal of deprecated features/tools starts.
-> > > > > 
-> > > > > So... what are plans for next release?
+On Thursday 14 November 2019 12:27:53 Pali Rohár wrote:
+> On Wednesday 09 October 2019 15:20:40 Pali Rohár wrote:
+> > On Sunday 06 October 2019 14:02:45 Pali Rohár wrote:
+> > > On Sunday 06 October 2019 13:53:37 Luiz Augusto von Dentz wrote:
+> > > > Hi Pali,
 > > > > 
-> > > > Marcel, Luiz, can you comment next steps? It is waiting there for your
-> > > > info here for more than 2 months.
+> > > > It is just another D-Bus method, the only difference is that it
+> > > > carries the entire object tree, btw I did add an example of how to
+> > > > register Endpoints in python:
+> > > > 
+> > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-endpoint
 > > > 
-> > > PING!
+> > > This example uses undocumented property "DelayReporting". What it is doing?
 > > 
-> > Just a gentle reminder for this thread and patch.
-> > 
+> > And I would like to know what is that undocumented DelayReporting is
+> > doing? And to which value should I initialize it in pulseaudio?
 > 
-> Ping, another reminder.
+> Luiz, any comments on this?
 
-Ping, could you please give us information what is the state of this
-tool and a linked patch?
+Luiz, could you please tell me some information about this undocumented
+property to which value should I set it? I really need it for proper
+implementation of endpoints in pulseaudio.
+
+I was not able to decode its meaning from source code nor found any
+other information about it.
