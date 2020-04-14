@@ -2,124 +2,140 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BACC2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 18:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14987C352BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:35:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7432C20787
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 18:59:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TKSsICsF"
+	by mail.kernel.org (Postfix) with ESMTP id F36F8206E9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:34:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504547AbgDNS7P (ORCPT
+        id S2504869AbgDNTeq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 14:59:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2504542AbgDNS7H (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 14:59:07 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7230C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 11:59:05 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id o22so9690707pjp.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 11:59:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=vIh5eTB8uOZv+p6Eoz7dTqGKo5Rnh4f9sFKMcqBFlS8=;
-        b=TKSsICsFBab9k1r/Gi5jGrU9d5rCvU8AKwKC4tWt+X4MHt8DCtd7JylXyPtfDr97It
-         cWvrhcw8k895UD38eusJiJiXLt8LJcVf5Z0GTMQSaGZKkNGuX6QUnhfCUraiApk4aPVC
-         zUkxuEaZUfBnb4dgp4Wh8RldstNeGPXqBLEoFg8r+Q29SKYCDPNTewavGBOmD/z5ndit
-         sA0PM1rjsRpW6QeqWDeMcUTlWpnOqsT5kP59nabvANNNLjPhqSj+/KRdaXN56Hkl3e7x
-         CBNpY6OGBXo+MK5RU/QXKqUxCMUGcDACNLYg8lKP/HdrZAgGjKO8EUe2ZDtvBqYc5LoE
-         rfTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=vIh5eTB8uOZv+p6Eoz7dTqGKo5Rnh4f9sFKMcqBFlS8=;
-        b=ZDBQHV5PxqYvS5+V6IOV5RcU63uiFvpwdhHAEl0zBp/+GRQ4NfW3JWg7akCD5bp0rx
-         8f22vs5rAIOd3rPuSTJf0t7hqvV4ArjtY8L8pIdJe4Nm+10peWPB0W26zrmOhDF7765v
-         7/G6Leje62eBdspHRdacling8/fleP2qFsxbuXxejO4dWC3W7G+nY0KBVApf/cPjN02m
-         dwSOhLs52OBFR6RmxIDlUGOnLsyEAqNuMQVDPtZCHZBCZK3JC/54OVFuc5lBS/SDxhXP
-         LFWBVyRsrD4LFmZ+6RTQjpBxRQDJ7WnLrB7LE5uOqpMaYgLHhSc2OauJfcywSCQfj7kC
-         WXfA==
-X-Gm-Message-State: AGi0PuYgbYbz/bead/Wj6Jrhv98ycpOwN8tggWenhwS+NPXK5kJNNhW1
-        fLOzzMZD99PJyztrbXHb7GbMpgmzNovC5w==
-X-Google-Smtp-Source: APiQypLCRwItYE4hAhA2TRPzwwyxc65C2HZuJqXdiigQnh9OCq/AJAhmepoJkaAhS7Huv9Y2QbNqd8iIqzVihw==
-X-Received: by 2002:a17:90a:e02:: with SMTP id v2mr1764972pje.131.1586890745234;
- Tue, 14 Apr 2020 11:59:05 -0700 (PDT)
-Date:   Tue, 14 Apr 2020 11:58:21 -0700
-Message-Id: <20200414115512.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
-Subject: [PATCH] Bluetooth: Terminate the link if pairing is cancelled
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Alain Michaud <alainm@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 14 Apr 2020 15:34:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60298 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2504805AbgDNTdv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Apr 2020 15:33:51 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 63506AC2C;
+        Tue, 14 Apr 2020 19:16:04 +0000 (UTC)
+Date:   Tue, 14 Apr 2020 21:16:01 +0200
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-crypto@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] crypto: Remove unnecessary memzero_explicit()
+Message-ID: <20200414191601.GZ25468@kitsune.suse.cz>
+References: <20200413211550.8307-1-longman@redhat.com>
+ <20200413222846.24240-1-longman@redhat.com>
+ <eca85e0b-0af3-c43a-31e4-bd5c3f519798@c-s.fr>
+ <e194a51f-a5e5-a557-c008-b08cac558572@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e194a51f-a5e5-a557-c008-b08cac558572@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If user decides to cancel ongoing pairing process (e.g. by clicking
-the cancel button on the pairing/passkey window), abort any ongoing
-pairing and then terminate the link.
+On Tue, Apr 14, 2020 at 12:24:36PM -0400, Waiman Long wrote:
+> On 4/14/20 2:08 AM, Christophe Leroy wrote:
+> >
+> >
+> > Le 14/04/2020 à 00:28, Waiman Long a écrit :
+> >> Since kfree_sensitive() will do an implicit memzero_explicit(), there
+> >> is no need to call memzero_explicit() before it. Eliminate those
+> >> memzero_explicit() and simplify the call sites. For better correctness,
+> >> the setting of keylen is also moved down after the key pointer check.
+> >>
+> >> Signed-off-by: Waiman Long <longman@redhat.com>
+> >> ---
+> >>   .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 19 +++++-------------
+> >>   .../allwinner/sun8i-ss/sun8i-ss-cipher.c      | 20 +++++--------------
+> >>   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 12 +++--------
+> >>   drivers/crypto/inside-secure/safexcel_hash.c  |  3 +--
+> >>   4 files changed, 14 insertions(+), 40 deletions(-)
+> >>
+> >> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> >> b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> >> index aa4e8fdc2b32..8358fac98719 100644
+> >> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> >> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> >> @@ -366,10 +366,7 @@ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm)
+> >>   {
+> >>       struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
+> >>   -    if (op->key) {
+> >> -        memzero_explicit(op->key, op->keylen);
+> >> -        kfree(op->key);
+> >> -    }
+> >> +    kfree_sensitive(op->key);
+> >>       crypto_free_sync_skcipher(op->fallback_tfm);
+> >>       pm_runtime_put_sync_suspend(op->ce->dev);
+> >>   }
+> >> @@ -391,14 +388,11 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher
+> >> *tfm, const u8 *key,
+> >>           dev_dbg(ce->dev, "ERROR: Invalid keylen %u\n", keylen);
+> >>           return -EINVAL;
+> >>       }
+> >> -    if (op->key) {
+> >> -        memzero_explicit(op->key, op->keylen);
+> >> -        kfree(op->key);
+> >> -    }
+> >> -    op->keylen = keylen;
+> >> +    kfree_sensitive(op->key);
+> >>       op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+> >>       if (!op->key)
+> >>           return -ENOMEM;
+> >> +    op->keylen = keylen;
+> >
+> > Does it matter at all to ensure op->keylen is not set when of->key is
+> > NULL ? I'm not sure.
+> >
+> > But if it does, then op->keylen should be set to 0 when freeing op->key. 
+> 
+> My thinking is that if memory allocation fails, we just don't touch
+> anything and return an error code. I will not explicitly set keylen to 0
+> in this case unless it is specified in the API documentation.
+You already freed the key by now so not touching anything is not
+possible. The key is set to NULL on allocation failure so setting keylen
+to 0 should be redundant. However, setting keylen to 0 is consisent with
+not having a key, and it avoids the possibility of leaking the length
+later should that ever cause any problem.
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
----
-Hello Linux-Bluetooth,
+Thanks
 
-  This patch aborts any ongoing pairing and then terminates the link
-  by calling hci_abort_conn() in cancel_pair_device() function.
-
-  However, I'm not very sure if hci_abort_conn() should be called here
-  in cancel_pair_device() or in smp for example to terminate the link
-  after it had sent the pairing failed PDU.
-
-  Please share your thoughts on this.
-
-Thanks and regards,
-Manish.
-
- net/bluetooth/mgmt.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6552003a170eb..1aaa44282af4f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3030,6 +3030,18 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
- 				addr, sizeof(*addr));
-+
-+	/* Since user doesn't want to proceed with the connection,
-+	 * abort any ongoing pairing and then terminate the link.
-+	 */
-+	if (addr->type == BDADDR_BREDR)
-+		hci_remove_link_key(hdev, &addr->bdaddr);
-+	else
-+		smp_cancel_and_remove_pairing(hdev, &addr->bdaddr,
-+					      le_addr_type(addr->type));
-+
-+	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
--- 
-2.26.0.110.g2183baf09c-goog
-
+Michal
