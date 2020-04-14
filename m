@@ -2,210 +2,293 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A28C2BB1D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 03:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E06E2C352BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 06:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD78720732
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 03:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B95A620735
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 06:08:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBUMFK3f"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="swLCNyX7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404523AbgDNDS2 (ORCPT
+        id S2405775AbgDNGIm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Apr 2020 23:18:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47424 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404542AbgDNDST (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Apr 2020 23:18:19 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9769FC0A3BDC;
-        Mon, 13 Apr 2020 20:18:19 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id u13so12118814wrp.3;
-        Mon, 13 Apr 2020 20:18:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=giWSpSfOhp4srs/f1cIhyKITUR4isg3xeqTrICKONHY=;
-        b=nBUMFK3fkZdy9DM1eKQcciB//NLauuaDyrFsHqf48+lN0sDj0eUPj89yOCX5iBSA9X
-         mGOWGgGpgQraxPcw/xk/+Kwe7fLrBY31RI2zRDPGKp0zU22qbwSRpW6NpGX64C/Ja4yD
-         USwz4F71Wfti6WjtpRt/ibRXx28nL7iFHprKDH2LeUmPnMdIZVr8CWflWrDol3dELEHL
-         Mu+1L59w3YcSy1788twvWjjyQ4Nny8KwTupUrwDmkW6qf1QWo4J/0/0T8lTl7UCJ5BwD
-         Ba6jSjgW+g7t5B9hg5HeuGONWpHLrCR203SxC9YyPyWyWsHr3Z872HULVu/iZyOZqEjS
-         2IZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=giWSpSfOhp4srs/f1cIhyKITUR4isg3xeqTrICKONHY=;
-        b=QxiSyjqSsprqxqF1WbMuU3zu+f+8JH1berN+/slb3TuoUvYsc48BNqe35OJFmxjnNq
-         WchutkyU6F9Clb/otKQsjLeaRQTHEyWavw+xVaGvOXTo2hf8KlzfDiqhynL2h6XAPnVh
-         l80uS1YAdLkvn9gpjg/MQtSPmzoiqYLLOVA3VnScjzNciy1qTEbAmSU9c8/vDh2atGlE
-         iT0XukWoUW8sCC+13vNhw/hTMso/3H9NPIbAKvxFgsrgK+XIbd9fClXMoat80EILIcrO
-         oN1JaTdTTeQ+6I8wZHcsuidN1Dad7awqfKvLQQ9x6P4D3cxepvXREnTcgi14SWWc6CD/
-         TMrA==
-X-Gm-Message-State: AGi0Pub4qM7C+5bPfyis7TKHM0/VkwgH5HuRGaaxmAr3v5wOUs98TqkR
-        I9m0wY4jw1nU7a74UOscs7xwaqyNf66/Xt3JsXI=
-X-Google-Smtp-Source: APiQypKMMDhD7xwuCEgfGLdUIfq0mNFjTiqY3bXUa+ho6L8vYto4kPMfkQjPu4KKTYj1zIIxbyg7zpZFZeAyD1/vGzA=
-X-Received: by 2002:a5d:48cc:: with SMTP id p12mr22788314wrs.170.1586834298330;
- Mon, 13 Apr 2020 20:18:18 -0700 (PDT)
+        Tue, 14 Apr 2020 02:08:42 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:51680 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405711AbgDNGIj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Apr 2020 02:08:39 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 491Zmc64yLz9txkH;
+        Tue, 14 Apr 2020 08:08:32 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=swLCNyX7; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 4yni2YpdXT3P; Tue, 14 Apr 2020 08:08:32 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 491Zmc4L0Rz9txkG;
+        Tue, 14 Apr 2020 08:08:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1586844512; bh=AyML/oaUiIiNPJKHTIdsIrbz6fYQpNyy/73cMAJtVGI=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=swLCNyX719PsbdWXJyAjua3tpVkuZHN/PgaRAzIUI6j3FuSDm374UPnlGZYSrGzxT
+         ndt6dm09KOl8ksmzmfqqYKRuIRIOuM5gK03jv/9oM2sodvHG7ZsAdW0K43bNG1m7AR
+         C9uF0GCYNnsgDDdT0CCsxA/cfFfbv77mzxAhptqM=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5B4A48B77D;
+        Tue, 14 Apr 2020 08:08:33 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id IsbJC8uJ2iOV; Tue, 14 Apr 2020 08:08:33 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 997728B752;
+        Tue, 14 Apr 2020 08:08:30 +0200 (CEST)
+Subject: Re: [PATCH v2 2/2] crypto: Remove unnecessary memzero_explicit()
+To:     Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>
+Cc:     linux-mm@kvack.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+References: <20200413211550.8307-1-longman@redhat.com>
+ <20200413222846.24240-1-longman@redhat.com>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Message-ID: <eca85e0b-0af3-c43a-31e4-bd5c3f519798@c-s.fr>
+Date:   Tue, 14 Apr 2020 08:08:22 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20190906023601.4378-1-andrew.smirnov@gmail.com>
-In-Reply-To: <20190906023601.4378-1-andrew.smirnov@gmail.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Mon, 13 Apr 2020 20:18:07 -0700
-Message-ID: <CAHQ1cqEqM5=Gm1jxEX=h02KW_-OLUn0W3R7T6o5bFW9+6ZPiOQ@mail.gmail.com>
-Subject: Re: [RESEND PATCH v2] Bluetooth: Retry configure request if result is L2CAP_CONF_UNKNOWN
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
-        Florian Dollinger <dollinger.florian@gmx.de>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200413222846.24240-1-longman@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Sep 5, 2019 at 7:36 PM Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->
-> Due to:
->
->  * Current implementation of l2cap_config_rsp() dropping BT
->    connection if sender of configuration response replied with unknown
->    option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
->
->  * Current implementation of l2cap_build_conf_req() adding
->    L2CAP_CONF_RFC(0x04) option to initial configure request sent by
->    the Linux host.
->
-> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
-> controllers, will get stuck in endless connect -> configure ->
-> disconnect loop, never connect and be generaly unusable.
->
-> To avoid this problem add code to do the following:
->
->  1. Parse the body of response L2CAP_CONF_UNKNOWN and, in case of
->     unsupported option being RFC, clear L2CAP_FEAT_ERTM and
->     L2CAP_FEAT_STREAMING from connection's feature mask (in order to
->     prevent RFC option from being added going forward)
->
->  2. Retry configuration step the same way it's done for
->     L2CAP_CONF_UNACCEPT
->
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
-> Cc: Florian Dollinger <dollinger.florian@gmx.de>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
+
+
+Le 14/04/2020 à 00:28, Waiman Long a écrit :
+> Since kfree_sensitive() will do an implicit memzero_explicit(), there
+> is no need to call memzero_explicit() before it. Eliminate those
+> memzero_explicit() and simplify the call sites. For better correctness,
+> the setting of keylen is also moved down after the key pointer check.
+> 
+> Signed-off-by: Waiman Long <longman@redhat.com>
 > ---
->
-> Changes since [v1]:
->
->    - Patch simplified to simply clear L2CAP_FEAT_ERTM |
->      L2CAP_FEAT_STREAMING from feat_mask when device flags RFC options
->      as unknown
->
-> [v1] lore.kernel.org/r/20190208025828.30901-1-andrew.smirnov@gmail.com
->
+>   .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 19 +++++-------------
+>   .../allwinner/sun8i-ss/sun8i-ss-cipher.c      | 20 +++++--------------
+>   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 12 +++--------
+>   drivers/crypto/inside-secure/safexcel_hash.c  |  3 +--
+>   4 files changed, 14 insertions(+), 40 deletions(-)
+> 
+> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> index aa4e8fdc2b32..8358fac98719 100644
+> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> @@ -366,10 +366,7 @@ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm)
+>   {
+>   	struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
+>   
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> +	kfree_sensitive(op->key);
+>   	crypto_free_sync_skcipher(op->fallback_tfm);
+>   	pm_runtime_put_sync_suspend(op->ce->dev);
+>   }
+> @@ -391,14 +388,11 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   		dev_dbg(ce->dev, "ERROR: Invalid keylen %u\n", keylen);
+>   		return -EINVAL;
+>   	}
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> -	op->keylen = keylen;
+> +	kfree_sensitive(op->key);
+>   	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+>   	if (!op->key)
+>   		return -ENOMEM;
+> +	op->keylen = keylen;
 
-Marcel, Johan, can either of you please comment on this patch? I've
-sent a number of patches to linux-bluetooth in past 6 month all of
-which were met with radio silence, so I am a bit worried that my
-messages are being filtered out or dropped.
+Does it matter at all to ensure op->keylen is not set when of->key is 
+NULL ? I'm not sure.
 
-Thanks,
-Andrey Smirnov
+But if it does, then op->keylen should be set to 0 when freeing op->key.
+
+>   
+>   	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
+>   	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+> @@ -416,14 +410,11 @@ int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   	if (err)
+>   		return err;
+>   
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> -	op->keylen = keylen;
+> +	kfree_sensitive(op->key);
+>   	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+>   	if (!op->key)
+>   		return -ENOMEM;
+> +	op->keylen = keylen;
+
+Same comment as above.
+
+>   
+>   	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
+>   	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> index 5246ef4f5430..0495fbc27fcc 100644
+> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> @@ -249,7 +249,6 @@ static int sun8i_ss_cipher(struct skcipher_request *areq)
+>   			offset = areq->cryptlen - ivsize;
+>   			if (rctx->op_dir & SS_DECRYPTION) {
+>   				memcpy(areq->iv, backup_iv, ivsize);
+> -				memzero_explicit(backup_iv, ivsize);
+>   				kfree_sensitive(backup_iv);
+>   			} else {
+>   				scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+> @@ -367,10 +366,7 @@ void sun8i_ss_cipher_exit(struct crypto_tfm *tfm)
+>   {
+>   	struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
+>   
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> +	kfree_sensitive(op->key);
+>   	crypto_free_sync_skcipher(op->fallback_tfm);
+>   	pm_runtime_put_sync(op->ss->dev);
+>   }
+> @@ -392,14 +388,11 @@ int sun8i_ss_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   		dev_dbg(ss->dev, "ERROR: Invalid keylen %u\n", keylen);
+>   		return -EINVAL;
+>   	}
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> -	op->keylen = keylen;
+> +	kfree_sensitive(op->key);
+>   	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+>   	if (!op->key)
+>   		return -ENOMEM;
+> +	op->keylen = keylen;
+
+Same comment as above.
+
+>   
+>   	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
+>   	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+> @@ -418,14 +411,11 @@ int sun8i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   		return -EINVAL;
+>   	}
+>   
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> -	op->keylen = keylen;
+> +	kfree_sensitive(op->key);
+>   	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+>   	if (!op->key)
+>   		return -ENOMEM;
+> +	op->keylen = keylen;
+
+Same comment as above.
+
+>   
+>   	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
+>   	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> index fd1269900d67..6aa9ce7bbbd4 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+> @@ -341,10 +341,7 @@ void meson_cipher_exit(struct crypto_tfm *tfm)
+>   {
+>   	struct meson_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
+>   
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> +	kfree_sensitive(op->key);
+>   	crypto_free_sync_skcipher(op->fallback_tfm);
+>   }
+>   
+> @@ -368,14 +365,11 @@ int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>   		dev_dbg(mc->dev, "ERROR: Invalid keylen %u\n", keylen);
+>   		return -EINVAL;
+>   	}
+> -	if (op->key) {
+> -		memzero_explicit(op->key, op->keylen);
+> -		kfree(op->key);
+> -	}
+> -	op->keylen = keylen;
+> +	kfree_sensitive(op->key);
+>   	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+>   	if (!op->key)
+>   		return -ENOMEM;
+> +	op->keylen = keylen;
+
+Same comment as above.
+
+>   
+>   	return crypto_sync_skcipher_setkey(op->fallback_tfm, key, keylen);
+>   }
+> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+> index 43962bc709c6..4a2d162914de 100644
+> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+> @@ -1081,8 +1081,7 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
+>   		}
+>   
+>   		/* Avoid leaking */
+> -		memzero_explicit(keydup, keylen);
+> -		kfree(keydup);
+> +		kfree_sensitive(keydup);
+>   
+>   		if (ret)
+>   			return ret;
+> 
 
 
->  net/bluetooth/l2cap_core.c | 58 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index dfc1edb168b7..77b65870b064 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4216,6 +4216,49 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
->         return err;
->  }
->
-> +static inline int l2cap_config_rsp_unknown(struct l2cap_conn *conn,
-> +                                          struct l2cap_chan *chan,
-> +                                          const u8 *data,
-> +                                          int len)
-> +{
-> +       char req[64];
-> +
-> +       if (!len || len > sizeof(req) -  sizeof(struct l2cap_conf_req))
-> +               return -ECONNRESET;
-> +
-> +       while (len--) {
-> +               const u8 option_type = *data++;
-> +
-> +               BT_DBG("chan %p, unknown option type: %u", chan,  option_type);
-> +
-> +               /* "...Hints shall not be included in the Response and
-> +                * shall not be the sole cause for rejecting the
-> +                * Request.."
-> +                */
-> +               if (option_type & L2CAP_CONF_HINT)
-> +                       return -ECONNRESET;
-> +
-> +               switch (option_type) {
-> +               case L2CAP_CONF_RFC:
-> +                       /* Clearing the following feature should
-> +                        * prevent RFC option from being added next
-> +                        * connection attempt
-> +                        */
-> +                       conn->feat_mask &= ~(L2CAP_FEAT_ERTM |
-> +                                            L2CAP_FEAT_STREAMING);
-> +                       break;
-> +               default:
-> +                       return -ECONNRESET;
-> +               }
-> +       }
-> +
-> +       len = l2cap_build_conf_req(chan, req, sizeof(req));
-> +       l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ, len, req);
-> +       chan->num_conf_req++;
-> +
-> +       return 0;
-> +}
-> +
->  static inline int l2cap_config_rsp(struct l2cap_conn *conn,
->                                    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
->                                    u8 *data)
-> @@ -4271,6 +4314,21 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
->                 }
->                 goto done;
->
-> +       case L2CAP_CONF_UNKNOWN:
-> +               if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
-> +                       if (l2cap_config_rsp_unknown(conn, chan, rsp->data,
-> +                                                    len) < 0) {
-> +                               l2cap_send_disconn_req(chan, ECONNRESET);
-> +                               goto done;
-> +                       }
-> +                       break;
-> +               }
-> +               /* Once, chan->num_conf_rsp goes above
-> +                * L2CAP_CONF_MAX_CONF_RSP we want to go down all the
-> +                * way to default label (just like L2CAP_CONF_UNACCEPT
-> +                * below)
-> +                */
-> +               /* fall through */
->         case L2CAP_CONF_UNACCEPT:
->                 if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
->                         char req[64];
-> --
-> 2.21.0
->
+Christophe
