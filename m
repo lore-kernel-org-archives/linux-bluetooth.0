@@ -2,132 +2,106 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E93CC2BB86
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 13:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2149DC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 13:27:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B67620732
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 13:10:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5pMf7te"
+	by mail.kernel.org (Postfix) with ESMTP id EE46C2063A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 13:27:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586870845;
+	bh=LGj3Qt8/4b6jvML46/rwmm7jZX7wSxG7VD3wLCkuQrY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=oA1mFqUvGyEPZgtZgRVbSFMT1LPBInChiNMwVyW3pt977kUdrFSz48TaQWjfKcYOR
+	 /B8uTyyqNozEFtRxEtRgxR6VAwTQrDhDAEgNRw9X//XtzfKsMC4icnV0gCVSacA0yn
+	 RzN+iHPCNuOTFDIvysPNWZyaRundxhrwC3D4ytfw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502590AbgDNNJw (ORCPT
+        id S1731873AbgDNN05 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 09:09:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52233 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2502593AbgDNNJG (ORCPT
+        Tue, 14 Apr 2020 09:26:57 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:36899 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731920AbgDNN0q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 09:09:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586869744;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hBYiVbPBfUS+AcwD+sXBpDKSbw0tQLOGN9sYzZKYAmI=;
-        b=E5pMf7teSFCC9JBnhS8f1BEJGtHVCJl+K0eYRvlRC8I2leFPfJPujGr6n8UoPKVEP628Yj
-        LeoRRdC1wPdu+ZSHIq2mUq+0MwCV0R9WCfoudeU0Y8EYnCoJiUMMwG0u1LBcXji8r7CCH4
-        JNVTKqUyJxPJZUS3WO2yloZbdDsuhi8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-PA7uLtZsM327ACx1G3T_7g-1; Tue, 14 Apr 2020 09:07:49 -0400
-X-MC-Unique: PA7uLtZsM327ACx1G3T_7g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96CEA8048E4;
-        Tue, 14 Apr 2020 13:07:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-113-129.rdu2.redhat.com [10.10.113.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5AB5418A8E;
-        Tue, 14 Apr 2020 13:06:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20200413211550.8307-2-longman@redhat.com>
-References: <20200413211550.8307-2-longman@redhat.com> <20200413211550.8307-1-longman@redhat.com>
-To:     Waiman Long <longman@redhat.com>, herbert@gondor.apana.org.au
-cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
-        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
+        Tue, 14 Apr 2020 09:26:46 -0400
+Received: by mail-ot1-f68.google.com with SMTP id z17so5190555oto.4;
+        Tue, 14 Apr 2020 06:26:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=uBhOSKycNvwYl7l6E83n7sL5ut/2EC0wcW7rRu2+vgQ=;
+        b=gAPCHNezv8kVntkHCkOFyoFDJD6U8cApb+wdwbHJtPqUGDRvYU/eb2ppq0xY84As5+
+         lvTDWxHsd2cF5RumBIR1qxwky7PvC7HGCtD4T1a2a61/CIXvuRcE1n60nLE1ogRGIicp
+         8J98wq0H+X6V2yAR9vh1D+EfIMmEbaibPjGhuCo44eahbV6O08wzBGPysHBLMds0zAia
+         kLMz3s+mdXwo1nzMsx2XS6RllIlTg8rNgJG27xPeP51iHMpU2RN3Q4HOb7oRODXgXcbj
+         bZai4XLrM4eIzCpBp8KwH/EMcI4IQPn4HbFfq/LiixS+8aMg1j9XC/MaoCdrtER1eu9P
+         wgaQ==
+X-Gm-Message-State: AGi0PuZhBfOaZJ2BshJjRkPQfM3RLfPuh9DsMTzg1C0lYFe3iPzP2R6e
+        hvhsp67+ED9HpN55WFvcqg==
+X-Google-Smtp-Source: APiQypKulh49diU5WYrDhPSyt9XOk4wDWnAaaQ7DGWExGEYwcWK2zN/uZk6o5BO0wBK0tmXEJhy44A==
+X-Received: by 2002:a9d:32a4:: with SMTP id u33mr19357758otb.23.1586870804064;
+        Tue, 14 Apr 2020 06:26:44 -0700 (PDT)
+Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id t23sm5711880ooq.20.2020.04.14.06.26.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2020 06:26:43 -0700 (PDT)
+Received: (nullmailer pid 15088 invoked by uid 1000);
+        Tue, 14 Apr 2020 13:26:42 -0000
+Date:   Tue, 14 Apr 2020 08:26:42 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Alistair Francis <alistair@alistair23.me>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, mripard@kernel.org, wens@csie.org,
+        anarsoul@gmail.com, devicetree@vger.kernel.org,
+        alistair23@gmail.com, linux-arm-kernel@lists.infradead.org,
+        Alistair Francis <alistair@alistair23.me>
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: bluetooth: Add
+ rtl8723bs-bluetooth
+Message-ID: <20200414132642.GA13898@bogus>
+References: <20200412020644.355142-1-alistair@alistair23.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3807473.1586869616.1@warthog.procyon.org.uk>
-Date:   Tue, 14 Apr 2020 14:06:56 +0100
-Message-ID: <3807474.1586869616@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200412020644.355142-1-alistair@alistair23.me>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Waiman Long <longman@redhat.com> wrote:
+On Sat, 11 Apr 2020 19:06:42 -0700, Alistair Francis wrote:
+> From: Vasily Khoruzhick <anarsoul@gmail.com>
+> 
+> Add binding document for bluetooth part of RTL8723BS/RTL8723CS
+> 
+> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> ---
+>  .../bindings/net/realtek,rtl8723bs-bt.yaml    | 52 +++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.yaml
+> 
 
-> As said by Linus:
-> 
->   A symmetric naming is only helpful if it implies symmetries in use.
->   Otherwise it's actively misleading.
-> 
->   In "kzalloc()", the z is meaningful and an important part of what the
->   caller wants.
-> 
->   In "kzfree()", the z is actively detrimental, because maybe in the
->   future we really _might_ want to use that "memfill(0xdeadbeef)" or
->   something. The "zero" part of the interface isn't even _relevant_.
-> 
-> The main reason that kzfree() exists is to clear sensitive information
-> that should not be leaked to other future users of the same memory
-> objects.
-> 
-> Rename kzfree() to kfree_sensitive() to follow the example of the
-> recently added kvfree_sensitive() and make the intention of the API
-> more explicit. In addition, memzero_explicit() is used to clear the
-> memory to make sure that it won't get optimized away by the compiler.
-> 
-> The renaming is done by using the command sequence:
-> 
->   git grep -w --name-only kzfree |\
->   xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
-> 
-> followed by some editing of the kfree_sensitive() kerneldoc and the
-> use of memzero_explicit() instead of memset().
-> 
-> Suggested-by: Joe Perches <joe@perches.com>
-> Signed-off-by: Waiman Long <longman@redhat.com>
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Since this changes a lot of crypto stuff, does it make sense for it to go via
-the crypto tree?
+Error: Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.example.dts:17.1-7 syntax error
+FATAL ERROR: Unable to parse input tree
+scripts/Makefile.lib:311: recipe for target 'Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.example.dt.yaml' failed
+make[1]: *** [Documentation/devicetree/bindings/net/realtek,rtl8723bs-bt.example.dt.yaml] Error 1
+Makefile:1262: recipe for target 'dt_binding_check' failed
+make: *** [dt_binding_check] Error 2
 
-Acked-by: David Howells <dhowells@redhat.com>
+See https://patchwork.ozlabs.org/patch/1269392
 
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure dt-schema is up to date:
+
+pip3 install git+https://github.com/devicetree-org/dt-schema.git@master --upgrade
+
+Please check and re-submit.
