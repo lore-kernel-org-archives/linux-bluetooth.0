@@ -2,111 +2,98 @@ Return-Path: <SRS0=1iyh=56=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6188EC2BB85
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C581FC3815B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38C8920771
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586894026;
-	bh=1Tfa7F6G/eHZuULvkVNU9okQUoW6vF7kPfZUtg/VEZc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZiqNM+rjMNdcOUdwL6ykZ/79mCGmbGG9NFch1cxE3F8ngn/sYvp0mQUZRlEiK02hW
-	 vb89wHDnX9J8lUTiPpz2NQRxtoF5eIWvxUXiBToSvBQKnplro0ZbxY4EBFcL3r5DE7
-	 lpcGkfbygLNHSV6ELHpde7ROsB+IclT94xkveJs0=
+	by mail.kernel.org (Postfix) with ESMTP id A90122074D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Apr 2020 19:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2505255AbgDNTxn (ORCPT
+        id S2505271AbgDNT4p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Apr 2020 15:53:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41340 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2505216AbgDNTxh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Apr 2020 15:53:37 -0400
-Received: from pali.im (pali.im [31.31.79.79])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 43FE620767;
-        Tue, 14 Apr 2020 19:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586894017;
-        bh=1Tfa7F6G/eHZuULvkVNU9okQUoW6vF7kPfZUtg/VEZc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CzHa6E+EvWP+WxqXjhDcXL74Lo+64rWtuvB0IKavlw7DbBmFN8pqmS1sbnrW6kbWK
-         QMM6m4g43bKN47R2sn01rl71ZZjb3xrddug7yxMplodLLlsbxcv5ELMnwlZN/H3HiO
-         BB7CrvuNmbeGRtKg7jmp89iIQhvKZqMqB2F21zys=
-Received: by pali.im (Postfix)
-        id 07CF1770; Tue, 14 Apr 2020 21:53:34 +0200 (CEST)
-Date:   Tue, 14 Apr 2020 21:53:34 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        David Heidelberg <david@ixit.cz>
-Subject: Re: [PATCH 0/3] bluez: Export SDP "Remote audio volume control" item
- for HSP profile
-Message-ID: <20200414195334.cucssmdt3xj7lf2y@pali>
-References: <20200321195404.fvyku5hmcuqxt7sg@pali>
- <20200413162513.2221-1-pali@kernel.org>
- <CABBYNZLvuDMoFhFSFq50hnjG24DatsHDHNiN2axeC75fSmDRsw@mail.gmail.com>
+        Tue, 14 Apr 2020 15:56:45 -0400
+Received: from smtprelay0211.hostedemail.com ([216.40.44.211]:34122 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2505250AbgDNTz5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Apr 2020 15:55:57 -0400
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave04.hostedemail.com (Postfix) with ESMTP id D5D591802CCB4;
+        Tue, 14 Apr 2020 19:47:05 +0000 (UTC)
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 9E3611802B57F;
+        Tue, 14 Apr 2020 19:47:05 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: coal59_5a1e7cc02a463
+X-Filterd-Recvd-Size: 2796
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf07.hostedemail.com (Postfix) with ESMTPA;
+        Tue, 14 Apr 2020 19:46:59 +0000 (UTC)
+Message-ID: <2a58f592879cf67b4c6b8e859ce87e1f9652902a.camel@perches.com>
+Subject: Re: [PATCH v2 2/2] crypto: Remove unnecessary memzero_explicit()
+From:   Joe Perches <joe@perches.com>
+To:     Waiman Long <longman@redhat.com>,
+        Michal =?ISO-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-crypto@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Date:   Tue, 14 Apr 2020 12:44:49 -0700
+In-Reply-To: <578fe9b6-1ccd-2698-60aa-96c3f2dd2c31@redhat.com>
+References: <20200413211550.8307-1-longman@redhat.com>
+         <20200413222846.24240-1-longman@redhat.com>
+         <eca85e0b-0af3-c43a-31e4-bd5c3f519798@c-s.fr>
+         <e194a51f-a5e5-a557-c008-b08cac558572@redhat.com>
+         <20200414191601.GZ25468@kitsune.suse.cz>
+         <578fe9b6-1ccd-2698-60aa-96c3f2dd2c31@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.34.1-2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZLvuDMoFhFSFq50hnjG24DatsHDHNiN2axeC75fSmDRsw@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz!
-
-I have there another simple change for updating documentation:
-
-diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-index ec18034a6..183c6c11a 100644
---- a/doc/profile-api.txt
-+++ b/doc/profile-api.txt
-@@ -16,10 +16,33 @@ Object path	/org/bluez
- 			If an application disconnects from the bus all
- 			its registered profiles will be removed.
- 
-+			Some predefined services:
-+
-+			HFP AG UUID: 0000111f-0000-1000-8000-00805f9b34fb
-+
-+				Default profile Version is 1.7, profile Features
-+				is 0b001001 and RFCOMM channel is 13.
-+				Authentication is required.
-+
- 			HFP HS UUID: 0000111e-0000-1000-8000-00805f9b34fb
- 
--				Default RFCOMM channel is 6. And this requires
--				authentication.
-+				Default profile Version is 1.7, profile Features
-+				is 0b000000 and RFCOMM channel is 7.
-+				Authentication is required.
-+
-+			HSP AG UUID: 00001112-0000-1000-8000-00805f9b34fb
-+
-+				Default profile Version is 1.2, RFCOMM channel
-+				is 12 and Authentication is required. Does not
-+				support any Features, option is ignored.
-+
-+			HSP HS UUID: 00001108-0000-1000-8000-00805f9b34fb
-+
-+				Default profile Version is 1.2, profile Features
-+				is 0b0 and RFCOMM channel is 6. Authentication
-+				is required. Features is one bit value, specify
-+				capability of Remote Audio Volume Control
-+				(by default turned off).
- 
- 			Available options:
- 
+On Tue, 2020-04-14 at 15:37 -0400, Waiman Long wrote:
+> OK, I can change it to clear the key length when the allocation failed
+> which isn't likely.
 
 
-There is a mistake in documentation that default rfcomm channel for HFP
-HS profile is 6. But in reality default rfcomm channel for HFP is 7.
-Channel 6 is default for HSP HS profile as can be seen in src/profile.c.
+Perhaps:
+
+	kfree_sensitive(op->key);
+	op->key = NULL;
+	op->keylen = 0;
+
+but I don't know that it impacts any possible state.
+
+
