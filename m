@@ -2,142 +2,192 @@ Return-Path: <SRS0=7bNH=57=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620FDC2BA2B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Apr 2020 05:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAEDC2BA2B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Apr 2020 05:07:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D7FE206A2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Apr 2020 05:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 346CC20767
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Apr 2020 05:07:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20150623.gappssmtp.com header.i=@cmpxchg-org.20150623.gappssmtp.com header.b="Tcxzc6xC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pKi7Y5Cp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393186AbgDOFBn (ORCPT
+        id S2393234AbgDOFHl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Apr 2020 01:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35188 "EHLO
+        Wed, 15 Apr 2020 01:07:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393185AbgDOFBJ (ORCPT
+        with ESMTP id S2389851AbgDOFHj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Apr 2020 01:01:09 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7A6C061A41
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 22:01:09 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id du18so1108922qvb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 22:01:09 -0700 (PDT)
+        Wed, 15 Apr 2020 01:07:39 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3658C061A0C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 22:07:37 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id r17so1617192lff.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2020 22:07:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ef3HLI/XX5ogd42JRuoGnEbb/Ln3ZxgvuLj5jaeUWkI=;
-        b=Tcxzc6xC3iVTZShTUf3CIv3N8B5ZyCbru12fLV5+tpVooL5/Bo3MM2R4w1+y/qKNnw
-         9lu0zJBRs+VK1Bc14YzwiZC+K/efs95VT8GzxaoJoz3t2WhfDZxWX+BgsMNU20r8wRPv
-         WS98QN/V8NZIzymtO0juNqdA9Tg6/2OTyjU7Zm1KL9ejebzf7wo1d0uOEsRrlg17M8fg
-         qYmffi6H6MwGLJe4epZjwPPvjWIdIXS0xtejpuhYYUqQSrz2GfoywvJh6tC6sCJVyKe7
-         xzOQhWdIv/o82YQJCk9DtMPUw2B8iLWuNwugd4l1OepDEbLixuOHRPHRALsrInJO+Rsn
-         o1og==
+        d=gmail.com; s=20161025;
+        h=from:content-transfer-encoding:mime-version:subject:message-id:date
+         :to;
+        bh=NGXx9M4AMUDqiyXTQf3bXZxEMC4hWGJ8ee6YLgmW8KY=;
+        b=pKi7Y5CpV4QwcBUujM6YKgR+dbxbHo0yR4hnHp6tX0xpT9aLSs9Zrgq74XCuUPxEt9
+         uXJR3C+o0+kcQJZUUDO3R8hZGGFv7GqYkZOLpFiQqi2pxteTGyXFYGPSCYBMTTG+IUQD
+         l4AAXUvcoiXZSaz99eW8kpJ2o2aRyBaJX2fV9+y5zg1HyQGgxJjxYZaheQ7M1i/BOryZ
+         MEPqU1Ng1C9B8Hdhh4YzNZuTgYyxYdCssVKvpyZbSE3QBYsDJY6VBfIUxmNRDtP1KFfr
+         QFMHM4RCVzSysPfh3yCPYjbHYD5RbUZ7KFFFhDTXBpw7W5nzJuLwii/fqJpgHeqn+FJ3
+         7S0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ef3HLI/XX5ogd42JRuoGnEbb/Ln3ZxgvuLj5jaeUWkI=;
-        b=iC0226L2mTwSWmsO3kPsgRLPQel3caaaYlvI/CApZEtpAkjCHMYhn0a71YxheLBb8G
-         eKp1oLFtxILAFGtvL6t3UwDSgOTpmClQ5uref+8COI1clhmzSQO1YoxaGRcnDQaqd5wc
-         4upqeXPOpSz3Vk6sdekr2YxSt+Ot7tYzEXqSQo2ER/hKSry5ReGOvpGDjHVZbSPzpC1M
-         /mHxKarcb6nDS8zcIjoUUTHboFm8ABbTSPh02vpuXs4Zdbc0VxSd571a6erg0k9E83qK
-         IINao9rLU+2g8XlGEJXpqwJ52cVsc+V23U7IzgQF5110Nf/SSM3qbyziZuSoiPFk89oy
-         RmbA==
-X-Gm-Message-State: AGi0Pubr+3e7QxmOiGGF+XoR4s6povw+bRol+KHNCsSA3xVIVRzGvlAQ
-        epIGEQN5FjH2e6CMBXJaHLKW3A==
-X-Google-Smtp-Source: APiQypJRjg+PyUSZjrIkjpxdMfgyPb9bMEWnffTFRMxoE1aQMUITXzNurR0P/0BN6q0H0W5xTyhSBA==
-X-Received: by 2002:a0c:e88d:: with SMTP id b13mr3243342qvo.245.1586926868219;
-        Tue, 14 Apr 2020 22:01:08 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:480::e623])
-        by smtp.gmail.com with ESMTPSA id 10sm6168833qtp.4.2020.04.14.22.01.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2020 22:01:07 -0700 (PDT)
-Date:   Wed, 15 Apr 2020 01:01:06 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
-        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-Message-ID: <20200415050106.GA154671@cmpxchg.org>
-References: <20200413211550.8307-1-longman@redhat.com>
- <20200413211550.8307-2-longman@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200413211550.8307-2-longman@redhat.com>
+        h=x-gm-message-state:from:content-transfer-encoding:mime-version
+         :subject:message-id:date:to;
+        bh=NGXx9M4AMUDqiyXTQf3bXZxEMC4hWGJ8ee6YLgmW8KY=;
+        b=h26y5UTB7SoSQ+5sk+j2y3zyo9EtT3CQ97lFk4D4AiBTkx376ujNLFj0Bqv426oWS0
+         LsLQIc+mv/OHoMjqHv4+jFOXynVxppU2NcLAMP/+Qu/MrtjFY3sH68vmxUUZxvUrVp1W
+         VYptjCfl1dpbqN3O3C2YFodaXRySvk1KaQ+9GYZbirU6y1RcGkYh0GzY8h80j6tL7Ewo
+         THfxsXaW/3E9LvSYrjrbFaWEAn5VVmtaKQQLHrhMexWNHhafk058yfJCL5LG6wwT+z9U
+         u+M9twug/4VoYnFiirL4PxvWSN3CYHqvx5WQyH/lXgvYaznRLmqsAkAcecNZgEt24s4F
+         UDag==
+X-Gm-Message-State: AGi0PuZ7GGDayxscUYJTXZvbczfZB7dkKqyGa+ZWleLJwwlO1RBYoQyx
+        7pGggX8tb9HPO52AYS8J9bFRh7cZ
+X-Google-Smtp-Source: APiQypIyI0xvKl4KNfB53nNN3x7k1h46cQW/y1g7vvypgv1o7kBry5wvy5nt9nXSIW5mFGzG0hooUg==
+X-Received: by 2002:a05:6512:3187:: with SMTP id i7mr1928107lfe.101.1586927255882;
+        Tue, 14 Apr 2020 22:07:35 -0700 (PDT)
+Received: from [172.16.20.20] ([87.200.95.144])
+        by smtp.gmail.com with ESMTPSA id d3sm8823741lfq.63.2020.04.14.22.07.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 Apr 2020 22:07:35 -0700 (PDT)
+From:   Christian Hewitt <christianshewitt@gmail.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.14\))
+Subject: How to handle different operating speed for QCA9377 SDIO BT module?
+Message-Id: <1D4C533D-575D-4AC5-A627-389502097A77@gmail.com>
+Date:   Wed, 15 Apr 2020 09:07:32 +0400
+To:     linux-bluetooth@vger.kernel.org
+X-Mailer: Apple Mail (2.3445.104.14)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Apr 13, 2020 at 05:15:49PM -0400, Waiman Long wrote:
-> As said by Linus:
-> 
->   A symmetric naming is only helpful if it implies symmetries in use.
->   Otherwise it's actively misleading.
+I=E2=80=99m working with a QCA9337 SDIO device on an Android (now Linux) =
+set-top box with an Amlogic S905D SoC.
 
-As the btrfs example proves - people can be tempted by this false
-symmetry to pair kzalloc with kzfree, which isn't what we wanted.
+SDIO WiFi (ath10k) is working since 5.7-rc1, but the BT side of the =
+module is still missing.
 
->   In "kzalloc()", the z is meaningful and an important part of what the
->   caller wants.
-> 
->   In "kzfree()", the z is actively detrimental, because maybe in the
->   future we really _might_ want to use that "memfill(0xdeadbeef)" or
->   something. The "zero" part of the interface isn't even _relevant_.
-> 
-> The main reason that kzfree() exists is to clear sensitive information
-> that should not be leaked to other future users of the same memory
-> objects.
-> 
-> Rename kzfree() to kfree_sensitive() to follow the example of the
-> recently added kvfree_sensitive() and make the intention of the API
-> more explicit. In addition, memzero_explicit() is used to clear the
-> memory to make sure that it won't get optimized away by the compiler.
-> 
-> The renaming is done by using the command sequence:
-> 
->   git grep -w --name-only kzfree |\
->   xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
-> 
-> followed by some editing of the kfree_sensitive() kerneldoc and the
-> use of memzero_explicit() instead of memset().
-> 
-> Suggested-by: Joe Perches <joe@perches.com>
-> Signed-off-by: Waiman Long <longman@redhat.com>
+Most Amlogic devices (95%+) use Broadcom SDIO modules with the following =
+device tree content:
 
-Looks good to me. Thanks for fixing this very old mistake.
+&uart_A {
+	bluetooth {
+		compatible =3D "brcm,bcm43438-bt";
+		shutdown-gpios =3D <&gpio GPIOX_17 GPIO_ACTIVE_HIGH>;
+		max-speed =3D <2000000>;
+		clocks =3D <&wifi32k>;
+		clock-names =3D "lpo";
+	};
+};
 
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+I changed the compatible to "qcom,qca9377-bt=E2=80=9D and applied the =
+following patch:
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 439392b1c043..6f0350fbdcd6 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2046,6 +2046,7 @@ static SIMPLE_DEV_PM_OPS(qca_pm_ops, qca_suspend, =
+qca_resume);
+=20
+ static const struct of_device_id qca_bluetooth_of_match[] =3D {
+        { .compatible =3D "qcom,qca6174-bt" },
++       { .compatible =3D "qcom,qca9377-bt" },
+        { .compatible =3D "qcom,wcn3990-bt", .data =3D =
+&qca_soc_data_wcn3990},
+        { .compatible =3D "qcom,wcn3991-bt", .data =3D =
+&qca_soc_data_wcn3991},
+        { .compatible =3D "qcom,wcn3998-bt", .data =3D =
+&qca_soc_data_wcn3998},
+
+This results in probing with errors: http://ix.io/2i6P
+
+I noticed "max-speed =3D <2000000>;=E2=80=9D while hci_qca.c sets =
+3000000. I attempted to set "max-speed =3D <3000000>;=E2=80=9D but this =
+made no difference, so I patched a lower value in hci_qca:
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 6f0350fbdcd6..b7ea1e9f4904 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1678,7 +1678,7 @@ static const struct hci_uart_proto qca_proto =3D {
+        .name           =3D "QCA",
+        .manufacturer   =3D 29,
+        .init_speed     =3D 115200,
+-       .oper_speed     =3D 3000000,
++       .oper_speed     =3D 2000000,
+        .open           =3D qca_open,
+        .close          =3D qca_close,
+        .flush          =3D qca_flush,
+
+This shows a frame reassembly error, but an attempt to load firmware, =
+see: http://ix.io/2i6Q
+
+Using renamed files from =
+https://github.com/boundarydevices/qca-firmware/tree/bd-sdmac-ath10k/qca
+
+There is still a "kernel: Bluetooth: hci0: Frame reassembly failed =
+(-84)=E2=80=9D error, but the module is now otherwise up/working - I can =
+scan/see/pair other BT devices.
+
+see: http://ix.io/2i6S and:
+
+SML5442TW:~ # bluetoothctl show
+Controller 91:08:00:00:00:00 (public)
+	Name: SML5442TW
+	Alias: SML5442TW
+	Class: 0x000c0000
+	Powered: yes
+	Discoverable: no
+	DiscoverableTimeout: 0x000000b4
+	Pairable: yes
+	UUID: Audio Source              =
+(0000110a-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Attribute Profile =
+(00001801-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Access Profile    =
+(00001800-0000-1000-8000-00805f9b34fb)
+	UUID: PnP Information           =
+(00001200-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control Target =
+(0000110c-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control        =
+(0000110e-0000-1000-8000-00805f9b34fb)
+	UUID: Audio Sink                =
+(0000110b-0000-1000-8000-00805f9b34fb)
+	Modalias: usb:v1D6Bp0246d0536
+	Discovering: no
+Advertising Features:
+	ActiveInstances: 0x00
+	SupportedInstances: 0x05
+	SupportedIncludes: tx-power
+	SupportedIncludes: appearance
+	SupportedIncludes: local-name
+
+So it looks like hci_qca.c needs modification to handle multiple =
+operating speeds, perhaps using the max-speed description from =
+device-tree if available, or defaulting to the current 3000000 value if =
+not.
+
+I=E2=80=99m not a coding developer so I need to ask for help. If someone =
+can suggest a patch - I can test and confirm it works. Or if someone can =
+explain how this should be implemented, I can see if I can find someone =
+to help with the task.
+
+Christian
+
