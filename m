@@ -2,95 +2,103 @@ Return-Path: <SRS0=gb+p=6A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 718D3C2BB85
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 09:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B80D4C352BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 14:54:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F28C21D7A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 09:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BBAE2051A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 14:54:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xjwlk9kK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qvy0kb3D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503968AbgDPJoG (ORCPT
+        id S2387468AbgDPOyW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Apr 2020 05:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48998 "EHLO
+        Thu, 16 Apr 2020 10:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2503681AbgDPJoF (ORCPT
+        by vger.kernel.org with ESMTP id S2441812AbgDPN45 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Apr 2020 05:44:05 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FF3C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 02:44:05 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id n10so1430623pff.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 02:44:04 -0700 (PDT)
+        Thu, 16 Apr 2020 09:56:57 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8FEC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 06:56:56 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id h6so5699620lfc.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 06:56:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=73qIqG9XIJzLC+J+cf2hUS0T48eUKRhxcJJ7kJxxd6g=;
-        b=Xjwlk9kKcA5ZFmeeI+GlwammwL+xhHY7Pwc2rpPyC5dQylUzXyxgJdtxRzWh/X5t31
-         7SsWWBd/lA563MnD4LktCv0KbsLHJAUR9+eWr0g0z6H1Rm727hKI3hPm+qCzaBrqSRc+
-         dyQmoVyI/Agl//Wy2xhIdJZcaWybLskgeheO64e2BYwcwzvt1ege5FbiHTahDkllxEy2
-         u97zrRr8E5TtHuOkuKuZaXWOnEZ/GJ2kPn12ZuaIlPZIykHC/Ai/g5Yew1rb7FvvKdwt
-         8Z0AWP8CHUSEdsvsSxGPD8YGgV0pYTZapGxnPvbvXjiegJnE7vASwqEDanSGEz6CBdp/
-         31vA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DVOcOOY0ED2cudmSxVcLHS8BeMKXbIr9MeNpLsVha08=;
+        b=qvy0kb3DcoGhHr/JXoP51oKShaktF4vRHXHL+F0dilulnsgBV9IFqapRb0Ir6dzknx
+         9xnsRiXaoYpErFCSW5TSwPJPJPj4cMkrbbzqS3HO7C+B8YAj6Nzk40zOnEJSL01W4coW
+         I5VSFM7W5JRSuconZuovPAPVxvnCKhIDMKQQqFXVSqy+RCJKC2ctmTJyz+aYM8wvWP6S
+         Ej+ll/ZUGY1BT5iK66o1jQK+bB8x/JYzPDh6+D399zc4JMmRgd7xjiQxxIhCL3/U42rT
+         O+5oSt4jPLN2Yk8epFM0UktK53c0hBlN1qEHM2z6W7GJrOtSIKoOx2trSxDiN43E/AQP
+         5DLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=73qIqG9XIJzLC+J+cf2hUS0T48eUKRhxcJJ7kJxxd6g=;
-        b=Vwnu4V+E7xRVNlQ1KR1WED2k+Zr2fpcVGly34yr2hESAM6JvusiCqkrHEyfzlfuwYr
-         O5mdNsfObJYgXxAsQZUO6/5v7kN669yk04JdILMrsyfRkRF/rDMUyDz+6o6bLctwvSJv
-         K9ZdXNxteRUoJ4/j/J/3829NxaKrlvHTo06xYEWiG2D89xRlfbVwsGqMqZdwL29s60E5
-         Tx41xLohmK/EGfMJ/xcaRFVj33xXiay9wiFg6VHfB+XH/aTQfJo/Nd+9VnGsfJK5sCHs
-         FszmrHRUEuMw/cFt9AdpPy0T0Cs/vdGH3brfbaCxFDz5vJ1q0j4o7iugesYjVDA2ukOB
-         gRDQ==
-X-Gm-Message-State: AGi0PuZogISKNm+io+7Tw2KgnhXRP7l3zxUr3BJKzLklfDhbojnd6s6N
-        vg1l3GWB6BexBGeYo49bDu9/6s6AfJ70xw==
-X-Google-Smtp-Source: APiQypJpcgzwi9DNTauKHDuZ+1AVrsZ1CqLw8sEWwoaxPE2UmY9ypSWxlSt44am2m8u+PUr/y7oSYA==
-X-Received: by 2002:a63:fa15:: with SMTP id y21mr29144437pgh.296.1587030244348;
-        Thu, 16 Apr 2020 02:44:04 -0700 (PDT)
-Received: from localhost (fmdmzpr03-ext.fm.intel.com. [192.55.54.38])
-        by smtp.gmail.com with ESMTPSA id f3sm2034761pjo.24.2020.04.16.02.44.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2020 02:44:03 -0700 (PDT)
-Date:   Thu, 16 Apr 2020 12:43:59 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Enhanced Connection Complete event belongs to
- LL Privacy
-Message-ID: <20200416094359.GA16609@spluber-mobl.ger.corp.intel.com>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <20200415153516.38267-1-marcel@holtmann.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DVOcOOY0ED2cudmSxVcLHS8BeMKXbIr9MeNpLsVha08=;
+        b=gdFwAZiuRoEP7RFxz6asmQ9ZlcbN9ll8SgTrN+vJp6WDtYXiDPWd1ml/4pEaZcGKKt
+         JZPWNuXtITYydDVstRpYXmYG1JgcbduOm7rD5F73flg5bFz6+qWSMYKY8mE+Gt9uNyVc
+         H7Np3ihSZHMWlSWUogRxedTjES2p2p0WA36jY55znD02Mc1EVQU0HGMA81EzkyBkN1dc
+         8yDXg8XkTfD4Dr8WMOeTg1zDfA30h9q4Q60Fg57MeOgzbgWeXvMBuTOyae6Aw9GiYbfG
+         e/tLI0uqNqzJ/HD6U4eHIZWCEh1f9T75H6gbu002ljL6u3JvIXzN6J7AF8X4OzABDNLv
+         p9kA==
+X-Gm-Message-State: AGi0PuY0Y4GM2rUxLNg4OLGj99wH2hh8982GBTD5drmO9tFs8uxunL4Y
+        /md6CwvdkVNSJeAWA56Dm10stRMeNMwyo5loucAhtg==
+X-Google-Smtp-Source: APiQypKDZ83rI0mOlPjnmio36gHXdLD/ns4FU4TuNrq0yBI7kR0dgxxQ5SC2fsp4u+XK4HiGzOiiCu94CrkqyUelclM=
+X-Received: by 2002:a19:1c3:: with SMTP id 186mr6090808lfb.191.1587045414765;
+ Thu, 16 Apr 2020 06:56:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200415153516.38267-1-marcel@holtmann.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+References: <20200403153331.101846-1-alainm@chromium.org>
+In-Reply-To: <20200403153331.101846-1-alainm@chromium.org>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Thu, 16 Apr 2020 09:56:43 -0400
+Message-ID: <CALWDO_VvEBqSgJgKHMM7D9G3tTrDEC2u0NUTrPyOsNuOC_F5kQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1 1/2] doc:adding a WidebandSpeechEnabled Api
+To:     Alain Michaud <alainm@chromium.org>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Friendly ping on this series.
 
-On Wed, Apr 15, 2020, Marcel Holtmann wrote:
-> The Enhanced Connection Complete event is use in conjunction with LL
-> Privacy and not Extended Advertising.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+On Fri, Apr 3, 2020 at 11:33 AM Alain Michaud <alainm@chromium.org> wrote:
+>
+> This change adds an adapter Api to report the controller's
+> widebandspeech enabled state.
+>
 > ---
->  net/bluetooth/hci_core.c | 8 --------
->  1 file changed, 8 deletions(-)
-
-Applied to bluetooth-next. Thanks.
-
-Johan
+>
+>  doc/adapter-api.txt | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index acae032d9..d8865e795 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -326,3 +326,11 @@ Properties string Address [readonly]
+>
+>                         Local Device ID information in modalias format
+>                         used by the kernel and udev.
+> +
+> +               boolean WidebandSpeechEnabled [readonly]
+> +
+> +                       Returns true if the adapter's wideband speech feature is
+> +                       supported and enabled.
+> +
+> +
+> +
+> --
+> 2.26.0.292.g33ef6b2f38-goog
+>
