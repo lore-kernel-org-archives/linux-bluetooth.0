@@ -2,175 +2,323 @@ Return-Path: <SRS0=gb+p=6A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15799C3815B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 16:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C046C2BA2B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 22:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E43D52222D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 16:35:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFD9A221F7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Apr 2020 22:46:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KX4AmIxt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730350AbgDPQfa convert rfc822-to-8bit (ORCPT
+        id S1728168AbgDPWqX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Apr 2020 12:35:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55436 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727976AbgDPQf1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Apr 2020 12:35:27 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 207309] New: system freeze after "Bluetooth: hci0: hardware
- error 0x44"
-Date:   Thu, 16 Apr 2020 16:35:26 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hurikhan77+bko@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-207309-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 16 Apr 2020 18:46:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58236 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726441AbgDPWqW (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 16 Apr 2020 18:46:22 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A7EC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 15:46:22 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id r7so111193ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 15:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6RxpsVjl4t2cnrk6yzcWs0XK4ICmxlqbzV/Hlnay+yw=;
+        b=KX4AmIxta8gaF0ocXF5XxwyQif24L9bZ9sjGAI7SkcJv1BccXxZN/HfZBR5itHaltw
+         s6+6xr/5RwZuxSZ0RpIgo99Kn8UemHXX98iqwOCiN/SVp2qxxDnrq3DrWdW7J3pZ3cHk
+         x2abjqGsPmV1CDCf2oXXFAddFnQ2WzMWHWwEI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6RxpsVjl4t2cnrk6yzcWs0XK4ICmxlqbzV/Hlnay+yw=;
+        b=Z7oiFGzd5+IDZnAwLc/MB3VQDFlkCPkmR76YaT3/5jYUQrt/Qig55rLF8fNomYqHtF
+         /antPoI9IDo1fQyhk+slKJRuMr4fmv6zFVaUVbD7U4ef4Az0aI5vRx+G1ARWPnxRh+Xv
+         xTr0nApeB7qV28bUeCvUoJcng9Zzgdqjv7TDvW6hy1xGftYNypqoiVwdin6e9q1aUT5J
+         4qcwjhcQXXMIE2DbW8Wen87ROxGTRSZHylF/2+NKdUNTN+Yh0iQM0nvRBjyYFI/r09PH
+         Hcfyr7ACbdVNBYj4FxFYlDnK00qMWwIlAV+DEoTpSO9RJtfHNvw8kFUrbSyt+wvzpAsR
+         zOyg==
+X-Gm-Message-State: AGi0PuafyyibA7HPb4Dhcv6xL32WpoWdz/YUtoFhkiRH+JC8AUe6osqa
+        BdP6m7yY/4J/PuJI2+GG5lzb9GWtmqe1RzleL1J77g==
+X-Google-Smtp-Source: APiQypKK+P8q4b1/k9hHvmSK0GWsHuBynAB3YXHi/liGIr8K45wwrzW9ijlcVFI1Fg0qQMgvEu+WZ4b8xQMGpENnFSY=
+X-Received: by 2002:a2e:9644:: with SMTP id z4mr238920ljh.86.1587077180617;
+ Thu, 16 Apr 2020 15:46:20 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200415200831.BlueZ.v2.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
+ <13923060.5j3lsEUdY8@ix>
+In-Reply-To: <13923060.5j3lsEUdY8@ix>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Thu, 16 Apr 2020 15:46:09 -0700
+Message-ID: <CABmPvSE4SS9__rHdzrp2haCd+t0NXKyVSHx1g1rKt1_5gdMFXQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v2] doc: Add Advertisement Monitoring API
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207309
+Hi Szymon,
 
-            Bug ID: 207309
-           Summary: system freeze after "Bluetooth: hci0: hardware error
-                    0x44"
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.4.32
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: hurikhan77+bko@gmail.com
-        Regression: No
+Thanks for your comments. Please see my inline replies below.
 
-While playing a game, my Xbox One S controller suddenly lost connection and
-after a few seconds the system froze (with audio playing in a loop):
+On Thu, Apr 16, 2020 at 12:49 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
+>
+> Hi,
+>
+> On Thursday, 16 April 2020 05:09:03 CEST Miao-chen Chou wrote:
+> > This patch proposes an Advertisement Monitoring API for an application to
+> > register a job of monitoring ADV reports with content filter and RSSI
+> > thresholds.
+> >
+> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+> > ---
+> >
+> > Changes in v2:
+> > - Rename the interfaces and functions.
+> > - Adopt the object manager mechanism so that a client can expose
+> > multiple monitor objects and expect to get notified on whether the
+> > monitor has been activated or not.
+> > - Change the contract of DeviceFound so that it is called to indicate
+> > the starting point of monitoring on a device instead of reporting every
+> > ADV. In other words, the client is expected to monitor corresponding
+> > device events.
+> >
+> >  doc/advertisement-monitor-api.txt | 127 ++++++++++++++++++++++++++++++
+> >  1 file changed, 127 insertions(+)
+> >  create mode 100644 doc/advertisement-monitor-api.txt
+> >
+> > diff --git a/doc/advertisement-monitor-api.txt
+> > b/doc/advertisement-monitor-api.txt new file mode 100644
+> > index 000000000..6491dab29
+> > --- /dev/null
+> > +++ b/doc/advertisement-monitor-api.txt
+> > @@ -0,0 +1,127 @@
+> > +BlueZ D-Bus Advertisement Monitor API Description
+> > +*************************************************
+> > +
+> > +This API allows an client to specify a job of monitoring advertisements by
+> > +registering the root of hierarchy and then exposing advertisement monitors
+> > +under the root with filtering conditions, thresholds of RSSI and timers
+> > +of RSSI thresholds.
+> > +
+> > +Once a monitoring job is activated by BlueZ, the client can expect to get
+> > +notified on the targeted advertisements no matter if there is an ongoing
+> > +discovery session (a discovery session is started/stopped with methods in
+> > +org.bluez.Adapter1 interface).
+> > +
+> > +Advertisement Monitor hierarchy
+> > +===============================
+> > +Service              org.bluez
+> > +Interface    org.bluez.AdvertisementMonitor1
+> > +Object path  freely definable
+> > +
+> > +Methods              void Release() [noreply]
+> > +
+> > +                     This gets called as a signal for a client to
+> perform
+> > +                     clean-up when (1)a monitor cannot be activated
+> after it
+> > +                     was exposed or (2)a monitor has been
+> deactivated.
+> > +
+> > +             void Activate() [noreply]
+>
+> Isn't is enough for RegisterApplication to return to ack this?
+RegisterApplication() only registers the root of a hierarchy, it
+doesn't actually add any monitor, so the return of it reflects the
+result of creating the root only. A client can expose some monitors
+later under that root, and once bluetooth gets object-added via object
+manager, it would call either Release() or Activate() to let the
+client know about whether a monitor has been adopted by bluetoothd or
+not.
+>
+> > +
+> > +                     After a monitor was exposed, this gets called as
+> a
+> > +                     signal for client to get acknowledged when a
+> monitor
+> > +                     has been activated, so the client can expect to
+> receive
+> > +                     calls on DeviceFound() or DeviceLost().
+> > +
+> > +             void DeviceFound(object device) [noreply]
+> > +
+> > +                     This gets called to notify the client of finding
+> the
+> > +                     targeted device. Once receiving the call, the
+> client
+> > +                     should start to monitor the corresponding device
+> to
+> > +                     retrieve the changes on RSSI and advertisement
+> content.
+> > +
+> > +             void DeviceLost(object device) [noreply]
+> > +
+> > +                     This gets called to notify the client of losing
+> the
+> > +                     targeted device. Once receiving this call, the
+> client
+> > +                     should stop monitoring the corresponding device.
+> > +
+> > +Properties   uint8 Type [read-only]
+> > +
+> > +                     The type of a monitor can be the following
+> values. More
+> > +                     will be added.
+> > +                     0x01 - Patterns with logic OR applied
+> > +                             Supported only if "patterns-with-
+> logic-or-
+> > +                             applied" is supported.
+> > +
+> > +             (Int16, Uint16, Int16, Uint16) RSSIThreshholdsAndTimers
+> [read-only,
+> > optional] +
+> > +                     This contains HighRSSIThreshold,
+> HighRSSIThresholdTimer,
+> > +                     LowRSSIThreshold, LowRSSIThresholdTimer in
+> order. The
+> > +                     unit of HighRSSIThreshold and LowRSSIThreshold
+> is dBm.
+> > +                     The unit of HighRSSIThresholdTimer and
+> > +                     LowRSSIThresholdTimer is second.
+> > +
+> > +                     If these are provided, RSSI would be used as a
+> factor to
+> > +                     notify the client of whether a device stays in
+> range or
+> > +                     move out of range. A device is considered in-
+> range when
+> > +                     the RSSIs of the received advertisement(s)
+> during
+> > +                     HighRSSIThresholdTimer seconds exceed
+> HighRSSIThreshold.
+> > +                     Likewise, a device is considered out-of-range
+> when the
+> > +                     RSSIs of the received advertisement(s) during
+> > +                     LowRSSIThresholdTimer do not reach
+> LowRSSIThreshold.
+> > +
+> > +             array{(uint8, uint8, string)} Patterns [read-only,
+> optional]
+> > +
+> > +                     If Type is set to 0x01, this must exist and has
+> at least
+> > +                     one entry in the array.
+> > +
+> > +                     The structure of a pattern contains the
+> following.
+> > +                     uint8 start_position
+> > +                             The index in an AD data field where
+> the search
+> > +                             should start. The beginning of an AD
+> data field
+> > +                             is index 0.
+> > +                     uint8 AD_data_type
+> > +                             See https://www.bluetooth.com/
+> specifications/
+> > +                             assigned-numbers/generic-access-
+> profile/ for
+> > +                             the possible allowed value.
+> > +                     string content_of_pattern
+> > +                             This is the value of the pattern.
+> > +
+> > +=======================================
+> > +Service              org.bluez
+> > +Interface    org.bluez.AdvertisementMonitorManager1
+> > +Object path  /org/bluez/{hci0,hci1,...}
+> > +Methods              void RegisterApplication(object application)
+> > +
+> > +                     This registers a hierarchy of advertisement
+> monitors.
+> > +                     The application object path together with the D-
+> Bus
+> > +                     system bus connection ID define the
+> identification of
+> > +                     the application registering advertisement
+> monitors.
+> > +
+> > +                     Possible errors:
+> org.bluez.Error.InvalidArguments
+> > +
+> org.bluez.Error.AlreadyExists
+> > +
+> > +             void UnregisterApplication(object application)
+> > +
+> > +                     This unregisters advertisement monitors that
+> have been
+> > +                     previously registered. The object path parameter
+> must
+> > +                     match the same value that has been used on
+> > +                     registration.
+> > +
+> > +                     Possible errors:
+> org.bluez.Error.InvalidArguments
+> > +
+> org.bluez.Error.DoesNotExist
+> > +
+> > +Properties   array{string} SupportedFeatures [read-only]
+> > +
+> > +                     This reflects the supported features of
+> advertisement
+> > +                     monitoring. An application should check this
+> before
+> > +                     instantiate and expose an object of
+> > +                     org.bluez.AdvertisementMonitor1.
+> > +
+> > +                     Here are the potential features. More will be
+> added.
+> > +                     software-based-filtering
+> > +                             The filtering process is mainly done
+> in BlueZ.
+> > +                     patterns-with-logic-or-applied
+> > +                             Logic OR would be applied among the
+> patterns
+> > +                             provided by a monitor object.
+> > +                     rssi-monitoring
+> > +                             Values of RSSIThreshholdsAndTimers
+> would be
+> > +                             applied during the filtering process.
+>
+>
+> I'm bit confused about this API. Why can't this be achieved with (possible
+> extended)  SetDiscoveryFilter? We could just add extra prop to Device1 to
+> indicate that device is "present".
+This API is fundamentally different from the existing APIs. Currently,
+in terms of LE there are 2 entries to perform scanning in BlueZ
+(bluetoothd + kernel) - (1) Discovery session (with transport dual or
+le) actively managed by D-Bus client (2) passive scanning managed by
+kernel for auto-reconnection purpose. The intention of (1) is to find
+the device ASAP, and (1) is widely used in the case where people open
+a Bluetooth setting page to locate the device for pairing or
+connection. The intention of (2) is to detect the LE devices for
+reconnection, and this is purely done in the kernel. In addition to
+(1) and (2), this API intends to provide the third entry to perform
+scanning, and that is to allow D-Bus clients to monitor on LE
+advertisements with RSSI thresholds and content filtering but without
+the need of actively managed by D-Bus in a power efficient way (There
+will be future works around offloading filtering to controllers based
+on Microsoft HCI extension or Android HCI extension.) This would
+empower applications which requires LE scanning in the background and
+eventually trigger some events. For instance, prompting a notification
+to the user if a new BLE mouse is close by and asking a user if he/she
+would like to pair with it, this way, the user doesn't need to
+manually look for the targeted device.
 
-Apr 16 17:50:05 jupiter kernel: Bluetooth: hci0: hardware error 0x44
-Apr 16 17:50:05 jupiter kernel: general protection fault: 0000 [#1] PREEMPT SMP
-Apr 16 17:50:05 jupiter kernel: CPU: 0 PID: 261163 Comm: kworker/u17:0 Tainted:
-P           O      5.4.32-gentoo #1
-Apr 16 17:50:05 jupiter kernel: Hardware name: To Be Filled By O.E.M. To Be
-Filled By O.E.M./Z68 Pro3, BIOS L2.16A 02/22/2013
-Apr 16 17:50:05 jupiter kernel: Workqueue: hci0 hci_error_reset [bluetooth]
-Apr 16 17:50:05 jupiter kernel: RIP: 0010:__wake_up_common+0xac/0x130
-Apr 16 17:50:05 jupiter kernel: Code: 08 00 74 26 83 c5 01 83 fd 40 7e 1e 49 8d
-44 24 18 48 39 04 24 75 6a 8b 44 24 14 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41
-5f c3 <49> 8b 44 24 18 49 8d 4c 24 18 48 8d 50 e8 4c 89 e0 48 39 0c 24 74
-Apr 16 17:50:05 jupiter kernel: RSP: 0018:ffffc9000b053c90 EFLAGS: 00010083
-Apr 16 17:50:05 jupiter kernel: RAX: 0000000000000000 RBX: 0000000000000000
-RCX: ffffffffa18b2078
-Apr 16 17:50:05 jupiter kernel: RDX: 0000000000000001 RSI: 0000000000000096
-RDI: ffffffffa18b2070
-Apr 16 17:50:05 jupiter kernel: RBP: 0000000000000002 R08: 0000000000000000
-R09: ffffc9000b053c28
-Apr 16 17:50:05 jupiter kernel: R10: ffff88843c995000 R11: 0000000000000000
-R12: dead0000000000e8
-Apr 16 17:50:05 jupiter kernel: R13: 0000000000000001 R14: 0000000000000000
-R15: 0000000000000000
-Apr 16 17:50:05 jupiter kernel: FS:  0000000000000000(0000)
-GS:ffff88880f000000(0000) knlGS:0000000000000000
-Apr 16 17:50:05 jupiter kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
-0000000080050033
-Apr 16 17:50:05 jupiter kernel: CR2: 00000001aa487000 CR3: 00000007e2401005
-CR4: 00000000001606f0
-Apr 16 17:50:05 jupiter kernel: Call Trace:
-Apr 16 17:50:05 jupiter kernel:  __wake_up_common_lock+0x67/0x90
-Apr 16 17:50:05 jupiter kernel:  sock_def_wakeup+0x36/0x40
-Apr 16 17:50:05 jupiter kernel:  l2cap_sock_teardown_cb+0x132/0x150 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  l2cap_chan_del+0x33/0x2a0 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  l2cap_conn_del.isra.0+0x10b/0x200 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  hci_conn_hash_flush+0x55/0xb0 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  hci_dev_do_close+0x1bb/0x450 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  hci_error_reset+0x28/0x60 [bluetooth]
-Apr 16 17:50:05 jupiter kernel:  process_one_work+0x1a9/0x2e0
-Apr 16 17:50:05 jupiter kernel:  worker_thread+0x45/0x3c0
-Apr 16 17:50:05 jupiter kernel:  kthread+0xee/0x130
-Apr 16 17:50:05 jupiter kernel:  ? current_work+0x30/0x30
-Apr 16 17:50:05 jupiter kernel:  ? kthread_park+0x80/0x80
-Apr 16 17:50:05 jupiter kernel:  ret_from_fork+0x1f/0x30
-Apr 16 17:50:05 jupiter kernel: Modules linked in: hid_xpadneo hidp snd_hrtimer
-snd_seq snd_seq_device rfcomm fuse ip6table_mangle ip6_tables xt_DSCP xt_tcpudp
-iptable_mangle bpfilter bnep cachefiles btusb btrtl btbcm btintel bluetooth
-af_packet snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic
-input_leds led_class snd_hda_intel snd>
-Apr 16 17:50:05 jupiter kernel: ---[ end trace 9e5f04e507fe7ebd ]---
-Apr 16 17:50:05 jupiter kernel: RIP: 0010:__wake_up_common+0xac/0x130
-Apr 16 17:50:05 jupiter kernel: Code: 08 00 74 26 83 c5 01 83 fd 40 7e 1e 49 8d
-44 24 18 48 39 04 24 75 6a 8b 44 24 14 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41
-5f c3 <49> 8b 44 24 18 49 8d 4c 24 18 48 8d 50 e8 4c 89 e0 48 39 0c 24 74
-Apr 16 17:50:05 jupiter kernel: RSP: 0018:ffffc9000b053c90 EFLAGS: 00010083
-Apr 16 17:50:05 jupiter kernel: RAX: 0000000000000000 RBX: 0000000000000000
-RCX: ffffffffa18b2078
-Apr 16 17:50:05 jupiter kernel: RDX: 0000000000000001 RSI: 0000000000000096
-RDI: ffffffffa18b2070
-Apr 16 17:50:05 jupiter kernel: RBP: 0000000000000002 R08: 0000000000000000
-R09: ffffc9000b053c28
-Apr 16 17:50:05 jupiter kernel: R10: ffff88843c995000 R11: 0000000000000000
-R12: dead0000000000e8
-Apr 16 17:50:05 jupiter kernel: R13: 0000000000000001 R14: 0000000000000000
-R15: 0000000000000000
-Apr 16 17:50:05 jupiter kernel: FS:  0000000000000000(0000)
-GS:ffff88880f000000(0000) knlGS:0000000000000000
-Apr 16 17:50:05 jupiter kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
-0000000080050033
-Apr 16 17:50:05 jupiter kernel: CR2: 00000001aa487000 CR3: 00000007e2401005
-CR4: 00000000001606f0
-Apr 16 17:50:05 jupiter kernel: note: kworker/u17:0[261163] exited with
-preempt_count 1
-
-I had to SysRQ+REISUB (tho, only B did actually have an effect).
-
-# lsusb | grep -i bluetooth
-Bus 002 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
-(HCI mode)
-
-# dmesg|grep -i bluetooth
-[   12.722976] Bluetooth: Core ver 2.22
-[   12.722981] Bluetooth: HCI device and connection manager initialized
-[   12.722983] Bluetooth: HCI socket layer initialized
-[   12.722984] Bluetooth: L2CAP socket layer initialized
-[   12.722985] Bluetooth: SCO socket layer initialized
-[   16.113440] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   16.113442] Bluetooth: BNEP filters: protocol multicast
-[   16.113445] Bluetooth: BNEP socket layer initialized
-[   23.623322] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
-[   23.623330] Bluetooth: HIDP socket layer initialized
-[   23.661883] input: Xbox Wireless Controller as
-/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2.7/2-1.2.7.2/2-1.2.7.2:1.0/bluetooth/hci0/hci0:70/0005:045E:02E0.0010/input/input19
-[   23.662096] xpadneo 0005:045E:02E0.0010: input,hidraw9: BLUETOOTH HID v9.03
-Gamepad [Xbox Wireless Controller] on 00:1a:7d:da:71:08
-[   46.035721] Bluetooth: RFCOMM TTY layer initialized
-[   46.035726] Bluetooth: RFCOMM socket layer initialized
-[   46.035727] Bluetooth: RFCOMM ver 1.11
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Thanks,
+Miao
