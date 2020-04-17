@@ -2,120 +2,220 @@ Return-Path: <SRS0=bfEF=6B=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC003C2BA2B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 00:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB8AC352BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 08:43:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 947A12053B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 00:29:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84C682137B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 08:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QSXBCSMk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyzfylL8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727868AbgDQA33 (ORCPT
+        id S1729838AbgDQInT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Apr 2020 20:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46154 "EHLO
+        Fri, 17 Apr 2020 04:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725858AbgDQA32 (ORCPT
+        by vger.kernel.org with ESMTP id S1729166AbgDQInS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Apr 2020 20:29:28 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EA7C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 17:29:27 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id t199so615668oif.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2020 17:29:27 -0700 (PDT)
+        Fri, 17 Apr 2020 04:43:18 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7947AC061A0C;
+        Fri, 17 Apr 2020 01:43:18 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id o185so249863pgo.3;
+        Fri, 17 Apr 2020 01:43:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WVtfL6YSBcLR8LvBQ5QkjL3IgWy6PCrGlutfgFSJLsU=;
-        b=QSXBCSMkcgAvSOsWujVe4J7T0HcqwvNVCYsF3E9t+/vzpIxUwZQvJ5nwBrxq88ZVxD
-         wK+/TOcFzHE1Xdaog5gxzSsAfaJmnCmYZpJJaUAi46GBlc+INARlX2GmSuf8bCSbCSiI
-         IWTMTeRQQ3RGhnGrlSUyb0NS88d/4lFyyCUnDb9k6oF5dzfRhSp7fyRxxM4Nwy3fkAOh
-         Jc5dbESDPPEWmVf+P9Wu7hFI9fwdI94xeYToU3xwe1UJZFPa3vsgKi/lqODb0VNiay6X
-         V7M1VIlzTDAdbBURmkUchVizuRFk+wnVBJ93sKEfm8Lz6qiBRx+Uy0NY/rCOXQgxY0yn
-         s/eQ==
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=ZYtPxSkxPL8MYWDVQZPQD6mXE0FtUySZKXmEXI2AGWI=;
+        b=hyzfylL8sSo+OmuHJ6mWKB0re2iYDIFctW9BkIwsY1aPIogRPtprWRZdUDOma+4QI3
+         Hg2jgq+mRybILpyWYiQuEh4XdpDLYatrE8eBWoEoDGeGrYGZXUYG7o1CtsvlxCwIS1w7
+         3f4G22PZEM+SM4XYpTSGm/CdahakH6TigV/ANEQt9sPNczlKgTxB9a/CJO+L87Vo+q3h
+         +uSCn9KHm08RpXG5ruidVJ4KLJCIJP2BURvPVsQQaaijOCOTYKjt50hMRXUSt3Y4vcdZ
+         Ot9NPvuNfWuqJFefuhF37GySCNe68K90MaMA71i7konutPu92Bi4SJ/PHs5JkyqwYPae
+         DNiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WVtfL6YSBcLR8LvBQ5QkjL3IgWy6PCrGlutfgFSJLsU=;
-        b=Nx35fosK++Lqs7Qig2mNpneE4EnvWDdI/8+bwgQJuvSrye7L7RaPRHGXgjV4XvIil+
-         fehQzBoWqDiIsCjVC3iNQEQEWCFLZ+zGPGPs2RhJoiMTavYB945FViQWbs8fZ34qdnyM
-         fbX8enMaCKceIb9X+r+vLe0jOhR6DXmfzYYwqFOaaAwqNLiyJn2Os8sZZB0zLEvGimzx
-         Ejo9ye8PpG1Tbh3whmdMiBb+bJFUMxB6f9ipMKsB4VTpl5v2e4C/eLgy4d12McIAntfR
-         m6rYm0pz4r0Th5Pi1aPKwvgFqpmWUMAr1pn1ITaxPdDO7gtUDVQM3pBUAuZ4tmHIzMZh
-         +d0g==
-X-Gm-Message-State: AGi0PuaWFFHJ9ve4JwHLF4ogL7nvURsRPnITJGbSnUQ9E1kgjaOIUb4q
-        0d+FEQvqBOnm5mKm+Sy4tj3Wu54rHFop9U2r5QqMPOm7Jbs=
-X-Google-Smtp-Source: APiQypKfN8U7ofooZuwGpSPPjxHIrE5Y13JkreC7bUCz4aIOcU9KONHDEtVXIjX3a2aMlmYKAevlrMV3lIvH8cAQALs=
-X-Received: by 2002:aca:f584:: with SMTP id t126mr553566oih.108.1587083366613;
- Thu, 16 Apr 2020 17:29:26 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=ZYtPxSkxPL8MYWDVQZPQD6mXE0FtUySZKXmEXI2AGWI=;
+        b=NReO4KbL7FmyFikbRPstBf5v4FU53uKuiEkrFqJBfEunl2yIw4YOPwJelHkZwxYTOZ
+         zqAKRguMDRItr1iwEGtJeqQEubmWV7ooqhQv+R8Mro6gqzph+fgHG/xZLRVMQCIlG8hC
+         sDaa3gmKZj8/UhiQsoVrj3TCu25i2ru6BbU2P35HGzvp/psOI4NLHOM7zZmwL0KT5Y/i
+         gT1Ao6IsG9b8cZvKaqGM2UEOM2lJNj9asnJCD96ysINwU5gL86ulphDc8T6TICS/Ipz2
+         5zYLhZRqdjlA0EpBE94QN3usiBCMeEYXtYC53970OhlTP5vVxhFg6cOjvxrxR18Jx/Yd
+         1ctQ==
+X-Gm-Message-State: AGi0PuaqkGbQUlj5ZMi0/yo+SsIXQSKep68gZrpavxCNn9PPw7C2lVBi
+        lBWpm7WsDYFIyFRTveTI7W5/J7xRentuPQ==
+X-Google-Smtp-Source: APiQypIG3l57lTVNTmyGPL2tQbzXEITTY6MSA+qiqQr7fURp/jIdnH9YQ/QvDkYr3PgcM9u2q7l/Xw==
+X-Received: by 2002:aa7:9904:: with SMTP id z4mr2111771pff.38.1587112997877;
+        Fri, 17 Apr 2020 01:43:17 -0700 (PDT)
+Received: from localhost ([134.134.139.83])
+        by smtp.gmail.com with ESMTPSA id r13sm18054229pgj.9.2020.04.17.01.43.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2020 01:43:17 -0700 (PDT)
+Date:   Fri, 17 Apr 2020 11:43:13 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2020-04-17
+Message-ID: <20200417084313.GA48142@oeltahan-mobl.ger.corp.intel.com>
+Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
 MIME-Version: 1.0
-References: <20200403153331.101846-1-alainm@chromium.org> <CALWDO_VvEBqSgJgKHMM7D9G3tTrDEC2u0NUTrPyOsNuOC_F5kQ@mail.gmail.com>
-In-Reply-To: <CALWDO_VvEBqSgJgKHMM7D9G3tTrDEC2u0NUTrPyOsNuOC_F5kQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 16 Apr 2020 17:29:15 -0700
-Message-ID: <CABBYNZJ0SF-atqPx6B26P4Coz2YUXMvSFnW=QnXPUD6i98o-4g@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1 1/2] doc:adding a WidebandSpeechEnabled Api
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+Content-Disposition: inline
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
 
-On Thu, Apr 16, 2020 at 1:32 PM Alain Michaud <alainmichaud@google.com> wrote:
->
-> Friendly ping on this series.
->
->
-> On Fri, Apr 3, 2020 at 11:33 AM Alain Michaud <alainm@chromium.org> wrote:
-> >
-> > This change adds an adapter Api to report the controller's
-> > widebandspeech enabled state.
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I wonder if this shouldn't be queried over SCO socket, or simple fail
-with BT_VOICE when using BT_VOICE_TRANSPARENT which is how what is
-normally used when using mSBC.
+Hi Dave,
 
-> > ---
-> >
-> >  doc/adapter-api.txt | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> > index acae032d9..d8865e795 100644
-> > --- a/doc/adapter-api.txt
-> > +++ b/doc/adapter-api.txt
-> > @@ -326,3 +326,11 @@ Properties string Address [readonly]
-> >
-> >                         Local Device ID information in modalias format
-> >                         used by the kernel and udev.
-> > +
-> > +               boolean WidebandSpeechEnabled [readonly]
-> > +
-> > +                       Returns true if the adapter's wideband speech feature is
-> > +                       supported and enabled.
+Here's the first bluetooth-next pull request for the 5.8 kernel:
 
-There seems to be some extra empty lines here.
+ - Added debugfs option to control MITM flag usage during pairing
+ - Added new BT_MODE socket option
+ - Added support for Qualcom QCA6390 device
+ - Added support for Realtek RTL8761B device
+ - Added support for mSBC audio codec over USB endpoints
+ - Added framework for Microsoft HCI vendor extensions
+ - Added new Read Security Information management command
+ - Fixes/cleanup to link layer privacy related code
+ - Various other smaller cleanups & fixes
 
-> > +
-> > +
-> > +
-> > --
-> > 2.26.0.292.g33ef6b2f38-goog
-> >
+Please let me know if there are any issues pulling. Thanks.
 
+Johan
 
+---
+The following changes since commit 1a323ea5356edbb3073dc59d51b9e6b86908857d:
 
--- 
-Luiz Augusto von Dentz
+  x86: get rid of 'errret' argument to __get_user_xyz() macross (2020-03-31=
+ 18:23:47 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to 7edc9079540b65026f3d3386b3642d1820d5fed5:
+
+  Bluetooth: Enhanced Connection Complete event belongs to LL Privacy (2020=
+-04-16 12:43:03 +0300)
+
+----------------------------------------------------------------
+Abhishek Pandit-Subedi (1):
+      Bluetooth: Prioritize SCO traffic
+
+Alain Michaud (1):
+      Bluetooth: fixing minor typo in comment
+
+Archie Pusaka (1):
+      Bluetooth: debugfs option to unset MITM flag
+
+Daniels Umanovskis (1):
+      Bluetooth: log advertisement packet length if it gets corrected
+
+Guenter Roeck (1):
+      Bluetooth: Simplify / fix return values from tk_request
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: L2CAP: Fix handling LE modes by L2CAP_OPTIONS
+      Bluetooth: Add BT_MODE socket option
+
+Marcel Holtmann (11):
+      Bluetooth: Move debugfs configuration above the selftests
+      Bluetooth: btusb: Enable Intel events even if already in operational =
+mode
+      Bluetooth: Add support for Read Local Simple Pairing Options
+      Bluetooth: Add support for reading security information
+      Bluetooth: Increment management interface revision
+      Bluetooth: Add HCI device identifier for VIRTIO devices
+      Bluetooth: Sort list of LE features constants
+      Bluetooth: Use extra variable to make code more readable
+      Bluetooth: Enable LE Enhanced Connection Complete event.
+      Bluetooth: Clear HCI_LL_RPA_RESOLUTION flag on reset
+      Bluetooth: Enhanced Connection Complete event belongs to LL Privacy
+
+Miao-chen Chou (2):
+      Bluetooth: Add framework for Microsoft vendor extension
+      Bluetooth: btusb: Enable MSFT extension for Intel ThunderPeak devices
+
+Micha=C5=82 Miros=C5=82aw (2):
+      Bluetooth: hci_bcm: respect IRQ polarity from DT
+      Bluetooth: hci_bcm: fix freeing not-requested IRQ
+
+Rocky Liao (2):
+      Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA6390
+      dt-bindings: net: bluetooth: Add device tree bindings for QCA chip QC=
+A6390
+
+Sathish Narasimman (2):
+      Bluetooth: btusb: handle mSBC audio over USB Endpoints
+      Bluetooth: btusb: check for NULL in btusb_find_altsetting()
+
+Sathish Narsimman (1):
+      Bluetooth: add support to notify using SCO air mode
+
+Sonny Sasaka (2):
+      Bluetooth: Always request for user confirmation for Just Works
+      Bluetooth: Always request for user confirmation for Just Works (LE SC)
+
+Ziqian SUN (Zamir) (1):
+      Bluetooth: btrtl: Add support for RTL8761B
+
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |   1 +
+ drivers/bluetooth/btqca.c                          |  18 +-
+ drivers/bluetooth/btqca.h                          |   3 +-
+ drivers/bluetooth/btrtl.c                          |  10 +-
+ drivers/bluetooth/btusb.c                          | 185 ++++++++++++++++-=
+----
+ drivers/bluetooth/hci_bcm.c                        |   8 +-
+ drivers/bluetooth/hci_qca.c                        |  40 ++++-
+ include/net/bluetooth/bluetooth.h                  |   8 +
+ include/net/bluetooth/hci.h                        |  17 +-
+ include/net/bluetooth/hci_core.h                   |  16 ++
+ include/net/bluetooth/mgmt.h                       |   7 +
+ net/bluetooth/Kconfig                              |  23 ++-
+ net/bluetooth/Makefile                             |   1 +
+ net/bluetooth/hci_conn.c                           |  25 ++-
+ net/bluetooth/hci_core.c                           | 131 ++++++++-------
+ net/bluetooth/hci_debugfs.c                        |  46 +++++
+ net/bluetooth/hci_event.c                          |  54 +++++-
+ net/bluetooth/hci_request.c                        |   4 +-
+ net/bluetooth/l2cap_sock.c                         | 138 ++++++++++++++-
+ net/bluetooth/mgmt.c                               |  55 +++++-
+ net/bluetooth/msft.c                               | 141 ++++++++++++++++
+ net/bluetooth/msft.h                               |  18 ++
+ net/bluetooth/smp.c                                |  33 +++-
+ 23 files changed, 830 insertions(+), 152 deletions(-)
+ create mode 100644 net/bluetooth/msft.c
+ create mode 100644 net/bluetooth/msft.h
+
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCXplsHgAKCRAfyv3T9pQ3
+Khx3AQCOCoJErZZnM4tstVhoBHv6hQguU7OtMfbNz0e2sCSktQD/Yb4dr6IrewB1
+cYhoifI6FTz/31moVLkKYtRkgUXwJA8=
+=Alls
+-----END PGP SIGNATURE-----
+
+--+HP7ph2BbKc20aGI--
