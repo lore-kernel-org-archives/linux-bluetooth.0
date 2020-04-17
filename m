@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C28C38A2B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 17:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E76C2D0EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 17:16:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6778322209
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 17:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48F7A2078E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Apr 2020 17:16:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhauOamf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVhpBpp8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728454AbgDQRQr (ORCPT
+        id S1729707AbgDQRQu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Apr 2020 13:16:47 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34266 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729687AbgDQRQr (ORCPT
+        Fri, 17 Apr 2020 13:16:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30118 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729687AbgDQRQu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Apr 2020 13:16:47 -0400
+        Fri, 17 Apr 2020 13:16:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587143806;
+        s=mimecast20190719; t=1587143808;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vWBTUfX4h0qFQMftuBWZYnImAcC3+Kc3kLWX3ba0HJ4=;
-        b=BhauOamf+6/7NF4XPbg7Y814puQ/aOxv5H/+KTyEJNy5rd4f5Th9syUPYAC9t13ceqXEg6
-        WHz7I4JT4EKcfc7pSct+9bUuKdP2Dx+9Qidf0/+WiVxwJr1pH1soruhHZNqzzoxqBT7tXN
-        dkHlnNZZBrDzg7Dy+/M8UtlmQpNhVUc=
+        bh=CGv2fgPNnWkB6F6rrs/oOKVeGJrIM+/McUrhS/YxLMo=;
+        b=VVhpBpp8cJuAs12CVTYPZttmS/4ElHYAsEqw3FIVR2td552hQxL8GsEYTn1b90y8jycfyM
+        297phkZpSv8xvVOdlxVwUPOc5rOHogUinCOMvfwkiEsY2bCpJoLTvDYm3FEtTNofIxmWPL
+        KUCE6ta4pcbDDUIJB9ymT6XNQaUxbAs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-yA5XRcAzPsGHfwUnrUXu8Q-1; Fri, 17 Apr 2020 13:15:42 -0400
-X-MC-Unique: yA5XRcAzPsGHfwUnrUXu8Q-1
+ us-mta-10-jYFzj31_MdiSZ7idJWqFKg-1; Fri, 17 Apr 2020 13:15:45 -0400
+X-MC-Unique: jYFzj31_MdiSZ7idJWqFKg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B944DB62;
-        Fri, 17 Apr 2020 17:15:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2781518CA242;
+        Fri, 17 Apr 2020 17:15:44 +0000 (UTC)
 Received: from x1.localdomain.com (ovpn-112-195.ams2.redhat.com [10.36.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A5CC60BE0;
-        Fri, 17 Apr 2020 17:15:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FB0760BE0;
+        Fri, 17 Apr 2020 17:15:43 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     Hans de Goede <hdegoede@redhat.com>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/8] Bluetooth: btbcm: Bail sooner from btbcm_initialize() when not loading fw
-Date:   Fri, 17 Apr 2020 19:15:30 +0200
-Message-Id: <20200417171532.448053-6-hdegoede@redhat.com>
+Subject: [PATCH 8/8] Bluetooth: btbcm: Add 2 missing models to subver tables
+Date:   Fri, 17 Apr 2020 19:15:32 +0200
+Message-Id: <20200417171532.448053-8-hdegoede@redhat.com>
 In-Reply-To: <20200417171532.448053-1-hdegoede@redhat.com>
 References: <20200417171532.448053-1-hdegoede@redhat.com>
 MIME-Version: 1.0
@@ -63,49 +63,48 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If we have already loaded the firmware/patchram and btbcm_initialize()
-is called to re-init the HCI after this then there is no need to get
-the USB device-ids and build a firmware-filename out of these.
+Currently the bcm_uart_subver_ and bcm_usb_subver_table-s lack entries
+for the BCM4324B5 and BCM20703A1 chipsets. This makes the code use just
+"BCM" as prefix for the filename to pass to request-firmware, making it
+harder for users to figure out which firmware they need. This especially
+is problematic with the UART attached BCM4324B5 where this leads to the
+filename being just "BCM.hcd".
+
+Add the 2 missing devices to subver tables. This has been tested on:
+
+1. A Dell XPS15 9550 where this makes btbcm.c try to load
+"BCM20703A1-0a5c-6410.hcd" before it tries to load "BCM-0a5c-6410.hcd".
+
+2. A Thinkpad 8 where this makes btbcm.c try to load
+"BCM4324B5.hcd" before it tries to load "BCM.hcd"
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/btbcm.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/bluetooth/btbcm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index cc3628cace35..9fa153b35825 100644
+index 739ba1200f5d..df7a8a22e53c 100644
 --- a/drivers/bluetooth/btbcm.c
 +++ b/drivers/bluetooth/btbcm.c
-@@ -463,6 +463,13 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_=
-load_done)
- 		}
- 	}
+@@ -392,6 +392,7 @@ static const struct bcm_subver_table bcm_uart_subver_=
+table[] =3D {
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+ 	{ 0x4204, "BCM2076B1"	},	/* 002.002.004 */
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
++	{ 0x4606, "BCM4324B5"	},	/* 002.006.006 */
+ 	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+ 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
+@@ -407,6 +408,7 @@ static const struct bcm_subver_table bcm_uart_subver_=
+table[] =3D {
+ };
 =20
-+	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
-+		    hw_name, (subver & 0xe000) >> 13,
-+		    (subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
-+
-+	if (*fw_load_done)
-+		return 0;
-+
- 	if (hdev->bus =3D=3D HCI_USB) {
- 		/* Read USB Product Info */
- 		skb =3D btbcm_read_usb_product(hdev);
-@@ -479,13 +486,6 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_=
-load_done)
- 		snprintf(fw_name, BCM_FW_NAME_LEN, "brcm/%s.hcd", hw_name);
- 	}
-=20
--	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
--		    hw_name, (subver & 0xe000) >> 13,
--		    (subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
--
--	if (*fw_load_done)
--		return 0;
--
- 	err =3D request_firmware(&fw, fw_name, &hdev->dev);
- 	if (err) {
- 		bt_dev_info(hdev, "BCM: Patch %s not found", fw_name);
+ static const struct bcm_subver_table bcm_usb_subver_table[] =3D {
++	{ 0x2105, "BCM20703A1"	},	/* 001.001.005 */
+ 	{ 0x210b, "BCM43142A0"	},	/* 001.001.011 */
+ 	{ 0x2112, "BCM4314A0"	},	/* 001.001.018 */
+ 	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
 --=20
 2.26.0
 
