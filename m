@@ -2,172 +2,113 @@ Return-Path: <SRS0=zUy1=6C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAF8C2BB1D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Apr 2020 03:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6837C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Apr 2020 06:44:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DDD6221F7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Apr 2020 03:09:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NlLNGOSR"
+	by mail.kernel.org (Postfix) with ESMTP id 8BA5A22242
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Apr 2020 06:44:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725969AbgDRDJb (ORCPT
+        id S1725891AbgDRGoQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Apr 2020 23:09:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725320AbgDRDJb (ORCPT
+        Sat, 18 Apr 2020 02:44:16 -0400
+Received: from mail-il1-f198.google.com ([209.85.166.198]:50191 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725869AbgDRGoP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Apr 2020 23:09:31 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC1FC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2020 20:09:29 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id a22so1842747pjk.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2020 20:09:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7epjNujTEWtV2z+kYZ+rP7ZeTkhIS5HfNwOqOHLAvB4=;
-        b=NlLNGOSRtbqhRdny0x6DiQs8TgZ4o5msZZCAQXcb6XJUHM5rCTldLVql79ZCXqQkbO
-         LGqu4ITNVmUumx/UTfgyb3wzo5Z5JQCMnWie81lX5wXNI20lCYo+BqtFKih0aBqpT5zg
-         GbXEJKLcL+Arf6hhaeDszwQ2QwdYFEcYwkUDM=
+        Sat, 18 Apr 2020 02:44:15 -0400
+Received: by mail-il1-f198.google.com with SMTP id s7so4715331ilo.17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2020 23:44:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7epjNujTEWtV2z+kYZ+rP7ZeTkhIS5HfNwOqOHLAvB4=;
-        b=PMS+b3SYiCPRXnxJ1lvWYEH+MZWNLdWk+8rEZUgE1HB+bje4VvqU2Nv/JmBicpyLji
-         fv5JsXvAyx01tzjK2hw6iV5t1BLmavTFF8Xg89vIm+slacyB+q/hwrEDlUFD39uNYIcn
-         2r91oTZwxsrrtOrLyNxfpQoh6dPSYnw/MbSUZJm1vqE/G1BI5l8iMvH9W5eUS0evz1D4
-         aT7li7pJMxRUVmkhqij/0+XwJRwBzFnIAqIOTVFzpmp6dOdsQThoSgyQCql0D1SMNO5O
-         PhSJMzX1drJvFJQMBESJ7yl5TaRUBydmG7DgUASbt5FqldCit1xNtn1IKWbIcqNSODA3
-         tgsg==
-X-Gm-Message-State: AGi0PubtDrPmmwKCLCnKxnuWP0us8JgE3Vszb31Pc+l9MsP0GyiTmJ+/
-        WXUpFzT9Z9MVJ4yfRlRHUeNVj8EHrb4=
-X-Google-Smtp-Source: APiQypI1KGNdLK9MPrQanbgdxO7TI6V3uXn0O30S7fYuyHhK4ma4bnshRIjI/Fptzpf6nuzZ2N6IpQ==
-X-Received: by 2002:a17:902:b108:: with SMTP id q8mr6841773plr.214.1587179368978;
-        Fri, 17 Apr 2020 20:09:28 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id g2sm20885794pfh.193.2020.04.17.20.09.27
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 Apr 2020 20:09:28 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v1] doc: Describe the new Advertisement Monitor support
-Date:   Fri, 17 Apr 2020 20:09:24 -0700
-Message-Id: <20200417200903.BlueZ.v1.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
-X-Mailer: git-send-email 2.24.1
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=pXmS78UP3PIHf/SRcQHxFXu6pvUOOha8DWE8p79NAfc=;
+        b=YBbk9q1ZG4ZXm2Z8AwXJwBz0Ho9QE6yyQwHhgjH+AzjQEWhZRuSFq1QzttfDFVM3f/
+         TmHe2+Cr0a4MpVJOgyY9wWWNXs9e1SaB5i+/njgkYoqAEfvzBHx3/639nR0ZSOFuZQo9
+         6JxxfKul3qRyo6bXB8us+BGI5VIQyAmc4seUtobI2GYF6QvZ5nljbVrikKk3lbM02k8y
+         b2xc06Jqn1S7cNh5krjWRflhq9jy7bGE7z0HkvwM0l6OCzTOdAMkVtLthyfVwRiAUFwt
+         xWyqrMjd4wl59tVrVPRa27IJZjTsd3kchdKc9qOUrWGw7U7LcK2jAy2270uippCDLKrc
+         aSWQ==
+X-Gm-Message-State: AGi0PubqMCP7o83ij4gI+yl6GR8q9xnMFvhqFrC1ZXhaSKB+l0mdw1jW
+        4UsVaSv/q0wPXcbvQpdWt2EDc8wSGtp/RWYevsyaMOcfYaob
+X-Google-Smtp-Source: APiQypLwcu3iOTuryi0ondhPJrW7F+zsa1E+M/lJpkpwzLcRN3No1r+6BnQvVrMCLeiRcr/Lbm77C2pukHrig8tX9tmVPQhe2ipS
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:39dd:: with SMTP id h90mr6713306ilf.80.1587192254928;
+ Fri, 17 Apr 2020 23:44:14 -0700 (PDT)
+Date:   Fri, 17 Apr 2020 23:44:14 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008b9e0705a38afe52@google.com>
+Subject: WARNING: refcount bug in do_enable_set
+From:   syzbot <syzbot+2e9900a1e1b3c9c96a77@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This describes the following commands.
-- Add Advertisement Patterns Monitor
-- Remove Advertisement Monitor
-- Remove All Advertisement Monitors
-Note that the content of a monitor can differ based on its type. For now we
-introduce only pattern-based monitor, so you may find that unlike commands
-for removing monitor(s), the Add command is tied to a specific type.
+Hello,
 
-Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+syzbot found the following crash on:
+
+HEAD commit:    8f3d9f35 Linux 5.7-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1182b24fe00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=11f10cc27c63cade
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e9900a1e1b3c9c96a77
+compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+2e9900a1e1b3c9c96a77@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 0 PID: 10817 at lib/refcount.c:28 refcount_warn_saturate+0x15b/0x1a0 lib/refcount.c:28
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 10817 Comm: kworker/0:7 Not tainted 5.7.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events do_enable_set
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x1e9/0x30e lib/dump_stack.c:118
+ panic+0x264/0x7a0 kernel/panic.c:221
+ __warn+0x209/0x210 kernel/panic.c:582
+ report_bug+0x1ac/0x2d0 lib/bug.c:195
+ fixup_bug arch/x86/kernel/traps.c:175 [inline]
+ do_error_trap+0xca/0x1c0 arch/x86/kernel/traps.c:267
+ do_invalid_op+0x32/0x40 arch/x86/kernel/traps.c:286
+ invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+RIP: 0010:refcount_warn_saturate+0x15b/0x1a0 lib/refcount.c:28
+Code: c7 9a a9 f2 88 31 c0 e8 a3 fb ac fd 0f 0b eb 85 e8 5a e7 da fd c6 05 10 48 cf 05 01 48 c7 c7 c6 a9 f2 88 31 c0 e8 85 fb ac fd <0f> 0b e9 64 ff ff ff e8 39 e7 da fd c6 05 f0 47 cf 05 01 48 c7 c7
+RSP: 0000:ffffc900016d7c48 EFLAGS: 00010246
+RAX: 8e9964d9ee901300 RBX: 0000000000000003 RCX: ffff888089a0e5c0
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: 0000000000000003 R08: ffffffff815cbca9 R09: ffffed1015d06660
+R10: ffffed1015d06660 R11: 0000000000000000 R12: ffffffff895f43c8
+R13: dffffc0000000000 R14: ffff88809365b018 R15: ffff8880ae83b400
+ do_enable_set+0x63a/0x8d0 net/bluetooth/6lowpan.c:1075
+ process_one_work+0x76e/0xfd0 kernel/workqueue.c:2268
+ worker_thread+0xa7f/0x1450 kernel/workqueue.c:2414
+ kthread+0x353/0x380 kernel/kthread.c:268
+ ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
 ---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- doc/mgmt-api.txt | 68 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 39f23c456..fcd281a35 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3138,6 +3138,74 @@ Read Security Information Command
- 				Invalid Index
- 
- 
-+Add Advertisement Patterns Monitor Command
-+=========================================
-+
-+	Command Code:		0x0049
-+	Controller Index:	<controller id>
-+	Command Parameters:	Pattern_count (1 Octets)
-+				Pattern1 {
-+					AD_Data_Type (1 Octet)
-+					Index (1 Octet)
-+					Length (1 Octet)
-+					Value (variable length)
-+				}
-+				Pattern2 { }
-+				...
-+	Return Parameters:	Monitor_Index (8 Octets)
-+
-+	This command is used to add an advertisement monitor whose filtering
-+	conditions are patterns. The kernel would track the number of registered
-+	monitors to determine whether to perform LE scanning while there is
-+	ongoing LE scanning for other intentions, such as auto-reconnection and
-+	discovery session. If the controller supports Microsoft HCI extension,
-+	the kernel would offload the content filtering to the controller in
-+	order to reduce power consumption; otherwise the kernel ignore the
-+	content of the monitor.
-+
-+	Possible errors:	Failed
-+				Busy
-+				Invalid Parameters
-+
-+
-+Remove Advertisement Monitor Command
-+====================================
-+
-+	Command Code:		0x004A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Monitor_Index (8 Octets)
-+	Return Parameters:	Monitor_Index (8 Octets)
-+
-+	This command is used to remove an advertisement monitor. The kernel
-+	would remove the monitor with Monitor_Index and update the LE scanning.
-+	If the controller supports Microsoft HCI extension and the monitor has
-+	been offloaded, the kernel would cancel the offloading; otherwise the
-+	kernel takes no further actions other than removing it from the list.
-+
-+	Possible errors:	Failed
-+				Busy
-+				Invalid Index
-+
-+
-+Remove All Advertisement Monitors Command
-+=========================================
-+
-+	Command Code:		0x004B
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Num_removed_Monitors (2 Octets)
-+				Monitor_Index[i] (2 Octets)
-+
-+	This command is used to remove all advertisement monitors. The kernel
-+	would remove all monitors and update the LE scanning if needed. If the
-+	controller supports Microsoft HCI extension the monitors have been
-+	offloaded, the kernel would cancel all offloadings; otherwise the kernel
-+	takes no further actions other than removing all monitors from the list.
-+
-+	Possible errors:	Failed
-+				Busy
-+
-+
- Command Complete Event
- ======================
- 
--- 
-2.24.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
