@@ -2,184 +2,236 @@ Return-Path: <SRS0=BGse=6D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 742E3C38A30
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Apr 2020 21:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3791DC3A5A0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Apr 2020 23:49:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D31C21744
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Apr 2020 21:11:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E43721D82
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Apr 2020 23:49:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587330679;
-	bh=tAlNDDF/rveRZkts9H2EploORCgvy18fXVIRmitWUTk=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=vW/p8xAvZpU9erN2ValnATzXx6/2lrzRgnZ8Y8gadQqksso0eiPVurAHTBqp2904g
-	 bIcZjXU/1Aba0kiV2VOfustXkPPim4k+UG5/vXKp3QRLskOUUQ8Ux0ZhJ1/rmsYnv1
-	 WiZ3DaEPJIsoHRsEULAPZsQGgosj9C3kHqIV+3f0=
+	s=default; t=1587340181;
+	bh=M3K0Z8H12CZbMmZt5UY5PKDgaFaeZCKSK9eagVbFAuE=;
+	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
+	b=rE5Jif1HjTVT0hVbYG9aWgG1uSs4G4w+W/tuyTr5W10dZJDEs/IbO337qcv/a5uZl
+	 cSl5WpYkylr2FEQNT8fw1/TFK40eTxm7RkbrczjdDquNouPEmkEI6PXoy9JuEMmGDu
+	 mEfdeOT3PQTlvt+iJ/9/H7NLdhGlx30D2JlCYT7U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725959AbgDSVLS (ORCPT
+        id S1725950AbgDSXtk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 19 Apr 2020 17:11:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42144 "EHLO mail.kernel.org"
+        Sun, 19 Apr 2020 19:49:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48036 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725891AbgDSVLS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 19 Apr 2020 17:11:18 -0400
+        id S1725834AbgDSXtk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 19 Apr 2020 19:49:40 -0400
 Received: from pali.im (pali.im [31.31.79.79])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E07672137B
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Apr 2020 21:11:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5B44F212CC;
+        Sun, 19 Apr 2020 23:49:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587330678;
-        bh=tAlNDDF/rveRZkts9H2EploORCgvy18fXVIRmitWUTk=;
-        h=From:To:Subject:Date:From;
-        b=1Qm2dOy3rHQoZn/cqxyareYCfsByOGiz1jmWrehNgWp5AvD+4iXYI+bMCwHzha/5U
-         uJ12a2Caguvyg1mymN3L/eZEYGqb3mh7iQr1omCq3BABp6G+tHaerWq42/1s5vKR2E
-         jwnOgUkvKAxt/teF+hF+WkqyvINTJXfTutFKvEbk=
+        s=default; t=1587340179;
+        bh=M3K0Z8H12CZbMmZt5UY5PKDgaFaeZCKSK9eagVbFAuE=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=WZDon6HiZNvrOY8tUuIqa4IqgWseK3audYu1B2Y6Sy1YEXJg3q0jH+juRWEwG1Rjp
+         eRzg3tckBXYLDN0XCw11/DhP21CrgXyybpnVDp0ereKHgn2TGcC0vxXLA67nrEEWcP
+         q5Cclp5eUXM7BpSxK7kJcHQXjju2m2MGEYWXZdw8=
 Received: by pali.im (Postfix)
-        id C8CDF8A3; Sun, 19 Apr 2020 23:11:15 +0200 (CEST)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] profile: Fix reporting error message when connection failed
-Date:   Sun, 19 Apr 2020 23:10:58 +0200
-Message-Id: <20200419211058.31987-1-pali@kernel.org>
-X-Mailer: git-send-email 2.20.1
+        id 32E1D1061; Mon, 20 Apr 2020 01:49:37 +0200 (CEST)
+Date:   Mon, 20 Apr 2020 01:49:37 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     David Heidelberg <david@ixit.cz>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        luiz.dentz@gmail.com, pavel@ucw.cz
+Subject: Bluetooth: Allow to use configure SCO socket codec parameters
+Message-ID: <20200419234937.4zozkqgpt557m3o6@pali>
+References: <B6A143FD-717D-44F9-B62F-17CF357961A1@holtmann.org>
+ <20200219120940.1509224-1-david@ixit.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200219120940.1509224-1-david@ixit.cz>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some bluetooth headsets do not support connecting more then one bluetooth
-profile (e.g. in parallel A2DP and HSP, or HSP and HFP) and issuing
-connect() syscall for second profile returns just ECONNREFUSED.
+Hello!
 
-Prior this patch bluetooth daemon for such situation reported following
-message to log:
+I'm sending next attempt for userspace <--> kernel API for specifying
+connection settings of SCO socket. I was thinking more about it and I
+was able to remove some members from struct bt_voice_setup which are not
+needed for Linux SCO sockets (e.g. specifying different routing then
+over HCI).
 
-  Unable to get connect data for Headset Voice gateway: getpeername: Transport endpoint is not connected (107)
+Here is this API:
 
-Message is incorrect as connect() syscall failed, not getpeername(). This
-patch fixes this problem and logs correct error message:
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index fabee6db0abb..f1f482bdf526 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -122,6 +122,37 @@ struct bt_voice {
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
+ 
++#define BT_VOICE_SETUP		14
++
++#define BT_VOICE_PKT_TYPE_CAP_SCO	BIT(0)
++#define BT_VOICE_PKT_TYPE_CAP_ESCO	BIT(1)
++struct bt_voice_pkt_type {
++	__u8 capability; /* bitmask of BT_VOICE_PKT_TYPE_CAP_* */
++	__u8 retrans_effort;
++	__u16 pkt_type;
++	__u16 max_latency;
++};
++struct bt_voice_setup {
++	__u32 tx_bandwidth;
++	__u32 rx_bandwidth;
++	__u16 tx_codec_frame_size;
++	__u16 rx_codec_frame_size;
++	__u8 tx_coding_format[5];
++	__u8 rx_coding_format[5];
++	__u8 input_coding_format[5];
++	__u8 output_coding_format[5];
++	__u16 input_coded_data_size;
++	__u16 output_coded_data_size;
++	__u8 input_pcm_data_format;
++	__u8 output_pcm_data_format;
++	__u8 input_pcm_msb_position;
++	__u8 output_pcm_msb_position;
++	__u32 input_bandwidth;
++	__u32 output_bandwidth;
++	__u32 pkt_types_count;
++	struct bt_voice_pkt_type pkt_types[];
++};
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
 
-  Headset Voice gateway failed connect to XX:XX:XX:XX:XX:XX: Connection refused (111)
 
-Main problem was in ext_connect() function which called bt_io_get() for
-retrieving remote address (BT_IO_OPT_DEST) and if it failed then original
-error from connect() syscall was masked. Because it is not possible to
-retrieve BT_IO_OPT_DEST for unconnected socket, original destination
-address for error message is propagated via connect_add() function in btio.
+Structure specify settings for exactly one codec.
 
---
+Meaning of those members is same as for Enhanced Setup Synchronous
+Connection HCI command.
 
-Having correct error message in logs is important. Due to this mangled
-error message I was not able to easily debug why particular bluetooth
-headset sometimes connection with nonsense error that Transport endpoint
-was not connected.
----
- btio/btio.c   | 19 ++++++++++++++-----
- src/profile.c |  5 +++--
- 2 files changed, 17 insertions(+), 7 deletions(-)
+Let me a bit explain it:
 
-diff --git a/btio/btio.c b/btio/btio.c
-index e7b4db16b..3ea73faea 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -85,6 +85,7 @@ struct connect {
- 	BtIOConnect connect;
- 	gpointer user_data;
- 	GDestroyNotify destroy;
-+	bdaddr_t dst;
- };
- 
- struct accept {
-@@ -214,6 +215,7 @@ static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
- 	GError *gerr = NULL;
- 	int err, sk_err, sock;
- 	socklen_t len = sizeof(sk_err);
-+	char addr[18];
- 
- 	/* If the user aborted this connect attempt */
- 	if ((cond & G_IO_NVAL) || check_nval(io))
-@@ -226,8 +228,11 @@ static gboolean connect_cb(GIOChannel *io, GIOCondition cond,
- 	else
- 		err = -sk_err;
- 
--	if (err < 0)
--		ERROR_FAILED(&gerr, "connect error", -err);
-+	if (err < 0) {
-+		ba2str(&conn->dst, addr);
-+		g_set_error(&gerr, BT_IO_ERROR, err,
-+			"connect to %s: %s (%d)", addr, strerror(-err), -err);
-+	}
- 
- 	conn->connect(io, gerr, conn->user_data);
- 
-@@ -286,7 +291,7 @@ static void server_add(GIOChannel *io, BtIOConnect connect,
- 					(GDestroyNotify) server_remove);
- }
- 
--static void connect_add(GIOChannel *io, BtIOConnect connect,
-+static void connect_add(GIOChannel *io, BtIOConnect connect, bdaddr_t dst,
- 				gpointer user_data, GDestroyNotify destroy)
- {
- 	struct connect *conn;
-@@ -296,6 +301,7 @@ static void connect_add(GIOChannel *io, BtIOConnect connect,
- 	conn->connect = connect;
- 	conn->user_data = user_data;
- 	conn->destroy = destroy;
-+	conn->dst = dst;
- 
- 	cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, conn,
-@@ -1671,6 +1677,7 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
- 	struct set_opts opts;
- 	int err, sock;
- 	gboolean ret;
-+	char addr[18];
- 
- 	va_start(args, opt1);
- 	ret = parse_set_opts(&opts, gerr, opt1, args);
-@@ -1710,12 +1717,14 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
- 	}
- 
- 	if (err < 0) {
--		ERROR_FAILED(gerr, "connect", -err);
-+		ba2str(&opts.dst, addr);
-+		g_set_error(gerr, BT_IO_ERROR, err,
-+				"connect to %s: %s (%d)", addr, strerror(-err), -err);
- 		g_io_channel_unref(io);
- 		return NULL;
- 	}
- 
--	connect_add(io, connect, user_data, destroy);
-+	connect_add(io, connect, opts.dst, user_data, destroy);
- 
- 	return io;
- }
-diff --git a/src/profile.c b/src/profile.c
-index c2992e795..6961a107b 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1085,12 +1085,13 @@ static void ext_connect(GIOChannel *io, GError *err, gpointer user_data)
- 	if (!bt_io_get(io, &io_err,
- 				BT_IO_OPT_DEST, addr,
- 				BT_IO_OPT_INVALID)) {
--		error("Unable to get connect data for %s: %s", ext->name,
--							io_err->message);
- 		if (err) {
-+			error("%s failed %s", ext->name, err->message);
- 			g_error_free(io_err);
- 			io_err = NULL;
- 		} else {
-+			error("Unable to get connect data for %s: %s",
-+				ext->name, io_err->message);
- 			err = io_err;
- 		}
- 		goto drop;
--- 
-2.20.1
+Members tx_bandwidth, rx_bandwidth, tx_codec_frame_size,
+rx_codec_frame_size, tx_coding_format and rx_coding_format specify AIR
+codec and all of them are needed to correctly describe codec used by
+bluetooth adapter to transmit data over the air. All of these members
+are also part of Enhanced Setup Synchronous Connection command and
+application which want to use vendor codec needs to control of all them.
 
+Members input_coding_format, output_coding_format,
+input_coded_data_size, output_coded_data_size, input_bandwidth and
+output_bandwidth describe LOCAL codec, format of audio data which is
+passed by application to the bluetooth adapter. It does not have to be
+same as AIR codec and in this case bluetooth adapter is doing HW
+encoding/decoding.
+
+When coding_format is PCM then additional parameters for PCM format
+needs to be specified, more exactly they are in members:
+input_pcm_data_format, output_pcm_data_format, input_pcm_msb_position
+and output_pcm_msb_position.
+
+For modern audio applications is is required to control all of these PCM
+parameters as audio application does not have to reencode everything to
+one format (e.g. 8Hz/s16le), but let bluetooth adapter to do reencoding
+at HW level.
+
+The last pkt_types[] array (with pkt_types_count items) defines what
+type bluetooth packets and SCO/eSCO mode can be used with particular
+codec.
+
+So all members of that structure are needed for userspace audio
+applications (e.g. pulseaudio) and without them it is not possible
+implement custom vendor SCO codecs which are already used in bluetooth
+headsets. Also without them it is not possible to use HW encoders in
+bluetooth chip, e.g. mSBC and applications are forced to use in-software
+encoding/decoding which may be slow or increase latency or power usage.
+
+And here are some example how to use it:
+
+SCO socket that would accept 16kHz PCM s16le data and bluetooth chip
+would encode it to mSBC over the air.
+
+  #define HCI_CODING_FORMAT_PCM 0x04
+  #define HCI_CODING_FORMAT_MSBC 0x05
+  #define HCI_PCM_DATA_FORMAT_2COMP 0x02
+  static const struct bt_voice_setup voice_setup = {
+    .tx_bandwidth = 8000,
+    .rx_bandwidth = 8000,
+    .tx_codec_frame_size = 60,
+    .rx_codec_frame_size = 60,
+    .tx_coding_format = { HCI_CODING_FORMAT_MSBC },
+    .rx_coding_format = { HCI_CODING_FORMAT_MSBC },
+    .input_coding_format = { HCI_CODING_FORMAT_PCM },
+    .output_coding_format = { HCI_CODING_FORMAT_PCM },
+    .input_coded_data_size = 16,
+    .output_coded_data_size = 16,
+    .input_pcm_data_format = HCI_PCM_DATA_FORMAT_2COMP,
+    .output_pcm_data_format = HCI_PCM_DATA_FORMAT_2COMP,
+    .input_pcm_msb_position = 0,
+    .output_pcm_msb_position = 0,
+    .input_bandwidth = 32000,
+    .output_bandwidth = 32000,
+    .pkt_types_count = 2,
+    .pkt_types = {
+      { BT_VOICE_PKT_TYPE_CAP_ESCO, 0x02, EDR_ESCO_MASK & ~ESCO_2EV3, 0x000d }, /* T2 */
+      { BT_VOICE_PKT_TYPE_CAP_ESCO, 0x02, EDR_ESCO_MASK | ESCO_EV3,   0x0008 }, /* T1 */
+    },
+  };
+  int fd = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+  bind(fd, ...);
+  setsockopt(fd, SOL_BLUETOOTH, BT_VOICE_SETUP, &voice_setup, sizeof(voice_setup));
+  connect(fd, ...);
+
+
+SCO socket that would accept AuriStream codec from application and tell
+bluetooth chip to pass-throu as is over the air:
+
+  #define HCI_CODING_FORMAT_TRANSPARENT 0x03
+  static const struct bt_voice_setup voice_setup = {
+    .tx_bandwidth = 4000,
+    .rx_bandwidth = 4000,
+    .tx_codec_frame_size = 60,
+    .rx_codec_frame_size = 60,
+    .tx_coding_format = { HCI_CODING_FORMAT_TRANSPARENT },
+    .rx_coding_format = { HCI_CODING_FORMAT_TRANSPARENT },
+    .input_coding_format = { HCI_CODING_FORMAT_TRANSPARENT },
+    .output_coding_format = { HCI_CODING_FORMAT_TRANSPARENT },
+    .input_coded_data_size = 8,
+    .output_coded_data_size = 8,
+    .input_pcm_data_format = 0,
+    .output_pcm_data_format = 0,
+    .input_pcm_msb_position = 0,
+    .output_pcm_msb_position = 0,
+    .input_bandwidth = 4000,
+    .output_bandwidth = 4000,
+    .pkt_types_count = 1,
+    .pkt_types = {
+      { BT_VOICE_PKT_TYPE_CAP_ESCO, 0x02, 0x003F, 16 },
+    },
+  };
+  int fd = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+  bind(fd, ...);
+  setsockopt(fd, SOL_BLUETOOTH, BT_VOICE_SETUP, &voice_setup, sizeof(voice_setup));
+  connect(fd, ...);
+
+
+That API is designed for Enhanced Setup Synchronous Connection HCI
+command, but can also be used by plain Setup Synchronous Connection HCI
+command. Plain version has just reduced set of features and basically
+instead of AIR codec members and LOCAL codec members use just one u16
+member voice_setting, which is just subset of all those possible
+Enhanced settings and can be generated from them. E.g. transparent
+coding format is encoded in voice_setting as 0x0003, usage of CVSD HW
+encoder from pcm_s16le_8kHz as 0x0060, but e.g. usage of mSBC HW encoder
+is not possible to specify.
+
+Please let me know what do you think about it. Thanks
