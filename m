@@ -7,65 +7,63 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA34C3815B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 16:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDC9C3815B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 17:21:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77AB320B1F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 16:58:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB01C21744
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 17:21:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XfKCxO+C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tq4u1SJO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726099AbgDTQ6M (ORCPT
+        id S1726013AbgDTRV5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Apr 2020 12:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44628 "EHLO
+        Mon, 20 Apr 2020 13:21:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725774AbgDTQ6L (ORCPT
+        by vger.kernel.org with ESMTP id S1725773AbgDTRV5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Apr 2020 12:58:11 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CA8C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 09:58:11 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id k133so9389085oih.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 09:58:11 -0700 (PDT)
+        Mon, 20 Apr 2020 13:21:57 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1ACC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 10:21:57 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id i22so8788851otp.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 10:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=X7zmAyKifgt7GNY01plBjIFAKN+iTDEaWmp+iQtBxro=;
-        b=XfKCxO+C+05iEP0i6Z9TsvgeY0lHf6R2kmsnNSTi59ADaKwTiOCju72JlnXGDgI2Ef
-         Y0iqEoFaQghmLc5Ss2+noNXi5FPMvgiYbe1A1Udk6iiQBeAVZFo/FXGY2NLYAnCCK6KF
-         r/Vn/dsjM+yKF+nCmNyGg2ulx5uJKylSEqSOdkJVO/Pq9r7wJbdYUe1dAlvGAREOC6km
-         8ovoyFteI5Otm/mOFajdbvrIdCraHZT0tQGB6cJgZJxtFFVN35sggngMRPNKgaWYwoXN
-         FysjDxsehz2Kb/I00L46AByzjSSpEkRfH8zSrhzot30GyvqQ2rQthFvw5QG67VweO1SK
-         /r2Q==
+        bh=/JMZgsOQj0TdBhE9VTKcNsArH+4yfXM/xRJ8Fbc/urk=;
+        b=Tq4u1SJOOnHglkQHjWRaxhWEGdcSvb7Wh7vHR8kBnIclovmZ5JgIbSopk5118388qA
+         fQY5pRTEUXXws8vEhBcwtcEMtlpjPlmiJP1nOLBqK4PRUbol2ykERlfHOBKjf91wVUpD
+         fgWthbZHZTYzzuXKYhqcFNkwLFmWYqxS8XJTldeD7q+dY9ZYzjZ3Jy5N2sn+/mP76KH9
+         gyC4NINOfy5OzJYpEc1YBhSnsbahjCyWZWYIGTQYLYX+4KBaSDbP53ziw8XyJsOsB9vo
+         pckkwhkKQjWkuRAQsSaelOiiGWPCoGno+vvKIrtmoRoaRoDCBT7pnUxP6NPNJPPAwaSH
+         rFVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=X7zmAyKifgt7GNY01plBjIFAKN+iTDEaWmp+iQtBxro=;
-        b=XaPSP35z46MSJbuhLw5yvAsV90fh/o7FS3ge85HsTfVyIy50y2qNL38nHK4oEXPGaG
-         /BRKg9NIzi3VaAjNDdD/zYPUP7E5cXJ85TPefR6vg4eJl5R22Ry96NSQWFGA5cuFQzgn
-         Uy94e/1uLZf1T/b90JXbLRkga+ZOR/DFwktNIWPjteD8hGdt8HoXHpNa2Uxw+Tp/5V22
-         q2HRj/NfS90WdppW0L7CmKGXWfhXDCd8qwUIs6eHztsdpKlLr+DvhfoncLihCJHX3zrR
-         kaFeklKhSD746g56RZrbwCeZii5VUuUnBPJOOlWNJP41J29IJsoKLa18w9aOyiDLx+cq
-         8CgQ==
-X-Gm-Message-State: AGi0PuYgeDwjTjvlZq3go0h4MZ+tv1hlb+QT8aEMSgjyGxzn+Me7cchy
-        hfC32XjN7yeQAOw2jZdKI6ohE9VPYO+cCGlPOs8=
-X-Google-Smtp-Source: APiQypLmlO1hcgCd5r18ZxWf40vnRV8CtuCenXGMMN6LVlWwVR+a/lNMSm+XtGPuxXyaVadIR8/C9FY3IFA31QP3XgU=
-X-Received: by 2002:aca:db8a:: with SMTP id s132mr265372oig.110.1587401890738;
- Mon, 20 Apr 2020 09:58:10 -0700 (PDT)
+        bh=/JMZgsOQj0TdBhE9VTKcNsArH+4yfXM/xRJ8Fbc/urk=;
+        b=aSDXIaidsrmFJFbF4OLy9/mp6JJDCYS1/PBf6Iq/ux2bsz2dRdJxXvbxvMd0DT44t0
+         atZfQfIK0guw5gbBgKQMxhnjkKmBLpcBJXxB7Y3Cvndz0eAl6yqHbpdCWQ5K7wTdfebY
+         QZ9eAKObI0gSqvEMIRdwG4VOa/xvdXuTg6JqYqMSYwXHFrp5L7f1Z0mqJhTsaqKh+qpw
+         oBWbjK7PyngIkR5F2DixIN51G1dqURD5Bw6yKQ4/ws6X8Yrjak9vRRXybVpSZ+CKfhW6
+         Hr//TgvnexPZCiLXH7ArmypaSAGr9Ji56qcomRordFenTyKKD7G1x3UKTNvsfey0Ldk6
+         IETQ==
+X-Gm-Message-State: AGi0PuaHqIKJ0wZyuio+XpjihfKT97CB4ueSNbP82Xxgw407TkHm2RlP
+        EQxXoYdF55LWnCbwQk9A9ivp+jCWu3dB4JzmDVb5cFfsHTw=
+X-Google-Smtp-Source: APiQypLwBOHsO9fRiW/PpIFwaQcAnPJ86ae9otpMdtqhk45rh/+NT+xOD58idvuY+ve5QLhJXIaFJuDYFgQvJupJZJg=
+X-Received: by 2002:a9d:644:: with SMTP id 62mr9261711otn.177.1587403316228;
+ Mon, 20 Apr 2020 10:21:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200420120705.89691-1-szymon.janc@codecoup.pl>
- <20200420120705.89691-3-szymon.janc@codecoup.pl> <a1e5a35a5073bda33d7f36c08bd776397f8c36da.camel@intel.com>
-In-Reply-To: <a1e5a35a5073bda33d7f36c08bd776397f8c36da.camel@intel.com>
+References: <20200420135112.6749-1-scerveau@collabora.com> <20200420135112.6749-2-scerveau@collabora.com>
+In-Reply-To: <20200420135112.6749-2-scerveau@collabora.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 20 Apr 2020 09:57:59 -0700
-Message-ID: <CABBYNZ+R1r66mFCNHtgu=RgD_gAeeXuYhk20a0jewmFBa523VA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] avctp: Fix compilation with GCC 10
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "szymon.janc@codecoup.pl" <szymon.janc@codecoup.pl>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 20 Apr 2020 10:21:44 -0700
+Message-ID: <CABBYNZJGFLEQoNqu=Z6pOxTzQ=jUpX1qxYu+rMZo4PyDW51QHQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] add hog ref before adding to instances
+To:     =?UTF-8?Q?St=C3=A9phane_Cerveau?= <scerveau@collabora.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -73,52 +71,106 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+Hi St=C3=A9phane,
 
-On Mon, Apr 20, 2020 at 9:44 AM Gix, Brian <brian.gix@intel.com> wrote:
+On Mon, Apr 20, 2020 at 9:39 AM St=C3=A9phane Cerveau <scerveau@collabora.c=
+om> wrote:
 >
-> On Mon, 2020-04-20 at 14:07 +0200, Szymon Janc wrote:
-> > This one is a false positive but since we never use more than
-> > UINPUT_MAX_NAME_SIZE bytes of name we can silence GCC by reducing
-> > size of source string.
-> >
-> >   CC       profiles/audio/bluetoothd-avctp.o
-> > In function =E2=80=98uinput_create=E2=80=99,
-> >     inlined from =E2=80=98init_uinput=E2=80=99 at profiles/audio/avctp.=
-c:1259:20:
-> > profiles/audio/avctp.c:1188:3: error: =E2=80=98strncpy=E2=80=99 output =
-may be truncated copying 79 bytes from a string of
-> > length 248 [-Werror=3Dstringop-truncation]
-> >  1188 |   strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE);
-> >       |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > cc1: all warnings being treated as errors
-> > ---
-> >  profiles/audio/avctp.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-> > index 37ffde9e7..058b44a8b 100644
-> > --- a/profiles/audio/avctp.c
-> > +++ b/profiles/audio/avctp.c
-> > @@ -1246,7 +1246,7 @@ static int uinput_create(struct btd_device *devic=
-e, const char *name,
-> >
-> >  static void init_uinput(struct avctp *session)
-> >  {
-> > -     char name[248 + 1];
-> > +     char name[UINPUT_MAX_NAME_SIZE];
+> To avoid a double hog free, need to add a ref
+> when adding the hog to the slist.
 >
-> Should this be nul terminated?  (UINPUT_MAX_NAME_SIZE + 1)  ?
+> This bug has been reproduced with gamepad-8718
+> which was connecting/disconnecting frantically.
+>
+> Fix also a typo in the method hog_attach_instance
+> ---
+>  profiles/input/hog-lib.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+> index 9c5c814a7..b9b5d565c 100644
+> --- a/profiles/input/hog-lib.c
+> +++ b/profiles/input/hog-lib.c
+> @@ -1357,7 +1357,7 @@ static struct bt_hog *hog_new(int fd, const char *n=
+ame, uint16_t vendor,
+>         return hog;
+>  }
+>
+> -static void hog_attach_instace(struct bt_hog *hog,
+> +static void hog_attach_instance(struct bt_hog *hog,
+>                                 struct gatt_db_attribute *attr)
+>  {
+>         struct bt_hog *instance;
+> @@ -1373,14 +1373,14 @@ static void hog_attach_instace(struct bt_hog *hog=
+,
+>         if (!instance)
+>                 return;
+>
+> -       hog->instances =3D g_slist_append(hog->instances, instance);
+> +       hog->instances =3D g_slist_append(hog->instances, bt_hog_ref(inst=
+ance));
 
-I guess not since that is send over to the kernel which accepts up to
-UINPUT_MAX_NAME_SIZE so if the name is exactly 248 then the kernel
-should be the one adding the NULL termination, if it doesn't then we
-need to truncate by doing name[247] =3D '\0'.
+That sounds like like a double ref since bt_hog_new already does add a
+reference, so chances are that you may be fixing the the symptom not
+the real problem which seems that we cannot unref the instances
+because they are not removed from the parent as it they should, in
+fact we might need to redesign it a little bit since bt_hog might
+actually be inefficient when there are multiple instances as it does
+allocate a new uhid instance of each of then so we might do something
+like:
 
-> >
-> >       device_get_name(session->device, name, sizeof(name));
-> >       if (g_str_equal(name, "Nokia CK-20W")) {
+struct bt_hog_instance {
+    struct bt_hog *parent;
+    struct gatt_db_attribute *attr;
+    struct gatt_primary *primary;
+    GAttrib *attrib;
+    GSList *reports;
+    gboolean has_report_id;
+    uint16_t bcdhid;
+    uint8_t bcountrycode;
+    uint16_t proto_mode_handle;
+    uint16_t ctrlpt_handle;
+    uint8_t flags;
+    unsigned int getrep_att;
+    uint16_t getrep_id;
+    unsigned int setrep_att;
+    uint16_t setrep_id;
+}
 
+That way the instances are indenpendent of the bt_hog which should be
+1:1 to a device, while we can have multple instances of
+bt_hog_instance, if you don't have time to do the rework then lets
+just add a parent pointer added to bt_hog so we can can remove child
+instances and resolve the double free.
+
+>  }
+>
+>  static void foreach_hog_service(struct gatt_db_attribute *attr, void *us=
+er_data)
+>  {
+>         struct bt_hog *hog =3D user_data;
+>
+> -       hog_attach_instace(hog, attr);
+> +       hog_attach_instance(hog, attr);
+>  }
+>
+>  static void dis_notify(uint8_t source, uint16_t vendor, uint16_t product=
+,
+> @@ -1528,7 +1528,7 @@ static void hog_attach_hog(struct bt_hog *hog, stru=
+ct gatt_primary *primary)
+>                         primary->range.end, find_included_cb, instance);
+>
+>         bt_hog_attach(instance, hog->attrib);
+> -       hog->instances =3D g_slist_append(hog->instances, instance);
+> +       hog->instances =3D g_slist_append(hog->instances, bt_hog_ref(inst=
+ance));
+>  }
+>
+>  static void primary_cb(uint8_t status, GSList *services, void *user_data=
+)
+> --
+> 2.17.1
+>
 
 
 --=20
