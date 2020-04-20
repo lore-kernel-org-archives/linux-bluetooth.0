@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C195C55181
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 21:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D50C54FCC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 22:38:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D20852078C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 21:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B879D205C9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 22:38:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tuzOCJhV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHKsaudD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgDTVF2 (ORCPT
+        id S1726405AbgDTWi4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Apr 2020 17:05:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725897AbgDTVF2 (ORCPT
+        Mon, 20 Apr 2020 18:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726006AbgDTWi4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:05:28 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A111C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 14:05:27 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id 8so10132973oiy.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 14:05:27 -0700 (PDT)
+        Mon, 20 Apr 2020 18:38:56 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0006C061A0C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 15:38:55 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id b13so9636825oti.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2020 15:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=LsK1wbtlNu6xEYcZi8/gnr/MAqwU3/mJ7ZfKr2g6zm4=;
-        b=tuzOCJhV7d+A/N6DnBKSg86zGObjDTy1nZtUxlbjR7V+a8nUWlULBpOLRTVS0Jjugs
-         HhCuROWNr4w0rD9Kp2MNt08+cmqahuDqIczj8aDUcTABZWuHtCWzYX5E5kBhabXSllzl
-         nUpi9c8AUZWm0Hr0xPhfZ7SlwLuShxrOsL6Ik3m1a7iTCT8cENXZw0GsRVjhLhX/Wxh/
-         ueKY2MKIDGYExlPwKEpwNfG/0ATsazbFDWzZncNWNEx5S3EY9Fw6c/2jCpUe201DjosX
-         IVwtCWptJQ9UpwtAro4NgkuY+FHFxD1WUo4uhQLZUX3DN6ilbAA5+S8wWn/hXZePIWNx
-         2BaA==
+        bh=04q0PmHXOuzQxjLLYpnWrSrywgKTNWy6DTSnBtlY6SQ=;
+        b=GHKsaudD8rhUwxEpzXc0c0HUcypwKLMmUwnK0FVxIBz0k2UvFUVFw03amtnyPU2OBX
+         2H+oMXIMHa5Q5dui0T+6n2QLTFnonC/93XkIaFWN7KRRQXq6yTZafActb2QzFZqtQJZM
+         4NzqYp2gzDgCLWvMt0al0zRLPAyKp+wzI86lYtRopJNS7LZc5lTkKeLRu4rmHWCt6xJs
+         J06XgQct4eqfZP7LL7cQLu0DJeARaR2PQH759R7Pn0AQE35+WawgLtV8qJUsGgb1BjMX
+         rPuXbU4i4iIJU+fP/mLCAN/uBTMVDPhtdI7DKAvp5p2Jt3d/2l+ajU/3wDjVDHwqhj1A
+         YZhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LsK1wbtlNu6xEYcZi8/gnr/MAqwU3/mJ7ZfKr2g6zm4=;
-        b=PrPTRLSzAGlG+Isfaw3v3Uts3zViARluYvUEz7qS5AGPTc4JWXRAa/pnaDFuDIzqAq
-         thkcu1RGmzb9JfRRv7cOSjhXO5teJhWXpK911xCYSTkfkXJwy7ycR+CGoLHLikEhHQco
-         gwzy2oURE+rqrPkynfnqP7lj/2eMAp2XIWisJ9+9DHgXVDGDW8q3c9O2tF6zHjG0na8w
-         +hHEfAXR8Sy5JU/ksWSH8afZuBW8GUvGEgfjIP2vHdCTqqToEjO0Rswn5FODuwOt84f0
-         LuHQkva+oeC+j2Xhn6Qq6GUu4bEPG3H8uCfc3GOlwQ3zZTYcwwYHGijciN0wlawwnBEb
-         Ts8A==
-X-Gm-Message-State: AGi0PuYYtETTXedcytob3fcllZJ7iLN/Uor/hQp7HNJZKCHix1Vyzo53
-        wOrFQxVFHNS8YbzhhkuwBAsgCQofJkadoLUtOlabMWg7Lh4=
-X-Google-Smtp-Source: APiQypIuB9Qcj7s340cXrOoh8GTrySRmnulveltuw6nit44hnsGPyDSpqf9hok5G5blYALvFBRqTxjX5TSQVEOte5B8=
-X-Received: by 2002:aca:f584:: with SMTP id t126mr1016073oih.108.1587416726497;
- Mon, 20 Apr 2020 14:05:26 -0700 (PDT)
+        bh=04q0PmHXOuzQxjLLYpnWrSrywgKTNWy6DTSnBtlY6SQ=;
+        b=A72CImX6taViysLSV8CH+8ZXJxIq/6INjSix7kiHbTbklor+gQnQWwZkOThcCa9nja
+         D3AzC4r96vVJuuEQRJAsJ3Rzz0xBmUjQtFGi6jabiad9UJN1JYPdiHDAp1ZNA0pzqNx4
+         WLZ3tKypQUfBcQHgPAKy8V7CGtpIl093Nu6lXp17PqyuYpfJJ/Ov//DIJtBsZevvrcNJ
+         PMclYsl/u7oBeisWcgdejq64csnR2YiX1oWQFdIrlSOOeXNYw3pbaPuW9Q+FyReIyvRO
+         C0Yc1AVShCcTorJuY7MjOF+Lpascb0vjQ+PE8td+VTuwNHbsdLh4MD4cnD9S6xZh779c
+         dbJg==
+X-Gm-Message-State: AGi0PuZHgP0xqlkftEqmEzTmWbKjnnFX/d91KvfpgLUsjtv9K8xv74+S
+        QYcdZgAq14Zs06WBjmR8rsH/s331lI3yLENE/uZyqFSn
+X-Google-Smtp-Source: APiQypLfMoL/BdO0QO5SO8vvuk/29uv3OKq61rIb6VXwxghKNUxoCzOpJDjSIzASPlcsCQN0A6Ey0n42SlkP+HbDkAs=
+X-Received: by 2002:a9d:644:: with SMTP id 62mr10091278otn.177.1587422335105;
+ Mon, 20 Apr 2020 15:38:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200420135112.6749-1-scerveau@collabora.com> <20200420135112.6749-2-scerveau@collabora.com>
- <CABBYNZJGFLEQoNqu=Z6pOxTzQ=jUpX1qxYu+rMZo4PyDW51QHQ@mail.gmail.com> <ff94c0ef-5778-8f96-3e91-b4e6ddb66d29@collabora.com>
-In-Reply-To: <ff94c0ef-5778-8f96-3e91-b4e6ddb66d29@collabora.com>
+References: <20200419211058.31987-1-pali@kernel.org>
+In-Reply-To: <20200419211058.31987-1-pali@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 20 Apr 2020 14:05:15 -0700
-Message-ID: <CABBYNZKVTJf8tyn0JbEeR9s2K7TGyaUZRVYof5H0mJOMxQF_fw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] add hog ref before adding to instances
-To:     scerveau <scerveau@collabora.com>
+Date:   Mon, 20 Apr 2020 15:38:43 -0700
+Message-ID: <CABBYNZLO+o1XiY7bo0epOt-hOQ+SSFKBiCjcKv4e+xkTfBYWGw@mail.gmail.com>
+Subject: Re: [PATCH] profile: Fix reporting error message when connection failed
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -72,140 +71,158 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Scerveau,
+Hi Pali,
 
-On Mon, Apr 20, 2020 at 11:37 AM scerveau <scerveau@collabora.com> wrote:
+On Sun, Apr 19, 2020 at 2:14 PM Pali Roh=C3=A1r <pali@kernel.org> wrote:
 >
-> Dear Luiz,
+> Some bluetooth headsets do not support connecting more then one bluetooth
+> profile (e.g. in parallel A2DP and HSP, or HSP and HFP) and issuing
+> connect() syscall for second profile returns just ECONNREFUSED.
 >
-> Thanks but see my comment below.
+> Prior this patch bluetooth daemon for such situation reported following
+> message to log:
 >
-> On 20/4/20 19:21, Luiz Augusto von Dentz wrote:
-> > Hi St=C3=A9phane,
-> >
-> > On Mon, Apr 20, 2020 at 9:39 AM St=C3=A9phane Cerveau <scerveau@collabo=
-ra.com> wrote:
-> >>
-> >> To avoid a double hog free, need to add a ref
-> >> when adding the hog to the slist.
-> >>
-> >> This bug has been reproduced with gamepad-8718
-> >> which was connecting/disconnecting frantically.
-> >>
-> >> Fix also a typo in the method hog_attach_instance
-> >> ---
-> >>   profiles/input/hog-lib.c | 8 ++++----
-> >>   1 file changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> >> index 9c5c814a7..b9b5d565c 100644
-> >> --- a/profiles/input/hog-lib.c
-> >> +++ b/profiles/input/hog-lib.c
-> >> @@ -1357,7 +1357,7 @@ static struct bt_hog *hog_new(int fd, const char=
- *name, uint16_t vendor,
-> >>          return hog;
-> >>   }
-> >>
-> >> -static void hog_attach_instace(struct bt_hog *hog,
-> >> +static void hog_attach_instance(struct bt_hog *hog,
-> >>                                  struct gatt_db_attribute *attr)
-> >>   {
-> >>          struct bt_hog *instance;
-> >> @@ -1373,14 +1373,14 @@ static void hog_attach_instace(struct bt_hog *=
-hog,
-> >>          if (!instance)
-> >>                  return;
-> >>
-> >> -       hog->instances =3D g_slist_append(hog->instances, instance);
-> >> +       hog->instances =3D g_slist_append(hog->instances, bt_hog_ref(i=
-nstance));
-> >
-> > That sounds like like a double ref since bt_hog_new already does add a
+>   Unable to get connect data for Headset Voice gateway: getpeername: Tran=
+sport endpoint is not connected (107)
 >
-> Yes but in `hog_attach_instance`, `hog_new` is used and not `bt_hog_new`
-> which is indeed reffing. So I dont think there is double ref in this meth=
-od.
-
-Yep, you are rigth it is not adding a reference, but that seems on
-purpose since on it doesn't use bt_hog_unref:
-
-g_slist_free_full(hog->instances, hog_free);
-
-> Unfortunately when I was preparing the patch, I noticed that another
-> instance was added to slist and here you are totally right there is a
-> double reference. I will remove this from the initial patch.
-
-Right, I see now that is really missing the ref because
-destroy_gatt_req does actually unref its own reference but since we
-use hog_new that would destroy the instance so adding the ref should
-be the right way to fix this.
-
+> Message is incorrect as connect() syscall failed, not getpeername(). This
+> patch fixes this problem and logs correct error message:
 >
+>   Headset Voice gateway failed connect to XX:XX:XX:XX:XX:XX: Connection r=
+efused (111)
 >
-> > reference, so chances are that you may be fixing the the symptom not
-> > the real problem which seems that we cannot unref the instances
-> > because they are not removed from the parent as it they should, in
-> > fact we might need to redesign it a little bit since bt_hog might
-> > actually be inefficient when there are multiple instances as it does
-> > allocate a new uhid instance of each of then so we might do something
-> > like:
-> >
-> > struct bt_hog_instance {
-> >      struct bt_hog *parent;
-> >      struct gatt_db_attribute *attr;
-> >      struct gatt_primary *primary;
-> >      GAttrib *attrib;
-> >      GSList *reports;
-> >      gboolean has_report_id;
-> >      uint16_t bcdhid;
-> >      uint8_t bcountrycode;
-> >      uint16_t proto_mode_handle;
-> >      uint16_t ctrlpt_handle;
-> >      uint8_t flags;
-> >      unsigned int getrep_att;
-> >      uint16_t getrep_id;
-> >      unsigned int setrep_att;
-> >      uint16_t setrep_id;
-> > }
-> >
-> > That way the instances are indenpendent of the bt_hog which should be
-> > 1:1 to a device, while we can have multple instances of
-> > bt_hog_instance, if you don't have time to do the rework then lets
-> > just add a parent pointer added to bt_hog so we can can remove child
-> > instances and resolve the double free.
-> >
-> >>   }
-> >>
-> >>   static void foreach_hog_service(struct gatt_db_attribute *attr, void=
- *user_data)
-> >>   {
-> >>          struct bt_hog *hog =3D user_data;
-> >>
-> >> -       hog_attach_instace(hog, attr);
-> >> +       hog_attach_instance(hog, attr);
-> >>   }
-> >>
-> >>   static void dis_notify(uint8_t source, uint16_t vendor, uint16_t pro=
-duct,
-> >> @@ -1528,7 +1528,7 @@ static void hog_attach_hog(struct bt_hog *hog, s=
-truct gatt_primary *primary)
-> >>                          primary->range.end, find_included_cb, instanc=
-e);
-> >>
-> >>          bt_hog_attach(instance, hog->attrib);
-> >> -       hog->instances =3D g_slist_append(hog->instances, instance);
-> >> +       hog->instances =3D g_slist_append(hog->instances, bt_hog_ref(i=
-nstance));
-> >>   }
-> >>
-> >>   static void primary_cb(uint8_t status, GSList *services, void *user_=
-data)
-> >> --
-> >> 2.17.1
-> >>
-> >
-> >
+> Main problem was in ext_connect() function which called bt_io_get() for
+> retrieving remote address (BT_IO_OPT_DEST) and if it failed then original
+> error from connect() syscall was masked. Because it is not possible to
+> retrieve BT_IO_OPT_DEST for unconnected socket, original destination
+> address for error message is propagated via connect_add() function in bti=
+o.
+>
+> --
+>
+> Having correct error message in logs is important. Due to this mangled
+> error message I was not able to easily debug why particular bluetooth
+> headset sometimes connection with nonsense error that Transport endpoint
+> was not connected.
 
+Looks good, but lets have the btio changes as a separate patch.
+
+> ---
+>  btio/btio.c   | 19 ++++++++++++++-----
+>  src/profile.c |  5 +++--
+>  2 files changed, 17 insertions(+), 7 deletions(-)
+>
+> diff --git a/btio/btio.c b/btio/btio.c
+> index e7b4db16b..3ea73faea 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -85,6 +85,7 @@ struct connect {
+>         BtIOConnect connect;
+>         gpointer user_data;
+>         GDestroyNotify destroy;
+> +       bdaddr_t dst;
+>  };
+>
+>  struct accept {
+> @@ -214,6 +215,7 @@ static gboolean connect_cb(GIOChannel *io, GIOConditi=
+on cond,
+>         GError *gerr =3D NULL;
+>         int err, sk_err, sock;
+>         socklen_t len =3D sizeof(sk_err);
+> +       char addr[18];
+>
+>         /* If the user aborted this connect attempt */
+>         if ((cond & G_IO_NVAL) || check_nval(io))
+> @@ -226,8 +228,11 @@ static gboolean connect_cb(GIOChannel *io, GIOCondit=
+ion cond,
+>         else
+>                 err =3D -sk_err;
+>
+> -       if (err < 0)
+> -               ERROR_FAILED(&gerr, "connect error", -err);
+> +       if (err < 0) {
+> +               ba2str(&conn->dst, addr);
+> +               g_set_error(&gerr, BT_IO_ERROR, err,
+> +                       "connect to %s: %s (%d)", addr, strerror(-err), -=
+err);
+> +       }
+>
+>         conn->connect(io, gerr, conn->user_data);
+>
+> @@ -286,7 +291,7 @@ static void server_add(GIOChannel *io, BtIOConnect co=
+nnect,
+>                                         (GDestroyNotify) server_remove);
+>  }
+>
+> -static void connect_add(GIOChannel *io, BtIOConnect connect,
+> +static void connect_add(GIOChannel *io, BtIOConnect connect, bdaddr_t ds=
+t,
+>                                 gpointer user_data, GDestroyNotify destro=
+y)
+>  {
+>         struct connect *conn;
+> @@ -296,6 +301,7 @@ static void connect_add(GIOChannel *io, BtIOConnect c=
+onnect,
+>         conn->connect =3D connect;
+>         conn->user_data =3D user_data;
+>         conn->destroy =3D destroy;
+> +       conn->dst =3D dst;
+>
+>         cond =3D G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+>         g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, con=
+n,
+> @@ -1671,6 +1677,7 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpoi=
+nter user_data,
+>         struct set_opts opts;
+>         int err, sock;
+>         gboolean ret;
+> +       char addr[18];
+>
+>         va_start(args, opt1);
+>         ret =3D parse_set_opts(&opts, gerr, opt1, args);
+> @@ -1710,12 +1717,14 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gp=
+ointer user_data,
+>         }
+>
+>         if (err < 0) {
+> -               ERROR_FAILED(gerr, "connect", -err);
+> +               ba2str(&opts.dst, addr);
+> +               g_set_error(gerr, BT_IO_ERROR, err,
+> +                               "connect to %s: %s (%d)", addr, strerror(=
+-err), -err);
+>                 g_io_channel_unref(io);
+>                 return NULL;
+>         }
+>
+> -       connect_add(io, connect, user_data, destroy);
+> +       connect_add(io, connect, opts.dst, user_data, destroy);
+>
+>         return io;
+>  }
+> diff --git a/src/profile.c b/src/profile.c
+> index c2992e795..6961a107b 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -1085,12 +1085,13 @@ static void ext_connect(GIOChannel *io, GError *e=
+rr, gpointer user_data)
+>         if (!bt_io_get(io, &io_err,
+>                                 BT_IO_OPT_DEST, addr,
+>                                 BT_IO_OPT_INVALID)) {
+> -               error("Unable to get connect data for %s: %s", ext->name,
+> -                                                       io_err->message);
+>                 if (err) {
+> +                       error("%s failed %s", ext->name, err->message);
+>                         g_error_free(io_err);
+>                         io_err =3D NULL;
+>                 } else {
+> +                       error("Unable to get connect data for %s: %s",
+> +                               ext->name, io_err->message);
+>                         err =3D io_err;
+>                 }
+>                 goto drop;
+> --
+> 2.20.1
+>
 
 
 --=20
