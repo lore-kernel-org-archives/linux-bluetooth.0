@@ -2,183 +2,119 @@ Return-Path: <SRS0=YdAw=6E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D239EC54FC9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 02:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1077DC3815B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 08:23:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB3C8214AF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 02:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3A94206B8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Apr 2020 08:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sIdmnxUm"
+	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="dE5h4joV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G23U+tfw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726105AbgDTCtP (ORCPT
+        id S1726209AbgDTIXD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 19 Apr 2020 22:49:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726009AbgDTCtO (ORCPT
+        Mon, 20 Apr 2020 04:23:03 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:33025 "EHLO
+        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725773AbgDTIXD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 19 Apr 2020 22:49:14 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450E5C061A10
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Apr 2020 19:49:14 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id x4so9302736wmj.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Apr 2020 19:49:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XF4ZBNY8eOltoWS9DH59FU+3eJBejRyDMSM+6kiUWqs=;
-        b=sIdmnxUmhis69w8p6uw4qmYP2Z5v6mqLxYksEbF/6q/iomvUq7MkebfX+6r4hNQtal
-         nNRM3pLi5spDPsCuJdQUSaweESsriBDcscu9ILu+qw8SXNpkdpjE9ZbNcpK4/AjZzahU
-         zgpBYkoUT8c4dNz102AQ7IP1+7o5pPQkQJILX/qBu3ZycrmeCcxJnWsGJSrkcsFZLpuu
-         4XQycMOdPQR/32xwQ1yw9rOZS6SUno7a5wu4N4dnzrdaia/NTEjicPrKa0vyJRiAIn5O
-         V0andon9Y84RJ17UaLC51x7qsGNU9mhLKZ98PqMq/W9jPzLpS7nkSi48uR+CiEqVZjZw
-         ALyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XF4ZBNY8eOltoWS9DH59FU+3eJBejRyDMSM+6kiUWqs=;
-        b=Ey4/iTd0U7Gg7Wz2bo2lIC84ypd1jdz22/dSApj3zHQdguifdRn9zXRwox/Mq4QLXc
-         Wzm8tKzQsXEO9Wsyd2r3c/oCOhvgGV/AUaIa2c9jdLKOoKe7nbo0x/DMTPKfxniaAafk
-         ZST/TvI25HPWigXvi4FeR2V4eQkYM2UuZQY3BSlowd8olGUybWeidY8qjVuYb+lmPvrn
-         XczpmjLjPb/PvK9Y81ypV5KDCJ8tivlLv4axbGGlq3Oj88xzLVaPHtZhA99Rop5h/VrW
-         Dv7C/5mUSurI9Cnqms2mKx+b8kh/EMkN0cJrxZ6cT2oI92WjhHku9HMtPvM8NT5Cflcj
-         x1Zw==
-X-Gm-Message-State: AGi0PuZWTGLGYFPqalVLBg9KI5fp2I9Bseu1CxFl6H5DycVPH/KW9SNh
-        w4JjRmWNIk5EmsnlMSwF/OPywXpO2sUzqWyCNMNiZdiCGQI=
-X-Google-Smtp-Source: APiQypJD4f70XggReG9ai4HI1qrC5N8k0+rIXKntIyZBl9gMP9tGuxcdatP5lyiSjxCWOTDefnNPkW96yX1rkLY7e/w=
-X-Received: by 2002:a1c:2e91:: with SMTP id u139mr14898263wmu.18.1587350952435;
- Sun, 19 Apr 2020 19:49:12 -0700 (PDT)
+        Mon, 20 Apr 2020 04:23:03 -0400
+X-Greylist: delayed 558 seconds by postgrey-1.27 at vger.kernel.org; Mon, 20 Apr 2020 04:23:02 EDT
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id 2C9A7434;
+        Mon, 20 Apr 2020 04:13:43 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Mon, 20 Apr 2020 04:13:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm2; bh=SXSTFribf+OBJQkU3j6jVIz3bY6
+        eV4OkRjDaFUbGPVw=; b=dE5h4joV1X2zyfsk9mJ41dSV9Gw9Z/YVaMMRGJ820cJ
+        NOM2XNUzGMrQc6ydYn/Zic69B5NNRAo6QYHu7GiXTukZObTUlEBXjml6kZ/h7tAT
+        KMRH6rsLmKGHMxHRm7KJLGWmYRqhGKyvler6AycFGuPEGCumuG7dlYNh0te1Urjx
+        B6h7D1L21WQxrWq9rbIg2awGPkD9xDLlas4gTjOZhaRUMmGgHQg+K1OSe1L7j+F6
+        bmwm6FQYhRHRkEqK671hDPeOeYQIt9YyhceNDEnvh2vN6YHgeij3N4pO5N+DJN7w
+        9V+2zj+aOoX22lyD9EziS9+y0v/eOMqyQ7U5xATaBqw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=SXSTFr
+        ibf+OBJQkU3j6jVIz3bY6eV4OkRjDaFUbGPVw=; b=G23U+tfw+wQH0rkso4eEwx
+        yQrM7P5msXz/OSSuwywZHpLw59W7M9piQzgYDymuZ/YKvqo9EW4FYeWdNyEoH+Ed
+        qmqsr4Sy9SCUAWo+U7Xi8UaefRJgr1xVvCWCNwhs0s9c7HwcgF9NnbIaBi1jxF8Q
+        z/QcFe7e+rHQBP1rEmpE2U43OrZLm5wRDGIiSoDuD1YdwkM+WbU5zoyBvHMF5KMW
+        C7vFCc8JDlwMTEP39M/PyYTBAbvRGE/SyZ1pVAhaeuNueZSROb33Z+uvkYT1/7c3
+        cpFJBI0Uq5E1XdygU8RLJ53HUPy2gALcm2KVAsWjq0oho1PeFfIGNg0GONbW7ZHA
+        ==
+X-ME-Sender: <xms:tFmdXrjoBzIgx--8HKQXgDrtxO5gVSCcQrfVsGCBN7W7YGtfh-qHEA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrgeefucetufdoteggodetrfdotffvucfrrh
+    hofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvffukfhfgggtuggjsehgtderredttddvnecuhfhrohhmpeforgigihhmvgcutfhi
+    phgrrhguuceomhgrgihimhgvsegtvghrnhhordhtvggthheqnecukfhppeeltddrkeelrd
+    eikedrjeeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
+    mhepmhgrgihimhgvsegtvghrnhhordhtvggthh
+X-ME-Proxy: <xmx:tFmdXix3P9qkRjDO69NN5eUQUL2gZwUhPrg6E8e4InQODtjq81Pbsw>
+    <xmx:tFmdXp8VSgOzUNGzxjXDXf0hmnasH9Zn98KD4SKEGNOKFRqoWr01-w>
+    <xmx:tFmdXvBn1GLk5m2Pm5avHEkDYkDZzYF2fWl4nUyo3FlyH1VrQfUqxg>
+    <xmx:tlmdXt6FXLOMGmuXYEy2LsOWngKuRKcExd-_FWiOCNilGysnqab04_8LDgI>
+Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        by mail.messagingengine.com (Postfix) with ESMTPA id A92B33280060;
+        Mon, 20 Apr 2020 04:13:40 -0400 (EDT)
+Date:   Mon, 20 Apr 2020 10:13:39 +0200
+From:   Maxime Ripard <maxime@cerno.tech>
+To:     Alistair Francis <alistair@alistair23.me>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, wens@csie.org, anarsoul@gmail.com,
+        devicetree@vger.kernel.org, alistair23@gmail.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 3/3] arm64: allwinner: Enable Bluetooth and WiFi on
+ sopine baseboard
+Message-ID: <20200420081339.znoxmshq2z74slvg@gilmour.lan>
+References: <20200412020644.355142-1-alistair@alistair23.me>
+ <20200412020644.355142-3-alistair@alistair23.me>
 MIME-Version: 1.0
-References: <20200414160758.v1.1.Idab9dcdc7da549ed1fd5c66341fb8baffaee8d10@changeid>
-In-Reply-To: <20200414160758.v1.1.Idab9dcdc7da549ed1fd5c66341fb8baffaee8d10@changeid>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Mon, 20 Apr 2020 10:49:01 +0800
-Message-ID: <CAJQfnxF+Sw2tDf4-WwUdJNV9nxjjwr3H48=pt8Ja0eTt8jEdeA@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: L2CAP: add support for waiting
- disconnection resp
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ejtot7cm3kxebrar"
+Content-Disposition: inline
+In-Reply-To: <20200412020644.355142-3-alistair@alistair23.me>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[Re-sending in plain text]
-Hi bluetooth maintainers,
 
-May I ask for your review on this?
+--ejtot7cm3kxebrar
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Archie
+Hi,
 
+On Sat, Apr 11, 2020 at 07:06:44PM -0700, Alistair Francis wrote:
+> The sopine board has an optional RTL8723BS WiFi + BT module that can be
+> connected to UART1. Add this to the device tree so that it will work
+> for users if connected.
+>=20
+> Signed-off-by: Alistair Francis <alistair@alistair23.me>
 
-On Tue, 14 Apr 2020 at 16:09, Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> Whenever we disconnect a L2CAP connection, we would immediately
-> report a disconnection event (EPOLLHUP) to the upper layer, without
-> waiting for the response of the other device.
->
-> This patch offers an option to wait until we receive a disconnection
-> response before reporting disconnection event, by using the "how"
-> parameter in l2cap_sock_shutdown(). Therefore, upper layer can opt
-> to wait for disconnection response by shutdown(sock, SHUT_WR).
->
-> This can be used to enforce proper disconnection order in HID,
-> where the disconnection of the interrupt channel must be complete
-> before attempting to disconnect the control channel.
->
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> ---
->
->  net/bluetooth/l2cap_sock.c | 30 +++++++++++++++++++++++-------
->  1 file changed, 23 insertions(+), 7 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 1cea42ee1e922..a995d2c51fa7f 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1271,14 +1271,21 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
->         struct l2cap_conn *conn;
->         int err = 0;
->
-> -       BT_DBG("sock %p, sk %p", sock, sk);
-> +       BT_DBG("sock %p, sk %p, how %d", sock, sk, how);
-> +
-> +       /* 'how' parameter is mapped to sk_shutdown as follows:
-> +        * SHUT_RD   (0) --> RCV_SHUTDOWN  (1)
-> +        * SHUT_WR   (1) --> SEND_SHUTDOWN (2)
-> +        * SHUT_RDWR (2) --> SHUTDOWN_MASK (3)
-> +        */
-> +       how++;
->
->         if (!sk)
->                 return 0;
->
->         lock_sock(sk);
->
-> -       if (sk->sk_shutdown)
-> +       if ((sk->sk_shutdown & how) == how)
->                 goto shutdown_already;
->
->         BT_DBG("Handling sock shutdown");
-> @@ -1301,11 +1308,20 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
->                  * has already been actioned to close the L2CAP
->                  * link such as by l2cap_disconnection_req().
->                  */
-> -               if (sk->sk_shutdown)
-> -                       goto has_shutdown;
-> +               if ((sk->sk_shutdown & how) == how)
-> +                       goto shutdown_matched;
->         }
->
-> -       sk->sk_shutdown = SHUTDOWN_MASK;
-> +       /* Try setting the RCV_SHUTDOWN bit, return early if SEND_SHUTDOWN
-> +        * is already set
-> +        */
-> +       if ((how & RCV_SHUTDOWN) && !(sk->sk_shutdown & RCV_SHUTDOWN)) {
-> +               sk->sk_shutdown |= RCV_SHUTDOWN;
-> +               if ((sk->sk_shutdown & how) == how)
-> +                       goto shutdown_matched;
-> +       }
-> +
-> +       sk->sk_shutdown |= SEND_SHUTDOWN;
->         release_sock(sk);
->
->         l2cap_chan_lock(chan);
-> @@ -1335,7 +1351,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
->                 err = bt_sock_wait_state(sk, BT_CLOSED,
->                                          sk->sk_lingertime);
->
-> -has_shutdown:
-> +shutdown_matched:
->         l2cap_chan_put(chan);
->         sock_put(sk);
->
-> @@ -1363,7 +1379,7 @@ static int l2cap_sock_release(struct socket *sock)
->
->         bt_sock_unlink(&l2cap_sk_list, sk);
->
-> -       err = l2cap_sock_shutdown(sock, 2);
-> +       err = l2cap_sock_shutdown(sock, SHUT_RDWR);
->         chan = l2cap_pi(sk)->chan;
->
->         l2cap_chan_hold(chan);
-> --
-> 2.26.0.110.g2183baf09c-goog
->
+Like Vasily said in a previous iteration, this should be an overlay.
+
+Maxime
+
+--ejtot7cm3kxebrar
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXp1ZswAKCRDj7w1vZxhR
+xRHnAQDHNvHWo1zmq8o4pNF0FFVzFdG9ZW4B0hE0ap3rEg3u+QEAtFnUoV0c8i8g
+nKNO32LMpG2lK/In+8B74ILYTIcZpAQ=
+=IRUG
+-----END PGP SIGNATURE-----
+
+--ejtot7cm3kxebrar--
