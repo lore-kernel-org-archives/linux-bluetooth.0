@@ -5,60 +5,60 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20377C54FC9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 08:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3545CC2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 08:17:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1A0B21D79
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 08:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 172F42073A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 08:17:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i/Y02tiK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1+nB5uB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728474AbgDUIRW (ORCPT
+        id S1728411AbgDUIRJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Apr 2020 04:17:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47542 "EHLO
+        Tue, 21 Apr 2020 04:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728437AbgDUIRM (ORCPT
+        with ESMTP id S1726095AbgDUIRH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Apr 2020 04:17:12 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66388C061A10;
-        Tue, 21 Apr 2020 01:17:12 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id z26so13002334ljz.11;
-        Tue, 21 Apr 2020 01:17:12 -0700 (PDT)
+        Tue, 21 Apr 2020 04:17:07 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCE3C061A0F;
+        Tue, 21 Apr 2020 01:17:06 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id e25so13035558ljg.5;
+        Tue, 21 Apr 2020 01:17:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ialMFur7X9DPC+g1oI8+Dh4E5wgzi1y2UDjvZas+VmA=;
-        b=i/Y02tiK0l6yFkhBoRWAQ8ngsHcCX2xSBJfxJBCKCAqshNvz+LHCKRSQOeBQSscDkp
-         p2Ar6wq5imowYLqGgI3f3VLhVycp2WNHEFZOMea7PNS/6XwegC5mrJN5tIljf0EAoRvV
-         bfipIepYuz9k8vEJSb+R/Xj5YVbE/W5ILgTUZhX2/rOJX/9W34BT2S3gN8X2Tka03bEM
-         8e18akw6yCponIlt2G5gF7mRNBzbS46aAJqaqXUj6Osgp+CZwERfcBEXYvyozVwEcVN0
-         45bW6IzA1SHguZHrUKsEyNZXu3ORrGCXWoAO5ofRxFV/d6hTkOrdKeQcmLBVIpRNXgBh
-         XkzA==
+        bh=I5j2meaXqfCQg6EDK5Yc89bHLLGnzZUOQwGDeJZNWgA=;
+        b=E1+nB5uBJ2Lvjqr0F2R2j0bbl3P9N2oY6AHBJZnv+/GOutnQoJb15Y0NW2HiQ6cxRI
+         my4chhnr8EQXJIog2d5xI1Dpg2A0bLatoQ85g/NAKsmGjnJ/aEe6aEVLQHyn1abwkRE1
+         svd91vjSfOWroeAPilW3Kj8YD2iCU8vRJ53F4PhItDzhHrA70emZX8el+lHqiqHltbzH
+         iua38U2ghEIQJ7L3vNh58/1gsgf+Z8Rxn+RxpLJUPX9eEn9aObgfETlEez4llz6gMve6
+         V/+Mwa+LXgbbK0WQRMDzxG7JkGMtxlyYRLjlLA8rFhdvI9ajqsSb0py/GPnfYCsK/HlM
+         QaXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ialMFur7X9DPC+g1oI8+Dh4E5wgzi1y2UDjvZas+VmA=;
-        b=sYYbjlS8vByOf89CmqFepzZbW50W1ZgeVqDZfZJnc4/z6Rc/ifY/aFyw6EUXnN4Q5P
-         tGxOIP8EIzWgsvernPet81Lltkq/cA7zeHyWSDfby0Xvel15mhFcYzIogV3C2csOFkhf
-         nS9Cto5hnPVXmu9KaAq1Gwog3AgwOHMAeR5IUJ8Y/zOddYKn/0IdswDbyERYMhO9i10/
-         y1L3RE1Mba7KXzjTtdABS+gWnCAKZBXJH5eqVcHwnAJJOFmQwtHl/civL9I7fzrUFqm/
-         n7Ft9NtLTBKPn5nxrIVJFWM3UDo/lDA5xJbl5nvVrGayWpN6ZtFNnwKE3Gui3IkT3Kke
-         35Lw==
-X-Gm-Message-State: AGi0PuZlyNEbz/DZ5WjbMUvbclid8nb+zMCssGH+DnrLNTPsRIoYVufr
-        snj1ItbGygCRFJPNJJTPjys=
-X-Google-Smtp-Source: APiQypIznA9Jxu+DKX+UuSMPdggfsfkTowEcFTLr3ooT4JKu6jZ6T+ctpSYQn4/3cR9ftldZA0SfKg==
-X-Received: by 2002:a2e:800f:: with SMTP id j15mr10309809ljg.27.1587457030910;
-        Tue, 21 Apr 2020 01:17:10 -0700 (PDT)
+        bh=I5j2meaXqfCQg6EDK5Yc89bHLLGnzZUOQwGDeJZNWgA=;
+        b=XU/kBZmSukjmyfVPXpSP4yk19pW5GG+GHngSB9DtJMHoBQRE64CiSeGmtINk2Y6qet
+         hSEUhHg2Dy9yKWACzObex/ROlVFIRPiiKAlv97BjeDf/AsurXGE7QDJBi5YAQYRuA7wp
+         8UYXNXM+EOBGHRAlpX7Qb5bmSRMfvQJkiTwyKMjo1Hq4yG7ApJuqyc+g5Wlv/69h9wF9
+         U3uyBggEGkmrbuVK6wBSzgtBtGGY1AUVja2b/RbWP38iFuwGkz4PB9by27CQlgiRZDwa
+         Yne/BTG2n8TRzUAJV5HvmjiTsPdJI8aNpAQbYU8UoacAKzqTS10uN6ExrqWunIipFsVt
+         SH8w==
+X-Gm-Message-State: AGi0PuZJf8TDPa+11Ar2P1gzlUYQ5h2cYK/8NrXTrKIq/SGz8U8+mll1
+        I3Qyarzrzi+wNlfgH0S/RBw=
+X-Google-Smtp-Source: APiQypKUA5C705+SoOWtEmSGF73au/UD7TbUtttQo3xwBmnBpYc2nLQjSuRpGgkARK/BASUxJDxPwQ==
+X-Received: by 2002:a05:651c:20f:: with SMTP id y15mr8030841ljn.230.1587457025160;
+        Tue, 21 Apr 2020 01:17:05 -0700 (PDT)
 Received: from localhost.localdomain ([87.200.95.144])
-        by smtp.gmail.com with ESMTPSA id j13sm1472756lfb.19.2020.04.21.01.17.08
+        by smtp.gmail.com with ESMTPSA id j13sm1472756lfb.19.2020.04.21.01.17.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2020 01:17:10 -0700 (PDT)
+        Tue, 21 Apr 2020 01:17:04 -0700 (PDT)
 From:   Christian Hewitt <christianshewitt@gmail.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -66,9 +66,9 @@ To:     Marcel Holtmann <marcel@holtmann.org>,
         devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH 3/3] Bluetooth: hci_qca: allow max-speed to be set for QCA9377 devices
-Date:   Tue, 21 Apr 2020 08:16:56 +0000
-Message-Id: <20200421081656.9067-4-christianshewitt@gmail.com>
+Subject: [PATCH 1/3] dt-bindings: net: bluetooth: Add device tree bindings for QCA9377
+Date:   Tue, 21 Apr 2020 08:16:54 +0000
+Message-Id: <20200421081656.9067-2-christianshewitt@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200421081656.9067-1-christianshewitt@gmail.com>
 References: <20200421081656.9067-1-christianshewitt@gmail.com>
@@ -77,58 +77,36 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Move the read of max-speed from device-tree out of the qca_is_wcn399x
-if block so oper_speed can be set for QCA9377 devices as well.
+QCA9377 is a QCA ROME device frequently found in Android TV boxes.
 
-Suggested-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
 ---
- drivers/bluetooth/hci_qca.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 6f0350fbdcd6..b63ec7a0ac9e 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -596,10 +596,12 @@ static int qca_open(struct hci_uart *hu)
+diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+index d2202791c1d4..2fec6912e160 100644
+--- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
++++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+@@ -10,6 +10,7 @@ device the slave device is attached to.
+ Required properties:
+  - compatible: should contain one of the following:
+    * "qcom,qca6174-bt"
++   * "qcom,qca9377-bt"
+    * "qcom,wcn3990-bt"
+    * "qcom,wcn3991-bt"
+    * "qcom,wcn3998-bt"
+@@ -20,6 +21,10 @@ Optional properties for compatible string qcom,qca6174-bt:
+  - clocks: clock provided to the controller (SUSCLK_32KHZ)
+  - firmware-name: specify the name of nvm firmware to load
  
- 	if (hu->serdev) {
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
--		if (qca_is_wcn399x(qcadev->btsoc_type)) {
++Optional properties for compatible string qcom,qca9377-bt:
 +
-+		if (qca_is_wcn399x(qcadev->btsoc_type))
- 			hu->init_speed = qcadev->init_speed;
++ - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
 +
-+		if (qcadev->oper_speed)
- 			hu->oper_speed = qcadev->oper_speed;
--		}
- 	}
+ Required properties for compatible string qcom,wcn399x-bt:
  
- 	timer_setup(&qca->wake_retrans_timer, hci_ibs_wake_retrans_timeout, 0);
-@@ -1865,6 +1867,11 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 	serdev_device_set_drvdata(serdev, qcadev);
- 	device_property_read_string(&serdev->dev, "firmware-name",
- 					 &qcadev->firmware_name);
-+	device_property_read_u32(&serdev->dev, "max-speed",
-+				 &qcadev->oper_speed);
-+	if (!qcadev->oper_speed)
-+		BT_DBG("UART will pick default operating speed");
-+
- 	if (data && qca_is_wcn399x(data->soc_type)) {
- 		qcadev->btsoc_type = data->soc_type;
- 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
-@@ -1889,11 +1896,6 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			return PTR_ERR(qcadev->susclk);
- 		}
- 
--		device_property_read_u32(&serdev->dev, "max-speed",
--					 &qcadev->oper_speed);
--		if (!qcadev->oper_speed)
--			BT_DBG("UART will pick default operating speed");
--
- 		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
- 		if (err) {
- 			BT_ERR("wcn3990 serdev registration failed");
+  - vddio-supply: VDD_IO supply regulator handle.
 -- 
 2.17.1
 
