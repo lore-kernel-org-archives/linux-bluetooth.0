@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535D5C54FC9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 16:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DBAC54FCC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 16:00:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E914206F4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 16:00:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 555FF2068F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 16:00:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cKNYBY1B"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HjwidcYG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbgDUQAV (ORCPT
+        id S1727911AbgDUQAh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Apr 2020 12:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34386 "EHLO
+        Tue, 21 Apr 2020 12:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725930AbgDUQAV (ORCPT
+        by vger.kernel.org with ESMTP id S1725930AbgDUQAh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Apr 2020 12:00:21 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BE2C061A10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 09:00:21 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id 184so8746140vsu.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 09:00:21 -0700 (PDT)
+        Tue, 21 Apr 2020 12:00:37 -0400
+Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF0DC061A10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 09:00:37 -0700 (PDT)
+Received: by mail-ua1-x941.google.com with SMTP id z16so548127uae.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 09:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FkIypgcddOiZPZ1yBFqxpKxj/S2eqFKe3dF1EGDP/Vg=;
-        b=cKNYBY1BMfW0xbFD9KeP2/b3dHpnui593WcxPX1W1qApdAKgsjZ8vWiTq5wcxU9DQk
-         1oZ9puRmypIPo+bmATTBHtb0qvTetnvub4aCfNDroGujbVQT5f1atBu1OdfLTTF0Ysap
-         tU5dXhTvJvKRXUAcIp3GZ6JGITsJDmB7UTG7k=
+        bh=KGjHlHj2yLZ30uJ1TR1oOXoayTLW/J80Sb28kEteyy8=;
+        b=HjwidcYG4n4aQPR2aBrmAaflorg+jxD3SPht/NTATIeB2J8q1jeo3bqFmEKs4154oF
+         Lsa3/gbSkYicrCyCZhRQhwsnfdGN8wU5vEIAbtmthWaqj/DC1E5BGTO+wsDok1mXziUj
+         hpDNkqwmK56oY0HwiTqlvkIV118msChguNPQw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FkIypgcddOiZPZ1yBFqxpKxj/S2eqFKe3dF1EGDP/Vg=;
-        b=VSJq5ZyYcUniIf+Fx3y05StWVKR+b3wulFT4rHuJujN4vedLMUu/jqEjDmAvmtPgs8
-         XSjmtbfB1M2SR0tPZcyZynIkXMhKK9AeEYP3CE4buPim9nkBXyX8c4k+O15p9WjhK+s+
-         MGspUOTGqM93bqrzVzVkZFUXTyF5gTV7M+PNC5n5o4gnXEwmpxjnNpKHwRUqyM+q6mE0
-         6Vnzc8U0OAUnEjJIkRSCJejvfN7u1NfiacV/ontKJQfY41Hn9i0SOoQQyDZKtWJVSH4J
-         JKIkrtfkQ4yfkuuiA4iP8WqtuL6qJhGdoZR4w05tynXg0V9mFCwPqrwv+E5PX6BFiRU5
-         ofeA==
-X-Gm-Message-State: AGi0PubyuaFXdxfN6Wo6E8VY7bshDlOUZqyEfnuPfLhd4+oyT9g4Xf5i
-        2iuhoAZWlmw98+LXY7wmrdMulrV6LcE=
-X-Google-Smtp-Source: APiQypIdlGDJTm5pT7TO/20aitHf2n7mngQHFKyYcqPqiF6TRIQNXW2xbZWdX5yrupGFz5Dv/P2ilA==
-X-Received: by 2002:a67:e83:: with SMTP id 125mr16244272vso.100.1587484820308;
-        Tue, 21 Apr 2020 09:00:20 -0700 (PDT)
+        bh=KGjHlHj2yLZ30uJ1TR1oOXoayTLW/J80Sb28kEteyy8=;
+        b=hde5pvTn9F4R9OW1aLDo+0oorlMLJw33On1dUVrwEvhgq8Qb2tr+A5flaix484dliA
+         gDPkOZenLEtC+kwbjXQhe2ugcWrDOCs39nU44PNiU+62/Svn3nVmZ4WmE2hCpQGXpU9+
+         DlA2WhKf+zSmR2yWZaJz4mJP3JxZ9eXgh625bdi5z/MZC1LgdE6Nj4h4qyJgzcxgW8Lb
+         AYRyslHg2ifQF85wBg9Lx+wocobhFlZSfYOhkym9JblGIG1MJVo7GaSgnYOHkhjQsNtw
+         zG/9S0GtjeXPPToZboOm/7gthxvICPBgk7I4jnteV4cpmnMSpB4Pui5V13ayoqsN7wjp
+         96WA==
+X-Gm-Message-State: AGi0PuZPh9hZv7x92IkdjvOZfGrYbpKb/mAkJ5T6erzEk5weIWKruike
+        NCMKw6tAieAEWnrNhbC1LkwkcJIP+2U=
+X-Google-Smtp-Source: APiQypJVN2Gt7EjydPTnVdfMObu6Q8ruOta8qcyDbOIuQQ0Sv8d66NSEL/gSb4ESEzhOUTNJC6Ljxw==
+X-Received: by 2002:ab0:67ce:: with SMTP id w14mr12693974uar.143.1587484835951;
+        Tue, 21 Apr 2020 09:00:35 -0700 (PDT)
 Received: from alain.c.googlers.com.com (161.138.243.35.bc.googleusercontent.com. [35.243.138.161])
-        by smtp.gmail.com with ESMTPSA id h16sm840074vkc.44.2020.04.21.09.00.19
+        by smtp.gmail.com with ESMTPSA id h16sm840074vkc.44.2020.04.21.09.00.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2020 09:00:19 -0700 (PDT)
+        Tue, 21 Apr 2020 09:00:35 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v3 2/3] bluetooth:allow scatternet connections if supported.
-Date:   Tue, 21 Apr 2020 15:59:55 +0000
-Message-Id: <20200421155954.137391-3-alainm@chromium.org>
+Subject: [PATCH v3 3/3] bluetooth:btusb: Adding support for LE scatternet to Jfp and ThP
+Date:   Tue, 21 Apr 2020 15:59:57 +0000
+Message-Id: <20200421155954.137391-4-alainm@chromium.org>
 X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
 In-Reply-To: <20200421155954.137391-1-alainm@chromium.org>
 References: <20200421155954.137391-1-alainm@chromium.org>
@@ -72,31 +72,49 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change allows scatternet connections to be created if the
-controller reports support and the HCI_QUIRK_VALID_LE_STATES indicates
-that the reported LE states can be trusted.
+This change adds support for LE scatternet connections to Intel's JfP
+and ThP controllers.
 
 Signed-off-by: Alain Michaud <alainm@chromium.org>
 ---
 
- net/bluetooth/hci_event.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0a591be8b0ae..34cd98a1d370 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5245,7 +5245,9 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 	/* Most controller will fail if we try to create new connections
- 	 * while we have an existing one in slave role.
- 	 */
--	if (hdev->conn_hash.le_num_slave > 0)
-+	if (hdev->conn_hash.le_num_slave > 0 &&
-+	    (hdev->quirks & HCI_QUIRK_VALID_LE_STATES) == 0 ||
-+	     !(hdev->le_states[3] & 0x10))
- 		return NULL;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index dd27e28d4601..d801c332b85a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -335,7 +335,8 @@ static const struct usb_device_id blacklist_table[] = {
  
- 	/* If we're not connectable only connect devices that we have in
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+@@ -348,7 +349,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Other Intel Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+@@ -3877,6 +3879,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
++	if (id->driver_info & BTUSB_VALID_LE_STATES)
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++
+ 	if (id->driver_info & BTUSB_DIGIANSWER) {
+ 		data->cmdreq_type = USB_TYPE_VENDOR;
+ 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
 -- 
 2.26.1.301.g55bc3eb7cb9-goog
 
