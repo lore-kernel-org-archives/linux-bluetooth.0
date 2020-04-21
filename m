@@ -2,210 +2,97 @@ Return-Path: <SRS0=JHfm=6F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE48C2BA19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 07:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250B3C2BA19
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 07:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACFA32074B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 07:15:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00FDF20CC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Apr 2020 07:59:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="W3r4Q0IN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SWpeN2Qu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726052AbgDUHPz (ORCPT
+        id S1726716AbgDUH72 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Apr 2020 03:15:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725926AbgDUHPz (ORCPT
+        Tue, 21 Apr 2020 03:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbgDUH72 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Apr 2020 03:15:55 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7AEC061A0F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 00:15:53 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id w20so6562434ljj.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 00:15:53 -0700 (PDT)
+        Tue, 21 Apr 2020 03:59:28 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A57C061A0F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 00:59:26 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id l9so2400612pjq.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2020 00:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Q2lV2zVviFx429eDDhLhQTtJt5drYidx2JsoYO3FjeU=;
-        b=W3r4Q0INrLwOSbkoxj8LTTvdDuLbz+S4gfP23cTWYZhhRghNkw1atZ09jfebq3pyq4
-         FDVc/4Xtua712bzWyEykIFvzxPNdXRXzYuk/4QE74piiy0BP+6hRXDcgTiwDsTCXwyUV
-         3xetlljqfIpdus9HQjWo7nCrjOHfCB37xORrY=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=HXFyDUscfdGi0ICO5wJP7agrZP67yVZV05e4YMvw9Tk=;
+        b=SWpeN2QuWXTBr4GpLZq2XkDkvNlGEAvRV6L6NEh2rPNKeNE/puRDoe+BMlz5OC4vyZ
+         0ykYZK4VAynmXu+LJrFmZo99Mx/azKTxjma2995Js2qa/4yIkY+z96XovtBo/CjFnGzS
+         TqZyer/pjJYQiGIa51dxY9THc3AnJmgtxqTUH74GWRqysn7wl6PZIKzzYFnjeUJMPOPg
+         z/1edS46Nfhj1JEHFg9MQZ6SUelGSlvoAAu+6et4lOBSHylCRqQ5hvv+0ucd57AKGt14
+         Z+c60/rlW96w2dpWD9uhlbufZgoRP1VOxNUrDUc7wCcXzaPtFlwhSrlTmcgewnKNcTu9
+         JduA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q2lV2zVviFx429eDDhLhQTtJt5drYidx2JsoYO3FjeU=;
-        b=dyrnKXnjPNomkFj5/p+EIyfO/ZTdJEjGnQyaDAPFELHMEvUXmu0jQEiL/8O1MqbO+J
-         GhVgqBwOhIEeu4kxXOqYyP00E9hl8sHwWjypTuwP18VkZ8U/UEmCqhxy4ECUL16u1Zhc
-         kRtKwGaf2BukXDEseA4GGxOg01oMxWqGJsDAdQEj0I9vNdUKZi9wpie/6z4qmA6OAJ/S
-         8tGzzLDCMORPO8IP3PGcgRQkp9sBroF+HQPVfy/G1UYj282g3g3ZcZ9MRm9F+RtBVNdb
-         62sRNSSZCG0oFJ29ZPJoNUnpbWXnQcrmjrzHvS590NEQAz8hbPZZNUn0ZSyDZa27xbSO
-         i7kg==
-X-Gm-Message-State: AGi0PuauBip70dLYKH8lF/truLn2NZmjNoVPmLJoq+XSDbBwKbuLM6CB
-        4tS7iRibbucYknLVRwdNnYclYRUhVkWwdYECp5w5x5Wu
-X-Google-Smtp-Source: APiQypKRI9k0cl+idqlmCzxSL64jTZS85Y3t6U+Jfp4M+kWBb17qghTBYr3Dm3cdd/nuo6tIzvXI457aW+jG1xex/3o=
-X-Received: by 2002:a2e:a37b:: with SMTP id i27mr11594870ljn.36.1587453351642;
- Tue, 21 Apr 2020 00:15:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200417200903.BlueZ.v1.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
- <CABBYNZ+tSNta-MjYQh51k8jExcS+vi1TqqA0cWQAxqSHd9GJkw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+tSNta-MjYQh51k8jExcS+vi1TqqA0cWQAxqSHd9GJkw@mail.gmail.com>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Tue, 21 Apr 2020 00:15:40 -0700
-Message-ID: <CABmPvSHTGsWEWxG6BHS0197_XFGsbRt4VzMS+ow=qd_6SYvhDg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v1] doc: Describe the new Advertisement Monitor support
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Yoni Shavit <yshavit@chromium.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=HXFyDUscfdGi0ICO5wJP7agrZP67yVZV05e4YMvw9Tk=;
+        b=BqHlwT0N9lbvci40/wiUpckkLRkXvGfWDz6YrINnj38bcRZ+6W2eArswmhgWLFUFvr
+         3xpZ9KRAVhMGYojbqpB4RNfPR5CRJutui8dNVtQQMRTbr27vMfKFsVIzAOCA0YaBENWo
+         wM4pYr3hjxvjXu8h8+GlRslhLMAkyc+TG3RUQyvsRQ6lFmg5J2RF/RrayJPy3lGoc2UO
+         /gFJ4U0H+WD/kRXSdsK0or1h5AY8MWKLsjmaNrsgFkB9xa7JzmOeqz6YPnTRmQ/Mx4TS
+         JZiyefC62tORyOePwromRAShvET0lgS6dAVQxQxL1SukzygJi4/8iSYTOjmC/Xtu9xSe
+         1euw==
+X-Gm-Message-State: AGi0PuYjN9KjYCZgNUN0Z/3IiwSq1ehwBrTKMsBW6zGWpL1gazzXhXaw
+        R7wS4NMtQBIeypfn1QzWaniQhVkF0wxP7Du/Pn2rO9tFPc9TZGwsrJJ5XYWNNG9firlKkyr9Vnn
+        5zRas+GcpQTtTsha2+sn8GTqrhxGtEPkwFp+EvEMbMThsJoYoRaOw6H/WUvAUPsQODQCAwAZuH5
+        Ce
+X-Google-Smtp-Source: APiQypIvlB975qVtUHW8r5SMV/AGZasaU/ovhAuMDblxEMPFfFpBNlIdJ50rrmnnKNenfqW3tauc3QF9uI2U
+X-Received: by 2002:a17:90a:b884:: with SMTP id o4mr4075234pjr.8.1587455966342;
+ Tue, 21 Apr 2020 00:59:26 -0700 (PDT)
+Date:   Tue, 21 Apr 2020 15:59:14 +0800
+Message-Id: <20200421155828.Bluez.v1.1.I6e4fbf41b1815dc3d497da5d9c94b18e9c912cba@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
+Subject: [Bluez PATCH v1] gatt: Fix service_changed characteristic permission
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 3:53 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Miao,
->
-> On Fri, Apr 17, 2020 at 8:13 PM Miao-chen Chou <mcchou@chromium.org> wrote:
-> >
-> > This describes the following commands.
-> > - Add Advertisement Patterns Monitor
-> > - Remove Advertisement Monitor
-> > - Remove All Advertisement Monitors
-> > Note that the content of a monitor can differ based on its type. For now we
-> > introduce only pattern-based monitor, so you may find that unlike commands
-> > for removing monitor(s), the Add command is tied to a specific type.
-> >
-> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
->
-> For userspace we don't require signed-of-by line.
-Ack, it was added by patman tool, I will remove it before sending.
->
-> > ---
-> >
-> >  doc/mgmt-api.txt | 68 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 68 insertions(+)
-> >
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index 39f23c456..fcd281a35 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -3138,6 +3138,74 @@ Read Security Information Command
-> >                                 Invalid Index
-> >
-> >
-> > +Add Advertisement Patterns Monitor Command
-> > +=========================================
-> > +
-> > +       Command Code:           0x0049
-> > +       Controller Index:       <controller id>
-> > +       Command Parameters:     Pattern_count (1 Octets)
-> > +                               Pattern1 {
-> > +                                       AD_Data_Type (1 Octet)
-> > +                                       Index (1 Octet)
->
-> What is this index for, it is not very clear why would we need it here
-> since we are going to return a index already.
-This is the starting position of the given pattern. For instance, if
-we'd like to look for the pattern within a Manufacturer Data field
-with value {0x01, 0x02, 0x03} starting from index 2. Given the
-Manufacturer Data field is {0x00, 0xFF, 0x01, 0x02, 0x03, 0x04}, the
-matching would start from octet 0x01, and the result would be a match.
-Perhaps I should rename "Index" to "Start_Position" or rename
-"Monitor_index" to "Monitor_handle" to avoid confusion.
->
-> > +                                       Length (1 Octet)
-> > +                                       Value (variable length)
-> > +                               }
-> > +                               Pattern2 { }
-> > +                               ...
-> > +       Return Parameters:      Monitor_Index (8 Octets)
->
-> I guess we could call this a handle if the is assigned by the
-> controller not the host stack, also it might be more a good idea to
-> put some example on how to build the parameter list, etc, to make it
-> easier to visualize how these parameters are put together.
-"Monitor_Handle" sounds good to me. I will add some examples.
->
-> > +
-> > +       This command is used to add an advertisement monitor whose filtering
-> > +       conditions are patterns. The kernel would track the number of registered
-> > +       monitors to determine whether to perform LE scanning while there is
-> > +       ongoing LE scanning for other intentions, such as auto-reconnection and
-> > +       discovery session. If the controller supports Microsoft HCI extension,
-> > +       the kernel would offload the content filtering to the controller in
-> > +       order to reduce power consumption; otherwise the kernel ignore the
-> > +       content of the monitor.
-> > +
-> > +       Possible errors:        Failed
-> > +                               Busy
-> > +                               Invalid Parameters
-> > +
-> > +
-> > +Remove Advertisement Monitor Command
-> > +====================================
-> > +
-> > +       Command Code:           0x004A
-> > +       Controller Index:       <controller id>
-> > +       Command Parameters:     Monitor_Index (8 Octets)
-> > +       Return Parameters:      Monitor_Index (8 Octets)
-> > +
-> > +       This command is used to remove an advertisement monitor. The kernel
-> > +       would remove the monitor with Monitor_Index and update the LE scanning.
-> > +       If the controller supports Microsoft HCI extension and the monitor has
-> > +       been offloaded, the kernel would cancel the offloading; otherwise the
-> > +       kernel takes no further actions other than removing it from the list.
-> > +
-> > +       Possible errors:        Failed
-> > +                               Busy
-> > +                               Invalid Index
-> > +
-> > +
-> > +Remove All Advertisement Monitors Command
-> > +=========================================
-> > +
-> > +       Command Code:           0x004B
-> > +       Controller Index:       <controller id>
-> > +       Command Parameters:
-> > +       Return Parameters:      Num_removed_Monitors (2 Octets)
-> > +                               Monitor_Index[i] (2 Octets)
-> > +
-> > +       This command is used to remove all advertisement monitors. The kernel
-> > +       would remove all monitors and update the LE scanning if needed. If the
-> > +       controller supports Microsoft HCI extension the monitors have been
-> > +       offloaded, the kernel would cancel all offloadings; otherwise the kernel
-> > +       takes no further actions other than removing all monitors from the list.
-> > +
-> > +       Possible errors:        Failed
-> > +                               Busy
->
-> I wonder if we could keep this simple and just have a special value
-> passed to Remove that would be consider remove all e.g.
-> 0x0000000000000000, that way we don't have to allocate yet another
-> opcode for removing all, though Im not sure how the values are managed
-> in that namespace so it may not be possible allocate one for use with
-> remote all logic, the other option would be to have a num_monitors and
-> then in case none is provided do the remove all, that actually might
-> be useful since if there are multiple application/monitors we can
-> remove all monitors from one application without afting the others
-> leaving remove all logic just for when bluetoothd is restarted which
-> is basically a cleanup.
-The intention of this command is indeed to handle the restart of
-bluetoothd. It's a good point that we may want to remove all monitors
-of an application. Let me try to combine remove and remove all
-commands in my next patch.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Thanks,
-Miao
+According to bluetooth spec Ver 5.2, Vol 3, Part G, 7.1, the
+service_changed characteristic is not readable. Therefore, this
+patch marks it as such.
+---
+
+ src/gatt-database.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index f2da27694..8cbe09bae 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1197,7 +1197,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
+ 	database->svc_chngd = gatt_db_service_add_characteristic(service, &uuid,
+-				BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_INDICATE,
++				BT_ATT_PERM_NONE, BT_GATT_CHRC_PROP_INDICATE,
+ 				NULL, NULL, database);
+ 
+ 	database->svc_chngd_ccc = service_add_ccc(service, database, NULL, NULL,
+-- 
+2.26.1.301.g55bc3eb7cb9-goog
+
