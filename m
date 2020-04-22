@@ -2,109 +2,182 @@ Return-Path: <SRS0=vsJv=6G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7465C5518B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 17:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E72BEC54FCB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 17:33:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95C1621569
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 17:01:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587574883;
-	bh=3+N2kLgOyTEEtxz+4c1rz6ODvL1KPynT5IZuQ37AJ6o=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ueWj4xSDiWt2dLyLaKGiXUo6kZVeBihvSiisVfnraWXChLEplFWmc1VavwUYpc6VO
-	 2weRN15RYlTcPRSB6vG5mUHvqclB8ZA1UD5fxbQe/LKIReVvWqMgpIXK9+dZIxwYTf
-	 e0h74LqbOtgRwSsFgmVV0qwWWR6G1cjp5Sbbbay0=
+	by mail.kernel.org (Postfix) with ESMTP id CDBC620706
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 17:33:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726832AbgDVRBW (ORCPT
+        id S1726061AbgDVRdw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Apr 2020 13:01:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726303AbgDVRBW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Apr 2020 13:01:22 -0400
-Received: from pali.im (pali.im [31.31.79.79])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8C57A20776
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2020 17:01:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587574881;
-        bh=3+N2kLgOyTEEtxz+4c1rz6ODvL1KPynT5IZuQ37AJ6o=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=RQd2uCJ1JYA2WC8mlybio3MG22wLChs7J4EEGjeLNzT7yWL/sdlKScmnWOA1oYpD2
-         pvr6LGzNbkSV92XXs1fABV3Ua3+jWd3nXvkmz3P307/MC1KIqPuf575zaZ2n61lTPT
-         mpTNdfjb52WyhCayyMkU4Jwzv3aSXF0C9mWhxBMM=
-Received: by pali.im (Postfix)
-        id E76CA7E6; Wed, 22 Apr 2020 19:01:19 +0200 (CEST)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] profile: Fix reporting error message when connection failed
-Date:   Wed, 22 Apr 2020 19:01:05 +0200
-Message-Id: <20200422170105.29685-2-pali@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200422170105.29685-1-pali@kernel.org>
-References: <20200422170105.29685-1-pali@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 22 Apr 2020 13:33:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:33749 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726006AbgDVRdw (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 Apr 2020 13:33:52 -0400
+Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8628CCECFD;
+        Wed, 22 Apr 2020 19:43:28 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [BlueZ PATCH v2] doc: Describe the new Advertisement Monitor
+ support
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200421180155.BlueZ.v2.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
+Date:   Wed, 22 Apr 2020 19:33:20 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Michael Sun <michaelfsun@google.com>,
+        Alain Michaud <alainm@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <C6C04FC6-4D51-45CB-BB85-94660F6B93E5@holtmann.org>
+References: <20200421180155.BlueZ.v2.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some bluetooth headsets do not support connecting more then one bluetooth
-profile (e.g. in parallel A2DP and HSP, or HSP and HFP) and issuing
-connect() syscall for second profile returns just ECONNREFUSED.
+Hi Miao-chen,
 
-Prior this patch bluetooth daemon for such situation reported following
-message to log:
+> This describes the following commands.
+> - Add Advertisement Patterns Monitor
+> - Remove Advertisement Monitors
+> Note that the content of a monitor can differ based on its type. For now we
+> introduce only pattern-based monitor, so you may find that unlike the
+> command of removing monitor(s), the Add command is tied to a specific type.
+> ---
+> 
+> Changes in v2:
+> - Combine commands to remove one monitor and remove all monitors. The
+> refined command takes multiple handles and an extra field to indicate
+> whether to remove all monitors.
+> 
+> doc/mgmt-api.txt | 83 ++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 83 insertions(+)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 39f23c456..d5d402361 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -3138,6 +3138,89 @@ Read Security Information Command
+> 				Invalid Index
+> 
+> 
+> +Add Advertisement Patterns Monitor Command
+> +=========================================
 
-  Unable to get connect data for Headset Voice gateway: getpeername: Transport endpoint is not connected (107)
+I wonder if we do Add Advertisement Monitor Pattern or Add Advertisement Monitor With Pattern.
 
-Message is incorrect as connect() syscall failed, not getpeername(). This
-patch fixes this problem and logs correct error message:
+> +
+> +	Command Code:		0x0049
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Pattern_count (1 Octets)
+> +				Pattern1 {
+> +					AD_Data_Type (1 Octet)
+> +					Offset (1 Octet)
+> +					Length (1 Octet)
+> +					Value (variable length)
+> +				}
+> +				Pattern2 { }
+> +				...
+> +	Return Parameters:	Monitor_Handle (8 Octets)
 
-  Headset Voice gateway failed connect to XX:XX:XX:XX:XX:XX: Connection refused (111)
+Why 8 Octets? How many do you expect? I would do 16-bit.
 
-Main problem was in ext_connect() function which called bt_io_get() for
-retrieving remote address (BT_IO_OPT_DEST) and if it failed then original
-error from connect() syscall was masked. Because it is not possible to
-retrieve BT_IO_OPT_DEST for unconnected socket, original destination
-address for error message is propagated via connect_add() function in btio.
+> +
+> +	This command is used to add an advertisement monitor whose filtering
+> +	conditions are patterns. The kernel would track the number of registered
+> +	monitors to determine whether to perform LE scanning while there is
+> +	ongoing LE scanning for other intentions, such as auto-reconnection and
+> +	discovery session. If the controller supports Microsoft HCI extension,
+> +	the kernel would offload the content filtering to the controller in
+> +	order to reduce power consumption; otherwise the kernel ignore the
+> +	content of the monitor. Note that if the there are more than one
+> +	patterns, OR logic would applied among patterns during filtering. In
+> +	other words, any advertisement matching at least one pattern in a given
+> +	monitor would be considered as a match.
+> +
+> +	A pattern contain the following fields.
+> +		AD_Data_Type	Advertising Data Type. The possible values are
+> +				defined in Core Specification Supplement.
+> +		Offset		The start index where pattern matching shall be
+> +				performed with in the AD data.
+> +		Length		The length of the pattern value in bytes.
+> +		Value		The value of the pattern in bytes.
+> +
+> +	Here is an example of a pattern.
+> +		{
+> +			0x16, // Service Data - 16-bit UUID
+> +			0x02, // Skip the UUID part.
+> +			0x04,
+> +			{0x11, 0x22, 0x33, 0x44},
+> +		}
+> +
+> +	Possible errors:	Failed
+> +				Busy
+> +				Invalid Parameters
+> +
+> +
+> +Remove Advertisement Monitors Command
+> +=====================================
 
----
+I would have a generic Remove Adveristement Monitor
 
-Having correct error message in logs is important. Due to this mangled
-error message I was not able to easily debug why particular bluetooth
-headset sometimes connection with nonsense error that Transport endpoint
-was not connected.
----
- src/profile.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> +
+> +	Command Code:		0x004A
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Remove_All (1 Octet)
 
-diff --git a/src/profile.c b/src/profile.c
-index c2992e795..6961a107b 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1085,12 +1085,13 @@ static void ext_connect(GIOChannel *io, GError *err, gpointer user_data)
- 	if (!bt_io_get(io, &io_err,
- 				BT_IO_OPT_DEST, addr,
- 				BT_IO_OPT_INVALID)) {
--		error("Unable to get connect data for %s: %s", ext->name,
--							io_err->message);
- 		if (err) {
-+			error("%s failed %s", ext->name, err->message);
- 			g_error_free(io_err);
- 			io_err = NULL;
- 		} else {
-+			error("Unable to get connect data for %s: %s",
-+				ext->name, io_err->message);
- 			err = io_err;
- 		}
- 		goto drop;
--- 
-2.20.1
+Skip the Remove_All. If you give Monitor_Count == 0, then it will remove all of them. This is how we have done the others.
+
+> +				Monitor_Count (2 Octets)
+> +				Monitor_Handle[i] (8 Octets)
+> +	Return Parameters:	Removed_Monitor_Count (2 Octets)
+> +				Removed_Monitor_Handle[i] (8 Octets)
+
+Return values are not needed here.
+
+> +
+> +	This command is used to remove advertisement monitor(s). The kernel
+> +	would remove the monitor(s) with Monitor_Index and update the LE
+> +	scanning. If the controller supports Microsoft HCI extension and the
+> +	monitor(s) has been offloaded, the kernel would cancel the offloading;
+> +	otherwise the kernel takes no further actions other than removing the
+> +	monitor(s) from the list.
+> +
+> +	Remove_All can be the following values.
+> +		Value		Operation
+> +		-------------------------
+> +		0x00		Removes only the monitors with handles specified
+> +				in Monitor_Handle[i], so there must be at least
+> +				one handle.
+> +		0x01		Removes all existing monitor(s), so
+> +				Monitor_Count must be 0, and Monitor_Handle
+> +				must be empty.
+> +
+> +	Possible errors:	Failed
+> +				Busy
+> +				Invalid Index
+> +				Invalid Parameters
+> +
+> +
+> Command Complete Event
+> ======================
+
+You are missing signals for Monitor Added and Monitor Removed.
+
+And we are also missing a command for reading the basic supported features. Like we do for Advertising as well.
+
+Regards
+
+Marcel
 
