@@ -2,115 +2,187 @@ Return-Path: <SRS0=vsJv=6G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44929C55185
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 18:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C062C54FCB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 18:31:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A11D21473
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 18:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 722012098B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Apr 2020 18:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=belchamber.com header.i=@belchamber.com header.b="cOWMb9uG";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="bDi3B1/H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HK8gcp4r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726416AbgDVSWK (ORCPT
+        id S1725994AbgDVSbK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Apr 2020 14:22:10 -0400
-Received: from a7-18.smtp-out.eu-west-1.amazonses.com ([54.240.7.18]:35922
-        "EHLO a7-18.smtp-out.eu-west-1.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726412AbgDVSWK (ORCPT
+        Wed, 22 Apr 2020 14:31:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55104 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725648AbgDVSbJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Apr 2020 14:22:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=6rp4w2husmdhljsd36xpa6qg7i74gvwa; d=belchamber.com; t=1587579728;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type;
-        bh=YWkQSnhh26aKnsSU32ykFoK16FB6iB6/L6EMP3JxaM4=;
-        b=cOWMb9uGkS8eguRF1Nf6l2hcafXjIp2D3I2M437RgwQ3mrYapTN/oxAVIuZpx2C1
-        fjA+t/Y4TQ9bpiR0ZQvNzCJFEHPiiCoaBxfCWezwQGXFqpIMXHmUf91kUpRaFSM7G8D
-        v/QfAUOLFPzThWoppe4ZfApf0CeJtAafOyt59X8w=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=shh3fegwg5fppqsuzphvschd53n6ihuv; d=amazonses.com; t=1587579728;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type:Feedback-ID;
-        bh=YWkQSnhh26aKnsSU32ykFoK16FB6iB6/L6EMP3JxaM4=;
-        b=bDi3B1/HjN+9BRFg9wqfIFTGU2f/9+yr3pqbYsPwOrRXDOr5pCwm1NMw4DDie/uv
-        Vl/RI2tPbAeYDHoF1Z1T4Gp2RSqnsSpOpH/0Y8zaGAyDnISaXKP4hB3jrh23Ywuzf9Q
-        HJqf0XhYXLlP0FFdbrNQjan9TReusvZd41DPVm+k=
-X-Gm-Message-State: AGi0PuZTzJvF+0ReUIXYb89QCA6HI/PCccyf564BO47BsUt6ztaRLy+m
-        qRq1HfrtTB0xSLBIRZhTVAaN9rWYU/5pDuNVjMc=
-X-Google-Smtp-Source: APiQypLPCP/x7Q9jwNdVGYWBv4/92y3we0+D7WIg6WArZg4L+oeQmjU1ysN7VPFWbNPh10k9ywLUdnSGL/W1Mku+Qco=
-X-Received: by 2002:a5e:d516:: with SMTP id e22mr26088037iom.183.1587579726464;
- Wed, 22 Apr 2020 11:22:06 -0700 (PDT)
+        Wed, 22 Apr 2020 14:31:09 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8D9C03C1A9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2020 11:31:09 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id g14so732941ooa.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2020 11:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=t32cHKHwAdtaArS3PyntRI2apJ7jkXgW3pqiTZ4LEOY=;
+        b=HK8gcp4rZ10WHW3NtYEQdzK7ZZCz5MSe6Qt5VWEP0T1U3d7kxqYalv3l0YozCkoDRh
+         RwUsD42FuBlx3IRK3XxiPB6EFQvkDam7QVcIaLJ9PbRYAvB7DNtfVz17yNMs4MULvIrJ
+         vbE4SxLCK6BIye8+tFFhyy1ItLS4oPCTZjlX/PK7Wz171J6gom+PvGlL1r2Gocf51niC
+         vl5GPqmkIPIvhiTUX2KllrB+06kyzGJYKzw8Dnomez4gy3CMhMUYVjkdYUSUn/Te+nn9
+         e4g9jT6hunHQi/vKn+TTv3XbesuB6NoAKwyZya4/4iPJPHreZpjCBlBNOsrr6RHY2HWF
+         ljAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=t32cHKHwAdtaArS3PyntRI2apJ7jkXgW3pqiTZ4LEOY=;
+        b=s0GgATuRU6QlorO1Vhe/RnS/cgo+NQMzPGyvVjU1feVMrUBk2c9jCCDsLaROCTw3Mc
+         CaCzsC21j0d6ew7dnQhdHZpElCyMFF3MJjqLi9RcKdk14hlZmU/P2ng+CR3J7P691zv7
+         SLqOuDW3cl/LEahnD1oFIHY3Ugj7BQ1Hig2nSot95PH0y2iWF1VapXdHfPXKEYKegCW0
+         JbDbhxGXEgx28dZvXYZ9jXjPuLLhMoq9vTyyEoSbNLuckYMLzYgKzpD3inQdoM2KQnyT
+         hKK2/216eqI8Z25lT9TaZ1Pz8QwDNdcKle1aaAuN+2J5BhpyyyvxILEP7KRWu55mqX+1
+         wJCA==
+X-Gm-Message-State: AGi0PuaF96D+uI6MdJd2ZeRItJAd+OwdbeOPgtT0w+Pbfyfn0r+49ZqR
+        RmqVP6+5xXh6gzzgQu789dQ2YQgyWuyUh9gtF2Q=
+X-Google-Smtp-Source: APiQypJZPU57UPSB0nZMdQtGQ2KWtBJzx1LbWGKF62DgKGKbZRGcbPpV7FUM4o+mOxSZ47oyxa4/J7n11259X76wCGI=
+X-Received: by 2002:a4a:e0d4:: with SMTP id e20mr98932oot.35.1587580268698;
+ Wed, 22 Apr 2020 11:31:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <010201715012e482-bca51111-db3c-4101-9bd4-208b69a0ff03-000000@eu-west-1.amazonses.com>
-In-Reply-To: <010201715012e482-bca51111-db3c-4101-9bd4-208b69a0ff03-000000@eu-west-1.amazonses.com>
-From:   James Belchamber <james@belchamber.com>
-Date:   Wed, 22 Apr 2020 18:22:08 +0000
-X-Gmail-Original-Message-ID: <CADQov_gh0qax9zH8Yf7giztNcq0ArVoDVjcYod5DapYcKxgbKA@mail.gmail.com>
-Message-ID: <01020171a3203016-7d1d5c39-46ee-4ba9-8ff3-a6928a329d2a-000000@eu-west-1.amazonses.com>
-Subject: Re: Setup Synchronous Connection fails when switching Sony WH-H900N
- headset to HSP
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20200422170105.29685-1-pali@kernel.org> <CABBYNZJg4SzHygkb0WtutA9pK0BSszOO1NCxW1in9wrSr6ugRg@mail.gmail.com>
+In-Reply-To: <CABBYNZJg4SzHygkb0WtutA9pK0BSszOO1NCxW1in9wrSr6ugRg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 22 Apr 2020 11:30:57 -0700
+Message-ID: <CABBYNZKCy6q77RiH150_5X2Qr=Pi2cxNrQe5tRBm66vaWSucpg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] btio: Show destination address in connect error message
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-SES-Outgoing: 2020.04.22-54.240.7.18
-Feedback-ID: 1.eu-west-1.iLkSOx0ll0H29nNg//Fx25T4fmIhOvUmYvVubjmmX6g=:AmazonSES
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Just bumping this for visibility, still an issue with the latest kernel.
+Hi Pali,
 
-Happy to test anything thrown my way.
+On Wed, Apr 22, 2020 at 10:57 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Pali,
+>
+> On Wed, Apr 22, 2020 at 10:06 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
+> >
+> > When connect() fails it is not possible to retrieve destination address=
+ as
+> > socket is not bound. So put destination address into error message.
+> > ---
+> >  btio/btio.c | 19 ++++++++++++++-----
+> >  1 file changed, 14 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/btio/btio.c b/btio/btio.c
+> > index e7b4db16b..3ea73faea 100644
+> > --- a/btio/btio.c
+> > +++ b/btio/btio.c
+> > @@ -85,6 +85,7 @@ struct connect {
+> >         BtIOConnect connect;
+> >         gpointer user_data;
+> >         GDestroyNotify destroy;
+> > +       bdaddr_t dst;
+> >  };
+> >
+> >  struct accept {
+> > @@ -214,6 +215,7 @@ static gboolean connect_cb(GIOChannel *io, GIOCondi=
+tion cond,
+> >         GError *gerr =3D NULL;
+> >         int err, sk_err, sock;
+> >         socklen_t len =3D sizeof(sk_err);
+> > +       char addr[18];
+> >
+> >         /* If the user aborted this connect attempt */
+> >         if ((cond & G_IO_NVAL) || check_nval(io))
+> > @@ -226,8 +228,11 @@ static gboolean connect_cb(GIOChannel *io, GIOCond=
+ition cond,
+> >         else
+> >                 err =3D -sk_err;
+> >
+> > -       if (err < 0)
+> > -               ERROR_FAILED(&gerr, "connect error", -err);
+> > +       if (err < 0) {
+> > +               ba2str(&conn->dst, addr);
+> > +               g_set_error(&gerr, BT_IO_ERROR, err,
+> > +                       "connect to %s: %s (%d)", addr, strerror(-err),=
+ -err);
+> > +       }
+> >
+> >         conn->connect(io, gerr, conn->user_data);
+> >
+> > @@ -286,7 +291,7 @@ static void server_add(GIOChannel *io, BtIOConnect =
+connect,
+> >                                         (GDestroyNotify) server_remove)=
+;
+> >  }
+> >
+> > -static void connect_add(GIOChannel *io, BtIOConnect connect,
+> > +static void connect_add(GIOChannel *io, BtIOConnect connect, bdaddr_t =
+dst,
+> >                                 gpointer user_data, GDestroyNotify dest=
+roy)
+> >  {
+> >         struct connect *conn;
+> > @@ -296,6 +301,7 @@ static void connect_add(GIOChannel *io, BtIOConnect=
+ connect,
+> >         conn->connect =3D connect;
+> >         conn->user_data =3D user_data;
+> >         conn->destroy =3D destroy;
+> > +       conn->dst =3D dst;
+> >
+> >         cond =3D G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+> >         g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, c=
+onn,
+> > @@ -1671,6 +1677,7 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gp=
+ointer user_data,
+> >         struct set_opts opts;
+> >         int err, sock;
+> >         gboolean ret;
+> > +       char addr[18];
+> >
+> >         va_start(args, opt1);
+> >         ret =3D parse_set_opts(&opts, gerr, opt1, args);
+> > @@ -1710,12 +1717,14 @@ GIOChannel *bt_io_connect(BtIOConnect connect, =
+gpointer user_data,
+> >         }
+> >
+> >         if (err < 0) {
+> > -               ERROR_FAILED(gerr, "connect", -err);
+> > +               ba2str(&opts.dst, addr);
+> > +               g_set_error(gerr, BT_IO_ERROR, err,
+> > +                               "connect to %s: %s (%d)", addr, strerro=
+r(-err), -err);
+> >                 g_io_channel_unref(io);
+> >                 return NULL;
+> >         }
+> >
+> > -       connect_add(io, connect, user_data, destroy);
+> > +       connect_add(io, connect, opts.dst, user_data, destroy);
+> >
+> >         return io;
+> >  }
+> > --
+> > 2.20.1
+>
+> WARNING:LONG_LINE: line over 80 characters
+> #67: FILE: btio/btio.c:1722:
+> + "connect to %s: %s (%d)", addr, strerror(-err), -err);
 
-On Mon, 6 Apr 2020 at 16:19, James Belchamber <james@belchamber.com> wrote:
->
-> When using my Sony WH-H900N headphones and switching from A2DP to
-> HSP/HFP the following error appears in journalctl:
->
-> (  60.063|   0.000) D: [pulseaudio] module-bluez5-device.c: Acquiring
-> transport /org/bluez/hci0/dev_04_5D_4B_E9_C9_90/fd34
-> (  60.063|   0.000) I: [pulseaudio] backend-native.c: doing connect
-> (  60.174|   0.111) E: [pulseaudio] backend-native.c: connect():
-> Function not implemented
->
-> And using btmon I can see the HCI command comes back with a failure
-> (full log attached):
->
-> < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->         Handle: 67
->         Transmit bandwidth: 8000
->         Receive bandwidth: 8000
->         Max latency: 10
->         Setting: 0x0060
->           Input Coding: Linear
->           Input Data Format: 2's complement
->           Input Sample Size: 16-bit
->           # of bits padding at MSB: 0
->           Air Coding Format: CVSD
->         Retransmission effort: Optimize for power consumption (0x01)
->         Packet type: 0x0380
->           3-EV3 may not be used
->           2-EV5 may not be used
->           3-EV5 may not be used
-> > HCI Event: Command Status (0x0f) plen 4
->       Setup Synchronous Connection (0x01|0x0028) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: Max Slots Change (0x1b) plen 3
->         Handle: 67
->         Max slots: 1
-> > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->         Status: Unspecified Error (0x1f)
->         Handle: 67
->         Address: 04:5D:4B:E9:C9:90 (Sony Corporation)
->         Link type: eSCO (0x02)
->         Transmission interval: 0x00
->         Retransmission window: 0x00
->         RX packet length: 0
->         TX packet length: 0
->         Air mode: u-law log (0x00)
->
-> This works on ChromeOS, which also uses a (modified) BlueZ stack -
-> though I can't work out why :)
+I went ahead and applied.
+
+--=20
+Luiz Augusto von Dentz
