@@ -2,168 +2,222 @@ Return-Path: <SRS0=6Duj=6H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A8AC54FD0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 16:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6F9C54FD0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:17:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81FF520857
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 16:43:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rrOFDVU8"
+	by mail.kernel.org (Postfix) with ESMTP id A39C320857
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729605AbgDWQn2 (ORCPT
+        id S1729889AbgDWRR4 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Apr 2020 12:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36590 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729407AbgDWQn1 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Apr 2020 12:43:27 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A3FC09B041
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 09:43:27 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id z17so7201978oto.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 09:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=r8yLL8F6UvbO4kW3Dtum/gVvuBPJnA+pFdutrhLE1Ro=;
-        b=rrOFDVU8psYnysgtkjKlLzc0lVDsMXl3M2OCYEZBz+obZP+uGUhm+4ZBLVpuX2E3IB
-         9lzCBdHYJDW/1G0N0D3NXzAXyafAzpRPBcSo3pMZ4cwTwKFHIlRXUskzPVYjDvtet3RT
-         7GGX3wa4MGBFIDn4TK24ZxXrV0wTkoEcJrjCU3Xk8UH8wcZuqbl/xNrbjVylmbSLvnEM
-         eT22LGGAn6IUbeikL/3Rk+qxi/rkKOEcYxB1JDVQC2f1J8fENHMVvkfzwgg9zpMafUPs
-         I89OjHxShOJl7Msnm3o5DZQgR4FBJBkmJKwjRPwDs8cRtS8o+DgIsSUIJh8/dW3Vb5by
-         mKMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=r8yLL8F6UvbO4kW3Dtum/gVvuBPJnA+pFdutrhLE1Ro=;
-        b=Xdsgo7WOsJn0Bv3/Bjy40DqzAJL0FbaBc6EmHuyRZztjbJ/B88Q2Wav8ZAphatCQ+N
-         g9uAEILBZjMspKBH7KchLVtAgYXbfXyFpt89xgrhj2ICDQcnAosnmFUBtra3SFXKR4wn
-         cv09qmruyLkT/w3kCgF0wF3zAAK+4D36As3WvAxci45Fq4lIR/HQu1tAMo5NWdw29jI0
-         Sc6+ebXAnlOl/bXdmk42BKKbX7jB48vHNC4kfTjcD1PD7xjOdmZv36wimRvAQhlK1Yl/
-         FNQMExqHt5M/XUO12rjnJ/LxXV6YxBeK+NnRz2xlFtmyl6wp6apK9ZTSUvnuD6xrccE2
-         K+Qg==
-X-Gm-Message-State: AGi0PuZ3ain/WLsILsNdtkkP/eCkgoId9lNqG2cexNvsJ+5AoaKdB/qP
-        qWIEpbAHLUoYSydgWgC7XBxxtfg02Eauybf5WAjAeppc
-X-Google-Smtp-Source: APiQypKPnmCtgIWecyRQkZJ4HCeolGpWBAuxDtR8Te38lxa2YsQ5y1nW1oQ0/B+O6v5b5BX/rf33nIhVNSShooojjnE=
-X-Received: by 2002:a9d:4699:: with SMTP id z25mr4222395ote.11.1587660206688;
- Thu, 23 Apr 2020 09:43:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <010201715012e482-bca51111-db3c-4101-9bd4-208b69a0ff03-000000@eu-west-1.amazonses.com>
- <01020171a3203016-7d1d5c39-46ee-4ba9-8ff3-a6928a329d2a-000000@eu-west-1.amazonses.com>
- <CABBYNZJ2tn6Riz7uouxD0qa1M-dT7GbtUSkD-dbn1nj1B372iQ@mail.gmail.com> <01020171a6b79a42-76ec69a9-7293-441a-911e-e48f8baf418b-000000@eu-west-1.amazonses.com>
-In-Reply-To: <01020171a6b79a42-76ec69a9-7293-441a-911e-e48f8baf418b-000000@eu-west-1.amazonses.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 23 Apr 2020 09:43:15 -0700
-Message-ID: <CABBYNZLfkWSpJHw82jct05buyuPVC_0jb1ykncRQZEk35vkTyw@mail.gmail.com>
-Subject: Re: Setup Synchronous Connection fails when switching Sony WH-H900N
- headset to HSP
-To:     James Belchamber <james@belchamber.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        Thu, 23 Apr 2020 13:17:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53236 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729887AbgDWRR4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Apr 2020 13:17:56 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Thu, 23 Apr 2020 17:17:53 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: thefugazi@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-yY4LaMaMJD@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi James,
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-On Thu, Apr 23, 2020 at 4:06 AM James Belchamber <james@belchamber.com> wrote:
->
-> Only difference in the btmon output is the handle (256 instead of 67)
-> - otherwise it all looks the same and it connects first time.
->
-> What logs are useful? I have the Chromebook in developer mode and so I
-> can capture whatever you want (hopefully!)
+thefugazi@gmail.com changed:
 
-Then I think this is because PulseAudio is using HSP not HFP, the
-headset might be expecting a call to exist, or something similar on
-HSP, in order to accept the SCO connection so the state machine is not
-ready, have a look if Chrome OS is sending any AT command before
-trying to connect SCO, or just past the btmon logs in some
-pastebing/gist.github.com so we can analyze what is going on.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |thefugazi@gmail.com
 
-> On Wed, 22 Apr 2020 at 23:32, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi James,
-> >
-> > On Wed, Apr 22, 2020 at 11:27 AM James Belchamber <james@belchamber.com> wrote:
-> > >
-> > > Just bumping this for visibility, still an issue with the latest kernel.
-> > >
-> > > Happy to test anything thrown my way.
-> > >
-> > > On Mon, 6 Apr 2020 at 16:19, James Belchamber <james@belchamber.com> wrote:
-> > > >
-> > > > When using my Sony WH-H900N headphones and switching from A2DP to
-> > > > HSP/HFP the following error appears in journalctl:
-> > > >
-> > > > (  60.063|   0.000) D: [pulseaudio] module-bluez5-device.c: Acquiring
-> > > > transport /org/bluez/hci0/dev_04_5D_4B_E9_C9_90/fd34
-> > > > (  60.063|   0.000) I: [pulseaudio] backend-native.c: doing connect
-> > > > (  60.174|   0.111) E: [pulseaudio] backend-native.c: connect():
-> > > > Function not implemented
-> > > >
-> > > > And using btmon I can see the HCI command comes back with a failure
-> > > > (full log attached):
-> > > >
-> > > > < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-> > > >         Handle: 67
-> > > >         Transmit bandwidth: 8000
-> > > >         Receive bandwidth: 8000
-> > > >         Max latency: 10
-> > > >         Setting: 0x0060
-> > > >           Input Coding: Linear
-> > > >           Input Data Format: 2's complement
-> > > >           Input Sample Size: 16-bit
-> > > >           # of bits padding at MSB: 0
-> > > >           Air Coding Format: CVSD
-> > > >         Retransmission effort: Optimize for power consumption (0x01)
-> > > >         Packet type: 0x0380
-> > > >           3-EV3 may not be used
-> > > >           2-EV5 may not be used
-> > > >           3-EV5 may not be used
-> > > > > HCI Event: Command Status (0x0f) plen 4
-> > > >       Setup Synchronous Connection (0x01|0x0028) ncmd 1
-> > > >         Status: Success (0x00)
-> > > > > HCI Event: Max Slots Change (0x1b) plen 3
-> > > >         Handle: 67
-> > > >         Max slots: 1
-> > > > > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-> > > >         Status: Unspecified Error (0x1f)
-> > > >         Handle: 67
-> > > >         Address: 04:5D:4B:E9:C9:90 (Sony Corporation)
-> > > >         Link type: eSCO (0x02)
-> > > >         Transmission interval: 0x00
-> > > >         Retransmission window: 0x00
-> > > >         RX packet length: 0
-> > > >         TX packet length: 0
-> > > >         Air mode: u-law log (0x00)
-> > > >
-> > > > This works on ChromeOS, which also uses a (modified) BlueZ stack -
-> > > > though I can't work out why :)
-> >
-> > It doesn't look like it is a host problem and Ive never seem this
-> > error before, have you tried with the same controller on Chrome OS? It
-> > may be worth trying to capture the logs in Chrome OS so we can compare
-> > if there is something different in the command parameters, but it
-> > could as well be that Chrome uses HFP instead of HSP as PulseAudio
-> > does and the headset is sensitive to that.
-> >
-> > --
-> > Luiz Augusto von Dentz
+--- Comment #61 from thefugazi@gmail.com ---
+(In reply to Michael Akushsky from comment #58)
+> Adopted patch to kernel version 5.5, confirmed that my device started working
+> 
+> ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+> 
+> That's my adoption:
+> https://github.com/akushsky/kernel_patches/blob/master/UbiquitousEvil/
+> bluetooth.patch
 
+Same device ID here and while this patch gets the dongle functioning, I am
+unable to establish a successful connection with any device.
 
+< HCI Command: Create Connection (0x01|0x0005) plen 13   #299 [hci0] 192.046072
+        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Packet type: 0xcc18
+          DM1 may be used
+          DH1 may be used
+          DM3 may be used
+          DH3 may be used
+          DM5 may be used
+          DH5 may be used
+        Page scan repetition mode: R2 (0x02)
+        Page scan mode: Mandatory (0x00)
+        Clock offset: 0x0000
+        Role switch: Allow slave (0x01)
+> HCI Event: Command Status (0x0f) plen 4                #300 [hci0] 192.048152
+      Create Connection (0x01|0x0005) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11             #301 [hci0] 192.508147
+        Status: Success (0x00)
+        Handle: 128
+        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+< HCI Command: Read Remote Suppo.. (0x01|0x001b) plen 2  #302 [hci0] 192.508223
+        Handle: 128
+> HCI Event: Command Status (0x0f) plen 4                #303 [hci0] 192.510138
+      Read Remote Supported Features (0x01|0x001b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Read Remote Supported Fea.. (0x0b) plen 11  #304 [hci0] 192.511139
+        Status: Success (0x00)
+        Handle: 128
+        Features: 0xff 0xfe 0x8f 0xfe 0xdb 0xff 0x5b 0x87
+          3 slot packets
+          5 slot packets
+          Encryption
+          Slot offset
+          Timing accuracy
+          Role switch
+          Hold mode
+          Sniff mode
+          Power control requests
+          Channel quality driven data rate (CQDDR)
+          SCO link
+          HV2 packets
+          HV3 packets
+          u-law log synchronous data
+          A-law log synchronous data
+          CVSD synchronous data
+          Paging parameter negotiation
+          Power control
+          Transparent synchronous data
+          Broadcast Encryption
+          Enhanced Data Rate ACL 2 Mbps mode
+          Enhanced Data Rate ACL 3 Mbps mode
+          Enhanced inquiry scan
+          Interlaced inquiry scan
+          Interlaced page scan
+          RSSI with inquiry results
+          Extended SCO link (EV3 packets)
+          EV4 packets
+          EV5 packets
+          AFH capable slave
+          AFH classification slave
+          LE Supported (Controller)
+          3-slot Enhanced Data Rate ACL packets
+          5-slot Enhanced Data Rate ACL packets
+          Sniff subrating
+          Pause encryption
+          AFH capable master
+          AFH classification master
+          Enhanced Data Rate eSCO 2 Mbps mode
+          Enhanced Data Rate eSCO 3 Mbps mode
+          3-slot Enhanced Data Rate eSCO packets
+          Extended Inquiry Response
+          Simultaneous LE and BR/EDR (Controller)
+          Secure Simple Pairing
+          Encapsulated PDU
+          Non-flushable Packet Boundary Flag
+          Link Supervision Timeout Changed Event
+          Inquiry TX Power Level
+          Enhanced Power Control
+          Extended features
+< HCI Command: Read Remote Exten.. (0x01|0x001c) plen 3  #305 [hci0] 192.511150
+        Handle: 128
+        Page: 1
+> HCI Event: Command Status (0x0f) plen 4                #306 [hci0] 192.513135
+      Read Remote Extended Features (0x01|0x001c) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Read Remote Extended Feat.. (0x23) plen 13  #307 [hci0] 192.514139
+        Status: Success (0x00)
+        Handle: 128
+        Page: 1/1
+        Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          Secure Simple Pairing (Host Support)
+          LE Supported (Host)
+< HCI Command: Remote Name Requ.. (0x01|0x0019) plen 10  #308 [hci0] 192.514157
+        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Page scan repetition mode: R2 (0x02)
+        Page scan mode: Mandatory (0x00)
+        Clock offset: 0x0000
+< ACL Data TX: Handle 128 flags 0x00 dlen 10             #309 [hci0] 192.514167
+      L2CAP: Information Request (0x0a) ident 1 len 2
+        Type: Extended features supported (0x0002)
+> HCI Event: Command Status (0x0f) plen 4                #310 [hci0] 192.516133
+      Remote Name Request (0x01|0x0019) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Max Slots Change (0x1b) plen 3              #311 [hci0] 192.517132
+        Handle: 128
+        Max slots: 5
+> HCI Event: Number of Completed Packets (0x13) plen 5   #312 [hci0] 192.554140
+        Num handles: 1
+        Handle: 128
+        Count: 1
+> HCI Event: Remote Name Req Complete (0x07) plen 255    #313 [hci0] 192.578126
+        Status: Success (0x00)
+        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Name: Tronsmart Spunky Beat
+@ MGMT Event: Device Connected (0x000b) plen 36      {0x0001} [hci0] 192.578141
+        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Flags: 0x00000000
+        Data length: 23
+        Name (complete): Tronsmart Spunky Beat
+@ MGMT Event: Device Connected (0x000b) plen 36      {0x0002} [hci0] 192.578141
+        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Flags: 0x00000000
+        Data length: 23
+        Name (complete): Tronsmart Spunky Beat
+< ACL Data TX: Handle 128 flags 0x00 dlen 12             #314 [hci0] 196.529160
+      L2CAP: Connection Request (0x02) ident 2 len 4
+        PSM: 1 (0x0001)
+        Source CID: 64
+> HCI Event: Number of Completed Packets (0x13) plen 5   #315 [hci0] 196.554157
+        Num handles: 1
+        Handle: 128
+        Count: 1
+> HCI Event: Disconnect Complete (0x05) plen 4           #316 [hci0] 226.973306
+        Status: Success (0x00)
+        Handle: 128
+        Reason: Remote User Terminated Connection (0x13)
+@ MGMT Event: Device Disconnected (0x000c) plen 8    {0x0001} [hci0] 226.973325
+        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Reason: Connection terminated by remote host (0x03)
+@ MGMT Event: Device Disconnected (0x000c) plen 8    {0x0002} [hci0] 226.973325
+        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
+        Reason: Connection terminated by remote host (0x03)
 
 -- 
-Luiz Augusto von Dentz
+You are receiving this mail because:
+You are the assignee for the bug.
