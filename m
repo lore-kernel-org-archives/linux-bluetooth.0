@@ -2,123 +2,142 @@ Return-Path: <SRS0=6Duj=6H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1CBC55186
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 10:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D89C55186
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 11:06:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B96120781
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 10:16:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD2FE20857
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 11:06:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+TLKuAs"
+	dkim=pass (1024-bit key) header.d=belchamber.com header.i=@belchamber.com header.b="AnftHPq9";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="r8Fic0Tx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgDWKP5 (ORCPT
+        id S1728010AbgDWLG1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Apr 2020 06:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60780 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725863AbgDWKP4 (ORCPT
+        Thu, 23 Apr 2020 07:06:27 -0400
+Received: from a7-18.smtp-out.eu-west-1.amazonses.com ([54.240.7.18]:40124
+        "EHLO a7-18.smtp-out.eu-west-1.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726805AbgDWLG1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Apr 2020 06:15:56 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD5DC03C1AF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 03:15:56 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id s10so6188455wrr.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 03:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Skhk4DHSP6S49ay3YbxbGVfdsBzay3NHmVMdnxxjSrE=;
-        b=I+TLKuAs2kcILC8r2y31+Fs6kHHC22w89oNz8ZAuEz7a/NwAHyHRhH49lQ99XqFuuo
-         R3IhyHzvFan0ZxMjjmeJfK6vIg83WNw9iTLpInlpuRh0PdnRrn0QvWtkQOg44kqgRhvV
-         6DE3DLosEbf6c35JWsxRezJggy2MUC2ISZmcIDlEBwPlnlZnKh5IFCFfY5isGVsrhkSe
-         AhshvpJ43SI2JP/9sqEtpMJfPwKQBtcEIfCfOo9Ifjn3Uc+GWmZyiKDrdDwhi1TlvmcU
-         OlaVa8Mi7yl+XSaQD426NmRdLYTQGFvtCyaSwMijaGAre7Qrmkw3FVmrCfkp2xlHM9CH
-         1ndg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Skhk4DHSP6S49ay3YbxbGVfdsBzay3NHmVMdnxxjSrE=;
-        b=gG7499hM+zSmiVr9YjkzHOCk2nbdJT4TT4L72yXgZhfvF/xZOqF3ydaaxmvLwaWHM0
-         EHRMM4QZ/ZhaDTXiBDAcx4Y8kdMFgV+Cf6bbA9l0ol7kXXkg4cxyTha3IZ1rEfbSoTlJ
-         dOnC582hWBTKd1c5FbFiEtksNhFtuGje2VvB/DDCOH8Hp68UXKVvkc9LRJSaJzIo9K86
-         Sj7FjAtIAXAa9r1FFHJsVgdnsjPphjHvUoVut5A80zvEHtsmiH10oEpvOzoAhbmlZbMk
-         7YVX2PkL+EMA4MvJj0D3l5+1qtXHhxyTSEndCUaqXUJ8A/9QbaaHyB/JYbshuVRI6Vzx
-         x3MQ==
-X-Gm-Message-State: AGi0PuY6QNPHY2mCAh7QItqs2GQ3aTOVrSa8K8vbnerNh51gsyMUDtTE
-        5U4GrNUEjYbdonKZHjHmujhcb8Ksls8yZegcpISeRQ==
-X-Google-Smtp-Source: APiQypI1r8e48tHFF0GT3T2PTE6IsJMo2BsxP2K03RKXkKpfdHnZXkmcBMVOlUzUr6+GY2um2U8mlX8yVowKNlWzFZk=
-X-Received: by 2002:a5d:6887:: with SMTP id h7mr4078989wru.365.1587636954682;
- Thu, 23 Apr 2020 03:15:54 -0700 (PDT)
+        Thu, 23 Apr 2020 07:06:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=6rp4w2husmdhljsd36xpa6qg7i74gvwa; d=belchamber.com; t=1587639983;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type;
+        bh=8S+rr6+VCtO86NiWdAu9R+szMneTBAP+ltocy0LNmv4=;
+        b=AnftHPq9hrZItn0sGXyD+mTVHpAwzVgMhFYYhX2C6YnwSQS6iP/DH+sM6Z9PannT
+        P7Z7c4RchbyZRYtV0DNzOeL3cBEtRRvYZjSWVXTleAttuICQ18b3BGfJeb5h5csI99i
+        hWY/MNKy+YhtKsI7a4fFlBxWcLKuTHIneCyJzxP4=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=shh3fegwg5fppqsuzphvschd53n6ihuv; d=amazonses.com; t=1587639983;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type:Feedback-ID;
+        bh=8S+rr6+VCtO86NiWdAu9R+szMneTBAP+ltocy0LNmv4=;
+        b=r8Fic0TxbBV5HyJjYvBKTgWsL+vQUYvrTv0a51LcHdM8v8FTKMBR7qgAnqLhbytm
+        s9iV+H8mrr7CP/rD0ibiJz8qai9mKE4Vgx/mDuuo22uFCA8oNxnvsUL4ZQwLfkOg0TF
+        x9fQbbaNsNtpHtge/DIdstE0wUkwvZ80fGysjLVI=
+X-Gm-Message-State: AGi0PuaBwf4nK+UJMk3vs9zbK2Ri3XNIcQ1VASP1CHWKOYoSTMwY6ztm
+        Qcs5I1MaS7J7e9ko4LycKkgxQvNKOeZc7Wf9wyg=
+X-Google-Smtp-Source: APiQypK+06aQGBStphr8dnzZq4eAZtMHZ+R1nH4iWSyMTcphvZs6EkoDfB8nq1uT/9jY3Z6zEsLdQUMoi7Z/W1dJYpI=
+X-Received: by 2002:a02:c9cb:: with SMTP id c11mr2497041jap.93.1587639981036;
+ Thu, 23 Apr 2020 04:06:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200414160758.v1.1.Idab9dcdc7da549ed1fd5c66341fb8baffaee8d10@changeid>
- <84DFB53F-C60A-48D3-AC01-2C9C87BA805D@holtmann.org>
-In-Reply-To: <84DFB53F-C60A-48D3-AC01-2C9C87BA805D@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Thu, 23 Apr 2020 18:15:43 +0800
-Message-ID: <CAJQfnxE_-8u_f2R9Twnn0v+tuLYu1bXmLLC_C9T_JrZ-otJxCA@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: L2CAP: add support for waiting
- disconnection resp
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+References: <010201715012e482-bca51111-db3c-4101-9bd4-208b69a0ff03-000000@eu-west-1.amazonses.com>
+ <01020171a3203016-7d1d5c39-46ee-4ba9-8ff3-a6928a329d2a-000000@eu-west-1.amazonses.com>
+ <CABBYNZJ2tn6Riz7uouxD0qa1M-dT7GbtUSkD-dbn1nj1B372iQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJ2tn6Riz7uouxD0qa1M-dT7GbtUSkD-dbn1nj1B372iQ@mail.gmail.com>
+From:   James Belchamber <james@belchamber.com>
+Date:   Thu, 23 Apr 2020 11:06:22 +0000
+X-Gmail-Original-Message-ID: <CADQov_imzyX1E-rDQsLWDuPkgz5G5xazyy_B10cc0nTteHKNEw@mail.gmail.com>
+Message-ID: <01020171a6b79a5e-6f98b660-3a61-4542-b956-70276882f469-000000@eu-west-1.amazonses.com>
+Subject: Re: Setup Synchronous Connection fails when switching Sony WH-H900N
+ headset to HSP
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+X-SES-Outgoing: 2020.04.23-54.240.7.18
+Feedback-ID: 1.eu-west-1.iLkSOx0ll0H29nNg//Fx25T4fmIhOvUmYvVubjmmX6g=:AmazonSES
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Only difference in the btmon output is the handle (256 instead of 67)
+- otherwise it all looks the same and it connects first time.
 
-Let me write a test for that.
+What logs are useful? I have the Chromebook in developer mode and so I
+can capture whatever you want (hopefully!)
 
-However, I cannot seem to run l2cap-tester properly.
-On raspberry pi, all of the tests failed to initiate.
-On chromeOS, all BREDR tests pass (before and after the change), but
-all LE tests timed out on init stage (before and after the change).
-
-I need to find out what went wrong when I execute those tests first.
-
-Thanks,
-Archie
-
-
-On Thu, 23 Apr 2020 at 01:42, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Wed, 22 Apr 2020 at 23:32, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hi Archie,
+> Hi James,
 >
-> > Whenever we disconnect a L2CAP connection, we would immediately
-> > report a disconnection event (EPOLLHUP) to the upper layer, without
-> > waiting for the response of the other device.
+> On Wed, Apr 22, 2020 at 11:27 AM James Belchamber <james@belchamber.com> wrote:
 > >
-> > This patch offers an option to wait until we receive a disconnection
-> > response before reporting disconnection event, by using the "how"
-> > parameter in l2cap_sock_shutdown(). Therefore, upper layer can opt
-> > to wait for disconnection response by shutdown(sock, SHUT_WR).
+> > Just bumping this for visibility, still an issue with the latest kernel.
 > >
-> > This can be used to enforce proper disconnection order in HID,
-> > where the disconnection of the interrupt channel must be complete
-> > before attempting to disconnect the control channel.
+> > Happy to test anything thrown my way.
 > >
-> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > ---
-> >
-> > net/bluetooth/l2cap_sock.c | 30 +++++++++++++++++++++++-------
-> > 1 file changed, 23 insertions(+), 7 deletions(-)
+> > On Mon, 6 Apr 2020 at 16:19, James Belchamber <james@belchamber.com> wrote:
+> > >
+> > > When using my Sony WH-H900N headphones and switching from A2DP to
+> > > HSP/HFP the following error appears in journalctl:
+> > >
+> > > (  60.063|   0.000) D: [pulseaudio] module-bluez5-device.c: Acquiring
+> > > transport /org/bluez/hci0/dev_04_5D_4B_E9_C9_90/fd34
+> > > (  60.063|   0.000) I: [pulseaudio] backend-native.c: doing connect
+> > > (  60.174|   0.111) E: [pulseaudio] backend-native.c: connect():
+> > > Function not implemented
+> > >
+> > > And using btmon I can see the HCI command comes back with a failure
+> > > (full log attached):
+> > >
+> > > < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+> > >         Handle: 67
+> > >         Transmit bandwidth: 8000
+> > >         Receive bandwidth: 8000
+> > >         Max latency: 10
+> > >         Setting: 0x0060
+> > >           Input Coding: Linear
+> > >           Input Data Format: 2's complement
+> > >           Input Sample Size: 16-bit
+> > >           # of bits padding at MSB: 0
+> > >           Air Coding Format: CVSD
+> > >         Retransmission effort: Optimize for power consumption (0x01)
+> > >         Packet type: 0x0380
+> > >           3-EV3 may not be used
+> > >           2-EV5 may not be used
+> > >           3-EV5 may not be used
+> > > > HCI Event: Command Status (0x0f) plen 4
+> > >       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+> > >         Status: Success (0x00)
+> > > > HCI Event: Max Slots Change (0x1b) plen 3
+> > >         Handle: 67
+> > >         Max slots: 1
+> > > > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+> > >         Status: Unspecified Error (0x1f)
+> > >         Handle: 67
+> > >         Address: 04:5D:4B:E9:C9:90 (Sony Corporation)
+> > >         Link type: eSCO (0x02)
+> > >         Transmission interval: 0x00
+> > >         Retransmission window: 0x00
+> > >         RX packet length: 0
+> > >         TX packet length: 0
+> > >         Air mode: u-law log (0x00)
+> > >
+> > > This works on ChromeOS, which also uses a (modified) BlueZ stack -
+> > > though I can't work out why :)
 >
-> the patch looks fine to me. Do we have something in l2cap-tester or l2test that we can verify this with before I apply it.
+> It doesn't look like it is a host problem and Ive never seem this
+> error before, have you tried with the same controller on Chrome OS? It
+> may be worth trying to capture the logs in Chrome OS so we can compare
+> if there is something different in the command parameters, but it
+> could as well be that Chrome uses HFP instead of HSP as PulseAudio
+> does and the headset is sensitive to that.
 >
-> Regards
->
-> Marcel
->
+> --
+> Luiz Augusto von Dentz
