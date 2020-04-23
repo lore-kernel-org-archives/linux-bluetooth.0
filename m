@@ -2,222 +2,160 @@ Return-Path: <SRS0=6Duj=6H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6F9C54FD0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 317F9C54FCB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:59:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A39C320857
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:17:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 146C02076C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 17:59:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729889AbgDWRR4 convert rfc822-to-8bit (ORCPT
+        id S1730052AbgDWR76 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Apr 2020 13:17:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53236 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729887AbgDWRR4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Apr 2020 13:17:56 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Thu, 23 Apr 2020 13:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729991AbgDWR76 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Apr 2020 13:59:58 -0400
+X-Greylist: delayed 396 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 23 Apr 2020 10:59:58 PDT
+Received: from kronos.mailus.de (kronos.mailus.de [IPv6:2a01:4f8:171:2684::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71240C09B042
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 10:59:58 -0700 (PDT)
+Received: from [IPv6:2003:c0:7714:6b00:527b:9dff:febd:4d92] (p200300C077146B00527B9DFFFEBD4D92.dip0.t-ipconnect.de [IPv6:2003:c0:7714:6b00:527b:9dff:febd:4d92])
+        by kronos.mailus.de (Postfix) with ESMTPSA id 0F9C2606DA
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 19:53:21 +0200 (CEST)
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Thu, 23 Apr 2020 17:17:53 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: thefugazi@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-yY4LaMaMJD@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+From:   Erik Andresen <erik@vontaene.de>
+Subject: HID device with multiple collections does not work
+Message-ID: <319b239d-3739-63e9-9fe4-f8b4215097b2@vontaene.de>
+Date:   Thu, 23 Apr 2020 19:53:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------67A6254BFE4B2AED16A829AE"
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+This is a multi-part message in MIME format.
+--------------67A6254BFE4B2AED16A829AE
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-thefugazi@gmail.com changed:
+Hi,
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |thefugazi@gmail.com
 
---- Comment #61 from thefugazi@gmail.com ---
-(In reply to Michael Akushsky from comment #58)
-> Adopted patch to kernel version 5.5, confirmed that my device started working
-> 
-> ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-> 
-> That's my adoption:
-> https://github.com/akushsky/kernel_patches/blob/master/UbiquitousEvil/
-> bluetooth.patch
+I have a simple bluetooth hid device which does work in Android but not with Linux 4.19/Bluez 5. It does have two collections in its hid description:
+0xA1, 0x01,        // Collection (Application)
+0x85, 0x02,        //   Report ID (2)
+(...)
+0xC0,              // End Collection
+0xA1, 0x01,        // Collection (Application)
+0x85, 0x01,        //   Report ID (1)
+(...)
+0xC0,              // End Collection
 
-Same device ID here and while this patch gets the dongle functioning, I am
-unable to establish a successful connection with any device.
+Complete description is attached.
 
-< HCI Command: Create Connection (0x01|0x0005) plen 13   #299 [hci0] 192.046072
-        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Packet type: 0xcc18
-          DM1 may be used
-          DH1 may be used
-          DM3 may be used
-          DH3 may be used
-          DM5 may be used
-          DH5 may be used
-        Page scan repetition mode: R2 (0x02)
-        Page scan mode: Mandatory (0x00)
-        Clock offset: 0x0000
-        Role switch: Allow slave (0x01)
-> HCI Event: Command Status (0x0f) plen 4                #300 [hci0] 192.048152
-      Create Connection (0x01|0x0005) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11             #301 [hci0] 192.508147
-        Status: Success (0x00)
-        Handle: 128
-        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-< HCI Command: Read Remote Suppo.. (0x01|0x001b) plen 2  #302 [hci0] 192.508223
-        Handle: 128
-> HCI Event: Command Status (0x0f) plen 4                #303 [hci0] 192.510138
-      Read Remote Supported Features (0x01|0x001b) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Read Remote Supported Fea.. (0x0b) plen 11  #304 [hci0] 192.511139
-        Status: Success (0x00)
-        Handle: 128
-        Features: 0xff 0xfe 0x8f 0xfe 0xdb 0xff 0x5b 0x87
-          3 slot packets
-          5 slot packets
-          Encryption
-          Slot offset
-          Timing accuracy
-          Role switch
-          Hold mode
-          Sniff mode
-          Power control requests
-          Channel quality driven data rate (CQDDR)
-          SCO link
-          HV2 packets
-          HV3 packets
-          u-law log synchronous data
-          A-law log synchronous data
-          CVSD synchronous data
-          Paging parameter negotiation
-          Power control
-          Transparent synchronous data
-          Broadcast Encryption
-          Enhanced Data Rate ACL 2 Mbps mode
-          Enhanced Data Rate ACL 3 Mbps mode
-          Enhanced inquiry scan
-          Interlaced inquiry scan
-          Interlaced page scan
-          RSSI with inquiry results
-          Extended SCO link (EV3 packets)
-          EV4 packets
-          EV5 packets
-          AFH capable slave
-          AFH classification slave
-          LE Supported (Controller)
-          3-slot Enhanced Data Rate ACL packets
-          5-slot Enhanced Data Rate ACL packets
-          Sniff subrating
-          Pause encryption
-          AFH capable master
-          AFH classification master
-          Enhanced Data Rate eSCO 2 Mbps mode
-          Enhanced Data Rate eSCO 3 Mbps mode
-          3-slot Enhanced Data Rate eSCO packets
-          Extended Inquiry Response
-          Simultaneous LE and BR/EDR (Controller)
-          Secure Simple Pairing
-          Encapsulated PDU
-          Non-flushable Packet Boundary Flag
-          Link Supervision Timeout Changed Event
-          Inquiry TX Power Level
-          Enhanced Power Control
-          Extended features
-< HCI Command: Read Remote Exten.. (0x01|0x001c) plen 3  #305 [hci0] 192.511150
-        Handle: 128
-        Page: 1
-> HCI Event: Command Status (0x0f) plen 4                #306 [hci0] 192.513135
-      Read Remote Extended Features (0x01|0x001c) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Read Remote Extended Feat.. (0x23) plen 13  #307 [hci0] 192.514139
-        Status: Success (0x00)
-        Handle: 128
-        Page: 1/1
-        Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-          Secure Simple Pairing (Host Support)
-          LE Supported (Host)
-< HCI Command: Remote Name Requ.. (0x01|0x0019) plen 10  #308 [hci0] 192.514157
-        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Page scan repetition mode: R2 (0x02)
-        Page scan mode: Mandatory (0x00)
-        Clock offset: 0x0000
-< ACL Data TX: Handle 128 flags 0x00 dlen 10             #309 [hci0] 192.514167
-      L2CAP: Information Request (0x0a) ident 1 len 2
-        Type: Extended features supported (0x0002)
-> HCI Event: Command Status (0x0f) plen 4                #310 [hci0] 192.516133
-      Remote Name Request (0x01|0x0019) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Max Slots Change (0x1b) plen 3              #311 [hci0] 192.517132
-        Handle: 128
-        Max slots: 5
-> HCI Event: Number of Completed Packets (0x13) plen 5   #312 [hci0] 192.554140
-        Num handles: 1
-        Handle: 128
-        Count: 1
-> HCI Event: Remote Name Req Complete (0x07) plen 255    #313 [hci0] 192.578126
-        Status: Success (0x00)
-        Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Name: Tronsmart Spunky Beat
-@ MGMT Event: Device Connected (0x000b) plen 36      {0x0001} [hci0] 192.578141
-        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Flags: 0x00000000
-        Data length: 23
-        Name (complete): Tronsmart Spunky Beat
-@ MGMT Event: Device Connected (0x000b) plen 36      {0x0002} [hci0] 192.578141
-        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Flags: 0x00000000
-        Data length: 23
-        Name (complete): Tronsmart Spunky Beat
-< ACL Data TX: Handle 128 flags 0x00 dlen 12             #314 [hci0] 196.529160
-      L2CAP: Connection Request (0x02) ident 2 len 4
-        PSM: 1 (0x0001)
-        Source CID: 64
-> HCI Event: Number of Completed Packets (0x13) plen 5   #315 [hci0] 196.554157
-        Num handles: 1
-        Handle: 128
-        Count: 1
-> HCI Event: Disconnect Complete (0x05) plen 4           #316 [hci0] 226.973306
-        Status: Success (0x00)
-        Handle: 128
-        Reason: Remote User Terminated Connection (0x13)
-@ MGMT Event: Device Disconnected (0x000c) plen 8    {0x0001} [hci0] 226.973325
-        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Reason: Connection terminated by remote host (0x03)
-@ MGMT Event: Device Disconnected (0x000c) plen 8    {0x0002} [hci0] 226.973325
-        BR/EDR Address: 5C:EB:68:74:50:AD (Cheerstar Technology Co., Ltd)
-        Reason: Connection terminated by remote host (0x03)
+Since there are multiple collections I understand that every report has to be prefixed with the id, so I send
+[2,0,0,0x52,0,0,0,0,0] (9 bytes) for the keycode 0x52, ID is 2.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Output from btmon is:
+> ACL Data RX: Handle 3585 flags 0x02 dlen 16                                                                                                                                                                                                            #2072 [hci0] 485.047387
+       ATT: Handle Value Notification (0x1b) len 11
+         Handle: 0x0015
+           Data: 020000520000000000
+
+This looks good for me so far, unfortunately Linux does not pick it up, in dmesg I get:
+drivers/hid/hid-core.c: undefined report_id 0 received
+
+cat /sys/kernel/debug/hid/0005:0000:0000.000­3/events # gives me:
+report (size 10) (numbered) = 00 02 00 00 52 00 00 00 00 00
+so I get 10 bytes instead the 9 I send
+
+So far I traced it to hog-lib.c, report_value_cb() of bluez where this extra 0 is prepended in the if (hog->has_report_id) block.
+report->id is 0 at this point. If I skip this extra addition of the zero or manually set id=2 here it works as expected. Does someone has an idea what I do wrong or what I'm missing?
+
+greetings,
+Erik Andresen
+
+--------------67A6254BFE4B2AED16A829AE
+Content-Type: text/plain; charset=UTF-8;
+ name="hid_report_descriptor.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="hid_report_descriptor.txt"
+
+MHgwNSwgMHgwMSwgICAgICAgIC8vIFVzYWdlIFBhZ2UgKEdlbmVyaWMgRGVza3RvcCBDdHJs
+cykKMHgwOSwgMHgwNiwgICAgICAgIC8vIFVzYWdlIChLZXlib2FyZCkKMHhBMSwgMHgwMSwg
+ICAgICAgIC8vIENvbGxlY3Rpb24gKEFwcGxpY2F0aW9uKQoweDg1LCAweDAyLCAgICAgICAg
+Ly8gICBSZXBvcnQgSUQgKDIpCjB4MDUsIDB4MDcsICAgICAgICAvLyAgIFVzYWdlIFBhZ2Ug
+KEticmQvS2V5cGFkKQoweDE5LCAweEUwLCAgICAgICAgLy8gICBVc2FnZSBNaW5pbXVtICgw
+eEUwKQoweDI5LCAweEU3LCAgICAgICAgLy8gICBVc2FnZSBNYXhpbXVtICgweEU3KQoweDE1
+LCAweDAwLCAgICAgICAgLy8gICBMb2dpY2FsIE1pbmltdW0gKDApCjB4MjUsIDB4MDEsICAg
+ICAgICAvLyAgIExvZ2ljYWwgTWF4aW11bSAoMSkKMHg3NSwgMHgwMSwgICAgICAgIC8vICAg
+UmVwb3J0IFNpemUgKDEpCjB4OTUsIDB4MDgsICAgICAgICAvLyAgIFJlcG9ydCBDb3VudCAo
+OCkKMHg4MSwgMHgwMiwgICAgICAgIC8vICAgSW5wdXQgKERhdGEsVmFyLEFicyxObyBXcmFw
+LExpbmVhcixQcmVmZXJyZWQgU3RhdGUsTm8gTnVsbCBQb3NpdGlvbikKCjB4OTUsIDB4MDEs
+ICAgICAgICAvLyAgIFJlcG9ydCBDb3VudCAoMSkKMHg3NSwgMHgwOCwgICAgICAgIC8vICAg
+UmVwb3J0IFNpemUgKDgpCjB4ODEsIDB4MDEsICAgICAgICAvLyAgIElucHV0IChDb25zdCxB
+cnJheSxBYnMsTm8gV3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5vIE51bGwgUG9zaXRp
+b24pCgoweDk1LCAweDA1LCAgICAgICAgLy8gICBSZXBvcnQgQ291bnQgKDUpCjB4NzUsIDB4
+MDEsICAgICAgICAvLyAgIFJlcG9ydCBTaXplICgxKQoweDA1LCAweDA4LCAgICAgICAgLy8g
+ICBVc2FnZSBQYWdlIChMRURzKQoweDE5LCAweDAxLCAgICAgICAgLy8gICBVc2FnZSBNaW5p
+bXVtIChOdW0gTG9jaykKMHgyOSwgMHgwNSwgICAgICAgIC8vICAgVXNhZ2UgTWF4aW11bSAo
+S2FuYSkKMHg5MSwgMHgwMiwgICAgICAgIC8vICAgT3V0cHV0IChEYXRhLFZhcixBYnMsTm8g
+V3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5vIE51bGwgUG9zaXRpb24sTm9uLXZvbGF0
+aWxlKQoKMHg5NSwgMHgwMSwgICAgICAgIC8vICAgUmVwb3J0IENvdW50ICgxKQoweDc1LCAw
+eDAzLCAgICAgICAgLy8gICBSZXBvcnQgU2l6ZSAoMykKMHg5MSwgMHgwMSwgICAgICAgIC8v
+ICAgT3V0cHV0IChDb25zdCxBcnJheSxBYnMsTm8gV3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0
+YXRlLE5vIE51bGwgUG9zaXRpb24sTm9uLXZvbGF0aWxlKQoKMHg5NSwgMHgwNiwgICAgICAg
+IC8vICAgUmVwb3J0IENvdW50ICg2KQoweDc1LCAweDA4LCAgICAgICAgLy8gICBSZXBvcnQg
+U2l6ZSAoOCkKMHgxNSwgMHgwMCwgICAgICAgIC8vICAgTG9naWNhbCBNaW5pbXVtICgwKQow
+eDI1LCAweDczLCAgICAgICAgLy8gICBMb2dpY2FsIE1heGltdW0gKDExNSkKMHgwNSwgMHgw
+NywgICAgICAgIC8vICAgVXNhZ2UgUGFnZSAoS2JyZC9LZXlwYWQpCjB4MTksIDB4MDAsICAg
+ICAgICAvLyAgIFVzYWdlIE1pbmltdW0gKDB4MDApCjB4MjksIDB4NzMsICAgICAgICAvLyAg
+IFVzYWdlIE1heGltdW0gKDB4NzMpCjB4ODEsIDB4MDAsICAgICAgICAvLyAgIElucHV0IChE
+YXRhLEFycmF5LEFicyxObyBXcmFwLExpbmVhcixQcmVmZXJyZWQgU3RhdGUsTm8gTnVsbCBQ
+b3NpdGlvbikKCjB4MDksIDB4MDUsICAgICAgICAvLyAgIFVzYWdlICgweDA1KQoweDE1LCAw
+eDAwLCAgICAgICAgLy8gICBMb2dpY2FsIE1pbmltdW0gKDApCjB4MjYsIDB4RkYsIDB4MDAs
+ICAvLyAgIExvZ2ljYWwgTWF4aW11bSAoMjU1KQoweDc1LCAweDA4LCAgICAgICAgLy8gICBS
+ZXBvcnQgU2l6ZSAoOCkKMHg5NSwgMHgwMiwgICAgICAgIC8vICAgUmVwb3J0IENvdW50ICgy
+KQoweEIxLCAweDAyLCAgICAgICAgLy8gICBGZWF0dXJlIChEYXRhLFZhcixBYnMsTm8gV3Jh
+cCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5vIE51bGwgUG9zaXRpb24sTm9uLXZvbGF0aWxl
+KQoweEMwLCAgICAgICAgICAgICAgLy8gRW5kIENvbGxlY3Rpb24KMHgwNSwgMHgwQywgICAg
+ICAgIC8vIFVzYWdlIFBhZ2UgKENvbnN1bWVyKQoweDA5LCAweDAxLCAgICAgICAgLy8gVXNh
+Z2UgKENvbnN1bWVyIENvbnRyb2wpCjB4QTEsIDB4MDEsICAgICAgICAvLyBDb2xsZWN0aW9u
+IChBcHBsaWNhdGlvbikKMHg4NSwgMHgwMSwgICAgICAgIC8vICAgUmVwb3J0IElEICgxKQow
+eDE1LCAweDAwLCAgICAgICAgLy8gICBMb2dpY2FsIE1pbmltdW0gKDApCjB4MjUsIDB4MDEs
+ICAgICAgICAvLyAgIExvZ2ljYWwgTWF4aW11bSAoMSkKMHg3NSwgMHgwMSwgICAgICAgIC8v
+ICAgUmVwb3J0IFNpemUgKDEpCjB4OTUsIDB4MDEsICAgICAgICAvLyAgIFJlcG9ydCBDb3Vu
+dCAoMSkKMHgwOSwgMHhCNSwgICAgICAgIC8vICAgVXNhZ2UgKFNjYW4gTmV4dCBUcmFjaykK
+MHg4MSwgMHgwMiwgICAgICAgIC8vICAgSW5wdXQgKERhdGEsVmFyLEFicyxObyBXcmFwLExp
+bmVhcixQcmVmZXJyZWQgU3RhdGUsTm8gTnVsbCBQb3NpdGlvbikKCjB4MDksIDB4QjYsICAg
+ICAgICAvLyAgIFVzYWdlIChTY2FuIFByZXZpb3VzIFRyYWNrKQoweDgxLCAweDAyLCAgICAg
+ICAgLy8gICBJbnB1dCAoRGF0YSxWYXIsQWJzLE5vIFdyYXAsTGluZWFyLFByZWZlcnJlZCBT
+dGF0ZSxObyBOdWxsIFBvc2l0aW9uKQoKMHgwOSwgMHhCNywgICAgICAgIC8vICAgVXNhZ2Ug
+KFN0b3ApCjB4ODEsIDB4MDIsICAgICAgICAvLyAgIElucHV0IChEYXRhLFZhcixBYnMsTm8g
+V3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5vIE51bGwgUG9zaXRpb24pCgoweDA5LCAw
+eEI4LCAgICAgICAgLy8gICBVc2FnZSAoRWplY3QpCjB4ODEsIDB4MDIsICAgICAgICAvLyAg
+IElucHV0IChEYXRhLFZhcixBYnMsTm8gV3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5v
+IE51bGwgUG9zaXRpb24pCgoweDA5LCAweENELCAgICAgICAgLy8gICBVc2FnZSAoUGxheS9Q
+YXVzZSkKMHg4MSwgMHgwMiwgICAgICAgIC8vICAgSW5wdXQgKERhdGEsVmFyLEFicyxObyBX
+cmFwLExpbmVhcixQcmVmZXJyZWQgU3RhdGUsTm8gTnVsbCBQb3NpdGlvbikKCjB4MDksIDB4
+RTIsICAgICAgICAvLyAgIFVzYWdlIChNdXRlKQoweDgxLCAweDAyLCAgICAgICAgLy8gICBJ
+bnB1dCAoRGF0YSxWYXIsQWJzLE5vIFdyYXAsTGluZWFyLFByZWZlcnJlZCBTdGF0ZSxObyBO
+dWxsIFBvc2l0aW9uKQoKMHgwOSwgMHhFOSwgICAgICAgIC8vICAgVXNhZ2UgKFZvbHVtZSBJ
+bmNyZW1lbnQpCjB4ODEsIDB4MDIsICAgICAgICAvLyAgIElucHV0IChEYXRhLFZhcixBYnMs
+Tm8gV3JhcCxMaW5lYXIsUHJlZmVycmVkIFN0YXRlLE5vIE51bGwgUG9zaXRpb24pCgoweDA5
+LCAweEVBLCAgICAgICAgLy8gICBVc2FnZSAoVm9sdW1lIERlY3JlbWVudCkKMHg4MSwgMHgw
+MiwgICAgICAgIC8vICAgSW5wdXQgKERhdGEsVmFyLEFicyxObyBXcmFwLExpbmVhcixQcmVm
+ZXJyZWQgU3RhdGUsTm8gTnVsbCBQb3NpdGlvbikKCjB4QzAsICAgICAgICAgICAgICAvLyBF
+bmQgQ29sbGVjdGlvbgoKLy8gMTI3IGJ5dGVzCg==
+--------------67A6254BFE4B2AED16A829AE--
