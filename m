@@ -2,67 +2,69 @@ Return-Path: <SRS0=6Duj=6H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D27EC54FD0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 14:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28826C54FCB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 14:43:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AAA520781
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 14:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 021CB20781
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Apr 2020 14:43:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lcIYdbkg"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gwyEd2TG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728128AbgDWOnd (ORCPT
+        id S1728190AbgDWOnk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Apr 2020 10:43:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
+        Thu, 23 Apr 2020 10:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726963AbgDWOnd (ORCPT
+        by vger.kernel.org with ESMTP id S1726380AbgDWOnk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Apr 2020 10:43:33 -0400
-Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A76AC08E934
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 07:43:33 -0700 (PDT)
-Received: by mail-ua1-x942.google.com with SMTP id g10so5908815uae.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 07:43:33 -0700 (PDT)
+        Thu, 23 Apr 2020 10:43:40 -0400
+Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2070EC08E934
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 07:43:40 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id 36so1822220uaf.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2020 07:43:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UaRDhlK2NHNeurmMan7RY0AcLjKjzIMg63JaKxpdTg4=;
-        b=lcIYdbkg5Exzv+pMyXXFnCDSRCHkQrBLvQ7xZzAYUSilE6XcCZgJhNH9eBGcyCh2IA
-         hZ8VzIFRFEV4S/Ge8HenpuokRkwXXax+FFk/7+1wUMWnQtuwrf7dk9jyy3+2RD8Pk74D
-         gsaH8E/pnoYEeAb3h2hks3tBwzerrSQNh4A3c=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=MRgEfFWldJ+nbPjKrWVW/UCyBRIS5F0risTypuqjZbc=;
+        b=gwyEd2TGkygP5ZI9Mw4tjYV5V1JxsI4x1VuWS8xPhOkkyku/DAFlzUqQoLrQCgd52P
+         qvSyXpjMg7vT2II8tQ8xO+1rBw/I2oORPzN/3Q2epEsL8Zg/bILleJl7tuW8cHcStA6z
+         Tdqbu0Hf5kdaYPjDDy4wV/wfnW2OZRej78C74=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UaRDhlK2NHNeurmMan7RY0AcLjKjzIMg63JaKxpdTg4=;
-        b=Nh3Mzu+3xlOGm2qlA/NUFjfW8+2Em2+/M+LmyPQwbN8Mo05L4nRioRsJ1YESa7Fflg
-         EQLAeJst3VCE6zXC7d8JHkv86CtjI15zFgvEnf4VN9Le01bwFLxWkAEGSQmTOwuR5weH
-         8v2ageRLAO2w3M5YCfbG5IyHzOX1KcJP0sDbdKAUHM2kFDWsGYZ0IH6c8tJXlF3FCFk+
-         AK6dIPzirMJIR8m0eUZHyXi/xIf8rYy+/SE7iI+mlTJE3KSzeIWJXw5YphWfG5095MCx
-         86p4pOubuAx4lDZOEZL1NSLBb6MYcIkiWZl9R9onc5o3HwcZTXUbvsp0cSFJ03h7iA1U
-         YtFA==
-X-Gm-Message-State: AGi0PuZWfBDIVkMt022Io52Bz7znnN/313zXK3J/yBsy3bt46Iko/ReH
-        6+FA0V4Cv/mtnKIyIuks1XaLY4XCBjo=
-X-Google-Smtp-Source: APiQypKbbk5R1B+XvVyQE7nUuj+URRUx1snUrES8VpBudR2pWzRpvwMPOZqbRhwVySgsJ3/eBxgjBQ==
-X-Received: by 2002:ab0:485:: with SMTP id 5mr3280622uaw.5.1587653011929;
-        Thu, 23 Apr 2020 07:43:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MRgEfFWldJ+nbPjKrWVW/UCyBRIS5F0risTypuqjZbc=;
+        b=dzLRcHrs8oeI/yg1gYaB4T2VBgnteH3DGNMaD1quMUUMsk/j3iu0Wy0WBlkgpJEysN
+         GHvpDfneEPHW57NRzG4kBYGSOOwe3+qiX9nbRWwcgnKXlLXZzguCGUYtgZtJDwLHmQqx
+         Ck8TAfsxWWsLOyMBc6aH3yP9nN30/iXjkEpy3hJGVRzlo6KLZZBr9chXFMUILgBODpqt
+         11w+s5Psfg6s2h6pFkwvJpJ1Vxx2vTB+MA6eVsxZebQr1UnKWoWrGKbXx8vhnqugKlVQ
+         8Hx4cJ+733aVuJtkmestdNXtenZH+PWFJQonR6NabBe20B8Is7ucsh727nHnnlvvl9q1
+         4niw==
+X-Gm-Message-State: AGi0PuYdW/XXc+GZmLcgKkItPG8YeHlBvk3sPhcW+rCSvtfFiwTDxIge
+        46Fbw7YlsXWhRcsIZIYPGmtXL5zvKnw=
+X-Google-Smtp-Source: APiQypLBtVRBs3350Zidyzog6HLIDcHd1Ww8twCeVhSReJRESu4V1eWu2L5nxPlW/x6F6IWw8NEkuw==
+X-Received: by 2002:a67:ff8d:: with SMTP id v13mr3484101vsq.71.1587653019057;
+        Thu, 23 Apr 2020 07:43:39 -0700 (PDT)
 Received: from alain.c.googlers.com.com (161.138.243.35.bc.googleusercontent.com. [35.243.138.161])
-        by smtp.gmail.com with ESMTPSA id d83sm762107vka.34.2020.04.23.07.43.30
+        by smtp.gmail.com with ESMTPSA id d83sm762107vka.34.2020.04.23.07.43.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2020 07:43:30 -0700 (PDT)
+        Thu, 23 Apr 2020 07:43:38 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v3 0/3] bluetooth:Adding driver and quirk defs for multi-role LE
-Date:   Thu, 23 Apr 2020 14:43:25 +0000
-Message-Id: <20200423144328.82478-1-alainm@chromium.org>
+Subject: [PATCH v3 1/3] bluetooth:Adding driver and quirk defs for multi-role LE
+Date:   Thu, 23 Apr 2020 14:43:27 +0000
+Message-Id: <20200423144328.82478-2-alainm@chromium.org>
 X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
+In-Reply-To: <20200423144328.82478-1-alainm@chromium.org>
+References: <20200423144328.82478-1-alainm@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -70,24 +72,59 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This series adds BTUSB and quirk support for the driver to confirm that
-the reported LE_states can be trusted.  The quirk will be used to
-gradually roll out the feature to supported controllers without
-affecting the stability of other controllers.  If all controllers FWs
-are fixed or else validated, we can consider removing the quirk over
-time.
+This change adds the relevant driver and quirk to allow drivers to
+report the le_states as being trustworthy.
 
+This has historically been disabled as controllers did not reliably
+support this. In particular, this will be used to relax this condition
+for controllers that have been well tested and reliable.
 
-Alain Michaud (3):
-  bluetooth:Adding driver and quirk defs for multi-role LE
-  bluetooth:allow scatternet connections if supported.
-  bluetooth:btusb: Adding support for LE scatternet to Jfp and ThP
+	/* Most controller will fail if we try to create new connections
+	 * while we have an existing one in slave role.
+	 */
+	if (hdev->conn_hash.le_num_slave > 0)
+		return NULL;
 
- drivers/bluetooth/btusb.c   | 11 ++++++++---
- include/net/bluetooth/hci.h |  9 +++++++++
- net/bluetooth/hci_event.c   |  4 +++-
- 3 files changed, 20 insertions(+), 4 deletions(-)
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
 
+ drivers/bluetooth/btusb.c   | 2 +-
+ include/net/bluetooth/hci.h | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3bdec42c9612..dd27e28d4601 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -58,7 +58,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_CW6622		0x100000
+ #define BTUSB_MEDIATEK		0x200000
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
+-
++#define BTUSB_VALID_LE_STATES   0x800000
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5f60e135aeb6..25c2e5ee81dc 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -214,6 +214,15 @@ enum {
+ 	 * This quirk must be set before hci_register_dev is called.
+ 	 */
+ 	HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
++
++	/* When this quirk is set, the controller has validated that
++	 * LE states reported through the HCI_LE_READ_SUPPORTED_STATES are
++	 * valid.  This mechanism is necessary as many controllers have
++	 * been seen has having trouble initiating a connectable
++	 * advertisement despite the state combination being reported as
++	 * supported.
++	 */
++	HCI_QUIRK_VALID_LE_STATES,
+ };
+ 
+ /* HCI device flags */
 -- 
 2.26.1.301.g55bc3eb7cb9-goog
 
