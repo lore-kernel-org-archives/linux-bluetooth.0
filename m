@@ -7,394 +7,254 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C31E6C54FCB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Apr 2020 17:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 689A4C54FD0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Apr 2020 19:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B67C20736
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Apr 2020 17:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3142E20704
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Apr 2020 19:38:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9gT3+Ah"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pjXR1k8C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728563AbgDXRvA (ORCPT
+        id S1729204AbgDXTig (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Apr 2020 13:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728110AbgDXRu7 (ORCPT
+        Fri, 24 Apr 2020 15:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35672 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727031AbgDXTig (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Apr 2020 13:50:59 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DCAC09B047
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 10:50:59 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id g19so13842521otk.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 10:50:59 -0700 (PDT)
+        Fri, 24 Apr 2020 15:38:36 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACE6C09B048
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 12:38:36 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id 72so14489900otu.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 12:38:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Xiiy48Nji2zZVj+IQPl4sLZF6+QczrdZt0CeDAJi/2c=;
-        b=W9gT3+AhsP85oPk5TFbs9HMQ/012oJ7IZXkCzgSUbBt7ioVkMSjOPQ49pwLD5T//Bv
-         XtrTZ6yBYWFhB8qhtRaK/L7hA6+2ZTrH2CbaO6eBkszmchHkeBlysL/FuwJet6fnp1Z1
-         aRsRFcBa9PCKity+7NAMu5pIsagycQDQakCBTQH4Mtz7E6xqad8DAv8d4igxhjEhwOhf
-         XSezYhiJh/1+W3NxE7MyJVa7j16PpSobeFpijT/fHeJvu9LXlET54Vj8fojzkmc4TcCT
-         s/8DD5+3TFVjJsd6SlHmqj3ZUToU1ZToASbbZvY1aczRjYZ8GuRkEqmDP3ucQP+EUcEa
-         hQGg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ayXZdQW3Ixf8tc8FDnwyxka20Av9zwLO17ctcMqENm8=;
+        b=pjXR1k8Cw6/0utnt0u922LnfCHmfDuL8hL7jxKBZ5YpVUbFN3FdcmG5DVodVLXf0sx
+         so3k8K/8UgeekyPUQwnqMfsRZ8Q8cUS2J15PBccwXi8ZuDqXF4HyP4YlVU1bXzPfRil4
+         5G2OUOeRbASuEAvEvY/5tYgPArz5QsHWeY7Rfc9W32Ic+Av+hHZxaE2ONg+PbjDjsCse
+         cF5wPPlxL0QGgPT+KNOjrI6ptM/BJRmgltGeIMB4gaH6PXfX3Grc7HX6M84zGmV1D53K
+         4ml77lXxkOXv0mcB1LuJoTHhxo530ilj0VPxakn7IJ7fRwAn/EGxdaU8IosRW1qw5tnP
+         LhPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Xiiy48Nji2zZVj+IQPl4sLZF6+QczrdZt0CeDAJi/2c=;
-        b=qJ6Cq9YIH0dUNTaWsFQCX0PNr39B/AmGnEBexxflat8LlP0gEAC+fb8+5hcgSMDh5q
-         GzHi7Opc3qkrXSUGdfTN0FxZNrF08TrBdJWWAMCGzIjxtW7DLoViUqf65hNyPbM0UuQW
-         cV6gDXf5sIfuOOKdJKxMAmhEFCkIrqVsgKQG/OM0DaSJa2qFYd5QynBPOceiK/M+WpSu
-         mj5xGE15kofYjLzlD+rZztbpf7yW2J1dIr6xT95pnK1qnbe1kIh3ACd/QtRANe+/4bxJ
-         Rkd5jIBXbfBBuQBBIvSsjzOO66g6R2XGxQ0dqPFkfY2PMb2NSd8IXbSIJD4yp5ZHyox9
-         uiUw==
-X-Gm-Message-State: AGi0PuYtxDZ0CqRNjFJEfCEOFAGXIgxPNQQzx6Y+5+EAy29Ot9FB0FH6
-        vjETjpU/Lxud+bX3KIPOvJPz4GRYkuzgCRlAcNw23SAF
-X-Google-Smtp-Source: APiQypLD/V0GA3HyDHE2XxG+KTYSp5ReF60Nut4xrKXp02wY8KUf5W3FnuG0gHx9RzVp64SFBKalMshei1bqfmqYmkM=
-X-Received: by 2002:aca:b5d5:: with SMTP id e204mr8116388oif.108.1587750658430;
- Fri, 24 Apr 2020 10:50:58 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=ayXZdQW3Ixf8tc8FDnwyxka20Av9zwLO17ctcMqENm8=;
+        b=Spqor07dOTYs0RHSAi9Z+EWzQzjvg6rR4GXQ+eBX0dDVesuGAObi+FZQxTWLHgpzkm
+         cZB+8SBS2rtmoE2LF2R6g/jVf/bWjknPEe/my0huQDOdj9dd+0EZqNKzen4tP930fVEb
+         dClwtOZcO0YS2Go+M1mu0iY+QhIld/aZSmtDYhL6xPc485a749iEGJLQUoOM+5ZZIfF9
+         nfa2/HLHOfaecTUKwCeU2AUuW8ca1MxJcaDzVY51iHnbS5cwS9stsewS42y7nyEwrmht
+         Dd0pNABsGeimV4EDp6aHYCuYBJev1nMkz3r3XFqcA9xnRZerUr86OoJSY49NOWkFQRMM
+         GRjg==
+X-Gm-Message-State: AGi0Pua2tha98l/IgF7Vz5hs+JyuA9Fl8yVwjyA121DsZrIeWWrfASTc
+        MBPd7tQ3dEiwDI/tSPXv7DqoMJmL5zhcqxNnZ1w=
+X-Google-Smtp-Source: APiQypJ6Pn1F6l618CVEgcDb4we8GOFKWN+GR0ftL8WwX+0YZABLwOdxdjxRDTsOStFFKwZClPVnPdcrbHAyrJNoFSg=
+X-Received: by 2002:a9d:644:: with SMTP id 62mr8103027otn.177.1587757115232;
+ Fri, 24 Apr 2020 12:38:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200423215501.427266-1-luiz.dentz@gmail.com>
-In-Reply-To: <20200423215501.427266-1-luiz.dentz@gmail.com>
+References: <20200423141423.BlueZ.v3.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
+In-Reply-To: <20200423141423.BlueZ.v3.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 24 Apr 2020 10:50:47 -0700
-Message-ID: <CABBYNZ+yNa2VicDFm=h5Y6Hg4E9gvVADVEchO4W781p7jyzJAQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] monitor: Remove use of base defines for 5.2
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Fri, 24 Apr 2020 12:38:23 -0700
+Message-ID: <CABBYNZ+xN4GCDq2hiuHUG9Y3bgA38W_r2nW+UBwnwyUdo9UhAQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v3] doc: Add Advertisement Monitoring API
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Miao,
 
-On Thu, Apr 23, 2020 at 2:55 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Thu, Apr 23, 2020 at 2:17 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Use the allocated value directly instead of base value + offset.
+> This patch proposes an Advertisement Monitoring API for an application to
+> register a job of monitoring ADV reports with content filter and RSSI
+> thresholds.
 > ---
->  monitor/bt.h | 117 ++++++++++++++++++++++++++-------------------------
->  1 file changed, 60 insertions(+), 57 deletions(-)
 >
-> diff --git a/monitor/bt.h b/monitor/bt.h
-> index f9ac6b180..39ca1e39a 100644
-> --- a/monitor/bt.h
-> +++ b/monitor/bt.h
-> @@ -24,11 +24,7 @@
+> Changes in v3:
+> - Introduce SupportedFeatures to reflect the features based on
+> controller's capabilities.
+> - Modify SupportedMonitorTypes to list available types of monitors.
 >
->  #include <stdint.h>
+> Changes in v2:
+> - Rename the interfaces and functions.
+> - Adopt the object manager mechanism so that a client can expose
+> multiple monitor objects and expect to get notified on whether the
+> monitor has been activated or not.
+> - Change the contract of DeviceFound so that it is called to indicate
+> the starting point of monitoring on a device instead of reporting every
+> ADV. In other words, the client is expected to monitor corresponding
+> device events.
 >
-> -#define BT_HCI_CMD_5_2         0x2060
-> -#define BT_HCI_BIT_5_2         (8 * 41) + 5
-> -#define BT_HCI_SUBEVT_5_2      0x19
-> -
-> -#define BT_LL_CMD_5_2          0x1f
-> +#define BT_HCI_CMD_BIT(_byte, _bit) ((8 * _byte) + _bit)
+>  doc/advertisement-monitor-api.txt | 134 ++++++++++++++++++++++++++++++
+>  1 file changed, 134 insertions(+)
+>  create mode 100644 doc/advertisement-monitor-api.txt
 >
->  struct bt_ll_hdr {
->         uint8_t  preamble;
-> @@ -181,7 +177,7 @@ struct bt_ll_clock_acc {
->
->  #define BT_LL_CLOCK_ACCURACY_RSP 0x1e
->
-> -#define BT_LL_CIS_REQ          BT_LL_CMD_5_2
-> +#define BT_LL_CIS_REQ          0x1f
->  struct bt_ll_cis_req {
->         uint8_t  cig;
->         uint8_t  cis;
-> @@ -204,14 +200,14 @@ struct bt_ll_cis_req {
->         uint16_t conn_event_count;
->  } __attribute__ ((packed));
->
-> -#define BT_LL_CIS_RSP          BT_LL_CMD_5_2 + 1
-> +#define BT_LL_CIS_RSP          0x20
->  struct bt_ll_cis_rsp {
->         uint8_t  offset_min[3];
->         uint8_t  offset_max[3];
->         uint16_t conn_event_count;
->  } __attribute__ ((packed));
->
-> -#define BT_LL_CIS_IND          BT_LL_CMD_5_2 + 2
-> +#define BT_LL_CIS_IND          0x21
->  struct bt_ll_cis_ind {
->         uint32_t addr;
->         uint8_t  cis_offset[3];
-> @@ -220,7 +216,7 @@ struct bt_ll_cis_ind {
->         uint16_t conn_event_count;
->  } __attribute__ ((packed));
->
-> -#define BT_LL_CIS_TERMINATE_IND        BT_LL_CMD_5_2 + 3
-> +#define BT_LL_CIS_TERMINATE_IND        0x22
->  struct bt_ll_cis_term_ind {
->         uint8_t  cig;
->         uint8_t  cis;
-> @@ -2568,8 +2564,8 @@ struct bt_hci_cmd_default_periodic_adv_sync_trans_params {
->         uint8_t  cte_type;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_READ_BUFFER_SIZE_V2      BT_HCI_CMD_5_2
-> -#define BT_HCI_BIT_LE_READ_BUFFER_SIZE_V2      BT_HCI_BIT_5_2
-> +#define BT_HCI_CMD_LE_READ_BUFFER_SIZE_V2      0x2060
-> +#define BT_HCI_BIT_LE_READ_BUFFER_SIZE_V2      BT_HCI_CMD_BIT(41, 5)
->  struct bt_hci_rsp_le_read_buffer_size_v2 {
->         uint8_t  status;
->         uint16_t acl_mtu;
-> @@ -2578,8 +2574,8 @@ struct bt_hci_rsp_le_read_buffer_size_v2 {
->         uint8_t  iso_max_pkt;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_READ_ISO_TX_SYNC         BT_HCI_CMD_5_2 + 1
-> -#define BT_HCI_BIT_LE_READ_ISO_TX_SYNC         BT_HCI_BIT_5_2 + 1
-> +#define BT_HCI_CMD_LE_READ_ISO_TX_SYNC         0x2061
-> +#define BT_HCI_BIT_LE_READ_ISO_TX_SYNC         BT_HCI_CMD_BIT(41, 6)
->  struct bt_hci_cmd_le_read_iso_tx_sync {
->         uint16_t handle;
->  } __attribute__ ((packed));
-> @@ -2592,8 +2588,8 @@ struct bt_hci_rsp_le_read_iso_tx_sync {
->         uint8_t  offset[3];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_SET_CIG_PARAMS           BT_HCI_CMD_5_2 + 2
-> -#define BT_HCI_BIT_LE_SET_CIG_PARAMS           BT_HCI_BIT_5_2 + 2
-> +#define BT_HCI_CMD_LE_SET_CIG_PARAMS           0x2062
-> +#define BT_HCI_BIT_LE_SET_CIG_PARAMS           BT_HCI_CMD_BIT(41, 7)
->  struct bt_hci_cis_params {
->         uint8_t  cis_id;
->         uint16_t m_sdu;
-> @@ -2624,8 +2620,8 @@ struct bt_hci_rsp_le_set_cig_params {
->         uint16_t handle[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_SET_CIG_PARAMS_TEST      BT_HCI_CMD_5_2 + 3
-> -#define BT_HCI_BIT_LE_SET_CIG_PARAMS_TEST      BT_HCI_BIT_5_2 + 3
-> +#define BT_HCI_CMD_LE_SET_CIG_PARAMS_TEST      0x2063
-> +#define BT_HCI_BIT_LE_SET_CIG_PARAMS_TEST      BT_HCI_CMD_BIT(42, 0)
->  struct bt_hci_cis_params_test {
->         uint8_t  cis_id;
->         uint8_t  nse;
-> @@ -2653,8 +2649,8 @@ struct bt_hci_cmd_le_set_cig_params_test {
->         struct bt_hci_cis_params_test cis[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_CREATE_CIS               BT_HCI_CMD_5_2 + 4
-> -#define BT_HCI_BIT_LE_CREATE_CIS               BT_HCI_BIT_5_2 + 4
-> +#define BT_HCI_CMD_LE_CREATE_CIS               0x2064
-> +#define BT_HCI_BIT_LE_CREATE_CIS               BT_HCI_CMD_BIT(42, 1)
->  struct bt_hci_cis {
->         uint16_t  cis_handle;
->         uint16_t  acl_handle;
-> @@ -2665,27 +2661,27 @@ struct bt_hci_cmd_le_create_cis {
->         struct bt_hci_cis cis[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_REMOVE_CIG               BT_HCI_CMD_5_2 + 5
-> -#define BT_HCI_BIT_LE_REMOVE_CIG               BT_HCI_BIT_5_2 + 5
-> +#define BT_HCI_CMD_LE_REMOVE_CIG               0x2065
-> +#define BT_HCI_BIT_LE_REMOVE_CIG               BT_HCI_CMD_BIT(42, 2)
->  struct bt_hci_cmd_le_remove_cig {
->         uint8_t  cig_id;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_ACCEPT_CIS               BT_HCI_CMD_5_2 + 6
-> -#define BT_HCI_BIT_LE_ACCEPT_CIS               BT_HCI_BIT_5_2 + 6
-> +#define BT_HCI_CMD_LE_ACCEPT_CIS               0x2066
-> +#define BT_HCI_BIT_LE_ACCEPT_CIS               BT_HCI_CMD_BIT(42, 3)
->  struct bt_hci_cmd_le_accept_cis {
->         uint16_t handle;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_REJECT_CIS               BT_HCI_CMD_5_2 + 7
-> -#define BT_HCI_BIT_LE_REJECT_CIS               BT_HCI_BIT_5_2 + 7
-> +#define BT_HCI_CMD_LE_REJECT_CIS               0x2067
-> +#define BT_HCI_BIT_LE_REJECT_CIS               BT_HCI_CMD_BIT(42, 4)
->  struct bt_hci_cmd_le_reject_cis {
->         uint16_t handle;
->         uint8_t  reason;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_CREATE_BIG               BT_HCI_CMD_5_2 + 8
-> -#define BT_HCI_BIT_LE_CREATE_BIG               BT_HCI_BIT_5_2 + 8
-> +#define BT_HCI_CMD_LE_CREATE_BIG               0x2068
-> +#define BT_HCI_BIT_LE_CREATE_BIG               BT_HCI_CMD_BIT(42, 5)
->  struct bt_hci_bis {
->         uint8_t  sdu_interval[3];
->         uint16_t sdu;
-> @@ -2705,8 +2701,8 @@ struct bt_hci_cmd_le_create_big {
->         struct bt_hci_bis bis[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_CREATE_BIG_TEST          BT_HCI_CMD_5_2 + 9
-> -#define BT_HCI_BIT_LE_CREATE_BIG_TEST          BT_HCI_BIT_5_2 + 9
-> +#define BT_HCI_CMD_LE_CREATE_BIG_TEST          0x2069
-> +#define BT_HCI_BIT_LE_CREATE_BIG_TEST          BT_HCI_CMD_BIT(42, 6)
->  struct bt_hci_bis_test {
->         uint8_t  sdu_interval[3];
->         uint16_t iso_interval;
-> @@ -2731,15 +2727,15 @@ struct bt_hci_cmd_le_create_big_test {
->         struct bt_hci_bis_test bis[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_TERM_BIG                 BT_HCI_CMD_5_2 + 10
-> -#define BT_HCI_BIT_LE_TERM_BIG                 BT_HCI_BIT_5_2 + 10
-> +#define BT_HCI_CMD_LE_TERM_BIG                 0x206a
-> +#define BT_HCI_BIT_LE_TERM_BIG                 BT_HCI_CMD_BIT(42, 7)
->  struct bt_hci_cmd_le_term_big {
->         uint8_t  big_id;
->         uint8_t  reason;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_BIG_CREATE_SYNC          BT_HCI_CMD_5_2 + 11
-> -#define BT_HCI_BIT_LE_BIG_CREATE_SYNC          BT_HCI_BIT_5_2 + 11
-> +#define BT_HCI_CMD_LE_BIG_CREATE_SYNC          0x206b
-> +#define BT_HCI_BIT_LE_BIG_CREATE_SYNC          BT_HCI_CMD_BIT(43, 0)
->  struct bt_hci_bis_sync {
->  } __attribute__ ((packed));
->
-> @@ -2754,20 +2750,20 @@ struct bt_hci_cmd_le_big_create_sync {
->         struct bt_hci_bis_sync bis[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_BIG_TERM_SYNC            BT_HCI_CMD_5_2 + 12
-> -#define BT_HCI_BIT_LE_BIG_TERM_SYNC            BT_HCI_BIT_5_2 + 12
-> +#define BT_HCI_CMD_LE_BIG_TERM_SYNC            0x206c
-> +#define BT_HCI_BIT_LE_BIG_TERM_SYNC            BT_HCI_CMD_BIT(43, 1)
->  struct bt_hci_cmd_le_big_term_sync {
->         uint8_t  big_id;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_REQ_PEER_SCA             BT_HCI_CMD_5_2 + 13
-> -#define BT_HCI_BIT_LE_REQ_PEER_SCA             BT_HCI_BIT_5_2 + 13
-> +#define BT_HCI_CMD_LE_REQ_PEER_SCA             0x206d
-> +#define BT_HCI_BIT_LE_REQ_PEER_SCA             BT_HCI_CMD_BIT(43, 2)
->  struct bt_hci_cmd_le_req_peer_sca {
->         uint16_t handle;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_SETUP_ISO_PATH           BT_HCI_CMD_5_2 + 14
-> -#define BT_HCI_BIT_LE_SETUP_ISO_PATH           BT_HCI_BIT_5_2 + 14
-> +#define BT_HCI_CMD_LE_SETUP_ISO_PATH           0x206e
-> +#define BT_HCI_BIT_LE_SETUP_ISO_PATH           BT_HCI_CMD_BIT(43, 3)
->  struct bt_hci_cmd_le_setup_iso_path {
->         uint16_t handle;
->         uint8_t  direction;
-> @@ -2780,24 +2776,31 @@ struct bt_hci_cmd_le_setup_iso_path {
->         uint8_t  codec_cfg[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_REMOVE_ISO_PATH          BT_HCI_CMD_5_2 + 15
-> -#define BT_HCI_BIT_LE_REMOVE_ISO_PATH          BT_HCI_BIT_5_2 + 15
-> +#define BT_HCI_CMD_LE_REMOVE_ISO_PATH          0x206f
-> +#define BT_HCI_BIT_LE_REMOVE_ISO_PATH          BT_HCI_CMD_BIT(43, 4)
->  struct bt_hci_cmd_le_remove_iso_path {
->         uint16_t handle;
->         uint8_t  path_dir;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_CMD_LE_ISO_TX_TEST              BT_HCI_CMD_5_2 + 16
-> -#define BT_HCI_BIT_LE_ISO_TX_TEST              BT_HCI_BIT_5_2 + 16
-> +#define BT_HCI_CMD_LE_ISO_TX_TEST              0x2070
-> +#define BT_HCI_BIT_LE_ISO_TX_TEST              BT_HCI_CMD_BIT(43, 5)
+> diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+> new file mode 100644
+> index 000000000..b8b01536a
+> --- /dev/null
+> +++ b/doc/advertisement-monitor-api.txt
+> @@ -0,0 +1,134 @@
+> +BlueZ D-Bus Advertisement Monitor API Description
+> +*************************************************
 > +
-> +#define BT_HCI_CMD_LE_ISO_RX_TEST              0x2071
-> +#define BT_HCI_BIT_LE_ISO_RX_TEST              BT_HCI_CMD_BIT(43, 6)
->
-> -#define BT_HCI_CMD_LE_ISO_RX_TEST              BT_HCI_CMD_5_2 + 17
-> -#define BT_HCI_BIT_LE_ISO_RX_TEST              BT_HCI_BIT_5_2 + 17
-> +#define BT_HCI_CMD_LE_ISO_READ_TEST_COUNTER    0x2072
-> +#define BT_HCI_BIT_LE_ISO_READ_TEST_COUNTER    BT_HCI_CMD_BIT(43, 7)
->
-> -#define BT_HCI_CMD_LE_ISO_READ_TEST_COUNTER    BT_HCI_CMD_5_2 + 18
-> -#define BT_HCI_BIT_LE_ISO_READ_TEST_COUNTER    BT_HCI_BIT_5_2 + 18
-> +#define BT_HCI_CMD_LE_ISO_TEST_END             0x2073
-> +#define BT_HCI_BIT_LE_ISO_TEST_END             BT_HCI_CMD_BIT(44, 0)
->
-> -#define BT_HCI_CMD_LE_ISO_TEST_END             BT_HCI_CMD_5_2 + 19
-> -#define BT_HCI_BIT_LE_ISO_TEST_END             BT_HCI_BIT_5_2 + 19
-> +#define BT_HCI_CMD_LE_SET_HOST_FEATURE         0x2074
-> +#define BT_HCI_BIT_LE_SET_HOST_FEATURE         BT_HCI_CMD_BIT(44, 1)
-> +struct bt_hci_cmd_le_set_host_feature {
-> +       uint8_t  bit_number;
-> +       uint8_t  bit_value;
-> +} __packed;
->
->  #define BT_HCI_EVT_INQUIRY_COMPLETE            0x01
->  struct bt_hci_evt_inquiry_complete {
-> @@ -3155,7 +3158,7 @@ struct bt_hci_evt_keypress_notify {
->
->  #define BT_HCI_EVT_REMOTE_HOST_FEATURES_NOTIFY 0x3d
->  struct bt_hci_evt_remote_host_features_notify {
-> -       uint8_t  bdaddr[6];
-> +uint8_t  bdaddr[6];
->         uint8_t  features[8];
->  } __attribute__ ((packed));
->
-> @@ -3498,7 +3501,7 @@ struct bt_hci_evt_le_per_adv_sync_trans_rec {
->         uint8_t  clock_accuracy;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_CIS_ESTABLISHED          BT_HCI_SUBEVT_5_2
-> +#define BT_HCI_EVT_LE_CIS_ESTABLISHED                  0x19
->  struct bt_hci_evt_le_cis_established {
->         uint8_t  status;
->         uint16_t conn_handle;
-> @@ -3518,7 +3521,7 @@ struct bt_hci_evt_le_cis_established {
->         uint16_t interval;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_CIS_REQ                  BT_HCI_SUBEVT_5_2 + 1
-> +#define BT_HCI_EVT_LE_CIS_REQ                          0x1a
->  struct bt_hci_evt_le_cis_req {
->         uint16_t acl_handle;
->         uint16_t cis_handle;
-> @@ -3526,7 +3529,7 @@ struct bt_hci_evt_le_cis_req {
->         uint8_t  cis_id;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_BIG_COMPLETE             BT_HCI_SUBEVT_5_2 + 2
-> +#define BT_HCI_EVT_LE_BIG_COMPLETE                     0x1b
->  struct bt_hci_evt_le_big_complete {
->         uint8_t  status;
->         uint8_t  big_id;
-> @@ -3537,13 +3540,13 @@ struct bt_hci_evt_le_big_complete {
->         uint16_t handle[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_BIG_TERMINATE            BT_HCI_SUBEVT_5_2 + 3
-> +#define BT_HCI_EVT_LE_BIG_TERMINATE                    0x1c
->  struct bt_hci_evt_le_big_terminate {
->         uint8_t  reason;
->         uint8_t  big_id;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED    BT_HCI_SUBEVT_5_2 + 4
-> +#define BT_HCI_EVT_LE_BIG_SYNC_ESTABILISHED            0x1d
->  struct bt_hci_evt_le_big_sync_estabilished {
->         uint8_t  status;
->         uint8_t  big_id;
-> @@ -3552,13 +3555,13 @@ struct bt_hci_evt_le_big_sync_estabilished {
->         uint16_t handle[0];
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_BIG_SYNC_LOST            BT_HCI_SUBEVT_5_2 + 5
-> +#define BT_HCI_EVT_LE_BIG_SYNC_LOST                    0x1e
->  struct bt_hci_evt_le_big_sync_lost {
->         uint8_t  big_id;
->         uint8_t  reason;
->  } __attribute__ ((packed));
->
-> -#define BT_HCI_EVT_LE_REQ_PEER_SCA_COMPLETE    BT_HCI_SUBEVT_5_2 + 6
-> +#define BT_HCI_EVT_LE_REQ_PEER_SCA_COMPLETE            0x1f
->  struct bt_hci_evt_le_req_peer_sca_complete {
->         uint8_t  status;
->         uint16_t handle;
-> --
-> 2.25.3
+> +This API allows an client to specify a job of monitoring advertisements by
+> +registering the root of hierarchy and then exposing advertisement monitors
+> +under the root with filtering conditions, thresholds of RSSI and timers
+> +of RSSI thresholds.
+> +
+> +Once a monitoring job is activated by BlueZ, the client can expect to get
+> +notified on the targeted advertisements no matter if there is an ongoing
+> +discovery session (a discovery session is started/stopped with methods in
+> +org.bluez.Adapter1 interface).
+> +
+> +Advertisement Monitor hierarchy
+> +===============================
+> +Service                org.bluez
+> +Interface      org.bluez.AdvertisementMonitor1
+> +Object path    freely definable
+> +
+> +Methods                void Release() [noreply]
+> +
+> +                       This gets called as a signal for a client to perform
+> +                       clean-up when (1)a monitor cannot be activated after it
+> +                       was exposed or (2)a monitor has been deactivated.
+> +
+> +               void Activate() [noreply]
+> +
+> +                       After a monitor was exposed, this gets called as a
+> +                       signal for client to get acknowledged when a monitor
+> +                       has been activated, so the client can expect to receive
+> +                       calls on DeviceFound() or DeviceLost().
+> +
+> +               void DeviceFound(object device) [noreply]
+> +
+> +                       This gets called to notify the client of finding the
+> +                       targeted device. Once receiving the call, the client
+> +                       should start to monitor the corresponding device to
+> +                       retrieve the changes on RSSI and advertisement content.
+> +
+> +               void DeviceLost(object device) [noreply]
+> +
+> +                       This gets called to notify the client of losing the
+> +                       targeted device. Once receiving this call, the client
+> +                       should stop monitoring the corresponding device.
+> +
+> +Properties     uint8 Type [read-only]
+> +
+> +                       The type of the monitor. See SupportedMonitorTypes in
+> +                       org.bluez.AdvertisementMonitorManager1 for the available
+> +                       options.
+> +
+> +               (Int16, Uint16, Int16, Uint16) RSSIThreshholdsAndTimers [read-only, optional]
+> +
+> +                       This contains HighRSSIThreshold, HighRSSIThresholdTimer,
+> +                       LowRSSIThreshold, LowRSSIThresholdTimer in order. The
+> +                       unit of HighRSSIThreshold and LowRSSIThreshold is dBm.
+> +                       The unit of HighRSSIThresholdTimer and
+> +                       LowRSSIThresholdTimer is second.
+> +
+> +                       If these are provided, RSSI would be used as a factor to
+> +                       notify the client of whether a device stays in range or
+> +                       move out of range. A device is considered in-range when
+> +                       the RSSIs of the received advertisement(s) during
+> +                       HighRSSIThresholdTimer seconds exceed HighRSSIThreshold.
+> +                       Likewise, a device is considered out-of-range when the
+> +                       RSSIs of the received advertisement(s) during
+> +                       LowRSSIThresholdTimer do not reach LowRSSIThreshold.
+> +
+> +               array{(uint8, uint8, string)} Patterns [read-only, optional]
+> +
+> +                       If Type is set to 0x01, this must exist and has at least
+> +                       one entry in the array.
+> +
+> +                       The structure of a pattern contains the following.
+> +                       uint8 start_position
+> +                               The index in an AD data field where the search
+> +                               should start. The beginning of an AD data field
+> +                               is index 0.
+> +                       uint8 AD_data_type
+> +                               See https://www.bluetooth.com/specifications/
+> +                               assigned-numbers/generic-access-profile/ for
+> +                               the possible allowed value.
+> +                       string content_of_pattern
+> +                               This is the value of the pattern.
+> +
+> +=======================================
+> +Service                org.bluez
+> +Interface      org.bluez.AdvertisementMonitorManager1
+> +Object path    /org/bluez/{hci0,hci1,...}
+> +Methods                void RegisterApplication(object application)
+> +
+> +                       This registers a hierarchy of advertisement monitors.
+> +                       The application object path together with the D-Bus
+> +                       system bus connection ID define the identification of
+> +                       the application registering advertisement monitors.
+> +
+> +                       Possible errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.AlreadyExists
+> +
+> +               void UnregisterApplication(object application)
+> +
+> +                       This unregisters advertisement monitors that have been
+> +                       previously registered. The object path parameter must
+> +                       match the same value that has been used on
+> +                       registration.
+> +
+> +                       Possible errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.DoesNotExist
+> +
+> +Properties     array{uint8} SupportedMonitorTypes [read-only]
+> +
+> +                       This lists the supported types of advertisement
+> +                       monitors. An application should check this before
+> +                       instantiate and expose an object of
+> +                       org.bluez.AdvertisementMonitor1.
+> +
+> +                       Possible values for monitor types:
+> +
+> +                       0x01    Patterns with logic OR applied. With this type,
+> +                               property "Patterns" must exist and has at least
+> +                               one pattern.
 
-Pushed.
+Perhaps we should also have this as string, D-Bus don't really support
+enums and it makes the types easier to debug if we express in them as
+strings.
+
+> +
+> +               array{string} SupportedFeatures [read-only]
+> +
+> +                       This lists the features of advertisement monitoring
+> +                       supported by BlueZ.
+> +
+> +                       Possible values for features:
+> +
+> +                       "controller-based-monitor-by-patterns"
+> +                               If the controller is capable of performing
+> +                               advertisement monitoring by patterns, BlueZ
+> +                               would offload the patterns to the controller to
+> +                               reduce power consumption.
+> --
+> 2.24.1
+
+Other than that it looks good to me, the only thing Id mark this
+interface as experimental for now so we still allow changes if we deem
+necessary.
+
 
 -- 
 Luiz Augusto von Dentz
