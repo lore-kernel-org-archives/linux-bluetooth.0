@@ -7,118 +7,93 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B4BC54FD0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0B7C2BA1A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:36:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C25092076C
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56C292076C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:36:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ddkdh2hF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQbJOcVJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbgDYCfR (ORCPT
+        id S1726059AbgDYCgx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Apr 2020 22:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43540 "EHLO
+        Fri, 24 Apr 2020 22:36:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726040AbgDYCfQ (ORCPT
+        with ESMTP id S1726032AbgDYCgw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Apr 2020 22:35:16 -0400
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3364C09B049
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:16 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id p13so5698007qvt.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:16 -0700 (PDT)
+        Fri, 24 Apr 2020 22:36:52 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07CC09B049
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:36:52 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id 20so12340503qkl.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:36:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
-        bh=1mC1sy1xQp39NZKzkPxRGurbngG3lDE6gmrzx5dJWlY=;
-        b=Ddkdh2hFecyyTPb3KR3ekhMxWq9MhOltTwYKg4n2eUdnFz7ovtFbzpfVyQrUI6s2eo
-         D+vlr+WOpu8kQyR7FXdKwU84kbQWpAY9GqvKET+OTFf0mpiz0uNQb/J3E2GwVrooLoO+
-         +DXIZQJjTyf49sfrY0RjDm5xnNG7vSs2R8zuxJ8BVJHrskcgFGHAHHWhv/nLvgB7gisH
-         I4I3zrwuQQDrbk+TmXdwGz04W19XOcHU8UDkX0ysPvxqCPs180siF9jOCQ8YoDOKJTRo
-         LaR/MzuukjTo4XDo9eum0PVxowaUbIIehx3UfpfAS7lGWjhXZCdCz6zpuNBnmSCA8zQq
-         Iymw==
+        bh=fj/HfCMmYa7CjTav7QUOLpKDuho58DutbBp0d7F2LgU=;
+        b=GQbJOcVJ8mJK4YioOjGcyRXHTCtq9h1KlEuJB+K5gDF1AU5vuXRjBR5+sOuQp2lcR7
+         gRCveQ84KgUjzj7HRrtjNCYIocOA3GF8FuGNdMjruIB5mliD2Mx81IJ3EgTCJZYo65F+
+         TfsrZO+sod0eR2DCklPRKD66r3Nfl+lUnudFotcv/dB8GjnJqovB9khNLJUuiHnYd2Pi
+         x1jg6oVuwQA1v6jApzp4SUYDPnNM11MWgt4+TfmBIBXuMVyGwVF2fJgNcx4PIaVQo6EK
+         bWosaVpO/y6NL1Wa1Y8lZs8a8RpDhJPW4JuTUjaVTmoFiVmFqUVfhemr5GPBgrBn2ibf
+         ealQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :in-reply-to:references;
-        bh=1mC1sy1xQp39NZKzkPxRGurbngG3lDE6gmrzx5dJWlY=;
-        b=izZDvpAP2iX5wEheXKLDcBSRsI+9WRDwE12hw5yd3g4+hwTG1C+3c2fUyVcXSx0lZx
-         FLg8AnUfBGayBEbgVTrU5GmlYYZOfw8uzBPb/KKpZ+vPiLUPJEY3hfZKQRFVzD+i6z67
-         L3i7z2vL30iAQoR5I0hG58nIOu5oM/jrG+9ZcnavBk+H+hL6JTPFuoRH7mF18U0KHI7j
-         FtSjIc13nOeZ0Dn8yp/0fEoCcHQ5PoHcNEEeid9mcROHT08F6LUCpBotAs+gZycq6mpX
-         Up8UZWaQvwgPlxv94+W1xGvBEWppH6sjVUCmXgqT9a8qbN0U+04jmlIGMCOEDV7+NP+3
-         Socw==
-X-Gm-Message-State: AGi0PuYvEzEid9dRbzGj9YYFO5o8tVVP/PIDemsVX23sFor7N6rBzL5p
-        Y5OaqAPVeyHcJnCFebhk83mSMyxuNus=
-X-Google-Smtp-Source: APiQypJHQAECscnBzTaj4w8xN78zkeIJTbNzkOURCjItJeOTrJcXUJLwrNH3bL1YNYT8V86mHx/Hfw==
-X-Received: by 2002:a0c:ee25:: with SMTP id l5mr5059063qvs.5.1587782115868;
-        Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.252.99.182])
-        by smtp.gmail.com with ESMTPSA id d69sm4931621qke.111.2020.04.24.19.35.15
+        bh=fj/HfCMmYa7CjTav7QUOLpKDuho58DutbBp0d7F2LgU=;
+        b=BBC97h1tez7BWkwOWbnyfgko3z4XbikgXVak+ynduGLr8b52dEqCPx4nUaz1scUxqc
+         Wurw8Fx6W75MoTKB2sNMCn24okISlHwmBbf6gdswvDRecfwSzK2Po7pDEiTW84vBGAIB
+         afxF54PmbOa9Ntv2mSGztFVDue78k5i34oTuA2GJ4/wMlpCMxMkJv57xxO4Vvjding4K
+         aLcvsvE2Gw0/fsLP4B/SD522WWGfJ0pQLp+27a78rXjtVZdFDRfQq9ixEIZxgUOMoZxy
+         m0Nn1iVOdRzROZ3GY6aX1ngeAvEyQRA28TVqxdrDGHW8jp3oTAWu2cO48xFITNNIRnOI
+         ehbg==
+X-Gm-Message-State: AGi0PuZGwks/+GOr019VKUWsc/txLwhSuacsrp1E92+goKqdhPzkwUl6
+        uhketgrJTgqF6nilVfAiIp1aRk8SmBM=
+X-Google-Smtp-Source: APiQypKsLsMfFkSgzjhc4Pft9axO+ueDF4z1QicJU6pV+n84WYmptd+tarOPzGDD46/49bABE1ohxA==
+X-Received: by 2002:a37:7d0:: with SMTP id 199mr10351575qkh.499.1587782211711;
+        Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
+Received: from [172.17.0.2] ([52.177.130.16])
+        by smtp.gmail.com with ESMTPSA id h19sm5269055qtk.78.2020.04.24.19.36.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
-Message-ID: <5ea3a1e3.1c69fb81.90b5b.08ee@mx.google.com>
-Date:   Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3169691382207792878=="
+        Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
+Message-ID: <5ea3a243.1c69fb81.81de.2b47@mx.google.com>
+Date:   Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3678202515449161327=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: [3/3] Test patch #3: OPEN_BRACE
-In-Reply-To: <20200424231026.127164-3-tedd.an@linux.intel.com>
-References: <20200424231026.127164-3-tedd.an@linux.intel.com>
+Subject: RE: Test patch: build fail
+In-Reply-To: <20200424231042.127237-1-tedd.an@linux.intel.com>
+References: <20200424231042.127237-1-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3169691382207792878==
-Content-Type: text/plain; charset="us-ascii"
+--===============3678202515449161327==
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 
+ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGxheSB0byB0aGlz
+IGVtYWlsIQoKRGVhciBzdWJtaXR0ZXIsCgpUaGFuayB5b3UgZm9yIHN1Ym1pdHRpbmcgdGhlIHBh
+dGNoZXMgdG8gdGhlIGxpbnV4IGJsdWV0b290aCBtYWlsaW5nIGxpc3QuCldoaWxlIHdlIGFyZSBw
+cmVwYXJpbmcgZm9yIHJldmlld2luZyB0aGUgcGF0Y2hlcywgd2UgZm91bmQgdGhlIGZvbGxvd2lu
+Zwppc3N1ZS93YXJuaW5nLgoKClRlc3QgUmVzdWx0OgpDaGVja2J1aWxkIEZhaWxlZAoKUGF0Y2gg
+U2VyaWVzOgpUZXN0IHBhdGNoOiBidWlsZCBmYWlsCgoKT3V0cHV0czoKYXI6IGB1JyBtb2RpZmll
+ciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2Rp
+ZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBt
+b2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1
+JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6
+IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykK
+dG9vbHMvYnRwY2xpZW50LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL2J0cGNsaWVu
+dC5jOjMyMTg6MTU6IGVycm9yOiBleHBlY3RlZCDigJg74oCZIGJlZm9yZSDigJhyZXR1cm7igJkK
+IDMyMTggfCAgbF9tYWluX2V4aXQoKQogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAg
+ICAgICAgICAgICAgOwogMzIxOSB8IAogMzIyMCB8ICByZXR1cm4gRVhJVF9TVUNDRVNTOwogICAg
+ICB8ICB+fn5+fn4gICAgICAgIAptYWtlWzFdOiAqKiogW01ha2VmaWxlOjY3OTE6IHRvb2xzL2J0
+cGNsaWVudC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDAxMDogYWxsXSBFcnJvciAy
+CgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgK
 
-This is automated email and please do not replay to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-
-Test Result:
-Checkpatch Failed
-
-Patch Title:
-[3/3] Test patch #3: OPEN_BRACE
-
-Output:
-ERROR:OPEN_BRACE: that open brace { should be on the previous line
-#17: FILE: tools/btpclient.c:230:
- 	for (entry = l_queue_get_entries(adapters); entry;
-+							entry = entry->next)
-+	{
-
-- total: 1 errors, 0 warnings, 9 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-For more details about BlueZ coding style guide, please find it
-in doc/coding-style.txt
-
----
-Regards,
-Linux Bluetooth
-
---===============3169691382207792878==--
+--===============3678202515449161327==--
