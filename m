@@ -7,93 +7,103 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0B7C2BA1A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182A7C54FCB
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 12:04:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56C292076C
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E72EE20714
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 12:04:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQbJOcVJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qk0W3yHD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726059AbgDYCgx (ORCPT
+        id S1726073AbgDYMEI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Apr 2020 22:36:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
+        Sat, 25 Apr 2020 08:04:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbgDYCgw (ORCPT
+        with ESMTP id S1725925AbgDYMEI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Apr 2020 22:36:52 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07CC09B049
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:36:52 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id 20so12340503qkl.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:36:52 -0700 (PDT)
+        Sat, 25 Apr 2020 08:04:08 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A19C09B04B
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2020 05:04:07 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id g13so14665666wrb.8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2020 05:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
-        bh=fj/HfCMmYa7CjTav7QUOLpKDuho58DutbBp0d7F2LgU=;
-        b=GQbJOcVJ8mJK4YioOjGcyRXHTCtq9h1KlEuJB+K5gDF1AU5vuXRjBR5+sOuQp2lcR7
-         gRCveQ84KgUjzj7HRrtjNCYIocOA3GF8FuGNdMjruIB5mliD2Mx81IJ3EgTCJZYo65F+
-         TfsrZO+sod0eR2DCklPRKD66r3Nfl+lUnudFotcv/dB8GjnJqovB9khNLJUuiHnYd2Pi
-         x1jg6oVuwQA1v6jApzp4SUYDPnNM11MWgt4+TfmBIBXuMVyGwVF2fJgNcx4PIaVQo6EK
-         bWosaVpO/y6NL1Wa1Y8lZs8a8RpDhJPW4JuTUjaVTmoFiVmFqUVfhemr5GPBgrBn2ibf
-         ealQ==
+        h=message-id:subject:from:to:date:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=fSauoZcALwfeTaeC6VG+uGNIgG+Zcdx8fX15Nm5SZws=;
+        b=Qk0W3yHDzbx8mpMQv9Qnc3+uYDoe3LFPfxGyOY37RjgraCKr02pwCzgwLvRyg2Lf4H
+         m+z2xPZfhF08GAG1uhtru9g/w4nskNqox+dRRlkK/q4UltEU5ZVsp0O3ETgByAydwk8G
+         0/QYGAFbeZtqEWCRcVX69f7CgW+na/HdEX64suVJzvR7byX4JOwiS0P+eDO2AUl+ZBQj
+         cnJf4Fu0J6mXldZsYbQjZPaSIw5AZyUzqMf/mCptZDBR57R4SsNkR1P7B/hVc5QW2Bfy
+         rf9gPqsJKvLvE3WFImrkN9s3nSMpxYxgdPP9QGSjnsiLiYDNIisqcAEn6Mmi+IcC8J1M
+         zL0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :in-reply-to:references;
-        bh=fj/HfCMmYa7CjTav7QUOLpKDuho58DutbBp0d7F2LgU=;
-        b=BBC97h1tez7BWkwOWbnyfgko3z4XbikgXVak+ynduGLr8b52dEqCPx4nUaz1scUxqc
-         Wurw8Fx6W75MoTKB2sNMCn24okISlHwmBbf6gdswvDRecfwSzK2Po7pDEiTW84vBGAIB
-         afxF54PmbOa9Ntv2mSGztFVDue78k5i34oTuA2GJ4/wMlpCMxMkJv57xxO4Vvjding4K
-         aLcvsvE2Gw0/fsLP4B/SD522WWGfJ0pQLp+27a78rXjtVZdFDRfQq9ixEIZxgUOMoZxy
-         m0Nn1iVOdRzROZ3GY6aX1ngeAvEyQRA28TVqxdrDGHW8jp3oTAWu2cO48xFITNNIRnOI
-         ehbg==
-X-Gm-Message-State: AGi0PuZGwks/+GOr019VKUWsc/txLwhSuacsrp1E92+goKqdhPzkwUl6
-        uhketgrJTgqF6nilVfAiIp1aRk8SmBM=
-X-Google-Smtp-Source: APiQypKsLsMfFkSgzjhc4Pft9axO+ueDF4z1QicJU6pV+n84WYmptd+tarOPzGDD46/49bABE1ohxA==
-X-Received: by 2002:a37:7d0:: with SMTP id 199mr10351575qkh.499.1587782211711;
-        Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
-Received: from [172.17.0.2] ([52.177.130.16])
-        by smtp.gmail.com with ESMTPSA id h19sm5269055qtk.78.2020.04.24.19.36.51
+        h=x-gm-message-state:message-id:subject:from:to:date:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=fSauoZcALwfeTaeC6VG+uGNIgG+Zcdx8fX15Nm5SZws=;
+        b=SYpVUS0EsHnLR5BBlDU9ybVhphYJiqE/ZDTIwaP5Qs4Pz08xQRe94n8hENKGHYWeKv
+         4U3yzhnXCvYgiqK76Vc3jb40iF/LBmNHjgQq/XXyr8zyeAFpkuNmOBWfbjYlWeK3fKPe
+         6S/kq9ujmGB3qHM4kp+9VfyhClXH7avNX0FeSYHNhh0IfAR0E4yWx4Gjn3oLcbUHgkKF
+         se3xAw4xUrsmT21FLZJIf3qmm9SMvWcCxQszK2IsZQwy3LgbMSKg5gFrU9PRgahduMDr
+         MenlXxIBaD5yBlDEICQiftj0xViRlCrsOOGSiCVibuqdxhd6BPqEDyxsn7OkyueEH24B
+         fCyg==
+X-Gm-Message-State: AGi0PubOLNM+NUGEVrlkQCH+PSLlS6hbBkdUPwy0rgfRqP1V9wkSl0Ic
+        AS3dKWS/Bi7nA96WmsPrwCaTVYkFKa4=
+X-Google-Smtp-Source: APiQypIfr1peIx0pZJ1yQ3O7X1HwshnPtfBuXyYK3mqAzseRWRvw8b1hhRuKa4UvzxRMLjSeQ60b4A==
+X-Received: by 2002:a5d:4404:: with SMTP id z4mr16449488wrq.316.1587816246123;
+        Sat, 25 Apr 2020 05:04:06 -0700 (PDT)
+Received: from black-betty (lfbn-idf1-1-1445-133.w90-90.abo.wanadoo.fr. [90.90.130.133])
+        by smtp.gmail.com with ESMTPSA id k6sm7410694wma.19.2020.04.25.05.04.04
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
-Message-ID: <5ea3a243.1c69fb81.81de.2b47@mx.google.com>
-Date:   Fri, 24 Apr 2020 19:36:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3678202515449161327=="
+        Sat, 25 Apr 2020 05:04:05 -0700 (PDT)
+Message-ID: <c56e5983093556f4fecf3a788c082639287bd332.camel@gmail.com>
+Subject: 0b05:1825 - HSP/HFP - command to route SCO to HCI
+From:   Nicolas Fabbro <nicolas.fabbro@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Date:   Sat, 25 Apr 2020 14:03:40 +0200
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: Test patch: build fail
-In-Reply-To: <20200424231042.127237-1-tedd.an@linux.intel.com>
-References: <20200424231042.127237-1-tedd.an@linux.intel.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3678202515449161327==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hello, 
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGxheSB0byB0aGlz
-IGVtYWlsIQoKRGVhciBzdWJtaXR0ZXIsCgpUaGFuayB5b3UgZm9yIHN1Ym1pdHRpbmcgdGhlIHBh
-dGNoZXMgdG8gdGhlIGxpbnV4IGJsdWV0b290aCBtYWlsaW5nIGxpc3QuCldoaWxlIHdlIGFyZSBw
-cmVwYXJpbmcgZm9yIHJldmlld2luZyB0aGUgcGF0Y2hlcywgd2UgZm91bmQgdGhlIGZvbGxvd2lu
-Zwppc3N1ZS93YXJuaW5nLgoKClRlc3QgUmVzdWx0OgpDaGVja2J1aWxkIEZhaWxlZAoKUGF0Y2gg
-U2VyaWVzOgpUZXN0IHBhdGNoOiBidWlsZCBmYWlsCgoKT3V0cHV0czoKYXI6IGB1JyBtb2RpZmll
-ciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2Rp
-ZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBt
-b2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1
-JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6
-IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykK
-dG9vbHMvYnRwY2xpZW50LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL2J0cGNsaWVu
-dC5jOjMyMTg6MTU6IGVycm9yOiBleHBlY3RlZCDigJg74oCZIGJlZm9yZSDigJhyZXR1cm7igJkK
-IDMyMTggfCAgbF9tYWluX2V4aXQoKQogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAg
-ICAgICAgICAgICAgOwogMzIxOSB8IAogMzIyMCB8ICByZXR1cm4gRVhJVF9TVUNDRVNTOwogICAg
-ICB8ICB+fn5+fn4gICAgICAgIAptYWtlWzFdOiAqKiogW01ha2VmaWxlOjY3OTE6IHRvb2xzL2J0
-cGNsaWVudC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDAxMDogYWxsXSBFcnJvciAy
-CgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgK
+I'm trying to get my bluetooth headset working under HSP/HFP.
+Currently, I can connect my headset to the bluetooth adapter, listen to
+audio without issues using A2DP profile. However, when switching to
+HSP/HFP, audio and mic do not work. For instance, when trying to
+troubleshoot using the parecord command, the stream seems to get stuck
+at a very early stage (after 0.028 sec). When opening the resulting
+test file, it's empty.
 
---===============3678202515449161327==--
+After investigating, my current conclusion is that I need to use a
+hardware specific hcitool command in order to route SCO traffic to the
+HCI interface. Nevertheless, I could not find the command to use for my
+bluetooth chipset. I am therefore contacting the mailing list to find
+out if anyone would know it by any chance.
+
+Hardware information:
+- Motherboard : Asus Strix Z270E Gaming
+- Bluetooth chipset : ID 0b05:1825 ASUSTek Computer, Inc. Qualcomm
+Bluetooth 4.1
+
+Software information : 
+- Void Linux
+- BlueZ v5.54
+- Pulseaudio v13.0
+
+Thank you very much in advance for your help, I'll happily provide
+additional information if needed.
+
+Best Regards,
+Nicolas
+
+
