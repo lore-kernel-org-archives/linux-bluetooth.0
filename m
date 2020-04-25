@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C41C55191
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B4BC54FD0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AC45208E4
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C25092076C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 02:35:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="po7WQy+I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ddkdh2hF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726062AbgDYCfP (ORCPT
+        id S1726076AbgDYCfR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Apr 2020 22:35:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
+        Fri, 24 Apr 2020 22:35:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726040AbgDYCfP (ORCPT
+        with ESMTP id S1726040AbgDYCfQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Apr 2020 22:35:15 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46344C09B049
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id c23so9132825qtp.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
+        Fri, 24 Apr 2020 22:35:16 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3364C09B049
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:16 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id p13so5698007qvt.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2020 19:35:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
-        bh=Q2o7ZMLlkQRfzRhlfJp1sNabPYuZVnsCh+T9Oe5IaHI=;
-        b=po7WQy+IMECWLQ5bTHcfuJOa3u0VAcZ7PPtgf1cWnjMBG8BFL30IsWf4qm0OVjz2X0
-         p0Gj9Qh37XARo8xlOwxyxZTpDLw/rJos5ypn0M5KYZUeJsuwkO7Jnec0M1M00ri/KUN8
-         ekOxN+h4+GKaTB570Yj8OZMHFus/+M/FqzGLkUrqOvLOfV8FXPIIZZfJc32/5F8BGjjH
-         gEKFtbQ13rxXayogmTGWvmvNkQB5DdjfdlnIH8O67giplrCo31LxwiRR8PdxdUIVflRe
-         lognRIEf0qqNv6AqqppfhXU30/8fCruvJXwWFgav4EvtL22rwkKblucheVjRF3FROa78
-         jOwQ==
+        bh=1mC1sy1xQp39NZKzkPxRGurbngG3lDE6gmrzx5dJWlY=;
+        b=Ddkdh2hFecyyTPb3KR3ekhMxWq9MhOltTwYKg4n2eUdnFz7ovtFbzpfVyQrUI6s2eo
+         D+vlr+WOpu8kQyR7FXdKwU84kbQWpAY9GqvKET+OTFf0mpiz0uNQb/J3E2GwVrooLoO+
+         +DXIZQJjTyf49sfrY0RjDm5xnNG7vSs2R8zuxJ8BVJHrskcgFGHAHHWhv/nLvgB7gisH
+         I4I3zrwuQQDrbk+TmXdwGz04W19XOcHU8UDkX0ysPvxqCPs180siF9jOCQ8YoDOKJTRo
+         LaR/MzuukjTo4XDo9eum0PVxowaUbIIehx3UfpfAS7lGWjhXZCdCz6zpuNBnmSCA8zQq
+         Iymw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :in-reply-to:references;
-        bh=Q2o7ZMLlkQRfzRhlfJp1sNabPYuZVnsCh+T9Oe5IaHI=;
-        b=cOt2xTfaHxVy5hSRPpbmwpXnKLWw2B4+fsvVIwXY/XBl/FEAAcOUfMfEIXHTA3jqny
-         uQUTg1bjGYQMDfXHcZLtP7SReI5uLFDmF7f2Q8xb3oHwjCHvI9YS8ChysACq7QUQYbMw
-         8XuaKO6eqlT6X2944P315tyGdzKuO3Er7cscDsn0LrHQ0buTxEeSAQJe5Unrr6B38il/
-         TBXOT6quqVQmW1ADOWNaXIWfYHg9hW8DJKA0csxhvGEslFGfxtPbb6Jgnl3HisLAjCTF
-         x4PXdpRPM+3PWoHyzPDV8Eg6YTPCJd7LDynnGpaxEZTjNPZy1WrwVOvAp2tLG5B38Kuw
-         8ySw==
-X-Gm-Message-State: AGi0PubELBQnA9jBDwuMfWMiQ2qSfJga3JRx/2VuaZNKFbZhHG0+EUYs
-        U7i+2pVnRwda05EM+3HjEbP8o1hPCm0=
-X-Google-Smtp-Source: APiQypJGgawMTbhoG1W7vQ60dOPU33fkzoyNbxhI85ZJu7YykLOKWhN5W40Hi8NrvMKbsn+9Kes8Sw==
-X-Received: by 2002:aed:31c7:: with SMTP id 65mr13116285qth.150.1587782114258;
-        Fri, 24 Apr 2020 19:35:14 -0700 (PDT)
+        bh=1mC1sy1xQp39NZKzkPxRGurbngG3lDE6gmrzx5dJWlY=;
+        b=izZDvpAP2iX5wEheXKLDcBSRsI+9WRDwE12hw5yd3g4+hwTG1C+3c2fUyVcXSx0lZx
+         FLg8AnUfBGayBEbgVTrU5GmlYYZOfw8uzBPb/KKpZ+vPiLUPJEY3hfZKQRFVzD+i6z67
+         L3i7z2vL30iAQoR5I0hG58nIOu5oM/jrG+9ZcnavBk+H+hL6JTPFuoRH7mF18U0KHI7j
+         FtSjIc13nOeZ0Dn8yp/0fEoCcHQ5PoHcNEEeid9mcROHT08F6LUCpBotAs+gZycq6mpX
+         Up8UZWaQvwgPlxv94+W1xGvBEWppH6sjVUCmXgqT9a8qbN0U+04jmlIGMCOEDV7+NP+3
+         Socw==
+X-Gm-Message-State: AGi0PuYvEzEid9dRbzGj9YYFO5o8tVVP/PIDemsVX23sFor7N6rBzL5p
+        Y5OaqAPVeyHcJnCFebhk83mSMyxuNus=
+X-Google-Smtp-Source: APiQypJHQAECscnBzTaj4w8xN78zkeIJTbNzkOURCjItJeOTrJcXUJLwrNH3bL1YNYT8V86mHx/Hfw==
+X-Received: by 2002:a0c:ee25:: with SMTP id l5mr5059063qvs.5.1587782115868;
+        Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
 Received: from [172.17.0.2] ([52.252.99.182])
-        by smtp.gmail.com with ESMTPSA id l8sm5365259qtl.86.2020.04.24.19.35.13
+        by smtp.gmail.com with ESMTPSA id d69sm4931621qke.111.2020.04.24.19.35.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2020 19:35:13 -0700 (PDT)
-Message-ID: <5ea3a1e1.1c69fb81.ca350.3189@mx.google.com>
-Date:   Fri, 24 Apr 2020 19:35:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7964464292591789048=="
+        Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
+Message-ID: <5ea3a1e3.1c69fb81.90b5b.08ee@mx.google.com>
+Date:   Fri, 24 Apr 2020 19:35:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3169691382207792878=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: [2/3] Test patch #2: CODE_INDENT, LEADING_SPACE
-In-Reply-To: <20200424231026.127164-2-tedd.an@linux.intel.com>
-References: <20200424231026.127164-2-tedd.an@linux.intel.com>
+Subject: RE: [3/3] Test patch #3: OPEN_BRACE
+In-Reply-To: <20200424231026.127164-3-tedd.an@linux.intel.com>
+References: <20200424231026.127164-3-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7964464292591789048==
+--===============3169691382207792878==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -91,24 +91,19 @@ Test Result:
 Checkpatch Failed
 
 Patch Title:
-[2/3] Test patch #2: CODE_INDENT, LEADING_SPACE
+[3/3] Test patch #3: OPEN_BRACE
 
 Output:
-ERROR:CODE_INDENT: code indent should use tabs where possible
-#19: FILE: tools/btpclient.c:65:
-+        struct l_queue *devices;$
+ERROR:OPEN_BRACE: that open brace { should be on the previous line
+#17: FILE: tools/btpclient.c:230:
+ 	for (entry = l_queue_get_entries(adapters); entry;
++							entry = entry->next)
++	{
 
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#19: FILE: tools/btpclient.c:65:
-+        struct l_queue *devices;$
-
-- total: 1 errors, 1 warnings, 8 lines checked
+- total: 1 errors, 0 warnings, 9 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
-
-NOTE: Whitespace errors detected.
-      You may wish to use scripts/cleanpatch or scripts/cleanfile
 
 Your patch has style problems, please review.
 
@@ -126,4 +121,4 @@ in doc/coding-style.txt
 Regards,
 Linux Bluetooth
 
---===============7964464292591789048==--
+--===============3169691382207792878==--
