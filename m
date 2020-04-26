@@ -2,109 +2,121 @@ Return-Path: <SRS0=2aAe=6K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3545C55185
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 01:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAB8C55185
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 02:06:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEA1B2072B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 01:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30ED02071E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 02:06:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lechnology.com header.i=@lechnology.com header.b="Dv6UCnP8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSENPcAV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726090AbgDZBj5 (ORCPT
+        id S1726140AbgDZCGe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Apr 2020 21:39:57 -0400
-Received: from vern.gendns.com ([98.142.107.122]:53036 "EHLO vern.gendns.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725931AbgDZBj4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Apr 2020 21:39:56 -0400
-X-Greylist: delayed 1200 seconds by postgrey-1.27 at vger.kernel.org; Sat, 25 Apr 2020 21:39:56 EDT
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=lechnology.com; s=default; h=Message-Id:Date:Subject:Cc:To:From:Sender:
-        Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=sY9DuPp4YT1BeXakn3aLkKJz2YAQ2ryvln0omqrV7W8=; b=Dv6UCnP8fGvptSjzCNEiAgizao
-        8Uu2SClHFC8htqqpxY3IwTgPC6V32V/+zvrCZA7XJ0E4ZcUVUyEs38H3by1ePCwaQ/A3oadBZxN2T
-        AAL3KX39wqDC5EYaMmlnuI9usYUffS5QiQMoST4ecWSjo8HX2JE/gyztFXqw/HoXpud/4iPjOaCgx
-        28JUwOK6WlGxMNvMMYXZu8S2ahAE0RpxUTMymw6c34DwMjMXY6iuh+FoMSTTgH4hY0XokKp2jOhDX
-        jSKjtV+/IR5JK7fwrk76fvKnppPPClUWoRc/osLIEWshlAlICMGZTpF7gq8qzTAMQLXAvd4PuRtjR
-        Oad3Kz2Q==;
-Received: from 108-198-5-147.lightspeed.okcbok.sbcglobal.net ([108.198.5.147]:46210 helo=freyr.lechnology.com)
-        by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <david@lechnology.com>)
-        id 1jSVxb-0004xU-Ec; Sat, 25 Apr 2020 21:19:55 -0400
-From:   David Lechner <david@lechnology.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     David Lechner <david@lechnology.com>
-Subject: [PATCH BlueZ] src/gatt-client: always check properties in WriteValue
-Date:   Sat, 25 Apr 2020 20:19:35 -0500
-Message-Id: <20200426011935.32742-1-david@lechnology.com>
-X-Mailer: git-send-email 2.17.1
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - vern.gendns.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - lechnology.com
-X-Get-Message-Sender-Via: vern.gendns.com: authenticated_id: davidmain+lechnology.com/only user confirmed/virtual account not confirmed
-X-Authenticated-Sender: vern.gendns.com: davidmain@lechnology.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+        Sat, 25 Apr 2020 22:06:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726119AbgDZCGd (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 25 Apr 2020 22:06:33 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28CD2C061A0C
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2020 19:06:33 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id z90so11394290qtd.10
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2020 19:06:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
+        bh=15wEOqTW+vvS20m3cQG+EdYKFpDAKJlek8uRhULqtIw=;
+        b=JSENPcAVgo9Aj63spzP2dAQ3YawplsHfnYrBKle4Sd1ccbC9FDWF+XifIGykcTCiNP
+         MjULHwt6Rx86odP9BjmML6jcmMbsUDAupKuotMrbb6hVihv8EUdLNSyQXvxBeNoKxBmU
+         UftL4GMn/ILGWsDvhHoTGEf8j0lIiB7mZ1Fu0xzc5nqKwuEh0wY7U68qEnguTsOpC/G+
+         rcNa5xV5sISO+qqvEOVpTK5litqu5JACebbjFNu5SqgLunhs1bAbtVJgJmy8M43xXGaS
+         rkSk/ziaAVbt/edv7i3esKEY3wklvPtiZeHcmxiOjR9Ta0EjfR+V7jJBmvU/RHON1f15
+         xQTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :in-reply-to:references;
+        bh=15wEOqTW+vvS20m3cQG+EdYKFpDAKJlek8uRhULqtIw=;
+        b=pPy97zVhSxydhhW4g7H3OYzdgzfNwGxdUa7vMF8L45RDCHk+5PYEqiW1YzxXpwxZVH
+         M5kkwgHb0hcB5gtNz2HweFJc27+awKBIB6LqYWT8GHUlZ546FwY6xesrr2PA8YkzijHu
+         S+21jyKqoGOjx2cCO2GWKS/0Mq5tbI4oXrbeOeyHDlGHCV9cRW7owT9dj0PkJ5XXJDod
+         cMFUrzeYB30FbQd58YCvkyyBs5jxI26QLFAN7Go/0Z3g1lC5cZEVs6NZmaVwr4/tL4zS
+         lecwG/ZAmcle/e3pxGTGJYCZnk69ezNPYou2Y3juEW8cXGfrHlLkEXCrE/KT8a5wmqJa
+         oOPw==
+X-Gm-Message-State: AGi0PuZZAT+WmRb+G6v9Tnz+XvTiN9bZNhYxzIbcld1o2WOReo8JDct8
+        1MCxC7rq5kS9Cmk+fn4GK4xCX+RlWKQ=
+X-Google-Smtp-Source: APiQypKr5QQAy1to+0tAqlPRbAkqWzYQIS7E53sud/pLDkrGOucrvNB8b++Sxk+5apW2tmdQfSZ9Tg==
+X-Received: by 2002:ac8:70c9:: with SMTP id g9mr16973836qtp.375.1587866792246;
+        Sat, 25 Apr 2020 19:06:32 -0700 (PDT)
+Received: from [172.17.0.2] ([52.232.253.73])
+        by smtp.gmail.com with ESMTPSA id 39sm6940857qtg.94.2020.04.25.19.06.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Apr 2020 19:06:31 -0700 (PDT)
+Message-ID: <5ea4eca7.1c69fb81.3835.c3a1@mx.google.com>
+Date:   Sat, 25 Apr 2020 19:06:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4873628359534257262=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, david@lechnology.com
+Subject: RE: [BlueZ] src/gatt-client: always check properties in WriteValue
+In-Reply-To: <20200426011935.32742-1-david@lechnology.com>
+References: <20200426011935.32742-1-david@lechnology.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This modifies the GATT client characteristic WriteValue D-Bus method to
-always check that the characteristic supports the requested type of
-write by checking for the corresponding property before attempting to
-write.
+--===============4873628359534257262==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Before this change, if the "type" option was used and it was set to
-"reliable" or "request", then BlueZ would attempt the write even if the
-characteristic does not support that write type. On the other hand, if
-"type" was set to "command" or was not specified, the method would
-return a org.bluez.Error.NotSupported error without attempting to write.
 
-After this change, the WriteValue method will consistently return
-org.bluez.Error.NotSupported if the corresponding property flag is not
-set for all types of writes.
----
- src/gatt-client.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This is automated email and please do not replay to this email!
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index a9bfc2802..0bfcfa692 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1016,8 +1016,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 	 *     - If value is larger than MTU - 3: long-write
- 	 *   * "write-without-response" property set -> write command.
- 	 */
--	if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
--			|| (type && !strcasecmp(type, "reliable"))) {
-+	if ((!type || (type && !strcasecmp(type, "reliable"))) &&
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+
+Test Result:
+Checkpatch Failed
+
+Patch Title:
+[BlueZ] src/gatt-client: always check properties in WriteValue
+
+Output:
+WARNING:LONG_LINE: line over 80 characters
+#32: FILE: src/gatt-client.c:1020:
 +			chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE) {
- 		supported = true;
- 		chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
- 						true, value, value_len, offset,
-@@ -1026,8 +1026,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 			return NULL;
- 	}
- 
--	if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
--			(type && !strcasecmp(type, "request"))) {
-+	if ((!type || (type && !strcasecmp(type, "request"))) &&
-+			chrc->props & BT_GATT_CHRC_PROP_WRITE) {
- 		uint16_t mtu;
- 
- 		supported = true;
--- 
-2.17.1
 
+- total: 0 errors, 1 warnings, 20 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+For more details about BlueZ coding style guide, please find it
+in doc/coding-style.txt
+
+---
+Regards,
+Linux Bluetooth
+
+--===============4873628359534257262==--
