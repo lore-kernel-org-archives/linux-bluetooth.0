@@ -1,152 +1,110 @@
-Return-Path: <SRS0=4/QO=6J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=2aAe=6K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD4AC55185
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 15:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3545C55185
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 01:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFFE320767
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Apr 2020 15:55:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEA1B2072B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Apr 2020 01:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="MyWUkHZZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UCDRN4Jd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lechnology.com header.i=@lechnology.com header.b="Dv6UCnP8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726284AbgDYPzy (ORCPT
+        id S1726090AbgDZBj5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Apr 2020 11:55:54 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:54085 "EHLO
-        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726118AbgDYPzm (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Apr 2020 11:55:42 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 3AC8E5803BD;
-        Sat, 25 Apr 2020 11:55:41 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Sat, 25 Apr 2020 11:55:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
-         h=from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding; s=fm3; bh=ILg74KFQ4/u/i
-        LEbpVIGKPDUn0lqkuyVDFTjVVQFF4M=; b=MyWUkHZZ+Mcwdt7tPDh4nOqgZAEVt
-        n8SU2n8ZR81Fv2JQ69Dyg1uEdGkMtEKpm/soc219ggCkilM6/1D9+OtmqfPOenjB
-        ldoLtqTsxpA3l58j2j2ws+Qsm4ncs+ahXHyZGwqLceD/yhD67JU+9FsvbJJ0KH0H
-        xKUJHUyoJjfvhIlvyuaPQBgQcyettaIm/ENgjGOFgP+fgXERqdExYTLQQvVQ3oZV
-        qCIkbphLwFFe8aJ50Ie2LVfwUjbiiN6EUeCKBKsMIpfGk9Xp/ZhqrJHuekKCLYaY
-        dduUrgJQ+SKwcqcQ2dEDydxkN8MCTy8Vkjd+XDRq0iFdlnkPfiOoL5EYw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=ILg74KFQ4/u/iLEbpVIGKPDUn0lqkuyVDFTjVVQFF4M=; b=UCDRN4Jd
-        LJ1aMZu0e0azt1QAd15mpQLEvkm7c3u+0gP103CIaOw4Q/XGpCcOEGGWyMJifCLg
-        9ohqiYsQi429Ig1oFNTzBFbW7VW/5MSqi2GRDxWR6smw/FieTf3ZS8BFdRFihbi+
-        50WCmvYm5421efcI5PBTNEhlHYua0qS7FC5QP1biymBNhbukf3tm84In2sOVExAh
-        GHl83AiZau8VJG05cv33yS4Of5eeOLPnRa0VbVUNsSBGGwqZRoTAq5tPACtbRGKN
-        JyzCbsnjkiymVnm4+scLO6k6toz5ie3GpFcSOEJ2WAC2mCqstpej7t2ACneO7mug
-        luZ/F72ZAiQlhg==
-X-ME-Sender: <xms:eV2kXi1pBLxDckTlLq0uQuE8lEyDr8jXdaOXJDDd04dyCcx-e5eu_Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrheeggdejvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffojghfggfgsedtkeertd
-    ertddtnecuhfhrohhmpeetlhhishhtrghirhcuhfhrrghntghishcuoegrlhhishhtrghi
-    rhesrghlihhsthgrihhrvdefrdhmvgeqnecukfhppeejfedrleefrdekgedrvddtkeenuc
-    evlhhushhtvghrufhiiigvpedunecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishht
-    rghirhesrghlihhsthgrihhrvdefrdhmvg
-X-ME-Proxy: <xmx:eV2kXqZrTsq_qRbUyCTF_6XuyPLGUjZ7BuDwiXHBjViahgBFV0hl6w>
-    <xmx:eV2kXm_x8CUI9jrkObOTtn3Yguxfh63r73e5LW3bdkcDWa5Q8iVRJg>
-    <xmx:eV2kXgZpYVI4tGkPcpJv3AmtMpyCUSWeZFa-C0lng4L1-U64Se0jcw>
-    <xmx:fV2kXi4qQrktnCVTQ7Iav98OQI_z_ThFrs3_xuZPYpAYfcQBnE1LSw>
-Received: from alistair-xps-14z.alistair23.me (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 921A03280067;
-        Sat, 25 Apr 2020 11:55:36 -0400 (EDT)
-From:   Alistair Francis <alistair@alistair23.me>
-To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, mripard@kernel.org, wens@csie.org
-Cc:     anarsoul@gmail.com, devicetree@vger.kernel.org,
-        alistair23@gmail.com, linux-arm-kernel@lists.infradead.org,
-        Alistair Francis <alistair@alistair23.me>
-Subject: [DO-NOT-MERGE][PATCH v4 3/3] arm64: allwinner: Enable Bluetooth and WiFi on sopine baseboard
-Date:   Sat, 25 Apr 2020 08:55:31 -0700
-Message-Id: <20200425155531.2816584-3-alistair@alistair23.me>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200425155531.2816584-1-alistair@alistair23.me>
-References: <20200425155531.2816584-1-alistair@alistair23.me>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sat, 25 Apr 2020 21:39:57 -0400
+Received: from vern.gendns.com ([98.142.107.122]:53036 "EHLO vern.gendns.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725931AbgDZBj4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 25 Apr 2020 21:39:56 -0400
+X-Greylist: delayed 1200 seconds by postgrey-1.27 at vger.kernel.org; Sat, 25 Apr 2020 21:39:56 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=lechnology.com; s=default; h=Message-Id:Date:Subject:Cc:To:From:Sender:
+        Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=sY9DuPp4YT1BeXakn3aLkKJz2YAQ2ryvln0omqrV7W8=; b=Dv6UCnP8fGvptSjzCNEiAgizao
+        8Uu2SClHFC8htqqpxY3IwTgPC6V32V/+zvrCZA7XJ0E4ZcUVUyEs38H3by1ePCwaQ/A3oadBZxN2T
+        AAL3KX39wqDC5EYaMmlnuI9usYUffS5QiQMoST4ecWSjo8HX2JE/gyztFXqw/HoXpud/4iPjOaCgx
+        28JUwOK6WlGxMNvMMYXZu8S2ahAE0RpxUTMymw6c34DwMjMXY6iuh+FoMSTTgH4hY0XokKp2jOhDX
+        jSKjtV+/IR5JK7fwrk76fvKnppPPClUWoRc/osLIEWshlAlICMGZTpF7gq8qzTAMQLXAvd4PuRtjR
+        Oad3Kz2Q==;
+Received: from 108-198-5-147.lightspeed.okcbok.sbcglobal.net ([108.198.5.147]:46210 helo=freyr.lechnology.com)
+        by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <david@lechnology.com>)
+        id 1jSVxb-0004xU-Ec; Sat, 25 Apr 2020 21:19:55 -0400
+From:   David Lechner <david@lechnology.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     David Lechner <david@lechnology.com>
+Subject: [PATCH BlueZ] src/gatt-client: always check properties in WriteValue
+Date:   Sat, 25 Apr 2020 20:19:35 -0500
+Message-Id: <20200426011935.32742-1-david@lechnology.com>
+X-Mailer: git-send-email 2.17.1
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - vern.gendns.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - lechnology.com
+X-Get-Message-Sender-Via: vern.gendns.com: authenticated_id: davidmain+lechnology.com/only user confirmed/virtual account not confirmed
+X-Authenticated-Sender: vern.gendns.com: davidmain@lechnology.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The sopine board has an optional RTL8723BS WiFi + BT module that can be
-connected to UART1. Add this to the device tree so that it will work
-for users if connected.
+This modifies the GATT client characteristic WriteValue D-Bus method to
+always check that the characteristic supports the requested type of
+write by checking for the corresponding property before attempting to
+write.
 
-Signed-off-by: Alistair Francis <alistair@alistair23.me>
+Before this change, if the "type" option was used and it was set to
+"reliable" or "request", then BlueZ would attempt the write even if the
+characteristic does not support that write type. On the other hand, if
+"type" was set to "command" or was not specified, the method would
+return a org.bluez.Error.NotSupported error without attempting to write.
+
+After this change, the WriteValue method will consistently return
+org.bluez.Error.NotSupported if the corresponding property flag is not
+set for all types of writes.
 ---
- .../allwinner/sun50i-a64-sopine-baseboard.dts | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ src/gatt-client.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
-index 2f6ea9f3f6a2..34357ba143cb 100644
---- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
-@@ -42,6 +42,11 @@ reg_vcc1v8: vcc1v8 {
- 		regulator-min-microvolt = <1800000>;
- 		regulator-max-microvolt = <1800000>;
- 	};
-+
-+	wifi_pwrseq: wifi_pwrseq {
-+		compatible = "mmc-pwrseq-simple";
-+		reset-gpios = <&r_pio 0 2 GPIO_ACTIVE_LOW>; /* PL2 */
-+	};
- };
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index a9bfc2802..0bfcfa692 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1016,8 +1016,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 	 *     - If value is larger than MTU - 3: long-write
+ 	 *   * "write-without-response" property set -> write command.
+ 	 */
+-	if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
+-			|| (type && !strcasecmp(type, "reliable"))) {
++	if ((!type || (type && !strcasecmp(type, "reliable"))) &&
++			chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE) {
+ 		supported = true;
+ 		chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
+ 						true, value, value_len, offset,
+@@ -1026,8 +1026,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 			return NULL;
+ 	}
  
- &ac_power_supply {
-@@ -103,6 +108,17 @@ ext_rgmii_phy: ethernet-phy@1 {
- 	};
- };
+-	if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
+-			(type && !strcasecmp(type, "request"))) {
++	if ((!type || (type && !strcasecmp(type, "request"))) &&
++			chrc->props & BT_GATT_CHRC_PROP_WRITE) {
+ 		uint16_t mtu;
  
-+&mmc1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&mmc1_pins>;
-+	vmmc-supply = <&reg_dldo4>;
-+	vqmmc-supply = <&reg_eldo1>;
-+	mmc-pwrseq = <&wifi_pwrseq>;
-+	non-removable;
-+	bus-width = <4>;
-+	status = "okay";
-+};
-+
- &mmc2 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&mmc2_pins>;
-@@ -174,6 +190,19 @@ &uart0 {
- 	status = "okay";
- };
- 
-+&uart1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
-+	uart-has-rtscts = <1>;
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "realtek,rtl8723bs-bt";
-+		device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
-+		host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-+	};
-+};
-+
- /* On Pi-2 connector */
- &uart2 {
- 	pinctrl-names = "default";
+ 		supported = true;
 -- 
-2.26.0
+2.17.1
 
