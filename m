@@ -2,113 +2,122 @@ Return-Path: <SRS0=BBV2=6L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 580DEC54FCB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E54C55199
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:58:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30B4520661
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E27B920656
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="In/OKeUB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YVvmP81Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728012AbgD0OyX (ORCPT
+        id S1727801AbgD0O6J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Apr 2020 10:54:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60423 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727010AbgD0OyX (ORCPT
+        Mon, 27 Apr 2020 10:58:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38668 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727073AbgD0O6G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Apr 2020 10:54:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587999262;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=YNFlswHXlYnAm35o1GlkqsA8tU4GT8bP6tfFTiYXoSg=;
-        b=In/OKeUB/EZiCTQk+w9vMvxqmu5qifUR2z07xQ8HIdDrqDLILm9ZLlt7lDXzWl12rtC5jR
-        zBf+wiFoowtaKdh/Ju7oaKuxqmt3FD0ebZP3lxHZShfGN2JGQN0r6lC7qUCRdOcFUvvw05
-        JuzOzaZv+rVR//K1I7XgjGp18Odle5w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-IiGZN3o9PIaySdOeFFZ30A-1; Mon, 27 Apr 2020 10:54:20 -0400
-X-MC-Unique: IiGZN3o9PIaySdOeFFZ30A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B1C1107ACF8;
-        Mon, 27 Apr 2020 14:54:19 +0000 (UTC)
-Received: from x1.localdomain.com (ovpn-114-38.ams2.redhat.com [10.36.114.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B1528397;
-        Mon, 27 Apr 2020 14:54:16 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btbcm: Do not free IRQ on close if we did not request it
-Date:   Mon, 27 Apr 2020 16:54:14 +0200
-Message-Id: <20200427145414.121700-1-hdegoede@redhat.com>
+        Mon, 27 Apr 2020 10:58:06 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25101C0610D5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 07:58:06 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id w145so14105404lff.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 07:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=P9yWHu/MnZh09x46GPkTbS23TLN5+4dZz+TmcsF3+LA=;
+        b=YVvmP81QmrAM8kfC9K+hXLTYF0xX2OeeareLvZPwysTZoHY08My23cp0uYg/9Vh+fo
+         wSAZcz9iJgpKdiaxBjcnEVtAZ9NqmgeuP7tEHFxWA4Q0T47hzZQCk+RLSKu+P4fd0iXc
+         UHE4/5a1I5boyY/KFadEz/E5FfPLEZsisogMiDeKaepYVk9j7K8ZijQGDaMdcf4rDR9Z
+         T3/55Y4HqvpRP5a2Dv2XdfhLerju5eOE52tvK+bpghkRzBOzN5lE7oOh/ryGisR9AG1+
+         YUVKh85xjTy8pAFyxMNYtYxY07a+8WAk9iTEgiQsfF3DKoKRisSysMqxpPIrZq9ApTfA
+         kzLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=P9yWHu/MnZh09x46GPkTbS23TLN5+4dZz+TmcsF3+LA=;
+        b=QVKQqr5yZmhN00YyeIBNuIiW44/OBcorKx5yaAfFgwlPPFDOMKDrqbKIqnFAQH+zGr
+         txqfqMLcOgqyt1UooDj2Xk8DlQY3aXWSUlNt7SVL/yAa2toCJovi88NWvkOH5DAjhQZY
+         lErCGQQfWd3s6IA7HNKe1R3AEp34+NXU1VOOOjeknNSk+qW+M6yYXM2H25JlVJmvhl1k
+         cxgc27TMZwePuBkfkGeYSDPykyCvd0ulRWKEPOkGDPIFSXWFQj9b/hB21YWzQHgRJLVP
+         zqKEqt5DgLY37l3oYvBdHtrcX6aibZbTbvB+GplrplWVzNvnZ5j2Vy0DjLZPg/5jeVN6
+         7nYw==
+X-Gm-Message-State: AGi0PuZc3kan+4Z6R+/V5iP1Hqt0zWAmQ/YDYbIvg+YxtO6p11JRfy8l
+        h/ttRSGJ7JTLnF09T0S37xIeNrwwdvhOgkwJ2wQP/Q==
+X-Google-Smtp-Source: APiQypJUgZYtdw2e8Tj+NCOfSfGb1LHscHo/UpCu/45OpsNVNKbPlnjnHnUSEH5KFJYby/KFD1ZWHxu48O/RQyLj3V8=
+X-Received: by 2002:ac2:57cc:: with SMTP id k12mr15335725lfo.69.1587999484274;
+ Mon, 27 Apr 2020 07:58:04 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+References: <20200423142305.66778-1-alainm@chromium.org> <5347568.DvuYhMxLoT@ix>
+ <CALWDO_Vk-JCtViCWSoCZRxhGtKKhFkJZTJKctOw7NBRJwT_zdg@mail.gmail.com>
+In-Reply-To: <CALWDO_Vk-JCtViCWSoCZRxhGtKKhFkJZTJKctOw7NBRJwT_zdg@mail.gmail.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Mon, 27 Apr 2020 10:57:52 -0400
+Message-ID: <CALWDO_XsouHaxheRgR7HGkLxf4U1ag0pxCnVN6zLLqbZF=rjVg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v3] doc:Adding Roles property
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When the patch-ram is missing the hci_bcm code does not request the
-IRQ, in this case we should not try to free it from bcm_close()
+Any more feedback on this Api design?
 
-This fixes the following WARN statements + backtraces:
-[  332.670662] WARNING: CPU: 3 PID: 4743 at kernel/irq/devres.c:143 devm_=
-free_irq+0x45/0x50
-[  332.670882] Trying to free already-free IRQ 44
-[  332.670891] WARNING: CPU: 3 PID: 4743 at kernel/irq/manage.c:1718 free=
-_irq+0x1f4/0x390
-
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 0c34b6c57f7d..0fb4b9c1dfc1 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -118,6 +118,7 @@ struct bcm_device {
- 	u32			oper_speed;
- 	int			irq;
- 	bool			irq_active_low;
-+	bool			irq_requested;
-=20
- #ifdef CONFIG_PM
- 	struct hci_uart		*hu;
-@@ -333,6 +334,8 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 		goto unlock;
- 	}
-=20
-+	bdev->irq_requested =3D true;
-+
- 	device_init_wakeup(bdev->dev, true);
-=20
- 	pm_runtime_set_autosuspend_delay(bdev->dev,
-@@ -514,10 +517,11 @@ static int bcm_close(struct hci_uart *hu)
- 	}
-=20
- 	if (bdev) {
--		if (IS_ENABLED(CONFIG_PM) && bdev->irq > 0) {
-+		if (bdev->irq_requested) {
- 			devm_free_irq(bdev->dev, bdev->irq, bdev);
- 			device_init_wakeup(bdev->dev, false);
- 			pm_runtime_disable(bdev->dev);
-+			bdev->irq_requested =3D false;
- 		}
-=20
- 		err =3D bcm_gpio_set_power(bdev, false);
---=20
-2.26.0
-
+On Thu, Apr 23, 2020 at 10:51 AM Alain Michaud <alainmichaud@google.com> wrote:
+>
+> On Thu, Apr 23, 2020 at 10:42 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> >
+> > Hi,
+> >
+> > On Thursday, 23 April 2020 16:23:05 CEST Alain Michaud wrote:
+> > > This change adds a new property to indicate the support for concurrent
+> > > roles which means that the controller has reported the appropriate
+> > > LE_Supported_States (hdev->le_states) and that the controller's driver
+> > > has reported correctly handling the various reported states.
+> > > ---
+> > >
+> > >  doc/adapter-api.txt | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> > >
+> > > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> > > index acae032d9..1a7255750 100644
+> > > --- a/doc/adapter-api.txt
+> > > +++ b/doc/adapter-api.txt
+> > > @@ -326,3 +326,11 @@ Properties       string Address [readonly]
+> > >
+> > >                       Local Device ID information in modalias format
+> > >                       used by the kernel and udev.
+> > > +
+> > > +             array{string} Roles [readonly]
+> > > +
+> > > +                     List of supported roles. Possible values:
+> > > +                             "central": Supports the central role.
+> > > +                             "peripheral": Supports the peripheral
+> > role.
+> > > +                             "central-peripheral": Supports both
+> > roles
+> > > +
+> > concurrently.
+> >
+> > If this is an array os strings why central-peripheral is needed?
+> The keyword in the description is "concurrently".  Not all adapters
+> support being peripheral and central concurrently.
+>
+> >
+> >
+> > --
+> > pozdrawiam
+> > Szymon Janc
+> >
+> >
