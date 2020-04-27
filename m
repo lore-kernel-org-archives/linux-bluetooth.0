@@ -2,122 +2,113 @@ Return-Path: <SRS0=BBV2=6L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E54C55199
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7A4C54FD0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 15:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E27B920656
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 14:58:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A241F206BF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 15:02:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YVvmP81Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lechnology.com header.i=@lechnology.com header.b="Jdcghy7s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbgD0O6J (ORCPT
+        id S1728058AbgD0PCK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Apr 2020 10:58:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727073AbgD0O6G (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Apr 2020 10:58:06 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25101C0610D5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 07:58:06 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id w145so14105404lff.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 07:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P9yWHu/MnZh09x46GPkTbS23TLN5+4dZz+TmcsF3+LA=;
-        b=YVvmP81QmrAM8kfC9K+hXLTYF0xX2OeeareLvZPwysTZoHY08My23cp0uYg/9Vh+fo
-         wSAZcz9iJgpKdiaxBjcnEVtAZ9NqmgeuP7tEHFxWA4Q0T47hzZQCk+RLSKu+P4fd0iXc
-         UHE4/5a1I5boyY/KFadEz/E5FfPLEZsisogMiDeKaepYVk9j7K8ZijQGDaMdcf4rDR9Z
-         T3/55Y4HqvpRP5a2Dv2XdfhLerju5eOE52tvK+bpghkRzBOzN5lE7oOh/ryGisR9AG1+
-         YUVKh85xjTy8pAFyxMNYtYxY07a+8WAk9iTEgiQsfF3DKoKRisSysMqxpPIrZq9ApTfA
-         kzLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P9yWHu/MnZh09x46GPkTbS23TLN5+4dZz+TmcsF3+LA=;
-        b=QVKQqr5yZmhN00YyeIBNuIiW44/OBcorKx5yaAfFgwlPPFDOMKDrqbKIqnFAQH+zGr
-         txqfqMLcOgqyt1UooDj2Xk8DlQY3aXWSUlNt7SVL/yAa2toCJovi88NWvkOH5DAjhQZY
-         lErCGQQfWd3s6IA7HNKe1R3AEp34+NXU1VOOOjeknNSk+qW+M6yYXM2H25JlVJmvhl1k
-         cxgc27TMZwePuBkfkGeYSDPykyCvd0ulRWKEPOkGDPIFSXWFQj9b/hB21YWzQHgRJLVP
-         zqKEqt5DgLY37l3oYvBdHtrcX6aibZbTbvB+GplrplWVzNvnZ5j2Vy0DjLZPg/5jeVN6
-         7nYw==
-X-Gm-Message-State: AGi0PuZc3kan+4Z6R+/V5iP1Hqt0zWAmQ/YDYbIvg+YxtO6p11JRfy8l
-        h/ttRSGJ7JTLnF09T0S37xIeNrwwdvhOgkwJ2wQP/Q==
-X-Google-Smtp-Source: APiQypJUgZYtdw2e8Tj+NCOfSfGb1LHscHo/UpCu/45OpsNVNKbPlnjnHnUSEH5KFJYby/KFD1ZWHxu48O/RQyLj3V8=
-X-Received: by 2002:ac2:57cc:: with SMTP id k12mr15335725lfo.69.1587999484274;
- Mon, 27 Apr 2020 07:58:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200423142305.66778-1-alainm@chromium.org> <5347568.DvuYhMxLoT@ix>
- <CALWDO_Vk-JCtViCWSoCZRxhGtKKhFkJZTJKctOw7NBRJwT_zdg@mail.gmail.com>
-In-Reply-To: <CALWDO_Vk-JCtViCWSoCZRxhGtKKhFkJZTJKctOw7NBRJwT_zdg@mail.gmail.com>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Mon, 27 Apr 2020 10:57:52 -0400
-Message-ID: <CALWDO_XsouHaxheRgR7HGkLxf4U1ag0pxCnVN6zLLqbZF=rjVg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v3] doc:Adding Roles property
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 27 Apr 2020 11:02:10 -0400
+Received: from vern.gendns.com ([98.142.107.122]:48464 "EHLO vern.gendns.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726292AbgD0PCJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 27 Apr 2020 11:02:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=lechnology.com; s=default; h=Message-Id:Date:Subject:Cc:To:From:Sender:
+        Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=LfI3ZGYWM24P6FDACjxA7OpUVBsAc7Gt9G4fHxOBUzs=; b=Jdcghy7s6y/+IqZaN0ScggF5CU
+        yDThdJP8Ocvwl3sUeUhGu9TnOABjN6MbnC5F7pRUI+QdnJdotoxIyRs+FcJ5uUm5hcTf+ruL6f5FS
+        nFi0YVfEVdUWMcwx1bGjzA9MJ9l3fH0PFC7Tkt7pJYhyEHZQq888FD7JCeFwa8Akauh6VUhQtHaEf
+        TZRKH/JrG0cBLTMw//XTNyvoiKDWLFyjvQHekW/8IZ/0GL/JIS3wuys32HInqAlVIOiZJ/F5LpzP8
+        sdSSCDFFGVysyAEyFHH9VHr+o2cmengqwhyTnyNuyY7a37JL5zaPelHfSX330h2lKGdJtewt4Jono
+        IiniUvWg==;
+Received: from 108-198-5-147.lightspeed.okcbok.sbcglobal.net ([108.198.5.147]:51718 helo=freyr.lechnology.com)
+        by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <david@lechnology.com>)
+        id 1jT5Go-0005qM-OH; Mon, 27 Apr 2020 11:02:06 -0400
+From:   David Lechner <david@lechnology.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     David Lechner <david@lechnology.com>
+Subject: [PATCH BlueZ v2] src/gatt-client: always check properties in WriteValue
+Date:   Mon, 27 Apr 2020 10:01:53 -0500
+Message-Id: <20200427150153.17055-1-david@lechnology.com>
+X-Mailer: git-send-email 2.17.1
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - vern.gendns.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - lechnology.com
+X-Get-Message-Sender-Via: vern.gendns.com: authenticated_id: davidmain+lechnology.com/only user confirmed/virtual account not confirmed
+X-Authenticated-Sender: vern.gendns.com: davidmain@lechnology.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Any more feedback on this Api design?
+This modifies the GATT client characteristic WriteValue D-Bus method to
+always check that the characteristic supports the requested type of
+write by checking for the corresponding property before attempting to
+write.
 
-On Thu, Apr 23, 2020 at 10:51 AM Alain Michaud <alainmichaud@google.com> wrote:
->
-> On Thu, Apr 23, 2020 at 10:42 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> >
-> > Hi,
-> >
-> > On Thursday, 23 April 2020 16:23:05 CEST Alain Michaud wrote:
-> > > This change adds a new property to indicate the support for concurrent
-> > > roles which means that the controller has reported the appropriate
-> > > LE_Supported_States (hdev->le_states) and that the controller's driver
-> > > has reported correctly handling the various reported states.
-> > > ---
-> > >
-> > >  doc/adapter-api.txt | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >
-> > > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> > > index acae032d9..1a7255750 100644
-> > > --- a/doc/adapter-api.txt
-> > > +++ b/doc/adapter-api.txt
-> > > @@ -326,3 +326,11 @@ Properties       string Address [readonly]
-> > >
-> > >                       Local Device ID information in modalias format
-> > >                       used by the kernel and udev.
-> > > +
-> > > +             array{string} Roles [readonly]
-> > > +
-> > > +                     List of supported roles. Possible values:
-> > > +                             "central": Supports the central role.
-> > > +                             "peripheral": Supports the peripheral
-> > role.
-> > > +                             "central-peripheral": Supports both
-> > roles
-> > > +
-> > concurrently.
-> >
-> > If this is an array os strings why central-peripheral is needed?
-> The keyword in the description is "concurrently".  Not all adapters
-> support being peripheral and central concurrently.
->
-> >
-> >
-> > --
-> > pozdrawiam
-> > Szymon Janc
-> >
-> >
+Before this change, if the "type" option was used and it was set to
+"reliable" or "request", then BlueZ would attempt the write even if the
+characteristic does not support that write type. On the other hand, if
+"type" was set to "command" or was not specified, the method would
+return a org.bluez.Error.NotSupported error without attempting to write.
+
+After this change, the WriteValue method will consistently return
+org.bluez.Error.NotSupported if the corresponding property flag is not
+set for all types of writes.
+---
+
+v2 changes:
+- remove extra check of test variable not NULL
+- fix one line over 80 chars
+
+ src/gatt-client.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index a9bfc2802..f80742fbb 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1016,8 +1016,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 	 *     - If value is larger than MTU - 3: long-write
+ 	 *   * "write-without-response" property set -> write command.
+ 	 */
+-	if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
+-			|| (type && !strcasecmp(type, "reliable"))) {
++	if ((!type || !strcasecmp(type, "reliable")) &&	chrc->ext_props &
++				BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE) {
+ 		supported = true;
+ 		chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
+ 						true, value, value_len, offset,
+@@ -1026,8 +1026,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 			return NULL;
+ 	}
+ 
+-	if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
+-			(type && !strcasecmp(type, "request"))) {
++	if ((!type || !strcasecmp(type, "request")) && chrc->props &
++						BT_GATT_CHRC_PROP_WRITE) {
+ 		uint16_t mtu;
+ 
+ 		supported = true;
+-- 
+2.17.1
+
