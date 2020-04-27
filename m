@@ -2,386 +2,250 @@ Return-Path: <SRS0=BBV2=6L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BDDC4CECC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 18:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D70DFC4CECC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 20:12:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2704220B1F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 18:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF48A20728
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Apr 2020 20:12:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SZtkGBr1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726519AbgD0S3k (ORCPT
+        id S1726230AbgD0UM3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Apr 2020 14:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        Mon, 27 Apr 2020 16:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726189AbgD0S3k (ORCPT
+        by vger.kernel.org with ESMTP id S1725919AbgD0UM3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Apr 2020 14:29:40 -0400
-Received: from kronos.mailus.de (kronos.mailus.de [IPv6:2a01:4f8:171:2684::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D1E3C0610D5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 11:29:40 -0700 (PDT)
-Received: from [IPv6:2003:c0:7714:6b00:527b:9dff:febd:4d92] (p200300C077146B00527B9DFFFEBD4D92.dip0.t-ipconnect.de [IPv6:2003:c0:7714:6b00:527b:9dff:febd:4d92])
-        by kronos.mailus.de (Postfix) with ESMTPSA id 96E5F609D1;
-        Mon, 27 Apr 2020 20:29:35 +0200 (CEST)
-Subject: Re: HID device with multiple collections does not work
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <319b239d-3739-63e9-9fe4-f8b4215097b2@vontaene.de>
- <CABBYNZ+1DytMUg6B7CrGNaNTz55_a6EDQAL58gD_xq4upz0Ctw@mail.gmail.com>
-From:   Erik Andresen <erik@vontaene.de>
-Message-ID: <6dc19d75-8a3c-4f90-f949-f964d6b568f9@vontaene.de>
-Date:   Mon, 27 Apr 2020 20:29:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Mon, 27 Apr 2020 16:12:29 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94A6EC0610D5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 13:12:27 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id a32so100003pje.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2020 13:12:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wDo8lVsO4GmBpQKRCqJTmRE6+3RnZE/MdVldWl0wABg=;
+        b=SZtkGBr1agY7qYPWxuWZd4IsHBzSV7Yr978TSnsaLTH5gCNjQmLfHnJ1hM7lhcepFJ
+         O0hAandOfWd17vyOUL9TVGs5C5ijH0pVR1jcikiImzxvNhRLYzIMwbXfvaoA0M1QKal4
+         /B6Iid9EwViLoN/P/wN1FNBA4Yeo83BE7ADjk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wDo8lVsO4GmBpQKRCqJTmRE6+3RnZE/MdVldWl0wABg=;
+        b=HSHHmhA8H2FnIL0QOdp6uhY1LzcIaVImfeo/qYqZkdRipFoza7HM2d0ZMGlBJl9R2u
+         N+5VesNNtUxV/ve8fIH889G9vqDWKn3PML/kE98/nwxDWlrlrpV8lBR4ciW4Hg85Fs7x
+         T7aiWud/ifpwRkUGneeku7vAjG3iN5ha0iGiefMZJFdfWQ3lZnjdZcRbOiZWTHX+38ik
+         ft2Oz4js0gaUhyJrB6Q9KMrliVdW/7Qgj6u6VvVbcVmoeozX/NpGsJJ1L8uY4DFyaYWJ
+         uO85hP1uDSlNXLbejkANWug/6oxEnhg1FVL1AcaiwKUu7AVHcYxIX5PRfuTm6+bs0uOM
+         yXFg==
+X-Gm-Message-State: AGi0PuYxV2WU0hGYQACKsiWHTVJs8xEMKKFZFHbQvXqT9XB53WjT9ENf
+        5WjQlpYVrPJ4FrsxtZf9CI/xo/kB+ug=
+X-Google-Smtp-Source: APiQypISYiEeOP5K+Pm9q7miYgo4h838rBsvugJ1eSJ0IemGJKT2/QeidkLKAh7d8MLU5+4FiRMs1w==
+X-Received: by 2002:a17:90a:8404:: with SMTP id j4mr494787pjn.12.1588018346178;
+        Mon, 27 Apr 2020 13:12:26 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id f6sm13028648pfn.189.2020.04.27.13.12.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 27 Apr 2020 13:12:25 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Michael Sun <michaelfsun@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v4] doc: Add Advertisement Monitoring API
+Date:   Mon, 27 Apr 2020 13:12:19 -0700
+Message-Id: <20200427131208.BlueZ.v4.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+1DytMUg6B7CrGNaNTz55_a6EDQAL58gD_xq4upz0Ctw@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------085A499F4F4D627F3B059298"
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------085A499F4F4D627F3B059298
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+This patch proposes an Advertisement Monitoring API for an application to
+register a job of monitoring ADV reports with content filter and RSSI
+thresholds.
+---
 
-Hi,
+Changes in v4:
+- Change the signature of SupportedMonitorTypes to be array of strings.
+- Fix document formatting.
 
-Am 27.04.20 um 19:18 schrieb Luiz Augusto von Dentz:
-> Hi Erik,
-> 
-> On Thu, Apr 23, 2020 at 11:07 AM Erik Andresen <erik@vontaene.de> wrote:
->>
->> Hi,
->>
->>
->> I have a simple bluetooth hid device which does work in Android but not with Linux 4.19/Bluez 5. It does have two collections in its hid description:
->> 0xA1, 0x01,        // Collection (Application)
->> 0x85, 0x02,        //   Report ID (2)
->> (...)
->> 0xC0,              // End Collection
->> 0xA1, 0x01,        // Collection (Application)
->> 0x85, 0x01,        //   Report ID (1)
->> (...)
->> 0xC0,              // End Collection
->>
->> Complete description is attached.
->>
->> Since there are multiple collections I understand that every report has to be prefixed with the id, so I send
->> [2,0,0,0x52,0,0,0,0,0] (9 bytes) for the keycode 0x52, ID is 2.
->>
->> Output from btmon is:
->>> ACL Data RX: Handle 3585 flags 0x02 dlen 16                                                                                                                                                                                                            #2072 [hci0] 485.047387
->>         ATT: Handle Value Notification (0x1b) len 11
->>           Handle: 0x0015
->>             Data: 020000520000000000
->>
->> This looks good for me so far, unfortunately Linux does not pick it up, in dmesg I get:
->> drivers/hid/hid-core.c: undefined report_id 0 received
->>
->> cat /sys/kernel/debug/hid/0005:0000:0000.000­3/events # gives me:
->> report (size 10) (numbered) = 00 02 00 00 52 00 00 00 00 00
->> so I get 10 bytes instead the 9 I send
->>
->> So far I traced it to hog-lib.c, report_value_cb() of bluez where this extra 0 is prepended in the if (hog->has_report_id) block.
->> report->id is 0 at this point. If I skip this extra addition of the zero or manually set id=2 here it works as expected. Does someone has an idea what I do wrong or what I'm missing?
-> 
-> Afaik each report ID will need to have its own characteristic, at
-> least that is how HIDS has put the spec, but if I got you right the
-> report->id is never initialized on report_reference_cb so this might
-> be how Android is detecting if there is a report ID or not, we should
-> be able to confiirm this if we have access to the HCI trace when
-> discovering the services.
+Changes in v3:
+- Introduce SupportedFeatures to reflect the features based on
+controller's capabilities.
+- Modify SupportedMonitorTypes to list available types of monitors.
 
-thanks for taking a look. I have attached the saved btsnoop from btmon, it contains the full pairing process from scan to connecting. I hope this is what you wanted, if not please let me know. The device in question is the "EB:47:34:30:3F:3E".
+Changes in v2:
+- Rename the interfaces and functions.
+- Adopt the object manager mechanism so that a client can expose
+multiple monitor objects and expect to get notified on whether the
+monitor has been activated or not.
+- Change the contract of DeviceFound so that it is called to indicate
+the starting point of monitoring on a device instead of reporting every
+ADV. In other words, the client is expected to monitor corresponding
+device events.
 
-greetings,
-Erik Andresen
+ doc/advertisement-monitor-api.txt | 137 ++++++++++++++++++++++++++++++
+ 1 file changed, 137 insertions(+)
+ create mode 100644 doc/advertisement-monitor-api.txt
 
+diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+new file mode 100644
+index 000000000..012fce420
+--- /dev/null
++++ b/doc/advertisement-monitor-api.txt
+@@ -0,0 +1,137 @@
++BlueZ D-Bus Advertisement Monitor API Description
++*************************************************
++
++This API allows an client to specify a job of monitoring advertisements by
++registering the root of hierarchy and then exposing advertisement monitors
++under the root with filtering conditions, thresholds of RSSI and timers
++of RSSI thresholds.
++
++Once a monitoring job is activated by BlueZ, the client can expect to get
++notified on the targeted advertisements no matter if there is an ongoing
++discovery session (a discovery session is started/stopped with methods in
++org.bluez.Adapter1 interface).
++
++Advertisement Monitor hierarchy
++===============================
++Service		org.bluez
++Interface	org.bluez.AdvertisementMonitor1 [experimental]
++Object path	freely definable
++
++Methods		void Release() [noreply]
++
++			This gets called as a signal for a client to perform
++			clean-up when (1)a monitor cannot be activated after it
++			was exposed or (2)a monitor has been deactivated.
++
++		void Activate() [noreply]
++
++			After a monitor was exposed, this gets called as a
++			signal for client to get acknowledged when a monitor
++			has been activated, so the client can expect to receive
++			calls on DeviceFound() or DeviceLost().
++
++		void DeviceFound(object device) [noreply]
++
++			This gets called to notify the client of finding the
++			targeted device. Once receiving the call, the client
++			should start to monitor the corresponding device to
++			retrieve the changes on RSSI and advertisement content.
++
++		void DeviceLost(object device) [noreply]
++
++			This gets called to notify the client of losing the
++			targeted device. Once receiving this call, the client
++			should stop monitoring the corresponding device.
++
++Properties	uint8 Type [read-only]
++
++			The type of the monitor. See SupportedMonitorTypes in
++			org.bluez.AdvertisementMonitorManager1 for the available
++			options.
++
++		(Int16, Uint16, Int16, Uint16) RSSIThreshholdsAndTimers [read-only, optional]
++
++			This contains HighRSSIThreshold, HighRSSIThresholdTimer,
++			LowRSSIThreshold, LowRSSIThresholdTimer in order. The
++			unit of HighRSSIThreshold and LowRSSIThreshold is dBm.
++			The unit of HighRSSIThresholdTimer and
++			LowRSSIThresholdTimer is second.
++
++			If these are provided, RSSI would be used as a factor to
++			notify the client of whether a device stays in range or
++			move out of range. A device is considered in-range when
++			the RSSIs of the received advertisement(s) during
++			HighRSSIThresholdTimer seconds exceed HighRSSIThreshold.
++			Likewise, a device is considered out-of-range when the
++			RSSIs of the received advertisement(s) during
++			LowRSSIThresholdTimer do not reach LowRSSIThreshold.
++
++		array{(uint8, uint8, string)} Patterns [read-only, optional]
++
++			If Type is set to 0x01, this must exist and has at least
++			one entry in the array.
++
++			The structure of a pattern contains the following.
++			uint8 start_position
++				The index in an AD data field where the search
++				should start. The beginning of an AD data field
++				is index 0.
++			uint8 AD_data_type
++				See https://www.bluetooth.com/specifications/
++				assigned-numbers/generic-access-profile/ for
++				the possible allowed value.
++			string content_of_pattern
++				This is the value of the pattern.
++
++Advertisement Monitor Manager hierarchy
++=======================================
++Service		org.bluez
++Interface	org.bluez.AdvertisementMonitorManager1 [experimental]
++Object path	/org/bluez/{hci0,hci1,...}
++
++Methods		void RegisterApplication(object application)
++
++			This registers a hierarchy of advertisement monitors.
++			The application object path together with the D-Bus
++			system bus connection ID define the identification of
++			the application registering advertisement monitors.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		void UnregisterApplication(object application)
++
++			This unregisters advertisement monitors that have been
++			previously registered. The object path parameter must
++			match the same value that has been used on
++			registration.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
++
++Properties	array{string} SupportedMonitorTypes [read-only]
++
++			This lists the supported types of advertisement
++			monitors. An application should check this before
++			instantiate and expose an object of
++			org.bluez.AdvertisementMonitor1.
++
++			Possible values for monitor types:
++
++			"patterns_with_logic_or"
++				Patterns with logic OR applied. With this type,
++				property "Patterns" must exist and has at least
++				one pattern.
++
++		array{string} SupportedFeatures [read-only]
++
++			This lists the features of advertisement monitoring
++			supported by BlueZ.
++
++			Possible values for features:
++
++			"controller-based-monitor-by-patterns"
++				If the controller is capable of performing
++				advertisement monitoring by patterns, BlueZ
++				would offload the patterns to the controller to
++				reduce power consumption.
+-- 
+2.24.1
 
---------------085A499F4F4D627F3B059298
-Content-Type: application/octet-stream;
- name="banglejs4.btsnoop"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="banglejs4.btsnoop"
-
-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
---------------085A499F4F4D627F3B059298--
