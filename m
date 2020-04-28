@@ -2,122 +2,151 @@ Return-Path: <SRS0=u/yl=6M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6C7C83000
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 14:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0130C83001
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 14:39:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 096C0206C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 14:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC8B82070B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 14:39:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OCOd1/VT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lechnology.com header.i=@lechnology.com header.b="dcmDQf2N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727825AbgD1Oh7 (ORCPT
+        id S1727988AbgD1Ojx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Apr 2020 10:37:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23271 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726868AbgD1Oh7 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Apr 2020 10:37:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588084677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2wWcgfxBQPCOubSMBYwNbBlHyf+/b+HUAXLwiPseogw=;
-        b=OCOd1/VT9bKoNYKOqLWp7Z1+Nabn3myQTUJyuqFd6oz0+d9rm+LKFsLrODA28XBcKrRl6Y
-        V8EM9B4jSSnBX5nVG/B5UNB/YnY6NbbWapDLjixVzFfa0z99AbrpUIWVquB80vO72wdunu
-        KW2+wXHhU2weBn6awt2jfibsQ2J5kxI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-MxZDBNFRMlGBotfHE_Tpwg-1; Tue, 28 Apr 2020 10:37:55 -0400
-X-MC-Unique: MxZDBNFRMlGBotfHE_Tpwg-1
-Received: by mail-wm1-f71.google.com with SMTP id d134so1257567wmd.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2020 07:37:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2wWcgfxBQPCOubSMBYwNbBlHyf+/b+HUAXLwiPseogw=;
-        b=TaRdfQrFwxOgEkeVCOvvxbueEDc5ZTYC4QSGQHcaMQOaH4I10Y8F8dfsVyBlFKRtqc
-         J62y8XNGR4Qyvl5AqxUpkvBx+G6cboYwekJLKgxLi1uYOiSJY2Q/JVnD6+R+EPlLIrTw
-         HLyay3phr2jcLu2Wv2IXbUjKfeCXHtOD6c5ZxfwcAnkDJM9zHDx8vbfEy23sTaV3n8Pj
-         lUzbGVpv3qk9w9tn7ziOahYoq3F97R0mSrlk0OWOXD/TUzb3EuKIYXzJJPmXlNw1IF9e
-         YWUuPO2jir7nQApZOnlyXSUvtBXNgSQQulzJcyHPg5s9VvTcAoDAibKCi/CHdgT8Bhq/
-         xdFw==
-X-Gm-Message-State: AGi0PuaT3etmq6eNTBPi5On82IhM8qT5O+RG8chdH92gClELXPbRM0Rg
-        pKQLp8ke7xW3i38UZ4LtKF4hkl4+m4n69bTeb9bkA0JxCWDAkaGh7OPdQ0Kg3SQTJuZ6Qr1pCTA
-        q18iZcFA49i6Ex6tgn+M2V91rUvoC
-X-Received: by 2002:adf:e450:: with SMTP id t16mr36103482wrm.301.1588084674430;
-        Tue, 28 Apr 2020 07:37:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJvko8yesIRqMiDpUVNHSXLnE4DZQKgTIDYgk/QUubqpFFWQNEmV+xxtOMoIu1gw07kinjp0Q==
-X-Received: by 2002:adf:e450:: with SMTP id t16mr36103465wrm.301.1588084674234;
-        Tue, 28 Apr 2020 07:37:54 -0700 (PDT)
-Received: from x1.localdomain (2001-1c00-0c0c-fe00-d2ea-f29d-118b-24dc.cable.dynamic.v6.ziggo.nl. [2001:1c00:c0c:fe00:d2ea:f29d:118b:24dc])
-        by smtp.gmail.com with ESMTPSA id p190sm3623306wmp.38.2020.04.28.07.37.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2020 07:37:53 -0700 (PDT)
-Subject: Re: [PATCH] Bluetooth: btbcm: Do not free IRQ on close if we did not
- request it
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
-References: <20200427145414.121700-1-hdegoede@redhat.com>
- <F764A836-9722-4192-AEB8-551DE080F175@holtmann.org>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <aeba5b72-3d66-7822-8b09-54cf35a6e2de@redhat.com>
-Date:   Tue, 28 Apr 2020 16:37:52 +0200
+        Tue, 28 Apr 2020 10:39:53 -0400
+Received: from vern.gendns.com ([98.142.107.122]:43314 "EHLO vern.gendns.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726868AbgD1Ojw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 28 Apr 2020 10:39:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=lechnology.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=Ejpcq21L5PMqCoD5MU69h6GGv9mNxHLMFkirDE2vroU=; b=dcmDQf2Ncga/dXaeUI+HsEFNfJ
+        lpsWsrF+/sB8j+o0MukbY9/v99w6wTFaZ2jGgweTS3ZCbdRxO+3N+yNS9kKiMz5DvT48SsfucX/Yn
+        0S+Iqfzav1Tb6uYouhtXblUR8K9WxdhQegIrBWv0rZZvOw/Kp46EFYtKSEuimxHwUEigayXk11QsT
+        Ja4+/K6jyJ/MwZifB4IgiC0xr1g78XF7iypYcwYwafToS2Y/P3vsmz/ihLidjGmkkG6TubngBJcnq
+        QHY2at6Hp9Kb80fM4Ci3soA8bw/LSQgp+o4H4Gq2zLecClYNeMRipodUgvulX583ry0vBtZSCGWF7
+        GS6iZ9fw==;
+Received: from 108-198-5-147.lightspeed.okcbok.sbcglobal.net ([108.198.5.147]:43536 helo=[192.168.0.134])
+        by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <david@lechnology.com>)
+        id 1jTROo-00031Q-Gc; Tue, 28 Apr 2020 10:39:50 -0400
+Subject: Re: [PATCH BlueZ v2] src/gatt-client: always check properties in
+ WriteValue
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20200427150153.17055-1-david@lechnology.com>
+ <CABBYNZKhVUqLortqL60CNtu0MZBdtW+qqdtn6zfacOVKDezYxQ@mail.gmail.com>
+From:   David Lechner <david@lechnology.com>
+Message-ID: <35f37936-e737-ac35-c538-9447a00d1cbc@lechnology.com>
+Date:   Tue, 28 Apr 2020 09:39:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <F764A836-9722-4192-AEB8-551DE080F175@holtmann.org>
+In-Reply-To: <CABBYNZKhVUqLortqL60CNtu0MZBdtW+qqdtn6zfacOVKDezYxQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - vern.gendns.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - lechnology.com
+X-Get-Message-Sender-Via: vern.gendns.com: authenticated_id: davidmain+lechnology.com/only user confirmed/virtual account not confirmed
+X-Authenticated-Sender: vern.gendns.com: davidmain@lechnology.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-On 4/28/20 11:39 AM, Marcel Holtmann wrote:
-> Hi Hans,
+On 4/27/20 11:28 AM, Luiz Augusto von Dentz wrote:
+> Hi David,
 > 
->> When the patch-ram is missing the hci_bcm code does not request the
->> IRQ, in this case we should not try to free it from bcm_close()
+> On Mon, Apr 27, 2020 at 8:07 AM David Lechner <david@lechnology.com> wrote:
 >>
->> This fixes the following WARN statements + backtraces:
->> [  332.670662] WARNING: CPU: 3 PID: 4743 at kernel/irq/devres.c:143 devm_free_irq+0x45/0x50
->> [  332.670882] Trying to free already-free IRQ 44
->> [  332.670891] WARNING: CPU: 3 PID: 4743 at kernel/irq/manage.c:1718 free_irq+0x1f4/0x390
+>> This modifies the GATT client characteristic WriteValue D-Bus method to
+>> always check that the characteristic supports the requested type of
+>> write by checking for the corresponding property before attempting to
+>> write.
 >>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>> Before this change, if the "type" option was used and it was set to
+>> "reliable" or "request", then BlueZ would attempt the write even if the
+>> characteristic does not support that write type. On the other hand, if
+>> "type" was set to "command" or was not specified, the method would
+>> return a org.bluez.Error.NotSupported error without attempting to write.
+>>
+>> After this change, the WriteValue method will consistently return
+>> org.bluez.Error.NotSupported if the corresponding property flag is not
+>> set for all types of writes.
 >> ---
->> drivers/bluetooth/hci_bcm.c | 6 +++++-
->> 1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> v2 changes:
+>> - remove extra check of test variable not NULL
+>> - fix one line over 80 chars
+>>
+>>   src/gatt-client.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index a9bfc2802..f80742fbb 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -1016,8 +1016,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+>>           *     - If value is larger than MTU - 3: long-write
+>>           *   * "write-without-response" property set -> write command.
+>>           */
+>> -       if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
+>> -                       || (type && !strcasecmp(type, "reliable"))) {
+>> +       if ((!type || !strcasecmp(type, "reliable")) && chrc->ext_props &
+>> +                               BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE) {
+>>                  supported = true;
+>>                  chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
+>>                                                  true, value, value_len, offset,
+>> @@ -1026,8 +1026,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+>>                          return NULL;
+>>          }
+>>
+>> -       if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
+>> -                       (type && !strcasecmp(type, "request"))) {
+>> +       if ((!type || !strcasecmp(type, "request")) && chrc->props &
+>> +                                               BT_GATT_CHRC_PROP_WRITE) {
+>>                  uint16_t mtu;
+>>
+>>                  supported = true;
+>> --
+>> 2.17.1
 > 
-> the patch doesn’t apply cleanly against bluetooth-next tree. Can you send a revised one. Thanks.
+> As far I can remember this is on purpose so the application can
+> overwrite the type if it needs to disabling the checks on the client
+> side, though the kernel can still return not supported, so if we want
+> to change this it will now not be possible to overwrite it anymore.
+> 
 
-So I looked into rebasing the patch and it did not apply because
-another (almost identical) fix for the issue has already landed
-in bluetooth-next:
+If this is the case, does it make sense to make the following change
+instead so that write without response can also be forced?
 
-d5d0c62437c0 ("Bluetooth: hci_bcm: fix freeing not-requested IRQ")
-
-So my version of this fix (this patch) can be dropped.
-
-It would be good if this straight forward fix can be send to Linus
-for one of the upcoming 5.7-rc# releases.
-
-Regards,
-
-Hans
-
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index f80742fbb..3153f571f 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1050,8 +1050,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+                         return NULL;
+         }
+  
+-       if ((type && strcasecmp(type, "command")) || offset ||
+-                       !(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
++       if ((type && strcasecmp(type, "command")) || offset || (!type &&
++                       !(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP)))
+                 goto fail;
+  
+         supported = true;
