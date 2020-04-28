@@ -2,190 +2,262 @@ Return-Path: <SRS0=u/yl=6M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F47FC83000
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 21:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88C1C83000
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 22:02:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26D9920731
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 21:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ADC0206D6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 22:02:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Njnf5muZ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="g8Sly55F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgD1VHs (ORCPT
+        id S1726378AbgD1WCj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Apr 2020 17:07:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40050 "EHLO
+        Tue, 28 Apr 2020 18:02:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726274AbgD1VHs (ORCPT
+        by vger.kernel.org with ESMTP id S1726355AbgD1WCj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Apr 2020 17:07:48 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29AD9C03C1AC
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2020 14:07:47 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id e26so35397144otr.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2020 14:07:47 -0700 (PDT)
+        Tue, 28 Apr 2020 18:02:39 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C4FEC03C1AC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2020 15:02:38 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id f8so18121169lfe.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2020 15:02:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/gUQZIHD+k3WI82+sRa1/EBE1hnpwMzmqhFoAyagTyQ=;
-        b=Njnf5muZnVbUTZcIiJIMHuxA622phNteq2XgThGVLHni/JZhY1NL6zqqHSLponPg7t
-         UrRxs/d+CfVydSOXJiMPFdwtZ53/aaLHHXT1fQoTgndKXjy3F0mjJy9GLiiPhQUKhs74
-         nbH+j7dyuftkfsDs8eZwCrxJ4yc/toOpOO4bH+6vyoEOlA0+4M/kR1j373DrhTiC+IpQ
-         ZE1Dqn18hFj2R0m8boSEz5BpbIbwvmWPxeZLpwpvO5feopqGBiV55Jk5i2iVfUnKr692
-         zy4oKSdO52eAyC0jqkgRzIV0bsqkH/5R7eLhRi3v5gDUXkHxb+Eia9Sc8aN9SNlmk73j
-         BI9Q==
+        bh=iSi7aTQiGBFWtl/N3/RLyQibHZcuchs5ZvLVr2t+HMo=;
+        b=g8Sly55FBb6gRbW4Vr4PsoSkm3ZW4YDr9GtWLEDSFU16lMSaGO9FvErZm4kAJZqHOB
+         Jb0rh1k9AWVNGXSNaL5+Oqrgl3vN1GP9Yv+aVmRrjm6ELKfpDKlGw1zU0BWZ1VdkpDxt
+         UsGXV3vjXGDzQhp4lNDlbqiZpRyUDIrIcO2cI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=/gUQZIHD+k3WI82+sRa1/EBE1hnpwMzmqhFoAyagTyQ=;
-        b=Oc0+RhviyHvAt3NeLfSvC5nkZ9K9y+q50Q33KnpaSmuy9Swybh4ibyNkXbD/xSe6GM
-         UZElthMUwLhaI4Jc9AlK7alHYYnT0EbWOw9InndikuwpDr2+7fJUoPqv4uuy94+SSx4a
-         6O717IfFgyDiXetYCmqM0cGPp4P7CDyvNiMQN0Qd3gfUYNJA6SmeyzrQW4uTiwQ+A/la
-         kC7L6GrVGyATJEZ7lUi04pIfaf0vbawW1OeMpfZWbngytoUWq+Me7uodx/h1p9sSfXz4
-         RYI2mubBwPHpLs4yT0zGPHwCCpeIw7r8t9kD22k9p7hcCzKnpA0Qyl/rhTHCklxbf1Cr
-         vWRw==
-X-Gm-Message-State: AGi0PuYCIy7FeiXenSPyXeo5jHHeuPImNsTngye3/nA+X8Y+SOhYXfeN
-        OYiyZmR7GtFqTKiMOE1LUJBp293aO4ugcfTAJ+L+ViYW
-X-Google-Smtp-Source: APiQypLxr5zHNPw8iifU2qoq5m6QMS3SXolyl284c5N0k2J9D4hfSrm/UgiNoRpluETUY63UQrof5aW3F3KvaVtcwrY=
-X-Received: by 2002:a9d:7a98:: with SMTP id l24mr25057712otn.79.1588108066365;
- Tue, 28 Apr 2020 14:07:46 -0700 (PDT)
+        bh=iSi7aTQiGBFWtl/N3/RLyQibHZcuchs5ZvLVr2t+HMo=;
+        b=m878eg2LKFvFPSDWC/G+lHn9JewzEwE+pkAnN0kAdVlMx2NnthAZYAunITp/uPks+g
+         42NIF61ue1D5lVXQTcrvqD2n/Wn0lXdTdz/ayfnOK5y6KktlhBzHHCKsevhtpNZ3lhny
+         /rQAtzQtEoCtqKIYY9EU8/RzSFcoU23wEFbP493PkcLf8kUHaWHxkrIo2PaIBytp1cjC
+         fA2fOP1g1P6jJrGOP+HQPXiQEdEMc32/pvYLqxcqMK29uhwwXSJBxcY0fc7KPzSG4QYb
+         bij/VuFEqFkVoAUOEji/C7wALHyA34Ap1CDSVdZYSUCJTR3M7Ofh40Fb5DAh8R0+S3/g
+         UgqA==
+X-Gm-Message-State: AGi0Pua/oTiEC/Em6V695Qo96pTiZ1+xSKDTnzy00c7VBfkIyxPk9lyI
+        7ZeabMP6bS0JYg8AVRR5tUGNNup5DtMIGpD6S/kRIg==
+X-Google-Smtp-Source: APiQypIG7hE7zp8+J181qo+6cQGjH2MiY+ZVTnqiJbjUC3F0rcbw7I1iK3PO5L8kGT18FEP8ZuMy1zwVglCcLcyqh2o=
+X-Received: by 2002:ac2:569b:: with SMTP id 27mr20694044lfr.134.1588111355781;
+ Tue, 28 Apr 2020 15:02:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200427150153.17055-1-david@lechnology.com> <CABBYNZKhVUqLortqL60CNtu0MZBdtW+qqdtn6zfacOVKDezYxQ@mail.gmail.com>
- <35f37936-e737-ac35-c538-9447a00d1cbc@lechnology.com> <CABBYNZKYXjKDb77988uFE6hQvW-R2es=Y4rZfNML9zFciOmuRg@mail.gmail.com>
- <685ddf1b-c824-9c45-298f-97b70cbf975f@lechnology.com>
-In-Reply-To: <685ddf1b-c824-9c45-298f-97b70cbf975f@lechnology.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 28 Apr 2020 14:07:34 -0700
-Message-ID: <CABBYNZJ_oLodrsZAftiaHfcM-CPsHvF4nw+Yzx+TeJPEvcUa+A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] src/gatt-client: always check properties in WriteValue
-To:     David Lechner <david@lechnology.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20200427131208.BlueZ.v4.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
+ <CABBYNZ+dh=ypP8hqhPEiB7mu2u5v-AfD+3y2W63_7ZCitJ=dOQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+dh=ypP8hqhPEiB7mu2u5v-AfD+3y2W63_7ZCitJ=dOQ@mail.gmail.com>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Tue, 28 Apr 2020 15:02:24 -0700
+Message-ID: <CABmPvSGkW9=f7uFVfwiLB7-UiMm+C6-d+Y7UX+4iw6Hy0YCE=A@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v4] doc: Add Advertisement Monitoring API
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Alain Michaud <alainm@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi David,
+Great! Thank you so much.
 
-On Tue, Apr 28, 2020 at 10:19 AM David Lechner <david@lechnology.com> wrote:
+On Mon, Apr 27, 2020 at 2:38 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> On 4/28/20 12:03 PM, Luiz Augusto von Dentz wrote:
-> > Hi David,
+> Hi Miao,
+>
+> On Mon, Apr 27, 2020 at 1:16 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 > >
-> > On Tue, Apr 28, 2020 at 7:39 AM David Lechner <david@lechnology.com> wrote:
-> >>
-> >> On 4/27/20 11:28 AM, Luiz Augusto von Dentz wrote:
-> >>> Hi David,
-> >>>
-> >>> On Mon, Apr 27, 2020 at 8:07 AM David Lechner <david@lechnology.com> wrote:
-> >>>>
-> >>>> This modifies the GATT client characteristic WriteValue D-Bus method to
-> >>>> always check that the characteristic supports the requested type of
-> >>>> write by checking for the corresponding property before attempting to
-> >>>> write.
-> >>>>
-> >>>> Before this change, if the "type" option was used and it was set to
-> >>>> "reliable" or "request", then BlueZ would attempt the write even if the
-> >>>> characteristic does not support that write type. On the other hand, if
-> >>>> "type" was set to "command" or was not specified, the method would
-> >>>> return a org.bluez.Error.NotSupported error without attempting to write.
-> >>>>
-> >>>> After this change, the WriteValue method will consistently return
-> >>>> org.bluez.Error.NotSupported if the corresponding property flag is not
-> >>>> set for all types of writes.
-> >>>> ---
-> >>>>
-> >>>> v2 changes:
-> >>>> - remove extra check of test variable not NULL
-> >>>> - fix one line over 80 chars
-> >>>>
-> >>>>    src/gatt-client.c | 8 ++++----
-> >>>>    1 file changed, 4 insertions(+), 4 deletions(-)
-> >>>>
-> >>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> >>>> index a9bfc2802..f80742fbb 100644
-> >>>> --- a/src/gatt-client.c
-> >>>> +++ b/src/gatt-client.c
-> >>>> @@ -1016,8 +1016,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
-> >>>>            *     - If value is larger than MTU - 3: long-write
-> >>>>            *   * "write-without-response" property set -> write command.
-> >>>>            */
-> >>>> -       if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
-> >>>> -                       || (type && !strcasecmp(type, "reliable"))) {
-> >>>> +       if ((!type || !strcasecmp(type, "reliable")) && chrc->ext_props &
-> >>>> +                               BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE) {
-> >>>>                   supported = true;
-> >>>>                   chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
-> >>>>                                                   true, value, value_len, offset,
-> >>>> @@ -1026,8 +1026,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
-> >>>>                           return NULL;
-> >>>>           }
-> >>>>
-> >>>> -       if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
-> >>>> -                       (type && !strcasecmp(type, "request"))) {
-> >>>> +       if ((!type || !strcasecmp(type, "request")) && chrc->props &
-> >>>> +                                               BT_GATT_CHRC_PROP_WRITE) {
-> >>>>                   uint16_t mtu;
-> >>>>
-> >>>>                   supported = true;
-> >>>> --
-> >>>> 2.17.1
-> >>>
-> >>> As far I can remember this is on purpose so the application can
-> >>> overwrite the type if it needs to disabling the checks on the client
-> >>> side, though the kernel can still return not supported, so if we want
-> >>> to change this it will now not be possible to overwrite it anymore.
-> >>>
-> >>
-> >> If this is the case, does it make sense to make the following change
-> >> instead so that write without response can also be forced?
-> >>
-> >> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> >> index f80742fbb..3153f571f 100644
-> >> --- a/src/gatt-client.c
-> >> +++ b/src/gatt-client.c
-> >> @@ -1050,8 +1050,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
-> >>                           return NULL;
-> >>           }
-> >>
-> >> -       if ((type && strcasecmp(type, "command")) || offset ||
-> >> -                       !(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
-> >> +       if ((type && strcasecmp(type, "command")) || offset || (!type &&
-> >> +                       !(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP)))
-> >>                   goto fail;
-> >>
-> >>           supported = true;
+> > This patch proposes an Advertisement Monitoring API for an application to
+> > register a job of monitoring ADV reports with content filter and RSSI
+> > thresholds.
+> > ---
 > >
-> > Yes, that is probably one of the use cases to use the type to force
-> > sending a command if the client don't care about the response but the
-> > server don't mark write without response as supported, is that what
-> > you are after? That sounds like a bug since it appears the intention
-> > was to allow commands all along.
+> > Changes in v4:
+> > - Change the signature of SupportedMonitorTypes to be array of strings.
+> > - Fix document formatting.
 > >
+> > Changes in v3:
+> > - Introduce SupportedFeatures to reflect the features based on
+> > controller's capabilities.
+> > - Modify SupportedMonitorTypes to list available types of monitors.
+> >
+> > Changes in v2:
+> > - Rename the interfaces and functions.
+> > - Adopt the object manager mechanism so that a client can expose
+> > multiple monitor objects and expect to get notified on whether the
+> > monitor has been activated or not.
+> > - Change the contract of DeviceFound so that it is called to indicate
+> > the starting point of monitoring on a device instead of reporting every
+> > ADV. In other words, the client is expected to monitor corresponding
+> > device events.
+> >
+> >  doc/advertisement-monitor-api.txt | 137 ++++++++++++++++++++++++++++++
+> >  1 file changed, 137 insertions(+)
+> >  create mode 100644 doc/advertisement-monitor-api.txt
+> >
+> > diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+> > new file mode 100644
+> > index 000000000..012fce420
+> > --- /dev/null
+> > +++ b/doc/advertisement-monitor-api.txt
+> > @@ -0,0 +1,137 @@
+> > +BlueZ D-Bus Advertisement Monitor API Description
+> > +*************************************************
+> > +
+> > +This API allows an client to specify a job of monitoring advertisements by
+> > +registering the root of hierarchy and then exposing advertisement monitors
+> > +under the root with filtering conditions, thresholds of RSSI and timers
+> > +of RSSI thresholds.
+> > +
+> > +Once a monitoring job is activated by BlueZ, the client can expect to get
+> > +notified on the targeted advertisements no matter if there is an ongoing
+> > +discovery session (a discovery session is started/stopped with methods in
+> > +org.bluez.Adapter1 interface).
+> > +
+> > +Advertisement Monitor hierarchy
+> > +===============================
+> > +Service                org.bluez
+> > +Interface      org.bluez.AdvertisementMonitor1 [experimental]
+> > +Object path    freely definable
+> > +
+> > +Methods                void Release() [noreply]
+> > +
+> > +                       This gets called as a signal for a client to perform
+> > +                       clean-up when (1)a monitor cannot be activated after it
+> > +                       was exposed or (2)a monitor has been deactivated.
+> > +
+> > +               void Activate() [noreply]
+> > +
+> > +                       After a monitor was exposed, this gets called as a
+> > +                       signal for client to get acknowledged when a monitor
+> > +                       has been activated, so the client can expect to receive
+> > +                       calls on DeviceFound() or DeviceLost().
+> > +
+> > +               void DeviceFound(object device) [noreply]
+> > +
+> > +                       This gets called to notify the client of finding the
+> > +                       targeted device. Once receiving the call, the client
+> > +                       should start to monitor the corresponding device to
+> > +                       retrieve the changes on RSSI and advertisement content.
+> > +
+> > +               void DeviceLost(object device) [noreply]
+> > +
+> > +                       This gets called to notify the client of losing the
+> > +                       targeted device. Once receiving this call, the client
+> > +                       should stop monitoring the corresponding device.
+> > +
+> > +Properties     uint8 Type [read-only]
+> > +
+> > +                       The type of the monitor. See SupportedMonitorTypes in
+> > +                       org.bluez.AdvertisementMonitorManager1 for the available
+> > +                       options.
+> > +
+> > +               (Int16, Uint16, Int16, Uint16) RSSIThreshholdsAndTimers [read-only, optional]
+> > +
+> > +                       This contains HighRSSIThreshold, HighRSSIThresholdTimer,
+> > +                       LowRSSIThreshold, LowRSSIThresholdTimer in order. The
+> > +                       unit of HighRSSIThreshold and LowRSSIThreshold is dBm.
+> > +                       The unit of HighRSSIThresholdTimer and
+> > +                       LowRSSIThresholdTimer is second.
+> > +
+> > +                       If these are provided, RSSI would be used as a factor to
+> > +                       notify the client of whether a device stays in range or
+> > +                       move out of range. A device is considered in-range when
+> > +                       the RSSIs of the received advertisement(s) during
+> > +                       HighRSSIThresholdTimer seconds exceed HighRSSIThreshold.
+> > +                       Likewise, a device is considered out-of-range when the
+> > +                       RSSIs of the received advertisement(s) during
+> > +                       LowRSSIThresholdTimer do not reach LowRSSIThreshold.
+> > +
+> > +               array{(uint8, uint8, string)} Patterns [read-only, optional]
+> > +
+> > +                       If Type is set to 0x01, this must exist and has at least
+> > +                       one entry in the array.
+> > +
+> > +                       The structure of a pattern contains the following.
+> > +                       uint8 start_position
+> > +                               The index in an AD data field where the search
+> > +                               should start. The beginning of an AD data field
+> > +                               is index 0.
+> > +                       uint8 AD_data_type
+> > +                               See https://www.bluetooth.com/specifications/
+> > +                               assigned-numbers/generic-access-profile/ for
+> > +                               the possible allowed value.
+> > +                       string content_of_pattern
+> > +                               This is the value of the pattern.
+> > +
+> > +Advertisement Monitor Manager hierarchy
+> > +=======================================
+> > +Service                org.bluez
+> > +Interface      org.bluez.AdvertisementMonitorManager1 [experimental]
+> > +Object path    /org/bluez/{hci0,hci1,...}
+> > +
+> > +Methods                void RegisterApplication(object application)
+> > +
+> > +                       This registers a hierarchy of advertisement monitors.
+> > +                       The application object path together with the D-Bus
+> > +                       system bus connection ID define the identification of
+> > +                       the application registering advertisement monitors.
+> > +
+> > +                       Possible errors: org.bluez.Error.InvalidArguments
+> > +                                        org.bluez.Error.AlreadyExists
+> > +
+> > +               void UnregisterApplication(object application)
+> > +
+> > +                       This unregisters advertisement monitors that have been
+> > +                       previously registered. The object path parameter must
+> > +                       match the same value that has been used on
+> > +                       registration.
+> > +
+> > +                       Possible errors: org.bluez.Error.InvalidArguments
+> > +                                        org.bluez.Error.DoesNotExist
+> > +
+> > +Properties     array{string} SupportedMonitorTypes [read-only]
+> > +
+> > +                       This lists the supported types of advertisement
+> > +                       monitors. An application should check this before
+> > +                       instantiate and expose an object of
+> > +                       org.bluez.AdvertisementMonitor1.
+> > +
+> > +                       Possible values for monitor types:
+> > +
+> > +                       "patterns_with_logic_or"
+> > +                               Patterns with logic OR applied. With this type,
+> > +                               property "Patterns" must exist and has at least
+> > +                               one pattern.
+> > +
+> > +               array{string} SupportedFeatures [read-only]
+> > +
+> > +                       This lists the features of advertisement monitoring
+> > +                       supported by BlueZ.
+> > +
+> > +                       Possible values for features:
+> > +
+> > +                       "controller-based-monitor-by-patterns"
+> > +                               If the controller is capable of performing
+> > +                               advertisement monitoring by patterns, BlueZ
+> > +                               would offload the patterns to the controller to
+> > +                               reduce power consumption.
+> > --
+> > 2.24.1
 >
-> I just noticed the inconsistency here while trying to implement
-> writeValueWithResponse() and writeValueWithoutResponse() in the Web
-> Bluetooth API for the Chromium browser and thought that it should
-> probably all be one way or the other.
+> Applied, thanks, note that I did change the Type to be string as well
+> so we is consistent with SupportMonitorTypes.
 >
-> FWIW, in the particular case I am working with, the device has both
-> the WRITE and WRITE_WITHOUT_RESP properties set so I am using "type"
-> to force writing without response since write with response would
-> be selected otherwise.
->
-> I will send a proper patch to fix the write without response case.
-
-Great, that indeed shall be supported since both are allowed
-bluetoothd will prefer Write since that gives a response, there is
-also some means to mark the D-Bus message don't expect a reply as well
-which might be another to solve this if you don't want to use type.
-
--- 
-Luiz Augusto von Dentz
+> --
+> Luiz Augusto von Dentz
