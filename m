@@ -3,90 +3,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A78C83004
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24000C83000
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:47:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 044D6206D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:43:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 071B5206A1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:47:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbgD1JnT (ORCPT
+        id S1727051AbgD1Jro convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Apr 2020 05:43:19 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60416 "EHLO
+        Tue, 28 Apr 2020 05:47:44 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60499 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726904AbgD1JnT (ORCPT
+        with ESMTP id S1726971AbgD1Jro (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Apr 2020 05:43:19 -0400
+        Tue, 28 Apr 2020 05:47:44 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 52440CECEA;
-        Tue, 28 Apr 2020 11:52:56 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0156DCECEB;
+        Tue, 28 Apr 2020 11:57:21 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: Add support for Intel Bluetooth
- Device Typhoon Peak (8087:0032)
+Subject: Re: [PATCH] Bluetooth: Handle Inquiry Cancel error after Inquiry
+ Complete
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200427094558.16649-1-amit.k.bag@intel.com>
-Date:   Tue, 28 Apr 2020 11:43:16 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        kiran.k@intel.com, "Hegde, Raghuram" <raghuram.hegde@intel.com>,
-        Tumkur@vger.kernel.org, Narayan@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <CA8F774D-7073-4EC4-97AF-F5EF431E8E46@holtmann.org>
-References: <20200427094558.16649-1-amit.k.bag@intel.com>
-To:     Amit K Bag <amit.k.bag@intel.com>
+In-Reply-To: <20200428051151.14879-1-sonnysasaka@gmail.com>
+Date:   Tue, 28 Apr 2020 11:47:42 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D2192131-CC65-4D4E-91BE-B1C3B1C12BC4@holtmann.org>
+References: <20200428051151.14879-1-sonnysasaka@gmail.com>
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Amit,
+Hi Sonny,
 
-> Device from /sys/kernel/debug/usb/devices:
+> After sending Inquiry Cancel command to the controller, it is possible
+> that Inquiry Complete event comes before Inquiry Cancel command complete
+> event. In this case the Inquiry Cancel command will have status of
+> Command Disallowed since there is no Inquiry session to be cancelled.
+> This case should not be treated as error, otherwise we can reach an
+> inconsistent state.
 > 
-> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=0032 Rev= 0.00
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> Example of a btmon trace when this happened:
 > 
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> Signed-off-by: Tumkur Narayan, Chethan <chethan.tumkur.narayan@intel.com>
+> < HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
+>> HCI Event: Inquiry Complete (0x01) plen 1
+>        Status: Success (0x00)
+>> HCI Event: Command Complete (0x0e) plen 4
+>      Inquiry Cancel (0x01|0x0002) ncmd 1
+>        Status: Command Disallowed (0x0c)
 > ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> net/bluetooth/hci_event.c | 19 +++++++++++++++----
+> 1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 966fc543c01d..0f3f7255779f 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -42,10 +42,9 @@
+> 
+> /* Handle HCI Event packets */
+> 
+> -static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+> +static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb,
+> +				  u8 status)
+> {
+> -	__u8 status = *((__u8 *) skb->data);
+> -
+> 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> 
+> 	if (status)
+> @@ -3233,7 +3232,19 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+> 
+> 	switch (*opcode) {
+> 	case HCI_OP_INQUIRY_CANCEL:
+> -		hci_cc_inquiry_cancel(hdev, skb);
+> +		/* It is possible that we receive Inquiry Complete event right
+> +		 * before we receive Inquiry Cancel Command Complete event, in
+> +		 * which case the latter event should have status of Command
+> +		 * Disallowed (0x0c). This should not be treated as error, since
+> +		 * we actually achieve what Inquiry Cancel wants to achieve,
+> +		 * which is to end the last Inquiry session.
+> +		 */
+> +		if (*status == 0x0c && !test_bit(HCI_INQUIRY, &hdev->flags)) {
+> +			BT_DBG("Ignoring error of HCI Inquiry Cancel command");
+> +			*status = 0;
+> +		}
 
-patch has been applied to bluetooth-next tree.
+is there a problem with moving this check into hci_cc_inquiry_cancel? Then we don’t have to play any tricks with an extra parameter that is also included in the skb data struct itself.
+
+I prefer we start using bt_dev_dbg and in this case maybe we just use bt_dev_warn or bt_dev_warn_ratelimited.
 
 Regards
 
