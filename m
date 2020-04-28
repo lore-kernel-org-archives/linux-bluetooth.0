@@ -2,70 +2,71 @@ Return-Path: <SRS0=u/yl=6M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA4BC83000
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BEDC83007
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:34:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0DD9206C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:29:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A947A206C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Apr 2020 09:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726951AbgD1J3g (ORCPT
+        id S1727094AbgD1Jeo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Apr 2020 05:29:36 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50225 "EHLO
+        Tue, 28 Apr 2020 05:34:44 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:37972 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726824AbgD1J3g (ORCPT
+        with ESMTP id S1726477AbgD1Jeo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Apr 2020 05:29:36 -0400
+        Tue, 28 Apr 2020 05:34:44 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5B7A9CECEA;
-        Tue, 28 Apr 2020 11:39:14 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 49A3CCECEA;
+        Tue, 28 Apr 2020 11:44:22 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v3 1/3] bluetooth:Adding driver and quirk defs for
- multi-role LE
+Subject: Re: [PATCH v2 0/3] Bluetooth: hci_qca: add support for QCA9377
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200423144328.82478-2-alainm@chromium.org>
-Date:   Tue, 28 Apr 2020 11:29:34 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20200423013430.21399-1-christianshewitt@gmail.com>
+Date:   Tue, 28 Apr 2020 11:34:42 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-amlogic@lists.infradead.org,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Content-Transfer-Encoding: 7bit
-Message-Id: <D83F7440-10F0-4DF8-AE8C-8DC2EDDD39E6@holtmann.org>
-References: <20200423144328.82478-1-alainm@chromium.org>
- <20200423144328.82478-2-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
+Message-Id: <07968FAA-BEC1-4E76-A529-0A004110F437@holtmann.org>
+References: <20200423013430.21399-1-christianshewitt@gmail.com>
+To:     Christian Hewitt <christianshewitt@gmail.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Christian,
 
-> This change adds the relevant driver and quirk to allow drivers to
-> report the le_states as being trustworthy.
+> This series adds a new compatible for the QCA9377 BT device that is found
+> in many Android TV box devices, makes minor changes to allow max-speed
+> values for the device to be read from device-tree, and updates bindings
+> to reflect those changes.
 > 
-> This has historically been disabled as controllers did not reliably
-> support this. In particular, this will be used to relax this condition
-> for controllers that have been well tested and reliable.
+> v2 changes: rebase against bluetooth-next
 > 
-> 	/* Most controller will fail if we try to create new connections
-> 	 * while we have an existing one in slave role.
-> 	 */
-> 	if (hdev->conn_hash.le_num_slave > 0)
-> 		return NULL;
+> Christian Hewitt (3):
+>  dt-bindings: net: bluetooth: Add device tree bindings for QCA9377
+>  Bluetooth: hci_qca: add compatible for QCA9377
+>  Bluetooth: hci_qca: allow max-speed to be set for QCA9377 devices
 > 
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> ---
-> 
-> drivers/bluetooth/btusb.c   | 2 +-
-> include/net/bluetooth/hci.h | 9 +++++++++
-> 2 files changed, 10 insertions(+), 1 deletion(-)
+> .../bindings/net/qualcomm-bluetooth.txt         |  5 +++++
+> drivers/bluetooth/hci_qca.c                     | 17 ++++++++++-------
+> 2 files changed, 15 insertions(+), 7 deletions(-)
 
-all 3 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
