@@ -2,145 +2,127 @@ Return-Path: <SRS0=4cRj=6N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7E3C83004
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Apr 2020 21:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 419E6C83000
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Apr 2020 21:35:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6329B206F0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Apr 2020 21:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 199D42083B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Apr 2020 21:35:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kzjJDaFS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vh3BLZhK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgD2VEX (ORCPT
+        id S1726852AbgD2Vf1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Apr 2020 17:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38920 "EHLO
+        Wed, 29 Apr 2020 17:35:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726869AbgD2VEW (ORCPT
+        by vger.kernel.org with ESMTP id S1726775AbgD2Vf1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Apr 2020 17:04:22 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CC9C03C1AE
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 14:04:21 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id ms17so1262767pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 14:04:21 -0700 (PDT)
+        Wed, 29 Apr 2020 17:35:27 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6491BC03C1AE
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 14:35:27 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id 20so3653816qkl.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 14:35:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=44cT6vg9o/XB4HDE3z3zf4ENTZzCjtOf3V3z37ECrMg=;
-        b=kzjJDaFS1Fr2bqCHv45FhjQIece6lcQ/ewfiP04OPxF3BuppPpdgi3Oikd9AJsT3K0
-         KmVbFbu6oeDQOATbmdG6zbB6zsF1GxM81rzlpT9waFXAB6zwGfI4pjY2Lrj/qMPvZU7d
-         /b0Sk7RtSTFSILa8/EbyaeMNUoUEWA1lD4VXIQAj4mE5e6Ggkigz/IRmOHRwG4FTpQv3
-         TbTix3ko8m2mXF4HAEg/AiFtm3Hd5OD9KYmZgrqlJIG4QK0uR4S/piTiGAYgW6iUU7Dm
-         3tiMVs6GVbBUz7xAKLlBm8O/CvXlMUToCfh+LOdBugpp4Bm/z1NXQ+RsVMbFOgkRKbmx
-         bk9w==
+        h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
+        bh=U2DsoS/6E9Q7A0DIVF6CO9Kk1e5xuHBU2zUhz+Yj3wQ=;
+        b=vh3BLZhKpl2Y1N9KIfPRy8//jAZisZkNuV+NnCVbVxdunGUIMsfNscx05dn2oVKiEP
+         2X22CJ7oxo2xKKbfgmG1CiUSrZNGJETUVeTZC4XBn9379rz2ehg3pVtQVPAmhTp778tz
+         tlt0YZByUgGANv6frbqHadS67TyGBfNp2c878FSk34B6ZPeULSLc892g11nhvZSAVQST
+         lKTxIQU7LlNl9ER195LSw7XCcl018W7aUtciTsuffX3oj7gPwqASw0W6YausIAP2tIFL
+         r0kKvFU35K+Aq+A0ItSL/YlVm9nOGBTeiIQCHd/2ni9eo25c0JnvyQJLyd3YZS+Hz/8n
+         5+FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=44cT6vg9o/XB4HDE3z3zf4ENTZzCjtOf3V3z37ECrMg=;
-        b=ucL63Qb2CxEui16nKxCL2ups2c5p83xTGr/X3X32qutONKGmD2PiBcKFuMLlN6JNdp
-         Qzq08cBhSZuA2WYGEUNFdw2cOcJQf4/+kuK1GvBQuxg3ZKp9U8JLcH0D/ggCP7G3Fdq3
-         J0pnSbhmfoAMP9Pohp9OFue2+apJAqRE4HwzzgYJJaI2bKuRh2j7gUlu+kHVJoMaHO6i
-         f06d+mnEEbmUf1pTQ/uW49b06K7AfOlVP91I65icO4HZmf2Jp4o/3dyeG75l8EHZBExd
-         ErDF7Qgshi94KDvMpLZ+avMW+7eKBaQOWwBIyEydEjmE0OSJcRxth8V5Nd/mCgkT+aCf
-         psWg==
-X-Gm-Message-State: AGi0PuaASJ4INX53P5jJe/ttmiZ01hURSkizQYa8+OBpWI7QmUkMRTYY
-        9tXXPcymDDKN6FEOsRkZmwJUNdFo/uk=
-X-Google-Smtp-Source: APiQypKchtDtHsga3HX20O2098MPVEPXGLOZJZvdYQqSlBoPsst4NhU0wtQ+LzqeCAQ/XIquTozmqA==
-X-Received: by 2002:a17:90a:68c1:: with SMTP id q1mr414198pjj.35.1588194260867;
-        Wed, 29 Apr 2020 14:04:20 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a136sm1783969pfa.99.2020.04.29.14.04.20
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :in-reply-to:references;
+        bh=U2DsoS/6E9Q7A0DIVF6CO9Kk1e5xuHBU2zUhz+Yj3wQ=;
+        b=LiNVGb3tqZogJs8gVufILoXhXKGeDes0yDt9jwpMhjpXI2nR/c2uGIcYdHenfqaFCL
+         BzJbnrwwdojZxgKhBHetzZIhO54v44+ofI+M7+EZGNWdxIZ4AQxFdPdXzh+LHXEK/cW9
+         Weovmj10y3bLtosqeCbWWnoMQc63HKsn34AkU/ugZYyRKOE+E86DqLZ3bBVyxWjSxMlt
+         g+YddP6K/m2bGzhHncgeFz7VWrNcwzgR6KxxjBT3PWxMf5vyzDztUhx2Z0Qy4wWbE8Km
+         zzRExv76Yx2BxYbRSnI19bhxmmUpXC5p5ZY5X5hwKsNMZB0TYfwdanWnYDwz8kz7onKE
+         yBPA==
+X-Gm-Message-State: AGi0PuYMKHV2hmAKv/ScCk0V18LTgR0aH7MuAyNEXTOgMZVNnZi0cEdK
+        SeEtUHOY7AydQeBGBCCnrKeHloHUcxE=
+X-Google-Smtp-Source: APiQypJme5M4dt8QWg9o/V+LSVZbjnAHBbr84cM82G9ocr5Agfnb5r64dKiJqL1vTrjykijRS7QaKw==
+X-Received: by 2002:a05:620a:2091:: with SMTP id e17mr562234qka.70.1588196126465;
+        Wed, 29 Apr 2020 14:35:26 -0700 (PDT)
+Received: from [172.17.0.2] ([52.149.180.133])
+        by smtp.gmail.com with ESMTPSA id v2sm399847qth.66.2020.04.29.14.35.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2020 14:04:20 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] log: Make error and warn log file and function information
-Date:   Wed, 29 Apr 2020 14:04:19 -0700
-Message-Id: <20200429210419.1569840-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.25.3
+        Wed, 29 Apr 2020 14:35:25 -0700 (PDT)
+Message-ID: <5ea9f31d.1c69fb81.3f794.3102@mx.google.com>
+Date:   Wed, 29 Apr 2020 14:35:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7726755867900548330=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] log: Make error and warn log file and function information
+In-Reply-To: <20200429210419.1569840-1-luiz.dentz@gmail.com>
+References: <20200429210419.1569840-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7726755867900548330==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes it a lot simpler to find out where errors/warnings come from
-and also remove the possibility of clashes when having multiple places
-where the message would be exactly the same.
----
- src/log.c | 26 --------------------------
- src/log.h |  6 ++++--
- 2 files changed, 4 insertions(+), 28 deletions(-)
 
-diff --git a/src/log.c b/src/log.c
-index 11d26d508..a42c5941d 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -53,32 +53,6 @@ static void monitor_log(uint16_t index, int priority,
- 	bt_log_vprintf(index, LOG_IDENT, priority, format, ap);
- }
- 
--void error(const char *format, ...)
--{
--	va_list ap;
--
--	va_start(ap, format);
--	vsyslog(LOG_ERR, format, ap);
--	va_end(ap);
--
--	va_start(ap, format);
--	monitor_log(HCI_DEV_NONE, LOG_ERR, format, ap);
--	va_end(ap);
--}
--
--void warn(const char *format, ...)
--{
--	va_list ap;
--
--	va_start(ap, format);
--	vsyslog(LOG_WARNING, format, ap);
--	va_end(ap);
--
--	va_start(ap, format);
--	monitor_log(HCI_DEV_NONE, LOG_WARNING, format, ap);
--	va_end(ap);
--}
--
- void info(const char *format, ...)
- {
- 	va_list ap;
-diff --git a/src/log.h b/src/log.h
-index 0d243ceca..73240e259 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -23,8 +23,6 @@
- 
- #include <stdint.h>
- 
--void error(const char *format, ...) __attribute__((format(printf, 1, 2)));
--void warn(const char *format, ...) __attribute__((format(printf, 1, 2)));
- void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
- 
- void btd_log(uint16_t index, int priority, const char *format, ...)
-@@ -71,3 +69,7 @@ void __btd_enable_debug(struct btd_debug_desc *start,
- } while (0)
- 
- #define DBG(fmt, arg...) DBG_IDX(0xffff, fmt, ## arg)
-+#define error(fmt, arg...) \
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+
+Test Result:
+Checkpatch Failed
+
+Patch Title:
+[BlueZ] log: Make error and warn log file and function information
+
+Output:
+ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
+#65: FILE: src/log.h:73:
 +	btd_error(0xffff, "%s:%s() " fmt, __FILE__, __func__ , ## arg)
-+#define warn(fmt, arg...) \
-+	btd_warn(0xffff, "%s:%s() " fmt, __FILE__, __func__ , ## arg)
--- 
-2.25.3
+ 	                                                     ^
 
+ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
+#67: FILE: src/log.h:75:
++	btd_warn(0xffff, "%s:%s() " fmt, __FILE__, __func__ , ## arg)
+ 	                                                    ^
+
+- total: 2 errors, 0 warnings, 47 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+For more details about BlueZ coding style guide, please find it
+in doc/coding-style.txt
+
+---
+Regards,
+Linux Bluetooth
+
+--===============7726755867900548330==--
