@@ -2,360 +2,276 @@ Return-Path: <SRS0=orbE=6O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 286B1C83000
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 01:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C147C83003
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 03:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA6E0208E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 01:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 025572083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 03:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EDyMUGkh"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Wb61UyZQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726337AbgD3BJv (ORCPT
+        id S1726396AbgD3DbC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Apr 2020 21:09:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48958 "EHLO
+        Wed, 29 Apr 2020 23:31:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726284AbgD3BJu (ORCPT
+        by vger.kernel.org with ESMTP id S1726355AbgD3DbC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Apr 2020 21:09:50 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59729C035494
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 18:09:50 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id b2so4682573ljp.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 18:09:50 -0700 (PDT)
+        Wed, 29 Apr 2020 23:31:02 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF30FC035494
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 20:31:01 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id t40so142254pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 20:31:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vS7IgAh56fVAdz4aXAUi3aaH4svNCUZRitQLqXsmPK0=;
-        b=EDyMUGkhm4bYEJWkSnTok/wNKfbKZrBQyvBvOr78jQN7i3swNxxhi5L/DKfT0ys3WL
-         LmBrLrRMNpGerhIWNrdqG/pjMo5oxGnZ6qGZMJPo7AgTgQOG9d2jmb/UJT0u+VnYWAEl
-         IzmydC3jXtLVm9GI8LGOMqFNZyRt/3lUC5WeI=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5s9YHaWtzDXo107Kcfzp1XkWTCE/gzb+RAWh5n/g0Z8=;
+        b=Wb61UyZQbBV271LNuoV6j9tIl18v8hWNIh5cuIhhZa8kIAs7orPd9LY3bUOyVNJnQn
+         eTGfirXddPHfXGUOoLacYp/onjPOKVPC+vJaJkc5NDfLfHnU/XGICPbT9xDYRrvmNWEc
+         KcPjvRZwGQmWm+7aw22t8cukm9WrWaoTBYvsw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vS7IgAh56fVAdz4aXAUi3aaH4svNCUZRitQLqXsmPK0=;
-        b=gUv5f164cBYHrXqHF1pNYpIKL4sTIXsZrk00RoaRbusCdweNy3hJrhU+4GTS0vlDKL
-         6Ok3oGQ4g+iyuj4/bTJWKiMRVJsQ7tdxTMoqqDldnAyGO6/rE7WqRNKtrZgzJ95acTus
-         5AjoanQ0FD3OHNeVAL88xahszKfKmK5GPEe6/YmKEV4vy7iPQK/ZkGI5tNELLr8ySCfP
-         GuUHb6Y2Vd4YW1eiQ3gWvuyqY0veVoQW+hkkcFd1vQ5AXIvMwJ2PcvD+2d1EicLGg62x
-         Tn0OHaGvDQnT3bZl34l5UxhIl8UIbOiJL2qlX39kuyPDrz5OapjHaCQ7yEFVDMWudtKZ
-         i/DA==
-X-Gm-Message-State: AGi0PuZRl97H0kg3s4iYaLQY+DZ3Pb8Or909rxHqIGxK+D4Z0nrscDAA
-        zcBG8i4vRUGlQ96p6OyTHkxKlu7KhVxYYa2dmF4LjA==
-X-Google-Smtp-Source: APiQypIGtRIiaVCz/tgzHuLEwnuFrhAr08ieTQfLzxB0LyI2Dqfsw3Iu6p7CdN1CIlnhk8HBVDt09KfR4/d0nzH9AiY=
-X-Received: by 2002:a2e:a37b:: with SMTP id i27mr531172ljn.36.1588208988603;
- Wed, 29 Apr 2020 18:09:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200427131208.BlueZ.v4.1.I137a529ab03c9d0d2327f1659bd1af4954a28e78@changeid>
- <D989C44F-A240-4129-8EF6-513645E5DFE6@holtmann.org> <CACumGO+Ss4s=tcaosXMRfVkccRZ_42Hh3YCr1bgFaUz5a6SUBw@mail.gmail.com>
-In-Reply-To: <CACumGO+Ss4s=tcaosXMRfVkccRZ_42Hh3YCr1bgFaUz5a6SUBw@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5s9YHaWtzDXo107Kcfzp1XkWTCE/gzb+RAWh5n/g0Z8=;
+        b=a45BQojbJuK9fxqYgdcIklu6ec7bnZV0AmTsMEVCT1OsHj3prl/SeYBQrQwRo0d7ZX
+         tGQSBvU4dGO/IBF8f2ogf+hoUHloPTJoX5KevWojxf4Toh+JQcffO4lqW1/Oj5llxAJv
+         /qxzI0hxRYJIjRulmqUZisGUJB3HMBiHl1kZFnnDuAlByBXsVkX+/WmFaPxBnyah7rtq
+         9R9yW4XSgno3AYez09biwSffOm84e1uPCOm0glwW1JYiEvmFCqEopZT9RF745NWFWV+i
+         jlqNMHRclxQNSHkMS5OOwDKLTQA5jcuHN14r1q6oif3XqfQlr+xAkNhqR4bX6HbBsm8Q
+         Wfjw==
+X-Gm-Message-State: AGi0PuYm/UUklnOYXoK/G8V+QGO7qu1ocQX54lN3FzoA45eC1BSESaf3
+        y4o4U4OzjhzXn4HGCXeWn3AiH3YU7bk=
+X-Google-Smtp-Source: APiQypKy7x4GVidHW/GLUhsFEvei6w0HpADSgQgYSST/GVZBpgk1hndiW3vHVbH0yRmMDWjIMwXP0g==
+X-Received: by 2002:a17:90a:17ed:: with SMTP id q100mr633232pja.80.1588217460464;
+        Wed, 29 Apr 2020 20:31:00 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id fh18sm565384pjb.0.2020.04.29.20.30.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 29 Apr 2020 20:30:59 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Wed, 29 Apr 2020 18:09:37 -0700
-Message-ID: <CABmPvSHfRHaJB4YQqOC3yq3S6j6hm4zdE3fqsXp-BaSJxiX6aQ@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v4] doc: Add Advertisement Monitoring API
-To:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
         Michael Sun <michaelfsun@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Yoni Shavit <yshavit@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v5] doc: Describe the new Advertisement Monitor support
+Date:   Wed, 29 Apr 2020 20:30:48 -0700
+Message-Id: <20200429203031.BlueZ.v5.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Apr 29, 2020 at 10:11 AM Von Dentz, Luiz
-<luiz.von.dentz@intel.com> wrote:
->
-> Hi Marcel,
->
-> On Wed, Apr 29, 2020 at 1:13 AM Marcel Holtmann <marcel@holtmann.org> wro=
-te:
->>
->> Hi Miao-chen,
->>
->> > This patch proposes an Advertisement Monitoring API for an application=
- to
->> > register a job of monitoring ADV reports with content filter and RSSI
->> > thresholds.
->> > ---
->> >
->> > Changes in v4:
->> > - Change the signature of SupportedMonitorTypes to be array of strings=
-.
->> > - Fix document formatting.
->> >
->> > Changes in v3:
->> > - Introduce SupportedFeatures to reflect the features based on
->> > controller's capabilities.
->> > - Modify SupportedMonitorTypes to list available types of monitors.
->> >
->> > Changes in v2:
->> > - Rename the interfaces and functions.
->> > - Adopt the object manager mechanism so that a client can expose
->> > multiple monitor objects and expect to get notified on whether the
->> > monitor has been activated or not.
->> > - Change the contract of DeviceFound so that it is called to indicate
->> > the starting point of monitoring on a device instead of reporting ever=
-y
->> > ADV. In other words, the client is expected to monitor corresponding
->> > device events.
->> >
->> > doc/advertisement-monitor-api.txt | 137 ++++++++++++++++++++++++++++++
->> > 1 file changed, 137 insertions(+)
->> > create mode 100644 doc/advertisement-monitor-api.txt
->> >
->> > diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-mon=
-itor-api.txt
->> > new file mode 100644
->> > index 000000000..012fce420
->> > --- /dev/null
->> > +++ b/doc/advertisement-monitor-api.txt
->> > @@ -0,0 +1,137 @@
->> > +BlueZ D-Bus Advertisement Monitor API Description
->> > +*************************************************
->> > +
->> > +This API allows an client to specify a job of monitoring advertisemen=
-ts by
->> > +registering the root of hierarchy and then exposing advertisement mon=
-itors
->> > +under the root with filtering conditions, thresholds of RSSI and time=
-rs
->> > +of RSSI thresholds.
->> > +
->> > +Once a monitoring job is activated by BlueZ, the client can expect to=
- get
->> > +notified on the targeted advertisements no matter if there is an ongo=
-ing
->> > +discovery session (a discovery session is started/stopped with method=
-s in
->> > +org.bluez.Adapter1 interface).
->> > +
->> > +Advertisement Monitor hierarchy
->> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
->> > +Service              org.bluez
->> > +Interface    org.bluez.AdvertisementMonitor1 [experimental]
->> > +Object path  freely definable
->>
->> can you please at least roughly follow the style regarding the empty lin=
-es from the other documents.
->>
->> > +
->> > +Methods              void Release() [noreply]
->> > +
->> > +                     This gets called as a signal for a client to per=
-form
->> > +                     clean-up when (1)a monitor cannot be activated a=
-fter it
->> > +                     was exposed or (2)a monitor has been deactivated=
-.
->> > +
->> > +             void Activate() [noreply]
->> > +
->> > +                     After a monitor was exposed, this gets called as=
- a
->> > +                     signal for client to get acknowledged when a mon=
-itor
->> > +                     has been activated, so the client can expect to =
-receive
->> > +                     calls on DeviceFound() or DeviceLost().
->>
->> Do we actually need this? As noted by Szymon we would expect RegisterMon=
-itor to only return when it successfully active a monitor.
-If we go with the direction where a client is allowed to expose
-multiple monitor objects at a time, then we need a way for the client
-to get notified once the monitors are activated. We don't need this if
-we only allow a client to register one monitor at a time.
->>
->> > +
->> > +             void DeviceFound(object device) [noreply]
->> > +
->> > +                     This gets called to notify the client of finding=
- the
->> > +                     targeted device. Once receiving the call, the cl=
-ient
->> > +                     should start to monitor the corresponding device=
- to
->> > +                     retrieve the changes on RSSI and advertisement c=
-ontent.
->> > +
->> > +             void DeviceLost(object device) [noreply]
->> > +
->> > +                     This gets called to notify the client of losing =
-the
->> > +                     targeted device. Once receiving this call, the c=
-lient
->> > +                     should stop monitoring the corresponding device.
->> > +
->> > +Properties   uint8 Type [read-only]
->> > +
->> > +                     The type of the monitor. See SupportedMonitorTyp=
-es in
->> > +                     org.bluez.AdvertisementMonitorManager1 for the a=
-vailable
->> > +                     options.
->> > +
->> > +             (Int16, Uint16, Int16, Uint16) RSSIThreshholdsAndTimers =
-[read-only, optional]
->> > +
->> > +                     This contains HighRSSIThreshold, HighRSSIThresho=
-ldTimer,
->> > +                     LowRSSIThreshold, LowRSSIThresholdTimer in order=
-. The
->> > +                     unit of HighRSSIThreshold and LowRSSIThreshold i=
-s dBm.
->> > +                     The unit of HighRSSIThresholdTimer and
->> > +                     LowRSSIThresholdTimer is second.
->> > +
->> > +                     If these are provided, RSSI would be used as a f=
-actor to
->> > +                     notify the client of whether a device stays in r=
-ange or
->> > +                     move out of range. A device is considered in-ran=
-ge when
->> > +                     the RSSIs of the received advertisement(s) durin=
-g
->> > +                     HighRSSIThresholdTimer seconds exceed HighRSSITh=
-reshold.
->> > +                     Likewise, a device is considered out-of-range wh=
-en the
->> > +                     RSSIs of the received advertisement(s) during
->> > +                     LowRSSIThresholdTimer do not reach LowRSSIThresh=
-old.
->> > +
->> > +             array{(uint8, uint8, string)} Patterns [read-only, optio=
-nal]
->> > +
->> > +                     If Type is set to 0x01, this must exist and has =
-at least
->> > +                     one entry in the array.
->> > +
->> > +                     The structure of a pattern contains the followin=
-g.
->> > +                     uint8 start_position
->> > +                             The index in an AD data field where the =
-search
->> > +                             should start. The beginning of an AD dat=
-a field
->> > +                             is index 0.
->> > +                     uint8 AD_data_type
->> > +                             See https://www.bluetooth.com/specificat=
-ions/
->> > +                             assigned-numbers/generic-access-profile/=
- for
->> > +                             the possible allowed value.
->> > +                     string content_of_pattern
->> > +                             This is the value of the pattern.
->>
->> This part we really need to discuss and come to an agreement. I am not i=
-n favor of doing these as properties on the monitor object. I would give th=
-em as dict to the RegisterMonitor.
->>
->
-> That was actually my recommendation to do go this way since we do want to=
- support registering multiple objects at once which is usually done with th=
-e likes of ObjectManager to list the whole tree of objects, if we go with g=
-iven this direction to RegisterMonitor this might have to be an array e.g a=
-{oa{sv}} which would require custom code to extract the objects and create =
-proper proxies for them, so I rather keep this simple and just use ObjectMa=
-nager to list the objects.
->
->>
->> > +
->> > +Advertisement Monitor Manager hierarchy
->> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> > +Service              org.bluez
->> > +Interface    org.bluez.AdvertisementMonitorManager1 [experimental]
->> > +Object path  /org/bluez/{hci0,hci1,...}
->> > +
->> > +Methods              void RegisterApplication(object application)
->> > +
->> > +                     This registers a hierarchy of advertisement moni=
-tors.
->> > +                     The application object path together with the D-=
-Bus
->> > +                     system bus connection ID define the identificati=
-on of
->> > +                     the application registering advertisement monito=
-rs.
->> > +
->> > +                     Possible errors: org.bluez.Error.InvalidArgument=
-s
->> > +                                      org.bluez.Error.AlreadyExists
->> > +
->> > +             void UnregisterApplication(object application)
->> > +
->> > +                     This unregisters advertisement monitors that hav=
-e been
->> > +                     previously registered. The object path parameter=
- must
->> > +                     match the same value that has been used on
->> > +                     registration.
->> > +
->> > +                     Possible errors: org.bluez.Error.InvalidArgument=
-s
->> > +                                      org.bluez.Error.DoesNotExist
->>
->> My choice of method naming would be RegisterMonitor and UnregisterMonito=
-r.
->>
->> > +
->> > +Properties   array{string} SupportedMonitorTypes [read-only]
->> > +
->> > +                     This lists the supported types of advertisement
->> > +                     monitors. An application should check this befor=
-e
->> > +                     instantiate and expose an object of
->> > +                     org.bluez.AdvertisementMonitor1.
->> > +
->> > +                     Possible values for monitor types:
->> > +
->> > +                     "patterns_with_logic_or"
->> > +                             Patterns with logic OR applied. With thi=
-s type,
->> > +                             property "Patterns" must exist and has a=
-t least
->> > +                             one pattern.
->>
->> To be consistent they need to be =E2=80=9Cpatterns-with-or-logic=E2=80=
-=9D. And maybe =E2=80=9Cor-patterns=E2=80=9D is just enough.
-ack
->>
->> > +
->> > +             array{string} SupportedFeatures [read-only]
->> > +
->> > +                     This lists the features of advertisement monitor=
-ing
->> > +                     supported by BlueZ.
->> > +
->> > +                     Possible values for features:
->> > +
->> > +                     "controller-based-monitor-by-patterns"
->> > +                             If the controller is capable of performi=
-ng
->> > +                             advertisement monitoring by patterns, Bl=
-ueZ
->> > +                             would offload the patterns to the contro=
-ller to
->> > +                             reduce power consumption.
->>
->> I would consider shortening this to =E2=80=9Ccontroller-patterns=E2=80=
-=9D.
-Ack.
->>
->> Regards
->>
->> Marcel
->>
+This describes the following commands and event.
+- Read Advertisement Monitor Features command
+- Add Advertisement Patterns Monitor command
+- Remove Advertisement Monitor command
+- Advertisement Monitor Added event
+- Advertisement Monitor Removed event
+Note that the content of a monitor can differ based on its type. For now we
+introduce only pattern-based monitor, so you may find that unlike the
+command of removing monitor(s), the Add command is tied to a specific type.
+---
+
+Changes in v5:
+- Add more fields in the return value of Read Advertisement Monitor
+Features command.
+- Refine the description of commands and events.
+
+Changes in v4:
+- In Read Advertisement Monitor Features command, rename
+Adopted_Features to Enabled_Features.
+
+Changes in v3:
+- Remove Advertisement Monitor can perform the removal of one monitor
+or all monitors.
+- Add Read Advertisement Monitor Features command.
+- Add Advertisement Monitor Added event and dvertisement Monitor Removed
+event.
+
+Changes in v2:
+- Combine commands to remove one monitor and remove all monitors. The
+refined command takes multiple handles and an extra field to indicate
+whether to remove all monitors.
+
+ doc/mgmt-api.txt | 147 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 147 insertions(+)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 39f23c456..4aa755c45 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3138,6 +3138,125 @@ Read Security Information Command
+ 				Invalid Index
+ 
+ 
++Read Advertisement Monitor Features Command
++===========================================
++
++	Command Code:		0x0049
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:	Supported_Features (4 octets)
++				Enabled_Features (4 octets)
++				Max_Num_Handles (2 octets)
++				Max_Num_Patterns (1 octet)
++				Num_Handles (2 octets)
++				Handle1 (2 octets)
++				Handle2 (2 octets)
++				...
++
++	This command is used to read the advertisement monitor features
++	supported by the controller and stack. Supported_Features lists all
++	related features supported by the controller while Enabled_Features
++	lists the ones currently used by the kernel.
++
++	Supported_Features and Enabled_Features are bitmasks with currently
++	the following available bits:
++
++		1	Advertisement content monitoring based on Microsoft
++			HCI extension.
++
++	Max_Num_Handles indicates the maximum number of supported
++	advertisement monitors. Note that the actual number of supported
++	ones might be less depending on the limitation of the controller.
++
++	Max_Num_Pattern indicates the maximum number of supported patterns
++	in an advertisement patterns monitor. Note that the actual number
++	of supported ones might be less depending on the limitation of the
++	controller.
++
++	Num_Handles indicates the number of added advertisement monitors,
++	and it is followed by a list of handles.
++
++	This command can be used when the controller is not powered.
++
++
++Add Advertisement Patterns Monitor Command
++=========================================
++
++	Command Code:		0x004A
++	Controller Index:	<controller id>
++	Command Parameters:	Pattern_count (1 Octets)
++				Pattern1 {
++					AD_Data_Type (1 Octet)
++					Offset (1 Octet)
++					Length (1 Octet)
++					Value (variable length)
++				}
++				Pattern2 { }
++				...
++	Return Parameters:	Monitor_Handle (2 Octets)
++
++	This command is used to add an advertisement monitor whose
++	filtering conditions are patterns. The kernel will trigger scanning
++	if there is at least one monitor added. If the controller supports
++	advertisement filtering, the kernel would offload the content
++	filtering to the controller in order to reduce power consumption;
++	otherwise the kernel ignores the content of the monitor. Note that
++	if the there are more than one patterns, OR logic would applied
++	among patterns during filtering. In other words, any advertisement
++	matching at least one pattern in a given monitor would be
++	considered as a match.
++
++	A pattern contains the following fields.
++		AD_Data_Type	Advertising Data Type. The possible values
++				are defined in Core Specification
++				Supplement.
++		Offset		The start index where pattern matching
++				shall be performed with in the AD data.
++		Length		The length of the pattern value in bytes.
++		Value		The value of the pattern in bytes.
++
++	Here is an example of a pattern.
++		{
++			0x16, // Service Data - 16-bit UUID
++			0x02, // Skip the UUID part.
++			0x04,
++			{0x11, 0x22, 0x33, 0x44},
++		}
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.
++
++	Possible errors:	Failed
++				Busy
++				No Resources
++				Invalid Parameters
++
++
++Remove Advertisement Monitor Command
++====================================
++
++	Command Code:		0x004B
++	Controller Index:	<controller id>
++	Command Parameters:	Monitor_Handle (2 Octets)
++	Return Parameters:
++
++	This command is used to remove advertisement monitor(s). The kernel
++	would remove the monitor(s) with Monitor_Handle and update the LE
++	scanning.
++
++	When the Monitor_Handle is set to zero, then all previously added
++	handles will be removed.
++
++	Removing a monitor while it is being added will be ignored.
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.
++
++	Possible errors:	Failed
++				Busy
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -4020,3 +4139,31 @@ PHY Configuration Changed Event
+ 	one through which the change was triggered.
+ 
+ 	Refer Get PHY Configuration command for PHYs parameter.
++
++
++Advertisement Monitor Added Event
++=================================
++
++	Event Code:		0x0027
++	Controller Index:	<controller id>
++	Event Parameters:	Monitor_Handle (2 Octets)
++
++	This event indicates that an advertisement monitor has been added
++	using the Add Advertisement Monitor command.
++
++	The event will only be sent to management sockets other than the
++	one through which the command was sent.
++
++
++Advertisement Monitor Removed Event
++===================================
++
++	Event Code:		0x0028
++	Controller Index:	<controller id>
++	Event Parameters:	Monitor_Handle (2 Octets)
++
++	This event indicates that an advertisement monitor has been removed
++	using the Remove Advertisement Monitor command.
++
++	The event will only be sent to management sockets other than the
++	one through which the command was sent.
+-- 
+2.24.1
+
