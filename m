@@ -2,325 +2,132 @@ Return-Path: <SRS0=orbE=6O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 032F9C47247
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C143CC4724C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:59:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FA620787
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:23:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91DBC20731
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uHoKfcZj"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="nnrl4CN0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgD3RXG (ORCPT
+        id S1726577AbgD3R7n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Apr 2020 13:23:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726396AbgD3RXF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Apr 2020 13:23:05 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6CFC035494
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 10:23:05 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id b17so80902ooa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 10:23:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZS1WaFH7YJCIy31Qbjb9brx9pTH6DmG7Wvv54HGv9U8=;
-        b=uHoKfcZjhU2Tt5QHM7/YiiGIwahszFFWTqjz6WnxNLB/Sf/gCF/5q8fvgKcXUU3Pb7
-         6GOzXGTeTMkqtRa7W0e9Fry4ewGXbIirAA5mZyY6Ji2UtJBggeoLavPsMyBNyRm1zCyx
-         OUXa9i78FUKT5AEd5D4NNGcdE6QxquoaVf+sr33fv0GVgq1nePLhOoSUXqMwIGfD/ZCx
-         WgZSmdaczOkgjA1TY9RaEZGRTQids4PWPX4NOVlgn4dExeBH/UbwCr0gbLM4MsMeXGQe
-         oLOaM6DTBXGHlhtTN1Hy6vgh6eeyVVDNYwR8dKAEYNyUGW1j8siwu+u6P0S7bSwaF10p
-         hUIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZS1WaFH7YJCIy31Qbjb9brx9pTH6DmG7Wvv54HGv9U8=;
-        b=cSeAjf+khHO9Fru7yJaSReptAO1QcPW5X6unKnV5opteQn2hNago+jalcGXNSMJhhl
-         1HcKpI8yGsIYH6fWJpyUz76NJdBBQRN+MO+uCieBv0OvLSlNOW7vCVMz93rQI0+ZaPBj
-         shF6iibzABqwytfGn8p6yklWBxtsXi1An+ffuQPOIpBp8dG1XHJFkU1CbJhsywHrMq36
-         YOf2nbOjXEA7OvHyO6HP5r8XQGQXjk76PJPQjSvhLBSQ94UtU+bSV773rvQJ0RdQNwci
-         RxrcpkPnwwv9D0h6IgHmxKIJLzPUTdsDAcD1jKpc9YTKkQjQ7OS6hbRt99jiWPYNAHcz
-         zJ3A==
-X-Gm-Message-State: AGi0PuaHZLeiA9bEp1Ww0LeQL7Ec8bOpfY/Nyyv/BbKju+JeChO+N4Is
-        RIk7nQH+1qD/RJZJMl02nsAsstq0UTDDafMNUKY0V7/v
-X-Google-Smtp-Source: APiQypIM+MX0E73MX2D3BfkPPXaSftOfxYfij6dbr8iLnDiJQdLMAhFXDHIeLT2aMwr+fAtCcTYS0jRUSaNhSx/XGFA=
-X-Received: by 2002:a4a:3445:: with SMTP id n5mr78736oof.91.1588267384822;
- Thu, 30 Apr 2020 10:23:04 -0700 (PDT)
+        Thu, 30 Apr 2020 13:59:43 -0400
+Received: from mga14.intel.com ([192.55.52.115]:49688 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726318AbgD3R7m (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 30 Apr 2020 13:59:42 -0400
+IronPort-SDR: /z6j+9gXQU8QCDOnQ7Krl2DiK/U/IuE4+TceVixCpcSBKv6okqDwhGrTD21jc28u2Asg4Q9g9L
+ lfrCTlUGFdaw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2020 10:59:41 -0700
+IronPort-SDR: mGTowpXT+ustkdIcP1QCIvrhJ2mQU4tbVoLzGh2F+qSI6hPppEOL0CJGkmxn6DXXeocCSUZYp6
+ YX0YtN30Pb9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,336,1583222400"; 
+   d="scan'208";a="258379989"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga003.jf.intel.com with ESMTP; 30 Apr 2020 10:59:40 -0700
+Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 30 Apr 2020 10:59:40 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 30 Apr 2020 10:59:40 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.175)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 30 Apr 2020 10:59:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d8xXSxSrAmPIsFXVE3P14u1eqNvjAvcz5ZJNQjGu3BhRZzgOfrAt3z7i9u5/S8V8RfNPVqPHfVa+qafcrcdRqLumEMDGYRfKNYiBvy00/8GW8WR4SueURae1qkt0uSsRhfa7c4yR3Yr4H7ZGH2AHe9J1NP3hXG4SAsoRK82e37WuSt6HfLcnuGRerD3Oaauh1LxIxxbDG1bQLhu0bWrUi9ub6djtbT5Rv1h5cuYBIhorQYNVikeoIQ8hQRvgXOwx6IH10SorMQ50dFcre37Ww7inf2Cd9lumEn1T3m9RIrp6W+tlY2BLt13FMxau21JYIdvZ9xwhBSvjMgJ4AZ9j8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lhdPuiQ82kM4L3gSEX/hvZSkVGd7Nx4PmtGKDUVghUA=;
+ b=ZnnCDmZ1245tGKmgBGTRfjuD+z87g5hvbVgLzSE1W2CwWowK1E2VUFPw4qngKV0koeH1/3rEPY9EGZT02cgRZCREDhcAbFyw5CjV3DRy68QjExaR4sK/yl7wjqPvyKW9At9wx1vIie525uVDcpyiMbJf6y5ZITNh6hZrk+KiRwL31dX/qkvzOc+aiPYD6+yR0If4rFnPjKTCC6Gvj9nG77JAxvO69hIhEt13XpTwqNlrLRTfnJlimkzg1DfFOR0VE52osQ7DrVPS5W1w3aZVo7unwwNC3CFDhGTNtWqUKkIG+nTHkbwjjEKqWbAGI9MxRWQO4BqHBfYkSYtpY4X4pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lhdPuiQ82kM4L3gSEX/hvZSkVGd7Nx4PmtGKDUVghUA=;
+ b=nnrl4CN0BZ/wB453V6HJYfVTTMmszqaIy74GGB4k1H4W+cnbXvyKn1m/g7rwJqKvx305LN76lp5vQEbNHmwSO3D4MnRLJTrNrmYBetaU0pNc8UfpKDHxa5zHrowvAObxCc2444U3v16qsP7opgnmfdJgltsIpmDhNcx0H99jJWg=
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
+ by MW3PR11MB4635.namprd11.prod.outlook.com (2603:10b6:303:2c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Thu, 30 Apr
+ 2020 17:59:37 +0000
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::5552:f057:3dbf:716c]) by MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::5552:f057:3dbf:716c%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
+ 17:59:37 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Fix adding virtual subscription to a vendor
+ model
+Thread-Topic: [PATCH BlueZ] mesh: Fix adding virtual subscription to a vendor
+ model
+Thread-Index: AQHWHlDmTHlt4NhkN0e2GvypD/ZNSqiR9ZWA
+Date:   Thu, 30 Apr 2020 17:59:37 +0000
+Message-ID: <bd98b3ccddd1da430c86a3497e98be495cd86b0f.camel@intel.com>
+References: <20200429180541.29791-1-inga.stotland@intel.com>
+In-Reply-To: <20200429180541.29791-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.55.41]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7791a31b-7662-405b-9408-08d7ed303f3a
+x-ms-traffictypediagnostic: MW3PR11MB4635:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MW3PR11MB4635FBE260BDCBB09755EDA4E1AA0@MW3PR11MB4635.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0389EDA07F
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(346002)(136003)(39860400002)(366004)(396003)(376002)(76116006)(8936002)(6636002)(91956017)(8676002)(66946007)(66476007)(66446008)(478600001)(64756008)(71200400001)(5660300002)(2616005)(66556008)(110136005)(26005)(6512007)(36756003)(6506007)(316002)(4744005)(2906002)(86362001)(186003)(6486002);DIR:OUT;SFP:1102;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: B7rt0JoUyi0Ck7s0VrDh/Td2w4JPbGWbineH07G9GE8o0wYH8JnUcdw2YlO91ZeD6TkiXgikRyDtVs/8U5AHBQ8Rlu1+PhDc/Jcyru/OEbS08D3v6C+ZY+HDenblsVCbBF3vQyVIXwYVOoL82VtL3MdUSP+J/feTehPEWNo0hRPM67e246bUBTnuE6kCDP7pEj4In3SVmc6iEdhbcYVlHUEEAD4QMtV5Kw5jXUMitX/eo82tA50eJZ/R+2Y/7rDKpLM2TQJSBE6Kw8/k+Zp20YPe7EmIcogw+qaVfR/+MgPr78uLF0LcW394iqjZO/F1AzulfSZT7YBs8v4lJ1DTa+foXXfU2S1jLK58JTPiOOQDiG+RB0r7SRFjTnrCtzHJq+53sa6MDoBvzJMkKlKhfAzDUY7lyECanzCNhXY/dydGsKqplOT3kRnZW6JU63/l
+x-ms-exchange-antispam-messagedata: qjuD3VQ0W8pNp81NmMTCRSWGaw/ksFdJdmfE1/2pg1TePp70AjGfnquRDAM9KpWcWQoebl9LD2LofoutzHzgL15HAsviLt6yX1202w3OkIKv2Inzd27WicvCfdb/d1Y3Hix6ISqDh82tB7kto+F+WU//gdOVZ4I7UlE7a5pF5Hvw2odJ5CJI+mr+65OnGkTHBsfV0qvDaAd9wZz2A7cABTIqI9v4ha8/REIN3IbpbtESuIMLxtoAGc4B1egmuccC+xIxQrL/rW2ry7tf9iXcmvnFsxXsU8tmd7f2/iJYTKF9PdWsrVjyLuf8isgl8OWS1zuVFvqskBxHnzvRB+UqLeIkaAGEmkfJrAIVhwY2Kfgn9J6w+OeYrPU3K0eeFxeT5yqM2yE06HHaRAUBX+I0h/utOhw1RQQzm5/tnLePngj4zxTuiJvzTCd6dmHIecIhfIVgjnOgQd6SoOQYbAuBA0xZcLz8IhibBocBiVA4u67vy7t1f4QQlqMORRwXFzXTBscMeQlBBfPa0C6T4kvEVkLEYd3wgyvaoH1qhJzIRcejhpS5Ym0mQh5hOFPeHTxeMF9rDHUNnXsVAa9bk4jr0QeqW65ZOst24sOVsygFCdVK1FvY/p5ypw5cKxj9GIjS19fgaZpufjRU7NJIvQm5Kfq/DluZO+zavBo+Iquzyq8PfdOtR/PT+XvaqO2m1JmyU+POiuYGyVt1BNgFt1TIA1N8Q58lSchJEZ3tnb51GhJC+axOchJGti39Ev7rj2w00xiJJ8e8HvfPia/LUJ/b3Xe7ybe8PpD4oLSF97Me3jk=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FDA0E6FF6192E548ADB81BE416415B02@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200430145105.Bluez.v1.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
-In-Reply-To: <20200430145105.Bluez.v1.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 30 Apr 2020 10:22:52 -0700
-Message-ID: <CABBYNZL_rOVYs-3W8DZn_ugh-c23r+H4qjmBi55t3Rd-iZCW-Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] tools/l2cap-tester: Add test for waiting
- disconnection response
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7791a31b-7662-405b-9408-08d7ed303f3a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 17:59:37.0773
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wWbsFCRT9meu9wVgD/lPT9oce7ZQXnjX0lZgcHFGnkmYhp1UDD0hldR0thGmRWN9sfDdOgGsnPQhsHYxHY1Okg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4635
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
-
-On Wed, Apr 29, 2020 at 11:52 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> This is to test the behaviour of L2CAP channel when closed with
-> shut_down(sock, SHUT_WR). In this case, we should wait until we
-> receive a disconnection response before raising G_IO_HUP.
-> ---
->
->  emulator/bthost.c     | 17 ++++++++++-
->  emulator/bthost.h     |  5 +++-
->  tools/l2cap-tester.c  | 65 ++++++++++++++++++++++++++++++++++++++-----
->  tools/rfcomm-tester.c |  2 +-
->  4 files changed, 79 insertions(+), 10 deletions(-)
->
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index 0fa283464..71d5f97bb 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -180,6 +180,7 @@ struct l2cap_pending_req {
->  struct l2cap_conn_cb_data {
->         uint16_t psm;
->         bthost_l2cap_connect_cb func;
-> +       bthost_l2cap_disconnect_cb disconn_func;
->         void *user_data;
->         struct l2cap_conn_cb_data *next;
->  };
-> @@ -1510,7 +1511,9 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
->                                 uint8_t ident, const void *data, uint16_t len)
->  {
->         const struct bt_l2cap_pdu_disconn_req *req = data;
-> +       struct l2cap_conn_cb_data *cb_data;
->         struct bt_l2cap_pdu_disconn_rsp rsp;
-> +       struct l2conn *l2conn;
->
->         if (len < sizeof(*req))
->                 return false;
-> @@ -1522,6 +1525,15 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
->         l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_DISCONN_RSP, ident, &rsp,
->                                                                 sizeof(rsp));
->
-> +       l2conn = btconn_find_l2cap_conn_by_scid(conn, rsp.scid);
-> +       if (!l2conn)
-> +               return true;
-> +
-> +       cb_data = bthost_find_l2cap_cb_by_psm(bthost, l2conn->psm);
-> +
-> +       if (cb_data && cb_data->disconn_func)
-> +               cb_data->disconn_func(cb_data->user_data);
-> +
->         return true;
->  }
->
-> @@ -2553,7 +2565,9 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
->  }
->
->  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-> -                               bthost_l2cap_connect_cb func, void *user_data)
-> +                               bthost_l2cap_connect_cb func,
-> +                               bthost_l2cap_disconnect_cb disconn_func,
-> +                               void *user_data)
->  {
->         struct l2cap_conn_cb_data *data;
->
-> @@ -2564,6 +2578,7 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
->         data->psm = psm;
->         data->user_data = user_data;
->         data->func = func;
-> +       data->disconn_func = disconn_func;
->         data->next = bthost->new_l2cap_conn_data;
->
->         bthost->new_l2cap_conn_data = data;
-> diff --git a/emulator/bthost.h b/emulator/bthost.h
-> index b5f36964d..2b347136f 100644
-> --- a/emulator/bthost.h
-> +++ b/emulator/bthost.h
-> @@ -100,9 +100,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
->                                                         const uint8_t ltk[16]);
->  typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
->                                                         void *user_data);
-> +typedef void (*bthost_l2cap_disconnect_cb) (void *user_data);
->
->  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-> -                               bthost_l2cap_connect_cb func, void *user_data);
-> +                               bthost_l2cap_connect_cb func,
-> +                               bthost_l2cap_disconnect_cb disconn_func,
-> +                               void *user_data);
->
->  void bthost_set_sc_support(struct bthost *bthost, bool enable);
->
-> diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-> index 844ff2b46..1ef4e9213 100644
-> --- a/tools/l2cap-tester.c
-> +++ b/tools/l2cap-tester.c
-> @@ -55,6 +55,7 @@ struct test_data {
->         uint16_t dcid;
->         int sk;
->         int sk2;
-> +       bool host_disconnected;
->  };
->
->  struct l2cap_data {
-> @@ -93,6 +94,8 @@ struct l2cap_data {
->         bool server_not_advertising;
->         bool direct_advertising;
->         bool close_1;
-> +
-> +       bool shut_sock_wr;
->  };
->
->  static void mgmt_debug(const char *str, void *user_data)
-> @@ -316,6 +319,12 @@ static const struct l2cap_data client_connect_write_success_test = {
->         .data_len = sizeof(l2_data),
->  };
->
-> +static const struct l2cap_data client_connect_shut_wr_success_test = {
-> +       .client_psm = 0x1001,
-> +       .server_psm = 0x1001,
-> +       .shut_sock_wr = true,
-> +};
-> +
->  static const struct l2cap_data client_connect_nval_psm_test_1 = {
->         .client_psm = 0x1001,
->         .expect_err = ECONNREFUSED,
-> @@ -967,6 +976,27 @@ static void server_bthost_received_data(const void *buf, uint16_t len,
->                 tester_test_passed();
->  }
->
-> +static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
-> +                                                       gpointer user_data)
-> +{
-> +       struct test_data *data = tester_get_data();
-> +       const struct l2cap_data *l2data = data->test_data;
-> +
-> +       if (l2data->shut_sock_wr) {
-> +               /* if socket is closed using SHUT_WR, L2CAP disconnection
-> +                * response must be received first before G_IO_HUP event.
-> +                */
-> +               if (data->host_disconnected)
-> +                       tester_test_passed();
-> +               else {
-> +                       tester_warn("G_IO_HUP received before receiving L2CAP disconnection");
-> +                       tester_test_failed();
-> +               }
-> +       }
-> +
-> +       return FALSE;
-> +}
-> +
->  static bool check_mtu(struct test_data *data, int sk)
->  {
->         const struct l2cap_data *l2data = data->test_data;
-> @@ -1062,6 +1092,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
->                         tester_test_failed();
->                 }
->
-> +               return FALSE;
-> +       } else if (l2data->shut_sock_wr) {
-> +               g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
-> +               shutdown(sk, SHUT_WR);
-
-Id make the test abort if cannot be disconnected properly, but it
-looks like we don't have any means to detect if the kernel has support
-for it or not, but perhaps it is fine since this is trying to test the
-right behavior.
-
-> +
->                 return FALSE;
->         }
->
-> @@ -1214,6 +1249,13 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
->         data->handle = handle;
->  }
->
-> +static void client_l2cap_disconnect_cb(void *user_data)
-> +{
-> +       struct test_data *data = user_data;
-> +
-> +       data->host_disconnected = true;
-> +}
-> +
->  static void direct_adv_cmd_complete(uint16_t opcode, const void *param,
->                                                 uint8_t len, void *user_data)
->  {
-> @@ -1254,13 +1296,18 @@ static void test_connect(const void *test_data)
->
->         if (l2data->server_psm) {
->                 struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-> +               bthost_l2cap_connect_cb host_connect_cb = NULL;
-> +               bthost_l2cap_disconnect_cb host_disconnect_cb = NULL;
->
-> -               if (!l2data->data_len)
-> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               NULL, NULL);
-> -               else
-> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               client_l2cap_connect_cb, data);
-> +               if (l2data->data_len)
-> +                       host_connect_cb = client_l2cap_connect_cb;
-> +
-> +               if (l2data->shut_sock_wr)
-> +                       host_disconnect_cb = client_l2cap_disconnect_cb;
-> +
-> +               bthost_add_l2cap_server(bthost, l2data->server_psm,
-> +                                       host_connect_cb, host_disconnect_cb,
-> +                                       data);
->         }
->
->         if (l2data->direct_advertising)
-> @@ -1639,7 +1686,7 @@ static void test_connect_2(const void *test_data)
->
->                 if (!l2data->data_len)
->                         bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               NULL, NULL);
-> +                                               NULL, NULL, NULL);
->         }
->
->         defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
-> @@ -1927,6 +1974,10 @@ int main(int argc, char *argv[])
->                                         &client_connect_nval_psm_test_3,
->                                         setup_powered_client, test_connect);
->
-> +       test_l2cap_bredr("L2CAP BR/EDR Client - Socket Shut WR Success",
-> +                                       &client_connect_shut_wr_success_test,
-> +                                       setup_powered_client, test_connect);
-> +
->         test_l2cap_bredr("L2CAP BR/EDR Server - Success",
->                                         &l2cap_server_success_test,
->                                         setup_powered_server, test_server);
-> diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-> index b20d70d58..2d3be27d8 100644
-> --- a/tools/rfcomm-tester.c
-> +++ b/tools/rfcomm-tester.c
-> @@ -548,7 +548,7 @@ static void test_connect(const void *test_data)
->         GIOChannel *io;
->         int sk;
->
-> -       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
-> +       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL, NULL);
->         bthost_add_rfcomm_server(bthost, cli->server_channel,
->                                                 rfcomm_connect_cb, NULL);
->
-> --
-> 2.26.2.303.gf8c07b1a785-goog
->
-
-
--- 
-Luiz Augusto von Dentz
+QXBwbGllZA0KDQpPbiBXZWQsIDIwMjAtMDQtMjkgYXQgMTE6MDUgLTA3MDAsIEluZ2EgU3RvdGxh
+bmQgd3JvdGU6DQo+IFRoaXMgZml4ZXMgYSBjYXNlIHdoZW4gYSBjb25maWd1cmF0aW9uIHNlcnZl
+ciByZWNlaXZlcyBhIHZpcnR1YWwNCj4gc3Vic2NyaXB0aW9uIGFkZC9vdmVyd3JpdGUgY29tbWFu
+ZCB0YXJnZXRpbmcgYSB2ZW5kb3IgbW9kZWwuDQo+IENvcnJlY3RseSBzZXQgInZlbmRvciIgYXJn
+dW1lbnQgYmVmb3JlIHRyeWluZyB0byBzYXZlIHRoZSB1cGRhdGVkDQo+IHN1YnNjcml0aW9uIHRv
+IGNvbmZpZ3VyYXRpb24gZmlsZS4NCj4gLS0tDQo+ICBtZXNoL2NmZ21vZC1zZXJ2ZXIuYyB8IDEg
+Kw0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEv
+bWVzaC9jZmdtb2Qtc2VydmVyLmMgYi9tZXNoL2NmZ21vZC1zZXJ2ZXIuYw0KPiBpbmRleCA4NTZl
+YjZiMjcuLjk0ODI1ZWQwZSAxMDA2NDQNCj4gLS0tIGEvbWVzaC9jZmdtb2Qtc2VydmVyLmMNCj4g
+KysrIGIvbWVzaC9jZmdtb2Qtc2VydmVyLmMNCj4gQEAgLTM1OCw2ICszNTgsNyBAQCBzdGF0aWMg
+dm9pZCBjb25maWdfc3ViX3NldChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBuZXRf
+aWR4LA0KPiAgCWNhc2UgMjI6DQo+ICAJCWlmICghdmlydCkNCj4gIAkJCXJldHVybjsNCj4gKwkJ
+dmVuZG9yID0gdHJ1ZTsNCj4gIAkJbW9kX2lkID0gbF9nZXRfbGUxNihwa3QgKyAxOCkgPDwgMTY7
+DQo+ICAJCW1vZF9pZCB8PSBsX2dldF9sZTE2KHBrdCArIDIwKTsNCj4gIAkJYnJlYWs7DQo=
