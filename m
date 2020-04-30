@@ -2,276 +2,310 @@ Return-Path: <SRS0=orbE=6O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C147C83003
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 03:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED4C83001
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 06:52:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 025572083B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 03:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAEDF2173E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 06:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Wb61UyZQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SmcDxDtn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbgD3DbC (ORCPT
+        id S1726412AbgD3GwK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Apr 2020 23:31:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
+        Thu, 30 Apr 2020 02:52:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726355AbgD3DbC (ORCPT
+        by vger.kernel.org with ESMTP id S1726180AbgD3GwK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Apr 2020 23:31:02 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF30FC035494
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 20:31:01 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id t40so142254pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 20:31:01 -0700 (PDT)
+        Thu, 30 Apr 2020 02:52:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C82C035494
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 23:52:08 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id j14so6646246ybt.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2020 23:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5s9YHaWtzDXo107Kcfzp1XkWTCE/gzb+RAWh5n/g0Z8=;
-        b=Wb61UyZQbBV271LNuoV6j9tIl18v8hWNIh5cuIhhZa8kIAs7orPd9LY3bUOyVNJnQn
-         eTGfirXddPHfXGUOoLacYp/onjPOKVPC+vJaJkc5NDfLfHnU/XGICPbT9xDYRrvmNWEc
-         KcPjvRZwGQmWm+7aw22t8cukm9WrWaoTBYvsw=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=omzHo0koY7dcjx+Gzrl5mBh8dtsJ/ea8rdYZunB0qDw=;
+        b=SmcDxDtnxUwDFpUGMwAWNq8361K6kvTNAut60UpERl17bvNUiyO1FaqVQYBTCvpn2H
+         A5NsxKGbJYbhjGFTxGDRw8FiBdWXxLcvSeF+RCxAOpMkkQgsSyDsiU6is7IoJEgUXn+S
+         aH2sCO3+ahnslMB2B4SsZzOXoAfSJFUxjn4hFlsWFQuHEtRK+WwUznB2h7AFddxkgYpF
+         rq5ySd+/9Cz8xYKtaYoL9XmEoCCJXrb4F0dzZ9HjWrk1dCzbcD7oakLDGi/Q7BekWMNO
+         ZbST4wF/jBCPdA7TncRUX+U5fQhNH2S4okjgLA28xZ0lGw+ukVjCbpVVlIxAVCaqTh1+
+         ZTow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5s9YHaWtzDXo107Kcfzp1XkWTCE/gzb+RAWh5n/g0Z8=;
-        b=a45BQojbJuK9fxqYgdcIklu6ec7bnZV0AmTsMEVCT1OsHj3prl/SeYBQrQwRo0d7ZX
-         tGQSBvU4dGO/IBF8f2ogf+hoUHloPTJoX5KevWojxf4Toh+JQcffO4lqW1/Oj5llxAJv
-         /qxzI0hxRYJIjRulmqUZisGUJB3HMBiHl1kZFnnDuAlByBXsVkX+/WmFaPxBnyah7rtq
-         9R9yW4XSgno3AYez09biwSffOm84e1uPCOm0glwW1JYiEvmFCqEopZT9RF745NWFWV+i
-         jlqNMHRclxQNSHkMS5OOwDKLTQA5jcuHN14r1q6oif3XqfQlr+xAkNhqR4bX6HbBsm8Q
-         Wfjw==
-X-Gm-Message-State: AGi0PuYm/UUklnOYXoK/G8V+QGO7qu1ocQX54lN3FzoA45eC1BSESaf3
-        y4o4U4OzjhzXn4HGCXeWn3AiH3YU7bk=
-X-Google-Smtp-Source: APiQypKy7x4GVidHW/GLUhsFEvei6w0HpADSgQgYSST/GVZBpgk1hndiW3vHVbH0yRmMDWjIMwXP0g==
-X-Received: by 2002:a17:90a:17ed:: with SMTP id q100mr633232pja.80.1588217460464;
-        Wed, 29 Apr 2020 20:31:00 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id fh18sm565384pjb.0.2020.04.29.20.30.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 Apr 2020 20:30:59 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v5] doc: Describe the new Advertisement Monitor support
-Date:   Wed, 29 Apr 2020 20:30:48 -0700
-Message-Id: <20200429203031.BlueZ.v5.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=omzHo0koY7dcjx+Gzrl5mBh8dtsJ/ea8rdYZunB0qDw=;
+        b=K9N0SmnjocxXKPG/tYqm9PeQ6sP803BAbBmepQCBTBZ5Rigi3EwOlLm2jc4J0Q1qNj
+         CGzlB3lhVCieOnvgrHD/NwluX+txHymqXkGVtMeKL673vBCyQSioJq9mfjNGADm5P4u7
+         VLkiiSYjDoLUs1JGKuXYBj9c7DlWkpZmg8qOPlPepLBW3mO59HbrdYPxpVNtV0Eu7DbE
+         /2UcJ3VJZLtRBGqkF9uMn8BfOuW/U6vyC//N7aZphtUEXZD0CHX+CqGZ3BV2xQchPoJF
+         TBgdkBP5uZ/JENG9Ixz3WDiajVnXi4OEeibYE/P9l06BKzgmODPBqQAW8eJ1PRUOj0vj
+         BpnQ==
+X-Gm-Message-State: AGi0PuZd6hvnzCgIEakmyrAtipWlzc+miJSeJISK3rgu4f5ZV17HxWdN
+        4pq1zFcSioSuJUNLSwQyfnZkdktpzQ5StzDjwWs3/NzHos+BDjOUwXWKYoAhuiw8+YWVaMEKCaT
+        HrBAnJ69zijgc5xWaUYtgn0aeFwKZiDH587kZnC0wGYmlwTY+XTFtuHwO5VWyUcTueMUeeUK2py
+        JK
+X-Google-Smtp-Source: APiQypIoOPMAoP2g4tr5v1LUKfZuEmUOwPozRtxSOvavAE3+fHliAacPfpuSDHQzpK/UzoXdjRz9Yz6tYvRU
+X-Received: by 2002:a25:bd6:: with SMTP id 205mr3673988ybl.93.1588229527781;
+ Wed, 29 Apr 2020 23:52:07 -0700 (PDT)
+Date:   Thu, 30 Apr 2020 14:51:45 +0800
+Message-Id: <20200430145105.Bluez.v1.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.2.303.gf8c07b1a785-goog
+Subject: [Bluez PATCH v1] tools/l2cap-tester: Add test for waiting
+ disconnection response
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This describes the following commands and event.
-- Read Advertisement Monitor Features command
-- Add Advertisement Patterns Monitor command
-- Remove Advertisement Monitor command
-- Advertisement Monitor Added event
-- Advertisement Monitor Removed event
-Note that the content of a monitor can differ based on its type. For now we
-introduce only pattern-based monitor, so you may find that unlike the
-command of removing monitor(s), the Add command is tied to a specific type.
+From: Archie Pusaka <apusaka@chromium.org>
+
+This is to test the behaviour of L2CAP channel when closed with
+shut_down(sock, SHUT_WR). In this case, we should wait until we
+receive a disconnection response before raising G_IO_HUP.
 ---
 
-Changes in v5:
-- Add more fields in the return value of Read Advertisement Monitor
-Features command.
-- Refine the description of commands and events.
+ emulator/bthost.c     | 17 ++++++++++-
+ emulator/bthost.h     |  5 +++-
+ tools/l2cap-tester.c  | 65 ++++++++++++++++++++++++++++++++++++++-----
+ tools/rfcomm-tester.c |  2 +-
+ 4 files changed, 79 insertions(+), 10 deletions(-)
 
-Changes in v4:
-- In Read Advertisement Monitor Features command, rename
-Adopted_Features to Enabled_Features.
-
-Changes in v3:
-- Remove Advertisement Monitor can perform the removal of one monitor
-or all monitors.
-- Add Read Advertisement Monitor Features command.
-- Add Advertisement Monitor Added event and dvertisement Monitor Removed
-event.
-
-Changes in v2:
-- Combine commands to remove one monitor and remove all monitors. The
-refined command takes multiple handles and an extra field to indicate
-whether to remove all monitors.
-
- doc/mgmt-api.txt | 147 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 147 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 39f23c456..4aa755c45 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3138,6 +3138,125 @@ Read Security Information Command
- 				Invalid Index
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 0fa283464..71d5f97bb 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -180,6 +180,7 @@ struct l2cap_pending_req {
+ struct l2cap_conn_cb_data {
+ 	uint16_t psm;
+ 	bthost_l2cap_connect_cb func;
++	bthost_l2cap_disconnect_cb disconn_func;
+ 	void *user_data;
+ 	struct l2cap_conn_cb_data *next;
+ };
+@@ -1510,7 +1511,9 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+ 				uint8_t ident, const void *data, uint16_t len)
+ {
+ 	const struct bt_l2cap_pdu_disconn_req *req = data;
++	struct l2cap_conn_cb_data *cb_data;
+ 	struct bt_l2cap_pdu_disconn_rsp rsp;
++	struct l2conn *l2conn;
  
+ 	if (len < sizeof(*req))
+ 		return false;
+@@ -1522,6 +1525,15 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+ 	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_DISCONN_RSP, ident, &rsp,
+ 								sizeof(rsp));
  
-+Read Advertisement Monitor Features Command
-+===========================================
++	l2conn = btconn_find_l2cap_conn_by_scid(conn, rsp.scid);
++	if (!l2conn)
++		return true;
 +
-+	Command Code:		0x0049
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Supported_Features (4 octets)
-+				Enabled_Features (4 octets)
-+				Max_Num_Handles (2 octets)
-+				Max_Num_Patterns (1 octet)
-+				Num_Handles (2 octets)
-+				Handle1 (2 octets)
-+				Handle2 (2 octets)
-+				...
++	cb_data = bthost_find_l2cap_cb_by_psm(bthost, l2conn->psm);
 +
-+	This command is used to read the advertisement monitor features
-+	supported by the controller and stack. Supported_Features lists all
-+	related features supported by the controller while Enabled_Features
-+	lists the ones currently used by the kernel.
++	if (cb_data && cb_data->disconn_func)
++		cb_data->disconn_func(cb_data->user_data);
 +
-+	Supported_Features and Enabled_Features are bitmasks with currently
-+	the following available bits:
+ 	return true;
+ }
+ 
+@@ -2553,7 +2565,9 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
+ }
+ 
+ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+-				bthost_l2cap_connect_cb func, void *user_data)
++				bthost_l2cap_connect_cb func,
++				bthost_l2cap_disconnect_cb disconn_func,
++				void *user_data)
+ {
+ 	struct l2cap_conn_cb_data *data;
+ 
+@@ -2564,6 +2578,7 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+ 	data->psm = psm;
+ 	data->user_data = user_data;
+ 	data->func = func;
++	data->disconn_func = disconn_func;
+ 	data->next = bthost->new_l2cap_conn_data;
+ 
+ 	bthost->new_l2cap_conn_data = data;
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index b5f36964d..2b347136f 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -100,9 +100,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
+ 							const uint8_t ltk[16]);
+ typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
+ 							void *user_data);
++typedef void (*bthost_l2cap_disconnect_cb) (void *user_data);
+ 
+ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+-				bthost_l2cap_connect_cb func, void *user_data);
++				bthost_l2cap_connect_cb func,
++				bthost_l2cap_disconnect_cb disconn_func,
++				void *user_data);
+ 
+ void bthost_set_sc_support(struct bthost *bthost, bool enable);
+ 
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 844ff2b46..1ef4e9213 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -55,6 +55,7 @@ struct test_data {
+ 	uint16_t dcid;
+ 	int sk;
+ 	int sk2;
++	bool host_disconnected;
+ };
+ 
+ struct l2cap_data {
+@@ -93,6 +94,8 @@ struct l2cap_data {
+ 	bool server_not_advertising;
+ 	bool direct_advertising;
+ 	bool close_1;
 +
-+		1	Advertisement content monitoring based on Microsoft
-+			HCI extension.
++	bool shut_sock_wr;
+ };
+ 
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -316,6 +319,12 @@ static const struct l2cap_data client_connect_write_success_test = {
+ 	.data_len = sizeof(l2_data),
+ };
+ 
++static const struct l2cap_data client_connect_shut_wr_success_test = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.shut_sock_wr = true,
++};
 +
-+	Max_Num_Handles indicates the maximum number of supported
-+	advertisement monitors. Note that the actual number of supported
-+	ones might be less depending on the limitation of the controller.
+ static const struct l2cap_data client_connect_nval_psm_test_1 = {
+ 	.client_psm = 0x1001,
+ 	.expect_err = ECONNREFUSED,
+@@ -967,6 +976,27 @@ static void server_bthost_received_data(const void *buf, uint16_t len,
+ 		tester_test_passed();
+ }
+ 
++static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
 +
-+	Max_Num_Pattern indicates the maximum number of supported patterns
-+	in an advertisement patterns monitor. Note that the actual number
-+	of supported ones might be less depending on the limitation of the
-+	controller.
-+
-+	Num_Handles indicates the number of added advertisement monitors,
-+	and it is followed by a list of handles.
-+
-+	This command can be used when the controller is not powered.
-+
-+
-+Add Advertisement Patterns Monitor Command
-+=========================================
-+
-+	Command Code:		0x004A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Pattern_count (1 Octets)
-+				Pattern1 {
-+					AD_Data_Type (1 Octet)
-+					Offset (1 Octet)
-+					Length (1 Octet)
-+					Value (variable length)
-+				}
-+				Pattern2 { }
-+				...
-+	Return Parameters:	Monitor_Handle (2 Octets)
-+
-+	This command is used to add an advertisement monitor whose
-+	filtering conditions are patterns. The kernel will trigger scanning
-+	if there is at least one monitor added. If the controller supports
-+	advertisement filtering, the kernel would offload the content
-+	filtering to the controller in order to reduce power consumption;
-+	otherwise the kernel ignores the content of the monitor. Note that
-+	if the there are more than one patterns, OR logic would applied
-+	among patterns during filtering. In other words, any advertisement
-+	matching at least one pattern in a given monitor would be
-+	considered as a match.
-+
-+	A pattern contains the following fields.
-+		AD_Data_Type	Advertising Data Type. The possible values
-+				are defined in Core Specification
-+				Supplement.
-+		Offset		The start index where pattern matching
-+				shall be performed with in the AD data.
-+		Length		The length of the pattern value in bytes.
-+		Value		The value of the pattern in bytes.
-+
-+	Here is an example of a pattern.
-+		{
-+			0x16, // Service Data - 16-bit UUID
-+			0x02, // Skip the UUID part.
-+			0x04,
-+			{0x11, 0x22, 0x33, 0x44},
++	if (l2data->shut_sock_wr) {
++		/* if socket is closed using SHUT_WR, L2CAP disconnection
++		 * response must be received first before G_IO_HUP event.
++		 */
++		if (data->host_disconnected)
++			tester_test_passed();
++		else {
++			tester_warn("G_IO_HUP received before receiving L2CAP disconnection");
++			tester_test_failed();
 +		}
++	}
 +
-+	This command can be used when the controller is not powered and
-+	all settings will be programmed once powered.
++	return FALSE;
++}
 +
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Remove Advertisement Monitor Command
-+====================================
-+
-+	Command Code:		0x004B
-+	Controller Index:	<controller id>
-+	Command Parameters:	Monitor_Handle (2 Octets)
-+	Return Parameters:
-+
-+	This command is used to remove advertisement monitor(s). The kernel
-+	would remove the monitor(s) with Monitor_Handle and update the LE
-+	scanning.
-+
-+	When the Monitor_Handle is set to zero, then all previously added
-+	handles will be removed.
-+
-+	Removing a monitor while it is being added will be ignored.
-+
-+	This command can be used when the controller is not powered and
-+	all settings will be programmed once powered.
-+
-+	Possible errors:	Failed
-+				Busy
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
+ static bool check_mtu(struct test_data *data, int sk)
+ {
+ 	const struct l2cap_data *l2data = data->test_data;
+@@ -1062,6 +1092,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 			tester_test_failed();
+ 		}
  
-@@ -4020,3 +4139,31 @@ PHY Configuration Changed Event
- 	one through which the change was triggered.
++		return FALSE;
++	} else if (l2data->shut_sock_wr) {
++		g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
++		shutdown(sk, SHUT_WR);
++
+ 		return FALSE;
+ 	}
  
- 	Refer Get PHY Configuration command for PHYs parameter.
+@@ -1214,6 +1249,13 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ 	data->handle = handle;
+ }
+ 
++static void client_l2cap_disconnect_cb(void *user_data)
++{
++	struct test_data *data = user_data;
 +
++	data->host_disconnected = true;
++}
 +
-+Advertisement Monitor Added Event
-+=================================
+ static void direct_adv_cmd_complete(uint16_t opcode, const void *param,
+ 						uint8_t len, void *user_data)
+ {
+@@ -1254,13 +1296,18 @@ static void test_connect(const void *test_data)
+ 
+ 	if (l2data->server_psm) {
+ 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++		bthost_l2cap_connect_cb host_connect_cb = NULL;
++		bthost_l2cap_disconnect_cb host_disconnect_cb = NULL;
+ 
+-		if (!l2data->data_len)
+-			bthost_add_l2cap_server(bthost, l2data->server_psm,
+-						NULL, NULL);
+-		else
+-			bthost_add_l2cap_server(bthost, l2data->server_psm,
+-						client_l2cap_connect_cb, data);
++		if (l2data->data_len)
++			host_connect_cb = client_l2cap_connect_cb;
 +
-+	Event Code:		0x0027
-+	Controller Index:	<controller id>
-+	Event Parameters:	Monitor_Handle (2 Octets)
++		if (l2data->shut_sock_wr)
++			host_disconnect_cb = client_l2cap_disconnect_cb;
 +
-+	This event indicates that an advertisement monitor has been added
-+	using the Add Advertisement Monitor command.
++		bthost_add_l2cap_server(bthost, l2data->server_psm,
++					host_connect_cb, host_disconnect_cb,
++					data);
+ 	}
+ 
+ 	if (l2data->direct_advertising)
+@@ -1639,7 +1686,7 @@ static void test_connect_2(const void *test_data)
+ 
+ 		if (!l2data->data_len)
+ 			bthost_add_l2cap_server(bthost, l2data->server_psm,
+-						NULL, NULL);
++						NULL, NULL, NULL);
+ 	}
+ 
+ 	defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
+@@ -1927,6 +1974,10 @@ int main(int argc, char *argv[])
+ 					&client_connect_nval_psm_test_3,
+ 					setup_powered_client, test_connect);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Client - Socket Shut WR Success",
++					&client_connect_shut_wr_success_test,
++					setup_powered_client, test_connect);
 +
-+	The event will only be sent to management sockets other than the
-+	one through which the command was sent.
-+
-+
-+Advertisement Monitor Removed Event
-+===================================
-+
-+	Event Code:		0x0028
-+	Controller Index:	<controller id>
-+	Event Parameters:	Monitor_Handle (2 Octets)
-+
-+	This event indicates that an advertisement monitor has been removed
-+	using the Remove Advertisement Monitor command.
-+
-+	The event will only be sent to management sockets other than the
-+	one through which the command was sent.
+ 	test_l2cap_bredr("L2CAP BR/EDR Server - Success",
+ 					&l2cap_server_success_test,
+ 					setup_powered_server, test_server);
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index b20d70d58..2d3be27d8 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -548,7 +548,7 @@ static void test_connect(const void *test_data)
+ 	GIOChannel *io;
+ 	int sk;
+ 
+-	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
++	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL, NULL);
+ 	bthost_add_rfcomm_server(bthost, cli->server_channel,
+ 						rfcomm_connect_cb, NULL);
+ 
 -- 
-2.24.1
+2.26.2.303.gf8c07b1a785-goog
 
