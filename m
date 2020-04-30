@@ -2,103 +2,171 @@ Return-Path: <SRS0=orbE=6O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DF3C83001
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 07:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02529C47247
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:11:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE35F2186A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 07:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C76C4206D6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Apr 2020 17:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZEfTLqb"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ixFLyvZi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbgD3HHz (ORCPT
+        id S1726336AbgD3RLm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Apr 2020 03:07:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
+        Thu, 30 Apr 2020 13:11:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726337AbgD3HHz (ORCPT
+        by vger.kernel.org with ESMTP id S1725844AbgD3RLm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Apr 2020 03:07:55 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17CBDC035494
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 00:07:55 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id t3so4744129qkg.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 00:07:55 -0700 (PDT)
+        Thu, 30 Apr 2020 13:11:42 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8470C035494
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 10:11:40 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id b13so145202oti.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2020 10:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:in-reply-to:references;
-        bh=VNQaaaE1ZPt5Ef7l7PhTMtX1W/DSVdY49QMFEvO+VWI=;
-        b=IZEfTLqbQl56rT/pIOViJVlPirvOYkBH8hUYWmwtRunsY0c1BeP2qZ88wv6464L3cT
-         NCYhpvFPLVAtTurJDLDJC55bqHjtQWp9kJcK8GUqJwQfnw4Xvz6UyMl6iwLD7XlSEifb
-         gezqoEbxOviQsnryt4gOwxBlwKS45l/bW9EPrcA6Jfxj0lbRPJ2Bn0IsIFBLGW558eD1
-         Tp/td38XcU5ugCbfohEu3/ugxDQrWNf5ewwh1lxdV9HVDteMzXOsMl/Nmy7bRo40t+vM
-         1ZGR3jSvRnthmh+fmqZ9gnUCbsM3BhhSmc7YMHFDPVBkfT09MeH31EXOxOkm4JNLl4PV
-         lJVA==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=HhEXPM15zHFi4pYSRE7q3ZLxaI3Dnl+P2vNjJtNZXzA=;
+        b=ixFLyvZisHaSM3yIipZxvIUVSL9ELQ6tK8202Oi9MJ9jifXH5IQomD5h1gTHmu7Paq
+         2DpFw8zvwmRxx3QsK00VNnl9xrX24imvatfgSpPl73C/nAXaV2gZk6951QcYv2J1wTsG
+         4Nbv7o16inGz4P8RBSuPF8svUuoEbM7/p6ptU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :in-reply-to:references;
-        bh=VNQaaaE1ZPt5Ef7l7PhTMtX1W/DSVdY49QMFEvO+VWI=;
-        b=bSb29jhda7agGJSZe6wqUZ0cb1oFixSeCmjn1Yo1CQ0fE0G65xb2vqAavy6TLwnIYJ
-         zI1TmfI2YUeg1gmdyr8NE8DN3Nv0oWnb2o9RPIJK4Mk7+IUM+sbuwEmtWTQORY2pqcEk
-         Z/qkI8v5RqO3WJSo7N0emlsjpsk0hNnaGiRyBDacaINhF2XKZPlESNWm2Ahi8GWPheX7
-         2XOlCVNJUbm5otHFNyJMzH942J9Xvhdy2mT99RCyDEBgOl6J92hBaegHHFPx6RHJH4PH
-         G0TCW/WYrpQCDmbjnZ+n4AOjMuJZwPW1aiBSMqpmJrcveHRPiD3IF3O5fpxWCV2A8d5q
-         16AA==
-X-Gm-Message-State: AGi0PuY6rwMyokSpSZSlnI6g8jzAVwGQM814yJ/jqiKTIMqBQtI+10+U
-        w1leydvmO8p459XjUAVipYpoIWQhKck=
-X-Google-Smtp-Source: APiQypI+ugAPwK84zQisQPFB+FkGpc1+JcmrofR6+HngOWgNdDukE/89cMvMdIe1uS2RWziqvDx0jw==
-X-Received: by 2002:a05:620a:b03:: with SMTP id t3mr2164041qkg.209.1588230474168;
-        Thu, 30 Apr 2020 00:07:54 -0700 (PDT)
-Received: from [172.17.0.2] ([13.68.21.112])
-        by smtp.gmail.com with ESMTPSA id b3sm1382242qtp.12.2020.04.30.00.07.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2020 00:07:53 -0700 (PDT)
-Message-ID: <5eaa7949.1c69fb81.28ac0.7f1e@mx.google.com>
-Date:   Thu, 30 Apr 2020 00:07:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2340660203944417822=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HhEXPM15zHFi4pYSRE7q3ZLxaI3Dnl+P2vNjJtNZXzA=;
+        b=gzBTKdqypxBIvH6qxuwAHa+mua0YxWUn1Y2TuQGr1SZXVL/uoZ+TwGX+wzUrKAKBSQ
+         dsMU1tDmdVdw/LJ/gm0CV2RuCVgHMFP6dIAd02fUKZq6XrmwUSoUgYoWliad0QJv6q5q
+         IncwEUTLacq+npW9Vij4oCWl/6bLw8WVQqCWDJYqFcJg+OMHKpUsIln0KuytCQ0XmXcV
+         4CViX2A0kfk6FfA3Ns7oufPvciwd7paIj4r8BVg7OQhUqgFRC8DXeyIH8xvJXddCiv54
+         jNlxk1XnRLcopiMU/ckoO+fwPBlm84wBVoShmyiN6D/W2lC3zE0EYEV92RXp0JOOh0VE
+         xUqA==
+X-Gm-Message-State: AGi0Pub9P4LkxVFHo7QeO5jSWya3IDBvFrrke+tpasVEKyut2vmZskOb
+        9/EkC3MdSabgr/Eek+gkarwrgWE3/xjiZk8pQL087y5681s=
+X-Google-Smtp-Source: APiQypJAXUu5v13jmVFGzJgDIcHLXV5IfYdhnHlk471Fi+d0adei0krApKcOkiX2VLiXI+IQHMGqFJgY6hQ8ieZpq9o=
+X-Received: by 2002:a05:6830:1d9c:: with SMTP id y28mr89958oti.280.1588266699851;
+ Thu, 30 Apr 2020 10:11:39 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v1] tools/l2cap-tester: Add test for waiting disconnection response
-In-Reply-To: <20200430145105.Bluez.v1.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
-References: <20200430145105.Bluez.v1.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
+References: <20200428051151.14879-1-sonnysasaka@gmail.com> <D2192131-CC65-4D4E-91BE-B1C3B1C12BC4@holtmann.org>
+ <CAOxioN=2p23_K1VuFth5PwFAUR1oXcgs5GPHeM595OOivh6Y2Q@mail.gmail.com>
+In-Reply-To: <CAOxioN=2p23_K1VuFth5PwFAUR1oXcgs5GPHeM595OOivh6Y2Q@mail.gmail.com>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Thu, 30 Apr 2020 10:11:28 -0700
+Message-ID: <CAOxioN=1dP9W=WZ2TM+3RLbVmxBYkcrG0s4HiExihAXQ=0pJJg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Handle Inquiry Cancel error after Inquiry Complete
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2340660203944417822==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Marcel,
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgoKVGVzdCBSZXN1bHQ6CkNoZWNrYnVpbGQgRmFpbGVkCgpQYXRjaCBT
-ZXJpZXM6CltCbHVleix2MV0gdG9vbHMvbDJjYXAtdGVzdGVyOiBBZGQgdGVzdCBmb3Igd2FpdGlu
-ZyBkaXNjb25uZWN0aW9uIHJlc3BvbnNlCgoKT3V0cHV0czoKYXI6IGB1JyBtb2RpZmllciBpZ25v
-cmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmllciBp
-Z25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmll
-ciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2Rp
-ZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBt
-b2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYW5kcm9p
-ZC90ZXN0ZXItbWFpbi5jOiBJbiBmdW5jdGlvbiDigJhlbXVfYWRkX2wyY2FwX3NlcnZlcl9hY3Rp
-b27igJk6CmFuZHJvaWQvdGVzdGVyLW1haW4uYzoyODY5OjI6IGVycm9yOiB0b28gZmV3IGFyZ3Vt
-ZW50cyB0byBmdW5jdGlvbiDigJhidGhvc3RfYWRkX2wyY2FwX3NlcnZlcuKAmQogMjg2OSB8ICBi
-dGhvc3RfYWRkX2wyY2FwX3NlcnZlcihidGhvc3QsIGwyY2FwX2RhdGEtPnBzbSwgbDJjYXBfZGF0
-YS0+ZnVuYywKICAgICAgfCAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRl
-ZCBmcm9tIGFuZHJvaWQvdGVzdGVyLW1haW4uYzozMzoKLi9lbXVsYXRvci9idGhvc3QuaDoxMDU6
-Njogbm90ZTogZGVjbGFyZWQgaGVyZQogIDEwNSB8IHZvaWQgYnRob3N0X2FkZF9sMmNhcF9zZXJ2
-ZXIoc3RydWN0IGJ0aG9zdCAqYnRob3N0LCB1aW50MTZfdCBwc20sCiAgICAgIHwgICAgICBefn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjcxNjU6IGFuZHJvaWQv
-YW5kcm9pZF90ZXN0ZXItdGVzdGVyLW1haW4ub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxl
-OjQwMTA6IGFsbF0gRXJyb3IgMgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCg==
+Could you take another look at my last proposal based on your
+suggestion? If we are to move the logic inside hci_cc_inquiry_cancel,
+we will need a way to update the status to the caller, for example by
+having hci_cc_inquiry_cancel return a value, or accept a pointer for
+the updated status value. Let me know which way you prefer.
 
---===============2340660203944417822==--
+On Tue, Apr 28, 2020 at 10:25 AM Sonny Sasaka <sonnysasaka@chromium.org> wr=
+ote:
+>
+> Hi Marcel,
+>
+> On Tue, Apr 28, 2020 at 2:47 AM Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> >
+> > Hi Sonny,
+> >
+> > > After sending Inquiry Cancel command to the controller, it is possibl=
+e
+> > > that Inquiry Complete event comes before Inquiry Cancel command compl=
+ete
+> > > event. In this case the Inquiry Cancel command will have status of
+> > > Command Disallowed since there is no Inquiry session to be cancelled.
+> > > This case should not be treated as error, otherwise we can reach an
+> > > inconsistent state.
+> > >
+> > > Example of a btmon trace when this happened:
+> > >
+> > > < HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
+> > >> HCI Event: Inquiry Complete (0x01) plen 1
+> > >        Status: Success (0x00)
+> > >> HCI Event: Command Complete (0x0e) plen 4
+> > >      Inquiry Cancel (0x01|0x0002) ncmd 1
+> > >        Status: Command Disallowed (0x0c)
+> > > ---
+> > > net/bluetooth/hci_event.c | 19 +++++++++++++++----
+> > > 1 file changed, 15 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 966fc543c01d..0f3f7255779f 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -42,10 +42,9 @@
+> > >
+> > > /* Handle HCI Event packets */
+> > >
+> > > -static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_bu=
+ff *skb)
+> > > +static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_bu=
+ff *skb,
+> > > +                               u8 status)
+> > > {
+> > > -     __u8 status =3D *((__u8 *) skb->data);
+> > > -
+> > >       BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> > >
+> > >       if (status)
+> > > @@ -3233,7 +3232,19 @@ static void hci_cmd_complete_evt(struct hci_de=
+v *hdev, struct sk_buff *skb,
+> > >
+> > >       switch (*opcode) {
+> > >       case HCI_OP_INQUIRY_CANCEL:
+> > > -             hci_cc_inquiry_cancel(hdev, skb);
+> > > +             /* It is possible that we receive Inquiry Complete even=
+t right
+> > > +              * before we receive Inquiry Cancel Command Complete ev=
+ent, in
+> > > +              * which case the latter event should have status of Co=
+mmand
+> > > +              * Disallowed (0x0c). This should not be treated as err=
+or, since
+> > > +              * we actually achieve what Inquiry Cancel wants to ach=
+ieve,
+> > > +              * which is to end the last Inquiry session.
+> > > +              */
+> > > +             if (*status =3D=3D 0x0c && !test_bit(HCI_INQUIRY, &hdev=
+->flags)) {
+> > > +                     BT_DBG("Ignoring error of HCI Inquiry Cancel co=
+mmand");
+> > > +                     *status =3D 0;
+> > > +             }
+> >
+> > is there a problem with moving this check into hci_cc_inquiry_cancel? T=
+hen we don=E2=80=99t have to play any tricks with an extra parameter that i=
+s also included in the skb data struct itself.
+> I did that the first time, but turns out the updated status code is
+> needed in the bottom part of this function. So, if we are to move this
+> logic inside hci_cc_inquiry_cancel, we will need a way to update the
+> status, for example by having hci_cc_inquiry_cancel return a value, or
+> accept a pointer for the updated status value. Let me know which way
+> you prefer.
+> >
+> > I prefer we start using bt_dev_dbg and in this case maybe we just use b=
+t_dev_warn or bt_dev_warn_ratelimited.
+> Ack, I will change BT_DBG to bt_dev_dbg.
+> >
+> > Regards
+> >
+> > Marcel
+> >
