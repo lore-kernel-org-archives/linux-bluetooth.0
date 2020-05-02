@@ -2,93 +2,74 @@ Return-Path: <SRS0=rn6A=6Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F50C47247
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 May 2020 06:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E66DAC3A5A9
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 May 2020 21:54:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B80A22184D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 May 2020 06:45:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0D5E20787
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 May 2020 21:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726782AbgEBGpK (ORCPT
+        id S1728541AbgEBVyU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 2 May 2020 02:45:10 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:40713 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbgEBGpK (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 2 May 2020 02:45:10 -0400
-Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 45329CED2C;
-        Sat,  2 May 2020 08:54:48 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 00/20] crypto: introduce crypto_shash_tfm_digest()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
-Date:   Sat, 2 May 2020 08:44:37 +0200
-Cc:     linux-crypto@vger.kernel.org,
-        Cheng-Yi Chiang <cychiang@chromium.org>,
-        ecryptfs@vger.kernel.org,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Jesper Nilsson <jesper.nilsson@axis.com>,
-        Kamil Konieczny <k.konieczny@samsung.com>,
-        keyrings@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Lars Persson <lars.persson@axis.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-sctp@vger.kernel.org, Robert Baldyga <r.baldyga@samsung.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <5E6F9382-3D91-4587-980A-377E7CB086E4@holtmann.org>
-References: <20200502053122.995648-1-ebiggers@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Sat, 2 May 2020 17:54:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50014 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728523AbgEBVyU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 2 May 2020 17:54:20 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sat, 02 May 2020 21:54:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: joselp@disroot.org
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-WmKBILhsrz@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Eric,
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-> This series introduces a helper function crypto_shash_tfm_digest() which
-> replaces the following common pattern:
-> 
-> 	{
-> 		SHASH_DESC_ON_STACK(desc, tfm);
-> 		int err;
-> 
-> 		desc->tfm = tfm;
-> 
-> 		err = crypto_shash_digest(desc, data, len, out);
-> 
-> 		shash_desc_zero(desc);
-> 	}
-> 
-> with:
-> 
-> 	err = crypto_shash_tfm_digest(tfm, data, len, out);
-> 
-> Patch 1 introduces this helper function, and patches 2-20 convert all
-> relevant users to use it.
-> 
-> IMO, it would be easiest to take all these patches through the crypto
-> tree.  But taking just the "crypto:" ones and then me trying to get the
-> rest merged later via subsystem trees is also an option.
+joselp (joselp@disroot.org) changed:
 
-I am fine if you take the net/bluetooth/smp.c change through the crypto tree.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |joselp@disroot.org
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+--- Comment #63 from joselp (joselp@disroot.org) ---
+Hi, I have the same problem in this computer with Mageia 7.1 with kernel 5.6.6:
 
-Regards
+4 x Intel Core 2 Quad CPU Q6600 @ 2400Ghz
+4,8 Gb Ram
 
-Marcel
+The bluetooth no works.
 
+Greetings!
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
