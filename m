@@ -2,160 +2,163 @@ Return-Path: <SRS0=w4jJ=6R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD3CC28CBC
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 May 2020 11:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09851C47247
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 May 2020 16:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 002AA2075B
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 May 2020 11:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDA4920757
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 May 2020 16:13:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588504493;
-	bh=EFrX7o2sXcwiJ+UqvRUJ5cTx3AnX0Gs275oZUtpjLmc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ezjk0I5y9C8QnSyLBxOKmODmoPS+Tr3l/2IrUKM5eKfl/U/r2OnZKv3mo+T2lBm6r
-	 eK04/Ku7iZiDq0FnBos9at/9tRkpRiqdoWtd0HHGbhV/sm7mzPCaAdcgxnEh7sowTe
-	 Xc5u6BJykBjhvJfoQm2Ysuzejy4BomZIXU3CkU/E=
+	s=default; t=1588522412;
+	bh=e6r2Z72h7hrcZe1FEJD+LSdrn+Cl58pNFQIvjPxoo2M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=2rO61jcbhLM/Ww2lCljSNJRWoSvwvcruN9wDIR6OswHLDrKop/NoAb+sNOnKkiJUo
+	 zbe3e5wDmwQMlOQz9t0CLztVEdSvSnPDNy2TxzehN/uDsVRsyIYWSF35AW8M65mq3X
+	 NwwKSGSSwCrrjolM8mwElO4TrxHdWzOYBSHEPj2w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727091AbgECLOw (ORCPT
+        id S1728824AbgECQNb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 May 2020 07:14:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57860 "EHLO mail.kernel.org"
+        Sun, 3 May 2020 12:13:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41136 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727023AbgECLOw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 May 2020 07:14:52 -0400
-Received: from pali.im (pali.im [31.31.79.79])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728665AbgECQNb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 3 May 2020 12:13:31 -0400
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4BD2D20757;
-        Sun,  3 May 2020 11:14:51 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6096A21973;
+        Sun,  3 May 2020 16:13:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588504491;
-        bh=EFrX7o2sXcwiJ+UqvRUJ5cTx3AnX0Gs275oZUtpjLmc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GrIc4ULd7vT5k3x+MvICFedViJH9JQslAu032W9ByX8KSUHSp4elV285a7EODa2+e
-         ErwN0GUjl5b9p/K/WIW+F/ie1Ed2FsxvldWhtcM9wwuPCaEdoOyRgxSVUM5fG3SNv+
-         4Jl+x1F2BzMibvjiNLU+kpKgwLnKgltIVYXjFwMg=
-Received: by pali.im (Postfix)
-        id 7B6A8A1E; Sun,  3 May 2020 13:14:49 +0200 (CEST)
-Date:   Sun, 3 May 2020 13:14:49 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20200503111449.k6ugzpaitbv5mggs@pali>
-References: <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
- <20190201124353.GK32745@reaktio.net>
- <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
- <20190305122630.gwnaz3y7ckzqfjfq@pali>
- <20190410082924.exo2oihzd7w2oz3e@pali>
- <20190607130739.j25oqqj624anmcqr@pali>
- <20191014110746.n3pmoigtf3ewbmrq@pali>
- <20200209130532.4evozfyutikzwn4a@pali>
- <20200414230015.5ndqz5k5kx5vakj4@pali>
+        s=default; t=1588522410;
+        bh=e6r2Z72h7hrcZe1FEJD+LSdrn+Cl58pNFQIvjPxoo2M=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=V8qtkFP37pelp3XQoW9bGwWGkgu5Kz3XzIxErbVnu3G8HsLuAndHmhHo1NBShv4m7
+         nNsogNOBrvbfT8TDxtrJsGXnjbwN+E7njDwepvGDR6/ufPefsD4zY6srKh6ETByRvQ
+         OMeM2HbrCm8B3m6HChhV5YmVghbNF7XaiwDaH6G4=
+Received: by mail-io1-f46.google.com with SMTP id k18so9841861ion.0;
+        Sun, 03 May 2020 09:13:30 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZQJKN5Ji5MB1+PY7st7xTLCdYjbUSoWwQPEV0kpZh02D8M3fau
+        Vzh4q5mQaUHiNWkT1i5Mj+utgycbMgFl7hSJMhs=
+X-Google-Smtp-Source: APiQypLhY9++881yFhc1aV+hz5b6ucbeJlKQ6tWViPFt3Ctm6mc2jiEci1yn1OxgzY22xIRCzNrubZForogPxDE10r0=
+X-Received: by 2002:a6b:5904:: with SMTP id n4mr12406558iob.142.1588522409725;
+ Sun, 03 May 2020 09:13:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200414230015.5ndqz5k5kx5vakj4@pali>
-User-Agent: NeoMutt/20180716
+References: <20200502053122.995648-1-ebiggers@kernel.org>
+In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sun, 3 May 2020 18:13:18 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXG9Cubj9zO4paGd94cAvG1h21Z0X3CmyNr-orD7WC1=vw@mail.gmail.com>
+Message-ID: <CAMj1kXG9Cubj9zO4paGd94cAvG1h21Z0X3CmyNr-orD7WC1=vw@mail.gmail.com>
+Subject: Re: [PATCH 00/20] crypto: introduce crypto_shash_tfm_digest()
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Cheng-Yi Chiang <cychiang@chromium.org>,
+        ecryptfs@vger.kernel.org,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Jesper Nilsson <jesper.nilsson@axis.com>,
+        Kamil Konieczny <k.konieczny@samsung.com>,
+        keyrings@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Lars Persson <lars.persson@axis.com>,
+        linux-bluetooth@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+        Robert Baldyga <r.baldyga@samsung.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wednesday 15 April 2020 01:00:15 Pali Rohár wrote:
-> On Sunday 09 February 2020 14:05:32 Pali Rohár wrote:
-> > On Monday 14 October 2019 13:07:46 Pali Rohár wrote:
-> > > On Friday 07 June 2019 15:07:39 Pali Rohár wrote:
-> > > > On Wednesday 10 April 2019 10:29:24 Pali Rohár wrote:
-> > > > > On Tuesday 05 March 2019 13:26:30 Pali Rohár wrote:
-> > > > > > On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> > > > > > > On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > > > > > > > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > > > > > > > Hi,
-> > > > > > > > > 
-> > > > > > > > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > > > > > > > Hi Pali, Pasi,
-> > > > > > > > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > > > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > > > > > > > Hi Pali,
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > > > > > > > {
-> > > > > > > > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > > > > > > > >                 return "aptX";
-> > > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > > > > > > > +               return "FastStream";
-> > > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > > > > > > > +               return "aptX HD";
-> > > > > > > > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > > > > > > > >                 return "LDAC";
-> > > > > > > > > > > > > > >         return "Unknown???;
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > > > > > > > implemented this parsing.
-> > > > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > > > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > > > > > > > >
-> > > > > > > > > > > Exactly, people still use hcidump...
-> > > > > > > > > > 
-> > > > > > > > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > > > > > > > 6.x which we would like to do in the very next release, if that
-> > > > > > > > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > > > > > > > BlueZ 5.x release.
-> > > > > > > > > > 
-> > > > > > > > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > > > > > > > start working on removing the deprecated tools/etc.
-> > > > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > > > > > > > 
-> > > > > > > > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > > > > > > > release, can you take this patch?
-> > > > > > > >
-> > > > > > > 
-> > > > > > > How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> > > > > > > hcidump then gets removed later whenever the removal of deprecated features/tools starts.
-> > > > > > 
-> > > > > > So... what are plans for next release?
-> > > > > 
-> > > > > Marcel, Luiz, can you comment next steps? It is waiting there for your
-> > > > > info here for more than 2 months.
-> > > > 
-> > > > PING!
-> > > 
-> > > Just a gentle reminder for this thread and patch.
-> > > 
-> > 
-> > Ping, another reminder.
-> 
-> Ping, could you please give us information what is the state of this
-> tool and a linked patch?
+On Sat, 2 May 2020 at 07:33, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This series introduces a helper function crypto_shash_tfm_digest() which
+> replaces the following common pattern:
+>
+>         {
+>                 SHASH_DESC_ON_STACK(desc, tfm);
+>                 int err;
+>
+>                 desc->tfm = tfm;
+>
+>                 err = crypto_shash_digest(desc, data, len, out);
+>
+>                 shash_desc_zero(desc);
+>         }
+>
+> with:
+>
+>         err = crypto_shash_tfm_digest(tfm, data, len, out);
+>
+> Patch 1 introduces this helper function, and patches 2-20 convert all
+> relevant users to use it.
+>
+> IMO, it would be easiest to take all these patches through the crypto
+> tree.  But taking just the "crypto:" ones and then me trying to get the
+> rest merged later via subsystem trees is also an option.
+>
+> Eric Biggers (20):
+>   crypto: hash - introduce crypto_shash_tfm_digest()
+>   crypto: arm64/aes-glue - use crypto_shash_tfm_digest()
+>   crypto: essiv - use crypto_shash_tfm_digest()
+>   crypto: artpec6 - use crypto_shash_tfm_digest()
+>   crypto: ccp - use crypto_shash_tfm_digest()
+>   crypto: ccree - use crypto_shash_tfm_digest()
+>   crypto: hisilicon/sec2 - use crypto_shash_tfm_digest()
+>   crypto: mediatek - use crypto_shash_tfm_digest()
+>   crypto: n2 - use crypto_shash_tfm_digest()
+>   crypto: omap-sham - use crypto_shash_tfm_digest()
+>   crypto: s5p-sss - use crypto_shash_tfm_digest()
+>   nfc: s3fwrn5: use crypto_shash_tfm_digest()
+>   fscrypt: use crypto_shash_tfm_digest()
+>   ecryptfs: use crypto_shash_tfm_digest()
+>   nfsd: use crypto_shash_tfm_digest()
+>   ubifs: use crypto_shash_tfm_digest()
+>   Bluetooth: use crypto_shash_tfm_digest()
+>   sctp: use crypto_shash_tfm_digest()
+>   KEYS: encrypted: use crypto_shash_tfm_digest()
+>   ASoC: cros_ec_codec: use crypto_shash_tfm_digest()
+>
 
-Ping again, I have not got any reply for this patch for more then year.
-Patch can be still cleanly applied on top of git master branch.
+For the series,
+
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+
+>  arch/arm64/crypto/aes-glue.c               |  4 +--
+>  crypto/essiv.c                             |  4 +--
+>  crypto/shash.c                             | 16 +++++++++
+>  drivers/crypto/axis/artpec6_crypto.c       | 10 ++----
+>  drivers/crypto/ccp/ccp-crypto-sha.c        |  9 ++---
+>  drivers/crypto/ccree/cc_cipher.c           |  9 ++---
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c |  5 ++-
+>  drivers/crypto/mediatek/mtk-sha.c          |  7 ++--
+>  drivers/crypto/n2_core.c                   |  7 ++--
+>  drivers/crypto/omap-sham.c                 | 20 +++--------
+>  drivers/crypto/s5p-sss.c                   | 39 ++++------------------
+>  drivers/nfc/s3fwrn5/firmware.c             | 10 +-----
+>  fs/crypto/fname.c                          |  7 +---
+>  fs/crypto/hkdf.c                           |  6 +---
+>  fs/ecryptfs/crypto.c                       | 17 +---------
+>  fs/nfsd/nfs4recover.c                      | 26 ++++-----------
+>  fs/ubifs/auth.c                            | 20 ++---------
+>  fs/ubifs/master.c                          |  9 ++---
+>  fs/ubifs/replay.c                          | 14 ++------
+>  include/crypto/hash.h                      | 19 +++++++++++
+>  net/bluetooth/smp.c                        |  6 +---
+>  net/sctp/auth.c                            | 10 ++----
+>  net/sctp/sm_make_chunk.c                   | 23 +++++--------
+>  security/keys/encrypted-keys/encrypted.c   | 18 ++--------
+>  sound/soc/codecs/cros_ec_codec.c           |  9 +----
+>  25 files changed, 95 insertions(+), 229 deletions(-)
+>
+> --
+> 2.26.2
+>
