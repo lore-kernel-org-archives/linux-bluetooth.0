@@ -2,39 +2,39 @@ Return-Path: <SRS0=pLxO=6S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1486C3A5A9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 17:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82119C4725B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 19:04:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEA93206D9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 17:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D8E1206B8
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 19:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730563AbgEDR4g (ORCPT
+        id S1727910AbgEDTEK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 May 2020 13:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56382 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729386AbgEDR4f (ORCPT
+        Mon, 4 May 2020 15:04:10 -0400
+Received: from smtprelay0193.hostedemail.com ([216.40.44.193]:45406 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727866AbgEDTEJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 May 2020 13:56:35 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FDF2C061A0E
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2020 10:56:35 -0700 (PDT)
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1jVfJy-0004nF-Rx; Mon, 04 May 2020 19:56:02 +0200
-Received: from ukl by pty.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1jVfJp-0002rR-TC; Mon, 04 May 2020 19:55:53 +0200
-Date:   Mon, 4 May 2020 19:55:53 +0200
-From:   Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Sam Ravnborg <sam@ravnborg.org>
+        Mon, 4 May 2020 15:04:09 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 90A1018022F46;
+        Mon,  4 May 2020 19:04:05 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: scarf42_6021543c5600
+X-Filterd-Recvd-Size: 2806
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf07.hostedemail.com (Postfix) with ESMTPA;
+        Mon,  4 May 2020 19:04:01 +0000 (UTC)
+Message-ID: <7af4a2979fb5c060af769a996d3e5917b4d265d0.camel@perches.com>
+Subject: Re: [PATCH] docs: dt: fix broken links due to txt->yaml renames
+From:   Joe Perches <joe@perches.com>
+To:     Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Sam Ravnborg <sam@ravnborg.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         alsa-devel@alsa-project.org,
         Olivier Moysan <olivier.moysan@st.com>,
@@ -56,46 +56,39 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Sandy Huang <hjc@rock-chips.com>, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
         netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] docs: dt: fix broken links due to txt->yaml renames
-Message-ID: <20200504175553.jdm7a7aabloevxba@pengutronix.de>
+Date:   Mon, 04 May 2020 12:04:00 -0700
+In-Reply-To: <20200504175553.jdm7a7aabloevxba@pengutronix.de>
 References: <967df5c3303b478b76199d4379fe40f5094f3f9b.1588584538.git.mchehab+huawei@kernel.org>
- <20200504174522.GA3383@ravnborg.org>
+         <20200504174522.GA3383@ravnborg.org>
+         <20200504175553.jdm7a7aabloevxba@pengutronix.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.1-2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200504174522.GA3383@ravnborg.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sam,
+On Mon, 2020-05-04 at 19:55 +0200, Uwe Kleine-König wrote:
+> Hi Sam,
+> 
+> On Mon, May 04, 2020 at 07:45:22PM +0200, Sam Ravnborg wrote:
+> > On Mon, May 04, 2020 at 11:30:20AM +0200, Mauro Carvalho Chehab wrote:
+> > > There are some new broken doc links due to yaml renames
+> > > at DT. Developers should really run:
+> > > 
+> > > 	./scripts/documentation-file-ref-check
+> > > 
+> > > in order to solve those issues while submitting patches.
+> > Would love if some bot could do this for me on any patches that creates
+> > .yaml files or so.
+> > I know I will forget this and it can be automated.
+> > If I get a bot mail that my patch would broke a link I would
+> > have it fixed before it hits any tree.
+> 
+> What about adding a check to check_patch?
 
-On Mon, May 04, 2020 at 07:45:22PM +0200, Sam Ravnborg wrote:
-> On Mon, May 04, 2020 at 11:30:20AM +0200, Mauro Carvalho Chehab wrote:
-> > There are some new broken doc links due to yaml renames
-> > at DT. Developers should really run:
-> > 
-> > 	./scripts/documentation-file-ref-check
-> > 
-> > in order to solve those issues while submitting patches.
-> Would love if some bot could do this for me on any patches that creates
-> .yaml files or so.
-> I know I will forget this and it can be automated.
-> If I get a bot mail that my patch would broke a link I would
-> have it fixed before it hits any tree.
+There's already a checkpatch warning when a patch renames
+a file without a MAINTAINERS update.
 
-What about adding a check to check_patch?
-
-Best regards
-Uwe
-
--- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
