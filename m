@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0380C3A5A9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 23:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C40C3A5A9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 23:39:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7352206D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 23:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B2FF206A4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 May 2020 23:39:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4QJ00yL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHzbO6Ix"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728315AbgEDXiy (ORCPT
+        id S1728307AbgEDXjf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 May 2020 19:38:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53484 "EHLO
+        Mon, 4 May 2020 19:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728092AbgEDXiy (ORCPT
+        with ESMTP id S1728092AbgEDXje (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 May 2020 19:38:54 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1355EC061A0E
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2020 16:38:54 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id r25so364604oij.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2020 16:38:54 -0700 (PDT)
+        Mon, 4 May 2020 19:39:34 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE58C061A0E
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2020 16:39:34 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id j26so152006ots.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2020 16:39:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=ELPnoqUh0urDUwpAiK8SXLr8aaUyMULi1shsvUvAuMk=;
-        b=h4QJ00yLVkaHjtw7ZKCwBNDZ3GiSMz/Ob61Rhiz28GoAG6PrjD2aR1MicokEYEWKyw
-         +4jRQ9rWkoiGL8I1QP2v9oBUxHUpGdPnjVT90txA6pNywcmxY66Tx2y2L3iBu7F/GQE/
-         fL+ZG6n9DhI88Xwzr429SM/k+5bDzAocd570YQcsoaPV0KUtxd9zoTRP5i8ENX1qS65T
-         8LBPpfd+7UkkeQy/03f9DscFre++X0X9RGaI+vsXTWWtHuDt9ZcUnWy9LEoB8E0UjM38
-         EYriiGnPRRp1HKTQGZlhNF+wCv9jo7Z6QfmUd3oqE75kkcfX6i28VmxekYxKqqYzDNCj
-         +Hbg==
+        bh=UjmIGecejNQeR2VrEVCg1PmfwxYsH2z936uF8rTB8X8=;
+        b=NHzbO6Ixan8IDKEPche5hU5H5fTHj6/BCUk+fFLvgxZhlxUo/NI7SHsawF8sVffk+/
+         CEUK+JNwv/rQufttlL67SNRvkQlrOgixGNdFV+Dydw9rtmbSZ5/SfglKhIhIeVZ/VJxX
+         tQ3CxnVKgj2MllzQw8rmAXYeH98UnZtX80T/jgxnqUiFNEMTc73eEKFc8ikSSm5VQZoy
+         FB78R0KTKxWZgs/RlhkyBOOkAZsrsmX3iybn9Fb31VHzBiVKswakKVnjttz/fJVPDY/Y
+         BlU1fF888k3LYDvvuTE8g+d7v2MiJQHVYeF3CSjST8A2cJvW8Fsbh8AWoGVcGAynC6Xw
+         wiBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ELPnoqUh0urDUwpAiK8SXLr8aaUyMULi1shsvUvAuMk=;
-        b=OqFu2eSlonaQQgxxf9VqLWiQEaPsP6jS2Jkq0xXtMrXCQXPOzTcapKJppEo6I8QXmR
-         hfzEp5PkRS9HYLtIEpqlZS3VbjwBeLFFtHLz/QFsn3fKIkxKz0G8WOYgQQJLvvOAXFDf
-         LznMjPcS4C76JPiWJDi9qjoHDvx7UtyHyyAxHezsTfmtdQs/RJOt2uRemS/mDEfr44l5
-         /r/w0iglgKW5KNAgT0YapMKve3aI/p2OnOMwgCyjIN5NHKCzpfwj1Ir6KDw7wSFakecX
-         TPrgEaxV0U3sHSgCHXf287bj7m1eklwFa5oiAlk85MTuOXobWzt3nz5RgEEBYHIW/vYc
-         qgNQ==
-X-Gm-Message-State: AGi0PuY+t1TCe+ZEDOwY90IYrhQMs4qs5cs5b6KWZ5uutjpKAqvRYmXs
-        6XrKBSlgSq3DFxXyVH/DDiV5OFuqhWbaqpsjI6N5dauI
-X-Google-Smtp-Source: APiQypLxRYNvtL6wqdG20RX7bUMJ11kpL4vrffVay6wNImVV1Ou35ijDQfJV/YiHh8dwLRvA9FInZejPRLTHaizPUko=
-X-Received: by 2002:aca:acd0:: with SMTP id v199mr637687oie.82.1588635533463;
- Mon, 04 May 2020 16:38:53 -0700 (PDT)
+        bh=UjmIGecejNQeR2VrEVCg1PmfwxYsH2z936uF8rTB8X8=;
+        b=Y+QzKSdapTNxUd3rGWItSw5jPb3/ghTU/r+IQRrL+XmN6eaOSTaQ16yV14DuPjmPuj
+         x/T/YDsF9FxWN788JAwM66mdg9cequb2C8GlKyoGHWre35PCDfIC1FoZvqFCgjqf2jsS
+         x6V0wEenE4aWNOCjWnU126lZogd9l9x1oGVPscFhqZwtqzk/1mlC1HhQYd2qkWoc8ye+
+         avorOQ9y3GtM2f0JJm42nOJqhS3v+Ibj796f1g6pyFPbgiBPlO1oK9gRZdqRyFnTvqhj
+         AfQV5EYpAebx9/TCO/nFfYPkXAKL3OtYka7pHgIHFS/aTatiiiPmAJ/DzTLPtx2DbAQs
+         sx+w==
+X-Gm-Message-State: AGi0PuYKW4H69dHbv1yz9zSdEpX8o6PN/sLqjN2kLpvjjJLi479m35+n
+        nG80KNp/RuwHf65gybkvWeVR5Lu0/zYpdoU/vnk=
+X-Google-Smtp-Source: APiQypIeVZ0DEtEBWlowVrt4DgXtsaLjaZLEMAtAUaNq1OGwl/s87lYKMOEYJKQH3ks1Hsx7KpKZyH6Vzx8fgGrhZjQ=
+X-Received: by 2002:a9d:3637:: with SMTP id w52mr75861otb.177.1588635573917;
+ Mon, 04 May 2020 16:39:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200503111148.11412-1-pali@kernel.org>
-In-Reply-To: <20200503111148.11412-1-pali@kernel.org>
+References: <5ea9d716.1c69fb81.92030.0ba2@mx.google.com> <20200503110629.11068-1-pali@kernel.org>
+In-Reply-To: <20200503110629.11068-1-pali@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 4 May 2020 16:38:41 -0700
-Message-ID: <CABBYNZJ_KQ39u5FvaVd678OTS3-Q7CSLzsbqB0NSLnEwGQD3Og@mail.gmail.com>
-Subject: Re: [PATCH] doc: Update assigned-numbers.txt
+Date:   Mon, 4 May 2020 16:39:22 -0700
+Message-ID: <CABBYNZ+5JsazyZUZHqS0B9LF3Mjs3Ly1kbEDFMQ2m-Y9d6eHLA@mail.gmail.com>
+Subject: Re: [PATCH v2] a2dp: Check for valid SEP in a2dp_reconfigure
 To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -73,26 +73,50 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Pali,
 
-On Sun, May 3, 2020 at 4:11 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
+On Sun, May 3, 2020 at 4:06 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
 >
-> Define missing rfcomm channels specified in src/profile.c
+> a2dp_reconfigure() is called as callback when local and remote SEP does n=
+ot
+> have to be valid anymore, sep->lsep can be NULL.
+>
+> This change fixes bluetoothd daemon crash (dereferencing NULL sep->lsep)
+> when audio agent disconnect in the middle of the reconfigure call.
 > ---
->  doc/assigned-numbers.txt | 2 ++
->  1 file changed, 2 insertions(+)
+>  profiles/audio/a2dp.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
-> diff --git a/doc/assigned-numbers.txt b/doc/assigned-numbers.txt
-> index ca171c4ff..cf481c15e 100644
-> --- a/doc/assigned-numbers.txt
-> +++ b/doc/assigned-numbers.txt
-> @@ -8,6 +8,8 @@ avoid conflicts.
->  Profile                Channel
->  -----------------------
->  DUN            1
-> +SPP            3
-> +HSP HS         6
->  HFP HF         7
->  OPP            9
->  FTP            10
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index c31aaf187..a2ce3204d 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -1178,6 +1178,12 @@ static gboolean a2dp_reconfigure(gpointer data)
+>         struct avdtp_media_codec_capability *rsep_codec;
+>         struct avdtp_service_capability *cap;
+>
+> +       if (!sep->lsep) {
+> +               error("no valid local SEP");
+> +               posix_err =3D -EINVAL;
+> +               goto failed;
+> +       }
+> +
+>         if (setup->rsep) {
+>                 cap =3D avdtp_get_codec(setup->rsep->sep);
+>                 rsep_codec =3D (struct avdtp_media_codec_capability *) ca=
+p->data;
+> @@ -1186,6 +1192,12 @@ static gboolean a2dp_reconfigure(gpointer data)
+>         if (!setup->rsep || sep->codec !=3D rsep_codec->media_codec_type)
+>                 setup->rsep =3D find_remote_sep(setup->chan, sep);
+>
+> +       if (!setup->rsep) {
+> +               error("unable to find remote SEP");
+> +               posix_err =3D -EINVAL;
+> +               goto failed;
+> +       }
+> +
+>         posix_err =3D avdtp_set_configuration(setup->session, setup->rsep=
+->sep,
+>                                                 sep->lsep,
+>                                                 setup->caps,
 > --
 > 2.20.1
 
