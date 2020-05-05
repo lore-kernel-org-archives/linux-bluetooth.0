@@ -2,35 +2,33 @@ Return-Path: <SRS0=nALV=6T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B56C47258
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 May 2020 23:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE08C47254
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 May 2020 23:20:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB14F206FA
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 May 2020 23:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B18020721
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 May 2020 23:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729495AbgEEXUq (ORCPT
+        id S1729509AbgEEXUq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 5 May 2020 19:20:46 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33479 "EHLO
+Received: from coyote.holtmann.net ([212.227.132.17]:54117 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729449AbgEEXUp (ORCPT
+        with ESMTP id S1727989AbgEEXUp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 5 May 2020 19:20:45 -0400
 Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 987E5CECFF
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2020 01:30:25 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id EC402CECFC
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2020 01:30:24 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/7] Bluetooth: replace zero-length array with flexible-array member
-Date:   Wed,  6 May 2020 01:20:35 +0200
-Message-Id: <c1c28c073acf0c37cb7804d33a43c42486c9e796.1588720791.git.marcel@holtmann.org>
+Subject: [PATCH v2 0/7] Patches introducing experimental feature support
+Date:   Wed,  6 May 2020 01:20:32 +0200
+Message-Id: <cover.1588720791.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1588720791.git.marcel@holtmann.org>
-References: <cover.1588720791.git.marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -38,206 +36,27 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The current codebase makes use of the zero-length array language extension
-to the C90 standard, but the preferred mechanism to declare variable-length
-types such as these ones is a flexible array member.
+Marcel Holtmann (7):
+  Bluetooth: Add MGMT_EV_PHY_CONFIGURATION_CHANGED to supported list
+  Bluetooth: Replace BT_DBG with bt_dev_dbg for management support
+  Bluetooth: replace zero-length array with flexible-array member
+  Bluetooth: Introduce HCI_MGMT_HDEV_OPTIONAL option
+  Bluetooth: Replace BT_DBG with bt_dev_dbg for security manager 
+    support
+  Bluetooth: Add support for experimental features configuration
+  Bluetooth: Introduce debug feature when dynamic debug is disabled
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h | 42 ++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ include/net/bluetooth/bluetooth.h |  11 +
+ include/net/bluetooth/hci.h       |   1 +
+ include/net/bluetooth/hci_core.h  |   1 +
+ include/net/bluetooth/mgmt.h      |  69 ++++--
+ net/bluetooth/Kconfig             |   7 +
+ net/bluetooth/hci_sock.c          |  12 +-
+ net/bluetooth/lib.c               |  33 +++
+ net/bluetooth/mgmt.c              | 362 +++++++++++++++++++++---------
+ net/bluetooth/smp.c               |   8 +-
+ 9 files changed, 363 insertions(+), 141 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 65dd6fd1fff3..9d4d87c6028e 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -70,14 +70,14 @@ struct mgmt_rp_read_version {
- struct mgmt_rp_read_commands {
- 	__le16	num_commands;
- 	__le16	num_events;
--	__le16	opcodes[0];
-+	__le16	opcodes[];
- } __packed;
- 
- #define MGMT_OP_READ_INDEX_LIST		0x0003
- #define MGMT_READ_INDEX_LIST_SIZE	0
- struct mgmt_rp_read_index_list {
- 	__le16	num_controllers;
--	__le16	index[0];
-+	__le16	index[];
- } __packed;
- 
- /* Reserve one extra byte for names in management messages so that they
-@@ -183,7 +183,7 @@ struct mgmt_link_key_info {
- struct mgmt_cp_load_link_keys {
- 	__u8	debug_keys;
- 	__le16	key_count;
--	struct	mgmt_link_key_info keys[0];
-+	struct	mgmt_link_key_info keys[];
- } __packed;
- #define MGMT_LOAD_LINK_KEYS_SIZE	3
- 
-@@ -206,7 +206,7 @@ struct mgmt_ltk_info {
- #define MGMT_OP_LOAD_LONG_TERM_KEYS	0x0013
- struct mgmt_cp_load_long_term_keys {
- 	__le16	key_count;
--	struct	mgmt_ltk_info keys[0];
-+	struct	mgmt_ltk_info keys[];
- } __packed;
- #define MGMT_LOAD_LONG_TERM_KEYS_SIZE	2
- 
-@@ -223,7 +223,7 @@ struct mgmt_rp_disconnect {
- #define MGMT_GET_CONNECTIONS_SIZE	0
- struct mgmt_rp_get_connections {
- 	__le16 conn_count;
--	struct mgmt_addr_info addr[0];
-+	struct mgmt_addr_info addr[];
- } __packed;
- 
- #define MGMT_OP_PIN_CODE_REPLY		0x0016
-@@ -413,7 +413,7 @@ struct mgmt_irk_info {
- #define MGMT_OP_LOAD_IRKS		0x0030
- struct mgmt_cp_load_irks {
- 	__le16 irk_count;
--	struct mgmt_irk_info irks[0];
-+	struct mgmt_irk_info irks[];
- } __packed;
- #define MGMT_LOAD_IRKS_SIZE		2
- 
-@@ -465,7 +465,7 @@ struct mgmt_conn_param {
- #define MGMT_OP_LOAD_CONN_PARAM		0x0035
- struct mgmt_cp_load_conn_param {
- 	__le16 param_count;
--	struct mgmt_conn_param params[0];
-+	struct mgmt_conn_param params[];
- } __packed;
- #define MGMT_LOAD_CONN_PARAM_SIZE	2
- 
-@@ -473,7 +473,7 @@ struct mgmt_cp_load_conn_param {
- #define MGMT_READ_UNCONF_INDEX_LIST_SIZE 0
- struct mgmt_rp_read_unconf_index_list {
- 	__le16	num_controllers;
--	__le16	index[0];
-+	__le16	index[];
- } __packed;
- 
- #define MGMT_OPTION_EXTERNAL_CONFIG	0x00000001
-@@ -504,7 +504,7 @@ struct mgmt_cp_start_service_discovery {
- 	__u8 type;
- 	__s8 rssi;
- 	__le16 uuid_count;
--	__u8 uuids[0][16];
-+	__u8 uuids[][16];
- } __packed;
- #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
- 
-@@ -516,7 +516,7 @@ struct mgmt_cp_read_local_oob_ext_data {
- struct mgmt_rp_read_local_oob_ext_data {
- 	__u8    type;
- 	__le16	eir_len;
--	__u8	eir[0];
-+	__u8	eir[];
- } __packed;
- 
- #define MGMT_OP_READ_EXT_INDEX_LIST	0x003C
-@@ -527,7 +527,7 @@ struct mgmt_rp_read_ext_index_list {
- 		__le16 index;
- 		__u8   type;
- 		__u8   bus;
--	} entry[0];
-+	} entry[];
- } __packed;
- 
- #define MGMT_OP_READ_ADV_FEATURES	0x0003D
-@@ -538,7 +538,7 @@ struct mgmt_rp_read_adv_features {
- 	__u8   max_scan_rsp_len;
- 	__u8   max_instances;
- 	__u8   num_instances;
--	__u8   instance[0];
-+	__u8   instance[];
- } __packed;
- 
- #define MGMT_OP_ADD_ADVERTISING		0x003E
-@@ -549,7 +549,7 @@ struct mgmt_cp_add_advertising {
- 	__le16	timeout;
- 	__u8	adv_data_len;
- 	__u8	scan_rsp_len;
--	__u8	data[0];
-+	__u8	data[];
- } __packed;
- #define MGMT_ADD_ADVERTISING_SIZE	11
- struct mgmt_rp_add_advertising {
-@@ -603,7 +603,7 @@ struct mgmt_rp_read_ext_info {
- 	__le32   supported_settings;
- 	__le32   current_settings;
- 	__le16   eir_len;
--	__u8     eir[0];
-+	__u8     eir[];
- } __packed;
- 
- #define MGMT_OP_SET_APPEARANCE		0x0043
-@@ -668,7 +668,7 @@ struct mgmt_blocked_key_info {
- 
- struct mgmt_cp_set_blocked_keys {
- 	__le16 key_count;
--	struct mgmt_blocked_key_info keys[0];
-+	struct mgmt_blocked_key_info keys[];
- } __packed;
- #define MGMT_OP_SET_BLOCKED_KEYS_SIZE 2
- 
-@@ -678,14 +678,14 @@ struct mgmt_cp_set_blocked_keys {
- #define MGMT_READ_SECURITY_INFO_SIZE	0
- struct mgmt_rp_read_security_info {
- 	__le16   sec_len;
--	__u8     sec[0];
-+	__u8     sec[];
- } __packed;
- 
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
- 	__u8	status;
--	__u8	data[0];
-+	__u8	data[];
- } __packed;
- 
- #define MGMT_EV_CMD_STATUS		0x0002
-@@ -733,7 +733,7 @@ struct mgmt_ev_device_connected {
- 	struct mgmt_addr_info addr;
- 	__le32	flags;
- 	__le16	eir_len;
--	__u8	eir[0];
-+	__u8	eir[];
- } __packed;
- 
- #define MGMT_DEV_DISCONN_UNKNOWN	0x00
-@@ -788,7 +788,7 @@ struct mgmt_ev_device_found {
- 	__s8	rssi;
- 	__le32	flags;
- 	__le16	eir_len;
--	__u8	eir[0];
-+	__u8	eir[];
- } __packed;
- 
- #define MGMT_EV_DISCOVERING		0x0013
-@@ -883,7 +883,7 @@ struct mgmt_ev_ext_index {
- struct mgmt_ev_local_oob_data_updated {
- 	__u8    type;
- 	__le16	eir_len;
--	__u8	eir[0];
-+	__u8	eir[];
- } __packed;
- 
- #define MGMT_EV_ADVERTISING_ADDED	0x0023
-@@ -899,7 +899,7 @@ struct mgmt_ev_advertising_removed {
- #define MGMT_EV_EXT_INFO_CHANGED	0x0025
- struct mgmt_ev_ext_info_changed {
- 	__le16	eir_len;
--	__u8	eir[0];
-+	__u8	eir[];
- } __packed;
- 
- #define MGMT_EV_PHY_CONFIGURATION_CHANGED	0x0026
 -- 
 2.26.2
 
