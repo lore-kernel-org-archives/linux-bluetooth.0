@@ -2,178 +2,297 @@ Return-Path: <SRS0=zRH5=6U=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D934C28CBC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 15:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A64DC28CBC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 16:25:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E521D208E4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 15:13:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A6B9208E4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 16:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="oxAT9CES"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGe1IgWb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729239AbgEFPNV (ORCPT
+        id S1729477AbgEFQZH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 May 2020 11:13:21 -0400
-Received: from mga02.intel.com ([134.134.136.20]:42584 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728784AbgEFPNU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 May 2020 11:13:20 -0400
-IronPort-SDR: 3GWXGnapFuRfXFJvF6nTXMpeRbEXSwR0fgKqDQ7WkVU+yy4DWqIOgSY76FcI8JdVrrF9cy3oXO
- GqOA2IJSs76w==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 08:13:19 -0700
-IronPort-SDR: tF1a6NIc86MGvs9CFjGYrsclzX6i/6D7vsxdu2YKOHdUlJxQE7gCazwqXQd4lw40izfIxdeDVH
- 4bv3MPTVcCpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,359,1583222400"; 
-   d="scan'208";a="461791398"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by fmsmga006.fm.intel.com with ESMTP; 06 May 2020 08:13:19 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 May 2020 08:13:18 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 6 May 2020 08:13:18 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 6 May 2020 08:13:18 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
- by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 6 May 2020 08:13:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hR/iaeQWA4WAnAMXi1QyY9/K8LtYbY4kKUWtYAtPFiFolgsuppx7vC02583sTxot92Nq8nVf0YAnsuMrIEbEF++xgSUhhmdjLd9Lr94UPxnxAJ+tgs2zXccu7WB69hgCcCUAEAD4VFysuAtFzGon5S892g3V/GyYfolSHo0PQvP+LldHouh0Io8Moc4p0YsQhRy/SJxQSrJ32eAoxS4KsPyXlqo5cfxoogkYNC3N+lbXdWZVhlIcsUx5g2rrjN+iW8fKaTsnWukLisXFTMDXvF9h5ftBs88euRGFQaS30evI5UyupJ9mNmpFKOJ2XSkz/O2DPQUAmj56P7E8q14wfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g6PxMwFPkyM2n5BeoJztqeQW77qkFktFsx0rxL8A0z8=;
- b=DXh6xaq4fyO/Vrr38b5b6WFUlOk8jW3vjAnnjs4WYoA5/pF0cvwfbTbcdrnsHRPrkW7UkcK8vpYROqooScMZHdve2/7KNQLlrqA1dB4R0Ba8Z2WQloSi0UTunvuOM47AxDJT5NIt8ePQBL4M+djSca9yXfN9Eu1DUQL8rLdPmG4dLpLyHuLPwI2av+2NeCyhZXC4oZBS/pOQsVLCMMyTbjXmJ1ZxAeHl/L+NAB+SrZWmR/88HchE7YiMQepeGAZQh0/EPRSpuwqOKWQHeWggOtUjcRJZ6Pp6L6LWaqdUquhIRisDN8ngIonVtH39Xo0AUKvHGx7q46A9ggflz9bquw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g6PxMwFPkyM2n5BeoJztqeQW77qkFktFsx0rxL8A0z8=;
- b=oxAT9CEShGE3gtJnLq3qY461+BYhtWm64WWHMtxVKD+PertslyJm9dSpGX0o2awp5gEisDTSylgUKOW71GlWxVP93+n9TQ38rgj4t4G+jjD4HsXN0yj5xn3l7Kij9/lWGeMfYmsB/XMz6as7y598mfOffViCEuOhmn6mbyTtm3E=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MW3PR11MB4523.namprd11.prod.outlook.com (2603:10b6:303:5b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Wed, 6 May
- 2020 15:13:16 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::5552:f057:3dbf:716c]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::5552:f057:3dbf:716c%3]) with mapi id 15.20.2958.030; Wed, 6 May 2020
- 15:13:16 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] tools/mesh-cfgclient: Fix saving KR phase to config
- file
-Thread-Topic: [PATCH BlueZ] tools/mesh-cfgclient: Fix saving KR phase to
- config file
-Thread-Index: AQHWIwS1a1uI3dCWh0qNonXi/ocMt6ibK7GA
-Date:   Wed, 6 May 2020 15:13:15 +0000
-Message-ID: <7c21e1760366bdb20438ff3339c9df68657ac57e.camel@intel.com>
-References: <20200505174303.6224-1-inga.stotland@intel.com>
-In-Reply-To: <20200505174303.6224-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.32.5 (3.32.5-1.fc30) 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.55.41]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ebea6c65-5b7c-469e-9242-08d7f1d0007f
-x-ms-traffictypediagnostic: MW3PR11MB4523:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW3PR11MB45236930F6EB8F0906103DF5E1A40@MW3PR11MB4523.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 03950F25EC
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rebjYoKDZmEu8qHLLcICGiBgSnAbVVYNgZQRtpbgzOBeNAqA09vnCR3V7PA2I0l8C6zRXoWkpH+J4T6PmML+wFNOFdDT5poxlpiVlhNcZnOT58kjK6vBDGmrToXIOkxDMqVVyH4Z2JsZ+NNeuM05IVBWXR/MsB9LPicif5pF4t6hvCV8zn+IQjnJQAFQQ72kZDOiYCMxlQGWgZrB2IMbbt60wYgSJkBvzCK9avM1jFsslvQBqmn2Jhw5YU3dofx9X86yROtnlFnTV8SQm89tw7BvUoDo0+9plOFrgWhm5iIsOrYokNNrZbLqFfYgB7GozGavIDG3rzhLSnrbfrAgr9rkitRFw6OOEKmZmM9lWH9QD6WB6g5JqKa1s9mvpvXVxn/Hg994Tdoz8B9FJw+lN0JkmlHsarMK7HFL9OdOcKHlsqezwl5j19g8AQmqqCiikPAH7yt6dOdzBL8Z3gC1TkHvVYavHA6DFE618E0GNmktNjAkoTMmE54OijlE6B3RAymexs4qayReBWdIV+ih5Q==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(376002)(39860400002)(366004)(136003)(396003)(346002)(33430700001)(76116006)(91956017)(316002)(66446008)(66476007)(66556008)(186003)(478600001)(64756008)(110136005)(33440700001)(2616005)(26005)(6506007)(6486002)(5660300002)(36756003)(6512007)(86362001)(2906002)(8676002)(8936002)(6636002)(71200400001)(66946007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: NATCp1rTC2AbN6qmmnC/0hC4ZBZDV32XCFhpbfAETy1hNQyHb1QZIZoVZ/M+K6nVxJchznvUn/ABwAcGsZx23qrwBYEw2V2Xtmd6YVlXsMNlIF7I5btWAYAaz0aeZx2f8+Ee/PWCdbobHZIVcmfid208sIWMaTrFuRXCumqjSHprXgd/twx6l97cpIHV6Evhlfen5/RroROMU0gvIJGxNSlDBNVDtLUc7kLyWPkPiO9Qm1LxEDW6lrW2JgbwztUhkXFXbeI4Fe87MATc8slxFVJqheR3INWIyVJ1697Wzxjp3WMrvZfDCys+Ipz542GNkExUAn8lz0Fd+pZZ6iiP2TeAS0y/wyzvuGLHNBL0S3g6yKlCywqElF06m6gHre9m68evwSl2nb69IqvcWmB4cMCfb8R8OlQEQRJZ+CfOj3NbgtnkWkucCY5Q9n1frhXs/JYb+TXUwrAuSyqds886o6RvWs3cZcE+TUX7GKjpxFb+BIASUgxIcTiHLxvkyzUD0LBPr1L0ztwbWMS62hSnrVBCTu+ssnK0mCyWhiR+2vZtaxHcSncwSM5r4vQ9/hkFHwyR4PpEuRkaZmBQGJd5rfvlxSfenazWaryokame6/qCYhTEJGizu7aIFB7K01CKWHNBOeWYHvNxkOjPFhMNhNhZELvY4RPBmff3PqpZw1U1TPMhc9JHB2ukq2i5Zyk2Q2ReeRihBHaryRR+eWS4tz+oKlvHVGDfPbUkVt+nR4lv5xKbpGb+/SsqZt+h/EAEzc9EODw1bIScZtVXlYiuKRErcmBzAsHDZ1q46KDAyyY=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9CA9A7F59E478D47AE8BF9D6B90251D2@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 6 May 2020 12:25:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729341AbgEFQZG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 6 May 2020 12:25:06 -0400
+Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408E1C061A0F
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2020 09:25:05 -0700 (PDT)
+Received: by mail-oo1-xc43.google.com with SMTP id x17so622214ooa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 May 2020 09:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=T2gVDGgQYnKqYTeded09E2Qtskzpqp5dHI9s/gsOZXs=;
+        b=lGe1IgWbEznBAc5ZH9YRvenib/nk6DxOny5O/e9vl7I69hm6HY1/1glvLCTNWysHSz
+         UnJZ2wSatLaOW/Gru+ehltwPs5o++BNi1jvHHCBXsUP/m8jHiPZeysIYx82wPG4+0Znf
+         JMjfHtxUxAjpP3fQM9F7wbj2bf9rt9DxL2GuWignD1IEa/hMqAUaPzQDX5S1ZqHdjjen
+         2t2rGDL0zRrbKqvVJbFZYPqjXH9+Sr71HmQyjNwLUF95sXyRaXW5mo6BPtz7b9ZP83wj
+         90SIdaNp68NQHFcIyctyN4qaBEXHPonZF+BBu16Upnjeg92tdDAa/V+VApjLT97nLDQJ
+         fQcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=T2gVDGgQYnKqYTeded09E2Qtskzpqp5dHI9s/gsOZXs=;
+        b=dD5dbqJk2Www/BZ4Szy+MNF0+9f4cajWQ2/PDk0MW6qoECxsV5Ehe/fGu5T9dITN6X
+         k/dPIdk+gurKSJs4cLLfcA/tvYB7btaJIyZojE/CVc7I/3aot9aZ+mdjfy1a4LS3OjjP
+         ub2UW/4IDKEK30crYjPyXxxW/aa4Kq4CLRCcRqhFM5t/kRWZTvcJHSUQX1tEueyho/aA
+         3Q3uvIW2KH7iXqvAqNw5LW8f2Nd5OZVax4sfbn7O6ixKC28QSUhSZFr8RjobjYUrXDPF
+         husogq43Muin/xNLaSKPlIo2/aQu09wRhevnTHN5ChKD4k+ok31bMGhjLUX16QTuOKPE
+         ePQA==
+X-Gm-Message-State: AGi0PuanQbP4UYUw8E1HuFIN6M4gjvFWtcDTzj66liR9RdnreZM4XN5u
+        43ZDVnkX6TVda2/sLi1NjgtbIg+pF5NBNQrr7LrVCWlixFI=
+X-Google-Smtp-Source: APiQypKAoYL2DnMHBYHnDRAyiPQMB2YWmnr6O3aN5IRLqQJZWtyuu2dBoP4yNqJTYbMgtoz/A7cn80XLEwfcTxyil6o=
+X-Received: by 2002:a4a:e0d4:: with SMTP id e20mr7968762oot.35.1588782304310;
+ Wed, 06 May 2020 09:25:04 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebea6c65-5b7c-469e-9242-08d7f1d0007f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2020 15:13:15.8214
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2SBGVBbpljqRIsj0peo6FOb4j5AH86GrZye6dHwS1XGb+f88NLpID0D3kYyUu3K3IUyjrl9fc53SDyibkkHXIg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4523
-X-OriginatorOrg: intel.com
+References: <20200403153331.101846-1-alainm@chromium.org> <CALWDO_VvEBqSgJgKHMM7D9G3tTrDEC2u0NUTrPyOsNuOC_F5kQ@mail.gmail.com>
+ <CABBYNZJ0SF-atqPx6B26P4Coz2YUXMvSFnW=QnXPUD6i98o-4g@mail.gmail.com>
+ <CALWDO_Ubb9NTAqQwv+q9XCKKoC6q2YE2nxX+N5o24fqp3xbvCQ@mail.gmail.com>
+ <CABBYNZLvxwtivQZ0Fwv_uZeJZBK6x85Nb8Kr+0orFPteeQcEhg@mail.gmail.com>
+ <CALWDO_VPRpxa-jpvQWzR0=ynwi-_v-N3oUz7dthwotfJeb25TQ@mail.gmail.com>
+ <CABBYNZ+oJtU+sjc_NFdhPMXVq5d4P-uTgmec9_s7dNVJzpDaQQ@mail.gmail.com>
+ <CALWDO_Ux+=YtWsvnNxwpO7W_PSbAmUukyh6MHUoBqStNF7qC2Q@mail.gmail.com>
+ <CALWDO_UJtMpTmvWj6KsAJkwzDE=ZXA_bq2Cp2DR-gcBgvQT0cA@mail.gmail.com>
+ <CALWDO_WpiztCRau98_eFegrCKNsK4VigKQhw7kvyzFgKLm3NZA@mail.gmail.com>
+ <CABBYNZJq43bjTneJ9wsCpzfMWHOGdZyhBFTDfAZcYUWFCv5brQ@mail.gmail.com> <CALWDO_XXb8riTsVfVTsYngYwY3u6sZeHDLP9Es8DnfBJfzgkGg@mail.gmail.com>
+In-Reply-To: <CALWDO_XXb8riTsVfVTsYngYwY3u6sZeHDLP9Es8DnfBJfzgkGg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 6 May 2020 09:24:52 -0700
+Message-ID: <CABBYNZKf2pBSEmBQvLg9Yoy7rR-TfPbokac=mm=wzNo1gwo0YA@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1 1/2] doc:adding a WidebandSpeechEnabled Api
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Alain Michaud <alainm@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KT24gVHVlLCAyMDIwLTA1LTA1IGF0IDEwOjQzIC0wNzAwLCBJbmdhIFN0b3RsYW5k
-IHdyb3RlOg0KPiBUaGlzIGVsaW1pbmF0ZXMgZXh0cmEgd3JpdGUgb2YgS1IgcGhhc2Ugd2hlbiBs
-b2FkaW5nIGtleXMNCj4gZnJvbSB0aGUgY29uZmlndXJhdGlvbiBmaWxlIG9uIGluaXRpYWxpemF0
-aW9uLg0KPiAtLS0NCj4gIHRvb2xzL21lc2gtY2ZnY2xpZW50LmMgfCA0ICsrLS0NCj4gIHRvb2xz
-L21lc2gva2V5cy5jICAgICAgfCA0ICsrLS0NCj4gIHRvb2xzL21lc2gva2V5cy5oICAgICAgfCAy
-ICstDQo+ICB0b29scy9tZXNoL21lc2gtZGIuYyAgIHwgMiArLQ0KPiAgNCBmaWxlcyBjaGFuZ2Vk
-LCA2IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdG9v
-bHMvbWVzaC1jZmdjbGllbnQuYyBiL3Rvb2xzL21lc2gtY2ZnY2xpZW50LmMNCj4gaW5kZXggNmRi
-NjVjZDQ5Li5kNzMxOGZmYjcgMTAwNjQ0DQo+IC0tLSBhL3Rvb2xzL21lc2gtY2ZnY2xpZW50LmMN
-Cj4gKysrIGIvdG9vbHMvbWVzaC1jZmdjbGllbnQuYw0KPiBAQCAtOTQ0LDcgKzk0NCw3IEBAIHN0
-YXRpYyB2b2lkIHN1Ym5ldF9zZXRfcGhhc2VfcmVwbHkoc3RydWN0IGxfZGJ1c19wcm94eSAqcHJv
-eHksDQo+ICAJaWYgKHBoYXNlID09IEtFWV9SRUZSRVNIX1BIQVNFX1RIUkVFKQ0KPiAgCQlwaGFz
-ZSA9IEtFWV9SRUZSRVNIX1BIQVNFX05PTkU7DQo+ICANCj4gLQlrZXlzX3NldF9uZXRfa2V5X3Bo
-YXNlKG5ldF9pZHgsIHBoYXNlKTsNCj4gKwlrZXlzX3NldF9uZXRfa2V5X3BoYXNlKG5ldF9pZHgs
-IHBoYXNlLCB0cnVlKTsNCj4gIH0NCj4gIA0KPiAgc3RhdGljIHZvaWQgc3VibmV0X3NldF9waGFz
-ZV9zZXR1cChzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKm1zZywgdm9pZCAqdXNlcl9kYXRhKQ0KPiBA
-QCAtMTAxNCw3ICsxMDE0LDcgQEAgc3RhdGljIHZvaWQgbWdyX2tleV9yZXBseShzdHJ1Y3QgbF9k
-YnVzX3Byb3h5ICpwcm94eSwNCj4gIAkJa2V5c19kZWxfbmV0X2tleShpZHgpOw0KPiAgCQltZXNo
-X2RiX25ldF9rZXlfZGVsKGlkeCk7DQo+ICAJfSBlbHNlIGlmICghc3RyY21wKCJVcGRhdGVTdWJu
-ZXQiLCBtZXRob2QpKSB7DQo+IC0JCWtleXNfc2V0X25ldF9rZXlfcGhhc2UoaWR4LCBLRVlfUkVG
-UkVTSF9QSEFTRV9PTkUpOw0KPiArCQlrZXlzX3NldF9uZXRfa2V5X3BoYXNlKGlkeCwgS0VZX1JF
-RlJFU0hfUEhBU0VfT05FLCB0cnVlKTsNCj4gIAl9IGVsc2UgaWYgKCFzdHJjbXAoIkRlbGV0ZUFw
-cEtleSIsIG1ldGhvZCkpIHsNCj4gIAkJa2V5c19kZWxfYXBwX2tleShpZHgpOw0KPiAgCQltZXNo
-X2RiX2FwcF9rZXlfZGVsKGlkeCk7DQo+IGRpZmYgLS1naXQgYS90b29scy9tZXNoL2tleXMuYyBi
-L3Rvb2xzL21lc2gva2V5cy5jDQo+IGluZGV4IGI3ZDM2NTk5YS4uZmYzYjIzZjYxIDEwMDY0NA0K
-PiAtLS0gYS90b29scy9tZXNoL2tleXMuYw0KPiArKysgYi90b29scy9tZXNoL2tleXMuYw0KPiBA
-QCAtOTksNyArOTksNyBAQCB2b2lkIGtleXNfZGVsX25ldF9rZXkodWludDE2X3QgaWR4KQ0KPiAg
-CWxfZnJlZShrZXkpOw0KPiAgfQ0KPiAgDQo+IC12b2lkIGtleXNfc2V0X25ldF9rZXlfcGhhc2Uo
-dWludDE2X3QgbmV0X2lkeCwgdWludDhfdCBwaGFzZSkNCj4gK3ZvaWQga2V5c19zZXRfbmV0X2tl
-eV9waGFzZSh1aW50MTZfdCBuZXRfaWR4LCB1aW50OF90IHBoYXNlLCBib29sIHNhdmUpDQo+ICB7
-DQo+ICAJc3RydWN0IG5ldF9rZXkgKmtleTsNCj4gIA0KPiBAQCAtMTEyLDcgKzExMiw3IEBAIHZv
-aWQga2V5c19zZXRfbmV0X2tleV9waGFzZSh1aW50MTZfdCBuZXRfaWR4LCB1aW50OF90IHBoYXNl
-KQ0KPiAgDQo+ICAJa2V5LT5waGFzZSA9IHBoYXNlOw0KPiAgDQo+IC0JaWYgKCFtZXNoX2RiX25l
-dF9rZXlfcGhhc2Vfc2V0KG5ldF9pZHgsIHBoYXNlKSkNCj4gKwlpZiAoc2F2ZSAmJiAhbWVzaF9k
-Yl9uZXRfa2V5X3BoYXNlX3NldChuZXRfaWR4LCBwaGFzZSkpDQo+ICAJCWJ0X3NoZWxsX3ByaW50
-ZigiRmFpbGVkIHRvIHNhdmUgdXBkYXRlZCBLUiBwaGFzZVxuIik7DQo+ICB9DQo+ICANCj4gZGlm
-ZiAtLWdpdCBhL3Rvb2xzL21lc2gva2V5cy5oIGIvdG9vbHMvbWVzaC9rZXlzLmgNCj4gaW5kZXgg
-M2E5MGZhMTRiLi5mYTUxMDQ0ZWYgMTAwNjQ0DQo+IC0tLSBhL3Rvb2xzL21lc2gva2V5cy5oDQo+
-ICsrKyBiL3Rvb2xzL21lc2gva2V5cy5oDQo+IEBAIC0yMCw3ICsyMCw3IEBADQo+ICANCj4gIHZv
-aWQga2V5c19hZGRfbmV0X2tleSh1aW50MTZfdCBuZXRfaWR4KTsNCj4gIHZvaWQga2V5c19kZWxf
-bmV0X2tleSh1aW50MTZfdCBuZXRfaWR4KTsNCj4gLXZvaWQga2V5c19zZXRfbmV0X2tleV9waGFz
-ZSh1aW50MTZfdCBuZXRfaWR4LCB1aW50OF90IHBoYXNlKTsNCj4gK3ZvaWQga2V5c19zZXRfbmV0
-X2tleV9waGFzZSh1aW50MTZfdCBuZXRfaWR4LCB1aW50OF90IHBoYXNlLCBib29sIHNhdmUpOw0K
-PiAgYm9vbCBrZXlzX2dldF9uZXRfa2V5X3BoYXNlKHVpbnQxNl90IG5ldF9pZHgsIHVpbnQ4X3Qg
-KnBoYXNlKTsNCj4gIHZvaWQga2V5c19hZGRfYXBwX2tleSh1aW50MTZfdCBuZXRfaWR4LCB1aW50
-MTZfdCBhcHBfaWR4KTsNCj4gIHZvaWQga2V5c19kZWxfYXBwX2tleSh1aW50MTZfdCBhcHBfaWR4
-KTsNCj4gZGlmZiAtLWdpdCBhL3Rvb2xzL21lc2gvbWVzaC1kYi5jIGIvdG9vbHMvbWVzaC9tZXNo
-LWRiLmMNCj4gaW5kZXggM2JkNmIwZDA2Li5kMzk0MzVjYTAgMTAwNjQ0DQo+IC0tLSBhL3Rvb2xz
-L21lc2gvbWVzaC1kYi5jDQo+ICsrKyBiL3Rvb2xzL21lc2gvbWVzaC1kYi5jDQo+IEBAIC02MDcs
-NyArNjA3LDcgQEAgc3RhdGljIGJvb2wgbG9hZF9rZXlzKGpzb25fb2JqZWN0ICpqb2JqKQ0KPiAg
-CQlpZiAoIWdldF9pbnQoamVudHJ5LCAicGhhc2UiLCAmcGhhc2UpKQ0KPiAgCQkJcmV0dXJuIGZh
-bHNlOw0KPiAgDQo+IC0JCWtleXNfc2V0X25ldF9rZXlfcGhhc2UobmV0X2lkeCwgKHVpbnQ4X3Qp
-IHBoYXNlKTsNCj4gKwkJa2V5c19zZXRfbmV0X2tleV9waGFzZShuZXRfaWR4LCAodWludDhfdCkg
-cGhhc2UsIGZhbHNlKTsNCj4gIAl9DQo+ICANCj4gIAlqc29uX29iamVjdF9vYmplY3RfZ2V0X2V4
-KGpvYmosICJhcHBLZXlzIiwgJmphcnJheSk7DQo=
+Hi Alain,
+
+On Wed, May 6, 2020 at 7:10 AM Alain Michaud <alainmichaud@google.com> wrote:
+>
+> Hi Luiz,
+>
+>
+> On Tue, May 5, 2020 at 7:48 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Marcel and Alain,
+> >
+> > On Tue, May 5, 2020 at 8:47 AM Alain Michaud <alainmichaud@google.com> wrote:
+> > >
+> > > Friendly ping on this series.
+> > >
+> > >
+> > > On Tue, May 5, 2020 at 11:46 AM Alain Michaud <alainmichaud@google.com> wrote:
+> > > >
+> > > > Friendly ping on this series.
+> > > >
+> > > > On Fri, Apr 17, 2020 at 5:03 PM Alain Michaud <alainmichaud@google.com> wrote:
+> > > >>
+> > > >> On Fri, Apr 17, 2020 at 4:58 PM Luiz Augusto von Dentz
+> > > >> <luiz.dentz@gmail.com> wrote:
+> > > >> >
+> > > >> > Hi Alain,
+> > > >> >
+> > > >> > On Fri, Apr 17, 2020 at 11:22 AM Alain Michaud <alainmichaud@google.com> wrote:
+> > > >> > >
+> > > >> > > On Fri, Apr 17, 2020 at 2:16 PM Luiz Augusto von Dentz
+> > > >> > > <luiz.dentz@gmail.com> wrote:
+> > > >> > > >
+> > > >> > > > Hi Alain,
+> > > >> > > >
+> > > >> > > > On Thu, Apr 16, 2020 at 5:34 PM Alain Michaud <alainmichaud@google.com> wrote:
+> > > >> > > > >
+> > > >> > > > > HI Luiz,
+> > > >> > > > >
+> > > >> > > > > On Thu, Apr 16, 2020 at 8:29 PM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> > > >> > > > >>
+> > > >> > > > >> Hi Alain,
+> > > >> > > > >>
+> > > >> > > > >> On Thu, Apr 16, 2020 at 1:32 PM Alain Michaud <alainmichaud@google.com> wrote:
+> > > >> > > > >> >
+> > > >> > > > >> > Friendly ping on this series.
+> > > >> > > > >> >
+> > > >> > > > >> >
+> > > >> > > > >> > On Fri, Apr 3, 2020 at 11:33 AM Alain Michaud <alainm@chromium.org> wrote:
+> > > >> > > > >> > >
+> > > >> > > > >> > > This change adds an adapter Api to report the controller's
+> > > >> > > > >> > > widebandspeech enabled state.
+> > > >> > > > >>
+> > > >> > > > >> I wonder if this shouldn't be queried over SCO socket, or simple fail
+> > > >> > > > >> with BT_VOICE when using BT_VOICE_TRANSPARENT which is how what is
+> > > >> > > > >> normally used when using mSBC.
+> > > >> > > > >
+> > > >> > > > > I think there is value in both.
+> > > >> > > >
+> > > >> > > > Can you expand on that? I think this might generate confusion if the
+> > > >> > > > property indicates support for it but HFP implementation don't support
+> > > >> > > > it, since the later is usually implemented as a external profile so we
+> > > >> > > > don't have the features it may support, or perhaps the intention here
+> > > >> > > > is to actually indicate when it is in use?
+> > > >> > >
+> > > >> > > This is a signal that the adapter supports it and has everything
+> > > >> > > enabled to support it.   Driver indicated it supports it and erroneous
+> > > >> > > data reporting was enabled.  The profile has it's own state which may
+> > > >> > > indicate if msbc will be used, but this will be on a per connection
+> > > >> > > basis and is independent from this adapter property.
+> > > >> > >
+> > > >> > > The value in this property is to support diagnostic UX about
+> > > >> > > controller capabilities/state and also allow profiles that are
+> > > >> > > implemented outside of bluetoothd to see which codec it can attempt to
+> > > >> > > negotiate with the device.
+> > > >> >
+> > > >> > For diagnosic I think we would be better off with some dedicated
+> > > >> > interface to query this, as for the later the information we are
+> > > >> > giving does not actually tell anything about the codec support, which
+> > > >> > was part of my original argument that for the likes of HFP and other
+> > > >> > profiles using it it might not be enough and they still need to use
+> > > >> > BT_VOICE in order to enable the use of custom codecs, if you take
+> > > >> > ofono for example it does implement support for wideband speech
+> > > >> > already and it would completely disregard this property which can give
+> > > >> > the false impression that wideband speech cannot be activated when in
+> > > >> > fact it can, it just don't have erroneous data reporting enable, so
+> > > >> > perhaps we should indicate the actual adapter feature (e.g.
+> > > >> > ErrnoneousDataReporting) not the profile feature here, so the profile
+> > > >> > implementation can check weather this would disable use of wideband
+> > > >> > speech or not, futhermore we should probably report the errors back to
+> > > >> > the SCO socket or is that just for diagnostic and cannot be used to
+> > > >> > adjust the streaming?
+> > > >>
+> > > >> My original patch actually had this MGMT feature called erroneous data
+> > > >> reporting and Marcel argued against it.  If you both agree, then I'm
+> > > >> happy to rename all of this to erroneous data reporting.  We'd still
+> > > >> need some way for the driver support to be messaged some other way
+> > > >> though. see:
+> > > >>
+> > > >> if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+> > > >>         set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+> >
+> > So this will get a little bit confusing if we don't have a HFP
+> > implementation that actually does implement the profile parts to
+> > enable wideband speech so I wonder if we should rename it to the
+> > underline feature it enables, that said this sort of feature is
+> > probably easier to be queried over the socket itself rather than over
+> > D-Bus so it can be used in conjunction with the likes of BT_VOICE,
+> > also regarding the erroneous data should that be also enabled by the
+> > HFP profile, because depending on the platform it may not support
+> > wideband speech so enabling erroneous data automatically may result in
+> > artifacs, specially in cases where the codecs don't have error
+> > correction or data loss concealment to handle data with possible error
+> > and lost data respectively, btw we don't seem to be parsing the
+> > SCO/ESCO flags and even if we do this properly we need to find a way
+> > to notify them over the socket so things like plc works properly.
+>
+> This indeed makes sense, but we'll need to decide how erroneous data
+> reporting gets enabled.  The SCO socket is a per connection scope
+> thing while erroneous data reporting is a controller level thing.
+
+The way I would have done this is to make use of recvmsg and then add
+the packet flags as msg_flags:
+
+   recvmsg()
+       The recvmsg() call uses a msghdr structure to minimize the
+number of directly supplied arguments.  This structure is defined as
+follows in <sys/socket.h>:
+
+           struct iovec {                    /* Scatter/gather array items */
+               void  *iov_base;              /* Starting address */
+               size_t iov_len;               /* Number of bytes to transfer */
+           };
+
+           struct msghdr {
+               void         *msg_name;       /* Optional address */
+               socklen_t     msg_namelen;    /* Size of address */
+               struct iovec *msg_iov;        /* Scatter/gather array */
+               size_t        msg_iovlen;     /* # elements in msg_iov */
+               void         *msg_control;    /* Ancillary data, see below */
+               size_t        msg_controllen; /* Ancillary data buffer len */
+               int           msg_flags;      /* Flags on received message */
+           };
+
+But to make this backward compatible I would recommend adding a
+socketopt that enables this new behavior and in case there is more
+than one SCO socket those that did not use the sockopt should probably
+drop packets with error or lost data so they work as without erroneous
+data report since in that case the application will likely be using
+regular reads it won't be able to detect the use of msg_flags.
+
+>
+>
+> >
+> > > >>
+> > > >>
+> > > >> > > >
+> > > >> > > >
+> > > >> > > > >>
+> > > >> > > > >>
+> > > >> > > > >> > > ---
+> > > >> > > > >> > >
+> > > >> > > > >> > >  doc/adapter-api.txt | 8 ++++++++
+> > > >> > > > >> > >  1 file changed, 8 insertions(+)
+> > > >> > > > >> > >
+> > > >> > > > >> > > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> > > >> > > > >> > > index acae032d9..d8865e795 100644
+> > > >> > > > >> > > --- a/doc/adapter-api.txt
+> > > >> > > > >> > > +++ b/doc/adapter-api.txt
+> > > >> > > > >> > > @@ -326,3 +326,11 @@ Properties string Address [readonly]
+> > > >> > > > >> > >
+> > > >> > > > >> > >                         Local Device ID information in modalias format
+> > > >> > > > >> > >                         used by the kernel and udev.
+> > > >> > > > >> > > +
+> > > >> > > > >> > > +               boolean WidebandSpeechEnabled [readonly]
+> > > >> > > > >> > > +
+> > > >> > > > >> > > +                       Returns true if the adapter's wideband speech feature is
+> > > >> > > > >> > > +                       supported and enabled.
+> > > >> > > > >>
+> > > >> > > > >> There seems to be some extra empty lines here.
+> > > >> > > > >
+> > > >> > > > > ACK, will fix.
+> > > >> > > > >>
+> > > >> > > > >>
+> > > >> > > > >> > > +
+> > > >> > > > >> > > +
+> > > >> > > > >> > > +
+> > > >> > > > >> > > --
+> > > >> > > > >> > > 2.26.0.292.g33ef6b2f38-goog
+> > > >> > > > >> > >
+> > > >> > > > >>
+> > > >> > > > >>
+> > > >> > > > >>
+> > > >> > > > >> --
+> > > >> > > > >> Luiz Augusto von Dentz
+> > > >> > > >
+> > > >> > > >
+> > > >> > > >
+> > > >> > > > --
+> > > >> > > > Luiz Augusto von Dentz
+> > > >> >
+> > > >> >
+> > > >> >
+> > > >> > --
+> > > >> > Luiz Augusto von Dentz
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+
+
+
+-- 
+Luiz Augusto von Dentz
