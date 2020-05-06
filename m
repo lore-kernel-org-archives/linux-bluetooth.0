@@ -2,44 +2,51 @@ Return-Path: <SRS0=zRH5=6U=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB487C28CBC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 17:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F682C28CBC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 19:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0EFC2080D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 17:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D7FA2075A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 19:35:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588793703;
+	bh=cgj82CcHMN/fJ6I1FD+RRR8TI2l6fREwhyG56P4SOVA=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=IAjmojsv122Cucov31E1zqyPssEc48ATp3JfiIwNsu1wLo/dkE3+osEBu4hl4vWbo
+	 +nJe1adSF6YjCI4wvjkxYyX0LAVb9Y44SRkE+x6JZQcj9+eDU8AOaIRng5f8BWqqa+
+	 ZPjTXAgICasSH5u7tEwMNbaFVWagkw3u//RoTG4w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728857AbgEFRqN (ORCPT
+        id S1729209AbgEFTfC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 May 2020 13:46:13 -0400
-Received: from mga01.intel.com ([192.55.52.88]:57542 "EHLO mga01.intel.com"
+        Wed, 6 May 2020 15:35:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58708 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728777AbgEFRqN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 May 2020 13:46:13 -0400
-IronPort-SDR: LgeP3/ZoUJGLCMZgIhNzL0AtS3cDUXonv1VmA2Qi+Xz5fdUd0YrTuTapdInrNYiZFIWpAS3bMb
- SvHRG1n0abMA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 10:46:12 -0700
-IronPort-SDR: Tjks7ZM/pOECtXzodIvOIERKItEB+gHN0xv9twFBBkmIOYQJWWwbC5bNSd6lKZyPcKmtmC9upY
- aYpV0QWMf4uQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
-   d="scan'208";a="407321793"
-Received: from ingas-nuc1.sea.intel.com ([10.254.75.48])
-  by orsmga004.jf.intel.com with ESMTP; 06 May 2020 10:46:11 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
+        id S1725915AbgEFTfC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 6 May 2020 15:35:02 -0400
+Received: from pali.im (pali.im [31.31.79.79])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1BF1520747;
+        Wed,  6 May 2020 19:35:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588793702;
+        bh=cgj82CcHMN/fJ6I1FD+RRR8TI2l6fREwhyG56P4SOVA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ryXQDBXG/MEsGYyuuV9937MUyY+zLIHGh473cDLdttLGl6gVeyHt3jWRGE/0o+6j9
+         RXtNUw4t01xnqgztB1MPmTHPcwFxXs3uk+PYjdSs2USwVSzWudNm9+IRP/YSfJxGiV
+         yds5KoLLCahj2vJp0xRWptdC0CuCa1n9BrYYWG5g=
+Received: by pali.im (Postfix)
+        id 0890089C; Wed,  6 May 2020 21:35:00 +0200 (CEST)
+From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] tools/mesh-cfgclient: Fix model app list parsing
-Date:   Wed,  6 May 2020 10:46:10 -0700
-Message-Id: <20200506174610.6638-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.1
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] Install avinfo utility
+Date:   Wed,  6 May 2020 21:34:35 +0200
+Message-Id: <20200506193435.3746-1-pali@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -47,266 +54,28 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes parsing of Model AppKey List & Vendor Model Appkey List
-messages: taking into account the packt that AppKey indices are parked
-two in three octets.
-
-Also, when printing key indices, print in both decimal and hexadecimal
-formats.
+This utility is very useful for determining which A2DP codecs are supported
+by remote side. So install it to system as part of bluez package.
 ---
- tools/mesh-cfgclient.c |  6 ++--
- tools/mesh/cfgcli.c    | 78 +++++++++++++++++++++++++-----------------
- tools/mesh/keys.c      |  6 ++--
- tools/mesh/remote.c    |  6 ++--
- 4 files changed, 57 insertions(+), 39 deletions(-)
+ Makefile.tools | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index 6db65cd49..b2fc0df0e 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -338,12 +338,14 @@ static bool send_key(void *user_data, uint16_t dst, uint16_t key_idx,
- 	}
+diff --git a/Makefile.tools b/Makefile.tools
+index 9b9236609..d52721612 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -176,9 +176,9 @@ endif
+ if TOOLS
+ bin_PROGRAMS += tools/rctest tools/l2test tools/l2ping tools/bccmd \
+ 			tools/bluemoon tools/hex2hcd tools/mpris-proxy \
+-			tools/btattach
++			tools/btattach tools/avinfo
  
- 	if (!is_appkey && !keys_subnet_exists(key_idx)) {
--		bt_shell_printf("Local NetKey %u not found\n", key_idx);
-+		bt_shell_printf("Local NetKey %u (0x%3.3x) not found\n",
-+							key_idx, key_idx);
- 		return false;
- 	}
- 
- 	if (is_appkey && (keys_get_bound_key(key_idx) == NET_IDX_INVALID)) {
--		bt_shell_printf("Local AppKey %u not found\n", key_idx);
-+		bt_shell_printf("Local AppKey %u (0x%3.3x) not found\n",
-+							key_idx, key_idx);
- 		return false;
- 	}
- 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index d9f1c9b72..af72b8faf 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -351,7 +351,8 @@ static void print_pub(uint16_t ele_addr, uint32_t mod_id,
- 		bt_shell_printf("\tModel: %4.4x\n",
- 				(uint16_t) (mod_id & 0xffff));
- 
--	bt_shell_printf("\tApp Key Idx: %4.4x\n", pub->app_idx);
-+	bt_shell_printf("\tApp Key Idx: %u (0x%3.3x)\n", pub->app_idx,
-+								pub->app_idx);
- 	bt_shell_printf("\tTTL: %2.2x\n", pub->ttl);
- }
- 
-@@ -374,6 +375,27 @@ static void print_sub_list(uint16_t addr, bool is_vendor, uint8_t *data,
- 		bt_shell_printf("\t\t%4.4x\n ", get_le16(data + i));
- }
- 
-+static void print_appkey_list(uint16_t len, uint8_t *data)
-+{
-+	uint16_t app_idx;
-+
-+	bt_shell_printf("AppKeys:\n");
-+
-+	while (len >= 3) {
-+		app_idx = l_get_le16(data) & 0xfff;
-+		bt_shell_printf("\t%u (0x%3.3x)\n", app_idx, app_idx);
-+		app_idx = l_get_le16(data + 1) >> 4;
-+		bt_shell_printf("\t%u (0x%3.3x)\n", app_idx, app_idx);
-+		data += 3;
-+		len -= 3;
-+	}
-+
-+	if (len == 2) {
-+		app_idx = l_get_le16(data) & 0xfff;
-+		bt_shell_printf("\t %u (0x%3.3x)\n", app_idx, app_idx);
-+	}
-+}
-+
- static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 							uint16_t len)
- {
-@@ -384,7 +406,6 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 	uint32_t mod_id;
- 	struct model_pub pub;
- 	int n;
--	uint16_t i;
- 	struct pending_req *req;
- 
- 	if (mesh_opcode_get(data, len, &opcode, &n)) {
-@@ -424,8 +445,8 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		net_idx = get_le16(data + 1) & 0xfff;
- 		app_idx = get_le16(data + 2) >> 4;
- 
--		bt_shell_printf("NetKey\t%3.3x\n", net_idx);
--		bt_shell_printf("AppKey\t%3.3x\n", app_idx);
-+		bt_shell_printf("NetKey\t%u (0x%3.3x)\n", net_idx, net_idx);
-+		bt_shell_printf("AppKey\t%u (0x%3.3x)\n", app_idx, app_idx);
- 
- 		if (data[0] != MESH_STATUS_SUCCESS)
- 			break;
-@@ -449,24 +470,16 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 
- 		bt_shell_printf("AppKey List (node %4.4x) Status %s\n",
- 						src, mesh_status_str(data[0]));
--		bt_shell_printf("NetKey %3.3x\n", l_get_le16(&data[1]));
-+
-+		net_idx = l_get_le16(&data[1]);
-+		bt_shell_printf("NetKey %u (0x%3.3x)\n", net_idx, net_idx);
- 		len -= 3;
- 
- 		if (data[0] != MESH_STATUS_SUCCESS)
- 			break;
- 
--		bt_shell_printf("AppKeys:\n");
- 		data += 3;
--
--		while (len >= 3) {
--			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
--			bt_shell_printf("\t%3.3x\n", l_get_le16(data + 1) >> 4);
--			len -= 3;
--			data += 3;
--		}
--
--		if (len == 2)
--			bt_shell_printf("\t%3.3x\n", l_get_le16(data));
-+		print_appkey_list(len, data);
- 
- 		break;
- 
-@@ -478,7 +491,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 						mesh_status_str(data[0]));
- 		net_idx = get_le16(data + 1) & 0xfff;
- 
--		bt_shell_printf("\tNetKey %3.3x\n", net_idx);
-+		bt_shell_printf("\tNetKey %u (0x%3.3x)\n", net_idx, net_idx);
- 
- 		if (data[0] != MESH_STATUS_SUCCESS)
- 			break;
-@@ -504,15 +517,17 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 
- 		while (len >= 3) {
- 			net_idx = l_get_le16(data) & 0xfff;
--			bt_shell_printf("\t%3.3x\n", net_idx);
-+			bt_shell_printf("\t%u (0x%3.3x)\n", net_idx, net_idx);
- 			net_idx = l_get_le16(data + 1) >> 4;
--			bt_shell_printf("\t%3.3x\n", net_idx);
-+			bt_shell_printf("\t%u (0x%3.3x)\n", net_idx, net_idx);
- 			data += 3;
- 			len -= 3;
- 		}
- 
--		if (len == 2)
--			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
-+		if (len == 2) {
-+			net_idx = l_get_le16(data) & 0xfff;
-+			bt_shell_printf("\t %u (0x%3.3x)\n", net_idx, net_idx);
-+		}
- 
- 		break;
- 
-@@ -524,7 +539,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 						mesh_status_str(data[0]));
- 		net_idx = get_le16(data + 1) & 0xfff;
- 
--		bt_shell_printf("\tNetKey %3.3x\n", net_idx);
-+		bt_shell_printf("\tNetKey %u (0x%3.3x)\n", net_idx, net_idx);
- 		bt_shell_printf("\tKR Phase %2.2x\n", data[3]);
- 		break;
- 
-@@ -541,7 +556,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 
- 		print_mod_id(data + 5, len == 9, "");
- 
--		bt_shell_printf("AppIdx\t\t%3.3x\n ", app_idx);
-+		bt_shell_printf("AppIdx\t\t%u (0x%3.3x)\n ", app_idx, app_idx);
- 
- 		break;
- 
-@@ -673,9 +688,9 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		bt_shell_printf("Element Addr\t%4.4x\n", get_le16(data + 1));
- 		bt_shell_printf("Model ID\t%4.4x\n", get_le16(data + 3));
- 
--		for (i = 5; i < len; i += 2)
--			bt_shell_printf("Model AppIdx\t%4.4x\n",
--							get_le16(data + i));
-+		data += 5;
-+		print_appkey_list(len, data);
-+
- 		break;
- 
- 	case OP_VEND_MODEL_APP_LIST:
-@@ -691,9 +706,9 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		bt_shell_printf("Element Addr\t%4.4x\n", get_le16(data + 1));
- 		print_mod_id(data + 3, true, "");
- 
--		for (i = 7; i < len; i += 2)
--			bt_shell_printf("Model AppIdx\t%4.4x\n",
--							get_le16(data + i));
-+		data += 7;
-+		print_appkey_list(len, data);
-+
- 		break;
- 
- 	/* Per Mesh Profile 4.3.2.63 */
-@@ -709,7 +724,8 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		bt_shell_printf("Period\t\t%2.2x\n", data[4]);
- 		bt_shell_printf("TTL\t\t%2.2x\n", data[5]);
- 		bt_shell_printf("Features\t%4.4x\n", get_le16(data + 6));
--		bt_shell_printf("Net_Idx\t%4.4x\n", get_le16(data + 8));
-+		net_idx = get_le16(data + 8);
-+		bt_shell_printf("Net_Idx\t%u (0x%3.3x)\n", net_idx, net_idx);
- 		break;
- 
- 	/* Per Mesh Profile 4.3.2.66 */
-@@ -733,7 +749,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		if (len != 1)
- 			return true;
- 
--		bt_shell_printf("Node %4.4x: Network transmit cnt %d, steps %d\n",
-+		bt_shell_printf("Node %4.4x: Net transmit cnt %d, steps %d\n",
- 				src, data[0] & 7, data[0] >> 3);
- 		break;
- 
-diff --git a/tools/mesh/keys.c b/tools/mesh/keys.c
-index b7d36599a..958df1d15 100644
---- a/tools/mesh/keys.c
-+++ b/tools/mesh/keys.c
-@@ -193,15 +193,15 @@ static void print_appkey(void *app_key, void *user_data)
- {
- 	uint16_t app_idx = L_PTR_TO_UINT(app_key);
- 
--	bt_shell_printf("0x%3.3x, ", app_idx);
-+	bt_shell_printf("%u (0x%3.3x), ", app_idx, app_idx);
- }
- 
- static void print_netkey(void *net_key, void *user_data)
- {
- 	struct net_key *key = net_key;
- 
--	bt_shell_printf(COLOR_YELLOW "NetKey: 0x%3.3x, phase: %u\n" COLOR_OFF,
--							key->idx, key->phase);
-+	bt_shell_printf(COLOR_YELLOW "NetKey: %u (0x%3.3x), phase: %u\n"
-+				COLOR_OFF, key->idx, key->idx, key->phase);
- 
- 	if (!key->app_keys || l_queue_isempty(key->app_keys))
- 		return;
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-index b9bc6b5c0..24bc59129 100644
---- a/tools/mesh/remote.c
-+++ b/tools/mesh/remote.c
-@@ -217,11 +217,11 @@ uint16_t remote_get_subnet_idx(uint16_t addr)
- 	return (uint16_t) net_idx;
- }
- 
--static void print_key(void *net_key, void *user_data)
-+static void print_key(void *key, void *user_data)
- {
--	uint16_t net_idx = L_PTR_TO_UINT(net_key);
-+	uint16_t idx = L_PTR_TO_UINT(key);
- 
--	bt_shell_printf("%3.3x, ", net_idx);
-+	bt_shell_printf("%u (0x%3.3x), ", idx, idx);
- }
- 
- static void print_node(void *rmt, void *user_data)
+-noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
++noinst_PROGRAMS += tools/bdaddr tools/avtest \
+ 			tools/scotest tools/amptest tools/hwdb \
+ 			tools/hcieventmask tools/hcisecfilter \
+ 			tools/btinfo tools/btconfig \
 -- 
-2.21.1
+2.20.1
 
