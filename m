@@ -1,120 +1,134 @@
-Return-Path: <SRS0=nALV=6T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=zRH5=6U=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C6FC47247
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 00:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A38B9C47247
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 00:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED9320721
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 May 2020 23:59:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E50A206A5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 May 2020 00:54:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dR428xa5"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B8+OX+/s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729570AbgEEX7z (ORCPT
+        id S1729657AbgEFAye (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 May 2020 19:59:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728875AbgEEX7y (ORCPT
+        Tue, 5 May 2020 20:54:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729332AbgEFAyd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 May 2020 19:59:54 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB6FC061A0F;
-        Tue,  5 May 2020 16:59:54 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id c3so3299015otp.8;
-        Tue, 05 May 2020 16:59:54 -0700 (PDT)
+        Tue, 5 May 2020 20:54:33 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB14C061A0F
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2020 17:54:33 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id a5so36164pjh.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 May 2020 17:54:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M/lOXwJ10lZREjH/g0nBHnRAQAxDlzXtqSNjgFSkMmY=;
-        b=dR428xa5XKa4gysK0zL+lRz9rkpXqI7TLC1PUnRmhcGUU4RtTcCOdSrHvB3Ouqd1xI
-         9HTlwQXl8kQY9tIToyHqvb874JrRAeNX/MXafaq6hJIro/mudyF75ROZo0AQ9V4lGFT1
-         t+QFnAnfZx8JxmcPZMNNVJar1Navzxsca+uNgfuwbL7vMgKUt2OSFhA8kDMOXOmd/bsZ
-         1EBdehvkuMw2cVSVZ2fg3Ssb68lOlJyf0PJkIGQpA9WlCt3F6u4S8ziZiL+XM/t8lUoq
-         b6gl4TuLYyFe+SAnkrj2dh6APEoqsWiejVzy0tp7SyIpf17OvZQQSLriI3WuFm1m1gbe
-         c3mA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8sMT7lAv4GZKOhjhPa0nWF7eit2w6jNHxcFCAZHV/I0=;
+        b=B8+OX+/szYT/2njnQElBJVWmUlNVohyI1HoC9e5ShEYqhR/4Vbxdy9JNfc3a3taf4T
+         Z4SfzoYTFaCheWVwtRusVjsmxhvG5sp8d1d1YSMUn5HSxwRdz/hJ9ZlKgEJ6481QYYMU
+         CQBhJfKtzohQtfV+mBdOOVsXVdT5ti5LsfSmA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M/lOXwJ10lZREjH/g0nBHnRAQAxDlzXtqSNjgFSkMmY=;
-        b=a4j5RVd7+K+USkxNwKmcgLcmNTkEpCRF2yEm9nK8O3YaU/vjPHwoL2uJhAlfrDydwY
-         AVPEFjrL4G4S1/zX8xGXHvawfDp6pdxXXBSWPXh5VF4J+cDN6WAwKU/v/pwFHaJ7qxLb
-         j3JyCkSjTOqs9kHkucfk2JnokY4dkIlK6WtxJXiAFxBxeooBF7iiPyEixnezoLtEdfc/
-         N89wfYGik3873On59JrZhNhXagg3RUGoJEhi2MCgbO4diJtSODfNecHc+lvIi5PicvOx
-         dc2HW4ER9clmFCn6TCGCBKAcCAwivA2cYP5IGxM8bEk6VichDn/TdUqcZMxowPNwQZes
-         A4Ww==
-X-Gm-Message-State: AGi0PuZ8lahE3IkB9qxGnjkASXMTO1h5ZQPB0vAWrk5g35UB9F47TeKd
-        AgrgWlS6BrqltcP1uj2+GmLAvLDDyeap6PTU+vfUFi1i
-X-Google-Smtp-Source: APiQypK5yu0INLelHDFEoDo2+85jy01veAwNyMWOG+XMporp0ozwgFbu+F8lCl/ZC3al+2cvPkWwB3ZetGlbfobhZ6A=
-X-Received: by 2002:a9d:57cb:: with SMTP id q11mr4639813oti.11.1588723194213;
- Tue, 05 May 2020 16:59:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200414115512.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
- <DF70A2DA-9E5F-4524-8F20-2EC7CF70597F@holtmann.org>
-In-Reply-To: <DF70A2DA-9E5F-4524-8F20-2EC7CF70597F@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 5 May 2020 16:59:43 -0700
-Message-ID: <CABBYNZ+1XLttkvoBzLR6iCguB2Atrr0+PA5isnD9Cg2af2TFKA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Terminate the link if pairing is cancelled
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Manish Mandlik <mmandlik@google.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8sMT7lAv4GZKOhjhPa0nWF7eit2w6jNHxcFCAZHV/I0=;
+        b=ZOLkJrS72dlqUY2fCsApruE3Ngula5t+4AxBaVX2CWQGg+brthlbUuYh4CTlLbf1WL
+         WJB0V2MdOkPgqZf9NL+En7vqMbxKo4nRZaf/iUfUuXm7nd6qPeU6wA5Deh7s9FDlYnw3
+         ajGcBQe7xAtaT+XN/Gzie18miMDqXijKbWmkuzpzHLtWRKz33vAMH3VJ8rOO7W7GsEDp
+         H7FHJjXIrTeRXVpMP1VEFi2FJ2yIt1eEXBjAvzQv5fs7icW00+tWGJ6LtMeaSH0yb3S9
+         +EesffkOorBcF1EALBTPyhhsXcslA66MHVPrPU4bFDpzG2X4Xa/iCrnC+IlVyclmMsfX
+         eggA==
+X-Gm-Message-State: AGi0PubHiDlABzkPs+coL7hjhR6FDN+iewh7zCD2sQ6S4vKMSaj69eel
+        hc3CblISMcNB9IFlstOSm1/4SK4DAQc=
+X-Google-Smtp-Source: APiQypKrRXicHFARlrf1gdfIfTNHdeNyyucFo455Q3pGUmN2zh7b0lR4FI4HeJybWjxxofiY158uSQ==
+X-Received: by 2002:a17:90b:1044:: with SMTP id gq4mr5963779pjb.81.1588726472766;
+        Tue, 05 May 2020 17:54:32 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id f99sm3365362pjg.22.2020.05.05.17.54.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 05 May 2020 17:54:31 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Yoni Shavit <yshavit@chromium.org>,
         Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Michael Sun <michaelfsun@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v1] doc/advertisement-monitor-api: Rename methods and shorten the preset strings
+Date:   Tue,  5 May 2020 17:54:20 -0700
+Message-Id: <20200505175338.BlueZ.v1.1.Ibb4c8b00abb07d20022768dfc8b9479b35e1d9a3@changeid>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish, Marcel,
+This renames RegisterApplication/UnregisterApplication to
+RegisterMonitor/UnregisterMonitor and shortens the strings used in some
+properties.
+---
+Hi Maintainers,
 
-On Tue, Apr 28, 2020 at 2:38 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Manish,
->
-> > If user decides to cancel ongoing pairing process (e.g. by clicking
-> > the cancel button on the pairing/passkey window), abort any ongoing
-> > pairing and then terminate the link.
-> >
-> > Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> > ---
-> > Hello Linux-Bluetooth,
-> >
-> >  This patch aborts any ongoing pairing and then terminates the link
-> >  by calling hci_abort_conn() in cancel_pair_device() function.
-> >
-> >  However, I'm not very sure if hci_abort_conn() should be called here
-> >  in cancel_pair_device() or in smp for example to terminate the link
-> >  after it had sent the pairing failed PDU.
-> >
+This patch updates the experimental API for advertisement monitoring.
 
-Id recommend leaving the hci_abort_conn out since that is a policy
-decision the userspace should be in charge to decide if the link
-should be disconnected or not.
+Thanks,
+Miao
 
-> >  Please share your thoughts on this.
->
-> I am look into this. Just bare with me for a bit to verify the call chain.
->
-> Regards
->
-> Marcel
->
+ doc/advertisement-monitor-api.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-
+diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+index 604448f56..74adbfae9 100644
+--- a/doc/advertisement-monitor-api.txt
++++ b/doc/advertisement-monitor-api.txt
+@@ -89,7 +89,7 @@ Service		org.bluez
+ Interface	org.bluez.AdvertisementMonitorManager1 [experimental]
+ Object path	/org/bluez/{hci0,hci1,...}
+ 
+-Methods		void RegisterApplication(object application)
++Methods		void RegisterMonitor(object application)
+ 
+ 			This registers a hierarchy of advertisement monitors.
+ 			The application object path together with the D-Bus
+@@ -99,7 +99,7 @@ Methods		void RegisterApplication(object application)
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
+ 
+-		void UnregisterApplication(object application)
++		void UnregisterMonitor(object application)
+ 
+ 			This unregisters advertisement monitors that have been
+ 			previously registered. The object path parameter must
+@@ -118,7 +118,7 @@ Properties	array{string} SupportedMonitorTypes [read-only]
+ 
+ 			Possible values for monitor types:
+ 
+-			"patterns_with_logic_or"
++			"or_patterns"
+ 				Patterns with logic OR applied. With this type,
+ 				property "Patterns" must exist and has at least
+ 				one pattern.
+@@ -130,7 +130,7 @@ Properties	array{string} SupportedMonitorTypes [read-only]
+ 
+ 			Possible values for features:
+ 
+-			"controller-based-monitor-by-patterns"
++			"controller-patterns"
+ 				If the controller is capable of performing
+ 				advertisement monitoring by patterns, BlueZ
+ 				would offload the patterns to the controller to
 -- 
-Luiz Augusto von Dentz
+2.24.1
+
