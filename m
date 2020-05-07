@@ -7,84 +7,178 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD56C38A2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 20:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24511C38A2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 20:24:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6527621582
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 20:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E07532083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 20:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYhICMlB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CICI+TRn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbgEGUB1 (ORCPT
+        id S1726491AbgEGUYZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 May 2020 16:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44630 "EHLO
+        Thu, 7 May 2020 16:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726320AbgEGUB0 (ORCPT
+        by vger.kernel.org with ESMTP id S1726320AbgEGUYZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 May 2020 16:01:26 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFC4C05BD43
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2020 13:01:26 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id f11so7753224ljp.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2020 13:01:26 -0700 (PDT)
+        Thu, 7 May 2020 16:24:25 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D5DC05BD43
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2020 13:24:23 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id r25so6416553oij.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2020 13:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Z5lCUHy01ZzBB0bl8e2rA065G968+1/h1OGz8LSzsjM=;
-        b=hYhICMlB6kRXQ+9aHCtQYzplrL7c/MKOYSeJ+BGw+73uyCzHC6wVicRCUOCMHmOK/R
-         kQZqClQloGwhSTZ865jQkWCVOiVqTiDLN6Wv23U7D1hSgsYYJvBPWE6enUynzGPJ+n0B
-         DLNgBN27dPQt9zyDriJOD0coTN2RGnwZ8cs7gc74jLGsWOJL9/pL2IUE1yaXGZqIV2P4
-         0M61xkytBXAAiXZByTCCqZzR0KJ45LXOvBXY5EYFpDuOf+/xQYE67+rJkdQ5CW4kRhj6
-         HZ5Nwa/sMvs8Yu5Rgf9RWiESbTT+gQtIUMxl5BwAeDQOa+C4vSZgEeK9RGKYByYUdLVv
-         vXQA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WPDSoIGlKBnhD0hfymMJ0hDYHcPFSakSRoe2LcTL95Y=;
+        b=CICI+TRnz0BuQ2i1EXESJxvkZV/80/USa8XEMxsKA5rfBDsVDZbBsiFa2tWF10K5MO
+         pE6itEiwbOoAuq3ZKOynnvq7ZGL4tJfH4CvgnpfWrGbPpHQYaHEF68FSn6JaE3Od5hYT
+         ROgudw0HWcYS+Fn6SW6cBLZPGhwTFoiUWifiPa413+OQ3td9QHu7y8U7gdl3Jr/b2Hcq
+         TbjwyN9UUxcV07/7jgK+1X+/D1bU01wwEsJBYqHOyajlJbFqikBI2ReCgy7Ob+nrfmAY
+         4cm1kR3+owyJ4opH8FmE5vroLt5Evl95oYZi36aKqKBla6BV6NXjUXB0/cg8BAALTsbM
+         1S/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Z5lCUHy01ZzBB0bl8e2rA065G968+1/h1OGz8LSzsjM=;
-        b=WL2N36VaVcgBTHUi2sHWv150x9rgP7gHYm+pV2cqRhK5K/4kKaHEgL+bze6LSMPuhJ
-         BQqw3dMcWt6dH26t8zHLlaPlzvvV1F+TVyWRr0+rpxjgucLB6LoQobVZnzFBDOe8ulpw
-         vKlL1wtTi5e8LmD1ePC43s68U6AEqPALk29VCG5ETxbcOSlt9vYrmhDiYEuCAEzwS8as
-         EZOMJxvNIPUtt7pi8c/z1uxWlX5Bm6ctM4tJr5UGWpXR5DAccfxGm1VFpWMgIpOjO6KW
-         lpqNcjbfG0hRhm81Kh7Y/eIzSZcUCcL9Awc2M+jmkJJHaoWw+jZHYdS1DoMv5AP/GBNH
-         4I4Q==
-X-Gm-Message-State: AGi0PubBnFdQj6fETyDFIWyQiygwPq+uChIUmexkyx2RXf3Uo7HrTm+R
-        vzvNZF97DJQicd38OEI4LLl90o7Kzrvtk773GW0JHyqhRWM=
-X-Google-Smtp-Source: APiQypJuIu83VWTCFpZ6R7rbeO1LjY5DRs03QB22KLv7fuQs8c5dEO/2VcCQA/4RbW4uzHiJk0NvhHwp7wer1yzIki4=
-X-Received: by 2002:a2e:a313:: with SMTP id l19mr9556014lje.133.1588881684544;
- Thu, 07 May 2020 13:01:24 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=WPDSoIGlKBnhD0hfymMJ0hDYHcPFSakSRoe2LcTL95Y=;
+        b=Y0+L6oMbyfZyzwQskeWrWhr8nJ7qFiaxdrkOH79U6moB53zpqrgvk68+nN8J99tMlL
+         U8/xAoWq/jH5MA1268niJgelzMPeHv8A5+P5l5ZLtq3KvojIpVjPA8Gj0YjhDs8z7lfT
+         IUGPe4+0ROXayeB6aVRpNhrLJO4kbSSDc81qdAt4zc8YUalKdWzL0AFXSWQy1PbahDiU
+         02uo1yJoPljmJMlxnrSKMcErI7kV/lrbU7keVc/ImRjgS8QVOYiBZurCsrumqG/QTWU1
+         Oc/wOyRCrOs1/tkGejsMMQ/GEmaxU6g0fRTBZdF61IqeppiiYzlJ5FBeEUY/Xt8fVhrG
+         PATA==
+X-Gm-Message-State: AGi0PubfZl41LvMuKyjdnrELp2a9js+fnOi13Bq4nHNgyPDhGMdwF6Z6
+        EwMFM04FHPcyuy1Mnd3j+J1npbVu7Zti7OmjP+g=
+X-Google-Smtp-Source: APiQypIaW1Yqhnnc1koD56SDvPvrMXA9J5qSfFQwBN1nt0pZQJV1nUf2l4zux2QwZ5rmne4AfNGpXMAPJrBFq233yZ0=
+X-Received: by 2002:aca:acd0:: with SMTP id v199mr7676876oie.82.1588883062735;
+ Thu, 07 May 2020 13:24:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <3057615.CFlnn7pYAm@g550jk>
-In-Reply-To: <3057615.CFlnn7pYAm@g550jk>
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Thu, 7 May 2020 21:01:12 +0100
-Message-ID: <CAAu3APacN9HMZqtNZ2SEFLXVLH2LqRZWxDhR+DT2AWqVo7bEFQ@mail.gmail.com>
-Subject: Re: ManufacturerData while discovering
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <1588847119436.26848@mentor.com>
+In-Reply-To: <1588847119436.26848@mentor.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 7 May 2020 13:24:11 -0700
+Message-ID: <CABBYNZ+a3Br71ExTi1XUa7UnDry2dNBaomz-+z7sVtVH_5toCQ@mail.gmail.com>
+Subject: Re: Incorrect advertise flags in bluetooth beacon using BlueZ
+To:     "Karim, Hafiz Abdul" <HafizAbdul_Karim@mentor.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I believe this is a known behavior. Here is a link to where it has
-been discussed previously on this mailing list:
-https://marc.info/?l=linux-bluetooth&m=158225950522806
+Hi Hafiz Abdul,
 
-On Thu, 7 May 2020 at 20:28, Luca Weiss <luca@z3ntu.xyz> wrote:
->
-> Hello,
-> I've been trying to get frequent manufacturer data from advertisements from a
-> BLE device into an application of mine. Unfortunately it looks like I only get
-> new ManufacturerData about every 15 seconds while discovering/scanning. The
-> manufacturer data from the device changes frequently (at least once per
-> second) so I need updates to this data more frequently than the 15 seconds.
->
-> I couldn't find any reference on how I could achieve this in the documentation
-> so any help would be welcome.
->
-> Regards
-> Luca
+
+On Thu, May 7, 2020 at 3:36 AM Karim, Hafiz Abdul
+<HafizAbdul_Karim@mentor.com> wrote:
 >
 >
+> Using nRF Connect android application, I'm getting incorrect advertise flags in bluetooth beacon using BlueZ
+> I have tried on two bluez versions i.e 5.48 and 5.52.
+>
+> I have set ControllerMode to "le" in main.conf. Using bluetootctl, when I turn on the advertisement using command "advertise on", I get 0x02 advertisement flag. Which means "BR/EDR Not Supported" (Bit 2) is not set.
+> Now, if i restart the bluetooth service, and turn on the advertisement again, I get 0x06 advertisement flags.
+
+Are you saying we are not updating the service once main.conf has
+changed? We don't do that automatically if that is what you are
+referring to, also if you want to advertise as a beacon/broadcaster
+and not as peripheral thean us you should use advertise broadcast.
+
+> Here is my main.conf
+>
+> [General]# Default adaper name
+> # Defaults to 'BlueZ X.YZ'
+> #Name = BlueZ# Default device class. Only the major and minor device class bits are
+> # considered. Defaults to '0x000000'.
+> Class = 0x000100# How long to stay in discoverable mode before going back to non-discoverable
+> # The value is in seconds. Default is 180, i.e. 3 minutes.
+> # 0 = disable timer, i.e. stay discoverable forever
+> DiscoverableTimeout = 0# How long to stay in pairable mode before going back to non-discoverable
+> # The value is in seconds. Default is 0.
+> # 0 = disable timer, i.e. stay pairable forever
+> #PairableTimeout = 0# Automatic connection for bonded devices driven by platform/user events.
+> # If a platform plugin uses this mechanism, automatic connections will be
+> # enabled during the interval defined below. Initially, this feature
+> # intends to be used to establish connections to ATT channels. Default is 60.
+> #AutoConnectTimeout = 60# Use vendor id source (assigner), vendor, product and version information for
+> # DID profile support. The values are separated by ":" and assigner, VID, PID
+> # and version.
+> # Possible vendor id source values: bluetooth, usb (defaults to usb)
+> #DeviceID = bluetooth:1234:5678:abcd# Do reverse service discovery for previously unknown devices that connect to
+> # us. This option is really only needed for qualification since the BITE tester
+> # doesn't like us doing reverse SDP for some test cases (though there could in
+> # theory be other useful purposes for this too). Defaults to 'true'.
+> #ReverseServiceDiscovery = true# Enable name resolving after inquiry. Set it to 'false' if you don't need
+> # remote devices name and want shorter discovery cycle. Defaults to 'true'.
+> #NameResolving = true# Enable runtime persistency of debug link keys. Default is false which
+> # makes debug link keys valid only for the duration of the connection
+> # that they were created for.
+> #DebugKeys = false# Restricts all controllers to the specified transport. Default value
+> # is "dual", i.e. both BR/EDR and LE enabled (when supported by the HW).
+> # Possible values: "dual", "bredr", "le"
+> ControllerMode = le# Enables Multi Profile Specification support. This allows to specify if
+> # system supports only Multiple Profiles Single Device (MPSD) configuration
+> # or both Multiple Profiles Single Device (MPSD) and Multiple Profiles Multiple
+> # Devices (MPMD) configurations.
+> # Possible values: "off", "single", "multiple"
+> #MultiProfile = off# Permanently enables the Fast Connectable setting for adapters that
+> # support it. When enabled other devices can connect faster to us,
+> # however the tradeoff is increased power consumptions. This feature
+> # will fully work only on kernel version 4.1 and newer. Defaults to
+> # 'false'.
+> #FastConnectable = false[Policy]# The ReconnectUUIDs defines the set of remote services that should try
+> # to be reconnected to in case of a link loss (link supervision
+> # timeout). The policy plugin should contain a sane set of values by
+> # default, but this list can be overridden here. By setting the list to
+> # empty the reconnection feature gets disabled.
+> #ReconnectUUIDs=00001112-0000-1000-8000-00805f9b34fb, 0000111f-0000-1000-8000-00805f9b34fb, 0000110a-0000-1000-8000-00805f9b34fb# ReconnectAttempts define the number of attempts to reconnect after a link
+> # lost. Setting the value to 0 disables reconnecting feature.
+> #ReconnectAttempts=7# ReconnectIntervals define the set of intervals in seconds to use in between
+> # attempts.
+> # If the number of attempts defined in ReconnectAttempts is bigger than the
+> # set of intervals the last interval is repeated until the last attempt.
+> #ReconnectIntervals=1, 2, 4, 8, 16, 32, 64# AutoEnable defines option to enable all controllers when they are found.
+> # This includes adapters present on start as well as adapters that are plugged
+> # in later on. Defaults to 'false'.
+> AutoEnable=true
+>
+>
+> And bluetooth.service
+>
+>
+> [Unit]
+> Description=Bluetooth service
+> Documentation=man:bluetoothd(8)
+> ConditionPathIsDirectory=/sys/class/bluetooth[Service]
+> Type=dbus
+> BusName=org.bluez
+> ExecStart=/usr/libexec/bluetooth/bluetoothd -d -n --configfile /etc/bluetooth/main.conf
+> NotifyAccess=main
+> #WatchdogSec=10
+> #Restart=on-failure
+> CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+> LimitNPROC=1
+> ProtectHome=true
+> ProtectSystem=full[Install]
+> WantedBy=bluetooth.target
+> Alias=dbus-org.bluez.service
+>
+> Any guidance/pointers?
+>
+>
+> Thanks,
+> Abdul Karim
+>
+>
+>
+>
+>
+>
+
+
+-- 
+Luiz Augusto von Dentz
