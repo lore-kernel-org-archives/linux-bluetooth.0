@@ -2,142 +2,331 @@ Return-Path: <SRS0=Gf0L=6V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7C6C38A2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 21:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74FDC38A2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 21:21:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E576E20663
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 21:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E33420731
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 21:21:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ibNgTHVr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CH/N4hN5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbgEGVLN (ORCPT
+        id S1726491AbgEGVVn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 May 2020 17:11:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
+        Thu, 7 May 2020 17:21:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbgEGVLN (ORCPT
+        with ESMTP id S1726218AbgEGVVm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 May 2020 17:11:13 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC0E9C05BD43
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2020 14:11:11 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id x15so3628365pfa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2020 14:11:11 -0700 (PDT)
+        Thu, 7 May 2020 17:21:42 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C5DC05BD43
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2020 14:21:42 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id f11so7976379ljp.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2020 14:21:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XENfBiTJw9E9Rtbe0OzRWQ3FYDRuG6S5hHWv6IBsaso=;
-        b=ibNgTHVrzD1E/Y3o4X7uGQ7f+68HYK9rpAZGI0XAxEMmRWqmDdwQAL47zysW0sVd6W
-         KElTkvpOoeUFhF9UUDiya3NF7d+95zoWpECN//URXeMOtI4ppBSp75cOxj2Hig/NL+4f
-         DEun6nsfMQN89Q+tnpOlz1Th1EwudCIP+VzsE=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=saUw1xZOVnaFYj9ZmUI+Z5XRbhgX9YzQ6aunpD7v5rw=;
+        b=CH/N4hN549/Z+UpYQUsXu/kN6Loo8xOD3SlwBl9fLHm/tmATghKEZzKfOPWVjaURJV
+         LLQnn3hIXKlg+kU9pnssfeTiBTW+S4IwcM9IOQ79FS1VGsqW6Fd5pIdDyb9d/gDE+RPS
+         /O/tfvi+yyiEcr/hXCBcyCjCVv2LFy0euVt7U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XENfBiTJw9E9Rtbe0OzRWQ3FYDRuG6S5hHWv6IBsaso=;
-        b=aS9b6yi9TkyJX79zVpatD8NviBoX8j/wyRSatH3la/IXywd9dNRNdjBEKQoB8d+OV6
-         hZQRUIRsjM/dx9wez5gUWc+dWVo2ezE3nKUfTLKar85ZYgpVQw6uz3kn2G0emFpFvGIz
-         nS3ui2bmB1pvlKEss6E8HQKNxbk8NDuOLL4nHNvWG+2waHr4bNukQ7HJFPlRqkyvnKhA
-         CJFmjPWbKfLfsbFsg+XIYrOEuTU6NNyo0ARY68yJXXY61K/tGbTTzLBg9Zoo+xG91BZH
-         XyrnOuUaoEszeSe+4HeNJbod6fjITtJ9z2rAurdInPgi9bP36yaP/aZERsjFNHOdFM5G
-         gvHw==
-X-Gm-Message-State: AGi0PubEyWmhlALjifG+EMSi8wufRG1X/tw3O8SYBOGW2p96PL/DXfMp
-        3N0V1Smg/WAvjxkpHpsVNXQbvibn/PM=
-X-Google-Smtp-Source: APiQypL93WDkqegJ0m3rM2KZTMJMY5ps5/3QJIXKxeI7gYOFZ8KyZLX4JKt319MJVXh1iVlwVkio+g==
-X-Received: by 2002:a63:1961:: with SMTP id 33mr13425718pgz.282.1588885871147;
-        Thu, 07 May 2020 14:11:11 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id 16sm623156pjg.56.2020.05.07.14.11.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2020 14:11:10 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Cc:     alainm@chromium.org, chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [Bluez PATCH] shared/gatt-db: Check for null pointers
-Date:   Thu,  7 May 2020 14:11:00 -0700
-Message-Id: <20200507141055.Bluez.1.Ie4c027829af0f3ca2ba0e532706584a554a69d38@changeid>
-X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=saUw1xZOVnaFYj9ZmUI+Z5XRbhgX9YzQ6aunpD7v5rw=;
+        b=jksv37TdxLDQ3ztpF/bMyphV7ejJECS2q84dhcs8Zjoi3I29tL6o19sY+3vtyLhA1M
+         WF8RGl7HB5PV1jQd6MywD5UI2sIyCGpwedH2WlYUOyTCjhh1NPbq2V0YMB+glepxjeiM
+         nX9UZeMs/nwggv46dFlYhp6PytdmhcLl5rA45ppeEi4KkiLUc52oMs0GoZeM2nocUkQx
+         ffg50OdoGyd+wscbZ5yuUWF2PBFeQo7bbesOnoXe3N+x6RTWWBUhCw3OqzgFUhEkcftx
+         RuvD3x4HgXdHzWaO4E/DkSWj1cXo+vDWUW8LpZjGGTUsdUf8aiK2yDL+Hyoa4l/y0/Ur
+         L8FQ==
+X-Gm-Message-State: AGi0PuZGPLaB/rvm9iukEdL3AJGU4TD2YEe6HUNtl1qvwkRIVN1tmfc3
+        Dv/hzDsjynDSfcSkps8urY1RMl1fVDhIw65PqZlqjg==
+X-Google-Smtp-Source: APiQypJ/cYjC75C1PFbl/Kkfom+mfI1zwZdWFxv3TC36Z1FC4LfCcPhIdb5Cfc3EJ05uVqwp+sWeRQ+eiJdXfJNV8XU=
+X-Received: by 2002:a2e:5746:: with SMTP id r6mr9396453ljd.15.1588886500657;
+ Thu, 07 May 2020 14:21:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200429203031.BlueZ.v5.1.If9f6be992cbaeaa35423de29da6db28675b35fcc@changeid>
+ <6FD8666C-39AD-4D41-9BBF-7E1371FDFFA6@holtmann.org>
+In-Reply-To: <6FD8666C-39AD-4D41-9BBF-7E1371FDFFA6@holtmann.org>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Thu, 7 May 2020 14:21:29 -0700
+Message-ID: <CABmPvSF_HVxDJPh7hdFtDAK4HTH-EYkYGwtCaaFLuQzpBB+R=g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v5] doc: Describe the new Advertisement Monitor support
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Yoni Shavit <yshavit@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Make sure the attribute, service and service attributes are not null
-before accessing them.
+Hi Marcel,
 
-The problem was seen with the following stack trace:
+On Wed, May 6, 2020 at 4:05 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Miao-chen,
+>
+> > This describes the following commands and event.
+> > - Read Advertisement Monitor Features command
+> > - Add Advertisement Patterns Monitor command
+> > - Remove Advertisement Monitor command
+> > - Advertisement Monitor Added event
+> > - Advertisement Monitor Removed event
+> > Note that the content of a monitor can differ based on its type. For no=
+w we
+> > introduce only pattern-based monitor, so you may find that unlike the
+> > command of removing monitor(s), the Add command is tied to a specific t=
+ype.
+> > ---
+> >
+> > Changes in v5:
+> > - Add more fields in the return value of Read Advertisement Monitor
+> > Features command.
+> > - Refine the description of commands and events.
+> >
+> > Changes in v4:
+> > - In Read Advertisement Monitor Features command, rename
+> > Adopted_Features to Enabled_Features.
+> >
+> > Changes in v3:
+> > - Remove Advertisement Monitor can perform the removal of one monitor
+> > or all monitors.
+> > - Add Read Advertisement Monitor Features command.
+> > - Add Advertisement Monitor Added event and dvertisement Monitor Remove=
+d
+> > event.
+> >
+> > Changes in v2:
+> > - Combine commands to remove one monitor and remove all monitors. The
+> > refined command takes multiple handles and an extra field to indicate
+> > whether to remove all monitors.
+> >
+> > doc/mgmt-api.txt | 147 +++++++++++++++++++++++++++++++++++++++++++++++
+> > 1 file changed, 147 insertions(+)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 39f23c456..4aa755c45 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -3138,6 +3138,125 @@ Read Security Information Command
+> >                               Invalid Index
+> >
+> >
+> > +Read Advertisement Monitor Features Command
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +     Command Code:           0x0049
+> > +     Controller Index:       <controller id>
+> > +     Command Parameters:
+> > +     Return Parameters:      Supported_Features (4 octets)
+> > +                             Enabled_Features (4 octets)
+> > +                             Max_Num_Handles (2 octets)
+> > +                             Max_Num_Patterns (1 octet)
+> > +                             Num_Handles (2 octets)
+> > +                             Handle1 (2 octets)
+> > +                             Handle2 (2 octets)
+> > +                             ...
+>
+>                                 Handle[i] (2 Octets)
+>
+> And we have been using Octet(s) and not octet(s). The document should be =
+pretty much consistent with its style. If you see mistakes, please send pat=
+ches to correct it.
+I will correct these in v6.
+>
+> > +
+> > +     This command is used to read the advertisement monitor features
+> > +     supported by the controller and stack. Supported_Features lists a=
+ll
+> > +     related features supported by the controller while Enabled_Featur=
+es
+> > +     lists the ones currently used by the kernel.
+> > +
+> > +     Supported_Features and Enabled_Features are bitmasks with current=
+ly
+> > +     the following available bits:
+> > +
+> > +             1       Advertisement content monitoring based on Microso=
+ft
+> > +                     HCI extension.
+>
+> Advertising content monitoring based on pattern. Lets leave Microsoft out=
+ of it.
+Ack.
+>
+> > +
+> > +     Max_Num_Handles indicates the maximum number of supported
+> > +     advertisement monitors. Note that the actual number of supported
+> > +     ones might be less depending on the limitation of the controller.
+> > +
+> > +     Max_Num_Pattern indicates the maximum number of supported pattern=
+s
+> > +     in an advertisement patterns monitor. Note that the actual number
+> > +     of supported ones might be less depending on the limitation of th=
+e
+> > +     controller.
+> > +
+> > +     Num_Handles indicates the number of added advertisement monitors,
+> > +     and it is followed by a list of handles.
+> > +
+> > +     This command can be used when the controller is not powered.
+> > +
+> > +
+> > +Add Advertisement Patterns Monitor Command
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +     Command Code:           0x004A
+> > +     Controller Index:       <controller id>
+> > +     Command Parameters:     Pattern_count (1 Octets)
+>
+> Pattern_Count please.
+>
+> > +                             Pattern1 {
+> > +                                     AD_Data_Type (1 Octet)
+>
+> Just call it Type and explain in the description that it is the AD Type.
+>
+> > +                                     Offset (1 Octet)
+> > +                                     Length (1 Octet)
+> > +                                     Value (variable length)
+>
+> We normally give a range and not =E2=80=9Cvariable length=E2=80=9D. I won=
+der if we should just use a fixed size field here.
+Sounds good to me.
+>
+> > +                             }
+> > +                             Pattern2 { }
+> > +                             ...
+> > +     Return Parameters:      Monitor_Handle (2 Octets)
+> > +
+> > +     This command is used to add an advertisement monitor whose
+> > +     filtering conditions are patterns. The kernel will trigger scanni=
+ng
+> > +     if there is at least one monitor added. If the controller support=
+s
+> > +     advertisement filtering, the kernel would offload the content
+> > +     filtering to the controller in order to reduce power consumption;
+> > +     otherwise the kernel ignores the content of the monitor. Note tha=
+t
+> > +     if the there are more than one patterns, OR logic would applied
+> > +     among patterns during filtering. In other words, any advertisemen=
+t
+> > +     matching at least one pattern in a given monitor would be
+> > +     considered as a match.
+> > +
+> > +     A pattern contains the following fields.
+> > +             AD_Data_Type    Advertising Data Type. The possible value=
+s
+> > +                             are defined in Core Specification
+> > +                             Supplement.
+> > +             Offset          The start index where pattern matching
+> > +                             shall be performed with in the AD data.
+> > +             Length          The length of the pattern value in bytes.
+> > +             Value           The value of the pattern in bytes.
+> > +
+> > +     Here is an example of a pattern.
+> > +             {
+> > +                     0x16, // Service Data - 16-bit UUID
+> > +                     0x02, // Skip the UUID part.
+> > +                     0x04,
+> > +                     {0x11, 0x22, 0x33, 0x44},
+> > +             }
+> > +
+> > +     This command can be used when the controller is not powered and
+> > +     all settings will be programmed once powered.
+> > +
+> > +     Possible errors:        Failed
+> > +                             Busy
+> > +                             No Resources
+> > +                             Invalid Parameters
+> > +
+> > +
+> > +Remove Advertisement Monitor Command
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +     Command Code:           0x004B
+> > +     Controller Index:       <controller id>
+> > +     Command Parameters:     Monitor_Handle (2 Octets)
+> > +     Return Parameters:
+>
+> Include Monitor_Handle in the return value. The events are not send to th=
+e caller and so the caller somehow needs to be able to map that response if=
+ they have to.
+>
+I will add it in v6.
+> > +
+> > +     This command is used to remove advertisement monitor(s). The kern=
+el
+> > +     would remove the monitor(s) with Monitor_Handle and update the LE
+> > +     scanning.
+> > +
+> > +     When the Monitor_Handle is set to zero, then all previously added
+> > +     handles will be removed.
+> > +
+> > +     Removing a monitor while it is being added will be ignored.
+> > +
+> > +     This command can be used when the controller is not powered and
+> > +     all settings will be programmed once powered.
+> > +
+> > +     Possible errors:        Failed
+> > +                             Busy
+> > +                             Invalid Index
+> > +
+> > +
+> > Command Complete Event
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > @@ -4020,3 +4139,31 @@ PHY Configuration Changed Event
+> >       one through which the change was triggered.
+> >
+> >       Refer Get PHY Configuration command for PHYs parameter.
+> > +
+> > +
+> > +Advertisement Monitor Added Event
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +     Event Code:             0x0027
+> > +     Controller Index:       <controller id>
+> > +     Event Parameters:       Monitor_Handle (2 Octets)
+> > +
+> > +     This event indicates that an advertisement monitor has been added
+> > +     using the Add Advertisement Monitor command.
+> > +
+> > +     The event will only be sent to management sockets other than the
+> > +     one through which the command was sent.
+> > +
+> > +
+> > +Advertisement Monitor Removed Event
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +     Event Code:             0x0028
+> > +     Controller Index:       <controller id>
+> > +     Event Parameters:       Monitor_Handle (2 Octets)
+> > +
+> > +     This event indicates that an advertisement monitor has been remov=
+ed
+> > +     using the Remove Advertisement Monitor command.
+> > +
+> > +     The event will only be sent to management sockets other than the
+> > +     one through which the command was sent.
 
- 0  bluetoothd!gatt_db_attribute_get_service_data [gatt-db.c : 1648 + 0x0]
-    rax = 0x0000000000000000   rdx = 0x00007ffce8cf70ec
-    rcx = 0x0000000000000000   rbx = 0x0000000000000000
-    rsi = 0x00007ffce8cf70ee   rdi = 0x00005a56611f05c0
-    rbp = 0x00007ffce8cf70d0   rsp = 0x00007ffce8cf70b0
-     r8 = 0x0000000000000000    r9 = 0x0000000000000050
-    r10 = 0x0000000000000073   r11 = 0x0000000000000246
-    r12 = 0x00005a56611cea10   r13 = 0x00005a56611efd90
-    r14 = 0x0000000000000000   r15 = 0x00005a565f3eed8d
-    rip = 0x00005a565f48147e
-    Found by: given as instruction pointer in context
- 1  bluetoothd!discovery_op_complete [gatt-client.c : 386 + 0x14]
-    rbx = 0x00005a56611e9d30   rbp = 0x00007ffce8cf7120
-    rsp = 0x00007ffce8cf70e0   r12 = 0x00005a56611cea10
-    r13 = 0x00005a56611efd90   r14 = 0x00007ffce8cf70ec
-    r15 = 0x00005a565f3eed8d   rip = 0x00005a565f47a6bc
-    Found by: call frame info
- 2  bluetoothd!discover_chrcs_cb [gatt-client.c : 1000 + 0xf]
-    rbx = 0x0000000000000000   rbp = 0x00007ffce8cf71d0
-    rsp = 0x00007ffce8cf7130   r12 = 0x000000000000000a
-    r13 = 0x00005a56611de920   r14 = 0x00005a56611cea10
-    r15 = 0x00007ffce8cf7188   rip = 0x00005a565f47b18a
-    Found by: call frame info
- 3  bluetoothd!discovery_op_complete [gatt-helpers.c : 628 + 0xc]
-    rbx = 0x00005a56611f0430   rbp = 0x00007ffce8cf71f0
-    rsp = 0x00007ffce8cf71e0   r12 = 0x00005a56611ea5a0
-    r13 = 0x00005a56611cd430   r14 = 0x00005a56611f0430
-    r15 = 0x00005a566119bc01   rip = 0x00005a565f47d60e
-    Found by: call frame info
- 4  bluetoothd!discover_chrcs_cb [gatt-helpers.c : 1250 + 0xe]
-    rbx = 0x00005a56611bf0f1   rbp = 0x00007ffce8cf7240
-    rsp = 0x00007ffce8cf7200   r12 = 0x00005a56611ea5a0
-    r13 = 0x00005a56611cd430   r14 = 0x00005a56611f0430
-    r15 = 0x00005a566119bc01   rip = 0x00005a565f47cc7a
-    Found by: call frame info
-
----
-
- src/shared/gatt-db.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index b44f7b5e9..2432bdfd4 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -513,6 +513,7 @@ bool gatt_db_remove_service(struct gatt_db *db,
- 		return false;
- 
- 	service = attrib->service;
-+	attrib->service = NULL;
- 
- 	queue_remove(db->services, service);
- 
-@@ -1605,7 +1606,7 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
- 	struct gatt_db_service *service;
- 	struct gatt_db_attribute *decl;
- 
--	if (!attrib)
-+	if (!(attrib && attrib->service && attrib->service->attributes))
- 		return false;
- 
- 	service = attrib->service;
--- 
-2.26.2.645.ge9eca65c58-goog
-
+Thanks,
+Miao
