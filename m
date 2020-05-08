@@ -1,374 +1,624 @@
-Return-Path: <SRS0=Gf0L=6V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=6WQ0=6W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEDEC35280
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 23:57:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1E0C35280
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 02:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D54C20735
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 May 2020 23:57:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZljUNppS"
+	by mail.kernel.org (Postfix) with ESMTP id C4FD2208CA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 02:45:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgEGX5S (ORCPT
+        id S1726770AbgEHCpz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 May 2020 19:57:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53040 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727051AbgEGX5Q (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 May 2020 19:57:16 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433F8C05BD43
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2020 16:57:16 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id h26so5998557lfg.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2020 16:57:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language;
-        bh=7cBd5Z9DIbKj9idmjfaAUA/v0qaSaQI72BuhcObHQU8=;
-        b=ZljUNppSETB9mKN+ZZzZ42iCxyRhItZE+o94e5MjtB2CNereMq0STtkbN3dX5M12nW
-         2m6Mkp8FIwRNuZx07pregurgN0rKYLX53YO3HwZ032GO4j73is0bhIZnL3GQ7IZrq34n
-         mp8+X+bBUQ+oV0njyxR7oic34anW+aDkT4AyVPo74Oev1vErur6iUx/CTA5hbNWYHo7h
-         nyOhCEl65aAP0IsYKTCpyDnFVgl2Z+9Ro3Y5KF7Az4bNUl9GV1IdDu048o/n8+WeF/Yf
-         dM46NnoOjqQXn4B0Li3oaI4e8KtszcxkrJBsO1Gv9pssNpKjau8UII9eCv50w1mNGmBQ
-         pT2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language;
-        bh=7cBd5Z9DIbKj9idmjfaAUA/v0qaSaQI72BuhcObHQU8=;
-        b=ZlmEtmxAZeQyH1sklwfsO217mnqhFVWWJUJdHy4t/1Gb+bWAQlhFtkOai1KGLUMgmE
-         zJiXEMZGAL43kGdsg/smsjID3HHlDoqXcdmTP91n9cNAerRJmkQM7BH0rfIbwQD0vCbT
-         /D+iiGuEFObXhVWhFEWb5frr5txxh/YTkNdBWezUSlg3OAQ4zIZWsB3OQ1nnFULSVz8M
-         XcgvXhTTtQSgKGfWcDRCiKOKWP6psyJ5BMhUez9gV8lR0t1zlMHa6r8yaPflFqx1bOQ4
-         +sHAqGHMcuU2QCuaYW+IzZ/x4UAh2VyBp+xew81sdTRwH3TZI5KFvfRWO0AEIDaUT/vu
-         zdGA==
-X-Gm-Message-State: AOAM530BrEg9IXe0JkAj4ky6gWuweLcrKe2P3Cur9IvY2tmHv79t79iW
-        A8wY9EN4sZYjIwouDaSeA59mjBXFjEI=
-X-Google-Smtp-Source: ABdhPJytohT5iQqYcNsNjWJXVHMol5rnSZSOYI1UhVwvQE+QXb18JD/VdwZmnvSAhqUS5U/VOrCBIQ==
-X-Received: by 2002:ac2:46c1:: with SMTP id p1mr6599lfo.25.1588895834042;
-        Thu, 07 May 2020 16:57:14 -0700 (PDT)
-Received: from [192.168.1.2] (broadband-188-255-20-215.ip.moscow.rt.ru. [188.255.20.215])
-        by smtp.gmail.com with ESMTPSA id q20sm4045635lfm.35.2020.05.07.16.57.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2020 16:57:12 -0700 (PDT)
-Subject: Re: avrcp: Cannot connect Sennheiser Momentum True Wireless 2
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <7c4e6f59-d2ef-36c0-46df-0195fad40e7e@gmail.com>
- <76911d0f-dd24-5536-586a-a8e9bc7ad786@gmail.com>
- <CABBYNZKr3r-6cXGAS3w6SR2-fw2h9gHqvnH=H7O6MSxnandUcg@mail.gmail.com>
-From:   Andrey Semashev <andrey.semashev@gmail.com>
-Message-ID: <74cd38cf-2390-b7be-bd51-9b549d2ad4f4@gmail.com>
-Date:   Fri, 8 May 2020 02:57:12 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Thu, 7 May 2020 22:45:55 -0400
+Received: from mga06.intel.com ([134.134.136.31]:12752 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726509AbgEHCpz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 7 May 2020 22:45:55 -0400
+IronPort-SDR: M9qnB0kSQckfh4QxpW8YVOq+RrSqNm8wiYXGtj8YmdLANS5ilyitrnz3R0dBiqajFfCkJVqtl1
+ 5C+XUHy74W3w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2020 19:45:52 -0700
+IronPort-SDR: Ac1IvRGTrJlk/oOvPW7Voi6/kVBLLF74FRmQ9zjzWoIRvPzx/VL7+CZFUbyjA7Ikek9DAsBgiB
+ lDmh0NWsE0aw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,366,1583222400"; 
+   d="scan'208";a="278807935"
+Received: from ingas-nuc1.sea.intel.com ([10.254.73.166])
+  by orsmga002.jf.intel.com with ESMTP; 07 May 2020 19:45:52 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2] tools/mesh-cfgclient: Save node's composition in config
+Date:   Thu,  7 May 2020 19:45:48 -0700
+Message-Id: <20200508024548.32091-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKr3r-6cXGAS3w6SR2-fw2h9gHqvnH=H7O6MSxnandUcg@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------C332DC2BCD71CE49BEB905CC"
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------C332DC2BCD71CE49BEB905CC
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Store remote node's composition after successful completion
+of "composition-get" command (config menu).
+Show model IDs when printing node info for "list-nodes" command
+(main menu).
+---
+ tools/mesh/cfgcli.c  |   2 +
+ tools/mesh/mesh-db.c | 287 ++++++++++++++++++++++++++++++++++++++++---
+ tools/mesh/mesh-db.h |  10 +-
+ tools/mesh/remote.c  |  93 +++++++++++++-
+ tools/mesh/remote.h  |   2 +
+ 5 files changed, 367 insertions(+), 27 deletions(-)
 
-On 2020-05-07 23:29, Luiz Augusto von Dentz wrote:
-> Hi Andrey,
-> 
-> On Wed, May 6, 2020 at 10:32 AM Andrey Semashev
-> <andrey.semashev@gmail.com> wrote:
->>
->> On 2020-05-06 19:56, Andrey Semashev wrote:
->>> Hello!
->>>
->>> I have a problem connecting Sennheiser Momentum True Wireless 2
->>> headphones over Bluetooth. The headphones say "Connected" and then
->>> reboot immediately after. After reboot the headphones say "Power on" and
->>> try connecting again, and fail the same way, and so on.
->>>
->>>   From the Bluetooth packet dump it looks like the problem happens after
->>> bluetoothd sends AVRCP ListPlayerApplicationSettingAttributes message to
->>> the headphones. The headphones send Not Implemented response and then
->>> reboot. Both in the request and the response Wireshark shows warnings
->>> about encoding issues.
->>>
->>> I'm attaching a packet dump captured from one of the connection
->>> attempts. The ListPlayerApplicationSettingAttributes message is in
->>> packet 262 and the response is in packet 264.
->>>
->>> This is on Kubuntu 20.04. I tried bluez 5.53 from Kubuntu and revision
->>> 3146b7a0785758be2d4e894d44e99d29c0db983e from git master - the behavior
->>> is the same.
->>>
->>> I've also verified that the headphones do work on Windows 10. On that
->>> system, ListPlayerApplicationSettingAttributes is not present in the
->>> packet exchange. I can provide the packet dump from Windows, if needed.
->>>
->>> I hope this is the right place to report problems like this one. If not
->>> - sorry, and please point me to the right place.
->>>
->>> Thank you.
->>
->> I'll add that I can connect the headphones if I disable AVRCP by adding
->> --noplugin=avrcp to bluetoothd command line.
-> 
-> Weird the ListPlayerApplicationSettingAttributes should only really be
-> used when the remote device claims to be have target role but I doubt
-> the headsets would be implementing that so perhaps we are not
-> detecting this properly, do you have the HCI traces in btsnoop format?
-> You can collect that with use of btmon.
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index b96c6c9e6..218e82c50 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -434,6 +434,8 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 
+ 		print_composition(data, len);
+ 
++		if (!mesh_db_node_set_composition(src, data, len))
++			bt_shell_printf("Failed to save node composition!\n");
+ 		break;
+ 
+ 	case OP_APPKEY_STATUS:
+diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
+index d39435ca0..b789c3933 100644
+--- a/tools/mesh/mesh-db.c
++++ b/tools/mesh/mesh-db.c
+@@ -45,6 +45,7 @@
+ #include "tools/mesh/mesh-db.h"
+ 
+ #define KEY_IDX_INVALID NET_IDX_INVALID
++#define DEFAULT_LOCATION 0x0000
+ 
+ struct mesh_db {
+ 	json_object *jcfg;
+@@ -217,6 +218,23 @@ static bool write_uint16_hex(json_object *jobj, const char *desc,
+ 	return true;
+ }
+ 
++static bool write_uint32_hex(json_object *jobj, const char *desc, uint32_t val)
++{
++	json_object *jstring;
++	char buf[9];
++
++	snprintf(buf, 9, "%8.8x", val);
++	jstring = json_object_new_string(buf);
++	if (!jstring)
++		return false;
++
++	/* Overwrite old value if present */
++	json_object_object_del(jobj, desc);
++
++	json_object_object_add(jobj, desc, jstring);
++	return true;
++}
++
+ static json_object *get_node_by_uuid(json_object *jcfg, uint8_t uuid[16])
+ {
+ 	json_object *jarray = NULL;
+@@ -338,6 +356,65 @@ static int compare_group_addr(const void *a, const void *b, void *user_data)
+ 	return 0;
+ }
+ 
++static bool load_composition(json_object *jnode, uint16_t unicast)
++{
++	json_object *jarray;
++	int i, ele_cnt;
++
++	if (!json_object_object_get_ex(jnode, "elements", &jarray))
++		return false;
++
++	if (json_object_get_type(jarray) != json_type_array)
++		return false;
++
++	ele_cnt = json_object_array_length(jarray);
++
++	for (i = 0; i < ele_cnt; ++i) {
++		json_object *jentry, *jval, *jmods;
++		int32_t index;
++		int k, mod_cnt;
++
++		jentry = json_object_array_get_idx(jarray, i);
++		if (!json_object_object_get_ex(jentry, "index", &jval))
++			return false;
++
++		index = json_object_get_int(jval);
++		if (index > 0xff)
++			return false;
++
++		if (!json_object_object_get_ex(jentry, "models", &jmods))
++			return false;
++
++		mod_cnt = json_object_array_length(jmods);
++
++		for (k = 0; k < mod_cnt; ++k) {
++			json_object *jmod, *jid;
++			uint32_t mod_id, len;
++			const char *str;
++
++			jmod = json_object_array_get_idx(jmods, k);
++			if (!json_object_object_get_ex(jmod, "modelId", &jid))
++				return false;
++
++			str = json_object_get_string(jid);
++			len = strlen(str);
++
++			if (len != 4 && len != 8)
++				return false;
++
++			if ((len == 4) && (sscanf(str, "%04x", &mod_id) != 1))
++				return false;
++
++			if ((len == 8) && (sscanf(str, "%08x", &mod_id) != 1))
++				return false;
++
++			remote_set_model(unicast, index, mod_id, len == 8);
++		}
++	}
++
++	return true;
++}
++
+ static void load_remotes(json_object *jcfg)
+ {
+ 	json_object *jnodes;
+@@ -420,6 +497,8 @@ static void load_remotes(json_object *jcfg)
+ 				remote_add_app_key(unicast, key_idx);
+ 		}
+ 
++		load_composition(jnode, unicast);
++
+ 		node_count++;
+ 
+ 		/* TODO: Add the rest of the configuration */
+@@ -819,12 +898,34 @@ struct l_queue *mesh_db_load_groups(void)
+ 	return groups;
+ }
+ 
++static json_object *init_elements(uint8_t num_els)
++{
++	json_object *jelements;
++	uint8_t i;
++
++	jelements = json_object_new_array();
++
++	for (i = 0; i < num_els; ++i) {
++		json_object *jelement, *jmods;
++
++		jelement = json_object_new_object();
++
++		write_int(jelement, "index", i);
++		write_uint16_hex(jelement, "location", DEFAULT_LOCATION);
++		jmods = json_object_new_array();
++		json_object_object_add(jelement, "models", jmods);
++
++		json_object_array_add(jelements, jelement);
++	}
++
++	return jelements;
++}
++
+ bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
+ 							uint16_t net_idx)
+ {
+ 	json_object *jnode;
+ 	json_object *jelements, *jnodes, *jnetkeys, *jappkeys;
+-	int i;
+ 
+ 	if (!cfg || !cfg->jcfg)
+ 		return false;
+@@ -842,22 +943,7 @@ bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
+ 	if (!add_u8_16(jnode, "uuid", uuid))
+ 		goto fail;
+ 
+-	jelements = json_object_new_array();
+-	if (!jelements)
+-		goto fail;
+-
+-	for (i = 0; i < num_els; ++i) {
+-		json_object *jelement = json_object_new_object();
+-
+-		if (!jelement) {
+-			json_object_put(jelements);
+-			goto fail;
+-		}
+-
+-		write_int(jelement, "elementIndex", i);
+-		json_object_array_add(jelements, jelement);
+-	}
+-
++	jelements = init_elements(num_els);
+ 	json_object_object_add(jnode, "elements", jelements);
+ 
+ 	jnetkeys = json_object_new_array();
+@@ -932,6 +1018,173 @@ bool mesh_db_del_node(uint16_t unicast)
+ 	return save_config();
+ }
+ 
++static json_object *init_model(uint16_t mod_id)
++{
++	json_object *jmod;
++
++	jmod = json_object_new_object();
++
++	if (!write_uint16_hex(jmod, "modelId", mod_id)) {
++		json_object_put(jmod);
++		return NULL;
++	}
++
++	return jmod;
++}
++
++static json_object *init_vendor_model(uint32_t mod_id)
++{
++	json_object *jmod;
++
++	jmod = json_object_new_object();
++
++	if (!write_uint32_hex(jmod, "modelId", mod_id)) {
++		json_object_put(jmod);
++		return NULL;
++	}
++
++	return jmod;
++}
++
++bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data, uint16_t len)
++{
++	uint16_t features;
++	int sz, i = 0;
++	json_object *jnode, *jobj, *jelements;
++	uint16_t crpl;
++
++	if (!cfg || !cfg->jcfg)
++		return false;
++
++	jnode = get_node_by_unicast(unicast);
++	if (!jnode)
++		return false;
++
++	/* skip page -- We only support Page Zero */
++	data++;
++	len--;
++
++	/* If "crpl" property is present, composition is already recorded */
++	if (json_object_object_get_ex(jnode, "crpl", &jobj))
++		return true;
++
++	if (!write_uint16_hex(jnode, "cid", l_get_le16(&data[0])))
++		return false;
++
++	if (!write_uint16_hex(jnode, "pid", l_get_le16(&data[2])))
++		return false;
++
++	if (!write_uint16_hex(jnode, "vid", l_get_le16(&data[4])))
++		return false;
++
++	crpl = l_get_le16(&data[6]);
++
++	features = l_get_le16(&data[8]);
++	data += 10;
++	len -= 10;
++
++	jobj = json_object_object_get(jnode, "features");
++	if (!jobj) {
++		jobj = json_object_new_object();
++		json_object_object_add(jnode, "features", jobj);
++	}
++
++	if (!(features & FEATURE_RELAY))
++		write_int(jobj, "relay", 2);
++
++	if (!(features & FEATURE_FRIEND))
++		write_int(jobj, "friend", 2);
++
++	if (!(features & FEATURE_PROXY))
++		write_int(jobj, "proxy", 2);
++
++	if (!(features & FEATURE_LPN))
++		write_int(jobj, "lowPower", 2);
++
++	jelements = json_object_object_get(jnode, "elements");
++	if (!jelements)
++		return false;
++
++	sz = json_object_array_length(jelements);
++
++	while (len) {
++		json_object *jentry, *jmods;
++		uint32_t mod_id;
++		uint8_t m, v;
++
++		/* Mismatch in the element count */
++		if (i >= sz)
++			return false;
++
++		jentry = json_object_array_get_idx(jelements, i);
++
++		write_int(jentry, "index", i);
++
++		if (!write_uint16_hex(jentry, "location", l_get_le16(data)))
++			return false;
++
++		data += 2;
++		len -= 2;
++
++		m = *data++;
++		v = *data++;
++		len -= 2;
++
++		jmods = json_object_object_get(jentry, "models");
++		if (!jmods) {
++			/* For backwards compatibility */
++			jmods = json_object_new_array();
++			json_object_object_add(jentry, "models", jmods);
++		}
++
++		while (len >= 2 && m--) {
++			mod_id = l_get_le16(data);
++
++			jobj = init_model(mod_id);
++			if (!jobj)
++				goto fail;
++
++			json_object_array_add(jmods, jobj);
++			data += 2;
++			len -= 2;
++		}
++
++		while (len >= 4 && v--) {
++			jobj = json_object_new_object();
++			mod_id = l_get_le16(data + 2);
++			mod_id = l_get_le16(data) << 16 | mod_id;
++
++			jobj = init_vendor_model(mod_id);
++			if (!jobj)
++				goto fail;
++
++			json_object_array_add(jmods, jobj);
++
++			data += 4;
++			len -= 4;
++		}
++
++		i++;
++	}
++
++	/* CRPL is written last. Will be used to check composition's presence */
++	if (!write_uint16_hex(jnode, "crpl", crpl))
++		goto fail;
++
++	/* Initiate remote's composition from storage */
++	if (!load_composition(jnode, unicast))
++		goto fail;
++
++	return save_config();
++
++fail:
++	/* Reset elements array */
++	json_object_object_del(jnode, "elements");
++	init_elements(sz);
++
++	return false;
++}
++
+ bool mesh_db_get_token(uint8_t token[8])
+ {
+ 	if (!cfg || !cfg->jcfg)
+diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
+index 1f9e4e3d3..89c644400 100644
+--- a/tools/mesh/mesh-db.h
++++ b/tools/mesh/mesh-db.h
+@@ -38,11 +38,11 @@ bool mesh_db_get_addr_range(uint16_t *low, uint16_t *high);
+ bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
+ 							uint16_t net_idx);
+ bool mesh_db_del_node(uint16_t unicast);
+-bool mesh_db_node_set_composition(uint16_t unicast, uint16_t cid, uint16_t pid,
+-						uint16_t vid, uint16_t crpl,
+-						struct mesh_config_modes modes,
+-						struct l_queue *elements);
+-
++bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data,
++								uint16_t len);
++bool mesh_db_add_provisioner(const char *name, uint8_t uuid[16],
++				uint16_t unicast_low, uint16_t unicast_high,
++				uint16_t group_low, uint16_t group_high);
+ bool mesh_db_node_set_net_transmit(uint16_t unicast, uint8_t cnt,
+ 							uint16_t interval);
+ bool mesh_db_node_net_key_add(uint16_t unicast, uint16_t idx);
+diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
+index 24bc59129..344de798b 100644
+--- a/tools/mesh/remote.c
++++ b/tools/mesh/remote.c
+@@ -35,12 +35,14 @@ struct remote_node {
+ 	uint16_t unicast;
+ 	struct l_queue *net_keys;
+ 	struct l_queue *app_keys;
++	struct l_queue **els;
+ 	uint8_t uuid[16];
+ 	uint8_t num_ele;
+ };
+ 
+ static struct l_queue *nodes;
+ 
++
+ static bool key_present(struct l_queue *keys, uint16_t app_idx)
+ {
+ 	const struct l_queue_entry *l;
+@@ -55,6 +57,26 @@ static bool key_present(struct l_queue *keys, uint16_t app_idx)
+ 	return false;
+ }
+ 
++static int compare_mod_id(const void *a, const void *b, void *user_data)
++{
++	uint32_t id1 = L_PTR_TO_UINT(a);
++	uint32_t id2 = L_PTR_TO_UINT(b);
++
++	if (id1 >= VENDOR_ID_MASK)
++		id1 &= ~VENDOR_ID_MASK;
++
++	if (id2 >= VENDOR_ID_MASK)
++		id2 &= ~VENDOR_ID_MASK;
++
++	if (id1 < id2)
++		return -1;
++
++	if (id1 > id2)
++		return 1;
++
++	return 0;
++}
++
+ static int compare_unicast(const void *a, const void *b, void *user_data)
+ {
+ 	const struct remote_node *a_rmt = a;
+@@ -92,7 +114,7 @@ static bool match_bound_key(const void *a, const void *b)
+ uint8_t remote_del_node(uint16_t unicast)
+ {
+ 	struct remote_node *rmt;
+-	uint8_t num_ele;
++	uint8_t num_ele, i;
+ 
+ 	rmt = l_queue_remove_if(nodes, match_node_addr, L_UINT_TO_PTR(unicast));
+ 	if (!rmt)
+@@ -100,8 +122,13 @@ uint8_t remote_del_node(uint16_t unicast)
+ 
+ 	num_ele = rmt->num_ele;
+ 
+-	l_queue_destroy(rmt->net_keys, NULL);
+-	l_queue_destroy(rmt->app_keys, NULL);
++	for (i = 0; i < num_ele; ++i)
++		l_queue_destroy(rmt->els[i], NULL);
++
++	l_free(rmt->els);
++
++	l_queue_destroy(rmt->net_keys, l_free);
++	l_queue_destroy(rmt->app_keys, l_free);
+ 	l_free(rmt);
+ 
+ 	mesh_db_del_node(unicast);
+@@ -126,6 +153,8 @@ bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
+ 
+ 	l_queue_push_tail(rmt->net_keys, L_UINT_TO_PTR(net_idx));
+ 
++	rmt->els = l_new(struct l_queue *, ele_cnt);
++
+ 	if (!nodes)
+ 		nodes = l_queue_new();
+ 
+@@ -133,6 +162,30 @@ bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
+ 	return true;
+ }
+ 
++bool remote_set_model(uint16_t unicast, uint8_t ele_idx, uint32_t mod_id,
++								bool vendor)
++{
++	struct remote_node *rmt;
++
++	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(unicast));
++	if (!rmt)
++		return false;
++
++	if (ele_idx >= rmt->num_ele)
++		return false;
++
++	if (!rmt->els[ele_idx])
++		rmt->els[ele_idx] = l_queue_new();
++
++	if (!vendor)
++		mod_id = VENDOR_ID_MASK | mod_id;
++
++	l_queue_insert(rmt->els[ele_idx], L_UINT_TO_PTR(mod_id),
++							compare_mod_id, NULL);
++
++	return true;
++}
++
+ bool remote_add_net_key(uint16_t addr, uint16_t net_idx)
+ {
+ 	struct remote_node *rmt;
+@@ -224,9 +277,35 @@ static void print_key(void *key, void *user_data)
+ 	bt_shell_printf("%u (0x%3.3x), ", idx, idx);
+ }
+ 
++static void print_model(void *model, void *user_data)
++{
++	uint32_t mod_id = L_PTR_TO_UINT(model);
++
++	if (mod_id >= VENDOR_ID_MASK) {
++		mod_id &= ~VENDOR_ID_MASK;
++		bt_shell_printf("\t\t\t" COLOR_GREEN "SIG model: %4.4x\n"
++							COLOR_OFF, mod_id);
++		return;
++	}
++
++	bt_shell_printf("\t\t\t" COLOR_GREEN "Vendor model: %8.8x\n"
++							COLOR_OFF, mod_id);
++
++}
++
++static void print_element(struct l_queue *mods, int idx)
++{
++	if (!mods)
++		return;
++
++	bt_shell_printf("\t\t" COLOR_GREEN "element %u:\n" COLOR_OFF, idx);
++	l_queue_foreach(mods, print_model, NULL);
++}
++
+ static void print_node(void *rmt, void *user_data)
+ {
+ 	struct remote_node *node = rmt;
++	int i;
+ 	char *str;
+ 
+ 	bt_shell_printf(COLOR_YELLOW "Mesh node:\n" COLOR_OFF);
+@@ -235,8 +314,6 @@ static void print_node(void *rmt, void *user_data)
+ 	l_free(str);
+ 	bt_shell_printf("\t" COLOR_GREEN "primary = %4.4x\n" COLOR_OFF,
+ 								node->unicast);
+-	bt_shell_printf("\t" COLOR_GREEN "elements = %u\n" COLOR_OFF,
+-								node->num_ele);
+ 	bt_shell_printf("\t" COLOR_GREEN "net_keys = ");
+ 	l_queue_foreach(node->net_keys, print_key, NULL);
+ 	bt_shell_printf("\n" COLOR_OFF);
+@@ -246,6 +323,12 @@ static void print_node(void *rmt, void *user_data)
+ 		l_queue_foreach(node->app_keys, print_key, NULL);
+ 		bt_shell_printf("\n" COLOR_OFF);
+ 	}
++
++	bt_shell_printf("\t" COLOR_GREEN "elements (%u):\n" COLOR_OFF,
++								node->num_ele);
++
++	for (i = 0; i < node->num_ele; ++i)
++		print_element(node->els[i], i);
+ }
+ 
+ void remote_print_node(uint16_t addr)
+diff --git a/tools/mesh/remote.h b/tools/mesh/remote.h
+index 63382ed90..33398c8bd 100644
+--- a/tools/mesh/remote.h
++++ b/tools/mesh/remote.h
+@@ -20,6 +20,8 @@
+ bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
+ 					uint8_t ele_cnt, uint16_t net_idx);
+ uint8_t remote_del_node(uint16_t unicast);
++bool remote_set_model(uint16_t unicast, uint8_t ele_idx, uint32_t mod_id,
++								bool vendor);
+ uint16_t remote_get_next_unicast(uint16_t low, uint16_t high, uint8_t ele_cnt);
+ bool remote_add_net_key(uint16_t addr, uint16_t net_idx);
+ bool remote_del_net_key(uint16_t addr, uint16_t net_idx);
+-- 
+2.21.3
 
-Here is the btsnoop dump attached. It was taken with your patch 
-regarding AVC_CTYPE_NOT_IMPLEMENTED applied.
-
---------------C332DC2BCD71CE49BEB905CC
-Content-Type: application/octet-stream;
- name="mtw2.btsnoop"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="mtw2.btsnoop"
-
-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
-EQ4MSAAAGVgQAAADAwENAAAAGgAAABoAAAAEAAAAAADigsql3Y9qCwAWABIARQQQEQ4DSAAA
-GVgxAAAFDQAAAAAAAAAaAAAAGgAAAAUAAAAAAOKCyqXdlCcLIBYAEgBDABARDgNIAAAZWDEA
-AAUBAAAAAAAAABcAAAAXAAAABAAAAAAA4oLKpd2UWgsAEwAPAEUEEhEOD0gAABlYMQAAAgEA
-AAAABwAAAAcAAAADAAAAAADigsql3aBkEwUBCwACAAAAABcAAAAXAAAABQAAAAAA4oLKpd21
-3gsgEwAPAEMAEhEOD0gAABlYMQAAAg1XAAAAFQAAABUAAAAEAAAAAADigsql3bYzCwARAA0A
-RQQgEQ4BSAAAGVgRAAAAAAAAFgAAABYAAAAFAAAAAADigsql3iFSCyASAA4AQwAiEQ4ISAAA
-GVgRAAABBAAAABUAAAAVAAAABAAAAAAA4oLKpd4hywsAEQANAEUEMBEOAUgAABlYMAAAAAAA
-AAcAAAAHAAAAAwAAAAAA4oLKpd5QJxMFAQsAAgAAAAALAAAACwAAAAQAAAAAAOKCyqYDkawL
-AAcAAwBBAzAHEAAAAAcAAAAHAAAAAwAAAAAA4oLKpi41BBMFAQsAAQAAAAAGAAAABgAAAAMA
-AAAAAOKCyqYuOOsFBAALAAgAAAAOAAAADgAAABEAAAAAAOKCyqYuOQABAAAADAAM1LhmGwAA
-AQAAAFYAAABW//8ADQAAAAAA4oLKpi46RQMLYmx1ZXRvb3RoZABwcm9maWxlcy9hdWRpby9h
-dmR0cC5jOmhhbmRsZV91bmFuc3dlcmVkX3JlcSgpIE5vIHJlcGx5IHRvIFN0YXJ0IHJlcXVl
-c3QAAAAAmQAAAJn//wANAAAAAADigsqmLm2iAwtibHVldG9vdGhkAHNyYy9wcm9maWxlLmM6
-ZXh0X2lvX2Rpc2Nvbm5lY3RlZCgpIFVuYWJsZSB0byBnZXQgaW8gZGF0YSBmb3IgSGVhZHNl
-dCBWb2ljZSBnYXRld2F5OiBnZXRwZWVybmFtZTogVHJhbnNwb3J0IGVuZHBvaW50IGlzIG5v
-dCBjb25uZWN0ZWQgKDEwNykAAAAADAAAAAwAAAADAAAAAADigsqmO81/BAoM1LhmGwAEBCQB
-AAAACgAAAAoAAAACAAAAAADigsqmO83KCQQHDNS4ZhsAAAAAAAYAAAAGAAAAAwAAAAAA4oLK
-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
-gsqmS+SrDAARAA0ACAQwEQ4BSAAAGVgwAAAAAAAABwAAAAcAAAADAAAAAADigsqmTdaVEwUB
-DAABAAAAAAsAAAALAAAABAAAAAAA4oLKpnBdWAwABwADAAUDcAcQAAAABwAAAAcAAAADAAAA
-AADigsqmm5SfEwUBDAABAAAAAAYAAAAGAAAAAwAAAAAA4oLKppuYzgUEAAwACAAAAA4AAAAO
-AAAAEQAAAAAA4oLKppuZBAEAAAAMAAzUuGYbAAABAAAAmQAAAJn//wANAAAAAADigsqmm5pY
-AwtibHVldG9vdGhkAHNyYy9wcm9maWxlLmM6ZXh0X2lvX2Rpc2Nvbm5lY3RlZCgpIFVuYWJs
-ZSB0byBnZXQgaW8gZGF0YSBmb3IgSGVhZHNldCBWb2ljZSBnYXRld2F5OiBnZXRwZWVybmFt
-ZTogVHJhbnNwb3J0IGVuZHBvaW50IGlzIG5vdCBjb25uZWN0ZWQgKDEwNykAAAAAVgAAAFb/
-/wANAAAAAADigsqmm5qRAwtibHVldG9vdGhkAHByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6aGFu
-ZGxlX3VuYW5zd2VyZWRfcmVxKCkgTm8gcmVwbHkgdG8gU3RhcnQgcmVxdWVzdAA=
---------------C332DC2BCD71CE49BEB905CC--
