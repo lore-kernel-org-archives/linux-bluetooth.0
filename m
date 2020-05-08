@@ -2,105 +2,127 @@ Return-Path: <SRS0=6WQ0=6W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC089C38A2A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 08:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C110AC38A2A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 09:24:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B653120731
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 08:59:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJhuvVh3"
+	by mail.kernel.org (Postfix) with ESMTP id 989D3208CA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 May 2020 09:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgEHI7b (ORCPT
+        id S1726750AbgEHJYH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 May 2020 04:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725815AbgEHI7b (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 May 2020 04:59:31 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC6DC05BD43
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2020 01:59:30 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id 207so585192pgc.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2020 01:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Xk8y/AJ3/8gnCPsTQkgW4RnJXrH/qbL8MduwYz1/YjI=;
-        b=AJhuvVh3jErzZCtRUXEn5epUTCpR493HY9pTw7t1J6DIQXGK17ju3so3ydng83CTxG
-         R6s37+dGuunCeKR2Wcvu0a9iw1pU7AMe20v1qNuZGGSN0oF87BtVz8s0xqsWPbKTLv6P
-         uaYr9sJ2QERHayG5Bsmjh+37mkmyEN/+NjXaHYxEBaNXMrjyJBpEQ04HG5ozZq5bp74Q
-         MwQUCxSnO4NwhkZO9/Ov0l+laIXxZMfxNrHW55C0wI7XGO26IvM/yAWuMf42JAMQW/+z
-         g4HkREBbaFHIhpXLn8Rg8bRcwQdGOLvkhdr4kHLKPRCFQHiys8tP9hzb0WHhbGnfzsB0
-         CY9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Xk8y/AJ3/8gnCPsTQkgW4RnJXrH/qbL8MduwYz1/YjI=;
-        b=ZQm7OfFnUOM6T+D6l3/s14Sj6BVcfKpKDH5oEGU2R4farenddfzvpJE2Ur8qOL5iqW
-         ql4PKBjZc8/6uoY9y/K5UqdCZ6p35I1uC0N2xG6fPAoGZNwQtp8vXRCagJG++Ji/dhBt
-         9Eo/X+I4GFfjjr5mR1VBERBBEkinjG30fh35X9ablf4oI3Y26ZlhCl3vNEMeJLOW6ila
-         PazoDPLyVSz+K09sVhMjuo0LMvOzhWvxonLW3dz8ASsHZFY+o8+Sf8sJlE2RxQaYgxMG
-         njmF5rXvWa/YI0ey/AMuqaorWWZckTcA4wJ13mRfHmhsUo9dskQQ/qgxLlrg6KUukVr6
-         PavA==
-X-Gm-Message-State: AGi0Pua76Gz7Z8oyG5YsemdCIOnMp14/sRcFI6KEHE7fhB2MtzwuwuUP
-        lgdNmgG5sKtRF9x8n6cavhiC22AGKHqv/g==
-X-Google-Smtp-Source: APiQypJGY76ioTCcrSpx/VIhrqA7rBunRQzPzlSq+GVU2VyA0YE3qHYY/cusnSx4bCJBBZiSyi9JAw==
-X-Received: by 2002:a62:6385:: with SMTP id x127mr1858639pfb.276.1588928370341;
-        Fri, 08 May 2020 01:59:30 -0700 (PDT)
-Received: from rsegal-mobl.ger.corp.intel.com (jfdmzpr03-ext.jf.intel.com. [134.134.139.72])
-        by smtp.gmail.com with ESMTPSA id c1sm1138992pfo.152.2020.05.08.01.59.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 May 2020 01:59:29 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v3 0/7] Patches introducing experimental feature support
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <cover.1588751831.git.marcel@holtmann.org>
-Date:   Fri, 8 May 2020 11:59:26 +0300
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <1978B405-610A-4A7C-8E0A-1128B471A707@gmail.com>
-References: <cover.1588751831.git.marcel@holtmann.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Fri, 8 May 2020 05:24:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42542 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725710AbgEHJYH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 May 2020 05:24:07 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 207623] New: Bluetooth LE keyboard wake ups slowly and drops
+ key presses
+Date:   Fri, 08 May 2020 09:24:06 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: chfast@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-207623-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+https://bugzilla.kernel.org/show_bug.cgi?id=207623
 
-On 6. May 2020, at 10.57, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Marcel Holtmann (7):
->  Bluetooth: Add MGMT_EV_PHY_CONFIGURATION_CHANGED to supported list
->  Bluetooth: Replace BT_DBG with bt_dev_dbg for management support
->  Bluetooth: replace zero-length array with flexible-array member
->  Bluetooth: Introduce HCI_MGMT_HDEV_OPTIONAL option
->  Bluetooth: Replace BT_DBG with bt_dev_dbg for security manager 
->    support
->  Bluetooth: Add support for experimental features configuration
->  Bluetooth: Introduce debug feature when dynamic debug is disabled
-> 
-> include/net/bluetooth/bluetooth.h |  11 +
-> include/net/bluetooth/hci.h       |   1 +
-> include/net/bluetooth/hci_core.h  |   1 +
-> include/net/bluetooth/mgmt.h      |  69 ++++--
-> net/bluetooth/Kconfig             |   7 +
-> net/bluetooth/hci_sock.c          |  12 +-
-> net/bluetooth/lib.c               |  33 +++
-> net/bluetooth/mgmt.c              | 364 +++++++++++++++++++++---------
-> net/bluetooth/smp.c               |   8 +-
-> 9 files changed, 365 insertions(+), 141 deletions(-)
+            Bug ID: 207623
+           Summary: Bluetooth LE keyboard wake ups slowly and drops key
+                    presses
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.4.0
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: chfast@gmail.com
+        Regression: No
 
-All patches in this set have been applied to bluetooth-next. Thanks.
+Created attachment 289001
+  --> https://bugzilla.kernel.org/attachment.cgi?id=289001&action=edit
+bluetoothd.log
 
-Johan
+Hello everyone.
+
+I have Microsoft Surface (Designer) Keyboard. It is connected by Bluetooth
+4.0/4.1 Low Energy.
+
+I'm having small usability issue with the device. After 10 minutes of being
+idle the keyboard goes to some kind of sleep state. Later, to wake it up it
+takes ~2 seconds and during this time keys pressed are ignored.
+
+Keyboard info:
+Device E8:0B:AE:73:18:16 (random)
+        Name: Surface Keyboard
+        Alias: Surface Keyboard
+        Appearance: 0x03c1
+        Icon: input-keyboard
+        Paired: yes
+        Trusted: yes
+        Blocked: no
+        Connected: yes
+        LegacyPairing: no
+        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+        UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
+        UUID: Battery Service           (0000180f-0000-1000-8000-00805f9b34fb)
+        UUID: Human Interface Device    (00001812-0000-1000-8000-00805f9b34fb)
+        Modalias: usb:v045Ep0917d0130
+
+Adapter info:
+hci0:   Type: Primary  Bus: USB
+        BD Address: 9C:B6:D0:96:E8:12  ACL MTU: 1024:8  SCO MTU: 50:8
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:186892186 acl:2266519 sco:0 events:3335487 errors:0
+        TX bytes:103210 acl:6540 sco:0 commands:1497 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF 
+        Link mode: SLAVE ACCEPT 
+        Name: 'x13'
+        Class: 0x1c010c
+        Service Classes: Rendering, Capturing, Object Transfer
+        Device Class: Computer, Laptop
+        HCI Version: 4.2 (0x8)  Revision: 0x0
+        LMP Version: 4.2 (0x8)  Subversion: 0x25a
+        Manufacturer: Qualcomm (29)
+
+
+I collected logs from bluetoothd and dmesg - see attachment with additional
+comments.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
