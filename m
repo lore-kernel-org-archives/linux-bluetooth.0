@@ -1,145 +1,120 @@
 Return-Path: <SRS0=Rej4=6X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704F9C28CBC
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 May 2020 08:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF50C47247
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 May 2020 13:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 425872184D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 May 2020 08:08:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FF02218AC
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 May 2020 13:19:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIXfthXB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqGx9xHM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgEIII1 (ORCPT
+        id S1727785AbgEINTB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 9 May 2020 04:08:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725880AbgEIII0 (ORCPT
+        Sat, 9 May 2020 09:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726891AbgEINTB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 9 May 2020 04:08:26 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5840AC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2020 01:08:24 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id e25so4101973ljg.5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 09 May 2020 01:08:24 -0700 (PDT)
+        Sat, 9 May 2020 09:19:01 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D07C061A0C;
+        Sat,  9 May 2020 06:19:01 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id y4so4574296ljn.7;
+        Sat, 09 May 2020 06:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=JGHigTwqTuqqyTCfUv7gtuRXk0RBaX/uWNjJx8Gl/Xk=;
-        b=JIXfthXBXk2r75JEBR7EkZ2VNWjpPlj+X/VqRHjoNR5jpSvFVeEWpIQbBLkvRXheis
-         bNqGAyfWlz2wA7Ocz7avBnGfdkGSBs4msbjqqChBBD9dHOPQxDO+EfH2+3/PZkiltTYs
-         vT1Y4OjINhykyp1qE1k7fQpvGe0aiRD4YI3pzhf19JNod8dAl8OLF3WdOhzM0+GCNUi0
-         7zkuFORAWu3XiRbo1VBLK80nBYjglqooqn4VFrl3b07fdbTT51XtjQftODeqsK9G8jXr
-         Kaaupr8g8mJ6IgPM9c2wjl8g3hBWS7SwOURbnd4l6IYmuGrwtpfkgU2MXnKUMUHL1UeG
-         j2sg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+fZJtWkOkMNUl6XTsiHiADWF9Kc6RxsIGqhrfQi5dRk=;
+        b=eqGx9xHMrXUUYA8PoEaJxXK+ild5Er04ALdMkmF2GBS6bgUG6+auJPq/dgqYbPzrHr
+         ugSMviR2iyfGXcP45VXnRxRVAFfnp9bZC/EcgnDeEZjmUFhyTba9Ve3aO2Hx2zBU2BME
+         Llqf318kX2bEeDl/ILaapokcZsY5ObVpOFoIw4rUBAo9ezPzrbQNZXzJFdGJIaw7Lrmi
+         zU/NtJmCfEPK+BtZ1Bp2jm9s1QV5ElRk0GFkGGFQNCSOHfYcgGRwUX88vgn9mMhnxwnz
+         tyYBsOI2o68CUm9/LkkUN+w0d3O/Xi9TmAh7IXlgSmACEHL31xXCDB2EGmGZaY+/sVXd
+         J9nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=JGHigTwqTuqqyTCfUv7gtuRXk0RBaX/uWNjJx8Gl/Xk=;
-        b=lohlJbpKq6EtXhzsuvZzRzDwljNnjcIiVpzrh/SNozzHV6kETH98s/za6kGPQW+7tb
-         JHX3xxIpqkjNvEiFnCjgncluq8rqG1wdz4SdnWv5+bGn6HsvigT3gFWa67x45VVKBFik
-         rBegLqxIFvJrnqSaHMrReN9IfkOCN8Zn208f9cQtI34IVjKeq78iL35LGCBfFgeVOyTs
-         wOHFcVCf2+PEECyDQeEtPwKiTb6QhPvxpF8vBD8SNcwedrvdJ3RqpO5Y1h8ngHIVXhzr
-         xSkmkmhCgu9sox9n8uyI0Cij3yk4BfzJil7cEkCXTxTQ8OGg4lrESjGjasDS08DiYNWg
-         1B+Q==
-X-Gm-Message-State: AOAM530s0d/wR1Qe5LIoYmUgJnax2mKB+1jPPpLjUiniKFjtrzzcsKOO
-        g9+2dmDXgojfmFPH+R3NE0xdEyUtTYf2LAKXrlFfn8x0XEw=
-X-Google-Smtp-Source: ABdhPJyKnvHWzV22OQWnFJWB+lYN/GvhGs9F6jaRUlvwJ3P0NSbQgXRhGmFUqePs+wMOT6BE2fS9/k/BkeTYp+EdgfM=
-X-Received: by 2002:a2e:910e:: with SMTP id m14mr3767874ljg.141.1589011702618;
- Sat, 09 May 2020 01:08:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+fZJtWkOkMNUl6XTsiHiADWF9Kc6RxsIGqhrfQi5dRk=;
+        b=S12NPtng5JIJwidUDZb/ncS8fr7E/o6oZqf1H11W/z/MAfY+mdUTFrwf544fsrfWe1
+         i7iZFHDvQ2MRzeclix1Y0h8Tb9tTdeFDitkzozgI2OLoRe5yeSJ9V8x3RsNO5sLJxCfU
+         u7/CO1BPpBMRFZkjVxOgaRhqHM970rVMnMa0l+nBTAs6TEAsD9DIp3L7YKoaBQ7y1ArF
+         SaI0iwgj2cY8HdRL7MDhi9yA7jodoeE05JWuyEiZDYIPE7gLKeed7wsWK2j29QvSnAGl
+         dBc6fuudxFr4HXXjcr6YgjEM/4Bb/mydF2HNvDkI+KYcOSUC5F5QxdMgHnWCxwyq5MX+
+         yQCw==
+X-Gm-Message-State: AOAM530QRBB43W3G/DzQHrDpGwhhnuTWUDlQq3vV1Nd5uEt27v3/bKrQ
+        aRhCf+TVvHjZ/CXsih5eV12MJRUryO4=
+X-Google-Smtp-Source: ABdhPJxmYVz6a9UOmFgdn5YnqxO0IIk8isZ6TsCVXS9pSZ1zCIee0z33rBdcNfsvJ4yydD4ptNcimw==
+X-Received: by 2002:a2e:9712:: with SMTP id r18mr4799815lji.225.1589030339581;
+        Sat, 09 May 2020 06:18:59 -0700 (PDT)
+Received: from localhost.localdomain (h-158-174-22-22.NA.cust.bahnhof.se. [158.174.22.22])
+        by smtp.gmail.com with ESMTPSA id e25sm4075185lfb.89.2020.05.09.06.18.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 May 2020 06:18:58 -0700 (PDT)
+From:   Rikard Falkeborn <rikard.falkeborn@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>
+Subject: [PATCH] Bluetooth: serdev: Constify serdev_device_ops
+Date:   Sat,  9 May 2020 15:17:19 +0200
+Message-Id: <20200509131719.5681-1-rikard.falkeborn@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <CA+icZUWtcQOVcb4-a6aCztjszh4gmk_QVXgHsn9FLOeb-zpLpg@mail.gmail.com>
-In-Reply-To: <CA+icZUWtcQOVcb4-a6aCztjszh4gmk_QVXgHsn9FLOeb-zpLpg@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Sat, 9 May 2020 10:08:11 +0200
-Message-ID: <CA+icZUU5Uz-zjQ7iPddvaOZrr19mMMNRN1G8RrLDrz6CEJCgzA@mail.gmail.com>
-Subject: Re: [btintel][ID 8086:0189 Intel Corp.] unexpected event for opcode
- 0x0000 / SCO packet for unknown connection handle
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000144a1b05a5329eec"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---000000000000144a1b05a5329eec
-Content-Type: text/plain; charset="UTF-8"
+serdev_device_ops is not modified and can be const. Also, remove the
+unneeded declaration of it.
 
-root@iniza:~# btmon -w trace-log_btmon.txt
+Output from the file command before and after:
 
-File is attached.
+Before:
+   text    data     bss     dec     hex filename
+   7192    2408     192    9792    2640 drivers/bluetooth/hci_serdev.o
 
-- Sedat -
+After:
+   text    data     bss     dec     hex filename
+   7256    2344     192    9792    2640 drivers/bluetooth/hci_serdev.o
 
---000000000000144a1b05a5329eec
-Content-Type: text/plain; charset="windows-1252"; name="trace-log_btmon.txt"
-Content-Disposition: attachment; filename="trace-log_btmon.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k9zcibfn0>
-X-Attachment-Id: f_k9zcibfn0
+Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+---
+ drivers/bluetooth/hci_serdev.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-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
---000000000000144a1b05a5329eec--
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 4652896d4990..599855e4c57c 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -21,8 +21,6 @@
+ 
+ #include "hci_uart.h"
+ 
+-static struct serdev_device_ops hci_serdev_client_ops;
+-
+ static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -260,7 +258,7 @@ static int hci_uart_receive_buf(struct serdev_device *serdev, const u8 *data,
+ 	return count;
+ }
+ 
+-static struct serdev_device_ops hci_serdev_client_ops = {
++static const struct serdev_device_ops hci_serdev_client_ops = {
+ 	.receive_buf = hci_uart_receive_buf,
+ 	.write_wakeup = hci_uart_write_wakeup,
+ };
+-- 
+2.26.2
+
