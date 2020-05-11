@@ -5,24 +5,24 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05934C47255
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3C9C47255
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:59:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCF782184D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:06:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A31112192A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726068AbgEKEGT convert rfc822-to-8bit (ORCPT
+        id S1727019AbgEKE7z convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 May 2020 00:06:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43040 "EHLO mail.kernel.org"
+        Mon, 11 May 2020 00:59:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46088 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725562AbgEKEGT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 May 2020 00:06:19 -0400
+        id S1726054AbgEKE7z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 11 May 2020 00:59:55 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 207629] BISECTED Bluetooth: hci0: command 0x2042 tx timeout -
  suspend fails - Dell XPS 9300
-Date:   Mon, 11 May 2020 04:06:18 +0000
+Date:   Mon, 11 May 2020 04:59:54 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,8 +37,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: blocked
-Message-ID: <bug-207629-62941-B0OPmx8hDm@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-207629-62941-KnnCiacjrC@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-207629-62941@https.bugzilla.kernel.org/>
 References: <bug-207629-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -57,13 +57,20 @@ Len Brown (lenb@kernel.org) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-             Blocks|                            |178231
+     Kernel Version|5.7.rc1, 5.7-rc2, 5.7-rc3,  |5.7-rc1, 5.7-rc2, 5.7-rc3,
+                   |5.7-rc4                     |5.7-rc4, 5.7-rc5
 
+--- Comment #5 from Len Brown (lenb@kernel.org) ---
+5.7-rc5 also fails.
 
-Referenced Bugs:
+It works with the following two commits reverted:
 
-https://bugzilla.kernel.org/show_bug.cgi?id=178231
-[Bug 178231] Meta-bug: Linux suspend-to-mem and freeze performance optimization
+# "Bluetooth: Pause discovery and advertising during suspend"
+git revert 4867bd007d25a8dfd4ffc558534f7aec8b361789
+
+# "Bluetooth: Handle LE devices during suspend"
+git revert dd522a7429b07e4441871ae75ebbfcf53635bdd4
+
 -- 
 You are receiving this mail because:
 You are the assignee for the bug.
