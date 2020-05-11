@@ -1,29 +1,29 @@
-Return-Path: <SRS0=BvBO=6Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=PQ2f=6Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC83EC38A2A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 May 2020 18:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF1E0C38A2A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 03:05:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCD2220737
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 May 2020 18:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8866924976
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 03:05:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729185AbgEJSxn convert rfc822-to-8bit (ORCPT
+        id S1727094AbgEKDFz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 10 May 2020 14:53:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44750 "EHLO mail.kernel.org"
+        Sun, 10 May 2020 23:05:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54924 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729113AbgEJSxn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 10 May 2020 14:53:43 -0400
+        id S1725830AbgEKDFz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 10 May 2020 23:05:55 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Sun, 10 May 2020 18:53:41 +0000
+Subject: [Bug 207629] BISECTED Bluetooth: hci0: command 0x2042 tx timeout -
+ suspend fails - Dell XPS 9300
+Date:   Mon, 11 May 2020 03:05:54 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -32,16 +32,16 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: m.novosyolov@rosalinux.ru
-X-Bugzilla-Status: REOPENED
+X-Bugzilla-Who: lenb@kernel.org
+X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-Dt8XxW3iHq@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc short_desc
+Message-ID: <bug-207629-62941-Yc2xFJcOYw@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-207629-62941@https.bugzilla.kernel.org/>
+References: <bug-207629-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -52,25 +52,35 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+https://bugzilla.kernel.org/show_bug.cgi?id=207629
 
---- Comment #72 from Mikhail Novosyolov (m.novosyolov@rosalinux.ru) ---
-(In reply to Alex from comment #71)
-> Unfortunately only part of devices actually work after detection. For
-> example mine was detected, but I was not able to pair anything to it (my
-> logs and traces were attached to this thread)
-Do you mean that some devices with UDB device/vendor ID 0x0811/0x8891 do work
-and some do not?!
+Len Brown (lenb@kernel.org) changed:
 
-Btw, some crappy USB dongles may have to be usb_modeswitch'ed. I once had to
-deal with a RTL8188GU-based USB WiFi dongle Tenda W311MI. It reported one model
-(USB device ID) before being usb_modeswitch'ed and another model after being
-usb_modeswitch'ed.
-https://www.raspberrypi.org/forums/viewtopic.php?t=215668
-https://nixtux.ru/718
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |abhishekpandit@chromium.org
+            Summary|Bluetooth: hci0: command    |BISECTED Bluetooth: hci0:
+                   |0x2042 tx timeout - suspend |command 0x2042 tx timeout -
+                   |fails - Dell XPS 9300       |suspend fails - Dell XPS
+                   |                            |9300
 
-I mean that in some cases you may be trying to make an incorrect model work...
-Hope that this is not the case.
+--- Comment #4 from Len Brown (lenb@kernel.org) ---
+dd522a7429b07e4441871ae75ebbfcf53635bdd4 is the first bad commit
+commit dd522a7429b07e4441871ae75ebbfcf53635bdd4
+Author: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed Mar 11 08:54:02 2020 -0700
+
+    Bluetooth: Handle LE devices during suspend
+
+    To handle LE devices, we must first disable passive scanning and
+    disconnect all connected devices. Once that is complete, we update the
+    whitelist and re-enable scanning
+
+    Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+
+Unfortunately this commit, by itself, does not cleanly revert from upstream.
 
 -- 
 You are receiving this mail because:
