@@ -6,131 +6,92 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D46DC54E8D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F1EC47255
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:21:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 772BB207DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F06C5207DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729313AbgEKKUn convert rfc822-to-8bit (ORCPT
+        id S1729327AbgEKKVF convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 May 2020 06:20:43 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34435 "EHLO
+        Mon, 11 May 2020 06:21:05 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58105 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727093AbgEKKUn (ORCPT
+        with ESMTP id S1727093AbgEKKVF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 May 2020 06:20:43 -0400
+        Mon, 11 May 2020 06:21:05 -0400
 Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8258DCECE3;
-        Mon, 11 May 2020 12:30:23 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6E513CECE3;
+        Mon, 11 May 2020 12:30:45 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: pull request: bluetooth-next 2020-05-09
+Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: Add support for Intel Bluetooth
+ Device Typhoon Peak (8087:0032)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200509152445.262a84f6@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-Date:   Mon, 11 May 2020 12:20:10 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
+In-Reply-To: <CA8F774D-7073-4EC4-97AF-F5EF431E8E46@holtmann.org>
+Date:   Mon, 11 May 2020 12:21:03 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        kiran.k@intel.com, "Hegde, Raghuram" <raghuram.hegde@intel.com>,
+        Tumkur@vger.kernel.org, Narayan@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <BC8E9B93-8D4F-4983-9D97-8D19BF27736C@holtmann.org>
-References: <20200509184928.GA26120@jhedberg-mac01.local>
- <20200509152445.262a84f6@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-To:     Jakub Kicinski <kuba@kernel.org>
+Message-Id: <96D67A1D-9EBF-4CE1-B2F6-239C7071D871@holtmann.org>
+References: <20200427094558.16649-1-amit.k.bag@intel.com>
+ <CA8F774D-7073-4EC4-97AF-F5EF431E8E46@holtmann.org>
+To:     Amit K Bag <amit.k.bag@intel.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+Hi Amit,
 
->> Here's another set of Bluetooth patches for the 5.8 kernel:
+>> Device from /sys/kernel/debug/usb/devices:
 >> 
->> - Add support for Intel Typhoon Peak device (8087:0032)
->> - Add device tree bindings for Realtek RTL8723BS device
->> - Add device tree bindings for Qualcomm QCA9377 device
->> - Add support for experimental features configuration through mgmt
->> - Multiple fixes & cleanups to the btbcm driver
->> - Add support for LE scatternet topology for selected devices
->> - A few other smaller fixes & cleanups
+>> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+>> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=8087 ProdID=0032 Rev= 0.00
+>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 >> 
->> Please let me know if there are any issues pulling. Thanks.
+>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+>> Signed-off-by: Tumkur Narayan, Chethan <chethan.tumkur.narayan@intel.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 2 ++
+>> 1 file changed, 2 insertions(+)
 > 
-> Is your tree immutable, is there a chance you could still get the missing sign-off?
-> 
-> Commit bf1f79470a62 ("Bluetooth: btusb: Add support for Intel Bluetooth Device Typhoon Peak (8087:0032)")
-> 	author Signed-off-by missing
-> 	author email:    raghuram.hegde@intel.com
-> 	committer email: marcel@holtmann.org
-> 	Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> 	Signed-off-by: Tumkur Narayan, Chethan <chethan.tumkur.narayan@intel.com>
-> 	Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> Also, in the same patch:
-> 
-> ---------------------------------------------------------------
-> 0015-Bluetooth-btusb-Add-support-for-Intel-Bluetooth-Devi.patch
-> ---------------------------------------------------------------
-> ERROR: code indent should use tabs where possible
-> #55: FILE: drivers/bluetooth/btusb.c:346:
-> +                                                     BTUSB_WIDEBAND_SPEECH},$
-> 
-> WARNING: please, no spaces at the start of a line
-> #55: FILE: drivers/bluetooth/btusb.c:346:
-> +                                                     BTUSB_WIDEBAND_SPEECH},$
-> 
-> WARNING: Missing Signed-off-by: line by nominal patch author '"Hegde, Raghuram" <raghuram.hegde@intel.com>'
-> 
-> total: 1 errors, 2 warnings, 0 checks, 8 lines checked
+> patch has been applied to bluetooth-next tree.
 
-I took this patch out. They should fix it up and re-submit it.
+so I am taking this patch back out. You are missing a Signed-off-by line. Please fix that and I also prefer first name last name for the addresses.
 
-> 
-> 
-> And:
-> 
-> ------------------------------------------------------------
-> 0016-dt-bindings-net-bluetooth-Add-rtl8723bs-bluetooth.patch
-> ------------------------------------------------------------
-> WARNING: DT binding documents should be licensed (GPL-2.0-only OR BSD-2-Clause)
-> #23: FILE: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml:1:
-> +# SPDX-License-Identifier: GPL-2.0
-> 
-> total: 0 errors, 2 warnings, 0 checks, 54 lines checked
-
-I try to get this fixed, but it might have to come in a subsequent pull request.
-
-> 
-> ---------------------------------------------------------------
-> 0026-Bluetooth-Introduce-debug-feature-when-dynamic-debug.patch
-> ---------------------------------------------------------------
-> WARNING: Prefer [subsystem eg: netdev]_dbg([subsystem]dev, ... then dev_dbg(dev, ... then pr_debug(...  to printk(KERN_DEBUG ...
-> #99: FILE: net/bluetooth/lib.c:212:
-> +	printk(KERN_DEBUG pr_fmt("%pV"), &vaf);
-
-This one is on purpose and has to be printk.
-
-> WARNING: Missing a blank line after declarations
-> #135: FILE: net/bluetooth/mgmt.c:3740:
-> +		u32 flags = bt_dbg_get() ? BIT(0) : 0;
-> +		memcpy(rp->features[idx].uuid, debug_uuid, 16);
-> 
-> WARNING: Missing a blank line after declarations
-> #173: FILE: net/bluetooth/mgmt.c:3788:
-> +			bool changed = bt_dbg_get();
-> +			bt_dbg_set(false);
-
-These two were on purpose, but while at it, I fixed them up.
-
-> WARNING: 'Paramters' may be misspelled - perhaps 'Parameters'?
-> #197: FILE: net/bluetooth/mgmt.c:3812:
-> +		/* Paramters are limited to a single octet */
-
-This was a dumb spelling mistake and I fixed it up.
-
-Thanks for checking everything. I think Johan will just send a new pull request.
+In addition there is white-space damage in the patch. That needs fixing as well.
 
 Regards
 
