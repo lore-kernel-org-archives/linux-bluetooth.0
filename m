@@ -2,75 +2,137 @@ Return-Path: <SRS0=PQ2f=6Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3C9C47255
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D46DC54E8D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:20:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A31112192A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 04:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 772BB207DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 May 2020 10:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbgEKE7z convert rfc822-to-8bit (ORCPT
+        id S1729313AbgEKKUn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 May 2020 00:59:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46088 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726054AbgEKE7z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 May 2020 00:59:55 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 207629] BISECTED Bluetooth: hci0: command 0x2042 tx timeout -
- suspend fails - Dell XPS 9300
-Date:   Mon, 11 May 2020 04:59:54 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lenb@kernel.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-207629-62941-KnnCiacjrC@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-207629-62941@https.bugzilla.kernel.org/>
-References: <bug-207629-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 11 May 2020 06:20:43 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:34435 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727093AbgEKKUn (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 11 May 2020 06:20:43 -0400
+Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8258DCECE3;
+        Mon, 11 May 2020 12:30:23 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: pull request: bluetooth-next 2020-05-09
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200509152445.262a84f6@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+Date:   Mon, 11 May 2020 12:20:10 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+Message-Id: <BC8E9B93-8D4F-4983-9D97-8D19BF27736C@holtmann.org>
+References: <20200509184928.GA26120@jhedberg-mac01.local>
+ <20200509152445.262a84f6@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207629
+Hi Jakub,
 
-Len Brown (lenb@kernel.org) changed:
+>> Here's another set of Bluetooth patches for the 5.8 kernel:
+>> 
+>> - Add support for Intel Typhoon Peak device (8087:0032)
+>> - Add device tree bindings for Realtek RTL8723BS device
+>> - Add device tree bindings for Qualcomm QCA9377 device
+>> - Add support for experimental features configuration through mgmt
+>> - Multiple fixes & cleanups to the btbcm driver
+>> - Add support for LE scatternet topology for selected devices
+>> - A few other smaller fixes & cleanups
+>> 
+>> Please let me know if there are any issues pulling. Thanks.
+> 
+> Is your tree immutable, is there a chance you could still get the missing sign-off?
+> 
+> Commit bf1f79470a62 ("Bluetooth: btusb: Add support for Intel Bluetooth Device Typhoon Peak (8087:0032)")
+> 	author Signed-off-by missing
+> 	author email:    raghuram.hegde@intel.com
+> 	committer email: marcel@holtmann.org
+> 	Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> 	Signed-off-by: Tumkur Narayan, Chethan <chethan.tumkur.narayan@intel.com>
+> 	Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Also, in the same patch:
+> 
+> ---------------------------------------------------------------
+> 0015-Bluetooth-btusb-Add-support-for-Intel-Bluetooth-Devi.patch
+> ---------------------------------------------------------------
+> ERROR: code indent should use tabs where possible
+> #55: FILE: drivers/bluetooth/btusb.c:346:
+> +                                                     BTUSB_WIDEBAND_SPEECH},$
+> 
+> WARNING: please, no spaces at the start of a line
+> #55: FILE: drivers/bluetooth/btusb.c:346:
+> +                                                     BTUSB_WIDEBAND_SPEECH},$
+> 
+> WARNING: Missing Signed-off-by: line by nominal patch author '"Hegde, Raghuram" <raghuram.hegde@intel.com>'
+> 
+> total: 1 errors, 2 warnings, 0 checks, 8 lines checked
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|5.7.rc1, 5.7-rc2, 5.7-rc3,  |5.7-rc1, 5.7-rc2, 5.7-rc3,
-                   |5.7-rc4                     |5.7-rc4, 5.7-rc5
+I took this patch out. They should fix it up and re-submit it.
 
---- Comment #5 from Len Brown (lenb@kernel.org) ---
-5.7-rc5 also fails.
+> 
+> 
+> And:
+> 
+> ------------------------------------------------------------
+> 0016-dt-bindings-net-bluetooth-Add-rtl8723bs-bluetooth.patch
+> ------------------------------------------------------------
+> WARNING: DT binding documents should be licensed (GPL-2.0-only OR BSD-2-Clause)
+> #23: FILE: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml:1:
+> +# SPDX-License-Identifier: GPL-2.0
+> 
+> total: 0 errors, 2 warnings, 0 checks, 54 lines checked
 
-It works with the following two commits reverted:
+I try to get this fixed, but it might have to come in a subsequent pull request.
 
-# "Bluetooth: Pause discovery and advertising during suspend"
-git revert 4867bd007d25a8dfd4ffc558534f7aec8b361789
+> 
+> ---------------------------------------------------------------
+> 0026-Bluetooth-Introduce-debug-feature-when-dynamic-debug.patch
+> ---------------------------------------------------------------
+> WARNING: Prefer [subsystem eg: netdev]_dbg([subsystem]dev, ... then dev_dbg(dev, ... then pr_debug(...  to printk(KERN_DEBUG ...
+> #99: FILE: net/bluetooth/lib.c:212:
+> +	printk(KERN_DEBUG pr_fmt("%pV"), &vaf);
 
-# "Bluetooth: Handle LE devices during suspend"
-git revert dd522a7429b07e4441871ae75ebbfcf53635bdd4
+This one is on purpose and has to be printk.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+> WARNING: Missing a blank line after declarations
+> #135: FILE: net/bluetooth/mgmt.c:3740:
+> +		u32 flags = bt_dbg_get() ? BIT(0) : 0;
+> +		memcpy(rp->features[idx].uuid, debug_uuid, 16);
+> 
+> WARNING: Missing a blank line after declarations
+> #173: FILE: net/bluetooth/mgmt.c:3788:
+> +			bool changed = bt_dbg_get();
+> +			bt_dbg_set(false);
+
+These two were on purpose, but while at it, I fixed them up.
+
+> WARNING: 'Paramters' may be misspelled - perhaps 'Parameters'?
+> #197: FILE: net/bluetooth/mgmt.c:3812:
+> +		/* Paramters are limited to a single octet */
+
+This was a dumb spelling mistake and I fixed it up.
+
+Thanks for checking everything. I think Johan will just send a new pull request.
+
+Regards
+
+Marcel
+
