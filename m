@@ -2,86 +2,121 @@ Return-Path: <SRS0=//f6=62=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD1DC2D0F8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A68D4C2D0F8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:58:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B801F20784
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 884B520747
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:58:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589324301;
+	bh=IG7ctD2YCoDDUQ8s+e3OABRWevBYaSivGtSptefac3E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Ek2ba0Xbpa1+hhoUXuVBVTLehkPwIeCjA5vQH+wnK4olBaM/CWrAOqHGaQWizdg40
+	 rGw5i6By23Oj7F+5D7q2vew/Qo+KS9ezldf33GqXNlKDzU9DELJchp9oYoOKvUz9+Q
+	 G1R4lp3R0tXiW2+iZQxvKYkbRStZI4+IVBig6oEA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730952AbgELWMp convert rfc822-to-8bit (ORCPT
+        id S1731583AbgELW6Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 May 2020 18:12:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45932 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725950AbgELWMp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 May 2020 18:12:45 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 207629] BISECTED Bluetooth: hci0: command 0x2042 tx timeout -
- suspend fails - Dell XPS 9300
-Date:   Tue, 12 May 2020 22:12:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: abhishekpandit@chromium.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-207629-62941-GwruxSuro1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-207629-62941@https.bugzilla.kernel.org/>
-References: <bug-207629-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 12 May 2020 18:58:16 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:44718 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbgELW6P (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 May 2020 18:58:15 -0400
+Received: by mail-ot1-f65.google.com with SMTP id j4so11921546otr.11;
+        Tue, 12 May 2020 15:58:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=cBiUIrWE+UaIH5tajkgyIKVaNp7k7WAC/qZUFSsrV2E=;
+        b=Quy2hnWtTrPiaE6w/mM3yp7OIxqHlGJ5eM+iUum/AwdpHUe4Rg7MFlDGRaqQAnX1SX
+         E6FRZh8GGJ30bZwIrjJFxV1DzHtfhqIuo2/1nqAtZns97/R9JtUPlr3SJ7qEgghjXZ/1
+         yVN/FGL/MFQE1W24lrgq7TbHWabnYGDdBC9pvebbrORwN4kLkUKVynIIh4Z0ky7AYaFm
+         7j1iTAz0Ed6ci4wuk29R8zsU9PD7wLeeoBfC7+omGslPMb1ZHYocGFpWQkOdEe/Lv37e
+         oI+4tl5lVY8WLmlm8yUVBsQhHG5EXMR9MpWhiKf/TCO2LW0ZBLSFK9e9LyckdmNOBVn7
+         MQmw==
+X-Gm-Message-State: AGi0PuYRrcYZUMViwY50619klgPsRgqJLAmWkrR+uJzMK7lM4wCfkBB7
+        +gOLrJlN6G1cUJOLJ7foTw==
+X-Google-Smtp-Source: APiQypL7PdOIK7Is7Nz5WrJlgO2HUyJLl2vgiulZfCULhki8ejQCn9T9ykjPsFKJznmjeuGro1Uq+g==
+X-Received: by 2002:a05:6830:22f8:: with SMTP id t24mr18122890otc.148.1589324294619;
+        Tue, 12 May 2020 15:58:14 -0700 (PDT)
+Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id w62sm5632505oia.32.2020.05.12.15.58.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2020 15:58:13 -0700 (PDT)
+Received: (nullmailer pid 32342 invoked by uid 1000);
+        Tue, 12 May 2020 22:58:12 -0000
+Date:   Tue, 12 May 2020 17:58:12 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Sandy Huang <hjc@rock-chips.com>,
+        =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>,
+        Sean Wang <sean.wang@mediatek.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Arnaud Pouliquen <arnaud.pouliquen@st.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Jyri Sarha <jsarha@ti.com>,
+        Andrzej Hajda <a.hajda@samsung.com>,
+        Benjamin Gaignard <benjamin.gaignard@linaro.org>,
+        Olivier Moysan <olivier.moysan@st.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rockchip@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH] docs: dt: fix broken links due to txt->yaml renames
+Message-ID: <20200512225812.GA28862@bogus>
+References: <967df5c3303b478b76199d4379fe40f5094f3f9b.1588584538.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <967df5c3303b478b76199d4379fe40f5094f3f9b.1588584538.git.mchehab+huawei@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207629
+On Mon, May 04, 2020 at 11:30:20AM +0200, Mauro Carvalho Chehab wrote:
+> There are some new broken doc links due to yaml renames
+> at DT. Developers should really run:
+> 
+> 	./scripts/documentation-file-ref-check
+> 
+> in order to solve those issues while submitting patches.
+> This tool can even fix most of the issues with:
+> 
+> 	./scripts/documentation-file-ref-check --fix
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+> 
+> PS.: This patch is against today's linux-next.
 
---- Comment #9 from Abhishek Pandit-Subedi (abhishekpandit@chromium.org) ---
-Could you collect grab dmesg w/ dynamic debug enabled? This will give us some
-confirmation about what's going on in Bluetooth (especially since 0x0c1a is
-sent before 0x2042 and that should be timing out first).
+That's not a base anyone can apply this patch against.
 
-Dyndebug instructions:
-https://www.kernel.org/doc/html/latest/admin-guide/dynamic-debug-howto.html
-
-Please enable debug for files hci_core.c, hci_request.c and hci_event.c:
-(for example: echo 'file hci_core.c +p' > <debugfs>/dynamic_debug/control)
-
-Collecting this is probably the most useful observation of this bunch.
-
---
-
-I'm not familiar with what power hooks Ubuntu uses but it might be worth
-checking the systemd-sleep programs to see if any of them are going to rfkill
-bluetooth:
-
-https://wiki.archlinux.org/index.php/Power_management#Hooks_in_/usr/lib/systemd/system-sleep
-
---
-
-You can also try running `rfkill event` in shell while suspending. This might
-capture any service that is rfkill-ing without your knowledge.
-
-http://manpages.ubuntu.com/manpages/bionic/man8/rfkill.8.html
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+> 
+> 
+>  .../devicetree/bindings/display/bridge/sii902x.txt          | 2 +-
+>  .../devicetree/bindings/display/rockchip/rockchip-drm.yaml  | 2 +-
+>  .../devicetree/bindings/net/mediatek-bluetooth.txt          | 2 +-
+>  .../devicetree/bindings/sound/audio-graph-card.txt          | 2 +-
+>  .../devicetree/bindings/sound/st,sti-asoc-card.txt          | 2 +-
+>  Documentation/mips/ingenic-tcu.rst                          | 2 +-
+>  MAINTAINERS                                                 | 6 +++---
+>  7 files changed, 9 insertions(+), 9 deletions(-)
