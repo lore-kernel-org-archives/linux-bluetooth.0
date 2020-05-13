@@ -2,95 +2,102 @@ Return-Path: <SRS0=PnVy=63=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86244C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 21:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05405C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 21:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6702A2054F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 21:38:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E839720659
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 21:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DWPXH1Ly"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YOK9MJ+H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729224AbgEMVim (ORCPT
+        id S1729610AbgEMVlT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 May 2020 17:38:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
+        Wed, 13 May 2020 17:41:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728954AbgEMVil (ORCPT
+        by vger.kernel.org with ESMTP id S1729196AbgEMVlS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 May 2020 17:38:41 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABEEC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 14:38:41 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id t40so11546686pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 14:38:41 -0700 (PDT)
+        Wed, 13 May 2020 17:41:18 -0400
+Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80665C061A0C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 14:41:18 -0700 (PDT)
+Received: by mail-oo1-xc44.google.com with SMTP id i9so282805ool.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 14:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=18CgMxLU+rbIFuY4cOwcYIpcbc6olt5ZDsvE6aAwIww=;
-        b=DWPXH1LygqxlwQxdOoKCxU9s3GW7rq5XKE/Khz1yu+TyDuRzFIxSRElBioo+as9al2
-         KiHmflIaGgmRrJWRbFwfmXBfF7v6+BOkHhFFtat8855otNRc0RpW2uUK5n/uILxi6+FU
-         ukykIPje2TNWTGV1xypfTXwwzjVJi8c5qs0t4=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jUgqD/1mE0M/NdryDGvF9KXQVYSbR3hhJRpB8xR6LTs=;
+        b=YOK9MJ+H0dndV1ZERYL9GGnqvRa6gSM4o0PrPHr2zRSGSbD1yFMOQmIJCEB9yX3a3K
+         kIsBq38gPhAg1j/KJcw29e2IDwV5FAUmrI43pe9vNTUmG+RFzIf1u+hOvT5nrf3NoGOL
+         HrsPWt1ekSVRFLU7GzpBr+hXsb4V1pu/c9I5o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=18CgMxLU+rbIFuY4cOwcYIpcbc6olt5ZDsvE6aAwIww=;
-        b=k6SIMs6KnZXh6BkLWfusSMl9H3LuOQP3g8nym9osRAWNoJa1rsjWO0K624ZlmL+ViR
-         0c/cmHDw9xbUiZNpk6SeNQe6ALdKE4T9PFKac3T/OO8eEd6wxj7mG/G22os/PrVTyli1
-         dQqrCuVhF5qqUx4m3NmNXsmxrKJFapmoc52+KtJZ6x13f1XqM7ItBEpvArbHdLdDUn8K
-         5sF3mPH7BvgDdWN2/1gJFtuAGUm0iVCaQszIQM7fS/8qpNh30G9ONBo/FD6Yu2DI1Eyq
-         fQzccvOT9Z+CXHfHr3AzNCVVDIX2SNrz1Oi/2iNyEjHpbnumTdfmsRzwID7n9zLPyHDG
-         0Otw==
-X-Gm-Message-State: AGi0Pub65B+IDjiN2LzwCfoojEg905nXhz/1VUiQC2Rb9ml4rwdPPKEy
-        KOwGgKM/S5HKNCIPyJBnm3HWGhXZVqQ=
-X-Google-Smtp-Source: APiQypLPAkwb98ugtRW0CQJcDJqzlG3A5IDtOrgtdvTqM4k7YAZlNyCVOnM2i9LaxS4XRWRGqwha9A==
-X-Received: by 2002:a17:90a:b293:: with SMTP id c19mr38654672pjr.22.1589405920676;
-        Wed, 13 May 2020 14:38:40 -0700 (PDT)
-Received: from localhost.localdomain (c-73-231-41-185.hsd1.ca.comcast.net. [73.231.41.185])
-        by smtp.googlemail.com with ESMTPSA id ev5sm35294423pjb.1.2020.05.13.14.38.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 14:38:39 -0700 (PDT)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
-Subject: [PATCH v2] build: Add an option to explicitly enable hid2hci
-Date:   Wed, 13 May 2020 14:38:12 -0700
-Message-Id: <20200513213812.23165-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jUgqD/1mE0M/NdryDGvF9KXQVYSbR3hhJRpB8xR6LTs=;
+        b=YOiI4+dwxZn7yjSVM6D4hKUQuW6MJEcvCwoKe7pZ3NkbKZg+2qKqe8d/er0pe3STzm
+         1aGiucbfYRtpiHLn1gYLchXrbgOEzoCXkoIVNuO/6grNbX15IZTGB9HCwouojJ9bdzEW
+         gLEtcXifyyCKgYOpNRL5+z+WuWelxnR22GAeHMRp9jQztsAsaNVD/j4z8MQ9esCGzaEn
+         Wb3wfJC2je71OvAJkN++kHEsHrTwKl37nqGheoWTucLOQ1LcGeA4n4fMUsU+10cHx2fh
+         vq+kRr2Ro95sgADKEgFiwv1GApoSEfKZ9XCaNDQh2U8We49N3rZhLVyQxVKcQEG0Rx8G
+         9snA==
+X-Gm-Message-State: AOAM530e60rUbnjvWeZAZ4va4BkKd0f8fbz+iAf/XszD09dcuVB1NPYx
+        brbNM1yXHcBJCatsM9UbxIHtmMT/dHMfTMg/4mXnSiHL
+X-Google-Smtp-Source: ABdhPJz5BntoK2GIWrvV4WY2HWqMVs02E9dyHTm5aJ6oOaIr2FZaudwGY6o0EBDtv2TGoK/0wqxay2DXWJFMirRA+Us=
+X-Received: by 2002:a4a:2511:: with SMTP id g17mr1177931ooa.24.1589406077842;
+ Wed, 13 May 2020 14:41:17 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200506005528.2897-1-sonnysasaka@chromium.org> <77B1AB20-C903-427C-A3BD-E10C79815EF9@holtmann.org>
 In-Reply-To: <77B1AB20-C903-427C-A3BD-E10C79815EF9@holtmann.org>
-References: <77B1AB20-C903-427C-A3BD-E10C79815EF9@holtmann.org>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Wed, 13 May 2020 14:41:06 -0700
+Message-ID: <CAOxioNkki7ZXHgz5VoTcfYzukiupHgs4Z1KktMFm4Cn8BX3+Hg@mail.gmail.com>
+Subject: Re: [PATCH] build: Add an option to explicitly disable installing hid2hci
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hid2hci is no longer a common use. This patch changes the default to not
-build and install hid2hci and provide a configure flag --enable-hid2hci
-to explicitly enable it.
----
- configure.ac | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for the suggestion, Marcel. I have sent the v2 patch, please
+take another look. Thanks.
 
-diff --git a/configure.ac b/configure.ac
-index 1433ace4a..e1c8fd9ad 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -218,7 +218,9 @@ if (test "${enable_udev}" != "no" && test -z "${path_udevdir}"); then
- fi
- AC_SUBST(UDEV_DIR, [${path_udevdir}])
- 
--AM_CONDITIONAL(HID2HCI, test "${enable_tools}" != "no" &&
-+AC_ARG_ENABLE(hid2hci, AC_HELP_STRING([--enable-hid2hci],
-+		[enable hid2hci tool]), [enable_hid2hci=${enableval}])
-+AM_CONDITIONAL(HID2HCI, test "${enable_hid2hci}" = "yes" &&
- 						test "${enable_udev}" != "no")
- 
- AC_ARG_ENABLE(cups, AC_HELP_STRING([--disable-cups],
--- 
-2.17.1
-
+On Wed, May 13, 2020 at 1:02 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Sonny,
+>
+> > ---
+> > configure.ac | 5 ++++-
+> > 1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/configure.ac b/configure.ac
+> > index 1433ace4a..ba9937a16 100644
+> > --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -218,8 +218,11 @@ if (test "${enable_udev}" != "no" && test -z "${path_udevdir}"); then
+> > fi
+> > AC_SUBST(UDEV_DIR, [${path_udevdir}])
+> >
+> > +AC_ARG_ENABLE(hid2hci, AC_HELP_STRING([--disable-hid2hci],
+> > +             [disable hid2hci tool]), [enable_hid2hci=${enableval}])
+> > AM_CONDITIONAL(HID2HCI, test "${enable_tools}" != "no" &&
+> > -                                             test "${enable_udev}" != "no")
+> > +                                     test "${enable_udev}" != "no" &&
+> > +                                     test "${enable_hid2hci}" != "no")
+>
+> I looked at this again. Lets turn this around and make this an --enable-hid2hci similar to --enable-sixaxis.
+>
+> And you need to change the ${enable_tools} into ${enable_hid2hci} actually and not just add another dependency. Everything else seems to be already in the Makefile.tools for this.
+>
+> Regards
+>
+> Marcel
+>
