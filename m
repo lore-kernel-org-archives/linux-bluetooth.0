@@ -2,213 +2,127 @@ Return-Path: <SRS0=PnVy=63=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C05CA90AF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 08:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 623C9CA90AF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 08:19:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2933E2078C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 08:15:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 335E220753
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 08:19:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PpdGaQgo"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="Iaaf7Rrw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729438AbgEMIPX (ORCPT
+        id S1730593AbgEMITI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 May 2020 04:15:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34474 "EHLO
+        Wed, 13 May 2020 04:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729106AbgEMIPX (ORCPT
+        with ESMTP id S1729247AbgEMITI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 May 2020 04:15:23 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A785C061A0C;
-        Wed, 13 May 2020 01:15:23 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id n18so184388pfa.2;
-        Wed, 13 May 2020 01:15:23 -0700 (PDT)
+        Wed, 13 May 2020 04:19:08 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E3FC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 01:19:08 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id r17so9818525lff.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 01:19:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition;
-        bh=s7Xwu90CYQ1ik4OayvSic3fdFdzVQBA9fJ9MJPdEP60=;
-        b=PpdGaQgoaefRxJ8DzfZE4eLQ4w7FwY4dDChcW/F0REcnC0joHbZF3W9GBztiVj+udf
-         UdS7spfcUewzF7/eABDA0XiUxw57e+GQ3ovwPZ4m0Cv0pxHf3U1kzIfJnsmEUbukpcF3
-         xI307NkEPg0F2mIvj2aCWBhQ4Jvwn//h/42LTadaL6f2J1/PHOkFJXWQ8j0BfMGuF7Dc
-         C8ojTDTEKE9/XoDLV03fU4CHk6IZKQD9xcGO8ei0LICEC3zPyj1aAlMF/1kAHq26Z6d6
-         CaVQXBgb26l/CrobOUza6Yuugvd+E9hf+uGVbDV6kwPMf/SL0EDGI4cyLtNgTagBfBk9
-         zvPA==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yMiL9z/zJ240LuJkCcbR1muu2svqn6tEj6mcSg7lb80=;
+        b=Iaaf7RrwvyDR1yJM/OEdWwI7r/xuSxMMWGrdOuKsSpuOKgzopBK1CDsO2tZ8IVbMS/
+         OpNQ76CpbJqwGgnvCNXKgxzksYuq/I1G/fjcQ59Qy+/aHIhw4pQ4NvE2pet0h1AxTo/7
+         q+tN3anwBRcqOqlY/m4qThuldk1kn8anofjV8ECkWI2K26Z2kJoy+GLDbI76/3FUuxfX
+         UOJJVB4QMG9dF3L4hRE4J4t7X4hYcU4BMhXqdEBjHgLV2GMLxYiOm/FSoau61NyJkezj
+         mJD7qpzqzQqkFqdc+0mLkxE6LMt/8wQ0Naqm7WE5zDPwy5IQovZoQhY/2BdHn8bIj0Ii
+         8EIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition;
-        bh=s7Xwu90CYQ1ik4OayvSic3fdFdzVQBA9fJ9MJPdEP60=;
-        b=Vh5PJyBG9mPZYauv68AXe5pkm8Qmdc23OHKGqETMLogZEohzTG3GcutXOZYhKfngvp
-         ZNpMO83+Jso3JxYmtg4J0db2QBb/dcaI7pBJ+S80CfSu/JQWzllWQO2y1+esRaVhlptX
-         ZeKZA/rCNDWpb2ZpYDFfUyQROx3mIuQKGX527WDBXrnCCttj3dirbIDspP+FeAW2cfZY
-         BCT6sb1/45plQnfm0VpVcmwtnlOi7latn+QjeWTwFl2Df1jTlqoc7n5SpXqLFPnN27mr
-         BE0e2/+Vi2GoLA4AGMRBHy5AxFmTyRYLYU4FdqQpzw0gZXvPjUviz7W97ZHfIsZVkN4Z
-         mfcA==
-X-Gm-Message-State: AGi0PuaU68tAFOumcWDeuk8/85k88LT2gjY4oh+gLihRdM3F+ELe/FSz
-        lCTGl0VD17+PQ5f0b7IuJfwxjS9dk0Tbvw==
-X-Google-Smtp-Source: APiQypJhzfkY7NWahOJLcE3JfTBkrmHzS4/CxZ4NT8nyuhtCCVYnYcvqPKTi946HR6NPtUZCyvlPEw==
-X-Received: by 2002:aa7:8489:: with SMTP id u9mr25143169pfn.248.1589357722620;
-        Wed, 13 May 2020 01:15:22 -0700 (PDT)
-Received: from localhost ([192.55.54.42])
-        by smtp.gmail.com with ESMTPSA id ie17sm14912102pjb.19.2020.05.13.01.15.20
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yMiL9z/zJ240LuJkCcbR1muu2svqn6tEj6mcSg7lb80=;
+        b=frGBTrLn6OaUoEwTzbNxdkxeuCzuulUBoqcgyDnrED+w22guXKmuLxdAk6eIeFh/Wx
+         pOUALxAb9PeEbi5YNkprOA14gSNct0c7H2YLuJInJXrN9kWC+z4fQmMzYgaIl6k4CwCX
+         iGUxD3bDye91cOUiCw4VBtgCus7XU/vv9/ST++rf9kDpkvpjfGnAE2GrJ3narlfzRTWR
+         pxhc384WvhMjXT6qj0VMObNTzqg3wfd3qGCfonERqIEruk2KYEPdjUaTc6GN21Y33Iso
+         rK2Cyoa0PmE9xcBE0pgyqYkU0yPtr+FfO3VGQ6TyO4QkQ0CnwaB+eHCVK40Ar5AF+ayj
+         cajA==
+X-Gm-Message-State: AOAM530ssNn6KMnntfOgjTM+P4zkIWU6OfQRRc96GIFf/jcTi8onw5UB
+        YBlYfghXGy5sF/C/2cCkRMml+RNl+dwCiQ==
+X-Google-Smtp-Source: ABdhPJwH3HPDR2QgbRKkl/h8mWQUAHPqTVEvd5jYyhpc9wAAUr3PI6dzQ7AEapTUKH2XobUHhFZ2sw==
+X-Received: by 2002:a19:c1cd:: with SMTP id r196mr13348697lff.187.1589357946112;
+        Wed, 13 May 2020 01:19:06 -0700 (PDT)
+Received: from rymek.int.codecoup.pl ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id b28sm13672684ljo.1.2020.05.13.01.19.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 01:15:21 -0700 (PDT)
-Date:   Wed, 13 May 2020 11:15:17 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2020-05-13
-Message-ID: <20200513081517.GA35645@isister-mobl.amr.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+        Wed, 13 May 2020 01:19:04 -0700 (PDT)
+From:   =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
+        <lukasz.rymanowski@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
+        <lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH] bluetooth/smp: Fix for GAP/SEC/SEM/BI-10-C
+Date:   Wed, 13 May 2020 10:18:53 +0200
+Message-Id: <20200513081853.362-1-lukasz.rymanowski@codecoup.pl>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ZPt4rx8FFjLCG7dd"
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Security Mode 1 level 4, force us to use have key size 16 octects long.
+This patch adds check for that.
 
---ZPt4rx8FFjLCG7dd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is required for the qualification test GAP/SEC/SEM/BI-10-C
 
-Hi,
+Logs from test when ATT is configured with sec level BT_SECURITY_FIPS
 
-Here's a second attempt at a bluetooth-next pull request which
-supercedes the one dated 2020-05-09. This should have the issues
-discovered by Jakub fixed.
+< ACL Data TX: Handle 3585 flags 0x00 dlen 11                                                                       #28 [hci0] 3.785965
+      SMP: Pairing Request (0x01) len 6
+        IO capability: DisplayYesNo (0x01)
+        OOB data: Authentication data not present (0x00)
+        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
+        Max encryption key size: 16
+        Initiator key distribution: EncKey Sign (0x05)
+        Responder key distribution: EncKey IdKey Sign (0x07)
+> ACL Data RX: Handle 3585 flags 0x02 dlen 11                                                                       #35 [hci0] 3.883020
+      SMP: Pairing Response (0x02) len 6
+        IO capability: DisplayYesNo (0x01)
+        OOB data: Authentication data not present (0x00)
+        Authentication requirement: Bonding, MITM, SC, No Keypresses (0x0d)
+        Max encryption key size: 7
+        Initiator key distribution: EncKey Sign (0x05)
+        Responder key distribution: EncKey IdKey Sign (0x07)
+< ACL Data TX: Handle 3585 flags 0x00 dlen 6                                                                        #36 [hci0] 3.883136
+      SMP: Pairing Failed (0x05) len 1
+        Reason: Encryption key size (0x06)
 
- - Add support for Intel Typhoon Peak device (8087:0032)
- - Add device tree bindings for Realtek RTL8723BS device
- - Add device tree bindings for Qualcomm QCA9377 device
- - Add support for experimental features configuration through mgmt
- - Add driver hook to prevent wake from suspend
- - Add support for waiting for L2CAP disconnection response
- - Multiple fixes & cleanups to the btbcm driver
- - Add support for LE scatternet topology for selected devices
- - A few other smaller fixes & cleanups
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+Signed-off-by: Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
 ---
-The following changes since commit 44dd5efc97dae0dc09ea9316597826c8b0fd1578:
+ net/bluetooth/smp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  Merge branch 'Support-programmable-pins-for-Ocelot-PTP-driver' (2020-04-21 15:38:34 -0700)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 5510017cf9ff..b9f5f74cd4a7 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -730,6 +730,10 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
+ 	struct hci_dev *hdev = conn->hcon->hdev;
+ 	struct smp_chan *smp = chan->data;
+ 
++	if (conn->hcon->pending_sec_level == BT_SECURITY_FIPS &&
++	    max_key_size != SMP_MAX_ENC_KEY_SIZE)
++		return SMP_ENC_KEY_SIZE;
++
+ 	if (max_key_size > hdev->le_max_key_size ||
+ 	    max_key_size < SMP_MIN_ENC_KEY_SIZE)
+ 		return SMP_ENC_KEY_SIZE;
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 5b440676c15bbe1a40f2546ec92db83ed66d9e22:
-
-  Bluetooth: L2CAP: add support for waiting disconnection resp (2020-05-13 10:03:51 +0200)
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (5):
-      Bluetooth: Fix incorrect type for window and interval
-      Bluetooth: Modify LE window and interval for suspend
-      Bluetooth: Rename BT_SUSPEND_COMPLETE
-      Bluetooth: Add hook for driver to prevent wake from suspend
-      Bluetooth: btusb: Implement hdev->prevent_wake
-
-Alain Michaud (3):
-      Bluetooth: Adding driver and quirk defs for multi-role LE
-      Bluetooth: allow scatternet connections if supported.
-      Bluetooth: btusb: Adding support for LE scatternet to Jfp and ThP
-
-Archie Pusaka (1):
-      Bluetooth: L2CAP: add support for waiting disconnection resp
-
-Christian Hewitt (3):
-      dt-bindings: net: bluetooth: Add device tree bindings for QCA9377
-      Bluetooth: hci_qca: add compatible for QCA9377
-      Bluetooth: hci_qca: allow max-speed to be set for QCA9377 devices
-
-Hans de Goede (8):
-      Bluetooth: btbcm: Drop upper nibble version check from btbcm_initialize()
-      Bluetooth: btbcm: Move setting of USE_BDADDR_PROPERTY quirk to hci_bcm.c
-      Bluetooth: btbcm: Fold Patch loading + applying into btbcm_initialize()
-      Bluetooth: btbcm: Make btbcm_initialize() print local-name on re-init too
-      Bluetooth: btbcm: Make btbcm_setup_patchram use btbcm_finalize
-      Bluetooth: btbcm: Bail sooner from btbcm_initialize() when not loading fw
-      Bluetooth: btbcm: Try multiple Patch filenames when loading the Patch firmware
-      Bluetooth: btbcm: Add 2 missing models to subver tables
-
-Konstantin Forostyan (1):
-      Bluetooth: L2CAP: Fix errors during L2CAP_CREDIT_BASED_CONNECTION_REQ (0x17)
-
-Marcel Holtmann (7):
-      Bluetooth: Add MGMT_EV_PHY_CONFIGURATION_CHANGED to supported list
-      Bluetooth: Replace BT_DBG with bt_dev_dbg for management support
-      Bluetooth: replace zero-length array with flexible-array member
-      Bluetooth: Introduce HCI_MGMT_HDEV_OPTIONAL option
-      Bluetooth: Replace BT_DBG with bt_dev_dbg for security manager support
-      Bluetooth: Add support for experimental features configuration
-      Bluetooth: Introduce debug feature when dynamic debug is disabled
-
-Raghuram Hegde (1):
-      Bluetooth: btusb: Add support for Intel Bluetooth Device Typhoon Peak (8087:0032)
-
-Rikard Falkeborn (1):
-      Bluetooth: serdev: Constify serdev_device_ops
-
-Sonny Sasaka (1):
-      Bluetooth: Handle Inquiry Cancel error after Inquiry Complete
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: Fix advertising handle is set to 0
-
-Vasily Khoruzhick (2):
-      dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
-      Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |   5 +
- .../devicetree/bindings/net/realtek-bluetooth.yaml |  54 +++
- drivers/bluetooth/btbcm.c                          | 139 ++++----
- drivers/bluetooth/btbcm.h                          |  10 +-
- drivers/bluetooth/btusb.c                          |  20 +-
- drivers/bluetooth/hci_bcm.c                        |  27 +-
- drivers/bluetooth/hci_h5.c                         |   2 +
- drivers/bluetooth/hci_qca.c                        |  17 +-
- drivers/bluetooth/hci_serdev.c                     |   4 +-
- include/net/bluetooth/bluetooth.h                  |  11 +
- include/net/bluetooth/hci.h                        |  10 +
- include/net/bluetooth/hci_core.h                   |   4 +-
- include/net/bluetooth/mgmt.h                       |  69 ++--
- net/bluetooth/Kconfig                              |   7 +
- net/bluetooth/hci_core.c                           |   8 +-
- net/bluetooth/hci_event.c                          |  23 +-
- net/bluetooth/hci_request.c                        |  12 +-
- net/bluetooth/hci_sock.c                           |  12 +-
- net/bluetooth/l2cap_core.c                         |   4 +-
- net/bluetooth/l2cap_sock.c                         |  30 +-
- net/bluetooth/lib.c                                |  33 ++
- net/bluetooth/mgmt.c                               | 367 ++++++++++++++-------
- net/bluetooth/smp.c                                |   8 +-
- 23 files changed, 618 insertions(+), 258 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-
---ZPt4rx8FFjLCG7dd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCXruskwAKCRAfyv3T9pQ3
-KkNrAP96TZQ00F7A1Yc81KX2sp2AtzKHExUtrjyPvXep7LDq4QEA3BIi0dJgt1Ex
-ZDMvT5bv77er2g/HOxevlDF2cLzLHgY=
-=jjun
------END PGP SIGNATURE-----
-
---ZPt4rx8FFjLCG7dd--
