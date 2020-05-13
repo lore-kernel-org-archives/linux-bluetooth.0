@@ -2,81 +2,81 @@ Return-Path: <SRS0=PnVy=63=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 411FFC2D0F8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 07:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DA0C2D0F8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 07:13:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1633A20769
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 07:09:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYVb5UMY"
+	by mail.kernel.org (Postfix) with ESMTP id 5C3DC206F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 07:13:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730537AbgEMHJQ (ORCPT
+        id S1732045AbgEMHNR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 May 2020 03:09:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729189AbgEMHJQ (ORCPT
+        Wed, 13 May 2020 03:13:17 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51825 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbgEMHNR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 May 2020 03:09:16 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEDFC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 00:09:14 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id s10so16913049iog.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2020 00:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=pZ0khIBt5fB/CdtSxjuGI1bNZXWH+u3Yb0DVZK1Hhsc=;
-        b=MYVb5UMYR/ppBdGissyse1ziOAs60giWeGKsbyka0SginBBjIbtDuib9411xHzh9F3
-         vydrc75qzCqu96La9qISjF6aVKhXOQq3mFK5N+XJbobYG5iZgyU6eKoAyZIb8YhWyzeL
-         Uv1sBBec3CsOVxzZCQoKrZJV0ni+kGr7CIdqjiYQ7zPuAym0BuPASwKayGUQ8/r3WIx1
-         +0yWm1AACwFsCoDfeAjqC4sjskMngWgPY363u/suG8DNk6EDJ2mpuSDlznlfCt161rJR
-         7WNrYD66sQaiBJH+uCG0vMF8BFS6+yb+nQe8iDw0ehtM0XKpdeA436tQfUlZGF3vQa6u
-         wfpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=pZ0khIBt5fB/CdtSxjuGI1bNZXWH+u3Yb0DVZK1Hhsc=;
-        b=INp14hyw5qQG8sO84JAmb6hXNfcbB10pUyPeuI59rpiNm0FDuE8T4pwqUAh3GOLllI
-         S2/6RweNezNvAquwJSJI/tBbRA8Te5hVd6rXQRtp+2Wh6JNGwYuI/ujl5r0tf0yw3VMT
-         O5if46mvf4ac+9C2yxKG8S4F8Mh/mXKkhlRhCwRe3VksBJdvn8cYLbEB3G1KHJO/b++m
-         OAvN4OtjPslhddlrAvIRzLvNkmXJLDJbW+uWMhTWRhKArYLZhScMqgY7vjBpXyGwRFxa
-         24mQuO624st8G1p7+13FAv9cvOu3AaqnokG+hQXX7viov49tpqej5yXcZ0ZuYwMBmjEC
-         os2A==
-X-Gm-Message-State: AGi0PuaZU6SyHsjzdcY4fqww1Xv7/RbnOFd31453tAWO8QZ+WPL+EENY
-        xrqvTaDNLOQNdrzR0iOD/Bx3PZTwCDqEqOTCcR9rVA==
-X-Google-Smtp-Source: APiQypKNkawFxe9k1U4/JuDIV+OLWINcNo1btsqmmmo+9gLP58NUoSeYr/RRAeTyog1Ni6kZttav6R5YUOWnEZttjVc=
-X-Received: by 2002:a02:a681:: with SMTP id j1mr7396318jam.13.1589353753962;
- Wed, 13 May 2020 00:09:13 -0700 (PDT)
-MIME-Version: 1.0
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Wed, 13 May 2020 12:39:02 +0530
-Message-ID: <CAOVXEJL_zq0_-KTh2HEBT1VvSCCkuwdecXLaEGFquMi30oH6Eg@mail.gmail.com>
-Subject: OPP File Transfer From Settings always uses L2cap Conf as BASIC_MODE-
- OS: Ubuntu 18.04
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 13 May 2020 03:13:17 -0400
+Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AA8F5CED07;
+        Wed, 13 May 2020 09:22:57 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH 0/3] Bluetooth: Prevent scanning when device is not
+ configured for wakeup
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200513021927.115700-1-abhishekpandit@chromium.org>
+Date:   Wed, 13 May 2020 09:12:44 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <F6E282C4-8688-47A8-946D-70A5ABFB9257@holtmann.org>
+References: <20200513021927.115700-1-abhishekpandit@chromium.org>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi
+Hi Abhishek,
 
-In Ubuntu when trying to do OPP File transfer using Bluetooth settings
-the L2cap Configuration  uses BASIC_MODE
+> This patch series adds a hook to prevent Bluetooth from scanning during
+> suspend if it is not configured to wake up. It's not always clear who
+> the wakeup owner is from looking at hdev->dev so we need the driver to
+> inform us whether to set up scanning.
+> 
+> By default, when no `prevent_wake` hook is implemented, we always
+> configure scanning for wake-up.
+> 
+> Thanks
+> Abhishek
+> 
+> 
+> 
+> Abhishek Pandit-Subedi (3):
+>  Bluetooth: Rename BT_SUSPEND_COMPLETE
+>  Bluetooth: Add hook for driver to prevent wake from suspend
+>  Bluetooth: btusb: Implement hdev->prevent_wake
+> 
+> drivers/bluetooth/btusb.c        | 8 ++++++++
+> include/net/bluetooth/hci_core.h | 3 ++-
+> net/bluetooth/hci_core.c         | 8 +++++---
+> net/bluetooth/hci_request.c      | 2 +-
+> 4 files changed, 16 insertions(+), 5 deletions(-)
 
-whereas obexctl it is using ERTM_MODE mode.
-
-Once the initial connection made from obexctl.later any transfer of
-files from setting UI also used ERTM mode.
-
-How to change the MODE to ERTM for the transfer of file using settings?
+all 3 patches have been applied to bluetooth-next tree.
 
 Regards
-Sathish N
+
+Marcel
+
