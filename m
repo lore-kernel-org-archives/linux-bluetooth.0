@@ -1,122 +1,108 @@
-Return-Path: <SRS0=//f6=62=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=PnVy=63=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A68D4C2D0F8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 147FCC2D0FB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 02:09:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 884B520747
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 May 2020 22:58:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589324301;
-	bh=IG7ctD2YCoDDUQ8s+e3OABRWevBYaSivGtSptefac3E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Ek2ba0Xbpa1+hhoUXuVBVTLehkPwIeCjA5vQH+wnK4olBaM/CWrAOqHGaQWizdg40
-	 rGw5i6By23Oj7F+5D7q2vew/Qo+KS9ezldf33GqXNlKDzU9DELJchp9oYoOKvUz9+Q
-	 G1R4lp3R0tXiW2+iZQxvKYkbRStZI4+IVBig6oEA=
+	by mail.kernel.org (Postfix) with ESMTP id E865E2492C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 May 2020 02:09:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y1F/Owmk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731583AbgELW6Q (ORCPT
+        id S1728881AbgEMCJp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 May 2020 18:58:16 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:44718 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbgELW6P (ORCPT
+        Tue, 12 May 2020 22:09:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728504AbgEMCJn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 May 2020 18:58:15 -0400
-Received: by mail-ot1-f65.google.com with SMTP id j4so11921546otr.11;
-        Tue, 12 May 2020 15:58:15 -0700 (PDT)
+        Tue, 12 May 2020 22:09:43 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A94F3C05BD09
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2020 19:09:43 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id mq3so10430843pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2020 19:09:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=8MeJ34SnvYHzMHHvMnJ7xniPWpeltfCL/1NFcCqodmE=;
+        b=Y1F/OwmkgG6a/vJSNdeI/glSNcKRNQhR1ng7pGL2w59MihUJLZYgexQEWUZuyMbmHS
+         mFk8UbtWEBPqVMJsNeKFvBtlZ/TxIOMHq68Y2wuKPqG6/AG78hEtZkXw8k/fGwC2k9XT
+         EvxSQTcfn3/wAg4QKCrM77pL1R02TQfdm0DJE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cBiUIrWE+UaIH5tajkgyIKVaNp7k7WAC/qZUFSsrV2E=;
-        b=Quy2hnWtTrPiaE6w/mM3yp7OIxqHlGJ5eM+iUum/AwdpHUe4Rg7MFlDGRaqQAnX1SX
-         E6FRZh8GGJ30bZwIrjJFxV1DzHtfhqIuo2/1nqAtZns97/R9JtUPlr3SJ7qEgghjXZ/1
-         yVN/FGL/MFQE1W24lrgq7TbHWabnYGDdBC9pvebbrORwN4kLkUKVynIIh4Z0ky7AYaFm
-         7j1iTAz0Ed6ci4wuk29R8zsU9PD7wLeeoBfC7+omGslPMb1ZHYocGFpWQkOdEe/Lv37e
-         oI+4tl5lVY8WLmlm8yUVBsQhHG5EXMR9MpWhiKf/TCO2LW0ZBLSFK9e9LyckdmNOBVn7
-         MQmw==
-X-Gm-Message-State: AGi0PuYRrcYZUMViwY50619klgPsRgqJLAmWkrR+uJzMK7lM4wCfkBB7
-        +gOLrJlN6G1cUJOLJ7foTw==
-X-Google-Smtp-Source: APiQypL7PdOIK7Is7Nz5WrJlgO2HUyJLl2vgiulZfCULhki8ejQCn9T9ykjPsFKJznmjeuGro1Uq+g==
-X-Received: by 2002:a05:6830:22f8:: with SMTP id t24mr18122890otc.148.1589324294619;
-        Tue, 12 May 2020 15:58:14 -0700 (PDT)
-Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id w62sm5632505oia.32.2020.05.12.15.58.12
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=8MeJ34SnvYHzMHHvMnJ7xniPWpeltfCL/1NFcCqodmE=;
+        b=uf7mqr8E/YCw9rZFtAjKt7VLkr+4gnAGLxek2gusprF/4PyZH0x9/lQKVlfrWIGKC9
+         C2istqsxFZC9C6JxQvLIoJF/keGP6tI+C7AI8c964qVWiI4vvsQApPE4warI/Q8jckKU
+         iWk5ldbw/PuKppt4G3bGjouP2Mfips2nVsiYZhz2bzl0mPaZm8WyDd27IjBCYcmM95J3
+         lhbyRqrmX2jqGJhPwSFb0d4eb6io8wmoQvO1gA5oEQD8xDigjXCF6fMToQerJbEDUXUe
+         t2cB+qxVKnHG9Puq8SlACapBen8U1fqT6VnVh01rbR+CRtz4XfbcrMckWyxvb2C2J2Gv
+         lyhA==
+X-Gm-Message-State: AGi0PuYRcLcDIujQ1mWck3TaD3Aj1hokv0e0XA/gDAZslPHs65WdsBs/
+        A6gBxAGeLre5YIWKAs3CgummXQ==
+X-Google-Smtp-Source: APiQypL5VhmJml8Eed/W5CjePHC1qJ4xGeTRfq/uu6YZm5Sp5R8CkjoREdA/z3nYr6+ZeuAsu5y9zg==
+X-Received: by 2002:a17:90a:8b82:: with SMTP id z2mr32211504pjn.124.1589335783268;
+        Tue, 12 May 2020 19:09:43 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id x7sm13456749pfj.122.2020.05.12.19.09.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2020 15:58:13 -0700 (PDT)
-Received: (nullmailer pid 32342 invoked by uid 1000);
-        Tue, 12 May 2020 22:58:12 -0000
-Date:   Tue, 12 May 2020 17:58:12 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Sandy Huang <hjc@rock-chips.com>,
-        =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>,
-        Sean Wang <sean.wang@mediatek.com>,
+        Tue, 12 May 2020 19:09:42 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Arnaud Pouliquen <arnaud.pouliquen@st.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Jyri Sarha <jsarha@ti.com>,
-        Andrzej Hajda <a.hajda@samsung.com>,
-        Benjamin Gaignard <benjamin.gaignard@linaro.org>,
-        Olivier Moysan <olivier.moysan@st.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rockchip@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH] docs: dt: fix broken links due to txt->yaml renames
-Message-ID: <20200512225812.GA28862@bogus>
-References: <967df5c3303b478b76199d4379fe40f5094f3f9b.1588584538.git.mchehab+huawei@kernel.org>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH 2/2] Bluetooth: Modify LE window and interval for suspend
+Date:   Tue, 12 May 2020 19:09:33 -0700
+Message-Id: <20200512190924.2.Ibdf1535b0d4c63aaf337161a333b419d6d32c364@changeid>
+X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
+In-Reply-To: <20200513020933.102443-1-abhishekpandit@chromium.org>
+References: <20200513020933.102443-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <967df5c3303b478b76199d4379fe40f5094f3f9b.1588584538.git.mchehab+huawei@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, May 04, 2020 at 11:30:20AM +0200, Mauro Carvalho Chehab wrote:
-> There are some new broken doc links due to yaml renames
-> at DT. Developers should really run:
-> 
-> 	./scripts/documentation-file-ref-check
-> 
-> in order to solve those issues while submitting patches.
-> This tool can even fix most of the issues with:
-> 
-> 	./scripts/documentation-file-ref-check --fix
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
-> 
-> PS.: This patch is against today's linux-next.
+When a device is suspended, it doesn't need to be as responsive to
+connection events. Increase the interval to 640ms (creating a duty cycle
+of roughly 1.75%) so that passive scanning uses much less power (vs
+previous duty cycle of 18.75%). The new window + interval combination
+has been tested to work with HID devices (which are currently the only
+devices capable of wake up).
 
-That's not a base anyone can apply this patch against.
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
 
-> 
-> 
->  .../devicetree/bindings/display/bridge/sii902x.txt          | 2 +-
->  .../devicetree/bindings/display/rockchip/rockchip-drm.yaml  | 2 +-
->  .../devicetree/bindings/net/mediatek-bluetooth.txt          | 2 +-
->  .../devicetree/bindings/sound/audio-graph-card.txt          | 2 +-
->  .../devicetree/bindings/sound/st,sti-asoc-card.txt          | 2 +-
->  Documentation/mips/ingenic-tcu.rst                          | 2 +-
->  MAINTAINERS                                                 | 6 +++---
->  7 files changed, 9 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index f6870e98faab2..6b45e31432a77 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -35,7 +35,7 @@
+ #define HCI_REQ_CANCELED  2
+ 
+ #define LE_SUSPEND_SCAN_WINDOW		0x0012
+-#define LE_SUSPEND_SCAN_INTERVAL	0x0060
++#define LE_SUSPEND_SCAN_INTERVAL	0x0400
+ 
+ void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
+ {
+-- 
+2.26.2.645.ge9eca65c58-goog
+
