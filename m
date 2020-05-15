@@ -2,105 +2,177 @@ Return-Path: <SRS0=w0Ns=65=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6810C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 May 2020 06:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AADC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 May 2020 09:27:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B374C20728
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 May 2020 06:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAA3420727
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 May 2020 09:27:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTpAoYTU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AQc3IgVY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726349AbgEOGgg (ORCPT
+        id S1728117AbgEOJ1L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 May 2020 02:36:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45216 "EHLO
+        Fri, 15 May 2020 05:27:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726269AbgEOGgg (ORCPT
+        by vger.kernel.org with ESMTP id S1728110AbgEOJ1L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 May 2020 02:36:36 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2DEC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2020 23:36:35 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id j2so1058518qtr.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2020 23:36:35 -0700 (PDT)
+        Fri, 15 May 2020 05:27:11 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E3EC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2020 02:27:11 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id z15so3957185pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2020 02:27:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=t/lOvpiSs4nt3XNuhjrFA3BNnzoVE4Lslo/8dfZMtHA=;
-        b=BTpAoYTUqWR4WTgf86zLHwRU/DzcZJa3xRRZhmTMkWNKfvv9foj/hVf5DFkMoru+Ck
-         6FR0JCla3slH38PUfbHJJqaH7T/PxYDdmglLLQ2OjOQUL9Jsea6fXFk8joN8xFsr/Qmn
-         tRa8zLHXMWYFYpfvI0VqfrANufrjXWUnFnJ6IGrLtoxhyL7Gx9DrNRemFJqNDuT1N3Xu
-         07hDmpixayqx7iTJZsGDF0noEb7/ldIj9IPXHNvsKWvvDU3PC6PiysrPhNtRBbAFbZRi
-         ci1T/aRo+5k+1Hjx+LECDklPjxpe41I++QvSQijP+XfZ+4Aq/HiDDJ+lJ9qMvkBo/fHy
-         Udow==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wMOi5U83vahobRubdonT8bbur/MVa6A0w3GNhnyDUz4=;
+        b=AQc3IgVYYvNRW4qGcvufZghnKSjxTPNroOiMoahmIELJkZLXL5dmyy9wxalXOuHT3Y
+         r+tS6aqIvct3Fby8P19vx72oVTDtEHHDlLQkRC3YKH6Ar3gucQ5Na3/e0nCSTy0yqJF7
+         OjmW2o9d63Jju7sSaV5QlbS6BwJB4eSNr2dng=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=t/lOvpiSs4nt3XNuhjrFA3BNnzoVE4Lslo/8dfZMtHA=;
-        b=anxxG+ZK0I0ebxb6juBbdEzB9plXttOexxJaKyZBLPF3o7yGtZwVjvzTNJRSXrLxHP
-         o5LoJrk4uv9OD3DI+NOV7BSGQxsU8tQCfJ86sa2Zm3FGdL1ymN5YWA4x11YgfkbrkPvh
-         wgCarrMjY6I7U/bus+xQYJc115x6Ze14EyKK2zApfhcMTcjymRArXXr7SOYkKwaGyEza
-         YHwFRbRDY4v3CpmCzhHcEXHf2Q4gCPoJG9oUlaZetS90k7oXgXbRtDvxBWvV5rquOpBS
-         j5Nyf6dhTusPtQqm4OpPe/tkhr0kY6zFAwYBDiFs3x0/WmIxHIdxMai4QzxDa1suL+aW
-         1AxQ==
-X-Gm-Message-State: AOAM532sy16H63BBgpJnPW6rPCzzZL7Z1nph5LNA982TmlN06kUkd4Jl
-        eHQm8RnjpRqVoJaE8W5MA3eOGand
-X-Google-Smtp-Source: ABdhPJy+/H09IhoXkaWCDUM4W2e1Ry4q9Lq07lNY2Nk8c1viBatPLPPkq+T8VD+wNcvzylR1jNYeHQ==
-X-Received: by 2002:ac8:7496:: with SMTP id v22mr1938497qtq.348.1589524594979;
-        Thu, 14 May 2020 23:36:34 -0700 (PDT)
-Received: from [172.17.0.2] ([52.251.124.247])
-        by smtp.gmail.com with ESMTPSA id h9sm1150434qtu.28.2020.05.14.23.36.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2020 23:36:34 -0700 (PDT)
-Message-ID: <5ebe3872.1c69fb81.2c3bf.6d26@mx.google.com>
-Date:   Thu, 14 May 2020 23:36:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3935328447011842391=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wMOi5U83vahobRubdonT8bbur/MVa6A0w3GNhnyDUz4=;
+        b=DzWV/iUScn+5RlTC5NH1FcEMr3UzBDegFksu38z8OH4AxB4+n+CrXjj8sDfnZPLyvC
+         DAD6FhlbTR6ioesqA6x5HMS7+lrCwmoEQZBWGhg/jfS8MHLnWUo+Gf99IkgI890tUfjj
+         8wpMC5XRemd6CuRs5Yw6NiCoMZ4b/86yZGasc1K3hBVUxCpGh2reuc9QHegBIzxBaT/d
+         BNIjPNH8uKccTup5kWZxuyA8PPfasZJ/vn+eQBN2BFesf2wSclQ5jKRu2RoJjZEMbimt
+         v8MtVUNoXQ4R+uiykZJczVFpI7PQoT8T1B4hdp6FXUHMXWyEt+y6o7IerY/9Wlw9Wh8S
+         M2dA==
+X-Gm-Message-State: AOAM5305nq6Wo0Sqt5zHzwYoI0broNNiIiKT/S2D2kD+9msV3lWx/NwJ
+        BDpbHFCXtOhFLHEPlLKbee4HB/e8KDc=
+X-Google-Smtp-Source: ABdhPJzHhXjBoIyj2ZJXGFU2c+94wmBwHsCvl+Pdg/bz4NgGDYbmPGTe6x67OlnPX+/nDgvf0f+81Q==
+X-Received: by 2002:a17:902:7b92:: with SMTP id w18mr2628500pll.273.1589534830054;
+        Fri, 15 May 2020 02:27:10 -0700 (PDT)
+Received: from hychaoz840.tpe.corp.google.com ([2401:fa00:1:10:a03d:e7d8:93ef:b2])
+        by smtp.gmail.com with ESMTPSA id p9sm1340961pgb.19.2020.05.15.02.27.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 15 May 2020 02:27:08 -0700 (PDT)
+From:   Hsin-Yu Chao <hychao@chromium.org>
+X-Google-Original-From: Hsin-Yu Chao <hychao@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, alainm@chromium.org,
+        linux-kernel@vger.kernel.org, Hsin-Yu Chao <hychao@chromium.org>
+Subject: [PATCH] Bluetooth: Add SCO fallback for invalid LMP parameters error
+Date:   Fri, 15 May 2020 17:27:04 +0800
+Message-Id: <20200515092704.902-1-hychao@google.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: [BlueZ] mesh: Fix segfault caused by re-enabling of HCI controller
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200515061530.4983-1-inga.stotland@intel.com>
-References: <20200515061530.4983-1-inga.stotland@intel.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3935328447011842391==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Hsin-Yu Chao <hychao@chromium.org>
 
+Bluetooth PTS test case HFP/AG/ACC/BI-12-I accepts SCO connection
+with invalid parameter at the first SCO request expecting AG to
+attempt another SCO request with the use of "safe settings" for
+given codec, base on section 5.7.1.2 of HFP 1.7 specification.
 
-This is automated email and please do not reply to this email!
+This patch addresses it by adding "Invalid LMP Parameters" (0x1e)
+to the SCO fallback case. Verified with below log:
 
-Dear submitter,
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x0380
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+        Handle: 0
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x00
+        Retransmission window: 0x02
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: Transparent (0x03)
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 8
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x03c8
+          EV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 5
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Success (0x00)
+        Handle: 257
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x06
+        Retransmission window: 0x04
+        RX packet length: 30
+        TX packet length: 30
+        Air mode: Transparent (0x03)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkgitlint Failed
-
-Outputs:
-11: B1 Line exceeds max length (109>80): "0x00005618e6e12d9a in io_ready_callback (user_data=0x5618e75538a0, result=<optimized out>) at mesh/mesh.c:174"
-12: B1 Line exceeds max length (125>80): "0x00005618e6e3d2c8 in l_queue_foreach (queue=<optimized out>, function=0x5618e6e158e0 <process_read_info_req>, user_data=0x0)"
-14: B1 Line exceeds max length (118>80): "0x00005618e6e37927 in request_complete (mgmt=mgmt@entry=0x5618e754ad50, status=<optimized out>, opcode=opcode@entry=4,"
-15: B1 Line exceeds max length (96>80): "    index=index@entry=0, length=length@entry=280, param=0x5618e754b389) at src/shared/mgmt.c:261"
-
-
-
+Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_event.c | 1 +
+ 1 file changed, 1 insertion(+)
 
---===============3935328447011842391==--
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 73aabca0064b7..f024b3d57a1c7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4337,6 +4337,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
++	case 0x1e:	/* Invalid LMP Parameters */
+ 	case 0x1f:	/* Unspecified error */
+ 	case 0x20:	/* Unsupported LMP Parameter value */
+ 		if (conn->out) {
+-- 
+2.24.1
+
