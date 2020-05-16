@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C70C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 May 2020 01:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1997FC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 May 2020 01:27:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E5D620756
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 May 2020 01:27:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086A8207BB
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 May 2020 01:27:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbgEPB1w (ORCPT
+        id S1726553AbgEPB1w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 15 May 2020 21:27:52 -0400
 Received: from mga14.intel.com ([192.55.52.115]:12009 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726231AbgEPB1v (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 May 2020 21:27:51 -0400
-IronPort-SDR: 0IFrDY+/Sf66Fhh2zpIfTvfGgwFutqR08DHg+vCNx+D+wfmT6G8r/z9iD/CnS0Wwo1lRn/b/Rg
- V+8iVET+vK0A==
+        id S1726223AbgEPB1w (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 15 May 2020 21:27:52 -0400
+IronPort-SDR: VemDf4cVLU0VdtGZPuf11tmAvWGOArKdbMt/GuwiQP/oitEWaTP+DOrXmagS4W6xpQRNcdLJa1
+ PXxFzyPliFIg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2020 18:27:51 -0700
-IronPort-SDR: 0T3vG1VZlL31+zCfhNSDIFmiFLrBEzm8TadnAXIdM6Gb930b88wEe9h+qHqCvYrgbXJmiYmSz0
- P7M8nc2MoeRA==
+IronPort-SDR: gXHx7h1QqxFOU6ss/Wut7MhoaRRDPbYAGbHGuPXiek+UA6AjLJ18xfQxWYnP9+VYKCTJwpLyey
+ 8afLeaY1S8ig==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,397,1583222400"; 
-   d="scan'208";a="307568634"
+   d="scan'208";a="307568637"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.252.132.104])
-  by FMSMGA003.fm.intel.com with ESMTP; 15 May 2020 18:27:50 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 15 May 2020 18:27:51 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 1/2] mesh: Fix valgrind memory leaks
-Date:   Fri, 15 May 2020 18:27:41 -0700
-Message-Id: <20200516012742.573151-2-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 2/2] mesh: Fix valgrind memory leak warnings
+Date:   Fri, 15 May 2020 18:27:42 -0700
+Message-Id: <20200516012742.573151-3-brian.gix@intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200516012742.573151-1-brian.gix@intel.com>
 References: <20200516012742.573151-1-brian.gix@intel.com>
@@ -48,125 +48,124 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-These memory leaks are ones that will compound over time with node
-creation and deletion.
+These warnings are caused by not completely freeing memory allocations
+at shutdown, and are not serious, but they make valgrind output cleaner.
 ---
- mesh/mesh-config-json.c | 16 ++++++++--------
- mesh/mesh.c             |  5 ++++-
- mesh/node.c             |  1 +
- 3 files changed, 13 insertions(+), 9 deletions(-)
+ mesh/agent.c    |  1 +
+ mesh/mesh.c     |  4 ++++
+ mesh/net-keys.c |  6 ++++++
+ mesh/net-keys.h |  1 +
+ mesh/net.c      | 12 +++++++++++-
+ mesh/net.h      |  3 ++-
+ 6 files changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 9ac3979f8..6567d761c 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -447,8 +447,6 @@ static bool read_app_keys(json_object *jobj, struct mesh_config_node *node)
- 	if (!len)
- 		return true;
+diff --git a/mesh/agent.c b/mesh/agent.c
+index bb52f4146..a06cc2b99 100644
+--- a/mesh/agent.c
++++ b/mesh/agent.c
+@@ -245,6 +245,7 @@ void mesh_agent_cleanup(void)
+ 		return;
  
--	node->appkeys = l_queue_new();
--
- 	for (i = 0; i < len; ++i) {
- 		json_object *jtemp, *jvalue;
- 		char *str;
-@@ -505,8 +503,6 @@ static bool read_net_keys(json_object *jobj, struct mesh_config_node *node)
- 	if (!len)
- 		return false;
+ 	l_queue_destroy(agents, agent_free);
++	agents = NULL;
  
--	node->netkeys = l_queue_new();
--
- 	for (i = 0; i < len; ++i) {
- 		json_object *jtemp, *jvalue;
- 		char *str;
-@@ -1133,8 +1129,6 @@ static bool parse_elements(json_object *jelems, struct mesh_config_node *node)
- 		/* Allow "empty" nodes */
- 		return true;
- 
--	node->elements = l_queue_new();
--
- 	for (i = 0; i < num_ele; ++i) {
- 		json_object *jelement;
- 		json_object *jmodels;
-@@ -1154,6 +1148,7 @@ static bool parse_elements(json_object *jelems, struct mesh_config_node *node)
- 		ele = l_new(struct mesh_config_element, 1);
- 		ele->index = index;
- 		ele->models = l_queue_new();
-+		l_queue_push_tail(node->elements, ele);
- 
- 		if (!json_object_object_get_ex(jelement, "location", &jvalue))
- 			goto fail;
-@@ -1167,8 +1162,6 @@ static bool parse_elements(json_object *jelems, struct mesh_config_node *node)
- 						!parse_models(jmodels, ele))
- 				goto fail;
- 		}
--
--		l_queue_push_tail(node->elements, ele);
- 	}
- 
- 	return true;
-@@ -2133,6 +2126,11 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 		goto done;
- 
- 	memset(&node, 0, sizeof(node));
-+
-+	node.elements = l_queue_new();
-+	node.netkeys = l_queue_new();
-+	node.appkeys = l_queue_new();
-+
- 	result = read_node(jnode, &node);
- 
- 	if (result) {
-@@ -2148,6 +2146,7 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 		result = cb(&node, uuid, cfg, user_data);
- 
- 		if (!result) {
-+			l_free(cfg->idles);
- 			l_free(cfg->node_dir_path);
- 			l_free(cfg);
- 		}
-@@ -2157,6 +2156,7 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 	l_free(node.net_transmit);
- 	l_queue_destroy(node.netkeys, l_free);
- 	l_queue_destroy(node.appkeys, l_free);
-+	l_queue_destroy(node.elements, free_element);
- 
- 	if (!result)
- 		json_object_put(jnode);
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 890a3aa8f..23ff9c2a8 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -209,7 +209,7 @@ static void parse_settings(const char *mesh_conf_fname)
- 
- 	settings = l_settings_new();
- 	if (!l_settings_load_from_file(settings, mesh_conf_fname))
--		return;
-+		goto done;
- 
- 	str = l_settings_get_string(settings, "General", "Beacon");
- 	if (str) {
-@@ -242,6 +242,9 @@ static void parse_settings(const char *mesh_conf_fname)
- 
- 	if (l_settings_get_uint(settings, "General", "ProvTimeout", &value))
- 		mesh.prov_timeout = value;
-+
-+done:
-+	l_settings_free(settings);
  }
  
- bool mesh_init(const char *config_dir, const char *mesh_conf_fname,
-diff --git a/mesh/node.c b/mesh/node.c
-index 8914b639d..2b4b3a563 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -335,6 +335,7 @@ static void free_node_resources(void *data)
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 23ff9c2a8..451cefbb4 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -27,6 +27,7 @@
+ #include "mesh/mesh-io.h"
+ #include "mesh/node.h"
+ #include "mesh/net.h"
++#include "mesh/net-keys.h"
+ #include "mesh/provision.h"
+ #include "mesh/model.h"
+ #include "mesh/dbus.h"
+@@ -340,8 +341,11 @@ void mesh_cleanup(void)
+ 	}
  
- 	free_node_dbus_resources(node);
+ 	l_queue_destroy(pending_queue, pending_request_exit);
++	mesh_agent_cleanup();
+ 	node_cleanup_all();
+ 	mesh_model_cleanup();
++	mesh_net_cleanup();
++	net_key_cleanup();
  
-+	mesh_config_release(node->cfg);
- 	mesh_net_free(node->net);
- 	l_free(node->storage_dir);
- 	l_free(node);
+ 	l_dbus_object_remove_interface(dbus_get_bus(), BLUEZ_MESH_PATH,
+ 							MESH_NETWORK_INTERFACE);
+diff --git a/mesh/net-keys.c b/mesh/net-keys.c
+index f7eb2ca68..7dfabf922 100644
+--- a/mesh/net-keys.c
++++ b/mesh/net-keys.c
+@@ -523,3 +523,9 @@ void net_key_beacon_disable(uint32_t id)
+ 	l_timeout_remove(key->snb.timeout);
+ 	key->snb.timeout = NULL;
+ }
++
++void net_key_cleanup(void)
++{
++	l_queue_destroy(keys, l_free);
++	keys = NULL;
++}
+diff --git a/mesh/net-keys.h b/mesh/net-keys.h
+index 9385e2c51..4f480fcda 100644
+--- a/mesh/net-keys.h
++++ b/mesh/net-keys.h
+@@ -21,6 +21,7 @@
+ #define KEY_REFRESH		0x01
+ #define IV_INDEX_UPDATE		0x02
+ 
++void net_key_cleanup(void);
+ bool net_key_confirm(uint32_t id, const uint8_t master[16]);
+ bool net_key_retrieve(uint32_t id, uint8_t *master);
+ uint32_t net_key_add(const uint8_t master[16]);
+diff --git a/mesh/net.c b/mesh/net.c
+index bfb9c4435..f104be0f9 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -681,8 +681,10 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
+ 	return net;
+ }
+ 
+-void mesh_net_free(struct mesh_net *net)
++void mesh_net_free(void *user_data)
+ {
++	struct mesh_net *net = user_data;
++
+ 	if (!net)
+ 		return;
+ 
+@@ -701,6 +703,14 @@ void mesh_net_free(struct mesh_net *net)
+ 	l_free(net);
+ }
+ 
++void mesh_net_cleanup(void)
++{
++	l_queue_destroy(fast_cache, l_free);
++	fast_cache = NULL;
++	l_queue_destroy(nets, mesh_net_free);
++	nets = NULL;
++}
++
+ bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t seq)
+ {
+ 	if (!net)
+diff --git a/mesh/net.h b/mesh/net.h
+index bfc8064f3..8646d5aef 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -265,7 +265,8 @@ typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
+ 					void *user_data);
+ 
+ struct mesh_net *mesh_net_new(struct mesh_node *node);
+-void mesh_net_free(struct mesh_net *net);
++void mesh_net_free(void *net);
++void mesh_net_cleanup(void);
+ void mesh_net_flush_msg_queues(struct mesh_net *net);
+ void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
+ bool mesh_net_iv_index_update(struct mesh_net *net);
 -- 
 2.25.4
 
