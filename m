@@ -2,69 +2,78 @@ Return-Path: <SRS0=JSwD=7A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19431C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 08:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7944BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 16:15:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED32A207D3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 08:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A1B320826
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 16:15:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589818530;
+	bh=q5HTwfOBGfBfZxqrTNTQaJvKuZMjmDhuRNoGsyo1ALM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=WVg5mGmMoVvc2EZAWEAKImEiRJP/6Y9v/gsN6SHRbQvKdrUKkIL5+5d1uVIS6r7Qn
+	 rW9HHp4hGT0SZnLYSTSDStZOKueANn30ip0ggbSVvBZaA+tE+Ug/BteSOTIDyiU6t1
+	 y/Zsp2mn6EtxtxsYGm8he1B4gThkQrxZ0LrUyz8c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727831AbgERIDi (ORCPT
+        id S1728043AbgERQP0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 May 2020 04:03:38 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57289 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726828AbgERIDi (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 May 2020 04:03:38 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 182A8CECE3;
-        Mon, 18 May 2020 10:13:21 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Enable WBS support for wcn3991
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200514131338.v2.1.I68404fc395a3dbc57c8a89ca02490013e8003a87@changeid>
-Date:   Mon, 18 May 2020 10:03:36 +0200
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>, bgodavar@codeaurora.org,
-        alainm@chromium.org, mka@chromium.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <8BFF0708-07AF-4034-8FEF-C1D95975404B@holtmann.org>
-References: <20200514131338.v2.1.I68404fc395a3dbc57c8a89ca02490013e8003a87@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 18 May 2020 12:15:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726958AbgERQP0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 May 2020 12:15:26 -0400
+Received: from embeddedor (unknown [189.207.59.248])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5908A20674;
+        Mon, 18 May 2020 16:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589818526;
+        bh=q5HTwfOBGfBfZxqrTNTQaJvKuZMjmDhuRNoGsyo1ALM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OYozICMkI4U5sVPYxuNXif+RiK9FF5K1kfQIRY1GQEd0hKFpapQDkVjcRkWWb8MVa
+         2amD3xnHM0zy7C4GX+zqgxn85hIjfdWtuMANqWW7Du5nbexhDcoVEyKihWAm1RVB9+
+         tdqJXcUCLASNAqypMZ85sQmW3obEgVcs7y42PNLo=
+Date:   Mon, 18 May 2020 11:20:11 -0500
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: Replace zero-length array with
+ flexible-array
+Message-ID: <20200518162011.GA9868@embeddedor>
+References: <20200513171556.GA21969@embeddedor>
+ <5C6DAE24-2E3B-4E89-AFA2-9B0E27B40815@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5C6DAE24-2E3B-4E89-AFA2-9B0E27B40815@holtmann.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
-
-> WCN3991 supports transparent WBS (host encoded mSBC). Add a flag to the
-> device match data to show WBS is supported.
+On Mon, May 18, 2020 at 09:58:22AM +0200, Marcel Holtmann wrote:
+> > 
+> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> > ---
+> > include/net/bluetooth/l2cap.h | 6 +++---
+> > 1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> This requires the matching firmware for WCN3991 in linux-firmware:
->        1a8b0dc00f77 (qca: Enable transparent WBS for WCN3991)
+> patch has been applied to bluetooth-next tree.
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
-> 
-> Changes in v2:
-> - Rename struct to qca_capabilities and fix enum naming
-> 
-> drivers/bluetooth/hci_qca.c | 23 +++++++++++++++++------
-> 1 file changed, 17 insertions(+), 6 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Thanks, Marcel.
 
-Regards
-
-Marcel
-
+--
+Gustavo
