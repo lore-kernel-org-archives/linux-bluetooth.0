@@ -2,102 +2,150 @@ Return-Path: <SRS0=JSwD=7A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDFEC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 18:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C853EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4900720715
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 18:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D67620756
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AEy766Lo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="txADvoHo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387443AbgERSNN (ORCPT
+        id S1726847AbgERU4k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 May 2020 14:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
+        Mon, 18 May 2020 16:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729710AbgERSNM (ORCPT
+        with ESMTP id S1726250AbgERU4k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 May 2020 14:13:12 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05274C061A0C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 11:13:12 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id g7so3810759uap.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 11:13:11 -0700 (PDT)
+        Mon, 18 May 2020 16:56:40 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D234EC061A0C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:39 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id a13so3177904pls.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YR1d4UXEmFjNR7Y1gBIt8dbUg7S85JgRbyJVZPiIUNk=;
-        b=AEy766LoSKCS9tRJqLmQ8eXHjd6CTGkG13kkjyRfr8RerSWhhwwtAQutlNvpijGw+g
-         tAyMZi/q4UPtECrrPB7WdElU6oPs6M7zJdUK6GJXj2vTn5iRSEbnwcWAZ0OlhiuZv+Po
-         1dwYV7bHLxCqNFwps10f6CT7PHXDI0v7N6MeU=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tHIUr6OI2tzpztosBH4ZilMc0GllNIQQ/6Oyt/MLLiY=;
+        b=txADvoHoXFuTKvxxvUZ5uBhNuTrq8SfLGWeIsAnl5ZeEGvRwbEbmnJIL5URIN+Ixv4
+         NfFJS/PXYaodm5kQUVm6SFdPy0enHC9Mr3Jxh1TswNfdYb6TdzuBkQNbuP8C322WC6Ep
+         yjThoFVQTzGKov6cRQYtGNX4LV2mmSKwLJV7fXX39/49oIHb7iIRE2OtpigIxZ+coEjm
+         Drs1djqI4FmQ9nOt7YlzYi8r5CwBCRCwcPMAo51d8FQC4YRNF1Mx8o65rSVIh5gPjoun
+         oCrIH+HItOb9PsLi+C1T0TSAJ+/2nbKSypjO5opml1PGJBMOVnJwnjBHXnOQk8xc0AF0
+         iIPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YR1d4UXEmFjNR7Y1gBIt8dbUg7S85JgRbyJVZPiIUNk=;
-        b=Y+ApqduGCCxqSRiaAyEA3x1PeG/Ha3CiOn9uCaZOVFGpX/+57p91ffeGsSwycXdheb
-         z+FX4e5mr7gwK7/61nyoSxr4Y1SWCtddrAYi8SrlRl76LuEnJX0Ph4qVZ5+8yvCm5VvP
-         TJ992gIvfhrTkoKD6oQCXo+n8Z0DU06W0rJT6rvIunwM+qedRuP5LhrAfeipoh7MX7bi
-         OsUq/5L8ROPF5EauhWkr+jEHhF3FTF88/W7PMKQvRempeRWlbWfhlNY1c6NUPws9mFFY
-         uhSf0XtbAcvvLFMjHgja82hhggeahmDwWqh40vjlM5H+SCxcGr5hBYpVexnkmQrvBwPf
-         jXCg==
-X-Gm-Message-State: AOAM532lE+WvCgJPsbzcmeSY2dj58aZ6EjebDbjtsax/eBKTs6h//Kbj
-        VguKAAzJ6FuyF2PMlK99df1fPF7g+Sh4SzI6OVUX2Q==
-X-Google-Smtp-Source: ABdhPJwfNlsAPqdUXufA61B/Ydm/oJiD59x98ZHXZ4VEeSGl7nby7Ozpmih+bLDyGLq7VRWMT69tGjfOcWtFRuhNFVg=
-X-Received: by 2002:ab0:6605:: with SMTP id r5mr4696251uam.115.1589825591243;
- Mon, 18 May 2020 11:13:11 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tHIUr6OI2tzpztosBH4ZilMc0GllNIQQ/6Oyt/MLLiY=;
+        b=ImHeXXfJ1QrJNfb4pKpytp0E35m5MdFvrRZ2E2l1b1asL+XbLEsE6zfZpvAg1kxjmS
+         7yaxWr84B6KDc8W+gOVMvznF/Hlr3WxROp5Jmh+Tt9HWEFXISr4CjUqff9RDvYVnekdZ
+         6NdDetSVKo38sIGJRtDWIoyCRW7t60hkQdojip3+ierUY41L9V77U5nQsgMidjcOZl2B
+         eHG8HSwffTaCBC0B76nc2baolGXEsqMl26HMdWbflqJHF4rNYeNXqPdi/Ef8E58/+30o
+         DvGuQYhqQCxysqnTUKEe/4dn+9nzb6gB36/ZFWJm8TZB89LRDa46WTTCHvm4wrzk54jp
+         TVvA==
+X-Gm-Message-State: AOAM533lBS2x9KYQXFyqqkfmyRAUQs525i47i21IHicoZWenfzSkdXEq
+        qGQNPtLbFEa+AxkFlSZTpUDs4lO7
+X-Google-Smtp-Source: ABdhPJz9cEkXnP/W7K16qhppLqGdQ7eXvJ8MlCtc/TGdqQotr0YTwDUrZB3TGSBn2Wdbw2LbdWFYBw==
+X-Received: by 2002:a17:902:d208:: with SMTP id t8mr18534109ply.324.1589835398309;
+        Mon, 18 May 2020 13:56:38 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id q18sm8519808pgn.34.2020.05.18.13.56.37
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2020 13:56:37 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] a2dp: Fix caching endpoints for unkown version
+Date:   Mon, 18 May 2020 13:56:33 -0700
+Message-Id: <20200518205636.139184-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
-References: <20200514131338.v2.1.I68404fc395a3dbc57c8a89ca02490013e8003a87@changeid>
- <8BFF0708-07AF-4034-8FEF-C1D95975404B@holtmann.org>
-In-Reply-To: <8BFF0708-07AF-4034-8FEF-C1D95975404B@holtmann.org>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 18 May 2020 11:12:59 -0700
-Message-ID: <CANFp7mUUJS9kxz5U+EMetfmDb=-Vn+Foz2G0ZuHTyuLCJmtDuQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Enable WBS support for wcn3991
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>, bgodavar@codeaurora.org,
-        Alain Michaud <alainm@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Marcel.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, May 18, 2020 at 1:03 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Abhishek,
->
-> > WCN3991 supports transparent WBS (host encoded mSBC). Add a flag to the
-> > device match data to show WBS is supported.
-> >
-> > This requires the matching firmware for WCN3991 in linux-firmware:
-> >        1a8b0dc00f77 (qca: Enable transparent WBS for WCN3991)
-> >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > ---
-> >
-> > Changes in v2:
-> > - Rename struct to qca_capabilities and fix enum naming
-> >
-> > drivers/bluetooth/hci_qca.c | 23 +++++++++++++++++------
-> > 1 file changed, 17 insertions(+), 6 deletions(-)
->
-> patch has been applied to bluetooth-next tree.
->
-> Regards
->
-> Marcel
->
+Don't cache the capabilities of endpoints which the version is unkown
+since so capabilities may not be available in such case.
+---
+ profiles/audio/a2dp.c  | 11 +++++++++--
+ profiles/audio/avdtp.c |  7 ++++++-
+ profiles/audio/avdtp.h |  1 +
+ 3 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index a2ce3204d..15e211b95 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2667,15 +2667,22 @@ static void discover_cb(struct avdtp *session, GSList *seps,
+ 				struct avdtp_error *err, void *user_data)
+ {
+ 	struct a2dp_setup *setup = user_data;
++	uint16_t version = avdtp_get_version(session);
+ 
+-	DBG("err %p", err);
++	DBG("version 0x%04x err %p", version, err);
+ 
+ 	setup->seps = seps;
+ 	setup->err = err;
+ 
+ 	if (!err) {
+ 		g_slist_foreach(seps, register_remote_sep, setup->chan);
+-		store_remote_seps(setup->chan);
++
++		/* Only store version has been initialized as features like
++		 * Delay Reporting may not be queried if the version in
++		 * unknown.
++		 */
++		if (version)
++			store_remote_seps(setup->chan);
+ 	}
+ 
+ 	finalize_discover(setup);
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index b632e41c5..1fd2be051 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -2256,7 +2256,7 @@ static uint16_t get_version(struct avdtp *session)
+ 	const sdp_record_t *rec;
+ 	sdp_list_t *protos;
+ 	sdp_data_t *proto_desc;
+-	uint16_t ver = 0x0100;
++	uint16_t ver = 0x0000;
+ 
+ 	rec = btd_device_get_record(session->device, A2DP_SINK_UUID);
+ 	if (!rec)
+@@ -2396,6 +2396,11 @@ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
+ 	return session;
+ }
+ 
++uint16_t avdtp_get_version(struct avdtp *session)
++{
++	return session->version;
++}
++
+ static GIOChannel *l2cap_connect(struct avdtp *session)
+ {
+ 	GError *err = NULL;
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index ad2cb9bcb..f1e51d4e3 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -310,3 +310,4 @@ struct avdtp_server *avdtp_get_server(struct avdtp_local_sep *lsep);
+ 
+ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
+ 							struct queue *lseps);
++uint16_t avdtp_get_version(struct avdtp *session);
+-- 
+2.25.3
+
