@@ -7,65 +7,67 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C853EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52241C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D67620756
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2494520829
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 20:56:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="txADvoHo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tt8o8htN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgERU4k (ORCPT
+        id S1727076AbgERU4l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 May 2020 16:56:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33914 "EHLO
+        Mon, 18 May 2020 16:56:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726250AbgERU4k (ORCPT
+        with ESMTP id S1726250AbgERU4l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 May 2020 16:56:40 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D234EC061A0C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:39 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id a13so3177904pls.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:39 -0700 (PDT)
+        Mon, 18 May 2020 16:56:41 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8F0C05BD09
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:40 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id y198so3936767pfb.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2020 13:56:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=tHIUr6OI2tzpztosBH4ZilMc0GllNIQQ/6Oyt/MLLiY=;
-        b=txADvoHoXFuTKvxxvUZ5uBhNuTrq8SfLGWeIsAnl5ZeEGvRwbEbmnJIL5URIN+Ixv4
-         NfFJS/PXYaodm5kQUVm6SFdPy0enHC9Mr3Jxh1TswNfdYb6TdzuBkQNbuP8C322WC6Ep
-         yjThoFVQTzGKov6cRQYtGNX4LV2mmSKwLJV7fXX39/49oIHb7iIRE2OtpigIxZ+coEjm
-         Drs1djqI4FmQ9nOt7YlzYi8r5CwBCRCwcPMAo51d8FQC4YRNF1Mx8o65rSVIh5gPjoun
-         oCrIH+HItOb9PsLi+C1T0TSAJ+/2nbKSypjO5opml1PGJBMOVnJwnjBHXnOQk8xc0AF0
-         iIPw==
+        bh=zy3uJZB5XsJzztjORyRIanJypmSXB+lz2legdKKnj/A=;
+        b=tt8o8htNfbhVVdJsV8BI0nj1NdnSxDmZQ4GzGOhCMkY/ogxMb6rNaV5vnmch+wzo+O
+         Y3CqtQRs16lXxMJ0oBQp0zsrJvNLOq/z/R2Rc5A8Q2cR4R7JEsVXJUGGrdx2BtBqdJT4
+         d5QpW02iPdoTecPLLpwT/dEuWSZPQxZTe24AfoEvfZcZe3Z33XyDznqPkeIyaeu/tABo
+         kRPSMXoB7tWGEa7RmV5b2J5NlFrozg4+S9kQLdbFslLdc1jB/iT0GTpWj9FMgf8Bz7eW
+         ZLZ/MLfuQTIzIktyYrNsUVp0PH2O3luXBi9CwC06//XRXX7rNHQgBWDb5+yn4rymXXHG
+         b2YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tHIUr6OI2tzpztosBH4ZilMc0GllNIQQ/6Oyt/MLLiY=;
-        b=ImHeXXfJ1QrJNfb4pKpytp0E35m5MdFvrRZ2E2l1b1asL+XbLEsE6zfZpvAg1kxjmS
-         7yaxWr84B6KDc8W+gOVMvznF/Hlr3WxROp5Jmh+Tt9HWEFXISr4CjUqff9RDvYVnekdZ
-         6NdDetSVKo38sIGJRtDWIoyCRW7t60hkQdojip3+ierUY41L9V77U5nQsgMidjcOZl2B
-         eHG8HSwffTaCBC0B76nc2baolGXEsqMl26HMdWbflqJHF4rNYeNXqPdi/Ef8E58/+30o
-         DvGuQYhqQCxysqnTUKEe/4dn+9nzb6gB36/ZFWJm8TZB89LRDa46WTTCHvm4wrzk54jp
-         TVvA==
-X-Gm-Message-State: AOAM533lBS2x9KYQXFyqqkfmyRAUQs525i47i21IHicoZWenfzSkdXEq
-        qGQNPtLbFEa+AxkFlSZTpUDs4lO7
-X-Google-Smtp-Source: ABdhPJz9cEkXnP/W7K16qhppLqGdQ7eXvJ8MlCtc/TGdqQotr0YTwDUrZB3TGSBn2Wdbw2LbdWFYBw==
-X-Received: by 2002:a17:902:d208:: with SMTP id t8mr18534109ply.324.1589835398309;
-        Mon, 18 May 2020 13:56:38 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=zy3uJZB5XsJzztjORyRIanJypmSXB+lz2legdKKnj/A=;
+        b=kyczgtXpdC33/XI/F0s3clgTy71FoSE67NpiqrwHfQi9uAXoH3YFNPExB/WiU11D8P
+         uK729YyOZx2bl8i9vX9z/NXHXbqV5hjTMoTYHJTDahv/3fHF5SOtjYwJgoQ4SYANb1yw
+         gCp3Dmq6xh7mmIZJQBacK4cjsOk9IAmcPNKT+lSzQJNp21ge2TO3m/4DcWc7raYfeAV6
+         uOvJtgydeV0azzfZRk/4bPcrVuURgU+L4mV99f2cFTAPD1Uh9VGlqNODsKcZJtAyOa1H
+         G/2jYYn6n/dgZSzce85VGbssWrTnBP7vdUUOcW3gXRzsx6tWX0n0TB9sD2mJl3JRWKAI
+         Rv8Q==
+X-Gm-Message-State: AOAM532pHK+7jh3aR5DBWx3l6J1eJfIO81QKOnOH4QAGGyUocUrfqYOn
+        N6Y7JyMnq5uLsvHofhWV5IkM7dv6
+X-Google-Smtp-Source: ABdhPJzZcQiuuPNiqOQJCORzN1Pgs1B48mZcGJjQH2sX14fDrN0eLM3Kd9oB7iFZ6sFU+EdOZPNdgg==
+X-Received: by 2002:aa7:9f8c:: with SMTP id z12mr15317624pfr.304.1589835399185;
+        Mon, 18 May 2020 13:56:39 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q18sm8519808pgn.34.2020.05.18.13.56.37
+        by smtp.gmail.com with ESMTPSA id q18sm8519808pgn.34.2020.05.18.13.56.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2020 13:56:37 -0700 (PDT)
+        Mon, 18 May 2020 13:56:38 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] a2dp: Fix caching endpoints for unkown version
-Date:   Mon, 18 May 2020 13:56:33 -0700
-Message-Id: <20200518205636.139184-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] doc/media-api: Add documentation for DelayReporting
+Date:   Mon, 18 May 2020 13:56:34 -0700
+Message-Id: <20200518205636.139184-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.25.3
+In-Reply-To: <20200518205636.139184-1-luiz.dentz@gmail.com>
+References: <20200518205636.139184-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,77 +77,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Don't cache the capabilities of endpoints which the version is unkown
-since so capabilities may not be available in such case.
+The code was expecting the endpoint to expose
+MediaEndpoint.DelayReporting property in order to expose
+MediaTransport.Delay property.
 ---
- profiles/audio/a2dp.c  | 11 +++++++++--
- profiles/audio/avdtp.c |  7 ++++++-
- profiles/audio/avdtp.h |  1 +
- 3 files changed, 16 insertions(+), 3 deletions(-)
+ doc/media-api.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index a2ce3204d..15e211b95 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -2667,15 +2667,22 @@ static void discover_cb(struct avdtp *session, GSList *seps,
- 				struct avdtp_error *err, void *user_data)
- {
- 	struct a2dp_setup *setup = user_data;
-+	uint16_t version = avdtp_get_version(session);
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 07f7ac3e0..dabc69936 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -580,6 +580,10 @@ Properties	string UUID [readonly, optional]:
  
--	DBG("err %p", err);
-+	DBG("version 0x%04x err %p", version, err);
+ 			Device object which the endpoint is belongs to.
  
- 	setup->seps = seps;
- 	setup->err = err;
- 
- 	if (!err) {
- 		g_slist_foreach(seps, register_remote_sep, setup->chan);
--		store_remote_seps(setup->chan);
++		bool DelayReporting [readonly, optional]:
 +
-+		/* Only store version has been initialized as features like
-+		 * Delay Reporting may not be queried if the version in
-+		 * unknown.
-+		 */
-+		if (version)
-+			store_remote_seps(setup->chan);
- 	}
- 
- 	finalize_discover(setup);
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index b632e41c5..1fd2be051 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -2256,7 +2256,7 @@ static uint16_t get_version(struct avdtp *session)
- 	const sdp_record_t *rec;
- 	sdp_list_t *protos;
- 	sdp_data_t *proto_desc;
--	uint16_t ver = 0x0100;
-+	uint16_t ver = 0x0000;
- 
- 	rec = btd_device_get_record(session->device, A2DP_SINK_UUID);
- 	if (!rec)
-@@ -2396,6 +2396,11 @@ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
- 	return session;
- }
- 
-+uint16_t avdtp_get_version(struct avdtp *session)
-+{
-+	return session->version;
-+}
++			Indicates if endpoint supports Delay Reporting.
 +
- static GIOChannel *l2cap_connect(struct avdtp *session)
- {
- 	GError *err = NULL;
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index ad2cb9bcb..f1e51d4e3 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -310,3 +310,4 @@ struct avdtp_server *avdtp_get_server(struct avdtp_local_sep *lsep);
+ MediaTransport1 hierarchy
+ =========================
  
- struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
- 							struct queue *lseps);
-+uint16_t avdtp_get_version(struct avdtp *session);
 -- 
 2.25.3
 
