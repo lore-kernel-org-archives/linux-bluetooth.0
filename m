@@ -1,240 +1,59 @@
-Return-Path: <SRS0=b6VV=67=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=JSwD=7A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2871EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 May 2020 15:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF198C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 07:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3278207BB
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 May 2020 15:27:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="WRxpTGaF"
+	by mail.kernel.org (Postfix) with ESMTP id D302A207D3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 May 2020 07:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728048AbgEQP1R (ORCPT
+        id S1726976AbgERHx6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 May 2020 11:27:17 -0400
-Received: from mga06.intel.com ([134.134.136.31]:64470 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727981AbgEQP1R (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 May 2020 11:27:17 -0400
-IronPort-SDR: jAl2XK+3TFJ4QzCu0W8iohSwdlgSkTqxMV0qxmqnS1ulgjQxNlopvA8wRKkHsvzDHIW2Il3D7s
- loaNZEJf7/4g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2020 08:27:15 -0700
-IronPort-SDR: Y5+qlL7VebbJa+FK/WR93rRyrQ5m0lz0+tUQzMvFlQo0nl/no0sZGStm90d/GDGYxvBcB9sOgx
- 4hjRjQPaLLmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,403,1583222400"; 
-   d="scan'208";a="373154600"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by fmsmga001.fm.intel.com with ESMTP; 17 May 2020 08:27:15 -0700
-Received: from orsmsx158.amr.corp.intel.com (10.22.240.20) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 17 May 2020 08:27:14 -0700
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX158.amr.corp.intel.com (10.22.240.20) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 17 May 2020 08:27:14 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 17 May 2020 08:27:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eekLVDWJ2k7MkzH/MWENM/5bKGe8FJ6NxL50k0lXpJpMQ3GkD155DUpKZM9K+HyZvUC6GgS5fGZKwM6J6ZEYgL3omWyEKR+5V2935P91cpv67YZp6Vf7L2ECygSmBvI5iobi65bxSvEAUE9n8GEg3VQIcDJiqdO9fVCMN/eDPNJBavstD6t1XZykMgl7M/9QLqVgA1Ni3dqVh796c3N/aHHPdCkOD7J3mTuqguLDcsBnQYycYy586tIgc5qiWyoRka3bR8j4M85R8XBRSssZjBvW8lf1ne0vVIJklkAK5/yV+dOiWXW9UUUFK87Mp0vdCvxWFFaJJzj4yGl48KxeaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DcXlZrIqq0IoAmdtvM7c9nq4Bp20Lh8F29BD0KZuU4M=;
- b=gGhgiebUTPcNC1JLuhA4empN4tmMXZ+Jtq/3h076MT2IqBSUl1PcuyfifxreO7MeaqSV8OAru2novckuaLxrI2GLtNpFb6rE6jDLnuxLsik5i6hp8sT9nppeUgOrDERaCan9t01x9SAOwfzeqF+OkU/2lfS80Yej/37ytJc7Y1zURR6iGw0KL08jEj7ISjWuWQdLbYRsEFggXKoPYsCoGit8RyoXhDTHCUgcIHPnq4cLiizDD8f3Cl9n/tvvNzlsb/qQ/XzGUHTNTNdp9oqrmyMuZurRJ+sIP5zAIW0sJVmLV7ZgaBaZkG57z+6f9bC8th+Gj6T5cm1lJrDPpMNAXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DcXlZrIqq0IoAmdtvM7c9nq4Bp20Lh8F29BD0KZuU4M=;
- b=WRxpTGaF4PDxmZCwwRqW9VdnDKCCJIfZxZOoSozRjO/BPBD7toRg+j7fVJvG3/fc7AKTzP/cCfbvAxy9Kt6QLDPY51B/PwA6v7cGLl9EsHnL0PDK7QdfNR3AzuvEjRFeU/Hic4YJoYL8ju2yUPQKVSS3UGwPvF7WXnyTfUrjaCQ=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MW3PR11MB4522.namprd11.prod.outlook.com (2603:10b6:303:2d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20; Sun, 17 May
- 2020 15:27:12 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::5b4:500e:f6a0:1ac0]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::5b4:500e:f6a0:1ac0%5]) with mapi id 15.20.3000.033; Sun, 17 May 2020
- 15:27:12 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2] mesh: Fix segfault caused by re-enabling of HCI
- controller
-Thread-Topic: [PATCH BlueZ v2] mesh: Fix segfault caused by re-enabling of HCI
- controller
-Thread-Index: AQHWKuAxIrcPbFZiPUyBgfsowJx+2KisaYUA
-Date:   Sun, 17 May 2020 15:27:12 +0000
-Message-ID: <fb805963cf5633fc7d57aa40e130b8aaceba33d9.camel@intel.com>
-References: <20200515174156.11958-1-inga.stotland@intel.com>
-In-Reply-To: <20200515174156.11958-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.34.4 (3.34.4-1.fc31) 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.55.39]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7406b776-4887-428a-297a-08d7fa76c5e9
-x-ms-traffictypediagnostic: MW3PR11MB4522:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW3PR11MB452251C79E292531782CD61AE1BB0@MW3PR11MB4522.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 040655413E
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3ccZIOafuxxfLT3pXO3wTVTvoUuMdXRkyG0fWeTUbl2huHOPYjYfPcJ/Rt44G8KIFaIfms+m7drX1X0ukvk6u6f5kYJ9IfxquFYQka2bxeCcee6aq8muWrVyNKGC7OYRz7ZtMwGSvveOwF2BZ7CwAONmCFX95Cz1hj7/jfbu4nxuG+WyyepGplzLazmTylQkI2yzAVnI0Ky1miRI0M6cOxPQ+0bXco2GQNVOzLa3r+R2q/1Plr+poRBidUzoXKkFrkyuAW/b5Y3o9VKQBnGhdA2J3sawcpHzjyftf3GG+dW6oJ1nUuWsW2D/rHC2dSI3bFWaMeNRNDfCTobgt47unOM5L6fFaytpaoTBxj5y5DRaykEUWwmcJDdw6JvesLeTvj0Oe/Ku+93dolMsxdJr0GIUITK5BgZDN9P4lAsLiDpVptbZKVTPnUchPK9MbEX0
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(396003)(376002)(366004)(39860400002)(136003)(346002)(26005)(71200400001)(8936002)(186003)(2616005)(8676002)(6486002)(66946007)(76116006)(66476007)(66556008)(64756008)(66446008)(91956017)(36756003)(2906002)(86362001)(110136005)(316002)(478600001)(5660300002)(6506007)(6636002)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: HvKBCJWYwMJsWXtf5VVr+YUI7aF52rFbpcD/yNUbjxSNSQFZsU4g+SUHDoVIYVaqAb08zZcArt64BM6agXElOHYr/k7Q2cEiEAP2MxIiFToGy2LIdGV5D+AYaP1ikJwY+IMajtUCEB+XwBwG0shFiW/AQralHQu71CTh51KoHlRbHbYWfMYZKnsOmWeex6dNqMnaCaFd10jc2PoOo494Acvk9m91cn6xqEHZjklEbqFmG3IzG4tjK28Fe7w9x4QT47TbnybQZAiwWe+OrF4b7jCrNaqfr6jTqiF71XsagFY3GNAsF+lhGQ0ju8PVXRZcmQ52ysi833wwHqHSrsmeOus7M0IUkt69GnXRH0tVIjTSgYO113JXD3pxvyhJOSZM4FNNARvtIj2mol2vvYpPwWPRp848BiQJ9hqDOp4iGslKolL0R7miAsntUxlY9GOKEJc8t6/yKb/0NsqNXvwCpvSN1PxWjqvjCWsIIc1ns70=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8148D97D9EFB1248A6EA588A139A4AD1@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7406b776-4887-428a-297a-08d7fa76c5e9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2020 15:27:12.8805
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QfQrJrokiNRPKIoUwNHWT0F0//xwGJGkI2QvR0FeH/C/AvNfueGzGsp0lMQLNP2aqeuK0FTyUcSfF6JKy/acjA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4522
-X-OriginatorOrg: intel.com
+        Mon, 18 May 2020 03:53:58 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43379 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726489AbgERHx6 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 May 2020 03:53:58 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C7C2DCECE2;
+        Mon, 18 May 2020 10:03:40 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2] build: Add an option to explicitly enable hid2hci
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200513213812.23165-1-sonnysasaka@chromium.org>
+Date:   Mon, 18 May 2020 09:53:56 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <BC34FA18-2DD5-4620-8224-4BDAEBB59651@holtmann.org>
+References: <77B1AB20-C903-427C-A3BD-E10C79815EF9@holtmann.org>
+ <20200513213812.23165-1-sonnysasaka@chromium.org>
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-UGF0Y2ggQXBwbGllZA0KT24gRnJpLCAyMDIwLTA1LTE1IGF0IDEwOjQxIC0wNzAwLCBJbmdhIFN0
-b3RsYW5kIHdyb3RlOg0KPiBUaGlzIGZpeGVzIHRoZSBjcmFzaCB0aGF0IG9jY3VycyB3aGVuIGEg
-Y29udHJvbGxlciB1c2VkIGJ5IGJsdWV0b290aC1tZXNoZA0KPiBpcyByZW1vdmVkIGFuZCB0aGVu
-IGFkZGVkIGJhY2sgYWdhaW4uDQo+IA0KPiBBbHNvLCBjb3JyZWN0bHkgcmVzdGFydCBzY2Fubmlu
-ZyB3aGVuIHRoZSBjb250cm9sbGVyIGlzIHJlLWVuYWJsZWQuDQo+IA0KPiBCYWNrdHJhY2U6DQo+
-IDB4MDAwMDU2MThlNzU0ZDA0MCBpbiA/PyAoKQ0KPiAweDAwMDA1NjE4ZTZlMTJkOWEgaW4gaW9f
-cmVhZHlfY2FsbGJhY2sgKCkgYXQgbWVzaC9tZXNoLmM6MTc0DQo+IDB4MDAwMDU2MThlNmUzZDJj
-OCBpbiBsX3F1ZXVlX2ZvcmVhY2ggKCkgYXQgZWxsL3F1ZXVlLmM6NDQxDQo+IDB4MDAwMDU2MThl
-NmUzNzkyNyBpbiByZXF1ZXN0X2NvbXBsZXRlICgpIGF0IHNyYy9zaGFyZWQvbWdtdC5jOjI2MQ0K
-PiAtLS0NCj4gIG1lc2gvbWVzaC1pby1nZW5lcmljLmMgfCAxMzUgKysrKysrKysrKysrKysrKysr
-KysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4gIG1lc2gvbWVzaC5jICAgICAgICAgICAgfCAgIDkg
-KystDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDg3IGluc2VydGlvbnMoKyksIDU3IGRlbGV0aW9ucygt
-KQ0KPiANCj4gZGlmZiAtLWdpdCBhL21lc2gvbWVzaC1pby1nZW5lcmljLmMgYi9tZXNoL21lc2gt
-aW8tZ2VuZXJpYy5jDQo+IGluZGV4IDJlZmQzMmYxMi4uM2FkMTMwNTY3IDEwMDY0NA0KPiAtLS0g
-YS9tZXNoL21lc2gtaW8tZ2VuZXJpYy5jDQo+ICsrKyBiL21lc2gvbWVzaC1pby1nZW5lcmljLmMN
-Cj4gQEAgLTI4NywxMCArMjg3LDg2IEBAIHN0YXRpYyB2b2lkIGNvbmZpZ3VyZV9oY2koc3RydWN0
-IG1lc2hfaW9fcHJpdmF0ZSAqaW8pDQo+ICAJCQkJc2l6ZW9mKGNtZCksIGhjaV9nZW5lcmljX2Nh
-bGxiYWNrLCBOVUxMLCBOVUxMKTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZvaWQgc2Nhbl9lbmFi
-bGVfcnNwKGNvbnN0IHZvaWQgKmJ1ZiwgdWludDhfdCBzaXplLA0KPiArCQkJCQkJCXZvaWQgKnVz
-ZXJfZGF0YSkNCj4gK3sNCj4gKwl1aW50OF90IHN0YXR1cyA9ICooKHVpbnQ4X3QgKikgYnVmKTsN
-Cj4gKw0KPiArCWlmIChzdGF0dXMpDQo+ICsJCWxfZXJyb3IoIkxFIFNjYW4gZW5hYmxlIGZhaWxl
-ZCAoMHglMDJ4KSIsIHN0YXR1cyk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkIHNldF9yZWN2
-X3NjYW5fZW5hYmxlKGNvbnN0IHZvaWQgKmJ1ZiwgdWludDhfdCBzaXplLA0KPiArCQkJCQkJCXZv
-aWQgKnVzZXJfZGF0YSkNCj4gK3sNCj4gKwlzdHJ1Y3QgbWVzaF9pb19wcml2YXRlICpwdnQgPSB1
-c2VyX2RhdGE7DQo+ICsJc3RydWN0IGJ0X2hjaV9jbWRfbGVfc2V0X3NjYW5fZW5hYmxlIGNtZDsN
-Cj4gKw0KPiArCWNtZC5lbmFibGUgPSAweDAxOwkvKiBFbmFibGUgc2Nhbm5pbmcgKi8NCj4gKwlj
-bWQuZmlsdGVyX2R1cCA9IDB4MDA7CS8qIFJlcG9ydCBkdXBsaWNhdGVzICovDQo+ICsJYnRfaGNp
-X3NlbmQocHZ0LT5oY2ksIEJUX0hDSV9DTURfTEVfU0VUX1NDQU5fRU5BQkxFLA0KPiArCQkJJmNt
-ZCwgc2l6ZW9mKGNtZCksIHNjYW5fZW5hYmxlX3JzcCwgcHZ0LCBOVUxMKTsNCj4gK30NCj4gKw0K
-PiArc3RhdGljIHZvaWQgc2Nhbl9kaXNhYmxlX3JzcChjb25zdCB2b2lkICpidWYsIHVpbnQ4X3Qg
-c2l6ZSwNCj4gKwkJCQkJCQl2b2lkICp1c2VyX2RhdGEpDQo+ICt7DQo+ICsJc3RydWN0IGJ0X2hj
-aV9jbWRfbGVfc2V0X3NjYW5fcGFyYW1ldGVycyBjbWQ7DQo+ICsJc3RydWN0IG1lc2hfaW9fcHJp
-dmF0ZSAqcHZ0ID0gdXNlcl9kYXRhOw0KPiArCXVpbnQ4X3Qgc3RhdHVzID0gKigodWludDhfdCAq
-KSBidWYpOw0KPiArDQo+ICsJaWYgKHN0YXR1cykNCj4gKwkJbF9lcnJvcigiTEUgU2NhbiBkaXNh
-YmxlIGZhaWxlZCAoMHglMDJ4KSIsIHN0YXR1cyk7DQo+ICsNCj4gKwljbWQudHlwZSA9IHB2dC0+
-YWN0aXZlID8gMHgwMSA6IDB4MDA7CS8qIFBhc3NpdmUvQWN0aXZlIHNjYW5uaW5nICovDQo+ICsJ
-Y21kLmludGVydmFsID0gTF9DUFVfVE9fTEUxNigweDAwMTApOwkvKiAxMCBtcyAqLw0KPiArCWNt
-ZC53aW5kb3cgPSBMX0NQVV9UT19MRTE2KDB4MDAxMCk7CS8qIDEwIG1zICovDQo+ICsJY21kLm93
-bl9hZGRyX3R5cGUgPSAweDAxOwkJLyogQUREUl9UWVBFX1JBTkRPTSAqLw0KPiArCWNtZC5maWx0
-ZXJfcG9saWN5ID0gMHgwMDsJCS8qIEFjY2VwdCBhbGwgKi8NCj4gKw0KPiArCWJ0X2hjaV9zZW5k
-KHB2dC0+aGNpLCBCVF9IQ0lfQ01EX0xFX1NFVF9TQ0FOX1BBUkFNRVRFUlMsDQo+ICsJCQkmY21k
-LCBzaXplb2YoY21kKSwNCj4gKwkJCXNldF9yZWN2X3NjYW5fZW5hYmxlLCBwdnQsIE5VTEwpOw0K
-PiArfQ0KPiArDQo+ICtzdGF0aWMgYm9vbCBmaW5kX2FjdGl2ZShjb25zdCB2b2lkICphLCBjb25z
-dCB2b2lkICpiKQ0KPiArew0KPiArCWNvbnN0IHN0cnVjdCBwdnRfcnhfcmVnICpyeF9yZWcgPSBh
-Ow0KPiArDQo+ICsJLyogTWVzaCBzcGVjaWZpYyBBRCB0eXBlcyBkbyAqbm90KiByZXF1aXJlIGFj
-dGl2ZSBzY2FubmluZywNCj4gKwkgKiBzbyBkbyBub3QgdHVybiBvbiBBY3RpdmUgU2Nhbm5pbmcg
-b24gdGhlaXIgYWNjb3VudC4NCj4gKwkgKi8NCj4gKwlpZiAocnhfcmVnLT5maWx0ZXJbMF0gPCBN
-RVNIX0FEX1RZUEVfUFJPVklTSU9OIHx8DQo+ICsJCQlyeF9yZWctPmZpbHRlclswXSA+IE1FU0hf
-QURfVFlQRV9CRUFDT04pDQo+ICsJCXJldHVybiB0cnVlOw0KPiArDQo+ICsJcmV0dXJuIGZhbHNl
-Ow0KPiArfQ0KPiArDQo+ICtzdGF0aWMgdm9pZCByZXN0YXJ0X3NjYW4oc3RydWN0IG1lc2hfaW9f
-cHJpdmF0ZSAqcHZ0KQ0KPiArew0KPiArCXN0cnVjdCBidF9oY2lfY21kX2xlX3NldF9zY2FuX2Vu
-YWJsZSBjbWQ7DQo+ICsNCj4gKwlpZiAobF9xdWV1ZV9pc2VtcHR5KHB2dC0+cnhfcmVncykpDQo+
-ICsJCXJldHVybjsNCj4gKw0KPiArCXB2dC0+YWN0aXZlID0gbF9xdWV1ZV9maW5kKHB2dC0+cnhf
-cmVncywgZmluZF9hY3RpdmUsIE5VTEwpOw0KPiArCWNtZC5lbmFibGUgPSAweDAwOwkvKiBEaXNh
-YmxlIHNjYW5uaW5nICovDQo+ICsJY21kLmZpbHRlcl9kdXAgPSAweDAwOwkvKiBSZXBvcnQgZHVw
-bGljYXRlcyAqLw0KPiArCWJ0X2hjaV9zZW5kKHB2dC0+aGNpLCBCVF9IQ0lfQ01EX0xFX1NFVF9T
-Q0FOX0VOQUJMRSwNCj4gKwkJCQkmY21kLCBzaXplb2YoY21kKSwgc2Nhbl9kaXNhYmxlX3JzcCwg
-cHZ0LCBOVUxMKTsNCj4gK30NCj4gKw0KPiAgc3RhdGljIHZvaWQgaGNpX2luaXQodm9pZCAqdXNl
-cl9kYXRhKQ0KPiAgew0KPiAgCXN0cnVjdCBtZXNoX2lvICppbyA9IHVzZXJfZGF0YTsNCj4gIAli
-b29sIHJlc3VsdCA9IHRydWU7DQo+ICsJYm9vbCByZXN0YXJ0ZWQgPSBmYWxzZTsNCj4gKw0KPiAr
-CWlmIChpby0+cHZ0LT5oY2kpIHsNCj4gKwkJcmVzdGFydGVkID0gdHJ1ZTsNCj4gKwkJYnRfaGNp
-X3VucmVmKGlvLT5wdnQtPmhjaSk7DQo+ICsJfQ0KPiAgDQo+ICAJaW8tPnB2dC0+aGNpID0gYnRf
-aGNpX25ld191c2VyX2NoYW5uZWwoaW8tPnB2dC0+aW5kZXgpOw0KPiAgCWlmICghaW8tPnB2dC0+
-aGNpKSB7DQo+IEBAIC0zMDYsNiArMzgyLDkgQEAgc3RhdGljIHZvaWQgaGNpX2luaXQodm9pZCAq
-dXNlcl9kYXRhKQ0KPiAgCQkJCQkJZXZlbnRfY2FsbGJhY2ssIGlvLCBOVUxMKTsNCj4gIA0KPiAg
-CQlsX2RlYnVnKCJTdGFydGVkIG1lc2ggb24gaGNpICV1IiwgaW8tPnB2dC0+aW5kZXgpOw0KPiAr
-DQo+ICsJCWlmIChyZXN0YXJ0ZWQpDQo+ICsJCQlyZXN0YXJ0X3NjYW4oaW8tPnB2dCk7DQo+ICAJ
-fQ0KPiAgDQo+ICAJaWYgKGlvLT5wdnQtPnJlYWR5X2NhbGxiYWNrKQ0KPiBAQCAtNzEzLDYyICs3
-OTIsNiBAQCBzdGF0aWMgYm9vbCBmaW5kX2J5X2ZpbHRlcihjb25zdCB2b2lkICphLCBjb25zdCB2
-b2lkICpiKQ0KPiAgCXJldHVybiAhbWVtY21wKHJ4X3JlZy0+ZmlsdGVyLCBmaWx0ZXIsIHJ4X3Jl
-Zy0+bGVuKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGljIHZvaWQgc2Nhbl9lbmFibGVfcnNwKGNvbnN0
-IHZvaWQgKmJ1ZiwgdWludDhfdCBzaXplLA0KPiAtCQkJCQkJCXZvaWQgKnVzZXJfZGF0YSkNCj4g
-LXsNCj4gLQl1aW50OF90IHN0YXR1cyA9ICooKHVpbnQ4X3QgKikgYnVmKTsNCj4gLQ0KPiAtCWlm
-IChzdGF0dXMpDQo+IC0JCWxfZXJyb3IoIkxFIFNjYW4gZW5hYmxlIGZhaWxlZCAoMHglMDJ4KSIs
-IHN0YXR1cyk7DQo+IC19DQo+IC0NCj4gLXN0YXRpYyB2b2lkIHNldF9yZWN2X3NjYW5fZW5hYmxl
-KGNvbnN0IHZvaWQgKmJ1ZiwgdWludDhfdCBzaXplLA0KPiAtCQkJCQkJCXZvaWQgKnVzZXJfZGF0
-YSkNCj4gLXsNCj4gLQlzdHJ1Y3QgbWVzaF9pb19wcml2YXRlICpwdnQgPSB1c2VyX2RhdGE7DQo+
-IC0Jc3RydWN0IGJ0X2hjaV9jbWRfbGVfc2V0X3NjYW5fZW5hYmxlIGNtZDsNCj4gLQ0KPiAtCWNt
-ZC5lbmFibGUgPSAweDAxOwkvKiBFbmFibGUgc2Nhbm5pbmcgKi8NCj4gLQljbWQuZmlsdGVyX2R1
-cCA9IDB4MDA7CS8qIFJlcG9ydCBkdXBsaWNhdGVzICovDQo+IC0JYnRfaGNpX3NlbmQocHZ0LT5o
-Y2ksIEJUX0hDSV9DTURfTEVfU0VUX1NDQU5fRU5BQkxFLA0KPiAtCQkJJmNtZCwgc2l6ZW9mKGNt
-ZCksIHNjYW5fZW5hYmxlX3JzcCwgcHZ0LCBOVUxMKTsNCj4gLX0NCj4gLQ0KPiAtc3RhdGljIHZv
-aWQgc2Nhbl9kaXNhYmxlX3JzcChjb25zdCB2b2lkICpidWYsIHVpbnQ4X3Qgc2l6ZSwNCj4gLQkJ
-CQkJCQl2b2lkICp1c2VyX2RhdGEpDQo+IC17DQo+IC0Jc3RydWN0IGJ0X2hjaV9jbWRfbGVfc2V0
-X3NjYW5fcGFyYW1ldGVycyBjbWQ7DQo+IC0Jc3RydWN0IG1lc2hfaW9fcHJpdmF0ZSAqcHZ0ID0g
-dXNlcl9kYXRhOw0KPiAtCXVpbnQ4X3Qgc3RhdHVzID0gKigodWludDhfdCAqKSBidWYpOw0KPiAt
-DQo+IC0JaWYgKHN0YXR1cykNCj4gLQkJbF9lcnJvcigiTEUgU2NhbiBkaXNhYmxlIGZhaWxlZCAo
-MHglMDJ4KSIsIHN0YXR1cyk7DQo+IC0NCj4gLQljbWQudHlwZSA9IHB2dC0+YWN0aXZlID8gMHgw
-MSA6IDB4MDA7CS8qIFBhc3NpdmUvQWN0aXZlIHNjYW5uaW5nICovDQo+IC0JY21kLmludGVydmFs
-ID0gTF9DUFVfVE9fTEUxNigweDAwMTApOwkvKiAxMCBtcyAqLw0KPiAtCWNtZC53aW5kb3cgPSBM
-X0NQVV9UT19MRTE2KDB4MDAxMCk7CS8qIDEwIG1zICovDQo+IC0JY21kLm93bl9hZGRyX3R5cGUg
-PSAweDAxOwkJLyogQUREUl9UWVBFX1JBTkRPTSAqLw0KPiAtCWNtZC5maWx0ZXJfcG9saWN5ID0g
-MHgwMDsJCS8qIEFjY2VwdCBhbGwgKi8NCj4gLQ0KPiAtCWJ0X2hjaV9zZW5kKHB2dC0+aGNpLCBC
-VF9IQ0lfQ01EX0xFX1NFVF9TQ0FOX1BBUkFNRVRFUlMsDQo+IC0JCQkmY21kLCBzaXplb2YoY21k
-KSwNCj4gLQkJCXNldF9yZWN2X3NjYW5fZW5hYmxlLCBwdnQsIE5VTEwpOw0KPiAtfQ0KPiAtDQo+
-IC1zdGF0aWMgYm9vbCBmaW5kX2FjdGl2ZShjb25zdCB2b2lkICphLCBjb25zdCB2b2lkICpiKQ0K
-PiAtew0KPiAtCWNvbnN0IHN0cnVjdCBwdnRfcnhfcmVnICpyeF9yZWcgPSBhOw0KPiAtDQo+IC0J
-LyogTWVzaCBzcGVjaWZpYyBBRCB0eXBlcyBkbyAqbm90KiByZXF1aXJlIGFjdGl2ZSBzY2Fubmlu
-ZywNCj4gLQkgKiBzbyBkbyBub3QgdHVybiBvbiBBY3RpdmUgU2Nhbm5pbmcgb24gdGhlaXIgYWNj
-b3VudC4NCj4gLQkgKi8NCj4gLQlpZiAocnhfcmVnLT5maWx0ZXJbMF0gPCBNRVNIX0FEX1RZUEVf
-UFJPVklTSU9OIHx8DQo+IC0JCQlyeF9yZWctPmZpbHRlclswXSA+IE1FU0hfQURfVFlQRV9CRUFD
-T04pDQo+IC0JCXJldHVybiB0cnVlOw0KPiAtDQo+IC0JcmV0dXJuIGZhbHNlOw0KPiAtfQ0KPiAt
-DQo+ICBzdGF0aWMgYm9vbCByZWN2X3JlZ2lzdGVyKHN0cnVjdCBtZXNoX2lvICppbywgY29uc3Qg
-dWludDhfdCAqZmlsdGVyLA0KPiAgCQkJdWludDhfdCBsZW4sIG1lc2hfaW9fcmVjdl9mdW5jX3Qg
-Y2IsIHZvaWQgKnVzZXJfZGF0YSkNCj4gIHsNCj4gZGlmZiAtLWdpdCBhL21lc2gvbWVzaC5jIGIv
-bWVzaC9tZXNoLmMNCj4gaW5kZXggODkwYTNhYThmLi4wYThlYTk3MGQgMTAwNjQ0DQo+IC0tLSBh
-L21lc2gvbWVzaC5jDQo+ICsrKyBiL21lc2gvbWVzaC5jDQo+IEBAIC02Niw2ICs2Niw3IEBAIHN0
-cnVjdCBidF9tZXNoIHsNCj4gIAl1aW50MTZfdCByZXFfaW5kZXg7DQo+ICAJdWludDhfdCBmcmll
-bmRfcXVldWVfc3o7DQo+ICAJdWludDhfdCBtYXhfZmlsdGVyczsNCj4gKwlib29sIGluaXRpYWxp
-emVkOw0KPiAgfTsNCj4gIA0KPiAgc3RydWN0IGpvaW5fZGF0YXsNCj4gQEAgLTkxLDcgKzkyLDgg
-QEAgc3RhdGljIHN0cnVjdCBidF9tZXNoIG1lc2ggPSB7DQo+ICAJLmxwbl9zdXBwb3J0ID0gZmFs
-c2UsDQo+ICAJLnByb3h5X3N1cHBvcnQgPSBmYWxzZSwNCj4gIAkuY3JwbCA9IERFRkFVTFRfQ1JQ
-TCwNCj4gLQkuZnJpZW5kX3F1ZXVlX3N6ID0gREVGQVVMVF9GUklFTkRfUVVFVUVfU1oNCj4gKwku
-ZnJpZW5kX3F1ZXVlX3N6ID0gREVGQVVMVF9GUklFTkRfUVVFVUVfU1osDQo+ICsJLmluaXRpYWxp
-emVkID0gZmFsc2UNCj4gIH07DQo+ICANCj4gIC8qIFdlIGFsbG93IG9ubHkgb25lIG91dHN0YW5k
-aW5nIEpvaW4gcmVxdWVzdCAqLw0KPiBAQCAtMTY4LDYgKzE3MCwxMSBAQCBzdGF0aWMgdm9pZCBp
-b19yZWFkeV9jYWxsYmFjayh2b2lkICp1c2VyX2RhdGEsIGJvb2wgcmVzdWx0KQ0KPiAgew0KPiAg
-CXN0cnVjdCBtZXNoX2luaXRfcmVxdWVzdCAqcmVxID0gdXNlcl9kYXRhOw0KPiAgDQo+ICsJaWYg
-KG1lc2guaW5pdGlhbGl6ZWQpDQo+ICsJCXJldHVybjsNCj4gKw0KPiArCW1lc2guaW5pdGlhbGl6
-ZWQgPSB0cnVlOw0KPiArDQo+ICAJaWYgKHJlc3VsdCkNCj4gIAkJbm9kZV9hdHRhY2hfaW9fYWxs
-KG1lc2guaW8pOw0KPiAgDQo=
+Hi Sonny,
+
+> hid2hci is no longer a common use. This patch changes the default to not
+> build and install hid2hci and provide a configure flag --enable-hid2hci
+> to explicitly enable it.
+> ---
+> configure.ac | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
+
+patch has been applied.
+
+Regards
+
+Marcel
+
