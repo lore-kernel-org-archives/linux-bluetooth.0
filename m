@@ -2,73 +2,71 @@ Return-Path: <SRS0=t8jV=7B=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9314FC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 May 2020 20:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D190C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 May 2020 20:25:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 725E220849
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 May 2020 20:03:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D2DD20657
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 May 2020 20:25:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qe2d0p4D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPjmSbDS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728392AbgESUDx (ORCPT
+        id S1727836AbgESUZW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 May 2020 16:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52904 "EHLO
+        Tue, 19 May 2020 16:25:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728180AbgESUDx (ORCPT
+        with ESMTP id S1726283AbgESUZW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 May 2020 16:03:53 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A3FC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2020 13:03:53 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id n18so418259pfa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2020 13:03:53 -0700 (PDT)
+        Tue, 19 May 2020 16:25:22 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58767C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2020 13:25:22 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id f15so359992plr.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2020 13:25:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=3vOmxRIz18xqHnh7KqZs026Bkg3/EflDmf6PCja04AI=;
-        b=qe2d0p4DqcsqJuwAZaKUbbEpw4CWfY5iH8qCEk+3OfXYoKHSE3mEeMP3/4vpPnSOq/
-         qYjn3Vj6hf1b/e2ibUMJ1mAvW6yfrqOGThwb1Da3T7vYF2xl2USA6UrN4dYPCes+HMBu
-         S6/mgXigmCvpGoJZXl03pLi/6UzWkOoJH9E7U9KKcC6LkZATPZ1Koc6LxViw9QtiYOrx
-         ItBQTRZcHxPGZ/J/b2QP6da1euh4E3f7tV5shsvMkCQPFyPDDTwCbFwAS22YZUyxDGaO
-         P+gnz/KLz4t+sKRXb1mRMAoeGQN51A56iuNpC8nK7T729UkeowhTwoA+T1QGIVSoY2Q4
-         e0kw==
+        bh=PlpimUzdploR0syL9l8/YlsWxzaH6bbKnKDninRyKo8=;
+        b=lPjmSbDS2xboM3Po4TkB2itCUlVdWT2DePlXwbqdllU5XAuiiUzjL4P5oe3JX6ttLf
+         xxYBLiP72GTG6MwRaj9sqerhgk28rVMvUfyuK3Dkiinzt0s/hnDBNlXHghNp2SFprTNv
+         2CXtVrv6ItxAYYl0c0RrCxzVSYTef0Hz9Nqex2LVgscyF52M9S7jenKBHcg119ayEFzW
+         3tdlCsERhHOHcvHqNnB7/FhiGl4FTtkrVKlEfxqxuw3JEspfI/XALkqRMrXw77FhO0pL
+         89alWlxJ69DOx0L111iGldKzKuSBQxm+ob0uYmKRg5bnw2nPAO6Jm+rUwXOLFlur0tSW
+         BMjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3vOmxRIz18xqHnh7KqZs026Bkg3/EflDmf6PCja04AI=;
-        b=meVVTQ/W21EtLtx6/dBDEDyU9ypEfWYuJfKidQGJnbgN7dh1/XLZTTAi6/Bejlw3cT
-         r5ggggyTOMMYnjjtv+kVUGMcNuq4rPJ0mt3rgsKDGFePye44yJslHmoG94jYpwLpsfwE
-         r81GPDFuyz+cUUmYiBSKTFhtRAnto6drKoJgvuZT1UUCyqKnN4+JEkIBGRl3zjk3vObE
-         t9WGsdyqRVpe7BoFFkE74lb+Nb+57J01GNJkkSELzHtfaClaxgjsxmvWczK6vDGJITfa
-         oyrcYvY5plqy4PjcbxSRmzHcZT8L+vjwnIjQY9qtkXSyn7OPFcjLDlWJeW+hDMMMfrRq
-         Nncw==
-X-Gm-Message-State: AOAM533Ue3+x1hWqasvtUZEcNAvS5WiPCHoZan2Q66XulL6N3kd/mz8q
-        PNAd3VtmUBx05pvMo+zTBcXxVWn0
-X-Google-Smtp-Source: ABdhPJz4DLCXwmAWF1gocd/W3quyXkdhNyZOKB3W9U6Ygfh9HO4TJl2iP6U3ucYoSZ1iXGlFsYG6uw==
-X-Received: by 2002:a63:f015:: with SMTP id k21mr868327pgh.248.1589918632118;
-        Tue, 19 May 2020 13:03:52 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PlpimUzdploR0syL9l8/YlsWxzaH6bbKnKDninRyKo8=;
+        b=SRYxjZHow5AlIPgHwXE5e+SvLYdpVt3iDebmrQhn+bHBnfqALMT84eoSyMJ3BvviAc
+         l71aa0xZeshprE+y2F7MtZLXtPv5CqtcJf332QN4tuyiAxF0LodCjnvIBmTb6Se2WNzD
+         I60HUMCGiMYcsY8qzb0Nuyqm8rkwlWC6CLfVyb1YRp72iWt4qVJ8ijg7YgJfFXzeW62R
+         sTNyxQ8gSQwswUI78o03mBNyIbbCnstVsgY6Xx17auZzlMlYM2DQUw35G96G+7pHK+Jh
+         JIJrflGB7Wsu4ZQbpVqV7vWjH//PzXSyNLEi4yxgMefwdedIAM167f53iP5ubM3zZ48P
+         Rjxg==
+X-Gm-Message-State: AOAM532io5tjDDw6JKl/xI/9GWrjuwi6jUW4Ol8OVv/SgVJ32rvIonx5
+        w6dSPb+3ZBsLJ5ryhgL/dUAEme+6
+X-Google-Smtp-Source: ABdhPJwpxeFYSso5iXkEPAuN4UdFdHfEulLYdjGRvTqGASiSFF6Yy5QD5G1/OeyN2NWtZZKIlpW9MA==
+X-Received: by 2002:a17:902:bb96:: with SMTP id m22mr1232413pls.222.1589919921259;
+        Tue, 19 May 2020 13:25:21 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i98sm302003pje.37.2020.05.19.13.03.50
+        by smtp.gmail.com with ESMTPSA id c184sm298808pfc.57.2020.05.19.13.25.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2020 13:03:51 -0700 (PDT)
+        Tue, 19 May 2020 13:25:20 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/4] doc/settings-storage: Update documentation of Endpoints
-Date:   Tue, 19 May 2020 13:03:45 -0700
-Message-Id: <20200519200345.217345-4-luiz.dentz@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: Disconnect if E0 is used for Level 4
+Date:   Tue, 19 May 2020 13:25:16 -0700
+Message-Id: <20200519202519.219335-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.25.3
-In-Reply-To: <20200519200345.217345-1-luiz.dentz@gmail.com>
-References: <20200519200345.217345-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -78,30 +76,99 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add documentation of DelayReporting storage as that has been added to
-the cache.
----
- doc/settings-storage.txt | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+E0 is not allowed with Level 4:
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 5f6d25141..d21150f09 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -218,9 +218,10 @@ Sample Attributes section:
+BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1319:
+
+  '128-bit equivalent strength for link and encryption keys
+   required using FIPS approved algorithms (E0 not allowed,
+   SAFER+ not allowed, and P-192 not allowed; encryption key
+   not shortened'
+
+SC enabled:
+
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+        Status: Success (0x00)
+        Handle: 256
+        Page: 1/2
+        Features: 0x0b 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          Secure Simple Pairing (Host Support)
+          LE Supported (Host)
+          Secure Connections (Host Support)
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 256
+        Encryption: Enabled with AES-CCM (0x02)
+
+SC disabled:
+
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+        Status: Success (0x00)
+        Handle: 256
+        Page: 1/2
+        Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          Secure Simple Pairing (Host Support)
+          LE Supported (Host)
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 256
+        Encryption: Enabled with E0 (0x01)
+[May 8 20:23] Bluetooth: hci0: Invalid security: expect AES but E0 was used
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+        Handle: 256
+        Reason: Authentication Failure (0x05)
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c  | 17 +++++++++++++++++
+ net/bluetooth/hci_event.c |  6 ++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 07c34c55fc50..0c1cae83c8dc 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1325,6 +1325,23 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+ 			return 0;
+ 	}
  
- [Endpoints] group contains:
- 
--	<xx>:<xx>:<xxxxxxxx...>	String	First field is the endpoint type,
--					followed by codec type and its
--					capabilies as hexadecimal encoded
-+	<xx>:<xx>:<xx>::<xx...> String	First field is the endpoint type,
-+					followed by codec type and delay
-+					reporting and its
-+					capabilities as hexadecimal encoded
- 					string.
- 	LastUsed:<xx>:<xx>	String	LastUsed has two fields which are the
- 					local and remote seids as hexadecimal
++	 /* AES encryption is required for Level 4:
++	  *
++	  * BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C
++	  * page 1319:
++	  *
++	  * 128-bit equivalent strength for link and encryption keys
++	  * required using FIPS approved algorithms (E0 not allowed,
++	  * SAFER+ not allowed, and P-192 not allowed; encryption key
++	  * not shortened)
++	  */
++	if (conn->sec_level == BT_SECURITY_FIPS &&
++	    !test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
++		bt_dev_err(conn->hdev, "Invalid security: expect AES but E0 "
++			   "was used");
++		return 0;
++	}
++
+ 	if (hci_conn_ssp_enabled(conn) &&
+ 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+ 		return 0;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 006c24e04b44..dc1cc3c4348c 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3078,10 +3078,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 * that are not encrypted with AES-CCM using a P-256 authenticated
+ 	 * combination key.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
+-	    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
+-	     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
+-		hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
++	if (!hci_conn_check_link_mode(conn)) {
++		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
+ 		hci_conn_drop(conn);
+ 		goto unlock;
+ 	}
 -- 
 2.25.3
 
