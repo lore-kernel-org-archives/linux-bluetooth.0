@@ -2,112 +2,147 @@ Return-Path: <SRS0=JpWv=7C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB431C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 May 2020 12:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDF9C433E4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 May 2020 14:23:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B78E020758
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 May 2020 12:07:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Zt2qOKtF"
+	by mail.kernel.org (Postfix) with ESMTP id 77575205CB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 May 2020 14:23:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726436AbgETMHT (ORCPT
+        id S1728044AbgETOXa convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 May 2020 08:07:19 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36840 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726224AbgETMHT (ORCPT
+        Wed, 20 May 2020 10:23:30 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51617 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728033AbgETOX3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 May 2020 08:07:19 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04KC1VCL176884;
-        Wed, 20 May 2020 12:07:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=8oaHWvAGVq5R/WBB72eBFbH4gGCNOq3E0d9WK/A9nI4=;
- b=Zt2qOKtFya/s2h/himwuAYu364yCvIgMJK3M2syqX3w58JNB34J93i1P3f4fugQ0TELj
- ujn2DAqbH7yYTv88YKmZZscTUSXw7fHHWJGHzAB3XrsJSZ5vV0vbqjWSzmxre7tD/8b+
- ifqhvJOnA7vEMF809rb6QDBIBMU7CPVvM8TRWt0nD3uBno0vbv30+UFn1FTmRV2O/AcY
- H2PgEr9qvyZJs2exorNkGCy+f2+T2RigQ73fATFZEiAySeT4+Y7G+a1dg8qSMF6YqPxN
- qLztcz9N4OBskVAgp4aYgUzESsZ55IRM5kmnXPAhX5BY9Ez6IAXxiOrUO1HrUXBRoTQO fQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 31501r97wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 20 May 2020 12:07:16 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04KC4Tjl147796;
-        Wed, 20 May 2020 12:05:16 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 314gm6y7gs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 May 2020 12:05:16 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04KC5FL5015280;
-        Wed, 20 May 2020 12:05:15 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 May 2020 05:05:15 -0700
-Date:   Wed, 20 May 2020 15:05:10 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     abhishekpandit@chromium.org
+        Wed, 20 May 2020 10:23:29 -0400
+Received: from marcel-macbook.fritz.box (p4fefc5a7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id E07AFCED09;
+        Wed, 20 May 2020 16:33:10 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH 1/4] Bluetooth: Disconnect if E0 is used for Level 4
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200519202519.219335-1-luiz.dentz@gmail.com>
+Date:   Wed, 20 May 2020 16:23:26 +0200
 Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bug report] Bluetooth: hci_qca: Enable WBS support for wcn3991
-Message-ID: <20200520120510.GF172354@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9626 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=876
- adultscore=0 phishscore=0 mlxscore=0 spamscore=0 suspectscore=3
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005200105
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9626 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=902 clxscore=1011 priorityscore=1501 cotscore=-2147483648
- impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0 phishscore=0
- mlxscore=0 suspectscore=3 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005200105
+Content-Transfer-Encoding: 8BIT
+Message-Id: <180CD116-CEC8-42B3-B3F0-C8EAF76FB1A7@holtmann.org>
+References: <20200519202519.219335-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Abhishek Pandit-Subedi,
+Hi Luiz,
 
-The patch a228f7a41029: "Bluetooth: hci_qca: Enable WBS support for
-wcn3991" from May 14, 2020, leads to the following static checker
-warning:
+> E0 is not allowed with Level 4:
+> 
+> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1319:
+> 
+>  '128-bit equivalent strength for link and encryption keys
+>   required using FIPS approved algorithms (E0 not allowed,
+>   SAFER+ not allowed, and P-192 not allowed; encryption key
+>   not shortened'
+> 
+> SC enabled:
+> 
+>> HCI Event: Read Remote Extended Features (0x23) plen 13
+>        Status: Success (0x00)
+>        Handle: 256
+>        Page: 1/2
+>        Features: 0x0b 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>          Secure Simple Pairing (Host Support)
+>          LE Supported (Host)
+>          Secure Connections (Host Support)
+>> HCI Event: Encryption Change (0x08) plen 4
+>        Status: Success (0x00)
+>        Handle: 256
+>        Encryption: Enabled with AES-CCM (0x02)
+> 
+> SC disabled:
+> 
+>> HCI Event: Read Remote Extended Features (0x23) plen 13
+>        Status: Success (0x00)
+>        Handle: 256
+>        Page: 1/2
+>        Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>          Secure Simple Pairing (Host Support)
+>          LE Supported (Host)
+>> HCI Event: Encryption Change (0x08) plen 4
+>        Status: Success (0x00)
+>        Handle: 256
+>        Encryption: Enabled with E0 (0x01)
+> [May 8 20:23] Bluetooth: hci0: Invalid security: expect AES but E0 was used
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>        Handle: 256
+>        Reason: Authentication Failure (0x05)
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_conn.c  | 17 +++++++++++++++++
+> net/bluetooth/hci_event.c |  6 ++----
+> 2 files changed, 19 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 07c34c55fc50..0c1cae83c8dc 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1325,6 +1325,23 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+> 			return 0;
+> 	}
+> 
+> +	 /* AES encryption is required for Level 4:
+> +	  *
+> +	  * BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C
+> +	  * page 1319:
+> +	  *
+> +	  * 128-bit equivalent strength for link and encryption keys
+> +	  * required using FIPS approved algorithms (E0 not allowed,
+> +	  * SAFER+ not allowed, and P-192 not allowed; encryption key
+> +	  * not shortened)
+> +	  */
+> +	if (conn->sec_level == BT_SECURITY_FIPS &&
+> +	    !test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
+> +		bt_dev_err(conn->hdev, "Invalid security: expect AES but E0 "
+> +			   "was used");
 
-	drivers/bluetooth/hci_qca.c:1960 qca_serdev_probe()
-	error: uninitialized symbol 'hdev'.
+make this bt_dev_warn since it is something that can happen. We fail appropriately now. Also try to fit the error in a single line. “Invalid security: Missing AES-CCM usage”.
 
-drivers/bluetooth/hci_qca.c
-  1948          }
-  1949  
-  1950          if (power_ctrl_enabled) {
-  1951                  hdev = qcadev->serdev_hu.hdev;
-                        ^^^^
-hdev is only initialized here.
+> +		return 0;
+> +	}
+> +
+> 	if (hci_conn_ssp_enabled(conn) &&
+> 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+> 		return 0;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 006c24e04b44..dc1cc3c4348c 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3078,10 +3078,8 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	 * that are not encrypted with AES-CCM using a P-256 authenticated
+> 	 * combination key.
+> 	 */
+> -	if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
+> -	    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
+> -	     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
+> -		hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
+> +	if (!hci_conn_check_link_mode(conn)) {
+> +		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
 
-  1952                  set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
-  1953                  hdev->shutdown = qca_power_off;
-  1954          }
-  1955  
-  1956          /* Wideband speech support must be set per driver since it can't be
-  1957           * queried via hci.
-  1958           */
-  1959          if (data && (data->capabilities & QCA_CAP_WIDEBAND_SPEECH))
-  1960                  set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
-                                                                      ^^^^
-Potentially uninitialized here.
+Why is this a disconnect now? If this is better, then this needs to be explained above, but I have the feeling we really want to respond to the connect request in a clean fashion.
 
-  1961  
-  1962          return 0;
-  1963  }
+> 		hci_conn_drop(conn);
+> 		goto unlock;
 
-regards,
-dan carpenter
+Regards
+
+Marcel
+
