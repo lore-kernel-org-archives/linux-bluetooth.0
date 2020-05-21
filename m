@@ -4,122 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA5E1C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 17:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFEDC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 17:56:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E0DE20759
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 17:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 324CD20759
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 17:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DveW9sRL"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mGs+Mq4b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728208AbgEUR4K (ORCPT
+        id S1728975AbgEUR4O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 May 2020 13:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59166 "EHLO
+        Thu, 21 May 2020 13:56:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728013AbgEUR4K (ORCPT
+        with ESMTP id S1728013AbgEUR4O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 May 2020 13:56:10 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404C8C061A0E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 10:56:09 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id s69so3453448pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 10:56:09 -0700 (PDT)
+        Thu, 21 May 2020 13:56:14 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B563C061A0E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 10:56:14 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id a13so3134517pls.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 10:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=MFO+E2oPIKbUN1g/6GJpK5+R9fJDP4WX5hJngZf8lr4=;
-        b=DveW9sRLz/phr8VwN/gRQ3taKZclG3hRRTbbvg371FgkivwF8znzKxmfXwq6qVSI2Y
-         n/+I8htDqzMKG3tCCpRI0l7MmAOwDYyMRtXa0gwwUWuKZgbUJIge/gSZX7RMl66Kw6SZ
-         h0I7BwcUQfM5GbYER+e5Ua+kRpfpa10jMByjU=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=/Z3lB2ps1Sz+hH9uANqYM5GmYI38A+1RffLNsWxLBxs=;
+        b=mGs+Mq4b6FrrO8mownqel2X2HrQuI6o+WpxPUAnlJ370aidz3hkq3YNxx9WYEiHUV6
+         2ASanzagfwSkMo7O4wRpw2Suq8TNQK5reLIsCDCDqO76RQBc5/7RpVI6GpfcJLHVT8N6
+         nIvAy1sSJ1FNI/Vc6IbI3sVD3JEXN7KOK9PQE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=MFO+E2oPIKbUN1g/6GJpK5+R9fJDP4WX5hJngZf8lr4=;
-        b=hxi68qhq4awbzNl7QaLf45aT/zCYh3Yv8/s+2hXDc4EfJuk6P4LDEkJrDBZNVgo92n
-         v+vvqJBMOehT0XuPHqqFogj8HTIQAlw60+b7a4N+5Zc93KOdS5CQjhZaF4XDDSiaidpn
-         JzB5TtUYz3Wf0MhLodiVHJ9du4W9UtJJGvmk8h9838ngeBndpLNWtztvL53j9f3425NB
-         8MAM5BxVflHg8hyojG7gOLe5YBTWxeKn2pFmbEUh3m0EAwsBkx/FZRQ9lVpb7B8UckT9
-         jlCg0gOYZX+x8uGzRT0ypIM3P9/uuivqPhahQV9MwqoMSTh8B/y6iHdpaPWL5Sajr5WN
-         EAnw==
-X-Gm-Message-State: AOAM531AMbKJxMQHW9YEsIOxTYlZ/mD4MVwq7KKTv2jCHyUrz7bIHUr6
-        z4Emxn/j8BO5umAz06q2rwsqfsG8T3k=
-X-Google-Smtp-Source: ABdhPJyCmtWaGvUIeLgp9zWVtEzlLLaf8n8TDXIcXGs/Kl/KWj7zncfwiuW9jQKb8vs+MovAx5aWog==
-X-Received: by 2002:a17:902:b187:: with SMTP id s7mr11024512plr.60.1590083768465;
-        Thu, 21 May 2020 10:56:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=/Z3lB2ps1Sz+hH9uANqYM5GmYI38A+1RffLNsWxLBxs=;
+        b=C65nP8UIgSYvXGT0RtXPstZgogwMRCRKC5rzYBGGPBV8znHSWoLJBlBhae8dBlsc5X
+         sYSnFz4wR0wQ6VhJkfBozskuByJqTiVgfI/hYigrVNKMLCyIuhGQMrWPXAixfGYKFyc5
+         FdBQz2mfkEsPu6qKZVp2MHvH3o4nxA4QtMPWAvfShzbm3vrGm/rJ2IWrZw7C1tUoakyn
+         SzTw+anmuMkBMYnW44WYk9YEGlTwPMrqKOFOlwCUE04DlZKRHeFWBO8IEWv1Wp21uEcK
+         RjE5CYkaUSxZz+WPhtR8vEZCPIPhNhjHQ5/ZS/zblyFYt+QDLYeN1ZBAl6L+b4iC/ABT
+         rdbw==
+X-Gm-Message-State: AOAM530PSXEw2ABSdnAQpu/d1/luv9uo5zr0Feloe0ueKzW6kKQUUuw9
+        Yqh7BHMdzrlc294lhqhLW0+stz3Z2aw=
+X-Google-Smtp-Source: ABdhPJxWYfFAUXQHpGtlPDk9NGs2z4LXK+hoyX8kGREBJLyBy4oH1DOTsnbNbW9yxnlT+AGHJCItAQ==
+X-Received: by 2002:a17:902:c403:: with SMTP id k3mr10841725plk.12.1590083773335;
+        Thu, 21 May 2020 10:56:13 -0700 (PDT)
 Received: from localhost.localdomain (c-73-231-41-185.hsd1.ca.comcast.net. [73.231.41.185])
-        by smtp.googlemail.com with ESMTPSA id a16sm4881910pjs.23.2020.05.21.10.56.06
+        by smtp.googlemail.com with ESMTPSA id a16sm4881910pjs.23.2020.05.21.10.56.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 10:56:07 -0700 (PDT)
+        Thu, 21 May 2020 10:56:12 -0700 (PDT)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Eric Caruso <ejcaruso@chromium.org>
-Subject: [PATCH v2 1/3] device: Add device type property
-Date:   Thu, 21 May 2020 10:55:41 -0700
-Message-Id: <20200521175543.7923-1-sonnysasaka@chromium.org>
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH v2 2/3] doc/device-api: Add Types property to org.bluez.Device1
+Date:   Thu, 21 May 2020 10:55:42 -0700
+Message-Id: <20200521175543.7923-2-sonnysasaka@chromium.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200521175543.7923-1-sonnysasaka@chromium.org>
+References: <20200521175543.7923-1-sonnysasaka@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Eric Caruso <ejcaruso@chromium.org>
-
-This allows us to gather information about whether a device
-supports BR/EDR, BLE, or both. It appears as DBus Property
-"Types" on the org.bluez.Device1 interface.
 ---
- src/device.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ doc/device-api.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 7b0eb256e..2b5a7f2e8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -745,6 +745,32 @@ static gboolean property_get_address_type(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 65d8fee37..ceb68d2f6 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -158,6 +158,11 @@ Properties	string Address [readonly]
  
-+static gboolean dev_property_get_types(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	const char *type;
+ 			The Bluetooth class of device of the remote device.
+ 
++		string Type [readonly, optional]
 +
-+	DBusMessageIter array;
++			The carriers supported by this remote device. If it
++			exists, it can be one of "BR/EDR", "LE", or "DUAL".
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	if (device->bredr) {
-+		type = "bredr";
-+		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &type);
-+	}
-+
-+	if (device->le) {
-+		type = "le";
-+		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &type);
-+	}
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
- static gboolean dev_property_get_name(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -2759,6 +2785,7 @@ static const GDBusMethodTable device_methods[] = {
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
- 	{ "AddressType", "s", property_get_address_type },
-+	{ "Types", "as", dev_property_get_types, NULL, NULL },
- 	{ "Name", "s", dev_property_get_name, NULL, dev_property_exists_name },
- 	{ "Alias", "s", dev_property_get_alias, dev_property_set_alias },
- 	{ "Class", "u", dev_property_get_class, NULL,
+ 		uint16 Appearance [readonly, optional]
+ 
+ 			External appearance of device, as found on GAP service.
 -- 
 2.17.1
 
