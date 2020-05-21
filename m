@@ -2,115 +2,98 @@ Return-Path: <SRS0=imY+=7D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C89FC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 16:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2810EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 16:24:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14EA020748
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 16:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBE0120826
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 May 2020 16:24:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfOk5XqK"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="W9i8Pixq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729017AbgEUQXT (ORCPT
+        id S1729532AbgEUQYv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 May 2020 12:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
+        Thu, 21 May 2020 12:24:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726808AbgEUQXS (ORCPT
+        with ESMTP id S1728399AbgEUQYv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 May 2020 12:23:18 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B7EC061A0E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 09:23:17 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 69so5963526otv.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 09:23:17 -0700 (PDT)
+        Thu, 21 May 2020 12:24:51 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEE2C061A0E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 09:24:51 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id z26so1546946oog.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 09:24:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wX3BGtuWgRKIwl8LY0OgnL46scpk643X5ArzO3KuMSA=;
-        b=NfOk5XqK3UfoGg0qMMv2O7Sm3UyE1TS5kORwXz3GMsa+z+mbyHVviTX2PU0JLoe3LV
-         EkCsW/ivdwSf6EuTJpfmdV810hxIlnZia4ffowfzig9N8b+9OTVPLTevIyaOMDhJuzBO
-         i3+2nLRwNMfd+cUotibI3AufUN4/lOifDtbaatLXtojfIcmHsPUUnVqMZMfSNfLnSiQL
-         aq5c+p4nqssUXXsYbS56uHPty+oowWJPuw5BjDd4v0fwPxNoNlklMbX9BsxUvwr4XEWJ
-         0yDn6XhKJE0PBuvvkbj7yDIUNPgZsEYSTXxV3V3MPsGkM8HaRv0GeBh2mX4N+fsGr2mw
-         +u7w==
+        bh=+aSdAGhDNk70FV8IK59ZoXJV2f5OF1mH42/BCOxBpBU=;
+        b=W9i8Pixq1xHjD6vP6/Ltocl3o4+Y9iw5gQG3HzgSFYVGbcAxjUs3t5vQZVXmzze2cl
+         83p1OZuER3vlzV8B3KAfmXdA8/9ByOzqvG5K+BujbX2QlatkdX1aCGORD8unys97lNO2
+         QxcfjLQfaPptU6ZRczawAwt2v5BEgDgeLqy6Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wX3BGtuWgRKIwl8LY0OgnL46scpk643X5ArzO3KuMSA=;
-        b=aVFM6IjQFBMuZmSuEc8Qpas7+i1CyKwACfZz+vO6PM/9+sGvq0NKNzp1SEKvdqmOuF
-         LlRMcVBxsC8sjHz+f3Rt+iAzFP1Vb6nzkCj8S0iU9SIMoeK6AHWQMlP9LNu4JMWQeZyD
-         6Xbs9bAaXTjrk/dw1obZqfbVqn0Ig9ADyUkVT+8eZSfm0Q4vZixchVi2FYBqOdTb5LIT
-         9hFJ5tOVgHN7F+eCQpTO52ILYawKRPBXchznLQqqVj6l+nw/Ry1oKJoCWKMS0fAJNLmH
-         +QsE2oTB2a6bray8D6xcUc+9pl+mdmeAZyFg/42eJWRwSQ0DFuP7uhvj/Lmxhxu1o0yT
-         SNQg==
-X-Gm-Message-State: AOAM533LZl7hbXLCuEx5rRGQ9woDu0Iu1iXXqFQsqdcGyFTgSBglde8w
-        zFMw8/i9pCIvJNJV4CEmxgiCxmD/5nb+Jks8pzk=
-X-Google-Smtp-Source: ABdhPJw/Ug0GNmRkeaYpAR2CwrhZLH2OiQqOn6fAESqmwV7/6paWZyh7/klOSO62VFjAx4MqfP/fC5GV1XAbL1v6y5E=
-X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr7918437ots.11.1590078196888;
- Thu, 21 May 2020 09:23:16 -0700 (PDT)
+        bh=+aSdAGhDNk70FV8IK59ZoXJV2f5OF1mH42/BCOxBpBU=;
+        b=BHBJtXvStKNCrEPAvxBBDnEwd1smrVk37d1/xeFZYHOmXdOU9nEPgdALXbY4/oT105
+         Vl2CX5zhG30asGaB7wFIUF2yTZBFHz96i6fTbT0vx6nGCWSJ0BdhHRROO+jZUxQak5P0
+         dH3blYFA1Rcumi/ErrP7vHVYxoCtKtFQ46jgOD19+MoxFHGafZMI11t/oxgljwj0+L8H
+         ZC9/2aY/80BmY9ciY17OE/xYbzBsd1hlC3opsVEVslNq6pwaBAdDdrnDwhFTIj1BRVzH
+         CsZUl6UJE4wxPFAfd4D7f5OeBamIA2KFMSZZdocMNPEQ2ccQSRdA2C2qEOIMOqOZ//gu
+         3ZHg==
+X-Gm-Message-State: AOAM5301YNN3Jep0qYshSZULHMmaZqRHGmm+csxUq43jJj7iLN10CByj
+        VF/o4aQSMTkN6wi82FbdQgwSFUpWDW1yLv97U77iCQ==
+X-Google-Smtp-Source: ABdhPJy47rmxE3NBLWx7D+kh2ze7QJFJ5PpaVWTEyFCVu0wqNl0m8RI6OEXyLgII3+CiVNEwklyX60We4w9FluM9f1I=
+X-Received: by 2002:a4a:e759:: with SMTP id n25mr7907599oov.75.1590078290582;
+ Thu, 21 May 2020 09:24:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200520204444.28994-1-post@0x21.biz>
-In-Reply-To: <20200520204444.28994-1-post@0x21.biz>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 21 May 2020 09:23:04 -0700
-Message-ID: <CABBYNZK4Uxgj+=TvTHjuoG9YDNn6ud739E7Dub0WWemq-vfGTA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] test/example-advertisement: Fix include_tx_power
-To:     Alvar Penning <post@0x21.biz>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20200401221320.12105-1-sonnysasaka@chromium.org>
+ <6A574E50-BBF3-4967-9C93-6F4B6DAFB47D@holtmann.org> <CAO271m=Rqq7QS6R362xLQWjbo6_ZLYPo-ttvevJmjqJ73HbAVQ@mail.gmail.com>
+ <68C2E4A8-29E0-44D8-9D2F-F4E2354DE419@holtmann.org> <CAOxioNkw8g90tVwQjqgdpX38__f17JHHTTsqBZwCjEkjME0Zyg@mail.gmail.com>
+ <6C21A2C1-6224-4FB6-B483-27B1C89864BE@holtmann.org> <CAOxioN=zqg59Kmc4rSEaceDuHd9PnS1-iHLkdN2DrUF_y=-40Q@mail.gmail.com>
+ <EB4FAB97-6425-419D-89B8-D31A7D553BB8@holtmann.org>
+In-Reply-To: <EB4FAB97-6425-419D-89B8-D31A7D553BB8@holtmann.org>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Thu, 21 May 2020 09:24:37 -0700
+Message-ID: <CAOxioN=D2NVQn7YifUk=oATn-T0mcpQ3ABp1vPFQ_O1=Bup3sw@mail.gmail.com>
+Subject: Re: [PATCH] device: Add device type property
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Eric Caruso <ejcaruso@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alvar,
+Thanks for confirming, Marcel. I will come back with the modified
+patch based on your feedback.
 
-On Wed, May 20, 2020 at 1:54 PM Alvar Penning <post@0x21.biz> wrote:
+On Thu, May 21, 2020 at 12:02 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Adding the Tx Power Level is no longer done via IncludeTxPower, but via
-> the tx-power value in the Includes array. The previous code did not
-> throw an error, but neither led to the insertion of the value. As a
-> result of this change, include_tx_power now adds the Tx Power Level
-> again.
-> ---
->  test/example-advertisement | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Hi Sonny,
 >
-> diff --git a/test/example-advertisement b/test/example-advertisement
-> index f116893b6..96e410683 100755
-> --- a/test/example-advertisement
-> +++ b/test/example-advertisement
-> @@ -57,7 +57,7 @@ class Advertisement(dbus.service.Object):
->          self.solicit_uuids = None
->          self.service_data = None
->          self.local_name = None
-> -        self.include_tx_power = None
-> +        self.include_tx_power = False
->          self.data = None
->          dbus.service.Object.__init__(self, bus, self.path)
+> > I am okay with Types = ["le", "bredr"]. However, I don't understand
+> > why a user should be able to change the Type, since this property
+> > describes the fact about a peer device, not a local adapter. What does
+> > it mean by a user changing the type of a peer device? Also, I don't
+> > understand why HS needs to be considered in that property, since I see
+> > org.bluez.Device1 objects as discovered devices either through Inquiry
+> > (in which case it'd be "bredr") or Advertisement (in which case it'd
+> > be "le"), or both. HS seems to be one of remote features rather than a
+> > type. Also the HS information is also not readily available in the
+> > struct btd_device, or even src/device.c, which suggests that it has
+> > been treated differently.
 >
-> @@ -78,8 +78,8 @@ class Advertisement(dbus.service.Object):
->                                                          signature='sv')
->          if self.local_name is not None:
->              properties['LocalName'] = dbus.String(self.local_name)
-> -        if self.include_tx_power is not None:
-> -            properties['IncludeTxPower'] = dbus.Boolean(self.include_tx_power)
-> +        if self.include_tx_power:
-> +            properties['Includes'] = dbus.Array(["tx-power"], signature='s')
+> you are correct. I was thinking about the local role. My bad.
 >
->          if self.data is not None:
->              properties['Data'] = dbus.Dictionary(
-> --
-> 2.25.4
-
-Applied, thanks.
-
--- 
-Luiz Augusto von Dentz
+> Regards
+>
+> Marcel
+>
