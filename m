@@ -2,132 +2,128 @@ Return-Path: <SRS0=Rzh7=7E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10002C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 08:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8979DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 09:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6EF1207FB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 08:22:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=BluetoothSIG.onmicrosoft.com header.i=@BluetoothSIG.onmicrosoft.com header.b="zyUvaw0S"
+	by mail.kernel.org (Postfix) with ESMTP id 74F9E206B6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 09:26:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729347AbgEVIWQ (ORCPT
+        id S1729589AbgEVJ0R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 May 2020 04:22:16 -0400
-Received: from mail-eopbgr750052.outbound.protection.outlook.com ([40.107.75.52]:56199
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728208AbgEVIWP (ORCPT <rfc822;Linux-bluetooth@vger.kernel.org>);
-        Fri, 22 May 2020 04:22:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AytFcUNUr/a4vznsYCgzzxpXb5Ex2wBrC0yh7ozRHAEL38KQ8PWJ1IV3nWaIN1Qr0qIkrJpW1ekyKxstnXUKcPJwZuQOdgYNdd6JMXNkQk1EZVqeiWWhnKFYGblikzHJwDXQ351ZPaagpaqZrVUzTQhXoezZmJnggC8sPYAx94XES68bl08am9i/CkR4gDO2xSlKZheWS6njnOadwq9OsQyxDbA5hbg93VBkvjG+P9RytHsEpbkgAIUzRCoszI3tb/YyuzfIK4tF1R3ZfcG+SA5h0nVneCKKFQdGi8YnVM3b56HTAFebFprItePTUykiQivIgq7yvtXZkmmiYB5PWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=96bqP975Lqtg91JDHumKkjHLFzJxfgraQtG34I5QlIk=;
- b=m8pBv2xxueaN/Tphs3NxiVJEDPRkgv1knwzIiNscIypOfRugiIsnmmyZ8jcc3ItnsaP3wsiwVBU56/svnyIAFzGF3ifdAy6teiUVePwRf66UgitkjspxHVwtbPR8/UjI/mo+g4OZ+/lxPpxdBr296Xu+d1BVjn8KzSDwS7wptszJeYyVHTgm3tbTxayhE07Mb3+Lb2VYWMmlbv7YYViqDFbp6LUgFEWu7K64XClNjp6UDJwrL3RhCuoFZStxKwF5PE5idjpI1BfcNY1kcl2V6u+H/rAV7gvWVW92pMWIcM6FzOLVOD5aXxC7FtFjSXNffSzKHb75YW7i0zjy7O/yfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bluetooth.com; dmarc=pass action=none
- header.from=bluetooth.com; dkim=pass header.d=bluetooth.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=BluetoothSIG.onmicrosoft.com; s=selector2-BluetoothSIG-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=96bqP975Lqtg91JDHumKkjHLFzJxfgraQtG34I5QlIk=;
- b=zyUvaw0Sl2axQbdjGp0Si3aTB1ORQ4hafElTZ5LjW40/07HWIz7xj1c+Fbs2L6TswyZaNzwTuGciudozpHzwRWI9hAN7pLc7GwQfokbwMILxUwhWb6OYA+Lm91CtL7V4vqiIiuOeluPx9/MgIPjraqrVeVMAWqRoD9E1rUS3ZYE=
-Received: from MWHPR17MB1967.namprd17.prod.outlook.com (2603:10b6:300:85::20)
- by MWHPR17MB1598.namprd17.prod.outlook.com (2603:10b6:300:cd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Fri, 22 May
- 2020 08:22:13 +0000
-Received: from MWHPR17MB1967.namprd17.prod.outlook.com
- ([fe80::3d71:790:b047:e941]) by MWHPR17MB1967.namprd17.prod.outlook.com
- ([fe80::3d71:790:b047:e941%5]) with mapi id 15.20.3021.027; Fri, 22 May 2020
- 08:22:13 +0000
-From:   Martin Woolley <mwoolley@bluetooth.com>
-To:     "Linux-bluetooth@vger.kernel.org" <Linux-bluetooth@vger.kernel.org>
-Subject: Comments on the ConnectDevice API function
-Thread-Topic: Comments on the ConnectDevice API function
-Thread-Index: AdYwEgyeeFpEUtO5S3yfGGFiF3wWKw==
-Date:   Fri, 22 May 2020 08:22:12 +0000
-Message-ID: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none
- header.from=bluetooth.com;
-x-originating-ip: [82.35.96.178]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 55239f9f-35bd-4c92-b93f-08d7fe293ad9
-x-ms-traffictypediagnostic: MWHPR17MB1598:
-x-microsoft-antispam-prvs: <MWHPR17MB1598CE357A5865A4AFC91F97C5B40@MWHPR17MB1598.namprd17.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 04111BAC64
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +N5uHtktqqesg/hLEcOjJ+//pYBoW3mX3wgbGr5m86r44dl8uJmav3VeYf7LC8Xz1z2PD+ly65KwSx65RC7pmGEcON5j1M1913gmWtqjLPX/GmqVoKBH7uHD5qiy9DaqCGH8y+CvRBTsLSSTJ90CU5P4tmbWFBgw6gzIHpoEDrszZ6cBSxD3c8J9qR165NZZ2zA8MMtomSWSjdWuMYGI2WdbFLMH02Ku+NJNrybn7TzCNSp+gVrlZT58jhHpoOF5ob+TYJGMna7qNyvL5HDob5wuVXRt6srvrkGj85tRHh6BS91jsa0yBiXtC2e+diBlBRZHEuqa2xzfjB8jylDThQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR17MB1967.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(39840400004)(136003)(346002)(366004)(376002)(66556008)(86362001)(6506007)(186003)(52536014)(478600001)(55236004)(55016002)(2906002)(5660300002)(71200400001)(26005)(9686003)(76116006)(64756008)(66446008)(66946007)(8936002)(66476007)(33656002)(7696005)(6916009)(8676002)(316002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: FseMTbu7qQcTGGM5oezkeWYyMGqzwCnDXNPfgtZ5FJe6Ej8f6SMdaJb/kXOENE7UK+Ge/HTVWJsH7snfgr/0+/67wZYkAR0+ow+hemXu9qkXUiVS/M7Bb5Bcgwa6AR1HHB4utqmuD0sitkXbPgeVK2No4keYNCIF5gNcx7fqMaEBLZ/o3odhP/fuLjLnOnomqLshgDg48SvuWo6Jsu2HLPD3MM4NK95D/5n+xN/ix7Mq8SFyObZOaRkKplJDzG6GFhD6rVE/zdk6yxqOSnbNi1cCvipbaxZ4md5MAVcw0963dsRmZVmJOqjs8dBfIXy5fE8mnoRbAWI8SoGNppk8kT557zBie21K35kVEe+TjC8aVVx/aJdqYRUjVoKIeS/rnj8xqRgpy+baFD7kiNGC2JcRDPSvUrLyqeuWPuV13Nw5D5/p9aGnHSfRZI/rckrM+yX1LQpPXLcqj4kLOmHMIX+4ZuAGdaLAoDfjURQM9Uc=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 22 May 2020 05:26:17 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:44836 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728068AbgEVJ0Q (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 May 2020 05:26:16 -0400
+Received: by mail-io1-f70.google.com with SMTP id a2so2073379iok.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2020 02:26:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=lnDnkHH8eIGRot84QQm9EkjYLwd2UTiQf0hCf63v5y0=;
+        b=ZIB377ezYPtd2g7diuMFLwsRcimyo5ab/VvcmM/mqTLCgqf1/3cUzhelwEAYwt6+BU
+         cdlUlWOYnmJscTI26/hDR6hmUsCjme7Qy933nkdx8QvGVFkefUeMr+wla4ztGMew9jvi
+         6ZOEuYc6NLZzyJ8gEy7The/kk59txejYhZdE+EBnecotwn3Ap8sBJkm1+r71e3UCR85W
+         TtE/7mbpiFv9GfO36i/460JpZp8NHfU6MKd1AAjMXtIM0f1KTHN9g+8swI1CWXeVngG2
+         V2RrK2gAtJF4PwlCmxIt/LIzKi3Xz9gFdgkjp9MdpQOvbq+fNqTVldLogzjggMQW50rK
+         uXrg==
+X-Gm-Message-State: AOAM531CzoFFiWKYFo4IA+uh6az3gG5jED21uOdNRS/siygVIL9kK/FC
+        g0w7t1pk7zedY1QeA9rkfEwyBWAuAr/PmH8aefp+SGvAAnLx
+X-Google-Smtp-Source: ABdhPJy5UwqNw5v0J/MMiDXS19aWx4ShtWQFpiylMBDvCxAMBOYoglvvPQiKE4Lo8qNgPNjryfgLvwpjiZrZwhEMDuvrVsReB4Ef
 MIME-Version: 1.0
-X-OriginatorOrg: Bluetooth.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55239f9f-35bd-4c92-b93f-08d7fe293ad9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2020 08:22:13.0086
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e4e0fec5-fc6c-4dd6-ae37-4bdb30e156b9
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qFGuroxT9F8VUd8MGZe97QXTrkyBM/PFLMLj0o2Ro8B0LKoxtWfZTb8twWSnM1wzZzY5oPEQ2BPBvonr708wmg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR17MB1598
+X-Received: by 2002:a92:8c4a:: with SMTP id o71mr12894641ild.130.1590139574866;
+ Fri, 22 May 2020 02:26:14 -0700 (PDT)
+Date:   Fri, 22 May 2020 02:26:14 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000080db0d05a639389e@google.com>
+Subject: WARNING in __queue_work (2)
+From:   syzbot <syzbot+8ceb187b741280aa5611@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello
+Hello,
 
-I've recently been working with BlueZ via D-Bus and have a situation which =
-requires me to be able to connect to a device whose Bluetooth device addres=
-s is known, but without first scanning. This is a link layer state transiti=
-on with the specification allows.
+syzbot found the following crash on:
 
-BlueZ currently supports this via an API adapter function called ConnectDev=
-ice, whose status is currently "experimental". From my experience of using =
-this function, it seems to behave like this:
+HEAD commit:    ac935d22 Add linux-next specific files for 20200415
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13666a22100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bc498783097e9019
+dashboard link: https://syzkaller.appspot.com/bug?extid=8ceb187b741280aa5611
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
-If the BlueZ instance has not scanned yet, so that the target device is not=
- known to it, the ConnectDevice call results in scanning taking place and t=
-hen if the target device is found, it is connected to. Success!
+Unfortunately, I don't have any reproducer for this crash yet.
 
-But if scanning has previously been performed, regardless of the state of t=
-he actual device (e.g. advertising and ready to accept connections), an exc=
-eption is thrown with a message whose text value is "Already Exists".
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+8ceb187b741280aa5611@syzkaller.appspotmail.com
 
-I was wondering if I could influence the design of the API before the Conne=
-ctDevice experimental status is removed?=20
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 20232 at kernel/workqueue.c:1412 __queue_work+0xe4e/0x1280 kernel/workqueue.c:1412
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 20232 Comm: syz-executor.4 Not tainted 5.7.0-rc1-next-20200415-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ panic+0x2e3/0x75c kernel/panic.c:221
+ __warn.cold+0x2f/0x35 kernel/panic.c:582
+ report_bug+0x27b/0x2f0 lib/bug.c:195
+ fixup_bug arch/x86/kernel/traps.c:175 [inline]
+ fixup_bug arch/x86/kernel/traps.c:170 [inline]
+ do_error_trap+0x12b/0x220 arch/x86/kernel/traps.c:267
+ do_invalid_op+0x32/0x40 arch/x86/kernel/traps.c:286
+ invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+RIP: 0010:__queue_work+0xe4e/0x1280 kernel/workqueue.c:1412
+Code: 03 38 d0 7c 09 84 d2 74 05 e8 9e c3 65 00 8b 5b 24 31 ff 83 e3 20 89 de e8 6f a4 27 00 85 db 0f 85 ce 00 00 00 e8 c2 a2 27 00 <0f> 0b e9 33 f7 ff ff e8 b6 a2 27 00 0f 0b e9 ac f6 ff ff e8 aa a2
+RSP: 0018:ffffc90006e67a08 EFLAGS: 00010012
+RAX: 0000000000040000 RBX: 0000000000000000 RCX: ffffc900115d4000
+RDX: 00000000000001e4 RSI: ffffffff814b91ce RDI: 0000000000000005
+RBP: 0000000000000040 R08: ffff88804de08480 R09: fffffbfff191fae9
+R10: ffffffff8c8fd743 R11: fffffbfff191fae8 R12: ffff88804c7d4aa0
+R13: ffff88809c6f3000 R14: ffff88809c6f3000 R15: 0000000000000040
+ queue_work_on+0x18b/0x200 kernel/workqueue.c:1517
+ queue_work include/linux/workqueue.h:507 [inline]
+ hci_sock_sendmsg+0x1339/0x2020 net/bluetooth/hci_sock.c:1812
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ sock_write_iter+0x289/0x3c0 net/socket.c:1004
+ call_write_iter include/linux/fs.h:1907 [inline]
+ new_sync_write+0x4a2/0x700 fs/read_write.c:484
+ __vfs_write+0xc9/0x100 fs/read_write.c:497
+ vfs_write+0x268/0x5d0 fs/read_write.c:559
+ ksys_write+0x1ee/0x250 fs/read_write.c:612
+ do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
+RIP: 0033:0x45ca29
+Code: 0d b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 db b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f776510fc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 000000000050d580 RCX: 000000000045ca29
+RDX: 0000000000000004 RSI: 0000000020000100 RDI: 000000000000000b
+RBP: 000000000078bfa0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
+R13: 0000000000000d1d R14: 00000000004cf706 R15: 00007f77651106d4
+Shutting down cpus with NMI
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
-I would like to suggest that there should be no need for a special API to c=
-onnect directly to a device without first scanning. Why burden the applicat=
-ion developer needing to call it just in case this condition applies, catch=
-ing the BlueZ exception ("Already Exists") and responding by then calling t=
-he normal Connect API?=20
 
-An alternative would be to accommodate this special case (not scanned befor=
-e) in the implementation of the standard device Connect(bdaddr) function or=
- if that makes no sense because Device objects must correspond to previousl=
-y discovered, physical devices, then at least the adapter ConnectDevice fun=
-ction could take care of the two possible paths and simplify matters for th=
-e application developer.=20
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks in anticipation.
-
-Martin Woolley=20
-Senior Developer Relations Manager, EMEA=A0 |=A0 Bluetooth Special Interest=
- Group, Inc.
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
