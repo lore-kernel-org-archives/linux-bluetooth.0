@@ -2,170 +2,102 @@ Return-Path: <SRS0=Rzh7=7E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1D9C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 00:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BE6C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 01:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43FF9207D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 00:35:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 910E22072C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 01:13:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AG5tbgvN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727035AbgEVAfJ (ORCPT
+        id S1726737AbgEVBNB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 May 2020 20:35:09 -0400
-Received: from mga14.intel.com ([192.55.52.115]:55685 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727000AbgEVAfI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 May 2020 20:35:08 -0400
-IronPort-SDR: jpHkh++iznV5bEp74OigBIUsdPyIxahmlr5OqVAdAe+kRWrdMxR4J2ZS64IB9Y1usagUoUBV5c
- c5yZd1YXyqnA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2020 17:35:07 -0700
-IronPort-SDR: joLupDWfE32RtaprLZBqREJTZrr9FbG71lRQBOm8+qPoht1CANhjedAhZu/umtxJzV4Rwsierx
- rWp0qJ1i+BmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,419,1583222400"; 
-   d="scan'208";a="300961706"
-Received: from nsalivat-mobl.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.98.52])
-  by orsmga008.jf.intel.com with ESMTP; 21 May 2020 17:35:07 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 10/10] mesh: Clean up Join() method
-Date:   Thu, 21 May 2020 17:35:01 -0700
-Message-Id: <20200522003501.106165-11-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200522003501.106165-1-inga.stotland@intel.com>
-References: <20200522003501.106165-1-inga.stotland@intel.com>
+        Thu, 21 May 2020 21:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726335AbgEVBNA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 May 2020 21:13:00 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F16EC061A0E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 18:12:59 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id i14so9230117qka.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2020 18:12:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=KHW80Cb5yjguPJuXi1ycuqAfPzQ0yKpv69yDVBrv2ls=;
+        b=AG5tbgvNOG3+L3tEJ9jZ+nedYbFEWgZ4zqb75CaTVIhzWLsV78psRElCdGp/llOveP
+         mXGghC9cZ0lpeyV/YaSGtHVRZivvboqcV+KfpNUBkamVnw6yW3/HiJA09IJFlQ+kK4nD
+         QlrAPKnUJJKiofztq9epogOb5nhOOjv55Ysruwlot/3iU2gT46n/9VkC8VTNRV6BBFTi
+         Gd5j8r3BhGYLvJRFjE/GybyNHI6vT9pIfcAtxU0Jjzfb+yYjS/vfSlmdwu5cC8tFf4IP
+         riqx6pu0BBU4KGVstCMdAWLNH76k1D/EbdZ4jCtqJkF8wlaCMYG/ClvHLl1P5kUGA+bu
+         UUPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=KHW80Cb5yjguPJuXi1ycuqAfPzQ0yKpv69yDVBrv2ls=;
+        b=Ki00FNND02GfcDA43p0sBGS09w2rWz+mwSsaVMvDTDJzXBXzZlDjj7CUxKQngQhLru
+         ywWlIaaQmp4aQWV3sOc++2ToD9jTwtMk26VKC0qu03AnH3SSoOat/JziAzGOKZ4VulAU
+         gbQM5KQg7pdl20IK87QMbAc1daJZpuTj+5eIsTAYyhAN7x7CtI2ZN6W5mvwL8zPjS+qN
+         OvO9Rc0C+1oMVkNHd54w+tal+exfjyYxyUddKDi7yxo66Rs2OMsiFCwsc4u9uNPyanLc
+         azYCtgBvZhW1DWyoxpbPYr2Msn1+ycthwSdU0dlx+K58vzEsg/9UH0ZCysnUP80yMcAX
+         yFyg==
+X-Gm-Message-State: AOAM532p+RiPg9XR1tcsogTdCzw0znqUUsTj62e7wC3DMWVKOwsNW7Q2
+        Ji7f+dISxbC65B+9ZGpOjWhzcdoO790=
+X-Google-Smtp-Source: ABdhPJzC9OtxT5CPEiEvO3KW15yZGM+3UjMqt5qrsxS99v0O2sTsNSi4s9xSTLLfoAsSKK4ukNjA8g==
+X-Received: by 2002:a05:620a:2110:: with SMTP id l16mr6440056qkl.290.1590109978690;
+        Thu, 21 May 2020 18:12:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.190.240.118])
+        by smtp.gmail.com with ESMTPSA id i3sm6263403qkf.39.2020.05.21.18.12.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2020 18:12:58 -0700 (PDT)
+Message-ID: <5ec7271a.1c69fb81.197ba.579d@mx.google.com>
+Date:   Thu, 21 May 2020 18:12:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4909538740328797776=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ,05/10] mesh: Remove unused function prototypes from node.h
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200522003501.106165-6-inga.stotland@intel.com>
+References: <20200522003501.106165-6-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This consolidates various places where a pending response
-to Join() is created and makes sure that l_dus_message_unref()
-is called correctly.
+--===============4909538740328797776==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkgitlint Failed
+
+Outputs:
+3: B6 Body message is missing
+
+
+
 ---
- mesh/mesh.c | 49 ++++++++++++++++++++++---------------------------
- 1 file changed, 22 insertions(+), 27 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 6f8974745..24ea3afd6 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -341,6 +341,7 @@ void mesh_cleanup(void)
- 			reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
- 							"Failed. Exiting");
- 			l_dbus_send(dbus_get_bus(), reply);
-+			l_dbus_message_unref(join_pending->msg);
- 		}
- 
- 		acceptor_cancel(&mesh);
-@@ -391,11 +392,6 @@ static void prov_disc_cb(struct l_dbus *bus, void *user_data)
- 	if (!join_pending)
- 		return;
- 
--	if (join_pending->msg) {
--		l_dbus_message_unref(join_pending->msg);
--		join_pending->msg = NULL;
--	}
--
- 	acceptor_cancel(&mesh);
- 	join_pending->disc_watch = 0;
- 
-@@ -501,39 +497,40 @@ static void node_init_cb(struct mesh_node *node, struct mesh_agent *agent)
- {
- 	struct l_dbus_message *reply;
- 	uint8_t num_ele;
-+	bool is_error = false;
-+	struct l_dbus *dbus = dbus_get_bus();
- 
- 	if (!node) {
- 		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
- 				"Failed to create node from application");
--		goto fail;
-+		is_error = true;
-+		goto done;
- 	}
- 
- 	join_pending->node = node;
- 	num_ele = node_get_num_elements(node);
- 
- 	if (!acceptor_start(num_ele, join_pending->uuid, mesh.algorithms,
--				mesh.prov_timeout, agent, prov_complete_cb,
--				&mesh))
--	{
-+						mesh.prov_timeout, agent,
-+						prov_complete_cb, &mesh)) {
- 		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
- 				"Failed to start provisioning acceptor");
--		goto fail;
--	}
-+		is_error = true;
-+	} else
-+		reply = l_dbus_message_new_method_return(join_pending->msg);
- 
--	reply = l_dbus_message_new_method_return(join_pending->msg);
--	l_dbus_send(dbus_get_bus(), reply);
-+done:
-+	l_dbus_send(dbus, reply);
-+	l_dbus_message_unref(join_pending->msg);
- 	join_pending->msg = NULL;
- 
--	/* Setup disconnect watch */
--	join_pending->disc_watch = l_dbus_add_disconnect_watch(dbus_get_bus(),
-+	if (is_error)
-+		free_pending_join_call(true);
-+	else
-+		/* Setup disconnect watch */
-+		join_pending->disc_watch = l_dbus_add_disconnect_watch(dbus,
- 						join_pending->sender,
- 						prov_disc_cb, NULL, NULL);
--
--	return;
--
--fail:
--	l_dbus_send(dbus_get_bus(), reply);
--	free_pending_join_call(true);
- }
- 
- static struct l_dbus_message *join_network_call(struct l_dbus *dbus,
-@@ -591,25 +588,23 @@ static struct l_dbus_message *cancel_join_call(struct l_dbus *dbus,
- 
- 	l_debug("Cancel Join");
- 
--	if (!join_pending) {
--		reply = dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST,
-+	if (!join_pending)
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST,
- 							"No join in progress");
--		goto done;
--	}
--
- 	acceptor_cancel(&mesh);
- 
- 	/* Return error to the original Join call */
- 	if (join_pending->msg) {
- 		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED, NULL);
- 		l_dbus_send(dbus_get_bus(), reply);
-+		l_dbus_message_unref(join_pending->msg);
- 	}
- 
- 	reply = l_dbus_message_new_method_return(msg);
- 	l_dbus_message_set_arguments(reply, "");
- 
- 	free_pending_join_call(true);
--done:
-+
- 	return reply;
- }
- 
--- 
-2.26.2
-
+--===============4909538740328797776==--
