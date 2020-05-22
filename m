@@ -2,128 +2,136 @@ Return-Path: <SRS0=Rzh7=7E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8979DC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 09:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5066FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 17:48:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74F9E206B6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 09:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F6BD20756
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 May 2020 17:48:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P9b0wOwQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729589AbgEVJ0R (ORCPT
+        id S1730762AbgEVRs5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 May 2020 05:26:17 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:44836 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728068AbgEVJ0Q (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 May 2020 05:26:16 -0400
-Received: by mail-io1-f70.google.com with SMTP id a2so2073379iok.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2020 02:26:15 -0700 (PDT)
+        Fri, 22 May 2020 13:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56832 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726373AbgEVRs5 (ORCPT
+        <rfc822;Linux-bluetooth@vger.kernel.org>);
+        Fri, 22 May 2020 13:48:57 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D945C061A0E
+        for <Linux-bluetooth@vger.kernel.org>; Fri, 22 May 2020 10:48:57 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id 63so8855872oto.8
+        for <Linux-bluetooth@vger.kernel.org>; Fri, 22 May 2020 10:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=lEMHMNKawgxn7/xc+Awu+QaXt6f8Yh5it5FLS1n+BVk=;
+        b=P9b0wOwQU0biGeDG3np+e7/P5Z1M3akkM38veC7yQ0AhGos5M6fZSJgF6FiaVIwSLp
+         3NpaGMyvTBljLerxD82oAoZXmpSTU4uFzF/osdm/ab4AAAdSKbNlEKc7YVQSs+skRhyw
+         Iy2d2MW43PjJKQ8X43mQgqrxRR4A79LLUzMV2MMceN3/bpriGU0kXf+qNd8lw2lLgn4g
+         TMeQ9Na8O6DF0Bc8wHuvtqaUtxtT7oAR8Pu3Mlv8gGTbSMT0H8SVhsWndvuBQ8wq1dG/
+         Z2Od+j+lXIfbY3Kngezq2uDgYviOX5wx95b9ECCq6T4Rw9StEfhDCOWmlwhlJ564F9xc
+         in+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=lnDnkHH8eIGRot84QQm9EkjYLwd2UTiQf0hCf63v5y0=;
-        b=ZIB377ezYPtd2g7diuMFLwsRcimyo5ab/VvcmM/mqTLCgqf1/3cUzhelwEAYwt6+BU
-         cdlUlWOYnmJscTI26/hDR6hmUsCjme7Qy933nkdx8QvGVFkefUeMr+wla4ztGMew9jvi
-         6ZOEuYc6NLZzyJ8gEy7The/kk59txejYhZdE+EBnecotwn3Ap8sBJkm1+r71e3UCR85W
-         TtE/7mbpiFv9GfO36i/460JpZp8NHfU6MKd1AAjMXtIM0f1KTHN9g+8swI1CWXeVngG2
-         V2RrK2gAtJF4PwlCmxIt/LIzKi3Xz9gFdgkjp9MdpQOvbq+fNqTVldLogzjggMQW50rK
-         uXrg==
-X-Gm-Message-State: AOAM531CzoFFiWKYFo4IA+uh6az3gG5jED21uOdNRS/siygVIL9kK/FC
-        g0w7t1pk7zedY1QeA9rkfEwyBWAuAr/PmH8aefp+SGvAAnLx
-X-Google-Smtp-Source: ABdhPJy5UwqNw5v0J/MMiDXS19aWx4ShtWQFpiylMBDvCxAMBOYoglvvPQiKE4Lo8qNgPNjryfgLvwpjiZrZwhEMDuvrVsReB4Ef
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=lEMHMNKawgxn7/xc+Awu+QaXt6f8Yh5it5FLS1n+BVk=;
+        b=QVaOaJ59IZPPImj+LnBY2EAe1yFQyl3bW2vYvZR/ShehQzJ5d8VdFBTjLI0zzaSBzY
+         I0MxWBMoQ62Mnf6cuw9Kk3vbTgDjKe74gtkTRouuW5yqwGVXZh0XXa78t5kbPv0bXxgM
+         g6I9wGTma6FhDHpENGKSoLWl3v6SYitHf4n8eu5AgGytAFJfY5tZQI0PUmhFSYTSqgeB
+         6BUaaK+UpSPaV/P6/0OxSqRy/H5db4G65tqZHdbuin3gUlCJWsfnpZAL3brFNDR0DTSZ
+         rucGhuDYbEXyuIeK2aaCu9iOIHxbrxTX1OxZynxYvJ1A+emtd4CU5BQdL+4sppBlDOxs
+         k8dQ==
+X-Gm-Message-State: AOAM532nR2ErfRNjDoytaBStXfINuf5oU3qXyyaIS9q2xug2qNOxR4Rx
+        ulBlLWaV6kn322YAkJkI3xEQG1FsGxEbUDN4M1s=
+X-Google-Smtp-Source: ABdhPJxrUhTNMVQGXmGTE2F2xBThp6UXaHOLbamFId092WDsLfb6xCXM6MJE7kCms34LkqmN86rcq9zh4sslb7B1pRQ=
+X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr12134171ots.11.1590169736198;
+ Fri, 22 May 2020 10:48:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a92:8c4a:: with SMTP id o71mr12894641ild.130.1590139574866;
- Fri, 22 May 2020 02:26:14 -0700 (PDT)
-Date:   Fri, 22 May 2020 02:26:14 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000080db0d05a639389e@google.com>
-Subject: WARNING in __queue_work (2)
-From:   syzbot <syzbot+8ceb187b741280aa5611@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+References: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com>
+In-Reply-To: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 22 May 2020 10:48:44 -0700
+Message-ID: <CABBYNZKonvHxnabQsu84rVQEPpou45UgqVUECZ2HoTdd7pWT+A@mail.gmail.com>
+Subject: Re: Comments on the ConnectDevice API function
+To:     Martin Woolley <mwoolley@bluetooth.com>
+Cc:     "Linux-bluetooth@vger.kernel.org" <Linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Martin,
 
-syzbot found the following crash on:
+On Fri, May 22, 2020 at 1:25 AM Martin Woolley <mwoolley@bluetooth.com> wro=
+te:
+>
+> Hello
+>
+> I've recently been working with BlueZ via D-Bus and have a situation whic=
+h requires me to be able to connect to a device whose Bluetooth device addr=
+ess is known, but without first scanning. This is a link layer state transi=
+tion with the specification allows.
+>
+> BlueZ currently supports this via an API adapter function called ConnectD=
+evice, whose status is currently "experimental". From my experience of usin=
+g this function, it seems to behave like this:
+>
+> If the BlueZ instance has not scanned yet, so that the target device is n=
+ot known to it, the ConnectDevice call results in scanning taking place and=
+ then if the target device is found, it is connected to. Success!
+>
+> But if scanning has previously been performed, regardless of the state of=
+ the actual device (e.g. advertising and ready to accept connections), an e=
+xception is thrown with a message whose text value is "Already Exists".
+>
+> I was wondering if I could influence the design of the API before the Con=
+nectDevice experimental status is removed?
+>
+> I would like to suggest that there should be no need for a special API to=
+ connect directly to a device without first scanning. Why burden the applic=
+ation developer needing to call it just in case this condition applies, cat=
+ching the BlueZ exception ("Already Exists") and responding by then calling=
+ the normal Connect API?
 
-HEAD commit:    ac935d22 Add linux-next specific files for 20200415
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13666a22100000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc498783097e9019
-dashboard link: https://syzkaller.appspot.com/bug?extid=8ceb187b741280aa5611
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+I guess the intention was to have the application use the intended API
+for devices already present _before_ calling ConnectDevice, so before
+entering the address manually the application would enumerate the
+existing devices and figure out if that was already present.
 
-Unfortunately, I don't have any reproducer for this crash yet.
+> An alternative would be to accommodate this special case (not scanned bef=
+ore) in the implementation of the standard device Connect(bdaddr) function =
+or if that makes no sense because Device objects must correspond to previou=
+sly discovered, physical devices, then at least the adapter ConnectDevice f=
+unction could take care of the two possible paths and simplify matters for =
+the application developer.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+8ceb187b741280aa5611@syzkaller.appspotmail.com
+I guess you probably know this but just in case someone look at the
+archives it is better that we make some things clearer, while the core
+spec allows connecting without scanning D-Bus are intend to be a
+higher level API thus why ConnectDevice was not really necessary for a
+long time and we just introduced it for qualification purpose or when
+there are multiple adapter where one acts as scanner. Also ever since
+the introduction of privacy (random addresses) APIs that takes
+addresses becomes rather complicated to be used directly, and there
+exists ways to scan for a specific address with pattern filtering:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt=
+#n122
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 20232 at kernel/workqueue.c:1412 __queue_work+0xe4e/0x1280 kernel/workqueue.c:1412
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 0 PID: 20232 Comm: syz-executor.4 Not tainted 5.7.0-rc1-next-20200415-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x188/0x20d lib/dump_stack.c:118
- panic+0x2e3/0x75c kernel/panic.c:221
- __warn.cold+0x2f/0x35 kernel/panic.c:582
- report_bug+0x27b/0x2f0 lib/bug.c:195
- fixup_bug arch/x86/kernel/traps.c:175 [inline]
- fixup_bug arch/x86/kernel/traps.c:170 [inline]
- do_error_trap+0x12b/0x220 arch/x86/kernel/traps.c:267
- do_invalid_op+0x32/0x40 arch/x86/kernel/traps.c:286
- invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-RIP: 0010:__queue_work+0xe4e/0x1280 kernel/workqueue.c:1412
-Code: 03 38 d0 7c 09 84 d2 74 05 e8 9e c3 65 00 8b 5b 24 31 ff 83 e3 20 89 de e8 6f a4 27 00 85 db 0f 85 ce 00 00 00 e8 c2 a2 27 00 <0f> 0b e9 33 f7 ff ff e8 b6 a2 27 00 0f 0b e9 ac f6 ff ff e8 aa a2
-RSP: 0018:ffffc90006e67a08 EFLAGS: 00010012
-RAX: 0000000000040000 RBX: 0000000000000000 RCX: ffffc900115d4000
-RDX: 00000000000001e4 RSI: ffffffff814b91ce RDI: 0000000000000005
-RBP: 0000000000000040 R08: ffff88804de08480 R09: fffffbfff191fae9
-R10: ffffffff8c8fd743 R11: fffffbfff191fae8 R12: ffff88804c7d4aa0
-R13: ffff88809c6f3000 R14: ffff88809c6f3000 R15: 0000000000000040
- queue_work_on+0x18b/0x200 kernel/workqueue.c:1517
- queue_work include/linux/workqueue.h:507 [inline]
- hci_sock_sendmsg+0x1339/0x2020 net/bluetooth/hci_sock.c:1812
- sock_sendmsg_nosec net/socket.c:652 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:672
- sock_write_iter+0x289/0x3c0 net/socket.c:1004
- call_write_iter include/linux/fs.h:1907 [inline]
- new_sync_write+0x4a2/0x700 fs/read_write.c:484
- __vfs_write+0xc9/0x100 fs/read_write.c:497
- vfs_write+0x268/0x5d0 fs/read_write.c:559
- ksys_write+0x1ee/0x250 fs/read_write.c:612
- do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
- entry_SYSCALL_64_after_hwframe+0x49/0xb3
-RIP: 0033:0x45ca29
-Code: 0d b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 db b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f776510fc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 000000000050d580 RCX: 000000000045ca29
-RDX: 0000000000000004 RSI: 0000000020000100 RDI: 000000000000000b
-RBP: 000000000078bfa0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 0000000000000d1d R14: 00000000004cf706 R15: 00007f77651106d4
-Shutting down cpus with NMI
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+That said I don't oppose to remove Already Exists error, but we should
+be very clear that the use of such API should only be recommended with
+users input and does not substitute the likes of Device.Connect.
 
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+--=20
+Luiz Augusto von Dentz
