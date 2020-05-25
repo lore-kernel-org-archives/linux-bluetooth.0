@@ -1,111 +1,144 @@
-Return-Path: <SRS0=1QSx=7G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=GU2S=7H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B70CC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 24 May 2020 17:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BC2C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 May 2020 09:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D6B720825
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 24 May 2020 17:41:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D387F20787
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 May 2020 09:31:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvBLdksW"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="DwtyaKIS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387814AbgEXRla (ORCPT
+        id S2389328AbgEYJbs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 24 May 2020 13:41:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387656AbgEXRl3 (ORCPT
+        Mon, 25 May 2020 05:31:48 -0400
+Received: from mail27.static.mailgun.info ([104.130.122.27]:56212 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389192AbgEYJbr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 24 May 2020 13:41:29 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81990C061A0E;
-        Sun, 24 May 2020 10:41:29 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id c11so16229431ljn.2;
-        Sun, 24 May 2020 10:41:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4DJnVhkC0smUm5PBOJDcd8TAmlHR8nF02N00TJklYYQ=;
-        b=IvBLdksWxW/9lWBFTdOtkxBKw0ZNRyZcRM5cSzd/Qfzo3v/KNB3EBAVpDzlRIpuSHH
-         ejgjQKeWwBm4DXQMwURZFcb/f5wPmXyHOlPv2N/lgcxVx4wm5MDeil6YbyLoq35oPsdL
-         DIqhR0vAPFM0NxGWIi6ypdqJ5lky1jIxUzBTYRReYLSI1ET6tnJ99rH3MeaPsgWaPVBg
-         +C3MVhgUdCpqbC2TwkY3tC/VXvJzjhYu6KL8hbrBjOhwYeXmPMnXiYXPwYqzfRq9izYi
-         p2ZNCeJPdtvo5DJXYE2Jenbc9/VpAeeqc50K3LI9ES4mAlVw1gpT3C7G+KDWovzm/N63
-         NDHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4DJnVhkC0smUm5PBOJDcd8TAmlHR8nF02N00TJklYYQ=;
-        b=BHNeFmU3qcAwjn+I4Rx7hNrzHtrOl0hL3anmx8Nh6kXaJVp+yCB8TrsccZzSOond8p
-         H8SCUIDS9XCjTVdsg42UPVGisWwaP73TorItAyQIDIj3VYwCvX790MP5Sr7kMbQtUKZc
-         H12BotD0Xtccg64ICAXeG2TBjxnomWQxOYpcilN+mDSdNZDRwFxnYO9PimNtub/2CYTR
-         BZ8pCUXhov34NT11kgAECQZXZhOYJ7UDjkm2qipeQ9jeztpSXnwj/RQj46QVYCwgO+JB
-         frXQMbJWmbC4DGwsTygnEywyeZksQ8aklvx5kUjLC25sAwwKtGRyBmpk8HikoCb5zzKF
-         GyeQ==
-X-Gm-Message-State: AOAM5311Elp6N7febNsy24fBMRYtVPbb+JcQqIAJ5XqAg6nDeeYvxVdD
-        VZSj86dmTLMimDGiWdP+DHY=
-X-Google-Smtp-Source: ABdhPJzZk+yfj1Ja13ec/de2TyVXKMy4/esJqt6+09zYGUJ3TAy8+GjWdPQ8wcmrRk5EmADWUdtzKg==
-X-Received: by 2002:a2e:9dd5:: with SMTP id x21mr10626462ljj.426.1590342086046;
-        Sun, 24 May 2020 10:41:26 -0700 (PDT)
-Received: from icewind.winter.local ([93.185.31.54])
-        by smtp.gmail.com with ESMTPSA id x3sm2957430lji.110.2020.05.24.10.41.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 May 2020 10:41:25 -0700 (PDT)
-From:   "Azamat H. Hackimov" <azamat.hackimov@gmail.com>
-Cc:     azamat.hackimov@gmail.com, Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH DRIVERS),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] Bluetooth: btbcm: Added 003.006.007, changed 001.003.015
-Date:   Sun, 24 May 2020 20:41:29 +0300
-Message-Id: <20200524174129.29372-1-azamat.hackimov@gmail.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+        Mon, 25 May 2020 05:31:47 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1590399106; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=rcy53dhh00j/cAlkf1xHyg4tWgvBbT8cJ1wghUEPwrA=; b=DwtyaKIS9GfLiN0L9M+mb0+KwuI28CeYg/fKyIwtIHFP+tzYQZGZ3qikOE+v0cDM36RiQooU
+ 6GUhRmg9c9+jIlKmTtmv+A+rSqV8qFOgigI67BX0gu8UMyJY2zkpVA40CyBs1wRc5sMsM27G
+ bnIfxvRCygMG9CbmQ/Mz+RAeEw0=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 5ecb907c7171b6d7e4bc3081 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 25 May 2020 09:31:40
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 13391C433CA; Mon, 25 May 2020 09:31:40 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 1767EC433C9;
+        Mon, 25 May 2020 09:31:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 1767EC433C9
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: [PATCH v1] bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot
+Date:   Mon, 25 May 2020 17:31:12 +0800
+Message-Id: <1590399072-32407-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Added new Broadcom device BCM4350C5, changed BCM4354A2 to BCM4356A2.
+Warm reboot can not restore qca6390 controller baudrate
+to default due to lack of controllable BT_EN pin or power
+supply, so fails to download firmware after warm reboot.
 
-Based on Broadcom Windows drivers 001.003.015 should be BCM4356A2. I
-have user report that firmware name is misplaced
-(https://github.com/winterheart/broadcom-bt-firmware/issues/3).
+Fixed by sending EDL_SOC_RESET VSC to reset controller
+within added device shutdown implementation.
 
-Signed-off-by: Azamat H. Hackimov <azamat.hackimov@gmail.com>
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
 ---
- drivers/bluetooth/btbcm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btqca.c   |  8 ++++----
+ drivers/bluetooth/hci_qca.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index df7a8a22e..1b9743b7f 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -414,11 +414,12 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
- 	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
- 	{ 0x2126, "BCM4335A0"	},	/* 001.001.038 */
- 	{ 0x220e, "BCM20702A1"	},	/* 001.002.014 */
--	{ 0x230f, "BCM4354A2"	},	/* 001.003.015 */
-+	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
- 	{ 0x4106, "BCM4335B0"	},	/* 002.001.006 */
- 	{ 0x410e, "BCM20702B0"	},	/* 002.001.014 */
- 	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
- 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
-+	{ 0x6607, "BCM4350C5"	},	/* 003.006.007 */
- 	{ }
- };
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 3ea866d..7bbdf4d 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -74,10 +74,10 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
  
+ 	ver = (struct qca_btsoc_version *)(edl->data);
+ 
+-	BT_DBG("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
+-	BT_DBG("%s: Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
+-	BT_DBG("%s: ROM    :0x%08x", hdev->name, le16_to_cpu(ver->rom_ver));
+-	BT_DBG("%s: SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
++	BT_INFO("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
++	BT_INFO("%s: Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
++	BT_INFO("%s: ROM    :0x%08x", hdev->name, le16_to_cpu(ver->rom_ver));
++	BT_INFO("%s: SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
+ 
+ 	/* QCA chipset version can be decided by patch and SoC
+ 	 * version, combination with upper 2 bytes from SoC
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e4a6823..a4f86e4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1975,6 +1975,32 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
+ }
+ 
++static void qca_serdev_shutdown(struct device *dev)
++{
++	int res;
++	int timeout = msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS);
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	u8 ibs_wake_cmd[] = {0xfd};
++	u8 edl_reset_soc_cmd[] = {0x01, 0x00, 0xfc, 0x01, 0x05};
++
++	if (qcadev->btsoc_type == QCA_QCA6390) {
++		serdev_device_write_flush(serdev);
++		res = serdev_device_write_buf(serdev,
++				ibs_wake_cmd, sizeof(ibs_wake_cmd));
++		BT_INFO("%s: send ibs_wake_cmd res = %d", __func__, res);
++		serdev_device_wait_until_sent(serdev, timeout);
++		usleep_range(8000, 10000);
++
++		serdev_device_write_flush(serdev);
++		res = serdev_device_write_buf(serdev,
++				edl_reset_soc_cmd, sizeof(edl_reset_soc_cmd));
++		BT_INFO("%s: send edl_reset_soc_cmd res = %d", __func__, res);
++		serdev_device_wait_until_sent(serdev, timeout);
++		usleep_range(8000, 10000);
++	}
++}
++
+ static int __maybe_unused qca_suspend(struct device *dev)
+ {
+ 	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+@@ -2100,6 +2126,7 @@ static struct serdev_device_driver qca_serdev_driver = {
+ 		.name = "hci_uart_qca",
+ 		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
+ 		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
++		.shutdown = qca_serdev_shutdown,
+ 		.pm = &qca_pm_ops,
+ 	},
+ };
 -- 
-2.26.2
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
