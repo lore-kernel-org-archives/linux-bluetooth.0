@@ -2,89 +2,174 @@ Return-Path: <SRS0=5fy2=7I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DB0C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA56C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76FAE20723
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08AE320776
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:51:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qVDGwRP3"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="OF/1URPT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgEZOiM (ORCPT
+        id S1729368AbgEZOvb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 May 2020 10:38:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47916 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbgEZOiL (ORCPT
+        Tue, 26 May 2020 10:51:31 -0400
+Received: from mail27.static.mailgun.info ([104.130.122.27]:45243 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729021AbgEZOvb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 May 2020 10:38:11 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ECDCC03E96D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:38:11 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id e10so17859716edq.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=fZO/WEUTygcKbpKhHsTEt5/8S36pBcFGVUf44p3YB/U=;
-        b=qVDGwRP3/IuY7kg1sDMsRANwNsg4xEQiHDjqptwc0ZgN3XpNYGf1RF2ZTR9ttrDiN6
-         BUvAPTsBcP+t55RkiSV01+eM6/6Epza6a0vy/4WaggSmvGokUADgFEMVo0CR8LIn4Qj8
-         /NDXVFQLddUBauGkNNOCNupcmiCteXVEaIfRfYSrznFVUWl9v5Ki2hxwnEUFUCcBimAs
-         mVStdAURsVqnUhb5wBDC5F4LfAsKhU51qzhcOjjQoAjLvoKz3SnV3BV89yIa7FG8puF6
-         ir4ZxnhdjABzUCAi+ZihQrZtZM8lVCUs9xN0b4q1So5QNlWuvj6TeFIviWWIoKVxTJGO
-         HtcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=fZO/WEUTygcKbpKhHsTEt5/8S36pBcFGVUf44p3YB/U=;
-        b=dZv2bFn3plC7xitpmQKG2Lk50lSK8BXSaC/2eojT07mG99dzUZW75krhemi3XvHLIu
-         9uxyVBaAKrPOeWFND+o5KFT9tM5Z3AsBhkDtrbgxBk82Not7SkWkCghR8D+pmpD8u86i
-         +6WjTh3yA2ZAtzG7IG8hBGZj0nt2aL4XzWzat2ZKWDK812NlmhSkOud+v/TKBKzSjFM4
-         syMs64DESiXw6vLNpFMNMPWLHOolsVuV3iWojjN8qksX9FOT24semDZuEW+F1NY+PhmU
-         H4OWhtqfHHeLhbFw68pcMF62bpvMTPRytP9zq8tNzv/USK+nH5BRRWqTXm2+zup7ODvs
-         6D3A==
-X-Gm-Message-State: AOAM531vd9h8+7xJfSKhEtIWYykZQUVlICUZTy5CnTRdx5TI5aBaR9GF
-        ui0jk+219XvTVzuRMdaDjdWaLL/CI6kpfHedl3ivPLJBzik=
-X-Google-Smtp-Source: ABdhPJwX36fG3QN6kk6vhRlV1TnDqLmXIwtULdNaqMRqsedNGh04h7AGqdOHI6qKYxX6Qm3XfF2te7iQujcFjfzQdco=
-X-Received: by 2002:a05:6402:3128:: with SMTP id dd8mr20735626edb.156.1590503890133;
- Tue, 26 May 2020 07:38:10 -0700 (PDT)
-MIME-Version: 1.0
-From:   Christopher de Vidal <cbdevidal.jk1@gmail.com>
-Date:   Tue, 26 May 2020 10:37:33 -0400
-Message-ID: <CAA2KLba+-VC+zytj=gwie8FOBwE6H78R78h5_Fqfn_Jnd=BvKA@mail.gmail.com>
-Subject: UUIDs for every single physical peripheral's service and characteristics?
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 26 May 2020 10:51:31 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1590504690; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=c8RXii6pifQBdUf4+jgUL7EdFr2F1OlKXX/MPLtY3BE=; b=OF/1URPTn8XtATyTTo/WSiNXs6sN9lfvGkhA9eDTy29FVsR4KRQF3FJZFqgUHhs95+Bywc+f
+ rbLmsSGNwOjG1KYeyo3WdoCnv0ocSyPBVbAI3iYtEYSxP1RC0Mb0RwP4nTCuoYVnpo4ReuEm
+ SNRVZBJKUhO+7A/C0pY3akz5kss=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 5ecd2cf227386861261101e0 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 26 May 2020 14:51:30
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 7AC6FC433CB; Tue, 26 May 2020 14:51:29 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9701BC433C6;
+        Tue, 26 May 2020 14:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 9701BC433C6
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: [PATCH v1] bluetooth: hci_qca: Fix QCA6390 memdump failure
+Date:   Tue, 26 May 2020 22:51:21 +0800
+Message-Id: <1590504681-6284-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Help a newbie? I'm seeking to build a niche product for sale, a
-Raspberry Pi-based device which during the initial setup acts a BLE
-peripheral. (Python using dbus to Bluez.) It has a single service and
-19 characteristics. I get that the first "U" in UUID stands for
-unique. Must that be unique among each physical product, or may it be
-unique among the product line?
+QCA6390 memdump VSE sometimes come to bluetooth driver
+with wrong sequence number as illustrated as follows:
+frame # in DEC: frame data in HEX
+1396: ff fd 01 08 74 05 00 37 8f 14
+1397: ff fd 01 08 75 05 00 ff bf 38
+1414: ff fd 01 08 86 05 00 fb 5e 4b
+1399: ff fd 01 08 77 05 00 f3 44 0a
+1400: ff fd 01 08 78 05 00 ca f7 41
+it is mistook for controller missing packets, so results
+in page fault after overwriting memdump buffer allocated.
 
-So if I sell 1,000 units (which would be a success), would I need to
-obtain 1,000 service UUIDs and 19,000 characteristic UUIDs? Or just 20
-total, for the entire product line?
+it is fixed by ignoring QCA6390 sequence number error
+and checking buffer space before writing.
 
-The goal is so that the iOS/Android app can have that pre-set in the
-code and quickly discover the device, pair it automagically.
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 45 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 38 insertions(+), 7 deletions(-)
 
-I suppose the risk is of a conflict of two similar devices which are
-in the same vicinity of the phone, and both set into peripheral mode
-at the same time. But that would be a minimal risk which I could
-accommodate for.
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e4a6823..ab90af6 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -114,6 +114,7 @@ struct qca_memdump_data {
+ 	char *memdump_buf_tail;
+ 	u32 current_seq_no;
+ 	u32 received_dump;
++	u32 ram_dump_size;
+ };
+ 
+ struct qca_memdump_event_hdr {
+@@ -976,6 +977,8 @@ static void qca_controller_memdump(struct work_struct *work)
+ 	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
+ 	u16 seq_no;
+ 	u32 dump_size;
++	u32 temp;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+ 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
+ 
+@@ -1029,6 +1032,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ 
+ 			skb_pull(skb, sizeof(dump_size));
+ 			memdump_buf = vmalloc(dump_size);
++			qca_memdump->ram_dump_size = dump_size;
+ 			qca_memdump->memdump_buf_head = memdump_buf;
+ 			qca_memdump->memdump_buf_tail = memdump_buf;
+ 		}
+@@ -1052,25 +1056,52 @@ static void qca_controller_memdump(struct work_struct *work)
+ 		 * packets in the buffer.
+ 		 */
+ 		while ((seq_no > qca_memdump->current_seq_no + 1) &&
++			(soc_type != QCA_QCA6390) &&
+ 			seq_no != QCA_LAST_SEQUENCE_NUM) {
+ 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
+ 				   qca_memdump->current_seq_no);
++			temp = qca_memdump->received_dump;
++			temp += QCA_DUMP_PACKET_SIZE;
++			if (temp > qca_memdump->ram_dump_size) {
++				bt_dev_err(hu->hdev,
++						"QCA memdump received %d, no space for missed packet",
++						qca_memdump->received_dump);
++				break;
++			}
+ 			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
+ 			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
+ 			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
+ 			qca_memdump->current_seq_no++;
+ 		}
+ 
+-		memcpy(memdump_buf, (unsigned char *) skb->data, skb->len);
+-		memdump_buf = memdump_buf + skb->len;
+-		qca_memdump->memdump_buf_tail = memdump_buf;
+-		qca_memdump->current_seq_no = seq_no + 1;
+-		qca_memdump->received_dump += skb->len;
++		temp = qca_memdump->received_dump + skb->len;
++		if (temp <= qca_memdump->ram_dump_size) {
++			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
++					(seq_no != qca_memdump->current_seq_no))
++				bt_dev_err(hu->hdev,
++						"QCA memdump unexpected packet %d",
++						seq_no);
++			bt_dev_dbg(hu->hdev,
++					"QCA memdump packet %d with length %d",
++					seq_no, skb->len);
++			memcpy(memdump_buf, (unsigned char *)skb->data,
++					skb->len);
++			memdump_buf = memdump_buf + skb->len;
++			qca_memdump->memdump_buf_tail = memdump_buf;
++			qca_memdump->current_seq_no = seq_no + 1;
++			qca_memdump->received_dump += skb->len;
++		} else {
++			bt_dev_err(hu->hdev,
++					"QCA memdump received %d, no space for packet %d",
++					qca_memdump->received_dump, seq_no);
++		}
+ 		qca->qca_memdump = qca_memdump;
+ 		kfree_skb(skb);
+ 		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
+-			bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
+-				   qca_memdump->received_dump);
++			bt_dev_info(hu->hdev,
++					"QCA memdump Done, received %d, total %d",
++					qca_memdump->received_dump,
++					qca_memdump->ram_dump_size);
+ 			memdump_buf = qca_memdump->memdump_buf_head;
+ 			dev_coredumpv(&hu->serdev->dev, memdump_buf,
+ 				      qca_memdump->received_dump, GFP_KERNEL);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
-Christopher de Vidal
-
-Would you consider yourself a good person? Have you ever taken the
-'Good Person' test? It's a fascinating five minute quiz. Google it.
