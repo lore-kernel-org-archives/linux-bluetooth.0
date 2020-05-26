@@ -1,156 +1,124 @@
-Return-Path: <SRS0=GU2S=7H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5fy2=7I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98092C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 May 2020 19:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34C5C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 02:57:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80FB82068D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 May 2020 19:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8293720812
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 02:57:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="Omtfl/4C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390247AbgEYTiM (ORCPT
+        id S2388417AbgEZC56 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 May 2020 15:38:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38222 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390218AbgEYTiC (ORCPT
+        Mon, 25 May 2020 22:57:58 -0400
+Received: from mail26.static.mailgun.info ([104.130.122.26]:37850 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388428AbgEZC56 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 May 2020 15:38:02 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B64EC061A0E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2020 12:38:02 -0700 (PDT)
-Received: from TesterBox (unknown [IPv6:2607:f2c0:f00e:4a00:781f:9cd6:122d:6995])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 25 May 2020 22:57:58 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1590461878; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=2lSQnTFuuDSH2tOGPsTeclalbej5l5YcEl5RqjPT5w4=; b=Omtfl/4Cnvr+lckWcLF2eJWWMQeGM7LWpy2O15Zhdq5sRh1mj/ZuC2GZiv1b7GpuSqO/jzeU
+ MgOHEuGfqNMtxaZ9OU87kZkeCQLbNuLySyaJu1EY6E+J3xi0RU95ZKxUpd7FlObvCG9ktFli
+ nY0oIub5nQI40E7rsm3ml7qkxjw=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
+ 5ecc85a344a25e0052e20db5 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 26 May 2020 02:57:39
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 39C55C433CA; Tue, 26 May 2020 02:57:37 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
-        (Authenticated sender: tester)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id E1E4C2A051E;
-        Mon, 25 May 2020 20:38:00 +0100 (BST)
-Message-ID: <5378e0c1e4b8710bb54442b8ae1972fbf17c7321.camel@collabora.com>
-Subject: Re: [PATCH] Bluetooth: Avoid calling device_add() on duplicated HCI
- conn event
-From:   Olivier =?ISO-8859-1?Q?Cr=EAte?= <olivier.crete@collabora.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Date:   Mon, 25 May 2020 15:37:58 -0400
-In-Reply-To: <0858E407-99A0-4EF7-B890-B367B206F4AD@holtmann.org>
-References: <20200506025358.361519-1-olivier.crete@collabora.com>
-         <0858E407-99A0-4EF7-B890-B367B206F4AD@holtmann.org>
-Organization: Collabora
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 4C385C433C6;
+        Tue, 26 May 2020 02:57:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 4C385C433C6
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: [PATCH v2] bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot
+Date:   Tue, 26 May 2020 10:57:30 +0800
+Message-Id: <1590461850-9908-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Warm reboot can not restore qca6390 controller baudrate
+to default due to lack of controllable BT_EN pin or power
+supply, so fails to download firmware after warm reboot.
 
-On Wed, 2020-05-06 at 10:47 +0200, Marcel Holtmann wrote:
-> Hi Olivier,
-> 
-> > The BCM20702A1 device in the ThinkPad x230 seems to send the HCI
-> > Connection Complete event twice for the same connection, for which the
-> > stack seems to recover, except for the core device_add() function
-> > which is not meant to be called twice for the same device. So let's
-> > just avoid calling it in that case.
-> > 
-> > BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=204633
-> > Signed-off-by: Olivier Crête <olivier.crete@collabora.com>
-> > Cc: stable@vger.kernel.org
-> 
-> please include the btmon output showing this issue.
+Fixed by sending EDL_SOC_RESET VSC to reset controller
+within added device shutdown implementation.
 
-The issue is quite intermittent, and it seems to happen more right
-after I update the rest of the distro (from Fedora 29 to 30.. and just
-recently from 31 to 32).. And I have no logical explanation. And right
-now, I can't reproduce it anymore.
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-> And there is no firmware update available for the Bluetooth controller in the ThinkPad. Most Broadcom devices require an actual firmware load to fix bugs. Does your device load firmware?
-
-I have a firmware file extracted from the Windows driver, without it,
-the Bluetooth connection is even more unstable.
-
-It comes from
-https://github.com/winterheart/broadcom-bt-firmware/blob/master/brcm/BCM20702A1-0a5c-21e6.hcd
-
-Olivier
-
-> 
-> > ---
-> > include/net/bluetooth/hci_core.h | 3 +++
-> > net/bluetooth/hci_conn.c         | 1 +
-> > net/bluetooth/hci_event.c        | 8 ++++++--
-> > 3 files changed, 10 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index d4e28773d378..b74669397dbb 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -500,6 +500,9 @@ struct hci_dev {
-> > 
-> > #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-> > 
-> > +/* Valid HCI handles are in the 0x0000-0x0EFF range per spec */
-> > +#define HCI_INVALID_HANDLE 0xFFFF
-> > +
-> > struct hci_conn {
-> > 	struct list_head list;
-> > 
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index e245bc155cc2..edf12a3f46aa 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -532,6 +532,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> > 	conn->rssi = HCI_RSSI_INVALID;
-> > 	conn->tx_power = HCI_TX_POWER_INVALID;
-> > 	conn->max_tx_power = HCI_TX_POWER_INVALID;
-> > +	conn->handle = HCI_INVALID_HANDLE;
-> > 
-> > 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
-> > 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 0a591be8b0ae..e498f70fcda9 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -2553,6 +2553,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> > 	}
-> > 
-> > 	if (!ev->status) {
-> > +		int first_connection = (conn->handle == HCI_INVALID_HANDLE);
-> > +
-> 
-> We have the type bool available for these kind of things. 
-> 
-> > 		conn->handle = __le16_to_cpu(ev->handle);
-> > 
-> > 		if (conn->type == ACL_LINK) {
-> > @@ -2567,8 +2569,10 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> > 		} else
-> > 			conn->state = BT_CONNECTED;
-> > 
-> > -		hci_debugfs_create_conn(conn);
-> > -		hci_conn_add_sysfs(conn);
-> > +		if (first_connection) {
-> > +			hci_debugfs_create_conn(conn);
-> > +			hci_conn_add_sysfs(conn);
-> > +		}
-> > 
-> > 		if (test_bit(HCI_AUTH, &hdev->flags))
-> > 			set_bit(HCI_CONN_AUTH, &conn->flags);
-> 
-> Regards
-> 
-> Marcel
-> 
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e4a6823..b479e51 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1975,6 +1975,32 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
+ }
+ 
++static void qca_serdev_shutdown(struct device *dev)
++{
++	int res;
++	int timeout = msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS);
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	const u8 ibs_wake_cmd[] = { 0xFD };
++	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
++
++	if (qcadev->btsoc_type == QCA_QCA6390) {
++		serdev_device_write_flush(serdev);
++		res = serdev_device_write_buf(serdev,
++				ibs_wake_cmd, sizeof(ibs_wake_cmd));
++		BT_DBG("%s: send ibs_wake_cmd res = %d", __func__, res);
++		serdev_device_wait_until_sent(serdev, timeout);
++		usleep_range(8000, 10000);
++
++		serdev_device_write_flush(serdev);
++		res = serdev_device_write_buf(serdev,
++				edl_reset_soc_cmd, sizeof(edl_reset_soc_cmd));
++		BT_DBG("%s: send edl_reset_soc_cmd res = %d", __func__, res);
++		serdev_device_wait_until_sent(serdev, timeout);
++		usleep_range(8000, 10000);
++	}
++}
++
+ static int __maybe_unused qca_suspend(struct device *dev)
+ {
+ 	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+@@ -2100,6 +2126,7 @@ static struct serdev_device_driver qca_serdev_driver = {
+ 		.name = "hci_uart_qca",
+ 		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
+ 		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
++		.shutdown = qca_serdev_shutdown,
+ 		.pm = &qca_pm_ops,
+ 	},
+ };
 -- 
-Olivier Crête
-olivier.crete@collabora.com
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
