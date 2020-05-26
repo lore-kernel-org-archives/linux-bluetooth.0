@@ -2,121 +2,108 @@ Return-Path: <SRS0=5fy2=7I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C6AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B91C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:36:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 851062065F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:30:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CEE920723
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 May 2020 14:36:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="muB9sQtY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bI9stRK1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728004AbgEZOaj (ORCPT
+        id S1727782AbgEZOgO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 May 2020 10:30:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46720 "EHLO
+        Tue, 26 May 2020 10:36:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727007AbgEZOaj (ORCPT
+        with ESMTP id S1726882AbgEZOgN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 May 2020 10:30:39 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9744DC03E96D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:30:38 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id w10so24817042ljo.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:30:38 -0700 (PDT)
+        Tue, 26 May 2020 10:36:13 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BFBC03E96D
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:36:13 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id c75so10167091pga.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2020 07:36:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LztMYlNxAp/YzMlFlAsB5KiKAsfpCCfOHvY1s1s4XCs=;
-        b=muB9sQtYshmJG2HyGawj5kPZ3mQ9OtxQqO65WeL7XZZGucmQP3f/dpE5Lnsd45jxGK
-         /olNwAccvNEDx0+UiRCswWlbzdsf5J/3DIyLeSmc+Fbi1SbIrOtxY067w7lfcMhSiESz
-         rxNDv4kI+JaXZtq4s8ooU0VPtKBCK7oepo8l2zy4uVZj9vOWTcM0U9tzHcB4aM0TtvEy
-         v/7zqfuXMpHACGXZ5R6S1J7UL9YyWYYr64p5TQbcZlFVDc4X/C+miUJGuRd055G5Wimn
-         SB5MaGWxTnnEEGig4KWaK9mwpYPA4TMKu/VQ/D+yp9lBCKbfAx69kRuCX4HMOfO8u9h1
-         Hyag==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LCEV3ZrXlklac0YuhlpaCMA8dYsILo8515UKdP2YSxA=;
+        b=bI9stRK1P5sIEX4p3T4jo4s2NukCBt55WkPrwWeInABvveTDCf+BMXiC4H/GbLM0Ep
+         CX8tOPQ/koheTWuCz/RGa3UBcA/ZGpCIkOssNdd8Q3k4z0cCkjv9qyWdghLhMlYkaFah
+         2jALXB+DX0UJVW/1p4SEQV5E8t7PjPi9VI1KqBo5BvYt6kJDlZ1jHy1MBKf/wb89B5lW
+         jAo27x7fsm5uuaoYxEOLbm9JWax2aa2aisZAojBou+Jlu4eFn03B/Dh5B12xj7KReF0v
+         11+jndyH+oqBwGj96uKWhN18iMrof9qLnOv+uyKiwvhp1fEkpq62Y9iKSPG+QlDGUZby
+         RJIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LztMYlNxAp/YzMlFlAsB5KiKAsfpCCfOHvY1s1s4XCs=;
-        b=da7Y3XnrOhTSpzlFeC5QrUIh1i7M9XafG15Uyw3YMmctxpLdirDPqwWvVV+jCCzN6K
-         Ewcv4BakdrnXyqmrIeA+pzUem66leR8GEJ3JjT5JRFVhrrnSjDurM8K0AznxBfB66E7g
-         pBjbnPqvjysaRaudRTVaN84uykeQANJOk81EDtKhiX555Udvl5j9KTlajb4CLWvSTPT4
-         EwhUe422RNv+ONRBPvw2xYJj3iCrfkIIYO4y2zgLxDtvRpwb9xuGfNZccS62OJc6y0hu
-         4BcQ0BZVyQ8uXhTWXE86EWI6o4ormzC4F88AZbF4gT5L33bZ1JuhqkSQCZJknPn6u8x3
-         WbYw==
-X-Gm-Message-State: AOAM533sw8K4h49bIwtdmSTkahs/zyd0v6ihG3ysAHYMxrMakNj0n21S
-        zfIydb0fwJIbmW/fG94rSC7wRHwtbdbKDIiNvBezJA==
-X-Google-Smtp-Source: ABdhPJwzEk5VNr/SL7nylGsx58wzNJxbHpP4LzE+YUTbmMFryHNavAgIPMVk8xcr5AMeuutQNFAY/UE+Aae6w0YNlUM=
-X-Received: by 2002:a2e:9586:: with SMTP id w6mr719718ljh.274.1590503436858;
- Tue, 26 May 2020 07:30:36 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LCEV3ZrXlklac0YuhlpaCMA8dYsILo8515UKdP2YSxA=;
+        b=CoEmkKQMPIjZQ0rm7N4Iam2Bc+sZi9dKpp9t/0A4TDdSh80Jk3Sep303IZr+9AafO4
+         itIOXodmbY6l6Euomr4c0JhKLZE6Ampxs1FZNGlyUw7cyAQeHsdFav9hBJv4RjwgQivm
+         4pXT53EcMlENR/yUujrwuhk0mpVZRtncDQg8HCvD9q/T0a337eYdEph8z4kBZZbOxgty
+         dCCuWF4nahg515j29cvZVRo2DiiE+DAT8qepXiT/zg8d+DwGuavhoJnWJLM4i8q9X9Im
+         7vA25YLGEEJX7SR6OnLhemQA0Gkga3BZaDLlvPfWQJvChFWeQ2S9GvHEvQvk74r3kkFo
+         NnBA==
+X-Gm-Message-State: AOAM530MvircwCteBJ6Y2jzGM82Op1Gg3XrCIezVIzRyVBZE2KkN0CqW
+        Ws3k+Rnvw8uxGiOO4tiwGf3J9mwU0Y0I9iXjDKWEvYpb
+X-Google-Smtp-Source: ABdhPJzYlFptKljrnyGPoRdtgdhXf+8aVFm3mstuoHR8SPtLymBadXhghH4rTiVyveXMEbk5FWyDCdpoCxbty/DhvQY=
+X-Received: by 2002:a65:4487:: with SMTP id l7mr1367550pgq.221.1590503772808;
+ Tue, 26 May 2020 07:36:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200519202519.219335-1-luiz.dentz@gmail.com> <20200519202519.219335-2-luiz.dentz@gmail.com>
- <C478BA49-0BBF-4323-AC3A-30442F65D346@holtmann.org> <CALWDO_UEPaAGyLFG93JzT41P=yGePB-N2Pbh5hioLBOXdh2YBw@mail.gmail.com>
- <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org>
-In-Reply-To: <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 26 May 2020 10:30:25 -0400
-Message-ID: <CALWDO_XztiDRfQEtioALNmO9smLm-qTW56hxkw8-ZH-Aw2cH1g@mail.gmail.com>
-Subject: Re: [PATCH 2/4] Bluetooth: Fix assuming EIR flags can result in SSP authentication
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
+From:   Andrey Batyiev <batyiev@gmail.com>
+Date:   Tue, 26 May 2020 17:36:01 +0300
+Message-ID: <CAEQQxWzHgiK6KHCE4kM4KepayNT5EihusKBmzaJLx6DkFDifBg@mail.gmail.com>
+Subject: [BUG] bluez: impossible to start/stop discovery over dbus if the
+ first discovery have failed
+To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello everyone,
 
-On Tue, May 26, 2020 at 10:17 AM Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->
-> Hi Alain,
->
-> > Starting with the 2.1 specification, it is my interpretation that it
-> > is not valid to support EIR but not SSP.  I understand that SSP may be
-> > disabled from BlueZ's point of view, but this doesn't seem to be a
-> > legitimate/qualifiable configuration.  Should we instead fail the
-> > legacy pairing if EIR was received as an invalid condition?
->
-> I know that using EIR requires to also use SSP. However this is just a pr=
-ecaution in case the other device is an attacked and tries to trick us.
->
-> You might get an inquiry result and not extended inquiry result, but you =
-are still talking to a SSP device. This has to do with the fact that the re=
-ception of EIR is not guaranteed. In case of radio interference you might m=
-iss one and only get an ordinary inquiry result.
->
-> If we indeed received an EIR and then get legacy pairing request, we coul=
-d try to reject the pairing. However keep in mind that our inquiry cache is=
- time limited and we through outdated information away. This might cause so=
-me race condition. So I rather read the remote host features to ensure we k=
-now the actual host features of the remote device.
+There is an interesting bug that causes StartDiscovery dbus method to
+permanently
+per connected dbus client. The root cause of it is incorrect
+processing of errors
+in src/adapter.c:start_discovery_complete function.
 
-You are correct, the EIR response is not a guaranteed thing.  For this
-reason, the host should try to resolve the name of the device before
-initiating bonding where a Remote Host Supported Feature Notification
-Event is generated to signal the remote side's support of SSP.  As you
-allude to, a remote spoofing a legitimate SSP device may always just
-jam and downgrade to not SSP, but if you have any signals that SSP is
-supported by the device, it may be a good defensive posture.
-Receiving an EIR response or a Remote Host Supported Feature Event
-with the SSP bit set is a good indication that the device supports SSP
-and you should expect SSP to take place.  Again, it is not a valid
-configuration to have EIR enabled but not SSP per my interpretation of
-the 2.1 specification.
+Steps:
+0. bluetooth adapter should be powered down
+1. start bluetoothctl and issue 'power on'
+2. in separate console issue 'hcitool inq' (or otherwise make adapter BUSY)
+3. return back to bluetoothctl and issue 'scan on'
+4. there would and error 'Failed to start discovery: org.bluez.Error.InProgress'
+5. wait until 'hcitool inq' completes
+6. issue 'scan on' again
+7. there would be same error 'Failed to start discovery:
+org.bluez.Error.InProgress'
 
+Expected:
+7. discovery should start
 
->
-> Regards
->
-> Marcel
->
+My investigation:
+1. in src/adapter.c:start_discovery, there is specific check with comment
+"Every client can only start one discovery"
+2. src/adapter.c:start_discovery adds new client into 'adapter->discovery_list'
+3. in src/adapter.c:start_discovery_complete, if 'status' is not
+MGMT_STATUS_SUCCESS,
+the 'btd_error_busy' is sent to client, but client is not removed from
+discovery_list
+4. apparently, it leads to a situation where bluez thinks that client
+have started discovery,
+but adapter is not discovering
+
+Personally, I'm not sure how to fix this bug (should the client be
+removed from discovery_list on error?).
+
+Hope it helps to fix the bug.
+
+Thanks,
+    Andrey
