@@ -2,208 +2,158 @@ Return-Path: <SRS0=nKc5=7J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC9DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BEDC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:42:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F54420776
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01FBE20899
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:42:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3tC5aAQ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="R/oPUx1+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgE0Piy (ORCPT
+        id S1730362AbgE0PmZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 May 2020 11:38:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55268 "EHLO
+        Wed, 27 May 2020 11:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726807AbgE0Pix (ORCPT
-        <rfc822;Linux-bluetooth@vger.kernel.org>);
-        Wed, 27 May 2020 11:38:53 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC3BC05BD1E
-        for <Linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:38:52 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id g25so19442697otp.13
-        for <Linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:38:52 -0700 (PDT)
+        with ESMTP id S1726807AbgE0PmZ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 May 2020 11:42:25 -0400
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACAFC05BD1E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:42:25 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id r10so1619666vsa.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WxfTPJMG0B7j7zZi7li0uvVMY8W3X3q/OTBuYRSk/CI=;
-        b=E3tC5aAQqDHGy/iMn7mC28/A1D9QNAU8A3at4bE3eP7fON5QOH5NL0NjrwOcKVFsTF
-         K8aUiSUQ0IjDnlqoAdKmI3mHcu9Ir2jcnf8cTioB9mtEt0MdCVX1z3CdJ3NIvQnuFoBh
-         pHBgu58QSD/rT3jtoh6inrxPR/Tpe1VmFPGTfoG5W4BMDrehuq5Ya6ZFk4VAlWXkXGQ3
-         rLXRns8ydMo9/WwAUUYvwczX7HcN8S2hrYXLLtbfCHukd0B0FAXLnrSQh6bbwX9boRo4
-         /zTzGT2H3hJGLqvzXG1b0t5oIVe0bgQd/VA4q53FPAKxJ79E8NBdvpY60s0mLKrTtQZs
-         aiXA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hYfhSUsIkz92mjrRMI3jfLi9LV8ibmLGXbRODHuw28c=;
+        b=R/oPUx1+vwS0q8WZ8xwBHhfg/n4Nvr/L5DVDqy/J0wuW0wjZJNCBleUPvckFgt1dhW
+         T7bWmrLBpiDc955+weAbKw70IGB2y1rLrpfUJ1t0x+O43X3Y4AxFTFWS3dmo34XCgg2o
+         3e9ZgwWwM6aUmjUcAiY/OC7B/9NWynCKM06bQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WxfTPJMG0B7j7zZi7li0uvVMY8W3X3q/OTBuYRSk/CI=;
-        b=dvCikQ7CnlVoHT3FerR7NoGoe4TWrCqH20hQVzrUNpUSmMcYFuyMHRtgpGQO5VUyOY
-         hX9OLr9jZqVPLTcwp+ZCZ5NchJFT1eK+xYRvpdmCr4EqSO4QsNz1ds0eiTIDwgXjM6N+
-         hLz7J4mmLtTjNQBsQCMpa+ImwmMM91WcqWlCwp5A/rPRLChsMaWhXzHmM5OQzog6U0Qo
-         U4PUXXCss0gaTP2CCRRAeU2eA1FoWrS1P7Dy+fgsLvo80O6ehpa025EuEuboUA8U4oR4
-         TibPWZ66FhxPdRKt41JPtKoPEo7ni9rxj/+FHdrc6c90phmspm2G9vJGCQikPGL+aM9r
-         OBgw==
-X-Gm-Message-State: AOAM5304TRexgES0gMTxUbj4QBUqpL1ILvDW9Zm/EdH2D4NNFhrWl6Yx
-        HDa5XWjndvw1Pck/ehhWYJrI0urMUQiy3QOyuQo=
-X-Google-Smtp-Source: ABdhPJyi8X6IeWrw7hreSuP0QVQ6ujc2GVU2GOupRjWJw/iWxGtrGRc16on0bQk8F2B8enKZYlCG3qcPlro7b7gNwAw=
-X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr5205706ots.11.1590593931942;
- Wed, 27 May 2020 08:38:51 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hYfhSUsIkz92mjrRMI3jfLi9LV8ibmLGXbRODHuw28c=;
+        b=Adp+CeOhnYYN24CFIQRXV2GKuABbW2Xo3jcbouZm8j1H2PDnmiH+XjoGiLnM9DqR+e
+         fO8x3oah8aEeReGNkH4L3/qIcuCoB//0xuoQa+BbjXwzkV/359rpmTNw0E96YXyX3ipG
+         9FsYTz1ahtmjFGThwsXxxHnt3cuoxMGekS6ifflFzRyHL3ahetKBPTl7pocvvTSRcBO8
+         6xjgNPqiWaUeNx6LROdNupSzezeNUDrCTeG/GHogfV3Wy+lMSmx+aDb/k1gEFaP2bquW
+         ZLnT8M521OIJQjLl+qjtYJK+dwEOk6OQyg8FT9EypmyCFJ0WWbzUJvWQq2Kzpm7q1FZm
+         SpJg==
+X-Gm-Message-State: AOAM530q+o4MV3McolRRml0O1xsAKnJUEVVZdtwNYvppx7wJoSG4yNGg
+        KuwBGkMNSCix74lTB6QYymET2Vci8NY=
+X-Google-Smtp-Source: ABdhPJwy/g4yEoSwHyLo9XCTLMBldFxxOe6pEJxXCQie4MR6CwERdL36YMmPqoUhGr4KTxGbOvJI/w==
+X-Received: by 2002:a05:6102:3033:: with SMTP id v19mr4996881vsa.217.1590594143910;
+        Wed, 27 May 2020 08:42:23 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id s65sm17194vss.5.2020.05.27.08.42.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2020 08:42:23 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [BlueZ PATCH v4] doc:adding definitions for load default params mgmt op
+Date:   Wed, 27 May 2020 15:42:17 +0000
+Message-Id: <20200527154217.21115-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
 MIME-Version: 1.0
-References: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com>
- <CABBYNZKonvHxnabQsu84rVQEPpou45UgqVUECZ2HoTdd7pWT+A@mail.gmail.com>
- <DM5PR17MB1963CCA502759CB08EB9FFE1C5B10@DM5PR17MB1963.namprd17.prod.outlook.com>
- <11527909.O9o76ZdvQC@ix>
-In-Reply-To: <11527909.O9o76ZdvQC@ix>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 27 May 2020 08:38:38 -0700
-Message-ID: <CABBYNZKb2LpyH1iEyc-nOn7ZXYBPA0j+-RoZ0ytNXNndYvEF3A@mail.gmail.com>
-Subject: Re: Comments on the ConnectDevice API function
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     Martin Woolley <mwoolley@bluetooth.com>,
-        "Linux-bluetooth@vger.kernel.org" <Linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+This change adds the definition for the load default parameter command.
+In particular, this command is used to load default parameters for
+various operations in the kernel. This mechanism is also expandable to
+future values that may be necessary.
 
-On Wed, May 27, 2020 at 7:10 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
->
-> Hi Martin,
->
-> On Wednesday, 27 May 2020 15:41:12 CEST Martin Woolley wrote:
-> > Hi Luiz
-> >
-> > thanks for your response. Much appreciated. I must confess this is the first
-> > time I've used the BlueZ APIs directly (via D-Bus).
->
-> > I'm all for hiding implementation details where possible in APIs and making
-> > the API itself take care of conditional aspects if possible, but these were
-> > just my $0.02, no more than that. I wasn't aware of the background or the
-> > philosophy, so thanks for that insight as well.
->
-> > Having the API take care of the AlreadyExists error by providing a
-> > connection to the already discovered device, transparently does seem a nice
-> > touch for the application developer but certainly not essential.
->
-> This API was added only for qualification purposes (there are some GAP tests
-> specified in a way that upper tester is not doing discovery) and it shouldn't
-> be used for 'normal' usage.
+This will allow bluetoothd to load parameters from a conf file that may
+be customized for the specific requirements of each platforms.
 
-Btw, we could perhaps have a different flag from such API e.g.
-qualification-only or perhaps add an entry on main.conf would be
-better in this regard since it may mean that we never really adopt
-them as stable APIs.
+---
 
->
->
-> > All the best
-> >
-> > Martin
-> >
-> > -----Original Message-----
-> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Sent: 22 May 2020 18:49
-> > To: Martin Woolley <mwoolley@bluetooth.com>
-> > Cc: Linux-bluetooth@vger.kernel.org
-> > Subject: Re: Comments on the ConnectDevice API function
-> >
-> > Hi Martin,
-> >
-> > On Fri, May 22, 2020 at 1:25 AM Martin Woolley <mwoolley@bluetooth.com>
-> > wrote:
-> > >
-> > >
-> > > Hello
-> > >
-> > >
-> > >
-> > > I've recently been working with BlueZ via D-Bus and have a situation which
-> > > requires me to be able to connect to a device whose Bluetooth device
-> > > address is known, but without first scanning. This is a link layer state
-> > > transition with the specification allows.
-> >
-> > >
-> > >
-> > > BlueZ currently supports this via an API adapter function called
-> > > ConnectDevice, whose status is currently "experimental". From my
-> > > experience of using this function, it seems to behave like this:
-> >
-> > >
-> > >
-> > > If the BlueZ instance has not scanned yet, so that the target device is
-> > > not known to it, the ConnectDevice call results in scanning taking place
-> > > and then if the target device is found, it is connected to. Success!
-> >
-> > >
-> > >
-> > > But if scanning has previously been performed, regardless of the state of
-> > > the actual device (e.g. advertising and ready to accept connections), an
-> > > exception is thrown with a message whose text value is "Already Exists".
-> >
-> > >
-> > >
-> > > I was wondering if I could influence the design of the API before the
-> > > ConnectDevice experimental status is removed?
-> >
-> > >
-> > >
-> > > I would like to suggest that there should be no need for a special API to
-> > > connect directly to a device without first scanning. Why burden the
-> > > application developer needing to call it just in case this condition
-> > > applies, catching the BlueZ exception ("Already Exists") and responding
-> > > by then calling the normal Connect API?
-> >
-> > I guess the intention was to have the application use the intended API for
-> > devices already present _before_ calling ConnectDevice, so before entering
-> > the address manually the application would enumerate the existing devices
-> > and figure out if that was already present.
->
-> >
-> > > An alternative would be to accommodate this special case (not scanned
-> > > before) in the implementation of the standard device Connect(bdaddr)
-> > > function or if that makes no sense because Device objects must correspond
-> > > to previously discovered, physical devices, then at least the adapter
-> > > ConnectDevice function could take care of the two possible paths and
-> > > simplify matters for the application developer.
-> >
-> > I guess you probably know this but just in case someone look at the archives
-> > it is better that we make some things clearer, while the core spec allows
-> > connecting without scanning D-Bus are intend to be a higher level API thus
-> > why ConnectDevice was not really necessary for a long time and we just
-> > introduced it for qualification purpose or when there are multiple adapter
-> > where one acts as scanner. Also ever since the introduction of privacy
-> > (random addresses) APIs that takes addresses becomes rather complicated to
-> > be used directly, and there exists ways to scan for a specific address with
-> > pattern filtering:
-> > https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kerne
-> > l.org%2Fpub%2Fscm%2Fbluetooth%2Fbluez.git%2Ftree%2Fdoc%2Fadapter-api.txt%23n
-> > 122&amp;data=02%7C01%7C%7Cfafcb0f940054867612508d7fe7866fb%7Ce4e0fec5fc6c4dd
-> > 6ae374bdb30e156b9%7C0%7C0%7C637257665400787125&amp;sdata=Iy%2FwWkxs%2FyW3gL2
-> > 39FLWdoDRGa0apb63WxMhYwRoneM%3D&amp;reserved=0
-> > That said I don't oppose to remove Already Exists error, but we should be
-> > very clear that the use of such API should only be recommended with users
-> > input and does not substitute the likes of Device.Connect.
->
-> > --
-> > Luiz Augusto von Dentz
->
->
-> --
-> pozdrawiam
-> Szymon Janc
->
->
+ doc/mgmt-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 6ee01fed8..391e818de 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3223,6 +3223,66 @@ Set Experimental Feature Command
+ 				Invalid Index
+ 
+ 
++Load Default Controller Parameter Command
++=============================
++
++	Command Code:		0x004b
++	Controller Index:	<controller id>
++	Command Parameters:	Parameter_Count (2 Octets)
++				Parameter1 {
++					Parameter_Type (2 Octet)
++					Value_Length (1 Octet)
++					Value (0-255 Octets)
++				}
++				Parameter2 { }
++				...
++	Return Parameters:
++
++	This command is used to feed the kernel a list of default controller
++	parameters.
++
++	Currently defined Parameter_Type values are:
++
++		0x0000	BR/EDR Page Scan Type
++		0x0001	BR/EDR Page Scan Interval
++		0x0002	BR/EDR Page Scan Window
++		0x0003	BR/EDR Inquiry Scan Type
++		0x0004	BR/EDR Inquiry Scan Interval
++		0x0005	BR/EDR Inquiry Scan Window
++		0x0006	BR/EDR Link Supervision Timeout
++		0x0007	BR/EDR Page Timeout
++		0x0008	BR/EDR Min Sniff Interval
++		0x0009	BR/EDR Max Sniff Interval
++		0x000a	LE Advertisement Min Interval
++		0x000b	LE Advertisement Max Interval
++		0x000c	LE Multi Advertisement Rotation Interval
++		0x000d	LE Scanning Interval for auto connect
++		0x000e	LE Scanning Window for auto connect
++		0x000f	LE Scanning Interval for wake scenarios
++		0x0010	LE Scanning Window for wake scenarios
++		0x0011	LE Scanning Interval for discovery
++		0x0012	LE Scanning Window for discovery
++		0x0013	LE Scanning Interval for adv monitoring
++		0x0014	LE Scanning Window for adv monitoring
++		0x0015	LE Scanning Interval for connect
++		0x0016	LE Scanning Window for connect
++		0x0017	LE Min Connection Interval
++		0x0018	LE Max Connection Interval
++		0x0019	LE Connection Connection Latency
++		0x001a	LE Connection Supervision Timeout
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.  Note that these only
++	control the default parameters.  Higher level Apis may influence the
++	effective value used.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-Luiz Augusto von Dentz
+2.27.0.rc0.183.gde8f92d652-goog
+
