@@ -2,158 +2,122 @@ Return-Path: <SRS0=nKc5=7J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BEDC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D354C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:49:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01FBE20899
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D97A620776
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 15:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="R/oPUx1+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGVkSHr9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730362AbgE0PmZ (ORCPT
+        id S2387467AbgE0PtI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 May 2020 11:42:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55810 "EHLO
+        Wed, 27 May 2020 11:49:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726807AbgE0PmZ (ORCPT
+        with ESMTP id S1727772AbgE0PtI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 May 2020 11:42:25 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACAFC05BD1E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:42:25 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id r10so1619666vsa.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:42:25 -0700 (PDT)
+        Wed, 27 May 2020 11:49:08 -0400
+Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5527DC05BD1E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:49:07 -0700 (PDT)
+Received: by mail-oo1-xc42.google.com with SMTP id r12so5085279ool.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 08:49:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hYfhSUsIkz92mjrRMI3jfLi9LV8ibmLGXbRODHuw28c=;
-        b=R/oPUx1+vwS0q8WZ8xwBHhfg/n4Nvr/L5DVDqy/J0wuW0wjZJNCBleUPvckFgt1dhW
-         T7bWmrLBpiDc955+weAbKw70IGB2y1rLrpfUJ1t0x+O43X3Y4AxFTFWS3dmo34XCgg2o
-         3e9ZgwWwM6aUmjUcAiY/OC7B/9NWynCKM06bQ=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RA0ORo2hEWbjZ+p2Reh5Jbg3LvAZ9GQ82ur7MO/qXp8=;
+        b=kGVkSHr9dMCPHIvqrL9h0TeyEKf79ZcC5xCa+kFgpaPOrtHyaF5KU6Ms+oxT1rnG0p
+         cm3rHf1NVZ20sVyZl3aVrBxMEAfAduA7DiqiVx661JyAn6mmok6gUiyWmSXnWP/BRkK5
+         su2CZwW+UG8PUrt+bF5AiirPkvPPS9qkCV/Qs5VfTaa+CLUExrcGsc8q9v7mDFzicdTh
+         9MyGhSJqN0RTF8DdEtaynNG89qEj8pwPl4lBjR6+cM0HkKtmyIOqcdexCAeAAAtWQQBi
+         wzQDGwD1XRAmXw8E3r4Pj8dFI46ze/mCqnQcqCHu0WB6CZc3wmoLDzGMsXNdkajJ/lZr
+         g78Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hYfhSUsIkz92mjrRMI3jfLi9LV8ibmLGXbRODHuw28c=;
-        b=Adp+CeOhnYYN24CFIQRXV2GKuABbW2Xo3jcbouZm8j1H2PDnmiH+XjoGiLnM9DqR+e
-         fO8x3oah8aEeReGNkH4L3/qIcuCoB//0xuoQa+BbjXwzkV/359rpmTNw0E96YXyX3ipG
-         9FsYTz1ahtmjFGThwsXxxHnt3cuoxMGekS6ifflFzRyHL3ahetKBPTl7pocvvTSRcBO8
-         6xjgNPqiWaUeNx6LROdNupSzezeNUDrCTeG/GHogfV3Wy+lMSmx+aDb/k1gEFaP2bquW
-         ZLnT8M521OIJQjLl+qjtYJK+dwEOk6OQyg8FT9EypmyCFJ0WWbzUJvWQq2Kzpm7q1FZm
-         SpJg==
-X-Gm-Message-State: AOAM530q+o4MV3McolRRml0O1xsAKnJUEVVZdtwNYvppx7wJoSG4yNGg
-        KuwBGkMNSCix74lTB6QYymET2Vci8NY=
-X-Google-Smtp-Source: ABdhPJwy/g4yEoSwHyLo9XCTLMBldFxxOe6pEJxXCQie4MR6CwERdL36YMmPqoUhGr4KTxGbOvJI/w==
-X-Received: by 2002:a05:6102:3033:: with SMTP id v19mr4996881vsa.217.1590594143910;
-        Wed, 27 May 2020 08:42:23 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id s65sm17194vss.5.2020.05.27.08.42.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 08:42:23 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [BlueZ PATCH v4] doc:adding definitions for load default params mgmt op
-Date:   Wed, 27 May 2020 15:42:17 +0000
-Message-Id: <20200527154217.21115-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RA0ORo2hEWbjZ+p2Reh5Jbg3LvAZ9GQ82ur7MO/qXp8=;
+        b=JkW+emh1bCWoPDrpfSjh3W7fgAVdSrgOTRYN51RR5iuqSPiTJLO4nHcnMjgUdw2vzv
+         vyyJUWeHGYN9zS1TGFC9plW16ZtNPrbfg+Mb1I245GOluWnqOD/F2MEMex8wMWZ8Lg3q
+         OiGhyr4NxqROhtgJ/2aK1/3iqQzXTqpNJdlCEhJYRxEspqf3w/CJArQxKFST5WwXVXAz
+         /OEmqIRi1J27KkTeexlz8bmzGbGTsoC5OpeJE61pebveyWtzzmJOhjxlbRStwB8Can7v
+         GI+0yVM4Ch+dZAkJ3SdORoaG50ZjKGXjJcu1TT8iFsJGSnlARH8nk/oxr3RyI37w6O4E
+         cfXw==
+X-Gm-Message-State: AOAM530ypGvqcG2nJ9Hc2RnFUe+ThndYRKO5vcdYYy+wzVE71YpWpWIE
+        hTq7As4PvZreCowWjm7QaeFmA3Q1o1mbb9tZQYE=
+X-Google-Smtp-Source: ABdhPJxyjjUu+FWhicVqGW4qXOxkwZ/3TLX+6NVC4M3xyRdenAQnjxFV7j9juv42I9AhILiCSkGbvgxSpCOcRp3gvkI=
+X-Received: by 2002:a4a:3b04:: with SMTP id s4mr3588851oos.35.1590594546608;
+ Wed, 27 May 2020 08:49:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <B6A143FD-717D-44F9-B62F-17CF357961A1@holtmann.org>
+ <20200219120940.1509224-1-david@ixit.cz> <20200419234937.4zozkqgpt557m3o6@pali>
+ <177c5794-1cd7-8f76-b66f-e9473ed37a31@redhat.com> <CAB5wbS97WQTduY9sKgiLjAnpsmka+9hGQOBDdbAEHgkcwnze1w@mail.gmail.com>
+ <CABBYNZ+TQ+oSYgL1wGsC0rs9faecd0RtQkFE9fbnV89D1r=LOg@mail.gmail.com>
+ <20200516075340.3z37ejs3fuhctunl@pali> <CABBYNZLWsYHeOo3_+hcq4r+gY_0sLBQhftW7My7Y4D1n9o5jxg@mail.gmail.com>
+ <20200518165011.jfarrp5mtqoy3mqz@pali> <6da08b42-34d5-9d20-bfc1-161cc8d0f2ea@igalia.com>
+In-Reply-To: <6da08b42-34d5-9d20-bfc1-161cc8d0f2ea@igalia.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 27 May 2020 08:48:51 -0700
+Message-ID: <CABBYNZ+myxfFmobLuzGeYfP_G5tM_ptKgCQCmpQCiUkPZYemuQ@mail.gmail.com>
+Subject: Re: Bluetooth: Allow to use configure SCO socket codec parameters
+To:     Ujjwal Sharma <ryzokuken@igalia.com>
+Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        Andrew Fuller <mactalla.obair@gmail.com>,
+        Aleksandar Kostadinov <akostadi@redhat.com>,
+        David Heidelberg <david@ixit.cz>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Pavel Machek <pavel@ucw.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change adds the definition for the load default parameter command.
-In particular, this command is used to load default parameters for
-various operations in the kernel. This mechanism is also expandable to
-future values that may be necessary.
+Hi Ujjwal,
 
-This will allow bluetoothd to load parameters from a conf file that may
-be customized for the specific requirements of each platforms.
+On Wed, May 27, 2020 at 5:19 AM Ujjwal Sharma <ryzokuken@igalia.com> wrote:
+>
+> On 5/18/20 10:20 PM, Pali Roh=C3=A1r wrote> ...
+> > AuriStream works also in HSP profile and I already implemented
+> > negotiation for AuriStream codec for both HSP and HFP profiles.
+> >
+> > The only missing part is to unblock kernel to allow usage of AuriStream=
+.
+> > ...
+> > AuriStream does not need HFP, it is available also in HSP. So missing
+> > HFP should not be a blocker.
+> >
+> > Anyway, my HFP implementation is there:
+> >
+> > https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/2=
+88
+> > https://github.com/pali/hsphfpd-prototype
+> >
+> > And people are already testing my HFP implementation with pulseaudio
+> > integration.
+> >
+> > So, we can continue at kernel level, as this is the missing part right
+> > now.
+>
+> Reading through this thread, it seems like Pali has alleviated all
+> concerns regarding the patch. I would like to ask what still remains to
+> be done in order to make this patch more acceptable?
 
----
+Testing is one thing but for production we would need a qualifyable
+solution, that said I wouldn't oppose to have the socket option behind
+a module options (runtime) or Kconfig (build-time) so people willing
+to run this code can do on their own.
 
- doc/mgmt-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 6ee01fed8..391e818de 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3223,6 +3223,66 @@ Set Experimental Feature Command
- 				Invalid Index
- 
- 
-+Load Default Controller Parameter Command
-+=============================
-+
-+	Command Code:		0x004b
-+	Controller Index:	<controller id>
-+	Command Parameters:	Parameter_Count (2 Octets)
-+				Parameter1 {
-+					Parameter_Type (2 Octet)
-+					Value_Length (1 Octet)
-+					Value (0-255 Octets)
-+				}
-+				Parameter2 { }
-+				...
-+	Return Parameters:
-+
-+	This command is used to feed the kernel a list of default controller
-+	parameters.
-+
-+	Currently defined Parameter_Type values are:
-+
-+		0x0000	BR/EDR Page Scan Type
-+		0x0001	BR/EDR Page Scan Interval
-+		0x0002	BR/EDR Page Scan Window
-+		0x0003	BR/EDR Inquiry Scan Type
-+		0x0004	BR/EDR Inquiry Scan Interval
-+		0x0005	BR/EDR Inquiry Scan Window
-+		0x0006	BR/EDR Link Supervision Timeout
-+		0x0007	BR/EDR Page Timeout
-+		0x0008	BR/EDR Min Sniff Interval
-+		0x0009	BR/EDR Max Sniff Interval
-+		0x000a	LE Advertisement Min Interval
-+		0x000b	LE Advertisement Max Interval
-+		0x000c	LE Multi Advertisement Rotation Interval
-+		0x000d	LE Scanning Interval for auto connect
-+		0x000e	LE Scanning Window for auto connect
-+		0x000f	LE Scanning Interval for wake scenarios
-+		0x0010	LE Scanning Window for wake scenarios
-+		0x0011	LE Scanning Interval for discovery
-+		0x0012	LE Scanning Window for discovery
-+		0x0013	LE Scanning Interval for adv monitoring
-+		0x0014	LE Scanning Window for adv monitoring
-+		0x0015	LE Scanning Interval for connect
-+		0x0016	LE Scanning Window for connect
-+		0x0017	LE Min Connection Interval
-+		0x0018	LE Max Connection Interval
-+		0x0019	LE Connection Connection Latency
-+		0x001a	LE Connection Supervision Timeout
-+
-+	This command can be used when the controller is not powered and
-+	all settings will be programmed once powered.  Note that these only
-+	control the default parameters.  Higher level Apis may influence the
-+	effective value used.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
--- 
-2.27.0.rc0.183.gde8f92d652-goog
-
+--=20
+Luiz Augusto von Dentz
