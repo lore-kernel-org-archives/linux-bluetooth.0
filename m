@@ -2,169 +2,197 @@ Return-Path: <SRS0=nKc5=7J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17544C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 13:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF381C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 14:10:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1453207CB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 13:41:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 867522073B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 May 2020 14:10:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=BluetoothSIG.onmicrosoft.com header.i=@BluetoothSIG.onmicrosoft.com header.b="dLziFg0L"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="HLZhAQoQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388544AbgE0NlQ (ORCPT
+        id S1726542AbgE0OK0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 May 2020 09:41:16 -0400
-Received: from mail-bn7nam10on2069.outbound.protection.outlook.com ([40.107.92.69]:24128
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387627AbgE0NlP (ORCPT <rfc822;Linux-bluetooth@vger.kernel.org>);
-        Wed, 27 May 2020 09:41:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fj83YsC7z6M4vTPHSrUTn2oW4AqzbNJQYPmH+ZTXoFfIRbVTkbrXC9enpLWrmgdtg+W7jWNHKsHrQbThOPR9zb05B187xv4e4kOGDybRaV7Rb9gClDOfEAZKJWSSXNmQXsVJ17+MZZ1u7m72RrqqRJqXiYv/jpUMmBB2QrCutj72goersfxHMoqeGbh9b/wuCdYWCNW6PejBUGU4W6htTG5orPKqyA7Z4KnahcHOiY89vxX5PF9gW9K76EV+STcOsZQoBPs8NNWHhgcRQTVb7CqQXzqA22L62Q2LzxiK5uRQz0FJcCgeXMpcYybpxW8GhY4yUCIMXZULlbjCBIENig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v2k+wl050eO5VT28d9GbB115OXXcg/Rp4zPIIHpMtso=;
- b=Ax0ohtL1j59JisIWsKcmmhYao9nR/RyabnYCWKOpdqoxkhDAL+htX0kHEU1s8C3IyDseW1GVhfZSF/qZdEnCgBfng8lB7XhvadpwWZME9IR8Ss0KlcLi6bVFGs9OvSuDOS2cQy6Qwg3anrIumMrsK0tCMr2ZM9nIFrk5uXiHC27+MAMwDvrIcOGIc9Cpu0qS0WT/32wPNl67kjpgnB9VnoulsL4idX0RldSUw/CurPEHN0uB/beAieIYasNXbrftwq1BFWvX/+eWcU56rgv5BiJzHSGlnRYty6BH9SsT3m+R6Vwv2m3iyh/6tSS24ngvgQvjeIsnv4W6eVAMXpeV+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bluetooth.com; dmarc=pass action=none
- header.from=bluetooth.com; dkim=pass header.d=bluetooth.com; arc=none
+        Wed, 27 May 2020 10:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbgE0OKZ (ORCPT
+        <rfc822;Linux-bluetooth@vger.kernel.org>);
+        Wed, 27 May 2020 10:10:25 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA012C08C5C1
+        for <Linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 07:10:24 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id l27so6172071ejc.1
+        for <Linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 07:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=BluetoothSIG.onmicrosoft.com; s=selector2-BluetoothSIG-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v2k+wl050eO5VT28d9GbB115OXXcg/Rp4zPIIHpMtso=;
- b=dLziFg0LiekaTlsR+x3ym7aZPBkvFa5mpp0rdxZ4G/FCKSzE4SCM1tSg/N551bnB7peymfD2Oa14PonU2P6E81Q/e0vH3ZnB4b/Mt6rbQaJAy9fMOadEBdN7MjJoNFmBOv2rJV8YeN64FHXsrA1TmBCCDTrHHm6KOvzpeFXyFXw=
-Received: from DM5PR17MB1963.namprd17.prod.outlook.com (2603:10b6:3:84::9) by
- DM5PR17MB0921.namprd17.prod.outlook.com (2603:10b6:3:26::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.24; Wed, 27 May 2020 13:41:12 +0000
-Received: from DM5PR17MB1963.namprd17.prod.outlook.com
- ([fe80::89d4:7215:b5e0:9190]) by DM5PR17MB1963.namprd17.prod.outlook.com
- ([fe80::89d4:7215:b5e0:9190%3]) with mapi id 15.20.3021.030; Wed, 27 May 2020
- 13:41:12 +0000
-From:   Martin Woolley <mwoolley@bluetooth.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "Linux-bluetooth@vger.kernel.org" <Linux-bluetooth@vger.kernel.org>
-Subject: RE: Comments on the ConnectDevice API function
-Thread-Topic: Comments on the ConnectDevice API function
-Thread-Index: AdYwEgyeeFpEUtO5S3yfGGFiF3wWKwATy/wAAPJSTdA=
-Date:   Wed, 27 May 2020 13:41:12 +0000
-Message-ID: <DM5PR17MB1963CCA502759CB08EB9FFE1C5B10@DM5PR17MB1963.namprd17.prod.outlook.com>
-References: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com>
- <CABBYNZKonvHxnabQsu84rVQEPpou45UgqVUECZ2HoTdd7pWT+A@mail.gmail.com>
-In-Reply-To: <CABBYNZKonvHxnabQsu84rVQEPpou45UgqVUECZ2HoTdd7pWT+A@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=bluetooth.com;
-x-originating-ip: [82.35.96.178]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 47a8f9d1-21ce-4dc4-ddca-08d802439ed2
-x-ms-traffictypediagnostic: DM5PR17MB0921:
-x-microsoft-antispam-prvs: <DM5PR17MB09218D7168587A10FD5EFA36C5B10@DM5PR17MB0921.namprd17.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 04163EF38A
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dt5O1Kb5Jajb4LN83qAKHCu35qzRUPNmdcaU7fgTB7wKvIegvdoENgQaJW4OXFTsGO9zEK7qwrrXPz0rE+lTKq/Tz5STc7BqbA2MFx/o5sLrSKaKmH/ti0RKMbz01yd5BJcnQjmv+JPA1ML0mpTZtGQImx2H/5Hnmc76QZ251AxxmFsnrHgepmEag6cNdGpHlwDGvqqkVKRODOTyP3MMbswA9HSmhZc+4+Q0IYLnxSRukFVwzkzLDUjuXJdUEYYsvOCE3dGQ/22Vgx79AXoTrnmd3t8JQ2KES7OWSkZhgFuX3GN5dV0NI90M1WDkOQRqNjkks3zYFy/OyKo1QGCoqeQefajzcE+G16u33CG4RY27SjcUw4QlsuSRmxGt7TFCUEYSlUhLuy4NnuTuzbIfTw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR17MB1963.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(136003)(39840400004)(346002)(376002)(66946007)(64756008)(66476007)(71200400001)(76116006)(6916009)(8936002)(9686003)(55236004)(5660300002)(4326008)(33656002)(66446008)(53546011)(26005)(83380400001)(186003)(6506007)(86362001)(52536014)(66556008)(2906002)(7696005)(45080400002)(8676002)(966005)(508600001)(316002)(55016002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: sOvSOVAEgubA2nSloWsBLqmeTKsXAUlFDygfnP8s8h6/zn03LYY9bIGjK95s8UXs8jYMz+mFhWE6dd3z2Tl/ns+dz4+KGZliHKroDGj/mTiVr0TBbUW3GSPNjKigBp1T1yyf4q+8pKmjUUndH07KfnvLxbKn5rkMta1gBTz8rKserEvUWw4ZGpSDPhHj0to1zbbBjlhwy7Qf2oxbWXGLekXc4k4zTY5rHqnF7y/UHfnOO99Rje+JmBm6xh9+5bS+UhVQfenp63cPdwaojfAIMwBfUptcFeixeiP0/Lga+kpXRnx0ChAoNm7KDgt9n7SJENsyYxzhj5QyFMlU4ma3x3MlhZlAwnVacY9FOcv1e6BxkImTipFHKFg6+92UUBp7qMDGqITiYnaO+NM/Vk+82VUewbQXqBkKhE7345kF+cgu6RQb3cGVwMr5RD4Vh7D0JtWiEwNGLbayX/6kq0yvj2+8RD4TZFJSLFwVmdVTyq8=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:organization:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=r3ChsXwgtsdDHA1e6pctmj99FS/CCPNNaSdj5UWBamA=;
+        b=HLZhAQoQEL5cGLM16CKyDGUiOSEF4CniuvXjMi1sdtXtdJ7qdUJqj3kTwhKF3W9fho
+         1nkxUNVshJ85K+vkV0dugnuyur29CKPkxEXfl4puUTg0gGXHC9rLe7yfP3b98HLnISFc
+         +FEe4SRTAWuS+lkK99gu84uT57pijMml/ND+UrXANA+uCOGPtwBUVgQJf8JLS87ONE2H
+         VP5SqpHNpAVKALYKFH01A9lNPW9xiT6pqgSjNbWa+GwZNYfVlVkWD4SGT0m+IqrPqgYN
+         EGG2QuwBQHFiP/ePY9FU69+ygJPFxTxFHOW1LE6JXYGE1cImddYZc378CK2GiBCND9Sb
+         aQuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=r3ChsXwgtsdDHA1e6pctmj99FS/CCPNNaSdj5UWBamA=;
+        b=EQ8aQmGKBQsU/USGPeqPf+0d6pqaTgOUusWak+8/tvQkyVz/f+AjjNMi/1My//ejSD
+         XmheTwOOsfeZB8KlJYletzGqjmw8uRziY30dfP4VOhw5HjKaFfBPKCUQVElnmTH5GuYr
+         c1yT2QQjkUv6K4+RExspL3+c1pufj1QSMETirm494WJ10J5o8B7fwAcoVOdB8Q2iwVGc
+         yfe/yfwqPQMAlzws1Q4FXSXFVBEl8hnrRk3XPX0aE+36oLS/U4GItF0W3guN3vmRa4tZ
+         nDPJ5YYffQs21xj0Vmrfdl9sPJ4wyJya25EASNqwJnkeQY9sSdPhO0jt4b6kEc3aZ9OX
+         bJXA==
+X-Gm-Message-State: AOAM531v7cg9M6IAeyXFeUcpwGqAC+5f5P5Ynl6EkxAS1r5nuo/VHX0e
+        riUgQYR+zCXyqXy0+a0bdCoH1vn5AKQ=
+X-Google-Smtp-Source: ABdhPJwMXi9Nl1W2TKeLEmKK6VS1MGAup/Bs2KlxP4HKRqZ1QwlkrrdBNCs8+pQOhdz/DDEde3U08Q==
+X-Received: by 2002:a17:907:9f0:: with SMTP id ce16mr6126270ejc.476.1590588622554;
+        Wed, 27 May 2020 07:10:22 -0700 (PDT)
+Received: from ix.localnet (45-11-60-42.ip4.greenlan.pl. [45.11.60.42])
+        by smtp.gmail.com with ESMTPSA id y16sm2910700ejq.82.2020.05.27.07.10.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2020 07:10:21 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Martin Woolley <mwoolley@bluetooth.com>
+Cc:     "Linux-bluetooth@vger.kernel.org" <Linux-bluetooth@vger.kernel.org>
+Subject: Re: Comments on the ConnectDevice API function
+Date:   Wed, 27 May 2020 16:10:19 +0200
+Message-ID: <11527909.O9o76ZdvQC@ix>
+Organization: CODECOUP
+In-Reply-To: <DM5PR17MB1963CCA502759CB08EB9FFE1C5B10@DM5PR17MB1963.namprd17.prod.outlook.com>
+References: <MWHPR17MB19671EAD4D74EA7BC5915CA7C5B40@MWHPR17MB1967.namprd17.prod.outlook.com> <CABBYNZKonvHxnabQsu84rVQEPpou45UgqVUECZ2HoTdd7pWT+A@mail.gmail.com> <DM5PR17MB1963CCA502759CB08EB9FFE1C5B10@DM5PR17MB1963.namprd17.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Bluetooth.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47a8f9d1-21ce-4dc4-ddca-08d802439ed2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2020 13:41:12.1370
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e4e0fec5-fc6c-4dd6-ae37-4bdb30e156b9
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8FRRjDP2xGat4vTjqQtXweOZEn8n4LXSeTOg/Pd8/3ynjAW8Zl2E6/MfI8ttlqYONJXwWePKCm4qmbDHAMfuOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR17MB0921
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTHVpeg0KDQp0aGFua3MgZm9yIHlvdXIgcmVzcG9uc2UuIE11Y2ggYXBwcmVjaWF0ZWQuIEkg
-bXVzdCBjb25mZXNzIHRoaXMgaXMgdGhlIGZpcnN0IHRpbWUgSSd2ZSB1c2VkIHRoZSBCbHVlWiBB
-UElzIGRpcmVjdGx5ICh2aWEgRC1CdXMpLiANCg0KSSdtIGFsbCBmb3IgaGlkaW5nIGltcGxlbWVu
-dGF0aW9uIGRldGFpbHMgd2hlcmUgcG9zc2libGUgaW4gQVBJcyBhbmQgbWFraW5nIHRoZSBBUEkg
-aXRzZWxmIHRha2UgY2FyZSBvZiBjb25kaXRpb25hbCBhc3BlY3RzIGlmIHBvc3NpYmxlLCBidXQg
-dGhlc2Ugd2VyZSBqdXN0IG15ICQwLjAyLCBubyBtb3JlIHRoYW4gdGhhdC4gSSB3YXNuJ3QgYXdh
-cmUgb2YgdGhlIGJhY2tncm91bmQgb3IgdGhlIHBoaWxvc29waHksIHNvIHRoYW5rcyBmb3IgdGhh
-dCBpbnNpZ2h0IGFzIHdlbGwuDQoNCkhhdmluZyB0aGUgQVBJIHRha2UgY2FyZSBvZiB0aGUgQWxy
-ZWFkeUV4aXN0cyBlcnJvciBieSBwcm92aWRpbmcgYSBjb25uZWN0aW9uIHRvIHRoZSBhbHJlYWR5
-IGRpc2NvdmVyZWQgZGV2aWNlLCB0cmFuc3BhcmVudGx5IGRvZXMgc2VlbSBhIG5pY2UgdG91Y2gg
-Zm9yIHRoZSBhcHBsaWNhdGlvbiBkZXZlbG9wZXIgYnV0IGNlcnRhaW5seSBub3QgZXNzZW50aWFs
-Lg0KDQpBbGwgdGhlIGJlc3QNCg0KTWFydGluDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-DQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gDQpT
-ZW50OiAyMiBNYXkgMjAyMCAxODo0OQ0KVG86IE1hcnRpbiBXb29sbGV5IDxtd29vbGxleUBibHVl
-dG9vdGguY29tPg0KQ2M6IExpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6
-IFJlOiBDb21tZW50cyBvbiB0aGUgQ29ubmVjdERldmljZSBBUEkgZnVuY3Rpb24NCg0KSGkgTWFy
-dGluLA0KDQpPbiBGcmksIE1heSAyMiwgMjAyMCBhdCAxOjI1IEFNIE1hcnRpbiBXb29sbGV5IDxt
-d29vbGxleUBibHVldG9vdGguY29tPiB3cm90ZToNCj4NCj4gSGVsbG8NCj4NCj4gSSd2ZSByZWNl
-bnRseSBiZWVuIHdvcmtpbmcgd2l0aCBCbHVlWiB2aWEgRC1CdXMgYW5kIGhhdmUgYSBzaXR1YXRp
-b24gd2hpY2ggcmVxdWlyZXMgbWUgdG8gYmUgYWJsZSB0byBjb25uZWN0IHRvIGEgZGV2aWNlIHdo
-b3NlIEJsdWV0b290aCBkZXZpY2UgYWRkcmVzcyBpcyBrbm93biwgYnV0IHdpdGhvdXQgZmlyc3Qg
-c2Nhbm5pbmcuIFRoaXMgaXMgYSBsaW5rIGxheWVyIHN0YXRlIHRyYW5zaXRpb24gd2l0aCB0aGUg
-c3BlY2lmaWNhdGlvbiBhbGxvd3MuDQo+DQo+IEJsdWVaIGN1cnJlbnRseSBzdXBwb3J0cyB0aGlz
-IHZpYSBhbiBBUEkgYWRhcHRlciBmdW5jdGlvbiBjYWxsZWQgQ29ubmVjdERldmljZSwgd2hvc2Ug
-c3RhdHVzIGlzIGN1cnJlbnRseSAiZXhwZXJpbWVudGFsIi4gRnJvbSBteSBleHBlcmllbmNlIG9m
-IHVzaW5nIHRoaXMgZnVuY3Rpb24sIGl0IHNlZW1zIHRvIGJlaGF2ZSBsaWtlIHRoaXM6DQo+DQo+
-IElmIHRoZSBCbHVlWiBpbnN0YW5jZSBoYXMgbm90IHNjYW5uZWQgeWV0LCBzbyB0aGF0IHRoZSB0
-YXJnZXQgZGV2aWNlIGlzIG5vdCBrbm93biB0byBpdCwgdGhlIENvbm5lY3REZXZpY2UgY2FsbCBy
-ZXN1bHRzIGluIHNjYW5uaW5nIHRha2luZyBwbGFjZSBhbmQgdGhlbiBpZiB0aGUgdGFyZ2V0IGRl
-dmljZSBpcyBmb3VuZCwgaXQgaXMgY29ubmVjdGVkIHRvLiBTdWNjZXNzIQ0KPg0KPiBCdXQgaWYg
-c2Nhbm5pbmcgaGFzIHByZXZpb3VzbHkgYmVlbiBwZXJmb3JtZWQsIHJlZ2FyZGxlc3Mgb2YgdGhl
-IHN0YXRlIG9mIHRoZSBhY3R1YWwgZGV2aWNlIChlLmcuIGFkdmVydGlzaW5nIGFuZCByZWFkeSB0
-byBhY2NlcHQgY29ubmVjdGlvbnMpLCBhbiBleGNlcHRpb24gaXMgdGhyb3duIHdpdGggYSBtZXNz
-YWdlIHdob3NlIHRleHQgdmFsdWUgaXMgIkFscmVhZHkgRXhpc3RzIi4NCj4NCj4gSSB3YXMgd29u
-ZGVyaW5nIGlmIEkgY291bGQgaW5mbHVlbmNlIHRoZSBkZXNpZ24gb2YgdGhlIEFQSSBiZWZvcmUg
-dGhlIENvbm5lY3REZXZpY2UgZXhwZXJpbWVudGFsIHN0YXR1cyBpcyByZW1vdmVkPw0KPg0KPiBJ
-IHdvdWxkIGxpa2UgdG8gc3VnZ2VzdCB0aGF0IHRoZXJlIHNob3VsZCBiZSBubyBuZWVkIGZvciBh
-IHNwZWNpYWwgQVBJIHRvIGNvbm5lY3QgZGlyZWN0bHkgdG8gYSBkZXZpY2Ugd2l0aG91dCBmaXJz
-dCBzY2FubmluZy4gV2h5IGJ1cmRlbiB0aGUgYXBwbGljYXRpb24gZGV2ZWxvcGVyIG5lZWRpbmcg
-dG8gY2FsbCBpdCBqdXN0IGluIGNhc2UgdGhpcyBjb25kaXRpb24gYXBwbGllcywgY2F0Y2hpbmcg
-dGhlIEJsdWVaIGV4Y2VwdGlvbiAoIkFscmVhZHkgRXhpc3RzIikgYW5kIHJlc3BvbmRpbmcgYnkg
-dGhlbiBjYWxsaW5nIHRoZSBub3JtYWwgQ29ubmVjdCBBUEk/DQoNCkkgZ3Vlc3MgdGhlIGludGVu
-dGlvbiB3YXMgdG8gaGF2ZSB0aGUgYXBwbGljYXRpb24gdXNlIHRoZSBpbnRlbmRlZCBBUEkgZm9y
-IGRldmljZXMgYWxyZWFkeSBwcmVzZW50IF9iZWZvcmVfIGNhbGxpbmcgQ29ubmVjdERldmljZSwg
-c28gYmVmb3JlIGVudGVyaW5nIHRoZSBhZGRyZXNzIG1hbnVhbGx5IHRoZSBhcHBsaWNhdGlvbiB3
-b3VsZCBlbnVtZXJhdGUgdGhlIGV4aXN0aW5nIGRldmljZXMgYW5kIGZpZ3VyZSBvdXQgaWYgdGhh
-dCB3YXMgYWxyZWFkeSBwcmVzZW50Lg0KDQo+IEFuIGFsdGVybmF0aXZlIHdvdWxkIGJlIHRvIGFj
-Y29tbW9kYXRlIHRoaXMgc3BlY2lhbCBjYXNlIChub3Qgc2Nhbm5lZCBiZWZvcmUpIGluIHRoZSBp
-bXBsZW1lbnRhdGlvbiBvZiB0aGUgc3RhbmRhcmQgZGV2aWNlIENvbm5lY3QoYmRhZGRyKSBmdW5j
-dGlvbiBvciBpZiB0aGF0IG1ha2VzIG5vIHNlbnNlIGJlY2F1c2UgRGV2aWNlIG9iamVjdHMgbXVz
-dCBjb3JyZXNwb25kIHRvIHByZXZpb3VzbHkgZGlzY292ZXJlZCwgcGh5c2ljYWwgZGV2aWNlcywg
-dGhlbiBhdCBsZWFzdCB0aGUgYWRhcHRlciBDb25uZWN0RGV2aWNlIGZ1bmN0aW9uIGNvdWxkIHRh
-a2UgY2FyZSBvZiB0aGUgdHdvIHBvc3NpYmxlIHBhdGhzIGFuZCBzaW1wbGlmeSBtYXR0ZXJzIGZv
-ciB0aGUgYXBwbGljYXRpb24gZGV2ZWxvcGVyLg0KDQpJIGd1ZXNzIHlvdSBwcm9iYWJseSBrbm93
-IHRoaXMgYnV0IGp1c3QgaW4gY2FzZSBzb21lb25lIGxvb2sgYXQgdGhlIGFyY2hpdmVzIGl0IGlz
-IGJldHRlciB0aGF0IHdlIG1ha2Ugc29tZSB0aGluZ3MgY2xlYXJlciwgd2hpbGUgdGhlIGNvcmUg
-c3BlYyBhbGxvd3MgY29ubmVjdGluZyB3aXRob3V0IHNjYW5uaW5nIEQtQnVzIGFyZSBpbnRlbmQg
-dG8gYmUgYSBoaWdoZXIgbGV2ZWwgQVBJIHRodXMgd2h5IENvbm5lY3REZXZpY2Ugd2FzIG5vdCBy
-ZWFsbHkgbmVjZXNzYXJ5IGZvciBhIGxvbmcgdGltZSBhbmQgd2UganVzdCBpbnRyb2R1Y2VkIGl0
-IGZvciBxdWFsaWZpY2F0aW9uIHB1cnBvc2Ugb3Igd2hlbiB0aGVyZSBhcmUgbXVsdGlwbGUgYWRh
-cHRlciB3aGVyZSBvbmUgYWN0cyBhcyBzY2FubmVyLiBBbHNvIGV2ZXIgc2luY2UgdGhlIGludHJv
-ZHVjdGlvbiBvZiBwcml2YWN5IChyYW5kb20gYWRkcmVzc2VzKSBBUElzIHRoYXQgdGFrZXMgYWRk
-cmVzc2VzIGJlY29tZXMgcmF0aGVyIGNvbXBsaWNhdGVkIHRvIGJlIHVzZWQgZGlyZWN0bHksIGFu
-ZCB0aGVyZSBleGlzdHMgd2F5cyB0byBzY2FuIGZvciBhIHNwZWNpZmljIGFkZHJlc3Mgd2l0aCBw
-YXR0ZXJuIGZpbHRlcmluZzoNCmh0dHBzOi8vbmFtMTIuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0
-bG9vay5jb20vP3VybD1odHRwcyUzQSUyRiUyRmdpdC5rZXJuZWwub3JnJTJGcHViJTJGc2NtJTJG
-Ymx1ZXRvb3RoJTJGYmx1ZXouZ2l0JTJGdHJlZSUyRmRvYyUyRmFkYXB0ZXItYXBpLnR4dCUyM24x
-MjImYW1wO2RhdGE9MDIlN0MwMSU3QyU3Q2ZhZmNiMGY5NDAwNTQ4Njc2MTI1MDhkN2ZlNzg2NmZi
-JTdDZTRlMGZlYzVmYzZjNGRkNmFlMzc0YmRiMzBlMTU2YjklN0MwJTdDMCU3QzYzNzI1NzY2NTQw
-MDc4NzEyNSZhbXA7c2RhdGE9SXklMkZ3V2t4cyUyRnlXM2dMMjM5RkxXZG9EUkdhMGFwYjYzV3hN
-aFl3Um9uZU0lM0QmYW1wO3Jlc2VydmVkPTANCg0KVGhhdCBzYWlkIEkgZG9uJ3Qgb3Bwb3NlIHRv
-IHJlbW92ZSBBbHJlYWR5IEV4aXN0cyBlcnJvciwgYnV0IHdlIHNob3VsZCBiZSB2ZXJ5IGNsZWFy
-IHRoYXQgdGhlIHVzZSBvZiBzdWNoIEFQSSBzaG91bGQgb25seSBiZSByZWNvbW1lbmRlZCB3aXRo
-IHVzZXJzIGlucHV0IGFuZCBkb2VzIG5vdCBzdWJzdGl0dXRlIHRoZSBsaWtlcyBvZiBEZXZpY2Uu
-Q29ubmVjdC4NCg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+Hi Martin,
+
+On Wednesday, 27 May 2020 15:41:12 CEST Martin Woolley wrote:
+> Hi Luiz
+> 
+> thanks for your response. Much appreciated. I must confess this is the first
+> time I've used the BlueZ APIs directly (via D-Bus). 
+ 
+> I'm all for hiding implementation details where possible in APIs and making
+> the API itself take care of conditional aspects if possible, but these were
+> just my $0.02, no more than that. I wasn't aware of the background or the
+> philosophy, so thanks for that insight as well.
+ 
+> Having the API take care of the AlreadyExists error by providing a
+> connection to the already discovered device, transparently does seem a nice
+> touch for the application developer but certainly not essential.
+
+This API was added only for qualification purposes (there are some GAP tests 
+specified in a way that upper tester is not doing discovery) and it shouldn't 
+be used for 'normal' usage.
+
+
+ 
+> All the best
+> 
+> Martin
+> 
+> -----Original Message-----
+> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com> 
+> Sent: 22 May 2020 18:49
+> To: Martin Woolley <mwoolley@bluetooth.com>
+> Cc: Linux-bluetooth@vger.kernel.org
+> Subject: Re: Comments on the ConnectDevice API function
+> 
+> Hi Martin,
+> 
+> On Fri, May 22, 2020 at 1:25 AM Martin Woolley <mwoolley@bluetooth.com>
+> wrote:
+> >
+> >
+> > Hello
+> >
+> >
+> >
+> > I've recently been working with BlueZ via D-Bus and have a situation which
+> > requires me to be able to connect to a device whose Bluetooth device
+> > address is known, but without first scanning. This is a link layer state
+> > transition with the specification allows.
+>
+> >
+> >
+> > BlueZ currently supports this via an API adapter function called
+> > ConnectDevice, whose status is currently "experimental". From my
+> > experience of using this function, it seems to behave like this:
+>
+> >
+> >
+> > If the BlueZ instance has not scanned yet, so that the target device is
+> > not known to it, the ConnectDevice call results in scanning taking place
+> > and then if the target device is found, it is connected to. Success!
+>
+> >
+> >
+> > But if scanning has previously been performed, regardless of the state of
+> > the actual device (e.g. advertising and ready to accept connections), an
+> > exception is thrown with a message whose text value is "Already Exists".
+>
+> >
+> >
+> > I was wondering if I could influence the design of the API before the
+> > ConnectDevice experimental status is removed?
+>
+> >
+> >
+> > I would like to suggest that there should be no need for a special API to
+> > connect directly to a device without first scanning. Why burden the
+> > application developer needing to call it just in case this condition
+> > applies, catching the BlueZ exception ("Already Exists") and responding
+> > by then calling the normal Connect API?
+> 
+> I guess the intention was to have the application use the intended API for
+> devices already present _before_ calling ConnectDevice, so before entering
+> the address manually the application would enumerate the existing devices
+> and figure out if that was already present.
+ 
+> 
+> > An alternative would be to accommodate this special case (not scanned
+> > before) in the implementation of the standard device Connect(bdaddr)
+> > function or if that makes no sense because Device objects must correspond
+> > to previously discovered, physical devices, then at least the adapter
+> > ConnectDevice function could take care of the two possible paths and
+> > simplify matters for the application developer.
+> 
+> I guess you probably know this but just in case someone look at the archives
+> it is better that we make some things clearer, while the core spec allows
+> connecting without scanning D-Bus are intend to be a higher level API thus
+> why ConnectDevice was not really necessary for a long time and we just
+> introduced it for qualification purpose or when there are multiple adapter
+> where one acts as scanner. Also ever since the introduction of privacy
+> (random addresses) APIs that takes addresses becomes rather complicated to
+> be used directly, and there exists ways to scan for a specific address with
+> pattern filtering:
+> https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kerne
+> l.org%2Fpub%2Fscm%2Fbluetooth%2Fbluez.git%2Ftree%2Fdoc%2Fadapter-api.txt%23n
+> 122&amp;data=02%7C01%7C%7Cfafcb0f940054867612508d7fe7866fb%7Ce4e0fec5fc6c4dd
+> 6ae374bdb30e156b9%7C0%7C0%7C637257665400787125&amp;sdata=Iy%2FwWkxs%2FyW3gL2
+> 39FLWdoDRGa0apb63WxMhYwRoneM%3D&amp;reserved=0 
+> That said I don't oppose to remove Already Exists error, but we should be
+> very clear that the use of such API should only be recommended with users
+> input and does not substitute the likes of Device.Connect.
+ 
+> --
+> Luiz Augusto von Dentz
+
+
+-- 
+pozdrawiam
+Szymon Janc
+
+
