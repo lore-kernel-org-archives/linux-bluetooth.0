@@ -2,109 +2,162 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9A0C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84354C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:55:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E95E207BC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BDDA2078C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:55:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyb/W9Ns"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="eZumT5u8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391517AbgE1XKz (ORCPT
+        id S2437736AbgE1XzL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 19:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38866 "EHLO
+        Thu, 28 May 2020 19:55:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389436AbgE1XKx (ORCPT
+        with ESMTP id S2437671AbgE1XzH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 19:10:53 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D03C08C5C6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:10:53 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id z6so204793ljm.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:10:53 -0700 (PDT)
+        Thu, 28 May 2020 19:55:07 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8918C08C5CA
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:55:07 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id t11so406058pgg.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:55:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=1hI74fsImfPuzOYhKCiqTGXVkbsrfNvc/o9rskSKsiU=;
-        b=cyb/W9NsfnyYf1ctJsYnps51ZWA7joFM9zLsxbxFfS2gpDhE4a6t5rdNzbGzK0Opzg
-         6/fUu2g4l5jW54Tex606hhn6G0SY/ZcO7vW8DBg9cM5U7/g5CZPnSyHX0sKQpBTIitEN
-         dKUA/JMrn2QVrnScv6Nng9xPj61Gf6yxfzUE5uZlkXmYtB/QtgR0KV4va2V6xVJSeYKd
-         Sc+bxxZl6+Q8FDWZDVYnXm9SqQL6SkOvFRDVSY7w0jS3meMuQM4fFrX8a9lWGQHR8kFT
-         MnZ8VuJftd+MM7oQu6ObG67iP7FyDVxMcWtIGwEzkAUiSMrykLlhcj7WCDoWrMAGugHj
-         xi5g==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e7SGnHQEJZH8F0krQCl34Ydvm5S42dlpxkmjv3VJYu0=;
+        b=eZumT5u8Wa2rtx0tfJi7hNCNpvi5FowWlYQPg0HGhtWAz2exsdLuiOm9vm80khaBOZ
+         sEerEOEVmI0X1JZBo5ez4n+g2U3SHxddLQSXjkFGGWId8po8DcqSbdABFlsPp2KqMeTt
+         fy7p33+jZTYUOaIG0lXROVj5SfR/tCZnOlUGQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=1hI74fsImfPuzOYhKCiqTGXVkbsrfNvc/o9rskSKsiU=;
-        b=axc6WnDcxlUlEQWX4kI1e+bGi9xXDIgDJUoQ6247lUKVNnC2ruY2t3gwIne8S87+Wr
-         TrIqavatlASbfq1skNA7F7rzt2LEn4m+0xWyxh9vRFc6djeouIy0IzDKx3AcZwtiP2sJ
-         zy9iHjiTIKLlOFfvjdsL/vJF33s7LlaG0+yAfUV6Bb0iDe3YDVpAXiEI/zUa+Prlc+th
-         IEzGHx5laTY4OWp05VR0s0g/lroV20WHHAPMai3Dw3Vvgv0ClmdRkMODHiyj9hmYXDmu
-         Kjdrc+C2dYX0wjQInxQTYQcZWRTGIb1rjuwODI0mRg0rUiX21QpZgF/RvWN/M8csG82H
-         VnYw==
-X-Gm-Message-State: AOAM531RiwVYZfen1m3lXD51DQW5uvIZf2MxirhFlovD/FBZ9sCSX7hX
-        o4nGdDNWs0OLYZRUIWKp0OfRkqCYM3Y=
-X-Google-Smtp-Source: ABdhPJyuGggvGzi8eoYPOHdQNo5IsqHlIbwtrSj1XB81NTo01dmFQZ7rPfW+6322atclffh9w2BIpw==
-X-Received: by 2002:a2e:7808:: with SMTP id t8mr2785070ljc.353.1590707450590;
-        Thu, 28 May 2020 16:10:50 -0700 (PDT)
-Received: from [192.168.1.2] (broadband-188-255-20-215.ip.moscow.rt.ru. [188.255.20.215])
-        by smtp.gmail.com with ESMTPSA id s28sm1890161lfs.3.2020.05.28.16.10.49
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2020 16:10:49 -0700 (PDT)
-Subject: Re: [PATCH v3 2/2] avrcp: Don't attempt to load settings if on volume
- changed is supported
-To:     linux-bluetooth@vger.kernel.org
-References: <20200528215300.225894-1-luiz.dentz@gmail.com>
- <20200528215300.225894-2-luiz.dentz@gmail.com>
-From:   Andrey Semashev <andrey.semashev@gmail.com>
-Message-ID: <37d5cdb5-4d05-ce02-ce5a-f53bff81bd31@gmail.com>
-Date:   Fri, 29 May 2020 02:10:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        bh=e7SGnHQEJZH8F0krQCl34Ydvm5S42dlpxkmjv3VJYu0=;
+        b=uQdjsYB8s7e1YIeRFOuAqth8y15W+lObeK3hIqOOxjflhNCYz9MEkniYRyj/Bnoa6/
+         FxSreF7aWtz+KMQD1FQ/g4n2EDZzzc1XlBPm51F3HgzHC0XSqamJ9RSh4h4uvbQAi5/r
+         5REoVj6qlAYSukU0o28FengTt7SDwazuiAevFfaxPbIRdMJgeodXLrr95TG5LZxCYAWC
+         FdDwEqswWlp+PzLaWC0CEZAjEwnOe95d3v4D9ev4surde70l36ilS3uazYNFhdpXv5hg
+         nlrK/nZYlWFwp1N+PbFkgnWhG4NWPirlNcJvXpYEky/XD2ivtmtoiSnN9EpMRKGsLMcX
+         h9/g==
+X-Gm-Message-State: AOAM532Gq1sF0tXJsW0f61xKtqhe6ZEACYgqQAjiwZdQVyHbUUzebVRq
+        YOsUBECTgbXOQjUkheFha6ChVDJyhTg=
+X-Google-Smtp-Source: ABdhPJwwodXakmojQKptX1+Fol9ux6f2AaOWGzBj7pIY7pNb4HrA3CwJVMigps57BlYgCLq/Gmt2LA==
+X-Received: by 2002:a62:7dcb:: with SMTP id y194mr5544651pfc.65.1590710106747;
+        Thu, 28 May 2020 16:55:06 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id f18sm5022591pga.75.2020.05.28.16.55.04
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 May 2020 16:55:05 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v1 1/7] Bluetooth: Add definitions for advertisement monitor features
+Date:   Thu, 28 May 2020 16:54:49 -0700
+Message-Id: <20200528165324.v1.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200528215300.225894-2-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2020-05-29 00:53, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If only volume changed is supported that means the player cannot really
-> indicate track/metadata changes so don't attempt to read them.
-> ---
->   profiles/audio/avrcp.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 75811bf98..8b3debe46 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3814,6 +3814,10 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
->   	if (!session->controller || !session->controller->player)
->   		return FALSE;
->   
-> +	/* Skip if player status/metadata if only volume changes is supported */
-> +	if (events == (1 << AVRCP_EVENT_VOLUME_CHANGED))
-> +		return FALSE;
-> +
->   	if ((session->controller->features & AVRCP_FEATURE_PLAYER_SETTINGS) &&
->   			!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
->   		avrcp_list_player_attributes(session);
-> 
+This adds support for Advertisement Monitor API. Here are the commands
+and events added.
+- Read Advertisement Monitor Feature command
+- Add Advertisement Pattern Monitor command
+- Remove Advertisement Monitor command
+- Advertisement Monitor Added event
+- Advertisement Monitor Removed event
 
-This patchset works, MTW2 is able to connect and play audio. Many thanks!
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+---
+
+ include/net/bluetooth/mgmt.h | 49 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 16e0d87bd8fae..df36c50d15f53 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -702,6 +702,45 @@ struct mgmt_rp_set_exp_feature {
+ 	__le32 flags;
+ } __packed;
+ 
++#define MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS    BIT(0)
++
++#define MGMT_OP_READ_ADV_MONITOR_FEATURES	0x004B
++#define MGMT_READ_ADV_MONITOR_FEATURES_SIZE	0
++struct mgmt_rp_read_adv_monitor_features {
++	__u32 supported_features;
++	__u32 enabled_features;
++	__u16 max_num_handles;
++	__u8 max_num_patterns;
++	__u16 num_handles;
++	__u16 handles[];
++}  __packed;
++
++struct mgmt_adv_pattern {
++	__u8 ad_type;
++	__u8 offset;
++	__u8 length;
++	__u8 value[31];
++} __packed;
++
++#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR	0x004C
++struct mgmt_cp_add_adv_patterns_monitor {
++	__u8 pattern_count;
++	struct mgmt_adv_pattern patterns[];
++} __packed;
++#define MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE	1
++struct mgmt_rp_add_adv_patterns_monitor {
++	__u16 monitor_handle;
++} __packed;
++
++#define MGMT_OP_REMOVE_ADV_MONITOR		0x004D
++struct mgmt_cp_remove_adv_monitor {
++	__u16 monitor_handle;
++} __packed;
++#define MGMT_REMOVE_ADV_MONITOR_SIZE		2
++struct mgmt_rp_remove_adv_monitor {
++	__u16 monitor_handle;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+@@ -933,3 +972,13 @@ struct mgmt_ev_exp_feature_changed {
+ 	__u8	uuid[16];
+ 	__le32	flags;
+ } __packed;
++
++#define MGMT_EV_ADV_MONITOR_ADDED	0x0028
++struct mgmt_ev_adv_monitor_added {
++	__u16 monitor_handle;
++}  __packed;
++
++#define MGMT_EV_ADV_MONITOR_REMOVED	0x0029
++struct mgmt_ev_adv_monitor_removed {
++	__u16 monitor_handle;
++}  __packed;
+-- 
+2.26.2
+
