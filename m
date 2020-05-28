@@ -2,158 +2,199 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE21C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 01:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E26DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 03:43:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E80E2078C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 01:24:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDB342075A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 03:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="R/9Y2pFD"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c9KdapEU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725960AbgE1BY1 (ORCPT
+        id S1727016AbgE1DnC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 May 2020 21:24:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
+        Wed, 27 May 2020 23:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbgE1BY0 (ORCPT
+        with ESMTP id S1726530AbgE1DnB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 May 2020 21:24:26 -0400
-Received: from mail-vk1-xa44.google.com (mail-vk1-xa44.google.com [IPv6:2607:f8b0:4864:20::a44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB64FC05BD1E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 18:24:26 -0700 (PDT)
-Received: by mail-vk1-xa44.google.com with SMTP id s192so3422736vkh.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 18:24:26 -0700 (PDT)
+        Wed, 27 May 2020 23:43:01 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 388D3C08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 20:43:00 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id v26so15012653vsa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 20:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RAJ8vno6YRTG3jxZLPEtz5iL0Y3/+q1Rvr89mCmtx8A=;
-        b=R/9Y2pFD2l41EaJe+MKqDBsJmGACKu0ZyrqYf5z8hWIPGUyYPd71ssA7FsmG0gK/qh
-         UWiwhpLfgS60gnHA0m5dHJOkcao/n5xRj17bbXg08MKqkVA43tXQlCcZTk6f58B9ZkQ4
-         GvIz78DUXPXZvuiSDBB9qxXYgNqsK1SMBwJIw=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bPaEtIz9pymnQ3zlLT7ky3GdzrpI5LZJGnrujJgXsc0=;
+        b=c9KdapEUJSPKNZeQyNnqiFrr6KubgXJeNvxUNO3s2hHeydiVxTVWyJmV7sGy63xdHL
+         5u8E+yrHjREHQPMLEuL2E3UkkkAQbONyrSQsVq8l/EpwP4xCYD2wzPXrZia+25uAnH0U
+         iBmmbZYYjcBr0vV5SVG54wPyyE8aX9epXx750=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RAJ8vno6YRTG3jxZLPEtz5iL0Y3/+q1Rvr89mCmtx8A=;
-        b=mTBgRY4bGj0zCKoIKvJGVq8Yn9oHawQByJ3fmc68EekZ4bh1nwch0C8MvpFil2QkZS
-         MbMIEuqXLV9sBLkHgwgkuXyNqpWXegnuJU10tj8iWFCrsmRlwHwPSZIP1Ofqu5rlvIEl
-         OYszsIL6/kEnJ43NLPKqmsj5cELmneF2u3aLVugfKmbl1iRzYh1isr9GIGjmph6a5aiG
-         LxGnGhdUHcZzPmX7Mw4cEjpdtOLBOfIzfsF213wlG4QQdyb0OYij+Jhqwh59x8Ez7mTT
-         PtDPcHiFstK5Yk/x+53Kftk+3esZE8w6oJBn8g8RgeE1ZddxLsZXolpbuv+/Aa9FMaR1
-         gFxw==
-X-Gm-Message-State: AOAM531wgVXkUwe25cIz5RFRvYi7+kwrSkR3A9ZntpQANZDSOw/nPZPJ
-        YqrfDnglJgiuQ2kFe9vY2z5qX5rFeP4=
-X-Google-Smtp-Source: ABdhPJwb+jmES4BlSM+aSJRE+YZTCLDt04nYufXPFZIZl2VOtMHHQ/gGKGGX1tWQYyVjD4acGy0hmw==
-X-Received: by 2002:a1f:5f4f:: with SMTP id t76mr493319vkb.77.1590629065566;
-        Wed, 27 May 2020 18:24:25 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id l2sm332863vsh.21.2020.05.27.18.24.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 18:24:24 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [BlueZ PATCH v5] doc:adding definitions for load default params mgmt op
-Date:   Thu, 28 May 2020 01:24:21 +0000
-Message-Id: <20200528012421.136864-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bPaEtIz9pymnQ3zlLT7ky3GdzrpI5LZJGnrujJgXsc0=;
+        b=RAdxeKIlz3HqVwyRIN7Z0sI6kbTOVLR1tJ2Ha/4TrAFpHQbwZtsxEUvk1jwCB8mOgE
+         ycMXTJTPo1EeDWU6S3AfiFOYX9tTkLl25u6Ou0EFcLrt0NL4+2ucYik5EzbmibbRLsmr
+         V3UCrN8dJLWaO5tJJKTfiYhVj7OwnUJW2FCYqoWFLhDc7QPVDT3ESe7m8j2fb8OTH7hs
+         91vwZLjT1RkdCkZf0cKsNK0zoSFoRPiYXeJWe2fy5FOcKE8ipENpVkLSzIDIHQilVZRb
+         RXvW6l0KESZOt1w28N5PrkwXahSyctAViHqVO1JijEILL/r9T1EIfdAERV9A83/3wTZX
+         LVMA==
+X-Gm-Message-State: AOAM5314KFXLgGN6iXZ0LToaUaUELL53dWoUEd53VZ0iHmzwZMBiTp+A
+        5qFQbmqUWEJyU8iP4hck1NsQ6qRfsp2AlnW3N56dIw==
+X-Google-Smtp-Source: ABdhPJyeD7CvriJPtSeRzw8WUSVDYFhVUzo6FlAFfBfHtHPhZb+maNEaAfevvGRTkmo+hfxiYZ5Kvr4W1jIDx7B+XcA=
+X-Received: by 2002:a67:8d48:: with SMTP id p69mr617029vsd.86.1590637379005;
+ Wed, 27 May 2020 20:42:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1590550627-24618-1-git-send-email-zijuhu@codeaurora.org>
+In-Reply-To: <1590550627-24618-1-git-send-email-zijuhu@codeaurora.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed, 27 May 2020 20:42:46 -0700
+Message-ID: <CANFp7mXMiYKY-33xZX2MaHd5RyicbRb2fZHo8mk4-VM_Jf47UQ@mail.gmail.com>
+Subject: Re: [PATCH v2] bluetooth: hci_qca: Fix QCA6390 memdump failure
+To:     Zijun Hu <zijuhu@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        Matthias Kaehlcke <mka@chromium.org>, rjliao@codeaurora.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change adds the definition for the load default parameter command.
-In particular, this command is used to load default parameters for
-various operations in the kernel. This mechanism is also expandable to
-future values that may be necessary.
+Hi Zijun,
 
-This will allow bluetoothd to load parameters from a conf file that may
-be customized for the specific requirements of each platforms.
+On Tue, May 26, 2020 at 8:37 PM Zijun Hu <zijuhu@codeaurora.org> wrote:
+>
+> QCA6390 memdump VSE sometimes come to bluetooth driver
+> with wrong sequence number as illustrated as follows:
+> frame # in DEC: frame data in HEX
+> 1396: ff fd 01 08 74 05 00 37 8f 14
+> 1397: ff fd 01 08 75 05 00 ff bf 38
+> 1414: ff fd 01 08 86 05 00 fb 5e 4b
+> 1399: ff fd 01 08 77 05 00 f3 44 0a
+> 1400: ff fd 01 08 78 05 00 ca f7 41
+> it is mistook for controller missing packets, so results
+> in page fault after overwriting memdump buffer allocated.
+>
+> it is fixed by ignoring QCA6390 sequence number error
+> and checking buffer space before writing.
+>
+> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 45 ++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 38 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index e4a6823..388fe01b 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -114,6 +114,7 @@ struct qca_memdump_data {
+>         char *memdump_buf_tail;
+>         u32 current_seq_no;
+>         u32 received_dump;
+> +       u32 ram_dump_size;
+>  };
+>
+>  struct qca_memdump_event_hdr {
+> @@ -976,6 +977,8 @@ static void qca_controller_memdump(struct work_struct *work)
+>         char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
+>         u16 seq_no;
+>         u32 dump_size;
+> +       u32 rx_size;
+> +       enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>
+>         while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
+>
+> @@ -1029,6 +1032,7 @@ static void qca_controller_memdump(struct work_struct *work)
+>
+>                         skb_pull(skb, sizeof(dump_size));
+>                         memdump_buf = vmalloc(dump_size);
+> +                       qca_memdump->ram_dump_size = dump_size;
+>                         qca_memdump->memdump_buf_head = memdump_buf;
+>                         qca_memdump->memdump_buf_tail = memdump_buf;
+>                 }
+> @@ -1052,25 +1056,52 @@ static void qca_controller_memdump(struct work_struct *work)
+>                  * packets in the buffer.
+>                  */
+>                 while ((seq_no > qca_memdump->current_seq_no + 1) &&
+> +                       (soc_type != QCA_QCA6390) &&
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+This probably shouldn't be SOC specific.
 
- doc/mgmt-api.txt | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+>                         seq_no != QCA_LAST_SEQUENCE_NUM) {
+>                         bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
+>                                    qca_memdump->current_seq_no);
+> +                       rx_size = qca_memdump->received_dump;
+> +                       rx_size += QCA_DUMP_PACKET_SIZE;
+> +                       if (rx_size > qca_memdump->ram_dump_size) {
+> +                               bt_dev_err(hu->hdev,
+> +                                               "QCA memdump received %d, no space for missed packet",
+> +                                               qca_memdump->received_dump);
+> +                               break;
+> +                       }
+>                         memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
+>                         memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
+>                         qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
+>                         qca_memdump->current_seq_no++;
+>                 }
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 6ee01fed8..14e3179b5 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3223,6 +3223,65 @@ Set Experimental Feature Command
- 				Invalid Index
- 
- 
-+Load Default Controller Parameter Command
-+=============================
-+
-+	Command Code:		0x004b
-+	Controller Index:	<controller id>
-+	Command Parameters:	Parameter1 {
-+					Parameter_Type (2 Octet)
-+					Value_Length (1 Octet)
-+					Value (0-255 Octets)
-+				}
-+				Parameter2 { }
-+				...
-+	Return Parameters:
-+
-+	This command is used to feed the kernel a list of default controller
-+	parameters.
-+
-+	Currently defined Parameter_Type values are:
-+
-+		0x0000	BR/EDR Page Scan Type
-+		0x0001	BR/EDR Page Scan Interval
-+		0x0002	BR/EDR Page Scan Window
-+		0x0003	BR/EDR Inquiry Scan Type
-+		0x0004	BR/EDR Inquiry Scan Interval
-+		0x0005	BR/EDR Inquiry Scan Window
-+		0x0006	BR/EDR Link Supervision Timeout
-+		0x0007	BR/EDR Page Timeout
-+		0x0008	BR/EDR Min Sniff Interval
-+		0x0009	BR/EDR Max Sniff Interval
-+		0x000a	LE Advertisement Min Interval
-+		0x000b	LE Advertisement Max Interval
-+		0x000c	LE Multi Advertisement Rotation Interval
-+		0x000d	LE Scanning Interval for auto connect
-+		0x000e	LE Scanning Window for auto connect
-+		0x000f	LE Scanning Interval for wake scenarios
-+		0x0010	LE Scanning Window for wake scenarios
-+		0x0011	LE Scanning Interval for discovery
-+		0x0012	LE Scanning Window for discovery
-+		0x0013	LE Scanning Interval for adv monitoring
-+		0x0014	LE Scanning Window for adv monitoring
-+		0x0015	LE Scanning Interval for connect
-+		0x0016	LE Scanning Window for connect
-+		0x0017	LE Min Connection Interval
-+		0x0018	LE Max Connection Interval
-+		0x0019	LE Connection Latency
-+		0x001a	LE Connection Supervision Timeout
-+
-+	This command can be used when the controller is not powered and
-+	all settings will be programmed once powered.  Note that these only
-+	control the default parameters.  Higher level Apis may influence the
-+	effective value used.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
--- 
-2.27.0.rc0.183.gde8f92d652-goog
+You can replace this loop with a memset(memdump_buf, 0, (seq_no -
+qca_memdump->current_seq_no) * QCA_DUMP_PACKET_SIZE). This simplifies
+the ram_dump_size check as well because it won't zero fill until the
+end anymore (meaning a single bad seq_no doesn't make the rest of the
+dump incorrect).
 
+>
+> -               memcpy(memdump_buf, (unsigned char *) skb->data, skb->len);
+> -               memdump_buf = memdump_buf + skb->len;
+> -               qca_memdump->memdump_buf_tail = memdump_buf;
+> -               qca_memdump->current_seq_no = seq_no + 1;
+> -               qca_memdump->received_dump += skb->len;
+> +               rx_size = qca_memdump->received_dump + skb->len;
+> +               if (rx_size <= qca_memdump->ram_dump_size) {
+> +                       if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
+> +                                       (seq_no != qca_memdump->current_seq_no))
+> +                               bt_dev_err(hu->hdev,
+> +                                               "QCA memdump unexpected packet %d",
+> +                                               seq_no);
+> +                       bt_dev_dbg(hu->hdev,
+> +                                       "QCA memdump packet %d with length %d",
+> +                                       seq_no, skb->len);
+> +                       memcpy(memdump_buf, (unsigned char *)skb->data,
+> +                                       skb->len);
+> +                       memdump_buf = memdump_buf + skb->len;
+> +                       qca_memdump->memdump_buf_tail = memdump_buf;
+> +                       qca_memdump->current_seq_no = seq_no + 1;
+> +                       qca_memdump->received_dump += skb->len;
+> +               } else {
+> +                       bt_dev_err(hu->hdev,
+> +                                       "QCA memdump received %d, no space for packet %d",
+> +                                       qca_memdump->received_dump, seq_no);
+> +               }
+>                 qca->qca_memdump = qca_memdump;
+>                 kfree_skb(skb);
+>                 if (seq_no == QCA_LAST_SEQUENCE_NUM) {
+> -                       bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
+> -                                  qca_memdump->received_dump);
+> +                       bt_dev_info(hu->hdev,
+> +                                       "QCA memdump Done, received %d, total %d",
+> +                                       qca_memdump->received_dump,
+> +                                       qca_memdump->ram_dump_size);
+>                         memdump_buf = qca_memdump->memdump_buf_head;
+>                         dev_coredumpv(&hu->serdev->dev, memdump_buf,
+>                                       qca_memdump->received_dump, GFP_KERNEL);
+> --
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+>
