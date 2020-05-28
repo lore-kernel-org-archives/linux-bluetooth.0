@@ -8,68 +8,68 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91730C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 00:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BEE8C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 00:23:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 605FD207CB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 00:23:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32ADE20888
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 00:23:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCB6lorU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ri34lTeL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725385AbgE1AXd (ORCPT
+        id S1725780AbgE1AXk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 May 2020 20:23:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52234 "EHLO
+        Wed, 27 May 2020 20:23:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbgE1AXd (ORCPT
+        with ESMTP id S1725681AbgE1AXk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 May 2020 20:23:33 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06290C05BD1E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 17:23:32 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id z206so11899694lfc.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 17:23:32 -0700 (PDT)
+        Wed, 27 May 2020 20:23:40 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216EEC05BD1E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 17:23:40 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id z18so31158007lji.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2020 17:23:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:references:from:message-id:date:user-agent:mime-version
          :in-reply-to:content-language:content-transfer-encoding;
         bh=gkDCYxkIaYpF+mMdysuvMKfvwvqYZtICLIzLu2hIjfM=;
-        b=XCB6lorUS+EXcz30TDNMnZKGsCZd6EMOPycWmbCyUcMiqjZiIuMJ707NfDZwnsLHNf
-         pD/iwFUnx3C5TV490JMvbtpmXekKjZCnm7xK9gj3N5dp1J1b4JnBXhDAmQPTiG0LUAfX
-         lWT3UN08Jf4TyOsRrzTrfAcS5o4/a8N/fhJdPX9J+SEMYDo2qvWr+y+KRp89KS/MfstN
-         RuZ0/uuuXFXACHnd8mIQPwW3JvBOukK1C9UvqOArXFzwSzs14VKCZKH9GCzFgJh3aqvg
-         m2bm85RRT1Tmuuno0AnKJw2a+uQezqPMUG7patRXghVYC44Oladqs6I3+gAVk2Uc9T7E
-         lsqQ==
+        b=ri34lTeLkxvXLsnbPFPNULWhPsQyUDbmrqtaFmqKgpLFnYriwkSk/rlUaPeLtcn7Ll
+         epnmG9Vw+dnon8K9D9q5aAABaeNm+6w+YJS1CpwzdS16YBQnuaxt3N1dFTWjQDADeT4O
+         ds1LvDsxoARxCVIB5Wm8GCiWde3LHPBINkFoip98xHLqpchrvJphrcvQDmUp/R3BxWZ+
+         y6dp4Wi2v1ljCajWUt9t5olnB8BE7BTRdUQi/V6kcpOIh8gKu7eBzebGR6HovFyoLr+h
+         Df4YWH1nxaesuBgaIfWAeGOePKkdJYIhXHdtWdLhWQntSx9MeBursrj6EV6S+UzuxO2C
+         iIMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=gkDCYxkIaYpF+mMdysuvMKfvwvqYZtICLIzLu2hIjfM=;
-        b=eyYsbOtz4/NdCv1XUrDS9UQCj2kFKckPIXiymXn9DEcf3GF4+Dkecki03Xc428z7O0
-         n5CgBqXDk3otdGLnKIt0sG+C0f9b3zUZrFY93cVCHafdl3UVkip8er9n9bZ8YGk2dA7B
-         KypUhkOZSLnPYQVZhgYuDcmOv23g1xDnp7JBl7GL8aONTAmlGM/cYys8MQsz6KBS4HaB
-         NB0E4D4m+G0fB/rHqTmXBAzrddx58gANC0hqt85o51SGNQ6pu4c24ecKSA5tTL4fS4TU
-         2/k2mqAHL6/j7rscdU0/NvoDzQBBlcVJsYWXc0Ksg45+sEoIP0h0ftWyUbio4m2y5CWx
-         jmlA==
-X-Gm-Message-State: AOAM530/qmvY6wGzn8d6QXb1Qi/WLCl7xx8SYKxhv36IVyLOz89kBotz
-        UUw1Tp01lybFZXRjIwgGPlEAwECEGTU=
-X-Google-Smtp-Source: ABdhPJwMNvAnBS+AphxalR6tFGP3JeHrdTN7U6R0iH5dFsdEnTcwRct0crkIl0rCepo3Choi+jbrmQ==
-X-Received: by 2002:a19:c751:: with SMTP id x78mr279881lff.82.1590625410790;
-        Wed, 27 May 2020 17:23:30 -0700 (PDT)
+        b=ivmSGHkJqGI+99nrOsk+NuPOaoIInxuRmLcr3fJ+x/F5TSC84u3iw/l5sbauyHZDJN
+         eun/FVnKLP44oIg1xAJfGnvy5Omju2xp1Gl010zshjPVwTTz/hHgGGuTiIlC9POcBg5M
+         Oan8FkSwkKRda62ADlTQ6BsSZHQsGWUJqUUUpopam0A/FjNlshWEp9u3Z9fthshK+KxN
+         OniUszmPJ1zOwwE81lyG/SLCQqO1zttk3kEgPyNBDb0Iyu/9ga7IvlRSywt+lahfF2yF
+         keFHF4+1h5HSyO0s4JxNrc1nKb8aaJQWfHVdfA0Ki9rm9N/ffma5Ao9SOzIGXHe7zaTT
+         TeEg==
+X-Gm-Message-State: AOAM530FBDmH1ZpT3EWtUMtHgTTYhj5G2BQNEOIf/Yz6aVGGgiu4HLge
+        NkylhROlpEXOCDrNFwN3jtOvTOOiNnQ=
+X-Google-Smtp-Source: ABdhPJzizfga/5KVu2WZHgF3eFMawJFpOygmij74nW5y81ZCkv5pSNeGeLAkT2cQTjpZEHnciEo0Xg==
+X-Received: by 2002:a2e:9395:: with SMTP id g21mr127413ljh.417.1590625417954;
+        Wed, 27 May 2020 17:23:37 -0700 (PDT)
 Received: from [192.168.1.2] (broadband-188-255-20-215.ip.moscow.rt.ru. [188.255.20.215])
-        by smtp.gmail.com with ESMTPSA id l15sm1032750ljc.73.2020.05.27.17.23.29
+        by smtp.gmail.com with ESMTPSA id o14sm1155281ljj.135.2020.05.27.17.23.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 17:23:29 -0700 (PDT)
+        Wed, 27 May 2020 17:23:36 -0700 (PDT)
 Subject: Re: [PATCH BlueZ] avrcp: Fix always requesting player settings for
  category 1
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <20200527224343.182610-1-luiz.dentz@gmail.com>
  <CABBYNZ+yYU=FOq8-xTVzv+jLufkOFgs_0UmJZnhW8XkvFCU3TA@mail.gmail.com>
 From:   Andrey Semashev <andrey.semashev@gmail.com>
-Message-ID: <1d23ca79-1940-dca0-6048-8374594ce6c7@gmail.com>
-Date:   Thu, 28 May 2020 03:23:28 +0300
+Message-ID: <7a7b8f77-4367-9b3d-823d-25716d06633a@gmail.com>
+Date:   Thu, 28 May 2020 03:23:36 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.1
 MIME-Version: 1.0
