@@ -2,95 +2,141 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47280C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:15:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40797C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:24:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16D6620707
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:15:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DE55208B8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:24:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="tRVNqRLW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FocExwZg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387805AbgE1KPh (ORCPT
+        id S2387840AbgE1KVp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 06:15:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
+        Thu, 28 May 2020 06:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387784AbgE1KPc (ORCPT
+        with ESMTP id S2387717AbgE1KUc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 06:15:32 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6CEC08C5C6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 03:15:32 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id w15so16198002lfe.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 03:15:31 -0700 (PDT)
+        Thu, 28 May 2020 06:20:32 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9D4C05BD1E;
+        Thu, 28 May 2020 03:20:32 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id nu7so2990778pjb.0;
+        Thu, 28 May 2020 03:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=QOnbSv2MzwkHToPYY7gPh1zaMuAdFzMQW2N/t4XfQPk=;
-        b=tRVNqRLWbSqKnxQXH8CI4wZgHLT8Ud2uo3nCVSYK6c5OUlIFbY8f3217JBSy5/6r2c
-         +tXLW2TiwlEpiT4jRC1WPS714ipLw4pewh7p+Y09ZyfBt/kwJJwney8r8njj7txHZH07
-         /OM/ftgF30BrtgslGUL9DC5GqPaPV8wpdQL9TLVx9War+U0S5zOJxxG/H6XzuDIgC5vr
-         aiaTC5MEh0VVS7mRRqGUd2vAsXqW+jrMJifV4qW8seAntxu094LZFJdhBXxAdgH/hODs
-         XOSOGaU7++UoSkEiJf9C6xD17Ojg5ryKyZZKClI8QhJJaBqieXl6vulc6a67FqhR5M2r
-         1g0w==
+        bh=n8iipgJAi/NQyT9g10+jXpAAhQUJmCgX3ykzxFLrLKM=;
+        b=FocExwZgEGs3gT0g8mnUyvPa6RpF30FXKarH1WH9tVM3Qfk2UMDFsUGGktPrgs6eG8
+         oWa6KQ3j+BOpYt1wNostFfpItGTf7Nia2InQUTO4w8rOcch2k+RjAUsNbvmSK/nxbgDp
+         HOSdd++QHNr67yGxv/1ozdj8+NQjB7FB8qxJMmDpuAv0IP2tidoiPkWbNp4AAileJdUN
+         QdUH88+CtMfwJs0OtDlUNxQ4KSfvGtRsAtsXTTE9PD0sEuaBlzkpIWj9IJNujmvNiVNe
+         Dr9VGxowiAhoIecs4k25fXf/tzGz9WKaUTZ5NiqHo5NEQkJnHkq98nLVkPhtXHFA+mMw
+         +hTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=QOnbSv2MzwkHToPYY7gPh1zaMuAdFzMQW2N/t4XfQPk=;
-        b=QPeU2NjLhNixsfl43nSgEkNY1foXFMz5W36UZYu7etuEPwNbxNzyDmrY0aMGPwh2+/
-         W933ajgY8Ql86e7UbAGfezaOUQujElUSltQXE9AZSfnHhll4hRDqNbQzFPPERJ7RwTlv
-         WzQPxWDEha+y3b+FWnpijZM2b6CEDPBDV+64beNLOxgkiPW2nH9tq2o4pRMJaHyisKoZ
-         /ol/9Idc4ORbmek/TGcVf4vl2zmsoBncZir2ahSLCownr2UQdzn+5BdLK3ZPtdzRx+R6
-         /MwUHJ9taRUzLaKUuzkPO/mQC/8dcrZ6S1cE7QXNej5ezl4lFK59L/PrULFfbuU48DW6
-         f7uQ==
-X-Gm-Message-State: AOAM5313s7d7c6ogiIe9uY0zsjkjZtvaOCc6wCCZkFbC6XVe2N0PhfRN
-        wq1+owUBfJ+ckErmAYAt2HvMA9zIFXA=
-X-Google-Smtp-Source: ABdhPJxorfgIiDQh46E6/t4W9cx4+/XHnSjjgRoY1YgroOR/TOEBtPID1glq+TDTiyqhgwbpJzvCag==
-X-Received: by 2002:ac2:4d25:: with SMTP id h5mr1313245lfk.87.1590660930141;
-        Thu, 28 May 2020 03:15:30 -0700 (PDT)
-Received: from michaln-ThinkPad-L490.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id n26sm1348011ljc.42.2020.05.28.03.15.29
+        bh=n8iipgJAi/NQyT9g10+jXpAAhQUJmCgX3ykzxFLrLKM=;
+        b=YklP6LXx4oECV0SSYmXgiqZbepkwFWyP8xO6sqMNDl87aFiDnqQ93A4+5OBV9Kboxy
+         vguPffM0h5oI1ETxtnEtQDsGzjlGJn4HsWTzHoSNwDl5oMHI8yaS8AiI6FTk2HwX90jI
+         7kRNOpJUw/PzOH9oriqlJK7s93em9wObm5HF0TJlf8r9JdpamWYgvF7ft4SZImV84zGZ
+         jNPrg/KN5EuVEoVeluQFwoptesN6dlcqZgJtGmisyrSh3MwWkmt4hli79seck2Zr5coh
+         eM7Y5qVEN5xWljone/2hUTIEmq2+BZkiTly3ROqEyyGqiFH4veYnNULMDfTAs1IEOyGr
+         gfEw==
+X-Gm-Message-State: AOAM531HDHOMXT5yQOujRrIZ8e5sXn80ap6zg6yoLXjIXOrKpSfDKxH+
+        /wi/JwUhetq2UuRcJRv6zNc=
+X-Google-Smtp-Source: ABdhPJywCGzsdw5guspTvAxKu+Juxq4ii0vQsLONLmhQYEB+Q72DtYuN3e5AP5ezkwffsfJqoQc9hQ==
+X-Received: by 2002:a17:90a:1485:: with SMTP id k5mr2995699pja.108.1590661231748;
+        Thu, 28 May 2020 03:20:31 -0700 (PDT)
+Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
+        by smtp.gmail.com with ESMTPSA id e16sm4193122pgg.8.2020.05.28.03.20.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2020 03:15:29 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Narajowski?= 
-        <michal.narajowski@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?Micha=C5=82=20Narajowski?= 
-        <michal.narajowski@codecoup.pl>
-Subject: [PATCH BlueZ] monitor: Fix for incorrect len in L2CAP Enhanced Connection Req
-Date:   Thu, 28 May 2020 12:14:08 +0200
-Message-Id: <20200528101408.98400-1-michal.narajowski@codecoup.pl>
-X-Mailer: git-send-email 2.25.1
+        Thu, 28 May 2020 03:20:30 -0700 (PDT)
+From:   Chuhong Yuan <hslester96@gmail.com>
+Cc:     Sean Wang <sean.wang@mediatek.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Chuhong Yuan <hslester96@gmail.com>
+Subject: [PATCH] Bluetooth: btmtkuart: add missed functions in the error paths of btmtuart_probe()
+Date:   Thu, 28 May 2020 18:20:21 +0800
+Message-Id: <20200528102021.911709-1-hslester96@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- monitor/l2cap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+btmtuart_probe() misses several function calls in its error paths,
+including hci_free_dev() and clk_disable_unprepare().
+Refactor the code and call correct undo functions to fix the error
+paths.
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 41c766863..e571dbb61 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1344,7 +1344,7 @@ static void sig_ecred_conn_req(const struct l2cap_frame *frame)
- 	const struct bt_l2cap_pdu_ecred_conn_req *pdu = frame->data;
- 	uint16_t scid;
+Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+---
+ drivers/bluetooth/btmtkuart.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index e11169ad8247..8a81fbca5c9d 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -1015,7 +1015,7 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ 	if (btmtkuart_is_standalone(bdev)) {
+ 		err = clk_prepare_enable(bdev->osc);
+ 		if (err < 0)
+-			return err;
++			goto err_hci_free_dev;
  
--	l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
-+	l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
+ 		if (bdev->boot) {
+ 			gpiod_set_value_cansleep(bdev->boot, 1);
+@@ -1028,10 +1028,8 @@ static int btmtkuart_probe(struct serdev_device *serdev)
  
- 	print_psm(pdu->psm);
- 	print_field("MTU: %u", le16_to_cpu(pdu->mtu));
+ 		/* Power on */
+ 		err = regulator_enable(bdev->vcc);
+-		if (err < 0) {
+-			clk_disable_unprepare(bdev->osc);
+-			return err;
+-		}
++		if (err < 0)
++			goto err_clk_disable_unprepare;
+ 
+ 		/* Reset if the reset-gpios is available otherwise the board
+ 		 * -level design should be guaranteed.
+@@ -1063,7 +1061,6 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		dev_err(&serdev->dev, "Can't register HCI device\n");
+-		hci_free_dev(hdev);
+ 		goto err_regulator_disable;
+ 	}
+ 
+@@ -1072,6 +1069,11 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ err_regulator_disable:
+ 	if (btmtkuart_is_standalone(bdev))
+ 		regulator_disable(bdev->vcc);
++err_clk_disable_unprepare:
++	if (btmtkuart_is_standalone(bdev))
++		clk_disable_unprepare(bdev->osc);
++err_hci_free_dev:
++	hci_free_dev(hdev);
+ 
+ 	return err;
+ }
 -- 
-2.25.1
+2.26.2
 
