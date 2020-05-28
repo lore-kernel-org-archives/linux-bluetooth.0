@@ -2,102 +2,107 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A2EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5194DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 565B4207D3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:37:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F10C207D3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 10:38:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJh2+Ofi"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="SMDd5sKq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387867AbgE1KhA (ORCPT
+        id S2387954AbgE1Kid (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 06:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387846AbgE1KhA (ORCPT
+        Thu, 28 May 2020 06:38:33 -0400
+Received: from mail27.static.mailgun.info ([104.130.122.27]:14077 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387949AbgE1Kid (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 06:37:00 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98CDC05BD1E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 03:36:58 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id a23so21788342qto.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 03:36:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=jyCYc4nZMOYTwzrCqYyfRueoxJc1INghjgHl4ae1n9E=;
-        b=VJh2+OfiOUWXHhJ6cryzmeYbAIifqCKWM9WqR0N8md20tsl9KgJ8VjApSkzKcqYAMC
-         btl6qHA7oOA2/ZVnyT/q4cjyRZHJbCuWjUtQaDnnCz1Dux/8npA7U7LZwmrvyQWXTR+C
-         iNrtxCdIBOUwfiIpeTtmcfJcRNpNRHbVQRTm0FlPJ0GkEwgdsXlYg9tDzuni1327VqNo
-         5lA7p5iWzHOiMkgemrmqkxFSaS+3bltQ2jPY/ABXJ0h2IrDyDunNzB1te3HpNLTZz+N/
-         uOpVj93BDkFX131lwO6qdDFCZjuuhEeq4naOWh7hQTJfY5nN29PgUUz3UKtWO/1O1h78
-         piXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=jyCYc4nZMOYTwzrCqYyfRueoxJc1INghjgHl4ae1n9E=;
-        b=WefWds3eXI4u+Fu90pwmitoXSPZXgiZSCxLqeVdcc5paoK+TG0w0PVxhao0d6it/C+
-         8OUZhtggwNuZmnU8avBiWDauLjEEeefZ8TNPq3r+GcB7buV1x1pKnxU8zIcdLXfkKODc
-         WkJnDTdi4wFGtoESBLGBpYBGI2HPnaO6j9POgL9nYVnYMA+xVZC4PRlU7AjFiiGMLdwn
-         DN21skxhptMpelmI60AOWpuLzA913W0XjRI4Ax6ezGwuIBfMtXh0v38rkEWFnF1YsLhL
-         VHnlBTPjpXQJDs6mFfx7LAoU5f6kJ+imrPPY6tPSyyf111A5RfAynch3swgMnYU1sRHD
-         F3bg==
-X-Gm-Message-State: AOAM531K0hXMl/olENs7MTLsdUQ6zmpLeUDH7UyVONNaDYOoQshM0+e9
-        2/VksnVvmvC2xXq/npPEvmf342OQoO0=
-X-Google-Smtp-Source: ABdhPJxTy5IiD+uCH4QLhSxl9a/ECIQ8a5vk9N6xZsxRH2P0oOSOhq50D6aDd5k9IlQV4kM6CUUS6w==
-X-Received: by 2002:aed:21af:: with SMTP id l44mr2405024qtc.124.1590662218044;
-        Thu, 28 May 2020 03:36:58 -0700 (PDT)
-Received: from [172.17.0.2] ([52.188.113.25])
-        by smtp.gmail.com with ESMTPSA id w10sm5366330qtc.15.2020.05.28.03.36.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2020 03:36:57 -0700 (PDT)
-Message-ID: <5ecf9449.1c69fb81.37d70.ec80@mx.google.com>
-Date:   Thu, 28 May 2020 03:36:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1053965527625791712=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, michal.narajowski@codecoup.pl
-Subject: RE: [BlueZ] monitor: Fix for incorrect len in L2CAP Enhanced Connection Req
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200528101408.98400-1-michal.narajowski@codecoup.pl>
-References: <20200528101408.98400-1-michal.narajowski@codecoup.pl>
+        Thu, 28 May 2020 06:38:33 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1590662312; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=W+PLB8yTgdEMHV27WJ3DIjLDjSUejKal5HqUAeoVY74=; b=SMDd5sKqOOoXbJcJ/+y3lGdk22QjDPzl9v3jXIblVUAgBEFrN9mLoOBgGCGdwY0+FU5AXm9v
+ Mly0fSjE+h2CKksIdpuNdNdTaaKFiirgPdbMdtMP39iaw7eNu+BuN358Uj3TFShIfqtPceG7
+ N+1Fu0y+Yr26l7ambn8d+MTCszs=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
+ 5ecf94a737a454afcbe55613 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 28 May 2020 10:38:31
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id A3467C43387; Thu, 28 May 2020 10:38:31 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id DAC38C433CA;
+        Thu, 28 May 2020 10:38:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org DAC38C433CA
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: [PATCH v1] bluetooth: hci_qca: Fix suspend/resume functionality failure
+Date:   Thu, 28 May 2020 18:38:22 +0800
+Message-Id: <1590662302-10102-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1053965527625791712==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+@dev parameter of qca_suspend()/qca_resume() represents
+serdev_device, but it is mistook for hci_dev and causes
+succedent unexpected memory access.
 
+Fix by taking @dev as serdev_device.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkgitlint Failed
-
-Outputs:
-3: B6 Body message is missing
-
-
-
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_qca.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
---===============1053965527625791712==--
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e4a6823..c159161 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1977,8 +1977,10 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 
+ static int __maybe_unused qca_suspend(struct device *dev)
+ {
+-	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+-	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	struct hci_uart *hu = &qcadev->serdev_hu;
++	struct hci_dev *hdev __maybe_unused = hu->hdev;
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned long flags;
+ 	int ret = 0;
+@@ -2057,8 +2059,10 @@ static int __maybe_unused qca_suspend(struct device *dev)
+ 
+ static int __maybe_unused qca_resume(struct device *dev)
+ {
+-	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+-	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	struct hci_uart *hu = &qcadev->serdev_hu;
++	struct hci_dev *hdev __maybe_unused = hu->hdev;
+ 	struct qca_data *qca = hu->priv;
+ 
+ 	clear_bit(QCA_SUSPENDING, &qca->flags);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
