@@ -2,138 +2,175 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F42CC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204B1C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:54:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B98721532
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:16:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 013762078C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JiWpVhyw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdtKcwbW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404958AbgE1QQd (ORCPT
+        id S2405162AbgE1QyA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 12:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58842 "EHLO
+        Thu, 28 May 2020 12:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404905AbgE1QQa (ORCPT
+        with ESMTP id S2405105AbgE1Qx7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 12:16:30 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E493C08C5C8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:16:30 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id n15so3289078pjt.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:16:30 -0700 (PDT)
+        Thu, 28 May 2020 12:53:59 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63CCC08C5C6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:53:59 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id h7so2903742otr.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:53:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=S76ddrdGq/cBbQZ5tUQB2unFDdKjzHHbrT8hpYe9YzM=;
-        b=JiWpVhyw1smRR696kDsmG/PvNo7sZu5e24qbl+VPXErlBMim+HjZG2Z2tGTg+EQ3c6
-         5K/pnLuPLxYJWoQDn9cFgvvzrAYr2oaWTol8ilzpzHKI9n+DCLhZPLSDfA/RFV9JAUDD
-         dNZ7x5M2uU8VqhhdK5Om372FdLpWT3N2o341M=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rVMH/lPBnj2Ofwhb8VGIGMVRX//UNquu8I6DnfQzma8=;
+        b=EdtKcwbWIIiAVvLU7QIcoQqsYa9ybcLed1MPS6pioPWdzHujKc7f9x9FUhI4n75ewK
+         qrseKt3kah3qR1jf01/5ofmWorrkLBzSFkKxNNzmz0cbyEBrGWDtT/pkraoUygURHHPl
+         ObCk8lwX40nQp5q5WNtx843lITsfuNW3bumPaP3U/MRjlopfNMIwrZjb3q9YCX2b8VeK
+         KhsOZbX3ubgqdq42lzShoIcVke3iHKn8iF3DcrRwwLeJKBl5o3qfpVV6GuERBYVM77pn
+         mBEgExuqXRAEzDrcHKPGkupAaeH3ErAKMRVpbrsTsv0MnaYn++dxHD37LwOW3mBjaR1T
+         fSCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=S76ddrdGq/cBbQZ5tUQB2unFDdKjzHHbrT8hpYe9YzM=;
-        b=IykbuSS29k6oZCLrerscpNgKw2Bg1xcwihOSkZVotl19ObbvaU93g+mDo4dxidazG+
-         r/BkfGIQUoDmAt/kS9az0O2pN7Xkz3bN5sTLzipGPomCBKQHgA7/HaErpbOJxzpBW8vy
-         3Mv5z5Ba9fgwUvHzFbEIwv5jLOv1n5Plu8huaBy+xKb46UOelNiq9n4jkHYK7Tj2C1/A
-         wMZe3xluTp3rAhJOCbpVoGLzxEo/XxpS/2p8dK43IBJxlVr6xZxAUu9wuvr+vcounTns
-         gwFX4SueVuHx10D2/S7TF/EcF7oJoA54dYYtI3dROklu8uNe1Y4v1zVkRgesVbXt26h+
-         M7rg==
-X-Gm-Message-State: AOAM532NeKQg3FfjkW979Fu2LzF0rsAknQLDOkr4qOjlK/ZDvzlslQYL
-        vK4LdUwMb5U0BxainCIXQSGBlA==
-X-Google-Smtp-Source: ABdhPJx8NV9kadMCeflkmPi1yiAesNMW3uLpAf3Uo3Djp1f3fesJ94fSB9RULJ/7tXTLkUaRNCdO2A==
-X-Received: by 2002:a17:902:b289:: with SMTP id u9mr4327057plr.138.1590682589611;
-        Thu, 28 May 2020 09:16:29 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id lj12sm5932279pjb.21.2020.05.28.09.16.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2020 09:16:28 -0700 (PDT)
-Date:   Thu, 28 May 2020 09:16:27 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org
-Subject: Re: [PATCH v1] bluetooth: hci_qca: Fix suspend/resume functionality
- failure
-Message-ID: <20200528161627.GK4525@google.com>
-References: <1590662302-10102-1-git-send-email-zijuhu@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rVMH/lPBnj2Ofwhb8VGIGMVRX//UNquu8I6DnfQzma8=;
+        b=GULAdn8RNRXSwX58s5w220SbajQIitRsJrjW+xL7Z3PE+ZTuiWpobpy3VDxUI30z14
+         EF5ucdL+wpkIb63Ga90i43WdfA3WekYX7EYAhgT5LX4ukgq3ip61sOBqsJVH3vZheZiJ
+         F4m0NSJRULHj9+N8n8fEcQ7oXjJyNETMYm5/kJEj4YD/lM+nidXKZ3JJwuRTOMg3S8Ya
+         DszLWJYGzRtkMjpf4yEn8Buk3KP7VsnnNH8VWMn1SoiRxH/Ao78cJkz497eZGP51ZCHo
+         k6vP2+ls3X9a2CTRVTAa/z9rG+gZnGInkZ96+yVSnynxtjVBFwFMyPTCXSJ/OBXXWd/v
+         vJEw==
+X-Gm-Message-State: AOAM533RZjvrgYBChBx+fH2RGYZZn00YIGLpu112j7O+Tdl6ID2uOMiF
+        CBgwZ9A1MdoSmBVY2i8VViA95s3olw7caFSp5As=
+X-Google-Smtp-Source: ABdhPJx8BuqociWX2EQ7UML/v+AObv1GdktZoD9X1lxr1LsVyHH99uHwHztUZk+V7ZNRwH6xSbxnG1rvXFWK1Qd99uc=
+X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr3038116ots.11.1590684838811;
+ Thu, 28 May 2020 09:53:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1590662302-10102-1-git-send-email-zijuhu@codeaurora.org>
+References: <20200519202519.219335-1-luiz.dentz@gmail.com> <20200519202519.219335-2-luiz.dentz@gmail.com>
+ <C478BA49-0BBF-4323-AC3A-30442F65D346@holtmann.org> <CALWDO_UEPaAGyLFG93JzT41P=yGePB-N2Pbh5hioLBOXdh2YBw@mail.gmail.com>
+ <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org> <CALWDO_XztiDRfQEtioALNmO9smLm-qTW56hxkw8-ZH-Aw2cH1g@mail.gmail.com>
+ <6F17F57F-8AF4-4539-8564-C3F13BC6FBF5@holtmann.org> <CALWDO_Umz9T9-_U3spSTO85V3sjw8AWku9iwwuF0J7SKQYiE6w@mail.gmail.com>
+In-Reply-To: <CALWDO_Umz9T9-_U3spSTO85V3sjw8AWku9iwwuF0J7SKQYiE6w@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 28 May 2020 09:53:45 -0700
+Message-ID: <CABBYNZLfEVmjXYfSMFDdazgt68Y53ssWqmD71m=YUJ-0g2zU=A@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Bluetooth: Fix assuming EIR flags can result in SSP authentication
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Alain,
 
-On Thu, May 28, 2020 at 06:38:22PM +0800, Zijun Hu wrote:
-> @dev parameter of qca_suspend()/qca_resume() represents
-> serdev_device, but it is mistook for hci_dev and causes
-> succedent unexpected memory access.
-> 
-> Fix by taking @dev as serdev_device.
-> 
-> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+On Thu, May 28, 2020 at 6:18 AM Alain Michaud <alainmichaud@google.com> wro=
+te:
+>
+> On Thu, May 28, 2020 at 4:22 AM Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> >
+> > Hi Alain,
+> >
+> > >>> Starting with the 2.1 specification, it is my interpretation that i=
+t
+> > >>> is not valid to support EIR but not SSP.  I understand that SSP may=
+ be
+> > >>> disabled from BlueZ's point of view, but this doesn't seem to be a
+> > >>> legitimate/qualifiable configuration.  Should we instead fail the
+> > >>> legacy pairing if EIR was received as an invalid condition?
+> > >>
+> > >> I know that using EIR requires to also use SSP. However this is just=
+ a precaution in case the other device is an attacked and tries to trick us=
+.
+> > >>
+> > >> You might get an inquiry result and not extended inquiry result, but=
+ you are still talking to a SSP device. This has to do with the fact that t=
+he reception of EIR is not guaranteed. In case of radio interference you mi=
+ght miss one and only get an ordinary inquiry result.
+> > >>
+> > >> If we indeed received an EIR and then get legacy pairing request, we=
+ could try to reject the pairing. However keep in mind that our inquiry cac=
+he is time limited and we through outdated information away. This might cau=
+se some race condition. So I rather read the remote host features to ensure=
+ we know the actual host features of the remote device.
+> > >
+> > > You are correct, the EIR response is not a guaranteed thing.  For thi=
+s
+> > > reason, the host should try to resolve the name of the device before
+> > > initiating bonding where a Remote Host Supported Feature Notification
+> > > Event is generated to signal the remote side's support of SSP.  As yo=
+u
+> > > allude to, a remote spoofing a legitimate SSP device may always just
+> > > jam and downgrade to not SSP, but if you have any signals that SSP is
+> > > supported by the device, it may be a good defensive posture.
+> >
+> > trying to resolve the name before connected is a waste of time. Resolvi=
+ng the name after connecting will not give you that event. You should just =
+read the remote features.
+>
+> I have a vague memory that there was an interoperability issue around
+> this that required the initiator to know ahead of time if SSP was
+> supported by the remote host before connecting which was the reason
+> why this was added in the first place.  However, I agree that this can
+> also be read after you are connected rather than just waiting for a
+> RNR page to complete just to page again.  The point here however is
+> about the signals that SSP should be supported and the conditions
+> where we let legacy pairing go through.  My assertion is that EIR
+> implies SSP, so legacy pairing shouldn't be allowed in that case.
+> It's not a definitive security measure, but IMO, every signals that we
+> can get will help close a door to downgrade attacks.
 
-Please add:
+Legacy pairing is still indicated with MGMT_DEV_FOUND_LEGACY_PAIRING
+so for what is worth this didn't change any logic regarding how legacy
+pairing is detected, in fact hci_conn_ssp_enabled is used to determine
+if encryption is required or not for low security it was never used to
+detect if the paring method used was really SSP or legacy.
 
-Fixes: 41d5b25fed0 ("Bluetooth: hci_qca: add PM support")
+> >
+> > > Receiving an EIR response or a Remote Host Supported Feature Event
+> > > with the SSP bit set is a good indication that the device supports SS=
+P
+> > > and you should expect SSP to take place.  Again, it is not a valid
+> > > configuration to have EIR enabled but not SSP per my interpretation o=
+f
+> > > the 2.1 specification.
+> >
+> > If you have an idea on how to tighten this and fail, please send a patc=
+h. It is just that our inquiry cache was never designed for that. It was ju=
+st to speed up the connection process.
+> Ack.  This definitely looks like an opportunity.  We can add it to the ba=
+cklog.
 
-and add stable@kernel.org to cc:
+If you guys agree I can prepare a patch requiring SSP to be used, but
+first we will need to agree on what action we would take under such
+situation, shall we disconnect if we figure out the SSP bit is
+disabled? Btw, if the remote device has dropped SSP for some reason (I
+suppose the spec allows doing it) and we have a EIR on the cache
+(which we keep for 30 seconds) that doesn't necessarily mean the
+device is broken since the use of EIR may have been dropped in the
+meantime.
 
-> ---
->  drivers/bluetooth/hci_qca.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index e4a6823..c159161 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1977,8 +1977,10 @@ static void qca_serdev_remove(struct serdev_device *serdev)
->  
->  static int __maybe_unused qca_suspend(struct device *dev)
->  {
-> -	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
-> -	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct serdev_device *serdev = to_serdev_device(dev);
-> +	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-> +	struct hci_uart *hu = &qcadev->serdev_hu;
-> +	struct hci_dev *hdev __maybe_unused = hu->hdev;
+> >
+> > Regards
+> >
+> > Marcel
+> >
 
-hdev is not used, please remove
 
->  	struct qca_data *qca = hu->priv;
->  	unsigned long flags;
->  	int ret = 0;
-> @@ -2057,8 +2059,10 @@ static int __maybe_unused qca_suspend(struct device *dev)
->  
->  static int __maybe_unused qca_resume(struct device *dev)
->  {
-> -	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
-> -	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct serdev_device *serdev = to_serdev_device(dev);
-> +	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-> +	struct hci_uart *hu = &qcadev->serdev_hu;
-> +	struct hci_dev *hdev __maybe_unused = hu->hdev;
 
-hdev is not used, please remove
-
->  	struct qca_data *qca = hu->priv;
->  
->  	clear_bit(QCA_SUSPENDING, &qca->flags);
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
-> 
+--=20
+Luiz Augusto von Dentz
