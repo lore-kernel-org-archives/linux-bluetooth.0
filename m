@@ -2,142 +2,113 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3ECC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 13:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A5DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 13:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B425D206C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 13:18:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 341A9207D3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 13:28:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XwaN9jkB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h7A4bd5I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390300AbgE1NSM (ORCPT
+        id S2390406AbgE1N2v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 09:18:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59130 "EHLO
+        Thu, 28 May 2020 09:28:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390102AbgE1NSJ (ORCPT
+        with ESMTP id S2390389AbgE1N2F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 09:18:09 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FBDC05BD1E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 06:18:09 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id e4so10855015ljn.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 06:18:09 -0700 (PDT)
+        Thu, 28 May 2020 09:28:05 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD36C05BD1E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 06:28:04 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id z206so12924368lfc.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 06:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=+T0laD8fwMrzvjRfzh0Qu+3vQImL3/pnRK93BRyZs14=;
-        b=XwaN9jkBM1r+uEfW7d+JdfAERto2G1UKO+19oBk2hn2miGYRSdG3u7zf63WSxPED60
-         +tFlGBBpON8yxsdMRHtfN4ybIhqAyLiODnPyzVJiIkrLSxOwCzbbHJnj/6gQhfjnAV6p
-         kpp1yczuR65RkkI+a67U6TIY4OqU9J43tWypuz9odSbjD8anMOdBNus4aOpv2XdYYLqm
-         Tpq+9lI4Cp61VJCK2uhsCN1smGGWWKr/YPrqJWPJVFJSqmUTIsWB+B79S1IO4GJvk5TO
-         1u1ud5nHuPkJL+3hbprVGNJjQFrXNY/DQHfhnTNOz2ahYJknRfr8H8wbBtjgZNzZ4XHM
-         /ezA==
+         :cc;
+        bh=scgdFkqrA9ipif8zfFAOgiEAeLrFRRq77UViCEgJYhQ=;
+        b=h7A4bd5ICjLIQNoqkc2kTYRm0GGVAuLAjpjqR0mvwJ3pu3AHYLFf+OLYBQCZJZc93b
+         WqKDDnxUlWCbcOw1OxmNILyLjqSsHmmDBF1nI9CUEQal823GmrNRcC77cS6YnJ5yxY7W
+         ucGwQU0xTxhX/cuEuTFjVpEoXnITkU8MpYPKyDkN4SyXx4Tvg7pAnn8PbI95Xmv3CfW/
+         qYmCJ+Vu2Alo/2Hjrq79Lx0UMUscEEWQpkSzReiG+7xSP3Dbi2LKc7B0kREN/Wxtzjcy
+         +LphpvXzLMor2fbWSTZ7TLI9sDveY01GZQPpLXYbpD1OrGs4LNIWXMP5bmn/u+6IazZt
+         eR4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=+T0laD8fwMrzvjRfzh0Qu+3vQImL3/pnRK93BRyZs14=;
-        b=dQpICyJ9D42LnYP13XfSZsg3wUmNKk0bsmIIDIMvdqI7CeP7pUxl4Ybvw2KNeSht6S
-         YZWpiYapSOHdum+P0+kB+xZ7bGUY+C3GqlfNrB3UXhvc4JIZUT/afE8GcgOD/74ElPcx
-         aF4PLGrXruKGz3JieAR+rpP82FUVArENS6WUsb/2HfIHhPepBebwmtYHjKVxW14IKLC7
-         LgVvjMHZd1JBxof9MadQf6oc+4lPNFoYlBR9lkB+AnGxTmNYuh1TZz4maP1XHDhS6/Lg
-         vV728EQ1GbrvCWvRyw/wnrWkiv6fqrpsqYxmnr2y8JFh9IEAm5MSEo0B1Bx2QCkpaZya
-         sL4Q==
-X-Gm-Message-State: AOAM533B3KBqQYBXL9LGbM6cXstb6fUVmRcfGm92a+9ZiWD4/6jLaIzc
-        zMljHvALSN0Fg5lmlCGUiwS19sf47OtgjoH2faKyzw==
-X-Google-Smtp-Source: ABdhPJxQr+bhwXHf16PbZjs04RZklpemYIbVgCm6E6U793c6ABUDdHbieK3L0GEqNhTPJ41P2WbsDBQLxva8SrXZnHo=
-X-Received: by 2002:a2e:9c45:: with SMTP id t5mr1655762ljj.344.1590671887515;
- Thu, 28 May 2020 06:18:07 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=scgdFkqrA9ipif8zfFAOgiEAeLrFRRq77UViCEgJYhQ=;
+        b=OaLVGMO8DKullsjAd95bIkzwIPnMLG7wCudfLc3QIUWtL8Rr0SCcc2L312L0gKehZL
+         sGsewmdaTAtMVLjKWYFKVgrFAUIkqQTHCyVD68STkkagAmnL+wAYINB8M23lphEHY9ra
+         CoAIRlrZgPZR/4f6v5SlOii8czLJP6CvlJVQgTCM7DH9bAUvkQOvoBMpXHgB+wF6OMMk
+         d4j3JgoT1ybLSKqBUahjE6pqZEl/ygNSZE0SLEZMk/yo+cNLynFjVQRku6VrGkuhQiWh
+         vZOpgZ3IJ0wIkYW0PINYxZKuVkD+qo0xCGC/szgSscpXLyfHKDSb9Fv04I4zKYCx+Qvc
+         9Gsw==
+X-Gm-Message-State: AOAM53390n8o6CjJjh3WbuYM3yUfnvGVMsl5VYQmDF1zivt/Q3wjJVLw
+        lwXkwXH3BTnKOkI7IYh6WNhW5XQ3B4R2oJshfGFKaA==
+X-Google-Smtp-Source: ABdhPJys7EDgDENTfzCOQMRtRYtNjk6p1D8wTCQERoxgVB1oJbh8QdBDRmFNDGGzXAr+njwICWTaIbEciwjwQ9sFvDg=
+X-Received: by 2002:a19:c016:: with SMTP id q22mr1687959lff.191.1590672482850;
+ Thu, 28 May 2020 06:28:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200519202519.219335-1-luiz.dentz@gmail.com> <20200519202519.219335-2-luiz.dentz@gmail.com>
- <C478BA49-0BBF-4323-AC3A-30442F65D346@holtmann.org> <CALWDO_UEPaAGyLFG93JzT41P=yGePB-N2Pbh5hioLBOXdh2YBw@mail.gmail.com>
- <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org> <CALWDO_XztiDRfQEtioALNmO9smLm-qTW56hxkw8-ZH-Aw2cH1g@mail.gmail.com>
- <6F17F57F-8AF4-4539-8564-C3F13BC6FBF5@holtmann.org>
-In-Reply-To: <6F17F57F-8AF4-4539-8564-C3F13BC6FBF5@holtmann.org>
+References: <20200525184343.8532-1-alainm@chromium.org> <31E0FE7F-34A6-4819-AE06-C9F0B49D7C11@holtmann.org>
+In-Reply-To: <31E0FE7F-34A6-4819-AE06-C9F0B49D7C11@holtmann.org>
 From:   Alain Michaud <alainmichaud@google.com>
-Date:   Thu, 28 May 2020 09:17:56 -0400
-Message-ID: <CALWDO_Umz9T9-_U3spSTO85V3sjw8AWku9iwwuF0J7SKQYiE6w@mail.gmail.com>
-Subject: Re: [PATCH 2/4] Bluetooth: Fix assuming EIR flags can result in SSP authentication
+Date:   Thu, 28 May 2020 09:27:51 -0400
+Message-ID: <CALWDO_XZLjFR1WheNogehz-STe+8wRpi2SSPb3Bscb2eKsPDmw@mail.gmail.com>
+Subject: Re: [PATCH v2] sco:Add support for BT_PKT_STATUS CMSG data
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+Cc:     Alain Michaud <alainm@chromium.org>,
         BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, May 28, 2020 at 4:22 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Thu, May 28, 2020 at 4:26 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Alain,
 >
-> >>> Starting with the 2.1 specification, it is my interpretation that it
-> >>> is not valid to support EIR but not SSP.  I understand that SSP may b=
-e
-> >>> disabled from BlueZ's point of view, but this doesn't seem to be a
-> >>> legitimate/qualifiable configuration.  Should we instead fail the
-> >>> legacy pairing if EIR was received as an invalid condition?
-> >>
-> >> I know that using EIR requires to also use SSP. However this is just a=
- precaution in case the other device is an attacked and tries to trick us.
-> >>
-> >> You might get an inquiry result and not extended inquiry result, but y=
-ou are still talking to a SSP device. This has to do with the fact that the=
- reception of EIR is not guaranteed. In case of radio interference you migh=
-t miss one and only get an ordinary inquiry result.
-> >>
-> >> If we indeed received an EIR and then get legacy pairing request, we c=
-ould try to reject the pairing. However keep in mind that our inquiry cache=
- is time limited and we through outdated information away. This might cause=
- some race condition. So I rather read the remote host features to ensure w=
-e know the actual host features of the remote device.
+> > This change adds support for reporting the BT_PKT_STATUS to the socket
+> > CMSG data to allow the implementation of a packet loss correction on
+> > erronous data received on the SCO socket.
 > >
-> > You are correct, the EIR response is not a guaranteed thing.  For this
-> > reason, the host should try to resolve the name of the device before
-> > initiating bonding where a Remote Host Supported Feature Notification
-> > Event is generated to signal the remote side's support of SSP.  As you
-> > allude to, a remote spoofing a legitimate SSP device may always just
-> > jam and downgrade to not SSP, but if you have any signals that SSP is
-> > supported by the device, it may be a good defensive posture.
+> > The patch was partially developed by Marcel Holtmann and validated by
+> > Hsin-yu Chao
+> >
+> > Signed-off-by: Alain Michaud <alainm@chromium.org>
+> >
+> > ---
+> >
+> > include/net/bluetooth/bluetooth.h |  8 ++++++++
+> > include/net/bluetooth/sco.h       |  3 +++
+> > net/bluetooth/af_bluetooth.c      |  3 +++
+> > net/bluetooth/hci_core.c          |  1 +
+> > net/bluetooth/sco.c               | 28 ++++++++++++++++++++++++++++
+> > 5 files changed, 43 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index 3fa7b1e3c5d9..85e6c5754448 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -147,6 +147,8 @@ struct bt_voice {
+> > #define BT_MODE_LE_FLOWCTL    0x03
+> > #define BT_MODE_EXT_FLOWCTL   0x04
+> >
+> > +#define BT_PKT_STATUS          16
+> > +
 >
-> trying to resolve the name before connected is a waste of time. Resolving=
- the name after connecting will not give you that event. You should just re=
-ad the remote features.
-
-I have a vague memory that there was an interoperability issue around
-this that required the initiator to know ahead of time if SSP was
-supported by the remote host before connecting which was the reason
-why this was added in the first place.  However, I agree that this can
-also be read after you are connected rather than just waiting for a
-RNR page to complete just to page again.  The point here however is
-about the signals that SSP should be supported and the conditions
-where we let legacy pairing go through.  My assertion is that EIR
-implies SSP, so legacy pairing shouldn't be allowed in that case.
-It's not a definitive security measure, but IMO, every signals that we
-can get will help close a door to downgrade attacks.
-
->
-> > Receiving an EIR response or a Remote Host Supported Feature Event
-> > with the SSP bit set is a good indication that the device supports SSP
-> > and you should expect SSP to take place.  Again, it is not a valid
-> > configuration to have EIR enabled but not SSP per my interpretation of
-> > the 2.1 specification.
->
-> If you have an idea on how to tighten this and fail, please send a patch.=
- It is just that our inquiry cache was never designed for that. It was just=
- to speed up the connection process.
-Ack.  This definitely looks like an opportunity.  We can add it to the back=
-log.
-
+> we need to agree on if this is an int or u8 value. Otherwise this looks good.
+Since doing anything beyond a u8 value would require a core spec
+change and likely a new definition for what the packet flags are, I
+think it is likely safe to keep as u8.  Do you have a different
+perspective?
 >
 > Regards
 >
