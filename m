@@ -2,115 +2,138 @@ Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FC0C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F42CC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4B272071A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:03:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B98721532
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 16:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAcTvPSZ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JiWpVhyw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404818AbgE1QDY (ORCPT
+        id S2404958AbgE1QQd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 12:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56812 "EHLO
+        Thu, 28 May 2020 12:16:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404688AbgE1QDW (ORCPT
+        with ESMTP id S2404905AbgE1QQa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 12:03:22 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE8EC08C5C6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:03:21 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id f18so2731958otq.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:03:21 -0700 (PDT)
+        Thu, 28 May 2020 12:16:30 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E493C08C5C8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:16:30 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id n15so3289078pjt.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 09:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gTq/2dCd+ML3kavQj4ipivKXoHS0xVwDAkG8RJcrJ+M=;
-        b=iAcTvPSZsIwzCFayGN29q+BGW305o6z5Oi/Tki2X6KZwmbs4NQ4Ks1q1eGrbxKxfPA
-         wLCsoRoPNwqPbcuX4WsjDb9ZqBm3hBs6i9w9Uky8eaH1TeiEE+qI2NciLQp+9fwJ7J2N
-         9PJ139Ba6lz041Cg3XVMfL7yRZidlRz9Ljg6yg69bbrmIUVRZsC9XatePAHOr/oPnrd/
-         ZXpBqeNzBglCRtYO3ulM7rN/yMyzHXE63+nRpsnbDDnO4WiqRz24azwDPpTA/4WU+389
-         Bl8braDcE+7LoEH0+hHi5H2eToCwhX0V5U/bY6ZtHJjeCcxhEgRNvDLFGurLmgds05kZ
-         pKpA==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=S76ddrdGq/cBbQZ5tUQB2unFDdKjzHHbrT8hpYe9YzM=;
+        b=JiWpVhyw1smRR696kDsmG/PvNo7sZu5e24qbl+VPXErlBMim+HjZG2Z2tGTg+EQ3c6
+         5K/pnLuPLxYJWoQDn9cFgvvzrAYr2oaWTol8ilzpzHKI9n+DCLhZPLSDfA/RFV9JAUDD
+         dNZ7x5M2uU8VqhhdK5Om372FdLpWT3N2o341M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gTq/2dCd+ML3kavQj4ipivKXoHS0xVwDAkG8RJcrJ+M=;
-        b=mvb9khdHrWh/+b8gN4ZrH53ao+xOM92W0en6kaFc8K0n6pBKj0SdBV1jIX4B5QvXoi
-         JHYYSnT+G0gGXDJInxJs0QEr8iSFLadJN7jQzI53YY5t7C+94HQSMu+26Qcn27gKPPns
-         Nupal3fvASs3BkV39K9Vzj1wz5oD7WNsyrJpoDM5jSwUcAWs3vL8E13lB5Rq+o21w5xQ
-         hFwS3mgceNDz7SvCfnxXUS+ELHqjKCIIR0n5ZknDlj28CoCfMVhRqKHwXl6iD8eXQmhc
-         94iuWEUxqbE9LjUuEt2mxjMpc1nXlVLHqry8l1H6vDJqnAWCGfkO3KNbEId6v4rxtf2l
-         hW/g==
-X-Gm-Message-State: AOAM532orQSwLlcjdUEa4W0F1mwJj+2Jiv5WGiZ0+iCOSqrzSCPZIvwP
-        T/FL9d6gypE7K8DFuq9HZpRMcPSMxJELi2Qp4DI=
-X-Google-Smtp-Source: ABdhPJxjfEGsJFzPejiFdByT6h2QNRAcTJ1cxTcmYIkI+5PIBJEnauYyuoyvUJOhLTtIVcweGzVsz5azAPuRsVwZYQQ=
-X-Received: by 2002:a9d:2049:: with SMTP id n67mr2520675ota.177.1590681800357;
- Thu, 28 May 2020 09:03:20 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=S76ddrdGq/cBbQZ5tUQB2unFDdKjzHHbrT8hpYe9YzM=;
+        b=IykbuSS29k6oZCLrerscpNgKw2Bg1xcwihOSkZVotl19ObbvaU93g+mDo4dxidazG+
+         r/BkfGIQUoDmAt/kS9az0O2pN7Xkz3bN5sTLzipGPomCBKQHgA7/HaErpbOJxzpBW8vy
+         3Mv5z5Ba9fgwUvHzFbEIwv5jLOv1n5Plu8huaBy+xKb46UOelNiq9n4jkHYK7Tj2C1/A
+         wMZe3xluTp3rAhJOCbpVoGLzxEo/XxpS/2p8dK43IBJxlVr6xZxAUu9wuvr+vcounTns
+         gwFX4SueVuHx10D2/S7TF/EcF7oJoA54dYYtI3dROklu8uNe1Y4v1zVkRgesVbXt26h+
+         M7rg==
+X-Gm-Message-State: AOAM532NeKQg3FfjkW979Fu2LzF0rsAknQLDOkr4qOjlK/ZDvzlslQYL
+        vK4LdUwMb5U0BxainCIXQSGBlA==
+X-Google-Smtp-Source: ABdhPJx8NV9kadMCeflkmPi1yiAesNMW3uLpAf3Uo3Djp1f3fesJ94fSB9RULJ/7tXTLkUaRNCdO2A==
+X-Received: by 2002:a17:902:b289:: with SMTP id u9mr4327057plr.138.1590682589611;
+        Thu, 28 May 2020 09:16:29 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id lj12sm5932279pjb.21.2020.05.28.09.16.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 May 2020 09:16:28 -0700 (PDT)
+Date:   Thu, 28 May 2020 09:16:27 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        rjliao@codeaurora.org
+Subject: Re: [PATCH v1] bluetooth: hci_qca: Fix suspend/resume functionality
+ failure
+Message-ID: <20200528161627.GK4525@google.com>
+References: <1590662302-10102-1-git-send-email-zijuhu@codeaurora.org>
 MIME-Version: 1.0
-References: <20200528144605.Bluez.v2.1.Idd38f20f6ff4fc0b295a0a4a8655079373216933@changeid>
-In-Reply-To: <20200528144605.Bluez.v2.1.Idd38f20f6ff4fc0b295a0a4a8655079373216933@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 28 May 2020 09:03:08 -0700
-Message-ID: <CABBYNZ+ei4hTCu8EMbvjF7CdsBsUj+qjwQo6ZDiF8_JMgbc=Kw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2] audio/avrcp: Fix media player passthrough bitmask
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1590662302-10102-1-git-send-email-zijuhu@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Zijun,
 
-On Wed, May 27, 2020 at 11:46 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> Adjust the values of the passthrough bitmask with the declared
-> keys in avctp.c:key_map, according to section 6.10.2.1 of the
-> AVRCP specification.
+On Thu, May 28, 2020 at 06:38:22PM +0800, Zijun Hu wrote:
+> @dev parameter of qca_suspend()/qca_resume() represents
+> serdev_device, but it is mistook for hci_dev and causes
+> succedent unexpected memory access.
+> 
+> Fix by taking @dev as serdev_device.
+> 
+> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+
+Please add:
+
+Fixes: 41d5b25fed0 ("Bluetooth: hci_qca: add PM support")
+
+and add stable@kernel.org to cc:
+
 > ---
->
-> Changes in v2:
-> - Fix the mix-up between the first 4 and the last 4 bits of each
-> octet
->
->  profiles/audio/avrcp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 773ccdb60..6c529bf0c 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -298,8 +298,8 @@ static unsigned int avctp_id = 0;
->
->  /* Default feature bit mask for media player as per avctp.c:key_map */
->  static const uint8_t features[16] = {
-> -                               0xF8, 0xBF, 0xFF, 0xBF, 0x1F,
-> -                               0xFB, 0x3F, 0x60, 0x00, 0x00,
-> +                               0x1F, 0xFA, 0xFF, 0xBB, 0xF3,
-> +                               0xBF, 0xF9, 0x06, 0x00, 0x00,
->                                 0x00, 0x00, 0x00, 0x00, 0x00,
->                                 0x00 };
->
-> --
-> 2.27.0.rc2.251.g90737beb825-goog
+>  drivers/bluetooth/hci_qca.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index e4a6823..c159161 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1977,8 +1977,10 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+>  
+>  static int __maybe_unused qca_suspend(struct device *dev)
+>  {
+> -	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct serdev_device *serdev = to_serdev_device(dev);
+> +	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+> +	struct hci_uart *hu = &qcadev->serdev_hu;
+> +	struct hci_dev *hdev __maybe_unused = hu->hdev;
 
-Perhaps we should add a translation table so when we update the
-key_map we automatically update the features as well otherwise we
-always risk having these out of sync.
+hdev is not used, please remove
 
--- 
-Luiz Augusto von Dentz
+>  	struct qca_data *qca = hu->priv;
+>  	unsigned long flags;
+>  	int ret = 0;
+> @@ -2057,8 +2059,10 @@ static int __maybe_unused qca_suspend(struct device *dev)
+>  
+>  static int __maybe_unused qca_resume(struct device *dev)
+>  {
+> -	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct serdev_device *serdev = to_serdev_device(dev);
+> +	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+> +	struct hci_uart *hu = &qcadev->serdev_hu;
+> +	struct hci_dev *hdev __maybe_unused = hu->hdev;
+
+hdev is not used, please remove
+
+>  	struct qca_data *qca = hu->priv;
+>  
+>  	clear_bit(QCA_SUSPENDING, &qca->flags);
+> -- 
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+> 
