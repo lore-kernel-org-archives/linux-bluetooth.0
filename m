@@ -2,421 +2,100 @@ Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53529C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4D2C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:39:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2188120776
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 431A720776
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:39:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fzc+V212"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aa5V73ci"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727091AbgE2PjB (ORCPT
+        id S1727090AbgE2PjT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 May 2020 11:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51420 "EHLO
+        Fri, 29 May 2020 11:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726898AbgE2PjB (ORCPT
+        with ESMTP id S1726898AbgE2PjR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 May 2020 11:39:01 -0400
-Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D04C03E969
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:39:01 -0700 (PDT)
-Received: by mail-vs1-xe42.google.com with SMTP id b13so1709397vsm.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:39:01 -0700 (PDT)
+        Fri, 29 May 2020 11:39:17 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8AA6C03E969
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:39:17 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id c12so2521618qkk.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:39:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=evPFsobzfzYzocLyRTYkoU44BUB/i3M66ha4jpOsv98=;
-        b=fzc+V212HNu/lhR6QZb2tLDGwoL0EU7/RF2hXcN7ATUAN24Ty6cMOUE1LW6ESq7ij4
-         TsQe6wRjn3XGpD6Z9T5hP18JF1ns5WZfSnLaachaihs9xiZHD51qosOP0pQQM05sK4nj
-         8cszuBkg0AqBmGXVIuObP4NBDfOMYbitTz26A=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=DIy0ITn9dm7qe6UG4VpiKzHkUR6AtBQiINnZO05xR8s=;
+        b=Aa5V73cif+gdEaDwEGBJm8eyvKNPOr90C2CpFn3RCboehUPcZSghn/C4l6AJlKcoZ9
+         YCnBLaFIcIdurUINcdDeg6XSffsdcbZCwn0aAY1j5grkO5RSARH1DmKIZi1NabJmLE5k
+         rfFnS+MPSwxozxULEAswtPv/FsyI73ht3RYQMJX11Tnxg9TZBxUBos6u+KISCzLnN96C
+         GgY9IK8ngCCzBEvFIwjy3BMfoWMByW8Ym7PPJ4s14P7qXEdFQUMrUczXjOM8KolJL3I7
+         danxRa6j7kd09ebllZ9Xnc75ktg+r1cAOyGkC1LcinPr/yVCYQ2hGLhbRZQ+l8CrZf3q
+         T8JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=evPFsobzfzYzocLyRTYkoU44BUB/i3M66ha4jpOsv98=;
-        b=EHz1nvonUFibZfw8rWnqVP94dy3FoDQUKZWnZtcRPXt+dYwuNjV4Czso5H59OwwRzF
-         qtsuTBDqL8Pxi0wfmkoAEMos0+DpgdzJP/CLJA8qn4gSY0bZamL6vaVbqL5atFmJRjIf
-         fmSv6yu+Vdc2sEyyWSXkQgM0QLBLYUZA/uAHj7d76c3KeUS/GOVCG2E5P+dyycaSWeHW
-         eqe3rWL73olfpVe2yH3PlZ39bAB/axT3YOkvF1GHxIcpSrOanngwCO8OsrphvdWAtHtp
-         1O9ysNbPBUWbgom5mUTbKfrIK8aSmVvifC2a5P3LI6N1+Z6zXdiluXNTW10iYROVdbyh
-         +U3Q==
-X-Gm-Message-State: AOAM530H7/D8uqejeMSukZHvswximCO3tBedsZP9+EsKyNyBjJtH0JBJ
-        gjNvLjCfY9I1jcBXq0IqGJ8MiAUlBh0=
-X-Google-Smtp-Source: ABdhPJyfZc5APUxdnlBX0XgU14If7jwjWDMvHFBFAmTSZaTCKiHGRaO1abr6fd4RjzD3uo+v82fb3Q==
-X-Received: by 2002:a67:f8c6:: with SMTP id c6mr6259106vsp.158.1590766739862;
-        Fri, 29 May 2020 08:38:59 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id o2sm1309494vkl.27.2020.05.29.08.38.59
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=DIy0ITn9dm7qe6UG4VpiKzHkUR6AtBQiINnZO05xR8s=;
+        b=EVmAlAiDxlHSiacBcydmSOwzT1u9B9+jMJn3/b1m4XLZi8h0bndBQtuXQxmd2iI1W+
+         q0oWr5h2mR7BLoFHdqt1+LapPxDPAp37IJrvKdkvBlh8tzuHaNcGN8+afumj4QuJH9Mq
+         MtbqQiBprx0IcU5c0UkP5so5WjnZYki2v4RATCMCBAPNpC29eDDd06yIEm/205u3sw/E
+         btI7dyozqwjTM311z4ZGC5AowYI+/WhfMIEwl6aK5dIIsLePwSX2E2ZOw2lUcISuZ7DP
+         uTSbwtbYFp9aKqblcyAiBlqgMQua12b9iC/lZNwGrzsiRvk3/LdjEiNXuPvLTHGF92a0
+         urvA==
+X-Gm-Message-State: AOAM532qNxihXluCNtZM644DY4CZVALHNFFyt7tSIKTEku7KpjIJiIxg
+        BiDbkDdoOqys3eOUoqNnyAOq+pKANA0=
+X-Google-Smtp-Source: ABdhPJy40bgf8v/YZWFr0tg+kPTGpvSKgcziTILR0WwUbVbkvLOqDSf8ePMQPjlpx9SRb75qTlbsiA==
+X-Received: by 2002:a37:4e02:: with SMTP id c2mr7779196qkb.97.1590766756758;
+        Fri, 29 May 2020 08:39:16 -0700 (PDT)
+Received: from [172.17.0.2] ([13.90.47.33])
+        by smtp.gmail.com with ESMTPSA id n13sm8831027qtb.20.2020.05.29.08.39.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 08:38:59 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [BlueZ PATCH v3 2/4] adapter:set default system configuration if available
-Date:   Fri, 29 May 2020 15:38:13 +0000
-Message-Id: <20200529153814.213125-3-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
-In-Reply-To: <20200529153814.213125-1-alainm@chromium.org>
-References: <20200529153814.213125-1-alainm@chromium.org>
+        Fri, 29 May 2020 08:39:16 -0700 (PDT)
+Message-ID: <5ed12ca4.1c69fb81.c0757.3bda@mx.google.com>
+Date:   Fri, 29 May 2020 08:39:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2492585243667061215=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, alainm@chromium.org
+Subject: RE: Load default system configuration from file.
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200529152940.208214-2-alainm@chromium.org>
+References: <20200529152940.208214-2-alainm@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change loads any specified system configuration if provided and
-supported by the kernel.
+--===============2492585243667061215==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
----
+ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
+ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
+Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
+ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
+Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
+CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
+VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
+ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
+KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
+bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
+ZmF1bHQgKHNlZSBgVScpCnNyYy9tYWluLmM6MTUzOjE4OiBlcnJvcjogaW5pdGlhbGl6YXRpb24g
+ZGlzY2FyZHMg4oCYY29uc3TigJkgcXVhbGlmaWVyIGZyb20gcG9pbnRlciB0YXJnZXQgdHlwZSBb
+LVdlcnJvcj1kaXNjYXJkZWQtcXVhbGlmaWVyc10KICAxNTMgfCAgeyAiQ29udHJvbGxlciIsIGNv
+bnRyb2xsZXJfb3B0aW9ucyB9LAogICAgICB8ICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06
+ICoqKiBbTWFrZWZpbGU6ODkwMTogc3JjL2JsdWV0b290aGQtbWFpbi5vXSBFcnJvciAxCm1ha2U6
+ICoqKiBbTWFrZWZpbGU6NDAxMDogYWxsXSBFcnJvciAyCgoKCi0tLQpSZWdhcmRzLApMaW51eCBC
+bHVldG9vdGgK
 
-Changes in v3: None
-Changes in v2: None
-
- src/adapter.c | 251 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/hcid.h    |  39 ++++++++
- 2 files changed, 290 insertions(+)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 972d88772..da3777cba 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -120,6 +120,8 @@ static bool kernel_conn_control = false;
- 
- static bool kernel_blocked_keys_supported = false;
- 
-+static bool kernel_set_system_params = false;
-+
- static GList *adapter_list = NULL;
- static unsigned int adapter_remaining = 0;
- static bool powering_down = false;
-@@ -4157,6 +4159,250 @@ static void probe_devices(void *user_data)
- 	device_probe_profiles(device, btd_device_get_uuids(device));
- }
- 
-+static void load_default_system_params(struct btd_adapter *adapter)
-+{
-+	/* note: for now all params are 2 bytes, if varying size params are
-+	 * added, calculating the right size of buffer will be necessary first.
-+	 */
-+	struct controller_params_tlv {
-+		uint16_t parameter_type;
-+		uint8_t length;
-+		uint16_t value;
-+	} __packed;
-+
-+	struct controller_params_tlv *params = NULL;
-+	uint16_t i = 0;
-+	size_t cp_size;
-+
-+	if (!main_opts.default_params.num_set_params ||
-+		!kernel_set_system_params)
-+		return;
-+
-+	cp_size = sizeof(struct controller_params_tlv) *
-+				main_opts.default_params.num_set_params;
-+	params = g_try_malloc0(cp_size);
-+	if (!params)
-+		return;
-+
-+	if (main_opts.default_params.br_page_scan_type != 0xFFFF) {
-+		params[i].parameter_type = 0x0000;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_scan_type;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_page_scan_interval) {
-+		params[i].parameter_type = 0x0001;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_page_scan_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_page_scan_window) {
-+		params[i].parameter_type = 0x0002;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_scan_window;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_type != 0xFFFF) {
-+		params[i].parameter_type = 0x0003;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_inquiry_scan_type;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_interval) {
-+		params[i].parameter_type = 0x0004;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.br_inquiry_scan_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_window) {
-+		params[i].parameter_type = 0x0005;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_inquiry_scan_window;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_link_supervision_timeout) {
-+		params[i].parameter_type = 0x0006;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.br_link_supervision_timeout;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_page_timeout) {
-+		params[i].parameter_type = 0x0007;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_timeout;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_min_sniff_interval) {
-+		params[i].parameter_type = 0x0008;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_min_sniff_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_max_sniff_interval) {
-+		params[i].parameter_type = 0x0009;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_max_sniff_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_min_adv_interval) {
-+		params[i].parameter_type = 0x000a;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_min_adv_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_max_adv_interval) {
-+		params[i].parameter_type = 0x000b;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_max_adv_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_multi_adv_rotation_interval) {
-+		params[i].parameter_type = 0x000c;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_multi_adv_rotation_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_autoconnect) {
-+		params[i].parameter_type = 0x000d;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_autoconnect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_autoconnect) {
-+		params[i].parameter_type = 0x000e;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_autoconnect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_suspend) {
-+		params[i].parameter_type = 0x000f;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_suspend;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_suspend) {
-+		params[i].parameter_type = 0x0010;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_suspend;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_discovery) {
-+		params[i].parameter_type = 0x0011;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_discovery;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_discovery) {
-+		params[i].parameter_type = 0x0012;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_discovery;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_adv_monitor) {
-+		params[i].parameter_type = 0x0013;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_adv_monitor;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_adv_monitor) {
-+		params[i].parameter_type = 0x0014;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_adv_monitor;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_connect) {
-+		params[i].parameter_type = 0x0015;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_connect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_connect) {
-+		params[i].parameter_type = 0x0016;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.le_scan_window_connect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_min_connection_interval) {
-+		params[i].parameter_type = 0x0017;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_min_connection_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_max_connection_interval) {
-+		params[i].parameter_type = 0x0018;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_max_connection_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_connection_latency) {
-+		params[i].parameter_type = 0x0019;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_connection_latency;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_connection_lsto) {
-+		params[i].parameter_type = 0x001a;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_connection_lsto;
-+		++i;
-+	}
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_SET_DEFAULT_SYSTEM_PARAMETERS,
-+			adapter->dev_id, cp_size, params, NULL, NULL, NULL);
-+
-+	btd_error(adapter->dev_id,
-+				"Failed to set default system params for hci%u",
-+				adapter->dev_id);
-+
-+	g_free(params);
-+}
-+
- static void load_devices(struct btd_adapter *adapter)
- {
- 	char dirname[PATH_MAX];
-@@ -8265,6 +8511,7 @@ load:
- 	load_drivers(adapter);
- 	btd_profile_foreach(probe_profile, adapter);
- 	clear_blocked(adapter);
-+	load_default_system_params(adapter);
- 	load_devices(adapter);
- 
- 	/* restore Service Changed CCC value for bonded devices */
-@@ -9158,6 +9405,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
- 			DBG("kernel supports the set_blocked_keys op");
- 			kernel_blocked_keys_supported = true;
- 			break;
-+		case MGMT_OP_SET_DEFAULT_SYSTEM_PARAMETERS:
-+			DBG("kernel supports set system params");
-+			kernel_set_system_params = true;
-+			break;
- 		default:
- 			break;
- 		}
-diff --git a/src/hcid.h b/src/hcid.h
-index 1bf93784d..e6d966c58 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -49,6 +49,45 @@ struct main_opts {
- 	uint32_t	discovto;
- 	uint8_t		privacy;
- 
-+	struct {
-+		uint16_t	num_set_params;
-+
-+		uint16_t	br_page_scan_type;
-+		uint16_t	br_page_scan_interval;
-+		uint16_t	br_page_scan_window;
-+
-+		uint16_t	br_inquiry_scan_type;
-+		uint16_t	br_inquiry_scan_interval;
-+		uint16_t	br_inquiry_scan_window;
-+
-+		uint16_t	br_link_supervision_timeout;
-+		uint16_t	br_page_timeout;
-+
-+		uint16_t	br_min_sniff_interval;
-+		uint16_t	br_max_sniff_interval;
-+
-+		uint16_t	le_min_adv_interval;
-+		uint16_t	le_max_adv_interval;
-+		uint16_t	le_multi_adv_rotation_interval;
-+
-+		uint16_t	le_scan_interval_autoconnect;
-+		uint16_t	le_scan_window_autoconnect;
-+		uint16_t	le_scan_interval_suspend;
-+		uint16_t	le_scan_window_suspend;
-+		uint16_t	le_scan_interval_discovery;
-+		uint16_t	le_scan_window_discovery;
-+		uint16_t	le_scan_interval_adv_monitor;
-+		uint16_t	le_scan_window_adv_monitor;
-+		uint16_t	le_scan_interval_connect;
-+		uint16_t	le_scan_window_connect;
-+
-+		uint16_t	le_min_connection_interval;
-+		uint16_t	le_max_connection_interval;
-+		uint16_t	le_connection_latency;
-+		uint16_t	le_connection_lsto;
-+	} default_params;
-+
-+
- 	gboolean	reverse_discovery;
- 	gboolean	name_resolv;
- 	gboolean	debug_keys;
--- 
-2.27.0.rc0.183.gde8f92d652-goog
-
+--===============2492585243667061215==--
