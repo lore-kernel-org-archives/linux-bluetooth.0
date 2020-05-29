@@ -2,113 +2,94 @@ Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9CBC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218EDC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AA0C20721
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7A08207BC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:50:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="fCrrqSTg"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lBhEchyZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727056AbgE2OqZ (ORCPT
+        id S1727080AbgE2OuN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 May 2020 10:46:25 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:12583 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727000AbgE2OqY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 May 2020 10:46:24 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1590763583; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=5zi+dHY2H+udPHk6hvdgwxKhHZOYwiTIbkrPlGN9DOA=; b=fCrrqSTglm0w8NajSLSgiBNUyFHkQj5aDGUCUn4Bsa+AcZ7yUL3083y8oU2pqoemZxNbhC25
- xeSvnkShODRemp0ILwDvb1RfLXyZ/GzzYxq7EOcNI25sgJvs/QjKH37mt6wTa7T9r685dr3w
- +7xDcRfpwqmhgTwbalh1CBFieNY=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
- 5ed1203eb4f0a9ae22e9c775 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 29 May 2020 14:46:22
- GMT
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 9E37BC43387; Fri, 29 May 2020 14:46:22 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id EA227C433C9;
-        Fri, 29 May 2020 14:46:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org EA227C433C9
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: [PATCH v4] Bluetooth: hci_qca: Improve controller ID info log level
-Date:   Fri, 29 May 2020 22:46:13 +0800
-Message-Id: <1590763573-8302-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Fri, 29 May 2020 10:50:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43674 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726838AbgE2OuM (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 29 May 2020 10:50:12 -0400
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2F0C03E969
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:50:12 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id d8so865372uam.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=COVUHSxTCMj2isyY9J+v1mwEZIAcu4F6fY+gjyNQtIA=;
+        b=lBhEchyZ/Q+vBamZ8g8B1Ns1tcncpcr7wwFG8Sa9MfKrvob9qneczS4Hf2PwBZng6R
+         OmBAB8BeXjiRd08pQY+50fyteHeI1hNVir0Im31sNws/a3Wnlaox5JX9ZMl4rtcCWkJh
+         UKpHuoSWT/thgKAagSTVcWBcpBlIm1RXW9Qzc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=COVUHSxTCMj2isyY9J+v1mwEZIAcu4F6fY+gjyNQtIA=;
+        b=LAtXFmrnNHDGq0cXKrjOUi8dzo3dAvAJzsqUFN+nsnva5XLfIvvuJsBo/qz13G9A1r
+         6bLcUX9gkF2LZWciF/k6R7DOzvzq0BgxSTImGa3qj5MMq+FljwyN81cCmWWvtclFz0Ao
+         rbmJPb+uCMfKXntlYl8BhlnqcVRevPld6C+Q+N/WVD+SpcxrEq9zq6Kg4USOfYAVkIj0
+         HocMlRp5HlKT8pAvLofXReqziyi0wAJrsk7Uio8qTT9VjdpMFreBir1OPq0BRykTlw4q
+         ZPpBtggMGf39Af1c055C7FwrwCjOTEMTmaW+bj4J5+UloUl/iQVBEyljhbrbkQuGjDf1
+         KLJA==
+X-Gm-Message-State: AOAM533zsSkXBbjKlvCFqZIGWQWhStZAVh0uHgzDHeMNSd/Jw6rzmiU4
+        WTcjboJu0Kt/ID85wCF3qe6myXCVy0U=
+X-Google-Smtp-Source: ABdhPJxuEseucJQAptA+FOj62Sg4NbUXcPGjT05iwLFnOlx8nbf4cM/f/dFaeREScUqnZXlsh3ZBpg==
+X-Received: by 2002:ab0:6642:: with SMTP id b2mr6137692uaq.92.1590763811490;
+        Fri, 29 May 2020 07:50:11 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id c65sm1196998vkh.32.2020.05.29.07.50.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2020 07:50:10 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [BlueZ PATCH 0/3] Load default system configuration from file.
+Date:   Fri, 29 May 2020 14:50:04 +0000
+Message-Id: <20200529145007.198906-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Controller ID info got by VSC EDL_PATCH_GETVER is very
-important, so improve its log level from DEBUG to INFO.
+This series adds supports for reading default system configurations from
+a configuration file.  This allows a system to override what are
+currently kernel hardcoded values from a conf file.
 
-Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
----
-Changes in v4:
-- correct coding style of qca_read_soc_version()
+The dependent kernel patch will be posted after some additional parsing
+validation on the tlv is completed.
 
-Changes in v3:
-- correct coding style
 
-Changes in v2:
-- adjust controller ID info print order
+Alain Michaud (3):
+  mgmt:adding load default system configuration definitions
+  adapter:set default system configuration if available
+  main:read default system configuration from the conf file.
 
- drivers/bluetooth/btqca.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ lib/mgmt.h    |  20 ++++
+ src/adapter.c | 251 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/hcid.h    |  39 ++++++++
+ src/main.c    | 162 ++++++++++++++++++++++++++++++++
+ src/main.conf |  65 +++++++++++++
+ 5 files changed, 537 insertions(+)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 3ea866d44568..5629e2c80b97 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -74,17 +74,21 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
- 
- 	ver = (struct qca_btsoc_version *)(edl->data);
- 
--	BT_DBG("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
--	BT_DBG("%s: Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
--	BT_DBG("%s: ROM    :0x%08x", hdev->name, le16_to_cpu(ver->rom_ver));
--	BT_DBG("%s: SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
-+	bt_dev_info(hdev, "QCA Product ID   :0x%08x",
-+		    le32_to_cpu(ver->product_id));
-+	bt_dev_info(hdev, "QCA SOC Version  :0x%08x",
-+		    le32_to_cpu(ver->soc_id));
-+	bt_dev_info(hdev, "QCA ROM Version  :0x%08x",
-+		    le16_to_cpu(ver->rom_ver));
-+	bt_dev_info(hdev, "QCA Patch Version:0x%08x",
-+		    le16_to_cpu(ver->patch_ver));
- 
- 	/* QCA chipset version can be decided by patch and SoC
- 	 * version, combination with upper 2 bytes from SoC
- 	 * and lower 2 bytes from patch will be used.
- 	 */
- 	*soc_version = (le32_to_cpu(ver->soc_id) << 16) |
--			(le16_to_cpu(ver->rom_ver) & 0x0000ffff);
-+		(le16_to_cpu(ver->rom_ver) & 0x0000ffff);
- 	if (*soc_version == 0)
- 		err = -EILSEQ;
- 
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.27.0.rc0.183.gde8f92d652-goog
 
