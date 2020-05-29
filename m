@@ -2,186 +2,295 @@ Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCA8C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 03:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F0BC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 05:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0753420829
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 03:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC3ED2074B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 05:31:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="clUacrb9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C7KQVVzL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391668AbgE2DNx (ORCPT
+        id S1725562AbgE2FbL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 23:13:53 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:57468 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391632AbgE2DNw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 23:13:52 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1590722031; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=MWOHZBeeiJpuUSHMnaP/5BbtwVak35PfjA2q3f6UkrY=; b=clUacrb92IMvq1EUCzfYqcuaeOQPLuwlUlM7wUV2gN+BBBvzMp7h7g7D9UreismN8lSyGVHB
- m0mmqxrxSvC+bUgnCvzCbeEJW6y8Y3gOyBfhyCUhf9EytuGQ+lLTx9HxB+DBtkDUyOwsajY9
- GkWaxS4Sb6ceU+xYK+5V033hIyw=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
- 5ed07de776fccbb4c8d3a66d (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 29 May 2020 03:13:43
- GMT
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 32135C433C9; Fri, 29 May 2020 03:13:42 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 0D1E5C433C6;
-        Fri, 29 May 2020 03:13:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 0D1E5C433C6
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tientzu@chromium.org
-Subject: [PATCH v4] bluetooth: hci_qca: Fix QCA6390 memdump failure
-Date:   Fri, 29 May 2020 11:13:35 +0800
-Message-Id: <1590722015-3495-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Fri, 29 May 2020 01:31:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725308AbgE2FbL (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 29 May 2020 01:31:11 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB1DC08C5C6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 22:31:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n7so1733822ybh.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 22:31:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=EPgk7zabpyB5rlEgy6P4j0ZSI9fA9lptxyM7WLNbnX8=;
+        b=C7KQVVzLCZXBOIzajuqP4RY59K46jLNuij3fL5a/NKF1285zopDIAywj98j8qEF0Dj
+         na7V5jEnWg5W2DoqTK4k9H2/cpwFaVwxH96rXtp9OrimCodUzHoLb2G+gWacTniA512L
+         RY8rUceXYJzcimNVZGnM6T6sNwzna+buSChEa/T+U/rFyFNhUmqoKwo1h6rWhIhED+3e
+         aZhM5jisGiUv/LINgfR1lNRI7QNXuA5NtBzWZiKRb7XpK4dZPmaQ/l/bZOSYAe8foI/V
+         3Iglx1KwuvDKKVQFZqcUENnVK7ZQ3yaLghU0eEI6RAtqWD3vgb9OhjLm/xMXe2m7IzQz
+         LsjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=EPgk7zabpyB5rlEgy6P4j0ZSI9fA9lptxyM7WLNbnX8=;
+        b=tMNvfdD0HHezvUKC5gTT6bbxRoxFJOy7C8O7UODWDW5uDQGXX0aWeEItpQCbUFxm6N
+         bJveKorEXFvB5NjxHDbDsUgCXZyhpZgFU3dYbAIAChl7lBFv0GKn2TUD/bJyeHr5Syeo
+         vDhejVj0HS9pU6SAKrO1j2B62xRwZUrA06sSoXImNZzi6/uHq5i511lXXjlkebhYI2nn
+         5acuNAdBj4ik3RHVoWXFK90NAU4qrY7233Jpw11OdIdPwOCJ3CoUH5r4EaWjjuCfy7td
+         GtR2n1Da746Pw0u+JiE3ocTyZQYrX8jWH8t0mYwJ1XVcW3BG/jFhFS/+8kvhmMZUVLp9
+         0Low==
+X-Gm-Message-State: AOAM530AbvWdMjoIu3gx/lfrx68Z539vhY9z8iDmtBwCBPbLOxGmx3vB
+        fQrithX382oHcZse+gnRznGkS8fPJS9ys/fKuVylxi3Lnq8EGQNlZAnWIUKJ8apvp8rXNS2du8b
+        nknnY16vsOMtEsgnhD2UM0V4pVlaevQ7DVI0rK9VdS2rWat0v3S4c61ZaFZNWHgBNIFPyMc1Pje
+        3q
+X-Google-Smtp-Source: ABdhPJwdOyPMiL2xU67Kf9Zxsh1ynAIvFoM2YHwRlfG/w6Qk2HOt6bJlMY528S/XVrMgRG1E5LcKPo7Buf7S
+X-Received: by 2002:a25:3295:: with SMTP id y143mr1023987yby.321.1590730269983;
+ Thu, 28 May 2020 22:31:09 -0700 (PDT)
+Date:   Fri, 29 May 2020 13:31:04 +0800
+Message-Id: <20200529133023.Bluez.v3.1.I804fb280949e4ce5cd9d0fce544a6f1a0592d11b@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
+Subject: [Bluez PATCH v3] audio/avrcp: Fix media player passthrough bitmask
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Michael Sun <michaelfsun@google.com>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QCA6390 memdump VSE sometimes come to bluetooth driver
-with wrong sequence number as illustrated as follows:
-frame # in dec: frame data in hex
-1396: ff fd 01 08 74 05 00 37 8f 14
-1397: ff fd 01 08 75 05 00 ff bf 38
-1414: ff fd 01 08 86 05 00 fb 5e 4b
-1399: ff fd 01 08 77 05 00 f3 44 0a
-1400: ff fd 01 08 78 05 00 ca f7 41
-it is mistook for controller missing packets, so results
-in page fault after overwriting memdump buffer allocated.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Fixed by ignoring QCA6390 sequence number check and
-checking buffer space before writing.
+Adjust the values of the passthrough bitmask with the declared
+keys in avctp.c:key_map, according to section 6.10.2.1 of the
+AVRCP specification.
 
-Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
-Tested-by: Zijun Hu <zijuhu@codeaurora.org>
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 ---
-Changes in v4:
-- add a piece of code comments
+
 Changes in v3:
-- correct coding style
+- Use table to map the passthrough bitmask instead of hardcoding
+
 Changes in v2:
-- rename a local variable from @temp to @rx_size
+- Fix the mix-up between the first 4 and the last 4 bits of each
+octet
 
- drivers/bluetooth/hci_qca.c | 49 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 42 insertions(+), 7 deletions(-)
+ profiles/audio/avctp.c | 11 +++++
+ profiles/audio/avctp.h | 11 +++++
+ profiles/audio/avrcp.c | 93 ++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 108 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index e4a6823..4acac13 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -114,6 +114,7 @@ struct qca_memdump_data {
- 	char *memdump_buf_tail;
- 	u32 current_seq_no;
- 	u32 received_dump;
-+	u32 ram_dump_size;
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 058b44a8b..7307eaa9e 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -2222,3 +2222,14 @@ bool avctp_is_initiator(struct avctp *session)
+ {
+ 	return session->initiator;
+ }
++
++bool avctp_supports_avc(uint8_t avc)
++{
++	int i;
++
++	for (i = 0; key_map[i].name != NULL; i++) {
++		if (key_map[i].avc == avc)
++			return true;
++	}
++	return false;
++}
+diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
+index 68a273561..c3cd49d88 100644
+--- a/profiles/audio/avctp.h
++++ b/profiles/audio/avctp.h
+@@ -54,7 +54,12 @@
+ #define AVC_DOWN			0x02
+ #define AVC_LEFT			0x03
+ #define AVC_RIGHT			0x04
++#define AVC_RIGHT_UP			0x05
++#define AVC_RIGHT_DOWN			0x06
++#define AVC_LEFT_UP			0x07
++#define AVC_LEFT_DOWN			0x08
+ #define AVC_ROOT_MENU			0x09
++#define AVC_SETUP_MENU			0x0a
+ #define AVC_CONTENTS_MENU		0x0b
+ #define AVC_FAVORITE_MENU		0x0c
+ #define AVC_EXIT			0x0d
+@@ -72,9 +77,11 @@
+ #define AVC_9				0x29
+ #define AVC_DOT				0x2a
+ #define AVC_ENTER			0x2b
++#define AVC_CLEAR			0x2c
+ #define AVC_CHANNEL_UP			0x30
+ #define AVC_CHANNEL_DOWN		0x31
+ #define AVC_CHANNEL_PREVIOUS		0x32
++#define AVC_SOUND_SELECT		0x33
+ #define AVC_INPUT_SELECT		0x34
+ #define AVC_INFO			0x35
+ #define AVC_HELP			0x36
+@@ -95,6 +102,8 @@
+ #define AVC_FORWARD			0x4b
+ #define AVC_BACKWARD			0x4c
+ #define AVC_LIST			0x4d
++#define AVC_ANGLE			0x50
++#define AVC_SUBPICTURE			0x51
+ #define AVC_F1				0x71
+ #define AVC_F2				0x72
+ #define AVC_F3				0x73
+@@ -108,6 +117,7 @@
+ #define AVC_GREEN			0x7b
+ #define AVC_BLUE			0x7c
+ #define AVC_YELLOW			0x7c
++#define AVC_VENDOR_UNIQUE		0x7e
+ 
+ struct avctp;
+ 
+@@ -183,3 +193,4 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
+ int avctp_send_browsing_req(struct avctp *session,
+ 				uint8_t *operands, size_t operand_count,
+ 				avctp_browsing_rsp_cb func, void *user_data);
++bool avctp_supports_avc(uint8_t avc);
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 773ccdb60..fa97a3a89 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -293,15 +293,75 @@ struct control_pdu_handler {
+ 							uint8_t transaction);
  };
  
- struct qca_memdump_event_hdr {
-@@ -976,6 +977,8 @@ static void qca_controller_memdump(struct work_struct *work)
- 	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
- 	u16 seq_no;
- 	u32 dump_size;
-+	u32 rx_size;
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++static struct {
++	uint8_t feature_bit;
++	uint8_t avc;
++} passthrough_map[] = {
++	{ 0, AVC_SELECT },
++	{ 1, AVC_UP },
++	{ 2, AVC_DOWN },
++	{ 3, AVC_LEFT },
++	{ 4, AVC_RIGHT },
++	{ 5, AVC_RIGHT_UP },
++	{ 6, AVC_RIGHT_DOWN },
++	{ 7, AVC_LEFT_UP },
++	{ 8, AVC_LEFT_DOWN },
++	{ 9, AVC_ROOT_MENU },
++	{ 10, AVC_SETUP_MENU },
++	{ 11, AVC_CONTENTS_MENU },
++	{ 12, AVC_FAVORITE_MENU },
++	{ 13, AVC_EXIT },
++	{ 14, AVC_0 },
++	{ 15, AVC_1 },
++	{ 16, AVC_2 },
++	{ 17, AVC_3 },
++	{ 18, AVC_4 },
++	{ 19, AVC_5 },
++	{ 20, AVC_6 },
++	{ 21, AVC_7 },
++	{ 22, AVC_8 },
++	{ 23, AVC_9 },
++	{ 24, AVC_DOT },
++	{ 25, AVC_ENTER },
++	{ 26, AVC_CLEAR },
++	{ 27, AVC_CHANNEL_UP },
++	{ 28, AVC_CHANNEL_DOWN },
++	{ 29, AVC_CHANNEL_PREVIOUS },
++	{ 30, AVC_SOUND_SELECT },
++	{ 31, AVC_INPUT_SELECT },
++	{ 32, AVC_INFO },
++	{ 33, AVC_HELP },
++	{ 34, AVC_PAGE_UP },
++	{ 35, AVC_PAGE_DOWN },
++	{ 36, AVC_POWER },
++	{ 37, AVC_VOLUME_UP },
++	{ 38, AVC_VOLUME_DOWN },
++	{ 39, AVC_MUTE },
++	{ 40, AVC_PLAY },
++	{ 41, AVC_STOP },
++	{ 42, AVC_PAUSE },
++	{ 43, AVC_RECORD },
++	{ 44, AVC_REWIND },
++	{ 45, AVC_FAST_FORWARD },
++	{ 46, AVC_EJECT },
++	{ 47, AVC_FORWARD },
++	{ 48, AVC_BACKWARD },
++	{ 49, AVC_ANGLE },
++	{ 50, AVC_SUBPICTURE },
++	{ 51, AVC_F1 },
++	{ 52, AVC_F2 },
++	{ 53, AVC_F3 },
++	{ 54, AVC_F4 },
++	{ 55, AVC_F5 },
++	{ 56, AVC_VENDOR_UNIQUE },
++	{ 0xff, 0xff }
++};
++
+ static GSList *servers = NULL;
+ static unsigned int avctp_id = 0;
  
- 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
+-/* Default feature bit mask for media player as per avctp.c:key_map */
+-static const uint8_t features[16] = {
+-				0xF8, 0xBF, 0xFF, 0xBF, 0x1F,
+-				0xFB, 0x3F, 0x60, 0x00, 0x00,
+-				0x00, 0x00, 0x00, 0x00, 0x00,
+-				0x00 };
++/* Default feature bit mask for media player */
++static uint8_t default_features[16];
  
-@@ -1029,6 +1032,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ /* Company IDs supported by this device */
+ static uint32_t company_ids[] = {
+@@ -490,6 +550,22 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	return record;
+ }
  
- 			skb_pull(skb, sizeof(dump_size));
- 			memdump_buf = vmalloc(dump_size);
-+			qca_memdump->ram_dump_size = dump_size;
- 			qca_memdump->memdump_buf_head = memdump_buf;
- 			qca_memdump->memdump_buf_tail = memdump_buf;
- 		}
-@@ -1051,26 +1055,57 @@ static void qca_controller_memdump(struct work_struct *work)
- 		 * the controller. In such cases let us store the dummy
- 		 * packets in the buffer.
- 		 */
-+		/* For QCA6390, controller does not lost packets but
-+		 * sequence number field of packat sometimes has error
-+		 * bits, so skip this checking for missing packet.
-+		 */
- 		while ((seq_no > qca_memdump->current_seq_no + 1) &&
-+			(soc_type != QCA_QCA6390) &&
- 			seq_no != QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
- 				   qca_memdump->current_seq_no);
-+			rx_size = qca_memdump->received_dump;
-+			rx_size += QCA_DUMP_PACKET_SIZE;
-+			if (rx_size > qca_memdump->ram_dump_size) {
-+				bt_dev_err(hu->hdev,
-+						"QCA memdump received %d, no space for missed packet",
-+						qca_memdump->received_dump);
-+				break;
-+			}
- 			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
- 			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
- 			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
- 			qca_memdump->current_seq_no++;
- 		}
- 
--		memcpy(memdump_buf, (unsigned char *) skb->data, skb->len);
--		memdump_buf = memdump_buf + skb->len;
--		qca_memdump->memdump_buf_tail = memdump_buf;
--		qca_memdump->current_seq_no = seq_no + 1;
--		qca_memdump->received_dump += skb->len;
-+		rx_size = qca_memdump->received_dump + skb->len;
-+		if (rx_size <= qca_memdump->ram_dump_size) {
-+			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
-+					(seq_no != qca_memdump->current_seq_no))
-+				bt_dev_err(hu->hdev,
-+						"QCA memdump unexpected packet %d",
-+						seq_no);
-+			bt_dev_dbg(hu->hdev,
-+					"QCA memdump packet %d with length %d",
-+					seq_no, skb->len);
-+			memcpy(memdump_buf, (unsigned char *)skb->data,
-+					skb->len);
-+			memdump_buf = memdump_buf + skb->len;
-+			qca_memdump->memdump_buf_tail = memdump_buf;
-+			qca_memdump->current_seq_no = seq_no + 1;
-+			qca_memdump->received_dump += skb->len;
-+		} else {
-+			bt_dev_err(hu->hdev,
-+					"QCA memdump received %d, no space for packet %d",
-+					qca_memdump->received_dump, seq_no);
++static void populate_default_features(void)
++{
++	int i;
++
++	for (i = 0; passthrough_map[i].feature_bit != 0xff; i++) {
++		if (avctp_supports_avc(passthrough_map[i].avc)) {
++			uint8_t bit = passthrough_map[i].feature_bit;
++
++			default_features[bit >> 3] |= (1 << (bit & 7));
 +		}
- 		qca->qca_memdump = qca_memdump;
- 		kfree_skb(skb);
- 		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
--			bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
--				   qca_memdump->received_dump);
-+			bt_dev_info(hu->hdev,
-+					"QCA memdump Done, received %d, total %d",
-+					qca_memdump->received_dump,
-+					qca_memdump->ram_dump_size);
- 			memdump_buf = qca_memdump->memdump_buf_head;
- 			dev_coredumpv(&hu->serdev->dev, memdump_buf,
- 				      qca_memdump->received_dump, GFP_KERNEL);
++	}
++
++	/* supports at least AVRCP 1.4 */
++	default_features[7] |= (1 << 2);
++}
++
+ static unsigned int attr_get_max_val(uint8_t attr)
+ {
+ 	switch (attr) {
+@@ -1913,7 +1989,8 @@ static void avrcp_handle_media_player_list(struct avrcp *session,
+ 		item->subtype = htonl(0x01); /* Audio Book */
+ 		item->status = player_get_status(player);
+ 		/* Assign Default Feature Bit Mask */
+-		memcpy(&item->features, &features, sizeof(features));
++		memcpy(&item->features, &default_features,
++					sizeof(default_features));
+ 
+ 		item->charset = htons(AVRCP_CHARSET_UTF8);
+ 
+@@ -4578,6 +4655,8 @@ static int avrcp_init(void)
+ 	btd_profile_register(&avrcp_controller_profile);
+ 	btd_profile_register(&avrcp_target_profile);
+ 
++	populate_default_features();
++
+ 	return 0;
+ }
+ 
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.27.0.rc2.251.g90737beb825-goog
 
