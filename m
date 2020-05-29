@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E943C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 02:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCA8C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 03:13:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E3A7204EA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 02:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0753420829
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 03:13:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="LN13hocv"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="clUacrb9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406199AbgE2C3a (ORCPT
+        id S2391668AbgE2DNx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 22:29:30 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:45078 "EHLO m43-7.mailgun.net"
+        Thu, 28 May 2020 23:13:53 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:57468 "EHLO m43-7.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404312AbgE2C33 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 22:29:29 -0400
+        id S2391632AbgE2DNw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 May 2020 23:13:52 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1590719368; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=6ZkZeLjBfTWlGAiLQK4hHlaxQJ7Mx2KTNta8bDJGGoU=; b=LN13hocvMrOzYJXYlyxPF8M61JrNQ567sUYdVz+nxNtq4PU2a25qrUHedwcgWuZgqZByD5Q5
- d6abQYRNfO92g4KRslkH3CY6YqzxUKRdIlGPabgtnNKR6J0b6OkY+0Oxy7/K5fVSUQzjwhsf
- GJtVyhj4IKVBlUfFOFnwHsZ6enw=
+ s=smtp; t=1590722031; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=MWOHZBeeiJpuUSHMnaP/5BbtwVak35PfjA2q3f6UkrY=; b=clUacrb92IMvq1EUCzfYqcuaeOQPLuwlUlM7wUV2gN+BBBvzMp7h7g7D9UreismN8lSyGVHB
+ m0mmqxrxSvC+bUgnCvzCbeEJW6y8Y3gOyBfhyCUhf9EytuGQ+lLTx9HxB+DBtkDUyOwsajY9
+ GkWaxS4Sb6ceU+xYK+5V033hIyw=
 X-Mailgun-Sending-Ip: 69.72.43.7
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
- 5ed073864776d1da6d7d0713 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 29 May 2020 02:29:26
+ smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 5ed07de776fccbb4c8d3a66d (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 29 May 2020 03:13:43
  GMT
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 9E3FAC433CA; Fri, 29 May 2020 02:29:26 +0000 (UTC)
+        id 32135C433C9; Fri, 29 May 2020 03:13:42 +0000 (UTC)
 Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id CA4B3C433C6;
-        Fri, 29 May 2020 02:29:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org CA4B3C433C6
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 0D1E5C433C6;
+        Fri, 29 May 2020 03:13:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 0D1E5C433C6
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=zijuhu@codeaurora.org
 From:   Zijun Hu <zijuhu@codeaurora.org>
@@ -51,80 +51,137 @@ To:     marcel@holtmann.org, johan.hedberg@gmail.com
 Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
         c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: [PATCH v1] Bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot
-Date:   Fri, 29 May 2020 10:29:20 +0800
-Message-Id: <1590719360-28257-1-git-send-email-zijuhu@codeaurora.org>
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tientzu@chromium.org
+Subject: [PATCH v4] bluetooth: hci_qca: Fix QCA6390 memdump failure
+Date:   Fri, 29 May 2020 11:13:35 +0800
+Message-Id: <1590722015-3495-1-git-send-email-zijuhu@codeaurora.org>
 X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Warm reboot can not reset controller qca6390 due to
-lack of controllable power supply, so causes firmware
-download failure during enable.
+QCA6390 memdump VSE sometimes come to bluetooth driver
+with wrong sequence number as illustrated as follows:
+frame # in dec: frame data in hex
+1396: ff fd 01 08 74 05 00 37 8f 14
+1397: ff fd 01 08 75 05 00 ff bf 38
+1414: ff fd 01 08 86 05 00 fb 5e 4b
+1399: ff fd 01 08 77 05 00 f3 44 0a
+1400: ff fd 01 08 78 05 00 ca f7 41
+it is mistook for controller missing packets, so results
+in page fault after overwriting memdump buffer allocated.
 
-Fixed by sending VSC EDL_SOC_RESET to reset qca6390
-within added device shutdown implementation.
+Fixed by ignoring QCA6390 sequence number check and
+checking buffer space before writing.
 
 Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
 Tested-by: Zijun Hu <zijuhu@codeaurora.org>
 ---
- drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Changes in v4:
+- add a piece of code comments
+Changes in v3:
+- correct coding style
+Changes in v2:
+- rename a local variable from @temp to @rx_size
+
+ drivers/bluetooth/hci_qca.c | 49 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index e4a6823..f525656 100644
+index e4a6823..4acac13 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1975,6 +1975,38 @@ static void qca_serdev_remove(struct serdev_device *serdev)
- 	hci_uart_unregister_device(&qcadev->serdev_hu);
- }
- 
-+static void qca_serdev_shutdown(struct device *dev)
-+{
-+	int ret;
-+	int timeout = msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS);
-+	struct serdev_device *serdev = to_serdev_device(dev);
-+	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-+	const u8 ibs_wake_cmd[] = { 0xFD };
-+	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
-+
-+	if (qcadev->btsoc_type == QCA_QCA6390) {
-+		serdev_device_write_flush(serdev);
-+		ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
-+					      sizeof(ibs_wake_cmd));
-+		if (ret < 0) {
-+			BT_ERR("QCA send IBS_WAKE_IND error: %d", ret);
-+			return;
-+		}
-+		serdev_device_wait_until_sent(serdev, timeout);
-+		usleep_range(8000, 10000);
-+
-+		serdev_device_write_flush(serdev);
-+		ret = serdev_device_write_buf(serdev, edl_reset_soc_cmd,
-+					      sizeof(edl_reset_soc_cmd));
-+		if (ret < 0) {
-+			BT_ERR("QCA send EDL_RESET_REQ error: %d", ret);
-+			return;
-+		}
-+		serdev_device_wait_until_sent(serdev, timeout);
-+		usleep_range(8000, 10000);
-+	}
-+}
-+
- static int __maybe_unused qca_suspend(struct device *dev)
- {
- 	struct hci_dev *hdev = container_of(dev, struct hci_dev, dev);
-@@ -2100,6 +2132,7 @@ static struct serdev_device_driver qca_serdev_driver = {
- 		.name = "hci_uart_qca",
- 		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
- 		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
-+		.shutdown = qca_serdev_shutdown,
- 		.pm = &qca_pm_ops,
- 	},
+@@ -114,6 +114,7 @@ struct qca_memdump_data {
+ 	char *memdump_buf_tail;
+ 	u32 current_seq_no;
+ 	u32 received_dump;
++	u32 ram_dump_size;
  };
+ 
+ struct qca_memdump_event_hdr {
+@@ -976,6 +977,8 @@ static void qca_controller_memdump(struct work_struct *work)
+ 	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
+ 	u16 seq_no;
+ 	u32 dump_size;
++	u32 rx_size;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+ 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
+ 
+@@ -1029,6 +1032,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ 
+ 			skb_pull(skb, sizeof(dump_size));
+ 			memdump_buf = vmalloc(dump_size);
++			qca_memdump->ram_dump_size = dump_size;
+ 			qca_memdump->memdump_buf_head = memdump_buf;
+ 			qca_memdump->memdump_buf_tail = memdump_buf;
+ 		}
+@@ -1051,26 +1055,57 @@ static void qca_controller_memdump(struct work_struct *work)
+ 		 * the controller. In such cases let us store the dummy
+ 		 * packets in the buffer.
+ 		 */
++		/* For QCA6390, controller does not lost packets but
++		 * sequence number field of packat sometimes has error
++		 * bits, so skip this checking for missing packet.
++		 */
+ 		while ((seq_no > qca_memdump->current_seq_no + 1) &&
++			(soc_type != QCA_QCA6390) &&
+ 			seq_no != QCA_LAST_SEQUENCE_NUM) {
+ 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
+ 				   qca_memdump->current_seq_no);
++			rx_size = qca_memdump->received_dump;
++			rx_size += QCA_DUMP_PACKET_SIZE;
++			if (rx_size > qca_memdump->ram_dump_size) {
++				bt_dev_err(hu->hdev,
++						"QCA memdump received %d, no space for missed packet",
++						qca_memdump->received_dump);
++				break;
++			}
+ 			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
+ 			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
+ 			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
+ 			qca_memdump->current_seq_no++;
+ 		}
+ 
+-		memcpy(memdump_buf, (unsigned char *) skb->data, skb->len);
+-		memdump_buf = memdump_buf + skb->len;
+-		qca_memdump->memdump_buf_tail = memdump_buf;
+-		qca_memdump->current_seq_no = seq_no + 1;
+-		qca_memdump->received_dump += skb->len;
++		rx_size = qca_memdump->received_dump + skb->len;
++		if (rx_size <= qca_memdump->ram_dump_size) {
++			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
++					(seq_no != qca_memdump->current_seq_no))
++				bt_dev_err(hu->hdev,
++						"QCA memdump unexpected packet %d",
++						seq_no);
++			bt_dev_dbg(hu->hdev,
++					"QCA memdump packet %d with length %d",
++					seq_no, skb->len);
++			memcpy(memdump_buf, (unsigned char *)skb->data,
++					skb->len);
++			memdump_buf = memdump_buf + skb->len;
++			qca_memdump->memdump_buf_tail = memdump_buf;
++			qca_memdump->current_seq_no = seq_no + 1;
++			qca_memdump->received_dump += skb->len;
++		} else {
++			bt_dev_err(hu->hdev,
++					"QCA memdump received %d, no space for packet %d",
++					qca_memdump->received_dump, seq_no);
++		}
+ 		qca->qca_memdump = qca_memdump;
+ 		kfree_skb(skb);
+ 		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
+-			bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
+-				   qca_memdump->received_dump);
++			bt_dev_info(hu->hdev,
++					"QCA memdump Done, received %d, total %d",
++					qca_memdump->received_dump,
++					qca_memdump->ram_dump_size);
+ 			memdump_buf = qca_memdump->memdump_buf_head;
+ 			dev_coredumpv(&hu->serdev->dev, memdump_buf,
+ 				      qca_memdump->received_dump, GFP_KERNEL);
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
