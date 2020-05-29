@@ -1,325 +1,148 @@
-Return-Path: <SRS0=YOMr=7K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81709C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A43FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 02:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B3212078C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 May 2020 23:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48903204EA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 02:27:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gkrsnXSM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NdaMAUAE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437876AbgE1XzT (ORCPT
+        id S2405131AbgE2C1o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 May 2020 19:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45774 "EHLO
+        Thu, 28 May 2020 22:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437867AbgE1XzP (ORCPT
+        with ESMTP id S2404312AbgE2C1n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 May 2020 19:55:15 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BA9C08C5CA
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:55:15 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id k22so243088pls.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2020 16:55:15 -0700 (PDT)
+        Thu, 28 May 2020 22:27:43 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF8BC08C5C6;
+        Thu, 28 May 2020 19:27:43 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id q8so461136pfu.5;
+        Thu, 28 May 2020 19:27:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UG+YRTgczMBHe9wEkROYRMbuDZggiQfqfaeoGep/dG0=;
-        b=gkrsnXSMfTk/73DDMn2DYj1mGVHV9YT6ug28i5AUe2cf1B7J2HmYVoBkeFJZWr8DBw
-         ASmQ/bQ9IdBz/6kY3Faua3kRT/Q5CUJmx8uLfnqEoTHceBdvxdfYbAWaGjD/9f5iwcI0
-         7kofbwvCUGA39oM3fR/Fzzdo5/XvgnMcELw1g=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q7Ds55mrogGXuEM4SJQgAqnILsJS644/RVVdZVRg++g=;
+        b=NdaMAUAEDkjuPmLDmz0DlFfsp4ufVxj0FWetWnq1nPXQTn0gJydk3i7kHOD2PRXom3
+         c29KH/BGst0jdrowBQuRWgbkg+GoAXln+xEXP1NqwS47xG3aHSDk1M5w+vVHQpAliTsw
+         DeiA/FQE5G/vByHeDu3RZNFz342dKsAcSGOI+Y0MFO2j6LDESQrHfi/LIundli+NzACx
+         cONgLmFWbTXn4pbj1NX7NnNFCZuUFS69lclsOMCxJw+eF+FOil6ro4HRH9JAsz7x1Q84
+         iwwSNSABC9+blpWz19mnQXvvlQgGvMEwGmhcMWmDRQGo/EYN6d1mnktit0bwCI1FnaLK
+         L8YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UG+YRTgczMBHe9wEkROYRMbuDZggiQfqfaeoGep/dG0=;
-        b=H1Oftfk2VivqtVNt4Zr0rC7ibmrjyJBzT7zYu54TiOM2dUcnrRDSQMeVqE9YLGZjUf
-         g27UBSerolg5Q7uzYzdVQx5UlYgvR6in3A0egTner1mgrRUfxAV6tyzBNkFtWA+Mb32W
-         wGEEfG5U6Lhf5AjBqtDSC0Z3Xj1oEMXL1qLSpJcDM4g+KnuCI92l+V/u3+SWCxOv5dCU
-         zYyoGCAxwriZN9b+VcCjrnI16CN0+3WkR3aDYxdN/ps2HyiSqm/vBHPDMcpmWcUMk2Pd
-         jYC9huasDcRwcE8+/ODupM4lCwqq4Gc0YXhMJPAbVul/EQW582mtroiVefHo0O++iox2
-         9GFQ==
-X-Gm-Message-State: AOAM53227hj2Bd14JuyuCrZPnS7SURf02X+x4iAiQiZiGjEw33XbPVMt
-        Tcbej8kCJrKCjI3WbsZhPQzjGZUtYTc=
-X-Google-Smtp-Source: ABdhPJy2bdPNcijfUy7CKvS7IOrx6V77QmTYO/Qs7Pd+dCT+oQFYedIKcWW0+uN9+1hs7xuhmqoxkw==
-X-Received: by 2002:a17:902:bc89:: with SMTP id bb9mr6224450plb.101.1590710114403;
-        Thu, 28 May 2020 16:55:14 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id f18sm5022591pga.75.2020.05.28.16.55.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 May 2020 16:55:13 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q7Ds55mrogGXuEM4SJQgAqnILsJS644/RVVdZVRg++g=;
+        b=GziKYztqRs3kieWU/dTo5KtZZuBM8cd3E7jfH3HO3dwJandvBDk6rkg7X9ivRrVe0v
+         kA4KYTfzPpKwWcqwBmSsR2nYDeCv7qBooWERILZnZCYwhETC4sy3wQxD9gcV2t0CP0yR
+         pPSq5Qlh6TvRyjvMFNI7QsechE0rLvJc0TtYgBtZWYGTaXGrKVDgDU4hAfT/gXJeSSJC
+         KuANMgwKEUE00v42vm9YXEM0cVyTb39o1FqEC7uhpBFX7Q6fydMWU41EQiSo1XHqZBgY
+         he2t6P1wFSZHDKCoPwrXPOU5ZIYctA49kZMzgy1hBi9jsBoioaI6V5W5XZRfcqer3CXN
+         CwiA==
+X-Gm-Message-State: AOAM531tTCq6UPHfQszumHB87fNZ0+zVUWO/Z2dute7AiNVIv57M6lfT
+        wqP1H4IxFTV1+rAKJJSK7axO8F9Wz88=
+X-Google-Smtp-Source: ABdhPJzx/ymfutkB2+J7IwEf32NLdzpK09ZlEr9zw9Gmck5sFYIuhFuU6NGYaBcMyXxxLR/h8SccjA==
+X-Received: by 2002:a62:2f45:: with SMTP id v66mr6665066pfv.45.1590719262506;
+        Thu, 28 May 2020 19:27:42 -0700 (PDT)
+Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
+        by smtp.gmail.com with ESMTPSA id u26sm5850316pfn.88.2020.05.28.19.27.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2020 19:27:41 -0700 (PDT)
+From:   Chuhong Yuan <hslester96@gmail.com>
+Cc:     Sean Wang <sean.wang@mediatek.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v1 2/7] Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
-Date:   Thu, 28 May 2020 16:54:50 -0700
-Message-Id: <20200528165324.v1.2.I7f3372c74a6569cd3445b77a67a0b0fcfdd8a333@changeid>
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Markus Elfring <Markus.Elfring@web.de>,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Chuhong Yuan <hslester96@gmail.com>
+Subject: [PATCH v2] Bluetooth: btmtkuart: Improve exception handling in btmtuart_probe()
+Date:   Fri, 29 May 2020 10:27:26 +0800
+Message-Id: <20200529022726.917826-1-hslester96@gmail.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200528165324.v1.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
-References: <20200528165324.v1.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds the request handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
-command. Since the controller-based monitoring is not yet in place, this
-report only the supported features but not the enabled features.
+Calls of the functions clk_disable_unprepare() and hci_free_dev()
+were missing for the exception handling.
+Thus add the missed function calls together with corresponding
+jump targets.
 
-The following test was performed.
-- Issuing btmgmt advmon-features.
-
-Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Fixes: 055825614c6b ("Bluetooth: btmtkuart: add an implementation for clock osc property")
+Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
 ---
+Changes in v2:
+  - Modify description.
+  - Add fixes tag.
 
- include/net/bluetooth/hci_core.h | 24 +++++++++++++++++
- net/bluetooth/hci_core.c         | 10 ++++++-
- net/bluetooth/mgmt.c             | 46 ++++++++++++++++++++++++++++++++
- net/bluetooth/msft.c             |  7 +++++
- net/bluetooth/msft.h             |  9 +++++++
- 5 files changed, 95 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btmtkuart.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index cdd4f1db8670e..431fe0265dcfb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -25,6 +25,7 @@
- #ifndef __HCI_CORE_H
- #define __HCI_CORE_H
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index e11169ad8247..8a81fbca5c9d 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -1015,7 +1015,7 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ 	if (btmtkuart_is_standalone(bdev)) {
+ 		err = clk_prepare_enable(bdev->osc);
+ 		if (err < 0)
+-			return err;
++			goto err_hci_free_dev;
  
-+#include <linux/idr.h>
- #include <linux/leds.h>
- #include <linux/rculist.h>
+ 		if (bdev->boot) {
+ 			gpiod_set_value_cansleep(bdev->boot, 1);
+@@ -1028,10 +1028,8 @@ static int btmtkuart_probe(struct serdev_device *serdev)
  
-@@ -220,6 +221,24 @@ struct adv_info {
- #define HCI_MAX_ADV_INSTANCES		5
- #define HCI_DEFAULT_ADV_DURATION	2
+ 		/* Power on */
+ 		err = regulator_enable(bdev->vcc);
+-		if (err < 0) {
+-			clk_disable_unprepare(bdev->osc);
+-			return err;
+-		}
++		if (err < 0)
++			goto err_clk_disable_unprepare;
  
-+struct adv_pattern {
-+	struct list_head list;
-+	__u8 ad_type;
-+	__u8 offset;
-+	__u8 length;
-+	__u8 value[HCI_MAX_AD_LENGTH];
-+};
-+
-+struct adv_monitor {
-+	struct list_head patterns;
-+	bool		active;
-+	__u16		handle;
-+};
-+
-+#define HCI_MIN_ADV_MONITOR_HANDLE		1
-+#define HCI_MAX_ADV_MONITOR_NUM_HANDLES	32
-+#define HCI_MAX_ADV_MONITOR_NUM_PATTERNS	16
-+
- #define HCI_MAX_SHORT_NAME_LENGTH	10
+ 		/* Reset if the reset-gpios is available otherwise the board
+ 		 * -level design should be guaranteed.
+@@ -1063,7 +1061,6 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		dev_err(&serdev->dev, "Can't register HCI device\n");
+-		hci_free_dev(hdev);
+ 		goto err_regulator_disable;
+ 	}
  
- /* Min encryption key size to match with SMP */
-@@ -477,6 +496,9 @@ struct hci_dev {
- 	__u16			adv_instance_timeout;
- 	struct delayed_work	adv_instance_expire;
+@@ -1072,6 +1069,11 @@ static int btmtkuart_probe(struct serdev_device *serdev)
+ err_regulator_disable:
+ 	if (btmtkuart_is_standalone(bdev))
+ 		regulator_disable(bdev->vcc);
++err_clk_disable_unprepare:
++	if (btmtkuart_is_standalone(bdev))
++		clk_disable_unprepare(bdev->osc);
++err_hci_free_dev:
++	hci_free_dev(hdev);
  
-+	struct idr		adv_monitors_idr;
-+	unsigned int		adv_monitors_cnt;
-+
- 	__u8			irk[16];
- 	__u32			rpa_timeout;
- 	struct delayed_work	rpa_expired;
-@@ -1217,6 +1239,8 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
- void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
- 
-+void hci_adv_monitors_clear(struct hci_dev *hdev);
-+
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- void hci_init_sysfs(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index dbe2d79f233fb..23bfe4f1d1e9d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -26,7 +26,6 @@
- /* Bluetooth HCI core. */
- 
- #include <linux/export.h>
--#include <linux/idr.h>
- #include <linux/rfkill.h>
- #include <linux/debugfs.h>
- #include <linux/crypto.h>
-@@ -2996,6 +2995,12 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 	return 0;
+ 	return err;
  }
- 
-+/* This function requires the caller holds hdev->lock */
-+void hci_adv_monitors_clear(struct hci_dev *hdev)
-+{
-+	idr_destroy(&hdev->adv_monitors_idr);
-+}
-+
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
- 					 bdaddr_t *bdaddr, u8 type)
- {
-@@ -3574,6 +3579,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	queue_work(hdev->req_workqueue, &hdev->power_on);
- 
-+	idr_init(&hdev->adv_monitors_idr);
-+
- 	return id;
- 
- err_wqueue:
-@@ -3644,6 +3651,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_smp_irks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
- 	hci_adv_instances_clear(hdev);
-+	hci_adv_monitors_clear(hdev);
- 	hci_bdaddr_list_clear(&hdev->le_white_list);
- 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
- 	hci_conn_params_clear_all(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9e8a3cccc6ca3..8d8275ee9718b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -36,6 +36,7 @@
- #include "hci_request.h"
- #include "smp.h"
- #include "mgmt_util.h"
-+#include "msft.h"
- 
- #define MGMT_VERSION	1
- #define MGMT_REVISION	17
-@@ -111,6 +112,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_SECURITY_INFO,
- 	MGMT_OP_READ_EXP_FEATURES_INFO,
- 	MGMT_OP_SET_EXP_FEATURE,
-+	MGMT_OP_READ_ADV_MONITOR_FEATURES,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -3849,6 +3851,49 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
- 			       MGMT_STATUS_NOT_SUPPORTED);
- }
- 
-+static int read_adv_monitor_features(struct sock *sk, struct hci_dev *hdev,
-+				     void *data, u16 len)
-+{
-+	struct adv_monitor *monitor = NULL;
-+	struct mgmt_rp_read_adv_monitor_features *rp = NULL;
-+	int handle;
-+	size_t rp_size = 0;
-+	__u32 supported = 0;
-+	__u16 num_handles = 0;
-+	__u16 handles[HCI_MAX_ADV_MONITOR_NUM_HANDLES];
-+
-+	BT_DBG("request for %s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR)
-+		supported |= MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS;
-+
-+	idr_for_each_entry(&hdev->adv_monitors_idr, monitor, handle)
-+		handles[num_handles++] = monitor->handle;
-+
-+	hci_dev_unlock(hdev);
-+
-+	rp_size = sizeof(*rp) + (num_handles * sizeof(u16));
-+	rp = kmalloc(rp_size, GFP_KERNEL);
-+	if (!rp)
-+		return -ENOMEM;
-+
-+	// Once controller-based monitoring is in place, the enabled_features
-+	// should reflect the use.
-+	rp->supported_features = supported;
-+	rp->enabled_features = 0;
-+	rp->max_num_handles = HCI_MAX_ADV_MONITOR_NUM_HANDLES;
-+	rp->max_num_patterns = HCI_MAX_ADV_MONITOR_NUM_PATTERNS;
-+	rp->num_handles = num_handles;
-+	if (num_handles)
-+		memcpy(&rp->handles, &handles, (num_handles * sizeof(u16)));
-+
-+	return mgmt_cmd_complete(sk, hdev->id,
-+				 MGMT_OP_READ_ADV_MONITOR_FEATURES,
-+				 MGMT_STATUS_SUCCESS, rp, rp_size);
-+}
-+
- static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
- 				         u16 opcode, struct sk_buff *skb)
- {
-@@ -7297,6 +7342,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ set_exp_feature,         MGMT_SET_EXP_FEATURE_SIZE,
- 						HCI_MGMT_VAR_LEN |
- 						HCI_MGMT_HDEV_OPTIONAL },
-+	{ read_adv_monitor_features, MGMT_READ_ADV_MONITOR_FEATURES_SIZE },
- };
- 
- void mgmt_index_added(struct hci_dev *hdev)
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d6c4e6b5ae777..8579bfeb28364 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -139,3 +139,10 @@ void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	bt_dev_dbg(hdev, "MSFT vendor event %u", event);
- }
-+
-+__u64 msft_get_features(struct hci_dev *hdev)
-+{
-+	struct msft_data *msft = hdev->msft_data;
-+
-+	return  msft ? msft->features : 0;
-+}
-diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
-index 5aa9130e1f8ab..e9c478e890b8b 100644
---- a/net/bluetooth/msft.h
-+++ b/net/bluetooth/msft.h
-@@ -3,16 +3,25 @@
-  * Copyright (C) 2020 Google Corporation
-  */
- 
-+#define MSFT_FEATURE_MASK_BREDR_RSSI_MONITOR		BIT(0)
-+#define MSFT_FEATURE_MASK_LE_CONN_RSSI_MONITOR		BIT(1)
-+#define MSFT_FEATURE_MASK_LE_ADV_RSSI_MONITOR		BIT(2)
-+#define MSFT_FEATURE_MASK_LE_ADV_MONITOR		BIT(3)
-+#define MSFT_FEATURE_MASK_CURVE_VALIDITY		BIT(4)
-+#define MSFT_FEATURE_MASK_CONCURRENT_ADV_MONITOR	BIT(5)
-+
- #if IS_ENABLED(CONFIG_BT_MSFTEXT)
- 
- void msft_do_open(struct hci_dev *hdev);
- void msft_do_close(struct hci_dev *hdev);
- void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb);
-+__u64 msft_get_features(struct hci_dev *hdev);
- 
- #else
- 
- static inline void msft_do_open(struct hci_dev *hdev) {}
- static inline void msft_do_close(struct hci_dev *hdev) {}
- static inline void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb) {}
-+static inline __u64 msft_get_features(struct hci_dev *hdev) { return 0; }
- 
- #endif
 -- 
 2.26.2
 
