@@ -2,89 +2,116 @@ Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B27D8C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 16:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453F3C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 16:10:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83FF9207BC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 16:00:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20DDA20814
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 16:10:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="P4jV66QA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OiG2Z6Br"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727988AbgE2P7z (ORCPT
+        id S1726886AbgE2QKF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 May 2020 11:59:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54734 "EHLO
+        Fri, 29 May 2020 12:10:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727062AbgE2P7y (ORCPT
+        with ESMTP id S1725601AbgE2QKF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 May 2020 11:59:54 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23CE8C03E969
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:59:54 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id s88so919914pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:59:54 -0700 (PDT)
+        Fri, 29 May 2020 12:10:05 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 043E2C03E969
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 09:10:05 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id b27so2677097qka.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 09:10:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kurCmkIiK6G16S1AS8MjE3nGZ5QMFbDaJnDr19QRtow=;
-        b=P4jV66QAnPYba6PsFDUDr1f6sy7Ye12Q/5dWhR5ZwIKceETcyEqNKs1s6UYIKj140U
-         DKCSzND8cGlwh197eDms/epq3q4w1x6YqaqhjBLumAbsr1EMuO42IE/3ZgKLrHD0azZb
-         WLuikp4YBl2qTTbDlCepkKiRA02G8QEjZLHiY=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=imlQ1gWwT9mHLSPx8I61RS3WBxXLDFEtZNkeOxifRXQ=;
+        b=OiG2Z6BrfdxMX0kEig4YjA9ynPD4EJ9VZ4d1HtoD4kNME7TghpmLUSi2zeW/avvijQ
+         iBQYIAwy15vVQq37zEJU73bmfpxh+Mprg5b4jFqmwPSfyUnloHSbkWybSzGRPhshNxN1
+         iq8V8fYf8RCkm/cF8z+6GCeASdW+dqRccaWdDJ2GHwXwmOzn6PBJH1ZQy5WbeLSALtQt
+         QzSkT0J4Z1BjgkLF9+9Flw0KW+DmSexs1NdeX1NEfnOqKlPWpLpCMP7wx773Hvfo2mn3
+         htCCQlwx1CAFvQVzAOmLmUPjNNWlbmsTx56logdLKfi0KU9Q3v8KIpQ6qjqbeLc/wuRB
+         YO/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kurCmkIiK6G16S1AS8MjE3nGZ5QMFbDaJnDr19QRtow=;
-        b=qxSeAzwVgvnVpWV3XRBpe86hbrq9tqWh/XbqLFMLZot9nT15niCD+DfNNvuI/4OjGR
-         JVWclC6tHd64LrvOH/ntCJnUF+MKLaAj26lCPuGecoRpgCGa64o1FFjcQxOwZlKsDpb6
-         jQVV/sWgF8XVLlDLV56Emva7FaT41KQ4hR52RpIJGLd0zTx3STH/gvJPHLIwd8gF2T93
-         nToG3iIFaAidswL2hrGKM7IOsbNqkroXFpCHaJUwPIdWbAG4+S8z5YadwBalnXbgVfhQ
-         2LXKXjxhRDYW7G4XnGhaeruxSizghWqh/N3T5BPktAzu4dd7H4fCet6b0CV2Be52qRvX
-         mJ2A==
-X-Gm-Message-State: AOAM532AXzpqRuNmfUqpq8giek+e050A02IgJg5AXs1m8J1eziahBepX
-        DOFM1od50mRoMGTd7FXzvkrNvg==
-X-Google-Smtp-Source: ABdhPJwtQNV2OvNaIRbkCIkqCwxriayrw68HJNbfr/VBL6ehccOxrthYFVFhrqhSbdeBanDCFD9b0A==
-X-Received: by 2002:a17:90a:1a17:: with SMTP id 23mr10401588pjk.198.1590767993701;
-        Fri, 29 May 2020 08:59:53 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id gt10sm8447666pjb.30.2020.05.29.08.59.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 08:59:53 -0700 (PDT)
-Date:   Fri, 29 May 2020 08:59:52 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org
-Subject: Re: [PATCH v4] Bluetooth: hci_qca: Improve controller ID info log
- level
-Message-ID: <20200529155952.GN4525@google.com>
-References: <1590763573-8302-1-git-send-email-zijuhu@codeaurora.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=imlQ1gWwT9mHLSPx8I61RS3WBxXLDFEtZNkeOxifRXQ=;
+        b=VQOT9D9pqeZNYdTWGqXo6p5+d5rCZSyvJ4t/YSy2jy6Adm0IfT1VjVfnFx8cFIsIUa
+         S1uGNJEMCW6eREJw24jEzjtxH3YSF7DU087e+yVBGE6aZH0muc27kMW2BVG0WmU+Ke14
+         jm+sGg2D7KMnSu7wAh4BDIGDOVS0sBunzQAPHzt3eKAhEC+J1XLeIv5AhLpBQtg1lEYh
+         LJB8D/PbIwfAErFbSH2qnKKarARzMi4uyZCMGX+q3DMyZZUhKG2isWib8Uf+hzCYF9zo
+         bKPwRmpWAJXWggOG69rDz80XITv8k2F5OD/7B9UG4nx4TjnWIku7XeG/vpl6Z8tJngm2
+         J9og==
+X-Gm-Message-State: AOAM532ICAAvW3IX8krQhD7nsf6KXy/WAqYyVJ2eLZNkSbw052E4Zxql
+        heFh50zIxM4WtJiYi/oqI/NyqRYGdVw=
+X-Google-Smtp-Source: ABdhPJx+AvyyPaCxtM78swTIE3qaeqRQGCEfNwDT5x7b+5i4Pi25VNMcQlQU0wXqeaSVvut3ObrRCg==
+X-Received: by 2002:a37:a9cd:: with SMTP id s196mr8448993qke.315.1590768604108;
+        Fri, 29 May 2020 09:10:04 -0700 (PDT)
+Received: from [172.17.0.2] ([104.46.108.37])
+        by smtp.gmail.com with ESMTPSA id g13sm7069092qki.95.2020.05.29.09.10.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2020 09:10:03 -0700 (PDT)
+Message-ID: <5ed133db.1c69fb81.c4fd7.95d8@mx.google.com>
+Date:   Fri, 29 May 2020 09:10:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2193247698100572256=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1590763573-8302-1-git-send-email-zijuhu@codeaurora.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, alainm@chromium.org
+Subject: RE: [BlueZ,v3,2/4] adapter:set default system configuration if available
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200529153814.213125-3-alainm@chromium.org>
+References: <20200529153814.213125-3-alainm@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 29, 2020 at 10:46:13PM +0800, Zijun Hu wrote:
-> Controller ID info got by VSC EDL_PATCH_GETVER is very
-> important, so improve its log level from DEBUG to INFO.
-> 
-> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+--===============2193247698100572256==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-As requested earlier, please add the tags from previous
-versions (in this case my 'Reviewed-by' tag from v2/v3),
-unless the new patch has substantial changes.
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkpatch Failed
+
+Outputs:
+ERROR:INITIALISED_STATIC: do not initialise statics to false
+#17: FILE: src/adapter.c:123:
++static bool kernel_set_system_params = false;
+
+- total: 1 errors, 0 warnings, 320 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+--===============2193247698100572256==--
