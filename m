@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCF6C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867B1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:51:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF1020776
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E9352077D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 14:51:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GqLAFAnP"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="INo4sHuJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgE2Oux (ORCPT
+        id S1726928AbgE2OvN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 May 2020 10:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43776 "EHLO
+        Fri, 29 May 2020 10:51:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726838AbgE2Ouw (ORCPT
+        with ESMTP id S1726476AbgE2OvM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 May 2020 10:50:52 -0400
-Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C19C03E969
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:50:51 -0700 (PDT)
-Received: by mail-ua1-x942.google.com with SMTP id k3so877033ual.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:50:51 -0700 (PDT)
+        Fri, 29 May 2020 10:51:12 -0400
+Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D21C03E969
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:51:12 -0700 (PDT)
+Received: by mail-ua1-x943.google.com with SMTP id c9so380357uao.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 07:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sFOBeMzcdDrnp5sCK1izhx9oF5C9Rvc1zxW/M94RojY=;
-        b=GqLAFAnPZCAur7o3YyajH0fJVMoFHbeOqHxJAy+QAjtrLdGSYapzZj+VUxOySqYlxC
-         qBZjCsBMVWYrn8X/Zx2JHtstHbgVHfH1LcpHL2CeXKgnZZ0K+GmcOuM4qIJ7y9VQtvF6
-         SJowNyrq7L4EO35W57QkjOLis6TsUdYHQCZP0=
+        bh=gmh9wPY+2NGf750V4YCacl8a1W5CC5z1zki2IBD9w0g=;
+        b=INo4sHuJD8ajnY/DmmrQ4uCU2b6jdndjR6jO8DRuN88MvwJd1SGcrx3HGKl7WKyX2k
+         B40aJ/wpX3jLLOqb05ZyhZ0d1iI6I8pDYGrNe4nF9p1dPwtJjl0KdsKE14SSdmdj+Co5
+         mco60mkAqg25VIsDxYnxhBjeMJlai8hB456ko=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sFOBeMzcdDrnp5sCK1izhx9oF5C9Rvc1zxW/M94RojY=;
-        b=UrbfybQ+lh3BwdUFoFWPpiLRqcrwQzMDWKs+9H6p+hjUYvjqt9wVFsDaMlF9XhCpfS
-         YVnjwJItgTrRwT9KwrmGSf/fmQNEafmUZramM3c2QjHfCYRxxW2eYOv6PsTzNtE884HQ
-         0pBAr0adhjAEk9PWhAXt/YykeAfGISjlHg307Dj0CDwMbCfodseK7C4dlVTKLPRID9TH
-         a/lzW2nT7B1kmpJ3zGUFJLMB6r7JJUXcoLxWFWBof4zcR9A9uZNY7IJ76ElVUNFCZx40
-         xJUueW7V4mbU1gzpR5gdaEPOEZ8re3GOKVBmQSKnS2hDVssiG4KZoyOcPP9iSDQ6X/oH
-         0HCg==
-X-Gm-Message-State: AOAM532IpYry7jdVvtP80kv0Avq7zuaoEfCHtYbkk8PSLSC6dcojp5oy
-        G2ZxKM7Oaw+5ccLbWK7gH/OrhIezqlc=
-X-Google-Smtp-Source: ABdhPJy4YYZS8hJnyxn4ig2SaJAVrAkW2f6XFQ4bXDozNPyQpnv4oCTZziBHjZhM+j0u2SMTrmg63g==
-X-Received: by 2002:a9f:236e:: with SMTP id 101mr1705217uae.103.1590763850040;
-        Fri, 29 May 2020 07:50:50 -0700 (PDT)
+        bh=gmh9wPY+2NGf750V4YCacl8a1W5CC5z1zki2IBD9w0g=;
+        b=eB+MM1o2pGilJJLPSQHV/OnShzXfKuE4DgtiS6FyIve2gLMITw1wdVsA+C85xrrOf4
+         8Xsy4eTM+hQPe/AD9uvV5I8TSC76AaJ9P1NRt0P1TbKCAjCqScXE9+AouXMnAoge07lH
+         ginFRmy+AXbSfUIxmU2bv6rr4wrd+oSdWWhIHGVnCz018fwbWwM6tOCHMOzOq2LhV9C+
+         dHH/GqjXtXoy0tZNI06m0WEw9RwmsOZztp3w3OGlhnl9ncuQTBbpllh834VGsGG+34HF
+         D4kZADnV6xqtUhGk/tQsQ/q0a7DxDyacv9JrVGTzk0XTk8VVI0nHOmOlcM8q1YwxO0Vb
+         9LWQ==
+X-Gm-Message-State: AOAM530O5QiHkyZlggd1omfmtjQizhlBwG03A5d0fu6OkdYhXGKMkCMq
+        QLe3Mhf/EzAVPsxFxHnYdp7Oe3hrUuQ=
+X-Google-Smtp-Source: ABdhPJwI5+ISfFWpYE700zB5iOXtXQmtly+Fy2Hs4zqAzMWzuWwhSVR+lU/KBfTbCL6131imbStXvw==
+X-Received: by 2002:a9f:3005:: with SMTP id h5mr6336352uab.65.1590763870367;
+        Fri, 29 May 2020 07:51:10 -0700 (PDT)
 Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id c65sm1196998vkh.32.2020.05.29.07.50.49
+        by smtp.gmail.com with ESMTPSA id c65sm1196998vkh.32.2020.05.29.07.51.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 07:50:49 -0700 (PDT)
+        Fri, 29 May 2020 07:51:09 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [BlueZ PATCH 2/3] adapter:set default system configuration if available
-Date:   Fri, 29 May 2020 14:50:08 +0000
-Message-Id: <20200529145007.198906-3-alainm@chromium.org>
+Subject: [BlueZ PATCH 3/3] main:read default system configuration from the conf file.
+Date:   Fri, 29 May 2020 14:50:10 +0000
+Message-Id: <20200529145007.198906-4-alainm@chromium.org>
 X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
 In-Reply-To: <20200529145007.198906-1-alainm@chromium.org>
 References: <20200529145007.198906-1-alainm@chromium.org>
@@ -72,348 +72,299 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change loads any specified system configuration if provided and
-supported by the kernel.
+This change adds support for reading the configurations from the
+main.conf file.
 
 ---
 
- src/adapter.c | 251 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/hcid.h    |  39 ++++++++
- 2 files changed, 290 insertions(+)
+ src/main.c    | 162 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/main.conf |  65 ++++++++++++++++++++
+ 2 files changed, 227 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 972d88772..a5eba8ef7 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -120,6 +120,8 @@ static bool kernel_conn_control = false;
+diff --git a/src/main.c b/src/main.c
+index 98621fddf..ca27f313d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -54,6 +54,7 @@
+ #include "shared/att-types.h"
+ #include "shared/mainloop.h"
+ #include "lib/uuid.h"
++#include "shared/util.h"
+ #include "hcid.h"
+ #include "sdpd.h"
+ #include "adapter.h"
+@@ -97,6 +98,37 @@ static const char *supported_options[] = {
+ 	NULL
+ };
  
- static bool kernel_blocked_keys_supported = false;
- 
-+static bool kernel_set_system_params = false;
++static const char * const controller_options[] = {
++	"BRPageScanType",
++	"BRPageScanInterval",
++	"BRPageScanWindow",
++	"BRInquiryScanType",
++	"BRInquiryScanInterval",
++	"BRInquiryScanWindow",
++	"BRLinkSupervisionTimeout",
++	"BRPageTimeout",
++	"BRMinSniffInterval",
++	"BRMaxSniffInterval",
++	"LEMinAdvertisementInterval",
++	"LEMaxAdvertisementInterval",
++	"LEMultiAdvertisementRotationInterval",
++	"LEScanIntervalAutoConnect",
++	"LEScanWindowAutoConnect",
++	"LEScanIntervalSuspend",
++	"LEScanWindowSuspend",
++	"LEScanIntervalDiscovery",
++	"LEScanWindowDiscovery",
++	"LEScanIntervalAdvMonitoring",
++	"LEScanWindowAdvMonitoring",
++	"LEScanIntervalConnect",
++	"LEScanWindowConnect",
++	"LEMinConnectionInterval",
++	"LEMaxConnectionInterval",
++	"LEConnectionLatency",
++	"LEConnectionSupervisionTimeout",
++	NULL
++};
 +
- static GList *adapter_list = NULL;
- static unsigned int adapter_remaining = 0;
- static bool powering_down = false;
-@@ -4157,6 +4159,250 @@ static void probe_devices(void *user_data)
- 	device_probe_profiles(device, btd_device_get_uuids(device));
+ static const char *policy_options[] = {
+ 	"ReconnectUUIDs",
+ 	"ReconnectAttempts",
+@@ -118,6 +150,7 @@ static const struct group_table {
+ 	const char **options;
+ } valid_groups[] = {
+ 	{ "General",	supported_options },
++	{ "Controller", controller_options },
+ 	{ "Policy",	policy_options },
+ 	{ "GATT",	gatt_options },
+ 	{ }
+@@ -283,6 +316,129 @@ static int get_mode(const char *str)
+ 	return BT_MODE_DUAL;
  }
  
-+static void load_default_system_params(struct btd_adapter *adapter)
++static void parse_controller_config(GKeyFile *config)
 +{
-+	/* note: for now all params are 2 bytes, if varying size params are
-+	 * added, calculating the right size of buffer will be necessary first.
-+	 */
-+	struct controller_params_tlv {
-+		uint16_t parameter_type;
-+		uint8_t length;
-+		uint16_t value;
-+	} __packed;
++	static const struct {
++		const char * const val_name;
++		uint16_t * const val;
++		const uint16_t min;
++		const uint16_t max;
++	} params[] = {
++		{ "BRPageScanType",
++		  &main_opts.default_params.br_page_scan_type,
++		  0,
++		  1},
++		{ "BRPageScanInterval",
++		  &main_opts.default_params.br_page_scan_interval,
++		  0x0012,
++		  0x1000},
++		{ "BRPageScanWindow",
++		  &main_opts.default_params.br_page_scan_window,
++		  0x0011,
++		  0x1000},
++		{ "BRInquiryScanType",
++		  &main_opts.default_params.br_inquiry_scan_type,
++		  0,
++		  1},
++		{ "BRInquiryScanInterval",
++		  &main_opts.default_params.br_inquiry_scan_interval,
++		  0x0012,
++		  0x1000},
++		{ "BRInquiryScanWindow",
++		  &main_opts.default_params.br_inquiry_scan_window,
++		  0x0011,
++		  0x1000},
++		{ "BRLinkSupervisionTimeout",
++		  &main_opts.default_params.br_link_supervision_timeout,
++		  0x0001,
++		  0xFFFF},
++		{ "BRPageTimeout",
++		  &main_opts.default_params.br_page_timeout,
++		  0x0001,
++		  0xFFFF},
++		{ "BRMinSniffInterval",
++		  &main_opts.default_params.br_min_sniff_interval,
++		  0x0001,
++		  0xFFFE},
++		{ "BRMaxSniffInterval",
++		  &main_opts.default_params.br_max_sniff_interval,
++		  0x0001,
++		  0xFFFE},
++		{ "LEMinAdvertisementInterval",
++		  &main_opts.default_params.le_min_adv_interval,
++		  0x0020,
++		  0x4000},
++		{ "LEMaxAdvertisementInterval",
++		  &main_opts.default_params.le_max_adv_interval,
++		  0x0020,
++		  0x4000},
++		{ "LEMultiAdvertisementRotationInterval",
++		  &main_opts.default_params.le_multi_adv_rotation_interval,
++		  0x0001,
++		  0xFFFF},
++		{ "LEScanIntervalAutoConnect",
++		  &main_opts.default_params.le_scan_interval_autoconnect,
++		  0x0004,
++		  0x4000},
++		{ "LEScanWindowAutoConnect",
++		  &main_opts.default_params.le_scan_window_autoconnect,
++		  0x0004,
++		  0x4000},
++		{ "LEScanIntervalSuspend",
++		  &main_opts.default_params.le_scan_interval_suspend,
++		  0x0004,
++		  0x4000},
++		{ "LEScanWindowSuspend",
++		  &main_opts.default_params.le_scan_window_suspend,
++		  0x0004,
++		  0x4000},
++		{ "LEScanIntervalDiscovery",
++		  &main_opts.default_params.le_scan_interval_discovery,
++		  0x0004,
++		  0x4000},
++		{ "LEScanWindowDiscovery",
++		  &main_opts.default_params.le_scan_window_discovery,
++		  0x0004,
++		  0x4000},
++		{ "LEScanIntervalAdvMonitor",
++		  &main_opts.default_params.le_scan_interval_adv_monitor,
++		  0x0004,
++		  0x4000},
++		{ "LEScanWindowAdvMonitor",
++		  &main_opts.default_params.le_scan_window_adv_monitor,
++		  0x0004,
++		  0x4000},
++		{ "LEScanIntervalConnect",
++		  &main_opts.default_params.le_scan_interval_connect,
++		  0x0004,
++		  0x4000},
++		{ "LEScanWindowConnect",
++		  &main_opts.default_params.le_scan_window_connect,
++		  0x0004,
++		  0x4000},
++	};
++	uint16_t i;
 +
-+	struct controller_params_tlv *params = NULL;
-+	uint16_t i = 0;
-+	size_t cp_size;
-+
-+	if (!main_opts.default_params.num_set_params ||
-+		!kernel_set_system_params)
++	if (!config)
 +		return;
 +
-+	cp_size = sizeof(struct controller_params_tlv) *
-+				main_opts.default_params.num_set_params;
-+	params = g_try_malloc0(cp_size);
-+	if (!params)
-+		return;
++	for (i = 0; i < ARRAY_SIZE(params); ++i) {
++		GError *err = NULL;
++		int val = g_key_file_get_integer(config, "Controller",
++						params[i].val_name, &err);
++		if (err) {
++			g_clear_error(&err);
++		} else {
++			DBG("%s=%d", params[i].val_name, val);
 +
-+	if (main_opts.default_params.br_page_scan_type != 0xFFFF) {
-+		params[i].parameter_type = 0x0000;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_scan_type;
-+		++i;
++			val = MIN(val, params[i].min);
++			val = MAX(val, params[i].max);
++			*params[i].val = val;
++			++main_opts.default_params.num_set_params;
++		}
 +	}
-+
-+	if (main_opts.default_params.br_page_scan_interval) {
-+		params[i].parameter_type = 0x0001;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_page_scan_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_page_scan_window) {
-+		params[i].parameter_type = 0x0002;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_scan_window;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_type != 0xFFFF) {
-+		params[i].parameter_type = 0x0003;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_inquiry_scan_type;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_interval) {
-+		params[i].parameter_type = 0x0004;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.br_inquiry_scan_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_inquiry_scan_window) {
-+		params[i].parameter_type = 0x0005;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_inquiry_scan_window;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_link_supervision_timeout) {
-+		params[i].parameter_type = 0x0006;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.br_link_supervision_timeout;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_page_timeout) {
-+		params[i].parameter_type = 0x0007;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.br_page_timeout;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_min_sniff_interval) {
-+		params[i].parameter_type = 0x0008;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_min_sniff_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.br_max_sniff_interval) {
-+		params[i].parameter_type = 0x0009;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.br_max_sniff_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_min_adv_interval) {
-+		params[i].parameter_type = 0x000a;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_min_adv_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_max_adv_interval) {
-+		params[i].parameter_type = 0x000b;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_max_adv_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_multi_adv_rotation_interval) {
-+		params[i].parameter_type = 0x000c;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_multi_adv_rotation_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_autoconnect) {
-+		params[i].parameter_type = 0x000d;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_autoconnect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_autoconnect) {
-+		params[i].parameter_type = 0x000e;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_autoconnect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_suspend) {
-+		params[i].parameter_type = 0x000f;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_suspend;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_suspend) {
-+		params[i].parameter_type = 0x0010;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_suspend;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_discovery) {
-+		params[i].parameter_type = 0x0011;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_discovery;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_discovery) {
-+		params[i].parameter_type = 0x0012;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_discovery;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_adv_monitor) {
-+		params[i].parameter_type = 0x0013;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_adv_monitor;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_adv_monitor) {
-+		params[i].parameter_type = 0x0014;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_window_adv_monitor;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_interval_connect) {
-+		params[i].parameter_type = 0x0015;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_scan_interval_connect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_scan_window_connect) {
-+		params[i].parameter_type = 0x0016;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+				main_opts.default_params.le_scan_window_connect;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_min_connection_interval) {
-+		params[i].parameter_type = 0x0017;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_min_connection_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_max_connection_interval) {
-+		params[i].parameter_type = 0x0018;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_max_connection_interval;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_connection_latency) {
-+		params[i].parameter_type = 0x0019;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value =
-+			main_opts.default_params.le_connection_latency;
-+		++i;
-+	}
-+
-+	if (main_opts.default_params.le_connection_lsto) {
-+		params[i].parameter_type = 0x001a;
-+		params[i].length = sizeof(params[i].value);
-+		params[i].value = main_opts.default_params.le_connection_lsto;
-+		++i;
-+	}
-+
-+	mgmt_send(adapter->mgmt,MGMT_OP_SET_DEFAULT_SYSTEM_PARAMETERS,
-+			adapter->dev_id, cp_size, params, NULL, NULL, NULL);
-+
-+	btd_error(adapter->dev_id,
-+				"Failed to set default system params for hci%u",
-+				adapter->dev_id);
-+
-+	g_free(params);
 +}
 +
- static void load_devices(struct btd_adapter *adapter)
+ static void parse_config(GKeyFile *config)
  {
- 	char dirname[PATH_MAX];
-@@ -8265,6 +8511,7 @@ load:
- 	load_drivers(adapter);
- 	btd_profile_foreach(probe_profile, adapter);
- 	clear_blocked(adapter);
-+	load_default_system_params(adapter);
- 	load_devices(adapter);
+ 	GError *err = NULL;
+@@ -484,6 +640,8 @@ static void parse_config(GKeyFile *config)
+ 		val = MAX(val, 1);
+ 		main_opts.gatt_channels = val;
+ 	}
++
++	parse_controller_config(config);
+ }
  
- 	/* restore Service Changed CCC value for bonded devices */
-@@ -9158,6 +9405,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
- 			DBG("kernel supports the set_blocked_keys op");
- 			kernel_blocked_keys_supported = true;
- 			break;
-+		case MGMT_OP_SET_DEFAULT_SYSTEM_PARAMETERS:
-+			DBG("kernel supports set system params");
-+			kernel_set_system_params = true;
-+			break;
- 		default:
- 			break;
- 		}
-diff --git a/src/hcid.h b/src/hcid.h
-index 1bf93784d..e6d966c58 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -49,6 +49,45 @@ struct main_opts {
- 	uint32_t	discovto;
- 	uint8_t		privacy;
+ static void init_defaults(void)
+@@ -500,6 +658,10 @@ static void init_defaults(void)
+ 	main_opts.name_resolv = TRUE;
+ 	main_opts.debug_keys = FALSE;
  
-+	struct {
-+		uint16_t	num_set_params;
++	main_opts.default_params.num_set_params = 0;
++	main_opts.default_params.br_page_scan_type = 0xFFFF;
++	main_opts.default_params.br_inquiry_scan_type = 0xFFFF;
 +
-+		uint16_t	br_page_scan_type;
-+		uint16_t	br_page_scan_interval;
-+		uint16_t	br_page_scan_window;
+ 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
+ 		return;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index 16701ebe4..92d937f0c 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -77,6 +77,71 @@
+ # Defaults to "never"
+ #JustWorksRepairing = never
+ 
++[Controller]
++# The following values are used to load default adapter parameters.  BlueZ loads
++# the values into the kernel before the adapter is powered if the kernel
++# supports the MGMT_LOAD_DEFAULT_PARAMETERS command. If a value isn't provided,
++# the kernel will be initialized to it's default value.  The actual value will
++# vary based on the kernel version and thus aren't provided here.
++# The Bluetooth Core Specification should be consulted for the meaning and valid
++# domain of each of these values.
 +
-+		uint16_t	br_inquiry_scan_type;
-+		uint16_t	br_inquiry_scan_interval;
-+		uint16_t	br_inquiry_scan_window;
++# BR/EDR Page scan activity configuration
++#BRPageScanType=
++#BRPageScanInterval=
++#BRPageScanWindow=
 +
-+		uint16_t	br_link_supervision_timeout;
-+		uint16_t	br_page_timeout;
++# BR/EDR Inquiry scan activity configuration
++#BRInquiryScanType=
++#BRInquiryScanInterval=
++#BRInquiryScanWindow=
 +
-+		uint16_t	br_min_sniff_interval;
-+		uint16_t	br_max_sniff_interval;
++# BR/EDR Link supervision timeout
++#BRLinkSupervisionTimeout=
 +
-+		uint16_t	le_min_adv_interval;
-+		uint16_t	le_max_adv_interval;
-+		uint16_t	le_multi_adv_rotation_interval;
++# BR/EDR Page Timeout
++#BRPageTimeout=
 +
-+		uint16_t	le_scan_interval_autoconnect;
-+		uint16_t	le_scan_window_autoconnect;
-+		uint16_t	le_scan_interval_suspend;
-+		uint16_t	le_scan_window_suspend;
-+		uint16_t	le_scan_interval_discovery;
-+		uint16_t	le_scan_window_discovery;
-+		uint16_t	le_scan_interval_adv_monitor;
-+		uint16_t	le_scan_window_adv_monitor;
-+		uint16_t	le_scan_interval_connect;
-+		uint16_t	le_scan_window_connect;
++# BR/EDR Sniff Intervals
++#BRMinSniffInterval=
++#BRMaxSniffInterval=
 +
-+		uint16_t	le_min_connection_interval;
-+		uint16_t	le_max_connection_interval;
-+		uint16_t	le_connection_latency;
-+		uint16_t	le_connection_lsto;
-+	} default_params;
++# LE advertisement interval (used for legacy advertisement interface only)
++#LEMinAdvertisementInterval=
++#LEMaxAdvertisementInterval=
++#LEMultiAdvertisementRotationInterval=
 +
++# LE scanning parameters used for passive scanning supporting auto connect
++# scenarios
++#LEScanIntervalAutoConnect=
++#LEScanWindowAutoConnect=
 +
- 	gboolean	reverse_discovery;
- 	gboolean	name_resolv;
- 	gboolean	debug_keys;
++# LE scanning parameters used for passive scanning supporting wake from suspend
++# scenarios
++#LEScanIntervalSuspend=
++#LEScanWindowSuspend=
++
++# LE scanning parameters used for active scanning supporting discovery
++# proceedure
++#LEScanIntervalDiscovery=
++#LEScanWindowDiscovery=
++
++# LE scanning parameters used for passive scanning supporting the advertisement
++# monitor Apis
++#LEScanIntervalAdvMonitor=
++#LEScanWindowAdvMonitor=
++
++# LE scanning parameters used for connection establishment.
++#LEScanIntervalConnect=
++#LEScanWindowConnect=
++
++# LE default connection parameters.  These values are superceeded by any
++# specific values provided via the Load Connection Parameters interface
++#LEMinConnectionInterval=
++#LEMaxConnectionInterval=
++#LEConnectionLatency=
++#LEConnectionSupervisionTimeout=
++
+ [GATT]
+ # GATT attribute cache.
+ # Possible values:
 -- 
 2.27.0.rc0.183.gde8f92d652-goog
 
