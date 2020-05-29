@@ -2,102 +2,100 @@ Return-Path: <SRS0=kIsL=7L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6A4C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39943C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:38:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D84720776
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 123D02077D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 May 2020 15:38:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqrUjFnY"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OWr9gi0g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgE2Pgy (ORCPT
+        id S1726901AbgE2PiU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 May 2020 11:36:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51076 "EHLO
+        Fri, 29 May 2020 11:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726838AbgE2Pgx (ORCPT
+        with ESMTP id S1726898AbgE2PiU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 May 2020 11:36:53 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6C2C03E969
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:36:53 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id n11so2546435qkn.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:36:53 -0700 (PDT)
+        Fri, 29 May 2020 11:38:20 -0400
+Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 283E2C03E969
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:38:19 -0700 (PDT)
+Received: by mail-vs1-xe42.google.com with SMTP id k3so1753564vsg.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2020 08:38:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Gx6HvrWoE7pRKmE5JTF038IgoECxUdX8+w1cOIC7VS8=;
-        b=LqrUjFnYl3XLqLSrfDKDpEP9TXq6eOAHheuk39h4BelccULY5eidV+GDajE5Te0ffy
-         EmINuO0g/Two7spYIesELsN6VNPuCkiuIOfsaliXZTpE9dcknKFuCrjw33VhDganLVQj
-         PRdiNC6KiVO6+OKVi2JXt9omH47SjQnmzrk1L2Gadj2CLijFoQ9RRDCEWBH/sHTF6v+k
-         VMsJGbtmx5704lGl7EGwNcuZpRjoG19VY1oTz1OXweg3lrEyhmrhT17xUwfjTH9I6gqR
-         cEbuINx1g2kjdYbE+Ba0Ejt7jbKzS/oaik5ylxHzLnkPVD0aVL9x1/4153ri6aIdCE5C
-         GKPA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DIVyaPrMnLKXr8E5UBrkKsc/WrG5o+j+XVU0uMFBAPo=;
+        b=OWr9gi0gCSJctQxQQQKdk/z2s7NyM0M91LYu3sdso/DAwP6MWpwqlQUmxnJoq5s7Mx
+         PJ9qMnItTbqbTSV76UrYfJlYR/GWO6Jk1JNlGFbonBt81dzafkUnwPhmZjPsCAmnPgu7
+         vvGBgzVrziQwExWbthUclXDYHuhju7u+QJEB0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Gx6HvrWoE7pRKmE5JTF038IgoECxUdX8+w1cOIC7VS8=;
-        b=CNg8OX9ae8g324JDwzZCnx6R+ymQdUPCMd+xfqU3OcHw5ti+3Pi1enrZuBUEdTzNjF
-         XQMRwxMD28QsuTvnxUFa8vZthSVfKdpDuQG3TvQ03ENCMoASPP5+ReWqoB5Cp+hKuDC3
-         BFtRrD9XWdCyVY6kLNnTjFGgNNr4gkZRBHFL1GLDSqrqJwbIdtvHMqfanbcK6Nxdt2vi
-         d1i7T9BBpC9bQQeXE3Zqdxfm24evBgPM9R33P27u+gw4tTj0c7Qrl66azt1ynxAMNlLZ
-         i6pcTJW+liRcWF2FRWWqvoIMN+B2yvQ3GOVqsG3tI4Atc08lalt1qymSp/lNz2IN3ysW
-         rZ1Q==
-X-Gm-Message-State: AOAM5313yqcvicMgV/GlwuE0k0KDL/dNsdrHljDKtzx4dYW/fERTqlEO
-        Tar19pGZPwxjbmj+cCamn0Jk2r0UES4=
-X-Google-Smtp-Source: ABdhPJzE25AlOQ8Uozntk42T3zElHr6eNj95iSd88k3pPAvn2Ih1SRhO4t0jqpTTMSPC54WF+PNkoA==
-X-Received: by 2002:a37:4e54:: with SMTP id c81mr8109822qkb.46.1590766612722;
-        Fri, 29 May 2020 08:36:52 -0700 (PDT)
-Received: from [172.17.0.2] ([13.90.47.33])
-        by smtp.gmail.com with ESMTPSA id r57sm314396qtr.41.2020.05.29.08.36.52
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DIVyaPrMnLKXr8E5UBrkKsc/WrG5o+j+XVU0uMFBAPo=;
+        b=TUh2RIaXb6z23eicPW5lP49JEoaKELj1cwEeGkIpe6b5ZzOQ7dgGeGRoe4DXRIItbX
+         6TdwSOlzFgbNAK6GOvyAyybxJPkqOCHXjrd8vatettFY8le6HCLFpXmkqN6w3vtfStSw
+         oiOOt4LS5nLoMZZCa8MJBPjr0o/+W43O5n4e0CDLfVL92bTAdOxUGVMcENZ8dA1KWfve
+         TAIjOaHKqtI9RwvoEZ8Gpb1zhmEg71htz2NCCBQGoiV3hlfqzuH1xptppkQuO+gzUqGf
+         6NLLrhyQhudzFt6nwLoBXY5yVV03j4xJCOfYGgSoserqo9iFqkPn1QgGnwpYLixoIPOa
+         T5zg==
+X-Gm-Message-State: AOAM532mJ7davVWxMjEK8H4gH38RTkv+U6DCAkJusGFdAnT6nrg70c04
+        ZC11E3ryi8dWvO0LV2FgBjDzhJKYbQU=
+X-Google-Smtp-Source: ABdhPJzin7abxiOEehC0hTQ7Q4gdjQsIBu4wjD4sayV3q/YFGyvku64jC9hlvTdbBPuRP9rxzUdevA==
+X-Received: by 2002:a67:6441:: with SMTP id y62mr6283940vsb.145.1590766698114;
+        Fri, 29 May 2020 08:38:18 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id o2sm1309494vkl.27.2020.05.29.08.38.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 08:36:52 -0700 (PDT)
-Message-ID: <5ed12c14.1c69fb81.1b9cb.22bb@mx.google.com>
-Date:   Fri, 29 May 2020 08:36:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0427218059280182854=="
+        Fri, 29 May 2020 08:38:17 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [BlueZ PATCH v3 0/4] Load default system configuration from file.
+Date:   Fri, 29 May 2020 15:38:09 +0000
+Message-Id: <20200529153814.213125-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.rc0.183.gde8f92d652-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, alainm@chromium.org
-Subject: RE: [BlueZ,v2,3/3] main:read default system configuration from the conf file.
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200529152940.208214-4-alainm@chromium.org>
-References: <20200529152940.208214-4-alainm@chromium.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0427218059280182854==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series adds supports for reading default system configurations from
+a configuration file.  This allows a system to override what are
+currently kernel hardcoded values from a conf file.
 
+The dependent kernel patch will be posted after some additional parsing
+validation on the tlv is completed.
 
-This is automated email and please do not reply to this email!
+Changes in v3:
+- Fixing const decoration warnings on options.
 
-Dear submitter,
+Changes in v2:
+- Fixing checkpatch warning that are applicable.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
+Alain Michaud (4):
+  mgmt:adding load default system configuration definitions
+  adapter:set default system configuration if available
+  main:read default system configuration from the conf file.
+  fixing const decoration warnins on options.
 
-Test Result:
-checkgitlint Failed
+ lib/mgmt.h    |  20 ++++
+ src/adapter.c | 251 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/hcid.h    |  39 ++++++++
+ src/main.c    | 174 ++++++++++++++++++++++++++++++++--
+ src/main.conf |  65 +++++++++++++
+ 5 files changed, 543 insertions(+), 6 deletions(-)
 
-Outputs:
-1: T3 Title has trailing punctuation (.): "main:read default system configuration from the conf file."
+-- 
+2.27.0.rc0.183.gde8f92d652-goog
 
-
-
----
-Regards,
-Linux Bluetooth
-
---===============0427218059280182854==--
