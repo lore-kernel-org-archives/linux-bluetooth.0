@@ -2,374 +2,102 @@ Return-Path: <SRS0=oW7/=7N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5ABFC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 May 2020 04:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0833C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 May 2020 05:08:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B682B2070B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 May 2020 04:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD4572070B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 May 2020 05:08:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhpOskFR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729355AbgEaEl5 (ORCPT
+        id S1726001AbgEaFIY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 May 2020 00:41:57 -0400
-Received: from mga01.intel.com ([192.55.52.88]:17964 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729039AbgEaEl5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 May 2020 00:41:57 -0400
-IronPort-SDR: Hb+ElYP6mt8u2GYeDzD6IwCAJ1Oe42y46e8oOVRvqE2zENqmDfH9DeOqiD9a6zPfJ6iAQi+Dw5
- u0mb4y6B9t3A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2020 21:41:54 -0700
-IronPort-SDR: PaexuqfsiSGfY9L0QLY2Gx8i1JwLuOgBLTNS9sXXSBskK6rHsTQbZdh5w7Q2VSHnYnS5YNC3x/
- So79Ab2XKmLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,455,1583222400"; 
-   d="scan'208";a="377087086"
-Received: from rfcheney-mobl.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.68.158])
-  by fmsmga001.fm.intel.com with ESMTP; 30 May 2020 21:41:54 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2 5/5] mesh: Remove unused functions from net.c
-Date:   Sat, 30 May 2020 21:41:28 -0700
-Message-Id: <20200531044128.16734-6-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200531044128.16734-1-inga.stotland@intel.com>
-References: <20200531044128.16734-1-inga.stotland@intel.com>
+        Sun, 31 May 2020 01:08:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725895AbgEaFIX (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 31 May 2020 01:08:23 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B3BC05BD43
+        for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2020 22:08:23 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id g28so5425990qkl.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2020 22:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=/x8nYvAaPSL3XCmiL2kwH0Mic4EeC53mssndxnU3kM8=;
+        b=ZhpOskFR05vybXPDcOCOnNPltwOlCUP7Gt62lPGPyOvUWQVNihsCl9UtVrnI/EKt7N
+         1QvrPwCgVlcRiiYU6xoF8bzYA3uvnDTM7CbRTLWU+w5n5MeG579C+vWHhIjJBkHbSKIT
+         Cbo4VtdL8AbAFuhLeveFC6kNKW2X//rJBVHbZilEABr2nbcH/3hHuV7luuJLC4pCPsE+
+         1UgGsUE5TH98KV8hFwE+UeJWyPZdrN3B3auVtuyKcG5oCE/uH5JpfdZpQ3mJ1EMIY0Kw
+         J+R52gTibuN/rOekAAGZ+ksriKJhW6UBzXijgxnHBVgIUD5MdsDjfCtzEAGs7vwSehXj
+         evnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=/x8nYvAaPSL3XCmiL2kwH0Mic4EeC53mssndxnU3kM8=;
+        b=YXWzy/pEYJGEjzzshWxpT5pWTwqslWQoXznOTycJqEx/PLoFQtlGhQVuiNxihvtg7Q
+         NQtfHFY5qlAf0qnX+n+XBPJCbT5u1PtKF4Cw9q2JvQ75BerfGHZCZPg7hOx8V92R5+l7
+         CBYW+70HekKI8YF8UWv57fUli/lirSv0fuvSwCbhdfphRz/YfgGZ2s8Xy2YiJI+Ua2HM
+         OcWnnvbjBpDbncblJ+Jvh+G0hFFfQoW7UhpYUaKufpbRUWA0Ob7OcVYmoUjevMkzFgRA
+         C4a/YgKsww++3q1HbQtpa/obIUTdxR7cG7UdtRdH6EYiD5tB3e7DfDzOoZl6k4ErwITd
+         iWPA==
+X-Gm-Message-State: AOAM533h52CKn2QwwT0pKbgV7zJ1rUChcFHCOiSDakjtXTcxRMggRn0a
+        t4rJoFsHq4z56BSBEOCz4mPd29VvmWA=
+X-Google-Smtp-Source: ABdhPJzE7Xcl1HdiN8oUog+l4MSnjL2ORynj1XX4oUjs7MDuzcy348y5QJYBjbLNqnSRRmOdcDD8VA==
+X-Received: by 2002:a37:38c:: with SMTP id 134mr12689484qkd.434.1590901702536;
+        Sat, 30 May 2020 22:08:22 -0700 (PDT)
+Received: from [172.17.0.2] ([20.186.64.244])
+        by smtp.gmail.com with ESMTPSA id d9sm11884978qtq.56.2020.05.30.22.08.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 May 2020 22:08:22 -0700 (PDT)
+Message-ID: <5ed33bc6.1c69fb81.ad95c.3131@mx.google.com>
+Date:   Sat, 30 May 2020 22:08:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8431105606806830260=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ,v2,4/5] mesh: Clean up style in net.c
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200531044128.16734-5-inga.stotland@intel.com>
+References: <20200531044128.16734-5-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The folllowing functionsa are not being used anywhere in the code and
-have been removed:
-mesh_net_flush()
-mesh_net_prov_caps_get()
-mesh_net_priv_key_get()
-mesh_net_priv_key_set()
-mesh_net_prov_rand()
-mesh_net_prov_uni()
-mesh_net_id_uuid_set()
-mesh_net_test_addr()
-mesh_net_test_mode()
-mesh_net_uni_range_set()
-mesh_net_uni_range_get()
-mesh_net_set_window_accuracy()
+--===============8431105606806830260==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkgitlint Failed
+
+Outputs:
+3: B6 Body message is missing
+
+
+
 ---
- mesh/net.c | 149 ++---------------------------------------------------
- mesh/net.h |  21 --------
- 2 files changed, 4 insertions(+), 166 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/net.c b/mesh/net.c
-index af891e5a9..07813eec4 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -124,7 +124,6 @@ struct mesh_net {
- 	uint8_t chan; /* Channel of recent Rx */
- 	uint8_t default_ttl;
- 	uint8_t tid;
--	uint8_t window_accuracy;
- 
- 	struct {
- 		bool enable;
-@@ -144,21 +143,6 @@ struct mesh_net {
- 	struct l_queue *friends;
- 	struct l_queue *negotiations;
- 	struct l_queue *destinations;
--
--	uint8_t prov_priv_key[32];
--
--	/* Unprovisioned Identity */
--	char id_name[20];
--	uint8_t id_uuid[16];
--
--	/* Provisioner: unicast address range */
--	struct mesh_net_addr_range prov_uni_addr;
--
--	/* Test Data */
--	uint8_t prov_rand[16];
--	uint8_t test_bd_addr[6];
--	struct mesh_net_prov_caps prov_caps;
--	bool test_mode;
- };
- 
- struct mesh_msg {
-@@ -648,9 +632,6 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
- 	net->seq_num = DEFAULT_SEQUENCE_NUMBER;
- 	net->default_ttl = TTL_MASK;
- 
--	memset(&net->prov_caps, 0, sizeof(net->prov_caps));
--	net->prov_caps.algorithms = 1;
--
- 	net->tx_cnt = DEFAULT_TRANSMIT_COUNT;
- 	net->tx_interval = DEFAULT_TRANSMIT_INTERVAL;
- 
-@@ -829,93 +810,6 @@ bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable,
- 	return true;
- }
- 
--struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net)
--{
--	if (net)
--		return &net->prov_caps;
--
--	return NULL;
--}
--
--char *mesh_net_id_name(struct mesh_net *net)
--{
--	if (net && net->id_name[0])
--		return net->id_name;
--
--	return NULL;
--}
--
--bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16])
--{
--	if (!net)
--		return false;
--
--	memcpy(net->id_uuid, uuid, 16);
--
--	return true;
--}
--
--uint8_t *mesh_net_priv_key_get(struct mesh_net *net)
--{
--	if (net)
--		return net->prov_priv_key;
--
--	return NULL;
--}
--
--bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32])
--{
--	if (!net)
--		return false;
--
--	memcpy(net->prov_priv_key, key, 32);
--	return true;
--}
--
--uint8_t *mesh_net_test_addr(struct mesh_net *net)
--{
--	const uint8_t zero_addr[] = {0, 0, 0, 0, 0, 0};
--
--	if (net && memcmp(net->test_bd_addr, zero_addr, 6))
--		return net->test_bd_addr;
--
--	return NULL;
--}
--
--uint8_t *mesh_net_prov_rand(struct mesh_net *net)
--{
--	if (net)
--		return net->prov_rand;
--
--	return NULL;
--}
--
--uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt)
--{
--	uint16_t uni;
--	uint16_t next;
--
--	if (!net)
--		return 0;
--
--	next = net->prov_uni_addr.next + ele_cnt;
--	if (next > 0x8000 || next > net->prov_uni_addr.high)
--		return UNASSIGNED_ADDRESS;
--
--	uni = net->prov_uni_addr.next;
--	net->prov_uni_addr.next = next;
--
--	return uni;
--}
--
--bool mesh_net_test_mode(struct mesh_net *net)
--{
--	if (net)
--		return net->test_mode;
--
--	return false;
--}
--
- int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
- 								uint8_t *mode)
- {
-@@ -1026,11 +920,6 @@ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- 	return MESH_STATUS_SUCCESS;
- }
- 
--void mesh_net_flush_msg_queues(struct mesh_net *net)
--{
--	l_queue_clear(net->msg_cache, l_free);
--}
--
- uint32_t mesh_net_get_iv_index(struct mesh_net *net)
- {
- 	if (!net)
-@@ -2543,7 +2432,7 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
- 							net->iv_index, false);
- 		l_queue_foreach(net->subnets, refresh_beacon, net);
- 		queue_friend_update(net);
--		mesh_net_flush_msg_queues(net);
-+		l_queue_clear(net->msg_cache, l_free);
- 		break;
- 
- 	case IV_UPD_INIT:
-@@ -2937,7 +2826,7 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
- 		return false;
- 
- 	l_debug("iv_upd_state = IV_UPD_UPDATING");
--	mesh_net_flush_msg_queues(net);
-+	l_queue_clear(net->msg_cache, l_free);
- 
- 	if (!mesh_config_write_iv_index(node_config_get(net->node),
- 						net->iv_index + 1, true))
-@@ -2999,15 +2888,6 @@ bool mesh_net_dst_unreg(struct mesh_net *net, uint16_t dst)
- 	return true;
- }
- 
--bool mesh_net_flush(struct mesh_net *net)
--{
--	if (!net)
--		return false;
--
--	/* TODO mesh-io Flush */
--	return true;
--}
--
- static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
- {
- 	struct mesh_subnet *subnet;
-@@ -3430,7 +3310,7 @@ int mesh_net_update_key(struct mesh_net *net, uint16_t idx,
- 	return MESH_STATUS_SUCCESS;
- }
- 
--uint16_t mesh_net_get_features(struct mesh_net *net)
-+static uint16_t get_features(struct mesh_net *net)
- {
- 	uint16_t features = 0;
- 
-@@ -3473,20 +3353,7 @@ void mesh_net_heartbeat_init(struct mesh_net *net)
- 
- 	memset(hb, 0, sizeof(struct mesh_net_heartbeat));
- 	hb->sub_min_hops = 0xff;
--	hb->features = mesh_net_get_features(net);
--}
--
--void mesh_net_uni_range_set(struct mesh_net *net,
--				struct mesh_net_addr_range *range)
--{
--	net->prov_uni_addr.low = range->low;
--	net->prov_uni_addr.high = range->high;
--	net->prov_uni_addr.next = range->next;
--}
--
--struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net)
--{
--	return net->prov_uni_addr;
-+	hb->features = get_features(net);
- }
- 
- void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update)
-@@ -3582,14 +3449,6 @@ bool mesh_net_is_local_address(struct mesh_net *net, uint16_t src,
- 			(last >= net->src_addr && last <= net->last_addr);
- }
- 
--void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy)
--{
--	if (!net)
--		return;
--
--	net->window_accuracy = accuracy;
--}
--
- void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
- 							uint16_t interval)
- {
-diff --git a/mesh/net.h b/mesh/net.h
-index 12808ce38..84e7c1545 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -120,12 +120,6 @@ struct mesh_node;
- #define DEFAULT_MIN_DELAY		0
- #define DEFAULT_MAX_DELAY		25
- 
--struct mesh_net_addr_range {
--	uint16_t low;
--	uint16_t high;
--	uint16_t next;
--};
--
- struct mesh_net_prov_caps {
- 	uint8_t num_ele;
- 	uint16_t algorithms;
-@@ -264,7 +258,6 @@ typedef void (*mesh_status_func_t)(void *user_data, bool result);
- struct mesh_net *mesh_net_new(struct mesh_node *node);
- void mesh_net_free(void *net);
- void mesh_net_cleanup(void);
--void mesh_net_flush_msg_queues(struct mesh_net *net);
- void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
- bool mesh_net_iv_index_update(struct mesh_net *net);
- bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number);
-@@ -300,7 +293,6 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io);
- struct mesh_io *mesh_net_detach(struct mesh_net *net);
- struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
- 
--bool mesh_net_flush(struct mesh_net *net);
- void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
- 				uint16_t net_idx, uint32_t iv_index,
- 				uint8_t ttl, uint32_t seq, uint16_t src,
-@@ -316,17 +308,9 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
- 				uint16_t src, uint16_t dst, bool rly,
- 				uint16_t seqZero, uint32_t ack_flags);
--struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net);
--uint8_t *mesh_net_priv_key_get(struct mesh_net *net);
--bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32]);
--uint8_t *mesh_net_prov_rand(struct mesh_net *net);
--uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt);
--bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16]);
--uint8_t *mesh_net_test_addr(struct mesh_net *net);
- int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
- 								uint8_t *mode);
- char *mesh_net_id_name(struct mesh_net *net);
--bool mesh_net_test_mode(struct mesh_net *net);
- bool mesh_net_dst_reg(struct mesh_net *net, uint16_t dst);
- bool mesh_net_dst_unreg(struct mesh_net *net, uint16_t dst);
- struct mesh_friend *mesh_friend_new(struct mesh_net *net, uint16_t dst,
-@@ -348,13 +332,9 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
- 				uint16_t src, uint16_t dst, uint32_t hdr,
- 				const void *seg, uint16_t seg_len);
--uint16_t mesh_net_get_features(struct mesh_net *net);
- struct mesh_net_heartbeat *mesh_net_heartbeat_get(struct mesh_net *net);
- void mesh_net_heartbeat_init(struct mesh_net *net);
- void mesh_net_heartbeat_send(struct mesh_net *net);
--void mesh_net_uni_range_set(struct mesh_net *net,
--				struct mesh_net_addr_range *range);
--struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net);
- void mesh_net_provisioner_mode_set(struct mesh_net *net, bool mode);
- bool mesh_net_provisioner_mode_get(struct mesh_net *net);
- bool mesh_net_key_list_get(struct mesh_net *net, uint8_t *buf, uint16_t *count);
-@@ -365,7 +345,6 @@ struct mesh_node *mesh_net_node_get(struct mesh_net *net);
- bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
- bool mesh_net_is_local_address(struct mesh_net *net, uint16_t src,
- 							uint16_t count);
--void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
- void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
- 							uint16_t interval);
- void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
--- 
-2.26.2
-
+--===============8431105606806830260==--
