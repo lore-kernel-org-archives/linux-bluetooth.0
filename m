@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2A7C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4981AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 16:30:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C7BD2073B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 16:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C5802073B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 16:30:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s4ggr3Os"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cR8Jtg3l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbgFAQ3h (ORCPT
+        id S1727096AbgFAQaC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jun 2020 12:29:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        Mon, 1 Jun 2020 12:30:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726124AbgFAQ3h (ORCPT
+        with ESMTP id S1726067AbgFAQaC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jun 2020 12:29:37 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35396C05BD43
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2020 09:29:37 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id v17so8513068ote.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2020 09:29:37 -0700 (PDT)
+        Mon, 1 Jun 2020 12:30:02 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CFEC05BD43
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2020 09:30:02 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id k15so5026314otp.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2020 09:30:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=aXyFualFd9q9VNoT+F1BinqWNS7HvcnYJGgYXeqNWyI=;
-        b=s4ggr3Os+DGVYKP217fUzYF+I5gjJ48qwYMoxaORie/1PLdQQ69xUcm9pTX8UWVxXL
-         cXUce8lfFIOGeWvIhmmpYguebP9hjEdv0Y4v6hQukEhU+XS+1V8NHLdncgm7mm/PouqE
-         x8mGw3oikT6wF5lQgvWIDXGXtOjD7NFWQz/ERe9MHI+b+q+SeAgKcwuSEfSJGVGXgWt9
-         V7KQeVjFW0eKJEhFlqglOT+8QFiCOeHkGUHeQ9sGEg2HBgOuQJtTUAmycA5l94xaM8IK
-         NfzReLPaHpNkLPnjIo86NNPF7fF96nQuyVQXZH3b9BEsTBS5Wr4U24/6+pYw34AbZ4aa
-         5bvQ==
+        bh=KKs2RNIXjZ4g918KQZTpNZSOkCD2Zpqkt1cEiqVrdQw=;
+        b=cR8Jtg3lj+2RLc51xs6H/OXSSM3C6VzAVxiequ47Q1IbeFz7wuUDeV9xxnyIlgY1YO
+         dWjD2SsSaPWMQLnmpn3XsEHPdMkWOeKMA3Mn8J5l+iPQMsL8lkrs/QdrVL6gaRxLGVMA
+         KqigPYYGLlKej7Eflou27/qw3KwZjlwaJ83l1vfvyWfWCHdy8am9o7/Kpi++3jMro6qB
+         2FJ3Z4A/jtE/w3v/OZw+CsxX4vNFawtk7Au9Av97T+bE0R/0B2BdcdihLcL4o+usCu1d
+         G1btLGpw1zOVRBoYDUbHWekhYjE7RSLM7lf5F3k5UBUGv5QIkl2iGafxsv9WwT0xl/ms
+         qqqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=aXyFualFd9q9VNoT+F1BinqWNS7HvcnYJGgYXeqNWyI=;
-        b=rwExcIXb0LKT2TETRCoJwFYSsmILvKuJCl26mVj0YtMLcvH15WbrzD6BxAZsYvSUs2
-         0c9Fd8dqKzCwd7zMMuTX+JTfEYWlbaAik727plwgMz0lWqtO8FodqoyTSbtL9WCe9Dwr
-         N2coz+M0p1yhWHFC3iiF8T3kUPYgy8Q35F/8132v39mL6CpaTzh4TCnZvNJuhv0ZmCPA
-         90o8qgkY69DsIKLScniyu5nhvAtyC32k15ECFusB1n9ZgZZo+lbiNhm2zZFus6VTFP3i
-         uxKhLbonya0mhfZd504UcQacwkgR/X7E4GMQeM7jh7sveABI4H1CCXwG86qr0XSvfON1
-         ivVw==
-X-Gm-Message-State: AOAM533AR441h3PCI506PsygjpGwEswb0G9IWZY9dMCdv/U0FUEkfgMC
-        cmEyzktWfzKWWmcFwoa3yirxfaBi3DixHZjEM/frzg==
-X-Google-Smtp-Source: ABdhPJwaCLGQoa16K4QVCqqqDnvOqzX2vZZ9vy/dkVQsiFnbcSADTyKJQcA8b97vU1F3Kjmucs+yVC7cKHGWzLqvpvw=
-X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr17720811ots.11.1591028976505;
- Mon, 01 Jun 2020 09:29:36 -0700 (PDT)
+        bh=KKs2RNIXjZ4g918KQZTpNZSOkCD2Zpqkt1cEiqVrdQw=;
+        b=eH5WH7PC50iZ+6waKX9Kkkot70m2CboJ1Gqd7iNeNN4ImhpjmSL31AgGeAvMYZyoLU
+         l7nYR660DXlHhaEZ0a5GDNY2yEsd6GEBC0HpQWYjKPEAjmFSYu3c1ol9AydHDbDGzFWe
+         cSupv0xYuiQ931TH6dPmMjv5/+vrdWJn/fIiUDIZB5Qi4yfXp5jcyXLWdeTWuaT9A/W2
+         3Vr049iCjxsMifFnOkB/wJnQtrzgD+/EBB7ioey33uBM4s0E00UMdp1ixM5vUjqBc4tL
+         wEJqrBXE3yiVWzEdATtwV4fBZkfNtW1ZUEynzMNO2E0MDca5spPwEkXBLW4pnMqrhQH2
+         WCpg==
+X-Gm-Message-State: AOAM530MvA9bymA8qh4YVHYPVkqVlwtpUY3oUaLUD0BU8vxWi2lPHM8y
+        IG4u7mZqY2XVFsXsSjR1L6Rf7t5iOV2cLRHcv48=
+X-Google-Smtp-Source: ABdhPJwyB34523RHlP9ccWgtg86FLRTfmS6PjYGzydOnOYPWnEsCXVVqGFuySJUMxtfQFLLGOx40AL3ZQDHZUXiAsi0=
+X-Received: by 2002:a05:6830:14c4:: with SMTP id t4mr18007514otq.79.1591029001710;
+ Mon, 01 Jun 2020 09:30:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200601005600.254025-1-alainm@chromium.org>
-In-Reply-To: <20200601005600.254025-1-alainm@chromium.org>
+References: <20200530085118.10703-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200530085118.10703-1-sonnysasaka@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 1 Jun 2020 09:29:24 -0700
-Message-ID: <CABBYNZLVK=KNOY6oDnCSAFP_y=wekmZYkFMYh21sj=J2V_XFuw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH] a2dp:fixing double free in load_remote_sep
-To:     Alain Michaud <alainm@chromium.org>
+Date:   Mon, 1 Jun 2020 09:29:50 -0700
+Message-ID: <CABBYNZLK6H6oPRgY53x0D=EM3HbJyE5aKy2FBgvOUnQk6qCiBA@mail.gmail.com>
+Subject: Re: [PATCH] a2dp: Fix ref counting bug of setup_unref
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -70,33 +70,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Sonny,
 
-On Sun, May 31, 2020 at 6:03 PM Alain Michaud <alainm@chromium.org> wrote:
+On Sat, May 30, 2020 at 1:56 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 >
-> This patch fixes a double free condition in load_remote_sep. Value is
-> freed, then the inner loop is broken, but the rest of the outer loop
-> will attempt to free value again.
->
+> In a2dp_reconfig, setup is ref-counted by cb_data. However, in the fail
+> label setup is unref-ed but cb_data is not cleared. This may cause
+> double unref in the future if cb_data gets executed. Instead, we should
+> do setup_cb_free to clear cb_data and unref setup.
 > ---
->
->  profiles/audio/a2dp.c | 1 -
->  1 file changed, 1 deletion(-)
+>  profiles/audio/a2dp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index a2ce3204d..6f46c92bf 100644
+> index 0d877b132..1b92352cf 100644
 > --- a/profiles/audio/a2dp.c
 > +++ b/profiles/audio/a2dp.c
-> @@ -1967,7 +1967,6 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+> @@ -1719,7 +1719,7 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
+>         return 0;
 >
->                         if (sscanf(caps + i, "%02hhx", tmp) != 1) {
->                                 warn("Unable to load Endpoint: seid %u", rseid);
-> -                               g_free(value);
->                                 break;
->                         }
->                 }
+>  fail:
+> -       setup_unref(setup);
+> +       setup_cb_free(cb_data);
+>         return err;
+>  }
+>
 > --
-> 2.27.0.rc2.251.g90737beb825-goog
+> 2.17.1
 
 Applied, thanks.
 
