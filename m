@@ -2,95 +2,75 @@ Return-Path: <SRS0=dAEe=7O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B95C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 00:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0D0C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 06:04:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 136E42067B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 00:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="haiHeVkL"
+	by mail.kernel.org (Postfix) with ESMTP id 8B573206C3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 06:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728500AbgFAA4F (ORCPT
+        id S1726072AbgFAGEv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 May 2020 20:56:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgFAA4F (ORCPT
+        Mon, 1 Jun 2020 02:04:51 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39210 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725778AbgFAGEv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 May 2020 20:56:05 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F88CC061A0E
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2020 17:56:05 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id 1so4684883vsl.9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2020 17:56:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bMwHaXbeSkXrwG2sSCSubJWsZKMT+JxW+Nt8ziFLHC8=;
-        b=haiHeVkL6R5ItR1U1IZsbhi4W1XY132nR9OlY8MUO5Z+/VK7ucEWYCCMLxapR+nysE
-         dDOKSJm8Nh0O+Cwl8ZVE6yEUsrY5B8bwnPdwiaMuS8zcnU2TWrm4iOHgJZ7s3aE0I5t0
-         515jQ+UOuLmqnS1Gv4Yf4E54UdQAyVFB0VmBc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bMwHaXbeSkXrwG2sSCSubJWsZKMT+JxW+Nt8ziFLHC8=;
-        b=WuzBJCRDtmM0x/PWTD4A5GX2dfV0OTE3SApoPQFkBe65MpmyhwjzckCKjle4DPR3re
-         8BR0co6T8zJOdDM8Y7ezUTrGsQWnNDEgEAL2pmG7OXW/NQUW/RoL4xlDFwP6rqLcZwyZ
-         54ORoCVRP1+dJRf4hKX1JKce4PYkXsAmf3T0PSXzFqN7vvQuzW4hIa4M+zhQFkz2MYtC
-         rYgid0UoPo+NCLJAsHQ0hhildb0EArPYHD4HayBIvX/CGiZ+RYuHaNB712670n6chAM6
-         7wjHI18pTghB/N9fGex14Eftj4QwoCXcZnoczd8MTnkzThjXmP3n0nPiZs1TLnyUOEPK
-         uREQ==
-X-Gm-Message-State: AOAM531kpKbb3g89olC2HLkrxmz7wH41er0kj5m0BbQJ4KwxjxrsSjgr
-        UTlSPamq32jU7Db29ou12I3g/9/crmY=
-X-Google-Smtp-Source: ABdhPJy0E7JaLyncd9CV/B9/p+gws7ohXZMB5B1sSv2+fv48Bemf3SpAYvIbSmIAkWJsrxWP61rBPA==
-X-Received: by 2002:a05:6102:2268:: with SMTP id v8mr10434140vsd.114.1590972964252;
-        Sun, 31 May 2020 17:56:04 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id r17sm350701vsi.34.2020.05.31.17.56.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2020 17:56:03 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [BlueZ PATCH] a2dp:fixing double free in load_remote_sep
-Date:   Mon,  1 Jun 2020 00:56:00 +0000
-Message-Id: <20200601005600.254025-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 1 Jun 2020 02:04:51 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 94D18CED01;
+        Mon,  1 Jun 2020 08:14:36 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v4] Bluetooth: hci_qca: Improve controller ID info log
+ level
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1590763573-8302-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Mon, 1 Jun 2020 08:04:48 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>, rjliao@codeaurora.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <814821B2-2DFD-4F6C-937A-34F7B369064B@holtmann.org>
+References: <1590763573-8302-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch fixes a double free condition in load_remote_sep. Value is
-freed, then the inner loop is broken, but the rest of the outer loop
-will attempt to free value again.
+Hi Zijun,
 
----
+> Controller ID info got by VSC EDL_PATCH_GETVER is very
+> important, so improve its log level from DEBUG to INFO.
+> 
+> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+> ---
+> Changes in v4:
+> - correct coding style of qca_read_soc_version()
+> 
+> Changes in v3:
+> - correct coding style
+> 
+> Changes in v2:
+> - adjust controller ID info print order
+> 
+> drivers/bluetooth/btqca.c | 14 +++++++++-----
+> 1 file changed, 9 insertions(+), 5 deletions(-)
 
- profiles/audio/a2dp.c | 1 -
- 1 file changed, 1 deletion(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index a2ce3204d..6f46c92bf 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1967,7 +1967,6 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
- 
- 			if (sscanf(caps + i, "%02hhx", tmp) != 1) {
- 				warn("Unable to load Endpoint: seid %u", rseid);
--				g_free(value);
- 				break;
- 			}
- 		}
--- 
-2.27.0.rc2.251.g90737beb825-goog
+Regards
+
+Marcel
 
