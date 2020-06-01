@@ -2,175 +2,183 @@ Return-Path: <SRS0=dAEe=7O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D2BC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79580C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DF672074B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:08:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 444B4206E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:42:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qqQNOe5K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="neRr65H0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727879AbgFAHII (ORCPT
+        id S1726076AbgFAHmo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jun 2020 03:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47322 "EHLO
+        Mon, 1 Jun 2020 03:42:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727769AbgFAHIH (ORCPT
+        with ESMTP id S1725935AbgFAHmn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jun 2020 03:08:07 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5543CC061A0E;
-        Mon,  1 Jun 2020 00:08:07 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id z18so6756494lji.12;
-        Mon, 01 Jun 2020 00:08:07 -0700 (PDT)
+        Mon, 1 Jun 2020 03:42:43 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391CDC061A0E
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2020 00:42:43 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id a25so6926395ljp.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2020 00:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition;
-        bh=teGMIGEAn03SZAqmtnK5Eu6aKuLPbrLDJb7FJDqvaOM=;
-        b=qqQNOe5Kp2xXDLgI4mqggchcmLtjcg3TkOFUTyjbS2sD+AELJkLQ0sM85sffwd4WaE
-         jEl8GVTRxtTJER2zovNEPEL4TnTjrha0IlImbRcYAS6aNCJx8/OVQSQ+BntSm4x+5IUz
-         IdsI/kc1J0Wemp2CKH9Url/76SSuUn2wE5/QibTDx9zNPLLNdjfDkiooH8bKnxeVUFMA
-         TwKqodLOOqeFJPMQucAXasBq1ueE9BiTq7EVdmVMjofDbIjIRUB7godEe+ImmO7Eswzu
-         fbdDmTTObtWBFrJTzt/HzUSERyGNDQwO5OvVjX2MS1qZXdkbmA1UlBqvmmonNwzBWRqY
-         8MfA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=Fga0SccuTIM5lD/5v50L6qFcKMfg0jwbtDVQEVZqdOY=;
+        b=neRr65H0rUn4YxCTPoFklDMgeQt99qZFn/9MIXljnpnMR7yrkutL6lseTpKO8mU0Au
+         df/ipcZeTpvmVS38MObHZf1t3zzJE95r43+hQVWsiuw0HqPJOFABehuWIF+wYFbwNpSl
+         Qk2TyaL32P7+bFf0y0J+RPfUtS0IjsNgiUQNwp81iZ78HM3lgVA4HABcCoEJWB9b+okR
+         0sBKiVDnR9pURrx2rMHui99qgHPfL3Gf7bsyWhMuxQr++XnDRaJIMoh9r95d8KaU82Ws
+         3BKny4BzPva9+apHDHYECYYoGvEz83ESfQxIgM0ohX+I6w5d1AWjmxn7tjQ4dbx2KGxp
+         DfQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition;
-        bh=teGMIGEAn03SZAqmtnK5Eu6aKuLPbrLDJb7FJDqvaOM=;
-        b=AuexlAZfk1iJzqNsWagdxj9qiQnye87xT+topejHtOj1raUW7x3Hj1wak1uFxAgVqa
-         vhtpbNC3G4HLNuvU7U+mBMHJHeo7/Rm8Rb6th2jWKVjC6szAJ0su461KttMv7rnCH44G
-         7meUd020CQ/eXt4rrwXo2NXwsOwn7H4bu2SXUf/cjgXb6zyFmu519s6IQbd8nKUdPC2/
-         NFx/vfNdJiCS7vn0C9eSpgf9U8v7+uYxTI+gss67JmzXm5Yxt0os+kX2HluPdYcEQxlR
-         Ao5FPrmMpccKi1Mbp7dhIN9LTwy/OJ/dGaT6hAPD9qEn+voBBrUbf8h32cZ2xX9Si68l
-         /2Gw==
-X-Gm-Message-State: AOAM532es6ZGzNnhizlisOZJLrpCFSpfgH2zH3uCSh9xAHYAYbdS2Gj/
-        aRgintKrKLyLXwOn0oW/b64hiOOn8Ug=
-X-Google-Smtp-Source: ABdhPJzRQ5yNhrGbMz2rTO8/rA9WStA+JQhGOgeunlLdmaV0kA44XmRDV8eAXVB8cxCmmzkSeNdMjQ==
-X-Received: by 2002:a2e:a545:: with SMTP id e5mr9526990ljn.271.1590995285717;
-        Mon, 01 Jun 2020 00:08:05 -0700 (PDT)
-Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id h24sm4477850lfj.11.2020.06.01.00.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2020 00:08:04 -0700 (PDT)
-Date:   Mon, 1 Jun 2020 10:08:03 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2020-06-01
-Message-ID: <20200601070803.GA18009@jhedberg-mac01.home>
-Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Fga0SccuTIM5lD/5v50L6qFcKMfg0jwbtDVQEVZqdOY=;
+        b=iVatUjEJ/Qn86VocjeS9lPoRUZTe+RQ9qHi66MzxLIsXgw3tKwu/V88F7ZbUsbYjDX
+         ffXVbJNOxa7SMME2PAz0BET5YY1MU1r1OXR1ZE31AjclM/u/XxXKUj+WYSoRbmSB9FiU
+         +OZ4HC/TX8ZTYAKrMH9knGDEMwxb5WO+kv4FzIDXxe6jvTnJEdQQ16zSq0gq67oheY9P
+         5LcfxRCAPnLMQ9xZHNYKAtAaTesroIOb2f9XUnTGnEggG87U3WyDxQ41AgeN6py7yCaQ
+         62udNn3fFQtMl9VrRInrk/w1nr3LteZOqesbBy2Vx9YN9oNiJWStmZyTaJXBUMB00iIr
+         r0kg==
+X-Gm-Message-State: AOAM530vUcTBbKYSYqdNF239Nbz6w/MBukSa8tGAkC/FD3dguQ4yvLIi
+        XqFd7AMfxkKrm6jlozWPCOHlUWKXNTRgZJlvOrCWzZXC
+X-Google-Smtp-Source: ABdhPJxFaf6x8lkv2ElUAZMOpooFtqXOiV288/K28tJVUHJf46HZl82p67hHwCOcnfGHG9cc1HICOY8NQ2Ic/EzpaMg=
+X-Received: by 2002:a2e:9608:: with SMTP id v8mr9442895ljh.420.1590997360838;
+ Mon, 01 Jun 2020 00:42:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
-Content-Disposition: inline
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Mon, 1 Jun 2020 08:42:29 +0100
+Message-ID: <CAAu3APZLXdgubFVzyF4G3fmnHjzTdmffiC234SCrzUsE_Skuaw@mail.gmail.com>
+Subject: Getting ADV_IND and SCAN_RSP data with DBus
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
 
---W/nzBZO5zC0uMSeA
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I attempting to get the advertising data from a commercially available
+sensor device using the DBus API.
+The sensor device gives different manufacturer data depending if the
+event type is ADV_IND or SCAN_RSP, as you can see below in the btmon
+output.
 
-Hi Dave,
+With DBus I am subscribing to the InterfacesAdded signal which
+triggers when the device has been found. However, it only seems to
+give me the information for the SCAN_RSP.
+If I subscribe to the PropertiesChanged signal on the device, that is
+also only giving the data from the SCAN_RSP event.
 
-Here's one last bluetooth-next pull request for 5.8, which I hope can
-still be accepted.
+How do I access both types of data with the DBus API?
 
- - Enabled Wide-Band Speech (WBS) support for Qualcomm wcn3991
- - Multiple fixes/imprvovements to Qualcomm-based devices
- - Fix GAP/SEC/SEM/BI-10-C qualfication test case
- - Added support for Broadcom BCM4350C5 device
- - Several other smaller fixes & improvements
+Thanks,
+Barry
 
-Please let me know if there are any issues pulling. Thanks.
+$ bluetoothctl -v
+bluetoothctl: 5.50
 
-Johan
 
----
-The following changes since commit dbfe7d74376e187f3c6eaff822e85176bc2cd06e:
+btmon output for sensor device:
 
-  rds: convert get_user_pages() --> pin_user_pages() (2020-05-17 12:37:45 -=
-0700)
+> HCI Event: LE Meta Event (0x3e) plen 43                                                                    #1969 [hci0] 740.157687
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Random (0x01)
+        Address: DC:76:F7:E1:62:E0 (Static)
+        Data length: 31
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Blue Maestro Limited (307)
+          Data: 1b640e10010400e701a527f50100
+        Name (complete): DC76F7E1
+        RSSI: -44 dBm (0xd4)
+> HCI Event: LE Meta Event (0x3e) plen 41                                                                    #1970 [hci0] 740.158684
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Random (0x01)
+        Address: DC:76:F7:E1:62:E0 (Static)
+        Data length: 29
+        Company: Blue Maestro Limited (307)
+          Data: 27fd27f227ea0000010201b600e4017100f4018c0000000000
+        RSSI: -44 dBm (0xd4)
+@ MGMT Event: Device Found (0x0012) plen 74
+                                   {0x0002} [hci0] 740.158704
+        LE Address: DC:76:F7:E1:62:E0 (Static)
+        RSSI: -44 dBm (0xd4)
+        Flags: 0x00000000
+        Data length: 60
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Blue Maestro Limited (307)
+          Data: 1b640e10010400e701a527f50100
+        Name (complete): DC76F7E1
+        Company: Blue Maestro Limited (307)
+          Data: 27fd27f227ea0000010201b600e4017100f4018c0000000000
+@ MGMT Event: Device Found (0x0012) plen 74
+                                   {0x0001} [hci0] 740.158704
+        LE Address: DC:76:F7:E1:62:E0 (Static)
+        RSSI: -44 dBm (0xd4)
+        Flags: 0x00000000
+        Data length: 60
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Blue Maestro Limited (307)
+          Data: 1b640e10010400e701a527f50100
+        Name (complete): DC76F7E1
+        Company: Blue Maestro Limited (307)
+          Data: 27fd27f227ea0000010201b600e4017100f4018c0000000000
 
-are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
+Device information from the InterfacesAdded DBus signal:
 
-for you to fetch changes up to e5aeebddfc312ea7bb55dfe6c7264e71a3b43992:
+{'Adapter': '/org/bluez/hci0',
+ 'Address': 'DC:76:F7:E1:62:E0',
+ 'AddressType': 'random',
+ 'Alias': 'DC76F7E1',
+ 'Blocked': False,
+ 'Connected': False,
+ 'LegacyPairing': False,
+ 'ManufacturerData': {307: [39, 253, 39, 242, 39, 234, 0, 0, 1, 2, 1,
+182, 0, 228, 1, 113, 0, 244,1, 140, 0, 0, 0, 0, 0]},
+ 'Name': 'DC76F7E1',
+ 'Paired': False,
+ 'RSSI': -51,
+ 'ServicesResolved': False,
+ 'Trusted': False,
+ 'UUIDs': []}
 
-  Bluetooth: hci_qca: Fix QCA6390 memdump failure (2020-06-01 08:07:33 +020=
-0)
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (2):
-      Bluetooth: hci_qca: Enable WBS support for wcn3991
-      Bluetooth: hci_qca: Fix uninitialized access to hdev
-
-Azamat H. Hackimov (1):
-      Bluetooth: btbcm: Added 003.006.007, changed 001.003.015
-
-Chuhong Yuan (1):
-      Bluetooth: btmtkuart: Improve exception handling in btmtuart_probe()
-
-Gustavo A. R. Silva (1):
-      Bluetooth: L2CAP: Replace zero-length array with flexible-array
-
-Hsin-Yu Chao (1):
-      Bluetooth: Add SCO fallback for invalid LMP parameters error
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: Consolidate encryption handling in hci_encrypt_cfm
-      Bluetooth: Fix assuming EIR flags can result in SSP authentication
-
-Sebastian Andrzej Siewior (1):
-      Bluetooth: Acquire sk_lock.slock without disabling interrupts
-
-Zijun Hu (5):
-      Bluetooth: hci_qca: Fix suspend/resume functionality failure
-      Bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot
-      Bluetooth: hci_qca: Improve controller ID info log level
-      Bluetooth: btmtkuart: Use serdev_device_write_buf() instead of serdev=
-_device_write()
-      Bluetooth: hci_qca: Fix QCA6390 memdump failure
-
-=C5=81ukasz Rymanowski (1):
-      Bluetooth: Fix for GAP/SEC/SEM/BI-10-C
-
- drivers/bluetooth/btbcm.c        |   3 +-
- drivers/bluetooth/btmtkuart.c    |  17 +++---
- drivers/bluetooth/btqca.c        |  14 +++--
- drivers/bluetooth/hci_qca.c      | 123 ++++++++++++++++++++++++++++++++---=
-----
- include/net/bluetooth/hci_core.h |  20 ++++++-
- include/net/bluetooth/l2cap.h    |   6 +-
- net/bluetooth/hci_conn.c         |   2 -
- net/bluetooth/hci_event.c        |  29 ++-------
- net/bluetooth/rfcomm/sock.c      |   7 +--
- net/bluetooth/smp.c              |   4 ++
- 10 files changed, 154 insertions(+), 71 deletions(-)
-
---W/nzBZO5zC0uMSeA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCXtSpUQAKCRAfyv3T9pQ3
-KuvzAQCO5NoK8D0Udbo0aEgxCG3fuOcrHc66eTVVUqO4m0lxJwEAjvrGiL5woyRx
-qfxurg76LzK40rbYA4+GIXVFX/sBJws=
-=zNxK
------END PGP SIGNATURE-----
-
---W/nzBZO5zC0uMSeA--
+Looking at the propertiesChanged signal on the device, it is also only
+showing the same manufacturer data:
+org.bluez.Device1 {'RSSI': -45, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
+org.bluez.Device1 {'RSSI': -52, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
+org.bluez.Device1 {'RSSI': -54, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
+org.bluez.Device1 {'RSSI': -45, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
+org.bluez.Device1 {'RSSI': -54, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
+org.bluez.Device1 {'RSSI': -52, 'ManufacturerData': {307: [39, 253,
+39, 242, 39, 234, 0, 0, 1, 2, 1, 182, 0, 228, 1, 113, 0, 244, 1, 140,
+0, 0, 0, 0, 0]}} []
