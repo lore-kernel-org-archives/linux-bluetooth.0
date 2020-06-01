@@ -2,123 +2,175 @@ Return-Path: <SRS0=dAEe=7O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FROM_LOCAL_DIGITS,FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4F3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 06:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D2BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:08:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA6A82076B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 06:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DF672074B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jun 2020 07:08:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=megamailservers.eu header.i=@megamailservers.eu header.b="WLqrgKuR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qqQNOe5K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbgFAGlh (ORCPT
+        id S1727879AbgFAHII (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jun 2020 02:41:37 -0400
-Received: from mail152c50.megamailservers.eu ([91.136.10.162]:46036 "EHLO
-        mail50c50.megamailservers.eu" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726107AbgFAGlg (ORCPT
+        Mon, 1 Jun 2020 03:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47322 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727769AbgFAHIH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jun 2020 02:41:36 -0400
-X-Greylist: delayed 1375 seconds by postgrey-1.27 at vger.kernel.org; Mon, 01 Jun 2020 02:41:34 EDT
-X-Authenticated-User: 017623705678@o2online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megamailservers.eu;
-        s=maildub; t=1590992304;
-        bh=Z/brSrFLhtcIYUkOaSqPdk3J09e7z63WS9a8otPRBMk=;
-        h=To:Cc:From:Subject:Date:From;
-        b=WLqrgKuRlto5mshAnCOn5suv1QKNMsOVspP3XCXqb9h1QlyU2DJ0XrHmF3ZogqO3O
-         BuUVEIso9H7tqpzQf5GPtnWQjh1EYNlXiK+bG5wuMidr7T+FBYIeeoAx4cRPR3c6wS
-         LhT6fMivCIPcw3clqZ2fFdgclqkVVNmz2ruamnrY=
-Feedback-ID: 017623705678@o2
-Received: from [192.168.2.2] (dslb-178-011-017-047.178.011.pools.vodafone-ip.de [178.11.17.47])
-        (authenticated bits=0)
-        by mail50c50.megamailservers.eu (8.14.9/8.13.1) with ESMTP id 0516IL0W011365;
-        Mon, 1 Jun 2020 06:18:23 +0000
-To:     linux-bluetooth@vger.kernel.org
-Cc:     alistair@alistair23.me, hdegoede@redhat.com,
-        Larry.Finger@lwfinger.net, jwboyer@kernel.org,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-From:   Tobias Baumann <017623705678@o2online.de>
-Subject: Bluetooth part of RTL8723BS
-Message-ID: <fb9c3d0e-813e-90f6-2492-c7eaaf0b490d@o2online.de>
-Date:   Mon, 1 Jun 2020 08:18:20 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        Mon, 1 Jun 2020 03:08:07 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5543CC061A0E;
+        Mon,  1 Jun 2020 00:08:07 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id z18so6756494lji.12;
+        Mon, 01 Jun 2020 00:08:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition;
+        bh=teGMIGEAn03SZAqmtnK5Eu6aKuLPbrLDJb7FJDqvaOM=;
+        b=qqQNOe5Kp2xXDLgI4mqggchcmLtjcg3TkOFUTyjbS2sD+AELJkLQ0sM85sffwd4WaE
+         jEl8GVTRxtTJER2zovNEPEL4TnTjrha0IlImbRcYAS6aNCJx8/OVQSQ+BntSm4x+5IUz
+         IdsI/kc1J0Wemp2CKH9Url/76SSuUn2wE5/QibTDx9zNPLLNdjfDkiooH8bKnxeVUFMA
+         TwKqodLOOqeFJPMQucAXasBq1ueE9BiTq7EVdmVMjofDbIjIRUB7godEe+ImmO7Eswzu
+         fbdDmTTObtWBFrJTzt/HzUSERyGNDQwO5OvVjX2MS1qZXdkbmA1UlBqvmmonNwzBWRqY
+         8MfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition;
+        bh=teGMIGEAn03SZAqmtnK5Eu6aKuLPbrLDJb7FJDqvaOM=;
+        b=AuexlAZfk1iJzqNsWagdxj9qiQnye87xT+topejHtOj1raUW7x3Hj1wak1uFxAgVqa
+         vhtpbNC3G4HLNuvU7U+mBMHJHeo7/Rm8Rb6th2jWKVjC6szAJ0su461KttMv7rnCH44G
+         7meUd020CQ/eXt4rrwXo2NXwsOwn7H4bu2SXUf/cjgXb6zyFmu519s6IQbd8nKUdPC2/
+         NFx/vfNdJiCS7vn0C9eSpgf9U8v7+uYxTI+gss67JmzXm5Yxt0os+kX2HluPdYcEQxlR
+         Ao5FPrmMpccKi1Mbp7dhIN9LTwy/OJ/dGaT6hAPD9qEn+voBBrUbf8h32cZ2xX9Si68l
+         /2Gw==
+X-Gm-Message-State: AOAM532es6ZGzNnhizlisOZJLrpCFSpfgH2zH3uCSh9xAHYAYbdS2Gj/
+        aRgintKrKLyLXwOn0oW/b64hiOOn8Ug=
+X-Google-Smtp-Source: ABdhPJzRQ5yNhrGbMz2rTO8/rA9WStA+JQhGOgeunlLdmaV0kA44XmRDV8eAXVB8cxCmmzkSeNdMjQ==
+X-Received: by 2002:a2e:a545:: with SMTP id e5mr9526990ljn.271.1590995285717;
+        Mon, 01 Jun 2020 00:08:05 -0700 (PDT)
+Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
+        by smtp.gmail.com with ESMTPSA id h24sm4477850lfj.11.2020.06.01.00.08.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2020 00:08:04 -0700 (PDT)
+Date:   Mon, 1 Jun 2020 10:08:03 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2020-06-01
+Message-ID: <20200601070803.GA18009@jhedberg-mac01.home>
+Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-Antivirus: AVG (VPS 200531-0, 31.05.2020), Outbound message
-X-Antivirus-Status: Clean
-X-CTCH-RefID: str=0001.0A782F1D.5ED49D48.003F,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-X-CTCH-VOD: Unknown
-X-CTCH-Spam: Unknown
-X-CTCH-Score: 0.000
-X-CTCH-Rules: 
-X-CTCH-Flags: 0
-X-CTCH-ScoreCust: 0.000
-X-CSC:  0
-X-CHA:  v=2.3 cv=NoevjPVJ c=1 sm=1 tr=0 a=cfXdPu6Ul6OsnrHrce2WRQ==:117
-        a=cfXdPu6Ul6OsnrHrce2WRQ==:17 a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8
-        a=oCcaPWc0AAAA:8 a=Dv3bG469tIUHqy_wcw4A:9 a=QEXdDO2ut3YA:10
-        a=AjGcO6oz07-iQ99wixmX:22 a=pHzHmUro8NiASowvMSCR:22
-        a=nt3jZW36AmriUCFCBwmW:22
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
+Content-Disposition: inline
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-REF: Linux Firmware commit e6b9001e91110c654573b8f8e2db6155d10d3b57 
-<https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/rtl_bt?id=e6b9001e91110c654573b8f8e2db6155d10d3b57>
 
-REF: rtl_bt: Add firmware and configuration files for the Bluetooth part 
-of RTL8723BS
+--W/nzBZO5zC0uMSeA
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hi Dave,
 
-Hello Community
+Here's one last bluetooth-next pull request for 5.8, which I hope can
+still be accepted.
 
-Hardware :
-  M8S ARM S812 RTL8723BS
-ODIS Wintab8 Intel Atom RTL8723BS
+ - Enabled Wide-Band Speech (WBS) support for Qualcomm wcn3991
+ - Multiple fixes/imprvovements to Qualcomm-based devices
+ - Fix GAP/SEC/SEM/BI-10-C qualfication test case
+ - Added support for Broadcom BCM4350C5 device
+ - Several other smaller fixes & improvements
 
+Please let me know if there are any issues pulling. Thanks.
 
-I'm working together with Martin (xdarklight) to get the new kernel 
-working for older Android Tv boxes with ARM chipset (Amlogic s802 - 
-Amlogic S812; Ubuntu , Debian ).
+Johan
 
-After Martin has successfully integrated the patch for SDIO controller . 
-I got my internal Wlan Adapter (RTL8723BS) working.
+---
+The following changes since commit dbfe7d74376e187f3c6eaff822e85176bc2cd06e:
 
-We are now also activating the Bluetooth part. But we encountered the 
-problem with the config file.  Hans was nice enough to extract the 
-RTL8723BS firmware file from the Realtek driver file.
+  rds: convert get_user_pages() --> pin_user_pages() (2020-05-17 12:37:45 -=
+0700)
 
-As Hans has already written there are almost no differences in the 
-tablet area with config file, I can only confirm this after looking at 
-different driver files (Realtek bluetooth UART).
+are available in the Git repository at:
 
-I found only 4 ACPI ID : once the already mentioned OBDA:8723 which is 
-the default version ,one for ACER tablet OBDA:0623 and the BESTbuy ( 
-Chuwi Hi10 ? ) OBDA:0242 ; in the driver version of 2015/2016 there were 
-still 2 config files available(standart and ACER) in the version 2017 
-only ONE so that also the Default, ACER and BESTbuy use the same config 
-files.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
 
-I myself and Martin are currently using the two files from the firmware 
-repro successfully.
+for you to fetch changes up to e5aeebddfc312ea7bb55dfe6c7264e71a3b43992:
 
-!! So I ask you to remove the ACPI ID from the file and rename the file 
-to RTL8723b_config.bin ; furthermore I ask you to set the reference when 
-loading the RTL8723BS Blueooth driver to the RTL8723b_firmware.bin so 
-that it corresponds to the standard file name. !!!!
+  Bluetooth: hci_qca: Fix QCA6390 memdump failure (2020-06-01 08:07:33 +020=
+0)
 
+----------------------------------------------------------------
+Abhishek Pandit-Subedi (2):
+      Bluetooth: hci_qca: Enable WBS support for wcn3991
+      Bluetooth: hci_qca: Fix uninitialized access to hdev
 
+Azamat H. Hackimov (1):
+      Bluetooth: btbcm: Added 003.006.007, changed 001.003.015
 
+Chuhong Yuan (1):
+      Bluetooth: btmtkuart: Improve exception handling in btmtuart_probe()
 
--- 
-Diese E-Mail wurde von AVG auf Viren geprüft.
-http://www.avg.com
+Gustavo A. R. Silva (1):
+      Bluetooth: L2CAP: Replace zero-length array with flexible-array
 
+Hsin-Yu Chao (1):
+      Bluetooth: Add SCO fallback for invalid LMP parameters error
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: Consolidate encryption handling in hci_encrypt_cfm
+      Bluetooth: Fix assuming EIR flags can result in SSP authentication
+
+Sebastian Andrzej Siewior (1):
+      Bluetooth: Acquire sk_lock.slock without disabling interrupts
+
+Zijun Hu (5):
+      Bluetooth: hci_qca: Fix suspend/resume functionality failure
+      Bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot
+      Bluetooth: hci_qca: Improve controller ID info log level
+      Bluetooth: btmtkuart: Use serdev_device_write_buf() instead of serdev=
+_device_write()
+      Bluetooth: hci_qca: Fix QCA6390 memdump failure
+
+=C5=81ukasz Rymanowski (1):
+      Bluetooth: Fix for GAP/SEC/SEM/BI-10-C
+
+ drivers/bluetooth/btbcm.c        |   3 +-
+ drivers/bluetooth/btmtkuart.c    |  17 +++---
+ drivers/bluetooth/btqca.c        |  14 +++--
+ drivers/bluetooth/hci_qca.c      | 123 ++++++++++++++++++++++++++++++++---=
+----
+ include/net/bluetooth/hci_core.h |  20 ++++++-
+ include/net/bluetooth/l2cap.h    |   6 +-
+ net/bluetooth/hci_conn.c         |   2 -
+ net/bluetooth/hci_event.c        |  29 ++-------
+ net/bluetooth/rfcomm/sock.c      |   7 +--
+ net/bluetooth/smp.c              |   4 ++
+ 10 files changed, 154 insertions(+), 71 deletions(-)
+
+--W/nzBZO5zC0uMSeA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCXtSpUQAKCRAfyv3T9pQ3
+KuvzAQCO5NoK8D0Udbo0aEgxCG3fuOcrHc66eTVVUqO4m0lxJwEAjvrGiL5woyRx
+qfxurg76LzK40rbYA4+GIXVFX/sBJws=
+=zNxK
+-----END PGP SIGNATURE-----
+
+--W/nzBZO5zC0uMSeA--
