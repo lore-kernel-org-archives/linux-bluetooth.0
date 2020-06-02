@@ -2,129 +2,181 @@ Return-Path: <SRS0=y60a=7P=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73233C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jun 2020 01:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D08C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jun 2020 05:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF9F2073B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jun 2020 01:49:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JRLmveyb"
+	by mail.kernel.org (Postfix) with ESMTP id 83A3620734
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jun 2020 05:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726320AbgFBBtM (ORCPT
+        id S1726255AbgFBFGu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jun 2020 21:49:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725900AbgFBBtM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jun 2020 21:49:12 -0400
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43DBBC05BD43
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2020 18:49:12 -0700 (PDT)
-Received: by mail-vs1-xe41.google.com with SMTP id q2so1139878vsr.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2020 18:49:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NDWXl875dqN44wgKFWnb7J8N8ciIKNPrxB/hfgmRf6E=;
-        b=JRLmveybXPnxAdAR5ejEglrEmyOiyP2YL2RN5n/MlBp2MeNBhvGO9anSMkR3eqhh2t
-         MgO/u4vY2vqOpbDz0WmA+G8JfN3AvlcSQNL+pgdrCUxXm7CigG5cODeMhRLWCjwTGpRn
-         7eZF8CynOwdiB9tMawAwrh2u90FVicvWPMPcM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NDWXl875dqN44wgKFWnb7J8N8ciIKNPrxB/hfgmRf6E=;
-        b=ZXkkzGw8FswpeRkLUeixKvgM0GspltD9wkdJT9B9dY9WThSksctHbSJVccPFIqGFaw
-         VV35yIalgKJxHUMSxsPjWyjxCbulJymClpqzX8ONbxdKuIp3VVAjYI4KbVRHDJ4tpBlo
-         grIAQArnVfCOE2TPiu6eAt/y2pPr/oWDOqI4xGWHc6rkL0WaF5KtPZCDK9NXHqkXs0dk
-         fs/9aFPmGY4oKK44Jf3WKJPmr83qRQKZ9T2NdNJvkAv8W8GgvhtA6XbDEROssEU0znQs
-         dYy5h91P/oScL83FHInxXfPKw6jrRI+5zRxXqHRBWawQsQS4F9Y2U8LFP4DignVYkd1l
-         +gpw==
-X-Gm-Message-State: AOAM533rJ1uRh2Rol/LPHhrGzM7TOPLRY6J4nOudsXylBTvSjHU1T5sL
-        S9Q7fHc7o9B8SqkkPtRyrhlrG50oTna4vBIjVUTOqA==
-X-Google-Smtp-Source: ABdhPJxnHpMSeb4VtSaFWRyXvmhoyEPhwE9kbpqMX2s88ZGNeqayUOtFxrd5o6oexWenHvUstmO2cW6SOHcwY/BFIpg=
-X-Received: by 2002:a67:b10c:: with SMTP id w12mr2735002vsl.96.1591062551158;
- Mon, 01 Jun 2020 18:49:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200601184223.1.I281c81384150e8fefbebf32fa79cb091d0311208@changeid>
-In-Reply-To: <20200601184223.1.I281c81384150e8fefbebf32fa79cb091d0311208@changeid>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 1 Jun 2020 18:48:56 -0700
-Message-ID: <CANFp7mXDvdicvyEpU-oDu4fBj92nQ7SENVdd_rG9TFQkqDevZg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Check scan state before disabling during suspend
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 2 Jun 2020 01:06:50 -0400
+Received: from mga05.intel.com ([192.55.52.43]:61114 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725781AbgFBFGu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jun 2020 01:06:50 -0400
+IronPort-SDR: Nxj0k7mGyF4bzD0KgW8AhCY7s722ioapwwyso3K+CgrEO80P84q1IuPMI0rP4xqwfXQVdxPRsK
+ HGZfdAHDd4Ug==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2020 22:06:49 -0700
+IronPort-SDR: i8tII4w7vdtkx0bth2vA9NYRyCN7DCA3pQ3zEVu5OUS/r9Kx3wo15WTAQGIxx8yRer2RFaTo9w
+ YKX5iEpt7q1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,463,1583222400"; 
+   d="scan'208";a="258162629"
+Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
+  by fmsmga008.fm.intel.com with ESMTP; 01 Jun 2020 22:06:47 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Ps@vger.kernel.org, AyappadasX <AyappadasX.Ps@intel.com>,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH 1/2] Bluetooth: Add support to Intel read supported feature
+Date:   Tue,  2 Jun 2020 10:37:51 +0530
+Message-Id: <20200602050752.7470-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hey linux-bluetooth,
+From: Chethan T N <chethan.tumkur.narayan@intel.com>
 
-We found this bug when reverting some Chromium maintained patches in
-our repository that was conditionally dropping LE scan enable commands
-if it wasn't toggling between true/false. On some Intel controllers,
-disabling LE scan when it's already disabled resulted in a "Command
-Disallowed" and this was causing suspend to fail.
+The command shall read the Intel controller supported
+feature. Based on the supported features addtional debug
+configuration shall be enabled.
 
-On Mon, Jun 1, 2020 at 6:43 PM Manish Mandlik <mmandlik@google.com> wrote:
->
-> Check current scan state by checking HCI_LE_SCAN flag and send scan
-> disable command only if scan is already enabled.
->
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> ---
->
->  net/bluetooth/hci_request.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 1fc55685da62d..1acf5b8e0910c 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -998,8 +998,9 @@ static void hci_req_set_event_filter(struct hci_request *req)
->
->  static void hci_req_config_le_suspend_scan(struct hci_request *req)
->  {
-> -       /* Can't change params without disabling first */
-> -       hci_req_add_le_scan_disable(req);
-> +       /* Before changing params disable scan if enabled */
-> +       if (hci_dev_test_flag(req->hdev, HCI_LE_SCAN))
-> +               hci_req_add_le_scan_disable(req);
->
->         /* Configure params and enable scanning */
->         hci_req_add_le_passive_scan(req);
-> @@ -1065,8 +1066,9 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
->                 page_scan = SCAN_DISABLED;
->                 hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
->
-> -               /* Disable LE passive scan */
-> -               hci_req_add_le_scan_disable(&req);
-> +               /* Disable LE passive scan if enabled */
-> +               if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
-> +                       hci_req_add_le_scan_disable(&req);
->
->                 /* Mark task needing completion */
->                 set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
-> --
-> 2.27.0.rc2.251.g90737beb825-goog
->
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Ps, AyappadasX <AyappadasX.Ps@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel.c | 34 ++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h | 14 ++++++++++++++
+ drivers/bluetooth/btusb.c   |  8 +++++++-
+ 3 files changed, 55 insertions(+), 1 deletion(-)
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 6a0e2c5a8beb..09e697b92426 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -754,6 +754,40 @@ void btintel_reset_to_bootloader(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(btintel_reset_to_bootloader);
+ 
++int btintel_read_supported_features(struct hci_dev *hdev,
++	struct intel_supported_features *supported_features)
++{
++	struct sk_buff *skb;
++	u8 page_no = 1;
++
++	/* Intel controller supports two pages, each page is of 128-bit
++	 * feature bit mask. And each bit defines specific feature support
++	 */
++	skb = __hci_cmd_sync(hdev, 0xfca6, sizeof(page_no), &page_no,
++		HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("Reading supported features(page1) failed (%ld)",
++			PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++
++	if (skb->len != (sizeof(supported_features->page1) + 3)) {
++		bt_dev_err(hdev,
++			"Supported feature(page1) event size mismatch");
++		kfree_skb(skb);
++		return -EILSEQ;
++	}
++
++	memcpy(supported_features->page1, skb->data + 3,
++		sizeof(supported_features->page1));
++
++	/* Read the supported features page2 if required in future.
++	 */
++	kfree_skb(skb);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_read_supported_features);
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index a69ea8a87b9b..f3892c0233f4 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -62,6 +62,11 @@ struct intel_reset {
+ 	__le32   boot_param;
+ } __packed;
+ 
++
++struct intel_supported_features {
++	__u8    page1[16];
++} __packed;
++
+ #if IS_ENABLED(CONFIG_BT_INTEL)
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+@@ -88,6 +93,9 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+ int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
+ 			      u32 *boot_param);
+ void btintel_reset_to_bootloader(struct hci_dev *hdev);
++int btintel_read_supported_features(struct hci_dev *hdev,
++			struct intel_supported_features *supported_features);
++
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -186,4 +194,10 @@ static inline int btintel_download_firmware(struct hci_dev *dev,
+ static inline void btintel_reset_to_bootloader(struct hci_dev *hdev)
+ {
+ }
++static int btintel_read_supported_features(struct hci_dev *hdev,
++		struct intel_supported_features *supported_features)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5f022e9cf667..a5a971e7025b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -5,7 +5,6 @@
+  *
+  *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
+  */
+-
+ #include <linux/dmi.h>
+ #include <linux/module.h>
+ #include <linux/usb.h>
+@@ -2273,6 +2272,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	ktime_t calltime, delta, rettime;
+ 	unsigned long long duration;
+ 	int err;
++	struct intel_supported_features supported_features;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -2542,6 +2542,12 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 */
+ 	btintel_load_ddc_config(hdev, fwname);
+ 
++	/* Read the Intel supported features and if new exception formats
++	 * supported, need to load the additional DDC config to enable.
++	 */
++	btintel_read_supported_features(hdev, &supported_features);
++
++
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version(hdev, &ver);
+ 	if (err)
+-- 
+2.17.1
+
