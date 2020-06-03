@@ -2,107 +2,93 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986FAC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF01AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:47:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3C62053B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:42:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EreiaZG9"
+	by mail.kernel.org (Postfix) with ESMTP id B21042053B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:47:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbgFCRmz (ORCPT
+        id S1726393AbgFCRrz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 13:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726265AbgFCRmq (ORCPT
+        Wed, 3 Jun 2020 13:47:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35918 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726103AbgFCRry (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 13:42:46 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC86C08C5C3
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 10:35:21 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id q16so1059131plr.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 10:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1HdGQH8ewb/MVR7Me82ORCscMq0KLTyZo+yRvedrkDw=;
-        b=EreiaZG9QfofIjMh+NsZCVJeqreByRnThmXg3qc8zzRfJ9IhIChugvgYWANAwuYKdU
-         I6Ggbp0TWCa2IZsa1K/HSdcGSdoskOg5L0Ymd2wiei+oamwNXldm6dLZ8GqFKOT+wEtN
-         FkBntGFGRhhnLRwUHc1bn0CXVlB6KCC5pSz6CBVWaYXyAZmZzqwtDoBwRh6kg5OWRl+J
-         0YmOGkNQx5JM/9YxefTLDQ+a7uy323xPmyFqdd6OUG4UBTEQcSClIN4ZV8vIxvhPpmhy
-         BFmvK0dntIvjj0pwChKERZNqol8Z50W5b/eQWBhZ1cYzNqGiOA06LwEDpb+FC+GpKT1a
-         6QWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1HdGQH8ewb/MVR7Me82ORCscMq0KLTyZo+yRvedrkDw=;
-        b=IlnpN6KijRXu2cHomP4S/X09Vuz2wihh0Wis2R/vb10y7ujOSPSABfe1LadxL+lGPz
-         qraEYRc9/WecKQuQHffqfDFhaaaAxW74MY+rj8n0NsRCJIGyKb4+7GvYE6YoTq58WxGX
-         EaSiU23rzRr4aTmt0B8P5MKU1RUCe4IhRnDLlTVw5JCOVSqLEmFRU3qJ1e56B3uZruFa
-         X6Al/U81A7wtWYY5DcLIHcNOMXQ6cH7ATdrp4NgSd27Lg6kZ0eBocpnGiZ5UsuTxjtOC
-         ZeLNLgmLCSnx7IYuHaCdUzbw6YkcgirhKxDlrA5vgngWH7J9nO5FnEP1wBs5yEbK+jaG
-         VxWw==
-X-Gm-Message-State: AOAM532tr8tQDBTjLWc0OX+MY7dGCcO0zmKORXr9KhoR3YqpQctKhHPO
-        +0ougv85ugFGyF29HdgAIhezh5ze
-X-Google-Smtp-Source: ABdhPJybG8EtV0lv9Dfv9w2qGZxk+/bzxsf5dzNkmcycYvudXTOKzTDkAwMbPDpDDv+9qCT2umiwuA==
-X-Received: by 2002:a17:902:ab87:: with SMTP id f7mr961156plr.166.1591205720535;
-        Wed, 03 Jun 2020 10:35:20 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y26sm2386707pff.26.2020.06.03.10.35.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2020 10:35:19 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] gatt: Fix possible crash when unable to generate hash
-Date:   Wed,  3 Jun 2020 10:35:19 -0700
-Message-Id: <20200603173519.559897-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.25.3
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 3 Jun 2020 13:47:54 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id D637ACED2E;
+        Wed,  3 Jun 2020 19:57:39 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH 0/4] marvell: Fix firmware filenames for sd8977/sd8997
+ chipsets
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200603082229.15043-1-pali@kernel.org>
+Date:   Wed, 3 Jun 2020 19:47:51 +0200
+Cc:     Ganapathi Bhat <ganapathi.bhat@nxp.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        =?utf-8?Q?Marek_Beh=C3=BAn?= <marek.behun@nic.cz>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        Hemantkumar Suthar <shemant@marvell.com>,
+        Rakesh Parmar <rakeshp@marvell.com>,
+        Zhaoyang Liu <liuzy@marvell.com>, Cathy Luo <cluo@marvell.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <3159E2B0-8B61-42AC-8DBC-BC036B809A85@holtmann.org>
+References: <20200603082229.15043-1-pali@kernel.org>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pali,
 
-gatt_db_get_hash actually depends on crypto so platforms that don't
-have it enabled shall not register GATT_CHARAC_DB_HASH as otherwise it
-would cause a crash due to hash being NULL.
----
- src/gatt-database.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> This patch series fixes mwifiex and btmrvl drivers to load firmware for sd8977
+> and sd8997 chipsets from correct filename.
+> 
+> Both Marvell distribution package and linux-firmware repository [1] contain
+> firmware for these chipsets in files sdsd8977_combo_v2.bin/sdsd8997_combo_v4.bin.
+> 
+> Linux drivers mwifiex and btmrvl try to load firmware for these chipsets from
+> sd8977_uapsta.bin/sd8997_uapsta.bin files which obviously fails as these files
+> do not exist neither in linux-firmware [1] nor in Marvell distribution packages.
+> 
+> So the result is that Marvell sd8977 and sd8997 chipsets via mainline kernel
+> drivers (mwifiex and btmrvl) do not work out of box.
+> 
+> Each patch in this series fixes particular git commit which introduced usage
+> of incorrect firmware filename. Also each patch contains Fixes: line for easier
+> backporting to stable kernels.
+> 
+> mwifiex (1/4, 2/4) and btmrvl (3/4, 4/4) parts of this patch series can be
+> applied separately via wireless and bluetooth trees. I'm sending all four
+> patches in one patch series for easier review.
+> 
+> [1] - https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/mrvl
+> 
+> Pali Rohár (4):
+>  mwifiex: Fix firmware filename for sd8977 chipset
+>  mwifiex: Fix firmware filename for sd8997 chipset
+>  btmrvl: Fix firmware filename for sd8977 chipset
+>  btmrvl: Fix firmware filename for sd8997 chipset
+> 
+> drivers/bluetooth/btmrvl_sdio.c             | 8 ++++----
+> drivers/net/wireless/marvell/mwifiex/sdio.h | 4 ++--
+> 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 8cbe09bae..d717bbcde 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1211,10 +1211,14 @@ static void populate_gatt_service(struct btd_gatt_database *database)
- 				cli_feat_read_cb, cli_feat_write_cb,
- 				database);
- 
--	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
--	database->db_hash = gatt_db_service_add_characteristic(service,
-+
-+	/* Only expose database hash chrc if supported */
-+	if (gatt_db_get_hash(database->db)) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
-+		database->db_hash = gatt_db_service_add_characteristic(service,
- 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
- 				db_hash_read_cb, NULL, database);
-+	}
- 
- 	/* Only enable EATT if there is a socket listening */
- 	if (database->eatt_io) {
--- 
-2.25.3
+all 4 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
