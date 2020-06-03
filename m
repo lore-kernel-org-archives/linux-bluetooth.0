@@ -2,87 +2,77 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E306C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE65C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:15:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F66C20734
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:13:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F9C12077D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:15:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZP4VtPr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYGfBn8d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgFCVNY (ORCPT
+        id S1726135AbgFCVPI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 17:13:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
+        Wed, 3 Jun 2020 17:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725922AbgFCVNY (ORCPT
+        with ESMTP id S1725922AbgFCVPI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 17:13:24 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2FBC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 14:13:23 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id w15so2219531lfe.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 14:13:23 -0700 (PDT)
+        Wed, 3 Jun 2020 17:15:08 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48538C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 14:15:08 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id s21so3140882oic.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 14:15:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=fEM3/t/EN1OWVSvDKicmsG6GzMMdc2Y9tRhLJwp9cvE=;
-        b=dZP4VtPr3/KyVhh/BY+mIRiHZA4zJORsQ8793qNZ9xfpJpJkNwUi/1xa4HirssNXgu
-         5PaMDZz9arPTB9+jP49jrKbgLgk2iSUdMVeEvPYWrQaurMpBD8DSXgcnewWJs3IZMdnj
-         tiL/miboOBJbMmzEnve7WiV65d6hpCGaV0/5eJz6Se8o9P3Uw25b0Q67BmcywhRMqFNe
-         j3DN6SyNPpo+YXN7ApEPyksuRRb4yM3Ei2QoVa/tVMhv1olaLTnJ1VWjPgeXgCwgNj6J
-         Hk8MJJqWnN5sr0u0YDT/kY6eQ8CVn1fTmwLr6/7zAVHg5tvG/xVtZOwXm6bljeggaWb+
-         hGCQ==
+        bh=cPw3S1zerV4eP1bQBWpe94Vh6YJh1xoA4dN2/uw/KGE=;
+        b=IYGfBn8d3V/5lnjAFthMGXZuvawbeAhe1yrDGGNA0Ozkx+12F5il/2+4uy4PeIn8h8
+         govorKhfyl4D2UQKRyj1n3xkoIPmg4QqkxG0QBku0LxbTO7Hz5sYChugV5vgze3cp7GG
+         2mx42077vbypsP8xMa6McDyIUhu0aZicNWyep+u2aADfbXBUpefuKzQZXU0EH8L1yInK
+         dUQDt+D9d667BRjNoll1YqiVYSLglB6x5s0pTFald0MKsS/unbtsvrd1wB2gd2WyBbnW
+         a3KG0Cw1ThJscHWjN2FSusTFwdk+CpdcYZ985iM68Hi6ptvhsIcff+alR4t/6X9kSN9T
+         jIPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=fEM3/t/EN1OWVSvDKicmsG6GzMMdc2Y9tRhLJwp9cvE=;
-        b=CKPq277mTuqeWKdZxR6Dwb057bSr6eMz3H4e27rUp2cOPWh8qcA1ANNUFLKqp13sql
-         tO9f+IAR2pjsBwHzSVHqEjLQ5Sb/O9/FFCACp0/VLj8qPAoPdUjLSmbGekluwHuORqnk
-         eu+xORHGrKh0u8mJ0Q3AkuGrf79KOWqu/52PR/mi/t0FT56kLoPNcJjUwth9a/K7Mmyq
-         h/vz/eQoRfVzSGwDEIaGI6WZ94RdKWe9VlItnvMy/NDbfvFPRq4OPBZI5YBGrWnqAP8n
-         Dn4LjDE2BcYuLozvT1WB0sO47eWCvlFjz+m1XZGrwOeKVqlQECY/iQJEB48v1wklMyYi
-         ug3A==
-X-Gm-Message-State: AOAM530T1zdX5TOFIj/lqD+BNIvnNuSfLixzwL8mO6zyafNTZrtT54M1
-        GtrQuVY3w54f8/EKobm9+udhMYCdY4LCu9kK9921M3Dq3TRPYw==
-X-Google-Smtp-Source: ABdhPJzcgng2av7NMtKS4hM3YSap15pNwO5x9Zms7HL0Xr83mvMURIaDKY6VK+Mt+EHqIbGLLNEaJMol3tevVxN56SY=
-X-Received: by 2002:a19:c016:: with SMTP id q22mr706089lff.191.1591218801716;
- Wed, 03 Jun 2020 14:13:21 -0700 (PDT)
+        bh=cPw3S1zerV4eP1bQBWpe94Vh6YJh1xoA4dN2/uw/KGE=;
+        b=nbPluGHM42/mkDWFL6q4bbNkH60Xa68aSfyhqPIgMVlxfxkcnVuDfK83FmiAgzDP9C
+         nGjOj+xTiB0K8H+kEWBcIhtTJatwdNxMqodHfOKPmMYn9SJ38U5e26PZL03k0jCcNgno
+         A3I4n1BwpOLY/qlf+ReFE7p7ofIuDeIvkqgh3tIYjK9Q9LD/RoM6u/oXcaC1eWc8b8hE
+         L16Cd/6AbLnVedFkK1FymVXb8DtzzX7C4npbiAkskvtg/gaJ0qiP7Q7//7POnHGv6LIZ
+         cVGTbmKEd53p2nRw7MMQhU7G3wPeqv8pwxsKkkGdfHzTZfCofdZiWvIZ+4DljLr5YK2Q
+         iBkQ==
+X-Gm-Message-State: AOAM530l2Gn+haKUW7dIZ8G+KZytbN17fAhYTeKYoaH1sWEkoUVqQSlH
+        gftC1sNT5VWlybnlCYWPqZ6WehgSLLv7zCsu1jZJF8u2
+X-Google-Smtp-Source: ABdhPJz1OoA5ayuSitsyuNU8oE2vPJcDD18ubFWJG1wjLL8uJs7AFjGJaRCBos6dKKR5mxvE9wNhdFh1fWfDYVTFU20=
+X-Received: by 2002:aca:b5d5:: with SMTP id e204mr1159158oif.108.1591218906856;
+ Wed, 03 Jun 2020 14:15:06 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200603145205.125167-1-alainm@chromium.org>
 In-Reply-To: <20200603145205.125167-1-alainm@chromium.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Wed, 3 Jun 2020 17:13:09 -0400
-Message-ID: <CALWDO_U6QW5TksDhmGP1eEEDa2b+_uDLTM0-BWe3uaJb6rW3dw@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Jun 2020 14:14:55 -0700
+Message-ID: <CABBYNZ+Os=u4=r+mSq+C9nRyN=PC6Yk7GNTGhto_2-TBmHxdRQ@mail.gmail.com>
 Subject: Re: [PATCH v3] sco:Add support for BT_PKT_STATUS CMSG data
 To:     Alain Michaud <alainm@chromium.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Alain, Marcel,
 
-Please disregard v2, I had forgotten to update the version tag before
-uploading.  V3 includes adding support for the getsockop and fixed the
-bug around int versus u8 that was missing in v2. This patch was also
-tested using the following update to chromos:
-
-https://chromium-review.googlesource.com/c/chromiumos/third_party/adhd/+/2190022
-
-Thanks!
-Alain
-
-On Wed, Jun 3, 2020 at 10:52 AM Alain Michaud <alainm@chromium.org> wrote:
+On Wed, Jun 3, 2020 at 7:56 AM Alain Michaud <alainm@chromium.org> wrote:
 >
 > This change adds support for reporting the BT_PKT_STATUS to the socket
 > CMSG data to allow the implementation of a packet loss correction on
@@ -153,6 +143,12 @@ On Wed, Jun 3, 2020 at 10:52 AM Alain Michaud <alainm@chromium.org> wrote:
 > +/* CMSG flags */
 > +#define SCO_CMSG_PKT_STATUS    0x0001
 > +
+
+I wonder if we can make this generic since ISO also has similar status
+of received packets so I was hoping I could reuse the same flag to
+indicate we want packet status to be transmitted with cmsg. Maybe have
+it as BT_CMSG_PKT_STATUS?
+
 >  #endif /* __SCO_H */
 > diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
 > index 3fd124927d4d..d0abea8d08cc 100644
@@ -264,3 +260,7 @@ On Wed, Jun 3, 2020 at 10:52 AM Alain Michaud <alainm@chromium.org> wrote:
 > --
 > 2.27.0.rc2.251.g90737beb825-goog
 >
+
+
+-- 
+Luiz Augusto von Dentz
