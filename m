@@ -7,141 +7,113 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9328CC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80E7C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 19:52:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7761E20734
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE62E207D0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 19:52:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGSfLSh9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CP/qgmsn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbgFCSWj (ORCPT
+        id S1725939AbgFCTww (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 14:22:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
+        Wed, 3 Jun 2020 15:52:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbgFCSWi (ORCPT
+        with ESMTP id S1725821AbgFCTwv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 14:22:38 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CCFC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 11:22:38 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id g18so2869951qtu.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 11:22:38 -0700 (PDT)
+        Wed, 3 Jun 2020 15:52:51 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B5CC08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 12:52:51 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id h7so2916984otr.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 12:52:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qtk3d48GZKqQPiCGMf66/sanUiiyzy5OiciyHOy0SUU=;
-        b=VGSfLSh9K71NZ5CAnTNhOnUm88A1gP5om7Au6ebzMIfkHFTxbkq4ITNWWt68CaCsiu
-         u6VPzeG0wsrTyYICiv1L9kYvE9lUzv/JqvyYCIWf/KuMGgxfbeedg57yNXwaXrbjQMQT
-         4GpUmamIG7DCf/w/95kjoDchDmy8nh6PD3Mg4wcDVD11ABrvhzE9B2hMDhR/eIVK79fG
-         GDxKmQZzXeVeNvEWr6kI/p/VfDLVngr0YeEVQOFl5sjdHHe9L/CEg4yKv+wrpLpbQAbK
-         3Kz1ti+2ETpKTKUU13w2bzeGuErXIU5Fk82FXlB+cFtSq21FG0/kFe0bAyhT/0ouquMI
-         46oQ==
+         :cc:content-transfer-encoding;
+        bh=8/mXneW7ht4EZPvLrDPgILB3BHVPtTWk9KHSwgWw+aE=;
+        b=CP/qgmsnonKMqYc7KzaaPsMaZ6zyMvvjU9KPr5X2vwE0++Uttp7Xc6LTCvuW/ng+jc
+         bqyCznD00h1vQ9jpYn9E+zROP5OlSaFVpjPZXmn8b+Swsn3fOLPz2c2OZvmCyrBlsKMm
+         TDwuS/i1NbU+B7tBVoTvY8aTT020Esq3RfP3K1uaIsXWJhgAvI8isNto9aFYGekvdnMd
+         FNj6IjhoV7/PrO0VR8Honlu6heG9LSrmQRiQu2ohmeEC9vZ+pdKcHMRQ+3e/xDUfNUur
+         zqSMWb8DAwyASCYsKi8DSJOsT/YwCBQ9L8/JM6ZWthgc4BlX2IWWtNhE//62g2VtVs7w
+         YufA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qtk3d48GZKqQPiCGMf66/sanUiiyzy5OiciyHOy0SUU=;
-        b=kkN4C3+vFzjbl1gQmO5CALeEysiWN9bo7AhZHj/9wGRQe+xKZo8hnsSF1ojEUK8zbk
-         3JmP3GjcrfcI7BvTcNGmacicRlArMj4WF5PCVZdZm9V/jikekYnaFBKs9G97C3tQgJvH
-         Bo4/VZ7oIT6kP1gFOy5zzjwB14j71l+Au79rMJESBl8UHgLCCW3AbVgeAUulR9mb9jHX
-         19zi97gPxO/9/KGnKNdgQdpOr/yHmTI71arxHCnx5cfH8vBKkbN4+LeqdryK4oz+UTnA
-         24UKzFG4lki2+WEaTIS5pnRBdZD/ot49/ceKSM32GX66wLDZiyLlPN6LtYl42ENpZkn0
-         2vMw==
-X-Gm-Message-State: AOAM530vr8Vxpmm4ThAtAuSJMMv0sKfhdR6M9X8Vzon15leH6MwFYueK
-        2FQY9f4cPeP/FlXDcVBBOc3hBiZnHhKzqSvaFmE=
-X-Google-Smtp-Source: ABdhPJycHYyhrocdYRAKI2pdJAOxn/G1fDfK7sJocYTPa58SXDcyO8a0V6BglpGNRgvqNAwzqF+yClltbBs151I02uo=
-X-Received: by 2002:ac8:3f88:: with SMTP id d8mr691865qtk.164.1591208556444;
- Wed, 03 Jun 2020 11:22:36 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8/mXneW7ht4EZPvLrDPgILB3BHVPtTWk9KHSwgWw+aE=;
+        b=S3xwb3fIvkCsptEW3MknELlzo9IDpWV4JVfH6y8YTTnz1+gGRaznsQhedeZfCHIHu6
+         yXLTKXfxoGMIgn60SVsRwqqNDH/Bi1Bq1IYY+fk5FQ/B+kOYQbFQl4X1GrxZWdTr9JW4
+         AmQ3ZIRkDcWb1IhAGyKd2L9WlEh/Yx6kQaF/m0ZoSra3xUITeCF0KPKf2RYpjgOpaxZQ
+         7FDuBkOeq6BvskQlQ6wgsXOfISBtqIA+vVfOsk1V2pYWZs3QsAbZdmGf6mhNkHHIQqPb
+         pr0f7kbLoXqgVaFeRvpdGonBDNmJ4VuAppmrzr4Vm/k6raxV8tv8YBDc5cxzeMwKwlrl
+         lMvw==
+X-Gm-Message-State: AOAM530t/+qlhkGBe/ooDSeUpmfu79jsjMBx1iYkxu7ll4tgSkAj5Ktv
+        8EOB0P1CaozAvD2gF41OtiR8wL3K3JCmdYl7a2XY7g==
+X-Google-Smtp-Source: ABdhPJyakEGLUHYjVLg7F/CzZlcXrDitja4VF27VW6hh1r71+Q/496/PdbA1PN4y5H/NkN2lQVuutuVfVBuzJiMndBk=
+X-Received: by 2002:a05:6830:14c4:: with SMTP id t4mr1209611otq.79.1591213970768;
+ Wed, 03 Jun 2020 12:52:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAGpqJgrBtwdauxv03jXsq+8+EG_BW-4QZXryXt-e5Y8HA_5+_g@mail.gmail.com>
- <CABBYNZLLx+zX_XyNjkW99D7HG_6+eZM_MP7EWVVAuuRtf0J6dw@mail.gmail.com> <CABBYNZJxVsnGtpnJkCCQtQFKXOiSEV7490me1vjAOOGynCdfUw@mail.gmail.com>
-In-Reply-To: <CABBYNZJxVsnGtpnJkCCQtQFKXOiSEV7490me1vjAOOGynCdfUw@mail.gmail.com>
-From:   Arthur Lambert <lambertarthur22@gmail.com>
-Date:   Wed, 3 Jun 2020 20:22:25 +0200
-Message-ID: <CAGpqJgrcxd0iwWUu=VB=MhiSS9+TRMLLsyTjbwQMdJ+6u66u6Q@mail.gmail.com>
-Subject: Re: Segmentation fault in bluetoothd with btgatt-client
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <CAPHZWUe9sLt8jsD57i3=PQxMfjODP7dUYLBm2qpSXFdgd9cvAQ@mail.gmail.com>
+ <64A824C9-7C3C-4B08-8A9E-827121C4786D@holtmann.org>
+In-Reply-To: <64A824C9-7C3C-4B08-8A9E-827121C4786D@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Jun 2020 12:52:39 -0700
+Message-ID: <CABBYNZJtgCNeZCYQ9tWno9qD9Vi2AaJNLH5TLxMtASHS-c+ySQ@mail.gmail.com>
+Subject: Re: Should we disable ERTM as default?
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Yun-hao Chung <howardchung@google.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS BT Qualification <chromeos-bt-qual@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
-thanks for your reply!
+Hi Yun-hao,
 
-Sorry I am lazy and stupid. I know that your next question will be
-around symbol...
+On Wed, Jun 3, 2020 at 10:43 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Yun-hao,
+>
+> > When I ran the following tests in PTS qualification on Chrome OS, I
+> > couldn=E2=80=99t pass all of them because they all failed to create an =
+AVDTP
+> > connection with channel type as =E2=80=98Streaming=E2=80=99 or =E2=80=
+=98Enhanced
+> > Retransmission=E2=80=99.
+> >
+> > - MPS/AG-SRC-TG/HFAV/CLH/SD/BV-03-I
+> > - MPS/AG-SRC-TG/HFAV/CLH/SD/BV-04-I
+> > - MPS/AG-SRC-TG/HFAV/CLH/SD/BV-05-I
+> > - MPS/AG-SRC-TG/HFAV/CLH/SD/BV-06-I
+> >
+> > It looks like bluez doesn=E2=80=99t want to change its mode even though=
+ it
+> > claims it supports them. Our question is do we still want to enable
+> > this feature as default?
 
-After removing the binary strip option and enable debug symbol :
+We don't use ERTM on AVDTP connections, in fact only AVRCP Browsing
+channel requires that but I guess you want low level testing of L2CAP
+parameters it more common to use l2test instead, or this does not come
+from L2CAP test spec?
 
-bluetoothd[246]: src/device.c:device_svc_resolved()
-/org/bluez/hci0/dev_80_32_53_37_58_A6 err -5
-bluetoothd[246]: src/device.c:gatt_debug() Read By Grp Type - start:
-0x00bb end: 0xffff
-bluetoothd[246]: src/device.c:gatt_debug() Read By Grp Type - start:
-0x0001 end: 0xffff
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x0001 end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x0001 end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x002a end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x0053 end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x007a end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x00a3 end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x00ba end: 0x00ba
-bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
-0x0001 end: 0xffff
-bluetoothd[246]: src/gatt-database.c:db_hash_read_cb() Database Hash read
-==246== Invalid read of size 1
-==246==    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
-==246==    by 0x87F3B: read_by_type_read_complete_cb (gatt-server.c:392)
-==246==    by 0x892AB: pending_read_result (gatt-db.c:145)
-==246==    by 0x8B2FB: gatt_db_attribute_read_result (gatt-db.c:1866)
-==246==    by 0x3AB0B: db_hash_read_cb (gatt-database.c:1156)
-==246==    by 0x8B1AB: gatt_db_attribute_read (gatt-db.c:1825)
-==246==    by 0x87DB7: process_read_by_type (gatt-server.c:482)
-==246==    by 0x8854F: read_by_type_cb (gatt-server.c:559)
-==246==    by 0x81727: handle_notify (att.c:966)
-==246==    by 0x81873: can_read_data (att.c:1057)
-==246==    by 0x8B91B: watch_callback (io-glib.c:170)
-==246==    by 0x488A413: g_main_context_dispatch (in
-/usr/lib/libglib-2.0.so.0.5600.3)
-==246==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==246==
-==246==
-==246== Process terminating with default action of signal 11 (SIGSEGV)
-==246==  Access not within mapped region at address 0x0
-==246==    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
-==246==    by 0x87F3B: read_by_type_read_complete_cb (gatt-server.c:392)
-==246==    by 0x892AB: pending_read_result (gatt-db.c:145)
-==246==    by 0x8B2FB: gatt_db_attribute_read_result (gatt-db.c:1866)
-==246==    by 0x3AB0B: db_hash_read_cb (gatt-database.c:1156)
-==246==    by 0x8B1AB: gatt_db_attribute_read (gatt-db.c:1825)
-==246==    by 0x87DB7: process_read_by_type (gatt-server.c:482)
-==246==    by 0x8854F: read_by_type_cb (gatt-server.c:559)
-==246==    by 0x81727: handle_notify (att.c:966)
-==246==    by 0x81873: can_read_data (att.c:1057)
-==246==    by 0x8B91B: watch_callback (io-glib.c:170)
-==246==    by 0x488A413: g_main_context_dispatch (in
-/usr/lib/libglib-2.0.so.0.5600.3)
-==246==  If you believe this happened as a result of a stack
-==246==  overflow in your program's main thread (unlikely but
-==246==  possible), you can try to increase the size of the
-==246==  main thread stack using the --main-stacksize= flag.
-==246==  The main thread stack size used in this run was 8388608.
-/usr/bin/bluetoothd: can't resolve symbol '__libc_freeres'
+> I am a bit confused. So when you use the disable_ertm kernel parameters, =
+these test pass? But ERTM is mandatory for AVRCP 1.3 and later.
+>
+> Are we sure that MPS test cases are correct? I mean, we never required ER=
+TM for HFP since that is based on RFCOMM and ERTM is useless for RFCOMM.
+>
+> Regards
+>
+> Marcel
+>
 
-is it the crypto error that you expect?
-Could you share a sha1 commit or a link to the patch to test the potential fix?
 
-Thanks !
+--=20
+Luiz Augusto von Dentz
