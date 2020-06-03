@@ -2,303 +2,127 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B23C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BE0C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3E572077D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14A532068D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbgFCR7z convert rfc822-to-8bit (ORCPT
+        id S1726542AbgFCSCp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 13:59:55 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33392 "EHLO
+        Wed, 3 Jun 2020 14:02:45 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38965 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726103AbgFCR7x (ORCPT
+        with ESMTP id S1726103AbgFCSCp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 13:59:53 -0400
+        Wed, 3 Jun 2020 14:02:45 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 68831CED2E;
-        Wed,  3 Jun 2020 20:09:39 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5C180CED2E;
+        Wed,  3 Jun 2020 20:12:31 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v1 2/7] Bluetooth: Add handler of
- MGMT_OP_READ_ADV_MONITOR_FEATURES
+Subject: Re: [PATCH 2/4] Bluetooth: Fix assuming EIR flags can result in SSP
+ authentication
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200528165324.v1.2.I7f3372c74a6569cd3445b77a67a0b0fcfdd8a333@changeid>
-Date:   Wed, 3 Jun 2020 19:59:50 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Michael Sun <michaelfsun@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <CALWDO_ViGdppcdDm_VNQF9fVSpCfya4WQshn7s2EtcV7HK0b_w@mail.gmail.com>
+Date:   Wed, 3 Jun 2020 20:02:42 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1359027D-E531-4022-89DD-DB19B3C7F499@holtmann.org>
-References: <20200528165324.v1.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
- <20200528165324.v1.2.I7f3372c74a6569cd3445b77a67a0b0fcfdd8a333@changeid>
-To:     Miao-chen Chou <mcchou@chromium.org>
+Message-Id: <154FE28A-B5DA-40C5-801E-F5F881F1FD51@holtmann.org>
+References: <20200519202519.219335-1-luiz.dentz@gmail.com>
+ <20200519202519.219335-2-luiz.dentz@gmail.com>
+ <C478BA49-0BBF-4323-AC3A-30442F65D346@holtmann.org>
+ <CALWDO_UEPaAGyLFG93JzT41P=yGePB-N2Pbh5hioLBOXdh2YBw@mail.gmail.com>
+ <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org>
+ <CALWDO_XztiDRfQEtioALNmO9smLm-qTW56hxkw8-ZH-Aw2cH1g@mail.gmail.com>
+ <6F17F57F-8AF4-4539-8564-C3F13BC6FBF5@holtmann.org>
+ <CALWDO_Umz9T9-_U3spSTO85V3sjw8AWku9iwwuF0J7SKQYiE6w@mail.gmail.com>
+ <CABBYNZLfEVmjXYfSMFDdazgt68Y53ssWqmD71m=YUJ-0g2zU=A@mail.gmail.com>
+ <CALWDO_ViGdppcdDm_VNQF9fVSpCfya4WQshn7s2EtcV7HK0b_w@mail.gmail.com>
+To:     Alain Michaud <alainmichaud@google.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Miao-chen,
+Hi Alain,
 
-> This adds the request handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
-> command. Since the controller-based monitoring is not yet in place, this
-> report only the supported features but not the enabled features.
-> 
-> The following test was performed.
-> - Issuing btmgmt advmon-features.
-> 
-> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
-> 
-> include/net/bluetooth/hci_core.h | 24 +++++++++++++++++
-> net/bluetooth/hci_core.c         | 10 ++++++-
-> net/bluetooth/mgmt.c             | 46 ++++++++++++++++++++++++++++++++
-> net/bluetooth/msft.c             |  7 +++++
-> net/bluetooth/msft.h             |  9 +++++++
-> 5 files changed, 95 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index cdd4f1db8670e..431fe0265dcfb 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -25,6 +25,7 @@
-> #ifndef __HCI_CORE_H
-> #define __HCI_CORE_H
-> 
-> +#include <linux/idr.h>
-> #include <linux/leds.h>
-> #include <linux/rculist.h>
-> 
-> @@ -220,6 +221,24 @@ struct adv_info {
-> #define HCI_MAX_ADV_INSTANCES		5
-> #define HCI_DEFAULT_ADV_DURATION	2
-> 
-> +struct adv_pattern {
-> +	struct list_head list;
-> +	__u8 ad_type;
-> +	__u8 offset;
-> +	__u8 length;
-> +	__u8 value[HCI_MAX_AD_LENGTH];
-> +};
-> +
-> +struct adv_monitor {
-> +	struct list_head patterns;
-> +	bool		active;
-> +	__u16		handle;
-> +};
-> +
-> +#define HCI_MIN_ADV_MONITOR_HANDLE		1
-> +#define HCI_MAX_ADV_MONITOR_NUM_HANDLES	32
-> +#define HCI_MAX_ADV_MONITOR_NUM_PATTERNS	16
-> +
-> #define HCI_MAX_SHORT_NAME_LENGTH	10
-> 
-> /* Min encryption key size to match with SMP */
-> @@ -477,6 +496,9 @@ struct hci_dev {
-> 	__u16			adv_instance_timeout;
-> 	struct delayed_work	adv_instance_expire;
-> 
-> +	struct idr		adv_monitors_idr;
-> +	unsigned int		adv_monitors_cnt;
-> +
-> 	__u8			irk[16];
-> 	__u32			rpa_timeout;
-> 	struct delayed_work	rpa_expired;
-> @@ -1217,6 +1239,8 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
-> void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
-> 
-> +void hci_adv_monitors_clear(struct hci_dev *hdev);
-> +
-> void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-> 
-> void hci_init_sysfs(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index dbe2d79f233fb..23bfe4f1d1e9d 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -26,7 +26,6 @@
-> /* Bluetooth HCI core. */
-> 
-> #include <linux/export.h>
-> -#include <linux/idr.h>
-> #include <linux/rfkill.h>
-> #include <linux/debugfs.h>
-> #include <linux/crypto.h>
-> @@ -2996,6 +2995,12 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> 	return 0;
-> }
-> 
-> +/* This function requires the caller holds hdev->lock */
-> +void hci_adv_monitors_clear(struct hci_dev *hdev)
-> +{
-> +	idr_destroy(&hdev->adv_monitors_idr);
-> +}
-> +
-> struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
-> 					 bdaddr_t *bdaddr, u8 type)
-> {
-> @@ -3574,6 +3579,8 @@ int hci_register_dev(struct hci_dev *hdev)
-> 
-> 	queue_work(hdev->req_workqueue, &hdev->power_on);
-> 
-> +	idr_init(&hdev->adv_monitors_idr);
-> +
-> 	return id;
-> 
-> err_wqueue:
-> @@ -3644,6 +3651,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> 	hci_smp_irks_clear(hdev);
-> 	hci_remote_oob_data_clear(hdev);
-> 	hci_adv_instances_clear(hdev);
-> +	hci_adv_monitors_clear(hdev);
-> 	hci_bdaddr_list_clear(&hdev->le_white_list);
-> 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
-> 	hci_conn_params_clear_all(hdev);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 9e8a3cccc6ca3..8d8275ee9718b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -36,6 +36,7 @@
-> #include "hci_request.h"
-> #include "smp.h"
-> #include "mgmt_util.h"
-> +#include "msft.h"
-> 
-> #define MGMT_VERSION	1
-> #define MGMT_REVISION	17
-> @@ -111,6 +112,7 @@ static const u16 mgmt_commands[] = {
-> 	MGMT_OP_READ_SECURITY_INFO,
-> 	MGMT_OP_READ_EXP_FEATURES_INFO,
-> 	MGMT_OP_SET_EXP_FEATURE,
-> +	MGMT_OP_READ_ADV_MONITOR_FEATURES,
-> };
-> 
-> static const u16 mgmt_events[] = {
-> @@ -3849,6 +3851,49 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
-> 			       MGMT_STATUS_NOT_SUPPORTED);
-> }
-> 
-> +static int read_adv_monitor_features(struct sock *sk, struct hci_dev *hdev,
-> +				     void *data, u16 len)
-> +{
-> +	struct adv_monitor *monitor = NULL;
-> +	struct mgmt_rp_read_adv_monitor_features *rp = NULL;
-> +	int handle;
-> +	size_t rp_size = 0;
-> +	__u32 supported = 0;
-> +	__u16 num_handles = 0;
-> +	__u16 handles[HCI_MAX_ADV_MONITOR_NUM_HANDLES];
-> +
-> +	BT_DBG("request for %s", hdev->name);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR)
-> +		supported |= MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS;
-> +
-> +	idr_for_each_entry(&hdev->adv_monitors_idr, monitor, handle)
-> +		handles[num_handles++] = monitor->handle;
+>>>>>>> Starting with the 2.1 specification, it is my interpretation that it
+>>>>>>> is not valid to support EIR but not SSP.  I understand that SSP may be
+>>>>>>> disabled from BlueZ's point of view, but this doesn't seem to be a
+>>>>>>> legitimate/qualifiable configuration.  Should we instead fail the
+>>>>>>> legacy pairing if EIR was received as an invalid condition?
+>>>>>> 
+>>>>>> I know that using EIR requires to also use SSP. However this is just a precaution in case the other device is an attacked and tries to trick us.
+>>>>>> 
+>>>>>> You might get an inquiry result and not extended inquiry result, but you are still talking to a SSP device. This has to do with the fact that the reception of EIR is not guaranteed. In case of radio interference you might miss one and only get an ordinary inquiry result.
+>>>>>> 
+>>>>>> If we indeed received an EIR and then get legacy pairing request, we could try to reject the pairing. However keep in mind that our inquiry cache is time limited and we through outdated information away. This might cause some race condition. So I rather read the remote host features to ensure we know the actual host features of the remote device.
+>>>>> 
+>>>>> You are correct, the EIR response is not a guaranteed thing.  For this
+>>>>> reason, the host should try to resolve the name of the device before
+>>>>> initiating bonding where a Remote Host Supported Feature Notification
+>>>>> Event is generated to signal the remote side's support of SSP.  As you
+>>>>> allude to, a remote spoofing a legitimate SSP device may always just
+>>>>> jam and downgrade to not SSP, but if you have any signals that SSP is
+>>>>> supported by the device, it may be a good defensive posture.
+>>>> 
+>>>> trying to resolve the name before connected is a waste of time. Resolving the name after connecting will not give you that event. You should just read the remote features.
+>>> 
+>>> I have a vague memory that there was an interoperability issue around
+>>> this that required the initiator to know ahead of time if SSP was
+>>> supported by the remote host before connecting which was the reason
+>>> why this was added in the first place.  However, I agree that this can
+>>> also be read after you are connected rather than just waiting for a
+>>> RNR page to complete just to page again.  The point here however is
+>>> about the signals that SSP should be supported and the conditions
+>>> where we let legacy pairing go through.  My assertion is that EIR
+>>> implies SSP, so legacy pairing shouldn't be allowed in that case.
+>>> It's not a definitive security measure, but IMO, every signals that we
+>>> can get will help close a door to downgrade attacks.
+>> 
+>> Legacy pairing is still indicated with MGMT_DEV_FOUND_LEGACY_PAIRING
+>> so for what is worth this didn't change any logic regarding how legacy
+>> pairing is detected, in fact hci_conn_ssp_enabled is used to determine
+>> if encryption is required or not for low security it was never used to
+>> detect if the paring method used was really SSP or legacy.
+> The general idea is to both "try" to protect against a downgrade
+> attack but also to encrypt all channels (other than SDP) if SSP is
+> supported by the remote.  If the later is already handled, we just
+> need to make sure we use all available signals that the remote side
+> supports SSP.  Receiving an EIR is a valid signal, the absence of EIR
+> doesn't imply the remote doesn't support SSP.
+>> 
+>>>> 
+>>>>> Receiving an EIR response or a Remote Host Supported Feature Event
+>>>>> with the SSP bit set is a good indication that the device supports SSP
+>>>>> and you should expect SSP to take place.  Again, it is not a valid
+>>>>> configuration to have EIR enabled but not SSP per my interpretation of
+>>>>> the 2.1 specification.
+>>>> 
+>>>> If you have an idea on how to tighten this and fail, please send a patch. It is just that our inquiry cache was never designed for that. It was just to speed up the connection process.
+>>> Ack.  This definitely looks like an opportunity.  We can add it to the backlog.
+>> 
+>> If you guys agree I can prepare a patch requiring SSP to be used, but
+>> first we will need to agree on what action we would take under such
+>> situation, shall we disconnect if we figure out the SSP bit is
+>> disabled? Btw, if the remote device has dropped SSP for some reason (I
+>> suppose the spec allows doing it) and we have a EIR on the cache
+>> (which we keep for 30 seconds) that doesn't necessarily mean the
+>> device is broken since the use of EIR may have been dropped in the
+>> meantime.
+> Right, but if we do have the EIR signal, then we should expect SSP to
+> be used.  It is legitimate, in my interpretation, to fail anything
+> less than SSP in that case.
 
-I would put { } here to make it readable.
-
-> +
-> +	hci_dev_unlock(hdev);
-> +
-> +	rp_size = sizeof(*rp) + (num_handles * sizeof(u16));
-> +	rp = kmalloc(rp_size, GFP_KERNEL);
-> +	if (!rp)
-> +		return -ENOMEM;
-> +
-> +	// Once controller-based monitoring is in place, the enabled_features
-> +	// should reflect the use.
-
-Please use /* */ comment style here.
-
-> +	rp->supported_features = supported;
-> +	rp->enabled_features = 0;
-> +	rp->max_num_handles = HCI_MAX_ADV_MONITOR_NUM_HANDLES;
-> +	rp->max_num_patterns = HCI_MAX_ADV_MONITOR_NUM_PATTERNS;
-
-These are little-endian.
-
-> +	rp->num_handles = num_handles;
-> +	if (num_handles)
-> +		memcpy(&rp->handles, &handles, (num_handles * sizeof(u16)));
-> +
-> +	return mgmt_cmd_complete(sk, hdev->id,
-> +				 MGMT_OP_READ_ADV_MONITOR_FEATURES,
-> +				 MGMT_STATUS_SUCCESS, rp, rp_size);
-> +}
-> +
-> static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
-> 				         u16 opcode, struct sk_buff *skb)
-> {
-> @@ -7297,6 +7342,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
-> 	{ set_exp_feature,         MGMT_SET_EXP_FEATURE_SIZE,
-> 						HCI_MGMT_VAR_LEN |
-> 						HCI_MGMT_HDEV_OPTIONAL },
-> +	{ read_adv_monitor_features, MGMT_READ_ADV_MONITOR_FEATURES_SIZE },
-> };
-> 
-> void mgmt_index_added(struct hci_dev *hdev)
-> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-> index d6c4e6b5ae777..8579bfeb28364 100644
-> --- a/net/bluetooth/msft.c
-> +++ b/net/bluetooth/msft.c
-> @@ -139,3 +139,10 @@ void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 
-> 	bt_dev_dbg(hdev, "MSFT vendor event %u", event);
-> }
-> +
-> +__u64 msft_get_features(struct hci_dev *hdev)
-> +{
-> +	struct msft_data *msft = hdev->msft_data;
-> +
-> +	return  msft ? msft->features : 0;
-> +}
-> diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
-> index 5aa9130e1f8ab..e9c478e890b8b 100644
-> --- a/net/bluetooth/msft.h
-> +++ b/net/bluetooth/msft.h
-> @@ -3,16 +3,25 @@
->  * Copyright (C) 2020 Google Corporation
->  */
-> 
-> +#define MSFT_FEATURE_MASK_BREDR_RSSI_MONITOR		BIT(0)
-> +#define MSFT_FEATURE_MASK_LE_CONN_RSSI_MONITOR		BIT(1)
-> +#define MSFT_FEATURE_MASK_LE_ADV_RSSI_MONITOR		BIT(2)
-> +#define MSFT_FEATURE_MASK_LE_ADV_MONITOR		BIT(3)
-> +#define MSFT_FEATURE_MASK_CURVE_VALIDITY		BIT(4)
-> +#define MSFT_FEATURE_MASK_CONCURRENT_ADV_MONITOR	BIT(5)
-> +
-> #if IS_ENABLED(CONFIG_BT_MSFTEXT)
-> 
-> void msft_do_open(struct hci_dev *hdev);
-> void msft_do_close(struct hci_dev *hdev);
-> void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb);
-> +__u64 msft_get_features(struct hci_dev *hdev);
-> 
-> #else
-> 
-> static inline void msft_do_open(struct hci_dev *hdev) {}
-> static inline void msft_do_close(struct hci_dev *hdev) {}
-> static inline void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb) {}
-> +static inline __u64 msft_get_features(struct hci_dev *hdev) { return 0; }
+lets try this then. Worst case we have to revert such a patch if it turns out it cause interop issues.
 
 Regards
 
