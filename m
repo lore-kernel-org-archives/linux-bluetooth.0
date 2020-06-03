@@ -2,265 +2,151 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE65C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FDFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F9C12077D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:15:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3A2D2077D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 21:31:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYGfBn8d"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oFj9Ts67"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726135AbgFCVPI (ORCPT
+        id S1726034AbgFCVbM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 17:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34512 "EHLO
+        Wed, 3 Jun 2020 17:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725922AbgFCVPI (ORCPT
+        with ESMTP id S1725961AbgFCVbL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 17:15:08 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48538C08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 14:15:08 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id s21so3140882oic.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 14:15:08 -0700 (PDT)
+        Wed, 3 Jun 2020 17:31:11 -0400
+Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD24C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 14:31:10 -0700 (PDT)
+Received: by mail-vs1-xe44.google.com with SMTP id t132so2038955vst.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 14:31:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cPw3S1zerV4eP1bQBWpe94Vh6YJh1xoA4dN2/uw/KGE=;
-        b=IYGfBn8d3V/5lnjAFthMGXZuvawbeAhe1yrDGGNA0Ozkx+12F5il/2+4uy4PeIn8h8
-         govorKhfyl4D2UQKRyj1n3xkoIPmg4QqkxG0QBku0LxbTO7Hz5sYChugV5vgze3cp7GG
-         2mx42077vbypsP8xMa6McDyIUhu0aZicNWyep+u2aADfbXBUpefuKzQZXU0EH8L1yInK
-         dUQDt+D9d667BRjNoll1YqiVYSLglB6x5s0pTFald0MKsS/unbtsvrd1wB2gd2WyBbnW
-         a3KG0Cw1ThJscHWjN2FSusTFwdk+CpdcYZ985iM68Hi6ptvhsIcff+alR4t/6X9kSN9T
-         jIPQ==
+        bh=JUaeWtaycwIzCev5kfRxlW9qrUY+p8Hm/aqijsovNfY=;
+        b=oFj9Ts67r+0LFpea3FIfUHxM4TANETordKvibgmkjMpGDDLUFCSbH/kuh9lIGPl2Rn
+         +fma5i6tVDsGXZSRh8ugXVEaKvRCbvlcEMgwDwafb7+ncHNLbrQlv8SWOETsPHJ8Nd5i
+         Z1Yd4Mry/xXUGfMaiUhQQkPSZIT0T7O5rnR0U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cPw3S1zerV4eP1bQBWpe94Vh6YJh1xoA4dN2/uw/KGE=;
-        b=nbPluGHM42/mkDWFL6q4bbNkH60Xa68aSfyhqPIgMVlxfxkcnVuDfK83FmiAgzDP9C
-         nGjOj+xTiB0K8H+kEWBcIhtTJatwdNxMqodHfOKPmMYn9SJ38U5e26PZL03k0jCcNgno
-         A3I4n1BwpOLY/qlf+ReFE7p7ofIuDeIvkqgh3tIYjK9Q9LD/RoM6u/oXcaC1eWc8b8hE
-         L16Cd/6AbLnVedFkK1FymVXb8DtzzX7C4npbiAkskvtg/gaJ0qiP7Q7//7POnHGv6LIZ
-         cVGTbmKEd53p2nRw7MMQhU7G3wPeqv8pwxsKkkGdfHzTZfCofdZiWvIZ+4DljLr5YK2Q
-         iBkQ==
-X-Gm-Message-State: AOAM530l2Gn+haKUW7dIZ8G+KZytbN17fAhYTeKYoaH1sWEkoUVqQSlH
-        gftC1sNT5VWlybnlCYWPqZ6WehgSLLv7zCsu1jZJF8u2
-X-Google-Smtp-Source: ABdhPJz1OoA5ayuSitsyuNU8oE2vPJcDD18ubFWJG1wjLL8uJs7AFjGJaRCBos6dKKR5mxvE9wNhdFh1fWfDYVTFU20=
-X-Received: by 2002:aca:b5d5:: with SMTP id e204mr1159158oif.108.1591218906856;
- Wed, 03 Jun 2020 14:15:06 -0700 (PDT)
+        bh=JUaeWtaycwIzCev5kfRxlW9qrUY+p8Hm/aqijsovNfY=;
+        b=kkJW2hnHkHacsmnb2Qu7PtONLKxgFdkrmwV1f/AHhfbjdawsRSH2Z1POWTGyqiT32u
+         g6POR2RHf+mJ5GNBWESYDhNu3Q8ApxkM750ag0oHTlhjhPUmnFdEAffYdtC347VNr/2v
+         I2cxVL+0PBtdDrCw6+2a7Zpcgu3pNT8tH40aowlkA6c//t0bFhiJT28BX9PCgLk0cynR
+         OcYFehxfeD3Hxoaz7QGXN8IZYJeSv7zKLWUqJsv6Qxuxq9mGqSsP1mlvcFbFbr5SBUWp
+         wcTi2FYAJfcbXMIW/YdwZ69ZzRqggxfZoMGgB8g7rrRHTB4HebpLXDw+k2eHt3XbU+bf
+         KGgQ==
+X-Gm-Message-State: AOAM533Q0pUHrtfLsflm0F2/5y6/ywPlllV9M7YI5ainY8zS9oyj651W
+        WX6vuWRYU77FD8YMAsn7Krrv/JW/Fckf4QvONpqwHg==
+X-Google-Smtp-Source: ABdhPJwFcYbNTcopnrN4YAmNTrC+Qxlv6gAVC12W0WU7kgh2pTRMPlBfn6XuFpceDw+ZKvXLPW2oKaX344QBepbbRP8=
+X-Received: by 2002:a67:7307:: with SMTP id o7mr1113957vsc.93.1591219869527;
+ Wed, 03 Jun 2020 14:31:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200603145205.125167-1-alainm@chromium.org>
-In-Reply-To: <20200603145205.125167-1-alainm@chromium.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 3 Jun 2020 14:14:55 -0700
-Message-ID: <CABBYNZ+Os=u4=r+mSq+C9nRyN=PC6Yk7GNTGhto_2-TBmHxdRQ@mail.gmail.com>
-Subject: Re: [PATCH v3] sco:Add support for BT_PKT_STATUS CMSG data
-To:     Alain Michaud <alainm@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <CAJZ5v0gA9Egmff0y4yTm2UH=ge+jJH1nMbLhTsRbUtP=+m8OLg@mail.gmail.com>
+ <CANFp7mWTk9qFqUhvwhxZY97_J=MwwWV-8ctJYFGT8_QJw_bPmA@mail.gmail.com> <CAJZ5v0jmdAK2R_oo50w0WLqG5rfGeeAxoDetuH-FEMRh=Oz4tw@mail.gmail.com>
+In-Reply-To: <CAJZ5v0jmdAK2R_oo50w0WLqG5rfGeeAxoDetuH-FEMRh=Oz4tw@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed, 3 Jun 2020 14:30:55 -0700
+Message-ID: <CANFp7mXdJbVk_4zpUPV+5sstUfErycO-yuhBc0MrzO++8c7kag@mail.gmail.com>
+Subject: Re: Problematic BT commit in Linux 5.7
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Len Brown <len.brown@intel.com>,
+        Todd Brandt <todd.e.brandt@linux.intel.com>,
+        "Zhang, Rui" <rui.zhang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain, Marcel,
+I've sent a patch to fix this titled: [PATCH] Bluetooth: Allow suspend
+even when preparation has failed
+https://patchwork.kernel.org/patch/11586223/
 
-On Wed, Jun 3, 2020 at 7:56 AM Alain Michaud <alainm@chromium.org> wrote:
->
-> This change adds support for reporting the BT_PKT_STATUS to the socket
-> CMSG data to allow the implementation of a packet loss correction on
-> erronous data received on the SCO socket.
->
-> The patch was partially developed by Marcel Holtmann and validated by
-> Hsin-yu Chao
->
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
->
-> ---
->
->  include/net/bluetooth/bluetooth.h |  8 +++++++
->  include/net/bluetooth/sco.h       |  3 +++
->  net/bluetooth/af_bluetooth.c      |  3 +++
->  net/bluetooth/hci_core.c          |  1 +
->  net/bluetooth/sco.c               | 35 +++++++++++++++++++++++++++++++
->  5 files changed, 50 insertions(+)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 3fa7b1e3c5d9..85e6c5754448 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -147,6 +147,8 @@ struct bt_voice {
->  #define BT_MODE_LE_FLOWCTL     0x03
->  #define BT_MODE_EXT_FLOWCTL    0x04
->
-> +#define BT_PKT_STATUS          16
-> +
->  __printf(1, 2)
->  void bt_info(const char *fmt, ...);
->  __printf(1, 2)
-> @@ -275,6 +277,7 @@ struct bt_sock {
->         struct sock *parent;
->         unsigned long flags;
->         void (*skb_msg_name)(struct sk_buff *, void *, int *);
-> +       void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock *);
->  };
->
->  enum {
-> @@ -324,6 +327,10 @@ struct l2cap_ctrl {
->         struct l2cap_chan *chan;
->  };
->
-> +struct sco_ctrl {
-> +       u8      pkt_status;
-> +};
-> +
->  struct hci_dev;
->
->  typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, u16 opcode);
-> @@ -350,6 +357,7 @@ struct bt_skb_cb {
->         u8 incoming:1;
->         union {
->                 struct l2cap_ctrl l2cap;
-> +               struct sco_ctrl sco;
->                 struct hci_ctrl hci;
->         };
->  };
-> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-> index f40ddb4264fc..7f0d7bdc53f6 100644
-> --- a/include/net/bluetooth/sco.h
-> +++ b/include/net/bluetooth/sco.h
-> @@ -46,4 +46,7 @@ struct sco_conninfo {
->         __u8  dev_class[3];
->  };
->
-> +/* CMSG flags */
-> +#define SCO_CMSG_PKT_STATUS    0x0001
-> +
+Please take a look.
 
-I wonder if we can make this generic since ISO also has similar status
-of received packets so I was hoping I could reuse the same flag to
-indicate we want packet status to be transmitted with cmsg. Maybe have
-it as BT_CMSG_PKT_STATUS?
+Thanks
+Abhishek
 
->  #endif /* __SCO_H */
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 3fd124927d4d..d0abea8d08cc 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -286,6 +286,9 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->                 if (msg->msg_name && bt_sk(sk)->skb_msg_name)
->                         bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
->                                                 &msg->msg_namelen);
-> +
-> +               if (bt_sk(sk)->skb_put_cmsg)
-> +                       bt_sk(sk)->skb_put_cmsg(skb, msg, sk);
->         }
+On Wed, Jun 3, 2020 at 9:32 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
 >
->         skb_free_datagram(sk, skb);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 51d399273276..7b5e46198d99 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -4549,6 +4549,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+> Hi Abhishek,
 >
->         if (conn) {
->                 /* Send to upper protocol */
-> +               bt_cb(skb)->sco.pkt_status = flags & 0x03;
->                 sco_recv_scodata(conn, skb);
->                 return;
->         } else {
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index c8c3d38cdc7b..f6b54853e547 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -66,6 +66,7 @@ struct sco_pinfo {
->         bdaddr_t        dst;
->         __u32           flags;
->         __u16           setting;
-> +       __u32           cmsg_mask;
->         struct sco_conn *conn;
->  };
+> On Wed, Jun 3, 2020 at 6:29 PM Abhishek Pandit-Subedi
+> <abhishekpandit@chromium.org> wrote:
+> >
+> > Hi Rafael,
+> >
+> > I left a comment on the bugzilla post as well but I agree with you now
+> > that it's probably bad to fail suspend when this occurs.
+> >
+> > At https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_core.c#n3363,
+> > we try to recover from a failed suspend by restoring running state and
+> > returning an -EBUSY.
+> > I think if we change this logic to not attempt to restore until
+> > resume, log the error and allow suspend, that would probably be
+> > preferable from a suspend perspective.
+> > I will make this change, test it out and send the patch today.
 >
-> @@ -449,6 +450,15 @@ static void sco_sock_close(struct sock *sk)
->         sco_sock_kill(sk);
->  }
+> Thank you!
 >
-> +static void sco_skb_put_cmsg(struct sk_buff *skb, struct msghdr *msg,
-> +                            struct sock *sk)
-> +{
-> +       if (sco_pi(sk)->cmsg_mask & SCO_CMSG_PKT_STATUS)
-> +               put_cmsg(msg, SOL_BLUETOOTH, BT_PKT_STATUS,
-> +                        sizeof(bt_cb(skb)->sco.pkt_status),
-> +                        &bt_cb(skb)->sco.pkt_status);
-> +}
-> +
->  static void sco_sock_init(struct sock *sk, struct sock *parent)
->  {
->         BT_DBG("sk %p", sk);
-> @@ -457,6 +467,8 @@ static void sco_sock_init(struct sock *sk, struct sock *parent)
->                 sk->sk_type = parent->sk_type;
->                 bt_sk(sk)->flags = bt_sk(parent)->flags;
->                 security_sk_clone(parent, sk);
-> +       } else {
-> +               bt_sk(sk)->skb_put_cmsg = sco_skb_put_cmsg;
->         }
->  }
+> Please CC linux-pm as well as Len Brown and Todd Brandt (both in the
+> CC list of this message) on that patch.
 >
-> @@ -846,6 +858,18 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
->                 sco_pi(sk)->setting = voice.setting;
->                 break;
+> Thanks!
 >
-> +       case BT_PKT_STATUS:
-> +               if (get_user(opt, (u32 __user *)optval)) {
-> +                       err = -EFAULT;
-> +                       break;
-> +               }
-> +
-> +               if (opt)
-> +                       sco_pi(sk)->cmsg_mask |= SCO_CMSG_PKT_STATUS;
-> +               else
-> +                       sco_pi(sk)->cmsg_mask &= ~SCO_CMSG_PKT_STATUS;
-> +               break;
-> +
->         default:
->                 err = -ENOPROTOOPT;
->                 break;
-> @@ -923,6 +947,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
->         int len, err = 0;
->         struct bt_voice voice;
->         u32 phys;
-> +       u32 pkt_status;
 >
->         BT_DBG("sk %p", sk);
->
-> @@ -969,6 +994,16 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
->                         err = -EFAULT;
->                 break;
->
-> +       case BT_PKT_STATUS:
-> +               if (sco_pi(sk)->cmsg_mask & SCO_CMSG_PKT_STATUS)
-> +                       pkt_status = 1;
-> +               else
-> +                       pkt_status = 0;
-> +
-> +               if (put_user(pkt_status, (u32 __user *)optval))
-> +                       err = -EFAULT;
-> +               break;
-> +
->         default:
->                 err = -ENOPROTOOPT;
->                 break;
-> --
-> 2.27.0.rc2.251.g90737beb825-goog
->
-
-
--- 
-Luiz Augusto von Dentz
+> > On Wed, Jun 3, 2020 at 9:16 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
+> > >
+> > > Hi Marcel,
+> > >
+> > > Unfortunately, we are observing system suspend failures on multiple
+> > > lab machines as reported in the BZ entry at
+> > >
+> > > https://bugzilla.kernel.org/show_bug.cgi?id=207629
+> > >
+> > > which is due to the following commit:
+> > >
+> > > commit dd522a7429b07e4441871ae75ebbfcf53635bdd4
+> > > Author: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > > Date:   Wed Mar 11 08:54:02 2020 -0700
+> > >
+> > >     Bluetooth: Handle LE devices during suspend
+> > >
+> > > Ostensibly, this is because the BT firmware on the machines in
+> > > question does not match the new kernel code, but the firmware update
+> > > requirement is not entirely obvious to the users and the steps to take
+> > > in order to upgrade the firmware are not clear.
+> > >
+> > > Apart from the above, failing system suspend for a reason like a
+> > > protocol timeout isn't really user-friendly, because the user may just
+> > > have closed the lid of a laptop and is expecting the system to be
+> > > suspended (so it may go into a backpack or similar).  Yes, the driver
+> > > may not be able to suspend its device gracefully, but failing the
+> > > entire system suspend really is a big deal and should be treated as a
+> > > last-resort type of action.
+> > >
+> > > As stated in the BZ above, reverting the above commit along with
+> > > "Bluetooth: Pause discovery and advertising during suspend"
+> > > (4867bd007d25a8dfd4ffc558534f7aec8b361789) makes the issue go away, so
+> > > can you please consider doing that?
+> > >
+> > > Alternatively, would it be possible to address the issue in a way that
+> > > would not require many users to update firmware on their systems?
+> > >
+> > > Cheers,
+> > > Rafael
