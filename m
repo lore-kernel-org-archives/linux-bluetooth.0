@@ -2,468 +2,305 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0309C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B23C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:59:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85A6F2068D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:58:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmgbeW0e"
+	by mail.kernel.org (Postfix) with ESMTP id D3E572077D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 17:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726376AbgFCR6z (ORCPT
+        id S1726402AbgFCR7z convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 13:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726342AbgFCR6y (ORCPT
+        Wed, 3 Jun 2020 13:59:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:33392 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726103AbgFCR7x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 13:58:54 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C5D5C08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 10:58:54 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id k15so2604886otp.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 10:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Q/rx3e+2T9gOb4cIezRUxURzTkiOUpXptsICFoYLbPE=;
-        b=RmgbeW0e+0gdn7A8SLfq5Xr+BAIA8/BYDiaLkuhDPTEhRnTzWEB519CH7+6a+cp6X6
-         +QI5HcrxCP+QS8SS7KtqU0pvqKXAp0wgq/PBzlQOzuS1UhONtZoz3Khlgs/PdWFGTme1
-         iPwZhYdZP73Fhk3y47w4pJ/ndS4+8eB58wd7dtxSWZQjawRQa+mOXSFCdiJQRKOtb/uc
-         55BTxslLbHssbDGIM92OLLsErz/u5iM5HkEypfJpho2i0E8eW5WG4vZhrtOq8c9LMQk5
-         eFrHf3XNC3I1FVOUjgu6gK8pCtps/Meitqf7Y17TI2laonBtGaRGDBExyWNrD5KOYCy+
-         qjMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Q/rx3e+2T9gOb4cIezRUxURzTkiOUpXptsICFoYLbPE=;
-        b=kY7gjF1wLzM3T+uvq8rKSXK28J+8aoSXGd8RJyNzcGpi9UcjxxcOdzigFlfxGx7pQo
-         ZLNyXE1r8M7BTES67n5e6W8MgovAYs7CaLZViydSxD1GVj8KkeS2uLO3xS4hxLE7RI4g
-         wavrnxXQwZlGr3V3Y7f61jsWgPap5kA2locs7+ukpIWYMB5qkVpVSturvNcVHqgSz/7v
-         KoR17EXRDFjRZMMgHIVAajldeCYznuG7sAeRaPdXIsAwTpdRc5HpacknF0NXi9PifdlA
-         7fce3kgm5i3toi9h9oH3QSAp0q2+nolr/uDoLN1JYIxjM0rFC4TJR+W4MuJ7Y+OZpUXe
-         MwnQ==
-X-Gm-Message-State: AOAM530A64jYCP1tuu6NHmxtOUf5FOpz1/E9131dcHy/sVJRzR27ZCry
-        RvrOFXIPYTPPFbwohn23QavGj3TsArX2DNistJ3XJA==
-X-Google-Smtp-Source: ABdhPJweoEQ7vmZwSPANNZEqmQruyKs1QUC0K6WsE1xi6TfR0tdajHGjhIb0x7HKzkng7Khnf8mU0+8733CFdZwPmxE=
-X-Received: by 2002:a9d:2049:: with SMTP id n67mr774923ota.177.1591207133587;
- Wed, 03 Jun 2020 10:58:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAGpqJgrBtwdauxv03jXsq+8+EG_BW-4QZXryXt-e5Y8HA_5+_g@mail.gmail.com>
- <CABBYNZLLx+zX_XyNjkW99D7HG_6+eZM_MP7EWVVAuuRtf0J6dw@mail.gmail.com>
-In-Reply-To: <CABBYNZLLx+zX_XyNjkW99D7HG_6+eZM_MP7EWVVAuuRtf0J6dw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 3 Jun 2020 10:58:39 -0700
-Message-ID: <CABBYNZJxVsnGtpnJkCCQtQFKXOiSEV7490me1vjAOOGynCdfUw@mail.gmail.com>
-Subject: Re: Segmentation fault in bluetoothd with btgatt-client
-To:     Arthur Lambert <lambertarthur22@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 3 Jun 2020 13:59:53 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 68831CED2E;
+        Wed,  3 Jun 2020 20:09:39 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v1 2/7] Bluetooth: Add handler of
+ MGMT_OP_READ_ADV_MONITOR_FEATURES
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200528165324.v1.2.I7f3372c74a6569cd3445b77a67a0b0fcfdd8a333@changeid>
+Date:   Wed, 3 Jun 2020 19:59:50 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Michael Sun <michaelfsun@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1359027D-E531-4022-89DD-DB19B3C7F499@holtmann.org>
+References: <20200528165324.v1.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
+ <20200528165324.v1.2.I7f3372c74a6569cd3445b77a67a0b0fcfdd8a333@changeid>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arthur,
+Hi Miao-chen,
 
-On Wed, Jun 3, 2020 at 10:17 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Arthur,
->
-> On Wed, Jun 3, 2020 at 2:45 AM Arthur Lambert <lambertarthur22@gmail.com>=
- wrote:
-> >
-> > Hello,
-> >
-> > I am working on an embedded device with Bluez 5.54.
-> > My bluez init script for the bluetoothd demon :
-> >
-> > # cat /etc/init.d/S19_bluez
-> > #!/bin/sh
-> >
-> > start() {
-> > echo -n "Starting $0: "
-> > #bluetoothd -dE&
-> > echo "Done."
-> > }
-> >
-> > (...)
-> >
-> > To initialize my hci0, we are using btmgmt :
-> >
-> > /usr/bin/btmgmt -i hci0 power off
-> > /usr/bin/btmgmt -i hci0 le on
-> > /usr/bin/btmgmt -i hci0 bredr on
-> > /usr/bin/btmgmt -i hci0 connectable on
-> > /usr/bin/btmgmt -i hci0 bondable on
-> > /usr/bin/btmgmt -i hci0 discov on
-> > /usr/bin/btmgmt -i hci0 name XXXXX-HEADBAND-V2
-> > /usr/bin/btmgmt -i hci0 advertising on
-> > /usr/bin/btmgmt -i hci0 power on
-> >
-> > Log from bluetoothd:
-> >
-> > # valgrind --leak-check=3Dno --show-reachable=3Dno
-> > --show-possibly-lost=3Dno --track-origins=3Dyes bluetoothd -dEn
-> > =3D=3D237=3D=3D Memcheck, a memory error detector
-> > =3D=3D237=3D=3D Copyright (C) 2002-2017, and GNU GPL'd, by Julian Sewar=
-d et al.
-> > =3D=3D237=3D=3D Using Valgrind-3.14.0 and LibVEX; rerun with -h for cop=
-yright info
-> > =3D=3D237=3D=3D Command: bluetoothd -dEn
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D Invalid read of size 4
-> > =3D=3D237=3D=3D    at 0x4005458: _dl_get_ready_to_run (in /lib/ld-uClib=
-c-1.0.31.so)
-> > =3D=3D237=3D=3D  Address 0x7dffc934 is on thread 1's stack
-> > =3D=3D237=3D=3D  20 bytes below stack pointer
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D Invalid read of size 4
-> > =3D=3D237=3D=3D    at 0x4B05AB8: __uClibc_main (in /lib/libuClibc-1.0.3=
-1.so)
-> > =3D=3D237=3D=3D  Address 0x7dffcbec is on thread 1's stack
-> > =3D=3D237=3D=3D  20 bytes below stack pointer
-> > =3D=3D237=3D=3D
-> > bluetoothd[237]: Bluetooth daemon 5.54
-> > bluetoothd[237]: src/main.c:parse_config() parsing /etc/bluetooth/main.=
-conf
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CDiscoverableTimeout=E2=80=9D in group =E2=80=9CGeneral=E2=80=
-=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CAlwaysPairable=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CPairableTimeout=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CPrivacy=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CJustWorksRepairing=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() name=3DXXXXX-HEADBAND-V2
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CClass=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CDeviceID=E2=80=9D in group =E2=80=9CGeneral=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have key
-> > =E2=80=9CReverseServiceDiscovery=E2=80=9D in group =E2=80=9CGeneral=E2=
-=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have group=
- =E2=80=9CGATT=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have group=
- =E2=80=9CGATT=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have group=
- =E2=80=9CGATT=E2=80=9D
-> > bluetoothd[237]: src/main.c:parse_config() Key file does not have group=
- =E2=80=9CGATT=E2=80=9D
-> > bluetoothd[237]: src/adapter.c:adapter_init() sending read version comm=
-and
-> > bluetoothd[237]: Starting SDP server
-> > bluetoothd[237]: src/sdpd-service.c:register_device_id() Adding device
-> > id record for 0002:1d6b:0246:0536
-> > bluetoothd[237]: src/plugin.c:plugin_init() Loading builtin plugins
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading hostname plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading wiimote plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading autopair plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading policy plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading network plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading input plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading hog plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading gap plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading scanparam plugin
-> > bluetoothd[237]: src/plugin.c:add_plugin() Loading deviceinfo plugin
-> > bluetoothd[237]: src/plugin.c:plugin_init() Loading plugins
-> > /usr/lib/bluetooth/plugins
-> > bluetoothd[237]: profiles/input/suspend-none.c:suspend_init()
-> > bluetoothd[237]: profiles/network/manager.c:read_config() Config
-> > options: Security=3Dtrue
-> > bluetoothd[237]: Failed to open RFKILL control device
-> > bluetoothd[237]: src/main.c:main() Entering main loop
-> > bluetoothd[237]: Bluetooth management interface 1.9 initialized
-> > bluetoothd[237]: src/adapter.c:read_version_complete() sending read
-> > supported commands command
-> > bluetoothd[237]: src/adapter.c:read_version_complete() sending read
-> > index list command
-> > bluetoothd[237]: src/adapter.c:read_commands_complete() Number of comma=
-nds: 61
-> > bluetoothd[237]: src/adapter.c:read_commands_complete() Number of event=
-s: 34
-> > bluetoothd[237]: src/adapter.c:read_commands_complete() enabling
-> > kernel-side connection control
-> > bluetoothd[237]: src/adapter.c:read_index_list_complete() Number of
-> > controllers: 0
-> > bluetoothd[237]: src/adapter.c:index_added() index 0
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() System name: XXXXXX-HE=
-ADBAND-V2
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() Major class: 0
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() Minor class: 0
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() Modalias: usb:v1D6Bp02=
-46d0536
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() Discoverable timeout:
-> > 180 seconds
-> > bluetoothd[237]: src/adapter.c:btd_adapter_new() Pairable timeout: 0 se=
-conds
-> > bluetoothd[237]: src/adapter.c:index_added() sending read info command
-> > for index 0
-> > bluetoothd[237]: src/adapter.c:read_info_complete() index 0 status 0x00
-> > bluetoothd[237]: src/adapter.c:clear_uuids() sending clear uuids
-> > command for index 0
-> > bluetoothd[237]: src/adapter.c:clear_devices() sending clear devices
-> > command for index 0
-> > bluetoothd[237]: src/adapter.c:set_mode() sending set mode command for =
-index 0
-> > bluetoothd[237]: src/adapter.c:set_mode() sending set mode command for =
-index 0
-> > bluetoothd[237]: src/adapter.c:set_mode() sending set mode command for =
-index 0
-> > bluetoothd[237]: src/adapter.c:set_privacy() sending set privacy
-> > command for index 0
-> > bluetoothd[237]: src/adapter.c:set_privacy() setting privacy mode 0x00
-> > for index 0
-> > bluetoothd[237]: src/gatt-database.c:btd_gatt_database_new() GATT
-> > Manager registered for adapter: /org/bluez/hci0
-> > bluetoothd[237]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Adding
-> > record with handle 0x10001
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00000007-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00000100-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00001002-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00001800-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-> > bluetoothd[237]: src/adapter.c:add_uuid() sending add uuid command for =
-index 0
-> > bluetoothd[237]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Adding
-> > record with handle 0x10002
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00000007-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00000100-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00001002-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/sdpd-service.c:add_record_to_server() Record
-> > pattern UUID 00001801-0000-1000-8000-00805f9
-> > bluetoothd[237]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-> > bluetoothd[237]: src/adapter.c:add_uuid() sending add uuid command for =
-index 0
-> > bluetoothd[237]: src/advertising.c:btd_adv_manager_new() LE
-> > Advertising Manager created for adapter: /org/bluez/hci0
-> > bluetoothd[237]: plugins/hostname.c:hostname_probe()
-> > bluetoothd[237]: profiles/network/manager.c:panu_server_probe() path
-> > /org/bluez/hci0
-> > bluetoothd[237]: profiles/network/server.c:server_register()
-> > Registered interface org.bluez.NetworkServer1 on path /org/bluez/hci0
-> > bluetoothd[237]: profiles/network/manager.c:gn_server_probe() path
-> > /org/bluez/hci0
-> > bluetoothd[237]: profiles/network/manager.c:nap_server_probe() path
-> > /org/bluez/hci0
-> > bluetoothd[237]: src/adapter.c:btd_adapter_unblock_address() hci0
-> > 00:00:00:00:00:00
-> > bluetoothd[237]: src/adapter.c:load_link_keys() hci0 keys 0 debug_keys =
-0
-> > bluetoothd[237]: src/adapter.c:load_ltks() hci0 keys 0
-> > bluetoothd[237]: src/adapter.c:load_irks() hci0 irks 0
-> > bluetoothd[237]: src/adapter.c:load_conn_params() hci0 conn params 0
-> > bluetoothd[237]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-> > bluetoothd[237]: src/adapter.c:add_uuid() sending add uuid command for =
-index 0
-> > bluetoothd[237]: src/adapter.c:set_did() hci0 source 2 vendor 1d6b
-> > product 246 version 536
-> > bluetoothd[237]: src/adapter.c:adapter_register() Adapter
-> > /org/bluez/hci0 registered
-> > bluetoothd[237]: src/adapter.c:set_dev_class() sending set device
-> > class command for index 0
-> > bluetoothd[237]: src/adapter.c:set_name() sending set local name
-> > command for index 0
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-0280
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000200
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-0282
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000002
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-0292
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000010
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-029a
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000008
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Name: TEST=
-BENCH-V2
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Short name=
-:
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Current
-> > alias: TESTBENCH-V2
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-069a
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000400
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: Failed to clear UUIDs: Busy (0x0a)
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-069b
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000001
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:adapter_start() adapter /org/bluez/hci0
-> > has been enabled
-> > bluetoothd[237]: src/adapter.c:trigger_passive_scanning()
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-06db
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000040
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: src/adapter.c:new_settings_callback() Settings: 0x0000=
-0edb
-> > bluetoothd[237]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000800
-> > bluetoothd[237]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
-> > bluetoothd[237]: Failed to set privacy: Rejected (0x0b)
-> > bluetoothd[237]: src/adapter.c:load_link_keys_complete() link keys
-> > loaded for hci0
-> > bluetoothd[237]: src/adapter.c:load_ltks_complete() LTKs loaded for hci=
-0
-> > bluetoothd[237]: src/adapter.c:load_irks_complete() IRKs loaded for hci=
-0
-> > bluetoothd[237]: src/adapter.c:load_conn_params_complete() Connection
-> > Parameters loaded for hci0
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Name:
-> > XXXXXX-HEADBAND-V2
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Short name=
-:
-> > bluetoothd[237]: src/adapter.c:local_name_changed_callback() Current
-> > alias: XXXXXXX-HEADBAND-V2
-> >
-> > # run btgatt client here...
-> >
-> > bluetoothd[237]: src/adapter.c:connected_callback() hci0 device
-> > 80:32:53:37:58:A6 connected eir_len 0
-> > bluetoothd[237]: src/device.c:device_create() dst 80:32:53:37:58:A6
-> > bluetoothd[237]: src/device.c:device_new() address 80:32:53:37:58:A6
-> > bluetoothd[237]: src/device.c:device_new() Creating device
-> > /org/bluez/hci0/dev_80_32_53_37_58_A6
-> > bluetoothd[237]: src/gatt-database.c:connect_cb() New incoming LE ATT c=
-onnection
-> > bluetoothd[237]: attrib/gattrib.c:g_attrib_ref() 0x4c56848: g_attrib_re=
-f=3D1
-> > bluetoothd[237]: src/device.c:load_gatt_db() Restoring
-> > 80:32:53:37:58:A6 gatt database from file
-> > bluetoothd[237]: No cache for 80:32:53:37:58:A6
-> > bluetoothd[237]: src/gatt-client.c:btd_gatt_client_connected() Device c=
-onnected.
-> > bluetoothd[237]: src/device.c:gatt_debug() MTU exchange complete, with =
-MTU: 256
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x0001 end: 0xffff
-> > bluetoothd[237]: src/device.c:gatt_debug() MTU Exchange failed. ATT ECO=
-DE: 0x06
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Grp Type - start:
-> > 0x0001 end: 0xffff
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x0010 end: 0xffff
-> > bluetoothd[237]: src/device.c:gatt_debug() Primary service discovery
-> > failed. ATT ECODE: 0x06
-> > bluetoothd[237]: src/device.c:gatt_debug() Failed to initialize gatt-cl=
-ient
-> > bluetoothd[237]: src/device.c:gatt_client_ready_cb() status: failed, er=
-ror: 6
-> > bluetoothd[237]: src/device.c:device_svc_resolved()
-> > /org/bluez/hci0/dev_80_32_53_37_58_A6 err -5
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Grp Type - start:
-> > 0x0010 end: 0xffff
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Grp Type - start:
-> > 0x0001 end: 0xffff
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x0001 end: 0x000f
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x0001 end: 0x000f
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x000f end: 0x000f
-> > bluetoothd[237]: src/device.c:gatt_debug() Read By Type - start:
-> > 0x0001 end: 0xffff
-> > bluetoothd[237]: src/gatt-database.c:db_hash_read_cb() Database Hash re=
-ad
-> > =3D=3D237=3D=3D Invalid read of size 1
-> > =3D=3D237=3D=3D    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
-> > =3D=3D237=3D=3D    by 0x79E1B: ??? (in /usr/bin/bluetoothd)
-> > =3D=3D237=3D=3D  Address 0x0 is not stack'd, malloc'd or (recently) fre=
-e'd
->
-> Looks like a NULL pointer, it would be great if you could provide the
-> backtrace with source symbols though.
->
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D Process terminating with default action of signal 11 (S=
-IGSEGV)
-> > =3D=3D237=3D=3D  Access not within mapped region at address 0x0
-> > =3D=3D237=3D=3D    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
-> > =3D=3D237=3D=3D    by 0x79E1B: ??? (in /usr/bin/bluetoothd)
-> > =3D=3D237=3D=3D  If you believe this happened as a result of a stack
-> > =3D=3D237=3D=3D  overflow in your program's main thread (unlikely but
-> > =3D=3D237=3D=3D  possible), you can try to increase the size of the
-> > =3D=3D237=3D=3D  main thread stack using the --main-stacksize=3D flag.
-> > =3D=3D237=3D=3D  The main thread stack size used in this run was 838860=
-8.
-> > /usr/bin/bluetoothd: can't resolve symbol '__libc_freeres'
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D HEAP SUMMARY:
-> > =3D=3D237=3D=3D     in use at exit: 40,320 bytes in 860 blocks
-> > =3D=3D237=3D=3D   total heap usage: 4,297 allocs, 3,437 frees, 981,133 =
-bytes allocated
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D For a detailed leak analysis, rerun with: --leak-check=
-=3Dfull
-> > =3D=3D237=3D=3D
-> > =3D=3D237=3D=3D For counts of detected and suppressed errors, rerun wit=
-h: -v
-> > =3D=3D237=3D=3D ERROR SUMMARY: 57 errors from 3 contexts (suppressed: 0=
- from 0)
-> > Segmentation fault
-> >
-> > From my host, I run this command to trigger the segmentation fault :
-> > [arthur ] sudo ./btgatt-client -i hci0 -d cc:c0:79:ce:f9:56 -m 256
-> > Connecting to device... Done
-> > [GATT client]# Service Added - UUID:
-> > 00001800-0000-1000-8000-00805f9b34fb start: 0x0001 end: 0x0005
-> > [GATT client]# Service Added - UUID:
-> > 00001801-0000-1000-8000-00805f9b34fb start: 0x0006 end: 0x000f
-> > [GATT client]# GATT discovery procedures failed - error code: 0x00
-> > [GATT client]# Device disconnected: Connection reset by peer
-> > Shutting down...
-> >
-> > When I run the test with btgatt-client from 5.50 release, there is no i=
-ssue.
-> > Is it normal?
+> This adds the request handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
+> command. Since the controller-based monitoring is not yet in place, this
+> report only the supported features but not the enabled features.
+> 
+> The following test was performed.
+> - Issuing btmgmt advmon-features.
+> 
+> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+> 
+> include/net/bluetooth/hci_core.h | 24 +++++++++++++++++
+> net/bluetooth/hci_core.c         | 10 ++++++-
+> net/bluetooth/mgmt.c             | 46 ++++++++++++++++++++++++++++++++
+> net/bluetooth/msft.c             |  7 +++++
+> net/bluetooth/msft.h             |  9 +++++++
+> 5 files changed, 95 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index cdd4f1db8670e..431fe0265dcfb 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -25,6 +25,7 @@
+> #ifndef __HCI_CORE_H
+> #define __HCI_CORE_H
+> 
+> +#include <linux/idr.h>
+> #include <linux/leds.h>
+> #include <linux/rculist.h>
+> 
+> @@ -220,6 +221,24 @@ struct adv_info {
+> #define HCI_MAX_ADV_INSTANCES		5
+> #define HCI_DEFAULT_ADV_DURATION	2
+> 
+> +struct adv_pattern {
+> +	struct list_head list;
+> +	__u8 ad_type;
+> +	__u8 offset;
+> +	__u8 length;
+> +	__u8 value[HCI_MAX_AD_LENGTH];
+> +};
+> +
+> +struct adv_monitor {
+> +	struct list_head patterns;
+> +	bool		active;
+> +	__u16		handle;
+> +};
+> +
+> +#define HCI_MIN_ADV_MONITOR_HANDLE		1
+> +#define HCI_MAX_ADV_MONITOR_NUM_HANDLES	32
+> +#define HCI_MAX_ADV_MONITOR_NUM_PATTERNS	16
+> +
+> #define HCI_MAX_SHORT_NAME_LENGTH	10
+> 
+> /* Min encryption key size to match with SMP */
+> @@ -477,6 +496,9 @@ struct hci_dev {
+> 	__u16			adv_instance_timeout;
+> 	struct delayed_work	adv_instance_expire;
+> 
+> +	struct idr		adv_monitors_idr;
+> +	unsigned int		adv_monitors_cnt;
+> +
+> 	__u8			irk[16];
+> 	__u32			rpa_timeout;
+> 	struct delayed_work	rpa_expired;
+> @@ -1217,6 +1239,8 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+> int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
+> void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
+> 
+> +void hci_adv_monitors_clear(struct hci_dev *hdev);
+> +
+> void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+> 
+> void hci_init_sysfs(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index dbe2d79f233fb..23bfe4f1d1e9d 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -26,7 +26,6 @@
+> /* Bluetooth HCI core. */
+> 
+> #include <linux/export.h>
+> -#include <linux/idr.h>
+> #include <linux/rfkill.h>
+> #include <linux/debugfs.h>
+> #include <linux/crypto.h>
+> @@ -2996,6 +2995,12 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+> 	return 0;
+> }
+> 
+> +/* This function requires the caller holds hdev->lock */
+> +void hci_adv_monitors_clear(struct hci_dev *hdev)
+> +{
+> +	idr_destroy(&hdev->adv_monitors_idr);
+> +}
+> +
+> struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
+> 					 bdaddr_t *bdaddr, u8 type)
+> {
+> @@ -3574,6 +3579,8 @@ int hci_register_dev(struct hci_dev *hdev)
+> 
+> 	queue_work(hdev->req_workqueue, &hdev->power_on);
+> 
+> +	idr_init(&hdev->adv_monitors_idr);
+> +
+> 	return id;
+> 
+> err_wqueue:
+> @@ -3644,6 +3651,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+> 	hci_smp_irks_clear(hdev);
+> 	hci_remote_oob_data_clear(hdev);
+> 	hci_adv_instances_clear(hdev);
+> +	hci_adv_monitors_clear(hdev);
+> 	hci_bdaddr_list_clear(&hdev->le_white_list);
+> 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
+> 	hci_conn_params_clear_all(hdev);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 9e8a3cccc6ca3..8d8275ee9718b 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -36,6 +36,7 @@
+> #include "hci_request.h"
+> #include "smp.h"
+> #include "mgmt_util.h"
+> +#include "msft.h"
+> 
+> #define MGMT_VERSION	1
+> #define MGMT_REVISION	17
+> @@ -111,6 +112,7 @@ static const u16 mgmt_commands[] = {
+> 	MGMT_OP_READ_SECURITY_INFO,
+> 	MGMT_OP_READ_EXP_FEATURES_INFO,
+> 	MGMT_OP_SET_EXP_FEATURE,
+> +	MGMT_OP_READ_ADV_MONITOR_FEATURES,
+> };
+> 
+> static const u16 mgmt_events[] = {
+> @@ -3849,6 +3851,49 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+> 			       MGMT_STATUS_NOT_SUPPORTED);
+> }
+> 
+> +static int read_adv_monitor_features(struct sock *sk, struct hci_dev *hdev,
+> +				     void *data, u16 len)
+> +{
+> +	struct adv_monitor *monitor = NULL;
+> +	struct mgmt_rp_read_adv_monitor_features *rp = NULL;
+> +	int handle;
+> +	size_t rp_size = 0;
+> +	__u32 supported = 0;
+> +	__u16 num_handles = 0;
+> +	__u16 handles[HCI_MAX_ADV_MONITOR_NUM_HANDLES];
+> +
+> +	BT_DBG("request for %s", hdev->name);
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	if (msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR)
+> +		supported |= MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS;
+> +
+> +	idr_for_each_entry(&hdev->adv_monitors_idr, monitor, handle)
+> +		handles[num_handles++] = monitor->handle;
 
-Ive send a fix about this, it is probably due to the lack of crypto
-support in your system the so called Database Hash cannot be
-generated.
+I would put { } here to make it readable.
 
---=20
-Luiz Augusto von Dentz
+> +
+> +	hci_dev_unlock(hdev);
+> +
+> +	rp_size = sizeof(*rp) + (num_handles * sizeof(u16));
+> +	rp = kmalloc(rp_size, GFP_KERNEL);
+> +	if (!rp)
+> +		return -ENOMEM;
+> +
+> +	// Once controller-based monitoring is in place, the enabled_features
+> +	// should reflect the use.
+
+Please use /* */ comment style here.
+
+> +	rp->supported_features = supported;
+> +	rp->enabled_features = 0;
+> +	rp->max_num_handles = HCI_MAX_ADV_MONITOR_NUM_HANDLES;
+> +	rp->max_num_patterns = HCI_MAX_ADV_MONITOR_NUM_PATTERNS;
+
+These are little-endian.
+
+> +	rp->num_handles = num_handles;
+> +	if (num_handles)
+> +		memcpy(&rp->handles, &handles, (num_handles * sizeof(u16)));
+> +
+> +	return mgmt_cmd_complete(sk, hdev->id,
+> +				 MGMT_OP_READ_ADV_MONITOR_FEATURES,
+> +				 MGMT_STATUS_SUCCESS, rp, rp_size);
+> +}
+> +
+> static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+> 				         u16 opcode, struct sk_buff *skb)
+> {
+> @@ -7297,6 +7342,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+> 	{ set_exp_feature,         MGMT_SET_EXP_FEATURE_SIZE,
+> 						HCI_MGMT_VAR_LEN |
+> 						HCI_MGMT_HDEV_OPTIONAL },
+> +	{ read_adv_monitor_features, MGMT_READ_ADV_MONITOR_FEATURES_SIZE },
+> };
+> 
+> void mgmt_index_added(struct hci_dev *hdev)
+> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> index d6c4e6b5ae777..8579bfeb28364 100644
+> --- a/net/bluetooth/msft.c
+> +++ b/net/bluetooth/msft.c
+> @@ -139,3 +139,10 @@ void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 
+> 	bt_dev_dbg(hdev, "MSFT vendor event %u", event);
+> }
+> +
+> +__u64 msft_get_features(struct hci_dev *hdev)
+> +{
+> +	struct msft_data *msft = hdev->msft_data;
+> +
+> +	return  msft ? msft->features : 0;
+> +}
+> diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
+> index 5aa9130e1f8ab..e9c478e890b8b 100644
+> --- a/net/bluetooth/msft.h
+> +++ b/net/bluetooth/msft.h
+> @@ -3,16 +3,25 @@
+>  * Copyright (C) 2020 Google Corporation
+>  */
+> 
+> +#define MSFT_FEATURE_MASK_BREDR_RSSI_MONITOR		BIT(0)
+> +#define MSFT_FEATURE_MASK_LE_CONN_RSSI_MONITOR		BIT(1)
+> +#define MSFT_FEATURE_MASK_LE_ADV_RSSI_MONITOR		BIT(2)
+> +#define MSFT_FEATURE_MASK_LE_ADV_MONITOR		BIT(3)
+> +#define MSFT_FEATURE_MASK_CURVE_VALIDITY		BIT(4)
+> +#define MSFT_FEATURE_MASK_CONCURRENT_ADV_MONITOR	BIT(5)
+> +
+> #if IS_ENABLED(CONFIG_BT_MSFTEXT)
+> 
+> void msft_do_open(struct hci_dev *hdev);
+> void msft_do_close(struct hci_dev *hdev);
+> void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb);
+> +__u64 msft_get_features(struct hci_dev *hdev);
+> 
+> #else
+> 
+> static inline void msft_do_open(struct hci_dev *hdev) {}
+> static inline void msft_do_close(struct hci_dev *hdev) {}
+> static inline void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb) {}
+> +static inline __u64 msft_get_features(struct hci_dev *hdev) { return 0; }
+
+Regards
+
+Marcel
+
