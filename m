@@ -2,129 +2,146 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BE0C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9328CC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14A532068D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:02:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7761E20734
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 18:22:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGSfLSh9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726542AbgFCSCp convert rfc822-to-8bit (ORCPT
+        id S1726076AbgFCSWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 14:02:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:38965 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726103AbgFCSCp (ORCPT
+        Wed, 3 Jun 2020 14:22:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbgFCSWi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 14:02:45 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5C180CED2E;
-        Wed,  3 Jun 2020 20:12:31 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 2/4] Bluetooth: Fix assuming EIR flags can result in SSP
- authentication
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALWDO_ViGdppcdDm_VNQF9fVSpCfya4WQshn7s2EtcV7HK0b_w@mail.gmail.com>
-Date:   Wed, 3 Jun 2020 20:02:42 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <154FE28A-B5DA-40C5-801E-F5F881F1FD51@holtmann.org>
-References: <20200519202519.219335-1-luiz.dentz@gmail.com>
- <20200519202519.219335-2-luiz.dentz@gmail.com>
- <C478BA49-0BBF-4323-AC3A-30442F65D346@holtmann.org>
- <CALWDO_UEPaAGyLFG93JzT41P=yGePB-N2Pbh5hioLBOXdh2YBw@mail.gmail.com>
- <23C4DB2B-4C5E-45E7-A777-6F26A675EB92@holtmann.org>
- <CALWDO_XztiDRfQEtioALNmO9smLm-qTW56hxkw8-ZH-Aw2cH1g@mail.gmail.com>
- <6F17F57F-8AF4-4539-8564-C3F13BC6FBF5@holtmann.org>
- <CALWDO_Umz9T9-_U3spSTO85V3sjw8AWku9iwwuF0J7SKQYiE6w@mail.gmail.com>
- <CABBYNZLfEVmjXYfSMFDdazgt68Y53ssWqmD71m=YUJ-0g2zU=A@mail.gmail.com>
- <CALWDO_ViGdppcdDm_VNQF9fVSpCfya4WQshn7s2EtcV7HK0b_w@mail.gmail.com>
-To:     Alain Michaud <alainmichaud@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Wed, 3 Jun 2020 14:22:38 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CCFC08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 11:22:38 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id g18so2869951qtu.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 11:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qtk3d48GZKqQPiCGMf66/sanUiiyzy5OiciyHOy0SUU=;
+        b=VGSfLSh9K71NZ5CAnTNhOnUm88A1gP5om7Au6ebzMIfkHFTxbkq4ITNWWt68CaCsiu
+         u6VPzeG0wsrTyYICiv1L9kYvE9lUzv/JqvyYCIWf/KuMGgxfbeedg57yNXwaXrbjQMQT
+         4GpUmamIG7DCf/w/95kjoDchDmy8nh6PD3Mg4wcDVD11ABrvhzE9B2hMDhR/eIVK79fG
+         GDxKmQZzXeVeNvEWr6kI/p/VfDLVngr0YeEVQOFl5sjdHHe9L/CEg4yKv+wrpLpbQAbK
+         3Kz1ti+2ETpKTKUU13w2bzeGuErXIU5Fk82FXlB+cFtSq21FG0/kFe0bAyhT/0ouquMI
+         46oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qtk3d48GZKqQPiCGMf66/sanUiiyzy5OiciyHOy0SUU=;
+        b=kkN4C3+vFzjbl1gQmO5CALeEysiWN9bo7AhZHj/9wGRQe+xKZo8hnsSF1ojEUK8zbk
+         3JmP3GjcrfcI7BvTcNGmacicRlArMj4WF5PCVZdZm9V/jikekYnaFBKs9G97C3tQgJvH
+         Bo4/VZ7oIT6kP1gFOy5zzjwB14j71l+Au79rMJESBl8UHgLCCW3AbVgeAUulR9mb9jHX
+         19zi97gPxO/9/KGnKNdgQdpOr/yHmTI71arxHCnx5cfH8vBKkbN4+LeqdryK4oz+UTnA
+         24UKzFG4lki2+WEaTIS5pnRBdZD/ot49/ceKSM32GX66wLDZiyLlPN6LtYl42ENpZkn0
+         2vMw==
+X-Gm-Message-State: AOAM530vr8Vxpmm4ThAtAuSJMMv0sKfhdR6M9X8Vzon15leH6MwFYueK
+        2FQY9f4cPeP/FlXDcVBBOc3hBiZnHhKzqSvaFmE=
+X-Google-Smtp-Source: ABdhPJycHYyhrocdYRAKI2pdJAOxn/G1fDfK7sJocYTPa58SXDcyO8a0V6BglpGNRgvqNAwzqF+yClltbBs151I02uo=
+X-Received: by 2002:ac8:3f88:: with SMTP id d8mr691865qtk.164.1591208556444;
+ Wed, 03 Jun 2020 11:22:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAGpqJgrBtwdauxv03jXsq+8+EG_BW-4QZXryXt-e5Y8HA_5+_g@mail.gmail.com>
+ <CABBYNZLLx+zX_XyNjkW99D7HG_6+eZM_MP7EWVVAuuRtf0J6dw@mail.gmail.com> <CABBYNZJxVsnGtpnJkCCQtQFKXOiSEV7490me1vjAOOGynCdfUw@mail.gmail.com>
+In-Reply-To: <CABBYNZJxVsnGtpnJkCCQtQFKXOiSEV7490me1vjAOOGynCdfUw@mail.gmail.com>
+From:   Arthur Lambert <lambertarthur22@gmail.com>
+Date:   Wed, 3 Jun 2020 20:22:25 +0200
+Message-ID: <CAGpqJgrcxd0iwWUu=VB=MhiSS9+TRMLLsyTjbwQMdJ+6u66u6Q@mail.gmail.com>
+Subject: Re: Segmentation fault in bluetoothd with btgatt-client
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Luiz,
+thanks for your reply!
 
->>>>>>> Starting with the 2.1 specification, it is my interpretation that it
->>>>>>> is not valid to support EIR but not SSP.  I understand that SSP may be
->>>>>>> disabled from BlueZ's point of view, but this doesn't seem to be a
->>>>>>> legitimate/qualifiable configuration.  Should we instead fail the
->>>>>>> legacy pairing if EIR was received as an invalid condition?
->>>>>> 
->>>>>> I know that using EIR requires to also use SSP. However this is just a precaution in case the other device is an attacked and tries to trick us.
->>>>>> 
->>>>>> You might get an inquiry result and not extended inquiry result, but you are still talking to a SSP device. This has to do with the fact that the reception of EIR is not guaranteed. In case of radio interference you might miss one and only get an ordinary inquiry result.
->>>>>> 
->>>>>> If we indeed received an EIR and then get legacy pairing request, we could try to reject the pairing. However keep in mind that our inquiry cache is time limited and we through outdated information away. This might cause some race condition. So I rather read the remote host features to ensure we know the actual host features of the remote device.
->>>>> 
->>>>> You are correct, the EIR response is not a guaranteed thing.  For this
->>>>> reason, the host should try to resolve the name of the device before
->>>>> initiating bonding where a Remote Host Supported Feature Notification
->>>>> Event is generated to signal the remote side's support of SSP.  As you
->>>>> allude to, a remote spoofing a legitimate SSP device may always just
->>>>> jam and downgrade to not SSP, but if you have any signals that SSP is
->>>>> supported by the device, it may be a good defensive posture.
->>>> 
->>>> trying to resolve the name before connected is a waste of time. Resolving the name after connecting will not give you that event. You should just read the remote features.
->>> 
->>> I have a vague memory that there was an interoperability issue around
->>> this that required the initiator to know ahead of time if SSP was
->>> supported by the remote host before connecting which was the reason
->>> why this was added in the first place.  However, I agree that this can
->>> also be read after you are connected rather than just waiting for a
->>> RNR page to complete just to page again.  The point here however is
->>> about the signals that SSP should be supported and the conditions
->>> where we let legacy pairing go through.  My assertion is that EIR
->>> implies SSP, so legacy pairing shouldn't be allowed in that case.
->>> It's not a definitive security measure, but IMO, every signals that we
->>> can get will help close a door to downgrade attacks.
->> 
->> Legacy pairing is still indicated with MGMT_DEV_FOUND_LEGACY_PAIRING
->> so for what is worth this didn't change any logic regarding how legacy
->> pairing is detected, in fact hci_conn_ssp_enabled is used to determine
->> if encryption is required or not for low security it was never used to
->> detect if the paring method used was really SSP or legacy.
-> The general idea is to both "try" to protect against a downgrade
-> attack but also to encrypt all channels (other than SDP) if SSP is
-> supported by the remote.  If the later is already handled, we just
-> need to make sure we use all available signals that the remote side
-> supports SSP.  Receiving an EIR is a valid signal, the absence of EIR
-> doesn't imply the remote doesn't support SSP.
->> 
->>>> 
->>>>> Receiving an EIR response or a Remote Host Supported Feature Event
->>>>> with the SSP bit set is a good indication that the device supports SSP
->>>>> and you should expect SSP to take place.  Again, it is not a valid
->>>>> configuration to have EIR enabled but not SSP per my interpretation of
->>>>> the 2.1 specification.
->>>> 
->>>> If you have an idea on how to tighten this and fail, please send a patch. It is just that our inquiry cache was never designed for that. It was just to speed up the connection process.
->>> Ack.  This definitely looks like an opportunity.  We can add it to the backlog.
->> 
->> If you guys agree I can prepare a patch requiring SSP to be used, but
->> first we will need to agree on what action we would take under such
->> situation, shall we disconnect if we figure out the SSP bit is
->> disabled? Btw, if the remote device has dropped SSP for some reason (I
->> suppose the spec allows doing it) and we have a EIR on the cache
->> (which we keep for 30 seconds) that doesn't necessarily mean the
->> device is broken since the use of EIR may have been dropped in the
->> meantime.
-> Right, but if we do have the EIR signal, then we should expect SSP to
-> be used.  It is legitimate, in my interpretation, to fail anything
-> less than SSP in that case.
+Sorry I am lazy and stupid. I know that your next question will be
+around symbol...
 
-lets try this then. Worst case we have to revert such a patch if it turns out it cause interop issues.
+After removing the binary strip option and enable debug symbol :
 
-Regards
+bluetoothd[246]: src/device.c:device_svc_resolved()
+/org/bluez/hci0/dev_80_32_53_37_58_A6 err -5
+bluetoothd[246]: src/device.c:gatt_debug() Read By Grp Type - start:
+0x00bb end: 0xffff
+bluetoothd[246]: src/device.c:gatt_debug() Read By Grp Type - start:
+0x0001 end: 0xffff
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x0001 end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x0001 end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x002a end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x0053 end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x007a end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x00a3 end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x00ba end: 0x00ba
+bluetoothd[246]: src/device.c:gatt_debug() Read By Type - start:
+0x0001 end: 0xffff
+bluetoothd[246]: src/gatt-database.c:db_hash_read_cb() Database Hash read
+==246== Invalid read of size 1
+==246==    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
+==246==    by 0x87F3B: read_by_type_read_complete_cb (gatt-server.c:392)
+==246==    by 0x892AB: pending_read_result (gatt-db.c:145)
+==246==    by 0x8B2FB: gatt_db_attribute_read_result (gatt-db.c:1866)
+==246==    by 0x3AB0B: db_hash_read_cb (gatt-database.c:1156)
+==246==    by 0x8B1AB: gatt_db_attribute_read (gatt-db.c:1825)
+==246==    by 0x87DB7: process_read_by_type (gatt-server.c:482)
+==246==    by 0x8854F: read_by_type_cb (gatt-server.c:559)
+==246==    by 0x81727: handle_notify (att.c:966)
+==246==    by 0x81873: can_read_data (att.c:1057)
+==246==    by 0x8B91B: watch_callback (io-glib.c:170)
+==246==    by 0x488A413: g_main_context_dispatch (in
+/usr/lib/libglib-2.0.so.0.5600.3)
+==246==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==246==
+==246==
+==246== Process terminating with default action of signal 11 (SIGSEGV)
+==246==  Access not within mapped region at address 0x0
+==246==    at 0x4831BA4: memcpy (vg_replace_strmem.c:1035)
+==246==    by 0x87F3B: read_by_type_read_complete_cb (gatt-server.c:392)
+==246==    by 0x892AB: pending_read_result (gatt-db.c:145)
+==246==    by 0x8B2FB: gatt_db_attribute_read_result (gatt-db.c:1866)
+==246==    by 0x3AB0B: db_hash_read_cb (gatt-database.c:1156)
+==246==    by 0x8B1AB: gatt_db_attribute_read (gatt-db.c:1825)
+==246==    by 0x87DB7: process_read_by_type (gatt-server.c:482)
+==246==    by 0x8854F: read_by_type_cb (gatt-server.c:559)
+==246==    by 0x81727: handle_notify (att.c:966)
+==246==    by 0x81873: can_read_data (att.c:1057)
+==246==    by 0x8B91B: watch_callback (io-glib.c:170)
+==246==    by 0x488A413: g_main_context_dispatch (in
+/usr/lib/libglib-2.0.so.0.5600.3)
+==246==  If you believe this happened as a result of a stack
+==246==  overflow in your program's main thread (unlikely but
+==246==  possible), you can try to increase the size of the
+==246==  main thread stack using the --main-stacksize= flag.
+==246==  The main thread stack size used in this run was 8388608.
+/usr/bin/bluetoothd: can't resolve symbol '__libc_freeres'
 
-Marcel
+is it the crypto error that you expect?
+Could you share a sha1 commit or a link to the patch to test the potential fix?
 
+Thanks !
