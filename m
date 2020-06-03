@@ -2,146 +2,89 @@ Return-Path: <SRS0=Vaj6=7Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 436BCC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 10:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58569C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AF932067B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 10:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25E86206A2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:04:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sz8AMdDI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726334AbgFCKOZ (ORCPT
+        id S1725937AbgFCOEW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 06:14:25 -0400
-Received: from mga02.intel.com ([134.134.136.20]:48549 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726123AbgFCKOY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 06:14:24 -0400
-IronPort-SDR: HVzYX1j05+d4F+8arqYfYB1+zRyS5z1kHha24/XWMnpDgqKiSWGvQ1tPXkEVzJDq1FBHZMkqhF
- SEcxNXvavcwg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 03:14:24 -0700
-IronPort-SDR: rPt8A2vkJiM4vE4vjsNoG3aTvxPlpg7MkJM+mW3PWzPiGWA97MDhjlgm6XzBlzvyT1faHB13AL
- 6apNi731NR/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,467,1583222400"; 
-   d="scan'208";a="471084226"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Jun 2020 03:14:21 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Ps AyappadasX <AyappadasX.Ps@intel.com>,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/2] Bluetooth : Load debug config based on the debug support
-Date:   Wed,  3 Jun 2020 15:45:23 +0530
-Message-Id: <20200603101523.12547-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200603101523.12547-1-kiran.k@intel.com>
-References: <20200603101523.12547-1-kiran.k@intel.com>
+        Wed, 3 Jun 2020 10:04:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725833AbgFCOEW (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Jun 2020 10:04:22 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6B8C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 07:04:22 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id k11so2289009ejr.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 07:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=NZ6dOJJHuwK9cUIB8XV0gWGLAPOtvUoYd7NP06AHxTI=;
+        b=Sz8AMdDIhurzxYzZYP43jMKRn3ogzaEUG5iLv//140mjIfkp/LBh47rvx+gzP9EI76
+         IZETuzGdPPTIH9+lYjpdUcVYxmG3SAXA0pySLAncPFyaembyv88E+JNDG0I/hOL2A3Mf
+         85F7/LcoW6m9+Cd/5HUWAfEspIiqEIbWwMXQuTIa8cBzj9QfFigAMIoZkDMBmpZPQ7vi
+         Sa7xYs8OwqOzvO5vo/mqJaPRd2wQOsZvhr5Pa7vhamgkgTqoS0/FAgVKvdQK29YSDPGM
+         VTBfcQAoJe4AemNPFGNOaFA37oLDRXBeBgDo6U6S4ELkwIj6S7MnaIlVngMDxiaUEeYA
+         bHiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=NZ6dOJJHuwK9cUIB8XV0gWGLAPOtvUoYd7NP06AHxTI=;
+        b=OFMB5o6n5M2NVLxzKIiMC6Cy+uQ9PlTrrVo/+FabbiV5caf2QQ1g1LetaXbABayYbW
+         DXGAwR8WRAPZyJpem8tMb4r/iJCjOZF/t1omX76+CM4DGh8V4cyFbmG6eWeNRRf6z2zZ
+         65wBk8MyXREHcdfeOd15LF5aFzN8Ap0Fe1Yr+7lfVo5zUHExZpXhH0nc39HFyDB8e0Vl
+         aQGVo1bTuVjE7U8SCAzWgHe1vaIZl4YIrPDGwX5MUfdRoEGxjh8rrXtmHsCuK5IYXrjl
+         E++v5eciJM3g5JtJOqBgyvr3vBAiSQvwMShAw2OWG3EkM+UImDNB05PDUqO51blDLZ4b
+         SrNA==
+X-Gm-Message-State: AOAM532sLG90ilwlUIRi12YBLJtASNaVI0SNCXxZnlklSqDBZnc4LLWJ
+        H2Hr6FI4s4tVINANur68tJu+YUvMGQcGly0vTHDrpN61CPQ=
+X-Google-Smtp-Source: ABdhPJzAvuwVs/IJSaUqWt324KiOcjIuYByIfTOsxKOOs78Cy+5cblip3RCPooYNFilfHv6cdHSD27C5E1QPqabqtW0=
+X-Received: by 2002:a17:906:9a02:: with SMTP id ai2mr26955480ejc.97.1591193060186;
+ Wed, 03 Jun 2020 07:04:20 -0700 (PDT)
+MIME-Version: 1.0
+From:   Yun-hao Chung <howardchung@google.com>
+Date:   Wed, 3 Jun 2020 22:04:08 +0800
+Message-ID: <CAPHZWUe9sLt8jsD57i3=PQxMfjODP7dUYLBm2qpSXFdgd9cvAQ@mail.gmail.com>
+Subject: Should we disable ERTM as default?
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Cc:     ChromeOS BT Qualification <chromeos-bt-qual@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
+Hi Linux-bluetooth,
 
-This patch shall enables the Intel telemetry exception format
-based on the supported features
+When I ran the following tests in PTS qualification on Chrome OS, I
+couldn=E2=80=99t pass all of them because they all failed to create an AVDT=
+P
+connection with channel type as =E2=80=98Streaming=E2=80=99 or =E2=80=98Enh=
+anced
+Retransmission=E2=80=99.
 
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Ps AyappadasX <AyappadasX.Ps@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel.c | 28 ++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  9 ++++++++-
- drivers/bluetooth/btusb.c   |  3 +++
- 3 files changed, 39 insertions(+), 1 deletion(-)
+- MPS/AG-SRC-TG/HFAV/CLH/SD/BV-03-I
+- MPS/AG-SRC-TG/HFAV/CLH/SD/BV-04-I
+- MPS/AG-SRC-TG/HFAV/CLH/SD/BV-05-I
+- MPS/AG-SRC-TG/HFAV/CLH/SD/BV-06-I
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 09e697b92426..5ef83e9ad19c 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -788,6 +788,34 @@ int btintel_read_supported_features(struct hci_dev *hdev,
- }
- EXPORT_SYMBOL_GPL(btintel_read_supported_features);
- 
-+int btintel_load_debug_config_based_on_supported_features(struct hci_dev *hdev,
-+	const struct intel_supported_features *supported_features)
-+{
-+	struct sk_buff *skb;
-+	u8 mask_ddc[11] = { 0x0a, 0x92, 0x02, 0x07, 0x00, 0x00, 0x00,
-+		0x00, 0x00, 0x00, 0x00 };
-+
-+	if (!supported_features)
-+		return -EINVAL;
-+
-+	if (!(supported_features->page1[0] & 0x3f)) {
-+		bt_dev_info(hdev, "Telemety exception format not supported");
-+		return 0;
-+	}
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc8b, 11, mask_ddc, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Setting Intel telemetry ddc write event mask failed (%ld)",
-+		PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_load_debug_config_based_on_supported_features);
-+
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index f3892c0233f4..c4e3c57c08ff 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -95,7 +95,8 @@ int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
- void btintel_reset_to_bootloader(struct hci_dev *hdev);
- int btintel_read_supported_features(struct hci_dev *hdev,
- 			struct intel_supported_features *supported_features);
--
-+int btintel_load_debug_config_based_on_supported_features(struct hci_dev *hdev,
-+	const struct intel_supported_features *supported_features);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -199,5 +200,11 @@ static int btintel_read_supported_features(struct hci_dev *hdev,
- {
- 	return -EOPNOTSUPP;
- }
-+static int btintel_load_debug_config_based_on_supported_features(
-+	struct hci_dev *hdev,
-+	const struct intel_supported_features *supported_features)
-+{
-+	return -EOPNOTSUPP;
-+}
- 
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a5a971e7025b..510e3c1c23dc 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2547,6 +2547,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 */
- 	btintel_read_supported_features(hdev, &supported_features);
- 
-+	btintel_load_debug_config_based_on_supported_features(hdev,
-+		&supported_features);
-+
- 
- 	/* Read the Intel version information after loading the FW  */
- 	err = btintel_read_version(hdev, &ver);
--- 
-2.17.1
+It looks like bluez doesn=E2=80=99t want to change its mode even though it
+claims it supports them. Our question is do we still want to enable
+this feature as default?
 
+Thanks.
