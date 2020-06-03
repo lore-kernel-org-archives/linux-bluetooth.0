@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B8AC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191D2C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:52:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4974B20823
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E460A20738
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jun 2020 14:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LoneoR49"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B6Y0b2VZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726182AbgFCOv3 (ORCPT
+        id S1726268AbgFCOwK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jun 2020 10:51:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59914 "EHLO
+        Wed, 3 Jun 2020 10:52:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726225AbgFCOv2 (ORCPT
+        with ESMTP id S1726167AbgFCOwJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jun 2020 10:51:28 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10BEBC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 07:51:28 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id c15so930187uar.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 07:51:28 -0700 (PDT)
+        Wed, 3 Jun 2020 10:52:09 -0400
+Received: from mail-vk1-xa41.google.com (mail-vk1-xa41.google.com [IPv6:2607:f8b0:4864:20::a41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8984C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2020 07:52:09 -0700 (PDT)
+Received: by mail-vk1-xa41.google.com with SMTP id u15so534056vkk.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2020 07:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=BtvKh6dBFh8QiSwUYYrfuKjbdVtIFde99aNkmrj9iHk=;
-        b=LoneoR49oi8004/I3jrSvTf2vLnI1YhD2Io9DZW4lmvkYSfThafpDQnu7prf3Qerj5
-         3XI3i9RTCxxCj0ZuZ4a8Wria5zRlu9FeSlkk3xgigkqzpxpi837RF5UywY0SGp2UU7Aa
-         e/AWYcyt+dTRAS/Slv3tQD4Zkl1WsEkDckBWM=
+        b=B6Y0b2VZT9JEl3KzESvIC9jQSBqmtcJchlC+BQwt6blHK/COpwj7R6/tSMsRCqfhAt
+         uyCIl+XI3iRMtBR6PwNe9sdpWIv714GEBSq+0Ycw+UJBXFey+X0NRlPVCuVWk2hMtm7+
+         l+nIZK4frIV5YQKqa/yYsnVCT0hcbFT2ptB5Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=BtvKh6dBFh8QiSwUYYrfuKjbdVtIFde99aNkmrj9iHk=;
-        b=nn3KDk0uoIToXkdR4hq5ZBoOF69hy1TU03rtFZKLVpNu0SoorV7Q2VJvSg1EO9tFUP
-         00ENOmdbhWNcKgpeVfn+dOOS+oB/UVIPBiOyQHILx+XOXuSKW+7Qdkv6i/vvLwPtFOPt
-         zBJS3ijUY2UBb2+0OLP2K1YNJE5VFr3YL36AQjt5pjvjdtKXKawMq1BsRirwvPPySR3X
-         rzyrdcbamTF0T+uX0P8tLvHI8VJDwuMt5M9g8fWCMSl3kXMoWHJ3LPlGp5WigZNqPRgw
-         rhrvNjBuKuhWYVvFisJ1C7pQ5RIvi4MX8hCuL3ab9WgybAqf5D1mN9thB+HtoqTznHpM
-         QqDg==
-X-Gm-Message-State: AOAM532uvouAW+GxYXX/SffzWWSxsqIBVqOWeBRKUgDb7AVLjRQBWFBq
-        qB4iuA9QsJ1w3IqOtu86hJw3bb0gQss=
-X-Google-Smtp-Source: ABdhPJwt8E1bvboFMOI7idE2Zjkb3qouhj19jT8e5ZLewV6iE9V0Hp0CU6OJ0DBwDBnKSns73xTVDA==
-X-Received: by 2002:a9f:2068:: with SMTP id 95mr238964uam.134.1591195886837;
-        Wed, 03 Jun 2020 07:51:26 -0700 (PDT)
+        b=Z79zZvDYz6cjwTqA2+hNjm5ez9gHQTviOH4YuM31PCehvNL6qmo4N/hs+8fAYqctvT
+         /eHOUruSqiuCbn9NJLv/y2HHztVmrzzV8j5Rwbxi+GXmaRhGPLQJ9/5jrr9LxPJ7zM0w
+         yVc0ZvEigxCMdcDbXtZ+zu0Y+OUJ1lOyjphOQlQH7bf2Y1ppKNg52B1j4N+E/VsEb0y5
+         5Me/cFZjmAoAQIPPg6c8wTNDAafRVI2AvRmUsHJiVXn8TT/tVhAWBIeS4HRptNn2izno
+         KXm+GL4lmus+eKHaD2GIzun0fEfDbx0wZEWWam1p0dNCp4v/CuMdXvAWlGWqnB8r/i/6
+         Yicw==
+X-Gm-Message-State: AOAM533GtKArX6pzhZkxtcSJexEHNSG3vdJqKPL06M86+D/bD4QgIxWU
+        hRwqUeZMBB7Q/8Uncnol2B8x1yOVD5k=
+X-Google-Smtp-Source: ABdhPJzKhRzoHMKVoDFajUEsFz5rv81XR3ttqOuGC75/hxF51JY3GeGV+B5UxaUEmio0SlpL8hEl/A==
+X-Received: by 2002:ac5:c84a:: with SMTP id g10mr41040vkm.22.1591195928404;
+        Wed, 03 Jun 2020 07:52:08 -0700 (PDT)
 Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id r128sm314669vkf.48.2020.06.03.07.51.24
+        by smtp.gmail.com with ESMTPSA id n195sm318063vke.33.2020.06.03.07.52.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2020 07:51:25 -0700 (PDT)
+        Wed, 03 Jun 2020 07:52:07 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v2] sco:Add support for BT_PKT_STATUS CMSG data
-Date:   Wed,  3 Jun 2020 14:51:21 +0000
-Message-Id: <20200603145121.124842-1-alainm@chromium.org>
+Subject: [PATCH v3] sco:Add support for BT_PKT_STATUS CMSG data
+Date:   Wed,  3 Jun 2020 14:52:05 +0000
+Message-Id: <20200603145205.125167-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
