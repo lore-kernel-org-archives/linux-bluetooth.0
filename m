@@ -2,122 +2,148 @@ Return-Path: <SRS0=9nD+=7R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74A6C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 12:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 819A3C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AABB420734
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 12:36:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D202207D8
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYDzk+ok"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbgFDMg1 (ORCPT
+        id S1728129AbgFDNHq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 08:36:27 -0400
-Received: from mxout04.lancloud.ru ([89.108.124.63]:47422 "EHLO
-        mxout04.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbgFDMg1 (ORCPT
+        Thu, 4 Jun 2020 09:07:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725926AbgFDNHq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 08:36:27 -0400
-X-Greylist: delayed 522 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Jun 2020 08:36:24 EDT
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 3DEB62071707
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-From:   Denis Grigorev <d.grigorev@omprussia.ru>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] gobex: Fix segfault caused by interrupted transfer
-Thread-Topic: [PATCH] gobex: Fix segfault caused by interrupted transfer
-Thread-Index: AQHWOmuJh2TkW+5veUuwo0zjkjERyg==
-Date:   Thu, 4 Jun 2020 12:27:39 +0000
-Message-ID: <a86f93d2d5a946d86bcdccb52218f20a959434cd.camel@omprussia.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [192.168.11.137]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B367C4676B214A4294BEC970726575CE@lancloud.ru>
-Content-Transfer-Encoding: base64
+        Thu, 4 Jun 2020 09:07:46 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D45EDC08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 06:07:44 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id v79so5831111qkb.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 06:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=mYZXTXdIlBM9C3Qe0Mbo4lkm3AD6nXgxP4WiKDC68xs=;
+        b=ZYDzk+okDPYbR0BLC2engoM6nE6GOp+DRGPgnN6z07tZJ2ChhgdIrG8HiKJ/8Kzbks
+         bFjPBcmTT+cCEa9Wy8Nsk28x6A4LthNjCXoE47ngYLJ95s4f8NKNFqWE9shfW9ULPAFR
+         /yjdXXyprQIRQ5eDlnhHZwmlhXZ3LI7IjIKEJOPOaammrFl3QZjRWPmAt0e6sLiff8Bk
+         kJKQcZ9h2oBreVWwNPbmM9h/d3MoK3VOMJ6J4l70C41+MM36jAYzaaXo69rTUm//EyS2
+         2wSxgQDZmREh+V1HsplR5U1UCFxSWgEa5DuYNdCSs55f7hHwYsR2pfoeSrryUMky4ieA
+         jUJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=mYZXTXdIlBM9C3Qe0Mbo4lkm3AD6nXgxP4WiKDC68xs=;
+        b=CFC+P6au+auevm+IR1F5/ROVdTdvWa5VQmoQ/Sq05rDr7bPe3oU5T1rTWySOXyhPs6
+         vK2dzMhaLDH+7Be3QpR3B3kvhbs7dXOSqV3fPu/QG7uN8R0K2MHEUe/eIqtz4p8cCi3T
+         6agvqCsvuxcQLS2UR+6i8Skt8VaR338vKGRHWER32lgnD1njp41sEPA3w+f0dCZdkQ7L
+         uAGBssIHMFPmErH7dR2J8AfzdQUCXJzAFNPv9MOdAhuOTsybKWH0vHNJRusOM5PQAkH3
+         LxhKqNk4p1nNDu7jM2KO5nPdDalYklla7lD8ncVvSC2SzUCWw6Gb8nODYwFNM4cwejHi
+         e7Qw==
+X-Gm-Message-State: AOAM533fC5ob9FXTvuvMeBEyHklcBqnOa6FA+B/s7RtpTU0LdolCSXxK
+        joQWdltyeC3HDLD0eoiXIRbaZ83xJbY=
+X-Google-Smtp-Source: ABdhPJzP66OW64+yFscDyZM1U7x/z8Wyk9APJEtBKH/1ZRw3+9IlEiCu9IrV+sOn8ubK7gdgVVnkpw==
+X-Received: by 2002:a37:2c05:: with SMTP id s5mr4580521qkh.379.1591276063973;
+        Thu, 04 Jun 2020 06:07:43 -0700 (PDT)
+Received: from [172.17.0.2] ([52.188.209.39])
+        by smtp.gmail.com with ESMTPSA id w26sm4369966qtt.86.2020.06.04.06.07.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2020 06:07:32 -0700 (PDT)
+Message-ID: <5ed8f214.1c69fb81.14964.6e67@mx.google.com>
+Date:   Thu, 04 Jun 2020 06:07:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5012219319050418054=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, d.grigorev@omprussia.ru
+Subject: RE: gobex: Fix segfault caused by interrupted transfer
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <a86f93d2d5a946d86bcdccb52218f20a959434cd.camel@omprussia.ru>
+References: <a86f93d2d5a946d86bcdccb52218f20a959434cd.camel@omprussia.ru>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-V2hlbiBhIG9iZXggdHJhbnNmZXIgaXMgaW50ZXJydXB0ZWQgYnkgYSBwZWVyIGluIHRoZSBtaWRk
-bGUsIHRoZSByZXNwb25zZQ0KR19PQkVYX1JTUF9GT1JCSURERU4gY29tZXMgYW5kIHRoZSB0cmFu
-c2ZlciBpcyBmcmVlZCBpbiB0cmFuc2Zlcl9jb21wbGV0ZS4NCkhvd2V2ZXIgZ29iZXggaXMgc3Rp
-bGwgcmVmJ2VkIGFuZCBnb2JleC0+aW8gY29udGludWVzIHRvIGJlIHdyaXRhYmxlLA0Kc28gd3Jp
-dGVfZGF0YSgpIGFuZCwgaWYgYSB0eCBwYWNrZXQgd2FzIHF1ZXVlZCwgcHV0X2dldF9kYXRhKCkg
-YW5kIHRoZW4NCmdfb2JleF9hYm9ydCgpIGFyZSBjYWxsZWQuIFdoZW4gdGhlIGFib3J0IHJlc3Bv
-bnNlIGNvbWVzLCB0aGUgZGF0YSBvZg0KY29tcGxldGVfZnVuYyBjYWxsYmFjayBpcyBhbHJlYWR5
-IGZyZWVkLCB3aGljaCBsZWFkcyB0byB0aGUgY3Jhc2guDQoNCkJhY2t0cmFjZSA6DQpfX0dJX19f
-cHRocmVhZF9tdXRleF9sb2NrIChtdXRleD0weDY1NzMyZjc0KSBhdCBwdGhyZWFkX211dGV4X2xv
-Y2suYzo2Nw0KMHhlY2M2ZWVkYSBpbiBkYnVzX2Nvbm5lY3Rpb25fZ2V0X29iamVjdF9wYXRoX2Rh
-dGEgKCkgZnJvbSAvdXNyL2xpYi9saWJkYnVzLTEuc28uMw0KMHgwMDA0NTdkNCBpbiBnX2RidXNf
-ZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkX2Z1bGwgKCkgYXQgZ2RidXMvb2JqZWN0LmM6MTc5NA0KMHgw
-MDA0NTg2OCBpbiBnX2RidXNfZW1pdF9wcm9wZXJ0eV9jaGFuZ2VkICgpIGF0IGdkYnVzL29iamVj
-dC5jOjE4MzINCjB4MDAwMzY3ZjAgaW4gdHJhbnNmZXJfc2V0X3N0YXR1cyAoKSBhdCBvYmV4ZC9j
-bGllbnQvdHJhbnNmZXIuYzoyMTENCjB4MDAwMzY4MWUgaW4gdHJhbnNmZXJfc2V0X3N0YXR1cyAo
-KSBhdCBvYmV4ZC9jbGllbnQvdHJhbnNmZXIuYzoyMDYNCnhmZXJfY29tcGxldGUgKCkgYXQgb2Jl
-eGQvY2xpZW50L3RyYW5zZmVyLmM6NjcyDQoweDAwMDIyZGY2IGluIHRyYW5zZmVyX2NvbXBsZXRl
-ICgpIGF0IGdvYmV4L2dvYmV4LXRyYW5zZmVyLmM6MTAzDQoweDAwMDIyZjQ0IGluIHRyYW5zZmVy
-X2Fib3J0X3Jlc3BvbnNlICgpIGF0IGdvYmV4L2dvYmV4LXRyYW5zZmVyLmM6MTI0DQoweDAwMDIw
-YTBlIGluIGhhbmRsZV9yZXNwb25zZSAoKSBhdCBnb2JleC9nb2JleC5jOjExMjgNCjB4MDAwMjBk
-ZGUgaW4gaW5jb21pbmdfZGF0YSAoKSBhdCBnb2JleC9nb2JleC5jOjEzNzMNCg0KVGhpcyBjb21t
-aXQgaW50cm9kdWNlcyBnX29iZXhfZHJvcF90eF9xdWV1ZSgpLCB3aGljaCB3aWxsIGJlIGNhbGxl
-ZCBpZg0KYSB0cmFuc2ZlciBlcnJvciBkZXRlY3RlZC4gQWZ0ZXIgdGhlIHR4IHF1ZXVlIGlzIGRy
-b3BwZWQsIG9iZXggc2h1dHMgZG93bg0KZ3JhY2VmdWxseS4NCg0KVG8gYmUgYWJsZSB0byBjbG9z
-ZSBMMkNBUCBjb25uZWN0aW9uIHdoZW4gdGhlcmUgYXJlIHBlbmRpbmcgZnJhbWVzLA0KTGludXgg
-a2VybmVscyBiZWxvdyB2NC4zIG11c3QgaGF2ZSB0aGUgZm9sbG93aW5nIGNvbW1pdHMgY2hlcnJ5
-LXBpY2tlZDoNCg0KMmJhZWE4NWRlYzFhZWJlMGIxMDBkNDgzNmRlZThiY2YyOWE1MWU5NCAtIEJs
-dWV0b290aDogTDJDQVAgRVJUTSBzaHV0ZG93biBwcm90ZWN0IHNrIGFuZCBjaGFuDQpmNjU0Njhm
-NmUyNmMzYmQwNWU2NDJlMTBlODBhNDg1Yjk5YjdkZTA1IC0gQmx1ZXRvb3RoOiBNYWtlIF9fbDJj
-YXBfd2FpdF9hY2sgbW9yZSBlZmZpY2llbnQNCjQ1MWU0YzZjNmIzZmQxYTlmNDQ2YTEwZWI5ZjZk
-NGMyYzQ3NjA0M2MgLSBCbHVldG9vdGg6IEFkZCBCVF9EQkcgdG8gbDJjYXBfc29ja19zaHV0ZG93
-bigpDQpjYjAyYTI1NTgzYjU5Y2U0ODI2NzQ3MmNkMDkyNDg1ZDc1NDk2NGY5IC0gQmx1ZXRvb3Ro
-OiBfX2wyY2FwX3dhaXRfYWNrKCkgdXNlIG1zZWNzX3RvX2ppZmZpZXMoKQ0KZTQzMmM3MmM0NjRk
-MmRlYjZjNjZkMWUyYTVmNTQ4ZGMxZjBlZjRkYyAtIEJsdWV0b290aDogX19sMmNhcF93YWl0X2Fj
-aygpIGFkZCBkZWZlbnNpdmUgdGltZW91dA0KZTc0NTY0MzdjMTVhMmZkNDJjZWRkMjVjMmIxMmIw
-Njg3NmYyODVmMCAtIEJsdWV0b290aDogVW53aW5kIGwyY2FwX3NvY2tfc2h1dGRvd24oKQ0KMDRi
-YTcyZTZiMjRmMWUwZTIyMjFmY2Q3M2YwODc4Mjg3MDQ3M2ZhMSAtIEJsdWV0b290aDogUmVvcmdh
-bml6ZSBtdXRleCBsb2NrIGluIGwyY2FwX3NvY2tfc2h1dGRvd24oKQ0KOWY3Mzc4YTlkNmNlZDE3
-ODRlMDhkM2UyMWE5ZGRiNzY5NTIzYmFmMiAtIEJsdWV0b290aDogbDJjYXBfZGlzY29ubmVjdGlv
-bl9yZXEgcHJpb3JpdHkgb3ZlciBzaHV0ZG93bg0KDQpTaWduZWQtb2ZmLWJ5OiBEZW5pcyBHcmln
-b3JldiA8ZC5ncmlnb3JldkBvbXBydXNzaWEucnU+DQotLS0NCiBnb2JleC9nb2JleC10cmFuc2Zl
-ci5jIHwgIDUgKysrKysNCiBnb2JleC9nb2JleC5jICAgICAgICAgIHwgMTAgKysrKysrKysrKw0K
-IGdvYmV4L2dvYmV4LmggICAgICAgICAgfCAgMSArDQogMyBmaWxlcyBjaGFuZ2VkLCAxNiBpbnNl
-cnRpb25zKCspDQoNCmRpZmYgLS1naXQgYS9nb2JleC9nb2JleC10cmFuc2Zlci5jIGIvZ29iZXgv
-Z29iZXgtdHJhbnNmZXIuYw0KaW5kZXggYmM5OTMwNjc5Li5lOTZlNjFmYmMgMTAwNjQ0DQotLS0g
-YS9nb2JleC9nb2JleC10cmFuc2Zlci5jDQorKysgYi9nb2JleC9nb2JleC10cmFuc2Zlci5jDQpA
-QCAtMTAwLDYgKzEwMCwxMSBAQCBzdGF0aWMgdm9pZCB0cmFuc2Zlcl9jb21wbGV0ZShzdHJ1Y3Qg
-dHJhbnNmZXIgKnRyYW5zZmVyLCBHRXJyb3IgKmVycikNCiANCiAJZ19vYmV4X2RlYnVnKEdfT0JF
-WF9ERUJVR19UUkFOU0ZFUiwgInRyYW5zZmVyICV1IiwgaWQpOw0KIA0KKwlpZiAoZXJyKSB7DQor
-CQkvKiBObyBmdXJ0aGVyIHR4IG11c3QgYmUgcGVyZm9ybWVkICovDQorCQlnX29iZXhfZHJvcF90
-eF9xdWV1ZSh0cmFuc2Zlci0+b2JleCk7DQorCX0NCisNCiAJdHJhbnNmZXItPmNvbXBsZXRlX2Z1
-bmModHJhbnNmZXItPm9iZXgsIGVyciwgdHJhbnNmZXItPnVzZXJfZGF0YSk7DQogCS8qIENoZWNr
-IGlmIHRoZSBjb21wbGV0ZV9mdW5jIHJlbW92ZWQgdGhlIHRyYW5zZmVyICovDQogCWlmIChmaW5k
-X3RyYW5zZmVyKGlkKSA9PSBOVUxMKQ0KZGlmZiAtLWdpdCBhL2dvYmV4L2dvYmV4LmMgYi9nb2Jl
-eC9nb2JleC5jDQppbmRleCA3N2YxYWFhZmQuLmQ2OGE4NWViNiAxMDA2NDQNCi0tLSBhL2dvYmV4
-L2dvYmV4LmMNCisrKyBiL2dvYmV4L2dvYmV4LmMNCkBAIC01MjEsNiArNTIxLDE2IEBAIHN0YXRp
-YyB2b2lkIGVuYWJsZV90eChHT2JleCAqb2JleCkNCiAJb2JleC0+d3JpdGVfc291cmNlID0gZ19p
-b19hZGRfd2F0Y2gob2JleC0+aW8sIGNvbmQsIHdyaXRlX2RhdGEsIG9iZXgpOw0KIH0NCiANCit2
-b2lkIGdfb2JleF9kcm9wX3R4X3F1ZXVlKEdPYmV4ICpvYmV4KQ0KK3sNCisJc3RydWN0IHBlbmRp
-bmdfcGt0ICpwOw0KKw0KKwlnX29iZXhfZGVidWcoR19PQkVYX0RFQlVHX0NPTU1BTkQsICIiKTsN
-CisNCisJd2hpbGUgKChwID0gZ19xdWV1ZV9wb3BfaGVhZChvYmV4LT50eF9xdWV1ZSkpKQ0KKwkJ
-cGVuZGluZ19wa3RfZnJlZShwKTsNCit9DQorDQogc3RhdGljIGdib29sZWFuIGdfb2JleF9zZW5k
-X2ludGVybmFsKEdPYmV4ICpvYmV4LCBzdHJ1Y3QgcGVuZGluZ19wa3QgKnAsDQogCQkJCQkJCQlH
-RXJyb3IgKiplcnIpDQogew0KZGlmZiAtLWdpdCBhL2dvYmV4L2dvYmV4LmggYi9nb2JleC9nb2Jl
-eC5oDQppbmRleCBiMjIzYTJmYWMuLmE5NGQ5MjQ2ZSAxMDA2NDQNCi0tLSBhL2dvYmV4L2dvYmV4
-LmgNCisrKyBiL2dvYmV4L2dvYmV4LmgNCkBAIC02Myw2ICs2Myw3IEBAIGdib29sZWFuIGdfb2Jl
-eF9yZW1vdmVfcmVxdWVzdF9mdW5jdGlvbihHT2JleCAqb2JleCwgZ3VpbnQgaWQpOw0KIHZvaWQg
-Z19vYmV4X3N1c3BlbmQoR09iZXggKm9iZXgpOw0KIHZvaWQgZ19vYmV4X3Jlc3VtZShHT2JleCAq
-b2JleCk7DQogZ2Jvb2xlYW4gZ19vYmV4X3NybV9hY3RpdmUoR09iZXggKm9iZXgpOw0KK3ZvaWQg
-Z19vYmV4X2Ryb3BfdHhfcXVldWUoR09iZXggKm9iZXgpOw0KIA0KIEdPYmV4ICpnX29iZXhfbmV3
-KEdJT0NoYW5uZWwgKmlvLCBHT2JleFRyYW5zcG9ydFR5cGUgdHJhbnNwb3J0X3R5cGUsDQogCQkJ
-CQkJZ3NzaXplIHJ4X210dSwgZ3NzaXplIHR4X210dSk7DQotLSANCjIuMTcuMQ0K
+--===============5012219319050418054==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkpatch Failed
+
+Outputs:
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#15: 
+0xecc6eeda in dbus_connection_get_object_path_data () from /usr/lib/libdbus-1.so.3
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("36dee8bcf29a51e94")'
+#33: 
+2baea85dec1aebe0b100d4836dee8bcf29a51e94 - Bluetooth: L2CAP ERTM shutdown protect sk and chan
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("0e80a485b99b7de05")'
+#34: 
+f65468f6e26c3bd05e642e10e80a485b99b7de05 - Bluetooth: Make __l2cap_wait_ack more efficient
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("eb9f6d4c2c476043c")'
+#35: 
+451e4c6c6b3fd1a9f446a10eb9f6d4c2c476043c - Bluetooth: Add BT_DBG to l2cap_sock_shutdown()
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("cd092485d754964f9")'
+#36: 
+cb02a25583b59ce48267472cd092485d754964f9 - Bluetooth: __l2cap_wait_ack() use msecs_to_jiffies()
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("2a5f548dc1f0ef4dc")'
+#37: 
+e432c72c464d2deb6c66d1e2a5f548dc1f0ef4dc - Bluetooth: __l2cap_wait_ack() add defensive timeout
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("c2b12b06876f285f0")'
+#38: 
+e7456437c15a2fd42cedd25c2b12b06876f285f0 - Bluetooth: Unwind l2cap_sock_shutdown()
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("73f08782870473fa1")'
+#39: 
+04ba72e6b24f1e0e2221fcd73f08782870473fa1 - Bluetooth: Reorganize mutex lock in l2cap_sock_shutdown()
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("21a9ddb769523baf2")'
+#40: 
+9f7378a9d6ced1784e08d3e21a9ddb769523baf2 - Bluetooth: l2cap_disconnection_req priority over shutdown
+
+- total: 8 errors, 1 warnings, 34 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+--===============5012219319050418054==--
