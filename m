@@ -2,112 +2,67 @@ Return-Path: <SRS0=9nD+=7R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7B3C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E349C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 14:53:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8524A207DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 482AA20823
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 14:53:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728891AbgFDN7M (ORCPT
+        id S1729134AbgFDOxx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 09:59:12 -0400
-Received: from alexa-out-blr-02.qualcomm.com ([103.229.18.198]:61597 "EHLO
-        alexa-out-blr-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728337AbgFDN7M (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 09:59:12 -0400
-Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
-  by alexa-out-blr-02.qualcomm.com with ESMTP/TLS/AES256-SHA; 04 Jun 2020 19:28:00 +0530
-Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 04 Jun 2020 19:27:34 +0530
-Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
-        id EB4772186F; Thu,  4 Jun 2020 19:27:33 +0530 (IST)
-From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, robh@kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, tientzu@chromium.org,
-        seanpaul@chromium.org, rjliao@codeaurora.org, yshavit@google.com,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Fix double free during SSR timeout
-Date:   Thu,  4 Jun 2020 19:27:12 +0530
-Message-Id: <1591279032-7527-1-git-send-email-gubbaven@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Thu, 4 Jun 2020 10:53:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729128AbgFDOxx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Jun 2020 10:53:53 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 207629] BISECTED Bluetooth: hci0: command 0x2042 tx timeout -
+ suspend fails - Dell XPS 9300, Dell XPS 7390, Dell Inspiron 7386, Intel
+ NUC7JYB
+Date:   Thu, 04 Jun 2020 14:53:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rjw@rjwysocki.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-207629-62941-pDEYXEPrJS@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-207629-62941@https.bugzilla.kernel.org/>
+References: <bug-207629-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Due to race conditions between qca_hw_error and qca_controller_memdump
-during SSR timeout,the same pointer is freed twice. Which results to
-double free error. Now a lock is acquired while SSR state moved to timeout.
+https://bugzilla.kernel.org/show_bug.cgi?id=207629
 
-Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+Rafael J. Wysocki (rjw@rjwysocki.net) changed:
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 836949d..9110775 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -983,8 +983,11 @@ static void qca_controller_memdump(struct work_struct *work)
- 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
- 
- 		mutex_lock(&qca->hci_memdump_lock);
--		/* Skip processing the received packets if timeout detected. */
--		if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
-+		/* Skip processing the received packets if timeout detected
-+		 * or memdump collection completed.
-+		 */
-+		if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT ||
-+		    qca->memdump_state == QCA_MEMDUMP_COLLECTED) {
- 			mutex_unlock(&qca->hci_memdump_lock);
- 			return;
- 		}
-@@ -1485,7 +1488,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
--	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
-+	struct qca_memdump_data *qca_memdump = NULL;
- 	char *memdump_buf = NULL;
- 
- 	set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
-@@ -1509,9 +1512,10 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		qca_wait_for_dump_collection(hdev);
- 	}
- 
-+	mutex_lock(&qca->hci_memdump_lock);
- 	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
- 		bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
--		mutex_lock(&qca->hci_memdump_lock);
-+		qca_memdump = qca->qca_memdump;
- 		if (qca_memdump)
- 			memdump_buf = qca_memdump->memdump_buf_head;
- 		vfree(memdump_buf);
-@@ -1520,8 +1524,13 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
- 		cancel_delayed_work(&qca->ctrl_memdump_timeout);
- 		skb_queue_purge(&qca->rx_memdump_q);
--		mutex_unlock(&qca->hci_memdump_lock);
-+	}
-+	mutex_unlock(&qca->hci_memdump_lock);
-+
-+	if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT ||
-+	    qca->memdump_state == QCA_MEMDUMP_COLLECTED) {
- 		cancel_work_sync(&qca->ctrl_memdump_evt);
-+		skb_queue_purge(&qca->rx_memdump_q);
- 	}
- 
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |rjw@rjwysocki.net
+
+--- Comment #22 from Rafael J. Wysocki (rjw@rjwysocki.net) ---
+Patch to test: https://patchwork.kernel.org/patch/11586221/
+
 -- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
-of Code Aurora Forum, hosted by The Linux Foundation
-
+You are receiving this mail because:
+You are the assignee for the bug.
