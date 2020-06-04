@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8016C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 23:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8755FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 23:24:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7777C206C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 23:16:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 511D5206C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 23:24:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591312560;
-	bh=5HAgBo3brAxccrTjx8FfyeZLISQRcVfU897pmQEopkM=;
+	s=default; t=1591313084;
+	bh=0tx9kpBc+f0HEiwsJThcotQHTTp9JdJkreVr9mEpIpQ=;
 	h=From:To:Subject:Date:List-ID:From;
-	b=RC/RiijGJvkvo7rBuAo4P/BTFas6pXoucUd+7O+FfCotFWBvI0XQuH1SgS9LEwf9t
-	 TevnxwUGF+F69IluvzTDDeb+TC56Vh7b4Tj7fWXUy9gwIENVnpx84tjbDBEZfpN4d6
-	 prK0OdafaFPlS35cuojCidVOCAZevZCnhKm68KXY=
+	b=CT1LCq7Gh0SdmnYn/6fvxC00Inc3fdYfC9VliFZIkgCWDUOM9BTfAI6wyNakhoRwi
+	 1yfvIWeICgKbxzCRfQKTuFW9mJFdOrXY9GM+AHzzHKC+H4CFuxWlGBQWKmAuzd66/L
+	 vnUbc7MIPY63czNAx1/y8miOs9JK1+dgkSzMn8jY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbgFDXQA (ORCPT
+        id S1725943AbgFDXYo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 19:16:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57288 "EHLO mail.kernel.org"
+        Thu, 4 Jun 2020 19:24:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59782 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbgFDXQA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 19:16:00 -0400
+        id S1725863AbgFDXYn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Jun 2020 19:24:43 -0400
 Received: from pali.im (pali.im [31.31.79.79])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4EC78206C3;
-        Thu,  4 Jun 2020 23:15:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3F5B0206A2;
+        Thu,  4 Jun 2020 23:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591312559;
-        bh=5HAgBo3brAxccrTjx8FfyeZLISQRcVfU897pmQEopkM=;
+        s=default; t=1591313083;
+        bh=0tx9kpBc+f0HEiwsJThcotQHTTp9JdJkreVr9mEpIpQ=;
         h=From:To:Subject:Date:From;
-        b=u9SbIW4JbOrZMKo482VqEI/wVxVoCk5b7Y2DyRGw2BlaCjt6uRJRhI7hmZqwD6j2I
-         kQWZvNSINOomcSAIbLBK4uwc38qUoA5IKYa93FQpd+qI8c3ImlK0W7sQvvHGvHNu4S
-         OwZVvmZrAP04KPcCZEz1PGivX4IGfT1aKdS+FReo=
+        b=VYLa7vCVWYPmgg7o/bcJYDULx16j12CnIRVKZgCP4MgKyMflhG/UE5TnWJzc5YHQk
+         8daf+cDrA7FcpDpncNAEwZOQYbzGIYaFkHaZckFNWtmbuC6kXDrAgBVuEuhpmaG1h8
+         UplbgvnLdEQCmxJYfo2qb98qDyFcdaFLOKaClpjw=
 Received: by pali.im (Postfix)
-        id D8995F88; Fri,  5 Jun 2020 01:15:56 +0200 (CEST)
+        id 80E07F88; Fri,  5 Jun 2020 01:24:41 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-bluetooth@vger.kernel.org,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH] btio: Fix registering Object Push, File Transfer and other L2CAP profiles
-Date:   Fri,  5 Jun 2020 01:15:41 +0200
-Message-Id: <20200604231541.4170-1-pali@kernel.org>
+Subject: [PATCH] sap: Improve error messages
+Date:   Fri,  5 Jun 2020 01:24:33 +0200
+Message-Id: <20200604232433.4951-1-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -54,66 +54,44 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When bluetoothd daemon is starting, it prints following error messages:
+When bluetoohd daemon is starting, it prints following error messages:
 
-bluetoothd[19117]: src/profile.c:ext_start_servers() L2CAP server failed for Message Notification: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
-bluetoothd[19117]: src/profile.c:ext_start_servers() L2CAP server failed for Message Access: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
-bluetoothd[19117]: src/profile.c:ext_start_servers() L2CAP server failed for Phone Book Access: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
-bluetoothd[19117]: src/profile.c:ext_start_servers() L2CAP server failed for File Transfer: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
-bluetoothd[19117]: src/profile.c:ext_start_servers() L2CAP server failed for Object Push: setsockopt(L2CAP_OPTIONS): Invalid argument (22)
+bluetoothd[19117]: profiles/sap/server.c:sap_server_register() Sap driver initialization failed.
+bluetoothd[19117]: sap-server: Operation not permitted (1)
 
-Result is that Object Push and File Transfer profiles do not work at all.
+Initialization is failing because sap server is enabled only when
+bluetoothd daemon is started with --experimental option.
 
-Debugging set_l2opts() function showed me that src/profile.c calls it with
-L2CAP mode 0x01 (L2CAP_MODE_RETRANS). But kernel bluetooth code in function
-l2cap_sock_setsockopt_old() for L2CAP_OPTIONS option disallows to set L2CAP
-method to 0x01 (L2CAP_MODE_RETRANS) and just returns -EINVAL (22).
+And "Operation not permitted" is result of returning error code -1.
 
-These bluetooth profiles have in src/profile.c file defined L2CAP mode to
-BT_IO_MODE_ERTM and not to RETRANS. So it means that BT_IO_MODE_ERTM value
-defined in 'enum BtIOMode' must be incorrect.
-
-Digging into git history, it appears that 'enum BtIOMode' was broken in
-commit f2418bf97d ("btio: Add mode to for Enhanced Credit Mode") which
-basically broke all those Object Push, File Transfer, Phone Book Access,
-Message Access and Message Notification L2CAP profiles. That commit removed
-some values from 'enum BtIOMode' and therefore broke all bluetooth code
-which uses 'enum BtIOMode' for communication with kernel.
-
-This patch fixes 'enum BtIOMode' by reverting back BT_IO_MODE_RETRANS and
-BT_IO_MODE_FLOWCTL modes, so BT_IO_MODE_ERTM has again correct value 0x03.
-
-After applying this patch, Object Push and File Transfer profiles work
-again.
-
-Fixes: f2418bf97d ("btio: Add mode to for Enhanced Credit Mode")
+This patch improves error messages. When --experimental option is not used
+then bluetoothd prints more explaining error message. And in case function
+sap_init() fails then -EOPNOTSUPP "Operation not supported" is returned
+instead of -EPERM (-1).
 ---
+ profiles/sap/server.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Hello Luiz, could you please review this patch? As that problematic commit
-f2418bf97d was introduced by you.
-
-I'm curious why nobody else reported this issue about broken Object Push
-and File Transfer profile as it should print those error messages... Or
-maybe error message is visible only in debug build and nobody is using
-Bluetooth File Transfer anymore?
-
----
- btio/btio.h | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/btio/btio.h b/btio/btio.h
-index 23e0ef72b..0d183e3ce 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -68,6 +68,8 @@ typedef enum {
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index 5de682a33..99ff80297 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -1353,9 +1353,14 @@ int sap_server_register(struct btd_adapter *adapter)
+ 	GIOChannel *io;
+ 	struct sap_server *server;
  
- typedef enum {
- 	BT_IO_MODE_BASIC = 0,
-+	BT_IO_MODE_RETRANS,
-+	BT_IO_MODE_FLOWCTL,
- 	BT_IO_MODE_ERTM,
- 	BT_IO_MODE_STREAMING,
- 	BT_IO_MODE_LE_FLOWCTL,
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		error("Sap driver is disabled without --experimental option");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (sap_init() < 0) {
+ 		error("Sap driver initialization failed.");
+-		return -1;
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	record = create_sap_record(SAP_SERVER_CHANNEL);
 -- 
 2.20.1
 
