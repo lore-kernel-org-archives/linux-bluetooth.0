@@ -2,70 +2,70 @@ Return-Path: <SRS0=9nD+=7R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAE7C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA121C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:28:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B1E0206C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:26:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3F42206E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:28:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoNCW01K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mG3BFqlw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726990AbgFDV0Y (ORCPT
+        id S1726819AbgFDV2l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 17:26:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
+        Thu, 4 Jun 2020 17:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbgFDV0X (ORCPT
+        with ESMTP id S1726326AbgFDV2k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 17:26:23 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDFEC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 14:26:22 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id q188so1538933ooq.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 14:26:22 -0700 (PDT)
+        Thu, 4 Jun 2020 17:28:40 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6545C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 14:28:40 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id o7so5950208oti.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 14:28:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=GwJEgzKXnIoM0ZhICPXeidYUgLgqF7aYeFNAxGWuXJY=;
-        b=VoNCW01KujgQynoqWMImLWIi6sMAn/FuqZuyqANQUAeNddKAPljyQjmk+4winxket0
-         NdSloR51yiyhODrCYepw7o6R7kgwV2f78TLaHDd5Jk1LU5Zevhb7durZfcgKPMaIueXC
-         frMaXFhCLVGH43nxyguwWpHA7/X53GYRnSZjmWwn5vco3YCXwGJvDfKGGjSfhoLZoFl9
-         CvOMWSULBqBZM8wEI8wS3igJ6WnyCqC2QP0qqa1rdSkr1mlgAjSDyio9+0+/DV1aRNdq
-         7vtkJJXGuso8EIApu9kbLM4LIo1R1J6ndssA88MOOQbgAQ6Jn4e9qpqYOoBYrTpkZ2iO
-         /LYQ==
+        bh=40z5tW1tj8hkDY/B0YuXmKTehDdhEBSqTBO+4DBw/f0=;
+        b=mG3BFqlwafNSIfYTQ3gWVO5MiFE5CHmdXG0P2HytuCXMGfdrgS66Tfz40JevY6rxrq
+         rI2NLKsdBFNi86QYeGgkqo9hddJqoaKtS4+T3PSHRb6JBqRct/GztdtDZOjLD7+FoSIp
+         BL/4p84ahV/9aAy6cBpGfaxceSUSJLoRgPvQYa91c10Ej7pNePMWXQCZk3xHXB4huO75
+         c6ocaKfWwz4F0XRts5/7QHYcpZq+Dfd5s3cSxgsQRVj0Z79GMSrklKvmqD/SqvcLbTLu
+         s7Zf4gmxkKoMENd4vWjPctzrFPNZLrbHwAFwV5nLz3PmLhJLVRotZdICX4l6Sg1O129+
+         m2Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=GwJEgzKXnIoM0ZhICPXeidYUgLgqF7aYeFNAxGWuXJY=;
-        b=S89fpzQFeYa8YvsptL7TpYh+xE0EIWU8Qxti79L3iGQFbTX6tBYvEYmbMzsTvEcdOw
-         tc01JfQTi2czHaonc9LJ7v7TyYAu3f0hZ5J7itvveElvOQAPXAv4Psdwq8+5Br9GVJ2A
-         O2BRCbRKGUk8ZjpTeVzra732+HGmDPWmaYuAZIZyH/ezMRDM7DDVoohKgUpPqO7aQO1k
-         pdJ/yKfKTjMpw/knoehX3hlLTR9MBjFVol+GUR11id06tHzIKNF7YnCE5/XAWbysOPS3
-         yTCKX9s1pZF5fAp8aWGOotnUI7Faxdr4/DkZbW/4Uey4snsftz783cwzPxHap1ASeOMa
-         EPkQ==
-X-Gm-Message-State: AOAM532GcxHkPBmFyzOuID+kXPWHmx7U40ZA4rJdPbIkCsAx1hGO1R3q
-        osx9yu3PwW/J5EJOHjx+fRfOzWRv83b2y3/4JoQ=
-X-Google-Smtp-Source: ABdhPJzr1DP13Vq9Oxt12bVdAhE92JYgHsfoFbhuiV5zkWfPFndrkvmC+oM4MMTy0UFZgu9xG/QZ3noPmYnMWmRB6Y0=
-X-Received: by 2002:a4a:3811:: with SMTP id c17mr5170710ooa.91.1591305981719;
- Thu, 04 Jun 2020 14:26:21 -0700 (PDT)
+        bh=40z5tW1tj8hkDY/B0YuXmKTehDdhEBSqTBO+4DBw/f0=;
+        b=rZRMT5Wc4x/+OwPIzIYtCtAvc7+ZtL+qyGgZeqf7ZhMci5uLSB0UxYiMSmOOc1QxIA
+         PgXLat1psba/BRwOe8Bc7zmmACI2rHOhnW/IP3arcqc54eXK56hU45tPFilsLuly8fgS
+         nukc0t2479yWYKFs5Vwm7M3jBq1rQ0mYRQtempDBw0xIQEMPO/jcGQhoGihsDw/h69+r
+         Ib3+yJ+Jy6/JxgPc0Q5B+x84JT358RuxMcP67OJ+sx3UXsok2kyzjH7V8kkkbm4jn6Dp
+         wvaP4s6RD2rLExD8QKQgEaI0227+S3cpbSufHmknpBZgs2syflhngaOu5NrFttgnuYgm
+         HQuQ==
+X-Gm-Message-State: AOAM532oj7quROd76wwSth8baZEhpLCEm7HWVQyklPsDahcxGxER3zaH
+        B9BO/CuPW/MKPJ5KPlYejjmZLZcyiIFai4MrC+4=
+X-Google-Smtp-Source: ABdhPJzg1tayxPt/8M5HCKJhVO1gMyci5gI+44K8w5S6A3bcJ2WNCj6u3xdjpoC7gkUi9mocMIycbaF3jBGDtVHkgns=
+X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr5383868ots.11.1591306120062;
+ Thu, 04 Jun 2020 14:28:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200529133023.Bluez.v3.1.I804fb280949e4ce5cd9d0fce544a6f1a0592d11b@changeid>
-In-Reply-To: <20200529133023.Bluez.v3.1.I804fb280949e4ce5cd9d0fce544a6f1a0592d11b@changeid>
+References: <20200505121918.Bluez.v2.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
+In-Reply-To: <20200505121918.Bluez.v2.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Jun 2020 14:26:10 -0700
-Message-ID: <CABBYNZKemz-L+xSWygEBmqnW9LQPqMvfXXgi2HjYgZA0YONFuw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3] audio/avrcp: Fix media player passthrough bitmask
+Date:   Thu, 4 Jun 2020 14:28:28 -0700
+Message-ID: <CABBYNZLRDzBv_ES3HvuBEc1Jse8oxfbFe+5j8exgZ1NbKsnpRg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2] tools/l2cap-tester: Add test for waiting
+ disconnection response
 To:     Archie Pusaka <apusaka@google.com>
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Michael Sun <michaelfsun@google.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,231 +75,264 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Archie,
 
-On Thu, May 28, 2020 at 10:31 PM Archie Pusaka <apusaka@google.com> wrote:
+On Mon, May 4, 2020 at 9:29 PM Archie Pusaka <apusaka@google.com> wrote:
 >
 > From: Archie Pusaka <apusaka@chromium.org>
 >
-> Adjust the values of the passthrough bitmask with the declared
-> keys in avctp.c:key_map, according to section 6.10.2.1 of the
-> AVRCP specification.
->
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> This is to test the behaviour of L2CAP channel when closed with
+> shut_down(sock, SHUT_WR). In this case, we should wait until we
+> receive a disconnection response before raising G_IO_HUP.
 > ---
 >
-> Changes in v3:
-> - Use table to map the passthrough bitmask instead of hardcoding
->
 > Changes in v2:
-> - Fix the mix-up between the first 4 and the last 4 bits of each
-> octet
+> - Fix compile error in android/tester-main.c
 >
->  profiles/audio/avctp.c | 11 +++++
->  profiles/audio/avctp.h | 11 +++++
->  profiles/audio/avrcp.c | 93 ++++++++++++++++++++++++++++++++++++++----
->  3 files changed, 108 insertions(+), 7 deletions(-)
+>  android/tester-main.c |  2 +-
+>  emulator/bthost.c     | 17 ++++++++++-
+>  emulator/bthost.h     |  5 +++-
+>  tools/l2cap-tester.c  | 65 ++++++++++++++++++++++++++++++++++++++-----
+>  tools/rfcomm-tester.c |  2 +-
+>  5 files changed, 80 insertions(+), 11 deletions(-)
 >
-> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-> index 058b44a8b..7307eaa9e 100644
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -2222,3 +2222,14 @@ bool avctp_is_initiator(struct avctp *session)
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index 3c5af299f..9a14b2899 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -2867,7 +2867,7 @@ void emu_add_l2cap_server_action(void)
+>         bthost = hciemu_client_get_host(data->hciemu);
+>
+>         bthost_add_l2cap_server(bthost, l2cap_data->psm, l2cap_data->func,
+> -                                                       l2cap_data->user_data);
+> +                                               NULL, l2cap_data->user_data);
+>
+>         step->action_status = BT_STATUS_SUCCESS;
+>
+> diff --git a/emulator/bthost.c b/emulator/bthost.c
+> index 0fa283464..71d5f97bb 100644
+> --- a/emulator/bthost.c
+> +++ b/emulator/bthost.c
+> @@ -180,6 +180,7 @@ struct l2cap_pending_req {
+>  struct l2cap_conn_cb_data {
+>         uint16_t psm;
+>         bthost_l2cap_connect_cb func;
+> +       bthost_l2cap_disconnect_cb disconn_func;
+>         void *user_data;
+>         struct l2cap_conn_cb_data *next;
+>  };
+> @@ -1510,7 +1511,9 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+>                                 uint8_t ident, const void *data, uint16_t len)
 >  {
->         return session->initiator;
+>         const struct bt_l2cap_pdu_disconn_req *req = data;
+> +       struct l2cap_conn_cb_data *cb_data;
+>         struct bt_l2cap_pdu_disconn_rsp rsp;
+> +       struct l2conn *l2conn;
+>
+>         if (len < sizeof(*req))
+>                 return false;
+> @@ -1522,6 +1525,15 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+>         l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_DISCONN_RSP, ident, &rsp,
+>                                                                 sizeof(rsp));
+>
+> +       l2conn = btconn_find_l2cap_conn_by_scid(conn, rsp.scid);
+> +       if (!l2conn)
+> +               return true;
+> +
+> +       cb_data = bthost_find_l2cap_cb_by_psm(bthost, l2conn->psm);
+> +
+> +       if (cb_data && cb_data->disconn_func)
+> +               cb_data->disconn_func(cb_data->user_data);
+> +
+>         return true;
 >  }
-> +
-> +bool avctp_supports_avc(uint8_t avc)
-> +{
-> +       int i;
-> +
-> +       for (i = 0; key_map[i].name != NULL; i++) {
-> +               if (key_map[i].avc == avc)
-> +                       return true;
-> +       }
-> +       return false;
-> +}
-> diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
-> index 68a273561..c3cd49d88 100644
-> --- a/profiles/audio/avctp.h
-> +++ b/profiles/audio/avctp.h
-> @@ -54,7 +54,12 @@
->  #define AVC_DOWN                       0x02
->  #define AVC_LEFT                       0x03
->  #define AVC_RIGHT                      0x04
-> +#define AVC_RIGHT_UP                   0x05
-> +#define AVC_RIGHT_DOWN                 0x06
-> +#define AVC_LEFT_UP                    0x07
-> +#define AVC_LEFT_DOWN                  0x08
->  #define AVC_ROOT_MENU                  0x09
-> +#define AVC_SETUP_MENU                 0x0a
->  #define AVC_CONTENTS_MENU              0x0b
->  #define AVC_FAVORITE_MENU              0x0c
->  #define AVC_EXIT                       0x0d
-> @@ -72,9 +77,11 @@
->  #define AVC_9                          0x29
->  #define AVC_DOT                                0x2a
->  #define AVC_ENTER                      0x2b
-> +#define AVC_CLEAR                      0x2c
->  #define AVC_CHANNEL_UP                 0x30
->  #define AVC_CHANNEL_DOWN               0x31
->  #define AVC_CHANNEL_PREVIOUS           0x32
-> +#define AVC_SOUND_SELECT               0x33
->  #define AVC_INPUT_SELECT               0x34
->  #define AVC_INFO                       0x35
->  #define AVC_HELP                       0x36
-> @@ -95,6 +102,8 @@
->  #define AVC_FORWARD                    0x4b
->  #define AVC_BACKWARD                   0x4c
->  #define AVC_LIST                       0x4d
-> +#define AVC_ANGLE                      0x50
-> +#define AVC_SUBPICTURE                 0x51
->  #define AVC_F1                         0x71
->  #define AVC_F2                         0x72
->  #define AVC_F3                         0x73
-> @@ -108,6 +117,7 @@
->  #define AVC_GREEN                      0x7b
->  #define AVC_BLUE                       0x7c
->  #define AVC_YELLOW                     0x7c
-> +#define AVC_VENDOR_UNIQUE              0x7e
 >
->  struct avctp;
+> @@ -2553,7 +2565,9 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
+>  }
 >
-> @@ -183,3 +193,4 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
->  int avctp_send_browsing_req(struct avctp *session,
->                                 uint8_t *operands, size_t operand_count,
->                                 avctp_browsing_rsp_cb func, void *user_data);
-> +bool avctp_supports_avc(uint8_t avc);
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 773ccdb60..fa97a3a89 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -293,15 +293,75 @@ struct control_pdu_handler {
->                                                         uint8_t transaction);
+>  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+> -                               bthost_l2cap_connect_cb func, void *user_data)
+> +                               bthost_l2cap_connect_cb func,
+> +                               bthost_l2cap_disconnect_cb disconn_func,
+> +                               void *user_data)
+>  {
+>         struct l2cap_conn_cb_data *data;
+>
+> @@ -2564,6 +2578,7 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+>         data->psm = psm;
+>         data->user_data = user_data;
+>         data->func = func;
+> +       data->disconn_func = disconn_func;
+>         data->next = bthost->new_l2cap_conn_data;
+>
+>         bthost->new_l2cap_conn_data = data;
+> diff --git a/emulator/bthost.h b/emulator/bthost.h
+> index b5f36964d..2b347136f 100644
+> --- a/emulator/bthost.h
+> +++ b/emulator/bthost.h
+> @@ -100,9 +100,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
+>                                                         const uint8_t ltk[16]);
+>  typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
+>                                                         void *user_data);
+> +typedef void (*bthost_l2cap_disconnect_cb) (void *user_data);
+>
+>  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+> -                               bthost_l2cap_connect_cb func, void *user_data);
+> +                               bthost_l2cap_connect_cb func,
+> +                               bthost_l2cap_disconnect_cb disconn_func,
+> +                               void *user_data);
+>
+>  void bthost_set_sc_support(struct bthost *bthost, bool enable);
+>
+> diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+> index 844ff2b46..1ef4e9213 100644
+> --- a/tools/l2cap-tester.c
+> +++ b/tools/l2cap-tester.c
+> @@ -55,6 +55,7 @@ struct test_data {
+>         uint16_t dcid;
+>         int sk;
+>         int sk2;
+> +       bool host_disconnected;
 >  };
 >
-> +static struct {
-> +       uint8_t feature_bit;
-> +       uint8_t avc;
-> +} passthrough_map[] = {
-> +       { 0, AVC_SELECT },
-> +       { 1, AVC_UP },
-> +       { 2, AVC_DOWN },
-> +       { 3, AVC_LEFT },
-> +       { 4, AVC_RIGHT },
-> +       { 5, AVC_RIGHT_UP },
-> +       { 6, AVC_RIGHT_DOWN },
-> +       { 7, AVC_LEFT_UP },
-> +       { 8, AVC_LEFT_DOWN },
-> +       { 9, AVC_ROOT_MENU },
-> +       { 10, AVC_SETUP_MENU },
-> +       { 11, AVC_CONTENTS_MENU },
-> +       { 12, AVC_FAVORITE_MENU },
-> +       { 13, AVC_EXIT },
-> +       { 14, AVC_0 },
-> +       { 15, AVC_1 },
-> +       { 16, AVC_2 },
-> +       { 17, AVC_3 },
-> +       { 18, AVC_4 },
-> +       { 19, AVC_5 },
-> +       { 20, AVC_6 },
-> +       { 21, AVC_7 },
-> +       { 22, AVC_8 },
-> +       { 23, AVC_9 },
-> +       { 24, AVC_DOT },
-> +       { 25, AVC_ENTER },
-> +       { 26, AVC_CLEAR },
-> +       { 27, AVC_CHANNEL_UP },
-> +       { 28, AVC_CHANNEL_DOWN },
-> +       { 29, AVC_CHANNEL_PREVIOUS },
-> +       { 30, AVC_SOUND_SELECT },
-> +       { 31, AVC_INPUT_SELECT },
-> +       { 32, AVC_INFO },
-> +       { 33, AVC_HELP },
-> +       { 34, AVC_PAGE_UP },
-> +       { 35, AVC_PAGE_DOWN },
-> +       { 36, AVC_POWER },
-> +       { 37, AVC_VOLUME_UP },
-> +       { 38, AVC_VOLUME_DOWN },
-> +       { 39, AVC_MUTE },
-> +       { 40, AVC_PLAY },
-> +       { 41, AVC_STOP },
-> +       { 42, AVC_PAUSE },
-> +       { 43, AVC_RECORD },
-> +       { 44, AVC_REWIND },
-> +       { 45, AVC_FAST_FORWARD },
-> +       { 46, AVC_EJECT },
-> +       { 47, AVC_FORWARD },
-> +       { 48, AVC_BACKWARD },
-> +       { 49, AVC_ANGLE },
-> +       { 50, AVC_SUBPICTURE },
-> +       { 51, AVC_F1 },
-> +       { 52, AVC_F2 },
-> +       { 53, AVC_F3 },
-> +       { 54, AVC_F4 },
-> +       { 55, AVC_F5 },
-> +       { 56, AVC_VENDOR_UNIQUE },
-> +       { 0xff, 0xff }
+>  struct l2cap_data {
+> @@ -93,6 +94,8 @@ struct l2cap_data {
+>         bool server_not_advertising;
+>         bool direct_advertising;
+>         bool close_1;
+> +
+> +       bool shut_sock_wr;
+>  };
+>
+>  static void mgmt_debug(const char *str, void *user_data)
+> @@ -316,6 +319,12 @@ static const struct l2cap_data client_connect_write_success_test = {
+>         .data_len = sizeof(l2_data),
+>  };
+>
+> +static const struct l2cap_data client_connect_shut_wr_success_test = {
+> +       .client_psm = 0x1001,
+> +       .server_psm = 0x1001,
+> +       .shut_sock_wr = true,
 > +};
 > +
->  static GSList *servers = NULL;
->  static unsigned int avctp_id = 0;
->
-> -/* Default feature bit mask for media player as per avctp.c:key_map */
-> -static const uint8_t features[16] = {
-> -                               0xF8, 0xBF, 0xFF, 0xBF, 0x1F,
-> -                               0xFB, 0x3F, 0x60, 0x00, 0x00,
-> -                               0x00, 0x00, 0x00, 0x00, 0x00,
-> -                               0x00 };
-> +/* Default feature bit mask for media player */
-> +static uint8_t default_features[16];
->
->  /* Company IDs supported by this device */
->  static uint32_t company_ids[] = {
-> @@ -490,6 +550,22 @@ static sdp_record_t *avrcp_tg_record(void)
->         return record;
+>  static const struct l2cap_data client_connect_nval_psm_test_1 = {
+>         .client_psm = 0x1001,
+>         .expect_err = ECONNREFUSED,
+> @@ -967,6 +976,27 @@ static void server_bthost_received_data(const void *buf, uint16_t len,
+>                 tester_test_passed();
 >  }
 >
-> +static void populate_default_features(void)
+> +static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
+> +                                                       gpointer user_data)
 > +{
-> +       int i;
+> +       struct test_data *data = tester_get_data();
+> +       const struct l2cap_data *l2data = data->test_data;
 > +
-> +       for (i = 0; passthrough_map[i].feature_bit != 0xff; i++) {
-> +               if (avctp_supports_avc(passthrough_map[i].avc)) {
-> +                       uint8_t bit = passthrough_map[i].feature_bit;
-> +
-> +                       default_features[bit >> 3] |= (1 << (bit & 7));
+> +       if (l2data->shut_sock_wr) {
+> +               /* if socket is closed using SHUT_WR, L2CAP disconnection
+> +                * response must be received first before G_IO_HUP event.
+> +                */
+> +               if (data->host_disconnected)
+> +                       tester_test_passed();
+> +               else {
+> +                       tester_warn("G_IO_HUP received before receiving L2CAP disconnection");
+> +                       tester_test_failed();
 > +               }
 > +       }
 > +
-> +       /* supports at least AVRCP 1.4 */
-> +       default_features[7] |= (1 << 2);
+> +       return FALSE;
 > +}
 > +
->  static unsigned int attr_get_max_val(uint8_t attr)
+>  static bool check_mtu(struct test_data *data, int sk)
 >  {
->         switch (attr) {
-> @@ -1913,7 +1989,8 @@ static void avrcp_handle_media_player_list(struct avrcp *session,
->                 item->subtype = htonl(0x01); /* Audio Book */
->                 item->status = player_get_status(player);
->                 /* Assign Default Feature Bit Mask */
-> -               memcpy(&item->features, &features, sizeof(features));
-> +               memcpy(&item->features, &default_features,
-> +                                       sizeof(default_features));
+>         const struct l2cap_data *l2data = data->test_data;
+> @@ -1062,6 +1092,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+>                         tester_test_failed();
+>                 }
 >
->                 item->charset = htons(AVRCP_CHARSET_UTF8);
->
-> @@ -4578,6 +4655,8 @@ static int avrcp_init(void)
->         btd_profile_register(&avrcp_controller_profile);
->         btd_profile_register(&avrcp_target_profile);
->
-> +       populate_default_features();
+> +               return FALSE;
+> +       } else if (l2data->shut_sock_wr) {
+> +               g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
+> +               shutdown(sk, SHUT_WR);
 > +
->         return 0;
+>                 return FALSE;
+>         }
+>
+> @@ -1214,6 +1249,13 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+>         data->handle = handle;
 >  }
 >
+> +static void client_l2cap_disconnect_cb(void *user_data)
+> +{
+> +       struct test_data *data = user_data;
+> +
+> +       data->host_disconnected = true;
+> +}
+> +
+>  static void direct_adv_cmd_complete(uint16_t opcode, const void *param,
+>                                                 uint8_t len, void *user_data)
+>  {
+> @@ -1254,13 +1296,18 @@ static void test_connect(const void *test_data)
+>
+>         if (l2data->server_psm) {
+>                 struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+> +               bthost_l2cap_connect_cb host_connect_cb = NULL;
+> +               bthost_l2cap_disconnect_cb host_disconnect_cb = NULL;
+>
+> -               if (!l2data->data_len)
+> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
+> -                                               NULL, NULL);
+> -               else
+> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
+> -                                               client_l2cap_connect_cb, data);
+> +               if (l2data->data_len)
+> +                       host_connect_cb = client_l2cap_connect_cb;
+> +
+> +               if (l2data->shut_sock_wr)
+> +                       host_disconnect_cb = client_l2cap_disconnect_cb;
+> +
+> +               bthost_add_l2cap_server(bthost, l2data->server_psm,
+> +                                       host_connect_cb, host_disconnect_cb,
+> +                                       data);
+>         }
+>
+>         if (l2data->direct_advertising)
+> @@ -1639,7 +1686,7 @@ static void test_connect_2(const void *test_data)
+>
+>                 if (!l2data->data_len)
+>                         bthost_add_l2cap_server(bthost, l2data->server_psm,
+> -                                               NULL, NULL);
+> +                                               NULL, NULL, NULL);
+>         }
+>
+>         defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
+> @@ -1927,6 +1974,10 @@ int main(int argc, char *argv[])
+>                                         &client_connect_nval_psm_test_3,
+>                                         setup_powered_client, test_connect);
+>
+> +       test_l2cap_bredr("L2CAP BR/EDR Client - Socket Shut WR Success",
+> +                                       &client_connect_shut_wr_success_test,
+> +                                       setup_powered_client, test_connect);
+> +
+>         test_l2cap_bredr("L2CAP BR/EDR Server - Success",
+>                                         &l2cap_server_success_test,
+>                                         setup_powered_server, test_server);
+> diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+> index b20d70d58..2d3be27d8 100644
+> --- a/tools/rfcomm-tester.c
+> +++ b/tools/rfcomm-tester.c
+> @@ -548,7 +548,7 @@ static void test_connect(const void *test_data)
+>         GIOChannel *io;
+>         int sk;
+>
+> -       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
+> +       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL, NULL);
+>         bthost_add_rfcomm_server(bthost, cli->server_channel,
+>                                                 rfcomm_connect_cb, NULL);
+>
 > --
-> 2.27.0.rc2.251.g90737beb825-goog
+> 2.26.2.526.g744177e7f7-goog
 
-Applied, thanks.
+Applied, thanks. Btw do you want me to apply the HID patch or do you
+have an update to that?
 
 -- 
 Luiz Augusto von Dentz
