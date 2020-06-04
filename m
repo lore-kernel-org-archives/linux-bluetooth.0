@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 819A3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C047C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D202207D8
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 051E3206C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 13:07:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYDzk+ok"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLvGMPYE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728129AbgFDNHq (ORCPT
+        id S1728235AbgFDNHx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 09:07:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40676 "EHLO
+        Thu, 4 Jun 2020 09:07:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbgFDNHq (ORCPT
+        with ESMTP id S1728038AbgFDNHw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 09:07:46 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D45EDC08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 06:07:44 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id v79so5831111qkb.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 06:07:44 -0700 (PDT)
+        Thu, 4 Jun 2020 09:07:52 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF5FC08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 06:07:52 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id v79so5831538qkb.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 06:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=mYZXTXdIlBM9C3Qe0Mbo4lkm3AD6nXgxP4WiKDC68xs=;
-        b=ZYDzk+okDPYbR0BLC2engoM6nE6GOp+DRGPgnN6z07tZJ2ChhgdIrG8HiKJ/8Kzbks
-         bFjPBcmTT+cCEa9Wy8Nsk28x6A4LthNjCXoE47ngYLJ95s4f8NKNFqWE9shfW9ULPAFR
-         /yjdXXyprQIRQ5eDlnhHZwmlhXZ3LI7IjIKEJOPOaammrFl3QZjRWPmAt0e6sLiff8Bk
-         kJKQcZ9h2oBreVWwNPbmM9h/d3MoK3VOMJ6J4l70C41+MM36jAYzaaXo69rTUm//EyS2
-         2wSxgQDZmREh+V1HsplR5U1UCFxSWgEa5DuYNdCSs55f7hHwYsR2pfoeSrryUMky4ieA
-         jUJg==
+        bh=du0xvdosbOk3TgTOz25b9Grv94Uo7Tf/4Srq7EgFhiM=;
+        b=lLvGMPYEz5ntO3uBuP6VekSZmQHiZkJ5jsCAtY2O7J3JyeNxacV9hNfxHLhOL6tKU5
+         1uBxRQrvwMfc0W0QdXx+MqOWrvaICEUQoLGP4AVA/YSz0UAig1yzSCS1JU9s4sahR6Eg
+         45iD/q6NM2mcrH5hM+SmnL/Fp6JXHC1tg5v2ovCBQpRLpFoPkNbteWISP+u+dxWbZoMe
+         GKxxtQc3Y8DTFdIf8IK/2UzhqdSb6K03j6mja453abKP2TxhxPrUJTRqsgRLZB1HoRyN
+         X4causiLB9NjGk0k0FbsgAH93qg5lrLHmNb42hU99MPqvMyyG/cUUF8VaEPkA0+mTlOK
+         Dn3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=mYZXTXdIlBM9C3Qe0Mbo4lkm3AD6nXgxP4WiKDC68xs=;
-        b=CFC+P6au+auevm+IR1F5/ROVdTdvWa5VQmoQ/Sq05rDr7bPe3oU5T1rTWySOXyhPs6
-         vK2dzMhaLDH+7Be3QpR3B3kvhbs7dXOSqV3fPu/QG7uN8R0K2MHEUe/eIqtz4p8cCi3T
-         6agvqCsvuxcQLS2UR+6i8Skt8VaR338vKGRHWER32lgnD1njp41sEPA3w+f0dCZdkQ7L
-         uAGBssIHMFPmErH7dR2J8AfzdQUCXJzAFNPv9MOdAhuOTsybKWH0vHNJRusOM5PQAkH3
-         LxhKqNk4p1nNDu7jM2KO5nPdDalYklla7lD8ncVvSC2SzUCWw6Gb8nODYwFNM4cwejHi
-         e7Qw==
-X-Gm-Message-State: AOAM533fC5ob9FXTvuvMeBEyHklcBqnOa6FA+B/s7RtpTU0LdolCSXxK
-        joQWdltyeC3HDLD0eoiXIRbaZ83xJbY=
-X-Google-Smtp-Source: ABdhPJzP66OW64+yFscDyZM1U7x/z8Wyk9APJEtBKH/1ZRw3+9IlEiCu9IrV+sOn8ubK7gdgVVnkpw==
-X-Received: by 2002:a37:2c05:: with SMTP id s5mr4580521qkh.379.1591276063973;
-        Thu, 04 Jun 2020 06:07:43 -0700 (PDT)
+        bh=du0xvdosbOk3TgTOz25b9Grv94Uo7Tf/4Srq7EgFhiM=;
+        b=R8XSzM2G+Djks8J5gntv9rndtRJE4xDjy4+2ABOHITNEC/jnSpg51BQtkKV7JTLajf
+         LUAlEaBX78FyxwUW76RBAk1y80rYb0cXHNc0DbsDl56D/P66rTm7RDF4HgCLvuw3ll7F
+         Mc2ufKFC6lUgF2gbvmItGBdELExCtc2xiIJKmvhApDu2ePQs9+eEbYGJuQbyOGfD1suX
+         naHs1tU6owKyfMTi+w+f4ZatODXiV40gtbA5HwhWqOjG4kmZfxNdNEKv2XY9YTKyUJHr
+         0Wqi2dbmxAShaUbIYpsyLXsbXhsQzyf2M9viWBS/bxvQbfyiB0JtpKNp7bkNfU6SDah9
+         tciQ==
+X-Gm-Message-State: AOAM530mxIcY3dYccDFzcDuQ/UmZ4VI6vq/+ITGf7lhI4pdQdLdnoTzp
+        zDelxhalaafvneDNFk67NbmQThAOYvo=
+X-Google-Smtp-Source: ABdhPJypQoM7gnFdDfD+VIQYv0PYSfvWFSoMraL2cD7jjLGiNmfUiGEmtrcUYL06lxS7eb7eFnnpHg==
+X-Received: by 2002:a37:2702:: with SMTP id n2mr4675629qkn.5.1591276067078;
+        Thu, 04 Jun 2020 06:07:47 -0700 (PDT)
 Received: from [172.17.0.2] ([52.188.209.39])
-        by smtp.gmail.com with ESMTPSA id w26sm4369966qtt.86.2020.06.04.06.07.32
+        by smtp.gmail.com with ESMTPSA id h64sm3846061qkf.46.2020.06.04.06.07.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 06:07:32 -0700 (PDT)
-Message-ID: <5ed8f214.1c69fb81.14964.6e67@mx.google.com>
-Date:   Thu, 04 Jun 2020 06:07:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5012219319050418054=="
+        Thu, 04 Jun 2020 06:07:46 -0700 (PDT)
+Message-ID: <5ed8f222.1c69fb81.bef6.420d@mx.google.com>
+Date:   Thu, 04 Jun 2020 06:07:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3985034793137061947=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, d.grigorev@omprussia.ru
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5012219319050418054==
+--===============3985034793137061947==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,56 +89,18 @@ While we are preparing for reviewing the patches, we found the following
 issue/warning.
 
 Test Result:
-checkpatch Failed
+checkgitlint Failed
 
 Outputs:
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#15: 
-0xecc6eeda in dbus_connection_get_object_path_data () from /usr/lib/libdbus-1.so.3
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("36dee8bcf29a51e94")'
-#33: 
-2baea85dec1aebe0b100d4836dee8bcf29a51e94 - Bluetooth: L2CAP ERTM shutdown protect sk and chan
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("0e80a485b99b7de05")'
-#34: 
-f65468f6e26c3bd05e642e10e80a485b99b7de05 - Bluetooth: Make __l2cap_wait_ack more efficient
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("eb9f6d4c2c476043c")'
-#35: 
-451e4c6c6b3fd1a9f446a10eb9f6d4c2c476043c - Bluetooth: Add BT_DBG to l2cap_sock_shutdown()
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("cd092485d754964f9")'
-#36: 
-cb02a25583b59ce48267472cd092485d754964f9 - Bluetooth: __l2cap_wait_ack() use msecs_to_jiffies()
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("2a5f548dc1f0ef4dc")'
-#37: 
-e432c72c464d2deb6c66d1e2a5f548dc1f0ef4dc - Bluetooth: __l2cap_wait_ack() add defensive timeout
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("c2b12b06876f285f0")'
-#38: 
-e7456437c15a2fd42cedd25c2b12b06876f285f0 - Bluetooth: Unwind l2cap_sock_shutdown()
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("73f08782870473fa1")'
-#39: 
-04ba72e6b24f1e0e2221fcd73f08782870473fa1 - Bluetooth: Reorganize mutex lock in l2cap_sock_shutdown()
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: bad o ("21a9ddb769523baf2")'
-#40: 
-9f7378a9d6ced1784e08d3e21a9ddb769523baf2 - Bluetooth: l2cap_disconnection_req priority over shutdown
-
-- total: 8 errors, 1 warnings, 34 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+12: B1 Line exceeds max length (82>80): "0xecc6eeda in dbus_connection_get_object_path_data () from /usr/lib/libdbus-1.so.3"
+30: B1 Line exceeds max length (93>80): "2baea85dec1aebe0b100d4836dee8bcf29a51e94 - Bluetooth: L2CAP ERTM shutdown protect sk and chan"
+31: B1 Line exceeds max length (90>80): "f65468f6e26c3bd05e642e10e80a485b99b7de05 - Bluetooth: Make __l2cap_wait_ack more efficient"
+32: B1 Line exceeds max length (89>80): "451e4c6c6b3fd1a9f446a10eb9f6d4c2c476043c - Bluetooth: Add BT_DBG to l2cap_sock_shutdown()"
+33: B1 Line exceeds max length (95>80): "cb02a25583b59ce48267472cd092485d754964f9 - Bluetooth: __l2cap_wait_ack() use msecs_to_jiffies()"
+34: B1 Line exceeds max length (94>80): "e432c72c464d2deb6c66d1e2a5f548dc1f0ef4dc - Bluetooth: __l2cap_wait_ack() add defensive timeout"
+35: B1 Line exceeds max length (82>80): "e7456437c15a2fd42cedd25c2b12b06876f285f0 - Bluetooth: Unwind l2cap_sock_shutdown()"
+36: B1 Line exceeds max length (100>80): "04ba72e6b24f1e0e2221fcd73f08782870473fa1 - Bluetooth: Reorganize mutex lock in l2cap_sock_shutdown()"
+37: B1 Line exceeds max length (100>80): "9f7378a9d6ced1784e08d3e21a9ddb769523baf2 - Bluetooth: l2cap_disconnection_req priority over shutdown"
 
 
 
@@ -146,4 +108,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============5012219319050418054==--
+--===============3985034793137061947==--
