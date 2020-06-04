@@ -7,332 +7,130 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA121C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A6CC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 22:58:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3F42206E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 21:28:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6A57207D0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jun 2020 22:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mG3BFqlw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RaRdTqoh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726819AbgFDV2l (ORCPT
+        id S1727053AbgFDW6x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 17:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33784 "EHLO
+        Thu, 4 Jun 2020 18:58:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726326AbgFDV2k (ORCPT
+        with ESMTP id S1726221AbgFDW6x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 17:28:40 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6545C08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 14:28:40 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id o7so5950208oti.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 14:28:40 -0700 (PDT)
+        Thu, 4 Jun 2020 18:58:53 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1354C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 15:58:52 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id s13so6117970otd.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 15:58:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=40z5tW1tj8hkDY/B0YuXmKTehDdhEBSqTBO+4DBw/f0=;
-        b=mG3BFqlwafNSIfYTQ3gWVO5MiFE5CHmdXG0P2HytuCXMGfdrgS66Tfz40JevY6rxrq
-         rI2NLKsdBFNi86QYeGgkqo9hddJqoaKtS4+T3PSHRb6JBqRct/GztdtDZOjLD7+FoSIp
-         BL/4p84ahV/9aAy6cBpGfaxceSUSJLoRgPvQYa91c10Ej7pNePMWXQCZk3xHXB4huO75
-         c6ocaKfWwz4F0XRts5/7QHYcpZq+Dfd5s3cSxgsQRVj0Z79GMSrklKvmqD/SqvcLbTLu
-         s7Zf4gmxkKoMENd4vWjPctzrFPNZLrbHwAFwV5nLz3PmLhJLVRotZdICX4l6Sg1O129+
-         m2Gw==
+        bh=y1LSZGQkJEVh00V8Qot8Gz5G9hgLYAEbbOwLVOv/nBs=;
+        b=RaRdTqohtNRs73bcBo2C9bWkHWqxDni7jqzO76DVm28EG9DlodFsIyM+pqwgBSSHRT
+         i1IBgf2s00IsdZZhpSYq6skFHc9/CNJFppyMKhWspDRCoDW0JXL+NVlInNq874Tc9igS
+         WqVjKA4img5UXp0JU7lgTBuIPaO7LWfGgkUJvDkrAz8YMW7eh7V757pzMktps9NRnonT
+         ZU2J2b28oD0UeKjWt64INbFq844GuJAdc8uYujpFRRn0Pw4P4vugiDmdXztjrk7R1KAK
+         g8VHb55rtXBWO3tPP5zdpVza8pHEVhn0E0aM2RmNIg8s3ztTUm9vMsFXlqN6X61BDayL
+         xKlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=40z5tW1tj8hkDY/B0YuXmKTehDdhEBSqTBO+4DBw/f0=;
-        b=rZRMT5Wc4x/+OwPIzIYtCtAvc7+ZtL+qyGgZeqf7ZhMci5uLSB0UxYiMSmOOc1QxIA
-         PgXLat1psba/BRwOe8Bc7zmmACI2rHOhnW/IP3arcqc54eXK56hU45tPFilsLuly8fgS
-         nukc0t2479yWYKFs5Vwm7M3jBq1rQ0mYRQtempDBw0xIQEMPO/jcGQhoGihsDw/h69+r
-         Ib3+yJ+Jy6/JxgPc0Q5B+x84JT358RuxMcP67OJ+sx3UXsok2kyzjH7V8kkkbm4jn6Dp
-         wvaP4s6RD2rLExD8QKQgEaI0227+S3cpbSufHmknpBZgs2syflhngaOu5NrFttgnuYgm
-         HQuQ==
-X-Gm-Message-State: AOAM532oj7quROd76wwSth8baZEhpLCEm7HWVQyklPsDahcxGxER3zaH
-        B9BO/CuPW/MKPJ5KPlYejjmZLZcyiIFai4MrC+4=
-X-Google-Smtp-Source: ABdhPJzg1tayxPt/8M5HCKJhVO1gMyci5gI+44K8w5S6A3bcJ2WNCj6u3xdjpoC7gkUi9mocMIycbaF3jBGDtVHkgns=
-X-Received: by 2002:a05:6830:310c:: with SMTP id b12mr5383868ots.11.1591306120062;
- Thu, 04 Jun 2020 14:28:40 -0700 (PDT)
+        bh=y1LSZGQkJEVh00V8Qot8Gz5G9hgLYAEbbOwLVOv/nBs=;
+        b=LSU54IXTO/uANVYeBGJavI3dMy2ECQ8x6TFZ6i98kAtH8ndD/dqzIPyVpQMSUk39S9
+         lekUm0rHP4aFnnqfxHYc9m1dcMM1L7u9vfh3WcDHvZFN0WGAJUD/LDkHw31wPiBkBgaN
+         0vacxJEQ39vEHGuqw0F9qHVLiYn83dK0kDZOq46C6bdUvk0LeCIVuxLKtI9ARWh7oOPd
+         ODGfd+VFVyMW12metjHnN2FTJppgoWNlXZK30qT8ftl8GfK3m5mksXGP/LWhtBzeGhIm
+         TuyyJQxZgNS1ksDKxDQfcp1103PLqKJ2+1mOgxYy9zwdY7S+uIhLGMq4ojIiZ5DCQNgV
+         ZIPQ==
+X-Gm-Message-State: AOAM532Y5KM7hQVdzKdUNdvz3P73wzbSxdXQQLjC1PW4K55ia+wMbtAF
+        fOZF91G6uqAPv5vI5WPu4LqaQC2RSjlxdRhd2eq2dA==
+X-Google-Smtp-Source: ABdhPJwgLKQQMDC4wKi8b/20Y5dgTf9NxLbiDA5C4gbgNcbIH1zdtwMDE5u4aLTXXn2NmZkPpd72uitVPSXIMK7+QZc=
+X-Received: by 2002:a9d:2049:: with SMTP id n67mr4944474ota.177.1591311532201;
+ Thu, 04 Jun 2020 15:58:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200505121918.Bluez.v2.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
-In-Reply-To: <20200505121918.Bluez.v2.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
+References: <20200529153814.213125-1-alainm@chromium.org> <20200529153814.213125-2-alainm@chromium.org>
+In-Reply-To: <20200529153814.213125-2-alainm@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Jun 2020 14:28:28 -0700
-Message-ID: <CABBYNZLRDzBv_ES3HvuBEc1Jse8oxfbFe+5j8exgZ1NbKsnpRg@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2] tools/l2cap-tester: Add test for waiting
- disconnection response
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Thu, 4 Jun 2020 15:58:41 -0700
+Message-ID: <CABBYNZKE8B2F6b9oEFWvh+A8FxEBhEGE4QrPc1gS6m_+gFW-aw@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v3 1/4] mgmt:adding load default system
+ configuration definitions
+To:     Alain Michaud <alainm@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Alain,
 
-On Mon, May 4, 2020 at 9:29 PM Archie Pusaka <apusaka@google.com> wrote:
+On Fri, May 29, 2020 at 8:42 AM Alain Michaud <alainm@chromium.org> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
+> This change adds the load default system configuration definitions
 >
-> This is to test the behaviour of L2CAP channel when closed with
-> shut_down(sock, SHUT_WR). In this case, we should wait until we
-> receive a disconnection response before raising G_IO_HUP.
 > ---
 >
-> Changes in v2:
-> - Fix compile error in android/tester-main.c
+> Changes in v3: None
+> Changes in v2: None
 >
->  android/tester-main.c |  2 +-
->  emulator/bthost.c     | 17 ++++++++++-
->  emulator/bthost.h     |  5 +++-
->  tools/l2cap-tester.c  | 65 ++++++++++++++++++++++++++++++++++++++-----
->  tools/rfcomm-tester.c |  2 +-
->  5 files changed, 80 insertions(+), 11 deletions(-)
+>  lib/mgmt.h | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 >
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index 3c5af299f..9a14b2899 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -2867,7 +2867,7 @@ void emu_add_l2cap_server_action(void)
->         bthost = hciemu_client_get_host(data->hciemu);
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index b4fc72069..ea89c46b1 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -628,6 +628,24 @@ struct mgmt_rp_set_exp_feature {
+>         uint32_t flags;
+>  } __packed;
 >
->         bthost_add_l2cap_server(bthost, l2cap_data->psm, l2cap_data->func,
-> -                                                       l2cap_data->user_data);
-> +                                               NULL, l2cap_data->user_data);
->
->         step->action_status = BT_STATUS_SUCCESS;
->
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index 0fa283464..71d5f97bb 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -180,6 +180,7 @@ struct l2cap_pending_req {
->  struct l2cap_conn_cb_data {
->         uint16_t psm;
->         bthost_l2cap_connect_cb func;
-> +       bthost_l2cap_disconnect_cb disconn_func;
->         void *user_data;
->         struct l2cap_conn_cb_data *next;
->  };
-> @@ -1510,7 +1511,9 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
->                                 uint8_t ident, const void *data, uint16_t len)
->  {
->         const struct bt_l2cap_pdu_disconn_req *req = data;
-> +       struct l2cap_conn_cb_data *cb_data;
->         struct bt_l2cap_pdu_disconn_rsp rsp;
-> +       struct l2conn *l2conn;
->
->         if (len < sizeof(*req))
->                 return false;
-> @@ -1522,6 +1525,15 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
->         l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_DISCONN_RSP, ident, &rsp,
->                                                                 sizeof(rsp));
->
-> +       l2conn = btconn_find_l2cap_conn_by_scid(conn, rsp.scid);
-> +       if (!l2conn)
-> +               return true;
+> +#define MGMT_OP_READ_DEFAULT_SYSTEM_PARAMETERS 0x004b
 > +
-> +       cb_data = bthost_find_l2cap_cb_by_psm(bthost, l2conn->psm);
+> +struct mgmt_system_parameter_tlv {
+> +       uint16_t parameter_type;
+> +       uint8_t length;
+> +       uint8_t value[];
+> +} __packed;
 > +
-> +       if (cb_data && cb_data->disconn_func)
-> +               cb_data->disconn_func(cb_data->user_data);
+> +struct mgmt_rp_read_default_system_parameters {
+> +       uint8_t parameters[0]; // mgmt_system_parameter_tlv
+> +} __packed;
 > +
->         return true;
->  }
->
-> @@ -2553,7 +2565,9 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
->  }
->
->  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-> -                               bthost_l2cap_connect_cb func, void *user_data)
-> +                               bthost_l2cap_connect_cb func,
-> +                               bthost_l2cap_disconnect_cb disconn_func,
-> +                               void *user_data)
->  {
->         struct l2cap_conn_cb_data *data;
->
-> @@ -2564,6 +2578,7 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
->         data->psm = psm;
->         data->user_data = user_data;
->         data->func = func;
-> +       data->disconn_func = disconn_func;
->         data->next = bthost->new_l2cap_conn_data;
->
->         bthost->new_l2cap_conn_data = data;
-> diff --git a/emulator/bthost.h b/emulator/bthost.h
-> index b5f36964d..2b347136f 100644
-> --- a/emulator/bthost.h
-> +++ b/emulator/bthost.h
-> @@ -100,9 +100,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
->                                                         const uint8_t ltk[16]);
->  typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
->                                                         void *user_data);
-> +typedef void (*bthost_l2cap_disconnect_cb) (void *user_data);
->
->  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-> -                               bthost_l2cap_connect_cb func, void *user_data);
-> +                               bthost_l2cap_connect_cb func,
-> +                               bthost_l2cap_disconnect_cb disconn_func,
-> +                               void *user_data);
->
->  void bthost_set_sc_support(struct bthost *bthost, bool enable);
->
-> diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-> index 844ff2b46..1ef4e9213 100644
-> --- a/tools/l2cap-tester.c
-> +++ b/tools/l2cap-tester.c
-> @@ -55,6 +55,7 @@ struct test_data {
->         uint16_t dcid;
->         int sk;
->         int sk2;
-> +       bool host_disconnected;
+> +#define MGMT_OP_SET_DEFAULT_SYSTEM_PARAMETERS  0x004c
+> +
+> +struct mgmt_cp_set_default_system_parameters {
+> +       uint8_t parameters[0]; // mgmt_system_parameter_tlv
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         uint16_t opcode;
+> @@ -933,6 +951,8 @@ static const char *mgmt_op[] = {
+>         "Read Security Information",                    /* 0x0048 */
+>         "Read Experimental Features Information",
+>         "Set Experimental Feature",
+> +       "Read Default System Configuration",
+> +       "Set Default System Configuration",
 >  };
 >
->  struct l2cap_data {
-> @@ -93,6 +94,8 @@ struct l2cap_data {
->         bool server_not_advertising;
->         bool direct_advertising;
->         bool close_1;
-> +
-> +       bool shut_sock_wr;
->  };
->
->  static void mgmt_debug(const char *str, void *user_data)
-> @@ -316,6 +319,12 @@ static const struct l2cap_data client_connect_write_success_test = {
->         .data_len = sizeof(l2_data),
->  };
->
-> +static const struct l2cap_data client_connect_shut_wr_success_test = {
-> +       .client_psm = 0x1001,
-> +       .server_psm = 0x1001,
-> +       .shut_sock_wr = true,
-> +};
-> +
->  static const struct l2cap_data client_connect_nval_psm_test_1 = {
->         .client_psm = 0x1001,
->         .expect_err = ECONNREFUSED,
-> @@ -967,6 +976,27 @@ static void server_bthost_received_data(const void *buf, uint16_t len,
->                 tester_test_passed();
->  }
->
-> +static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
-> +                                                       gpointer user_data)
-> +{
-> +       struct test_data *data = tester_get_data();
-> +       const struct l2cap_data *l2data = data->test_data;
-> +
-> +       if (l2data->shut_sock_wr) {
-> +               /* if socket is closed using SHUT_WR, L2CAP disconnection
-> +                * response must be received first before G_IO_HUP event.
-> +                */
-> +               if (data->host_disconnected)
-> +                       tester_test_passed();
-> +               else {
-> +                       tester_warn("G_IO_HUP received before receiving L2CAP disconnection");
-> +                       tester_test_failed();
-> +               }
-> +       }
-> +
-> +       return FALSE;
-> +}
-> +
->  static bool check_mtu(struct test_data *data, int sk)
->  {
->         const struct l2cap_data *l2data = data->test_data;
-> @@ -1062,6 +1092,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
->                         tester_test_failed();
->                 }
->
-> +               return FALSE;
-> +       } else if (l2data->shut_sock_wr) {
-> +               g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
-> +               shutdown(sk, SHUT_WR);
-> +
->                 return FALSE;
->         }
->
-> @@ -1214,6 +1249,13 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
->         data->handle = handle;
->  }
->
-> +static void client_l2cap_disconnect_cb(void *user_data)
-> +{
-> +       struct test_data *data = user_data;
-> +
-> +       data->host_disconnected = true;
-> +}
-> +
->  static void direct_adv_cmd_complete(uint16_t opcode, const void *param,
->                                                 uint8_t len, void *user_data)
->  {
-> @@ -1254,13 +1296,18 @@ static void test_connect(const void *test_data)
->
->         if (l2data->server_psm) {
->                 struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-> +               bthost_l2cap_connect_cb host_connect_cb = NULL;
-> +               bthost_l2cap_disconnect_cb host_disconnect_cb = NULL;
->
-> -               if (!l2data->data_len)
-> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               NULL, NULL);
-> -               else
-> -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               client_l2cap_connect_cb, data);
-> +               if (l2data->data_len)
-> +                       host_connect_cb = client_l2cap_connect_cb;
-> +
-> +               if (l2data->shut_sock_wr)
-> +                       host_disconnect_cb = client_l2cap_disconnect_cb;
-> +
-> +               bthost_add_l2cap_server(bthost, l2data->server_psm,
-> +                                       host_connect_cb, host_disconnect_cb,
-> +                                       data);
->         }
->
->         if (l2data->direct_advertising)
-> @@ -1639,7 +1686,7 @@ static void test_connect_2(const void *test_data)
->
->                 if (!l2data->data_len)
->                         bthost_add_l2cap_server(bthost, l2data->server_psm,
-> -                                               NULL, NULL);
-> +                                               NULL, NULL, NULL);
->         }
->
->         defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
-> @@ -1927,6 +1974,10 @@ int main(int argc, char *argv[])
->                                         &client_connect_nval_psm_test_3,
->                                         setup_powered_client, test_connect);
->
-> +       test_l2cap_bredr("L2CAP BR/EDR Client - Socket Shut WR Success",
-> +                                       &client_connect_shut_wr_success_test,
-> +                                       setup_powered_client, test_connect);
-> +
->         test_l2cap_bredr("L2CAP BR/EDR Server - Success",
->                                         &l2cap_server_success_test,
->                                         setup_powered_server, test_server);
-> diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-> index b20d70d58..2d3be27d8 100644
-> --- a/tools/rfcomm-tester.c
-> +++ b/tools/rfcomm-tester.c
-> @@ -548,7 +548,7 @@ static void test_connect(const void *test_data)
->         GIOChannel *io;
->         int sk;
->
-> -       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
-> +       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL, NULL);
->         bthost_add_rfcomm_server(bthost, cli->server_channel,
->                                                 rfcomm_connect_cb, NULL);
->
+>  static const char *mgmt_ev[] = {
 > --
-> 2.26.2.526.g744177e7f7-goog
+> 2.27.0.rc0.183.gde8f92d652-goog
 
-Applied, thanks. Btw do you want me to apply the HID patch or do you
-have an update to that?
+Applied 1-3, thanks. I could not make up my mind regarding 4/4, while
+it seems correct it doesn't seem to be a common practice on C projects
+(e.g: linux, zephyr, etc.), most likely because it would not save much
+in practice since it just making const pointer while the string
+literal is already marked as const.
 
 -- 
 Luiz Augusto von Dentz
