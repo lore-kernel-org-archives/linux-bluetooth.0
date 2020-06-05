@@ -4,510 +4,317 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB13CC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 19:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECB9C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 19:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 613B2207D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 19:19:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00F39207D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 19:43:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="gFSNCyzq"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="v3nPmwQc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgFETTG (ORCPT
+        id S1727917AbgFETnR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 15:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726963AbgFETTF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 15:19:05 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5380CC08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 12:19:05 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id j18so34667lji.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 12:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/dHJS67tmfamwL6ILh9vqoceSvjvLL8Uqu42SppWFnQ=;
-        b=gFSNCyzqt1vK18MYPIqHtny60wfqxQNfKdKwbuNpoDWcyhal4mhYP1Zag3Ezo/aYak
-         L+wVNvqKB2Qa8e4XjiM0emuumyBBXzkHJC6B7lyG3TkM76DMH8OsYmvFlMCWZebvUi42
-         uBCeMSmuAI1u+ECK1S73DsseI1MD6mFoTXvIJ6rZUCRFGmlOn23gf2zFn48iJuqFiGqW
-         ZrqzXPp8Qcm5RfpTPNJXPJa7oXABorW/yEfLw4438Nw5BsWP2NVIFGw6lyk8FkNqDmL6
-         WZ84kh61U05F8KGCeBLI2LLXi6xZg8dgwZsFxj2gZolJzZdW8ZC09VGhtWHuKszxCam5
-         IrmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=/dHJS67tmfamwL6ILh9vqoceSvjvLL8Uqu42SppWFnQ=;
-        b=iSbXd1jUEYWcnGWeRSauUqBOt2LKMS8yMFsyTJjhIzoqc77a0NCl1jseCGkclkJIfY
-         /zbp2at7E0XoA871v9qltLW05nXlICovnDYiNTAoVlJlxr6+JsF0pzzoScsSBGSK2y5P
-         h5iUjFSnqOpYHjqmFnsnoqV8/EUm5WpUevJ8nIAG0wlsYogdAWCONKNT366s0t65LQq+
-         trTvzZnpPy+j1UKLD+YEg5A4R6DlPQJYKfn7LC3YT5B8/LrU1o8NpmWqqqtgecOnvpwR
-         2nU8vx5GB8YXweHR0kUVSA84ZbvprcT3lRdt5yVpOgjBYTP8Y+qoFriRGuQMUcK7Ly9i
-         9K/w==
-X-Gm-Message-State: AOAM531itSkyA113QDIAv7Hfp5Ee78PALVq5A5N2CdnCepUX+7kf4603
-        LDYjWvnlrBMdcRaLfFbfxRzYzA==
-X-Google-Smtp-Source: ABdhPJyLllnILUPKAFszQOHIIoaKMWP9eWRD/4NUVLUAbCPfaVTKheBsLlSvr96yooCScT1MEQyndA==
-X-Received: by 2002:a05:651c:2c6:: with SMTP id f6mr5264677ljo.371.1591384743687;
-        Fri, 05 Jun 2020 12:19:03 -0700 (PDT)
-Received: from ix.localnet (45-11-60-42.ip4.greenlan.pl. [45.11.60.42])
-        by smtp.gmail.com with ESMTPSA id 2sm1113077lji.100.2020.06.05.12.19.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 12:19:03 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@linux.intel.com>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: Re: [PATCH V2 2/2] tools/btpclient: Use mgmt api for limited discovery
-Date:   Fri, 05 Jun 2020 21:19:01 +0200
-Message-ID: <4562368.31r3eYUQgx@ix>
-Organization: CODECOUP
-In-Reply-To: <CABBYNZKtmeEKS-U9mbr3_UBPU9wnnc=xegguLNkvEia5BndGrA@mail.gmail.com>
-References: <20200605061003.14634-1-tedd.an@linux.intel.com> <5360600.DvuYhMxLoT@ix> <CABBYNZKtmeEKS-U9mbr3_UBPU9wnnc=xegguLNkvEia5BndGrA@mail.gmail.com>
+        Fri, 5 Jun 2020 15:43:17 -0400
+Received: from mga06.intel.com ([134.134.136.31]:27566 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727879AbgFETnR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 5 Jun 2020 15:43:17 -0400
+IronPort-SDR: o5As556CURAE6FXscadg6hHl/HaFTPejBJJqYyij/dO4za9UT8ZFsC19AD8WTscCvEig2DlZJh
+ eLJHJSLJh6ng==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 12:43:02 -0700
+IronPort-SDR: exUymSniFJo6JwAaxQPLOcBLXEqaCvvnwns8D3XqA/KfhNmo8uoOySsFRnXFqSas7UWLRkR4q6
+ JEOylmXlqD2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
+   d="scan'208";a="259263760"
+Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
+  by fmsmga008.fm.intel.com with ESMTP; 05 Jun 2020 12:43:02 -0700
+Received: from orsmsx155.amr.corp.intel.com (10.22.240.21) by
+ ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 5 Jun 2020 12:43:01 -0700
+Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
+ ORSMSX155.amr.corp.intel.com (10.22.240.21) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 5 Jun 2020 12:43:01 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 5 Jun 2020 12:43:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D3RqAugQbbSpqQoMT8gCL1418GQ4ZF+N5e6SvNaYAfCX4Blkj+MHywMyb6F6KkVe+Oike5E83F6X46F7+iAgsG2ZVt8CGyBgO+joG2dcCnEVa/IuILkG042xY1VrrMoOdo/QWEIauDplXqVCmin264dzB3DDdD9kAPCqyORqpJKDtD9mUmMXjSueMOoLoFMhlA6AqhKzSSi7VIzDWeHNbsCJxyGolQcsvV7AsYtYy3niDlJ+rQs0GXc/j+WgDyCDPIlNBstQlBs1cDcW5Sn7E4wFKSYTje0cOTbV6MRwuVHF3Nx9jFjJ0YI8dLtmonmcnJd23mDd63b8fIxRwL7JIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oXv2V9TYqRjq2G3NSQqI1X2CeAvziUyM68jLqBKMqro=;
+ b=S2u6MZVLvy2NW53EkW7xy4KvY2wLGmHX3Z5rR5QAsZAxf4eAJ+GkDvrqvvyiho5dY6f9NhhAWk502H1QBboRdV5jZ/+MxwA4JgaHSfS1wi17mkH2OgtVDLo12Pn8ZwfrvrZ8kjhT2l9EORaDS70xS4hGevzjKRy/QccCbu+GY3aGZvWbT8Lzw2/bjS95Hv6kkhuRTwu16Xyv7oWEE6HU1a7aAetsriBvte73TCCVRdFnz4thk9HssIwZmqV6nM14EwP6vSgbNrIHCOwp+KdcdpHmHw7X6/ROcvNV8hglWIHie4v1eG5bj4JGj8uwTKK8O3NhkxmiVkerm48GbpTmZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oXv2V9TYqRjq2G3NSQqI1X2CeAvziUyM68jLqBKMqro=;
+ b=v3nPmwQcFvgXxfJ7gllPCJaEsIOTB6biXbMh/7hDRs0wpR7jvJn7bjEVBLCN1poDHrym5SNG/9DSAbFb3ZDkbku/yznVJyjDH/JXvYbzYew4xvG7tWQs5idxpZYbIJAVobgccTdQyRADpZRXx9T7ts8dEMvDNwFu9+/4AdkJUzc=
+Received: from MWHPR11MB1472.namprd11.prod.outlook.com (2603:10b6:301:d::16)
+ by MWHPR11MB0061.namprd11.prod.outlook.com (2603:10b6:301:65::37) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Fri, 5 Jun
+ 2020 19:42:59 +0000
+Received: from MWHPR11MB1472.namprd11.prod.outlook.com
+ ([fe80::8838:b559:cd66:59d2]) by MWHPR11MB1472.namprd11.prod.outlook.com
+ ([fe80::8838:b559:cd66:59d2%6]) with mapi id 15.20.3066.022; Fri, 5 Jun 2020
+ 19:42:59 +0000
+From:   "An, Tedd" <tedd.an@intel.com>
+To:     Szymon Janc <szymon.janc@codecoup.pl>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+Subject: Re: [PATCH V2 2/2] tools/btpclient: Use mgmt api for limited
+ discovery
+Thread-Topic: [PATCH V2 2/2] tools/btpclient: Use mgmt api for limited
+ discovery
+Thread-Index: AQHWOwAENCnenFB2hUy+sjc81S2M4KjJunqAgAA9NAA=
+Date:   Fri, 5 Jun 2020 19:42:58 +0000
+Message-ID: <CB433EB2-E2F0-417E-96E3-855BAB7CC7AA@intel.com>
+References: <20200605061003.14634-1-tedd.an@linux.intel.com>
+ <20200605061003.14634-2-tedd.an@linux.intel.com> <5360600.DvuYhMxLoT@ix>
+In-Reply-To: <5360600.DvuYhMxLoT@ix>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/16.37.20051002
+authentication-results: codecoup.pl; dkim=none (message not signed)
+ header.d=none;codecoup.pl; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [134.134.136.213]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7070ad94-9e5e-4c7d-d20b-08d80988a6c4
+x-ms-traffictypediagnostic: MWHPR11MB0061:
+x-microsoft-antispam-prvs: <MWHPR11MB0061B97EB5EEA0547B73C941FF860@MWHPR11MB0061.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:69;
+x-forefront-prvs: 0425A67DEF
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: vR/wrqLC7Ev0VXxsI/PF+s4ysZvvQUje+pkQ9etnMHN9i0nStRHs6EAXLCmVvJWxJDlnmkCrR0KJ7k3UKxth6NXWaTERjth23l2LNe/GACRUZwKN8DrSOsCrBuH85b7QGn2MkTO/gC/N8UkTP2noyo9FB0WKb2FcZPEabu9pQW2K3m8caFn9hmRRPDxNEzshYoNw7Z8+0oSe4gqll72K28OW/NuqaET47B7KDKNgBiEEfI9H2H5BLxci+d25Al/SUTa/KOQd5nVdCXm+kSBErw4onya5jvMPXqLms5CzI/uoV+ZdBISY0HEktcx5RxlFy8mOmLzroZKZw1kCBlSMiA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1472.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(346002)(396003)(376002)(136003)(39860400002)(366004)(186003)(8676002)(76116006)(2616005)(316002)(26005)(8936002)(6506007)(83380400001)(6512007)(2906002)(5660300002)(6486002)(110136005)(478600001)(66556008)(36756003)(66946007)(66476007)(71200400001)(33656002)(64756008)(66446008)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: bFMjSL1Gu3LuOGvZvRouGJeg4G/WBBaFpnC9GhtFTFAaw2zLiveq+YvdhCKLDPjQRcfkyh/WJJP82FmtJHlxkAnLjZ058cbqVcIZMFoK+OphrybIk+wyYx/7Ggh5RDoTWFgY7vNlhikvQAxF53ZImWgDgixrkFk10g7jMG6GjCdt6MCGufQ1hrMl0s30eq42jh+u82Ux9VI0DWEBOwxORL3rRFj4BEFWilFMGGS3lRSzGA1Vzoou2NhpVhU5QjqlvQ5IIZ6shv+36d8lqzBcq6YpRINJESkm+zgzKk8gtEhvqrnsZ91aC/BYrCA7kSmjCCOJJnIVT7/HZoCfQE8YC1XOSvXeVrnlOi0vDJ10VIH3sOMl9pumVOfi2KBerdBhjGZEkBWcgvOo5s9Ur0IIeYHXcujFTEAX7Y1KZBqZJhypbNIwdkiBZhFtKGBj7iy8qaBQR+uzxTOEfjvMUqGnKfM8aW5uRdbzVqM3QzMjcG0pKKmi01WjWk9J/owU1bJN
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <504F5240A0A3C7478EC7873AB80F63D0@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7070ad94-9e5e-4c7d-d20b-08d80988a6c4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2020 19:42:58.8985
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Tuakoj4Wrzt1jvjaF7eqbZ5TE8nZ0x2n9NvOxbSGRJ+iojSCPKAqFMY/philFRljXWbQdyMYncsRYpCO4z7+qQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB0061
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
-
-On Friday, 5 June 2020 19:22:56 CEST Luiz Augusto von Dentz wrote:
-> Hi Tedd,
-> 
-> On Fri, Jun 5, 2020 at 2:09 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> > Hi Ted,
-> > 
-> > On Friday, 5 June 2020 08:10:03 CEST Tedd Ho-Jeong An wrote:
-> > > From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > > 
-> > > There are a few test cases for limited discovery in GAP qualification
-> > > test suite. But the d-bus API doesn't support it and the only way to
-> > > start the limited discovery is using the management API.
-> > > 
-> > > This patch adds support for limited discovery by using management API.
-> > 
-> > Isn't it enough by spec to check if limited discoverable flag is set?
-> > We provide this info in AdvertisingFlags so we should be conforming.
-> > 
-> > Also, if we want to be able to explicitly do Limited Discovery this should
-> > be added to SetDiscoveryFilter so that btpclient can stay D-Bus only.
-> We should probably use DiscoverableTimeout to indicate a limited
-> discoverable flag instead of general discoverable, I will send a patch
-> for that.
-
-This is about doing limited discovery as scanner, not advertising as limited 
-discoverable :-)
-
-> 
-> > > ---
-> > > 
-> > >  tools/btpclient.c | 194 ++++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 187 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/tools/btpclient.c b/tools/btpclient.c
-> > > index f9c693056..46f866117 100644
-> > > --- a/tools/btpclient.c
-> > > +++ b/tools/btpclient.c
-> > > @@ -36,6 +36,10 @@
-> > > 
-> > >  #include "lib/bluetooth.h"
-> > >  #include "src/shared/btp.h"
-> > > 
-> > > +/* For BT_MGMT API */
-> > > +#include "lib/mgmt.h"
-> > > +#include "src/shared/mgmt.h"
-> > > +
-> > > 
-> > >  #define AD_PATH "/org/bluez/advertising"
-> > >  #define AG_PATH "/org/bluez/agent"
-> > >  #define AD_IFACE "org.bluez.LEAdvertisement1"
-> > > 
-> > > @@ -77,6 +81,14 @@ static struct btp *btp;
-> > > 
-> > >  static bool gap_service_registered;
-> > > 
-> > > +/* For BT_MGMT API */
-> > > +static struct mgmt *mgmt;
-> > > +static uint16_t mgmt_index;
-> > > +
-> > > +static uint32_t mgmt_flags;
-> > > +
-> > > +#define MGMT_OPS_DISCOVERY   0x01
-> > > +
-> > > 
-> > >  struct ad_data {
-> > >  
-> > >       uint8_t data[25];
-> > >       uint8_t len;
-> > > 
-> > > @@ -1403,6 +1415,88 @@ static void set_discovery_filter_reply(struct
-> > > l_dbus_proxy *proxy, start_discovery_reply, NULL, NULL);
-> > > 
-> > >  }
-> > > 
-> > > +#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-> > > +#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 <<
-> > > BDADDR_LE_RANDOM))
-> > > +#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-> > > +
-> > > +struct discovery_flags {
-> > > +     uint8_t flags;
-> > > +};
-> > > +
-> > > +static int btp_mgmt_start_limited_discovery(uint8_t flags)
-> > > +{
-> > > +     struct mgmt_cp_start_discovery cp;
-> > > +     uint8_t type = SCAN_TYPE_DUAL;
-> > > +
-> > > +     memset(&cp, 0, sizeof(cp));
-> > > +
-> > > +     if (flags & (BTP_GAP_DISCOVERY_FLAG_LE |
-> > > +                  BTP_GAP_DISCOVERY_FLAG_BREDR)) {
-> > > +             type = SCAN_TYPE_DUAL;
-> > > +     } else if (flags & BTP_GAP_DISCOVERY_FLAG_LE) {
-> > > +             type &= ~SCAN_TYPE_BREDR;
-> > > +             type |= SCAN_TYPE_LE;
-> > > +     } else if (flags & BTP_GAP_DISCOVERY_FLAG_BREDR) {
-> > > +             type |= SCAN_TYPE_BREDR;
-> > > +             type &= ~SCAN_TYPE_LE;
-> > > +     }
-> > > +     cp.type = type;
-> > > +
-> > > +     return mgmt_send(mgmt, MGMT_OP_START_LIMITED_DISCOVERY,
-> > > mgmt_index,
-> > > +                      sizeof(cp), &cp, NULL, NULL, NULL);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_discovering_destroy(void *user_data)
-> > > +{
-> > > +     l_free(user_data);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_discovering_cb(uint16_t index, uint16_t len,
-> > > +                                 const void *param, void
-> > 
-> > *user_data)
-> > 
-> > > +{
-> > > +     const struct mgmt_ev_discovering *ev = param;
-> > > +     struct discovery_flags *df = user_data;
-> > > +
-> > > +     if (len < sizeof(*ev)) {
-> > > +             l_error("Too short (%u bytes) discovering event", len);
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     l_info("MGMT: discovering %s", ev->discovering ? "on" : "off");
-> > > +
-> > > +     /* Start new discovery */
-> > > +     if (ev->discovering == 0 && (mgmt_flags & MGMT_OPS_DISCOVERY))
-> > > +             btp_mgmt_start_limited_discovery(df->flags);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_setup_limited_discovery(uint8_t index, uint8_t
-> > > flags)
-> > > +{
-> > > +     int ret;
-> > > +     struct discovery_flags *df;
-> > > +
-> > > +     /* Saves the flags so it can be used to start new discovery */
-> > > +     df = l_new(struct discovery_flags, 1);
-> > > +     df->flags = flags;
-> > > +
-> > > +     /* Register event for discovering */
-> > > +     mgmt_register(mgmt, MGMT_EV_DISCOVERING, mgmt_index,
-> > > +                   btp_mgmt_discovering_cb, df,
-> > > +                   btp_mgmt_discovering_destroy);
-> > > +
-> > > +     ret = btp_mgmt_start_limited_discovery(flags);
-> > > +     if (ret == 0) {
-> > > +             l_error("Unable to send start_discovery cmd");
-> > > +             btp_send_error(btp, BTP_GAP_SERVICE, index,
-> > 
-> > BTP_ERROR_FAIL);
-> > 
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     /* Set flag that mgmt interface is used for scanning */
-> > > +     mgmt_flags |= MGMT_OPS_DISCOVERY;
-> > > +
-> > > +     btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
-> > > +              index, 0, NULL);
-> > > +}
-> > > +
-> > > 
-> > >  static void btp_gap_start_discovery(uint8_t index, const void *param,
-> > >  
-> > >                                       uint16_t length, void
-> > 
-> > *user_data)
-> > 
-> > >  {
-> > > 
-> > > @@ -1423,10 +1517,17 @@ static void btp_gap_start_discovery(uint8_t
-> > > index,
-> > > const void *param, return;
-> > > 
-> > >       }
-> > > 
-> > > -     l_dbus_proxy_method_call(adapter->proxy, "SetDiscoveryFilter",
-> > > -
-> > 
-> > set_discovery_filter_setup,
-> > 
-> > > -
-> > 
-> > set_discovery_filter_reply,
-> > 
-> > > -                                             L_UINT_TO_PTR(cp-
-> > >
-> > >flags), NULL);
-> > >
-> > > +     /* Use BT MGMT interface to start limited discovery procedure
-> > > since
-> > > +      * it is not supported by D-BUS API
-> > > +      */
-> > > +     if (cp->flags & BTP_GAP_DISCOVERY_FLAG_LIMITED)
-> > > +             btp_mgmt_setup_limited_discovery(index, cp->flags);
-> > > +     else {
-> > > +             l_dbus_proxy_method_call(adapter->proxy,
-> > 
-> > "SetDiscoveryFilter",
-> > 
-> > > +                                      set_discovery_filter_setup,
-> > > +                                      set_discovery_filter_reply,
-> > > +                                      L_UINT_TO_PTR(cp->flags),
-> > 
-> > NULL);
-> > 
-> > > +     }
-> > > 
-> > >  }
-> > >  
-> > >  static void clear_discovery_filter_setup(struct l_dbus_message
-> > >  *message,
-> > > 
-> > > @@ -1501,6 +1602,29 @@ static void stop_discovery_reply(struct
-> > > l_dbus_proxy
-> > > *proxy, NULL, NULL);
-> > > 
-> > >  }
-> > > 
-> > > +static void btp_mgmt_stop_discovery(uint8_t index)
-> > > +{
-> > > +     struct mgmt_cp_stop_discovery cp;
-> > > +     int ret;
-> > > +
-> > > +     memset(&cp, 0, sizeof(cp));
-> > > +     cp.type = SCAN_TYPE_DUAL;
-> > > +
-> > > +     ret = mgmt_send(mgmt, MGMT_OP_STOP_DISCOVERY, mgmt_index,
-> > 
-> > sizeof(cp),
-> > 
-> > > +                     &cp, NULL, NULL, NULL);
-> > > +     if (ret == 0) {
-> > > +             l_error("Unable to send stop_discovery cmd");
-> > > +             btp_send_error(btp, BTP_GAP_SERVICE, index,
-> > 
-> > BTP_ERROR_FAIL);
-> > 
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     /* Clear flag that mgmt interface is used for scanning */
-> > > +     mgmt_flags &= ~MGMT_OPS_DISCOVERY;
-> > > +
-> > > +     btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
-> > > +              index, 0, NULL);
-> > > +}
-> > > +
-> > > 
-> > >  static void btp_gap_stop_discovery(uint8_t index, const void *param,
-> > >  
-> > >                                       uint16_t length, void
-> > 
-> > *user_data)
-> > 
-> > >  {
-> > > 
-> > > @@ -1520,8 +1644,14 @@ static void btp_gap_stop_discovery(uint8_t index,
-> > > const void *param, return;
-> > > 
-> > >       }
-> > > 
-> > > -     l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery", NULL,
-> > > -                                     stop_discovery_reply, NULL,
-> > 
-> > NULL);
-> > 
-> > > +     /* If the discovery procedure is started by BT MGMT API for
-> > > limited
-> > > +      * discovering, it should be stopped by mgmt API.
-> > > +      */
-> > > +     if (mgmt_flags & MGMT_OPS_DISCOVERY)
-> > > +             btp_mgmt_stop_discovery(index);
-> > > +     else
-> > > +             l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery",
-> > 
-> > NULL,
-> > 
-> > > +                                      stop_discovery_reply, NULL,
-> > 
-> > NULL);
-> > 
-> > >  }
-> > >  
-> > >  static void connect_reply(struct l_dbus_proxy *proxy,
-> > > 
-> > > @@ -3140,6 +3270,7 @@ static void usage(void)
-> > > 
-> > >       l_info("\tbtpclient [options]");
-> > >       l_info("options:\n"
-> > >       "\t-s, --socket <socket>  Socket to use for BTP\n"
-> > > 
-> > > +     "\t-i, --index <id>       Specify the adapter index\n"
-> > > 
-> > >       "\t-q, --quiet            Don't emit any logs\n"
-> > >       "\t-v, --version          Show version\n"
-> > >       "\t-h, --help             Show help options");
-> > > 
-> > > @@ -3147,12 +3278,52 @@ static void usage(void)
-> > > 
-> > >  static const struct option options[] = {
-> > >  
-> > >       { "socket",     1, 0, 's' },
-> > > 
-> > > +     { "index",      1, 0, 'i' },
-> > > 
-> > >       { "quiet",      0, 0, 'q' },
-> > >       { "version",    0, 0, 'v' },
-> > >       { "help",       0, 0, 'h' },
-> > >       { 0, 0, 0, 0 }
-> > >  
-> > >  };
-> > > 
-> > > +static void set_index(const char *arg)
-> > > +{
-> > > +     /* Use default index 0 */
-> > > +     if (!arg || !strcmp(arg, "none") || !strcmp(arg, "any") ||
-> > > +                                             !strcmp(arg,
-> > 
-> > "all"))
-> > 
-> > > +             mgmt_index = MGMT_INDEX_NONE;
-> > > +     else if (strlen(arg) > 3 && !strncasecmp(arg, "hci", 3))
-> > > +             mgmt_index = atoi(&arg[3]);
-> > > +     else
-> > > +             mgmt_index = atoi(arg);
-> > > +}
-> > > +
-> > > +static int btp_mgmt_init(const char *index_opt)
-> > > +{
-> > > +     mgmt = mgmt_new_default();
-> > > +     if (!mgmt) {
-> > > +             l_info("Unable to open mgmt_socket\n");
-> > > +             return EXIT_FAILURE;
-> > > +     }
-> > > +
-> > > +     if (index_opt)
-> > > +             set_index(index_opt);
-> > > +
-> > > +     if (mgmt_index == MGMT_INDEX_NONE)
-> > > +             mgmt_index = 0;
-> > > +
-> > > +     return EXIT_SUCCESS;
-> > > +}
-> > > +
-> > > +static void btp_mgmt_release(void)
-> > > +{
-> > > +     l_error("MGMT: Release all management resources");
-> > > +     mgmt_cancel_all(mgmt);
-> > > +     mgmt_unregister_all(mgmt);
-> > > +     mgmt_unref(mgmt);
-> > > +}
-> > > +
-> > > +static const char *index_opt;
-> > > +
-> > > 
-> > >  int main(int argc, char *argv[])
-> > >  {
-> > >  
-> > >       struct l_dbus_client *client;
-> > > 
-> > > @@ -3160,7 +3331,8 @@ int main(int argc, char *argv[])
-> > > 
-> > >       l_log_set_stderr();
-> > > 
-> > > -     while ((opt = getopt_long(argc, argv, "+hs:vq", options, NULL)) !=
-> > 
-> > -1) {
-> > 
-> > > +     while ((opt = getopt_long(argc, argv, "+hs:vqi:", options,
-> > > +
-> > 
-> > NULL)) != -1) {
-> > 
-> > >               switch (opt) {
-> > >               
-> > >               case 's':
-> > >                       socket_path = l_strdup(optarg);
-> > > 
-> > > @@ -3173,6 +3345,9 @@ int main(int argc, char *argv[])
-> > > 
-> > >               case 'v':
-> > >                       l_info("%s", VERSION);
-> > >                       return EXIT_SUCCESS;
-> > > 
-> > > +             case 'i':
-> > > +                     index_opt = l_strdup(optarg);
-> > > +                     break;
-> > > 
-> > >               case 'h':
-> > >               
-> > >               default:
-> > >                       usage();
-> > > 
-> > > @@ -3189,6 +3364,10 @@ int main(int argc, char *argv[])
-> > > 
-> > >       if (!l_main_init())
-> > >       
-> > >               return EXIT_FAILURE;
-> > > 
-> > > +     if (btp_mgmt_init(index_opt)) {
-> > > +             l_error("Unable to initialize the management interface");
-> > > +             return EXIT_FAILURE;
-> > > +     }
-> > > 
-> > >       adapters = l_queue_new();
-> > > 
-> > > @@ -3210,6 +3389,7 @@ int main(int argc, char *argv[])
-> > > 
-> > >       l_dbus_client_destroy(client);
-> > >       l_dbus_destroy(dbus);
-> > >       btp_cleanup(btp);
-> > > 
-> > > +     btp_mgmt_release();
-> > > 
-> > >       l_queue_destroy(adapters,
-> > >       (l_queue_destroy_func_t)btp_adapter_free);
-> > 
-> > --
-> > pozdrawiam
-> > Szymon Janc
-
-
--- 
-pozdrawiam
-Szymon Janc
-
-
+SGkgU3p5bW9uLA0KDQrvu79PbiA2LzUvMjAsIDI6MDQgQU0sICJTenltb24gSmFuYyIgPHN6eW1v
+bi5qYW5jQGNvZGVjb3VwLnBsPiB3cm90ZToNCg0KICAgIEhpIFRlZCwNCg0KICAgIE9uIEZyaWRh
+eSwgNSBKdW5lIDIwMjAgMDg6MTA6MDMgQ0VTVCBUZWRkIEhvLUplb25nIEFuIHdyb3RlOg0KICAg
+ID4gRnJvbTogVGVkZCBIby1KZW9uZyBBbiA8dGVkZC5hbkBpbnRlbC5jb20+DQogICAgPiANCiAg
+ICA+IFRoZXJlIGFyZSBhIGZldyB0ZXN0IGNhc2VzIGZvciBsaW1pdGVkIGRpc2NvdmVyeSBpbiBH
+QVAgcXVhbGlmaWNhdGlvbg0KICAgID4gdGVzdCBzdWl0ZS4gQnV0IHRoZSBkLWJ1cyBBUEkgZG9l
+c24ndCBzdXBwb3J0IGl0IGFuZCB0aGUgb25seSB3YXkgdG8NCiAgICA+IHN0YXJ0IHRoZSBsaW1p
+dGVkIGRpc2NvdmVyeSBpcyB1c2luZyB0aGUgbWFuYWdlbWVudCBBUEkuDQogICAgPiANCiAgICA+
+IFRoaXMgcGF0Y2ggYWRkcyBzdXBwb3J0IGZvciBsaW1pdGVkIGRpc2NvdmVyeSBieSB1c2luZyBt
+YW5hZ2VtZW50IEFQSS4NCg0KICAgIElzbid0IGl0IGVub3VnaCBieSBzcGVjIHRvIGNoZWNrIGlm
+IGxpbWl0ZWQgZGlzY292ZXJhYmxlIGZsYWcgaXMgc2V0Pw0KICAgIFdlIHByb3ZpZGUgdGhpcyBp
+bmZvIGluIEFkdmVydGlzaW5nRmxhZ3Mgc28gd2Ugc2hvdWxkIGJlIGNvbmZvcm1pbmcuDQoNCkdB
+Uy5UUyBkZXNjcmliZXMgdGhhdCBJVVQgZG9lc24ndCBmaW5kIGEgZGV2aWNlIGluIHRoZSBHZW5l
+cmFsIERpc2NvdmVyYWJsZQ0KTW9kZSB3aGlsZSBwZXJmb3JtaW5nIHRoZSBMaW1pdGVkIERpc2Nv
+dmVyeS4gKEdBUC9ESVNDL0xJTVAvQlYtMDItQykNCg0KICAgIEFsc28sIGlmIHdlIHdhbnQgdG8g
+YmUgYWJsZSB0byBleHBsaWNpdGx5IGRvIExpbWl0ZWQgRGlzY292ZXJ5IHRoaXMgc2hvdWxkIGJl
+IA0KICAgIGFkZGVkIHRvIFNldERpc2NvdmVyeUZpbHRlciBzbyB0aGF0IGJ0cGNsaWVudCBjYW4g
+c3RheSBELUJ1cyBvbmx5Lg0KDQpJIHdpbGwgdGFrZSBhIGxvb2sgaW50byBpdC4gVGhhbmtzIGZv
+ciB0aGUgcG9pbnRpbmcgaXQgb3V0LiBJIHdhc24ndCBzdXJlIHRoZSBzY29wZSBvZg0KYnRwY2xp
+ZW50Lg0KDQoNCiAgICA+IC0tLQ0KICAgID4gIHRvb2xzL2J0cGNsaWVudC5jIHwgMTk0ICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCiAgICA+ICAxIGZpbGUg
+Y2hhbmdlZCwgMTg3IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQogICAgPiANCiAgICA+
+IGRpZmYgLS1naXQgYS90b29scy9idHBjbGllbnQuYyBiL3Rvb2xzL2J0cGNsaWVudC5jDQogICAg
+PiBpbmRleCBmOWM2OTMwNTYuLjQ2Zjg2NjExNyAxMDA2NDQNCiAgICA+IC0tLSBhL3Rvb2xzL2J0
+cGNsaWVudC5jDQogICAgPiArKysgYi90b29scy9idHBjbGllbnQuYw0KICAgID4gQEAgLTM2LDYg
+KzM2LDEwIEBADQogICAgPiAgI2luY2x1ZGUgImxpYi9ibHVldG9vdGguaCINCiAgICA+ICAjaW5j
+bHVkZSAic3JjL3NoYXJlZC9idHAuaCINCiAgICA+IA0KICAgID4gKy8qIEZvciBCVF9NR01UIEFQ
+SSAqLw0KICAgID4gKyNpbmNsdWRlICJsaWIvbWdtdC5oIg0KICAgID4gKyNpbmNsdWRlICJzcmMv
+c2hhcmVkL21nbXQuaCINCiAgICA+ICsNCiAgICA+ICAjZGVmaW5lIEFEX1BBVEggIi9vcmcvYmx1
+ZXovYWR2ZXJ0aXNpbmciDQogICAgPiAgI2RlZmluZSBBR19QQVRIICIvb3JnL2JsdWV6L2FnZW50
+Ig0KICAgID4gICNkZWZpbmUgQURfSUZBQ0UgIm9yZy5ibHVlei5MRUFkdmVydGlzZW1lbnQxIg0K
+ICAgID4gQEAgLTc3LDYgKzgxLDE0IEBAIHN0YXRpYyBzdHJ1Y3QgYnRwICpidHA7DQogICAgPiAN
+CiAgICA+ICBzdGF0aWMgYm9vbCBnYXBfc2VydmljZV9yZWdpc3RlcmVkOw0KICAgID4gDQogICAg
+PiArLyogRm9yIEJUX01HTVQgQVBJICovDQogICAgPiArc3RhdGljIHN0cnVjdCBtZ210ICptZ210
+Ow0KICAgID4gK3N0YXRpYyB1aW50MTZfdCBtZ210X2luZGV4Ow0KICAgID4gKw0KICAgID4gK3N0
+YXRpYyB1aW50MzJfdCBtZ210X2ZsYWdzOw0KICAgID4gKw0KICAgID4gKyNkZWZpbmUgTUdNVF9P
+UFNfRElTQ09WRVJZCTB4MDENCiAgICA+ICsNCiAgICA+ICBzdHJ1Y3QgYWRfZGF0YSB7DQogICAg
+PiAgCXVpbnQ4X3QgZGF0YVsyNV07DQogICAgPiAgCXVpbnQ4X3QgbGVuOw0KICAgID4gQEAgLTE0
+MDMsNiArMTQxNSw4OCBAQCBzdGF0aWMgdm9pZCBzZXRfZGlzY292ZXJ5X2ZpbHRlcl9yZXBseShz
+dHJ1Y3QNCiAgICA+IGxfZGJ1c19wcm94eSAqcHJveHksIHN0YXJ0X2Rpc2NvdmVyeV9yZXBseSwg
+TlVMTCwgTlVMTCk7DQogICAgPiAgfQ0KICAgID4gDQogICAgPiArI2RlZmluZSBTQ0FOX1RZUEVf
+QlJFRFIgKDEgPDwgQkRBRERSX0JSRURSKQ0KICAgID4gKyNkZWZpbmUgU0NBTl9UWVBFX0xFICgo
+MSA8PCBCREFERFJfTEVfUFVCTElDKSB8ICgxIDw8IEJEQUREUl9MRV9SQU5ET00pKQ0KICAgID4g
+KyNkZWZpbmUgU0NBTl9UWVBFX0RVQUwgKFNDQU5fVFlQRV9CUkVEUiB8IFNDQU5fVFlQRV9MRSkN
+CiAgICA+ICsNCiAgICA+ICtzdHJ1Y3QgZGlzY292ZXJ5X2ZsYWdzIHsNCiAgICA+ICsJdWludDhf
+dCBmbGFnczsNCiAgICA+ICt9Ow0KICAgID4gKw0KICAgID4gK3N0YXRpYyBpbnQgYnRwX21nbXRf
+c3RhcnRfbGltaXRlZF9kaXNjb3ZlcnkodWludDhfdCBmbGFncykNCiAgICA+ICt7DQogICAgPiAr
+CXN0cnVjdCBtZ210X2NwX3N0YXJ0X2Rpc2NvdmVyeSBjcDsNCiAgICA+ICsJdWludDhfdCB0eXBl
+ID0gU0NBTl9UWVBFX0RVQUw7DQogICAgPiArDQogICAgPiArCW1lbXNldCgmY3AsIDAsIHNpemVv
+ZihjcCkpOw0KICAgID4gKw0KICAgID4gKwlpZiAoZmxhZ3MgJiAoQlRQX0dBUF9ESVNDT1ZFUllf
+RkxBR19MRSB8DQogICAgPiArCQkgICAgIEJUUF9HQVBfRElTQ09WRVJZX0ZMQUdfQlJFRFIpKSB7
+DQogICAgPiArCQl0eXBlID0gU0NBTl9UWVBFX0RVQUw7DQogICAgPiArCX0gZWxzZSBpZiAoZmxh
+Z3MgJiBCVFBfR0FQX0RJU0NPVkVSWV9GTEFHX0xFKSB7DQogICAgPiArCQl0eXBlICY9IH5TQ0FO
+X1RZUEVfQlJFRFI7DQogICAgPiArCQl0eXBlIHw9IFNDQU5fVFlQRV9MRTsNCiAgICA+ICsJfSBl
+bHNlIGlmIChmbGFncyAmIEJUUF9HQVBfRElTQ09WRVJZX0ZMQUdfQlJFRFIpIHsNCiAgICA+ICsJ
+CXR5cGUgfD0gU0NBTl9UWVBFX0JSRURSOw0KICAgID4gKwkJdHlwZSAmPSB+U0NBTl9UWVBFX0xF
+Ow0KICAgID4gKwl9DQogICAgPiArCWNwLnR5cGUgPSB0eXBlOw0KICAgID4gKw0KICAgID4gKwly
+ZXR1cm4gbWdtdF9zZW5kKG1nbXQsIE1HTVRfT1BfU1RBUlRfTElNSVRFRF9ESVNDT1ZFUlksIG1n
+bXRfaW5kZXgsDQogICAgPiArCQkJIHNpemVvZihjcCksICZjcCwgTlVMTCwgTlVMTCwgTlVMTCk7
+DQogICAgPiArfQ0KICAgID4gKw0KICAgID4gK3N0YXRpYyB2b2lkIGJ0cF9tZ210X2Rpc2NvdmVy
+aW5nX2Rlc3Ryb3kodm9pZCAqdXNlcl9kYXRhKQ0KICAgID4gK3sNCiAgICA+ICsJbF9mcmVlKHVz
+ZXJfZGF0YSk7DQogICAgPiArfQ0KICAgID4gKw0KICAgID4gK3N0YXRpYyB2b2lkIGJ0cF9tZ210
+X2Rpc2NvdmVyaW5nX2NiKHVpbnQxNl90IGluZGV4LCB1aW50MTZfdCBsZW4sDQogICAgPiArCQkJ
+CSAgICBjb25zdCB2b2lkICpwYXJhbSwgdm9pZCANCiAgICAqdXNlcl9kYXRhKQ0KICAgID4gK3sN
+CiAgICA+ICsJY29uc3Qgc3RydWN0IG1nbXRfZXZfZGlzY292ZXJpbmcgKmV2ID0gcGFyYW07DQog
+ICAgPiArCXN0cnVjdCBkaXNjb3ZlcnlfZmxhZ3MgKmRmID0gdXNlcl9kYXRhOw0KICAgID4gKw0K
+ICAgID4gKwlpZiAobGVuIDwgc2l6ZW9mKCpldikpIHsNCiAgICA+ICsJCWxfZXJyb3IoIlRvbyBz
+aG9ydCAoJXUgYnl0ZXMpIGRpc2NvdmVyaW5nIGV2ZW50IiwgbGVuKTsNCiAgICA+ICsJCXJldHVy
+bjsNCiAgICA+ICsJfQ0KICAgID4gKw0KICAgID4gKwlsX2luZm8oIk1HTVQ6IGRpc2NvdmVyaW5n
+ICVzIiwgZXYtPmRpc2NvdmVyaW5nID8gIm9uIiA6ICJvZmYiKTsNCiAgICA+ICsNCiAgICA+ICsJ
+LyogU3RhcnQgbmV3IGRpc2NvdmVyeSAqLw0KICAgID4gKwlpZiAoZXYtPmRpc2NvdmVyaW5nID09
+IDAgJiYgKG1nbXRfZmxhZ3MgJiBNR01UX09QU19ESVNDT1ZFUlkpKQ0KICAgID4gKwkJYnRwX21n
+bXRfc3RhcnRfbGltaXRlZF9kaXNjb3ZlcnkoZGYtPmZsYWdzKTsNCiAgICA+ICt9DQogICAgPiAr
+DQogICAgPiArc3RhdGljIHZvaWQgYnRwX21nbXRfc2V0dXBfbGltaXRlZF9kaXNjb3ZlcnkodWlu
+dDhfdCBpbmRleCwgdWludDhfdCBmbGFncykNCiAgICA+ICt7DQogICAgPiArCWludCByZXQ7DQog
+ICAgPiArCXN0cnVjdCBkaXNjb3ZlcnlfZmxhZ3MgKmRmOw0KICAgID4gKw0KICAgID4gKwkvKiBT
+YXZlcyB0aGUgZmxhZ3Mgc28gaXQgY2FuIGJlIHVzZWQgdG8gc3RhcnQgbmV3IGRpc2NvdmVyeSAq
+Lw0KICAgID4gKwlkZiA9IGxfbmV3KHN0cnVjdCBkaXNjb3ZlcnlfZmxhZ3MsIDEpOw0KICAgID4g
+KwlkZi0+ZmxhZ3MgPSBmbGFnczsNCiAgICA+ICsNCiAgICA+ICsJLyogUmVnaXN0ZXIgZXZlbnQg
+Zm9yIGRpc2NvdmVyaW5nICovDQogICAgPiArCW1nbXRfcmVnaXN0ZXIobWdtdCwgTUdNVF9FVl9E
+SVNDT1ZFUklORywgbWdtdF9pbmRleCwNCiAgICA+ICsJCSAgICAgIGJ0cF9tZ210X2Rpc2NvdmVy
+aW5nX2NiLCBkZiwNCiAgICA+ICsJCSAgICAgIGJ0cF9tZ210X2Rpc2NvdmVyaW5nX2Rlc3Ryb3kp
+Ow0KICAgID4gKw0KICAgID4gKwlyZXQgPSBidHBfbWdtdF9zdGFydF9saW1pdGVkX2Rpc2NvdmVy
+eShmbGFncyk7DQogICAgPiArCWlmIChyZXQgPT0gMCkgew0KICAgID4gKwkJbF9lcnJvcigiVW5h
+YmxlIHRvIHNlbmQgc3RhcnRfZGlzY292ZXJ5IGNtZCIpOw0KICAgID4gKwkJYnRwX3NlbmRfZXJy
+b3IoYnRwLCBCVFBfR0FQX1NFUlZJQ0UsIGluZGV4LCANCiAgICBCVFBfRVJST1JfRkFJTCk7DQog
+ICAgPiArCQlyZXR1cm47DQogICAgPiArCX0NCiAgICA+ICsNCiAgICA+ICsJLyogU2V0IGZsYWcg
+dGhhdCBtZ210IGludGVyZmFjZSBpcyB1c2VkIGZvciBzY2FubmluZyAqLw0KICAgID4gKwltZ210
+X2ZsYWdzIHw9IE1HTVRfT1BTX0RJU0NPVkVSWTsNCiAgICA+ICsNCiAgICA+ICsJYnRwX3NlbmQo
+YnRwLCBCVFBfR0FQX1NFUlZJQ0UsIEJUUF9PUF9HQVBfU1RBUlRfRElTQ09WRVJZLA0KICAgID4g
+KwkJIGluZGV4LCAwLCBOVUxMKTsNCiAgICA+ICt9DQogICAgPiArDQogICAgPiAgc3RhdGljIHZv
+aWQgYnRwX2dhcF9zdGFydF9kaXNjb3ZlcnkodWludDhfdCBpbmRleCwgY29uc3Qgdm9pZCAqcGFy
+YW0sDQogICAgPiAgCQkJCQl1aW50MTZfdCBsZW5ndGgsIHZvaWQgDQogICAgKnVzZXJfZGF0YSkN
+CiAgICA+ICB7DQogICAgPiBAQCAtMTQyMywxMCArMTUxNywxNyBAQCBzdGF0aWMgdm9pZCBidHBf
+Z2FwX3N0YXJ0X2Rpc2NvdmVyeSh1aW50OF90IGluZGV4LA0KICAgID4gY29uc3Qgdm9pZCAqcGFy
+YW0sIHJldHVybjsNCiAgICA+ICAJfQ0KICAgID4gDQogICAgPiAtCWxfZGJ1c19wcm94eV9tZXRo
+b2RfY2FsbChhZGFwdGVyLT5wcm94eSwgIlNldERpc2NvdmVyeUZpbHRlciIsDQogICAgPiAtCQkJ
+CQkJDQogICAgc2V0X2Rpc2NvdmVyeV9maWx0ZXJfc2V0dXAsDQogICAgPiAtCQkJCQkJDQogICAg
+c2V0X2Rpc2NvdmVyeV9maWx0ZXJfcmVwbHksDQogICAgPiAtCQkJCQkJTF9VSU5UX1RPX1BUUihj
+cC0NCiAgICA+ZmxhZ3MpLCBOVUxMKTsNCiAgICA+ICsJLyogVXNlIEJUIE1HTVQgaW50ZXJmYWNl
+IHRvIHN0YXJ0IGxpbWl0ZWQgZGlzY292ZXJ5IHByb2NlZHVyZSBzaW5jZQ0KICAgID4gKwkgKiBp
+dCBpcyBub3Qgc3VwcG9ydGVkIGJ5IEQtQlVTIEFQSQ0KICAgID4gKwkgKi8NCiAgICA+ICsJaWYg
+KGNwLT5mbGFncyAmIEJUUF9HQVBfRElTQ09WRVJZX0ZMQUdfTElNSVRFRCkNCiAgICA+ICsJCWJ0
+cF9tZ210X3NldHVwX2xpbWl0ZWRfZGlzY292ZXJ5KGluZGV4LCBjcC0+ZmxhZ3MpOw0KICAgID4g
+KwllbHNlIHsNCiAgICA+ICsJCWxfZGJ1c19wcm94eV9tZXRob2RfY2FsbChhZGFwdGVyLT5wcm94
+eSwgDQogICAgIlNldERpc2NvdmVyeUZpbHRlciIsDQogICAgPiArCQkJCQkgc2V0X2Rpc2NvdmVy
+eV9maWx0ZXJfc2V0dXAsDQogICAgPiArCQkJCQkgc2V0X2Rpc2NvdmVyeV9maWx0ZXJfcmVwbHks
+DQogICAgPiArCQkJCQkgTF9VSU5UX1RPX1BUUihjcC0+ZmxhZ3MpLCANCiAgICBOVUxMKTsNCiAg
+ICA+ICsJfQ0KICAgID4gIH0NCiAgICA+IA0KICAgID4gIHN0YXRpYyB2b2lkIGNsZWFyX2Rpc2Nv
+dmVyeV9maWx0ZXJfc2V0dXAoc3RydWN0IGxfZGJ1c19tZXNzYWdlICptZXNzYWdlLA0KICAgID4g
+QEAgLTE1MDEsNiArMTYwMiwyOSBAQCBzdGF0aWMgdm9pZCBzdG9wX2Rpc2NvdmVyeV9yZXBseShz
+dHJ1Y3QgbF9kYnVzX3Byb3h5DQogICAgPiAqcHJveHksIE5VTEwsIE5VTEwpOw0KICAgID4gIH0N
+CiAgICA+IA0KICAgID4gK3N0YXRpYyB2b2lkIGJ0cF9tZ210X3N0b3BfZGlzY292ZXJ5KHVpbnQ4
+X3QgaW5kZXgpDQogICAgPiArew0KICAgID4gKwlzdHJ1Y3QgbWdtdF9jcF9zdG9wX2Rpc2NvdmVy
+eSBjcDsNCiAgICA+ICsJaW50IHJldDsNCiAgICA+ICsNCiAgICA+ICsJbWVtc2V0KCZjcCwgMCwg
+c2l6ZW9mKGNwKSk7DQogICAgPiArCWNwLnR5cGUgPSBTQ0FOX1RZUEVfRFVBTDsNCiAgICA+ICsN
+CiAgICA+ICsJcmV0ID0gbWdtdF9zZW5kKG1nbXQsIE1HTVRfT1BfU1RPUF9ESVNDT1ZFUlksIG1n
+bXRfaW5kZXgsIA0KICAgIHNpemVvZihjcCksDQogICAgPiArCQkJJmNwLCBOVUxMLCBOVUxMLCBO
+VUxMKTsNCiAgICA+ICsJaWYgKHJldCA9PSAwKSB7DQogICAgPiArCQlsX2Vycm9yKCJVbmFibGUg
+dG8gc2VuZCBzdG9wX2Rpc2NvdmVyeSBjbWQiKTsNCiAgICA+ICsJCWJ0cF9zZW5kX2Vycm9yKGJ0
+cCwgQlRQX0dBUF9TRVJWSUNFLCBpbmRleCwgDQogICAgQlRQX0VSUk9SX0ZBSUwpOw0KICAgID4g
+KwkJcmV0dXJuOw0KICAgID4gKwl9DQogICAgPiArDQogICAgPiArCS8qIENsZWFyIGZsYWcgdGhh
+dCBtZ210IGludGVyZmFjZSBpcyB1c2VkIGZvciBzY2FubmluZyAqLw0KICAgID4gKwltZ210X2Zs
+YWdzICY9IH5NR01UX09QU19ESVNDT1ZFUlk7DQogICAgPiArDQogICAgPiArCWJ0cF9zZW5kKGJ0
+cCwgQlRQX0dBUF9TRVJWSUNFLCBCVFBfT1BfR0FQX1NUT1BfRElTQ09WRVJZLA0KICAgID4gKwkJ
+IGluZGV4LCAwLCBOVUxMKTsNCiAgICA+ICt9DQogICAgPiArDQogICAgPiAgc3RhdGljIHZvaWQg
+YnRwX2dhcF9zdG9wX2Rpc2NvdmVyeSh1aW50OF90IGluZGV4LCBjb25zdCB2b2lkICpwYXJhbSwN
+CiAgICA+ICAJCQkJCXVpbnQxNl90IGxlbmd0aCwgdm9pZCANCiAgICAqdXNlcl9kYXRhKQ0KICAg
+ID4gIHsNCiAgICA+IEBAIC0xNTIwLDggKzE2NDQsMTQgQEAgc3RhdGljIHZvaWQgYnRwX2dhcF9z
+dG9wX2Rpc2NvdmVyeSh1aW50OF90IGluZGV4LA0KICAgID4gY29uc3Qgdm9pZCAqcGFyYW0sIHJl
+dHVybjsNCiAgICA+ICAJfQ0KICAgID4gDQogICAgPiAtCWxfZGJ1c19wcm94eV9tZXRob2RfY2Fs
+bChhZGFwdGVyLT5wcm94eSwgIlN0b3BEaXNjb3ZlcnkiLCBOVUxMLA0KICAgID4gLQkJCQkJc3Rv
+cF9kaXNjb3ZlcnlfcmVwbHksIE5VTEwsIA0KICAgIE5VTEwpOw0KICAgID4gKwkvKiBJZiB0aGUg
+ZGlzY292ZXJ5IHByb2NlZHVyZSBpcyBzdGFydGVkIGJ5IEJUIE1HTVQgQVBJIGZvciBsaW1pdGVk
+DQogICAgPiArCSAqIGRpc2NvdmVyaW5nLCBpdCBzaG91bGQgYmUgc3RvcHBlZCBieSBtZ210IEFQ
+SS4NCiAgICA+ICsJICovDQogICAgPiArCWlmIChtZ210X2ZsYWdzICYgTUdNVF9PUFNfRElTQ09W
+RVJZKQ0KICAgID4gKwkJYnRwX21nbXRfc3RvcF9kaXNjb3ZlcnkoaW5kZXgpOw0KICAgID4gKwll
+bHNlDQogICAgPiArCQlsX2RidXNfcHJveHlfbWV0aG9kX2NhbGwoYWRhcHRlci0+cHJveHksICJT
+dG9wRGlzY292ZXJ5IiwgDQogICAgTlVMTCwNCiAgICA+ICsJCQkJCSBzdG9wX2Rpc2NvdmVyeV9y
+ZXBseSwgTlVMTCwgDQogICAgTlVMTCk7DQogICAgPiAgfQ0KICAgID4gDQogICAgPiAgc3RhdGlj
+IHZvaWQgY29ubmVjdF9yZXBseShzdHJ1Y3QgbF9kYnVzX3Byb3h5ICpwcm94eSwNCiAgICA+IEBA
+IC0zMTQwLDYgKzMyNzAsNyBAQCBzdGF0aWMgdm9pZCB1c2FnZSh2b2lkKQ0KICAgID4gIAlsX2lu
+Zm8oIlx0YnRwY2xpZW50IFtvcHRpb25zXSIpOw0KICAgID4gIAlsX2luZm8oIm9wdGlvbnM6XG4i
+DQogICAgPiAgCSJcdC1zLCAtLXNvY2tldCA8c29ja2V0PiAgU29ja2V0IHRvIHVzZSBmb3IgQlRQ
+XG4iDQogICAgPiArCSJcdC1pLCAtLWluZGV4IDxpZD4gICAgICAgU3BlY2lmeSB0aGUgYWRhcHRl
+ciBpbmRleFxuIg0KICAgID4gIAkiXHQtcSwgLS1xdWlldCAgICAgICAgICAgIERvbid0IGVtaXQg
+YW55IGxvZ3NcbiINCiAgICA+ICAJIlx0LXYsIC0tdmVyc2lvbiAgICAgICAgICBTaG93IHZlcnNp
+b25cbiINCiAgICA+ICAJIlx0LWgsIC0taGVscCAgICAgICAgICAgICBTaG93IGhlbHAgb3B0aW9u
+cyIpOw0KICAgID4gQEAgLTMxNDcsMTIgKzMyNzgsNTIgQEAgc3RhdGljIHZvaWQgdXNhZ2Uodm9p
+ZCkNCiAgICA+IA0KICAgID4gIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgb3B0aW9uIG9wdGlvbnNbXSA9
+IHsNCiAgICA+ICAJeyAic29ja2V0IiwJMSwgMCwgJ3MnIH0sDQogICAgPiArCXsgImluZGV4IiwJ
+MSwgMCwgJ2knIH0sDQogICAgPiAgCXsgInF1aWV0IiwJMCwgMCwgJ3EnIH0sDQogICAgPiAgCXsg
+InZlcnNpb24iLAkwLCAwLCAndicgfSwNCiAgICA+ICAJeyAiaGVscCIsCTAsIDAsICdoJyB9LA0K
+ICAgID4gIAl7IDAsIDAsIDAsIDAgfQ0KICAgID4gIH07DQogICAgPiANCiAgICA+ICtzdGF0aWMg
+dm9pZCBzZXRfaW5kZXgoY29uc3QgY2hhciAqYXJnKQ0KICAgID4gK3sNCiAgICA+ICsJLyogVXNl
+IGRlZmF1bHQgaW5kZXggMCAqLw0KICAgID4gKwlpZiAoIWFyZyB8fCAhc3RyY21wKGFyZywgIm5v
+bmUiKSB8fCAhc3RyY21wKGFyZywgImFueSIpIHx8DQogICAgPiArCQkJCQkJIXN0cmNtcChhcmcs
+IA0KICAgICJhbGwiKSkNCiAgICA+ICsJCW1nbXRfaW5kZXggPSBNR01UX0lOREVYX05PTkU7DQog
+ICAgPiArCWVsc2UgaWYgKHN0cmxlbihhcmcpID4gMyAmJiAhc3RybmNhc2VjbXAoYXJnLCAiaGNp
+IiwgMykpDQogICAgPiArCQltZ210X2luZGV4ID0gYXRvaSgmYXJnWzNdKTsNCiAgICA+ICsJZWxz
+ZQ0KICAgID4gKwkJbWdtdF9pbmRleCA9IGF0b2koYXJnKTsNCiAgICA+ICt9DQogICAgPiArDQog
+ICAgPiArc3RhdGljIGludCBidHBfbWdtdF9pbml0KGNvbnN0IGNoYXIgKmluZGV4X29wdCkNCiAg
+ICA+ICt7DQogICAgPiArCW1nbXQgPSBtZ210X25ld19kZWZhdWx0KCk7DQogICAgPiArCWlmICgh
+bWdtdCkgew0KICAgID4gKwkJbF9pbmZvKCJVbmFibGUgdG8gb3BlbiBtZ210X3NvY2tldFxuIik7
+DQogICAgPiArCQlyZXR1cm4gRVhJVF9GQUlMVVJFOw0KICAgID4gKwl9DQogICAgPiArDQogICAg
+PiArCWlmIChpbmRleF9vcHQpDQogICAgPiArCQlzZXRfaW5kZXgoaW5kZXhfb3B0KTsNCiAgICA+
+ICsNCiAgICA+ICsJaWYgKG1nbXRfaW5kZXggPT0gTUdNVF9JTkRFWF9OT05FKQ0KICAgID4gKwkJ
+bWdtdF9pbmRleCA9IDA7DQogICAgPiArDQogICAgPiArCXJldHVybiBFWElUX1NVQ0NFU1M7DQog
+ICAgPiArfQ0KICAgID4gKw0KICAgID4gK3N0YXRpYyB2b2lkIGJ0cF9tZ210X3JlbGVhc2Uodm9p
+ZCkNCiAgICA+ICt7DQogICAgPiArCWxfZXJyb3IoIk1HTVQ6IFJlbGVhc2UgYWxsIG1hbmFnZW1l
+bnQgcmVzb3VyY2VzIik7DQogICAgPiArCW1nbXRfY2FuY2VsX2FsbChtZ210KTsNCiAgICA+ICsJ
+bWdtdF91bnJlZ2lzdGVyX2FsbChtZ210KTsNCiAgICA+ICsJbWdtdF91bnJlZihtZ210KTsNCiAg
+ICA+ICt9DQogICAgPiArDQogICAgPiArc3RhdGljIGNvbnN0IGNoYXIgKmluZGV4X29wdDsNCiAg
+ICA+ICsNCiAgICA+ICBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KICAgID4gIHsN
+CiAgICA+ICAJc3RydWN0IGxfZGJ1c19jbGllbnQgKmNsaWVudDsNCiAgICA+IEBAIC0zMTYwLDcg
+KzMzMzEsOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KICAgID4gDQogICAg
+PiAgCWxfbG9nX3NldF9zdGRlcnIoKTsNCiAgICA+IA0KICAgID4gLQl3aGlsZSAoKG9wdCA9IGdl
+dG9wdF9sb25nKGFyZ2MsIGFyZ3YsICIraHM6dnEiLCBvcHRpb25zLCBOVUxMKSkgIT0gDQogICAg
+LTEpIHsNCiAgICA+ICsJd2hpbGUgKChvcHQgPSBnZXRvcHRfbG9uZyhhcmdjLCBhcmd2LCAiK2hz
+OnZxaToiLCBvcHRpb25zLA0KICAgID4gKwkJCQkJCQkJDQogICAgTlVMTCkpICE9IC0xKSB7DQog
+ICAgPiAgCQlzd2l0Y2ggKG9wdCkgew0KICAgID4gIAkJY2FzZSAncyc6DQogICAgPiAgCQkJc29j
+a2V0X3BhdGggPSBsX3N0cmR1cChvcHRhcmcpOw0KICAgID4gQEAgLTMxNzMsNiArMzM0NSw5IEBA
+IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQogICAgPiAgCQljYXNlICd2JzoNCiAg
+ICA+ICAJCQlsX2luZm8oIiVzIiwgVkVSU0lPTik7DQogICAgPiAgCQkJcmV0dXJuIEVYSVRfU1VD
+Q0VTUzsNCiAgICA+ICsJCWNhc2UgJ2knOg0KICAgID4gKwkJCWluZGV4X29wdCA9IGxfc3RyZHVw
+KG9wdGFyZyk7DQogICAgPiArCQkJYnJlYWs7DQogICAgPiAgCQljYXNlICdoJzoNCiAgICA+ICAJ
+CWRlZmF1bHQ6DQogICAgPiAgCQkJdXNhZ2UoKTsNCiAgICA+IEBAIC0zMTg5LDYgKzMzNjQsMTAg
+QEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCiAgICA+ICAJaWYgKCFsX21haW5f
+aW5pdCgpKQ0KICAgID4gIAkJcmV0dXJuIEVYSVRfRkFJTFVSRTsNCiAgICA+IA0KICAgID4gKwlp
+ZiAoYnRwX21nbXRfaW5pdChpbmRleF9vcHQpKSB7DQogICAgPiArCQlsX2Vycm9yKCJVbmFibGUg
+dG8gaW5pdGlhbGl6ZSB0aGUgbWFuYWdlbWVudCBpbnRlcmZhY2UiKTsNCiAgICA+ICsJCXJldHVy
+biBFWElUX0ZBSUxVUkU7DQogICAgPiArCX0NCiAgICA+IA0KICAgID4gIAlhZGFwdGVycyA9IGxf
+cXVldWVfbmV3KCk7DQogICAgPiANCiAgICA+IEBAIC0zMjEwLDYgKzMzODksNyBAQCBpbnQgbWFp
+bihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KICAgID4gIAlsX2RidXNfY2xpZW50X2Rlc3Ryb3ko
+Y2xpZW50KTsNCiAgICA+ICAJbF9kYnVzX2Rlc3Ryb3koZGJ1cyk7DQogICAgPiAgCWJ0cF9jbGVh
+bnVwKGJ0cCk7DQogICAgPiArCWJ0cF9tZ210X3JlbGVhc2UoKTsNCiAgICA+IA0KICAgID4gIAls
+X3F1ZXVlX2Rlc3Ryb3koYWRhcHRlcnMsIChsX3F1ZXVlX2Rlc3Ryb3lfZnVuY190KWJ0cF9hZGFw
+dGVyX2ZyZWUpOw0KDQoNCiAgICAtLSANCiAgICBwb3pkcmF3aWFtDQogICAgU3p5bW9uIEphbmMN
+Cg0KUmVnYXJkcywNClRlZGQNCg0K
