@@ -2,60 +2,60 @@ Return-Path: <SRS0=pjei=7S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DCCC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F911C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10D9320820
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 205C4206FA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="W/10+ZA/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SnhpLZp4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728071AbgFESqY (ORCPT
+        id S1727787AbgFESqU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 14:46:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
+        Fri, 5 Jun 2020 14:46:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728044AbgFESqX (ORCPT
+        with ESMTP id S1726077AbgFESqS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 14:46:23 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B53EC08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:46:23 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id s88so3217183pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:46:23 -0700 (PDT)
+        Fri, 5 Jun 2020 14:46:18 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA49C08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:46:18 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id o8so5598553pgm.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:46:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Db/Gm4BeoJW6NqmdsTHnrKmt8poh4eKp40QU8EXC28s=;
-        b=W/10+ZA/PhUPpgG2XIwOlVrsgp35BOoaVW2TDVRzf+W7w0UnHTDmw0ieOnWvlN3vdP
-         PFj5GknvyJkFXDq/PPl9Jk+ySjCWshsIMbIW2TegEREdo0boT/Ym/nQS8RpmJyH1BxrV
-         2IkY/rzZIK/yYybOfCdmK3whjSMgxbpx6yX5w=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CJNgAE8W4L7bDdkEn/de45xF1mTctBl3JZOgDeiH31E=;
+        b=SnhpLZp4Omylm5YzCyZ+OziHEXjtNTiqVN8OXyS3vg3li2fxjVapcJ/c5vgfnrWGM3
+         4Ab3R9zlXs8J5L8+wANYt4y6QbjY1rI8meKI9a3WtyPJ34oBIu5M/WqJzGSG0/8+e0B0
+         isJK3X9mHFI0PyyRNU4nDwhw+z32JYnn5ySqQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Db/Gm4BeoJW6NqmdsTHnrKmt8poh4eKp40QU8EXC28s=;
-        b=Gp8zPWPfcVPg6jMfl1vhycCfxQ21LPbVy1psdvoYZZ60CnNd9qg4qbcaep3MmF4JLz
-         Y7oO+ZhuXZi9RKGnvQ/UWW/OL87Sdu9jhbeshLUJqzLQ2LnXQdDLQVhLRiNazG/hbp2O
-         ByInLjsypa7P8NfcIcdRKxI8Ay9yOKfvmyygXW8l6trLPgGPXPOodGrb8KLbUNHqjFUp
-         zqz+DagxMFBsKH9fJzh67OwNWAMdFBvRiIIdMyrJTHmytWT6KjhsVnS/MBeGqFTzAsYV
-         PwLZYYDdzHNPQHMF3OHN1aDeb9hGRfGY+0rQG0rOP8AE2pJjMjkQVj65CzwQxc7Q1Hmt
-         k9Xw==
-X-Gm-Message-State: AOAM533AL+na0C2nMuskaHWAbLmTiY3A5ZBqCpWqh1AZrdwmhcxCXmCq
-        MSPQb4oC33+uwWyalhHpER4GTw==
-X-Google-Smtp-Source: ABdhPJxgwwx3U8FhEfyBF8XeXfPMutpv4xe50ifCJaUL8ETmcyboqaMCFgbkn1oxbLIBfwVBPzdw0w==
-X-Received: by 2002:a17:90b:882:: with SMTP id bj2mr4851194pjb.122.1591382782676;
-        Fri, 05 Jun 2020 11:46:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CJNgAE8W4L7bDdkEn/de45xF1mTctBl3JZOgDeiH31E=;
+        b=Jf0EAIwF/9d4t4/aBMfJzdHUP5ZCvxVGKBvp0VVf0AZ/7mjziMa4sKNtjSJdkSvCYy
+         QwmlCey5dm9cLS8q16SC0OzZtzhiuf1GRNplEX6bYXnFMCnV3MMUPxm5WXpJIev19Bbj
+         3NhMEnbyBHoPyckrUFFfKRIXO9VDDz7h0pIdkM6sOfOG0O6EWdXpqA8y7Glyvzc8eaam
+         KFzCC1dvP1Zx+PVcuW+KucAGn6uVGrInoZKlsmffu+r6RhV1qHVJeSRnhQM1Nv6PJ9m5
+         uFi/dzSicBH9Rju8DBprhXbFKwbSwbSxf25b5vbLDf1YvKZKjEgNiNqlX22vKVsglfuA
+         Giqw==
+X-Gm-Message-State: AOAM530kGGlU0p3tRf60/Qy5YLnVaLZuO9snEqeNFg8cHAD7tyX6yCOS
+        nSgnP679xUD+PNFAPzmereazQA==
+X-Google-Smtp-Source: ABdhPJwA+d7fJQcL5nPsCQ4cEYnUF+r4G7dUXN+b7g8/2ykdGsMs6nbt78RG4NKopns6i2hTyJ/7aw==
+X-Received: by 2002:a63:fc0e:: with SMTP id j14mr10998607pgi.264.1591382778281;
+        Fri, 05 Jun 2020 11:46:18 -0700 (PDT)
 Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id a20sm268894pff.147.2020.06.05.11.46.21
+        by smtp.gmail.com with ESMTPSA id j130sm312505pfd.94.2020.06.05.11.46.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2020 11:46:22 -0700 (PDT)
+        Fri, 05 Jun 2020 11:46:17 -0700 (PDT)
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
@@ -66,12 +66,10 @@ Cc:     linux-bluetooth@vger.kernel.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Claire Chang <tientzu@chromium.org>,
         Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 2/3] Bluetooth: hci_qca: Skip serdev wait when no transfer is pending
-Date:   Fri,  5 Jun 2020 11:46:10 -0700
-Message-Id: <20200605114552.2.I2a095adb2a9a98b15c11d7310db142b27f8cab28@changeid>
+Subject: [PATCH 0/3] 
+Date:   Fri,  5 Jun 2020 11:46:08 -0700
+Message-Id: <20200605184611.252218-1-mka@chromium.org>
 X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
-In-Reply-To: <20200605184611.252218-1-mka@chromium.org>
-References: <20200605184611.252218-1-mka@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -79,51 +77,18 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-qca_suspend() calls serdev_device_wait_until_sent() regardless of
-whether a transfer is pending. While it does no active harm since
-the function should return immediately it makes the code more
-confusing. Add a flag to track whether a transfer is pending and
-only call serdev_device_wait_until_sent() is needed.
+This series includes a fix for a possible race in qca_suspend() and
+some minor refactoring of the same function.
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
 
- drivers/bluetooth/hci_qca.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Matthias Kaehlcke (3):
+  Bluetooth: hci_qca: Only remove TX clock vote after TX is completed
+  Bluetooth: hci_qca: Skip serdev wait when no transfer is pending
+  Bluetooth: hci_qca: Refactor error handling in qca_suspend()
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index b1d82d32892e9..90ffd8ca1fb0d 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2050,6 +2050,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
- 	struct hci_uart *hu = &qcadev->serdev_hu;
- 	struct qca_data *qca = hu->priv;
- 	unsigned long flags;
-+	bool tx_pending = false;
- 	int ret = 0;
- 	u8 cmd;
- 
-@@ -2083,6 +2084,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
- 
- 		qca->tx_ibs_state = HCI_IBS_TX_ASLEEP;
- 		qca->ibs_sent_slps++;
-+		tx_pending = true;
- 		break;
- 
- 	case HCI_IBS_TX_ASLEEP:
-@@ -2099,8 +2101,10 @@ static int __maybe_unused qca_suspend(struct device *dev)
- 	if (ret < 0)
- 		goto error;
- 
--	serdev_device_wait_until_sent(hu->serdev,
--				      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
-+	if (tx_pending) {
-+		serdev_device_wait_until_sent(hu->serdev,
-+					      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
-+	}
- 
- 	/* Wait for HCI_IBS_SLEEP_IND sent by device to indicate its Tx is going
- 	 * to sleep, so that the packet does not wake the system later.
+ drivers/bluetooth/hci_qca.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
 -- 
 2.27.0.278.ge193c7cf3a9-goog
 
