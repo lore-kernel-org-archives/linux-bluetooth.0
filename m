@@ -2,409 +2,350 @@ Return-Path: <SRS0=pjei=7S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07202C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 09:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3EBC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 09:53:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5D9A207D0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 09:04:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF012207D5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 09:53:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="maxPq0mj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A2oBu/Ly"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgFEJEA (ORCPT
+        id S1726408AbgFEJx0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 05:04:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55884 "EHLO
+        Fri, 5 Jun 2020 05:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726096AbgFEJD7 (ORCPT
+        with ESMTP id S1726270AbgFEJx0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 05:03:59 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6C3C08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 02:03:59 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id c17so10752948lji.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 02:03:59 -0700 (PDT)
+        Fri, 5 Jun 2020 05:53:26 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB505C08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 02:53:25 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id b6so11002014ljj.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 02:53:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=91PQ5iOJNfaG6bug5VuV0p/lbHvR3d+0QGmyUXHxNYI=;
-        b=maxPq0mjWR3uwbn0dqX3C72Xnm2ntjh67I6JlF6dhiny8h1VHgrtNc8eYZMmiNXnhB
-         f49WxA0HWRUzHxcsDR/kXo+UocCQ5dN2Cj4zq2Pc4RiQzVtYQlKguIEjBzoBqaCz08mH
-         JI93JIosrAvGKcARJhaRvLRn1sAdV5HFqaP2VBLCVXKsK2g0MMI3QgDSyRy2QCBi7J1g
-         z8dCbPFiFFQJcag1dXKYhELua2IEMGPmHF9Nt7H/Z7aRnUhuQFIMCvZqO3L3PJDkgqG0
-         H+zA9BA1zhQlcVdNLLCw1K4Em0YCXGRZi/UM45IQIG2Ov8lgrZSe68xh38bEi4JHV5Eh
-         jcjA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mBqJKAR+TWCXiJFohsuhdpfPLPeWgkPLRuvS2j25SXc=;
+        b=A2oBu/Lyq/IEXtmgwyKcddTYZZNf6I4SAk4EtZfTPEI+jo8oBo5N0uX9GhisYaeG6j
+         RGtQfC5MQsX4Y3ELVkSyUrNQIi7e56j98uM/xLrIVqJI3EtpmvJ5MZd+6Y2EJEeZI+KP
+         oVXcuIxJDBlrXfIhvRUEoLTLs2GQs/LrF2p/JdJNIcnoT/NHp3cxNo3oBMUqymHov20W
+         GHXS75cqq4E+7L3sAwoyvb8Q1LJofQjPaTAsv62sjBM2xdqTjJv9YRW9cgu+m+G8STku
+         w4pizWP15WEfmsv1LTExOAL0z/aJUkE/A2IMt2VSW5iqFeyKJWfbeXG5qDPRXzkkBnrT
+         Z5rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=91PQ5iOJNfaG6bug5VuV0p/lbHvR3d+0QGmyUXHxNYI=;
-        b=do5SvQ59pQO5f2HpDPUaXiTRv824fAxRiy6YAO4zFwxDpqM9mDMYWGEpHnXCYb08N/
-         tcz3pUrbo67WKPsoCCRT/37FRxk7otG1njmK1qTPOnMXZHlmaUXrG0W0BpB60+dlpDP1
-         uWK3UA7e4Wmlxk8nQJDkukY+HkFmUHgeEGD69oJAChV9BZG59ZqmLK2xrSojCkE8v+vP
-         iwVLZpVrgv+uM5PjFdicCb/p7NBCk3ro/Y2yqXUU1KGopbJO2kXRWDpiSrckddpJMNaT
-         8JN0vm4VakBe5qYAE1LauCIHypP4rVLiNdo/xb8CPa6h3R+vwpSrX/VGelhrwvxjVXNO
-         R80w==
-X-Gm-Message-State: AOAM530lADNIRM8qTzx6gzxwGPkykeu2/4OBOKk/ItHwK+OTrN+BuVkM
-        bS0uXKJ9g21Orx/VJVdtvkLmRkb6Pxo=
-X-Google-Smtp-Source: ABdhPJwCyZhqIjXZ/JnODom9MckjBc3KG3jL3Z1GlJlLLf7cSRuqVDPWcNrRqb9VgkYBrhEbkLyaqQ==
-X-Received: by 2002:a2e:85c4:: with SMTP id h4mr4256148ljj.43.1591347837396;
-        Fri, 05 Jun 2020 02:03:57 -0700 (PDT)
-Received: from ix.localnet ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id w26sm510556ljj.114.2020.06.05.02.03.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 02:03:56 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: Re: [PATCH V2 2/2] tools/btpclient: Use mgmt api for limited discovery
-Date:   Fri, 05 Jun 2020 11:03:55 +0200
-Message-ID: <5360600.DvuYhMxLoT@ix>
-Organization: CODECOUP
-In-Reply-To: <20200605061003.14634-2-tedd.an@linux.intel.com>
-References: <20200605061003.14634-1-tedd.an@linux.intel.com> <20200605061003.14634-2-tedd.an@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mBqJKAR+TWCXiJFohsuhdpfPLPeWgkPLRuvS2j25SXc=;
+        b=WcvR5sOp2pchTzYrrZBsP4voE1g9PY3oH8WMWl8nd8oBzvbUJvaqCmNAsecKX5oNXS
+         oPGUzEg5/6IufnlHxrlfLC36WXr3A7HlfuKm38zvILcNF2rT26I2uIjCZnQMZ5+CqRIs
+         VLnkt6HRzyy56A7tlQci0/CbkRXHKDX3b0tOJjxeY+w4xfeJS8gHTxW5rOB9qkXrmbJD
+         bPaM4FE2OmCDpU2BmlMFe5HQX5g9UtWazk3b7ZWonGG2ixFugaQTqtooi4T69KQ5Pr9i
+         1nTFwd0lePsnVRfWq0N+kdP2VHzD1NSOMy0JTriPr5O96QulMB9y1KYpXur6Spw1U0Gc
+         95Eg==
+X-Gm-Message-State: AOAM532znjrnzFrM6RoxniJZ9sJkQrnVXkzPS0rdaxblRb6kU24SmDCv
+        OeC/FjufXP87IK9Pb0Ja/f/SYb9MF7OKCWF5NwFgSiU3
+X-Google-Smtp-Source: ABdhPJwdVqMMgpxHx/BvibVg2uyQPqNLQVaBkucncUGazDmngo311obnvzFZlUox6R+DgHP/hPFV4C3hIa4yiNDMpSs=
+X-Received: by 2002:a2e:998f:: with SMTP id w15mr4266343lji.463.1591350803950;
+ Fri, 05 Jun 2020 02:53:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20200505121918.Bluez.v2.1.I86c1e0e8933d92d8d76dcd95036bf325cfaeced0@changeid>
+ <CABBYNZLRDzBv_ES3HvuBEc1Jse8oxfbFe+5j8exgZ1NbKsnpRg@mail.gmail.com>
+In-Reply-To: <CABBYNZLRDzBv_ES3HvuBEc1Jse8oxfbFe+5j8exgZ1NbKsnpRg@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Fri, 5 Jun 2020 17:53:12 +0800
+Message-ID: <CAJQfnxHGL0VRB+TwRjM252j7rwXQH++8SqCXVK-H05bTg=ZyDg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2] tools/l2cap-tester: Add test for waiting
+ disconnection response
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ted,
+Hi Luiz,
 
-On Friday, 5 June 2020 08:10:03 CEST Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> There are a few test cases for limited discovery in GAP qualification
-> test suite. But the d-bus API doesn't support it and the only way to
-> start the limited discovery is using the management API.
-> 
-> This patch adds support for limited discovery by using management API.
+Please apply the HID patch, I have no update to that.
+However, I still encountered some other failures when executing HID
+tests qualification, but let's address them in a different patch.
 
-Isn't it enough by spec to check if limited discoverable flag is set?
-We provide this info in AdvertisingFlags so we should be conforming.
-
-Also, if we want to be able to explicitly do Limited Discovery this should be 
-added to SetDiscoveryFilter so that btpclient can stay D-Bus only.
-
-> ---
->  tools/btpclient.c | 194 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 187 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index f9c693056..46f866117 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -36,6 +36,10 @@
->  #include "lib/bluetooth.h"
->  #include "src/shared/btp.h"
-> 
-> +/* For BT_MGMT API */
-> +#include "lib/mgmt.h"
-> +#include "src/shared/mgmt.h"
-> +
->  #define AD_PATH "/org/bluez/advertising"
->  #define AG_PATH "/org/bluez/agent"
->  #define AD_IFACE "org.bluez.LEAdvertisement1"
-> @@ -77,6 +81,14 @@ static struct btp *btp;
-> 
->  static bool gap_service_registered;
-> 
-> +/* For BT_MGMT API */
-> +static struct mgmt *mgmt;
-> +static uint16_t mgmt_index;
-> +
-> +static uint32_t mgmt_flags;
-> +
-> +#define MGMT_OPS_DISCOVERY	0x01
-> +
->  struct ad_data {
->  	uint8_t data[25];
->  	uint8_t len;
-> @@ -1403,6 +1415,88 @@ static void set_discovery_filter_reply(struct
-> l_dbus_proxy *proxy, start_discovery_reply, NULL, NULL);
->  }
-> 
-> +#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-> +#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-> +#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-> +
-> +struct discovery_flags {
-> +	uint8_t flags;
-> +};
-> +
-> +static int btp_mgmt_start_limited_discovery(uint8_t flags)
-> +{
-> +	struct mgmt_cp_start_discovery cp;
-> +	uint8_t type = SCAN_TYPE_DUAL;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +
-> +	if (flags & (BTP_GAP_DISCOVERY_FLAG_LE |
-> +		     BTP_GAP_DISCOVERY_FLAG_BREDR)) {
-> +		type = SCAN_TYPE_DUAL;
-> +	} else if (flags & BTP_GAP_DISCOVERY_FLAG_LE) {
-> +		type &= ~SCAN_TYPE_BREDR;
-> +		type |= SCAN_TYPE_LE;
-> +	} else if (flags & BTP_GAP_DISCOVERY_FLAG_BREDR) {
-> +		type |= SCAN_TYPE_BREDR;
-> +		type &= ~SCAN_TYPE_LE;
-> +	}
-> +	cp.type = type;
-> +
-> +	return mgmt_send(mgmt, MGMT_OP_START_LIMITED_DISCOVERY, mgmt_index,
-> +			 sizeof(cp), &cp, NULL, NULL, NULL);
-> +}
-> +
-> +static void btp_mgmt_discovering_destroy(void *user_data)
-> +{
-> +	l_free(user_data);
-> +}
-> +
-> +static void btp_mgmt_discovering_cb(uint16_t index, uint16_t len,
-> +				    const void *param, void 
-*user_data)
-> +{
-> +	const struct mgmt_ev_discovering *ev = param;
-> +	struct discovery_flags *df = user_data;
-> +
-> +	if (len < sizeof(*ev)) {
-> +		l_error("Too short (%u bytes) discovering event", len);
-> +		return;
-> +	}
-> +
-> +	l_info("MGMT: discovering %s", ev->discovering ? "on" : "off");
-> +
-> +	/* Start new discovery */
-> +	if (ev->discovering == 0 && (mgmt_flags & MGMT_OPS_DISCOVERY))
-> +		btp_mgmt_start_limited_discovery(df->flags);
-> +}
-> +
-> +static void btp_mgmt_setup_limited_discovery(uint8_t index, uint8_t flags)
-> +{
-> +	int ret;
-> +	struct discovery_flags *df;
-> +
-> +	/* Saves the flags so it can be used to start new discovery */
-> +	df = l_new(struct discovery_flags, 1);
-> +	df->flags = flags;
-> +
-> +	/* Register event for discovering */
-> +	mgmt_register(mgmt, MGMT_EV_DISCOVERING, mgmt_index,
-> +		      btp_mgmt_discovering_cb, df,
-> +		      btp_mgmt_discovering_destroy);
-> +
-> +	ret = btp_mgmt_start_limited_discovery(flags);
-> +	if (ret == 0) {
-> +		l_error("Unable to send start_discovery cmd");
-> +		btp_send_error(btp, BTP_GAP_SERVICE, index, 
-BTP_ERROR_FAIL);
-> +		return;
-> +	}
-> +
-> +	/* Set flag that mgmt interface is used for scanning */
-> +	mgmt_flags |= MGMT_OPS_DISCOVERY;
-> +
-> +	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
-> +		 index, 0, NULL);
-> +}
-> +
->  static void btp_gap_start_discovery(uint8_t index, const void *param,
->  					uint16_t length, void 
-*user_data)
->  {
-> @@ -1423,10 +1517,17 @@ static void btp_gap_start_discovery(uint8_t index,
-> const void *param, return;
->  	}
-> 
-> -	l_dbus_proxy_method_call(adapter->proxy, "SetDiscoveryFilter",
-> -						
-set_discovery_filter_setup,
-> -						
-set_discovery_filter_reply,
-> -						L_UINT_TO_PTR(cp-
->flags), NULL);
-> +	/* Use BT MGMT interface to start limited discovery procedure since
-> +	 * it is not supported by D-BUS API
-> +	 */
-> +	if (cp->flags & BTP_GAP_DISCOVERY_FLAG_LIMITED)
-> +		btp_mgmt_setup_limited_discovery(index, cp->flags);
-> +	else {
-> +		l_dbus_proxy_method_call(adapter->proxy, 
-"SetDiscoveryFilter",
-> +					 set_discovery_filter_setup,
-> +					 set_discovery_filter_reply,
-> +					 L_UINT_TO_PTR(cp->flags), 
-NULL);
-> +	}
->  }
-> 
->  static void clear_discovery_filter_setup(struct l_dbus_message *message,
-> @@ -1501,6 +1602,29 @@ static void stop_discovery_reply(struct l_dbus_proxy
-> *proxy, NULL, NULL);
->  }
-> 
-> +static void btp_mgmt_stop_discovery(uint8_t index)
-> +{
-> +	struct mgmt_cp_stop_discovery cp;
-> +	int ret;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.type = SCAN_TYPE_DUAL;
-> +
-> +	ret = mgmt_send(mgmt, MGMT_OP_STOP_DISCOVERY, mgmt_index, 
-sizeof(cp),
-> +			&cp, NULL, NULL, NULL);
-> +	if (ret == 0) {
-> +		l_error("Unable to send stop_discovery cmd");
-> +		btp_send_error(btp, BTP_GAP_SERVICE, index, 
-BTP_ERROR_FAIL);
-> +		return;
-> +	}
-> +
-> +	/* Clear flag that mgmt interface is used for scanning */
-> +	mgmt_flags &= ~MGMT_OPS_DISCOVERY;
-> +
-> +	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
-> +		 index, 0, NULL);
-> +}
-> +
->  static void btp_gap_stop_discovery(uint8_t index, const void *param,
->  					uint16_t length, void 
-*user_data)
->  {
-> @@ -1520,8 +1644,14 @@ static void btp_gap_stop_discovery(uint8_t index,
-> const void *param, return;
->  	}
-> 
-> -	l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery", NULL,
-> -					stop_discovery_reply, NULL, 
-NULL);
-> +	/* If the discovery procedure is started by BT MGMT API for limited
-> +	 * discovering, it should be stopped by mgmt API.
-> +	 */
-> +	if (mgmt_flags & MGMT_OPS_DISCOVERY)
-> +		btp_mgmt_stop_discovery(index);
-> +	else
-> +		l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery", 
-NULL,
-> +					 stop_discovery_reply, NULL, 
-NULL);
->  }
-> 
->  static void connect_reply(struct l_dbus_proxy *proxy,
-> @@ -3140,6 +3270,7 @@ static void usage(void)
->  	l_info("\tbtpclient [options]");
->  	l_info("options:\n"
->  	"\t-s, --socket <socket>  Socket to use for BTP\n"
-> +	"\t-i, --index <id>       Specify the adapter index\n"
->  	"\t-q, --quiet            Don't emit any logs\n"
->  	"\t-v, --version          Show version\n"
->  	"\t-h, --help             Show help options");
-> @@ -3147,12 +3278,52 @@ static void usage(void)
-> 
->  static const struct option options[] = {
->  	{ "socket",	1, 0, 's' },
-> +	{ "index",	1, 0, 'i' },
->  	{ "quiet",	0, 0, 'q' },
->  	{ "version",	0, 0, 'v' },
->  	{ "help",	0, 0, 'h' },
->  	{ 0, 0, 0, 0 }
->  };
-> 
-> +static void set_index(const char *arg)
-> +{
-> +	/* Use default index 0 */
-> +	if (!arg || !strcmp(arg, "none") || !strcmp(arg, "any") ||
-> +						!strcmp(arg, 
-"all"))
-> +		mgmt_index = MGMT_INDEX_NONE;
-> +	else if (strlen(arg) > 3 && !strncasecmp(arg, "hci", 3))
-> +		mgmt_index = atoi(&arg[3]);
-> +	else
-> +		mgmt_index = atoi(arg);
-> +}
-> +
-> +static int btp_mgmt_init(const char *index_opt)
-> +{
-> +	mgmt = mgmt_new_default();
-> +	if (!mgmt) {
-> +		l_info("Unable to open mgmt_socket\n");
-> +		return EXIT_FAILURE;
-> +	}
-> +
-> +	if (index_opt)
-> +		set_index(index_opt);
-> +
-> +	if (mgmt_index == MGMT_INDEX_NONE)
-> +		mgmt_index = 0;
-> +
-> +	return EXIT_SUCCESS;
-> +}
-> +
-> +static void btp_mgmt_release(void)
-> +{
-> +	l_error("MGMT: Release all management resources");
-> +	mgmt_cancel_all(mgmt);
-> +	mgmt_unregister_all(mgmt);
-> +	mgmt_unref(mgmt);
-> +}
-> +
-> +static const char *index_opt;
-> +
->  int main(int argc, char *argv[])
->  {
->  	struct l_dbus_client *client;
-> @@ -3160,7 +3331,8 @@ int main(int argc, char *argv[])
-> 
->  	l_log_set_stderr();
-> 
-> -	while ((opt = getopt_long(argc, argv, "+hs:vq", options, NULL)) != 
--1) {
-> +	while ((opt = getopt_long(argc, argv, "+hs:vqi:", options,
-> +								
-NULL)) != -1) {
->  		switch (opt) {
->  		case 's':
->  			socket_path = l_strdup(optarg);
-> @@ -3173,6 +3345,9 @@ int main(int argc, char *argv[])
->  		case 'v':
->  			l_info("%s", VERSION);
->  			return EXIT_SUCCESS;
-> +		case 'i':
-> +			index_opt = l_strdup(optarg);
-> +			break;
->  		case 'h':
->  		default:
->  			usage();
-> @@ -3189,6 +3364,10 @@ int main(int argc, char *argv[])
->  	if (!l_main_init())
->  		return EXIT_FAILURE;
-> 
-> +	if (btp_mgmt_init(index_opt)) {
-> +		l_error("Unable to initialize the management interface");
-> +		return EXIT_FAILURE;
-> +	}
-> 
->  	adapters = l_queue_new();
-> 
-> @@ -3210,6 +3389,7 @@ int main(int argc, char *argv[])
->  	l_dbus_client_destroy(client);
->  	l_dbus_destroy(dbus);
->  	btp_cleanup(btp);
-> +	btp_mgmt_release();
-> 
->  	l_queue_destroy(adapters, (l_queue_destroy_func_t)btp_adapter_free);
+Thanks,
+Archie
 
 
--- 
-pozdrawiam
-Szymon Janc
-
-
+On Fri, 5 Jun 2020 at 05:28, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Mon, May 4, 2020 at 9:29 PM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > This is to test the behaviour of L2CAP channel when closed with
+> > shut_down(sock, SHUT_WR). In this case, we should wait until we
+> > receive a disconnection response before raising G_IO_HUP.
+> > ---
+> >
+> > Changes in v2:
+> > - Fix compile error in android/tester-main.c
+> >
+> >  android/tester-main.c |  2 +-
+> >  emulator/bthost.c     | 17 ++++++++++-
+> >  emulator/bthost.h     |  5 +++-
+> >  tools/l2cap-tester.c  | 65 ++++++++++++++++++++++++++++++++++++++-----
+> >  tools/rfcomm-tester.c |  2 +-
+> >  5 files changed, 80 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/android/tester-main.c b/android/tester-main.c
+> > index 3c5af299f..9a14b2899 100644
+> > --- a/android/tester-main.c
+> > +++ b/android/tester-main.c
+> > @@ -2867,7 +2867,7 @@ void emu_add_l2cap_server_action(void)
+> >         bthost = hciemu_client_get_host(data->hciemu);
+> >
+> >         bthost_add_l2cap_server(bthost, l2cap_data->psm, l2cap_data->func,
+> > -                                                       l2cap_data->user_data);
+> > +                                               NULL, l2cap_data->user_data);
+> >
+> >         step->action_status = BT_STATUS_SUCCESS;
+> >
+> > diff --git a/emulator/bthost.c b/emulator/bthost.c
+> > index 0fa283464..71d5f97bb 100644
+> > --- a/emulator/bthost.c
+> > +++ b/emulator/bthost.c
+> > @@ -180,6 +180,7 @@ struct l2cap_pending_req {
+> >  struct l2cap_conn_cb_data {
+> >         uint16_t psm;
+> >         bthost_l2cap_connect_cb func;
+> > +       bthost_l2cap_disconnect_cb disconn_func;
+> >         void *user_data;
+> >         struct l2cap_conn_cb_data *next;
+> >  };
+> > @@ -1510,7 +1511,9 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+> >                                 uint8_t ident, const void *data, uint16_t len)
+> >  {
+> >         const struct bt_l2cap_pdu_disconn_req *req = data;
+> > +       struct l2cap_conn_cb_data *cb_data;
+> >         struct bt_l2cap_pdu_disconn_rsp rsp;
+> > +       struct l2conn *l2conn;
+> >
+> >         if (len < sizeof(*req))
+> >                 return false;
+> > @@ -1522,6 +1525,15 @@ static bool l2cap_disconn_req(struct bthost *bthost, struct btconn *conn,
+> >         l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_DISCONN_RSP, ident, &rsp,
+> >                                                                 sizeof(rsp));
+> >
+> > +       l2conn = btconn_find_l2cap_conn_by_scid(conn, rsp.scid);
+> > +       if (!l2conn)
+> > +               return true;
+> > +
+> > +       cb_data = bthost_find_l2cap_cb_by_psm(bthost, l2conn->psm);
+> > +
+> > +       if (cb_data && cb_data->disconn_func)
+> > +               cb_data->disconn_func(cb_data->user_data);
+> > +
+> >         return true;
+> >  }
+> >
+> > @@ -2553,7 +2565,9 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
+> >  }
+> >
+> >  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+> > -                               bthost_l2cap_connect_cb func, void *user_data)
+> > +                               bthost_l2cap_connect_cb func,
+> > +                               bthost_l2cap_disconnect_cb disconn_func,
+> > +                               void *user_data)
+> >  {
+> >         struct l2cap_conn_cb_data *data;
+> >
+> > @@ -2564,6 +2578,7 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+> >         data->psm = psm;
+> >         data->user_data = user_data;
+> >         data->func = func;
+> > +       data->disconn_func = disconn_func;
+> >         data->next = bthost->new_l2cap_conn_data;
+> >
+> >         bthost->new_l2cap_conn_data = data;
+> > diff --git a/emulator/bthost.h b/emulator/bthost.h
+> > index b5f36964d..2b347136f 100644
+> > --- a/emulator/bthost.h
+> > +++ b/emulator/bthost.h
+> > @@ -100,9 +100,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
+> >                                                         const uint8_t ltk[16]);
+> >  typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
+> >                                                         void *user_data);
+> > +typedef void (*bthost_l2cap_disconnect_cb) (void *user_data);
+> >
+> >  void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+> > -                               bthost_l2cap_connect_cb func, void *user_data);
+> > +                               bthost_l2cap_connect_cb func,
+> > +                               bthost_l2cap_disconnect_cb disconn_func,
+> > +                               void *user_data);
+> >
+> >  void bthost_set_sc_support(struct bthost *bthost, bool enable);
+> >
+> > diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+> > index 844ff2b46..1ef4e9213 100644
+> > --- a/tools/l2cap-tester.c
+> > +++ b/tools/l2cap-tester.c
+> > @@ -55,6 +55,7 @@ struct test_data {
+> >         uint16_t dcid;
+> >         int sk;
+> >         int sk2;
+> > +       bool host_disconnected;
+> >  };
+> >
+> >  struct l2cap_data {
+> > @@ -93,6 +94,8 @@ struct l2cap_data {
+> >         bool server_not_advertising;
+> >         bool direct_advertising;
+> >         bool close_1;
+> > +
+> > +       bool shut_sock_wr;
+> >  };
+> >
+> >  static void mgmt_debug(const char *str, void *user_data)
+> > @@ -316,6 +319,12 @@ static const struct l2cap_data client_connect_write_success_test = {
+> >         .data_len = sizeof(l2_data),
+> >  };
+> >
+> > +static const struct l2cap_data client_connect_shut_wr_success_test = {
+> > +       .client_psm = 0x1001,
+> > +       .server_psm = 0x1001,
+> > +       .shut_sock_wr = true,
+> > +};
+> > +
+> >  static const struct l2cap_data client_connect_nval_psm_test_1 = {
+> >         .client_psm = 0x1001,
+> >         .expect_err = ECONNREFUSED,
+> > @@ -967,6 +976,27 @@ static void server_bthost_received_data(const void *buf, uint16_t len,
+> >                 tester_test_passed();
+> >  }
+> >
+> > +static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
+> > +                                                       gpointer user_data)
+> > +{
+> > +       struct test_data *data = tester_get_data();
+> > +       const struct l2cap_data *l2data = data->test_data;
+> > +
+> > +       if (l2data->shut_sock_wr) {
+> > +               /* if socket is closed using SHUT_WR, L2CAP disconnection
+> > +                * response must be received first before G_IO_HUP event.
+> > +                */
+> > +               if (data->host_disconnected)
+> > +                       tester_test_passed();
+> > +               else {
+> > +                       tester_warn("G_IO_HUP received before receiving L2CAP disconnection");
+> > +                       tester_test_failed();
+> > +               }
+> > +       }
+> > +
+> > +       return FALSE;
+> > +}
+> > +
+> >  static bool check_mtu(struct test_data *data, int sk)
+> >  {
+> >         const struct l2cap_data *l2data = data->test_data;
+> > @@ -1062,6 +1092,11 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+> >                         tester_test_failed();
+> >                 }
+> >
+> > +               return FALSE;
+> > +       } else if (l2data->shut_sock_wr) {
+> > +               g_io_add_watch(io, G_IO_HUP, socket_closed_cb, NULL);
+> > +               shutdown(sk, SHUT_WR);
+> > +
+> >                 return FALSE;
+> >         }
+> >
+> > @@ -1214,6 +1249,13 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+> >         data->handle = handle;
+> >  }
+> >
+> > +static void client_l2cap_disconnect_cb(void *user_data)
+> > +{
+> > +       struct test_data *data = user_data;
+> > +
+> > +       data->host_disconnected = true;
+> > +}
+> > +
+> >  static void direct_adv_cmd_complete(uint16_t opcode, const void *param,
+> >                                                 uint8_t len, void *user_data)
+> >  {
+> > @@ -1254,13 +1296,18 @@ static void test_connect(const void *test_data)
+> >
+> >         if (l2data->server_psm) {
+> >                 struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+> > +               bthost_l2cap_connect_cb host_connect_cb = NULL;
+> > +               bthost_l2cap_disconnect_cb host_disconnect_cb = NULL;
+> >
+> > -               if (!l2data->data_len)
+> > -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
+> > -                                               NULL, NULL);
+> > -               else
+> > -                       bthost_add_l2cap_server(bthost, l2data->server_psm,
+> > -                                               client_l2cap_connect_cb, data);
+> > +               if (l2data->data_len)
+> > +                       host_connect_cb = client_l2cap_connect_cb;
+> > +
+> > +               if (l2data->shut_sock_wr)
+> > +                       host_disconnect_cb = client_l2cap_disconnect_cb;
+> > +
+> > +               bthost_add_l2cap_server(bthost, l2data->server_psm,
+> > +                                       host_connect_cb, host_disconnect_cb,
+> > +                                       data);
+> >         }
+> >
+> >         if (l2data->direct_advertising)
+> > @@ -1639,7 +1686,7 @@ static void test_connect_2(const void *test_data)
+> >
+> >                 if (!l2data->data_len)
+> >                         bthost_add_l2cap_server(bthost, l2data->server_psm,
+> > -                                               NULL, NULL);
+> > +                                               NULL, NULL, NULL);
+> >         }
+> >
+> >         defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
+> > @@ -1927,6 +1974,10 @@ int main(int argc, char *argv[])
+> >                                         &client_connect_nval_psm_test_3,
+> >                                         setup_powered_client, test_connect);
+> >
+> > +       test_l2cap_bredr("L2CAP BR/EDR Client - Socket Shut WR Success",
+> > +                                       &client_connect_shut_wr_success_test,
+> > +                                       setup_powered_client, test_connect);
+> > +
+> >         test_l2cap_bredr("L2CAP BR/EDR Server - Success",
+> >                                         &l2cap_server_success_test,
+> >                                         setup_powered_server, test_server);
+> > diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+> > index b20d70d58..2d3be27d8 100644
+> > --- a/tools/rfcomm-tester.c
+> > +++ b/tools/rfcomm-tester.c
+> > @@ -548,7 +548,7 @@ static void test_connect(const void *test_data)
+> >         GIOChannel *io;
+> >         int sk;
+> >
+> > -       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
+> > +       bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL, NULL);
+> >         bthost_add_rfcomm_server(bthost, cli->server_channel,
+> >                                                 rfcomm_connect_cb, NULL);
+> >
+> > --
+> > 2.26.2.526.g744177e7f7-goog
+>
+> Applied, thanks. Btw do you want me to apply the HID patch or do you
+> have an update to that?
+>
+> --
+> Luiz Augusto von Dentz
