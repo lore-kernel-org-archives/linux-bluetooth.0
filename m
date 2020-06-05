@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4E6C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 00:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A843C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 00:12:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B67762065C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 00:12:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E1E82065C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 00:12:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hrWC2BvY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iRZ4HdqI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726060AbgFEAMs (ORCPT
+        id S1726068AbgFEAMu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jun 2020 20:12:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
+        Thu, 4 Jun 2020 20:12:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbgFEAMs (ORCPT
+        with ESMTP id S1725986AbgFEAMu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jun 2020 20:12:48 -0400
+        Thu, 4 Jun 2020 20:12:50 -0400
 Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC446C08C5C0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 17:12:46 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id n141so8183073qke.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 17:12:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46788C08C5C0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 17:12:49 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id b27so8161806qka.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 17:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=xVowTHGCvoECuNd+5F586Wj77rtkM2T8VHbhnc/jbW0=;
-        b=hrWC2BvY0SXqqJc1u+E+nPvnxSZCu6RWtMVOk9zBCZeY8pXHX7HgAupDx5s/wzzFi0
-         FZMHjIZzOVDvV6Px3tNT4V3Aj4ZN0V7oM5c5XOGimEqC0HPy72853d6/2jwg8ABNfMHf
-         AKA2kPWqYmCFYkhoYdzmmF01H3MB50qGD1re2Tas8GBGNOndLJ33IHEsKAuErKwMMmsg
-         6DjBDeb/iD8GyS2kaC4le3lT+HQDd/jMGwbJ89VVqXYbu0heavLFwrKDgi2PWj/5pWsl
-         xq9QYvt0w/LV9IgRNG6COQaU1ye4EpO7Kuqm2craniT3/FoV/d+oi5FMNIJSY5fwAmaJ
-         LNuw==
+        bh=hc1osGXZBqZMEbdtS21QOC2f6qIo9WDKdYyGEqk70po=;
+        b=iRZ4HdqI11HXeMd0erG/NMBxzXFhMtIiUaifVb+X+bf89NG9TxnRnbgbcdShqAzokX
+         zi3a5jETB7l9bntyN2/EgkXmqNGbNJJB9ogRdQhTkyanjXXAbKO0V7JFgQk9D8Y/AE0h
+         2o94MgIeKB7Sj6i203mpLOj692Y6//RlTgE7my5fB+cLM9JjMtpouX3skxSs7KlIYfcm
+         mqSQH6wa5Uy/VmouYsVlw1EsNTRSLdajNUyGYZjlkpY/dTqn+829gJYF7xYCKz03I2xR
+         I0fJqM6/3saoE2SFAPBNfW5dkq7wJy9duvKtBIruAWxDdzWiPpd0cK+p3lqHK3Xgk4Sz
+         PfSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=xVowTHGCvoECuNd+5F586Wj77rtkM2T8VHbhnc/jbW0=;
-        b=lDX4oKZIOQ1yp6k0CSoNXWA11CmcskFhDwanpJu6WaCsToVf6FPf+MfF0Y8v0YOUrH
-         wDm3H1dPsVmRUjJXNv2tpQRO6SY7qJnRLrQGCcrJjZ0gQGjRQ8RBtYkucwqrv4sxb8S8
-         G2KMYfFcMMIBXgQ7WquiN8cTYTJuaDQuynkB5xS/K5XSBst9YN6U/AFYOkbYhiXdZ2Aw
-         PiQwWPw9kp/rMCKhWxF1FcGRxbSWeyXKJDMxZLW+VYSrW96QUzhBkrkaVYEZ1Uu2RLC2
-         8xAQc1GhhT1JMxHLUQvBAVh4vYtzhvyB4elCPIuVbIcdh66JW0a2xBuo6ALyDhu8yMdO
-         z/Gg==
-X-Gm-Message-State: AOAM532yzcxA+0XC2WdbU7k5FrBYPqhpH7pI3hY53ez2HxgcJcoXMF/8
-        vDobyx95pQpkc3a9codt9nOaGDGuv78=
-X-Google-Smtp-Source: ABdhPJzd4lLygW7bc/YwGWt8bE3gJ3XhpwB7hMIRT9bHhWcwp2iag3nxWyTkN77Jb5yoI84CQjhIVA==
-X-Received: by 2002:a05:620a:c87:: with SMTP id q7mr7383446qki.31.1591315966111;
-        Thu, 04 Jun 2020 17:12:46 -0700 (PDT)
+        bh=hc1osGXZBqZMEbdtS21QOC2f6qIo9WDKdYyGEqk70po=;
+        b=fdhp4SG7TCaI8TNiGj1iUBmGlfabiEWlGpKRSFdZ/NoQbON/kHZTenST6iLUsiCHHd
+         Ft7mSOWz6j3tmVkcEP8mv8tt8pTt1KqKcB2Ug4YiRqyTob2hrr77ObB5XfGZqQ4YNTeD
+         Ezx8kusaLTExuB+CuB81xOdJ6VfLixzfdoZQIS+ftMkOTKiHe03o84d+zYV+hBcoypc9
+         Herg8qtAu2nuZTpOe+odoFmva0pvX7eTzbzg4LikhvXNem23qKNftT8PLEhdKd7Tw/6i
+         XDky9GubTJTYYCycQ8QU1P0vdZLrSSxAhDKPe67qrh4uU+qHg+SP8MoRA6goumuEPeTC
+         xyCA==
+X-Gm-Message-State: AOAM533k6yaJ3XICRjoMv8ZoqrlgUHg/8M2EsrHh8w/p9D3FbVhiTzUu
+        MX8rzCMcI4vvhu1Hknvr55H07ehgtmw=
+X-Google-Smtp-Source: ABdhPJwPrD4izc7MgpscvBXLPxRr9X1kEIW3IEAtLibv+PejOpkx3WuzcGGVotBSd9EyiWX2WDTeag==
+X-Received: by 2002:a05:620a:14b6:: with SMTP id x22mr7137616qkj.448.1591315968462;
+        Thu, 04 Jun 2020 17:12:48 -0700 (PDT)
 Received: from [172.17.0.2] ([52.138.85.28])
-        by smtp.gmail.com with ESMTPSA id r57sm6758012qtr.41.2020.06.04.17.12.45
+        by smtp.gmail.com with ESMTPSA id d14sm6113085qtr.17.2020.06.04.17.12.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 17:12:45 -0700 (PDT)
-Message-ID: <5ed98dfd.1c69fb81.aa9e5.6148@mx.google.com>
-Date:   Thu, 04 Jun 2020 17:12:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0776810541008128068=="
+        Thu, 04 Jun 2020 17:12:48 -0700 (PDT)
+Message-ID: <5ed98e00.1c69fb81.34673.28af@mx.google.com>
+Date:   Thu, 04 Jun 2020 17:12:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8324068411868692985=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, pali@kernel.org
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0776810541008128068==
+--===============8324068411868692985==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,24 +89,10 @@ While we are preparing for reviewing the patches, we found the following
 issue/warning.
 
 Test Result:
-checkpatch Failed
+checkgitlint Failed
 
 Outputs:
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#8: 
-bluetoothd[19117]: profiles/sap/server.c:sap_server_register() Sap driver initialization failed.
-
-- total: 0 errors, 1 warnings, 15 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+5: B1 Line exceeds max length (96>80): "bluetoothd[19117]: profiles/sap/server.c:sap_server_register() Sap driver initialization failed."
 
 
 
@@ -114,4 +100,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============0776810541008128068==--
+--===============8324068411868692985==--
