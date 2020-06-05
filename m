@@ -2,437 +2,137 @@ Return-Path: <SRS0=pjei=7S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678A0C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469BAC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CFEC207D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:15:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21AF4207ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow0e9HXK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+fhvl9+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726989AbgFESPh (ORCPT
+        id S1726836AbgFESRr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 14:15:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
+        Fri, 5 Jun 2020 14:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726964AbgFESPh (ORCPT
+        with ESMTP id S1726171AbgFESRq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 14:15:37 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109F5C08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:15:37 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id b8so9036082oic.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:15:37 -0700 (PDT)
+        Fri, 5 Jun 2020 14:17:46 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865CDC08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:17:46 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id m7so4042114plt.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:17:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7IEbgjt4KyxFD8jbnquIQCUe7UxKSu+DX3xxPyoblSI=;
-        b=Ow0e9HXKOTDJg4d5mtJJ+AxW9ngeb7bbQOT131IUNHJZARDnqNjyRcuCm6OBiE0PnI
-         n4144f07408ecLtgJ8petwHJqedYiS0Qod7FmYbxwdwiQfWChZV4/+l8MZOd/ZiSENaa
-         yO6HxNEZKNBDKghSOIrK7ndXHHRYZyxIA5AAzqf4oMmzwZk8v9v7soL9+H7KA8Zkx0Ev
-         D+Kqk06kIeH6H31lGxYb2yjajIHK2oe/KNXzIcbo7AYySCp6mbYN5BHzOKXq9wwneQ+6
-         GtPDLD1UsdWH+PirW7+UHL+HWV9Hv+MDlk5VBGi8tQKIqgVNxzZGF6zhn70hu6ACbzUS
-         QMZg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9wnUBnIGiHnmupdesTjLijqyj8kpX2av7C0AkM6kHts=;
+        b=k+fhvl9+/6tntmynY+bgKj0/EKBvrNlsVOKmT7er8YOdbCVqUMtCLADFd3z2NHh2TL
+         2zOEprhcFhIwYOdcXgNV02eA5Ly05N2SqncRHX4KNZ5GqnLX2uo7GX6IP3mGaZfC0Wv5
+         5qs7luts49yrMpVHCcB8QEqObXOvbWY5YieETr6udTIMdum1LDuk4sklyrzszGyF1+yU
+         9dJZ43knSgwBdQ2TWpzFEuxKe4+FtMQfk0mTA/NgkJ7BQZKW9/h9XPQ8/8dY13j0Keyk
+         XB51WPvbYI3q35Pxtn9zZjSR8BImf6AJQx0nWPjmJi8swMqapdxiOkKIWF23h+47plQH
+         pbDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7IEbgjt4KyxFD8jbnquIQCUe7UxKSu+DX3xxPyoblSI=;
-        b=tVVLD8B60lP3SywVkVr8Zf8XQTfMO171gqYYZjJl/0ylfi+wcboMb0PNpZgfB/QklC
-         3yGNGIdvbYTbsruS0STMZoV1X0lFUClnDqOH4u7rQt1UE1n7UgG7SfJL+5VCHhb43Rbf
-         PKpT+eZkfCwge9aWYYB7RCQPrzD6e8BWZ9wQwTxcdsnioOKXncol6s6SNqD5bWO6TIx/
-         cCa1+aZ6lCtniiWz5dMw7rSowt8aPkzmahqCXWJayuGeLx/NtVwqN/6sbY7aioMGEv8+
-         n51oshwxRUq6YSS6jMqjN0hc3Eb/Upp0tRAXDXpUJbv1k7RRwilEtZP8v9QZXrS31Bk0
-         Xe/g==
-X-Gm-Message-State: AOAM530I7S53haq5EHL1kMmGLHtFcYZY9kC0JlNJdSVoi57SGoC95f3X
-        zixY7aHb32fq9rINYK3DBslv6zBtyD9iudXnALe+qUY2
-X-Google-Smtp-Source: ABdhPJxjVOhDaoHFe3j1oqag1JjIvef3T7hxs2+F7vSt0TQS8rIyEyxsSpaXLe0kY83bP1SXJCwei77Bs7MaIJOPxDs=
-X-Received: by 2002:a05:6808:b32:: with SMTP id t18mr2615126oij.82.1591380936282;
- Fri, 05 Jun 2020 11:15:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200605061003.14634-1-tedd.an@linux.intel.com>
- <20200605061003.14634-2-tedd.an@linux.intel.com> <5360600.DvuYhMxLoT@ix> <CABBYNZKtmeEKS-U9mbr3_UBPU9wnnc=xegguLNkvEia5BndGrA@mail.gmail.com>
-In-Reply-To: <CABBYNZKtmeEKS-U9mbr3_UBPU9wnnc=xegguLNkvEia5BndGrA@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9wnUBnIGiHnmupdesTjLijqyj8kpX2av7C0AkM6kHts=;
+        b=Hwpfj33KaKG0vlrf+QCA6H4ynMQj3MMi1VFObxLQPykpx1IqX/C6COuhul+zMxYe0M
+         +2GyPnM4/YY1NF0qUuTj3RU+0jsUfX1KJGLpD6SB2WvGXh2Yvnk+IBHkKSsVPUIoOvYJ
+         Wp99RdLwHdwftxvyYCM2Qs/9rHcUiWEieKZG1gpkvcc5/I0ddBuW08dDFCoOfgjHf5S0
+         MehDmEZ7FW8TtbJK4nuDopcANTOnwfdq86sqKxuHHjaajIkA5WrHtS8293tDspt6RTB4
+         jkBJUznbKtJIpnD28mbGMKFKC8jYhpRfUfp7n6v/GylIV0Pt/hDkJ6L38nxxdObh4trH
+         g3IQ==
+X-Gm-Message-State: AOAM530nBln9Vnec2lid45k6QfKkeLbJHxd9lCVT6tE/uS+1Cu08r05U
+        FPbyfQesCe9CeTuqgTXtr5Fpb0Lj
+X-Google-Smtp-Source: ABdhPJy4WJ76BqL9lYkPz+oCfwqyl4UORPTtDIqa6Ahr2kfRLyypZ/GJEE2qNDZWgnhy5zRQi7h1RQ==
+X-Received: by 2002:a17:90a:394b:: with SMTP id n11mr4563058pjf.100.1591381065602;
+        Fri, 05 Jun 2020 11:17:45 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id y5sm221385pgl.85.2020.06.05.11.17.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2020 11:17:44 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 5 Jun 2020 11:15:24 -0700
-Message-ID: <CABBYNZ+Y78pJawotYwXPWVQ8UJMJaCHmHWxCPVGA-9FX+z_Uqw@mail.gmail.com>
-Subject: Re: [PATCH V2 2/2] tools/btpclient: Use mgmt api for limited discovery
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@linux.intel.com>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/2] shared/ad: Add defines for possible flags
+Date:   Fri,  5 Jun 2020 11:17:42 -0700
+Message-Id: <20200605181743.720661-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jun 5, 2020 at 10:22 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Tedd,
->
-> On Fri, Jun 5, 2020 at 2:09 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> >
-> > Hi Ted,
-> >
-> > On Friday, 5 June 2020 08:10:03 CEST Tedd Ho-Jeong An wrote:
-> > > From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > >
-> > > There are a few test cases for limited discovery in GAP qualification
-> > > test suite. But the d-bus API doesn't support it and the only way to
-> > > start the limited discovery is using the management API.
-> > >
-> > > This patch adds support for limited discovery by using management API.
-> >
-> > Isn't it enough by spec to check if limited discoverable flag is set?
-> > We provide this info in AdvertisingFlags so we should be conforming.
-> >
-> > Also, if we want to be able to explicitly do Limited Discovery this should be
-> > added to SetDiscoveryFilter so that btpclient can stay D-Bus only.
->
-> We should probably use DiscoverableTimeout to indicate a limited
-> discoverable flag instead of general discoverable, I will send a patch
-> for that.
+This adds defines for limited disverable, general discoveral and BR/EDR
+not supported.
+---
+ src/advertising.c | 9 +++++----
+ src/shared/ad.h   | 5 +++++
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-In fact it is already supported:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n1067
-
-Though there is a small bug related to it that it doesn't set NO_BREDR
-in case the adapter global discoverable is not set, but Ive send a fix
-for that.
-
-> > > ---
-> > >  tools/btpclient.c | 194 ++++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 187 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/tools/btpclient.c b/tools/btpclient.c
-> > > index f9c693056..46f866117 100644
-> > > --- a/tools/btpclient.c
-> > > +++ b/tools/btpclient.c
-> > > @@ -36,6 +36,10 @@
-> > >  #include "lib/bluetooth.h"
-> > >  #include "src/shared/btp.h"
-> > >
-> > > +/* For BT_MGMT API */
-> > > +#include "lib/mgmt.h"
-> > > +#include "src/shared/mgmt.h"
-> > > +
-> > >  #define AD_PATH "/org/bluez/advertising"
-> > >  #define AG_PATH "/org/bluez/agent"
-> > >  #define AD_IFACE "org.bluez.LEAdvertisement1"
-> > > @@ -77,6 +81,14 @@ static struct btp *btp;
-> > >
-> > >  static bool gap_service_registered;
-> > >
-> > > +/* For BT_MGMT API */
-> > > +static struct mgmt *mgmt;
-> > > +static uint16_t mgmt_index;
-> > > +
-> > > +static uint32_t mgmt_flags;
-> > > +
-> > > +#define MGMT_OPS_DISCOVERY   0x01
-> > > +
-> > >  struct ad_data {
-> > >       uint8_t data[25];
-> > >       uint8_t len;
-> > > @@ -1403,6 +1415,88 @@ static void set_discovery_filter_reply(struct
-> > > l_dbus_proxy *proxy, start_discovery_reply, NULL, NULL);
-> > >  }
-> > >
-> > > +#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-> > > +#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-> > > +#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-> > > +
-> > > +struct discovery_flags {
-> > > +     uint8_t flags;
-> > > +};
-> > > +
-> > > +static int btp_mgmt_start_limited_discovery(uint8_t flags)
-> > > +{
-> > > +     struct mgmt_cp_start_discovery cp;
-> > > +     uint8_t type = SCAN_TYPE_DUAL;
-> > > +
-> > > +     memset(&cp, 0, sizeof(cp));
-> > > +
-> > > +     if (flags & (BTP_GAP_DISCOVERY_FLAG_LE |
-> > > +                  BTP_GAP_DISCOVERY_FLAG_BREDR)) {
-> > > +             type = SCAN_TYPE_DUAL;
-> > > +     } else if (flags & BTP_GAP_DISCOVERY_FLAG_LE) {
-> > > +             type &= ~SCAN_TYPE_BREDR;
-> > > +             type |= SCAN_TYPE_LE;
-> > > +     } else if (flags & BTP_GAP_DISCOVERY_FLAG_BREDR) {
-> > > +             type |= SCAN_TYPE_BREDR;
-> > > +             type &= ~SCAN_TYPE_LE;
-> > > +     }
-> > > +     cp.type = type;
-> > > +
-> > > +     return mgmt_send(mgmt, MGMT_OP_START_LIMITED_DISCOVERY, mgmt_index,
-> > > +                      sizeof(cp), &cp, NULL, NULL, NULL);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_discovering_destroy(void *user_data)
-> > > +{
-> > > +     l_free(user_data);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_discovering_cb(uint16_t index, uint16_t len,
-> > > +                                 const void *param, void
-> > *user_data)
-> > > +{
-> > > +     const struct mgmt_ev_discovering *ev = param;
-> > > +     struct discovery_flags *df = user_data;
-> > > +
-> > > +     if (len < sizeof(*ev)) {
-> > > +             l_error("Too short (%u bytes) discovering event", len);
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     l_info("MGMT: discovering %s", ev->discovering ? "on" : "off");
-> > > +
-> > > +     /* Start new discovery */
-> > > +     if (ev->discovering == 0 && (mgmt_flags & MGMT_OPS_DISCOVERY))
-> > > +             btp_mgmt_start_limited_discovery(df->flags);
-> > > +}
-> > > +
-> > > +static void btp_mgmt_setup_limited_discovery(uint8_t index, uint8_t flags)
-> > > +{
-> > > +     int ret;
-> > > +     struct discovery_flags *df;
-> > > +
-> > > +     /* Saves the flags so it can be used to start new discovery */
-> > > +     df = l_new(struct discovery_flags, 1);
-> > > +     df->flags = flags;
-> > > +
-> > > +     /* Register event for discovering */
-> > > +     mgmt_register(mgmt, MGMT_EV_DISCOVERING, mgmt_index,
-> > > +                   btp_mgmt_discovering_cb, df,
-> > > +                   btp_mgmt_discovering_destroy);
-> > > +
-> > > +     ret = btp_mgmt_start_limited_discovery(flags);
-> > > +     if (ret == 0) {
-> > > +             l_error("Unable to send start_discovery cmd");
-> > > +             btp_send_error(btp, BTP_GAP_SERVICE, index,
-> > BTP_ERROR_FAIL);
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     /* Set flag that mgmt interface is used for scanning */
-> > > +     mgmt_flags |= MGMT_OPS_DISCOVERY;
-> > > +
-> > > +     btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
-> > > +              index, 0, NULL);
-> > > +}
-> > > +
-> > >  static void btp_gap_start_discovery(uint8_t index, const void *param,
-> > >                                       uint16_t length, void
-> > *user_data)
-> > >  {
-> > > @@ -1423,10 +1517,17 @@ static void btp_gap_start_discovery(uint8_t index,
-> > > const void *param, return;
-> > >       }
-> > >
-> > > -     l_dbus_proxy_method_call(adapter->proxy, "SetDiscoveryFilter",
-> > > -
-> > set_discovery_filter_setup,
-> > > -
-> > set_discovery_filter_reply,
-> > > -                                             L_UINT_TO_PTR(cp-
-> > >flags), NULL);
-> > > +     /* Use BT MGMT interface to start limited discovery procedure since
-> > > +      * it is not supported by D-BUS API
-> > > +      */
-> > > +     if (cp->flags & BTP_GAP_DISCOVERY_FLAG_LIMITED)
-> > > +             btp_mgmt_setup_limited_discovery(index, cp->flags);
-> > > +     else {
-> > > +             l_dbus_proxy_method_call(adapter->proxy,
-> > "SetDiscoveryFilter",
-> > > +                                      set_discovery_filter_setup,
-> > > +                                      set_discovery_filter_reply,
-> > > +                                      L_UINT_TO_PTR(cp->flags),
-> > NULL);
-> > > +     }
-> > >  }
-> > >
-> > >  static void clear_discovery_filter_setup(struct l_dbus_message *message,
-> > > @@ -1501,6 +1602,29 @@ static void stop_discovery_reply(struct l_dbus_proxy
-> > > *proxy, NULL, NULL);
-> > >  }
-> > >
-> > > +static void btp_mgmt_stop_discovery(uint8_t index)
-> > > +{
-> > > +     struct mgmt_cp_stop_discovery cp;
-> > > +     int ret;
-> > > +
-> > > +     memset(&cp, 0, sizeof(cp));
-> > > +     cp.type = SCAN_TYPE_DUAL;
-> > > +
-> > > +     ret = mgmt_send(mgmt, MGMT_OP_STOP_DISCOVERY, mgmt_index,
-> > sizeof(cp),
-> > > +                     &cp, NULL, NULL, NULL);
-> > > +     if (ret == 0) {
-> > > +             l_error("Unable to send stop_discovery cmd");
-> > > +             btp_send_error(btp, BTP_GAP_SERVICE, index,
-> > BTP_ERROR_FAIL);
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     /* Clear flag that mgmt interface is used for scanning */
-> > > +     mgmt_flags &= ~MGMT_OPS_DISCOVERY;
-> > > +
-> > > +     btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
-> > > +              index, 0, NULL);
-> > > +}
-> > > +
-> > >  static void btp_gap_stop_discovery(uint8_t index, const void *param,
-> > >                                       uint16_t length, void
-> > *user_data)
-> > >  {
-> > > @@ -1520,8 +1644,14 @@ static void btp_gap_stop_discovery(uint8_t index,
-> > > const void *param, return;
-> > >       }
-> > >
-> > > -     l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery", NULL,
-> > > -                                     stop_discovery_reply, NULL,
-> > NULL);
-> > > +     /* If the discovery procedure is started by BT MGMT API for limited
-> > > +      * discovering, it should be stopped by mgmt API.
-> > > +      */
-> > > +     if (mgmt_flags & MGMT_OPS_DISCOVERY)
-> > > +             btp_mgmt_stop_discovery(index);
-> > > +     else
-> > > +             l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery",
-> > NULL,
-> > > +                                      stop_discovery_reply, NULL,
-> > NULL);
-> > >  }
-> > >
-> > >  static void connect_reply(struct l_dbus_proxy *proxy,
-> > > @@ -3140,6 +3270,7 @@ static void usage(void)
-> > >       l_info("\tbtpclient [options]");
-> > >       l_info("options:\n"
-> > >       "\t-s, --socket <socket>  Socket to use for BTP\n"
-> > > +     "\t-i, --index <id>       Specify the adapter index\n"
-> > >       "\t-q, --quiet            Don't emit any logs\n"
-> > >       "\t-v, --version          Show version\n"
-> > >       "\t-h, --help             Show help options");
-> > > @@ -3147,12 +3278,52 @@ static void usage(void)
-> > >
-> > >  static const struct option options[] = {
-> > >       { "socket",     1, 0, 's' },
-> > > +     { "index",      1, 0, 'i' },
-> > >       { "quiet",      0, 0, 'q' },
-> > >       { "version",    0, 0, 'v' },
-> > >       { "help",       0, 0, 'h' },
-> > >       { 0, 0, 0, 0 }
-> > >  };
-> > >
-> > > +static void set_index(const char *arg)
-> > > +{
-> > > +     /* Use default index 0 */
-> > > +     if (!arg || !strcmp(arg, "none") || !strcmp(arg, "any") ||
-> > > +                                             !strcmp(arg,
-> > "all"))
-> > > +             mgmt_index = MGMT_INDEX_NONE;
-> > > +     else if (strlen(arg) > 3 && !strncasecmp(arg, "hci", 3))
-> > > +             mgmt_index = atoi(&arg[3]);
-> > > +     else
-> > > +             mgmt_index = atoi(arg);
-> > > +}
-> > > +
-> > > +static int btp_mgmt_init(const char *index_opt)
-> > > +{
-> > > +     mgmt = mgmt_new_default();
-> > > +     if (!mgmt) {
-> > > +             l_info("Unable to open mgmt_socket\n");
-> > > +             return EXIT_FAILURE;
-> > > +     }
-> > > +
-> > > +     if (index_opt)
-> > > +             set_index(index_opt);
-> > > +
-> > > +     if (mgmt_index == MGMT_INDEX_NONE)
-> > > +             mgmt_index = 0;
-> > > +
-> > > +     return EXIT_SUCCESS;
-> > > +}
-> > > +
-> > > +static void btp_mgmt_release(void)
-> > > +{
-> > > +     l_error("MGMT: Release all management resources");
-> > > +     mgmt_cancel_all(mgmt);
-> > > +     mgmt_unregister_all(mgmt);
-> > > +     mgmt_unref(mgmt);
-> > > +}
-> > > +
-> > > +static const char *index_opt;
-> > > +
-> > >  int main(int argc, char *argv[])
-> > >  {
-> > >       struct l_dbus_client *client;
-> > > @@ -3160,7 +3331,8 @@ int main(int argc, char *argv[])
-> > >
-> > >       l_log_set_stderr();
-> > >
-> > > -     while ((opt = getopt_long(argc, argv, "+hs:vq", options, NULL)) !=
-> > -1) {
-> > > +     while ((opt = getopt_long(argc, argv, "+hs:vqi:", options,
-> > > +
-> > NULL)) != -1) {
-> > >               switch (opt) {
-> > >               case 's':
-> > >                       socket_path = l_strdup(optarg);
-> > > @@ -3173,6 +3345,9 @@ int main(int argc, char *argv[])
-> > >               case 'v':
-> > >                       l_info("%s", VERSION);
-> > >                       return EXIT_SUCCESS;
-> > > +             case 'i':
-> > > +                     index_opt = l_strdup(optarg);
-> > > +                     break;
-> > >               case 'h':
-> > >               default:
-> > >                       usage();
-> > > @@ -3189,6 +3364,10 @@ int main(int argc, char *argv[])
-> > >       if (!l_main_init())
-> > >               return EXIT_FAILURE;
-> > >
-> > > +     if (btp_mgmt_init(index_opt)) {
-> > > +             l_error("Unable to initialize the management interface");
-> > > +             return EXIT_FAILURE;
-> > > +     }
-> > >
-> > >       adapters = l_queue_new();
-> > >
-> > > @@ -3210,6 +3389,7 @@ int main(int argc, char *argv[])
-> > >       l_dbus_client_destroy(client);
-> > >       l_dbus_destroy(dbus);
-> > >       btp_cleanup(btp);
-> > > +     btp_mgmt_release();
-> > >
-> > >       l_queue_destroy(adapters, (l_queue_destroy_func_t)btp_adapter_free);
-> >
-> >
-> > --
-> > pozdrawiam
-> > Szymon Janc
-> >
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
+diff --git a/src/advertising.c b/src/advertising.c
+index 829c481f6..4c91586c2 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -673,7 +673,7 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
+ 
+ 	/* Set BR/EDR Not Supported for LE only */
+ 	if (!btd_adapter_get_bredr(client->manager->adapter))
+-		flags |= 0x04;
++		flags |= BT_AD_FLAG_NO_BREDR;
+ 
+ 	if (!bt_ad_add_flags(client->data, &flags, 1))
+ 		return false;
+@@ -700,8 +700,8 @@ static bool parse_discoverable(DBusMessageIter *iter,
+ 	if (discoverable) {
+ 		/* Set BR/EDR Not Supported if adapter is no discoverable */
+ 		if (!btd_adapter_get_discoverable(client->manager->adapter))
+-			flags = 0x04;
+-		flags |= 0x02;
++			flags = BT_AD_FLAG_NO_BREDR;
++		flags |= BT_AD_FLAG_GENERAL;
+ 	} else
+ 		flags = 0x00;
+ 
+@@ -1065,7 +1065,8 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		}
+ 
+ 		/* Set Limited Discoverable if DiscoverableTimeout is set */
+-		if (client->disc_to_id && !set_flags(client, 0x01)) {
++		if (client->disc_to_id &&
++				!set_flags(client, BT_AD_FLAG_LIMITED)) {
+ 			error("Failed to set Limited Discoverable Flag");
+ 			goto fail;
+ 		}
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index a31df0fe5..19aa1d035 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -71,6 +71,11 @@
+ #define BT_AD_3D_INFO_DATA		0x3d
+ #define BT_AD_MANUFACTURER_DATA		0xff
+ 
++/* Low Energy Advertising Flags */
++#define BT_AD_FLAG_LIMITED		0x01 /* Limited Discoverable */
++#define BT_AD_FLAG_GENERAL		0x02 /* General Discoverable */
++#define BT_AD_FLAG_NO_BREDR		0x04 /* BR/EDR not supported */
++
+ typedef void (*bt_ad_func_t)(void *data, void *user_data);
+ 
+ struct bt_ad;
 -- 
-Luiz Augusto von Dentz
+2.25.3
+
