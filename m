@@ -8,65 +8,67 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469BAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9696C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21AF4207ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9847207ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:17:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+fhvl9+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxZgbQI8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726836AbgFESRr (ORCPT
+        id S1728090AbgFESRs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 14:17:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
+        Fri, 5 Jun 2020 14:17:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726171AbgFESRq (ORCPT
+        with ESMTP id S1726171AbgFESRs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 14:17:46 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865CDC08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:17:46 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id m7so4042114plt.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:17:46 -0700 (PDT)
+        Fri, 5 Jun 2020 14:17:48 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0AF3C08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:17:47 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id m7so4042130plt.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=9wnUBnIGiHnmupdesTjLijqyj8kpX2av7C0AkM6kHts=;
-        b=k+fhvl9+/6tntmynY+bgKj0/EKBvrNlsVOKmT7er8YOdbCVqUMtCLADFd3z2NHh2TL
-         2zOEprhcFhIwYOdcXgNV02eA5Ly05N2SqncRHX4KNZ5GqnLX2uo7GX6IP3mGaZfC0Wv5
-         5qs7luts49yrMpVHCcB8QEqObXOvbWY5YieETr6udTIMdum1LDuk4sklyrzszGyF1+yU
-         9dJZ43knSgwBdQ2TWpzFEuxKe4+FtMQfk0mTA/NgkJ7BQZKW9/h9XPQ8/8dY13j0Keyk
-         XB51WPvbYI3q35Pxtn9zZjSR8BImf6AJQx0nWPjmJi8swMqapdxiOkKIWF23h+47plQH
-         pbDw==
+        bh=ne4lsec+U3AJ33tnijiF6V316Nr9mwIXEdrvN6qq4pE=;
+        b=YxZgbQI8Ov9IxbqVJ28Vkg30TEJQW3RrkOVPVSUIoIAuaGTuqOjFivUFuXcOPwXPF9
+         VQLe950VVnfnzPF1tPIyIGr0jENBpxL689Cvjd85DgbFryfgZKMsfupNm2uCpNPcPinO
+         NS+jvi/sGdWDh4xvvMRrgpEH+2Vy/Dh5oI2m7DRnDy5pK0NzxHrqwRNC0LhFgxZJ1WXt
+         M46NIKbECkcrqwL70hLZGGJZ3G9f8QmYSNVzwQkfQBlReNZ2/rPFKwELOI0bCYCexINF
+         bKMUYEps9yPJUEWPn/E2N06ic3kyy8E/6d6AVMHR6V+AGUKrLrBG7aYMIAMYUqmzD2yj
+         QiIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9wnUBnIGiHnmupdesTjLijqyj8kpX2av7C0AkM6kHts=;
-        b=Hwpfj33KaKG0vlrf+QCA6H4ynMQj3MMi1VFObxLQPykpx1IqX/C6COuhul+zMxYe0M
-         +2GyPnM4/YY1NF0qUuTj3RU+0jsUfX1KJGLpD6SB2WvGXh2Yvnk+IBHkKSsVPUIoOvYJ
-         Wp99RdLwHdwftxvyYCM2Qs/9rHcUiWEieKZG1gpkvcc5/I0ddBuW08dDFCoOfgjHf5S0
-         MehDmEZ7FW8TtbJK4nuDopcANTOnwfdq86sqKxuHHjaajIkA5WrHtS8293tDspt6RTB4
-         jkBJUznbKtJIpnD28mbGMKFKC8jYhpRfUfp7n6v/GylIV0Pt/hDkJ6L38nxxdObh4trH
-         g3IQ==
-X-Gm-Message-State: AOAM530nBln9Vnec2lid45k6QfKkeLbJHxd9lCVT6tE/uS+1Cu08r05U
-        FPbyfQesCe9CeTuqgTXtr5Fpb0Lj
-X-Google-Smtp-Source: ABdhPJy4WJ76BqL9lYkPz+oCfwqyl4UORPTtDIqa6Ahr2kfRLyypZ/GJEE2qNDZWgnhy5zRQi7h1RQ==
-X-Received: by 2002:a17:90a:394b:: with SMTP id n11mr4563058pjf.100.1591381065602;
-        Fri, 05 Jun 2020 11:17:45 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ne4lsec+U3AJ33tnijiF6V316Nr9mwIXEdrvN6qq4pE=;
+        b=FpOopy3c/WomKzhXeBD/iowqPRbcZAMyIBxdFO+r+vcQ2ZAgpSfvywXtgh1SmXMnvJ
+         XJMfYaK1jGBH5wiMKzaEyKKjg4Da8F97owJVr0ocXNncigsfabgsz2zXejqH5e97zoZn
+         AQPo+WWNOzTRt4bwA0xM+3PGqP0dtyE151UzTnWj8QH9q/foexnAS4ZfzU3+TL6L2sKO
+         sFRfjhzGhqtwcESivQ7jrb2UBQ22ailKkS9HLRGyq25/3UGAXrRki+eVXiSwiBOGUOs3
+         PRW+qIH3gsX/5jlasJvtT612ftjhsKyBmQNCutiRyP4zF1BLJr0gvTmojTuemchpbpOY
+         j/CA==
+X-Gm-Message-State: AOAM530qJyccioTJT9sr6AY5Z5A4979EbFEDW6AMPrdS1vM2qqgmpANZ
+        +OCQLvu8a7NzQcpJes9h++idsZNo
+X-Google-Smtp-Source: ABdhPJxs//VjFIEa/wAYFeB0gP42b6BxwWXn9GvzWmbh6wyX2TYP9mwk6+oA4bd3Qi0flTZc9QRS0g==
+X-Received: by 2002:a17:902:8d8d:: with SMTP id v13mr10358318plo.162.1591381067047;
+        Fri, 05 Jun 2020 11:17:47 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y5sm221385pgl.85.2020.06.05.11.17.44
+        by smtp.gmail.com with ESMTPSA id y5sm221385pgl.85.2020.06.05.11.17.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 11:17:44 -0700 (PDT)
+        Fri, 05 Jun 2020 11:17:45 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] shared/ad: Add defines for possible flags
-Date:   Fri,  5 Jun 2020 11:17:42 -0700
-Message-Id: <20200605181743.720661-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] advertising: Fix resetting NO_BREDR flag
+Date:   Fri,  5 Jun 2020 11:17:43 -0700
+Message-Id: <20200605181743.720661-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.25.3
+In-Reply-To: <20200605181743.720661-1-luiz.dentz@gmail.com>
+References: <20200605181743.720661-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -76,63 +78,48 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds defines for limited disverable, general discoveral and BR/EDR
-not supported.
+When setting BT_AD_FLAG_LIMITED it was actually overwriting
+BT_AD_FLAG_NO_BREDR as well so this moves the logic of detecting if the
+instance needs to set BT_AD_FLAG_NO_BREDR to set_flags so it is always
+updated when attempting to set any flags.
 ---
- src/advertising.c | 9 +++++----
- src/shared/ad.h   | 5 +++++
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ src/advertising.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index 829c481f6..4c91586c2 100644
+index 4c91586c2..076d591b6 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -673,7 +673,7 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
- 
- 	/* Set BR/EDR Not Supported for LE only */
+@@ -675,6 +675,13 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
  	if (!btd_adapter_get_bredr(client->manager->adapter))
--		flags |= 0x04;
-+		flags |= BT_AD_FLAG_NO_BREDR;
+ 		flags |= BT_AD_FLAG_NO_BREDR;
  
++	/* Set BR/EDR Not Supported if adapter is not discoverable but the
++	 * instance is.
++	 */
++	if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
++			!btd_adapter_get_discoverable(client->manager->adapter))
++		flags |= BT_AD_FLAG_NO_BREDR;
++
  	if (!bt_ad_add_flags(client->data, &flags, 1))
  		return false;
-@@ -700,8 +700,8 @@ static bool parse_discoverable(DBusMessageIter *iter,
- 	if (discoverable) {
- 		/* Set BR/EDR Not Supported if adapter is no discoverable */
- 		if (!btd_adapter_get_discoverable(client->manager->adapter))
--			flags = 0x04;
--		flags |= 0x02;
-+			flags = BT_AD_FLAG_NO_BREDR;
-+		flags |= BT_AD_FLAG_GENERAL;
- 	} else
+ 
+@@ -697,12 +704,9 @@ static bool parse_discoverable(DBusMessageIter *iter,
+ 
+ 	dbus_message_iter_get_basic(iter, &discoverable);
+ 
+-	if (discoverable) {
+-		/* Set BR/EDR Not Supported if adapter is no discoverable */
+-		if (!btd_adapter_get_discoverable(client->manager->adapter))
+-			flags = BT_AD_FLAG_NO_BREDR;
+-		flags |= BT_AD_FLAG_GENERAL;
+-	} else
++	if (discoverable)
++		flags = BT_AD_FLAG_GENERAL;
++	else
  		flags = 0x00;
  
-@@ -1065,7 +1065,8 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
- 		}
- 
- 		/* Set Limited Discoverable if DiscoverableTimeout is set */
--		if (client->disc_to_id && !set_flags(client, 0x01)) {
-+		if (client->disc_to_id &&
-+				!set_flags(client, BT_AD_FLAG_LIMITED)) {
- 			error("Failed to set Limited Discoverable Flag");
- 			goto fail;
- 		}
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index a31df0fe5..19aa1d035 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -71,6 +71,11 @@
- #define BT_AD_3D_INFO_DATA		0x3d
- #define BT_AD_MANUFACTURER_DATA		0xff
- 
-+/* Low Energy Advertising Flags */
-+#define BT_AD_FLAG_LIMITED		0x01 /* Limited Discoverable */
-+#define BT_AD_FLAG_GENERAL		0x02 /* General Discoverable */
-+#define BT_AD_FLAG_NO_BREDR		0x04 /* BR/EDR not supported */
-+
- typedef void (*bt_ad_func_t)(void *data, void *user_data);
- 
- struct bt_ad;
+ 	if (!set_flags(client , flags))
 -- 
 2.25.3
 
