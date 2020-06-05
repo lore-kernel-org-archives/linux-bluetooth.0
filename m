@@ -2,178 +2,80 @@ Return-Path: <SRS0=pjei=7S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DC3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 04:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05FCC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 05:15:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34BC720872
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 04:53:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OLKa3Eru"
+	by mail.kernel.org (Postfix) with ESMTP id 7B94720659
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 05:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbgFEEx6 (ORCPT
+        id S1726021AbgFEFPQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 00:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725280AbgFEEx5 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 00:53:57 -0400
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6293C08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2020 21:53:57 -0700 (PDT)
-Received: by mail-vs1-xe41.google.com with SMTP id g129so4889035vsc.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2020 21:53:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iSK3iGrwNXhNPMJarS5DBwkVfOTARnkNBQgwEVg9fzQ=;
-        b=OLKa3Eru19miQbfdsFwziHODftiQNhKc4EdQde9u1NnrdN7pNq03T9y6y7pRRxwOH/
-         3O+4MIcvxf/abLwwAyZDvo3EVUiawKW9fPciyLPXrNe3mzA4cb0fsaqJEtKQPGjet+0x
-         yUiD4YjaWXlzJaW3tX5tQX009Vhxc4SCODiWc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iSK3iGrwNXhNPMJarS5DBwkVfOTARnkNBQgwEVg9fzQ=;
-        b=LxNp/YSFEtAU0QIVN6bi2e3AeiteYm8wUvPk+op8u1Y/QKYPlz+zaM91yi9RNnzlo3
-         XIosBB5JOwNi47XBAWJOk6c2WWOIMW7PoITFIoSjvLHE9XbK6R4eLBJ2dCV12PHNIKLo
-         TiXq+qGmYwYtRPIvRAlelA6MtM/SNF3RhsWeXOeKrPlx4Kvi2Ccjs91mAwXCA0sWRFu5
-         rEC7UXRe5yExVFPnfv7j4699z4VOaoxK4i7/dx4OD+ddjyd5aBqlQ9VZxls67AxFSkUC
-         I3eqp+u2UunlovUamT0E6BnPnyqLMqnwb0J7b+oC+3bZDGoHvmMJ2wS6L2uieXIDi/I9
-         HFKg==
-X-Gm-Message-State: AOAM532qkkul9VVpqt4r+Wb+yNmoZlG2JpC4E8Vv25BJy0UxTYyPq9WU
-        45LkZEBMUGdYiKy+Dv2M4fVvqGebum67NFYbxZ9a8w==
-X-Google-Smtp-Source: ABdhPJwdWFvJCxmedX/E9k5TaI0rTCAck27IIEFlzSk+XHOBcn46sl1Tb3UUpBvYtbnaohow5PXV2JknybmaQG/rT6Y=
-X-Received: by 2002:a67:3c6:: with SMTP id 189mr6264601vsd.71.1591332836701;
- Thu, 04 Jun 2020 21:53:56 -0700 (PDT)
+        Fri, 5 Jun 2020 01:15:16 -0400
+Received: from mga09.intel.com ([134.134.136.24]:22227 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725280AbgFEFPP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 5 Jun 2020 01:15:15 -0400
+IronPort-SDR: vnipzEgeBMryh8aqiIV1NYlMIfchuavbYVO53soHUZEHi5MRRuuhe8Ro02cKZZQvaA+ZU9y6Dp
+ s2te4M2JJ+lw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:15:15 -0700
+IronPort-SDR: 4A+Ep2uNZhFSIL13xRPsKpcMQpqGFbH5NsdJtnhPTOSUiRRh4XFlkKNoZH4m2Eis00fz9h+e7Y
+ r9Et+9CsRoHw==
+X-IronPort-AV: E=Sophos;i="5.73,475,1583222400"; 
+   d="scan'208";a="445770204"
+Received: from svedanta-mobl1.amr.corp.intel.com (HELO han1-mobl3.jf.intel.com) ([10.254.69.224])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:15:15 -0700
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH 1/2] btp: Update connect event structure
+Date:   Thu,  4 Jun 2020 22:15:08 -0700
+Message-Id: <20200605051509.10766-1-tedd.an@linux.intel.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-References: <1591279032-7527-1-git-send-email-gubbaven@codeaurora.org>
-In-Reply-To: <1591279032-7527-1-git-send-email-gubbaven@codeaurora.org>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Thu, 4 Jun 2020 21:53:42 -0700
-Message-ID: <CANFp7mX1iKNETqzjdp5z4OrRJBdaGV+f4rOQBtGomYEhsazVfw@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Fix double free during SSR timeout
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        robh@kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        Claire Chang <tientzu@chromium.org>,
-        Sean Paul <seanpaul@chromium.org>, rjliao@codeaurora.org,
-        Yoni Shavit <yshavit@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Thu, Jun 4, 2020 at 6:59 AM Venkata Lakshmi Narayana Gubba
-<gubbaven@codeaurora.org> wrote:
->
-> Due to race conditions between qca_hw_error and qca_controller_memdump
-> during SSR timeout,the same pointer is freed twice. Which results to
-> double free error. Now a lock is acquired while SSR state moved to timeout.
-suggestion: Change "which results to double free error" to "This
-results in a double free."
-suggestion: Change "while SSR state moved to timeout" to "when SSR
-state is changed to timeout"
+This patch updates the connect event struct to align withe the btp spec.
 
->
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 836949d..9110775 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -983,8 +983,11 @@ static void qca_controller_memdump(struct work_struct *work)
->         while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
->
->                 mutex_lock(&qca->hci_memdump_lock);
-> -               /* Skip processing the received packets if timeout detected. */
-> -               if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
-> +               /* Skip processing the received packets if timeout detected
-> +                * or memdump collection completed.
-> +                */
-> +               if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT ||
-> +                   qca->memdump_state == QCA_MEMDUMP_COLLECTED) {
->                         mutex_unlock(&qca->hci_memdump_lock);
->                         return;
->                 }
-> @@ -1485,7 +1488,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->  {
->         struct hci_uart *hu = hci_get_drvdata(hdev);
->         struct qca_data *qca = hu->priv;
-> -       struct qca_memdump_data *qca_memdump = qca->qca_memdump;
-> +       struct qca_memdump_data *qca_memdump = NULL;
->         char *memdump_buf = NULL;
->
->         set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
-> @@ -1509,9 +1512,10 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->                 qca_wait_for_dump_collection(hdev);
->         }
->
-> +       mutex_lock(&qca->hci_memdump_lock);
->         if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
->                 bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
-> -               mutex_lock(&qca->hci_memdump_lock);
-> +               qca_memdump = qca->qca_memdump;
->                 if (qca_memdump)
->                         memdump_buf = qca_memdump->memdump_buf_head;
->                 vfree(memdump_buf);
+  Opcode 0x82 - Device Connected event
+    Controller Index:	<controller id>
+    Event parameters:	Address_Type (1 octet)
+			Address (6 octets)
+			Connection Interval (2 octets)
+			Connection Latency (2 octets)
+			Supervision Timeout (2 octets)
 
-This section of code looks a bit unclear because it's only partially
-in an if statement. Suggestion:
-  if (qca->qca_memdump) {
-    vfree(qca->qca_memdump->memdump_buf_head);
-    kfree(qca->qca_memdump);
-    qca->qca_memdump = NULL;
-  }
+  This event indicates that a device was connected.
+---
+ src/shared/btp.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> @@ -1520,8 +1524,13 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->                 qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
->                 cancel_delayed_work(&qca->ctrl_memdump_timeout);
->                 skb_queue_purge(&qca->rx_memdump_q);
-> -               mutex_unlock(&qca->hci_memdump_lock);
-> +       }
-> +       mutex_unlock(&qca->hci_memdump_lock);
-> +
-> +       if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT ||
-> +           qca->memdump_state == QCA_MEMDUMP_COLLECTED) {
->                 cancel_work_sync(&qca->ctrl_memdump_evt);
-> +               skb_queue_purge(&qca->rx_memdump_q);
->         }
+diff --git a/src/shared/btp.h b/src/shared/btp.h
+index f0ac3a1ee..cc71a71df 100644
+--- a/src/shared/btp.h
++++ b/src/shared/btp.h
+@@ -259,6 +259,9 @@ struct btp_device_found_ev {
+ struct btp_gap_device_connected_ev {
+ 	uint8_t address_type;
+ 	bdaddr_t address;
++	uint16_t connection_interval;
++	uint16_t connection_latency;
++	uint16_t supervision_timeout;
+ } __packed;
+ 
+ #define BTP_EV_GAP_DEVICE_DISCONNECTED		0x83
+-- 
+2.25.4
 
-Earlier in the function, you call qca_wait_for_dump_collection for
-[Idle, Collecting] so the state should be either [Timeout, Collected]
-at this branch. So, you can remove the `cancel_delayed_work` and
-`skb_queue_purge` from above and just leave it only in the bottom
-branch. Currently you're duplicating these calls unnecessarily.
-
-I don't know if we discussed this in an earlier review but I noticed
-that `qca_wait_for_dump_collection` doesn't actually pay attention to
-the return value of `wait_on_bit_timeout`. I don't have context for
-the order of calls anymore but is there a possibility for that timeout
-to complete before `qca_memdump_timeout` is called? In that case, you
-should probably set the state to timeout in
-`qca_wait_for_dump_collection` as well.
-
->
->         clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
-> --
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member
-> of Code Aurora Forum, hosted by The Linux Foundation
->
