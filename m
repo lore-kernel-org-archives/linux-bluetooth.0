@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9D6C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DCCC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B0F0207ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10D9320820
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jun 2020 18:46:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="i41lqYoc"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="W/10+ZA/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728181AbgFESqc (ORCPT
+        id S1728071AbgFESqY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jun 2020 14:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34670 "EHLO
+        Fri, 5 Jun 2020 14:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728124AbgFESq0 (ORCPT
+        with ESMTP id S1728044AbgFESqX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jun 2020 14:46:26 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67163C08C5C3
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:46:25 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id h185so5394209pfg.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:46:25 -0700 (PDT)
+        Fri, 5 Jun 2020 14:46:23 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B53EC08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2020 11:46:23 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id s88so3217183pjb.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2020 11:46:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=JhzYHKvdQtmn/u3Ni8ya8R48LHH3rdnvSdBrewLu5k4=;
-        b=i41lqYocUx3+ZNZY/212s2DaUIWl1vrB9Z7fj0qpcDJHUaBBHP2o+yVISBfn0Y4sEj
-         nDzwq5keH/rr1fCEJvwXBjXi2Kd5/ZpAJbxkmlutS4lqhpRenwXmTphYNPY9D2MmISP5
-         FUboCT6imy55vB3+dm6v9nobWuokqvNJ2Zr/k=
+        bh=Db/Gm4BeoJW6NqmdsTHnrKmt8poh4eKp40QU8EXC28s=;
+        b=W/10+ZA/PhUPpgG2XIwOlVrsgp35BOoaVW2TDVRzf+W7w0UnHTDmw0ieOnWvlN3vdP
+         PFj5GknvyJkFXDq/PPl9Jk+ySjCWshsIMbIW2TegEREdo0boT/Ym/nQS8RpmJyH1BxrV
+         2IkY/rzZIK/yYybOfCdmK3whjSMgxbpx6yX5w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=JhzYHKvdQtmn/u3Ni8ya8R48LHH3rdnvSdBrewLu5k4=;
-        b=Y9LdRzjys4gSpJUzDfy01GOGhUkmj3T2NBeQX3KLOz512p6JsNRynK5MbGJ5Iho3/I
-         aDGHOnPhLOb6GCK6dZxN8jCaFlUe/iv0Mlr3Xm3MoeNrauu6N9g1VK2bZ42wNyufAc4D
-         mytQGYiN+oipvbEh13Frii2JNY2pXYxEE7PvFRD2bJ29myoTgepKol/58163EES2Envi
-         EXLvTxPHgsNg2LJx60IZ9/JdVPEcjejTa8VMlH2RKgWxIUvtlKAB+ncxNs1NWAFPoplU
-         BnC3yeYmt1QwX0jKN87MYP3xc3oVG0wYAfcJ7Z0S1bFNojxK95P3UGOeU2UG6nfL8UBC
-         waUQ==
-X-Gm-Message-State: AOAM530sEyM7dmWV3udntvV4p6fVjdH3C5HSlmHRVwuuLL63lwPC+IGx
-        L3EEh5BSc46kxWHDGW1uuSuwKQ==
-X-Google-Smtp-Source: ABdhPJwelWUinwmWNJnCRScNIf8pUY19AIVEka6dRO9dLs0VBOstGXsHxxpRO9qaapucx7H5cAxKng==
-X-Received: by 2002:aa7:85da:: with SMTP id z26mr10736885pfn.13.1591382784923;
-        Fri, 05 Jun 2020 11:46:24 -0700 (PDT)
+        bh=Db/Gm4BeoJW6NqmdsTHnrKmt8poh4eKp40QU8EXC28s=;
+        b=Gp8zPWPfcVPg6jMfl1vhycCfxQ21LPbVy1psdvoYZZ60CnNd9qg4qbcaep3MmF4JLz
+         Y7oO+ZhuXZi9RKGnvQ/UWW/OL87Sdu9jhbeshLUJqzLQ2LnXQdDLQVhLRiNazG/hbp2O
+         ByInLjsypa7P8NfcIcdRKxI8Ay9yOKfvmyygXW8l6trLPgGPXPOodGrb8KLbUNHqjFUp
+         zqz+DagxMFBsKH9fJzh67OwNWAMdFBvRiIIdMyrJTHmytWT6KjhsVnS/MBeGqFTzAsYV
+         PwLZYYDdzHNPQHMF3OHN1aDeb9hGRfGY+0rQG0rOP8AE2pJjMjkQVj65CzwQxc7Q1Hmt
+         k9Xw==
+X-Gm-Message-State: AOAM533AL+na0C2nMuskaHWAbLmTiY3A5ZBqCpWqh1AZrdwmhcxCXmCq
+        MSPQb4oC33+uwWyalhHpER4GTw==
+X-Google-Smtp-Source: ABdhPJxgwwx3U8FhEfyBF8XeXfPMutpv4xe50ifCJaUL8ETmcyboqaMCFgbkn1oxbLIBfwVBPzdw0w==
+X-Received: by 2002:a17:90b:882:: with SMTP id bj2mr4851194pjb.122.1591382782676;
+        Fri, 05 Jun 2020 11:46:22 -0700 (PDT)
 Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id n189sm282147pfn.108.2020.06.05.11.46.23
+        by smtp.gmail.com with ESMTPSA id a20sm268894pff.147.2020.06.05.11.46.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2020 11:46:24 -0700 (PDT)
+        Fri, 05 Jun 2020 11:46:22 -0700 (PDT)
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
@@ -66,9 +66,9 @@ Cc:     linux-bluetooth@vger.kernel.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Claire Chang <tientzu@chromium.org>,
         Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 3/3] Bluetooth: hci_qca: Refactor error handling in qca_suspend()
-Date:   Fri,  5 Jun 2020 11:46:11 -0700
-Message-Id: <20200605114552.3.Ib9b5e6e81ea31cdc964cd0562ef4985a6c6c5154@changeid>
+Subject: [PATCH 2/3] Bluetooth: hci_qca: Skip serdev wait when no transfer is pending
+Date:   Fri,  5 Jun 2020 11:46:10 -0700
+Message-Id: <20200605114552.2.I2a095adb2a9a98b15c11d7310db142b27f8cab28@changeid>
 X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
 In-Reply-To: <20200605184611.252218-1-mka@chromium.org>
 References: <20200605184611.252218-1-mka@chromium.org>
@@ -79,44 +79,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If waiting for IBS sleep times out jump to the error handler, this is
-easier to read than multiple 'if' branches and a fall through to the
-error handler.
+qca_suspend() calls serdev_device_wait_until_sent() regardless of
+whether a transfer is pending. While it does no active harm since
+the function should return immediately it makes the code more
+confusing. Add a flag to track whether a transfer is pending and
+only call serdev_device_wait_until_sent() is needed.
 
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 ---
 
- drivers/bluetooth/hci_qca.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ drivers/bluetooth/hci_qca.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 90ffd8ca1fb0d..cf76f128e9834 100644
+index b1d82d32892e9..90ffd8ca1fb0d 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -2109,18 +2109,16 @@ static int __maybe_unused qca_suspend(struct device *dev)
+@@ -2050,6 +2050,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
+ 	struct hci_uart *hu = &qcadev->serdev_hu;
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned long flags;
++	bool tx_pending = false;
+ 	int ret = 0;
+ 	u8 cmd;
+ 
+@@ -2083,6 +2084,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
+ 
+ 		qca->tx_ibs_state = HCI_IBS_TX_ASLEEP;
+ 		qca->ibs_sent_slps++;
++		tx_pending = true;
+ 		break;
+ 
+ 	case HCI_IBS_TX_ASLEEP:
+@@ -2099,8 +2101,10 @@ static int __maybe_unused qca_suspend(struct device *dev)
+ 	if (ret < 0)
+ 		goto error;
+ 
+-	serdev_device_wait_until_sent(hu->serdev,
+-				      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
++	if (tx_pending) {
++		serdev_device_wait_until_sent(hu->serdev,
++					      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
++	}
+ 
  	/* Wait for HCI_IBS_SLEEP_IND sent by device to indicate its Tx is going
  	 * to sleep, so that the packet does not wake the system later.
- 	 */
--
- 	ret = wait_event_interruptible_timeout(qca->suspend_wait_q,
- 			qca->rx_ibs_state == HCI_IBS_RX_ASLEEP,
- 			msecs_to_jiffies(IBS_BTSOC_TX_IDLE_TIMEOUT_MS));
--
--	if (ret > 0) {
--		qca_wq_serial_tx_clock_vote_off(&qca->ws_tx_vote_off);
--		return 0;
-+	if (ret == 0) {
-+		ret = -ETIMEDOUT;
-+		goto error;
- 	}
- 
--	if (ret == 0)
--		ret = -ETIMEDOUT;
-+	qca_wq_serial_tx_clock_vote_off(&qca->ws_tx_vote_off);
-+	return 0;
- 
- error:
- 	clear_bit(QCA_SUSPENDING, &qca->flags);
 -- 
 2.27.0.278.ge193c7cf3a9-goog
 
