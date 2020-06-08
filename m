@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FF2C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A277C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:59:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C524C20737
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0015F20737
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:59:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591664231;
-	bh=84y+gW41dURSJi/gdvoDOb2sY4x5qag2jIQ+OeQgv8s=;
+	s=default; t=1591664359;
+	bh=dmbHKk/CvJ8hqCWgAkefYUpXXod9lx3uh0ILF4HJH5s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ftGuh295nwT92UtLy19l/DRIELGsiSV6U5cFQIVE8et8kcpCzyzUb2KKbUrNfXpwg
-	 TXAyakppoM+NU8X1Xcgypfx9noeNetbvkz/rAsKJptTog4d+IlNFzqq1XRalaXvGI4
-	 k483D+vxI+4yX2fknMyhjm+qd2mKoXVQWlXD8puQ=
+	b=hNTIfw/WqDfxy0LByBs9vTd2cdNolKUR3KU072Jrj61miWiJNmsZ9/JG1gcuiDBxY
+	 /kfz3R15nKqgC6QKXTgEg+EEaar7utovtf1MKlRMQYJtoVUPEv0bhpuurDZskwNQL7
+	 5dS3H60oMTwlPDAsOmFq7w36TJ921Q3IjQWRKxlk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728730AbgFIA5K (ORCPT
+        id S2387889AbgFIA7B (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 20:57:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54508 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 20:59:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54118 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728291AbgFHXI4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:08:56 -0400
+        id S1728225AbgFHXIl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:08:41 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 735CF2085B;
-        Mon,  8 Jun 2020 23:08:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 56098208C9;
+        Mon,  8 Jun 2020 23:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591657736;
-        bh=84y+gW41dURSJi/gdvoDOb2sY4x5qag2jIQ+OeQgv8s=;
+        s=default; t=1591657721;
+        bh=dmbHKk/CvJ8hqCWgAkefYUpXXod9lx3uh0ILF4HJH5s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XUynSZ2HWhsPfzIukzg3R68sZn+l+CpO6f/KVYplWfYLX+HvtqvDPJchna2c8D125
-         2QzU8i0zpw7EdHEeSmqSl0S5VDjyoGw/3y6dsTRPgEVV9EABFlGKJ2iOAhtNgBsewA
-         ewJbc848PauumTH1KwhGMPyC5b7rwxkkBt5qhQrI=
+        b=fnh5MmtozhO9R2twYmFqOSd1ReWHWpOfF6Rv/njvuzu3bR3e3V5S4xG5M7fe6fcwu
+         B4qiw/X8zaJ4klWiDvWGMV4tLOD97iV1YFZL68MjQGYdrJTgIJ4sA8q3f640FIiuKx
+         Lg0EYmBPRa4wqgidZZ8L4sWnjI1bW5YpDYTnY2VU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
+Cc:     Hans de Goede <hdegoede@redhat.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 126/274] Bluetooth: Adding driver and quirk defs for multi-role LE
-Date:   Mon,  8 Jun 2020 19:03:39 -0400
-Message-Id: <20200608230607.3361041-126-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.7 114/274] Bluetooth: btbcm: Add 2 missing models to subver tables
+Date:   Mon,  8 Jun 2020 19:03:27 -0400
+Message-Id: <20200608230607.3361041-114-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200608230607.3361041-1-sashal@kernel.org>
 References: <20200608230607.3361041-1-sashal@kernel.org>
@@ -60,63 +60,52 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Alain Michaud <alainm@chromium.org>
+From: Hans de Goede <hdegoede@redhat.com>
 
-[ Upstream commit 220915857e29795ae5ba4222806268b4a99c19c1 ]
+[ Upstream commit c03ee9af4e07112bd3fc688daca9e654f41eca93 ]
 
-This change adds the relevant driver and quirk to allow drivers to
-report the le_states as being trustworthy.
+Currently the bcm_uart_subver_ and bcm_usb_subver_table-s lack entries
+for the BCM4324B5 and BCM20703A1 chipsets. This makes the code use just
+"BCM" as prefix for the filename to pass to request-firmware, making it
+harder for users to figure out which firmware they need. This especially
+is problematic with the UART attached BCM4324B5 where this leads to the
+filename being just "BCM.hcd".
 
-This has historically been disabled as controllers did not reliably
-support this. In particular, this will be used to relax this condition
-for controllers that have been well tested and reliable.
+Add the 2 missing devices to subver tables. This has been tested on:
 
-	/* Most controller will fail if we try to create new connections
-	 * while we have an existing one in slave role.
-	 */
-	if (hdev->conn_hash.le_num_slave > 0)
-		return NULL;
+1. A Dell XPS15 9550 where this makes btbcm.c try to load
+"BCM20703A1-0a5c-6410.hcd" before it tries to load "BCM-0a5c-6410.hcd".
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
+2. A Thinkpad 8 where this makes btbcm.c try to load
+"BCM4324B5.hcd" before it tries to load "BCM.hcd"
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c   | 1 +
- include/net/bluetooth/hci.h | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ drivers/bluetooth/btbcm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3bdec42c9612..3d9313c746f3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_CW6622		0x100000
- #define BTUSB_MEDIATEK		0x200000
- #define BTUSB_WIDEBAND_SPEECH	0x400000
-+#define BTUSB_VALID_LE_STATES   0x800000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5f60e135aeb6..25c2e5ee81dc 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -214,6 +214,15 @@ enum {
- 	 * This quirk must be set before hci_register_dev is called.
- 	 */
- 	HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
-+
-+	/* When this quirk is set, the controller has validated that
-+	 * LE states reported through the HCI_LE_READ_SUPPORTED_STATES are
-+	 * valid.  This mechanism is necessary as many controllers have
-+	 * been seen has having trouble initiating a connectable
-+	 * advertisement despite the state combination being reported as
-+	 * supported.
-+	 */
-+	HCI_QUIRK_VALID_LE_STATES,
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 1f498f358f60..e1377934507c 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -380,6 +380,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+ 	{ 0x4204, "BCM2076B1"	},	/* 002.002.004 */
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
++	{ 0x4606, "BCM4324B5"	},	/* 002.006.006 */
+ 	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+ 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
+@@ -395,6 +396,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
  };
  
- /* HCI device flags */
+ static const struct bcm_subver_table bcm_usb_subver_table[] = {
++	{ 0x2105, "BCM20703A1"	},	/* 001.001.005 */
+ 	{ 0x210b, "BCM43142A0"	},	/* 001.001.011 */
+ 	{ 0x2112, "BCM4314A0"	},	/* 001.001.018 */
+ 	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
 -- 
 2.25.1
 
