@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10097C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0E9C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E079F20812
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A684820775
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:13:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591661471;
-	bh=PRuINvBRZW2mZwEv6yL9odErB1I7qLxkutEUY51xAFc=;
+	s=default; t=1591661581;
+	bh=Y875Dia4Q1F7Rb7MJQgFlPzLbag97EsU+2KHsI8K/aU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=UCc2qAg/2AwoQvp44+bYsnchog8/3+NcTj5PejNSyCQpWFy3NJJ48xoqgj3Tf0JGx
-	 G5N6jS6En2yP4qiwIFN8TxwgOgZl7UmVxPELDzZ/hXj4AHMkg9J3dWPJRgVQfTfsk1
-	 jfeSoVefxHpmbGjIVZwMWKRRaw1fOEC2Sbr9IlQc=
+	b=xNbx6AfBbucmq6LbcLO58T1gnru2Tp90B0n4ll79/BSbhYH0pkz94aC0y7TrdiYYD
+	 uju933vWfw87FOMcC6jMGOg3VoSFHXSEIZUuMOlwJeUxBWoNx2gRC3GEkkpApunYDi
+	 NYkR6B2mMxY68DxT7ODGH1lGvTicC27IGiaKU3XY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732584AbgFIAKz (ORCPT
+        id S2387959AbgFIAMp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 20:10:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43182 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 20:12:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730896AbgFHXT7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:19:59 -0400
+        id S1730826AbgFHXTg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:19:36 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9EDF920823;
-        Mon,  8 Jun 2020 23:19:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 70B002085B;
+        Mon,  8 Jun 2020 23:19:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658399;
-        bh=PRuINvBRZW2mZwEv6yL9odErB1I7qLxkutEUY51xAFc=;
+        s=default; t=1591658376;
+        bh=Y875Dia4Q1F7Rb7MJQgFlPzLbag97EsU+2KHsI8K/aU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OBJlHTlLYJCrIS/T0vc8HigBTccwaYPH2dGJfpSumlSl5wTkUcp2Iypp6cw1cHCgp
-         +xOUpUE2P2fTLK1uEa37UWElQlV4C7SrHrx0rMvs91v+Xo3UraLCZXL0rawjOWZ0D8
-         oBuyFyGp+PsT/wkb2yLRgDjspM7W+l1tAaP5xN8c=
+        b=SJCKnY3QOGReMVGE+EaKVTPMtMk4j7zNuqjvalUXaKcu3gY9WkfheG89oN2erQYIr
+         BAtJWSA9FALY7JqY+9usql2gdxL/OUZMw7rFgv3inQvjZjEZ9eBE2IrUKxNB3sSaEa
+         VzAmWx8tYoB+thd9+uUDq+tM+7707Ir7slRvUf+o=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chuhong Yuan <hslester96@gmail.com>,
+Cc:     Hsin-Yu Chao <hychao@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 055/175] Bluetooth: btmtkuart: Improve exception handling in btmtuart_probe()
-Date:   Mon,  8 Jun 2020 19:16:48 -0400
-Message-Id: <20200608231848.3366970-55-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 038/175] Bluetooth: Add SCO fallback for invalid LMP parameters error
+Date:   Mon,  8 Jun 2020 19:16:31 -0400
+Message-Id: <20200608231848.3366970-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200608231848.3366970-1-sashal@kernel.org>
 References: <20200608231848.3366970-1-sashal@kernel.org>
@@ -62,69 +60,111 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chuhong Yuan <hslester96@gmail.com>
+From: Hsin-Yu Chao <hychao@chromium.org>
 
-[ Upstream commit 4803c54ca24923a30664bea2a7772db6e7303c51 ]
+[ Upstream commit 56b5453a86203a44726f523b4133c1feca49ce7c ]
 
-Calls of the functions clk_disable_unprepare() and hci_free_dev()
-were missing for the exception handling.
-Thus add the missed function calls together with corresponding
-jump targets.
+Bluetooth PTS test case HFP/AG/ACC/BI-12-I accepts SCO connection
+with invalid parameter at the first SCO request expecting AG to
+attempt another SCO request with the use of "safe settings" for
+given codec, base on section 5.7.1.2 of HFP 1.7 specification.
 
-Fixes: 055825614c6b ("Bluetooth: btmtkuart: add an implementation for clock osc property")
-Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+This patch addresses it by adding "Invalid LMP Parameters" (0x1e)
+to the SCO fallback case. Verified with below log:
+
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x0380
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+        Handle: 0
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x00
+        Retransmission window: 0x02
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: Transparent (0x03)
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 8
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x03c8
+          EV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 5
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Success (0x00)
+        Handle: 257
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x06
+        Retransmission window: 0x04
+        RX packet length: 30
+        TX packet length: 30
+        Air mode: Transparent (0x03)
+
+Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btmtkuart.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_event.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
-index e11169ad8247..8a81fbca5c9d 100644
---- a/drivers/bluetooth/btmtkuart.c
-+++ b/drivers/bluetooth/btmtkuart.c
-@@ -1015,7 +1015,7 @@ static int btmtkuart_probe(struct serdev_device *serdev)
- 	if (btmtkuart_is_standalone(bdev)) {
- 		err = clk_prepare_enable(bdev->osc);
- 		if (err < 0)
--			return err;
-+			goto err_hci_free_dev;
- 
- 		if (bdev->boot) {
- 			gpiod_set_value_cansleep(bdev->boot, 1);
-@@ -1028,10 +1028,8 @@ static int btmtkuart_probe(struct serdev_device *serdev)
- 
- 		/* Power on */
- 		err = regulator_enable(bdev->vcc);
--		if (err < 0) {
--			clk_disable_unprepare(bdev->osc);
--			return err;
--		}
-+		if (err < 0)
-+			goto err_clk_disable_unprepare;
- 
- 		/* Reset if the reset-gpios is available otherwise the board
- 		 * -level design should be guaranteed.
-@@ -1063,7 +1061,6 @@ static int btmtkuart_probe(struct serdev_device *serdev)
- 	err = hci_register_dev(hdev);
- 	if (err < 0) {
- 		dev_err(&serdev->dev, "Can't register HCI device\n");
--		hci_free_dev(hdev);
- 		goto err_regulator_disable;
- 	}
- 
-@@ -1072,6 +1069,11 @@ static int btmtkuart_probe(struct serdev_device *serdev)
- err_regulator_disable:
- 	if (btmtkuart_is_standalone(bdev))
- 		regulator_disable(bdev->vcc);
-+err_clk_disable_unprepare:
-+	if (btmtkuart_is_standalone(bdev))
-+		clk_disable_unprepare(bdev->osc);
-+err_hci_free_dev:
-+	hci_free_dev(hdev);
- 
- 	return err;
- }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c1d3a303d97f..88cd410e5728 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4216,6 +4216,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
++	case 0x1e:	/* Invalid LMP Parameters */
+ 	case 0x1f:	/* Unspecified error */
+ 	case 0x20:	/* Unsupported LMP Parameter value */
+ 		if (conn->out) {
 -- 
 2.25.1
 
