@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 978C0C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0C9C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:50:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7216E2078D
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D90C20659
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:50:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591659885;
-	bh=WY31jg+QTjwpvgTyqbJoQiR6KxR7XceZbkjxg2z4T+k=;
+	s=default; t=1591660246;
+	bh=ZMwayBUU3/PlVmz76TjQ1HqD5QNQrMGAw7LYg//B0fQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=JVhegfC8hOB00k+YouEpDj37rLu8ettgWWvQoEcfAWc0wwE+fbqqmtsuW0pIAzbU7
-	 QYkyKkACQ2D+B4uQCvp6wT5jcyip7KhvJqFTtUvCP7WKd+MCPNcpSYo8w+0dHu9mpU
-	 U9YBJngbOXFtEvMV2k+reuq/6O8qCx7b7ZLApsaM=
+	b=zfhqcFdOkoHfs0zu15S4D/ZPZZVoWpxX2psfg9P5FEjCbdy0rndEsUB/WBGQEH0m9
+	 zN3D5YqMcYh+FSQM8xLpR55e2NMpUfSDOKnUl+fp/HW2KbXNYw7PZv51VXGeJ+TFm7
+	 bCYQpk0GJ+5N0YI7L3z2uAp6YjoJS4hw3rzLyLIM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732062AbgFHX0v (ORCPT
+        id S1732615AbgFHXuj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 19:26:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54726 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 19:50:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51642 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732055AbgFHX0t (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:26:49 -0400
+        id S2387534AbgFHXZP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:25:15 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7AF382076C;
-        Mon,  8 Jun 2020 23:26:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C04C72076C;
+        Mon,  8 Jun 2020 23:25:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658809;
-        bh=WY31jg+QTjwpvgTyqbJoQiR6KxR7XceZbkjxg2z4T+k=;
+        s=default; t=1591658715;
+        bh=ZMwayBUU3/PlVmz76TjQ1HqD5QNQrMGAw7LYg//B0fQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cOlxYAYoO34qxL9IzQ+vjKuu9oM/xeF+mo9QAIhJF9X16xwJTeNVp22Ete7qkpSgZ
-         sKf2jJNVM3YqqCX+5DtqEFc/gFMrxDQxp1fE7EwY/COOHiGi2FiLhjqLfGaAlaMMLv
-         tBFJfnvwr7kfIQEmHXcz4MbIf0YbKb9sgy6zapCY=
+        b=k+KMJX0uKylzn3Mrzt1klpRK/onvQ7SS0AwgOyO4mo40B9j3IfBLGWQUHI1NdkLvQ
+         A3hH6jOaf7rHk7pioePrRFxFG5g7ZIxYhxalnzKerHKnx1I8yHEQUfDCC5qc2j0NkM
+         qYHfMcCuGmZ8P57FFJcV75B34lBKL1YaL03j5mD8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Hsin-Yu Chao <hychao@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 07/50] Bluetooth: Add SCO fallback for invalid LMP parameters error
-Date:   Mon,  8 Jun 2020 19:25:57 -0400
-Message-Id: <20200608232640.3370262-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 12/72] Bluetooth: Add SCO fallback for invalid LMP parameters error
+Date:   Mon,  8 Jun 2020 19:24:00 -0400
+Message-Id: <20200608232500.3369581-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608232640.3370262-1-sashal@kernel.org>
-References: <20200608232640.3370262-1-sashal@kernel.org>
+In-Reply-To: <20200608232500.3369581-1-sashal@kernel.org>
+References: <20200608232500.3369581-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -154,7 +154,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6f78489fdb13..a8aa3f29f2d6 100644
+index 363dc85bbc5c..56e4ae7d7f63 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -3775,6 +3775,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
