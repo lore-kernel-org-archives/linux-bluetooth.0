@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF395C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C5AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA85220659
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3FBD20659
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 23:59:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591660632;
-	bh=4p3kFaNwbjzRd7XMk2dV+c7fRUlfKlHkAbQyxboRuws=;
+	s=default; t=1591660747;
+	bh=PTNJSFiuLP09hxP415aSDF4UBv9j2fM6vwrHY8m2+tU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=RM/Q76dzidv7Jog4FNEMrhhqtr6IORev/0tbV4OmUJSwPPVSTifQiRIKAdUjPEDuw
-	 12ODkuA4oJsBntrgVtes6BqxFfDkhgdV3ZTc/QiyvSL7jN2Nu5GSBTuWA/zZgFMEqr
-	 6pUdnB/7Ac3YPHWrR1eCNRtkQkn/fPYRk49OJSIM=
+	b=QnYmVK7YLzxXNtkCF5n3NO/ZUWSKKJC4VU9ZGCeSwzYFTJdFt0NrodDoanwC1aBZS
+	 bpI2d6C5mIbcWdwlFDiivckU6WwsiPZIDUs/KSTY2HuOB/te/ny1Of/PDTd3k8hDis
+	 KxSCr4hpJY3VzygXsZ3ffLGnPw4VzXSxUMEwrXvg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387513AbgFHX47 (ORCPT
+        id S1730708AbgFHXXC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 19:56:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49066 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 19:23:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47994 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731170AbgFHXXf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:23:35 -0400
+        id S1730526AbgFHXXA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:23:00 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F0F4A20872;
-        Mon,  8 Jun 2020 23:23:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E507420899;
+        Mon,  8 Jun 2020 23:22:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658615;
-        bh=4p3kFaNwbjzRd7XMk2dV+c7fRUlfKlHkAbQyxboRuws=;
+        s=default; t=1591658579;
+        bh=PTNJSFiuLP09hxP415aSDF4UBv9j2fM6vwrHY8m2+tU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bMr9AhyIspDlK2o0MbcRPmEnVCvsrfcLOb4VS+bp+JBod4MDUYrGIlKB39t++5MBV
-         z1FgPGiRXg4yzIlkfG6MbiD0ZDIyqtu8cxtZUrgT51e/F+U3ATZCw4CYYxr59jHdGZ
-         OjEZvjTkCuitiBkKVTeXGHWhfPlNuy4NIgTAnvIA=
+        b=F0/VN4R6Fefj0hdfj1ZPv6gQaUyn5MycbPv0yzRFaK5tKxhjlst+zEKbaR6afwvr0
+         QGYj5+/h07MBRxUsdinQjQQfIl+rx+IoW0RuZx+aQbVB4nA5aHelZOfEAtuvD5oy8x
+         TnwM1LE34gNcJPXtJz0ZJ1EfkRwlziayxVP/ommc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hans de Goede <hdegoede@redhat.com>,
+Cc:     Hsin-Yu Chao <hychao@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 041/106] Bluetooth: btbcm: Add 2 missing models to subver tables
-Date:   Mon,  8 Jun 2020 19:21:33 -0400
-Message-Id: <20200608232238.3368589-41-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 017/106] Bluetooth: Add SCO fallback for invalid LMP parameters error
+Date:   Mon,  8 Jun 2020 19:21:09 -0400
+Message-Id: <20200608232238.3368589-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200608232238.3368589-1-sashal@kernel.org>
 References: <20200608232238.3368589-1-sashal@kernel.org>
@@ -60,52 +60,111 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hans de Goede <hdegoede@redhat.com>
+From: Hsin-Yu Chao <hychao@chromium.org>
 
-[ Upstream commit c03ee9af4e07112bd3fc688daca9e654f41eca93 ]
+[ Upstream commit 56b5453a86203a44726f523b4133c1feca49ce7c ]
 
-Currently the bcm_uart_subver_ and bcm_usb_subver_table-s lack entries
-for the BCM4324B5 and BCM20703A1 chipsets. This makes the code use just
-"BCM" as prefix for the filename to pass to request-firmware, making it
-harder for users to figure out which firmware they need. This especially
-is problematic with the UART attached BCM4324B5 where this leads to the
-filename being just "BCM.hcd".
+Bluetooth PTS test case HFP/AG/ACC/BI-12-I accepts SCO connection
+with invalid parameter at the first SCO request expecting AG to
+attempt another SCO request with the use of "safe settings" for
+given codec, base on section 5.7.1.2 of HFP 1.7 specification.
 
-Add the 2 missing devices to subver tables. This has been tested on:
+This patch addresses it by adding "Invalid LMP Parameters" (0x1e)
+to the SCO fallback case. Verified with below log:
 
-1. A Dell XPS15 9550 where this makes btbcm.c try to load
-"BCM20703A1-0a5c-6410.hcd" before it tries to load "BCM-0a5c-6410.hcd".
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x0380
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 256
+        Count: 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+        Handle: 0
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x00
+        Retransmission window: 0x02
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: Transparent (0x03)
+< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+        Handle: 256
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 8
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x03c8
+          EV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 5
+> HCI Event: Max Slots Change (0x1b) plen 3
+        Handle: 256
+        Max slots: 1
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17
+        Status: Success (0x00)
+        Handle: 257
+        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x06
+        Retransmission window: 0x04
+        RX packet length: 30
+        TX packet length: 30
+        Air mode: Transparent (0x03)
 
-2. A Thinkpad 8 where this makes btbcm.c try to load
-"BCM4324B5.hcd" before it tries to load "BCM.hcd"
-
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btbcm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/hci_event.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index e3e4d929e74f..ff6203c331ff 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -324,6 +324,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
- 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
- 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
-+	{ 0x4606, "BCM4324B5"	},	/* 002.006.006 */
- 	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
- 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
- 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
-@@ -334,6 +335,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- };
- 
- static const struct bcm_subver_table bcm_usb_subver_table[] = {
-+	{ 0x2105, "BCM20703A1"	},	/* 001.001.005 */
- 	{ 0x210b, "BCM43142A0"	},	/* 001.001.011 */
- 	{ 0x2112, "BCM4314A0"	},	/* 001.001.018 */
- 	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3e7badb3ac2d..a044e6bb12b8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4097,6 +4097,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
++	case 0x1e:	/* Invalid LMP Parameters */
+ 	case 0x1f:	/* Unspecified error */
+ 	case 0x20:	/* Unsupported LMP Parameter value */
+ 		if (conn->out) {
 -- 
 2.25.1
 
