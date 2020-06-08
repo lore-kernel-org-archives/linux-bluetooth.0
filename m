@@ -2,169 +2,185 @@ Return-Path: <SRS0=V72R=7W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0E9C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98693C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:17:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A684820775
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591661581;
-	bh=Y875Dia4Q1F7Rb7MJQgFlPzLbag97EsU+2KHsI8K/aU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xNbx6AfBbucmq6LbcLO58T1gnru2Tp90B0n4ll79/BSbhYH0pkz94aC0y7TrdiYYD
-	 uju933vWfw87FOMcC6jMGOg3VoSFHXSEIZUuMOlwJeUxBWoNx2gRC3GEkkpApunYDi
-	 NYkR6B2mMxY68DxT7ODGH1lGvTicC27IGiaKU3XY=
+	by mail.kernel.org (Postfix) with ESMTP id 6D1C72078D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 00:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387959AbgFIAMp (ORCPT
+        id S1730492AbgFIAR1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 20:12:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42514 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 20:17:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41320 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730826AbgFHXTg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:19:36 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 70B002085B;
-        Mon,  8 Jun 2020 23:19:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658376;
-        bh=Y875Dia4Q1F7Rb7MJQgFlPzLbag97EsU+2KHsI8K/aU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SJCKnY3QOGReMVGE+EaKVTPMtMk4j7zNuqjvalUXaKcu3gY9WkfheG89oN2erQYIr
-         BAtJWSA9FALY7JqY+9usql2gdxL/OUZMw7rFgv3inQvjZjEZ9eBE2IrUKxNB3sSaEa
-         VzAmWx8tYoB+thd9+uUDq+tM+7707Ir7slRvUf+o=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hsin-Yu Chao <hychao@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 038/175] Bluetooth: Add SCO fallback for invalid LMP parameters error
-Date:   Mon,  8 Jun 2020 19:16:31 -0400
-Message-Id: <20200608231848.3366970-38-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608231848.3366970-1-sashal@kernel.org>
-References: <20200608231848.3366970-1-sashal@kernel.org>
+        id S1729040AbgFHXSw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:18:52 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 208109] New: bluetooth module blocking suspend on Toshiba X30-F
+Date:   Mon, 08 Jun 2020 23:18:51 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: grbitt@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-208109-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hsin-Yu Chao <hychao@chromium.org>
+https://bugzilla.kernel.org/show_bug.cgi?id=208109
 
-[ Upstream commit 56b5453a86203a44726f523b4133c1feca49ce7c ]
+            Bug ID: 208109
+           Summary: bluetooth module blocking suspend on Toshiba X30-F
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.7.0
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: grbitt@gmail.com
+        Regression: No
 
-Bluetooth PTS test case HFP/AG/ACC/BI-12-I accepts SCO connection
-with invalid parameter at the first SCO request expecting AG to
-attempt another SCO request with the use of "safe settings" for
-given codec, base on section 5.7.1.2 of HFP 1.7 specification.
+Tested suspend like in this article
+https://www.kernel.org/doc/html/latest/power/basic-pm-debugging.html
 
-This patch addresses it by adding "Invalid LMP Parameters" (0x1e)
-to the SCO fallback case. Verified with below log:
+Sometime when I do 'devices' or higher ('plaform', 'core', 'none') step s2ram
+do not do anything and return "s2ram_do: Device or resource busy". In dmesg
+there are this lines:
+[168559.764356] Bluetooth: hci0: command 0x2042 tx timeout
+[168559.764362] Bluetooth: hci0: No way to reset. Ignoring and continuing
+[168559.770445] PM: suspend exit
 
-< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-        Handle: 256
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 13
-        Setting: 0x0003
-          Input Coding: Linear
-          Input Data Format: 1's complement
-          Input Sample Size: 8-bit
-          # of bits padding at MSB: 0
-          Air Coding Format: Transparent Data
-        Retransmission effort: Optimize for link quality (0x02)
-        Packet type: 0x0380
-          3-EV3 may not be used
-          2-EV5 may not be used
-          3-EV5 may not be used
-> HCI Event: Command Status (0x0f) plen 4
-      Setup Synchronous Connection (0x01|0x0028) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-        Handle: 256
-        Max slots: 1
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-        Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
-        Handle: 0
-        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
-        Link type: eSCO (0x02)
-        Transmission interval: 0x00
-        Retransmission window: 0x02
-        RX packet length: 0
-        TX packet length: 0
-        Air mode: Transparent (0x03)
-< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-        Handle: 256
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 8
-        Setting: 0x0003
-          Input Coding: Linear
-          Input Data Format: 1's complement
-          Input Sample Size: 8-bit
-          # of bits padding at MSB: 0
-          Air Coding Format: Transparent Data
-        Retransmission effort: Optimize for link quality (0x02)
-        Packet type: 0x03c8
-          EV3 may be used
-          2-EV3 may not be used
-          3-EV3 may not be used
-          2-EV5 may not be used
-          3-EV5 may not be used
-> HCI Event: Command Status (0x0f) plen 4
-      Setup Synchronous Connection (0x01|0x0028) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Max Slots Change (0x1b) plen 3
-        Handle: 256
-        Max slots: 5
-> HCI Event: Max Slots Change (0x1b) plen 3
-        Handle: 256
-        Max slots: 1
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-        Status: Success (0x00)
-        Handle: 257
-        Address: 00:1B:DC:F2:21:59 (OUI 00-1B-DC)
-        Link type: eSCO (0x02)
-        Transmission interval: 0x06
-        Retransmission window: 0x04
-        RX packet length: 30
-        TX packet length: 30
-        Air mode: Transparent (0x03)
+On any new try I get the same reaction. But, if I cahnge suspend mode back to
+'freezer':
 
-Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/hci_event.c | 1 +
- 1 file changed, 1 insertion(+)
+$ echo freezer > /sys/power/pm_test
+$ s2ram
+KMS graphics driver is in use, skipping quirks.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c1d3a303d97f..88cd410e5728 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4216,6 +4216,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 	case 0x11:	/* Unsupported Feature or Parameter Value */
- 	case 0x1c:	/* SCO interval rejected */
- 	case 0x1a:	/* Unsupported Remote Feature */
-+	case 0x1e:	/* Invalid LMP Parameters */
- 	case 0x1f:	/* Unspecified error */
- 	case 0x20:	/* Unsupported LMP Parameter value */
- 		if (conn->out) {
+and after that run 's2ram', system will freeze all processes successfuly. After
+that I can get back to 'devices', or even 'none' mode and usually sleep will
+work well at least couple of times.
+
+$ echo none > /sys/power/pm_test
+$ s2ram
+
+
+Also in some cases, after waking up from suspend my system hangs every
+halfsecond-second. Strace'ign every process, inculding init (and, by the way,
+killing all of them excluding init and login/bash) didn't worked out well, I'v
+still got no clue. There is nothing interesting or somehow related to hangs
+activity or polling or whatever.
+
+So, here is dmesg before suspend
+====================== BEFORE BUGGY SUSPEND ======================
+[191829.790397] PM: suspend entry (s2idle)
+[191829.807975] Filesystems sync: 0.017 seconds
+[191829.808803] Freezing user space processes ... (elapsed 0.002 seconds) done.
+[191829.811519] OOM killer disabled.
+[191829.811521] Freezing remaining freezable tasks ... (elapsed 0.001 seconds)
+done.
+[191829.813097] printk: Suspending console(s) (use no_console_suspend to debug)
+[191829.818779] wlan0: deauthenticating from b0:e2:35:ca:1b:5b by local choice
+(Reason: 3=DEAUTH_LEAVING)
+==================================================================
+
+And after suspend which lead to hangs:
+====================== AFTER BUGGGY SUSPEND ======================
+[198262.334096] ACPI: EC: interrupt unblocked
+[198265.608349] OOM killer enabled.
+[198265.608351] Restarting tasks ... 
+[198265.608452] pci_bus 0000:05: Allocating resources
+[198265.608480] pci_bus 0000:39: Allocating resources
+[198265.615005] done.
+[198265.621481] PM: suspend exit
+[198266.125942] usb 1-10: new full-speed USB device number 12 using xhci_hcd
+[198266.254840] usb 1-10: New USB device found, idVendor=8087, idProduct=0aaa,
+bcdDevice= 0.02
+[198266.254845] usb 1-10: New USB device strings: Mfr=0, Product=0,
+SerialNumber=0
+[198266.256821] Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
+[198266.257838] Bluetooth: hci0: Device revision is 2
+[198266.257842] Bluetooth: hci0: Secure boot is enabled
+[198266.257844] Bluetooth: hci0: OTP lock is enabled
+[198266.257845] Bluetooth: hci0: API lock is enabled
+[198266.257846] Bluetooth: hci0: Debug lock is disabled
+[198266.257848] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[198266.259721] Bluetooth: hci0: Found device firmware: intel/ibt-17-16-1.sfi
+[198267.636489] Bluetooth: hci0: Waiting for firmware download to complete
+[198267.636793] Bluetooth: hci0: Firmware loaded in 1347969 usecs
+[198267.636949] Bluetooth: hci0: Waiting for device to boot
+[198267.649795] Bluetooth: hci0: Device booted in 12590 usecs
+[198267.650018] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-17-16-1.ddc
+[198267.652809] Bluetooth: hci0: Applying Intel DDC parameters completed
+[198267.654810] Bluetooth: hci0: Firmware revision 0.1 build 26 week 11 2020
+=============================================================================
+
+But I can solve hangs problem by changing debug suspend mode and running
+'devices' suspend. After that system goes to suspend fine, exit suspend just
+fine and works after that just fine.
+
+
+Here is example of dmesg with correct suspend and wakeup:
+[204009.881166] PM: suspend entry (s2idle)
+[204009.887627] Filesystems sync: 0.006 seconds
+[204009.993112] Freezing user space processes ... (elapsed 0.002 seconds) done.
+[204009.996092] OOM killer disabled.
+[204009.996093] Freezing remaining freezable tasks ... (elapsed 0.001 seconds)
+done.
+[204009.997225] printk: Suspending console(s) (use no_console_suspend to debug)
+[204009.997714] wlan0: deauthenticating from 4c:5e:0c:5c:22:6d by local choice
+(Reason: 3=DEAUTH_LEAVING)
+[204010.442910] PM: suspend debug: Waiting for 5 second(s).
+[204015.465110] nvme nvme0: Shutdown timeout set to 8 seconds
+[204015.473568] nvme nvme0: 8/0/0 default/read/poll queues
+[204015.900672] OOM killer enabled.
+[204015.900673] Restarting tasks ... done.
+[204015.927051] PM: suspend exit
+[204018.264651] atkbd serio0: Spurious NAK on isa0060/serio0. Some program
+might be trying to access hardware directly.
+
+And of course usb-devices for bluetooth module:
+
+T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=01 Dev#= 12 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0aaa Rev=00.02
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#=0x0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#=0x1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+
+Bug tested with 5.7.0 with PM debug options. I'm using MX 19.2 patito feo.
+
+Any logs or testing needed?
+
 -- 
-2.25.1
-
+You are receiving this mail because:
+You are the assignee for the bug.
