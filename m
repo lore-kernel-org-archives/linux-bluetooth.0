@@ -6,60 +6,97 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB84C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 08:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8EEC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 08:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8D452072F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 08:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5125B20656
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jun 2020 08:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729090AbgFHIO5 (ORCPT
+        id S1729153AbgFHIRI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jun 2020 04:14:57 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48005 "EHLO
+        Mon, 8 Jun 2020 04:17:08 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52107 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729060AbgFHIO4 (ORCPT
+        with ESMTP id S1729085AbgFHIRI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jun 2020 04:14:56 -0400
+        Mon, 8 Jun 2020 04:17:08 -0400
 Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CC6E3CEC82;
-        Mon,  8 Jun 2020 10:24:43 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A3843CEC82;
+        Mon,  8 Jun 2020 10:26:54 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 3/3] Bluetooth: hci_qca: Refactor error handling in
- qca_suspend()
+Subject: Re: [PATCH v3] Bluetooth: Allow suspend even when preparation has
+ failed
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200605114552.3.Ib9b5e6e81ea31cdc964cd0562ef4985a6c6c5154@changeid>
-Date:   Mon, 8 Jun 2020 10:14:54 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Zijun Hu <zijuhu@codeaurora.org>, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Claire Chang <tientzu@chromium.org>
-Content-Transfer-Encoding: 7bit
-Message-Id: <7C70D49B-16CE-4299-8E35-78FA0668FF65@holtmann.org>
-References: <20200605184611.252218-1-mka@chromium.org>
- <20200605114552.3.Ib9b5e6e81ea31cdc964cd0562ef4985a6c6c5154@changeid>
-To:     Matthias Kaehlcke <mka@chromium.org>
+In-Reply-To: <20200605135009.v3.1.I0ec31d716619532fc007eac081e827a204ba03de@changeid>
+Date:   Mon, 8 Jun 2020 10:17:05 +0200
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        len.brown@intel.com,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        linux-pm@vger.kernel.org, rafael@kernel.org,
+        todd.e.brandt@linux.intel.com, rui.zhang@intel.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <24703FC2-32D1-434A-84FC-7111BEC45C2F@holtmann.org>
+References: <20200605135009.v3.1.I0ec31d716619532fc007eac081e827a204ba03de@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+Hi Abhishek,
 
-> If waiting for IBS sleep times out jump to the error handler, this is
-> easier to read than multiple 'if' branches and a fall through to the
-> error handler.
+> It is preferable to allow suspend even when Bluetooth has problems
+> preparing for sleep. When Bluetooth fails to finish preparing for
+> suspend, log the error and allow the suspend notifier to continue
+> instead.
 > 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> To also make it clearer why suspend failed, change bt_dev_dbg to
+> bt_dev_err when handling the suspend timeout.
+> 
+> Fixes: dd522a7429b07e ("Bluetooth: Handle LE devices during suspend")
+> Reported-by: Len Brown <len.brown@intel.com>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
+> To verify this is properly working, I added an additional change to
+> hci_suspend_wait_event to always return -16. This validates that suspend
+> continues even when an error has occurred during the suspend
+> preparation.
 > 
-> drivers/bluetooth/hci_qca.c | 12 +++++-------
-> 1 file changed, 5 insertions(+), 7 deletions(-)
+> Example on Chromebook:
+> [   55.834524] PM: Syncing filesystems ... done.
+> [   55.841930] PM: Preparing system for sleep (s2idle)
+> [   55.940492] Bluetooth: hci_core.c:hci_suspend_notifier() hci0: Suspend notifier action (3) failed: -16
+> [   55.940497] Freezing user space processes ... (elapsed 0.001 seconds) done.
+> [   55.941692] OOM killer disabled.
+> [   55.941693] Freezing remaining freezable tasks ... (elapsed 0.000 seconds) done.
+> [   55.942632] PM: Suspending system (s2idle)
+> 
+> I ran this through a suspend_stress_test in the following scenarios:
+> * Peer classic device connected: 50+ suspends
+> * No devices connected: 100 suspends
+> * With the above test case returning -EBUSY: 50 suspends
+> 
+> I also ran this through our automated testing for suspend and wake on
+> BT from suspend continues to work.
+> 
+> 
+> Changes in v3:
+> - Changed printf format for unsigned long
+> 
+> Changes in v2:
+> - Added fixes and reported-by tags
+> 
+> net/bluetooth/hci_core.c | 17 ++++++++++-------
+> 1 file changed, 10 insertions(+), 7 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
