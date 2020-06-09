@@ -2,220 +2,139 @@ Return-Path: <SRS0=V72R=7W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EFAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 19:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25000C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 21:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8F692067B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 19:10:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDE2E20737
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 21:25:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="n+hLPPcE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389165AbgFITKX (ORCPT
+        id S1728135AbgFIVZd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Jun 2020 15:10:23 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40922 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389150AbgFITKV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Jun 2020 15:10:21 -0400
-IronPort-SDR: BQzk+08dh/GVALutcZAhj6gUvrVy6Tx+Uyveuf3Arvn1pZsaOrFqpP3j7M1oM6oHkyJ4573s0i
- TJhNpE7rvGeg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2020 12:10:21 -0700
-IronPort-SDR: EP/18YhmeE8APyg4+PTCi/M0dIsQVQy3eDG7PjthAAQiMK6il2/Xa+ldcxXBOMZ7pgPpw8hsDM
- /Ff/MupH+EXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,493,1583222400"; 
-   d="scan'208";a="259071193"
-Received: from rpedgeco-mobl.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.255.229.21])
-  by fmsmga007.fm.intel.com with ESMTP; 09 Jun 2020 12:10:20 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, przemyslaw.fierek@silvair.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2 4/4] mesh: Add "node is busy" check for Leave() & Attach()
-Date:   Tue,  9 Jun 2020 12:10:15 -0700
-Message-Id: <20200609191015.18459-5-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200609191015.18459-1-inga.stotland@intel.com>
-References: <20200609191015.18459-1-inga.stotland@intel.com>
+        Tue, 9 Jun 2020 17:25:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725894AbgFIVZc (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 9 Jun 2020 17:25:32 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E858C05BD1E
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2020 14:25:32 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id e4so26972659ljn.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2020 14:25:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Oh20Gu011TTYQA4lVRUxSMUTBW0G3IQUbkaHag5Vhb8=;
+        b=n+hLPPcEPT7B66fK//yz8872j9i3ByxuvWDur5lklEMfIUmygLZFj115euAlY/q8Oc
+         N2+i3ahGwz1XRVO/uajkBGoNgMaPoReIlfMqwtojTsv8Sgek37tH1LbMU+NUTUITi1+Z
+         My/Fj8vnMYca1H7Sukx6uFCDuL7a54vRANt5nnpSGy5gbM+rWavZWaIgCUta5Rno8EWJ
+         OlTtbcw+Gypld8HebNAhdw3KN5/yOYPpLc9NmuAIDSdZr2JelNxyeFNcppHAMvZEfP8l
+         6oPPONgI/GcZMW1POZIpLqxkSOAwCg3fXUMwLrR0fYnSu5jsSnaIw5DmSxV/fAwu9xvv
+         D+Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Oh20Gu011TTYQA4lVRUxSMUTBW0G3IQUbkaHag5Vhb8=;
+        b=E0oeOhAzMtcp2Vr8aj4GLrQyVPo7EAp5Er46LR0xpJaJrOB/JNrs2Z/fEVaRtMStDB
+         ISEu2JikNcUgynMfgn2ZljPrWfcKsz8bOU57SLRR35iS0UhNNwkRh9EibMuDy6qKMJfa
+         OnaWIrUYXLT9S0hJjVzl9+kxpajPMnWkpa5bMh2B3TPGfUHL15B9Ij6eQ/jiIA6Xm0CM
+         84PAdy4vLf8FkN8JfgkCsqdlo6aJ3Pr3IRrpE990Eu4RNeX4Ac/fNQDkAgAZ223gi5UC
+         eqGYX9WkvC+zT2Y53v9w5aTulhpsuq30RlJL+pLUz0TwK1mPzJtDAPANjn4Hj5BHIk7+
+         HCcQ==
+X-Gm-Message-State: AOAM532bylyFv+kP3qgPotIgnISDYIHFIJpK/dcs8DIfqhSj1dyulgA3
+        SE5wyLlz6q5u5EpX5P/g7FxR+tUu0PVsa7CJ/hcWFw==
+X-Google-Smtp-Source: ABdhPJxtiSFiqyqXQUwYB+PnfQ9QsfJvWu/UYL88zyOrOzTp4mV13eFlzcVBgA+TPSfFYH8p9DymnctQ1yIFtf0Ssqk=
+X-Received: by 2002:a2e:7006:: with SMTP id l6mr113458ljc.453.1591737931057;
+ Tue, 09 Jun 2020 14:25:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200608180241.BlueZ.v1.1.Ibf8331f6c835d53fe7ca978de962f93981573d9a@changeid>
+ <CACumGOKqrBQJzYt_ayW6KRmu9QKCCPYiojdozvGwO3yTR-2Jyg@mail.gmail.com>
+In-Reply-To: <CACumGOKqrBQJzYt_ayW6KRmu9QKCCPYiojdozvGwO3yTR-2Jyg@mail.gmail.com>
+From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Date:   Tue, 9 Jun 2020 14:25:19 -0700
+Message-ID: <CACumGOKyAfdgP6t4PnNBzmVmFayV4b3gPOjux3aGg_de2T104g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1] adapter: Fix the unref and reset of
+ watch_client's members
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Alain Michaud <alainm@chromium.org>,
+        Yoni Shavit <yshavit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This introduces the following behavior change for the methods
-on Network interface that specify node token as an input parameter
+Hi,
 
-Leave() method:
-If Leave method is called for a node that is being processed as a result
-of a Create, Import, Join or Attach method calls in progress, node removal
-is not allowed and org.bluez.mesh.Error.Busy error is returned.
 
-Attach() method:
-If Attach method is called for a node that is being processed as a result
-of a Create, Import or Join method calls in progress, node attachment
-is not allowed and org.bluez.mesh.Error.Busy error is returned.
----
- doc/mesh-api.txt |  3 +++
- mesh/mesh.c      | 10 +++++++++-
- mesh/node.c      | 21 +++++++++++++++++++++
- mesh/node.h      |  1 +
- test/test-mesh   |  2 --
- 5 files changed, 34 insertions(+), 3 deletions(-)
+On Mon, Jun 8, 2020 at 6:11 PM Von Dentz, Luiz <luiz.von.dentz@intel.com> wrote:
+>
+> Hi Miao,
+>
+> On Mon, Jun 8, 2020 at 6:03 PM Miao-chen Chou <mcchou@chromium.org> wrote:
+>>
+>> This properly handles the unref of client->msg in
+>> stop_discovery_complete() and the reset of it. This also handles the unref
+>> of client->msg, the reset of client->watch and the reset of client->msg in
+>> start_discovery_complete().
+>>
+>> The following test was performed:
+>> (1) Intentionally changed the MGMT status other than MGMT_STATUS_SUCCESS
+>> in stop_discovery_complete() and start_discovery_complete() and built
+>> bluetoothd.
+>> (2) In bluetoothctl console, issued scan on/scan off to invoke
+>> StartDiscovery and verified that new discovery requests can be processed.
+>>
+>> Reviewed-by: Alain Michaud <alainm@chromium.org>
+>> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+>> ---
+>>
+>>  src/adapter.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 76acfea70..0857a3115 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -1652,6 +1652,9 @@ fail:
+>>                 reply = btd_error_busy(client->msg);
+>>                 g_dbus_send_message(dbus_conn, reply);
+>>                 g_dbus_remove_watch(dbus_conn, client->watch);
+>
+>
+> We shouldn't be removing the watch directly since the client may have registered filters so we let discovery_remove do it by calling discovery_free if necessary.
+>
+>>
+>> +               client->watch = 0;
+>> +               dbus_message_unref(client->msg);
+>> +               client->msg = NULL;
+>>                 discovery_remove(client, false);
+>>                 return;
+>>         }
+>> @@ -1926,6 +1929,8 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+>>                 if (client->msg) {
+>>                         reply = btd_error_busy(client->msg);
+>>                         g_dbus_send_message(dbus_conn, reply);
+>> +                       dbus_message_unref(client->msg);
+>> +                       client->msg = NULL;
+>>                 }
+>>                 goto done;
+>>         }
+>> --
+>> 2.26.2
+>
+>
+> Ive sent similar fixes upstream, let me attach them here just in case.
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index e85f0bf52..4bef6174c 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -116,6 +116,7 @@ Methods:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.NotFound,
- 			org.bluez.mesh.Error.AlreadyExists,
-+			org.bluez.mesh.Error.Busy,
- 			org.bluez.mesh.Error.Failed
- 
- 	void Leave(uint64 token)
-@@ -126,6 +127,8 @@ Methods:
- 
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotFound
-+			org.bluez.mesh.Error.Busy
- 
- 	void CreateNetwork(object app_root, array{byte}[16] uuid)
- 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index a5935c216..c8767ee7a 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -655,13 +655,21 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 						void *user_data)
- {
- 	uint64_t token;
-+	struct mesh_node *node;
- 
- 	l_debug("Leave");
- 
- 	if (!l_dbus_message_get_arguments(msg, "t", &token))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	node_remove(node_find_by_token(token));
-+	node = node_find_by_token(token);
-+	if (!node)
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
-+
-+	if (node_is_busy(node))
-+		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+	node_remove(node);
- 
- 	return l_dbus_message_new_method_return(msg);
- }
-diff --git a/mesh/node.c b/mesh/node.c
-index 7ec06437b..567f2e6db 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -88,6 +88,7 @@ struct mesh_node {
- 	char *storage_dir;
- 	uint32_t disc_watch;
- 	uint32_t seq_number;
-+	bool busy;
- 	bool provisioner;
- 	uint16_t primary;
- 	struct node_composition comp;
-@@ -598,6 +599,11 @@ bool node_is_provisioner(struct mesh_node *node)
- 	return node->provisioner;
- }
- 
-+bool node_is_busy(struct mesh_node *node)
-+{
-+	return node->busy;
-+}
-+
- void node_app_key_delete(struct mesh_node *node, uint16_t net_idx,
- 							uint16_t app_idx)
- {
-@@ -1352,6 +1358,8 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
- 	/* Initialize configuration server model */
- 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
- 
-+	node->busy = true;
-+
- 	return true;
- }
- 
-@@ -1459,6 +1467,9 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 	struct keyring_net_key net_key;
- 	uint8_t dev_key[16];
- 
-+	if (req->type == REQUEST_TYPE_ATTACH)
-+		req->attach->busy = false;
-+
- 	if (!msg || l_dbus_message_is_error(msg)) {
- 		l_error("Failed to get app's dbus objects");
- 		goto fail;
-@@ -1654,6 +1665,12 @@ void node_attach(const char *app_root, const char *sender, uint64_t token,
- 		return;
- 	}
- 
-+	/* Check if there is a pending request associated with this node */
-+	if (node->busy) {
-+		cb(user_data, MESH_ERROR_BUSY, NULL);
-+		return;
-+	}
-+
- 	/* Check if the node is already in use */
- 	if (node->owner) {
- 		l_warn("The node is already in use");
-@@ -1674,6 +1691,8 @@ void node_attach(const char *app_root, const char *sender, uint64_t token,
- 	req->attach = node;
- 	req->type = REQUEST_TYPE_ATTACH;
- 
-+	node->busy = true;
-+
- 	send_managed_objects_request(sender, app_root, req);
- }
- 
-@@ -2347,6 +2366,8 @@ void node_finalize_new_node(struct mesh_node *node, struct mesh_io *io)
- 	free_node_dbus_resources(node);
- 	mesh_agent_remove(node->agent);
- 
-+	node->busy = false;
-+
- 	/* Register callback for the node's io */
- 	attach_io(node, io);
- }
-diff --git a/mesh/node.h b/mesh/node.h
-index e26d410c8..b8b2b1b49 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -39,6 +39,7 @@ struct mesh_node *node_find_by_addr(uint16_t addr);
- struct mesh_node *node_find_by_uuid(uint8_t uuid[16]);
- struct mesh_node *node_find_by_token(uint64_t token);
- bool node_is_provisioner(struct mesh_node *node);
-+bool node_is_busy(struct mesh_node *node);
- void node_app_key_delete(struct mesh_node *node, uint16_t net_idx,
- 							uint16_t app_idx);
- uint16_t node_get_primary(struct mesh_node *node);
-diff --git a/test/test-mesh b/test/test-mesh
-index 38f0c0a74..7c8a25482 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -412,8 +412,6 @@ class Application(dbus.service.Object):
- 
- 		token = value
- 		have_token = True
--		if attached == False:
--			attach(token)
- 
- 	@dbus.service.method(MESH_APPLICATION_IFACE,
- 					in_signature="s", out_signature="")
--- 
-2.26.2
-
+Any comments on these changes, I would like to push them as soon as possible.
