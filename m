@@ -7,59 +7,64 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DF8C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E9DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50A6C2078C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4ED322078C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bNGhbEar"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OxPB1aXF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727979AbgFJPGA (ORCPT
+        id S1729908AbgFJPGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 11:06:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41092 "EHLO
+        Wed, 10 Jun 2020 11:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgFJPF7 (ORCPT
+        with ESMTP id S1726081AbgFJPGJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 11:05:59 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CAFAC03E96B
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 08:05:59 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id k186so2411400ybc.19
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 08:05:59 -0700 (PDT)
+        Wed, 10 Jun 2020 11:06:09 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E310C03E96B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 08:06:09 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p22so2424305ybg.21
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 08:06:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DFAugfN6wid2Iaw64Qa5wmgkAZMD2ptZtMQ6f6/Mx5k=;
-        b=bNGhbEar8k6GzFFMv4elDtAvcB+/KK1rmqsogGa3ZjOTKs5fjArrzgqi+nVyTP6Rq2
-         +C+FRG08BQRKpmkcXoabmPJfDVRM3pyzalMMfAAYrusI65VBF9W0+BYEZVifnG6Fhx8j
-         O2fMhJkgkAzMhcAQ6djYLKp650DrQgN8tsy6DpKvgVLr6T4rgxOmlfci9rskWDPUYvAP
-         Rla62cC8u9XqBuXj9Zrw9PJLJV6MyY972x22sHT78ViasP32iDn5NFVfJRUCWgKLB8Nv
-         pXCAxmDXlr5MEYi83JgWKkltIlor6UeQZMoOJf2ARi/vfwV9hOpn9hLyrZVUBRiCLUn/
-         l3nQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=ytCJjlQonwgpmtQxsMptExchNW5WfYR+Wur9JMGT4ts=;
+        b=OxPB1aXFJ3JX5/JjHR6obEQrCdw9SFVl75XDL/LfGPo+eaza1HUoMN1qpPQaeb0e1s
+         pkhaGPSbl8i/PI9OQt7xVIS96sI6jbDu0daPYsQZzyv1zXPmpcDIIIGd//SGfAE07cOt
+         PRPfqPN2MgKA71SdCkwR0dUqqCVSy62kOjHRz+9sv7k+uLAlohcpaoWq+GalzvQgf0MH
+         Hwvk4w8CpETzbvrh2KhLDz3J+ZpZr+xAhzZmjReRPe0IRsDAU9zyfRc7hIkE3XR4ANW5
+         gekZ5eMXYH3Fy9PPRfSDGTgKAh0Il7lXOBomuWWwpA+WJExj6o/k8Zi7dSriZujBKaAR
+         E+dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DFAugfN6wid2Iaw64Qa5wmgkAZMD2ptZtMQ6f6/Mx5k=;
-        b=EbttL1R0EzGQfezjB9iXVDOWcFvCIqrEix/RHjvatdQ9uyOXORmd65i55WXU/TTV+f
-         DcLXLJnsAGXMTepqJcfPdxWEwFeI5Tg/+GLzijpJT8wOT3KPFv43pcvJ9lJDmkVUV5eH
-         KkBr/Q8IcFEy1KNb45H96S1GtD6JOq7M/Wp0I4AU3opGUp0gDL76eSstu5MEbX7nOYuc
-         4lOWTwcS29Fc9XY6vEbqACck8HXKPrhN9YX6VukSI5buOsDuSrrd2Rh5niiWUnQVm3ud
-         ILaZcMI8Ob4uvr0Cak9Q5F7E9b5tFqJiHohimW/VsVDH2eobmBSLTorNiQozNHBHfBqd
-         4NQw==
-X-Gm-Message-State: AOAM531zD4jYNy+cnxO3OUBY29n9tN0HU61tOdjlvMBJzi8Q+7ciVss3
-        TWKzERsjmZ1uuPe6G5qWZ5m9z/gm3K6DNpUB/l3+jNAoUqEZNqmJ6h9oKGXo+oN1rEFZJLNLWv+
-        gopViq8/BpAhFuSpG9Yw0EIRoWT3A5GuFIzqW06dDiCuPeI7EfTgp3r2VovPOkZELR4FGjDH7b2
-        tP
-X-Google-Smtp-Source: ABdhPJzkkpzDnQeVmQexa7JL44T3LJVo/aM5dHT+SrkwDxJoSHmQHosoU1SoZI1XNEKL83XCcQztMCZuAcBB
-X-Received: by 2002:a25:d354:: with SMTP id e81mr6591544ybf.398.1591801558180;
- Wed, 10 Jun 2020 08:05:58 -0700 (PDT)
-Date:   Wed, 10 Jun 2020 23:05:44 +0800
-Message-Id: <20200610230524.Bluez.v1.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=ytCJjlQonwgpmtQxsMptExchNW5WfYR+Wur9JMGT4ts=;
+        b=mghhIqYhHaWL/sbDYCdrSdGWzEf2b8BltHMvqPCt1ytXSD96+386jFQ32Dx8kOj4w5
+         UrN/mBfgg55KkLQnVmyfrXJIJn2Si/XSdYXycmlildKki3hreo8a8pdVoWuPep45pXuL
+         BXwaOYN6090L83QhrhDLkZUvqUv0nn8p8l9KdabdPSEL61REVVvV+r/0nYWD2MHF1jv7
+         2EPSXArf5dS1ll52cNhJDPXcxhKlMo0MlPxtHleiVVk5S6lZkr/bHMxy5x4Vh+jXCV1N
+         EXcrR2AFOu3kulgt16BXqewM+SvNgtl+OvAUjmh5LRKpvALhcq0WOACficMwHm3+93G8
+         bFKQ==
+X-Gm-Message-State: AOAM531iH9VLSEP798BVUgNnDnNsNkF05n1U5w0GuvU4tLBkSksIsHGt
+        zw1RN0wJh/U70AxC7keTXZ/z4FVNXdU0vOsxcL19tucQ2p1rTnArEyKToV4sgTVsOOmWl73nhKs
+        EcvIMo/kB+a/2/nHptq/sE9uAexKE79FKJPlDMTAMRFTK+1xeFBKU2rcGXgoPP6pbq3wywZD36M
+        B3
+X-Google-Smtp-Source: ABdhPJxKKFSSyKoPkkA6IWiM8I7Bn+urZLgFaW9REsaG1+Wrhe31D9ibJQAQ5zXaTSCzM865LECSWkv5tkii
+X-Received: by 2002:a25:80c3:: with SMTP id c3mr6970636ybm.33.1591801568483;
+ Wed, 10 Jun 2020 08:06:08 -0700 (PDT)
+Date:   Wed, 10 Jun 2020 23:05:45 +0800
+In-Reply-To: <20200610230524.Bluez.v1.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
+Message-Id: <20200610230524.Bluez.v1.2.I16f38fd33617bbbf84d144605861b8391605a761@changeid>
 Mime-Version: 1.0
+References: <20200610230524.Bluez.v1.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
 X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
-Subject: [Bluez PATCH v1 1/2] device: add device_remove_bonding function
+Subject: [Bluez PATCH v1 2/2] input: Remove bonding info when receiving
+ virtual cable unplug
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -72,71 +77,96 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-This patch splits the "bonding removal" function in device.c,
-because we need to remove bonding information when receiving
-"virtual cable unplug" in HID profile.
+From Bluetooth HID Profile 1.1 Spec: If a Virtual Cable is
+unplugged via a HID control Virtual Unplug command, then both the
+Bluetooth HID device and Bluetooth HID Host shall destroy or
+invalidate all Bluetooth bonding and Virtual Cable information
+that was previously stored in persistent memory for the respective
+Virtually Cabled devices and hosts.
+
+This patch removes the bonding information upon receiving and/or
+sending a "virtual cable unplug".
 ---
 
- src/device.c | 25 +++++++++++++++----------
- src/device.h |  1 +
- 2 files changed, 16 insertions(+), 10 deletions(-)
+ profiles/input/device.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/src/device.c b/src/device.c
-index 7b0eb256e..9fb0e018c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4162,6 +4162,17 @@ static void delete_folder_tree(const char *dirname)
- 	rmdir(dirname);
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index d89da2d7c..45d86b6cb 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -88,6 +88,7 @@ struct input_device {
+ 	uint8_t			report_req_pending;
+ 	guint			report_req_timer;
+ 	uint32_t		report_rsp_id;
++	bool			unbond_on_disconnect;
+ };
+ 
+ static int idle_timeout = 0;
+@@ -148,6 +149,14 @@ static void input_device_free(struct input_device *idev)
+ 	g_free(idev);
  }
  
-+void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type)
++static void invalidate_bonding(struct input_device *idev)
 +{
-+	if (bdaddr_type == BDADDR_BREDR)
-+		device->bredr_state.bonded = false;
-+	else
-+		device->le_state.bonded = false;
++	device_remove_bonding(device_get_adapter(idev->device),
++				btd_device_get_bdaddr_type(idev->device));
 +
-+	btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-+							bdaddr_type);
++	idev->unbond_on_disconnect = false;
 +}
 +
- static void device_remove_stored(struct btd_device *device)
+ static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
+ 					const uint8_t *data, size_t size)
  {
- 	char device_addr[18];
-@@ -4170,17 +4181,11 @@ static void device_remove_stored(struct btd_device *device)
- 	char *data;
- 	gsize length = 0;
+@@ -188,6 +197,9 @@ static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
+ static bool hidp_send_ctrl_message(struct input_device *idev, uint8_t hdr,
+ 					const uint8_t *data, size_t size)
+ {
++	if (hdr == (HIDP_TRANS_HID_CONTROL | HIDP_CTRL_VIRTUAL_CABLE_UNPLUG))
++		idev->unbond_on_disconnect = true;
++
+ 	return hidp_send_message(idev->ctrl_io, hdr, data, size);
+ }
  
--	if (device->bredr_state.bonded) {
--		device->bredr_state.bonded = false;
--		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
--								BDADDR_BREDR);
--	}
-+	if (device->bredr_state.bonded)
-+		device_remove_bonding(device, BDADDR_BREDR);
+@@ -342,6 +354,9 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 	/* Enter the auto-reconnect mode if needed */
+ 	input_device_enter_reconnect_mode(idev);
  
--	if (device->le_state.bonded) {
--		device->le_state.bonded = false;
--		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
--							device->bdaddr_type);
--	}
-+	if (device->le_state.bonded)
-+		device_remove_bonding(device, device->bdaddr_type);
++	if (!idev->ctrl_io && idev->unbond_on_disconnect)
++		invalidate_bonding(idev);
++
+ 	return FALSE;
+ }
  
- 	device->bredr_state.paired = false;
- 	device->le_state.paired = false;
-diff --git a/src/device.h b/src/device.h
-index 06b100499..907c7c5c4 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -49,6 +49,7 @@ uint16_t btd_device_get_vendor(struct btd_device *device);
- uint16_t btd_device_get_vendor_src(struct btd_device *device);
- uint16_t btd_device_get_product(struct btd_device *device);
- uint16_t btd_device_get_version(struct btd_device *device);
-+void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type);
- void device_remove(struct btd_device *device, gboolean remove_stored);
- int device_address_cmp(gconstpointer a, gconstpointer b);
- int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
+@@ -406,7 +421,7 @@ static void hidp_recv_ctrl_hid_control(struct input_device *idev, uint8_t param)
+ 	DBG("");
+ 
+ 	if (param == HIDP_CTRL_VIRTUAL_CABLE_UNPLUG)
+-		connection_disconnect(idev, 0);
++		connection_disconnect(idev, (1 << HIDP_VIRTUAL_CABLE_UNPLUG));
+ }
+ 
+ static void hidp_recv_ctrl_data(struct input_device *idev, uint8_t param,
+@@ -530,6 +545,9 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 	if (idev->intr_io && !(cond & G_IO_NVAL))
+ 		g_io_channel_shutdown(idev->intr_io, TRUE, NULL);
+ 
++	if (!idev->intr_io && idev->unbond_on_disconnect)
++		invalidate_bonding(idev);
++
+ 	return FALSE;
+ }
+ 
+@@ -1035,6 +1053,9 @@ static int connection_disconnect(struct input_device *idev, uint32_t flags)
+ 	if (idev->ctrl_io)
+ 		g_io_channel_shutdown(idev->ctrl_io, TRUE, NULL);
+ 
++	if (flags & (1 << HIDP_VIRTUAL_CABLE_UNPLUG))
++		idev->unbond_on_disconnect = true;
++
+ 	if (idev->uhid)
+ 		return 0;
+ 	else
 -- 
 2.27.0.278.ge193c7cf3a9-goog
 
