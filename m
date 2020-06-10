@@ -2,421 +2,145 @@ Return-Path: <SRS0=8+Sx=7X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0ACC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0838DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D9A6206F7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF6F52078D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A6L5cQEU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFsUSFgB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730494AbgFJUF1 (ORCPT
+        id S1727038AbgFJUWd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 16:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59228 "EHLO
+        Wed, 10 Jun 2020 16:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727877AbgFJUF1 (ORCPT
+        with ESMTP id S1726219AbgFJUWd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 16:05:27 -0400
-Received: from mail-vk1-xa43.google.com (mail-vk1-xa43.google.com [IPv6:2607:f8b0:4864:20::a43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5914AC03E96B
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:05:27 -0700 (PDT)
-Received: by mail-vk1-xa43.google.com with SMTP id u15so904780vkk.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:05:27 -0700 (PDT)
+        Wed, 10 Jun 2020 16:22:33 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE98C03E96B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:22:32 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id 69so2799979otv.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:22:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=/yqETY+RHpYYZsFOwaipeBbdkgyHX5zy6ufvwsI+Jbk=;
-        b=A6L5cQEUg2iwPOFE6akkofrmuZKHIEi9BQp5BZm3nn4YFPCe0auYVpOw2ewH5xw0ri
-         kSpcnfuRbNTpkydFW3IOSYIb35FGweAqSorVhuVaFzuZWthikEZjXpVUu0gfcduGoitS
-         Llay0pRFNnnzn9KLrJi6PnZCkn9g/1+rb6dhE=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RSJwoJOONFjfcicEnTC8HxvKhhMUTlXSAnKW+KEzDx0=;
+        b=gFsUSFgBvbqua7BAtgsTG3DNEs24quQX59JszaZlfb7pu9lrgjTVkM2VM8Drv0k2WJ
+         xNS0F7d1oIQuDjr/CjhD59K7D5coPOb/N9WwrQw5HTT0/xqW20X5For0chYwId2tWn1U
+         9A58OWx1crbVRSh7JdylEfVyYK40lFs+li5QkAHTYKF5hyyZ6/y+EpXTsxtkJmRqW8nv
+         pHNRoAtUhEHz5EbMhDT10hBepof6M6gM+7q0SRvYsQeNF45os0qaWMySnfxZMYooj3ci
+         Ambfwir6WmJhCMmhL5GwMwYYBy/bKHaLVsULX9lJEat6ZSWRItM1FAjlYJ7KPlGFPaXN
+         vzbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/yqETY+RHpYYZsFOwaipeBbdkgyHX5zy6ufvwsI+Jbk=;
-        b=hSWz1V8mIPeEpdC62EANU2yCv0rqK3LL4n40mdax2bxUOzYNhqrVfHHk0xD/fxmECi
-         t9CwlZcaNMG9PG/++ZQeEBT1bET2jnLUNruBlLdTYH50WWkbqixhMlH6izVrK1I6XPYK
-         zjCkRKa+vcmhPCc7lRg3jb0RqMqL3bqYSg5b7J73lMyEgW6UdYmEfjs71u2Tfru4ySXc
-         Pk5dEOza0k8FRunYEbt4Tjl3rRdptaqL/c/N13OSX9Ue/l4Lpb4qR4+kVyeUGJ+Z6AgF
-         EusWnduJgoaHX9ivNJ15mqhq05zZQOnKn0y8NT6p7zPERXJXnKQbV/ExXP+p31oH/JxQ
-         onvA==
-X-Gm-Message-State: AOAM532osKRkooecH0X/TyBP392K7Pb20wqZA+JLKiuXjILm4SUNxX5e
-        IAkvC/RcTANlce+RsVpa4IV+AXjzJrE=
-X-Google-Smtp-Source: ABdhPJzVUwoBjPT6acpbjdGj5ZYYhYcjtET7FDyZRbYmTtuKMncRT2nVcs7mBhfT0AmmbqXzT7x+8A==
-X-Received: by 2002:a1f:a448:: with SMTP id n69mr3822071vke.44.1591819526013;
-        Wed, 10 Jun 2020 13:05:26 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id q185sm107253vkq.10.2020.06.10.13.05.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2020 13:05:25 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH v2 3/3] bluetooth: implement read/set default system parameters mgmt
-Date:   Wed, 10 Jun 2020 20:04:55 +0000
-Message-Id: <20200610200452.107406-4-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
-In-Reply-To: <20200610200452.107406-1-alainm@chromium.org>
-References: <20200610200452.107406-1-alainm@chromium.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RSJwoJOONFjfcicEnTC8HxvKhhMUTlXSAnKW+KEzDx0=;
+        b=XAtboURp0ocWZlTWBGZhPzcrbP+/urR8XlywdBfGOSUV98LRdeaZH4TmtwsR5bL5RW
+         LHlQSrCfazgDa7rWAlOL/6bOBNE17ZVc2dRZia0LNF/JxndfBbMEcT6EMKGUCtFU3WsV
+         ArLnqKyguDB+QSyepYK5QwFx+pfBQSRuhnEaWmdppGBxEP1uPk8ELpASoyO9Uhsu9/BF
+         cpvphMlecoXvOWfbN1gLI9qODvvr7EUZcKmWmHuf66vb/2SAer05qHHoxB1FY/+bWWEt
+         /h7RL0h3fgPYrHmzM4txG4XOUPt+50T3hVcCP1BUHV4QyQ532bE0wAJ5U9jC3PjWWYlq
+         lSLg==
+X-Gm-Message-State: AOAM533l+uzbBY7knjjbDwJVJJJ77tN2J50nFXx0b8xi1Sq21LnTf/Pp
+        VyMBLcjKCcKv38Vh2Lt0O0b/4iUUkpAtUm2Eltk=
+X-Google-Smtp-Source: ABdhPJz2ro0xCJpfPhElxnz2IJ5xdRC9zxFd4venu/x7zIghVa/FvfpU2NAhIg7/Z9wuHZ1cCrPXKfqhK/A+4HyhN7g=
+X-Received: by 2002:a05:6830:14c4:: with SMTP id t4mr4198025otq.79.1591820552050;
+ Wed, 10 Jun 2020 13:22:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200609225813.Bluez.v2.1.I1952bb847ed07631095daf37fe281a49ccf864d0@changeid>
+ <CAJQfnxGAAFY0j1GQcOLvWuoYmLmmBSyimMz-hn7-Lh25A6fOtg@mail.gmail.com>
+In-Reply-To: <CAJQfnxGAAFY0j1GQcOLvWuoYmLmmBSyimMz-hn7-Lh25A6fOtg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 10 Jun 2020 13:22:20 -0700
+Message-ID: <CABBYNZJq0qggkBagHuxyvmw7rW-boq4ju1O79eZDm_bGjkaB3Q@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2] input: disconnect intr channel before ctrl channel
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch implements the read default system parameters and the set
-default system parameters mgmt commands.
+Hi Archie,
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+On Tue, Jun 9, 2020 at 8:03 AM Archie Pusaka <apusaka@google.com> wrote:
+>
+> Hi Luiz,
+>
+> Sorry, I didn't realize sooner that the version which I sent earlier
+> as v1 is different than the one in my local repo. This is the correct
+> version.
+>
+> Thanks,
+> Archie
+>
+>
+> On Tue, 9 Jun 2020 at 22:58, Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > According to bluetooth HID Profile spec Ver 1.0, section 7.2.2, A
+> > host or device shall always complete the disconnection of the
+> > interrupt channel before disconnecting the control channel.
+> > However, the current implementation disconnects them both
+> > simultaneously.
+> >
+> > This patch postpone the disconnection of control channel to the
+> > callback of interrupt watch, which shall be called upon receiving
+> > interrupt channel disconnection response.
+> > ---
+> >
+> > Changes in v2:
+> > -change socket shut mode to SHUT_WR
+> >
+> >  profiles/input/device.c | 15 ++++++++++-----
+> >  1 file changed, 10 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/profiles/input/device.c b/profiles/input/device.c
+> > index d89da2d7c..e2ea459fe 100644
+> > --- a/profiles/input/device.c
+> > +++ b/profiles/input/device.c
+> > @@ -1026,14 +1026,19 @@ static bool is_connected(struct input_device *idev)
+> >
+> >  static int connection_disconnect(struct input_device *idev, uint32_t flags)
+> >  {
+> > +       int sock;
+> > +
+> >         if (!is_connected(idev))
+> >                 return -ENOTCONN;
+> >
+> > -       /* Standard HID disconnect */
+> > -       if (idev->intr_io)
+> > -               g_io_channel_shutdown(idev->intr_io, TRUE, NULL);
+> > -       if (idev->ctrl_io)
+> > -               g_io_channel_shutdown(idev->ctrl_io, TRUE, NULL);
+> > +       /* Standard HID disconnect
+> > +        * Intr channel must be disconnected before ctrl channel, so only
+> > +        * disconnect intr here, ctrl is disconnected in intr_watch_cb.
+> > +        */
+> > +       if (idev->intr_io) {
+> > +               sock = g_io_channel_unix_get_fd(idev->intr_io);
+> > +               shutdown(sock, SHUT_WR);
+> > +       }
+> >
+> >         if (idev->uhid)
+> >                 return 0;
+> > --
+> > 2.27.0.278.ge193c7cf3a9-goog
+> >
 
-Changes in v2: None
+Applied, thanks.
 
- net/bluetooth/Makefile      |   2 +-
- net/bluetooth/mgmt.c        |   6 +
- net/bluetooth/mgmt_config.c | 253 ++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt_config.h |  11 ++
- 4 files changed, 271 insertions(+), 1 deletion(-)
- create mode 100644 net/bluetooth/mgmt_config.c
- create mode 100644 net/bluetooth/mgmt_config.h
-
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 41dd541a44a5..1c645fba8c49 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
--	ecdh_helper.o hci_request.o mgmt_util.o
-+	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o
- 
- bluetooth-$(CONFIG_BT_BREDR) += sco.o
- bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9e8a3cccc6ca..69cd4f756a0d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -36,6 +36,7 @@
- #include "hci_request.h"
- #include "smp.h"
- #include "mgmt_util.h"
-+#include "mgmt_config.h"
- 
- #define MGMT_VERSION	1
- #define MGMT_REVISION	17
-@@ -111,6 +112,8 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_SECURITY_INFO,
- 	MGMT_OP_READ_EXP_FEATURES_INFO,
- 	MGMT_OP_SET_EXP_FEATURE,
-+	MGMT_OP_READ_DEF_SYSTEM_CONFIG,
-+	MGMT_OP_SET_DEF_SYSTEM_CONFIG,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -162,6 +165,7 @@ static const u16 mgmt_untrusted_commands[] = {
- 	MGMT_OP_READ_EXT_INFO,
- 	MGMT_OP_READ_SECURITY_INFO,
- 	MGMT_OP_READ_EXP_FEATURES_INFO,
-+	MGMT_OP_READ_DEF_SYSTEM_CONFIG,
- };
- 
- static const u16 mgmt_untrusted_events[] = {
-@@ -7297,6 +7301,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ set_exp_feature,         MGMT_SET_EXP_FEATURE_SIZE,
- 						HCI_MGMT_VAR_LEN |
- 						HCI_MGMT_HDEV_OPTIONAL },
-+	{ read_def_system_config, 0, HCI_MGMT_UNTRUSTED },
-+	{ set_def_system_config, 0, HCI_MGMT_VAR_LEN },
- };
- 
- void mgmt_index_added(struct hci_dev *hdev)
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-new file mode 100644
-index 000000000000..f967ffc3fbb1
---- /dev/null
-+++ b/net/bluetooth/mgmt_config.c
-@@ -0,0 +1,253 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+/*
-+ * Copyright (C) 2020 Google Corporation
-+ */
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/mgmt.h>
-+
-+#include "mgmt_util.h"
-+#include "mgmt_config.h"
-+
-+#define HDEV_PARAM_U16(_param_code_, _param_name_) \
-+{ \
-+	{ _param_code_, sizeof(__u16) }, \
-+	{ cpu_to_le16(hdev->_param_name_) } \
-+}
-+
-+int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-+			   u16 data_len)
-+{
-+	struct {
-+		struct mgmt_tlv entry;
-+		union {
-+			/* This is a simplification for now since all values
-+			 * are 16 bits.  In the future, this code may need
-+			 * refactoring to account for variable length values
-+			 * and properly calculate the required buffer size.
-+			 */
-+			u16 value;
-+		};
-+	} __packed params[] = {
-+		/* Please see mgmt-api.txt for documentation of these values */
-+		HDEV_PARAM_U16(0x0000, def_page_scan_type),
-+		HDEV_PARAM_U16(0x0001, def_page_scan_int),
-+		HDEV_PARAM_U16(0x0002, def_page_scan_window),
-+		HDEV_PARAM_U16(0x0003, def_inq_scan_type),
-+		HDEV_PARAM_U16(0x0004, def_inq_scan_int),
-+		HDEV_PARAM_U16(0x0005, def_inq_scan_window),
-+		HDEV_PARAM_U16(0x0006, def_br_lsto),
-+		HDEV_PARAM_U16(0x0007, def_page_timeout),
-+		HDEV_PARAM_U16(0x0008, sniff_min_interval),
-+		HDEV_PARAM_U16(0x0009, sniff_max_interval),
-+		HDEV_PARAM_U16(0x000a, le_adv_min_interval),
-+		HDEV_PARAM_U16(0x000b, le_adv_max_interval),
-+		HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
-+		HDEV_PARAM_U16(0x000d, le_scan_interval),
-+		HDEV_PARAM_U16(0x000e, le_scan_window),
-+		HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
-+		HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
-+		HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
-+		HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
-+		HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
-+		HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
-+		HDEV_PARAM_U16(0x0015, le_scan_int_connect),
-+		HDEV_PARAM_U16(0x0016, le_scan_window_connect),
-+		HDEV_PARAM_U16(0x0017, le_conn_min_interval),
-+		HDEV_PARAM_U16(0x0018, le_conn_max_interval),
-+		HDEV_PARAM_U16(0x0019, le_conn_latency),
-+		HDEV_PARAM_U16(0x001a, le_supv_timeout),
-+	};
-+	struct mgmt_rp_read_def_system_config *rp = (void *)params;
-+
-+	bt_dev_dbg(hdev, "sock %p", sk);
-+
-+	return mgmt_cmd_complete(sk, hdev->id,
-+				 MGMT_OP_READ_DEF_SYSTEM_CONFIG,
-+				 0, rp, sizeof(params));
-+}
-+
-+#define TO_TLV(x)		((struct mgmt_tlv *)(x))
-+#define TLV_GET_LE16(tlv)	le16_to_cpu(*((u16 *)(TO_TLV(tlv)->value)))
-+
-+int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 data_len)
-+{
-+	u16 buffer_left = data_len;
-+	u8 *buffer = data;
-+
-+	if (buffer_left < sizeof(struct mgmt_tlv)) {
-+		return mgmt_cmd_status(sk, hdev->id,
-+				       MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+				       MGMT_STATUS_INVALID_PARAMS);
-+	}
-+
-+	/* First pass to validate the tlv */
-+	while (buffer_left >= sizeof(struct mgmt_tlv)) {
-+		const u8 len = TO_TLV(buffer)->length;
-+		const u16 exp_len = sizeof(struct mgmt_tlv) +
-+				    len;
-+		const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
-+
-+		if (buffer_left < exp_len) {
-+			bt_dev_warn(hdev, "invalid len left %d, exp >= %d",
-+				    buffer_left, exp_len);
-+
-+			return mgmt_cmd_status(sk, hdev->id,
-+					MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+					MGMT_STATUS_INVALID_PARAMS);
-+		}
-+
-+		/* Please see mgmt-api.txt for documentation of these values */
-+		switch (type) {
-+		case 0x0000:
-+		case 0x0001:
-+		case 0x0002:
-+		case 0x0003:
-+		case 0x0004:
-+		case 0x0005:
-+		case 0x0006:
-+		case 0x0007:
-+		case 0x0008:
-+		case 0x0009:
-+		case 0x000a:
-+		case 0x000b:
-+		case 0x000c:
-+		case 0x000d:
-+		case 0x000e:
-+		case 0x000f:
-+		case 0x0010:
-+		case 0x0011:
-+		case 0x0012:
-+		case 0x0013:
-+		case 0x0014:
-+		case 0x0015:
-+		case 0x0016:
-+		case 0x0017:
-+		case 0x0018:
-+		case 0x0019:
-+		case 0x001a:
-+			if (len != sizeof(u16)) {
-+				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
-+					    len, sizeof(u16), type);
-+
-+				return mgmt_cmd_status(sk, hdev->id,
-+					MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+					MGMT_STATUS_INVALID_PARAMS);
-+			}
-+			break;
-+		default:
-+			bt_dev_warn(hdev, "unsupported parameter %u", type);
-+			break;
-+		}
-+
-+		buffer_left -= exp_len;
-+		buffer += exp_len;
-+	}
-+
-+	buffer_left = data_len;
-+	buffer = data;
-+	while (buffer_left >= sizeof(struct mgmt_tlv)) {
-+		const u8 len = TO_TLV(buffer)->length;
-+		const u16 exp_len = sizeof(struct mgmt_tlv) +
-+				    len;
-+		const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
-+
-+		switch (type) {
-+		case 0x0000:
-+			hdev->def_page_scan_type = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0001:
-+			hdev->def_page_scan_int = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0002:
-+			hdev->def_page_scan_window = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0003:
-+			hdev->def_inq_scan_type = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0004:
-+			hdev->def_inq_scan_int = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0005:
-+			hdev->def_inq_scan_window = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0006:
-+			hdev->def_br_lsto = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0007:
-+			hdev->def_page_timeout = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0008:
-+			hdev->sniff_min_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0009:
-+			hdev->sniff_max_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000a:
-+			hdev->le_adv_min_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000b:
-+			hdev->le_adv_max_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000c:
-+			hdev->def_multi_adv_rotation_duration =
-+							   TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000d:
-+			hdev->le_scan_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000e:
-+			hdev->le_scan_window = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x000f:
-+			hdev->le_scan_int_suspend = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0010:
-+			hdev->le_scan_window_suspend = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0011:
-+			hdev->le_scan_int_discovery = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00012:
-+			hdev->le_scan_window_discovery = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00013:
-+			hdev->le_scan_int_adv_monitor = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00014:
-+			hdev->le_scan_window_adv_monitor = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00015:
-+			hdev->le_scan_int_connect = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00016:
-+			hdev->le_scan_window_connect = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00017:
-+			hdev->le_conn_min_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00018:
-+			hdev->le_conn_max_interval = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x00019:
-+			hdev->le_conn_latency = TLV_GET_LE16(buffer);
-+			break;
-+		case 0x0001a:
-+			hdev->le_supv_timeout = TLV_GET_LE16(buffer);
-+			break;
-+		default:
-+			bt_dev_warn(hdev, "unsupported parameter %u", type);
-+			break;
-+		}
-+
-+		buffer_left -= exp_len;
-+		buffer += exp_len;
-+	}
-+
-+	return mgmt_cmd_status(sk, hdev->id,
-+			       MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+			       MGMT_STATUS_SUCCESS);
-+}
-diff --git a/net/bluetooth/mgmt_config.h b/net/bluetooth/mgmt_config.h
-new file mode 100644
-index 000000000000..0005db246afc
---- /dev/null
-+++ b/net/bluetooth/mgmt_config.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+/*
-+ * Copyright (C) 2020 Google Corporation
-+ */
-+
-+int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-+			   u16 data_len);
-+
-+int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 data_len);
 -- 
-2.27.0.290.gba653c62da-goog
-
+Luiz Augusto von Dentz
