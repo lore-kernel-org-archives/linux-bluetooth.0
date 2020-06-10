@@ -2,132 +2,95 @@ Return-Path: <SRS0=8+Sx=7X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E956C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A16AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 09:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07842204EA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:55:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AD5020734
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 09:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbgFJIzN convert rfc822-to-8bit (ORCPT
+        id S1727812AbgFJJ2x convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 04:55:13 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49217 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726855AbgFJIzN (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 04:55:13 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 086BDCECE0;
-        Wed, 10 Jun 2020 11:05:01 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [BlueZ PATCH v3 4/4] fixing const decoration warnins on options.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALWDO_UoNKFcFgTNUgY691Lj61udG0WsL9vdxbSF4Q0fpqBwEg@mail.gmail.com>
-Date:   Wed, 10 Jun 2020 10:55:10 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Alain Michaud <alainm@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        Wed, 10 Jun 2020 05:28:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43970 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727041AbgFJJ2x (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Jun 2020 05:28:53 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 208119] New: 5.6.7 bluez don't show battery status on YiChip
+ 1201 based bluetooth 4.0 mouses.
+Date:   Wed, 10 Jun 2020 09:28:53 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pavel@noa-labs.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-208119-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Message-Id: <B735F98B-8EB8-4FA3-B0C1-52A8C2CC8C60@holtmann.org>
-References: <20200529153814.213125-1-alainm@chromium.org>
- <20200529153814.213125-5-alainm@chromium.org>
- <CABBYNZJJ751fxpjpZ0MFvUsQ21H9CptM_gySAgZbcGPwz76W2Q@mail.gmail.com>
- <CALWDO_UoNKFcFgTNUgY691Lj61udG0WsL9vdxbSF4Q0fpqBwEg@mail.gmail.com>
-To:     Alain Michaud <alainmichaud@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+https://bugzilla.kernel.org/show_bug.cgi?id=208119
 
->>> ---
->>> 
->>> Changes in v3: None
->>> Changes in v2: None
->>> 
->>> src/main.c | 12 ++++++------
->>> 1 file changed, 6 insertions(+), 6 deletions(-)
->>> 
->>> diff --git a/src/main.c b/src/main.c
->>> index ca27f313d..cea50a3d2 100644
->>> --- a/src/main.c
->>> +++ b/src/main.c
->>> @@ -80,7 +80,7 @@ static enum {
->>>        MPS_MULTIPLE,
->>> } mps = MPS_OFF;
->>> 
->>> -static const char *supported_options[] = {
->>> +static const char * const supported_options[] = {
->>>        "Name",
->>>        "Class",
->>>        "DiscoverableTimeout",
->>> @@ -129,7 +129,7 @@ static const char * const controller_options[] = {
->>>        NULL
->>> };
->>> 
->>> -static const char *policy_options[] = {
->>> +static const char * const policy_options[] = {
->>>        "ReconnectUUIDs",
->>>        "ReconnectAttempts",
->>>        "ReconnectIntervals",
->>> @@ -137,7 +137,7 @@ static const char *policy_options[] = {
->>>        NULL
->>> };
->>> 
->>> -static const char *gatt_options[] = {
->>> +static const char * const gatt_options[] = {
->>>        "Cache",
->>>        "KeySize",
->>>        "ExchangeMTU",
->>> @@ -146,8 +146,8 @@ static const char *gatt_options[] = {
->>> };
->>> 
->>> static const struct group_table {
->>> -       const char *name;
->>> -       const char **options;
->>> +       const char * const name;
->>> +       const char * const * const options;
->>> } valid_groups[] = {
->>>        { "General",    supported_options },
->>>        { "Controller", controller_options },
->>> @@ -243,7 +243,7 @@ static enum jw_repairing_t parse_jw_repairing(const char *jw_repairing)
->>> 
->>> 
->>> static void check_options(GKeyFile *config, const char *group,
->>> -                                               const char **options)
->>> +                                       const char * const * const options)
->>> {
->>>        char **keys;
->>>        int i;
->>> --
->>> 2.27.0.rc0.183.gde8f92d652-goog
->>> 
->> 
->> I wonder how usufull is to tell it is a constant pointer to a constant
->> character given that is so rarely in the kernel and userspace,
->> something like const char * const * const would be very hard to keep
->> it readable.
-> 
-> I'm personally a big fan of leveraging the compiler to find bugs, but
-> in this case it also allows the compiler to put all the strings into
-> read only sections.  In this example, it will catch code trying to
-> write into the string or prevent code execution in the read only
-> sections if there is ever a bug that leverages this data section to
-> store code that can be manipulated.  For readability, I've seen other
-> platforms use type definitions LPCSTR to typedef const char * const
-> etc..  I'm happy to follow guidance here.
+            Bug ID: 208119
+           Summary: 5.6.7 bluez don't show battery status on YiChip 1201
+                    based bluetooth 4.0 mouses.
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.6.7
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: pavel@noa-labs.com
+        Regression: No
 
-I am a big fan of letting the compiler help us, but the readability concerns me a bit in this case. Can we explore what kind of macros we might be able to introduce to make this easier on the eyes.
+I have a Rapoo m550 mouse based on YiChip 1201.
 
-Regards
+It has a battery service on Gatt, but no battery attribute.
 
-Marcel
+Device ED:8E:0E:BF:E0:B8 (random)
+        Name: RAPOO BT4.0 MS
+        Alias: RAPOO BT4.0 MS
+        Appearance: 0x03c2
+        Icon: input-mouse
+        Paired: yes
+        Trusted: yes
+        Blocked: no
+        Connected: yes
+        LegacyPairing: no
+        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+        UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
+        UUID: Battery Service           (0000180f-0000-1000-8000-00805f9b34fb)
+        UUID: Human Interface Device    (00001812-0000-1000-8000-00805f9b34fb)
+        Modalias: usb:v1235pAA22d0001
 
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
