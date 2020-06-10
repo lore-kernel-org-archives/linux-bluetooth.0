@@ -1,70 +1,70 @@
-Return-Path: <SRS0=V72R=7W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=8+Sx=7X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0392C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 22:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF67C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 07:50:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D2D82072F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jun 2020 22:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E98A20734
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 07:50:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728200AbgFIWKG convert rfc822-to-8bit (ORCPT
+        id S1726545AbgFJHuY convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Jun 2020 18:10:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60232 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726992AbgFIWKG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Jun 2020 18:10:06 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 208109] bluetooth module blocking suspend on Toshiba X30-F
-Date:   Tue, 09 Jun 2020 22:10:05 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: grbitt@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-208109-62941-k6SXC6cK5C@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-208109-62941@https.bugzilla.kernel.org/>
-References: <bug-208109-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 10 Jun 2020 03:50:24 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51558 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbgFJHuY (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Jun 2020 03:50:24 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1411DCECE0;
+        Wed, 10 Jun 2020 10:00:12 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2] Bluetooth: hci_qca: Bug fix during SSR timeout
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1591718228-18819-1-git-send-email-gubbaven@codeaurora.org>
+Date:   Wed, 10 Jun 2020 09:50:21 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+Message-Id: <ED3A2B26-B9FB-4BF4-B52D-6256CE523580@holtmann.org>
+References: <1591718228-18819-1-git-send-email-gubbaven@codeaurora.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208109
+Hi Venkata,
 
-GRbit (grbitt@gmail.com) changed:
+> Due to race conditions between qca_hw_error and qca_controller_memdump
+> during SSR timeout,the same pointer is freed twice. This results in a
+> double free. Now a lock is acquired before checking the stauts of SSR
+> state.
+> 
+> Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump during SSR")
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 29 +++++++++++++++++------------
+> 1 file changed, 17 insertions(+), 12 deletions(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+patch has been applied to bluetooth-next tree.
 
---- Comment #2 from GRbit (grbitt@gmail.com) ---
-Tested on 5.7.1 and it's working) I have some another trouble with entering
-suspend, but since s2ram is 100% working, it seems to be xfce DE bug. 
+Regards
 
-Thank you
+Marcel
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
