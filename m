@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF67C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 07:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D69B2C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:07:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E98A20734
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 07:50:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0FE42072E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:07:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgFJHuY convert rfc822-to-8bit (ORCPT
+        id S1726506AbgFJIHw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 03:50:24 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51558 "EHLO
+        Wed, 10 Jun 2020 04:07:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52496 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726105AbgFJHuY (ORCPT
+        with ESMTP id S1726484AbgFJIHw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 03:50:24 -0400
+        Wed, 10 Jun 2020 04:07:52 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1411DCECE0;
-        Wed, 10 Jun 2020 10:00:12 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9A421CECE1;
+        Wed, 10 Jun 2020 10:17:40 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Bug fix during SSR timeout
+Subject: Re: [PATCH v3 2/2] Bluetooth : Config debug feature based on
+ available support
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1591718228-18819-1-git-send-email-gubbaven@codeaurora.org>
-Date:   Wed, 10 Jun 2020 09:50:21 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <ED3A2B26-B9FB-4BF4-B52D-6256CE523580@holtmann.org>
-References: <1591718228-18819-1-git-send-email-gubbaven@codeaurora.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+In-Reply-To: <20200608122747.10714-2-kiran.k@intel.com>
+Date:   Wed, 10 Jun 2020 10:07:50 +0200
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ravishankar.srivatsa@intel.com, kiraank@gmail.com,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Ps AyappadasX <AyappadasX.Ps@intel.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <E14396C9-30FF-4ADA-A43B-38F87BFBFECC@holtmann.org>
+References: <20200608122747.10714-1-kiran.k@intel.com>
+ <20200608122747.10714-2-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Venkata,
+Hi Kiran,
 
-> Due to race conditions between qca_hw_error and qca_controller_memdump
-> during SSR timeout,the same pointer is freed twice. This results in a
-> double free. Now a lock is acquired before checking the stauts of SSR
-> state.
+> This patch shall enable the Intel telemetry exception format
+> based on the supported features
 > 
-> Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump during SSR")
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Ps AyappadasX <AyappadasX.Ps@intel.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
 > ---
-> drivers/bluetooth/hci_qca.c | 29 +++++++++++++++++------------
-> 1 file changed, 17 insertions(+), 12 deletions(-)
+> drivers/bluetooth/btintel.c | 27 +++++++++++++++++++++++++++
+> drivers/bluetooth/btintel.h |  9 +++++++--
+> drivers/bluetooth/btusb.c   |  2 ++
+> 3 files changed, 36 insertions(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
