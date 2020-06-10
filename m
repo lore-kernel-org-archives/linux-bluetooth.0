@@ -6,36 +6,40 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAE4C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E956C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:55:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5806A2072E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07842204EA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 08:55:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbgFJIuI convert rfc822-to-8bit (ORCPT
+        id S1726899AbgFJIzN convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 04:50:08 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58677 "EHLO
+        Wed, 10 Jun 2020 04:55:13 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49217 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgFJIuH (ORCPT
+        with ESMTP id S1726855AbgFJIzN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 04:50:07 -0400
+        Wed, 10 Jun 2020 04:55:13 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4CF7BCECE0;
-        Wed, 10 Jun 2020 10:59:56 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 086BDCECE0;
+        Wed, 10 Jun 2020 11:05:01 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [BlueZ PATCH v6] doc:adding definitions for load default params
- mgmt op
+Subject: Re: [BlueZ PATCH v3 4/4] fixing const decoration warnins on options.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200528135459.18496-1-alainm@chromium.org>
-Date:   Wed, 10 Jun 2020 10:50:06 +0200
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <CALWDO_UoNKFcFgTNUgY691Lj61udG0WsL9vdxbSF4Q0fpqBwEg@mail.gmail.com>
+Date:   Wed, 10 Jun 2020 10:55:10 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Alain Michaud <alainm@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <F39E72FF-0271-4B87-9C49-0BDFE39F74B5@holtmann.org>
-References: <20200528135459.18496-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
+Message-Id: <B735F98B-8EB8-4FA3-B0C1-52A8C2CC8C60@holtmann.org>
+References: <20200529153814.213125-1-alainm@chromium.org>
+ <20200529153814.213125-5-alainm@chromium.org>
+ <CABBYNZJJ751fxpjpZ0MFvUsQ21H9CptM_gySAgZbcGPwz76W2Q@mail.gmail.com>
+ <CALWDO_UoNKFcFgTNUgY691Lj61udG0WsL9vdxbSF4Q0fpqBwEg@mail.gmail.com>
+To:     Alain Michaud <alainmichaud@google.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -44,140 +48,84 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Alain,
 
-> This change adds the definition for the read/set default parameter
-> commands.
+>>> ---
+>>> 
+>>> Changes in v3: None
+>>> Changes in v2: None
+>>> 
+>>> src/main.c | 12 ++++++------
+>>> 1 file changed, 6 insertions(+), 6 deletions(-)
+>>> 
+>>> diff --git a/src/main.c b/src/main.c
+>>> index ca27f313d..cea50a3d2 100644
+>>> --- a/src/main.c
+>>> +++ b/src/main.c
+>>> @@ -80,7 +80,7 @@ static enum {
+>>>        MPS_MULTIPLE,
+>>> } mps = MPS_OFF;
+>>> 
+>>> -static const char *supported_options[] = {
+>>> +static const char * const supported_options[] = {
+>>>        "Name",
+>>>        "Class",
+>>>        "DiscoverableTimeout",
+>>> @@ -129,7 +129,7 @@ static const char * const controller_options[] = {
+>>>        NULL
+>>> };
+>>> 
+>>> -static const char *policy_options[] = {
+>>> +static const char * const policy_options[] = {
+>>>        "ReconnectUUIDs",
+>>>        "ReconnectAttempts",
+>>>        "ReconnectIntervals",
+>>> @@ -137,7 +137,7 @@ static const char *policy_options[] = {
+>>>        NULL
+>>> };
+>>> 
+>>> -static const char *gatt_options[] = {
+>>> +static const char * const gatt_options[] = {
+>>>        "Cache",
+>>>        "KeySize",
+>>>        "ExchangeMTU",
+>>> @@ -146,8 +146,8 @@ static const char *gatt_options[] = {
+>>> };
+>>> 
+>>> static const struct group_table {
+>>> -       const char *name;
+>>> -       const char **options;
+>>> +       const char * const name;
+>>> +       const char * const * const options;
+>>> } valid_groups[] = {
+>>>        { "General",    supported_options },
+>>>        { "Controller", controller_options },
+>>> @@ -243,7 +243,7 @@ static enum jw_repairing_t parse_jw_repairing(const char *jw_repairing)
+>>> 
+>>> 
+>>> static void check_options(GKeyFile *config, const char *group,
+>>> -                                               const char **options)
+>>> +                                       const char * const * const options)
+>>> {
+>>>        char **keys;
+>>>        int i;
+>>> --
+>>> 2.27.0.rc0.183.gde8f92d652-goog
+>>> 
+>> 
+>> I wonder how usufull is to tell it is a constant pointer to a constant
+>> character given that is so rarely in the kernel and userspace,
+>> something like const char * const * const would be very hard to keep
+>> it readable.
 > 
-> In particular, these commands are used to read and set the system
-> default parameters.  The use of a TLV format also ensures that
-> parameters are expandable in the future.
-> 
-> This will allow bluetoothd to load parameters from a conf file that may
-> be customized for the specific requirements of each platforms.
-> 
-> ---
-> 
-> doc/mgmt-api.txt | 113 +++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 113 insertions(+)
+> I'm personally a big fan of leveraging the compiler to find bugs, but
+> in this case it also allows the compiler to put all the strings into
+> read only sections.  In this example, it will catch code trying to
+> write into the string or prevent code execution in the read only
+> sections if there is ever a bug that leverages this data section to
+> store code that can be manipulated.  For readability, I've seen other
+> platforms use type definitions LPCSTR to typedef const char * const
+> etc..  I'm happy to follow guidance here.
 
-patch has been applied.
-
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 6ee01fed8..cbe6422a5 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -3223,6 +3223,119 @@ Set Experimental Feature Command
-> 				Invalid Index
-> 
-> 
-> +Read Default System Configuration Command
-> +=============================
-> +
-> +	Command Code:		0x004b
-> +	Controller Index:	<controller id>
-> +	Command Parameters:
-> +	Return Parameters:	Parameter1 {
-> +					Parameter_Type (2 Octet)
-> +					Value_Length (1 Octet)
-> +					Value (0-255 Octets)
-> +				}
-> +				Parameter2 { }
-> +				...
-> +
-> +	This command is used to read a list of default controller parameters.
-> +
-> +	Currently defined Parameter_Type values are:
-> +
-> +		0x0000	BR/EDR Page Scan Type
-> +		0x0001	BR/EDR Page Scan Interval
-> +		0x0002	BR/EDR Page Scan Window
-> +		0x0003	BR/EDR Inquiry Scan Type
-> +		0x0004	BR/EDR Inquiry Scan Interval
-> +		0x0005	BR/EDR Inquiry Scan Window
-> +		0x0006	BR/EDR Link Supervision Timeout
-> +		0x0007	BR/EDR Page Timeout
-> +		0x0008	BR/EDR Min Sniff Interval
-> +		0x0009	BR/EDR Max Sniff Interval
-> +		0x000a	LE Advertisement Min Interval
-> +		0x000b	LE Advertisement Max Interval
-> +		0x000c	LE Multi Advertisement Rotation Interval
-> +		0x000d	LE Scanning Interval for auto connect
-> +		0x000e	LE Scanning Window for auto connect
-> +		0x000f	LE Scanning Interval for wake scenarios
-> +		0x0010	LE Scanning Window for wake scenarios
-> +		0x0011	LE Scanning Interval for discovery
-> +		0x0012	LE Scanning Window for discovery
-> +		0x0013	LE Scanning Interval for adv monitoring
-> +		0x0014	LE Scanning Window for adv monitoring
-> +		0x0015	LE Scanning Interval for connect
-> +		0x0016	LE Scanning Window for connect
-> +		0x0017	LE Min Connection Interval
-> +		0x0018	LE Max Connection Interval
-> +		0x0019	LE Connection Latency
-> +		0x001a	LE Connection Supervision Timeout
-> +
-> +	This command can be used at any time and will return a list of supported
-> +	parameters as well as their current default value.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +	Possible errors:	Invalid Parameters
-> +				Invalid Index
-> +
-> +Set Default System Configuration Command
-> +=============================
-> +
-> +	Command Code:		0x004c
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Parameter1 {
-> +					Parameter_Type (2 Octet)
-> +					Value_Length (1 Octet)
-> +					Value (0-255 Octets)
-> +				}
-> +				Parameter2 { }
-> +				...
-> +	Return Parameters:
-> +
-> +	This command is used to set a list of default controller parameters.
-> +
-> +	Currently defined Parameter_Type values are:
-> +
-> +		0x0000	BR/EDR Page Scan Type
-> +		0x0001	BR/EDR Page Scan Interval
-> +		0x0002	BR/EDR Page Scan Window
-> +		0x0003	BR/EDR Inquiry Scan Type
-> +		0x0004	BR/EDR Inquiry Scan Interval
-> +		0x0005	BR/EDR Inquiry Scan Window
-> +		0x0006	BR/EDR Link Supervision Timeout
-> +		0x0007	BR/EDR Page Timeout
-> +		0x0008	BR/EDR Min Sniff Interval
-> +		0x0009	BR/EDR Max Sniff Interval
-> +		0x000a	LE Advertisement Min Interval
-> +		0x000b	LE Advertisement Max Interval
-> +		0x000c	LE Multi Advertisement Rotation Interval
-> +		0x000d	LE Scanning Interval for auto connect
-> +		0x000e	LE Scanning Window for auto connect
-> +		0x000f	LE Scanning Interval for wake scenarios
-> +		0x0010	LE Scanning Window for wake scenarios
-> +		0x0011	LE Scanning Interval for discovery
-> +		0x0012	LE Scanning Window for discovery
-> +		0x0013	LE Scanning Interval for adv monitoring
-> +		0x0014	LE Scanning Window for adv monitoring
-> +		0x0015	LE Scanning Interval for connect
-> +		0x0016	LE Scanning Window for connect
-> +		0x0017	LE Min Connection Interval
-> +		0x0018	LE Max Connection Interval
-> +		0x0019	LE Connection Latency
-> +		0x001a	LE Connection Supervision Timeout
-
-However I collapsed this into see the Read command.
-
-> +	This command can be used when the controller is not powered and
-> +	all supported parameters will be programmed once powered. Non supported
-> +	parameters will be ignored.  Note that these only control the default
-> +	parameters.  Higher level Apis may influence the effective value used.
-
-And I think it is prudent that the kernel does a validity check and fails gracefully. Let bluetoothd do all the work for creating the correct set of parameters to supply. We have the read command to know which ones are supported and which are not.
+I am a big fan of letting the compiler help us, but the readability concerns me a bit in this case. Can we explore what kind of macros we might be able to introduce to make this easier on the eyes.
 
 Regards
 
