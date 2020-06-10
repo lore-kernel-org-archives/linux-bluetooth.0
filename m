@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DA9C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E97CC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:25:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7650A206F7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:25:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5668207ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jun 2020 20:25:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfZw0Yn6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yn4STn4C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgFJUZF (ORCPT
+        id S1726668AbgFJUZk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 16:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34088 "EHLO
+        Wed, 10 Jun 2020 16:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726284AbgFJUZE (ORCPT
+        with ESMTP id S1726417AbgFJUZk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 16:25:04 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE63C03E96B
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:25:04 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id e5so2764077ote.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:25:04 -0700 (PDT)
+        Wed, 10 Jun 2020 16:25:40 -0400
+Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC60AC03E96B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:25:39 -0700 (PDT)
+Received: by mail-oo1-xc43.google.com with SMTP id e12so781500oou.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 13:25:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=lvED4AjYSQozjXwlpC8nBIbkjDyy0JoAp2dVmO/VsaI=;
-        b=EfZw0Yn6rS2lVHTIsII9ct1Ye+yc/dJAjFJegwGz0sjh4Wj9q0e/hJl5g60yTFb3Rj
-         O0qtabFk8XyuPSmDcRNo/3bUdUsSVneo0Eq5nkccEAOfA6HsXRthzsrE+20u4XcBUDOi
-         tiZwH6nDmJC8ywjWXjWtLLw9k8qluJSKCb8JaeK0q17HOa11t4dlOQLx6Tr2B9T/mYdZ
-         16Hyj+NyPJWoQAskxArvT/bcwmiCccUtR5sxAU2wB/Tf2qqTcPpT6goJpeSgmIZyjPpZ
-         4TX2Du8ZuOTzt+Pm5yo4DDvHegUDqSbHk8nhb49JiW0opBOEAzWnPbvecLpiMy7aR3DX
-         SpPg==
+        bh=4cod7zvxfie8YrihbE5IwK1b0nHHjh7+HOCJNBsTjwA=;
+        b=Yn4STn4CHg+RPCzQCY60FFxqgzHeA7IUevCicJK/r99kS0BFMxx3jUva7p3pyuqo8l
+         rnW2q4fH3jeqxh58UjrpmbhjF4bJsVczBfmgFm1/ScuiDH/NbNKnX+wG3cAoFbC/6ixt
+         02T78k0hxs1yEzbj72IUYkgWgUmozNhasSJjRs15K9D/xXd3H7LS9XyrNQEOZkJ+ajWv
+         2YHHXm9HtdhklbzMxWIKYMpwF8NYERzICXfrOtIcCyaZJAjijnR6ew3AcBPqTieXyE6A
+         LhFEVHvJVJk6SSN5lXWwvz8bJwEHno5H4LMlYb+Hwj+avWhSFFV8f0TWA0SyaP21UcLz
+         Mdbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to;
-        bh=lvED4AjYSQozjXwlpC8nBIbkjDyy0JoAp2dVmO/VsaI=;
-        b=E0p8KkXT/OduOo5CMtXyw1fvYSfhgDa0o2HrgplkmQDFY8GJCd0JQUxYA1ilMBKFTm
-         DPkGoFa2sZUEsynPQzdHULA0qZoihTRbOxz8cq/4mvAgMn8RZzVfX9Cgt57k2cqzZVly
-         vvByIJ6tIVD3gAOSnG+8JIsS7GW0LGblzWrqXxwMyGCmI56tajUGnCqRAanPzFjJqD2I
-         8lLoO03Ol+TWpMRAwbWURp6d3wXmVr/X8n43FSoHVu3zI1RtKasd5/OlvC/HsfDrYkS8
-         gE7SYI4Fr2WFJC7JJ4Yltlgs39OAJ/ia12Hp9+NiB273XNuRqkz9cKAxy8r86xXIiGoF
-         EeqQ==
-X-Gm-Message-State: AOAM532XqEB3FcJgzWb4vkTTY0ayQSYbsauVzzofR31B0VU+lezVwdjE
-        g0c92uUtJQJtnvuF1EwZw9j3hW1vTSGAt+xhEFx2GQ==
-X-Google-Smtp-Source: ABdhPJyMST3IYLmVtgtEWY26WW0w2Z0gjqR7mjSG1ufnlz0/1NdfIOVezjzgXjCfI2d/Wv2QLxPdQBGCXhe4w+zBdi4=
-X-Received: by 2002:a05:6830:1d76:: with SMTP id l22mr3734097oti.177.1591820703116;
- Wed, 10 Jun 2020 13:25:03 -0700 (PDT)
+        bh=4cod7zvxfie8YrihbE5IwK1b0nHHjh7+HOCJNBsTjwA=;
+        b=F+t+V2zefaSb61Td8Te4oEHRO2/wHjT89+O6+Ry1KuBNi+8Fa9DtD7/mm8BN8Dz8QN
+         a9I+Vf30OF8uSnXkZKFqMmAOadpiZzoSR3M0jwL+YMG5y4TckUjVvLDLJ9OtuU0ohhe8
+         z6Nlz0I9MKBvAsjMyWCkDMDxx6YEmMlLJtDulsZJiIoH6Hxb+cwgYjnLCLRJbZEhi7Dr
+         ofEsVogyFfm1e4YgxZOc0LAo2OksWXAHNgS1HO5hcspoUOkS+jH2gUwSXR4Yow7UmUj6
+         rSdxfRqLBWKa2VXUN5wwsTwUzFxXvYNMp6zbV+TOYPynAw71uq9XDq1c9zUqaA5g7APt
+         Ar2g==
+X-Gm-Message-State: AOAM533ykkYEOnQNjOPGw7xne+mOeC0KsqE3XBXEAOzCYoXPOUgQNXWS
+        xIW5bbsu5LlRNhRIa5/xlodtrxfvFQ0oh/VG/i6o2Q==
+X-Google-Smtp-Source: ABdhPJyWW53b97L56E4QYsL6VWGn355CQ43EpyvUJxK/08eLdgpYS7u/7rJUf6a08lFllnxOoalcj3wVUDuJCS/dShk=
+X-Received: by 2002:a4a:3811:: with SMTP id c17mr3876650ooa.91.1591820738893;
+ Wed, 10 Jun 2020 13:25:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200608202628.875833-1-luiz.dentz@gmail.com>
-In-Reply-To: <20200608202628.875833-1-luiz.dentz@gmail.com>
+References: <20200608220153.880790-1-luiz.dentz@gmail.com>
+In-Reply-To: <20200608220153.880790-1-luiz.dentz@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 10 Jun 2020 13:24:49 -0700
-Message-ID: <CABBYNZJhbDDcdZRTh0TMQswJBDqZuQHreiv+yzKEk6h=0=paeg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] a2dp: Use streaming mode when MPS is enabled
+Date:   Wed, 10 Jun 2020 13:25:23 -0700
+Message-ID: <CABBYNZKHeyqEZqbDdrs3SWqZJakLoUmM02_VW6xFHP0qqwqf5A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] adapter: Do not remove client watch directly if
+ discovery fails
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -70,164 +71,29 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Mon, Jun 8, 2020 at 1:26 PM Luiz Augusto von Dentz
+On Mon, Jun 8, 2020 at 3:01 PM Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> If MPS is enabled use L2CAP streaming mode for AVDTP channels.
+> Client watch is used for both discovery and it filters so in case the
+> client has set the later the watch shall be perserved.
 > ---
->  profiles/audio/a2dp.c  |  8 ++++++++
->  profiles/audio/avdtp.c |  9 +++++++++
->  src/hcid.h             |  7 +++++++
->  src/main.c             | 16 ++++++----------
->  4 files changed, 30 insertions(+), 10 deletions(-)
+>  src/adapter.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 0a66589b0..f00e5c923 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -43,6 +43,7 @@
->
->  #include "gdbus/gdbus.h"
->
-> +#include "src/hcid.h"
->  #include "src/plugin.h"
->  #include "src/adapter.h"
->  #include "src/device.h"
-> @@ -2331,14 +2332,21 @@ drop:
->  static bool a2dp_server_listen(struct a2dp_server *server)
->  {
->         GError *err = NULL;
-> +       BtIOMode mode;
->
->         if (server->io)
->                 return true;
->
-> +       if (main_opts.mps == MPS_OFF)
-> +               mode = BT_IO_MODE_BASIC;
-> +       else
-> +               mode = BT_IO_MODE_STREAMING;
-> +
->         server->io = bt_io_listen(NULL, confirm_cb, server, NULL, &err,
->                                 BT_IO_OPT_SOURCE_BDADDR,
->                                 btd_adapter_get_address(server->adapter),
->                                 BT_IO_OPT_PSM, AVDTP_PSM,
-> +                               BT_IO_OPT_MODE, mode,
->                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
->                                 BT_IO_OPT_MASTER, true,
->                                 BT_IO_OPT_INVALID);
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 45727f01e..e5193f79b 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -42,6 +42,7 @@
->  #include "lib/uuid.h"
->
->  #include "btio/btio.h"
-> +#include "src/hcid.h"
->  #include "src/log.h"
->  #include "src/shared/util.h"
->  #include "src/shared/queue.h"
-> @@ -2406,9 +2407,15 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
->         GError *err = NULL;
->         GIOChannel *io;
->         const bdaddr_t *src;
-> +       BtIOMode mode;
->
->         src = btd_adapter_get_address(device_get_adapter(session->device));
->
-> +       if (main_opts.mps == MPS_OFF)
-> +               mode = BT_IO_MODE_BASIC;
-> +       else
-> +               mode = BT_IO_MODE_STREAMING;
-> +
->         if (session->phy)
->                 io = bt_io_connect(avdtp_connect_cb, session,
->                                         NULL, &err,
-> @@ -2416,6 +2423,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
->                                         BT_IO_OPT_DEST_BDADDR,
->                                         device_get_address(session->device),
->                                         BT_IO_OPT_PSM, AVDTP_PSM,
-> +                                       BT_IO_OPT_MODE, mode,
->                                         BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
->                                         /* Set Input MTU to 0 to auto-tune */
->                                         BT_IO_OPT_IMTU, 0,
-> @@ -2427,6 +2435,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
->                                         BT_IO_OPT_DEST_BDADDR,
->                                         device_get_address(session->device),
->                                         BT_IO_OPT_PSM, AVDTP_PSM,
-> +                                       BT_IO_OPT_MODE, mode,
->                                         BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
->                                         BT_IO_OPT_INVALID);
->         if (!io) {
-> diff --git a/src/hcid.h b/src/hcid.h
-> index 56e2b4f31..1b2714b1d 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -41,6 +41,12 @@ enum jw_repairing_t {
->         JW_REPAIRING_ALWAYS,
->  };
->
-> +enum mps_mode_t {
-> +       MPS_OFF,
-> +       MPS_SINGLE,
-> +       MPS_MULTIPLE,
-> +};
-> +
->  struct main_opts {
->         char            *name;
->         uint32_t        class;
-> @@ -102,6 +108,7 @@ struct main_opts {
->         bt_gatt_cache_t gatt_cache;
->         uint16_t        gatt_mtu;
->         uint8_t         gatt_channels;
-> +       enum mps_mode_t mps;
->
->         uint8_t         key_size;
->
-> diff --git a/src/main.c b/src/main.c
-> index 50e37e57a..e51f614b3 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -74,12 +74,6 @@ struct main_opts main_opts;
->  static GKeyFile *main_conf;
->  static char *main_conf_file_path;
->
-> -static enum {
-> -       MPS_OFF,
-> -       MPS_SINGLE,
-> -       MPS_MULTIPLE,
-> -} mps = MPS_OFF;
-> -
->  static const char *supported_options[] = {
->         "Name",
->         "Class",
-> @@ -583,9 +577,11 @@ static void parse_config(GKeyFile *config)
->                 DBG("MultiProfile=%s", str);
->
->                 if (!strcmp(str, "single"))
-> -                       mps = MPS_SINGLE;
-> +                       main_opts.mps = MPS_SINGLE;
->                 else if (!strcmp(str, "multiple"))
-> -                       mps = MPS_MULTIPLE;
-> +                       main_opts.mps = MPS_MULTIPLE;
-> +               else
-> +                       main_opts.mps = MPS_OFF;
->
->                 g_free(str);
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 76acfea70..bf51b120b 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1651,7 +1651,6 @@ fail:
+>         if (client->msg) {
+>                 reply = btd_error_busy(client->msg);
+>                 g_dbus_send_message(dbus_conn, reply);
+> -               g_dbus_remove_watch(dbus_conn, client->watch);
+>                 discovery_remove(client, false);
+>                 return;
 >         }
-> @@ -910,8 +906,8 @@ int main(int argc, char *argv[])
->                                                 main_opts.did_version);
->         }
->
-> -       if (mps != MPS_OFF)
-> -               register_mps(mps == MPS_MULTIPLE);
-> +       if (main_opts.mps != MPS_OFF)
-> +               register_mps(main_opts.mps == MPS_MULTIPLE);
->
->         /* Loading plugins has to be done after D-Bus has been setup since
->          * the plugins might wanna expose some paths on the bus. However the
 > --
 > 2.25.3
 >
