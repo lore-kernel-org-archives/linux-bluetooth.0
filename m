@@ -2,74 +2,67 @@ Return-Path: <SRS0=Bgmv=7Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A43C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 01:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7EAC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 02:02:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4724D206FA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 01:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2B8C206FA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 02:02:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bI0QHc97"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Oe13Mt3E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726569AbgFKByN (ORCPT
+        id S1726279AbgFKCCC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 21:54:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
+        Wed, 10 Jun 2020 22:02:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726434AbgFKByH (ORCPT
+        with ESMTP id S1726265AbgFKCCC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 21:54:07 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD13C08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 18:54:05 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id k1so1598697pls.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 18:54:05 -0700 (PDT)
+        Wed, 10 Jun 2020 22:02:02 -0400
+Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 066C5C08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 19:02:01 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id c15so1578641uar.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 19:02:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=68tOX7LFGwg3KdrWFaND58PhUb0yFjG30aqSPFP4qOo=;
-        b=bI0QHc97vrE2ixZB3Ft5YFX2q3YGOLN8XZOWaIdcXk6oSwQhBoTngxIbHYA/p5H2eF
-         qKJkFpEX566vocBObSrMWXEaJzhz2aKnfSqWJuOBpJn36aATpUouuOcI/APl14505Bb1
-         mPhuGpAqDeS9MhAu1xh1uMBniCzK4iZQ2HZSI=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jdGd7oJ9RVYQxRo7fYstmcN3nIcBgTRAT3s0K47VsMw=;
+        b=Oe13Mt3Ep6s4ftXeT3oIdif8Sny7slkjK7nXXSGRk40SOMgQL531HPfrSR/f+EFZaV
+         dSP/yt8I49RDYF6zMBzHc4oYxjyOhSrNkkJWmNb31ou9RtBYedmeo0O4mOBu4tMe2HKj
+         DTrbMyGNobD0YiKVD0s+gkCMRIymGdxdARxUc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=68tOX7LFGwg3KdrWFaND58PhUb0yFjG30aqSPFP4qOo=;
-        b=P6y3pbMTCgCYlb2JMLK0wjfLy+JOsNCIEwMnoauAU/Eql/kn+VB4cyvnRekVoIn2Kc
-         WrkA43nJ+RGjaUf0tvV7p8eYAMBaZFK73fnH/wodo1ysODnACU9kV6tEnSgVaCdJ7sia
-         rJGmFsru03ExL3S2Qy1uSd34LR5rEUFLevrI+fDAr2yXRQr0eBHSu6u5zQ05K8JqYxjD
-         CZA4E087/GlQhv6PHwg5sXjNd9Bae9oubzYrsAOXPpc9b9oat6JY2AVFekL1WXEEu4t+
-         BIP0A6R4/wItobl2b1kqczcab3N0teWegclB/fjYtCEtSTwLbZwjL260xpyxurAaTqAR
-         jCZg==
-X-Gm-Message-State: AOAM530eP30fl1GJK2EtHlHwaePL60X4LexzTdzIzzQ2g7UVo10xQ8T+
-        3A6ZYsUzzjQJrtyHptE8ZNIWPw==
-X-Google-Smtp-Source: ABdhPJyB39hYptqE3xQPM4crTPBVQQmD7IFP/wMWPf+cpsmhSEX6xrwYWTCiONcgocktbarjbC642Q==
-X-Received: by 2002:a17:90a:898a:: with SMTP id v10mr5470622pjn.95.1591840445210;
-        Wed, 10 Jun 2020 18:54:05 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id b191sm998661pga.13.2020.06.10.18.54.04
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jdGd7oJ9RVYQxRo7fYstmcN3nIcBgTRAT3s0K47VsMw=;
+        b=TmrRzIt2/OB/8wGunpmrJC1daVBTB4tLI4bP+eVEFhn0iTaahWu+nuGWHf32qcLsNf
+         e5+ZHhjXGc601Ml9soOMOI307RgubuoOasVVcwxos/yzgzTEwsqWCZMNWQHw7BHZatLR
+         TLNtFSaFkKiBmJnR8FaOB1G64h+y0MR+2H0wspEeLYaY5WJnUO9syHWs7M8uMOm4RIPV
+         GjBs1GHPGlKKEU+OYYTdY69IlROW1HZBu5Vg8VmzGSs00waoqy5H2SLlQYwOBnvjkvOp
+         LfxIow7Z3nWebapLQ2+d/OaZdOvE627l/ZMZZ+M8aYNC44Lmh+KNWxa5tP16+yeOiIsE
+         7yJQ==
+X-Gm-Message-State: AOAM533w2DVVIa6lH7cRKlE0232hx52ghe/SR6YMe1diKm9cnbtS8lbV
+        XSYQLIkMKEYhP2vIujEWsFXogGRDqCs=
+X-Google-Smtp-Source: ABdhPJxw0LoTdjxtqg+UevhIaXbdOzrsrz35ycvH5X+k+sk2T+kKU9JuUIeZRVqp439LycMQvc4vFg==
+X-Received: by 2002:ab0:5f95:: with SMTP id b21mr4850462uaj.122.1591840920746;
+        Wed, 10 Jun 2020 19:02:00 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id r17sm243197vsi.34.2020.06.10.19.02.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2020 18:54:04 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtman.org, linux-bluetooth@vger.kernel.org
-Cc:     alainm@chromium.org, chromeos-bluetooth-upstreaming@chromium.org,
-        mka@chromium.org, dianders@chromium.org, linux-pm@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: btmrvl_sdio: Implement prevent_wake
-Date:   Wed, 10 Jun 2020 18:53:54 -0700
-Message-Id: <20200610185214.2.I317eb69189c90ed26ba88e996f7df59ee62c2495@changeid>
-X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
-In-Reply-To: <20200611015355.186666-1-abhishekpandit@chromium.org>
-References: <20200611015355.186666-1-abhishekpandit@chromium.org>
+        Wed, 10 Jun 2020 19:02:00 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v3 0/3] Support reading and setting default system parameters
+Date:   Thu, 11 Jun 2020 02:01:54 +0000
+Message-Id: <20200611020157.70230-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -77,44 +70,41 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use the parent device's power/wakeup to control whether we support
-remote wake. If remote wakeup is disabled, Bluetooth will not enable
-scanning for incoming connections.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Douglas Anderson <dianders@chromium.org>
----
+This series adds support for reading and setting default system
+parameters from userspace.  In particular, combined with the userspace
+changes, allows platforms to override default system parameters from a
+main.conf file.
 
- drivers/bluetooth/btmrvl_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+The series has been reviewed and tested on chromeos.
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 47e450903af423..8b9d78ce6bb29e 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -587,6 +587,14 @@ static int btmrvl_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- 	return 0;
- }
- 
-+static bool btmrvl_prevent_wake(struct hci_dev *hdev)
-+{
-+	struct btmrvl_private *priv = hci_get_drvdata(hdev);
-+	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
-+
-+	return !device_may_wakeup(&card->func->dev);
-+}
-+
- /*
-  * This function handles the event generated by firmware, rx data
-  * received from firmware, and tx data sent from kernel.
-@@ -688,6 +696,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
- 	hdev->send  = btmrvl_send_frame;
- 	hdev->setup = btmrvl_setup;
- 	hdev->set_bdaddr = btmrvl_set_bdaddr;
-+	hdev->prevent_wake = btmrvl_prevent_wake;
- 	SET_HCIDEV_DEV(hdev, &card->func->dev);
- 
- 	hdev->dev_type = priv->btmrvl_dev.dev_type;
+
+Changes in v3:
+- Fixed sparse errors
+-Fixing sparse errors
+
+Changes in v2:
+- Renamed the mgmt.h per Marcel's comments.
+- Addressed Marcel's comments in the implementation.
+
+Alain Michaud (3):
+  mgmt: read/set system parameter definitions
+  bluetooth:centralize default value initialization.
+  bluetooth: implement read/set default system parameters mgmt
+
+ include/net/bluetooth/hci_core.h |  18 +++
+ include/net/bluetooth/mgmt.h     |  30 ++++
+ net/bluetooth/Makefile           |   2 +-
+ net/bluetooth/hci_conn.c         |  14 +-
+ net/bluetooth/hci_core.c         |  14 +-
+ net/bluetooth/hci_request.c      |  15 +-
+ net/bluetooth/mgmt.c             |   6 +
+ net/bluetooth/mgmt_config.c      | 253 +++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt_config.h      |  11 ++
+ 9 files changed, 341 insertions(+), 22 deletions(-)
+ create mode 100644 net/bluetooth/mgmt_config.c
+ create mode 100644 net/bluetooth/mgmt_config.h
+
 -- 
-2.27.0.278.ge193c7cf3a9-goog
+2.27.0.290.gba653c62da-goog
 
