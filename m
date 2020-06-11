@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE7BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 11:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3616AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 11:45:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3CDD2072F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 11:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E5C12072F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 11:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbgFKLo5 (ORCPT
+        id S1727841AbgFKLo7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Jun 2020 07:44:57 -0400
+        Thu, 11 Jun 2020 07:44:59 -0400
 Received: from mga12.intel.com ([192.55.52.136]:26678 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727829AbgFKLo4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Jun 2020 07:44:56 -0400
-IronPort-SDR: kMpVEdw7/H/bqDiQPo75ILr2JlxYbpCjuDwoT6N6Pc7uyvu3x2dZRcqnEDfPAswf9JJF4lUuPt
- RCkKsWzkOVKQ==
+        id S1727829AbgFKLo7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Jun 2020 07:44:59 -0400
+IronPort-SDR: kCXgdUS7MlZ31um2Drs0a4bd5qAZLt6IdxwCMUxD+OE3SmaoyrnG9CSVd11OuatcJwSh0nASt7
+ ymqQYVJP5KLA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 04:44:56 -0700
-IronPort-SDR: vNQxPm7lbQ7Kbi4e+2MDNp3mpPpGOmuAsHWap/LXfnhD2d52DEkpMs/TDuQANipV+Pqb0b5eML
- MLolZX07r1aQ==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 04:44:58 -0700
+IronPort-SDR: nGGZhFtFEh52jmxDbEMUbcCAI/iobC4NwAOOyPdHSqdJWay/poenp/il03Q70cbL60deCMgY4Z
+ /MSrsYjnemtQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
-   d="scan'208";a="296562858"
+   d="scan'208";a="296562876"
 Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by fmsmga004.fm.intel.com with ESMTP; 11 Jun 2020 04:44:54 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 11 Jun 2020 04:44:56 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, kiraank@gmail.com,
@@ -39,9 +39,9 @@ Cc:     ravishankar.srivatsa@intel.com, kiraank@gmail.com,
         Raghuram Hegde <raghuram.hegde@intel.com>,
         Chethan T N <chethan.tumkur.narayan@intel.com>,
         Amit K Bag <amit.k.bag@intel.com>
-Subject: [PATCH 3/4] Bluetooth: btintel: Add helper functions to parse firmware name
-Date:   Thu, 11 Jun 2020 17:15:25 +0530
-Message-Id: <20200611114526.13594-4-kiran.k@intel.com>
+Subject: [PATCH 4/4] Bluetooth: btintel: Add helper function to help controller type
+Date:   Thu, 11 Jun 2020 17:15:26 +0530
+Message-Id: <20200611114526.13594-5-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200611114526.13594-1-kiran.k@intel.com>
 References: <20200611114526.13594-1-kiran.k@intel.com>
@@ -52,121 +52,95 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Raghuram Hegde <raghuram.hegde@intel.com>
 
-Define helper functions to construct firmware file name as the format of
-legacy differs from new generation Intel controllers
+As the firmware download flow for new generation controller changes
+from legacy controller, this function helps in deciding the download
+flow to be used
 
 Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
 Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Kiran K <kiran.k@intel.com>
 Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
 ---
- drivers/bluetooth/btintel.c | 75 +++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  6 +++
- 2 files changed, 81 insertions(+)
+ drivers/bluetooth/btintel.c | 51 +++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  3 +++
+ 2 files changed, 54 insertions(+)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 0139857f6a2c..ae60527e1abd 100644
+index ae60527e1abd..93a0e5a2e927 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -382,6 +382,81 @@ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
+@@ -482,6 +482,57 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
  }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
+ EXPORT_SYMBOL_GPL(btintel_read_version);
  
-+bool btintel_get_fw_name(struct intel_version *ver,
-+			 struct intel_boot_params *params,
-+			 char *fw_name, size_t len,
-+			 const char *suffix)
++int btintel_read_version_tlv(struct hci_dev *hdev, bool *is_tlv_format,
++			     struct sk_buff **skb_out)
 +{
-+	/* This is for legacy HCI_Intel_Read_Version command.
-+	 *
-+	 * With this Intel bootloader only the hardware variant and device
-+	 * revision information are used to select the right firmware for SfP
-+	 * and WsP.
-+	 *
-+	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
-+	 *
-+	 * Currently the supported hardware variants are:
-+	 *   11 (0x0b) for iBT3.0 (LnP/SfP)
-+	 *   12 (0x0c) for iBT3.5 (WsP)
-+	 *
-+	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
-+	 * variant, HW revision and FW revision, as these are dependent on CNVi
-+	 * and RF Combination.
-+	 *
-+	 *   17 (0x11) for iBT3.5 (JfP)
-+	 *   18 (0x12) for iBT3.5 (ThP)
-+	 *
-+	 * The firmware file name for these will be
-+	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
-+	 *
-+	 */
++	u8 param;
++	u8 status;
++	u8 tlv_check_octet;
++	u8 *data;
++	struct sk_buff *skb;
 +
-+	switch (ver->hw_variant) {
-+	case 0x0b:	/* SfP */
-+	case 0x0c:	/* WsP */
-+		snprintf(fw_name, len, "intel/ibt-%u-%u.%s",
-+			 le16_to_cpu(ver->hw_variant),
-+			 le16_to_cpu(params->dev_revid),
-+			 suffix);
-+		break;
-+	case 0x11:	/* JfP */
-+	case 0x12:	/* ThP */
-+	case 0x13:	/* HrP */
-+	case 0x14:	/* CcP */
-+		snprintf(fw_name, len, "intel/ibt-%u-%u-%u.%s",
-+			 le16_to_cpu(ver->hw_variant),
-+			 le16_to_cpu(ver->hw_revision),
-+			 le16_to_cpu(ver->fw_revision),
-+			 suffix);
-+		break;
-+	default:
-+		return false;
++	param = 0xFF;
++	skb_out = NULL;
++
++	skb = __hci_cmd_sync(hdev,  0xfc05, 1, &param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Intel read version command failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
 +	}
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(btintel_get_fw_name);
 +
-+void btintel_get_fw_name_tlv(struct intel_version_tlv *ver,
-+			     char *fw_name, size_t len,
-+			     const char *suffix)
-+{
-+	/* This is for legacy HCI_Intel_Read_Version command.
-+	 * The firmware file name for these will be
-+	 * ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step>
-+	 *
-+	 * Currently the supported hardware variants are:
-+	 * iBT4.2 23 (0x17) for TyP
-+	 * iBT4.2 24 (0x18) for Solar
++	/* Check status */
++	data = skb->data;
++	status = *data;
++	if (status) {
++		bt_dev_err(hdev, "Intel Read Version failed (%02x)",
++			   status);
++		kfree_skb(skb);
++		return -bt_to_errno(status);
++	}
++
++	/* There are two variants of HCI_Intel_Read_Version_Command_Complete
++	 * depending on SKU type (legacy and TLV format).If the skb->len
++	 * parameter is equal to INTEL_VERSION_LEN  and the first octet
++	 * after the status parameter is 0x37 then it's the legacy format,
++	 * otherwise it's TLV format
 +	 */
-+	snprintf(fw_name, len, "intel/ibt-%04x-%04x.%s",
-+		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvi_top),
-+		 INTEL_CNVX_TOP_STEP(ver->cnvi_top)),
-+		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvr_top),
-+		 INTEL_CNVX_TOP_STEP(ver->cnvr_top)),
-+		 suffix);
-+}
-+EXPORT_SYMBOL_GPL(btintel_get_fw_name_tlv);
 +
- int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
- {
- 	struct sk_buff *skb;
++	/* Fetch the octet after status */
++	tlv_check_octet = *(data + 1);
++
++	if (skb->len == INTEL_VERSION_LEN && tlv_check_octet == 0x37) {
++		bt_dev_dbg(hdev, "Using Legacy Intel Version command");
++		*is_tlv_format = false;
++	} else {
++		bt_dev_dbg(hdev, "Using TLV format Version command");
++		*is_tlv_format = true;
++	}
++	*skb_out = skb;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_read_version_tlv);
++
+ /* ------- REGMAP IBT SUPPORT ------- */
+ 
+ #define IBT_REG_MODE_8BIT  0x00
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 32b2cd887bdd..fa4b1b801b13 100644
+index fa4b1b801b13..de2d104cb86d 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
-@@ -106,6 +106,12 @@ struct intel_debug_features {
- 	__u8    page1[16];
- } __packed;
+@@ -6,6 +6,9 @@
+  *  Copyright (C) 2015  Intel Corporation
+  */
  
-+#define INTEL_CNVX_TOP_TYPE_MASK	0x00000fff
-+#define INTEL_CNVX_TOP_STEP_MASK	0x0f000000
-+#define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & INTEL_CNVX_TOP_TYPE_MASK)
-+#define INTEL_CNVX_TOP_STEP(cnvx_top)	(((cnvx_top) & INTEL_CNVX_TOP_STEP_MASK) >> 24)
-+#define INTEL_CNVX_TOP_PACK_SWAB(t, s)	__swab16(((__u16)(((t) << 4) | (s))))
++/* Length of intel_version structure*/
++#define INTEL_VERSION_LEN	10
 +
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
+ struct intel_version {
+ 	u8 status;
+ 	u8 hw_platform;
 -- 
 2.17.1
 
