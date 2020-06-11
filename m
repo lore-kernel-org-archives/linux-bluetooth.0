@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0C4C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 13:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DF9C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 14:26:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78B722078D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 13:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4E422065C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 14:26:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PhEkMbQn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TZt6Vw1s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726277AbgFKN2K (ORCPT
+        id S1728086AbgFKO0P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Jun 2020 09:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50536 "EHLO
+        Thu, 11 Jun 2020 10:26:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbgFKN2K (ORCPT
+        with ESMTP id S1726657AbgFKO0P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Jun 2020 09:28:10 -0400
+        Thu, 11 Jun 2020 10:26:15 -0400
 Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3B9C03E96F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2020 06:28:10 -0700 (PDT)
-Received: by mail-ua1-x944.google.com with SMTP id z47so2086134uad.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2020 06:28:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6ABC08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2020 07:26:14 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id v25so2160817uau.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2020 07:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=nS+TDLihjg0mf4/EFDDec+3kbAwkozLu02FpGibKD+M=;
-        b=PhEkMbQncYUKy3Si/U1yd8QvV9n3yvTPqdZUY27X95P9XAquyH0R6aVFHzTs+YANic
-         rqawhLUmtK3rzDcSTNBOj1hm75vKEAUVtjFpk15aBvLkgOs98pNX6LMHCIo03jguANRg
-         4Wtjn4JufO2RTW8Ib5xkqu3ggxZJZ0pHksFso=
+        bh=fQDXtrStnVos/LlqQyOSKYMP2pT/eyHgs6Tku5covdQ=;
+        b=TZt6Vw1sV2VsDpJpOj1Th674IxePFoLW5a7rpp9LzQEbH0401nzfk/YRerw6aCiO1j
+         /pkgR1IhHLyO2blfFZSu1hIXf4UrbYPTCD4T/a/DBe7KC6hIfmaS1LOJVjOrZ2P7toIk
+         ZyLNkfT103rDY+CO5dWRY8uL4u7y8EqPeVQQ8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=nS+TDLihjg0mf4/EFDDec+3kbAwkozLu02FpGibKD+M=;
-        b=a8QpISlmgzHk7OAq1S1uh5UWMIVWxYM6p4sUg8A0WDAx+wRPFOjBpqtHqjDLWpsnXk
-         ylfTz/0GGd1M6YZApMv4kU5A/ku7TrYXM+w/k4l80n87lpbjTLYbsA5VezkqbM/6s+cO
-         OFM8AHsBFay3XSp0vhZPe+M08xxh/xBQBDU12va30vgTO9QuywTEiT0ER4dDM3GKudi1
-         BnqL1nUfc+gXbNOwqzkmBjgoYcH+u7v0rLCCbEOMMIYHuXbQof22Vx0TIxPZnpVRtjAV
-         b0WbKp7SGXWJR7qK8MJatWbIMwYXV4o8XrOQyHQJhzLAt6MPJw58bp638tB4C6de6r8m
-         FMFQ==
-X-Gm-Message-State: AOAM531+w6My31qYb8w+AgBd2d+lM0yGLj1m7X/0bhAQcPMunuX7npwZ
-        pSilC/EeAepUm+5myKUx3EV44ATVAhY=
-X-Google-Smtp-Source: ABdhPJwv4fRkanu6SMxkim2CFH6HMrtXpaO279Yb5AV4od9ubfmDwZg3oeiRtadHwr42y0ArLdS/hg==
-X-Received: by 2002:ab0:5f95:: with SMTP id b21mr6338465uaj.122.1591882088686;
-        Thu, 11 Jun 2020 06:28:08 -0700 (PDT)
+        bh=fQDXtrStnVos/LlqQyOSKYMP2pT/eyHgs6Tku5covdQ=;
+        b=jlV26A582k2M2tavCpTeI1t/z1skyAbI3Cuakm04FhpbggDguBNsvCUFMrF6HvQAqP
+         upbkhWh8UViO2bP6beBLVg3bKSNIAIaZELp3r8QiTvO5Dqj5KsgBPNlIrvKjK5L5GasQ
+         cH0zzFH1olEmSKxOuuQyoqU4Rq+8bTpzWTGivit/VRtbFYyS5A38YzxmRs0yps2Yu8bv
+         zHDA+ICMREtIG5i6Cy9Dos/X5v4IC81Z1x71h00UQ97BtZ7E85+GuDPKjZ/MdBS014tb
+         Vfk0yNQaK+2dwpX4MiVNf5hGZ+e1El+O5Hr39Fxi6bNrkpsoj8IrSioRECz5Rix61MNC
+         WhkA==
+X-Gm-Message-State: AOAM530umFLYMEMwLr9WOdW8ZxjyrjjHRdL1wg1oFHJgcThuYs0sjnum
+        BnNp36pMznuqC5f+K3322XD7YI33cqM=
+X-Google-Smtp-Source: ABdhPJzosMcj6D9Rvx7oHT7zg7mXxpwEg7M0xyP/caVgGLo1fDZ6cUQtBVRpxTtpAIIIGQmoajAYjw==
+X-Received: by 2002:ab0:5398:: with SMTP id k24mr6513678uaa.2.1591885573798;
+        Thu, 11 Jun 2020 07:26:13 -0700 (PDT)
 Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id d1sm438898vke.18.2020.06.11.06.28.08
+        by smtp.gmail.com with ESMTPSA id l84sm450608vke.15.2020.06.11.07.26.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2020 06:28:08 -0700 (PDT)
+        Thu, 11 Jun 2020 07:26:13 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v5] sco:Add support for BT_PKT_STATUS CMSG data
-Date:   Thu, 11 Jun 2020 13:28:05 +0000
-Message-Id: <20200611132805.139622-1-alainm@chromium.org>
+Subject: [PATCH v1] bluetooth:using 8bits for the hci cmsg state flags
+Date:   Thu, 11 Jun 2020 14:26:10 +0000
+Message-Id: <20200611142610.18125-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -70,189 +70,53 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change adds support for reporting the BT_PKT_STATUS to the socket
-CMSG data to allow the implementation of a packet loss correction on
-erronous data received on the SCO socket.
-
-The patch was partially developed by Marcel Holtmann and validated by
-Hsin-yu Chao.
+This change implements suggestions from the code review of the sco cmsg
+state flag patch.
 
 Signed-off-by: Alain Michaud <alainm@chromium.org>
-
 ---
 
-Changes in v5:
-- reducing cmsg_mask to 8 bit
-- clarifying the public symbol usage versus internal CMSG flags.
+ include/net/bluetooth/hci_sock.h | 4 ++--
+ net/bluetooth/hci_sock.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Changes in v4:
-- Addressing feedback from Marcel
-
- include/net/bluetooth/bluetooth.h | 10 ++++++++++
- include/net/bluetooth/sco.h       |  2 ++
- net/bluetooth/af_bluetooth.c      |  3 +++
- net/bluetooth/hci_core.c          |  1 +
- net/bluetooth/sco.c               | 33 +++++++++++++++++++++++++++++++
- 5 files changed, 49 insertions(+)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 3fa7b1e3c5d9..4044c6a1ffd0 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -147,6 +147,10 @@ struct bt_voice {
- #define BT_MODE_LE_FLOWCTL	0x03
- #define BT_MODE_EXT_FLOWCTL	0x04
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 9352bb1bf34c..9949870f7d78 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -31,8 +31,8 @@
+ #define HCI_TIME_STAMP	3
  
-+#define BT_PKT_STATUS          16
-+
-+#define BT_SCM_PKT_STATUS	0x03
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-@@ -275,6 +279,7 @@ struct bt_sock {
- 	struct sock *parent;
- 	unsigned long flags;
- 	void (*skb_msg_name)(struct sk_buff *, void *, int *);
-+	void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock *);
- };
+ /* CMSG flags */
+-#define HCI_CMSG_DIR	0x0001
+-#define HCI_CMSG_TSTAMP	0x0002
++#define HCI_CMSG_DIR	0x01
++#define HCI_CMSG_TSTAMP	0x02
  
- enum {
-@@ -324,6 +329,10 @@ struct l2cap_ctrl {
- 	struct l2cap_chan *chan;
- };
- 
-+struct sco_ctrl {
-+	u8	pkt_status;
-+};
-+
- struct hci_dev;
- 
- typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, u16 opcode);
-@@ -350,6 +359,7 @@ struct bt_skb_cb {
- 	u8 incoming:1;
- 	union {
- 		struct l2cap_ctrl l2cap;
-+		struct sco_ctrl sco;
- 		struct hci_ctrl hci;
- 	};
- };
-diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-index f40ddb4264fc..1aa2e14b6c94 100644
---- a/include/net/bluetooth/sco.h
-+++ b/include/net/bluetooth/sco.h
-@@ -46,4 +46,6 @@ struct sco_conninfo {
- 	__u8  dev_class[3];
- };
- 
-+#define SCO_CMSG_PKT_STATUS	0x01
-+
- #endif /* __SCO_H */
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 3fd124927d4d..d0abea8d08cc 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -286,6 +286,9 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 		if (msg->msg_name && bt_sk(sk)->skb_msg_name)
- 			bt_sk(sk)->skb_msg_name(skb, msg->msg_name,
- 						&msg->msg_namelen);
-+
-+		if (bt_sk(sk)->skb_put_cmsg)
-+			bt_sk(sk)->skb_put_cmsg(skb, msg, sk);
- 	}
- 
- 	skb_free_datagram(sk, skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 51d399273276..7b5e46198d99 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4549,6 +4549,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	if (conn) {
- 		/* Send to upper protocol */
-+		bt_cb(skb)->sco.pkt_status = flags & 0x03;
- 		sco_recv_scodata(conn, skb);
- 		return;
- 	} else {
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c8c3d38cdc7b..012a1579c260 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -66,6 +66,7 @@ struct sco_pinfo {
- 	bdaddr_t	dst;
- 	__u32		flags;
- 	__u16		setting;
-+	__u8		cmsg_mask;
- 	struct sco_conn	*conn;
- };
- 
-@@ -449,6 +450,15 @@ static void sco_sock_close(struct sock *sk)
- 	sco_sock_kill(sk);
- }
- 
-+static void sco_skb_put_cmsg(struct sk_buff *skb, struct msghdr *msg,
-+			     struct sock *sk)
-+{
-+	if (test_bit(SCO_CMSG_PKT_STATUS, &sco_pi(sk)->cmsg_mask))
-+		put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
-+			 sizeof(bt_cb(skb)->sco.pkt_status),
-+			 &bt_cb(skb)->sco.pkt_status);
-+}
-+
- static void sco_sock_init(struct sock *sk, struct sock *parent)
+ struct sockaddr_hci {
+ 	sa_family_t    hci_family;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index caf38a8ea6a8..d5627967fc25 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -52,7 +52,7 @@ struct hci_pinfo {
+ 	struct bt_sock    bt;
+ 	struct hci_dev    *hdev;
+ 	struct hci_filter filter;
+-	__u32             cmsg_mask;
++	__u8              cmsg_mask;
+ 	unsigned short    channel;
+ 	unsigned long     flags;
+ 	__u32             cookie;
+@@ -1399,7 +1399,7 @@ static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
+ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
+ 			  struct sk_buff *skb)
  {
- 	BT_DBG("sk %p", sk);
-@@ -457,6 +467,8 @@ static void sco_sock_init(struct sock *sk, struct sock *parent)
- 		sk->sk_type = parent->sk_type;
- 		bt_sk(sk)->flags = bt_sk(parent)->flags;
- 		security_sk_clone(parent, sk);
-+	} else {
-+		bt_sk(sk)->skb_put_cmsg = sco_skb_put_cmsg;
- 	}
- }
+-	__u32 mask = hci_pi(sk)->cmsg_mask;
++	__u8 mask = hci_pi(sk)->cmsg_mask;
  
-@@ -846,6 +858,18 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 		sco_pi(sk)->setting = voice.setting;
- 		break;
- 
-+	case BT_PKT_STATUS:
-+		if (get_user(opt, (u32 __user *)optval)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+		if (opt)
-+			set_bit(SCO_CMSG_PKT_STATUS, &sco_pi(sk)->cmsg_mask);
-+		else
-+			clear_bit(SCO_CMSG_PKT_STATUS, &sco_pi(sk)->cmsg_mask);
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-@@ -923,6 +947,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 	int len, err = 0;
- 	struct bt_voice voice;
- 	u32 phys;
-+	int pkt_status;
- 
- 	BT_DBG("sk %p", sk);
- 
-@@ -969,6 +994,14 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 			err = -EFAULT;
- 		break;
- 
-+	case BT_PKT_STATUS:
-+		pkt_status = test_bit(SCO_CMSG_PKT_STATUS,
-+				      &(sco_pi(sk)->cmsg_mask));
-+
-+		if (put_user(pkt_status, (int __user *)optval))
-+			err = -EFAULT;
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
+ 	if (mask & HCI_CMSG_DIR) {
+ 		int incoming = bt_cb(skb)->incoming;
 -- 
 2.27.0.290.gba653c62da-goog
 
