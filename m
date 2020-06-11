@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 950B0C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 00:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA64C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 00:35:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6AACE20814
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 00:35:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5E172081A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jun 2020 00:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvtAoqg6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkQXji1d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727030AbgFKAft (ORCPT
+        id S1727038AbgFKAfw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jun 2020 20:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44492 "EHLO
+        Wed, 10 Jun 2020 20:35:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726999AbgFKAfs (ORCPT
+        with ESMTP id S1726999AbgFKAfw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jun 2020 20:35:48 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8706EC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 17:35:48 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id fc4so1956438qvb.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 17:35:48 -0700 (PDT)
+        Wed, 10 Jun 2020 20:35:52 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D433FC08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 17:35:50 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id q8so4018044qkm.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2020 17:35:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=7L69tmG4ge+CdDQ9ol5h+rVeqDlvsxJmsg+k+xmy1Fk=;
-        b=rvtAoqg6CopLaMlqlTxpx+M4h8DxWiB4tjWjFW0CPmgTHASIOkPQcPJ74q5oVNzXJg
-         Ji27oPVYUzwVDBdoQSQu3C+M8s979X6JST/Jnq3hr2NthGnvUMbzHC6QZyVFK7k9ouwO
-         Kc0j2yTOwg1rH0TE9JPMimYYAtvApysODN+yInunJjyU+BOxr2fHYHpuXt3oLPYwAdN2
-         Mzvnd9a4hnJrp6p+yB5MArT1p23t6qeAHzEZsgN9sxxdZvFbcm8UYhp42OHbqQvcLcsX
-         lNz7VNLNAXeoirfDh+Udh75mC150x38fXj2jybze77/fFwNO4IE7BZerriQU0osQR2ts
-         IA3w==
+        bh=/i/zK71gymuqJezGK4E7P7L8fTocECH46UpHtKjBkpA=;
+        b=JkQXji1dktmNdFLiHn4KYqyDWxAGsrkWLgOAYgccT8pcfkogKBkJLI2m0KQdVS+7m+
+         1nGl4pp/UIB+K3BjG11PJV3G3wovjOPfJfHPLpLPCidTsYAkHqd/XzcNUMvlESDC3rdm
+         xqc3e+EuXGRtOA068e2tXx6nK62yISsAo4givfHrBi2aZDa7dPVS7RGCWzC7Op+17Ipb
+         qqxjbbg2c1y/FJTLyb3Tx4q2ItqzCkFyMCruIJKOY6wSVZhbA61eVnmzkSlKmZoCbrw6
+         xdt5Q3+GUqdF33/O02DJyLp+wPEtssZlQu8h/VYJtLPTeNezlOeAX8O9z4Zrun2MPwLb
+         5cmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=7L69tmG4ge+CdDQ9ol5h+rVeqDlvsxJmsg+k+xmy1Fk=;
-        b=FEhqgl2cyC6oWmjSPTabe3Fc2nXKkZQB1twDcwE8r4GnPwA8npnyh5QNubJqEMrE39
-         2uFhwPeXq1Uf8Jpyt/NJiv507n6lV5lRt76L8iA3LlbRYRRfURDnZkIPt0hfQoD3NQFg
-         grX3nFagr0Tvlp/W+y6+pj4EXXmGmOBA+9w4lNK4tken/IyGRTvR8/sBvzv+OyZ8QnOy
-         CeicKZeWAQe1QHIKkf9r6rmXO289I40h8uqP5YDYXPx/fy1yJLfU4ckD02ZXXCy83a4b
-         RqUGDZZHZ9Hc8yDO+/6b7ZR/IB+3jwCFATNFKE5yx35ob5gdkgbwnLNojdJMBugeUVV8
-         WbaQ==
-X-Gm-Message-State: AOAM532DT+xXb6IWOXqHlReihXML93no8eahaKAhWFEyjGiGLw+HmiWR
-        3iq5OVM50+niz/dPoaAJXfcExSomLF8=
-X-Google-Smtp-Source: ABdhPJw1uJTBaWpX4+qOy1UL+KsefNqopUiaUypt+OzQ7EVqVQ5ybuTE4tORXsiQ1ePpheW7i/VOcg==
-X-Received: by 2002:a0c:8482:: with SMTP id m2mr5808236qva.65.1591835747584;
-        Wed, 10 Jun 2020 17:35:47 -0700 (PDT)
+        bh=/i/zK71gymuqJezGK4E7P7L8fTocECH46UpHtKjBkpA=;
+        b=Bi1QHFfNJQH6SmaAlRd2x7+l9g/nruHnx854iDcLFHN0QrSrzddPq/b20U3/t8Xrf7
+         AH2Ua0PTwb5suNEXsYX04UYrrUiWSX+R4RetrsrwelM1IiewmFE16NBH6vaWhLCTiLs6
+         JNJpTqlUn6kFg3xW+EMetk5pGyHaF/JUhBvxfGmbFDMu1iJ/GGCimybkRihuCv6+PgQ0
+         oZy1W4OzoegNzhlAFB2fXAAPpPVyWZqovloMWlWqVm4MOBGgT7B0WEIH5HsWzg+J8o3S
+         qgGvRLB/1u9C3uHdwOmydus4VumJnxJFuyw0LIzBrHB2YWOmN0MGw3/fsybucbKK3vJi
+         mffw==
+X-Gm-Message-State: AOAM53169cRKniUaNHmAkneqCDe/6C0guwklHmnhn6AEVtMGU5k4izUK
+        SOPC+i0/OSbL0x3zfXOhujkRlFDcCFg=
+X-Google-Smtp-Source: ABdhPJw0mHyBYjrCJ1++zry3MjmgUrcFVPd5PaTIRkfHYU1ROsRRy2mLQ6Z5aLX4+jxIfvfN2yUQ9Q==
+X-Received: by 2002:a05:620a:11b2:: with SMTP id c18mr5753556qkk.480.1591835750064;
+        Wed, 10 Jun 2020 17:35:50 -0700 (PDT)
 Received: from [172.17.0.2] ([104.209.145.45])
-        by smtp.gmail.com with ESMTPSA id d78sm1043408qkg.106.2020.06.10.17.35.47
+        by smtp.gmail.com with ESMTPSA id y1sm1203176qta.82.2020.06.10.17.35.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2020 17:35:47 -0700 (PDT)
-Message-ID: <5ee17c63.1c69fb81.ead3b.78ac@mx.google.com>
-Date:   Wed, 10 Jun 2020 17:35:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6672828760119075187=="
+        Wed, 10 Jun 2020 17:35:49 -0700 (PDT)
+Message-ID: <5ee17c65.1c69fb81.997bb.89d6@mx.google.com>
+Date:   Wed, 10 Jun 2020 17:35:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7614803705217581314=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, alainm@chromium.org
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6672828760119075187==
+--===============7614803705217581314==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,28 +89,10 @@ While we are preparing for reviewing the patches, we found the following
 issue/warning.
 
 Test Result:
-checkpatch Failed
+checkgitlint Failed
 
 Outputs:
-WARNING:TYPO_SPELLING: 'implemenation' may be misspelled - perhaps 'implementation'?
-#7: 
-implemenation) to the adopted documentation.
-
-ERROR:INITIALISED_STATIC: do not initialise statics to false
-#64: FILE: src/adapter.c:123:
-+static bool kernel_set_system_config = false;
-
-- total: 1 errors, 1 warnings, 90 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+1: T3 Title has trailing punctuation (.): "mgmt:syncing configuration commands to the documentation."
 
 
 
@@ -118,4 +100,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============6672828760119075187==--
+--===============7614803705217581314==--
