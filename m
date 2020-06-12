@@ -2,82 +2,99 @@ Return-Path: <SRS0=RDM4=7Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E777BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 17:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 914E9C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:34:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC3AE2083E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 17:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591984201;
-	bh=J0DPukvkbx9lZmoUXIpR5Hr1tA3Fg6w8OyFfhndfJdg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=a+DfhdmJpDZ/+K90Kr4ZZO2zL3Y0smhYj5qXcpRPR6/sfaybf4t0bfwCsyMX/g5SR
-	 zcygmtb8nVUrQL1pCWg+IvfEGtoIS4rVdlZupkkw4JX2El2YpNZndRjcsYCjWc3V52
-	 ASJtf6mDxMdsqDNq7NeQT1oBnHbTRTAej3ArpJOQ=
+	by mail.kernel.org (Postfix) with ESMTP id 67859206D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:34:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SMDFxJ+D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726387AbgFLRt4 (ORCPT
+        id S1726453AbgFLTeG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Jun 2020 13:49:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38616 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726367AbgFLRtz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Jun 2020 13:49:55 -0400
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7E46D20835;
-        Fri, 12 Jun 2020 17:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591984195;
-        bh=J0DPukvkbx9lZmoUXIpR5Hr1tA3Fg6w8OyFfhndfJdg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ycGb4OgHXuBinxtKbBaVran6kE/iPBBGzgynhheGbRsY6QIsEiwJojYxeEGQswOR0
-         obF/zqOAsHYdcBZgVKUmtl6EQkO9WgdMJe1sOkTI6Qv7HJ2ot1FgPOOPp6JE6l4R38
-         3E6fPh2ncSMexCuYCljeTOleyf01XlgdhZA29T5w=
-Date:   Fri, 12 Jun 2020 10:49:52 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Miao-chen Chou <mcchou@chromium.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Yoni Shavit <yshavit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 4/7] Bluetooth: Add handler of
- MGMT_OP_REMOVE_ADV_MONITOR
-Message-ID: <20200612104952.0955d965@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20200611231459.v3.4.Ib4effd5813fb2f8585e2c7394735050c16a765eb@changeid>
-References: <20200611231459.v3.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
-        <20200611231459.v3.4.Ib4effd5813fb2f8585e2c7394735050c16a765eb@changeid>
+        Fri, 12 Jun 2020 15:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726290AbgFLTeF (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 12 Jun 2020 15:34:05 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27BFC03E96F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:34:03 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id u17so5956815vsu.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:34:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iVVWc6HyREAoGnNyqlZ+8iYxN4HVegfcVcqO1g9C5gQ=;
+        b=SMDFxJ+DubD+yQp0ET0n8bQqWTHBMXU1pk6HdT4dW5x2M1tyA/HSjBc0Fjtarau3YK
+         FzHr/PsyDGlAysrOXt7GCEKIV2qgXvRSPUCxf4OgvrLmD+d+sUo5SWQpQLBV4d7YJ3SK
+         0RgCelq7AMKkSgRyzyicKh+iqAGw5tRErrmBQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iVVWc6HyREAoGnNyqlZ+8iYxN4HVegfcVcqO1g9C5gQ=;
+        b=seWEgaW/Kh/NstZkyei79Zh7KMreYiL+0mqfOKoKuXkxCBoMPibhlSP2O9js+NhHg6
+         ZFATzADcLu0o23SXyMi3M7ZEAd1p1L7R0WcfiOM7ux4QGUrTi4KohQCBF7SxMbfMJ/NH
+         MM9WL45yAaSfjosN/ujVlsejrHK61sJ0c0LYubmdd1KHkDS38FAEohfMs8VE+4Uyzsv3
+         yNerpXehywu24yet4A4sdLjCDe1Biov4aAw1jOcbzlrhJZeLUb1cfN6KXQWNtmBgPtsA
+         AzGibCfdVSPfsSMVQeXAYjgICq/zRSBCK9ZBGaOO1WIFL3gTuF1+AaJJUntdoPtG33WT
+         TEig==
+X-Gm-Message-State: AOAM530hbfVXaD385cKoegzvIK91TInUeWqsqmdwnWVe3h2h6t0g5glM
+        l66JZcR7ulG2tJczAAE0E7S5R+60rMo=
+X-Google-Smtp-Source: ABdhPJyzxr0dRNy+9whG5CwfrG4sdOKAla1vCkFmfcjMOxrtJEUQ2Vgi9Md+HNsHQ6Nas5i0OwoeBQ==
+X-Received: by 2002:a05:6102:41b:: with SMTP id d27mr11923557vsq.197.1591990442138;
+        Fri, 12 Jun 2020 12:34:02 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id t76sm1086987vkt.56.2020.06.12.12.34.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2020 12:34:01 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH] bluetooth: Fix op_code size entry from the previous patch
+Date:   Fri, 12 Jun 2020 19:33:58 +0000
+Message-Id: <20200612193358.203186-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 11 Jun 2020 23:15:26 -0700 Miao-chen Chou wrote:
-> This adds the request handler of MGMT_OP_REMOVE_ADV_MONITOR command.
-> Note that the controller-based monitoring is not yet in place. This
-> removes the internal monitor(s) without sending HCI traffic, so the
-> request returns immediately.
-> 
-> The following test was performed.
-> - Issue btmgmt advmon-remove with valid and invalid handles.
-> 
-> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+The previous applied patch introduced an error that was not present in
+the submitted patch here: https://patchwork.kernel.org/patch/11599123/
 
-Still doesn't build cleanly with W=1 C=1
+In particular MGMT_SET_DEF_SYSTEM_CONFIG_SIZE was introduced but
+MGMT_SET_DEF_SYSTEM_CONFIG was used.
 
-net/bluetooth/mgmt.c:4009:46: warning: incorrect type in argument 2 (different base types)
-net/bluetooth/mgmt.c:4009:46:    expected unsigned short [usertype] handle
-net/bluetooth/mgmt.c:4009:46:    got restricted __le16 [usertype] monitor_handle
-net/bluetooth/mgmt.c:4018:29: warning: cast from restricted __le16
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
+
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2e0f976e7e04..99fbfd467d04 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7303,7 +7303,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_HDEV_OPTIONAL },
+ 	{ read_def_system_config,  MGMT_READ_DEF_SYSTEM_CONFIG_SIZE,
+ 						HCI_MGMT_UNTRUSTED },
+-	{ set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG,
++	{ set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG_SIZE,
+ 						HCI_MGMT_VAR_LEN },
+ };
+ 
+-- 
+2.27.0.290.gba653c62da-goog
+
