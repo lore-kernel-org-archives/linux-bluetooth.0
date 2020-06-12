@@ -2,99 +2,460 @@ Return-Path: <SRS0=RDM4=7Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 914E9C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF5AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:41:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67859206D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:34:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECB392063A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 19:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SMDFxJ+D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oILuede4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726453AbgFLTeG (ORCPT
+        id S1726302AbgFLTl6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Jun 2020 15:34:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
+        Fri, 12 Jun 2020 15:41:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726290AbgFLTeF (ORCPT
+        with ESMTP id S1726268AbgFLTl6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Jun 2020 15:34:05 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27BFC03E96F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:34:03 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id u17so5956815vsu.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:34:03 -0700 (PDT)
+        Fri, 12 Jun 2020 15:41:58 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E779C03E96F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:41:56 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id e4so12422136ljn.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 12:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iVVWc6HyREAoGnNyqlZ+8iYxN4HVegfcVcqO1g9C5gQ=;
-        b=SMDFxJ+DubD+yQp0ET0n8bQqWTHBMXU1pk6HdT4dW5x2M1tyA/HSjBc0Fjtarau3YK
-         FzHr/PsyDGlAysrOXt7GCEKIV2qgXvRSPUCxf4OgvrLmD+d+sUo5SWQpQLBV4d7YJ3SK
-         0RgCelq7AMKkSgRyzyicKh+iqAGw5tRErrmBQ=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DNUPjKURU0/6w0nWXj/1NGk56mwxRuqP58MLwIUsbVQ=;
+        b=oILuede4sPip4P1TokraJJ+wbLsTcDKwfeT5Tfl3a/6ggOsX0cgeDGXU7ekQA7c45h
+         Wixw/6W/RglzSljPIigu628fuowD7zxKESse+DEuHE0Jta8BDku2zCjFfrWj+us/+JLl
+         DuqtYFZZSJ5qBy3toV0r/nCpvPFPvg2Whvgg9LDAQCqBP8eM4Sfhe9ogI5VN/z8WglNX
+         1vyyyp7V5hSxrza7Q+ropUtqIoclFlEcZgGg/z2ZWjaHAnXrxyJlxvSuihbCpsp+rE0/
+         PIjnBfggSP1FSzhUknueOiWv57zAF+GmtpVQ7fRooZfhzkqIGPWm/8QQ97/7wKXnSDbW
+         wtLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iVVWc6HyREAoGnNyqlZ+8iYxN4HVegfcVcqO1g9C5gQ=;
-        b=seWEgaW/Kh/NstZkyei79Zh7KMreYiL+0mqfOKoKuXkxCBoMPibhlSP2O9js+NhHg6
-         ZFATzADcLu0o23SXyMi3M7ZEAd1p1L7R0WcfiOM7ux4QGUrTi4KohQCBF7SxMbfMJ/NH
-         MM9WL45yAaSfjosN/ujVlsejrHK61sJ0c0LYubmdd1KHkDS38FAEohfMs8VE+4Uyzsv3
-         yNerpXehywu24yet4A4sdLjCDe1Biov4aAw1jOcbzlrhJZeLUb1cfN6KXQWNtmBgPtsA
-         AzGibCfdVSPfsSMVQeXAYjgICq/zRSBCK9ZBGaOO1WIFL3gTuF1+AaJJUntdoPtG33WT
-         TEig==
-X-Gm-Message-State: AOAM530hbfVXaD385cKoegzvIK91TInUeWqsqmdwnWVe3h2h6t0g5glM
-        l66JZcR7ulG2tJczAAE0E7S5R+60rMo=
-X-Google-Smtp-Source: ABdhPJyzxr0dRNy+9whG5CwfrG4sdOKAla1vCkFmfcjMOxrtJEUQ2Vgi9Md+HNsHQ6Nas5i0OwoeBQ==
-X-Received: by 2002:a05:6102:41b:: with SMTP id d27mr11923557vsq.197.1591990442138;
-        Fri, 12 Jun 2020 12:34:02 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id t76sm1086987vkt.56.2020.06.12.12.34.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2020 12:34:01 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH] bluetooth: Fix op_code size entry from the previous patch
-Date:   Fri, 12 Jun 2020 19:33:58 +0000
-Message-Id: <20200612193358.203186-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DNUPjKURU0/6w0nWXj/1NGk56mwxRuqP58MLwIUsbVQ=;
+        b=qTMluMRrxmjc6HJyLWnqtCVmBbOoDFwFO2OxQGCj81KbNaLANlxYko+jXXVxuIsXFD
+         Uf0Q9BmS0jFJdY2KV7xU5jkiRxsUK9oX6EUnop4UPjYrq/caDwtF4C7iytm20+7v5TGV
+         XgGMQF5v9H37vEjTIhC3NMJn++FLHxMKyc9XtbElBTHQ14sPisEHm/h8A3m/w5z/+73p
+         ANmiIGc57L1nqNSrYTvvqWhiKF5Md0kwKeVaZrfb6mw3rWk46J8LPGKtB3a+GSRZ212o
+         7pjpfkBDe+rjjKnaPxTF1Saj7bpUiZHB0JAPMYJd7TK0tzU88P9TaBFnzyKSdcejTUCi
+         RQZg==
+X-Gm-Message-State: AOAM531sLyzK+3BRsXGpVWbiP8/jEEP8+0hC2K0BRAsW4WMCPIgtX+Fg
+        RsWMlg+uk252q80lUsQx61QTTZp+J4T4L39lX/zY/7hnVTI=
+X-Google-Smtp-Source: ABdhPJxQaEn3XThUQrTMQsBe/2wDsKBCSCAFQ3whcAlh9zdgzD2dCU2EVKN3xqqMkocvDR9F+XAgzoz0OXkF+efH13k=
+X-Received: by 2002:a2e:890d:: with SMTP id d13mr7680557lji.75.1591990914145;
+ Fri, 12 Jun 2020 12:41:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200611020157.70230-1-alainm@chromium.org> <20200611020157.70230-4-alainm@chromium.org>
+ <CE5B40FA-93DD-4E17-8C0D-54AB09BFC283@holtmann.org>
+In-Reply-To: <CE5B40FA-93DD-4E17-8C0D-54AB09BFC283@holtmann.org>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Fri, 12 Jun 2020 15:41:42 -0400
+Message-ID: <CALWDO_UnkSHg1rWNxC268xxA4iHU1_1NYWvZVm3au5DkiSVGvQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] bluetooth: implement read/set default system
+ parameters mgmt
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The previous applied patch introduced an error that was not present in
-the submitted patch here: https://patchwork.kernel.org/patch/11599123/
+Hi Marcel,
 
-In particular MGMT_SET_DEF_SYSTEM_CONFIG_SIZE was introduced but
-MGMT_SET_DEF_SYSTEM_CONFIG was used.
+On Fri, Jun 12, 2020 at 9:46 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Alain,
+>
+> > This patch implements the read default system parameters and the set
+> > default system parameters mgmt commands.
+> >
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > Reported-by: kernel test robot <lkp@intel.com>
+> >
+> > Signed-off-by: Alain Michaud <alainm@chromium.org>
+> > ---
+> >
+> > Changes in v3:
+> > -Fixing sparse errors
+> >
+> > Changes in v2: None
+> >
+> > include/net/bluetooth/mgmt.h |   2 +-
+> > net/bluetooth/Makefile       |   2 +-
+> > net/bluetooth/mgmt.c         |   6 +
+> > net/bluetooth/mgmt_config.c  | 253 +++++++++++++++++++++++++++++++++++
+> > net/bluetooth/mgmt_config.h  |  11 ++
+> > 5 files changed, 272 insertions(+), 2 deletions(-)
+> > create mode 100644 net/bluetooth/mgmt_config.c
+> > create mode 100644 net/bluetooth/mgmt_config.h
+> >
+> > diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> > index 09452d2ea6d3..39e849744f28 100644
+> > --- a/include/net/bluetooth/mgmt.h
+> > +++ b/include/net/bluetooth/mgmt.h
+> > @@ -705,7 +705,7 @@ struct mgmt_rp_set_exp_feature {
+> > #define MGMT_OP_READ_DEF_SYSTEM_CONFIG        0x004b
+> >
+> > struct mgmt_tlv {
+> > -     __u16 type;
+> > +     __le16 type;
+> >       __u8  length;
+> >       __u8  value[];
+> > } __packed;
+>
+> I fixed this cleanly in the first patch.
+>
+> > diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> > index 41dd541a44a5..1c645fba8c49 100644
+> > --- a/net/bluetooth/Makefile
+> > +++ b/net/bluetooth/Makefile
+> > @@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
+> >
+> > bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+> >       hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+> > -     ecdh_helper.o hci_request.o mgmt_util.o
+> > +     ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o
+> >
+> > bluetooth-$(CONFIG_BT_BREDR) += sco.o
+> > bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 9e8a3cccc6ca..69cd4f756a0d 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -36,6 +36,7 @@
+> > #include "hci_request.h"
+> > #include "smp.h"
+> > #include "mgmt_util.h"
+> > +#include "mgmt_config.h"
+> >
+> > #define MGMT_VERSION  1
+> > #define MGMT_REVISION 17
+> > @@ -111,6 +112,8 @@ static const u16 mgmt_commands[] = {
+> >       MGMT_OP_READ_SECURITY_INFO,
+> >       MGMT_OP_READ_EXP_FEATURES_INFO,
+> >       MGMT_OP_SET_EXP_FEATURE,
+> > +     MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+> > +     MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> > };
+> >
+> > static const u16 mgmt_events[] = {
+> > @@ -162,6 +165,7 @@ static const u16 mgmt_untrusted_commands[] = {
+> >       MGMT_OP_READ_EXT_INFO,
+> >       MGMT_OP_READ_SECURITY_INFO,
+> >       MGMT_OP_READ_EXP_FEATURES_INFO,
+> > +     MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+> > };
+> >
+> > static const u16 mgmt_untrusted_events[] = {
+> > @@ -7297,6 +7301,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+> >       { set_exp_feature,         MGMT_SET_EXP_FEATURE_SIZE,
+> >                                               HCI_MGMT_VAR_LEN |
+> >                                               HCI_MGMT_HDEV_OPTIONAL },
+> > +     { read_def_system_config, 0, HCI_MGMT_UNTRUSTED },
+> > +     { set_def_system_config, 0, HCI_MGMT_VAR_LEN },
+> > };
+>
+> I also added _SIZE constants for you.
+Looks like your fix may have a typo...  Patch submitted to address the typo.
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
-
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2e0f976e7e04..99fbfd467d04 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7303,7 +7303,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_HDEV_OPTIONAL },
- 	{ read_def_system_config,  MGMT_READ_DEF_SYSTEM_CONFIG_SIZE,
- 						HCI_MGMT_UNTRUSTED },
--	{ set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG,
-+	{ set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG_SIZE,
- 						HCI_MGMT_VAR_LEN },
- };
- 
--- 
-2.27.0.290.gba653c62da-goog
-
+>
+> >
+> > void mgmt_index_added(struct hci_dev *hdev)
+> > diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+> > new file mode 100644
+> > index 000000000000..f6dfbe93542c
+> > --- /dev/null
+> > +++ b/net/bluetooth/mgmt_config.c
+> > @@ -0,0 +1,253 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +/*
+> > + * Copyright (C) 2020 Google Corporation
+> > + */
+> > +
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/hci_core.h>
+> > +#include <net/bluetooth/mgmt.h>
+> > +
+> > +#include "mgmt_util.h"
+> > +#include "mgmt_config.h"
+> > +
+> > +#define HDEV_PARAM_U16(_param_code_, _param_name_) \
+> > +{ \
+> > +     { cpu_to_le16(_param_code_), sizeof(__u16) }, \
+> > +     { cpu_to_le16(hdev->_param_name_) } \
+> > +}
+> > +
+> > +int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+> > +                        u16 data_len)
+> > +{
+> > +     struct {
+> > +             struct mgmt_tlv entry;
+> > +             union {
+> > +                     /* This is a simplification for now since all values
+> > +                      * are 16 bits.  In the future, this code may need
+> > +                      * refactoring to account for variable length values
+> > +                      * and properly calculate the required buffer size.
+> > +                      */
+> > +                     __le16 value;
+> > +             };
+> > +     } __packed params[] = {
+> > +             /* Please see mgmt-api.txt for documentation of these values */
+> > +             HDEV_PARAM_U16(0x0000, def_page_scan_type),
+> > +             HDEV_PARAM_U16(0x0001, def_page_scan_int),
+> > +             HDEV_PARAM_U16(0x0002, def_page_scan_window),
+> > +             HDEV_PARAM_U16(0x0003, def_inq_scan_type),
+> > +             HDEV_PARAM_U16(0x0004, def_inq_scan_int),
+> > +             HDEV_PARAM_U16(0x0005, def_inq_scan_window),
+> > +             HDEV_PARAM_U16(0x0006, def_br_lsto),
+> > +             HDEV_PARAM_U16(0x0007, def_page_timeout),
+> > +             HDEV_PARAM_U16(0x0008, sniff_min_interval),
+> > +             HDEV_PARAM_U16(0x0009, sniff_max_interval),
+> > +             HDEV_PARAM_U16(0x000a, le_adv_min_interval),
+> > +             HDEV_PARAM_U16(0x000b, le_adv_max_interval),
+> > +             HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
+> > +             HDEV_PARAM_U16(0x000d, le_scan_interval),
+> > +             HDEV_PARAM_U16(0x000e, le_scan_window),
+> > +             HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
+> > +             HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
+> > +             HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
+> > +             HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
+> > +             HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
+> > +             HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
+> > +             HDEV_PARAM_U16(0x0015, le_scan_int_connect),
+> > +             HDEV_PARAM_U16(0x0016, le_scan_window_connect),
+> > +             HDEV_PARAM_U16(0x0017, le_conn_min_interval),
+> > +             HDEV_PARAM_U16(0x0018, le_conn_max_interval),
+> > +             HDEV_PARAM_U16(0x0019, le_conn_latency),
+> > +             HDEV_PARAM_U16(0x001a, le_supv_timeout),
+> > +     };
+> > +     struct mgmt_rp_read_def_system_config *rp = (void *)params;
+> > +
+> > +     bt_dev_dbg(hdev, "sock %p", sk);
+> > +
+> > +     return mgmt_cmd_complete(sk, hdev->id,
+> > +                              MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+> > +                              0, rp, sizeof(params));
+> > +}
+> > +
+> > +#define TO_TLV(x)            ((struct mgmt_tlv *)(x))
+> > +#define TLV_GET_LE16(tlv)    le16_to_cpu(*((__le16 *)(TO_TLV(tlv)->value)))
+> > +
+> > +int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+> > +                       u16 data_len)
+> > +{
+> > +     u16 buffer_left = data_len;
+> > +     u8 *buffer = data;
+> > +
+> > +     if (buffer_left < sizeof(struct mgmt_tlv)) {
+> > +             return mgmt_cmd_status(sk, hdev->id,
+> > +                                    MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> > +                                    MGMT_STATUS_INVALID_PARAMS);
+> > +     }
+> > +
+> > +     /* First pass to validate the tlv */
+> > +     while (buffer_left >= sizeof(struct mgmt_tlv)) {
+> > +             const u8 len = TO_TLV(buffer)->length;
+> > +             const u16 exp_len = sizeof(struct mgmt_tlv) +
+> > +                                 len;
+> > +             const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
+> > +
+> > +             if (buffer_left < exp_len) {
+> > +                     bt_dev_warn(hdev, "invalid len left %d, exp >= %d",
+> > +                                 buffer_left, exp_len);
+> > +
+> > +                     return mgmt_cmd_status(sk, hdev->id,
+> > +                                     MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> > +                                     MGMT_STATUS_INVALID_PARAMS);
+> > +             }
+> > +
+> > +             /* Please see mgmt-api.txt for documentation of these values */
+> > +             switch (type) {
+> > +             case 0x0000:
+> > +             case 0x0001:
+> > +             case 0x0002:
+> > +             case 0x0003:
+> > +             case 0x0004:
+> > +             case 0x0005:
+> > +             case 0x0006:
+> > +             case 0x0007:
+> > +             case 0x0008:
+> > +             case 0x0009:
+> > +             case 0x000a:
+> > +             case 0x000b:
+> > +             case 0x000c:
+> > +             case 0x000d:
+> > +             case 0x000e:
+> > +             case 0x000f:
+> > +             case 0x0010:
+> > +             case 0x0011:
+> > +             case 0x0012:
+> > +             case 0x0013:
+> > +             case 0x0014:
+> > +             case 0x0015:
+> > +             case 0x0016:
+> > +             case 0x0017:
+> > +             case 0x0018:
+> > +             case 0x0019:
+> > +             case 0x001a:
+> > +                     if (len != sizeof(u16)) {
+> > +                             bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
+> > +                                         len, sizeof(u16), type);
+> > +
+> > +                             return mgmt_cmd_status(sk, hdev->id,
+> > +                                     MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> > +                                     MGMT_STATUS_INVALID_PARAMS);
+> > +                     }
+> > +                     break;
+> > +             default:
+> > +                     bt_dev_warn(hdev, "unsupported parameter %u", type);
+> > +                     break;
+> > +             }
+> > +
+> > +             buffer_left -= exp_len;
+> > +             buffer += exp_len;
+> > +     }
+> > +
+> > +     buffer_left = data_len;
+> > +     buffer = data;
+> > +     while (buffer_left >= sizeof(struct mgmt_tlv)) {
+> > +             const u8 len = TO_TLV(buffer)->length;
+> > +             const u16 exp_len = sizeof(struct mgmt_tlv) +
+> > +                                 len;
+> > +             const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
+> > +
+> > +             switch (type) {
+> > +             case 0x0000:
+> > +                     hdev->def_page_scan_type = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0001:
+> > +                     hdev->def_page_scan_int = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0002:
+> > +                     hdev->def_page_scan_window = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0003:
+> > +                     hdev->def_inq_scan_type = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0004:
+> > +                     hdev->def_inq_scan_int = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0005:
+> > +                     hdev->def_inq_scan_window = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0006:
+> > +                     hdev->def_br_lsto = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0007:
+> > +                     hdev->def_page_timeout = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0008:
+> > +                     hdev->sniff_min_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0009:
+> > +                     hdev->sniff_max_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000a:
+> > +                     hdev->le_adv_min_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000b:
+> > +                     hdev->le_adv_max_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000c:
+> > +                     hdev->def_multi_adv_rotation_duration =
+> > +                                                        TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000d:
+> > +                     hdev->le_scan_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000e:
+> > +                     hdev->le_scan_window = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x000f:
+> > +                     hdev->le_scan_int_suspend = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0010:
+> > +                     hdev->le_scan_window_suspend = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0011:
+> > +                     hdev->le_scan_int_discovery = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00012:
+> > +                     hdev->le_scan_window_discovery = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00013:
+> > +                     hdev->le_scan_int_adv_monitor = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00014:
+> > +                     hdev->le_scan_window_adv_monitor = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00015:
+> > +                     hdev->le_scan_int_connect = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00016:
+> > +                     hdev->le_scan_window_connect = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00017:
+> > +                     hdev->le_conn_min_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00018:
+> > +                     hdev->le_conn_max_interval = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x00019:
+> > +                     hdev->le_conn_latency = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             case 0x0001a:
+> > +                     hdev->le_supv_timeout = TLV_GET_LE16(buffer);
+> > +                     break;
+> > +             default:
+> > +                     bt_dev_warn(hdev, "unsupported parameter %u", type);
+> > +                     break;
+> > +             }
+> > +
+> > +             buffer_left -= exp_len;
+> > +             buffer += exp_len;
+> > +     }
+> > +
+> > +     return mgmt_cmd_status(sk, hdev->id,
+> > +                            MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> > +                            MGMT_STATUS_SUCCESS);
+> > +}
+> > diff --git a/net/bluetooth/mgmt_config.h b/net/bluetooth/mgmt_config.h
+> > new file mode 100644
+> > index 000000000000..51da6e63b1a0
+> > --- /dev/null
+> > +++ b/net/bluetooth/mgmt_config.h
+> > @@ -0,0 +1,11 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +/*
+> > + * Copyright (C) 2020 Google Corporation
+> > + */
+> > +
+> > +int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+> > +                        u16 data_len);
+> > +
+> > +int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+> > +                       u16 data_len);
+>
+> Other than that, patch has been applied to bluetooth-next tree.
+>
+> Regards
+>
+> Marcel
+>
