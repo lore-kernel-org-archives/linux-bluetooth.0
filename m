@@ -2,66 +2,68 @@ Return-Path: <SRS0=RDM4=7Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 315E2C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 13:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D53A3C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 13:21:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B819206A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 13:19:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE4AA2074B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 13:21:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726537AbgFLNTn (ORCPT
+        id S1726353AbgFLNVp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Jun 2020 09:19:43 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59379 "EHLO
+        Fri, 12 Jun 2020 09:21:45 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:45922 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726255AbgFLNTm (ORCPT
+        with ESMTP id S1726253AbgFLNVp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Jun 2020 09:19:42 -0400
+        Fri, 12 Jun 2020 09:21:45 -0400
 Received: from marcel-macbook.fritz.box (ip-109-41-64-170.web.vodafone.de [109.41.64.170])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5CF69CED05;
-        Fri, 12 Jun 2020 15:29:28 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5B018CED03;
+        Fri, 12 Jun 2020 15:31:33 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Disable SoC debug logging for
- WCN3991
+Subject: Re: [PATCH v2 1/7] Bluetooth: Add definitions for advertisement
+ monitor features
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1591964428-9607-1-git-send-email-bgodavar@codeaurora.org>
-Date:   Fri, 12 Jun 2020 15:19:35 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        abhishekpandit@chromium.org, rjliao@codeaurora.org,
-        gubbaven@codeaurora.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <BF82F217-1BD4-48B6-AC9E-AF94A20EE7C9@holtmann.org>
-References: <1591964428-9607-1-git-send-email-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+In-Reply-To: <CABmPvSHKfS3fCfLzKCLAmf2p_JUYSkRrSfdkePVaHXSrLrXpbA@mail.gmail.com>
+Date:   Fri, 12 Jun 2020 15:21:33 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Michael Sun <michaelfsun@google.com>,
+        Yoni Shavit <yshavit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <550BD45A-FE50-48C1-91CB-470D157A728B@holtmann.org>
+References: <20200603160058.v2.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
+ <2097432F-C4FA-4166-A221-DAE82B4A0C31@holtmann.org>
+ <CABmPvSHKfS3fCfLzKCLAmf2p_JUYSkRrSfdkePVaHXSrLrXpbA@mail.gmail.com>
+To:     Miao-chen Chou <mcchou@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Miao-chen,
 
-> By default, WCN3991 sent debug packets to HOST via ACL packet
-> with header 0xDC2E. This logging is not required on commercial
-> devices. With this patch SoC logging is disabled post fw
-> download.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> drivers/bluetooth/btqca.c | 27 +++++++++++++++++++++++++++
-> drivers/bluetooth/btqca.h |  2 ++
-> 2 files changed, 29 insertions(+)
+> Thanks for reviewing. Please see v3 for the update.
+> I am trying to settle down the name of Add Advertisement Pattern
+> Monitor command with Luiz on the other thread. I will post the update
+> here once it is sorted out.
 
-patch has been applied to bluetooth-next tree.
+I thought the name was just fine. Especially in the discussed context that we might add another “Add” command for future vendors, but keep a single “Remove” command.
 
-Regareds
+Regards
 
 Marcel
 
