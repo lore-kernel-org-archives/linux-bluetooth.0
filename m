@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E0F1C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 23:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD7EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 23:46:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D51FD2078A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 23:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C549C2078A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jun 2020 23:46:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lcuSr3hS"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bYIfnUI3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726552AbgFLXqn (ORCPT
+        id S1726463AbgFLXqm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Jun 2020 19:46:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57196 "EHLO
+        Fri, 12 Jun 2020 19:46:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgFLXqY (ORCPT
+        with ESMTP id S1726499AbgFLXqY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 12 Jun 2020 19:46:24 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260F7C03E96F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 16:46:23 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id m7so4372225plt.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 16:46:23 -0700 (PDT)
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF27EC08C5C4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 16:46:24 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id h95so4517855pje.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2020 16:46:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sPZCJqVc3VD6afd7xeVx3YjOD3wIc/J7v0YJPBSoylE=;
-        b=lcuSr3hS4k5aLLSKgmXkW/LobMkGihyN93NoxtdICodDkIleftkSl3TxXyf4CtsgMM
-         9JJrmGdfeL0WCJKg/LRuCg42jUkMv5CXGjcgWTSpF0XikppJKnL06so1Hd7an3U1YKWT
-         cQUJZARDuLv03cTDDoIMce3SxYkC2U/GZAclY=
+        bh=GMh9znkko3Eeh+wj8HArzemUcagcDQr49Ksm6hwe3xM=;
+        b=bYIfnUI3ZsF13U18gugxCWcabmkVVttN6ouoWxFNjLXkQxBw4bOLvhNQXHwfl5Ta78
+         qSTu/nhbk6kErxjVmwNX6FgFULT86Jo1njCz46rxueK4oOfUw/M6fgnCPO/7jj8Bl0qf
+         x9dVQ4qJtVaLIVRSCkzay00w19I5VhxZTNU+4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sPZCJqVc3VD6afd7xeVx3YjOD3wIc/J7v0YJPBSoylE=;
-        b=UZds5/o3buUInvRG7gl5i7Zdh5WccWS5rEUoT4mI4o/GBQLDY0Esiq3m3t62O5ORLS
-         U2O8vBYGbbnLXA/BRrKtNTO7iK0QAADzVpBpOoVh2jQCWT/EtkM72uuwm99RhlQW/C6k
-         8X4lSshZhzD4c+5ZOoP8zninjTShpi26jgeZwWX/wGmy7qGIhE1IZ0vXdUJphgf6F2jG
-         d+1iQOiUBlbQkI3BIc18KvKQevM+ncaXiSANY5+GMLUO8+DgOQo/mkVpQC+QXNiwMyyW
-         CCVSxooaP28p5y0kkv7OeB7/Y60ncIvZOW57PSdijG36IhsnULwc4iwhCiz0j1zCv6BT
-         +oZg==
-X-Gm-Message-State: AOAM531CohDD9QzeXw6EqmUhKGGqNWCuku9jtLy68hrEtOU/V9kqQITr
-        fMsnYFUI7i8zV/IRG5B/sIoY5rkcO+c=
-X-Google-Smtp-Source: ABdhPJwZKG3kD4by+PeapJCV/S1whRjsjb71Wsm7yFU3/BtOC3DLfidb5BMvGxir4etSif7VJlZ04A==
-X-Received: by 2002:a17:90a:ea84:: with SMTP id h4mr1109960pjz.45.1592005582350;
-        Fri, 12 Jun 2020 16:46:22 -0700 (PDT)
+        bh=GMh9znkko3Eeh+wj8HArzemUcagcDQr49Ksm6hwe3xM=;
+        b=XLBInKg+nZUsrJjgMUOkIg4pHuGIoYgB1rSxigJviQwYjN9Cx5tOI8M4YfLLZg3lH4
+         AmnVYhTF51rhssIhGw/kh29nMuJVD61817jx9p02MLLQk39OV0e4ja6C/XJjwxSbcqzy
+         fnyh9eSoF4+ZrAwRk/tH5aR/t6MAI3Agv6hs+opWBNF7695dTjgpBhINswam5rvkIlpU
+         DRVGC+DrJxHhBWxsfWUtDMoFELkAIOMvSnaB9EGLDC+ZhGDL50MDk7qJOTm7hfSpBGXE
+         O1tcU1xwv5ZF3xFDpqzywyieQuap8MIDCx5Eg2C3xfS4nPpB9EIC4Ng3rWdJq9jtcI/r
+         vUoA==
+X-Gm-Message-State: AOAM533HMiMmI4qUuyh6gFNoPTg++21sn8g8DxKjFpdrc/x9Gtm0jJX5
+        801ZHbctdU8u+Sqoj31O5GRTeQIJi5w=
+X-Google-Smtp-Source: ABdhPJzfVJcmfIwdz1PSyA1t6VJIL0U0DwB9RBAIapD125Ni28J2wNcedoi2eX/MR0IitTtm0JxyKw==
+X-Received: by 2002:a17:902:d711:: with SMTP id w17mr13815334ply.122.1592005583736;
+        Fri, 12 Jun 2020 16:46:23 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id b19sm6198639pjo.57.2020.06.12.16.46.21
+        by smtp.gmail.com with ESMTPSA id b19sm6198639pjo.57.2020.06.12.16.46.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jun 2020 16:46:21 -0700 (PDT)
+        Fri, 12 Jun 2020 16:46:23 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Alain Michaud <alainm@chromium.org>,
@@ -68,9 +68,9 @@ Cc:     Alain Michaud <alainm@chromium.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v4 6/7] Bluetooth: Notify adv monitor removed event
-Date:   Fri, 12 Jun 2020 16:45:55 -0700
-Message-Id: <20200612164243.v4.6.If1a82f71eb63f969de3d5a5da03c2908b58a721a@changeid>
+Subject: [PATCH v4 7/7] Bluetooth: Update background scan and report device based on advertisement monitors
+Date:   Fri, 12 Jun 2020 16:45:56 -0700
+Message-Id: <20200612164243.v4.7.Id9ca021d5a3e8c748ea5c0a1c81582b9a8183f45@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200612164243.v4.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
 References: <20200612164243.v4.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
@@ -81,79 +81,166 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This notifies management sockets on MGMT_EV_ADV_MONITOR_REMOVED event.
+This calls hci_update_background_scan() when there is any update on the
+advertisement monitors. If there is at least one advertisement monitor,
+the filtering policy of scan parameters should be 0x00. This also reports
+device found mgmt events if there is at least one monitor.
 
-The following test was performed.
-- Start two btmgmt consoles, issue a btmgmt advmon-remove command on one
-console and observe a MGMT_EV_ADV_MONITOR_REMOVED event on the other.
+The following cases were tested with btmgmt advmon-* commands.
+(1) add a ADV monitor and observe that the passive scanning is
+triggered.
+(2) remove the last ADV monitor and observe that the passive scanning is
+terminated.
+(3) with a LE peripheral paired, repeat (1) and observe the passive
+scanning continues.
+(4) with a LE peripheral paired, repeat (2) and observe the passive
+scanning continues.
+(5) with a ADV monitor, suspend/resume the host and observe the passive
+scanning continues.
 
 Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 Changes in v4: None
-Changes in v3:
-- Convert the endianness of the returned handle.
-
+Changes in v3: None
 Changes in v2: None
 
- net/bluetooth/mgmt.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 13 +++++++++++++
+ net/bluetooth/hci_event.c        |  5 +++--
+ net/bluetooth/hci_request.c      | 17 ++++++++++++++---
+ net/bluetooth/mgmt.c             |  5 ++++-
+ 5 files changed, 35 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0a1e89ce75eae..325e528a1773e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -156,6 +156,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_PHY_CONFIGURATION_CHANGED,
- 	MGMT_EV_EXP_FEATURE_CHANGED,
- 	MGMT_EV_ADV_MONITOR_ADDED,
-+	MGMT_EV_ADV_MONITOR_REMOVED,
- };
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 78ac7fd282d77..1ce89e546a64e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1243,6 +1243,7 @@ void hci_adv_monitors_clear(struct hci_dev *hdev);
+ void hci_free_adv_monitor(struct adv_monitor *monitor);
+ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
+ int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle);
++bool hci_is_adv_monitoring(struct hci_dev *hdev);
  
- static const u16 mgmt_untrusted_commands[] = {
-@@ -3864,6 +3865,16 @@ static void mgmt_adv_monitor_added(struct sock *sk, struct hci_dev *hdev,
- 	mgmt_event(MGMT_EV_ADV_MONITOR_ADDED, hdev, &ev, sizeof(ev), sk);
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d0f30e2e29471..2d318916e9ebc 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3005,6 +3005,8 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
+ 		hci_free_adv_monitor(monitor);
+ 
+ 	idr_destroy(&hdev->adv_monitors_idr);
++
++	hci_update_background_scan(hdev);
  }
  
-+static void mgmt_adv_monitor_removed(struct sock *sk, struct hci_dev *hdev,
-+				     u16 handle)
-+{
-+	struct mgmt_ev_adv_monitor_added ev;
-+
-+	ev.monitor_handle = cpu_to_le16(handle);
-+
-+	mgmt_event(MGMT_EV_ADV_MONITOR_REMOVED, hdev, &ev, sizeof(ev), sk);
-+}
-+
- static int read_adv_monitor_features(struct sock *sk, struct hci_dev *hdev,
- 				     void *data, u16 len)
- {
-@@ -4016,12 +4027,15 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
- {
- 	struct mgmt_cp_remove_adv_monitor *cp = data;
- 	struct mgmt_rp_remove_adv_monitor rp;
-+	unsigned int prev_adv_monitors_cnt;
- 	int err;
+ void hci_free_adv_monitor(struct adv_monitor *monitor)
+@@ -3038,6 +3040,9 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
  
- 	BT_DBG("request for %s", hdev->name);
- 
- 	hci_dev_lock(hdev);
- 
-+	prev_adv_monitors_cnt = hdev->adv_monitors_cnt;
+ 	hdev->adv_monitors_cnt++;
+ 	monitor->handle = handle;
 +
- 	err = hci_remove_adv_monitor(hdev, __le16_to_cpu(cp->monitor_handle));
- 	if (err == -ENOENT) {
- 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADV_MONITOR,
-@@ -4029,6 +4043,9 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
++	hci_update_background_scan(hdev);
++
+ 	return 0;
+ }
+ 
+@@ -3069,9 +3074,17 @@ int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle)
+ 		idr_for_each(&hdev->adv_monitors_idr, &free_adv_monitor, hdev);
  	}
  
-+	if (hdev->adv_monitors_cnt < prev_adv_monitors_cnt)
-+		mgmt_adv_monitor_removed(sk, hdev, cp->monitor_handle);
++	hci_update_background_scan(hdev);
 +
- 	hci_dev_unlock(hdev);
+ 	return 0;
+ }
  
- 	rp.monitor_handle = cp->monitor_handle;
++/* This function requires the caller holds hdev->lock */
++bool hci_is_adv_monitoring(struct hci_dev *hdev)
++{
++	return !idr_is_empty(&hdev->adv_monitors_idr);
++}
++
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
+ 					 bdaddr_t *bdaddr, u8 type)
+ {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cfeaee347db32..cbcc0b590fd41 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5447,14 +5447,15 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 
+ 	/* Passive scanning shouldn't trigger any device found events,
+ 	 * except for devices marked as CONN_REPORT for which we do send
+-	 * device found events.
++	 * device found events, or advertisement monitoring requested.
+ 	 */
+ 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
+ 		if (type == LE_ADV_DIRECT_IND)
+ 			return;
+ 
+ 		if (!hci_pend_le_action_lookup(&hdev->pend_le_reports,
+-					       bdaddr, bdaddr_type))
++					       bdaddr, bdaddr_type) &&
++		    idr_is_empty(&hdev->adv_monitors_idr))
+ 			return;
+ 
+ 		if (type == LE_ADV_NONCONN_IND || type == LE_ADV_SCAN_IND)
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 1acf5b8e0910c..d465dbbb1963c 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -418,11 +418,15 @@ static void __hci_update_background_scan(struct hci_request *req)
+ 	 */
+ 	hci_discovery_filter_clear(hdev);
+ 
++	BT_DBG("%s ADV monitoring is %s", hdev->name,
++	       hci_is_adv_monitoring(hdev) ? "on" : "off");
++
+ 	if (list_empty(&hdev->pend_le_conns) &&
+-	    list_empty(&hdev->pend_le_reports)) {
++	    list_empty(&hdev->pend_le_reports) &&
++	    !hci_is_adv_monitoring(hdev)) {
+ 		/* If there is no pending LE connections or devices
+-		 * to be scanned for, we should stop the background
+-		 * scanning.
++		 * to be scanned for or no ADV monitors, we should stop the
++		 * background scanning.
+ 		 */
+ 
+ 		/* If controller is not scanning we are done. */
+@@ -798,6 +802,13 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 	}
+ 
++	/* Once the controller offloading of advertisement monitor is in place,
++	 * the if condition should include the support of MSFT extension
++	 * support.
++	 */
++	if (!idr_is_empty(&hdev->adv_monitors_idr))
++		return 0x00;
++
+ 	/* Select filter policy to use white list */
+ 	return 0x01;
+ }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 325e528a1773e..10a239d396827 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8435,8 +8435,11 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	if (!hci_discovery_active(hdev)) {
+ 		if (link_type == ACL_LINK)
+ 			return;
+-		if (link_type == LE_LINK && list_empty(&hdev->pend_le_reports))
++		if (link_type == LE_LINK &&
++		    list_empty(&hdev->pend_le_reports) &&
++		    !hci_is_adv_monitoring(hdev)) {
+ 			return;
++		}
+ 	}
+ 
+ 	if (hdev->discovery.result_filtering) {
 -- 
 2.26.2
 
