@@ -2,147 +2,150 @@ Return-Path: <SRS0=u3xs=74=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBAEC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA580C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 19:55:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72C092071A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75CC02071A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 19:55:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OvjaSOOC"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="eW4MH3t+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731332AbgFOSkb (ORCPT
+        id S1729714AbgFOTzz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 14:40:31 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57522 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729354AbgFOSkb (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 14:40:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592246429;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LdVapGy9WTsAkwpfNEzCTfQe3Pij8/lM5ySXZsHExs=;
-        b=OvjaSOOCfyp307NW0Ll0v8HBOtktVG83FBcqFzJ1QSR5rShNapnPdRP4kax9ApS19ZA8eP
-        zODD4GVwCIlP6FCFeiKCeDK6hOgdKoUvRXwL2J6jdxsT+heXdTtquL9P+XZptqtG1ekpr3
-        29TEnsoBdGPs2biowVKGBTC+bNdH1ac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-n3G_ZfGUONug8wkjJytxqA-1; Mon, 15 Jun 2020 14:40:12 -0400
-X-MC-Unique: n3G_ZfGUONug8wkjJytxqA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F43184D144;
-        Mon, 15 Jun 2020 18:40:06 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3972B5D9CC;
-        Mon, 15 Jun 2020 18:40:00 +0000 (UTC)
-Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        samba-technical@lists.samba.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-sctp@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        devel@driverdev.osuosl.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, x86@kernel.org,
-        kasan-dev@googlegroups.com, cocci@systeme.lip6.fr,
-        linux-wpan@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, wireguard@lists.zx2c4.com,
-        linux-ppp@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-btrfs@vger.kernel.org
-References: <20200413211550.8307-1-longman@redhat.com>
- <20200413211550.8307-2-longman@redhat.com> <20200615180753.GJ4151@kadam>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <9d084be2-29a3-7757-9386-20dbaeb5fc24@redhat.com>
-Date:   Mon, 15 Jun 2020 14:39:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200615180753.GJ4151@kadam>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Mon, 15 Jun 2020 15:55:55 -0400
+Received: from mga14.intel.com ([192.55.52.115]:23630 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728771AbgFOTzy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jun 2020 15:55:54 -0400
+IronPort-SDR: Dp/nlt9mndfPIUsUx0h2FpFXch9IhmmBoLZKoA0pFc0bIPXnKKpAMN4xJBWx1YrIyMmptAYxRm
+ RFAoZC30MwGQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2020 12:55:53 -0700
+IronPort-SDR: raVGGDkpmVMDEVEBnBfPchXCsvFiTnsIaCjmB+DilyCaiUuLqRnd05MsY7Itn2oc5yKXp4GFAn
+ 4Yb1UTFC4vbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,515,1583222400"; 
+   d="scan'208";a="276670798"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga006.jf.intel.com with ESMTP; 15 Jun 2020 12:55:53 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 15 Jun 2020 12:55:53 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 15 Jun 2020 12:55:52 -0700
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 15 Jun 2020 12:55:52 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.102)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 15 Jun 2020 12:55:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZhOyfp3bxjsDBMupFEzyAW8FHOkLyttsHfx6WicI0F0fK/QGlR90cuO2Z46x8vshKpxaYLo3BbRjWZIdr9qEM97IneaOGOGJQYqxHxnrApl93ltWiSF3TlM43EM/eME/EX4bp4R3BAyT28FNzSKDWsAP/GOCy9nJVlNePBq3SqnhIpIwqQCuUVMYIfvDR/BI9jdzYwD5yPBJ3nnPFJj70jDe0LPMdwxv94om2N33p+wXFxDqjIXhDFDNSgK6f2zTgUJ7SLz8CrfZq8x9PKQaxPHGfgddLs+lktnhBUIzsI60dl2a6zXT+hDjYGY2ngCNnXYtLKkXeWCZ5UXLWfS3zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sIIrA2IHfY4PIKmELJrOc1V70oay99ef3PSdG35Oz2A=;
+ b=I6dASh5xyRAjg7ebLIsOcTrMxfYCPwVGw/uiroGc5zPkjq7K8d8VsBD0+z9qvaouLdUIUHjZDdIck/6t96thy5JgGxq8PG9F70vWJ624CNTqwWsG9PcQ++xBQSrHIsFUems2SN+in/ahBKiUs4KKsmiRCmBGtFki+gVhHe0syiDslYRsvnD1yUhM8Z8EzrPp7CnPslvALFGMeeDTLBUASJNo84MmyipJ4ixa82Cnf4z1vbUetOQHkBa2oh2+cpWWRsoCb7m+uvUZy+7KB0ney9mlsutdJMo2rz/2reIfPg/r1VvOH/XJr+PAlboHUbFuQYnIoTC2ERMyci1H1kW3VQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sIIrA2IHfY4PIKmELJrOc1V70oay99ef3PSdG35Oz2A=;
+ b=eW4MH3t+Uk6gwFDmDD2/3G/BqOVwbCTNeKi9OUYGX3yDkh3Qkg118VXcXHTepGjC1tNK+jx8XJ8RyahC3M1uNkwIQ/m01sklJAbnaSo3Y/4Gygnw+BsNhmGP6VeIVE9VtqTGqauccrvIAl94R9SiyFTOeWXNWh3FlnWWkCp1GDM=
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
+ by MW3PR11MB4682.namprd11.prod.outlook.com (2603:10b6:303:2e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.21; Mon, 15 Jun
+ 2020 19:55:47 +0000
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::5b4:500e:f6a0:1ac0]) by MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::5b4:500e:f6a0:1ac0%6]) with mapi id 15.20.3088.029; Mon, 15 Jun 2020
+ 19:55:47 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] mesh: Fix updating CID, PID, VID & CRPL on node
+ attach
+Thread-Topic: [PATCH BlueZ] mesh: Fix updating CID, PID, VID & CRPL on node
+ attach
+Thread-Index: AQHWQwXKG3yQnkQF/keoq+5ni3ZKrqjaF+CA
+Date:   Mon, 15 Jun 2020 19:55:47 +0000
+Message-ID: <32674f54152dea5d1d1e602c1f573d2490d847de.camel@intel.com>
+References: <20200615111152.29089-1-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20200615111152.29089-1-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+authentication-results: silvair.com; dkim=none (message not signed)
+ header.d=none;silvair.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.55.39]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3fca30c7-fecc-4f79-53ce-08d81166192c
+x-ms-traffictypediagnostic: MW3PR11MB4682:
+x-microsoft-antispam-prvs: <MW3PR11MB46828212E8B0FFE5B702F623E19C0@MW3PR11MB4682.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 04359FAD81
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4pmgY5dwclVw6qCqFLpMcXq4vt8oWp/WuYZ64EzoiENBJf4xqNFY5VJdRhHgfO/oEcxi4LlWSTIhNdiWaxy2onlDMuzQ41bV6sMGDfJXvGq7xGX6g1/OAQD0+cPnGnaOu8Vm66tNAcVxLSAF8TaYkGXPx8WWdWwQSB7UuICMSRD7mjidhwv1H4bqOEWCy82C3egyywJIfqUSak5z6wWPVbFJXWQU41OJHF1wfSGNbWLp3jtk7noSeZBROZ4Rk4kJFpjN7cngnwojnMCK5J33IXZIxFlO7oa26OmZCOwZ1XstSJfqZftJHc5ZqcRDusH1GKURdjV1nQtGr6uLr0dyVQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(376002)(346002)(366004)(39860400002)(396003)(136003)(71200400001)(8936002)(6506007)(26005)(66556008)(66476007)(66946007)(76116006)(91956017)(316002)(66446008)(64756008)(186003)(110136005)(86362001)(8676002)(6486002)(478600001)(6512007)(36756003)(2906002)(83380400001)(2616005)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: TrGLmMd4W3qMoXf3b/fQLOOcMGPUK3k0PXATqjnTUMOXJx7u/7zh0cDzTrWbsB7+YOeqtF/6VythVQWLr88lEvhpPcSEyzUNGqXXkIvb0wxr/EZiCy/0Pr1u98d+j04ap/f7fWyan3GyP/aD+GsHs9xxeB5RdmZssoNSZ6NS5G6/5V9MMyeh7AAf8pPTN+yyi5swDBCiIOF1eMOHVSmGHdmK5PXs/Ed1YtqGR4oaOd3gStV8CUVvG1X8tXP5P0juQMWDSSCBHSnJ5qkr+F+ROCbUhXBDY0VvjCrz/ld749a2Mm//O6RijLUI9V/rm2NFgyCf76BArk3E2legSpGj3r17kwn9USFJC4uy0CwkJdu4JyUKtQdYKzuu9Z/xQyUmW3rSbYlvALjads8krp7p24O7MBiuQ5j5+//a0F59QrvmWtfMSqiWz1S15xyoW9ysiPUSblteZmrPNHY1YzNjG/lavU+KFolxMAnChg83Yq4=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C7554E0F6B21554DB89D557F3873FCCC@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3fca30c7-fecc-4f79-53ce-08d81166192c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2020 19:55:47.7964
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MlbgHOPvj++h/gxOJY8mBsj+ccCBxzjoO6FKSXqXn7UYjHZ3HOn8e2RQe31VRJ1ebE00AGizeB9ffMXJTE0bKA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4682
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 6/15/20 2:07 PM, Dan Carpenter wrote:
-> On Mon, Apr 13, 2020 at 05:15:49PM -0400, Waiman Long wrote:
->> diff --git a/mm/slab_common.c b/mm/slab_common.c
->> index 23c7500eea7d..c08bc7eb20bd 100644
->> --- a/mm/slab_common.c
->> +++ b/mm/slab_common.c
->> @@ -1707,17 +1707,17 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
->>   EXPORT_SYMBOL(krealloc);
->>   
->>   /**
->> - * kzfree - like kfree but zero memory
->> + * kfree_sensitive - Clear sensitive information in memory before freeing
->>    * @p: object to free memory of
->>    *
->>    * The memory of the object @p points to is zeroed before freed.
->> - * If @p is %NULL, kzfree() does nothing.
->> + * If @p is %NULL, kfree_sensitive() does nothing.
->>    *
->>    * Note: this function zeroes the whole allocated buffer which can be a good
->>    * deal bigger than the requested buffer size passed to kmalloc(). So be
->>    * careful when using this function in performance sensitive code.
->>    */
->> -void kzfree(const void *p)
->> +void kfree_sensitive(const void *p)
->>   {
->>   	size_t ks;
->>   	void *mem = (void *)p;
->> @@ -1725,10 +1725,10 @@ void kzfree(const void *p)
->>   	if (unlikely(ZERO_OR_NULL_PTR(mem)))
->>   		return;
->>   	ks = ksize(mem);
->> -	memset(mem, 0, ks);
->> +	memzero_explicit(mem, ks);
->          ^^^^^^^^^^^^^^^^^^^^^^^^^
-> This is an unrelated bug fix.  It really needs to be pulled into a
-> separate patch by itself and back ported to stable kernels.
->
->>   	kfree(mem);
->>   }
->> -EXPORT_SYMBOL(kzfree);
->> +EXPORT_SYMBOL(kfree_sensitive);
->>   
->>   /**
->>    * ksize - get the actual amount of memory allocated for a given object
-> regards,
-> dan carpenter
->
-Thanks for the suggestion. I will break it out and post a version soon.
-
-Cheers,
-Longman
-
+QXBwbGllZCwgVGhhbmtzLg0KDQpPbiBNb24sIDIwMjAtMDYtMTUgYXQgMTM6MTEgKzAyMDAsIE1p
+Y2hhxYIgTG93YXMtUnplY2hvbmVrIHdyb3RlOg0KPiBJbiA4YTM4MjI2MjEyNTc4N2NhZjM4YTFm
+ODAwZWM4OTU2YTFiZjcxZDg1LCB3ZSB3YW50ZWQgdG8gYWxsb3cgdGhlDQo+IGFwcGxpY2F0aW9u
+IHRvIHVwZGF0ZSBjZXJ0YWluIGNvbXBvc2l0aW9uIGZpZWxkcy4gVGhpcyBwYXRjaCBtYWtlcyBp
+dA0KPiB3b3JrLg0KPiAtLS0NCj4gIG1lc2gvbm9kZS5jIHwgMTAgKysrKysrLS0tLQ0KPiAgMSBm
+aWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYg
+LS1naXQgYS9tZXNoL25vZGUuYyBiL21lc2gvbm9kZS5jDQo+IGluZGV4IDEwYjQ0YzhhNS4uNjE0
+MGZkZjlmIDEwMDY0NA0KPiAtLS0gYS9tZXNoL25vZGUuYw0KPiArKysgYi9tZXNoL25vZGUuYw0K
+PiBAQCAtMTM2NSwxNiArMTM2NSwxOCBAQCBzdGF0aWMgYm9vbCBhZGRfbG9jYWxfbm9kZShzdHJ1
+Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCB1bmljYXN0LCBib29sIGtyLA0KPiAgc3RhdGlj
+IHZvaWQgdXBkYXRlX2NvbXBvc2l0aW9uKHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIHN0cnVjdCBt
+ZXNoX25vZGUgKmF0dGFjaCkNCj4gIHsNCj4gIAlpZiAobm9kZS0+Y29tcC5jaWQgIT0gYXR0YWNo
+LT5jb21wLmNpZCkNCj4gLQkJbWVzaF9jb25maWdfdXBkYXRlX2NvbXBhbnlfaWQobm9kZS0+Y2Zn
+LCBhdHRhY2gtPmNvbXAuY2lkKTsNCj4gKwkJbWVzaF9jb25maWdfdXBkYXRlX2NvbXBhbnlfaWQo
+YXR0YWNoLT5jZmcsIG5vZGUtPmNvbXAuY2lkKTsNCj4gIA0KPiAgCWlmIChub2RlLT5jb21wLnBp
+ZCAhPSBhdHRhY2gtPmNvbXAucGlkKQ0KPiAtCQltZXNoX2NvbmZpZ191cGRhdGVfcHJvZHVjdF9p
+ZChub2RlLT5jZmcsIGF0dGFjaC0+Y29tcC5waWQpOw0KPiArCQltZXNoX2NvbmZpZ191cGRhdGVf
+cHJvZHVjdF9pZChhdHRhY2gtPmNmZywgbm9kZS0+Y29tcC5waWQpOw0KPiAgDQo+ICAJaWYgKG5v
+ZGUtPmNvbXAudmlkICE9IGF0dGFjaC0+Y29tcC52aWQpDQo+IC0JCW1lc2hfY29uZmlnX3VwZGF0
+ZV92ZXJzaW9uX2lkKG5vZGUtPmNmZywgYXR0YWNoLT5jb21wLnZpZCk7DQo+ICsJCW1lc2hfY29u
+ZmlnX3VwZGF0ZV92ZXJzaW9uX2lkKGF0dGFjaC0+Y2ZnLCBub2RlLT5jb21wLnZpZCk7DQo+ICAN
+Cj4gIAlpZiAobm9kZS0+Y29tcC5jcnBsICE9IGF0dGFjaC0+Y29tcC5jcnBsKQ0KPiAtCQltZXNo
+X2NvbmZpZ191cGRhdGVfY3JwbChub2RlLT5jZmcsIGF0dGFjaC0+Y29tcC5jcnBsKTsNCj4gKwkJ
+bWVzaF9jb25maWdfdXBkYXRlX2NycGwoYXR0YWNoLT5jZmcsIG5vZGUtPmNvbXAuY3JwbCk7DQo+
+ICsNCj4gKwlhdHRhY2gtPmNvbXAgPSBub2RlLT5jb21wOw0KPiAgfQ0KPiAgDQo+ICBzdGF0aWMg
+Ym9vbCBjaGVja19yZXFfbm9kZShzdHJ1Y3QgbWFuYWdlZF9vYmpfcmVxdWVzdCAqcmVxKQ0K
