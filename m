@@ -2,111 +2,106 @@ Return-Path: <SRS0=u3xs=74=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF27C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 11:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDA7C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 11:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C89A20679
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 11:11:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Ddtqm6Xj"
+	by mail.kernel.org (Postfix) with ESMTP id 1781320738
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jun 2020 11:19:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592219978;
+	bh=09YCLJTSpwXYksfyCYSJl2k+cwsJ7qFx3Cq3UzjbGyI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=QqjOoCUt0h/eL710J+4JKhN5qMlu2gDgbfWzTCT2oTKwxoVjGtqqkqjOT+40Zij2e
+	 1Zrf1qXAL3jfAKe1tx8wKJrf3v89KU53pQypc2GmNLs+Q+6MpTMIcnIDxeI4EHEoXa
+	 7YH87Uv7svkz0Ef9N6mS7/OqUCgIpBcp7ct8H4FM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729625AbgFOLLq (ORCPT
+        id S1729645AbgFOLTa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 07:11:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35480 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728285AbgFOLLj (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 07:11:39 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC53C061A0E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 04:11:38 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id u25so2793166lfm.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 04:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZnuAcdMnPsU+0QvTurZJgPGJvDcvnFpgfhe3386GwoQ=;
-        b=Ddtqm6XjHWO4ycilR0FE7p53PISdnhP9uJr3Mp61UaFY3sr7xHOKkO3ts4xWbOIafO
-         968BpW9yDpwgGPuMWz08nnSrbgyI3GYClVKTOnLlu8gW8bvuKds5xxweiYktw+8zIOfk
-         LkB8Ao0NU8yNArrNpLrFIbFDXzzzEeeWSkiSH1dyYeqxo+g7tMdt+/57i7FdEwWid+/5
-         At0rztCRsIa/HUE7t0Fg61OpiFJateHacp/618WdKlLiJVljd4NwsrcbuBiunf2giR24
-         LE8/wSnpjYN/u1hFoBXYX4HLdEMbVnj/ru29E3ruE9tc8u84r5r6hnLhfdwnI56dqLj3
-         r9Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZnuAcdMnPsU+0QvTurZJgPGJvDcvnFpgfhe3386GwoQ=;
-        b=PkVoMYLewaCnR9fg/Q2kTgSarXo8efZdqSHiJe1Jw/xghcSL0FnA646niCxAGQwz15
-         UVuOULP9Id/Ujlu5+fwKEDRNjhh0WV7MNJrp0ZNMP+ybQoVRWzEFdytyAzoy9YX3mWks
-         +N1pBxgKkvQODoWHfVGHXBMEWI6FfCFZT3PsCOWg/RtXAUMO9rBqMil1PSN+5jeYu60L
-         YieAY1P2bDmB+x+y9GBmj5Ahr1UAGhNGucz0PDcHCffEMTIU9RC4ff5kibEihPQlWsEC
-         TenbW7YkOSlX0vrEx2UMr/DrSEWeuH2008r2iOSN0RCj8cVaIZ2o8Bx5dqjkoNamDn6i
-         Fh5w==
-X-Gm-Message-State: AOAM531C2NhOaWYpv8wNyqPmRfNdCWDIuKNqi/tYkBPBb6yK2NhWvwBw
-        tWWmWlQ6Y5qj6BoSncYxE0u/KwFh6FdY+Q==
-X-Google-Smtp-Source: ABdhPJxWoLzN6co+pgJNTGIZSY5uG4uZmay4PTbLu6gc8GP2hke/F8SCzsawYWAcEakcx7VkeYwmOQ==
-X-Received: by 2002:a19:b01:: with SMTP id 1mr7158786lfl.54.1592219495655;
-        Mon, 15 Jun 2020 04:11:35 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id r7sm3750891ljc.62.2020.06.15.04.11.34
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2020 04:11:35 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix updating CID, PID, VID & CRPL on node attach
-Date:   Mon, 15 Jun 2020 13:11:52 +0200
-Message-Id: <20200615111152.29089-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 15 Jun 2020 07:19:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41348 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728285AbgFOLT3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jun 2020 07:19:29 -0400
+Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 058D020679;
+        Mon, 15 Jun 2020 11:19:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592219969;
+        bh=09YCLJTSpwXYksfyCYSJl2k+cwsJ7qFx3Cq3UzjbGyI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y9XD9p0MeL4taa2ELATHmZjnxuB2Qwom8k1ILpzM+ZKmgHncRSrZRkWHzXJoKUZYG
+         RVzFdcjhfF4+7tviRu0Z7J7pql7QVnbcy5lmyaFqXh1wKUMpINf6iGMDn+vhj+ObwV
+         iv9FZnGvAGdOWuUFB1fqKEZG7JlfMHbBDSJzRm08=
+Date:   Mon, 15 Jun 2020 12:19:27 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Rob Herring <robh+dt@kernel.org>,
+        Sandy Huang <hjc@rock-chips.com>,
+        Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
+        Sean Wang <sean.wang@mediatek.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Arnaud Pouliquen <arnaud.pouliquen@st.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rockchip@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH 13/29] dt: fix broken links due to txt->yaml renames
+Message-ID: <20200615111927.GC4447@sirena.org.uk>
+References: <cover.1592203542.git.mchehab+huawei@kernel.org>
+ <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="WfZ7S8PLGjBY9Voh"
+Content-Disposition: inline
+In-Reply-To: <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
+X-Cookie: Offer may end without notice.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In 8a382262125787caf38a1f800ec8956a1bf71d85, we wanted to allow the
-application to update certain composition fields. This patch makes it
-work.
----
- mesh/node.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 10b44c8a5..6140fdf9f 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1365,16 +1365,18 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
- static void update_composition(struct mesh_node *node, struct mesh_node *attach)
- {
- 	if (node->comp.cid != attach->comp.cid)
--		mesh_config_update_company_id(node->cfg, attach->comp.cid);
-+		mesh_config_update_company_id(attach->cfg, node->comp.cid);
- 
- 	if (node->comp.pid != attach->comp.pid)
--		mesh_config_update_product_id(node->cfg, attach->comp.pid);
-+		mesh_config_update_product_id(attach->cfg, node->comp.pid);
- 
- 	if (node->comp.vid != attach->comp.vid)
--		mesh_config_update_version_id(node->cfg, attach->comp.vid);
-+		mesh_config_update_version_id(attach->cfg, node->comp.vid);
- 
- 	if (node->comp.crpl != attach->comp.crpl)
--		mesh_config_update_crpl(node->cfg, attach->comp.crpl);
-+		mesh_config_update_crpl(attach->cfg, node->comp.crpl);
-+
-+	attach->comp = node->comp;
- }
- 
- static bool check_req_node(struct managed_obj_request *req)
--- 
-2.20.1
+--WfZ7S8PLGjBY9Voh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Mon, Jun 15, 2020 at 08:46:52AM +0200, Mauro Carvalho Chehab wrote:
+> There are some new broken doc links due to yaml renames
+> at DT. Developers should really run:
+
+I also previously acked this one in 20200504100822.GA5491@sirena.org.uk.
+Has anything changed here to cause the ack to be dropped?
+
+--WfZ7S8PLGjBY9Voh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl7nWT4ACgkQJNaLcl1U
+h9BSJQf9FR8Vke3pe9Gs5pnWmw6vzxds7jfidCUpXIKPoosgfYfzYQrN1G9m2fSm
+pLlYWjhQBEAU+w9oq7WktfEZ8r736noKsRW4hd5a+Zf2koBr0M9O7ull4h7WlHvr
+asCHlWuqJvpVevxf1ag9x0dAA9NRMqh8xxd8ah/ENWTbXmzZPir0Pa6Q+9lzG2Ld
+aqgHcA+WbonAUk4BqLRSasRy6AkO3zUbYWqVecAV8xRPcVjiWd/PkhEQ/BV67wG9
+Kh/sFCs6+PalKQu5PDZP70apmaRPYHwPZmkNu5Y8rAUsjsQradS2JB1zFlWDSxZk
+0qIWVDJdY+FIcxlqt8Rda5akpjL2SQ==
+=51fv
+-----END PGP SIGNATURE-----
+
+--WfZ7S8PLGjBY9Voh--
