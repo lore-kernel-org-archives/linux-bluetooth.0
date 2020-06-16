@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F4EC433E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B6A1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8569B20739
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CF3F20739
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmfbCyUD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UokQpNvK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726782AbgFPB6T (ORCPT
+        id S1726606AbgFPB6i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 21:58:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59909 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726589AbgFPB6K (ORCPT
+        Mon, 15 Jun 2020 21:58:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34587 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726489AbgFPB63 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 21:58:10 -0400
+        Mon, 15 Jun 2020 21:58:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592272689;
+        s=mimecast20190719; t=1592272707;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=w0ZJeQQk3EMaWCq5vRe2fLP4T7LhSgQGKZa9FTUZAA4=;
-        b=cmfbCyUDRGwKjLGBejxtzwXYJZpxYp4m4gTqt1HJSocbaTeByL2ZSn3rJ/ux/7hS8NPcJY
-        pDmzv+GqMhAOF/UyMu9ENB1TqV6U+tP0Mht2YLdiU0vgD5MEO3kgZFDGI5G30nsnTYzl6e
-        3vAL0jFWUiwI5s0OQXwAYyvRhcKeSIM=
+        bh=zNT9QNZqNhCOtvB39Ne/de/mYb4LuwliJqmp3BjLDNM=;
+        b=UokQpNvKXYul7vOqlGYuUIAUqzwSWBF+gr+aP1+ZUErbLBYZQRwybZijb0s/38cbFLU2YJ
+        TTGdKHEI5kUqJDRHzdkgjoarKRncy89sxZVBRrHmVTMInN8q2B1xaY5CvVIirpVb5vD2ff
+        zvXpFZC8WWJbBm+5sRDFdtOQGIDZSSc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-siDUOdYEMkuGDz0Coifxdg-1; Mon, 15 Jun 2020 21:58:05 -0400
-X-MC-Unique: siDUOdYEMkuGDz0Coifxdg-1
+ us-mta-275-En0zXgVSO2KfRECG05UTtA-1; Mon, 15 Jun 2020 21:58:20 -0400
+X-MC-Unique: En0zXgVSO2KfRECG05UTtA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6856710059B7;
-        Tue, 16 Jun 2020 01:58:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55EBE8035CF;
+        Tue, 16 Jun 2020 01:58:15 +0000 (UTC)
 Received: from llong.com (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 45E126ED96;
-        Tue, 16 Jun 2020 01:57:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B4E4F6ED96;
+        Tue, 16 Jun 2020 01:58:10 +0000 (UTC)
 From:   Waiman Long <longman@redhat.com>
 To:     Andrew Morton <akpm@linux-foundation.org>,
         David Howells <dhowells@redhat.com>,
@@ -73,11 +73,10 @@ Cc:     Michal Hocko <mhocko@suse.com>,
         linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
         linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
         linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>,
-        stable@vger.kernel.org
-Subject: [PATCH v4 1/3] mm/slab: Use memzero_explicit() in kzfree()
-Date:   Mon, 15 Jun 2020 21:57:16 -0400
-Message-Id: <20200616015718.7812-2-longman@redhat.com>
+        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>
+Subject: [PATCH v4 3/3] btrfs: Use kfree() in btrfs_ioctl_get_subvol_info()
+Date:   Mon, 15 Jun 2020 21:57:18 -0400
+Message-Id: <20200616015718.7812-4-longman@redhat.com>
 In-Reply-To: <20200616015718.7812-1-longman@redhat.com>
 References: <20200616015718.7812-1-longman@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
@@ -86,34 +85,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The kzfree() function is normally used to clear some sensitive
-information, like encryption keys, in the buffer before freeing it back
-to the pool. Memset() is currently used for the buffer clearing. However,
-it is entirely possible that the compiler may choose to optimize away the
-memory clearing especially if LTO is being used. To make sure that this
-optimization will not happen, memzero_explicit(), which is introduced
-in v3.18, is now used in kzfree() to do the clearing.
+In btrfs_ioctl_get_subvol_info(), there is a classic case where kzalloc()
+was incorrectly paired with kzfree(). According to David Sterba, there
+isn't any sensitive information in the subvol_info that needs to be
+cleared before freeing. So kfree_sensitive() isn't really needed,
+use kfree() instead.
 
-Fixes: 3ef0e5ba4673 ("slab: introduce kzfree()")
-Cc: stable@vger.kernel.org
+Reported-by: David Sterba <dsterba@suse.cz>
 Signed-off-by: Waiman Long <longman@redhat.com>
 ---
- mm/slab_common.c | 2 +-
+ fs/btrfs/ioctl.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 9e72ba224175..37d48a56431d 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -1726,7 +1726,7 @@ void kzfree(const void *p)
- 	if (unlikely(ZERO_OR_NULL_PTR(mem)))
- 		return;
- 	ks = ksize(mem);
--	memset(mem, 0, ks);
-+	memzero_explicit(mem, ks);
- 	kfree(mem);
+diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+index f1dd9e4271e9..e8f7c5f00894 100644
+--- a/fs/btrfs/ioctl.c
++++ b/fs/btrfs/ioctl.c
+@@ -2692,7 +2692,7 @@ static int btrfs_ioctl_get_subvol_info(struct file *file, void __user *argp)
+ 	btrfs_put_root(root);
+ out_free:
+ 	btrfs_free_path(path);
+-	kfree_sensitive(subvol_info);
++	kfree(subvol_info);
+ 	return ret;
  }
- EXPORT_SYMBOL(kzfree);
+ 
 -- 
 2.18.1
 
