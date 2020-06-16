@@ -2,215 +2,223 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46407C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1539C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D75120739
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BED242074D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="yyXcwwnY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IsnhpT3G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725979AbgFPBe2 (ORCPT
+        id S1726536AbgFPB6D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 21:34:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725949AbgFPBe1 (ORCPT
+        Mon, 15 Jun 2020 21:58:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22351 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726482AbgFPB6C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 21:34:27 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C009C08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 18:34:27 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id i27so21480369ljb.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 18:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=fBOUW8DcQP5RUVEFEB+Nscd2xBILZhFX+tn0TCk7DB8=;
-        b=yyXcwwnYrYybF2aEe0N4qbSKVu4CEbbanw0eikFKGAjDHQ8W8ACE5USzpdhsz3pIKc
-         dm6vzTKbutAEzmVrAMtktWr7qRMqTm1oc4QlBxMvjra5wuXWh9kXX6pl1QxROcmMZQbU
-         jAAGEpBYPBGseoHI1SMfii39mkVf4JuyUxjNbsZcaPRHo1BG+I1vsxabf0gSCfsAyN9x
-         b9nPMYYhjebTf0g0ds2lpyohjkUP0/+r8KlxO21AFe7BSPN1VAUOz/uU5P47kxqm4szP
-         ibOorSmHkYUdRJVg8n27iZI6ZM5hR7GLnRvrKYieF2QvsDOef2/mpuDc+NByhOJC/CKx
-         IoRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=fBOUW8DcQP5RUVEFEB+Nscd2xBILZhFX+tn0TCk7DB8=;
-        b=e1DpsCnu/AKHABJ3CDhl46xsyf2s3/WXMy0JqySb2aaCoqzjZEKk80D4GBnBn0kBkp
-         0ipt0v/ntTldNGS0Am9O1qAod8byRvJKndpehWp39hVa0Rzhg+awQU7SR5Sjdegpf86E
-         1rHPXLt2owHwQLDHYN5pDpqn6Setr23EMup0njZ1NTW4ZXn/Dy0tGYvihE0/1MTQyEbz
-         VAY2V+BdpBt1EeWSwtsxpBI3Ydj8rtjc6hRszRB7e04mmnv8Gr3YSaF6Xb5yy6TuTOAS
-         cebBLiYbEXijfoFTlgR1gLGLRI+emGA3kYlDfwP5+7PKSpyy2kGrsfYZDUeRDeX1y+Mx
-         4rUg==
-X-Gm-Message-State: AOAM530UtIN4gFYgOBKNBK/Oq0vrsAHHVOa7oKvWlL7ZI9XVxBtqwLbO
-        Q8kulJVUu+RJVrHUpMz9tBp+INdncaf7UmlCzhOTrQ==
-X-Google-Smtp-Source: ABdhPJz+Wg9Z0NbEWwfXy+zMFK5B15e9mQDuJzw6r8c/XGOODhFRM6krLVSR3Atai7Y1d3stFKOyJjWWo3QM93mTa5g=
-X-Received: by 2002:a2e:7107:: with SMTP id m7mr184599ljc.342.1592271265772;
- Mon, 15 Jun 2020 18:34:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200616000318.42664-1-michaelfsun@google.com> <20200616000318.42664-2-michaelfsun@google.com>
-In-Reply-To: <20200616000318.42664-2-michaelfsun@google.com>
-From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Date:   Mon, 15 Jun 2020 18:34:13 -0700
-Message-ID: <CACumGO+banV_pQNnB53ddqU2Rjj+K+FnLnNTyztOQMcA3n2yGg@mail.gmail.com>
-Subject: Re: [bluez PATCH v1 1/3] btmgmt: Add btmgmt command advmon-features
-To:     Michael Sun <michaelfsun@google.com>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 15 Jun 2020 21:58:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592272679;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=MZUCLAMZdmO5EM+jCfqRymLIPQ+NHghkczuzn6RqHtY=;
+        b=IsnhpT3GAFxi0CPqBqlOuYfu9Px29KnkfJxyu5VNPZwmFu9a0Pz9kbVaTc1Opqa2QRXHF3
+        CefxBghphbhq4I5zadaqeef1/+HYq5GY0RBbJgNWZL3EylqVYCZv2rKUZJD1oa1mjiKNCV
+        SCzIPtnFyv2i6Twz5IR7u1ilCSxcsgo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-kG50-M7xPwedRKQDZzJkIQ-1; Mon, 15 Jun 2020 21:57:57 -0400
+X-MC-Unique: kG50-M7xPwedRKQDZzJkIQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 182E77BB2;
+        Tue, 16 Jun 2020 01:57:52 +0000 (UTC)
+Received: from llong.com (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 96E15768AE;
+        Tue, 16 Jun 2020 01:57:43 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>
+Cc:     Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>
+Subject: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Date:   Mon, 15 Jun 2020 21:57:15 -0400
+Message-Id: <20200616015718.7812-1-longman@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michael,
+ v4:
+  - Break out the memzero_explicit() change as suggested by Dan Carpenter
+    so that it can be backported to stable.
+  - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
+    now as there can be a bit more discussion on what is best. It will be
+    introduced as a separate patch later on after this one is merged.
 
-On Mon, Jun 15, 2020 at 5:03 PM Michael Sun <michaelfsun@google.com> wrote:
->
-> This patch introduces a new btmgmt command =E2=80=98advmon-features=E2=80=
-=99 to help
-> user query for supported advertisement features. The command will work
-> with the new MGMT opcode MGMT_OP_READ_ADV_MONITOR_FEATURES.
->
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Signed-off-by: Michael Sun <michaelfsun@google.com>
-> ---
->
->  tools/btmgmt.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 81 insertions(+)
->
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 46e7465b3..1aae7098c 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4567,6 +4567,84 @@ static void cmd_wbs(int argc, char **argv)
->         cmd_setting(MGMT_OP_SET_WIDEBAND_SPEECH, argc, argv);
->  }
->
-> +static const char *advmon_features_str[] =3D {
-> +       "Pattern monitor with logic OR.",
-> +};
-> +
-> +static const char *advmon_features2str(uint32_t features)
-> +{
-> +       static char str[512];
-> +       int off, i;
-> +
-> +       off =3D 0;
-> +       snprintf(str, sizeof(str), "\n\tNone");
-> +
-> +       for (i =3D 0; i < NELEM(advmon_features_str); i++) {
-> +               if ((features & (1 << i)) !=3D 0 && off < sizeof(str))
-> +                       off +=3D snprintf(str + off, sizeof(str) - off, "=
-\n\t%s",
-> +                                               advmon_features_str[i]);
-> +       }
-> +
-> +       return str;
-> +}
-> +
-> +static void advmon_features_rsp(uint8_t status, uint16_t len, const void=
- *param,
-> +                                                       void *user_data)
-> +{
-> +       const struct mgmt_rp_read_adv_monitor_features *rp =3D param;
-> +       uint32_t supported_features, enabled_features;
-> +       uint16_t num_handles;
-> +       int i;
-> +
-> +       if (status !=3D MGMT_STATUS_SUCCESS) {
-> +               error("Reading adv monitor features failed with status 0x=
-%02x "
-> +                                       "(%s)", status, mgmt_errstr(statu=
-s));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (len < sizeof(*rp)) {
-> +               error("Too small adv monitor features reply (%u bytes)", =
-len);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (len < sizeof(*rp) + rp->num_handles * sizeof(uint16_t)) {
-> +               error("Handles count (%u) doesn't match reply length (%u)=
-",
-> +                                                       rp->num_handles, =
-len);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       supported_features =3D le32_to_cpu(rp->supported_features);
-> +       enabled_features =3D le32_to_cpu(rp->enabled_features);
-> +       num_handles =3D le16_to_cpu(rp->num_handles);
-> +
-> +       print("Supported features:%s", advmon_features2str(supported_feat=
-ures));
-> +       print("Enabled features:%s", advmon_features2str(enabled_features=
-));
-> +       print("Max number of handles: %u", le16_to_cpu(rp->max_num_handle=
-s));
-> +       print("Max number of patterns: %u", rp->max_num_patterns);
-> +       print("Handles list with %u item%s", num_handles,
-> +                       num_handles =3D=3D 0 ? "" : num_handles =3D=3D 1 =
-? ":" : "s:");
-> +       for (i =3D 0; i < num_handles; i++) {
-> +               print("\t0x%04x ", le16_to_cpu(rp->handles[i]));
-> +       }
-> +
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_advmon_features(int argc, char **argv)
-> +{
-> +       uint16_t index;
-> +
-> +       index =3D mgmt_index;
-> +       if (index =3D=3D MGMT_INDEX_NONE)
-> +               index =3D 0;
-> +
-> +       if (!mgmt_send(mgmt, MGMT_OP_READ_ADV_MONITOR_FEATURES, index, 0,=
- NULL,
-> +                                       advmon_features_rsp, NULL, NULL))=
- {
-> +               error("Unable to send advertising monitor features comman=
-d");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> +
->  static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
->  {
->         mgmt_register(mgmt, MGMT_EV_CONTROLLER_ERROR, index, controller_e=
-rror,
-> @@ -4776,6 +4854,9 @@ static const struct bt_shell_menu main_menu =3D {
->                 cmd_expinfo,            "Show experimental features"    }=
-,
->         { "exp-debug",          "<on/off>",
->                 cmd_exp_debug,          "Set debug feature"             }=
-,
-> +       { "advmon-features",    NULL,
-> +               cmd_advmon_features,    "Show advertisement monitor "
-> +                                       "features"                      }=
-,
->         {} },
->  };
+This patchset makes a global rename of the kzfree() to kfree_sensitive()
+to highlight the fact buffer clearing is only needed if the data objects
+contain sensitive information like encrpytion key. The fact that kzfree()
+uses memset() to do the clearing isn't totally safe either as compiler
+may compile out the clearing in their optimizer especially if LTO is
+used. Instead, the new kfree_sensitive() uses memzero_explicit() which
+won't get compiled out.
 
-It might be a good idea to organize this as a submenu e.g.
-> menu monitor
-> features
+Waiman Long (3):
+  mm/slab: Use memzero_explicit() in kzfree()
+  mm, treewide: Rename kzfree() to kfree_sensitive()
+  btrfs: Use kfree() in btrfs_ioctl_get_subvol_info()
 
-That way we can expand the number of commands for adding/removing
-monitors without making the list of commands way too big to show in
-one screen (although it already is).
+ arch/s390/crypto/prng.c                       |  4 +--
+ arch/x86/power/hibernate.c                    |  2 +-
+ crypto/adiantum.c                             |  2 +-
+ crypto/ahash.c                                |  4 +--
+ crypto/api.c                                  |  2 +-
+ crypto/asymmetric_keys/verify_pefile.c        |  4 +--
+ crypto/deflate.c                              |  2 +-
+ crypto/drbg.c                                 | 10 +++---
+ crypto/ecc.c                                  |  8 ++---
+ crypto/ecdh.c                                 |  2 +-
+ crypto/gcm.c                                  |  2 +-
+ crypto/gf128mul.c                             |  4 +--
+ crypto/jitterentropy-kcapi.c                  |  2 +-
+ crypto/rng.c                                  |  2 +-
+ crypto/rsa-pkcs1pad.c                         |  6 ++--
+ crypto/seqiv.c                                |  2 +-
+ crypto/shash.c                                |  2 +-
+ crypto/skcipher.c                             |  2 +-
+ crypto/testmgr.c                              |  6 ++--
+ crypto/zstd.c                                 |  2 +-
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |  2 +-
+ .../allwinner/sun8i-ss/sun8i-ss-cipher.c      |  2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   |  4 +--
+ drivers/crypto/atmel-ecc.c                    |  2 +-
+ drivers/crypto/caam/caampkc.c                 | 28 +++++++--------
+ drivers/crypto/cavium/cpt/cptvf_main.c        |  6 ++--
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c  | 12 +++----
+ drivers/crypto/cavium/nitrox/nitrox_lib.c     |  4 +--
+ drivers/crypto/cavium/zip/zip_crypto.c        |  6 ++--
+ drivers/crypto/ccp/ccp-crypto-rsa.c           |  6 ++--
+ drivers/crypto/ccree/cc_aead.c                |  4 +--
+ drivers/crypto/ccree/cc_buffer_mgr.c          |  4 +--
+ drivers/crypto/ccree/cc_cipher.c              |  6 ++--
+ drivers/crypto/ccree/cc_hash.c                |  8 ++---
+ drivers/crypto/ccree/cc_request_mgr.c         |  2 +-
+ drivers/crypto/marvell/cesa/hash.c            |  2 +-
+ .../crypto/marvell/octeontx/otx_cptvf_main.c  |  6 ++--
+ .../marvell/octeontx/otx_cptvf_reqmgr.h       |  2 +-
+ drivers/crypto/mediatek/mtk-aes.c             |  2 +-
+ drivers/crypto/nx/nx.c                        |  4 +--
+ drivers/crypto/virtio/virtio_crypto_algs.c    | 12 +++----
+ drivers/crypto/virtio/virtio_crypto_core.c    |  2 +-
+ drivers/md/dm-crypt.c                         | 32 ++++++++---------
+ drivers/md/dm-integrity.c                     |  6 ++--
+ drivers/misc/ibmvmc.c                         |  6 ++--
+ .../hisilicon/hns3/hns3pf/hclge_mbx.c         |  2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |  6 ++--
+ drivers/net/ppp/ppp_mppe.c                    |  6 ++--
+ drivers/net/wireguard/noise.c                 |  4 +--
+ drivers/net/wireguard/peer.c                  |  2 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/rx.c  |  2 +-
+ .../net/wireless/intel/iwlwifi/pcie/tx-gen2.c |  6 ++--
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c  |  6 ++--
+ drivers/net/wireless/intersil/orinoco/wext.c  |  4 +--
+ drivers/s390/crypto/ap_bus.h                  |  4 +--
+ drivers/staging/ks7010/ks_hostif.c            |  2 +-
+ drivers/staging/rtl8723bs/core/rtw_security.c |  2 +-
+ drivers/staging/wlan-ng/p80211netdev.c        |  2 +-
+ drivers/target/iscsi/iscsi_target_auth.c      |  2 +-
+ fs/btrfs/ioctl.c                              |  2 +-
+ fs/cifs/cifsencrypt.c                         |  2 +-
+ fs/cifs/connect.c                             | 10 +++---
+ fs/cifs/dfs_cache.c                           |  2 +-
+ fs/cifs/misc.c                                |  8 ++---
+ fs/crypto/keyring.c                           |  6 ++--
+ fs/crypto/keysetup_v1.c                       |  4 +--
+ fs/ecryptfs/keystore.c                        |  4 +--
+ fs/ecryptfs/messaging.c                       |  2 +-
+ include/crypto/aead.h                         |  2 +-
+ include/crypto/akcipher.h                     |  2 +-
+ include/crypto/gf128mul.h                     |  2 +-
+ include/crypto/hash.h                         |  2 +-
+ include/crypto/internal/acompress.h           |  2 +-
+ include/crypto/kpp.h                          |  2 +-
+ include/crypto/skcipher.h                     |  2 +-
+ include/linux/slab.h                          |  2 +-
+ lib/mpi/mpiutil.c                             |  6 ++--
+ lib/test_kasan.c                              |  6 ++--
+ mm/slab_common.c                              | 10 +++---
+ net/atm/mpoa_caches.c                         |  4 +--
+ net/bluetooth/ecdh_helper.c                   |  6 ++--
+ net/bluetooth/smp.c                           | 24 ++++++-------
+ net/core/sock.c                               |  2 +-
+ net/ipv4/tcp_fastopen.c                       |  2 +-
+ net/mac80211/aead_api.c                       |  4 +--
+ net/mac80211/aes_gmac.c                       |  2 +-
+ net/mac80211/key.c                            |  2 +-
+ net/mac802154/llsec.c                         | 20 +++++------
+ net/sctp/auth.c                               |  2 +-
+ net/sctp/socket.c                             |  2 +-
+ net/sunrpc/auth_gss/gss_krb5_crypto.c         |  4 +--
+ net/sunrpc/auth_gss/gss_krb5_keys.c           |  6 ++--
+ net/sunrpc/auth_gss/gss_krb5_mech.c           |  2 +-
+ net/tipc/crypto.c                             | 10 +++---
+ net/wireless/core.c                           |  2 +-
+ net/wireless/ibss.c                           |  4 +--
+ net/wireless/lib80211_crypt_tkip.c            |  2 +-
+ net/wireless/lib80211_crypt_wep.c             |  2 +-
+ net/wireless/nl80211.c                        | 24 ++++++-------
+ net/wireless/sme.c                            |  6 ++--
+ net/wireless/util.c                           |  2 +-
+ net/wireless/wext-sme.c                       |  2 +-
+ scripts/coccinelle/free/devm_free.cocci       |  4 +--
+ scripts/coccinelle/free/ifnullfree.cocci      |  4 +--
+ scripts/coccinelle/free/kfree.cocci           |  6 ++--
+ scripts/coccinelle/free/kfreeaddr.cocci       |  2 +-
+ security/apparmor/domain.c                    |  4 +--
+ security/apparmor/include/file.h              |  2 +-
+ security/apparmor/policy.c                    | 24 ++++++-------
+ security/apparmor/policy_ns.c                 |  6 ++--
+ security/apparmor/policy_unpack.c             | 14 ++++----
+ security/keys/big_key.c                       |  6 ++--
+ security/keys/dh.c                            | 14 ++++----
+ security/keys/encrypted-keys/encrypted.c      | 14 ++++----
+ security/keys/trusted-keys/trusted_tpm1.c     | 34 +++++++++----------
+ security/keys/user_defined.c                  |  6 ++--
+ 116 files changed, 322 insertions(+), 322 deletions(-)
+
+-- 
+2.18.1
+
