@@ -2,128 +2,158 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7F2C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B522C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE1812078D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:30:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39F23214D8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:36:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsbTXqwl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729543AbgFPSaj (ORCPT
+        id S1729941AbgFPSgf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Jun 2020 14:30:39 -0400
-Received: from mxout03.lancloud.ru ([89.108.73.187]:58268 "EHLO
-        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727114AbgFPSai (ORCPT
+        Tue, 16 Jun 2020 14:36:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20641 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729841AbgFPSgd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:30:38 -0400
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 2DB1D2094BEF
-Received: from LanCloud
-Received: from LanCloud
-Received: by spb1wst017.omp.ru (Postfix, from userid 10000)
-        id B4414BA1D81; Tue, 16 Jun 2020 21:30:35 +0300 (MSK)
-From:   Denis Grigorev <d.grigorev@omprussia.ru>
-To:     <linux-bluetooth@vger.kernel.org>
-CC:     Denis Grigorev <d.grigorev@omprussia.ru>
-Subject: [PATCH BlueZ v3] gobex: Fix segfault caused by interrupted transfer
-Date:   Tue, 16 Jun 2020 21:30:33 +0300
-Message-ID: <20200616183033.5243-1-d.grigorev@omprussia.ru>
-X-Mailer: git-send-email 2.17.1
+        Tue, 16 Jun 2020 14:36:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592332591;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7/6v2jfN6UIDhJeosnSs1R4UAP7mOiLuFVPEnJvGTnM=;
+        b=VsbTXqwl7xxf+MUWbnJM4vCOVIS/iCxA1SAjzyA8FsjzrodShKHnZfMLXBOQL/GHNJH8vC
+        OuxP6I6blTXluNjdUqYdGiIeMKVM7wFH4inGVQHpTaw8gw2uwB0FCvyIBJbPEBsvhu17TV
+        Bbxsdyz8zlcvC51jFF/xVTwdyLhzHT8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-73-AXrSOJCONRyyvrghDqFtvA-1; Tue, 16 Jun 2020 14:36:27 -0400
+X-MC-Unique: AXrSOJCONRyyvrghDqFtvA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2578680332A;
+        Tue, 16 Jun 2020 18:36:22 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-114-156.rdu2.redhat.com [10.10.114.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B77519C71;
+        Tue, 16 Jun 2020 18:36:16 +0000 (UTC)
+Subject: Re: [PATCH v5 2/2] mm, treewide: Rename kzfree() to kfree_sensitive()
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        ecryptfs@vger.kernel.org, kasan-dev@googlegroups.com,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+References: <20200616154311.12314-1-longman@redhat.com>
+ <20200616154311.12314-3-longman@redhat.com>
+ <20200616110944.c13f221e5c3f54e775190afe@linux-foundation.org>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <65002c1e-5e31-1f4e-283c-186e06e55ef0@redhat.com>
+Date:   Tue, 16 Jun 2020 14:36:15 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [81.3.167.34]
-X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To LFEX09.lancloud.ru
- (fd00:f066::59)
+In-Reply-To: <20200616110944.c13f221e5c3f54e775190afe@linux-foundation.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When a obex transfer is interrupted by a peer in the middle, the response
-G_OBEX_RSP_FORBIDDEN comes and the transfer is freed in transfer_complete.
-However gobex is still ref'ed and gobex->io continues to be writable,
-so write_data() and then g_obex_abort() are called. When the abort response
-comes, struct obc_transfer is already freed, which leads to the crash.
+On 6/16/20 2:09 PM, Andrew Morton wrote:
+> On Tue, 16 Jun 2020 11:43:11 -0400 Waiman Long <longman@redhat.com> wrote:
+>
+>> As said by Linus:
+>>
+>>    A symmetric naming is only helpful if it implies symmetries in use.
+>>    Otherwise it's actively misleading.
+>>
+>>    In "kzalloc()", the z is meaningful and an important part of what the
+>>    caller wants.
+>>
+>>    In "kzfree()", the z is actively detrimental, because maybe in the
+>>    future we really _might_ want to use that "memfill(0xdeadbeef)" or
+>>    something. The "zero" part of the interface isn't even _relevant_.
+>>
+>> The main reason that kzfree() exists is to clear sensitive information
+>> that should not be leaked to other future users of the same memory
+>> objects.
+>>
+>> Rename kzfree() to kfree_sensitive() to follow the example of the
+>> recently added kvfree_sensitive() and make the intention of the API
+>> more explicit. In addition, memzero_explicit() is used to clear the
+>> memory to make sure that it won't get optimized away by the compiler.
+>>
+>> The renaming is done by using the command sequence:
+>>
+>>    git grep -w --name-only kzfree |\
+>>    xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
+>>
+>> followed by some editing of the kfree_sensitive() kerneldoc and adding
+>> a kzfree backward compatibility macro in slab.h.
+>>
+>> ...
+>>
+>> --- a/include/linux/slab.h
+>> +++ b/include/linux/slab.h
+>> @@ -186,10 +186,12 @@ void memcg_deactivate_kmem_caches(struct mem_cgroup *, struct mem_cgroup *);
+>>    */
+>>   void * __must_check krealloc(const void *, size_t, gfp_t);
+>>   void kfree(const void *);
+>> -void kzfree(const void *);
+>> +void kfree_sensitive(const void *);
+>>   size_t __ksize(const void *);
+>>   size_t ksize(const void *);
+>>   
+>> +#define kzfree(x)	kfree_sensitive(x)	/* For backward compatibility */
+>> +
+> What was the thinking here?  Is this really necessary?
+>
+> I suppose we could keep this around for a while to ease migration.  But
+> not for too long, please.
+>
+It should be there just for 1 release cycle. I have broken out the btrfs 
+patch to the btrfs list and I didn't make the kzfree to kfree_sensitive 
+conversion there as that patch was in front in my patch list. So 
+depending on which one lands first, there can be a window where the 
+compilation may fail without this workaround. I am going to send out 
+another patch in the next release cycle to remove it.
 
-Backtrace :
-__GI___pthread_mutex_lock (mutex=0x65732f74) at pthread_mutex_lock.c:67
-0xecc6eeda in dbus_connection_get_object_path_data () from libdbus-1.so.3
-0x000457d4 in g_dbus_emit_property_changed_full () at gdbus/object.c:1794
-0x00045868 in g_dbus_emit_property_changed () at gdbus/object.c:1832
-0x000367f0 in transfer_set_status () at obexd/client/transfer.c:211
-0x0003681e in transfer_set_status () at obexd/client/transfer.c:206
-xfer_complete () at obexd/client/transfer.c:672
-0x00022df6 in transfer_complete () at gobex/gobex-transfer.c:103
-0x00022f44 in transfer_abort_response () at gobex/gobex-transfer.c:124
-0x00020a0e in handle_response () at gobex/gobex.c:1128
-0x00020dde in incoming_data () at gobex/gobex.c:1373
-
-This commit introduces g_obex_drop_tx_queue(), which will be called if
-a transfer error detected. After the tx queue is dropped, obex shuts
-down gracefully.
----
-
-Changes in v2 and v3:
-- Edit commit message formatting.
-
- gobex/gobex-transfer.c |  5 +++++
- gobex/gobex.c          | 10 ++++++++++
- gobex/gobex.h          |  1 +
- 3 files changed, 16 insertions(+)
-
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index bc9930679..e96e61fbc 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -100,6 +100,11 @@ static void transfer_complete(struct transfer *transfer, GError *err)
- 
- 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
- 
-+	if (err) {
-+		/* No further tx must be performed */
-+		g_obex_drop_tx_queue(transfer->obex);
-+	}
-+
- 	transfer->complete_func(transfer->obex, err, transfer->user_data);
- 	/* Check if the complete_func removed the transfer */
- 	if (find_transfer(id) == NULL)
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 77f1aaafd..d68a85eb6 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -521,6 +521,16 @@ static void enable_tx(GObex *obex)
- 	obex->write_source = g_io_add_watch(obex->io, cond, write_data, obex);
- }
- 
-+void g_obex_drop_tx_queue(GObex *obex)
-+{
-+	struct pending_pkt *p;
-+
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
-+
-+	while ((p = g_queue_pop_head(obex->tx_queue)))
-+		pending_pkt_free(p);
-+}
-+
- static gboolean g_obex_send_internal(GObex *obex, struct pending_pkt *p,
- 								GError **err)
- {
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index b223a2fac..a94d9246e 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -63,6 +63,7 @@ gboolean g_obex_remove_request_function(GObex *obex, guint id);
- void g_obex_suspend(GObex *obex);
- void g_obex_resume(GObex *obex);
- gboolean g_obex_srm_active(GObex *obex);
-+void g_obex_drop_tx_queue(GObex *obex);
- 
- GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 						gssize rx_mtu, gssize tx_mtu);
--- 
-2.17.1
+Cheers,
+Longman
 
