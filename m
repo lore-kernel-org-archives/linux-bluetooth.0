@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7314BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9A5C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54C9C2074D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 811752074D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vWmzfO4J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PqyELywi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726451AbgFPAMd (ORCPT
+        id S1726479AbgFPAMd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 15 Jun 2020 20:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbgFPAM2 (ORCPT
+        with ESMTP id S1726392AbgFPAM3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 20:12:28 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC587C08C5C2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id q14so14165295qtr.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
+        Mon, 15 Jun 2020 20:12:29 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3719C08C5C3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:28 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id q8so17585428qkm.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=XNzpy1tbF2yZ11DauzGLMmY8ZVyuOFn4GSoZ4F3xiIs=;
-        b=vWmzfO4JgXp6/kH10UiDT2cS82Ps2kyfPEtefCwc9MUjJz6fWtY5n1DZV7gSiJwoJk
-         j5rXVY7XVBB7/FzwkjNTE6NU7hAVm2Q1B5/H3dYx9Lds8PcMWwWbjjbtkTBHwTs+QkND
-         QTp+w9Rp0Coq9MownWnqtq7/kVgAuLktLk+PohFon8q67bPlw7arwsoZCAD8pB4F5J7P
-         OjNWAchMIHrBPekXC6hD5CushnkuXKQAxDqdiJnX924Oi7oMsVlr9Fr9ln89WtBafnzf
-         Gmn5xXCtTtqDUOIvKPfkJodCvWsdwpB/OZ5wGsXZfRzt+uXEV+Fa4q646zJ1q4/mEEe3
-         2RkA==
+        bh=k+VzHbkhOPjOL4gN6qNphY1NMRuZ5keNHoEp+Jfs8ag=;
+        b=PqyELywi+kdpdiU6HBX4Rgujl7pQ9cNeh9ZEHEtMMT4JbUmsMObk7NObg3UN1/6Yf2
+         RLZfRDCxp29dnSNAIXRDqICRl0VgQOZ6/uv4OXOTRwKUUXn+2Yj7a3423S4sRLhvsOok
+         YNKvzIApkgdb3rTe3cLxn/PVmxf3YOLrL1d4PV8fKuXuv85OpVBaYiFqmjI9U/Csmgze
+         lC+d0Kj4oqPO4Kh9GOMpy30tQ732/WBsdlE+SnhtPyjc7UEXQVPheL+Tv1NKQNLdd3qo
+         3atuTGV0Ux5qjMhjvsMGtB4yPkB1TDI0xfvLEOJEICBCuezg02jR9uLIbbZZ7TMtCOrj
+         zm0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=XNzpy1tbF2yZ11DauzGLMmY8ZVyuOFn4GSoZ4F3xiIs=;
-        b=NScs5zywthlrb0w7JG8pjhPDGNftqL22bGoj+HIXoRH4IruU5uT6jfsF1Rzj+HRusi
-         IPxurpU51z0MQFLbW0YELwBmUWul74BgKOhtItpnp4cck9AqIEsH7N425mQENCso78Zg
-         0alrioZXJ5hDcfRY0PXpCworMnHaOxgvItcxJiP99otrXGtYQyN1FyoOCjF2oSCkWu2R
-         ORCvc+H0lLBQitwFGofyZeo279ZlHFQG4CSoGMJOV07AwYc5B9T6k3tWAnzqgQ1e2xvr
-         /eSlEc3iv/LDDmzP4KtsKsj3os9ydUz/V4p5uizf+J5ITo8N+gMzc0qPsW/qktONcGmy
-         xyag==
-X-Gm-Message-State: AOAM533ubCc0lXeac4j4xSkXuoHGpmHscZJgAzPsSIaTrk5WtyA5Um1x
-        TZ4j39NIk7XUkOJF3oLPfn2gjITa
-X-Google-Smtp-Source: ABdhPJzGwaYMELdAnYeypQcvLf3u3PcXT7fQYWV3vOZ5POXUhPVMWmHTc9/ivS0UkClF2VOzo8/4dg==
-X-Received: by 2002:ac8:342b:: with SMTP id u40mr18031072qtb.59.1592266346814;
-        Mon, 15 Jun 2020 17:12:26 -0700 (PDT)
+        bh=k+VzHbkhOPjOL4gN6qNphY1NMRuZ5keNHoEp+Jfs8ag=;
+        b=Gz4rg3bxy4Gf5jElkTkGfLbf7bnnmxGfOVof1X1n4UPMPRdGD0JbM0UWnm+AToX3In
+         UPmGOMSpcaVLvXD4Z8x+m9WJAuFEdIHNA0fv2F6MV1sZIHgleAsvRQIG9IrW9ED2+8eL
+         DuW9jyUUpHgvPRqBBhiiWxHyyTeKwh6alZdZ3oDETZDEO41p4D1KLfNb2r163qULKy6/
+         hHTx8YMP9o+syKrWhaX+dWz5vPMmESR42ebzSOLn6n/XIziPgerOk8nIJ2Gv+UqH3UR+
+         2OW2iU7zMKj99EmffMZEXJyulzroVP7i1tCqoSlJ9XYetgiv22Rr7+k8x4mT4Cm9q5b1
+         L/5w==
+X-Gm-Message-State: AOAM531v0oKNpTtz0f2hXvVVhO0BnqdvmypU3k3yYcAe0ZRdDLGwGcHW
+        wDWu5AEsc/YkZHEiEka6T0qYS0ka
+X-Google-Smtp-Source: ABdhPJzIdYrAImZNScrc/WZPpolfC4uKf/RfjF8tn2eFVEzHgX+PTK60aycFSH+hSoTWhZWVgVQFfQ==
+X-Received: by 2002:a37:5805:: with SMTP id m5mr16003068qkb.176.1592266347851;
+        Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
 Received: from [172.17.0.2] ([20.36.191.240])
-        by smtp.gmail.com with ESMTPSA id r138sm12534294qka.56.2020.06.15.17.12.26
+        by smtp.gmail.com with ESMTPSA id k34sm12256147qtf.35.2020.06.15.17.12.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2020 17:12:26 -0700 (PDT)
-Message-ID: <5ee80e6a.1c69fb81.7796.7fac@mx.google.com>
-Date:   Mon, 15 Jun 2020 17:12:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7612047573608803163=="
+        Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
+Message-ID: <5ee80e6b.1c69fb81.8ff3e.42c8@mx.google.com>
+Date:   Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1251069115927506470=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, michaelfsun@google.com
-Subject: RE: [bluez,v1,2/3] btmgmt: Add btmgmt command advmon-remove
+Subject: RE: [bluez,v1,3/3] btmgmt: Add btmgmt command advmon-add
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200616000318.42664-3-michaelfsun@google.com>
-References: <20200616000318.42664-3-michaelfsun@google.com>
+In-Reply-To: <20200616000318.42664-4-michaelfsun@google.com>
+References: <20200616000318.42664-4-michaelfsun@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7612047573608803163==
+--===============1251069115927506470==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,22 +92,34 @@ Test Result:
 checkpatch Failed
 
 Outputs:
-WARNING:EMBEDDED_FUNCTION_NAME: Prefer using '"%s...", __func__' to using 'advmon_removed', this function's name, in a string
-#32: FILE: tools/btmgmt.c:1022:
-+		error("Too small (%u bytes) advmon_removed event", len);
+WARNING:EMBEDDED_FUNCTION_NAME: Prefer using '"%s...", __func__' to using 'advmon_added', this function's name, in a string
+#38: FILE: tools/btmgmt.c:1026:
++	print("hci%u advmon_added: handle %u", index, ev->monitor_handle);
 
-WARNING:EMBEDDED_FUNCTION_NAME: Prefer using '"%s...", __func__' to using 'advmon_removed', this function's name, in a string
-#36: FILE: tools/btmgmt.c:1026:
-+	print("hci%u advmon_removed: handle %u", index, ev->monitor_handle);
+WARNING:NAKED_SSCANF: unchecked sscanf return value
+#84: FILE: tools/btmgmt.c:4710:
++		if (!sscanf(&pattern_str[i++], "%2hhx", &pattern->value[j]))
++			return false;
 
-WARNING:SSCANF_TO_KSTRTO: Prefer kstrto<type> to single variable sscanf
-#71: FILE: tools/btmgmt.c:4686:
-+	if (sscanf(argv[1], "%hx", &monitor_handle) != 1) {
-+		error("Wrong formatted handle argument");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
+WARNING:NAKED_SSCANF: unchecked sscanf return value
+#86: FILE: tools/btmgmt.c:4712:
++		if (i < str_len && !sscanf(&pattern_str[i], "%1hhx", &tmp))
++			return false;
 
-- total: 0 errors, 3 warnings, 79 lines checked
+ERROR:OPEN_BRACE: that open brace { should be on the previous line
+#107: FILE: tools/btmgmt.c:4733:
++static struct option advmon_add_options[] =
++					{ { "help", 0, 0, 'h' },
+
+WARNING:LONG_LINE: line over 80 characters
+#145: FILE: tools/btmgmt.c:4771:
++				sizeof(struct mgmt_cp_add_adv_patterns_monitor) +
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#158: FILE: tools/btmgmt.c:4784:
++			/* fall through */
+
+- total: 1 errors, 5 warnings, 182 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
@@ -125,4 +137,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============7612047573608803163==--
+--===============1251069115927506470==--
