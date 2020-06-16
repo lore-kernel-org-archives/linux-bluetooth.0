@@ -2,227 +2,255 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4718DC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AC8C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:28:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 273012071A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B77D4208B3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:28:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kr0cwc+H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="twJ3EoJy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731893AbgFPQMU (ORCPT
+        id S1730252AbgFPQ2Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Jun 2020 12:12:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45097 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731879AbgFPPn6 (ORCPT
+        Tue, 16 Jun 2020 12:28:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52828 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730099AbgFPQ2N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Jun 2020 11:43:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592322235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=n2vgEtySMMJw+Y6/Iz7yVj4GHK2o/g3YD4HMOMKMGxw=;
-        b=Kr0cwc+HRVHnmnKsYYV3UqzW3PHTGjd/Qb4fvvXrY9gxrA+fC4zPWzeE+63uGE7zkOtHoK
-        GfgiIfEKFyYdyuToX7/lqNCnV935c+cFQyZ7ZlZ2ZbVwnemwqwS/BOZQ2ttPGADs80G1Lz
-        Xl+sF7Gm/o42WUYge8t/5umo2Zca46c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-iVwDnxGCNeS1_dm-BMJ-EQ-1; Tue, 16 Jun 2020 11:43:51 -0400
-X-MC-Unique: iVwDnxGCNeS1_dm-BMJ-EQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A261EC1A2;
-        Tue, 16 Jun 2020 15:43:45 +0000 (UTC)
-Received: from llong.com (ovpn-114-156.rdu2.redhat.com [10.10.114.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68C6460C47;
-        Tue, 16 Jun 2020 15:43:37 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>
-Cc:     Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        ecryptfs@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>
-Subject: [PATCH v5 0/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-Date:   Tue, 16 Jun 2020 11:43:09 -0400
-Message-Id: <20200616154311.12314-1-longman@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        Tue, 16 Jun 2020 12:28:13 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F18C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 09:28:12 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id l184so17247784qkb.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 09:28:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=We8MnYtBaG4t88DyFPaEaI/3JbDRE1+6v3kM+jWwEtw=;
+        b=twJ3EoJyQcjR+d+L58Wh0mCUcbuU0+QAPzB6rQHEnZENPLcQAx6EyybBFWdDulFrRu
+         J+xYIN0w3N2j1OTLubTC0Z3/jMGTHmMEsMPwbbi1Va8gSib0TNwb6JQG2B15hvLIduDf
+         qvffpC/NY5VWez+haI1YnTr5R/IzVvBS6rCm51x+Y8S/7MwI3Co9fs2IBlueJtb+DiRm
+         uiYfQM8xkBPA31QHXbdQiOtkLC3jgb5PqnDmKfROWQbON9TeEHtuYjr1bKkByTF8iqxW
+         e/quk5yfVTrn2+46OxKdNHH1aWfy5zIgqBhm7pTYxlIY3ZpxpNj8sdxP8J1IcybZQdiW
+         KT0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=We8MnYtBaG4t88DyFPaEaI/3JbDRE1+6v3kM+jWwEtw=;
+        b=TqjHCJ64CicBLHg384IeXZ/mCaYuRYzQkDiS/8xERZhQOl8RPvZ/NthxPR6Bxb+W6d
+         i7NCSG2kVVr1hVIrveKAAwQwL3Qq5TWQowAs5FHeXr1UDMu2yChRNlNFYUaucMaRonKl
+         m8DSulBuyidAn2xnGPGGmC7TaRSrijCIvFfrKVNKhON0zHa8oikcFj/4AX+AfQq5W6cn
+         x87zhc0jpJbExyjuxuw7wUgRUXalhcvlsq5C62B3htowY1xmsYTdutcjtZNg/aQbsO19
+         ctQYsDOupqBConthY4TgGVOZSvTugTlV6QfbYqdJADCvbkMi6+3A4rI4Z36ROT5vsRH+
+         Nigg==
+X-Gm-Message-State: AOAM533MF2Be4Kdz2x5klmbBUXsoStuI66/seKoqg+DaU0Cw8diTFVxC
+        kfuIN+mzfBOfjHLCKD7hJ37URAtWpDyWIA==
+X-Google-Smtp-Source: ABdhPJxSJhezPui+2TcwUkCJnNFInLrEP/g22g01ekicafFP/qnFgKnxpBHUD1MX9kPOnf4BHKk7214nYOqT/A==
+X-Received: by 2002:a05:6214:1842:: with SMTP id d2mr3087871qvy.197.1592324891019;
+ Tue, 16 Jun 2020 09:28:11 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 09:28:02 -0700
+Message-Id: <20200616092341.v2.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
+Subject: [PATCH v2] Bluetooth: Terminate the link if pairing is cancelled
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
- v5:
-  - Break the btrfs patch out as a separate patch to be processed
-    independently.
-  - Update the commit log of patch 1 to make it less scary.
-  - Add a kzfree backward compatibility macro in patch 2.
+If user decides to cancel the ongoing pairing process (e.g. by clicking
+the cancel button on pairing/passkey window), abort any ongoing pairing
+and then terminate the link if it was created because of the pair
+device action.
 
- v4:
-  - Break out the memzero_explicit() change as suggested by Dan Carpenter
-    so that it can be backported to stable.
-  - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
-    now as there can be a bit more discussion on what is best. It will be
-    introduced as a separate patch later on after this one is merged.
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+---
 
-This patchset makes a global rename of the kzfree() to kfree_sensitive()
-to highlight the fact buffer clearing is only needed if the data objects
-contain sensitive information like encrpytion key. The fact that kzfree()
-uses memset() to do the clearing isn't totally safe either as compiler
-may compile out the clearing in their optimizer especially if LTO is
-used. Instead, the new kfree_sensitive() uses memzero_explicit() which
-won't get compiled out.
+Changes in v2:
+- Added code to track if the connection was triggered because of the pair
+  device action and then only terminate the link on pairing cancel.
 
+ include/net/bluetooth/hci_core.h | 14 ++++++++++++--
+ net/bluetooth/hci_conn.c         | 11 ++++++++---
+ net/bluetooth/l2cap_core.c       |  6 ++++--
+ net/bluetooth/mgmt.c             | 22 ++++++++++++++++++----
+ 4 files changed, 42 insertions(+), 11 deletions(-)
 
-Waiman Long (2):
-  mm/slab: Use memzero_explicit() in kzfree()
-  mm, treewide: Rename kzfree() to kfree_sensitive()
-
- arch/s390/crypto/prng.c                       |  4 +--
- arch/x86/power/hibernate.c                    |  2 +-
- crypto/adiantum.c                             |  2 +-
- crypto/ahash.c                                |  4 +--
- crypto/api.c                                  |  2 +-
- crypto/asymmetric_keys/verify_pefile.c        |  4 +--
- crypto/deflate.c                              |  2 +-
- crypto/drbg.c                                 | 10 +++---
- crypto/ecc.c                                  |  8 ++---
- crypto/ecdh.c                                 |  2 +-
- crypto/gcm.c                                  |  2 +-
- crypto/gf128mul.c                             |  4 +--
- crypto/jitterentropy-kcapi.c                  |  2 +-
- crypto/rng.c                                  |  2 +-
- crypto/rsa-pkcs1pad.c                         |  6 ++--
- crypto/seqiv.c                                |  2 +-
- crypto/shash.c                                |  2 +-
- crypto/skcipher.c                             |  2 +-
- crypto/testmgr.c                              |  6 ++--
- crypto/zstd.c                                 |  2 +-
- .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |  2 +-
- .../allwinner/sun8i-ss/sun8i-ss-cipher.c      |  2 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c   |  4 +--
- drivers/crypto/atmel-ecc.c                    |  2 +-
- drivers/crypto/caam/caampkc.c                 | 28 +++++++--------
- drivers/crypto/cavium/cpt/cptvf_main.c        |  6 ++--
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c  | 12 +++----
- drivers/crypto/cavium/nitrox/nitrox_lib.c     |  4 +--
- drivers/crypto/cavium/zip/zip_crypto.c        |  6 ++--
- drivers/crypto/ccp/ccp-crypto-rsa.c           |  6 ++--
- drivers/crypto/ccree/cc_aead.c                |  4 +--
- drivers/crypto/ccree/cc_buffer_mgr.c          |  4 +--
- drivers/crypto/ccree/cc_cipher.c              |  6 ++--
- drivers/crypto/ccree/cc_hash.c                |  8 ++---
- drivers/crypto/ccree/cc_request_mgr.c         |  2 +-
- drivers/crypto/marvell/cesa/hash.c            |  2 +-
- .../crypto/marvell/octeontx/otx_cptvf_main.c  |  6 ++--
- .../marvell/octeontx/otx_cptvf_reqmgr.h       |  2 +-
- drivers/crypto/mediatek/mtk-aes.c             |  2 +-
- drivers/crypto/nx/nx.c                        |  4 +--
- drivers/crypto/virtio/virtio_crypto_algs.c    | 12 +++----
- drivers/crypto/virtio/virtio_crypto_core.c    |  2 +-
- drivers/md/dm-crypt.c                         | 32 ++++++++---------
- drivers/md/dm-integrity.c                     |  6 ++--
- drivers/misc/ibmvmc.c                         |  6 ++--
- .../hisilicon/hns3/hns3pf/hclge_mbx.c         |  2 +-
- .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |  6 ++--
- drivers/net/ppp/ppp_mppe.c                    |  6 ++--
- drivers/net/wireguard/noise.c                 |  4 +--
- drivers/net/wireguard/peer.c                  |  2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c  |  2 +-
- .../net/wireless/intel/iwlwifi/pcie/tx-gen2.c |  6 ++--
- drivers/net/wireless/intel/iwlwifi/pcie/tx.c  |  6 ++--
- drivers/net/wireless/intersil/orinoco/wext.c  |  4 +--
- drivers/s390/crypto/ap_bus.h                  |  4 +--
- drivers/staging/ks7010/ks_hostif.c            |  2 +-
- drivers/staging/rtl8723bs/core/rtw_security.c |  2 +-
- drivers/staging/wlan-ng/p80211netdev.c        |  2 +-
- drivers/target/iscsi/iscsi_target_auth.c      |  2 +-
- fs/cifs/cifsencrypt.c                         |  2 +-
- fs/cifs/connect.c                             | 10 +++---
- fs/cifs/dfs_cache.c                           |  2 +-
- fs/cifs/misc.c                                |  8 ++---
- fs/crypto/keyring.c                           |  6 ++--
- fs/crypto/keysetup_v1.c                       |  4 +--
- fs/ecryptfs/keystore.c                        |  4 +--
- fs/ecryptfs/messaging.c                       |  2 +-
- include/crypto/aead.h                         |  2 +-
- include/crypto/akcipher.h                     |  2 +-
- include/crypto/gf128mul.h                     |  2 +-
- include/crypto/hash.h                         |  2 +-
- include/crypto/internal/acompress.h           |  2 +-
- include/crypto/kpp.h                          |  2 +-
- include/crypto/skcipher.h                     |  2 +-
- include/linux/slab.h                          |  4 ++-
- lib/mpi/mpiutil.c                             |  6 ++--
- lib/test_kasan.c                              |  6 ++--
- mm/slab_common.c                              | 10 +++---
- net/atm/mpoa_caches.c                         |  4 +--
- net/bluetooth/ecdh_helper.c                   |  6 ++--
- net/bluetooth/smp.c                           | 24 ++++++-------
- net/core/sock.c                               |  2 +-
- net/ipv4/tcp_fastopen.c                       |  2 +-
- net/mac80211/aead_api.c                       |  4 +--
- net/mac80211/aes_gmac.c                       |  2 +-
- net/mac80211/key.c                            |  2 +-
- net/mac802154/llsec.c                         | 20 +++++------
- net/sctp/auth.c                               |  2 +-
- net/sctp/socket.c                             |  2 +-
- net/sunrpc/auth_gss/gss_krb5_crypto.c         |  4 +--
- net/sunrpc/auth_gss/gss_krb5_keys.c           |  6 ++--
- net/sunrpc/auth_gss/gss_krb5_mech.c           |  2 +-
- net/tipc/crypto.c                             | 10 +++---
- net/wireless/core.c                           |  2 +-
- net/wireless/ibss.c                           |  4 +--
- net/wireless/lib80211_crypt_tkip.c            |  2 +-
- net/wireless/lib80211_crypt_wep.c             |  2 +-
- net/wireless/nl80211.c                        | 24 ++++++-------
- net/wireless/sme.c                            |  6 ++--
- net/wireless/util.c                           |  2 +-
- net/wireless/wext-sme.c                       |  2 +-
- scripts/coccinelle/free/devm_free.cocci       |  4 +--
- scripts/coccinelle/free/ifnullfree.cocci      |  4 +--
- scripts/coccinelle/free/kfree.cocci           |  6 ++--
- scripts/coccinelle/free/kfreeaddr.cocci       |  2 +-
- security/apparmor/domain.c                    |  4 +--
- security/apparmor/include/file.h              |  2 +-
- security/apparmor/policy.c                    | 24 ++++++-------
- security/apparmor/policy_ns.c                 |  6 ++--
- security/apparmor/policy_unpack.c             | 14 ++++----
- security/keys/big_key.c                       |  6 ++--
- security/keys/dh.c                            | 14 ++++----
- security/keys/encrypted-keys/encrypted.c      | 14 ++++----
- security/keys/trusted-keys/trusted_tpm1.c     | 34 +++++++++----------
- security/keys/user_defined.c                  |  6 ++--
- 115 files changed, 323 insertions(+), 321 deletions(-)
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f5b28c7cae9f2..236ffbc36b2c3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -519,6 +519,12 @@ struct hci_dev {
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+ 
++enum conn_reasons {
++	CONN_REASON_PAIR_DEVICE,
++	CONN_REASON_L2CAP_CHAN,
++	CONN_REASON_SCO_CONNECT,
++};
++
+ struct hci_conn {
+ 	struct list_head list;
+ 
+@@ -567,6 +573,8 @@ struct hci_conn {
+ 	__s8		max_tx_power;
+ 	unsigned long	flags;
+ 
++	enum conn_reasons conn_reason;
++
+ 	__u32		clock;
+ 	__u16		clock_accuracy;
+ 
+@@ -991,12 +999,14 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+ 
+ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u8 dst_type, u8 sec_level,
+-				     u16 conn_timeout);
++				     u16 conn_timeout,
++				     enum conn_reasons conn_reason);
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+ 				u8 role, bdaddr_t *direct_rpa);
+ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+-				 u8 sec_level, u8 auth_type);
++				 u8 sec_level, u8 auth_type,
++				 enum conn_reasons conn_reason);
+ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 				 __u16 setting);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3ea1bdf5d1e35..1353d7e3f1012 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1157,7 +1157,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u8 dst_type, u8 sec_level,
+-				     u16 conn_timeout)
++				     u16 conn_timeout,
++				     enum conn_reasons conn_reason)
+ {
+ 	struct hci_conn *conn;
+ 
+@@ -1202,6 +1203,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->conn_timeout = conn_timeout;
++	conn->conn_reason = conn_reason;
+ 
+ 	hci_update_background_scan(hdev);
+ 
+@@ -1211,7 +1213,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ }
+ 
+ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+-				 u8 sec_level, u8 auth_type)
++				 u8 sec_level, u8 auth_type,
++				 enum conn_reasons conn_reason)
+ {
+ 	struct hci_conn *acl;
+ 
+@@ -1231,6 +1234,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 
+ 	hci_conn_hold(acl);
+ 
++	acl->conn_reason = conn_reason;
+ 	if (acl->state == BT_OPEN || acl->state == BT_CLOSED) {
+ 		acl->sec_level = BT_SECURITY_LOW;
+ 		acl->pending_sec_level = sec_level;
+@@ -1247,7 +1251,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	struct hci_conn *acl;
+ 	struct hci_conn *sco;
+ 
+-	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
++	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING,
++			      CONN_REASON_SCO_CONNECT);
+ 	if (IS_ERR(acl))
+ 		return acl;
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index bdbf37337bc6c..ee71b68582f48 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7224,11 +7224,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		else
+ 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
+ 						   chan->sec_level,
+-						   HCI_LE_CONN_TIMEOUT);
++						   HCI_LE_CONN_TIMEOUT,
++						   CONN_REASON_L2CAP_CHAN);
+ 
+ 	} else {
+ 		u8 auth_type = l2cap_get_auth_type(chan);
+-		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
++		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type,
++				       CONN_REASON_L2CAP_CHAN);
+ 	}
+ 
+ 	if (IS_ERR(hcon)) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index db7023dfcd253..06cc8d30f8f00 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2940,7 +2940,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
+-				       auth_type);
++				       auth_type, CONN_REASON_PAIR_DEVICE);
+ 	} else {
+ 		u8 addr_type = le_addr_type(cp->addr.type);
+ 		struct hci_conn_params *p;
+@@ -2959,9 +2959,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
+ 			p->auto_connect = HCI_AUTO_CONN_DISABLED;
+ 
+-		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
+-					   addr_type, sec_level,
+-					   HCI_LE_CONN_TIMEOUT);
++		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr, addr_type,
++					   sec_level, HCI_LE_CONN_TIMEOUT,
++					   CONN_REASON_PAIR_DEVICE);
+ 	}
+ 
+ 	if (IS_ERR(conn)) {
+@@ -3062,6 +3062,20 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
+ 				addr, sizeof(*addr));
++
++	/* Since user doesn't want to proceed with the connection, abort any
++	 * ongoing pairing and then terminate the link if it was created
++	 * because of the pair device action.
++	 */
++	if (addr->type == BDADDR_BREDR)
++		hci_remove_link_key(hdev, &addr->bdaddr);
++	else
++		smp_cancel_and_remove_pairing(hdev, &addr->bdaddr,
++					      le_addr_type(addr->type));
++
++	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
++		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
 -- 
-2.18.1
+2.27.0.111.gc72c7da667-goog
 
