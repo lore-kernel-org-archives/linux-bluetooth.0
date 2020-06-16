@@ -2,255 +2,161 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AC8C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF84FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 17:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B77D4208B3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 16:28:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="twJ3EoJy"
+	by mail.kernel.org (Postfix) with ESMTP id AEAFE20B1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 17:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730252AbgFPQ2Q (ORCPT
+        id S1730767AbgFPRFS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Jun 2020 12:28:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730099AbgFPQ2N (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Jun 2020 12:28:13 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F18C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 09:28:12 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id l184so17247784qkb.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 09:28:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=We8MnYtBaG4t88DyFPaEaI/3JbDRE1+6v3kM+jWwEtw=;
-        b=twJ3EoJyQcjR+d+L58Wh0mCUcbuU0+QAPzB6rQHEnZENPLcQAx6EyybBFWdDulFrRu
-         J+xYIN0w3N2j1OTLubTC0Z3/jMGTHmMEsMPwbbi1Va8gSib0TNwb6JQG2B15hvLIduDf
-         qvffpC/NY5VWez+haI1YnTr5R/IzVvBS6rCm51x+Y8S/7MwI3Co9fs2IBlueJtb+DiRm
-         uiYfQM8xkBPA31QHXbdQiOtkLC3jgb5PqnDmKfROWQbON9TeEHtuYjr1bKkByTF8iqxW
-         e/quk5yfVTrn2+46OxKdNHH1aWfy5zIgqBhm7pTYxlIY3ZpxpNj8sdxP8J1IcybZQdiW
-         KT0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=We8MnYtBaG4t88DyFPaEaI/3JbDRE1+6v3kM+jWwEtw=;
-        b=TqjHCJ64CicBLHg384IeXZ/mCaYuRYzQkDiS/8xERZhQOl8RPvZ/NthxPR6Bxb+W6d
-         i7NCSG2kVVr1hVIrveKAAwQwL3Qq5TWQowAs5FHeXr1UDMu2yChRNlNFYUaucMaRonKl
-         m8DSulBuyidAn2xnGPGGmC7TaRSrijCIvFfrKVNKhON0zHa8oikcFj/4AX+AfQq5W6cn
-         x87zhc0jpJbExyjuxuw7wUgRUXalhcvlsq5C62B3htowY1xmsYTdutcjtZNg/aQbsO19
-         ctQYsDOupqBConthY4TgGVOZSvTugTlV6QfbYqdJADCvbkMi6+3A4rI4Z36ROT5vsRH+
-         Nigg==
-X-Gm-Message-State: AOAM533MF2Be4Kdz2x5klmbBUXsoStuI66/seKoqg+DaU0Cw8diTFVxC
-        kfuIN+mzfBOfjHLCKD7hJ37URAtWpDyWIA==
-X-Google-Smtp-Source: ABdhPJxSJhezPui+2TcwUkCJnNFInLrEP/g22g01ekicafFP/qnFgKnxpBHUD1MX9kPOnf4BHKk7214nYOqT/A==
-X-Received: by 2002:a05:6214:1842:: with SMTP id d2mr3087871qvy.197.1592324891019;
- Tue, 16 Jun 2020 09:28:11 -0700 (PDT)
-Date:   Tue, 16 Jun 2020 09:28:02 -0700
-Message-Id: <20200616092341.v2.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
-Subject: [PATCH v2] Bluetooth: Terminate the link if pairing is cancelled
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Alain Michaud <alainm@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 16 Jun 2020 13:05:18 -0400
+Received: from mga18.intel.com ([134.134.136.126]:10921 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729794AbgFPRFQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Jun 2020 13:05:16 -0400
+IronPort-SDR: PrnzhPRXEvtS/HSBojBjKYHNsswmC+/X7YkQ7n9qGGrJO9dAyDE/8PpS33oDmBxHBQCENamd0p
+ 5hnMW29ggkow==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 10:05:15 -0700
+IronPort-SDR: /ebYbodjb7CIPib+KQWNj5B+1SLo58aCOkf1s6n95HW4U5FZ/Rx8Spiu7i4UgfiPgf4DTxGSlu
+ Hk2101ZrCJgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,518,1583222400"; 
+   d="scan'208";a="351800794"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.72.197])
+  by orsmga001.jf.intel.com with ESMTP; 16 Jun 2020 10:05:15 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com,
+        michal.lowas-rzechonek@silvair.com
+Subject: [PATCH BlueZ] mesh: Add deferal of Attach() and Leave() if busy
+Date:   Tue, 16 Jun 2020 10:05:10 -0700
+Message-Id: <20200616170510.27378-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.25.4
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If user decides to cancel the ongoing pairing process (e.g. by clicking
-the cancel button on pairing/passkey window), abort any ongoing pairing
-and then terminate the link if it was created because of the pair
-device action.
+We require the successful return of JoinComplete() method before
+handling subsequent Attach() or Leave() method calls.  To simplify the
+construction of Applications, we will accept one of these calls up to 1
+second prior to receiving the final return status of JoinComplete,
+which tells us that the Application is ready to use the node.
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+If the node is still not ready after the deferal, Attach and/or Leave
+will fail.
 ---
+ mesh/mesh.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 52 insertions(+), 2 deletions(-)
 
-Changes in v2:
-- Added code to track if the connection was triggered because of the pair
-  device action and then only terminate the link on pairing cancel.
-
- include/net/bluetooth/hci_core.h | 14 ++++++++++++--
- net/bluetooth/hci_conn.c         | 11 ++++++++---
- net/bluetooth/l2cap_core.c       |  6 ++++--
- net/bluetooth/mgmt.c             | 22 ++++++++++++++++++----
- 4 files changed, 42 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f5b28c7cae9f2..236ffbc36b2c3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -519,6 +519,12 @@ struct hci_dev {
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index c8767ee7a..96e7cf464 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -104,6 +104,10 @@ static struct l_queue *pending_queue;
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+ static const char *storage_dir;
  
-+enum conn_reasons {
-+	CONN_REASON_PAIR_DEVICE,
-+	CONN_REASON_L2CAP_CHAN,
-+	CONN_REASON_SCO_CONNECT,
-+};
++/* Forward static decalrations */
++static void def_attach(struct l_timeout *timeout, void *user_data);
++static void def_leave(struct l_timeout *timeout, void *user_data);
 +
- struct hci_conn {
- 	struct list_head list;
- 
-@@ -567,6 +573,8 @@ struct hci_conn {
- 	__s8		max_tx_power;
- 	unsigned long	flags;
- 
-+	enum conn_reasons conn_reason;
-+
- 	__u32		clock;
- 	__u16		clock_accuracy;
- 
-@@ -991,12 +999,14 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
- 
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout);
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 dst_type, u8 sec_level, u16 conn_timeout,
- 				u8 role, bdaddr_t *direct_rpa);
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type);
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3ea1bdf5d1e35..1353d7e3f1012 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1157,7 +1157,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
- /* This function requires the caller holds hdev->lock */
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout)
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason)
+ static bool simple_match(const void *a, const void *b)
  {
- 	struct hci_conn *conn;
+ 	return a == b;
+@@ -634,12 +638,26 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
+ 	uint64_t token;
+ 	const char *app_path, *sender;
+ 	struct l_dbus_message *pending_msg;
++	struct mesh_node *node;
  
-@@ -1202,6 +1203,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
-+	conn->conn_reason = conn_reason;
+ 	l_debug("Attach");
  
- 	hci_update_background_scan(hdev);
+ 	if (!l_dbus_message_get_arguments(msg, "ot", &app_path, &token))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
  
-@@ -1211,7 +1213,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
++	node = node_find_by_token(token);
++	if (!node)
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND, "Attach failed");
++
++	if (node_is_busy(node)) {
++		if (user_data)
++			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
++
++		/* Try once more in 1 second */
++		l_timeout_create(1, def_attach, l_dbus_message_ref(msg), NULL);
++		return NULL;
++	}
++
+ 	sender = l_dbus_message_get_sender(msg);
+ 
+ 	pending_msg = l_dbus_message_ref(msg);
+@@ -650,6 +668,19 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
+ 	return NULL;
  }
  
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type)
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason)
++static void def_attach(struct l_timeout *timeout, void *user_data)
++{
++	struct l_dbus *dbus =  dbus_get_bus();
++	struct l_dbus_message *msg = user_data;
++	struct l_dbus_message *reply;
++
++	l_timeout_remove(timeout);
++
++	reply = attach_call(dbus, msg, (void *) true);
++	l_dbus_send(dbus, reply);
++	l_dbus_message_unref(msg);
++}
++
+ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
+ 						struct l_dbus_message *msg,
+ 						void *user_data)
+@@ -666,14 +697,33 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
+ 	if (!node)
+ 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+ 
+-	if (node_is_busy(node))
+-		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
++	if (node_is_busy(node)) {
++		if (user_data)
++			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
++
++		/* Try once more in 1 second */
++		l_timeout_create(1, def_leave, l_dbus_message_ref(msg), NULL);
++		return NULL;
++	}
+ 
+ 	node_remove(node);
+ 
+ 	return l_dbus_message_new_method_return(msg);
+ }
+ 
++static void def_leave(struct l_timeout *timeout, void *user_data)
++{
++	struct l_dbus *dbus =  dbus_get_bus();
++	struct l_dbus_message *msg = user_data;
++	struct l_dbus_message *reply;
++
++	l_timeout_remove(timeout);
++
++	reply = leave_call(dbus, msg, (void *) true);
++	l_dbus_send(dbus, reply);
++	l_dbus_message_unref(msg);
++}
++
+ static void create_join_complete_reply_cb(struct l_dbus_message *msg,
+ 								void *user_data)
  {
- 	struct hci_conn *acl;
- 
-@@ -1231,6 +1234,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	hci_conn_hold(acl);
- 
-+	acl->conn_reason = conn_reason;
- 	if (acl->state == BT_OPEN || acl->state == BT_CLOSED) {
- 		acl->sec_level = BT_SECURITY_LOW;
- 		acl->pending_sec_level = sec_level;
-@@ -1247,7 +1251,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING,
-+			      CONN_REASON_SCO_CONNECT);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bdbf37337bc6c..ee71b68582f48 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7224,11 +7224,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		else
- 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
- 						   chan->sec_level,
--						   HCI_LE_CONN_TIMEOUT);
-+						   HCI_LE_CONN_TIMEOUT,
-+						   CONN_REASON_L2CAP_CHAN);
- 
- 	} else {
- 		u8 auth_type = l2cap_get_auth_type(chan);
--		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
-+		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type,
-+				       CONN_REASON_L2CAP_CHAN);
- 	}
- 
- 	if (IS_ERR(hcon)) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index db7023dfcd253..06cc8d30f8f00 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2940,7 +2940,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
--				       auth_type);
-+				       auth_type, CONN_REASON_PAIR_DEVICE);
- 	} else {
- 		u8 addr_type = le_addr_type(cp->addr.type);
- 		struct hci_conn_params *p;
-@@ -2959,9 +2959,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
- 			p->auto_connect = HCI_AUTO_CONN_DISABLED;
- 
--		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
--					   addr_type, sec_level,
--					   HCI_LE_CONN_TIMEOUT);
-+		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr, addr_type,
-+					   sec_level, HCI_LE_CONN_TIMEOUT,
-+					   CONN_REASON_PAIR_DEVICE);
- 	}
- 
- 	if (IS_ERR(conn)) {
-@@ -3062,6 +3062,20 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
- 				addr, sizeof(*addr));
-+
-+	/* Since user doesn't want to proceed with the connection, abort any
-+	 * ongoing pairing and then terminate the link if it was created
-+	 * because of the pair device action.
-+	 */
-+	if (addr->type == BDADDR_BREDR)
-+		hci_remove_link_key(hdev, &addr->bdaddr);
-+	else
-+		smp_cancel_and_remove_pairing(hdev, &addr->bdaddr,
-+					      le_addr_type(addr->type));
-+
-+	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
-+		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
 -- 
-2.27.0.111.gc72c7da667-goog
+2.25.4
 
