@@ -2,169 +2,215 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1AFC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46407C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:34:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CBC5206DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D75120739
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 01:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BSEPUpGU"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="yyXcwwnY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726625AbgFPAZM (ORCPT
+        id S1725979AbgFPBe2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 20:25:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45354 "EHLO
+        Mon, 15 Jun 2020 21:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbgFPAZL (ORCPT
+        with ESMTP id S1725949AbgFPBe1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 20:25:11 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36F3DC08C5C3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:25:11 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id m2so701644pjv.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:25:11 -0700 (PDT)
+        Mon, 15 Jun 2020 21:34:27 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C009C08C5C2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 18:34:27 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id i27so21480369ljb.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 18:34:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=26J9i57XuI3tG/PuFvKTO+VO1i2nL2WVB2t8LtWV05c=;
-        b=BSEPUpGU1bfDNggNEUP0Nqj8JTnaO9oNkCnioW9UyA6ww9VVZNq9IKAow/hJO5/x7E
-         K0a10xuT2S8dYWvAS+OXJg+2PHzFd//cNbC1MX+hx4O8Gjm4Qnb2PA9mZaQ+M3UePUPU
-         qznnlg6z29H6l1ei7e5Kvg21Zcq5Wbt/vWFN8=
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=fBOUW8DcQP5RUVEFEB+Nscd2xBILZhFX+tn0TCk7DB8=;
+        b=yyXcwwnYrYybF2aEe0N4qbSKVu4CEbbanw0eikFKGAjDHQ8W8ACE5USzpdhsz3pIKc
+         dm6vzTKbutAEzmVrAMtktWr7qRMqTm1oc4QlBxMvjra5wuXWh9kXX6pl1QxROcmMZQbU
+         jAAGEpBYPBGseoHI1SMfii39mkVf4JuyUxjNbsZcaPRHo1BG+I1vsxabf0gSCfsAyN9x
+         b9nPMYYhjebTf0g0ds2lpyohjkUP0/+r8KlxO21AFe7BSPN1VAUOz/uU5P47kxqm4szP
+         ibOorSmHkYUdRJVg8n27iZI6ZM5hR7GLnRvrKYieF2QvsDOef2/mpuDc+NByhOJC/CKx
+         IoRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=26J9i57XuI3tG/PuFvKTO+VO1i2nL2WVB2t8LtWV05c=;
-        b=MTcXagtOxCgaC6Hl9w4HVBBmFPwNYy05jP9B8Qvv6FzmFm7Wo7m6lMMrYvwYODhaHB
-         3ePBfcj6mPA6tcvqf+cm5NStQDQ1tma7v8tsBnwRoVwB5QC/2AUP0Q3KdQEzO4hiwA+y
-         bwmWniI3QzAmsQbWYkyxph6rgnJAm/EE+aa/Jwgqw1RXtzH0R7el2WvqoqxegBrP0SE4
-         VMoCewrQQSc2NgTG++9McAb5k3zP5kJnba8yrPpuTZkthUXCAFmA5pCsAl++t2dm+/XK
-         A1dEFeloJSCe8i8h5gOs2vqCvoNhi4zkfxrpCmG1Zf8VoUTPo+/oOrAam0Z+5fUg9dnR
-         paDQ==
-X-Gm-Message-State: AOAM532ONdssqFeioy8K57sLdRcTQd+Y8yCt53LDAmHHQ5x1zJwUalFv
-        pNPwCwrwk8SGyv+M27W6hH1eXsrLQyk=
-X-Google-Smtp-Source: ABdhPJxVB/SPUO4YceUOYDXgO9v7NEYHhRiD2wKqsOs65ag64IEdo4Lgk8Sgle21byjXPyLlrM8QFg==
-X-Received: by 2002:a17:902:9301:: with SMTP id bc1mr397515plb.116.1592267110266;
-        Mon, 15 Jun 2020 17:25:10 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id x2sm14783781pfr.186.2020.06.15.17.25.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jun 2020 17:25:09 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Michael Sun <michaelfsun@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v5 1/7] Bluetooth: Add definitions for advertisement monitor features
-Date:   Mon, 15 Jun 2020 17:24:59 -0700
-Message-Id: <20200615172440.v5.1.I636f906bf8122855dfd2ba636352bbdcb50c35ed@changeid>
-X-Mailer: git-send-email 2.26.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=fBOUW8DcQP5RUVEFEB+Nscd2xBILZhFX+tn0TCk7DB8=;
+        b=e1DpsCnu/AKHABJ3CDhl46xsyf2s3/WXMy0JqySb2aaCoqzjZEKk80D4GBnBn0kBkp
+         0ipt0v/ntTldNGS0Am9O1qAod8byRvJKndpehWp39hVa0Rzhg+awQU7SR5Sjdegpf86E
+         1rHPXLt2owHwQLDHYN5pDpqn6Setr23EMup0njZ1NTW4ZXn/Dy0tGYvihE0/1MTQyEbz
+         VAY2V+BdpBt1EeWSwtsxpBI3Ydj8rtjc6hRszRB7e04mmnv8Gr3YSaF6Xb5yy6TuTOAS
+         cebBLiYbEXijfoFTlgR1gLGLRI+emGA3kYlDfwP5+7PKSpyy2kGrsfYZDUeRDeX1y+Mx
+         4rUg==
+X-Gm-Message-State: AOAM530UtIN4gFYgOBKNBK/Oq0vrsAHHVOa7oKvWlL7ZI9XVxBtqwLbO
+        Q8kulJVUu+RJVrHUpMz9tBp+INdncaf7UmlCzhOTrQ==
+X-Google-Smtp-Source: ABdhPJz+Wg9Z0NbEWwfXy+zMFK5B15e9mQDuJzw6r8c/XGOODhFRM6krLVSR3Atai7Y1d3stFKOyJjWWo3QM93mTa5g=
+X-Received: by 2002:a2e:7107:: with SMTP id m7mr184599ljc.342.1592271265772;
+ Mon, 15 Jun 2020 18:34:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200616000318.42664-1-michaelfsun@google.com> <20200616000318.42664-2-michaelfsun@google.com>
+In-Reply-To: <20200616000318.42664-2-michaelfsun@google.com>
+From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Date:   Mon, 15 Jun 2020 18:34:13 -0700
+Message-ID: <CACumGO+banV_pQNnB53ddqU2Rjj+K+FnLnNTyztOQMcA3n2yGg@mail.gmail.com>
+Subject: Re: [bluez PATCH v1 1/3] btmgmt: Add btmgmt command advmon-features
+To:     Michael Sun <michaelfsun@google.com>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Alain Michaud <alainm@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds support for Advertisement Monitor API. Here are the commands
-and events added.
-- Read Advertisement Monitor Feature command
-- Add Advertisement Pattern Monitor command
-- Remove Advertisement Monitor command
-- Advertisement Monitor Added event
-- Advertisement Monitor Removed event
+Hi Michael,
 
-Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
----
+On Mon, Jun 15, 2020 at 5:03 PM Michael Sun <michaelfsun@google.com> wrote:
+>
+> This patch introduces a new btmgmt command =E2=80=98advmon-features=E2=80=
+=99 to help
+> user query for supported advertisement features. The command will work
+> with the new MGMT opcode MGMT_OP_READ_ADV_MONITOR_FEATURES.
+>
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Signed-off-by: Michael Sun <michaelfsun@google.com>
+> ---
+>
+>  tools/btmgmt.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 81 insertions(+)
+>
+> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+> index 46e7465b3..1aae7098c 100644
+> --- a/tools/btmgmt.c
+> +++ b/tools/btmgmt.c
+> @@ -4567,6 +4567,84 @@ static void cmd_wbs(int argc, char **argv)
+>         cmd_setting(MGMT_OP_SET_WIDEBAND_SPEECH, argc, argv);
+>  }
+>
+> +static const char *advmon_features_str[] =3D {
+> +       "Pattern monitor with logic OR.",
+> +};
+> +
+> +static const char *advmon_features2str(uint32_t features)
+> +{
+> +       static char str[512];
+> +       int off, i;
+> +
+> +       off =3D 0;
+> +       snprintf(str, sizeof(str), "\n\tNone");
+> +
+> +       for (i =3D 0; i < NELEM(advmon_features_str); i++) {
+> +               if ((features & (1 << i)) !=3D 0 && off < sizeof(str))
+> +                       off +=3D snprintf(str + off, sizeof(str) - off, "=
+\n\t%s",
+> +                                               advmon_features_str[i]);
+> +       }
+> +
+> +       return str;
+> +}
+> +
+> +static void advmon_features_rsp(uint8_t status, uint16_t len, const void=
+ *param,
+> +                                                       void *user_data)
+> +{
+> +       const struct mgmt_rp_read_adv_monitor_features *rp =3D param;
+> +       uint32_t supported_features, enabled_features;
+> +       uint16_t num_handles;
+> +       int i;
+> +
+> +       if (status !=3D MGMT_STATUS_SUCCESS) {
+> +               error("Reading adv monitor features failed with status 0x=
+%02x "
+> +                                       "(%s)", status, mgmt_errstr(statu=
+s));
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       if (len < sizeof(*rp)) {
+> +               error("Too small adv monitor features reply (%u bytes)", =
+len);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       if (len < sizeof(*rp) + rp->num_handles * sizeof(uint16_t)) {
+> +               error("Handles count (%u) doesn't match reply length (%u)=
+",
+> +                                                       rp->num_handles, =
+len);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       supported_features =3D le32_to_cpu(rp->supported_features);
+> +       enabled_features =3D le32_to_cpu(rp->enabled_features);
+> +       num_handles =3D le16_to_cpu(rp->num_handles);
+> +
+> +       print("Supported features:%s", advmon_features2str(supported_feat=
+ures));
+> +       print("Enabled features:%s", advmon_features2str(enabled_features=
+));
+> +       print("Max number of handles: %u", le16_to_cpu(rp->max_num_handle=
+s));
+> +       print("Max number of patterns: %u", rp->max_num_patterns);
+> +       print("Handles list with %u item%s", num_handles,
+> +                       num_handles =3D=3D 0 ? "" : num_handles =3D=3D 1 =
+? ":" : "s:");
+> +       for (i =3D 0; i < num_handles; i++) {
+> +               print("\t0x%04x ", le16_to_cpu(rp->handles[i]));
+> +       }
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_advmon_features(int argc, char **argv)
+> +{
+> +       uint16_t index;
+> +
+> +       index =3D mgmt_index;
+> +       if (index =3D=3D MGMT_INDEX_NONE)
+> +               index =3D 0;
+> +
+> +       if (!mgmt_send(mgmt, MGMT_OP_READ_ADV_MONITOR_FEATURES, index, 0,=
+ NULL,
+> +                                       advmon_features_rsp, NULL, NULL))=
+ {
+> +               error("Unable to send advertising monitor features comman=
+d");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +}
+> +
+>  static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
+>  {
+>         mgmt_register(mgmt, MGMT_EV_CONTROLLER_ERROR, index, controller_e=
+rror,
+> @@ -4776,6 +4854,9 @@ static const struct bt_shell_menu main_menu =3D {
+>                 cmd_expinfo,            "Show experimental features"    }=
+,
+>         { "exp-debug",          "<on/off>",
+>                 cmd_exp_debug,          "Set debug feature"             }=
+,
+> +       { "advmon-features",    NULL,
+> +               cmd_advmon_features,    "Show advertisement monitor "
+> +                                       "features"                      }=
+,
+>         {} },
+>  };
 
-Changes in v5: None
-Changes in v4: None
-Changes in v3:
-- Update command/event opcodes.
-- Correct data types.
+It might be a good idea to organize this as a submenu e.g.
+> menu monitor
+> features
 
-Changes in v2: None
-
- include/net/bluetooth/mgmt.h | 49 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
-
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 16e0d87bd8fae..fcc5d0349f549 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -702,6 +702,45 @@ struct mgmt_rp_set_exp_feature {
- 	__le32 flags;
- } __packed;
- 
-+#define MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS    BIT(0)
-+
-+#define MGMT_OP_READ_ADV_MONITOR_FEATURES	0x0051
-+#define MGMT_READ_ADV_MONITOR_FEATURES_SIZE	0
-+struct mgmt_rp_read_adv_monitor_features {
-+	__le32 supported_features;
-+	__le32 enabled_features;
-+	__le16 max_num_handles;
-+	__u8 max_num_patterns;
-+	__le16 num_handles;
-+	__le16 handles[];
-+}  __packed;
-+
-+struct mgmt_adv_pattern {
-+	__u8 ad_type;
-+	__u8 offset;
-+	__u8 length;
-+	__u8 value[31];
-+} __packed;
-+
-+#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR	0x0052
-+struct mgmt_cp_add_adv_patterns_monitor {
-+	__u8 pattern_count;
-+	struct mgmt_adv_pattern patterns[];
-+} __packed;
-+#define MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE	1
-+struct mgmt_rp_add_adv_patterns_monitor {
-+	__le16 monitor_handle;
-+} __packed;
-+
-+#define MGMT_OP_REMOVE_ADV_MONITOR		0x0053
-+struct mgmt_cp_remove_adv_monitor {
-+	__le16 monitor_handle;
-+} __packed;
-+#define MGMT_REMOVE_ADV_MONITOR_SIZE		2
-+struct mgmt_rp_remove_adv_monitor {
-+	__le16 monitor_handle;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-@@ -933,3 +972,13 @@ struct mgmt_ev_exp_feature_changed {
- 	__u8	uuid[16];
- 	__le32	flags;
- } __packed;
-+
-+#define MGMT_EV_ADV_MONITOR_ADDED	0x002b
-+struct mgmt_ev_adv_monitor_added {
-+	__le16 monitor_handle;
-+}  __packed;
-+
-+#define MGMT_EV_ADV_MONITOR_REMOVED	0x002c
-+struct mgmt_ev_adv_monitor_removed {
-+	__le16 monitor_handle;
-+}  __packed;
--- 
-2.26.2
-
+That way we can expand the number of commands for adding/removing
+monitors without making the list of commands way too big to show in
+one screen (although it already is).
