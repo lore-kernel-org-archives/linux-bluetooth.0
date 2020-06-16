@@ -2,97 +2,123 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FA4C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 22:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E855DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 23:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3FB720B80
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 22:56:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d+NB92zi"
+	by mail.kernel.org (Postfix) with ESMTP id C877320B80
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 23:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726500AbgFPW45 (ORCPT
+        id S1726326AbgFPXBs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Jun 2020 18:56:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbgFPW44 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Jun 2020 18:56:56 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C714C061573
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 15:56:56 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id d4so285551pgk.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 15:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CdHyWq/MfAuzSAG7Mf8tf08IXfZGy0e5RAYSXPj9atg=;
-        b=d+NB92zi75DKJkiL/hlcU/PZNamGnRf3orr+CawWEnmjKp3tntfwmq8Dq1QIkmzMbn
-         xPjsCWIDbMmiCBZA5kTPp+nx92Agoi/8WkCjrMpZafb+JEr7ZnnYH4gLcLsCBN+ZnplO
-         93IIuqsWP+1ps6z4AJFCkZzHArwgzCyXCC2fk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CdHyWq/MfAuzSAG7Mf8tf08IXfZGy0e5RAYSXPj9atg=;
-        b=n4tlGXpZIB64qf/4U9yCAl8NaakGnuBefdAzKuRXGvH1fYH2/KvNicpMfiv5dyd5/F
-         u9CKsUgZGN1xLhcItwxFCDL1XgfaWeGobIG7svK2+FE4AUjXsvZ2LGBC5RLATydE56iv
-         IfLW5IbuqFtSbqdWRKd2QcftDj8PT6dPMXKFMd9l9bV+CF2jsxLCLQH3SmFNw5DT4HM2
-         T9Ze9JxE7CKKRP8FK5e+m49sNzJYMP/nkXWPwYnCVy1e+on1tmNjZ6PdWkrzx/ivyFe2
-         yO4YoKdxUwAH6LivIl9POSGLz+5Z3VOwgD3/1xGoeH1OIbZbJMhqVk9SWCzvNMu1ZtbP
-         LtTg==
-X-Gm-Message-State: AOAM531bEVxGM8otEM93WJ4nOvrRy5CteHK+BfSrO+wnHWpI3/ZjTHhK
-        oMQmGd9psEAg5YHb/5YHDrpZMGy3jMs=
-X-Google-Smtp-Source: ABdhPJz4vktZsxj2YLU2Fci/GZMQso11G/G45P4jx1/QRvyJtubW6M8zwvjPA7vppr1lFGo95DuZqg==
-X-Received: by 2002:a65:458e:: with SMTP id o14mr3598356pgq.87.1592348215420;
-        Tue, 16 Jun 2020 15:56:55 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
-        by smtp.gmail.com with ESMTPSA id k11sm3460269pjs.9.2020.06.16.15.56.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Jun 2020 15:56:54 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v1] lib: Correct the string for a mgmt op
-Date:   Tue, 16 Jun 2020 15:56:50 -0700
-Message-Id: <20200616155641.BlueZ.v1.1.I5d071a56cb3a8d3640abf7c41d96e8233f14f8e6@changeid>
-X-Mailer: git-send-email 2.26.2
+        Tue, 16 Jun 2020 19:01:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39104 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725849AbgFPXBs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Jun 2020 19:01:48 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 6CB7AADA8;
+        Tue, 16 Jun 2020 23:01:45 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 1AC8EDA7C3; Wed, 17 Jun 2020 01:01:30 +0200 (CEST)
+Date:   Wed, 17 Jun 2020 01:01:30 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Joe Perches <joe@perches.com>
+Cc:     Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Message-ID: <20200616230130.GJ27795@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Joe Perches <joe@perches.com>,
+        Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+References: <20200616015718.7812-1-longman@redhat.com>
+ <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This corrects the string of MGMT_OP_ADD_ADV_PATTERNS_MONITOR to match
-mgmt-api.txt.
----
+On Tue, Jun 16, 2020 at 11:53:50AM -0700, Joe Perches wrote:
+> On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
+> >  v4:
+> >   - Break out the memzero_explicit() change as suggested by Dan Carpenter
+> >     so that it can be backported to stable.
+> >   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
+> >     now as there can be a bit more discussion on what is best. It will be
+> >     introduced as a separate patch later on after this one is merged.
+> 
+> To this larger audience and last week without reply:
+> https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
+> 
+> Are there _any_ fastpath uses of kfree or vfree?
 
- lib/mgmt.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index bb31156ab..fad1f3dfe 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -1008,7 +1008,7 @@ static const char *mgmt_op[] = {
- 	"Read Default System Configuration",
- 	"Set Default System Configuration",
- 	"Read Advertisement Monitor Features",
--	"Add Advertisement Monitor",
-+	"Add Advertisement Patterns Monitor",
- 	"Remove Advertisement Monitor",
- };
- 
--- 
-2.26.2
-
+I'd consider kfree performance critical for cases where it is called
+under locks. If possible the kfree is moved outside of the critical
+section, but we have rbtrees or lists that get deleted under locks and
+restructuring the code to do eg. splice and free it outside of the lock
+is not always possible.
