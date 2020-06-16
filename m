@@ -2,127 +2,93 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C18B2C433E5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 03:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF65C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 04:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A106C207D4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 03:30:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592278249;
-	bh=cbCBV+GA89Kxk07F75+TVwUbSIVVlsmXitOPPgujt0g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=o1hbRj4dzikWr0Aq3VKhgvf2iCXUj/wSFl8jRUieMBkv7CVTiQLq4Ga3BcJFuSnNM
-	 xdhpFjRUTjRhl0QjM93vHKZu5qsLiEKvwZfbjCcO35kG3ooV1kZ/XZlIDpPBaNNJJ1
-	 piOn/VSLFJFOYEDH9uffaH9pmDuZVC9TPWgR5Qng=
+	by mail.kernel.org (Postfix) with ESMTP id F21EA20707
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 04:28:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UGMLBKRV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726303AbgFPDaj (ORCPT
+        id S1726712AbgFPE2l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 23:30:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53234 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725978AbgFPDai (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 23:30:38 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9B3B8206D7;
-        Tue, 16 Jun 2020 03:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592278237;
-        bh=cbCBV+GA89Kxk07F75+TVwUbSIVVlsmXitOPPgujt0g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CI14aWxQPw24ENjaHXJfOipbxs59iBOy6w+TeEVniGvJYBqy6D1cwSzDbSE5kI4lU
-         lIYg5jNgJLjG7j91Xm1X3e+BxtmR8FfP4CJnhYPkHwCMU6wjZ6YBjNC+nYJMCpp2N5
-         Vlpy20o3OcJdDug0iUS5K1iWjVtuIX+008M01eB4=
-Date:   Mon, 15 Jun 2020 20:30:35 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        David Sterba <dsterba@suse.cz>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] mm/slab: Use memzero_explicit() in kzfree()
-Message-ID: <20200616033035.GB902@sol.localdomain>
-References: <20200616015718.7812-1-longman@redhat.com>
- <20200616015718.7812-2-longman@redhat.com>
+        Tue, 16 Jun 2020 00:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbgFPE2k (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Jun 2020 00:28:40 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69223C05BD43
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 21:28:40 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id e9so8633164pgo.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 21:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9XTshnA7BR3B2kzepDrQGoX5KjoJhidKH0c8vEqbQtU=;
+        b=UGMLBKRVUL6Fs/ZlMascYH3BjfXIQQJRxZZ1i485i+/aASXMcDNtg6ySyUJxUXzVWs
+         7i/nzvAingF4VRZbrZX71n642pB8ZGeyRLNHSu+SBgu19aV0qooKiZLIq5+Dpn6q5ban
+         A6xcP2HM+Q5uSisIdEQ+aoLDfLs5Wt/bJorqU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9XTshnA7BR3B2kzepDrQGoX5KjoJhidKH0c8vEqbQtU=;
+        b=N3ejOc/VjyasRgsMuvPQEdRmVw5Ac2yXCztDtPfhTbLVx7Er3+7MASvmGnqS4G4Yfz
+         gFFynrQLkBgiwEsNI2ohEOj6mhkNWnZN3jtd4uSBrgEMO1kO6pkORnZoQD0UAt0bA0E/
+         LJQ/Eiu5lzWuCWKtX1I/hldKGRX+W4NCgm6Y7lfzSAzcTNpR1yeziTcmlW+9CY2uUzmu
+         jLYYlx1aefNfQrEl+OLPku3sEEvORTEYmYExHjNuOQbpvC8MU9OTkUbiCs64BvhJw3QR
+         iZWLWDZyozWGJDbPjXUk6iAhokfLkCM65XD2ibO6omuuS/pWCsk8zm8Qk4H0vdWShhxb
+         SrNQ==
+X-Gm-Message-State: AOAM530Z0HqOYR7ODS1zQVqpeRtLrdyD9BIERlXq0wOQh8rXrEd6jmh1
+        ePXJbt2iRdI2ibPFWaisMb1GOaJEcfM=
+X-Google-Smtp-Source: ABdhPJxWwVeNi6T7kU/pymkp3b/m2ik+NY2vMKXghz+UVKsyDbClNU76JNFLONBHovKyejdzx0cDLQ==
+X-Received: by 2002:a63:f413:: with SMTP id g19mr637523pgi.200.1592281719603;
+        Mon, 15 Jun 2020 21:28:39 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id y6sm16010851pfp.144.2020.06.15.21.28.38
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Jun 2020 21:28:38 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v1] lib: Correct the name of Add Advertisement Patterns Monitor Command opcode
+Date:   Mon, 15 Jun 2020 21:28:34 -0700
+Message-Id: <20200615212806.BlueZ.v1.1.I8328c620402620c9aadc149614bb279e42a9db4f@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200616015718.7812-2-longman@redhat.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 09:57:16PM -0400, Waiman Long wrote:
-> The kzfree() function is normally used to clear some sensitive
-> information, like encryption keys, in the buffer before freeing it back
-> to the pool. Memset() is currently used for the buffer clearing. However,
-> it is entirely possible that the compiler may choose to optimize away the
-> memory clearing especially if LTO is being used. To make sure that this
-> optimization will not happen, memzero_explicit(), which is introduced
-> in v3.18, is now used in kzfree() to do the clearing.
-> 
-> Fixes: 3ef0e5ba4673 ("slab: introduce kzfree()")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Waiman Long <longman@redhat.com>
-> ---
->  mm/slab_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/mm/slab_common.c b/mm/slab_common.c
-> index 9e72ba224175..37d48a56431d 100644
-> --- a/mm/slab_common.c
-> +++ b/mm/slab_common.c
-> @@ -1726,7 +1726,7 @@ void kzfree(const void *p)
->  	if (unlikely(ZERO_OR_NULL_PTR(mem)))
->  		return;
->  	ks = ksize(mem);
-> -	memset(mem, 0, ks);
-> +	memzero_explicit(mem, ks);
->  	kfree(mem);
->  }
->  EXPORT_SYMBOL(kzfree);
+ lib/mgmt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is a good change, but the commit message isn't really accurate.  AFAIK, no
-one has found any case where this memset() gets optimized out.  And even with
-LTO, it would be virtually impossible due to all the synchronization and global
-data structures that kfree() uses.  (Remember that this isn't the C standard
-function "free()", so the compiler can't assign it any special meaning.)
-Not to mention that LTO support isn't actually upstream yet.
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index f44f2465d..bb31156ab 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -673,7 +673,7 @@ struct mgmt_adv_pattern {
+ 	uint8_t value[31];
+ } __packed;
+ 
+-#define MGMT_OP_ADD_ADV_MONITOR			0x0052
++#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR	0x0052
+ struct mgmt_cp_add_adv_monitor {
+ 	uint8_t pattern_count;
+ 	struct mgmt_adv_pattern patterns[0];
+-- 
+2.26.2
 
-I still agree with the change, but it might be helpful if the commit message
-were honest that this is really a hardening measure and about properly conveying
-the intent.  As-is this sounds like a critical fix, which might confuse people.
-
-- Eric
