@@ -2,293 +2,122 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C9FC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C03C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15C662074D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:03:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3291520739
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 00:12:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MMIyZLpP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOLhSGR9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbgFPADf (ORCPT
+        id S1726408AbgFPAMb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jun 2020 20:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
+        Mon, 15 Jun 2020 20:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbgFPADd (ORCPT
+        with ESMTP id S1725960AbgFPAM2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jun 2020 20:03:33 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C5BC061A0E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:03:33 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id k23so15411583qtb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:03:33 -0700 (PDT)
+        Mon, 15 Jun 2020 20:12:28 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36488C061A0E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:27 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id j32so14162374qte.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2020 17:12:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc:content-transfer-encoding;
-        bh=P8sypJtpBIoUK0gFq2shspleE46NBUSITI+9t3y6wLg=;
-        b=MMIyZLpP7PvVUwB/FzkBHtZ6KEedPwelOp68ZTf1r6vx/2QiVYa2oqGzdOaBHFJVBH
-         FUScv8X3shOPWG8sn8TF0BeZxJjlRhcbMTXwhemtd77X4mzRG97SZub1pk+4994CQEYP
-         LuizN6saipNAPRCGXQ1EWXHqnsl0XPnCTu84RSQSILLP3pMhsipQaViWWzmJeiRufHgb
-         1mpoCf0+hm2bDcY0Z3Srg0jpiu47jU1UfTfyh91rYDvmfQDl3jVSoI0hv0FtU7P+q/0c
-         1fIGnqbRJ3z/Ea4fg6P8VDncYrv2X573D/QpSE8C8cmikYn82hg0O9WFJaPqfBbdl7WZ
-         13IQ==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=PqUkJDQGqnIz1xMRg1ZqgV5aSgqEwUGHX+Q0bYvPYUQ=;
+        b=FOLhSGR9tOz5TOLbIXLsUCu8KtIlXukGwjducr2/wWZeSlIeiWkM/Q+SieY/78qIhF
+         tYi3xKhREnF6UgPsVovkck6x6Q4YHavOydwS3xqA6x3mYgex4G/FvwsDfN1lZVb+ZSeJ
+         mrmT65shhx/YcpR0TJWh1E6LmYgPDqvtl3piHd0muW1w+RSC4+hjyQOIRjQttrA6NKuL
+         CKKiwAhKcvMVw2JYrLa/lhAJSJk+uIeO9qVfB5cTmeI2abDIuDe2S0ZJZmDaYbLy3uOM
+         2y4S/7msjBAKXvImRNmuvIQNoGSLf8TbK5vfOq/7aoYBKsNVXbTrqaivRx4npU6BvOj5
+         0NKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc:content-transfer-encoding;
-        bh=P8sypJtpBIoUK0gFq2shspleE46NBUSITI+9t3y6wLg=;
-        b=f66LohLqye42cpMs++7+dnijYIni9kprBQ0por9k6SiN3wUccC7zENLPM3Dv3XGJg8
-         WIgoY5WToDDlkfPp7bkEJSHuQcYQOhpAE8nKmJFGJzYmPNnAmEZpTe9oulEAnL8A50Rl
-         0g7wHSFFVvrH8ykOQ2WpF2g9hyE/8F5iXH+jokkp5HcN2VQXQ7daijianLcv5fvbMHyt
-         5OHg1MMffjZc0eqOvjeR51oOMSx/u+I+tu7RAU05mSVITOgLhobEMldJxxRHEYCH1gqO
-         sCHc6ssActz15GcaHtPhZpRbHnPL0U+hS6o87MdGud1Dvsi/20g7QdB4n01mTRbVncxf
-         foLg==
-X-Gm-Message-State: AOAM532iZg8TNbhZZ67HaZLKMydS7d+JaRHeT2PU1tJa8/nHvHFTWSDB
-        OO/kgPHWJ6KFJlH4GD9dK65uvItl+2uoz/d/j0ZlAPIAxCyf+Nzhdm0OxKOY5KKgpRD7fw/Df5m
-        mIjyL8t6Kvhaf7X28cz2SFEBPIvYf8t7PZPU0u5QeHS8OiEwwzRcBO/yd4mK87K7Bu0/WU/ki1w
-        22PDQ1KNrrNSo=
-X-Google-Smtp-Source: ABdhPJyZaKVjhYo7XFEMHBD10vphC0JtgA0K1wrMJ3iAznPOE3d35mzJuiL8OrpiIxbBNDnWlSFtfBw2EWkD/hJUXA==
-X-Received: by 2002:ad4:552b:: with SMTP id ba11mr278705qvb.145.1592265812333;
- Mon, 15 Jun 2020 17:03:32 -0700 (PDT)
-Date:   Mon, 15 Jun 2020 17:03:18 -0700
-In-Reply-To: <20200616000318.42664-1-michaelfsun@google.com>
-Message-Id: <20200616000318.42664-4-michaelfsun@google.com>
-Mime-Version: 1.0
-References: <20200616000318.42664-1-michaelfsun@google.com>
-X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
-Subject: [bluez PATCH v1 3/3] btmgmt: Add btmgmt command advmon-add
-From:   Michael Sun <michaelfsun@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.von.dentz@intel.com,
-        chromeos-bluetooth-upstreaming@chromium.org, mcchou@chromium.org,
-        alainm@chromium.org, Michael Sun <michaelfsun@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=PqUkJDQGqnIz1xMRg1ZqgV5aSgqEwUGHX+Q0bYvPYUQ=;
+        b=UUzKKFmxxjSuXT82zRlq+AsF6EgtBtAytbPSDb1cf1EAIVL8qXNSviMIV7I1jzLQ1R
+         rKM/ORWDcZD7UnIx0zFyxqtQt35LmlRHaLMnoVD4ZCpJs3uo6WyvEuzrjQHV1LQDhJZU
+         f7byZ2tv+TCehNje3Jct3/pCAJoJix4L8+dYWu6qqPtDffrQlz1wTLq7mXgMnliWh6Th
+         f+cqjRZ8viWXm+jfuWKitQ1hSPrS3Qu86LlR+0hRkR9IZEmYTfoX7lFEN+v0QDEiFZBq
+         o6M1uKV6uBWBJw/dHcbW5dnL9Nt1G3cQtbJVgp1ajPJ9w9UppAgnFrm6oYSVaZXPnX3Z
+         tWaA==
+X-Gm-Message-State: AOAM5329FED41qQuHpWvcLco4piqiPLAMG6qNJOaC6tO4MrDxHaZvydh
+        PzK5VfIFpyYmm9kJMHGineTG9ipN
+X-Google-Smtp-Source: ABdhPJxeG4/P+HL+uqesJf6INUc1kYU/D1dncPBOVKGzmjxUiKUexV8VtvT7rDULFWkCDQW1GcAKeg==
+X-Received: by 2002:ac8:3fdb:: with SMTP id v27mr18692914qtk.220.1592266345776;
+        Mon, 15 Jun 2020 17:12:25 -0700 (PDT)
+Received: from [172.17.0.2] ([20.36.191.240])
+        by smtp.gmail.com with ESMTPSA id o21sm1376186qkk.4.2020.06.15.17.12.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2020 17:12:25 -0700 (PDT)
+Message-ID: <5ee80e69.1c69fb81.137a4.8518@mx.google.com>
+Date:   Mon, 15 Jun 2020 17:12:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1099034768328737238=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, michaelfsun@google.com
+Subject: RE: [bluez,v1,1/3] btmgmt: Add btmgmt command advmon-features
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200616000318.42664-2-michaelfsun@google.com>
+References: <20200616000318.42664-2-michaelfsun@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch introduces a new btmgmt command =E2=80=98advmon-add=E2=80=99 to =
-allow users
-to add advertisement monitor filters and return monitor handlers. An
-event handler is also added to handle kernel issued
-MGMT_EV_ADV_MONITOR_ADDED events. The command will work with the new
-MGMT opcode MGMT_OP_ADD_ADV_MONITOR. This patch only adds support for
-adding pattern based filters.
+--===============1099034768328737238==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Michael Sun <michaelfsun@google.com>
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkpatch Failed
+
+Outputs:
+WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+#25: FILE: tools/btmgmt.c:4570:
++static const char *advmon_features_str[] = {
+
+WARNING:BRACES: braces {} are not necessary for single statement blocks
+#81: FILE: tools/btmgmt.c:4626:
++	for (i = 0; i < num_handles; i++) {
++		print("\t0x%04x ", le16_to_cpu(rp->handles[i]));
++	}
+
+- total: 0 errors, 2 warnings, 93 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- tools/btmgmt.c | 158 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 158 insertions(+)
-
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 719e92196..2bdaf03fa 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -1013,6 +1013,19 @@ static void advertising_removed(uint16_t index, uint=
-16_t len,
- 	print("hci%u advertising_removed: instance %u", index, ev->instance);
- }
-=20
-+static void advmon_added(uint16_t index, uint16_t len, const void *param,
-+							void *user_data)
-+{
-+	const struct mgmt_ev_adv_monitor_added *ev =3D param;
-+
-+	if (len < sizeof(*ev)) {
-+		error("Too small (%u bytes) advmon_removed event", len);
-+		return;
-+	}
-+
-+	print("hci%u advmon_added: handle %u", index, ev->monitor_handle);
-+}
-+
- static void advmon_removed(uint16_t index, uint16_t len, const void *param=
-,
- 							void *user_data)
- {
-@@ -4658,6 +4671,147 @@ static void cmd_advmon_features(int argc, char **ar=
-gv)
- 	}
- }
-=20
-+static void advmon_add_rsp(uint8_t status, uint16_t len, const void *param=
-,
-+							void *user_data)
-+{
-+	const struct mgmt_rp_add_adv_patterns_monitor *rp =3D param;
-+
-+	if (status !=3D MGMT_STATUS_SUCCESS) {
-+		error("Could not add advertisement monitor with status "
-+				"0x%02x (%s)", status, mgmt_errstr(status));
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	print("Advertisement monitor with handle:0x%04x added",
-+							rp->monitor_handle);
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static bool str2pattern(struct mgmt_adv_pattern *pattern, const char *str)
-+{
-+	int type_len, offset_len, offset_end_pos, length, str_len;
-+	int i, j;
-+	char pattern_str[62] =3D { 0 };
-+	char tmp;
-+
-+	if (sscanf(str, "%2hhx%n:%2hhx%n:%s", &pattern->ad_type, &type_len,
-+			&pattern->offset, &offset_end_pos, pattern_str) !=3D 3)
-+		return false;
-+
-+	offset_len =3D offset_end_pos - type_len - 1;
-+	str_len =3D strlen(pattern_str);
-+	pattern->length =3D str_len / 2 + str_len % 2;
-+
-+	if (type_len > 2 || offset_len > 2 ||
-+					pattern->offset + pattern->length > 31)
-+		return false;
-+
-+	for (i =3D 0, j =3D 0; i < str_len; i++, j++) {
-+		if (!sscanf(&pattern_str[i++], "%2hhx", &pattern->value[j]))
-+			return false;
-+		if (i < str_len && !sscanf(&pattern_str[i], "%1hhx", &tmp))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void advmon_add_usage(void)
-+{
-+	bt_shell_usage();
-+	print("Options:\n"
-+		"\t -P, --pattern <ad_type:offset:pattern> "
-+		"Advertising Data bytes\n"
-+		"Monitor Types:\n"
-+		"\t -p, --pattern-monitor			"
-+		"Pattern Monitor\n"
-+		"e.g.:\n"
-+		"\tadvmon-add -P 0:1:c504 -P 1:a:9a55beef -p");
-+}
-+
-+static struct option advmon_add_options[] =3D
-+					{ { "help", 0, 0, 'h' },
-+					{ "pattern-monitor", 0, 0, 'p' },
-+					{ "pattern", 1, 0, 'P' },
-+					{ 0, 0, 0, 0 } };
-+
-+static void cmd_advmon_add(int argc, char **argv)
-+{
-+
-+	uint16_t index;
-+	void *cp =3D NULL;
-+	struct mgmt_adv_pattern *patterns =3D NULL;
-+	int opt, i;
-+	int pattern_count =3D 0, patterns_len, cp_len;
-+	bool success =3D false, type_selected =3D false;
-+
-+	index =3D mgmt_index;
-+	if (index =3D=3D MGMT_INDEX_NONE)
-+		index =3D 0;
-+
-+	while ((opt =3D getopt_long(argc, argv, "P:ph", advmon_add_options,
-+								NULL)) !=3D -1) {
-+		switch (opt) {
-+		case 'P':
-+			patterns_len =3D (pattern_count + 1) *
-+					sizeof(struct mgmt_adv_pattern);
-+			patterns =3D realloc(patterns, patterns_len);
-+
-+			if (!str2pattern(&patterns[pattern_count++], optarg)) {
-+				error("Failed to parse monitor patterns.");
-+				goto done;
-+			}
-+			break;
-+		case 'p':
-+			if (!pattern_count) {
-+				advmon_add_usage();
-+				goto done;
-+			}
-+			cp_len =3D
-+				sizeof(struct mgmt_cp_add_adv_patterns_monitor) +
-+				patterns_len;
-+			cp =3D realloc(cp, cp_len);
-+
-+			((struct mgmt_cp_add_adv_patterns_monitor *)cp)
-+					->pattern_count =3D pattern_count;
-+
-+			memcpy(((struct mgmt_cp_add_adv_patterns_monitor *)cp)
-+					->patterns, patterns, patterns_len);
-+			type_selected =3D true;
-+			break;
-+		case 'h':
-+			success =3D true;
-+			/* fall through */
-+		default:
-+			advmon_add_usage();
-+			goto done;
-+		}
-+	}
-+
-+	argc -=3D optind;
-+	argv +=3D optind;
-+
-+	if (argc || !type_selected) {
-+		advmon_add_usage();
-+		goto done;
-+	}
-+
-+	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR, index, cp_len,
-+					cp, advmon_add_rsp, NULL, NULL)) {
-+		error("Unable to send \"Add Advertising Monitor\" command");
-+		goto done;
-+	}
-+
-+	success =3D true;
-+
-+done:
-+	optind =3D 0;
-+	free(patterns);
-+	free(cp);
-+	if (!success)
-+		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
- static void advmon_remove_rsp(uint8_t status, uint16_t len, const void *pa=
-ram,
- 							void *user_data)
- {
-@@ -4748,6 +4902,8 @@ static void register_mgmt_callbacks(struct mgmt *mgmt=
-, uint16_t index)
- 						advertising_added, NULL, NULL);
- 	mgmt_register(mgmt, MGMT_EV_ADVERTISING_REMOVED, index,
- 					advertising_removed, NULL, NULL);
-+	mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_ADDED, index, advmon_added,
-+								NULL, NULL);
- 	mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_REMOVED, index, advmon_removed,
- 								NULL, NULL);
- }
-@@ -4910,6 +5066,8 @@ static const struct bt_shell_menu main_menu =3D {
- 	{ "advmon-features",	NULL,
- 		cmd_advmon_features,	"Show advertisement monitor "
- 					"features"			},
-+	{ "advmon-add",		"[options] <-p|-h>",
-+		cmd_advmon_add,		"Add advertisement monitor "	},
- 	{ "advmon-remove",	"<handle>",
- 		cmd_advmon_remove,	"Remove advertisement monitor "	},
- 	{} },
---=20
-2.27.0.290.gba653c62da-goog
-
+--===============1099034768328737238==--
