@@ -2,161 +2,128 @@ Return-Path: <SRS0=6MVD=75=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0942C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7F2C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:30:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B87DA2080D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE1812078D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jun 2020 18:30:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727819AbgFPSOo (ORCPT
+        id S1729543AbgFPSaj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Jun 2020 14:14:44 -0400
-Received: from mga07.intel.com ([134.134.136.100]:49322 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727083AbgFPSOn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:14:43 -0400
-IronPort-SDR: moikEsVJ+Id1FeW4DCZxm0bGl9iFl/JWJKydLjbXgjdZMqHePT7CrkmjwZS6MQlWOPh+rnY5JC
- YhIhxHStYDAg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 11:14:43 -0700
-IronPort-SDR: 0rVb+n2yF3XT03RMVfWj+j6u5GrdWdhJcNAswv0UEYie0zNh8/hNGjNay8lTxERtil5dTRhzq/
- 6ha2Jhdl5rKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,519,1583222400"; 
-   d="scan'208";a="263085314"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.72.197])
-  by fmsmga008.fm.intel.com with ESMTP; 16 Jun 2020 11:14:42 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com,
-        michal.lowas-rzechonek@silvair.com
-Subject: [PATCH BlueZ v2] mesh: Add deferral of Attach() and Leave() if busy
-Date:   Tue, 16 Jun 2020 11:14:36 -0700
-Message-Id: <20200616181436.50319-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.25.4
+        Tue, 16 Jun 2020 14:30:39 -0400
+Received: from mxout03.lancloud.ru ([89.108.73.187]:58268 "EHLO
+        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727114AbgFPSai (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Jun 2020 14:30:38 -0400
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 2DB1D2094BEF
+Received: from LanCloud
+Received: from LanCloud
+Received: by spb1wst017.omp.ru (Postfix, from userid 10000)
+        id B4414BA1D81; Tue, 16 Jun 2020 21:30:35 +0300 (MSK)
+From:   Denis Grigorev <d.grigorev@omprussia.ru>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Denis Grigorev <d.grigorev@omprussia.ru>
+Subject: [PATCH BlueZ v3] gobex: Fix segfault caused by interrupted transfer
+Date:   Tue, 16 Jun 2020 21:30:33 +0300
+Message-ID: <20200616183033.5243-1-d.grigorev@omprussia.ru>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [81.3.167.34]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To LFEX09.lancloud.ru
+ (fd00:f066::59)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We require the successful return of JoinComplete() method before
-handling subsequent Attach() or Leave() method calls. To simplify the
-construction of Applications, we will accept one of these calls up to 1
-second prior to receiving the final return status of JoinComplete,
-which tells us that the Application is ready to use the node.
+When a obex transfer is interrupted by a peer in the middle, the response
+G_OBEX_RSP_FORBIDDEN comes and the transfer is freed in transfer_complete.
+However gobex is still ref'ed and gobex->io continues to be writable,
+so write_data() and then g_obex_abort() are called. When the abort response
+comes, struct obc_transfer is already freed, which leads to the crash.
 
-If the node is still not ready after the deferral, Attach and/or Leave
-will fail.
+Backtrace :
+__GI___pthread_mutex_lock (mutex=0x65732f74) at pthread_mutex_lock.c:67
+0xecc6eeda in dbus_connection_get_object_path_data () from libdbus-1.so.3
+0x000457d4 in g_dbus_emit_property_changed_full () at gdbus/object.c:1794
+0x00045868 in g_dbus_emit_property_changed () at gdbus/object.c:1832
+0x000367f0 in transfer_set_status () at obexd/client/transfer.c:211
+0x0003681e in transfer_set_status () at obexd/client/transfer.c:206
+xfer_complete () at obexd/client/transfer.c:672
+0x00022df6 in transfer_complete () at gobex/gobex-transfer.c:103
+0x00022f44 in transfer_abort_response () at gobex/gobex-transfer.c:124
+0x00020a0e in handle_response () at gobex/gobex.c:1128
+0x00020dde in incoming_data () at gobex/gobex.c:1373
+
+This commit introduces g_obex_drop_tx_queue(), which will be called if
+a transfer error detected. After the tx queue is dropped, obex shuts
+down gracefully.
 ---
- mesh/mesh.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index ab2393deb..bc170371d 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -104,6 +104,10 @@ static struct l_queue *pending_queue;
+Changes in v2 and v3:
+- Edit commit message formatting.
+
+ gobex/gobex-transfer.c |  5 +++++
+ gobex/gobex.c          | 10 ++++++++++
+ gobex/gobex.h          |  1 +
+ 3 files changed, 16 insertions(+)
+
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index bc9930679..e96e61fbc 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -100,6 +100,11 @@ static void transfer_complete(struct transfer *transfer, GError *err)
  
- static const char *storage_dir;
+ 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
  
-+/* Forward static decalrations */
-+static void def_attach(struct l_timeout *timeout, void *user_data);
-+static void def_leave(struct l_timeout *timeout, void *user_data);
-+
- static bool simple_match(const void *a, const void *b)
- {
- 	return a == b;
-@@ -634,12 +638,26 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
- 	uint64_t token;
- 	const char *app_path, *sender;
- 	struct l_dbus_message *pending_msg;
-+	struct mesh_node *node;
- 
- 	l_debug("Attach");
- 
- 	if (!l_dbus_message_get_arguments(msg, "ot", &app_path, &token))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
-+	node = node_find_by_token(token);
-+	if (!node)
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND, "Attach failed");
-+
-+	if (node_is_busy(node)) {
-+		if (user_data)
-+			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+		/* Try once more in 1 second */
-+		l_timeout_create(1, def_attach, l_dbus_message_ref(msg), NULL);
-+		return NULL;
++	if (err) {
++		/* No further tx must be performed */
++		g_obex_drop_tx_queue(transfer->obex);
 +	}
 +
- 	sender = l_dbus_message_get_sender(msg);
- 
- 	pending_msg = l_dbus_message_ref(msg);
-@@ -650,6 +668,19 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
- 	return NULL;
+ 	transfer->complete_func(transfer->obex, err, transfer->user_data);
+ 	/* Check if the complete_func removed the transfer */
+ 	if (find_transfer(id) == NULL)
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 77f1aaafd..d68a85eb6 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -521,6 +521,16 @@ static void enable_tx(GObex *obex)
+ 	obex->write_source = g_io_add_watch(obex->io, cond, write_data, obex);
  }
  
-+static void def_attach(struct l_timeout *timeout, void *user_data)
++void g_obex_drop_tx_queue(GObex *obex)
 +{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message *msg = user_data;
-+	struct l_dbus_message *reply;
++	struct pending_pkt *p;
 +
-+	l_timeout_remove(timeout);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
 +
-+	reply = attach_call(dbus, msg, (void *) true);
-+	l_dbus_send(dbus, reply);
-+	l_dbus_message_unref(msg);
++	while ((p = g_queue_pop_head(obex->tx_queue)))
++		pending_pkt_free(p);
 +}
 +
- static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -666,14 +697,33 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 	if (!node)
- 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
- 
--	if (node_is_busy(node))
--		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+	if (node_is_busy(node)) {
-+		if (user_data)
-+			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+		/* Try once more in 1 second */
-+		l_timeout_create(1, def_leave, l_dbus_message_ref(msg), NULL);
-+		return NULL;
-+	}
- 
- 	node_remove(node);
- 
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static void def_leave(struct l_timeout *timeout, void *user_data)
-+{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message *msg = user_data;
-+	struct l_dbus_message *reply;
-+
-+	l_timeout_remove(timeout);
-+
-+	reply = leave_call(dbus, msg, (void *) true);
-+	l_dbus_send(dbus, reply);
-+	l_dbus_message_unref(msg);
-+}
-+
- static void create_join_complete_reply_cb(struct l_dbus_message *msg,
- 								void *user_data)
+ static gboolean g_obex_send_internal(GObex *obex, struct pending_pkt *p,
+ 								GError **err)
  {
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index b223a2fac..a94d9246e 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -63,6 +63,7 @@ gboolean g_obex_remove_request_function(GObex *obex, guint id);
+ void g_obex_suspend(GObex *obex);
+ void g_obex_resume(GObex *obex);
+ gboolean g_obex_srm_active(GObex *obex);
++void g_obex_drop_tx_queue(GObex *obex);
+ 
+ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
+ 						gssize rx_mtu, gssize tx_mtu);
 -- 
-2.25.4
+2.17.1
 
