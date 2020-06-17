@@ -2,127 +2,215 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBB1C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70172C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E29120FC3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:56:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592398575;
-	bh=nYFO/oI254U78ynuhC4MshoQshU2kuGAPO7lVMtzojE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=L+e1yQGaNQQCSIGMT7FeHieewFVDgvkC+E3mynSk1je7nLndLbQ8h3IMufYmRoleD
-	 7gS1nk2U/YndWZRX9KJxL6iKaF7efK9BY9i5qCb+u5cGHcrQWhHs1ZKmKJLeTWHbc0
-	 xQnrrk1MKZ4Fpven+Z+NDy0Ieg4gU/rZNgxxr6Eo=
+	by mail.kernel.org (Postfix) with ESMTP id 5AAAD206F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbgFQM4D (ORCPT
+        id S1727029AbgFQOj3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 08:56:03 -0400
-Received: from mail-ej1-f67.google.com ([209.85.218.67]:46289 "EHLO
-        mail-ej1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbgFQM4B (ORCPT
+        Wed, 17 Jun 2020 10:39:29 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51845 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726977AbgFQOj0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 08:56:01 -0400
-Received: by mail-ej1-f67.google.com with SMTP id p20so2155867ejd.13;
-        Wed, 17 Jun 2020 05:55:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fOVgSeVqTVqWvUfLoOdj4nt+48hh42lucWZp1VWswtg=;
-        b=dH49tmuZwIi2AW45bvCm3iTsdIn3uF71ykSn9PsnXeadpR8w4CiekLmYpZM958HwJD
-         ibgE+xf/ARAeXcjze6WrTSv5kWz7b8jTpIZP8lCgh3Ylunh3gjcMdzhvwrFj+vqHznwg
-         rXWDmWvWLvm2e4k8WV0pN2mW4Bnb86WB17lGi1mJqvxtygd7za3zqTFaYjfZJY22Zxhx
-         82tjvjiERWaV0Yt8ZqtypoDKflVAblaEOMwz6De3hPO1oN+J4thsHfe7IhMjPM4f9vzY
-         7KAKmVbgfZKj2sH/BeUJ6fCaZrsjP79n5Sfl/vPFusfBPpcILYmSLk3eh1Dy43dOJL87
-         2WTw==
-X-Gm-Message-State: AOAM530bhtu6+RkmEZpogtJgUxdROzQTUK2XsEI7R0YXnSFuAtjx2e2X
-        yl1V8OEEuJPvrEpbgOi6IDA=
-X-Google-Smtp-Source: ABdhPJz5smjYQcDGdXsq8Ug+fgHwHPeIMnfqM9kX0E57nHrzErZZpyVOrifVPC/iAZURBZCGoIl/9Q==
-X-Received: by 2002:a17:906:aad8:: with SMTP id kt24mr7265073ejb.527.1592398555771;
-        Wed, 17 Jun 2020 05:55:55 -0700 (PDT)
-Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
-        by smtp.gmail.com with ESMTPSA id mh14sm13501385ejb.116.2020.06.17.05.55.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 05:55:54 -0700 (PDT)
-Date:   Wed, 17 Jun 2020 14:55:53 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
-        Waiman Long <longman@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Rientjes <rientjes@google.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
-Message-ID: <20200617125553.GO9499@dhcp22.suse.cz>
-References: <20200616015718.7812-1-longman@redhat.com>
- <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
- <20200616230130.GJ27795@twin.jikos.cz>
- <20200617003711.GD8681@bombadil.infradead.org>
- <20200617071212.GJ9499@dhcp22.suse.cz>
- <20200617110820.GG8681@bombadil.infradead.org>
- <20200617113157.GM9499@dhcp22.suse.cz>
- <20200617122321.GJ8681@bombadil.infradead.org>
+        Wed, 17 Jun 2020 10:39:26 -0400
+Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 82D7ACECD7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:16 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 02/14] Bluetooth: Add bdaddr_list_with_flags for classic whitelist
+Date:   Wed, 17 Jun 2020 16:39:08 +0200
+Message-Id: <0ec7794d0a40d3462433de4fe57f74b3c7f5a9b7.1592404644.git.marcel@holtmann.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
+References: <cover.1592404644.git.marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200617122321.GJ8681@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed 17-06-20 05:23:21, Matthew Wilcox wrote:
-> On Wed, Jun 17, 2020 at 01:31:57PM +0200, Michal Hocko wrote:
-> > On Wed 17-06-20 04:08:20, Matthew Wilcox wrote:
-> > > If you call vfree() under
-> > > a spinlock, you're in trouble.  in_atomic() only knows if we hold a
-> > > spinlock for CONFIG_PREEMPT, so it's not safe to check for in_atomic()
-> > > in __vfree().  So we need the warning in order that preempt people can
-> > > tell those without that there is a bug here.
-> > 
-> > ... Unless I am missing something in_interrupt depends on preempt_count() as
-> > well so neither of the two is reliable without PREEMPT_COUNT configured.
-> 
-> preempt_count() always tracks whether we're in interrupt context,
-> regardless of CONFIG_PREEMPT.  The difference is that CONFIG_PREEMPT
-> will track spinlock acquisitions as well.
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-Right you are! Thanks for the clarification. I find the situation
-around preempt_count quite confusing TBH. Looking at existing users
-of in_atomic() (e.g. a random one zd_usb_iowrite16v_async which check
-in_atomic and then does GFP_KERNEL allocation which would be obviously
-broken on !PREEMPT if the function can be called from an atomic
-context), I am wondering whether it would make sense to track atomic
-context also for !PREEMPT. This check is just terribly error prone.
+In order to more easily add device flags to classic devices, create
+a new type of bdaddr_list that supports setting flags.
 
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h | 18 ++++++++--
+ net/bluetooth/hci_core.c         | 58 ++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  8 ++---
+ net/bluetooth/mgmt.c             |  5 +--
+ 4 files changed, 81 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0d5dbb6cb5a0..95a3935325bb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -136,6 +136,13 @@ struct bdaddr_list_with_irk {
+ 	u8 local_irk[16];
+ };
+ 
++struct bdaddr_list_with_flags {
++	struct list_head list;
++	bdaddr_t bdaddr;
++	u8 bdaddr_type;
++	u32 current_flags;
++};
++
+ struct bt_uuid {
+ 	struct list_head list;
+ 	u8 uuid[16];
+@@ -1169,12 +1176,19 @@ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
+ struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
+ 				    struct list_head *list, bdaddr_t *bdaddr,
+ 				    u8 type);
++struct bdaddr_list_with_flags *
++hci_bdaddr_list_lookup_with_flags(struct list_head *list, bdaddr_t *bdaddr,
++				  u8 type);
+ int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
+ int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+-					u8 type, u8 *peer_irk, u8 *local_irk);
++				 u8 type, u8 *peer_irk, u8 *local_irk);
++int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
++				   u8 type, u32 flags);
+ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
+ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+-								u8 type);
++				 u8 type);
++int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
++				   u8 type);
+ void hci_bdaddr_list_clear(struct list_head *list);
+ 
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4f1052a7c488..8a471bec2731 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3023,6 +3023,20 @@ struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
+ 	return NULL;
+ }
+ 
++struct bdaddr_list_with_flags *
++hci_bdaddr_list_lookup_with_flags(struct list_head *bdaddr_list,
++				  bdaddr_t *bdaddr, u8 type)
++{
++	struct bdaddr_list_with_flags *b;
++
++	list_for_each_entry(b, bdaddr_list, list) {
++		if (!bacmp(&b->bdaddr, bdaddr) && b->bdaddr_type == type)
++			return b;
++	}
++
++	return NULL;
++}
++
+ void hci_bdaddr_list_clear(struct list_head *bdaddr_list)
+ {
+ 	struct bdaddr_list *b, *n;
+@@ -3084,6 +3098,30 @@ int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
++int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
++				   u8 type, u32 flags)
++{
++	struct bdaddr_list_with_flags *entry;
++
++	if (!bacmp(bdaddr, BDADDR_ANY))
++		return -EBADF;
++
++	if (hci_bdaddr_list_lookup(list, bdaddr, type))
++		return -EEXIST;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	bacpy(&entry->bdaddr, bdaddr);
++	entry->bdaddr_type = type;
++	entry->current_flags = flags;
++
++	list_add(&entry->list, list);
++
++	return 0;
++}
++
+ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type)
+ {
+ 	struct bdaddr_list *entry;
+@@ -3123,6 +3161,26 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
++int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
++				   u8 type)
++{
++	struct bdaddr_list_with_flags *entry;
++
++	if (!bacmp(bdaddr, BDADDR_ANY)) {
++		hci_bdaddr_list_clear(list);
++		return 0;
++	}
++
++	entry = hci_bdaddr_list_lookup_with_flags(list, bdaddr, type);
++	if (!entry)
++		return -ENOENT;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	return 0;
++}
++
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cfeaee347db3..8981954ff4c4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2697,10 +2697,10 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_MGMT) &&
+ 	    !hci_dev_test_flag(hdev, HCI_CONNECTABLE) &&
+-	    !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
+-				    BDADDR_BREDR)) {
+-		    hci_reject_conn(hdev, &ev->bdaddr);
+-		    return;
++	    !hci_bdaddr_list_lookup_with_flags(&hdev->whitelist, &ev->bdaddr,
++					       BDADDR_BREDR)) {
++		hci_reject_conn(hdev, &ev->bdaddr);
++		return;
+ 	}
+ 
+ 	/* Connection accepted */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ecfdfc4df486..d0d0fa832c8a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6000,8 +6000,9 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 			goto unlock;
+ 		}
+ 
+-		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
+-					  cp->addr.type);
++		err = hci_bdaddr_list_add_with_flags(&hdev->whitelist,
++						     &cp->addr.bdaddr,
++						     cp->addr.type, 0);
+ 		if (err)
+ 			goto unlock;
+ 
 -- 
-Michal Hocko
-SUSE Labs
+2.26.2
+
