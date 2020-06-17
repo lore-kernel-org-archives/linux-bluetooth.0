@@ -2,130 +2,212 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EF7C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 07:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F00C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 07:49:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 552FE206D8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 07:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592377940;
-	bh=R+eM1qGvKUN1HiDySxCpFv8ACpnCrS/luvzLeM7dI8o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=oqr3+rb/8eUSAq6k25t/OsgY/pkVV5/biv3TqHJb8IcEPtGtlLA9STyKdVY2AWIr+
-	 SQiFvZh9sB33VB3EV89CmB4nkFWm4FCKK2f4B4dLvCQUd7upLS8GNMof7kLwG8yC/s
-	 8M4PRnX2r6TBZG3vj9vIjBMETLYhakVgJtiBUzZI=
+	by mail.kernel.org (Postfix) with ESMTP id E1B94208D5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 07:49:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="XOOIql9Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726134AbgFQHMT (ORCPT
+        id S1725873AbgFQHt4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 03:12:19 -0400
-Received: from mail-ej1-f65.google.com ([209.85.218.65]:34229 "EHLO
-        mail-ej1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725860AbgFQHMT (ORCPT
+        Wed, 17 Jun 2020 03:49:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53640 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbgFQHtz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 03:12:19 -0400
-Received: by mail-ej1-f65.google.com with SMTP id l27so1176601ejc.1;
-        Wed, 17 Jun 2020 00:12:15 -0700 (PDT)
+        Wed, 17 Jun 2020 03:49:55 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AAEFC061573
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 00:49:54 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id n24so1639697lji.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 00:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=IwFpNEPNq9wxv3xJ7gG8eHJ66U4NFq8U8PuusGH9/YQ=;
+        b=XOOIql9QXrE51u0F/d1Gqy51CviKGQPs1i6JHSM/E/256c6OSeAnUEsNG/HCvILzsh
+         hP/bxVTJoHrcgVOASHx8lxpdPQirF1WbyXUGyRuRP5EsK2Neai8J7jPGTntiaM/LNHlS
+         wqZI1gwfvlimEqfxNxTS73RvTabMPQbeKGyLTsN0cFvD7lbZ50iYiJ8nfjrXpQBfH67V
+         8H65r8WylPLOMvLG5g3aaE4S8WA76+pik0+IaqwMR5k2RVyH5OOh6SPdh8HyQ6O9givn
+         96fkZOQzOjdJ/h6K2dj87R+F8MRidm2EXVlKVXbInFfWdPrKBbnwawGQkoZj3A5WNt7X
+         LsoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=E5EcWVbc+7tsS+GAmjqiwsU8zuC9ZQ4KDsXaJSfWulo=;
-        b=hpp62K4a8CwZm2UreL6e+o7U64jJN0cGZO64x4/KaxFcj3JVTRwtGgvvphlWOGIwmB
-         mKDjFk36BUKL84X0A9sBPYLln2swyjTrxBpOKfntaidgraTsEqWSInVYjR+f229KLn86
-         JQgPgDrHQKjlcGt4G5FRUs/LnXp6LNLqNd3mRfMJQtEv721UDpyA2floMIWMSRRU63gC
-         qmC2URd5guep9hGNbmRJS4tl3WdSME9dwc9fVWomUGjNxDBIdLQAdimTtHyDG+qL4Z/x
-         N3yZtL4KoRdctI+kyJccwtPMuNdYqp+mPDxIX3roHMzcx6zoabwiEq+N3FeX8asH5wbJ
-         BPbw==
-X-Gm-Message-State: AOAM532QhxsCV6VV0nmw55nyn7fUqk+2MaOyho+lUa6ubnTkcAd2T2f0
-        jAq+dwgSw/eEUQy0iHHJ2nc=
-X-Google-Smtp-Source: ABdhPJzxXEZ/32Vk1uutSgWgDm/2Kml+FRFv6q/oUOzaHXvM3d9a7wcEm5DrSyb0iZ8v3ZPtZ+pKKg==
-X-Received: by 2002:a17:906:2581:: with SMTP id m1mr6681797ejb.89.1592377934427;
-        Wed, 17 Jun 2020 00:12:14 -0700 (PDT)
-Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
-        by smtp.gmail.com with ESMTPSA id g22sm12516138ejo.1.2020.06.17.00.12.13
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=IwFpNEPNq9wxv3xJ7gG8eHJ66U4NFq8U8PuusGH9/YQ=;
+        b=MhqnAB7BOGajluo3BdJpELUILPmxs92OxjPIrXyk98gfmfEshf7b2KwHRSaTmhqmiK
+         drDmqt8TfTF2jvFrRan8Jf+e22uQ70WYK/jiLARIF0Av4tbLRcQAAHbnpbNZmZYDyH5f
+         KEhM6A+arpzVfgUPG93HM7jBijRdbG7m7v9dV9UUJwY66XYWSRbWJe4XjMHCwXkEkbsd
+         IWnshVFcXNk1iRRMe9J2YeAmzzR/3lzo6XGlDNdsT0yiIPQGNzoKIRKM5iCIUmSFhbl4
+         1gwwAeixCU+IRqFVBuZuBkKfj2VmTwPd5wt+L4ReC6iVzoM1GgV+CeL1YGWew9lYQakD
+         2SeQ==
+X-Gm-Message-State: AOAM531+445uxiscNaKT43qjDMtFcftI+H/XfxTO/X77T/nphhNyJM25
+        NtLasYE9TEKWkTm0BHu+jUWRNOGVIp4eYQ==
+X-Google-Smtp-Source: ABdhPJxiQwl1paUQ2qAD3HP+dq5tZeodHd0FL/+6lhF7TWmepOX+SG4Lg9EdB5TZa2Q43Xq8/fQWHA==
+X-Received: by 2002:a2e:1311:: with SMTP id 17mr3347715ljt.122.1592380192251;
+        Wed, 17 Jun 2020 00:49:52 -0700 (PDT)
+Received: from mlowasrzechonek2133 ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id l22sm4826539lji.120.2020.06.17.00.49.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 00:12:13 -0700 (PDT)
-Date:   Wed, 17 Jun 2020 09:12:12 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
-        Waiman Long <longman@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Rientjes <rientjes@google.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
-Message-ID: <20200617071212.GJ9499@dhcp22.suse.cz>
-References: <20200616015718.7812-1-longman@redhat.com>
- <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
- <20200616230130.GJ27795@twin.jikos.cz>
- <20200617003711.GD8681@bombadil.infradead.org>
+        Wed, 17 Jun 2020 00:49:51 -0700 (PDT)
+Date:   Wed, 17 Jun 2020 09:50:15 +0200
+From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        <michal.lowas-rzechonek@silvair.com>
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: Re: [PATCH BlueZ v2] mesh: Add deferral of Attach() and Leave() if
+ busy
+Message-ID: <20200617075015.4hntygf64dzz6fka@mlowasrzechonek2133>
+Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
+        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+References: <20200616181436.50319-1-brian.gix@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200617003711.GD8681@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200616181436.50319-1-brian.gix@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue 16-06-20 17:37:11, Matthew Wilcox wrote:
-> On Wed, Jun 17, 2020 at 01:01:30AM +0200, David Sterba wrote:
-> > On Tue, Jun 16, 2020 at 11:53:50AM -0700, Joe Perches wrote:
-> > > On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
-> > > >  v4:
-> > > >   - Break out the memzero_explicit() change as suggested by Dan Carpenter
-> > > >     so that it can be backported to stable.
-> > > >   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
-> > > >     now as there can be a bit more discussion on what is best. It will be
-> > > >     introduced as a separate patch later on after this one is merged.
-> > > 
-> > > To this larger audience and last week without reply:
-> > > https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
-> > > 
-> > > Are there _any_ fastpath uses of kfree or vfree?
-> > 
-> > I'd consider kfree performance critical for cases where it is called
-> > under locks. If possible the kfree is moved outside of the critical
-> > section, but we have rbtrees or lists that get deleted under locks and
-> > restructuring the code to do eg. splice and free it outside of the lock
-> > is not always possible.
+On 06/16, Brian Gix wrote:
+> We require the successful return of JoinComplete() method before
+> handling subsequent Attach() or Leave() method calls. To simplify the
+> construction of Applications, we will accept one of these calls up to 1
+> second prior to receiving the final return status of JoinComplete,
+> which tells us that the Application is ready to use the node.
 > 
-> Not just performance critical, but correctness critical.  Since kvfree()
-> may allocate from the vmalloc allocator, I really think that kvfree()
-> should assert that it's !in_atomic().  Otherwise we can get into trouble
-> if we end up calling vfree() and have to take the mutex.
+> If the node is still not ready after the deferral, Attach and/or Leave
+> will fail.
 
-FWIW __vfree already checks for atomic context and put the work into a
-deferred context. So this should be safe. It should be used as a last
-resort, though.
+Nice, I think this solution is simpler than the patch I came up with.
+
+> ---
+>  mesh/mesh.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 52 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mesh/mesh.c b/mesh/mesh.c
+> index ab2393deb..bc170371d 100644
+> --- a/mesh/mesh.c
+> +++ b/mesh/mesh.c
+> @@ -104,6 +104,10 @@ static struct l_queue *pending_queue;
+>  
+>  static const char *storage_dir;
+>  
+> +/* Forward static decalrations */
+> +static void def_attach(struct l_timeout *timeout, void *user_data);
+> +static void def_leave(struct l_timeout *timeout, void *user_data);
+> +
+>  static bool simple_match(const void *a, const void *b)
+>  {
+>  	return a == b;
+> @@ -634,12 +638,26 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
+>  	uint64_t token;
+>  	const char *app_path, *sender;
+>  	struct l_dbus_message *pending_msg;
+> +	struct mesh_node *node;
+>  
+>  	l_debug("Attach");
+>  
+>  	if (!l_dbus_message_get_arguments(msg, "ot", &app_path, &token))
+>  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+>  
+> +	node = node_find_by_token(token);
+> +	if (!node)
+> +		return dbus_error(msg, MESH_ERROR_NOT_FOUND, "Attach failed");
+> +
+> +	if (node_is_busy(node)) {
+> +		if (user_data)
+> +			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
+> +
+> +		/* Try once more in 1 second */
+> +		l_timeout_create(1, def_attach, l_dbus_message_ref(msg), NULL);
+> +		return NULL;
+> +	}
+> +
+>  	sender = l_dbus_message_get_sender(msg);
+>  
+>  	pending_msg = l_dbus_message_ref(msg);
+> @@ -650,6 +668,19 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
+>  	return NULL;
+>  }
+>  
+> +static void def_attach(struct l_timeout *timeout, void *user_data)
+> +{
+> +	struct l_dbus *dbus = dbus_get_bus();
+> +	struct l_dbus_message *msg = user_data;
+> +	struct l_dbus_message *reply;
+> +
+> +	l_timeout_remove(timeout);
+> +
+> +	reply = attach_call(dbus, msg, (void *) true);
+
+Why not pass NULL as the 3rd argument? We register the interface with
+empty user data, so this would be an equivalent.
+
+> +	l_dbus_send(dbus, reply);
+> +	l_dbus_message_unref(msg);
+> +}
+> +
+>  static struct l_dbus_message *leave_call(struct l_dbus *dbus,
+>  						struct l_dbus_message *msg,
+>  						void *user_data)
+> @@ -666,14 +697,33 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
+>  	if (!node)
+>  		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+>  
+> -	if (node_is_busy(node))
+> -		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
+> +	if (node_is_busy(node)) {
+> +		if (user_data)
+> +			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
+> +
+> +		/* Try once more in 1 second */
+> +		l_timeout_create(1, def_leave, l_dbus_message_ref(msg), NULL);
+> +		return NULL;
+> +	}
+>  
+>  	node_remove(node);
+>  
+>  	return l_dbus_message_new_method_return(msg);
+>  }
+>  
+> +static void def_leave(struct l_timeout *timeout, void *user_data)
+> +{
+> +	struct l_dbus *dbus = dbus_get_bus();
+> +	struct l_dbus_message *msg = user_data;
+> +	struct l_dbus_message *reply;
+> +
+> +	l_timeout_remove(timeout);
+> +
+> +	reply = leave_call(dbus, msg, (void *) true);
+
+Same here.
+
+> +	l_dbus_send(dbus, reply);
+> +	l_dbus_message_unref(msg);
+> +}
+> +
+>  static void create_join_complete_reply_cb(struct l_dbus_message *msg,
+>  								void *user_data)
+>  {
+> -- 
+> 2.25.4
+> 
 
 -- 
-Michal Hocko
-SUSE Labs
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
