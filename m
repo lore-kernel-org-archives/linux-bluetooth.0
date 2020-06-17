@@ -2,76 +2,125 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27A3C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2D3C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD0D820739
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18C22208B3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbgFQKdu convert rfc822-to-8bit (ORCPT
+        id S1726572AbgFQKmL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 06:33:50 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60498 "EHLO
+        Wed, 17 Jun 2020 06:42:11 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50022 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725554AbgFQKdt (ORCPT
+        with ESMTP id S1725894AbgFQKmL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 06:33:49 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 66051CECD1;
-        Wed, 17 Jun 2020 12:43:39 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: Terminate the link if pairing is cancelled
+        Wed, 17 Jun 2020 06:42:11 -0400
+Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AC42ACECD3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 12:52:01 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200616092341.v2.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
-Date:   Wed, 17 Jun 2020 12:33:47 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4F76321E-918F-4A16-B35A-888733D5B75D@holtmann.org>
-References: <20200616092341.v2.1.I9dd050ead919f2cc3ef83d4e866de537c7799cf3@changeid>
-To:     Manish Mandlik <mmandlik@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 01/14] Bluetooth: mgmt: Add commands for runtime configuration
+Date:   Wed, 17 Jun 2020 12:41:52 +0200
+Message-Id: <33f8fb3c32ce1940f2cb41adfe440ca0f77fc39c.1592390407.git.marcel@holtmann.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1592390407.git.marcel@holtmann.org>
+References: <cover.1592390407.git.marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+This adds the required read/set commands for runtime configuration. Even
+while currently no parameters are specified, the commands are made
+available.
 
-> If user decides to cancel the ongoing pairing process (e.g. by clicking
-> the cancel button on pairing/passkey window), abort any ongoing pairing
-> and then terminate the link if it was created because of the pair
-> device action.
-> 
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> ---
-> 
-> Changes in v2:
-> - Added code to track if the connection was triggered because of the pair
->  device action and then only terminate the link on pairing cancel.
-> 
-> include/net/bluetooth/hci_core.h | 14 ++++++++++++--
-> net/bluetooth/hci_conn.c         | 11 ++++++++---
-> net/bluetooth/l2cap_core.c       |  6 ++++--
-> net/bluetooth/mgmt.c             | 22 ++++++++++++++++++----
-> 4 files changed, 42 insertions(+), 11 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c        |  7 +++++++
+ net/bluetooth/mgmt_config.c | 18 ++++++++++++++++++
+ net/bluetooth/mgmt_config.h |  6 ++++++
+ 3 files changed, 31 insertions(+)
 
-patch has been added to my local tree. I will send an update with all pending patches in a bit.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 99fbfd467d04..ecfdfc4df486 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -114,6 +114,8 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_EXP_FEATURE,
+ 	MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+ 	MGMT_OP_SET_DEF_SYSTEM_CONFIG,
++	MGMT_OP_READ_DEF_RUNTIME_CONFIG,
++	MGMT_OP_SET_DEF_RUNTIME_CONFIG,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -166,6 +168,7 @@ static const u16 mgmt_untrusted_commands[] = {
+ 	MGMT_OP_READ_SECURITY_INFO,
+ 	MGMT_OP_READ_EXP_FEATURES_INFO,
+ 	MGMT_OP_READ_DEF_SYSTEM_CONFIG,
++	MGMT_OP_READ_DEF_RUNTIME_CONFIG,
+ };
+ 
+ static const u16 mgmt_untrusted_events[] = {
+@@ -7305,6 +7308,10 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_UNTRUSTED },
+ 	{ set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ read_def_runtime_config, MGMT_READ_DEF_RUNTIME_CONFIG_SIZE,
++						HCI_MGMT_UNTRUSTED },
++	{ set_def_runtime_config,  MGMT_SET_DEF_RUNTIME_CONFIG_SIZE,
++						HCI_MGMT_VAR_LEN },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index f6dfbe93542c..8e7ad2a51dbb 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -251,3 +251,21 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			       MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+ 			       MGMT_STATUS_SUCCESS);
+ }
++
++int read_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
++			    u16 data_len)
++{
++	bt_dev_dbg(hdev, "sock %p", sk);
++
++	return mgmt_cmd_complete(sk, hdev->id,
++				 MGMT_OP_READ_DEF_RUNTIME_CONFIG, 0, NULL, 0);
++}
++
++int set_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
++			   u16 data_len)
++{
++	bt_dev_dbg(hdev, "sock %p", sk);
++
++	return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
++			       MGMT_STATUS_INVALID_PARAMS);
++}
+diff --git a/net/bluetooth/mgmt_config.h b/net/bluetooth/mgmt_config.h
+index 51da6e63b1a0..a4965f107891 100644
+--- a/net/bluetooth/mgmt_config.h
++++ b/net/bluetooth/mgmt_config.h
+@@ -9,3 +9,9 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 data_len);
++
++int read_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
++			    u16 data_len);
++
++int set_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
++			   u16 data_len);
+-- 
+2.26.2
 
