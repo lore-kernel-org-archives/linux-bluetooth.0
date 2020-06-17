@@ -2,163 +2,127 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 683BBC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBB1C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:56:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C15820FC3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:52:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZjCgzjoI"
+	by mail.kernel.org (Postfix) with ESMTP id 5E29120FC3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 12:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592398575;
+	bh=nYFO/oI254U78ynuhC4MshoQshU2kuGAPO7lVMtzojE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=L+e1yQGaNQQCSIGMT7FeHieewFVDgvkC+E3mynSk1je7nLndLbQ8h3IMufYmRoleD
+	 7gS1nk2U/YndWZRX9KJxL6iKaF7efK9BY9i5qCb+u5cGHcrQWhHs1ZKmKJLeTWHbc0
+	 xQnrrk1MKZ4Fpven+Z+NDy0Ieg4gU/rZNgxxr6Eo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbgFQMwD (ORCPT
+        id S1726326AbgFQM4D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 08:52:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44006 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbgFQMwC (ORCPT
+        Wed, 17 Jun 2020 08:56:03 -0400
+Received: from mail-ej1-f67.google.com ([209.85.218.67]:46289 "EHLO
+        mail-ej1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbgFQM4B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 08:52:02 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48965C06174E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 05:52:02 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id s1so2744827ljo.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 05:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ydc4Anp7yqvrtJe1VckMIJmtVzaa7m1psqY7l5LknoE=;
-        b=ZjCgzjoI0hBRmEg86l18ac2TqJaeKjuYMSO9RVxaxqvOPwYrV0XCeJIS/pEoMKED9p
-         8cQBdZ5Nwvzep4ZkXoGsenwU6gbdl7unGcpOD7qeiZHOqeaId377utONIZpquD7sJAjj
-         nqeU/V1/STz5I7IXx84oPv+fXmm/QdpSlTzvtJ1zHZ6rGqxt9Qtngmpj9r5uAbZklkxh
-         dzPsRigkywp/QNY/M/MBXxc0jmNTRlD1CP5YapSBIN/V7NOXwYkxTQwHLWLowuKnlvi7
-         mTYywCHRjbRHvSudJbWTxssZQNYzXuov+Z53cbRIRUfcvvUw0dX+8LLMpN3QR9wYyLz5
-         EhQg==
+        Wed, 17 Jun 2020 08:56:01 -0400
+Received: by mail-ej1-f67.google.com with SMTP id p20so2155867ejd.13;
+        Wed, 17 Jun 2020 05:55:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ydc4Anp7yqvrtJe1VckMIJmtVzaa7m1psqY7l5LknoE=;
-        b=hRa2H2H718pduW7j5uBElpeWbM+NI1Z5gHJvN0+C4T+gPLjn7Hw1L4A8ZglAe97hBM
-         F9ZoR4j87oRo6PouW+b7OEMjagrmCcYLN7Aov5I/xZGWSCdaMXaV+l1ZXv8mZlpGGf98
-         KFkA2M5fZ07mcBVR9IjTY/n2VdQjT7raCHeNd5aFou1E5goBzj9RzaUoIqus8gWZP9D8
-         iSbcyH0/zTCWhzdXxbpyxyv+docqUjtklCDoi2Oh0YyXkWL8DpiyU/DSexgUGfALkoZV
-         RddZ12rx5Y3WM4hJvB2vy1kioK8XGxF83O/9V0wb6E+dQAqDHZMaYQsaGCBu53ikA9Qd
-         wn4w==
-X-Gm-Message-State: AOAM532hEzk1wWwx74Y9b2qqxVE3PZxXKqn1GW34lgQOcBSu0DdCrc5A
-        oivbVzhpf4m2PgQyuHGQh47OKHAnx+fhBUN+0c/2OtxjW+g=
-X-Google-Smtp-Source: ABdhPJyefdY2FLhLAz0mvOvN4thuiBVrBcPST7C2kcEvt/XJjXbhDnQWqOux4rLmwJxy1rqOvH12JJcwBp+U6ELDjkk=
-X-Received: by 2002:a2e:890d:: with SMTP id d13mr4049371lji.75.1592398320495;
- Wed, 17 Jun 2020 05:52:00 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fOVgSeVqTVqWvUfLoOdj4nt+48hh42lucWZp1VWswtg=;
+        b=dH49tmuZwIi2AW45bvCm3iTsdIn3uF71ykSn9PsnXeadpR8w4CiekLmYpZM958HwJD
+         ibgE+xf/ARAeXcjze6WrTSv5kWz7b8jTpIZP8lCgh3Ylunh3gjcMdzhvwrFj+vqHznwg
+         rXWDmWvWLvm2e4k8WV0pN2mW4Bnb86WB17lGi1mJqvxtygd7za3zqTFaYjfZJY22Zxhx
+         82tjvjiERWaV0Yt8ZqtypoDKflVAblaEOMwz6De3hPO1oN+J4thsHfe7IhMjPM4f9vzY
+         7KAKmVbgfZKj2sH/BeUJ6fCaZrsjP79n5Sfl/vPFusfBPpcILYmSLk3eh1Dy43dOJL87
+         2WTw==
+X-Gm-Message-State: AOAM530bhtu6+RkmEZpogtJgUxdROzQTUK2XsEI7R0YXnSFuAtjx2e2X
+        yl1V8OEEuJPvrEpbgOi6IDA=
+X-Google-Smtp-Source: ABdhPJz5smjYQcDGdXsq8Ug+fgHwHPeIMnfqM9kX0E57nHrzErZZpyVOrifVPC/iAZURBZCGoIl/9Q==
+X-Received: by 2002:a17:906:aad8:: with SMTP id kt24mr7265073ejb.527.1592398555771;
+        Wed, 17 Jun 2020 05:55:55 -0700 (PDT)
+Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
+        by smtp.gmail.com with ESMTPSA id mh14sm13501385ejb.116.2020.06.17.05.55.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2020 05:55:54 -0700 (PDT)
+Date:   Wed, 17 Jun 2020 14:55:53 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
+        Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Rientjes <rientjes@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Message-ID: <20200617125553.GO9499@dhcp22.suse.cz>
+References: <20200616015718.7812-1-longman@redhat.com>
+ <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+ <20200616230130.GJ27795@twin.jikos.cz>
+ <20200617003711.GD8681@bombadil.infradead.org>
+ <20200617071212.GJ9499@dhcp22.suse.cz>
+ <20200617110820.GG8681@bombadil.infradead.org>
+ <20200617113157.GM9499@dhcp22.suse.cz>
+ <20200617122321.GJ8681@bombadil.infradead.org>
 MIME-Version: 1.0
-References: <cover.1592390407.git.marcel@holtmann.org> <33f8fb3c32ce1940f2cb41adfe440ca0f77fc39c.1592390407.git.marcel@holtmann.org>
-In-Reply-To: <33f8fb3c32ce1940f2cb41adfe440ca0f77fc39c.1592390407.git.marcel@holtmann.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Wed, 17 Jun 2020 08:51:48 -0400
-Message-ID: <CALWDO_XOhECFiQcpcMTxs_MPubcv3HVHZKXSgxbPFRLA6w1atQ@mail.gmail.com>
-Subject: Re: [PATCH 01/14] Bluetooth: mgmt: Add commands for runtime configuration
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200617122321.GJ8681@bombadil.infradead.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On Wed 17-06-20 05:23:21, Matthew Wilcox wrote:
+> On Wed, Jun 17, 2020 at 01:31:57PM +0200, Michal Hocko wrote:
+> > On Wed 17-06-20 04:08:20, Matthew Wilcox wrote:
+> > > If you call vfree() under
+> > > a spinlock, you're in trouble.  in_atomic() only knows if we hold a
+> > > spinlock for CONFIG_PREEMPT, so it's not safe to check for in_atomic()
+> > > in __vfree().  So we need the warning in order that preempt people can
+> > > tell those without that there is a bug here.
+> > 
+> > ... Unless I am missing something in_interrupt depends on preempt_count() as
+> > well so neither of the two is reliable without PREEMPT_COUNT configured.
+> 
+> preempt_count() always tracks whether we're in interrupt context,
+> regardless of CONFIG_PREEMPT.  The difference is that CONFIG_PREEMPT
+> will track spinlock acquisitions as well.
 
+Right you are! Thanks for the clarification. I find the situation
+around preempt_count quite confusing TBH. Looking at existing users
+of in_atomic() (e.g. a random one zd_usb_iowrite16v_async which check
+in_atomic and then does GFP_KERNEL allocation which would be obviously
+broken on !PREEMPT if the function can be called from an atomic
+context), I am wondering whether it would make sense to track atomic
+context also for !PREEMPT. This check is just terribly error prone.
 
-On Wed, Jun 17, 2020 at 6:42 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> This adds the required read/set commands for runtime configuration. Even
-> while currently no parameters are specified, the commands are made
-> available.
->
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c        |  7 +++++++
->  net/bluetooth/mgmt_config.c | 18 ++++++++++++++++++
->  net/bluetooth/mgmt_config.h |  6 ++++++
->  3 files changed, 31 insertions(+)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 99fbfd467d04..ecfdfc4df486 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -114,6 +114,8 @@ static const u16 mgmt_commands[] = {
->         MGMT_OP_SET_EXP_FEATURE,
->         MGMT_OP_READ_DEF_SYSTEM_CONFIG,
->         MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-> +       MGMT_OP_READ_DEF_RUNTIME_CONFIG,
-> +       MGMT_OP_SET_DEF_RUNTIME_CONFIG,
->  };
->
->  static const u16 mgmt_events[] = {
-> @@ -166,6 +168,7 @@ static const u16 mgmt_untrusted_commands[] = {
->         MGMT_OP_READ_SECURITY_INFO,
->         MGMT_OP_READ_EXP_FEATURES_INFO,
->         MGMT_OP_READ_DEF_SYSTEM_CONFIG,
-> +       MGMT_OP_READ_DEF_RUNTIME_CONFIG,
->  };
->
->  static const u16 mgmt_untrusted_events[] = {
-> @@ -7305,6 +7308,10 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
->                                                 HCI_MGMT_UNTRUSTED },
->         { set_def_system_config,   MGMT_SET_DEF_SYSTEM_CONFIG_SIZE,
->                                                 HCI_MGMT_VAR_LEN },
-> +       { read_def_runtime_config, MGMT_READ_DEF_RUNTIME_CONFIG_SIZE,
-> +                                               HCI_MGMT_UNTRUSTED },
-> +       { set_def_runtime_config,  MGMT_SET_DEF_RUNTIME_CONFIG_SIZE,
-> +                                               HCI_MGMT_VAR_LEN },
->  };
->
->  void mgmt_index_added(struct hci_dev *hdev)
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index f6dfbe93542c..8e7ad2a51dbb 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -251,3 +251,21 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->                                MGMT_OP_SET_DEF_SYSTEM_CONFIG,
->                                MGMT_STATUS_SUCCESS);
->  }
-> +
-> +int read_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> +                           u16 data_len)
-> +{
-> +       bt_dev_dbg(hdev, "sock %p", sk);
-> +
-> +       return mgmt_cmd_complete(sk, hdev->id,
-> +                                MGMT_OP_READ_DEF_RUNTIME_CONFIG, 0, NULL, 0);
-> +}
-> +
-> +int set_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> +                          u16 data_len)
-> +{
-> +       bt_dev_dbg(hdev, "sock %p", sk);
-> +
-> +       return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-> +                              MGMT_STATUS_INVALID_PARAMS);
-> +}
-> diff --git a/net/bluetooth/mgmt_config.h b/net/bluetooth/mgmt_config.h
-> index 51da6e63b1a0..a4965f107891 100644
-> --- a/net/bluetooth/mgmt_config.h
-> +++ b/net/bluetooth/mgmt_config.h
-> @@ -9,3 +9,9 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->
->  int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
->                           u16 data_len);
-> +
-> +int read_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> +                           u16 data_len);
-> +
-> +int set_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> +                          u16 data_len);
-> --
-> 2.26.2
->
+-- 
+Michal Hocko
+SUSE Labs
