@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70172C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAFBC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AAAD206F1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16E5C206F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727029AbgFQOj3 (ORCPT
+        id S1727058AbgFQOja (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 10:39:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51845 "EHLO
+        Wed, 17 Jun 2020 10:39:30 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52175 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726977AbgFQOj0 (ORCPT
+        with ESMTP id S1726986AbgFQOj2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 10:39:26 -0400
+        Wed, 17 Jun 2020 10:39:28 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 82D7ACECD7
+        by mail.holtmann.org (Postfix) with ESMTPSA id F0934CECDB
         for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:16 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/14] Bluetooth: Add bdaddr_list_with_flags for classic whitelist
-Date:   Wed, 17 Jun 2020 16:39:08 +0200
-Message-Id: <0ec7794d0a40d3462433de4fe57f74b3c7f5a9b7.1592404644.git.marcel@holtmann.org>
+Subject: [PATCH v2 06/14] Bluetooth: Add definitions for advertisement monitor features
+Date:   Wed, 17 Jun 2020 16:39:12 +0200
+Message-Id: <f485d7c275dae2e3d7f1e990caaf7c0706b0c36b.1592404644.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
 References: <cover.1592404644.git.marcel@holtmann.org>
@@ -38,179 +38,86 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+From: Miao-chen Chou <mcchou@chromium.org>
 
-In order to more easily add device flags to classic devices, create
-a new type of bdaddr_list that supports setting flags.
+This adds support for Advertisement Monitor API. Here are the commands
+and events added.
+- Read Advertisement Monitor Feature command
+- Add Advertisement Pattern Monitor command
+- Remove Advertisement Monitor command
+- Advertisement Monitor Added event
+- Advertisement Monitor Removed event
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 18 ++++++++--
- net/bluetooth/hci_core.c         | 58 ++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  8 ++---
- net/bluetooth/mgmt.c             |  5 +--
- 4 files changed, 81 insertions(+), 8 deletions(-)
+ include/net/bluetooth/mgmt.h | 49 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0d5dbb6cb5a0..95a3935325bb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -136,6 +136,13 @@ struct bdaddr_list_with_irk {
- 	u8 local_irk[16];
- };
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 8e47b0c5fe52..beae5c3980f0 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -741,6 +741,45 @@ struct mgmt_rp_set_device_flags {
+ 	struct mgmt_addr_info addr;
+ } __packed;
  
-+struct bdaddr_list_with_flags {
-+	struct list_head list;
-+	bdaddr_t bdaddr;
-+	u8 bdaddr_type;
-+	u32 current_flags;
-+};
++#define MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS    BIT(0)
 +
- struct bt_uuid {
- 	struct list_head list;
- 	u8 uuid[16];
-@@ -1169,12 +1176,19 @@ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
- struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
- 				    struct list_head *list, bdaddr_t *bdaddr,
- 				    u8 type);
-+struct bdaddr_list_with_flags *
-+hci_bdaddr_list_lookup_with_flags(struct list_head *list, bdaddr_t *bdaddr,
-+				  u8 type);
- int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
- int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
--					u8 type, u8 *peer_irk, u8 *local_irk);
-+				 u8 type, u8 *peer_irk, u8 *local_irk);
-+int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
-+				   u8 type, u32 flags);
- int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
- int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
--								u8 type);
-+				 u8 type);
-+int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
-+				   u8 type);
- void hci_bdaddr_list_clear(struct list_head *list);
- 
- struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4f1052a7c488..8a471bec2731 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3023,6 +3023,20 @@ struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
- 	return NULL;
- }
- 
-+struct bdaddr_list_with_flags *
-+hci_bdaddr_list_lookup_with_flags(struct list_head *bdaddr_list,
-+				  bdaddr_t *bdaddr, u8 type)
-+{
-+	struct bdaddr_list_with_flags *b;
++#define MGMT_OP_READ_ADV_MONITOR_FEATURES	0x0051
++#define MGMT_READ_ADV_MONITOR_FEATURES_SIZE	0
++struct mgmt_rp_read_adv_monitor_features {
++	__le32 supported_features;
++	__le32 enabled_features;
++	__le16 max_num_handles;
++	__u8 max_num_patterns;
++	__le16 num_handles;
++	__le16 handles[];
++}  __packed;
 +
-+	list_for_each_entry(b, bdaddr_list, list) {
-+		if (!bacmp(&b->bdaddr, bdaddr) && b->bdaddr_type == type)
-+			return b;
-+	}
++struct mgmt_adv_pattern {
++	__u8 ad_type;
++	__u8 offset;
++	__u8 length;
++	__u8 value[31];
++} __packed;
 +
-+	return NULL;
-+}
++#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR	0x0052
++struct mgmt_cp_add_adv_patterns_monitor {
++	__u8 pattern_count;
++	struct mgmt_adv_pattern patterns[];
++} __packed;
++#define MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE	1
++struct mgmt_rp_add_adv_patterns_monitor {
++	__le16 monitor_handle;
++} __packed;
 +
- void hci_bdaddr_list_clear(struct list_head *bdaddr_list)
- {
- 	struct bdaddr_list *b, *n;
-@@ -3084,6 +3098,30 @@ int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
- 	return 0;
- }
- 
-+int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
-+				   u8 type, u32 flags)
-+{
-+	struct bdaddr_list_with_flags *entry;
++#define MGMT_OP_REMOVE_ADV_MONITOR		0x0053
++struct mgmt_cp_remove_adv_monitor {
++	__le16 monitor_handle;
++} __packed;
++#define MGMT_REMOVE_ADV_MONITOR_SIZE		2
++struct mgmt_rp_remove_adv_monitor {
++	__le16 monitor_handle;
++} __packed;
 +
-+	if (!bacmp(bdaddr, BDADDR_ANY))
-+		return -EBADF;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+@@ -979,3 +1018,13 @@ struct mgmt_ev_device_flags_changed {
+ 	__le32 supported_flags;
+ 	__le32 current_flags;
+ } __packed;
 +
-+	if (hci_bdaddr_list_lookup(list, bdaddr, type))
-+		return -EEXIST;
++#define MGMT_EV_ADV_MONITOR_ADDED	0x002b
++struct mgmt_ev_adv_monitor_added {
++	__le16 monitor_handle;
++}  __packed;
 +
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	bacpy(&entry->bdaddr, bdaddr);
-+	entry->bdaddr_type = type;
-+	entry->current_flags = flags;
-+
-+	list_add(&entry->list, list);
-+
-+	return 0;
-+}
-+
- int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type)
- {
- 	struct bdaddr_list *entry;
-@@ -3123,6 +3161,26 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
- 	return 0;
- }
- 
-+int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
-+				   u8 type)
-+{
-+	struct bdaddr_list_with_flags *entry;
-+
-+	if (!bacmp(bdaddr, BDADDR_ANY)) {
-+		hci_bdaddr_list_clear(list);
-+		return 0;
-+	}
-+
-+	entry = hci_bdaddr_list_lookup_with_flags(list, bdaddr, type);
-+	if (!entry)
-+		return -ENOENT;
-+
-+	list_del(&entry->list);
-+	kfree(entry);
-+
-+	return 0;
-+}
-+
- /* This function requires the caller holds hdev->lock */
- struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- 					       bdaddr_t *addr, u8 addr_type)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cfeaee347db3..8981954ff4c4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2697,10 +2697,10 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_MGMT) &&
- 	    !hci_dev_test_flag(hdev, HCI_CONNECTABLE) &&
--	    !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
--				    BDADDR_BREDR)) {
--		    hci_reject_conn(hdev, &ev->bdaddr);
--		    return;
-+	    !hci_bdaddr_list_lookup_with_flags(&hdev->whitelist, &ev->bdaddr,
-+					       BDADDR_BREDR)) {
-+		hci_reject_conn(hdev, &ev->bdaddr);
-+		return;
- 	}
- 
- 	/* Connection accepted */
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ecfdfc4df486..d0d0fa832c8a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6000,8 +6000,9 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 			goto unlock;
- 		}
- 
--		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
--					  cp->addr.type);
-+		err = hci_bdaddr_list_add_with_flags(&hdev->whitelist,
-+						     &cp->addr.bdaddr,
-+						     cp->addr.type, 0);
- 		if (err)
- 			goto unlock;
- 
++#define MGMT_EV_ADV_MONITOR_REMOVED	0x002c
++struct mgmt_ev_adv_monitor_removed {
++	__le16 monitor_handle;
++}  __packed;
 -- 
 2.26.2
 
