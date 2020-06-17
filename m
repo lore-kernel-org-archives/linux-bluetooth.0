@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3DAC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF6CC433E4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9C76206F1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FA4E206F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbgFQOjc (ORCPT
+        id S1727065AbgFQOjc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 17 Jun 2020 10:39:32 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39578 "EHLO
+Received: from coyote.holtmann.net ([212.227.132.17]:60450 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727031AbgFQOja (ORCPT
+        with ESMTP id S1727054AbgFQOjb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 10:39:30 -0400
+        Wed, 17 Jun 2020 10:39:31 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C6B32CECE2
+        by mail.holtmann.org (Postfix) with ESMTPSA id AB81FCECE1
         for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:17 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 13/14] Bluetooth: Terminate the link if pairing is cancelled
-Date:   Wed, 17 Jun 2020 16:39:19 +0200
-Message-Id: <d9233675e37458675f209bd3a6b5636e6a8f752d.1592404644.git.marcel@holtmann.org>
+Subject: [PATCH v2 12/14] Bluetooth: Update background scan and report device based on advertisement monitors
+Date:   Wed, 17 Jun 2020 16:39:18 +0200
+Message-Id: <4c8aeca04ed20e2776cadd9bdb57a7a3632d622c.1592404644.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
 References: <cover.1592404644.git.marcel@holtmann.org>
@@ -38,182 +38,164 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Manish Mandlik <mmandlik@google.com>
+From: Miao-chen Chou <mcchou@chromium.org>
 
-If user decides to cancel the ongoing pairing process (e.g. by clicking
-the cancel button on pairing/passkey window), abort any ongoing pairing
-and then terminate the link if it was created because of the pair
-device action.
+This calls hci_update_background_scan() when there is any update on the
+advertisement monitors. If there is at least one advertisement monitor,
+the filtering policy of scan parameters should be 0x00. This also reports
+device found mgmt events if there is at least one monitor.
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+The following cases were tested with btmgmt advmon-* commands.
+(1) add a ADV monitor and observe that the passive scanning is
+triggered.
+(2) remove the last ADV monitor and observe that the passive scanning is
+terminated.
+(3) with a LE peripheral paired, repeat (1) and observe the passive
+scanning continues.
+(4) with a LE peripheral paired, repeat (2) and observe the passive
+scanning continues.
+(5) with a ADV monitor, suspend/resume the host and observe the passive
+scanning continues.
+
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 14 ++++++++++++--
- net/bluetooth/hci_conn.c         | 11 ++++++++---
- net/bluetooth/l2cap_core.c       |  6 ++++--
- net/bluetooth/mgmt.c             | 22 ++++++++++++++++++----
- 4 files changed, 42 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 13 +++++++++++++
+ net/bluetooth/hci_event.c        |  5 +++--
+ net/bluetooth/hci_request.c      | 17 ++++++++++++++---
+ net/bluetooth/mgmt.c             |  5 ++++-
+ 5 files changed, 35 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 524057598ffd..77d29341b064 100644
+index c54f9295892e..524057598ffd 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -564,6 +564,12 @@ struct hci_dev {
+@@ -1284,6 +1284,7 @@ void hci_adv_monitors_clear(struct hci_dev *hdev);
+ void hci_free_adv_monitor(struct adv_monitor *monitor);
+ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
+ int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle);
++bool hci_is_adv_monitoring(struct hci_dev *hdev);
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
  
-+enum conn_reasons {
-+	CONN_REASON_PAIR_DEVICE,
-+	CONN_REASON_L2CAP_CHAN,
-+	CONN_REASON_SCO_CONNECT,
-+};
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 59132b3e2cde..7959b851cc63 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3005,6 +3005,8 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
+ 		hci_free_adv_monitor(monitor);
+ 
+ 	idr_destroy(&hdev->adv_monitors_idr);
 +
- struct hci_conn {
- 	struct list_head list;
- 
-@@ -615,6 +621,8 @@ struct hci_conn {
- 	__s8		max_tx_power;
- 	unsigned long	flags;
- 
-+	enum conn_reasons conn_reason;
-+
- 	__u32		clock;
- 	__u16		clock_accuracy;
- 
-@@ -1040,12 +1048,14 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
- 
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout);
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 dst_type, u8 sec_level, u16 conn_timeout,
- 				u8 role, bdaddr_t *direct_rpa);
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type);
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9bdffc4e79b0..47f3a45d7dcb 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1174,7 +1174,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
- /* This function requires the caller holds hdev->lock */
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout)
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason)
- {
- 	struct hci_conn *conn;
- 
-@@ -1219,6 +1220,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
-+	conn->conn_reason = conn_reason;
- 
- 	hci_update_background_scan(hdev);
- 
-@@ -1228,7 +1230,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
++	hci_update_background_scan(hdev);
  }
  
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type)
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason)
- {
- 	struct hci_conn *acl;
+ void hci_free_adv_monitor(struct adv_monitor *monitor)
+@@ -3038,6 +3040,9 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
  
-@@ -1248,6 +1251,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 	hdev->adv_monitors_cnt++;
+ 	monitor->handle = handle;
++
++	hci_update_background_scan(hdev);
++
+ 	return 0;
+ }
  
- 	hci_conn_hold(acl);
- 
-+	acl->conn_reason = conn_reason;
- 	if (acl->state == BT_OPEN || acl->state == BT_CLOSED) {
- 		acl->sec_level = BT_SECURITY_LOW;
- 		acl->pending_sec_level = sec_level;
-@@ -1264,7 +1268,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING,
-+			      CONN_REASON_SCO_CONNECT);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fe913a5c754a..35d2bc569a2d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7893,11 +7893,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		else
- 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
- 						   chan->sec_level,
--						   HCI_LE_CONN_TIMEOUT);
-+						   HCI_LE_CONN_TIMEOUT,
-+						   CONN_REASON_L2CAP_CHAN);
- 
- 	} else {
- 		u8 auth_type = l2cap_get_auth_type(chan);
--		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
-+		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type,
-+				       CONN_REASON_L2CAP_CHAN);
+@@ -3069,9 +3074,17 @@ int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle)
+ 		idr_for_each(&hdev->adv_monitors_idr, &free_adv_monitor, hdev);
  	}
  
- 	if (IS_ERR(hcon)) {
++	hci_update_background_scan(hdev);
++
+ 	return 0;
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++bool hci_is_adv_monitoring(struct hci_dev *hdev)
++{
++	return !idr_is_empty(&hdev->adv_monitors_idr);
++}
++
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
+ 					 bdaddr_t *bdaddr, u8 type)
+ {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8981954ff4c4..e08d4dd9a24e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5447,14 +5447,15 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 
+ 	/* Passive scanning shouldn't trigger any device found events,
+ 	 * except for devices marked as CONN_REPORT for which we do send
+-	 * device found events.
++	 * device found events, or advertisement monitoring requested.
+ 	 */
+ 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
+ 		if (type == LE_ADV_DIRECT_IND)
+ 			return;
+ 
+ 		if (!hci_pend_le_action_lookup(&hdev->pend_le_reports,
+-					       bdaddr, bdaddr_type))
++					       bdaddr, bdaddr_type) &&
++		    idr_is_empty(&hdev->adv_monitors_idr))
+ 			return;
+ 
+ 		if (type == LE_ADV_NONCONN_IND || type == LE_ADV_SCAN_IND)
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index eee9c007a5fb..29decd7e8051 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -413,11 +413,15 @@ static void __hci_update_background_scan(struct hci_request *req)
+ 	 */
+ 	hci_discovery_filter_clear(hdev);
+ 
++	BT_DBG("%s ADV monitoring is %s", hdev->name,
++	       hci_is_adv_monitoring(hdev) ? "on" : "off");
++
+ 	if (list_empty(&hdev->pend_le_conns) &&
+-	    list_empty(&hdev->pend_le_reports)) {
++	    list_empty(&hdev->pend_le_reports) &&
++	    !hci_is_adv_monitoring(hdev)) {
+ 		/* If there is no pending LE connections or devices
+-		 * to be scanned for, we should stop the background
+-		 * scanning.
++		 * to be scanned for or no ADV monitors, we should stop the
++		 * background scanning.
+ 		 */
+ 
+ 		/* If controller is not scanning we are done. */
+@@ -794,6 +798,13 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 	}
+ 
++	/* Once the controller offloading of advertisement monitor is in place,
++	 * the if condition should include the support of MSFT extension
++	 * support.
++	 */
++	if (!idr_is_empty(&hdev->adv_monitors_idr))
++		return 0x00;
++
+ 	/* Select filter policy to use white list */
+ 	return 0x01;
+ }
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ec66160a673c..2a732cab1dc9 100644
+index b194da4de2d7..ec66160a673c 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2931,7 +2931,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
--				       auth_type);
-+				       auth_type, CONN_REASON_PAIR_DEVICE);
- 	} else {
- 		u8 addr_type = le_addr_type(cp->addr.type);
- 		struct hci_conn_params *p;
-@@ -2950,9 +2950,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
- 			p->auto_connect = HCI_AUTO_CONN_DISABLED;
- 
--		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
--					   addr_type, sec_level,
--					   HCI_LE_CONN_TIMEOUT);
-+		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr, addr_type,
-+					   sec_level, HCI_LE_CONN_TIMEOUT,
-+					   CONN_REASON_PAIR_DEVICE);
+@@ -8575,8 +8575,11 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	if (!hci_discovery_active(hdev)) {
+ 		if (link_type == ACL_LINK)
+ 			return;
+-		if (link_type == LE_LINK && list_empty(&hdev->pend_le_reports))
++		if (link_type == LE_LINK &&
++		    list_empty(&hdev->pend_le_reports) &&
++		    !hci_is_adv_monitoring(hdev)) {
+ 			return;
++		}
  	}
  
- 	if (IS_ERR(conn)) {
-@@ -3053,6 +3053,20 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
- 				addr, sizeof(*addr));
-+
-+	/* Since user doesn't want to proceed with the connection, abort any
-+	 * ongoing pairing and then terminate the link if it was created
-+	 * because of the pair device action.
-+	 */
-+	if (addr->type == BDADDR_BREDR)
-+		hci_remove_link_key(hdev, &addr->bdaddr);
-+	else
-+		smp_cancel_and_remove_pairing(hdev, &addr->bdaddr,
-+					      le_addr_type(addr->type));
-+
-+	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
-+		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
+ 	if (hdev->discovery.result_filtering) {
 -- 
 2.26.2
 
