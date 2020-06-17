@@ -2,32 +2,32 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F06C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA794C433E1
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42098206F1
+	by mail.kernel.org (Postfix) with ESMTP id 98217206F1
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbgFQOjb (ORCPT
+        id S1727059AbgFQOjc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 10:39:31 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49147 "EHLO
+        Wed, 17 Jun 2020 10:39:32 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52175 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727055AbgFQOja (ORCPT
+        with ESMTP id S1727040AbgFQOja (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 17 Jun 2020 10:39:30 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E7F95CECE3
+        by mail.holtmann.org (Postfix) with ESMTPSA id 83867CECE0
         for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:17 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 14/14] Bluetooth: mgmt: Use command complete on success for set system config
-Date:   Wed, 17 Jun 2020 16:39:20 +0200
-Message-Id: <13f017e592c175aa4af83f09521305da3c7edd74.1592404644.git.marcel@holtmann.org>
+Subject: [PATCH v2 11/14] Bluetooth: Notify adv monitor removed event
+Date:   Wed, 17 Jun 2020 16:39:17 +0200
+Message-Id: <d9e5396faa040104371ddf13f15647f0848a02c2.1592404644.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
 References: <cover.1592404644.git.marcel@holtmann.org>
@@ -38,31 +38,75 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The command status reply is only for failure. When completing set system
-config command, the reply has to be command complete.
+From: Miao-chen Chou <mcchou@chromium.org>
 
+This notifies management sockets on MGMT_EV_ADV_MONITOR_REMOVED event.
+
+The following test was performed.
+- Start two btmgmt consoles, issue a btmgmt advmon-remove command on one
+console and observe a MGMT_EV_ADV_MONITOR_REMOVED event on the other.
+
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
- net/bluetooth/mgmt_config.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index 8e7ad2a51dbb..8d01a8ff85e9 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -247,9 +247,8 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		buffer += exp_len;
- 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3268d9a00608..b194da4de2d7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -192,6 +192,7 @@ static const u16 mgmt_untrusted_events[] = {
+ 	MGMT_EV_EXT_INFO_CHANGED,
+ 	MGMT_EV_EXP_FEATURE_CHANGED,
+ 	MGMT_EV_ADV_MONITOR_ADDED,
++	MGMT_EV_ADV_MONITOR_REMOVED,
+ };
  
--	return mgmt_cmd_status(sk, hdev->id,
--			       MGMT_OP_SET_DEF_SYSTEM_CONFIG,
--			       MGMT_STATUS_SUCCESS);
-+	return mgmt_cmd_complete(sk, hdev->id,
-+				 MGMT_OP_SET_DEF_SYSTEM_CONFIG, 0, NULL, 0);
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -3988,6 +3989,16 @@ static void mgmt_adv_monitor_added(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_ADV_MONITOR_ADDED, hdev, &ev, sizeof(ev), sk);
  }
  
- int read_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
++static void mgmt_adv_monitor_removed(struct sock *sk, struct hci_dev *hdev,
++				     u16 handle)
++{
++	struct mgmt_ev_adv_monitor_added ev;
++
++	ev.monitor_handle = cpu_to_le16(handle);
++
++	mgmt_event(MGMT_EV_ADV_MONITOR_REMOVED, hdev, &ev, sizeof(ev), sk);
++}
++
+ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+ 				 void *data, u16 len)
+ {
+@@ -4140,6 +4151,7 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_cp_remove_adv_monitor *cp = data;
+ 	struct mgmt_rp_remove_adv_monitor rp;
++	unsigned int prev_adv_monitors_cnt;
+ 	u16 handle;
+ 	int err;
+ 
+@@ -4148,6 +4160,7 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
+ 	hci_dev_lock(hdev);
+ 
+ 	handle = __le16_to_cpu(cp->monitor_handle);
++	prev_adv_monitors_cnt = hdev->adv_monitors_cnt;
+ 
+ 	err = hci_remove_adv_monitor(hdev, handle);
+ 	if (err == -ENOENT) {
+@@ -4156,6 +4169,9 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	if (hdev->adv_monitors_cnt < prev_adv_monitors_cnt)
++		mgmt_adv_monitor_removed(sk, hdev, handle);
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	rp.monitor_handle = cp->monitor_handle;
 -- 
 2.26.2
 
