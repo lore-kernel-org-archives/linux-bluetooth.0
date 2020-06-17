@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FABC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A11C433E3
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C07E2082F
+	by mail.kernel.org (Postfix) with ESMTP id A30922082F
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgFQKmP (ORCPT
+        id S1726681AbgFQKmP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 17 Jun 2020 06:42:15 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53656 "EHLO
+Received: from coyote.holtmann.net ([212.227.132.17]:44649 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726652AbgFQKmO (ORCPT
+        with ESMTP id S1726599AbgFQKmN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 06:42:14 -0400
+        Wed, 17 Jun 2020 06:42:13 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4BFB1CECD2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 12:52:03 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 33843CECD7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 12:52:02 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/14] Bluetooth: Terminate the link if pairing is cancelled
-Date:   Wed, 17 Jun 2020 12:42:04 +0200
-Message-Id: <d9233675e37458675f209bd3a6b5636e6a8f752d.1592390407.git.marcel@holtmann.org>
+Subject: [PATCH 05/14] Bluetooth: Add get/set device flags mgmt op
+Date:   Wed, 17 Jun 2020 12:41:56 +0200
+Message-Id: <146480ca31b6e4caf5c2e4efde2485f63adc0433.1592390407.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592390407.git.marcel@holtmann.org>
 References: <cover.1592390407.git.marcel@holtmann.org>
@@ -38,182 +38,279 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Manish Mandlik <mmandlik@google.com>
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-If user decides to cancel the ongoing pairing process (e.g. by clicking
-the cancel button on pairing/passkey window), abort any ongoing pairing
-and then terminate the link if it was created because of the pair
-device action.
+Add the get device flags and set device flags mgmt ops and the device
+flags changed event. Their behavior is described in detail in
+mgmt-api.txt in bluez.
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+Sample btmon trace when a HID device is added (trimmed to 75 chars):
+
+@ MGMT Command: Unknown (0x0050) plen 11        {0x0001} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00                 ...........
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0004} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0003} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0002} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Command Compl.. (0x0001) plen 10  {0x0001} [hci0] 18:06:14.98
+      Unknown (0x0050) plen 7
+        Status: Success (0x00)
+        90 c5 13 cd f3 cd 02                             .......
+@ MGMT Command: Add Device (0x0033) plen 8      {0x0001} [hci0] 18:06:14.98
+        LE Address: CD:F3:CD:13:C5:90 (Static)
+        Action: Auto-connect remote device (0x02)
+@ MGMT Event: Device Added (0x001a) plen 8      {0x0004} [hci0] 18:06:14.98
+        LE Address: CD:F3:CD:13:C5:90 (Static)
+        Action: Auto-connect remote device (0x02)
+@ MGMT Event: Device Added (0x001a) plen 8      {0x0003} [hci0] 18:06:14.98
+        LE Address: CD:F3:CD:13:C5:90 (Static)
+        Action: Auto-connect remote device (0x02)
+@ MGMT Event: Device Added (0x001a) plen 8      {0x0002} [hci0] 18:06:14.98
+        LE Address: CD:F3:CD:13:C5:90 (Static)
+        Action: Auto-connect remote device (0x02)
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0004} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0003} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0002} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+@ MGMT Event: Unknown (0x002a) plen 15          {0x0001} [hci0] 18:06:14.98
+        90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 14 ++++++++++++--
- net/bluetooth/hci_conn.c         | 11 ++++++++---
- net/bluetooth/l2cap_core.c       |  6 ++++--
- net/bluetooth/mgmt.c             | 22 ++++++++++++++++++----
- 4 files changed, 42 insertions(+), 11 deletions(-)
+ include/net/bluetooth/mgmt.h |  28 ++++++++
+ net/bluetooth/mgmt.c         | 128 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 156 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 524057598ffd..77d29341b064 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -564,6 +564,12 @@ struct hci_dev {
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index e515288f328f..8e47b0c5fe52 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -720,6 +720,27 @@ struct mgmt_rp_set_exp_feature {
+ #define MGMT_OP_SET_DEF_RUNTIME_CONFIG	0x004e
+ #define MGMT_SET_DEF_RUNTIME_CONFIG_SIZE	0
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
- 
-+enum conn_reasons {
-+	CONN_REASON_PAIR_DEVICE,
-+	CONN_REASON_L2CAP_CHAN,
-+	CONN_REASON_SCO_CONNECT,
-+};
++#define MGMT_OP_GET_DEVICE_FLAGS	0x004F
++#define MGMT_GET_DEVICE_FLAGS_SIZE	7
++struct mgmt_cp_get_device_flags {
++	struct mgmt_addr_info addr;
++} __packed;
++struct mgmt_rp_get_device_flags {
++	struct mgmt_addr_info addr;
++	__le32 supported_flags;
++	__le32 current_flags;
++} __packed;
 +
- struct hci_conn {
- 	struct list_head list;
- 
-@@ -615,6 +621,8 @@ struct hci_conn {
- 	__s8		max_tx_power;
- 	unsigned long	flags;
- 
-+	enum conn_reasons conn_reason;
++#define MGMT_OP_SET_DEVICE_FLAGS	0x0050
++#define MGMT_SET_DEVICE_FLAGS_SIZE	11
++struct mgmt_cp_set_device_flags {
++	struct mgmt_addr_info addr;
++	__le32 current_flags;
++} __packed;
++struct mgmt_rp_set_device_flags {
++	struct mgmt_addr_info addr;
++} __packed;
 +
- 	__u32		clock;
- 	__u16		clock_accuracy;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+@@ -951,3 +972,10 @@ struct mgmt_ev_exp_feature_changed {
+ 	__u8	uuid[16];
+ 	__le32	flags;
+ } __packed;
++
++#define MGMT_EV_DEVICE_FLAGS_CHANGED		0x002a
++struct mgmt_ev_device_flags_changed {
++	struct mgmt_addr_info addr;
++	__le32 supported_flags;
++	__le32 current_flags;
++} __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d0d0fa832c8a..e409ff48e8e6 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -116,6 +116,8 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+ 	MGMT_OP_READ_DEF_RUNTIME_CONFIG,
+ 	MGMT_OP_SET_DEF_RUNTIME_CONFIG,
++	MGMT_OP_GET_DEVICE_FLAGS,
++	MGMT_OP_SET_DEVICE_FLAGS,
+ };
  
-@@ -1040,12 +1048,14 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+ static const u16 mgmt_events[] = {
+@@ -156,6 +158,7 @@ static const u16 mgmt_events[] = {
+ 	MGMT_EV_EXT_INFO_CHANGED,
+ 	MGMT_EV_PHY_CONFIGURATION_CHANGED,
+ 	MGMT_EV_EXP_FEATURE_CHANGED,
++	MGMT_EV_DEVICE_FLAGS_CHANGED,
+ };
  
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout);
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 dst_type, u8 sec_level, u16 conn_timeout,
- 				u8 role, bdaddr_t *direct_rpa);
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type);
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9bdffc4e79b0..47f3a45d7dcb 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1174,7 +1174,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
- /* This function requires the caller holds hdev->lock */
- struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u8 dst_type, u8 sec_level,
--				     u16 conn_timeout)
-+				     u16 conn_timeout,
-+				     enum conn_reasons conn_reason)
+ static const u16 mgmt_untrusted_commands[] = {
+@@ -3856,6 +3859,120 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 			       MGMT_STATUS_NOT_SUPPORTED);
+ }
+ 
++#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
++
++static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
++			    u16 data_len)
++{
++	struct mgmt_cp_get_device_flags *cp = data;
++	struct mgmt_rp_get_device_flags rp;
++	struct bdaddr_list_with_flags *br_params;
++	struct hci_conn_params *params;
++	u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
++	u32 current_flags = 0;
++	u8 status = MGMT_STATUS_INVALID_PARAMS;
++
++	bt_dev_dbg(hdev, "Get device flags %pMR (type 0x%x)\n",
++		   &cp->addr.bdaddr, cp->addr.type);
++
++	if (cp->addr.type == BDADDR_BREDR) {
++		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
++							      &cp->addr.bdaddr,
++							      cp->addr.type);
++		if (!br_params)
++			goto done;
++
++		current_flags = br_params->current_flags;
++	} else {
++		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
++						le_addr_type(cp->addr.type));
++
++		if (!params)
++			goto done;
++
++		current_flags = params->current_flags;
++	}
++
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
++	rp.supported_flags = cpu_to_le32(supported_flags);
++	rp.current_flags = cpu_to_le32(current_flags);
++
++	status = MGMT_STATUS_SUCCESS;
++
++done:
++	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_DEVICE_FLAGS, status,
++				&rp, sizeof(rp));
++}
++
++static void device_flags_changed(struct sock *sk, struct hci_dev *hdev,
++				 bdaddr_t *bdaddr, u8 bdaddr_type,
++				 u32 supported_flags, u32 current_flags)
++{
++	struct mgmt_ev_device_flags_changed ev;
++
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = bdaddr_type;
++	ev.supported_flags = cpu_to_le32(supported_flags);
++	ev.current_flags = cpu_to_le32(current_flags);
++
++	mgmt_event(MGMT_EV_DEVICE_FLAGS_CHANGED, hdev, &ev, sizeof(ev), sk);
++}
++
++static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
++			    u16 len)
++{
++	struct mgmt_cp_set_device_flags *cp = data;
++	struct bdaddr_list_with_flags *br_params;
++	struct hci_conn_params *params;
++	u8 status = MGMT_STATUS_INVALID_PARAMS;
++	u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
++	u32 current_flags = __le32_to_cpu(cp->current_flags);
++
++	bt_dev_dbg(hdev, "Set device flags %pMR (type 0x%x) = 0x%x",
++		   &cp->addr.bdaddr, cp->addr.type,
++		   __le32_to_cpu(current_flags));
++
++	if ((supported_flags | current_flags) != supported_flags) {
++		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
++			    current_flags, supported_flags);
++		goto done;
++	}
++
++	if (cp->addr.type == BDADDR_BREDR) {
++		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
++							      &cp->addr.bdaddr,
++							      cp->addr.type);
++
++		if (br_params) {
++			br_params->current_flags = current_flags;
++			status = MGMT_STATUS_SUCCESS;
++		} else {
++			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
++				    &cp->addr.bdaddr, cp->addr.type);
++		}
++	} else {
++		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
++						le_addr_type(cp->addr.type));
++		if (params) {
++			params->current_flags = current_flags;
++			status = MGMT_STATUS_SUCCESS;
++		} else {
++			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
++				    &cp->addr.bdaddr,
++				    le_addr_type(cp->addr.type));
++		}
++	}
++
++done:
++	if (status == MGMT_STATUS_SUCCESS)
++		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++				     supported_flags, current_flags);
++
++	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
++				 &cp->addr, sizeof(cp->addr));
++}
++
+ static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+ 				         u16 opcode, struct sk_buff *skb)
  {
- 	struct hci_conn *conn;
+@@ -5973,7 +6090,9 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_cp_add_device *cp = data;
+ 	u8 auto_conn, addr_type;
++	struct hci_conn_params *params;
+ 	int err;
++	u32 current_flags = 0;
  
-@@ -1219,6 +1220,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
-+	conn->conn_reason = conn_reason;
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
+@@ -6041,12 +6160,19 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 					MGMT_STATUS_FAILED, &cp->addr,
+ 					sizeof(cp->addr));
+ 		goto unlock;
++	} else {
++		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
++						addr_type);
++		if (params)
++			current_flags = params->current_flags;
+ 	}
  
  	hci_update_background_scan(hdev);
  
-@@ -1228,7 +1230,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- }
+ added:
+ 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
++	device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
++			     SUPPORTED_DEVICE_FLAGS(), current_flags);
  
- struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
--				 u8 sec_level, u8 auth_type)
-+				 u8 sec_level, u8 auth_type,
-+				 enum conn_reasons conn_reason)
- {
- 	struct hci_conn *acl;
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
+ 				MGMT_STATUS_SUCCESS, &cp->addr,
+@@ -7313,6 +7439,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_UNTRUSTED },
+ 	{ set_def_runtime_config,  MGMT_SET_DEF_RUNTIME_CONFIG_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ get_device_flags,        MGMT_GET_DEVICE_FLAGS_SIZE },
++	{ set_device_flags,        MGMT_SET_DEVICE_FLAGS_SIZE },
+ };
  
-@@ -1248,6 +1251,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	hci_conn_hold(acl);
- 
-+	acl->conn_reason = conn_reason;
- 	if (acl->state == BT_OPEN || acl->state == BT_CLOSED) {
- 		acl->sec_level = BT_SECURITY_LOW;
- 		acl->pending_sec_level = sec_level;
-@@ -1264,7 +1268,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING,
-+			      CONN_REASON_SCO_CONNECT);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fe913a5c754a..35d2bc569a2d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7893,11 +7893,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		else
- 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
- 						   chan->sec_level,
--						   HCI_LE_CONN_TIMEOUT);
-+						   HCI_LE_CONN_TIMEOUT,
-+						   CONN_REASON_L2CAP_CHAN);
- 
- 	} else {
- 		u8 auth_type = l2cap_get_auth_type(chan);
--		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
-+		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type,
-+				       CONN_REASON_L2CAP_CHAN);
- 	}
- 
- 	if (IS_ERR(hcon)) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ec66160a673c..2a732cab1dc9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2931,7 +2931,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
--				       auth_type);
-+				       auth_type, CONN_REASON_PAIR_DEVICE);
- 	} else {
- 		u8 addr_type = le_addr_type(cp->addr.type);
- 		struct hci_conn_params *p;
-@@ -2950,9 +2950,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
- 			p->auto_connect = HCI_AUTO_CONN_DISABLED;
- 
--		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
--					   addr_type, sec_level,
--					   HCI_LE_CONN_TIMEOUT);
-+		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr, addr_type,
-+					   sec_level, HCI_LE_CONN_TIMEOUT,
-+					   CONN_REASON_PAIR_DEVICE);
- 	}
- 
- 	if (IS_ERR(conn)) {
-@@ -3053,6 +3053,20 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
- 				addr, sizeof(*addr));
-+
-+	/* Since user doesn't want to proceed with the connection, abort any
-+	 * ongoing pairing and then terminate the link if it was created
-+	 * because of the pair device action.
-+	 */
-+	if (addr->type == BDADDR_BREDR)
-+		hci_remove_link_key(hdev, &addr->bdaddr);
-+	else
-+		smp_cancel_and_remove_pairing(hdev, &addr->bdaddr,
-+					      le_addr_type(addr->type));
-+
-+	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
-+		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
+ void mgmt_index_added(struct hci_dev *hdev)
 -- 
 2.26.2
 
