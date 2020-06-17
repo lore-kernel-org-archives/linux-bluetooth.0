@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1190C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 870FEC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A19CD206F1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BC56206F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 14:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbgFQOj2 (ORCPT
+        id S1727054AbgFQOjg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 10:39:28 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34557 "EHLO
+        Wed, 17 Jun 2020 10:39:36 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39578 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbgFQOj0 (ORCPT
+        with ESMTP id S1726998AbgFQOj2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 10:39:26 -0400
+        Wed, 17 Jun 2020 10:39:28 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9CA9FCECD8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:16 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4DB01CECDE
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 16:49:17 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 03/14] Bluetooth: Replace wakeable list with flag
-Date:   Wed, 17 Jun 2020 16:39:09 +0200
-Message-Id: <71a3186aa0d3d08981e2e3289e5669c737c79c21.1592404644.git.marcel@holtmann.org>
+Subject: [PATCH v2 09/14] Bluetooth: Add handler of MGMT_OP_REMOVE_ADV_MONITOR
+Date:   Wed, 17 Jun 2020 16:39:15 +0200
+Message-Id: <211ca797e01a6ccab70d6432bf33ff73ab37d994.1592404644.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
 References: <cover.1592404644.git.marcel@holtmann.org>
@@ -38,99 +38,138 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+From: Miao-chen Chou <mcchou@chromium.org>
 
-Since the classic device list now supports flags, convert the wakeable
-list into a flag on the existing device list.
+This adds the request handler of MGMT_OP_REMOVE_ADV_MONITOR command.
+Note that the controller-based monitoring is not yet in place. This
+removes the internal monitor(s) without sending HCI traffic, so the
+request returns immediately.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
+The following test was performed.
+- Issue btmgmt advmon-remove with valid and invalid handles.
+
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 11 ++++++++++-
- net/bluetooth/hci_core.c         |  1 -
- net/bluetooth/hci_request.c      | 12 ++++++++----
- 3 files changed, 18 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 31 ++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             | 35 ++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 95a3935325bb..0643c737ba85 100644
+index 13fad419ae7d..c54f9295892e 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -143,6 +143,16 @@ struct bdaddr_list_with_flags {
- 	u32 current_flags;
- };
+@@ -1283,6 +1283,7 @@ void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
+ void hci_adv_monitors_clear(struct hci_dev *hdev);
+ void hci_free_adv_monitor(struct adv_monitor *monitor);
+ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
++int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle);
  
-+enum hci_conn_flags {
-+	HCI_CONN_FLAG_REMOTE_WAKEUP,
-+	HCI_CONN_FLAG_MAX
-+};
-+
-+#define hci_conn_test_flag(nr, flags) ((flags) & (1U << nr))
-+
-+/* Make sure number of flags doesn't exceed sizeof(current_flags) */
-+static_assert(HCI_CONN_FLAG_MAX < 32);
-+
- struct bt_uuid {
- 	struct list_head list;
- 	u8 uuid[16];
-@@ -463,7 +473,6 @@ struct hci_dev {
- 	struct list_head	mgmt_pending;
- 	struct list_head	blacklist;
- 	struct list_head	whitelist;
--	struct list_head	wakeable;
- 	struct list_head	uuids;
- 	struct list_head	link_keys;
- 	struct list_head	long_term_keys;
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8a471bec2731..8e01afb2ee8c 100644
+index ce481fab349d..59132b3e2cde 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3499,7 +3499,6 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->mgmt_pending);
- 	INIT_LIST_HEAD(&hdev->blacklist);
- 	INIT_LIST_HEAD(&hdev->whitelist);
--	INIT_LIST_HEAD(&hdev->wakeable);
- 	INIT_LIST_HEAD(&hdev->uuids);
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index a7f572ad38ef..a5b53d3ea508 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -968,15 +968,19 @@ static void hci_req_clear_event_filter(struct hci_request *req)
- 
- static void hci_req_set_event_filter(struct hci_request *req)
- {
--	struct bdaddr_list *b;
-+	struct bdaddr_list_with_flags *b;
- 	struct hci_cp_set_event_filter f;
- 	struct hci_dev *hdev = req->hdev;
--	u8 scan;
-+	u8 scan = SCAN_DISABLED;
- 
- 	/* Always clear event filter when starting */
- 	hci_req_clear_event_filter(req);
- 
--	list_for_each_entry(b, &hdev->wakeable, list) {
-+	list_for_each_entry(b, &hdev->whitelist, list) {
-+		if (!hci_conn_test_flag(HCI_CONN_FLAG_REMOTE_WAKEUP,
-+					b->current_flags))
-+			continue;
-+
- 		memset(&f, 0, sizeof(f));
- 		bacpy(&f.addr_conn_flt.bdaddr, &b->bdaddr);
- 		f.flt_type = HCI_FLT_CONN_SETUP;
-@@ -985,9 +989,9 @@ static void hci_req_set_event_filter(struct hci_request *req)
- 
- 		bt_dev_dbg(hdev, "Adding event filters for %pMR", &b->bdaddr);
- 		hci_req_add(req, HCI_OP_SET_EVENT_FLT, sizeof(f), &f);
-+		scan = SCAN_PAGE;
- 	}
- 
--	scan = !list_empty(&hdev->wakeable) ? SCAN_PAGE : SCAN_DISABLED;
- 	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+@@ -3041,6 +3041,37 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+ 	return 0;
  }
  
++static int free_adv_monitor(int id, void *ptr, void *data)
++{
++	struct hci_dev *hdev = data;
++	struct adv_monitor *monitor = ptr;
++
++	idr_remove(&hdev->adv_monitors_idr, monitor->handle);
++	hci_free_adv_monitor(monitor);
++
++	return 0;
++}
++
++/* This function requires the caller holds hdev->lock */
++int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle)
++{
++	struct adv_monitor *monitor;
++
++	if (handle) {
++		monitor = idr_find(&hdev->adv_monitors_idr, handle);
++		if (!monitor)
++			return -ENOENT;
++
++		idr_remove(&hdev->adv_monitors_idr, monitor->handle);
++		hci_free_adv_monitor(monitor);
++	} else {
++		/* Remove all monitors if handle is 0. */
++		idr_for_each(&hdev->adv_monitors_idr, &free_adv_monitor, hdev);
++	}
++
++	return 0;
++}
++
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
+ 					 bdaddr_t *bdaddr, u8 type)
+ {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1eca36e51706..cff24fde72d2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -121,6 +121,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_DEVICE_FLAGS,
+ 	MGMT_OP_READ_ADV_MONITOR_FEATURES,
+ 	MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
++	MGMT_OP_REMOVE_ADV_MONITOR,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -4118,6 +4119,39 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
++			      void *data, u16 len)
++{
++	struct mgmt_cp_remove_adv_monitor *cp = data;
++	struct mgmt_rp_remove_adv_monitor rp;
++	u16 handle;
++	int err;
++
++	BT_DBG("request for %s", hdev->name);
++
++	hci_dev_lock(hdev);
++
++	handle = __le16_to_cpu(cp->monitor_handle);
++
++	err = hci_remove_adv_monitor(hdev, handle);
++	if (err == -ENOENT) {
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADV_MONITOR,
++				      MGMT_STATUS_INVALID_INDEX);
++		goto unlock;
++	}
++
++	hci_dev_unlock(hdev);
++
++	rp.monitor_handle = cp->monitor_handle;
++
++	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_ADV_MONITOR,
++				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+ 				         u16 opcode, struct sk_buff *skb)
+ {
+@@ -7589,6 +7623,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ read_adv_mon_features,   MGMT_READ_ADV_MONITOR_FEATURES_SIZE },
+ 	{ add_adv_patterns_monitor,MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ remove_adv_monitor,      MGMT_REMOVE_ADV_MONITOR_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
 -- 
 2.26.2
 
