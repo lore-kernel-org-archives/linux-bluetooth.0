@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58495C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 06:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD28EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 06:37:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3392A2098B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 06:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D6ED20853
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 06:37:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDxB+3HU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1RwIptV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbgFQGha (ORCPT
+        id S1726815AbgFQGhd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 02:37:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42512 "EHLO
+        Wed, 17 Jun 2020 02:37:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725929AbgFQGha (ORCPT
+        with ESMTP id S1725929AbgFQGhc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 02:37:30 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1239DC061573
+        Wed, 17 Jun 2020 02:37:32 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F262DC061573
         for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 23:37:30 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id u17so730343qtq.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 23:37:29 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id er17so510220qvb.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2020 23:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=Mx+FRKLDzN4YI90LdMKYe1BxLfgYlMWj3Du5hoYgOp0=;
-        b=NDxB+3HUTRfXQoSUyoTDPN4NE5SJ7VW6isqa8nkwOqebbx6nHEo6RDTkWPMZUg2aVq
-         vVD6Wr2fE2KmaeC8ENdG4SbbA4oi6pVz93S+wfWpuxmevdBVD4+sgMz+MLmFtd7kcdEl
-         OylNoqK5EGbFFQyLoeJl36ezoQBa0OcngZz4ttdPvqtalR6Rmj57YFokArf9P3H96kGh
-         opRwXFf1bARMYhhLrvrRizPdwFrsOfXibPmZG6Req45L6jgAwWawiwHqWd6DBHnUP95Q
-         lWKPxCXO/oAGlCvIZ1C0z0BPVc9Nf944uUm53T+Pr8p53gJo3Se5OYeq+W/gAhrHpJwv
-         L/iA==
+        bh=8dlLCtvWsrFChYgRx6iRr5vaZrSmdOv4nZcEgYE2vcc=;
+        b=m1RwIptVkcYk2q7MR2bdQKJyGw1iteGAqF3Im/BE/JIxUkiwVXVKhq4n1IDYMsAih5
+         lf2d48WNDKMVSrkH3v5pwBub7IVW9BC5z74oQSJ9/F+7niu5bu9Xi0vOAl3nPiv8pxb4
+         g1MZPSKYbgTHmVf5Kdjn/DqVQfTEiwa9/6qPp/W5YwhBhgh1IsTH+oMnvCQVjD8XWOvk
+         its+jOBSxCUfMpUhkx3j571uGy5Gm9pJt0GL0vKk/cS5kQjvo8pKfprk3Ox/Q7B+2Cku
+         PF7q33x5NYuKjqqKaUVTb5jBVzm4lk+HhhRVsTibkY4xlOD4HNuTar4Aw4sgHEY6zxee
+         UFOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=Mx+FRKLDzN4YI90LdMKYe1BxLfgYlMWj3Du5hoYgOp0=;
-        b=ZgztRSiW6pt7BvAYpxM+tOJxeWgUG93wiIRIIELfZtNMK5vXlBTzX3LTppc44v9NAi
-         EW9Cj6ZdmFoVHXO984V/DkogAwCZbnQWaPC5Elsz90NuD6SBGW8+T8elKVIPh8eNxN/w
-         2hyyigJs9NgTfm3fwV8NL1iHl515SJUQsVVz+VouOHzrlcrfaGEdQ2eOiHSCDWKgWVjZ
-         bIo4+trQrlQZ3wVGKOtfbR2LqXODO14Rg/Y7GUz5Y0+fjO09Fzic/S1DL+wHZzT2Ewnx
-         tXvIYmR9RGsFWyPjZygxYtyuAB+MCURI1VnWJEkzn3s6TD2t7v4T2O2ADcsiW9bM/Djo
-         MkJA==
-X-Gm-Message-State: AOAM533fL8tF/Nxi68v8NSyothY1u+Kx9D2++Kczz0LmA3Ec20jM/jON
-        N45tR4cpjxPuCK8xD/ZiE691ziFolaw=
-X-Google-Smtp-Source: ABdhPJz39ptiCkZuKirwmDmBT8VL9L3Z3+3Llm5yqy16Q7f0bOJHFOZf83dkMW79KJnH4xK1jaLiRA==
-X-Received: by 2002:ac8:3a06:: with SMTP id w6mr24894659qte.199.1592375848916;
-        Tue, 16 Jun 2020 23:37:28 -0700 (PDT)
+        bh=8dlLCtvWsrFChYgRx6iRr5vaZrSmdOv4nZcEgYE2vcc=;
+        b=IJ0Fiiu91UCQ80LdSVzrT7OC7v9S045LMgHBqq+frx/qg7NXnGHTssTwcc3MBiHHWA
+         kZ1i+4EhliLym1MqTMoEII0Rf/UZpi926ilpK0qzxzhlDhd/FsS+cA9csDKb01Mf6Eby
+         fdADXryoyvWrCxMJH4JOyx54E/VSXaob/9BGQx9+3jbr9cXg0ugtIjC2mm6cDKvalRQG
+         HKXUD8qiX2ju9+V7t4jJreyf6lQGSI0qajDiVYcie/nGAAQ5388e40Cn1Fp+9v3titoo
+         +u00OWIDvaTtpsYgvpi2oj+JE7qpZJpM2HQrPxJcdzWFhj1ON/mEaYGENKYLDDNCIDeR
+         qD7w==
+X-Gm-Message-State: AOAM531Q1WBoJrLvl3IlIIZ+NKpZBnvy9DZSQEA27Vo4MQF6VAdDNQez
+        zTVT1xYK3dMKuABlMjWp6jWLKtmvzNQ=
+X-Google-Smtp-Source: ABdhPJyOJtM0/HqoMp4mQIWCDyU489O6OdSpRTvhy/mKCuGXv3zA3YHFfBAAPPSRdl8SkBZ3na9/Ew==
+X-Received: by 2002:a05:6214:1333:: with SMTP id c19mr6075837qvv.72.1592375849836;
+        Tue, 16 Jun 2020 23:37:29 -0700 (PDT)
 Received: from [172.17.0.2] ([13.68.98.178])
-        by smtp.gmail.com with ESMTPSA id l2sm19482560qtc.80.2020.06.16.23.37.28
+        by smtp.gmail.com with ESMTPSA id m13sm18130988qta.90.2020.06.16.23.37.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2020 23:37:28 -0700 (PDT)
-Message-ID: <5ee9ba28.1c69fb81.d10b0.a845@mx.google.com>
-Date:   Tue, 16 Jun 2020 23:37:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5027362676469036389=="
+        Tue, 16 Jun 2020 23:37:29 -0700 (PDT)
+Message-ID: <5ee9ba29.1c69fb81.0f4a.2d63@mx.google.com>
+Date:   Tue, 16 Jun 2020 23:37:29 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0737617278581065273=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, michaelfsun@google.com
-Subject: RE: [bluez,v2,2/3] btmgmt: Add command "remove" into "monitor" btmgmt submenu
+Subject: RE: [bluez,v2,3/3] btmgmt: Add command "add" into "monitor" btmgmt submenu
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200616232642.bluez.v2.2.I6847f3a5339713811d88b3a234e6454e11f0f042@changeid>
-References: <20200616232642.bluez.v2.2.I6847f3a5339713811d88b3a234e6454e11f0f042@changeid>
+In-Reply-To: <20200616232642.bluez.v2.3.I29854cfe9ccae25c34666856326c07cd680151b1@changeid>
+References: <20200616232642.bluez.v2.3.I29854cfe9ccae25c34666856326c07cd680151b1@changeid>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5027362676469036389==
+--===============0737617278581065273==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,14 +92,11 @@ Test Result:
 checkpatch Failed
 
 Outputs:
-WARNING:SSCANF_TO_KSTRTO: Prefer kstrto<type> to single variable sscanf
-#72: FILE: tools/btmgmt.c:4685:
-+	if (sscanf(argv[1], "%hx", &monitor_handle) != 1) {
-+		error("Wrong formatted handle argument");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#159: FILE: tools/btmgmt.c:4784:
++			/* fall through */
 
-- total: 0 errors, 1 warnings, 79 lines checked
+- total: 0 errors, 1 warnings, 183 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
@@ -117,4 +114,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============5027362676469036389==--
+--===============0737617278581065273==--
