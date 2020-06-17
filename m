@@ -2,349 +2,353 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7A6C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 15:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB968C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 18:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F17A20888
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 15:01:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABB40217D8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 18:03:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="rV7T2DOy"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nFAX0G8n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726594AbgFQPBn (ORCPT
+        id S1727045AbgFQSDk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 11:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35956 "EHLO
+        Wed, 17 Jun 2020 14:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726491AbgFQPBm (ORCPT
+        with ESMTP id S1727028AbgFQSDj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 11:01:42 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673B2C06174E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 08:01:42 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id n24so3230531lji.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 08:01:42 -0700 (PDT)
+        Wed, 17 Jun 2020 14:03:39 -0400
+Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA831C06174E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 11:03:38 -0700 (PDT)
+Received: by mail-vk1-xa42.google.com with SMTP id s192so790374vkh.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 11:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6omWERRJGdyMzfylVv8hdNU7qwrXfmeVO8i3n+7b8QM=;
-        b=rV7T2DOyjyh10IzNEJRyrt7GpksRAxOd+8x/hXXWo/y/4mUCTylEGgQHa4/P8ExOed
-         FjTaLdypJeL1POATOIsrcgUSNvrQoHkSYjXrxyiqc4WFepB+axpSLqidfOCnlUS1Yijo
-         hn1ipQiFs1WkoObPZLCDsGmDIOBuFg8Vyz5Dykxp/0rIx0TWsLTwJVQLEZVYZT721oZB
-         U/sjoLCSUpoE0r8kDCia6jmZ4Jt2OtuiY+j6v5F2POfEoJT9dyysENzRLnDLK/CU1ogn
-         bDixFF7ykME4QncO/ATr2BVeEm+9rrMX7kHJNFnBrb4s/oYpPRJFwlQeRn2GhIT/0DE/
-         n7LA==
+         :cc;
+        bh=JBkZv+uMh9/PDhI0++fcjb4JD1KRbVEa+HKhvt1JRDo=;
+        b=nFAX0G8nTcjgx4A+DehQ9p7iA8UoQrzR1LJx++nIB1Q02Ez9cz67JrOgVgIFKbX+TU
+         Oqq4Fm8JvBlJU2/DckNW0J/wZHpe6xkHy9+v1b1/fJGgYEpdR0mmDJvxFtdLH//pnMRv
+         PUYDspaScpjLIS7FdTJ/8+izykPKzMnzolWIY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6omWERRJGdyMzfylVv8hdNU7qwrXfmeVO8i3n+7b8QM=;
-        b=HZVAbpKPiHf9C5huQSJK7eQYlUeW8+lohlw3L+xkRn58JPDg7DFEWxYG/CLFjwyNmY
-         B16EioxD7VSvWNi2B5fcfwtgIWyXjE/WUhuIU7fjbXpmuSHiHWSkveFTKEJW76KvolSy
-         e2DVZnddgw4rQbcapwF/uzDxn9oSCvUKDpFKlp1MhL38YuV085XbYonEjB9aqeQ/hGq3
-         /gNM/C3lFs73dpr4QRfJlKW69ktv9i+bL3eIIl5O+lcQqZb3Do0vWJ4Bx3INsFsJlc9U
-         XihFfDM8Io/y5VY2Sem+E7VbFFPl2S5Jl5CIvfov3y5Y+dWMw/5fS2/Xux0UyD5PiqSQ
-         XXHw==
-X-Gm-Message-State: AOAM532aqiQMQ6u9XeD8S3fpxucyW1CH3My9PQGEZTJhGBMV5Qg7yFle
-        eYthx0keU0bh+dbf/fiOP10RXJQ8HdtpXy9/Uz6D/A==
-X-Google-Smtp-Source: ABdhPJxMQN5UROZ7X2PsZhUnYegBQkPshjKQFA4iNIbu9OpCmIzTs0/B1LO8yTA+lmjmuhWQMm2jjHf/q3tXSqJ1VVM=
-X-Received: by 2002:a2e:9dd8:: with SMTP id x24mr4600424ljj.304.1592406100504;
- Wed, 17 Jun 2020 08:01:40 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=JBkZv+uMh9/PDhI0++fcjb4JD1KRbVEa+HKhvt1JRDo=;
+        b=OhgNljtrpDbCQJv0QWtRKSzaEjf1osn/1PvxTUpmOGtfNoIFhAQdQu+h05jsvpIfei
+         tf9FMyjHnrFPtqLBYiSuAjowO0D0pQr1/M4fIr8HzENbZDkBjgxof6taV0AgXygTSnNv
+         +iqWEGXq7zMm1q727ueO8tq41hcp060XdIedhdiPamrC8ZUoXfF9LJeGUhIxaceQjcdx
+         WomDY7uqAezfMnBaYK9+5nTeaPQoU9mUtJ/tT45AFKGSbgbLPbfb2yur/6jyOmEQCZP2
+         9NQMVzoEDgf9ZLUmaJT4Khua0Tf/fqQq6/sI/vBORw0cR0EaPTODcwv9XX63NPCbL4Ri
+         4UGg==
+X-Gm-Message-State: AOAM531J+K4pDJZglAiXtU6oszWdDsYpzNEYoOxr1D45903M+2RRolpg
+        D4ss2kbOHjR+Lq8m94q6QI1xqkzctNEu6AjbD0BwrmKHXbwU+A==
+X-Google-Smtp-Source: ABdhPJzsKZYFV1KXyZHlb4nT4uQB/+CG4XrfyOH1lwXLU2brTm6dovnVjIDkzKq/Ko8kHNzlfKbSP0Yz8ClscTG7ZAM=
+X-Received: by 2002:a1f:2014:: with SMTP id g20mr553048vkg.17.1592417017886;
+ Wed, 17 Jun 2020 11:03:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200617075536.98672-1-michaelfsun@google.com> <20200617005531.bluez.v3.3.I55df963e4055bf1778db6f9e46f166b88472e051@changeid>
-In-Reply-To: <20200617005531.bluez.v3.3.I55df963e4055bf1778db6f9e46f166b88472e051@changeid>
-From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Date:   Wed, 17 Jun 2020 08:01:28 -0700
-Message-ID: <CACumGOLjw5N8v=+r_kjWCn6G=2zyzf+RT+bXFdaGfdEmvrhEeA@mail.gmail.com>
-Subject: Re: [bluez PATCH v3 3/3] btmgmt: Add command "add" into "monitor"
- btmgmt submenu
-To:     Michael Sun <michaelfsun@google.com>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Alain Michaud <alainm@chromium.org>
+References: <cover.1592404644.git.marcel@holtmann.org> <146480ca31b6e4caf5c2e4efde2485f63adc0433.1592404644.git.marcel@holtmann.org>
+In-Reply-To: <146480ca31b6e4caf5c2e4efde2485f63adc0433.1592404644.git.marcel@holtmann.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed, 17 Jun 2020 11:03:25 -0700
+Message-ID: <CANFp7mX4ddC0Okr0UgfU9-rQDiO1GSGVnFPn1Qvyoje2g7EpkQ@mail.gmail.com>
+Subject: Re: [PATCH v2 05/14] Bluetooth: Add get/set device flags mgmt op
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michael,
+Hi Marcel,
 
-On Wed, Jun 17, 2020 at 12:55 AM Michael Sun <michaelfsun@google.com> wrote=
-:
+This looks good to me. Thanks for removing
+HCI_MGMT_DEVICE_FLAGS_EVENTS -- I misunderstood what it was for.
+
+Abhishek
+
+On Wed, Jun 17, 2020 at 7:39 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> This patch introduces a new command =E2=80=98add=E2=80=99 within "monitor=
-" submenu to
-> allow users to add advertisement monitor filters and get back monitor
-> handlers. An event handler is also added to handle kernel issued
-> MGMT_EV_ADV_MONITOR_ADDED events. The command will work with the new
-> MGMT opcode MGMT_OP_ADD_ADV_MONITOR. This patch only adds support for
-> adding pattern based filters.
+> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 >
+> Add the get device flags and set device flags mgmt ops and the device
+> flags changed event. Their behavior is described in detail in
+> mgmt-api.txt in bluez.
+>
+> Sample btmon trace when a HID device is added (trimmed to 75 chars):
+>
+> @ MGMT Command: Unknown (0x0050) plen 11        {0x0001} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00                 ...........
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0004} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0003} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0002} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Command Compl.. (0x0001) plen 10  {0x0001} [hci0] 18:06:14.98
+>       Unknown (0x0050) plen 7
+>         Status: Success (0x00)
+>         90 c5 13 cd f3 cd 02                             .......
+> @ MGMT Command: Add Device (0x0033) plen 8      {0x0001} [hci0] 18:06:14.98
+>         LE Address: CD:F3:CD:13:C5:90 (Static)
+>         Action: Auto-connect remote device (0x02)
+> @ MGMT Event: Device Added (0x001a) plen 8      {0x0004} [hci0] 18:06:14.98
+>         LE Address: CD:F3:CD:13:C5:90 (Static)
+>         Action: Auto-connect remote device (0x02)
+> @ MGMT Event: Device Added (0x001a) plen 8      {0x0003} [hci0] 18:06:14.98
+>         LE Address: CD:F3:CD:13:C5:90 (Static)
+>         Action: Auto-connect remote device (0x02)
+> @ MGMT Event: Device Added (0x001a) plen 8      {0x0002} [hci0] 18:06:14.98
+>         LE Address: CD:F3:CD:13:C5:90 (Static)
+>         Action: Auto-connect remote device (0x02)
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0004} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0003} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0002} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+> @ MGMT Event: Unknown (0x002a) plen 15          {0x0001} [hci0] 18:06:14.98
+>         90 c5 13 cd f3 cd 02 01 00 00 00 01 00 00 00     ...............
+>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Signed-off-by: Michael Sun <michaelfsun@google.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
+>  include/net/bluetooth/mgmt.h |  28 ++++++++
+>  net/bluetooth/mgmt.c         | 128 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 156 insertions(+)
 >
-> Changes in v3:
-> - Fix build errors
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index e515288f328f..8e47b0c5fe52 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -720,6 +720,27 @@ struct mgmt_rp_set_exp_feature {
+>  #define MGMT_OP_SET_DEF_RUNTIME_CONFIG 0x004e
+>  #define MGMT_SET_DEF_RUNTIME_CONFIG_SIZE       0
 >
-> Changes in v2:
-> - Move add command into submenu and fix build warnings
+> +#define MGMT_OP_GET_DEVICE_FLAGS       0x004F
+> +#define MGMT_GET_DEVICE_FLAGS_SIZE     7
+> +struct mgmt_cp_get_device_flags {
+> +       struct mgmt_addr_info addr;
+> +} __packed;
+> +struct mgmt_rp_get_device_flags {
+> +       struct mgmt_addr_info addr;
+> +       __le32 supported_flags;
+> +       __le32 current_flags;
+> +} __packed;
+> +
+> +#define MGMT_OP_SET_DEVICE_FLAGS       0x0050
+> +#define MGMT_SET_DEVICE_FLAGS_SIZE     11
+> +struct mgmt_cp_set_device_flags {
+> +       struct mgmt_addr_info addr;
+> +       __le32 current_flags;
+> +} __packed;
+> +struct mgmt_rp_set_device_flags {
+> +       struct mgmt_addr_info addr;
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         __le16  opcode;
+> @@ -951,3 +972,10 @@ struct mgmt_ev_exp_feature_changed {
+>         __u8    uuid[16];
+>         __le32  flags;
+>  } __packed;
+> +
+> +#define MGMT_EV_DEVICE_FLAGS_CHANGED           0x002a
+> +struct mgmt_ev_device_flags_changed {
+> +       struct mgmt_addr_info addr;
+> +       __le32 supported_flags;
+> +       __le32 current_flags;
+> +} __packed;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index d0d0fa832c8a..e409ff48e8e6 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -116,6 +116,8 @@ static const u16 mgmt_commands[] = {
+>         MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+>         MGMT_OP_READ_DEF_RUNTIME_CONFIG,
+>         MGMT_OP_SET_DEF_RUNTIME_CONFIG,
+> +       MGMT_OP_GET_DEVICE_FLAGS,
+> +       MGMT_OP_SET_DEVICE_FLAGS,
+>  };
 >
->  tools/btmgmt.c | 161 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 160 insertions(+), 1 deletion(-)
+>  static const u16 mgmt_events[] = {
+> @@ -156,6 +158,7 @@ static const u16 mgmt_events[] = {
+>         MGMT_EV_EXT_INFO_CHANGED,
+>         MGMT_EV_PHY_CONFIGURATION_CHANGED,
+>         MGMT_EV_EXP_FEATURE_CHANGED,
+> +       MGMT_EV_DEVICE_FLAGS_CHANGED,
+>  };
 >
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 5a70e9e1c3e9..ce2a198b1b29 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -1013,6 +1013,19 @@ static void advertising_removed(uint16_t index, ui=
-nt16_t len,
->         print("hci%u advertising_removed: instance %u", index, ev->instan=
-ce);
+>  static const u16 mgmt_untrusted_commands[] = {
+> @@ -3856,6 +3859,120 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+>                                MGMT_STATUS_NOT_SUPPORTED);
 >  }
 >
-> +static void advmon_added(uint16_t index, uint16_t len, const void *param=
-,
-> +                                                       void *user_data)
+> +#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
+> +
+> +static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+> +                           u16 data_len)
 > +{
-> +       const struct mgmt_ev_adv_monitor_added *ev =3D param;
+> +       struct mgmt_cp_get_device_flags *cp = data;
+> +       struct mgmt_rp_get_device_flags rp;
+> +       struct bdaddr_list_with_flags *br_params;
+> +       struct hci_conn_params *params;
+> +       u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
+> +       u32 current_flags = 0;
+> +       u8 status = MGMT_STATUS_INVALID_PARAMS;
 > +
-> +       if (len < sizeof(*ev)) {
-> +               error("Too small (%u bytes) %s event", len, __func__);
-> +               return;
-> +       }
+> +       bt_dev_dbg(hdev, "Get device flags %pMR (type 0x%x)\n",
+> +                  &cp->addr.bdaddr, cp->addr.type);
 > +
-> +       print("hci%u %s: handle %u", index, __func__, ev->monitor_handle)=
-;
-> +}
-> +
->  static void advmon_removed(uint16_t index, uint16_t len, const void *par=
-am,
->                                                         void *user_data)
->  {
-> @@ -4587,7 +4600,7 @@ static const char * const advmon_features_str[] =3D=
- {
->  static const char *advmon_features2str(uint32_t features)
->  {
->         static char str[512];
-> -       int off, i;
-> +       unsigned int off, i;
->
->         off =3D 0;
->         snprintf(str, sizeof(str), "\n\tNone");
-> @@ -4657,6 +4670,148 @@ static void cmd_advmon_features(int argc, char **=
-argv)
->         }
->  }
->
-> +static void advmon_add_rsp(uint8_t status, uint16_t len, const void *par=
-am,
-> +                                                       void *user_data)
-> +{
-> +       const struct mgmt_rp_add_adv_patterns_monitor *rp =3D param;
-> +
-> +       if (status !=3D MGMT_STATUS_SUCCESS) {
-> +               error("Could not add advertisement monitor with status "
-> +                               "0x%02x (%s)", status, mgmt_errstr(status=
-));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       print("Advertisement monitor with handle:0x%04x added",
-> +                                                       rp->monitor_handl=
-e);
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static bool str2pattern(struct mgmt_adv_pattern *pattern, const char *st=
-r)
-> +{
-> +       int type_len, offset_len, offset_end_pos, str_len;
-> +       int i, j;
-> +       char pattern_str[62] =3D { 0 };
-> +       char tmp;
-> +
-> +       if (sscanf(str, "%2hhx%n:%2hhx%n:%s", &pattern->ad_type, &type_le=
-n,
-> +                       &pattern->offset, &offset_end_pos, pattern_str) !=
-=3D 3)
-> +               return false;
-> +
-> +       offset_len =3D offset_end_pos - type_len - 1;
-> +       str_len =3D strlen(pattern_str);
-> +       pattern->length =3D str_len / 2 + str_len % 2;
-> +
-> +       if (type_len > 2 || offset_len > 2 ||
-> +                                       pattern->offset + pattern->length=
- > 31)
-> +               return false;
-> +
-> +       for (i =3D 0, j =3D 0; i < str_len; i++, j++) {
-> +               if (sscanf(&pattern_str[i++], "%2hhx", &pattern->value[j]=
-)
-> +                                                                       !=
-=3D 1)
-> +                       return false;
-> +               if (i < str_len && sscanf(&pattern_str[i], "%1hhx", &tmp)=
- !=3D 1)
-> +                       return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static void advmon_add_usage(void)
-> +{
-> +       bt_shell_usage();
-> +       print("Options:\n"
-> +               "\t-P, --pattern <ad_type:offset:pattern>  "
-> +               "Advertising data bytes\n"
-> +               "Monitor Types:\n"
-> +               "\t-p, --pattern-monitor                        "
-> +               "Pattern Monitor\n"
-> +               "e.g.:\n"
-> +               "\tadd -P 0:1:c504 -P 1:a:9a55beef -p");
-> +}
-> +
-> +static struct option advmon_add_options[] =3D {
-> +                                       { "help", 0, 0, 'h' },
-> +                                       { "pattern-monitor", 0, 0, 'p' },
-> +                                       { "pattern", 1, 0, 'P' },
-> +                                       { 0, 0, 0, 0 } };
-> +
-> +static void cmd_advmon_add(int argc, char **argv)
-> +{
-> +
-> +       uint16_t index;
-> +       void *cp =3D NULL;
-> +       struct mgmt_adv_pattern *patterns =3D NULL;
-> +       int opt, patterns_len;
-> +       int pattern_count =3D 0, cp_len =3D 0;
-> +       bool success =3D false, type_selected =3D false;
-> +
-> +       index =3D mgmt_index;
-> +       if (index =3D=3D MGMT_INDEX_NONE)
-> +               index =3D 0;
-> +
-> +       while ((opt =3D getopt_long(argc, argv, "P:ph", advmon_add_option=
-s,
-> +                                                               NULL)) !=
-=3D -1) {
-> +               switch (opt) {
-> +               case 'P':
-> +                       patterns_len =3D (pattern_count + 1) *
-> +                                       sizeof(struct mgmt_adv_pattern);
-> +                       patterns =3D realloc(patterns, patterns_len);
-> +
-> +                       if (!str2pattern(&patterns[pattern_count++], opta=
-rg)) {
-> +                               error("Failed to parse monitor patterns."=
-);
-> +                               goto done;
-> +                       }
-> +                       break;
-> +               case 'p':
-> +                       if (!pattern_count) {
-> +                               advmon_add_usage();
-> +                               goto done;
-> +                       }
-> +                       cp_len =3D
-> +                               sizeof(struct mgmt_cp_add_adv_monitor) +
-> +                               patterns_len;
-> +                       cp =3D realloc(cp, cp_len);
-> +
-> +                       ((struct mgmt_cp_add_adv_monitor *)cp)
-> +                                       ->pattern_count =3D pattern_count=
-;
-> +
-> +                       memcpy(((struct mgmt_cp_add_adv_monitor *)cp)
-> +                                       ->patterns, patterns, patterns_le=
-n);
-> +                       type_selected =3D true;
-> +                       break;
-> +               case 'h':
-> +                       success =3D true;
-> +                       /* fall through */
-> +               default:
-> +                       advmon_add_usage();
+> +       if (cp->addr.type == BDADDR_BREDR) {
+> +               br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+> +                                                             &cp->addr.bdaddr,
+> +                                                             cp->addr.type);
+> +               if (!br_params)
 > +                       goto done;
+> +
+> +               current_flags = br_params->current_flags;
+> +       } else {
+> +               params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+> +                                               le_addr_type(cp->addr.type));
+> +
+> +               if (!params)
+> +                       goto done;
+> +
+> +               current_flags = params->current_flags;
+> +       }
+> +
+> +       bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
+> +       rp.addr.type = cp->addr.type;
+> +       rp.supported_flags = cpu_to_le32(supported_flags);
+> +       rp.current_flags = cpu_to_le32(current_flags);
+> +
+> +       status = MGMT_STATUS_SUCCESS;
+> +
+> +done:
+> +       return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_DEVICE_FLAGS, status,
+> +                               &rp, sizeof(rp));
+> +}
+> +
+> +static void device_flags_changed(struct sock *sk, struct hci_dev *hdev,
+> +                                bdaddr_t *bdaddr, u8 bdaddr_type,
+> +                                u32 supported_flags, u32 current_flags)
+> +{
+> +       struct mgmt_ev_device_flags_changed ev;
+> +
+> +       bacpy(&ev.addr.bdaddr, bdaddr);
+> +       ev.addr.type = bdaddr_type;
+> +       ev.supported_flags = cpu_to_le32(supported_flags);
+> +       ev.current_flags = cpu_to_le32(current_flags);
+> +
+> +       mgmt_event(MGMT_EV_DEVICE_FLAGS_CHANGED, hdev, &ev, sizeof(ev), sk);
+> +}
+> +
+> +static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+> +                           u16 len)
+> +{
+> +       struct mgmt_cp_set_device_flags *cp = data;
+> +       struct bdaddr_list_with_flags *br_params;
+> +       struct hci_conn_params *params;
+> +       u8 status = MGMT_STATUS_INVALID_PARAMS;
+> +       u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
+> +       u32 current_flags = __le32_to_cpu(cp->current_flags);
+> +
+> +       bt_dev_dbg(hdev, "Set device flags %pMR (type 0x%x) = 0x%x",
+> +                  &cp->addr.bdaddr, cp->addr.type,
+> +                  __le32_to_cpu(current_flags));
+> +
+> +       if ((supported_flags | current_flags) != supported_flags) {
+> +               bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
+> +                           current_flags, supported_flags);
+> +               goto done;
+> +       }
+> +
+> +       if (cp->addr.type == BDADDR_BREDR) {
+> +               br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+> +                                                             &cp->addr.bdaddr,
+> +                                                             cp->addr.type);
+> +
+> +               if (br_params) {
+> +                       br_params->current_flags = current_flags;
+> +                       status = MGMT_STATUS_SUCCESS;
+> +               } else {
+> +                       bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
+> +                                   &cp->addr.bdaddr, cp->addr.type);
+> +               }
+> +       } else {
+> +               params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+> +                                               le_addr_type(cp->addr.type));
+> +               if (params) {
+> +                       params->current_flags = current_flags;
+> +                       status = MGMT_STATUS_SUCCESS;
+> +               } else {
+> +                       bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
+> +                                   &cp->addr.bdaddr,
+> +                                   le_addr_type(cp->addr.type));
 > +               }
 > +       }
 > +
-> +       argc -=3D optind;
-> +       argv +=3D optind;
-> +
-> +       if (argc || !type_selected) {
-> +               advmon_add_usage();
-> +               goto done;
-> +       }
-> +
-> +       if (!mgmt_send(mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR, index, cp_=
-len,
-> +                                       cp, advmon_add_rsp, NULL, NULL)) =
-{
-> +               error("Unable to send \"Add Advertising Monitor\" command=
-");
-> +               goto done;
-> +       }
-> +
-> +       success =3D true;
-> +
 > +done:
-> +       optind =3D 0;
-> +       free(patterns);
-> +       free(cp);
-> +       if (!success)
-> +               bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       if (status == MGMT_STATUS_SUCCESS)
+> +               device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
+> +                                    supported_flags, current_flags);
+> +
+> +       return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
+> +                                &cp->addr, sizeof(cp->addr));
 > +}
 > +
->  static void advmon_remove_rsp(uint8_t status, uint16_t len, const void *=
-param,
->                                                         void *user_data)
+>  static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+>                                          u16 opcode, struct sk_buff *skb)
 >  {
-> @@ -4747,6 +4902,8 @@ static void register_mgmt_callbacks(struct mgmt *mg=
-mt, uint16_t index)
->                                                 advertising_added, NULL, =
-NULL);
->         mgmt_register(mgmt, MGMT_EV_ADVERTISING_REMOVED, index,
->                                         advertising_removed, NULL, NULL);
-> +       mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_ADDED, index, advmon_adde=
-d,
-> +                                                               NULL, NUL=
-L);
->         mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_REMOVED, index, advmon_re=
-moved,
->                                                                 NULL, NUL=
-L);
->  }
-> @@ -4774,6 +4931,8 @@ static const struct bt_shell_menu monitor_menu =3D =
-{
->                                         "features"                      }=
-,
->         { "remove",             "<handle>",
->                 cmd_advmon_remove,      "Remove advertisement monitor " }=
-,
-> +       { "add",                "[options] <-p|-h>",
-> +               cmd_advmon_add,         "Add advertisement monitor"     }=
-,
-
-Is there any particular reason why you are adding getopt options
-instead of just having regular arguments? Also the optional parameters
-(those delimited by []), shall come after the mandatory ones
-(delimited by <>).
-
->         { } },
+> @@ -5973,7 +6090,9 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+>  {
+>         struct mgmt_cp_add_device *cp = data;
+>         u8 auto_conn, addr_type;
+> +       struct hci_conn_params *params;
+>         int err;
+> +       u32 current_flags = 0;
+>
+>         bt_dev_dbg(hdev, "sock %p", sk);
+>
+> @@ -6041,12 +6160,19 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+>                                         MGMT_STATUS_FAILED, &cp->addr,
+>                                         sizeof(cp->addr));
+>                 goto unlock;
+> +       } else {
+> +               params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+> +                                               addr_type);
+> +               if (params)
+> +                       current_flags = params->current_flags;
+>         }
+>
+>         hci_update_background_scan(hdev);
+>
+>  added:
+>         device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
+> +       device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
+> +                            SUPPORTED_DEVICE_FLAGS(), current_flags);
+>
+>         err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
+>                                 MGMT_STATUS_SUCCESS, &cp->addr,
+> @@ -7313,6 +7439,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+>                                                 HCI_MGMT_UNTRUSTED },
+>         { set_def_runtime_config,  MGMT_SET_DEF_RUNTIME_CONFIG_SIZE,
+>                                                 HCI_MGMT_VAR_LEN },
+> +       { get_device_flags,        MGMT_GET_DEVICE_FLAGS_SIZE },
+> +       { set_device_flags,        MGMT_SET_DEVICE_FLAGS_SIZE },
 >  };
 >
+>  void mgmt_index_added(struct hci_dev *hdev)
 > --
-> 2.27.0.290.gba653c62da-goog
+> 2.26.2
 >
