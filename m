@@ -2,154 +2,146 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE998C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 20:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3479C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 21:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8662821532
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 20:27:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="tzW6WXH2"
+	by mail.kernel.org (Postfix) with ESMTP id 82D2C21556
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 21:37:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726861AbgFQU1J (ORCPT
+        id S1727053AbgFQVhJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 16:27:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58252 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726758AbgFQU1I (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 16:27:08 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38044C06174E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 13:27:07 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id k8so3142548edq.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 13:27:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=L11zMselXA31Ce45AwpHjwobbsEPgmwoCvPE/l7GZyM=;
-        b=tzW6WXH2IVBywaiRxM+x7HovrsBYe8B10Isc8IQlvH+UheeEaEnb+vIUUA9/DPe9sB
-         VcpXlZj4yupB4Ke/xmcgmcolQ65GU36lk8QVU6JH+na+hDPXECil2FZbH7xpS72UKSrJ
-         fc9Uh4Ltz8IuxW80rwMqsK1e+atSAO3VvvziE7DFQTdl0NRKY8Ob0r8X2THR+BwXJlx2
-         eh71YiTJxjuSaFhBfIgwbBylI8dtua/+iuUDsoom9Sqz6xun9l6YfV+vEE+kld39GxEB
-         ZKsNSmjB0w9BZmDzYmBSgDnkZx6igXTog2Cop7BWIjinIIMji8S8i1P2X3Ees9QGOeTg
-         iL/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=L11zMselXA31Ce45AwpHjwobbsEPgmwoCvPE/l7GZyM=;
-        b=RNOD2THH60paQa0xesfR5JLEWGQF2SwNiwSG8d9Qr684ZLqDIlhcpKjYxVgS8JOcxj
-         SwQDxC87PNFLZthuIajItvSBpLe8Br9tsDWdWTfbPLRAJzGLwQrtb6WLcr7RR3IutNJJ
-         f3cbuZBOSQ5+hZXBvAPzPFL6bkZzL2/rcCMduCmzCzrDBxxgbIVi3cPGLYiy3Stw9K3D
-         bNKj1Q0PJo2Bk94wLVo/wDOd8DINI49QaQG4GKhKUxoeitg+rAJ72eWNLNIT7ffC0pef
-         v2HN5nKL1ty74/FoDmFIE+mCT1wPLTsx4lnZ0RZcBWR634PkE+2WtDUJgRY1PCU7U9AY
-         HtKQ==
-X-Gm-Message-State: AOAM530224a9VumYtmfJ7sKJsAhSOrF9IXsOW+iQw53Ta5vAa0dxxlQN
-        FtRfum6n0TrZgooXztDd8wyPBYvFsu8=
-X-Google-Smtp-Source: ABdhPJwCMsdJOZHK8JNcjN1E+McRdsW0fmUtOFbA2c93L0RnLGCB6+14xH3hoRXAjoktRiVRS0Fa5g==
-X-Received: by 2002:aa7:d283:: with SMTP id w3mr926600edq.262.1592425625639;
-        Wed, 17 Jun 2020 13:27:05 -0700 (PDT)
-Received: from kynes.internet.domowy (apn-37-7-126-70.dynamic.gprs.plus.pl. [37.7.126.70])
-        by smtp.gmail.com with ESMTPSA id lw11sm661727ejb.58.2020.06.17.13.27.03
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 13:27:05 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Replace BeaconFlags with just IvUpdate
-Date:   Wed, 17 Jun 2020 22:26:57 +0200
-Message-Id: <20200617202657.42474-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.26.0
+        Wed, 17 Jun 2020 17:37:09 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42916 "EHLO mail.ispras.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726758AbgFQVhI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Jun 2020 17:37:08 -0400
+X-Greylist: delayed 346 seconds by postgrey-1.27 at vger.kernel.org; Wed, 17 Jun 2020 17:37:02 EDT
+Received: from [192.168.1.8] (unknown [213.87.137.195])
+        by mail.ispras.ru (Postfix) with ESMTPSA id 54355BFD1E;
+        Thu, 18 Jun 2020 00:31:03 +0300 (MSK)
+To:     Joe Perches <joe@perches.com>, Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>
+Cc:     Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+References: <20200616015718.7812-1-longman@redhat.com>
+ <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+From:   Denis Efremov <efremov@ispras.ru>
+Autocrypt: addr=efremov@ispras.ru; keydata=
+ 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
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Message-ID: <17e4fede-bab0-d93c-6964-69decc889d7d@ispras.ru>
+Date:   Thu, 18 Jun 2020 00:31:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-To import nodes, applications need just IvIndex and IvUpdate. KeyRefresh
-phase in under provisioner's control, so we don't need to expose it.
 
-Moreover, BeaconFlags property dealt just with the primary net key, and
-each subnet key is refreshed separately.
----
- doc/mesh-api.txt |  8 ++++----
- mesh/node.c      | 12 ++++++++----
- 2 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 7fbab32b6..0f10a7c89 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -431,11 +431,11 @@ Properties:
- 		This property indicates whether the periodic beaconing is
- 		enabled (true) or disabled (false).
- 
--	uint8 BeaconFlags [read-only]
-+	boolean IvUpdate [read-only]
- 
--		This property may be read at any time to determine the flag
--		field setting on sent and received beacons of the primary
--		network key.
-+		When true, indicates that the network is in the middle of IV
-+		Index Update procedure. This information is only useful for
-+		provisioning.
- 
- 	uint32 IvIndex [read-only]
- 
-diff --git a/mesh/node.c b/mesh/node.c
-index 6140fdf9f..87c3bb46f 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -32,6 +32,7 @@
- #include "mesh/mesh-defs.h"
- #include "mesh/mesh.h"
- #include "mesh/net.h"
-+#include "mesh/net-keys.h"
- #include "mesh/appkey.h"
- #include "mesh/mesh-config.h"
- #include "mesh/provision.h"
-@@ -2183,7 +2184,7 @@ static bool beacon_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
- 	return true;
- }
- 
--static bool beaconflags_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+static bool ivupdate_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
- 					struct l_dbus_message_builder *builder,
- 					void *user_data)
- {
-@@ -2191,10 +2192,13 @@ static bool beaconflags_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
- 	struct mesh_net *net = node_get_net(node);
- 	uint8_t flags;
- 	uint32_t iv_index;
-+	bool ivu;
- 
- 	mesh_net_get_snb_state(net, &flags, &iv_index);
- 
--	l_dbus_message_builder_append_basic(builder, 'y', &flags);
-+	ivu = flags & IV_INDEX_UPDATE;
-+
-+	l_dbus_message_builder_append_basic(builder, 'b', &ivu);
- 
- 	return true;
- }
-@@ -2295,8 +2299,8 @@ static void setup_node_interface(struct l_dbus_interface *iface)
- 	l_dbus_interface_property(iface, "Features", 0, "a{sv}", features_getter,
- 									NULL);
- 	l_dbus_interface_property(iface, "Beacon", 0, "b", beacon_getter, NULL);
--	l_dbus_interface_property(iface, "BeaconFlags", 0, "y",
--						beaconflags_getter, NULL);
-+	l_dbus_interface_property(iface, "IvUpdate", 0, "b", ivupdate_getter,
-+									NULL);
- 	l_dbus_interface_property(iface, "IvIndex", 0, "u", ivindex_getter,
- 									NULL);
- 	l_dbus_interface_property(iface, "SequenceNumber", 0, "u",
--- 
-2.26.0
+On 6/16/20 9:53 PM, Joe Perches wrote:
+> On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
+>>  v4:
+>>   - Break out the memzero_explicit() change as suggested by Dan Carpenter
+>>     so that it can be backported to stable.
+>>   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
+>>     now as there can be a bit more discussion on what is best. It will be
+>>     introduced as a separate patch later on after this one is merged.
+> 
+> To this larger audience and last week without reply:
+> https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
+> 
+> Are there _any_ fastpath uses of kfree or vfree?
+> 
+> Many patches have been posted recently to fix mispairings
+> of specific types of alloc and free functions.
 
+I've prepared a coccinelle script to highlight these mispairings in a function
+a couple of days ago: https://lkml.org/lkml/2020/6/5/953
+I've listed all the fixes in the commit message. 
+
+Not so many mispairings actually, and most of them are harmless like:
+kmalloc(E) -> kvfree(E)
+
+However, coccinelle script can't detect cross-functions mispairings, i.e.
+allocation in one function, free in another funtion.
+
+Thanks,
+Denis
