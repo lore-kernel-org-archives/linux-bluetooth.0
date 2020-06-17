@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80084C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23050C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69C442082F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 046B420FC3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 10:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbgFQKmO (ORCPT
+        id S1726688AbgFQKmP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 06:42:14 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36294 "EHLO
+        Wed, 17 Jun 2020 06:42:15 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:45924 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726600AbgFQKmN (ORCPT
+        with ESMTP id S1725964AbgFQKmN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 17 Jun 2020 06:42:13 -0400
 Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B5F14CECDB
+        by mail.holtmann.org (Postfix) with ESMTPSA id D2552CECDC
         for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 12:52:02 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/14] Bluetooth: Add handler of MGMT_OP_REMOVE_ADV_MONITOR
-Date:   Wed, 17 Jun 2020 12:42:00 +0200
-Message-Id: <211ca797e01a6ccab70d6432bf33ff73ab37d994.1592390407.git.marcel@holtmann.org>
+Subject: [PATCH 10/14] Bluetooth: Notify adv monitor added event
+Date:   Wed, 17 Jun 2020 12:42:01 +0200
+Message-Id: <fdb52b467869fa9d3d125a2439d0d7a4c59f0143.1592390407.git.marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592390407.git.marcel@holtmann.org>
 References: <cover.1592390407.git.marcel@holtmann.org>
@@ -40,136 +40,76 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Miao-chen Chou <mcchou@chromium.org>
 
-This adds the request handler of MGMT_OP_REMOVE_ADV_MONITOR command.
-Note that the controller-based monitoring is not yet in place. This
-removes the internal monitor(s) without sending HCI traffic, so the
-request returns immediately.
+This notifies management sockets on MGMT_EV_ADV_MONITOR_ADDED event.
 
 The following test was performed.
-- Issue btmgmt advmon-remove with valid and invalid handles.
+- Start two btmgmt consoles, issue a btmgmt advmon-add command on one
+console and observe a MGMT_EV_ADV_MONITOR_ADDED event on the other
 
 Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 31 ++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             | 35 ++++++++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+)
+ net/bluetooth/mgmt.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 13fad419ae7d..c54f9295892e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1283,6 +1283,7 @@ void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
- void hci_adv_monitors_clear(struct hci_dev *hdev);
- void hci_free_adv_monitor(struct adv_monitor *monitor);
- int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
-+int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle);
- 
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ce481fab349d..59132b3e2cde 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3041,6 +3041,37 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
- 	return 0;
- }
- 
-+static int free_adv_monitor(int id, void *ptr, void *data)
-+{
-+	struct hci_dev *hdev = data;
-+	struct adv_monitor *monitor = ptr;
-+
-+	idr_remove(&hdev->adv_monitors_idr, monitor->handle);
-+	hci_free_adv_monitor(monitor);
-+
-+	return 0;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+int hci_remove_adv_monitor(struct hci_dev *hdev, u16 handle)
-+{
-+	struct adv_monitor *monitor;
-+
-+	if (handle) {
-+		monitor = idr_find(&hdev->adv_monitors_idr, handle);
-+		if (!monitor)
-+			return -ENOENT;
-+
-+		idr_remove(&hdev->adv_monitors_idr, monitor->handle);
-+		hci_free_adv_monitor(monitor);
-+	} else {
-+		/* Remove all monitors if handle is 0. */
-+		idr_for_each(&hdev->adv_monitors_idr, &free_adv_monitor, hdev);
-+	}
-+
-+	return 0;
-+}
-+
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
- 					 bdaddr_t *bdaddr, u8 type)
- {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1eca36e51706..cff24fde72d2 100644
+index cff24fde72d2..3268d9a00608 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -121,6 +121,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_DEVICE_FLAGS,
- 	MGMT_OP_READ_ADV_MONITOR_FEATURES,
- 	MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+	MGMT_OP_REMOVE_ADV_MONITOR,
+@@ -191,6 +191,7 @@ static const u16 mgmt_untrusted_events[] = {
+ 	MGMT_EV_EXT_INDEX_REMOVED,
+ 	MGMT_EV_EXT_INFO_CHANGED,
+ 	MGMT_EV_EXP_FEATURE_CHANGED,
++	MGMT_EV_ADV_MONITOR_ADDED,
  };
  
- static const u16 mgmt_events[] = {
-@@ -4118,6 +4119,39 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 	return err;
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -3977,6 +3978,16 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				 &cp->addr, sizeof(cp->addr));
  }
  
-+static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
-+			      void *data, u16 len)
++static void mgmt_adv_monitor_added(struct sock *sk, struct hci_dev *hdev,
++				   u16 handle)
 +{
-+	struct mgmt_cp_remove_adv_monitor *cp = data;
-+	struct mgmt_rp_remove_adv_monitor rp;
-+	u16 handle;
-+	int err;
++	struct mgmt_ev_adv_monitor_added ev;
 +
-+	BT_DBG("request for %s", hdev->name);
++	ev.monitor_handle = cpu_to_le16(handle);
 +
-+	hci_dev_lock(hdev);
-+
-+	handle = __le16_to_cpu(cp->monitor_handle);
-+
-+	err = hci_remove_adv_monitor(hdev, handle);
-+	if (err == -ENOENT) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADV_MONITOR,
-+				      MGMT_STATUS_INVALID_INDEX);
-+		goto unlock;
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	rp.monitor_handle = cp->monitor_handle;
-+
-+	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_ADV_MONITOR,
-+				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+	return err;
++	mgmt_event(MGMT_EV_ADV_MONITOR_ADDED, hdev, &ev, sizeof(ev), sk);
 +}
 +
- static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
- 				         u16 opcode, struct sk_buff *skb)
+ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+ 				 void *data, u16 len)
  {
-@@ -7589,6 +7623,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ read_adv_mon_features,   MGMT_READ_ADV_MONITOR_FEATURES_SIZE },
- 	{ add_adv_patterns_monitor,MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE,
- 						HCI_MGMT_VAR_LEN },
-+	{ remove_adv_monitor,      MGMT_REMOVE_ADV_MONITOR_SIZE },
- };
+@@ -4029,8 +4040,8 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_rp_add_adv_patterns_monitor rp;
+ 	struct adv_monitor *m = NULL;
+ 	struct adv_pattern *p = NULL;
++	unsigned int mp_cnt = 0, prev_adv_monitors_cnt;
+ 	__u8 cp_ofst = 0, cp_len = 0;
+-	unsigned int mp_cnt = 0;
+ 	int err, i;
  
- void mgmt_index_added(struct hci_dev *hdev)
+ 	BT_DBG("request for %s", hdev->name);
+@@ -4094,6 +4105,8 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	hci_dev_lock(hdev);
+ 
++	prev_adv_monitors_cnt = hdev->adv_monitors_cnt;
++
+ 	err = hci_add_adv_monitor(hdev, m);
+ 	if (err) {
+ 		if (err == -ENOSPC) {
+@@ -4104,6 +4117,9 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	if (hdev->adv_monitors_cnt > prev_adv_monitors_cnt)
++		mgmt_adv_monitor_added(sk, hdev, m->handle);
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	rp.monitor_handle = cpu_to_le16(m->handle);
 -- 
 2.26.2
 
