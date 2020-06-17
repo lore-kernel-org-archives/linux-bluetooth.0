@@ -2,130 +2,101 @@ Return-Path: <SRS0=B2uu=76=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C9BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 11:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015B1C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 11:08:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 787702071A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 11:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB73E208B3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jun 2020 11:08:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uEnXH1vp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726303AbgFQLBr convert rfc822-to-8bit (ORCPT
+        id S1726328AbgFQLIk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jun 2020 07:01:47 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39834 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725554AbgFQLBq (ORCPT
+        Wed, 17 Jun 2020 07:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbgFQLIj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jun 2020 07:01:46 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1AFD2CECD2;
-        Wed, 17 Jun 2020 13:11:36 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: Requested feedback for new advertising MGMT command
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAKc116CHjs=hOLxz-76DxQpU-sSML1yxRnACuTCoOuCh3nFNog@mail.gmail.com>
-Date:   Wed, 17 Jun 2020 13:01:44 +0200
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <2FAC3F24-01C3-43A7-A6DF-01614A4B62AE@holtmann.org>
-References: <CAKc116CHjs=hOLxz-76DxQpU-sSML1yxRnACuTCoOuCh3nFNog@mail.gmail.com>
-To:     Daniel Winkler <danielwinkler@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Wed, 17 Jun 2020 07:08:39 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E515C061573;
+        Wed, 17 Jun 2020 04:08:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6UMFO2TmbdpnJT0c5EXP2Aydp2MaQ5RYJc+GA8ZrxVg=; b=uEnXH1vpZaG2U8FFM/pYkfHc5Y
+        SeAjiiS0wb4uxVIyAse/Mlkd6U3qaJ4r4kEh9T7lE+/o5L5t1dNjJ28G/NIqVe0DWG/fV4/lQHo1o
+        QDwGZP0qomelniIocS0ybLZQjvlRxX/INLpmjUp5+LL4fh2HQo9F6qYCqhyg1imU2AHxFgkQk0jvm
+        8nOqGDFYb7CZcfryOG0jsO4VWYAKfvslQU5aBRvXZEAb7odmsPQzoqooHS6qL3UZV2AdZFQmkWhak
+        uKTLzMfmXR1ZbqokaLQoFEtbowD5zP+hhe/qVdQ+y0/QB4rOvsOqTW0JOhm+R3UUkEQZTtPszFNR9
+        vDBLz4ZQ==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jlVvY-0007BQ-88; Wed, 17 Jun 2020 11:08:20 +0000
+Date:   Wed, 17 Jun 2020 04:08:20 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
+        Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Rientjes <rientjes@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Message-ID: <20200617110820.GG8681@bombadil.infradead.org>
+References: <20200616015718.7812-1-longman@redhat.com>
+ <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+ <20200616230130.GJ27795@twin.jikos.cz>
+ <20200617003711.GD8681@bombadil.infradead.org>
+ <20200617071212.GJ9499@dhcp22.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200617071212.GJ9499@dhcp22.suse.cz>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
-
-> We are working on a feature to allow advertising clients to customize
-> both advertising intervals and requested tx power for each registered
-> advertising set. It is clear that the existing "add advertising" MGMT
-> command is not sufficient for these new features, so we have narrowed
-> it down to two options for the new interface, and hope for your
-> feedback:
+On Wed, Jun 17, 2020 at 09:12:12AM +0200, Michal Hocko wrote:
+> On Tue 16-06-20 17:37:11, Matthew Wilcox wrote:
+> > Not just performance critical, but correctness critical.  Since kvfree()
+> > may allocate from the vmalloc allocator, I really think that kvfree()
+> > should assert that it's !in_atomic().  Otherwise we can get into trouble
+> > if we end up calling vfree() and have to take the mutex.
 > 
-> Option 1 replicates existing MGMT command, and in addition provides
-> new interval and tx_power members.
-> 
-> #define MGMT_OP_ADD_EXT_ADVERTISING 0x00??
-> struct mgmt_cp_add_ext_advertising {
->    uint8_t  instance;
->    uint32_t flags;
->    uint16_t timeout;
->    uint16_t min_interval;
->    uint16_t max_interval;
->    int8_t tx_power;
->    uint8_t  adv_data_len;
->    uint8_t  scan_rsp_len;
->    uint8_t  data[];
-> } __packed;
-> 
-> Option 2 packs the data into a flexible TLV data member. This allows
-> unused/unnecessary parameters to be omitted, and also allows for
-> future addition of functionality without redefining the MGMT
-> interface, for instance when more of the extended advertising features
-> are enabled in userspace.
-> 
-> #define MGMT_OP_ADD_EXT_ADVERTISING 0x00??
-> struct mgmt_cp_add_ext_advertising {
->    uint8_t  instance;
->    uint32_t flags;
->    uint8_t  tlv_data[];
-> } __packed;
-> 
-> Feedback/comments/concerns are highly welcome, thanks in advance!
+> FWIW __vfree already checks for atomic context and put the work into a
+> deferred context. So this should be safe. It should be used as a last
+> resort, though.
 
-I am leaning towards option 1 since it is a lot easier to read and also handle inside the code. We can add extra flags if default values should be applied.
-
-The one thing that is rather more problematic is that fact that we want to provide tx_power and then we need to know what the tx_power level has been chosen by the controller. In HCI there is no combined command and thus setting the parameters first and then the data is possible.
-
-So maybe one proposal could also be this:
-
-Add Extended Advertising Command
-================================
-
-        Command Code:           0x00xx
-        Controller Index:       <controller id>
-        Command Parameters:     Instance (1 Octet)
-                                Flags (4 Octets)
-                                Duration (2 Octets)
-                                Timeout (2 Octets)
-				TX_Power (1 Octet)
-				Min_Interval (2 Octets)
-				Max_Interval (2 Octets)
-        Return Parameters:      Instance (1 Octet)
-				TX_Power (1 Octet)
-
-
-We can implement this command in way that extension with new fields is possible. Not all commands need to be strict in length. Such a created instance is of course off by default.
-
-And then you need to provide the AD with a separate command to activate the instance.
-
-Set Advertising Data Command
-============================
-
-	Command Code:		0x00xx
-	Controller Index:	<controller id>
-	Command Parameters:	Instance (1 Octet)
-				Flags (4 Octets)
-                                Adv_Data_Len (1 Octet)
-                                Scan_Rsp_Len (1 Octet)
-                                Adv_Data (0-255 Octets)
-                                Scan_Rsp (0-255 Octets)
-	Return Parameters:      Instance (1 Octet)
-
-This command should only be allowed if Add Extended Advertising is used and most likely also Advertising Data Changed event needs to be added to complete this.
-
-The Flags might share a namespace if that makes sense, but not all are available for both commands.
-
-Regards
-
-Marcel
-
+Actually, it only checks for in_interrupt().  If you call vfree() under
+a spinlock, you're in trouble.  in_atomic() only knows if we hold a
+spinlock for CONFIG_PREEMPT, so it's not safe to check for in_atomic()
+in __vfree().  So we need the warning in order that preempt people can
+tell those without that there is a bug here.
