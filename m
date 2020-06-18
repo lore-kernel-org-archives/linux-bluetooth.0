@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CEEC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 04:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF7AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 04:41:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03108217A0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 04:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C274207E8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 04:41:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U64yTdFc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="afD18gdD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725942AbgFREi3 (ORCPT
+        id S1725987AbgFRElJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 00:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48888 "EHLO
+        Thu, 18 Jun 2020 00:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbgFREi3 (ORCPT
+        with ESMTP id S1725953AbgFRElH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 00:38:29 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19F4C06174E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 21:38:28 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id a21so3906668oic.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 21:38:28 -0700 (PDT)
+        Thu, 18 Jun 2020 00:41:07 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC37C06174E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 21:41:07 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id m2so3497876otr.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2020 21:41:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=U8r1OH+uUbWSBJiX7OSVuf0HNyzobipC/Wk5oB6lFas=;
-        b=U64yTdFcERlATolea51eJ0+cUXCRdO4HCnNu/s2HIiJhvNshQmjDMyyf0ss5RotDj0
-         JjGFm2wcFpLXUcsz+iZkL01Ob0m+nU0/s8eqWYHvLeAB9dIq1IeF0NjStcUmiutB+rXN
-         8MtWqFMCNt3skICXQp9YM99H4jlUKfS6JGxN/xGl96Pj0IMomU7qhDSlF60s2OlMq32y
-         0iOWUQpqxdoTIvs0sjRoFEPAEsoEMw+4LI9dOwF21fcHqhQtW+jArBD5+zAPnWUPcOLM
-         8R8ijkOT7aVVec786eHJ80UxB6Xe5i8VKrxYyIEEL4kzXIreaU2cJSS/si/fxqmuJNm0
-         j0BA==
+        bh=w3sCUp2rgh5RKQcJxoLWtXqBhZSKg+aDZdHcLr2HlEc=;
+        b=afD18gdDE67H0h0b4sQ/cmZfMnPjMKrPPDwh/FeCraMwbEVPWkjwNTCm4Aw8ZX+yJq
+         YkiefPRJcTW409X78bfn/7mZc/BlIcGjZocVC2Hc310OhyDYpmQD7fhMYkhtG7sRzXhQ
+         64ghxxfsrgcgPtqrsbl186gG9LsWkYetrFu4ihvrFUQA5cAbArLwpKB9lxjP+og+CA96
+         SebvqnSfOBIwdx26ZUiXOkiUlnV5YmQCO5I1/9JxsfGksbLygMBo3yYCcSZXXCKiraTv
+         S0RBzrFF5BhTHW2OYdRubor7rVdV1mshQwDYBCQWFQ6ui0gD8axh94rqZei20lLxFEq8
+         hMxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=U8r1OH+uUbWSBJiX7OSVuf0HNyzobipC/Wk5oB6lFas=;
-        b=kuEnoNDHd3Kl/i2cB5op/M2yLhKrRC1lG8r+8Ky+RAKDJH5Rg6zl67jpKNq1g0jKbh
-         JKP8WMp3kLn99slifW3IGCELHBcrPXYVo/k8hSPNiN2AQOXXViFLSzF7ZaGthTRR5Z2z
-         AlyikXatdfICQq4iHXuEdO2kHESRvYQ0ZhDY/MEXVj1lmFTy+lSPJi+YBQY52IFcyq/n
-         OVn3rF33JPP/kKqT6MKRYPlENx36p2+QIr3P6ZjBC5UkRjkAnNqknx6HTmc8DUzj4Tkl
-         CRGCK70AnVfhuPmUGBxCCsIicguncNGw3oLgeeEnxa4G3kyq09l7PZCm75uIV8rt8k6g
-         D5ow==
-X-Gm-Message-State: AOAM532WCxCA03VVqS0CFRbtkUWcEqyJoe5f2jzhQW9svs6lOhuQjp4u
-        6TWipw9GeUZEPnQo16LCbbKNSK7ge9dEAmDGC9d9+g==
-X-Google-Smtp-Source: ABdhPJynD3MYOY7fWKYhykNIvLhP3T/U1upHRyqXFyKaOs/pUDE9V3ky5Mfr2S/+TnhY+1OuE4vb5Pz+1UQhT0tKE7c=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr1500323oib.48.1592455107771;
- Wed, 17 Jun 2020 21:38:27 -0700 (PDT)
+        bh=w3sCUp2rgh5RKQcJxoLWtXqBhZSKg+aDZdHcLr2HlEc=;
+        b=Opw0Bz3hrLw1wKLlkP3v+juI8AFi2CQVnIQzEy9x5dZqd5nj25wNbzKavhy0A7UFQL
+         r/2/ub6WAOrWoSjhnBa17nDk0R1N1Lw1K1XtgWl4+n1HC9e91rYwtVBKrjahMXmijOC8
+         catszPZx/nGxSDofhZi+Fp2ztS1zbFsiJJuJT9y5hwrEc1Wca6FuL9vNW+3hXOT6Nncc
+         cgUG3qIlTC0HbMO90jvNO2+QQ2pWF00Jj/Rb7sOGfCjmGYPI4TEYUCfJ5rN9coBV+4zh
+         LwidGgsStpjnE02U8KYe0eWKYdw2QURYu1m+IWg//as5VtigeSmkVzJ00prYypCOjAok
+         TjyQ==
+X-Gm-Message-State: AOAM531aO4apuZXPaF9JKkrqaitBKtZmFnDO1fOg7B/AgOQbdShF+mKV
+        4EjlRMSQs4sNBHNihw6k18LzwOKjIj8QYJRzlCw=
+X-Google-Smtp-Source: ABdhPJy0fP061ujxy0svICHV8SFHxsNe85jtgcU3FY2OmNXbsAQ4OG8Fp+Sb8zDncdLUk7ncaZ4xuf3c3gF6G6UCyYc=
+X-Received: by 2002:a05:6830:1e85:: with SMTP id n5mr1916743otr.362.1592455267000;
+ Wed, 17 Jun 2020 21:41:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200618014812.234606-1-alainm@chromium.org>
-In-Reply-To: <20200618014812.234606-1-alainm@chromium.org>
+References: <20200615145221.224747-1-alainm@chromium.org>
+In-Reply-To: <20200615145221.224747-1-alainm@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 17 Jun 2020 21:38:16 -0700
-Message-ID: <CABBYNZJazkorL2ea7C+P95y769qVUuRC9YO8XXOCob7CzuSL9Q@mail.gmail.com>
-Subject: Re: [BlueZ PATCH] main: fixing logical error when loading controller params
+Date:   Wed, 17 Jun 2020 21:40:56 -0700
+Message-ID: <CABBYNZLTorEmM3t5BCWqYLGF6Q4e7kOXo2TTj20YShrFEV3Z0g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1] main: adding missing connection parameter entries
 To:     Alain Michaud <alainm@chromium.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,40 +72,45 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Alain,
 
-On Wed, Jun 17, 2020 at 6:51 PM Alain Michaud <alainm@chromium.org> wrote:
+On Mon, Jun 15, 2020 at 7:55 AM Alain Michaud <alainm@chromium.org> wrote:
 >
-> Fixing logical error when loading configuration parameters from the
-> config file.  Without this patch, the maximum allowable value is always
-> used.
+> This patch adds the missing connection parameter entries for loading
+> connection parameters from main.conf
 >
 > ---
 >
->  src/main.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  src/main.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >
 > diff --git a/src/main.c b/src/main.c
-> index e51f614b3..75ea27f40 100644
+> index 77886d58e..ceb839d11 100644
 > --- a/src/main.c
 > +++ b/src/main.c
-> @@ -421,12 +421,13 @@ static void parse_controller_config(GKeyFile *config)
->                 int val = g_key_file_get_integer(config, "Controller",
->                                                 params[i].val_name, &err);
->                 if (err) {
-> +                       warn("%s", err->message);
->                         g_clear_error(&err);
->                 } else {
-> -                       DBG("%s=%d", params[i].val_name, val);
-> +                       info("%s=%d", params[i].val_name, val);
->
-> -                       val = MIN(val, params[i].min);
-> -                       val = MAX(val, params[i].max);
-> +                       val = MAX(val, params[i].min);
-> +                       val = MIN(val, params[i].max);
->                         *params[i].val = val;
->                         ++main_opts.default_params.num_entries;
->                 }
+> @@ -411,6 +411,22 @@ static void parse_controller_config(GKeyFile *config)
+>                   &main_opts.default_params.le_scan_win_connect,
+>                   0x0004,
+>                   0x4000},
+> +               { "LEMinConnectionInterval",
+> +                 &main_opts.default_params.le_min_conn_interval,
+> +                 0x0006,
+> +                 0x0C80},
+> +               { "LEMaxConnectionInterval",
+> +                 &main_opts.default_params.le_max_conn_interval,
+> +                 0x0006,
+> +                 0x0C80},
+> +               { "LEConnectionLatency",
+> +                 &main_opts.default_params.le_conn_latency,
+> +                 0x0000,
+> +                 0x01F3},
+> +               { "LEConnectionSupervisionTimeout",
+> +                 &main_opts.default_params.le_conn_lsto,
+> +                 0x000A,
+> +                 0x0C80},
+>                 { "LEAutoconnecttimeout",
+>                   &main_opts.default_params.le_autoconnect_timeout,
+>                   0x0001,
 > --
-> 2.27.0.111.gc72c7da667-goog
+> 2.27.0.290.gba653c62da-goog
 
 Applied, thanks.
 
