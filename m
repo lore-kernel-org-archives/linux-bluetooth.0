@@ -2,112 +2,225 @@ Return-Path: <SRS0=NPxI=77=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B897C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 16:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867D5C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 17:37:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 260D720707
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 16:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592498683;
-	bh=V/vmS3iE8bYbFH1KgNhqWAC8guQyH2lID8qzr22I8bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OiS6fubWy5J/9CmgNEE9KIxRDfes9WD3lYYMH8E5of+DEYnqZWX3pALBtPenz+UIM
-	 uIjhH33Y1Vm6CA4YBnFROL3h+/CY2BdIvQnUVnIrA9EM/mmIRXUi+tKnctcuRG2Tuy
-	 DezEoacLqaFEzZjzAc8k2xD/rm+69iSEeaSzr/c0=
+	by mail.kernel.org (Postfix) with ESMTP id 5EE6520706
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 17:37:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbhgY+X1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731917AbgFRQog (ORCPT
+        id S1729546AbgFRRhf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 12:44:36 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:35679 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728090AbgFRQog (ORCPT
+        Thu, 18 Jun 2020 13:37:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728514AbgFRRhd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 12:44:36 -0400
-Received: by mail-io1-f68.google.com with SMTP id s18so7822174ioe.2;
-        Thu, 18 Jun 2020 09:44:35 -0700 (PDT)
+        Thu, 18 Jun 2020 13:37:33 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B19C0613EE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 10:37:32 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id s13so5187716otd.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 10:37:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HCBfNmZg/9Xb+bCpZGi47AZAQwI7RzmkzN4hrII2gQI=;
+        b=jbhgY+X1kxfwun4widosJ6H0UXwhG2T/OHil3rUF/Jdp0+MKeovqx7m0GXv7svqpZW
+         WZVsyxP7hydRKO6gNi3Gbz8BbkHKu8X9eB9DhB/aWNZuqy7YY8AYzouWiQrnqm5mCPsw
+         W88Ge4zpZrarqZB92GlDqNNNNQjpMOcEw38IeoRjMhiUCpsKaxurFxXhRPN3FAA+rv0t
+         7nr9Dzas539jaoLu+GpDLv2B5llNsXbVnYb9HaxfDRoUPGyFPcpQ/q9dNJCKKvRAAdqK
+         pFqurFvYo83DrdfLUi3nMybH9tUQpF8cLU8OqdiiNnJj1iHf7CjSC8rUuHOLANpap2BO
+         x5gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=P6K0NMCQ9QdVvPAqikzClu5E67Y9Qrb4CGCZ1kreB7k=;
-        b=lQQF7kigInRkQfosEdD964L/MxE8WBfqhlcjat7uGcKAHLo05DRETCrqGSyks++q+N
-         LD4YhxofHAtxiU5+rHlIy3fj7hI2j+51pQtcM6jdo+VhoSuWboDrT/C3r1LucoJ5fPo8
-         XH90hJcCZpxLydo/zfi86U+YTKyjFpcCynbHwPNVBykLh/AwfkGFiYvV01UC7Njcn9Fm
-         i7JzC87Ts5XcXKgf8rWto+0uBp8pgMrufHPIklBNXVWtmArrkvPMRXYS+6uQQNqXM3nF
-         lkAvJYLMGcm+LVrud0JLT3mPZ6pXFG4l0Cfon9dqlnZ+CMrhPV3AS8sCW/3sHC9A7wxY
-         h+Og==
-X-Gm-Message-State: AOAM532zD6wytvJDMt90fD2r8Vx2DFdu1IjS513iNUXpDm7pYMOGOlBs
-        R7JCddqfLJIs+WZMZ6CLdg==
-X-Google-Smtp-Source: ABdhPJwkW4ZsJ4bdYKr0qKa9ryOy5g+2hE48HtjOUzrbj3WgzjP+FDJi5kL2BbFKLOci4Y0m6ArWyw==
-X-Received: by 2002:a5d:858a:: with SMTP id f10mr6056867ioj.184.1592498674934;
-        Thu, 18 Jun 2020 09:44:34 -0700 (PDT)
-Received: from xps15 ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id g21sm1969126ioc.14.2020.06.18.09.44.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 09:44:34 -0700 (PDT)
-Received: (nullmailer pid 504576 invoked by uid 1000);
-        Thu, 18 Jun 2020 16:44:31 -0000
-Date:   Thu, 18 Jun 2020 10:44:31 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
-        Sean Wang <sean.wang@mediatek.com>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        linux-rockchip@lists.infradead.org,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Mark Brown <broonie@kernel.org>,
-        David Airlie <airlied@linux.ie>, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Sandy Huang <hjc@rock-chips.com>, alsa-devel@alsa-project.org,
-        Arnaud Pouliquen <arnaud.pouliquen@st.com>,
-        Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 13/29] dt: fix broken links due to txt->yaml renames
-Message-ID: <20200618164431.GA504444@bogus>
-References: <cover.1592203542.git.mchehab+huawei@kernel.org>
- <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HCBfNmZg/9Xb+bCpZGi47AZAQwI7RzmkzN4hrII2gQI=;
+        b=rYVJvGcKxu+GurA2xeaHyB+wsatwaBGGgzSda9m7FK1DxTyTfKv6Ow23+omY+aJvLn
+         +TRZ4nInhQPUdxaYNaQt4qtNvqCWEuCiLBviT0Vfl0IoGMsgzM/MoR9GnvdTILfu6er3
+         Q73Q7ifWXi9lwgdaiVeRdBEPVs9RkO3OyhPA+3p7NwFmiLS9kc/mKmRRlNMtIcNdwZD/
+         9sz4jR3h3N7sYz1g/KVdBmOkNorZGg2G1IM3hs3cBg6DE6nlCXV/GJvj8JvnD0tfVZGS
+         Ac+9JUIHU9ULk1TPE8masCpD4m1x26xg5XzvKblfDuQMQn2gS4qseks89tRJeOnG8Yf4
+         hGiw==
+X-Gm-Message-State: AOAM533uX8OnNDylT3HzY8J35vzUwDA48PDLcw+57OkKSLA1aZ3esXcM
+        mZcp7wZxyUtrl2+T6sS41e/iTlFAJIzHD/hw8ArCUA==
+X-Google-Smtp-Source: ABdhPJwnewXl3+kMrUvDPbIAIL/C6FzSTJTs5kb7n5NwNdypDp8yx73OpVCK1GBZxRMYEd5sVddndsigGF6S3jY6fK4=
+X-Received: by 2002:a9d:4691:: with SMTP id z17mr4437509ote.88.1592501851401;
+ Thu, 18 Jun 2020 10:37:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
+References: <20200520212015.626026-1-luiz.dentz@gmail.com>
+In-Reply-To: <20200520212015.626026-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 18 Jun 2020 10:37:20 -0700
+Message-ID: <CABBYNZKBcpV4CNhLKkzApnEq0FWX+wbY7o4P-6sWr85j9qWhMg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Bluetooth: Disconnect if E0 is used for Level 4
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 15 Jun 2020 08:46:52 +0200, Mauro Carvalho Chehab wrote:
-> There are some new broken doc links due to yaml renames
-> at DT. Developers should really run:
-> 
-> 	./scripts/documentation-file-ref-check
-> 
-> in order to solve those issues while submitting patches.
-> This tool can even fix most of the issues with:
-> 
-> 	./scripts/documentation-file-ref-check --fix
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  Documentation/devicetree/bindings/display/bridge/sii902x.txt  | 2 +-
->  .../devicetree/bindings/display/rockchip/rockchip-drm.yaml    | 2 +-
->  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt  | 2 +-
->  Documentation/devicetree/bindings/sound/audio-graph-card.txt  | 2 +-
->  Documentation/devicetree/bindings/sound/st,sti-asoc-card.txt  | 2 +-
->  Documentation/mips/ingenic-tcu.rst                            | 2 +-
->  MAINTAINERS                                                   | 4 ++--
->  7 files changed, 8 insertions(+), 8 deletions(-)
-> 
+Hi Marcel,
 
-Applied, thanks!
+On Wed, May 20, 2020 at 2:20 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> E0 is not allowed with Level 4:
+>
+> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1319:
+>
+>   '128-bit equivalent strength for link and encryption keys
+>    required using FIPS approved algorithms (E0 not allowed,
+>    SAFER+ not allowed, and P-192 not allowed; encryption key
+>    not shortened'
+>
+> SC enabled:
+>
+> > HCI Event: Read Remote Extended Features (0x23) plen 13
+>         Status: Success (0x00)
+>         Handle: 256
+>         Page: 1/2
+>         Features: 0x0b 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>           Secure Simple Pairing (Host Support)
+>           LE Supported (Host)
+>           Secure Connections (Host Support)
+> > HCI Event: Encryption Change (0x08) plen 4
+>         Status: Success (0x00)
+>         Handle: 256
+>         Encryption: Enabled with AES-CCM (0x02)
+>
+> SC disabled:
+>
+> > HCI Event: Read Remote Extended Features (0x23) plen 13
+>         Status: Success (0x00)
+>         Handle: 256
+>         Page: 1/2
+>         Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>           Secure Simple Pairing (Host Support)
+>           LE Supported (Host)
+> > HCI Event: Encryption Change (0x08) plen 4
+>         Status: Success (0x00)
+>         Handle: 256
+>         Encryption: Enabled with E0 (0x01)
+> [May 8 20:23] Bluetooth: hci0: Invalid security: expect AES but E0 was used
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>         Handle: 256
+>         Reason: Authentication Failure (0x05)
+>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h | 10 ++++++----
+>  net/bluetooth/hci_conn.c         | 17 +++++++++++++++++
+>  net/bluetooth/hci_event.c        | 20 ++++++++------------
+>  3 files changed, 31 insertions(+), 16 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index cdd4f1db8670..c69309ffd40a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1402,11 +1402,13 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+>         else
+>                 encrypt = 0x01;
+>
+> -       if (conn->sec_level == BT_SECURITY_SDP)
+> -               conn->sec_level = BT_SECURITY_LOW;
+> +       if (!status) {
+> +               if (conn->sec_level == BT_SECURITY_SDP)
+> +                       conn->sec_level = BT_SECURITY_LOW;
+>
+> -       if (conn->pending_sec_level > conn->sec_level)
+> -               conn->sec_level = conn->pending_sec_level;
+> +               if (conn->pending_sec_level > conn->sec_level)
+> +                       conn->sec_level = conn->pending_sec_level;
+> +       }
+>
+>         mutex_lock(&hci_cb_list_lock);
+>         list_for_each_entry(cb, &hci_cb_list, list) {
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 307800fd18e6..b99b5c6de55a 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1323,6 +1323,23 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+>                         return 0;
+>         }
+>
+> +        /* AES encryption is required for Level 4:
+> +         *
+> +         * BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C
+> +         * page 1319:
+> +         *
+> +         * 128-bit equivalent strength for link and encryption keys
+> +         * required using FIPS approved algorithms (E0 not allowed,
+> +         * SAFER+ not allowed, and P-192 not allowed; encryption key
+> +         * not shortened)
+> +         */
+> +       if (conn->sec_level == BT_SECURITY_FIPS &&
+> +           !test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
+> +               bt_dev_err(conn->hdev,
+> +                          "Invalid security: Missing AES-CCM usage");
+> +               return 0;
+> +       }
+> +
+>         if (hci_conn_ssp_enabled(conn) &&
+>             !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+>                 return 0;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index cfeaee347db3..d6a1e2450696 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3065,27 +3065,23 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>
+>         clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+>
+> +       /* Check link security requirements are met */
+> +       if (!hci_conn_check_link_mode(conn))
+> +               ev->status = HCI_ERROR_AUTH_FAILURE;
+> +
+>         if (ev->status && conn->state == BT_CONNECTED) {
+>                 if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
+>                         set_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
+>
+> +               /* Notify upper layers so they can cleanup before
+> +                * disconnecting.
+> +                */
+> +               hci_encrypt_cfm(conn, ev->status);
+>                 hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
+>                 hci_conn_drop(conn);
+>                 goto unlock;
+>         }
+>
+> -       /* In Secure Connections Only mode, do not allow any connections
+> -        * that are not encrypted with AES-CCM using a P-256 authenticated
+> -        * combination key.
+> -        */
+> -       if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
+> -           (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
+> -            conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
+> -               hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
+> -               hci_conn_drop(conn);
+> -               goto unlock;
+> -       }
+> -
+>         /* Try reading the encryption key size for encrypted ACL links */
+>         if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
+>                 struct hci_cp_read_enc_key_size cp;
+> --
+> 2.25.3
+
+Looks like we had left this behind.
+
+-- 
+Luiz Augusto von Dentz
