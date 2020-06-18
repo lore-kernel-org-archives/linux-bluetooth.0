@@ -2,102 +2,112 @@ Return-Path: <SRS0=NPxI=77=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 875DDC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 15:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B897C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 16:44:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 659592075E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 15:54:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="gi5PeLgb"
+	by mail.kernel.org (Postfix) with ESMTP id 260D720707
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 16:44:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592498683;
+	bh=V/vmS3iE8bYbFH1KgNhqWAC8guQyH2lID8qzr22I8bA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=OiS6fubWy5J/9CmgNEE9KIxRDfes9WD3lYYMH8E5of+DEYnqZWX3pALBtPenz+UIM
+	 uIjhH33Y1Vm6CA4YBnFROL3h+/CY2BdIvQnUVnIrA9EM/mmIRXUi+tKnctcuRG2Tuy
+	 DezEoacLqaFEzZjzAc8k2xD/rm+69iSEeaSzr/c0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728489AbgFRPyS (ORCPT
+        id S1731917AbgFRQog (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 11:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728090AbgFRPyS (ORCPT
+        Thu, 18 Jun 2020 12:44:36 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:35679 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728090AbgFRQog (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 11:54:18 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF72BC06174E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 08:54:17 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id t74so3786665lff.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 08:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=E7+l03fsBHCYz8VsMiL0F/uUy+gdwbJV4YORJA1NV58=;
-        b=gi5PeLgbguTHZLL+aZpArO2k+fWJXPZrYxYlVQbEt12jJzFYMbKTlKbgzo0/6Iwurj
-         bqeJn0IUs/gqI297WBAnZ5SgIPB/5jq224SyVPXgLr+H8d5AyEC2w+cEzDtuA5CfTn4G
-         dkM3vojgPx/ItFjnQ7WOpTPNBk7jug+vy3KP3NG1EuXsvb5T3Uhrpb8xRbhC/uz6T8h7
-         4VwmR+LFiahv//buqfFy97oyNnqE1RbTxwWve73bDSvAU1KFuoTj7mzMFeil63yq1rMe
-         0w9HmSURnGWRYuNOHG3eQ50Cu/+bDkEsWU6TLP1CS2E6t9xpv3kDgey+2KP+4PaOsRNS
-         hU7Q==
+        Thu, 18 Jun 2020 12:44:36 -0400
+Received: by mail-io1-f68.google.com with SMTP id s18so7822174ioe.2;
+        Thu, 18 Jun 2020 09:44:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to;
-        bh=E7+l03fsBHCYz8VsMiL0F/uUy+gdwbJV4YORJA1NV58=;
-        b=K2UrH83a5mr3BwOShnpIzMS3lnAhSaH6F1nQrX1YoU3eqSoOzzVaLQ0ZgGbHvv7GUS
-         PC28jbNVXD0f8Tz3aGvwrYvhKJFm2f63hsYLsUE0CsRocIdJBhxUI/18iRNobU/6xEdd
-         Ri+5Foxi4cKgBwNgoAL2nUJR6TwaR7p4uyhmQ7VPr+3f2fE5CNgHXf1BsnmOOomIR6I+
-         LKZ6Xk/AwXhgbubXqcLHI+DPfcjXDV7TarGvawlEqqKrgzoTb3on5BFLqrpxrknNPO9n
-         eKCc6Mys2om3FAbky24MlTQt2y1q23y/oTpWhFguhPK9vsZLanNDZT7rnG8qp2YcMI/+
-         AGRw==
-X-Gm-Message-State: AOAM531KcUcQKPYPun6ygfE8w4R+f4xWvFiBSY/1qiID+i2jxrFoyni8
-        Cwr3eEUNCEyt9xUV6dTFaTgy5g==
-X-Google-Smtp-Source: ABdhPJzABfuvMtrhjo9Z4UUxv48pxRxeoBF6ItLLIjpRDbcZZENxxcgLe1uRRy4qEZlaKdcBRUELDQ==
-X-Received: by 2002:a19:4945:: with SMTP id l5mr2751845lfj.12.1592495654592;
-        Thu, 18 Jun 2020 08:54:14 -0700 (PDT)
-Received: from kynes ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id r17sm804544ljd.0.2020.06.18.08.54.13
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=P6K0NMCQ9QdVvPAqikzClu5E67Y9Qrb4CGCZ1kreB7k=;
+        b=lQQF7kigInRkQfosEdD964L/MxE8WBfqhlcjat7uGcKAHLo05DRETCrqGSyks++q+N
+         LD4YhxofHAtxiU5+rHlIy3fj7hI2j+51pQtcM6jdo+VhoSuWboDrT/C3r1LucoJ5fPo8
+         XH90hJcCZpxLydo/zfi86U+YTKyjFpcCynbHwPNVBykLh/AwfkGFiYvV01UC7Njcn9Fm
+         i7JzC87Ts5XcXKgf8rWto+0uBp8pgMrufHPIklBNXVWtmArrkvPMRXYS+6uQQNqXM3nF
+         lkAvJYLMGcm+LVrud0JLT3mPZ6pXFG4l0Cfon9dqlnZ+CMrhPV3AS8sCW/3sHC9A7wxY
+         h+Og==
+X-Gm-Message-State: AOAM532zD6wytvJDMt90fD2r8Vx2DFdu1IjS513iNUXpDm7pYMOGOlBs
+        R7JCddqfLJIs+WZMZ6CLdg==
+X-Google-Smtp-Source: ABdhPJwkW4ZsJ4bdYKr0qKa9ryOy5g+2hE48HtjOUzrbj3WgzjP+FDJi5kL2BbFKLOci4Y0m6ArWyw==
+X-Received: by 2002:a5d:858a:: with SMTP id f10mr6056867ioj.184.1592498674934;
+        Thu, 18 Jun 2020 09:44:34 -0700 (PDT)
+Received: from xps15 ([64.188.179.253])
+        by smtp.gmail.com with ESMTPSA id g21sm1969126ioc.14.2020.06.18.09.44.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 08:54:13 -0700 (PDT)
-Date:   Thu, 18 Jun 2020 17:54:11 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2] mesh: Add deferral of Attach() and Leave() if
- busy
-Message-ID: <20200618155411.coomela7gawizxxl@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-References: <20200616181436.50319-1-brian.gix@intel.com>
- <f4c0a48f8d7c30b7c12bdcce84cf8ee172709daa.camel@intel.com>
- <20200618154325.eaudqfy4inbjl7oy@kynes>
- <12a59828baabec5621917d283e03338d796715f3.camel@intel.com>
+        Thu, 18 Jun 2020 09:44:34 -0700 (PDT)
+Received: (nullmailer pid 504576 invoked by uid 1000);
+        Thu, 18 Jun 2020 16:44:31 -0000
+Date:   Thu, 18 Jun 2020 10:44:31 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
+        Sean Wang <sean.wang@mediatek.com>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        linux-rockchip@lists.infradead.org,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Mark Brown <broonie@kernel.org>,
+        David Airlie <airlied@linux.ie>, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Sandy Huang <hjc@rock-chips.com>, alsa-devel@alsa-project.org,
+        Arnaud Pouliquen <arnaud.pouliquen@st.com>,
+        Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH 13/29] dt: fix broken links due to txt->yaml renames
+Message-ID: <20200618164431.GA504444@bogus>
+References: <cover.1592203542.git.mchehab+huawei@kernel.org>
+ <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <12a59828baabec5621917d283e03338d796715f3.camel@intel.com>
+In-Reply-To: <0e4a7f0b7efcc8109c8a41a2e13c8adde4d9c6b9.1592203542.git.mchehab+huawei@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian,
+On Mon, 15 Jun 2020 08:46:52 +0200, Mauro Carvalho Chehab wrote:
+> There are some new broken doc links due to yaml renames
+> at DT. Developers should really run:
+> 
+> 	./scripts/documentation-file-ref-check
+> 
+> in order to solve those issues while submitting patches.
+> This tool can even fix most of the issues with:
+> 
+> 	./scripts/documentation-file-ref-check --fix
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/display/bridge/sii902x.txt  | 2 +-
+>  .../devicetree/bindings/display/rockchip/rockchip-drm.yaml    | 2 +-
+>  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt  | 2 +-
+>  Documentation/devicetree/bindings/sound/audio-graph-card.txt  | 2 +-
+>  Documentation/devicetree/bindings/sound/st,sti-asoc-card.txt  | 2 +-
+>  Documentation/mips/ingenic-tcu.rst                            | 2 +-
+>  MAINTAINERS                                                   | 4 ++--
+>  7 files changed, 8 insertions(+), 8 deletions(-)
+> 
 
-On 06/18, Gix, Brian wrote:
-> I am using the user_data for the Attach and Leave call (which the dbus
-> system always passes as NULL) as the indication that the timed
-> deferral call is just that...   Otherwise if we *never* get the
-> JoinComplete response, we will forever loop repeatedly re-deferring
-> the Attach/Leave.
-
-Ah, right. I missed that part. Thanks.
-
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+Applied, thanks!
