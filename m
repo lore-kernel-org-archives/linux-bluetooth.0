@@ -2,89 +2,128 @@ Return-Path: <SRS0=NPxI=77=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DEAC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 07:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2658C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 10:17:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27F6D21532
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 07:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD0E120B1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 10:17:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="rTYqOdTb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iY4QbUCm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727911AbgFRHRU (ORCPT
+        id S1727084AbgFRKRp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 03:17:20 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:60927 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725829AbgFRHRR (ORCPT
+        Thu, 18 Jun 2020 06:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727815AbgFRKRc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 03:17:17 -0400
-X-UUID: e8455561c44641ffb33f1fde6f3d70d3-20200618
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=aDN+iiFlgb/HTwHnI1GgrUUk9EOWb7fnkVZpVNjf0yw=;
-        b=rTYqOdTbz9Vb4gOIc7omEyOWE5VLJ1HjwntjUdSH6YTsuxcYpE0GGVDE2fbpbX0+vdV14YBdtgUkvIKCr2mpVV1VJXidoJdKHE58TE8K/hti3E5h81l9IjHlSlJfsPpW/5tf1nhfe5ZUYcpqNYHRaNm+IMiY3mbyIBDMa5DfOcY=;
-X-UUID: e8455561c44641ffb33f1fde6f3d70d3-20200618
-Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 454420887; Thu, 18 Jun 2020 15:17:12 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs08n1.mediatek.inc (172.21.101.55) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Thu, 18 Jun 2020 15:17:08 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas07.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 18 Jun 2020 15:17:08 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
-        Mark Chen <Mark-YW.Chen@mediatek.com>
-Subject: [PATCH 2/2] Bluetooth: btmtksdio: fix up firmware download sequence
-Date:   Thu, 18 Jun 2020 15:17:07 +0800
-Message-ID: <51dda3f7e6e3a01b20145c5e879e837cec78b7da.1592463595.git.sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <c9bf7346a060d8913b670bbed7ed9e60b592e16f.1592463595.git.sean.wang@mediatek.com>
-References: <c9bf7346a060d8913b670bbed7ed9e60b592e16f.1592463595.git.sean.wang@mediatek.com>
+        Thu, 18 Jun 2020 06:17:32 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C82DC06174E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 03:17:29 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id d7so3120942lfi.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 03:17:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y2RIAJV8ZsSpSlmsN0Mtm8ddYweIRQvNFQDpS74Mfhk=;
+        b=iY4QbUCmdiZJda231G5kcdXutq150SsmwFqY0XLt/gdmLeJx5QUxkZrr3uuCAdsHQ+
+         9ysiifgProcqc/KmKlxPQ4wg/S9P5GeiCvxm/jyit8oiz9H5JCnXEFWiUbPrP2UrJLqc
+         M8RK0qK9uBMyQ7DFeGsRYnmekMPsqIexpeNgA1DcB3xben8BK9py3SHyeMngjIyCWiLl
+         NK2FKSuT7vZm9FpebViWZL+R7AY+gC4K/MjBpXK03VlZY5Fqjl6bQUNeLfE9Goe7QSC7
+         se6FejAyTUBBfs6I+B4AaGva/Ha6w3oOdgEvlYqLom9jqrxobKCkiLtG5SirYQLTY5Cg
+         xDmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to;
+        bh=Y2RIAJV8ZsSpSlmsN0Mtm8ddYweIRQvNFQDpS74Mfhk=;
+        b=IGLy9nDQ09+KRxKbI0x07qpxo0Fq70TpuZs1O7+NCqyfcJcU55c0TjlUru0y5DiBns
+         zximoYGv/jP5kLCc9Qhp5MohzyLjRC6TRlL85BntsTCmPwrYSAIJ9VdwcesfsY8JcEL6
+         C4hkkt3OzM5aCJurxou4d5qYOwzgOWyOvNjl8gIJ9tSL2lsbPp5ivLzXsOEXF9S+cIxa
+         y4KcLgTS8xToFbWkNbJw3NfNBy8+s6OZej9BDxYYfb+dohJ+xSruxCE8KlMeakpS6Ymn
+         k5hlTjEgTXJEpghxuSSWsqTd6YQ6YsQ4gTgjR6ttcGpROCG2x7ET0MuROEMSSzjbhhu9
+         s1iw==
+X-Gm-Message-State: AOAM531Hk1IvwcdX8RqPAuLskCOrhYUKEZUW7AnO2eDJEwSLZ9IFto/o
+        R+u5LMU5vYuuPZFmaysVlWBJMTepoAs=
+X-Google-Smtp-Source: ABdhPJynfDk7z6/2pF5MWjTWyAMO7tkGf6jDydsZKjKB7y3SyRR/HLVGms8EGH1wl5Myv9hua5AG4Q==
+X-Received: by 2002:ac2:5443:: with SMTP id d3mr1973508lfn.121.1592475447508;
+        Thu, 18 Jun 2020 03:17:27 -0700 (PDT)
+Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
+        by smtp.gmail.com with ESMTPSA id o16sm615276ljg.90.2020.06.18.03.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2020 03:17:26 -0700 (PDT)
+Date:   Thu, 18 Jun 2020 13:17:24 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 00/14] Combination of pending patches
+Message-ID: <20200618101724.GA76432@jhedberg-mac01.home>
+Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org
+References: <cover.1592404644.git.marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RnJvbTogU2VhbiBXYW5nIDxzZWFuLndhbmdAbWVkaWF0ZWsuY29tPg0KDQpEYXRhIFJBTSBvbiB0
-aGUgZGV2aWNlIGhhdmUgdG8gYmUgcG93ZXJlZCBvbiBiZWZvcmUgc3RhcnRpbmcgdG8gZG93bmxv
-YWQNCnRoZSBmaXJtd2FyZS4NCg0KRml4ZXM6IDlhZWJmZDRhMjIwMCAoIkJsdWV0b290aDogbWVk
-aWF0ZWs6IGFkZCBzdXBwb3J0IGZvciBNZWRpYVRlayBNVDc2NjNTIGFuZCBNVDc2NjhTIFNESU8g
-ZGV2aWNlcyIpDQpDby1kZXZlbG9wZWQtYnk6IE1hcmsgQ2hlbiA8TWFyay1ZVy5DaGVuQG1lZGlh
-dGVrLmNvbT4NClNpZ25lZC1vZmYtYnk6IE1hcmsgQ2hlbiA8TWFyay1ZVy5DaGVuQG1lZGlhdGVr
-LmNvbT4NClNpZ25lZC1vZmYtYnk6IFNlYW4gV2FuZyA8c2Vhbi53YW5nQG1lZGlhdGVrLmNvbT4N
-Ci0tLQ0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrc2Rpby5jIHwgMTYgKysrKysrKysrKysrKysr
-LQ0KIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQoNCmRp
-ZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idG10a3NkaW8uYyBiL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0bXRrc2Rpby5jDQppbmRleCA1MTk3ODhjNDQyY2EuLjExNDk0Y2QyYTk4MiAxMDA2NDQN
-Ci0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrc2Rpby5jDQorKysgYi9kcml2ZXJzL2JsdWV0
-b290aC9idG10a3NkaW8uYw0KQEAgLTY4NSw3ICs2ODUsNyBAQCBzdGF0aWMgaW50IG10a19zZXR1
-cF9maXJtd2FyZShzdHJ1Y3QgaGNpX2RldiAqaGRldiwgY29uc3QgY2hhciAqZnduYW1lKQ0KIAlj
-b25zdCB1OCAqZndfcHRyOw0KIAlzaXplX3QgZndfc2l6ZTsNCiAJaW50IGVyciwgZGxlbjsNCi0J
-dTggZmxhZzsNCisJdTggZmxhZywgcGFyYW07DQogDQogCWVyciA9IHJlcXVlc3RfZmlybXdhcmUo
-JmZ3LCBmd25hbWUsICZoZGV2LT5kZXYpOw0KIAlpZiAoZXJyIDwgMCkgew0KQEAgLTY5Myw2ICs2
-OTMsMjAgQEAgc3RhdGljIGludCBtdGtfc2V0dXBfZmlybXdhcmUoc3RydWN0IGhjaV9kZXYgKmhk
-ZXYsIGNvbnN0IGNoYXIgKmZ3bmFtZSkNCiAJCXJldHVybiBlcnI7DQogCX0NCiANCisJLyogUG93
-ZXIgb24gZGF0YSBSQU0gdGhlIGZpcm13YXJlIHJlbGllcyBvbi4gKi8NCisJcGFyYW0gPSAxOw0K
-Kwl3bXRfcGFyYW1zLm9wID0gTVRLX1dNVF9GVU5DX0NUUkw7DQorCXdtdF9wYXJhbXMuZmxhZyA9
-IDM7DQorCXdtdF9wYXJhbXMuZGxlbiA9IHNpemVvZihwYXJhbSk7DQorCXdtdF9wYXJhbXMuZGF0
-YSA9ICZwYXJhbTsNCisJd210X3BhcmFtcy5zdGF0dXMgPSBOVUxMOw0KKw0KKwllcnIgPSBtdGtf
-aGNpX3dtdF9zeW5jKGhkZXYsICZ3bXRfcGFyYW1zKTsNCisJaWYgKGVyciA8IDApIHsNCisJCWJ0
-X2Rldl9lcnIoaGRldiwgIkZhaWxlZCB0byBwb3dlciBvbiBkYXRhIFJBTSAoJWQpIiwgZXJyKTsN
-CisJCXJldHVybiBlcnI7DQorCX0NCisNCiAJZndfcHRyID0gZnctPmRhdGE7DQogCWZ3X3NpemUg
-PSBmdy0+c2l6ZTsNCiANCi0tIA0KMi4yNS4xDQo=
+Hi Marcel,
 
+On Wed, Jun 17, 2020, Marcel Holtmann wrote:
+> This is the list of pending patches and fixes merged together. Please
+> review that the set and functionality is correct and working as
+> expected.
+> 
+> In v2 the Reviewed-by tags have been added.
+> 
+> Abhishek Pandit-Subedi (4):
+>   Bluetooth: Add bdaddr_list_with_flags for classic whitelist
+>   Bluetooth: Replace wakeable list with flag
+>   Bluetooth: Replace wakeable in hci_conn_params
+>   Bluetooth: Add get/set device flags mgmt op
+> 
+> Manish Mandlik (1):
+>   Bluetooth: Terminate the link if pairing is cancelled
+> 
+> Marcel Holtmann (2):
+>   Bluetooth: mgmt: Add commands for runtime configuration
+>   Bluetooth: mgmt: Use command complete on success for set system config
+> 
+> Miao-chen Chou (7):
+>   Bluetooth: Add definitions for advertisement monitor features
+>   Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
+>   Bluetooth: Add handler of MGMT_OP_ADD_ADV_PATTERNS_MONITOR
+>   Bluetooth: Add handler of MGMT_OP_REMOVE_ADV_MONITOR
+>   Bluetooth: Notify adv monitor added event
+>   Bluetooth: Notify adv monitor removed event
+>   Bluetooth: Update background scan and report device based on
+>     advertisement monitors
+> 
+>  include/net/bluetooth/hci_core.h |  73 +++++-
+>  include/net/bluetooth/mgmt.h     |  77 +++++++
+>  net/bluetooth/hci_conn.c         |  11 +-
+>  net/bluetooth/hci_core.c         | 153 ++++++++++++-
+>  net/bluetooth/hci_event.c        |  13 +-
+>  net/bluetooth/hci_request.c      |  32 ++-
+>  net/bluetooth/l2cap_core.c       |   6 +-
+>  net/bluetooth/mgmt.c             | 382 ++++++++++++++++++++++++++++++-
+>  net/bluetooth/mgmt_config.c      |  23 +-
+>  net/bluetooth/mgmt_config.h      |   6 +
+>  net/bluetooth/msft.c             |   7 +
+>  net/bluetooth/msft.h             |   9 +
+>  12 files changed, 755 insertions(+), 37 deletions(-)
+
+All patches in this set have been applied to bluetooth-next. Thanks.
+
+Johan
