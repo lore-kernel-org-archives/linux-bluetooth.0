@@ -2,128 +2,179 @@ Return-Path: <SRS0=NPxI=77=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2658C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 10:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EA1C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 12:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD0E120B1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 10:17:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE5F92082F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 12:59:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iY4QbUCm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tFEpeObP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727084AbgFRKRp (ORCPT
+        id S1729970AbgFRM72 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 06:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
+        Thu, 18 Jun 2020 08:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727815AbgFRKRc (ORCPT
+        with ESMTP id S1729943AbgFRM7Z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 06:17:32 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C82DC06174E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 03:17:29 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id d7so3120942lfi.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 03:17:29 -0700 (PDT)
+        Thu, 18 Jun 2020 08:59:25 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05B91C06174E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 05:59:24 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id 9so7105756ljv.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 05:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Y2RIAJV8ZsSpSlmsN0Mtm8ddYweIRQvNFQDpS74Mfhk=;
-        b=iY4QbUCmdiZJda231G5kcdXutq150SsmwFqY0XLt/gdmLeJx5QUxkZrr3uuCAdsHQ+
-         9ysiifgProcqc/KmKlxPQ4wg/S9P5GeiCvxm/jyit8oiz9H5JCnXEFWiUbPrP2UrJLqc
-         M8RK0qK9uBMyQ7DFeGsRYnmekMPsqIexpeNgA1DcB3xben8BK9py3SHyeMngjIyCWiLl
-         NK2FKSuT7vZm9FpebViWZL+R7AY+gC4K/MjBpXK03VlZY5Fqjl6bQUNeLfE9Goe7QSC7
-         se6FejAyTUBBfs6I+B4AaGva/Ha6w3oOdgEvlYqLom9jqrxobKCkiLtG5SirYQLTY5Cg
-         xDmg==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kX+2vne+jkdoNchWYpH9zx0FwV8hi+bqEcEygiN+2TA=;
+        b=tFEpeObPE1mNxZgKf8okj7+Vwyh38NDr2Wj776osHcph9O6CDutxy7pqeNeEbDREAY
+         xkTw4oG4VwNsDXpqW7XrAvSMKWbblw6F3xmUwNjxWz0WJcDF1bFz21vG6jGkPOz8H3ch
+         jVWBw8l0tqoxqqFia0XK9XHSoPEs3IK9I8e+V6sHGlGHuOEDJZJHoDeyLLFtauG5DuXi
+         /wNGAIJwsxga70fcFPYtgMDrkWh9i4i+OxipbZhnJl0oELy8ZJE71Bgj7AT4y9Fm3NvQ
+         fVwwUa27hnmtsU4EoO4phk2v1GDwFedC04XgP4q/kcbBI1fFUzKttdNnG6PpsmOPttpu
+         xMzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=Y2RIAJV8ZsSpSlmsN0Mtm8ddYweIRQvNFQDpS74Mfhk=;
-        b=IGLy9nDQ09+KRxKbI0x07qpxo0Fq70TpuZs1O7+NCqyfcJcU55c0TjlUru0y5DiBns
-         zximoYGv/jP5kLCc9Qhp5MohzyLjRC6TRlL85BntsTCmPwrYSAIJ9VdwcesfsY8JcEL6
-         C4hkkt3OzM5aCJurxou4d5qYOwzgOWyOvNjl8gIJ9tSL2lsbPp5ivLzXsOEXF9S+cIxa
-         y4KcLgTS8xToFbWkNbJw3NfNBy8+s6OZej9BDxYYfb+dohJ+xSruxCE8KlMeakpS6Ymn
-         k5hlTjEgTXJEpghxuSSWsqTd6YQ6YsQ4gTgjR6ttcGpROCG2x7ET0MuROEMSSzjbhhu9
-         s1iw==
-X-Gm-Message-State: AOAM531Hk1IvwcdX8RqPAuLskCOrhYUKEZUW7AnO2eDJEwSLZ9IFto/o
-        R+u5LMU5vYuuPZFmaysVlWBJMTepoAs=
-X-Google-Smtp-Source: ABdhPJynfDk7z6/2pF5MWjTWyAMO7tkGf6jDydsZKjKB7y3SyRR/HLVGms8EGH1wl5Myv9hua5AG4Q==
-X-Received: by 2002:ac2:5443:: with SMTP id d3mr1973508lfn.121.1592475447508;
-        Thu, 18 Jun 2020 03:17:27 -0700 (PDT)
-Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id o16sm615276ljg.90.2020.06.18.03.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 03:17:26 -0700 (PDT)
-Date:   Thu, 18 Jun 2020 13:17:24 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 00/14] Combination of pending patches
-Message-ID: <20200618101724.GA76432@jhedberg-mac01.home>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <cover.1592404644.git.marcel@holtmann.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kX+2vne+jkdoNchWYpH9zx0FwV8hi+bqEcEygiN+2TA=;
+        b=T5yr00mpv8pwut8XZAgbtm0eJWBfN2kgOGzMdIb2P1hsPkeJcKYF6ES72SY9AlhAuK
+         dtEOwhN+sN52nynRDiK40oq9W3QEP92czy5JbbhuikTJaKn/45f8NtF2hOawxSJGbuef
+         mI/KC3LlK+UqazNUBBelfyhkHevAFJ+oZBwZ4/fqyTRj+EZFDlcajJmzu3lmyj6uIDsh
+         NRk/GPTw2iaZ3sZiN24wDSulqfIffl4O55hdIUmyu/IVpmlIEingf2ImU1et7nBePuXN
+         nm1IiG12T+lWbKV9ekUbJfGakl+HVlyVZdPZWFq5bCOtwqCsj8Q5Ppyxw8iG75EvjIWM
+         HD3g==
+X-Gm-Message-State: AOAM532Pdkqpe21ZD6EZMIzVeAZQAgg16sIOK8dxZVPKToXcgaf5/J+H
+        FaYMrq7edyY+dOSJVA7NCHL3+UKeiUmG3OQYLy7Inw==
+X-Google-Smtp-Source: ABdhPJxtc6h7AF+1+UK9Sk8j9IijIVlPTM60ApFz+GcIIhEbZWuVEs9saznWHm27BJppVTTC+29CO6ly2L6bCrbYjvo=
+X-Received: by 2002:a2e:890d:: with SMTP id d13mr2353198lji.75.1592485162259;
+ Thu, 18 Jun 2020 05:59:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1592404644.git.marcel@holtmann.org>
+References: <20200615145252.259971-1-alainm@chromium.org> <CABBYNZK=-_uN=Z==-vi3rKaAFzEWmKn2c2eXSsMMWJXTQFiJ_g@mail.gmail.com>
+In-Reply-To: <CABBYNZK=-_uN=Z==-vi3rKaAFzEWmKn2c2eXSsMMWJXTQFiJ_g@mail.gmail.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Thu, 18 Jun 2020 08:59:10 -0400
+Message-ID: <CALWDO_XVhu3iHO7i-j+6Xjq19ZMBEt8HWc0EY=+in-JUvUj5_A@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1] adding a configurable le autoconnect timeout value
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+thanks Luiz
 
-On Wed, Jun 17, 2020, Marcel Holtmann wrote:
-> This is the list of pending patches and fixes merged together. Please
-> review that the set and functionality is correct and working as
-> expected.
-> 
-> In v2 the Reviewed-by tags have been added.
-> 
-> Abhishek Pandit-Subedi (4):
->   Bluetooth: Add bdaddr_list_with_flags for classic whitelist
->   Bluetooth: Replace wakeable list with flag
->   Bluetooth: Replace wakeable in hci_conn_params
->   Bluetooth: Add get/set device flags mgmt op
-> 
-> Manish Mandlik (1):
->   Bluetooth: Terminate the link if pairing is cancelled
-> 
-> Marcel Holtmann (2):
->   Bluetooth: mgmt: Add commands for runtime configuration
->   Bluetooth: mgmt: Use command complete on success for set system config
-> 
-> Miao-chen Chou (7):
->   Bluetooth: Add definitions for advertisement monitor features
->   Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES
->   Bluetooth: Add handler of MGMT_OP_ADD_ADV_PATTERNS_MONITOR
->   Bluetooth: Add handler of MGMT_OP_REMOVE_ADV_MONITOR
->   Bluetooth: Notify adv monitor added event
->   Bluetooth: Notify adv monitor removed event
->   Bluetooth: Update background scan and report device based on
->     advertisement monitors
-> 
->  include/net/bluetooth/hci_core.h |  73 +++++-
->  include/net/bluetooth/mgmt.h     |  77 +++++++
->  net/bluetooth/hci_conn.c         |  11 +-
->  net/bluetooth/hci_core.c         | 153 ++++++++++++-
->  net/bluetooth/hci_event.c        |  13 +-
->  net/bluetooth/hci_request.c      |  32 ++-
->  net/bluetooth/l2cap_core.c       |   6 +-
->  net/bluetooth/mgmt.c             | 382 ++++++++++++++++++++++++++++++-
->  net/bluetooth/mgmt_config.c      |  23 +-
->  net/bluetooth/mgmt_config.h      |   6 +
->  net/bluetooth/msft.c             |   7 +
->  net/bluetooth/msft.h             |   9 +
->  12 files changed, 755 insertions(+), 37 deletions(-)
 
-All patches in this set have been applied to bluetooth-next. Thanks.
-
-Johan
+On Thu, Jun 18, 2020 at 12:43 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Alain,
+>
+> On Mon, Jun 15, 2020 at 7:57 AM Alain Michaud <alainm@chromium.org> wrote:
+> >
+> > This patch adds support for a configurable le autoconnect timer.
+> >
+> > ---
+> >
+> >  doc/mgmt-api.txt | 1 +
+> >  src/adapter.c    | 8 ++++++++
+> >  src/hcid.h       | 1 +
+> >  src/main.c       | 5 +++++
+> >  src/main.conf    | 1 +
+> >  5 files changed, 16 insertions(+)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 80c483f8b..ca0d38469 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -3278,6 +3278,7 @@ Read Default System Configuration Command
+> >                 0x0018  LE Max Connection Interval
+> >                 0x0019  LE Connection Latency
+> >                 0x001a  LE Connection Supervision Timeout
+> > +               0x001b  LE Autoconnect Timeout
+> >
+> >         This command can be used at any time and will return a list of
+> >         supported default parameters as well as their current value.
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 92002673b..9ce351893 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -4423,6 +4423,14 @@ static void load_default_system_params(struct btd_adapter *adapter)
+> >                 len += sizeof(params[i].u16);
+> >         }
+> >
+> > +       if (main_opts.default_params.le_autoconnect_timeout) {
+> > +               params[i].entry.type = 0x001b;
+> > +               params[i].entry.length = sizeof(params[i].u16);
+> > +               params[i].u16 = main_opts.default_params.le_autoconnect_timeout;
+> > +               ++i;
+> > +               len += sizeof(params[i].u16);
+> > +       }
+> > +
+> >         err = mgmt_send(adapter->mgmt, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> >                         adapter->dev_id, len, params, NULL, NULL, NULL);
+> >         if (!err)
+> > diff --git a/src/hcid.h b/src/hcid.h
+> > index 1b2714b1d..c21ac9980 100644
+> > --- a/src/hcid.h
+> > +++ b/src/hcid.h
+> > @@ -91,6 +91,7 @@ struct main_opts {
+> >                 uint16_t        le_max_conn_interval;
+> >                 uint16_t        le_conn_latency;
+> >                 uint16_t        le_conn_lsto;
+> > +               uint16_t        le_autoconnect_timeout;
+> >         } default_params;
+> >
+> >
+> > diff --git a/src/main.c b/src/main.c
+> > index e51f614b3..77886d58e 100644
+> > --- a/src/main.c
+> > +++ b/src/main.c
+> > @@ -120,6 +120,7 @@ static const char *controller_options[] = {
+> >         "LEMaxConnectionInterval",
+> >         "LEConnectionLatency",
+> >         "LEConnectionSupervisionTimeout",
+> > +       "LEAutoconnecttimeout",
+> >         NULL
+> >  };
+> >
+> > @@ -410,6 +411,10 @@ static void parse_controller_config(GKeyFile *config)
+> >                   &main_opts.default_params.le_scan_win_connect,
+> >                   0x0004,
+> >                   0x4000},
+> > +               { "LEAutoconnecttimeout",
+> > +                 &main_opts.default_params.le_autoconnect_timeout,
+> > +                 0x0001,
+> > +                 0x4000},
+> >         };
+> >         uint16_t i;
+> >
+> > diff --git a/src/main.conf b/src/main.conf
+> > index 92d937f0c..6a6f7d4b4 100644
+> > --- a/src/main.conf
+> > +++ b/src/main.conf
+> > @@ -141,6 +141,7 @@
+> >  #LEMaxConnectionInterval=
+> >  #LEConnectionLatency=
+> >  #LEConnectionSupervisionTimeout=
+> > +#LEAutoconnecttimeout=
+> >
+> >  [GATT]
+> >  # GATT attribute cache.
+> > --
+> > 2.27.0.290.gba653c62da-goog
+> >
+> Applied, thanks. Note that it might be better to send the
+> documentation changes as a separate patch next time.
+>
+> --
+> Luiz Augusto von Dentz
