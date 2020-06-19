@@ -1,129 +1,128 @@
-Return-Path: <SRS0=NPxI=77=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=y5DB=AA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF83C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 21:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9903AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 06:02:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6D9E208DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jun 2020 21:07:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZZk+ms7d"
+	by mail.kernel.org (Postfix) with ESMTP id 7ED2020809
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 06:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729282AbgFRVHL (ORCPT
+        id S1727922AbgFSGCR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jun 2020 17:07:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726478AbgFRVHD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jun 2020 17:07:03 -0400
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047C9C06174E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 14:07:03 -0700 (PDT)
-Received: by mail-vs1-xe41.google.com with SMTP id u17so4392335vsu.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2020 14:07:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Hgqt/bs2UKjnBLgAEpUq3clHZ0oP/HrtIklkQ+jFjjs=;
-        b=ZZk+ms7dqownSqJ+CKPyGAYD22zRpI/FipesUUN6pGXL196Nf7q/CItmoa3D4N1/Nq
-         yA4y34fDuw5hdIR2uj+UvDcd0qh3yPVmScSwoWsb53NdUxTlaT1141ta1PcMHL8L+7Xq
-         0yPPlHd6JrrN5dZUMVQFulE6SwYiWJs6bVglI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Hgqt/bs2UKjnBLgAEpUq3clHZ0oP/HrtIklkQ+jFjjs=;
-        b=Ijb94k/BCppRwKVNNOWEtlATAMxpAZ+AZ++vltmetLeIo0tzmQloS9VuXAUZEJRqbm
-         qwPfZ/BGS4iRSVxvTzJ+SEcO3pDGMkFyBcdkmMSDq5WnTNXT/P6oaFdySW1hUaY2jnQb
-         AGff4CvRAGxgtvNpEaav69bef7jaPpxNnZsYqyB0PiSVk0wFMaYUgOcZMBxPxtFHHQft
-         sxN7iwMGuM5l7TVBzUTKxy8CSbWYwbIKe4aa4o2L6+AFd22mbtp9wioJR7LtIFIXtTrS
-         JtqTYzgH9QgqQX4BHecQA5feuGSru2FJVz+pEElSEkt3f78IwsVWbbTaSaNlCkQzlfbg
-         w/wg==
-X-Gm-Message-State: AOAM532MBMY+3u54L8LnL2sejUfYbOo24BaNzjLjy9QMdAalnMGMlQJG
-        4AjE+aGVcF6tPjsJ+j2IfMR5NEkf9bk=
-X-Google-Smtp-Source: ABdhPJzpOK+ugI1KoubyJavbdWPq0a02W1eZn7fthe5dfWVrW0Pmv3zAIXOzURdjn6CuoYqRBxedWw==
-X-Received: by 2002:a67:2c4c:: with SMTP id s73mr5275082vss.233.1592514421982;
-        Thu, 18 Jun 2020 14:07:01 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id p16sm472977vkd.27.2020.06.18.14.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 14:07:01 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
+        Fri, 19 Jun 2020 02:02:17 -0400
+Received: from mga01.intel.com ([192.55.52.88]:62658 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726382AbgFSGCR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 19 Jun 2020 02:02:17 -0400
+IronPort-SDR: GKXkgBj8BqMtQ9z+ZLcTyXSC0LnfNbNh3twvHRShGUBanc/U1/3XhUss1AcZ0VOYLrHQlbTa3/
+ VxTGsCZnHrpg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9656"; a="160959304"
+X-IronPort-AV: E=Sophos;i="5.75,253,1589266800"; 
+   d="scan'208";a="160959304"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 23:02:16 -0700
+IronPort-SDR: ya9aubVcVbEmltdD1cyVhWk6pi0VBuGXcn6SpJbgKjFRHKUKXU3dJIygpxh5kz7S5e2uan5j3i
+ KD3NPB8veiBQ==
+X-IronPort-AV: E=Sophos;i="5.75,253,1589266800"; 
+   d="scan'208";a="299948780"
+Received: from han1-mobl3.jf.intel.com ([10.255.228.38])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 23:02:16 -0700
+From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
-Subject: [PATCH v1] bluetooth: use configured params for ext adv
-Date:   Thu, 18 Jun 2020 21:06:59 +0000
-Message-Id: <20200618210659.142284-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH 1/2] midi: Fix SysEx parser in MIDI plugin
+Date:   Thu, 18 Jun 2020 23:01:52 -0700
+Message-Id: <20200619060153.65114-1-tedd.an@linux.intel.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When the extended advertisement feature is enabled, a hardcoded min and
-max interval of 0x8000 is used.  This patches fixes this issue by using
-the configured min/max value.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This was validated by setting min/max in main.conf and making sure the
-right setting is applied:
+The SysEx end of message parser didn't consider the fact that
+timestampsLow are in the stream and it might have the EOX (F7)
+byte as well.
 
-< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen
-25                                          #93 [hci0] 10.953011
-…
-Min advertising interval: 181.250 msec (0x0122)
-Max advertising interval: 181.250 msec (0x0122)
-…
+Fix that by always assuming the first system message byte is
+the timestampLow.
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-
-Signed-off-by: Alain Michaud <alainm@chromium.org>
+Future work would involve support other type of system message
+bytes, such as real-time.
 ---
+ profiles/midi/libmidi.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
- net/bluetooth/hci_request.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 29decd7e8051..08818b9bf89f 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1799,8 +1799,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	int err;
- 	struct adv_info *adv_instance;
- 	bool secondary_adv;
--	/* In ext adv set param interval is 3 octets */
--	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
-+	/* In ext adv set param interval is 3 octets in le format */
-+	const __le32 min_adv_interval = cpu_to_le32(hdev->le_adv_min_interval);
-+	const __le32 max_adv_interval = cpu_to_le32(hdev->le_adv_max_interval);
+diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+index 4b4df799f..cc5f079e7 100644
+--- a/profiles/midi/libmidi.c
++++ b/profiles/midi/libmidi.c
+@@ -331,6 +331,24 @@ static size_t handle_end_of_sysex(struct midi_read_parser *parser,
+ 	return sysex_length + 1; /* +1 because of timestampLow */
+ }
  
- 	if (instance > 0) {
- 		adv_instance = hci_find_adv_instance(hdev, instance);
-@@ -1833,8 +1834,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
++/* Searches the end of a SysEx message that contains a timestampLow
++ * before the SysEx end byte. Returns the number of bytes of valid
++ * SysEx payload in the buffer.
++ */
++static size_t sysex_eox_len(const uint8_t *data, size_t size)
++{
++	size_t i = 0;
++
++	MIDI_ASSERT(size > 0);
++
++	if (data[i] == 0xF0)
++		i++;
++
++	/* search for timestamp low */
++	while (i < size && !(data[i++] & 0x80));
++
++	return (i < size && data[i] == 0xF7) ? i : 0;
++}
  
- 	memset(&cp, 0, sizeof(cp));
  
--	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
--	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
-+	/* take least significant 3 bytes */
-+	memcpy(cp.min_interval, &min_adv_interval, sizeof(cp.min_interval));
-+	memcpy(cp.max_interval, &max_adv_interval, sizeof(cp.max_interval));
+ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+@@ -368,14 +386,13 @@ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
  
- 	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
+ 		/* System Common Messages */
+ 	case 0xF0: /* SysEx Start */ {
+-		uint8_t *pos;
++		size_t sysex_length;
  
+ 		/* cleanup Running Status Message */
+ 		parser->rstatus = 0;
+ 
+-		/* Avoid parsing if SysEx is contained in one BLE packet */
+-		if ((pos = memchr(data + i, 0xF7, size - i))) {
+-			const size_t sysex_length = pos - (data + i);
++		/* Search for End of SysEx message in one BLE message */
++		if ((sysex_length = sysex_eox_len(data + i, size - i)) > 0) {
+ 			midi_size = handle_end_of_sysex(parser, ev, data + i,
+ 			                                sysex_length);
+ 		} else {
+@@ -424,10 +441,9 @@ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+ 
+ 		/* Check for SysEx messages */
+ 		if (parser->sysex_stream.len > 0) {
+-			uint8_t *pos;
++			size_t sysex_length;
+ 
+-			if ((pos = memchr(data + i, 0xF7, size - i))) {
+-				const size_t sysex_length = pos - (data + i);
++			if ((sysex_length = sysex_eox_len(data + i, size - i)) > 0) {
+ 				midi_size = handle_end_of_sysex(parser, ev, data + i,
+ 				                                sysex_length);
+ 			} else {
 -- 
-2.27.0.111.gc72c7da667-goog
+2.25.4
 
