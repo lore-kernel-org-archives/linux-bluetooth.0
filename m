@@ -2,62 +2,117 @@ Return-Path: <SRS0=y5DB=AA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC8BC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BECAC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:45:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02D2B20739
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:36:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CDC02080C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730751AbgFSHgX convert rfc822-to-8bit (ORCPT
+        id S1730880AbgFSHp6 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Jun 2020 03:36:23 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:40484 "EHLO
+        Fri, 19 Jun 2020 03:45:58 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50376 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729740AbgFSHgX (ORCPT
+        with ESMTP id S1730830AbgFSHp6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Jun 2020 03:36:23 -0400
+        Fri, 19 Jun 2020 03:45:58 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 61F19CECF3;
-        Fri, 19 Jun 2020 09:46:13 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 08BF4CECF0;
+        Fri, 19 Jun 2020 09:55:47 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 1/2] Bluetooth: btusb: fix up firmware download sequence
+Subject: Re: [PATCH v1] bluetooth: use configured params for ext adv
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <c9bf7346a060d8913b670bbed7ed9e60b592e16f.1592463595.git.sean.wang@mediatek.com>
-Date:   Fri, 19 Jun 2020 09:36:21 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Mark Chen <Mark-YW.Chen@mediatek.com>
+In-Reply-To: <20200618210659.142284-1-alainm@chromium.org>
+Date:   Fri, 19 Jun 2020 09:45:55 +0200
+Cc:     linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1450856E-36E2-4B49-A23A-7BE94669856E@holtmann.org>
-References: <c9bf7346a060d8913b670bbed7ed9e60b592e16f.1592463595.git.sean.wang@mediatek.com>
-To:     Sean Wang <sean.wang@mediatek.com>
+Message-Id: <C5D30F5E-B50F-4DE7-A909-F48F6C555661@holtmann.org>
+References: <20200618210659.142284-1-alainm@chromium.org>
+To:     Alain Michaud <alainm@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+Hi Alain,
 
-> Data RAM on the device have to be powered on before starting to download
-> the firmware.
+please use “Bluetooth: “ prefix for the subject.
+
+> When the extended advertisement feature is enabled, a hardcoded min and
+> max interval of 0x8000 is used.  This patches fixes this issue by using
+> the configured min/max value.
 > 
-> Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
-> Co-developed-by: Mark Chen <Mark-YW.Chen@mediatek.com>
-> Signed-off-by: Mark Chen <Mark-YW.Chen@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> drivers/bluetooth/btusb.c | 16 +++++++++++++++-
-> 1 file changed, 15 insertions(+), 1 deletion(-)
+> This was validated by setting min/max in main.conf and making sure the
+> right setting is applied:
+> 
+> < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen
+> 25                                          #93 [hci0] 10.953011
+> …
+> Min advertising interval: 181.250 msec (0x0122)
+> Max advertising interval: 181.250 msec (0x0122)
+> …
+> 
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+> 
+> Signed-off-by: Alain Michaud <alainm@chromium.org>
 
-the patch doesn’t apply to bluetooth-next tree.
+The Reviewed-by lines go after your Signed-off-by.
+
+> ---
+> 
+> net/bluetooth/hci_request.c | 10 ++++++----
+> 1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index 29decd7e8051..08818b9bf89f 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -1799,8 +1799,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+> 	int err;
+> 	struct adv_info *adv_instance;
+> 	bool secondary_adv;
+> -	/* In ext adv set param interval is 3 octets */
+> -	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
+> +	/* In ext adv set param interval is 3 octets in le format */
+> +	const __le32 min_adv_interval = cpu_to_le32(hdev->le_adv_min_interval);
+> +	const __le32 max_adv_interval = cpu_to_le32(hdev->le_adv_max_interval);
+
+Scrap the const here.
+
+And it is wrong since your hdev->le_adv_{min,max}_interval is actually __u16. So that first needs to be extended to a __u16 value.
+
+That said, if we have this in the Load Default System Configuration list, we should extended it to __le32 there as well.
+
+> 	if (instance > 0) {
+> 		adv_instance = hci_find_adv_instance(hdev, instance);
+> @@ -1833,8 +1834,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+> 
+> 	memset(&cp, 0, sizeof(cp));
+> 
+> -	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
+> -	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
+> +	/* take least significant 3 bytes */
+> +	memcpy(cp.min_interval, &min_adv_interval, sizeof(cp.min_interval));
+> +	memcpy(cp.max_interval, &max_adv_interval, sizeof(cp.max_interval));
+
+This is dangerous and I think it actually break in case of unaligned access platforms.
+
+In this case I prefer to actually do this manually.
+
+		/* In ext adv min interval is 3 octets */
+		cp.min_interval[0] = cp.min_interval & 0xff;
+		cp.min_interval[1] = (cp.min_interval & 0xff00) >> 8;
+		cp.min_interval[2] = (cp.min_interval & 0xff0000) >> 12;
 
 Regards
 
