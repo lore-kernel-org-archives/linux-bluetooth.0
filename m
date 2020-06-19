@@ -2,63 +2,99 @@ Return-Path: <SRS0=y5DB=AA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A05C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD7AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F092D207FC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 392222078D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 07:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730725AbgFSHuG (ORCPT
+        id S1730936AbgFSHzB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Jun 2020 03:50:06 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41664 "EHLO
+        Fri, 19 Jun 2020 03:55:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:34130 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729548AbgFSHuG (ORCPT
+        with ESMTP id S1730880AbgFSHzA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Jun 2020 03:50:06 -0400
-Received: from localhost.localdomain (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8FAF7CECF0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 09:59:56 +0200 (CEST)
+        Fri, 19 Jun 2020 03:55:00 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 70974CECF1;
+        Fri, 19 Jun 2020 10:04:51 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: Disconnect if E0 is used for Level 4
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix debug statement with double endian conversion
-Date:   Fri, 19 Jun 2020 09:50:00 +0200
-Message-Id: <20200619075000.138897-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200520212015.626026-1-luiz.dentz@gmail.com>
+Date:   Fri, 19 Jun 2020 09:54:59 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <2B2EAC6C-D6FA-4CF1-87EB-8CCB774DBBE4@holtmann.org>
+References: <20200520212015.626026-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The current_flags field is already in CPU endian and so no need to
-convert it again from little-endian.
+Hi Luiz,
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> E0 is not allowed with Level 4:
+> 
+> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1319:
+> 
+>  '128-bit equivalent strength for link and encryption keys
+>   required using FIPS approved algorithms (E0 not allowed,
+>   SAFER+ not allowed, and P-192 not allowed; encryption key
+>   not shortened'
+> 
+> SC enabled:
+> 
+>> HCI Event: Read Remote Extended Features (0x23) plen 13
+>        Status: Success (0x00)
+>        Handle: 256
+>        Page: 1/2
+>        Features: 0x0b 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>          Secure Simple Pairing (Host Support)
+>          LE Supported (Host)
+>          Secure Connections (Host Support)
+>> HCI Event: Encryption Change (0x08) plen 4
+>        Status: Success (0x00)
+>        Handle: 256
+>        Encryption: Enabled with AES-CCM (0x02)
+> 
+> SC disabled:
+> 
+>> HCI Event: Read Remote Extended Features (0x23) plen 13
+>        Status: Success (0x00)
+>        Handle: 256
+>        Page: 1/2
+>        Features: 0x03 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>          Secure Simple Pairing (Host Support)
+>          LE Supported (Host)
+>> HCI Event: Encryption Change (0x08) plen 4
+>        Status: Success (0x00)
+>        Handle: 256
+>        Encryption: Enabled with E0 (0x01)
+> [May 8 20:23] Bluetooth: hci0: Invalid security: expect AES but E0 was used
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>        Handle: 256
+>        Reason: Authentication Failure (0x05)
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h | 10 ++++++----
+> net/bluetooth/hci_conn.c         | 17 +++++++++++++++++
+> net/bluetooth/hci_event.c        | 20 ++++++++------------
+> 3 files changed, 31 insertions(+), 16 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2a732cab1dc9..a27620ba7f3d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3950,8 +3950,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	u32 current_flags = __le32_to_cpu(cp->current_flags);
- 
- 	bt_dev_dbg(hdev, "Set device flags %pMR (type 0x%x) = 0x%x",
--		   &cp->addr.bdaddr, cp->addr.type,
--		   __le32_to_cpu(current_flags));
-+		   &cp->addr.bdaddr, cp->addr.type, current_flags);
- 
- 	if ((supported_flags | current_flags) != supported_flags) {
- 		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
--- 
-2.26.2
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
