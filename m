@@ -2,89 +2,99 @@ Return-Path: <SRS0=y5DB=AA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59487C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 17:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93481C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 18:10:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39C1720B80
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 17:52:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DCFE21548
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 18:10:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="WwLT4Y/8"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bshg.com header.i=@bshg.com header.b="R92physT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389432AbgFSRwL (ORCPT
+        id S1732352AbgFSSKa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Jun 2020 13:52:11 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:26179 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725880AbgFSRwK (ORCPT
+        Fri, 19 Jun 2020 14:10:30 -0400
+Received: from de-out1.bosch-org.com ([139.15.230.186]:58992 "EHLO
+        de-out1.bosch-org.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732326AbgFSSK1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Jun 2020 13:52:10 -0400
-X-UUID: 1c2ed6c6bdd54063b7e71a69ee6f7b0d-20200620
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=3xq/EA3dMYuLkP6tJy8QiqzcaouWnuGLQAnhnlu8VYw=;
-        b=WwLT4Y/8Q4nbDJJLE50vLvGMX9k62J11bDO7T5fr9tvJ5KlqhYhhWZw0XwAwGdEnPjB96Eu12TEY32ccUe4s7PDcN305+2+v1XgFwwPNlhOLzOnsdFuIV+NZ0k/Ap35gzu43cUZurwWrF+fd9ZNnRIWQRfXib5ma6UkQc6vGilc=;
-X-UUID: 1c2ed6c6bdd54063b7e71a69ee6f7b0d-20200620
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 835340811; Sat, 20 Jun 2020 01:52:08 +0800
-Received: from mtkcas08.mediatek.inc (172.21.101.126) by
- mtkmbs08n2.mediatek.inc (172.21.101.56) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Sat, 20 Jun 2020 01:52:00 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 20 Jun 2020 01:52:01 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
-        Mark Chen <Mark-YW.Chen@mediatek.com>
-Subject: [PATCH v2 1/2] Bluetooth: btusb: fix up firmware download sequence
-Date:   Sat, 20 Jun 2020 01:52:01 +0800
-Message-ID: <7d835850c16e07d1346c763900cc8c880182f497.1592588740.git.sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
+        Fri, 19 Jun 2020 14:10:27 -0400
+Received: from si0vm1948.rbesz01.com (unknown [139.15.230.188])
+        by fe0vms0186.rbdmz01.com (Postfix) with ESMTPS id 49pRg462wFz1XLFjP
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 20:10:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bshg.com;
+        s=key1-intmail; t=1592590224;
+        bh=DtQdrwnwtqpNnlEyroFs6PYLb5etDZmDNMRh890itbs=; l=10;
+        h=From:Subject:From:Reply-To:Sender;
+        b=R92physTDureWNn5o4oigc29W2Zo0kXaboEzO2xv33Ork/d6eCpUyKEKHuCguBZh2
+         qgSZLxsyNj3NZMHEsHuC9mwGUgPHg3gIwtzzFMQEnHWCCFGo1f2OnqG1hVpz9tuZdB
+         DCriOmBJjOTHtqdwzpxxGlBC0NuXfR4xqyFEG+5w=
+Received: from fe0vm02900.rbesz01.com (unknown [10.58.172.176])
+        by si0vm1948.rbesz01.com (Postfix) with ESMTPS id 49pRg45hjRz2p9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 20:10:24 +0200 (CEST)
+X-AuditID: 0a3aad0c-cdbff7000000304a-44-5eecff9045b1
+Received: from fe0vm1651.rbesz01.com ( [10.58.173.29])
+        (using TLS with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by fe0vm02900.rbesz01.com (SMG Outbound) with SMTP id 6B.08.12362.09FFCEE5; Fri, 19 Jun 2020 20:10:24 +0200 (CEST)
+Received: from SI0SWIEXHC02.bsh.corp.bshg.com (si0swiexhc02.bsh.corp.bshg.com [10.49.76.142])
+        by fe0vm1651.rbesz01.com (Postfix) with ESMTPS id 49pRg44f8bzvl8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 20:10:24 +0200 (CEST)
+Received: from SI0SWIEXMB2A.bsh.corp.bshg.com (10.49.76.131) by
+ SI0SWIEXHC02.bsh.corp.bshg.com (10.49.76.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1979.3; Fri, 19 Jun 2020 20:10:24 +0200
+Received: from SI0SWIEXMB2B.bsh.corp.bshg.com (10.49.76.132) by
+ SI0SWIEXMB2A.bsh.corp.bshg.com (10.49.76.131) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1979.3; Fri, 19 Jun 2020 20:10:24 +0200
+Received: from SI0SWIEXMB2B.bsh.corp.bshg.com ([fe80::5154:c3ab:d4e0:8272]) by
+ SI0SWIEXMB2B.bsh.corp.bshg.com ([fe80::5154:c3ab:d4e0:8272%5]) with mapi id
+ 15.01.1979.003; Fri, 19 Jun 2020 20:10:24 +0200
+From:   "Ryll, Jan (GED-SDD2)" <Jan.Ryll@bshg.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Question regarding Generic Attribute Service and characteristic
+Thread-Topic: Question regarding Generic Attribute Service and characteristic
+Thread-Index: AdZGZORl1AmsIUXhSDmQX5NABVkz+w==
+Date:   Fri, 19 Jun 2020 18:10:24 +0000
+Message-ID: <909baa33d2f847cfaa3f86cc7f554c03@bshg.com>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.49.87.14]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-SNTS-SMTP: 2821007EF3AFA80A7E8D45E7FC13707227D66AE0967B67343F6BEA83B2DC8ED92000:8
-X-MTK:  N
-Content-Transfer-Encoding: base64
+X-EXCLAIMER-MD-CONFIG: fd782ad6-06f5-4690-bfdd-57c58a3839e9
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMLMWRmVeSWpSXmKPExsXCZbVWVnfC/zdxBmd7dCzmXOtjdmD0+LxJ
+        LoAxissmJTUnsyy1SN8ugSvj3eFWtoJfjBU/tz9naWA8zdjFyMEhIWAicaidt4uRk0NIYCaT
+        xLevIV2MXED2B0aJLW1/WSGcJiaJK19vMEM4fxklmqb+YYJwzjFKzPn5jxmkn03AQOJa1x0w
+        W0TAXWLP/tuMILawgIfEsyvPmCDivhK7p61hh7D1JH7u/ABWwyKgKvF6+yOwGl4Bc4mF3R/B
+        4owCshIbNpwHm8ksIC6x6dl3VhBbQkBAYskeiLiEgKjEy8f/oOLyEvOXb2aEqNeRWLD7ExuE
+        rS2xbOFrZoj5ghInZz5hgai3lli++QHjBEaxWUhWzELSPgtJ+ywk7QsYWVYxiqWlGpTlGhhZ
+        GhjoFSWlFlcZGOol5+duYoTEC88OxlM9H/QOMTJxMB5ilOBgVhLhPfz+TZwQb0piZVVqUX58
+        UWlOavEhRmkOFiVxXhWejXFCAumJJanZqakFqUUwWSYOTqkGJq6/sievvP/n2/Rh9Y6Yhc9P
+        9X7e07eI39OnpdN/g+ZPxv4eo+mfM7SLcu5xc1TvEcz3Twg4dlV+4+EqcZulD/7YT07b+PtW
+        RNuvVYaKl+o0vhz5ovy+30riTdu5n7d1TLxF3WSeVJ9k15O3YOH7+srqkLunTXLTqxqDYwll
+        d+rfdK3ZLbS1ujvx4q09b3+71Ws6pJ0VLMzneuHn8DDQaJpky9myBe5VjT7ubmc43lT6vZqz
+        79vRrxvWVzlNZT5XuFHxblnzrOmNOav26DFOsbhTuFb6o226/7GC286Jj/3+ivPann1Y84yj
+        20/33Zkdf7dwefwrN3g17XhhaItp5KEvTP/W/VGYnr4vITFeTYmlOCPRUIu5qDgRAJkF/2sG
+        AwAA
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RnJvbTogU2VhbiBXYW5nIDxzZWFuLndhbmdAbWVkaWF0ZWsuY29tPg0KDQpEYXRhIFJBTSBvbiB0
-aGUgZGV2aWNlIGhhdmUgdG8gYmUgcG93ZXJlZCBvbiBiZWZvcmUgc3RhcnRpbmcgdG8gZG93bmxv
-YWQNCnRoZSBmaXJtd2FyZS4NCg0KdjEtPnYyOg0KCXJlYmFzZWQgdG8gYmx1ZXRvb3RoLW5leHQN
-Cg0KRml4ZXM6IGExYzQ5YzQzNGUxNSAoIkJsdWV0b290aDogYnR1c2I6IEFkZCBwcm90b2NvbCBz
-dXBwb3J0IGZvciBNZWRpYVRlayBNVDc2NjhVIFVTQiBkZXZpY2VzIikNCkNvLWRldmVsb3BlZC1i
-eTogTWFyayBDaGVuIDxNYXJrLVlXLkNoZW5AbWVkaWF0ZWsuY29tPg0KU2lnbmVkLW9mZi1ieTog
-TWFyayBDaGVuIDxNYXJrLVlXLkNoZW5AbWVkaWF0ZWsuY29tPg0KU2lnbmVkLW9mZi1ieTogU2Vh
-biBXYW5nIDxzZWFuLndhbmdAbWVkaWF0ZWsuY29tPg0KLS0tDQogZHJpdmVycy9ibHVldG9vdGgv
-YnR1c2IuYyB8IDE2ICsrKysrKysrKysrKysrKy0NCiAxIGZpbGUgY2hhbmdlZCwgMTUgaW5zZXJ0
-aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgv
-YnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCmluZGV4IGM3Y2M4ZTU5NDE2Ni4u
-ZTQyZmRkNjI1ZWIwIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KKysr
-IGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KQEAgLTI5MzQsNyArMjkzNCw3IEBAIHN0YXRp
-YyBpbnQgYnR1c2JfbXRrX3NldHVwX2Zpcm13YXJlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBjb25z
-dCBjaGFyICpmd25hbWUpDQogCWNvbnN0IHU4ICpmd19wdHI7DQogCXNpemVfdCBmd19zaXplOw0K
-IAlpbnQgZXJyLCBkbGVuOw0KLQl1OCBmbGFnOw0KKwl1OCBmbGFnLCBwYXJhbTsNCiANCiAJZXJy
-ID0gcmVxdWVzdF9maXJtd2FyZSgmZncsIGZ3bmFtZSwgJmhkZXYtPmRldik7DQogCWlmIChlcnIg
-PCAwKSB7DQpAQCAtMjk0Miw2ICsyOTQyLDIwIEBAIHN0YXRpYyBpbnQgYnR1c2JfbXRrX3NldHVw
-X2Zpcm13YXJlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBjb25zdCBjaGFyICpmd25hbWUpDQogCQly
-ZXR1cm4gZXJyOw0KIAl9DQogDQorCS8qIFBvd2VyIG9uIGRhdGEgUkFNIHRoZSBmaXJtd2FyZSBy
-ZWxpZXMgb24uICovDQorCXBhcmFtID0gMTsNCisJd210X3BhcmFtcy5vcCA9IEJUTVRLX1dNVF9G
-VU5DX0NUUkw7DQorCXdtdF9wYXJhbXMuZmxhZyA9IDM7DQorCXdtdF9wYXJhbXMuZGxlbiA9IHNp
-emVvZihwYXJhbSk7DQorCXdtdF9wYXJhbXMuZGF0YSA9ICZwYXJhbTsNCisJd210X3BhcmFtcy5z
-dGF0dXMgPSBOVUxMOw0KKw0KKwllcnIgPSBidHVzYl9tdGtfaGNpX3dtdF9zeW5jKGhkZXYsICZ3
-bXRfcGFyYW1zKTsNCisJaWYgKGVyciA8IDApIHsNCisJCWJ0X2Rldl9lcnIoaGRldiwgIkZhaWxl
-ZCB0byBwb3dlciBvbiBkYXRhIFJBTSAoJWQpIiwgZXJyKTsNCisJCXJldHVybiBlcnI7DQorCX0N
-CisNCiAJZndfcHRyID0gZnctPmRhdGE7DQogCWZ3X3NpemUgPSBmdy0+c2l6ZTsNCiANCi0tIA0K
-Mi4yNS4xDQo=
+Hi Everybody,
+
+the Bluetooth Standard defines a "Generic Attribute Service" (since 4.2) wi=
+th exactly 1 characteristic "service changed".
+Is that service per default enabled in the Bluetooth/bluez stack?
+
+Best regards and stay healthy
+Jan
 
