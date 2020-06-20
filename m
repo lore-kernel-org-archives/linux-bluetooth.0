@@ -1,120 +1,131 @@
-Return-Path: <SRS0=y5DB=AA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=kzp+=AB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9A9C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 23:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A47C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Jun 2020 00:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3708208B8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Jun 2020 23:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0643B2224A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Jun 2020 00:10:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Whf+JbuO"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C8tcCrI8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730243AbgFSXF3 (ORCPT
+        id S1730557AbgFTAKj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Jun 2020 19:05:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
+        Fri, 19 Jun 2020 20:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729923AbgFSXF2 (ORCPT
+        with ESMTP id S1730373AbgFTAKh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Jun 2020 19:05:28 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE3DC06174E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 16:05:28 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id l17so10539014qki.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 16:05:28 -0700 (PDT)
+        Fri, 19 Jun 2020 20:10:37 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56064C0613EE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 17:10:37 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id 35so4627256ple.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 17:10:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Skp7ka6G4daxKIPlabjWQ/X/5qMdH6n+Nu79aelw88w=;
-        b=Whf+JbuOqVcd62W6Neizjl+ygrKM4F17tluSuzsW0rnAvuSTw06OJrylaL1Ch92WqO
-         scOQALiOEn4bVcyibBIeYF+veT7ZINboe98+3nWekt+/90pfrcTWdPltNo97hEUB0w04
-         50mNJNHg+ruuVH3xdwjyE4Hw0etnUlQnsoojkaB8xgc1DVi36G4kUwZd6d6rL7iwUESC
-         Hv22dVTSAkxi1cFOSGFHqiXacxPMnwJsDktn2/fEbCBnHV7tYbJ51RDLqMVM3AIuXnID
-         ZBSGD5DOzqqMVzHSp9eLM+9azEAfJgymZNdWhF9C3H00hlY2rycfQ0yw5MkgRRcNrbKs
-         hL9w==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bA2Hx5ZHpgALpLTRNJ8RED5WSk+bgJtyk0UtUvWs6Ck=;
+        b=C8tcCrI8g2+v2wcL3NpiNtX1IWiokLbLw8080bz8al5zRbmxNRQMiMlIXUUBpC6Pb3
+         fWgQJWNsW+zM/oSOPUPebSZypulS7JDINuPt9f3+7p3BQXL4kawkzNK0zrCz473Kn+ku
+         qlpP8WWn0Th6SbqDLG1uxkzeTxb6XjBlPWG9Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Skp7ka6G4daxKIPlabjWQ/X/5qMdH6n+Nu79aelw88w=;
-        b=P1yznqm4kxoUh294VvdcmoZW/QWG1RaSyOAU0scPZexmj8Y+u+sg39uzgXAsQyg5mA
-         mZWW/mexV4r6fg1pv6PvI1LK/82iE05PLirp2gLMFjMl0FNbN/dG/BRoo8+rzWv260pe
-         8Z0Y5db7N5vACf9E/g7IwlQyO/pKwIJHO64IvumUDIdQ63Jkr1rZwOdLKppLXoYSZq8l
-         LlJjJ+DPKK+SHy4EI9LKVfXch67778cAscByifWe3UHVueNCN6Xty6JdSTJeBxuZnk/E
-         18Dfy8w15obiyDAL6/B8OONsu/M3ELYt7P4S07BVp3qJ8MgbNSeu3kcx1m+hwSWt/DlU
-         NTbg==
-X-Gm-Message-State: AOAM533ZKsYhEH6DQwwCKYAZQEqvaAwK/tjE+oHHGVMaOK6s/EejdTDx
-        xGt3uhgq8P6Hx7vC5NEPbpWgfbthkf8=
-X-Google-Smtp-Source: ABdhPJwJOXQ2GA+jQ4nBrFq26TecumVw+0H76abgta21I3DPJj1UgrnAGoNj+YEbk6rXfr5T5IV4hA==
-X-Received: by 2002:a37:6744:: with SMTP id b65mr5222159qkc.324.1592607927092;
-        Fri, 19 Jun 2020 16:05:27 -0700 (PDT)
-Received: from [172.17.0.2] ([52.179.172.175])
-        by smtp.gmail.com with ESMTPSA id h19sm7964902qkj.109.2020.06.19.16.05.26
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bA2Hx5ZHpgALpLTRNJ8RED5WSk+bgJtyk0UtUvWs6Ck=;
+        b=LQEGT5nE0ggDjsaNJTQ9wGOMziDo6WC+W71VyI6FZdzGEu8b/chhcpcvsT/vjsFtTU
+         qRIuJuDJ3Rlx0kge9SEJU6JT0qFLOvUQxzcEAEFc2tBVMDAcozlmqhMRYwbADrAOb8Ow
+         E0Isx4rZvscGs2ZG14pBBDJWfJftm1FmqVcKWGptcynXpaUtlc+R3nDx5qJi3iW6SKrb
+         LgMgLqWvM5WmVgu69dSMIyX041BEKYdyiLHAzcnrMpP4sPSmkW9YKbY8//8ktXMoQ3kj
+         abH19MPG2osvR8XhCiuCV9l8DzrTxCF50iqa2YI+iyiB9Pu5Gx3h0uJWmIU94sSE39A5
+         nQXw==
+X-Gm-Message-State: AOAM532SUVXolqk5/6/0RdUt06Bssa4mzxjtvjs3H/mMGKDOGgAHzxw8
+        7ZzchRSmgcQsoTLVcp0qHwmsww==
+X-Google-Smtp-Source: ABdhPJxutMk1mTkLK2Fj/BDxglLsp0izci0o1QVdjpFFc0keXGjw9NMDqSB7A3+jQt7om7jczbkn4g==
+X-Received: by 2002:a17:90a:9904:: with SMTP id b4mr5893613pjp.207.1592611836739;
+        Fri, 19 Jun 2020 17:10:36 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id y136sm7032325pfg.55.2020.06.19.17.10.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 16:05:26 -0700 (PDT)
-Message-ID: <5eed44b6.1c69fb81.44ef1.7e06@mx.google.com>
-Date:   Fri, 19 Jun 2020 16:05:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1276049013917436348=="
+        Fri, 19 Jun 2020 17:10:36 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+        mcchou@chromium.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH] Bluetooth: Add hci_dev_lock to get/set device flags
+Date:   Fri, 19 Jun 2020 17:10:24 -0700
+Message-Id: <20200619171016.1.I56e71a63b5d2712a1b198681e0f107b5aa3cd725@changeid>
+X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, michaelfsun@google.com
-Subject: RE: [bluez,v4,2/3] btmgmt: Add command "remove" into "monitor" btmgmt submenu
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200619155612.bluez.v4.2.Ib8ae2d78936aa9f16a318aca14cf8c7198449bac@changeid>
-References: <20200619155612.bluez.v4.2.Ib8ae2d78936aa9f16a318aca14cf8c7198449bac@changeid>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1276049013917436348==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Adding hci_dev_lock since hci_conn_params_(lookup|add) require this
+lock.
 
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkpatch Failed
-
-Outputs:
-WARNING:SSCANF_TO_KSTRTO: Prefer kstrto<type> to single variable sscanf
-#78: FILE: tools/btmgmt.c:4686:
-+	if (sscanf(argv[1], "%hx", &monitor_handle) != 1) {
-+		error("Wrong formatted handle argument");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-
-- total: 0 errors, 1 warnings, 80 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
+Suggested-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
---===============1276049013917436348==--
+ net/bluetooth/mgmt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2a732cab1dc99d..5e9b9728eeac03 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3895,6 +3895,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	bt_dev_dbg(hdev, "Get device flags %pMR (type 0x%x)\n",
+ 		   &cp->addr.bdaddr, cp->addr.type);
+ 
++	hci_dev_lock(hdev);
++
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+ 							      &cp->addr.bdaddr,
+@@ -3921,6 +3923,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	status = MGMT_STATUS_SUCCESS;
+ 
+ done:
++	hci_dev_unlock(hdev);
++
+ 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_DEVICE_FLAGS, status,
+ 				&rp, sizeof(rp));
+ }
+@@ -3959,6 +3963,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto done;
+ 	}
+ 
++	hci_dev_lock(hdev);
++
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+ 							      &cp->addr.bdaddr,
+@@ -3985,6 +3991,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ done:
++	hci_dev_unlock(hdev);
++
+ 	if (status == MGMT_STATUS_SUCCESS)
+ 		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
+ 				     supported_flags, current_flags);
+-- 
+2.27.0.111.gc72c7da667-goog
+
