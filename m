@@ -1,131 +1,562 @@
-Return-Path: <SRS0=kzp+=AB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Pq0q=AC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A47C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Jun 2020 00:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7424C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 18:56:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0643B2224A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Jun 2020 00:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CECC23B84
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 18:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C8tcCrI8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVwPJnVg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730557AbgFTAKj (ORCPT
+        id S1730194AbgFUS4k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Jun 2020 20:10:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55860 "EHLO
+        Sun, 21 Jun 2020 14:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730373AbgFTAKh (ORCPT
+        with ESMTP id S1729783AbgFUS4j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Jun 2020 20:10:37 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56064C0613EE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 17:10:37 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id 35so4627256ple.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jun 2020 17:10:37 -0700 (PDT)
+        Sun, 21 Jun 2020 14:56:39 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F22A5C061794
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 11:56:37 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id l6so10066131qkc.6
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 11:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=bA2Hx5ZHpgALpLTRNJ8RED5WSk+bgJtyk0UtUvWs6Ck=;
-        b=C8tcCrI8g2+v2wcL3NpiNtX1IWiokLbLw8080bz8al5zRbmxNRQMiMlIXUUBpC6Pb3
-         fWgQJWNsW+zM/oSOPUPebSZypulS7JDINuPt9f3+7p3BQXL4kawkzNK0zrCz473Kn+ku
-         qlpP8WWn0Th6SbqDLG1uxkzeTxb6XjBlPWG9Q=
+        bh=aiInBEy0NjXvT26MOIYBUY8cRL8/+sigBDqoSKTM9oY=;
+        b=OVwPJnVgmi8Pb2sPmxdoRt8h1IamQk8w8c3+xkKN/1U6aILavLY69ZhuVgUZ8Czvl3
+         cKICA44sCKD9hrzmEiTMZNYgxRqAcoVJhW8Fp/CxLBYJ5YiBNEtLyt85FvTikEQivgwS
+         n7Ug0dgQB8sgocj9rk7XMTQ2Ll6elKzosd6QFVwwG3uQNNE9I2GUX8nR0FbKZoHA5CmB
+         8b3zJYCcLDoQBOalzl7XdVk9MAeR/7NTgTdG7qA8AbYuU/6lYqojAta2fLewNekw4ULT
+         TuDDMhJqa1xIA127XuYF2vUgSUItbtIdLKEazAlX6/IDSHrTPhstRKR/j0GEZcOxqYs5
+         rPpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=bA2Hx5ZHpgALpLTRNJ8RED5WSk+bgJtyk0UtUvWs6Ck=;
-        b=LQEGT5nE0ggDjsaNJTQ9wGOMziDo6WC+W71VyI6FZdzGEu8b/chhcpcvsT/vjsFtTU
-         qRIuJuDJ3Rlx0kge9SEJU6JT0qFLOvUQxzcEAEFc2tBVMDAcozlmqhMRYwbADrAOb8Ow
-         E0Isx4rZvscGs2ZG14pBBDJWfJftm1FmqVcKWGptcynXpaUtlc+R3nDx5qJi3iW6SKrb
-         LgMgLqWvM5WmVgu69dSMIyX041BEKYdyiLHAzcnrMpP4sPSmkW9YKbY8//8ktXMoQ3kj
-         abH19MPG2osvR8XhCiuCV9l8DzrTxCF50iqa2YI+iyiB9Pu5Gx3h0uJWmIU94sSE39A5
-         nQXw==
-X-Gm-Message-State: AOAM532SUVXolqk5/6/0RdUt06Bssa4mzxjtvjs3H/mMGKDOGgAHzxw8
-        7ZzchRSmgcQsoTLVcp0qHwmsww==
-X-Google-Smtp-Source: ABdhPJxutMk1mTkLK2Fj/BDxglLsp0izci0o1QVdjpFFc0keXGjw9NMDqSB7A3+jQt7om7jczbkn4g==
-X-Received: by 2002:a17:90a:9904:: with SMTP id b4mr5893613pjp.207.1592611836739;
-        Fri, 19 Jun 2020 17:10:36 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id y136sm7032325pfg.55.2020.06.19.17.10.35
+        bh=aiInBEy0NjXvT26MOIYBUY8cRL8/+sigBDqoSKTM9oY=;
+        b=nc2P/SC3GxTREVEOP5PYDPjX1Mn1I2wBMNtXY7AzUzDoYnTIGpUVivSrDaPieik7Eg
+         MJc3MT8sIT3fV/RyrGvHmxnaQUQOdvWIIT9YqhmB6zA0du27nkI3Pw9oU6V4w4WXa/di
+         giFXoINPC9f1N6O/iL8RrWOkOvi0rRccHYQ3LMxDXyfQDr94Cl1CCbXyzH5dA9dZvjuD
+         NTGJJZQ1BEWtHC0IprrXk0nHG3rko3zfWyApYBWeeAt2achXh6/23sX6QXn6qcm3yOxL
+         bebwKkeSbqwkWaDYD4BygPCQOF/pqVG/sEbsSJmJioVoLlLKX3m2LmQXfX51gg05Ue/G
+         Y0zA==
+X-Gm-Message-State: AOAM531bsdF6YxzBck0SkKq1RXrv06OrBFdfAjRM+KOUs8aEiB3KchTm
+        kyhb8Z7OvjH1Fh3B+NSXcC8WDTos
+X-Google-Smtp-Source: ABdhPJxT45r5KuS5UPzFRUSNF7yPqGknnNdF2WFpNRu0Ybz+tYYOmxcd6UCN/OvdhCXxE5ilwPcsPA==
+X-Received: by 2002:a37:a18f:: with SMTP id k137mr1973522qke.249.1592765796397;
+        Sun, 21 Jun 2020 11:56:36 -0700 (PDT)
+Received: from noah720s.lan (pool-108-49-79-97.bstnma.fios.verizon.net. [108.49.79.97])
+        by smtp.gmail.com with ESMTPSA id g132sm11524994qkb.78.2020.06.21.11.56.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 17:10:36 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-        mcchou@chromium.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH] Bluetooth: Add hci_dev_lock to get/set device flags
-Date:   Fri, 19 Jun 2020 17:10:24 -0700
-Message-Id: <20200619171016.1.I56e71a63b5d2712a1b198681e0f107b5aa3cd725@changeid>
-X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
+        Sun, 21 Jun 2020 11:56:35 -0700 (PDT)
+From:   Noah Pendleton <noah.pendleton@gmail.com>
+X-Google-Original-From: Noah Pendleton <2538614+noahp@users.noreply.github.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Noah Pendleton <noah.pendleton@gmail.com>
+Subject: [PATCH BlueZ] src/shared: update uuid16_table to latest
+Date:   Sun, 21 Jun 2020 14:56:18 -0400
+Message-Id: <20200621185618.214415-1-2538614+noahp@users.noreply.github.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adding hci_dev_lock since hci_conn_params_(lookup|add) require this
-lock.
+From: Noah Pendleton <noah.pendleton@gmail.com>
 
-Suggested-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Update the table of 16-bit UUID to manufacturer name string to the
+latest from this url:
+
+https://www.bluetooth.com/specifications/assigned-numbers/16-bit-uuids-for-members/
+
+I used this script to convert to the bluez format:
+
+https://github.com/noahp/bt-sig-16-bit-uuids
 ---
+ src/shared/util.c | 357 +++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 273 insertions(+), 84 deletions(-)
 
- net/bluetooth/mgmt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2a732cab1dc99d..5e9b9728eeac03 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3895,6 +3895,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	bt_dev_dbg(hdev, "Get device flags %pMR (type 0x%x)\n",
- 		   &cp->addr.bdaddr, cp->addr.type);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
- 							      &cp->addr.bdaddr,
-@@ -3921,6 +3923,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	status = MGMT_STATUS_SUCCESS;
- 
- done:
-+	hci_dev_unlock(hdev);
-+
- 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_DEVICE_FLAGS, status,
- 				&rp, sizeof(rp));
- }
-@@ -3959,6 +3963,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto done;
- 	}
- 
-+	hci_dev_lock(hdev);
-+
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
- 							      &cp->addr.bdaddr,
-@@ -3985,6 +3991,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	}
- 
- done:
-+	hci_dev_unlock(hdev);
-+
- 	if (status == MGMT_STATUS_SUCCESS)
- 		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
- 				     supported_flags, current_flags);
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 3b976fa16..4ecf31a03 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -533,7 +533,7 @@ static const struct {
+ 	{ 0xfefe, "GN ReSound A/S"				},
+ 	{ 0xfefd, "Gimbal, Inc."				},
+ 	{ 0xfefc, "Gimbal, Inc."				},
+-	{ 0xfefb, "Stollmann E+V GmbH"				},
++	{ 0xfefb, "Telit Wireless Solutions (Formerly Stollmann E+V GmbH)" },
+ 	{ 0xfefa, "PayPal, Inc."				},
+ 	{ 0xfef9, "PayPal, Inc."				},
+ 	{ 0xfef8, "Aplix Corporation"				},
+@@ -545,32 +545,32 @@ static const struct {
+ 	{ 0xfef2, "CSR"						},
+ 	{ 0xfef1, "CSR"						},
+ 	{ 0xfef0, "Intel"					},
+-	{ 0xfeef, "Polar Electro Oy"				},
+-	{ 0xfeee, "Polar Electro Oy"				},
++	{ 0xfeef, "Polar Electro Oy "				},
++	{ 0xfeee, "Polar Electro Oy "				},
+ 	{ 0xfeed, "Tile, Inc."					},
+ 	{ 0xfeec, "Tile, Inc."					},
+ 	{ 0xfeeb, "Swirl Networks, Inc."			},
+ 	{ 0xfeea, "Swirl Networks, Inc."			},
+ 	{ 0xfee9, "Quintic Corp."				},
+ 	{ 0xfee8, "Quintic Corp."				},
+-	{ 0xfee7, "Tencent Holdings Limited"			},
+-	{ 0xfee6, "Seed Labs, Inc."				},
++	{ 0xfee7, "Tencent Holdings Limited."			},
++	{ 0xfee6, "Silvair, Inc."				},
+ 	{ 0xfee5, "Nordic Semiconductor ASA"			},
+ 	{ 0xfee4, "Nordic Semiconductor ASA"			},
+ 	{ 0xfee3, "Anki, Inc."					},
+ 	{ 0xfee2, "Anki, Inc."					},
+-	{ 0xfee1, "Anhui Huami Information Technology Co."	},
+-	{ 0xfee0, "Anhui Huami Information Technology Co."	},
++	{ 0xfee1, "Anhui Huami Information Technology Co., Ltd. " },
++	{ 0xfee0, "Anhui Huami Information Technology Co., Ltd. " },
+ 	{ 0xfedf, "Design SHIFT"				},
+ 	{ 0xfede, "Coin, Inc."					},
+ 	{ 0xfedd, "Jawbone"					},
+ 	{ 0xfedc, "Jawbone"					},
+ 	{ 0xfedb, "Perka, Inc."					},
+-	{ 0xfeda, "ISSC Technologies Corporation"		},
++	{ 0xfeda, "ISSC Technologies Corp. "			},
+ 	{ 0xfed9, "Pebble Technology Corporation"		},
+ 	{ 0xfed8, "Google"					},
+-	{ 0xfed7, "Broadcom Corporation"			},
+-	{ 0xfed6, "Broadcom Corporation"			},
++	{ 0xfed7, "Broadcom"					},
++	{ 0xfed6, "Broadcom"					},
+ 	{ 0xfed5, "Plantronics Inc."				},
+ 	{ 0xfed4, "Apple, Inc."					},
+ 	{ 0xfed3, "Apple, Inc."					},
+@@ -595,25 +595,25 @@ static const struct {
+ 	{ 0xfec0, "KDDI Corporation"				},
+ 	{ 0xfebf, "Nod, Inc."					},
+ 	{ 0xfebe, "Bose Corporation"				},
+-	{ 0xfebd, "Clover Network, Inc."			},
+-	{ 0xfebc, "Dexcom, Inc."				},
++	{ 0xfebd, "Clover Network, Inc"				},
++	{ 0xfebc, "Dexcom Inc"					},
+ 	{ 0xfebb, "adafruit industries"				},
+ 	{ 0xfeba, "Tencent Holdings Limited"			},
+ 	{ 0xfeb9, "LG Electronics"				},
+ 	{ 0xfeb8, "Facebook, Inc."				},
+ 	{ 0xfeb7, "Facebook, Inc."				},
+-	{ 0xfeb6, "Vencer Co, Ltd"				},
++	{ 0xfeb6, "Vencer Co., Ltd"				},
+ 	{ 0xfeb5, "WiSilica Inc."				},
+ 	{ 0xfeb4, "WiSilica Inc."				},
+ 	{ 0xfeb3, "Taobao"					},
+ 	{ 0xfeb2, "Microsoft Corporation"			},
+ 	{ 0xfeb1, "Electronics Tomorrow Limited"		},
+-	{ 0xfeb0, "Nest Labs Inc."				},
+-	{ 0xfeaf, "Nest Labs Inc."				},
+-	{ 0xfeae, "Nokia Corporation"				},
+-	{ 0xfead, "Nokia Corporation"				},
+-	{ 0xfeac, "Nokia Corporation"				},
+-	{ 0xfeab, "Nokia Corporation"				},
++	{ 0xfeb0, "Nest Labs Inc"				},
++	{ 0xfeaf, "Nest Labs Inc"				},
++	{ 0xfeae, "Nokia"					},
++	{ 0xfead, "Nokia"					},
++	{ 0xfeac, "Nokia"					},
++	{ 0xfeab, "Nokia"					},
+ 	{ 0xfeaa, "Google"					},
+ 	{ 0xfea9, "Savant Systems LLC"				},
+ 	{ 0xfea8, "Savant Systems LLC"				},
+@@ -631,13 +631,13 @@ static const struct {
+ 	{ 0xfe9c, "GSI Laboratories, Inc."			},
+ 	{ 0xfe9b, "Samsara Networks, Inc"			},
+ 	{ 0xfe9a, "Estimote"					},
+-	{ 0xfe99, "Currant, Inc."				},
+-	{ 0xfe98, "Currant, Inc."				},
+-	{ 0xfe97, "Tesla Motor Inc."				},
+-	{ 0xfe96, "Tesla Motor Inc."				},
++	{ 0xfe99, "Currant Inc"					},
++	{ 0xfe98, "Currant Inc"					},
++	{ 0xfe97, "Tesla Motors Inc."				},
++	{ 0xfe96, "Tesla Motors Inc."				},
+ 	{ 0xfe95, "Xiaomi Inc."					},
+-	{ 0xfe94, "OttoQ Inc."					},
+-	{ 0xfe93, "OttoQ Inc."					},
++	{ 0xfe94, "OttoQ In"					},
++	{ 0xfe93, "OttoQ In"					},
+ 	{ 0xfe92, "Jarden Safety & Security"			},
+ 	{ 0xfe91, "Shanghai Imilab Technology Co.,Ltd"		},
+ 	{ 0xfe90, "JUMA"					},
+@@ -649,8 +649,8 @@ static const struct {
+ 	{ 0xfe8a, "Apple, Inc."					},
+ 	{ 0xfe89, "B&O Play A/S"				},
+ 	{ 0xfe88, "SALTO SYSTEMS S.L."				},
+-	{ 0xfe87, "Qingdao Yeelink Information Technology Co., Ltd. ( 青岛亿联客信息技术有限公司 )"	},
+-	{ 0xfe86, "HUAWEI Technologies Co., Ltd. ( 华为技术有限公司 )"					},
++	{ 0xfe87, "Qingdao Yeelink Information Technology Co., Ltd. ( 青岛亿联客信息技术有限公司 )" },
++	{ 0xfe86, "HUAWEI Technologies Co., Ltd. ( 华为技术有限公司 )"	},
+ 	{ 0xfe85, "RF Digital Corp"				},
+ 	{ 0xfe84, "RF Digital Corp"				},
+ 	{ 0xfe83, "Blue Bite"					},
+@@ -660,7 +660,7 @@ static const struct {
+ 	{ 0xfe7f, "Doppler Lab"					},
+ 	{ 0xfe7e, "Awear Solutions Ltd"				},
+ 	{ 0xfe7d, "Aterica Health Inc."				},
+-	{ 0xfe7c, "Stollmann E+V GmbH"				},
++	{ 0xfe7c, "Telit Wireless Solutions (Formerly Stollmann E+V GmbH)" },
+ 	{ 0xfe7b, "Orion Labs, Inc."				},
+ 	{ 0xfe7a, "Bragi GmbH"					},
+ 	{ 0xfe79, "Zebra Technologies"				},
+@@ -669,64 +669,64 @@ static const struct {
+ 	{ 0xfe76, "TangoMe"					},
+ 	{ 0xfe75, "TangoMe"					},
+ 	{ 0xfe74, "unwire"					},
+-	{ 0xfe73, "St. Jude Medical, Inc."			},
+-	{ 0xfe72, "St. Jude Medical, Inc."			},
++	{ 0xfe73, "Abbott (formerly St. Jude Medical, Inc.)"	},
++	{ 0xfe72, "Abbott (formerly St. Jude Medical, Inc.)"	},
+ 	{ 0xfe71, "Plume Design Inc"				},
+ 	{ 0xfe70, "Beijing Jingdong Century Trading Co., Ltd."	},
+ 	{ 0xfe6f, "LINE Corporation"				},
+-	{ 0xfe6e, "The University of Tokyo"			},
+-	{ 0xfe6d, "The University of Tokyo"			},
++	{ 0xfe6e, "The University of Tokyo "			},
++	{ 0xfe6d, "The University of Tokyo "			},
+ 	{ 0xfe6c, "TASER International, Inc."			},
+ 	{ 0xfe6b, "TASER International, Inc."			},
+ 	{ 0xfe6a, "Kontakt Micro-Location Sp. z o.o."		},
+-	{ 0xfe69, "Qualcomm Life Inc"				},
+-	{ 0xfe68, "Qualcomm Life Inc"				},
++	{ 0xfe69, "Capsule Technologies Inc."			},
++	{ 0xfe68, "Capsule Technologies Inc."			},
+ 	{ 0xfe67, "Lab Sensor Solutions"			},
+-	{ 0xfe66, "Intel Corporation"				},
+-	{ 0xfe65, "CHIPOLO d.o.o."				},
++	{ 0xfe66, "Intel Corporation "				},
++	{ 0xfe65, "CHIPOLO d.o.o. "				},
+ 	{ 0xfe64, "Siemens AG"					},
+-	{ 0xfe63, "Connected Yard, Inc."			},
+-	{ 0xfe62, "Indagem Tech LLC"				},
+-	{ 0xfe61, "Logitech International SA"			},
++	{ 0xfe63, "Connected Yard, Inc. "			},
++	{ 0xfe62, "Indagem Tech LLC "				},
++	{ 0xfe61, "Logitech International SA "			},
+ 	{ 0xfe60, "Lierda Science & Technology Group Co., Ltd."	},
+-	{ 0xfe5F, "Eyefi, Inc."					},
+-	{ 0xfe5E, "Plastc Corporation"				},
+-	{ 0xfe5D, "Grundfos A/S"				},
+-	{ 0xfe5C, "million hunters GmbH"			},
+-	{ 0xfe5B, "GT-tronics HK Ltd"				},
+-	{ 0xfe5A, "Chronologics Corporation"			},
+-	{ 0xfe59, "Nordic Semiconductor ASA"			},
+-	{ 0xfe58, "Nordic Semiconductor ASA"			},
+-	{ 0xfe57, "Dotted Labs"					},
+-	{ 0xfe56, "Google Inc."					},
+-	{ 0xfe55, "Google Inc."					},
+-	{ 0xfe54, "Motiv, Inc."					},
++	{ 0xfe5f, "Eyefi, Inc."					},
++	{ 0xfe5e, "Plastc Corporation "				},
++	{ 0xfe5d, "Grundfos A/S "				},
++	{ 0xfe5c, "million hunters GmbH "			},
++	{ 0xfe5b, "GT-tronics HK Ltd"				},
++	{ 0xfe5a, "Cronologics Corporation"			},
++	{ 0xfe59, "Nordic Semiconductor ASA "			},
++	{ 0xfe58, "Nordic Semiconductor ASA "			},
++	{ 0xfe57, "Dotted Labs "				},
++	{ 0xfe56, "Google Inc. "				},
++	{ 0xfe55, "Google Inc. "				},
++	{ 0xfe54, "Motiv, Inc. "				},
+ 	{ 0xfe53, "3M"						},
+-	{ 0xfe52, "SetPoint Medical"				},
+-	{ 0xfe51, "SRAM"					},
++	{ 0xfe52, "SetPoint Medical "				},
++	{ 0xfe51, "SRAM "					},
+ 	{ 0xfe50, "Google Inc."					},
+-	{ 0xfe4F, "Molekule, Inc."				},
+-	{ 0xfe4E, "NTT docomo"					},
+-	{ 0xfe4D, "Casambi Technologies Oy"			},
+-	{ 0xfe4C, "Volkswagen AG"				},
+-	{ 0xfe4B, "Koninklijke Philips N.V."			},
+-	{ 0xfe4A, "OMRON HEALTHCARE Co., Ltd."			},
++	{ 0xfe4f, "Molekule, Inc."				},
++	{ 0xfe4e, "NTT docomo "					},
++	{ 0xfe4d, "Casambi Technologies Oy"			},
++	{ 0xfe4c, "Volkswagen AG "				},
++	{ 0xfe4b, "Signify Netherlands B.V. (formerly Philips Lighting B.V.)" },
++	{ 0xfe4a, "OMRON HEALTHCARE Co., Ltd."			},
+ 	{ 0xfe49, "SenionLab AB"				},
+-	{ 0xfe48, "General Motors"				},
+-	{ 0xfe47, "General Motors"				},
+-	{ 0xfe46, "B&O Play A/S"				},
++	{ 0xfe48, "General Motors "				},
++	{ 0xfe47, "General Motors "				},
++	{ 0xfe46, "B&O Play A/S "				},
+ 	{ 0xfe45, "Snapchat Inc"				},
+-	{ 0xfe44, "SK Telecom"					},
++	{ 0xfe44, "SK Telecom "					},
+ 	{ 0xfe43, "Andreas Stihl AG & Co. KG"			},
+-	{ 0xfe42, "Nets A/S"					},
++	{ 0xfe42, "Nets A/S "					},
+ 	{ 0xfe41, "Inugo Systems Limited"			},
+ 	{ 0xfe40, "Inugo Systems Limited"			},
+-	{ 0xfe3F, "Friday Labs Limited"				},
+-	{ 0xfe3E, "BD Medical"					},
+-	{ 0xfe3D, "BD Medical"					},
+-	{ 0xfe3C, "Alibaba"					},
+-	{ 0xfe3B, "Dolby Laboratories"				},
+-	{ 0xfe3A, "TTS Tooltechnic Systems AG & Co. KG"		},
++	{ 0xfe3f, "Friday Labs Limited"				},
++	{ 0xfe3e, "BD Medical"					},
++	{ 0xfe3d, "BD Medical"					},
++	{ 0xfe3c, "alibaba"					},
++	{ 0xfe3b, "Dobly Laboratories"				},
++	{ 0xfe3a, "TTS Tooltechnic Systems AG & Co. KG"		},
+ 	{ 0xfe39, "TTS Tooltechnic Systems AG & Co. KG"		},
+ 	{ 0xfe38, "Spaceek LTD"					},
+ 	{ 0xfe37, "Spaceek LTD"					},
+@@ -737,26 +737,215 @@ static const struct {
+ 	{ 0xfe32, "Pro-Mark, Inc."				},
+ 	{ 0xfe31, "Volkswagen AG"				},
+ 	{ 0xfe30, "Volkswagen AG"				},
+-	{ 0xfe2F, "CRESCO Wireless, Inc"			},
+-	{ 0xfe2E, "ERi,Inc."					},
+-	{ 0xfe2D, "SMART INNOVATION Co.,Ltd"			},
+-	{ 0xfe2C, "Google Inc."					},
+-	{ 0xfe2B, "ITT Industries"				},
+-	{ 0xfe2A, "DaisyWorks, Inc."				},
++	{ 0xfe2f, "CRESCO Wireless, Inc"			},
++	{ 0xfe2e, "ERi,Inc."					},
++	{ 0xfe2d, "SMART INNOVATION Co.,Ltd"			},
++	{ 0xfe2c, "Google"					},
++	{ 0xfe2b, "ITT Industries"				},
++	{ 0xfe2a, "DaisyWorks, Inc."				},
+ 	{ 0xfe29, "Gibson Innovations"				},
+-	{ 0xfe28, "Ayla Network"				},
+-	{ 0xfe27, "Google Inc."					},
+-	{ 0xfe26, "Google Inc."					},
+-	{ 0xfe25, "Apple, Inc."					},
++	{ 0xfe28, "Ayla Networks"				},
++	{ 0xfe27, "Google"					},
++	{ 0xfe26, "Google"					},
++	{ 0xfe25, "Apple, Inc. "				},
+ 	{ 0xfe24, "August Home Inc"				},
+ 	{ 0xfe23, "Zoll Medical Corporation"			},
+ 	{ 0xfe22, "Zoll Medical Corporation"			},
+ 	{ 0xfe21, "Bose Corporation"				},
+ 	{ 0xfe20, "Emerson"					},
+-	{ 0xfe1F, "Garmin International, Inc."			},
+-	{ 0xfe1E, "Smart Innovations Co., Ltd"			},
+-	{ 0xfe1D, "Illuminati Instrument Corporation"		},
+-	{ 0xfe1C, "NetMedia, Inc."				},
++	{ 0xfe1f, "Garmin International, Inc."			},
++	{ 0xfe1e, "Smart Innovations Co., Ltd"			},
++	{ 0xfe1d, "Illuminati Instrument Corporation"		},
++	{ 0xfe1c, "NetMedia, Inc."				},
++	{ 0xfe1b, "Tyto Life LLC"				},
++	{ 0xfe1a, "Tyto Life LLC"				},
++	{ 0xfe19, "Google, Inc"					},
++	{ 0xfe18, "Runtime, Inc."				},
++	{ 0xfe17, "Telit Wireless Solutions GmbH"		},
++	{ 0xfe16, "Footmarks, Inc."				},
++	{ 0xfe15, "Amazon.com Services, Inc.."			},
++	{ 0xfe14, "Flextronics International USA Inc."		},
++	{ 0xfe13, "Apple Inc."					},
++	{ 0xfe12, "M-Way Solutions GmbH"			},
++	{ 0xfe11, "GMC-I Messtechnik GmbH"			},
++	{ 0xfe10, "Lapis Semiconductor Co., Ltd."		},
++	{ 0xfe0f, "Signify Netherlands B.V. (formerly Philips Lighting B.V.)" },
++	{ 0xfe0e, "Setec Pty Ltd"				},
++	{ 0xfe0d, "Procter & Gamble"				},
++	{ 0xfe0c, "Procter & Gamble"				},
++	{ 0xfe0b, "ruwido austria gmbh"				},
++	{ 0xfe0a, "ruwido austria gmbh"				},
++	{ 0xfe09, "Pillsy, Inc."				},
++	{ 0xfe08, "Microsoft"					},
++	{ 0xfe07, "Sonos, Inc."					},
++	{ 0xfe06, "Qualcomm Technologies, Inc."			},
++	{ 0xfe05, "CORE Transport Technologies NZ Limited "	},
++	{ 0xfe04, "OpenPath Security Inc"			},
++	{ 0xfe03, "Amazon.com Services, Inc."			},
++	{ 0xfe02, "Robert Bosch GmbH"				},
++	{ 0xfe01, "Duracell U.S. Operations Inc."		},
++	{ 0xfe00, "Amazon.com Services, Inc."			},
++	{ 0xfdff, "OSRAM GmbH"					},
++	{ 0xfdfe, "ADHERIUM(NZ) LIMITED"			},
++	{ 0xfdfd, "RecursiveSoft Inc."				},
++	{ 0xfdfc, "Optrel AG"					},
++	{ 0xfdfb, "Tandem Diabetes Care"			},
++	{ 0xfdfa, "Tandem Diabetes Care"			},
++	{ 0xfdf9, "INIA"					},
++	{ 0xfdf8, "Onvocal"					},
++	{ 0xfdf7, "HP Inc."					},
++	{ 0xfdf6, "AIAIAI ApS"					},
++	{ 0xfdf5, "Milwaukee Electric Tools"			},
++	{ 0xfdf4, "O. E. M. Controls, Inc."			},
++	{ 0xfdf3, "Amersports"					},
++	{ 0xfdf2, "AMICCOM Electronics Corporation"		},
++	{ 0xfdf1, "LAMPLIGHT Co.,Ltd"				},
++	{ 0xfdf0, "Google Inc."					},
++	{ 0xfdef, "ART AND PROGRAM, INC."			},
++	{ 0xfdee, "Huawei Technologies Co., Ltd."		},
++	{ 0xfded, "Pole Star"					},
++	{ 0xfdec, "Mannkind Corporation"			},
++	{ 0xfdeb, "Syntronix Corporation"			},
++	{ 0xfdea, "SeeScan, Inc"				},
++	{ 0xfde9, "Spacesaver Corporation"			},
++	{ 0xfde8, "Robert Bosch GmbH"				},
++	{ 0xfde7, "SECOM Co., LTD"				},
++	{ 0xfde6, "Intelletto Technologies Inc"			},
++	{ 0xfde5, "SMK Corporation "				},
++	{ 0xfde4, "JUUL Labs, Inc."				},
++	{ 0xfde3, "Abbott Diabetes Care"			},
++	{ 0xfde2, "Google Inc."					},
++	{ 0xfde1, "Fortin Electronic Systems "			},
++	{ 0xfde0, "John Deere"					},
++	{ 0xfddf, "Harman International"			},
++	{ 0xfdde, "Noodle Technology Inc. "			},
++	{ 0xfddd, "Arch Systems Inc"				},
++	{ 0xfddc, "4iiii Innovations Inc."			},
++	{ 0xfddb, "Samsung Electronics Co., Ltd. "		},
++	{ 0xfdda, "MHCS"					},
++	{ 0xfdd9, "Jiangsu Teranovo Tech Co., Ltd."		},
++	{ 0xfdd8, "Jiangsu Teranovo Tech Co., Ltd."		},
++	{ 0xfdd7, "Emerson"					},
++	{ 0xfdd6, "Ministry of Supply "				},
++	{ 0xfdd5, "Brompton Bicycle Ltd"			},
++	{ 0xfdd4, "LX Solutions Pty Limited"			},
++	{ 0xfdd3, "FUBA Automotive Electronics GmbH"		},
++	{ 0xfdd2, "Bose Corporation"				},
++	{ 0xfdd1, "Huawei Technologies Co., Ltd "		},
++	{ 0xfdd0, "Huawei Technologies Co., Ltd "		},
++	{ 0xfdcf, "Nalu Medical, Inc"				},
++	{ 0xfdce, "SENNHEISER electronic GmbH & Co. KG"		},
++	{ 0xfdcd, "Qingping Technology (Beijing) Co., Ltd."	},
++	{ 0xfdcc, "Shoof Technologies"				},
++	{ 0xfdcb, "Meggitt SA"					},
++	{ 0xfdca, "Fortin Electronic Systems "			},
++	{ 0xfdc9, "Busch-Jaeger Elektro GmbH"			},
++	{ 0xfdc8, "Hach – Danaher"				},
++	{ 0xfdc7, "Eli Lilly and Company"			},
++	{ 0xfdc6, "Eli Lilly and Company"			},
++	{ 0xfdc5, "Automatic Labs"				},
++	{ 0xfdc4, "Simavita (Aust) Pty Ltd"			},
++	{ 0xfdc3, "Baidu Online Network Technology (Beijing) Co., Ltd" },
++	{ 0xfdc2, "Baidu Online Network Technology (Beijing) Co., Ltd" },
++	{ 0xfdc1, "Hunter Douglas"				},
++	{ 0xfdc0, "Hunter Douglas"				},
++	{ 0xfdbf, "California Things Inc. "			},
++	{ 0xfdbe, "California Things Inc. "			},
++	{ 0xfdbd, "Clover Network, Inc."			},
++	{ 0xfdbc, "Emerson"					},
++	{ 0xfdbb, "Profoto"					},
++	{ 0xfdba, "Comcast Cable Corporation"			},
++	{ 0xfdb9, "Comcast Cable Corporation"			},
++	{ 0xfdb8, "LivaNova USA Inc."				},
++	{ 0xfdb7, "LivaNova USA Inc."				},
++	{ 0xfdb6, "GWA Hygiene GmbH"				},
++	{ 0xfdb5, "ECSG"					},
++	{ 0xfdb4, "HP Inc"					},
++	{ 0xfdb3, "Audiodo AB"					},
++	{ 0xfdb2, "Portable Multimedia Ltd "			},
++	{ 0xfdb1, "Proxy Technologies, Inc."			},
++	{ 0xfdb0, "Proxy Technologies, Inc."			},
++	{ 0xfdaf, "Wiliot LTD"					},
++	{ 0xfdae, "Houwa System Design, k.k."			},
++	{ 0xfdad, "Houwa System Design, k.k."			},
++	{ 0xfdac, "Tentacle Sync GmbH"				},
++	{ 0xfdab, "Xiaomi Inc."					},
++	{ 0xfdaa, "Xiaomi Inc."					},
++	{ 0xfda9, "Rhombus Systems, Inc."			},
++	{ 0xfda8, "PSA Peugeot Citroën"				},
++	{ 0xfda7, "WWZN Information Technology Company Limited"	},
++	{ 0xfda6, "WWZN Information Technology Company Limited"	},
++	{ 0xfda5, "Neurostim OAB, Inc."				},
++	{ 0xfda4, "Inseego Corp."				},
++	{ 0xfda3, "Inseego Corp."				},
++	{ 0xfda2, "Groove X, Inc"				},
++	{ 0xfda1, "Groove X, Inc"				},
++	{ 0xfda0, "Secugen Corporation"				},
++	{ 0xfd9f, "VitalTech Affiliates LLC"			},
++	{ 0xfd9e, "The Coca-Cola Company"			},
++	{ 0xfd9d, "Gastec Corporation"				},
++	{ 0xfd9c, "Huawei Technologies Co., Ltd."		},
++	{ 0xfd9b, "Huawei Technologies Co., Ltd."		},
++	{ 0xfd9a, "Huawei Technologies Co., Ltd."		},
++	{ 0xfd99, "ABB Oy"					},
++	{ 0xfd98, "Disney Worldwide Services, Inc."		},
++	{ 0xfd97, "June Life, Inc."				},
++	{ 0xfd96, "Google LLC"					},
++	{ 0xfd95, "Rigado"					},
++	{ 0xfd94, "Hewlett Packard Enterprise"			},
++	{ 0xfd93, "Bayerische Motoren Werke AG"			},
++	{ 0xfd92, "Qualcomm Technologies International, Ltd. (QTIL)" },
++	{ 0xfd91, "Groove X, Inc."				},
++	{ 0xfd90, "Guangzhou SuperSound Information Technology Co.,Ltd" },
++	{ 0xfd8f, "Matrix ComSec Pvt. Ltd."			},
++	{ 0xfd8e, "Motorola Solutions"				},
++	{ 0xfd8d, "quip NYC Inc."				},
++	{ 0xfd8c, "Google LLC"					},
++	{ 0xfd8b, "Jigowatts Inc."				},
++	{ 0xfd8a, "Signify Netherlands B.V."			},
++	{ 0xfd89, "Urbanminded LTD"				},
++	{ 0xfd88, "Urbanminded LTD"				},
++	{ 0xfd87, "Google LLC"					},
++	{ 0xfd86, "Abbott"					},
++	{ 0xfd85, "Husqvarna AB"				},
++	{ 0xfd84, "Tile, Inc."					},
++	{ 0xfd83, "iNFORM Technology GmbH"			},
++	{ 0xfd82, "Sony Corporation"				},
++	{ 0xfd81, "CANDY HOUSE, Inc."				},
++	{ 0xfd80, "Phindex Technologies, Inc"			},
++	{ 0xfd7f, "Husqvarna AB"				},
++	{ 0xfd7e, "Samsung Electronics Co., Ltd."		},
++	{ 0xfd7d, "Center for Advanced Research Wernher Von Braun" },
++	{ 0xfd7c, "Toshiba Information Systems(Japan) Corporation" },
++	{ 0xfd7b, "WYZE LABS, INC."				},
++	{ 0xfd7a, "Withings"					},
++	{ 0xfd79, "Withings"					},
++	{ 0xfd78, "Withings"					},
++	{ 0xfd77, "Withings"					},
++	{ 0xfd76, "Insulet Corporation"				},
++	{ 0xfd75, "Insulet Corporation"				},
++	{ 0xfd74, "BRControls Products BV"			},
++	{ 0xfd73, "BRControls Products BV"			},
++	{ 0xfd72, "Logitech International SA"			},
++	{ 0xfd71, "GN Hearing A/S"				},
++	{ 0xfd70, "GuangDong Oppo Mobile Telecommunications Corp., Ltd." },
++	{ 0xfd6f, "Apple, Inc."					},
++	{ 0xfd6e, "Polidea sp. z o.o."				},
++	{ 0xfd6d, "Sigma Elektro GmbH"				},
++	{ 0xfd6c, "Samsung Electronics Co., Ltd."		},
++	{ 0xfd6b, " rapitag GmbH"				},
++	{ 0xfd6a, "Emerson"					},
++	{ 0xfd69, "Samsung Electronics Co., Ltd."		},
++	{ 0xfd68, "Ubique Innovation AG"			},
++	{ 0xfd67, "Montblanc Simplo GmbH"			},
++	{ 0xfd66, "Zebra Technologies Corporation"		},
++	{ 0xfd65, "Razer Inc."					},
++	{ 0xfd64, "INRIA"					},
++	{ 0xfd63, "Fitbit, Inc."				},
++	{ 0xfd62, "Fitbit, Inc."				},
++	{ 0xfd61, "Arendi AG"					},
++	{ 0xfd60, "Sercomm Corporation"				},
++	{ 0xfd5f, "Oculus VR, LLC"				},
+ 	/* SDO defined */
+ 	{ 0xfffc, "AirFuel Alliance"				},
+ 	{ 0xfffe, "Alliance for Wireless Power (A4WP)"		},
 -- 
-2.27.0.111.gc72c7da667-goog
+2.25.1
 
