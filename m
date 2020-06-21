@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB15C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 19:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3FDC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 19:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFAC025226
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 19:08:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1FA625231
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Jun 2020 19:08:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXp4SvI6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DiloR879"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729289AbgFUTIB (ORCPT
+        id S1729571AbgFUTIE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Jun 2020 15:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        Sun, 21 Jun 2020 15:08:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728649AbgFUTIB (ORCPT
+        with ESMTP id S1728649AbgFUTIE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Jun 2020 15:08:01 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60D0C061794
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 12:08:00 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id z1so11135939qtn.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 12:08:00 -0700 (PDT)
+        Sun, 21 Jun 2020 15:08:04 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0745C061794
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 12:08:02 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id z63so1673766qkb.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2020 12:08:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=cDHyAgBiLzCDSpxcuOp9to5hpXfNRPLhIQjFQaF79Yo=;
-        b=aXp4SvI6Xqn8zRvT1wdwdagv5gfs7lrVDYRoPGWRBhJak9O7mTTXoc0QJz0w3H/v9o
-         Rwb1BbyAa2Eq+YPDmCbiJxO5+wkGFF+zsS4b/aTSj6oUeLUjL+4AsBZzC/pQFIU2Dao3
-         PTAFk66MU1Ms+cbSqlwaTtNkHdAt0x9V5lKQEYjIACWyH0W+nRWvvrirYnGeQ2h4uyrx
-         hrR8z3v1/ZBd2KKT3D6+WlcFmg9Xzl7eOzl/ZoBI3BZAckAkSagUUePxcZHelzNM8NNx
-         FRbGLdX+85isaRWr19QRC4VbkcGWLoJy7wQ3MFMS45TJlMa7gEJFIGEP6E8/qsf7o74V
-         OrAA==
+        bh=qwngX6Tf8eXXLGqv5xhD8f+54fdRlHJlu8RtEvriV7I=;
+        b=DiloR879oJGotO6XWUa2GBfna2G0v9vi1U/5YPzJ/rKSAxQTUogjy1NXS/fVlkrOWZ
+         Kv+AjrMkzAC+lf0mZmh1bjGyHj9ba2bFgtwiHOU+eEQqWsow3VBHdVYuDG43oRbddm9i
+         qnQeaiSO3Y4KGTuc/AD4eYcGqadKz8uU+2dAGrEH0zs/CfGxFpRGLseWVUSi9N69OaBR
+         lfk6YBs55m49buahhUsWZWl3LYik6NySjk9KD2IWMtKzWqnnmnbNLpzj3o1XwtqdwJAi
+         VVM5dueM4m9MD0r8w1r+k+kcKcp0CZjLe/IWFqfTaKX33jNBweeR3PhyKjSzC9rlgIXr
+         GR/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=cDHyAgBiLzCDSpxcuOp9to5hpXfNRPLhIQjFQaF79Yo=;
-        b=WqSrSiA/hw0NvZNNDco7iIC86CS5lUzU/x6YvAv655ZNkzETv4kh+4eeT0ee4B1Ex7
-         Duh3JR/lwuYXN3XwlxVBQFJZsOyKq474AjwNVzxDNkpXshmlV5kQX6K7ZyZ+LQbGNIGv
-         4B2T7n7J+o0xO0uckfDT+6ovkzA75MzPHwKk/N4tvPMXJgFZj05H31TF/BytT3puQcfE
-         qEe86+2rn3oYabNTBuBwH3ZotvP0kLmzdQfftPwxYGobefsJmfpVJBmxBZhTbohRupVi
-         UtxJQayf8LrsuWdUNqVojccWt2WRrVDjSXMxwaPGGbv9TFsF4N7dm6/WJNtoGfmjYqys
-         TcCA==
-X-Gm-Message-State: AOAM53028FJHZykjGdvPq25aRYUNTIG3Zv3OhbBU6k64mJL9FSHXMhCa
-        41hcv1KbgojW+gXnk4TL3rPXhfWElaA=
-X-Google-Smtp-Source: ABdhPJxb65gav5Mwq/Q0pR2uc13Yfr4W0eP852Cik7QXafWQASGiznjfjJH5FPqpXwuErIozy05m2Q==
-X-Received: by 2002:ac8:4806:: with SMTP id g6mr11866000qtq.213.1592766479562;
-        Sun, 21 Jun 2020 12:07:59 -0700 (PDT)
+        bh=qwngX6Tf8eXXLGqv5xhD8f+54fdRlHJlu8RtEvriV7I=;
+        b=tD4shyNHcNZHB6HpHAiB97GkyV7YymduVHqrmp6WO7v4fuYEcDvNGL4Vjb3tftWGZp
+         Q1brsJpiu/jiLn7ic0Q4l4IHzWCDwLlfjZaBHHOkShXiK8BrcbDNcr9kE4dAo+5+L2FN
+         XQbehs5xStKB000XmxuDoESlhRiImo/EGYIlrIjnN3yMzYG4GLbEc0WlPdwXmiqfl9YS
+         H764GjsEGJNAY+zD17v29UWkkiwMZaFJ+sTpFt9+O4+Xv1TucdvL+vdys4OQWzPq/XRL
+         0FffUUFhfaCkL644pwYU5V/TjIE8yjIEN+rWqKXnDmm9bZ6oSQe06dzkMbqbmEjhyPE0
+         4mEw==
+X-Gm-Message-State: AOAM532hi/870ktU52GrovMsJBOlOOeevji3wh79czlC3fClDeo7sTCa
+        /b+cFKAT6bLHG2m47O77SHOZE9cN9pM=
+X-Google-Smtp-Source: ABdhPJxSfQi4Gm6L0e5OgJnp0pGWciYJya9U4UxnVmViyBnSJS6r7wUuOrrtWNamOY97VBJ+Uj0k/w==
+X-Received: by 2002:a37:6589:: with SMTP id z131mr5440931qkb.235.1592766481751;
+        Sun, 21 Jun 2020 12:08:01 -0700 (PDT)
 Received: from [172.17.0.2] ([20.186.155.207])
-        by smtp.gmail.com with ESMTPSA id p44sm14073235qta.12.2020.06.21.12.07.58
+        by smtp.gmail.com with ESMTPSA id h8sm12852426qto.0.2020.06.21.12.08.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2020 12:07:59 -0700 (PDT)
-Message-ID: <5eefb00f.1c69fb81.9d779.1975@mx.google.com>
-Date:   Sun, 21 Jun 2020 12:07:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2855206913963054636=="
+        Sun, 21 Jun 2020 12:08:01 -0700 (PDT)
+Message-ID: <5eefb011.1c69fb81.9a90d.c39a@mx.google.com>
+Date:   Sun, 21 Jun 2020 12:08:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8548379448607460851=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, noah.pendleton@gmail.com
@@ -74,34 +74,30 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2855206913963054636==
-Content-Type: text/plain; charset="utf-8"
+--===============8548379448607460851==
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2twYXRjaCBGYWlsZWQKCk91dHB1dHM6
-CldBUk5JTkc6Q09NTUlUX0xPR19MT05HX0xJTkU6IFBvc3NpYmxlIHVud3JhcHBlZCBjb21taXQg
-ZGVzY3JpcHRpb24gKHByZWZlciBhIG1heGltdW0gNzUgY2hhcnMgcGVyIGxpbmUpCiM5OiAKaHR0
-cHM6Ly93d3cuYmx1ZXRvb3RoLmNvbS9zcGVjaWZpY2F0aW9ucy9hc3NpZ25lZC1udW1iZXJzLzE2
-LWJpdC11dWlkcy1mb3ItbWVtYmVycy8KCldBUk5JTkc6TE9OR19MSU5FOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMTMxOiBGSUxFOiBzcmMvc2hhcmVkL3V0aWwuYzo2NTI6CisJeyAweGZlODcs
-ICJRaW5nZGFvIFllZWxpbmsgSW5mb3JtYXRpb24gVGVjaG5vbG9neSBDby4sIEx0ZC4gKCDpnZLl
-spvkur/ogZTlrqLkv6Hmga/mioDmnK/mnInpmZDlhazlj7ggKSIgfSwKCldBUk5JTkc6TE9OR19M
-SU5FOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTMyOiBGSUxFOiBzcmMvc2hhcmVkL3V0aWwu
-Yzo2NTM6CisJeyAweGZlODYsICJIVUFXRUkgVGVjaG5vbG9naWVzIENvLiwgTHRkLiAoIOWNjuS4
-uuaKgOacr+aciemZkOWFrOWPuCApIgl9LAoKLSB0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3Ms
-IDQ1NSBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0
-cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0
-byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBsYWNlLgoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1l
-c3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJ
-TEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUExJVF9TVFJJ
-TkcKCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFz
-ZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgK
 
---===============2855206913963054636==--
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkgitlint Failed
+
+Outputs:
+6: B1 Line exceeds max length (83>80): "https://www.bluetooth.com/specifications/assigned-numbers/16-bit-uuids-for-members/"
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+--===============8548379448607460851==--
