@@ -2,71 +2,90 @@ Return-Path: <SRS0=Uimr=AD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C3C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 07:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081C1C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 09:06:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14C2820DD4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 07:15:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE921206C1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 09:05:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="u+Kxc0Tr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731341AbgFVHPf convert rfc822-to-8bit (ORCPT
+        id S1726201AbgFVJF7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Jun 2020 03:15:35 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33356 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726850AbgFVHPf (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jun 2020 03:15:35 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 48940CED25;
-        Mon, 22 Jun 2020 09:25:26 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: fix up firmware download
- sequence
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <7d835850c16e07d1346c763900cc8c880182f497.1592588740.git.sean.wang@mediatek.com>
-Date:   Mon, 22 Jun 2020 09:15:33 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Mark Chen <Mark-YW.Chen@mediatek.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5F6C2EB2-B0DF-4534-A123-4E6969A98410@holtmann.org>
-References: <7d835850c16e07d1346c763900cc8c880182f497.1592588740.git.sean.wang@mediatek.com>
-To:     Sean Wang <sean.wang@mediatek.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 22 Jun 2020 05:05:59 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:29232 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726070AbgFVJF7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 22 Jun 2020 05:05:59 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1592816758; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=fB96uV2NdnKSNrO0LJe7BUAqV2cVEReSBjWYNNIxyrg=; b=u+Kxc0TrJKwEDCebJ/RN3wZJFDWG6qsjl71rgEgIIKZHXYyScHXIBTqwXYQHANsMojVP/ToA
+ O8TM1g8q+EdHxM+O1EZ+b9GH5aKxOxPrtdTwjzcREamB8hkP+P0x21gEcbZ7xyCjAZo9pQMZ
+ ZGIy8789MnbOVn5LG5K6qRrWFwQ=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n12.prod.us-east-1.postgun.com with SMTP id
+ 5ef0747686de6ccd44179517 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 22 Jun 2020 09:05:58
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 8C7DEC433CA; Mon, 22 Jun 2020 09:05:57 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 569D3C433C6;
+        Mon, 22 Jun 2020 09:05:57 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 22 Jun 2020 14:35:57 +0530
+From:   bgodavar@codeaurora.org
+List-Id: <linux-firmware.lore.kernel.org>
+To:     linux-firmware@kernel.org
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, gubbaven@codeaurora.org,
+        abhishekpandit@chromium.org
+Subject: Update WCN3991 FW with new enhancements
+Message-ID: <251806a04b162259103050eb11c48bf1@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+The following changes since commit 
+887d2a103c2bdd267dbca5bed39b1b493d6cbe13:
 
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> Data RAM on the device have to be powered on before starting to download
-> the firmware.
-> 
-> v1->v2:
-> 	rebased to bluetooth-next
-> 
-> Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
-> Co-developed-by: Mark Chen <Mark-YW.Chen@mediatek.com>
-> Signed-off-by: Mark Chen <Mark-YW.Chen@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> drivers/bluetooth/btusb.c | 16 +++++++++++++++-
-> 1 file changed, 15 insertions(+), 1 deletion(-)
+   linux-firmware: Update firmware file for Intel Bluetooth AX200 
+(2020-06-10 08:32:52 -0400)
 
-something is fishy here. git am still fails.
+are available in the git repository at:
+
+   https://github.com/bgodavar/qca_wcn3991
+
+for you to fetch changes up to 24cc617d85a466ba58a94e3040690d0a43c83226:
+
+   QCA: Update WCN3991 FW files (2020-06-22 14:20:47 +0530)
+
+----------------------------------------------------------------
+Balakrishna Godavarthi (1):
+       QCA: Update WCN3991 FW files
+
+  qca/crbtfw32.tlv | Bin 95784 -> 125896 bytes
+  qca/crnv32.bin   | Bin 5388 -> 5299 bytes
+  2 files changed, 0 insertions(+), 0 deletions(-)
 
 Regards
-
-Marcel
-
+Balakrishna
