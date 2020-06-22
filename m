@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7032C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 19:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43968C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 19:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 727EA20767
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 19:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DE8120767
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 19:29:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLXnp58D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="koV2GwSq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728225AbgFVT2i (ORCPT
+        id S1728294AbgFVT3H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Jun 2020 15:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
+        Mon, 22 Jun 2020 15:29:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728140AbgFVT2i (ORCPT
+        with ESMTP id S1728140AbgFVT3G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jun 2020 15:28:38 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73024C061573
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 12:28:38 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id t25so16676011oij.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 12:28:38 -0700 (PDT)
+        Mon, 22 Jun 2020 15:29:06 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69E5C061573
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 12:29:06 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id 25so16660507oiy.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 12:29:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nITZWK1n0LKPk3x5RqeDfZR3MGOdty/EBCvI+cFvcro=;
-        b=JLXnp58D0a4gNZWvsukg3L+vIpRR/lPfglrj/E/5H7sKN1M6DU0D3dwYs+9BykGAlp
-         P3fcVKUlmgigbn51HJwyeskqLbCWcb2xyRrSVWNuNMt0sbZWk8L0w/LWxRiUR8Wak7LK
-         foKwdHa1m12m/qziXOM/RX/zLqp/zg5VjYChJivc2JK2GIYCdr+0IAbiTk5+UWOFjsF5
-         GpmJ2ciblNJwjIufYmLFkx88qxgVq96EQACSIH+OoxADnL3YUzM2Nbsb1vch4G5+4+1b
-         YA0ywpMbtsWcz6qOAJ1WGL04Ph0r8am50LBCUmBmQ+FjPj65qwiQRn3yxArOecCr+He4
-         q9rA==
+        bh=uG7ktmVmHhtH+zZNCHerRHEynF4USMtwuSPvt3ZKgAU=;
+        b=koV2GwSqFxX8odhqiduXuq+eMkJQXPNf7fVi5bx9ClkKXvzVwG8fP4A0r+L5um7idO
+         KEuff78NN5BQqdAax7Zs4+4OPvUjpQk7stoOOldcMM8jDQ3jGdzfD9d6xJqtu/EQC+tk
+         mOt9iZO9H920rKpGMMgSA0NLiX7vRzuEAx6EdyU65qyIBzdDH41FOiK31EAhXMPQXxcT
+         +veISPy5Y1E3NYofMg0xPHTlOsT1nvhtAvuWnOcNPMar4WBIKEgJaYQPDraOWCBL4sgR
+         szzBE8jY0rnkl00I7QFOxmgnOAl3EP7z4o9inxuwopC+V3fUs+676QXgl9Zw3jQNPgDG
+         voWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nITZWK1n0LKPk3x5RqeDfZR3MGOdty/EBCvI+cFvcro=;
-        b=BSThvxGJ1HaNGl6Mmf/97K/LmYB47ig1nUUA2dKDm5iyG5MWehPN2xDq5KYBxdJ1Wy
-         Kv3O5MltTIfTeWh8WWxTPHkS6l6DZhMjWbUpXcKbVY8FmpCNff4C+vzKmOeSXnQTsgWB
-         Dgv3tn436Skev8Af66zNm2DYQ4hf1+tRjQhpYhFFtxBMKeqfebCFOGaooq9lGYEpVwSr
-         j5lZRou+RNoJNY8tTi1GNGhi4sbryWWewbVJr2ORvT8VM+BRFYVr/8roJ+YLNJuX9cgb
-         aBoUp/XAAnTedLqgGNkD7oX6fHih0+EUocKHVH62LE2IjEdMMHD2NUcp4jGlsSEl/VqK
-         yURw==
-X-Gm-Message-State: AOAM531k+ar/7yLiaUpazWypcSuD7doszF0TPz47owM2d59rUFJGq+K1
-        qTrfazDqQtmptaLMP2GwPAcRF0aamRDazU0UROaexw==
-X-Google-Smtp-Source: ABdhPJzTXsH0Hr5oxcKHx8ukLJIZhsFil5Zwq2iSwxa9X1EilId24mhhK3D70raPaRgPjljiO1NDYLIZ+vUcenZZvxA=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr12919791oib.48.1592854117718;
- Mon, 22 Jun 2020 12:28:37 -0700 (PDT)
+        bh=uG7ktmVmHhtH+zZNCHerRHEynF4USMtwuSPvt3ZKgAU=;
+        b=TlcTJ/xk4V8I5VioCBbmPpMh5G6yQC2gxBXkG2v0aV7EdVngVg53blnnRCnuwrYs/i
+         jPuFgPb9maEMhGrIFZv7dPUP3UVJv7nRpDkQePAGPXHjZWQ2oFShlsebQhRxiZHM99xv
+         3Io4jVep/PRZJA4Flzf71pyeJrhmYE+fSWlnzIJ58dhNnxPSusysE+VBKOEY/9JNu/wO
+         5AFy2H7LuuRhvuTBQu4yEz1YJQeqEIxVoKDZuvF2mtEUSP8qqYtBfXf27AqfHLR22o1C
+         22S4nVTE3RhmdZyc3nAjzo4C0e7XPOHl5NYLL7ZfQNDDzxQBPc5ktyaUamGiRFQ33EZp
+         W8yw==
+X-Gm-Message-State: AOAM533HzlIjFG9K4xmpwItZAz5RoWLWtHpmavZPL5UY+SdUwd/fkpT+
+        AHGfg0blDDuOQG1CqhnT/k0KXX0xPeMk1k+2L2Q=
+X-Google-Smtp-Source: ABdhPJySCICJWvrw3OFT3V6wqz+ahRKJGzpc7xaN7AX85WojxPNQNiTf0lMOpZBHS/a7raJf+aIp0Y1PUW90RHkAQQ4=
+X-Received: by 2002:aca:4f4f:: with SMTP id d76mr13059448oib.152.1592854146102;
+ Mon, 22 Jun 2020 12:29:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200622171817.144830-1-tedd.an@linux.intel.com>
-In-Reply-To: <20200622171817.144830-1-tedd.an@linux.intel.com>
+References: <20200619183456.38696-1-tedd.an@linux.intel.com>
+In-Reply-To: <20200619183456.38696-1-tedd.an@linux.intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 22 Jun 2020 12:28:26 -0700
-Message-ID: <CABBYNZ+1oQ-jq6nf3VeyKrEgKG+t0EfTdTgPuT5T1VB=5aia3A@mail.gmail.com>
-Subject: Re: [PATCH V2] checkpatch: Add configuration for checkpatch
+Date:   Mon, 22 Jun 2020 12:28:54 -0700
+Message-ID: <CABBYNZLm9dWkcJ8Kbf=jeyN2VTzuRh2RFvY7iAqeqQ8LwSJ1cA@mail.gmail.com>
+Subject: Re: [PATCH V2 1/2] midi: Fix SysEx parser in MIDI plugin
 To:     Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Tedd Ho-Jeong An <tedd.an@intel.com>
@@ -73,38 +73,94 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Tedd,
 
-On Mon, Jun 22, 2020 at 10:22 AM <tedd.an@linux.intel.com> wrote:
+On Fri, Jun 19, 2020 at 9:27 PM <tedd.an@linux.intel.com> wrote:
 >
 > From: Tedd Ho-Jeong An <tedd.an@intel.com>
 >
-> This patch adds a configuration with basic rules for checkpatch.
-> ---
->  .checkpatch.conf | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->  create mode 100644 .checkpatch.conf
+> The SysEx end of message parser didn't consider the fact that
+> timestampsLow are in the stream and it might have the EOX (F7)
+> byte as well.
 >
-> diff --git a/.checkpatch.conf b/.checkpatch.conf
-> new file mode 100644
-> index 000000000..419733832
-> --- /dev/null
-> +++ b/.checkpatch.conf
-> @@ -0,0 +1,14 @@
-> +--no-tree
-> +--no-signoff
-> +--summary-file
-> +--show-types
-> +--max-line-length=80
+> Fix that by always assuming the first system message byte is
+> the timestampLow.
+>
+> Future work would involve support other type of system message
+> bytes, such as real-time.
+> ---
+>  profiles/midi/libmidi.c | 38 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 31 insertions(+), 7 deletions(-)
+>
+> diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+> index 4b4df799f..7d57e7335 100644
+> --- a/profiles/midi/libmidi.c
+> +++ b/profiles/midi/libmidi.c
+> @@ -331,6 +331,30 @@ static size_t handle_end_of_sysex(struct midi_read_parser *parser,
+>         return sysex_length + 1; /* +1 because of timestampLow */
+>  }
+>
+> +/* Searches the end of a SysEx message that contains a timestampLow
+> + * before the SysEx end byte. Returns the number of bytes of valid
+> + * SysEx payload in the buffer.
+> + */
+> +static size_t sysex_eox_len(const uint8_t *data, size_t size)
+> +{
+> +       size_t i = 0;
 > +
-> +--ignore COMPLEX_MACRO
-> +--ignore SPLIT_STRING
-> +--ignore CONST_STRUCT
-> +--ignore FILE_PATH_CHANGES
-> +--ignore MISSING_SIGN_OFF
-> +--ignore PREFER_PACKED
-> +--ignore COMMIT_MESSAGE
-> +--ignore SSCANF_TO_KSTRTO
+> +       MIDI_ASSERT(size > 0);
+> +
+> +       if (data[i] == 0xF0)
+> +               i++;
+> +
+> +       /* Search for timestamp low */
+> +       while (i < size) {
+> +               if ((data[i] & 0x80)) {
+> +                       i++;
+> +                       break;
+> +               }
+> +               i++;
+> +       }
+> +
+> +       return (i < size && data[i] == 0xF7) ? i : 0;
+> +}
+>
+>
+>  size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+> @@ -368,14 +392,14 @@ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+>
+>                 /* System Common Messages */
+>         case 0xF0: /* SysEx Start */ {
+> -               uint8_t *pos;
+> +               size_t sysex_length;
+>
+>                 /* cleanup Running Status Message */
+>                 parser->rstatus = 0;
+>
+> -               /* Avoid parsing if SysEx is contained in one BLE packet */
+> -               if ((pos = memchr(data + i, 0xF7, size - i))) {
+> -                       const size_t sysex_length = pos - (data + i);
+> +               sysex_length = sysex_eox_len(data + i, size - i);
+> +               /* Search for End of SysEx message in one BLE message */
+> +               if (sysex_length > 0) {
+>                         midi_size = handle_end_of_sysex(parser, ev, data + i,
+>                                                         sysex_length);
+>                 } else {
+> @@ -424,10 +448,10 @@ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+>
+>                 /* Check for SysEx messages */
+>                 if (parser->sysex_stream.len > 0) {
+> -                       uint8_t *pos;
+> +                       size_t sysex_length;
+>
+> -                       if ((pos = memchr(data + i, 0xF7, size - i))) {
+> -                               const size_t sysex_length = pos - (data + i);
+> +                       sysex_length = sysex_eox_len(data + i, size - i);
+> +                       if (sysex_length > 0) {
+>                                 midi_size = handle_end_of_sysex(parser, ev, data + i,
+>                                                                 sysex_length);
+>                         } else {
 > --
 > 2.25.4
+>
 
 Applied, thanks.
 
