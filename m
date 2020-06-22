@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37843C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7873BC433E0
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 23:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1486420738
+	by mail.kernel.org (Postfix) with ESMTP id 572B820720
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jun 2020 23:41:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Eq2IW+Gj"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dTi0e7hq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731100AbgFVXlM (ORCPT
+        id S1731110AbgFVXlM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 22 Jun 2020 19:41:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731034AbgFVXlL (ORCPT
+        with ESMTP id S1731085AbgFVXlM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jun 2020 19:41:11 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CFAC061795
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 16:41:10 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id k1so8296805pls.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 16:41:10 -0700 (PDT)
+        Mon, 22 Jun 2020 19:41:12 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D13AC061795
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 16:41:12 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id q17so1971348pfu.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 16:41:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rx9oioKmV1hXOmQeUskpAWObYiB+UYpRucZChdpRzZg=;
-        b=Eq2IW+GjCM0u1hJlkNg1GfwuMVDDACpeBKR79YQMxfKhy/NTayT9Phk98M53Cw7iDX
-         lN3w0ikLVUtiFtsaX+97Zoi6cz6yAsas71ntusxG3h2Nn8LAVsV/LJ+9xDcXFDfqlbSn
-         Q8sLU7TG0Cgt/iXnQOu79NRcdR0jSKoNjPqbM=
+        bh=o3PfK6QUgkIF1Eoe6Yq3txIIjXluV0eFd2f20nkoGxM=;
+        b=dTi0e7hqPsOq4VW/d2Nvfv24/RzBW1kGkz7E2KI8ACl7q8AG1HPDqyuILCFOWx0ozZ
+         B3ZejWHeT92xh4Q7HUZllBZlraDBv8j7PhhtPBQ3fzHDXBk8qw17J0AuYT3LkKK6J1lj
+         os8OCLyGf6YNt2F99OKiBXUjz0I9YiRkDfXxE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rx9oioKmV1hXOmQeUskpAWObYiB+UYpRucZChdpRzZg=;
-        b=baezguNyew56aWEu/6MnZOyz4sDscj59ehWTQw0kgIvauv7YgrimNTI3gvp/2P3b0i
-         w4aremmfTZEQrxvW/vOiz2kaMqdii47NsLmRMIYp5ACteGV45m7nSHi7RIrlSOQg+t7A
-         7EwiMssxZvgcs9scC7M01D/hepypXS55XYzEK29imM8xXEctF7IG7tonZLPmgtMRwASf
-         pvvjaUZaRQLoT0UqfUMr2xoFVf3lXGgki+/FC4mtEdwPPW3hOfk9YWX2F5bcpZvGUFK+
-         scTWPsXk5Tp2KP1WkhNhWKSLzK0pbEHFf4OdjTGdAgr/VPITMVa3z2F8RZ/4m/qhwp35
-         eIxg==
-X-Gm-Message-State: AOAM532HP6U0j/f6671uvRyGDI61Yqn8DOv+yE5EhngsAcdmv9VUApbv
-        xXsVQxdH96weT8tymZ++tJriS2r4IYc=
-X-Google-Smtp-Source: ABdhPJzg6XBwEIzuNpsqSgMb+UzdqgVrs5RVKqOxtqCZy1zC7clv7aKB/H0FWehnjiyT8DWEdPAtTw==
-X-Received: by 2002:a17:90a:de95:: with SMTP id n21mr20906558pjv.100.1592869269731;
-        Mon, 22 Jun 2020 16:41:09 -0700 (PDT)
+        bh=o3PfK6QUgkIF1Eoe6Yq3txIIjXluV0eFd2f20nkoGxM=;
+        b=oPT8x++dzOlSOSTKNhFxxtTJN7V5xLZob7kGs3e+rr0KDXeDwP3JC0GnDSmpJ1E/F1
+         e8s5dqXjJ7pkBmMqknzRJKHZgoisFmA9gfKK1E12cx4XVZdlOuRqNCS3N1TQYxZ65Awz
+         Ps2CWYEkXzp4N5moHo8p9uuQrUR5xyymdQfwm/amP6zpFSxqhEPL59PQJWhe3TklKtMo
+         sVbusY+pL4kFLGAVgiGzLesFlt7BDCzLLfYmq03Ai2gx3Qy33LKX93mKMyTrGcJt1A7N
+         fmyCxY8XF0LLEoeMjyasf7q27MDUAztS9RjZflJv28TzxMvYEmlTBCDBdlIFes1dhirH
+         jO5A==
+X-Gm-Message-State: AOAM5300uIUs211dZmLtV7W1mr37+Y6OTxwLqLH3wicgKsu6IQxMKlM+
+        eHy7cGiQnuv8sgvnQ2NJXKQ1SQ==
+X-Google-Smtp-Source: ABdhPJyLG4hue6NS4lAgOmntU3qOooAM1nwcamYyIGZJ+R/PbB4MLz3+O8rP4NyUfWF3wMAGTQ8vBw==
+X-Received: by 2002:aa7:99c4:: with SMTP id v4mr22749933pfi.40.1592869271573;
+        Mon, 22 Jun 2020 16:41:11 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id w22sm15049500pfq.193.2020.06.22.16.41.08
+        by smtp.gmail.com with ESMTPSA id w22sm15049500pfq.193.2020.06.22.16.41.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2020 16:41:09 -0700 (PDT)
+        Mon, 22 Jun 2020 16:41:11 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
 Cc:     alainm@chromium.org, marcel@holtmann.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v5 4/6] client: Display wake allowed property with info
-Date:   Mon, 22 Jun 2020 16:40:49 -0700
-Message-Id: <20200622164003.BlueZ.v5.4.I45dbf8ee15dff6c9346dc9754574a0be9bee1fa1@changeid>
+Subject: [BlueZ PATCH v5 6/6] input: Make HID devices support wake
+Date:   Mon, 22 Jun 2020 16:40:51 -0700
+Message-Id: <20200622164003.BlueZ.v5.6.I3290604153369ff32013f3dcadda4df3f2eb0f36@changeid>
 X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
 In-Reply-To: <20200622234051.206800-1-abhishekpandit@chromium.org>
 References: <20200622234051.206800-1-abhishekpandit@chromium.org>
@@ -74,35 +74,53 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Display whether the device is configured as wake allowed when queried
-with cmd_info.
+HID devices can wake the host from a suspended state. Mark the profiles
+to support wake when they are accepted. If the device hasn't already
+been configured with a Wake Allowed configuration, it will default to
+yes when the profile is accepted.
 
 ---
 
-Changes in v5: None
+Changes in v5:
+* Only call device_set_wake_support
+
 Changes in v4:
-* Renamed WakeCapable to WakeAllowed
+* Renamed device_set_profile_wake_support to just
+device_set_wake_support
 
-Changes in v3: None
-Changes in v2:
-* Newly added to show whether device is wake capable
-* Removed automatically setting wake capable for HID devices
+Changes in v3:
+* Mark HID device to support wake from suspend
 
- client/main.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2: None
 
-diff --git a/client/main.c b/client/main.c
-index 422da5593..4953f50f0 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1637,6 +1637,7 @@ static void cmd_info(int argc, char *argv[])
- 	print_property(proxy, "Trusted");
- 	print_property(proxy, "Blocked");
- 	print_property(proxy, "Connected");
-+	print_property(proxy, "WakeAllowed");
- 	print_property(proxy, "LegacyPairing");
- 	print_uuids(proxy);
- 	print_property(proxy, "Modalias");
+ profiles/input/device.c | 1 +
+ profiles/input/hog.c    | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index d3724ed54..2dc2ecab2 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -1409,6 +1409,7 @@ int input_device_register(struct btd_service *service)
+ 	}
+ 
+ 	btd_service_set_user_data(service, idev);
++	device_set_wake_support(device, true);
+ 
+ 	return 0;
+ }
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index 9335b7e8b..130f696a9 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -166,6 +166,7 @@ static int hog_probe(struct btd_service *service)
+ 		return -EINVAL;
+ 
+ 	btd_service_set_user_data(service, dev);
++	device_set_wake_support(device, true);
+ 	return 0;
+ }
+ 
 -- 
 2.27.0.111.gc72c7da667-goog
 
