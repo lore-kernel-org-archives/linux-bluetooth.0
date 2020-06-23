@@ -2,577 +2,152 @@ Return-Path: <SRS0=Gzv7=AE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AD1C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 00:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADFFC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 06:08:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19044206C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 00:11:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIi4twLB"
+	by mail.kernel.org (Postfix) with ESMTP id 5E3BF20771
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 06:08:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731444AbgFWALI (ORCPT
+        id S1730362AbgFWGIz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Jun 2020 20:11:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34820 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731023AbgFWALI (ORCPT
+        Tue, 23 Jun 2020 02:08:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49649 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728830AbgFWGIy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jun 2020 20:11:08 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E6AC061573
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 17:11:08 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id p82so6583881oif.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2020 17:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DeiKxFi8vRrp0Hlrz2gTcQQkKglSQb471pTSDkLc+Iw=;
-        b=KIi4twLBz4bp3JR6advAzjo5Um8gYnOnE/POen/Bt7EdgJAgBYIUK+erSvCuQ9RX+f
-         YcVQAefEs5utFcJZJNmQms2Y6yRr/acUY0ZhyDvOHlrCbtKx6abyrWLDy3fqT6hgcpdT
-         Wob5EX+9tC+hpX2FwPEjMVGIzeKrX7ur4rwuqAc34EzifgP7Z6jonEkBbQFRE9JoxFAI
-         kV71fSlMX0W6D7Jf6jjONAeSAszLMvv8uHUjb48x67COvJIjkmTDJCNVZCGa20+DS4Du
-         YbDVBKymZa9cnYuDcqBHCDUXsw0nxTfwyxfsxYrvAtxph6Sq+2noSAd9xWcAPgav3wCH
-         wTbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DeiKxFi8vRrp0Hlrz2gTcQQkKglSQb471pTSDkLc+Iw=;
-        b=QvJ+qml2D5gjXwIUEN/kPi9EaK+ZMNKVWu2jh15L2kQnx7R/FUlDLkBoX68NB2pj7W
-         4z9J3TbcrNVWEOIEmz5mfRw5fGvrch30gonSyxTZV+hGmue5ty8Ww1PD2Npc0vqh7MHw
-         RHR7dhGPHfP7g6lHuN92iYM7Y/xj0GO9cVWKGkNbCFsyql3XjdrwWOhSy8S4JHgBJbU4
-         x05Hl+ePSp4bh5OLDlG+zFK9aQc+/NTDmooI9DfZX5UJj7G1RX0CyqzWP6VTATtPi210
-         NURD1moFPIb2Dx+9IcflH9cKdyThx00y643h2jGV4ByA5/RrNxXJsUqsDfnXrsb6OBt3
-         tjQg==
-X-Gm-Message-State: AOAM533ZJ1IC4ihdPBd7rlbg+R9MT853JhEJsI+b5sFkvAjM3DWEzsPU
-        6y5GeJVqbu2XEXjUZA34sGeaXlYVFUoii8/FDuw=
-X-Google-Smtp-Source: ABdhPJzO/zrkVoBlsANAXjmjacwO9RyJn7VpoRonWa2OGwSKVr+4v5Ql1qsv+H5+QFpUO2hQJ9YPsFGmgBjZPGcRqiY=
-X-Received: by 2002:a54:4787:: with SMTP id o7mr14984743oic.137.1592871067054;
- Mon, 22 Jun 2020 17:11:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200622234051.206800-1-abhishekpandit@chromium.org> <20200622164003.BlueZ.v5.3.I1b0ff04f458fdaec2a193d27c2b94ce8f2cc4138@changeid>
-In-Reply-To: <20200622164003.BlueZ.v5.3.I1b0ff04f458fdaec2a193d27c2b94ce8f2cc4138@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 22 Jun 2020 17:10:55 -0700
-Message-ID: <CABBYNZKvDtAM4CjQ1=Dwt8jbUU3r2m0V1uNxD3ZL9Mi2EpC2LQ@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v5 3/6] device: Support marking a device with wake allowed
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 23 Jun 2020 02:08:54 -0400
+Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 014B8CED34;
+        Tue, 23 Jun 2020 08:18:44 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH] Bluetooth: btusb: Fix and detect most of the Chinese
+ Bluetooth controllers
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <0018a41a-5a46-2db6-5df2-e1b026b81bae@gmail.com>
+Date:   Tue, 23 Jun 2020 08:08:51 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <AFE45DF6-8803-4613-9F7C-F9EB9894C4AD@holtmann.org>
+References: <0018a41a-5a46-2db6-5df2-e1b026b81bae@gmail.com>
+To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Ismael,
 
-On Mon, Jun 22, 2020 at 4:41 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> If a device is allowed to wake the host system from suspend, it should
-> be marked as wake allowed. We add support for a new property that is
-> sent to the kernel via set device flags mgmt op. We also add the dbus
-> endpoint to allow the wake allowed setting to be controlled.
->
-> In order for wake allowed to be set, the profile must also support wake.
-> This setting isn't exposed to the user but must be set by profiles that
-> intend to support wake from suspend.
->
-> If a device is connecting for the first time, it will be marked
-> WakeAllowed if the profile supports it. On subsequent reloads of bluez,
-> the stored setting "WakeAllowed" will be used to override any other
-> setting.
->
+> For some reason they tend to squat on the very first CSR/
+> Cambridge Silicon Radio VID/PID instead of paying fees.
+> 
+> This is an extremely common problem; the issue goes as back as 2013
+> and these devices are only getting more popular, even rebranded by
+> reputable vendors and sold by retailers everywhere.
+> 
+> So, at this point in time there are hundreds of modern dongles reusing
+> the ID of what originally was an early Bluetooth 1.1 controller.
+> 
+> Linux is the only place where they don't work due to spotty checks
+> in our detection code. It only covered a minimum subset.
+> 
+> So what's the big idea? Flip the check around, we know that there
+> are potentially going to be more. But CSR is done for and the
+> real device only worked in an old and narrow subset of the
+> protocol that has been amply superseded.
+> 
+> Known fake bcdDevices: 0x0100, 0x0134, 0x1915, 0x2520, 0x7558, 0x8891
+> IC markings on 0x7558: FR3191AHAL 749H15143 (???)
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=60824
+> 
+> Fixes: 81cac64ba258ae (Deal with USB devices that are faking CSR vendor)
+> Reported-by: Michał Wiśniewski <brylozketrzyn@gmail.com>
+> Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 > ---
->
-> Changes in v5:
-> * Refactor to use set_wake_flags and respond to device flags changed
-> * Add wake_override so we can keep track of user/profile configuration
->   vs what is currently active
->
-> Changes in v4:
-> * Renamed wake_capable to wake_allowed
-> * Removed set_wake_capable mgmt op and updated add_device to accept
->   flags to set whether a device is wakeable
-> * Refactored adapter_whitelist_add and adapter_auto_connect_add to call
->   adapter_add_device
->
-> Changes in v3:
-> * Added profile_wake_support and made wake_capable dependent on it
->
-> Changes in v2:
-> * Added dbus api "WakeCapable" to set value
-> * Update device_set_wake_capable to be called by
->   adapter_set_wake_capable_complete so we can emit property changed
->
->  lib/mgmt.h    |   2 +
->  src/adapter.c |  98 +++++++++++++++++++++++++++
->  src/adapter.h |   3 +-
->  src/device.c  | 184 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/device.h  |   9 +++
->  5 files changed, 295 insertions(+), 1 deletion(-)
->
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index 525c4dd62..a800bcab4 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -665,6 +665,8 @@ struct mgmt_rp_get_device_flags {
->         uint32_t current_flags;
->  } __packed;
->
-> +#define DEVICE_FLAG_REMOTE_WAKEUP      (1 << 0)
-> +
->  #define MGMT_OP_SET_DEVICE_FLAGS       0x0050
->  #define MGMT_SET_DEVICE_FLAGS_SIZE     11
->  struct mgmt_cp_set_device_flags {
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 9ce351893..0ab1f85a8 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -5102,6 +5102,99 @@ void adapter_auto_connect_add(struct btd_adapter *adapter,
->         adapter->connect_list = g_slist_append(adapter->connect_list, device);
->  }
->
-> +static void set_device_wakeable_complete(uint8_t status, uint16_t length,
-> +                                        const void *param, void *user_data)
-> +{
-> +       const struct mgmt_rp_set_device_flags *rp = param;
-> +       struct btd_adapter *adapter = user_data;
-> +       struct btd_device *dev;
-> +       char addr[18];
-> +
-> +       if (status != MGMT_STATUS_SUCCESS) {
-> +               btd_error(adapter->dev_id, "Set device flags return status: %s",
-> +                         mgmt_errstr(status));
+> drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++--------
+> 1 file changed, 20 insertions(+), 8 deletions(-)
+> 
+> PS: I'm wondering how flexible the new 100-column limit really is,
+>    I tried to trim the comment a bit but it looked ugly. :)
 
-Should you return here, or just move the other if statement down this
-function here since it seems a little pointless to try to find the
-device if the status is an error, that said perhaps we do indeed need
-to notify the status on complete so we can actually report back to the
-D-Bus client if it cannot be set, apparently this cannot fail now it
-seems to be wrong.
+it might be in general for Linus, but here lets try to keep it at 80.
 
-> +       }
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 5f022e9cf..880fe46aa 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1739,9 +1739,22 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+> 
+> 	rp = (struct hci_rp_read_local_version *)skb->data;
+> 
+> -	/* Detect controllers which aren't real CSR ones. */
+> +	/* Detect a wide host of Chinese controllers that aren't CSR. Some of these clones even
+> +	 * respond with the correct HCI manufacturer, and their bcdDevice tags are all over the place,
+> +	 * which may be another good angle to look into if we really want to have really long quirk lists.
+> +	 *
+> +	 * Known fake bcdDevices: 0x0100, 0x0134, 0x1915, 0x2520, 0x7558, 0x8891
+> +	 * IC markings on 0x7558: FR3191AHAL 749H15143 (???)
+> +	 *
+> +	 * But the main thing they have in common is that these are really popular low-cost
+> +	 * options that support newer Bluetooth versions but rely on heavy VID/PID
+> +	 * squatting of this poor old Bluetooth 1.1 device. Even sold as such.
+> +	 */
+> 	if (le16_to_cpu(rp->manufacturer) != 10 ||
+> -	    le16_to_cpu(rp->lmp_subver) == 0x0c5c) {
+> +	    le16_to_cpu(rp->lmp_subver) == 0x0c5c ||
+> +	    le16_to_cpu(rp->hci_ver) >= BLUETOOTH_VER_1_2) {
+
+This check will also catch actually Bluetooth 2.0 and later made devices from CSR.
+
+> +		bt_dev_info(hdev, "CSR: Unbranded CSR clone detected; adding workaround");
 > +
-> +       if (length < sizeof(*rp)) {
-> +               btd_error(adapter->dev_id,
-> +                         "Too small Set Device Flags complete event: %d",
-> +                         length);
-> +               return;
-> +       }
-> +
-> +       ba2str(&rp->addr.bdaddr, addr);
-> +
-> +       dev = btd_adapter_find_device(adapter, &rp->addr.bdaddr, rp->addr.type);
-> +       if (!dev) {
-> +               btd_error(adapter->dev_id,
-> +                       "Set Device Flags complete for unknown device %s", addr);
-> +               return;
-> +       }
-> +
-> +       if (status != MGMT_STATUS_SUCCESS) {
-> +               btd_error(adapter->dev_id,
-> +                       "Failed to configure wakeable %s (%u): %s (0x%02x)",
-> +                       addr, rp->addr.type, mgmt_errstr(status), status);
-> +               return;
-> +       }
-> +
-> +       device_set_wake_allowed_complete(dev);
-> +}
-> +
-> +void adapter_set_device_wakeable(struct btd_adapter *adapter,
-> +                                struct btd_device *device, bool wakeable)
-> +{
-> +       struct mgmt_cp_set_device_flags cp;
-> +       const bdaddr_t *bdaddr;
-> +       uint8_t bdaddr_type;
-> +
-> +       if (!kernel_conn_control)
-> +               return;
-> +
-> +       bdaddr = device_get_address(device);
-> +       bdaddr_type = btd_device_get_bdaddr_type(device);
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +       bacpy(&cp.addr.bdaddr, bdaddr);
-> +       cp.addr.type = bdaddr_type;
-> +       cp.current_flags = btd_device_get_current_flags(device);
-> +       if (wakeable)
-> +               cp.current_flags |= DEVICE_FLAG_REMOTE_WAKEUP;
-> +       else
-> +               cp.current_flags &= ~DEVICE_FLAG_REMOTE_WAKEUP;
-> +
-> +       mgmt_send(adapter->mgmt, MGMT_OP_SET_DEVICE_FLAGS, adapter->dev_id,
-> +                 sizeof(cp), &cp, set_device_wakeable_complete, adapter, NULL);
-> +}
-> +
-> +static void device_flags_changed_callback(uint16_t index, uint16_t length,
-> +                                         const void *param, void *user_data)
-> +{
-> +       const struct mgmt_ev_device_flags_changed *ev = param;
-> +       struct btd_adapter *adapter = user_data;
-> +       struct btd_device *dev;
-> +       char addr[18];
-> +
-> +       if (length < sizeof(*ev)) {
-> +               btd_error(adapter->dev_id,
-> +                         "Too small Device Flags Changed event: %d",
-> +                         length);
-> +               return;
-> +       }
-> +
-> +       ba2str(&ev->addr.bdaddr, addr);
-> +
-> +       dev = btd_adapter_find_device(adapter, &ev->addr.bdaddr, ev->addr.type);
-> +       if (!dev) {
-> +               btd_error(adapter->dev_id,
-> +                       "Device Flags Changed for unknown device %s", addr);
-> +               return;
-> +       }
-> +
-> +       btd_device_flags_changed(dev, ev->supported_flags, ev->current_flags);
-> +}
-> +
-> +
->  static void remove_device_complete(uint8_t status, uint16_t length,
->                                         const void *param, void *user_data)
->  {
-> @@ -8544,6 +8637,11 @@ static int adapter_register(struct btd_adapter *adapter)
->                                                         adapter, NULL);
->
->  load:
-> +       mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_FLAGS_CHANGED,
-> +                                               adapter->dev_id,
-> +                                               device_flags_changed_callback,
-> +                                               adapter, NULL);
-> +
->         load_config(adapter);
->         fix_storage(adapter);
->         load_drivers(adapter);
-> diff --git a/src/adapter.h b/src/adapter.h
-> index d0a5253bd..f8ac20261 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -213,6 +213,8 @@ int adapter_connect_list_add(struct btd_adapter *adapter,
->                                         struct btd_device *device);
->  void adapter_connect_list_remove(struct btd_adapter *adapter,
->                                                 struct btd_device *device);
-> +void adapter_set_device_wakeable(struct btd_adapter *adapter,
-> +                                struct btd_device *dev, bool wakeable);
->  void adapter_auto_connect_add(struct btd_adapter *adapter,
->                                         struct btd_device *device);
->  void adapter_auto_connect_remove(struct btd_adapter *adapter,
-> @@ -231,4 +233,3 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
->                         void *data);
->
->  bool btd_le_connect_before_pairing(void);
+> 		/* Clear the reset quirk since this is not an actual
+> 		 * early Bluetooth 1.1 device from CSR.
+> 		 */
+> @@ -1751,6 +1764,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+> 		 * stored link key handling and so just disable it.
+> 		 */
+> 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+> +	} else {
+> +		/* Only apply these quirks to the actual, old CSR devices */
+> +		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> 	}
+> 
+> 	kfree_skb(skb);
+> @@ -3995,17 +4011,13 @@ static int btusb_probe(struct usb_interface *intf,
+> 
+> 	if (id->driver_info & BTUSB_CSR) {
+> 		struct usb_device *udev = data->udev;
+> -		u16 bcdDevice = le16_to_cpu(udev->descriptor.bcdDevice);
+> 
+> 		/* Old firmware would otherwise execute USB reset */
+> -		if (bcdDevice < 0x117)
+> +		if (le16_to_cpu(udev->descriptor.bcdDevice) < 0x117)
+> 			set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+
+Keep this as is.
+
+> 
+> 		/* Fake CSR devices with broken commands */
+> -		if (bcdDevice <= 0x100 || bcdDevice == 0x134)
+> -			hdev->setup = btusb_setup_csr;
 > -
-> diff --git a/src/device.c b/src/device.c
-> index 7b0eb256e..cd25111b8 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -177,6 +177,12 @@ struct csrk_info {
->         uint32_t counter;
->  };
->
-> +typedef enum {
-> +       WAKE_FLAG_DEFAULT = 0,
-> +       WAKE_FLAG_ENABLED,
-> +       WAKE_FLAG_DISABLED,
-> +} wake_flag_t;
-> +
->  struct btd_device {
->         int ref_count;
->
-> @@ -189,6 +195,20 @@ struct btd_device {
->         bool            le;
->         bool            pending_paired;         /* "Paired" waiting for SDP */
->         bool            svc_refreshed;
-> +
-> +       /* Manage whether this device can wake the system from suspend.
-> +        * - wake_support: Requires a profile that supports wake (i.e. HID)
-> +        * - wake_allowed: Is wake currently allowed?
-> +        * - pending_wake_allowed - Wake flag sent via set_device_flags
-> +        * - wake_override - User configured wake setting
-> +        */
-> +       bool            wake_support;
-> +       bool            wake_allowed;
-> +       bool            pending_wake_allowed;
-> +       wake_flag_t     wake_override;
-> +
-> +       uint32_t        supported_flags;
-> +       uint32_t        current_flags;
->         GSList          *svc_callbacks;
->         GSList          *eir_uuids;
->         struct bt_ad    *ad;
-> @@ -415,6 +435,12 @@ static gboolean store_device_info_cb(gpointer user_data)
->         g_key_file_set_boolean(key_file, "General", "Blocked",
->                                                         device->blocked);
->
-> +       if (device->wake_override != WAKE_FLAG_DEFAULT) {
-> +               g_key_file_set_boolean(key_file, "General", "WakeAllowed",
-> +                                      device->wake_override ==
-> +                                              WAKE_FLAG_ENABLED);
-> +       }
-> +
->         if (device->uuids) {
->                 GSList *l;
->                 int i;
-> @@ -1318,6 +1344,105 @@ dev_property_advertising_data_exist(const GDBusPropertyTable *property,
->         return bt_ad_has_data(device->ad, NULL);
->  }
->
-> +bool device_get_wake_support(struct btd_device *device)
-> +{
-> +       return device->wake_support;
-> +}
-> +
-> +void device_set_wake_support(struct btd_device *device, bool wake_support)
-> +{
-> +       device->wake_support = wake_support;
-> +
-> +       /* If wake configuration has not been made yet, set the initial
-> +        * configuration.
-> +        */
-> +       if (device->wake_override == WAKE_FLAG_DEFAULT) {
-> +               device_set_wake_override(device, wake_support);
-> +               device_set_wake_allowed(device, wake_support);
-> +       }
-> +}
-> +
-> +bool device_get_wake_allowed(struct btd_device *device)
-> +{
-> +       return device->wake_allowed;
-> +}
-> +
-> +void device_set_wake_override(struct btd_device *device, bool wake_override)
-> +{
-> +       if (wake_override) {
-> +               device->wake_override = WAKE_FLAG_ENABLED;
-> +               device->current_flags |= DEVICE_FLAG_REMOTE_WAKEUP;
-> +       } else {
-> +               device->wake_override = WAKE_FLAG_DISABLED;
-> +               device->current_flags &= ~DEVICE_FLAG_REMOTE_WAKEUP;
-> +       }
-> +}
-> +
-> +void device_set_wake_allowed(struct btd_device *device, bool wake_allowed)
-> +{
+> -		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> +		hdev->setup = btusb_setup_csr;
 
-I guess it would be a good idea to add a check if there is already a
-device->pending_wake_allowed set, since there could be multiple
-clients attempting to set it, also if device->wake_allowed is already
-the same there is probably no reason to call
-adapter_set_device_wakeable either.
+Frankly, I rather add a switch statement and list all the known broken bcdDevice instead of trying to penalize real CSR devices.
 
-> +       device->pending_wake_allowed = wake_allowed;
-> +       adapter_set_device_wakeable(device_get_adapter(device), device,
-> +                                   wake_allowed);
-> +}
-> +
-> +void device_set_wake_allowed_complete(struct btd_device *device)
-> +{
-> +       device->wake_allowed = device->pending_wake_allowed;
-> +       g_dbus_emit_property_changed(dbus_conn, device->path,
-> +                                       DEVICE_INTERFACE, "WakeAllowed");
-> +
-> +       store_device_info(device);
-> +}
-> +
-> +
-> +static gboolean
-> +dev_property_get_wake_allowed(const GDBusPropertyTable *property,
-> +                            DBusMessageIter *iter, void *data)
-> +{
-> +       struct btd_device *device = data;
-> +       dbus_bool_t wake_allowed = device_get_wake_allowed(device);
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &wake_allowed);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static void dev_property_set_wake_allowed(const GDBusPropertyTable *property,
-> +                                        DBusMessageIter *value,
-> +                                        GDBusPendingPropertySet id, void *data)
-> +{
-> +       struct btd_device *device = data;
-> +       dbus_bool_t b;
-> +
-> +       if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_BOOLEAN) {
-> +               g_dbus_pending_property_error(id,
-> +                                       ERROR_INTERFACE ".InvalidArguments",
-> +                                       "Invalid arguments in method call");
-> +               return;
-> +       }
-> +
-> +       if (device->temporary) {
-> +               g_dbus_pending_property_error(id,
-> +                                       ERROR_INTERFACE ".Unsupported",
-> +                                       "Cannot set property while temporary");
-> +               return;
-> +       }
-> +
-> +       dbus_message_iter_get_basic(value, &b);
-> +       device_set_wake_override(device, b);
-> +       device_set_wake_allowed(device, b);
+Regards
 
-We should probably store the id here and only invoke
-g_dbus_pendin_property* on complete that way the client is notified
-even if the command fails.
+Marcel
 
-> +       g_dbus_pending_property_success(id);
-> +}
-> +
-> +static gboolean dev_property_wake_allowed_exist(
-> +               const GDBusPropertyTable *property, void *data)
-> +{
-> +       struct btd_device *device = data;
-> +
-> +       return device_get_wake_support(device);
-> +}
-> +
-> +
->  static gboolean disconnect_all(gpointer user_data)
->  {
->         struct btd_device *device = user_data;
-> @@ -2790,6 +2915,9 @@ static const GDBusPropertyTable device_properties[] = {
->         { "AdvertisingData", "a{yv}", dev_property_get_advertising_data,
->                                 NULL, dev_property_advertising_data_exist,
->                                 G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +       { "WakeAllowed", "b", dev_property_get_wake_allowed,
-> +                               dev_property_set_wake_allowed,
-> +                               dev_property_wake_allowed_exist },
->         { }
->  };
->
-> @@ -3038,9 +3166,11 @@ static void convert_info(struct btd_device *device, GKeyFile *key_file)
->  static void load_info(struct btd_device *device, const char *local,
->                         const char *peer, GKeyFile *key_file)
->  {
-> +       GError *gerr = NULL;
->         char *str;
->         gboolean store_needed = FALSE;
->         gboolean blocked;
-> +       gboolean wake_allowed;
->         char **uuids;
->         int source, vendor, product, version;
->         char **techno, **t;
-> @@ -3152,6 +3282,17 @@ next:
->                 btd_device_set_pnpid(device, source, vendor, product, version);
->         }
->
-> +       /* Wake allowed is only configured and stored if user changed it.
-> +        * Otherwise, we enable if profile supports it. */
-> +       wake_allowed = g_key_file_get_boolean(key_file, "General",
-> +                                             "WakeAllowed", &gerr);
-> +       if (!gerr) {
-> +               device_set_wake_override(device, wake_allowed);
-> +       } else {
-> +               g_error_free(gerr);
-> +               gerr = NULL;
-> +       }
-> +
->         if (store_needed)
->                 store_device_info(device);
->  }
-> @@ -6558,6 +6699,49 @@ void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
->         store_device_info(device);
->  }
->
-> +uint32_t btd_device_get_current_flags(struct btd_device *dev) {
-> +       return dev->current_flags;
-> +}
-> +
-> +/* This event is sent immediately after add device on all mgmt sockets.
-> + * Afterwards, it is only sent to mgmt sockets other than the one which called
-> + * set_device_flags.
-> + */
-> +void btd_device_flags_changed(struct btd_device *dev, uint32_t supported_flags,
-> +                             uint32_t current_flags)
-> +{
-> +       int i;
-> +       const uint32_t changed_flags = dev->current_flags ^ current_flags;
-> +       bool flag_value;
-> +
-> +       dev->supported_flags = supported_flags;
-> +       dev->current_flags = current_flags;
-> +
-> +       if (!changed_flags)
-> +               return;
-> +
-> +       if (changed_flags & DEVICE_FLAG_REMOTE_WAKEUP) {
-> +               flag_value = !!(current_flags & DEVICE_FLAG_REMOTE_WAKEUP);
-> +               dev->pending_wake_allowed = flag_value;
-> +
-> +               /* If an override exists and doesn't match the current state,
-> +                * apply it. This logic will run after Add Device only and will
-> +                * enable wake for previously paired devices.
-> +                */
-> +               if (dev->wake_override != WAKE_FLAG_DEFAULT) {
-> +                       bool wake_allowed =
-> +                               dev->wake_override == WAKE_FLAG_ENABLED;
-> +                       if (flag_value != wake_allowed) {
-> +                               device_set_wake_allowed(dev, wake_allowed);
-> +                       } else {
-> +                               device_set_wake_allowed_complete(dev);
-> +                       }
-> +               } else {
-> +                       device_set_wake_allowed_complete(dev);
-> +               }
-> +       }
-> +}
-> +
->  static void service_state_changed(struct btd_service *service,
->                                                 btd_service_state_t old_state,
->                                                 btd_service_state_t new_state,
-> diff --git a/src/device.h b/src/device.h
-> index 06b100499..104e3f1dd 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -33,6 +33,7 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
->  char *btd_device_get_storage_path(struct btd_device *device,
->                                 const char *filename);
->
-> +
->  void btd_device_device_set_name(struct btd_device *device, const char *name);
->  void device_store_cached_name(struct btd_device *dev, const char *name);
->  void device_get_name(struct btd_device *device, char *name, size_t len);
-> @@ -139,6 +140,10 @@ void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
->                                                                 uint16_t value);
->  void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
->                                                         uint16_t *ccc_bredr);
-> +void device_set_wake_support(struct btd_device *device, bool wake_support);
-> +void device_set_wake_override(struct btd_device *device, bool wake_override);
-> +void device_set_wake_allowed(struct btd_device *device, bool wake_allowed);
-> +void device_set_wake_allowed_complete(struct btd_device *device);
->
->  typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
->                                         void *user_data);
-> @@ -176,5 +181,9 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
->  int device_discover_services(struct btd_device *device);
->  int btd_device_connect_services(struct btd_device *dev, GSList *services);
->
-> +uint32_t btd_device_get_current_flags(struct btd_device *dev);
-> +void btd_device_flags_changed(struct btd_device *dev, uint32_t supported_flags,
-> +                             uint32_t current_flags);
-> +
->  void btd_device_init(void);
->  void btd_device_cleanup(void);
-> --
-> 2.27.0.111.gc72c7da667-goog
->
-
-
--- 
-Luiz Augusto von Dentz
