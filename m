@@ -2,152 +2,84 @@ Return-Path: <SRS0=Gzv7=AE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADFFC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 06:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21462C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 09:58:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3BF20771
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 06:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF53E20738
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Jun 2020 09:58:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=orcam.com header.i=@orcam.com header.b="iejA/IPZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730362AbgFWGIz convert rfc822-to-8bit (ORCPT
+        id S1732201AbgFWJ6G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Jun 2020 02:08:55 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49649 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728830AbgFWGIy (ORCPT
+        Tue, 23 Jun 2020 05:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731947AbgFWJ6F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Jun 2020 02:08:54 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 014B8CED34;
-        Tue, 23 Jun 2020 08:18:44 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: btusb: Fix and detect most of the Chinese
- Bluetooth controllers
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0018a41a-5a46-2db6-5df2-e1b026b81bae@gmail.com>
-Date:   Tue, 23 Jun 2020 08:08:51 +0200
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AFE45DF6-8803-4613-9F7C-F9EB9894C4AD@holtmann.org>
-References: <0018a41a-5a46-2db6-5df2-e1b026b81bae@gmail.com>
-To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Tue, 23 Jun 2020 05:58:05 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B858C061573
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2020 02:58:05 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id c4so9313828iot.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2020 02:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=orcam.com; s=google;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=z+NLoHvR7pL7e9bXEqE7ANamElXGMJmyWSurZyi8Vgw=;
+        b=iejA/IPZgvNy/iKsht0lKMmbfoxxizdebWTL+2c7YzrghNgzTsevG2pBiQENomZxn1
+         47EuHjvwknDegBmLyOPDqGpTo+FJyOotInftUfsBihOYD7Ee8rt3upeuWpdjv2oAtnwJ
+         lcBigT5vpw4OMa9librWOhvAdjpCNLI4p4XF0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=z+NLoHvR7pL7e9bXEqE7ANamElXGMJmyWSurZyi8Vgw=;
+        b=UPuiHUzxjLYkF94VUU6KAsVmzBUfiPMPf1wjFU9LgGh8W4Mo+z6j86uirPmnVOxoSy
+         1j0wRD8NkXwWG4ebqblFc412mvbb9CbYGRVK6Zei5E6ZaPfj+VxUie5EWVXVTtuno/9f
+         he8o98og0x3WR7KcDRdUii79i3+PeJjVDATjqRFPCqVE3A0Uu1Qg9S15iL8/v3LcPa3u
+         ioMXv84xnho0fh335/qgl9c1FAlaWJzvyu4bu+nMrzdI4QbdVDMPc56MOsOOI9PA+I8j
+         n0yaUOusPFK5DjRh3onE3BjJ4APfQInEjtQhtJCWdJGAUtTZGXYJ2RIpyzbdLisgWfHy
+         hfCA==
+X-Gm-Message-State: AOAM533X0l1aSY2gj0jD4zfyWHdtxDIln9GNQqPu1Uoce3z5X0mxF6WR
+        lQoLZdC0i9LoLm1SRZyiSJitvsw2FBq5srKpLyjqnuZcbq9vtQ==
+X-Google-Smtp-Source: ABdhPJydyv5Rz77rQUZnxeNVCfFhxeN7H6fwXaNaSHY1G2f6Mog7gajVNGhJrPSF8RLieHX8Vj/9vVXcE79VpArqzCA=
+X-Received: by 2002:a5d:8b53:: with SMTP id c19mr22952353iot.93.1592906284693;
+ Tue, 23 Jun 2020 02:58:04 -0700 (PDT)
+MIME-Version: 1.0
+From:   Ordit Gross <ordit.gross@orcam.com>
+Date:   Tue, 23 Jun 2020 12:57:53 +0300
+Message-ID: <CAB+bgRbZ+40TsjrjPnA2UDQLyeVvwqBcQ6nmQfvfvu2xNE547g@mail.gmail.com>
+Subject: avoid speaker (br/edr) reconnect
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ismael,
+hi all,
 
-> For some reason they tend to squat on the very first CSR/
-> Cambridge Silicon Radio VID/PID instead of paying fees.
-> 
-> This is an extremely common problem; the issue goes as back as 2013
-> and these devices are only getting more popular, even rebranded by
-> reputable vendors and sold by retailers everywhere.
-> 
-> So, at this point in time there are hundreds of modern dongles reusing
-> the ID of what originally was an early Bluetooth 1.1 controller.
-> 
-> Linux is the only place where they don't work due to spotty checks
-> in our detection code. It only covered a minimum subset.
-> 
-> So what's the big idea? Flip the check around, we know that there
-> are potentially going to be more. But CSR is done for and the
-> real device only worked in an old and narrow subset of the
-> protocol that has been amply superseded.
-> 
-> Known fake bcdDevices: 0x0100, 0x0134, 0x1915, 0x2520, 0x7558, 0x8891
-> IC markings on 0x7558: FR3191AHAL 749H15143 (???)
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=60824
-> 
-> Fixes: 81cac64ba258ae (Deal with USB devices that are faking CSR vendor)
-> Reported-by: Michał Wiśniewski <brylozketrzyn@gmail.com>
-> Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-> ---
-> drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++--------
-> 1 file changed, 20 insertions(+), 8 deletions(-)
-> 
-> PS: I'm wondering how flexible the new 100-column limit really is,
->    I tried to trim the comment a bit but it looked ugly. :)
+our device (audio source) has the capability to connect to audio
+speakers (using code that is based on bluetoothctl bluez v5.47).
+I understand that the first connection to the speaker is initiated
+from our device,
+whereas further connections are initiated by the speaker. (still
+looking for documentation for that behavior, but have observed it in
+hci dump).
 
-it might be in general for Linus, but here lets try to keep it at 80.
+When user removes credentials of the speaker on our device, the audio
+speaker still connects to us, pair, but mediaControl connects and
+disconnects immediately, so we can't open pcm device.
 
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 5f022e9cf..880fe46aa 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1739,9 +1739,22 @@ static int btusb_setup_csr(struct hci_dev *hdev)
-> 
-> 	rp = (struct hci_rp_read_local_version *)skb->data;
-> 
-> -	/* Detect controllers which aren't real CSR ones. */
-> +	/* Detect a wide host of Chinese controllers that aren't CSR. Some of these clones even
-> +	 * respond with the correct HCI manufacturer, and their bcdDevice tags are all over the place,
-> +	 * which may be another good angle to look into if we really want to have really long quirk lists.
-> +	 *
-> +	 * Known fake bcdDevices: 0x0100, 0x0134, 0x1915, 0x2520, 0x7558, 0x8891
-> +	 * IC markings on 0x7558: FR3191AHAL 749H15143 (???)
-> +	 *
-> +	 * But the main thing they have in common is that these are really popular low-cost
-> +	 * options that support newer Bluetooth versions but rely on heavy VID/PID
-> +	 * squatting of this poor old Bluetooth 1.1 device. Even sold as such.
-> +	 */
-> 	if (le16_to_cpu(rp->manufacturer) != 10 ||
-> -	    le16_to_cpu(rp->lmp_subver) == 0x0c5c) {
-> +	    le16_to_cpu(rp->lmp_subver) == 0x0c5c ||
-> +	    le16_to_cpu(rp->hci_ver) >= BLUETOOTH_VER_1_2) {
+1. What is the recommended way for canceling the auto reconnect of a
+speaker to a known device? (is the only way reset speaker? or can
+source device do something?)
 
-This check will also catch actually Bluetooth 2.0 and later made devices from CSR.
+2. Considering we have removed credentials on the source side, why
+does flow get stuck?
 
-> +		bt_dev_info(hdev, "CSR: Unbranded CSR clone detected; adding workaround");
-> +
-> 		/* Clear the reset quirk since this is not an actual
-> 		 * early Bluetooth 1.1 device from CSR.
-> 		 */
-> @@ -1751,6 +1764,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
-> 		 * stored link key handling and so just disable it.
-> 		 */
-> 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
-> +	} else {
-> +		/* Only apply these quirks to the actual, old CSR devices */
-> +		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> 	}
-> 
-> 	kfree_skb(skb);
-> @@ -3995,17 +4011,13 @@ static int btusb_probe(struct usb_interface *intf,
-> 
-> 	if (id->driver_info & BTUSB_CSR) {
-> 		struct usb_device *udev = data->udev;
-> -		u16 bcdDevice = le16_to_cpu(udev->descriptor.bcdDevice);
-> 
-> 		/* Old firmware would otherwise execute USB reset */
-> -		if (bcdDevice < 0x117)
-> +		if (le16_to_cpu(udev->descriptor.bcdDevice) < 0x117)
-> 			set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
-
-Keep this as is.
-
-> 
-> 		/* Fake CSR devices with broken commands */
-> -		if (bcdDevice <= 0x100 || bcdDevice == 0x134)
-> -			hdev->setup = btusb_setup_csr;
-> -
-> -		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> +		hdev->setup = btusb_setup_csr;
-
-Frankly, I rather add a switch statement and list all the known broken bcdDevice instead of trying to penalize real CSR devices.
-
-Regards
-
-Marcel
-
+any help would be appreciated
