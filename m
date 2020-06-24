@@ -2,60 +2,60 @@ Return-Path: <SRS0=JtDF=AF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 031F1C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 21:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE4C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 21:06:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDB602072E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 21:06:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DCD82084D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 21:06:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nGg2gjeB"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JohKMkVo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389254AbgFXVGY (ORCPT
+        id S2389695AbgFXVGf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Jun 2020 17:06:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55774 "EHLO
+        Wed, 24 Jun 2020 17:06:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387853AbgFXVGX (ORCPT
+        with ESMTP id S2389303AbgFXVGZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Jun 2020 17:06:23 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9A3C061573
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2020 14:06:23 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id d4so2053816pgk.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2020 14:06:23 -0700 (PDT)
+        Wed, 24 Jun 2020 17:06:25 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B85C0613ED
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2020 14:06:24 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id 35so1640581ple.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2020 14:06:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2MJjDisSYsFLi9xjpuxw/vmSuouvLE6xSiePJnwRksg=;
-        b=nGg2gjeBPhPwU7thZ1v6JzWty3y8rRAI/iIlXN0JlQmZd1dX6Taavm70RQncr/FVmX
-         IlFoXu2K3JqzWg6Ejw0e4HbVfWsQpgjWv1qYxIw5YiQraZTpAQ58NssIb/+GUnyUzA8L
-         5Q/WN5nncXm7ARdnvhcEtDn54pJv/0PFKq+IY=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=S3HW0RJtzvOToZX2nxN+EFrEoQt3NsHrnZyl7VA0dYw=;
+        b=JohKMkVoqHt/HTUforsqWQm58891DVmEUb+w04axP+7B45zw8idyTlriuzK218xzJO
+         RA8I1DSviGuwqFKfdHk57bGxiy3ld4v64w+99TWuyatYhjkPEg++kzqVs8cNq7y/reD3
+         6uDHTzZUkhATKDLEFKGH4bqPsVkzqT4P8P3pI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2MJjDisSYsFLi9xjpuxw/vmSuouvLE6xSiePJnwRksg=;
-        b=qZBbLax67HwCpz8HNcKXmBVdeTuWAyggz9YOqK9XJSlxbF5m4RvvUdr1PWON2S5tOH
-         bNO/cvhsLXJ8IhtlUQt1/R3J1a7kWrpMM3LkiuO/7Kfe9HuHpXoR8zDcseKdM4xRXUK9
-         28FZoc9fyOt9uzxeJkoD1J0qlkU8C4kX3ZNQDKiwAezOAtG3tjzbV+rCaQ29tmPPphHE
-         TaR+/f80DVrC3JhdoAps1MCt7JzVeYDFqH0uB7zMloqsh5AEG4ZE6QqqS+Tjmn14O2sa
-         fCa/SVUj9pewEQ0cDSjQ640ZJQlrhOE+ClFpD69EUuSxDm9W0lxRzaX+F1ZBMT9hA86B
-         OMHQ==
-X-Gm-Message-State: AOAM533uiiDT/QtQNFR5GJqxu301LiGJZDqBRR3GPf9XeA++5DxXE8I8
-        sIeBzE9xRy9fADl0XO9M4iPrdA==
-X-Google-Smtp-Source: ABdhPJwnLertNgi8e0ErMQYUFVupWeSlyxCkLSLR+LP5JzpyPFSxudWYnPgOS2GT8jLpWRLkG7r9/g==
-X-Received: by 2002:a62:4d46:: with SMTP id a67mr14170483pfb.290.1593032783177;
-        Wed, 24 Jun 2020 14:06:23 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=S3HW0RJtzvOToZX2nxN+EFrEoQt3NsHrnZyl7VA0dYw=;
+        b=Pgs6ysckmovweRHxc74JDs8Jq40iAoie152U88nMuDI9zB/oXJgDy3svhTRK55Jgvg
+         nX6/MU+cJ7auv2IyhTrCDt5m5AXcZ0/6Q4uUhTIduRRFliFYZnP4EjIRv8UpuveRCph5
+         EyIjFTOABtOhiYatteuvCc9BYeptVsvGnR2nc57wSWw2HMy9N4bbyul0njcVzQdhFjwU
+         xObf/mQEY/8v4Wf6+ViEX20ELuxj+NvYaSnzW+iCVAsZLtLFZy9GpSqFE7K7XsBJBGVJ
+         ynPFOhOnZ4VxhE7LtTE4KR46PS3ONUVCt+A7RvrRmKcqvMCNYX2IKcWABQug+yvagiLN
+         VBVw==
+X-Gm-Message-State: AOAM533I3N64Tw+ZBlEtXc60Nj7oQJNlRARODIDbpvHsYXwXobPxeQL0
+        OJGwnfrnE2r7vX5EebCw1Dn6bw==
+X-Google-Smtp-Source: ABdhPJwBB3oaMB/JFBK/9Rn3lpf31LljGpKoOc2GFLH+XsPu0YKNEaiJTcj2ido/xazt+cL0yPeyaQ==
+X-Received: by 2002:a17:902:c408:: with SMTP id k8mr30750918plk.279.1593032784398;
+        Wed, 24 Jun 2020 14:06:24 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id y9sm442927pfn.84.2020.06.24.14.06.22
+        by smtp.gmail.com with ESMTPSA id y9sm442927pfn.84.2020.06.24.14.06.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2020 14:06:22 -0700 (PDT)
+        Wed, 24 Jun 2020 14:06:23 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     linux-pm@vger.kernel.org
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -66,10 +66,12 @@ Cc:     linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pavel Machek <pavel@ucw.cz>
-Subject: [PATCH 0/1] power: Emit change uevent when updating sysfs
-Date:   Wed, 24 Jun 2020 14:06:15 -0700
-Message-Id: <20200624210616.28477-1-abhishekpandit@chromium.org>
+Subject: [PATCH 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove
+Date:   Wed, 24 Jun 2020 14:06:16 -0700
+Message-Id: <20200624140541.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
 X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
+In-Reply-To: <20200624210616.28477-1-abhishekpandit@chromium.org>
+References: <20200624210616.28477-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -77,52 +79,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Udev rules that depend on the power/wakeup attribute don't get triggered
+correctly if device_set_wakeup_capable is called after the device is
+created. This can happen for several reasons (driver sets wakeup after
+device is created, wakeup is changed on parent device, etc) and it seems
+reasonable to emit a changed event when adding or removing attributes on
+the device.
 
-Hi linux-pm,
-
-ChromeOS has a udev rule to chown the `power/wakeup` attribute so that
-the power manager can modify it during runtime.
-
-(https://source.chromium.org/chromiumos/chromiumos/codesearch/+/master:src/platform2/power_manager/udev/99-powerd-permissions.rules)
-
-In our automated tests, we found that the `power/wakeup` attributes
-weren't being chown-ed for some boards. On investigating, I found that
-when the drivers probe and call device_set_wakeup_capable, no uevent was
-being emitted for the newly added power/wakeup attribute. This was
-manifesting at boot on some boards (Marvell SDIO bluetooth and Broadcom
-Serial bluetooth drivers) or during usb disconnects during resume
-(Realtek btusb driver with reset resume quirk).
-
-It seems reasonable to me that changes to the attributes of a device
-should cause a changed uevent so I have added that here.
-
-Here's an example of the kernel events after toggling the authorized
-bit of /sys/bus/usb/devices/1-3/
-
-$ echo 0 > /sys/bus/usb/devices/1-3/authorized
-KERNEL[27.357994] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill1 (rfkill)
-KERNEL[27.358049] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[27.358458] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[27.358486] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-KERNEL[27.358529] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-
-$ echo 1 > /sys/bus/usb/devices/1-3/authorized
-KERNEL[36.415749] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-KERNEL[36.415798] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[36.417414] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[36.417447] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill2 (rfkill)
-KERNEL[36.417481] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-
-Thanks
-Abhishek
-
-
-Abhishek Pandit-Subedi (1):
-  power: Emit changed uevent on wakeup_sysfs_add/remove
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
 
  drivers/base/power/sysfs.c | 20 +++++++++++++++++++-
  1 file changed, 19 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/base/power/sysfs.c b/drivers/base/power/sysfs.c
+index 24d25cf8ab1487..592a890bf137f0 100644
+--- a/drivers/base/power/sysfs.c
++++ b/drivers/base/power/sysfs.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* sysfs entries for device PM */
+ #include <linux/device.h>
++#include <linux/kobject.h>
+ #include <linux/string.h>
+ #include <linux/export.h>
+ #include <linux/pm_qos.h>
+@@ -739,12 +740,29 @@ int dpm_sysfs_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
+ 
+ int wakeup_sysfs_add(struct device *dev)
+ {
+-	return sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
++	int ret = sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
++
++	if (!ret) {
++		int tmp = kobject_uevent(&dev->kobj, KOBJ_CHANGE);
++
++		if (tmp)
++			dev_err(dev, "Error in uevent for wakeup_sysfs_add: %d",
++				tmp);
++	}
++
++	return ret;
+ }
+ 
+ void wakeup_sysfs_remove(struct device *dev)
+ {
++	int tmp;
++
+ 	sysfs_unmerge_group(&dev->kobj, &pm_wakeup_attr_group);
++
++	tmp = kobject_uevent(&dev->kobj, KOBJ_CHANGE);
++	if (tmp)
++		dev_err(dev, "Error in uevent for wakeup_sysfs_remove: %d",
++			tmp);
+ }
+ 
+ int pm_qos_sysfs_add_resume_latency(struct device *dev)
 -- 
 2.27.0.111.gc72c7da667-goog
 
