@@ -2,96 +2,78 @@ Return-Path: <SRS0=JtDF=AF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3696C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 18:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6BEC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 19:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 969972082F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 18:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B46612077D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jun 2020 19:40:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406056AbgFXSmv convert rfc822-to-8bit (ORCPT
+        id S2391350AbgFXTkH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Jun 2020 14:42:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47706 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405581AbgFXSmu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Jun 2020 14:42:50 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 24 Jun 2020 18:42:48 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-hRAZebhSeD@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Wed, 24 Jun 2020 15:40:07 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58971 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391239AbgFXTkG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Jun 2020 15:40:06 -0400
+Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C34A3CECDB;
+        Wed, 24 Jun 2020 21:49:56 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH] Bluetooth: Don't restart scanning if paused
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200624113351.1.Ic6b1fca2b1b3fe989db21ceae76bab80bd87d387@changeid>
+Date:   Wed, 24 Jun 2020 21:40:03 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <EAEF89F3-8F6B-49AE-95B4-E6A961C6474D@holtmann.org>
+References: <20200624113351.1.Ic6b1fca2b1b3fe989db21ceae76bab80bd87d387@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+Hi Abhishek,
 
---- Comment #84 from Swyter (swyterzone@gmail.com) ---
-Interesting. Sounds like another quirk for that specific model that was hidden
-until now; they don't support the Read Default Erroneous Data Reporting
-command.
+> When restarting LE scanning, check if it's currently paused before
+> enabling passive scanning.
+> 
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
+> When running suspend stress tests on Chromebooks, we discovered
+> instances where the Chromebook didn't enter the deepest idle states
+> (i.e. S0ix). After some debugging, we found that passive scanning was
+> being enabled AFTER the suspend notifier had run (and disabled all
+> scanning).
+> 
+> For this fix, I simply looked at all the places where we call
+> HCI_OP_LE_SET_SCAN_ENABLE and added a guard clause for suspend. With
+> this fix, we were able to get through 100+ iterations of the suspend
+> stress test without any problems entering S0ix.
+> 
+> 
+> net/bluetooth/hci_request.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
-Let's try something, continuing with the same patches as before, change this in
-net/bluetooth/hci_core.c:
+patch has been applied to bluetooth-next tree.
 
->       if (hdev->commands[18] & 0x04)
->               hci_req_add(req, HCI_OP_READ_DEF_ERR_DATA_REPORTING, 0, NULL);
+Regards
 
-...to this:
->       if (false)
->               hci_req_add(req, HCI_OP_READ_DEF_ERR_DATA_REPORTING, 0, NULL);
+Marcel
 
-...and see if the log moves a bit, maybe that fixes it. Who knows? Save the log
-somewhere.
-
-
-Chances are that the last change wasn't enough. So additionally, after that
-change this in net/bluetooth/hci_core.c:
->       /* Set erroneous data reporting if supported to the wideband speech
->        * setting value
->        */
->       if (hdev->commands[18] & 0x08) {
-
-...to this:
->       /* Set erroneous data reporting if supported to the wideband speech
->        * setting value
->        */
->       if (false) {
-
-
-Technically with that Linux should ignore the wideband error thingy altogether.
-Sounds like we need a HCI_QUIRK_WIDEBAND_SPEECH_NOT_SUPPORTED. The opposite of
-the HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED that already exists.
-
-Anyway, good progress. This is a different bug. ¯\_(ツ)_/¯
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
