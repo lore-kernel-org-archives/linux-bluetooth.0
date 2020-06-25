@@ -2,584 +2,156 @@ Return-Path: <SRS0=OFBO=AG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3958C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 20:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4975C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:00:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66F0320791
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 20:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8376206FA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:00:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXsgyqHl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404531AbgFYUNr convert rfc822-to-8bit (ORCPT
+        id S2405326AbgFYVAT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jun 2020 16:13:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58038 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404386AbgFYUNq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jun 2020 16:13:46 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Thu, 25 Jun 2020 17:00:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51098 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405069AbgFYVAS (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 25 Jun 2020 17:00:18 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C120AC08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:00:18 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id p11so3596009pff.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CHDhMlgJTibjtwElhqt5x8hbWAW3rqhB5KyDah6RhQA=;
+        b=lXsgyqHlKGreVK10DFO+zw1QF7twQPb5h+iGzFnYP6Q7/iOMLwDGxjgAOc1t5uApE9
+         u5a+xO4TKNFZdbVGCJgq+j0/f6zHmCjNHzFjJ5xJi8nrZakg9Ma2pMP3ArERitUiTBiW
+         5K/9cXxk8x6ZyEIAx3rfoEwtwvqgogqlo76EH3EnSXe63skwxITOhoSG5F+wdFG8p6ej
+         wH3nTQ3Q8Lv4aojX4TUsirZfpUsq5dW4hJc1kvhuFpsuNIRZhVKLYE3R6EbnEl+erLf9
+         vNduNXEu/S21cj7s5gzt6yi3qkCtEylVs2Qoe2V+sLjkCBwTVdvcHAPXrZ/ZjACq6st6
+         Xjfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CHDhMlgJTibjtwElhqt5x8hbWAW3rqhB5KyDah6RhQA=;
+        b=f61v7nX5zyhhj5yeA3hAT2ekGCT1htLJ+YLxUTE6jbLp63SFm3hTMbPEZwJHDPogoV
+         U5LwTCoiVC5JHE2HCssZUwv+KLlEkQz2oQCmxf7jnLq6xsEmw9csSXPKybBDBEB/C13J
+         tU+lW4GuUk+WkJeqAcWINOW5qcqfpeQEg1p5CMGD+TPBU6PHIQ5ZHra9ulTIDrbkqzde
+         +pc1XcFydIXcqHTSaR6zt0yy28SiMx2MSlUCpKBbbi9HgMOkVJ8BCbWSxN8eAlfYOQ/h
+         sTXGb76U74o3lD9UAd91YE2f6fjkx5ySKWUSqioWuKEWFiaWOhtJYrjtyRXcRpqciRdv
+         vCsQ==
+X-Gm-Message-State: AOAM532M8sLC153j7HqNDo1XfmKN0dg+enoluI3pIcJwK/mHHxzFysdr
+        bblnbyYeZeBJNkq8rbt1FxkS1kXx1gU=
+X-Google-Smtp-Source: ABdhPJyZOSMWU8rgVaEAHaJNqb7SpqgcLMJpwZXNNA2AtJ36rqU6Hin5bILIOe++KSIatrzvbB/GiQ==
+X-Received: by 2002:a63:7a56:: with SMTP id j22mr26707027pgn.194.1593118817799;
+        Thu, 25 Jun 2020 14:00:17 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id m18sm24123194pfo.173.2020.06.25.14.00.16
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2020 14:00:17 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 208319] New: bluetoothd repeatedly crashes with Logitech MX
- Keys keyboard
-Date:   Thu, 25 Jun 2020 20:13:45 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: leva@ecentrum.hu
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-208319-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ] shared/gatt-client: Fix freeing instance while processing notification
+Date:   Thu, 25 Jun 2020 14:00:16 -0700
+Message-Id: <20200625210016.2233909-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208319
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-            Bug ID: 208319
-           Summary: bluetoothd repeatedly crashes with Logitech MX Keys
-                    keyboard
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.7.3
-          Hardware: ARM
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: leva@ecentrum.hu
-        Regression: No
+If CCC fails to be programmed the callback would be run without taking
+a reference which may lead to freeing the client instance while there
+are still notification to be processed.
 
-I'm having these bluetoothd crashes when I turn on my Logitech MX Keys
-keyboard. It lasts for a while, meaning it crashes, then systemd starts it up
-again, then crashes again, etc... For about 1-2 minutes, then it "settles" (I
-don't know how else to put it, but as long as I keep pressing buttons and the
-keyboard reconnects, the crashes stop after a while, usually after about 1-2
-minutes).
-I'm using aarch64 (ARMv8) on a Raspberry Pi 4 and Manjaro Linux (Arch-based)
-with bluez-5.54:
-5.7.3-1-MANJARO-ARM #1 SMP PREEMPT Wed Jun 17 13:20:14 CDT 2020 aarch64
-GNU/Linux
+To fix this handling of both success and failure to program the CCC will
+now take a reference to the client, also in case of failure instead of
+attempting to program the CCC once again the code now notify all the
+queued requests which is consistent with how the success case is
+handled.
+---
+ src/shared/gatt-client.c | 31 +++++++------------------------
+ 1 file changed, 7 insertions(+), 24 deletions(-)
 
-Here's the backtrace:
-Core was generated by `/usr/lib/bluetooth/bluetoothd'.
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  queue_remove (queue=0x559c1b6d40, data=data@entry=0x559c1c7d00) at
-src/shared/queue.c:259
-259                             continue;
-(gdb) list
-254                     return false;
-255
-256             for (entry = queue->head, prev = NULL; entry;
-257                                             prev = entry, entry =
-entry->next) {
-258                     if (entry->data != data)
-259                             continue;
-260
-261                     if (prev)
-262                             prev->next = entry->next;
-263                     else
-(gdb) bt
-#0  queue_remove (queue=0x559c1b6d40, data=data@entry=0x559c1c7d00) at
-src/shared/queue.c:259
-#1  0x000000558fc4f928 in enable_ccc_callback (opcode=<optimized out>,
-pdu=<optimized out>, length=<optimized out>, user_data=0x559c1c7d00) at
-src/shared/gatt-client.c:1627
-#2  0x000000558fc4947c in disc_att_send_op (data=0x559c1a6c30) at
-src/shared/att.c:417
-#3  0x000000558fc43c18 in queue_remove_all (queue=<optimized out>,
-function=function@entry=0x0, user_data=user_data@entry=0x0,
-destroy=destroy@entry=0x558fc49450 <disc_att_send_op>) at
-src/shared/queue.c:353
-#4  0x000000558fc4b7b8 in disconnect_cb (io=<optimized out>,
-user_data=0x559c1bbe00) at src/shared/att.c:635
-#5  0x000000558fc586e8 in watch_callback (channel=<optimized out>,
-cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:170
-#6  0x0000007fb94ed66c in g_main_context_dispatch () from
-/usr/lib/libglib-2.0.so.0
-#7  0x0000007fb94edaf8 in ?? () from /usr/lib/libglib-2.0.so.0
-#8  0x0000007fb94edf00 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
-#9  0x000000558fc58e78 in mainloop_run () at src/shared/mainloop-glib.c:79
-#10 0x000000558fc59394 in mainloop_run_with_signal (func=<optimized out>,
-user_data=0x0) at src/shared/mainloop-notify.c:201
-#11 0x000000558fba2c3c in main (argc=<optimized out>, argv=<optimized out>) at
-src/main.c:770
-(gdb) bt full
-#0  queue_remove (queue=0x559c1b6d40, data=data@entry=0x559c1c7d00) at
-src/shared/queue.c:259
-        entry = <error reading variable entry (Cannot access memory at address
-0x59)>
-        prev = 0x51
-#1  0x000000558fc4f928 in enable_ccc_callback (opcode=<optimized out>,
-pdu=<optimized out>, length=<optimized out>, user_data=0x559c1c7d00) at
-src/shared/gatt-client.c:1627
-        notify_data = 0x559c1c7d00
-        att_ecode = <optimized out>
-        __PRETTY_FUNCTION__ = "enable_ccc_callback"
-#2  0x000000558fc4947c in disc_att_send_op (data=0x559c1a6c30) at
-src/shared/att.c:417
-        op = 0x559c1a6c30
-#3  0x000000558fc43c18 in queue_remove_all (queue=<optimized out>,
-function=function@entry=0x0, user_data=user_data@entry=0x0,
-destroy=destroy@entry=0x558fc49450 <disc_att_send_op>) at
-src/shared/queue.c:353
-        tmp = 0x559c1b14a0
-        entry = 0x0
-        count = 9
-#4  0x000000558fc4b7b8 in disconnect_cb (io=<optimized out>,
-user_data=0x559c1bbe00) at src/shared/att.c:635
-        chan = 0x559c1bbe00
-        att = 0x559c1c8890
-        err = 110
-        len = 4
-#5  0x000000558fc586e8 in watch_callback (channel=<optimized out>,
-cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:170
-        watch = <optimized out>
-        result = <optimized out>
-        destroy = <optimized out>
-#6  0x0000007fb94ed66c in g_main_context_dispatch () from
-/usr/lib/libglib-2.0.so.0
-No symbol table info available.
-#7  0x0000007fb94edaf8 in ?? () from /usr/lib/libglib-2.0.so.0
-No symbol table info available.
-#8  0x0000007fb94edf00 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
-No symbol table info available.
-#9  0x000000558fc58e78 in mainloop_run () at src/shared/mainloop-glib.c:79
-No locals.
-#10 0x000000558fc59394 in mainloop_run_with_signal (func=<optimized out>,
-user_data=0x0) at src/shared/mainloop-notify.c:201
-        data = 0x559c199170
-        io = 0x559c19a330
-        ret = <optimized out>
-#11 0x000000558fba2c3c in main (argc=<optimized out>, argv=<optimized out>) at
-src/main.c:770
-        context = <optimized out>
-        err = 0x0
-        sdp_flags = <optimized out>
-        gdbus_flags = <optimized out>
-        __func__ = "main"
-
-
-And here's the log from bluetoothd while this happens:
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descriptor
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:01 hostname bluetoothd[434271]: Protocol Mode characteristic read
-failed: Request attribute has encountered an unlikely error
-Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Main process exited,
-code=dumped, status=11/SEGV
-Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Failed with result
-'core-dump'.
-Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Scheduled restart job,
-restart counter is at 1.
-Jun 24 22:39:02 hostname systemd[1]: Stopped Bluetooth service.
-Jun 24 22:39:02 hostname systemd[1]: Starting Bluetooth service...
-Jun 24 22:39:02 hostname bluetoothd[436294]: Bluetooth daemon 5.54
-Jun 24 22:39:02 hostname systemd[1]: Started Bluetooth service.
-Jun 24 22:39:02 hostname bluetoothd[436294]: Starting SDP server
-Jun 24 22:39:02 hostname bluetoothd[436294]: Bluetooth management interface
-1.16 initialized
-Jun 24 22:39:02 hostname bluetoothd[436294]: Failed to set privacy: Rejected
-(0x0b)
-Jun 24 22:39:02 hostname bluetoothd[436294]: Endpoint registered: sender=:1.53
-path=/MediaEndpoint/A2DPSink/sbc
-Jun 24 22:39:02 hostname bluetoothd[436294]: Endpoint registered: sender=:1.53
-path=/MediaEndpoint/A2DPSource/sbc
-Jun 24 22:39:08 hostname bluetoothd[436294]: No cache for E6:25:BB:xx:xx:xx
-Jun 24 22:39:08 hostname bluetoothd[436294]: BATT attribute not found
-Jun 24 22:39:08 hostname bluetoothd[436294]: batt-profile profile accept failed
-for E6:25:BB:xx:xx:xx
-Jun 24 22:39:08 hostname bluetoothd[436294]: GAP attribute not found
-Jun 24 22:39:08 hostname bluetoothd[436294]: gap-profile profile accept failed
-for E6:25:BB:xx:xx:xx
-Jun 24 22:39:08 hostname bluetoothd[436294]: input-hog profile accept failed
-for E6:25:BB:xx:xx:xx
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:33 hostname bluetoothd[436294]: Report Map parsing failed at 87
-Jun 24 22:39:33 hostname bluetoothd[436294]: Failed to connection details:
-getpeername: Transport endpoint is not connected (107)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:39:47 hostname bluetoothd[436294]: Write output report failed:
-Request attribute has encountered an unlikely error
-Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic
-descriptor failed: Request attribute has encountered an unlikely error
-Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic
-descriptor failed: Request attribute has encountered an unlikely error
-Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic
-descriptor failed: Request attribute has encountered an unlikely error
-Jun 24 22:40:01 hostname bluetoothd[436294]: Report Map parsing failed at 65
-Jun 24 22:40:01 hostname bluetoothd[436294]: Failed to connection details:
-getpeername: Transport endpoint is not connected (107)
-Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic
-descriptor failed: Request attribute has encountered an unlikely error
-Jun 24 22:40:04 hostname bluetoothd[436294]: No cache for E6:25:BB:xx:xx:xx
-Jun 24 22:40:08 hostname bluetoothd[436294]: Unable to register
-org.bluez.Battery1 interface for /org/bluez/hci0/dev_E6_25_BB_xx_xx_xx
-Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed:
-Request attribute has encountered an unlikely error
-Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed:
-Request attribute has encountered an unlikely error
-Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed:
-Request attribute has encountered an unlikely error
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:42:55 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argument
-(22)
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 19ff6ab65..db079e75a 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -190,6 +190,7 @@ struct notify_data {
+ 	struct bt_gatt_client *client;
+ 	unsigned int id;
+ 	unsigned int att_id;
++	uint8_t att_ecode;
+ 	int ref_count;
+ 	struct notify_chrc *chrc;
+ 	bt_gatt_client_register_callback_t callback;
+@@ -1565,7 +1566,8 @@ static void complete_notify_request(void *data)
+ 	notify_data->att_id = 0;
+ 
+ 	if (notify_data->callback)
+-		notify_data->callback(0, notify_data->user_data);
++		notify_data->callback(notify_data->att_ecode,
++						notify_data->user_data);
+ }
+ 
+ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
+@@ -1617,36 +1619,17 @@ static void enable_ccc_callback(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+ 	struct notify_data *notify_data = user_data;
+-	uint8_t att_ecode;
+ 
+ 	assert(notify_data->chrc->ccc_write_id);
+ 
+ 	notify_data->chrc->ccc_write_id = 0;
+ 
+-	if (opcode == BT_ATT_OP_ERROR_RSP) {
+-		att_ecode = process_error(pdu, length);
+-
+-		/* Failed to enable. Complete the current request and move on to
+-		 * the next one in the queue. If there was an error sending the
+-		 * write request, then just move on to the next queued entry.
+-		 */
+-		queue_remove(notify_data->client->notify_list, notify_data);
+-		notify_data->callback(att_ecode, notify_data->user_data);
+-
+-		while ((notify_data = queue_pop_head(
+-					notify_data->chrc->reg_notify_queue))) {
+-
+-			if (notify_data_write_ccc(notify_data, true,
+-							enable_ccc_callback))
+-				return;
+-		}
+-
+-		return;
+-	}
+-
+-	/* Success! Report success for all remaining requests. */
+ 	bt_gatt_client_ref(notify_data->client);
+ 
++	if (opcode == BT_ATT_OP_ERROR_RSP)
++		notify_data->att_ecode = process_error(pdu, length);
++
++	/* Notify for all remaining requests. */
+ 	complete_notify_request(notify_data);
+ 	queue_remove_all(notify_data->chrc->reg_notify_queue, NULL, NULL,
+ 						complete_notify_request);
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.25.3
+
