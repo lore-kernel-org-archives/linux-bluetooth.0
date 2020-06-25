@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4975C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7FFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:11:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8376206FA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:00:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36C9520768
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:11:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXsgyqHl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDJHwNnz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405326AbgFYVAT (ORCPT
+        id S2391183AbgFYVL2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jun 2020 17:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51098 "EHLO
+        Thu, 25 Jun 2020 17:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405069AbgFYVAS (ORCPT
+        with ESMTP id S2391179AbgFYVL2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jun 2020 17:00:18 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C120AC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:00:18 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id p11so3596009pff.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:00:18 -0700 (PDT)
+        Thu, 25 Jun 2020 17:11:28 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50ECEC08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:11:28 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id f2so3349480plr.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=CHDhMlgJTibjtwElhqt5x8hbWAW3rqhB5KyDah6RhQA=;
-        b=lXsgyqHlKGreVK10DFO+zw1QF7twQPb5h+iGzFnYP6Q7/iOMLwDGxjgAOc1t5uApE9
-         u5a+xO4TKNFZdbVGCJgq+j0/f6zHmCjNHzFjJ5xJi8nrZakg9Ma2pMP3ArERitUiTBiW
-         5K/9cXxk8x6ZyEIAx3rfoEwtwvqgogqlo76EH3EnSXe63skwxITOhoSG5F+wdFG8p6ej
-         wH3nTQ3Q8Lv4aojX4TUsirZfpUsq5dW4hJc1kvhuFpsuNIRZhVKLYE3R6EbnEl+erLf9
-         vNduNXEu/S21cj7s5gzt6yi3qkCtEylVs2Qoe2V+sLjkCBwTVdvcHAPXrZ/ZjACq6st6
-         Xjfw==
+        bh=P3eQ7KJiOLP1SitBTtMnSlcHe/6bydu/h07euCIprVQ=;
+        b=YDJHwNnzo/ypKC5vqLOPtjJTdl7zLSEOrcP855s2syhaPvfVw7Ga9IpmGnijlqYN+r
+         sxyC/Z1WsrsnSnl/20ZaS9oSRvqWzwf5ZVIfTeh9B/tYWUySLBaiWSWa3WgPLIj7lIMu
+         2Wek4Q0sdOeuKTvqjkAX/rj6NRBrCVtgaub5V73hrd7Lev8lUDoJ0fJy1cEKFNNf0Ypf
+         KZ+eLU3hAp76sjuefBCLUM7KO0Gnur18TBxWpg0Spc+NIdimMNlcz8qDo7OtgKwpUYhR
+         nXs+esMb4X68KZMOH8FatqKwAXlKY26RX6avNsuoaiy8eKCuesSn5DY5AHGBphGiySeS
+         ontQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=CHDhMlgJTibjtwElhqt5x8hbWAW3rqhB5KyDah6RhQA=;
-        b=f61v7nX5zyhhj5yeA3hAT2ekGCT1htLJ+YLxUTE6jbLp63SFm3hTMbPEZwJHDPogoV
-         U5LwTCoiVC5JHE2HCssZUwv+KLlEkQz2oQCmxf7jnLq6xsEmw9csSXPKybBDBEB/C13J
-         tU+lW4GuUk+WkJeqAcWINOW5qcqfpeQEg1p5CMGD+TPBU6PHIQ5ZHra9ulTIDrbkqzde
-         +pc1XcFydIXcqHTSaR6zt0yy28SiMx2MSlUCpKBbbi9HgMOkVJ8BCbWSxN8eAlfYOQ/h
-         sTXGb76U74o3lD9UAd91YE2f6fjkx5ySKWUSqioWuKEWFiaWOhtJYrjtyRXcRpqciRdv
-         vCsQ==
-X-Gm-Message-State: AOAM532M8sLC153j7HqNDo1XfmKN0dg+enoluI3pIcJwK/mHHxzFysdr
-        bblnbyYeZeBJNkq8rbt1FxkS1kXx1gU=
-X-Google-Smtp-Source: ABdhPJyZOSMWU8rgVaEAHaJNqb7SpqgcLMJpwZXNNA2AtJ36rqU6Hin5bILIOe++KSIatrzvbB/GiQ==
-X-Received: by 2002:a63:7a56:: with SMTP id j22mr26707027pgn.194.1593118817799;
-        Thu, 25 Jun 2020 14:00:17 -0700 (PDT)
+        bh=P3eQ7KJiOLP1SitBTtMnSlcHe/6bydu/h07euCIprVQ=;
+        b=gcqPPAJbOPZB0jMo+mVFTwIBgEwgFoUOTgMjff4RxGKOTrAfzhRJL5BilDFErY9R8O
+         jqy0TcOlCNV2jIXVAGzioHN9Wdd7gudG4EXxJaInONJ3g4Cbzp7wtmtenDZfxZ74VKkP
+         NzH6pFOdIjfroaNKan2Xjl+2g9tAZOWYkj5k7MzeKJEjIgm5oQVwYs3j55xLi87aVJbA
+         BP/tsqfsIr6IwGvH4lU7Hfq7+nXy4L0sDB5zU0KNHBfwHrLtXBoz+cmz1nU4S4I8Eil6
+         HVxKNMt0tIIRJsw29mtuh6odecM2eDir9QI/GwlDa4gV2I6HvBxkO58cg1JrfazyHGBy
+         NJ2w==
+X-Gm-Message-State: AOAM532IcIcLg7WVDQRHiSte3Ye6aAkT22VX1UcNb8syWJHuDHd/33N2
+        1qpg2YMKoLqwDLm443H1zvU5Ja4tVQk=
+X-Google-Smtp-Source: ABdhPJyCTLGIVpfeWXnbgF6YNpITD3p8/o5UE/2gwwf/9n5K4d6D/ChBFutn9MFGRJWxxGX+00szRw==
+X-Received: by 2002:a17:90a:8b09:: with SMTP id y9mr5346015pjn.90.1593119487463;
+        Thu, 25 Jun 2020 14:11:27 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m18sm24123194pfo.173.2020.06.25.14.00.16
+        by smtp.gmail.com with ESMTPSA id gm11sm9326294pjb.9.2020.06.25.14.11.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2020 14:00:17 -0700 (PDT)
+        Thu, 25 Jun 2020 14:11:26 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Fix freeing instance while processing notification
-Date:   Thu, 25 Jun 2020 14:00:16 -0700
-Message-Id: <20200625210016.2233909-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2] shared/gatt-client: Fix freeing instance while processing notification
+Date:   Thu, 25 Jun 2020 14:11:25 -0700
+Message-Id: <20200625211125.2239435-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -86,11 +86,11 @@ attempting to program the CCC once again the code now notify all the
 queued requests which is consistent with how the success case is
 handled.
 ---
- src/shared/gatt-client.c | 31 +++++++------------------------
- 1 file changed, 7 insertions(+), 24 deletions(-)
+ src/shared/gatt-client.c | 46 +++++++++++++++++-----------------------
+ 1 file changed, 20 insertions(+), 26 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 19ff6ab65..db079e75a 100644
+index 19ff6ab65..421f9a13c 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
 @@ -190,6 +190,7 @@ struct notify_data {
@@ -111,7 +111,21 @@ index 19ff6ab65..db079e75a 100644
  }
  
  static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
-@@ -1617,36 +1619,17 @@ static void enable_ccc_callback(uint8_t opcode, const void *pdu,
+@@ -1613,43 +1615,35 @@ static uint8_t process_error(const void *pdu, uint16_t length)
+ 	return error_pdu->ecode;
+ }
+ 
++static bool notify_set_ecode(const void *data, const void *match_data)
++{
++	struct notify_data *notify_data = (void *)data;
++	uint8_t ecode = PTR_TO_UINT(match_data);
++
++	notify_data->att_ecode = ecode;
++
++	return true;
++}
++
+ static void enable_ccc_callback(uint8_t opcode, const void *pdu,
  					uint16_t length, void *user_data)
  {
  	struct notify_data *notify_data = user_data;
@@ -150,8 +164,14 @@ index 19ff6ab65..db079e75a 100644
 +
 +	/* Notify for all remaining requests. */
  	complete_notify_request(notify_data);
- 	queue_remove_all(notify_data->chrc->reg_notify_queue, NULL, NULL,
- 						complete_notify_request);
+-	queue_remove_all(notify_data->chrc->reg_notify_queue, NULL, NULL,
+-						complete_notify_request);
++	queue_remove_all(notify_data->chrc->reg_notify_queue, notify_set_ecode,
++				UINT_TO_PTR(notify_data->att_ecode),
++				complete_notify_request);
+ 
+ 	bt_gatt_client_unref(notify_data->client);
+ }
 -- 
 2.25.3
 
