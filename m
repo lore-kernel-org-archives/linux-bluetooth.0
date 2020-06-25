@@ -7,155 +7,91 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9A4C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6032C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:19:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9FFA207FC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6B8A2082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:19:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fbe0YAfd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gEFD/h6/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405693AbgFYVSI (ORCPT
+        id S2407753AbgFYXTB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jun 2020 17:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
+        Thu, 25 Jun 2020 19:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405705AbgFYVSI (ORCPT
+        with ESMTP id S2407746AbgFYXSz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jun 2020 17:18:08 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F441C08C5DC
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:18:07 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id h19so8074660ljg.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:18:07 -0700 (PDT)
+        Thu, 25 Jun 2020 19:18:55 -0400
+Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CCFC08C5DC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 16:18:54 -0700 (PDT)
+Received: by mail-vs1-xe42.google.com with SMTP id f24so4544306vsg.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 16:18:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=SWIaY12Y0G2dy4SWvhoH0txkwE664AQyplOHmcrCZV8=;
-        b=fbe0YAfdtHX4mE/5jYK+b08zs+3EV0uom5viW7YIAmLz+nBMpOQmDjRSOyXr8Yq7yN
-         PwAutxSNdIeuWip+kNrf3gcnBZH8jKFNmBwAjc+LNvXoR6BzQQvm7fzO0cpyVFFej+U+
-         XAmFafYM1/fWIYT+jg3hsjYgmUj6CrBiGce7w=
+         :cc;
+        bh=UZUejZ4FxIPzgalcSBOTl7RrSB8oG1JXXKFu2TzIVTY=;
+        b=gEFD/h6/YccJ6NUPfYT/xgz0X+isX8Cd6CGn2UCUGx7jpM3t81GIEKLZxSIh9n3gSf
+         LyFFAVqzLW2EOg2vox4IxQFv/KkghELE3h+1pMYcAk3L5vCjE1vuqYv6ModKBhiykPJm
+         E+uZ3A7Yo3f2524NLn2qvAOct1Q0SfZjBL3KQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=SWIaY12Y0G2dy4SWvhoH0txkwE664AQyplOHmcrCZV8=;
-        b=Qdq19HShsev5fjee1SxfV25UxSjyctZV8bng25542voAAU9QGf/Vgc116k3FcZxnf0
-         /COakim8aXATx0p6cl8pb0+Wtb8XloybDVGcUyauMlBm0zjFwZk+INOXHLOAEGnbVbd3
-         RZFRRQoeAw9JM3+NFqQBc5wcZv+BQRnScLQ3Macg1ENBT5jdv6H3Sq7KDHClPfS/cetB
-         1fVGEHEorc1S+ORf/y2ydnMl4k6XZqeeOCs1aDccM+1Apwkh9+ZAlnDIqxX/XYzXnzdo
-         CRZk6loAKSXNwudfz1DHv2Kgsg/6slaknC+QZytuqiQeqFJCMzr+XRPr//3nHfaclYu/
-         rZ4A==
-X-Gm-Message-State: AOAM530ev1YdsxqXvBI0JUo/5ruOY2gSi559TZr4rrjTG6DybDj04xzC
-        gF2vUubdpJAuiavRR3Mb4Q/4JT0HJfvDF8UzC7pg+Q==
-X-Google-Smtp-Source: ABdhPJwAZAO0URb5429RQ8KWWyn03Dh+VW7wXxDaU0pyTnnX/WMtSBWQoRxtR41F5V5Wn0lUPYIIIBTzfxfYflSU0Sw=
-X-Received: by 2002:a2e:3314:: with SMTP id d20mr17597674ljc.359.1593119885826;
- Thu, 25 Jun 2020 14:18:05 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=UZUejZ4FxIPzgalcSBOTl7RrSB8oG1JXXKFu2TzIVTY=;
+        b=UC5fMN605N/118ZAjZ5khhm0txPSbMzoZLJvRDWxrvJmw8D8YB5A1/d05wPFvHbbNQ
+         P3hgUxS2IGppLkdtCfFSNEAEwZm6NNX8USZMcufYg5Vn1iS8T8WIOBA1lf+0amCBBgtz
+         UKKi9FPyYp4xOer2Sp+XT9I0a/5NXDC/Gcvm3zFS8eUf/qOyA+2SzcSZEo2hvi8lB1c1
+         qLyGMS9GuMAaJw6W+sgoDzEnczJjOjaQAdr3ba/7o2r8nvVCBhM8DgTk+UZUawD4HtZs
+         31FCqfjdhuxB64FvxWto8LkMNr9etKVK2wOYAgmHCboXXwHJ2JQ1upD3vV01JsEody6A
+         8p0Q==
+X-Gm-Message-State: AOAM533gIinQXVimt1Fl5Yi3PUcZn7QHl1kWNGeYA2HgN7JolXm90XNO
+        ZDkDmPjGH3lGpB4jt79v8HiR8WInihDiomxrrd8mLA==
+X-Google-Smtp-Source: ABdhPJzhi8dHdwc7k/3b1+iOeFD6RskzYY/+B8+g9RbXB08kX6vZ9AZiixX+D9Pnv0ODrkx1cdSZ8uCd7wY1U33lSFI=
+X-Received: by 2002:a05:6102:1167:: with SMTP id k7mr517235vsg.71.1593127133874;
+ Thu, 25 Jun 2020 16:18:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200623194533.GA3815@amd> <8C887FD6-DDC0-4FD6-8994-00939EFCB0F9@holtmann.org>
-In-Reply-To: <8C887FD6-DDC0-4FD6-8994-00939EFCB0F9@holtmann.org>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Thu, 25 Jun 2020 14:17:54 -0700
-Message-ID: <CABmPvSFbXNcBdgtmygaOdOrJ-4W_PU8ATiEL7StiEqtwXtfZzA@mail.gmail.com>
-Subject: Re: next-20200623: oops in btusb_disconnect() at boot on thinkpad x60
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Pavel Machek <pavel@ucw.cz>,
-        kernel list <linux-kernel@vger.kernel.org>,
+References: <20200624111128.v2.1.Ibae403db54245c458d14297f1892c77c5055da41@changeid>
+ <1593080522.28236.17.camel@suse.com>
+In-Reply-To: <1593080522.28236.17.camel@suse.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Thu, 25 Jun 2020 16:18:42 -0700
+Message-ID: <CANFp7mUmk=HqPyJ5TS5uQPyaEtOWdz=D+7XBS8MyikuF9y9EJQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Reset port on cmd timeout
+To:     Oliver Neukum <oneukum@suse.com>
+Cc:     Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        linux-usb@vger.kernel.org, Linux PM <linux-pm@vger.kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        gregkh@linuxfoundation.org, linux-usb@vger.kernel.org
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel and all,
+Thanks for the heads up Oliver -- I will send a patch with a comment on this.
 
-Thanks for the note here. 8208f5a9d435e58ee7f53a24d9ccbe7787944537 is
-the cause of this, I will upload a fix shortly to address the
-distinguishment between tearing down hdev and user space request.
-
-Regards,
-Miao
-
-
-On Tue, Jun 23, 2020 at 11:44 PM Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+On Thu, Jun 25, 2020 at 3:22 AM Oliver Neukum <oneukum@suse.com> wrote:
 >
-> Hi Pavel,
+> Am Mittwoch, den 24.06.2020, 11:11 -0700 schrieb Abhishek Pandit-
+> Subedi:
+> > QCA_ROME sometimes gets into a state where it is unresponsive to
+> > commands. Since it doesn't have support for a reset gpio, reset the usb
+> > port when this occurs instead.
 >
-> > I'm getting this at boot:
-> >
-> > [    7.984584] *pdpt =3D 0000000033a31001 *pde =3D 0000000000000000
-> > [    7.984584] Oops: 0000 [#1] PREEMPT SMP PTI
-> > [    7.984584] CPU: 1 PID: 2532 Comm: systemd-udevd Not tainted
-> > 5.8.0-rc2-next-20200623+ #126
-> > [    7.998580] Hardware name: LENOVO 17097HU/17097HU, BIOS 7BETD8WW
-> > (2.19 ) 03/31/2011
-> > [    8.000592] EIP: __queue_work+0x139/0x320
-> > [    8.000592] Code: 90 83 7d f0 08 0f 84 b6 00 00 00 8b 45 ec 8b 9f
-> > 04 01 00 00 03 1c 85 40 63 1f c5 89 f0 e8 df f8 ff ff 85 c0 0f 85 4f
-> > ff ff ff <8b> 03 e9 50 ff ff ff 89 45 e4 e8 48 0a cb 00 8b 4d e8 8b 45
-> > e4 8b
-> > [    8.007883] EAX: 00000000 EBX: 00000000 ECX: 47d88848 EDX: 03ffffff
-> > [    8.007883] ESI: f4a348bc EDI: f492a600 EBP: f3b1dd0c ESP: f3b1dcf0
-> > [    8.019981] DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068 EFLAGS:
-> > 00010046
-> > [    8.023156] CR0: 80050033 CR2: 00000000 CR3: 33b1e000 CR4: 000006b0
-> > [    8.028892] Call Trace:
-> > [    8.034199]  queue_work_on+0x1d/0x30
-> > [    8.034199]  hci_adv_monitors_clear+0x5c/0x80
-> > [    8.042158]  hci_unregister_dev+0x161/0x2f0
-> > [    8.042158]  ? usb_disable_endpoint+0x94/0xa0
-> > [    8.042158]  btusb_disconnect+0x4b/0x120
-> > [    8.057018]  usb_unbind_interface+0x64/0x230
-> > [    8.057018]  device_release_driver_internal+0xc1/0x180
-> > [    8.065196]  device_release_driver+0xc/0x10
-> > [    8.068040]  bus_remove_device+0xa8/0x110
-> > [    8.071767]  device_del+0x126/0x370
-> > [    8.071767]  ? usb_remove_ep_devs+0x15/0x20
-> > [    8.079199]  ? remove_intf_ep_devs+0x30/0x50
-> > [    8.081371]  usb_disable_device+0x8e/0x240
-> > [    8.087478]  usb_set_configuration+0x47c/0x800
-> > [    8.087478]  usb_deauthorize_device+0x36/0x50
-> > [    8.092662]  authorized_store+0x5d/0x70
-> > [    8.096608]  ? authorized_default_store+0x60/0x60
-> > [    8.096608]  dev_attr_store+0x13/0x20
-> > [    8.096608]  ? component_bind_all.cold+0x52/0x52
-> > [    8.106151]  sysfs_kf_write+0x2f/0x50
-> > [    8.106151]  ? sysfs_file_ops+0x50/0x50
-> > [    8.106151]  kernfs_fop_write+0x105/0x1a0
-> > [    8.106151]  ? kernfs_fop_open+0x3c0/0x3c0
-> > [    8.106151]  __vfs_write+0x2b/0x1e0
-> > [    8.106151]  ? lock_acquire+0x3f/0x70
-> > [    8.106151]  ? vfs_write+0x12a/0x180
-> > [    8.106151]  ? __sb_start_write+0xd6/0x180
-> > [    8.106151]  ? vfs_write+0x12a/0x180
-> > [    8.106151]  vfs_write+0xa1/0x180
-> > [    8.106151]  ksys_write+0x5c/0xd0
-> > [    8.106151]  __ia32_sys_write+0x10/0x20
-> > [    8.106151]  do_syscall_32_irqs_on+0x3a/0xf0
-> > [    8.106151]  do_int80_syscall_32+0x9/0x20
-> > [    8.106151]  entry_INT80_32+0x116/0x116
-> > [    8.106151] EIP: 0xb7f45092
-> > [    8.106151] Code: Bad RIP value.
-> > [    8.146079] EAX: ffffffda EBX: 00000007 ECX: 004fb760 EDX: 00000001
-> > [    8.146079] ESI: 004fb760 EDI: 00000001 EBP: 004c79f0 ESP: bfabc48c
-> > [    8.146079] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS:
-> > 00000246
-> > [    8.150364] Modules linked in:
-> > [    8.150364] CR2: 0000000000000000
-> > [    8.150364] ---[ end trace 468d097aaf220284 ]---
+> Hi,
 >
-> I assume this is caused by commit e5e1e7fd470ccf2eb38ab7fb5a3ab0fc4792fe5=
-3 and mainly because it triggers the background scan workqueue. I think we =
-need to distinguish clearing the monitors when removing the controller comp=
-ared to clearing the controllers from bluetoothd as a runtime operation.
+> on first glance this looks like an unbalanced PM reference. It is not
+> because the operation is suicidal, but this deserves a comment, unless
+> you want to get a note telling you that you caused an imbalance every
+> few weeks.
 >
-> Regards
->
-> Marcel
+>         Regards
+>                 Oliver
 >
