@@ -2,68 +2,69 @@ Return-Path: <SRS0=OFBO=AG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535A5C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9A4C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:18:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 137AF20768
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:12:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9FFA207FC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 21:18:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vImEFICc"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fbe0YAfd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405716AbgFYVMb (ORCPT
+        id S2405693AbgFYVSI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jun 2020 17:12:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52990 "EHLO
+        Thu, 25 Jun 2020 17:18:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405670AbgFYVMa (ORCPT
+        with ESMTP id S2405705AbgFYVSI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jun 2020 17:12:30 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8233DC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:12:30 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id s10so6008253oih.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:12:30 -0700 (PDT)
+        Thu, 25 Jun 2020 17:18:08 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F441C08C5DC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:18:07 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id h19so8074660ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 14:18:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=9sDOwoeCZT+MxijlOzitUPOv2MjsWunsLgKimDc1Xtk=;
-        b=vImEFICcH1wV0UpqsAe68Ge1AS5+uXLVfCb5t3fW+0RGPh3i5o1WuGTOn9yABdKCPl
-         6v0nfZX7qN2gEsW73MnbnnJv6Wk6z+NOCqzfupQJ6Kc4pkPn/C6WoJJOjDrinhLhxP8U
-         1Z8KX+fiU7g7Our3CzumBoRh3zzR674V81hYGqg98dzeVPwsfGx0tgLR/1+uxozR+zxP
-         IP2FNsw0Wk6jGyjPzTW0qE//0tdbku2ZCInQ/NGxBJ/baiGfl+ZN4Sl4FBkSFVKTITHe
-         FP0v2nxH5ltWi+zTxRX08Y+BZk+LAPAMCJofIfLJzp6Q+Bt+OCs7+Fdz8KivyLLotQOO
-         IWLg==
+        bh=SWIaY12Y0G2dy4SWvhoH0txkwE664AQyplOHmcrCZV8=;
+        b=fbe0YAfdtHX4mE/5jYK+b08zs+3EV0uom5viW7YIAmLz+nBMpOQmDjRSOyXr8Yq7yN
+         PwAutxSNdIeuWip+kNrf3gcnBZH8jKFNmBwAjc+LNvXoR6BzQQvm7fzO0cpyVFFej+U+
+         XAmFafYM1/fWIYT+jg3hsjYgmUj6CrBiGce7w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9sDOwoeCZT+MxijlOzitUPOv2MjsWunsLgKimDc1Xtk=;
-        b=a6bQaADHqvYEjbgv+1LWRjSAUd23boIAjMCNGFx12TAbcDGPOAfrxdlCQJx1rz4c0I
-         e2hV+WE+i0pwWhlgN2xY6q4rh6Aj/VCJXbIlqFXI8bqMrjnQx1CpsSYhwJwVwcpLJ1gy
-         JIKaa7anogF09MXQqlPcRnsl44hYpejGt9AHyucP0p4CWn0Parl86D9QyMrY7bxUQEks
-         QnE4OW2eB1wCakCSan1lf6nuROFtZVp9IRivLkLKdlm6nb+Ekinvt6P4LvHbF40/kYBt
-         +JV4d9eZdP04NefCJdR+QCQAsYCskJqcljV2qhDCLEOqYgUHslFWwuSMrOxTwhDobwYh
-         AN4Q==
-X-Gm-Message-State: AOAM532GHXTyj2jtf3Gm5244Q/lAy/uD5DzpS6PEmWyPVXy62OWhprIt
-        yDmyx+HCxld0jIRJBs3cBdL7pA+FCdRZXRtOef3NGVPi3/k=
-X-Google-Smtp-Source: ABdhPJyWRdNzM8tgvaZLRid331PNNmiG5khFLHNcYws4JvIG3lS8xUiiQzK2yv8XjL2CcpObx+SASZfUhAM1piAUh1E=
-X-Received: by 2002:aca:49cb:: with SMTP id w194mr3781377oia.152.1593119549524;
- Thu, 25 Jun 2020 14:12:29 -0700 (PDT)
+        bh=SWIaY12Y0G2dy4SWvhoH0txkwE664AQyplOHmcrCZV8=;
+        b=Qdq19HShsev5fjee1SxfV25UxSjyctZV8bng25542voAAU9QGf/Vgc116k3FcZxnf0
+         /COakim8aXATx0p6cl8pb0+Wtb8XloybDVGcUyauMlBm0zjFwZk+INOXHLOAEGnbVbd3
+         RZFRRQoeAw9JM3+NFqQBc5wcZv+BQRnScLQ3Macg1ENBT5jdv6H3Sq7KDHClPfS/cetB
+         1fVGEHEorc1S+ORf/y2ydnMl4k6XZqeeOCs1aDccM+1Apwkh9+ZAlnDIqxX/XYzXnzdo
+         CRZk6loAKSXNwudfz1DHv2Kgsg/6slaknC+QZytuqiQeqFJCMzr+XRPr//3nHfaclYu/
+         rZ4A==
+X-Gm-Message-State: AOAM530ev1YdsxqXvBI0JUo/5ruOY2gSi559TZr4rrjTG6DybDj04xzC
+        gF2vUubdpJAuiavRR3Mb4Q/4JT0HJfvDF8UzC7pg+Q==
+X-Google-Smtp-Source: ABdhPJwAZAO0URb5429RQ8KWWyn03Dh+VW7wXxDaU0pyTnnX/WMtSBWQoRxtR41F5V5Wn0lUPYIIIBTzfxfYflSU0Sw=
+X-Received: by 2002:a2e:3314:: with SMTP id d20mr17597674ljc.359.1593119885826;
+ Thu, 25 Jun 2020 14:18:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <yZpTVIoy_4_lKVatpEXUFe3q3tXmvfdSwUiSGO1UiLaRoODws9PoqLXuyxok4Sl_ZS6mvH-sEdurYCkmbNTtRc38-J5yqAtfH6BIXU7INTM=@ecentrum.hu>
-In-Reply-To: <yZpTVIoy_4_lKVatpEXUFe3q3tXmvfdSwUiSGO1UiLaRoODws9PoqLXuyxok4Sl_ZS6mvH-sEdurYCkmbNTtRc38-J5yqAtfH6BIXU7INTM=@ecentrum.hu>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 25 Jun 2020 14:12:18 -0700
-Message-ID: <CABBYNZLry-8-R1dfnm_usYS-B7EBcL4Dgctw2Cnb8MiEd43v9g@mail.gmail.com>
-Subject: Re: bluetoothd repeatedly crashes with Logitech MX Keys keyboard
-To:     =?UTF-8?B?TMOpdmFpLCBEw6FuaWVs?= <leva@ecentrum.hu>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20200623194533.GA3815@amd> <8C887FD6-DDC0-4FD6-8994-00939EFCB0F9@holtmann.org>
+In-Reply-To: <8C887FD6-DDC0-4FD6-8994-00939EFCB0F9@holtmann.org>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Thu, 25 Jun 2020 14:17:54 -0700
+Message-ID: <CABmPvSFbXNcBdgtmygaOdOrJ-4W_PU8ATiEL7StiEqtwXtfZzA@mail.gmail.com>
+Subject: Re: next-20200623: oops in btusb_disconnect() at boot on thinkpad x60
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Pavel Machek <pavel@ucw.cz>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        gregkh@linuxfoundation.org, linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -71,542 +72,90 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi D=C3=A1niel,
+Hi Marcel and all,
 
-On Wed, Jun 24, 2020 at 3:05 PM L=C3=A9vai, D=C3=A1niel <leva@ecentrum.hu> =
-wrote:
->
-> Hi list!
->
-> First post here, be gentle :)
->
-> So I'm having these bluetoothd crashes when I turn on my Logitech MX Keys=
- keyboard. It lasts for a while, meaning it crashes, then systemd starts it=
- up again, then crashes again, etc... For about 1-2 minutes, then it "settl=
-es" (I don't know how else to put it, but as long as I keep pressing button=
-s and the keyboard reconnects, the crashes stop after a while, usually afte=
-r about 1-2 minutes).
-> I'm using aarch64 (ARMv8) on a raspberry pi 4 and Manjaro Linux (Arch-bas=
-ed) with bluez-5.54:
-> 5.7.3-1-MANJARO-ARM #1 SMP PREEMPT Wed Jun 17 13:20:14 CDT 2020 aarch64 G=
-NU/Linux
->
-> Here's the backtrace:
-> Core was generated by `/usr/lib/bluetooth/bluetoothd'.
-> Program terminated with signal SIGSEGV, Segmentation fault.
-> #0  queue_remove (queue=3D0x559c1b6d40, data=3Ddata@entry=3D0x559c1c7d00)=
- at src/shared/queue.c:259
-> 259                             continue;
-> (gdb) list
-> 254                     return false;
-> 255
-> 256             for (entry =3D queue->head, prev =3D NULL; entry;
-> 257                                             prev =3D entry, entry =3D=
- entry->next) {
-> 258                     if (entry->data !=3D data)
-> 259                             continue;
-> 260
-> 261                     if (prev)
-> 262                             prev->next =3D entry->next;
-> 263                     else
-> (gdb) bt
-> #0  queue_remove (queue=3D0x559c1b6d40, data=3Ddata@entry=3D0x559c1c7d00)=
- at src/shared/queue.c:259
-> #1  0x000000558fc4f928 in enable_ccc_callback (opcode=3D<optimized out>, =
-pdu=3D<optimized out>, length=3D<optimized out>, user_data=3D0x559c1c7d00) =
-at src/shared/gatt-client.c:1627
-> #2  0x000000558fc4947c in disc_att_send_op (data=3D0x559c1a6c30) at src/s=
-hared/att.c:417
-> #3  0x000000558fc43c18 in queue_remove_all (queue=3D<optimized out>, func=
-tion=3Dfunction@entry=3D0x0, user_data=3Duser_data@entry=3D0x0, destroy=3Dd=
-estroy@entry=3D0x558fc49450 <disc_att_send_op>) at src/shared/queue.c:353
-> #4  0x000000558fc4b7b8 in disconnect_cb (io=3D<optimized out>, user_data=
-=3D0x559c1bbe00) at src/shared/att.c:635
-> #5  0x000000558fc586e8 in watch_callback (channel=3D<optimized out>, cond=
-=3D<optimized out>, user_data=3D<optimized out>) at src/shared/io-glib.c:17=
-0
-> #6  0x0000007fb94ed66c in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-> #7  0x0000007fb94edaf8 in ?? () from /usr/lib/libglib-2.0.so.0
-> #8  0x0000007fb94edf00 in g_main_loop_run () from /usr/lib/libglib-2.0.so=
-.0
-> #9  0x000000558fc58e78 in mainloop_run () at src/shared/mainloop-glib.c:7=
-9
-> #10 0x000000558fc59394 in mainloop_run_with_signal (func=3D<optimized out=
->, user_data=3D0x0) at src/shared/mainloop-notify.c:201
-> #11 0x000000558fba2c3c in main (argc=3D<optimized out>, argv=3D<optimized=
- out>) at src/main.c:770
-> (gdb) bt full
-> #0  queue_remove (queue=3D0x559c1b6d40, data=3Ddata@entry=3D0x559c1c7d00)=
- at src/shared/queue.c:259
->         entry =3D <error reading variable entry (Cannot access memory at =
-address 0x59)>
->         prev =3D 0x51
-> #1  0x000000558fc4f928 in enable_ccc_callback (opcode=3D<optimized out>, =
-pdu=3D<optimized out>, length=3D<optimized out>, user_data=3D0x559c1c7d00) =
-at src/shared/gatt-client.c:1627
->         notify_data =3D 0x559c1c7d00
->         att_ecode =3D <optimized out>
->         __PRETTY_FUNCTION__ =3D "enable_ccc_callback"
-> #2  0x000000558fc4947c in disc_att_send_op (data=3D0x559c1a6c30) at src/s=
-hared/att.c:417
->         op =3D 0x559c1a6c30
-> #3  0x000000558fc43c18 in queue_remove_all (queue=3D<optimized out>, func=
-tion=3Dfunction@entry=3D0x0, user_data=3Duser_data@entry=3D0x0, destroy=3Dd=
-estroy@entry=3D0x558fc49450 <disc_att_send_op>) at src/shared/queue.c:353
->         tmp =3D 0x559c1b14a0
->         entry =3D 0x0
->         count =3D 9
-> #4  0x000000558fc4b7b8 in disconnect_cb (io=3D<optimized out>, user_data=
-=3D0x559c1bbe00) at src/shared/att.c:635
->         chan =3D 0x559c1bbe00
->         att =3D 0x559c1c8890
->         err =3D 110
->         len =3D 4
-> #5  0x000000558fc586e8 in watch_callback (channel=3D<optimized out>, cond=
-=3D<optimized out>, user_data=3D<optimized out>) at src/shared/io-glib.c:17=
-0
->         watch =3D <optimized out>
->         result =3D <optimized out>
->         destroy =3D <optimized out>
-> #6  0x0000007fb94ed66c in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-> No symbol table info available.
-> #7  0x0000007fb94edaf8 in ?? () from /usr/lib/libglib-2.0.so.0
-> No symbol table info available.
-> #8  0x0000007fb94edf00 in g_main_loop_run () from /usr/lib/libglib-2.0.so=
-.0
-> No symbol table info available.
-> #9  0x000000558fc58e78 in mainloop_run () at src/shared/mainloop-glib.c:7=
-9
-> No locals.
-> #10 0x000000558fc59394 in mainloop_run_with_signal (func=3D<optimized out=
->, user_data=3D0x0) at src/shared/mainloop-notify.c:201
->         data =3D 0x559c199170
->         io =3D 0x559c19a330
->         ret =3D <optimized out>
-> #11 0x000000558fba2c3c in main (argc=3D<optimized out>, argv=3D<optimized=
- out>) at src/main.c:770
->         context =3D <optimized out>
->         err =3D 0x0
->         sdp_flags =3D <optimized out>
->         gdbus_flags =3D <optimized out>
->         __func__ =3D "main"
->
->
-> And here's the log from bluetoothd while this happens:
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Read Report Reference descri=
-ptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:01 hostname bluetoothd[434271]: Protocol Mode characteristic=
- read failed: Request attribute has encountered an unlikely error
-> Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Main process exit=
-ed, code=3Ddumped, status=3D11/SEGV
-> Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Failed with resul=
-t 'core-dump'.
-> Jun 24 22:39:02 hostname systemd[1]: bluetooth.service: Scheduled restart=
- job, restart counter is at 1.
-> Jun 24 22:39:02 hostname systemd[1]: Stopped Bluetooth service.
-> Jun 24 22:39:02 hostname systemd[1]: Starting Bluetooth service...
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Bluetooth daemon 5.54
-> Jun 24 22:39:02 hostname systemd[1]: Started Bluetooth service.
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Starting SDP server
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Bluetooth management interfa=
-ce 1.16 initialized
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Failed to set privacy: Rejec=
-ted (0x0b)
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Endpoint registered: sender=
-=3D:1.53 path=3D/MediaEndpoint/A2DPSink/sbc
-> Jun 24 22:39:02 hostname bluetoothd[436294]: Endpoint registered: sender=
-=3D:1.53 path=3D/MediaEndpoint/A2DPSource/sbc
-> Jun 24 22:39:08 hostname bluetoothd[436294]: No cache for E6:25:BB:xx:xx:=
-xx
-> Jun 24 22:39:08 hostname bluetoothd[436294]: BATT attribute not found
-> Jun 24 22:39:08 hostname bluetoothd[436294]: batt-profile profile accept =
-failed for E6:25:BB:xx:xx:xx
-> Jun 24 22:39:08 hostname bluetoothd[436294]: GAP attribute not found
-> Jun 24 22:39:08 hostname bluetoothd[436294]: gap-profile profile accept f=
-ailed for E6:25:BB:xx:xx:xx
-> Jun 24 22:39:08 hostname bluetoothd[436294]: input-hog profile accept fai=
-led for E6:25:BB:xx:xx:xx
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:11 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:21 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:33 hostname bluetoothd[436294]: Report Map parsing failed at=
- 87
-> Jun 24 22:39:33 hostname bluetoothd[436294]: Failed to connection details=
-: getpeername: Transport endpoint is not connected (107)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:40 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:41 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:39:47 hostname bluetoothd[436294]: Write output report failed: =
-Request attribute has encountered an unlikely error
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic =
-descriptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic =
-descriptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic =
-descriptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Report Map parsing failed at=
- 65
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Failed to connection details=
-: getpeername: Transport endpoint is not connected (107)
-> Jun 24 22:40:01 hostname bluetoothd[436294]: Write report characteristic =
-descriptor failed: Request attribute has encountered an unlikely error
-> Jun 24 22:40:04 hostname bluetoothd[436294]: No cache for E6:25:BB:xx:xx:=
-xx
-> Jun 24 22:40:08 hostname bluetoothd[436294]: Unable to register org.bluez=
-.Battery1 interface for /org/bluez/hci0/dev_E6_25_BB_xx_xx_xx
-> Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:09 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:40:43 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:14 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:15 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:49 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:50 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:57 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:41:58 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:23 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:24 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed: =
-Request attribute has encountered an unlikely error
-> Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed: =
-Request attribute has encountered an unlikely error
-> Jun 24 22:42:30 hostname bluetoothd[436294]: Write output report failed: =
-Request attribute has encountered an unlikely error
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:30 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:44 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:54 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:42:55 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:06 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
-> Jun 24 22:43:16 hostname bluetoothd[436294]: bt_uhid_send: Invalid argume=
-nt (22)
->
-> I guess this latter would be more useful with --debug=3D<something>, but =
-I'm not sure what would be a good option there. If it helps, I'd be happy t=
-o retest this with the debug parameter to bluetoothd.
->
-> Is this (MX Keys or BLE) something that's been known to confuse bluez?
+Thanks for the note here. 8208f5a9d435e58ee7f53a24d9ccbe7787944537 is
+the cause of this, I will upload a fix shortly to address the
+distinguishment between tearing down hdev and user space request.
 
-Thanks for the report, Ive sent a tentative fix for the problem above:
+Regards,
+Miao
 
-https://lore.kernel.org/linux-bluetooth/20200625211125.2239435-1-luiz.dentz=
-@gmail.com/T/#u
 
---=20
-Luiz Augusto von Dentz
+On Tue, Jun 23, 2020 at 11:44 PM Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+>
+> Hi Pavel,
+>
+> > I'm getting this at boot:
+> >
+> > [    7.984584] *pdpt =3D 0000000033a31001 *pde =3D 0000000000000000
+> > [    7.984584] Oops: 0000 [#1] PREEMPT SMP PTI
+> > [    7.984584] CPU: 1 PID: 2532 Comm: systemd-udevd Not tainted
+> > 5.8.0-rc2-next-20200623+ #126
+> > [    7.998580] Hardware name: LENOVO 17097HU/17097HU, BIOS 7BETD8WW
+> > (2.19 ) 03/31/2011
+> > [    8.000592] EIP: __queue_work+0x139/0x320
+> > [    8.000592] Code: 90 83 7d f0 08 0f 84 b6 00 00 00 8b 45 ec 8b 9f
+> > 04 01 00 00 03 1c 85 40 63 1f c5 89 f0 e8 df f8 ff ff 85 c0 0f 85 4f
+> > ff ff ff <8b> 03 e9 50 ff ff ff 89 45 e4 e8 48 0a cb 00 8b 4d e8 8b 45
+> > e4 8b
+> > [    8.007883] EAX: 00000000 EBX: 00000000 ECX: 47d88848 EDX: 03ffffff
+> > [    8.007883] ESI: f4a348bc EDI: f492a600 EBP: f3b1dd0c ESP: f3b1dcf0
+> > [    8.019981] DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068 EFLAGS:
+> > 00010046
+> > [    8.023156] CR0: 80050033 CR2: 00000000 CR3: 33b1e000 CR4: 000006b0
+> > [    8.028892] Call Trace:
+> > [    8.034199]  queue_work_on+0x1d/0x30
+> > [    8.034199]  hci_adv_monitors_clear+0x5c/0x80
+> > [    8.042158]  hci_unregister_dev+0x161/0x2f0
+> > [    8.042158]  ? usb_disable_endpoint+0x94/0xa0
+> > [    8.042158]  btusb_disconnect+0x4b/0x120
+> > [    8.057018]  usb_unbind_interface+0x64/0x230
+> > [    8.057018]  device_release_driver_internal+0xc1/0x180
+> > [    8.065196]  device_release_driver+0xc/0x10
+> > [    8.068040]  bus_remove_device+0xa8/0x110
+> > [    8.071767]  device_del+0x126/0x370
+> > [    8.071767]  ? usb_remove_ep_devs+0x15/0x20
+> > [    8.079199]  ? remove_intf_ep_devs+0x30/0x50
+> > [    8.081371]  usb_disable_device+0x8e/0x240
+> > [    8.087478]  usb_set_configuration+0x47c/0x800
+> > [    8.087478]  usb_deauthorize_device+0x36/0x50
+> > [    8.092662]  authorized_store+0x5d/0x70
+> > [    8.096608]  ? authorized_default_store+0x60/0x60
+> > [    8.096608]  dev_attr_store+0x13/0x20
+> > [    8.096608]  ? component_bind_all.cold+0x52/0x52
+> > [    8.106151]  sysfs_kf_write+0x2f/0x50
+> > [    8.106151]  ? sysfs_file_ops+0x50/0x50
+> > [    8.106151]  kernfs_fop_write+0x105/0x1a0
+> > [    8.106151]  ? kernfs_fop_open+0x3c0/0x3c0
+> > [    8.106151]  __vfs_write+0x2b/0x1e0
+> > [    8.106151]  ? lock_acquire+0x3f/0x70
+> > [    8.106151]  ? vfs_write+0x12a/0x180
+> > [    8.106151]  ? __sb_start_write+0xd6/0x180
+> > [    8.106151]  ? vfs_write+0x12a/0x180
+> > [    8.106151]  vfs_write+0xa1/0x180
+> > [    8.106151]  ksys_write+0x5c/0xd0
+> > [    8.106151]  __ia32_sys_write+0x10/0x20
+> > [    8.106151]  do_syscall_32_irqs_on+0x3a/0xf0
+> > [    8.106151]  do_int80_syscall_32+0x9/0x20
+> > [    8.106151]  entry_INT80_32+0x116/0x116
+> > [    8.106151] EIP: 0xb7f45092
+> > [    8.106151] Code: Bad RIP value.
+> > [    8.146079] EAX: ffffffda EBX: 00000007 ECX: 004fb760 EDX: 00000001
+> > [    8.146079] ESI: 004fb760 EDI: 00000001 EBP: 004c79f0 ESP: bfabc48c
+> > [    8.146079] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS:
+> > 00000246
+> > [    8.150364] Modules linked in:
+> > [    8.150364] CR2: 0000000000000000
+> > [    8.150364] ---[ end trace 468d097aaf220284 ]---
+>
+> I assume this is caused by commit e5e1e7fd470ccf2eb38ab7fb5a3ab0fc4792fe5=
+3 and mainly because it triggers the background scan workqueue. I think we =
+need to distinguish clearing the monitors when removing the controller comp=
+ared to clearing the controllers from bluetoothd as a runtime operation.
+>
+> Regards
+>
+> Marcel
+>
