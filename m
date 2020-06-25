@@ -2,100 +2,84 @@ Return-Path: <SRS0=OFBO=AG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44122C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D92C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:34:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DA1720768
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:26:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BC5QnNm/"
+	by mail.kernel.org (Postfix) with ESMTP id C39BF20768
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jun 2020 23:34:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390827AbgFYX0f (ORCPT
+        id S1725859AbgFYXeR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jun 2020 19:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45472 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389740AbgFYX0e (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jun 2020 19:26:34 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9FCC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 16:26:34 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id j12so3770038pfn.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2020 16:26:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wcg6bLKAHJ0/BxsC+brekPNOiBl21FKQYq+hY1Ge/R8=;
-        b=BC5QnNm/L9fi0/7m8QzEN2dxwRm+UEWAUD0wfyKtJN3dH3RSF2OfNu+WtclANsPrj0
-         tccUpSmsJU6AXH4UrZsO6uoZhCt2UkUkc+F3mD5CpUKXZYyuWLUNOGBNl2XGZYTF3WZr
-         ijY/VFyXQ74HchwLZNMFyPvcLQOxOcA/UoQ0M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wcg6bLKAHJ0/BxsC+brekPNOiBl21FKQYq+hY1Ge/R8=;
-        b=gV07oxG4aJVTbGbKMcwnei6MGeNZDM0vsYgSw3GljvuRxfUR//NXwNXggO+IsXKJ6D
-         DJrgRQQp8UgJpn+zbcGZj1gsKnJZcmcdNuA4SLY/9/jt00wg6wTbmXa89ESFAByRCDfy
-         KWZMXiMbj51O8vM9i0huxw2nuSA8WmYSgo55dBplr9TetjCbNEWBv7epYBCO7fG0vhY/
-         +W6J0FBFOo0Emg5134xaCnzwdx6FewcOGwhK4PcEkcl4i8JKX840P23O4RQaATm0S5hB
-         gY6M6K3B/R9hIiUG1/chZaVUFV5rlBPn6aRZcLYZSBuWZtI1bctmuT+tB+FtinHFrgoU
-         6Eog==
-X-Gm-Message-State: AOAM532YJEgY6yL5JwAH9Al0yUv+FkjVwrpYoCAOn4mx8jwuYjFwGP60
-        FcV1w0gaKm4gOi9302qLAUJgNQ==
-X-Google-Smtp-Source: ABdhPJxbIKdpaqZK2+wHlfbZwwz6bF78GirDWwQUzayQq/pWbTr2e2gviyY7c0WS4IBaYh/15HOjxg==
-X-Received: by 2002:a63:182:: with SMTP id 124mr232820pgb.288.1593127594156;
-        Thu, 25 Jun 2020 16:26:34 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id f207sm8901936pfa.107.2020.06.25.16.26.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2020 16:26:33 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, Oliver Neukum <oneukum@suse.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-pm@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Comment on unbalanced pm reference
-Date:   Thu, 25 Jun 2020 16:26:27 -0700
-Message-Id: <20200625162544.1.Iea2fbf7a284191c0f09c2ffbe8c14b872d0f68b2@changeid>
-X-Mailer: git-send-email 2.27.0.111.gc72c7da667-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 25 Jun 2020 19:34:17 -0400
+Received: from mga09.intel.com ([134.134.136.24]:61107 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725841AbgFYXeR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 25 Jun 2020 19:34:17 -0400
+IronPort-SDR: rOiXKiCX/QhbIuXPycB8Z+ooBaS28FuiytJxVKmERndf9rKzq+z+IP/oBWhvhlYUTVuax/p9mS
+ NYgrUTPoLRUg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="146624254"
+X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; 
+   d="scan'208";a="146624254"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2020 16:34:16 -0700
+IronPort-SDR: W1Lzd/qR21p41Tmiild9HahgKzxd81KsMQqVRmKTA1ZmcsaEg97WEe9fij7CwYryOLfvvHcPxz
+ HAMzAXipYQig==
+X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; 
+   d="scan'208";a="265486311"
+Received: from han1-xps-13-9350.jf.intel.com ([10.54.74.33])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2020 16:34:16 -0700
+Message-ID: <c77abd13007953bce8b42203d4ec08c756832df1.camel@linux.intel.com>
+Subject: [BlueZ PATCH] btp: Update connect event structure
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     Linux Bluetooth Mailing List <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 25 Jun 2020 16:34:15 -0700
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add a comment clarifying that a PM reference in btusb_qca_cmd_timeout is
-not unbalanced because it results in a device reset.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+This patch updates the connect event struct to align withe the btp spec.
+
+  Opcode 0x82 - Device Connected event
+    Controller Index:	<controller id>
+    Event parameters:	Address_Type (1 octet)
+			Address (6 octets)
+			Connection Interval (2 octets)
+			Connection Latency (2 octets)
+			Supervision Timeout (2 octets)
+
+  This event indicates that a device was connected.
 ---
+ src/shared/btp.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f8a71fdabb3d1b..0e143c0cecf2a1 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -581,6 +581,7 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
- 		return;
+diff --git a/src/shared/btp.h b/src/shared/btp.h
+index f0ac3a1ee..cc71a71df 100644
+--- a/src/shared/btp.h
++++ b/src/shared/btp.h
+@@ -259,6 +259,9 @@ struct btp_device_found_ev {
+ struct btp_gap_device_connected_ev {
+ 	uint8_t address_type;
+ 	bdaddr_t address;
++	uint16_t connection_interval;
++	uint16_t connection_latency;
++	uint16_t supervision_timeout;
+ } __packed;
  
- 	bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
-+	/* This is not an unbalanced PM reference since the device will reset */
- 	err = usb_autopm_get_interface(data->intf);
- 	if (!err)
- 		usb_queue_reset_device(data->intf);
+ #define BTP_EV_GAP_DEVICE_DISCONNECTED		0x83
 -- 
-2.27.0.111.gc72c7da667-goog
+2.17.1
+
 
