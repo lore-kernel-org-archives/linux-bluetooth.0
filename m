@@ -2,104 +2,118 @@ Return-Path: <SRS0=vuCz=AH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0ACCC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 17:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF872C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 20:53:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89206206DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 17:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F37F20720
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 20:53:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C+Q859+l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgFZRd4 (ORCPT
+        id S1725823AbgFZUxM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jun 2020 13:33:56 -0400
-Received: from mga18.intel.com ([134.134.136.126]:61151 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725977AbgFZRdz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jun 2020 13:33:55 -0400
-IronPort-SDR: bBDyGK6TzE3RUJZq0VzzO8sGkqTlzLdmwSuF0WRQlgSJB6o2f1J81UnDKKV+RUfyMTwt/xKiSp
- TBBZIELIjgRg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9664"; a="132827650"
-X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
-   d="scan'208";a="132827650"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2020 10:33:54 -0700
-IronPort-SDR: DIRoWrO4YMjg2CWLSXiCTe+BZJiLpQdwwHrEHYHOdpGerbyhii+oTPkuzUOeun6w9zV2Un3nDe
- 79Y4xDqQZWzg==
-X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
-   d="scan'208";a="480070565"
-Received: from han1-mobl3.jf.intel.com ([10.254.109.237])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2020 10:33:54 -0700
-Message-ID: <01396c1298c1d34127aa6a164f59adc15aa3b7af.camel@linux.intel.com>
-Subject: Re: [BlueZ PATCH V2] btp: Update connect event structure
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Linux Bluetooth Mailing List <linux-bluetooth@vger.kernel.org>
-Date:   Fri, 26 Jun 2020 10:33:53 -0700
-In-Reply-To: <CABBYNZJ34-f3_2vZStRaghc8jn9YPPc+Av93bBOuU1Jek7Fprg@mail.gmail.com>
-References: <37bbc9912da0efcf5e7afd252eba90309f53c79a.camel@linux.intel.com>
-         <CABBYNZJ34-f3_2vZStRaghc8jn9YPPc+Av93bBOuU1Jek7Fprg@mail.gmail.com>
-Organization: Intel Corporation
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+        Fri, 26 Jun 2020 16:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46102 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725803AbgFZUxM (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Jun 2020 16:53:12 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB19C03E979
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2020 13:53:11 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id v1so6179160vsb.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2020 13:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=F28DKKzLmbR7W73UOUFS8FIZyK/mYYGjEUVIdBnpyC8=;
+        b=C+Q859+lsX0buzzJl3WTARLJc6834nPZxLq4uL9mnv7kXzJsp/jEo+kjLiXxYuGg5a
+         wRxn82t0r4YmP9iPQFPbwj0L3JKlkKflBxFSRqdV0QfQINizYTKQUsxtrauF4GUmFSWM
+         k1LLW4UfmiMGHp1w5GiVJQa4F1CfQ659GcEpI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=F28DKKzLmbR7W73UOUFS8FIZyK/mYYGjEUVIdBnpyC8=;
+        b=X8NK1KSwPgIp26AmwWLOavjwJJ81Xu25C49pS8MI9AWr+fGC0GAfxdHypIobI3ivT4
+         PsrAmDEnl/BSd1CjJxI2Q9WMI7vmPhQbwEKQkQSGNO/t//wcvUioqqFdaDnftU04+WeW
+         brheEeeWVh6BmYFAmO3f5Mkdp10w/LoihahJloFwERVslfO5G56PL/dTxPW9GOHeWhkK
+         17qvr5omPuxHTAF28xF2SEEBfNl3s8Kp0laBS7Ui2f/lJSdiiLMhUseq9MTfD7/BTNvv
+         4XcHVzssn2FxvXbrFN2ldNO76fw3oW9rkhW9xNQ3A2D1xePfgIQD45zNZNwHRueZWq+K
+         mPxw==
+X-Gm-Message-State: AOAM530dndYiHHJx0B3P92ynMcZmg4AHdZmwx0Xo6ogQQWPZ4hvGdXNP
+        Kr600F9gi51RG111mZqc1Lh07DLySxM=
+X-Google-Smtp-Source: ABdhPJyNOqJqdE6aKhNsM9Xvku5VKC3vR1BhBywuNwxxoixVCnjuFjTFfuIUqQS/acH0bjRiFKr9Xw==
+X-Received: by 2002:a67:eaca:: with SMTP id s10mr3984018vso.58.1593204790787;
+        Fri, 26 Jun 2020 13:53:10 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id i203sm4299185vke.7.2020.06.26.13.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2020 13:53:10 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [BlueZ PATCH v1] profiles/scanparam: use configured scanparams when available
+Date:   Fri, 26 Jun 2020 20:53:06 +0000
+Message-Id: <20200626205306.803784-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz
+This patch updates the scan parameter service to use the configured scan
+parameters when available rather than the hardcoded kernel defaults.
 
-On Fri, 2020-06-26 at 09:58 -0700, Luiz Augusto von Dentz wrote:
-> Hi Tedd,
-> 
-> On Thu, Jun 25, 2020 at 5:10 PM Tedd Ho-Jeong An
-> <tedd.an@linux.intel.com> wrote:
-> > From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > 
-> > This patch updates the connect event struct to align withe the btp spec.
-> > 
-> >  Opcode 0x82 - Device Connected event
-> >     Controller Index:   <controller id>
-> >     Event parameters:   Address_Type (1 octet)
-> >                         Address (6 octets)
-> >                         Connection Interval (2 octets)
-> >                         Connection Latency (2 octets)
-> >                         Supervision Timeout (2 octets)
-> > ---
-> >  src/shared/btp.h | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/src/shared/btp.h b/src/shared/btp.h
-> > index f0ac3a1ee..cc71a71df 100644
-> > --- a/src/shared/btp.h
-> > +++ b/src/shared/btp.h
-> > @@ -259,6 +259,9 @@ struct btp_device_found_ev {
-> >  struct btp_gap_device_connected_ev {
-> >         uint8_t address_type;
-> >         bdaddr_t address;
-> > +       uint16_t connection_interval;
-> > +       uint16_t connection_latency;
-> > +       uint16_t supervision_timeout;
-> >  } __packed;
-> 
-> This appears to be an API break, or we don't for BTP to be stable?
+---
 
-It was old change and this patch was to align the change for BlueZ.
-All other projects using BTP such as Zephyr and Mynewt are already using new
-change.
+ profiles/scanparam/scan.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-> 
-> >  #define BTP_EV_GAP_DEVICE_DISCONNECTED         0x83
-> > --
-> > 2.17.1
-> > 
-> > 
-> 
-> 
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 9e8f57747..fd22b876b 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -45,12 +45,11 @@
+ #include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-client.h"
+ #include "attrib/att.h"
++#include "src/hcid.h"
+ 
+ #define SCAN_INTERVAL_WIN_UUID		0x2A4F
+ #define SCAN_REFRESH_UUID		0x2A31
+ 
+-#define SCAN_INTERVAL		0x0060
+-#define SCAN_WINDOW		0x0030
+ #define SERVER_REQUIRES_REFRESH	0x00
+ 
+ struct scan {
+@@ -75,8 +74,15 @@ static void write_scan_params(struct scan *scan)
+ {
+ 	uint8_t value[4];
+ 
+-	put_le16(SCAN_INTERVAL, &value[0]);
+-	put_le16(SCAN_WINDOW, &value[2]);
++	/* Unless scan parameters are configured, use the known kernel default
++	 * parameters */
++	put_le16(main_opts.default_params.le_scan_interval_autoconnect ?
++			main_opts.default_params.le_scan_interval_autoconnect :
++			0x60, &value[0]);
++
++	put_le16(main_opts.default_params.le_scan_win_autoconnect ?
++			main_opts.default_params.le_scan_win_autoconnect :
++			0x30, &value[2]);
+ 
+ 	bt_gatt_client_write_without_response(scan->client, scan->iwhandle,
+ 						false, value, sizeof(value));
+-- 
+2.27.0.212.ge8ba1cc988-goog
 
