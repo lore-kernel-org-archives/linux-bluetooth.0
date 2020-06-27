@@ -1,117 +1,160 @@
-Return-Path: <SRS0=vuCz=AH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=tE/w=AI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689A3C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 22:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2238C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Jun 2020 10:55:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4291320B1F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jun 2020 22:18:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CBE22081A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Jun 2020 10:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sf2MaWE6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CFSyJ0bI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725852AbgFZWSN (ORCPT
+        id S1726515AbgF0KzV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jun 2020 18:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59456 "EHLO
+        Sat, 27 Jun 2020 06:55:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725803AbgFZWSM (ORCPT
+        with ESMTP id S1726489AbgF0KzS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jun 2020 18:18:12 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CA1C03E979
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2020 15:18:12 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id c139so10213760qkg.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2020 15:18:12 -0700 (PDT)
+        Sat, 27 Jun 2020 06:55:18 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D5FC03E97A
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2020 03:55:18 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id c22so8416318qtp.9
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2020 03:55:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=hrjm8k8kWaANozoyI/5q79U7jBzJEkOuzq49IzTOrTI=;
-        b=Sf2MaWE6WJo7TSCvfuXj+P0dAoZNsn3xEW2w5Va2CC9oC4qsS52sQnmmw1opSdJtfS
-         Nv7ce46WuOKWcKAaBr22kAn2mkbROKNCqsDFaEqcRcyNikXcaI9qJj3GaoxlsGbKL5Q1
-         dh/dw+vFFu+SB0h84ZuZfLM9/RS5wSWfEUqAySA2KDP8EAF6UohQABK9I8b5gVxiGACn
-         FhWT4d4QAIKtxIXelRieBSTc/hkmXwTWUJWessZ2O3dp9/O/Aky0j+Fu2bXtJU5xp18X
-         P00l4V/o4MWiLnPCNEVZ6ZEuyf5nNfA0dErwz9+KGj+nllXxB2o3//cJaOEupXxTmPZj
-         WU3g==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=2mGLRB8uPJH0YAc6/MnuRKvu/ULwpMyORujULmy6i+Y=;
+        b=CFSyJ0bICK6PSFwxqgsKeGzYSTf3+XF6VyPV1mxWmPtx/T7LIDNx3b7BhCtOBIIDDx
+         saGvGu2IHmNTAOrP8wRR096LqlWYrXj6vX3u9H9hb1gR2ZT9gChh2qHo7CuK6xU26mTh
+         ugeGeXGZ9MbvssjMHININc8bbLPjlLXPkoCIiEPwf7GUa9OOYY7gS4hG174IOCKxcRQB
+         52/ocKW0PH3or+OyzC+1CMniDj0bgj2WboitomX96J2RhgbQvs3x3UQ3ta0s1ihzYn3J
+         e8rOzsvk4k1kOM2ylfw4mG90zyfUw+UALtIWI3DKROLFhN7b9lRxzdSBmdSFytYy0S1q
+         gm8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=hrjm8k8kWaANozoyI/5q79U7jBzJEkOuzq49IzTOrTI=;
-        b=D7gkm0uQ6QX2p/8OkqGg1cip3JoIxkvLSp8nYTGd28waidP4U55GWr/ZGlGZpfzA94
-         ovgbQSjaQkjQbRNhk2ZlIYUMgNsBA2FQjchCh8xXbjjg20YV2ED1LQupwa6ynCixs9+T
-         2PUSGaYIEi/uCZ3YzF00zmIv8EzjCboU67munplLK8hyIB+rsPCLWTb80b+1pZqPGp3X
-         hpHw/J//APZTfHLLu2ks2UJY5jjzfG+11uogSynl4TizY0eIiPLEI1KXxZUu9OyqoBz7
-         U12/5hy1T5qoeQQpPfKgX0YXRQy20Lf/1iyvLBZXyoCWkWCUblNDlot7RWICxfQxpnU2
-         gdPA==
-X-Gm-Message-State: AOAM533H41Q8jlZWcGagxxRJcvx1g2x73Bqs8ZGYW6jvmN2cHnWTH1uJ
-        ITlHfxf0leqCuf26xRqFI7Rv0IJTGU0=
-X-Google-Smtp-Source: ABdhPJyeq/10i3avnKRHd99k8bxpGKOF66Mi6KYCRRlmwlPoK0Z2CnL8Cd0uGgSZl8MvSrMZ02S2XA==
-X-Received: by 2002:a37:d0d:: with SMTP id 13mr5264389qkn.234.1593209891403;
-        Fri, 26 Jun 2020 15:18:11 -0700 (PDT)
-Received: from [172.17.0.2] ([52.177.116.116])
-        by smtp.gmail.com with ESMTPSA id r7sm9180008qtm.66.2020.06.26.15.18.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2020 15:18:10 -0700 (PDT)
-Message-ID: <5ef67422.1c69fb81.cd3a3.4600@mx.google.com>
-Date:   Fri, 26 Jun 2020 15:18:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7677329624274572586=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: [BlueZ] mesh: Clean up config model publication set
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200626215907.201532-1-inga.stotland@intel.com>
-References: <20200626215907.201532-1-inga.stotland@intel.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=2mGLRB8uPJH0YAc6/MnuRKvu/ULwpMyORujULmy6i+Y=;
+        b=VkOvxxBgqImk25LUSNqOfCRsh5aW7RqiVkMsg6WOP8RlwuOaqtsDh1Z2VeL9Zhk0QH
+         MYScVGbAqGh/k6SNW2rPj7uS0MVt0M0UW5NKAFSvq/1wtiC8MZX99l8P8T5YMffhMZwo
+         ixIT4lw7MiHXXCEt1LUQTjFHs7bNZ3d9PMv3nEEoLPMuSnn+6dlAalWckFHGnuBGVEMn
+         zQxzmQ3YAdix2qVc5MKwNgiocvm9rxU+ln0BOsJqyN3eTgfAZjV8EgHjgXqAvHLSxeYl
+         9owK3M0Mh/+HP9jctiJ33AN8hoh8QQcHaBVLjZTVMcnu5HXt1WVEevNlrMDHLZiKRLhA
+         naGQ==
+X-Gm-Message-State: AOAM5309M9vaHFhaPbwvnj9bVMjRG0LEaMlaPq7Eo8Md1KKxVTfjhTqa
+        hV0w3wp7j8N7CF3uTsmNOZR93l90WA8UC/gcEeK8QgDeeH3F3w45HRE2XQ2F8tbkKtb4Or6kTAH
+        ALLNKcq4IoUrLF04SQkB+sAv5nvpwqcjwxDWVOHgOj2Z8nLsJEQOJWgLpRlSVcRqeCyNz7GcCFx
+        1a
+X-Google-Smtp-Source: ABdhPJzFb0bs+uHa25I0jEdxFh7meeHE5nAwPlh1GDjMeAg0Vyn7GKxVw0jxJChgt4g//OSkf+6aRc6Oouf/
+X-Received: by 2002:a05:6214:5a3:: with SMTP id by3mr7193441qvb.201.1593255315932;
+ Sat, 27 Jun 2020 03:55:15 -0700 (PDT)
+Date:   Sat, 27 Jun 2020 18:54:35 +0800
+Message-Id: <20200627105437.453053-1-apusaka@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+Subject: [RFC PATCH v1 0/2] handle USB endpoint race condition
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7677329624274572586==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Archie Pusaka <apusaka@chromium.org>
+
+On platforms with USB transport, events and data are transferred via
+different endpoints. This could potentially cause ordering problems,
+where the order of processed information is different than the actual
+order.
+
+One such a case is we receive a ACL packet before receiving the
+connect complete event. This could be frequently observed on ChromeOS
+auto test setup.
+
+> ACL Data RX: Handle 256 flags 0x02 dlen 12       #6 [hci0] 9.314240
+      L2CAP: Connection Request (0x02) ident 1 len 4
+        PSM: 1 (0x0001)
+        Source CID: 1536
+> HCI Event: Connect Complete (0x03) plen 11       #7 [hci0] 9.333236
+        Status: Success (0x00)
+        Handle: 256
+        Address: 70:BF:92:CF:95:B7 (OUI 70-BF-92)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+
+If this happens, we will simply discard the ACL packet, since no
+corresponding handle is registered yet. The situation where the ACL
+packet is not replied by us is handled differently by each peripheral:
+some will resend the ACL packet (which will be successful, since the
+handle can be found now), but some will get upset and disconnect.
+
+To prevent this from happening, we propose to introduce a queue. So,
+instead of discarding those packets without handle, we put them in a
+queue. Then, we will process this queue when we receive a connect
+completion event for the matching handle. The queued packets will be
+cleared if after 2 seconds we still don't receive the corresponding
+connect complete event.
+
+Similarly, there is a chance that the incoming L2CAP connection
+request comes before HCI encryption change event. When this happens,
+the incoming connection will be refused.
+> ACL Data RX: Handle 256 flags 0x02 dlen 12      #46 [hci0] 9.275297
+      L2CAP: Connection Request (0x02) ident 4 len 4
+        PSM: 3 (0x0003)
+        Source CID: 256
+< ACL Data TX: Handle 256 flags 0x00 dlen 16      #47 [hci0] 9.275393
+      L2CAP: Connection Response (0x03) ident 4 len 8
+        Destination CID: 0
+        Source CID: 256
+        Result: Connection refused - security block (0x0003)
+        Status: No further information available (0x0000)
+> HCI Event: Encryption Change (0x08) plen 4      #51 [hci0] 9.314109
+        Status: Success (0x00)
+        Handle: 256
+        Encryption: Enabled with E0 (0x01)
+
+We propose to handle this case with a similar solution: queuing the
+L2CAP connection request until we receive HCI encryption change.
+
+The proposed patch is tested with a special Intel firmware which
+allows us to purposely delay the "connect complete" event.
+
+We plan to merge this change to ChromeOS auto test setup to see
+whether this could fix the problem there, but we also would like
+to have your input on this in the meantime.
+
+Thanks,
+Archie
 
 
-This is automated email and please do not reply to this email!
+Archie Pusaka (2):
+  Bluetooth: queue ACL packets if no handle is found
+  Bluetooth: queue L2CAP conn req if encryption is needed
 
-Dear submitter,
+ include/net/bluetooth/bluetooth.h |  6 +++
+ include/net/bluetooth/hci_core.h  |  8 +++
+ include/net/bluetooth/l2cap.h     |  6 +++
+ net/bluetooth/hci_core.c          | 84 ++++++++++++++++++++++++++---
+ net/bluetooth/hci_event.c         |  5 ++
+ net/bluetooth/l2cap_core.c        | 87 +++++++++++++++++++++++++++----
+ 6 files changed, 179 insertions(+), 17 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
+-- 
+2.27.0.212.ge8ba1cc988-goog
 
-Test Result:
-checkpatch Failed
-
-Outputs:
-WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
-#174: FILE: mesh/cfgmod-server.c:782:
-+		/* Fall Through */
-
-- total: 0 errors, 1 warnings, 168 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
----
-Regards,
-Linux Bluetooth
-
---===============7677329624274572586==--
