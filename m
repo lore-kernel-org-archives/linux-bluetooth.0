@@ -2,123 +2,104 @@ Return-Path: <SRS0=UgXA=AK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4594EC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0BCC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:39:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23AD5206E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05178206A1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Vf+zZf7k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oVdw+9L7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732760AbgF2Tea (ORCPT
+        id S1733117AbgF2TjA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jun 2020 15:34:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
+        Mon, 29 Jun 2020 15:39:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733024AbgF2Tcm (ORCPT
+        with ESMTP id S2387438AbgF2Thn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:32:42 -0400
-Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6C4C031405
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:04:20 -0700 (PDT)
-Received: by mail-ua1-x942.google.com with SMTP id e3so5561100uan.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:04:20 -0700 (PDT)
+        Mon, 29 Jun 2020 15:37:43 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7FBCC031409
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:07:52 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id o4so9535538lfi.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wUScfTTQZ2UEHLk7DIUgTbQZriky8XElkexhKByLka8=;
-        b=Vf+zZf7k38RgimUpEM1jE0pS2fmK4blEW6nYJD1zI+Jhjh7sYhCvEDT0wU7G8PAsix
-         3Z562XRHnbSia2Oiug1w+WrLVHoShaX/QQfU9RlCScO/GJAFCn6Dhfuquvrpoevo20tf
-         5VijLffaBfZSS4PV61p251M2l5j5dhI8mMTFo=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qNx/RsQ/hx1F8kp3HJnLewdznf5IP/ZW/G1I/H7b9gE=;
+        b=oVdw+9L7cSR/PvaRbhWcisFTB9Jw2uNfX656W/hJa9b2WM+V3PmyZvRxlc178rNY/a
+         oPpXlX00xjo3LtLcX956/48V4wXJNkLabkhFWBNxQda/BI67WdT5N0oUvSdiYmDdSuof
+         SiiC0ftYXZxDH2uZWSoBX3Am0YiFdTZHkMw3XrDze1USyJsrECdAFLN9bFq9T9mejtw/
+         BwHh73aRfcnVyqex7eLgT0HA7G8WvACjj4v3HtWMDC+MsQAuaDt7tVBMnV8up2aGfQbg
+         TjYan4JPaKEs29tvDx0dFXb32bM+zp51vOc2GGfbpBtpihVcTELAiyN1rdHRjpLmIcHd
+         YsnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wUScfTTQZ2UEHLk7DIUgTbQZriky8XElkexhKByLka8=;
-        b=Zp15Zh1PH7WX+vHgXY0eERZA3Fe6XsbR+M8CvjtvJGuqeP4JxYH/jgMNXD8NWvpM/4
-         wXmSwBBX0Gh64um4JahzZ0QFeW2KYdQHhZEgBqJntKwF4OfBFwOJWAE7idp5Ft5cZVTV
-         IcNUmomMjlGFldjh8OLfAuOu/N0M6aSzMNf03Kdibyq81EVEjKs6JprCoPRcKkBpXTA+
-         xYhEk9sshqjzp27JG0PlHtQzg5UKgnP0fKVZkLZH8YMsSc5MkQjAAHawavG4FZv1HhjB
-         1p+FnCxzt+fQGNE94MopHQkvoeolZfyeEA3odnmcr2MgRmiCOgufqbVLtap+tc68wyiC
-         QTTg==
-X-Gm-Message-State: AOAM533ZcmUpASjs91rdlAehsFR2efofyFsnJtexMps7mOSbqyiiDyCd
-        McZislgTzxrqC4uzUAL8yh+72rk1flQ=
-X-Google-Smtp-Source: ABdhPJwwGXCfRKV0alLplVm5rbB5oQM4Fm1xbAUFauKamgRs7aOs34pi1hmuI0+n7inEy8OsNof6bg==
-X-Received: by 2002:ab0:69c4:: with SMTP id u4mr11098485uaq.5.1593450259332;
-        Mon, 29 Jun 2020 10:04:19 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id n9sm23669uaa.18.2020.06.29.10.04.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2020 10:04:18 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v2] Bluetooth: use configured default params for active scans
-Date:   Mon, 29 Jun 2020 17:04:15 +0000
-Message-Id: <20200629170415.3227892-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qNx/RsQ/hx1F8kp3HJnLewdznf5IP/ZW/G1I/H7b9gE=;
+        b=gCAtB8uNYbWDr4DlnEqS0TV4biQHyG5ffLmqjZOwo4w3+kkGAvHI+VBwQPGxBXdLro
+         h13vRs6Od3JpJVGGnkU5HAN4i5cK92GO1XzaU4PIVtNr2lERIEj5mUPY1ZdZESswWNcx
+         VXsg23DIY2FS3I4hHyFaGENcXSKILjuqLt4dNLUMnguDOGmswCue39jKET14024GY/+O
+         nTvbtjquttoNAkb8UzRwa0SFERzyplO/4pGuEvANTYvttj0sYnDm3Zf51O7LWw32ceQF
+         h8jH95I3iczv6kVQeHJqLrVF8pOJ+GqYb9TrUCDecrenewuLFQIjhIyoSuCvFDgXbDAe
+         zk0A==
+X-Gm-Message-State: AOAM530fZcpCtzyxHOIx/LAWcC5yzAU16XgSra2Jy4GpqFPVdLVFIuLD
+        MsYc8EN1E1BB5kLZ9mHVxgyohcAIhpo5hDyirfi4hFCC
+X-Google-Smtp-Source: ABdhPJzXygbeZco41Lhk+6cpVFdmInKkQNlTi69l716j3ZlkTkNDXeSXRyUyzAZko+Q7xEaHs0Ld5LQNcLqb663RwFs=
+X-Received: by 2002:a19:7e09:: with SMTP id z9mr9689801lfc.69.1593450471173;
+ Mon, 29 Jun 2020 10:07:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200601155858.156798-1-alainm@chromium.org>
+In-Reply-To: <20200601155858.156798-1-alainm@chromium.org>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Mon, 29 Jun 2020 13:07:40 -0400
+Message-ID: <CALWDO_WDhOZigHU8SWtkTV1TcUeDRae910fiiHJmiyo8NPp6pg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH] a2dp:fixing typo in endpoint_setconf_ind
+To:     Alain Michaud <alainm@chromium.org>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch fixes active scans to use the configured default parameters.
+Hi Luiz,
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+Just a friendly nudge, this is an easy one :)
 
-Changes in v2:
- - Rebase onto master
+Thanks,
+Alain
 
- net/bluetooth/hci_request.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 116207009dde..68a2ec36e1c1 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -2767,8 +2767,9 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	if (err < 0)
- 		own_addr_type = ADDR_LE_DEV_PUBLIC;
- 
--	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval, DISCOV_LE_SCAN_WIN,
--			   own_addr_type, filter_policy);
-+	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval,
-+			   hdev->le_scan_window_discovery, own_addr_type,
-+			   filter_policy);
- 	return 0;
- }
- 
-@@ -2815,18 +2816,18 @@ static void start_discovery(struct hci_dev *hdev, u8 *status)
- 			 * to do BR/EDR inquiry.
- 			 */
- 			hci_req_sync(hdev, interleaved_discov,
--				     DISCOV_LE_SCAN_INT * 2, HCI_CMD_TIMEOUT,
-+				     hdev->le_scan_int_discovery * 2, HCI_CMD_TIMEOUT,
- 				     status);
- 			break;
- 		}
- 
- 		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
--		hci_req_sync(hdev, active_scan, DISCOV_LE_SCAN_INT,
-+		hci_req_sync(hdev, active_scan, hdev->le_scan_int_discovery,
- 			     HCI_CMD_TIMEOUT, status);
- 		break;
- 	case DISCOV_TYPE_LE:
- 		timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
--		hci_req_sync(hdev, active_scan, DISCOV_LE_SCAN_INT,
-+		hci_req_sync(hdev, active_scan, hdev->le_scan_int_discovery,
- 			     HCI_CMD_TIMEOUT, status);
- 		break;
- 	default:
--- 
-2.27.0.212.ge8ba1cc988-goog
-
+On Mon, Jun 1, 2020 at 11:59 AM Alain Michaud <alainm@chromium.org> wrote:
+>
+> This patch simply fixes a typo in endpoint_setconf_ind.
+>
+> ---
+>
+>  profiles/audio/a2dp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 6f46c92bf..e3d6cfc9e 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -654,7 +654,7 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+>                                                 endpoint_setconf_cb,
+>                                                 a2dp_sep->user_data);
+>                 if (ret == 0) {
+> -                       /* Attempt to reverve discover if there are no remote
+> +                       /* Attempt to reverse discover if there are no remote
+>                          * SEPs.
+>                          */
+>                         if (queue_isempty(setup->chan->seps))
+> --
+> 2.27.0.rc2.251.g90737beb825-goog
+>
