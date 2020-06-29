@@ -2,83 +2,112 @@ Return-Path: <SRS0=UgXA=AK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90941C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 21:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B9BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 21:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7BD63206A1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 21:14:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F164208B6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 21:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388618AbgF2VOU (ORCPT
+        id S1728078AbgF2VYT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jun 2020 17:14:20 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:43155 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729877AbgF2S5l (ORCPT
+        Mon, 29 Jun 2020 17:24:19 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:34467 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729349AbgF2SuQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:57:41 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 012ABCECD6;
-        Mon, 29 Jun 2020 17:51:57 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: fix kernel null pointer dereference error on
- suspend
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200629142600.GA3102@cosmos>
-Date:   Mon, 29 Jun 2020 17:42:02 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <C9C778D8-E453-4400-9475-E5127F5FA575@holtmann.org>
-References: <20200629142600.GA3102@cosmos>
-To:     Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 29 Jun 2020 14:50:16 -0400
+X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 05T63kQL2014575, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmb06.realtek.com.tw[172.21.6.99])
+        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 05T63kQL2014575
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Mon, 29 Jun 2020 14:03:46 +0800
+Received: from RTEXMB04.realtek.com.tw (172.21.6.97) by
+ RTEXMB06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1779.2; Mon, 29 Jun 2020 14:03:46 +0800
+Received: from localhost.localdomain (172.21.87.237) by
+ RTEXMB04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1779.2; Mon, 29 Jun 2020 14:03:46 +0800
+From:   <hildawu@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <matthias.bgg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, <max.chou@realtek.com>,
+        <alex_lu@realsil.com.cn>, <kidman@realtek.com>
+Subject: [PATCH] Bluetooth: btusb: WBS support USB alternate setting 1
+Date:   Mon, 29 Jun 2020 14:03:38 +0800
+Message-ID: <20200629060338.10705-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.21.87.237]
+X-ClientProxiedBy: RTEXMB02.realtek.com.tw (172.21.6.95) To
+ RTEXMB04.realtek.com.tw (172.21.6.97)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vamshi,
+From: Hilda Wu <hildawu@realtek.com>
 
-> BUG Call Trace:
->  queue_work_on+0x39/0x40
->  hci_adv_monitors_clear+0x71/0x90 [bluetooth]
->  hci_unregister_dev+0x18a/0x2f0 [bluetooth]
->  btusb_disconnect+0x68/0x150 [btusb]
->  usb_unbind_interface+0x7f/0x260
->  device_release_driver_internal+0xec/0x1b0
->  device_release_driver+0x12/0x20
->  bus_remove_device+0xe1/0x150
->  device_del+0x17d/0x3e0
->  usb_disable_device+0x9f/0x250
->  usb_disconnect+0xc6/0x270
->  hub_event+0x6da/0x18d0
->  process_one_work+0x20c/0x400
->  worker_thread+0x34/0x400
-> 
-> RIP: 0010:__queue_work+0x92/0x3f0
-> 
-> NULL deference occurs in hci_update_background_scan() while it tries
-> to queue_work on already destroyed workqueues.
-> 
-> Change hci_unregister_dev() to invoke destroy_workqueues after the
-> call to hci_adv_monitors_clear().
-> 
-> Signed-off-by: Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>
-> ---
-> net/bluetooth/hci_core.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+For WBS support, btusb driver could be set to alternate setting 1.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
+---
+ drivers/bluetooth/btusb.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c7cc8e594166..7942f9314fd7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -453,6 +453,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ #define BTUSB_HW_RESET_ACTIVE	12
+ #define BTUSB_TX_WAIT_VND_EVT	13
+ #define BTUSB_WAKEUP_DISABLE	14
++#define BTUSB_WBS_ALT1		15
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -1666,14 +1667,18 @@ static void btusb_work(struct work_struct *work)
+ 				new_alts = data->sco_num;
+ 			}
+ 		} else if (data->air_mode == HCI_NOTIFY_ENABLE_SCO_TRANSP) {
+-
+-			data->usb_alt6_packet_flow = true;
+-
+ 			/* Check if Alt 6 is supported for Transparent audio */
+-			if (btusb_find_altsetting(data, 6))
++			if (btusb_find_altsetting(data, 6)) {
++				data->usb_alt6_packet_flow = true;
+ 				new_alts = 6;
+-			else
++			} else if (test_bit(BTUSB_WBS_ALT1, &data->flags)) {
++				if (btusb_find_altsetting(data, 1))
++					new_alts = 1;
++				else
++					bt_dev_err(hdev, "Device does not support ALT setting 1");
++			} else {
+ 				bt_dev_err(hdev, "Device does not support ALT setting 6");
++			}
+ 		}
+ 
+ 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
+@@ -3965,6 +3970,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		 * (DEVICE_REMOTE_WAKEUP)
+ 		 */
+ 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
++		set_bit(BTUSB_WBS_ALT1, &data->flags);
+ 
+ 		err = usb_autopm_get_interface(intf);
+ 		if (err < 0)
+-- 
+2.17.1
 
