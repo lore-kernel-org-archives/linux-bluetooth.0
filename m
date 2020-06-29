@@ -2,115 +2,123 @@ Return-Path: <SRS0=UgXA=AK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD76AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 18:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4594EC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEE0320663
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 18:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23AD5206E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 19:34:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Vf+zZf7k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727928AbgF2S5m convert rfc822-to-8bit (ORCPT
+        id S1732760AbgF2Tea (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:57:42 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47515 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730012AbgF2S5k (ORCPT
+        Mon, 29 Jun 2020 15:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733024AbgF2Tcm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:57:40 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 806F1CECCA;
-        Mon, 29 Jun 2020 08:29:16 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: btusb: WBS support USB alternate setting 1
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200629060338.10705-1-hildawu@realtek.com>
-Date:   Mon, 29 Jun 2020 08:19:21 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, max.chou@realtek.com,
-        alex_lu@realsil.com.cn, kidman@realtek.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FBDECDBA-A76F-4276-91E0-685DC828EF87@holtmann.org>
-References: <20200629060338.10705-1-hildawu@realtek.com>
-To:     hildawu@realtek.com
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 29 Jun 2020 15:32:42 -0400
+Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6C4C031405
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:04:20 -0700 (PDT)
+Received: by mail-ua1-x942.google.com with SMTP id e3so5561100uan.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 10:04:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wUScfTTQZ2UEHLk7DIUgTbQZriky8XElkexhKByLka8=;
+        b=Vf+zZf7k38RgimUpEM1jE0pS2fmK4blEW6nYJD1zI+Jhjh7sYhCvEDT0wU7G8PAsix
+         3Z562XRHnbSia2Oiug1w+WrLVHoShaX/QQfU9RlCScO/GJAFCn6Dhfuquvrpoevo20tf
+         5VijLffaBfZSS4PV61p251M2l5j5dhI8mMTFo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wUScfTTQZ2UEHLk7DIUgTbQZriky8XElkexhKByLka8=;
+        b=Zp15Zh1PH7WX+vHgXY0eERZA3Fe6XsbR+M8CvjtvJGuqeP4JxYH/jgMNXD8NWvpM/4
+         wXmSwBBX0Gh64um4JahzZ0QFeW2KYdQHhZEgBqJntKwF4OfBFwOJWAE7idp5Ft5cZVTV
+         IcNUmomMjlGFldjh8OLfAuOu/N0M6aSzMNf03Kdibyq81EVEjKs6JprCoPRcKkBpXTA+
+         xYhEk9sshqjzp27JG0PlHtQzg5UKgnP0fKVZkLZH8YMsSc5MkQjAAHawavG4FZv1HhjB
+         1p+FnCxzt+fQGNE94MopHQkvoeolZfyeEA3odnmcr2MgRmiCOgufqbVLtap+tc68wyiC
+         QTTg==
+X-Gm-Message-State: AOAM533ZcmUpASjs91rdlAehsFR2efofyFsnJtexMps7mOSbqyiiDyCd
+        McZislgTzxrqC4uzUAL8yh+72rk1flQ=
+X-Google-Smtp-Source: ABdhPJwwGXCfRKV0alLplVm5rbB5oQM4Fm1xbAUFauKamgRs7aOs34pi1hmuI0+n7inEy8OsNof6bg==
+X-Received: by 2002:ab0:69c4:: with SMTP id u4mr11098485uaq.5.1593450259332;
+        Mon, 29 Jun 2020 10:04:19 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id n9sm23669uaa.18.2020.06.29.10.04.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2020 10:04:18 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v2] Bluetooth: use configured default params for active scans
+Date:   Mon, 29 Jun 2020 17:04:15 +0000
+Message-Id: <20200629170415.3227892-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hilda,
+This patch fixes active scans to use the configured default parameters.
 
-> For WBS support, btusb driver could be set to alternate setting 1.
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
 
-please be more descriptive since this is special for Realtek devices.
+Changes in v2:
+ - Rebase onto master
 
-> 
-> Signed-off-by: Hilda Wu <hildawu@realtek.com>
-> ---
-> drivers/bluetooth/btusb.c | 16 +++++++++++-----
-> 1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index c7cc8e594166..7942f9314fd7 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -453,6 +453,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
-> #define BTUSB_HW_RESET_ACTIVE	12
-> #define BTUSB_TX_WAIT_VND_EVT	13
-> #define BTUSB_WAKEUP_DISABLE	14
-> +#define BTUSB_WBS_ALT1		15
+ net/bluetooth/hci_request.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Use BTUSB_USE_ALT1_FOR_WBS as a more descriptive name.
-
-> 
-> struct btusb_data {
-> 	struct hci_dev       *hdev;
-> @@ -1666,14 +1667,18 @@ static void btusb_work(struct work_struct *work)
-> 				new_alts = data->sco_num;
-> 			}
-> 		} else if (data->air_mode == HCI_NOTIFY_ENABLE_SCO_TRANSP) {
-> -
-> -			data->usb_alt6_packet_flow = true;
-> -
-> 			/* Check if Alt 6 is supported for Transparent audio */
-> -			if (btusb_find_altsetting(data, 6))
-> +			if (btusb_find_altsetting(data, 6)) {
-> +				data->usb_alt6_packet_flow = true;
-> 				new_alts = 6;
-> -			else
-> +			} else if (test_bit(BTUSB_WBS_ALT1, &data->flags)) {
-> +				if (btusb_find_altsetting(data, 1))
-> +					new_alts = 1;
-> +				else
-> +					bt_dev_err(hdev, "Device does not support ALT setting 1");
-
-Scrap this check and error and move it into the probe() function if you actually have Realtek hardware that does not support alternate setting 1.
-
-> +			} else {
-> 				bt_dev_err(hdev, "Device does not support ALT setting 6");
-> +			}
-> 		}
-> 
-> 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
-> @@ -3965,6 +3970,7 @@ static int btusb_probe(struct usb_interface *intf,
-> 		 * (DEVICE_REMOTE_WAKEUP)
-> 		 */
-> 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-> +		set_bit(BTUSB_WBS_ALT1, &data->flags);
-> 
-> 		err = usb_autopm_get_interface(intf);
-> 		if (err < 0)
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 116207009dde..68a2ec36e1c1 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -2767,8 +2767,9 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	if (err < 0)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
+-	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval, DISCOV_LE_SCAN_WIN,
+-			   own_addr_type, filter_policy);
++	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval,
++			   hdev->le_scan_window_discovery, own_addr_type,
++			   filter_policy);
+ 	return 0;
+ }
+ 
+@@ -2815,18 +2816,18 @@ static void start_discovery(struct hci_dev *hdev, u8 *status)
+ 			 * to do BR/EDR inquiry.
+ 			 */
+ 			hci_req_sync(hdev, interleaved_discov,
+-				     DISCOV_LE_SCAN_INT * 2, HCI_CMD_TIMEOUT,
++				     hdev->le_scan_int_discovery * 2, HCI_CMD_TIMEOUT,
+ 				     status);
+ 			break;
+ 		}
+ 
+ 		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
+-		hci_req_sync(hdev, active_scan, DISCOV_LE_SCAN_INT,
++		hci_req_sync(hdev, active_scan, hdev->le_scan_int_discovery,
+ 			     HCI_CMD_TIMEOUT, status);
+ 		break;
+ 	case DISCOV_TYPE_LE:
+ 		timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
+-		hci_req_sync(hdev, active_scan, DISCOV_LE_SCAN_INT,
++		hci_req_sync(hdev, active_scan, hdev->le_scan_int_discovery,
+ 			     HCI_CMD_TIMEOUT, status);
+ 		break;
+ 	default:
+-- 
+2.27.0.212.ge8ba1cc988-goog
 
