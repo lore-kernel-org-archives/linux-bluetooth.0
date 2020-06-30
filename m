@@ -1,107 +1,110 @@
-Return-Path: <SRS0=UgXA=AK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F60C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 23:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B568C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 03:15:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4C8E20776
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jun 2020 23:19:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D07A2078B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 03:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/ABWZqx"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XWeAl/Q1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729441AbgF2XT4 (ORCPT
+        id S1729033AbgF3DPH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jun 2020 19:19:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54708 "EHLO
+        Mon, 29 Jun 2020 23:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729207AbgF2XTv (ORCPT
+        with ESMTP id S1728945AbgF3DPG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jun 2020 19:19:51 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF7DC061755
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 16:19:51 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id b185so6356743qkg.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 16:19:51 -0700 (PDT)
+        Mon, 29 Jun 2020 23:15:06 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EBF7C03E97A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 20:15:06 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id cv18so3659693pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2020 20:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=vLldCdJwvdLpnSWDwt6STIK/xZGjzsrb0svyCFh1Gqo=;
-        b=I/ABWZqx4KSXrUWKq/I4LCQ8tY3Hb8IKxkUmHsTc/OGHxXIcECs2hhsPmWTrpL7PMe
-         JP8ZLojatM90RkVkROLLOD0yKtxwHP7go17j+2NTcDNDM3B24grI9lRmgslqgeVTg/9r
-         QNpBIFQ7nqbpMpp9xOoDNgtk5ztjYsVhMPxhL3FhMQROG42DUExnzQCUOpnxG+aoPJxJ
-         0yM2qjiGuy3UfLq++Uq839mcPJlML3PQY3kUSnZ+7Ja086kwuyeLWdR3qahiDkIj7Xyd
-         XxuAx3ejurbXa9h/Hq2kEDFEFTbN6FKHXn6BIQVRTLDIptn4hl5Sg2EbUtz/Yw0w7F5D
-         AdxA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lnvoY3haB0lkXFUtpPBEotF++tFsvMyqqAyM4Qg1MaQ=;
+        b=XWeAl/Q1DUptQJdejIDggTu9F0H4AtRUlR9s9MxsEwBtXR7JAE3kLeX11fTCj/Dycr
+         hNBqrh5b7MRiUYB5pQgEbL71EsKqbhYN8g63BKt1LHdu4lI8vK0prJ1YAISUG7K2RqVS
+         hcvNXEbx1VMxIGtqRnzQ+tKyAcStwdn8W3PgQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=vLldCdJwvdLpnSWDwt6STIK/xZGjzsrb0svyCFh1Gqo=;
-        b=F0JraZ4J7iC3kz3nPRY89e33Ng5W2kZZR6faLs5m1gM5MItTgGOpcYI9UqK+MthDWQ
-         q29aMpi9EAFstyEtghSIsZyZy/nWsNiX6ueqTovqJjmZYfX5m39QYfhhXIps4Fk8aE2E
-         QkJMqn9JcbjEPuu3AAUuJKW8HQ3z7R0mUgtZczlpZn5fjgK9zCPkG1QxqY/0nl7MhgT8
-         C808OAmLTqxyrqJN7v9nmnZz/nR7PH5ZrDNC5BsKN175VPGafUye2Czeh2VQAqSDm+oK
-         xegbyhBFzliKrmmauWrYLGjEB977gtuH3JpK/OqKEVEQS29jjAoyXa+TM2NHuGTwtuNV
-         B6eA==
-X-Gm-Message-State: AOAM5326ayzt0uHBAm46AwEE0nhnPWmNzHqOPJRfvAhHPg33RKDQxZZw
-        D3jbCG5Put2qKUGXlsGsRSiYp4DQWEM=
-X-Google-Smtp-Source: ABdhPJzV0PSOEMJq5LRWqy6wjW8VnOKLxv2etDRQmt2aaznAiA9KusVtfoq0HUAsF191Mhkz9v+VKA==
-X-Received: by 2002:ae9:ed86:: with SMTP id c128mr17680338qkg.475.1593472790545;
-        Mon, 29 Jun 2020 16:19:50 -0700 (PDT)
-Received: from [172.17.0.2] ([40.65.198.18])
-        by smtp.gmail.com with ESMTPSA id o145sm1417086qke.2.2020.06.29.16.19.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2020 16:19:50 -0700 (PDT)
-Message-ID: <5efa7716.1c69fb81.c56a8.6cbe@mx.google.com>
-Date:   Mon, 29 Jun 2020 16:19:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0479134367170190409=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lnvoY3haB0lkXFUtpPBEotF++tFsvMyqqAyM4Qg1MaQ=;
+        b=hz/NrZNObC4V49d0rXtqRXEYFlkQKFcfKzv+90xE/ldfp0eYW0WZ0koBrnEU7wNjrz
+         hr8s0KYGEXnTjYdTGDeROSH0gumm39ECOBTO6kyudPl0XUcfKoeS8c36V4T+X7mQ4chB
+         lsns0h0HbFEG4/tcqurMsVUel/Q/uzdDVwbHVc9eLSZkx3/d/gaxFMXXufD1d7SpydQr
+         sqlJIynUs3+D4czgCzdJzFoD/uMbs/Y7SMClxtrevrO4gsbON19nSmB6Lw0cF7/GTa45
+         yCGRgpOSdTbwaKVQ574ECw+ExNHgvpjAptO6iujjzuCrQGRbyDRoXDNa6+jCyMHf7iGk
+         OkPA==
+X-Gm-Message-State: AOAM531bBSEQQRZlWEkarV2RI30wT2b3VHo/Q+PWoJ4BkpkPYGEOvQ3i
+        KND+BjqMfz7hIeEpMYzQ5QXMGSh49xc=
+X-Google-Smtp-Source: ABdhPJyCaY4RyJ36oOm/AkJtdEmCYXpSXmi7dv53zIUgI3DXuKN9uF2aD+jKbihSx6VE2FF7bgv16w==
+X-Received: by 2002:a17:902:a513:: with SMTP id s19mr15417102plq.140.1593486905209;
+        Mon, 29 Jun 2020 20:15:05 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
+        by smtp.gmail.com with ESMTPSA id x66sm54166pgb.12.2020.06.29.20.15.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Jun 2020 20:15:04 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Alain Michaud <alainm@chromium.org>, pavel@ucw.cz,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
+Date:   Mon, 29 Jun 2020 20:15:00 -0700
+Message-Id: <20200629201441.v1.1.I162e3c6c4f4d963250c37733c3428329110c5989@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhishekpandit@chromium.org
-Subject: RE: device: Allow devices to be marked as wake capable
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200629160206.BlueZ.v6.1.I3a6c238b09e1a0fad69e69cc2e6f4063af989b37@changeid>
-References: <20200629160206.BlueZ.v6.1.I3a6c238b09e1a0fad69e69cc2e6f4063af989b37@changeid>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0479134367170190409==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+This fixes the kernel oops by removing unnecessary background scan
+update from hci_adv_monitors_clear() which shouldn't invoke any work
+queue.
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
-CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
-VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
-ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
-KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
-bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
-ZmF1bHQgKHNlZSBgVScpCnNyYy9kZXZpY2UuYzoxMzQ4OjY6IGVycm9yOiBubyBwcmV2aW91cyBk
-ZWNsYXJhdGlvbiBmb3Ig4oCYZGV2aWNlX2dldF93YWtlX3N1cHBvcnTigJkgWy1XZXJyb3I9bWlz
-c2luZy1kZWNsYXJhdGlvbnNdCiAxMzQ4IHwgYm9vbCBkZXZpY2VfZ2V0X3dha2Vfc3VwcG9ydChz
-dHJ1Y3QgYnRkX2RldmljZSAqZGV2aWNlKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn4Kc3JjL2RldmljZS5jOjEzNjY6NjogZXJyb3I6IG5vIHByZXZpb3VzIGRlY2xhcmF0aW9u
-IGZvciDigJhkZXZpY2VfZ2V0X3dha2VfYWxsb3dlZOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xh
-cmF0aW9uc10KIDEzNjYgfCBib29sIGRldmljZV9nZXRfd2FrZV9hbGxvd2VkKHN0cnVjdCBidGRf
-ZGV2aWNlICpkZXZpY2UpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMv
-ZGV2aWNlLmM6IEluIGZ1bmN0aW9uIOKAmGJ0ZF9kZXZpY2VfZmxhZ3NfY2hhbmdlZOKAmToKc3Jj
-L2RldmljZS5jOjY3NDI6NjogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJhp4oCZIFstV2Vycm9y
-PXVudXNlZC12YXJpYWJsZV0KIDY3NDIgfCAgaW50IGk7CiAgICAgIHwgICAgICBeCmNjMTogYWxs
-IHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6
-OTIyMzogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmls
-ZTo0MDEwOiBhbGxdIEVycm9yIDIKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAo=
+The following test was performed.
+- Run "rmmod btusb" and verify that no kernel oops is triggered.
 
---===============0479134367170190409==--
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+---
+
+ net/bluetooth/hci_core.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5577cf9e2c7cd..77615161c7d72 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3005,8 +3005,6 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
+ 		hci_free_adv_monitor(monitor);
+ 
+ 	idr_destroy(&hdev->adv_monitors_idr);
+-
+-	hci_update_background_scan(hdev);
+ }
+ 
+ void hci_free_adv_monitor(struct adv_monitor *monitor)
+-- 
+2.26.2
+
