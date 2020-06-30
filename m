@@ -2,678 +2,128 @@ Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9984C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 19:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 269F4C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 21:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B0BD2067D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 19:00:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDC1B206B6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 21:56:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Vyf6XWz5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbgF3TAX (ORCPT
+        id S1727083AbgF3V4C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 15:00:23 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57132 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726192AbgF3TAX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 15:00:23 -0400
-IronPort-SDR: Q92GSGEd+lGbTVnW66d1ocLLfAWShtrtYMQkcrvjL55qWavjsO33RxPQcYuY07ILb0v/JzsvXu
- 3empO42KH4mA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="231222956"
-X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="231222956"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 11:56:21 -0700
-IronPort-SDR: 1br6XPM+IpqVFw2ZfMmg0hJddXBgnLbc+949FSLPz0N4mvYkEgNIGcHEyQ3T1smqALn5ornL5q
- GhUT/KOqoSdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="355864256"
-Received: from mlindstr-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.108.27])
-  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 11:56:20 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2 2/4] mesh: Check app model settings of pub/sub support
-Date:   Tue, 30 Jun 2020 11:56:15 -0700
-Message-Id: <20200630185617.14755-3-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200630185617.14755-1-inga.stotland@intel.com>
-References: <20200630185617.14755-1-inga.stotland@intel.com>
+        Tue, 30 Jun 2020 17:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38084 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726376AbgF3V4B (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Jun 2020 17:56:01 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F52C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 14:56:01 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id t74so12355392lff.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 14:56:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tmOZ0XuG4g2eZl+4ZC4AL+xOIxaD6EMfVCRTLIIYYGE=;
+        b=Vyf6XWz5jRcDww52yc4d4Oq+roFuuZKNq/BHB+ZWpxojfUqNPllihDN3f5lJ8Y/T9Z
+         mwZ+lFjbe/hrfezCl+gc8clJtr574NRs/xP5o/wtJ8y+u91ep3VP16u8K22A7ej7qLdC
+         ehvTBg23bF+6odhA/tdesc/Y3povKcjIUODms=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tmOZ0XuG4g2eZl+4ZC4AL+xOIxaD6EMfVCRTLIIYYGE=;
+        b=JRXwxCUP7UQXyh5nHusgmI2md3mOU45yczKv83vYLsbELe8AIHsRydxjikOyrtCcil
+         ibtK2IEoRJg8x/9pNDWmfBoZiVhqSzORYBHxkYq3ituQT633/yBfdPDlbmrOR4ouDuES
+         o2iHP+NlUanf5Od8YM1ugoa6qLDILZlxitIvqoje01H2CTY5pSLkf2DPK72teMu/wAuM
+         EYZ8BORf7PT3feh7C787IChh/arcD50UvVsoVx6InuSdO7N3AOWZ3eZs4ceEqicUu782
+         Ix8Ibbo2WTCa/RX3RyrquLbQElbG0Vfa7xLPN3f19sRphvca/UPGY1CeARDM/7x/hhuM
+         FsDg==
+X-Gm-Message-State: AOAM530NctXgzTurm9kZY+Oad73N7wPFFcHRVHPd2V8rBW1c9tm/XhBe
+        KCF3Ha0+R0O5Xqd4aaP+OmNiQdAdVro/2rbb9d+X0yY6lEY=
+X-Google-Smtp-Source: ABdhPJwR94n+7xH83mHqidczu9CR0DjnMKdnF/jaaPKl94g8fG7h0fWVOeEftBCONCQWeAKI/tJPnTqCAI/9SJ7Gstg=
+X-Received: by 2002:a19:8407:: with SMTP id g7mr13225699lfd.61.1593554159514;
+ Tue, 30 Jun 2020 14:55:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200629201441.v1.1.I162e3c6c4f4d963250c37733c3428329110c5989@changeid>
+ <968D6753-8ACB-4298-91A4-F2C9438EAC06@holtmann.org>
+In-Reply-To: <968D6753-8ACB-4298-91A4-F2C9438EAC06@holtmann.org>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Tue, 30 Jun 2020 14:55:48 -0700
+Message-ID: <CABmPvSFq36OA-dxXxjhhocZjoJ1ZMZXZ4TULRYyTxcpksuXA7g@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds handling of new options dictionary included with
-"Models" and "VendorModels" properties on org.bluez.mesh.Element1
-interface.
+Hi Marcel,
 
-Supported (optional) dictionary entries:
-"Publish" - indicates whether the model supports publication mechanism.
-                If not present, publication is enabled.
-"Subscribe" - indicates whether the model supports subscription mechanism.
-                If not present, subscriptions are enabled.
+hci_unregister_dev() is invoked when the controller is intended to be
+removed by btusb driver. In other words, there should not be any
+activity on hdev's workqueue, so the destruction of the workqueue
+should be the first thing to do to prevent the clear helpers from
+issuing any work. So my suggestion is to revert the patch re-arranging
+the workqueue and apply this instead.
+I should have uploaded this earlier, but I encountered some troubles
+while verifying the changes. Sorry for the inconvenience.
 
-If a config message related to subscription state is received for a model
-that does not support subscription mechanism, an error code 0x08,
-("Not A Subscribe Model") is sent in response.
+Regards,
+Miao
 
-If a config message related to publication state is received for a model
-that does not support publication mechanism, an error code 0x07
-("Invalid Publish Parameters") is sent in response.
----
- mesh/mesh-config-json.c |  76 +++++++++++++++++-
- mesh/mesh-config.h      |   8 ++
- mesh/model.c            |  98 +++++++++++++++++++----
- mesh/model.h            |   6 ++
- mesh/node.c             | 168 ++++++++++++++++++++++++++++++++--------
- 5 files changed, 309 insertions(+), 47 deletions(-)
-
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 05b2a5651..661775f95 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -1096,6 +1096,16 @@ static bool parse_models(json_object *jmodels, struct mesh_config_element *ele)
- 				goto fail;
- 		}
- 
-+		if (json_object_object_get_ex(jmodel, "pubEnabled", &jvalue))
-+			mod->pub_enabled = json_object_get_boolean(jvalue);
-+		else
-+			mod->pub_enabled = true;
-+
-+		if (json_object_object_get_ex(jmodel, "subEnabled", &jvalue))
-+			mod->sub_enabled = json_object_get_boolean(jvalue);
-+		else
-+			mod->sub_enabled = true;
-+
- 		if (json_object_object_get_ex(jmodel, "publish", &jvalue)) {
- 			mod->pub = parse_model_publication(jvalue);
- 			if (!mod->pub)
-@@ -1562,7 +1572,7 @@ bool mesh_config_write_iv_index(struct mesh_config *cfg, uint32_t idx,
- static void add_model(void *a, void *b)
- {
- 	struct mesh_config_model *mod = a;
--	json_object *jmodels = b, *jmodel;
-+	json_object *jmodels = b, *jmodel, *jval;
- 
- 	jmodel = json_object_new_object();
- 	if (!jmodel)
-@@ -1574,6 +1584,12 @@ static void add_model(void *a, void *b)
- 	else
- 		write_uint32_hex(jmodel, "modelId", mod->id);
- 
-+	jval = json_object_new_boolean(mod->sub_enabled);
-+	json_object_object_add(jmodel, "subEnabled", jval);
-+
-+	jval = json_object_new_boolean(mod->pub_enabled);
-+	json_object_object_add(jmodel, "pubEnabled", jval);
-+
- 	json_object_array_add(jmodels, jmodel);
- }
- 
-@@ -1974,6 +1990,64 @@ bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t addr,
- 	return save_config(cfg->jnode, cfg->node_dir_path);
- }
- 
-+bool mesh_config_model_pub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable)
-+{
-+	json_object *jmodel, *jval;
-+	int ele_idx;
-+
-+	if (!cfg)
-+		return false;
-+
-+	ele_idx = get_element_index(cfg->jnode, ele_addr);
-+	if (ele_idx < 0)
-+		return false;
-+
-+	jmodel = get_element_model(cfg->jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_del(jmodel, "pubDisabled");
-+
-+	jval = json_object_new_boolean(!enable);
-+	json_object_object_add(jmodel, "pubDisabled", jval);
-+
-+	if (!enable)
-+		json_object_object_del(jmodel, "publish");
-+
-+	return save_config(cfg->jnode, cfg->node_dir_path);
-+}
-+
-+bool mesh_config_model_sub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable)
-+{
-+	json_object *jmodel, *jval;
-+	int ele_idx;
-+
-+	if (!cfg)
-+		return false;
-+
-+	ele_idx = get_element_index(cfg->jnode, ele_addr);
-+	if (ele_idx < 0)
-+		return false;
-+
-+	jmodel = get_element_model(cfg->jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_del(jmodel, "subEnabled");
-+
-+	jval = json_object_new_boolean(enable);
-+	json_object_object_add(jmodel, "subEnabled", jval);
-+
-+	if (!enable)
-+		json_object_object_del(jmodel, "subscribe");
-+
-+	return save_config(cfg->jnode, cfg->node_dir_path);
-+}
-+
- bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
- 								bool cache)
- {
-diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
-index 8ff7b63c7..9f30e693b 100644
---- a/mesh/mesh-config.h
-+++ b/mesh/mesh-config.h
-@@ -45,6 +45,8 @@ struct mesh_config_model {
- 	uint16_t *bindings;
- 	uint32_t id;
- 	bool vendor;
-+	bool sub_enabled;
-+	bool pub_enabled;
- 	uint32_t num_bindings;
- 	uint32_t num_subs;
- };
-@@ -156,6 +158,12 @@ bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t ele_addr,
- 						struct mesh_config_sub *sub);
- bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t ele_addr,
- 						uint32_t mod_id, bool vendor);
-+bool mesh_config_model_pub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable);
-+bool mesh_config_model_sub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable);
- bool mesh_config_app_key_add(struct mesh_config *cfg, uint16_t net_idx,
- 				uint16_t app_idx, const uint8_t key[16]);
- bool mesh_config_app_key_update(struct mesh_config *cfg, uint16_t app_idx,
-diff --git a/mesh/model.c b/mesh/model.c
-index 5ed95afac..afac6ec69 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -51,6 +51,8 @@ struct mesh_model {
- 	struct l_queue *subs;
- 	struct l_queue *virtuals;
- 	struct mesh_model_pub *pub;
-+	bool sub_enabled;
-+	bool pub_enabled;
- 	uint32_t id;
- 	uint8_t ele_idx;
- };
-@@ -1097,7 +1099,7 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
--	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
-+	if (!mod->pub_enabled || (mod->cbs && !(mod->cbs->pub)))
- 		return MESH_STATUS_INVALID_PUB_PARAM;
- 
- 	if (!appkey_have_key(node_get_net(node), idx))
-@@ -1134,9 +1136,11 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		/* External model */
- 		config_update_model_pub_period(node, mod->ele_idx, id,
- 						pub_period_to_ms(period));
--	else
-+	else {
- 		/* Internal model, call registered callbacks */
--		mod->cbs->pub(mod->pub);
-+		if (mod->cbs->pub)
-+			mod->cbs->pub(mod->pub);
-+	}
- 
- 	return MESH_STATUS_SUCCESS;
- }
-@@ -1150,6 +1154,11 @@ struct mesh_model_pub *mesh_model_pub_get(struct mesh_node *node, uint16_t addr,
- 	if (!mod)
- 		return NULL;
- 
-+	if (!mod->pub_enabled || (mod->cbs && !(mod->cbs->pub)))
-+		*status = MESH_STATUS_INVALID_PUB_PARAM;
-+	else
-+		*status = MESH_STATUS_SUCCESS;
-+
- 	return mod->pub;
- }
- 
-@@ -1171,6 +1180,13 @@ struct mesh_model *mesh_model_new(uint8_t ele_idx, uint32_t id)
- 	mod->id = id;
- 	mod->ele_idx = ele_idx;
- 	mod->virtuals = l_queue_new();
-+
-+	/*
-+	 * Unless specifically indicated by an app, subscriptions and
-+	 * publications are enabled by default
-+	 */
-+	mod->sub_enabled = true;
-+	mod->pub_enabled = true;
- 	return mod;
- }
- 
-@@ -1318,6 +1334,9 @@ int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (!mod->sub_enabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	entry = l_queue_get_entries(mod->subs);
- 	*size = 0;
- 	n = 0;
-@@ -1358,6 +1377,9 @@ int mesh_model_sub_add(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (!mod->sub_enabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	status = add_sub(node_get_net(node), mod, group, is_virt, dst);
- 
- 	if (status != MESH_STATUS_SUCCESS)
-@@ -1381,6 +1403,9 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (!mod->sub_enabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	subs = mod->subs;
- 	virtuals = mod->virtuals;
- 	mod->subs = l_queue_new();
-@@ -1430,6 +1455,9 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (!mod->sub_enabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	if (is_virt) {
- 		struct mesh_virtual *virt;
- 
-@@ -1448,27 +1476,22 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 
- 	*dst = grp;
- 
--	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp)))
-+	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp))) {
- 		mesh_net_dst_unreg(node_get_net(node), grp);
- 
--	if (!mod->cbs)
--		/* External models */
--		config_update_model_subscriptions(node, mod);
-+		if (!mod->cbs)
-+			/* External models */
-+			config_update_model_subscriptions(node, mod);
-+	}
- 
- 	return MESH_STATUS_SUCCESS;
- }
- 
--int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
-+static void remove_subs(struct mesh_node *node, struct mesh_model *mod)
- {
--	int status;
--	struct mesh_model *mod;
- 	const struct l_queue_entry *entry;
- 	struct mesh_net *net = node_get_net(node);
- 
--	mod = find_model(node, addr, id, &status);
--	if (!mod)
--		return status;
--
- 	entry = l_queue_get_entries(mod->subs);
- 
- 	for (; entry; entry = entry->next)
-@@ -1476,6 +1499,21 @@ int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
- 
- 	l_queue_clear(mod->subs, NULL);
- 	l_queue_clear(mod->virtuals, unref_virt);
-+}
-+
-+int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
-+{
-+	int status;
-+	struct mesh_model *mod;
-+
-+	mod = find_model(node, addr, id, &status);
-+	if (!mod)
-+		return status;
-+
-+	if (!mod->sub_enabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
-+	remove_subs(node, mod);
- 
- 	if (!mod->cbs)
- 		/* External models */
-@@ -1677,6 +1715,38 @@ void model_build_config(void *model, void *msg_builder)
- 	l_dbus_message_builder_leave_struct(builder);
- }
- 
-+void mesh_model_enable_pub(struct mesh_model *mod, bool enable)
-+{
-+	mod->pub_enabled = enable;
-+
-+	if (!mod->pub_enabled && mod->pub) {
-+		if (mod->pub->virt)
-+			unref_virt(mod->pub->virt);
-+
-+		l_free(mod->pub);
-+		mod->pub = NULL;
-+	}
-+}
-+
-+bool mesh_model_is_pub_enabled(struct mesh_model *mod)
-+{
-+	return mod->pub_enabled;
-+}
-+
-+void mesh_model_enable_sub(struct mesh_node *node, struct mesh_model *mod,
-+								bool enable)
-+{
-+	mod->sub_enabled = enable;
-+
-+	if (!mod->sub_enabled)
-+		remove_subs(node, mod);
-+}
-+
-+bool mesh_model_is_sub_enabled(struct mesh_model *mod)
-+{
-+	return mod->sub_enabled;
-+}
-+
- void mesh_model_init(void)
- {
- 	mesh_virtuals = l_queue_new();
-diff --git a/mesh/model.h b/mesh/model.h
-index f8e0f9d37..f717fb00c 100644
---- a/mesh/model.h
-+++ b/mesh/model.h
-@@ -112,5 +112,11 @@ bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size, uint32_t *opcode,
- 								uint16_t *n);
- void model_build_config(void *model, void *msg_builder);
- 
-+void mesh_model_enable_pub(struct mesh_model *mod, bool enable);
-+bool mesh_model_is_pub_enabled(struct mesh_model *mod);
-+void mesh_model_enable_sub(struct mesh_node *node, struct mesh_model *mod,
-+								bool enable);
-+bool mesh_model_is_sub_enabled(struct mesh_model *mod);
-+
- void mesh_model_init(void);
- void mesh_model_cleanup(void);
-diff --git a/mesh/node.c b/mesh/node.c
-index ee6d1833f..9f0f15070 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -386,6 +386,12 @@ static bool add_models_from_storage(struct mesh_node *node,
- 		if (!mod)
- 			return false;
- 
-+		if (!db_mod->pub_enabled)
-+			mesh_model_enable_pub(mod, false);
-+
-+		if (!db_mod->sub_enabled)
-+			mesh_model_enable_sub(node, mod, false);
-+
- 		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
-@@ -1041,65 +1047,99 @@ static void app_disc_cb(struct l_dbus *bus, void *user_data)
- 	free_node_dbus_resources(node);
- }
- 
--static bool get_sig_models_from_properties(struct node_element *ele,
-+static bool get_model_options(struct mesh_node *node, struct mesh_model *mod,
-+					struct l_dbus_message_iter *opts)
-+{
-+	const char *key;
-+	struct l_dbus_message_iter var;
-+	bool opt;
-+
-+	while (l_dbus_message_iter_next_entry(opts, &key, &var)) {
-+
-+		if (!strcmp(key, "Publish")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "b", &opt))
-+				return false;
-+			mesh_model_enable_pub(mod, opt);
-+		} else if (!strcmp(key, "Subscribe")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "b", &opt))
-+				return false;
-+			mesh_model_enable_sub(node, mod, opt);
-+		} else
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool generate_model(struct mesh_node *node, struct node_element *ele,
-+				uint32_t id, struct l_dbus_message_iter *opts)
-+{
-+	struct mesh_model *mod;
-+
-+	/* Disallow duplicates */
-+	if (l_queue_find(ele->models, match_model_id,
-+			 L_UINT_TO_PTR(id)))
-+		return false;
-+
-+	mod = mesh_model_new(ele->idx, id);
-+
-+	if (!get_model_options(node, mod, opts)) {
-+		l_free(mod);
-+		return false;
-+	}
-+
-+	l_queue_insert(ele->models, mod, compare_model_id, NULL);
-+
-+	return true;
-+}
-+
-+static bool get_sig_models_from_properties(struct mesh_node *node,
-+					struct node_element *ele,
- 					struct l_dbus_message_iter *property)
- {
--	struct l_dbus_message_iter ids;
--	uint16_t mod_id;
-+	struct l_dbus_message_iter mods, var;
-+	uint16_t m_id;
- 
- 	if (!ele->models)
- 		ele->models = l_queue_new();
- 
--	if (!l_dbus_message_iter_get_variant(property, "aq", &ids))
-+	if (!l_dbus_message_iter_get_variant(property, "a(qa{sv})", &mods))
- 		return false;
- 
- 	/* Bluetooth SIG defined models */
--	while (l_dbus_message_iter_next_entry(&ids, &mod_id)) {
--		struct mesh_model *mod;
--		uint32_t id = mod_id | VENDOR_ID_MASK;
-+	while (l_dbus_message_iter_next_entry(&mods, &m_id, &var)) {
-+		uint32_t id = m_id | VENDOR_ID_MASK;
- 
- 		/* Allow Config Server Model only on the primary element */
- 		if (ele->idx != PRIMARY_ELE_IDX && id == CONFIG_SRV_MODEL)
- 			return false;
- 
--		/* Disallow duplicates */
--		if (l_queue_find(ele->models, match_model_id,
--						L_UINT_TO_PTR(id)))
-+		if (!generate_model(node, ele, id, &var))
- 			return false;
--
--		mod = mesh_model_new(ele->idx, id);
--
--		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
- 	return true;
- }
- 
--static bool get_vendor_models_from_properties(struct node_element *ele,
-+static bool get_vendor_models_from_properties(struct mesh_node *node,
-+					struct node_element *ele,
- 					struct l_dbus_message_iter *property)
- {
--	struct l_dbus_message_iter ids;
--	uint16_t mod_id, vendor_id;
-+	struct l_dbus_message_iter mods, var;
-+	uint16_t m_id, v_id;
- 
- 	if (!ele->models)
- 		ele->models = l_queue_new();
- 
--	if (!l_dbus_message_iter_get_variant(property, "a(qq)", &ids))
-+	if (!l_dbus_message_iter_get_variant(property, "a(qqa{sv})", &mods))
- 		return false;
- 
- 	/* Vendor defined models */
--	while (l_dbus_message_iter_next_entry(&ids, &vendor_id, &mod_id)) {
--		struct mesh_model *mod;
--		uint32_t id = mod_id | (vendor_id << 16);
-+	while (l_dbus_message_iter_next_entry(&mods, &v_id, &m_id, &var)) {
-+		uint32_t id = m_id | (v_id << 16);
- 
--		/* Disallow duplicates */
--		if (l_queue_find(ele->models, match_model_id,
--							L_UINT_TO_PTR(id)))
-+		if (!generate_model(node, ele, id, &var))
- 			return false;
--
--		mod = mesh_model_new(ele->idx, id);
--
--		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
- 	return true;
-@@ -1130,14 +1170,19 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
- 
- 		} else if (!strcmp(key, "Models")) {
- 
--			if (mods || !get_sig_models_from_properties(ele, &var))
-+			if (mods)
-+				goto fail;
-+
-+			if (!get_sig_models_from_properties(node, ele, &var))
- 				goto fail;
- 
- 			mods = true;
- 		} else if (!strcmp(key, "VendorModels")) {
- 
--			if (vendor_mods ||
--				!get_vendor_models_from_properties(ele, &var))
-+			if (vendor_mods)
-+				goto fail;
-+
-+			if (!get_vendor_models_from_properties(node, ele, &var))
- 				goto fail;
- 
- 			vendor_mods = true;
-@@ -1225,7 +1270,8 @@ static void convert_node_to_storage(struct mesh_node *node,
- 			db_mod->id = mod_id;
- 			db_mod->vendor = ((mod_id & VENDOR_ID_MASK)
- 							!= VENDOR_ID_MASK);
--
-+			db_mod->pub_enabled = mesh_model_is_pub_enabled(mod);
-+			db_mod->sub_enabled = mesh_model_is_sub_enabled(mod);
- 			l_queue_push_tail(db_ele->models, db_mod);
- 		}
- 		l_queue_push_tail(db_node->elements, db_ele);
-@@ -1381,6 +1427,63 @@ static void update_composition(struct mesh_node *node, struct mesh_node *attach)
- 	attach->comp = node->comp;
- }
- 
-+static void update_model_options(struct mesh_node *node,
-+						struct mesh_node *attach)
-+{
-+	uint32_t len, i;
-+	struct node_element *ele, *ele_attach;
-+
-+	len = l_queue_length(node->elements);
-+
-+	for (i = 0; i < len; i++) {
-+		const struct l_queue_entry *entry;
-+
-+		ele = l_queue_find(node->elements, match_element_idx,
-+							L_UINT_TO_PTR(i));
-+		ele_attach = l_queue_find(attach->elements, match_element_idx,
-+							L_UINT_TO_PTR(i));
-+		if (!ele || !ele_attach)
-+			continue;
-+
-+		entry = l_queue_get_entries(ele->models);
-+
-+		for (; entry; entry = entry->next) {
-+			struct mesh_model *mod, *updated_mod = entry->data;
-+			uint32_t id = mesh_model_get_model_id(updated_mod);
-+			bool opt, updated_opt;
-+			bool vendor = id < VENDOR_ID_MASK;
-+
-+			mod = l_queue_find(ele_attach->models, match_model_id,
-+							L_UINT_TO_PTR(id));
-+			if (!mod)
-+				continue;
-+
-+			if (!vendor)
-+				id &= ~VENDOR_ID_MASK;
-+
-+			opt = mesh_model_is_pub_enabled(mod);
-+			updated_opt = mesh_model_is_pub_enabled(updated_mod);
-+
-+			if (updated_opt != opt) {
-+				mesh_model_enable_pub(mod, updated_opt);
-+				mesh_config_model_pub_enable(attach->cfg,
-+							attach->primary + i, id,
-+							vendor, updated_opt);
-+			}
-+
-+			opt = mesh_model_is_sub_enabled(mod);
-+			updated_opt = mesh_model_is_sub_enabled(updated_mod);
-+
-+			if (updated_opt != opt) {
-+				mesh_model_enable_sub(node, mod, updated_opt);
-+				mesh_config_model_sub_enable(attach->cfg,
-+							attach->primary + i, id,
-+							vendor, updated_opt);
-+			}
-+		}
-+	}
-+}
-+
- static bool check_req_node(struct managed_obj_request *req)
- {
- 	uint8_t node_comp[MAX_MSG_LEN - 2];
-@@ -1452,6 +1555,7 @@ static bool attach_req_node(struct mesh_node *attach, struct mesh_node *node)
- 	node->owner = NULL;
- 
- 	update_composition(node, attach);
-+	update_model_options(node, attach);
- 
- 	node_remove(node);
- 
--- 
-2.26.2
-
+On Mon, Jun 29, 2020 at 11:51 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Miao-chen,
+>
+> > This fixes the kernel oops by removing unnecessary background scan
+> > update from hci_adv_monitors_clear() which shouldn't invoke any work
+> > queue.
+> >
+> > The following test was performed.
+> > - Run "rmmod btusb" and verify that no kernel oops is triggered.
+> >
+> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > ---
+> >
+> > net/bluetooth/hci_core.c | 2 --
+> > 1 file changed, 2 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 5577cf9e2c7cd..77615161c7d72 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -3005,8 +3005,6 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
+> >               hci_free_adv_monitor(monitor);
+> >
+> >       idr_destroy(&hdev->adv_monitors_idr);
+> > -
+> > -     hci_update_background_scan(hdev);
+> > }
+>
+> I am happy to apply this as well, but I also applied another patch re-arranging the workqueue destroy handling. Can you check which prefer or if we should include both patches.
+>
+> Regards
+>
+> Marcel
+>
