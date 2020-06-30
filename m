@@ -2,315 +2,144 @@ Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63E0C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B471C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:49:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA73C207E8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71C59207E8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730502AbgF3Gsp convert rfc822-to-8bit (ORCPT
+        id S1730449AbgF3Gtw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 02:48:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49677 "EHLO
+        Tue, 30 Jun 2020 02:49:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47425 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730386AbgF3Gsp (ORCPT
+        with ESMTP id S1730386AbgF3Gtv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 02:48:45 -0400
+        Tue, 30 Jun 2020 02:49:51 -0400
 Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B1EA0CECE3;
-        Tue, 30 Jun 2020 08:58:37 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8E30DCECE2;
+        Tue, 30 Jun 2020 08:59:44 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [RFC PATCH v1 2/2] Bluetooth: queue L2CAP conn req if encryption
- is needed
+Subject: Re: [PATCH v2 12/14] Bluetooth: Update background scan and report
+ device based on advertisement monitors
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZ+tYaUiCqO9n33OiXLyxKGbgfbZCvXHQ39U-77yT+_WXQ@mail.gmail.com>
-Date:   Tue, 30 Jun 2020 08:48:42 +0200
-Cc:     Archie Pusaka <apusaka@google.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+In-Reply-To: <cc9eb868-4f4e-e7a3-d0fb-73c54586e1d1@samsung.com>
+Date:   Tue, 30 Jun 2020 08:49:49 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Samsung SOC <linux-samsung-soc@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <981D8546-AFFB-41F6-93A4-E0CF63CD66CE@holtmann.org>
-References: <20200627105437.453053-1-apusaka@google.com>
- <20200627185320.RFC.v1.2.I7363a6e528433d88c5240b67cbda5a88a107f56c@changeid>
- <9117B008-7B6C-48E1-B6B6-087531652C70@holtmann.org>
- <CABBYNZ+jbOJGutuP_4B8YFaysiR6pGa-pCE65AEFZAXg_EV9Kg@mail.gmail.com>
- <3860C10A-DA02-49F0-9EDF-13BFF3C6C197@holtmann.org>
- <CABBYNZ+tYaUiCqO9n33OiXLyxKGbgfbZCvXHQ39U-77yT+_WXQ@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <2378EEDB-97C4-4AFB-91B7-4EAF63FA4EFD@holtmann.org>
+References: <cover.1592404644.git.marcel@holtmann.org>
+ <4c8aeca04ed20e2776cadd9bdb57a7a3632d622c.1592404644.git.marcel@holtmann.org>
+ <CGME20200629223028eucas1p27b9482456072d7864f7505379885a0b4@eucas1p2.samsung.com>
+ <cc9eb868-4f4e-e7a3-d0fb-73c54586e1d1@samsung.com>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Marek,
 
->>>>> It is possible to receive an L2CAP conn req for an encrypted
->>>>> connection, before actually receiving the HCI change encryption
->>>>> event. If this happened, the received L2CAP packet will be ignored.
->>> 
->>> How is this possible? Or you are referring to a race between the ACL
->>> and Event endpoint where the Encryption Change is actually pending to
->>> be processed but we end up processing the ACL data first.
+>> This calls hci_update_background_scan() when there is any update on the
+>> advertisement monitors. If there is at least one advertisement monitor,
+>> the filtering policy of scan parameters should be 0x00. This also reports
+>> device found mgmt events if there is at least one monitor.
 >> 
->> you get the ACL packet with the L2CAP_Connect_Req in it and then the HCI Encryption Change event. However over the air they go in the different order. It is specific to the USB transport and nothing is going to fix this. The USB transport design is borked. You can only do bandaids.
+>> The following cases were tested with btmgmt advmon-* commands.
+>> (1) add a ADV monitor and observe that the passive scanning is
+>> triggered.
+>> (2) remove the last ADV monitor and observe that the passive scanning is
+>> terminated.
+>> (3) with a LE peripheral paired, repeat (1) and observe the passive
+>> scanning continues.
+>> (4) with a LE peripheral paired, repeat (2) and observe the passive
+>> scanning continues.
+>> (5) with a ADV monitor, suspend/resume the host and observe the passive
+>> scanning continues.
 >> 
->>>>> This patch queues the L2CAP packet and process them after the
->>>>> expected HCI event is received. If after 2 seconds we still don't
->>>>> receive it, then we assume something bad happened and discard the
->>>>> queued packets.
->>>> 
->>>> as with the other patch, this should be behind the same quirk and experimental setting for exactly the same reasons.
->>>> 
->>>>> 
->>>>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
->>>>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->>>>> 
->>>>> ---
->>>>> 
->>>>> include/net/bluetooth/bluetooth.h |  6 +++
->>>>> include/net/bluetooth/l2cap.h     |  6 +++
->>>>> net/bluetooth/hci_event.c         |  3 ++
->>>>> net/bluetooth/l2cap_core.c        | 87 +++++++++++++++++++++++++++----
->>>>> 4 files changed, 91 insertions(+), 11 deletions(-)
->>>>> 
->>>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->>>>> index 7ee8041af803..e64278401084 100644
->>>>> --- a/include/net/bluetooth/bluetooth.h
->>>>> +++ b/include/net/bluetooth/bluetooth.h
->>>>> @@ -335,7 +335,11 @@ struct l2cap_ctrl {
->>>>>     u16     reqseq;
->>>>>     u16     txseq;
->>>>>     u8      retries;
->>>>> +     u8      rsp_code;
->>>>> +     u8      amp_id;
->>>>> +     __u8    ident;
->>>>>     __le16  psm;
->>>>> +     __le16  scid;
->>>>>     bdaddr_t bdaddr;
->>>>>     struct l2cap_chan *chan;
->>>>> };
->>>> 
->>>> I would not bother trying to make this work with CREATE_CHAN_REQ. That is if you want to setup a L2CAP channel that can be moved between BR/EDR and AMP controllers and in that case you have to read the L2CAP information and features first. Meaning there will have been unencrypted ACL packets. This problem only exists if the remote side doesn’t request any version information first.
->>>> 
->>>>> @@ -374,6 +378,8 @@ struct bt_skb_cb {
->>>>>             struct hci_ctrl hci;
->>>>>     };
->>>>> };
->>>>> +static_assert(sizeof(struct bt_skb_cb) <= sizeof(((struct sk_buff *)0)->cb));
->>>>> +
->>>>> #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
->>>>> 
->>>>> #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
->>>>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->>>>> index 8f1e6a7a2df8..f8f6dec96f12 100644
->>>>> --- a/include/net/bluetooth/l2cap.h
->>>>> +++ b/include/net/bluetooth/l2cap.h
->>>>> @@ -58,6 +58,7 @@
->>>>> #define L2CAP_MOVE_ERTX_TIMEOUT               msecs_to_jiffies(60000)
->>>>> #define L2CAP_WAIT_ACK_POLL_PERIOD    msecs_to_jiffies(200)
->>>>> #define L2CAP_WAIT_ACK_TIMEOUT                msecs_to_jiffies(10000)
->>>>> +#define L2CAP_PEND_ENC_CONN_TIMEOUT  msecs_to_jiffies(2000)
->>>>> 
->>>>> #define L2CAP_A2MP_DEFAULT_MTU                670
->>>>> 
->>>>> @@ -700,6 +701,9 @@ struct l2cap_conn {
->>>>>     struct mutex            chan_lock;
->>>>>     struct kref             ref;
->>>>>     struct list_head        users;
->>>>> +
->>>>> +     struct delayed_work     remove_pending_encrypt_conn;
->>>>> +     struct sk_buff_head     pending_conn_q;
->>>>> };
->>>>> 
->>>>> struct l2cap_user {
->>>>> @@ -1001,4 +1005,6 @@ void l2cap_conn_put(struct l2cap_conn *conn);
->>>>> int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
->>>>> void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
->>>>> 
->>>>> +void l2cap_process_pending_encrypt_conn(struct hci_conn *hcon);
->>>>> +
->>>>> #endif /* __L2CAP_H */
->>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>>>> index 108c6c102a6a..8cefc51a5ca4 100644
->>>>> --- a/net/bluetooth/hci_event.c
->>>>> +++ b/net/bluetooth/hci_event.c
->>>>> @@ -3136,6 +3136,9 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>>>> 
->>>>> unlock:
->>>>>     hci_dev_unlock(hdev);
->>>>> +
->>>>> +     if (conn && !ev->status && ev->encrypt)
->>>>> +             l2cap_process_pending_encrypt_conn(conn);
->>>>> }
->>>>> 
->>>>> static void hci_change_link_key_complete_evt(struct hci_dev *hdev,
->>>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->>>>> index 35d2bc569a2d..fc6fe2c80c46 100644
->>>>> --- a/net/bluetooth/l2cap_core.c
->>>>> +++ b/net/bluetooth/l2cap_core.c
->>>>> @@ -62,6 +62,10 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
->>>>> static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
->>>>>                  struct sk_buff_head *skbs, u8 event);
->>>>> 
->>>>> +static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
->>>>> +                                     u8 ident, u8 *data, u8 rsp_code,
->>>>> +                                     u8 amp_id, bool queue_if_fail);
->>>>> +
->>>>> static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
->>>>> {
->>>>>     if (link_type == LE_LINK) {
->>>>> @@ -1902,6 +1906,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
->>>>>     if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
->>>>>             cancel_delayed_work_sync(&conn->info_timer);
->>>>> 
->>>>> +     cancel_delayed_work_sync(&conn->remove_pending_encrypt_conn);
->>>>> +
->>>>>     hcon->l2cap_data = NULL;
->>>>>     conn->hchan = NULL;
->>>>>     l2cap_conn_put(conn);
->>>>> @@ -2023,6 +2029,55 @@ static void l2cap_retrans_timeout(struct work_struct *work)
->>>>>     l2cap_chan_put(chan);
->>>>> }
->>>>> 
->>>>> +static void l2cap_add_pending_encrypt_conn(struct l2cap_conn *conn,
->>>>> +                                        struct l2cap_conn_req *req,
->>>>> +                                        u8 ident, u8 rsp_code, u8 amp_id)
->>>>> +{
->>>>> +     struct sk_buff *skb = bt_skb_alloc(0, GFP_KERNEL);
->>>>> +
->>>>> +     bt_cb(skb)->l2cap.psm = req->psm;
->>>>> +     bt_cb(skb)->l2cap.scid = req->scid;
->>>>> +     bt_cb(skb)->l2cap.ident = ident;
->>>>> +     bt_cb(skb)->l2cap.rsp_code = rsp_code;
->>>>> +     bt_cb(skb)->l2cap.amp_id = amp_id;
->>>>> +
->>>>> +     skb_queue_tail(&conn->pending_conn_q, skb);
->>>>> +     queue_delayed_work(conn->hcon->hdev->workqueue,
->>>>> +                        &conn->remove_pending_encrypt_conn,
->>>>> +                        L2CAP_PEND_ENC_CONN_TIMEOUT);
->>>>> +}
->>>>> +
->>>>> +void l2cap_process_pending_encrypt_conn(struct hci_conn *hcon)
->>>>> +{
->>>>> +     struct sk_buff *skb;
->>>>> +     struct l2cap_conn *conn = hcon->l2cap_data;
->>>>> +
->>>>> +     if (!conn)
->>>>> +             return;
->>>>> +
->>>>> +     while ((skb = skb_dequeue(&conn->pending_conn_q))) {
->>>>> +             struct l2cap_conn_req req;
->>>>> +             u8 ident, rsp_code, amp_id;
->>>>> +
->>>>> +             req.psm = bt_cb(skb)->l2cap.psm;
->>>>> +             req.scid = bt_cb(skb)->l2cap.scid;
->>>>> +             ident = bt_cb(skb)->l2cap.ident;
->>>>> +             rsp_code = bt_cb(skb)->l2cap.rsp_code;
->>>>> +             amp_id = bt_cb(skb)->l2cap.amp_id;
->>>>> +
->>>>> +             l2cap_connect(conn, ident, (u8 *)&req, rsp_code, amp_id, false);
->>>>> +             kfree_skb(skb);
->>>>> +     }
->>>>> +}
->>>>> +
->>>>> +static void l2cap_remove_pending_encrypt_conn(struct work_struct *work)
->>>>> +{
->>>>> +     struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
->>>>> +                                         remove_pending_encrypt_conn.work);
->>>>> +
->>>>> +     l2cap_process_pending_encrypt_conn(conn->hcon);
->>>>> +}
->>>>> +
->>>>> static void l2cap_streaming_send(struct l2cap_chan *chan,
->>>>>                              struct sk_buff_head *skbs)
->>>>> {
->>>>> @@ -4076,8 +4131,8 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
->>>>> }
->>>>> 
->>>>> static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
->>>>> -                                     struct l2cap_cmd_hdr *cmd,
->>>>> -                                     u8 *data, u8 rsp_code, u8 amp_id)
->>>>> +                                     u8 ident, u8 *data, u8 rsp_code,
->>>>> +                                     u8 amp_id, bool queue_if_fail)
->>>>> {
->>>>>     struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
->>>>>     struct l2cap_conn_rsp rsp;
->>>>> @@ -4103,8 +4158,15 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
->>>>>     /* Check if the ACL is secure enough (if not SDP) */
->>>>>     if (psm != cpu_to_le16(L2CAP_PSM_SDP) &&
->>>>>         !hci_conn_check_link_mode(conn->hcon)) {
->>>>> -             conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
->>>>> -             result = L2CAP_CR_SEC_BLOCK;
->>>>> +             if (!queue_if_fail) {
->>>>> +                     conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
->>>>> +                     result = L2CAP_CR_SEC_BLOCK;
->>>>> +                     goto response;
->>>>> +             }
->>>>> +
->>>>> +             l2cap_add_pending_encrypt_conn(conn, req, ident, rsp_code,
->>>>> +                                            amp_id);
->>>>> +             result = L2CAP_CR_PEND;
->>>>>             goto response;
->>>>>     }
->>>> 
->>>> So I am actually wondering if the approach is not better to send back a pending to the connect request like we do for everything else. And then proceed with getting our remote L2CAP information. If these come back in encrypted, then we can assume that we actually had encryption enabled and proceed with a L2CAP connect response saying that all is fine.
->>> 
->>> I wonder if we should resolve this by having different queues in
->>> hci_recv_frame (e.g. hdev->evt_rx), that way we can dequeue the HCI
->>> events before ACL so we first update the HCI states before start
->>> processing the L2CAP data, thoughts? Something like this:
->>> 
->>> https://gist.github.com/Vudentz/464fb0065a73e5c99bdb66cd2c5a1a2d
->> 
->> No. We need to keep things serialized. We actually have to reject unencrypted packets.
->> 
->> So whatever we do needs to be behind a quirk and an explicit opt-in.
+>> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > 
-> While I agree we are just working around the real issue, Id guess
-> processing the event before ACL would work (I haven't tested it yet)
-> much better than leaving this up to the L2CAP layer since that
-> requires a timer in order for us to e.g. accept/reject the connection
-> request, also since this problem is known to affect other events as
-> well (e.g. data for ATT coming before Connection Complete) I guess
-> using the time the kernel takes to schedule the rx_work as the window
-> where we would assume the packets arrived 'at same time' so we can
-> resolve the conflicts between endpoints. On top of this we could
-> perhaps consider using a delayed work for rx_work so the driver can
-> actually tune up what is the time window (perhaps for USB that should
-> be the polling interval) where we would consider events and data that
-> have arrived at same time.
+> This patch landed recently in linux-next as commit 8208f5a9d435 
+> ("Bluetooth: Update background scan and report device based on 
+> advertisement monitors").
+> 
+> It causes a regression, a kernel oops during system suspend/resume cycle 
+> on Samsung Exynos5250 based Snow Chromebook:
+> 
+> 8<--- cut here ---
+> Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> pgd = 86c149f5
+> [00000000] *pgd=00000000
+> Internal error: Oops: 5 [#1] SMP ARM
+> Modules linked in: cmac cros_ec_sysfs cros_ec_lightbar cros_ec_debugfs 
+> cros_ec_chardev cros_ec_keyb cros_ec_dev snd_soc_hdmi_codec cros_ec_i2c 
+> cros_ec snd_soc_snow snd_soc_i2s snd_soc_idma snd_soc_s3c_dma exynosdrm 
+> analogix_dp exynos_gsc v4l2_mem2mem snd_soc_max98095 snd_soc_core 
+> ac97_bus snd_pcm_dmaengine snd_pcm snd_timer nxp_ptn3460 snd soundcore 
+> pwm_samsung spi_s3c64xx cyapatp crc_itu_t mwifiex_sdio mwifiex 
+> sha256_generic libsha256 sha256_arm btmrvl_sdio btmrvl cfg80211 
+> bluetooth s5p_mfc governor_simpleondemand videobuf2_dma_contig 
+> videobuf2_memops videobuf2_v4l2 ecdh_generic ecc videobuf2_common 
+> videodev phy_exynos_usb2 ohci_exynos panfrost gpu_sched mc s3c2410_wdt 
+> s5p_sss s5p_cec exynos_rng rtc_s3c i2c_arb_gpio_challenge
+> CPU: 1 PID: 16 Comm: kworker/1:0 Not tainted 
+> 5.7.0-rc7-02995-g8208f5a9d435 #8564
+> Hardware name: Samsung Exynos (Flattened Device Tree)
+> Workqueue: events_freezable mmc_rescan
+> PC is at __queue_work+0x6c/0x4e8
+> LR is at __queue_work+0x68/0x4e8
+> pc : [<c03619d8>]    lr : [<c03619d4>]    psr: 60000093
+> ...
+> Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> Control: 10c5387d  Table: 6be2406a  DAC: 00000051
+> Process kworker/1:0 (pid: 16, stack limit = 0xf9898f75)
+> Stack: (0xee117de0 to 0xee118000)
+> ...
+> [<c03619d8>] (__queue_work) from [<c0361e94>] (queue_work_on+0x40/0x4c)
+> [<c0361e94>] (queue_work_on) from [<bf17dd0c>] 
+> (hci_adv_monitors_clear+0x74/0x90 [bluetooth])
+> [<bf17dd0c>] (hci_adv_monitors_clear [bluetooth]) from [<bf17e138>] 
+> (hci_unregister_dev+0x158/0x224 [bluetooth])
+> [<bf17e138>] (hci_unregister_dev [bluetooth]) from [<bf1d1638>] 
+> (btmrvl_remove_card+0x58/0x7c [btmrvl])
+> [<bf1d1638>] (btmrvl_remove_card [btmrvl]) from [<c0d09698>] 
+> (sdio_bus_remove+0x30/0x11c)
+> [<c0d09698>] (sdio_bus_remove) from [<c09d534c>] 
+> (device_release_driver_internal+0xe8/0x1ac)
+> [<c09d534c>] (device_release_driver_internal) from [<c09d3e18>] 
+> (bus_remove_device+0xcc/0xf8)
+> [<c09d3e18>] (bus_remove_device) from [<c09cfa3c>] (device_del+0x15c/0x384)
+> [<c09cfa3c>] (device_del) from [<c0d098b8>] (sdio_remove_func+0x20/0x34)
+> [<c0d098b8>] (sdio_remove_func) from [<c0d075bc>] 
+> (mmc_sdio_remove+0x38/0x64)
+> [<c0d075bc>] (mmc_sdio_remove) from [<c0d08858>] (mmc_sdio_detect+0x6c/0xf8)
+> [<c0d08858>] (mmc_sdio_detect) from [<c0cff6f0>] (mmc_rescan+0x1d0/0x42c)
+> [<c0cff6f0>] (mmc_rescan) from [<c0362454>] (process_one_work+0x178/0x4ac)
+> [<c0362454>] (process_one_work) from [<c0362b44>] (worker_thread+0x2c/0x530)
+> [<c0362b44>] (worker_thread) from [<c0368610>] (kthread+0x12c/0x158)
+> [<c0368610>] (kthread) from [<c03001a8>] (ret_from_fork+0x14/0x2c)
+> Exception stack(0xee117fb0 to 0xee117ff8)
+> ...
+> ---[ end trace 0ec00d142e0a49cf ]---
+> 
+> This board uses btmrvl_sdio bluetooth driver if that helps. Reverting 
+> this commit in linux-next 20200629 'fixes' the issue.
+> 
+> I can do more tests if needed on this hardware, just let me know how can 
+> I help and what to do.
 
-I am not following this argumentation. The drivers call hci_recv_frame and they get all put into the rx_q. The processing of that queue doesn’t change the order. So for the core, it is all serialized as it is suppose to be. That means the timing of when rx_work is irrelevant to this discussion.
-
-But I agree that I want to fix this without having to use timers and I think that is possible. And of course it is in opt-in. Long term we need to fix the USB transport to proper serialize things. Please keep in mind that all other transports don’t have this problem.
-
-> Or are you saying that the conflict resolution I proposed would
-> actually break things? I could picture any event that if it were
-> processed before the data at such a short time window would, note here
-> I'm talking about miliseconds not seconds so it is not that this will
-> be doing much reordering and if we go with delayed work it should be
-> relatively simple to add a Kconfig option(build-time)/module(runtime)
-> parameter to btusb to configure the interface were we would do such
-> reordering which the default could be 0 in which case we can just keep
-> queuing everything on rx_q.
-
-The not-encrypted issues worries me the the most. You need to opt-in and accept the risk. If you are unlucky, you might fail qualification because of this.
+can you check latest bluetooth-next. I think that we applied a fix for it.
 
 Regards
 
