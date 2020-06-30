@@ -2,649 +2,218 @@ Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CECBC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7106BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:36:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11B0E20759
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:19:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A8D9207D0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:36:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NcU3+YTh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730827AbgF3HTn (ORCPT
+        id S1731076AbgF3Hgg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 03:19:43 -0400
-Received: from mga18.intel.com ([134.134.136.126]:22972 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730637AbgF3HTm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 03:19:42 -0400
-IronPort-SDR: GMDweNJOC5tw7arMG78PGU1YuLVG3eMOXJI7ihiffhNJ6JWG0JkPHQ2TEj3v/5sYRKaNo9bsfZ
- qrP4GtLOkF6g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="133613601"
-X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
-   d="scan'208";a="133613601"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 00:19:39 -0700
-IronPort-SDR: 9hdIjKO082UERsXCjWeP12UsqQCsg01omqpDIHvNkbTeWC6ssVJlPQ7rYxslSTxcMnfPtFHt3x
- iZQSD0sE1BZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
-   d="scan'208";a="355698470"
-Received: from sdkini-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.110.226])
-  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 00:19:38 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 2/4] mesh: Check app model settings of pub/sub support
-Date:   Tue, 30 Jun 2020 00:19:34 -0700
-Message-Id: <20200630071936.40437-3-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200630071936.40437-1-inga.stotland@intel.com>
-References: <20200630071936.40437-1-inga.stotland@intel.com>
+        Tue, 30 Jun 2020 03:36:36 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:55154 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731033AbgF3Hgf (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Jun 2020 03:36:35 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20200630073633euoutp02bc6d778f5df7cb76b41d22b2f7aac7ba~dQip_4BN62410324103euoutp02a
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 07:36:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20200630073633euoutp02bc6d778f5df7cb76b41d22b2f7aac7ba~dQip_4BN62410324103euoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1593502593;
+        bh=43wwakXWd1isGO8+rcTNITURKmYWk3ZL+jiehc1no2U=;
+        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
+        b=NcU3+YThBzOTuvZ0MmYkatV/hs8O/um3ycH28AI3y1n6nhb8XSMyj6DAQZru2YawT
+         +15EUQMscZtMp1riMzzKilUb1dcxRzotb5BSWzL/IEN0d42IXGO8dndKyT/qhsRb1C
+         zVupaqFzXe/cOxMPNKvARyYpxwrJuZGLLyqvILls=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200630073633eucas1p128dbf0cecfa5f5069d62ce143ac53195~dQipzSlGd2195821958eucas1p19;
+        Tue, 30 Jun 2020 07:36:33 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 03.29.06318.18BEAFE5; Tue, 30
+        Jun 2020 08:36:33 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200630073632eucas1p155551c37b45a6653c0611ec93fafe335~dQipVPPCH0886508865eucas1p1-;
+        Tue, 30 Jun 2020 07:36:32 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200630073632eusmtrp23e968e6b7ca52fee02b9972cc9d24323~dQipUphD81006110061eusmtrp23;
+        Tue, 30 Jun 2020 07:36:32 +0000 (GMT)
+X-AuditID: cbfec7f5-38bff700000018ae-d0-5efaeb81c109
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id EB.C6.06314.08BEAFE5; Tue, 30
+        Jun 2020 08:36:32 +0100 (BST)
+Received: from [106.210.88.143] (unknown [106.210.88.143]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200630073632eusmtip1d9b9038b235fc3bb9fe433a2cbd73bad~dQio_SjP22526025260eusmtip1H;
+        Tue, 30 Jun 2020 07:36:32 +0000 (GMT)
+Subject: Re: [PATCH v2 12/14] Bluetooth: Update background scan and report
+ device based on advertisement monitors
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Samsung SOC <linux-samsung-soc@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@intel.com>
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+Message-ID: <ddb9ef62-f773-2a0c-8ac4-31d0116ef456@samsung.com>
+Date:   Tue, 30 Jun 2020 09:36:32 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+        Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2378EEDB-97C4-4AFB-91B7-4EAF63FA4EFD@holtmann.org>
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNKsWRmVeSWpSXmKPExsWy7djP87qNr3/FGTyczGGxdd9jVos51/qY
+        LWac38dk8e3TL0aL012vWBxYPWY3XGTxWL97ObvH4j0vmTw+b5ILYInisklJzcksSy3St0vg
+        yvj6eQFrwWy1io7/LA2MFxW6GDk5JARMJDbe/s7axcjFISSwglHizJnXUM4XRommx7+gnM+M
+        EovabrHAtGw/tZ4RIrGcUaJ96nuoqveMEm9nPgeq4uAQFiiW+DklA6RBREBTYu6Ss8wgNcwC
+        +xklbt5aCjaJTcBQouttFxtIPa+AncSBdmaQMIuAqkTPzM2sILaoQKxE39IFbCA2r4CgxMmZ
+        T8BaOQUcJDa07gezmQXkJba/ncMMYYtL3Hoynwlkl4TAInaJdZ/PsUJc7SLRe3s7I4QtLPHq
+        +BZ2CFtG4v9OmIZmRomH59ayQzg9jBKXm2ZAdVhL3Dn3C+xSZqB31u/Shwg7Slw518gIEpYQ
+        4JO48VYQ4gg+iUnbpjNDhHklOtqEIKrVJGYdXwe39uCFS8wTGJVmIXltFpJ3ZiF5ZxbC3gWM
+        LKsYxVNLi3PTU4uN81LL9YoTc4tL89L1kvNzNzECk8zpf8e/7mDc9yfpEKMAB6MSD2/CuZ9x
+        QqyJZcWVuYcYJTiYlUR4nc6ejhPiTUmsrEotyo8vKs1JLT7EKM3BoiTOa7zoZayQQHpiSWp2
+        ampBahFMlomDU6qBkeNpZUx69MSynfs5J56c+Gyl5ltF9+XL5z5u2HZKTlhC1Oh56CV1vgiL
+        xdxfqhPtbdoNL+x5ud8pSuuE+/uCPu/n59NeVc+M5dyvuPXqxVv7littPHpJjo/XV0Hgr1iV
+        cPjro82a3OJXvX1i3f8l//y16f62Of//N7qYq7rxXGeaEnteyFH4jxJLcUaioRZzUXEiAAt1
+        SmQuAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrDIsWRmVeSWpSXmKPExsVy+t/xu7oNr3/FGcz8pW2xdd9jVos51/qY
+        LWac38dk8e3TL0aL012vWBxYPWY3XGTxWL97ObvH4j0vmTw+b5ILYInSsynKLy1JVcjILy6x
+        VYo2tDDSM7S00DMysdQzNDaPtTIyVdK3s0lJzcksSy3St0vQy/j6eQFrwWy1io7/LA2MFxW6
+        GDk5JARMJLafWs/YxcjFISSwlFFi/8seNoiEjMTJaQ2sELawxJ9rXWwQRW8ZJZa/nsXSxcjB
+        ISxQLPFzSgZIjYiApsTcJWeZQWqYBfYzSkzefo8RJCEkcJRJYutisEFsAoYSXW9BBnFw8ArY
+        SRxoZwYJswioSvTM3AxWIioQK/Ht3hawG3gFBCVOznzCAmJzCjhIbGjdD2YzC5hJzNv8kBnC
+        lpfY/nYOlC0ucevJfKYJjEKzkLTPQtIyC0nLLCQtCxhZVjGKpJYW56bnFhvqFSfmFpfmpesl
+        5+duYgTG1LZjPzfvYLy0MfgQowAHoxIPb8K5n3FCrIllxZW5hxglOJiVRHidzp6OE+JNSays
+        Si3Kjy8qzUktPsRoCvTcRGYp0eR8YLznlcQbmhqaW1gamhubG5tZKInzdggcjBESSE8sSc1O
+        TS1ILYLpY+LglGpgbPM8uW/7357O8/eDrf3cIrmDN/o7+PexrXhWO+9byWV/t4X2a6/6z7Z3
+        WZautCjyaMaV9QeXP/7t+yHmqc+VyLOuqX6T5WPy53kwvw7JW/dhXopZq8ZTyYWRRv0VkWI/
+        bl6+/XJe+JYem+q2pvmS+SLRT6amuhyf4rskqEuIW/ahQeopxtdblViKMxINtZiLihMByGKG
+        Lr8CAAA=
+X-CMS-MailID: 20200630073632eucas1p155551c37b45a6653c0611ec93fafe335
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200629223028eucas1p27b9482456072d7864f7505379885a0b4
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200629223028eucas1p27b9482456072d7864f7505379885a0b4
+References: <cover.1592404644.git.marcel@holtmann.org>
+        <4c8aeca04ed20e2776cadd9bdb57a7a3632d622c.1592404644.git.marcel@holtmann.org>
+        <CGME20200629223028eucas1p27b9482456072d7864f7505379885a0b4@eucas1p2.samsung.com>
+        <cc9eb868-4f4e-e7a3-d0fb-73c54586e1d1@samsung.com>
+        <2378EEDB-97C4-4AFB-91B7-4EAF63FA4EFD@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds handling of new options dictionary included with
-"Models" and "VendorModels" properties on org.bluez.mesh.Element1
-interface.
+Hi Marcel,
 
-Supported (optional) dictionary entries:
-"Publish" - indicates whether the model supports publication mechanism.
-                If not present, publication is enabled.
-"Subscribe" - indicates whether the model supports subscription mechanism.
-                If not present, subscriptions are enabled.
+On 30.06.2020 08:49, Marcel Holtmann wrote:
+>>> This calls hci_update_background_scan() when there is any update on the
+>>> advertisement monitors. If there is at least one advertisement monitor,
+>>> the filtering policy of scan parameters should be 0x00. This also reports
+>>> device found mgmt events if there is at least one monitor.
+>>>
+>>> The following cases were tested with btmgmt advmon-* commands.
+>>> (1) add a ADV monitor and observe that the passive scanning is
+>>> triggered.
+>>> (2) remove the last ADV monitor and observe that the passive scanning is
+>>> terminated.
+>>> (3) with a LE peripheral paired, repeat (1) and observe the passive
+>>> scanning continues.
+>>> (4) with a LE peripheral paired, repeat (2) and observe the passive
+>>> scanning continues.
+>>> (5) with a ADV monitor, suspend/resume the host and observe the passive
+>>> scanning continues.
+>>>
+>>> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>> This patch landed recently in linux-next as commit 8208f5a9d435
+>> ("Bluetooth: Update background scan and report device based on
+>> advertisement monitors").
+>>
+>> It causes a regression, a kernel oops during system suspend/resume cycle
+>> on Samsung Exynos5250 based Snow Chromebook:
+>>
+>> 8<--- cut here ---
+>> Unable to handle kernel NULL pointer dereference at virtual address 00000000
+>> pgd = 86c149f5
+>> [00000000] *pgd=00000000
+>> Internal error: Oops: 5 [#1] SMP ARM
+>> Modules linked in: cmac cros_ec_sysfs cros_ec_lightbar cros_ec_debugfs
+>> cros_ec_chardev cros_ec_keyb cros_ec_dev snd_soc_hdmi_codec cros_ec_i2c
+>> cros_ec snd_soc_snow snd_soc_i2s snd_soc_idma snd_soc_s3c_dma exynosdrm
+>> analogix_dp exynos_gsc v4l2_mem2mem snd_soc_max98095 snd_soc_core
+>> ac97_bus snd_pcm_dmaengine snd_pcm snd_timer nxp_ptn3460 snd soundcore
+>> pwm_samsung spi_s3c64xx cyapatp crc_itu_t mwifiex_sdio mwifiex
+>> sha256_generic libsha256 sha256_arm btmrvl_sdio btmrvl cfg80211
+>> bluetooth s5p_mfc governor_simpleondemand videobuf2_dma_contig
+>> videobuf2_memops videobuf2_v4l2 ecdh_generic ecc videobuf2_common
+>> videodev phy_exynos_usb2 ohci_exynos panfrost gpu_sched mc s3c2410_wdt
+>> s5p_sss s5p_cec exynos_rng rtc_s3c i2c_arb_gpio_challenge
+>> CPU: 1 PID: 16 Comm: kworker/1:0 Not tainted
+>> 5.7.0-rc7-02995-g8208f5a9d435 #8564
+>> Hardware name: Samsung Exynos (Flattened Device Tree)
+>> Workqueue: events_freezable mmc_rescan
+>> PC is at __queue_work+0x6c/0x4e8
+>> LR is at __queue_work+0x68/0x4e8
+>> pc : [<c03619d8>]    lr : [<c03619d4>]    psr: 60000093
+>> ...
+>> Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
+>> Control: 10c5387d  Table: 6be2406a  DAC: 00000051
+>> Process kworker/1:0 (pid: 16, stack limit = 0xf9898f75)
+>> Stack: (0xee117de0 to 0xee118000)
+>> ...
+>> [<c03619d8>] (__queue_work) from [<c0361e94>] (queue_work_on+0x40/0x4c)
+>> [<c0361e94>] (queue_work_on) from [<bf17dd0c>]
+>> (hci_adv_monitors_clear+0x74/0x90 [bluetooth])
+>> [<bf17dd0c>] (hci_adv_monitors_clear [bluetooth]) from [<bf17e138>]
+>> (hci_unregister_dev+0x158/0x224 [bluetooth])
+>> [<bf17e138>] (hci_unregister_dev [bluetooth]) from [<bf1d1638>]
+>> (btmrvl_remove_card+0x58/0x7c [btmrvl])
+>> [<bf1d1638>] (btmrvl_remove_card [btmrvl]) from [<c0d09698>]
+>> (sdio_bus_remove+0x30/0x11c)
+>> [<c0d09698>] (sdio_bus_remove) from [<c09d534c>]
+>> (device_release_driver_internal+0xe8/0x1ac)
+>> [<c09d534c>] (device_release_driver_internal) from [<c09d3e18>]
+>> (bus_remove_device+0xcc/0xf8)
+>> [<c09d3e18>] (bus_remove_device) from [<c09cfa3c>] (device_del+0x15c/0x384)
+>> [<c09cfa3c>] (device_del) from [<c0d098b8>] (sdio_remove_func+0x20/0x34)
+>> [<c0d098b8>] (sdio_remove_func) from [<c0d075bc>]
+>> (mmc_sdio_remove+0x38/0x64)
+>> [<c0d075bc>] (mmc_sdio_remove) from [<c0d08858>] (mmc_sdio_detect+0x6c/0xf8)
+>> [<c0d08858>] (mmc_sdio_detect) from [<c0cff6f0>] (mmc_rescan+0x1d0/0x42c)
+>> [<c0cff6f0>] (mmc_rescan) from [<c0362454>] (process_one_work+0x178/0x4ac)
+>> [<c0362454>] (process_one_work) from [<c0362b44>] (worker_thread+0x2c/0x530)
+>> [<c0362b44>] (worker_thread) from [<c0368610>] (kthread+0x12c/0x158)
+>> [<c0368610>] (kthread) from [<c03001a8>] (ret_from_fork+0x14/0x2c)
+>> Exception stack(0xee117fb0 to 0xee117ff8)
+>> ...
+>> ---[ end trace 0ec00d142e0a49cf ]---
+>>
+>> This board uses btmrvl_sdio bluetooth driver if that helps. Reverting
+>> this commit in linux-next 20200629 'fixes' the issue.
+>>
+>> I can do more tests if needed on this hardware, just let me know how can
+>> I help and what to do.
+> can you check latest bluetooth-next. I think that we applied a fix for it.
 
-If a config message altering subscription state is received for a model
-that does not support subscription mechanism, an error code 0x08,
-("Not A Subscribe Model") is sent in response.
+Indeed. Commit f2790f025a0e ("Bluetooth: fix kernel null pointer 
+dereference error on suspend") fixed the issue.
 
-If a config message altering publication state is received for a model
-that does not support publication mechanism, an error code 0x07
-("Invalid Publish Parameters") is sent in response.
----
- mesh/mesh-config-json.c |  72 ++++++++++++++++-
- mesh/mesh-config.h      |   8 ++
- mesh/model.c            |  87 +++++++++++++++++----
- mesh/model.h            |   6 ++
- mesh/node.c             | 168 ++++++++++++++++++++++++++++++++--------
- 5 files changed, 294 insertions(+), 47 deletions(-)
-
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 05b2a5651..7eca78430 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -1096,6 +1096,12 @@ static bool parse_models(json_object *jmodels, struct mesh_config_element *ele)
- 				goto fail;
- 		}
- 
-+		if (json_object_object_get_ex(jmodel, "pubDisabled", &jvalue))
-+			mod->pub_disabled = json_object_get_boolean(jvalue);
-+
-+		if (json_object_object_get_ex(jmodel, "subDisabled", &jvalue))
-+			mod->sub_disabled = json_object_get_boolean(jvalue);
-+
- 		if (json_object_object_get_ex(jmodel, "publish", &jvalue)) {
- 			mod->pub = parse_model_publication(jvalue);
- 			if (!mod->pub)
-@@ -1562,7 +1568,7 @@ bool mesh_config_write_iv_index(struct mesh_config *cfg, uint32_t idx,
- static void add_model(void *a, void *b)
- {
- 	struct mesh_config_model *mod = a;
--	json_object *jmodels = b, *jmodel;
-+	json_object *jmodels = b, *jmodel, *jval;
- 
- 	jmodel = json_object_new_object();
- 	if (!jmodel)
-@@ -1574,6 +1580,12 @@ static void add_model(void *a, void *b)
- 	else
- 		write_uint32_hex(jmodel, "modelId", mod->id);
- 
-+	jval = json_object_new_boolean(mod->sub_disabled);
-+	json_object_object_add(jmodel, "subDisabled", jval);
-+
-+	jval = json_object_new_boolean(mod->pub_disabled);
-+	json_object_object_add(jmodel, "pubDisabled", jval);
-+
- 	json_object_array_add(jmodels, jmodel);
- }
- 
-@@ -1974,6 +1986,64 @@ bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t addr,
- 	return save_config(cfg->jnode, cfg->node_dir_path);
- }
- 
-+bool mesh_config_model_pub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable)
-+{
-+	json_object *jmodel, *jval;
-+	int ele_idx;
-+
-+	if (!cfg)
-+		return false;
-+
-+	ele_idx = get_element_index(cfg->jnode, ele_addr);
-+	if (ele_idx < 0)
-+		return false;
-+
-+	jmodel = get_element_model(cfg->jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_del(jmodel, "pubDisabled");
-+
-+	jval = json_object_new_boolean(!enable);
-+	json_object_object_add(jmodel, "pubDisabled", jval);
-+
-+	if (!enable)
-+		json_object_object_del(jmodel, "publish");
-+
-+	return save_config(cfg->jnode, cfg->node_dir_path);
-+}
-+
-+bool mesh_config_model_sub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable)
-+{
-+	json_object *jmodel, *jval;
-+	int ele_idx;
-+
-+	if (!cfg)
-+		return false;
-+
-+	ele_idx = get_element_index(cfg->jnode, ele_addr);
-+	if (ele_idx < 0)
-+		return false;
-+
-+	jmodel = get_element_model(cfg->jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_del(jmodel, "subDisabled");
-+
-+	jval = json_object_new_boolean(!enable);
-+	json_object_object_add(jmodel, "subDisabled", jval);
-+
-+	if (!enable)
-+		json_object_object_del(jmodel, "subscribe");
-+
-+	return save_config(cfg->jnode, cfg->node_dir_path);
-+}
-+
- bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
- 								bool cache)
- {
-diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
-index 8ff7b63c7..b07bf8d23 100644
---- a/mesh/mesh-config.h
-+++ b/mesh/mesh-config.h
-@@ -45,6 +45,8 @@ struct mesh_config_model {
- 	uint16_t *bindings;
- 	uint32_t id;
- 	bool vendor;
-+	bool sub_disabled;
-+	bool pub_disabled;
- 	uint32_t num_bindings;
- 	uint32_t num_subs;
- };
-@@ -156,6 +158,12 @@ bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t ele_addr,
- 						struct mesh_config_sub *sub);
- bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t ele_addr,
- 						uint32_t mod_id, bool vendor);
-+bool mesh_config_model_pub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable);
-+bool mesh_config_model_sub_enable(struct mesh_config *cfg, uint16_t ele_addr,
-+						uint32_t mod_id, bool vendor,
-+						bool enable);
- bool mesh_config_app_key_add(struct mesh_config *cfg, uint16_t net_idx,
- 				uint16_t app_idx, const uint8_t key[16]);
- bool mesh_config_app_key_update(struct mesh_config *cfg, uint16_t app_idx,
-diff --git a/mesh/model.c b/mesh/model.c
-index 5ed95afac..7e2d72863 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -51,6 +51,8 @@ struct mesh_model {
- 	struct l_queue *subs;
- 	struct l_queue *virtuals;
- 	struct mesh_model_pub *pub;
-+	bool sub_disabled;
-+	bool pub_disabled;
- 	uint32_t id;
- 	uint8_t ele_idx;
- };
-@@ -1097,7 +1099,7 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
--	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
-+	if (mod->pub_disabled || (mod->cbs && !(mod->cbs->pub)))
- 		return MESH_STATUS_INVALID_PUB_PARAM;
- 
- 	if (!appkey_have_key(node_get_net(node), idx))
-@@ -1134,9 +1136,12 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		/* External model */
- 		config_update_model_pub_period(node, mod->ele_idx, id,
- 						pub_period_to_ms(period));
--	else
-+	else {
- 		/* Internal model, call registered callbacks */
--		mod->cbs->pub(mod->pub);
-+		if (mod->cbs->pub)
-+			mod->cbs->pub(mod->pub);
-+		return MESH_STATUS_INVALID_PUB_PARAM;
-+	}
- 
- 	return MESH_STATUS_SUCCESS;
- }
-@@ -1318,6 +1323,9 @@ int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (mod->sub_disabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	entry = l_queue_get_entries(mod->subs);
- 	*size = 0;
- 	n = 0;
-@@ -1358,6 +1366,9 @@ int mesh_model_sub_add(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (mod->sub_disabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	status = add_sub(node_get_net(node), mod, group, is_virt, dst);
- 
- 	if (status != MESH_STATUS_SUCCESS)
-@@ -1381,6 +1392,9 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (mod->sub_disabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	subs = mod->subs;
- 	virtuals = mod->virtuals;
- 	mod->subs = l_queue_new();
-@@ -1430,6 +1444,9 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!mod)
- 		return status;
- 
-+	if (mod->sub_disabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
- 	if (is_virt) {
- 		struct mesh_virtual *virt;
- 
-@@ -1448,27 +1465,22 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 
- 	*dst = grp;
- 
--	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp)))
-+	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp))) {
- 		mesh_net_dst_unreg(node_get_net(node), grp);
- 
--	if (!mod->cbs)
--		/* External models */
--		config_update_model_subscriptions(node, mod);
-+		if (!mod->cbs)
-+			/* External models */
-+			config_update_model_subscriptions(node, mod);
-+	}
- 
- 	return MESH_STATUS_SUCCESS;
- }
- 
--int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
-+static void remove_subs(struct mesh_node *node, struct mesh_model *mod)
- {
--	int status;
--	struct mesh_model *mod;
- 	const struct l_queue_entry *entry;
- 	struct mesh_net *net = node_get_net(node);
- 
--	mod = find_model(node, addr, id, &status);
--	if (!mod)
--		return status;
--
- 	entry = l_queue_get_entries(mod->subs);
- 
- 	for (; entry; entry = entry->next)
-@@ -1476,6 +1488,21 @@ int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
- 
- 	l_queue_clear(mod->subs, NULL);
- 	l_queue_clear(mod->virtuals, unref_virt);
-+}
-+
-+int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
-+{
-+	int status;
-+	struct mesh_model *mod;
-+
-+	mod = find_model(node, addr, id, &status);
-+	if (!mod)
-+		return status;
-+
-+	if (mod->sub_disabled || (mod->cbs && !(mod->cbs->sub)))
-+		return MESH_STATUS_NOT_SUB_MOD;
-+
-+	remove_subs(node, mod);
- 
- 	if (!mod->cbs)
- 		/* External models */
-@@ -1677,6 +1704,38 @@ void model_build_config(void *model, void *msg_builder)
- 	l_dbus_message_builder_leave_struct(builder);
- }
- 
-+void mesh_model_enable_pub(struct mesh_model *mod, bool enable)
-+{
-+	mod->pub_disabled = !enable;
-+
-+	if (mod->pub_disabled && mod->pub) {
-+		if (mod->pub->virt)
-+			unref_virt(mod->pub->virt);
-+
-+		l_free(mod->pub);
-+		mod->pub = NULL;
-+	}
-+}
-+
-+bool mesh_model_is_pub_enabled(struct mesh_model *mod)
-+{
-+	return !mod->pub_disabled;
-+}
-+
-+void mesh_model_enable_sub(struct mesh_node *node, struct mesh_model *mod,
-+								bool enable)
-+{
-+	mod->sub_disabled = !enable;
-+
-+	if (mod->sub_disabled)
-+		remove_subs(node, mod);
-+}
-+
-+bool mesh_model_is_sub_enabled(struct mesh_model *mod)
-+{
-+	return !mod->sub_disabled;
-+}
-+
- void mesh_model_init(void)
- {
- 	mesh_virtuals = l_queue_new();
-diff --git a/mesh/model.h b/mesh/model.h
-index f8e0f9d37..f717fb00c 100644
---- a/mesh/model.h
-+++ b/mesh/model.h
-@@ -112,5 +112,11 @@ bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size, uint32_t *opcode,
- 								uint16_t *n);
- void model_build_config(void *model, void *msg_builder);
- 
-+void mesh_model_enable_pub(struct mesh_model *mod, bool enable);
-+bool mesh_model_is_pub_enabled(struct mesh_model *mod);
-+void mesh_model_enable_sub(struct mesh_node *node, struct mesh_model *mod,
-+								bool enable);
-+bool mesh_model_is_sub_enabled(struct mesh_model *mod);
-+
- void mesh_model_init(void);
- void mesh_model_cleanup(void);
-diff --git a/mesh/node.c b/mesh/node.c
-index ee6d1833f..4a55c2cc8 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -386,6 +386,12 @@ static bool add_models_from_storage(struct mesh_node *node,
- 		if (!mod)
- 			return false;
- 
-+		if (db_mod->pub_disabled)
-+			mesh_model_enable_pub(mod, false);
-+
-+		if (db_mod->sub_disabled)
-+			mesh_model_enable_sub(node, mod, false);
-+
- 		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
-@@ -1041,65 +1047,99 @@ static void app_disc_cb(struct l_dbus *bus, void *user_data)
- 	free_node_dbus_resources(node);
- }
- 
--static bool get_sig_models_from_properties(struct node_element *ele,
-+static bool get_model_options(struct mesh_node *node, struct mesh_model *mod,
-+					struct l_dbus_message_iter *opts)
-+{
-+	const char *key;
-+	struct l_dbus_message_iter var;
-+	bool opt;
-+
-+	while (l_dbus_message_iter_next_entry(opts, &key, &var)) {
-+
-+		if (!strcmp(key, "Publish")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "b", &opt))
-+				return false;
-+			mesh_model_enable_pub(mod, opt);
-+		} else if (!strcmp(key, "Subscribe")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "b", &opt))
-+				return false;
-+			mesh_model_enable_sub(node, mod, opt);
-+		} else
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool generate_model(struct mesh_node *node, struct node_element *ele,
-+				uint32_t id, struct l_dbus_message_iter *opts)
-+{
-+	struct mesh_model *mod;
-+
-+	/* Disallow duplicates */
-+	if (l_queue_find(ele->models, match_model_id,
-+			 L_UINT_TO_PTR(id)))
-+		return false;
-+
-+	mod = mesh_model_new(ele->idx, id);
-+
-+	if (!get_model_options(node, mod, opts)) {
-+		l_free(mod);
-+		return false;
-+	}
-+
-+	l_queue_insert(ele->models, mod, compare_model_id, NULL);
-+
-+	return true;
-+}
-+
-+static bool get_sig_models_from_properties(struct mesh_node *node,
-+					struct node_element *ele,
- 					struct l_dbus_message_iter *property)
- {
--	struct l_dbus_message_iter ids;
--	uint16_t mod_id;
-+	struct l_dbus_message_iter mods, var;
-+	uint16_t m_id;
- 
- 	if (!ele->models)
- 		ele->models = l_queue_new();
- 
--	if (!l_dbus_message_iter_get_variant(property, "aq", &ids))
-+	if (!l_dbus_message_iter_get_variant(property, "a(qa{sv})", &mods))
- 		return false;
- 
- 	/* Bluetooth SIG defined models */
--	while (l_dbus_message_iter_next_entry(&ids, &mod_id)) {
--		struct mesh_model *mod;
--		uint32_t id = mod_id | VENDOR_ID_MASK;
-+	while (l_dbus_message_iter_next_entry(&mods, &m_id, &var)) {
-+		uint32_t id = m_id | VENDOR_ID_MASK;
- 
- 		/* Allow Config Server Model only on the primary element */
- 		if (ele->idx != PRIMARY_ELE_IDX && id == CONFIG_SRV_MODEL)
- 			return false;
- 
--		/* Disallow duplicates */
--		if (l_queue_find(ele->models, match_model_id,
--						L_UINT_TO_PTR(id)))
-+		if (!generate_model(node, ele, id, &var))
- 			return false;
--
--		mod = mesh_model_new(ele->idx, id);
--
--		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
- 	return true;
- }
- 
--static bool get_vendor_models_from_properties(struct node_element *ele,
-+static bool get_vendor_models_from_properties(struct mesh_node *node,
-+					struct node_element *ele,
- 					struct l_dbus_message_iter *property)
- {
--	struct l_dbus_message_iter ids;
--	uint16_t mod_id, vendor_id;
-+	struct l_dbus_message_iter mods, var;
-+	uint16_t m_id, v_id;
- 
- 	if (!ele->models)
- 		ele->models = l_queue_new();
- 
--	if (!l_dbus_message_iter_get_variant(property, "a(qq)", &ids))
-+	if (!l_dbus_message_iter_get_variant(property, "a(qqa{sv})", &mods))
- 		return false;
- 
- 	/* Vendor defined models */
--	while (l_dbus_message_iter_next_entry(&ids, &vendor_id, &mod_id)) {
--		struct mesh_model *mod;
--		uint32_t id = mod_id | (vendor_id << 16);
-+	while (l_dbus_message_iter_next_entry(&mods, &v_id, &m_id, &var)) {
-+		uint32_t id = m_id | (v_id << 16);
- 
--		/* Disallow duplicates */
--		if (l_queue_find(ele->models, match_model_id,
--							L_UINT_TO_PTR(id)))
-+		if (!generate_model(node, ele, id, &var))
- 			return false;
--
--		mod = mesh_model_new(ele->idx, id);
--
--		l_queue_insert(ele->models, mod, compare_model_id, NULL);
- 	}
- 
- 	return true;
-@@ -1130,14 +1170,19 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
- 
- 		} else if (!strcmp(key, "Models")) {
- 
--			if (mods || !get_sig_models_from_properties(ele, &var))
-+			if (mods)
-+				goto fail;
-+
-+			if (!get_sig_models_from_properties(node, ele, &var))
- 				goto fail;
- 
- 			mods = true;
- 		} else if (!strcmp(key, "VendorModels")) {
- 
--			if (vendor_mods ||
--				!get_vendor_models_from_properties(ele, &var))
-+			if (vendor_mods)
-+				goto fail;
-+
-+			if (!get_vendor_models_from_properties(node, ele, &var))
- 				goto fail;
- 
- 			vendor_mods = true;
-@@ -1225,7 +1270,8 @@ static void convert_node_to_storage(struct mesh_node *node,
- 			db_mod->id = mod_id;
- 			db_mod->vendor = ((mod_id & VENDOR_ID_MASK)
- 							!= VENDOR_ID_MASK);
--
-+			db_mod->pub_disabled = !mesh_model_is_pub_enabled(mod);
-+			db_mod->sub_disabled = !mesh_model_is_sub_enabled(mod);
- 			l_queue_push_tail(db_ele->models, db_mod);
- 		}
- 		l_queue_push_tail(db_node->elements, db_ele);
-@@ -1381,6 +1427,63 @@ static void update_composition(struct mesh_node *node, struct mesh_node *attach)
- 	attach->comp = node->comp;
- }
- 
-+static void update_model_options(struct mesh_node *node,
-+						struct mesh_node *attach)
-+{
-+	uint32_t len, i;
-+	struct node_element *ele, *ele_attach;
-+
-+	len = l_queue_length(node->elements);
-+
-+	for (i = 0; i < len; i++) {
-+		const struct l_queue_entry *entry;
-+
-+		ele = l_queue_find(node->elements, match_element_idx,
-+							L_UINT_TO_PTR(i));
-+		ele_attach = l_queue_find(attach->elements, match_element_idx,
-+							L_UINT_TO_PTR(i));
-+		if (!ele || !ele_attach)
-+			continue;
-+
-+		entry = l_queue_get_entries(ele->models);
-+
-+		for (; entry; entry = entry->next) {
-+			struct mesh_model *mod, *updated_mod = entry->data;
-+			uint32_t id = mesh_model_get_model_id(updated_mod);
-+			bool opt, updated_opt;
-+			bool vendor = id < VENDOR_ID_MASK;
-+
-+			mod = l_queue_find(ele_attach->models, match_model_id,
-+							L_UINT_TO_PTR(id));
-+			if (!mod)
-+				continue;
-+
-+			if (!vendor)
-+				id &= ~VENDOR_ID_MASK;
-+
-+			opt = mesh_model_is_pub_enabled(mod);
-+			updated_opt = mesh_model_is_pub_enabled(updated_mod);
-+
-+			if (updated_opt != opt) {
-+				mesh_model_enable_pub(mod, updated_opt);
-+				mesh_config_model_pub_enable(attach->cfg,
-+							attach->primary + i, id,
-+							vendor, updated_opt);
-+			}
-+
-+			opt = mesh_model_is_sub_enabled(mod);
-+			updated_opt = mesh_model_is_sub_enabled(updated_mod);
-+
-+			if (updated_opt != opt) {
-+				mesh_model_enable_sub(node, mod, updated_opt);
-+				mesh_config_model_sub_enable(attach->cfg,
-+							attach->primary + i, id,
-+							vendor, updated_opt);
-+			}
-+		}
-+	}
-+}
-+
- static bool check_req_node(struct managed_obj_request *req)
- {
- 	uint8_t node_comp[MAX_MSG_LEN - 2];
-@@ -1452,6 +1555,7 @@ static bool attach_req_node(struct mesh_node *attach, struct mesh_node *node)
- 	node->owner = NULL;
- 
- 	update_composition(node, attach);
-+	update_model_options(node, attach);
- 
- 	node_remove(node);
- 
+Best regards
 -- 
-2.26.2
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
