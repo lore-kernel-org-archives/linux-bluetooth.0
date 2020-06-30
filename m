@@ -2,249 +2,92 @@ Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD19C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11B7C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 833F3206B6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 06:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99D9A2073E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 07:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730504AbgF3Gy4 convert rfc822-to-8bit (ORCPT
+        id S1730755AbgF3HTi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 02:54:56 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36390 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730386AbgF3Gy4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 02:54:56 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id F0BB3CECE2;
-        Tue, 30 Jun 2020 09:04:48 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [RFC PATCH v1 1/2] Bluetooth: queue ACL packets if no handle is
- found
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJQfnxFSfbUbPLVC-be41TqNXzr_6hLq2z=u521HL+BqxLHn_Q@mail.gmail.com>
-Date:   Tue, 30 Jun 2020 08:54:54 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7BBB55E0-FBD9-40C0-80D9-D5E7FC9F80D2@holtmann.org>
-References: <20200627105437.453053-1-apusaka@google.com>
- <20200627185320.RFC.v1.1.Icea550bb064a24b89f2217cf19e35b4480a31afd@changeid>
- <91CFE951-262A-4E83-8550-25445AE84B5A@holtmann.org>
- <CAJQfnxFSfbUbPLVC-be41TqNXzr_6hLq2z=u521HL+BqxLHn_Q@mail.gmail.com>
-To:     Archie Pusaka <apusaka@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Tue, 30 Jun 2020 03:19:38 -0400
+Received: from mga18.intel.com ([134.134.136.126]:22972 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730637AbgF3HTh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Jun 2020 03:19:37 -0400
+IronPort-SDR: 5gcKX30Q+hk/CVkuRMCQC9lDCEUB5CfJCuiBI7inioF+ztTewR/J8+ego2ZshPkNpPRyxnqapO
+ yddVRCkvSL3w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="133613599"
+X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
+   d="scan'208";a="133613599"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 00:19:37 -0700
+IronPort-SDR: sQXfukDtX9jhiRNIQGjTCRjbIJnsAItUEe3TDvSB0a2DBp3vvSJ1SPABCpSkl2jVJuzff8YIpI
+ SmdTrgGZnnsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
+   d="scan'208";a="355698459"
+Received: from sdkini-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.110.226])
+  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 00:19:37 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 0/4] Add options to Models and VendorModels
+Date:   Tue, 30 Jun 2020 00:19:32 -0700
+Message-Id: <20200630071936.40437-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+If a model does not support either subscription mechanism,
+Config Server is supposed to return "Not a Subscribe Model" if a Config Client sends
+a subscription add/overwrite message.
 
->>> There is a possibility that an ACL packet is received before we
->>> receive the HCI connect event for the corresponding handle. If this
->>> happens, we discard the ACL packet.
->>> 
->>> Rather than just ignoring them, this patch provides a queue for
->>> incoming ACL packet without a handle. The queue is processed when
->>> receiving a HCI connection event. If 2 seconds elapsed without
->>> receiving the HCI connection event, assume something bad happened
->>> and discard the queued packet.
->>> 
->>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
->>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->> 
->> so two things up front. I want to hide this behind a HCI_QUIRK_OUT_OF_ORDER_ACL that a transport driver has to set first. Frankly if this kind of out-of-order happens on UART or SDIO transports, then something is obviously going wrong. I have no plan to fix up after a fully serialized transport.
->> 
->> Secondly, if a transport sets HCI_QUIRK_OUT_OF_ORDER_ACL, then I want this off by default. You can enable it via an experimental setting. The reason here is that we have to make it really hard and fail as often as possible so that hardware manufactures and spec writers realize that something is fundamentally broken here.
->> 
->> I have no problem in running the code and complaining loudly in case the quirk has been set. Just injecting the packets can only happen if bluetoothd explicitly enabled it.
-> 
-> Got it.
-> 
->> 
->> 
->>> 
->>> ---
->>> 
->>> include/net/bluetooth/hci_core.h |  8 +++
->>> net/bluetooth/hci_core.c         | 84 +++++++++++++++++++++++++++++---
->>> net/bluetooth/hci_event.c        |  2 +
->>> 3 files changed, 88 insertions(+), 6 deletions(-)
->>> 
->>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>> index 836dc997ff94..b69ecdd0d15a 100644
->>> --- a/include/net/bluetooth/hci_core.h
->>> +++ b/include/net/bluetooth/hci_core.h
->>> @@ -270,6 +270,9 @@ struct adv_monitor {
->>> /* Default authenticated payload timeout 30s */
->>> #define DEFAULT_AUTH_PAYLOAD_TIMEOUT   0x0bb8
->>> 
->>> +/* Time to keep ACL packets without a corresponding handle queued (2s) */
->>> +#define PENDING_ACL_TIMEOUT          msecs_to_jiffies(2000)
->>> +
->> 
->> Do we have some btmon traces with timestamps. Isn’t a second enough? Actually 2 seconds is an awful long time.
-> 
-> When this happens in the test lab, the HCI connect event is about
-> 0.002 second behind the first ACL packet. We can change this if
-> required.
-> 
->> 
->>> struct amp_assoc {
->>>      __u16   len;
->>>      __u16   offset;
->>> @@ -538,6 +541,9 @@ struct hci_dev {
->>>      struct delayed_work     rpa_expired;
->>>      bdaddr_t                rpa;
->>> 
->>> +     struct delayed_work     remove_pending_acl;
->>> +     struct sk_buff_head     pending_acl_q;
->>> +
->> 
->> can we name this ooo_q and move it to the other queues in this struct. Unless we want to add a Kconfig option around it, we don’t need to keep it here.
-> 
-> Ack.
-> 
->> 
->>> #if IS_ENABLED(CONFIG_BT_LEDS)
->>>      struct led_trigger      *power_led;
->>> #endif
->>> @@ -1773,6 +1779,8 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
->>> void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
->>>                             u8 *bdaddr_type);
->>> 
->>> +void hci_process_pending_acl(struct hci_dev *hdev, struct hci_conn *conn);
->>> +
->>> #define SCO_AIRMODE_MASK       0x0003
->>> #define SCO_AIRMODE_CVSD       0x0000
->>> #define SCO_AIRMODE_TRANSP     0x0003
->>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>> index 7959b851cc63..30780242c267 100644
->>> --- a/net/bluetooth/hci_core.c
->>> +++ b/net/bluetooth/hci_core.c
->>> @@ -1786,6 +1786,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
->>>      skb_queue_purge(&hdev->rx_q);
->>>      skb_queue_purge(&hdev->cmd_q);
->>>      skb_queue_purge(&hdev->raw_q);
->>> +     skb_queue_purge(&hdev->pending_acl_q);
->>> 
->>>      /* Drop last sent command */
->>>      if (hdev->sent_cmd) {
->>> @@ -3518,6 +3519,78 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
->>>      return NOTIFY_STOP;
->>> }
->>> 
->>> +static void hci_add_pending_acl(struct hci_dev *hdev, struct sk_buff *skb)
->>> +{
->>> +     skb_queue_tail(&hdev->pending_acl_q, skb);
->>> +
->>> +     queue_delayed_work(hdev->workqueue, &hdev->remove_pending_acl,
->>> +                        PENDING_ACL_TIMEOUT);
->>> +}
->>> +
->>> +void hci_process_pending_acl(struct hci_dev *hdev, struct hci_conn *conn)
->>> +{
->>> +     struct sk_buff *skb, *tmp;
->>> +     struct hci_acl_hdr *hdr;
->>> +     u16 handle, flags;
->>> +     bool reset_timer = false;
->>> +
->>> +     skb_queue_walk_safe(&hdev->pending_acl_q, skb, tmp) {
->>> +             hdr = (struct hci_acl_hdr *)skb->data;
->>> +             handle = __le16_to_cpu(hdr->handle);
->>> +             flags  = hci_flags(handle);
->>> +             handle = hci_handle(handle);
->>> +
->>> +             if (handle != conn->handle)
->>> +                     continue;
->>> +
->>> +             __skb_unlink(skb, &hdev->pending_acl_q);
->>> +             skb_pull(skb, HCI_ACL_HDR_SIZE);
->>> +
->>> +             l2cap_recv_acldata(conn, skb, flags);
->>> +             reset_timer = true;
->>> +     }
->>> +
->>> +     if (reset_timer)
->>> +             mod_delayed_work(hdev->workqueue, &hdev->remove_pending_acl,
->>> +                              PENDING_ACL_TIMEOUT);
->>> +}
->>> +
->>> +/* Remove the oldest pending ACL, and all pending ACLs with the same handle */
->>> +static void hci_remove_pending_acl(struct work_struct *work)
->>> +{
->>> +     struct hci_dev *hdev;
->>> +     struct sk_buff *skb, *tmp;
->>> +     struct hci_acl_hdr *hdr;
->>> +     u16 handle, oldest_handle;
->>> +
->>> +     hdev = container_of(work, struct hci_dev, remove_pending_acl.work);
->>> +     skb = skb_dequeue(&hdev->pending_acl_q);
->>> +
->>> +     if (!skb)
->>> +             return;
->>> +
->>> +     hdr = (struct hci_acl_hdr *)skb->data;
->>> +     oldest_handle = hci_handle(__le16_to_cpu(hdr->handle));
->>> +     kfree_skb(skb);
->>> +
->>> +     bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
->>> +                oldest_handle);
->>> +
->>> +     skb_queue_walk_safe(&hdev->pending_acl_q, skb, tmp) {
->>> +             hdr = (struct hci_acl_hdr *)skb->data;
->>> +             handle = hci_handle(__le16_to_cpu(hdr->handle));
->>> +
->>> +             if (handle == oldest_handle) {
->>> +                     __skb_unlink(skb, &hdev->pending_acl_q);
->>> +                     kfree_skb(skb);
->>> +             }
->>> +     }
->>> +
->>> +     if (!skb_queue_empty(&hdev->pending_acl_q))
->>> +             queue_delayed_work(hdev->workqueue, &hdev->remove_pending_acl,
->>> +                                PENDING_ACL_TIMEOUT);
->>> +}
->>> +
->> 
->> So I am wondering if we make this too complicated. Since generally speaking we can only have a single HCI connect complete anyway at a time. No matter if the controller serializes it for us or we do it for the controller. So hci_conn_add could just process the queue for packets with its handle and then flush it. And it can flush it no matter what since whatever other packets are in the queue, they can not be valid.
->> 
->> That said, we wouldn’t even need to check the packet handles at all. We just needed to flag them as already out-of-order queued once and hand them back into the rx_q at the top. Then the would be processed as usual. Already ooo packets would cause the same error as before if it is for a non-existing handle and others would end up being processed.
->> 
->> For me this means we just need another queue to park the packets until hci_conn_add gets called. I might have missed something, but I am looking for the least invasive option for this and least code duplication.
-> 
-> I'm not aware of the fact that we can only have a single HCI connect
-> complete event at any time. Is this also true even if two / more
-> peripherals connect at the same time?
-> I was under the impression that if we have device A and B both are
-> connecting to us at the same time, we might receive the packets in
-> this order:
-> (1) ACL A
-> (2) ACL B
-> (3) HCI conn evt B
-> (4) HCI conn evt A
-> Hence the queue and the handle check.
+Similarly, if a model does not support publication, "Invalid Publish Parameters"
+should be returned in response to Publication Set message.
 
-my reading from the LL state machine is that once the first LL_Connect_Req is processes, the controller moves out of the advertising state. So no other LL_Connect_Req can be processed. So that means that connection attempts are serialized.
+Since config server is running even when an app is not attached, the only way to collect
+these model capabilities is on Attach, Join, Create, Import methods when the
+object manager collects app info.
 
-Now if you run AE and multiple instances, that might be different, but then again, these instances are also offset in time and so I don’t see how we can get more than one HCI_Connection_Complete event at a time (and with that a leading ACL packet).
+To address this issue, signatures for properties "Models" and "VendorModels" on Element
+interface change to include "options" dictionary:
+    Models: signature change "aq" -> "a(qa{sv})"
+    VendorModels: signature change "a(qq)" -> "a(qqa{sv})"
+    
+The defined keywords for the options dictionary are:
+    "Publish" - indicates whether the model supports publication mechanism.
+                If not present, publication is enabled.
+    "Subscribe" - indicates whether the model supports subscription mechanism.
+                If not present, subscriptions are enabled.
+    
+Inga Stotland (4):
+  doc/mesh-api: Add dictionary to model properties
+  mesh: Check app model settings of pub/sub support
+  tools/mesh-cfgclient: Add options to "Models" property
+  test/test-mesh: Add options to "Models" property
 
-Regards
+ doc/mesh-api.txt        |  40 ++++++++--
+ mesh/mesh-config-json.c |  72 ++++++++++++++++-
+ mesh/mesh-config.h      |   8 ++
+ mesh/model.c            |  87 +++++++++++++++++----
+ mesh/model.h            |   6 ++
+ mesh/node.c             | 168 ++++++++++++++++++++++++++++++++--------
+ test/test-mesh          |  21 ++---
+ tools/mesh-cfgclient.c  |  25 ++++--
+ 8 files changed, 359 insertions(+), 68 deletions(-)
 
-Marcel
+-- 
+2.26.2
 
