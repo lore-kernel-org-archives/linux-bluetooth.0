@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A099C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 18:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EF2C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 18:56:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 710162067D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 18:56:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C64CC2067D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 18:56:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbgF3S4U (ORCPT
+        id S1726382AbgF3S4W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 14:56:20 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57132 "EHLO mga05.intel.com"
+        Tue, 30 Jun 2020 14:56:22 -0400
+Received: from mga05.intel.com ([192.55.52.43]:57136 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726207AbgF3S4U (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 14:56:20 -0400
-IronPort-SDR: lSjb/vKyQfKfsiquppXIKvMymr3s/C6MqKMLtL4gOUKEigS4S5FfQX4vm5K5tIgj4ZkxQ41Wxx
- IePXfJPIJmnQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="231222955"
+        id S1726207AbgF3S4V (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Jun 2020 14:56:21 -0400
+IronPort-SDR: pWWsIlSY9yYBQ9umrtm7QeRcT3/LwP88zlya5ei2kS7IvR4LMRCTHRJsg9XNQs8utGtw9hJwZ/
+ Rm0A3l/dhXwA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="231222957"
 X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="231222955"
+   d="scan'208";a="231222957"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 11:56:20 -0700
-IronPort-SDR: L6rWgbEQzsSc2Y9vgiJc4OFQLTySxJd3KnZ2/HVDDGdQNaAUkOSSbOPDCpBGRDdcWLsgetYQ1f
- EtsSxNCbL9Rg==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 11:56:21 -0700
+IronPort-SDR: H3VwgdpiP90NDUQW/Kkf8UERXuz4MoYIGKnnK2zDB8kdRRpqZ66IvLVraAWKwwCDpQ3A/wUAox
+ DGK1UK+OJ4RQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="355864252"
+   d="scan'208";a="355864259"
 Received: from mlindstr-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.254.108.27])
-  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 11:56:20 -0700
+  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 11:56:21 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
         Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2 1/4] doc/mesh-api: Add dictionary to model properties
-Date:   Tue, 30 Jun 2020 11:56:14 -0700
-Message-Id: <20200630185617.14755-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2 3/4] tools/mesh-cfgclient: Add options to "Models" property
+Date:   Tue, 30 Jun 2020 11:56:16 -0700
+Message-Id: <20200630185617.14755-4-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200630185617.14755-1-inga.stotland@intel.com>
 References: <20200630185617.14755-1-inga.stotland@intel.com>
@@ -52,78 +52,68 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This changes the signature of "Models" and "VendorModels" properties
-on org.bluez.mesh.Element1 interface to contain a dictionary with
-model options.
-
-Models: signature change "aq" -> "a(qa{sv})"
-VendorModels: signature change "a(qq)" -> "a(qqa{sv})"
-
-Currently, the defined keywords for the options dictionary are
-"Publish" - indicates whether the model supports publication mechanism.
-            If not present, publication is enabled.
-"Subscribe" - indicates whether the model supports subscription mechanism.
-            If not present, subscriptions are enabled.
-
-The dictionary allowed to be empty.
+This adds options dictionary to "Models" property to stay
+in sync with mesh-api changes.
 ---
- doc/mesh-api.txt | 40 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 6 deletions(-)
+ tools/mesh-cfgclient.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 3be11e342..495f95b0b 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -888,15 +888,43 @@ Properties:
- 		Element index. It is required that the application follows
- 		sequential numbering scheme for the elements, starting with 0.
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index 0dd02fad8..59f079213 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -1448,14 +1448,26 @@ static void proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
+ 	}
+ }
  
--	array{uint16} Models [read-only]
-+	array{(uint16 id, dict caps)} Models [read-only]
++static void build_model(struct l_dbus_message_builder *builder, uint16_t mod_id,
++					bool pub_enable, bool sub_enable)
++{
++	l_dbus_message_builder_enter_struct(builder, "qa{sv}");
++	l_dbus_message_builder_append_basic(builder, 'q', &mod_id);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++	append_dict_entry_basic(builder, "Subscribe", "b", &sub_enable);
++	append_dict_entry_basic(builder, "Publish", "b", &pub_enable);
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_struct(builder);
++}
++
+ static bool mod_getter(struct l_dbus *dbus,
+ 				struct l_dbus_message *message,
+ 				struct l_dbus_message_builder *builder,
+ 				void *user_data)
+ {
+-	l_dbus_message_builder_enter_array(builder, "q");
+-	l_dbus_message_builder_append_basic(builder, 'q', &app.ele.mods[0]);
+-	l_dbus_message_builder_append_basic(builder, 'q', &app.ele.mods[1]);
++	l_dbus_message_builder_enter_array(builder, "(qa{sv})");
++	build_model(builder, app.ele.mods[0], false, false);
++	build_model(builder, app.ele.mods[1], false, false);
+ 	l_dbus_message_builder_leave_array(builder);
  
--		An array of SIG Model Identifiers. The array may be empty.
-+		An array of SIG Models:
+ 	return true;
+@@ -1466,7 +1478,7 @@ static bool vmod_getter(struct l_dbus *dbus,
+ 				struct l_dbus_message_builder *builder,
+ 				void *user_data)
+ {
+-	l_dbus_message_builder_enter_array(builder, "(qq)");
++	l_dbus_message_builder_enter_array(builder, "(qqa{sv})");
+ 	l_dbus_message_builder_leave_array(builder);
  
--	array{(uint16, uint16)} VendorModels [read-only]
-+			id - SIG Model Identifier
+ 	return true;
+@@ -1517,9 +1529,10 @@ static void setup_ele_iface(struct l_dbus_interface *iface)
+ 	/* Properties */
+ 	l_dbus_interface_property(iface, "Index", 0, "y", ele_idx_getter,
+ 									NULL);
+-	l_dbus_interface_property(iface, "VendorModels", 0, "a(qq)",
++	l_dbus_interface_property(iface, "VendorModels", 0, "a(qqa{sv})",
+ 							vmod_getter, NULL);
+-	l_dbus_interface_property(iface, "Models", 0, "aq", mod_getter, NULL);
++	l_dbus_interface_property(iface, "Models", 0, "a(qa{sv})", mod_getter,
++									NULL);
  
--		An array of pairs (vendor, model ID): vendor is a 16-bit
--		Bluetooth-assigned Company ID as defined by Bluetooth SIG.
--		model ID is a 16-bit vendor-assigned Model Identifier
-+			options - a dictionary that may contain additional model
-+			info. The following keys are defined:
-+
-+				boolean Publish - indicates whether the model
-+					supports publication mechanism. If not
-+					present, publication is enabled.
-+
-+				boolean Subscribe - indicates whether the model
-+					supports subscription mechanism. If not
-+					present, subscriptons are enabled.
-+
-+		The array may be empty.
-+
-+
-+	array{(uint16 vendor, uint16 id, dict options)} VendorModels [read-only]
-+
-+		An array of Vendor Models:
-+
-+			vendor - a 16-bit Bluetooth-assigned Company ID as
-+			defined by Bluetooth SIG.
-+
-+			id - a 16-bit vendor-assigned Model Identifier
-+
-+			options - a dictionary that may contain additional model
-+			info. The following keys are defined:
-+
-+				boolean Publish - indicates whether the model
-+					supports publication mechanism
-+
-+				boolean Subscribe - indicates whether the model
-+					supports subscription mechanism
- 
- 		The array may be empty.
- 
+ 	/* Methods */
+ 	l_dbus_interface_method(iface, "DevKeyMessageReceived", 0,
 -- 
 2.26.2
 
