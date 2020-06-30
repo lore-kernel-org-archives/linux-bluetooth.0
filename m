@@ -2,128 +2,115 @@ Return-Path: <SRS0=BnFh=AL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 269F4C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 21:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6531C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 22:50:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDC1B206B6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 21:56:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2C3220722
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jun 2020 22:50:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Vyf6XWz5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JB5A5Jb4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727083AbgF3V4C (ORCPT
+        id S1726352AbgF3WuL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jun 2020 17:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38084 "EHLO
+        Tue, 30 Jun 2020 18:50:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726376AbgF3V4B (ORCPT
+        with ESMTP id S1726117AbgF3WuL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jun 2020 17:56:01 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F52C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 14:56:01 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id t74so12355392lff.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 14:56:00 -0700 (PDT)
+        Tue, 30 Jun 2020 18:50:11 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1DEFC061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 15:50:10 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id bf1so8104657pjb.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2020 15:50:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tmOZ0XuG4g2eZl+4ZC4AL+xOIxaD6EMfVCRTLIIYYGE=;
-        b=Vyf6XWz5jRcDww52yc4d4Oq+roFuuZKNq/BHB+ZWpxojfUqNPllihDN3f5lJ8Y/T9Z
-         mwZ+lFjbe/hrfezCl+gc8clJtr574NRs/xP5o/wtJ8y+u91ep3VP16u8K22A7ej7qLdC
-         ehvTBg23bF+6odhA/tdesc/Y3povKcjIUODms=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=cVROIil0P6Me4UmNrUmy9jeA88aHofdQBlO7lyf+/O4=;
+        b=JB5A5Jb4NzllbO3m0+J+h8eiJURMMGVIg8h38t7RXOLWdMsrzuYRffbM/qDQngEqTl
+         UG+PX6i0+sZd+JDt04t2SNIQIEkMlniucDCCEWbKibfXbCiSg/JmkLXC2CI7Np9PekGs
+         kQQDrXnIK+btDZNy8XZ1ceh3Eg5lB1x7rEESWjINfys+GFaUIT03pmpLbxIbOwL1aMOa
+         inh9VYk4uA8F1VM0Wq+l4dAwAZ9PDf51kgN9HDogFVPbSW7AVs9GqXj8NJXVYBsM8yFO
+         A4BRYCAAwUc2/300YO1Lq3RnruZ+95UhfMob0dxGNthQyVupegOiTtn3rDM2hNEJLyJg
+         abFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tmOZ0XuG4g2eZl+4ZC4AL+xOIxaD6EMfVCRTLIIYYGE=;
-        b=JRXwxCUP7UQXyh5nHusgmI2md3mOU45yczKv83vYLsbELe8AIHsRydxjikOyrtCcil
-         ibtK2IEoRJg8x/9pNDWmfBoZiVhqSzORYBHxkYq3ituQT633/yBfdPDlbmrOR4ouDuES
-         o2iHP+NlUanf5Od8YM1ugoa6qLDILZlxitIvqoje01H2CTY5pSLkf2DPK72teMu/wAuM
-         EYZ8BORf7PT3feh7C787IChh/arcD50UvVsoVx6InuSdO7N3AOWZ3eZs4ceEqicUu782
-         Ix8Ibbo2WTCa/RX3RyrquLbQElbG0Vfa7xLPN3f19sRphvca/UPGY1CeARDM/7x/hhuM
-         FsDg==
-X-Gm-Message-State: AOAM530NctXgzTurm9kZY+Oad73N7wPFFcHRVHPd2V8rBW1c9tm/XhBe
-        KCF3Ha0+R0O5Xqd4aaP+OmNiQdAdVro/2rbb9d+X0yY6lEY=
-X-Google-Smtp-Source: ABdhPJwR94n+7xH83mHqidczu9CR0DjnMKdnF/jaaPKl94g8fG7h0fWVOeEftBCONCQWeAKI/tJPnTqCAI/9SJ7Gstg=
-X-Received: by 2002:a19:8407:: with SMTP id g7mr13225699lfd.61.1593554159514;
- Tue, 30 Jun 2020 14:55:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200629201441.v1.1.I162e3c6c4f4d963250c37733c3428329110c5989@changeid>
- <968D6753-8ACB-4298-91A4-F2C9438EAC06@holtmann.org>
-In-Reply-To: <968D6753-8ACB-4298-91A4-F2C9438EAC06@holtmann.org>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Tue, 30 Jun 2020 14:55:48 -0700
-Message-ID: <CABmPvSFq36OA-dxXxjhhocZjoJ1ZMZXZ4TULRYyTxcpksuXA7g@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=cVROIil0P6Me4UmNrUmy9jeA88aHofdQBlO7lyf+/O4=;
+        b=m5vz85Yvs2aJ2Gw/eabf2msDvliemihwnU+/UAgoNu4w54BgD1ot3P9koWY6rTZ0lF
+         K3/0cRJQIn0vGVfPXsRKJOcdL+4pANy1DFsSvZpD2oDi2RiONexSyPQCNWp++7fXEnFd
+         HPtYDn/hic1hkte+9/c2m0csok+l9HWoX1tpvfJryZiNo+TaGiNNpoNV4WNKcvZre3pr
+         YTKDqtp4Gac1ggzouiaa9Ww5X9agjXdqHQmkc+J20IW67o+uxLSQuLBP3k3enu6Is6cI
+         yqawMlFfWeu3OX5Yu+D60WIxfwzx+PKOG6NwmRQh56vayBSx+03chO9k6C8tp+x58Nvv
+         5LSw==
+X-Gm-Message-State: AOAM5336n8xfazDsRfIXQ+axZj+1AjM3enplRfwVjCRv8DBmHkipTWvE
+        xiJjgPDSjr88niOIwfZ2YoxbzpP9UlSPWGr2/w1y06znZtFGnCkqHsx8EMud5/O+G9VZ0NlYtyY
+        hxuml/XO9dR986fQhN7O2Ly9IrOJZdpw7pgP88a4vi1wSvU5ujs076qybc/btQimNOo8T5VFvnf
+        kA
+X-Google-Smtp-Source: ABdhPJxGTayO9mHc2L7BN83AOy4exVzxM5TTUN0K8NJUCMXZRLcaLVJ+HDlkjIyGVI8zq78hdSCnDyKW48qs
+X-Received: by 2002:a62:2c54:: with SMTP id s81mr15503821pfs.252.1593557410362;
+ Tue, 30 Jun 2020 15:50:10 -0700 (PDT)
+Date:   Tue, 30 Jun 2020 15:49:34 -0700
+Message-Id: <20200630154855.Bluez.v1.1.I63c3ddd54189c2ad9ca9aba2c08e0925d7f0aee3@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+Subject: [Bluez PATCH v1] device - If HFP is supported, ignore HSP
+From:   Yu Liu <yudiliu@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Hsin-Yu Chao <hychao@google.com>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Hsin-Yu Chao <hychao@google.com>
 
-hci_unregister_dev() is invoked when the controller is intended to be
-removed by btusb driver. In other words, there should not be any
-activity on hdev's workqueue, so the destruction of the workqueue
-should be the first thing to do to prevent the clear helpers from
-issuing any work. So my suggestion is to revert the patch re-arranging
-the workqueue and apply this instead.
-I should have uploaded this earlier, but I encountered some troubles
-while verifying the changes. Sorry for the inconvenience.
+For a BT headset that supports both HSP and HFP, BlueZ creates
+service instances for these two profiles and connects them.
+It's uncertain that which of HSP and HFP eventually get connected
+and being used for SCO audio. And we start observing some problem
+because of this uncertainty:
 
-Regards,
-Miao
+- For headset that supports WBS, we need HFP connect for codec
+negotiation. If HSP connects but not HFP, WBS cannot be used.
+- For WH-1000XM3, if BlueZ ever initiated HFP connection but failed,
+headset won't have working SCO audio even HSP is connected.
 
-On Mon, Jun 29, 2020 at 11:51 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Miao-chen,
->
-> > This fixes the kernel oops by removing unnecessary background scan
-> > update from hci_adv_monitors_clear() which shouldn't invoke any work
-> > queue.
-> >
-> > The following test was performed.
-> > - Run "rmmod btusb" and verify that no kernel oops is triggered.
-> >
-> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > ---
-> >
-> > net/bluetooth/hci_core.c | 2 --
-> > 1 file changed, 2 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 5577cf9e2c7cd..77615161c7d72 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -3005,8 +3005,6 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
-> >               hci_free_adv_monitor(monitor);
-> >
-> >       idr_destroy(&hdev->adv_monitors_idr);
-> > -
-> > -     hci_update_background_scan(hdev);
-> > }
->
-> I am happy to apply this as well, but I also applied another patch re-arranging the workqueue destroy handling. Can you check which prefer or if we should include both patches.
->
-> Regards
->
-> Marcel
->
+Fix this at when device probes services, if HFP is in the uuid list,
+don't bother create one for HSP.
+
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+---
+
+Changes in v1:
+- Initial change
+
+ src/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 7b0eb256e..4036bfd81 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4370,6 +4370,11 @@ static struct btd_service *probe_service(struct btd_device *device,
+ 	if (!device_match_profile(device, profile, uuids))
+ 		return NULL;
+ 
++	/* If device supports HFP, don't bother create service for HSP. */
++	if (g_slist_find_custom(uuids, HFP_HS_UUID, bt_uuid_strcmp) &&
++		bt_uuid_strcmp(profile->remote_uuid, HSP_HS_UUID) == 0)
++		return NULL;
++
+ 	l = find_service_with_profile(device->services, profile);
+ 	if (l)
+ 		return l->data;
+-- 
+2.27.0.212.ge8ba1cc988-goog
+
