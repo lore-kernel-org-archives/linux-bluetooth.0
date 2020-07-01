@@ -2,120 +2,106 @@ Return-Path: <SRS0=mBsK=AM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D2FC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 21:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF35CC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 21:13:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC38520870
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 21:09:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFE7E20748
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 21:13:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m4oeAeMQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4N13e+9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726865AbgGAVJA (ORCPT
+        id S1727050AbgGAVNo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Jul 2020 17:09:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56526 "EHLO
+        Wed, 1 Jul 2020 17:13:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbgGAVI7 (ORCPT
+        with ESMTP id S1726441AbgGAVNn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Jul 2020 17:08:59 -0400
-Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACBCC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2020 14:08:59 -0700 (PDT)
-Received: by mail-ua1-x941.google.com with SMTP id b24so702790uak.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2020 14:08:59 -0700 (PDT)
+        Wed, 1 Jul 2020 17:13:43 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456A6C08C5DC
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2020 14:13:43 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p22so27394417ybg.21
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2020 14:13:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ka+PnVHK/1B/CrRrAZfYxcFHrqbNySjfxP7d7NkszAU=;
-        b=m4oeAeMQkY62Y9pJCbsP2LJM44KZ2NxAjS1RZqeUD+uY9llI00BqEAcix5XIm//OCA
-         Jkj6we/QqJ7VgCfsjBN/PL+RtDETarYm+q4hoYwc6vJ7eAMM76MM0VmSQ3o7uQcC2ulM
-         503PhAYUeTyD/tn3+KWz/LaZyRGGxgk/LAJOE=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=1693jLPCRTZKv04e3tT1L2R/SD/azULEZvoSLa7Hf7o=;
+        b=X4N13e+9sePnsNX3KaC3ifEpq8r8prYY7zHclzCR5upKpuH+zMAIp0a3v81FRPNLSQ
+         G/oEf3GoGKzfnImMohbfzdfak484FP/LerO7QfZnV6oiJy5RkPeJ4JGyaWW4d/KoT+og
+         xaCTxxyLWdrK4Iy5oj1E4JZQLNCwWwFK+QmJ/rHwp8YgFpakYgrdyJcDKvQ7Hhutimdk
+         veAa42QeTkaDOUzn9UlIWlC4KV+uT51zeVpLjn2F2l8a/oToAXzSKFN4laYPXVsvB7KO
+         IWeEQJElTFTPPbn1R8LGZw8Vc3cSYrMYEomRY+SMbjXzjp+LawK0qruJeF/TCA8JmuqR
+         92mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ka+PnVHK/1B/CrRrAZfYxcFHrqbNySjfxP7d7NkszAU=;
-        b=MoWT9Nwugxw8z9eOjkZv3n9Xz0gfX2Hg4V1rqTnsaj8OZNRTDOFh8DiUwsakaloYT3
-         RVQigmsNxMQwZwjrDA0SuJqn3cnpT4U5RNwvFx4sEhD7QjUiYOqmzvtbIl4oz6rLaMg5
-         k2h2FJ2u2JlZeEpNmwVqLC39tAad1i48EmtBMZ/AsxjrPlt1oHcmDpenKP+MlHPZsKpi
-         u9Mo5P22hZ70fgDdQZeywdqVU/sBYAy6HcOvxIiNID0/T8zGaNZlv2+10VjK8JHQmG1C
-         FhiQ2ZgJ63OYVe0C0tYQQCzCAehiKZ6CSqHKeFZwxRLtNlv/TO6j/2duVWGJ3uV0In0r
-         oMhw==
-X-Gm-Message-State: AOAM531r2/Solh+Ef/2MQfjoETHk/lCFHqhTWVK5/fOFfxnrpdixJFJo
-        cuaRm1OMCarbYonhoVVoXvEjjNHAudM=
-X-Google-Smtp-Source: ABdhPJxLN0QM6HGgzDG6i9b4Dza95ez5N+UiN44S1w4R8cUTgXi/wWXRu4ExuMHMaeQRH/F0Fl9bDQ==
-X-Received: by 2002:a9f:260b:: with SMTP id 11mr19897956uag.49.1593637738606;
-        Wed, 01 Jul 2020 14:08:58 -0700 (PDT)
-Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id d200sm1148839vkd.16.2020.07.01.14.08.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 14:08:58 -0700 (PDT)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v1] Bluetooth: le_simult_central_peripheral exp feature
-Date:   Wed,  1 Jul 2020 21:08:55 +0000
-Message-Id: <20200701210855.351671-1-alainm@chromium.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=1693jLPCRTZKv04e3tT1L2R/SD/azULEZvoSLa7Hf7o=;
+        b=QCT73f/0KrJgDrlMp5u9VXvMagC7QxmMwFOaFCWtIgmA0zk7XGchTht6R6V8fUqm5k
+         2DHpTsVXBchec5/3ta1wwstSGH6En44fjXwk5tESballDH5wnAKszuzTAfRSXI0xitba
+         XuJp9M6FeqfaEYPtyvhwO/fLTADOWkeGo7GO/u9zKpCo9UcBpZSKWt4NcFy2Hnf5goSb
+         yKEfYGYyLXM/mROpPmRH78OTRTI+nRkpAQ2e//KFJnHXIFq6V1ff8XYs9n4KmUtZhzLn
+         6NuLH70oSbZfcCUjGUVwHfJWWS/iTVvMgaBAkSS/pVdTiAx1ilnTEYwugwUw01tmxHsD
+         4TEA==
+X-Gm-Message-State: AOAM530D9+UMCYA95XsA4QqXA5cMd1OCICrGNDurpqw/F285bc+/+tZY
+        mTwuHJVdxA3C53SWDst7CribIOS2NRzy5e4Oi0YP
+X-Google-Smtp-Source: ABdhPJz8wsHLEwNJYlVtw6qZZkh7AGzr6LYq5q8mwTBXuA/WiMwNXf+RKMjvBio06uTM33Rt9QsVW8X11w5NfovFi+WJ
+X-Received: by 2002:a25:c7d3:: with SMTP id w202mr29331301ybe.84.1593638022312;
+ Wed, 01 Jul 2020 14:13:42 -0700 (PDT)
+Date:   Wed,  1 Jul 2020 14:13:36 -0700
+Message-Id: <20200701211337.3027448-1-danielwinkler@google.com>
+Mime-Version: 1.0
 X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v2 0/1] Revert "serial: 8250: Fix max baud limit in generic
+ 8250 port"
+From:   Daniel Winkler <danielwinkler@google.com>
+To:     linux-serial@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        stable@vger.kernel.org, abhishekpandit@chromium.org,
+        Daniel Winkler <danielwinkler@google.com>,
+        Aaron Sierra <asierra@xes-inc.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, Lukas Wunner <lukas@wunner.de>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds an le_simult_central_peripheral features which allows a
-clients to determine if the controller is able to support peripheral and
-central connections at the same time.
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+This change regresses the QCA6174A-3 bluetooth chip, preventing
+firmware from being properly loaded. Without this change, the
+chip works as intended.
 
- net/bluetooth/mgmt.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+The device is the Kukui Chromebook using the Mediatek chipset
+and the 8250_mtk uart. Initial controller baudrate is 115200
+and operating speed is 3000000. Our entire suite of bluetooth
+tests now fail on this platform due to an apparent failure to
+sync its firmware on initialization.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5e9b9728eeac..b34547d7a897 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3753,10 +3753,16 @@ static const u8 debug_uuid[16] = {
- };
- #endif
- 
-+/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
-+static const u8 le_simult_central_peripheral[16] = {
-+	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
-+	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
-+};
-+
- static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 				  void *data, u16 data_len)
- {
--	char buf[42];
-+	char buf[44];
- 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
- 	u16 idx = 0;
- 
-@@ -3774,6 +3780,13 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 	}
- #endif
- 
-+	if (hdev && test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) &&
-+	    (hdev->le_states[3] & 0x10)) {
-+		memcpy(rp->features[idx].uuid, le_simult_central_peripheral,
-+		       sizeof(le_simult_central_peripheral));
-+		rp->features[idx].flags = cpu_to_le32(BIT(0));
-+	}
-+
- 	rp->feature_count = cpu_to_le16(idx);
- 
- 	/* After reading the experimental features information, enable
+The driver is in the cros tree at drivers/bluetooth/hci_qca.c
+and uses the serdev interface. Specifically, this is the
+QCA_ROME chipset.
+
+
+Daniel Winkler (1):
+  Revert "serial: 8250: Fix max baud limit in generic 8250 port"
+
+ drivers/tty/serial/8250/8250_port.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
 -- 
 2.27.0.212.ge8ba1cc988-goog
 
