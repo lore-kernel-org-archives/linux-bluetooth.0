@@ -7,137 +7,212 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1192C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 17:55:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAFFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 17:56:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8BF820771
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 17:55:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C913F207F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jul 2020 17:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aT13mzU+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/AKkttC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732016AbgGARzJ (ORCPT
+        id S1732016AbgGAR4h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Jul 2020 13:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54688 "EHLO
+        Wed, 1 Jul 2020 13:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726693AbgGARzJ (ORCPT
+        with ESMTP id S1729871AbgGAR4h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Jul 2020 13:55:09 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B8A4C08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2020 10:55:08 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id e4so13223229oib.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2020 10:55:08 -0700 (PDT)
+        Wed, 1 Jul 2020 13:56:37 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08162C08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2020 10:56:37 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id y22so8752333oie.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2020 10:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gyQF7N46rccRe51etLI7nVzODLmPrqWQyISOUMmMZXM=;
-        b=aT13mzU+yVEAV+120HJCM5aNR0ikcpI2/fyyC400rmUauGIrTZJ9HEswLx2SQSzShl
-         KvMmT/yuK3RqOJwLWDxOUm0pmdEjtGDtk0w3mBdxzLOTSgFAYmqrUpVVJHj8TKiu7eMS
-         WH9kuiP/qYr8dUZoMOjofTKoSofoHGhsDSFvrUdrpCyA/zb5sDM4cxbBonti1gXjh6rc
-         dEpGwcDarfXeVawfmXyeesnNFhbkDZrYc1n9NDe6xHKQgg4tCCnsBmErMEW5I+QG4w2v
-         9iVQAEErt/h5vnAcb8NaBmikjUZPq1bgikhCv9ltVM11aXCn/GssR6UnA1Bxe8BSRWj8
-         MyRA==
+        bh=0Ls8IsKIk7NU/ETs03RIvkIdisdmmvQF6Bl4XBfF4+E=;
+        b=Z/AKkttCI2eIXOQi6/fByvTN36UJdKkDOn1aVIAp6HIpABDE/tZedpbPg7FpCQQ2vm
+         oRA8obcuJrEnJV9ghlxUxyR4H3xeWCJ4eDydzJRZiR9UWx6HiHy6nHvCa2G5gMpDsGyx
+         fQwDx1ctEtZ7JW5auvgnZvyuZ+ppttIaQvMywb6XJVFy1NHlEYMeH0v34t7USYUr1kfy
+         sru9l9Xww165JMhZijnT80pLpGO2AZVN6cZWawylNg4e3i3G+3rowBNy2N1q7x7kZ+Nd
+         KC3+0j31zqOF2smpwBUrYg6loj9y2RPg2drFkKuhIUdXkAq5bfb9/xx0jJQxOsU5uVRo
+         7/CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gyQF7N46rccRe51etLI7nVzODLmPrqWQyISOUMmMZXM=;
-        b=hN72Krpb/rN4Vr7AK/2dbd0Dav3zCpCS1r97JKC1njssrn4KDDxbgO11A0nNkLwLqt
-         HZL1yCiz+9TodJVm5vxqKGjMPp2PXfc35a5xt+qsmQ6I8vd3nFObyRAlvXQzfHhruqey
-         Xqt6ONjq1akVUnj50353eZmvclhBL/QCrX/W+xZzZ8Q5ovmNdyxdR+pla61pj/yaxfKR
-         gjz1B4U0jiaPIpyLy0O7JBzGQE/e8IQCUvJCZ2DhS2lU8LMvHctsqNUih709XueXEiZy
-         cQVtV1iOKEVfJfhQZFbvbyH9fueW8OcX3sb/5FADIdH4IM0LhycrhilApNTE7iLIlW3s
-         rW5Q==
-X-Gm-Message-State: AOAM531DT7n19VuyrM4il8oob9xBMigK8+/Ipwr4IOph7BbBCKyb0Bf3
-        aNHkqu2GdBPBsZx5mOtys39dCS6LlT2k6ZeeyeaxNFIY
-X-Google-Smtp-Source: ABdhPJx0Vlug3SMuuYns/x1sLLojNvX7NRS2ZYHdNDFcWRh4CElcYaraPMcBI38a1jHJPARMzW3vQkDO5HNtA2rnBK8=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr14927355oix.48.1593626107393;
- Wed, 01 Jul 2020 10:55:07 -0700 (PDT)
+        bh=0Ls8IsKIk7NU/ETs03RIvkIdisdmmvQF6Bl4XBfF4+E=;
+        b=sQjsVCYK4KqjLS5biSUKx73RnyvnwQQYTEMXXykc9Y65+J4Xgsc7rgbxCi1IQAN9ec
+         rkfIgs8gxEQMV9urt3o0iFXitjFmHkHUf7Y920OhOcjqXYVEvF9qTHGzuBbydY7gvmrQ
+         2RKT+7GOoi0r3DZWyzKOHQaulKr52FC9+iE1XkC0r0Zk+pQsmDmZhNHtSEipdjX3IVtZ
+         xaERmCUoOFA7RuWbTE0j5jzAHrhmF4jz1LEvMZgnMr9RkYIsRE7wfUibr+ldhqO5nrqb
+         U4unlXYn2aP1PSmCqZHJMSrQ2O2Ovvm/9ju4PDo40dX8Sy4/pcYCSMpT33tMnhR3TG2H
+         CUqw==
+X-Gm-Message-State: AOAM531RVPPP92yhK5uxatunF4ETBiWmOU2NAjLDycohfO+pryEJbj4e
+        uho3Er2doy3JP1tx55y2mZmRp0C0MfP0gbODmNE=
+X-Google-Smtp-Source: ABdhPJyeEQSUGGoHfHKC8otW9FaxyxClTDkRoO8nLu3vK7lper9WpURQGnJ2GtVw0vzXH6p459QUH+GxkRZkwyCOk/k=
+X-Received: by 2002:aca:cf81:: with SMTP id f123mr15017156oig.137.1593626196366;
+ Wed, 01 Jul 2020 10:56:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200701131328.3835273-1-alainm@chromium.org>
-In-Reply-To: <20200701131328.3835273-1-alainm@chromium.org>
+References: <20200630184629.95013-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200630184629.95013-1-sonnysasaka@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 1 Jul 2020 10:54:55 -0700
-Message-ID: <CABBYNZLZPJKy=Fk9bLeSys5mMh3QtWcoqW4yhqszPsP=Jj6MEg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v3] profiles/scanparam: use configured scanparams
- when available
-To:     Alain Michaud <alainm@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Miao-Chen Chou <mcchou@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>
+Date:   Wed, 1 Jul 2020 10:56:24 -0700
+Message-ID: <CABBYNZKvKNhZeQ52sEE8uZYdrX9cBjM2Wh_BrOpZnkJUc5YcKQ@mail.gmail.com>
+Subject: Re: [PATCH v2] client: Add battery command
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Sonny,
 
-On Wed, Jul 1, 2020 at 6:16 AM Alain Michaud <alainm@chromium.org> wrote:
+On Tue, Jun 30, 2020 at 1:48 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 >
-> This patch updates the scan parameter service to use the configured scan
-> parameters when available rather than the hardcoded kernel defaults.
+> This adds the "battery" command to show battery information of a peer
+> device based on org.bluez.Battery1 API. Example usage:
 >
-> Reviewed-by: Miao-Chen Chou <mcchou@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
->
+> [bluetooth]# battery XX:XX:XX:XX:XX:XX
+> Percentage: 100%
+
+It might be better to put the battery level under info command.
+
 > ---
+>  client/main.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
 >
-> Changes in v3:
->  - Addin Chromium/Gerrit reviewers
+> diff --git a/client/main.c b/client/main.c
+> index 422da5593..8c1ed00fb 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -65,6 +65,7 @@ static struct adapter *default_ctrl;
+>  static GDBusProxy *default_dev;
+>  static GDBusProxy *default_attr;
+>  static GList *ctrl_list;
+> +static GList *battery_proxies;
 >
-> Changes in v2:
->  - Fixing checkpatch comment warning.
+>  static const char *agent_arguments[] = {
+>         "on",
+> @@ -107,7 +108,9 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+>         bt_shell_set_prompt(PROMPT_OFF);
 >
->  profiles/scanparam/scan.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
+>         g_list_free_full(ctrl_list, proxy_leak);
+> +       g_list_free_full(battery_proxies, proxy_leak);
+>         ctrl_list = NULL;
+> +       battery_proxies = NULL;
 >
-> diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-> index 9e8f57747..d72be3dff 100644
-> --- a/profiles/scanparam/scan.c
-> +++ b/profiles/scanparam/scan.c
-> @@ -45,12 +45,11 @@
->  #include "src/shared/gatt-db.h"
->  #include "src/shared/gatt-client.h"
->  #include "attrib/att.h"
-> +#include "src/hcid.h"
+>         default_ctrl = NULL;
+>  }
+> @@ -445,6 +448,16 @@ done:
+>         g_free(desc);
+>  }
 >
->  #define SCAN_INTERVAL_WIN_UUID         0x2A4F
->  #define SCAN_REFRESH_UUID              0x2A31
->
-> -#define SCAN_INTERVAL          0x0060
-> -#define SCAN_WINDOW            0x0030
->  #define SERVER_REQUIRES_REFRESH        0x00
->
->  struct scan {
-> @@ -75,8 +74,16 @@ static void write_scan_params(struct scan *scan)
->  {
->         uint8_t value[4];
->
-> -       put_le16(SCAN_INTERVAL, &value[0]);
-> -       put_le16(SCAN_WINDOW, &value[2]);
-> +       /* Unless scan parameters are configured, use the known kernel default
-> +        * parameters
-> +        */
-> +       put_le16(main_opts.default_params.le_scan_interval_autoconnect ?
-> +                       main_opts.default_params.le_scan_interval_autoconnect :
-> +                       0x60, &value[0]);
+> +static void battery_added(GDBusProxy *proxy)
+> +{
+> +       battery_proxies = g_list_append(battery_proxies, proxy);
+> +}
 > +
-> +       put_le16(main_opts.default_params.le_scan_win_autoconnect ?
-> +                       main_opts.default_params.le_scan_win_autoconnect :
-> +                       0x30, &value[2]);
+> +static void battery_removed(GDBusProxy *proxy)
+> +{
+> +       battery_proxies = g_list_remove(battery_proxies, proxy);
+> +}
+> +
+>  static void device_added(GDBusProxy *proxy)
+>  {
+>         DBusMessageIter iter;
+> @@ -539,6 +552,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>                 gatt_add_manager(proxy);
+>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>                 ad_manager_added(proxy);
+> +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
+> +               battery_added(proxy);
+>         }
+>  }
 >
->         bt_gatt_client_write_without_response(scan->client, scan->iwhandle,
->                                                 false, value, sizeof(value));
+> @@ -630,6 +645,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>                 gatt_remove_manager(proxy);
+>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>                 ad_unregister(dbus_conn, NULL);
+> +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
+> +               battery_removed(proxy);
+>         }
+>  }
+>
+> @@ -763,6 +780,20 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
+>         return NULL;
+>  }
+>
+> +static GDBusProxy *find_battery_by_path(GList *source, const char *path)
+> +{
+> +       GList *list;
+> +
+> +       for (list = g_list_first(source); list; list = g_list_next(list)) {
+> +               GDBusProxy *proxy = list->data;
+> +
+> +               if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
+> +                       return proxy;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+>  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+>  {
+>         GList *list;
+> @@ -1650,6 +1681,35 @@ static void cmd_info(int argc, char *argv[])
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> +static void cmd_battery(int argc, char *argv[])
+> +{
+> +       DBusMessageIter iter;
+> +       GDBusProxy *device_proxy;
+> +       GDBusProxy *battery_proxy;
+> +       unsigned char percentage;
+> +
+> +       device_proxy = find_device(argc, argv);
+> +       if (!device_proxy)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       battery_proxy = find_battery_by_path(battery_proxies,
+> +                                       g_dbus_proxy_get_path(device_proxy));
+> +       if (!battery_proxy) {
+> +               bt_shell_printf("Device %s does not have battery information\n",
+> +                               argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       if (g_dbus_proxy_get_property(battery_proxy, "Percentage", &iter) ==
+> +                                                                       FALSE)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       dbus_message_iter_get_basic(&iter, &percentage);
+> +       bt_shell_printf("Percentage: %d%%\n", percentage);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+>  static void pair_reply(DBusMessage *message, void *user_data)
+>  {
+>         DBusError error;
+> @@ -2785,6 +2845,8 @@ static const struct bt_shell_menu main_menu = {
+>                                                         dev_generator },
+>         { "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
+>                                                         dev_generator },
+> +       { "battery",      "[dev]",    cmd_battery, "Show device battery",
+> +                                                       dev_generator },
+>         { } },
+>  };
+>
 > --
-> 2.27.0.212.ge8ba1cc988-goog
+> 2.26.2
 >
 
-Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
