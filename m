@@ -2,105 +2,73 @@ Return-Path: <SRS0=k5tg=AN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A229CC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE73C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 12:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 895D620884
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 244FB207CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 12:02:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbgGBIq6 (ORCPT
+        id S1728742AbgGBMCG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jul 2020 04:46:58 -0400
-Received: from mga07.intel.com ([134.134.136.100]:46981 "EHLO mga07.intel.com"
+        Thu, 2 Jul 2020 08:02:06 -0400
+Received: from mga14.intel.com ([192.55.52.115]:27652 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726445AbgGBIq5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jul 2020 04:46:57 -0400
-IronPort-SDR: SMm7EsYoyGOCw1VH5AY5MYxjoaW32H29P1oECYocvko45IY5F5b95UUmHgEiCVDdbXD7I/6b+L
- oqc/XQVNs4sQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="211871600"
-X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
-   d="scan'208";a="211871600"
+        id S1728697AbgGBMCG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Jul 2020 08:02:06 -0400
+IronPort-SDR: TG4/sEYIa8m7xIk78sPgt0iAGN5zZBnq7BZcoqy5obJY+9FhCgljYP7rRPWxTK/HnvVItVrAIu
+ XOyRW3IvM9Kg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="145947812"
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="145947812"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 01:46:57 -0700
-IronPort-SDR: 8v773znlm029UZL/qcOa676PS5qX3eVR1JOuEsIfC/o5+P9qUYXJro3MDuwBkXM9lWFBy+Zfy4
- emMN3tj3kZLQ==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 05:02:06 -0700
+IronPort-SDR: djcz1Eo83MXMCRmRyJRqmliIvD50mP7od4NQwsU9NZN8B9U3eHLZJlhYI8DKZPZ2R/zEOyJ1jL
+ cgZ2KVIE8yAA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
-   d="scan'208";a="455443914"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
-  by orsmga005.jf.intel.com with ESMTP; 02 Jul 2020 01:46:53 -0700
-Received: from andy by smile with local (Exim 4.94)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1jqurt-00HAon-VD; Thu, 02 Jul 2020 11:46:53 +0300
-Date:   Thu, 2 Jul 2020 11:46:53 +0300
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Lukas Wunner <lukas@wunner.de>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Daniel Winkler <danielwinkler@google.com>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        linux-serial@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        stable@vger.kernel.org, abhishekpandit@chromium.org,
-        Aaron Sierra <asierra@xes-inc.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] Revert "serial: 8250: Fix max baud limit in
- generic 8250 port"
-Message-ID: <20200702084653.GG3703480@smile.fi.intel.com>
-References: <20200701211337.3027448-1-danielwinkler@google.com>
- <20200701223713.gavale4aramu3xnb@mobilestation>
- <20200702041152.e5csvbodojzwnagx@wunner.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200702041152.e5csvbodojzwnagx@wunner.de>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="304224689"
+Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Jul 2020 05:02:04 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        kiraank@gmail.com, Kiran K <kiran.k@intel.com>
+Subject: [PATCH 0/5]  Refactor firmware download
+Date:   Thu,  2 Jul 2020 17:33:10 +0530
+Message-Id: <20200702120315.26768-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 06:11:52AM +0200, Lukas Wunner wrote:
-> On Thu, Jul 02, 2020 at 01:37:13AM +0300, Serge Semin wrote:
-> > 1) Add a new capability like UART_CAP_NO16DIV and take it into account
-> >    in the serial8250_get_baud_rate() method.
-> >  
-> > I don't have a documentation for the Mediatek UART port, but it seems to me
-> > that that controller calculates the baud rate differently from the standard
-> > 8250 port. A standard 8250 port does that by the next formulae:
-> >   baud = uartclk / (16 * divisor).
-> > While it seems to me that the Mediatek port uses the formulae like:
-> >   baud = uartclk / divisor. (Please, correct me if I'm wrong)
-> 
-> 8250_bcm2835aux.c seems to suffer from a similar issue and
-> solves it like this in the ->probe hook:
-> 
-> 	/* the HW-clock divider for bcm2835aux is 8,
-> 	 * but 8250 expects a divider of 16,
-> 	 * so we have to multiply the actual clock by 2
-> 	 * to get identical baudrates.
-> 	 */
-> 	up.port.uartclk = clk_get_rate(data->clk) * 2;
+Hi,
 
-8250_mid for example lies about UART clock due to this. It has a comment in the
-code in its ->set_termios().
+This patchset series refactors firmware download sequence to accomodate
+new generation Intel controllers. Few functions have been split to enhance
+readability and reusability.
 
-Yes, we have a lot of possibilities here to fix, I guess. We have custom
-termios callback, also get and set divisor and so on.
+Kiran K (5):
+  Bluetooth: btintel: Make controller version read generic
+  Bluetooth: btintel: Refactor firmware header download sequence
+  Bluetooth: btintel: Refactor firmware payload download code
+  Bluetooth: btintel: Define tlv structure for new generation
+    Controllers
+  Bluetooth: btintel: Parse controller information present in TLV format
+
+ drivers/bluetooth/btintel.c   | 223 ++++++++++++++++++++++++++++++----
+ drivers/bluetooth/btintel.h   | 110 +++++++++++++++--
+ drivers/bluetooth/btusb.c     |  73 +++++++----
+ drivers/bluetooth/hci_ag6xx.c |  12 +-
+ drivers/bluetooth/hci_intel.c |  14 ++-
+ 5 files changed, 369 insertions(+), 63 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.17.1
 
