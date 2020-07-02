@@ -2,238 +2,222 @@ Return-Path: <SRS0=k5tg=AN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACB2C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 15:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A25AFC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 334C2208B8
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 15:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D9AA21534
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 17:12:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mn9sqSRj"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="oSMwrXn5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730280AbgGBPnE (ORCPT
+        id S1727951AbgGBRMi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jul 2020 11:43:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726353AbgGBPnD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:43:03 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C552C08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2020 08:43:03 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id g37so715400otb.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2020 08:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wacwb6gdlVm4ErQQEHazoKnIUKGvN0uOle2VWL6Ms4E=;
-        b=mn9sqSRjZ4t8Ol5Dr/3tVs9e8IIWHTvavbBa6p1ZnP7kF6kjbSkOC4Ccnu1u47y81U
-         Ppr344czHUSkpMNKfFtX9e8MZsQa2I1wgD3BwLVVC4H3Mz2T9gePqc3bzkDi/p05s9Cv
-         Du2N9JdnARhUAkN+QAMOB8LgwcBNR076rNMbEVA2Sgpn+kQbzIEg2umhOC4pxQXl0rA2
-         rhc2SKUlFvT3EOV++GyvCmUgaHDZd87RO11siv/vFTiS04HL7KUOqG8k/NAZWWCg0GJK
-         Pt6Y+JyAs2dkxKb9aLgbcOLGAJz8ao3BV2+jyrxRtHzmTg7zk+iYYwFUM7dA78C0eCm3
-         Kpqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wacwb6gdlVm4ErQQEHazoKnIUKGvN0uOle2VWL6Ms4E=;
-        b=j4WeUUQjdLHT1o4oZkM/TgrUmG3CsDHQc1tpm5cN1PeXOgDUanPW1GOurHvTD0XbFf
-         N4CwgQZUBWwNxIs9f1eS0YWHyIrQC1XDEVQRAiURfddiHxgI2UhCfAN+XA0g73Kixrgu
-         uU8V7kBnzTSQ+pyljN3jefgR02AvUP86KCDz/NZOcbbvqc5+0GuSz9+bMZZNuzYGFiBx
-         US4XEuOPJE5+ylUOWV7ex2Zp7QPPdMAHYj1ykN/xy6a2Vld+UaJ4MSYfnteQWGcU0N/b
-         wiOX+JxbGKncyd3lOI41vK3Q7RKG3OA+t3m88KUhALptTFvmxW7vFzLcEV7K1tUOLLtT
-         wYrA==
-X-Gm-Message-State: AOAM531kuJIdkjgB35ogh307NYCls/ubw+lyS32oxBNdfLizwswlGzif
-        QhSPAr+o43FvAOv+hcBhuxCQ7gi4sjXZTDdPuxM=
-X-Google-Smtp-Source: ABdhPJwgkTuQNDmuPh/0Bn8rVx5kEK4inahJY18zg8r8VIxIctYsH2x19jGSyEc0k3gjl2L+YsvoC9ckr5v6FtTPf7g=
-X-Received: by 2002:a9d:3da5:: with SMTP id l34mr26580484otc.88.1593704582694;
- Thu, 02 Jul 2020 08:43:02 -0700 (PDT)
+        Thu, 2 Jul 2020 13:12:38 -0400
+Received: from mga14.intel.com ([192.55.52.115]:60985 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727817AbgGBRMb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Jul 2020 13:12:31 -0400
+IronPort-SDR: TdWHlBp//X+yXbhPyvjtBYEUldZ0/t5UYGEbPGeA63TyljAfSghAqCNKFvW/JEXhOdGD/irLbD
+ TgZmDKHjU+Zw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="146057739"
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="146057739"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 10:12:28 -0700
+IronPort-SDR: CRaXBcYpNSNnzALPYcDthxnoGUuqbnzsQ5mEbBVEz7t3/N+9GqF7JVgT/vwX/t2ckW1Mq/k+Km
+ gzAcGy4Qx16w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="295961668"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga002.jf.intel.com with ESMTP; 02 Jul 2020 10:12:28 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Jul 2020 10:12:28 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 2 Jul 2020 10:12:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cIcDitTn7PObwoeAa7y1M8g+9hGa13VouXIVtpzteZIJ4qEX9wBp8bT21dgOMki/WyuWpngLbdUz6jjd8CIbQiY6ijwClQ0aX6heLjq1vzF72qn7lEtRQ2XgGR4Dzf5K8+4LHpK4nayvfZRKFPUu5wsHZj/nztumLwLCSl4qzS2V5m8AVVkHqtiFyVMrF1Ye55EVr/8asYmNipNuOTZKsdarfocWnXNipzhKg1mRCNKZTdsPCLqVfDHDZB3QVe1InfeVkAx6vRItEoyg4zJ2PwHAS/K8gOZDKDjMYySY1gExjklkcWPiC41Qi91o/Itb8h3+ddwJoCW0+hqLXg3XQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8QwE996iYUojjzuErdA89dNQTCBB+5Ok/2gVElc7wFI=;
+ b=gTjmHtUK59/+Q5ke7blHaUlKYad3q1NFO/JEmMjzA5naR1wtS+7aer+B/jwyYpz1apQy8VdRZrZElJsw9/GEBWKGeTT/i+TdgaemkqdDBVCTdM3bLa6Xyhzfrz681sViZJo5IQ1EHyD8k0umh6a4mtoGQ4FAeIo4ZVzb+HFw0myeLvc9FfMnV2broQ2nRh99RA443IqcjZT5M7X2v+6tpxzyPkdHGH7eZD5Ni/IgYohJFP7BcuN1jKHSTf6S8KLDcPW7eK8GE1dCqLAcTOHP48krzwCHlG5u3vYi32FjdxmEfp5iRI2NPjz8mjkzw/Hor/d4+bqSjLmNPEuMKN+ECQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8QwE996iYUojjzuErdA89dNQTCBB+5Ok/2gVElc7wFI=;
+ b=oSMwrXn547Tft4W9FTGG2uNnBJujYGZNXK/wHskSaKwrdkSB6N4M9a8YyxL6CVAydAagsrw8TGkna3/PqwIFVsp9bZLJ/5DbUmHgxAoWirvmxi3ppZdqj1VOq8G1pL27JaDjKTXgGr1FF3yuagXjSk+rQd5BT44J4v49XjrYSuc=
+Received: from BYAPR11MB3141.namprd11.prod.outlook.com (2603:10b6:a03:8d::13)
+ by BYAPR11MB3656.namprd11.prod.outlook.com (2603:10b6:a03:f8::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Thu, 2 Jul
+ 2020 17:12:23 +0000
+Received: from BYAPR11MB3141.namprd11.prod.outlook.com
+ ([fe80::9ce5:c8f4:581b:9d9f]) by BYAPR11MB3141.namprd11.prod.outlook.com
+ ([fe80::9ce5:c8f4:581b:9d9f%5]) with mapi id 15.20.3131.028; Thu, 2 Jul 2020
+ 17:12:23 +0000
+From:   "K, Kiran" <kiran.k@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "kiraank@gmail.com" <kiraank@gmail.com>,
+        "Bag, Amit K" <amit.k.bag@intel.com>,
+        Raghuram Hegde <raghuram.hegde@intel.com>
+Subject: RE: [PATCH 2/5] Bluetooth: btintel: Refactor firmware header download
+ sequence
+Thread-Topic: [PATCH 2/5] Bluetooth: btintel: Refactor firmware header
+ download sequence
+Thread-Index: AQHWUGikJG8ZDOrkEUGU3i8Ku3Xo3Kj0R9GAgAA+jQA=
+Date:   Thu, 2 Jul 2020 17:12:23 +0000
+Message-ID: <BYAPR11MB3141F7C82AA1D4A78A8A1AC2F56D0@BYAPR11MB3141.namprd11.prod.outlook.com>
+References: <20200702120315.26768-1-kiran.k@intel.com>
+ <20200702120315.26768-3-kiran.k@intel.com>
+ <8040CBA1-AF50-43A1-8314-4E44E4F27173@holtmann.org>
+In-Reply-To: <8040CBA1-AF50-43A1-8314-4E44E4F27173@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.2.0.6
+dlp-product: dlpe-windows
+authentication-results: holtmann.org; dkim=none (message not signed)
+ header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.79.96]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6a4503c5-651c-4fd5-a2be-08d81eab162c
+x-ms-traffictypediagnostic: BYAPR11MB3656:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR11MB365665B201669BDC08914CEFF56D0@BYAPR11MB3656.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0452022BE1
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RpJxg7ovTqggl6YV5ebnqPjOs1DhVcwjDUUXtnckoWUOOzSCp4A6emmmzrS8uJeIiTGZbL70OAGekPmqRscaHrl/7qNgmlvO6c48T7haMinqNTt0yv3odOtPixJL0u3nozhB63TL3ClxKW2cYP4J5+QOUGVYj8pZ2ddMDfRvwn0PB8aRelr5FY47jgh+Bmo+WDCAvCNK2X7xvlXMKCmq+wIB/TnwzwnymATGY7rCr30fLuwaDuOr0zdpy4lRHixhpCJ+nWpfz7TtSBCOZSduauykqm0h+RsS8tU30tptQUEWN4CFShZoFYn3Qsn9lxsLe1guCASw1q7rbDCR1UA5ZQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3141.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(8936002)(64756008)(76116006)(66556008)(4326008)(66446008)(66946007)(66476007)(83380400001)(8676002)(7696005)(33656002)(478600001)(55016002)(9686003)(54906003)(52536014)(316002)(107886003)(6506007)(71200400001)(86362001)(186003)(2906002)(26005)(6916009)(5660300002)(53546011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: usD3W7JwpOiFlwg4yjty0Xfq4tRxYlkjPKdyS3mnb/wKeqNZAEEImdW0S8KLSJm15IP4M5fkwEsfnMKiyveBCN3aoQsafTHqq1F5zo4t5IrVvIWVdpxtmhF31JIVtOeSVCeHv/9hxUzMolNjxn2pa5+nrdZw0t/eqK7t8wC1e8yVu+lvT9h6vT0y0BCsbEk9TqYwLzVrVajaHsAFFIffCcxHanPsaRpRvxIknyfNaDzkueXrZR9xSQx460lEK5y988aRBTZ2lz4Z3nseQ9VdMN4Poyq2RdFLR11PCfiE2sojCVMA1MkbFgjJHQAwBqWMY3+5ZY5vlR/zcZTWoTTGDXcpHducZbDVH4rjBYk4MsgdaSudUkHLJ9EHE2T8Bu/DhDeQBFKkrzBFNqj+U8Jx1xmV6AhZUMOq56QpY3XXfYojGV3a64YL4b+RyKz3325HyhCMjJyYX7XsMYq5Wijw9sWlftrt7fP3WShzpTlqtD4=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20200701192202.9508-1-sonnysasaka@chromium.org>
- <CABBYNZKsM52hLuNEYSqhHoiMXE5Kix_pp6AoCJeJ4rd6f-NyWg@mail.gmail.com> <CAOxioN=0s1XebO6qg_kohi=s8Q8DkP6GXdqqqGL17QK2e=Dg4w@mail.gmail.com>
-In-Reply-To: <CAOxioN=0s1XebO6qg_kohi=s8Q8DkP6GXdqqqGL17QK2e=Dg4w@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 2 Jul 2020 08:42:50 -0700
-Message-ID: <CABBYNZK5SyZL6mx0D2dtRqz1P7m6+JZSBXMP-xRKjNBngf-oaA@mail.gmail.com>
-Subject: Re: [PATCH v2] client: Add battery percentage to info command
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3141.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a4503c5-651c-4fd5-a2be-08d81eab162c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2020 17:12:23.1061
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1uT0wECCpVtHWiJxt8wlA+fqe5yLNE9npw4K7AUHr6TQVXS/DReA/TSo5HbbG9uGs2Aycov2KRP6vIDfkEpfwA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB3656
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+Hi Marcel,
 
-On Wed, Jul 1, 2020 at 11:06 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
->
-> Hi Luiz,
->
-> On Wed, Jul 1, 2020 at 10:20 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org <linux-bluetooth-
+> owner@vger.kernel.org> On Behalf Of Marcel Holtmann
+> Sent: Thursday, July 2, 2020 6:56 PM
+> To: K, Kiran <kiran.k@intel.com>
+> Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishan=
+kar
+> <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
+> <chethan.tumkur.narayan@intel.com>; kiraank@gmail.com; Bag, Amit K
+> <amit.k.bag@intel.com>; Raghuram Hegde <raghuram.hegde@intel.com>
+> Subject: Re: [PATCH 2/5] Bluetooth: btintel: Refactor firmware header
+> download sequence
+>=20
+> Hi Kiran,
+>=20
+> > Move firmware header download code to a separate function to enhance
+> > readability and reusability
 > >
-> > Hi Sonny,
+> > Signed-off-by: Kiran K <kiran.k@intel.com>
+> > Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> > Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+> > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> > Reviewed-by: Sathish Narasimman <Sathish.Narasimman@intel.com>
+> > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+> > ---
+> > drivers/bluetooth/btintel.c | 21 +++++++++++++++++----
+> > 1 file changed, 17 insertions(+), 4 deletions(-)
 > >
-> > On Wed, Jul 1, 2020 at 12:24 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > >
-> > > This adds the Battery Percentage to the info command based on
-> > > org.bluez.Battery1 API. Example usage:
-> > >
-> > > [bluetooth]# info XX:XX:XX:XX:XX:XX
-> > > Device XX:XX:XX:XX:XX:XX (random)
-> > >         Name: ...
-> > >         Alias: ...
-> > >         ...
-> > >         Modalias: ...
-> > >         Battery Percentage: 100%
-> > > ---
-> > >  client/main.c | 43 +++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 43 insertions(+)
-> > >
-> > > diff --git a/client/main.c b/client/main.c
-> > > index 422da5593..4b787240e 100644
-> > > --- a/client/main.c
-> > > +++ b/client/main.c
-> > > @@ -65,6 +65,7 @@ static struct adapter *default_ctrl;
-> > >  static GDBusProxy *default_dev;
-> > >  static GDBusProxy *default_attr;
-> > >  static GList *ctrl_list;
-> > > +static GList *battery_proxies;
-> > >
-> > >  static const char *agent_arguments[] = {
-> > >         "on",
-> > > @@ -107,7 +108,9 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
-> > >         bt_shell_set_prompt(PROMPT_OFF);
-> > >
-> > >         g_list_free_full(ctrl_list, proxy_leak);
-> > > +       g_list_free_full(battery_proxies, proxy_leak);
-> > >         ctrl_list = NULL;
-> > > +       battery_proxies = NULL;
-> > >
-> > >         default_ctrl = NULL;
-> > >  }
-> > > @@ -445,6 +448,16 @@ done:
-> > >         g_free(desc);
-> > >  }
-> > >
-> > > +static void battery_added(GDBusProxy *proxy)
-> > > +{
-> > > +       battery_proxies = g_list_append(battery_proxies, proxy);
-> > > +}
-> > > +
-> > > +static void battery_removed(GDBusProxy *proxy)
-> > > +{
-> > > +       battery_proxies = g_list_remove(battery_proxies, proxy);
-> > > +}
-> > > +
-> > >  static void device_added(GDBusProxy *proxy)
-> > >  {
-> > >         DBusMessageIter iter;
-> > > @@ -539,6 +552,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
-> > >                 gatt_add_manager(proxy);
-> > >         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> > >                 ad_manager_added(proxy);
-> > > +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
-> > > +               battery_added(proxy);
-> > >         }
-> > >  }
-> > >
-> > > @@ -630,6 +645,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
-> > >                 gatt_remove_manager(proxy);
-> > >         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> > >                 ad_unregister(dbus_conn, NULL);
-> > > +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
-> > > +               battery_removed(proxy);
-> > >         }
-> > >  }
-> > >
-> > > @@ -763,6 +780,20 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
-> > >         return NULL;
-> > >  }
-> > >
-> > > +static GDBusProxy *find_battery_by_path(GList *source, const char *path)
-> > > +{
-> > > +       GList *list;
-> > > +
-> > > +       for (list = g_list_first(source); list; list = g_list_next(list)) {
-> > > +               GDBusProxy *proxy = list->data;
-> > > +
-> > > +               if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
-> > > +                       return proxy;
-> > > +       }
-> > > +
-> > > +       return NULL;
-> > > +}
-> > > +
-> > >  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
-> > >  {
-> > >         GList *list;
-> > > @@ -1606,8 +1637,10 @@ static struct GDBusProxy *find_device(int argc, char *argv[])
-> > >  static void cmd_info(int argc, char *argv[])
-> > >  {
-> > >         GDBusProxy *proxy;
-> > > +       GDBusProxy *battery_proxy;
-> > >         DBusMessageIter iter;
-> > >         const char *address;
-> > > +       unsigned char percentage;
-> > >
-> > >         proxy = find_device(argc, argv);
-> > >         if (!proxy)
-> > > @@ -1647,6 +1680,16 @@ static void cmd_info(int argc, char *argv[])
-> > >         print_property(proxy, "AdvertisingFlags");
-> > >         print_property(proxy, "AdvertisingData");
-> > >
-> > > +       battery_proxy = find_battery_by_path(battery_proxies,
-> > > +                                       g_dbus_proxy_get_path(proxy));
+> > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> > index dea96c585ecb..1c820c187421 100644
+> > --- a/drivers/bluetooth/btintel.c
+> > +++ b/drivers/bluetooth/btintel.c
+> > @@ -646,12 +646,10 @@ int btintel_read_boot_params(struct hci_dev
+> > *hdev, } EXPORT_SYMBOL_GPL(btintel_read_boot_params);
 > >
-> > I'd replace the lines below with just print_property(battery_proxy,
-> > "Percentage"); and just make print_property check for NULL proxy if it
-> > doesn't already.
-> I tried this but the result doesn't look quite good:
-> Device XX:XX:XX:XX:XX:XX (random)
->         Name: ...
->         ...
->         Modalias: ...
->         Percentage: 0x64
->
-> The name "Percentage" is not clear (what kind of percentage does it
-> mean) when shown in the "info" command. And also the format for byte
-> data type is hex and there is no percent sign. I tried to modify the
-> print_property function to support custom format but the code gets
-> overly complex and I think it's more straightforward to use custom
-> logic like in this patch.
+> > -int btintel_download_firmware(struct hci_dev *hdev, const struct firmw=
+are
+> *fw,
+> > -			      u32 *boot_param)
+> > +static int btintel_sfi_rsa_header_secure_send(struct hci_dev *hdev,
+> > +					      const struct firmware *fw)
+> > {
+> > 	int err;
+> > -	const u8 *fw_ptr;
+> > -	u32 frag_len;
+> >
+> > 	/* Start the firmware download transaction with the Init fragment
+> > 	 * represented by the 128 bytes of CSS header.
+> > @@ -679,6 +677,21 @@ int btintel_download_firmware(struct hci_dev
+> *hdev, const struct firmware *fw,
+> > 		bt_dev_err(hdev, "Failed to send firmware signature (%d)",
+> err);
+> > 		goto done;
+> > 	}
+>=20
+> Here should be an extra empty line before the label.
 
-Just make it always print both the decimal and (hex).
+Ack. I will fix it in v2.
+>=20
+> > +done:
+> > +	return err;
+> > +}
+> > +
+> > +int btintel_download_firmware(struct hci_dev *hdev, const struct firmw=
+are
+> *fw,
+> > +			      u32 *boot_param)
+> > +{
+> > +	int err;
+> > +	const u8 *fw_ptr;
+> > +	u32 frag_len;
+> > +
+> > +	err =3D btintel_sfi_rsa_header_secure_send(hdev, fw);
+> > +	if (err)
+> > +		goto done;
+> > +
+>=20
+> Scrap the extra empty line here.
 
+Ack.
+>=20
 > >
-> > > +       if (battery_proxy && g_dbus_proxy_get_property(
-> > > +                               battery_proxy, "Percentage", &iter)) {
-> > > +               dbus_message_iter_get_basic(&iter, &percentage);
-> > > +               bt_shell_printf("\tBattery Percentage: %d%%\n", percentage);
-> > > +       } else {
-> > > +               bt_shell_printf("\tNo battery information\n");
-> > > +       }
-> > > +
-> > >         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> > >  }
-> > >
-> > > --
-> > > 2.17.1
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+> > 	fw_ptr =3D fw->data + 644;
+> > 	frag_len =3D 0;
+>=20
+> Regards
+>=20
+> Marcel
 
+Thanks,
+Kiran
 
-
--- 
-Luiz Augusto von Dentz
