@@ -2,98 +2,207 @@ Return-Path: <SRS0=k5tg=AN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8171BC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 04:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C60C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 05:20:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6567020737
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 04:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1A8620737
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 05:20:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMgSbogJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726184AbgGBEL4 (ORCPT
+        id S1726174AbgGBFUM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jul 2020 00:11:56 -0400
-Received: from bmailout1.hostsharing.net ([83.223.95.100]:45731 "EHLO
-        bmailout1.hostsharing.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbgGBEL4 (ORCPT
+        Thu, 2 Jul 2020 01:20:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbgGBFUL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jul 2020 00:11:56 -0400
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "*.hostsharing.net", Issuer "COMODO RSA Domain Validation Secure Server CA" (not verified))
-        by bmailout1.hostsharing.net (Postfix) with ESMTPS id 07030300011B9;
-        Thu,  2 Jul 2020 06:11:53 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id BC3492ED3E2; Thu,  2 Jul 2020 06:11:52 +0200 (CEST)
-Date:   Thu, 2 Jul 2020 06:11:52 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Cc:     Daniel Winkler <danielwinkler@google.com>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        linux-serial@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        stable@vger.kernel.org, abhishekpandit@chromium.org,
-        Aaron Sierra <asierra@xes-inc.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] Revert "serial: 8250: Fix max baud limit in
- generic 8250 port"
-Message-ID: <20200702041152.e5csvbodojzwnagx@wunner.de>
-References: <20200701211337.3027448-1-danielwinkler@google.com>
- <20200701223713.gavale4aramu3xnb@mobilestation>
+        Thu, 2 Jul 2020 01:20:11 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B2AC08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2020 22:20:11 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id k15so23185638otp.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2020 22:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+QuSF3vVBHGBgyyhE3tJdb3M+cAv1YvUDZ6m/v58lP8=;
+        b=iMgSbogJ2VIELyvkevpGa1KBWZGHJr/i39GF9DUDy6BcUQIc8Kcv1y6mbHdW1x+YRh
+         0Qy0oDao55DwDsxuGGCkSMVOJvVMY5pxt2/hSGvxVLlHDm54n8eO+ufRUwYoNZPZ/uba
+         +nDYn0ma6ciojnTq1mM0JaUuYg5f4U79Pw98gNIQ/5NBG7+H6WI9uHQufDbNj4i5opJ/
+         X5hnszT2wodgiG6b9zqVhiaoaA0W0vVM3vKB8XPnX59AF9nW3dWCCq04w36iRABYI7GY
+         hVvnSj0vLn1mlxsAA63D3AxVJY21m1E7xeIB1NzgOzcBsfEezCBqJ133mKnUxwAWrhUz
+         wn1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+QuSF3vVBHGBgyyhE3tJdb3M+cAv1YvUDZ6m/v58lP8=;
+        b=rbe9/5PuHrm8/GzGsolk4xGgpm4W5DspIdBDhVlu6X7unR72kmz5/l2Z2dSERwuBKA
+         aN/w8sbJYIcaSJyWNlYJGrzDi8suFho8VVtxvTrWP8wEMYPVoqvqn9qqdfdhbQpLc0uB
+         6lmgaQRBUTg2Gao4/zK/KxlNceDZ0GpAgAXkHPtEmFFuX8KsKP/BD/wmZ7vsu7gtVuZD
+         l1fDdp3sApydST2LWeoM0S7J/GOg6yOLmuuXfUdysRkwKIyc0Y5Eh+N6bmCthzB9UAAp
+         tpVUobIT77qsnVPIpUgNfXdUl55AXG6jJ+9qqSQ8nwy5AZBGBZjrHPIvZFHMQYyVwkri
+         LA0w==
+X-Gm-Message-State: AOAM531C9O4PgnO//ZitsOUFNclCPZu2HRzCIdo/co551IR8oFBI9ytj
+        pU89FUuRL0ZaBJ/LMPOxIKnnIKxL+QHqkYnhn68=
+X-Google-Smtp-Source: ABdhPJxdQiYxok6hDiKMNWxvwbeQ4fgJNtvPes/Mz5/Jp1ZPAeiqcOgg0qjjO/zvxLlAyqyVmGrLVjsQpuSY0JN5zSw=
+X-Received: by 2002:a9d:6c09:: with SMTP id f9mr8047001otq.362.1593667210999;
+ Wed, 01 Jul 2020 22:20:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200701223713.gavale4aramu3xnb@mobilestation>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20200701192202.9508-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200701192202.9508-1-sonnysasaka@chromium.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 1 Jul 2020 22:19:55 -0700
+Message-ID: <CABBYNZKsM52hLuNEYSqhHoiMXE5Kix_pp6AoCJeJ4rd6f-NyWg@mail.gmail.com>
+Subject: Re: [PATCH v2] client: Add battery percentage to info command
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 01:37:13AM +0300, Serge Semin wrote:
-> 1) Add a new capability like UART_CAP_NO16DIV and take it into account
->    in the serial8250_get_baud_rate() method.
->  
-> I don't have a documentation for the Mediatek UART port, but it seems to me
-> that that controller calculates the baud rate differently from the standard
-> 8250 port. A standard 8250 port does that by the next formulae:
->   baud = uartclk / (16 * divisor).
-> While it seems to me that the Mediatek port uses the formulae like:
->   baud = uartclk / divisor. (Please, correct me if I'm wrong)
+Hi Sonny,
 
-8250_bcm2835aux.c seems to suffer from a similar issue and
-solves it like this in the ->probe hook:
+On Wed, Jul 1, 2020 at 12:24 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+>
+> This adds the Battery Percentage to the info command based on
+> org.bluez.Battery1 API. Example usage:
+>
+> [bluetooth]# info XX:XX:XX:XX:XX:XX
+> Device XX:XX:XX:XX:XX:XX (random)
+>         Name: ...
+>         Alias: ...
+>         ...
+>         Modalias: ...
+>         Battery Percentage: 100%
+> ---
+>  client/main.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 43 insertions(+)
+>
+> diff --git a/client/main.c b/client/main.c
+> index 422da5593..4b787240e 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -65,6 +65,7 @@ static struct adapter *default_ctrl;
+>  static GDBusProxy *default_dev;
+>  static GDBusProxy *default_attr;
+>  static GList *ctrl_list;
+> +static GList *battery_proxies;
+>
+>  static const char *agent_arguments[] = {
+>         "on",
+> @@ -107,7 +108,9 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+>         bt_shell_set_prompt(PROMPT_OFF);
+>
+>         g_list_free_full(ctrl_list, proxy_leak);
+> +       g_list_free_full(battery_proxies, proxy_leak);
+>         ctrl_list = NULL;
+> +       battery_proxies = NULL;
+>
+>         default_ctrl = NULL;
+>  }
+> @@ -445,6 +448,16 @@ done:
+>         g_free(desc);
+>  }
+>
+> +static void battery_added(GDBusProxy *proxy)
+> +{
+> +       battery_proxies = g_list_append(battery_proxies, proxy);
+> +}
+> +
+> +static void battery_removed(GDBusProxy *proxy)
+> +{
+> +       battery_proxies = g_list_remove(battery_proxies, proxy);
+> +}
+> +
+>  static void device_added(GDBusProxy *proxy)
+>  {
+>         DBusMessageIter iter;
+> @@ -539,6 +552,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>                 gatt_add_manager(proxy);
+>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>                 ad_manager_added(proxy);
+> +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
+> +               battery_added(proxy);
+>         }
+>  }
+>
+> @@ -630,6 +645,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>                 gatt_remove_manager(proxy);
+>         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
+>                 ad_unregister(dbus_conn, NULL);
+> +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
+> +               battery_removed(proxy);
+>         }
+>  }
+>
+> @@ -763,6 +780,20 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
+>         return NULL;
+>  }
+>
+> +static GDBusProxy *find_battery_by_path(GList *source, const char *path)
+> +{
+> +       GList *list;
+> +
+> +       for (list = g_list_first(source); list; list = g_list_next(list)) {
+> +               GDBusProxy *proxy = list->data;
+> +
+> +               if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
+> +                       return proxy;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+>  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
+>  {
+>         GList *list;
+> @@ -1606,8 +1637,10 @@ static struct GDBusProxy *find_device(int argc, char *argv[])
+>  static void cmd_info(int argc, char *argv[])
+>  {
+>         GDBusProxy *proxy;
+> +       GDBusProxy *battery_proxy;
+>         DBusMessageIter iter;
+>         const char *address;
+> +       unsigned char percentage;
+>
+>         proxy = find_device(argc, argv);
+>         if (!proxy)
+> @@ -1647,6 +1680,16 @@ static void cmd_info(int argc, char *argv[])
+>         print_property(proxy, "AdvertisingFlags");
+>         print_property(proxy, "AdvertisingData");
+>
+> +       battery_proxy = find_battery_by_path(battery_proxies,
+> +                                       g_dbus_proxy_get_path(proxy));
 
-	/* the HW-clock divider for bcm2835aux is 8,
-	 * but 8250 expects a divider of 16,
-	 * so we have to multiply the actual clock by 2
-	 * to get identical baudrates.
-	 */
-	up.port.uartclk = clk_get_rate(data->clk) * 2;
+I'd replace the lines below with just print_property(battery_proxy,
+"Percentage"); and just make print_property check for NULL proxy if it
+doesn't already.
+
+> +       if (battery_proxy && g_dbus_proxy_get_property(
+> +                               battery_proxy, "Percentage", &iter)) {
+> +               dbus_message_iter_get_basic(&iter, &percentage);
+> +               bt_shell_printf("\tBattery Percentage: %d%%\n", percentage);
+> +       } else {
+> +               bt_shell_printf("\tNo battery information\n");
+> +       }
+> +
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> --
+> 2.17.1
+>
 
 
-> 2) Manually call serial8250_do_set_divisor() in the custom set_termios()
->    callback.
-> 
-> Just add the uart_update_timeout() and serial8250_do_set_divisor() methods
-> invocation into the mtk8250_set_termios() function, which the original commit
-> 81bb549fdf14 ("serial: 8250_mtk: support big baud rate") author should have
-> done in the first place.
-
-That sound preferable as adding new quirks into core code feels
-like a case of midlayer fallacy:
-
-https://blog.ffwll.ch/2016/12/midlayers-once-more-with-feeling.html
-
-Thanks,
-
-Lukas
+-- 
+Luiz Augusto von Dentz
