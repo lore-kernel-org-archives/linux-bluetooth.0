@@ -2,46 +2,47 @@ Return-Path: <SRS0=k5tg=AN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3550BC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 07:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A229CC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 139D32089D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 07:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593675441;
-	bh=vpifWVwgbjHSUaEegAAHzDiKupI4P46wI+RPjm/wU9M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2RmP+oz7hT1ykPee5p4lUQRliMGmp2vINeocJUPll55zobYq0zhIhA/gKZjbGr6FD
-	 48PM5l7MThjaEeVOMsjqMKsq1hIM3lCAikBjqu89R6i6zvGrhiJSPQgCzoKBA9ZFot
-	 pR978ZTYNyov5BM+WJz4x6ZSsO0yAJfDF9Chcdiw=
+	by mail.kernel.org (Postfix) with ESMTP id 895D620884
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728034AbgGBHhR (ORCPT
+        id S1726682AbgGBIq6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jul 2020 03:37:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33360 "EHLO mail.kernel.org"
+        Thu, 2 Jul 2020 04:46:58 -0400
+Received: from mga07.intel.com ([134.134.136.100]:46981 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726630AbgGBHhQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jul 2020 03:37:16 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8A27F2085B;
-        Thu,  2 Jul 2020 07:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593675436;
-        bh=vpifWVwgbjHSUaEegAAHzDiKupI4P46wI+RPjm/wU9M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KmcMFIrPlH/DYGVA69kjk8PKCY/DCTSfxA7mi8F7SUmgwxhtcI3ae4CZwpCU359bq
-         O48jck5Plf9ZR0KbrKdFvmTivRigbjS7x7dcIjocdZd0fcyNBPP6IoFm28o+ZJ2gwT
-         rN71msrjI6cYKrnS0UT2QSDl1Lxr4H8miKM1euLk=
-Date:   Thu, 2 Jul 2020 09:37:20 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Cc:     Daniel Winkler <danielwinkler@google.com>,
+        id S1726445AbgGBIq5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Jul 2020 04:46:57 -0400
+IronPort-SDR: SMm7EsYoyGOCw1VH5AY5MYxjoaW32H29P1oECYocvko45IY5F5b95UUmHgEiCVDdbXD7I/6b+L
+ oqc/XQVNs4sQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="211871600"
+X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
+   d="scan'208";a="211871600"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 01:46:57 -0700
+IronPort-SDR: 8v773znlm029UZL/qcOa676PS5qX3eVR1JOuEsIfC/o5+P9qUYXJro3MDuwBkXM9lWFBy+Zfy4
+ emMN3tj3kZLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
+   d="scan'208";a="455443914"
+Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
+  by orsmga005.jf.intel.com with ESMTP; 02 Jul 2020 01:46:53 -0700
+Received: from andy by smile with local (Exim 4.94)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1jqurt-00HAon-VD; Thu, 02 Jul 2020 11:46:53 +0300
+Date:   Thu, 2 Jul 2020 11:46:53 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Lukas Wunner <lukas@wunner.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Daniel Winkler <danielwinkler@google.com>,
         Serge Semin <fancer.lancer@gmail.com>,
         linux-serial@vger.kernel.org, linux-mediatek@lists.infradead.org,
         Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
@@ -50,64 +51,56 @@ Cc:     Daniel Winkler <danielwinkler@google.com>,
         <chromeos-bluetooth-upstreaming@chromium.org>,
         stable@vger.kernel.org, abhishekpandit@chromium.org,
         Aaron Sierra <asierra@xes-inc.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.com>, Lukas Wunner <lukas@wunner.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
         Vignesh Raghavendra <vigneshr@ti.com>,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 0/1] Revert "serial: 8250: Fix max baud limit in
  generic 8250 port"
-Message-ID: <20200702073720.GE1073011@kroah.com>
+Message-ID: <20200702084653.GG3703480@smile.fi.intel.com>
 References: <20200701211337.3027448-1-danielwinkler@google.com>
  <20200701223713.gavale4aramu3xnb@mobilestation>
+ <20200702041152.e5csvbodojzwnagx@wunner.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200701223713.gavale4aramu3xnb@mobilestation>
+In-Reply-To: <20200702041152.e5csvbodojzwnagx@wunner.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 01:37:13AM +0300, Serge Semin wrote:
-> On Wed, Jul 01, 2020 at 02:13:36PM -0700, Daniel Winkler wrote:
-> > 
-> > This change regresses the QCA6174A-3 bluetooth chip, preventing
-> > firmware from being properly loaded. Without this change, the
-> > chip works as intended.
-> > 
-> > The device is the Kukui Chromebook using the Mediatek chipset
-> > and the 8250_mtk uart. Initial controller baudrate is 115200
-> > and operating speed is 3000000. Our entire suite of bluetooth
-> > tests now fail on this platform due to an apparent failure to
-> > sync its firmware on initialization.
+On Thu, Jul 02, 2020 at 06:11:52AM +0200, Lukas Wunner wrote:
+> On Thu, Jul 02, 2020 at 01:37:13AM +0300, Serge Semin wrote:
+> > 1) Add a new capability like UART_CAP_NO16DIV and take it into account
+> >    in the serial8250_get_baud_rate() method.
+> >  
+> > I don't have a documentation for the Mediatek UART port, but it seems to me
+> > that that controller calculates the baud rate differently from the standard
+> > 8250 port. A standard 8250 port does that by the next formulae:
+> >   baud = uartclk / (16 * divisor).
+> > While it seems to me that the Mediatek port uses the formulae like:
+> >   baud = uartclk / divisor. (Please, correct me if I'm wrong)
 > 
-> Ok. It's mediatek 8250 driver, which is responsible for the failure.
-> Then we'll have two options:
+> 8250_bcm2835aux.c seems to suffer from a similar issue and
+> solves it like this in the ->probe hook:
 > 
-> 1) Add a new capability like UART_CAP_NO16DIV and take it into account
->    in the serial8250_get_baud_rate() method.
->  
-> I don't have a documentation for the Mediatek UART port, but it seems to me
-> that that controller calculates the baud rate differently from the standard
-> 8250 port. A standard 8250 port does that by the next formulae:
->   baud = uartclk / (16 * divisor).
-> While it seems to me that the Mediatek port uses the formulae like:
->   baud = uartclk / divisor. (Please, correct me if I'm wrong)
-> If so, then we could introduce a new capability like UART_CAP_NO16DIV. The
-> 8250_mtk driver will add it to the 8250-port capabilities field. The
-> serial8250_get_baud_rate() method should be altered in a way so one would check
-> whether the UART_CAP_NO16DIV flag is set and if it is then the
-> uart_get_baud_rate() function will be called without uartclk normalized by the
-> factor of 16.
-> 
-> 2) Manually call serial8250_do_set_divisor() in the custom set_termios()
->    callback.
-> 
-> Just add the uart_update_timeout() and serial8250_do_set_divisor() methods
-> invocation into the mtk8250_set_termios() function, which the original commit
-> 81bb549fdf14 ("serial: 8250_mtk: support big baud rate") author should have
-> done in the first place.
+> 	/* the HW-clock divider for bcm2835aux is 8,
+> 	 * but 8250 expects a divider of 16,
+> 	 * so we have to multiply the actual clock by 2
+> 	 * to get identical baudrates.
+> 	 */
+> 	up.port.uartclk = clk_get_rate(data->clk) * 2;
 
-Sounds like a sane fix, thanks for looking into this.
+8250_mid for example lies about UART clock due to this. It has a comment in the
+code in its ->set_termios().
 
-greg k-h
+Yes, we have a lot of possibilities here to fix, I guess. We have custom
+termios callback, also get and set divisor and so on.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
