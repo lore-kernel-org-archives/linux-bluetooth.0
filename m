@@ -2,244 +2,366 @@ Return-Path: <SRS0=k5tg=AN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DECFBC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 18:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95715C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 22:06:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B08D02084C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 18:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59D0E20780
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jul 2020 22:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UKJI1gBf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tDKrpJMA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgGBSF5 (ORCPT
+        id S1726102AbgGBWGC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jul 2020 14:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52880 "EHLO
+        Thu, 2 Jul 2020 18:06:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726349AbgGBSF5 (ORCPT
+        with ESMTP id S1725937AbgGBWGB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jul 2020 14:05:57 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CFBC08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2020 11:05:56 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id r8so24382073oij.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2020 11:05:56 -0700 (PDT)
+        Thu, 2 Jul 2020 18:06:01 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E671C08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2020 15:06:01 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id o22so8027041pjw.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2020 15:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Luqimbir/57tQriFXcTbh2hWaUyPr2MwVfjaS7PtjWY=;
-        b=UKJI1gBfEXwejkMPGNb1EiHRVaOAnGVyBacr6FwZSP4QBFjetEm9BR9RlTGSDNAESM
-         MX2PvENNMbE6F2d7chHuxHyTabMznjrRxME10gnWhN1UM1ZQXw/ZtvuiLTWzo2G4l3nN
-         hqAl7WqArT9YJ9z8Hn+6WBH/7Nnr294L3EmfY=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KLVCAsgCYrnpTxr27cIa0AxMzfsiLcn5LAAMEfcyjfE=;
+        b=tDKrpJMAT9o1aJH2sbCJBpDqxi0koKXj7Pfspk7oqLzUnYn5L5DhjgCQAAk4fTN234
+         Zplu+2sBFr03j3W7L3+wFCt0/MGB0XLk0zEhBvj/G9SdCWxE7FLd/rXLwWSF0Pay+/J1
+         ylF+YC3WtY7Plr3dHQaCQZym15q4KdMPa/+kLKtcSSyBvKub/tRLmqICe566cdJ1akuF
+         Zjfk1TTAGHJxVAgXrU4annHUiENONtXUG0BLskHHDH8eg4Tmwt9J4tzQWG0GAKM+EL7R
+         lWwRJRvGmDVudU+P7V7FoY30BxLoErQmlf1eTcqPHrJrLdGpRyDws0R8mQo+bKtsn3hM
+         wMzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Luqimbir/57tQriFXcTbh2hWaUyPr2MwVfjaS7PtjWY=;
-        b=WpBFHw0xuz5wFAuylZhP/cibFBLowThgyDpSsWw7FmSymgC136lSnd035MPiffQF8Y
-         QtDFIQ33UWTIGM8DEaf6kmsjXCccOi/On/D1e4zZSbxBEUkfNbZN6Ob5F4mDUSD4SBH4
-         ObNNqNHq1DsByZSCatVCrpkI5ssLY7SaYJKSipJ2AlRQZbGG1OAPwzROwtpESk3oYDsY
-         Vg6q7ZKKH/u/enSbmXJtl6GTXRgc/aMe71VoKEnmHeE2HlJvQAe3BoKoJN9GIrOwhR28
-         6bxOwbUXz+JRofbEChDT+cwgl6YGWhfZygqbNrjDL0kYPmxD+8v9nWyQ6G0yCib/4Z1I
-         aHuQ==
-X-Gm-Message-State: AOAM532iyTlTNLg1T+t0FztlTI6WPKSZ69Yca+3jiqYxTAxMfctWSSIS
-        1XLoqH0vTh+/J8nhC+N100us+R/rCFi4XROyLiwgu1B2zz0=
-X-Google-Smtp-Source: ABdhPJzCRQYR5ZclBRWxw6Nn8fSCjOYxcl+Sm/M9SWk6S4VnCr5aw9CsPYwUtkKQ5yjgtirNa9CuBI7k5FUXEVBRpyk=
-X-Received: by 2002:aca:c157:: with SMTP id r84mr16965301oif.136.1593713154852;
- Thu, 02 Jul 2020 11:05:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KLVCAsgCYrnpTxr27cIa0AxMzfsiLcn5LAAMEfcyjfE=;
+        b=K+oFBz/91ckOD1ezGnzpFsQAYVOAh8EBRcMcpdJU9B4jkjA5Kvh4OLRG7LQIxla6yp
+         3q3tZjsex3a8xP8avUDqHBsok7NsUCqXCB6mnmQKSE0sZKTHOcdTa51uH25Ix49VGo9Z
+         csdcAjPomD/6IYvkVpIEfbTV5+7PU3I4KlzBMuO6Pfs0Kf/tWnjj2XTgQUClFbjWaWjm
+         L18VF3oCUuMyZvGRpgZU7y9ztA+SnqIAIHfjQQUPs4PTPthd5IgahMSolf9G10198N7l
+         D7LcSwH+4JcnV6NxFH+fxUdjUFzbH4k9u48FSr6+5aT91tdKljD+V4SMc9L65F4oT5/D
+         FCHg==
+X-Gm-Message-State: AOAM531CqaT54sR75lzOPRBbth2ystmo2SnAlYVWMwhxDZ+s5G26Ecdt
+        vBC4XDNj3xDymYz9UzziyBS8ivkXFKQ=
+X-Google-Smtp-Source: ABdhPJwHgiffdaMpEtoTgA+utXtko8kgsMcL7bDfVXCJHgbamE/Oey45oJwLGSv3eJ4KKjuYwwHAqg==
+X-Received: by 2002:a17:902:bccc:: with SMTP id o12mr29615636pls.29.1593727560549;
+        Thu, 02 Jul 2020 15:06:00 -0700 (PDT)
+Received: from localhost.localdomain ([192.102.209.44])
+        by smtp.gmail.com with ESMTPSA id n62sm9284219pjb.42.2020.07.02.15.05.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2020 15:05:59 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: btusb: Add support for notifying the polling interval
+Date:   Thu,  2 Jul 2020 15:05:58 -0700
+Message-Id: <20200702220558.3467870-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
-References: <20200701192202.9508-1-sonnysasaka@chromium.org>
- <CABBYNZKsM52hLuNEYSqhHoiMXE5Kix_pp6AoCJeJ4rd6f-NyWg@mail.gmail.com>
- <CAOxioN=0s1XebO6qg_kohi=s8Q8DkP6GXdqqqGL17QK2e=Dg4w@mail.gmail.com> <CABBYNZK5SyZL6mx0D2dtRqz1P7m6+JZSBXMP-xRKjNBngf-oaA@mail.gmail.com>
-In-Reply-To: <CABBYNZK5SyZL6mx0D2dtRqz1P7m6+JZSBXMP-xRKjNBngf-oaA@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Thu, 2 Jul 2020 11:05:43 -0700
-Message-ID: <CAOxioNk7h99rd+9aF4B8NVShD3LtXRykFdfqiwG16hXKqs98wA@mail.gmail.com>
-Subject: Re: [PATCH v2] client: Add battery percentage to info command
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I just sent another patch following your feedback. Please take another
-look. Thanks!
+This enables btusb to inform the polling interval used for receiving
+packets, the interval is then used wih rx_work which has been changed
+to be a delayed work.
 
-On Thu, Jul 2, 2020 at 8:43 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sonny,
->
-> On Wed, Jul 1, 2020 at 11:06 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Wed, Jul 1, 2020 at 10:20 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Sonny,
-> > >
-> > > On Wed, Jul 1, 2020 at 12:24 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > >
-> > > > This adds the Battery Percentage to the info command based on
-> > > > org.bluez.Battery1 API. Example usage:
-> > > >
-> > > > [bluetooth]# info XX:XX:XX:XX:XX:XX
-> > > > Device XX:XX:XX:XX:XX:XX (random)
-> > > >         Name: ...
-> > > >         Alias: ...
-> > > >         ...
-> > > >         Modalias: ...
-> > > >         Battery Percentage: 100%
-> > > > ---
-> > > >  client/main.c | 43 +++++++++++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 43 insertions(+)
-> > > >
-> > > > diff --git a/client/main.c b/client/main.c
-> > > > index 422da5593..4b787240e 100644
-> > > > --- a/client/main.c
-> > > > +++ b/client/main.c
-> > > > @@ -65,6 +65,7 @@ static struct adapter *default_ctrl;
-> > > >  static GDBusProxy *default_dev;
-> > > >  static GDBusProxy *default_attr;
-> > > >  static GList *ctrl_list;
-> > > > +static GList *battery_proxies;
-> > > >
-> > > >  static const char *agent_arguments[] = {
-> > > >         "on",
-> > > > @@ -107,7 +108,9 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
-> > > >         bt_shell_set_prompt(PROMPT_OFF);
-> > > >
-> > > >         g_list_free_full(ctrl_list, proxy_leak);
-> > > > +       g_list_free_full(battery_proxies, proxy_leak);
-> > > >         ctrl_list = NULL;
-> > > > +       battery_proxies = NULL;
-> > > >
-> > > >         default_ctrl = NULL;
-> > > >  }
-> > > > @@ -445,6 +448,16 @@ done:
-> > > >         g_free(desc);
-> > > >  }
-> > > >
-> > > > +static void battery_added(GDBusProxy *proxy)
-> > > > +{
-> > > > +       battery_proxies = g_list_append(battery_proxies, proxy);
-> > > > +}
-> > > > +
-> > > > +static void battery_removed(GDBusProxy *proxy)
-> > > > +{
-> > > > +       battery_proxies = g_list_remove(battery_proxies, proxy);
-> > > > +}
-> > > > +
-> > > >  static void device_added(GDBusProxy *proxy)
-> > > >  {
-> > > >         DBusMessageIter iter;
-> > > > @@ -539,6 +552,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
-> > > >                 gatt_add_manager(proxy);
-> > > >         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> > > >                 ad_manager_added(proxy);
-> > > > +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
-> > > > +               battery_added(proxy);
-> > > >         }
-> > > >  }
-> > > >
-> > > > @@ -630,6 +645,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
-> > > >                 gatt_remove_manager(proxy);
-> > > >         } else if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-> > > >                 ad_unregister(dbus_conn, NULL);
-> > > > +       } else if (!strcmp(interface, "org.bluez.Battery1")) {
-> > > > +               battery_removed(proxy);
-> > > >         }
-> > > >  }
-> > > >
-> > > > @@ -763,6 +780,20 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
-> > > >         return NULL;
-> > > >  }
-> > > >
-> > > > +static GDBusProxy *find_battery_by_path(GList *source, const char *path)
-> > > > +{
-> > > > +       GList *list;
-> > > > +
-> > > > +       for (list = g_list_first(source); list; list = g_list_next(list)) {
-> > > > +               GDBusProxy *proxy = list->data;
-> > > > +
-> > > > +               if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
-> > > > +                       return proxy;
-> > > > +       }
-> > > > +
-> > > > +       return NULL;
-> > > > +}
-> > > > +
-> > > >  static GDBusProxy *find_proxy_by_address(GList *source, const char *address)
-> > > >  {
-> > > >         GList *list;
-> > > > @@ -1606,8 +1637,10 @@ static struct GDBusProxy *find_device(int argc, char *argv[])
-> > > >  static void cmd_info(int argc, char *argv[])
-> > > >  {
-> > > >         GDBusProxy *proxy;
-> > > > +       GDBusProxy *battery_proxy;
-> > > >         DBusMessageIter iter;
-> > > >         const char *address;
-> > > > +       unsigned char percentage;
-> > > >
-> > > >         proxy = find_device(argc, argv);
-> > > >         if (!proxy)
-> > > > @@ -1647,6 +1680,16 @@ static void cmd_info(int argc, char *argv[])
-> > > >         print_property(proxy, "AdvertisingFlags");
-> > > >         print_property(proxy, "AdvertisingData");
-> > > >
-> > > > +       battery_proxy = find_battery_by_path(battery_proxies,
-> > > > +                                       g_dbus_proxy_get_path(proxy));
-> > >
-> > > I'd replace the lines below with just print_property(battery_proxy,
-> > > "Percentage"); and just make print_property check for NULL proxy if it
-> > > doesn't already.
-> > I tried this but the result doesn't look quite good:
-> > Device XX:XX:XX:XX:XX:XX (random)
-> >         Name: ...
-> >         ...
-> >         Modalias: ...
-> >         Percentage: 0x64
-> >
-> > The name "Percentage" is not clear (what kind of percentage does it
-> > mean) when shown in the "info" command. And also the format for byte
-> > data type is hex and there is no percent sign. I tried to modify the
-> > print_property function to support custom format but the code gets
-> > overly complex and I think it's more straightforward to use custom
-> > logic like in this patch.
->
-> Just make it always print both the decimal and (hex).
->
-> > >
-> > > > +       if (battery_proxy && g_dbus_proxy_get_property(
-> > > > +                               battery_proxy, "Percentage", &iter)) {
-> > > > +               dbus_message_iter_get_basic(&iter, &percentage);
-> > > > +               bt_shell_printf("\tBattery Percentage: %d%%\n", percentage);
-> > > > +       } else {
-> > > > +               bt_shell_printf("\tNo battery information\n");
-> > > > +       }
-> > > > +
-> > > >         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> > > >  }
-> > > >
-> > > > --
-> > > > 2.17.1
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+The interval is then used as a time window where frames received from
+different endpoints are considered to be arrived at same time.
+
+In order to resolve potential conflicts between endpoints a dedicated
+queue for events was introduced and it is now processed before the ACL
+packets.
+
+It worth noting though that priorizing events over ACL data may result
+in inverting the order of the packets over the air, for instance there
+may be packets received before a disconnect event that will be
+discarded and unencrypted packets received before encryption change
+which would considered encrypted, because of these potential inversions
+the support for polling interval is not enabled by default so platforms
+have the following means to enable it:
+
+At build-time:
+
+CONFIG_BT_HCIBTUSB_INTERVAL=y
+
+At runtime with use of module option:
+
+enable_interval
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/Kconfig        |  7 ++++
+ drivers/bluetooth/btusb.c        | 16 +++++++--
+ include/net/bluetooth/hci_core.h |  6 +++-
+ net/bluetooth/hci_core.c         | 60 +++++++++++++++++++++++++-------
+ 4 files changed, 72 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 4e73a531b377..2f20a853d946 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
+ 	  This can be overridden by passing btusb.enable_autosuspend=[y|n]
+ 	  on the kernel commandline.
+ 
++config BT_HCIBTUSB_INTERVAL
++	bool "Enable notification of USB polling interval"
++	depends on BT_HCIBTUSB
++	help
++	  Say Y here to enable notification of USB polling interval for
++	  Bluetooth USB devices by default.
++
+ config BT_HCIBTUSB_BCM
+ 	bool "Broadcom protocol support"
+ 	depends on BT_HCIBTUSB
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index faa863dd5d0a..6525b10bd40c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -30,7 +30,7 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+-
++static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
+ static bool reset = true;
+ 
+ static struct usb_driver btusb_driver;
+@@ -711,7 +711,14 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			hci_recv_frame(data->hdev, skb);
++			if (enable_interval)
++				/* TODO: Calculate polling interval based on
++				 * endpoint bInterval?
++				 */
++				hci_recv_acl(data->hdev, skb,
++					     msecs_to_jiffies(1));
++			else
++				hci_recv_frame(data->hdev, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -3866,7 +3873,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->recv_bulk = btusb_recv_bulk_intel;
+ 		set_bit(BTUSB_BOOTLOADER, &data->flags);
+ 	} else {
+-		data->recv_event = hci_recv_frame;
++		data->recv_event = hci_recv_evt;
+ 		data->recv_bulk = btusb_recv_bulk;
+ 	}
+ 
+@@ -4335,6 +4342,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+ module_param(enable_autosuspend, bool, 0644);
+ MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+ 
++module_param(enable_interval, bool, 0644);
++MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
++
+ module_param(reset, bool, 0644);
+ MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0de041eac844..d07d3df27ba9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -444,7 +444,7 @@ struct hci_dev {
+ 
+ 	struct delayed_work	cmd_timer;
+ 
+-	struct work_struct	rx_work;
++	struct delayed_work	rx_work;
+ 	struct work_struct	cmd_work;
+ 	struct work_struct	tx_work;
+ 
+@@ -457,6 +457,7 @@ struct hci_dev {
+ 	struct delayed_work	le_scan_restart;
+ 
+ 	struct sk_buff_head	rx_q;
++	struct sk_buff_head	ev_q;
+ 	struct sk_buff_head	raw_q;
+ 	struct sk_buff_head	cmd_q;
+ 
+@@ -1190,6 +1191,9 @@ int hci_suspend_dev(struct hci_dev *hdev);
+ int hci_resume_dev(struct hci_dev *hdev);
+ int hci_reset_dev(struct hci_dev *hdev);
+ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
++int hci_recv_acl(struct hci_dev *hdev, struct sk_buff *skb,
++		 unsigned int interval);
++int hci_recv_evt(struct hci_dev *hdev, struct sk_buff *skb);
+ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
+ __printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+ __printf(2, 3) void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1920e3c5c6f6..bbf02cd24cfb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1591,10 +1591,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 		/* Init failed, cleanup */
+ 		flush_work(&hdev->tx_work);
+ 		flush_work(&hdev->cmd_work);
+-		flush_work(&hdev->rx_work);
++		cancel_delayed_work(&hdev->rx_work);
+ 
+ 		skb_queue_purge(&hdev->cmd_q);
+ 		skb_queue_purge(&hdev->rx_q);
++		skb_queue_purge(&hdev->ev_q);
+ 
+ 		if (hdev->flush)
+ 			hdev->flush(hdev);
+@@ -1719,7 +1720,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	/* Flush RX and TX works */
+ 	flush_work(&hdev->tx_work);
+-	flush_work(&hdev->rx_work);
++	cancel_delayed_work(&hdev->rx_work);
+ 
+ 	if (hdev->discov_timeout > 0) {
+ 		hdev->discov_timeout = 0;
+@@ -1784,6 +1785,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	/* Drop queues */
+ 	skb_queue_purge(&hdev->rx_q);
++	skb_queue_purge(&hdev->ev_q);
+ 	skb_queue_purge(&hdev->cmd_q);
+ 	skb_queue_purge(&hdev->raw_q);
+ 
+@@ -1855,6 +1857,7 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+ 
+ 	/* Drop queues */
+ 	skb_queue_purge(&hdev->rx_q);
++	skb_queue_purge(&hdev->ev_q);
+ 	skb_queue_purge(&hdev->cmd_q);
+ 
+ 	/* Avoid potential lockdep warnings from the *_flush() calls by
+@@ -3603,16 +3606,17 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->adv_instances);
+ 	INIT_LIST_HEAD(&hdev->blocked_keys);
+ 
+-	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
+ 
++	INIT_DELAYED_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
++	skb_queue_head_init(&hdev->ev_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+ 	skb_queue_head_init(&hdev->raw_q);
+ 
+@@ -3856,8 +3860,8 @@ int hci_reset_dev(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL(hci_reset_dev);
+ 
+-/* Receive frame from HCI drivers */
+-int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
++static int hci_rx_queue(struct hci_dev *hdev, struct sk_buff *skb,
++			struct sk_buff_head *queue, unsigned int interval)
+ {
+ 	if (!hdev || (!test_bit(HCI_UP, &hdev->flags)
+ 		      && !test_bit(HCI_INIT, &hdev->flags))) {
+@@ -3879,13 +3883,35 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	/* Time stamp */
+ 	__net_timestamp(skb);
+ 
+-	skb_queue_tail(&hdev->rx_q, skb);
+-	queue_work(hdev->workqueue, &hdev->rx_work);
++	skb_queue_tail(queue, skb);
++
++	queue_delayed_work(hdev->workqueue, &hdev->rx_work, interval);
+ 
+ 	return 0;
+ }
++
++/* Receive frame from HCI drivers */
++int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	return hci_rx_queue(hdev, skb, &hdev->rx_q, 0);
++}
+ EXPORT_SYMBOL(hci_recv_frame);
+ 
++/* Receive ACL frame from HCI drivers */
++int hci_recv_acl(struct hci_dev *hdev, struct sk_buff *skb,
++		 unsigned int interval)
++{
++	return hci_rx_queue(hdev, skb, &hdev->rx_q, interval);
++}
++EXPORT_SYMBOL(hci_recv_acl);
++
++/* Receive Event frame from HCI drivers */
++int hci_recv_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	return hci_rx_queue(hdev, skb, &hdev->ev_q, 0);
++}
++EXPORT_SYMBOL(hci_recv_evt);
++
+ /* Receive diagnostic message from HCI drivers */
+ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+@@ -3896,7 +3922,7 @@ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb)
+ 	__net_timestamp(skb);
+ 
+ 	skb_queue_tail(&hdev->rx_q, skb);
+-	queue_work(hdev->workqueue, &hdev->rx_work);
++	queue_delayed_work(hdev->workqueue, &hdev->rx_work, 0);
+ 
+ 	return 0;
+ }
+@@ -4825,14 +4851,11 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
+ }
+ 
+-static void hci_rx_work(struct work_struct *work)
++static void hci_rx_dequeue(struct hci_dev *hdev, struct sk_buff_head *queue)
+ {
+-	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
+ 	struct sk_buff *skb;
+ 
+-	BT_DBG("%s", hdev->name);
+-
+-	while ((skb = skb_dequeue(&hdev->rx_q))) {
++	while ((skb = skb_dequeue(queue))) {
+ 		/* Send copy to monitor */
+ 		hci_send_to_monitor(hdev, skb);
+ 
+@@ -4888,6 +4911,17 @@ static void hci_rx_work(struct work_struct *work)
+ 	}
+ }
+ 
++static void hci_rx_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work.work);
++
++	BT_DBG("%s", hdev->name);
++
++	/* Process HCI event packets so states changes are synchronized first */
++	hci_rx_dequeue(hdev, &hdev->ev_q);
++	hci_rx_dequeue(hdev, &hdev->rx_q);
++}
++
+ static void hci_cmd_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_work);
+-- 
+2.25.3
+
