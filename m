@@ -3,178 +3,106 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D533AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 13:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A87C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:20:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B534E2070A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 13:03:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B1C820870
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbgGCNDD convert rfc822-to-8bit (ORCPT
+        id S1726236AbgGCQU1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jul 2020 09:03:03 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:32797 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726074AbgGCNDD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jul 2020 09:03:03 -0400
-Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 28816CED26;
-        Fri,  3 Jul 2020 15:12:57 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: le_supported_roles experimental feature
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2CCCE793-1489-4162-AD02-A5737718B956@holtmann.org>
-Date:   Fri, 3 Jul 2020 15:03:01 +0200
-Cc:     Alain Michaud <alainm@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A86FD76A-EA51-4A55-9F7B-D5675A3943E2@holtmann.org>
-References: <20200701220853.421445-1-alainm@chromium.org>
- <427B6E1C-178C-405D-88F8-899EC48AC8A9@holtmann.org>
- <CALWDO_XT=O4NiqMur+_u1z4o0868ZzBr4gpUikgmgw2U4zqMzw@mail.gmail.com>
- <2CCCE793-1489-4162-AD02-A5737718B956@holtmann.org>
-To:     Alain Michaud <alainmichaud@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Fri, 3 Jul 2020 12:20:27 -0400
+Received: from mga05.intel.com ([192.55.52.43]:10774 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726178AbgGCQU1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 3 Jul 2020 12:20:27 -0400
+IronPort-SDR: no61GK9JPuKqki1UeFNeL4jYFs6sA45YCyUZS1AxxcRdD0L2HSlX7sUFvB9jrZXPiXxhH/a0VG
+ dpKpxhlsgz9g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="232033682"
+X-IronPort-AV: E=Sophos;i="5.75,308,1589266800"; 
+   d="scan'208";a="232033682"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2020 09:20:26 -0700
+IronPort-SDR: 7WBDWnu79obzexHNvVgFM6SQS1cbb5IsQ02Cc5lfHZEMMp8OGY1kqmXz6P978KMlacTzjWKOya
+ aRTgZgcHjVog==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,308,1589266800"; 
+   d="scan'208";a="296244897"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.251.6.196])
+  by orsmga002.jf.intel.com with ESMTP; 03 Jul 2020 09:20:26 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com
+Subject: [PATCH BlueZ] mesh: Fix Seg Fault - App unattached IVIndex chg
+Date:   Fri,  3 Jul 2020 09:20:18 -0700
+Message-Id: <20200703162018.940172-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.25.4
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Object path to node interfaces do not exist unless the owning
+application is attached.  This caused a Segmentation fault if IVIndex
+change was signaled.
 
->>> This patch adds an le_supported_roles features which allows a
->>> clients to determine if the controller is able to support peripheral and
->>> central connections separately and at the same time.
->>> 
->>> Signed-off-by: Alain Michaud <alainm@chromium.org>
->>> ---
->>> 
->>> Changes in v2:
->>> - Slight change of design based on offline feedback
->>> 
->>> net/bluetooth/mgmt.c | 36 +++++++++++++++++++++++++++++++++++-
->>> 1 file changed, 35 insertions(+), 1 deletion(-)
->>> 
->>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->>> index 5e9b9728eeac..c13fcc21745f 100644
->>> --- a/net/bluetooth/mgmt.c
->>> +++ b/net/bluetooth/mgmt.c
->>> @@ -3753,10 +3753,36 @@ static const u8 debug_uuid[16] = {
->>> };
->>> #endif
->>> 
->>> +/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
->>> +static const u8 le_supported_roles[16] = {
->>> +     0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
->>> +     0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
->>> +};
->>> +
->>> +static u32 get_le_roles_flags(struct hci_dev *hdev)
->>> +{
->>> +     u32 flags = 0;
->>> +
->>> +     /* Central connections supported */
->>> +     if (hdev->le_states[4] & 0x08)
->>> +             flags |= BIT(0);
->>> +
->>> +     /* Peripheral connections supported */
->>> +     if (hdev->le_states[4] & 0x40)
->>> +             flags |= BIT(1);
->>> +
->>> +     /* Simult central and peripheral connections supported */
->>> +     if (test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) &&
->>> +         (hdev->le_states[3] & 0x10))
->>> +             flags |= BIT(2);
->>> +
->>> +     return flags;
->>> +}
->> 
->> this is not what we can do here. The flags are defined like this.
->> 
->>        The following bits are defined for the Flags parameter:
->> 
->>                0       Feature active
->>                1       Causes change in supported settings
->> 
->> And I want these flags for generic handling of experimental features. Individual features can not overwrite it.
->> 
->> So if you only want to support a the “read" functionality, then something like this please.
->> 
->>        if ((hdev->le_states[4] & 0x08) &&      /* Central */
->>            (hdev->le_states[4] & 0x40) &&      /* Peripheral */
->>            (hdev->le_states[3] & 0x10) &&      /* Simultaneous */
->>            test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks))
->>                flags |= BIT(0);
->> 
->> OK, Since the userspace Api we discussed reports individual states, would you suggest if LE is supported that the Central and Peripheral roles are supported and just use this to query the simultaneous support?
-> 
-> you get the Central state support from the LE setting and Peripheral from the Advertising setting. So I think the only extra information you would need is the support for both at the same time.
-> 
-> That said, I have been discussing with Daniel if we could extend (and with that rename) the Read Security Information command and allow it to report static information about the controller support. Maybe it fits better there. However for now, I would just export this via a simple experimental feature.
+Crash output:
 
-so something like this and then we can extend it.
+mesh/pb-adv.c:send_adv_segs() size: 01, CRC: 3e
+mesh/pb-adv.c:pb_adv_packet() Link closed notification: 00
+mesh/net.c:update_iv_ivu_state() iv_upd_state = IV_UPD_NORMAL
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ca0d38469e56..84a26183029d 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3110,20 +3110,20 @@ Set Wideband Speech Command
-                                Invalid Index
- 
- 
--Read Security Information Command
--=================================
-+Read System Information Command
-+===============================
- 
-        Command Code:           0x0048
-        Controller Index:       <controller id>
-        Command Parameters:
--       Return Parameters:      Security_Data_Length (2 Octets)
--                               Security_Data (0-65535 Octets)
-+       Return Parameters:      System_Data_Length (2 Octets)
-+                               System_Data (0-65535 Octets)
- 
--       This command is used to retrieve the supported security features
--       by the controller or the host stack.
-+       This command is used to retrieve the supported system and security
-+       features by the controller or the host stack.
- 
--       The Security_Data_Length and Security_Data parameters provide
--       a list of security settings, features and information. It uses
-+       The System_Data_Length and System_Data parameters provide a list
-+       of system and security settings, features and information. It uses
-        the same format as EIR_Data, but with the namespace defined here.
- 
-                Data Type       Name
-@@ -3131,6 +3131,8 @@ Read Security Information Command
-                0x01            Flags
-                0x02            Max Encryption Key Size (BR/EDR)
-                0x03            Max Encryption Key Size (LE)
-+               0x04            Transmit Power (BR/EDR)
-+               0x05            Transmit Power (LE)
- 
-        Flags (data type 0x01)
- 
-@@ -3146,6 +3148,11 @@ Read Security Information Command
-                present, then it is unknown what the max encryption key
-                size of the controller or host is in use.
- 
-+       Transmit Power (data types 0x04 and 0x05)
-+
-+               When this field is present, then it provides 4 Octets
-+               indicating min and max transmit power values.
-+
-        This command generates a Command Complete event on success or
-        a Command Status event on failure.
- 
+Program received signal SIGSEGV, Segmentation fault.
+0xb6fbc1dc in strlen () from /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
+(gdb) backtrace
+0  0xb6fbc1dc in strlen () from /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
+1  0x00448488 in l_str_hash (p=0x0) at ell/hashmap.c:168
+2  0x00448980 in l_hashmap_lookup (hashmap=0x46b550, key=key@entry=0x0) at ell/hashmap.c:487
+3  0x00444704 in _dbus_object_tree_property_changed (dbus=0x469438, path=0x0, interface_name=0x44bb74 "org.bluez.mesh.Node1", property_name=0x44aa18 "IVIndex") at ell/dbus-service.c:1196
+4  0x0044545c in l_dbus_property_changed (dbus=<optimized out>, path=<optimized out>, interface=<optimized out>, property=<optimized out>) at ell/dbus-service.c:1804
+5  0x0041805c in node_property_changed (node=<optimized out>, property=<optimized out>) at mesh/node.c:2392
+6  0x0040c690 in update_iv_ivu_state (ivu=false, iv_index=0, net=0x46e240) at mesh/net.c:2569
+7  process_beacon (net_ptr=0x46e240, user_data=0xbefff1e4) at mesh/net.c:2610
+8  0x00431edc in l_queue_foreach (queue=<optimized out>, function=0x40c468 <process_beacon>, user_data=user_data@entry=0xbefff1e4) at ell/queue.c:441
+9  0x0040a848 in beacon_recv (user_data=<optimized out>, info=<optimized out>, data=<optimized out>, len=<optimized out>) at mesh/net.c:2647
+10 0x00431edc in l_queue_foreach (queue=<optimized out>, function=0x408bec <process_rx_callbacks>, function@entry=0x15463acd, user_data=user_data@entry=0xbefff230) at ell/queue.c:441
+11 0x00409ec0 in process_rx (len=<optimized out>, data=0xbefff297 "+\001", addr=0xbefff258 "\260\362B", instant=4646248, rssi=-78 '\262', pvt=<optimized out>) at mesh/mesh-io-generic.c:121
+12 event_adv_report (io=0x46c3c8, size=<optimized out>, buf=0xbefff255) at mesh/mesh-io-generic.c:159
+13 event_callback (buf=<optimized out>, size=<optimized out>, user_data=0x46c3c8) at mesh/mesh-io- generic.c:172
+14 0x0042ff58 in queue_foreach (queue=0x46d370, function=0x42f2b0 <process_notify>, user_data=user_data@entry= 0xbefff289) at src/shared/queue.c:219
+15 0x0042f674 in process_event (size=<optimized out>, data=0xbefff283, hci=0x46c3d8) at src/shared/hci.c:258
+16 io_read_callback (io=<optimized out>, user_data=0x46c3d8) at src/shared/hci.c:286
+17 0x00432600 in io_callback (fd=<optimized out>, events=1, user_data=0x46d318) at ell/io.c:126
+18 0x0043348c in l_main_iterate (timeout=<optimized out>) at ell/main.c:470
+19 0x00433554 in l_main_run () at ell/main.c:520
+20 l_main_run () at ell/main.c:502
+21 0x004337b4 in l_main_run_with_signal (callback=<optimized out>, user_data=0x0) at ell/main.c:642
+22 0x00404e90 in main (argc=<optimized out>, argv=<optimized out>) at mesh/main.c:269
+(gdb)
+---
+ mesh/node.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/mesh/node.c b/mesh/node.c
+index 9f0f15070..3e888ce61 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -2388,7 +2388,7 @@ void node_property_changed(struct mesh_node *node, const char *property)
+ {
+ 	struct l_dbus *bus = dbus_get_bus();
+ 
+-	if (bus)
++	if (bus && node->obj_path)
+ 		l_dbus_property_changed(dbus_get_bus(), node->obj_path,
+ 						MESH_NODE_INTERFACE, property);
+ }
+-- 
+2.25.4
 
