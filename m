@@ -4,117 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 587ABC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 07:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 596B7C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 07:27:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3991720720
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 07:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3949A20720
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 07:27:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726108AbgGCHYZ convert rfc822-to-8bit (ORCPT
+        id S1726035AbgGCH1L convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jul 2020 03:24:25 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:46836 "EHLO
+        Fri, 3 Jul 2020 03:27:11 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:46473 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725648AbgGCHYZ (ORCPT
+        with ESMTP id S1725648AbgGCH1L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jul 2020 03:24:25 -0400
+        Fri, 3 Jul 2020 03:27:11 -0400
 Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A2DE1CED23;
-        Fri,  3 Jul 2020 09:34:19 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 26A0DCED23;
+        Fri,  3 Jul 2020 09:37:05 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: le_supported_roles experimental feature
+Subject: Re: [PATCH] Bluetooth: btusb: add Realtek 8822CE to blacklist_table
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALWDO_XT=O4NiqMur+_u1z4o0868ZzBr4gpUikgmgw2U4zqMzw@mail.gmail.com>
-Date:   Fri, 3 Jul 2020 09:24:23 +0200
-Cc:     Alain Michaud <alainm@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20200703091124.1.I63705bf6abab9cb79c14f7959a59b201af2b8827@changeid>
+Date:   Fri, 3 Jul 2020 09:27:09 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        josephsih@google.com,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2CCCE793-1489-4162-AD02-A5737718B956@holtmann.org>
-References: <20200701220853.421445-1-alainm@chromium.org>
- <427B6E1C-178C-405D-88F8-899EC48AC8A9@holtmann.org>
- <CALWDO_XT=O4NiqMur+_u1z4o0868ZzBr4gpUikgmgw2U4zqMzw@mail.gmail.com>
-To:     Alain Michaud <alainmichaud@google.com>
+Message-Id: <5B5301EF-4C71-4EBC-8753-C872071D4DC5@holtmann.org>
+References: <20200703091124.1.I63705bf6abab9cb79c14f7959a59b201af2b8827@changeid>
+To:     Joseph Hwang <josephsih@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Joseph,
 
-> > This patch adds an le_supported_roles features which allows a
-> > clients to determine if the controller is able to support peripheral and
-> > central connections separately and at the same time.
-> > 
-> > Signed-off-by: Alain Michaud <alainm@chromium.org>
-> > ---
-> > 
-> > Changes in v2:
-> > - Slight change of design based on offline feedback
-> > 
-> > net/bluetooth/mgmt.c | 36 +++++++++++++++++++++++++++++++++++-
-> > 1 file changed, 35 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index 5e9b9728eeac..c13fcc21745f 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -3753,10 +3753,36 @@ static const u8 debug_uuid[16] = {
-> > };
-> > #endif
-> > 
-> > +/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
-> > +static const u8 le_supported_roles[16] = {
-> > +     0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
-> > +     0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
-> > +};
-> > +
-> > +static u32 get_le_roles_flags(struct hci_dev *hdev)
-> > +{
-> > +     u32 flags = 0;
-> > +
-> > +     /* Central connections supported */
-> > +     if (hdev->le_states[4] & 0x08)
-> > +             flags |= BIT(0);
-> > +
-> > +     /* Peripheral connections supported */
-> > +     if (hdev->le_states[4] & 0x40)
-> > +             flags |= BIT(1);
-> > +
-> > +     /* Simult central and peripheral connections supported */
-> > +     if (test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) &&
-> > +         (hdev->le_states[3] & 0x10))
-> > +             flags |= BIT(2);
-> > +
-> > +     return flags;
-> > +}
+> This patch adds the Realtek 8822CE controller to the blacklist_table
+> to support the wideband speech capability.
 > 
-> this is not what we can do here. The flags are defined like this.
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> ---
 > 
->         The following bits are defined for the Flags parameter:
+> drivers/bluetooth/btusb.c | 4 ++++
+> 1 file changed, 4 insertions(+)
 > 
->                 0       Feature active
->                 1       Causes change in supported settings
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 0e143c0cecf2a1..34a84c64e4c83e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -359,6 +359,10 @@ static const struct usb_device_id blacklist_table[] = {
+> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+> 	  .driver_info = BTUSB_IGNORE },
 > 
-> And I want these flags for generic handling of experimental features. Individual features can not overwrite it.
-> 
-> So if you only want to support a the “read" functionality, then something like this please.
-> 
->         if ((hdev->le_states[4] & 0x08) &&      /* Central */
->             (hdev->le_states[4] & 0x40) &&      /* Peripheral */
->             (hdev->le_states[3] & 0x10) &&      /* Simultaneous */
->             test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks))
->                 flags |= BIT(0);
-> 
-> OK, Since the userspace Api we discussed reports individual states, would you suggest if LE is supported that the Central and Peripheral roles are supported and just use this to query the simultaneous support?
+> +	/* Realtek 8822CE Bluetooth devices */
+> +	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+> +
+> 	/* Realtek Bluetooth devices */
+> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+> 	  .driver_info = BTUSB_REALTEK },
 
-you get the Central state support from the LE setting and Peripheral from the Advertising setting. So I think the only extra information you would need is the support for both at the same time.
-
-That said, I have been discussing with Daniel if we could extend (and with that rename) the Read Security Information command and allow it to report static information about the controller support. Maybe it fits better there. However for now, I would just export this via a simple experimental feature.
+I rather not have to list these one-by-one. Can we just not globally declare support for this? Or can we have a Realtek vendor command to read this out?
 
 Regards
 
