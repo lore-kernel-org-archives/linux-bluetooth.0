@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F64C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1D1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CD21208C7
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:48:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3927208FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jul 2020 16:48:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPTwC4ZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtqjlbhS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgGCQsG (ORCPT
+        id S1726258AbgGCQsJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jul 2020 12:48:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36098 "EHLO
+        Fri, 3 Jul 2020 12:48:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbgGCQsG (ORCPT
+        with ESMTP id S1726111AbgGCQsJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jul 2020 12:48:06 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB25C061794
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2020 09:48:06 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id ed14so4008636qvb.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2020 09:48:06 -0700 (PDT)
+        Fri, 3 Jul 2020 12:48:09 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5D2C061794
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2020 09:48:08 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id p7so14513730qvl.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2020 09:48:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=anG1Oo2SNB8vzM8YnvrDtiCG6DNwKsTBaFN00s1SrCk=;
-        b=FPTwC4ZAFWvLMGg3RDSlj9UUUnFJzO1uO/lI+RXDR7rzM6T8jR5Ci1ubOH85rETm7L
-         sfWLZ1QtsoQZ4wo//YBpP5kIE7e5e2UnfEm1iXpPv3i0VPLg/Vxt1ov1v1y5YGj0Pfvn
-         93pWrHKBXf8elbISwweFY8B15NDyk/lJSqnUdhfasAG4yBYKGRAf4ppMD0ctYljmqBtr
-         n+Yu0kistjIh7DT/Ko96eYTDCUnBDSKTPaGAEc6hc9Y9PFUid6IBx9SFmOca7qo34CS8
-         E8SzU32nnDLnmgvf6ptPipUAN0gD9qAJXWVljCAQlUUVkgR4kF3kCKzr61MfO6xeh3Y9
-         NFQA==
+        bh=+Up3ZyusUMy5a05aqkaTQkkIYPZzDl5XBJxyPMX+it0=;
+        b=PtqjlbhSLTmQO1d7KKTY+8lTpdB5g+QZ6wapSwOgt5FythAPnLehodmvuohu6Jydg/
+         8wKYFTxGLgguWfHNWwD2w028isoYkscPOWDfaFy7tE4f6CR5BaVRgK4K+KpGpyOj0oF1
+         Vy+956THND+H1LBWGxcACs+DBf8cSRBjozvqVSKnNWtqxblw6ybdkBzENbhcsF88dECb
+         DZ0ghvJ9il/zneRdhASyIGhTxW1Lhop2G2FLTQO2NruZuX+Ozh3nT4yKSv5dZTIpsteg
+         oK9gd/cv9KpUf0epbxg4DrIh1r9MnlmHwBeTlA64hMk3/s5FgcmluwOk8c9lV/D8KNty
+         mcHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=anG1Oo2SNB8vzM8YnvrDtiCG6DNwKsTBaFN00s1SrCk=;
-        b=Hp8p4ukRUL9MTS3bB0PSp3YYaCL6jQUnhDTanJjwv6p88daU6b+ozaqvEn9Q/Mxl3u
-         viwG20wqgITpOrCtnWI7/XxINU2q/AQ+TTVbCAz8eklRSv/1EfNhu3vJEeikz0l9HRkV
-         u8bfwi1QnN5iCMwmBgTUqUXj2aMfQDhHbiMR/mSPjx2ENW4l2Jhfh2R59jc+aWUUZTY7
-         vs6nIh5+bVCKdjWXqj5Zy5r12s6VG8J08O/Q4BXWIjS56bVaMONvs1vpZhwdP729S7ph
-         qHEL6crhYzoYEmXHFZqh/mYvucZnM5fcDefSsuGzuAZ01xpx88LEkyQFf+xf9tU+5YLG
-         /C2g==
-X-Gm-Message-State: AOAM530q8jchjvwEhGLTtNf04t/EOG3OUK+BDki6YensYHjD5eZyIyhY
-        KFTRutGfSyk/nwFKVFtZZxZbwcjheiA=
-X-Google-Smtp-Source: ABdhPJyvrw2adc1hlFo2gwdk4eW+iHlJihdEE4RnYyC+6TU/4/JfEiT0gQ4QCjHjzZ09x7OACuRp3A==
-X-Received: by 2002:a05:6214:72c:: with SMTP id c12mr33580149qvz.76.1593794884913;
-        Fri, 03 Jul 2020 09:48:04 -0700 (PDT)
+        bh=+Up3ZyusUMy5a05aqkaTQkkIYPZzDl5XBJxyPMX+it0=;
+        b=R02OngppKUBMe+0x2Yap5plHTUKtR6JzJbBzhLRlK94b90WuMKtckAkt76jGQA6VIj
+         Nyu3zvHZNsrw43moTXm2u3gZv4opiYBZfj+bZBlU3V6U5mH+5S0Ml5WKluNlZpMh0xfg
+         LCT3hZ2BwH7qPoCBwTloSKfZ49ym3vG7ufV4N/+Y5SKn6OI0aSFpTKl9AVn35rwKR3PO
+         DaoEYY2OwcjdhMKq1asfUWBFX5vzpG9zixqNK9Bg8djxfWlX/LCLnWaAx5LU/d0+LsQ5
+         f8SvX1BuuBppV6LxL/l2GpK2s8dnOMKk5z2JEMephozvbRA3SqL8l++5O6Bu8EVEQh6z
+         UaSA==
+X-Gm-Message-State: AOAM5335YYPkJj5w6G4TH0y44QL60uWpW+I7lVjDHCMoOoldU3OckCQW
+        y9ENN1TRf4rInMPKCvEwT8Heq8mk2Xw=
+X-Google-Smtp-Source: ABdhPJzzM3mYpacsN2/wNA/Q9AMF3j98FaaWEvUTVTX6/bCWcW1uq1+n4ootpI40yKfEKZ9vV2M7wg==
+X-Received: by 2002:a05:6214:370:: with SMTP id t16mr34934204qvu.206.1593794887998;
+        Fri, 03 Jul 2020 09:48:07 -0700 (PDT)
 Received: from [172.17.0.2] ([104.208.240.96])
-        by smtp.gmail.com with ESMTPSA id d13sm10940183qkj.27.2020.07.03.09.48.04
+        by smtp.gmail.com with ESMTPSA id h41sm1041599qtk.68.2020.07.03.09.48.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2020 09:48:04 -0700 (PDT)
-Message-ID: <5eff6144.1c69fb81.489f1.ba81@mx.google.com>
-Date:   Fri, 03 Jul 2020 09:48:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1451388738377639551=="
+        Fri, 03 Jul 2020 09:48:07 -0700 (PDT)
+Message-ID: <5eff6147.1c69fb81.05e7.58b9@mx.google.com>
+Date:   Fri, 03 Jul 2020 09:48:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6795625013646968184=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1451388738377639551==
+--===============6795625013646968184==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,24 +89,26 @@ While we are preparing for reviewing the patches, we found the following
 issue/warning.
 
 Test Result:
-checkpatch Failed
+checkgitlint Failed
 
 Outputs:
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#19: 
-0  0xb6fbc1dc in strlen () from /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
-
-- total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+18: B1 Line exceeds max length (92>80): "2  0x00448980 in l_hashmap_lookup (hashmap=0x46b550, key=key@entry=0x0) at ell/hashmap.c:487"
+19: B1 Line exceeds max length (186>80): "3  0x00444704 in _dbus_object_tree_property_changed (dbus=0x469438, path=0x0, interface_name=0x44bb74 "org.bluez.mesh.Node1", property_name=0x44aa18 "IVIndex") at ell/dbus-service.c:1196"
+20: B1 Line exceeds max length (165>80): "4  0x0044545c in l_dbus_property_changed (dbus=<optimized out>, path=<optimized out>, interface=<optimized out>, property=<optimized out>) at ell/dbus-service.c:1804"
+21: B1 Line exceeds max length (107>80): "5  0x0041805c in node_property_changed (node=<optimized out>, property=<optimized out>) at mesh/node.c:2392"
+22: B1 Line exceeds max length (93>80): "6  0x0040c690 in update_iv_ivu_state (ivu=false, iv_index=0, net=0x46e240) at mesh/net.c:2569"
+24: B1 Line exceeds max length (149>80): "8  0x00431edc in l_queue_foreach (queue=<optimized out>, function=0x40c468 <process_beacon>, user_data=user_data@entry=0xbefff1e4) at ell/queue.c:441"
+25: B1 Line exceeds max length (140>80): "9  0x0040a848 in beacon_recv (user_data=<optimized out>, info=<optimized out>, data=<optimized out>, len=<optimized out>) at mesh/net.c:2647"
+26: B1 Line exceeds max length (182>80): "10 0x00431edc in l_queue_foreach (queue=<optimized out>, function=0x408bec <process_rx_callbacks>, function@entry=0x15463acd, user_data=user_data@entry=0xbefff230) at ell/queue.c:441"
+27: B1 Line exceeds max length (188>80): "11 0x00409ec0 in process_rx (len=<optimized out>, data=0xbefff297 "+\001", addr=0xbefff258 "\260\362B", instant=4646248, rssi=-78 '\262', pvt=<optimized out>) at mesh/mesh-io-generic.c:121"
+28: B1 Line exceeds max length (101>80): "12 event_adv_report (io=0x46c3c8, size=<optimized out>, buf=0xbefff255) at mesh/mesh-io-generic.c:159"
+29: B1 Line exceeds max length (112>80): "13 event_callback (buf=<optimized out>, size=<optimized out>, user_data=0x46c3c8) at mesh/mesh-io- generic.c:172"
+30: B1 Line exceeds max length (148>80): "14 0x0042ff58 in queue_foreach (queue=0x46d370, function=0x42f2b0 <process_notify>, user_data=user_data@entry= 0xbefff289) at src/shared/queue.c:219"
+31: B1 Line exceeds max length (108>80): "15 0x0042f674 in process_event (size=<optimized out>, data=0xbefff283, hci=0x46c3d8) at src/shared/hci.c:258"
+32: B1 Line exceeds max length (84>80): "16 io_read_callback (io=<optimized out>, user_data=0x46c3d8) at src/shared/hci.c:286"
+33: B1 Line exceeds max length (95>80): "17 0x00432600 in io_callback (fd=<optimized out>, events=1, user_data=0x46d318) at ell/io.c:126"
+37: B1 Line exceeds max length (99>80): "21 0x004337b4 in l_main_run_with_signal (callback=<optimized out>, user_data=0x0) at ell/main.c:642"
+38: B1 Line exceeds max length (85>80): "22 0x00404e90 in main (argc=<optimized out>, argv=<optimized out>) at mesh/main.c:269"
 
 
 
@@ -114,4 +116,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============1451388738377639551==--
+--===============6795625013646968184==--
