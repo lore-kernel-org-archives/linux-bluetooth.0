@@ -2,139 +2,129 @@ Return-Path: <SRS0=7cy9=AR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEE1C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 21:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EDFC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 21:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F03B6206BE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 21:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A49042075B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 21:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="G88ybYN2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="h2cbsGNv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726625AbgGFVFe (ORCPT
+        id S1726839AbgGFVHb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Jul 2020 17:05:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60838 "EHLO
+        Mon, 6 Jul 2020 17:07:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgGFVFe (ORCPT
+        with ESMTP id S1725860AbgGFVHa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Jul 2020 17:05:34 -0400
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A4CC08C5DF
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2020 14:05:33 -0700 (PDT)
-Received: by mail-lf1-x142.google.com with SMTP id d21so23466120lfb.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2020 14:05:33 -0700 (PDT)
+        Mon, 6 Jul 2020 17:07:30 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98FFC061755
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2020 14:07:30 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id k27so2871541pgm.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2020 14:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZIf5BAN7x2kxktXeQK1tz8O0tAhgpueX6XBodeYeUWU=;
-        b=G88ybYN2JoC2gLQbYZnAHhHeRYyuWI/EaZ/NPsAE9s8SgZDV1E++W8K6TB6h0sLqZV
-         0RVVM206wkSWJWkz/Zs0WB0IenfA3pY7Es2vvKWlSfEjaOXrvuAfTlqTwRqPeVQUsCxE
-         oI6a0rwOWOy0jtk2LbEFmwjbAka7qT2PiEzew=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ltxd3dYIIoYCEWLVWkAFd+Lvzl8zZTtrqnBoRTLOPrw=;
+        b=h2cbsGNvG0tAe/ImaTVsxGwkE46Q+vlxD3xFsSo9MKqc4fVdwDwBfTqyph9hswjzur
+         CYqkBZet0gWna39RzAOQhznMY3bFxO6++cwd1MVuakUPA9PHjxpwnjzfSkwh/f1/OrM7
+         aSBK9wYYoe8Umfp4asSMM2vMDK98EqA4ftz7Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZIf5BAN7x2kxktXeQK1tz8O0tAhgpueX6XBodeYeUWU=;
-        b=uMFsivD25muyFq6m/BtcGJxkAY7pOQrhIHK25xxL/Hsk14VwO547IkosffRbtOSRnU
-         9BDJg7b/4eCOCCaAJFBix2kB37efWsadqdwPxW/QL8nLlUSmBNtCj1/KslC1FMh4pLRJ
-         HIrMIdZ/mqBa5XyRmf6V6Ke3aaK4iML4heA2aWRgg8aHnvkHNRWxUktvg6fBBpj5IT7n
-         pKV1crCNv4hL4WYeyt7IDYWyPMy21E9cIPMM0qk+RO6WHT0jeDc0EGi6kIjks79V9wYk
-         hD71NUTKR0RCYgKPaaFytlxKaJeAgbaZRCwl1VLyT5wKBkCFIPOXER4lrCUJXi1VxKtC
-         0GLA==
-X-Gm-Message-State: AOAM531ZgV7WuOC7kq5WSTdgKhqBsi0KmMeCWS0TX6Or/DcwGU+pTTfh
-        h+Wnn6ltmXxwFX0HF3jaSkGJQLOEHjaLgJHkLkEj4g==
-X-Google-Smtp-Source: ABdhPJw/C573wYg00zUcrBo1SJd6xbJ33WaRub/AC8BVEfvsSEBHLyWeDw7+PTsKYsSLlFM0Xc3zTWuUv5TYsAtqscI=
-X-Received: by 2002:ac2:5619:: with SMTP id v25mr31528433lfd.117.1594069532077;
- Mon, 06 Jul 2020 14:05:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200629201441.v1.1.I162e3c6c4f4d963250c37733c3428329110c5989@changeid>
- <968D6753-8ACB-4298-91A4-F2C9438EAC06@holtmann.org> <CABmPvSFq36OA-dxXxjhhocZjoJ1ZMZXZ4TULRYyTxcpksuXA7g@mail.gmail.com>
-In-Reply-To: <CABmPvSFq36OA-dxXxjhhocZjoJ1ZMZXZ4TULRYyTxcpksuXA7g@mail.gmail.com>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Mon, 6 Jul 2020 14:05:21 -0700
-Message-ID: <CABmPvSGAfWY-9UiApJ70ra-u9Mc66ED6PQCkB9zimt0HEaN3Zw@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Pavel Machek <pavel@ucw.cz>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ltxd3dYIIoYCEWLVWkAFd+Lvzl8zZTtrqnBoRTLOPrw=;
+        b=m+YsGVQoqkJSvW1Ku0RsD5BH2dEtnJEZ3HD7CGL4cVJH+ykw6dbgpwyBWcqWrBULg1
+         K0CKARylFMKOVKU0cXAloR785KFcqE7qOb6uVoOQR/4CnCfjO/pK4SWHkUTp0K9v6Za0
+         n6X10KPL532xjUlVRMJEoajXZAZRYgSyKzUCspt+fhYrWsJ1j0iCXvw8YdOSGqWBGN9i
+         0Z9AP7VdauhpjSusOLjowRNX1TMT0Ag1TYcKeEER7QGekZmTV5HUmWEuz3Bx2uNZZnPr
+         x+N5S5BwrZi1VVb5YhNXfMiIyckHVBQXCV5QUksmqJemGAEK7MGSkrBysdWyzawXt6XZ
+         A24A==
+X-Gm-Message-State: AOAM532enAdlDFe8TPhbMT7fMSpIOGlVB7t/pxhHO72hSlD/gQa/d1/E
+        qNZPxLigb+pWRmuAWpfdgx61rw==
+X-Google-Smtp-Source: ABdhPJy7PL/hlbFhwfnzuhW1Tr79eUWHhfP6EcBz2eu08ukka/c7cEFGGfAvpTJxtAZYYZAIv4kw1Q==
+X-Received: by 2002:a63:338c:: with SMTP id z134mr27954169pgz.245.1594069649524;
+        Mon, 06 Jul 2020 14:07:29 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id j8sm21088609pfd.145.2020.07.06.14.07.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2020 14:07:28 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     linux-pm@vger.kernel.org
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        rafael.j.wysocki@intel.com, swboyd@chromium.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pavel Machek <pavel@ucw.cz>
+Subject: [PATCH v2 0/1] power: Emit change uevent when updating sysfs
+Date:   Mon,  6 Jul 2020 14:07:16 -0700
+Message-Id: <20200706210717.1210639-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
 
-In case you missed this thread, my suggestion is to revert the
-previous patch and apply this patch. Please see my earlier email for
-the reason. Thanks.
+Hi linux-pm,
 
-Regards,
-Miao
+ChromeOS has a udev rule to chown the `power/wakeup` attribute so that
+the power manager can modify it during runtime.
 
-On Tue, Jun 30, 2020 at 2:55 PM Miao-chen Chou <mcchou@chromium.org> wrote:
->
-> Hi Marcel,
->
-> hci_unregister_dev() is invoked when the controller is intended to be
-> removed by btusb driver. In other words, there should not be any
-> activity on hdev's workqueue, so the destruction of the workqueue
-> should be the first thing to do to prevent the clear helpers from
-> issuing any work. So my suggestion is to revert the patch re-arranging
-> the workqueue and apply this instead.
-> I should have uploaded this earlier, but I encountered some troubles
-> while verifying the changes. Sorry for the inconvenience.
->
-> Regards,
-> Miao
->
-> On Mon, Jun 29, 2020 at 11:51 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Miao-chen,
-> >
-> > > This fixes the kernel oops by removing unnecessary background scan
-> > > update from hci_adv_monitors_clear() which shouldn't invoke any work
-> > > queue.
-> > >
-> > > The following test was performed.
-> > > - Run "rmmod btusb" and verify that no kernel oops is triggered.
-> > >
-> > > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> > > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > ---
-> > >
-> > > net/bluetooth/hci_core.c | 2 --
-> > > 1 file changed, 2 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index 5577cf9e2c7cd..77615161c7d72 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -3005,8 +3005,6 @@ void hci_adv_monitors_clear(struct hci_dev *hdev)
-> > >               hci_free_adv_monitor(monitor);
-> > >
-> > >       idr_destroy(&hdev->adv_monitors_idr);
-> > > -
-> > > -     hci_update_background_scan(hdev);
-> > > }
-> >
-> > I am happy to apply this as well, but I also applied another patch re-arranging the workqueue destroy handling. Can you check which prefer or if we should include both patches.
-> >
-> > Regards
-> >
-> > Marcel
-> >
+(https://source.chromium.org/chromiumos/chromiumos/codesearch/+/master:src/platform2/power_manager/udev/99-powerd-permissions.rules)
+
+In our automated tests, we found that the `power/wakeup` attributes
+weren't being chown-ed for some boards. On investigating, I found that
+when the drivers probe and call device_set_wakeup_capable, no uevent was
+being emitted for the newly added power/wakeup attribute. This was
+manifesting at boot on some boards (Marvell SDIO bluetooth and Broadcom
+Serial bluetooth drivers) or during usb disconnects during resume
+(Realtek btusb driver with reset resume quirk).
+
+It seems reasonable to me that changes to the attributes of a device
+should cause a changed uevent so I have added that here.
+
+Here's an example of the kernel events after toggling the authorized
+bit of /sys/bus/usb/devices/1-3/
+
+$ echo 0 > /sys/bus/usb/devices/1-3/authorized
+KERNEL[27.357994] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill1 (rfkill)
+KERNEL[27.358049] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
+KERNEL[27.358458] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
+KERNEL[27.358486] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
+KERNEL[27.358529] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
+
+$ echo 1 > /sys/bus/usb/devices/1-3/authorized
+KERNEL[36.415749] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
+KERNEL[36.415798] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
+KERNEL[36.417414] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
+KERNEL[36.417447] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill2 (rfkill)
+KERNEL[36.417481] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
+
+Thanks
+Abhishek
+
+Changes in v2:
+- Add newline at end of bt_dev_err
+
+Abhishek Pandit-Subedi (1):
+  power: Emit changed uevent on wakeup_sysfs_add/remove
+
+ drivers/base/power/sysfs.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+-- 
+2.27.0.212.ge8ba1cc988-goog
+
