@@ -2,133 +2,85 @@ Return-Path: <SRS0=7cy9=AR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AEDBC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 11:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E4BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 13:48:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 256F3206E6
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 11:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CEE220702
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jul 2020 13:48:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="Zzs66ifj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SZ4cYbHK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrO9XmIt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728921AbgGFLrO (ORCPT
+        id S1729112AbgGFNsP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Jul 2020 07:47:14 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:50705 "EHLO
-        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728845AbgGFLrO (ORCPT
+        Mon, 6 Jul 2020 09:48:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729109AbgGFNsO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Jul 2020 07:47:14 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 846375803CA;
-        Mon,  6 Jul 2020 07:47:12 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Mon, 06 Jul 2020 07:47:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:content-transfer-encoding:in-reply-to; s=fm3; bh=2
-        j5XHM8eiIAtdQDxQdQP6yCaAAsGGZ2pUNXQED85J7g=; b=Zzs66ifjtoAR5TI2a
-        tCf7OIEx92ai/QD7cSp0uedZvsK8UTWbCHjYxNr/z36PyKgM1pctOeTGulfGFUsM
-        91YgsL7gY0B+On1Rgpc3N+37WpUA6Qb8BZUOCgde0ik0vXiD7kWot0VeEyQ0vknZ
-        wQBIsBuOdBAif9XmzN+JNVaAqe00F+P7q4hBI5BUYwzUfKiKUmBSjKiOGxW3lUEz
-        ArJVteF2X1ifaUbcLS198iDYVvlED8Oln13Ku5h4Qtn8XOJQk/C4LO/YgVIKvqcu
-        bzaxpi7yaFW8NeekoC3vDhgfrd7MlHOuzVLNUE2RctGUgxNcSuDlXO8chLU3JQ0E
-        vgW7A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; bh=2j5XHM8eiIAtdQDxQdQP6yCaAAsGGZ2pUNXQED85J
-        7g=; b=SZ4cYbHKTKhaqeOfZUDYAWuZ6oY6YVQapo04+2pcJsRnP/k+si0WCkSSC
-        HIj1iQeGPdwFH9+0YSSTJ866051WiSWrrCOYau/UQowMy9hk7Ivm+QrVOA59ewiS
-        /xVZDtxhEX1ZwROmgJdrxcKOpT0KfHzwk9O3TTzKyHLDy/jUfgobWRXj6V6VFRc5
-        q1Gh3gUpyi5uj2fdNDrHX2Xp0Xn4Xz+QsPwZXn73Mb4i0NqOvrG0oWHGyMveFOse
-        8sozd7xbl1AZOF5IzHshSB64dyGcMSWO335MduOHKlkKtYk3KzC+PqlnzQTwO5om
-        Mt1Qfwv5SA9rbrIceM76Zo+c7I1CQ==
-X-ME-Sender: <xms:Pg8DX8ACshx8OXih7Tsx8To0gB270QzKuS2_NCU1p5fEf9o2R97m9Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudefgdeghecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggugfgjsehtqhertddttddvnecuhfhrohhmpeforgigihhm
-    vgcutfhiphgrrhguuceomhgrgihimhgvsegtvghrnhhordhtvggthheqnecuggftrfgrth
-    htvghrnhepgfejtedtjefggfffvdetuedthedtheegheeuteekfeeghfdtteejkeeludeg
-    vddunecukfhppeeltddrkeelrdeikedrjeeinecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepmhgrgihimhgvsegtvghrnhhordhtvggthh
-X-ME-Proxy: <xmx:Pg8DX-jHOXcfJ2sJoTl9jBNLiEym-N_hLdoBzSvpOVY4gudaPo0mBw>
-    <xmx:Pg8DX_nldB4L1GipaM69hGsaqzA7AiKazJRLfHQR_rBGczPC-Ys6Zg>
-    <xmx:Pg8DXywN0zJgmX6ntjFlltpOrwOipOZDa6Em-HoTVms3kpbDSPYJIQ>
-    <xmx:QA8DX-_QtSLuvFTsL3EvWkyB-2jqWDHQRXEhzvRph5PhJiuKwZ_yKA>
-Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 774E830653ED;
-        Mon,  6 Jul 2020 07:47:10 -0400 (EDT)
-Date:   Mon, 6 Jul 2020 13:47:09 +0200
-From:   Maxime Ripard <maxime@cerno.tech>
-To:     Vasily Khoruzhick <anarsoul@gmail.com>
-Cc:     Rob Herring <robh+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Ondrej Jirman <megous@megous.com>
-Subject: Re: [PATCH 3/3] arm64: allwinner: a64: enable Bluetooth On Pinebook
-Message-ID: <20200706114709.l6poszepqsmg5p5r@gilmour.lan>
-References: <20200705195110.405139-1-anarsoul@gmail.com>
- <20200705195110.405139-4-anarsoul@gmail.com>
+        Mon, 6 Jul 2020 09:48:14 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F0BC061755
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2020 06:48:13 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id h17so1285997qvr.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2020 06:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=SJj/JvBPbNhbHyJm/9hDgOHzKrUjF4dRqvNCzuVKegE=;
+        b=PrO9XmItLYJZ+8Ggre51FsCbathoDhq2k08KS+edj6FjEicFyBNmy1iQ40Q9JqeEwt
+         SqTYNEqXDYPlX48v5LCqbWvKQmGSBfACM0/B7PDRqQTvE1oI8NOusKTuycZBcGGX6lkG
+         NoToffZhDljH5lq4Pg4xGeSgWOXvrRZztLYlkO8br+3V48v6L83z7KiB1ogA3APa5Jxi
+         uw/dvaOQZhqonppcUOzELSqz+/fG/PFH8oQdOok10e2Oem2NhGIRlnyf98YGhxRYq4IB
+         CemyPPWxHYZ440Geyimv5LHHJzFauete94ld+PGGNJ8eTGsCPeDbwFPHJ9RpH5Kt0BDb
+         KA+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=SJj/JvBPbNhbHyJm/9hDgOHzKrUjF4dRqvNCzuVKegE=;
+        b=V2+i3QxGeBqxUdwsNUuFEQUEmeRaysiG4pZ+JqYUdJCEsziZa6HpdGieIpgXFPDwFJ
+         xe/FgzpwJZVGiJ+1eJKcUBl2YmYhVH/qn3xaK4Uc3BESEDfFCNT6guKqtIaJCzf+UaMh
+         L+ZtpBktg5hZtIbMxU4FT7It+NcBGks1PmRsK21UXpuSYmPhphUL0fO090qlgD9fxDMe
+         7HJ52s1VL13o77PKhGxZAypCCdr+GiZ6DyXHr4PdiXFqaUep9cG7XI75uDzjGAH3A3p0
+         8lYompOXLHDXToZKV8sTjQ7Oz27yFw21FQqLeicfiqnbv8Hie+jX1x/DeNjz9/nv39oX
+         WuJQ==
+X-Gm-Message-State: AOAM532v9S1xF63zwu3a8evW7yiyHInQrUtUIyPSoXt2k7oegAlMVPU/
+        897U8nJh64C0lTWsPiu4sdeGWegpz/KYneW8QBerDoNI
+X-Google-Smtp-Source: ABdhPJxf2AEXYcdAWa8ewvVnaVllCMCg4t0saeQoUcFQoI0IWKW2s+bpGxj8igVn5hAzwM728rkrQYRQhI6HlV9eRWk=
+X-Received: by 2002:a0c:fd2a:: with SMTP id i10mr48305210qvs.23.1594043292811;
+ Mon, 06 Jul 2020 06:48:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200705195110.405139-4-anarsoul@gmail.com>
+References: <CAPYaOEQ1GAfZMY7WLuZjsVhPm9Z+iUb0cTnNnzaCFS0uHRdUSg@mail.gmail.com>
+In-Reply-To: <CAPYaOEQ1GAfZMY7WLuZjsVhPm9Z+iUb0cTnNnzaCFS0uHRdUSg@mail.gmail.com>
+From:   Jean-Baptiste MARIE <jbaptiste.marie@gmail.com>
+Date:   Mon, 6 Jul 2020 15:48:01 +0200
+Message-ID: <CAPYaOETzsKS3nWE+r_xpKw0Hc8cnJReZpqbG-riQPv8cSie5oA@mail.gmail.com>
+Subject: L2CAP channels bit rate sharing policy
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hello,
 
-On Sun, Jul 05, 2020 at 12:51:10PM -0700, Vasily Khoruzhick wrote:
-> Pinebook has an RTL8723CS WiFi + BT chip, BT is connected to UART1
-> and uses PL5 as device wake GPIO, PL6 as host wake GPIO the I2C
-> controlling signals are connected to R_I2C bus.
->=20
-> Enable it in the device tree.
->=20
-> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-> ---
->  .../arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts b/arch=
-/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
-> index 64b1c54f87c0..e63ff271be4e 100644
-> --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
-> +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
-> @@ -408,6 +408,18 @@ &uart0 {
->  	status =3D "okay";
->  };
-> =20
-> +&uart1 {
-> +	pinctrl-names =3D "default";
-> +	pinctrl-0 =3D <&uart1_pins>, <&uart1_rts_cts_pins>;
-> +	status =3D "okay";
+I would like to know how is managed the sharing of available bandwidth
+between two L2CAP sockets over the same link.
 
-You probably need uart-has-rtscts here
+Here are my observations so far:
+- Connect one L2CAP socket from one device to another device.
+- Generate permanent traffic over the socket and measure the bitrate.
+- Open a second L2CAP socket over the same link
+- The throughput of the first socket is divided by 2.
 
-> +
-> +	bluetooth {
-> +		compatible =3D "realtek,rtl8723cs-bt";
-> +		device-wake-gpios =3D <&r_pio 0 5 GPIO_ACTIVE_LOW>; /* PL5 */
-> +		host-wake-gpios =3D <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-> +	};
+Is it possible through a patch or any configuration to set a maximum
+allowed bitrate for a L2CAP channel? How is managed the sharing of the
+link capability between the L2CAP channels?
 
-And max-speed I guess?
-
-Maxime
->
+Thank you for your feedback,
