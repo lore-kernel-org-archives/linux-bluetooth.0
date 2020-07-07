@@ -2,70 +2,132 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F46C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 15:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7279EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 15:49:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 802622065D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 15:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48DC62065D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 15:49:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Pv2fPxp7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729051AbgGGPrg convert rfc822-to-8bit (ORCPT
+        id S1728883AbgGGPtP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 11:47:36 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47902 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728133AbgGGPrg (ORCPT
+        Tue, 7 Jul 2020 11:49:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36622 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728133AbgGGPtO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 11:47:36 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1BE05CECED;
-        Tue,  7 Jul 2020 17:57:31 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v4] Bluetooth: le_simult_central_peripheral experimental
- feature
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200707142555.397598-1-alainm@chromium.org>
-Date:   Tue, 7 Jul 2020 17:47:34 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <EB5752C9-B3B2-424F-A4CB-B8DBF886AC6A@holtmann.org>
-References: <20200707142555.397598-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Tue, 7 Jul 2020 11:49:14 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D3EC08C5E1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 08:49:14 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id t15so4296594pjq.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 08:49:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e5vsrk7vEHY5/cQx0UlucywmyaBj8fW6BqF1VBBdS+A=;
+        b=Pv2fPxp7OIeEF3uKCol9thsCERjYulCcAkB8AUk4Gwl1bXaMqg3qeUpmuYbfoG9h9f
+         R5P3I1Ko6Ww0MIpmSFkLAAtMlFxfdZNVyLLOkErJST905aoYkJitnFGHHJ6iFlOuBYlK
+         CgPKunazaYPhxRQlwQCb+IDxN7kMA+6YmsRDU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e5vsrk7vEHY5/cQx0UlucywmyaBj8fW6BqF1VBBdS+A=;
+        b=PMU8AZfVj8oIjN4YnsJ7ItxZXIib1akizsIdInwIG6Klz5iMOvx/OfKlh3sCn46DjX
+         yOAK9Uhp9h1/QsEqw7YaTmF3s5f323O9c25cDuMwnDLE61rJGpPVVNWxUfBQcdvGPiNf
+         jx0GAz0n3sM/MSxI0ncRt4tITdGoRXhlgSKyzYFboYMiPYFJRPqKoUwacQhXaUyiclHk
+         MaWHIe2CaI0EZo+g+umyfg8shX5VZ/ziH/7n3XjYGJdZZRU0mPRB39++lVJl323wczi1
+         PSxTiW7T97id88f4UnGcXWHwNosmGWl6k18q65jO+Kh8hYe51/j+wZEdMpp9NBvuH/HG
+         UgRQ==
+X-Gm-Message-State: AOAM530Qf6RoI/YVnv1KzGSJAExE+2rGop6on4/qVHSWfRAKprzX9mAg
+        5VwVfTKz3VelVKatZT+UU5Xmgw==
+X-Google-Smtp-Source: ABdhPJzLS/0a5ZIkTRnBJsarvJBHCyL5ykuVlth8AWwaID0VPkNo2x7wmAhQzmyPS9TNjQsw6QlLFA==
+X-Received: by 2002:a17:90a:cd01:: with SMTP id d1mr5071431pju.212.1594136953766;
+        Tue, 07 Jul 2020 08:49:13 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id t5sm1360194pgl.38.2020.07.07.08.49.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jul 2020 08:49:13 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-pm@vger.kernel.org
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        rafael.j.wysocki@intel.com, swboyd@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
+        Pavel Machek <pavel@ucw.cz>
+Subject: [PATCH v3 0/1] power: Emit change uevent when updating sysfs
+Date:   Tue,  7 Jul 2020 08:49:04 -0700
+Message-Id: <20200707154905.2763616-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
 
-> This patch adds an le_simult_central_peripheral features which allows a
-> clients to determine if the controller is able to support peripheral and
-> central connections separately and at the same time.
-> 
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> ---
-> 
-> Changes in v4:
-> - Wrapping the feature around an if (hdev) per Marcel's feedback.
-> 
-> Changes in v3:
-> - Back to the original design of V1 and integrated Marcel's feedback.
-> 
-> Changes in v2:
-> - Slight change of design based on offline feedback
-> 
-> net/bluetooth/mgmt.c | 26 ++++++++++++++++++++++++--
-> 1 file changed, 24 insertions(+), 2 deletions(-)
+Hi linux-pm,
 
-I changed the code a little bit to make it simpler to read. See the modified v5 I just mailed to the mailing list.
+ChromeOS has a udev rule to chown the `power/wakeup` attribute so that
+the power manager can modify it during runtime.
 
-Regards
+(https://source.chromium.org/chromiumos/chromiumos/codesearch/+/master:src/platform2/power_manager/udev/99-powerd-permissions.rules)
 
-Marcel
+In our automated tests, we found that the `power/wakeup` attributes
+weren't being chown-ed for some boards. On investigating, I found that
+when the drivers probe and call device_set_wakeup_capable, no uevent was
+being emitted for the newly added power/wakeup attribute. This was
+manifesting at boot on some boards (Marvell SDIO bluetooth and Broadcom
+Serial bluetooth drivers) or during usb disconnects during resume
+(Realtek btusb driver with reset resume quirk).
+
+It seems reasonable to me that changes to the attributes of a device
+should cause a changed uevent so I have added that here.
+
+Here's an example of the kernel events after toggling the authorized
+bit of /sys/bus/usb/devices/1-3/
+
+$ echo 0 > /sys/bus/usb/devices/1-3/authorized
+KERNEL[27.357994] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill1 (rfkill)
+KERNEL[27.358049] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
+KERNEL[27.358458] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
+KERNEL[27.358486] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
+KERNEL[27.358529] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
+
+$ echo 1 > /sys/bus/usb/devices/1-3/authorized
+KERNEL[36.415749] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
+KERNEL[36.415798] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
+KERNEL[36.417414] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
+KERNEL[36.417447] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill2 (rfkill)
+KERNEL[36.417481] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
+
+Thanks
+Abhishek
+
+Changes in v3:
+- Simplified error handling
+
+Changes in v2:
+- Add newline at end of bt_dev_err
+
+Abhishek Pandit-Subedi (1):
+  power: Emit changed uevent on wakeup_sysfs_add/remove
+
+ drivers/base/power/sysfs.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+-- 
+2.27.0.212.ge8ba1cc988-goog
 
