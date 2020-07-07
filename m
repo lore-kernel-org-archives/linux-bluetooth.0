@@ -2,172 +2,230 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A01C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB0CC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94143206E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:50:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1F3520708
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:51:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIdBr80o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rht8URpw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728674AbgGGRu7 (ORCPT
+        id S1728137AbgGGRv2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 13:50:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55664 "EHLO
+        Tue, 7 Jul 2020 13:51:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728211AbgGGRu6 (ORCPT
+        with ESMTP id S1728036AbgGGRv2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 13:50:58 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16B3C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:50:58 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id s190so4767002ooa.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:50:58 -0700 (PDT)
+        Tue, 7 Jul 2020 13:51:28 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E822C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:51:28 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id c25so17356226otf.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:51:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AjJzSpH+6PSgjm7K9Fmcq3Du4iGdtClqyugjGVFCgYE=;
-        b=dIdBr80o69ULkmGHD/noIM9/vWDvLeQcc7bXpGZoIlEzn8yAGECqovUxUNgQyn/mMf
-         6dc5WtZihvq2SlAhnvKc6xOu7Q4Qy3JHSAMHPnPdCJN/IGXQyY9f1aJkHyH46rJ7DqL+
-         jEUHGZ2Vf/qrFpTQhG+iKqodsBGJKhIxo1T4lM/mfz9RNMpqNLPmOI8zPHVOnqjz248M
-         PagwRgFJnRa518NGSlgCZyZPoSfdpewUr+Mced7Q5LezZ5gRc558u++tdMmi2lOlq60x
-         349qu1i07TZbw9XzBAKbxM+RbFGAI0XRaYMvsphPHQALQZu2Kzpx/lm20zSM//QJYKH6
-         I2tA==
+        bh=bCVEYuJGviAWDatB6nt/gU/BOAlgCXbGWrHAbOwkPM8=;
+        b=Rht8URpwxd9gX5PA5/JT+3uV5XL9oFaGK/Jao/JBHQppF7uaeAVNBYtpyjK2fsw6z2
+         Fe+svI+i5aQ6woIvUpHIAdhqyu8iXNh749QLE2ABQspG+OLKSGMPAdemox+C4E1T8yi4
+         I5dNHh5NIVxPQ+4NGocIqMObudiFOCFMK5tSxR7WLBWM2B6cCIatjD5iZ3XEWzobI2cZ
+         vFD2SU2kDx/B7knd53xO4QPLj5rYZ+9mur6y+r48hEDN9S1rQ6jhlIE0mgHKcVY73rPt
+         YX+IONEQO56nUcAEP8OIard2D+8KFq8MRRf/FZ/87anJJ3kptGf72oBdCRDH/phHLgb1
+         rehg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AjJzSpH+6PSgjm7K9Fmcq3Du4iGdtClqyugjGVFCgYE=;
-        b=sI+TFL1oFuRgzds1i1tdKQXm0cAy2DkCUTR9fANH1ICqDQ0/cCFse3U+w+IfbK268e
-         HUJ+pfboAEbwxUAJ6t73/sWRe3r2zyaqNYWnz/v/IjM2ubEvAM4IMNviilrKKccu2oTV
-         2mCQHIxigPLd2zEayE2ridPhCCALSwdCtkFL4Qfk8P7ejg48QmmcS/wUzdfDNgx4lsg/
-         1TQD/a3/r9bgQI8Oos8PaTEGusFcg6j7nXTzuMWVzQTnU45RLjz8r9CDTUmpyvOCTpx0
-         lidWyF37AvB/7V4fwej7f76XPTWtes25ew0zDk269eMYEBh75hS/uUlYAYIPfhh7rl3h
-         KIbQ==
-X-Gm-Message-State: AOAM530+uHky7wyjxpuDmRHJdweRUYt1ARSBWZPlZETQSRUWkV8Wo9wj
-        7uvWN4t3bT6Mto+2+m4aBt720q1ekBJEqPNr7e+c9mqw
-X-Google-Smtp-Source: ABdhPJwTkOheZNHaq4c4RTNRDbNKk1vvm5I47GDhcg9cpRTT+5/I5VVtMUdpS6is0aDYpEMprOGPMf4stoMPjPyUdzA=
-X-Received: by 2002:a4a:b284:: with SMTP id k4mr9384681ooo.49.1594144257960;
- Tue, 07 Jul 2020 10:50:57 -0700 (PDT)
+        bh=bCVEYuJGviAWDatB6nt/gU/BOAlgCXbGWrHAbOwkPM8=;
+        b=uSI0U5z2flJIdtSg2gtF4RJp6DEHHQc6CJ8brVxQPIUxHdViOHXFGDeAknsTiJOhlI
+         e9cqGPYbeu/qVfJC1mEKMA7iGVho5o2AhqCuNRREneyjPZzFOf7h/xEMWLB8smZwE5ow
+         XIxhO18xv7upRoFu+xxiTRxLEwKy54Vhgwn+wGF+92k6KYEyBKnPYa6dW0KkTbcZ7O5x
+         l02Xc7HR0wvmcrr2WfBV0IykzXvN027AefVAoZEywn/YxfHmO10JYPdfMXRh1EcPXzVD
+         MmN3PxYS4Ex+Wu93cE0vBrEjy75gp7AHuNAGB2h1pV/Omb1nXLfwJoaF6IrCOLl4eWq5
+         h9QQ==
+X-Gm-Message-State: AOAM533NQk1B6r4A11wYASG7cWACU7WroAotSrJoC9KXl9XOY6R3CM8a
+        EZuDdS5PXVrFMxuASnepMiLXbXQKqWl7yy6D17k=
+X-Google-Smtp-Source: ABdhPJytVQaekzSiypSjEbBEFmsiq2WgrZ3CHfbaBDCrGPA0fbJpODg4jKZIuvIoFG1pzw9ogrzMf4cSwQimOepYX9g=
+X-Received: by 2002:a9d:5e18:: with SMTP id d24mr6700783oti.88.1594144287426;
+ Tue, 07 Jul 2020 10:51:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200706202518.1153647-1-abhishekpandit@chromium.org>
-In-Reply-To: <20200706202518.1153647-1-abhishekpandit@chromium.org>
+References: <20200707021920.209213-1-alainm@chromium.org>
+In-Reply-To: <20200707021920.209213-1-alainm@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 7 Jul 2020 10:50:46 -0700
-Message-ID: <CABBYNZLDBFxa4ojp5HK9YbPjm+fB=qznKzp95hHPA-dN8-UsQA@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v7 0/6] device: Allow devices to be marked as wake capable
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
+Date:   Tue, 7 Jul 2020 10:51:16 -0700
+Message-ID: <CABBYNZLmF5r2RQ94mNti3Q=4zO_eahg1wDV=AiGSDqPn1NiDJg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH 1/2] adapter: add support for the Roles property
+To:     Alain Michaud <alainm@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Alain,
 
-On Mon, Jul 6, 2020 at 1:25 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
+On Mon, Jul 6, 2020 at 7:22 PM Alain Michaud <alainm@chromium.org> wrote:
 >
+> This patch adds support for the Roles property as defined in
+> adapter-api.txt.
 >
-> Hi Luiz,
+> ---
 >
-> This change accompanies a change in the kernel to allow marking devices
-> as wakeable so they can wake the system from suspend. Currently, only
-> HID devices support this and will be configured to allow this setting to
-> be changed via the WakeAllowed property.
+>  src/adapter.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 91 insertions(+)
 >
-> Accompanying kernel change: https://patchwork.kernel.org/patch/11609999/
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 9ce351893..7afd6980c 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -122,6 +122,8 @@ static bool kernel_blocked_keys_supported = false;
 >
-> In order to set this flag, Bluez must call Set Device Flags with the
-> Remote Wakeup bit set. This change was tested with the accompanying
-> kernel changes on v5.4 with both manual tests and automated tests.
+>  static bool kernel_set_system_config = false;
 >
-> Here's the tests that I ran manually:
->   - Pair new HID device and confirm it has Wake Allowed to True
->   (default). Verify device can be woken from suspend with device.
->   - Restart bluetoothd, confirm Device Flags Changed event after Add
->   Device has no Remote Wakeup flag and Set Device Flags is called
->   afterwards to restore it. Verify wake from suspend still works.
->   - Disable Wake allowed via dbus and confirm wake from suspend no
->   longer works.
->   - Restart bluetoothd and confirm Wake Allowed is still false. Verify
->   wake from suspend does not work.
+> +static bool kernel_exp_features = false;
+> +
+>  static GList *adapter_list = NULL;
+>  static unsigned int adapter_remaining = 0;
+>  static bool powering_down = false;
+> @@ -293,6 +295,8 @@ struct btd_adapter {
+>         unsigned int db_id;             /* Service event handler for GATT db */
 >
-> Thanks
-> Abhishek
+>         bool is_default;                /* true if adapter is default one */
+> +
+> +       bool le_simult_roles_supported;
+>  };
 >
-> Changes in v7:
-> * Fix more build issues reported by bluez.test.bot
+>  typedef enum {
+> @@ -3199,6 +3203,35 @@ static gboolean property_get_modalias(const GDBusPropertyTable *property,
+>         return TRUE;
+>  }
 >
-> Changes in v6:
-> * Fix up some build issues reported by bluez.test.bot
-> * Save pending property id and emit success only after set flags returns
-> * Ignore multiple calls to set_wake_allowed to the same value
-> * Emit property error busy if same value is already sent to mgmt
-> * Fix up build issues reported by bluez.test.bot
+> +static gboolean property_get_roles(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *user_data)
+> +{
+> +       struct btd_adapter *adapter = user_data;
+> +       DBusMessageIter entry;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                                       DBUS_TYPE_STRING_AS_STRING, &entry);
+> +
+> +       if (adapter->supported_settings & MGMT_SETTING_LE) {
+> +               const char *str = "central";
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
+> +       }
+> +
+> +       if (adapter->supported_settings & MGMT_SETTING_ADVERTISING) {
+> +               const char *str = "peripheral";
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
+> +       }
+> +
+> +       if (adapter->le_simult_roles_supported) {
+> +               const char *str = "central-peripheral";
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
+> +       }
+> +
+> +       dbus_message_iter_close_container(iter, &entry);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static int device_path_cmp(gconstpointer a, gconstpointer b)
+>  {
+>         const struct btd_device *device = a;
+> @@ -3479,6 +3512,7 @@ static const GDBusPropertyTable adapter_properties[] = {
+>         { "UUIDs", "as", property_get_uuids },
+>         { "Modalias", "s", property_get_modalias, NULL,
+>                                         property_exists_modalias },
+> +       { "Roles", "as", property_get_roles },
+>         { }
+>  };
 >
-> Changes in v5:
-> - Use device_flags mgmt op
-> * Decode device flags
-> * Refactor to use set_wake_flags and respond to device flags changed
-> * Add wake_override so we can keep track of user/profile configuration
->   vs what is currently active
-> * Only call device_set_wake_support
+> @@ -9023,6 +9057,56 @@ static bool set_blocked_keys(struct btd_adapter *adapter)
+>                                                 adapter, NULL);
+>  }
 >
-> Changes in v4:
-> * Renamed wake_capable to wake_allowed
-> * Removed set_wake_capable mgmt op and updated add_device to accept
->   flags to set whether a device is wakeable
-> * Refactored adapter_whitelist_add and adapter_auto_connect_add to call
->   adapter_add_device
-> * Renamed WakeCapable to WakeAllowed
-> * Renamed WakeCapable to WakeAllowed
-> * Renamed device_set_profile_wake_support to just
-> device_set_wake_support
+> +static void read_exp_features_complete(uint8_t status, uint16_t length,
+> +                                       const void *param, void *user_data)
+> +{
+> +       struct btd_adapter *adapter = user_data;
+> +       const struct mgmt_rp_read_exp_features_info *rp = param;
+> +       size_t feature_count = 0;
+> +       size_t i = 0;
+> +
+> +       DBG("index %u status 0x%02x", adapter->dev_id, status);
+> +
+> +       if (status != MGMT_STATUS_SUCCESS) {
+> +               btd_error(adapter->dev_id,
+> +                               "Failed to read exp features info: %s (0x%02x)",
+> +                               mgmt_errstr(status), status);
+> +               return;
+> +       }
+> +
+> +       if (length < sizeof(*rp)) {
+> +               btd_error(adapter->dev_id, "Response too small");
+> +               return;
+> +       }
+> +
+> +       feature_count = le16_to_cpu(rp->feature_count);
+> +       for (i = 0; i < feature_count; ++i) {
+> +
+> +               /* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
+> +               static const uint8_t le_simult_central_peripheral[16] = {
+> +                       0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
+> +                       0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
+> +               };
+> +
+> +               if (memcmp(rp->features[i].uuid, le_simult_central_peripheral,
+> +                               sizeof(le_simult_central_peripheral)) == 0) {
+> +                       uint32_t flags = le32_to_cpu(rp->features[i].flags);
+> +
+> +                       adapter->le_simult_roles_supported = flags & 0x01;
+> +               }
+> +       }
+> +}
+> +
+> +static void read_exp_features(struct btd_adapter *adapter)
+> +{
+> +       if (mgmt_send(adapter->mgmt, MGMT_OP_READ_EXP_FEATURES_INFO,
+> +                       adapter->dev_id, 0, NULL, read_exp_features_complete,
+> +                       adapter, NULL) > 0)
+> +               return;
+> +
+> +       btd_error(adapter->dev_id, "Failed to read exp features info");
+> +}
+> +
+>  static void read_info_complete(uint8_t status, uint16_t length,
+>                                         const void *param, void *user_data)
+>  {
+> @@ -9132,6 +9216,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
+>                         (missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
+>                 set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
 >
-> Changes in v3:
-> * Added profile_wake_support and made wake_capable dependent on it
-> * Added documentation for WakeCapable
-> * Mark HID device to support wake from suspend
->
-> Changes in v2:
-> * Added dbus api "WakeCapable" to set value
-> * Update device_set_wake_capable to be called by
->   adapter_set_wake_capable_complete so we can emit property changed
-> * Newly added to show whether device is wake capable
-> * Removed automatically setting wake capable for HID devices
->
-> Abhishek Pandit-Subedi (6):
->   mgmt: Add mgmt op and events for device flags
->   monitor: Decode device flags mgmt ops and event
->   device: Support marking a device with wake allowed
->   client: Display wake allowed property with info
->   doc/device-api: Add WakeAllowed
->   input: Make HID devices support wake
->
->  client/main.c           |   1 +
->  doc/device-api.txt      |   5 +
->  lib/mgmt.h              |  33 +++++++
->  monitor/packet.c        |  70 ++++++++++++++
->  profiles/input/device.c |   1 +
->  profiles/input/hog.c    |   1 +
->  src/adapter.c           |  93 ++++++++++++++++++
->  src/adapter.h           |   3 +-
->  src/device.c            | 210 ++++++++++++++++++++++++++++++++++++++++
->  src/device.h            |  10 ++
->  10 files changed, 426 insertions(+), 1 deletion(-)
->
+> +       if (kernel_exp_features)
+> +               read_exp_features(adapter);
+> +
+>         err = adapter_register(adapter);
+>         if (err < 0) {
+>                 btd_error(adapter->dev_id, "Unable to register new adapter");
+> @@ -9447,6 +9534,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+>                         DBG("kernel supports set system confic");
+>                         kernel_set_system_config = true;
+>                         break;
+> +               case MGMT_OP_READ_EXP_FEATURES_INFO:
+> +                       DBG("kernel supports exp features");
+> +                       kernel_exp_features = true;
+> +                       break;
+>                 default:
+>                         break;
+>                 }
 > --
 > 2.27.0.212.ge8ba1cc988-goog
 
