@@ -2,62 +2,68 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D6B9C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A1AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F04C420738
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:16:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594142208;
-	bh=S+LIhpvc5j7Usk+mnHJUWylvioZ/DAfiKNR/5zD03bs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=sKChh9lb268JmA0i9zBUsUb9IQwZdYRy+URrz2WRU9n0UFViBq0YEj3U3qhyTmofp
-	 Pn0pZqwy2f8DGb+DD7+wJ+BjaVReNQGOGLoM61MsuXloNf/kmVEVkMyY+ARWqfshXl
-	 YoVUwBjVQORgiEYJPw0xsjOEDehUzn98CHU56iF4=
+	by mail.kernel.org (Postfix) with ESMTP id A10D32073E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:18:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UWYVic96"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728267AbgGGRQo (ORCPT
+        id S1727975AbgGGRS2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 13:16:44 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:37235 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727886AbgGGRQn (ORCPT
+        Tue, 7 Jul 2020 13:18:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728036AbgGGRS1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 13:16:43 -0400
-Received: by mail-ot1-f68.google.com with SMTP id w17so27027483otl.4;
-        Tue, 07 Jul 2020 10:16:42 -0700 (PDT)
+        Tue, 7 Jul 2020 13:18:27 -0400
+Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57C14C08C5E1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:18:27 -0700 (PDT)
+Received: by mail-vs1-xe42.google.com with SMTP id s20so15562970vsq.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:18:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=74Xd65ujs50AwKytINLgt7qtTa7IevS/aqZRV1i9Rd8=;
+        b=UWYVic96pOSZRZsRmw2D0xW579eTy1JPNBw9lI+/tOGAhV3ymR2VcORJIdFnYMXlx/
+         Pyh7l5oLPF9TOnZJYezcZKg0Et63e+3Ah4oPnZkC/aFt8IXpEP/Dw63qRvAoiZeMGyTl
+         BkYS5dtdJ+VAfBgPrKdTozMDQ4weGwZxX/96E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=TUdKoU1H+z8qeBTxQdM+SPgy95nTHPoa7jpopZEDv8Y=;
-        b=Pf6FMT5LyEMitO9qDPArxDr4uMH/z/aW3bgwB682VenojpZ1OL3XD4exe5l3VC99rM
-         b8KeATINejGg2ywbQa75nwXG+kjYfGOIHpN+jIIF9dsmkgQ8usP2utRu/MuteJVJKnl/
-         BjaQRfr/LQipscWjSUNq93QvZm5q9gy25mHYMfZdwlrVvMFOexza0nu3A5/Km2il6r3j
-         T0GqLb3OqGY6ZKDS+2r/5GAlsFdybpwcY9jDK8lr9J/TRiegRQtpI9gQVcUnClsnnCu7
-         /Xl8GNEgBjIyoGOetVldvar/UgMsHtq4BI1MTAtqNCn4Z7z80cK8uCHjohq8gO3UitAs
-         wb2w==
-X-Gm-Message-State: AOAM531x+oKnoQQT+oNWQzSrWfcHD7rmG2ZvegSdZ5BAXccEppmjXmtf
-        c6+DDfLx7xH41Iz0sWRRheOwOZKtNnzXf3Eqthc=
-X-Google-Smtp-Source: ABdhPJx8HATaz0zjRx9gs1OrA241/fnh2U+zL02uEuN+UC4P7Dh1KnovbuqHuDqumPh5Ub2BG0nc5bCvGslWULqn6lk=
-X-Received: by 2002:a9d:590a:: with SMTP id t10mr9944178oth.262.1594142202516;
- Tue, 07 Jul 2020 10:16:42 -0700 (PDT)
+        bh=74Xd65ujs50AwKytINLgt7qtTa7IevS/aqZRV1i9Rd8=;
+        b=h2RN3GMo8vyYVplFxs++00qy1m8MO+BiW91rBO325l9jPN07lquZ80FNXWvSyabFIp
+         l/RgjZtCjJQk2AF8s3MyVI2aRCp0VGPQBMNUIw/IP+2/HobNYhaAmR/sLh95zHL1Tol5
+         ABqkN0hrqCDdx/YBcAkDohKHxNt8RkJvQLr3jAV0RWXvq0L9ApAu5UncjhUB8VFQSr0t
+         P5kxw07TSD5LH4WIJVYZS83/MJEqhrSgqctFsIAuTghNq4Ml1NTCNNtBSr+73IKlQjPY
+         OlPADJXEPR/Yz5PaKbJXh+hka21lb42c4JifiyoY/EoyubRXIiClXrufZtZt4A88bEy/
+         kA2g==
+X-Gm-Message-State: AOAM533HQO6mKZPyMHJwfYYWqo7m4kgBlGz1//L8HctAdr6Zuu8lexKn
+        5E7twnDc6CH2QX7/zi5PNDZT2vzJbAv6VfYbppM7vA==
+X-Google-Smtp-Source: ABdhPJwk+V71z2wv/WQnTefFWymSCRO53UNKZiBT8TehImzf1AUUKNg93mkz/cBBz2gO3h2NY5EkhH6PKev8387kkUo=
+X-Received: by 2002:a67:6e05:: with SMTP id j5mr32408546vsc.196.1594142306552;
+ Tue, 07 Jul 2020 10:18:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200707162417.3514284-1-abhishekpandit@chromium.org>
  <20200707092406.v4.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
- <CAJZ5v0iyvge_Hqgm46_vfjh45YFdnsJ7ksvY7DqD6gx+f+1dvg@mail.gmail.com> <CANFp7mUas8Qnzqeivri25S7SWbKe6T+6riN419dR6xZXXOcaKA@mail.gmail.com>
-In-Reply-To: <CANFp7mUas8Qnzqeivri25S7SWbKe6T+6riN419dR6xZXXOcaKA@mail.gmail.com>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 7 Jul 2020 19:16:31 +0200
-Message-ID: <CAJZ5v0iVXbxHzV0Y_y5idkoS4DdF+cXQ6kmA0bWWHWZ-TVv8wg@mail.gmail.com>
+ <CAJZ5v0iyvge_Hqgm46_vfjh45YFdnsJ7ksvY7DqD6gx+f+1dvg@mail.gmail.com>
+ <CANFp7mUas8Qnzqeivri25S7SWbKe6T+6riN419dR6xZXXOcaKA@mail.gmail.com> <CAJZ5v0iVXbxHzV0Y_y5idkoS4DdF+cXQ6kmA0bWWHWZ-TVv8wg@mail.gmail.com>
+In-Reply-To: <CAJZ5v0iVXbxHzV0Y_y5idkoS4DdF+cXQ6kmA0bWWHWZ-TVv8wg@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Tue, 7 Jul 2020 10:18:15 -0700
+Message-ID: <CANFp7mXEB4ckWKRDDqUdmBBrbk00CW_pOX+1zmo_AgywtHZ+Nw@mail.gmail.com>
 Subject: Re: [PATCH v4 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Linux PM <linux-pm@vger.kernel.org>,
         "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         ChromeOS Bluetooth Upstreaming 
@@ -73,105 +79,112 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jul 7, 2020 at 6:48 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> Hi Rafael,
->
-> (resent in plain text)
->
-> On Tue, Jul 7, 2020 at 9:28 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
-> >
-> > On Tue, Jul 7, 2020 at 6:24 PM Abhishek Pandit-Subedi
-> > <abhishekpandit@chromium.org> wrote:
-> > >
-> > > Udev rules that depend on the power/wakeup attribute don't get triggered
-> > > correctly if device_set_wakeup_capable is called after the device is
-> > > created. This can happen for several reasons (driver sets wakeup after
-> > > device is created, wakeup is changed on parent device, etc) and it seems
-> > > reasonable to emit a changed event when adding or removing attributes on
-> > > the device.
-> > >
-> > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > > ---
-> > >
-> > > Changes in v4:
-> > > - Fix warning where returning from void and tested on device
-> > >
-> > > Changes in v3:
-> > > - Simplified error handling
-> > >
-> > > Changes in v2:
-> > > - Add newline at end of bt_dev_err
-> > >
-> > >  drivers/base/power/sysfs.c | 9 ++++++++-
-> > >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/base/power/sysfs.c b/drivers/base/power/sysfs.c
-> > > index 24d25cf8ab1487..aeb58d40aac8de 100644
-> > > --- a/drivers/base/power/sysfs.c
-> > > +++ b/drivers/base/power/sysfs.c
-> > > @@ -1,6 +1,7 @@
-> > >  // SPDX-License-Identifier: GPL-2.0
-> > >  /* sysfs entries for device PM */
-> > >  #include <linux/device.h>
-> > > +#include <linux/kobject.h>
-> > >  #include <linux/string.h>
-> > >  #include <linux/export.h>
-> > >  #include <linux/pm_qos.h>
-> > > @@ -739,12 +740,18 @@ int dpm_sysfs_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
-> > >
-> > >  int wakeup_sysfs_add(struct device *dev)
-> > >  {
-> > > -       return sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > > +       int ret = sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > > +
-> > > +       if (ret)
-> > > +               return ret;
-> > > +
-> > > +       return kobject_uevent(&dev->kobj, KOBJ_CHANGE);
-> >
-> > So let me repeat the previous comment:
-> >
-> > If you return an error here, it may confuse the caller to think that
-> > the operation has failed completely, whereas the merging of the
-> > attribute group has been successful already.
-> >
-> > I don't think that an error can be returned at this point.
-> >
->
-> The caller looks at the return code and just logs that an error
-> occurred (no other action). It's also unlikely for kobject_uevent to
-> fail (I saw mostly -ENOMEM and an -ENOENT when the kobj wasn't in the
-> correct set).
->
-> Call site:
->     int ret = wakeup_sysfs_add(dev);
->
->     if (ret)
->         dev_info(dev, "Wakeup sysfs attributes not added\n");
+Sounds good to me. Patch v5 incoming after compile-test.
 
-Yes, which is confusing, because the wakeup attributes may in fact
-have been added.  Which is my point.
+Thanks
+Abhishek
 
+On Tue, Jul 7, 2020 at 10:16 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
 >
-> So I'm ok with either keeping this as-is (caller isn't getting
-> confused, just logging) or swallowing the return of kobject_uevent.
-
-I would just ignore the return value of kobject_uevent() along the
-lines of wakeup_sysfs_remove() below.
-
-Thanks!
-
-> > >  }
+> On Tue, Jul 7, 2020 at 6:48 PM Abhishek Pandit-Subedi
+> <abhishekpandit@chromium.org> wrote:
+> >
+> > Hi Rafael,
+> >
+> > (resent in plain text)
+> >
+> > On Tue, Jul 7, 2020 at 9:28 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
 > > >
-> > >  void wakeup_sysfs_remove(struct device *dev)
-> > >  {
-> > >         sysfs_unmerge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > > +       kobject_uevent(&dev->kobj, KOBJ_CHANGE);
-> > >  }
+> > > On Tue, Jul 7, 2020 at 6:24 PM Abhishek Pandit-Subedi
+> > > <abhishekpandit@chromium.org> wrote:
+> > > >
+> > > > Udev rules that depend on the power/wakeup attribute don't get triggered
+> > > > correctly if device_set_wakeup_capable is called after the device is
+> > > > created. This can happen for several reasons (driver sets wakeup after
+> > > > device is created, wakeup is changed on parent device, etc) and it seems
+> > > > reasonable to emit a changed event when adding or removing attributes on
+> > > > the device.
+> > > >
+> > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > > > ---
+> > > >
+> > > > Changes in v4:
+> > > > - Fix warning where returning from void and tested on device
+> > > >
+> > > > Changes in v3:
+> > > > - Simplified error handling
+> > > >
+> > > > Changes in v2:
+> > > > - Add newline at end of bt_dev_err
+> > > >
+> > > >  drivers/base/power/sysfs.c | 9 ++++++++-
+> > > >  1 file changed, 8 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/drivers/base/power/sysfs.c b/drivers/base/power/sysfs.c
+> > > > index 24d25cf8ab1487..aeb58d40aac8de 100644
+> > > > --- a/drivers/base/power/sysfs.c
+> > > > +++ b/drivers/base/power/sysfs.c
+> > > > @@ -1,6 +1,7 @@
+> > > >  // SPDX-License-Identifier: GPL-2.0
+> > > >  /* sysfs entries for device PM */
+> > > >  #include <linux/device.h>
+> > > > +#include <linux/kobject.h>
+> > > >  #include <linux/string.h>
+> > > >  #include <linux/export.h>
+> > > >  #include <linux/pm_qos.h>
+> > > > @@ -739,12 +740,18 @@ int dpm_sysfs_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
+> > > >
+> > > >  int wakeup_sysfs_add(struct device *dev)
+> > > >  {
+> > > > -       return sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
+> > > > +       int ret = sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
+> > > > +
+> > > > +       if (ret)
+> > > > +               return ret;
+> > > > +
+> > > > +       return kobject_uevent(&dev->kobj, KOBJ_CHANGE);
 > > >
-> > >  int pm_qos_sysfs_add_resume_latency(struct device *dev)
-> > > --
-> > > 2.27.0.212.ge8ba1cc988-goog
+> > > So let me repeat the previous comment:
 > > >
+> > > If you return an error here, it may confuse the caller to think that
+> > > the operation has failed completely, whereas the merging of the
+> > > attribute group has been successful already.
+> > >
+> > > I don't think that an error can be returned at this point.
+> > >
+> >
+> > The caller looks at the return code and just logs that an error
+> > occurred (no other action). It's also unlikely for kobject_uevent to
+> > fail (I saw mostly -ENOMEM and an -ENOENT when the kobj wasn't in the
+> > correct set).
+> >
+> > Call site:
+> >     int ret = wakeup_sysfs_add(dev);
+> >
+> >     if (ret)
+> >         dev_info(dev, "Wakeup sysfs attributes not added\n");
+>
+> Yes, which is confusing, because the wakeup attributes may in fact
+> have been added.  Which is my point.
+>
+> >
+> > So I'm ok with either keeping this as-is (caller isn't getting
+> > confused, just logging) or swallowing the return of kobject_uevent.
+>
+> I would just ignore the return value of kobject_uevent() along the
+> lines of wakeup_sysfs_remove() below.
+>
+> Thanks!
+>
+> > > >  }
+> > > >
+> > > >  void wakeup_sysfs_remove(struct device *dev)
+> > > >  {
+> > > >         sysfs_unmerge_group(&dev->kobj, &pm_wakeup_attr_group);
+> > > > +       kobject_uevent(&dev->kobj, KOBJ_CHANGE);
+> > > >  }
+> > > >
+> > > >  int pm_qos_sysfs_add_resume_latency(struct device *dev)
+> > > > --
+> > > > 2.27.0.212.ge8ba1cc988-goog
+> > > >
