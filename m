@@ -2,139 +2,152 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC4DC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5028AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:44:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD23320675
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:28:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594139301;
-	bh=upb+MiMjE+yhpC/DQQ/r/unIOjwPvDoKJjDDvM8RleQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=1rS29iZdf+Pqp9aIMteUlVaoEsHJjr2F91HyBgFRW9s7Kjjh/iCMIeGbh84nMG8G5
-	 XHWiW/HL+/obEsvoHECvMIywmh26RL0ZzwfLvdV+AP+FZ6jxwCFTk+gnJUa6X+gZkn
-	 ZrxEzfiC631WtMdmWSHerFZHYLXFl3Yui2e5lAqY=
+	by mail.kernel.org (Postfix) with ESMTP id 3598A2073E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728172AbgGGQ2S (ORCPT
+        id S1728122AbgGGQot (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 12:28:18 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:46180 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726911AbgGGQ2S (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 12:28:18 -0400
-Received: by mail-oi1-f193.google.com with SMTP id l63so33924109oih.13;
-        Tue, 07 Jul 2020 09:28:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qqA8J6CgHJ1oaRzYuw9U/pBjnnBjCWF7/6JXnD6SNeI=;
-        b=fAiVt3yqIgVL/Vd9TRAgthE4dRaHiCqRkxSnfarLUPMS4LYutAu8xdEPhJoA4bi1pw
-         ne+rdWwu/aQAaFAuqIVf6IhdMBWAy8XRlMOowocJ1sYWMhD0srRbqDv89rlbaN1lLCoD
-         XbGJ892l6I7pVFjPd1ngGQgTn/dGqaWpqXVZl4vhf8M47bXZdysOt/0C1mTkYbGxT7B8
-         xvqn1X1xssyxWuJTpJQZS5pwKr2e84+Cn2qinjANbazLFS6iUiph9U9GwLYdaVN2yn2N
-         7Wped44lTUlbjZ2Xt3V9lkaaWTm1VM0uLXkOpIazHk53EK/Hl3oD+xBUAgLekBUK3cER
-         X/wQ==
-X-Gm-Message-State: AOAM530Y4wubsuDnbmiZXxo9vUubteHb0wgrD+VSwvzdp37gXBro5BHr
-        GTZpZ4wFHZJn053oxSPBGllrVQJ75OdKc2vfBoo=
-X-Google-Smtp-Source: ABdhPJwWEu1nW2hVdT2oditOw+IT/F4slchce0IYqSxCLUtcrqN8q00tngKV7H/5HMxNHixTJq1zO157Gf900Ep315g=
-X-Received: by 2002:aca:f58a:: with SMTP id t132mr3798335oih.68.1594139296771;
- Tue, 07 Jul 2020 09:28:16 -0700 (PDT)
+        Tue, 7 Jul 2020 12:44:49 -0400
+Received: from mga03.intel.com ([134.134.136.65]:62900 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726911AbgGGQot (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Jul 2020 12:44:49 -0400
+IronPort-SDR: LfPdDm9L2YEyqXQFYfEaCz73AXcz8XGvybsbrwAVSvlU14JRNKlRMe0tQNrEd3QFKhfqRZL77I
+ +NfLn6oAL7RQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="147657526"
+X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
+   d="scan'208";a="147657526"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 09:44:41 -0700
+IronPort-SDR: sjwYZw1bSqGtv389avo8bjKvuUYNTxpyaoI292FaUiM/VRv2C1RCDzXrZSXsB4SyaTvNIHS61f
+ 1HK+P5oItxpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
+   d="scan'208";a="323592435"
+Received: from jdlachim-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.255.230.123])
+  by orsmga007.jf.intel.com with ESMTP; 07 Jul 2020 09:44:40 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/2] tools/mesh: Get rid of "unreliable opcodes" in models
+Date:   Tue,  7 Jul 2020 09:44:39 -0700
+Message-Id: <20200707164439.24146-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200707164439.24146-1-inga.stotland@intel.com>
+References: <20200707164439.24146-1-inga.stotland@intel.com>
 MIME-Version: 1.0
-References: <20200707162417.3514284-1-abhishekpandit@chromium.org> <20200707092406.v4.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
-In-Reply-To: <20200707092406.v4.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 7 Jul 2020 18:28:05 +0200
-Message-ID: <CAJZ5v0iyvge_Hqgm46_vfjh45YFdnsJ7ksvY7DqD6gx+f+1dvg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Stephen Boyd <swboyd@chromium.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jul 7, 2020 at 6:24 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> Udev rules that depend on the power/wakeup attribute don't get triggered
-> correctly if device_set_wakeup_capable is called after the device is
-> created. This can happen for several reasons (driver sets wakeup after
-> device is created, wakeup is changed on parent device, etc) and it seems
-> reasonable to emit a changed event when adding or removing attributes on
-> the device.
->
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
->
-> Changes in v4:
-> - Fix warning where returning from void and tested on device
->
-> Changes in v3:
-> - Simplified error handling
->
-> Changes in v2:
-> - Add newline at end of bt_dev_err
->
->  drivers/base/power/sysfs.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/base/power/sysfs.c b/drivers/base/power/sysfs.c
-> index 24d25cf8ab1487..aeb58d40aac8de 100644
-> --- a/drivers/base/power/sysfs.c
-> +++ b/drivers/base/power/sysfs.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* sysfs entries for device PM */
->  #include <linux/device.h>
-> +#include <linux/kobject.h>
->  #include <linux/string.h>
->  #include <linux/export.h>
->  #include <linux/pm_qos.h>
-> @@ -739,12 +740,18 @@ int dpm_sysfs_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
->
->  int wakeup_sysfs_add(struct device *dev)
->  {
-> -       return sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> +       int ret = sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> +
-> +       if (ret)
-> +               return ret;
-> +
-> +       return kobject_uevent(&dev->kobj, KOBJ_CHANGE);
+This removes an old notion of unreliable opcodes in models , i.e.,
+a correctly formatted acknowledged message always gets a response.
+---
+ tools/mesh-gatt/config-client.c | 2 +-
+ tools/mesh-gatt/config-server.c | 2 +-
+ tools/mesh-gatt/onoff-model.c   | 2 +-
+ tools/mesh-gatt/util.h          | 2 --
+ tools/mesh/cfgcli.c             | 4 ++--
+ tools/mesh/model.h              | 1 -
+ 6 files changed, 5 insertions(+), 8 deletions(-)
 
-So let me repeat the previous comment:
+diff --git a/tools/mesh-gatt/config-client.c b/tools/mesh-gatt/config-client.c
+index ed31c67d9..bfc788258 100644
+--- a/tools/mesh-gatt/config-client.c
++++ b/tools/mesh-gatt/config-client.c
+@@ -100,7 +100,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 	if (primary != src)
+ 		return false;
+ 
+-	switch (opcode & ~OP_UNRELIABLE) {
++	switch (opcode) {
+ 	default:
+ 		return false;
+ 
+diff --git a/tools/mesh-gatt/config-server.c b/tools/mesh-gatt/config-server.c
+index 8fc6edcc0..9e9b93959 100644
+--- a/tools/mesh-gatt/config-server.c
++++ b/tools/mesh-gatt/config-server.c
+@@ -73,7 +73,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 
+ 	n = 0;
+ 
+-	switch (opcode & ~OP_UNRELIABLE) {
++	switch (opcode) {
+ 	default:
+ 		return false;
+ 
+diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
+index 92c9a3105..be519c969 100644
+--- a/tools/mesh-gatt/onoff-model.c
++++ b/tools/mesh-gatt/onoff-model.c
+@@ -123,7 +123,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 								len, opcode);
+ 	print_byte_array("\t",data, len);
+ 
+-	switch (opcode & ~OP_UNRELIABLE) {
++	switch (opcode) {
+ 	default:
+ 		return false;
+ 
+diff --git a/tools/mesh-gatt/util.h b/tools/mesh-gatt/util.h
+index c3facfa73..dba2c480b 100644
+--- a/tools/mesh-gatt/util.h
++++ b/tools/mesh-gatt/util.h
+@@ -25,8 +25,6 @@
+ 
+ struct mesh_publication;
+ 
+-#define OP_UNRELIABLE			0x0100
+-
+ void set_menu_prompt(const char *name, const char *id);
+ void print_byte_array(const char *prefix, const void *ptr, int len);
+ bool str2hex(const char *str, uint16_t in_len, uint8_t *out_buf,
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 218e82c50..e36c8dca5 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -416,7 +416,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 
+ 	bt_shell_printf("Received %s (len %u)\n", opcode_str(opcode), len);
+ 
+-	req = get_req_by_rsp(src, (opcode & ~OP_UNRELIABLE));
++	req = get_req_by_rsp(src, opcode);
+ 	if (req) {
+ 		cmd = req->cmd;
+ 		free_request(req);
+@@ -424,7 +424,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 	} else
+ 		cmd = NULL;
+ 
+-	switch (opcode & ~OP_UNRELIABLE) {
++	switch (opcode) {
+ 	default:
+ 		return false;
+ 
+diff --git a/tools/mesh/model.h b/tools/mesh/model.h
+index 449fe19b2..35bb80efc 100644
+--- a/tools/mesh/model.h
++++ b/tools/mesh/model.h
+@@ -18,7 +18,6 @@
+  *
+  */
+ 
+-#define OP_UNRELIABLE	0x0100
+ #define VENDOR_ID_INVALID	0xFFFF
+ 
+ typedef bool (*model_send_msg_func_t) (void *user_data, uint16_t dst,
+-- 
+2.26.2
 
-If you return an error here, it may confuse the caller to think that
-the operation has failed completely, whereas the merging of the
-attribute group has been successful already.
-
-I don't think that an error can be returned at this point.
-
->  }
->
->  void wakeup_sysfs_remove(struct device *dev)
->  {
->         sysfs_unmerge_group(&dev->kobj, &pm_wakeup_attr_group);
-> +       kobject_uevent(&dev->kobj, KOBJ_CHANGE);
->  }
->
->  int pm_qos_sysfs_add_resume_latency(struct device *dev)
-> --
-> 2.27.0.212.ge8ba1cc988-goog
->
