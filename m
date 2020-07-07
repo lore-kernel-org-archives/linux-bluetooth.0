@@ -2,72 +2,68 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D3AC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F81C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A089A2073E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA30A206DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AD6CoW2U"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fwGbCy9Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728194AbgGGR3A (ORCPT
+        id S1728386AbgGGRaU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 13:29:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52226 "EHLO
+        Tue, 7 Jul 2020 13:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728073AbgGGR27 (ORCPT
+        with ESMTP id S1727834AbgGGRaU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 13:28:59 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2C3C08C5E1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:28:59 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id o22so13750004pjw.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:28:59 -0700 (PDT)
+        Tue, 7 Jul 2020 13:30:20 -0400
+Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F266C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:30:20 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id n4so2360943uae.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=GDk3o4K7Qdy44WeUL6xRZLs/1lKN7Q2+qDuM1ziAKUE=;
-        b=AD6CoW2UICDWk/1zx/l6PEom5Vnjn8v6sAqR+Vebu1tpz3GUosmm3pgGhiWnNTMqEn
-         m+gTH9ORFg6cG+8B+7LfOi7FXvVjWYao93wjk1OI12A4kbeZrQ1mKBOLdFjwX0/wEq0W
-         NkqU+R92VjKbfG/v2osMCZiL9GgHrO1xI5Upo=
+        bh=xuq/cPtz4H8qHzQbgSRImu0AoYB1hM4DNGsoUIniXWY=;
+        b=fwGbCy9YCvQBDRQlOQ25QRUychesGDZK3sJuyPcvSnyuyS0I22pqF4exaGQ3mQyN/r
+         DayeW+opzCqR2T2qzTTTGrU7hm+4tM5zuU/EtzraZe5onxlrJGgWC5QeLPMJrVcdMSWz
+         ojecYyRdTC/hSK8h0GMUZdKXilvmRHXgpiLdo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=GDk3o4K7Qdy44WeUL6xRZLs/1lKN7Q2+qDuM1ziAKUE=;
-        b=eQ8b95INMZ123O33lKFHSUb81rGXveGKAYPUCYZMyIvpSRTPBFQj0PAQACIry3QLIR
-         jYCxzESpsglBgtOMYU/eMOpMbaxO7PJ4mE1TI2ySdtReSLTP1pSN7Z2XaWy8fbPzx6EK
-         jn7M7lipXhVANPoarTIh+NtF2IMvTJT2bexzhExJwULL7bWyOvlTnwu7sryvT+FHwdtk
-         a4mhomVNDsGgkmPOa9QBNGG/ZxAn+36uUqvy9A8Gs3XXOcw/4NOUHRkFGU1zd5EeldSZ
-         gHLLGA8SBAwaYGvfoMgJtn/+tFnshFYfLpKuMAAlJZ3P8k65FkP+i+j/hSuqzLYOzSr1
-         PPcw==
-X-Gm-Message-State: AOAM530+9iHyUql+AJVajd9D7VIkKLzwdYdpuDGapLURbPBP/yiur9II
-        JMRh4OgJ7o7Qrtzd8HJNyeuHU7wmI0o=
-X-Google-Smtp-Source: ABdhPJzf226Gragbu1zI/saxunXJOqH4GwQ3BKzo0ajhKJmOD3ROv3HiPeqfCvACm0AL0aY/4IdfFQ==
-X-Received: by 2002:a17:902:8d89:: with SMTP id v9mr45486975plo.191.1594142938963;
-        Tue, 07 Jul 2020 10:28:58 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id e15sm1414285pgt.17.2020.07.07.10.28.57
+        bh=xuq/cPtz4H8qHzQbgSRImu0AoYB1hM4DNGsoUIniXWY=;
+        b=PVFxXWFajanDNe+c7OFG8ok9Wi1mX8KnfuOr2PkkSBbGJKD5/ZjPQYMlIXXp13PavN
+         HsHFETgH2tS+ewoYY3tbCKkXecVklYEjxup3qfO12dJcQvW2+w5yrasE0iN/jZlSC4pK
+         x1f6KkVcGqrcHwG1fdOuqyEGfQOv13rJRDoYce2dAy34Z9/09hqUWDGCxtDyEYpKLQjI
+         HFZSH66ELEFOk2/GmpkNDSTiS/JsDK+fCPo0hZAntjN8nrzEPiKOS9mgcKZDBcSehYKv
+         gG8sNLoUk+BVsbFqvSZCDQKKoOZz8cyW8S6Ful4rySZL6kSYaqMjGBYfSmQRZGHPIJZC
+         AxbA==
+X-Gm-Message-State: AOAM532vJa5+Ffmn9wOIuwT/XfjlynsxQEMek+BgHZtnd7dbv7QuiYME
+        Vp+JiBHkluzISHaNc/8oUb2XxiIAQNo=
+X-Google-Smtp-Source: ABdhPJxlFpzLk0NFQqzKJTTbvutsQGyOY1l75h8QASiigsice6dgJn/zVDMUT4sJKnZ2+a3gaMyyAA==
+X-Received: by 2002:a9f:260b:: with SMTP id 11mr38745138uag.49.1594143019041;
+        Tue, 07 Jul 2020 10:30:19 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id r18sm168394vkf.49.2020.07.07.10.30.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2020 10:28:58 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rafael.j.wysocki@intel.com, linux-pm@vger.kernel.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org, swboyd@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
-        Pavel Machek <pavel@ucw.cz>
-Subject: [PATCH v5 0/1] power: Emit change uevent when updating sysfs
-Date:   Tue,  7 Jul 2020 10:28:43 -0700
-Message-Id: <20200707172845.4177903-1-abhishekpandit@chromium.org>
+        Tue, 07 Jul 2020 10:30:18 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Chethan Tumkur Narayan 
+        <chethan.tumkur.narayan@intel.corp-partner.google.com>
+Subject: [PATCH v1] Bluetooth: adding BTUSB_VALID_LE_STATES to Intel Controllers
+Date:   Tue,  7 Jul 2020 17:30:15 +0000
+Message-Id: <20200707173015.543198-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -76,76 +72,50 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This patch adds the BTUSB_VALID_LE_STATES to the appropriate Intel
+controllers.
 
-Hi linux-pm,
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.corp-partner.google.com>
 
-ChromeOS has a udev rule to chown the `power/wakeup` attribute so that
-the power manager can modify it during runtime.
+---
 
-(https://source.chromium.org/chromiumos/chromiumos/codesearch/+/master:src/platform2/power_manager/udev/99-powerd-permissions.rules)
+ drivers/bluetooth/btusb.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-In our automated tests, we found that the `power/wakeup` attributes
-weren't being chown-ed for some boards. On investigating, I found that
-when the drivers probe and call device_set_wakeup_capable, no uevent was
-being emitted for the newly added power/wakeup attribute. This was
-manifesting at boot on some boards (Marvell SDIO bluetooth and Broadcom
-Serial bluetooth drivers) or during usb disconnects during resume
-(Realtek btusb driver with reset resume quirk).
-
-It seems reasonable to me that changes to the attributes of a device
-should cause a changed uevent so I have added that here.
-
-Here's an example of the kernel events after toggling the authorized
-bit of /sys/bus/usb/devices/1-3/
-
-$ echo 0 > /sys/bus/usb/devices/1-3/authorized
-KERNEL[27.357994] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill1 (rfkill)
-KERNEL[27.358049] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[27.358458] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[27.358486] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-KERNEL[27.358529] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-
-$ echo 1 > /sys/bus/usb/devices/1-3/authorized
-KERNEL[36.415749] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-KERNEL[36.415798] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[36.417414] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[36.417447] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill2 (rfkill)
-KERNEL[36.417481] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-
-Series-version 4 update:
-Tested again on device and verified it's working as expected:
-KERNEL[52.678174] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill2 (rfkill)
-KERNEL[52.678211] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[52.678251] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[52.679721] remove   /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-KERNEL[52.679772] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-KERNEL[56.022259] change   /devices/pci0000:00/0000:00:15.0/usb1/1-3 (usb)
-KERNEL[56.022306] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0 (usb)
-KERNEL[56.022488] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0 (bluetooth)
-KERNEL[56.022531] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.0/bluetooth/hci0/rfkill3 (rfkill)
-KERNEL[56.023392] add      /devices/pci0000:00/0000:00:15.0/usb1/1-3/1-3:1.1 (usb)
-
-Thanks
-Abhishek
-
-Changes in v5:
-- Ignore return from kobject_uevent when adding to sysfs
-
-Changes in v4:
-- Fix warning where returning from void and tested on device
-
-Changes in v3:
-- Simplified error handling
-
-Changes in v2:
-- Add newline at end of bt_dev_err
-
-Abhishek Pandit-Subedi (1):
-  power: Emit changed uevent on wakeup_sysfs_add/remove
-
- drivers/base/power/sysfs.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index faa863dd5d0a..ca387531b940 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -339,18 +339,23 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH},
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
 -- 
 2.27.0.212.ge8ba1cc988-goog
 
