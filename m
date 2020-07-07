@@ -2,168 +2,157 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB8AC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21EBC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:15:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 878CF20708
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A1222075B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 17:15:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="El0vxZtq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WU2bb6Pf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgGGQsG (ORCPT
+        id S1728519AbgGGRPs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 12:48:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45830 "EHLO
+        Tue, 7 Jul 2020 13:15:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727886AbgGGQsE (ORCPT
+        with ESMTP id S1728208AbgGGRPq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 12:48:04 -0400
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0EE9C08C5DC
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 09:48:04 -0700 (PDT)
-Received: by mail-vs1-xe41.google.com with SMTP id u133so9353191vsc.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 09:48:04 -0700 (PDT)
+        Tue, 7 Jul 2020 13:15:46 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C990DC061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 10:15:45 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id m26so25194093lfo.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 10:15:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1eWoCnOASAKMtuQZyGLOuX3o7NTlzqUAEG+oBEPWKJ8=;
-        b=El0vxZtqg6JPxeKZyM66PqiJ4jyD0i9lHL6yotyIIDUC+AViY0YG4D/79jNwjMUabw
-         9Pr+v/FoxAAvwkEMHuljUs0iNcnGbyDN1kDvHa6dchgrr3JbLcEOq/qc5RS43jbf9URR
-         JVyJb24B6MSCghW0Q5LihVIf3+BHxKMaYaFA8=
+         :cc:content-transfer-encoding;
+        bh=sJDZPklgLSz+bMRCtm1xi8y9hsWb4olH788+hzSKmpc=;
+        b=WU2bb6PfdBoznpT00kQbPfsp33gzKy0a5KqENwSsU/gVoWIvE49o5u2I+6Sez81hbH
+         w5fYuOus/0PYiDWA+RkRzY9ezg1OhuCGxVUfNf85Cv4g/29s/FhS8WbIKh4jDMEbOp1p
+         B5+ZVSvp2WtzIfDvCw5QXs9NwbWsSKpo7YNPIf2U5Zy+yrNV6y4Q+NNmp3SotlKVaNUH
+         r5QFHef5Xni4w6CsBCC3IXFE0lAPQQcnVZ4ocsC06VpM0PTLBNMCU7NeKu79Pdg/JpXg
+         wDr/Ihr7cZ17ygR3kCgN0P1uAdg2sltX4LAirT86NQdzYfI+ZhbKAymYDj/OGLHeqn7n
+         1LZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1eWoCnOASAKMtuQZyGLOuX3o7NTlzqUAEG+oBEPWKJ8=;
-        b=hGrUVRhJSxdsONG/siCW+ff4VpSiiErIOq5OWafvjDi9dctElV28NRjSuM2PHKx2QJ
-         Dsd7MoqCfsWHq16ifeuuayy6bCtOmNglQtVq5vUlRM9R++7Rjx95biLtDLS69wcZ43ni
-         72IoUKwX0JjNpn+rWoIF918FG64tyuy51Z2fveQV1hDVnqxhCMChENYxCEz8WwBN3T80
-         WEjJ7FKQsQk/sveZKERsu3KKjaD+P/pyvDvyvdIcPuM2feh4aNyl1dkHppUfdQII24mR
-         5luiChznnn0CADqTKR/pDP3rGghs4hqfQNWIY40uKRgl1W6UMDOgtd20KDxati13MKh2
-         f+vQ==
-X-Gm-Message-State: AOAM530Av1XtvEEfWJWYOawlRii/WvzTYjeZ4q5mZTuhHkxlMBmp4ZUN
-        kLvvXNo68wYPty7Taf8TKOxP93CNiTYWy0GYTwUUvg==
-X-Google-Smtp-Source: ABdhPJysq8+6FxhpZrg1dgwHaUrHRyK3KI93qSdqzWL6HNijbQcEkUjFbxYm09sE8WLnXhQ1UoylWLanSIj9IJCT5bo=
-X-Received: by 2002:a67:c90c:: with SMTP id w12mr30280616vsk.86.1594140483655;
- Tue, 07 Jul 2020 09:48:03 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=sJDZPklgLSz+bMRCtm1xi8y9hsWb4olH788+hzSKmpc=;
+        b=uMavb3GhOSRaQ5M9fyEEHAxkxCF4cieza5NFukAZ540TQZbTwalqDYRpmOOFGKZVfz
+         coIiSt2/G0oTPkbe+B7HBNomsL9WCml8+VkVz7NAWLCWL/nSd8YoOtt8toRkctwb8lUS
+         42394t4CcEImyQ/ObIoPjQNXwEtgGXde9q6vkL/qyD7dVNOL2hvc0uFqIsws0BJjwzxn
+         8KkzxYxPFu90pyCXQzwn7IPBLgkqErHgid0KA936uu3y8ZVQd/LGdUkCTvmyFkcUYIdc
+         aIbD+FNxpbamyqaRLy8SJM+nn4rG8VknJTp8nDkEsEge3eZiR3cjfJGgP8G8ikF1p+py
+         YDAg==
+X-Gm-Message-State: AOAM531++kN+P9l7IaoEKoLu6/aYBBkAEn9Q0kLOH6eA3Yzam7bnzbVU
+        SacybgqufV3exFqQ6O5+OyUvmxHYjdjMoWHE0xtyiw==
+X-Google-Smtp-Source: ABdhPJw0O/NQ9Ttp8qPZtYIS6Gf/pmCpEN6ZaMZtLnMb2C0HbUS0zh7XzrX5OjjGaDJ11wyJklRuNze8RLtFhwec+f4=
+X-Received: by 2002:a19:ad41:: with SMTP id s1mr17609418lfd.191.1594142143948;
+ Tue, 07 Jul 2020 10:15:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200707162417.3514284-1-abhishekpandit@chromium.org>
- <20200707092406.v4.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid> <CAJZ5v0iyvge_Hqgm46_vfjh45YFdnsJ7ksvY7DqD6gx+f+1dvg@mail.gmail.com>
-In-Reply-To: <CAJZ5v0iyvge_Hqgm46_vfjh45YFdnsJ7ksvY7DqD6gx+f+1dvg@mail.gmail.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Tue, 7 Jul 2020 09:47:52 -0700
-Message-ID: <CANFp7mUas8Qnzqeivri25S7SWbKe6T+6riN419dR6xZXXOcaKA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Stephen Boyd <swboyd@chromium.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>
+References: <20200707141628.368748-1-alainm@chromium.org> <67268C4E-674E-4DE9-B642-E1CAE8748E28@holtmann.org>
+In-Reply-To: <67268C4E-674E-4DE9-B642-E1CAE8748E28@holtmann.org>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Tue, 7 Jul 2020 13:15:32 -0400
+Message-ID: <CALWDO_UDxA3maSxKr_wc_VKo3bXuT+GtSmSrMAJ5u4640cyKxw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: create CONFIG_BT_DEBUG_FEATURE_FUNC_NAME
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rafael,
-
-(resent in plain text)
-
-On Tue, Jul 7, 2020 at 9:28 AM Rafael J. Wysocki <rafael@kernel.org> wrote:
+On Tue, Jul 7, 2020 at 11:53 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 >
-> On Tue, Jul 7, 2020 at 6:24 PM Abhishek Pandit-Subedi
-> <abhishekpandit@chromium.org> wrote:
+> Hi Alain,
+>
+> > Creates a CONFIG_BT_DEBUG_FEATURE_FUNC_NAME option to include function =
+names in
+> > debug statements.
 > >
-> > Udev rules that depend on the power/wakeup attribute don't get triggered
-> > correctly if device_set_wakeup_capable is called after the device is
-> > created. This can happen for several reasons (driver sets wakeup after
-> > device is created, wakeup is changed on parent device, etc) and it seems
-> > reasonable to emit a changed event when adding or removing attributes on
-> > the device.
+> > Unlike other platforms __func__ isn't a string literal so it cannot be
+> > automatically concatenated by the pre-processor.  As a result, the
+> > function name is passed as a parameter to the tracing function.  Since
+> > pr_debug is a function like macro, the normal expansion of BT_PREFIX_PA=
+RAM
+> > does not work as it gets processed within the first parameter as well,
+> > for this reason, BT_DBG is split into two versions.
 > >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > This patch was built tested with all 4 possible combinations of
+> > CONFIG_BT_DEBUG_FUNC_NAME and CONFIG_BT_FEATURE_DEBUG configurations.
+> >
+> > Signed-off-by: Alain Michaud <alainm@chromium.org>
+> > Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 > > ---
 > >
-> > Changes in v4:
-> > - Fix warning where returning from void and tested on device
-> >
-> > Changes in v3:
-> > - Simplified error handling
-> >
 > > Changes in v2:
-> > - Add newline at end of bt_dev_err
+> > - Making CONFIG_BT_DEBUG_FEATURE_FUNC_NAME dependent on
+> > CONFIG_BT_DEBUG_FEATURE
 > >
-> >  drivers/base/power/sysfs.c | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
+> > include/net/bluetooth/bluetooth.h | 32 +++++++++++++++++++++++--------
+> > net/bluetooth/Kconfig             | 11 +++++++++++
+> > 2 files changed, 35 insertions(+), 8 deletions(-)
 > >
-> > diff --git a/drivers/base/power/sysfs.c b/drivers/base/power/sysfs.c
-> > index 24d25cf8ab1487..aeb58d40aac8de 100644
-> > --- a/drivers/base/power/sysfs.c
-> > +++ b/drivers/base/power/sysfs.c
-> > @@ -1,6 +1,7 @@
-> >  // SPDX-License-Identifier: GPL-2.0
-> >  /* sysfs entries for device PM */
-> >  #include <linux/device.h>
-> > +#include <linux/kobject.h>
-> >  #include <linux/string.h>
-> >  #include <linux/export.h>
-> >  #include <linux/pm_qos.h>
-> > @@ -739,12 +740,18 @@ int dpm_sysfs_change_owner(struct device *dev, kuid_t kuid, kgid_t kgid)
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/=
+bluetooth.h
+> > index 7ee8041af803..8506dd268d4b 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -162,22 +162,37 @@ void bt_dbg_set(bool enable);
+> > bool bt_dbg_get(void);
+> > __printf(1, 2)
+> > void bt_dbg(const char *fmt, ...);
+> > +#define BT_DBG_INT   bt_dbg
+> > +#else
+> > +#define BT_DBG_INT   pr_debug
+> > #endif
+> > __printf(1, 2)
+> > void bt_warn_ratelimited(const char *fmt, ...);
+> > __printf(1, 2)
+> > void bt_err_ratelimited(const char *fmt, ...);
 > >
-> >  int wakeup_sysfs_add(struct device *dev)
-> >  {
-> > -       return sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > +       int ret = sysfs_merge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > +
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       return kobject_uevent(&dev->kobj, KOBJ_CHANGE);
+> > -#define BT_INFO(fmt, ...)    bt_info(fmt "\n", ##__VA_ARGS__)
+> > -#define BT_WARN(fmt, ...)    bt_warn(fmt "\n", ##__VA_ARGS__)
+> > -#define BT_ERR(fmt, ...)     bt_err(fmt "\n", ##__VA_ARGS__)
+> > -
+> > -#if IS_ENABLED(CONFIG_BT_FEATURE_DEBUG)
+> > -#define BT_DBG(fmt, ...)     bt_dbg(fmt "\n", ##__VA_ARGS__)
+> > +#if IS_ENABLED(BT_FEATURE_DEBUG_FUNC_NAMES)
 >
-> So let me repeat the previous comment:
+> are you sure you tested this?
+
+This was tested on chromeos using this patch chain which also sets the
+configuration and revert our original patch:
+https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/=
+2279613
+
 >
-> If you return an error here, it may confuse the caller to think that
-> the operation has failed completely, whereas the merging of the
-> attribute group has been successful already.
 >
-> I don't think that an error can be returned at this point.
+> And frankly I don=E2=80=99t get the point for the new Kconfig option. It =
+is rather useless in this patch. Tell me one thing, do you prefer that FEAT=
+URE_DEBUG prints the function names or not. Because if dynamic debug is use=
+d, we don=E2=80=99t need it since that is all configurable via dynamic debu=
+g itself and we don=E2=80=99t need it there (and I also don=E2=80=99t want =
+it in the dynamic debug case).
+I'd be ok if we unconditionally print function names if
+CONFIG_BT_FEATURE_DEBUG is set.  what I want to avoid is to overly
+complicate the debug macros to have the function names configurable at
+runtime.
+
 >
-
-The caller looks at the return code and just logs that an error
-occurred (no other action). It's also unlikely for kobject_uevent to
-fail (I saw mostly -ENOMEM and an -ENOENT when the kobj wasn't in the
-correct set).
-
-Call site:
-    int ret = wakeup_sysfs_add(dev);
-
-    if (ret)
-        dev_info(dev, "Wakeup sysfs attributes not added\n");
-
-So I'm ok with either keeping this as-is (caller isn't getting
-confused, just logging) or swallowing the return of kobject_uevent.
-
-> >  }
-> >
-> >  void wakeup_sysfs_remove(struct device *dev)
-> >  {
-> >         sysfs_unmerge_group(&dev->kobj, &pm_wakeup_attr_group);
-> > +       kobject_uevent(&dev->kobj, KOBJ_CHANGE);
-> >  }
-> >
-> >  int pm_qos_sysfs_add_resume_latency(struct device *dev)
-> > --
-> > 2.27.0.212.ge8ba1cc988-goog
-> >
+> Regards
+>
+> Marcel
+>
