@@ -2,46 +2,68 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B7EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 18:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB26C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 19:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1059206CD
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 18:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69DBA2067D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 19:52:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RyHl2c2+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728315AbgGGSQa (ORCPT
+        id S1728036AbgGGTwG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 14:16:30 -0400
-Received: from mga06.intel.com ([134.134.136.31]:48438 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728036AbgGGSQa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 14:16:30 -0400
-IronPort-SDR: ziQpBEowCT9YPXgtO+CeqHAzSMVwM8b/ab/sfhuEq5j596qQutfFjteQiU/C1GKh2Wo+Vx0ExA
- 3SGhYX3XVqIA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="209202552"
-X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
-   d="scan'208";a="209202552"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 11:16:14 -0700
-IronPort-SDR: U24HwwBhsxR2f/kEkJ/WVkVk3S+0/YrlHCaIpQIwusjDiZKBDsxuW19Zr1I/uTeGXZbMjNLbAj
- iFKpCB/JhAVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
-   d="scan'208";a="457204842"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.77.128])
-  by orsmga005.jf.intel.com with ESMTP; 07 Jul 2020 11:16:14 -0700
-From:   Brian Gix <brian.gix@intel.com>
+        Tue, 7 Jul 2020 15:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728254AbgGGTwA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Jul 2020 15:52:00 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949F8C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 12:52:00 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id x205so2976697vsc.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 12:52:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WgPoz0FJ30UPfGpy4Cb13jMdX0qVm1LilRnd+oWGuDw=;
+        b=RyHl2c2+kgfmWJVFqOd/Io7Rxe9mmPc2iGR+v1P1BT9PwfcKfd7jXkF72irWMAcsJT
+         qz3+e6PtyEZxESbJqznENCJYPsD3oaPGC8wkgS+zZqzOlpwKeou4WhCsrBlDrNsZVULX
+         Pvj3kVdVMDLQQi3Ep7IeG+QZYErSw6ExVfUBI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WgPoz0FJ30UPfGpy4Cb13jMdX0qVm1LilRnd+oWGuDw=;
+        b=l/dw5ufziz846fQZFWfEnb53fX95zN6lsaZw09nOYJpTQFrEWujUDrjAHHq8iV2j+M
+         W0OCPB676qNcR9LHXy3DxFn6JX0Hj2OU2vG/mppbB7Xry81N8buGCXy2T8O6JeQOcBtn
+         wUVpd38BxkFqfcvNqIdBy+toJ35Ur2h8Q6w647YsVqE/qB7QO1n5ckjiBJnFcmELZqtX
+         MwDx+8ZQPRTCnVNBnFxMuqqd9E1l38UzWsK9xdkOpwwUbOF6EGs6+fJPPaWFlgFLZqFh
+         ypk74eCopygKhbW89c2Hh2F9A5qzYRQGkLwUrA1mX/MGOZvHi7brA/Kwynt81JssahWI
+         /aeQ==
+X-Gm-Message-State: AOAM533q+zeZilfDOjV0+mxyhrtF/kzy7WEfE0I/TOCO7Fx4HAw/7o2h
+        McQWkyuZTlHLCmMUa9Si6Sc1nEkGo9M=
+X-Google-Smtp-Source: ABdhPJzeRp19fMav6E9eBd29i12t7babCVLjUDWIshN+yxWcg81OnM2jqxZz6kveFemRci1XakrPEg==
+X-Received: by 2002:a67:e9d1:: with SMTP id q17mr31538248vso.212.1594151519408;
+        Tue, 07 Jul 2020 12:51:59 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id i203sm230625vke.7.2020.07.07.12.51.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jul 2020 12:51:58 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v2] mesh: Add Composition page storage to node.json
-Date:   Tue,  7 Jul 2020 11:16:11 -0700
-Message-Id: <20200707181611.135109-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.25.4
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Subject: [PATCH v3] Bluetooth: create CONFIG_BT_DEBUG_FEATURE_FUNC_NAME
+Date:   Tue,  7 Jul 2020 19:51:56 +0000
+Message-Id: <20200707195156.885137-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -49,538 +71,114 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Mesh supports multiple Composition Pages, although only one is defined
-in the current specification. This change allows saving and retrieval of
-any pages, numbered 0-255.
----
- mesh/cfgmod-server.c    |  42 +++++++++--
- mesh/mesh-config-json.c | 162 ++++++++++++++++++++++++++++++++++++++++
- mesh/mesh-config.h      |  12 +++
- mesh/node.c             | 130 ++++++++++++++++++++++++++------
- mesh/node.h             |   6 +-
- 5 files changed, 320 insertions(+), 32 deletions(-)
+Creates a CONFIG_BT_DEBUG_FEATURE_FUNC_NAME option to include function names in
+debug statements.
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index c525d9d24..6194fc7d4 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -34,6 +34,12 @@
+Unlike other platforms __func__ isn't a string literal so it cannot be
+automatically concatenated by the pre-processor.  As a result, the
+function name is passed as a parameter to the tracing function.  Since
+pr_debug is a function like macro, the normal expansion of BT_PREFIX_PARAM
+does not work as it gets processed within the first parameter as well,
+for this reason, BT_DBG is split into two versions.
+
+This patch was built tested with all 4 possible combinations of
+CONFIG_BT_DEBUG_FUNC_NAME and CONFIG_BT_FEATURE_DEBUG configurations.
+
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+---
+
+Changes in v3:
+ - Fixing bug introduced in the last version when the configuration name
+ was changed.
+
+Changes in v2:
+ - Making CONFIG_BT_DEBUG_FEATURE_FUNC_NAME dependent on
+ CONFIG_BT_DEBUG_FEATURE
+
+ include/net/bluetooth/bluetooth.h | 32 +++++++++++++++++++++++--------
+ net/bluetooth/Kconfig             | 11 +++++++++++
+ 2 files changed, 35 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 7ee8041af803..2528589c0b28 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -162,22 +162,37 @@ void bt_dbg_set(bool enable);
+ bool bt_dbg_get(void);
+ __printf(1, 2)
+ void bt_dbg(const char *fmt, ...);
++#define BT_DBG_INT	bt_dbg
++#else
++#define BT_DBG_INT	pr_debug
+ #endif
+ __printf(1, 2)
+ void bt_warn_ratelimited(const char *fmt, ...);
+ __printf(1, 2)
+ void bt_err_ratelimited(const char *fmt, ...);
  
- #define CFG_MAX_MSG_LEN 380
- 
-+/* Supported composition pages, sorted high to low */
-+/* Only page 0 is currently supported */
-+static const uint8_t supported_pages[] = {
-+	0
-+};
-+
- static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
- 			uint16_t src, uint16_t dst,
- 			uint8_t status, uint16_t ele_addr, uint32_t mod_id,
-@@ -701,6 +707,33 @@ static void node_reset(void *user_data)
- 	node_remove(node);
- }
- 
-+static uint16_t get_composition(struct mesh_node *node, uint8_t page,
-+								uint8_t *buf)
-+{
-+	const uint8_t *comp;
-+	uint16_t len = 0;
-+	size_t i;
-+
-+	for (i = 0; i < sizeof(supported_pages); i++) {
-+		if (page < supported_pages[i])
-+			continue;
-+
-+		page = supported_pages[i];
-+		comp = node_get_comp(node, page, &len);
-+
-+		if (!page || len)
-+			break;
-+	}
-+
-+	if (!len)
-+		return 0;
-+
-+	*buf++ = page;
-+	memcpy(buf, comp, len);
-+
-+	return len + 1;
-+}
-+
- static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 				uint16_t net_idx, const uint8_t *data,
- 				uint16_t size, const void *user_data)
-@@ -746,16 +779,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 		if (size != 1)
- 			return false;
- 
--		/* Only page 0 is currently supported */
--		if (pkt[0] != 0) {
--			l_debug("Unsupported page number %d", pkt[0]);
--			l_debug("Returning page number 0");
--		}
- 		long_msg = l_malloc(CFG_MAX_MSG_LEN);
- 		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, long_msg);
--		long_msg[n++] = 0;
--		n += node_generate_comp(node, long_msg + n,
--							CFG_MAX_MSG_LEN - n);
-+		n += get_composition(node, pkt[0], long_msg + n);
- 
- 		break;
- 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 661775f95..88f715fc1 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -430,6 +430,54 @@ static bool read_device_key(json_object *jobj, uint8_t key_buf[16])
- 	return true;
- }
- 
-+static bool read_comp_pages(json_object *jobj, struct mesh_config_node *node)
-+{
-+	json_object *jarray, *jentry;
-+	struct mesh_config_comp_page *page;
-+	int len;
-+	int i;
-+
-+	if (!json_object_object_get_ex(jobj, "pages", &jarray))
-+		return true;
-+
-+	if (json_object_get_type(jarray) != json_type_array)
-+		return false;
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; i++) {
-+		size_t clen;
-+		char *str;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str = (char *)json_object_get_string(jentry);
-+		clen = strlen(str);
-+
-+		if (clen < ((MIN_COMP_SIZE * 2) + 1))
-+			continue;
-+
-+		clen = (clen / 2) - 1;
-+
-+		page = l_malloc(sizeof(struct mesh_config_comp_page) + clen);
-+
-+		if (!str2hex(str + 2, clen * 2, page->data, clen))
-+			goto parse_fail;
-+
-+		if (sscanf(str, "%02hhx", &page->page_num) != 1)
-+			goto parse_fail;
-+
-+		page->len = clen;
-+
-+		l_queue_push_tail(node->pages, page);
-+	}
-+
-+	return true;
-+
-+parse_fail:
-+	l_free(page);
-+	return false;
-+}
-+
- static bool read_app_keys(json_object *jobj, struct mesh_config_node *node)
- {
- 	json_object *jarray;
-@@ -1384,6 +1432,11 @@ static bool read_node(json_object *jnode, struct mesh_config_node *node)
- 		return false;
- 	}
- 
-+	if (!read_comp_pages(jnode, node)) {
-+		l_info("Failed to read Composition Pages");
-+		return false;
-+	}
-+
- 	if (!parse_elements(jvalue, node)) {
- 		l_info("Failed to parse elements");
- 		return false;
-@@ -1889,6 +1942,113 @@ bool mesh_config_model_pub_del(struct mesh_config *cfg, uint16_t addr,
- 	return save_config(cfg->jnode, cfg->node_dir_path);
- }
- 
-+static void del_page(json_object *jarray, uint8_t page)
-+{
-+	char buf[3];
-+	int i, len;
-+
-+	if (!jarray)
-+		return;
-+
-+	snprintf(buf, 3, "%2.2x", page);
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; i++) {
-+		json_object *jentry;
-+		char *str;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str = (char *)json_object_get_string(jentry);
-+
-+		/* Delete matching page(s) */
-+		if (!memcmp(str, buf, 2))
-+			json_object_array_del_idx(jarray, i, 1);
-+	}
-+}
-+
-+bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
-+						uint8_t *data, uint16_t size)
-+{
-+	json_object *jnode, *jstring, *jarray = NULL;
-+	char *buf;
-+	int len;
-+
-+	if (!cfg)
-+		return false;
-+
-+	jnode = cfg->jnode;
-+
-+	json_object_object_get_ex(jnode, "pages", &jarray);
-+
-+	len = (size * 2) + 3;
-+	buf = l_malloc(len);
-+	snprintf(buf, len, "%2.2x", page);
-+	hex2str(data, size, buf + 2, len - 2);
-+
-+	if (jarray && jarray_has_string(jarray, buf, len)) {
-+		l_free(buf);
-+		return true;
-+	} else if (!jarray) {
-+		jarray = json_object_new_array();
-+		json_object_object_add(jnode, "pages", jarray);
-+	} else
-+		del_page(jarray, page);
-+
-+	jstring = json_object_new_string(buf);
-+	json_object_array_add(jarray, jstring);
-+	l_free(buf);
-+
-+	return save_config(jnode, cfg->node_dir_path);
-+}
-+
-+bool mesh_config_comp_page_mv(struct mesh_config *cfg, uint8_t old, uint8_t nw)
-+{
-+	json_object *jnode, *jarray = NULL;
-+	uint8_t *data;
-+	char *str;
-+	char old_buf[3];
-+	int i, len, dlen = 0;
-+	bool status = true;
-+
-+	if (!cfg || old == nw)
-+		return false;
-+
-+	jnode = cfg->jnode;
-+
-+	json_object_object_get_ex(jnode, "pages", &jarray);
-+
-+	if (!jarray)
-+		return false;
-+
-+	snprintf(old_buf, 3, "%2.2x", old);
-+	data = l_malloc(MAX_MSG_LEN);
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; i++) {
-+		json_object *jentry;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str = (char *)json_object_get_string(jentry);
-+
-+		/* Delete matching page(s) but save data*/
-+		if (!memcmp(str, old_buf, 2)) {
-+			dlen = strlen(str + 2);
-+			str2hex(str + 2, dlen, data, MAX_MSG_LEN);
-+			dlen /= 2;
-+			json_object_array_del_idx(jarray, i, 1);
-+		}
-+	}
-+
-+	if (dlen)
-+		status = mesh_config_comp_page_add(cfg, nw, data, dlen);
-+
-+	l_free(data);
-+
-+	return status;
-+}
-+
- bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t ele_addr,
- 						uint32_t mod_id, bool vendor,
- 						struct mesh_config_sub *sub)
-@@ -2212,6 +2372,7 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 	node.elements = l_queue_new();
- 	node.netkeys = l_queue_new();
- 	node.appkeys = l_queue_new();
-+	node.pages = l_queue_new();
- 
- 	result = read_node(jnode, &node);
- 
-@@ -2238,6 +2399,7 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 	l_free(node.net_transmit);
- 	l_queue_destroy(node.netkeys, l_free);
- 	l_queue_destroy(node.appkeys, l_free);
-+	l_queue_destroy(node.pages, l_free);
- 	l_queue_destroy(node.elements, free_element);
- 
- 	if (!result)
-diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
-index 9f30e693b..7dfa9f20c 100644
---- a/mesh/mesh-config.h
-+++ b/mesh/mesh-config.h
-@@ -17,6 +17,8 @@
-  *
-  */
- 
-+#define MIN_COMP_SIZE 14
-+
- struct mesh_config;
- 
- struct mesh_config_sub {
-@@ -88,10 +90,17 @@ struct mesh_config_transmit {
- 	uint8_t count;
- };
- 
-+struct mesh_config_comp_page {
-+	uint16_t len;
-+	uint8_t page_num;
-+	uint8_t data[];
-+};
-+
- struct mesh_config_node {
- 	struct l_queue *elements;
- 	struct l_queue *netkeys;
- 	struct l_queue *appkeys;
-+	struct l_queue *pages;
- 	uint32_t seq_number;
- 	uint32_t iv_index;
- 	bool iv_update;
-@@ -139,6 +148,9 @@ bool mesh_config_write_relay_mode(struct mesh_config *cfg, uint8_t mode,
- bool mesh_config_write_ttl(struct mesh_config *cfg, uint8_t ttl);
- bool mesh_config_write_mode(struct mesh_config *cfg, const char *keyword,
- 								int value);
-+bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
-+						uint8_t *data, uint16_t size);
-+bool mesh_config_comp_page_mv(struct mesh_config *cfg, uint8_t old, uint8_t nw);
- bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
- 						bool vendor, uint32_t mod_id,
- 							uint16_t app_idx);
-diff --git a/mesh/node.c b/mesh/node.c
-index 3e888ce61..c61167bda 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -46,8 +46,6 @@
- #include "mesh/manager.h"
- #include "mesh/node.h"
- 
--#define MIN_COMP_SIZE 14
+-#define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
+-#define BT_WARN(fmt, ...)	bt_warn(fmt "\n", ##__VA_ARGS__)
+-#define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
 -
- #define MESH_NODE_PATH_PREFIX "/node"
+-#if IS_ENABLED(CONFIG_BT_FEATURE_DEBUG)
+-#define BT_DBG(fmt, ...)	bt_dbg(fmt "\n", ##__VA_ARGS__)
++#if IS_ENABLED(CONFIG_BT_FEATURE_DEBUG_FUNC_NAMES)
++#define BT_PREFIX "%s() "
++#define BT_PREFIX_PARAM ,__func__
++#define BT_DBG(fmt, ...)	\
++	BT_DBG_INT(BT_PREFIX fmt "\n", __func__, ##__VA_ARGS__)
+ #else
+-#define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
++#define BT_PREFIX
++#define BT_PREFIX_PARAM
++#define BT_DBG(fmt, ...)	\
++	BT_DBG_INT(fmt "\n", ##__VA_ARGS__)
+ #endif
  
- /* Default values for a new locally created node */
-@@ -81,6 +79,7 @@ struct node_composition {
- struct mesh_node {
- 	struct mesh_net *net;
- 	struct l_queue *elements;
-+	struct l_queue *pages;
- 	char *app_path;
- 	char *owner;
- 	char *obj_path;
-@@ -266,6 +265,7 @@ static struct mesh_node *node_new(const uint8_t uuid[16])
- 	node = l_new(struct mesh_node, 1);
- 	node->net = mesh_net_new(node);
- 	node->elements = l_queue_new();
-+	node->pages = l_queue_new();
- 	memcpy(node->uuid, uuid, sizeof(node->uuid));
- 	set_defaults(node);
++#define BT_INFO(fmt, ...)	\
++	bt_info(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
++#define BT_WARN(fmt, ...)	\
++	bt_warn(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
++#define BT_ERR(fmt, ...)	\
++	bt_err(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
++
++#define BT_ERR_RATELIMITED(fmt, ...) \
++	bt_err_ratelimited(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
++
+ #define bt_dev_info(hdev, fmt, ...)				\
+ 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
+ #define bt_dev_warn(hdev, fmt, ...)				\
+@@ -188,7 +203,8 @@ void bt_err_ratelimited(const char *fmt, ...);
+ 	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
  
-@@ -335,6 +335,7 @@ static void free_node_resources(void *data)
- 	/* Free dynamic resources */
- 	free_node_dbus_resources(node);
- 	l_queue_destroy(node->elements, element_free);
-+	l_queue_destroy(node->pages, l_free);
- 	mesh_agent_remove(node->agent);
- 	mesh_config_release(node->cfg);
- 	mesh_net_free(node->net);
-@@ -557,8 +558,15 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ #define bt_dev_warn_ratelimited(hdev, fmt, ...)			\
+-	bt_warn_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	bt_warn_ratelimited("%s: " BT_PREFIX fmt, (hdev)->name	\
++			    BT_PREFIX_PARAM, ##__VA_ARGS__)
+ #define bt_dev_err_ratelimited(hdev, fmt, ...)			\
+ 	bt_err_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
  
- 	l_queue_foreach(db_node->netkeys, set_net_key, node);
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 1d6d243cdde9..ccbf762053f1 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -142,4 +142,15 @@ config BT_FEATURE_DEBUG
+ 	  This provides an option to enable/disable debugging statements
+ 	  at runtime via the experimental features interface.
  
--	if (db_node->appkeys)
--		l_queue_foreach(db_node->appkeys, set_appkey, node);
-+	l_queue_foreach(db_node->appkeys, set_appkey, node);
++config BT_FEATURE_DEBUG_FUNC_NAMES
++	bool "Include function names in debugging statements"
++	depends on BT_FEATURE_DEBUG
++	default n
++	help
++	  Provides an option to include function names in debugging
++	  statements.
 +
-+	while (l_queue_length(db_node->pages)) {
-+		struct mesh_config_comp_page *page;
++	  When enabled, trace statements will include the function name as a
++	  prefix which may help identify the source code references.
 +
-+		/* Move the composition pages to the node struct */
-+		page = l_queue_pop_head(db_node->pages);
-+		l_queue_push_tail(node->pages, page);
-+	}
- 
- 	mesh_net_set_seq_num(node->net, node->seq_number);
- 	mesh_net_set_default_ttl(node->net, node->ttl);
-@@ -877,7 +885,8 @@ uint8_t node_friend_mode_get(struct mesh_node *node)
- 	return node->friend;
- }
- 
--uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf, uint16_t sz)
-+static uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf,
-+								uint16_t sz)
- {
- 	uint16_t n, features;
- 	uint16_t num_ele = 0;
-@@ -991,6 +1000,78 @@ element_done:
- 	return n;
- }
- 
-+static bool match_page(const void *a, const void *b)
-+{
-+	const struct mesh_config_comp_page *page = a;
-+	uint8_t page_num = L_PTR_TO_UINT(b);
-+
-+	return page->page_num == page_num;
-+}
-+
-+bool node_set_comp(struct mesh_node *node, uint8_t page_num,
-+					const uint8_t *data, uint16_t len)
-+{
-+	struct mesh_config_comp_page *page;
-+
-+	if (!node || len < MIN_COMP_SIZE)
-+		return false;
-+
-+	page = l_queue_remove_if(node->pages, match_page,
-+						L_UINT_TO_PTR(page_num));
-+
-+	l_free(page);
-+
-+	page = l_malloc(sizeof(struct mesh_config_comp_page) + len);
-+	page->len = len;
-+	page->page_num = page_num;
-+	memcpy(page->data, data, len);
-+	l_queue_push_tail(node->pages, page);
-+
-+	mesh_config_comp_page_add(node->cfg, page_num, page->data, len);
-+
-+	return true;
-+}
-+
-+const uint8_t *node_get_comp(struct mesh_node *node, uint8_t page_num,
-+								uint16_t *len)
-+{
-+	struct mesh_config_comp_page *page = NULL;
-+
-+	if (node)
-+		page = l_queue_find(node->pages, match_page,
-+						L_UINT_TO_PTR(page_num));
-+
-+	if (!page) {
-+		*len = 0;
-+		return NULL;
-+	}
-+
-+	*len = page->len;
-+	return page->data;
-+}
-+
-+bool node_replace_comp(struct mesh_node *node, uint8_t retire, uint8_t with)
-+{
-+	struct mesh_config_comp_page *old_page, *keep;
-+
-+	if (!node)
-+		return false;
-+
-+	keep = l_queue_find(node->pages, match_page, L_UINT_TO_PTR(with));
-+
-+	if (!keep)
-+		return false;
-+
-+	old_page = l_queue_remove_if(node->pages, match_page,
-+							L_UINT_TO_PTR(retire));
-+
-+	l_free(old_page);
-+	keep->page_num = retire;
-+	mesh_config_comp_page_mv(node->cfg, with, retire);
-+
-+	return true;
-+}
-+
- static void attach_io(void *a, void *b)
- {
- 	struct mesh_node *node = a;
-@@ -1486,27 +1567,30 @@ static void update_model_options(struct mesh_node *node,
- 
- static bool check_req_node(struct managed_obj_request *req)
- {
--	uint8_t node_comp[MAX_MSG_LEN - 2];
--	uint8_t attach_comp[MAX_MSG_LEN - 2];
--	uint16_t offset = 10;
--	uint16_t node_len = node_generate_comp(req->node, node_comp,
--							sizeof(node_comp));
-+	struct mesh_node *node;
-+	const int offset = 8;
-+	uint16_t node_len, len;
-+	uint8_t comp[MAX_MSG_LEN - 2];
-+	const uint8_t *node_comp;
- 
--	if (!node_len)
--		return false;
-+	if (req->type == REQUEST_TYPE_ATTACH)
-+		node = req->attach;
-+	else
-+		node = req->node;
- 
--	if (req->type == REQUEST_TYPE_ATTACH) {
--		uint16_t attach_len = node_generate_comp(req->attach,
--					attach_comp, sizeof(attach_comp));
-+	node_comp = node_get_comp(node, 0, &node_len);
-+	len = node_generate_comp(node, comp, sizeof(comp));
- 
--		/* Verify only element/models composition */
--		if (node_len != attach_len ||
--				memcmp(&node_comp[offset], &attach_comp[offset],
--							node_len - offset)) {
--			l_debug("Failed to verify app's composition data");
--			return false;
--		}
--	}
-+	/* If no page 0 exists, save it and return */
-+	if (req->type != REQUEST_TYPE_ATTACH || !node_len || !node_comp)
-+		return node_set_comp(node, 0, comp, len);
-+
-+	if (node_len != len || memcmp(&node_comp[offset], &comp[offset],
-+							node_len - offset))
-+		return false;
-+
-+	else if (memcmp(node_comp, comp, node_len))
-+		return node_set_comp(node, 0, comp, len);
- 
- 	return true;
- }
-diff --git a/mesh/node.h b/mesh/node.h
-index 6c4542a78..df058458a 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -63,7 +63,11 @@ struct l_queue *node_get_element_models(struct mesh_node *node, uint8_t ele_idx,
- uint16_t node_get_crpl(struct mesh_node *node);
- bool node_init_from_storage(struct mesh_node *node, const uint8_t uuid[16],
- 					struct mesh_config_node *db_node);
--uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf, uint16_t sz);
-+const uint8_t *node_get_comp(struct mesh_node *node, uint8_t page_num,
-+								uint16_t *len);
-+bool node_set_comp(struct mesh_node *node, uint8_t page_num,
-+					const uint8_t *data, uint16_t len);
-+bool node_replace_comp(struct mesh_node *node, uint8_t retire, uint8_t with);
- uint8_t node_lpn_mode_get(struct mesh_node *node);
- bool node_relay_mode_set(struct mesh_node *node, bool enable, uint8_t cnt,
- 							uint16_t interval);
+ source "drivers/bluetooth/Kconfig"
 -- 
-2.25.4
+2.27.0.383.g050319c2ae-goog
 
