@@ -6,44 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5028AC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 914D4C433E0
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:44:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3598A2073E
+	by mail.kernel.org (Postfix) with ESMTP id 7AF812073E
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 16:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728122AbgGGQot (ORCPT
+        id S1728155AbgGGQot (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 7 Jul 2020 12:44:49 -0400
 Received: from mga03.intel.com ([134.134.136.65]:62900 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726911AbgGGQot (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1728073AbgGGQot (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 7 Jul 2020 12:44:49 -0400
-IronPort-SDR: LfPdDm9L2YEyqXQFYfEaCz73AXcz8XGvybsbrwAVSvlU14JRNKlRMe0tQNrEd3QFKhfqRZL77I
- +NfLn6oAL7RQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="147657526"
+IronPort-SDR: 4MMHdr2gbIQbT9W2XLLV/MwOsyUhWBDfncWD7lA76htGQRnumqNBb2PQZ5TcQZAmTfVd+XfqsU
+ eakmiqgQslwQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="147657525"
 X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
-   d="scan'208";a="147657526"
+   d="scan'208";a="147657525"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 09:44:41 -0700
-IronPort-SDR: sjwYZw1bSqGtv389avo8bjKvuUYNTxpyaoI292FaUiM/VRv2C1RCDzXrZSXsB4SyaTvNIHS61f
- 1HK+P5oItxpQ==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 09:44:40 -0700
+IronPort-SDR: JLP6Xz/YBRmEUso3fbskmMKTEYHUoAE+f0LEAY67oo4ZRwa8GmEF64m2AzHmQrkO2paptUhRI8
+ cXIwwojdTClw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
-   d="scan'208";a="323592435"
+   d="scan'208";a="323592430"
 Received: from jdlachim-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.255.230.123])
   by orsmga007.jf.intel.com with ESMTP; 07 Jul 2020 09:44:40 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 2/2] tools/mesh: Get rid of "unreliable opcodes" in models
-Date:   Tue,  7 Jul 2020 09:44:39 -0700
-Message-Id: <20200707164439.24146-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/2] mesh: Get rid of "unreliable opcodes" in config server
+Date:   Tue,  7 Jul 2020 09:44:38 -0700
+Message-Id: <20200707164439.24146-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200707164439.24146-1-inga.stotland@intel.com>
-References: <20200707164439.24146-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -51,103 +49,118 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This removes an old notion of unreliable opcodes in models , i.e.,
-a correctly formatted acknowledged message always gets a response.
+This removes an old notion of unreliable opcodes in config server
+model , i.e., a correctly formatted acknowledged message always
+gets a response.
 ---
- tools/mesh-gatt/config-client.c | 2 +-
- tools/mesh-gatt/config-server.c | 2 +-
- tools/mesh-gatt/onoff-model.c   | 2 +-
- tools/mesh-gatt/util.h          | 2 --
- tools/mesh/cfgcli.c             | 4 ++--
- tools/mesh/model.h              | 1 -
- 6 files changed, 5 insertions(+), 8 deletions(-)
+ mesh/cfgmod-server.c | 31 +++++++++++--------------------
+ mesh/model.h         |  2 --
+ 2 files changed, 11 insertions(+), 22 deletions(-)
 
-diff --git a/tools/mesh-gatt/config-client.c b/tools/mesh-gatt/config-client.c
-index ed31c67d9..bfc788258 100644
---- a/tools/mesh-gatt/config-client.c
-+++ b/tools/mesh-gatt/config-client.c
-@@ -100,7 +100,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- 	if (primary != src)
- 		return false;
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index c525d9d24..8ba9bc6ec 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -98,9 +98,8 @@ static void config_pub_get(struct mesh_node *node, uint16_t net_idx,
+ }
+ 
+ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
+-					uint16_t src, uint16_t dst,
+-					const uint8_t *pkt, bool virt,
+-					bool vendor, bool unreliable)
++				uint16_t src, uint16_t dst,
++				const uint8_t *pkt, bool virt, bool vendor)
+ {
+ 	uint32_t mod_id;
+ 	uint16_t ele_addr, idx, ota = UNASSIGNED_ADDRESS;
+@@ -143,9 +142,8 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
+ 					status, ele_addr, ota, mod_id, idx);
+ 
+ 	if (status != MESH_STATUS_SUCCESS) {
+-		if (!unreliable)
+-			send_pub_status(node, net_idx, src, dst, status,
+-					ele_addr, mod_id, 0, 0, 0, 0, 0, 0);
++		send_pub_status(node, net_idx, src, dst, status, ele_addr,
++						mod_id, 0, 0, 0, 0, 0, 0);
+ 
+ 		return;
+ 	}
+@@ -180,10 +178,8 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
+ 			status = MESH_STATUS_STORAGE_FAIL;
+ 	}
+ 
+-	if (!unreliable)
+-		send_pub_status(node, net_idx, src, dst, status, ele_addr,
+-					mod_id, ota, idx, cred_flag, ttl,
+-					period, retransmit);
++	send_pub_status(node, net_idx, src, dst, status, ele_addr, mod_id, ota,
++				idx, cred_flag, ttl, period, retransmit);
+ }
+ 
+ static void send_sub_status(struct mesh_node *node, uint16_t net_idx,
+@@ -311,7 +307,6 @@ static void config_sub_set(struct mesh_node *node, uint16_t net_idx,
+ 					bool virt, uint32_t opcode)
+ {
+ 	uint16_t grp, ele_addr;
+-	bool unreliable = !!(opcode & OP_UNRELIABLE);
+ 	uint32_t mod_id;
+ 	const uint8_t *addr = NULL;
+ 	int status = MESH_STATUS_SUCCESS;
+@@ -369,7 +364,7 @@ static void config_sub_set(struct mesh_node *node, uint16_t net_idx,
+ 	} else
+ 		grp = UNASSIGNED_ADDRESS;
  
 -	switch (opcode & ~OP_UNRELIABLE) {
 +	switch (opcode) {
  	default:
- 		return false;
+ 		l_debug("Bad opcode: %x", opcode);
+ 		return;
+@@ -411,8 +406,8 @@ static void config_sub_set(struct mesh_node *node, uint16_t net_idx,
+ 		grp = UNASSIGNED_ADDRESS;
+ 		/* Fall Through */
+ 	case OP_CONFIG_MODEL_SUB_DELETE:
+-		status = mesh_model_sub_del(node, ele_addr, mod_id,
+-							addr, virt, &grp);
++		status = mesh_model_sub_del(node, ele_addr, mod_id, addr, virt,
++									&grp);
  
-diff --git a/tools/mesh-gatt/config-server.c b/tools/mesh-gatt/config-server.c
-index 8fc6edcc0..9e9b93959 100644
---- a/tools/mesh-gatt/config-server.c
-+++ b/tools/mesh-gatt/config-server.c
-@@ -73,7 +73,7 @@ static bool server_msg_recvd(uint16_t src, uint8_t *data,
+ 		if (status == MESH_STATUS_SUCCESS)
+ 			save_config_sub(node, ele_addr, mod_id, vendor, addr,
+@@ -421,10 +416,7 @@ static void config_sub_set(struct mesh_node *node, uint16_t net_idx,
+ 		break;
+ 	}
  
- 	n = 0;
+-	if (!unreliable)
+-		send_sub_status(node, net_idx, src, dst, status, ele_addr,
+-								grp, mod_id);
+-
++	send_sub_status(node, net_idx, src, dst, status, ele_addr, grp, mod_id);
+ }
  
--	switch (opcode & ~OP_UNRELIABLE) {
-+	switch (opcode) {
- 	default:
- 		return false;
+ static void send_model_app_status(struct mesh_node *node, uint16_t net_idx,
+@@ -786,8 +778,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 			return true;
  
-diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
-index 92c9a3105..be519c969 100644
---- a/tools/mesh-gatt/onoff-model.c
-+++ b/tools/mesh-gatt/onoff-model.c
-@@ -123,7 +123,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- 								len, opcode);
- 	print_byte_array("\t",data, len);
+ 		config_pub_set(node, net_idx, src, dst, pkt, virt,
+-						size == 13 || size == 27,
+-						!!(opcode & OP_UNRELIABLE));
++						size == 13 || size == 27);
+ 		break;
  
--	switch (opcode & ~OP_UNRELIABLE) {
-+	switch (opcode) {
- 	default:
- 		return false;
+ 	case OP_CONFIG_MODEL_PUB_GET:
+diff --git a/mesh/model.h b/mesh/model.h
+index f717fb00c..0377d3fdd 100644
+--- a/mesh/model.h
++++ b/mesh/model.h
+@@ -19,8 +19,6 @@
  
-diff --git a/tools/mesh-gatt/util.h b/tools/mesh-gatt/util.h
-index c3facfa73..dba2c480b 100644
---- a/tools/mesh-gatt/util.h
-+++ b/tools/mesh-gatt/util.h
-@@ -25,8 +25,6 @@
- 
- struct mesh_publication;
+ struct mesh_model;
  
 -#define OP_UNRELIABLE			0x0100
 -
- void set_menu_prompt(const char *name, const char *id);
- void print_byte_array(const char *prefix, const void *ptr, int len);
- bool str2hex(const char *str, uint16_t in_len, uint8_t *out_buf,
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 218e82c50..e36c8dca5 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -416,7 +416,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ #define MAX_BINDINGS	10
+ #define MAX_GRP_PER_MOD	10
  
- 	bt_shell_printf("Received %s (len %u)\n", opcode_str(opcode), len);
- 
--	req = get_req_by_rsp(src, (opcode & ~OP_UNRELIABLE));
-+	req = get_req_by_rsp(src, opcode);
- 	if (req) {
- 		cmd = req->cmd;
- 		free_request(req);
-@@ -424,7 +424,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 	} else
- 		cmd = NULL;
- 
--	switch (opcode & ~OP_UNRELIABLE) {
-+	switch (opcode) {
- 	default:
- 		return false;
- 
-diff --git a/tools/mesh/model.h b/tools/mesh/model.h
-index 449fe19b2..35bb80efc 100644
---- a/tools/mesh/model.h
-+++ b/tools/mesh/model.h
-@@ -18,7 +18,6 @@
-  *
-  */
- 
--#define OP_UNRELIABLE	0x0100
- #define VENDOR_ID_INVALID	0xFFFF
- 
- typedef bool (*model_send_msg_func_t) (void *user_data, uint16_t dst,
 -- 
 2.26.2
 
