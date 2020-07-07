@@ -2,369 +2,114 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50913C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 20:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C21EC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 22:52:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29132206C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 20:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594153823;
-	bh=ZBG73L/0WVqupbAF8AmWnDxYad91I+9I1o5IDmHitwY=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=rdTbCI+TTWz6qCQnU39IKObNttPq1wcusqfwcY4J65yY6vL6+lpD5X4fls/fjy+UV
-	 GlYPKyGCEVmPDAdT6UXafJ32v05s8DRDDZ94iESc3bAo7ELaP4HtCdVxjRMxC0njER
-	 9Oed1S3EPtd1lK0al/8DB71DqbKL5yDzmZdfM/N0=
+	by mail.kernel.org (Postfix) with ESMTP id 22E4E20738
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 22:52:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BUW2C+eL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728430AbgGGUaR (ORCPT
+        id S1729348AbgGGWwe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jul 2020 16:30:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48980 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728020AbgGGUaR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jul 2020 16:30:17 -0400
-Received: from embeddedor (unknown [200.39.26.250])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A2129206C3;
-        Tue,  7 Jul 2020 20:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594153815;
-        bh=ZBG73L/0WVqupbAF8AmWnDxYad91I+9I1o5IDmHitwY=;
-        h=Date:From:To:Cc:Subject:From;
-        b=NzUBMPH/ZaapJTJiyzPUPPW1foolDWpL0iqmVYiH4frWQyxIpGocwDiReTEJo31Ul
-         CZ49UYizkrY++Si77EnlY3L448s4U3/xeNe97CUzBzFfJGmI+O2mlkcH0kGfjdQ6vN
-         QjQzahhoQ5rWu9yUmfrrDJYEzaWyQe4UWFp3GpbU=
-Date:   Tue, 7 Jul 2020 15:35:41 -0500
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        Tue, 7 Jul 2020 18:52:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728299AbgGGWwe (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Jul 2020 18:52:34 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB9DCC08C5E1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2020 15:52:33 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id w2so19890638pgg.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2020 15:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tg/83hrbdiKC/nqtULfMVzExwdn+D48CNwXlyo8fmO4=;
+        b=BUW2C+eLfsuR3+MVx1e1OCy+7uFgx75RJLG1jW550N43OasNBoRqPU9cB8UXYlfNDu
+         pcU1SBWMsnh822z3jayvN0pIM00XnDdb8FMJBRAAJGgSeedETZntzbCQ8EbrVjJqGFUR
+         g8Z/FkPIapa/KAtXuPv/Xx9z25M1nW9ELxH1U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tg/83hrbdiKC/nqtULfMVzExwdn+D48CNwXlyo8fmO4=;
+        b=UyWIw5pphU1WyzNb9J4kGysGwcT277WYBgx0xWWon7S3PX0J8XYR6AF6w/A5kfXCPz
+         3UvQuJuicEueR1Td22ymXoKojLO6M5klbQRQrWAEv5Bdg533hKY7q5+Wn1f0cVsrQwvQ
+         P/m6pwYb3IgPcowBodvKtYvflVw/6AD3j0FbEtf7/NJQCiMSM2iEF1jvmdzO0gkfRd+6
+         /Ar3CiamWo4X8MSQoxr+Mn6K49xbUSIzRLsqlKh3zo277RaGQfGNqf6SvLnujUlTh0V4
+         iLsNzGdGpHcwPhy4vMbT3xBDHFYyb2jWgYtIi5EAw0yylLmSFJTjMyurOBoN7HT1FjGU
+         VL8g==
+X-Gm-Message-State: AOAM531RokutxP9YfWmmPA89Ex/HrEkhCai3EbPLvLbPcjBF5hQGkCPg
+        DXWBXOj2b/MZw3Mjf8CI/F6wlVpz6SI=
+X-Google-Smtp-Source: ABdhPJwu9V/dqmxBw5pNmoYQaZrQMps5/47kI7zjjDffv70FpI2X7Gle+8miopcdNJQjUzX2lnINDg==
+X-Received: by 2002:a62:7bc9:: with SMTP id w192mr49102384pfc.255.1594162353028;
+        Tue, 07 Jul 2020 15:52:33 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
+        by smtp.gmail.com with ESMTPSA id 73sm23737551pfy.24.2020.07.07.15.52.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 07 Jul 2020 15:52:32 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Subject: [PATCH][next] Bluetooth: Use fallthrough pseudo-keyword
-Message-ID: <20200707203541.GA8972@embeddedor>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use whitelist for scan policy when suspending
+Date:   Tue,  7 Jul 2020 15:52:28 -0700
+Message-Id: <20200707155207.1.Id31098b8dbbcf90468fcd7fb07ad0e872b11c36b@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Replace the existing /* fall through */ comments and its variants with
-the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
-fall-through markings when it is the case.
+Even with one advertisement monitor in place, the scan policy should use
+the whitelist while the system is going to suspend to prevent waking by
+random advertisement.
 
-[1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
+The following test was performed.
+- With a paired device, register one advertisement monitor, suspend
+the system and verify that the host was not awaken by random
+advertisements.
 
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+
 ---
- drivers/bluetooth/bcm203x.c     |  2 +-
- drivers/bluetooth/bluecard_cs.c |  2 --
- drivers/bluetooth/hci_ll.c      |  2 +-
- drivers/bluetooth/hci_qca.c     |  8 +-------
- net/bluetooth/hci_event.c       |  4 ++--
- net/bluetooth/hci_sock.c        |  3 +--
- net/bluetooth/l2cap_core.c      | 19 +++++++++----------
- net/bluetooth/l2cap_sock.c      |  4 ++--
- net/bluetooth/mgmt.c            |  4 ++--
- net/bluetooth/rfcomm/core.c     |  2 +-
- net/bluetooth/rfcomm/sock.c     |  2 +-
- net/bluetooth/smp.c             |  2 +-
- 12 files changed, 22 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
-index 3b176257b993..e667933c3d70 100644
---- a/drivers/bluetooth/bcm203x.c
-+++ b/drivers/bluetooth/bcm203x.c
-@@ -106,7 +106,7 @@ static void bcm203x_complete(struct urb *urb)
- 		}
+ net/bluetooth/hci_request.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 6168a3440eff9..e161aabd7bf36 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -799,9 +799,10 @@ static u8 update_white_list(struct hci_request *req)
  
- 		data->state = BCM203X_LOAD_FIRMWARE;
--		/* fall through */
-+		fallthrough;
- 	case BCM203X_LOAD_FIRMWARE:
- 		if (data->fw_sent == data->fw_size) {
- 			usb_fill_int_urb(urb, udev, usb_rcvintpipe(udev, BCM203X_IN_EP),
-diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
-index cc6e56223656..36eabf61717f 100644
---- a/drivers/bluetooth/bluecard_cs.c
-+++ b/drivers/bluetooth/bluecard_cs.c
-@@ -295,7 +295,6 @@ static void bluecard_write_wakeup(struct bluecard_info *info)
- 				baud_reg = REG_CONTROL_BAUD_RATE_115200;
- 				break;
- 			case PKT_BAUD_RATE_57600:
--				/* Fall through... */
- 			default:
- 				baud_reg = REG_CONTROL_BAUD_RATE_57600;
- 				break;
-@@ -585,7 +584,6 @@ static int bluecard_hci_set_baud_rate(struct hci_dev *hdev, int baud)
- 		hci_skb_pkt_type(skb) = PKT_BAUD_RATE_115200;
- 		break;
- 	case 57600:
--		/* Fall through... */
- 	default:
- 		cmd[4] = 0x03;
- 		hci_skb_pkt_type(skb) = PKT_BAUD_RATE_57600;
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index d9a4c6c691e0..8bfe024d1fcd 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -219,7 +219,7 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
- 		 * perfectly safe to always send one.
- 		 */
- 		BT_DBG("dual wake-up-indication");
--		/* fall through */
-+		fallthrough;
- 	case HCILL_ASLEEP:
- 		/* acknowledge device wake up */
- 		if (send_hcill_cmd(HCILL_WAKE_UP_ACK, hu) < 0) {
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 99d14c777105..7e395469ca4f 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -472,8 +472,6 @@ static void hci_ibs_tx_idle_timeout(struct timer_list *t)
+ 	/* Once the controller offloading of advertisement monitor is in place,
+ 	 * the if condition should include the support of MSFT extension
+-	 * support.
++	 * support. If suspend is ongoing, whitelist should be the default to
++	 * prevent waking by random advertisements.
+ 	 */
+-	if (!idr_is_empty(&hdev->adv_monitors_idr))
++	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended)
+ 		return 0x00;
  
- 	case HCI_IBS_TX_ASLEEP:
- 	case HCI_IBS_TX_WAKING:
--		/* Fall through */
--
- 	default:
- 		BT_ERR("Spurious timeout tx state %d", qca->tx_ibs_state);
- 		break;
-@@ -516,8 +514,6 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
- 
- 	case HCI_IBS_TX_ASLEEP:
- 	case HCI_IBS_TX_AWAKE:
--		/* Fall through */
--
- 	default:
- 		BT_ERR("Spurious timeout tx state %d", qca->tx_ibs_state);
- 		break;
-@@ -835,8 +831,6 @@ static void device_woke_up(struct hci_uart *hu)
- 		break;
- 
- 	case HCI_IBS_TX_ASLEEP:
--		/* Fall through */
--
- 	default:
- 		BT_ERR("Received HCI_IBS_WAKE_ACK in tx state %d",
- 		       qca->tx_ibs_state);
-@@ -2072,7 +2066,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
- 	switch (qca->tx_ibs_state) {
- 	case HCI_IBS_TX_WAKING:
- 		del_timer(&qca->wake_retrans_timer);
--		/* Fall through */
-+		fallthrough;
- 	case HCI_IBS_TX_AWAKE:
- 		del_timer(&qca->tx_idle_timer);
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 03a0759f2fc2..94f046f08301 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2825,7 +2825,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		case HCI_AUTO_CONN_LINK_LOSS:
- 			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
- 				break;
--			/* Fall through */
-+			fallthrough;
- 
- 		case HCI_AUTO_CONN_DIRECT:
- 		case HCI_AUTO_CONN_ALWAYS:
-@@ -4320,7 +4320,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 			if (hci_setup_sync(conn, conn->link->handle))
- 				goto unlock;
- 		}
--		/* fall through */
-+		fallthrough;
- 
- 	default:
- 		conn->state = BT_CLOSED;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index d5627967fc25..fad842750442 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -443,8 +443,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
- 	case HCI_DEV_SETUP:
- 		if (hdev->manufacturer == 0xffff)
- 			return NULL;
--
--		/* fall through */
-+		fallthrough;
- 
- 	case HCI_DEV_UP:
- 		skb = bt_skb_alloc(HCI_MON_INDEX_INFO_SIZE, GFP_ATOMIC);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 35d2bc569a2d..ade83e224567 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -666,8 +666,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 
- 		l2cap_seq_list_free(&chan->srej_list);
- 		l2cap_seq_list_free(&chan->retrans_list);
--
--		/* fall through */
-+		fallthrough;
- 
- 	case L2CAP_MODE_STREAMING:
- 		skb_queue_purge(&chan->tx_q);
-@@ -872,7 +871,8 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- 			else
- 				return HCI_AT_NO_BONDING;
- 		}
--		/* fall through */
-+		fallthrough;
-+
- 	default:
- 		switch (chan->sec_level) {
- 		case BT_SECURITY_HIGH:
-@@ -2983,8 +2983,7 @@ static void l2cap_tx_state_wait_f(struct l2cap_chan *chan,
- 		break;
- 	case L2CAP_EV_RECV_REQSEQ_AND_FBIT:
- 		l2cap_process_reqseq(chan, control->reqseq);
--
--		/* Fall through */
-+		fallthrough;
- 
- 	case L2CAP_EV_RECV_FBIT:
- 		if (control && control->final) {
-@@ -3311,7 +3310,7 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
- 	case L2CAP_MODE_ERTM:
- 		if (l2cap_mode_supported(mode, remote_feat_mask))
- 			return mode;
--		/* fall through */
-+		fallthrough;
- 	default:
- 		return L2CAP_MODE_BASIC;
- 	}
-@@ -3447,7 +3446,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		if (__l2cap_efs_supported(chan->conn))
- 			set_bit(FLAG_EFS_ENABLE, &chan->flags);
- 
--		/* fall through */
-+		fallthrough;
- 	default:
- 		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
- 		break;
-@@ -4539,7 +4538,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 				goto done;
- 			break;
- 		}
--		/* fall through */
-+		fallthrough;
- 
- 	default:
- 		l2cap_chan_set_err(chan, ECONNRESET);
-@@ -7719,7 +7718,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 			conn->mtu = hcon->hdev->le_mtu;
- 			break;
- 		}
--		/* fall through */
-+		fallthrough;
- 	default:
- 		conn->mtu = hcon->hdev->acl_mtu;
- 		break;
-@@ -7841,7 +7840,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	case L2CAP_MODE_STREAMING:
- 		if (!disable_ertm)
- 			break;
--		/* fall through */
-+		fallthrough;
- 	default:
- 		err = -EOPNOTSUPP;
- 		goto done;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a995d2c51fa7..738a5345fa21 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -284,7 +284,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 	case L2CAP_MODE_STREAMING:
- 		if (!disable_ertm)
- 			break;
--		/* fall through */
-+		fallthrough;
- 	default:
- 		err = -EOPNOTSUPP;
- 		goto done;
-@@ -760,7 +760,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
- 		case L2CAP_MODE_STREAMING:
- 			if (!disable_ertm)
- 				break;
--			/* fall through */
-+			fallthrough;
- 		default:
- 			err = -EINVAL;
- 			break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5e9b9728eeac..2e6b4312f5fe 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4504,7 +4504,7 @@ static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
- 		*mgmt_status = mgmt_le_support(hdev);
- 		if (*mgmt_status)
- 			return false;
--		/* Intentional fall-through */
-+		fallthrough;
- 	case DISCOV_TYPE_BREDR:
- 		*mgmt_status = mgmt_bredr_support(hdev);
- 		if (*mgmt_status)
-@@ -5880,7 +5880,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 		case MGMT_LTK_P256_DEBUG:
- 			authenticated = 0x00;
- 			type = SMP_LTK_P256_DEBUG;
--			/* fall through */
-+			fallthrough;
- 		default:
- 			continue;
- 		}
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 2e20af317cea..f2bacb464ccf 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -479,7 +479,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 		/* if closing a dlc in a session that hasn't been started,
- 		 * just close and unlink the dlc
- 		 */
--		/* fall through */
-+		fallthrough;
- 
- 	default:
- 		rfcomm_dlc_clear_timer(d);
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index df14eebe80da..0afc4bc5ab41 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -218,7 +218,7 @@ static void __rfcomm_sock_close(struct sock *sk)
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
- 		rfcomm_dlc_close(d, 0);
--		/* fall through */
-+		fallthrough;
- 
- 	default:
- 		sock_set_flag(sk, SOCK_ZAPPED);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 684e60e1915c..21f5e6d9ea95 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1654,7 +1654,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
- 		memset(smp->tk, 0, sizeof(smp->tk));
- 		BT_DBG("PassKey: %d", value);
- 		put_unaligned_le32(value, smp->tk);
--		/* Fall Through */
-+		fallthrough;
- 	case MGMT_OP_USER_CONFIRM_REPLY:
- 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
- 		break;
+ 	/* Select filter policy to use white list */
 -- 
-2.27.0
+2.26.2
 
