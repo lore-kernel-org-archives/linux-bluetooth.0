@@ -2,67 +2,66 @@ Return-Path: <SRS0=I8IU=AS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C10BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 00:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD1EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 02:19:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3216B206E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 00:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 350D2206E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jul 2020 02:19:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IwfVu7Z5"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XqI44sTl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726911AbgGGAjo (ORCPT
+        id S1726681AbgGGCT0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Jul 2020 20:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
+        Mon, 6 Jul 2020 22:19:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725942AbgGGAjo (ORCPT
+        with ESMTP id S1726583AbgGGCT0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Jul 2020 20:39:44 -0400
-Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49AD7C061755
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2020 17:39:43 -0700 (PDT)
-Received: by mail-vs1-xe44.google.com with SMTP id a17so10713996vsq.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2020 17:39:43 -0700 (PDT)
+        Mon, 6 Jul 2020 22:19:26 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564C8C061755
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2020 19:19:26 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id v1so21698351vsb.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2020 19:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=pTKT+OgdQXytrQx567fvW+SoDkWq0qLBy6EFdrqiakI=;
-        b=IwfVu7Z50Ix/dHptaW/scdYp/lsAs0w3+g+z7kjzQEcB9jG6S44YmIj8pnsC23X1xL
-         fyDpWbsyw75QbEQyEQnJw0DF0WmYZa8kSbM/+hrEva4pMcLj/g5qapUN6Ut+WtCNly+7
-         k2n2FmLsieBt/4bc0TT8fKNHOVCf0hiRGImeU=
+        bh=fXlDVwOK9y2sRda2nGIuhcRuMpsLxZNBuUuDCTcE2Uk=;
+        b=XqI44sTllruhD3zy/xvdUWl2f7aJPJne1DfyUdUbL1MxiAQJS9woTQ67PnHrvldesw
+         LKr1TDtKG9MCMXg1TKjXQ7DjWQlBINXDGXvsvYonss9vDl9yqerCBFWRwl+xwpVWyhVf
+         KhEkPujx2Uuf2vrZ5XzbDmlqZPhyAOMK5S07Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=pTKT+OgdQXytrQx567fvW+SoDkWq0qLBy6EFdrqiakI=;
-        b=rWSHrgXkIPgpI32WOOufYoPT+fxgli28uU70Rb01bX2pn0YLFiXjNJt6RxRwzw0eUw
-         sZMDMet+lvSlYAaLhB4eI5BJc/VlFG6+e6y/WvjU1I17+Qx3SoLrAeoVzYcdK1mI9a71
-         yiifRG65qnDSb1UhtRVKKKr7cylKhXyLs2YvQDpGdpR2oEyS7RJPC7I1S6Bv8zjzhlPu
-         hOZSSOBdjQOHB47W2MkrwkKUn5jqNpFo+GWuayhFYfXesSsMHXgWMKn0dKm2+4u4DIeM
-         +1HqGilUh7X34fsD5PS2d7VyFoCe59KhUbcoPeZiyX+HvriXmMXGR2QdSA73OKtD77Jq
-         L/Pg==
-X-Gm-Message-State: AOAM530N6eSXsClelcEX/karS8jEhAEpiJS8TeMg0NcGiZuTClN6XGbx
-        y3pKmfDe6b2tH/KKR4qNHzvvnMXgmnI=
-X-Google-Smtp-Source: ABdhPJw4Hr3Vj/GeTsZgwGGCmJQ9+pU3SOhLqoMVcoQlutObFYVOA4/9bjm10lo0OK4wMxfoYY9EDA==
-X-Received: by 2002:a05:6102:3002:: with SMTP id s2mr21458975vsa.2.1594082382203;
-        Mon, 06 Jul 2020 17:39:42 -0700 (PDT)
+        bh=fXlDVwOK9y2sRda2nGIuhcRuMpsLxZNBuUuDCTcE2Uk=;
+        b=pGKMCVDdRVBokVDeDePuj6uNPoaXFYPEaoI+ISJgyOkC/CkYpNys1/JnfQ4jzjXdnD
+         bE8KKW/WPVTPkWdI4sFeMT49C33UpOVvQMcYkQBr0cHqNngVOXChcizzIeFo8l8rvdtP
+         FtLukQYQ3iWb7d0ShYJ+1XeoeZWXmEtlsg9R/pfAmPD5Hd6iVQwzRmj6CXIfkkJ79ppJ
+         ILH4ziX+V/SXmEmXjNTIFVRC9zsOcwU5P9zMefazdJVy07kxNh9vqm3UDHt1RKSfk+fN
+         K7I7l/WhV9C5C2GRU37dLXuO8tdOqXMm93LahaCuPwYgdHZIPcZ5eQ2ERDvbysgKznRo
+         zIPg==
+X-Gm-Message-State: AOAM530f5dNrOsYZGcY/VylngYSP2TaYMWCWCI3tbrrDZ/MpC3ASqe5G
+        v7vCqQlmCqsBDgEJrmH6S3ueb/b+ATM=
+X-Google-Smtp-Source: ABdhPJzdoL9gbR78xJ64mxmGHylXLShpoitfalka4xzYvWlINC/4cOgKTz9Lk2s9h/3mZMDXtA4uGg==
+X-Received: by 2002:a67:7d50:: with SMTP id y77mr37509155vsc.66.1594088364876;
+        Mon, 06 Jul 2020 19:19:24 -0700 (PDT)
 Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id c62sm323315vkg.30.2020.07.06.17.39.41
+        by smtp.gmail.com with ESMTPSA id q200sm4855727vke.53.2020.07.06.19.19.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2020 17:39:41 -0700 (PDT)
+        Mon, 06 Jul 2020 19:19:24 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH v1] Bluetooth: create CONFIG_BT_DEBUG_FUNC_NAME
-Date:   Tue,  7 Jul 2020 00:39:37 +0000
-Message-Id: <20200707003937.187125-1-alainm@chromium.org>
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [BlueZ PATCH 1/2] adapter: add support for the Roles property
+Date:   Tue,  7 Jul 2020 02:19:18 +0000
+Message-Id: <20200707021920.209213-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -71,106 +70,158 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Creates a CONFIG_BT_DEBUG_FUNC_NAME option to include function names in
-debug statements.
+This patch adds support for the Roles property as defined in
+adapter-api.txt.
 
-Unlike other platforms __func__ isn't a string literal so it cannot be
-automatically concatenated by the pre-processor.  As a result, the
-function name is passed as a parameter to the tracing function.  Since
-pr_debug is a function like macro, the normal expansion of BT_PREFIX_PARAM
-does not work as it gets processed within the first parameter as well,
-for this reason, BT_DBG is split into two versions.
-
-This patch was built tested with all 4 possible combinations of
-CONFIG_BT_DEBUG_FUNC_NAME and CONFIG_BT_FEATURE_DEBUG configurations.
-
-Signed-off-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
 
- include/net/bluetooth/bluetooth.h | 32 +++++++++++++++++++++++--------
- net/bluetooth/Kconfig             | 11 +++++++++++
- 2 files changed, 35 insertions(+), 8 deletions(-)
+ src/adapter.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 7ee8041af803..27ec8f2a7c28 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -162,22 +162,37 @@ void bt_dbg_set(bool enable);
- bool bt_dbg_get(void);
- __printf(1, 2)
- void bt_dbg(const char *fmt, ...);
-+#define BT_DBG_INT	bt_dbg
-+#else
-+#define BT_DBG_INT	pr_debug
- #endif
- __printf(1, 2)
- void bt_warn_ratelimited(const char *fmt, ...);
- __printf(1, 2)
- void bt_err_ratelimited(const char *fmt, ...);
+diff --git a/src/adapter.c b/src/adapter.c
+index 9ce351893..7afd6980c 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -122,6 +122,8 @@ static bool kernel_blocked_keys_supported = false;
  
--#define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
--#define BT_WARN(fmt, ...)	bt_warn(fmt "\n", ##__VA_ARGS__)
--#define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
--
--#if IS_ENABLED(CONFIG_BT_FEATURE_DEBUG)
--#define BT_DBG(fmt, ...)	bt_dbg(fmt "\n", ##__VA_ARGS__)
-+#if IS_ENABLED(CONFIG_BT_DEBUG_FUNC_NAMES)
-+#define BT_PREFIX "%s() "
-+#define BT_PREFIX_PARAM ,__func__
-+#define BT_DBG(fmt, ...)	\
-+	BT_DBG_INT(BT_PREFIX fmt "\n", __func__, ##__VA_ARGS__)
- #else
--#define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
-+#define BT_PREFIX
-+#define BT_PREFIX_PARAM
-+#define BT_DBG(fmt, ...)	\
-+	BT_DBG_INT(fmt "\n", ##__VA_ARGS__)
- #endif
+ static bool kernel_set_system_config = false;
  
-+#define BT_INFO(fmt, ...)	\
-+	bt_info(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
-+#define BT_WARN(fmt, ...)	\
-+	bt_warn(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
-+#define BT_ERR(fmt, ...)	\
-+	bt_err(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
++static bool kernel_exp_features = false;
 +
-+#define BT_ERR_RATELIMITED(fmt, ...) \
-+	bt_err_ratelimited(BT_PREFIX fmt "\n" BT_PREFIX_PARAM, ##__VA_ARGS__)
-+
- #define bt_dev_info(hdev, fmt, ...)				\
- 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
- #define bt_dev_warn(hdev, fmt, ...)				\
-@@ -188,7 +203,8 @@ void bt_err_ratelimited(const char *fmt, ...);
- 	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
+ static GList *adapter_list = NULL;
+ static unsigned int adapter_remaining = 0;
+ static bool powering_down = false;
+@@ -293,6 +295,8 @@ struct btd_adapter {
+ 	unsigned int db_id;		/* Service event handler for GATT db */
  
- #define bt_dev_warn_ratelimited(hdev, fmt, ...)			\
--	bt_warn_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-+	bt_warn_ratelimited("%s: " BT_PREFIX fmt, (hdev)->name	\
-+			    BT_PREFIX_PARAM, ##__VA_ARGS__)
- #define bt_dev_err_ratelimited(hdev, fmt, ...)			\
- 	bt_err_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
- 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 1d6d243cdde9..de31c682c7b0 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -142,4 +142,15 @@ config BT_FEATURE_DEBUG
- 	  This provides an option to enable/disable debugging statements
- 	  at runtime via the experimental features interface.
- 
-+config BT_DEBUG_FUNC_NAMES
-+	bool "Include function names in debugging statements"
-+	depends on BT
-+	default n
-+	help
-+	  Provides an option to include function names in debugging
-+	  statements.
+ 	bool is_default;		/* true if adapter is default one */
 +
-+	  When enabled, trace statements will include the function name as a
-+	  prefix which may help identify the source code references.
++	bool le_simult_roles_supported;
+ };
+ 
+ typedef enum {
+@@ -3199,6 +3203,35 @@ static gboolean property_get_modalias(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean property_get_roles(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	DBusMessageIter entry;
 +
- source "drivers/bluetooth/Kconfig"
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_STRING_AS_STRING, &entry);
++
++	if (adapter->supported_settings & MGMT_SETTING_LE) {
++		const char *str = "central";
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
++	}
++
++	if (adapter->supported_settings & MGMT_SETTING_ADVERTISING) {
++		const char *str = "peripheral";
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
++	}
++
++	if (adapter->le_simult_roles_supported) {
++		const char *str = "central-peripheral";
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &str);
++	}
++
++	dbus_message_iter_close_container(iter, &entry);
++
++	return TRUE;
++}
++
+ static int device_path_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct btd_device *device = a;
+@@ -3479,6 +3512,7 @@ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ "UUIDs", "as", property_get_uuids },
+ 	{ "Modalias", "s", property_get_modalias, NULL,
+ 					property_exists_modalias },
++	{ "Roles", "as", property_get_roles },
+ 	{ }
+ };
+ 
+@@ -9023,6 +9057,56 @@ static bool set_blocked_keys(struct btd_adapter *adapter)
+ 						adapter, NULL);
+ }
+ 
++static void read_exp_features_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	const struct mgmt_rp_read_exp_features_info *rp = param;
++	size_t feature_count = 0;
++	size_t i = 0;
++
++	DBG("index %u status 0x%02x", adapter->dev_id, status);
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		btd_error(adapter->dev_id,
++				"Failed to read exp features info: %s (0x%02x)",
++				mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		btd_error(adapter->dev_id, "Response too small");
++		return;
++	}
++
++	feature_count = le16_to_cpu(rp->feature_count);
++	for (i = 0; i < feature_count; ++i) {
++
++		/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
++		static const uint8_t le_simult_central_peripheral[16] = {
++			0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
++			0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
++		};
++
++		if (memcmp(rp->features[i].uuid, le_simult_central_peripheral,
++				sizeof(le_simult_central_peripheral)) == 0) {
++			uint32_t flags = le32_to_cpu(rp->features[i].flags);
++
++			adapter->le_simult_roles_supported = flags & 0x01;
++		}
++	}
++}
++
++static void read_exp_features(struct btd_adapter *adapter)
++{
++	if (mgmt_send(adapter->mgmt, MGMT_OP_READ_EXP_FEATURES_INFO,
++			adapter->dev_id, 0, NULL, read_exp_features_complete,
++			adapter, NULL) > 0)
++		return;
++
++	btd_error(adapter->dev_id, "Failed to read exp features info");
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -9132,6 +9216,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 			(missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
+ 		set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
+ 
++	if (kernel_exp_features)
++		read_exp_features(adapter);
++
+ 	err = adapter_register(adapter);
+ 	if (err < 0) {
+ 		btd_error(adapter->dev_id, "Unable to register new adapter");
+@@ -9447,6 +9534,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+ 			DBG("kernel supports set system confic");
+ 			kernel_set_system_config = true;
+ 			break;
++		case MGMT_OP_READ_EXP_FEATURES_INFO:
++			DBG("kernel supports exp features");
++			kernel_exp_features = true;
++			break;
+ 		default:
+ 			break;
+ 		}
 -- 
 2.27.0.212.ge8ba1cc988-goog
 
