@@ -2,95 +2,251 @@ Return-Path: <SRS0=eST2=AT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D249AC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 18:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D32C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 20:13:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A583E206F6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 18:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D0E3206F6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 20:13:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594232810;
-	bh=P4cXOjS7XD3EKQggGz2XzeV426YqZpcn9AX6M313xkw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=y7Pe7rjUxLdF1SnibLpycvcYCBWsIAcIGsF3ksieDpkaLNho8F3kPBcIcndu05tWx
-	 bGsyj0ISdXJ+uZZ/vENm2bBZ9+T8oROERn8HNWmlTfEb4ff71KtdXbcG0k6FU2jQDX
-	 ckNYXzI5v7Rd0dS5ftJi9hQDoG6anFw9IW48yPbs=
+	s=default; t=1594239182;
+	bh=/oZNYXkUuncpQ7MRSVjnoq+faFRhFQzcs8SweMSBbF4=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=tT3RuaCUcW/bW41Y8WtaymJGGty/Y+uTSdqHkh+ZlahDyhzqyWdQ3ooHAJw1PdM1G
+	 eR3ai/zSF7TGwrbjhyTOkya2d5U9QcWOyyzB3cQG1PwNHWASBFnDtBPD2MbzNDgoZ2
+	 tam+/B+mkjfnC6+P9oKCeTaDFadP74BvDn8MuIbE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgGHS0s (ORCPT
+        id S1726112AbgGHUM4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jul 2020 14:26:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44932 "EHLO mail.kernel.org"
+        Wed, 8 Jul 2020 16:12:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34274 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725937AbgGHS0r (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jul 2020 14:26:47 -0400
+        id S1725964AbgGHUMz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 8 Jul 2020 16:12:55 -0400
 Received: from embeddedor (unknown [201.162.240.161])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 261E1206F6;
-        Wed,  8 Jul 2020 18:26:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A443206F6;
+        Wed,  8 Jul 2020 20:12:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594232806;
-        bh=P4cXOjS7XD3EKQggGz2XzeV426YqZpcn9AX6M313xkw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LJXCmf2cjDCxZnRljodId9rJBikTsGOMlIjDlRQ7f8DigAdE9Rv0nsNrc+0HPNGQb
-         G5yItZnEO9a3TUHzTYDgwPvuqvCjq3zwH+eYbSo4ulPMzrgKgETloyCCw0BWjhcZZw
-         3sdrN/xrED/RSiWoeF04gTc0HQPYmi9cCyxkjFzA=
-Date:   Wed, 8 Jul 2020 13:32:15 -0500
+        s=default; t=1594239175;
+        bh=/oZNYXkUuncpQ7MRSVjnoq+faFRhFQzcs8SweMSBbF4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=nN2+GlrJm8Tb/736hM2zeg5pf296zZmUVfvcVTzfzAvNoghyJqxpP093aN8qPltxz
+         sqZ4xJVJJelAGPbOUwgkFzEtv3VnYfgrQ2lmIyenqAYSx5bEz8uZGV2mZO9fa3JZ5+
+         v6R5fPgSO5lT9J5z24afsP234CrKEijEGLMTG+ms=
+Date:   Wed, 8 Jul 2020 15:18:23 -0500
 From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH][next] Bluetooth: Use fallthrough pseudo-keyword
-Message-ID: <20200708183215.GI11533@embeddedor>
-References: <20200707203541.GA8972@embeddedor>
- <AA68478E-A46A-4914-BE62-3AC9989E358D@holtmann.org>
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: [PATCH] Bluetooth: core: Use fallthrough pseudo-keyword
+Message-ID: <20200708201823.GA400@embeddedor>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AA68478E-A46A-4914-BE62-3AC9989E358D@holtmann.org>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jul 08, 2020 at 06:49:39AM +0200, Marcel Holtmann wrote:
-> Hi Gustavo,
-> 
-> > Replace the existing /* fall through */ comments and its variants with
-> > the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
-> > fall-through markings when it is the case.
-> > 
-> > [1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
-> > 
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> > ---
-> > drivers/bluetooth/bcm203x.c     |  2 +-
-> > drivers/bluetooth/bluecard_cs.c |  2 --
-> > drivers/bluetooth/hci_ll.c      |  2 +-
-> > drivers/bluetooth/hci_qca.c     |  8 +-------
-> > net/bluetooth/hci_event.c       |  4 ++--
-> > net/bluetooth/hci_sock.c        |  3 +--
-> > net/bluetooth/l2cap_core.c      | 19 +++++++++----------
-> > net/bluetooth/l2cap_sock.c      |  4 ++--
-> > net/bluetooth/mgmt.c            |  4 ++--
-> > net/bluetooth/rfcomm/core.c     |  2 +-
-> > net/bluetooth/rfcomm/sock.c     |  2 +-
-> > net/bluetooth/smp.c             |  2 +-
-> > 12 files changed, 22 insertions(+), 32 deletions(-)
-> 
-> can we split these a little bit between drivers, core and rfcomm. Thanks.
-> 
+Replace the existing /* fall through */ comments and its variants with
+the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
+fall-through markings when it is the case.
 
-Sure thing, no problem. I'll split this up and send again.
+[1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
 
-Thanks
---
-Gustavo
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ net/bluetooth/hci_event.c  |  4 ++--
+ net/bluetooth/hci_sock.c   |  3 +--
+ net/bluetooth/l2cap_core.c | 19 +++++++++----------
+ net/bluetooth/l2cap_sock.c |  4 ++--
+ net/bluetooth/mgmt.c       |  4 ++--
+ net/bluetooth/smp.c        |  2 +-
+ 6 files changed, 17 insertions(+), 19 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 03a0759f2fc2..94f046f08301 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2825,7 +2825,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		case HCI_AUTO_CONN_LINK_LOSS:
+ 			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
+ 				break;
+-			/* Fall through */
++			fallthrough;
+ 
+ 		case HCI_AUTO_CONN_DIRECT:
+ 		case HCI_AUTO_CONN_ALWAYS:
+@@ -4320,7 +4320,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 			if (hci_setup_sync(conn, conn->link->handle))
+ 				goto unlock;
+ 		}
+-		/* fall through */
++		fallthrough;
+ 
+ 	default:
+ 		conn->state = BT_CLOSED;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index d5627967fc25..fad842750442 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -443,8 +443,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ 	case HCI_DEV_SETUP:
+ 		if (hdev->manufacturer == 0xffff)
+ 			return NULL;
+-
+-		/* fall through */
++		fallthrough;
+ 
+ 	case HCI_DEV_UP:
+ 		skb = bt_skb_alloc(HCI_MON_INDEX_INFO_SIZE, GFP_ATOMIC);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 35d2bc569a2d..ade83e224567 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -666,8 +666,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 
+ 		l2cap_seq_list_free(&chan->srej_list);
+ 		l2cap_seq_list_free(&chan->retrans_list);
+-
+-		/* fall through */
++		fallthrough;
+ 
+ 	case L2CAP_MODE_STREAMING:
+ 		skb_queue_purge(&chan->tx_q);
+@@ -872,7 +871,8 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
+ 			else
+ 				return HCI_AT_NO_BONDING;
+ 		}
+-		/* fall through */
++		fallthrough;
++
+ 	default:
+ 		switch (chan->sec_level) {
+ 		case BT_SECURITY_HIGH:
+@@ -2983,8 +2983,7 @@ static void l2cap_tx_state_wait_f(struct l2cap_chan *chan,
+ 		break;
+ 	case L2CAP_EV_RECV_REQSEQ_AND_FBIT:
+ 		l2cap_process_reqseq(chan, control->reqseq);
+-
+-		/* Fall through */
++		fallthrough;
+ 
+ 	case L2CAP_EV_RECV_FBIT:
+ 		if (control && control->final) {
+@@ -3311,7 +3310,7 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
+ 	case L2CAP_MODE_ERTM:
+ 		if (l2cap_mode_supported(mode, remote_feat_mask))
+ 			return mode;
+-		/* fall through */
++		fallthrough;
+ 	default:
+ 		return L2CAP_MODE_BASIC;
+ 	}
+@@ -3447,7 +3446,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 		if (__l2cap_efs_supported(chan->conn))
+ 			set_bit(FLAG_EFS_ENABLE, &chan->flags);
+ 
+-		/* fall through */
++		fallthrough;
+ 	default:
+ 		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
+ 		break;
+@@ -4539,7 +4538,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				goto done;
+ 			break;
+ 		}
+-		/* fall through */
++		fallthrough;
+ 
+ 	default:
+ 		l2cap_chan_set_err(chan, ECONNRESET);
+@@ -7719,7 +7718,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 			conn->mtu = hcon->hdev->le_mtu;
+ 			break;
+ 		}
+-		/* fall through */
++		fallthrough;
+ 	default:
+ 		conn->mtu = hcon->hdev->acl_mtu;
+ 		break;
+@@ -7841,7 +7840,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	case L2CAP_MODE_STREAMING:
+ 		if (!disable_ertm)
+ 			break;
+-		/* fall through */
++		fallthrough;
+ 	default:
+ 		err = -EOPNOTSUPP;
+ 		goto done;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a995d2c51fa7..738a5345fa21 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -284,7 +284,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+ 	case L2CAP_MODE_STREAMING:
+ 		if (!disable_ertm)
+ 			break;
+-		/* fall through */
++		fallthrough;
+ 	default:
+ 		err = -EOPNOTSUPP;
+ 		goto done;
+@@ -760,7 +760,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 		case L2CAP_MODE_STREAMING:
+ 			if (!disable_ertm)
+ 				break;
+-			/* fall through */
++			fallthrough;
+ 		default:
+ 			err = -EINVAL;
+ 			break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d29da80e38fe..686ef4792831 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4525,7 +4525,7 @@ static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
+ 		*mgmt_status = mgmt_le_support(hdev);
+ 		if (*mgmt_status)
+ 			return false;
+-		/* Intentional fall-through */
++		fallthrough;
+ 	case DISCOV_TYPE_BREDR:
+ 		*mgmt_status = mgmt_bredr_support(hdev);
+ 		if (*mgmt_status)
+@@ -5901,7 +5901,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 		case MGMT_LTK_P256_DEBUG:
+ 			authenticated = 0x00;
+ 			type = SMP_LTK_P256_DEBUG;
+-			/* fall through */
++			fallthrough;
+ 		default:
+ 			continue;
+ 		}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 684e60e1915c..21f5e6d9ea95 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1654,7 +1654,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ 		memset(smp->tk, 0, sizeof(smp->tk));
+ 		BT_DBG("PassKey: %d", value);
+ 		put_unaligned_le32(value, smp->tk);
+-		/* Fall Through */
++		fallthrough;
+ 	case MGMT_OP_USER_CONFIRM_REPLY:
+ 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
+ 		break;
+-- 
+2.27.0
+
