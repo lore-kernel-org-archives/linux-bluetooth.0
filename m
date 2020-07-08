@@ -2,73 +2,96 @@ Return-Path: <SRS0=eST2=AT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44630C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 12:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DD2C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 13:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E52E20578
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 12:00:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 076A62065F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 13:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728864AbgGHMAM (ORCPT
+        id S1729772AbgGHNgu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jul 2020 08:00:12 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53915 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728723AbgGHMAM (ORCPT
+        Wed, 8 Jul 2020 09:36:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729762AbgGHNgt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jul 2020 08:00:12 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CA3CECECFA;
-        Wed,  8 Jul 2020 14:10:06 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: Use whitelist for scan policy when suspending
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200707155207.1.Id31098b8dbbcf90468fcd7fb07ad0e872b11c36b@changeid>
-Date:   Wed, 8 Jul 2020 14:00:09 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <ED3D3D2F-98BA-453C-B990-A487EBB5DD6C@holtmann.org>
-References: <20200707155207.1.Id31098b8dbbcf90468fcd7fb07ad0e872b11c36b@changeid>
-To:     Miao-chen Chou <mcchou@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Wed, 8 Jul 2020 09:36:49 -0400
+Received: from smtp.al2klimov.de (smtp.al2klimov.de [IPv6:2a01:4f8:c0c:1465::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0E8C08C5CE;
+        Wed,  8 Jul 2020 06:36:49 -0700 (PDT)
+Received: from authenticated-user (PRIMARY_HOSTNAME [PUBLIC_IP])
+        by smtp.al2klimov.de (Postfix) with ESMTPA id C5E5DBC06E;
+        Wed,  8 Jul 2020 13:36:44 +0000 (UTC)
+From:   "Alexander A. Klimov" <grandmaster@al2klimov.de>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Alexander A. Klimov" <grandmaster@al2klimov.de>
+Subject: [PATCH] Replace HTTP links with HTTPS ones: BLUETOOTH SUBSYSTEM
+Date:   Wed,  8 Jul 2020 15:36:38 +0200
+Message-Id: <20200708133638.14589-1-grandmaster@al2klimov.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: ++++++
+Authentication-Results: smtp.al2klimov.de;
+        auth=pass smtp.auth=aklimov@al2klimov.de smtp.mailfrom=grandmaster@al2klimov.de
+X-Spam: Yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Miao-chen,
+Rationale:
+Reduces attack surface on kernel devs opening the links for MITM
+as HTTPS traffic is much harder to manipulate.
 
-> Even with one advertisement monitor in place, the scan policy should use
-> the whitelist while the system is going to suspend to prevent waking by
-> random advertisement.
-> 
-> The following test was performed.
-> - With a paired device, register one advertisement monitor, suspend
-> the system and verify that the host was not awaken by random
-> advertisements.
-> 
-> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> ---
-> 
-> net/bluetooth/hci_request.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
+Deterministic algorithm:
+For each file:
+  If not .svg:
+    For each line:
+      If doesn't contain `\bxmlns\b`:
+        For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
+	  If neither `\bgnu\.org/license`, nor `\bmozilla\.org/MPL\b`:
+            If both the HTTP and HTTPS versions
+            return 200 OK and serve the same content:
+              Replace HTTP with HTTPS.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
+---
+ Continuing my work started at 93431e0607e5.
+ See also: git log --oneline '--author=Alexander A. Klimov <grandmaster@al2klimov.de>' v5.7..master
+ (Actually letting a shell for loop submit all this stuff for me.)
 
-Regards
+ If there are any URLs to be removed completely or at least not HTTPSified:
+ Just clearly say so and I'll *undo my change*.
+ See also: https://lkml.org/lkml/2020/6/27/64
 
-Marcel
+ If there are any valid, but yet not changed URLs:
+ See: https://lkml.org/lkml/2020/6/26/837
+
+ If you apply the patch, please let me know.
+
+
+ net/bluetooth/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 1d6d243cdde9..e2497d764e97 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -21,7 +21,7 @@ menuconfig BT
+ 	  It was designed as a replacement for cables and other short-range
+ 	  technologies like IrDA.  Bluetooth operates in personal area range
+ 	  that typically extends up to 10 meters.  More information about
+-	  Bluetooth can be found at <http://www.bluetooth.com/>.
++	  Bluetooth can be found at <https://www.bluetooth.com/>.
+ 
+ 	  Linux Bluetooth subsystem consist of several layers:
+ 	     Bluetooth Core
+-- 
+2.27.0
 
