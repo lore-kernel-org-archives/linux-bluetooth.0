@@ -2,85 +2,73 @@ Return-Path: <SRS0=eST2=AT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92192C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 11:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44630C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 12:00:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7193B20772
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 11:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E52E20578
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jul 2020 12:00:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728762AbgGHL3c (ORCPT
+        id S1728864AbgGHMAM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jul 2020 07:29:32 -0400
-Received: from relay10.mail.gandi.net ([217.70.178.230]:55527 "EHLO
-        relay10.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728385AbgGHL3c (ORCPT
+        Wed, 8 Jul 2020 08:00:12 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53915 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728723AbgGHMAM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jul 2020 07:29:32 -0400
-Received: from classic (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
-        (Authenticated sender: hadess@hadess.net)
-        by relay10.mail.gandi.net (Postfix) with ESMTPSA id 0657B240011;
-        Wed,  8 Jul 2020 11:29:29 +0000 (UTC)
-Message-ID: <d9eca20059088ad8bdaac70d7d98811166839b27.camel@hadess.net>
-Subject: Re: Temporary device removal during discovery
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Andrey Batyiev <batyiev@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date:   Wed, 08 Jul 2020 13:29:29 +0200
-In-Reply-To: <CAEQQxWxKs7ewwVyq4mnsyLbRhErQe9vZc5joNK6zfGSO3wN5bg@mail.gmail.com>
-References: <CAEQQxWxKs7ewwVyq4mnsyLbRhErQe9vZc5joNK6zfGSO3wN5bg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
-MIME-Version: 1.0
+        Wed, 8 Jul 2020 08:00:12 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id CA3CECECFA;
+        Wed,  8 Jul 2020 14:10:06 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH] Bluetooth: Use whitelist for scan policy when suspending
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200707155207.1.Id31098b8dbbcf90468fcd7fb07ad0e872b11c36b@changeid>
+Date:   Wed, 8 Jul 2020 14:00:09 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
 Content-Transfer-Encoding: 7bit
+Message-Id: <ED3D3D2F-98BA-453C-B990-A487EBB5DD6C@holtmann.org>
+References: <20200707155207.1.Id31098b8dbbcf90468fcd7fb07ad0e872b11c36b@changeid>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hey Andrey,
+Hi Miao-chen,
 
-On Wed, 2020-07-08 at 13:24 +0300, Andrey Batyiev wrote:
-> Hello everyone,
+> Even with one advertisement monitor in place, the scan policy should use
+> the whitelist while the system is going to suspend to prevent waking by
+> random advertisement.
 > 
-> I've found the following issue:
-> 1. in bluetoothctl run "power on", "scan on"
-> 2. discovery is now permanent
-> 3. make one device discoverable for a moment (e.g. turn bluetooth on
-> on your phone)
-> 4. bluez would detect new device
-> 5. turn bluetooth off on your phone
-> 6. now wait
+> The following test was performed.
+> - With a paired device, register one advertisement monitor, suspend
+> the system and verify that the host was not awaken by random
+> advertisements.
 > 
-> Expected result:
-> 7. your phone should disappear from discovered set after some time
+> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > 
-> Actual result:
-> 7. phone would stay there until discovery is off (i.e. "scan off" in
-> bluetoothctl)
+> ---
 > 
-> 
-> It seems like there is a code in src/adapter.c responsible for purge
-> stale entries
-> (remove_temp_devices), however it only triggers when discovery is off
-> (and after 3 mins).
-> 
-> 
-> My use case is to continuously monitor the bluetooth environment. Is
-> it bluez responsibility to
-> remove stale entries during discovery or should my own app repeatedly
-> stop discovery?
+> net/bluetooth/hci_request.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-It's been a problem for a while. I sent one of those mails as well:
-https://www.spinics.net/lists/linux-bluetooth/msg75947.html
-https://www.spinics.net/lists/linux-bluetooth/msg74397.html
+patch has been applied to bluetooth-next tree.
 
-Can you please file a bug at https://github.com/bluez/bluez/issues ?
+Regards
 
-I'll CC: myself on it too.
-
-Cheers
+Marcel
 
