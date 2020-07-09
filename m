@@ -2,113 +2,121 @@ Return-Path: <SRS0=bebH=AU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E39C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 00:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3607C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 05:20:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA22120775
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 00:14:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E86F2053B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 05:20:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vo0AD9F2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rR8wMB0W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgGIAOD (ORCPT
+        id S1726367AbgGIFUA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jul 2020 20:14:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56124 "EHLO
+        Thu, 9 Jul 2020 01:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbgGIAOD (ORCPT
+        with ESMTP id S1726124AbgGIFUA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jul 2020 20:14:03 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15BAC061A0B
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2020 17:14:02 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id l63so435361oih.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jul 2020 17:14:02 -0700 (PDT)
+        Thu, 9 Jul 2020 01:20:00 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25B8AC08C5CE;
+        Wed,  8 Jul 2020 22:20:00 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id t7so432913qvl.8;
+        Wed, 08 Jul 2020 22:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DAy6fpR5/xZbQxxlH57PWAcHB2SkdiT0qmgOwdkwU3M=;
-        b=Vo0AD9F2JCLgzg51iFjf4CjdrlnaKjCfb72swb5t8LB83DSXRI2OQfip1ztqiVOtWp
-         h+pCVqeuc8ogG0Bp72fU+bZfCUhMFUAmu0mYbjKlsX03oLT/Y2xxfu2dmclgE3cqoNqd
-         XCagqhQYHGo02BryRIysoVGGab2af3B/m0R+5f8VpUd1HwKL5AFUFQSYKbLsl09NbBle
-         RSXBpGHpAEWu/O5e5mbet9WxRxdhFBV0S/g9fyqOPna04xAlJk3HTD7EQCrBvqTiuJff
-         sUwaBWHI5PMExnWQISzgs/lyJ++3z9mhcz2j4GPNqWb3EW4ASpHy+0n6WUhtRbtu4mt7
-         RlJQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=h2ey5u0rQyusT9d/zc6U5JsDDVWxF+R85sT24kpAB5c=;
+        b=rR8wMB0WbQzJVmK1fG6vrA9QgvikGKfYsQl+iy+CoUKQ+prDnqBeSkuG178FVewnNR
+         n7PpgaXv02dMHyYy29chR5Ui46SVLx5QcQvAiSauy9uNwq9Tzt47WxTO3BVMOODMgwaL
+         6MHRhl0+ZwymBPoWbQqUVhWwbqvIjmy86Et/RPKmPJ/ZSKZBZTT/KXXhnS+A6U4IDEfw
+         INW6hYTuqzC+srHq80xDOjEV1TEzQbZ1QSWcY9DZzOLwcZzmJDfvKjHy5KbAP3Ll8FgO
+         2aWwhwUq9duT2DQ7p5SbWR3qalA0C9DtOShUzl2J76jUBmG+sDac0gyA0cTw6Y45/Pm4
+         yLhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DAy6fpR5/xZbQxxlH57PWAcHB2SkdiT0qmgOwdkwU3M=;
-        b=FWsz6WwVow9r8ZoTuabfen0yVsa0Y9dw0IqJPiuugjnKvDvpEkRTFrNUB99KgO18Ps
-         6z4W3Yp9/PLJu1DkaXRLwrYn3b9H6nhwZ/sN5P5J49RkdwG1cX4bxbuAerCj5JRirwha
-         GNeEQ5SlmultyZry9bTtC+UOdHyMFSe/bpUDvvDdfWFTwJ2WqU3jNzQip34x0fNC+tX8
-         eiRMuQYqnZibQlqrcYICg9rOJHwHrWAmvgIeCLjJsEYzoXvsVXD7o6buYYIpPTs6MmaE
-         rbBN4GTK18zNst0gAJmbTKCu9Elfh6Re4IIi/0lIww2vMCOogREu0UUvcdfGWoeSlsPb
-         YWEQ==
-X-Gm-Message-State: AOAM531wh9iqg9G2qfCsuUwOxfIYMoqnqKjLEausnMp8+AvZvsQ6A97X
-        a7Y/SdsU8JGs2GH9xvmAi24LS9ryTRGXi1VcRuE=
-X-Google-Smtp-Source: ABdhPJyvh1v32zht01ybkI9BpmyAXJ9zuhxhLNX79/znuJlKBahdpKkN7WLQ9SX66Us26HIqWCH7g05n5hAURXc/6mk=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr8632910oix.48.1594253642055;
- Wed, 08 Jul 2020 17:14:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=h2ey5u0rQyusT9d/zc6U5JsDDVWxF+R85sT24kpAB5c=;
+        b=EUwJWHeyHjK5GBDGz1PD8PVHXIeURKxZNpFXGc5Qp61ai9T2WmBNanoVlSHSUITcL+
+         YkIbIvGVP/ioIpKIoHets4qtwP6fCN6TWpIfDlZyjWWPcPiL14MD1qOrj+x8EpMSxEYZ
+         o9Zkxhi4ljF+yRROi26yxeby35USOwmXPluPsjJQPWNpC863yRtjqBNJRR7qNucL2sJz
+         zd1VwxOFJn1pGOO1PaFJpN7oue+4nTV1On09ZvbZfICtl4oKVxPQX29OP7b83myeX+OM
+         UtQcmw1OmDsps5anJzff6ofFeznwyPUWaq9novPan81Xhzwu0wuqEVv0x/inH/oC1yg+
+         uP5A==
+X-Gm-Message-State: AOAM533dZ5XMFb6b6Q9Omgoc+I5cowRughxYQMbLcbvT4dOt1P+tSJXz
+        wZTMx/CM+2a6n/Cvo2O8bk9MrwWDHInM
+X-Google-Smtp-Source: ABdhPJysCYkfIBcts8kENFrUYmdr3eXiSmrlK8fWILE44f0rLD8RRzITYv0N2MTnGAM7xAIdtT++8g==
+X-Received: by 2002:a05:6214:4c4:: with SMTP id ck4mr59679790qvb.202.1594271999346;
+        Wed, 08 Jul 2020 22:19:59 -0700 (PDT)
+Received: from localhost.localdomain (c-76-119-149-155.hsd1.ma.comcast.net. [76.119.149.155])
+        by smtp.gmail.com with ESMTPSA id p7sm2502952qki.61.2020.07.08.22.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2020 22:19:58 -0700 (PDT)
+From:   Peilin Ye <yepeilin.cs@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org
+Subject: [Linux-kernel-mentees] [PATCH] net/bluetooth: Fix slab-out-of-bounds read in hci_extended_inquiry_result_evt()
+Date:   Thu,  9 Jul 2020 01:18:02 -0400
+Message-Id: <20200709051802.185168-1-yepeilin.cs@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CAEQQxWxKs7ewwVyq4mnsyLbRhErQe9vZc5joNK6zfGSO3wN5bg@mail.gmail.com>
- <d9eca20059088ad8bdaac70d7d98811166839b27.camel@hadess.net>
- <CAEQQxWyz-9iDU5Cs_NjHm81A6kdr0WUXPggp_2DTHeVVAQXUZQ@mail.gmail.com>
- <CABBYNZLzQH5ow02xB61d8pF7pcxXoP7Boa06G-HNxJ0Q66FGRg@mail.gmail.com> <CAEQQxWwzzZoFiGQg7minJU6pLRY=B5-yLSOun+xksZHUAEWgRA@mail.gmail.com>
-In-Reply-To: <CAEQQxWwzzZoFiGQg7minJU6pLRY=B5-yLSOun+xksZHUAEWgRA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Jul 2020 17:13:49 -0700
-Message-ID: <CABBYNZK88np0OWb0F846tGj=HqqBFz7Z+cVi-MjNrkrHMv7c8w@mail.gmail.com>
-Subject: Re: Temporary device removal during discovery
-To:     Andrey Batyiev <batyiev@gmail.com>
-Cc:     Bastien Nocera <hadess@hadess.net>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Andrey,
+Check upon `num_rsp` is insufficient. A malformed event packet with a
+large `num_rsp` number makes hci_extended_inquiry_result_evt() go out
+of bounds. Fix it. Also, make `num_rsp` unsigned.
 
-On Wed, Jul 8, 2020 at 3:57 PM Andrey Batyiev <batyiev@gmail.com> wrote:
->
-> Hi Luiz,
->
-> On Thu, Jul 9, 2020 at 12:14 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> > The delta logic might be a nice addition as a separate patch, it is
-> > more for detecting devices disappearing then actually cleanup during
-> > power off.
-> No-no, it's not about adapter powering off.
->
-> I meant that (external) devices never disappear from the bluez device
-> list during the discovery,
-> even if the (external) devices are turned off (i.e. they should be
-> purged by bluez).
->
-> So:
-> - bluez is central
-> - bluez is discovering
-> - peripheral appear for a moment, than disappear (i.e. peripheral
-> would be turned off)
-> - bluez would not remove device from the list (at least until
-> discovery is stopped)
->
-> Use case:
-> - bluez is monitoring environment (discovering literally forever)
-> - peripherals are brought in and out of bluez visibility range
-> - bluez list of visible devices grows infinitely and causes problems
-> (hundreds of devices)
+This patch fixes the following syzbot bug:
 
-That is exactly what I mean with detecting devices disappearing, so
-I'm fine to introduce such logic and use the temporary timeout so it
-can be removed while an existing discovery is in place.
+    https://syzkaller.appspot.com/bug?id=4bf11aa05c4ca51ce0df86e500fce486552dc8d2
 
+Reported-by: syzbot+d8489a79b781849b9c46@syzkaller.appspotmail.com
+Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+---
+ net/bluetooth/hci_event.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 03a0759f2fc2..29aff5e7dec2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4369,13 +4369,13 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ 					    struct sk_buff *skb)
+ {
+ 	struct inquiry_data data;
+-	struct extended_inquiry_info *info = (void *) (skb->data + 1);
+-	int num_rsp = *((__u8 *) skb->data);
++	struct extended_inquiry_info *info = (void *)(skb->data + 1);
++	__u8 num_rsp = *((__u8 *)skb->data);
+ 	size_t eir_len;
+ 
+ 	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
+ 
+-	if (!num_rsp)
++	if (!num_rsp || num_rsp * sizeof(*info) > skb->truesize)
+ 		return;
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
