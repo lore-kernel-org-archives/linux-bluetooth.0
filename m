@@ -2,119 +2,106 @@ Return-Path: <SRS0=bebH=AU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E546C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 13:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EDB8C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 16:06:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5783E2073A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 13:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C5E420767
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jul 2020 16:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sdQvfSnD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fbYJKts3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726767AbgGINEK (ORCPT
+        id S1728206AbgGIQGl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jul 2020 09:04:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33414 "EHLO
+        Thu, 9 Jul 2020 12:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726320AbgGINEJ (ORCPT
+        with ESMTP id S1726357AbgGIQGl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jul 2020 09:04:09 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90CAC061A0B;
-        Thu,  9 Jul 2020 06:04:09 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id e12so1535600qtr.9;
-        Thu, 09 Jul 2020 06:04:09 -0700 (PDT)
+        Thu, 9 Jul 2020 12:06:41 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4CFC08C5CE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2020 09:06:41 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id g16so1999547pjz.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2020 09:06:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=QGEwhK7+HOB5UDgh/+KiU6/EDHzIv+5VNqxy139wdGM=;
-        b=sdQvfSnDRAJBUsy+ESk4398OyprIdU0M5hUcZa+PA922C/+M4v0Z9UQNrEC4+TYTfA
-         tYneGiD04EOzzYC+Wkznu3Illuf9QZVpbClghcgrU7TSFQQyCuPQpLR/6axtrYtHm8nN
-         LhQNtvhdmlwyLWO1ggwMrTITgwSXREje0yQ7kTRWIE0N7pr1c9LgHgsaetzb0pTI8cA1
-         12xew+zGAloXiRL9HDVvy3Tn8A1y0+bpLIgG0SGtaA8Q89Zyosc3trGCo5iDVkGV3D49
-         TQWx0H/rl1dGETXFQgt7j2/rY/bO/iPkk4a7Qv7syqb8RycQ7I7GRnsXSDomWmElG3Hf
-         ditw==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Y+kIbnGkHotm9lccHj/nLpbXHnZU4LZKnUryVen0AX4=;
+        b=fbYJKts353khLfb+Q/WIRbn0JcADVkHtG3LnD05lA5wN9VzX5D4YX1ZXvuKurOUBNQ
+         uC8WG5Avrv194R7bb+MOBFxw9NZklkPkbx3D6r6liEGwLJF1mDxMniixxQN4fpGffjoe
+         7XuJGPIZpq0KzwzELCxfABIWqYvy9UXcANbx0ZaxLM2vu1IeeFwcJmkfmtS4cEYJJEVK
+         YXd2P+uDeVLqmfjE6AsI2vUBeOWbri6PknX1GlRRETOdadln+zM7IZxIDXzoKeJ0Nnfc
+         rBs0+zK8N/Lk9zmYqZgEZKxDwEGIQ5ni0kmGjudzF3JqbYkUo3BwGnUjSDQrgu0YNIfS
+         lfyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=QGEwhK7+HOB5UDgh/+KiU6/EDHzIv+5VNqxy139wdGM=;
-        b=As9XFwq/lVKGnZ2TyWw8+5TxrsMLQAIpizOaA2q1AC/Q1lZz9T8k6tvIQkqxhc+0/Z
-         /se379FSuEdWNK+uqTSl20r6BuFwA9bhAXKZZ0F+kThs7atMZOAgxQsecEMmCYa2w86C
-         afDk9G7qUt1cOwz7Oxz6kqxX0WFBlROPHcyKMIfFM50JBVGMkmmzgI49R1XMLOA6Dgkp
-         zROAKk14qhTyJgVAvPgDwxuxLXBMbrjXcjBqF8sAiHRKBbdXpcDs4vshAShbiJ1kOGWZ
-         pwQXzPANWIpjBW5328xMnxJr7uqt3OIWsEnC/RmnoPCAusZMdbmrGgcw4v9CUCdLSiiZ
-         Se2Q==
-X-Gm-Message-State: AOAM532etSLmIaRbBg6B4sbDgC0m9XEnnQzRBCDSEgg0VuPoeXS/4bTT
-        lMzYRjxz7IYehC7i9bbU8mOr9wjzsBHa
-X-Google-Smtp-Source: ABdhPJw73GzxPHh95KuS+8iUpcn45BCe3CRu5/OTi7CJ2JO0fCvf4YVaQIXayVOeIH8DOPuKW38axQ==
-X-Received: by 2002:ac8:47d0:: with SMTP id d16mr65906935qtr.349.1594299848927;
-        Thu, 09 Jul 2020 06:04:08 -0700 (PDT)
-Received: from localhost.localdomain (c-76-119-149-155.hsd1.ma.comcast.net. [76.119.149.155])
-        by smtp.gmail.com with ESMTPSA id v62sm3882456qkb.81.2020.07.09.06.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2020 06:04:08 -0700 (PDT)
-From:   Peilin Ye <yepeilin.cs@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
-Subject: [Linux-kernel-mentees] [PATCH v2] net/bluetooth: Fix slab-out-of-bounds read in hci_extended_inquiry_result_evt()
-Date:   Thu,  9 Jul 2020 09:02:24 -0400
-Message-Id: <20200709130224.214204-1-yepeilin.cs@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200709051802.185168-1-yepeilin.cs@gmail.com>
-References: <20200709051802.185168-1-yepeilin.cs@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Y+kIbnGkHotm9lccHj/nLpbXHnZU4LZKnUryVen0AX4=;
+        b=lcHBEz2dbQV2TjBk6sweUZ4ljxNlcfngeXA1+2+JsCma9Z04sTro/QVkRt8zyv/8Oo
+         f2bvwEpHc/zYDozKv3MA54TVyVQmIVaN3RJkTgxEpQLEnaUfk+3dxbaSwmv6wLalUtGF
+         sf2sBIOZKs477dalOo6ZnArzZr9XLv/7tzWEePGsTyrQVkf9eo0JmhXWcmjhM22TnXUq
+         M2kfqWzAXqvVeBHh6FVSvpZ26Lr6TH9Vlcb84/m4rmGxwsYOyXyUr6xq93r3+Ht4XohO
+         XJDTSaCMQWKGTqXrt7Du1/jxcBRZ4lxCf3TZFgZFNyTuW0Btpc64LbamKnuKx2YxGi4A
+         AXlg==
+X-Gm-Message-State: AOAM5306n+pR+CYDqRUX9nNmjVZunjm63kpXkuJy0FPeoFGA/S7jCAhH
+        MzMAqlot6BhL1iVx3tN2Ysl0vtcPT731f/fWu/6fi60XiiNdcbpEpUnw/blgqqyk3BJTtela6y7
+        k+HrJebhCflwbkJtl3M/E2YTqQaUkpgWv8N7d0swGAAUAz1RfViLTHEssMgLiReraHyOWunaYCC
+        oL
+X-Google-Smtp-Source: ABdhPJxWrGtk9geN/md/yQve8C/kI1We/jnmnzs55UKYX/6gx79TbpUBn/tO3WwooC6G4CgHaGOjdbkrD3bt
+X-Received: by 2002:a17:902:be0e:: with SMTP id r14mr28892156pls.309.1594310800664;
+ Thu, 09 Jul 2020 09:06:40 -0700 (PDT)
+Date:   Thu,  9 Jul 2020 09:06:37 -0700
+Message-Id: <20200709090631.Bluez.v1.1.I6aa22c6e425e5b19c321c0768f50ca3fc2c090da@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
+Subject: [Bluez PATCH v1] audio/media - Fix volume sync between media and transport
+From:   Yu Liu <yudiliu@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Hsin-Yu Chao <hychao@chromium.org>, sonnysasaka@chromium.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Check upon `num_rsp` is insufficient. A malformed event packet with a
-large `num_rsp` number makes hci_extended_inquiry_result_evt() go out
-of bounds. Fix it.
+From: Hsin-Yu Chao <hychao@chromium.org>
 
-This patch fixes the following syzbot bug:
+A volume value is cached on the global media player object. And a
+check was used to NOT update volume to each transport if this
+value doesn't change. That is causing problem at disconnect then
+reconnect when the new constructed transport never receive update
+about the last used volume value.
 
-    https://syzkaller.appspot.com/bug?id=4bf11aa05c4ca51ce0df86e500fce486552dc8d2
+Reviewed-by: sonnysasaka@chromium.org
+Reviewed-by: hychao@chromium.org
 
-Reported-by: syzbot+d8489a79b781849b9c46@syzkaller.appspotmail.com
-Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
 ---
-Changes in v2:
-    - Use `skb->len` instead of `skb->truesize` as the length limit.
-    - Leave `num_rsp` as of type `int`.
 
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v1:
+- Initial change
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 03a0759f2fc2..91cb3707d20a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4375,7 +4375,7 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ profiles/audio/media.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 993ecb3b3..92e363de9 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1204,9 +1204,6 @@ static void set_volume(uint8_t volume, struct btd_device *dev, void *user_data)
+ 	struct media_player *mp = user_data;
+ 	GSList *l;
  
- 	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
+-	if (mp->volume == volume)
+-		return;
+-
+ 	mp->volume = volume;
  
--	if (!num_rsp)
-+	if (!num_rsp || skb->len < num_rsp * sizeof(*info))
- 		return;
- 
- 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
+ 	for (l = mp->adapter->endpoints; l; l = l->next) {
 -- 
-2.25.1
+2.27.0.383.g050319c2ae-goog
 
