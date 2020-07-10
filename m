@@ -2,83 +2,141 @@ Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEF3C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C666C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:20:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EF0420674
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:16:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594401363;
-	bh=8BlM6oYrDWVXFwdkiKVw0CvLzU+HCpGIc+rJuBWYCxE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kwoVgnPaaSOSxzRSwoaJYKbR2LnevEm+6sPriSSh2Vk/uCHyIHqRrI4W2JemtPKIN
-	 hGsfDVMmBUyN1FnqrUdQz1gIvU/a/0Hi+bKf6ybdAPN2Idi3gfAUBl+OQ9SVWlmTMW
-	 LIn1y/ScTBHJdGq7yYdls0xWA/iS272zt4gi0fho=
+	by mail.kernel.org (Postfix) with ESMTP id 61B47206A5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:20:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728179AbgGJRP7 (ORCPT
+        id S1727065AbgGJRUc convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 13:15:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728054AbgGJRP5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:15:57 -0400
-Received: from embeddedor (unknown [200.39.25.189])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F2C9D20674;
-        Fri, 10 Jul 2020 17:15:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594401357;
-        bh=8BlM6oYrDWVXFwdkiKVw0CvLzU+HCpGIc+rJuBWYCxE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fBC59ssUIz4aHv6uokkVYB3PO6+eBcxcrP0+g0UwBhDwXCqNru5WyOjP0Q62C4Oxl
-         lSyzkqnvHikOT7xhtOhttveiJ0tzj3HkNXMWNhLMDB+Dmq313C7yuDpD4Tw8hKONYw
-         BWZrxO4wBDXLzZLpeHlDOWFNS7HifqqNwwk19fWg=
-Date:   Fri, 10 Jul 2020 12:21:31 -0500
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use fallthrough pseudo-keyword
-Message-ID: <20200710172131.GA21202@embeddedor>
-References: <20200708202650.GA3866@embeddedor>
- <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        Fri, 10 Jul 2020 13:20:32 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35994 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726977AbgGJRUb (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Jul 2020 13:20:31 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 93CCCCED26;
+        Fri, 10 Jul 2020 19:30:27 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [Bluez PATCH] doc: Add Suspend and Resume events
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200709140928.Bluez.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
+Date:   Fri, 10 Jul 2020 19:20:30 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <22D4931F-A15D-4ECE-9EBC-D080EF6430E2@holtmann.org>
+References: <20200709140928.Bluez.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 07:10:55PM +0200, Marcel Holtmann wrote:
-> Hi Gustavo,
-> 
-> > Replace the existing /* fall through */ comments and its variants with
-> > the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
-> > fall-through markings when it is the case.
-> > 
-> > [1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
-> > 
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> > ---
-> > drivers/bluetooth/bcm203x.c     | 2 +-
-> > drivers/bluetooth/bluecard_cs.c | 2 --
-> > drivers/bluetooth/hci_ll.c      | 2 +-
-> > drivers/bluetooth/hci_qca.c     | 8 +-------
-> > 4 files changed, 3 insertions(+), 11 deletions(-)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
+Hi Abhishek,
 
-Thanks, Marcel.
+> Add Controller Suspend Event and Controller Resume Event to identify
+> suspend or resume of the Bluetooth stack has occurred.
+> 
+> Also update Device Disconnected Event to indicate a new disconnect
+> reason: "Connection terminated by local host for suspend"
+> 
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+> 
+> doc/mgmt-api.txt | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 53 insertions(+)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index ca0d38469..f79c0222c 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -3834,6 +3834,7 @@ Device Disconnected Event
+> 		2	Connection terminated by local host
+> 		3	Connection terminated by remote host
+> 		4	Connection terminated due to authentication failure
+> +		5	Connection terminated by local host for suspend
+> 
+> 	Note that the local/remote distinction just determines which side
+> 	terminated the low-level connection, regardless of the
+> @@ -4577,3 +4578,55 @@ Advertisement Monitor Removed Event
+> 
+> 	The event will only be sent to management sockets other than the
+> 	one through which the command was sent.
+> +
+> +
+> +Controller Suspend Event
+> +========================
+> +
+> +	Event code:		0x002d
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Suspend_State (1 octet)
+> +
+> +	This event indicates that the controller is suspended for host suspend.
+> +
+> +	Possible values for the Suspend_State parameter:
+> +		0	Running (not disconnected)
+> +		1	Disconnected and not scanning
+> +		2	Page scanning and/or passive scanning.
+> +
+> +	The value 0 is used for the running state and may be sent if the
+> +	controller could not be configured to suspend properly.
 
---
-Gustavo
+does it make sense to send a suspend event with state suspend not succeeded. That doesn’t really fit well.
+
+> +
+> +	This event will be sent to all management sockets.
+> +
+> +
+> +Controller Resume Event
+> +=======================
+> +
+> +	Event code:		0x002e
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Address (6 octets)
+> +				Address_Type (1 octet)
+> +				Wake_Reason (1 octet)
+> +
+> +	This event indicates that the controller has resumed from suspend.
+> +
+> +	Possible values for the Wake_Reason parameter:
+> +		0	Unexpected Event
+> +		1	Resume from non-Bluetooth wake source
+> +		2	Connection Request (BR/EDR)
+> +		3	Connection Complete (BR/EDR)
+> +		4	LE Advertisement
+> +		5	LE Direct Advertisement
+> +		6	LE Extended Advertisement
+> +
+> +	We expect that only peer reconnections should wake us from the suspended
+> +	state. Any other events that cause a wakeup will be marked as Unexpected
+> +	Event.
+> +
+> +	If the Wake_Reason was any of the expected wake reasons (values 2-6),
+> +	the address of the peer device that caused the event will be shared in
+> +	Address and Address_Type. Otherwise, Address and Address_Type will both
+> +	be zero.
+
+So I would be using Wake_Reason as first argument. However do you need all this distinction. For example the Device Connected event could gain an extra Flags bit for wakeup. I would especially not make any distinction between the advertising types.
+
+I am in principal fine telling bluetoothd when suspend / resume happened, but letting HCI event specifics bleed into the mgmt API is not really helpful.
+
+Regards
+
+Marcel
+
