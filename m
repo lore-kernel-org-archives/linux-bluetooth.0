@@ -2,65 +2,83 @@ Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CB3C433E8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEF3C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:16:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FCCD20674
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EF0420674
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:16:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594401363;
+	bh=8BlM6oYrDWVXFwdkiKVw0CvLzU+HCpGIc+rJuBWYCxE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=kwoVgnPaaSOSxzRSwoaJYKbR2LnevEm+6sPriSSh2Vk/uCHyIHqRrI4W2JemtPKIN
+	 hGsfDVMmBUyN1FnqrUdQz1gIvU/a/0Hi+bKf6ybdAPN2Idi3gfAUBl+OQ9SVWlmTMW
+	 LIn1y/ScTBHJdGq7yYdls0xWA/iS272zt4gi0fho=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728172AbgGJRLE convert rfc822-to-8bit (ORCPT
+        id S1728179AbgGJRP7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 13:11:04 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58642 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbgGJRK7 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:10:59 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0C750CED27;
-        Fri, 10 Jul 2020 19:20:55 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: RFCOMM: Use fallthrough pseudo-keyword
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200708202505.GA1733@embeddedor>
-Date:   Fri, 10 Jul 2020 19:10:57 +0200
+        Fri, 10 Jul 2020 13:15:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46696 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728054AbgGJRP5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Jul 2020 13:15:57 -0400
+Received: from embeddedor (unknown [200.39.25.189])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F2C9D20674;
+        Fri, 10 Jul 2020 17:15:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594401357;
+        bh=8BlM6oYrDWVXFwdkiKVw0CvLzU+HCpGIc+rJuBWYCxE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fBC59ssUIz4aHv6uokkVYB3PO6+eBcxcrP0+g0UwBhDwXCqNru5WyOjP0Q62C4Oxl
+         lSyzkqnvHikOT7xhtOhttveiJ0tzj3HkNXMWNhLMDB+Dmq313C7yuDpD4Tw8hKONYw
+         BWZrxO4wBDXLzZLpeHlDOWFNS7HifqqNwwk19fWg=
+Date:   Fri, 10 Jul 2020 12:21:31 -0500
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <1DB804F8-B14A-4A27-BB33-8622929F20CF@holtmann.org>
-References: <20200708202505.GA1733@embeddedor>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Use fallthrough pseudo-keyword
+Message-ID: <20200710172131.GA21202@embeddedor>
+References: <20200708202650.GA3866@embeddedor>
+ <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Gustavo,
-
-> Replace the existing /* fall through */ comments and its variants with
-> the new pseudo-keyword macro fallthrough[1].
+On Fri, Jul 10, 2020 at 07:10:55PM +0200, Marcel Holtmann wrote:
+> Hi Gustavo,
 > 
-> [1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
+> > Replace the existing /* fall through */ comments and its variants with
+> > the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
+> > fall-through markings when it is the case.
+> > 
+> > [1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
+> > 
+> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> > ---
+> > drivers/bluetooth/bcm203x.c     | 2 +-
+> > drivers/bluetooth/bluecard_cs.c | 2 --
+> > drivers/bluetooth/hci_ll.c      | 2 +-
+> > drivers/bluetooth/hci_qca.c     | 8 +-------
+> > 4 files changed, 3 insertions(+), 11 deletions(-)
 > 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
-> net/bluetooth/rfcomm/core.c | 2 +-
-> net/bluetooth/rfcomm/sock.c | 2 +-
-> 2 files changed, 2 insertions(+), 2 deletions(-)
+> patch has been applied to bluetooth-next tree.
+> 
 
-patch has been applied to bluetooth-next tree.
+Thanks, Marcel.
 
-Regards
-
-Marcel
-
+--
+Gustavo
