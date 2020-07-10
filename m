@@ -6,35 +6,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7DBC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D1AC433E7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06D1E20674
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA82420674
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727818AbgGJRK5 convert rfc822-to-8bit (ORCPT
+        id S1728209AbgGJRLE convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 13:10:57 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:43121 "EHLO
+        Fri, 10 Jul 2020 13:11:04 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38531 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbgGJRK5 (ORCPT
+        with ESMTP id S1728048AbgGJRLB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:10:57 -0400
+        Fri, 10 Jul 2020 13:11:01 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 755B8CED27;
-        Fri, 10 Jul 2020 19:20:52 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 455FBCED28;
+        Fri, 10 Jul 2020 19:20:57 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: Use fallthrough pseudo-keyword
+Subject: Re: [PATCH] Bluetooth: core: Use fallthrough pseudo-keyword
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200708202650.GA3866@embeddedor>
-Date:   Fri, 10 Jul 2020 19:10:55 +0200
+In-Reply-To: <20200708201823.GA400@embeddedor>
+Date:   Fri, 10 Jul 2020 19:11:00 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
-References: <20200708202650.GA3866@embeddedor>
+Message-Id: <506A63D3-4B3E-4148-B862-2CB5418FF84A@holtmann.org>
+References: <20200708201823.GA400@embeddedor>
 To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -52,11 +55,13 @@ Hi Gustavo,
 > 
 > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 > ---
-> drivers/bluetooth/bcm203x.c     | 2 +-
-> drivers/bluetooth/bluecard_cs.c | 2 --
-> drivers/bluetooth/hci_ll.c      | 2 +-
-> drivers/bluetooth/hci_qca.c     | 8 +-------
-> 4 files changed, 3 insertions(+), 11 deletions(-)
+> net/bluetooth/hci_event.c  |  4 ++--
+> net/bluetooth/hci_sock.c   |  3 +--
+> net/bluetooth/l2cap_core.c | 19 +++++++++----------
+> net/bluetooth/l2cap_sock.c |  4 ++--
+> net/bluetooth/mgmt.c       |  4 ++--
+> net/bluetooth/smp.c        |  2 +-
+> 6 files changed, 17 insertions(+), 19 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
