@@ -2,81 +2,61 @@ Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B4FC433E5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7DBC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D44C2078D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06D1E20674
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:11:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727819AbgGJRIx convert rfc822-to-8bit (ORCPT
+        id S1727818AbgGJRK5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 13:08:53 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42254 "EHLO
+        Fri, 10 Jul 2020 13:10:57 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43121 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbgGJRIx (ORCPT
+        with ESMTP id S1726496AbgGJRK5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:08:53 -0400
+        Fri, 10 Jul 2020 13:10:57 -0400
 Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B137CCED26;
-        Fri, 10 Jul 2020 19:18:48 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 755B8CED27;
+        Fri, 10 Jul 2020 19:20:52 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [Linux-kernel-mentees] [PATCH v3] net/bluetooth: Fix
- slab-out-of-bounds read in hci_extended_inquiry_result_evt()
+Subject: Re: [PATCH] Bluetooth: Use fallthrough pseudo-keyword
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200710160915.228980-1-yepeilin.cs@gmail.com>
-Date:   Fri, 10 Jul 2020 19:08:51 +0200
+In-Reply-To: <20200708202650.GA3866@embeddedor>
+Date:   Fri, 10 Jul 2020 19:10:55 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <43E6945B-1FFE-4283-9F1B-E84AFDCB528F@holtmann.org>
-References: <20200709130224.214204-1-yepeilin.cs@gmail.com>
- <20200710160915.228980-1-yepeilin.cs@gmail.com>
-To:     Peilin Ye <yepeilin.cs@gmail.com>
+Message-Id: <DAA2B121-5D77-4611-86BB-BFBE9200DB7C@holtmann.org>
+References: <20200708202650.GA3866@embeddedor>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Peilin,
+Hi Gustavo,
 
-> Check upon `num_rsp` is insufficient. A malformed event packet with a
-> large `num_rsp` number makes hci_extended_inquiry_result_evt() go out
-> of bounds. Fix it.
+> Replace the existing /* fall through */ comments and its variants with
+> the new pseudo-keyword macro fallthrough[1]. Also, remove unnecessary
+> fall-through markings when it is the case.
 > 
-> This patch fixes the following syzbot bug:
+> [1] https://www.kernel.org/doc/html/latest/process/deprecated.html?highlight=fallthrough#implicit-switch-case-fall-through
 > 
->    https://syzkaller.appspot.com/bug?id=4bf11aa05c4ca51ce0df86e500fce486552dc8d2
-> 
-> Reported-by: syzbot+d8489a79b781849b9c46@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 > ---
-> Change in v3:
->    - Minimum `skb->len` requirement was 1 byte inaccurate since `info`
->      starts from `skb->data + 1`. Fix it.
-> 
-> Changes in v2:
->    - Use `skb->len` instead of `skb->truesize` as the length limit.
->    - Leave `num_rsp` as of type `int`.
-> 
-> net/bluetooth/hci_event.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/bluetooth/bcm203x.c     | 2 +-
+> drivers/bluetooth/bluecard_cs.c | 2 --
+> drivers/bluetooth/hci_ll.c      | 2 +-
+> drivers/bluetooth/hci_qca.c     | 8 +-------
+> 4 files changed, 3 insertions(+), 11 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
