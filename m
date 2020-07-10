@@ -2,86 +2,74 @@ Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB476C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 10:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66FE2C433EA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 12:26:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B81E020767
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 10:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 418C320836
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 12:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594377856;
-	bh=EW9MXB8Q/dnRDJNPSoM2A4yEsAsEcseFCmlJ8Ror7LM=;
+	s=default; t=1594383985;
+	bh=6aBy/efwqSNbHGKVg4ZdfQ85XJ40aFOZJto45y2cftA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fxethKHVyFl+kOsvFKlELZkERNeSPVTX6tVfIL7htJEeKngaNW3k6qvkee2OPsxiw
-	 Ir5yl+yXYc8ljStI7+Qh3SGP5+4RG2LQVjXoOhZEgjWF8L6HEhxInYFp0IRDf8uwgW
-	 USNuBDBFhCXXA6WnbYARDXyyL/i6ZyZUo41v41VU=
+	b=gB5nd3ib7fSF0KFZyP3rnT4Lc6iUM+U+eqwnB6OIxA5KSxBv7V7M7xdOnCbk777Se
+	 xmw5ma9nXSaMnsIg+oowSjdyXmFlmXMItFIhd6wXZuH+CIwKH/riTVUrfB5mfr8RoI
+	 Qj5DsxHoOjHz/KcZLNRq8IgXH1ehvdJBTtijccpo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgGJKnD (ORCPT
+        id S1728024AbgGJM0P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 06:43:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45408 "EHLO mail.kernel.org"
+        Fri, 10 Jul 2020 08:26:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33082 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726816AbgGJKnB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 06:43:01 -0400
+        id S1727886AbgGJM0M (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Jul 2020 08:26:12 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A442920767;
-        Fri, 10 Jul 2020 10:43:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2698520748;
+        Fri, 10 Jul 2020 12:26:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594377781;
-        bh=EW9MXB8Q/dnRDJNPSoM2A4yEsAsEcseFCmlJ8Ror7LM=;
+        s=default; t=1594383971;
+        bh=6aBy/efwqSNbHGKVg4ZdfQ85XJ40aFOZJto45y2cftA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Tgf16EmbXRYSEQZYn/cD34QnoXjzA8+ynp8kG9ZTETZVgYmoZQ9HvJcHNXOiKeHSn
-         ehE3cqhz2C4YyZLSq60EHVpE21xVtudo/UnjDSVTbJXS6+ZLI1L1JyynmCLNZ/0g6z
-         AvmxePRff76ZbZNo72ZomEjDcZUd8MKCvgjWHDRI=
-Date:   Fri, 10 Jul 2020 12:43:06 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Peilin Ye <yepeilin.cs@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Linux-kernel-mentees] [PATCH v2] net/bluetooth: Fix
- slab-out-of-bounds read in hci_extended_inquiry_result_evt()
-Message-ID: <20200710104306.GA1229536@kroah.com>
-References: <20200709051802.185168-1-yepeilin.cs@gmail.com>
- <20200709130224.214204-1-yepeilin.cs@gmail.com>
+        b=FuvBYzFNdOILgKmCl8WTmMc9uSS8TtRrZYsWLdPSFAxtfq1+kcYE+LuW2OMewf2Ib
+         SRdSW9YxYBwNoCddgSNlB9Y802yVLA6F1eXldKyCtWAVowT+aFa8n1TgPe02jfEdxD
+         x8hI83YRkUK4WPcpPky6f/5fN9CqWEI1/zTZP4QE=
+Date:   Fri, 10 Jul 2020 14:26:16 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     rafael.j.wysocki@intel.com, linux-pm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org, swboyd@chromium.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
+        Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH v5 1/1] power: Emit changed uevent on
+ wakeup_sysfs_add/remove
+Message-ID: <20200710122616.GA1536085@kroah.com>
+References: <20200707172845.4177903-1-abhishekpandit@chromium.org>
+ <20200707102823.v5.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200709130224.214204-1-yepeilin.cs@gmail.com>
+In-Reply-To: <20200707102823.v5.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 09:02:24AM -0400, Peilin Ye wrote:
-> Check upon `num_rsp` is insufficient. A malformed event packet with a
-> large `num_rsp` number makes hci_extended_inquiry_result_evt() go out
-> of bounds. Fix it.
+On Tue, Jul 07, 2020 at 10:28:44AM -0700, Abhishek Pandit-Subedi wrote:
+> Udev rules that depend on the power/wakeup attribute don't get triggered
+> correctly if device_set_wakeup_capable is called after the device is
+> created. This can happen for several reasons (driver sets wakeup after
+> device is created, wakeup is changed on parent device, etc) and it seems
+> reasonable to emit a changed event when adding or removing attributes on
+> the device.
 > 
-> This patch fixes the following syzbot bug:
-> 
->     https://syzkaller.appspot.com/bug?id=4bf11aa05c4ca51ce0df86e500fce486552dc8d2
-> 
-> Reported-by: syzbot+d8489a79b781849b9c46@syzkaller.appspotmail.com
-> Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-Bluetooth maintainers, can you also add a cc: stable on this so it gets
-picked up properly there?
-
-thanks,
-
-greg k-h
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
