@@ -2,212 +2,126 @@ Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE379C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC954C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 18:06:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BE2920725
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 17:50:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A636220720
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 18:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="af2/oRs1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXsLtgdI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728044AbgGJRui (ORCPT
+        id S1727046AbgGJSGf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 13:50:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46840 "EHLO
+        Fri, 10 Jul 2020 14:06:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726925AbgGJRui (ORCPT
+        with ESMTP id S1726920AbgGJSGf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:50:38 -0400
-Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71E6C08C5DC
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2020 10:50:37 -0700 (PDT)
-Received: by mail-vs1-xe42.google.com with SMTP id a17so3430630vsq.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2020 10:50:37 -0700 (PDT)
+        Fri, 10 Jul 2020 14:06:35 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E963BC08C5DC
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2020 11:06:34 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id t198so5496708oie.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2020 11:06:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=4rzocPAk8ZjAvLrdFpel7D1BLIGZFyXCyq25N8W6QTc=;
-        b=af2/oRs1dUTONsRkDgibkWKjUlmBXuzOVfP0iIqcwQZRwwsT7GJURaRfW5tfIrVeMM
-         GlUNJ6HqrtqLyH3UMDrtsEiJjXwRxTPbdjLy9925t9XcZhdUHnWxRJWBPdQGyR68lyz9
-         72qG8aDWiFlnQ5JoLd61PyXs/oNv64jPPmXhE=
+         :cc;
+        bh=Mwwxt+6Dm0ceODIWJuacgu8G2+IT6Ypl2+OAhI2wq48=;
+        b=dXsLtgdIutKGrFJ+t1nZg/NvSd2nia9K52l7u1DSdYJeipCK2p/LXuLdR8DopSq8Ey
+         aFTkYa9JUaVVuyPbKqYShTkb6nutyBzRaDWAlTqAi7Qw3JZp7D4rd7isGjIPfqS5qTYx
+         Rm5JbyXzvDrUPUNqgQ0p6VNOyrAthJddWV6o7f9vm1HX92GXRz5AmAWd/Z+WCGZxFAAD
+         BJ+VN4c7NJOrsGqRUeJuiGTjBgWNiK1ZE5vz4jS4mMdOe6AzPVA1sGXtlatVEOBSgL7s
+         J7h9T0zmaAN+U9ofTjzJ3ZQxJpNPF1cweR3q68fE7ZEAeiy4pcuWY5Q+C+meFoJgP67+
+         bAuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4rzocPAk8ZjAvLrdFpel7D1BLIGZFyXCyq25N8W6QTc=;
-        b=Qc7Gj/oAtF+HwO/Iw03T/TfBumXublX3aqAAsCwMP29W1+4a4YkARr5hnV5Ccn251P
-         5SYcyK10Kx9eGDH9eFBgX0nmTsGqw3RyXZo1DdBOXNBsFbXW4lhx9B6LfqfkvlpqRTLE
-         tzeOdAlbrzgAcrWe8viOQ6r0nmqzebnCdoL37qNxIbLK14oEjImSulwYJh/RQFO1nkTM
-         i6sqUDND/aRAH5ppkRC4UvpTb/GRt75QpYinhBFQwmRA9zjblZ60hc41RtN2lCe5GOVB
-         XdMZSpi+ZZ1OH8CNYKGWYR2OzDZPDcMXNXt2z9UEgNERE3abOyfi9GygmBcV/p8UIvma
-         elNQ==
-X-Gm-Message-State: AOAM531RcEd8fC9TSOtQ8gTibjjRVOzUB7lmiTDcNLzM6kNRZPlj5LPB
-        uTcwy8Z8Ge+hm18Mw/NUtRafUb4n5H1cS1bv0ku+qg==
-X-Google-Smtp-Source: ABdhPJyKGKy71roZteV3huBY9UQjAPpitJCambFzQ4Joq33T5VS2hYF6ZJd3PXQXOBnIfvN1WjxleWSNyTNUfbZcSyo=
-X-Received: by 2002:a67:fd0b:: with SMTP id f11mr49031013vsr.93.1594403437055;
- Fri, 10 Jul 2020 10:50:37 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=Mwwxt+6Dm0ceODIWJuacgu8G2+IT6Ypl2+OAhI2wq48=;
+        b=ctFA+DXGfRF4zi8d1AvwxpUzjUbpHJAUtFKlVxHgt4zszZChXeSYRl8F4y4OkTsMRq
+         pclDxJzaqRQuqQ94Ydlo1okFiJbHK1O4i+i2mxyRd32OBHc7PZuwlFzQ3q5snD4JbsPD
+         5u77+Jx9Kz3evI3KsZDOMVOfQrDTXxvmCanSvL6fIQ4ZE8/LzpZsFSxPWpMVH+jsyTW+
+         uv3bdrhKvmHoAgw+uUJjk9wL/MGt+ge///XC0iMbZXg/GhqsVO15IZdT7trYbUnqDISq
+         SHN568WjDbx+SdcO/4gpgp6MJFNQgWzx1Zj7sU8X5S6sPtCMQVEeg+EmdfJqqmEXqn8B
+         UV2Q==
+X-Gm-Message-State: AOAM532YzYRmt//Z/p8mWopeZTvGFeUuURcuWkRXW0CbAOLmU0a331Oc
+        SJLPGE+5L2gH0SA9TYtoSwg15NRNYRM3m24fd1w=
+X-Google-Smtp-Source: ABdhPJyaZ42ywxpwRjsUjOjUP22rq2zM7MRTu54uRilzOkq0s0p5vGnKyQfobFbk+49P1rvCvrxP9wqPuZtteWTRUmY=
+X-Received: by 2002:aca:4a04:: with SMTP id x4mr4898436oia.152.1594404394207;
+ Fri, 10 Jul 2020 11:06:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200709140928.Bluez.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
- <22D4931F-A15D-4ECE-9EBC-D080EF6430E2@holtmann.org>
-In-Reply-To: <22D4931F-A15D-4ECE-9EBC-D080EF6430E2@holtmann.org>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Fri, 10 Jul 2020 10:50:25 -0700
-Message-ID: <CANFp7mWzCnW9YFpWeMGOyh62nsQZ9YmEV29Xg_rDMHEo9A24wg@mail.gmail.com>
-Subject: Re: [Bluez PATCH] doc: Add Suspend and Resume events
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
+References: <CAEQQxWxKs7ewwVyq4mnsyLbRhErQe9vZc5joNK6zfGSO3wN5bg@mail.gmail.com>
+ <d9eca20059088ad8bdaac70d7d98811166839b27.camel@hadess.net>
+ <CAEQQxWyz-9iDU5Cs_NjHm81A6kdr0WUXPggp_2DTHeVVAQXUZQ@mail.gmail.com>
+ <CABBYNZLzQH5ow02xB61d8pF7pcxXoP7Boa06G-HNxJ0Q66FGRg@mail.gmail.com>
+ <CAEQQxWwzzZoFiGQg7minJU6pLRY=B5-yLSOun+xksZHUAEWgRA@mail.gmail.com> <ddb9a0761e52a2e70e1c0dcc6fcefca02937dda6.camel@hadess.net>
+In-Reply-To: <ddb9a0761e52a2e70e1c0dcc6fcefca02937dda6.camel@hadess.net>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 10 Jul 2020 11:06:22 -0700
+Message-ID: <CABBYNZ+y9UTv1yakyB3Z+1oa+B4dw5TmSiuhCmWQCq88sXpXgw@mail.gmail.com>
+Subject: Re: Temporary device removal during discovery
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     Andrey Batyiev <batyiev@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Bastien,
 
-On Fri, Jul 10, 2020 at 10:20 AM Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+On Thu, Jul 9, 2020 at 1:26 AM Bastien Nocera <hadess@hadess.net> wrote:
 >
-> Hi Abhishek,
+> On Thu, 2020-07-09 at 01:57 +0300, Andrey Batyiev wrote:
+> > Hi Luiz,
+> >
+> > On Thu, Jul 9, 2020 at 12:14 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > > The delta logic might be a nice addition as a separate patch, it is
+> > > more for detecting devices disappearing then actually cleanup
+> > > during
+> > > power off.
+> > No-no, it's not about adapter powering off.
+> >
+> > I meant that (external) devices never disappear from the bluez device
+> > list during the discovery,
+> > even if the (external) devices are turned off (i.e. they should be
+> > purged by bluez).
+> >
+> > So:
+> > - bluez is central
+> > - bluez is discovering
+> > - peripheral appear for a moment, than disappear (i.e. peripheral
+> > would be turned off)
+> > - bluez would not remove device from the list (at least until
+> > discovery is stopped)
+> >
+> > Use case:
+> > - bluez is monitoring environment (discovering literally forever)
+> > - peripherals are brought in and out of bluez visibility range
+> > - bluez list of visible devices grows infinitely and causes problems
+> > (hundreds of devices)
 >
-> > Add Controller Suspend Event and Controller Resume Event to identify
-> > suspend or resume of the Bluetooth stack has occurred.
-> >
-> > Also update Device Disconnected Event to indicate a new disconnect
-> > reason: "Connection terminated by local host for suspend"
-> >
-> > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> > ---
-> >
-> > doc/mgmt-api.txt | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 53 insertions(+)
-> >
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index ca0d38469..f79c0222c 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -3834,6 +3834,7 @@ Device Disconnected Event
-> >               2       Connection terminated by local host
-> >               3       Connection terminated by remote host
-> >               4       Connection terminated due to authentication failu=
-re
-> > +             5       Connection terminated by local host for suspend
-> >
-> >       Note that the local/remote distinction just determines which side
-> >       terminated the low-level connection, regardless of the
-> > @@ -4577,3 +4578,55 @@ Advertisement Monitor Removed Event
-> >
-> >       The event will only be sent to management sockets other than the
-> >       one through which the command was sent.
-> > +
-> > +
-> > +Controller Suspend Event
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> > +
-> > +     Event code:             0x002d
-> > +     Controller Index:       <controller_id>
-> > +     Event Parameters:       Suspend_State (1 octet)
-> > +
-> > +     This event indicates that the controller is suspended for host su=
-spend.
-> > +
-> > +     Possible values for the Suspend_State parameter:
-> > +             0       Running (not disconnected)
-> > +             1       Disconnected and not scanning
-> > +             2       Page scanning and/or passive scanning.
-> > +
-> > +     The value 0 is used for the running state and may be sent if the
-> > +     controller could not be configured to suspend properly.
+> I'd also expect devices that are recently discovered to disappear if
+> they haven't replied to a discovery in 30 seconds. It would stop
+> GNOME's Bluetooth Settings's Bluetooth list forever expanding.
 >
-> does it make sense to send a suspend event with state suspend not succeed=
-ed. That doesn=E2=80=99t really fit well.
+> Or we need to give the ability for front-ends to do that by exporting
+> the "last seen" dates.
 
-We don't block suspend if preparing for suspend fails so it's useful
-to know when a suspend was attempted. Also, having the suspend event
-emitted acts as an anchor that lets us search through the HCI trace
-quickly and observe what happened around it to cause an unexpected
-state.
+I am fine with that as well, 30 seconds doesn't sound too bad even for
+cleanup temporary devices as the current 3 minutes seems awful long
+sometimes, we could perhaps have a filter for configuring that though
+so if the application wants to have its own timeout, the only problem
+is if there are multiple application doing that on parallel we would
+need a strategy on how to handle that.
 
->
-> > +
-> > +     This event will be sent to all management sockets.
-> > +
-> > +
-> > +Controller Resume Event
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +     Event code:             0x002e
-> > +     Controller Index:       <controller_id>
-> > +     Event Parameters:       Address (6 octets)
-> > +                             Address_Type (1 octet)
-> > +                             Wake_Reason (1 octet)
-> > +
-> > +     This event indicates that the controller has resumed from suspend=
-.
-> > +
-> > +     Possible values for the Wake_Reason parameter:
-> > +             0       Unexpected Event
-> > +             1       Resume from non-Bluetooth wake source
-> > +             2       Connection Request (BR/EDR)
-> > +             3       Connection Complete (BR/EDR)
-> > +             4       LE Advertisement
-> > +             5       LE Direct Advertisement
-> > +             6       LE Extended Advertisement
-> > +
-> > +     We expect that only peer reconnections should wake us from the su=
-spended
-> > +     state. Any other events that cause a wakeup will be marked as Une=
-xpected
-> > +     Event.
-> > +
-> > +     If the Wake_Reason was any of the expected wake reasons (values 2=
--6),
-> > +     the address of the peer device that caused the event will be shar=
-ed in
-> > +     Address and Address_Type. Otherwise, Address and Address_Type wil=
-l both
-> > +     be zero.
->
-> So I would be using Wake_Reason as first argument. However do you need al=
-l this distinction. For example the Device Connected event could gain an ex=
-tra Flags bit for wakeup. I would especially not make any distinction betwe=
-en the advertising types.
->
-> I am in principal fine telling bluetoothd when suspend / resume happened,=
- but letting HCI event specifics bleed into the mgmt API is not really help=
-ful.
-
-Sure, we can reduce the wake_reason to 0 =3D Unexpected, 1 =3D Non
-bluetooth source, 2 =3D Device Connection.
-
-I think a distinct event is preferable to adding another bit to Device
-Connected.
-a) It acts as an anchor point for searching an HCI trace for suspend occurr=
-ing.
-b) It is resilient to failures in any of the connection events (since
-the Device Connected event sometimes requires subsequent calls to the
-controller before the connection completes).
-c) Properly captures wake from unexpected events. This is really nice
-to understand what events came BEFORE the PM_SUSPEND_DONE event was
-sent by the kernel and would help identify suspend bugs and
-regressions.
-
->
-> Regards
->
-> Marcel
->
+-- 
+Luiz Augusto von Dentz
