@@ -1,129 +1,151 @@
-Return-Path: <SRS0=rPFF=AV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=nBj1=AW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8DDC433E4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 21:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7288AC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jul 2020 11:31:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60EA92075D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jul 2020 21:47:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXA0dnkh"
+	by mail.kernel.org (Postfix) with ESMTP id 5703A2077D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jul 2020 11:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726505AbgGJVrZ (ORCPT
+        id S1728025AbgGKLbl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jul 2020 17:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbgGJVrZ (ORCPT
+        Sat, 11 Jul 2020 07:31:41 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:13526 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726725AbgGKLbl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jul 2020 17:47:25 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA0BC08C5DC;
-        Fri, 10 Jul 2020 14:47:25 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id a14so3294100qvq.6;
-        Fri, 10 Jul 2020 14:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=H4BIXM/X/4TDwBaDfHH2qeLVBAs7PCGQrZDucm3WMQA=;
-        b=lXA0dnkhWEzo+ZcE67jH+G1OgotEBlFxSKDTrTSdVqYCG25rP2YQDQjX8ZX2ow1Q1/
-         XlzIEgUG9K6iyMLvNZFTuxDS7VSBtmGBdcVsjPM+2I8UX3K5VAsatr9rnxB9FfBvjsJq
-         hABIVqaZYYjcKtikl3YtQSstw1Iv512kGKS/L21/Yro9jRmyD8t/OtRiByiwvlFiixgz
-         9C1CnWBNmZQfAm3+g2JVCaxPmzfqZIPr2DvRSCA3EonhzUW4Z3W1oS46s/06jAky2TW1
-         IH0hvL3WhTD98VFnr3vKykPgI2eZVcLjZz8PgsVx1H7itedHXLhQm2hRbCUkxOqFFFll
-         6KaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=H4BIXM/X/4TDwBaDfHH2qeLVBAs7PCGQrZDucm3WMQA=;
-        b=UyFu8h6Y7gp8UktsR9xP2HnmBHHEITCOT5ivZ1aFfuvLQg/bQmpDf4KQCisW8kM+KN
-         UGrbh42GqOjXrvE0TYku82v9qB/vhTLN8vq7q3RxUYTlBLYEFaNuxQfe5OeXlrVaNDH4
-         3izTCPBbYPz38aXUABKBfz4Qyy5KPjU/iWM810WRt8JsRwrYxEJmKglYGGvBbnuDeoK8
-         kn6gW1jSQYyDpvL6avbD+8ofxdp3ibj1i7PPi0AqPgFyAvIPCBA9ozIveZeBYoT3bQoC
-         clYR5d0hgN/aKGSNiiRPbTTX1ptnkN6oh0CDd0ruV6LW1Gq9flIN+rCg4wP0hEdV4A4w
-         n6xg==
-X-Gm-Message-State: AOAM532170PK2l+vuyoXpM1AilKWqKowti22fmSXjB1dhOTNYPw9343Q
-        1ES3DSVmIg6PQ5eDBcjHKw==
-X-Google-Smtp-Source: ABdhPJy+8ouNnOFsAjWlZGUPZPhMenwY4SizL6H6mf4dXiIltgFw3gi7pzw+NnH3gWcRNGhFtiNNMA==
-X-Received: by 2002:a0c:f109:: with SMTP id i9mr66510402qvl.154.1594417644040;
-        Fri, 10 Jul 2020 14:47:24 -0700 (PDT)
-Received: from localhost.localdomain (c-76-119-149-155.hsd1.ma.comcast.net. [76.119.149.155])
-        by smtp.gmail.com with ESMTPSA id p66sm8930426qkf.58.2020.07.10.14.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2020 14:47:23 -0700 (PDT)
-From:   Peilin Ye <yepeilin.cs@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
-Subject: [Linux-kernel-mentees] [PATCH 2/2] net/bluetooth: Prevent out-of-bounds read in hci_inquiry_result_with_rssi_evt()
-Date:   Fri, 10 Jul 2020 17:45:26 -0400
-Message-Id: <82c4e719b7615f5333444bdc2b5cc243a693eeb1.1594414498.git.yepeilin.cs@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <3f69f09d6eb0bc1430cae2894c635252a1cb09e1.1594414498.git.yepeilin.cs@gmail.com>
-References: <3f69f09d6eb0bc1430cae2894c635252a1cb09e1.1594414498.git.yepeilin.cs@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sat, 11 Jul 2020 07:31:41 -0400
+Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
+  by alexa-out.qualcomm.com with ESMTP; 11 Jul 2020 04:31:40 -0700
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg09-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 11 Jul 2020 04:31:38 -0700
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 11 Jul 2020 17:01:16 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id 5534B21515; Sat, 11 Jul 2020 17:01:15 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Bug fixes for SSR
+Date:   Sat, 11 Jul 2020 17:01:12 +0530
+Message-Id: <1594467072-13332-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Check `num_rsp` before using it as for-loop counter. Add `unlock` label.
+1.During SSR for command time out if BT SoC goes to inresponsive
+state, power cycling of BT SoC was not happening.Given the fix by
+sending hw error event to reset the BT SoC.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+2.If SSR is triggered then ignore the transmit data requests to
+BT SoC until SSR is completed.
+
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 ---
- net/bluetooth/hci_event.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/hci_qca.c | 40 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 36 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8b3736c83b8e..f9f4262414b3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4159,6 +4159,9 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
- 		struct inquiry_info_with_rssi_and_pscan_mode *info;
- 		info = (void *) (skb->data + 1);
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 7e39546..bfebefa 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -72,7 +72,8 @@ enum qca_flags {
+ 	QCA_DROP_VENDOR_EVENT,
+ 	QCA_SUSPENDING,
+ 	QCA_MEMDUMP_COLLECTION,
+-	QCA_HW_ERROR_EVENT
++	QCA_HW_ERROR_EVENT,
++	QCA_SSR_TRIGGERED
+ };
  
-+		if (skb->len < num_rsp * sizeof(*info) + 1)
-+			goto unlock;
+ enum qca_capabilities {
+@@ -854,6 +855,13 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 	BT_DBG("hu %p qca enq skb %p tx_ibs_state %d", hu, skb,
+ 	       qca->tx_ibs_state);
+ 
++	if (test_bit(QCA_SSR_TRIGGERED, &qca->flags)) {
++		/* As SSR is in progress,Ignore the packets */
++		bt_dev_dbg(hu->hdev, "SSR is in progress");
++		kfree_skb(skb);
++		return 0;
++	}
 +
- 		for (; num_rsp; num_rsp--, info++) {
- 			u32 flags;
+ 	/* Prepend skb with frame type */
+ 	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
  
-@@ -4180,6 +4183,9 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
- 	} else {
- 		struct inquiry_info_with_rssi *info = (void *) (skb->data + 1);
+@@ -1123,6 +1131,7 @@ static int qca_controller_memdump_event(struct hci_dev *hdev,
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
  
-+		if (skb->len < num_rsp * sizeof(*info) + 1)
-+			goto unlock;
++	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
+ 	skb_queue_tail(&qca->rx_memdump_q, skb);
+ 	queue_work(qca->workqueue, &qca->ctrl_memdump_evt);
+ 
+@@ -1481,6 +1490,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+ 
++	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
+ 	set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+ 	bt_dev_info(hdev, "mem_dump_status: %d", qca->memdump_state);
+ 
+@@ -1529,10 +1539,30 @@ static void qca_cmd_timeout(struct hci_dev *hdev)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+ 
+-	if (qca->memdump_state == QCA_MEMDUMP_IDLE)
++	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
++	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
++		set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
+ 		qca_send_crashbuffer(hu);
+-	else
+-		bt_dev_info(hdev, "Dump collection is in process");
++		qca_wait_for_dump_collection(hdev);
++	} else if (qca->memdump_state == QCA_MEMDUMP_COLLECTING) {
++		/* Let us wait here until memory dump collected or
++		 * memory dump timer expired.
++		 */
++		bt_dev_info(hdev, "waiting for dump to complete");
++		qca_wait_for_dump_collection(hdev);
++	}
 +
- 		for (; num_rsp; num_rsp--, info++) {
- 			u32 flags;
- 
-@@ -4200,6 +4206,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
- 		}
- 	}
- 
-+unlock:
- 	hci_dev_unlock(hdev);
++	mutex_lock(&qca->hci_memdump_lock);
++	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
++		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
++		if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
++			/* Inject hw error event to reset the device
++			 * and driver.
++			 */
++			hci_reset_dev(hu->hdev);
++		}
++	}
++	mutex_unlock(&qca->hci_memdump_lock);
  }
  
+ static int qca_wcn3990_init(struct hci_uart *hu)
+@@ -1643,6 +1673,8 @@ static int qca_setup(struct hci_uart *hu)
+ 	if (ret)
+ 		return ret;
+ 
++	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
++
+ 	if (qca_is_wcn399x(soc_type)) {
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 
 -- 
-2.25.1
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
