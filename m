@@ -2,46 +2,45 @@ Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34114C433E5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F011CC433E1
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 23:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F86421473
+	by mail.kernel.org (Postfix) with ESMTP id D64542145D
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 23:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbgGMXFb (ORCPT
+        id S1726765AbgGMXFc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 19:05:31 -0400
-Received: from mga06.intel.com ([134.134.136.31]:39333 "EHLO mga06.intel.com"
+        Mon, 13 Jul 2020 19:05:32 -0400
+Received: from mga06.intel.com ([134.134.136.31]:39335 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726734AbgGMXFa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 19:05:30 -0400
-IronPort-SDR: EXHd1WoYKZiJkWy2vYXCtQI2crNu+ZdqGHOGo3rO2o7IPhAp+NH7ZMUx+9dQ9IeuWwdN2hlZLt
- Cn7y7IaJVTkw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="210285811"
+        id S1726352AbgGMXFb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Jul 2020 19:05:31 -0400
+IronPort-SDR: 4Q+q0twiCZfmSV/K2YvDX9WZp70E47yHDMDzvj84naVz5/UNbt2r74wx0GA3c93gOWDM+mhEkY
+ GDfSaNbV6oeg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="210285814"
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
-   d="scan'208";a="210285811"
+   d="scan'208";a="210285814"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 16:05:30 -0700
-IronPort-SDR: 268xJKY2evXU6iepcid2z6Syo/nJBmKynY+JgsV4egcNvXRlmP/Qa+AF4sJIoe6dlXEh0k77Qt
- yuNrAypC30wA==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 16:05:31 -0700
+IronPort-SDR: tMTv+b5dKee/Tq6WcIDvq5T1Uq7cxLU4/RIFuL+vXSFUhX4NCCdTbs4B6Cf4Co6ooEx4b38ljg
+ BrytYOHcWpBg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
-   d="scan'208";a="459465780"
+   d="scan'208";a="459465788"
 Received: from unknown (HELO ingas-nuc1.intel.com) ([10.254.112.118])
   by orsmga005.jf.intel.com with ESMTP; 13 Jul 2020 16:05:30 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/3] mesh: Use static array to hold config server response
-Date:   Mon, 13 Jul 2020 16:05:26 -0700
-Message-Id: <20200713230528.107948-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/3] mesh: Add size checks for every opcode in config server
+Date:   Mon, 13 Jul 2020 16:05:27 -0700
+Message-Id: <20200713230528.107948-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200713230528.107948-1-inga.stotland@intel.com>
 References: <20200713230528.107948-1-inga.stotland@intel.com>
@@ -52,178 +51,176 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This eliminates dynamic allocation for long responses and local
-arrays for short responses. Instead, aclear text response from
-config server is written into a static buffer and then encoded
-into dynamically allocated messafe buffer to use in actual
-transmission.
+This adds missing size checks for the incoming config server messages.
 ---
- mesh/cfgmod-server.c | 53 +++++++++++++-------------------------------
- 1 file changed, 16 insertions(+), 37 deletions(-)
+ mesh/cfgmod-server.c | 46 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
 
 diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 14b4a980e..08a74d014 100644
+index 08a74d014..9046a1ad9 100644
 --- a/mesh/cfgmod-server.c
 +++ b/mesh/cfgmod-server.c
-@@ -32,21 +32,20 @@
- #include "mesh/mesh-config.h"
- #include "mesh/cfgmod.h"
+@@ -754,7 +754,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
  
--#define CFG_MAX_MSG_LEN 380
--
- /* Supported composition pages, sorted high to low */
- /* Only page 0 is currently supported */
- static const uint8_t supported_pages[] = {
- 	0
- };
- 
-+static uint8_t msg[MAX_MSG_LEN];
-+
- static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
- 			uint16_t src, uint16_t dst,
- 			uint8_t status, uint16_t ele_addr, uint32_t mod_id,
- 			uint16_t pub_addr, uint16_t idx, bool cred_flag,
- 			uint8_t ttl, uint8_t period, uint8_t retransmit)
- {
--	uint8_t msg[16];
- 	size_t n;
- 
- 	n = mesh_model_opcode_set(OP_CONFIG_MODEL_PUB_STATUS, msg);
-@@ -193,7 +192,6 @@ static void send_sub_status(struct mesh_node *node, uint16_t net_idx,
- 					uint8_t status, uint16_t ele_addr,
- 					uint16_t addr, uint32_t mod)
- {
--	uint8_t msg[12];
- 	int n = mesh_model_opcode_set(OP_CONFIG_MODEL_SUB_STATUS, msg);
- 
- 	msg[n++] = status;
-@@ -224,7 +222,6 @@ static bool config_sub_get(struct mesh_node *node, uint16_t net_idx,
- 	int status;
- 	uint8_t *msg_status;
- 	uint16_t buf_size;
--	uint8_t msg[5 + sizeof(uint16_t) * MAX_GRP_PER_MOD];
- 
- 	/* Incoming message has already been size-checked */
- 	ele_addr = l_get_le16(pkt);
-@@ -430,7 +427,6 @@ static void send_model_app_status(struct mesh_node *node, uint16_t net_idx,
- 					uint8_t status, uint16_t addr,
- 					uint32_t id, uint16_t idx)
- {
--	uint8_t msg[12];
- 	size_t n = mesh_model_opcode_set(OP_MODEL_APP_STATUS, msg);
- 
- 	msg[n++] = status;
-@@ -455,21 +451,14 @@ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
- {
- 	uint16_t ele_addr;
- 	uint32_t mod_id = 0xffff;
--	uint8_t *msg = NULL;
- 	uint8_t *status;
--	uint16_t n, buf_size;
-+	uint16_t n;
- 	int result;
- 
--	buf_size = MAX_BINDINGS * sizeof(uint16_t);
--	msg = l_malloc(7 + buf_size);
--	if (!msg)
--		return;
--
- 	ele_addr = l_get_le16(pkt);
- 
- 	switch (size) {
- 	default:
--		l_free(msg);
- 		return;
- 	case 4:
- 		n = mesh_model_opcode_set(OP_MODEL_APP_LIST, msg);
-@@ -495,7 +484,7 @@ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
- 
- 
- 	result = mesh_model_get_bindings(node, ele_addr, mod_id, msg + n,
--							buf_size, &size);
-+						MAX_MSG_LEN - n, &size);
- 	n += size;
- 
- 	if (result >= 0) {
-@@ -503,8 +492,6 @@ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
- 		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
- 						DEFAULT_TTL, false, msg, n);
- 	}
--
--	l_free(msg);
- }
- 
- static bool model_app_bind(struct mesh_node *node, uint16_t net_idx,
-@@ -736,8 +723,6 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	struct timeval time_now;
- 	uint32_t opcode, tmp32;
- 	int b_res = MESH_STATUS_SUCCESS;
--	uint8_t msg[11];
--	uint8_t *long_msg = NULL;
- 	struct mesh_net_heartbeat *hb;
- 	uint16_t n_idx, a_idx;
- 	uint8_t state, status;
-@@ -771,9 +756,8 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	case OP_DEV_COMP_GET:
  		if (size != 1)
- 			return false;
+-			return false;
++			return true;
  
--		long_msg = l_malloc(CFG_MAX_MSG_LEN);
--		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, long_msg);
--		n += get_composition(node, pkt[0], long_msg + n);
-+		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, msg);
-+		n += get_composition(node, pkt[0], msg + n);
+ 		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, msg);
+ 		n += get_composition(node, pkt[0], msg + n);
+@@ -770,6 +770,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
  
+ 	case OP_CONFIG_DEFAULT_TTL_GET:
++		if (opcode == OP_CONFIG_DEFAULT_TTL_GET && size != 0)
++			return true;
++
+ 		l_debug("Get/Set Default TTL");
+ 
+ 		n = mesh_model_opcode_set(OP_CONFIG_DEFAULT_TTL_STATUS, msg);
+@@ -792,6 +795,8 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
  		break;
  
-@@ -1040,14 +1024,13 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 
- 		n_idx = l_get_le16(pkt);
- 
--		long_msg = l_malloc(CFG_MAX_MSG_LEN);
--		n = mesh_model_opcode_set(OP_APPKEY_LIST, long_msg);
-+		n = mesh_model_opcode_set(OP_APPKEY_LIST, msg);
- 
--		status = appkey_list(net, n_idx, long_msg + n + 3,
--						CFG_MAX_MSG_LEN - n - 3, &size);
-+		status = appkey_list(net, n_idx, msg + n + 3,
-+						MAX_MSG_LEN - n - 3, &size);
- 
--		long_msg[n] = status;
--		l_put_le16(n_idx, long_msg + n + 1);
-+		msg[n] = status;
-+		l_put_le16(n_idx, msg + n + 1);
- 		n += (size + 3);
+ 	case OP_CONFIG_MODEL_PUB_GET:
++		if (size != 4 && size != 6)
++			return true;
+ 		config_pub_get(node, net_idx, src, dst, pkt, size);
  		break;
  
-@@ -1088,11 +1071,10 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+@@ -832,6 +837,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_RELAY_GET:
++		if (opcode == OP_CONFIG_RELAY_GET && size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_CONFIG_RELAY_STATUS, msg);
+ 
+ 		msg[n++] = node_relay_mode_get(node, &count, &interval);
+@@ -853,6 +861,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_NETWORK_TRANSMIT_GET:
++		if (opcode == OP_CONFIG_NETWORK_TRANSMIT_GET && size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_STATUS,
+ 									msg);
+ 		mesh_net_transmit_params_get(net, &count, &interval);
+@@ -869,6 +880,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_PROXY_GET:
++		if (opcode == OP_CONFIG_PROXY_GET && size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_CONFIG_PROXY_STATUS, msg);
+ 
+ 		msg[n++] = node_proxy_mode_get(node);
+@@ -883,9 +897,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		if (n_idx > 0xfff)
+ 			return true;
+ 
+-		/*
+-		 * Currently no support for proxy: node identity not supported
+-		 */
++		/* Currently setting node identity not supported */
+ 
+ 		/* Fall Through */
+ 
+@@ -918,6 +930,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_BEACON_GET:
++		if (opcode == OP_CONFIG_BEACON_GET && size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_CONFIG_BEACON_STATUS, msg);
+ 
+ 		msg[n++] = node_beacon_mode_get(node);
+@@ -932,6 +947,8 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_FRIEND_GET:
++		if (opcode == OP_CONFIG_FRIEND_GET && size != 0)
++			return true;
+ 
+ 		n = mesh_model_opcode_set(OP_CONFIG_FRIEND_STATUS, msg);
+ 
+@@ -1071,13 +1088,14 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
  		break;
  
  	case OP_NETKEY_GET:
--		long_msg = l_malloc(CFG_MAX_MSG_LEN);
--		n = mesh_model_opcode_set(OP_NETKEY_LIST, long_msg);
--		size = CFG_MAX_MSG_LEN - n;
-+		n = mesh_model_opcode_set(OP_NETKEY_LIST, msg);
-+		size = MAX_MSG_LEN - n;
++		if (size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_NETKEY_LIST, msg);
+ 		size = MAX_MSG_LEN - n;
  
--		if (mesh_net_key_list_get(net, long_msg + n, &size))
-+		if (mesh_net_key_list_get(net, msg + n, &size))
+ 		if (mesh_net_key_list_get(net, msg + n, &size))
  			n += size;
- 		else
- 			n = 0;
-@@ -1244,11 +1226,8 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	}
+-		else
+-			n = 0;
+ 		break;
  
- 	if (n)
--		mesh_model_send(node, dst, src,
--				APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL, false,
--				long_msg ? long_msg : msg, n);
--
--	l_free(long_msg);
-+		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
-+						DEFAULT_TTL, false, msg, n);
+ 	case OP_MODEL_APP_BIND:
+@@ -1089,21 +1107,22 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	case OP_VEND_MODEL_APP_GET:
+ 		if (size != 6)
+ 			return true;
++
+ 		model_app_list(node, net_idx, src, dst, pkt, size);
+ 		break;
  
- 	return true;
- }
+ 	case OP_MODEL_APP_GET:
+ 		if (size != 4)
+ 			return true;
++
+ 		model_app_list(node, net_idx, src, dst, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_HEARTBEAT_PUB_SET:
+ 		l_debug("OP_CONFIG_HEARTBEAT_PUB_SET");
+-		if (size != 9) {
+-			l_debug("bad size %d", size);
++		if (size != 9)
+ 			return true;
+-		}
++
+ 		if (pkt[2] > 0x11 || pkt[3] > 0x10 || pkt[4] > 0x7f)
+ 			return true;
+ 		else if (IS_VIRTUAL(l_get_le16(pkt)))
+@@ -1150,6 +1169,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		break;
+ 
+ 	case OP_CONFIG_HEARTBEAT_PUB_GET:
++		if (size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_CONFIG_HEARTBEAT_PUB_STATUS, msg);
+ 		msg[n++] = b_res;
+ 		l_put_le16(hb->pub_dst, msg + n);
+@@ -1179,6 +1201,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		/* Fall through */
+ 
+ 	case OP_CONFIG_HEARTBEAT_SUB_GET:
++		if (opcode == OP_CONFIG_HEARTBEAT_SUB_GET && size != 0)
++			return true;
++
+ 		gettimeofday(&time_now, NULL);
+ 		time_now.tv_sec -= hb->sub_start;
+ 
+@@ -1218,6 +1243,9 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		break;
+ 
+ 	case OP_NODE_RESET:
++		if (size != 0)
++			return true;
++
+ 		n = mesh_model_opcode_set(OP_NODE_RESET_STATUS, msg);
+ 
+ 		/* Delay node removal to give it a chance to send the status */
 -- 
 2.26.2
 
