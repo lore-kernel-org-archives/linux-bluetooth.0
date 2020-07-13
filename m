@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D980DC433E5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA09C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3E332068F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:08:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30CF42068F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UX+daJPI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSBHmv6M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbgGMGIq (ORCPT
+        id S1729059AbgGMGIw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 02:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35138 "EHLO
+        Mon, 13 Jul 2020 02:08:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726571AbgGMGIq (ORCPT
+        with ESMTP id S1726571AbgGMGIw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 02:08:46 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191C3C061794
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 23:08:46 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id p3so5591558pgh.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 23:08:46 -0700 (PDT)
+        Mon, 13 Jul 2020 02:08:52 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76530C061794
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 23:08:52 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id z5so5577355pgb.6
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 23:08:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=s2IcTEAY6E8gqIiH1UvcKWcRD7F04eaPXNmCRRgH/EI=;
-        b=UX+daJPIEuP+dPh8PvOHWEB96LtLs8zZGJ2Sf6WAnNrDdiFL7t/n21KdDqUnkzJveF
-         l1a2A2P+XBmqMMCP+uYgo6Pf87yzjZL5IGshlMRuYCUKLKtw0XITUOmgFkUucLXU3MGJ
-         tOPq6Y+HdDZm6OO1gmb0Dsy06o+ARmCygSpY8YIiASNNvctF2xTldH9i2b56lM6+jiF0
-         IzCDAU34IH1JzG1TPiVFk+zcbMXR5cp04DR3X3sqPYs4v3ufcVGrGJvKam9r1YLG11nj
-         n8GeXfceaekQGucTVpDOrSOeqiFtmSyBCl82v0u8qoX0H6J2CMyllQDebbzYI4sR8Sxe
-         VcOw==
+        bh=gqesOFNLs3tg0XsWgFXS5D1nTeu/tqmZApdWPI1nKEU=;
+        b=SSBHmv6MrXGTdUjKJlZ6wRDj8BYpx0/JsYTjUEAP/hhWS4PoLO1jdYGLn8o3PkdBkU
+         eQySQiT2EA0MfgvDByFUIV8C7lRm6bQXaPLR6isltPw6MFkkNpBcTzpFfsgLO+wy7lxB
+         bhKT7gYlOT8TtM8rGYis7AAEr/UUFmovp6m7TzPkpejgGCCiby4GMrBg2DP6CS29YZS7
+         BsVLSLsBbYscJ3kputOuiejbCDpWEBq/WQb4OTOF0vxZybuT632lIcx6skhVVWzg0rtn
+         CcSCwIliYnp1lWIa9OhZQuZxySUAiZnn8N2m69s9TU6V3Wr3DdPLFTL1JWE0/MuQbpti
+         PdWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=s2IcTEAY6E8gqIiH1UvcKWcRD7F04eaPXNmCRRgH/EI=;
-        b=Qi8/aEk01bResru4tJGJF5ldsmP0RdybwUXTCISyhtgd0uetS2xdlHugC7pXg8zBf4
-         oW8fcY/3ACIo8tpVKQJQX9Pa37LZv7bLxmSj/2LLJiwaJiSGd7R2Gb1f2RM1TMn5EHnt
-         5nO9T17azBNaKt415eGnVTMCTgWa1P6cga7M5rNdq5rSd6YsKu1w8cXCqIYYDANegzXl
-         X5MOHdfwg3aYHXvpZqy2sVAlM4jDz8w3QtgilUlXNNMmh1VlgIOIoItRj9CaZARQbnNj
-         xirXRlxt+d2cSDgsnsUHkwLkodGbgz2dchHhIVctH+70TR8CbNSDVjmBkgld5K4/ZyFj
-         y3LQ==
-X-Gm-Message-State: AOAM532Ie/wNtOuyLFCe0j7fihVapDZql/ZD5q9dGo9XteCMw9K5LjjV
-        y+4LVPA5aDnlQFv9Qf4w8DyEydfFFzyJ8g==
-X-Google-Smtp-Source: ABdhPJy9Uc1Yz2TEZcgp9KLzQFPJzYdZ/F1ZFmHPYFIvdbA+QirBsDe7f06Zg1P2gijcyDo5EGDIrA==
-X-Received: by 2002:a63:b90a:: with SMTP id z10mr64900272pge.277.1594620525467;
-        Sun, 12 Jul 2020 23:08:45 -0700 (PDT)
+        bh=gqesOFNLs3tg0XsWgFXS5D1nTeu/tqmZApdWPI1nKEU=;
+        b=Ya4gIQYMzFHCYlojdQhXSphowk7m2lRLZ6MgoFK8wSbAsemDFZQj93Klck2RdG74hn
+         OIkdFBIyb1ygeW2oxiCwvKWHSYHeUKXWGzscewLsi5Gb3xpDWVc8QG/bI2bDZ89S1BmR
+         +9fPR8Jph7cRBDHipRJu7LkNbMGn1d/eUtPZSWETHM+6IGWeNPILTyjqnd4uWVN2dG0X
+         Eh/aKHvVnZQ+W+HGOuDwkNw0rTD3Z59tT5ujan6NNJUcUy0XYU5vWudaOYFmHGtPCCv+
+         1Q8RmyMgBWVYJ6YhhGm8zD9+T/tHbYRnaKK9CLn4deF75iViDiVRBtL6oJMJL2fBAMQZ
+         zo7g==
+X-Gm-Message-State: AOAM531N6ILq7KVURNL4JdCWdotnSQAFGrF5qkDJnzp5Bqr+j1sOwxwX
+        PKw4/FzOc20o9nS42ib8MKlYXApY58NZ+g==
+X-Google-Smtp-Source: ABdhPJzJyTeFvqjbSipn7qyPqlMZ76dv/zUyZ7JuO6LH/Lc+cj4zebrwguLcfJTr04g/p9nRZJ/e3g==
+X-Received: by 2002:a63:2104:: with SMTP id h4mr69899532pgh.427.1594620531727;
+        Sun, 12 Jul 2020 23:08:51 -0700 (PDT)
 Received: from nsathish-Latitude-7480.iind.intel.com ([192.55.54.40])
-        by smtp.gmail.com with ESMTPSA id e5sm12787172pjy.26.2020.07.12.23.08.43
+        by smtp.gmail.com with ESMTPSA id e5sm12787172pjy.26.2020.07.12.23.08.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2020 23:08:45 -0700 (PDT)
+        Sun, 12 Jul 2020 23:08:51 -0700 (PDT)
 From:   Sathish Narasimman <nsathish41@gmail.com>
 X-Google-Original-From: Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH 4/8] Bluetooth: Translate additional address type during le_conn
-Date:   Mon, 13 Jul 2020 11:42:16 +0530
-Message-Id: <20200713061220.3252-5-sathish.narasimman@intel.com>
+Subject: [PATCH 6/8] Bluetooth: Enable/Disable address resolution during le create conn
+Date:   Mon, 13 Jul 2020 11:42:18 +0530
+Message-Id: <20200713061220.3252-7-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200713061220.3252-1-sathish.narasimman@intel.com>
 References: <20200713061220.3252-1-sathish.narasimman@intel.com>
@@ -74,45 +74,223 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When using controller based address resolution, then the new address
-types 0x02 and 0x03 are used. These types need to be converted back into
-either public address or random address types.
-
-This patch is specially during LE_CREATE_CONN if using own_add_type as 0x02
-or 0x03.
+In this patch if le_create_conn process is started restrict to
+disable address resolution and same is disabled during
+le_enh_connection_complete
 
 Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
 ---
- net/bluetooth/hci_event.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/bluetooth/hci_conn.c    |  7 +++++-
+ net/bluetooth/hci_event.c   |  4 ++++
+ net/bluetooth/hci_request.c | 45 ++++++++++++++++++++++++++++---------
+ net/bluetooth/hci_request.h |  3 ++-
+ net/bluetooth/mgmt.c        |  2 +-
+ 5 files changed, 47 insertions(+), 14 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8805d68e65f2..caf1598758bf 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1003,6 +1003,11 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	struct hci_request req;
+ 	int err;
+ 
++	/* This ensures that during disable le_scan address resolution
++	 * will not be disabled if it is followed by le_create_conn
++	 */
++	bool rpa_le_conn = true;
++
+ 	/* Let's make sure that le is enabled.*/
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+ 		if (lmp_le_capable(hdev))
+@@ -1103,7 +1108,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	 * state.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-		hci_req_add_le_scan_disable(&req);
++		hci_req_add_le_scan_disable(&req, rpa_le_conn);
+ 		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
+ 	}
+ 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 927bde511170..eae5bd4a53ac 100644
+index eae5bd4a53ac..684c68cb5c76 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2296,6 +2296,22 @@ static void cs_le_create_conn(struct hci_dev *hdev, bdaddr_t *peer_addr,
- 	if (!conn)
- 		return;
- 
-+	/* When using controller based address resolution, then the new
-+	 * address types 0x02 and 0x03 are used. These types need to be
-+	 * converted back into either public address or random address type
-+	 */
-+	if (use_ll_privacy(hdev) &&
-+	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
-+		switch (own_address_type) {
-+		case ADDR_LE_DEV_PUBLIC_RESOLVED:
-+			own_address_type = ADDR_LE_DEV_PUBLIC;
-+			break;
-+		case ADDR_LE_DEV_RANDOM_RESOLVED:
-+			own_address_type = ADDR_LE_DEV_RANDOM;
-+			break;
-+		}
-+	}
+@@ -5221,6 +5221,10 @@ static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
+ 			     le16_to_cpu(ev->interval),
+ 			     le16_to_cpu(ev->latency),
+ 			     le16_to_cpu(ev->supervision_timeout));
 +
- 	/* Store the initiator and responder address information which
- 	 * is needed for SMP. These values will not change during the
- 	 * lifetime of the connection.
++	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
++		hci_req_disable_address_resolution(hdev);
+ }
+ 
+ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e16d5154b2cf..c3193f7f9ff0 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -428,7 +428,7 @@ static void __hci_update_background_scan(struct hci_request *req)
+ 		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
+ 			return;
+ 
+-		hci_req_add_le_scan_disable(req);
++		hci_req_add_le_scan_disable(req, false);
+ 
+ 		BT_DBG("%s stopping background scanning", hdev->name);
+ 	} else {
+@@ -447,7 +447,7 @@ static void __hci_update_background_scan(struct hci_request *req)
+ 		 * don't miss any advertising (due to duplicates filter).
+ 		 */
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+-			hci_req_add_le_scan_disable(req);
++			hci_req_add_le_scan_disable(req, false);
+ 
+ 		hci_req_add_le_passive_scan(req);
+ 
+@@ -652,7 +652,7 @@ void __hci_req_update_eir(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
+ }
+ 
+-void hci_req_add_le_scan_disable(struct hci_request *req)
++void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
+@@ -676,8 +676,9 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+ 	}
+ 
++	/* Disable address resolution */
+ 	if (use_ll_privacy(hdev) &&
+-	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
++	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
+ 		__u8 enable = 0x00;
+ 		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
+ 	}
+@@ -1072,7 +1073,7 @@ static void hci_req_config_le_suspend_scan(struct hci_request *req)
+ {
+ 	/* Before changing params disable scan if enabled */
+ 	if (hci_dev_test_flag(req->hdev, HCI_LE_SCAN))
+-		hci_req_add_le_scan_disable(req);
++		hci_req_add_le_scan_disable(req, false);
+ 
+ 	/* Configure params and enable scanning */
+ 	hci_req_add_le_passive_scan(req);
+@@ -1140,7 +1141,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 
+ 		/* Disable LE passive scan if enabled */
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+-			hci_req_add_le_scan_disable(&req);
++			hci_req_add_le_scan_disable(&req, false);
+ 
+ 		/* Mark task needing completion */
+ 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
+@@ -1701,6 +1702,28 @@ int hci_req_update_adv_data(struct hci_dev *hdev, u8 instance)
+ 	return hci_req_run(&req, NULL);
+ }
+ 
++static void enable_addr_resolution_complete(struct hci_dev *hdev, u8 status,
++					    u16 opcode)
++{
++	BT_DBG("%s status %u", hdev->name, status);
++}
++
++void hci_req_disable_address_resolution(struct hci_dev *hdev)
++{
++	struct hci_request req;
++	__u8 enable = 0x00;
++
++	if (!use_ll_privacy(hdev) &&
++	    !hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
++		return;
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add(&req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
++
++	hci_req_run(&req, enable_addr_resolution_complete);
++}
++
+ static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	BT_DBG("%s status %u", hdev->name, status);
+@@ -2626,7 +2649,7 @@ static void bg_scan_update(struct work_struct *work)
+ 
+ static int le_scan_disable(struct hci_request *req, unsigned long opt)
+ {
+-	hci_req_add_le_scan_disable(req);
++	hci_req_add_le_scan_disable(req, false);
+ 	return 0;
+ }
+ 
+@@ -2729,7 +2752,7 @@ static int le_scan_restart(struct hci_request *req, unsigned long opt)
+ 		return 0;
+ 	}
+ 
+-	hci_req_add_le_scan_disable(req);
++	hci_req_add_le_scan_disable(req, false);
+ 
+ 	if (use_ext_scan(hdev)) {
+ 		struct hci_cp_le_set_ext_scan_enable ext_enable_cp;
+@@ -2820,7 +2843,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	 * discovery scanning parameters.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+-		hci_req_add_le_scan_disable(req);
++		hci_req_add_le_scan_disable(req, false);
+ 
+ 	/* All active scans will be done with either a resolvable private
+ 	 * address (when privacy feature has been enabled) or non-resolvable
+@@ -2935,14 +2958,14 @@ bool hci_req_stop_discovery(struct hci_request *req)
+ 
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+ 			cancel_delayed_work(&hdev->le_scan_disable);
+-			hci_req_add_le_scan_disable(req);
++			hci_req_add_le_scan_disable(req, false);
+ 		}
+ 
+ 		ret = true;
+ 	} else {
+ 		/* Passive scanning */
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-			hci_req_add_le_scan_disable(req);
++			hci_req_add_le_scan_disable(req, false);
+ 			ret = true;
+ 		}
+ 	}
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 0e81614d235e..12bea10e7d70 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -65,11 +65,12 @@ void __hci_req_write_fast_connectable(struct hci_request *req, bool enable);
+ void __hci_req_update_name(struct hci_request *req);
+ void __hci_req_update_eir(struct hci_request *req);
+ 
+-void hci_req_add_le_scan_disable(struct hci_request *req);
++void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn);
+ void hci_req_add_le_passive_scan(struct hci_request *req);
+ 
+ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
+ 
++void hci_req_disable_address_resolution(struct hci_dev *hdev);
+ void hci_req_reenable_advertising(struct hci_dev *hdev);
+ void __hci_req_enable_advertising(struct hci_request *req);
+ void __hci_req_disable_advertising(struct hci_request *req);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 686ef4792831..c292d5de4dc3 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5226,7 +5226,7 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+ 
+ 		hci_req_init(&req, hdev);
+ 
+-		hci_req_add_le_scan_disable(&req);
++		hci_req_add_le_scan_disable(&req, false);
+ 		hci_req_add_le_passive_scan(&req);
+ 
+ 		hci_req_run(&req, NULL);
 -- 
 2.17.1
 
