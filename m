@@ -2,80 +2,79 @@ Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FABC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55015C433E4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:15:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AC9020724
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34A812073A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Agzoe9FS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t1YTVsAO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728866AbgGMFJY (ORCPT
+        id S1728869AbgGMFO6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 01:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54324 "EHLO
+        Mon, 13 Jul 2020 01:14:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbgGMFJY (ORCPT
+        with ESMTP id S1725804AbgGMFO6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 01:09:24 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F28FC061794;
-        Sun, 12 Jul 2020 22:09:24 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id o38so9085956qtf.6;
-        Sun, 12 Jul 2020 22:09:24 -0700 (PDT)
+        Mon, 13 Jul 2020 01:14:58 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38958C061794;
+        Sun, 12 Jul 2020 22:14:58 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id b185so11119104qkg.1;
+        Sun, 12 Jul 2020 22:14:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Mgj/wvd79X6Tg0otEw1MjyAhvhEJqLE80+gVPS33EpM=;
-        b=Agzoe9FSrpGTKPO+ZjPAOqoT76Xl/XX1v0yMlXP5nbGof6W1/JAmCMjBdIopUjwhw3
-         FvslyZbteEaNueMND2tqEw7qxjofYqRQ0e0+kgBwpWN656vEtasQf665kounoqet6iGw
-         ui3e9LtGa0wCYk3zVc/2Px7MKpzWlbQjfkvxkO8o2oTDSLoFLW8f0I3N20xDX1llYivr
-         s42qm/WZB7hP0OqjAt+u6tVOn3fb1wBcM9/8EWCrd/c1Mdx2YlLiFkKKeQzpvslWBzLr
-         PXMcAi8wg6/jmwSp+psa2Yw1mLGSyn4DaoJ8J+2FIeX+vyj9SbFURP3TQ6g09gh0/ylh
-         /WPw==
+        bh=HJfMKkuixe8TcFmSgPVFQeX2ebVBk2NIfALDJvpOegk=;
+        b=t1YTVsAOG7g2piVPzr9XqfcOnf1nl6fNsrPCzOhU25jJur4I0iJE19KVWcxP9TixlH
+         hA57KrAkQoI5IRkXUIwJDb5X00QSGkNpOaOxcD3Nan/XQTZVduQjrEg9Z14YNRooh0xq
+         YkYJUAB1lMa26uVrPQtmfvx05NKveu8jVXhT7ISzvFaojV/IuhzB9juQsNLM3nZX6QQD
+         /qypLMf6oZvwdlxwTxzwIwzH7E9u7lNMkYjJAceAoVyAthjE9BnK7zA8TE7Rk6oyIh60
+         ynOFniFe80hCUQ6h5+qkWRhJ8BTalGQHjoywwL3/780fkljffvktE9z46d8S7NnRo8NP
+         Pcrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Mgj/wvd79X6Tg0otEw1MjyAhvhEJqLE80+gVPS33EpM=;
-        b=eYmt97XTYeYGEx/CL1x137GLCcTW2aVrUWhbDWuhrJSHfn5lTz45ZeQJVu971YjoqT
-         fvIP60DVbPWJAD/43IJyx+9TycIOV6L4loRX95wE+10WbcGEdPVPNWEV8UTVCi2EI8ur
-         QUf+JluhuT+0Pk4IAsTh2XJILh3BArQYZaXQoH4pGa3kV38yZYZ1d3vdHP2RR7tbX1Kg
-         vwa7wIXysyvvojI7FgLF+TfmlFybqLvmBYRSnEZS567RzxaMRDdNSfQtDXXuaxtxB5tb
-         PgE72RMtNgSyRz5F5/j4Fn+0VX4xv1gmEUu9BgRfS3mAxSAJLC4EMVNSHJtTu/E42WWy
-         V8qw==
-X-Gm-Message-State: AOAM530msnpKJdt00qb4IXvw/L0X77yPSR+4nvzo5xe5iNlIMppayjTL
-        RH37e/gVl5J3B/SHepdnw8Mv5CbGYaFnwbY3iNUXhTUR
-X-Google-Smtp-Source: ABdhPJzD7BsbNZXIjdhXtbehLOCjRVk4RfzGsSOpsgLAbeS7Uko6VPVwDPPI9M+P5gIgNFSmYPVC02V9b45NXmkMSiY=
-X-Received: by 2002:ac8:40cd:: with SMTP id f13mr79930028qtm.373.1594616963390;
- Sun, 12 Jul 2020 22:09:23 -0700 (PDT)
+        bh=HJfMKkuixe8TcFmSgPVFQeX2ebVBk2NIfALDJvpOegk=;
+        b=RNSKVmAOg6thIvBcvJUq6+3eFdcH5xiFQhlXG6eDRxyKu1jh76dauF/Wcf8Gfr4Szj
+         0mc0eBddzEBohWpVuIgzBXm+J3ucz7Uy/NZYrT3Kak9DHqdXsJ7L5xF+auWrBltrNpJE
+         1ECRdrdmD3ujcWZKz9VC2KX6O7JV2riVu117BsaYF1WXKixyRsO05faBSCspLOjQ7A5W
+         SuaLmRt1j7HQu5N65MUeW/CQOYEIenkt8L7eZPkTlKtf9YERTlTS/+6n/IJYbTaSXOUz
+         QAs3n4P7vSqNjQe569CGCueTbwgqDKnLYUsqKWYmWZ2u702THHU71nTv6wSbEfMzgVeI
+         G/Ew==
+X-Gm-Message-State: AOAM530TRfWQQe0FuEMnTWGtHnCTIpHvAmpfk4oaAuE7NRB7AVjM1dDp
+        rPt0QacZWdkpgA0zh26YNvuW9A2R841sMg9WzhU=
+X-Google-Smtp-Source: ABdhPJzZeRI4Vo+yZmNHHCrZWhnaKiX6BuWRvS5dt2QggK3l73mOoFiEQTzrVHTr+lD9cXIK0pQuLgSHhO8q2rUM2KU=
+X-Received: by 2002:a37:ec7:: with SMTP id 190mr75015576qko.421.1594617297477;
+ Sun, 12 Jul 2020 22:14:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200705195110.405139-1-anarsoul@gmail.com> <20200705195110.405139-2-anarsoul@gmail.com>
- <DF6CC01A-0282-45E2-A437-2E3E58CC2883@holtmann.org>
-In-Reply-To: <DF6CC01A-0282-45E2-A437-2E3E58CC2883@holtmann.org>
+References: <20200705195110.405139-1-anarsoul@gmail.com> <20200705195110.405139-4-anarsoul@gmail.com>
+ <20200706114709.l6poszepqsmg5p5r@gilmour.lan>
+In-Reply-To: <20200706114709.l6poszepqsmg5p5r@gilmour.lan>
 From:   Vasily Khoruzhick <anarsoul@gmail.com>
-Date:   Sun, 12 Jul 2020 22:08:57 -0700
-Message-ID: <CA+E=qVeYT41Wpp4wHgoVFMa9ty-FPsxxvUB-DJDnj07SpWhpjQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Bluetooth: Add new quirk for broken local ext
- features max_page
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
+Date:   Sun, 12 Jul 2020 22:14:31 -0700
+Message-ID: <CA+E=qVe30AEocwi62sJSX7=tRUJ3LeKdgEwtA8trQN4xtMpgTA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] arm64: allwinner: a64: enable Bluetooth On Pinebook
+To:     Maxime Ripard <maxime@cerno.tech>
+Cc:     Rob Herring <robh+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         devicetree <devicetree@vger.kernel.org>,
         arm-linux <linux-arm-kernel@lists.infradead.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
         Ondrej Jirman <megous@megous.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -83,52 +82,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jul 7, 2020 at 9:03 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Jul 6, 2020 at 4:47 AM Maxime Ripard <maxime@cerno.tech> wrote:
 >
-> Hi Vasily,
+> Hi,
 >
-> > Some adapters (e.g. RTL8723CS) advertise that they have more than
-> > 2 pages for local ext features, but they don't support any features
-> > declared in these pages. RTL8723CS reports max_page = 2 and declares
-> > support for sync train and secure connection, but it responds with
-> > either garbage or with error in status on corresponding commands.
+> On Sun, Jul 05, 2020 at 12:51:10PM -0700, Vasily Khoruzhick wrote:
+> > Pinebook has an RTL8723CS WiFi + BT chip, BT is connected to UART1
+> > and uses PL5 as device wake GPIO, PL6 as host wake GPIO the I2C
+> > controlling signals are connected to R_I2C bus.
+> >
+> > Enable it in the device tree.
+> >
+> > Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> > ---
+> >  .../arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >
+> > diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
+> > index 64b1c54f87c0..e63ff271be4e 100644
+> > --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
+> > +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
+> > @@ -408,6 +408,18 @@ &uart0 {
+> >       status = "okay";
+> >  };
+> >
+> > +&uart1 {
+> > +     pinctrl-names = "default";
+> > +     pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
+> > +     status = "okay";
 >
-> please send the btmon for this so I can see what the controller is responding.
+> You probably need uart-has-rtscts here
 
-Here is relevant part:
+Will add in v2
 
-< HCI Command: Read Local Extend.. (0x04|0x0004) plen 1  #228 [hci0] 6.889869
-        Page: 2
-> HCI Event: Command Complete (0x0e) plen 14             #229 [hci0] 6.890487
-      Read Local Extended Features (0x04|0x0004) ncmd 2
-        Status: Success (0x00)
-        Page: 2/2
-        Features: 0x5f 0x03 0x00 0x00 0x00 0x00 0x00 0x00
-          Connectionless Slave Broadcast - Master
-          Connectionless Slave Broadcast - Slave
-          Synchronization Train
-          Synchronization Scan
-          Inquiry Response Notification Event
-          Coarse Clock Adjustment
-          Secure Connections (Controller Support)
-          Ping
-< HCI Command: Delete Stored Lin.. (0x03|0x0012) plen 7  #230 [hci0] 6.890559
-        Address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Delete all: 0x01
-> HCI Event: Command Complete (0x0e) plen 6              #231 [hci0] 6.891170
-      Delete Stored Link Key (0x03|0x0012) ncmd 2
-        Status: Success (0x00)
-        Num keys: 0
-< HCI Command: Read Synchronizat.. (0x03|0x0077) plen 0  #232 [hci0] 6.891199
-> HCI Event: Command Complete (0x0e) plen 9              #233 [hci0] 6.891788
-      Read Synchronization Train Parameters (0x03|0x0077) ncmd 2
-        invalid packet size
-        01 ac bd 11 80 80                                ......
-= Close Index: 00:E0:4C:23:99:87                              [hci0] 6.891832
-
-hci0 registration stops here and bluetoothctl doesn't even see the controller.
-
-> Regards
+> > +
+> > +     bluetooth {
+> > +             compatible = "realtek,rtl8723cs-bt";
+> > +             device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_LOW>; /* PL5 */
+> > +             host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
+> > +     };
 >
-> Marcel
->
+> And max-speed I guess?
+
+There's no max-speed in the schema for this bluetooth controller.
+Moreover it reads uart settings from firmware config. See
+btrtl_get_uart_settings() in drivers/bluetooth/btrtl.c
+
+> Maxime
+> >
