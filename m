@@ -2,169 +2,162 @@ Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 856D8C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 19:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FF3C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 19:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67EAB20738
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 19:18:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BCD520663
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 19:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726356AbgGMTSO convert rfc822-to-8bit (ORCPT
+        id S1726504AbgGMTYT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 15:18:14 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:35879 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726347AbgGMTSO (ORCPT
+        Mon, 13 Jul 2020 15:24:19 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:56955 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726374AbgGMTYS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 15:18:14 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1791CCECCE;
-        Mon, 13 Jul 2020 21:28:10 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2 4/5] Bluetooth: btintel: Define tlv structure for new
- generation Controllers
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200703071212.17046-4-kiran.k@intel.com>
-Date:   Mon, 13 Jul 2020 21:18:11 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        kiraank@gmail.com, Amit K Bag <amit.k.bag@intel.com>,
-        Raghuram Hegde <raghuram.hegde@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <06420AF3-C3AE-44A3-95DC-0A99BE845FC5@holtmann.org>
-References: <20200703071212.17046-1-kiran.k@intel.com>
- <20200703071212.17046-4-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Mon, 13 Jul 2020 15:24:18 -0400
+Received: by mail-il1-f200.google.com with SMTP id w81so3427757ilk.23
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 12:24:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=V7Mn4NNEM06LP8L1Vm2er27FmjQm0mFjhBQQAteUK84=;
+        b=g0MN37McfsNqPC5VNVpNF4w6HjDfImJgG/x/KS/T5F6Z1PF63dPvp7myZnTxMRC4wx
+         EZsn+lirtWtQQ0bcZOdIRmMG2my1eoBqvyXcIkqPHgPd5wJY5Ze8+FTr4wabLWqvpxtf
+         ShNOBhjKwr7IdvWjfEW8p0VFAn8sywWRGJAxv51zwghOIm28/EPjXUuL2YNIo2fMp6Bw
+         U6/rmvNy8miS5wOU5ikcihy1jh47Z23LeJSqFdP/3v1X+8F969OQHYFwEUmdU/L8922R
+         KdW4e8CPkhAawqUoSHP9vpgL8LPbVmKPn5s805y/AdVraGxInvYYAOcuWPNsCpa/C/Az
+         7C6A==
+X-Gm-Message-State: AOAM533FaOX0xnnZRoNgKYxBSHyUoXjMGSvG5mTlje4vVNeg7fdLS9ai
+        lEIaMZjM5HgjsPrU3SBhRctMbYnjBOOJY1cA0/VuYjl2E0cb
+X-Google-Smtp-Source: ABdhPJzT+lWNu0VlZTNXdCmcr7/UEHNw/1fGt8Rft2zNTuf/VQoMNItCVH2ngRVbMDeKgr92CMYbVi+QiLb4ZNodGgTLo9o3VbTt
+MIME-Version: 1.0
+X-Received: by 2002:a6b:7107:: with SMTP id q7mr1318729iog.86.1594668257740;
+ Mon, 13 Jul 2020 12:24:17 -0700 (PDT)
+Date:   Mon, 13 Jul 2020 12:24:17 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000098e7505aa57a3d5@google.com>
+Subject: KASAN: slab-out-of-bounds Read in hci_inquiry_result_with_rssi_evt
+From:   syzbot <syzbot+3a430af182785b4c7360@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux@armlinux.org.uk, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+Hello,
 
-> Define structure used for reading controller information and
-> to downloading firmware in tlv format used for new generation
-> Intel controllers
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Reviewed-by: Sathish Narasimman <Sathish.Narasimman@intel.com>
-> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> ---
-> 
-> Changes in v2: None
-> Changes in v1:
-> - Add tlv structure definition
-> 
-> 
-> drivers/bluetooth/btintel.h | 85 +++++++++++++++++++++++++++++++++++++
-> 1 file changed, 85 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 0865d2d4aca7..20007da6b9bd 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -6,6 +6,90 @@
->  *  Copyright (C) 2015  Intel Corporation
->  */
-> 
-> +/* List of tlv type */
-> +enum {
-> +	INTEL_TLV_CNVI_TOP = 0x10,
-> +	INTEL_TLV_CNVR_TOP,
-> +	INTEL_TLV_CNVI_BT,
-> +	INTEL_TLV_CNVR_BT,
-> +	INTEL_TLV_CNVI_OTP,
-> +	INTEL_TLV_CNVR_OTP,
-> +	INTEL_TLV_DEV_REV_ID,
-> +	INTEL_TLV_USB_VENDOR_ID,
-> +	INTEL_TLV_USB_PRODUCT_ID,
-> +	INTEL_TLV_PCIE_VENDOR_ID,
-> +	INTEL_TLV_PCIE_DEVICE_ID,
-> +	INTEL_TLV_PCIE_SUBSYSTEM_ID,
-> +	INTEL_TLV_IMAGE_TYPE,
-> +	INTEL_TLV_TIME_STAMP,
-> +	INTEL_TLV_BUILD_TYPE,
-> +	INTEL_TLV_BUILD_NUM,
-> +	INTEL_TLV_FW_BUILD_PRODUCT,
-> +	INTEL_TLV_FW_BUILD_HW,
-> +	INTEL_TLV_FW_STEP,
-> +	INTEL_TLV_BT_SPEC,
-> +	INTEL_TLV_MFG_NAME,
-> +	INTEL_TLV_HCI_REV,
-> +	INTEL_TLV_LMP_SUBVER,
-> +	INTEL_TLV_OTP_PATCH_VER,
-> +	INTEL_TLV_SECURE_BOOT,
-> +	INTEL_TLV_KEY_FROM_HDR,
-> +	INTEL_TLV_OTP_LOCK,
-> +	INTEL_TLV_API_LOCK,
-> +	INTEL_TLV_DEBUG_LOCK,
-> +	INTEL_TLV_MIN_FW,
-> +	INTEL_TLV_LIMITED_CCE,
-> +	INTEL_TLV_SBE_TYPE,
-> +	INTEL_TLV_OTP_BDADDR,
-> +	INTEL_TLV_UNLOCKED_STATE
-> +};
-> +
-> +struct intel_tlv {
-> +	u8 type;
-> +	u8 len;
-> +	u8 val[0];
-> +} __packed;
-> +
-> +struct intel_version_tlv {
-> +	u8	 status;
-> +	u32	 cnvi_top;
-> +	u32	 cnvr_top;
-> +	u32	 cnvi_bt;
-> +	u32	 cnvr_bt;
-> +	u16	 cnvi_otp;
-> +	u16	 cnvr_otp;
-> +	u16	 dev_rev_id;
-> +	u16	 usb_vid;
-> +	u16	 usb_pid;
-> +	u16	 pcie_vendor_id;
-> +	u16	 pcie_dev_id;
-> +	u16	 pcie_subsys_id;
-> +	u8	 img_type;
-> +	u16	 timestamp;
-> +	u8	 build_type;
-> +	u32	 build_num;
-> +	u8	 fw_build_prod;
-> +	u8	 fw_build_hw;
-> +	u8	 fw_build_step;
-> +	u8	 bt_spec_ver;
-> +	u16	 mfg_name;
-> +	u16	 hci_rev;
-> +	u16	 lmp_sub_ver;
-> +	u8	 otp_patch_ver;
-> +	u8	 secure_boot;
-> +	u8	 key_from_hdr;
-> +	u8	 otp_lock;
-> +	u8	 api_lock;
-> +	u8	 debug_lock;
-> +	u8	 min_fw_build_nn;
-> +	u8	 min_fw_build_cw;
-> +	u8	 min_fw_build_yy;
-> +	u8	 limited_cce;
-> +	u8	 sbe_type;
-> +	bdaddr_t otp_bd_addr;
-> +	u8	 unlocked_state;
-> +} __packed;
-> +
+syzbot found the following crash on:
 
-This is not required to be __packed. It is not a on-wire structure. In addition, I would just only include the data fields we currently require or want to show in dmesg.
+HEAD commit:    a581387e Merge tag 'io_uring-5.8-2020-07-10' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=173dd65d100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=66ad203c2bb6d8b
+dashboard link: https://syzkaller.appspot.com/bug?extid=3a430af182785b4c7360
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12badf8f100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1000d6db100000
 
-Regards
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+3a430af182785b4c7360@syzkaller.appspotmail.com
 
-Marcel
+==================================================================
+BUG: KASAN: slab-out-of-bounds in memcpy include/linux/string.h:406 [inline]
+BUG: KASAN: slab-out-of-bounds in bacpy include/net/bluetooth/bluetooth.h:274 [inline]
+BUG: KASAN: slab-out-of-bounds in hci_inquiry_result_with_rssi_evt+0x230/0x6b0 net/bluetooth/hci_event.c:4169
+Read of size 6 at addr ffff88809dbc85fb by task kworker/u5:0/1521
 
+CPU: 1 PID: 1521 Comm: kworker/u5:0 Not tainted 5.8.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0xae/0x436 mm/kasan/report.c:383
+ __kasan_report mm/kasan/report.c:513 [inline]
+ kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
+ check_memory_region_inline mm/kasan/generic.c:186 [inline]
+ check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
+ memcpy+0x20/0x60 mm/kasan/common.c:105
+ memcpy include/linux/string.h:406 [inline]
+ bacpy include/net/bluetooth/bluetooth.h:274 [inline]
+ hci_inquiry_result_with_rssi_evt+0x230/0x6b0 net/bluetooth/hci_event.c:4169
+ hci_event_packet+0x1e8c/0x86f5 net/bluetooth/hci_event.c:6103
+ hci_rx_work+0x22e/0xb10 net/bluetooth/hci_core.c:4705
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:291
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+
+Allocated by task 6905:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc.constprop.0+0xc2/0xd0 mm/kasan/common.c:494
+ __kmalloc_reserve net/core/skbuff.c:142 [inline]
+ __alloc_skb+0xae/0x550 net/core/skbuff.c:210
+ alloc_skb include/linux/skbuff.h:1083 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:377 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:165 [inline]
+ vhci_write+0xbd/0x450 drivers/bluetooth/hci_vhci.c:285
+ call_write_iter include/linux/fs.h:1908 [inline]
+ new_sync_write+0x422/0x650 fs/read_write.c:503
+ vfs_write+0x59d/0x6b0 fs/read_write.c:578
+ ksys_write+0x12d/0x250 fs/read_write.c:631
+ do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:384
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Freed by task 4921:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ kasan_set_free_info mm/kasan/common.c:316 [inline]
+ __kasan_slab_free+0xf5/0x140 mm/kasan/common.c:455
+ __cache_free mm/slab.c:3426 [inline]
+ kfree+0x103/0x2c0 mm/slab.c:3757
+ ep_eventpoll_release+0x41/0x60 fs/eventpoll.c:864
+ __fput+0x33c/0x880 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:135
+ tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+ exit_to_usermode_loop arch/x86/entry/common.c:239 [inline]
+ __prepare_exit_to_usermode+0x1e9/0x1f0 arch/x86/entry/common.c:269
+ do_syscall_64+0x6c/0xe0 arch/x86/entry/common.c:393
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+The buggy address belongs to the object at ffff88809dbc8400
+ which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 507 bytes inside of
+ 512-byte region [ffff88809dbc8400, ffff88809dbc8600)
+The buggy address belongs to the page:
+page:ffffea000276f200 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea000288bb48 ffffea0002877488 ffff8880aa000a80
+raw: 0000000000000000 ffff88809dbc8000 0000000100000004 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88809dbc8500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff88809dbc8580: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff88809dbc8600: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                   ^
+ ffff88809dbc8680: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88809dbc8700: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
