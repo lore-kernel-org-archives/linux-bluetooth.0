@@ -2,378 +2,383 @@ Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF44C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 00:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B00C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CD1A206B6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 00:58:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3F2820724
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 05:07:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ho0AkJg2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ThNgHLlS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbgGMA6z (ORCPT
+        id S1728599AbgGMFHy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 12 Jul 2020 20:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
+        Mon, 13 Jul 2020 01:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726262AbgGMA6y (ORCPT
+        with ESMTP id S1725920AbgGMFHy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 12 Jul 2020 20:58:54 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5624CC061794
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 17:58:54 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id g13so8802604qtv.8
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2020 17:58:54 -0700 (PDT)
+        Mon, 13 Jul 2020 01:07:54 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CE8C061794;
+        Sun, 12 Jul 2020 22:07:54 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id a32so9093040qtb.5;
+        Sun, 12 Jul 2020 22:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:autocrypt:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=8vy1eANgDjv0peNQM5v7lWEdM7p24FJdnYs8I5JxYGo=;
-        b=ho0AkJg2Fz+PKv5z/BBMGm8oCmsSDsKlKaVFO94q5H8iZJK5gGTln12RM9MSBX6S6p
-         t6hMPNMyXhUZ1qhOj/8oa6l+2tKCew9MF0NoFGdJTXwCV9rnOP61D82ISfJPLa9xS4Kb
-         zPW+LU5ONgXWmHiwbidNEHmlNyqnqCNPSJJBkXNIZFN+6C3b7Rdkk7BKohj66ILB8Gyz
-         lWSKIUCF37fup42HnIAIJ/+Eq8R6Yp4BfKCDntnthd9r1OsSreyr2NIhzS3bCgNxNqyZ
-         ukwqI9OT4DhhMsalH8jO8HrNGkSf8z+6Orda4BMmhRhCTqwh+jkwuFxyvqGJCLtNcowc
-         K/gg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zn4QovJTObyer1bkeM2XLJCYckJFice9R/PcByfIUJ8=;
+        b=ThNgHLlSpgpnRfaARHvJvVG762LNQbG0fUZAGvcBXEsS3bqrJJN0UVVluSCt8deMyi
+         uWEnzKHO4QMhyjYoomcglALeDyflrhp1TTfcU26u8OzhWaRWQ3oX1YDLWBdwND0nuHAl
+         UI8w13XGp5yb9iP0WzOb8jDEch5c0DFakcv0ZedPje1CspVB56pIH9mLyTKxleRlqMMQ
+         7pS8g/iqBZGI5xpKK6462NsdnHGM5EzeJ1sUDJ2Jh/fi6ZXc1ZXtvO/LT+lb6qAKbiKd
+         N6+mHT/tuREq7G9rdOVgMY2QAIKCr/a3zmcEEFuYrPF/qf5kurc3rbn/t9NfhAadIvR0
+         DK9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:autocrypt:message-id:date
-         :user-agent:mime-version:content-transfer-encoding:content-language;
-        bh=8vy1eANgDjv0peNQM5v7lWEdM7p24FJdnYs8I5JxYGo=;
-        b=N29XkT7B/ybJEx58jU0i8VQDdUMCkqVxlo3cbLNFnFQ7BxLR6AXkv1exTliKXH9wYl
-         XgHe/lfiIFAs7f2y0TzpfbtIyYVLYlNU2Cb+sfkcyh9wHE5Miy9nDnfUvTxu8pYyw7Lv
-         zRRSFTsUN0bOuMh5Yv2xHE/5Sfbqg3/H1KgDGx0IuUN1GIdTePh3Inz5cxopfcJ8qdZE
-         RdLTsMDE8XhGlDji5Yefr9M0YMMKBjzcl7A0alFU3Ip7kdvAOww7zZNAiDxDc44kpCqb
-         OyONAKUXTKQSWuDn/zax+3iSmP1X/iFMalOHLKrPpbvwnp8ifgNy4ZwbmciJ+Kk7/9Cf
-         5WYA==
-X-Gm-Message-State: AOAM533CUAuaLu4CA09a4Y3SE989g5zIZAT+8NB/BzV1Mk6lUzrZATZQ
-        0yY1yR0z7pGQ2PsMkk0ROPB44EZL
-X-Google-Smtp-Source: ABdhPJzAS28sN5C71smpN3FK+vQP3402Hh2tb6cvDfd/skXwzw/6fnFgmsdao+XXgdeTvDckLnUvfQ==
-X-Received: by 2002:ac8:19d3:: with SMTP id s19mr73308804qtk.356.1594601933040;
-        Sun, 12 Jul 2020 17:58:53 -0700 (PDT)
-Received: from meimei.greshko.com (2001-b030-112f-0000-0000-0000-0000-140e.hinet-ip6.hinet.net. [2001:b030:112f::140e])
-        by smtp.gmail.com with ESMTPSA id p5sm8501428qtb.62.2020.07.12.17.58.51
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Jul 2020 17:58:52 -0700 (PDT)
-From:   Ed Greshko <ed.greshko@gmail.com>
-X-Google-Original-From: Ed Greshko <Ed.Greshko@gmail.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Unsupported Adapter?
-Autocrypt: addr=Ed.Greshko@gmail.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <5c552dc0-1ef8-ae35-b51a-b6889853d535@gmail.com>
-Date:   Mon, 13 Jul 2020 08:58:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zn4QovJTObyer1bkeM2XLJCYckJFice9R/PcByfIUJ8=;
+        b=Mqo4xTEg+LSiv8KVRtSQbunBh2qZzoVqHAT7J9Xk1jsq7vdq71e66bZZ57O24DwlmP
+         zY2ApVmqFtRDTdMT79fiylaNGcdd8YucK5lLpwlMXL520QbNs5FctLJy59Ag12SgTdv3
+         MonW24/lKZfWaw1mt9EQjz1jDYskDN0N54UVD4iprhQesD3y4Y8zu/G6K/AMC5QHWFl6
+         Vo9YQOvNyueb3T1JZ/oxdMLFwt4ycv1So3A7jIJq/JE66gtbu4su5n74CGuJu141b8wb
+         663QlDH76HCmAlkZdjGjLdj0N+Z1I5WedFdmP+uzchxlsjZSEP1PPowPdn2MHJPU+3rJ
+         EZhg==
+X-Gm-Message-State: AOAM533mope4/FrgVtxmR6j8UvKdXkNhvN8lWRSrF5nj+OHHBceRhuUD
+        s6RrJxV/IYg5ggkdHrgBWJI27c4BWPe3pueCWlI=
+X-Google-Smtp-Source: ABdhPJwAyvvGNRCcOOt8bd/qMLFaLFQW73VNJhJJ0aRdBdnbxvk2SK/yLjDUI7jnRE1G6McBbITWAyI7HcCP3XNgRmw=
+X-Received: by 2002:ac8:6d1a:: with SMTP id o26mr76449982qtt.87.1594616873269;
+ Sun, 12 Jul 2020 22:07:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20200705195110.405139-1-anarsoul@gmail.com> <20200705195110.405139-3-anarsoul@gmail.com>
+ <99A48FC7-0DCB-42F9-A3E3-91292BB92100@holtmann.org>
+In-Reply-To: <99A48FC7-0DCB-42F9-A3E3-91292BB92100@holtmann.org>
+From:   Vasily Khoruzhick <anarsoul@gmail.com>
+Date:   Sun, 12 Jul 2020 22:07:27 -0700
+Message-ID: <CA+E=qVegvJqvVWNb7V-QHG0BDFJP6GYw7P36_M33xmRMcyetGw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Bluetooth: btrtl: add support for the RTL8723CS
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        arm-linux <linux-arm-kernel@lists.infradead.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Tue, Jul 7, 2020 at 9:01 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Vasily,
+>
+> > The Realtek RTL8723CS is SDIO WiFi chip. It also contains a Bluetooth
+> > module which is connected via UART to the host.
+> >
+> > It shares lmp subversion with 8703B, so Realtek's userspace
+> > initialization tool (rtk_hciattach) differentiates varieties of RTL8723CS
+> > (CG, VF, XX) with RTL8703B using vendor's command to read chip type.
+> >
+> > Also this chip declares support for some features it doesn't support
+> > so add a quirk to indicate that these features are broken.
+> >
+> > Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> > ---
+> > drivers/bluetooth/btrtl.c  | 128 ++++++++++++++++++++++++++++++++++++-
+> > drivers/bluetooth/btrtl.h  |  12 ++++
+> > drivers/bluetooth/hci_h5.c |   6 ++
+> > 3 files changed, 143 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> > index 3a9afc905f24..8c7b35abe492 100644
+> > --- a/drivers/bluetooth/btrtl.c
+> > +++ b/drivers/bluetooth/btrtl.c
+> > @@ -17,8 +17,12 @@
+> >
+> > #define VERSION "0.1"
+> >
+> > +#define RTL_CHIP_8723CS_CG   3
+> > +#define RTL_CHIP_8723CS_VF   4
+> > +#define RTL_CHIP_8723CS_XX   5
+> > #define RTL_EPATCH_SIGNATURE  "Realtech"
+> > #define RTL_ROM_LMP_3499      0x3499
+> > +#define RTL_ROM_LMP_8703B    0x8703
+> > #define RTL_ROM_LMP_8723A     0x1200
+> > #define RTL_ROM_LMP_8723B     0x8723
+> > #define RTL_ROM_LMP_8723D     0x8873
+> > @@ -31,6 +35,7 @@
+> > #define IC_MATCH_FL_HCIREV    (1 << 1)
+> > #define IC_MATCH_FL_HCIVER    (1 << 2)
+> > #define IC_MATCH_FL_HCIBUS    (1 << 3)
+> > +#define IC_MATCH_FL_CHIP_TYPE        (1 << 4)
+> > #define IC_INFO(lmps, hcir) \
+> >       .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV, \
+> >       .lmp_subver = (lmps), \
+> > @@ -42,6 +47,7 @@ struct id_table {
+> >       __u16 hci_rev;
+> >       __u8 hci_ver;
+> >       __u8 hci_bus;
+> > +     __u8 chip_type;
+> >       bool config_needed;
+> >       bool has_rom_version;
+> >       char *fw_name;
+> > @@ -89,6 +95,39 @@ static const struct id_table ic_id_table[] = {
+> >         .fw_name  = "rtl_bt/rtl8723b_fw.bin",
+> >         .cfg_name = "rtl_bt/rtl8723b_config" },
+> >
+> > +     /* 8723CS-CG */
+> > +     { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
+> > +                      IC_MATCH_FL_HCIBUS,
+> > +       .lmp_subver = RTL_ROM_LMP_8703B,
+> > +       .chip_type = RTL_CHIP_8723CS_CG,
+> > +       .hci_bus = HCI_UART,
+> > +       .config_needed = true,
+> > +       .has_rom_version = true,
+> > +       .fw_name  = "rtl_bt/rtl8723cs_cg_fw.bin",
+> > +       .cfg_name = "rtl_bt/rtl8723cs_cg_config" },
+> > +
+> > +     /* 8723CS-VF */
+> > +     { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
+> > +                      IC_MATCH_FL_HCIBUS,
+> > +       .lmp_subver = RTL_ROM_LMP_8703B,
+> > +       .chip_type = RTL_CHIP_8723CS_VF,
+> > +       .hci_bus = HCI_UART,
+> > +       .config_needed = true,
+> > +       .has_rom_version = true,
+> > +       .fw_name  = "rtl_bt/rtl8723cs_vf_fw.bin",
+> > +       .cfg_name = "rtl_bt/rtl8723cs_vf_config" },
+> > +
+> > +     /* 8723CS-XX */
+> > +     { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
+> > +                      IC_MATCH_FL_HCIBUS,
+> > +       .lmp_subver = RTL_ROM_LMP_8703B,
+> > +       .chip_type = RTL_CHIP_8723CS_XX,
+> > +       .hci_bus = HCI_UART,
+> > +       .config_needed = true,
+> > +       .has_rom_version = true,
+> > +       .fw_name  = "rtl_bt/rtl8723cs_xx_fw.bin",
+> > +       .cfg_name = "rtl_bt/rtl8723cs_xx_config" },
+> > +
+> >       /* 8723D */
+> >       { IC_INFO(RTL_ROM_LMP_8723B, 0xd),
+> >         .config_needed = true,
+> > @@ -171,7 +210,8 @@ static const struct id_table ic_id_table[] = {
+> >       };
+> >
+> > static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+> > -                                          u8 hci_ver, u8 hci_bus)
+> > +                                          u8 hci_ver, u8 hci_bus,
+> > +                                          u8 chip_type)
+> > {
+> >       int i;
+> >
+> > @@ -188,6 +228,9 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+> >               if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIBUS) &&
+> >                   (ic_id_table[i].hci_bus != hci_bus))
+> >                       continue;
+> > +             if ((ic_id_table[i].match_flags & IC_MATCH_FL_CHIP_TYPE) &&
+> > +                 (ic_id_table[i].chip_type != chip_type))
+> > +                     continue;
+> >
+> >               break;
+> >       }
+> > @@ -270,6 +313,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+> >               { RTL_ROM_LMP_8723B, 1 },
+> >               { RTL_ROM_LMP_8821A, 2 },
+> >               { RTL_ROM_LMP_8761A, 3 },
+> > +             { RTL_ROM_LMP_8703B, 7 },
+> >               { RTL_ROM_LMP_8822B, 8 },
+> >               { RTL_ROM_LMP_8723B, 9 },       /* 8723D */
+> >               { RTL_ROM_LMP_8821A, 10 },      /* 8821C */
+> > @@ -545,6 +589,48 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
+> >       return ret;
+> > }
+> >
+> > +static bool rtl_has_chip_type(u16 lmp_subver)
+> > +{
+> > +     switch (lmp_subver) {
+> > +     case RTL_ROM_LMP_8703B:
+> > +             return true;
+> > +     default:
+> > +             break;
+> > +     }
+> > +
+> > +     return  false;
+> > +}
+> > +
+> > +static int rtl_read_chip_type(struct hci_dev *hdev, u8 *type)
+> > +{
+> > +     struct rtl_chip_type_evt *chip_type;
+> > +     struct sk_buff *skb;
+> > +     const unsigned char cmd_buf[] = {0x00, 0x94, 0xa0, 0x00, 0xb0};
+> > +
+> > +     /* Read RTL chip type command */
+> > +     skb = __hci_cmd_sync(hdev, 0xfc61, 5, cmd_buf, HCI_INIT_TIMEOUT);
+> > +     if (IS_ERR(skb)) {
+> > +             rtl_dev_err(hdev, "Read chip type failed (%ld)",
+> > +                         PTR_ERR(skb));
+> > +             return PTR_ERR(skb);
+> > +     }
+> > +
+> > +     if (skb->len != sizeof(*chip_type)) {
+> > +             rtl_dev_err(hdev, "RTL chip type event length mismatch");
+> > +             kfree_skb(skb);
+> > +             return -EIO;
+> > +     }
+> > +
+> > +     chip_type = (struct rtl_chip_type_evt *)skb->data;
+> > +     rtl_dev_info(hdev, "chip_type status=%x type=%x",
+> > +                  chip_type->status, chip_type->type);
+> > +
+> > +     *type = chip_type->type & 0x0f;
+> > +
+> > +     kfree_skb(skb);
+> > +     return 0;
+> > +}
+> > +
+> > void btrtl_free(struct btrtl_device_info *btrtl_dev)
+> > {
+> >       kvfree(btrtl_dev->fw_data);
+> > @@ -561,7 +647,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+> >       struct hci_rp_read_local_version *resp;
+> >       char cfg_name[40];
+> >       u16 hci_rev, lmp_subver;
+> > -     u8 hci_ver;
+> > +     u8 hci_ver, chip_type = 0;
+> >       int ret;
+> >
+> >       btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
+> > @@ -586,8 +672,14 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+> >       lmp_subver = le16_to_cpu(resp->lmp_subver);
+> >       kfree_skb(skb);
+> >
+> > +     if (rtl_has_chip_type(lmp_subver)) {
+> > +             ret = rtl_read_chip_type(hdev, &chip_type);
+> > +             if (ret)
+> > +                     goto err_free;
+> > +     }
+> > +
+> >       btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
+> > -                                         hdev->bus);
+> > +                                         hdev->bus, chip_type);
+> >
+> >       if (!btrtl_dev->ic_info) {
+> >               rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
+> > @@ -660,6 +752,7 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+> >       case RTL_ROM_LMP_8821A:
+> >       case RTL_ROM_LMP_8761A:
+> >       case RTL_ROM_LMP_8822B:
+> > +     case RTL_ROM_LMP_8703B:
+> >               return btrtl_setup_rtl8723b(hdev, btrtl_dev);
+> >       default:
+> >               rtl_dev_info(hdev, "assuming no firmware upload needed");
+> > @@ -678,7 +771,12 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+> >               return PTR_ERR(btrtl_dev);
+> >
+> >       ret = btrtl_download_firmware(hdev, btrtl_dev);
+> > +     if (ret)
+> > +             goto out_free;
+> >
+> > +     btrtl_apply_quirks(hdev, btrtl_dev);
+> > +
+> > +out_free:
+> >       btrtl_free(btrtl_dev);
+> >
+> >       /* Enable controller to do both LE scan and BR/EDR inquiry
+> > @@ -818,6 +916,24 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+> > }
+> > EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
+> >
+> > +void btrtl_apply_quirks(struct hci_dev *hdev,
+> > +                     struct btrtl_device_info *btrtl_dev)
+> > +{
+> > +     switch (btrtl_dev->ic_info->lmp_subver) {
+> > +     case RTL_ROM_LMP_8703B:
+> > +             /* 8723CS reports two pages for local ext features,
+> > +              * but it doesn't support any features from page 2 -
+> > +              * it either responds with garbage or with error status
+> > +              */
+> > +             set_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FTR_MAX_PAGE,
+> > +                     &hdev->quirks);
+> > +             break;
+> > +     default:
+> > +             break;
+> > +     }
+> > +}
+> > +EXPORT_SYMBOL_GPL(btrtl_apply_quirks);
+> > +
+> > MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
+> > MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
+> > MODULE_VERSION(VERSION);
+> > @@ -827,6 +943,12 @@ MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_cg_fw.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_cg_config.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_fw.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_config.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_fw.bin");
+> > +MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_config.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
+> > MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+> > diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+> > index 2a582682136d..152ed2ece4c2 100644
+> > --- a/drivers/bluetooth/btrtl.h
+> > +++ b/drivers/bluetooth/btrtl.h
+> > @@ -14,6 +14,11 @@
+> >
+> > struct btrtl_device_info;
+> >
+> > +struct rtl_chip_type_evt {
+> > +     __u8 status;
+> > +     __u8 type;
+> > +} __packed;
+> > +
+> > struct rtl_download_cmd {
+> >       __u8 index;
+> >       __u8 data[RTL_FRAG_LEN];
+> > @@ -60,6 +65,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+> >                           struct btrtl_device_info *btrtl_dev,
+> >                           unsigned int *controller_baudrate,
+> >                           u32 *device_baudrate, bool *flow_control);
+> > +void btrtl_apply_quirks(struct hci_dev *hdev,
+> > +                     struct btrtl_device_info *btrtl_dev);
+> >
+> > #else
+> >
+> > @@ -96,6 +103,11 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
+> >                                         bool *flow_control)
+> > {
+> >       return -ENOENT;
+> > +
+> > +static inline void btrtl_apply_quirks(struct hci_dev *hdev,
+> > +                     struct btrtl_device_info *btrtl_dev)
+> > +{
+> > +}
+> > }
+>
+> this hunk is fundamentally broken.
 
-I'm running the Fedora 32 disto and bluez-5.54-1.fc32 is installed.
+Will fix in v2
 
-I have 2 bluetooth dongles.  One is recognized and the other isn't.
-The one not recognized is shown in lsusb.
-
-The info is as below.  It there a process to get an adapter supported?
-
-Bus 002 Device 008: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-  idProduct          0x0001 Bluetooth Dongle (HCI mode)
-  bcdDevice           88.91
-  iManufacturer           0
-  iProduct                2 USB1.1-A￿翼
-  iSerial                 0
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength       0x00b1
-    bNumInterfaces          2
-    bConfigurationValue     1
-    iConfiguration          0
-    bmAttributes         0xe0
-      Self Powered
-      Remote Wakeup
-    MaxPower              100mA
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        0
-      bAlternateSetting       0
-      bNumEndpoints           3
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x81  EP 1 IN
-        bmAttributes            3
-          Transfer Type            Interrupt
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0010  1x 16 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x02  EP 2 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x82  EP 2 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       1
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       2
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       3
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       4
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       5
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x003f  1x 63 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x003f  1x 63 bytes
-        bInterval               1
-Device Status:     0x0000
-  (Bus Powered)
+> Regards
+>
+> Marcel
+>
