@@ -2,108 +2,107 @@ Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBF4C433E5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7EFC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 07:45:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B308620674
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 06:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 396EB20674
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 07:45:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Kc5iLI/i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728949AbgGMG2G convert rfc822-to-8bit (ORCPT
+        id S1728118AbgGMHpu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 02:28:06 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:38951 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgGMG2F (ORCPT
+        Mon, 13 Jul 2020 03:45:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50134 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727035AbgGMHps (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 02:28:05 -0400
-Received: from [192.168.1.91] (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CFBE6CECA3;
-        Mon, 13 Jul 2020 08:38:01 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 1/3] Bluetooth: Add new quirk for broken local ext
- features max_page
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+E=qVeYT41Wpp4wHgoVFMa9ty-FPsxxvUB-DJDnj07SpWhpjQ@mail.gmail.com>
-Date:   Mon, 13 Jul 2020 08:27:33 +0200
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
+        Mon, 13 Jul 2020 03:45:48 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73964C061794
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 00:45:48 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id 1so5637849pfn.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 00:45:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+xSpopuz70JG6iQfzM5HgibXAJUo1c/P7qmmEsvws9s=;
+        b=Kc5iLI/iQywUAZzcS/x0aAofjXobkcKggku2JP87VotyNaCUPk2Py7OWxK8E9eVaxa
+         CahAMnsRsqRjstEh9jYRglZqFJ7nQJNIVORRbfGSzjOG/UdG8t6tQqFc39Acu563iNdX
+         74kCvC+jQYgz/0vCK77oVtwe7UbVamVpsCR9Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+xSpopuz70JG6iQfzM5HgibXAJUo1c/P7qmmEsvws9s=;
+        b=tCfpOzvkXhRJeAztnorglS5UQ2f1DYY4XMqXlce5hfRUVKXtjAqThuF0LxgFl2Qjuc
+         5Xjr/eIB5vDy+RlCsAVIt4v2y99Owl6qzAeCS4g8VsByUp8VYLNlnvu3DmQLwERtjFNy
+         m/5p1AfQCyZFQ36ndAC3M2R06fr1Q6jedrrUHnRJRcHm5WZhmQTedueXuWYVc+h9+dqA
+         730o6Ha8bLmqZ+AsADvI1ONeqIYg7RqRuZDBRwNQn5C+xGvElDfOBzYjno6d8p5WtvHx
+         6mAWdV3rZ+I3bawmRjwDXDoOu0bFmY6GnatO4E/0NS5WzHkntmVPpV+j3wdJCDPbouuC
+         FuNg==
+X-Gm-Message-State: AOAM532lKvpps67rk7f97t07WRcOYCCuOMw96ZN1ze0kYC+gcwFBoBSV
+        Z5Vo1gx1xXi9nUIDaab0QKllUDtyVXBTCw==
+X-Google-Smtp-Source: ABdhPJzW69Vm+lK8/pCwW1u4QfMsHRO3SS16AexP6hozF17c7XNzQfwn82/Bxo+zSG+hxNagRn79rQ==
+X-Received: by 2002:a65:4bc8:: with SMTP id p8mr67352267pgr.418.1594626347737;
+        Mon, 13 Jul 2020 00:45:47 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:de4a:3eff:fe7d:ff5f])
+        by smtp.gmail.com with ESMTPSA id g8sm12691498pgr.70.2020.07.13.00.45.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2020 00:45:46 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>, alainm@chromium.org,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        arm-linux <linux-arm-kernel@lists.infradead.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Ondrej Jirman <megous@megous.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <70578F86-20D3-41C7-A968-83B0605D3526@holtmann.org>
-References: <20200705195110.405139-1-anarsoul@gmail.com>
- <20200705195110.405139-2-anarsoul@gmail.com>
- <DF6CC01A-0282-45E2-A437-2E3E58CC2883@holtmann.org>
- <CA+E=qVeYT41Wpp4wHgoVFMa9ty-FPsxxvUB-DJDnj07SpWhpjQ@mail.gmail.com>
-To:     Vasily Khoruzhick <anarsoul@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: add Realtek 8822CE to usb_device_id table
+Date:   Mon, 13 Jul 2020 15:45:29 +0800
+Message-Id: <20200713154512.v2.1.I63705bf6abab9cb79c14f7959a59b201af2b8827@changeid>
+X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vasily,
+This patch adds the Realtek 8822CE controller to the usb_device_id
+table to support the wideband speech capability.
 
->>> Some adapters (e.g. RTL8723CS) advertise that they have more than
->>> 2 pages for local ext features, but they don't support any features
->>> declared in these pages. RTL8723CS reports max_page = 2 and declares
->>> support for sync train and secure connection, but it responds with
->>> either garbage or with error in status on corresponding commands.
->> 
->> please send the btmon for this so I can see what the controller is responding.
-> 
-> Here is relevant part:
-> 
-> < HCI Command: Read Local Extend.. (0x04|0x0004) plen 1  #228 [hci0] 6.889869
->        Page: 2
->> HCI Event: Command Complete (0x0e) plen 14             #229 [hci0] 6.890487
->      Read Local Extended Features (0x04|0x0004) ncmd 2
->        Status: Success (0x00)
->        Page: 2/2
->        Features: 0x5f 0x03 0x00 0x00 0x00 0x00 0x00 0x00
->          Connectionless Slave Broadcast - Master
->          Connectionless Slave Broadcast - Slave
->          Synchronization Train
->          Synchronization Scan
->          Inquiry Response Notification Event
->          Coarse Clock Adjustment
->          Secure Connections (Controller Support)
->          Ping
-> < HCI Command: Delete Stored Lin.. (0x03|0x0012) plen 7  #230 [hci0] 6.890559
->        Address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Delete all: 0x01
->> HCI Event: Command Complete (0x0e) plen 6              #231 [hci0] 6.891170
->      Delete Stored Link Key (0x03|0x0012) ncmd 2
->        Status: Success (0x00)
->        Num keys: 0
-> < HCI Command: Read Synchronizat.. (0x03|0x0077) plen 0  #232 [hci0] 6.891199
->> HCI Event: Command Complete (0x0e) plen 9              #233 [hci0] 6.891788
->      Read Synchronization Train Parameters (0x03|0x0077) ncmd 2
->        invalid packet size
->        01 ac bd 11 80 80                                ......
-> = Close Index: 00:E0:4C:23:99:87                              [hci0] 6.891832
-> 
-> hci0 registration stops here and bluetoothctl doesn't even see the controller.
+Reviewed-by: alainm@chromium.org
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+---
 
-maybe just the read sync train params command is broken? Can you change the init code and not send it and see if the rest of the init phase proceeds. I would rather have the secure connections actually tested before dismissing it altogether.
+Changes in v2:
+- Fixed the commit subject and message body.
 
-Mind you, there were broken Broadcom implementation of connectionless slave broadcast as well. Maybe this is similar.
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index faa863dd5d0a33..aa0bc9942afda9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -359,6 +359,10 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_IGNORE },
+ 
++	/* Realtek 8822CE Bluetooth devices */
++	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++
+ 	/* Realtek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_REALTEK },
+-- 
+2.27.0.383.g050319c2ae-goog
 
