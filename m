@@ -2,283 +2,229 @@ Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E22E1C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 20:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5027C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FAB42067D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 20:55:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC1D32072D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:16:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zu7BZBcD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kSx6jbza"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728036AbgGNUzn (ORCPT
+        id S1728273AbgGNVQI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 16:55:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58594 "EHLO
+        Tue, 14 Jul 2020 17:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728002AbgGNUzm (ORCPT
+        with ESMTP id S1727941AbgGNVQG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 16:55:42 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8EA8C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 13:55:42 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id w17so67487oie.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 13:55:42 -0700 (PDT)
+        Tue, 14 Jul 2020 17:16:06 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0B7C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:16:06 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id t7so318936ybk.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:16:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=71kwtVIvNO6pfD7j+0gcY3/TDmX9mKDOLZFCzqzfOEk=;
-        b=Zu7BZBcD2AxCn1kOvIn+tRhaXY3zu1vemcrzsfoR+sVIzmB5jVDQQJtLBSrv4rTq3w
-         Az1eWKJ3v9q5LRy/WgWvJI9oByL+dcLZlchxRXwiiHtoDmiUCWo1N1wHVcVCsKje8dMl
-         b7t9JuXumk1f9XFORJW5uC7yVyfm6LNkkCSio=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=HzEMpeAsA85Ww9OWf319/ckjyVKaoI/djE5Efi8rzCg=;
+        b=kSx6jbza4TcJaMQAaLz2/vObPEtYak6vZaux2wv9qmAAIQRRBlDC+teIjl3cw0m/El
+         RydhEHRbnFzZbdocR+vyyCnrL0+snaVFtJwuIbJr1Clvdb4dkL/puff33XrndB51HnM1
+         8L89teW1qxyW/3BPCAvdY8PKR3oAIZBLVpmGMf/YqRkdruIdoga7xNRJ7d9vel/pjGzj
+         3OuvJv9jXDJnRD+AbHUMxLbwiR2l6LK5dQsWGrjilwCNtB2vDbGjfltynnmjXtxsuDPT
+         iiEOwIpCtNF32NiYiKM18iBpXlKlAvkr9xqytJ7AxnblUX+myhWQvs8/bSh51uOPgVSb
+         B9kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=71kwtVIvNO6pfD7j+0gcY3/TDmX9mKDOLZFCzqzfOEk=;
-        b=oattuxKucARHSyKKqrOsHIoLmMw5kKmRtZmLIsFdU0wZKzn1FCDF5yQtxKrztktTez
-         +ubNQJ4qvogeME3EaJSXp/dAG8lEJDIQtnllTj+xVQwLIa3iaE8KCU9tjkGPEgtyZWBs
-         kqKWkQNiErCxVQ1dFDeLJN+hPHVW6ZrvjUiXXsUyHDRfWup83va3/17odEe5BI42wHCb
-         y7iOfLSf6sakcwwWqT3a96y2NLeiYwig6Sv/YqVBn0xUjDumPNwxAkVyfnjCokBZ1Xth
-         nuLP6PBrHCOkJUVOCiVLVLbmjGJQRstLkqzqTgp9XCZtIH5JABKq3ejbdv4Fg5HxnkYd
-         b4Rw==
-X-Gm-Message-State: AOAM53157ZTFFzp5nSWQYy8lCojWCgv3zpzoajjx7SyukUnJmcBIQWN1
-        KqjykuesnMPIMER5qbXK2FdAjF0IQS5n1PCJ4T1YRQ==
-X-Google-Smtp-Source: ABdhPJz5ikIqYRXJ3GAw1Uv5PJGRERav2bpqC3Z/eujhhM+G0unX/GknfczgfynTOWX1LqQd5mr/xZiewd7hfy46J5w=
-X-Received: by 2002:aca:4fd3:: with SMTP id d202mr5414262oib.142.1594760141714;
- Tue, 14 Jul 2020 13:55:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200713201441.235959-1-sonnysasaka@chromium.org>
- <CABBYNZJ+7SFRra4S890bv+_oCbUXHPexVmxvGS2pAzdnHyhJXw@mail.gmail.com>
- <CAOxioNkHgmycT=xoJp01GHQxL-0enVhWh9NsiQxqbDUCZ1Gj8g@mail.gmail.com>
- <CABBYNZ+FyGLMGJUNJLR=quBn0R=bzsYRBHwbe1xnhR4BsR6k_w@mail.gmail.com>
- <CAOxioNnN23PkSdqYpS5MgaSjp2=BDpc--qUiCPYMF0KP0qAqQA@mail.gmail.com> <CABBYNZLd-NYoqtreM-0BNwJGM1JLCw9TbXJwusKMUGJPpvjNAw@mail.gmail.com>
-In-Reply-To: <CABBYNZLd-NYoqtreM-0BNwJGM1JLCw9TbXJwusKMUGJPpvjNAw@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Tue, 14 Jul 2020 13:55:29 -0700
-Message-ID: <CAOxioNmjL4a8aZpn3Lok5P=c9agCJYt8MaaqH=rz7HEbknwHOg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Per-device option to enable/disable internal profiles
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=HzEMpeAsA85Ww9OWf319/ckjyVKaoI/djE5Efi8rzCg=;
+        b=bLV41TZ3gy9/GQCwtFwSe0su1xBzK6g11mLDge7xedPaMwVY06eqIj+U2NOTCLA7wx
+         4e/ZGf2v9X7T1XZlRHCi808H5nTxQWb7QgOJ4KqdimWVmVotSf+YVtISHnN/eOf4EAFr
+         ni6NtMUupX9+3NfMirijwOKDuEW/SANSLpP3sfbap+zUu0o/s25XehPD03KQW/VA5mRH
+         xDprysqrDOF409/knCP3pbnBCSukZXRqwgkFM28iNM50F/vV0BuKnkU3qjpbmqt64fWA
+         v/THaeAqhXCDOgLSE1fAXPhUuMF85SOZHRe3ksAjPXgyPCVkepSAh6RZ/7qFkygD/goi
+         DYFw==
+X-Gm-Message-State: AOAM531SXZ+ey1ZIziXU+hlr6pvixB7N1y505Ki99Agj1Phzv8TAYnSj
+        eCyh6x9Eog+wyjLuldig1uezRlyjJVwwE/D2wicEXUgrRcl6H45N9/r3l7F6xmmVQU5dwr0c9X2
+        t0CuAFMCEKnHd7QBwmtLCHgFop9h5XPODbxDKadVxS7dpKCFU1yX0A9TxCvB7nQh6hNRdaTSnpy
+        CPOhOqrMffSCa5zSF8
+X-Google-Smtp-Source: ABdhPJzhQxfr7YmLnLQTuyAFMguLsPYwrYEipp4TVDG1jwjXWfgiFWmBYjDjwuyfzpGJzDHivCEfhKH77tKI4eUU13ro
+X-Received: by 2002:a25:2105:: with SMTP id h5mr10362528ybh.65.1594761365824;
+ Tue, 14 Jul 2020 14:16:05 -0700 (PDT)
+Date:   Tue, 14 Jul 2020 14:16:00 -0700
+Message-Id: <20200714141547.v1.1.Icd35ad65fb4136d45dd701ef9022fa8f7c9e5d65@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
+Subject: [PATCH v1] Bluetooth: Add per-instance adv disable/remove
+From:   Daniel Winkler <danielwinkler@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Daniel Winkler <danielwinkler@google.com>,
+        Shyh-In Hwang <josephsih@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Add functionality to disable and remove advertising instances,
+and use that functionality in MGMT add/remove advertising calls.
 
-On Mon, Jul 13, 2020 at 10:28 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sonny,
->
-> On Mon, Jul 13, 2020 at 4:48 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Mon, Jul 13, 2020 at 3:59 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Sonny,
-> > >
-> > > On Mon, Jul 13, 2020 at 3:04 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > >
-> > > > Hi Luiz,
-> > > >
-> > > > I considered having such an approach that gives exception to some
-> > > > profile to not claim exclusive access. However, I think that this
-> > > > approach has a drawback that it can only be guaranteed to work
-> > > > correctly for profiles that contain only read-only attributes. Any
-> > > > profile that contains writable attributes, naturally, cannot be
-> > > > guaranteed to always work correctly (as is the case with the Battery
-> > > > profile). Therefore, the usefulness of that feature will be very
-> > > > limited.
-> > > >
-> > > > I also considered the benefits of the AllowInternalProfiles approach:
-> > > > * Applications can also have control over any profile, not just
-> > > > Battery profile. For example, if in the future BlueZ has more internal
-> > > > profiles, like (Blood Pressure Profile or any other profile that may
-> > > > contain writable attributes), we can guarantee that applications can
-> > > > still opt to have access to that profile, without relying on a profile
-> > > > being "safe" to be shared by both BlueZ's internal and external
-> > > > handlers.
-> > > > * This has an added security benefit: applications which operate on a
-> > > > specific GATT profile will not unintentionally activate internal
-> > > > profiles such as HOG (which is able to hijack input control of the
-> > > > host). This is the correct and expected behavior of Android apps that
-> > > > connect over GATT and get access to a GATT profile.
-> > >
-> > > Not sure I follow these arguments, it seems AllowInternalProfiles may
-> > > actually enable hijacking the profiles so I wonder if you got this
-> > > backwards as we can't let things like HoG be controlled by
-> > > applications directly it would be too easy to implement something like
-> > > a keylogger, or perhaps you are suggesting that there is another layer
-> > > for implementing the profiles? Note that it is intended that plugins
-> > > shall be used for profiles that need to be integrated system wide,
-> > > D-Bus interface shall be restricted to only application specific
-> > > profiles.
-> >
-> > I think you misunderstood my point about HOG hijacking. Consider the
-> > following case:
-> > 1. A legit application (not System UI) on a host computer scans and
-> > connects to a nearby peer. It makes a guess about the peer device
-> > based on its advertising data. It intends to operate on a specific
-> > GATT profile (not necessarily Battery).
-> > 2. The peer device turns out to be malicious. It runs HOG GATT server
-> > and triggers the host's HOG profile to be active.
-> > 3. The malicious peer device's HOG GATT server can now maliciously
-> > make mouse movements or enter keystrokes to the host.
->
-> I'm not sure how you would like to prevent that, we could in theory
-> attempt to authorize every single profile before connecting, just like
-> it is done for legacy, but Im sure system would not be asking the user
-> what profiles to connect so they just end up trusting the device,
-> alternatively we could make ConnectProfile to work also for LE so you
-> can provide a UUID and nothing else would be exposed, but note that
-> this guess on the AD may actually be wrong and the device may end up
-> malfunctioning.
->
-> > In this case the user is considered being attacked, because he/she
-> > doesn't consciously interact with the System UI to connect to a nearby
-> > mouse/keyboard.
-> > My example doesn't have to be HOG. It just happens to be a profile
-> > which is attackable at the moment. My point is that, for applications
-> > it's always safest to turn off all internal profiles to avoid such
-> > incident. There is no use case where applications want to trigger
-> > internal profiles.
-> >
-> > Note 1: By "applications", I mean things like Android apps or
-> > JavaScript apps which are not considered System's Bluetooth UI.
->
-> Well that doesn't make my point moot, let's say we do enable
-> connecting by UUID and the application try to connect HoG, it could be
-> a malicious application trying to eavesdrop what the user is typing,
-> so this problem of malicious goes both ways Im afraid, besides the
-> performance penalty that one would have if we need to transport HID
-> over D-Bus.
-If an application handles HOG, there will be nothing to eavesdrop
-because that application shouldn't have an access to UHID in the first
-place. If that malicious application had UHID access, that is already
-a problem to begin with regardless of whether there is Bluetooth or
-not. The security of this is handled above the Bluetooth layer. The
-operating system that uses this feature is responsible for higher
-layer security. For operating systems that don't need it I am okay
-with adding an option to disable this feature altogether. But I can
-see that there are systems that need it and I am not convinced that a
-general purpose Bluetooth stack should not support it.
+Signed-off-by: Daniel Winkler <danielwinkler@google.com>
+Reviewed-by: Shyh-In Hwang <josephsih@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+---
 
->
-> More applications could be involved and then this all becomes a mess
-> if they have to fight over AllowInternalProfiles, so instead of using
-> a theoretical example we better find real apps and devices where
-> conflicts happens and work out case by case, adding ConnectProfile
-> should actually fix most of them if there is a single profile involved
-> by we could also thing about an alternative to connect multiples.
-> There is also the possibility of exposing the btd_service as objects,
-> I've actually had this implemented for the car industry, that way
-> AutoConnect property could actually be controlled on a per service
-> basis instead of having just one switch for everything.
-To be clear, applications do not have direct access to
-AllowInternalProfiles. The higher layer operating system controls it.
-This is just the same case as the org.bluez.Adapter1.Powered property
-and many other examples where applications are not expected to have
-direct control of. Therefore there should be no problem of many things
-fighting over it if used correctly, just like many other properties.
-Again, I am okay with adding an option to disable this for operating
-systems that do not want it.
+ net/bluetooth/hci_conn.c    |  2 +-
+ net/bluetooth/hci_request.c | 59 +++++++++++++++++++++++++++++++------
+ net/bluetooth/hci_request.h |  2 ++
+ net/bluetooth/mgmt.c        |  6 ++++
+ 4 files changed, 59 insertions(+), 10 deletions(-)
 
-Note: I have been using the term "operating system" to refer to high
-level components rather than the kernel.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8805d68e65f2a..be67361ff2f00 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -931,7 +931,7 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 		 * So it is required to remove adv set for handle 0x00. since we use
+ 		 * instance 0 for directed adv.
+ 		 */
+-		hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(cp.handle), &cp.handle);
++		__hci_req_remove_ext_adv_instance(req, cp.handle);
+ 
+ 		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 770b937581122..7c0c2fda04adf 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1179,13 +1179,8 @@ static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
+ void __hci_req_disable_advertising(struct hci_request *req)
+ {
+ 	if (ext_adv_capable(req->hdev)) {
+-		struct hci_cp_le_set_ext_adv_enable cp;
++		__hci_req_disable_ext_adv_instance(req, 0x00);
+ 
+-		cp.enable = 0x00;
+-		/* Disable all sets since we only support one set at the moment */
+-		cp.num_of_sets = 0x00;
+-
+-		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE, sizeof(cp), &cp);
+ 	} else {
+ 		u8 enable = 0x00;
+ 
+@@ -1950,13 +1945,59 @@ int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance)
+ 	return 0;
+ }
+ 
++int __hci_req_disable_ext_adv_instance(struct hci_request *req, u8 instance)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_set_ext_adv_enable *cp;
++	struct hci_cp_ext_adv_set *adv_set;
++	u8 data[sizeof(*cp) + sizeof(*adv_set) * 1];
++	u8 req_size;
++
++	/* If request specifies an instance that doesn't exist, fail */
++	if (instance > 0 && !hci_find_adv_instance(hdev, instance))
++		return -EINVAL;
++
++	memset(data, 0, sizeof(data));
++
++	cp = (void *)data;
++	adv_set = (void *)cp->data;
++
++	/* Instance 0x00 indicates all advertising instances will be disabled */
++	cp->num_of_sets = !!instance;
++	cp->enable = 0x00;
++
++	adv_set->handle = instance;
++
++	req_size = sizeof(*cp) + sizeof(*adv_set) * cp->num_of_sets;
++	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE, req_size, data);
++
++	return 0;
++}
++
++int __hci_req_remove_ext_adv_instance(struct hci_request *req, u8 instance)
++{
++	struct hci_dev *hdev = req->hdev;
++
++	/* If request specifies an instance that doesn't exist, fail */
++	if (instance > 0 && !hci_find_adv_instance(hdev, instance))
++		return -EINVAL;
++
++	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(instance), &instance);
++
++	return 0;
++}
++
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
+ {
+ 	struct hci_dev *hdev = req->hdev;
++	struct adv_info *adv_instance = hci_find_adv_instance(hdev, instance);
+ 	int err;
+ 
+-	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-		__hci_req_disable_advertising(req);
++	/* If instance isn't pending, the chip knows about it, and it's safe to
++	 * disable
++	 */
++	if (adv_instance && !adv_instance->pending)
++		__hci_req_disable_ext_adv_instance(req, instance);
+ 
+ 	err = __hci_req_setup_ext_adv_instance(req, instance);
+ 	if (err < 0)
+@@ -2104,7 +2145,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
+ 	    hci_dev_test_flag(hdev, HCI_ADVERTISING))
+ 		return;
+ 
+-	if (next_instance)
++	if (next_instance && !ext_adv_capable(hdev))
+ 		__hci_req_schedule_adv_instance(req, next_instance->instance,
+ 						false);
+ }
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 0e81614d235e9..bbe892ab078ab 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -86,6 +86,8 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
+ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
+ int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
++int __hci_req_disable_ext_adv_instance(struct hci_request *req, u8 instance);
++int __hci_req_remove_ext_adv_instance(struct hci_request *req, u8 instance);
+ void __hci_req_clear_ext_adv_sets(struct hci_request *req);
+ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 			   bool use_rpa, struct adv_info *adv_instance,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 686ef47928316..f45105d2de772 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7504,6 +7504,12 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	hci_req_init(&req, hdev);
+ 
++	/* If we use extended advertising, instance is disabled and removed */
++	if (ext_adv_capable(hdev)) {
++		__hci_req_disable_ext_adv_instance(&req, cp->instance);
++		__hci_req_remove_ext_adv_instance(&req, cp->instance);
++	}
++
+ 	hci_req_clear_adv_instance(hdev, sk, &req, cp->instance, true);
+ 
+ 	if (list_empty(&hdev->adv_instances))
+-- 
+2.27.0.389.gc38d7665816-goog
 
-
->
-> > >
-> > > Note that we do allow external profiles to be registered with use of:
-> > >
-> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt
-> > >
-> > > And for GATT:
-> > >
-> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n366
-> > >
-> > > We could perhaps make the assumption that once an application
-> > > registers itself as supporting a given profile we check if against a
-> > > blacklist of profiles that may have security implications, which
-> > > perhaps could be defined via main.conf or some other file, if that is
-> > > not the case the internal profile can be disabled and the D-Bus object
-> > > would be accessible over D-Bus. Also note that we do offer clients the
-> > > ability to have exclusive access with AcquireWrite and AcquireNotify.
-> > >
-> > > > Therefore I think that this approach, although more complex, has
-> > > > longer lasting benefits. Let me know if you have any objection to
-> > > > having such a feature.
-> > > >
-> > > >
-> > > > On Mon, Jul 13, 2020 at 1:35 PM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > > >
-> > > > > Hi Sonny,
-> > > > >
-> > > > > On Mon, Jul 13, 2020 at 1:18 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > > > >
-> > > > > > This patch series adds a mechanism for clients to choose whether to
-> > > > > > enable BlueZ internal profiles (e.g. A2DP, Battery) for specific
-> > > > > > devices.
-> > > > > >
-> > > > > > The motivation behind this feature is that some applications (e.g. Web
-> > > > > > Bluetooth or Android apps) need to have control over all remove GATT
-> > > > > > services, like Battery service. With "battery" plugin being enabled on
-> > > > > > BlueZ, it becomes not possible for those apps to work properly because
-> > > > > > BlueZ "hides" the Battery-related attributes from its GATT Client API.
-> > > > > > Disabling the "battery" plugin won't solve the problem either, since we
-> > > > > > do also need to enable the plugin so that we can use org.bluez.Battery1
-> > > > > > API.
-> > > > > >
-> > > > > > The solution that we propose is that clients can choose whether to
-> > > > > > enable internal profiles for each device. Clients know when to enable
-> > > > > > internal profiles (such as when a user chooses to pair/connect via a UI)
-> > > > > > and when to disable internal profiles (such as when the connection is
-> > > > > > initiated by a generic application).
-> > > > >
-> > > > > I wonder if it is not better to just have a flag indicating if the
-> > > > > profile shall claim exclusive access (such as GAP and GATT services),
-> > > > > so profiles that don't set that will have the services exposed so for
-> > > > > battery we can probably just have it exposed by default since it
-> > > > > doesn't appear to would be any conflicts on having it exposed.
-> > > > >
-> > > > > > Sonny Sasaka (3):
-> > > > > >   doc: Add "AllowInternalProfiles" property to org.bluez.Device1
-> > > > > >   device: Add "AllowInternalProfiles" property to org.bluez.Device1
-> > > > > >   client: Add set-allow-internal-profiles command
-> > > > > >
-> > > > > >  client/main.c      | 38 ++++++++++++++++++
-> > > > > >  doc/device-api.txt | 13 +++++++
-> > > > > >  src/device.c       | 96 ++++++++++++++++++++++++++++++++++++++++++++++
-> > > > > >  src/hcid.h         |  2 +
-> > > > > >  src/main.c         | 10 +++++
-> > > > > >  src/main.conf      |  4 ++
-> > > > > >  6 files changed, 163 insertions(+)
-> > > > > >
-> > > > > > --
-> > > > > > 2.26.2
-> > > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Luiz Augusto von Dentz
-> > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
