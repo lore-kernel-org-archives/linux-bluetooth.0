@@ -2,174 +2,171 @@ Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847BAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 12:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8850C433EB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 16:41:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EB6F2242C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 12:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C88E32222E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 16:41:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VHZOUHrV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728066AbgGNMlX (ORCPT
+        id S1728688AbgGNQlz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 08:41:23 -0400
-Received: from mail.baikalelectronics.com ([87.245.175.226]:32916 "EHLO
-        mail.baikalelectronics.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726354AbgGNMlX (ORCPT
+        Tue, 14 Jul 2020 12:41:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46434 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726364AbgGNQlx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 08:41:23 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mail.baikalelectronics.ru (Postfix) with ESMTP id F1F208030809;
-        Tue, 14 Jul 2020 12:41:19 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at baikalelectronics.ru
-Received: from mail.baikalelectronics.ru ([127.0.0.1])
-        by localhost (mail.baikalelectronics.ru [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id wvIaP-V6CogS; Tue, 14 Jul 2020 15:41:18 +0300 (MSK)
-From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>
-CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        Daniel Winkler <danielwinkler@google.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Aaron Sierra <asierra@xes-inc.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        <linux-serial@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        <abhishekpandit@chromium.org>, <stable@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] serial: 8250_mtk: Fix high-speed baud rates clamping
-Date:   Tue, 14 Jul 2020 15:41:12 +0300
-Message-ID: <20200714124113.20918-1-Sergey.Semin@baikalelectronics.ru>
+        Tue, 14 Jul 2020 12:41:53 -0400
+Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E9BC061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 09:41:53 -0700 (PDT)
+Received: by mail-ua1-x942.google.com with SMTP id p6so5895403uaq.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 09:41:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ab7n3z5mmwJTrVdm4I/Qk+EgWW2BK5sF3S4Gs9LC2pU=;
+        b=VHZOUHrVRhNSrg3KXXZP+GAKYukKuZJqUkm5rQjUQ1ljdD3rJiZmHJ9JBEZxI/gQ78
+         LdVSaAcjIaGH2WHm3B6K1fnEsO+RpwuJIMwNVJZg0DwnljFT9vzkoAWDwNWe+zXSrjao
+         IpMj2M0CS/PRNwwFHxaGEGojTVKjZxRItENog=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ab7n3z5mmwJTrVdm4I/Qk+EgWW2BK5sF3S4Gs9LC2pU=;
+        b=OiPmz2hd34EoTtE+3hiXVe+CINBOlKMBwRnR29t4Ogv/7sCOgA6np2OSlywwTDjOaK
+         d+XWruQ1OEkPiUBlc1McKC27dotbAMZbdUySJqVzEODwbC7tCX7jz7SUazvC6RfIRkFz
+         cA6nDLukpF1219VY0TUWX0i/KffmBNN88TeapakRQuxpMIOso35lWTv+gC51koIfW2Ah
+         kaPhcjdKtt0Iv93WgJ1UOGf5ISiD/i7rIO3kjrBAMpp/OoI058ufxbgu9s/OWcEI5qhR
+         RD1FRDq9Kn5xZmxtyx9s5adr1kc50n8gSRqUq4wV74mn3fbh+1vF9BPQ/acvVhCWHB1j
+         F0Xw==
+X-Gm-Message-State: AOAM53263dAbo3GyuwMRN4Cm3eq+I4AiRzOB0lDgICWmlRueTR5abqSN
+        aolD+/9ye2DJcnXSk6uo2BvVeM05xI59eitHMKct3Q==
+X-Google-Smtp-Source: ABdhPJyXVJ/fLtTJ5u5u/TYEyFxPBC2v7sTjbhSHP3mdXvobPVLvPRM7juHvP/wKZQeY+BIpC4A3UhZVueVzzEMcOHI=
+X-Received: by 2002:ab0:6f0a:: with SMTP id r10mr4847028uah.100.1594744912382;
+ Tue, 14 Jul 2020 09:41:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
+References: <20200706140715.v2.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
+ <20200714052941.GB3874@shao2-debian>
+In-Reply-To: <20200714052941.GB3874@shao2-debian>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Tue, 14 Jul 2020 09:41:41 -0700
+Message-ID: <CANFp7mURm5QKe8afuCHjFt89bgJtOyUkj_MJKdfzVto0i7EpZw@mail.gmail.com>
+Subject: Re: [power] 47b918cf9a: kmsg.power_supply_ADP1:Error_in_uevent_for_wakeup_sysfs_add
+To:     kernel test robot <rong.a.chen@intel.com>
+Cc:     Linux PM <linux-pm@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Rafael Wysocki <rafael.j.wysocki@intel.com>,
+        Stephen Boyd <swboyd@chromium.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Len Brown <len.brown@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pavel Machek <pavel@ucw.cz>, lkp@lists.01.org,
+        yu.c.chen@intel.com, "Zhang, Rui" <rui.zhang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 7b668c064ec3 ("serial: 8250: Fix max baud limit in generic 8250
-port") fixed limits of a baud rate setting for a generic 8250 port.
-In other words since that commit the baud rate has been permitted to be
-within [uartclk / 16 / UART_DIV_MAX; uartclk / 16], which is absolutely
-normal for a standard 8250 UART port. But there are custom 8250 ports,
-which provide extended baud rate limits. In particular the Mediatek 8250
-port can work with baud rates up to "uartclk" speed.
+This version of the patch was not merged and the message above doesn't
+exist in the merged patch:
+https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git/commit/?h=bleeding-edge&id=9a3e9e6ff6d7f6b8ce7903893962d50adcbe82d2
 
-Normally that and any other peculiarity is supposed to be handled in a
-custom set_termios() callback implemented in the vendor-specific
-8250-port glue-driver. Currently that is how it's done for the most of
-the vendor-specific 8250 ports, but for some reason for Mediatek a
-solution has been spread out to both the glue-driver and to the generic
-8250-port code. Due to that a bug has been introduced, which permitted the
-extended baud rate limit for all even for standard 8250-ports. The bug
-has been fixed by the commit 7b668c064ec3 ("serial: 8250: Fix max baud
-limit in generic 8250 port") by narrowing the baud rates limit back down to
-the normal bounds. Unfortunately by doing so we also broke the
-Mediatek-specific extended bauds feature.
+The err log was emitted during boot as well and is innocuous since the
+power_supply initializes fully in the next line:
+kern  :err   : [    5.918034] power_supply ADP1: Error in uevent for
+wakeup_sysfs_add: -11
+kern  :info  : [    5.918300] ACPI: AC Adapter [ADP1] (on-line)
 
-A fix of the problem described above is twofold. First since we can't get
-back the extended baud rate limits feature to the generic set_termios()
-function and that method supports only a standard baud rates range, the
-requested baud rate must be locally stored before calling it and then
-restored back to the new termios structure after the generic set_termios()
-finished its magic business. By doing so we still use the
-serial8250_do_set_termios() method to set the LCR/MCR/FCR/etc. registers,
-while the extended baud rate setting procedure will be performed later in
-the custom Mediatek-specific set_termios() callback. Second since a true
-baud rate is now fully calculated in the custom set_termios() method we
-need to locally update the port timeout by calling the
-uart_update_timeout() function. After the fixes described above are
-implemented in the 8250_mtk.c driver, the Mediatek 8250-port should
-get back to normally working with extended baud rates.
+Abhishek
 
-Link: https://lore.kernel.org/linux-serial/20200701211337.3027448-1-danielwinkler@google.com
-
-Fixes: 7b668c064ec3 ("serial: 8250: Fix max baud limit in generic 8250 port")
-Reported-by: Daniel Winkler <danielwinkler@google.com>
-Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
-
----
-
-Folks, sorry for a delay with the problem fix. A solution is turned out to
-be a bit more complicated than I originally thought in my comment to the
-Daniel revert-patch.
-
-Please also note, that I don't have a Mediatek hardware to test the
-solution suggested in the patch. The code is written as on so called
-the tip of the pen after digging into the 8250_mtk.c and 8250_port.c
-drivers code. So please Daniel or someone with Mediatek 8250-port
-available on a board test this patch first and report about the results in
-reply to this emailing thread. After that, if your conclusion is positive
-and there is no objection against the solution design the patch can be
-merged in.
-
-Cc: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
-Cc: Daniel Winkler <danielwinkler@google.com>
-Cc: Aaron Sierra <asierra@xes-inc.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Lukas Wunner <lukas@wunner.de>
-Cc: Vignesh Raghavendra <vigneshr@ti.com>
-Cc: linux-serial@vger.kernel.org
-Cc: linux-mediatek@lists.infradead.org
-Cc: BlueZ <linux-bluetooth@vger.kernel.org>
-Cc: chromeos-bluetooth-upstreaming <chromeos-bluetooth-upstreaming@chromium.org>
-Cc: abhishekpandit@chromium.org
-Cc: stable@vger.kernel.org
----
- drivers/tty/serial/8250/8250_mtk.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/drivers/tty/serial/8250/8250_mtk.c b/drivers/tty/serial/8250/8250_mtk.c
-index f839380c2f4c..98b8a3e30733 100644
---- a/drivers/tty/serial/8250/8250_mtk.c
-+++ b/drivers/tty/serial/8250/8250_mtk.c
-@@ -306,8 +306,21 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
- 	}
- #endif
- 
-+	/*
-+	 * Store the requested baud rate before calling the generic 8250
-+	 * set_termios method. Standard 8250 port expects bauds to be
-+	 * no higher than (uartclk / 16) so the baud will be clamped if it
-+	 * gets out of that bound. Mediatek 8250 port supports speed
-+	 * higher than that, therefore we'll get original baud rate back
-+	 * after calling the generic set_termios method and recalculate
-+	 * the speed later in this method.
-+	 */
-+	baud = tty_termios_baud_rate(termios);
-+
- 	serial8250_do_set_termios(port, termios, old);
- 
-+	tty_termios_encode_baud_rate(termios, baud, baud);
-+
- 	/*
- 	 * Mediatek UARTs use an extra highspeed register (MTK_UART_HIGHS)
- 	 *
-@@ -339,6 +352,11 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
- 	 */
- 	spin_lock_irqsave(&port->lock, flags);
- 
-+	/*
-+	 * Update the per-port timeout.
-+	 */
-+	uart_update_timeout(port, termios->c_cflag, baud);
-+
- 	/* set DLAB we have cval saved in up->lcr from the call to the core */
- 	serial_port_out(port, UART_LCR, up->lcr | UART_LCR_DLAB);
- 	serial_dl_write(up, quot);
--- 
-2.26.2
-
+On Mon, Jul 13, 2020 at 10:30 PM kernel test robot
+<rong.a.chen@intel.com> wrote:
+>
+> Greeting,
+>
+> FYI, we noticed the following commit (built with gcc-9):
+>
+> commit: 47b918cf9a1d2b6e36706fd2be2b91e65f490146 ("[PATCH v2 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove")
+> url: https://github.com/0day-ci/linux/commits/Abhishek-Pandit-Subedi/power-Emit-changed-uevent-on-wakeup_sysfs_add-remove/20200707-050912
+> base: https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git linux-next
+>
+> in testcase: suspend-stress
+> with following parameters:
+>
+>         mode: freeze
+>         iterations: 10
+>
+>
+>
+> on test machine: 4 threads Ivy Bridge with 4G memory
+>
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+>
+>
+>
+>
+> If you fix the issue, kindly add following tag
+> Reported-by: kernel test robot <rong.a.chen@intel.com>
+>
+>
+>
+> kern  :debug : [    5.917685] calling  acpi_ac_init+0x0/0xa3 @ 1
+> kern  :err   : [    5.918034] power_supply ADP1: Error in uevent for wakeup_sysfs_add: -11
+> kern  :info  : [    5.918300] ACPI: AC Adapter [ADP1] (on-line)
+> kern  :debug : [    5.918500] initcall acpi_ac_init+0x0/0xa3 returned 0 after 609 usecs
+> kern  :debug : [    5.918725] calling  acpi_button_driver_init+0x0/0x53 @ 1
+> kern  :info  : [    5.919006] input: Power Button as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input0
+> kern  :info  : [    5.919367] ACPI: Power Button [PWRB]
+> kern  :info  : [    5.919580] input: Lid Switch as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0D:00/input/input1
+> kern  :info  : [    5.919927] ACPI: Lid Switch [LID]
+> kern  :info  : [    5.920131] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input2
+> kern  :info  : [    5.920455] ACPI: Power Button [PWRF]
+> kern  :debug : [    5.920644] initcall acpi_button_driver_init+0x0/0x53 returned 0 after 1669 usecs
+> kern  :debug : [    5.920944] calling  acpi_fan_driver_init+0x0/0x13 @ 1
+> kern  :debug : [    5.921155] initcall acpi_fan_driver_init+0x0/0x13 returned 0 after 11 usecs
+> kern  :debug : [    5.921388] calling  acpi_processor_driver_init+0x0/0xb7 @ 1
+> kern  :debug : [    5.921905] initcall acpi_processor_driver_init+0x0/0xb7 returned 0 after 299 usecs
+> kern  :debug : [    5.922203] calling  acpi_thermal_init+0x0/0x82 @ 1
+> kern  :info  : [    5.922755] thermal LNXTHERM:00: registered as thermal_zone0
+> kern  :info  : [    5.922977] ACPI: Thermal Zone [TZ01] (16 C)
+> kern  :debug : [    5.923177] initcall acpi_thermal_init+0x0/0x82 returned 0 after 759 usecs
+> kern  :debug : [    5.923409] calling  acpi_battery_init+0x0/0x39 @ 1
+> kern  :debug : [    5.923606] initcall acpi_battery_init+0x0/0x39 returned 0 after 4 usecs
+> kern  :debug : [    5.923841] calling  acpi_hed_driver_init+0x0/0x11 @ 1
+> kern  :debug : [    5.924075] initcall acpi_hed_driver_init+0x0/0x11 returned 0 after 32 usecs
+> kern  :info  : [    5.924178] battery: ACPI: Battery Slot [BAT1] (battery present)
+> kern  :debug : [    5.924309] calling  bgrt_init+0x0/0xbe @ 1
+> kern  :debug : [    5.924312] initcall bgrt_init+0x0/0xbe returned -19 after 0 usecs
+> kern  :debug : [    5.924928] calling  erst_init+0x0/0x309 @ 1
+> kern  :debug : [    5.925110] initcall erst_init+0x0/0x309 returned 0 after 0 usecs
+> kern  :debug : [    5.925325] calling  ghes_init+0x0/0xe5 @ 1
+> kern  :debug : [    5.925504] initcall ghes_init+0x0/0xe5 returned -19 after 0 usecs
+> kern  :debug : [    5.925721] calling  erst_dbg_init+0x0/0x2c @ 1
+> kern  :info  : [    5.925912] ERST DBG: ERST support is disabled.
+>
+>
+>
+> To reproduce:
+>
+>         git clone https://github.com/intel/lkp-tests.git
+>         cd lkp-tests
+>         bin/lkp install job.yaml  # job file is attached in this email
+>         bin/lkp run     job.yaml
+>
+>
+>
+> Thanks,
+> Rong Chen
+>
