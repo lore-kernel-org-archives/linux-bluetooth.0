@@ -1,67 +1,69 @@
-Return-Path: <SRS0=pby4=AY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB62C43459
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 23:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CF0C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 00:05:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7123D21582
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jul 2020 23:49:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97548217D9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 00:05:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jzuvwvt+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpXQf2m3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727826AbgGMXtP (ORCPT
+        id S1726510AbgGNAFe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jul 2020 19:49:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59634 "EHLO
+        Mon, 13 Jul 2020 20:05:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727095AbgGMXst (ORCPT
+        with ESMTP id S1726150AbgGNAFd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jul 2020 19:48:49 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855BDC061755
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 16:48:49 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 18so11128919otv.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 16:48:49 -0700 (PDT)
+        Mon, 13 Jul 2020 20:05:33 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AE1C061755
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 17:05:33 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id t198so12521405oie.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2020 17:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=B3FnEyMXCyMjWIZc011broRSH16kPZ5lCcUamQmS3Xk=;
-        b=jzuvwvt+xmjT2+N8izRgmG1JKSDrHN/k/n5DWA7b9VDulN/HMSXfRdwRtMG7s/tqZl
-         8MPk4PRcNIlyb/H2eHVJOF5P32g+uBI0+GKDgZMlh4Hlppcv/4IKV/09rkcI5kdOfhZc
-         qQJN/xPDJq3HDn/Mdi6dv8xYz76TFPUl58gMA=
+        bh=rt1mhXPGHE83AVIN8DrCzJjKR7f6iw436AtFM0CwQtc=;
+        b=CpXQf2m3hu5kk5IAt4urk1zMt3n0cGYyhahSYrt4xVoIkFxfq22g+hVjsGgChVlg/u
+         t8mldv18/+xQcHgmPFFJb27+SCm3nEOKWmEWluXMcK8bZgyg+0APgjxYff4U4vnwI87H
+         nXHczOYasYuUK0SfUGvLN7nLlLxAvidZr5E1VjxHD4SU2+PQ5eFcqfiDg707mi99Zrjs
+         ufvcAag0p84eDyqVTyEOt5EsAunfHLNSZCx94MiMnzEnN58mvXQ0siQ9i/MYmewY9PTf
+         3kwbdNUphJcCR/U6RcUUtJsP9UGV2QzwHv5izxe8qjvwq6gUoJ6AyMbj4+YW1DBhl7Sj
+         HEyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=B3FnEyMXCyMjWIZc011broRSH16kPZ5lCcUamQmS3Xk=;
-        b=pfUPIyAg2fqom6t6ImnEegalXiJRujws4ABZ+W1JcEpFhO3r6eXUIGHXbVyaPX+ncO
-         4U/KQrPt6xQU4zZcWHjt8eaX9CJXKHiEucOEXShN07AnVM3fu0uunDUt46ee0xU4PI6E
-         MNsmqXJ3hLien00fSz2Trsvwh22lTW9wANhzUaG9uhpkCMEFLugyDmmqg0mhCnH5BO6v
-         aBklYWOEPz17ul0qnMXwetlhDlIQKhc2sqaYfJHE+CrFtVEz8zRsaSWaGmzVOAIebLQ2
-         1VNDKAEGbaQKHmk9eVXpjRuBs5Ht/5VcdWpO/3cLGTq9cf+P2Eok8djUvJeEOFWNtb/K
-         wrFQ==
-X-Gm-Message-State: AOAM533/Awau9jCHXCFcc0Lg97saLjVjeTzjS9DUsrydTr2Piz7yjtGk
-        cs/iTaTuV8ZxtW/E0C6oWV+T3BTdp0aKgl3IEn9STbKH0GM=
-X-Google-Smtp-Source: ABdhPJyveyuIEQxaAUFvWpCIWLlqsiLTx2bcWpUkVi016ZLpUPKlCp1nSl+bUwSeRMYv+HW0a33p6b9WLabNmhAKihA=
-X-Received: by 2002:a9d:554d:: with SMTP id h13mr1660215oti.329.1594684128701;
- Mon, 13 Jul 2020 16:48:48 -0700 (PDT)
+        bh=rt1mhXPGHE83AVIN8DrCzJjKR7f6iw436AtFM0CwQtc=;
+        b=L18ZUVOkPXYiW0r7Kz88DHeH8SgjT4IyTVNfw9reKHC1fKJTRW2Dic7/f9RH40dPm5
+         s9yeWxUrmz65H+74Xbbod4Pt0RrpOA/vNECb/WzdHyQTpUiF50O2kaJRU8tOXPVD2sxO
+         f2hlH1zYBq1UveyLwu2hY2tyGRAK9Y/Q2PZ2OYlN1irR6CveOS0MDXpHpvFDflCSfvas
+         VXQVmXDDSBwuzanfIni5w030NMEsdP+cNwPMikp1QG5rarZ+WrLrCLEa2xjYe9htwt5j
+         bJO7MB9eZd+hL0rKljcHb2mlxKgt8rQlLspk1jeg0kByj94c1Wxp7g7W3f7gMBkoGdXA
+         jfNw==
+X-Gm-Message-State: AOAM531oBQgXjcDyH12/IIKBS0e6z3HMOXh0YOpmk8dcJPYsRNofnNEf
+        sBnNdm33PTTqoVAoOQUN8b6PF8DEAv8zgFDRhIM=
+X-Google-Smtp-Source: ABdhPJzgtaVOI1IKch9rn+CPXnWt+GfRBOpgf3TwXbqCOc31+besFW8y2WWl9XD5W/5I782dKU0oZzQDKnB0tykqrcY=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr1558792oix.48.1594685132425;
+ Mon, 13 Jul 2020 17:05:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200713201441.235959-1-sonnysasaka@chromium.org>
- <CABBYNZJ+7SFRra4S890bv+_oCbUXHPexVmxvGS2pAzdnHyhJXw@mail.gmail.com>
- <CAOxioNkHgmycT=xoJp01GHQxL-0enVhWh9NsiQxqbDUCZ1Gj8g@mail.gmail.com> <CABBYNZ+FyGLMGJUNJLR=quBn0R=bzsYRBHwbe1xnhR4BsR6k_w@mail.gmail.com>
-In-Reply-To: <CABBYNZ+FyGLMGJUNJLR=quBn0R=bzsYRBHwbe1xnhR4BsR6k_w@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Mon, 13 Jul 2020 16:48:36 -0700
-Message-ID: <CAOxioNnN23PkSdqYpS5MgaSjp2=BDpc--qUiCPYMF0KP0qAqQA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Per-device option to enable/disable internal profiles
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20200711115031.123793-1-marijns95@gmail.com>
+In-Reply-To: <20200711115031.123793-1-marijns95@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 13 Jul 2020 17:05:20 -0700
+Message-ID: <CABBYNZJid20zZDBtjkm14zLF8XOEhxBOfGffYo0aWX0aE0N54A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/avrcp: Always update transport volume
+ regardless of player
+To:     Marijn Suijten <marijns95@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -69,149 +71,142 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Marijn,
 
-On Mon, Jul 13, 2020 at 3:59 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Sat, Jul 11, 2020 at 4:50 AM Marijn Suijten <marijns95@gmail.com> wrote:
 >
-> Hi Sonny,
+> `Volume` is a special property that not only exists on players but also
+> on the transport (see org.bluez.MediaTransport1). A player is not
+> attached when the controller does not support FEATURE_CATEGORY_1, which
+> is common on headphones without media browsing capabilities.
 >
-> On Mon, Jul 13, 2020 at 3:04 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > Hi Luiz,
-> >
-> > I considered having such an approach that gives exception to some
-> > profile to not claim exclusive access. However, I think that this
-> > approach has a drawback that it can only be guaranteed to work
-> > correctly for profiles that contain only read-only attributes. Any
-> > profile that contains writable attributes, naturally, cannot be
-> > guaranteed to always work correctly (as is the case with the Battery
-> > profile). Therefore, the usefulness of that feature will be very
-> > limited.
-> >
-> > I also considered the benefits of the AllowInternalProfiles approach:
-> > * Applications can also have control over any profile, not just
-> > Battery profile. For example, if in the future BlueZ has more internal
-> > profiles, like (Blood Pressure Profile or any other profile that may
-> > contain writable attributes), we can guarantee that applications can
-> > still opt to have access to that profile, without relying on a profile
-> > being "safe" to be shared by both BlueZ's internal and external
-> > handlers.
-> > * This has an added security benefit: applications which operate on a
-> > specific GATT profile will not unintentionally activate internal
-> > profiles such as HOG (which is able to hijack input control of the
-> > host). This is the correct and expected behavior of Android apps that
-> > connect over GATT and get access to a GATT profile.
+> On such audio devices (headphones, in-ears and the like) Absolute Volume
+> is not available unless an external player is registered
+> (org.bluez.Media1.RegisterPlayer) and the device sends a volume event
+> back after that to set a2dp->volume in transport.c to a valid value
+> (causing volume_exists to finally return true).
 >
-> Not sure I follow these arguments, it seems AllowInternalProfiles may
-> actually enable hijacking the profiles so I wonder if you got this
-> backwards as we can't let things like HoG be controlled by
-> applications directly it would be too easy to implement something like
-> a keylogger, or perhaps you are suggesting that there is another layer
-> for implementing the profiles? Note that it is intended that plugins
-> shall be used for profiles that need to be integrated system wide,
-> D-Bus interface shall be restricted to only application specific
-> profiles.
+> This [1] mail thread denoting the same issue has a solution to at least
+> request capabilities from the controller, but the proposed player object
+> is not created on category 2 devices. Any notifications received on
+> AVRCP_EVENT_VOLUME_CHANGED (avrcp_volume_changed) that is subsequently
+> registered, or handling the result of avrcp_set_volume in
+> avrcp_handle_set_volume will be ignored unless said player is present.
+>
+> This issue is not addressed by adding a fake player but instead dealing
+> with the fact that volume is "special" and available on the transport
+> regardless of the existence of a player. This is confirmed in
+> avrcp_get_capabilities_resp as well which requires a player to register
+> any event except AVRCP_EVENT_VOLUME_CHANGED.
+>
+> The applied solution moves media_transport_update_device_volume out of
+> the player and into avrcp_volume_changed/avrcp_handle_set_volume where
+> it is unconditionally called. These functions are the only users of
+> avrcp_player->set_volume.
+>
+> Note that the volume member of media_player is never used which seems a
+> result of updating from org.bluez.MediaPlayer1 to
+> org.mpris.MediaPlayer2.Player in
+> 15e421737ccc4696ed567edcc24d178aedb47854, where the volume property [2]
+> is left out.
 
-I think you misunderstood my point about HOG hijacking. Consider the
-following case:
-1. A legit application (not System UI) on a host computer scans and
-connects to a nearby peer. It makes a guess about the peer device
-based on its advertising data. It intends to operate on a specific
-GATT profile (not necessarily Battery).
-2. The peer device turns out to be malicious. It runs HOG GATT server
-and triggers the host's HOG profile to be active.
-3. The malicious peer device's HOG GATT server can now maliciously
-make mouse movements or enter keystrokes to the host.
+This is actually on purpose since the volume notification indicates
+the volume at the device side we don't want to change the player
+volume as well as it would most likely result in duplicating the
+volume change both at sink and source, note that the likes of handling
+the transport like pulseaudio would already notify the device volume
+level change without actually applying any change to the volume
+locally.
 
-In this case the user is considered being attacked, because he/she
-doesn't consciously interact with the System UI to connect to a nearby
-mouse/keyboard.
-My example doesn't have to be HOG. It just happens to be a profile
-which is attackable at the moment. My point is that, for applications
-it's always safest to turn off all internal profiles to avoid such
-incident. There is no use case where applications want to trigger
-internal profiles.
-
-Note 1: By "applications", I mean things like Android apps or
-JavaScript apps which are not considered System's Bluetooth UI.
-
+> [1]: https://marc.info/?l=linux-bluetooth&m=145337574806153
+> [2]: https://specifications.freedesktop.org/mpris-spec/2.2/Player_Interface.html#Property:Volume
 >
-> Note that we do allow external profiles to be registered with use of:
+> ---
+> Hi,
 >
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt
+> This is is a resend from an earlier mail that didn't comply with the
+> contributor guidelines. Seeing that the topic of AVRCP volume is brought
+> up recently it is about time to repair it and hereby send it again.
 >
-> And for GATT:
+> I still have an incomplete patch lying around that synchronizes Volume
+> on org.mpris.MediaPlayer2.Player back when this patch was written 6
+> months ago. It'll require some time to get back in to it and finalize
+> it, let me know if that's desired.
 >
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n366
+> - Marijn Suijten
 >
-> We could perhaps make the assumption that once an application
-> registers itself as supporting a given profile we check if against a
-> blacklist of profiles that may have security implications, which
-> perhaps could be defined via main.conf or some other file, if that is
-> not the case the internal profile can be disabled and the D-Bus object
-> would be accessible over D-Bus. Also note that we do offer clients the
-> ability to have exclusive access with AcquireWrite and AcquireNotify.
+>  profiles/audio/avrcp.c | 12 ++++++++----
+>  profiles/audio/media.c | 16 ----------------
+>  2 files changed, 8 insertions(+), 20 deletions(-)
 >
-> > Therefore I think that this approach, although more complex, has
-> > longer lasting benefits. Let me know if you have any objection to
-> > having such a feature.
-> >
-> >
-> > On Mon, Jul 13, 2020 at 1:35 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Sonny,
-> > >
-> > > On Mon, Jul 13, 2020 at 1:18 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > >
-> > > > This patch series adds a mechanism for clients to choose whether to
-> > > > enable BlueZ internal profiles (e.g. A2DP, Battery) for specific
-> > > > devices.
-> > > >
-> > > > The motivation behind this feature is that some applications (e.g. Web
-> > > > Bluetooth or Android apps) need to have control over all remove GATT
-> > > > services, like Battery service. With "battery" plugin being enabled on
-> > > > BlueZ, it becomes not possible for those apps to work properly because
-> > > > BlueZ "hides" the Battery-related attributes from its GATT Client API.
-> > > > Disabling the "battery" plugin won't solve the problem either, since we
-> > > > do also need to enable the plugin so that we can use org.bluez.Battery1
-> > > > API.
-> > > >
-> > > > The solution that we propose is that clients can choose whether to
-> > > > enable internal profiles for each device. Clients know when to enable
-> > > > internal profiles (such as when a user chooses to pair/connect via a UI)
-> > > > and when to disable internal profiles (such as when the connection is
-> > > > initiated by a generic application).
-> > >
-> > > I wonder if it is not better to just have a flag indicating if the
-> > > profile shall claim exclusive access (such as GAP and GATT services),
-> > > so profiles that don't set that will have the services exposed so for
-> > > battery we can probably just have it exposed by default since it
-> > > doesn't appear to would be any conflicts on having it exposed.
-> > >
-> > > > Sonny Sasaka (3):
-> > > >   doc: Add "AllowInternalProfiles" property to org.bluez.Device1
-> > > >   device: Add "AllowInternalProfiles" property to org.bluez.Device1
-> > > >   client: Add set-allow-internal-profiles command
-> > > >
-> > > >  client/main.c      | 38 ++++++++++++++++++
-> > > >  doc/device-api.txt | 13 +++++++
-> > > >  src/device.c       | 96 ++++++++++++++++++++++++++++++++++++++++++++++
-> > > >  src/hcid.h         |  2 +
-> > > >  src/main.c         | 10 +++++
-> > > >  src/main.conf      |  4 ++
-> > > >  6 files changed, 163 insertions(+)
-> > > >
-> > > > --
-> > > > 2.26.2
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index e2428250e..8370c8a44 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3625,12 +3625,13 @@ static void avrcp_volume_changed(struct avrcp *session,
+>         struct avrcp_player *player = target_get_player(session);
+>         uint8_t volume;
 >
+> -       if (!player)
+> -               return;
+> -
+>         volume = pdu->params[1] & 0x7F;
 >
+> -       player->cb->set_volume(volume, session->dev, player->user_data);
+> +       /* Always update the transport volume, which is separate from the player */
+> +       media_transport_update_device_volume(session->dev, volume);
+> +
+> +       if (player)
+> +               player->cb->set_volume(volume, session->dev, player->user_data);
+>  }
 >
+>  static void avrcp_status_changed(struct avrcp *session,
+> @@ -4378,6 +4379,9 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
+>
+>         volume = pdu->params[0] & 0x7F;
+>
+> +       /* Always update the transport volume, which is separate from the player */
+> +       media_transport_update_device_volume(session->dev, volume);
+> +
+>         if (player != NULL)
+>                 player->cb->set_volume(volume, session->dev, player->user_data);
+>
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 993ecb3b3..a0173fdd4 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -1202,27 +1202,11 @@ static uint32_t get_duration(void *user_data)
+>  static void set_volume(uint8_t volume, struct btd_device *dev, void *user_data)
+>  {
+>         struct media_player *mp = user_data;
+> -       GSList *l;
+>
+>         if (mp->volume == volume)
+>                 return;
+>
+>         mp->volume = volume;
+> -
+> -       for (l = mp->adapter->endpoints; l; l = l->next) {
+> -               struct media_endpoint *endpoint = l->data;
+> -               struct media_transport *transport;
+> -
+> -               /* Volume is A2DP only */
+> -               if (endpoint->sep == NULL)
+> -                       continue;
+> -
+> -               transport = find_device_transport(endpoint, dev);
+> -               if (transport == NULL)
+> -                       continue;
+> -
+> -               media_transport_update_volume(transport, volume);
+> -       }
+>  }
+>
+>  static bool media_player_send(struct media_player *mp, const char *name)
 > --
-> Luiz Augusto von Dentz
+> 2.27.0
+>
+
+
+-- 
+Luiz Augusto von Dentz
