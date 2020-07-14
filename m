@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5027C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6F9C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:28:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC1D32072D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:16:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62F6520658
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kSx6jbza"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l38dTQyw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728273AbgGNVQI (ORCPT
+        id S1728324AbgGNV2Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 17:16:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
+        Tue, 14 Jul 2020 17:28:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727941AbgGNVQG (ORCPT
+        with ESMTP id S1727981AbgGNV2Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 17:16:06 -0400
+        Tue, 14 Jul 2020 17:28:24 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0B7C061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:16:06 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id t7so318936ybk.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:16:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499F3C08C5C1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:28:24 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id u12so362960ybj.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:28:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=HzEMpeAsA85Ww9OWf319/ckjyVKaoI/djE5Efi8rzCg=;
-        b=kSx6jbza4TcJaMQAaLz2/vObPEtYak6vZaux2wv9qmAAIQRRBlDC+teIjl3cw0m/El
-         RydhEHRbnFzZbdocR+vyyCnrL0+snaVFtJwuIbJr1Clvdb4dkL/puff33XrndB51HnM1
-         8L89teW1qxyW/3BPCAvdY8PKR3oAIZBLVpmGMf/YqRkdruIdoga7xNRJ7d9vel/pjGzj
-         3OuvJv9jXDJnRD+AbHUMxLbwiR2l6LK5dQsWGrjilwCNtB2vDbGjfltynnmjXtxsuDPT
-         iiEOwIpCtNF32NiYiKM18iBpXlKlAvkr9xqytJ7AxnblUX+myhWQvs8/bSh51uOPgVSb
-         B9kQ==
+        bh=5Behtcws30Pp0nDQ23hDNBtqNP5bqp4CSfxyj349GYE=;
+        b=l38dTQyw2IrM5kbznrKVpPLablAiGcaqv+lkFFedxeNwW16nlKSBZdJAhX3/TV/Brm
+         MvKr6yC3Gq4BiJIZq4CgxKwEaSknQXLkSggaBC7wGg7rLgA29O6Wi4fsisqlhv18s2LP
+         WF/w1jNMYA8enA7rWZlwg4NIDV2y+gazD7a1IVsQa/VIKEYTkAly9Mfqp0RboPwfXt9w
+         6L2wfqEGoZ+oUtcRaJQs6g1ThE2GKuQjfqCXwwZkzTCs3UNqe5zXasjKdFaNdE/6E49H
+         f+x0X+uXn3V88VHKuTu9rjhhu4WQmFA3PTgJorReU1jMrw23CaHbLF8ZORS9+KFdazK4
+         P3+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=HzEMpeAsA85Ww9OWf319/ckjyVKaoI/djE5Efi8rzCg=;
-        b=bLV41TZ3gy9/GQCwtFwSe0su1xBzK6g11mLDge7xedPaMwVY06eqIj+U2NOTCLA7wx
-         4e/ZGf2v9X7T1XZlRHCi808H5nTxQWb7QgOJ4KqdimWVmVotSf+YVtISHnN/eOf4EAFr
-         ni6NtMUupX9+3NfMirijwOKDuEW/SANSLpP3sfbap+zUu0o/s25XehPD03KQW/VA5mRH
-         xDprysqrDOF409/knCP3pbnBCSukZXRqwgkFM28iNM50F/vV0BuKnkU3qjpbmqt64fWA
-         v/THaeAqhXCDOgLSE1fAXPhUuMF85SOZHRe3ksAjPXgyPCVkepSAh6RZ/7qFkygD/goi
-         DYFw==
-X-Gm-Message-State: AOAM531SXZ+ey1ZIziXU+hlr6pvixB7N1y505Ki99Agj1Phzv8TAYnSj
-        eCyh6x9Eog+wyjLuldig1uezRlyjJVwwE/D2wicEXUgrRcl6H45N9/r3l7F6xmmVQU5dwr0c9X2
-        t0CuAFMCEKnHd7QBwmtLCHgFop9h5XPODbxDKadVxS7dpKCFU1yX0A9TxCvB7nQh6hNRdaTSnpy
-        CPOhOqrMffSCa5zSF8
-X-Google-Smtp-Source: ABdhPJzhQxfr7YmLnLQTuyAFMguLsPYwrYEipp4TVDG1jwjXWfgiFWmBYjDjwuyfzpGJzDHivCEfhKH77tKI4eUU13ro
-X-Received: by 2002:a25:2105:: with SMTP id h5mr10362528ybh.65.1594761365824;
- Tue, 14 Jul 2020 14:16:05 -0700 (PDT)
-Date:   Tue, 14 Jul 2020 14:16:00 -0700
-Message-Id: <20200714141547.v1.1.Icd35ad65fb4136d45dd701ef9022fa8f7c9e5d65@changeid>
+        bh=5Behtcws30Pp0nDQ23hDNBtqNP5bqp4CSfxyj349GYE=;
+        b=npyjwilNt+20+z4vbD3h46lC9IL95P4uXvQKU3gH5cClQvPvqEt6+YfOcoxxMuxNEs
+         bjcb4gBV+s+leO36wYahFoe19dBoIPsBBkaqYOc3Vz7fuK0JL39UP9SBkfOVrCI2HCgF
+         PsQuMScfMFQaDOcHL/PzkT0w2OajA4D10SKYcktpRzP3pmSYgA3w8j+MZj09dGUYHZC5
+         t62uLpEMBKh/bQ6gbS458egDWkEEBKbdM9J4PeabH3yCcYBh76iN/VpwUkZ7eAq9tZ+U
+         pP1DhAePn9pcogiBjkc3AamoBVVmDObcwfeXplM/wx6I8DH85PYrBNKaucPn+jG9jzak
+         40hA==
+X-Gm-Message-State: AOAM53375VGzXgWnkXO3cG1Av6aRM8aPxSn8KMpmyONwmnIlAvJRTNeT
+        SrAqw1Mikglg/4v5blzOwbsy2qt7TBEVU6qafnVrIc17lIdTPudfMWEMLA86q4tItZXSUmoCpc3
+        MWA/lCFEufMGaXdqedApNflxX+LZSvTGFMtUhg/pf3T2MryCPumYTvvrgg059ssCjHQAi7ZmLGM
+        VTlK7pz/RnEtsqT1fa
+X-Google-Smtp-Source: ABdhPJzuhzn0stnH04Y0xmiGPJJI6ddjd4INyuVFCT9ZvtB9fwZLNAJ1DPmpkDN9PNJIDYgcFx+WfgfepQ4EHN++vCRa
+X-Received: by 2002:a25:b90e:: with SMTP id x14mr11855088ybj.8.1594762103396;
+ Tue, 14 Jul 2020 14:28:23 -0700 (PDT)
+Date:   Tue, 14 Jul 2020 14:28:17 -0700
+Message-Id: <20200714142741.v2.1.Icd35ad65fb4136d45dd701ef9022fa8f7c9e5d65@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH v1] Bluetooth: Add per-instance adv disable/remove
+Subject: [PATCH v2] Bluetooth: Add per-instance adv disable/remove
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -85,6 +85,30 @@ Signed-off-by: Daniel Winkler <danielwinkler@google.com>
 Reviewed-by: Shyh-In Hwang <josephsih@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
+Hi Maintainers,
+
+Currently, advertising is globally-disabled, i.e. all instances are
+disabled together, even if hardware offloading is available. This
+patch adds functionality to disable and remove individual adv
+instances, solving two issues:
+
+1. On new advertisement registration, a global disable was done, and
+then only the new instance was enabled. This meant only the newest
+instance was actually enabled.
+
+2. On advertisement removal, the structure was removed, but the instance
+was never disabled or removed, which is incorrect with hardware offload
+support.
+
+Patch has been tested on advertising test suite and with manual testing
+to verify instances are added/removed properly on kernel 4.19 on hatch
+chromebook.
+
+Best,
+Daniel
+
+Changes in v2:
+- Re-add commit notes
 
  net/bluetooth/hci_conn.c    |  2 +-
  net/bluetooth/hci_request.c | 59 +++++++++++++++++++++++++++++++------
