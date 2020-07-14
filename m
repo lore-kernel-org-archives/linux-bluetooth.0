@@ -2,158 +2,210 @@ Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5A4C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 19:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A263C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 20:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3ACD22BF5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 19:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C09220656
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 20:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YmYxRna2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dsDrvsXK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729419AbgGNTvk (ORCPT
+        id S1727114AbgGNUpV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 15:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48588 "EHLO
+        Tue, 14 Jul 2020 16:45:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729203AbgGNTvj (ORCPT
+        with ESMTP id S1726634AbgGNUpP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 15:51:39 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDC9C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id d1so2204136plr.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
+        Tue, 14 Jul 2020 16:45:15 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49740C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 13:45:15 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id y10so24422394eje.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 13:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VPwCP5Z0Rhdnq92HhIud0aSAxStvJXr6W4dUKLtLBOA=;
-        b=YmYxRna25SgjM+JEwS0tqppDvfeBV/qU9QsX6CYlPCcHVV9leU80Cnyh0NEHhThURq
-         eoexJTg9KAz2whnzYLk5ZmKVI0Z5A3Dvc/7RBHnmyMH01FXXUVEaBtL4jo451g0pIkF8
-         20c6LzLkW6kZvJLTRH9j2AZS9chKtTnrINLtA=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Kqh1NBVBlHrZFE286BUwAHdoh8ntAaaIXSLlXQ7Bm6s=;
+        b=dsDrvsXKwnz4Ec5AoGC7UzNnGr6HGFuQx0fMIrzZdpvzT8V+sMBjSseqibtKkUleNp
+         YAQBi76uicXluskJd+hTeTsyWAg05jNYM0frcHY4PBAtEKlADxwqvaJdPcxxHuR6fSg4
+         Z8Av9Xw3kWBU7AcvAiZLJvP0ANAQYQY/1HRVk5m0U6KRDc+OtwfbXN0N1c0AAmeVdh96
+         7p0jLgi5ACnL+H0e8teJtGjWlj+U1ay7gVzmHsVYk1zN8dRbuaztcrZ66pzJ2Ok7zto2
+         EGMDow93S9QTHHgzoSZB16/uOQk9fIg12WPTEmg38d7cg2Gx2p4CpzISSSFIUXkbDAsr
+         HC/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VPwCP5Z0Rhdnq92HhIud0aSAxStvJXr6W4dUKLtLBOA=;
-        b=qzkYseWRUCc/SaXHHHMqfttDKl+G87SmSMGjPZP4IPPQwlRljd9/Np0RQl9iaLEvk0
-         wuvS9QYyOjVIwf5txDXAznIFjCnbmo83lQ1J+iQP6i1Z4ViFdSEz03XiDYjr/ykxwpz8
-         7/R6VyIfNSQ8uwTTkB3Oph4LAggM8f+09I80RxbTlljTu8wFiI0CvDUi0k/oBd1Zi02i
-         eW3rN5H4BzRsIVfKMJhAf2ctA+oN/dS0WPig0tZBHNS3Of6hMOXvx3ZgTpyeXJrTxUCS
-         RfjuBQjAviqcmfd4F6rFeDdkPKrCHHqKXhezJuuSDDOxpiFccjdKpluTeTGuqFCanEiR
-         8dPg==
-X-Gm-Message-State: AOAM532rw/Y6cwyKtux2e66OlN1aQas3x16tCdGWVsRlNQQG43FIpsOX
-        +sPOzhBI2zdR9VoZZwktDlDcwA==
-X-Google-Smtp-Source: ABdhPJwYPtlW44unqGfV01GTHWMUkecTDgeXt1t7arg3sjWlLPfO2Bqw+bL9pwJF2r5QmVDjXvLsrQ==
-X-Received: by 2002:a17:90a:3488:: with SMTP id p8mr6634739pjb.211.1594756299490;
-        Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id 204sm30669pfx.3.2020.07.14.12.51.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2020 12:51:38 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [Bluez PATCH v2] doc: Add Suspend and Resume events
-Date:   Tue, 14 Jul 2020 12:51:31 -0700
-Message-Id: <20200714125120.Bluez.v2.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
-X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Kqh1NBVBlHrZFE286BUwAHdoh8ntAaaIXSLlXQ7Bm6s=;
+        b=i0w1ntqnyd7CD9N48XmhbYXjbVWk/Jj+a3CyZGkizfz6re+Y0i+uljCwMySYoCw6Jp
+         PfCyO21gk/qA8H2aLi1xErXGAvspfjxKx8LVxj+pkCRamIomO267ZGVY2xASoabCT5oC
+         a3hq2oJO6VNZ35Y0MLGZrAKsWv05AwXAMvNfRlLePC0QYG2lVC1BjJbxpMHubUc+HRR6
+         XZ1aSUNv/mPB6JjgbtRzMtL8nx+SLx07heh/j7uCt7V7AYm/OVZoDJ085UDcCCJYa5zq
+         yiyT9j6H/JAPJJMr4sci1s4Cvtx4N9DchS7V+aZngJgf2Ljg33FBlsTYG7o00ujsbAFG
+         JUMw==
+X-Gm-Message-State: AOAM531J4ifNnbgUCKfwg3cVtGw48QtJKIlWsquoS9FmkwxeYFJ4PBgR
+        2V0wzt2R9mwpyiVA2aHDs7FU3XEW47EQK2bBw9/JpQ==
+X-Google-Smtp-Source: ABdhPJysUSBHVOa53sWJQjIcFkn4l3OgSNQEcR9y15L+mAV25fgE46PISgPYdobloPCBMeTthBtC00kZdSRclXpMQu0=
+X-Received: by 2002:a17:906:fa9b:: with SMTP id lt27mr6000034ejb.513.1594759512692;
+ Tue, 14 Jul 2020 13:45:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200714124113.20918-1-Sergey.Semin@baikalelectronics.ru>
+In-Reply-To: <20200714124113.20918-1-Sergey.Semin@baikalelectronics.ru>
+From:   Daniel Winkler <danielwinkler@google.com>
+Date:   Tue, 14 Jul 2020 13:45:01 -0700
+Message-ID: <CAP2xMbvwxYaGPPCDWY2LWUc2te8kS9t-+A0zieYp3RiGMJR6ng@mail.gmail.com>
+Subject: Re: [PATCH] serial: 8250_mtk: Fix high-speed baud rates clamping
+To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Claire Chang <tientzu@google.com>,
+        Nicolas Boichat <drinkcat@google.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Serge Semin <fancer.lancer@gmail.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Aaron Sierra <asierra@xes-inc.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-serial@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        abhishekpandit@chromium.org, stable@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add Controller Suspend Event and Controller Resume Event to identify
-suspend or resume of the Bluetooth stack has occurred.
+Thank you Sergey for looking into this. Adding folks working on this
+platform to perform validation of the proposed patch.
 
-Also update Device Disconnected Event to indicate a new disconnect
-reason: "Connection terminated by local host for suspend"
+Best,
+Daniel
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
-
-Changes in v2:
-- Moved Wake_Reason to first value
-- Reduced Wake_Reason to not Bluetooth, unexpected event and remote wake
-
- doc/mgmt-api.txt | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ca0d38469..e7a713824 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3834,6 +3834,7 @@ Device Disconnected Event
- 		2	Connection terminated by local host
- 		3	Connection terminated by remote host
- 		4	Connection terminated due to authentication failure
-+		5	Connection terminated by local host for suspend
- 
- 	Note that the local/remote distinction just determines which side
- 	terminated the low-level connection, regardless of the
-@@ -4577,3 +4578,50 @@ Advertisement Monitor Removed Event
- 
- 	The event will only be sent to management sockets other than the
- 	one through which the command was sent.
-+
-+
-+Controller Suspend Event
-+========================
-+
-+	Event code:		0x002d
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Suspend_State (1 octet)
-+
-+	This event indicates that the controller is suspended for host suspend.
-+
-+	Possible values for the Suspend_State parameter:
-+		0	Running (not disconnected)
-+		1	Disconnected and not scanning
-+		2	Page scanning and/or passive scanning.
-+
-+	The value 0 is used for the running state and may be sent if the
-+	controller could not be configured to suspend properly.
-+
-+	This event will be sent to all management sockets.
-+
-+
-+Controller Resume Event
-+=======================
-+
-+	Event code:		0x002e
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Wake_Reason (1 octet)
-+				Address (6 octets)
-+				Address_Type (1 octet)
-+
-+	This event indicates that the controller has resumed from suspend.
-+
-+	Possible values for the Wake_Reason parameter:
-+		0	Resume from non-Bluetooth wake source
-+		1	Wake due to unexpected event
-+		2	Remote wake due to peer device connection
-+
-+	Currently, we expect that only peer reconnections should wake us from
-+	the suspended state. Any other events that occurred while the system
-+	should have been suspended results in wake due to unexpected event.
-+
-+	If the Wake_Reason is Remote wake due to connection, the address of the
-+	peer device that caused the event will be shared in Address and
-+	Address_Type. Otherwise, Address and Address_Type will both be zero.
-+
-+	This event will be sent to all management sockets.
--- 
-2.27.0.389.gc38d7665816-goog
-
+On Tue, Jul 14, 2020 at 5:41 AM Serge Semin
+<Sergey.Semin@baikalelectronics.ru> wrote:
+>
+> Commit 7b668c064ec3 ("serial: 8250: Fix max baud limit in generic 8250
+> port") fixed limits of a baud rate setting for a generic 8250 port.
+> In other words since that commit the baud rate has been permitted to be
+> within [uartclk / 16 / UART_DIV_MAX; uartclk / 16], which is absolutely
+> normal for a standard 8250 UART port. But there are custom 8250 ports,
+> which provide extended baud rate limits. In particular the Mediatek 8250
+> port can work with baud rates up to "uartclk" speed.
+>
+> Normally that and any other peculiarity is supposed to be handled in a
+> custom set_termios() callback implemented in the vendor-specific
+> 8250-port glue-driver. Currently that is how it's done for the most of
+> the vendor-specific 8250 ports, but for some reason for Mediatek a
+> solution has been spread out to both the glue-driver and to the generic
+> 8250-port code. Due to that a bug has been introduced, which permitted the
+> extended baud rate limit for all even for standard 8250-ports. The bug
+> has been fixed by the commit 7b668c064ec3 ("serial: 8250: Fix max baud
+> limit in generic 8250 port") by narrowing the baud rates limit back down to
+> the normal bounds. Unfortunately by doing so we also broke the
+> Mediatek-specific extended bauds feature.
+>
+> A fix of the problem described above is twofold. First since we can't get
+> back the extended baud rate limits feature to the generic set_termios()
+> function and that method supports only a standard baud rates range, the
+> requested baud rate must be locally stored before calling it and then
+> restored back to the new termios structure after the generic set_termios()
+> finished its magic business. By doing so we still use the
+> serial8250_do_set_termios() method to set the LCR/MCR/FCR/etc. registers,
+> while the extended baud rate setting procedure will be performed later in
+> the custom Mediatek-specific set_termios() callback. Second since a true
+> baud rate is now fully calculated in the custom set_termios() method we
+> need to locally update the port timeout by calling the
+> uart_update_timeout() function. After the fixes described above are
+> implemented in the 8250_mtk.c driver, the Mediatek 8250-port should
+> get back to normally working with extended baud rates.
+>
+> Link: https://lore.kernel.org/linux-serial/20200701211337.3027448-1-danielwinkler@google.com
+>
+> Fixes: 7b668c064ec3 ("serial: 8250: Fix max baud limit in generic 8250 port")
+> Reported-by: Daniel Winkler <danielwinkler@google.com>
+> Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+>
+> ---
+>
+> Folks, sorry for a delay with the problem fix. A solution is turned out to
+> be a bit more complicated than I originally thought in my comment to the
+> Daniel revert-patch.
+>
+> Please also note, that I don't have a Mediatek hardware to test the
+> solution suggested in the patch. The code is written as on so called
+> the tip of the pen after digging into the 8250_mtk.c and 8250_port.c
+> drivers code. So please Daniel or someone with Mediatek 8250-port
+> available on a board test this patch first and report about the results in
+> reply to this emailing thread. After that, if your conclusion is positive
+> and there is no objection against the solution design the patch can be
+> merged in.
+>
+> Cc: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+> Cc: Daniel Winkler <danielwinkler@google.com>
+> Cc: Aaron Sierra <asierra@xes-inc.com>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: Lukas Wunner <lukas@wunner.de>
+> Cc: Vignesh Raghavendra <vigneshr@ti.com>
+> Cc: linux-serial@vger.kernel.org
+> Cc: linux-mediatek@lists.infradead.org
+> Cc: BlueZ <linux-bluetooth@vger.kernel.org>
+> Cc: chromeos-bluetooth-upstreaming <chromeos-bluetooth-upstreaming@chromium.org>
+> Cc: abhishekpandit@chromium.org
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/tty/serial/8250/8250_mtk.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>
+> diff --git a/drivers/tty/serial/8250/8250_mtk.c b/drivers/tty/serial/8250/8250_mtk.c
+> index f839380c2f4c..98b8a3e30733 100644
+> --- a/drivers/tty/serial/8250/8250_mtk.c
+> +++ b/drivers/tty/serial/8250/8250_mtk.c
+> @@ -306,8 +306,21 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
+>         }
+>  #endif
+>
+> +       /*
+> +        * Store the requested baud rate before calling the generic 8250
+> +        * set_termios method. Standard 8250 port expects bauds to be
+> +        * no higher than (uartclk / 16) so the baud will be clamped if it
+> +        * gets out of that bound. Mediatek 8250 port supports speed
+> +        * higher than that, therefore we'll get original baud rate back
+> +        * after calling the generic set_termios method and recalculate
+> +        * the speed later in this method.
+> +        */
+> +       baud = tty_termios_baud_rate(termios);
+> +
+>         serial8250_do_set_termios(port, termios, old);
+>
+> +       tty_termios_encode_baud_rate(termios, baud, baud);
+> +
+>         /*
+>          * Mediatek UARTs use an extra highspeed register (MTK_UART_HIGHS)
+>          *
+> @@ -339,6 +352,11 @@ mtk8250_set_termios(struct uart_port *port, struct ktermios *termios,
+>          */
+>         spin_lock_irqsave(&port->lock, flags);
+>
+> +       /*
+> +        * Update the per-port timeout.
+> +        */
+> +       uart_update_timeout(port, termios->c_cflag, baud);
+> +
+>         /* set DLAB we have cval saved in up->lcr from the call to the core */
+>         serial_port_out(port, UART_LCR, up->lcr | UART_LCR_DLAB);
+>         serial_dl_write(up, quot);
+> --
+> 2.26.2
+>
