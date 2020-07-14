@@ -2,253 +2,328 @@ Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6F9C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2807AC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 23:12:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62F6520658
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 21:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED0192065E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 23:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l38dTQyw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUDYAelp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728324AbgGNV2Z (ORCPT
+        id S1726970AbgGNXMD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 17:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35394 "EHLO
+        Tue, 14 Jul 2020 19:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727981AbgGNV2Y (ORCPT
+        with ESMTP id S1726446AbgGNXMD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 17:28:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499F3C08C5C1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:28:24 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id u12so362960ybj.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 14:28:24 -0700 (PDT)
+        Tue, 14 Jul 2020 19:12:03 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FBA8C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 16:12:03 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id e8so72318pgc.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 16:12:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5Behtcws30Pp0nDQ23hDNBtqNP5bqp4CSfxyj349GYE=;
-        b=l38dTQyw2IrM5kbznrKVpPLablAiGcaqv+lkFFedxeNwW16nlKSBZdJAhX3/TV/Brm
-         MvKr6yC3Gq4BiJIZq4CgxKwEaSknQXLkSggaBC7wGg7rLgA29O6Wi4fsisqlhv18s2LP
-         WF/w1jNMYA8enA7rWZlwg4NIDV2y+gazD7a1IVsQa/VIKEYTkAly9Mfqp0RboPwfXt9w
-         6L2wfqEGoZ+oUtcRaJQs6g1ThE2GKuQjfqCXwwZkzTCs3UNqe5zXasjKdFaNdE/6E49H
-         f+x0X+uXn3V88VHKuTu9rjhhu4WQmFA3PTgJorReU1jMrw23CaHbLF8ZORS9+KFdazK4
-         P3+g==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IlTzMdk+7M90bKP45e+XUoQ4Pa5aVbYqIXRRa78peiI=;
+        b=BUDYAelpVEE+jj0hBMPWbsEOB3f8w3/1FKtKul+sgZHuY1+Aky/IfYQcRTZWsdJVFT
+         yCNsMUO/y/etGzQ1s41YM6282aG5BipV6jNJ9v7kSuRU6Mrn/IKZHEJ90tqaysPcfP+J
+         H+vmw6WuowhxdR6w2V6q3ICTw8q179VZYnece9JVFPOvSIZ1v8kpt3gPeGJh7VFEEOJY
+         k9lxyTNjE0M1tiZn01C66R3ifJwRqxsG46oUv+9fBSmWfysxZ+U7PkwvVH5juq4JBqWn
+         uY3nl15CHBxohQD8LSqlL05p6occOdy6ETk2MtG4MJq0Tb6iUBgnqpLmuGz+QyJcXQia
+         /Lgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5Behtcws30Pp0nDQ23hDNBtqNP5bqp4CSfxyj349GYE=;
-        b=npyjwilNt+20+z4vbD3h46lC9IL95P4uXvQKU3gH5cClQvPvqEt6+YfOcoxxMuxNEs
-         bjcb4gBV+s+leO36wYahFoe19dBoIPsBBkaqYOc3Vz7fuK0JL39UP9SBkfOVrCI2HCgF
-         PsQuMScfMFQaDOcHL/PzkT0w2OajA4D10SKYcktpRzP3pmSYgA3w8j+MZj09dGUYHZC5
-         t62uLpEMBKh/bQ6gbS458egDWkEEBKbdM9J4PeabH3yCcYBh76iN/VpwUkZ7eAq9tZ+U
-         pP1DhAePn9pcogiBjkc3AamoBVVmDObcwfeXplM/wx6I8DH85PYrBNKaucPn+jG9jzak
-         40hA==
-X-Gm-Message-State: AOAM53375VGzXgWnkXO3cG1Av6aRM8aPxSn8KMpmyONwmnIlAvJRTNeT
-        SrAqw1Mikglg/4v5blzOwbsy2qt7TBEVU6qafnVrIc17lIdTPudfMWEMLA86q4tItZXSUmoCpc3
-        MWA/lCFEufMGaXdqedApNflxX+LZSvTGFMtUhg/pf3T2MryCPumYTvvrgg059ssCjHQAi7ZmLGM
-        VTlK7pz/RnEtsqT1fa
-X-Google-Smtp-Source: ABdhPJzuhzn0stnH04Y0xmiGPJJI6ddjd4INyuVFCT9ZvtB9fwZLNAJ1DPmpkDN9PNJIDYgcFx+WfgfepQ4EHN++vCRa
-X-Received: by 2002:a25:b90e:: with SMTP id x14mr11855088ybj.8.1594762103396;
- Tue, 14 Jul 2020 14:28:23 -0700 (PDT)
-Date:   Tue, 14 Jul 2020 14:28:17 -0700
-Message-Id: <20200714142741.v2.1.Icd35ad65fb4136d45dd701ef9022fa8f7c9e5d65@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH v2] Bluetooth: Add per-instance adv disable/remove
-From:   Daniel Winkler <danielwinkler@google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IlTzMdk+7M90bKP45e+XUoQ4Pa5aVbYqIXRRa78peiI=;
+        b=RA5Q4TsU/yVCU75ulSE/1v69+kofDImLHEwnLIgUrghrQ9HiFJGnLuG0XQxpf7UIJ4
+         uVHb+1cz3LLulX6tEB3AXalJtqVaQuKwfL8QsH3pHT/scnllMr6+e0ZlIEEuKHtcfu1M
+         BpQdkjoN5vHhHJdVld7n2qmtoSJN/fqYgOq17SYVGezJrByGv9GhHzfRCsZtkxxKsOwm
+         hvyABdk2SXxr2dS8nl+U3k3hRgJk2JBRGnj4Bo7CtiWvzjiTQgsN/Pc9QaZLnvPAGW+U
+         AY+EInj85r3hlr8zrdENhcIibzvJWJHSlNitugNBCN1SWpppTO95gEYk3bDvOSxonz2X
+         hnow==
+X-Gm-Message-State: AOAM532qp6qLJCBUP3V50PHdC3e9YG6KnfSsndBk3PjNaMjTsFhkZTdg
+        c1X49qMIEw4SESBMSsNQQpEO5Jgwp+8=
+X-Google-Smtp-Source: ABdhPJz1ZofVq1FZzaYJVxyE+Lb4rj+mrTgDR1zAiOAVsDw1crGw1VnlQ4sa49EgiaLy4mpuDuBxIg==
+X-Received: by 2002:a63:531e:: with SMTP id h30mr5053980pgb.165.1594768322011;
+        Tue, 14 Jul 2020 16:12:02 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id g10sm133608pjs.20.2020.07.14.16.12.00
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2020 16:12:01 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>,
-        Shyh-In Hwang <josephsih@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [RFC v2] Bluetooth: btusb: Add support for queuing during polling interval
+Date:   Tue, 14 Jul 2020 16:12:00 -0700
+Message-Id: <20200714231200.690268-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add functionality to disable and remove advertising instances,
-and use that functionality in MGMT add/remove advertising calls.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Daniel Winkler <danielwinkler@google.com>
-Reviewed-by: Shyh-In Hwang <josephsih@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
+This makes btusb to queue ACL and events during a polling interval
+by using of a delayed work, with the interval working as a time window
+where frames received from different endpoints are considered to be
+arrived at same time and then attempt to resolve potential conflics by
+processing the events ahead of ACL packets.
+
+It worth noting though that priorizing events over ACL data may result
+in inverting the order compared to how they appeared over the air, for
+instance there may be packets received before a disconnect event that
+will be discarded and unencrypted packets received before encryption
+change which would considered encrypted, because of these potential
+changes on the order the support for queuing during the polling
+interval is not enabled by default so platforms have the following
+means to enable it:
+
+At build-time:
+
+    CONFIG_BT_HCIBTUSB_INTERVAL=y
+
+At runtime with use of module option:
+
+    enable_interval
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Hi Maintainers,
+ drivers/bluetooth/Kconfig |  7 ++++
+ drivers/bluetooth/btusb.c | 88 ++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 84 insertions(+), 11 deletions(-)
 
-Currently, advertising is globally-disabled, i.e. all instances are
-disabled together, even if hardware offloading is available. This
-patch adds functionality to disable and remove individual adv
-instances, solving two issues:
-
-1. On new advertisement registration, a global disable was done, and
-then only the new instance was enabled. This meant only the newest
-instance was actually enabled.
-
-2. On advertisement removal, the structure was removed, but the instance
-was never disabled or removed, which is incorrect with hardware offload
-support.
-
-Patch has been tested on advertising test suite and with manual testing
-to verify instances are added/removed properly on kernel 4.19 on hatch
-chromebook.
-
-Best,
-Daniel
-
-Changes in v2:
-- Re-add commit notes
-
- net/bluetooth/hci_conn.c    |  2 +-
- net/bluetooth/hci_request.c | 59 +++++++++++++++++++++++++++++++------
- net/bluetooth/hci_request.h |  2 ++
- net/bluetooth/mgmt.c        |  6 ++++
- 4 files changed, 59 insertions(+), 10 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 8805d68e65f2a..be67361ff2f00 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -931,7 +931,7 @@ static void hci_req_directed_advertising(struct hci_request *req,
- 		 * So it is required to remove adv set for handle 0x00. since we use
- 		 * instance 0 for directed adv.
- 		 */
--		hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(cp.handle), &cp.handle);
-+		__hci_req_remove_ext_adv_instance(req, cp.handle);
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 4e73a531b377..2f20a853d946 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
+ 	  This can be overridden by passing btusb.enable_autosuspend=[y|n]
+ 	  on the kernel commandline.
  
- 		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
- 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 770b937581122..7c0c2fda04adf 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1179,13 +1179,8 @@ static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
- void __hci_req_disable_advertising(struct hci_request *req)
- {
- 	if (ext_adv_capable(req->hdev)) {
--		struct hci_cp_le_set_ext_adv_enable cp;
-+		__hci_req_disable_ext_adv_instance(req, 0x00);
- 
--		cp.enable = 0x00;
--		/* Disable all sets since we only support one set at the moment */
--		cp.num_of_sets = 0x00;
++config BT_HCIBTUSB_INTERVAL
++	bool "Enable notification of USB polling interval"
++	depends on BT_HCIBTUSB
++	help
++	  Say Y here to enable notification of USB polling interval for
++	  Bluetooth USB devices by default.
++
+ config BT_HCIBTUSB_BCM
+ 	bool "Broadcom protocol support"
+ 	depends on BT_HCIBTUSB
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index faa863dd5d0a..8fcf19bc5b36 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -30,7 +30,7 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
 -
--		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE, sizeof(cp), &cp);
- 	} else {
- 		u8 enable = 0x00;
++static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
+ static bool reset = true;
  
-@@ -1950,13 +1945,59 @@ int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance)
- 	return 0;
+ static struct usb_driver btusb_driver;
+@@ -465,8 +465,12 @@ struct btusb_data {
+ 
+ 	unsigned long flags;
+ 
+-	struct work_struct work;
+-	struct work_struct waker;
++	struct work_struct  work;
++	struct work_struct  waker;
++	struct delayed_work rx_work;
++
++	struct sk_buff_head acl_q;
++	struct sk_buff_head evt_q;
+ 
+ 	struct usb_anchor deferred;
+ 	struct usb_anchor tx_anchor;
+@@ -503,7 +507,7 @@ struct btusb_data {
+ 	int isoc_altsetting;
+ 	int suspend_count;
+ 
+-	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
++	int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
+ 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+ 
+ 	int (*setup_on_usb)(struct hci_dev *hdev);
+@@ -653,7 +657,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_event(data->hdev, skb);
++			data->recv_event(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -664,6 +668,25 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 	return err;
  }
  
-+int __hci_req_disable_ext_adv_instance(struct hci_request *req, u8 instance)
++static int btusb_rx_queue(struct btusb_data *data, struct sk_buff *skb,
++			  struct sk_buff_head *queue, unsigned int interval)
 +{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_cp_le_set_ext_adv_enable *cp;
-+	struct hci_cp_ext_adv_set *adv_set;
-+	u8 data[sizeof(*cp) + sizeof(*adv_set) * 1];
-+	u8 req_size;
++	skb_queue_tail(queue, skb);
 +
-+	/* If request specifies an instance that doesn't exist, fail */
-+	if (instance > 0 && !hci_find_adv_instance(hdev, instance))
-+		return -EINVAL;
-+
-+	memset(data, 0, sizeof(data));
-+
-+	cp = (void *)data;
-+	adv_set = (void *)cp->data;
-+
-+	/* Instance 0x00 indicates all advertising instances will be disabled */
-+	cp->num_of_sets = !!instance;
-+	cp->enable = 0x00;
-+
-+	adv_set->handle = instance;
-+
-+	req_size = sizeof(*cp) + sizeof(*adv_set) * cp->num_of_sets;
-+	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE, req_size, data);
++	schedule_delayed_work(&data->rx_work, interval);
 +
 +	return 0;
 +}
 +
-+int __hci_req_remove_ext_adv_instance(struct hci_request *req, u8 instance)
++static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
 +{
-+	struct hci_dev *hdev = req->hdev;
++	if (!enable_interval)
++		return hci_recv_frame(data->hdev, skb);
 +
-+	/* If request specifies an instance that doesn't exist, fail */
-+	if (instance > 0 && !hci_find_adv_instance(hdev, instance))
-+		return -EINVAL;
-+
-+	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(instance), &instance);
-+
-+	return 0;
++	/* TODO: Calculate polling interval based on endpoint bInterval? */
++	return btusb_rx_queue(data, skb, &data->acl_q, msecs_to_jiffies(1));
 +}
 +
- int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
+ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
  {
- 	struct hci_dev *hdev = req->hdev;
-+	struct adv_info *adv_instance = hci_find_adv_instance(hdev, instance);
- 	int err;
+ 	struct sk_buff *skb;
+@@ -711,7 +734,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
  
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
--		__hci_req_disable_advertising(req);
-+	/* If instance isn't pending, the chip knows about it, and it's safe to
-+	 * disable
-+	 */
-+	if (adv_instance && !adv_instance->pending)
-+		__hci_req_disable_ext_adv_instance(req, instance);
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			hci_recv_frame(data->hdev, skb);
++			btusb_recv_acl(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -1329,9 +1352,13 @@ static int btusb_close(struct hci_dev *hdev)
  
- 	err = __hci_req_setup_ext_adv_instance(req, instance);
- 	if (err < 0)
-@@ -2104,7 +2145,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
- 	    hci_dev_test_flag(hdev, HCI_ADVERTISING))
- 		return;
+ 	BT_DBG("%s", hdev->name);
  
--	if (next_instance)
-+	if (next_instance && !ext_adv_capable(hdev))
- 		__hci_req_schedule_adv_instance(req, next_instance->instance,
- 						false);
- }
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 0e81614d235e9..bbe892ab078ab 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -86,6 +86,8 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
- int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
- int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
- int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
-+int __hci_req_disable_ext_adv_instance(struct hci_request *req, u8 instance);
-+int __hci_req_remove_ext_adv_instance(struct hci_request *req, u8 instance);
- void __hci_req_clear_ext_adv_sets(struct hci_request *req);
- int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
- 			   bool use_rpa, struct adv_info *adv_instance,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 686ef47928316..f45105d2de772 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7504,6 +7504,12 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
++	cancel_delayed_work(&data->rx_work);
+ 	cancel_work_sync(&data->work);
+ 	cancel_work_sync(&data->waker);
  
- 	hci_req_init(&req, hdev);
- 
-+	/* If we use extended advertising, instance is disabled and removed */
-+	if (ext_adv_capable(hdev)) {
-+		__hci_req_disable_ext_adv_instance(&req, cp->instance);
-+		__hci_req_remove_ext_adv_instance(&req, cp->instance);
-+	}
++	skb_queue_purge(&data->acl_q);
++	skb_queue_purge(&data->evt_q);
 +
- 	hci_req_clear_adv_instance(hdev, sk, &req, cp->instance, true);
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+@@ -1363,6 +1390,11 @@ static int btusb_flush(struct hci_dev *hdev)
  
- 	if (list_empty(&hdev->adv_instances))
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
++
++	skb_queue_purge(&data->acl_q);
++	skb_queue_purge(&data->evt_q);
++
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 	btusb_free_frags(data);
+ 
+@@ -1718,6 +1750,25 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++static void btusb_rx_dequeue(struct btusb_data *data,
++			     struct sk_buff_head *queue)
++{
++	struct sk_buff *skb;
++
++	while ((skb = skb_dequeue(queue)))
++		hci_recv_frame(data->hdev, skb);
++}
++
++static void btusb_rx_work(struct work_struct *work)
++{
++	struct btusb_data *data = container_of(work, struct btusb_data,
++					       rx_work.work);
++
++	/* Process HCI event packets so states changes are synchronized first */
++	btusb_rx_dequeue(data, &data->evt_q);
++	btusb_rx_dequeue(data, &data->acl_q);
++}
++
+ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -2155,10 +2206,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
+ 		wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
+ }
+ 
+-static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
++static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
+ {
+-	struct btusb_data *data = hci_get_drvdata(hdev);
+-
+ 	if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
+ 		struct hci_event_hdr *hdr = (void *)skb->data;
+ 
+@@ -2187,7 +2236,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 	}
+ 
+-	return hci_recv_frame(hdev, skb);
++	return hci_recv_frame(data->hdev, skb);
+ }
+ 
+ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3767,6 +3816,15 @@ static bool btusb_prevent_wake(struct hci_dev *hdev)
+ 	return !device_may_wakeup(&data->udev->dev);
+ }
+ 
++static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (!enable_interval)
++		return hci_recv_frame(data->hdev, skb);
++
++	/* Don't delay event processing */
++	return btusb_rx_queue(data, skb, &data->evt_q, 0);
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -3850,6 +3908,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
++	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
++
++	skb_queue_head_init(&data->acl_q);
++	skb_queue_head_init(&data->evt_q);
++
+ 	init_usb_anchor(&data->deferred);
+ 	init_usb_anchor(&data->tx_anchor);
+ 	spin_lock_init(&data->txlock);
+@@ -3866,7 +3929,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->recv_bulk = btusb_recv_bulk_intel;
+ 		set_bit(BTUSB_BOOTLOADER, &data->flags);
+ 	} else {
+-		data->recv_event = hci_recv_frame;
++		data->recv_event = btusb_recv_evt;
+ 		data->recv_bulk = btusb_recv_bulk;
+ 	}
+ 
+@@ -4335,6 +4398,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+ module_param(enable_autosuspend, bool, 0644);
+ MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+ 
++module_param(enable_interval, bool, 0644);
++MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
++
+ module_param(reset, bool, 0644);
+ MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+ 
 -- 
-2.27.0.389.gc38d7665816-goog
+2.25.3
 
