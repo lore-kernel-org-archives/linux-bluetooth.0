@@ -2,206 +2,158 @@ Return-Path: <SRS0=5ENf=AZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6888C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 17:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5A4C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 19:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB11922464
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 17:10:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3ACD22BF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jul 2020 19:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EwyPLZj1"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YmYxRna2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbgGNRKK (ORCPT
+        id S1729419AbgGNTvk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jul 2020 13:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
+        Tue, 14 Jul 2020 15:51:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726477AbgGNRKJ (ORCPT
+        with ESMTP id S1729203AbgGNTvj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jul 2020 13:10:09 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA611C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 10:10:09 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id 18so13563679otv.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 10:10:09 -0700 (PDT)
+        Tue, 14 Jul 2020 15:51:39 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDC9C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id d1so2204136plr.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wZ225EF+OkAAsyxWL9/lOWbhPOMvqnQib3F5lTrCkho=;
-        b=EwyPLZj1k8QMnRROeJbtHVgVX33zeKb6gZ7U1WCFLFR02ZYsZLX5HukLKpy0t9pAga
-         VrHVNQUAJ7QPQvN1Xwp2yMQoecHM5P5oRg78LzWcpI5/Y93kGOvakdoM5KBlOHPIlv5M
-         DtLsE2YVOyOZWeBE/nQPw4CIjtmiALYX065zvR2lytzTe0Z7BEY5zun6qFifl/rLyVSj
-         S91LJI/b2XE2RpBreBAtB9qfmxJneal5g6wU2K0ON7sI+9HYhC8nW4pfyVjlvye6WGpD
-         ztxWj/bH3I3DBC/gHXJQU6d/J3/8OHg359Qo1w/XFZXoJLhJiqoBRoeMUGwreoBaApMY
-         kv5A==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VPwCP5Z0Rhdnq92HhIud0aSAxStvJXr6W4dUKLtLBOA=;
+        b=YmYxRna25SgjM+JEwS0tqppDvfeBV/qU9QsX6CYlPCcHVV9leU80Cnyh0NEHhThURq
+         eoexJTg9KAz2whnzYLk5ZmKVI0Z5A3Dvc/7RBHnmyMH01FXXUVEaBtL4jo451g0pIkF8
+         20c6LzLkW6kZvJLTRH9j2AZS9chKtTnrINLtA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wZ225EF+OkAAsyxWL9/lOWbhPOMvqnQib3F5lTrCkho=;
-        b=np9winhAMjc1xPh9FFV9tsSklVwnvZ+lxoMHPadF4Y9i9ttnAstSUXxz1caONxFbNA
-         pPrQh7ODIUn+C69/TMRLakq4fY267OziDnesI6rWieqnnXcyzeziBF2VSH2eCN87VKSr
-         TUX+7IJ7kVlvZAE3ScMs6qIYDKvFiGr4sq1Oidm9psJhCnDYRnGP1EaTqbgI91ECquIe
-         9W7hpdzcW5NvAa4gPRbhFo7X1meuJ6uHoaLcx76m4eyB7z/tdPiwx1BIyR+L1TWgD3Rj
-         S2T/Wa01Rycpd8m5Ekk3Gnc53bdMc3CmMp4tux8phcmPIaGYYJfYkAQ5+zlpAAlLGWou
-         nClQ==
-X-Gm-Message-State: AOAM531Qmo+d31VShzwmnIu5aLxe4H/mPqIwNpbWiktQ3hLgkkY2sEV9
-        hdBk+Gr66oqrFHJWlGOyDpmwEd7dD9dOezzO7QOWRqcZ
-X-Google-Smtp-Source: ABdhPJxBOMLainKilL0xte4NzLnpv3DXC6wbXjK7MKobehG/vHbACpUMUV6YTKVkijKj4BdAiigKLgs97g5UTBaG7d8=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id v19mr4954618ota.91.1594746609062;
- Tue, 14 Jul 2020 10:10:09 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VPwCP5Z0Rhdnq92HhIud0aSAxStvJXr6W4dUKLtLBOA=;
+        b=qzkYseWRUCc/SaXHHHMqfttDKl+G87SmSMGjPZP4IPPQwlRljd9/Np0RQl9iaLEvk0
+         wuvS9QYyOjVIwf5txDXAznIFjCnbmo83lQ1J+iQP6i1Z4ViFdSEz03XiDYjr/ykxwpz8
+         7/R6VyIfNSQ8uwTTkB3Oph4LAggM8f+09I80RxbTlljTu8wFiI0CvDUi0k/oBd1Zi02i
+         eW3rN5H4BzRsIVfKMJhAf2ctA+oN/dS0WPig0tZBHNS3Of6hMOXvx3ZgTpyeXJrTxUCS
+         RfjuBQjAviqcmfd4F6rFeDdkPKrCHHqKXhezJuuSDDOxpiFccjdKpluTeTGuqFCanEiR
+         8dPg==
+X-Gm-Message-State: AOAM532rw/Y6cwyKtux2e66OlN1aQas3x16tCdGWVsRlNQQG43FIpsOX
+        +sPOzhBI2zdR9VoZZwktDlDcwA==
+X-Google-Smtp-Source: ABdhPJwYPtlW44unqGfV01GTHWMUkecTDgeXt1t7arg3sjWlLPfO2Bqw+bL9pwJF2r5QmVDjXvLsrQ==
+X-Received: by 2002:a17:90a:3488:: with SMTP id p8mr6634739pjb.211.1594756299490;
+        Tue, 14 Jul 2020 12:51:39 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id 204sm30669pfx.3.2020.07.14.12.51.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2020 12:51:38 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [Bluez PATCH v2] doc: Add Suspend and Resume events
+Date:   Tue, 14 Jul 2020 12:51:31 -0700
+Message-Id: <20200714125120.Bluez.v2.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
+X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
 MIME-Version: 1.0
-References: <20200627235318.Bluez.v2.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
- <CABBYNZ+8bZW7qjzVNsSv7Sc_3h-ZwbSa6Hnz=dAX+2AxmWV9Dw@mail.gmail.com> <CAJQfnxHnLKoMQ+Z5bRhAQPWkoN5Lb5m-9o2pe4HTMP4Jy26qrQ@mail.gmail.com>
-In-Reply-To: <CAJQfnxHnLKoMQ+Z5bRhAQPWkoN5Lb5m-9o2pe4HTMP4Jy26qrQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 14 Jul 2020 10:09:57 -0700
-Message-ID: <CABBYNZJxcgtkGRTiwjvKgTndT22SbK+gY8tZk-2z2++7d_57ag@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2 1/2] device: add device_remove_bonding function
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Add Controller Suspend Event and Controller Resume Event to identify
+suspend or resume of the Bluetooth stack has occurred.
 
-On Tue, Jul 7, 2020 at 9:30 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> Hi Luiz,
->
-> As far as the spec is concerned, we can also remove the device by
-> calling device_remove. However, I suppose it would be confusing for
-> end users if they can no longer find their HID device on the device
-> list just because the device previously sent a virtual cable
-> disconnection.
-> The HID 1.0 spec part 6.4.2 also gives an example of a possible
-> scenario when a virtually cabled device is removed: "Unplugged devices
-> shall be marked as known and put into a =E2=80=9Cmost recently used list=
-=E2=80=9D of
-> known devices to facilitate future re-connecting".
+Also update Device Disconnected Event to indicate a new disconnect
+reason: "Connection terminated by local host for suspend"
 
-Then perhaps we shall have it marked as temporary as well, that said
-we do want to introduce disappearing logic so temporary devices are
-not left dangling for too long.
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
 
-> Thanks,
-> Archie
->
->
-> On Wed, 8 Jul 2020 at 02:03, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Sat, Jun 27, 2020 at 8:54 AM Archie Pusaka <apusaka@google.com> wrot=
-e:
-> > >
-> > > From: Archie Pusaka <apusaka@chromium.org>
-> > >
-> > > This patch splits the "bonding removal" function in device.c,
-> > > because we need to remove bonding information when receiving
-> > > "virtual cable unplug" in HID profile.
-> > >
-> > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > ---
-> > >
-> > > Changes in v2: None
-> > >
-> > >  src/device.c | 25 +++++++++++++++----------
-> > >  src/device.h |  1 +
-> > >  2 files changed, 16 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/src/device.c b/src/device.c
-> > > index 7b0eb256e..9fb0e018c 100644
-> > > --- a/src/device.c
-> > > +++ b/src/device.c
-> > > @@ -4162,6 +4162,17 @@ static void delete_folder_tree(const char *dir=
-name)
-> > >         rmdir(dirname);
-> > >  }
-> > >
-> > > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr=
-_type)
-> > > +{
-> > > +       if (bdaddr_type =3D=3D BDADDR_BREDR)
-> > > +               device->bredr_state.bonded =3D false;
-> > > +       else
-> > > +               device->le_state.bonded =3D false;
-> > > +
-> > > +       btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> > > +                                                       bdaddr_type);
-> > > +}
-> > > +
-> > >  static void device_remove_stored(struct btd_device *device)
-> > >  {
-> > >         char device_addr[18];
-> > > @@ -4170,17 +4181,11 @@ static void device_remove_stored(struct btd_d=
-evice *device)
-> > >         char *data;
-> > >         gsize length =3D 0;
-> > >
-> > > -       if (device->bredr_state.bonded) {
-> > > -               device->bredr_state.bonded =3D false;
-> > > -               btd_adapter_remove_bonding(device->adapter, &device->=
-bdaddr,
-> > > -                                                               BDADD=
-R_BREDR);
-> > > -       }
-> > > +       if (device->bredr_state.bonded)
-> > > +               device_remove_bonding(device, BDADDR_BREDR);
-> > >
-> > > -       if (device->le_state.bonded) {
-> > > -               device->le_state.bonded =3D false;
-> > > -               btd_adapter_remove_bonding(device->adapter, &device->=
-bdaddr,
-> > > -                                                       device->bdadd=
-r_type);
-> > > -       }
-> > > +       if (device->le_state.bonded)
-> > > +               device_remove_bonding(device, device->bdaddr_type);
-> > >
-> > >         device->bredr_state.paired =3D false;
-> > >         device->le_state.paired =3D false;
-> > > diff --git a/src/device.h b/src/device.h
-> > > index 06b100499..907c7c5c4 100644
-> > > --- a/src/device.h
-> > > +++ b/src/device.h
-> > > @@ -49,6 +49,7 @@ uint16_t btd_device_get_vendor(struct btd_device *d=
-evice);
-> > >  uint16_t btd_device_get_vendor_src(struct btd_device *device);
-> > >  uint16_t btd_device_get_product(struct btd_device *device);
-> > >  uint16_t btd_device_get_version(struct btd_device *device);
-> > > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr=
-_type);
-> > >  void device_remove(struct btd_device *device, gboolean remove_stored=
-);
-> >
-> > Is there any particular reason why device_remove is not enough here? I
-> > don't see any reason to leave the device object around after removing
-> > its bonding.
-> >
-> > >  int device_address_cmp(gconstpointer a, gconstpointer b);
-> > >  int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
-> > > --
-> > > 2.27.0.212.ge8ba1cc988-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+Changes in v2:
+- Moved Wake_Reason to first value
+- Reduced Wake_Reason to not Bluetooth, unexpected event and remote wake
 
+ doc/mgmt-api.txt | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ca0d38469..e7a713824 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3834,6 +3834,7 @@ Device Disconnected Event
+ 		2	Connection terminated by local host
+ 		3	Connection terminated by remote host
+ 		4	Connection terminated due to authentication failure
++		5	Connection terminated by local host for suspend
+ 
+ 	Note that the local/remote distinction just determines which side
+ 	terminated the low-level connection, regardless of the
+@@ -4577,3 +4578,50 @@ Advertisement Monitor Removed Event
+ 
+ 	The event will only be sent to management sockets other than the
+ 	one through which the command was sent.
++
++
++Controller Suspend Event
++========================
++
++	Event code:		0x002d
++	Controller Index:	<controller_id>
++	Event Parameters:	Suspend_State (1 octet)
++
++	This event indicates that the controller is suspended for host suspend.
++
++	Possible values for the Suspend_State parameter:
++		0	Running (not disconnected)
++		1	Disconnected and not scanning
++		2	Page scanning and/or passive scanning.
++
++	The value 0 is used for the running state and may be sent if the
++	controller could not be configured to suspend properly.
++
++	This event will be sent to all management sockets.
++
++
++Controller Resume Event
++=======================
++
++	Event code:		0x002e
++	Controller Index:	<controller_id>
++	Event Parameters:	Wake_Reason (1 octet)
++				Address (6 octets)
++				Address_Type (1 octet)
++
++	This event indicates that the controller has resumed from suspend.
++
++	Possible values for the Wake_Reason parameter:
++		0	Resume from non-Bluetooth wake source
++		1	Wake due to unexpected event
++		2	Remote wake due to peer device connection
++
++	Currently, we expect that only peer reconnections should wake us from
++	the suspended state. Any other events that occurred while the system
++	should have been suspended results in wake due to unexpected event.
++
++	If the Wake_Reason is Remote wake due to connection, the address of the
++	peer device that caused the event will be shared in Address and
++	Address_Type. Otherwise, Address and Address_Type will both be zero.
++
++	This event will be sent to all management sockets.
+-- 
+2.27.0.389.gc38d7665816-goog
 
---=20
-Luiz Augusto von Dentz
