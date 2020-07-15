@@ -2,72 +2,81 @@ Return-Path: <SRS0=eiFZ=A2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F534C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jul 2020 14:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F9DC433E4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jul 2020 15:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAC57206E9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jul 2020 14:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B79C420663
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jul 2020 15:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fru6NuFP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBmd4Z/F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgGOOPh (ORCPT
+        id S1726675AbgGOP0N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jul 2020 10:15:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49202 "EHLO
+        Wed, 15 Jul 2020 11:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726834AbgGOOPh (ORCPT
+        with ESMTP id S1726425AbgGOP0M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jul 2020 10:15:37 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2AE6C061755
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2020 07:15:36 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id j18so5770111wmi.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2020 07:15:36 -0700 (PDT)
+        Wed, 15 Jul 2020 11:26:12 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF99DC061755;
+        Wed, 15 Jul 2020 08:26:11 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id 12so2509573oir.4;
+        Wed, 15 Jul 2020 08:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=1ewJDA+uKRhpNjXIL8tsMezrJq68UXqo5kRUEl5auJs=;
-        b=Fru6NuFPC3iRhBULRCMIXdcBJN/ZQLaLKB92qpZ17u/6fH04xPLPYJi4Kiio3F1gdI
-         HixvMzkyiM9Iwzx/2JTVtWa24U9zk5+obGxY4yDYTsjOpE/Xw1ste2WnbI3qlPXF+N9k
-         uEk1UViISOTlno6Q/mF8MeaBhytkGJQ+kwr2YQLO221CDQx5Dmrqy9INso/0xvNFT245
-         yWptLwHN1oA0VKVgBPsltf/PFwI8wb3QgXdw8xquUbN73/eP5DebexH4lJCty6bAFoJN
-         sbRBnZAVR59NQUKoTasG3BuvHwcNuxHo3hJBVzMv6Z8/L7BsfSvgBD2v+ZzNjkffiDw3
-         mTPg==
+        bh=4u0MYE5Hv4MZlWDF0+ytXg/Vh8b5Piy9y2hJOynhogo=;
+        b=YBmd4Z/FA3zV0n93TF3jJ85Cupe79N4fRRDu3keVic1IjVfEC2I2qRO1URuvKUxh81
+         uPXcz/CNeRcvb4Jlg+Ujq59fbYcXe86CQTAJrhJf838Z5ZQT4p/fbZnX0iDId0UX+70G
+         VT4w6MPcUPZg1Qs7DfliKEbO2u/1vORQFraIRU2/SGxil8Ni5Tg/qnLCb3t7Gl7PAveq
+         TixNPVrmORBGYetOV4E2wRlKko0Kp+rCAcYU2guLnJY7dg0Npmm7rODq+FOW+DWplPlt
+         LJK/C7Q4Kl2aj/bm4mGa7njGcQdhtx48alzGH/eYYhus8Xek6vFoTVuako2jo6/5gItE
+         GsnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=1ewJDA+uKRhpNjXIL8tsMezrJq68UXqo5kRUEl5auJs=;
-        b=Rl9p7z8QEfehVHYb3K21gDSTM6xiBnGG+xQlwNXhFDPx9f4Wp/qmRlj2MN+9WHKLU6
-         YipvERfzEmHBrcHrAvfIKOJOvDOA1BONQrcATrn4TCpLv2wI2STrM5EL/Os4ku6mpfL1
-         iIM/zVRLvZemh4SlS1LL54LdeKFMjzEt3iydVJpwq6eNLVY9vT+vXrScOAvwbeb6H11X
-         vyXAr1XdC75+UhdfK7CTSggYhfehmiHPcu/Yo+sYsAgYEQLGmT2YpEK2qQE8hUBRnygj
-         z78eju0t2vG25W2ge3YRbHZAWbsCVbp979qpMHjwlclzTFwfT7d3HGMhIV/vPZMfJ7I/
-         k+Ew==
-X-Gm-Message-State: AOAM533/Eb+tznlwdY1DWBu17QMr7cjU3+l7/tEDJKCrKn0WRPG1xzWK
-        /jyoqmIDMlVwgdIfbVcvS4ZvIV4EWc3v6Qz0TtUFnQ==
-X-Google-Smtp-Source: ABdhPJzrGwvzSR9TRYQjfx/W/2r9Vxcf1SZC4LAX1ZQ4PjsfbnnqWY/L4HscvKFL2s+gDQzn5WGx2IY0gNDdQV9K2ro=
-X-Received: by 2002:a7b:cf18:: with SMTP id l24mr8846396wmg.116.1594822534882;
- Wed, 15 Jul 2020 07:15:34 -0700 (PDT)
+        bh=4u0MYE5Hv4MZlWDF0+ytXg/Vh8b5Piy9y2hJOynhogo=;
+        b=OX0sex9V4OMjYcmFsCGG4yAogbKuCvOYEkx+334WnQ3P98KmfdmqNuMdqqJ7T0OtN5
+         D4fQ06tDfzzOCu319EW1gWEDj7sm69XJp3PLWxK8RxRM3qmPQUvoXdpTKmY1IFye1BzB
+         0AVK5zmDM18zWls9hbVadGXexORv2xSzECcNSBg9w5wmnad62TPsrPBXd50FewP3/LOZ
+         3AgJ5JiVAS7YVI12wiOfV8xqC5VYrvLEKSBKm64xui1xqXHr5l3KjWlGe+eZ7Ua4iRR/
+         pL/+cl4geTiWRFU9yzv2Yuvs91IegTUgrBwm+J7vqrVr98JjvEPxcZbgpDinYGy50bb3
+         cmew==
+X-Gm-Message-State: AOAM530h9sOS+lgHSwH7zKvSueKeEUsxclakhGa51Xe7kVpyZIU3GAIV
+        WsLUIjwNsZlLwRxSypY9wEHa9ChJxGMF2s+QYtY=
+X-Google-Smtp-Source: ABdhPJyvP5/WOrJAQhh5gAFgy3OCO1l0+YuNhb0lE44rireuqmPWrg9uu4/Zd/ksXagftdMRIRBf2ykLxj9iBGqHWJc=
+X-Received: by 2002:aca:4a04:: with SMTP id x4mr205534oia.152.1594826770975;
+ Wed, 15 Jul 2020 08:26:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200627235318.Bluez.v2.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
- <CABBYNZ+8bZW7qjzVNsSv7Sc_3h-ZwbSa6Hnz=dAX+2AxmWV9Dw@mail.gmail.com>
- <CAJQfnxHnLKoMQ+Z5bRhAQPWkoN5Lb5m-9o2pe4HTMP4Jy26qrQ@mail.gmail.com> <CABBYNZJxcgtkGRTiwjvKgTndT22SbK+gY8tZk-2z2++7d_57ag@mail.gmail.com>
-In-Reply-To: <CABBYNZJxcgtkGRTiwjvKgTndT22SbK+gY8tZk-2z2++7d_57ag@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Wed, 15 Jul 2020 22:15:23 +0800
-Message-ID: <CAJQfnxF19gmarFT+Eimuo+UPEu1Lgkrq4XBu2RtBDpKxPQ4dtQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2 1/2] device: add device_remove_bonding function
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
+References: <20200627105437.453053-1-apusaka@google.com> <20200627185320.RFC.v1.1.Icea550bb064a24b89f2217cf19e35b4480a31afd@changeid>
+ <91CFE951-262A-4E83-8550-25445AE84B5A@holtmann.org> <CAJQfnxFSfbUbPLVC-be41TqNXzr_6hLq2z=u521HL+BqxLHn_Q@mail.gmail.com>
+ <7BBB55E0-FBD9-40C0-80D9-D5E7FC9F80D2@holtmann.org> <CALWDO_Vrn_pXMbkXifKFazha7BYPqLpCthqHOb9ZmVE3wDRMfA@mail.gmail.com>
+ <CALWDO_X5JuDaugE-s2uaBu9DCn2gBxq22JBmq+HxmKhznFoPdA@mail.gmail.com>
+In-Reply-To: <CALWDO_X5JuDaugE-s2uaBu9DCn2gBxq22JBmq+HxmKhznFoPdA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 15 Jul 2020 08:25:54 -0700
+Message-ID: <CABBYNZ+nF+2hn2HmEep7v-iUN-Ezh=NRg2bwJULFWT8q83iGwA@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 1/2] Bluetooth: queue ACL packets if no handle is found
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Archie Pusaka <apusaka@google.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,157 +84,296 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Alain,
 
-If we mark it as temporary, then the device will immediately get
-deleted upon disconnection.
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/adapter.c#n6875
-This is the same situation as directly calling device_remove.
-
-May I know the reason why we want to put the device as temporary?
-
-If we currently don't have a way to keep a "previously connected but
-no longer bonded" device, then removing the device perhaps is the next
-best option. It still makes the user scan for the virtually
-disconnected device though.
-
-Thanks,
-Archie
-
-On Wed, 15 Jul 2020 at 01:10, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Jul 15, 2020 at 8:10 AM Alain Michaud <alainmichaud@google.com> wro=
+te:
 >
-> Hi Archie,
+> Resending in plain text.
+
+I've sent a RFC to work out the ordering, that should work out for any
+race where it process ACL before Events during a polling interval
+(1ms) so I hope that is enough to catch all these races, if that is
+not perhaps we could make the interval configurable.
+
 >
-> On Tue, Jul 7, 2020 at 9:30 PM Archie Pusaka <apusaka@google.com> wrote:
+> On Wed, Jul 15, 2020 at 9:56 AM Alain Michaud <alainmichaud@google.com> w=
+rote:
 > >
-> > Hi Luiz,
+> > Hi Marcel,
 > >
-> > As far as the spec is concerned, we can also remove the device by
-> > calling device_remove. However, I suppose it would be confusing for
-> > end users if they can no longer find their HID device on the device
-> > list just because the device previously sent a virtual cable
-> > disconnection.
-> > The HID 1.0 spec part 6.4.2 also gives an example of a possible
-> > scenario when a virtually cabled device is removed: "Unplugged devices
-> > shall be marked as known and put into a =E2=80=9Cmost recently used lis=
-t=E2=80=9D of
-> > known devices to facilitate future re-connecting".
->
-> Then perhaps we shall have it marked as temporary as well, that said
-> we do want to introduce disappearing logic so temporary devices are
-> not left dangling for too long.
->
-> > Thanks,
-> > Archie
+> > Sorry, just got around to this.
 > >
+> > On Tue, Jun 30, 2020 at 2:55 AM Marcel Holtmann <marcel@holtmann.org> w=
+rote:
+> >>
+> >> Hi Archie,
+> >>
+> >> >>> There is a possibility that an ACL packet is received before we
+> >> >>> receive the HCI connect event for the corresponding handle. If thi=
+s
+> >> >>> happens, we discard the ACL packet.
+> >> >>>
+> >> >>> Rather than just ignoring them, this patch provides a queue for
+> >> >>> incoming ACL packet without a handle. The queue is processed when
+> >> >>> receiving a HCI connection event. If 2 seconds elapsed without
+> >> >>> receiving the HCI connection event, assume something bad happened
+> >> >>> and discard the queued packet.
+> >> >>>
+> >> >>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> >> >>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> >> >>
+> >> >> so two things up front. I want to hide this behind a HCI_QUIRK_OUT_=
+OF_ORDER_ACL that a transport driver has to set first. Frankly if this kind=
+ of out-of-order happens on UART or SDIO transports, then something is obvi=
+ously going wrong. I have no plan to fix up after a fully serialized transp=
+ort.
+> >> >>
+> >> >> Secondly, if a transport sets HCI_QUIRK_OUT_OF_ORDER_ACL, then I wa=
+nt this off by default. You can enable it via an experimental setting. The =
+reason here is that we have to make it really hard and fail as often as pos=
+sible so that hardware manufactures and spec writers realize that something=
+ is fundamentally broken here.
 > >
-> > On Wed, 8 Jul 2020 at 02:03, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > > On Sat, Jun 27, 2020 at 8:54 AM Archie Pusaka <apusaka@google.com> wr=
-ote:
-> > > >
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > This patch splits the "bonding removal" function in device.c,
-> > > > because we need to remove bonding information when receiving
-> > > > "virtual cable unplug" in HID profile.
-> > > >
-> > > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > > ---
-> > > >
-> > > > Changes in v2: None
-> > > >
-> > > >  src/device.c | 25 +++++++++++++++----------
-> > > >  src/device.h |  1 +
-> > > >  2 files changed, 16 insertions(+), 10 deletions(-)
-> > > >
-> > > > diff --git a/src/device.c b/src/device.c
-> > > > index 7b0eb256e..9fb0e018c 100644
-> > > > --- a/src/device.c
-> > > > +++ b/src/device.c
-> > > > @@ -4162,6 +4162,17 @@ static void delete_folder_tree(const char *d=
-irname)
-> > > >         rmdir(dirname);
-> > > >  }
-> > > >
-> > > > +void device_remove_bonding(struct btd_device *device, uint8_t bdad=
-dr_type)
-> > > > +{
-> > > > +       if (bdaddr_type =3D=3D BDADDR_BREDR)
-> > > > +               device->bredr_state.bonded =3D false;
-> > > > +       else
-> > > > +               device->le_state.bonded =3D false;
-> > > > +
-> > > > +       btd_adapter_remove_bonding(device->adapter, &device->bdaddr=
-,
-> > > > +                                                       bdaddr_type=
-);
-> > > > +}
-> > > > +
-> > > >  static void device_remove_stored(struct btd_device *device)
-> > > >  {
-> > > >         char device_addr[18];
-> > > > @@ -4170,17 +4181,11 @@ static void device_remove_stored(struct btd=
-_device *device)
-> > > >         char *data;
-> > > >         gsize length =3D 0;
-> > > >
-> > > > -       if (device->bredr_state.bonded) {
-> > > > -               device->bredr_state.bonded =3D false;
-> > > > -               btd_adapter_remove_bonding(device->adapter, &device=
-->bdaddr,
-> > > > -                                                               BDA=
-DDR_BREDR);
-> > > > -       }
-> > > > +       if (device->bredr_state.bonded)
-> > > > +               device_remove_bonding(device, BDADDR_BREDR);
-> > > >
-> > > > -       if (device->le_state.bonded) {
-> > > > -               device->le_state.bonded =3D false;
-> > > > -               btd_adapter_remove_bonding(device->adapter, &device=
-->bdaddr,
-> > > > -                                                       device->bda=
-ddr_type);
-> > > > -       }
-> > > > +       if (device->le_state.bonded)
-> > > > +               device_remove_bonding(device, device->bdaddr_type);
-> > > >
-> > > >         device->bredr_state.paired =3D false;
-> > > >         device->le_state.paired =3D false;
-> > > > diff --git a/src/device.h b/src/device.h
-> > > > index 06b100499..907c7c5c4 100644
-> > > > --- a/src/device.h
-> > > > +++ b/src/device.h
-> > > > @@ -49,6 +49,7 @@ uint16_t btd_device_get_vendor(struct btd_device =
-*device);
-> > > >  uint16_t btd_device_get_vendor_src(struct btd_device *device);
-> > > >  uint16_t btd_device_get_product(struct btd_device *device);
-> > > >  uint16_t btd_device_get_version(struct btd_device *device);
-> > > > +void device_remove_bonding(struct btd_device *device, uint8_t bdad=
-dr_type);
-> > > >  void device_remove(struct btd_device *device, gboolean remove_stor=
-ed);
-> > >
-> > > Is there any particular reason why device_remove is not enough here? =
-I
-> > > don't see any reason to leave the device object around after removing
-> > > its bonding.
-> > >
-> > > >  int device_address_cmp(gconstpointer a, gconstpointer b);
-> > > >  int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
-> > > > --
-> > > > 2.27.0.212.ge8ba1cc988-goog
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+> > I don't have any objection to making this explicit enable to non serial=
+ized transports.  However, I do wonder what the intention is around making =
+this off by default.  We already know there is a race condition between the=
+ interupt and bulk endpoints over USB, so this can and does happen.  Hardwa=
+re manufaturers can't relly do much about this other than trying to pull th=
+e interupt endpoint more often, but that's only a workaround, it can't avoi=
+d it all together.
+> >
+> > IMO, this seems like a legitimate fix at the host level and I don't see=
+ any obvious benefits to hide this fix under an experimental feature and ma=
+ke it more difficult for the customers and system integrators to discover.
+> >
+> >>
+> >> >>
+> >> >> I have no problem in running the code and complaining loudly in cas=
+e the quirk has been set. Just injecting the packets can only happen if blu=
+etoothd explicitly enabled it.
+> >> >
+> >> > Got it.
+> >> >
+> >> >>
+> >> >>
+> >> >>>
+> >> >>> ---
+> >> >>>
+> >> >>> include/net/bluetooth/hci_core.h |  8 +++
+> >> >>> net/bluetooth/hci_core.c         | 84 ++++++++++++++++++++++++++++=
++---
+> >> >>> net/bluetooth/hci_event.c        |  2 +
+> >> >>> 3 files changed, 88 insertions(+), 6 deletions(-)
+> >> >>>
+> >> >>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/blueto=
+oth/hci_core.h
+> >> >>> index 836dc997ff94..b69ecdd0d15a 100644
+> >> >>> --- a/include/net/bluetooth/hci_core.h
+> >> >>> +++ b/include/net/bluetooth/hci_core.h
+> >> >>> @@ -270,6 +270,9 @@ struct adv_monitor {
+> >> >>> /* Default authenticated payload timeout 30s */
+> >> >>> #define DEFAULT_AUTH_PAYLOAD_TIMEOUT   0x0bb8
+> >> >>>
+> >> >>> +/* Time to keep ACL packets without a corresponding handle queued=
+ (2s) */
+> >> >>> +#define PENDING_ACL_TIMEOUT          msecs_to_jiffies(2000)
+> >> >>> +
+> >> >>
+> >> >> Do we have some btmon traces with timestamps. Isn=E2=80=99t a secon=
+d enough? Actually 2 seconds is an awful long time.
+> >> >
+> >> > When this happens in the test lab, the HCI connect event is about
+> >> > 0.002 second behind the first ACL packet. We can change this if
+> >> > required.
+> >> >
+> >> >>
+> >> >>> struct amp_assoc {
+> >> >>>      __u16   len;
+> >> >>>      __u16   offset;
+> >> >>> @@ -538,6 +541,9 @@ struct hci_dev {
+> >> >>>      struct delayed_work     rpa_expired;
+> >> >>>      bdaddr_t                rpa;
+> >> >>>
+> >> >>> +     struct delayed_work     remove_pending_acl;
+> >> >>> +     struct sk_buff_head     pending_acl_q;
+> >> >>> +
+> >> >>
+> >> >> can we name this ooo_q and move it to the other queues in this stru=
+ct. Unless we want to add a Kconfig option around it, we don=E2=80=99t need=
+ to keep it here.
+> >> >
+> >> > Ack.
+> >> >
+> >> >>
+> >> >>> #if IS_ENABLED(CONFIG_BT_LEDS)
+> >> >>>      struct led_trigger      *power_led;
+> >> >>> #endif
+> >> >>> @@ -1773,6 +1779,8 @@ void hci_le_start_enc(struct hci_conn *conn,=
+ __le16 ediv, __le64 rand,
+> >> >>> void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bda=
+ddr,
+> >> >>>                             u8 *bdaddr_type);
+> >> >>>
+> >> >>> +void hci_process_pending_acl(struct hci_dev *hdev, struct hci_con=
+n *conn);
+> >> >>> +
+> >> >>> #define SCO_AIRMODE_MASK       0x0003
+> >> >>> #define SCO_AIRMODE_CVSD       0x0000
+> >> >>> #define SCO_AIRMODE_TRANSP     0x0003
+> >> >>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> >> >>> index 7959b851cc63..30780242c267 100644
+> >> >>> --- a/net/bluetooth/hci_core.c
+> >> >>> +++ b/net/bluetooth/hci_core.c
+> >> >>> @@ -1786,6 +1786,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> >> >>>      skb_queue_purge(&hdev->rx_q);
+> >> >>>      skb_queue_purge(&hdev->cmd_q);
+> >> >>>      skb_queue_purge(&hdev->raw_q);
+> >> >>> +     skb_queue_purge(&hdev->pending_acl_q);
+> >> >>>
+> >> >>>      /* Drop last sent command */
+> >> >>>      if (hdev->sent_cmd) {
+> >> >>> @@ -3518,6 +3519,78 @@ static int hci_suspend_notifier(struct noti=
+fier_block *nb, unsigned long action,
+> >> >>>      return NOTIFY_STOP;
+> >> >>> }
+> >> >>>
+> >> >>> +static void hci_add_pending_acl(struct hci_dev *hdev, struct sk_b=
+uff *skb)
+> >> >>> +{
+> >> >>> +     skb_queue_tail(&hdev->pending_acl_q, skb);
+> >> >>> +
+> >> >>> +     queue_delayed_work(hdev->workqueue, &hdev->remove_pending_ac=
+l,
+> >> >>> +                        PENDING_ACL_TIMEOUT);
+> >> >>> +}
+> >> >>> +
+> >> >>> +void hci_process_pending_acl(struct hci_dev *hdev, struct hci_con=
+n *conn)
+> >> >>> +{
+> >> >>> +     struct sk_buff *skb, *tmp;
+> >> >>> +     struct hci_acl_hdr *hdr;
+> >> >>> +     u16 handle, flags;
+> >> >>> +     bool reset_timer =3D false;
+> >> >>> +
+> >> >>> +     skb_queue_walk_safe(&hdev->pending_acl_q, skb, tmp) {
+> >> >>> +             hdr =3D (struct hci_acl_hdr *)skb->data;
+> >> >>> +             handle =3D __le16_to_cpu(hdr->handle);
+> >> >>> +             flags  =3D hci_flags(handle);
+> >> >>> +             handle =3D hci_handle(handle);
+> >> >>> +
+> >> >>> +             if (handle !=3D conn->handle)
+> >> >>> +                     continue;
+> >> >>> +
+> >> >>> +             __skb_unlink(skb, &hdev->pending_acl_q);
+> >> >>> +             skb_pull(skb, HCI_ACL_HDR_SIZE);
+> >> >>> +
+> >> >>> +             l2cap_recv_acldata(conn, skb, flags);
+> >> >>> +             reset_timer =3D true;
+> >> >>> +     }
+> >> >>> +
+> >> >>> +     if (reset_timer)
+> >> >>> +             mod_delayed_work(hdev->workqueue, &hdev->remove_pend=
+ing_acl,
+> >> >>> +                              PENDING_ACL_TIMEOUT);
+> >> >>> +}
+> >> >>> +
+> >> >>> +/* Remove the oldest pending ACL, and all pending ACLs with the s=
+ame handle */
+> >> >>> +static void hci_remove_pending_acl(struct work_struct *work)
+> >> >>> +{
+> >> >>> +     struct hci_dev *hdev;
+> >> >>> +     struct sk_buff *skb, *tmp;
+> >> >>> +     struct hci_acl_hdr *hdr;
+> >> >>> +     u16 handle, oldest_handle;
+> >> >>> +
+> >> >>> +     hdev =3D container_of(work, struct hci_dev, remove_pending_a=
+cl.work);
+> >> >>> +     skb =3D skb_dequeue(&hdev->pending_acl_q);
+> >> >>> +
+> >> >>> +     if (!skb)
+> >> >>> +             return;
+> >> >>> +
+> >> >>> +     hdr =3D (struct hci_acl_hdr *)skb->data;
+> >> >>> +     oldest_handle =3D hci_handle(__le16_to_cpu(hdr->handle));
+> >> >>> +     kfree_skb(skb);
+> >> >>> +
+> >> >>> +     bt_dev_err(hdev, "ACL packet for unknown connection handle %=
+d",
+> >> >>> +                oldest_handle);
+> >> >>> +
+> >> >>> +     skb_queue_walk_safe(&hdev->pending_acl_q, skb, tmp) {
+> >> >>> +             hdr =3D (struct hci_acl_hdr *)skb->data;
+> >> >>> +             handle =3D hci_handle(__le16_to_cpu(hdr->handle));
+> >> >>> +
+> >> >>> +             if (handle =3D=3D oldest_handle) {
+> >> >>> +                     __skb_unlink(skb, &hdev->pending_acl_q);
+> >> >>> +                     kfree_skb(skb);
+> >> >>> +             }
+> >> >>> +     }
+> >> >>> +
+> >> >>> +     if (!skb_queue_empty(&hdev->pending_acl_q))
+> >> >>> +             queue_delayed_work(hdev->workqueue, &hdev->remove_pe=
+nding_acl,
+> >> >>> +                                PENDING_ACL_TIMEOUT);
+> >> >>> +}
+> >> >>> +
+> >> >>
+> >> >> So I am wondering if we make this too complicated. Since generally =
+speaking we can only have a single HCI connect complete anyway at a time. N=
+o matter if the controller serializes it for us or we do it for the control=
+ler. So hci_conn_add could just process the queue for packets with its hand=
+le and then flush it. And it can flush it no matter what since whatever oth=
+er packets are in the queue, they can not be valid.
+> >> >>
+> >> >> That said, we wouldn=E2=80=99t even need to check the packet handle=
+s at all. We just needed to flag them as already out-of-order queued once a=
+nd hand them back into the rx_q at the top. Then the would be processed as =
+usual. Already ooo packets would cause the same error as before if it is fo=
+r a non-existing handle and others would end up being processed.
+> >> >>
+> >> >> For me this means we just need another queue to park the packets un=
+til hci_conn_add gets called. I might have missed something, but I am looki=
+ng for the least invasive option for this and least code duplication.
+> >> >
+> >> > I'm not aware of the fact that we can only have a single HCI connect
+> >> > complete event at any time. Is this also true even if two / more
+> >> > peripherals connect at the same time?
+> >> > I was under the impression that if we have device A and B both are
+> >> > connecting to us at the same time, we might receive the packets in
+> >> > this order:
+> >> > (1) ACL A
+> >> > (2) ACL B
+> >> > (3) HCI conn evt B
+> >> > (4) HCI conn evt A
+> >> > Hence the queue and the handle check.
+> >>
+> >> my reading from the LL state machine is that once the first LL_Connect=
+_Req is processes, the controller moves out of the advertising state. So no=
+ other LL_Connect_Req can be processed. So that means that connection attem=
+pts are serialized.
+> >>
+> >> Now if you run AE and multiple instances, that might be different, but=
+ then again, these instances are also offset in time and so I don=E2=80=99t=
+ see how we can get more than one HCI_Connection_Complete event at a time (=
+and with that a leading ACL packet).
+> >>
+> >> Regards
+> >>
+> >> Marcel
+> >>
+> >> --
+> >> You received this message because you are subscribed to the Google Gro=
+ups "ChromeOS Bluetooth Upstreaming" group.
+> >> To unsubscribe from this group and stop receiving emails from it, send=
+ an email to chromeos-bluetooth-upstreaming+unsubscribe@chromium.org.
+> >> To post to this group, send email to chromeos-bluetooth-upstreaming@ch=
+romium.org.
+> >> To view this discussion on the web visit https://groups.google.com/a/c=
+hromium.org/d/msgid/chromeos-bluetooth-upstreaming/7BBB55E0-FBD9-40C0-80D9-=
+D5E7FC9F80D2%40holtmann.org.
+
+
+
+--=20
+Luiz Augusto von Dentz
