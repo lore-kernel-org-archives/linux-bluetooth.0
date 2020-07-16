@@ -2,111 +2,76 @@ Return-Path: <SRS0=Zco+=A3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A772C433E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 05:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EA4C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 06:40:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67F99207BB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 05:12:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n1kwjjjK"
+	by mail.kernel.org (Postfix) with ESMTP id 5D7AD206F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 06:40:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbgGPFMX (ORCPT
+        id S1728033AbgGPGkq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jul 2020 01:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46272 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725268AbgGPFMT (ORCPT
+        Thu, 16 Jul 2020 02:40:46 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:37516 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727850AbgGPGkq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jul 2020 01:12:19 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2DA0C061755
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2020 22:12:19 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id i18so3978122ilk.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2020 22:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=46kz+Eza/6bwvKMNUgCo81wTzXHTZri/532QaxEYzzA=;
-        b=n1kwjjjKlTqe9naWgY89IqF2JGWKl4Nxf8cbc4BuJjqhz0/aIdjEJWgEO7BeTuWQ0m
-         jN+a2Dh8fI27J5hYiAXV+0MmUEPjsa4VWQT2fz61SvVmVnf2zu6M/Cpq3i9/kMRLFEd7
-         /eSM+Na+8VrUW02XpLq3/KMTJZGHldNb+2fXyZF04Tvkmh2GYaquNHDKJKw4kD64NQSS
-         TluKXQbQX7xJvEGnwCdk8UwEBw/4MsqG0ZWXrmbf4pvrr6GQ+HpFGa6q7DeE2CqlgcpM
-         OhQbu4uPoG4vapr09WgrdRaECrdibxZbNxpzKg04RWISCnbwMNzL1WnLp0eQ04Imhfbv
-         EBOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=46kz+Eza/6bwvKMNUgCo81wTzXHTZri/532QaxEYzzA=;
-        b=oWDYUlKkUs7QDWpl/DTzEsQl8fJ1/LjBYYd0bU/o80rlu2UCpAEe5Lcnodmd0Vt83K
-         x+wZkOY9v1SFPcdFy4y6hfYs2jaDf3ixlLrNjwAbDlTZE+QOcc1iVabbSXCr4MizTom6
-         kZFTCqHsw7f9yvFwlZmqMIB/olvloHMQdO4ctsQEGqb1eYF9wHjF0HdgkWWj3AitLNJq
-         TeRKqNfAGdfh5f784fdVrdcebOLBVArHB3AmQUpkLrsbNp66lcEvcyEne/Qk88KBRp47
-         a1X0N79hnz1Y/XEyvK75odCzSPMpAe7/5MnBBHxFR2AtcUxjAdSo23V7Vm6hZkN8dQu2
-         QNEw==
-X-Gm-Message-State: AOAM530UwyuDxABycP2TBO5aXalMSOeZJSpbg6BgDwQNT3ttuLUOnEOt
-        eN74f2yPwWrbf+BRgixDuVnX/7a+tyqk0R7jprPCVRaA
-X-Google-Smtp-Source: ABdhPJyOeufne2bXodDR0ovoG8C2++5zaguX4Qziwm81ERMKZvVKEApI7CbttFtsrGauB345ogsB0A90T6RJswKAIvY=
-X-Received: by 2002:a92:4913:: with SMTP id w19mr2751990ila.185.1594876338875;
- Wed, 15 Jul 2020 22:12:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200713062213.3692-1-sathish.narasimman@intel.com>
-In-Reply-To: <20200713062213.3692-1-sathish.narasimman@intel.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Thu, 16 Jul 2020 10:42:07 +0530
-Message-ID: <CAOVXEJL=gZnZYi42zzGauLMVr94eAwALXm1qppW3TRy61+H2CQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/8] LL Privacy Support
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>,
-        Sathish N <nsathish41@gmail.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 16 Jul 2020 02:40:46 -0400
+Received: from marcel-macpro.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id B8F35CECFC;
+        Thu, 16 Jul 2020 08:50:43 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2] Bluetooth: Fix update of connection state in
+ `hci_encrypt_cfm`
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <50fd2c75ce196196f879f8373555cc30bfc75154.1594834970.git.ps@pks.im>
+Date:   Thu, 16 Jul 2020 08:40:44 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B06670C9-21F4-484E-91FD-11713B8DCBFF@holtmann.org>
+References: <0df5bf3eac160de28b9493a8959510980a8a8e8b.1594803508.git.ps@pks.im>
+ <50fd2c75ce196196f879f8373555cc30bfc75154.1594834970.git.ps@pks.im>
+To:     Patrick Steinhardt <ps@pks.im>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi
+Hi Patrick,
 
-Gentle reminder
+> Starting with the upgrade to v5.8-rc3, I've noticed I wasn't able to
+> connect to my Bluetooth headset properly anymore. While connecting to
+> the device would eventually succeed, bluetoothd seemed to be confused
+> about the current connection state where the state was flapping hence
+> and forth. Bisecting this issue led to commit 3ca44c16b0dc (Bluetooth:
+> Consolidate encryption handling in hci_encrypt_cfm, 2020-05-19), which
+> refactored `hci_encrypt_cfm` to also handle updating the connection
+> state.
+> 
+> The commit in question changed the code to call `hci_connect_cfm` inside
+> `hci_encrypt_cfm` and to change the connection state. But with the
+> conversion, we now only update the connection state if a status was set
+> already. In fact, the reverse should be true: the status should be
+> updated if no status is yet set. So let's fix the isuse by reversing the
+> condition.
+> 
+> Fixes: 3ca44c16b0dc ("Bluetooth: Consolidate encryption handling in hci_encrypt_cfm")
+> Signed-off-by: Patrick Steinhardt <ps@pks.im>
+> ---
+> include/net/bluetooth/hci_core.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Mon, Jul 13, 2020 at 11:48 AM Sathish Narasimman
-<nsathish41@gmail.com> wrote:
->
-> V4: patches are rebased
-> Added support to use set Experimental feature to enable controller
-> address resolution
->
-> Marcel Holtmann (3):
->   Bluetooth: Translate additional address type correctly
->   Bluetooth: Configure controller address resolution if available
->   Bluetooth: Update resolving list when updating whitelist
->
-> Sathish Narasimman (5):
->   Bluetooth: Translate additional address type during le_conn
->   Bluetooth: Let controller creates RPA during le create conn
->   Bluetooth: Enable/Disable address resolution during le create conn
->   Bluetooth: Enable RPA Timeout
->   Bluetooth: Enable controller RPA resolution using Experimental feature
->
->  include/net/bluetooth/hci.h      |   9 ++-
->  include/net/bluetooth/hci_core.h |   3 +
->  net/bluetooth/hci_conn.c         |   7 +-
->  net/bluetooth/hci_core.c         |  17 +++++
->  net/bluetooth/hci_event.c        |  21 ++++++
->  net/bluetooth/hci_request.c      | 120 ++++++++++++++++++++++++++-----
->  net/bluetooth/hci_request.h      |   3 +-
->  net/bluetooth/mgmt.c             |  54 +++++++++++++-
->  8 files changed, 213 insertions(+), 21 deletions(-)
->
-> --
-> 2.17.1
->
+patch has been applied to bluetooth-next tree.
+
 Regards
-Sathish N
+
+Marcel
+
