@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF56C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82641C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:51:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1E78204EC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 533FA2074B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YS3Rlpis"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJ14j/Z/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725980AbgGPXs6 (ORCPT
+        id S1726141AbgGPXvz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jul 2020 19:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49720 "EHLO
+        Thu, 16 Jul 2020 19:51:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725948AbgGPXs5 (ORCPT
+        with ESMTP id S1725948AbgGPXvz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jul 2020 19:48:57 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94472C061755
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:48:57 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id j80so7304087qke.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:48:57 -0700 (PDT)
+        Thu, 16 Jul 2020 19:51:55 -0400
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DBD9C061755
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:51:55 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id w27so6370052qtb.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:51:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=8NZbwJ+q0qt7nP7otXGqQ/bDUtTJDOQiBz+kZgwjkxQ=;
-        b=YS3Rlpisc0dV46nf1TefjgkArU8iktOINSVdBLIu8QvVuePXuEKYLLnuJ1cIEBMa9e
-         Tqg+YYLXU1QFAjhrY5qhqvCN/HDhy/XKiZ3ycLJVln7k1joCoaSPFG+Wionaf+KHv+LG
-         jPdERZLlqR+7XwAuvc2LZbew4z+x3wcEx9OW4j4hHi0YLvpsIWpNmO7FEATJtEly/fVj
-         fDfIjr27062RNmspLaL4G0yok1NqXJNx3vNNI/JUtqWj/V+rGp7Ngp8QxKyj0yOyck7I
-         5JELqE85MWyeUmNHiWTcdZMJm8aaZ5GRPJ80fUniwrtRG8nfMIIS68KvJFUCKaFyCUsu
-         8ptw==
+        bh=/MJnLkbJLE9mXLEnJaHh67UU5knjI7/nh0C4gIyYoGw=;
+        b=aJ14j/Z/hhqRNNs+3t+uuqhJ3OUSRCEAmlJ2LKrSbbzaaZtLEt7byKINP8g5Z5ltsR
+         iqzX1g7XTpgHGXshYKILzLbcQRYC9c5WTYVegjs8LZr5feNJ/Se5sT1D2TSeOnuVgvzq
+         u9JSpdj9pRvsb/VxagHLXUyVB32q8FsrtTbUcbBff7aer2qPAwbImPq/2mpzqajE/fx4
+         SnTGvVUpXeXdFwgDjVPqs5UH/oNZo8rSjuzl2W/J3GHtWrmZCaALjU3YC9cwFe/Tu+2i
+         CNbJX8E9LVD4ErAR/yWdXXMAFif9BhdAUeyru/UncQ7HDfjcpRDJgJPYrBTDVKRVX6iM
+         KL4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=8NZbwJ+q0qt7nP7otXGqQ/bDUtTJDOQiBz+kZgwjkxQ=;
-        b=Mx0CohlHi2JZOBgfAHaJeajiylRd/mkVBzmBet4kaPk2X1A54RqJ+nsXVHb46ECA0D
-         JtthSF/4jZk+0/RuyryCBqo+qARJ5hhx8mBWwoXRpvFDa3nxQvSioZJCa1hwpXI2D7IW
-         QF8L1YtNUB229kmgEgr3HsAyM5YG/0ucF+0N9of1MjntSZHbfOpfr6mZi5ln5Srn5DZE
-         52Re5svKzLU1t5K99YYFaWQ3/aYsV+7MUrbLOZXZ1D+qqmzq3PHQBnLz8u9xPa5G3kpU
-         2BglbO2spt1PtuWWS9hKZyzeKqvfoeo+3Ww9XIhZ/mZarNGVXn0aAHoXAFSe5RqY/Obi
-         wjBA==
-X-Gm-Message-State: AOAM530NLIQIFDf+M32oqrlsuyTBHeQJVWF8iqImBEBQX0TVypgPj09O
-        H43uvL/Dh+kjyDUh77ANfD5jr44rgss=
-X-Google-Smtp-Source: ABdhPJyF+S5/olsweZG3kUnoelZTWBWI8VqcZN47JLEOVbZhKi1G+C2UN5//fl+tpAjy5Dt2KtH4JQ==
-X-Received: by 2002:a37:7a42:: with SMTP id v63mr6770262qkc.258.1594943336682;
-        Thu, 16 Jul 2020 16:48:56 -0700 (PDT)
+        bh=/MJnLkbJLE9mXLEnJaHh67UU5knjI7/nh0C4gIyYoGw=;
+        b=F/8CxK0VMxG27p+OAiM78FXAL2XNJ5KVzJCzwYFRCRyDdsg8n4Gokc4qdFPM0t5Ams
+         0+7IP2zI99MgPOMtecwYP8TqLqFdXug2SQWTLEiBYjs4P3I0tv7AoYVDrleCC0BAw1SM
+         H7dErL7KD/uxLWvgqqwntUSSZP+iPlwdTcFErdF/DRVgCy1esrHr/K38MBzD9Rvy7hJf
+         zSv26PCXt19OtZmM/1OT0jBkfE2P50vWXlSOPhjUJZv1Qt54a+GHS8qI5N0iNxYlRdzf
+         M4XXTCNXEqx+AtP5jQXPC/fu5GMKUNrXxHuMfJ0/HV3f39P1HrT9rV1syxKEf1YQkC3S
+         w2LQ==
+X-Gm-Message-State: AOAM530C5lHZxEWe1UKHSHintBL+XaN2eqalgvu+74Srh8EERi509u5M
+        UCaVQC1ImA+Dq9BoQoZoV8/R1sD6LJk=
+X-Google-Smtp-Source: ABdhPJyRqL2sGMMrHFTpS/2Lj/D76nVSB66KprlwG4Af7nlFDlr9envABBafj9+9sRUiF+7XxhIfIQ==
+X-Received: by 2002:ac8:108d:: with SMTP id a13mr7738078qtj.42.1594943514121;
+        Thu, 16 Jul 2020 16:51:54 -0700 (PDT)
 Received: from [172.17.0.2] ([52.184.161.145])
-        by smtp.gmail.com with ESMTPSA id f16sm2806291qta.20.2020.07.16.16.48.55
+        by smtp.gmail.com with ESMTPSA id v10sm9566238qtk.14.2020.07.16.16.51.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2020 16:48:56 -0700 (PDT)
-Message-ID: <5f10e768.1c69fb81.68390.b524@mx.google.com>
-Date:   Thu, 16 Jul 2020 16:48:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6301206506728767054=="
+        Thu, 16 Jul 2020 16:51:53 -0700 (PDT)
+Message-ID: <5f10e819.1c69fb81.2d00b.1b14@mx.google.com>
+Date:   Thu, 16 Jul 2020 16:51:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3665026671272091068=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6301206506728767054==
+--===============3665026671272091068==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,24 +89,14 @@ While we are preparing for reviewing the patches, we found the following
 issue/warning.
 
 Test Result:
-checkpatch Failed
+makecheck Failed
 
 Outputs:
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#17: 
-   by 0x48E963B: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.6400.4)
-
-- total: 0 errors, 1 warnings, 83 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+./test-driver: line 107: 14798 Bus error               (core dumped) "$@" > $log_file 2>&1
+make[3]: *** [Makefile:9726: test-suite.log] Error 1
+make[2]: *** [Makefile:9834: check-TESTS] Error 2
+make[1]: *** [Makefile:10228: check-am] Error 2
+make: *** [Makefile:10230: check] Error 2
 
 
 
@@ -114,4 +104,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============6301206506728767054==--
+--===============3665026671272091068==--
