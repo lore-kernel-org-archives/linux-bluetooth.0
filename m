@@ -8,67 +8,65 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D339AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4532AC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA3CA20739
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EDE72074B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eU/FMNwS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tlWeZyYh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726962AbgGPXTF (ORCPT
+        id S1726984AbgGPXTG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jul 2020 19:19:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45112 "EHLO
+        Thu, 16 Jul 2020 19:19:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbgGPXTD (ORCPT
+        with ESMTP id S1726189AbgGPXTD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 16 Jul 2020 19:19:03 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DB3C08C5DB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:19:02 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id a24so4429633pfc.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:19:02 -0700 (PDT)
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE64C061755
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:18:59 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id gc15so3446068pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=PDMHwDVtsDk5UMkcQwleT4i0giCi3Nlydh8pBuDrWH4=;
-        b=eU/FMNwSC6iFYkrn6ugnLK6IWYy0FM1/D+KO46qIZ8kNgm1Ms9OKDEblKs5nS0LxY+
-         qvlw0uihm+6X5uvZjzWQEa+a/km1GAJT9Fcf8Fapyh/7ElYkXw3Z6vO2mwBb5w3f3vNL
-         Ulh4uhhvzR+WJK4h6Wba+LgG/HhDKV/l0OMAUKU/vsU355q5zybNkT+xcNXlPVF0gUl2
-         1CQM1RjadXKwzqM9GBd3/6EEfZjykbOYNgRKdiSOwBb4C/dKo/jPPE4r4aHqTJT60Ssx
-         Or+YOsSKRAvmccEYHo5jxkt6bUTmLor6fEuNZq49Ntgv0FvDfoPwj468SjyiaypbWTTo
-         ugPQ==
+        bh=CX74muhyV/pRHgal4c+5eAgaYcu9OhB2bqVlNBbpWPY=;
+        b=tlWeZyYhdvELQRbBK2wYeh7v+/nzkmqiwAHHOdyaLkUS37fs0dgjxxcbJpTNI58iAi
+         Qm1X21B1Agd53gndQSjM6T8dzuXT/kpLLGeGFVZxDQHn8yCQMWbhEGR3aFxt43BI5KHE
+         ff+pYUKIW+00a80+W3A3jWpXMYPzNs/h8SxRbecftE8r/yTUSZgqAdJAW5bBVjwQCG0b
+         g95Ae7W59/GjCO8+dhKw4EkYDeDdftNF/dwjfnw/ntm86aO9eHL3X6GUFDup1V4JrrJE
+         25e6X3DkgPmzewURI7x7UDneUkXDij1hxFvAlsTILd/fv6PyKDgFA4KGjbaU/Xh1ncwR
+         IJPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=PDMHwDVtsDk5UMkcQwleT4i0giCi3Nlydh8pBuDrWH4=;
-        b=ZpNOhLlam9SN60qAEm+1K7fZi8FhubmoAQjwBUWIOgnwCyTQ8VnB1P1P/3kZiyFFjS
-         M8IsbeMop9L60+k32+fuUzN+3kV5lE99Fgj23KYKzvEMKrcIP3rpkz0n7zGnW1ovdPUf
-         Ju1th8X6XDbXnxHEJAZvrgZMMz1m2C9G8HgnxszpOOAniyNZ2ZO9di6riBJDbuV36DGI
-         o0xRRetVF5+HVf6OwdlKbIanBK6HBddsrlLedf4OZ+et2S6x9J293GLMp5jg7Cae5V+u
-         mHbXq4vP2yjokFI597YhoY65+IwQ911ph5u2yOf72URdVcNmy5dRTF0X/d3Cb4PHmgsH
-         1xcg==
-X-Gm-Message-State: AOAM533PE8MzJWDXkJ1iy0JUbNRUnK/gmHEh8VC6lFW09fyh73KU0RUi
-        R7qsAh/od4bHRlmZlWpnaDVTKc71Vrg=
-X-Google-Smtp-Source: ABdhPJwAcBI4xHNvuFN4ykd9hCIoZ/lS3nebdw3y0zL00Abf5QaTu2asFKNgLkThePTZgMwEvoXzRQ==
-X-Received: by 2002:a62:ce88:: with SMTP id y130mr5699199pfg.37.1594941541956;
-        Thu, 16 Jul 2020 16:19:01 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CX74muhyV/pRHgal4c+5eAgaYcu9OhB2bqVlNBbpWPY=;
+        b=D3hpvgSfaxm90rSvEEZSiGb4iQmXL9kSZfZdt0kV2zR/vUuhBNMOX7LihCUoSNlf0e
+         9E7ODOCdvvH7Dst/U4N4B/dXtg5mw0SeTo2o/uMzfesaOED/wxu+h/H8yapkb/PiGfuf
+         tV57IwOPeIR5PPcYVEUC5ddDYqrMqhFRXYS6Z+vxfnD6tqDi0cVsAvWh5Eif/YEJHBf5
+         mGqDCa38faeCpx+pUOJs6n1DxxREVA/faOSit5Jwk9jWafcD3RgaqasQfygaK5tgplVD
+         Usk9cGIGjw4ko+FFHVGX/LjxX/M8El5fkuF4Tt/3W71UW+ZEsc4/xZRrA2WCs/1E3dSW
+         D9+Q==
+X-Gm-Message-State: AOAM530v7ZHa7FF0PwZbtRlKNmmr38BYFbqPpZvfKmi4l8Rfg9IyzSu2
+        XYXeqiU0R67yLDOUp2E0Q4OJbIZkYKY=
+X-Google-Smtp-Source: ABdhPJxzCyao9FEV6ADUuVRH1cVu6hwwZhNukvJxA8Vnwb+9UtCL3xwz7ww8x7vTkRYsl8MJUze9eQ==
+X-Received: by 2002:a17:90a:d304:: with SMTP id p4mr7482109pju.153.1594941538736;
+        Thu, 16 Jul 2020 16:18:58 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a2sm6024530pgf.53.2020.07.16.16.19.01
+        by smtp.gmail.com with ESMTPSA id a2sm6024530pgf.53.2020.07.16.16.18.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2020 16:19:01 -0700 (PDT)
+        Thu, 16 Jul 2020 16:18:58 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] share/gatt-client: Don't remove active services
-Date:   Thu, 16 Jul 2020 16:18:57 -0700
-Message-Id: <20200716231857.934396-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] shared/att: Fix possible crash on disconnect
+Date:   Thu, 16 Jul 2020 16:18:54 -0700
+Message-Id: <20200716231857.934396-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.25.3
-In-Reply-To: <20200716231857.934396-1-luiz.dentz@gmail.com>
-References: <20200716231857.934396-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -78,36 +76,142 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Only remove services that have not been fetched completed as
-unsuccessful discovery may be the result of an aborted connection the
-attributes that have been fetched previously are likely to be valid.
----
- src/shared/gatt-client.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+If there are pending request while disconnecting they would be notified
+but clients may endup being freed in the proccess which will then be
+calling bt_att_cancel to cancal its requests causing the following
+trace:
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index e21aca1f0..5ba8e83ba 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -407,11 +407,17 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
- 	gatt_db_unregister(op->client->db, op->db_id);
- 	op->db_id = 0;
+Invalid read of size 4
+   at 0x1D894C: enable_ccc_callback (gatt-client.c:1627)
+   by 0x1D247B: disc_att_send_op (att.c:417)
+   by 0x1CCC17: queue_remove_all (queue.c:354)
+   by 0x1D47B7: disconnect_cb (att.c:635)
+   by 0x1E0707: watch_callback (io-glib.c:170)
+   by 0x48E963B: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.6400.4)
+   by 0x48E9AC7: ??? (in /usr/lib/libglib-2.0.so.0.6400.4)
+   by 0x48E9ECF: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.6400.4)
+   by 0x1E0E97: mainloop_run (mainloop-glib.c:79)
+   by 0x1E13B3: mainloop_run_with_signal (mainloop-notify.c:201)
+   by 0x12BC3B: main (main.c:770)
+ Address 0x7d40a28 is 24 bytes inside a block of size 32 free'd
+   at 0x484A2E0: free (vg_replace_malloc.c:540)
+   by 0x1CCC17: queue_remove_all (queue.c:354)
+   by 0x1CCC83: queue_destroy (queue.c:73)
+   by 0x1D7DD7: bt_gatt_client_free (gatt-client.c:2209)
+   by 0x16497B: batt_free (battery.c:77)
+   by 0x16497B: batt_remove (battery.c:286)
+   by 0x1A0013: service_remove (service.c:176)
+   by 0x1A9B7B: device_remove_gatt_service (device.c:3691)
+   by 0x1A9B7B: gatt_service_removed (device.c:3805)
+   by 0x1CC90B: queue_foreach (queue.c:220)
+   by 0x1DE27B: notify_service_changed.isra.0.part.0 (gatt-db.c:369)
+   by 0x1DE387: notify_service_changed (gatt-db.c:361)
+   by 0x1DE387: gatt_db_service_destroy (gatt-db.c:385)
+   by 0x1DE3EF: gatt_db_remove_service (gatt-db.c:519)
+   by 0x1D674F: discovery_op_complete (gatt-client.c:388)
+   by 0x1D6877: discover_primary_cb (gatt-client.c:1260)
+   by 0x1E220B: discovery_op_complete (gatt-helpers.c:628)
+   by 0x1E249B: read_by_grp_type_cb (gatt-helpers.c:730)
+   by 0x1D247B: disc_att_send_op (att.c:417)
+   by 0x1CCC17: queue_remove_all (queue.c:354)
+   by 0x1D47B7: disconnect_cb (att.c:635)
+---
+ src/shared/att.c | 46 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 6 deletions(-)
+
+diff --git a/src/shared/att.c b/src/shared/att.c
+index ed3af2920..58f23dfcb 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -84,6 +84,7 @@ struct bt_att {
+ 	struct queue *req_queue;	/* Queued ATT protocol requests */
+ 	struct queue *ind_queue;	/* Queued ATT protocol indications */
+ 	struct queue *write_queue;	/* Queue of PDUs ready to send */
++	bool in_disc;			/* Cleanup queues on disconnect_cb */
  
--	/* Remove services pending */
-+	/* Remove staled services */
- 	for (svc = queue_get_entries(op->pending_svcs); svc; svc = svc->next) {
- 		struct gatt_db_attribute *attr = svc->data;
- 		uint16_t start, end;
+ 	bt_att_timeout_func_t timeout_callback;
+ 	bt_att_destroy_func_t timeout_destroy;
+@@ -222,8 +223,10 @@ static void destroy_att_send_op(void *data)
+ 	free(op);
+ }
  
-+		/* Don't remove services that already been marked as active
-+		 * previously.
-+		 */
-+		if (gatt_db_service_get_active(attr))
-+			continue;
+-static void cancel_att_send_op(struct att_send_op *op)
++static void cancel_att_send_op(void *data)
+ {
++	struct att_send_op *op = data;
 +
- 		gatt_db_attribute_get_service_data(attr, &start, &end,
- 							NULL, NULL);
+ 	if (op->destroy)
+ 		op->destroy(op->user_data);
  
+@@ -631,11 +634,6 @@ static bool disconnect_cb(struct io *io, void *user_data)
+ 	/* Dettach channel */
+ 	queue_remove(att->chans, chan);
+ 
+-	/* Notify request callbacks */
+-	queue_remove_all(att->req_queue, NULL, NULL, disc_att_send_op);
+-	queue_remove_all(att->ind_queue, NULL, NULL, disc_att_send_op);
+-	queue_remove_all(att->write_queue, NULL, NULL, disc_att_send_op);
+-
+ 	if (chan->pending_req) {
+ 		disc_att_send_op(chan->pending_req);
+ 		chan->pending_req = NULL;
+@@ -654,6 +652,15 @@ static bool disconnect_cb(struct io *io, void *user_data)
+ 
+ 	bt_att_ref(att);
+ 
++	att->in_disc = true;
++
++	/* Notify request callbacks */
++	queue_remove_all(att->req_queue, NULL, NULL, disc_att_send_op);
++	queue_remove_all(att->ind_queue, NULL, NULL, disc_att_send_op);
++	queue_remove_all(att->write_queue, NULL, NULL, disc_att_send_op);
++
++	att->in_disc = false;
++
+ 	queue_foreach(att->disconn_list, disconn_handler, INT_TO_PTR(err));
+ 
+ 	bt_att_unregister_all(att);
+@@ -1574,6 +1581,30 @@ bool bt_att_chan_cancel(struct bt_att_chan *chan, unsigned int id)
+ 	return true;
+ }
+ 
++static bool bt_att_disc_cancel(struct bt_att *att, unsigned int id)
++{
++	struct att_send_op *op;
++
++	op = queue_find(att->req_queue, match_op_id, UINT_TO_PTR(id));
++	if (op)
++		goto done;
++
++	op = queue_find(att->ind_queue, match_op_id, UINT_TO_PTR(id));
++	if (op)
++		goto done;
++
++	op = queue_find(att->write_queue, match_op_id, UINT_TO_PTR(id));
++
++done:
++	if (!op)
++		return false;
++
++	/* Just cancel since disconnect_cb will be cleaning up */
++	cancel_att_send_op(op);
++
++	return true;
++}
++
+ bool bt_att_cancel(struct bt_att *att, unsigned int id)
+ {
+ 	const struct queue_entry *entry;
+@@ -1591,6 +1622,9 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
+ 			return true;
+ 	}
+ 
++	if (att->in_disc)
++		return bt_att_disc_cancel(att, id);
++
+ 	op = queue_remove_if(att->req_queue, match_op_id, UINT_TO_PTR(id));
+ 	if (op)
+ 		goto done;
 -- 
 2.25.3
 
