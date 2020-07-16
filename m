@@ -2,102 +2,99 @@ Return-Path: <SRS0=Zco+=A3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1971C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 11:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC85C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 13:14:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F88620760
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 11:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD6B820760
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 13:14:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727081AbgGPLRo (ORCPT
+        id S1728374AbgGPNOe convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jul 2020 07:17:44 -0400
-Received: from mxout03.lancloud.ru ([89.108.73.187]:33992 "EHLO
-        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbgGPLRo (ORCPT
+        Thu, 16 Jul 2020 09:14:34 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39948 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728260AbgGPNOd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jul 2020 07:17:44 -0400
-X-Greylist: delayed 579 seconds by postgrey-1.27 at vger.kernel.org; Thu, 16 Jul 2020 07:17:43 EDT
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 4E6132092F27
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-From:   Sergey Shtylyov <s.shtylyov@omprussia.ru>
-Subject: [PATCH RFC] bluetooth: add support for some old headsets
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>
-Organization: Open Mobile Platform, LLC
-Message-ID: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
-Date:   Thu, 16 Jul 2020 14:08:01 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [213.87.162.13]
-X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
- LFEX1908.lancloud.ru (fd00:f066::208)
+        Thu, 16 Jul 2020 09:14:33 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7A4F8CED01;
+        Thu, 16 Jul 2020 15:24:30 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH RFC] bluetooth: add support for some old headsets
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
+Date:   Thu, 16 Jul 2020 15:14:31 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
+References: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
+To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The MediaTek Bluetooth platform (MT6630 etc.) has a peculiar implementation
-for the eSCO/SCO connection via BT/EDR: the host controller returns error
-code 0x20 (LMP feature not supported) for HCI_Setup_Synchronous_Connection
-(0x0028) command without actually trying to setup connection with a remote
-device in case such device (like Digma BT-14 headset) didn't advertise its
-supported features.  Even though this doesn't break compatibility with the
-Bluetooth standard it breaks the compatibility with the Hands-Free Profile
-(HFP).
+Hi Sergey,
 
-This patch returns the compatibility with the HFP profile and actually
-tries to check all available connection parameters despite of the specific
-MediaTek implementation. Without it one was unable to establish eSCO/SCO
-connection with some headsets.
+> The MediaTek Bluetooth platform (MT6630 etc.) has a peculiar implementation
+> for the eSCO/SCO connection via BT/EDR: the host controller returns error
+> code 0x20 (LMP feature not supported) for HCI_Setup_Synchronous_Connection
+> (0x0028) command without actually trying to setup connection with a remote
+> device in case such device (like Digma BT-14 headset) didn't advertise its
+> supported features.  Even though this doesn't break compatibility with the
+> Bluetooth standard it breaks the compatibility with the Hands-Free Profile
+> (HFP).
+> 
+> This patch returns the compatibility with the HFP profile and actually
+> tries to check all available connection parameters despite of the specific
+> MediaTek implementation. Without it one was unable to establish eSCO/SCO
+> connection with some headsets.
 
-Based on the patch by Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>.
+please include the parts of btmon output that show this issue.
 
-Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
+> Based on the patch by Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>.
+> 
+> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
+> 
+> ---
+> This patch is against the 'bluetooth-next.git' repo.
+> 
+> net/bluetooth/hci_event.c |    8 ++++++++
+> 1 file changed, 8 insertions(+)
+> 
+> Index: bluetooth-next/net/bluetooth/hci_event.c
+> ===================================================================
+> --- bluetooth-next.orig/net/bluetooth/hci_event.c
+> +++ bluetooth-next/net/bluetooth/hci_event.c
+> @@ -2187,6 +2187,13 @@ static void hci_cs_setup_sync_conn(struc
+> 	if (acl) {
+> 		sco = acl->link;
+> 		if (sco) {
+> +			if (status == 0x20 && /* Unsupported LMP Parameter value */
+> +			    sco->out) {
+> +				sco->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
+> +						(hdev->esco_type & EDR_ESCO_MASK);
+> +				if (hci_setup_sync(sco, sco->link->handle))
+> +					goto unlock;
+> +			}
+> 			sco->state = BT_CLOSED;
 
----
-This patch is against the 'bluetooth-next.git' repo.
+since this is the command status event, I doubt that sco->out check is needed. And I would start with a switch statement right away.
 
- net/bluetooth/hci_event.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+I also think that we need to re-structure this hci_cs_setup_sync_conn function a little to avoid the deep indentation. Make it look more like hci_sync_conn_complete_evt also use a switch statement even if right now we only have one entry.
 
-Index: bluetooth-next/net/bluetooth/hci_event.c
-===================================================================
---- bluetooth-next.orig/net/bluetooth/hci_event.c
-+++ bluetooth-next/net/bluetooth/hci_event.c
-@@ -2187,6 +2187,13 @@ static void hci_cs_setup_sync_conn(struc
- 	if (acl) {
- 		sco = acl->link;
- 		if (sco) {
-+			if (status == 0x20 && /* Unsupported LMP Parameter value */
-+			    sco->out) {
-+				sco->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
-+						(hdev->esco_type & EDR_ESCO_MASK);
-+				if (hci_setup_sync(sco, sco->link->handle))
-+					goto unlock;
-+			}
- 			sco->state = BT_CLOSED;
- 
- 			hci_connect_cfm(sco, status);
-@@ -2194,6 +2201,7 @@ static void hci_cs_setup_sync_conn(struc
- 		}
- 	}
- 
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
+Regards
+
+Marcel
+
