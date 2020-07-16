@@ -2,144 +2,112 @@ Return-Path: <SRS0=Zco+=A3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AACAC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 20:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D339AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E7A120787
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 20:41:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA3CA20739
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jul 2020 23:19:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eU/FMNwS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbgGPUlt (ORCPT
+        id S1726962AbgGPXTF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jul 2020 16:41:49 -0400
-Received: from mxout04.lancloud.ru ([89.108.124.63]:49028 "EHLO
-        mxout04.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbgGPUls (ORCPT
+        Thu, 16 Jul 2020 19:19:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726113AbgGPXTD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jul 2020 16:41:48 -0400
-X-Greylist: delayed 484 seconds by postgrey-1.27 at vger.kernel.org; Thu, 16 Jul 2020 16:41:47 EDT
-Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru A7CC920F54B3
-Received: from LanCloud
-Received: from LanCloud
-Received: from LanCloud
-Subject: Re: [PATCH RFC] bluetooth: add support for some old headsets
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>
-References: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
- <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
-From:   Sergey Shtylyov <s.shtylyov@omprussia.ru>
-Organization: Open Mobile Platform, LLC
-Message-ID: <e9f32310-2728-60a2-adc7-3a7418ce54e3@omprussia.ru>
-Date:   Thu, 16 Jul 2020 23:33:40 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 16 Jul 2020 19:19:03 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DB3C08C5DB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:19:02 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id a24so4429633pfc.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2020 16:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=PDMHwDVtsDk5UMkcQwleT4i0giCi3Nlydh8pBuDrWH4=;
+        b=eU/FMNwSC6iFYkrn6ugnLK6IWYy0FM1/D+KO46qIZ8kNgm1Ms9OKDEblKs5nS0LxY+
+         qvlw0uihm+6X5uvZjzWQEa+a/km1GAJT9Fcf8Fapyh/7ElYkXw3Z6vO2mwBb5w3f3vNL
+         Ulh4uhhvzR+WJK4h6Wba+LgG/HhDKV/l0OMAUKU/vsU355q5zybNkT+xcNXlPVF0gUl2
+         1CQM1RjadXKwzqM9GBd3/6EEfZjykbOYNgRKdiSOwBb4C/dKo/jPPE4r4aHqTJT60Ssx
+         Or+YOsSKRAvmccEYHo5jxkt6bUTmLor6fEuNZq49Ntgv0FvDfoPwj468SjyiaypbWTTo
+         ugPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=PDMHwDVtsDk5UMkcQwleT4i0giCi3Nlydh8pBuDrWH4=;
+        b=ZpNOhLlam9SN60qAEm+1K7fZi8FhubmoAQjwBUWIOgnwCyTQ8VnB1P1P/3kZiyFFjS
+         M8IsbeMop9L60+k32+fuUzN+3kV5lE99Fgj23KYKzvEMKrcIP3rpkz0n7zGnW1ovdPUf
+         Ju1th8X6XDbXnxHEJAZvrgZMMz1m2C9G8HgnxszpOOAniyNZ2ZO9di6riBJDbuV36DGI
+         o0xRRetVF5+HVf6OwdlKbIanBK6HBddsrlLedf4OZ+et2S6x9J293GLMp5jg7Cae5V+u
+         mHbXq4vP2yjokFI597YhoY65+IwQ911ph5u2yOf72URdVcNmy5dRTF0X/d3Cb4PHmgsH
+         1xcg==
+X-Gm-Message-State: AOAM533PE8MzJWDXkJ1iy0JUbNRUnK/gmHEh8VC6lFW09fyh73KU0RUi
+        R7qsAh/od4bHRlmZlWpnaDVTKc71Vrg=
+X-Google-Smtp-Source: ABdhPJwAcBI4xHNvuFN4ykd9hCIoZ/lS3nebdw3y0zL00Abf5QaTu2asFKNgLkThePTZgMwEvoXzRQ==
+X-Received: by 2002:a62:ce88:: with SMTP id y130mr5699199pfg.37.1594941541956;
+        Thu, 16 Jul 2020 16:19:01 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id a2sm6024530pgf.53.2020.07.16.16.19.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jul 2020 16:19:01 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] share/gatt-client: Don't remove active services
+Date:   Thu, 16 Jul 2020 16:18:57 -0700
+Message-Id: <20200716231857.934396-4-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.25.3
+In-Reply-To: <20200716231857.934396-1-luiz.dentz@gmail.com>
+References: <20200716231857.934396-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [213.87.162.122]
-X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
- LFEX1908.lancloud.ru (fd00:f066::208)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello!
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 7/16/20 4:14 PM, Marcel Holtmann wrote:
+Only remove services that have not been fetched completed as
+unsuccessful discovery may be the result of an aborted connection the
+attributes that have been fetched previously are likely to be valid.
+---
+ src/shared/gatt-client.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
->> The MediaTek Bluetooth platform (MT6630 etc.) has a peculiar implementation
->> for the eSCO/SCO connection via BT/EDR: the host controller returns error
->> code 0x20 (LMP feature not supported) for HCI_Setup_Synchronous_Connection
->> (0x0028) command without actually trying to setup connection with a remote
->> device in case such device (like Digma BT-14 headset) didn't advertise its
->> supported features.  Even though this doesn't break compatibility with the
->> Bluetooth standard it breaks the compatibility with the Hands-Free Profile
->> (HFP).
->>
->> This patch returns the compatibility with the HFP profile and actually
->> tries to check all available connection parameters despite of the specific
->> MediaTek implementation. Without it one was unable to establish eSCO/SCO
->> connection with some headsets.
-> 
-> please include the parts of btmon output that show this issue.
-
-   Funny, I had removed that part from the original patch. Here's that log:
-
-< HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17                                  #1 [hci0] 6.705320
-        Handle: 50
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 10
-        Setting: 0x0060
-          Input Coding: Linear
-          Input Data Format: 2's complement
-          Input Sample Size: 16-bit
-            of bits padding at MSB: 0
-          Air Coding Format: CVSD
-        Retransmission effort: Optimize for power consumption (0x01)
-        Packet type: 0x0380
-          3-EV3 may not be used
-          2-EV5 may not be used
-          3-EV5 may not be used
-> HCI Event: Command Status (0x0f) plen 4                                                          #2 [hci0] 6.719598
-      Setup Synchronous Connection (0x01|0x0028) ncmd 1
-        Status: Unsupported LMP Parameter Value / Unsupported LL Parameter Value (0x20)
-
->> Based on the patch by Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>.
->>
->> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
->>
->> ---
->> This patch is against the 'bluetooth-next.git' repo.
->>
->> net/bluetooth/hci_event.c |    8 ++++++++
->> 1 file changed, 8 insertions(+)
->>
->> Index: bluetooth-next/net/bluetooth/hci_event.c
->> ===================================================================
->> --- bluetooth-next.orig/net/bluetooth/hci_event.c
->> +++ bluetooth-next/net/bluetooth/hci_event.c
->> @@ -2187,6 +2187,13 @@ static void hci_cs_setup_sync_conn(struc
->> 	if (acl) {
->> 		sco = acl->link;
->> 		if (sco) {
->> +			if (status == 0x20 && /* Unsupported LMP Parameter value */
->> +			    sco->out) {
->> +				sco->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
->> +						(hdev->esco_type & EDR_ESCO_MASK);
->> +				if (hci_setup_sync(sco, sco->link->handle))
->> +					goto unlock;
->> +			}
->> 			sco->state = BT_CLOSED;
-> 
-> since this is the command status event, I doubt that sco->out check is needed.
-
-   Can't comment oin this, my BT fu is too weak... 
-
-> And I would start with a switch statement right away.
-
-   Funny, I had removed the *switch* statement from the original patch... :-)
-
-> I also think that we need to re-structure this hci_cs_setup_sync_conn function a little to avoid the deep indentation.
-> Make it look more like hci_sync_conn_complete_evt also use a switch statement even if right now we only have one 
-> entry.
-
-    Indeed, done now. :-)
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index e21aca1f0..5ba8e83ba 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -407,11 +407,17 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
+ 	gatt_db_unregister(op->client->db, op->db_id);
+ 	op->db_id = 0;
  
-> Regards
-> 
-> Marcel
+-	/* Remove services pending */
++	/* Remove staled services */
+ 	for (svc = queue_get_entries(op->pending_svcs); svc; svc = svc->next) {
+ 		struct gatt_db_attribute *attr = svc->data;
+ 		uint16_t start, end;
+ 
++		/* Don't remove services that already been marked as active
++		 * previously.
++		 */
++		if (gatt_db_service_get_active(attr))
++			continue;
++
+ 		gatt_db_attribute_get_service_data(attr, &start, &end,
+ 							NULL, NULL);
+ 
+-- 
+2.25.3
 
-MBR, Sergey
