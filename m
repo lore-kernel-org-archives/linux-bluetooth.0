@@ -2,110 +2,167 @@ Return-Path: <SRS0=OLf3=A4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F62C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 13:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD31C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 14:40:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0A012076A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 13:49:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 778B622B4D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 14:40:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pTno8Hzb"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d28AYG6k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726210AbgGQNtt (ORCPT
+        id S1726691AbgGQOkN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 09:49:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37918 "EHLO
+        Fri, 17 Jul 2020 10:40:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726090AbgGQNts (ORCPT
+        with ESMTP id S1726429AbgGQOkM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jul 2020 09:49:48 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF60C0619D2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 06:49:48 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id t11so4252584qvk.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 06:49:48 -0700 (PDT)
+        Fri, 17 Jul 2020 10:40:12 -0400
+Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55C4C0619D2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 07:40:12 -0700 (PDT)
+Received: by mail-vs1-xe33.google.com with SMTP id q15so4968758vso.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 07:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=nnuXue4VpiaVRfmSKwPcfaE5TO3Q1PfHQRTDKc6/neo=;
-        b=pTno8HzbMur81prIPrhO1FIZ2hqnsFdpcfs2FlKtQ3xOqAWBANNcpsdA3I2EZHSs5/
-         03IUtdsy6UVDGP1Tha4xW0Cg3g8vmazf91+wFaQUjkHpr/KzEyBaPiL4VzqJgF1qu+Ue
-         K/oYf3bTbQCVgT/ISb7qMh+D+6DJcBam0SNl1W0Kj8FRQUCuJBm9uXNvDBORbU8cpDgW
-         WgpR5L5H3C0BZKDDdOjZbVXvT74IZYNCWi31H3rzaMpBxtvt8cOwyztDgDDydTwGj0eS
-         2W1l1CAwbY3uAW4othxmx7/uGyr15+HbvBcdn5O70CRfFXYEvCf5Nhy2ofyBPK9yfAhV
-         5fnw==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZjUlDVuPtPdSCx+f/FpW9ivNQqmi/K/CqsiUpmcooyw=;
+        b=d28AYG6k+lZi39HwDNYPvF7uULiV5EDpThgcn1pcvl8g5BDJr4dF858+vgDprun91l
+         OeN7tM1d9JEHbZea8mYcpZ5VHTPTCPADLue85ZVtUnnQtWXnf/D4vblPQVSkF88oGl0I
+         aH0YfyCtPEgLGp8Quuvas797NM0ESRvX4bz3c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=nnuXue4VpiaVRfmSKwPcfaE5TO3Q1PfHQRTDKc6/neo=;
-        b=g/bfwJhdgmL3GRSywPLGggarCzUxHXwZ/bBOEMcfhRodILaB4rnwJWya595gloOv1z
-         FEsMWPy31FjEZRmxfWo4VtrKmYEO4S5khRy/mjyYh1fJqLOrEKLh7GBDW4RcDMzV5+8C
-         VSRwrwBnln26G7NlL5pfWbUwmrSAzW5JZzdKX0GUX80PrxlLLcKFCe5TpBCT1qbe/Y53
-         7IkMMBNXU0HR4w/loIKMrsrdUZi0ycKADZMU8UBc8jud9to6IXTeu5ggRvEPHi/NjOSq
-         oXcO4U/qrXx0zHDlNC8/EeroBMtbQV7OLgUdwhFtd4aEN6Ft0VZEDoHWmJIBSYH7jGr4
-         yT9Q==
-X-Gm-Message-State: AOAM532vS/eX+avaLDgzg8WagVHf3k4L7x2HUmjuihHU1mqnfwMGZsR6
-        0b+PJVTZOtQq23z9/usvT8udlUcUqts=
-X-Google-Smtp-Source: ABdhPJy3O6eDXut/VYnCg9PTpu3AfB7bu9hx9OcDZvozaxXJCV/xlklIz8gsF/O2ANMEelzQssB7FQ==
-X-Received: by 2002:ad4:4903:: with SMTP id bh3mr9182562qvb.17.1594993787836;
-        Fri, 17 Jul 2020 06:49:47 -0700 (PDT)
-Received: from [172.17.0.2] ([52.225.230.214])
-        by smtp.gmail.com with ESMTPSA id g1sm11779544qko.70.2020.07.17.06.49.47
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZjUlDVuPtPdSCx+f/FpW9ivNQqmi/K/CqsiUpmcooyw=;
+        b=jVA6Zwf0D3/Ct9d9+G/jG4xAVhppww+KJPBOl5Nj9M+o9S5KqPfly3I50uEE3Doo2r
+         VGpuqlEJWk82FCNTXjEZFsxY5fs/mXQAhDONyg6XUv0d3gbr8OeVakPGvbjSn9QV1zWQ
+         ofF9+eEvJeLTa/AESW7l69Bf2XK4ozthMXqo0dvXE9DVoeAYDHtfvhjthHsreoBgqE4i
+         y3eCXuUfTFK5t++ZLauHokumDI6BDaN2jbvQYXu3nq7Yn9W84qOr9Ho3MhavFL6PXylV
+         y5noTwsAYUU3/CpRRoYaD0SLz2uH7E96AQJMv0SEpaDYYMv0MgvBo8Apu0wh9IHKOxlh
+         mwxA==
+X-Gm-Message-State: AOAM530DtS4ZDiANwgyDjZGeScgY2qZJ8yv5/aAoscL3sr9llmu99dHO
+        /3cTo34YE9r88OOJVOtfLPIABhAIIRM=
+X-Google-Smtp-Source: ABdhPJyaNo5h4VZSx0cj1tXHlgthFAXiKKM1297/45YNRzmLc4pcXcZi0zpvrfvfAmc8XbjNzQ3fFg==
+X-Received: by 2002:a67:cb03:: with SMTP id b3mr7815318vsl.214.1594996811360;
+        Fri, 17 Jul 2020 07:40:11 -0700 (PDT)
+Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
+        by smtp.gmail.com with ESMTPSA id 132sm1206123vkb.2.2020.07.17.07.40.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2020 06:49:47 -0700 (PDT)
-Message-ID: <5f11ac7b.1c69fb81.2b25.91a8@mx.google.com>
-Date:   Fri, 17 Jul 2020 06:49:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0820563623741101674=="
+        Fri, 17 Jul 2020 07:40:10 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [Bluez PATCH v2] gatt: Support DeviceInfo Service when vid/pid is specified
+Date:   Fri, 17 Jul 2020 14:40:07 +0000
+Message-Id: <20200717144007.3160721-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, alainm@chromium.org
-Subject: RE: [Bluez] gatt: Support DeviceInfo Service when vid/pid is specified
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200717134251.3148686-1-alainm@chromium.org>
-References: <20200717134251.3148686-1-alainm@chromium.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0820563623741101674==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+This patch adds support for the PNPID characteristic when configured in
+main.conf.
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
-CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
-VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
-ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
-KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
-bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
-ZmF1bHQgKHNlZSBgVScpCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBwZXJpcGhlcmFsL2dhdHQuYzo0
-NDoKLi9zcmMvaGNpZC5oOjUzOjI6IGVycm9yOiB1bmtub3duIHR5cGUgbmFtZSDigJhnYm9vbGVh
-buKAmQogICA1MyB8ICBnYm9vbGVhbiBwYWlyYWJsZTsKICAgICAgfCAgXn5+fn5+fn4KLi9zcmMv
-aGNpZC5oOjk5OjI6IGVycm9yOiB1bmtub3duIHR5cGUgbmFtZSDigJhnYm9vbGVhbuKAmQogICA5
-OSB8ICBnYm9vbGVhbiByZXZlcnNlX2Rpc2NvdmVyeTsKICAgICAgfCAgXn5+fn5+fn4KLi9zcmMv
-aGNpZC5oOjEwMDoyOiBlcnJvcjogdW5rbm93biB0eXBlIG5hbWUg4oCYZ2Jvb2xlYW7igJkKICAx
-MDAgfCAgZ2Jvb2xlYW4gbmFtZV9yZXNvbHY7CiAgICAgIHwgIF5+fn5+fn5+Ci4vc3JjL2hjaWQu
-aDoxMDE6MjogZXJyb3I6IHVua25vd24gdHlwZSBuYW1lIOKAmGdib29sZWFu4oCZCiAgMTAxIHwg
-IGdib29sZWFuIGRlYnVnX2tleXM7CiAgICAgIHwgIF5+fn5+fn5+Ci4vc3JjL2hjaWQuaDoxMDI6
-MjogZXJyb3I6IHVua25vd24gdHlwZSBuYW1lIOKAmGdib29sZWFu4oCZCiAgMTAyIHwgIGdib29s
-ZWFuIGZhc3RfY29ubjsKICAgICAgfCAgXn5+fn5+fn4KLi9zcmMvaGNpZC5oOjEyMjoxOiBlcnJv
-cjogdW5rbm93biB0eXBlIG5hbWUg4oCYZ2Jvb2xlYW7igJkKICAxMjIgfCBnYm9vbGVhbiBwbHVn
-aW5faW5pdChjb25zdCBjaGFyICplbmFibGUsIGNvbnN0IGNoYXIgKmRpc2FibGUpOwogICAgICB8
-IF5+fn5+fn5+Ci4vc3JjL2hjaWQuaDoxMjg6MTogZXJyb3I6IHVua25vd24gdHlwZSBuYW1lIOKA
-mEdLZXlGaWxl4oCZCiAgMTI4IHwgR0tleUZpbGUgKmJ0ZF9nZXRfbWFpbl9jb25mKHZvaWQpOwog
-ICAgICB8IF5+fn5+fn5+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6Njc5MTogcGVyaXBoZXJhbC9n
-YXR0Lm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MDEwOiBhbGxdIEVycm9yIDIKCgoK
-LS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAo=
+This was validated as read correclty both by manually reading the valud
+and confirming in the Ellisys Analyzer.
 
---===============0820563623741101674==--
+ATT Read (PnP ID: Source=Bluetooth ID, Vendor=224, Product=50181,
+ATT Read Response Packet (Source=Bluetooth ID, Vendor=224,
+Product=50181, Version=86)     | OK     | 7 bytes (01 E0 00 05 C4 56 00)
+
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
+I admit I don't know how to quantify the compatibility risk with adding
+the Device Info Service if the DeviceID is specified.  I can see that
+some system may be configured with an app to publish the DIS and this
+may break it.
+
+If the community feels it is necessary, I can include a DeviceIdOverLE
+configuration which defaults to false in main.conf to address this
+compatibility risk.
+
+Changes in v2:
+ - Removing file I didn't intend to commit (peripheral/gatt.c)
+
+ src/gatt-database.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 95ba39897..07d567078 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -57,6 +57,7 @@
+ 
+ #define UUID_GAP	0x1800
+ #define UUID_GATT	0x1801
++#define UUID_DIS	0x180a
+ 
+ #ifndef MIN
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+@@ -1233,11 +1234,51 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 	database_add_record(database, service);
+ }
+ 
++static void device_info_read_pnp_id_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	uint8_t pdu[7];
++
++	pdu[0] = main_opts.did_source;
++	put_le16(main_opts.did_vendor, &pdu[1]);
++	put_le16(main_opts.did_product, &pdu[3]);
++	put_le16(main_opts.did_version, &pdu[5]);
++
++	gatt_db_attribute_read_result(attrib, id, 0, pdu, sizeof(pdu));
++}
++
++static void populate_devinfo_service(struct btd_gatt_database *database)
++{
++	struct gatt_db_attribute *service;
++	bt_uuid_t uuid;
++
++	bt_uuid16_create(&uuid, UUID_DIS);
++	service = gatt_db_add_service(database->db, &uuid, true, 3);
++
++	if (main_opts.did_source > 0) {
++		bt_uuid16_create(&uuid, GATT_CHARAC_PNP_ID);
++		gatt_db_service_add_characteristic(service, &uuid,
++						BT_ATT_PERM_READ,
++						BT_GATT_CHRC_PROP_READ,
++						device_info_read_pnp_id_cb,
++						NULL, database);
++	}
++
++	gatt_db_service_set_active(service, true);
++
++	database_add_record(database, service);
++}
+ 
+ static void register_core_services(struct btd_gatt_database *database)
+ {
+ 	populate_gap_service(database);
+ 	populate_gatt_service(database);
++
++	if (main_opts.did_source > 0)
++		populate_devinfo_service(database);
++
+ }
+ 
+ static void conf_cb(void *user_data)
+-- 
+2.28.0.rc0.105.gf9edc3c819-goog
+
