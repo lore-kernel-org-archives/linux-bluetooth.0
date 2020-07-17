@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5006C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B8FC43462
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:25:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C27632074B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FDDF2076A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:25:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aFcX2soS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kdONCNhz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbgGQGYU (ORCPT
+        id S1728040AbgGQGZF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 02:24:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
+        Fri, 17 Jul 2020 02:25:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbgGQGYR (ORCPT
+        with ESMTP id S1727924AbgGQGYj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jul 2020 02:24:17 -0400
+        Fri, 17 Jul 2020 02:24:39 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84C1AC08C5C0;
-        Thu, 16 Jul 2020 23:24:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A347C061755;
+        Thu, 16 Jul 2020 23:24:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=15CB9V7QI/EJP4CEaWkoXbSz4JSBsbnp24tauy2SAlc=; b=aFcX2soSjBmLa8/cRhua5QBWnT
-        7gyYF7oDmYQFLRFdjsrPLADpoApsS91mlCTiDWBDRNpYne4Q4FB9+D+vEGKWN1fkd52ifFfy6y70i
-        QlTP4pYrRVhtkusVcZaJS2BzoSvxYPXODbLDwD+yVF0u35uVyoBPGPUz/+ZRPXy/YWPyi7AOeziTG
-        7YpC4zg3wHYdi9UDxHVd4uXYngadXhSP8kWziNbYQAOp3wIfafvDQhe5UpxM4Cihj6hY6novUL7+a
-        ZABKfMAt5UbDLVDUnDhPHh6vXC0yzJO/s4rgEjJ8e65eXAKEw5RyxAO+pdFtfHGSc/YmBJY0vT/q0
-        6nRGA/Eg==;
+        bh=Gk0icm7W1l6PNEXjPOF00ZeKuwMt8n5bPcc1urfvli0=; b=kdONCNhzaytXfggMeiqE4liA5Y
+        FXH+SFlM1+3qR6XQC2W1Oaf4xZKwcHTS280Wb7OjSJkro6ZKuR/1KAJwAq+qVtU0I9X6Q5O3435fo
+        wYk5zHTb2J1M7DQwFjefr5Obsa64MfX857EgZzFtKqJtQdmNkd0gYhoJUUgEP2VdhXekZ2pyDGdve
+        9qda6eWKiRYoNjZCm81FOtLtE+KX4Ef4Qlj62tsEQap1zg8E7qJcPXwGv/7kGhdcwVVNY/3Aj98Y7
+        laS1Ayw6MYPKpXY2HJCzp5OopcEewXMcxqL8ZWmyG+Y5Ky3TmP1U++jo12psasWq/z5SF90tdWKSj
+        3++RRymw==;
 Received: from [2001:4bb8:105:4a81:3772:912d:640:e6c6] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jwJmv-00052k-DO; Fri, 17 Jul 2020 06:24:06 +0000
+        id 1jwJnH-000569-E3; Fri, 17 Jul 2020 06:24:27 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>
 Cc:     Alexei Starovoitov <ast@kernel.org>,
@@ -55,9 +55,9 @@ Cc:     Alexei Starovoitov <ast@kernel.org>,
         linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
         linux-can@vger.kernel.org, dccp@vger.kernel.org,
         linux-wpan@vger.kernel.org, mptcp@lists.01.org
-Subject: [PATCH 07/22] netfilter/arp_tables: clean up compat {get,set}sockopt handling
-Date:   Fri, 17 Jul 2020 08:23:16 +0200
-Message-Id: <20200717062331.691152-8-hch@lst.de>
+Subject: [PATCH 19/22] net/ipv6: factor out MCAST_MSFILTER setsockopt helpers
+Date:   Fri, 17 Jul 2020 08:23:28 +0200
+Message-Id: <20200717062331.691152-20-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200717062331.691152-1-hch@lst.de>
 References: <20200717062331.691152-1-hch@lst.de>
@@ -69,189 +69,199 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Merge the native and compat {get,set}sockopt handlers using
-in_compat_syscall().
+Factor out one helper each for setting the native and compat
+version of the MCAST_MSFILTER option.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/ipv4/netfilter/arp_tables.c | 85 ++++++++-------------------------
- 1 file changed, 21 insertions(+), 64 deletions(-)
+ net/ipv6/ipv6_sockglue.c | 159 ++++++++++++++++++++-------------------
+ 1 file changed, 83 insertions(+), 76 deletions(-)
 
-diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-index b167f4a5b68453..15807fb4a65f3e 100644
---- a/net/ipv4/netfilter/arp_tables.c
-+++ b/net/ipv4/netfilter/arp_tables.c
-@@ -787,8 +787,7 @@ static int compat_table_info(const struct xt_table_info *info,
- }
- #endif
- 
--static int get_info(struct net *net, void __user *user,
--		    const int *len, int compat)
-+static int get_info(struct net *net, void __user *user, const int *len)
- {
- 	char name[XT_TABLE_MAXNAMELEN];
- 	struct xt_table *t;
-@@ -802,7 +801,7 @@ static int get_info(struct net *net, void __user *user,
- 
- 	name[XT_TABLE_MAXNAMELEN-1] = '\0';
- #ifdef CONFIG_COMPAT
--	if (compat)
-+	if (in_compat_syscall())
- 		xt_compat_lock(NFPROTO_ARP);
- #endif
- 	t = xt_request_find_table_lock(net, NFPROTO_ARP, name);
-@@ -812,7 +811,7 @@ static int get_info(struct net *net, void __user *user,
- #ifdef CONFIG_COMPAT
- 		struct xt_table_info tmp;
- 
--		if (compat) {
-+		if (in_compat_syscall()) {
- 			ret = compat_table_info(private, &tmp);
- 			xt_compat_flush_offsets(NFPROTO_ARP);
- 			private = &tmp;
-@@ -837,7 +836,7 @@ static int get_info(struct net *net, void __user *user,
- 	} else
- 		ret = PTR_ERR(t);
- #ifdef CONFIG_COMPAT
--	if (compat)
-+	if (in_compat_syscall())
- 		xt_compat_unlock(NFPROTO_ARP);
- #endif
- 	return ret;
-@@ -998,7 +997,7 @@ static int do_replace(struct net *net, const void __user *user,
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index ef5656f876ac05..6aa49495d7bc0b 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -171,6 +171,87 @@ static int do_ipv6_mcast_group_source(struct sock *sk, int optname,
+ 	return ip6_mc_source(add, omode, sk, greqs);
  }
  
- static int do_add_counters(struct net *net, const void __user *user,
--			   unsigned int len, int compat)
-+			   unsigned int len)
- {
- 	unsigned int i;
- 	struct xt_counters_info tmp;
-@@ -1009,7 +1008,8 @@ static int do_add_counters(struct net *net, const void __user *user,
- 	struct arpt_entry *iter;
- 	unsigned int addend;
- 
--	paddc = xt_copy_counters_from_user(user, len, &tmp, compat);
-+	paddc = xt_copy_counters_from_user(user, len, &tmp,
-+					   in_compat_syscall());
- 	if (IS_ERR(paddc))
- 		return PTR_ERR(paddc);
- 
-@@ -1294,30 +1294,6 @@ static int compat_do_replace(struct net *net, void __user *user,
- 	return ret;
- }
- 
--static int compat_do_arpt_set_ctl(struct sock *sk, int cmd, void __user *user,
--				  unsigned int len)
--{
--	int ret;
--
--	if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
--		return -EPERM;
--
--	switch (cmd) {
--	case ARPT_SO_SET_REPLACE:
--		ret = compat_do_replace(sock_net(sk), user, len);
--		break;
--
--	case ARPT_SO_SET_ADD_COUNTERS:
--		ret = do_add_counters(sock_net(sk), user, len, 1);
--		break;
--
--	default:
--		ret = -EINVAL;
--	}
--
--	return ret;
--}
--
- static int compat_copy_entry_to_user(struct arpt_entry *e, void __user **dstptr,
- 				     compat_uint_t *size,
- 				     struct xt_counters *counters,
-@@ -1425,29 +1401,6 @@ static int compat_get_entries(struct net *net,
- 	xt_compat_unlock(NFPROTO_ARP);
- 	return ret;
- }
--
--static int do_arpt_get_ctl(struct sock *, int, void __user *, int *);
--
--static int compat_do_arpt_get_ctl(struct sock *sk, int cmd, void __user *user,
--				  int *len)
--{
--	int ret;
--
--	if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
--		return -EPERM;
--
--	switch (cmd) {
--	case ARPT_SO_GET_INFO:
--		ret = get_info(sock_net(sk), user, len, 1);
--		break;
--	case ARPT_SO_GET_ENTRIES:
--		ret = compat_get_entries(sock_net(sk), user, len);
--		break;
--	default:
--		ret = do_arpt_get_ctl(sk, cmd, user, len);
--	}
--	return ret;
--}
- #endif
- 
- static int do_arpt_set_ctl(struct sock *sk, int cmd, void __user *user, unsigned int len)
-@@ -1459,11 +1412,16 @@ static int do_arpt_set_ctl(struct sock *sk, int cmd, void __user *user, unsigned
- 
- 	switch (cmd) {
- 	case ARPT_SO_SET_REPLACE:
--		ret = do_replace(sock_net(sk), user, len);
++static int ipv6_set_mcast_msfilter(struct sock *sk, void __user *optval,
++		int optlen)
++{
++	struct group_filter *gsf;
++	int ret;
++
++	if (optlen < GROUP_FILTER_SIZE(0))
++		return -EINVAL;
++	if (optlen > sysctl_optmem_max)
++		return -ENOBUFS;
++
++	gsf = memdup_user(optval, optlen);
++	if (IS_ERR(gsf))
++		return PTR_ERR(gsf);
++
++	/* numsrc >= (4G-140)/128 overflow in 32 bits */
++	ret = -ENOBUFS;
++	if (gsf->gf_numsrc >= 0x1ffffffU ||
++	    gsf->gf_numsrc > sysctl_mld_max_msf)
++		goto out_free_gsf;
++
++	ret = -EINVAL;
++	if (GROUP_FILTER_SIZE(gsf->gf_numsrc) > optlen)
++		goto out_free_gsf;
++
++	ret = ip6_mc_msfilter(sk, gsf, gsf->gf_slist);
++out_free_gsf:
++	kfree(gsf);
++	return ret;
++}
++
 +#ifdef CONFIG_COMPAT
-+		if (in_compat_syscall())
-+			ret = compat_do_replace(sock_net(sk), user, len);
-+		else
++static int compat_ipv6_set_mcast_msfilter(struct sock *sk, void __user *optval,
++		int optlen)
++{
++	const int size0 = offsetof(struct compat_group_filter, gf_slist);
++	struct compat_group_filter *gf32;
++	void *p;
++	int ret;
++	int n;
++
++	if (optlen < size0)
++		return -EINVAL;
++	if (optlen > sysctl_optmem_max - 4)
++		return -ENOBUFS;
++
++	p = kmalloc(optlen + 4, GFP_KERNEL);
++	if (!p)
++		return -ENOMEM;
++
++	gf32 = p + 4; /* we want ->gf_group and ->gf_slist aligned */
++	ret = -EFAULT;
++	if (copy_from_user(gf32, optval, optlen))
++		goto out_free_p;
++
++	/* numsrc >= (4G-140)/128 overflow in 32 bits */
++	ret = -ENOBUFS;
++	n = gf32->gf_numsrc;
++	if (n >= 0x1ffffffU || n > sysctl_mld_max_msf)
++		goto out_free_p;
++
++	ret = -EINVAL;
++	if (offsetof(struct compat_group_filter, gf_slist[n]) > optlen)
++		goto out_free_p;
++
++	rtnl_lock();
++	lock_sock(sk);
++	ret = ip6_mc_msfilter(sk, &(struct group_filter){
++			.gf_interface = gf32->gf_interface,
++			.gf_group = gf32->gf_group,
++			.gf_fmode = gf32->gf_fmode,
++			.gf_numsrc = gf32->gf_numsrc}, gf32->gf_slist);
++	release_sock(sk);
++	rtnl_unlock();
++
++out_free_p:
++	kfree(p);
++	return ret;
++}
 +#endif
-+			ret = do_replace(sock_net(sk), user, len);
++
+ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		    char __user *optval, unsigned int optlen)
+ {
+@@ -762,37 +843,8 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
  		break;
- 
- 	case ARPT_SO_SET_ADD_COUNTERS:
--		ret = do_add_counters(sock_net(sk), user, len, 0);
-+		ret = do_add_counters(sock_net(sk), user, len);
+ 	}
+ 	case MCAST_MSFILTER:
+-	{
+-		struct group_filter *gsf;
+-
+-		if (optlen < GROUP_FILTER_SIZE(0))
+-			goto e_inval;
+-		if (optlen > sysctl_optmem_max) {
+-			retv = -ENOBUFS;
+-			break;
+-		}
+-		gsf = memdup_user(optval, optlen);
+-		if (IS_ERR(gsf)) {
+-			retv = PTR_ERR(gsf);
+-			break;
+-		}
+-		/* numsrc >= (4G-140)/128 overflow in 32 bits */
+-		if (gsf->gf_numsrc >= 0x1ffffffU ||
+-		    gsf->gf_numsrc > sysctl_mld_max_msf) {
+-			kfree(gsf);
+-			retv = -ENOBUFS;
+-			break;
+-		}
+-		if (GROUP_FILTER_SIZE(gsf->gf_numsrc) > optlen) {
+-			kfree(gsf);
+-			retv = -EINVAL;
+-			break;
+-		}
+-		retv = ip6_mc_msfilter(sk, gsf, gsf->gf_slist);
+-		kfree(gsf);
+-
++		retv = ipv6_set_mcast_msfilter(sk, optval, optlen);
  		break;
+-	}
+ 	case IPV6_ROUTER_ALERT:
+ 		if (optlen < sizeof(int))
+ 			goto e_inval;
+@@ -977,52 +1029,7 @@ int compat_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		return err;
+ 	}
+ 	case MCAST_MSFILTER:
+-	{
+-		const int size0 = offsetof(struct compat_group_filter, gf_slist);
+-		struct compat_group_filter *gf32;
+-		void *p;
+-		int n;
+-
+-		if (optlen < size0)
+-			return -EINVAL;
+-		if (optlen > sysctl_optmem_max - 4)
+-			return -ENOBUFS;
+-
+-		p = kmalloc(optlen + 4, GFP_KERNEL);
+-		if (!p)
+-			return -ENOMEM;
+-
+-		gf32 = p + 4; /* we want ->gf_group and ->gf_slist aligned */
+-		if (copy_from_user(gf32, optval, optlen)) {
+-			err = -EFAULT;
+-			goto mc_msf_out;
+-		}
+-
+-		n = gf32->gf_numsrc;
+-		/* numsrc >= (4G-140)/128 overflow in 32 bits */
+-		if (n >= 0x1ffffffU ||
+-		    n > sysctl_mld_max_msf) {
+-			err = -ENOBUFS;
+-			goto mc_msf_out;
+-		}
+-		if (offsetof(struct compat_group_filter, gf_slist[n]) > optlen) {
+-			err = -EINVAL;
+-			goto mc_msf_out;
+-		}
+-
+-		rtnl_lock();
+-		lock_sock(sk);
+-		err = ip6_mc_msfilter(sk, &(struct group_filter){
+-				.gf_interface = gf32->gf_interface,
+-				.gf_group = gf32->gf_group,
+-				.gf_fmode = gf32->gf_fmode,
+-				.gf_numsrc = gf32->gf_numsrc}, gf32->gf_slist);
+-		release_sock(sk);
+-		rtnl_unlock();
+-mc_msf_out:
+-		kfree(p);
+-		return err;
+-	}
++		return compat_ipv6_set_mcast_msfilter(sk, optval, optlen);
+ 	}
  
- 	default:
-@@ -1482,11 +1440,16 @@ static int do_arpt_get_ctl(struct sock *sk, int cmd, void __user *user, int *len
- 
- 	switch (cmd) {
- 	case ARPT_SO_GET_INFO:
--		ret = get_info(sock_net(sk), user, len, 0);
-+		ret = get_info(sock_net(sk), user, len);
- 		break;
- 
- 	case ARPT_SO_GET_ENTRIES:
--		ret = get_entries(sock_net(sk), user, len);
-+#ifdef CONFIG_COMPAT
-+		if (in_compat_syscall())
-+			ret = compat_get_entries(sock_net(sk), user, len);
-+		else
-+#endif
-+			ret = get_entries(sock_net(sk), user, len);
- 		break;
- 
- 	case ARPT_SO_GET_REVISION_TARGET: {
-@@ -1610,15 +1573,9 @@ static struct nf_sockopt_ops arpt_sockopts = {
- 	.set_optmin	= ARPT_BASE_CTL,
- 	.set_optmax	= ARPT_SO_SET_MAX+1,
- 	.set		= do_arpt_set_ctl,
--#ifdef CONFIG_COMPAT
--	.compat_set	= compat_do_arpt_set_ctl,
--#endif
- 	.get_optmin	= ARPT_BASE_CTL,
- 	.get_optmax	= ARPT_SO_GET_MAX+1,
- 	.get		= do_arpt_get_ctl,
--#ifdef CONFIG_COMPAT
--	.compat_get	= compat_do_arpt_get_ctl,
--#endif
- 	.owner		= THIS_MODULE,
- };
- 
+ 	err = do_ipv6_setsockopt(sk, level, optname, optval, optlen);
 -- 
 2.27.0
 
