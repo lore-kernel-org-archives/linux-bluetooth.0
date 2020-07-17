@@ -2,156 +2,87 @@ Return-Path: <SRS0=OLf3=A4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B22C28E8A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A09C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B80F122CA0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:27:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZEqOtR7Y"
+	by mail.kernel.org (Postfix) with ESMTP id 2DA1420734
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:52:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgGQG1X (ORCPT
+        id S1727891AbgGQGv6 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 02:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726056AbgGQGYK (ORCPT
+        Fri, 17 Jul 2020 02:51:58 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:40187 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726855AbgGQGv5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jul 2020 02:24:10 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FC16C061755;
-        Thu, 16 Jul 2020 23:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=f8sxF6lqgSOtJgTg8maQxOEGY1f8ZNeToFNAXuRekpY=; b=ZEqOtR7YleQvC92xGmKC91Kk8L
-        WTEXAQTf/mF9q9Sr6E1umt3uL5isI+jl33iT6B+NTWGjBQCHmj5vR2cqc1gH3RLw87ZBI2KJCyK4j
-        OsS524C9XTPJYGNJrzCJ0VEVOeyFwAvP/JchrRtBr8ED8bo6wbJFPIQWRaekV0RZYb5LDDC0UrqeR
-        Kus4x/xm2hTJTg5FJATe/2UhIbHHDHlA3jUWlAv1s3QZx4Q0PEQpxDBuCxzrE9R/3L9T6dPjNnTit
-        /CDWgXJrbMMzBa/1e6cziI38mK/P6j9Kyif5s6YoYnAzkO1g0wtsXDHyWgAfdl3/mbxZnLS51qNWF
-        JN+mKrIg==;
-Received: from [2001:4bb8:105:4a81:3772:912d:640:e6c6] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jwJmi-00051X-6v; Fri, 17 Jul 2020 06:23:53 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "David S. Miller" <davem@davemloft.net>
-Cc:     Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Chas Williams <3chas3@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, mptcp@lists.01.org
-Subject: [PATCH 02/22] net: streamline __sys_setsockopt
-Date:   Fri, 17 Jul 2020 08:23:11 +0200
-Message-Id: <20200717062331.691152-3-hch@lst.de>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200717062331.691152-1-hch@lst.de>
-References: <20200717062331.691152-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        Fri, 17 Jul 2020 02:51:57 -0400
+Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
+        by mail.holtmann.org (Postfix) with ESMTPSA id E391ECED0F;
+        Fri, 17 Jul 2020 09:01:54 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [RFC PATCH v1 1/2] Bluetooth: queue ACL packets if no handle is
+ found
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CALWDO_Vrn_pXMbkXifKFazha7BYPqLpCthqHOb9ZmVE3wDRMfA@mail.gmail.com>
+Date:   Fri, 17 Jul 2020 08:51:55 +0200
+Cc:     Archie Pusaka <apusaka@google.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F17D321B-DCD2-4A80-97EE-B4589FBFF406@holtmann.org>
+References: <20200627105437.453053-1-apusaka@google.com>
+ <20200627185320.RFC.v1.1.Icea550bb064a24b89f2217cf19e35b4480a31afd@changeid>
+ <91CFE951-262A-4E83-8550-25445AE84B5A@holtmann.org>
+ <CAJQfnxFSfbUbPLVC-be41TqNXzr_6hLq2z=u521HL+BqxLHn_Q@mail.gmail.com>
+ <7BBB55E0-FBD9-40C0-80D9-D5E7FC9F80D2@holtmann.org>
+ <CALWDO_Vrn_pXMbkXifKFazha7BYPqLpCthqHOb9ZmVE3wDRMfA@mail.gmail.com>
+To:     Alain Michaud <alainmichaud@google.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Return early when sockfd_lookup_light fails to reduce a level of
-indentation for most of the function body.
+Hi Alain,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- net/socket.c | 57 +++++++++++++++++++++++++---------------------------
- 1 file changed, 27 insertions(+), 30 deletions(-)
+> >>> There is a possibility that an ACL packet is received before we
+> >>> receive the HCI connect event for the corresponding handle. If this
+> >>> happens, we discard the ACL packet.
+> >>> 
+> >>> Rather than just ignoring them, this patch provides a queue for
+> >>> incoming ACL packet without a handle. The queue is processed when
+> >>> receiving a HCI connection event. If 2 seconds elapsed without
+> >>> receiving the HCI connection event, assume something bad happened
+> >>> and discard the queued packet.
+> >>> 
+> >>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> >>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> >> 
+> >> so two things up front. I want to hide this behind a HCI_QUIRK_OUT_OF_ORDER_ACL that a transport driver has to set first. Frankly if this kind of out-of-order happens on UART or SDIO transports, then something is obviously going wrong. I have no plan to fix up after a fully serialized transport.
+> >> 
+> >> Secondly, if a transport sets HCI_QUIRK_OUT_OF_ORDER_ACL, then I want this off by default. You can enable it via an experimental setting. The reason here is that we have to make it really hard and fail as often as possible so that hardware manufactures and spec writers realize that something is fundamentally broken here.
+> I don't have any objection to making this explicit enable to non serialized transports.  However, I do wonder what the intention is around making this off by default.  We already know there is a race condition between the interupt and bulk endpoints over USB, so this can and does happen.  Hardware manufaturers can't relly do much about this other than trying to pull the interupt endpoint more often, but that's only a workaround, it can't avoid it all together.
+> 
+> IMO, this seems like a legitimate fix at the host level and I don't see any obvious benefits to hide this fix under an experimental feature and make it more difficult for the customers and system integrators to discover.
 
-diff --git a/net/socket.c b/net/socket.c
-index 770503c4ca76c9..49a6daf0293b83 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2107,43 +2107,40 @@ static int __sys_setsockopt(int fd, int level, int optname,
- 		return -EINVAL;
- 
- 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (sock != NULL) {
--		err = security_socket_setsockopt(sock, level, optname);
--		if (err)
--			goto out_put;
-+	if (!sock)
-+		return err;
- 
--		err = BPF_CGROUP_RUN_PROG_SETSOCKOPT(sock->sk, &level,
--						     &optname, optval, &optlen,
--						     &kernel_optval);
-+	err = security_socket_setsockopt(sock, level, optname);
-+	if (err)
-+		goto out_put;
- 
--		if (err < 0) {
--			goto out_put;
--		} else if (err > 0) {
--			err = 0;
--			goto out_put;
--		}
-+	err = BPF_CGROUP_RUN_PROG_SETSOCKOPT(sock->sk, &level, &optname,
-+					     optval, &optlen, &kernel_optval);
-+	if (err < 0)
-+		goto out_put;
-+	if (err > 0) {
-+		err = 0;
-+		goto out_put;
-+	}
- 
--		if (kernel_optval) {
--			set_fs(KERNEL_DS);
--			optval = (char __user __force *)kernel_optval;
--		}
-+	if (kernel_optval) {
-+		set_fs(KERNEL_DS);
-+		optval = (char __user __force *)kernel_optval;
-+	}
- 
--		if (level == SOL_SOCKET && !sock_use_custom_sol_socket(sock))
--			err =
--			    sock_setsockopt(sock, level, optname, optval,
-+	if (level == SOL_SOCKET && !sock_use_custom_sol_socket(sock))
-+		err = sock_setsockopt(sock, level, optname, optval, optlen);
-+	else
-+		err = sock->ops->setsockopt(sock, level, optname, optval,
- 					    optlen);
--		else
--			err =
--			    sock->ops->setsockopt(sock, level, optname, optval,
--						  optlen);
- 
--		if (kernel_optval) {
--			set_fs(oldfs);
--			kfree(kernel_optval);
--		}
--out_put:
--		fput_light(sock->file, fput_needed);
-+	if (kernel_optval) {
-+		set_fs(oldfs);
-+		kfree(kernel_optval);
- 	}
-+
-+out_put:
-+	fput_light(sock->file, fput_needed);
- 	return err;
- }
- 
--- 
-2.27.0
+the problem is that this is not a fix. It is papering over a hole and at best a workaround with both eyes closed and hoping for the best. I am not looking forward for the first security researcher to figure out that they have a chance to inject an unencrypted packet since we are waiting 2 seconds for the USB transport to get its act together.
+
+In addition, I think that Luiz attempt to align with the poll intervals inside the USB transport directly is a cleaner and more self-contained approach. It also reduces the window of opportunity for any attacker since we actually align the USB transport specific intervals with each other.
+
+Regards
+
+Marcel
 
