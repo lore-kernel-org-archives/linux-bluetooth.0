@@ -2,128 +2,119 @@ Return-Path: <SRS0=OLf3=A4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C77DC433E4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1F8C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 08:02:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24B7620704
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 06:59:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 667A820704
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 08:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727989AbgGQG7q convert rfc822-to-8bit (ORCPT
+        id S1728256AbgGQICP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 02:59:46 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:45345 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727901AbgGQG7q (ORCPT
+        Fri, 17 Jul 2020 04:02:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728234AbgGQICO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jul 2020 02:59:46 -0400
-Received: from marcel-macbook.fritz.box (p5b3d2638.dip0.t-ipconnect.de [91.61.38.56])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 81F2ECED0F;
-        Fri, 17 Jul 2020 09:09:43 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH RFC] bluetooth: add support for some old headsets
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <e9f32310-2728-60a2-adc7-3a7418ce54e3@omprussia.ru>
-Date:   Fri, 17 Jul 2020 08:59:44 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <848144D3-85F9-47F8-8CDA-02457FA7530F@holtmann.org>
-References: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
- <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
- <e9f32310-2728-60a2-adc7-3a7418ce54e3@omprussia.ru>
-To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Fri, 17 Jul 2020 04:02:14 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA2DC061755
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 01:02:13 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <mkl@pengutronix.de>)
+        id 1jwLJO-0000MA-Fl; Fri, 17 Jul 2020 10:01:42 +0200
+Received: from [IPv6:2a03:f580:87bc:d400:6150:3c6e:283b:b7f7] (unknown [IPv6:2a03:f580:87bc:d400:6150:3c6e:283b:b7f7])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "mkl@blackshift.org", Issuer "StartCom Class 1 Client CA" (not verified))
+        (Authenticated sender: mkl@blackshift.org)
+        by smtp.blackshift.org (Postfix) with ESMTPSA id AE488532E22;
+        Fri, 17 Jul 2020 08:01:30 +0000 (UTC)
+Subject: Re: [PATCH 22/22] net: make ->{get,set}sockopt in proto_ops optional
+To:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Chas Williams <3chas3@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mptcp@lists.01.org
+References: <20200717062331.691152-1-hch@lst.de>
+ <20200717062331.691152-23-hch@lst.de>
+From:   Marc Kleine-Budde <mkl@pengutronix.de>
+Autocrypt: addr=mkl@pengutronix.de; prefer-encrypt=mutual; keydata=
+ mQINBFFVq30BEACtnSvtXHoeHJxG6nRULcvlkW6RuNwHKmrqoksispp43X8+nwqIFYgb8UaX
+ zu8T6kZP2wEIpM9RjEL3jdBjZNCsjSS6x1qzpc2+2ivjdiJsqeaagIgvy2JWy7vUa4/PyGfx
+ QyUeXOxdj59DvLwAx8I6hOgeHx2X/ntKAMUxwawYfPZpP3gwTNKc27dJWSomOLgp+gbmOmgc
+ 6U5KwhAxPTEb3CsT5RicsC+uQQFumdl5I6XS+pbeXZndXwnj5t84M+HEj7RN6bUfV2WZO/AB
+ Xt5+qFkC/AVUcj/dcHvZwQJlGeZxoi4veCoOT2MYqfR0ax1MmN+LVRvKm29oSyD4Ts/97cbs
+ XsZDRxnEG3z/7Winiv0ZanclA7v7CQwrzsbpCv+oj+zokGuKasofzKdpywkjAfSE1zTyF+8K
+ nxBAmzwEqeQ3iKqBc3AcCseqSPX53mPqmwvNVS2GqBpnOfY7Mxr1AEmxdEcRYbhG6Xdn+ACq
+ Dq0Db3A++3PhMSaOu125uIAIwMXRJIzCXYSqXo8NIeo9tobk0C/9w3fUfMTrBDtSviLHqlp8
+ eQEP8+TDSmRP/CwmFHv36jd+XGmBHzW5I7qw0OORRwNFYBeEuiOIgxAfjjbLGHh9SRwEqXAL
+ kw+WVTwh0MN1k7I9/CDVlGvc3yIKS0sA+wudYiselXzgLuP5cQARAQABtCZNYXJjIEtsZWlu
+ ZS1CdWRkZSA8bWtsQHBlbmd1dHJvbml4LmRlPokCVAQTAQoAPgIbAwIeAQIXgAULCQgHAwUV
+ CgkICwUWAgMBABYhBMFAC6CzmJ5vvH1bXCte4hHFiupUBQJcUsSbBQkM366zAAoJECte4hHF
+ iupUgkAP/2RdxKPZ3GMqag33jKwKAbn/fRqAFWqUH9TCsRH3h6+/uEPnZdzhkL4a9p/6OeJn
+ Z6NXqgsyRAOTZsSFcwlfxLNHVxBWm8pMwrBecdt4lzrjSt/3ws2GqxPsmza1Gs61lEdYvLST
+ Ix2vPbB4FAfE0kizKAjRZzlwOyuHOr2ilujDsKTpFtd8lV1nBNNn6HBIBR5ShvJnwyUdzuby
+ tOsSt7qJEvF1x3y49bHCy3uy+MmYuoEyG6zo9udUzhVsKe3hHYC2kfB16ZOBjFC3lH2U5An+
+ yQYIIPZrSWXUeKjeMaKGvbg6W9Oi4XEtrwpzUGhbewxCZZCIrzAH2hz0dUhacxB201Y/faY6
+ BdTS75SPs+zjTYo8yE9Y9eG7x/lB60nQjJiZVNvZ88QDfVuLl/heuIq+fyNajBbqbtBT5CWf
+ mOP4Dh4xjm3Vwlz8imWW/drEVJZJrPYqv0HdPbY8jVMpqoe5jDloyVn3prfLdXSbKPexlJaW
+ 5tnPd4lj8rqOFShRnLFCibpeHWIumqrIqIkiRA9kFW3XMgtU6JkIrQzhJb6Tc6mZg2wuYW0d
+ Wo2qvdziMgPkMFiWJpsxM9xPk9BBVwR+uojNq5LzdCsXQ2seG0dhaOTaaIDWVS8U/V8Nqjrl
+ 6bGG2quo5YzJuXKjtKjZ4R6k762pHJ3tnzI/jnlc1sXz
+Message-ID: <5f88e695-d787-2191-feef-883a067788ed@pengutronix.de>
+Date:   Fri, 17 Jul 2020 10:01:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200717062331.691152-23-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sergey,
-
->>> The MediaTek Bluetooth platform (MT6630 etc.) has a peculiar implementation
->>> for the eSCO/SCO connection via BT/EDR: the host controller returns error
->>> code 0x20 (LMP feature not supported) for HCI_Setup_Synchronous_Connection
->>> (0x0028) command without actually trying to setup connection with a remote
->>> device in case such device (like Digma BT-14 headset) didn't advertise its
->>> supported features.  Even though this doesn't break compatibility with the
->>> Bluetooth standard it breaks the compatibility with the Hands-Free Profile
->>> (HFP).
->>> 
->>> This patch returns the compatibility with the HFP profile and actually
->>> tries to check all available connection parameters despite of the specific
->>> MediaTek implementation. Without it one was unable to establish eSCO/SCO
->>> connection with some headsets.
->> 
->> please include the parts of btmon output that show this issue.
+On 7/17/20 8:23 AM, Christoph Hellwig wrote:
+> Just check for a NULL method instead of wiring up
+> sock_no_{get,set}sockopt.
 > 
->   Funny, I had removed that part from the original patch. Here's that log:
-> 
-> < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17                                  #1 [hci0] 6.705320
->        Handle: 50
->        Transmit bandwidth: 8000
->        Receive bandwidth: 8000
->        Max latency: 10
->        Setting: 0x0060
->          Input Coding: Linear
->          Input Data Format: 2's complement
->          Input Sample Size: 16-bit
->            of bits padding at MSB: 0
->          Air Coding Format: CVSD
->        Retransmission effort: Optimize for power consumption (0x01)
->        Packet type: 0x0380
->          3-EV3 may not be used
->          2-EV5 may not be used
->          3-EV5 may not be used
->> HCI Event: Command Status (0x0f) plen 4                                                          #2 [hci0] 6.719598
->      Setup Synchronous Connection (0x01|0x0028) ncmd 1
->        Status: Unsupported LMP Parameter Value / Unsupported LL Parameter Value (0x20)
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  net/can/bcm.c               |  2 --
+>  net/core/sock.c             | 14 --------------
 
-I double check with the specification and it is not precise that errors should be reported via sync conn complete events. My assumption would be that your headset only supports SCO and thus the controller realizes that eSCO request can not be completed anyway. So the controller opts for quickest path to get out of this.
+For the CAN part:
 
-> 
->>> Based on the patch by Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>.
->>> 
->>> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
->>> 
->>> ---
->>> This patch is against the 'bluetooth-next.git' repo.
->>> 
->>> net/bluetooth/hci_event.c |    8 ++++++++
->>> 1 file changed, 8 insertions(+)
->>> 
->>> Index: bluetooth-next/net/bluetooth/hci_event.c
->>> ===================================================================
->>> --- bluetooth-next.orig/net/bluetooth/hci_event.c
->>> +++ bluetooth-next/net/bluetooth/hci_event.c
->>> @@ -2187,6 +2187,13 @@ static void hci_cs_setup_sync_conn(struc
->>> 	if (acl) {
->>> 		sco = acl->link;
->>> 		if (sco) {
->>> +			if (status == 0x20 && /* Unsupported LMP Parameter value */
->>> +			    sco->out) {
->>> +				sco->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
->>> +						(hdev->esco_type & EDR_ESCO_MASK);
->>> +				if (hci_setup_sync(sco, sco->link->handle))
->>> +					goto unlock;
->>> +			}
->>> 			sco->state = BT_CLOSED;
->> 
->> since this is the command status event, I doubt that sco->out check is needed.
-> 
->   Can't comment oin this, my BT fu is too weak... 
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-It is the case. Command status is only local to command we issued and thus in this case it is the connection creation attempt from our side. Meaning it is always outgoing.
+Marc
 
-Regards
-
-Marcel
-
+-- 
+Pengutronix e.K.                 | Marc Kleine-Budde           |
+Embedded Linux                   | https://www.pengutronix.de  |
+Vertretung West/Dortmund         | Phone: +49-231-2826-924     |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
