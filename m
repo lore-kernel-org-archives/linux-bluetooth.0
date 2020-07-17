@@ -2,143 +2,97 @@ Return-Path: <SRS0=OLf3=A4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8532C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 21:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C902C433E5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 23:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A79F2070A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 21:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5971020759
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 23:14:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PO+sWNW/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aoxHqdmw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726945AbgGQVwo (ORCPT
+        id S1728068AbgGQXOP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 17:52:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56210 "EHLO
+        Fri, 17 Jul 2020 19:14:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726793AbgGQVwn (ORCPT
+        with ESMTP id S1726205AbgGQXOO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jul 2020 17:52:43 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F90C0619D2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 14:52:43 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id k4so9220228oik.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 14:52:43 -0700 (PDT)
+        Fri, 17 Jul 2020 19:14:14 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F4BC0619D2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 16:14:14 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id 1so6080802pfn.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 16:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HM65dzyo59lndgA/bc5swjwlUj2IqjCWZFL5dFvIYZQ=;
-        b=PO+sWNW/asCK96pjlUtTRg01ehPfMQfWl111aTegNAFUvKqUaIqpEfjwmC651+lRIA
-         K64vgyXJZC4Kc/mtoB0nnxyBnjlfHMYu0bYO9OTMi2ACvEeZ2vZgweZswCIE+oMJJqHM
-         IaUW8g85s6aGFmfSrj3Jenj4LIZRyelM46uaqWI5yUSVMncYKhHSosTiGlyx7iNcXxK8
-         Ems4PDtJiUHzT9pbccMr/kaMCUCEyXdwe17FlvuIH/o0e4r+7ZDqIDFXAfzAUAAW7Q1B
-         zH4MrAlY4ptZKRkTpuzwcYHYeebCmtqOsD54q3QwkANZaNAx2dU3rNsOGyKGLoO8BbYN
-         iNNQ==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nppnqGQdyrmLaloqOb/xJexNPUqspC/+yZWe6iO5RTQ=;
+        b=aoxHqdmwYI7Z90ufEZxMQKhdT6c+XESjhWndlCQ/JSBs13ECudKa815QwXEjJNb0E5
+         xG6En0nujGh8LVft4r2rK3FguSqE9GnKdLA8uB+ZzVT4YpfNnfvHIazuKjbWbJ/3j/qS
+         4Cw91GVmnxYvtO/Kam1jsIn4f0IgJxHobjYnA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HM65dzyo59lndgA/bc5swjwlUj2IqjCWZFL5dFvIYZQ=;
-        b=sfrCPBMaGh/JpiQKO79AZELqzgSF1yS+WwiK0IRcpNveYVnNm4SxCl1cSU/83iLw6E
-         rHu/ifVLGTN8xL72+OEB7IT/yHen83RmLnxnei1EUMVTKTLw3Mb34WwfSE5BUS5QNjSg
-         0nWpAFTizSmGhP4+VPomh1oPghx1sMQwhRhEPKUx0IG8qGl4V8X0OEtC9aFJR4PC5I2U
-         BWEyJvfvDGjSGt4YtAotAfARfyrmMPZxBzgFNxFflq2ItBr+tEPFwdAp4PmGqWxI3FEM
-         ChPm34vkY2Tf8rXY4GNYigBLoAqdS9FtVUmAzBtR9MU8RtVKrSPFOdWtU4G6yv4afEgR
-         6Uhw==
-X-Gm-Message-State: AOAM533BHSdABWvIZltgSMoVMudVzmWdXofdGt3J3V2RiuYHWZwpo6Of
-        OSXgnY7ab9srbhKCvNBQJhTo34GOMlW+rx/pSnuGpGEW
-X-Google-Smtp-Source: ABdhPJwFgbsl69Z0K9FU7CbNMuVM/3Kb2peBwYBn0nBxjpxCXgyBpqcpIV4ASCD9bxJtlHOoq37caUjDM7wZ4rqt8uw=
-X-Received: by 2002:aca:cf81:: with SMTP id f123mr9527980oig.137.1595022762823;
- Fri, 17 Jul 2020 14:52:42 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nppnqGQdyrmLaloqOb/xJexNPUqspC/+yZWe6iO5RTQ=;
+        b=cBC3Eo+TVuD+hR0aDgGRWBA2fdX6QAyu//RsO5XS5U+NDYSd9QBvpVrhzHjE90HBQ+
+         Toa8dtDWgESKDrfwdMYufzZp97D0EPwsCJClSd6BLWkuqR5XaYyWiu+87enkVfINuw66
+         NmniuzA9M3GOiQiypnkyKakUJN8NaT770IA4dNMOGtXviXOo7tkTS+LXU4jDyvwhbFL4
+         /P8Sy7g2JuFlodnC6y0pGQ60cAh3dOxW4GVO9fGbMF4k08TY7Sh+/LIp569dRo1zkKZk
+         xDDY7Or5kKUITtaxyOoMEGlh+gY7F3R7aqZwuucLRjPSJ7B/lJgUj6hatYgc/dbrVQ5J
+         h3ZQ==
+X-Gm-Message-State: AOAM531pc8t0MDLYTS+mlAlnx0edUDfoCiiXDDdcmv81pnw0KO23eByc
+        DQ+h3dbKFHxad1Zy9HW0VK6WJ/7I0lY=
+X-Google-Smtp-Source: ABdhPJy+6q9UdEAcO4FZHXj1i01vCDUktucECy54qdSNsqHF1xDvfZDGQZH3QCLU6tpWmPZrWXt5GA==
+X-Received: by 2002:a62:e30f:: with SMTP id g15mr9583406pfh.203.1595027653675;
+        Fri, 17 Jul 2020 16:14:13 -0700 (PDT)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
+        by smtp.gmail.com with ESMTPSA id y7sm8194469pgk.93.2020.07.17.16.14.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 17 Jul 2020 16:14:13 -0700 (PDT)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] Add a presubmit configuration file for Chromium OS repo
+Date:   Fri, 17 Jul 2020 16:14:04 -0700
+Message-Id: <20200717231404.240644-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200717191515.220621-1-luiz.dentz@gmail.com> <5f11facb.1c69fb81.6f815.57f7@mx.google.com>
- <dac373c76940dbf30302a1420fceaf7a01e00397.camel@linux.intel.com> <CABBYNZKNBRT-3t_SSh8dHWVZk6S7NBU9rY2X-miE6bKwLOqQnw@mail.gmail.com>
-In-Reply-To: <CABBYNZKNBRT-3t_SSh8dHWVZk6S7NBU9rY2X-miE6bKwLOqQnw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 17 Jul 2020 14:52:31 -0700
-Message-ID: <CABBYNZ+UEAxJ3vHOou85sC_xiXnVZUoN+xJiwAcSDUTcpJhe8w@mail.gmail.com>
-Subject: Re: [BlueZ,1/5] shared/att: Fix possible crash on disconnect
-To:     Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Chromium OS developers use gerrit and repo in their workflow.
+(https://gerrit.googlesource.com/git-repo/). This configuration file
+makes it easier when uploading patches to gerrit with the repo tool.
 
-On Fri, Jul 17, 2020 at 1:45 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Tedd,
->
-> On Fri, Jul 17, 2020 at 1:35 PM Tedd Ho-Jeong An
-> <tedd.an@linux.intel.com> wrote:
-> >
-> > Hi Luiz,
-> >
-> > The failure is from test-gatt
-> >
-> > DEBUG   :FAIL: unit/test-gatt
-> >
-> > I will update the CI to include the test result.
-> >
-> > Regards,
-> > Tedd
-> >
-> > On Fri, 2020-07-17 at 12:23 -0700, bluez.test.bot@gmail.com wrote:
-> > > This is automated email and please do not reply to this email!
-> > >
-> > > Dear submitter,
-> > >
-> > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > While we are preparing for reviewing the patches, we found the following
-> > > issue/warning.
-> > >
-> > > Test Result:
-> > > makecheck Failed
-> > >
-> > > Outputs:
-> > > ./test-driver: line 107: 14830 Bus error               (core dumped) "$@" >
-> > > $log_file 2>&1
-> > > make[3]: *** [Makefile:9726: test-suite.log] Error 1
-> > > make[2]: *** [Makefile:9834: check-TESTS] Error 2
-> > > make[1]: *** [Makefile:10228: check-am] Error 2
-> > > make: *** [Makefile:10230: check] Error 2
->
-> Weird, it start failing for me as well but it doesn't seems to be
-> causing any test to fail:
->
-> Total: 192, Passed: 192 (100.0%), Failed: 0, Not Run: 0
-> Overall execution time: 0.849 seconds
-> FAIL unit/test-gatt (exit status: 1)
+---
+ PRESUBMIT.cfg | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ create mode 100644 PRESUBMIT.cfg
 
-Ive send a fix for it, there was a crash detected by valgrind which
-don't make the test to fail but it actually shows in the logs, there
-might be a way to detect the crash and make the test fail to make this
-more obvious.
-
->
-> > >
-> > >
-> > >
-> > > ---
-> > > Regards,
-> > > Linux Bluetooth
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
+diff --git a/PRESUBMIT.cfg b/PRESUBMIT.cfg
+new file mode 100644
+index 000000000..10f89b741
+--- /dev/null
++++ b/PRESUBMIT.cfg
+@@ -0,0 +1,8 @@
++# This is a configuration for Chromium OS repo pre-upload hooks.
++# repohooks doc: https://chromium.googlesource.com/chromiumos/repohooks/
++# Chromium OS BlueZ git repo: https://chromium.googlesource.com/chromiumos/third_party/bluez/
++
++[Hook Overrides]
++cros_license_check: false
++tab_check: false
++checkpatch_check: true
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
