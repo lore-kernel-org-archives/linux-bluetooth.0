@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7231CC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 19:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0358BC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 19:15:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5158D2070E
+	by mail.kernel.org (Postfix) with ESMTP id D626B2064C
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jul 2020 19:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="plKj0A5+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEzvugMW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728312AbgGQTPV (ORCPT
+        id S1728346AbgGQTPW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jul 2020 15:15:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60246 "EHLO
+        Fri, 17 Jul 2020 15:15:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
         with ESMTP id S1728202AbgGQTPV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 17 Jul 2020 15:15:21 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05D38C0619D2
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE81C0619D2
         for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 12:15:21 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id md7so6852863pjb.1
+Received: by mail-pg1-x542.google.com with SMTP id z5so7137182pgb.6
         for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2020 12:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ATkHjHvmlTIlEcbg7ocsMTKN2/DIf8EdCBGX5pPpsu0=;
-        b=plKj0A5+0+pIQ5vMicUPmk9ttxFrwTUGYF8Xu/pS1rQl5/Og4uvrMV4/pUyatNu/Rm
-         w9++F9MlP4p48IqyQqDmFZS590VNPq97qfr39iwycqZEFEI0uAvRBOMjLqy+nE9mfJ4P
-         a80Nw/3OA1L2J8DZwNnbq+JbC807pZfCt06ljRP7xo33S9BSO4Zyze9pNdUBtoGSRUuC
-         ooNn5aQq2V3Qv8KmzB9OVA/Vcs2IkP/AtdhhBV/Q0Y6wHVk1vhBPo/W8SBhPuWrUUFOV
-         Q5SR1tksMlKdZXEJQs7HGAgwCWO+yPEna1o5LHJJMXueYMhxDDO+u4ZP0ebNSDlMrqAo
-         taLQ==
+        bh=9CGEiPF9wLML97aLDtUYlsZfnzcMXSIYdV6ccazgttk=;
+        b=QEzvugMW3rA8H/hC61bH5KXTPgjAxuP1722fOdVyFEjhHCc4GzcHWSIC93EOC3LuZi
+         r6we0pvaCPKQZXKcL6NVsRecO4MDz2Zy+thz1nf9HdF3AR5egnBmyTrCoJ57LtuwzzX2
+         6LYK727UJVvCxOMnjB0GMhXbpf3qNleD9pDyaiF5S8yPzgh7DJgVdR0BVrlQ6IF2A3mg
+         qGTfjaJpaTsB3BqZq2aEdAMz/kQOM9xAXEnxxyTcTwVXc0XWa8ZMnmzCFMG0JLNdPyt1
+         V3Us5Jo1t2Rw7TRaY6aDvVNpIb7Wehvctt0l4stjs7wvvymnCvC1P0sSFZraqFu0X990
+         KfWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ATkHjHvmlTIlEcbg7ocsMTKN2/DIf8EdCBGX5pPpsu0=;
-        b=SPRZUQWElscndWwOSiOBfal+AoYUez2UcywOrRJ3onjYceVF6Ue4BllhZOpHqM+TDr
-         Y4AH3GtVa2FAi5RCPynVoHLfcf0P/P+s9dB47Zc4f263TGRf1OdiExgAUXt8XnpLBsr4
-         6bme2a/7gQDKhTHRZhEFtKZQ1NmNbhJMCCkNQtyup2EFRIsny5nULDuFCArDQ75HFpzt
-         EVRvu/N1flYVSs9FX0sn/KJGWwG+7I6DnTrGsXAMmTsbyVbVAMg/uAQcY6pYfq68U5Ft
-         h6BCDQz3Epe5D5MJIxX9nCN2xHyvvctYOluAt1XnBcz5IPx5kpllyOBv6jrkmEr0n8wG
-         deAQ==
-X-Gm-Message-State: AOAM532dl0mcT4Ajdn8/NE/7bxsMy5EB8GNzRN9YSTyf2VCNshRgdrbx
-        53pNLeLxUhMFoTkeOSI9bNR+Uj2EWn4=
-X-Google-Smtp-Source: ABdhPJyw49NmFaXrDTbQS4uSKs61ZibUHgBozKcj+P/SioV7SyLcuo36bh7yxaTEioXdaj5xl0c+Sw==
-X-Received: by 2002:a17:90a:c28f:: with SMTP id f15mr11555127pjt.72.1595013320253;
-        Fri, 17 Jul 2020 12:15:20 -0700 (PDT)
+        bh=9CGEiPF9wLML97aLDtUYlsZfnzcMXSIYdV6ccazgttk=;
+        b=T2X0JcmbMwpCLIOP1DSMG2XwlIvt3sQp5TazGca/ePyM5zPWMpWwQzYS+dT/AoQv+0
+         TBsGKra9xGQcJTABm3A5dV03hTwct8yhMHC9RFvqTDZwWJ65cGdfCs7LULGA2I4KZgt1
+         ex5RmyVDj7k6MEh7rfBmWk/EZwy727doATvyNrschYKev33PB/AmuprLjqhe2CVF8dH1
+         DPnkT/0C/LCGcnhzfi4d1c8IVtymrwH+pl2dnXmWkqKC2mqjx5CdNpPR4QHDO/j1Kesx
+         WE/sw2XQds1QswIY3DmlXpDPYRQ9B34iwgguTyaX5QL+E6PLGnQtEH999JgjFjLp/mxx
+         joZA==
+X-Gm-Message-State: AOAM533GXqM1AnZQwXbmWckMosNXXrpaIFwFPBnJ5iHbQ55HBaji0e1Y
+        cilIkIizSLXgvgK+449Kfp3G//3MDcc=
+X-Google-Smtp-Source: ABdhPJxE/kSuEPzqBxwJlkkjCaqfKc/JiIsh92nF0YkFH7s8pgVSHeKGGpieTucKHVjYaJBDueSXCw==
+X-Received: by 2002:a05:6a00:78a:: with SMTP id g10mr9473873pfu.0.1595013321219;
+        Fri, 17 Jul 2020 12:15:21 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p9sm6488334pgc.77.2020.07.17.12.15.19
+        by smtp.gmail.com with ESMTPSA id p9sm6488334pgc.77.2020.07.17.12.15.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2020 12:15:19 -0700 (PDT)
+        Fri, 17 Jul 2020 12:15:20 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] shared/gatt-client: Don't remove active services
-Date:   Fri, 17 Jul 2020 12:15:14 -0700
-Message-Id: <20200717191515.220621-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/5] shared/gatt-client: Fix handling of service changed
+Date:   Fri, 17 Jul 2020 12:15:15 -0700
+Message-Id: <20200717191515.220621-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200717191515.220621-1-luiz.dentz@gmail.com>
 References: <20200717191515.220621-1-luiz.dentz@gmail.com>
@@ -77,28 +77,31 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If discovery was aborted (i.e due to a disconnect) check if pending
-services were active so only staled services which were not completed
-fetched are removed.
+When handling multiple service changed multiple discovery operations
+would be performed but at the end of each one the hash would be read
+which not only would create extra traffic but also prevents the code
+to properly detection services disappering.
 ---
- src/shared/gatt-client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/shared/gatt-client.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index e21aca1f0..409a3ee57 100644
+index 409a3ee57..f6cff5014 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -412,6 +412,10 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
- 		struct gatt_db_attribute *attr = svc->data;
- 		uint16_t start, end;
+@@ -1460,8 +1460,10 @@ static bool read_db_hash(struct discovery_op *op)
+ 	struct bt_gatt_client *client = op->client;
+ 	bt_uuid_t uuid;
  
-+		/* Leave active services if operation was aborted */
-+		if ((!success && err == 0) && gatt_db_service_get_active(attr))
-+			continue;
-+
- 		gatt_db_attribute_get_service_data(attr, &start, &end,
- 							NULL, NULL);
+-	/* Check if hash was already read */
+-	if (op->hash)
++	/* Check if hash was already been read or there are more services to
++	 * process.
++	 */
++	if (op->hash || !queue_isempty(client->svc_chngd_queue))
+ 		return false;
  
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
 -- 
 2.26.2
 
