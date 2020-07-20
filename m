@@ -2,118 +2,316 @@ Return-Path: <SRS0=mCsq=A7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E1DC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 20:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D5BC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 21:13:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F27720773
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 20:48:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGmrrLEC"
+	by mail.kernel.org (Postfix) with ESMTP id ABBD922BEF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 21:13:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbgGTUsC (ORCPT
+        id S1726530AbgGTVNe convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jul 2020 16:48:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726012AbgGTUsB (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jul 2020 16:48:01 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3549C061794;
-        Mon, 20 Jul 2020 13:48:01 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id md7so536206pjb.1;
-        Mon, 20 Jul 2020 13:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=W3gFxb9MTLvTnCe3A+iabUWXBAu7mA9HyhZHWgTOkUw=;
-        b=OGmrrLECo+9bEWcObjspsB7mZd1Knz6TplGXozOrISTfqD7/NX21SXnbWcSkV3fL4v
-         rTtVk5lWAA2Zu7uZ6u1mrfxhancqzyg3QAj3aPjlEycGVWZJlozkhUGEvXA8Lh3Zhd9y
-         MI2pFWCUVAw0qhoczi2fzDR5o+9jsXf0u50JS+cFIfuTYX6fdThXqy7BkTGCK/dg3wkY
-         mbds6x2z1GfwvAA0D5GwOBd9MLDFeCqWgb4tYptazoXAosQDHX7Ytsgw6xoiVQCij+q6
-         LhYcFToAHR8FWmsf1prWh4sudrDF50FXVoAgPYMNb7eWHKWg9zXFnQitJW8+uw6BZBn8
-         8EhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=W3gFxb9MTLvTnCe3A+iabUWXBAu7mA9HyhZHWgTOkUw=;
-        b=NmiT+9oS9uGFkHRMP8aKc0bdouhlF+z3N5dmTZmMvJTuQlavya2QOjW9QZluOBDMSN
-         Bf8iOVH8ZwsENeYxwjEQZujdZFojbyI5o/gyN8uqRyJGsRUd4CmnulXJhw4+Gy1N/tQM
-         4ju/0yxyaquisGWKaNo8IDmPDegmXL1hE7sGBPd37CAuuHg4bE7IRXJLKd5HezY+6rbI
-         57Abyx0O6OS1c4sJpbqMwZFxec+2L4ngp4CDZv566S1w3ZjoKKvtWYtElQPsITi+GpaX
-         QeoAbDjDDjufLbC3qeDlBil3FMgGdXH7tdt3RJ0ZPfbGcZ8VCfWS6QkfnGtmwRWsDlu/
-         2GXQ==
-X-Gm-Message-State: AOAM532xzswQCE9EmiTk87sBNFqaRV6lXN9+OTa+JTpTX2JXZ3mv7RA8
-        Lqgsib0ge2mJ4jEvgoQdL6o=
-X-Google-Smtp-Source: ABdhPJznKJm/ctwfQ0zEUlKph93VMIYlrMPvmwUzvON4KJd0PPoASWmZCQzIIZBDlRvR10ywRtQVEg==
-X-Received: by 2002:a17:902:a50d:: with SMTP id s13mr19573067plq.149.1595278081037;
-        Mon, 20 Jul 2020 13:48:01 -0700 (PDT)
-Received: from ast-mbp.dhcp.thefacebook.com ([2620:10d:c090:400::5:e3b])
-        by smtp.gmail.com with ESMTPSA id m31sm455776pjb.52.2020.07.20.13.47.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2020 13:47:59 -0700 (PDT)
-Date:   Mon, 20 Jul 2020 13:47:56 -0700
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: get rid of the address_space override in setsockopt
-Message-ID: <20200720204756.iengwcguikj2yrxt@ast-mbp.dhcp.thefacebook.com>
-References: <20200720124737.118617-1-hch@lst.de>
+        Mon, 20 Jul 2020 17:13:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44102 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726012AbgGTVNe (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 20 Jul 2020 17:13:34 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Mon, 20 Jul 2020 21:13:31 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: b.brahim.oussama@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-1f4eBR52MI@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200720124737.118617-1-hch@lst.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 02:47:13PM +0200, Christoph Hellwig wrote:
-> Hi Dave,
-> 
-> setsockopt is the last place in architecture-independ code that still
-> uses set_fs to force the uaccess routines to operate on kernel pointers.
-> 
-> This series adds a new sockptr_t type that can contained either a kernel
-> or user pointer, and which has accessors that do the right thing, and
-> then uses it for setsockopt, starting by refactoring some low-level
-> helpers and moving them over to it before finally doing the main
-> setsockopt method.
-> 
-> Note that I could not get the eBPF selftests to work, so this has been
-> tested with a testing patch that always copies the data first and passes
-> a kernel pointer.  This is something that works for most common sockopts
-> (and is something that the ePBF support relies on), but unfortunately
-> in various corner cases we either don't use the passed in length, or in
-> one case actually copy data back from setsockopt, so we unfortunately
-> can't just always do the copy in the highlevel code, which would have
-> been much nicer.
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-could you rebase on bpf-next tree and we can route it this way then?
-we'll also test the whole thing before applying.
+--- Comment #108 from Oussama BEN BRAHIM (b.brahim.oussama@gmail.com) ---
+many thanks @Swyter.It works like a charm.
+This is my first time patching and building a custom kernel. It's quite fancy
+experience.
+this is lsusb output if it can help.
+#lsusb -vd 0a12:0001
 
-sounds like v2 is needed anyway to address Eric's addr space concern?
+Bus 003 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
+(HCI mode)
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
+  idProduct          0x0001 Bluetooth Dongle (HCI mode)
+  bcdDevice           88.91
+  iManufacturer           0 
+  iProduct                2 (error)
+  iSerial                 0 
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x00b1
+    bNumInterfaces          2
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0xe0
+      Self Powered
+      Remote Wakeup
+    MaxPower              100mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+can't get debug descriptor: Resource temporarily unavailable
+Device Status:     0x0000
+  (Bus Powered)
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
