@@ -2,101 +2,120 @@ Return-Path: <SRS0=Dy9H=BA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D4EC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD79C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:40:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1DF9207DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AA5520672
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:40:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="noElnCmR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeoCW/0t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727991AbgGUChe (ORCPT
+        id S1727818AbgGUCkV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jul 2020 22:37:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55522 "EHLO
+        Mon, 20 Jul 2020 22:40:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbgGUChd (ORCPT
+        with ESMTP id S1725857AbgGUCkU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jul 2020 22:37:33 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65E7C061794
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2020 19:37:33 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id w2so11229545pgg.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2020 19:37:33 -0700 (PDT)
+        Mon, 20 Jul 2020 22:40:20 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA0CC061794;
+        Mon, 20 Jul 2020 19:40:20 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id o18so20085596eje.7;
+        Mon, 20 Jul 2020 19:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7iFj+VYGc+pNg7a3sKnrHzO0tOtNEDnzb7gZ2GZVQs8=;
-        b=noElnCmRRcf07/EwPZXseNlTjLl7oyF5hncD1UoH/a7QU9ljzes9KOXJQPW87AG8oJ
-         35HwfsZuhrgIrCJPNU2o0mgDT9nhrM7OHmgQbsUHAPPv6rjVJptumWmlZb5aCkcmG9wp
-         UVVRUS3MO+8/cFaXKzHgNabWiaZzRRLLUfogo=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uGJfiXXxVHM7zniHW3sl0xVltZ7h7OdT0FRQ5H6GgQM=;
+        b=OeoCW/0tbvMmfJG3/GXVxS0sf0NU1F3vv5ek0RwSeUB4oL3xBRF4212opG/Qca2oMt
+         w/LznXXPQ/9latRxVyAN7HoUeXaNxvpuCBnCtE8R4VgfJiFrlJWGUZ3AudCWWBSFASY5
+         rHitPZwk5CzwZGC9yY+cINRMFHfhNoff5Hs0bqMLp86BM3TNE6gCd0fujLU9Jp1gGqkn
+         fbgcZ3ejttQ6DUlGWTOX05MbhnYkq6NEeVjuv6BJvSSMm0lLza1F8vnXHY24yVrWhuUw
+         mE4fVqq6wL70udwjlBJkWv9YZBUUfIIT74p06ZRe0yu4iR7nwWtzJQYm2S7oIsa47DMh
+         Anhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7iFj+VYGc+pNg7a3sKnrHzO0tOtNEDnzb7gZ2GZVQs8=;
-        b=PCvXLesLasvlawCveoMrQDMlv16r5fJA4wkGsDlm99KxgSIjeinytiOYREg24QVEhC
-         BSJ/fCijEPnvpovvRPpqXpCBAmRYMEG7tcy1kPQxXN9WRNy+IayWUTvbYQC8TYnAtaNV
-         3/aZunRHELIoJGRfXybstrxg8t7wcgi2QWwGmkBr9xbZ9FV3rb/Uv/aUrZka9ulh1tXx
-         WRC/plJpz2xK2Rj8SDnPCxbkZzHzpR32ajl+DMzOwQVSYWxbQm87dDiiB2O34KnPFro5
-         Zi1WS47qFHF9GbtmeaNfK3PVmLAyZ9KggowY/XOP5YR0AZwljsHsXvXwoL9H1pOSOzyw
-         MAOw==
-X-Gm-Message-State: AOAM532nX4hI+8q+WIJIL1NtQMV5U7u5gBqoJctGWTmRIG/aHIAAP4WY
-        GIbnGb7ZlTVzym4Qww7auqru3Q==
-X-Google-Smtp-Source: ABdhPJybp2k+BYGwk3hoadcZotDg0bccX+mZOYTZdEOKiuC6mz/d1aDLcwfDGdDWCJ1he1lkB8yNGA==
-X-Received: by 2002:a63:e017:: with SMTP id e23mr20944311pgh.125.1595299052135;
-        Mon, 20 Jul 2020 19:37:32 -0700 (PDT)
-Received: from drinkcat2.tpe.corp.google.com ([2401:fa00:1:b:7220:84ff:fe09:41dc])
-        by smtp.gmail.com with ESMTPSA id z6sm17888266pfn.173.2020.07.20.19.37.30
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uGJfiXXxVHM7zniHW3sl0xVltZ7h7OdT0FRQ5H6GgQM=;
+        b=GHjMlunOBJHywoda8QvnUbXzKcpxcToPi5q96IB0nS8SV/0w9n9vzOTdLuLBkJfa66
+         Wx+so/SDt0UFrPX51D8RnHdX40HSdnl6kE/k6vZO4s9ue44FnSEti2xAj4QsHxi1ZuS8
+         n8bgQ5tsoUDpMlL93DF5xblWvbQ3H5eghxR0Mtzi2I4CAj6rrdbmLsCHl38hninxxXoX
+         76ZXWvblM4Uf1Fxl+4ZiPTOjHMLC4IbkIchoKtoGeeZKJjpz15SvX2Oa5LjhyljEa0fI
+         5MhVKEix35nP+fLDc3sQBkgL5fxi5KKKVrhwepSVfiwSc8W9UIKYcgBLIIbj4vBZqYxE
+         R3cw==
+X-Gm-Message-State: AOAM530XQWjOFj5xGhVnLVxnH6MpDNXehwO5Bs0Rwte4hqLm1r0Q6JKr
+        qlYP/tURkjHiGQun4RSN6ds=
+X-Google-Smtp-Source: ABdhPJxwHHfj4AzpvPUUwMsSPbeGFb02Lr8Q1E98GpxaDKbKNy5p2S/jP2546lXFLYroLU3vdKdQBA==
+X-Received: by 2002:a17:906:c41:: with SMTP id t1mr23432470ejf.18.1595299219166;
+        Mon, 20 Jul 2020 19:40:19 -0700 (PDT)
+Received: from ltop.local ([2a02:a03f:a7fb:e200:d978:aa6c:4528:f5b1])
+        by smtp.gmail.com with ESMTPSA id y22sm15676844ejj.67.2020.07.20.19.40.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2020 19:37:31 -0700 (PDT)
-From:   Nicolas Boichat <drinkcat@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Nicolas Boichat <drinkcat@chromium.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: hci_h5: Set HCI_UART_RESET_ON_INIT to correct flags
-Date:   Tue, 21 Jul 2020 10:37:15 +0800
-Message-Id: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
-X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
+        Mon, 20 Jul 2020 19:40:18 -0700 (PDT)
+Date:   Tue, 21 Jul 2020 04:40:16 +0200
+From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: Re: [PATCH 02/24] bpfilter: fix up a sparse annotation
+Message-ID: <20200721024016.2talwdt5hjqvirr6@ltop.local>
+References: <20200720124737.118617-1-hch@lst.de>
+ <20200720124737.118617-3-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200720124737.118617-3-hch@lst.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-HCI_UART_RESET_ON_INIT belongs in hdev_flags, not flags.
+On Mon, Jul 20, 2020 at 02:47:15PM +0200, Christoph Hellwig wrote:
+> The __user doesn't make sense when casting to an integer type.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  net/bpfilter/bpfilter_kern.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
+> index 977e9dad72ca4f..713b4b3d02005d 100644
+> --- a/net/bpfilter/bpfilter_kern.c
+> +++ b/net/bpfilter/bpfilter_kern.c
+> @@ -49,7 +49,7 @@ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
+>  	req.is_set = is_set;
+>  	req.pid = current->pid;
+>  	req.cmd = optname;
+> -	req.addr = (long __force __user)optval;
+> +	req.addr = (__force long)optval;
 
-Fixes: ce945552fde4a09 ("Bluetooth: hci_h5: Add support for serdev enumerated devices")
-Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
+For casts to integers, even '__force' is not needed (since integers
+can't be dereferenced, the concept of address-space is meaningless
+for them, so it's never useful to warn when it's dropped and
+'__force' is thus not needed).
 
----
-
- drivers/bluetooth/hci_h5.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index e60b2e0773db110..e41854e0d79aae2 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -793,7 +793,7 @@ static int h5_serdev_probe(struct serdev_device *serdev)
- 	if (!h5)
- 		return -ENOMEM;
- 
--	set_bit(HCI_UART_RESET_ON_INIT, &h5->serdev_hu.flags);
-+	set_bit(HCI_UART_RESET_ON_INIT, &h5->serdev_hu.hdev_flags);
- 
- 	h5->hu = &h5->serdev_hu;
- 	h5->serdev_hu.serdev = serdev;
--- 
-2.28.0.rc0.105.gf9edc3c819-goog
-
+-- Luc
