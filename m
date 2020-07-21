@@ -1,74 +1,107 @@
-Return-Path: <SRS0=mCsq=A7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Dy9H=BA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F30C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 23:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A79C433E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6DDC20684
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jul 2020 23:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40F2C207DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jul 2020 02:37:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MT9XwQvk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbgGTXUW (ORCPT
+        id S1728307AbgGUChh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jul 2020 19:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53298 "EHLO
+        Mon, 20 Jul 2020 22:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726021AbgGTXUV (ORCPT
+        with ESMTP id S1725857AbgGUChg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jul 2020 19:20:21 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C65C061794;
-        Mon, 20 Jul 2020 16:20:21 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 0E8A811E8EC0A;
-        Mon, 20 Jul 2020 16:20:16 -0700 (PDT)
-Date:   Mon, 20 Jul 2020 16:20:13 -0700 (PDT)
-Message-Id: <20200720.162013.456211151711627380.davem@davemloft.net>
-To:     stefan@datenfreihafen.org
-Cc:     hch@lst.de, kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, edumazet@google.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 24/24] net: pass a sockptr_t into ->setsockopt
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <deaedc6d-edde-68da-50e8-6474ca818191@datenfreihafen.org>
-References: <20200720124737.118617-1-hch@lst.de>
-        <20200720124737.118617-25-hch@lst.de>
-        <deaedc6d-edde-68da-50e8-6474ca818191@datenfreihafen.org>
-X-Mailer: Mew version 6.8 on Emacs 26.3
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Mon, 20 Jul 2020 16:20:17 -0700 (PDT)
+        Mon, 20 Jul 2020 22:37:36 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6689AC0619D5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2020 19:37:36 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id a9so828236pjd.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2020 19:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=TY8XfCON4S0JDepfGrFgWfYRJOwnBuFe9fcLJ+y+GUE=;
+        b=MT9XwQvk7j9jaVTNDu33PSB3paK7rMOToCBADL8lAhj8gfTegZZY0dRfXMdKpbwIsl
+         WT2qUkCmWI5WetdDngau1iznOVAqPUFe3M1Pbnsy34yKF3EDeLkJcL1uG1E1EZs5d1jr
+         6GJgb8m8HGh1IC//kNuLNntIXuRVewVb4EtGA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=TY8XfCON4S0JDepfGrFgWfYRJOwnBuFe9fcLJ+y+GUE=;
+        b=eVp5m+16+SVN6QgMC/v1rEcK3780PIdCI0/wHuFQ0AYLNSS3OZ+foMUNjnqiTgcaDS
+         felMw4bBPkIB9ivAw387FeoLyd1X8k43pCf663Q3kJ+i19lvhm/0PUwmR7OEHxgFTsuA
+         TQZGrFqCt58LPhWjjYE2uKbCsbWu1tUYnRmHTWekHLQcU4CBwnp+S16VXYntvIQ4y+k/
+         ThRqw4P9wMsKzE+NQL6Eb4eZI0nPQ6/8M9Zsxcmu2WxnIxeNhiqlXk6gCVFDSsvW5HM3
+         LlehwIxGVfzWEEzaBoJbotleZdAVaK7g7eXYjXSN42K67eieBPmM5vIfodlUWd/wfF+2
+         p1Ww==
+X-Gm-Message-State: AOAM531yNhGdvDkMO64zclw3lW6IN3r7WXoQj6Wdqk/AndrrNqTl2lXE
+        iFfpOot7ek4TK/qUnK9+tCMTWQ==
+X-Google-Smtp-Source: ABdhPJwifeShuy9aax97sR/LrIOKU8AKLyOW/DZJQT86QH8j0OfGEcNJxiqcAH9HAEPFwoFMNFLi9A==
+X-Received: by 2002:a17:902:547:: with SMTP id 65mr20764059plf.256.1595299055940;
+        Mon, 20 Jul 2020 19:37:35 -0700 (PDT)
+Received: from drinkcat2.tpe.corp.google.com ([2401:fa00:1:b:7220:84ff:fe09:41dc])
+        by smtp.gmail.com with ESMTPSA id z6sm17888266pfn.173.2020.07.20.19.37.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2020 19:37:35 -0700 (PDT)
+From:   Nicolas Boichat <drinkcat@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Molton <ian@mnementh.co.uk>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: hci_serdev: Only unregister device if it was registered
+Date:   Tue, 21 Jul 2020 10:37:16 +0800
+Message-Id: <20200721103652.2.I8a2fdad30d42399fa5afc15d66b460d1738c3946@changeid>
+X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
+In-Reply-To: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
+References: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Date: Mon, 20 Jul 2020 16:19:38 +0200
+We should not call hci_unregister_dev if the device was not
+successfully registered.
 
-> For the ieee802154 part:
-> 
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Fixes: c34dc3bfa7642fd ("Bluetooth: hci_serdev: Introduce hci_uart_unregister_device()")
+Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
 
-Please do not quote an entire patch just to add an ACK, trim it just
-to the commit message, or even less.
+---
 
-Thank you.
+ drivers/bluetooth/hci_serdev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 599855e4c57c13d..7b233312e723fb2 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -355,7 +355,8 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	struct hci_dev *hdev = hu->hdev;
+ 
+ 	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-	hci_unregister_dev(hdev);
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++		hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+ 
+ 	cancel_work_sync(&hu->write_work);
+-- 
+2.28.0.rc0.105.gf9edc3c819-goog
+
