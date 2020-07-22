@@ -2,163 +2,112 @@ Return-Path: <SRS0=zLyx=BB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1B3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 16:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4D5C433E8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 17:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BBC22065F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 16:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBF252065F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 17:10:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sK7Dmyvv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbFOpYWq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726938AbgGVQU4 (ORCPT
+        id S1730381AbgGVRJz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jul 2020 12:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
+        Wed, 22 Jul 2020 13:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726535AbgGVQU4 (ORCPT
+        with ESMTP id S1726462AbgGVRJz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jul 2020 12:20:56 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD100C0619DC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 09:20:55 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id i203so2900635yba.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 09:20:55 -0700 (PDT)
+        Wed, 22 Jul 2020 13:09:55 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCACC0619DC;
+        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id h19so3257561ljg.13;
+        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc:content-transfer-encoding;
-        bh=6O+2S1vqoOM1pGQ5IMq7IrTBnWEmCGoXKJEKgM6sXHM=;
-        b=sK7DmyvvTRqoxviUC1rV/Pptdlgh1q1QSx548MbzXrWeGvVvKSXgv2ahNhnvhhI417
-         pJ8BdU2jiCpzY34TzRQgzG4gWkgKKPlTydYF+WgFeAmJMF78miVY6SGAeCUJg8+glMgi
-         p+wPxP3gbNTtJjKdKiIkGgQRYy53MdbeBGz0ZVbuqAPChNhqzU35ZvqVqfJWJmXTSgEX
-         GyaOVgs59yMCqTjKUgnBI3nSbuAIg2ZAyDN2iMNTgImNiKUlawzpo3wfs1+atNbOZwqs
-         3i4K3BnXmHP0+cIjMFMdx5kt4xPyjMu+mbzP/49NLHxZUKgIfNaHArlXOrDkc4h9GJUq
-         NIaQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
+        b=QbFOpYWq197fvdaI4E7hogiJ5z6DhlnMwFbSAyObyOYxQk/ojAWvAxU5xeCwIzRoyp
+         bGpv6okHRbaDCk3F5IJgGXS3Wesi1t0HKLxD0rWbntKFa+o4FEuZ/aNqddB2gT9rJhFi
+         ekTLt46VwAAqYYSOS+Ti6gpiM2sULyDbPlDxrV2EC1wYfvYmkCiCMfUA2sia4+eUOZSm
+         DpKqJKTrsnJtuquGnG9/42hXesw1S5DhQmqbpijEy6OLbaHF8RyBbV+paN+wC914K+DB
+         Om2JyFGEZL8bVoXG7xFZFOn3b/hxnJAALpQKOVax/+9YzLSzmIzDLinAT6/sMjMDDXxC
+         pBiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc:content-transfer-encoding;
-        bh=6O+2S1vqoOM1pGQ5IMq7IrTBnWEmCGoXKJEKgM6sXHM=;
-        b=JOnSPKTBY5jZgVWw08sepsgF0Flg+b0f23fT9+B+48VwxsXWXiEsGx2RMiCX2R3qQ4
-         lY2AeHLuS0fDsl5TY7N7YSyVvSOFIQCQCYuVe46Pz8P6eUi8MsvfI94czWFnVbSITwJu
-         JgtcJj0UPRDvNFz/jkCluEOBypbk/ULAC/1b5JX8fIUrVlNKGBMY2JkQEQ3tEQPa9cY2
-         9IN4AKI2PDi3DI5xitdfJQrhpOT+f+a0fU2d1SzTSUYmE1N48KNafGEpQIj+EGk2sALI
-         60BcW5lRQ2I4hcaYW1J66aV5J1tgi2RXm/nm6LNnmh43EXlS6uxw5y/gZuvdE/N2A71b
-         LGhw==
-X-Gm-Message-State: AOAM532T/CsACk4Zqo+1hFNqA0A+MwJYgEEv3zkhNwOp1HfwvI0JqWcj
-        /dgIExbYt8g/rInLV1fJQ8eubFM1jZGbnxmKCb+Fdg7KoMh4AV3CCxGzsB2VqA/aIsSZUfAYDOY
-        ab33rZBwovt3u1DQFgXz1wQd/1jGx/f/qVfGn5ZTCAmH53paXW5ylQfI6DQe0xdvtLObFlqWWhQ
-        1+
-X-Google-Smtp-Source: ABdhPJymqBv14YTpqNe5yOj3F0sSyhXYwnojkSGVh7/9DwCiGVkUNyKtiFd3933ip2hTUWbGkG5i3VE5dLkq
-X-Received: by 2002:a25:618e:: with SMTP id v136mr185735ybb.432.1595434854998;
- Wed, 22 Jul 2020 09:20:54 -0700 (PDT)
-Date:   Thu, 23 Jul 2020 00:20:33 +0800
-In-Reply-To: <20200723002022.Bluez.v1.1.I45e09d196073f099e1b67d2d69efd5cd20237ad1@changeid>
-Message-Id: <20200723002022.Bluez.v1.2.If59e157d622b3f90c4b92919567a4662a2137806@changeid>
-Mime-Version: 1.0
-References: <20200723002022.Bluez.v1.1.I45e09d196073f099e1b67d2d69efd5cd20237ad1@changeid>
-X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
-Subject: [Bluez PATCH v1 2/2] input: encrypt on receive conn req if classic_bonded_only
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
+        b=k3wIByikShOaLkMc1Od1tLGwmab7hG9iKbyDULD2uOU+twM7jxZwJn7IWxMKu4MHdb
+         2Um8GRz1pnUx6Or1zrBKsXK1VsWCVoqGK+g00uoLdXwN0ZIjQs2SY1NcE1kAF8LDVTbU
+         yec/VCQcloskNDtE/ZzYq3LleNJ4xRU3nJ3wI0s/geljdUP2TUb94FrsAN6b/v2V85qz
+         Jc8CdA/0064dg3bpth9PgXEMbwg5daPhBpS5N9zJpR/T9aF3Yn/Utf8++olez5sBFyLk
+         PhS8JcXdC8vjOKTUaUQOoc6YRUqpWtVVYj0gjyhYOFPmkN984ejeamHM/Bn02+cBPon8
+         gMPw==
+X-Gm-Message-State: AOAM531Eo1Acr/3nE2b3iA/QDxbQGbfSLq/pJjtA4rrQ+YuHqM+38kBs
+        PxMKDcJqZcbVcOCj/Ts6eT4QBe1XJMs+YgpX9dqBNA==
+X-Google-Smtp-Source: ABdhPJzXtI3YBeORsJYQmEu28fVJCUtGV7rd5sI5b8tsC3G9617tl0t2hP5zU+hEdegWolMtC+F/64n4emjrett5jt8=
+X-Received: by 2002:a2e:90da:: with SMTP id o26mr95292ljg.91.1595437793253;
+ Wed, 22 Jul 2020 10:09:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200720124737.118617-1-hch@lst.de> <20200720204756.iengwcguikj2yrxt@ast-mbp.dhcp.thefacebook.com>
+ <20200722075657.GB26554@lst.de>
+In-Reply-To: <20200722075657.GB26554@lst.de>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Wed, 22 Jul 2020 10:09:41 -0700
+Message-ID: <CAADnVQKy0+rsRftEzp4PvxQtj7uOwybz0Nd4_h0FR37p2Q=X4w@mail.gmail.com>
+Subject: Re: get rid of the address_space override in setsockopt
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>,
+        netfilter-devel <netfilter-devel@vger.kernel.org>,
+        coreteam@netfilter.org, linux-sctp@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "moderated list:ETHERNET BRIDGE" <bridge@lists.linux-foundation.org>,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org,
+        linux-s390 <linux-s390@vger.kernel.org>, mptcp@lists.01.org,
+        lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+        linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+On Wed, Jul 22, 2020 at 12:56 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Mon, Jul 20, 2020 at 01:47:56PM -0700, Alexei Starovoitov wrote:
+> > > a kernel pointer.  This is something that works for most common sockopts
+> > > (and is something that the ePBF support relies on), but unfortunately
+> > > in various corner cases we either don't use the passed in length, or in
+> > > one case actually copy data back from setsockopt, so we unfortunately
+> > > can't just always do the copy in the highlevel code, which would have
+> > > been much nicer.
+> >
+> > could you rebase on bpf-next tree and we can route it this way then?
+> > we'll also test the whole thing before applying.
+>
+> The bpf-next tree is missing all my previous setsockopt cleanups, so
+> there series won't apply.
 
-According to bluetooth HID1.1 spec, section 5.4.3.5.3:
-If the Bluetooth HID Host is bonded to a Bluetooth HID device:
-If encryption is not already enabled, the Bluetooth HID Host shall
-enable encryption with the Bluetooth HID device before sending an
-L2CAP Connect Response with a result code of =E2=80=9CConnection Successful=
-=E2=80=9D
-(0x0000) after an L2CAP Connect Request is received.
-
-This patch raises the security level to medium when listening for
-incoming connection if the flag classic_bonded_only is set,
-effectively starting encryption.
-
-Reviewed-by: Alain Michaud <alainm@chromium.org>
----
-
- profiles/input/device.c | 5 +++++
- profiles/input/device.h | 1 +
- profiles/input/server.c | 6 ++++--
- 3 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 9f89f4459..6ec0a4c63 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -109,6 +109,11 @@ void input_set_classic_bonded_only(bool state)
- 	classic_bonded_only =3D state;
- }
-=20
-+bool input_get_classic_bonded_only(void)
-+{
-+	return classic_bonded_only;
-+}
-+
- static void input_device_enter_reconnect_mode(struct input_device *idev);
- static int connection_disconnect(struct input_device *idev, uint32_t flags=
-);
-=20
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index 5a077f92a..f61e8a558 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -30,6 +30,7 @@ struct input_conn;
- void input_set_idle_timeout(int timeout);
- void input_enable_userspace_hid(bool state);
- void input_set_classic_bonded_only(bool state);
-+bool input_get_classic_bonded_only(void);
- void input_set_auto_sec(bool state);
-=20
- int input_device_register(struct btd_service *service);
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index f2c8c0f70..2bd5e92e4 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -283,6 +283,8 @@ int server_start(const bdaddr_t *src)
- {
- 	struct input_server *server;
- 	GError *err =3D NULL;
-+	BtIOSecLevel sec_level =3D input_get_classic_bonded_only() ?
-+					BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-=20
- 	server =3D g_new0(struct input_server, 1);
- 	bacpy(&server->src, src);
-@@ -291,7 +293,7 @@ int server_start(const bdaddr_t *src)
- 				server, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
- 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	if (!server->ctrl) {
- 		error("Failed to listen on control channel");
-@@ -304,7 +306,7 @@ int server_start(const bdaddr_t *src)
- 				server, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
- 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	if (!server->intr) {
- 		error("Failed to listen on interrupt channel");
---=20
-2.28.0.rc0.105.gf9edc3c819-goog
-
+Right. I've realized that after sending that email two days ago.
+Now bpf-next->net-next PR is pending and as soon as it's merged
+bpf-next will have all the recent bits.
