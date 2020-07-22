@@ -2,70 +2,72 @@ Return-Path: <SRS0=zLyx=BB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B66D5C433E5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0385C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:37:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88D7F20714
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:37:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9BFE20714
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:37:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kh1OPDr3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FrM0T9NI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731922AbgGVDhG (ORCPT
+        id S1731943AbgGVDhL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jul 2020 23:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35496 "EHLO
+        Tue, 21 Jul 2020 23:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731781AbgGVDhF (ORCPT
+        with ESMTP id S1731923AbgGVDhL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jul 2020 23:37:05 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDE50C061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:37:05 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id h2so623413pgc.19
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:37:05 -0700 (PDT)
+        Tue, 21 Jul 2020 23:37:11 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D24F0C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:37:10 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id k3so642611qvm.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=q6GOxmnZxvMuRWp1Be88fRKnZLqubwTjD+MVU6pdfjk=;
-        b=Kh1OPDr3tp5Gbb680tWUkDKVXULq2Z7X8TtiI8XgdL4jOA0go6rBSRL320O7o0DMyo
-         PBrWFLulFaX2aI8I9UiZy7UfDSdjy592fn+iUvBnJ7P+iHqHZEqMQQsxkX7XV+z70Ojn
-         X/2RVp5+zxkSUtzGNCRFI3s1p1IFTWEy5AujZaSdFyFp/JydUZdFZKloGpS4Z3ZBhZpH
-         krPJlp4CYOICsno0XokKC6/Z5daY0hL0HbkTbHQte0b8Pym5Fd9v4HIsVzRde10N/8EL
-         lpSv/kC7MLagoCjPbyKJvrRAVFjbqIswL/6kGoVyf6KIno/gnUPL6q1g8TpTstszF2V1
-         KzNA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=9UZr8lVBu9yu6MjFSQdTaOLx7CZsgJFttBxe7lF4F1k=;
+        b=FrM0T9NI+ZISYLb4EczjLjO2IBAE+rqK+2ZEDhN/seaFeAUJEJRfoMJA5BqWnOLhJl
+         phXPTziFAd60sJiPfn+zIiHWsnIs5UMiiu0mGBGxTV9IXXvM1monTCqhlBiiT4fGmeR5
+         R7szw2tKffrnsR6oRghdrExYnkghKhDHziE3e/bEVRyxTuoT3i3hKC6ZmQwsAw1e9sa4
+         xZBH9XRZTPvk1ELjsAR6kAGwK29ChxE+nFLNUbiCQEzEbXx0pcWUXHpCIDpYP6d2dvxF
+         RZb0DzCc8ANFX8XqVNjxogheYHh3RqSqnOZP106Ys+H7KhRtEcI+sKCFKriI//EDAGPO
+         3ryA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=q6GOxmnZxvMuRWp1Be88fRKnZLqubwTjD+MVU6pdfjk=;
-        b=sYoPWv3u9TjJr7ZwmNUIeqhrcHsDjAIW2uOTiK5nFDPE7NI0izkWd5+c8FnjzdKovD
-         QrE31NHX7KhiFqaFKnlZqzBzUgyLHB2FH334EFV5UPIyP5O+dyLnMfPFrkXqFiVqjWlX
-         F/ZC6zd4Nc525eNsa6vYutdyTA9HPUYczw8f0+GNNlet8L+ceNx7XxMjDPpZFj9sLiIR
-         0UcC2Q4PPVxEK+r5s0ZnD5Qr1YtvKI0JOjdLyJ7NWefAH2kxpODjVttMrxlkt3RHdwq8
-         wTUl3//MHTZg5DNo3vIfUDHn/o6DagySxgSaQppVfTKAluNe+jzgl7i/lw1HUrgIAh85
-         ahTQ==
-X-Gm-Message-State: AOAM530T4Kmk9dj5x2kQJJ3q7ipn7MqIDJ4tawU3v7ntQx6nPjVtarqa
-        nCGmzfWhS6PfmZvCzmXQ7ILOV7TBCSXEygRyuJJh9Pp9FapMHNrifhRZ7ra9JylnDjflxVCcju7
-        +gobOhcFQopPbUOQk7htiwaheBRQu4eNintqiatU3OS/v3tHJWeDThyu33RrRqsrV0SXnx8wA5v
-        Yr
-X-Google-Smtp-Source: ABdhPJxa0o6mLpqFgviuvEf3cJ43pvELV35bXcW8HI3xvzEARXmqCxrRRr7DACXkFa4ei70fMQjMgT9m5Qvl
-X-Received: by 2002:a17:90a:1fcb:: with SMTP id z11mr825759pjz.1.1595389024702;
- Tue, 21 Jul 2020 20:37:04 -0700 (PDT)
-Date:   Wed, 22 Jul 2020 11:36:58 +0800
-Message-Id: <20200722113644.Bluez.v3.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=9UZr8lVBu9yu6MjFSQdTaOLx7CZsgJFttBxe7lF4F1k=;
+        b=QZNexVxc+tDxaMB6hYngtnidOoZ1wBTJDH0bSikvCmjAgyLqkZfe4Xb1QaW6q9IJt/
+         ltiMF2HzIydfFNOcGoHk7S4GcCcMZ+R8UOscUp/42h+n1eCfA6hbwhx8ImfnzckArpY7
+         XQafe69pJK+kl7N/+79TI5iiO8lQZ0QuBoy1ZStHupB967lIGdjBxQEK0LUWOb1YWht4
+         LReFtuM9aprD2FpyT+BdVwLqMqtfD2TEKMS+h7bndJXgZzEDgupfZonYI67P09QjNnQd
+         RZr/8GIdEetlGMDtyur/rOh0B2te/b91nORUK8jL8ZeZvNNLe20SE2320vKAnSJ13MG3
+         +86w==
+X-Gm-Message-State: AOAM531SqRTy7E8vfjz/KP/VeZGpIV0shfXHR6Zw42BgnNhtgjPJKmEV
+        5xUt3OjC1UivVZe0h0gUK+Q5kAzJJNoYWckfS2r+FU8B/FKu85UKOhBeSpfg7LsVZbPVQ5zCelJ
+        T/C9/Zs+yxVMirh7H23qUJDH5WIo+Y17NUqBCvua11yb6cmIK+5pYyoC9iAK++ATpv8Ozp+b37s
+        VO
+X-Google-Smtp-Source: ABdhPJwI/PPW0oPMw1M23EpwZ5kUG+ETXNviUILCtR3X1eD+pvCaJeMeJ4oDRN2q/2LU8RomNT6sOwcAFAb+
+X-Received: by 2002:ad4:4d04:: with SMTP id l4mr29133664qvl.245.1595389029917;
+ Tue, 21 Jul 2020 20:37:09 -0700 (PDT)
+Date:   Wed, 22 Jul 2020 11:36:59 +0800
+In-Reply-To: <20200722113644.Bluez.v3.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
+Message-Id: <20200722113644.Bluez.v3.2.Ic16589fde45fac0c496dfca2fa27672059114c3b@changeid>
 Mime-Version: 1.0
+References: <20200722113644.Bluez.v3.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
 X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
-Subject: [Bluez PATCH v3 1/2] audio/transport: change volume to 8bit
+Subject: [Bluez PATCH v3 2/2] audio/transport: supply volume on transport init
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Archie Pusaka <apusaka@chromium.org>,
-        Michael Sun <michaelfsun@google.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>, Yu Liu <yudiliu@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -74,182 +76,257 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-The valid range of volume is 0 - 127, yet it is stored in 16bit
-data type. This patch modifies it so we use 8bit data type to
-store volume instead.
+Sometimes the response of RegisterNotification for volume change
+event came before we create the transport for the corresponding
+device. If that happens, the volume will be stuck to an
+uninitialized invalid value. The property Volume of
+MediaTransport1 will also be left unaccessible.
 
-Furthermore, this patch introduces helper function and defined
-values to check for volume validity, to prevent numbers
-scattered all over.
+This patch supplies the initial volume when creating a new
+transport. The value is obtained from the media_player object.
+However, since the avrcp session might not be created by the time
+the transport is created, we also try to initialize the volume
+when creating avrcp session.
 
-Reviewed-by: Michael Sun <michaelfsun@google.com>
+Reviewed-by: Yu Liu <yudiliu@google.com>
 ---
 
-Changes in v3: None
-Changes in v2: None
+Changes in v3:
+-Add missing library
 
- profiles/audio/avrcp.c     |  2 +-
- profiles/audio/avrcp.h     |  1 -
- profiles/audio/transport.c | 46 ++++++++++++++++++++++----------------
- profiles/audio/transport.h |  3 ++-
- 4 files changed, 30 insertions(+), 22 deletions(-)
+Changes in v2:
+-Get the volume from media_player instead of from separate list
+
+ profiles/audio/avrcp.c     | 27 ++++++++++++++++-
+ profiles/audio/avrcp.h     |  2 ++
+ profiles/audio/media.c     | 60 +++++++++++++++++++++++++++++---------
+ profiles/audio/media.h     |  2 ++
+ profiles/audio/transport.c |  4 +--
+ profiles/audio/transport.h |  2 ++
+ 6 files changed, 79 insertions(+), 18 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 1bf85041e..b312b70b9 100644
+index b312b70b9..f59d1cace 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -1660,7 +1660,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 		break;
- 	case AVRCP_EVENT_VOLUME_CHANGED:
- 		pdu->params[1] = media_transport_get_device_volume(dev);
--		if (pdu->params[1] > 127)
-+		if (!media_transport_volume_valid(pdu->params[1]))
- 			goto err;
+@@ -64,6 +64,7 @@
+ #include "avctp.h"
+ #include "avrcp.h"
+ #include "control.h"
++#include "media.h"
+ #include "player.h"
+ #include "transport.h"
  
- 		len = 2;
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index 86d310c73..3fd74e18a 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -114,6 +114,5 @@ void avrcp_unregister_player(struct avrcp_player *player);
- void avrcp_player_event(struct avrcp_player *player, uint8_t id,
- 							const void *data);
+@@ -1701,7 +1702,6 @@ static uint8_t avrcp_handle_request_continuing(struct avrcp *session,
+ 	if (pending->pdu_id != pdu->params[0])
+ 		goto err;
  
 -
+ 	len = 0;
+ 	pending->attr_ids = player_fill_media_attribute(player,
+ 							pending->attr_ids,
+@@ -4037,8 +4037,12 @@ static void target_init(struct avrcp *session)
+ 
+ 	player = g_slist_nth_data(server->players, 0);
+ 	if (player != NULL) {
++		uint8_t init_volume;
+ 		target->player = player;
+ 		player->sessions = g_slist_prepend(player->sessions, session);
++
++		init_volume = media_player_get_device_volume(session->dev);
++		media_transport_update_device_volume(session->dev, init_volume);
+ 	}
+ 
+ 	session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+@@ -4473,6 +4477,27 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume, bool notify)
+ 					avrcp_handle_set_volume, session);
+ }
+ 
++struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev)
++{
++	struct avrcp_server *server;
++	struct avrcp *session;
++	struct avrcp_data *target;
++
++	server = find_server(servers, device_get_adapter(dev));
++	if (server == NULL)
++		return NULL;
++
++	session = find_session(server->sessions, dev);
++	if (session == NULL)
++		return NULL;
++
++	target = session->target;
++	if (target == NULL)
++		return NULL;
++
++	return target->player;
++}
++
+ static int avrcp_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 3fd74e18a..a9964f4fa 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -116,3 +116,5 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 
  size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
  size_t avrcp_browsing_general_reject(uint8_t *operands);
++
++struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev);
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index a0173fdd4..4ae936556 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -239,6 +239,20 @@ static void media_endpoint_exit(DBusConnection *connection, void *user_data)
+ 	media_endpoint_remove(endpoint);
+ }
+ 
++static struct media_adapter *find_adapter(struct btd_device *device)
++{
++	GSList *l;
++
++	for (l = adapters; l; l = l->next) {
++		struct media_adapter *adapter = l->data;
++
++		if (adapter->btd_adapter == device_get_adapter(device))
++			return adapter;
++	}
++
++	return NULL;
++}
++
+ static void clear_configuration(struct media_endpoint *endpoint,
+ 					struct media_transport *transport)
+ {
+@@ -426,6 +440,33 @@ struct a2dp_config_data {
+ 	a2dp_endpoint_config_t cb;
+ };
+ 
++uint8_t media_player_get_device_volume(struct btd_device *device)
++{
++	struct avrcp_player *target_player;
++	struct media_adapter *adapter;
++	GSList *l;
++
++	if (!device)
++		return UNINITIALIZED_VOLUME_VALUE;
++
++	target_player = avrcp_get_target_player_by_device(device);
++	if (!target_player)
++		return UNINITIALIZED_VOLUME_VALUE;
++
++	adapter = find_adapter(device);
++	if (!adapter)
++		return UNINITIALIZED_VOLUME_VALUE;
++
++	for (l = adapter->players; l; l = l->next) {
++		struct media_player *mp = l->data;
++
++		if (mp->player == target_player)
++			return mp->volume;
++	}
++
++	return UNINITIALIZED_VOLUME_VALUE;
++}
++
+ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 					uint8_t *configuration, size_t size,
+ 					media_endpoint_cb_t cb,
+@@ -439,6 +480,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	const char *path;
+ 	DBusMessageIter iter;
+ 	struct media_transport *transport;
++	uint8_t init_volume;
+ 
+ 	transport = find_device_transport(endpoint, device);
+ 
+@@ -451,6 +493,9 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	if (transport == NULL)
+ 		return FALSE;
+ 
++	init_volume = media_player_get_device_volume(device);
++	media_transport_update_volume(transport, init_volume);
++
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+ 						MEDIA_ENDPOINT_INTERFACE,
+ 						"SetConfiguration");
+@@ -646,20 +691,6 @@ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
+ 	return TRUE;
+ }
+ 
+-static struct media_adapter *find_adapter(struct btd_device *device)
+-{
+-	GSList *l;
+-
+-	for (l = adapters; l; l = l->next) {
+-		struct media_adapter *adapter = l->data;
+-
+-		if (adapter->btd_adapter == device_get_adapter(device))
+-			return adapter;
+-	}
+-
+-	return NULL;
+-}
+-
+ static bool endpoint_properties_exists(const char *uuid,
+ 						struct btd_device *dev,
+ 						void *user_data)
+@@ -1779,6 +1810,7 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 	mp->sender = g_strdup(sender);
+ 	mp->path = g_strdup(path);
+ 	mp->timer = g_timer_new();
++	mp->volume = UNINITIALIZED_VOLUME_VALUE;
+ 
+ 	mp->watch = g_dbus_add_disconnect_watch(conn, sender,
+ 						media_player_exit, mp,
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index dd630d432..f84f36d61 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -33,3 +33,5 @@ void media_unregister(struct btd_adapter *btd_adapter);
+ struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint);
+ const char *media_endpoint_get_uuid(struct media_endpoint *endpoint);
+ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
++
++uint8_t media_player_get_device_volume(struct btd_device *device);
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 48fabba9b..a32073380 100644
+index a32073380..285bfb714 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -55,6 +55,8 @@
+@@ -55,8 +55,6 @@
  
  #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport1"
  
-+#define UNINITIALIZED_VOLUME_VALUE	128
-+
+-#define UNINITIALIZED_VOLUME_VALUE	128
+-
  typedef enum {
  	TRANSPORT_STATE_IDLE,		/* Not acquired and suspended */
  	TRANSPORT_STATE_PENDING,	/* Playing but not acquired */
-@@ -86,7 +88,7 @@ struct media_owner {
- struct a2dp_transport {
- 	struct avdtp		*session;
- 	uint16_t		delay;
--	uint16_t		volume;
-+	uint8_t			volume;
- };
- 
- struct media_transport {
-@@ -634,7 +636,7 @@ static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
- 	struct media_transport *transport = data;
- 	struct a2dp_transport *a2dp = transport->data;
- 
--	return a2dp->volume <= 127;
-+	return media_transport_volume_valid(a2dp->volume);
- }
- 
- static gboolean get_volume(const GDBusPropertyTable *property,
-@@ -654,24 +656,20 @@ static void set_volume(const GDBusPropertyTable *property,
+@@ -981,7 +979,7 @@ void media_transport_update_device_volume(struct btd_device *dev,
  {
- 	struct media_transport *transport = data;
- 	struct a2dp_transport *a2dp = transport->data;
--	uint16_t volume;
-+	uint16_t arg;
-+	uint8_t volume;
- 	bool notify;
- 
--	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16) {
--		g_dbus_pending_property_error(id,
--					ERROR_INTERFACE ".InvalidArguments",
--					"Invalid arguments in method call");
--		return;
--	}
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
-+		goto error;
- 
--	dbus_message_iter_get_basic(iter, &volume);
-+	dbus_message_iter_get_basic(iter, &arg);
-+	if (arg > UINT8_MAX)
-+		goto error;
- 
--	if (volume > 127) {
--		g_dbus_pending_property_error(id,
--					ERROR_INTERFACE ".InvalidArguments",
--					"Invalid arguments in method call");
--		return;
--	}
-+	volume = (uint8_t)arg;
-+	if (!media_transport_volume_valid(volume))
-+		goto error;
- 
- 	g_dbus_pending_property_success(id);
- 
-@@ -688,6 +686,11 @@ static void set_volume(const GDBusPropertyTable *property,
- 						"Volume");
- 
- 	avrcp_set_volume(transport->device, volume, notify);
-+	return;
-+
-+error:
-+	g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
- }
- 
- static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
-@@ -824,7 +827,7 @@ static int media_transport_init_source(struct media_transport *transport)
- 	transport->data = a2dp;
- 	transport->destroy = destroy_a2dp;
- 
--	a2dp->volume = -1;
-+	a2dp->volume = UNINITIALIZED_VOLUME_VALUE;
- 	transport->sink_watch = sink_add_state_cb(service, sink_state_changed,
- 								transport);
- 
-@@ -931,7 +934,7 @@ struct btd_device *media_transport_get_dev(struct media_transport *transport)
- 	return transport->device;
- }
- 
--uint16_t media_transport_get_volume(struct media_transport *transport)
-+uint8_t media_transport_get_volume(struct media_transport *transport)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	return a2dp->volume;
-@@ -958,7 +961,7 @@ uint8_t media_transport_get_device_volume(struct btd_device *dev)
  	GSList *l;
  
- 	if (dev == NULL)
--		return 128;
-+		return UNINITIALIZED_VOLUME_VALUE;
+-	if (dev == NULL)
++	if (dev == NULL || !media_transport_volume_valid(volume))
+ 		return;
  
  	for (l = transports; l; l = l->next) {
- 		struct media_transport *transport = l->data;
-@@ -991,3 +994,8 @@ void media_transport_update_device_volume(struct btd_device *dev,
- 			media_transport_update_volume(transport, volume);
- 	}
- }
-+
-+bool media_transport_volume_valid(uint8_t volume)
-+{
-+	return volume < 128;
-+}
 diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
-index ac542bf6c..c430515f2 100644
+index c430515f2..46a9c91bd 100644
 --- a/profiles/audio/transport.h
 +++ b/profiles/audio/transport.h
-@@ -32,7 +32,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
- void media_transport_destroy(struct media_transport *transport);
- const char *media_transport_get_path(struct media_transport *transport);
- struct btd_device *media_transport_get_dev(struct media_transport *transport);
--uint16_t media_transport_get_volume(struct media_transport *transport);
-+uint8_t media_transport_get_volume(struct media_transport *transport);
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay);
- void media_transport_update_volume(struct media_transport *transport,
-@@ -43,3 +43,4 @@ void transport_get_properties(struct media_transport *transport,
- uint8_t media_transport_get_device_volume(struct btd_device *dev);
- void media_transport_update_device_volume(struct btd_device *dev,
- 								uint8_t volume);
-+bool media_transport_volume_valid(uint8_t volume);
+@@ -22,6 +22,8 @@
+  *
+  */
+ 
++#define UNINITIALIZED_VOLUME_VALUE	128
++
+ struct media_transport;
+ 
+ struct media_transport *media_transport_create(struct btd_device *device,
 -- 
 2.28.0.rc0.105.gf9edc3c819-goog
 
