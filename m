@@ -2,166 +2,104 @@ Return-Path: <SRS0=zLyx=BB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E26EAC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1248C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:24:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BABCF20787
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72FCA2073A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jul 2020 03:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fhLZ/Ya/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAHibwp7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731857AbgGVDTD (ORCPT
+        id S1731846AbgGVDY1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jul 2020 23:19:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60938 "EHLO
+        Tue, 21 Jul 2020 23:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731621AbgGVDTD (ORCPT
+        with ESMTP id S1731781AbgGVDY0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jul 2020 23:19:03 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF36C061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:19:02 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id k7so398752vso.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:19:02 -0700 (PDT)
+        Tue, 21 Jul 2020 23:24:26 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89DB7C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:24:26 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id g26so742905qka.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2020 20:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=msnUWH+TlT3OvBHqrc8dcTnpYvjDPCiZd6MOKcGt6yo=;
-        b=fhLZ/Ya/fXEsadc4ZkOXfRtFfbH45MVSgVTu4fDNgzstBzSQPgo1YCiCINjEGIM5z8
-         HCHiXzfBnDzNR79ddpJTDmqO/SxZVHdVUtGxIvFRIb5J0Zwo5IMd+0+GF87MX5+ueRjy
-         kMAlcep8sMJkzaGILuwtv4bNFh1Ow83dwTVyg=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=LWn+HwHtQaf83JNo/tsGsWvrHjJ4Qq+hBu+FHi2HB0Y=;
+        b=eAHibwp7nDxIRZ1KamqQQkwpHoy3692yCLS4oE3IvlnUoghVR2iFseXtJe1MMIMmAW
+         3e9nRIDbZZr1KwAZalc92k4vBYylttGsfS0gv6NWeaD8X7lQ5l+eFtZRY1iGWEJybnhm
+         Ks2qw7sfeWSb10UdztGeYKEUQhWBUojJrdu8AByIaOgHzsNTsW5WH/T2TwhFjUnbMKg9
+         IXe2FQq5L7HWdbmIOxiaf/d8VRPbJca02FmChUTivob+O3jY4ITgSEElU5vBSpViSzoK
+         ABHzNvhzcS+JmjY12b7uCah6wFUxFyLYHqfdxPugKPT0StYRK1CZPVLVIrSeilWnc41J
+         wdcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=msnUWH+TlT3OvBHqrc8dcTnpYvjDPCiZd6MOKcGt6yo=;
-        b=P4vSAN6dOXs3ogTmd3BcZtT/HCSYG24MEIndnQGzLE9S2u9KyZm78FYn8hYsF+zSwM
-         GLuFvBfXT4G9hFRO6Du/Qq1s567oR3N3P1XiYDPz+6LYhMDBAdGifHubXImTBjZrm1qw
-         uusXNHQzNXwM427ORg9rxrC7gurHJRqJveABI5aXt5KFj0NgqafFwBUjMcYPGTcitBzS
-         T/YM13E5SFvhtzizi2iLymthV9KpxEww0/ESHz6uCHBO8ZvYkYmSV5PssTi/mB5oZCDg
-         XwXi/TpCBce4SoS4IB1qAEbyq2GWm2At0Vlw8RUC1ewD0Mrnbfv2R9o9axSLpCOWFm8c
-         wvhA==
-X-Gm-Message-State: AOAM530xWicId4WmfQb/4CfItr+RtoOc4E+Tuh0XNc4ecZ+2w9i3wWNr
-        /KHk0f7FHIiY2rsYtAoxzcgFo5/P2EITbZ6jr0l99Q==
-X-Google-Smtp-Source: ABdhPJwXGOpkro1pNwYymoO3cxCJfjOkPDDFv8cui6cm35shb30xdtYO/HxpSfooij9etavppczVU3cmkYIbRa2l3IA=
-X-Received: by 2002:a67:fd0b:: with SMTP id f11mr21027225vsr.93.1595387942008;
- Tue, 21 Jul 2020 20:19:02 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=LWn+HwHtQaf83JNo/tsGsWvrHjJ4Qq+hBu+FHi2HB0Y=;
+        b=POw+DPC9dM1TXlg7gqNAXQ8jn5hkV7McyKoR8ZPwekUVOh5I9DJjmp1qlXoa9NzeM2
+         EEUy8Oc+HmpM3D0qGEMlxHCAYNNvZ9MxbU1/KWl7XqO5EQvMtV/jHsp62uKm5GecYkc7
+         WXtYsV88qA4klYCOLmYzEjcWZ1CMmOaGhKMJXWTSfp6RwWABINxicQYKAlrD2fELXTQl
+         ts9IJN6nArgCXIxHDJ/qSNRzBx3hoOYuLGDDg5qSgTWQJ1I4bqd+o9nnZH51uHTnQ3Zk
+         hBvzT1CrlbQyMyWGZ55z0BnlJHlCXbbY+gxfghsbLp5oF4b5Y1Md/fPRd3JOb8/MWxrR
+         E+yg==
+X-Gm-Message-State: AOAM530UjXk26Ke4bFbbr8I+VQz55/Nr2WCssnDNIqkmNhd7svO9lMnB
+        g1cIwrBS8Pv0SuZlvUNFv1P42VNpSi0=
+X-Google-Smtp-Source: ABdhPJwaSuxeTC4g8AysuhqZtDkVQc2OOpiz1YQ8sx+9/zo38FOcCz55Uo2SGnumOYInfi8gEgzKtQ==
+X-Received: by 2002:a37:4ca:: with SMTP id 193mr10993367qke.198.1595388265720;
+        Tue, 21 Jul 2020 20:24:25 -0700 (PDT)
+Received: from [172.17.0.2] ([20.190.246.123])
+        by smtp.gmail.com with ESMTPSA id z36sm24518238qtd.22.2020.07.21.20.24.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jul 2020 20:24:25 -0700 (PDT)
+Message-ID: <5f17b169.1c69fb81.6abc4.5625@mx.google.com>
+Date:   Tue, 21 Jul 2020 20:24:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4596658088273435016=="
 MIME-Version: 1.0
-References: <20200714125120.Bluez.v2.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
-In-Reply-To: <20200714125120.Bluez.v2.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Tue, 21 Jul 2020 20:18:50 -0700
-Message-ID: <CANFp7mWRZWnC6FB3noMq8NBpgT1J7EfYe1-n8_FxpY5LQaSxaA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2] doc: Add Suspend and Resume events
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [Bluez,v2,1/2] audio/transport: change volume to 8bit
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200722110826.Bluez.v2.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
+References: <20200722110826.Bluez.v2.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+--===============4596658088273435016==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Please take a look at this v2 patch.
+ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
+ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
+Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
+ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
+Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
+CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
+VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
+ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
+KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
+bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
+ZmF1bHQgKHNlZSBgVScpCnByb2ZpbGVzL2F1ZGlvL2F2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmHRh
+cmdldF9pbml04oCZOgpwcm9maWxlcy9hdWRpby9hdnJjcC5jOjQwNDM6MTc6IGVycm9yOiBpbXBs
+aWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJhtZWRpYV9wbGF5ZXJfZ2V0X2RldmljZV92
+b2x1bWXigJk7IGRpZCB5b3UgbWVhbiDigJhtZWRpYV90cmFuc3BvcnRfZ2V0X2RldmljZV92b2x1
+bWXigJk/IFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogNDA0MyB8ICAg
+aW5pdF92b2x1bWUgPSBtZWRpYV9wbGF5ZXJfZ2V0X2RldmljZV92b2x1bWUoc2Vzc2lvbi0+ZGV2
+KTsKICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+CiAgICAgIHwgICAgICAgICAgICAgICAgIG1lZGlhX3RyYW5zcG9ydF9nZXRfZGV2aWNlX3ZvbHVt
+ZQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiog
+W01ha2VmaWxlOjg0Njc6IHByb2ZpbGVzL2F1ZGlvL2JsdWV0b290aGQtYXZyY3Aub10gRXJyb3Ig
+MQptYWtlOiAqKiogW01ha2VmaWxlOjQwMTA6IGFsbF0gRXJyb3IgMgoKCgotLS0KUmVnYXJkcywK
+TGludXggQmx1ZXRvb3RoCg==
 
-Thanks
-Abhishek
-
-On Tue, Jul 14, 2020 at 12:51 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> Add Controller Suspend Event and Controller Resume Event to identify
-> suspend or resume of the Bluetooth stack has occurred.
->
-> Also update Device Disconnected Event to indicate a new disconnect
-> reason: "Connection terminated by local host for suspend"
->
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
->
-> Changes in v2:
-> - Moved Wake_Reason to first value
-> - Reduced Wake_Reason to not Bluetooth, unexpected event and remote wake
->
->  doc/mgmt-api.txt | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index ca0d38469..e7a713824 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -3834,6 +3834,7 @@ Device Disconnected Event
->                 2       Connection terminated by local host
->                 3       Connection terminated by remote host
->                 4       Connection terminated due to authentication failure
-> +               5       Connection terminated by local host for suspend
->
->         Note that the local/remote distinction just determines which side
->         terminated the low-level connection, regardless of the
-> @@ -4577,3 +4578,50 @@ Advertisement Monitor Removed Event
->
->         The event will only be sent to management sockets other than the
->         one through which the command was sent.
-> +
-> +
-> +Controller Suspend Event
-> +========================
-> +
-> +       Event code:             0x002d
-> +       Controller Index:       <controller_id>
-> +       Event Parameters:       Suspend_State (1 octet)
-> +
-> +       This event indicates that the controller is suspended for host suspend.
-> +
-> +       Possible values for the Suspend_State parameter:
-> +               0       Running (not disconnected)
-> +               1       Disconnected and not scanning
-> +               2       Page scanning and/or passive scanning.
-> +
-> +       The value 0 is used for the running state and may be sent if the
-> +       controller could not be configured to suspend properly.
-> +
-> +       This event will be sent to all management sockets.
-> +
-> +
-> +Controller Resume Event
-> +=======================
-> +
-> +       Event code:             0x002e
-> +       Controller Index:       <controller_id>
-> +       Event Parameters:       Wake_Reason (1 octet)
-> +                               Address (6 octets)
-> +                               Address_Type (1 octet)
-> +
-> +       This event indicates that the controller has resumed from suspend.
-> +
-> +       Possible values for the Wake_Reason parameter:
-> +               0       Resume from non-Bluetooth wake source
-> +               1       Wake due to unexpected event
-> +               2       Remote wake due to peer device connection
-> +
-> +       Currently, we expect that only peer reconnections should wake us from
-> +       the suspended state. Any other events that occurred while the system
-> +       should have been suspended results in wake due to unexpected event.
-> +
-> +       If the Wake_Reason is Remote wake due to connection, the address of the
-> +       peer device that caused the event will be shared in Address and
-> +       Address_Type. Otherwise, Address and Address_Type will both be zero.
-> +
-> +       This event will be sent to all management sockets.
-> --
-> 2.27.0.389.gc38d7665816-goog
->
+--===============4596658088273435016==--
