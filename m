@@ -2,75 +2,115 @@ Return-Path: <SRS0=glhu=BC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BCFC433E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 05:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2ECC433EB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E740F207F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 05:06:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B02D2084D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vH9z2S1k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CNu8wX7/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726108AbgGWFG5 (ORCPT
+        id S1726834AbgGWGJh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jul 2020 01:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46762 "EHLO
+        Thu, 23 Jul 2020 02:09:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbgGWFG5 (ORCPT
+        with ESMTP id S1725773AbgGWGJg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jul 2020 01:06:57 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11A8C0619E1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 22:06:56 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id h17so3946534oie.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 22:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=AeHRv/0sB5DW1ivWHhxc5xKHLhyP/6NIUxodWKVPFA0=;
-        b=vH9z2S1k3nHSoqUGdkmoiY+PFZS6bkSvJMbLrELOT1ouLEphhm7areNuea2yE7hKRJ
-         9WIIKdXA6KEygDYWZOGj+XXmnl1XpONsLOnGjLxCzKzqTqtNr17i/MX0h/jf/Qb1A/Gv
-         zUFE6wvfjIA3xQsGn+J+t5i+/Fhzm3Iv05lK1GqFhDqr1RMzxawm8Dww4v9zjjh5yaho
-         jBsaO94P4wEJvK3riZrzD40WuWPW2dKfaZV2Z23u1UFyP2HZN8lAQOwC17osGxq6Tuif
-         ROn7nu6TAsDV7FLrcl9bjjZir8eg0+eDDdNO1lYv7halI1Pbjd2SKlrl4x9cEXkR/aQE
-         GUiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=AeHRv/0sB5DW1ivWHhxc5xKHLhyP/6NIUxodWKVPFA0=;
-        b=bauK45ZMV5C780wJRo7hFSydGlqNJAt5Ow2qr6BE2kcsf50EZ9LpE+dB43ZdkYk08w
-         e27gHoUNMwEGlG5uMu0f0j/Jgq0C5owteQ/XVO5OcD/qT9FWNmjnR3BaTB/9Ldz3pqml
-         nzfbTtEp6/0sypgGeLWDILWC8QqjDGEQAlxk2PiQ2UtYYGjo9VQRk8kWVo7U0g5jeNHS
-         PiUO0aaKIAoZn1kb0HqlsyS/KzcuKaoYVw32tlA6eWPFIc/u7UOMRuVv7lwjdmcGqg1j
-         v9WO4hWqQx9E5xS1rb+UqdnlIyvzV8BRel7ua11jk1lcMTVIvwwMSOUmYjU+MipF11MT
-         PCow==
-X-Gm-Message-State: AOAM530YDnkS/bbGIT3QTzzWZVXscrSLtde8NtavE/GvaoPsnUJ3dXjw
-        lLFl8qkovEd1ojAfNZvSQEnqc4gPfVypUpcXmAwXPMA=
-X-Google-Smtp-Source: ABdhPJwCckgW1CXt1ZynFqtlCQTt0kprxlTI4HEcCSgVvGnb/gIpO4wpJkaSUXhZMkOjVF3OaEZ9oy7GL/gDsN++Sq8=
-X-Received: by 2002:aca:3357:: with SMTP id z84mr2453615oiz.100.1595480816110;
- Wed, 22 Jul 2020 22:06:56 -0700 (PDT)
+        Thu, 23 Jul 2020 02:09:36 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26629C0619DC;
+        Wed, 22 Jul 2020 23:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=AjKHhDGZLqL4OuQUXI3ghPRn4d0K9eK+41+WmsKDw4s=; b=CNu8wX7/4AaScPiP+yKasX/Nuq
+        00LHKTXAD3IquBRcEMSnRF8bNgMD1cvHh+U+oC9aYlopzyBcHDT20XOh1UxeZFqfjZgeBbGvE1wB6
+        /V6nQUH0PdaU2g+5JOnd1u9l8C/s6uwbv4KhpIhdxBK8oLO0ZwY+sqyTh4ne0vagAIgh4N5VQBGx0
+        JHE6q8bbDMTkx2eOaxshkvfo9rjtP0ncEN/z4VwN6Hb6/0xYri2cf1nNOzgptOsfvtMuA7wmNkOac
+        QLJGCjm4BB8DbTIK1mpqQYiSCZNmMlsC+Vd1KrBSfphtSKPM32mRgHArgFrIC0MlfCF8txHO3F2DP
+        u7/I0W5g==;
+Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jyUPz-0003lF-6z; Thu, 23 Jul 2020 06:09:23 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: [PATCH 10/26] netfilter: remove the unused user argument to do_update_counters
+Date:   Thu, 23 Jul 2020 08:08:52 +0200
+Message-Id: <20200723060908.50081-11-hch@lst.de>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200723060908.50081-1-hch@lst.de>
+References: <20200723060908.50081-1-hch@lst.de>
 MIME-Version: 1.0
-From:   Click2 work <clicktowork2@gmail.com>
-Date:   Thu, 23 Jul 2020 10:36:42 +0530
-Message-ID: <CAPWCbyVdeYTQ5ERFVcH_EwXf41FhnpYAxCSN1q-cM-Aez-cwCg@mail.gmail.com>
-Subject: BlueZ host
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ net/bridge/netfilter/ebtables.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-I want to use the BlueZ host stack with one of the controller which
-supports the latest Bluetooth 5.2 features. I want to know whether
-BlueZ supports latest BT 5.2 or 5.1 or 5.0 features?.Looking forward
-to hearing from you. Thanks in advance.
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index fe13108af1f542..12f8929667bf43 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -1242,9 +1242,8 @@ void ebt_unregister_table(struct net *net, struct ebt_table *table,
+ 
+ /* userspace just supplied us with counters */
+ static int do_update_counters(struct net *net, const char *name,
+-				struct ebt_counter __user *counters,
+-				unsigned int num_counters,
+-				const void __user *user, unsigned int len)
++			      struct ebt_counter __user *counters,
++			      unsigned int num_counters, unsigned int len)
+ {
+ 	int i, ret;
+ 	struct ebt_counter *tmp;
+@@ -1299,7 +1298,7 @@ static int update_counters(struct net *net, const void __user *user,
+ 		return -EINVAL;
+ 
+ 	return do_update_counters(net, hlp.name, hlp.counters,
+-				hlp.num_counters, user, len);
++				  hlp.num_counters, len);
+ }
+ 
+ static inline int ebt_obj_to_user(char __user *um, const char *_name,
+@@ -2231,7 +2230,7 @@ static int compat_update_counters(struct net *net, void __user *user,
+ 		return update_counters(net, user, len);
+ 
+ 	return do_update_counters(net, hlp.name, compat_ptr(hlp.counters),
+-					hlp.num_counters, user, len);
++				  hlp.num_counters, len);
+ }
+ 
+ static int compat_do_ebt_get_ctl(struct sock *sk, int cmd,
+-- 
+2.27.0
 
-Regards,
-Sridhar
