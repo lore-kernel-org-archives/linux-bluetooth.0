@@ -2,100 +2,310 @@ Return-Path: <SRS0=glhu=BC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FBDC433EA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AF3C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:23:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 178F122D00
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6149E2065F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 06:23:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ATPIX3sY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F7awYNCS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727111AbgGWGNt (ORCPT
+        id S1726711AbgGWGXD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56430 "EHLO
+        Thu, 23 Jul 2020 02:23:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725846AbgGWGJ3 (ORCPT
+        with ESMTP id S1725858AbgGWGXC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jul 2020 02:09:29 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83229C0619E2;
-        Wed, 22 Jul 2020 23:09:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=gCUb2KALoHVqEKu8rEH+C8lWt+ULTZIwW5IcTvAPZOE=; b=ATPIX3sYRFhC7WaiE9BzREZuc5
-        cG3sYs1eD725v8winTFEqlUitrKu3d6dcE2QNeb9tLQS/xlmm+Lwc0xkgmGNIgb7JCD4ezErd4DBn
-        9p9aTwTzEYw6D+be9JrRR3QEczOkzAWwyArehyn1eSvNMr3ISxeuRa3IuGi295j1EfVowQZ2UjQ6Z
-        wd/YxGdW+I/jDCW8g89M+AqOLZGJjGXcpB6wuML4/ZE+SDzzAPZHP5kRGWH+QfxuKxtAkaxPtP+/f
-        DwmcusSufm/WG/k6lNStK4mo9aHpGpQgKtHqEHIsnJOzGYTQzluUkSiXxr4PmmMJafDnLDnRNxnsh
-        i+hp3mvg==;
-Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUPp-0003jz-GJ; Thu, 23 Jul 2020 06:09:13 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 03/26] bpfilter: reject kernel addresses
-Date:   Thu, 23 Jul 2020 08:08:45 +0200
-Message-Id: <20200723060908.50081-4-hch@lst.de>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200723060908.50081-1-hch@lst.de>
-References: <20200723060908.50081-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        Thu, 23 Jul 2020 02:23:02 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B95C0619E2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 23:23:02 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id d202so5306544ybh.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jul 2020 23:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=WADh6ZvhdBEhj4v8Bh0vTejKQyp+42zGkpP8WL38NHo=;
+        b=F7awYNCSiaMvQBlusOuoLyQabgbbOxRGC6K6h4LAnXaoNYXXQP/pBt9SpjZpg481CT
+         e0sYZ2RKy/trnlwHFD4coTiDrMpExdcRNQLvRO6YnckO+75bxIRIEa5zoU/+G9rxsyA1
+         wcx69F8iSYr0bggZq1GVeI7qrtYTD0mi6LCvgRQsdjIFfyLogchx6BKMDAqklk+C11dl
+         EMc4OScc3MmnQYZH+FqogNRgB45LK8RG4/zUo8YbvmIiFljFVt5rbm/rM8D2oje08yHL
+         arxd6F+1SXn/hIm15iJeiFMZXJTSbd2yS9783k5ZRhiqjOcvFHt/BfxLi74lpEw8hQOh
+         btGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=WADh6ZvhdBEhj4v8Bh0vTejKQyp+42zGkpP8WL38NHo=;
+        b=ECSci2eLqUNt/Avqx4Rw3F5777lgEpu/kXWBu6eXq8dFnVYwNMOmoXnSRy/1P/p3fB
+         Yw12sIF6PhWO86rkdBfhMhCN3vBvsE73eQcR5OKUy/utAXCqqcAacE4kMHpWll6v1hzI
+         UcMxBjSY2v4RZJg5ayvAqQj3gMgAXagX0hLoGt2jCODioqd1LFeAalrv8SEBsJJnDSYe
+         dVz83m8gZxByq3yapVUqjw1nc97gfBHSnFOqgD8OoPw1N4xomunxbRSGPOsIQIhHsDSa
+         OUfRQZMdx3GTmOmBLNtsYc3YNToWvEnPN2QncV07jZZqeIVq0CFiLLzEpEr46jvaNKSr
+         zXKg==
+X-Gm-Message-State: AOAM531lE08YuHFSP8NUwfbByGL1BMZGrq3ORLB6/xTPmC9Vg2Za5ttr
+        NegTj4SaxNR49/tXN5TEOIegr5hblExWVN5zDNCcmlWVCedOTk0BbSyG8efsjf7HtUmnc5ypiJ7
+        oRspF7gmKzFA730k5XkZp3gxx5aagKXvv7/+pZiYF9IV3qh7rR/Z+MjqfELKdkxXH8EKL+84UG6
+        sT
+X-Google-Smtp-Source: ABdhPJxUmr2i+eQbUWRBqJETR1ggD0F+dQjQzlKbcxf65IZMhO7nzFfXCzwuLtVclJuGjchHwquyCMv8Wo50
+X-Received: by 2002:a25:bbd2:: with SMTP id c18mr4196310ybk.495.1595485381655;
+ Wed, 22 Jul 2020 23:23:01 -0700 (PDT)
+Date:   Thu, 23 Jul 2020 14:22:50 +0800
+In-Reply-To: <20200723142128.Bluez.v4.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
+Message-Id: <20200723142128.Bluez.v4.2.Ic16589fde45fac0c496dfca2fa27672059114c3b@changeid>
+Mime-Version: 1.0
+References: <20200723142128.Bluez.v4.1.I667fa0ebcc3056a21c22fdaf476a56dd72aff38d@changeid>
+X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
+Subject: [Bluez PATCH v4 2/2] audio/transport: supply volume on transport init
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>, Yu Liu <yudiliu@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The bpfilter user mode helper processes the optval address using
-process_vm_readv.  Don't send it kernel addresses fed under
-set_fs(KERNEL_DS) as that won't work.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Sometimes the response of RegisterNotification for volume change
+event came before we create the transport for the corresponding
+device. If that happens, the volume will be stuck to an
+uninitialized invalid value. The property Volume of
+MediaTransport1 will also be left unaccessible.
+
+This patch supplies the initial volume when creating a new
+transport. The value is obtained from the media_player object.
+However, since the avrcp session might not be created by the time
+the transport is created, we also try to initialize the volume
+when creating avrcp session.
+
+Reviewed-by: Yu Liu <yudiliu@google.com>
 ---
- net/bpfilter/bpfilter_kern.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
-index 78d561f2c54da7..00540457e5f4d3 100644
---- a/net/bpfilter/bpfilter_kern.c
-+++ b/net/bpfilter/bpfilter_kern.c
-@@ -70,6 +70,10 @@ static int bpfilter_process_sockopt(struct sock *sk, int optname,
- 		.addr		= (uintptr_t)optval,
- 		.len		= optlen,
- 	};
-+	if (uaccess_kernel()) {
-+		pr_err("kernel access not supported\n");
-+		return -EFAULT;
-+	}
- 	return bpfilter_send_req(&req);
+Changes in v4: None
+Changes in v3:
+-Add missing library
+
+Changes in v2:
+-Get the volume from media_player instead of from separate list
+
+ profiles/audio/avrcp.c     | 27 ++++++++++++++++-
+ profiles/audio/avrcp.h     |  2 ++
+ profiles/audio/media.c     | 60 +++++++++++++++++++++++++++++---------
+ profiles/audio/media.h     |  2 ++
+ profiles/audio/transport.c |  2 +-
+ 5 files changed, 77 insertions(+), 16 deletions(-)
+
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index d2d1d9dae..0ea66c671 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -64,6 +64,7 @@
+ #include "avctp.h"
+ #include "avrcp.h"
+ #include "control.h"
++#include "media.h"
+ #include "player.h"
+ #include "transport.h"
+ 
+@@ -1701,7 +1702,6 @@ static uint8_t avrcp_handle_request_continuing(struct avrcp *session,
+ 	if (pending->pdu_id != pdu->params[0])
+ 		goto err;
+ 
+-
+ 	len = 0;
+ 	pending->attr_ids = player_fill_media_attribute(player,
+ 							pending->attr_ids,
+@@ -4037,8 +4037,12 @@ static void target_init(struct avrcp *session)
+ 
+ 	player = g_slist_nth_data(server->players, 0);
+ 	if (player != NULL) {
++		int8_t init_volume;
+ 		target->player = player;
+ 		player->sessions = g_slist_prepend(player->sessions, session);
++
++		init_volume = media_player_get_device_volume(session->dev);
++		media_transport_update_device_volume(session->dev, init_volume);
+ 	}
+ 
+ 	session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+@@ -4476,6 +4480,27 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+ 					avrcp_handle_set_volume, session);
  }
  
++struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev)
++{
++	struct avrcp_server *server;
++	struct avrcp *session;
++	struct avrcp_data *target;
++
++	server = find_server(servers, device_get_adapter(dev));
++	if (server == NULL)
++		return NULL;
++
++	session = find_session(server->sessions, dev);
++	if (session == NULL)
++		return NULL;
++
++	target = session->target;
++	if (target == NULL)
++		return NULL;
++
++	return target->player;
++}
++
+ static int avrcp_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 026a820f5..702d57442 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -116,3 +116,5 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 
+ size_t avrcp_handle_vendor_reject(uint8_t *code, uint8_t *operands);
+ size_t avrcp_browsing_general_reject(uint8_t *operands);
++
++struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev);
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index d4d58ec86..02bf82a49 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -239,6 +239,20 @@ static void media_endpoint_exit(DBusConnection *connection, void *user_data)
+ 	media_endpoint_remove(endpoint);
+ }
+ 
++static struct media_adapter *find_adapter(struct btd_device *device)
++{
++	GSList *l;
++
++	for (l = adapters; l; l = l->next) {
++		struct media_adapter *adapter = l->data;
++
++		if (adapter->btd_adapter == device_get_adapter(device))
++			return adapter;
++	}
++
++	return NULL;
++}
++
+ static void clear_configuration(struct media_endpoint *endpoint,
+ 					struct media_transport *transport)
+ {
+@@ -426,6 +440,33 @@ struct a2dp_config_data {
+ 	a2dp_endpoint_config_t cb;
+ };
+ 
++int8_t media_player_get_device_volume(struct btd_device *device)
++{
++	struct avrcp_player *target_player;
++	struct media_adapter *adapter;
++	GSList *l;
++
++	if (!device)
++		return -1;
++
++	target_player = avrcp_get_target_player_by_device(device);
++	if (!target_player)
++		return -1;
++
++	adapter = find_adapter(device);
++	if (!adapter)
++		return -1;
++
++	for (l = adapter->players; l; l = l->next) {
++		struct media_player *mp = l->data;
++
++		if (mp->player == target_player)
++			return mp->volume;
++	}
++
++	return -1;
++}
++
+ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 					uint8_t *configuration, size_t size,
+ 					media_endpoint_cb_t cb,
+@@ -439,6 +480,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	const char *path;
+ 	DBusMessageIter iter;
+ 	struct media_transport *transport;
++	int8_t init_volume;
+ 
+ 	transport = find_device_transport(endpoint, device);
+ 
+@@ -451,6 +493,9 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	if (transport == NULL)
+ 		return FALSE;
+ 
++	init_volume = media_player_get_device_volume(device);
++	media_transport_update_volume(transport, init_volume);
++
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+ 						MEDIA_ENDPOINT_INTERFACE,
+ 						"SetConfiguration");
+@@ -646,20 +691,6 @@ static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
+ 	return TRUE;
+ }
+ 
+-static struct media_adapter *find_adapter(struct btd_device *device)
+-{
+-	GSList *l;
+-
+-	for (l = adapters; l; l = l->next) {
+-		struct media_adapter *adapter = l->data;
+-
+-		if (adapter->btd_adapter == device_get_adapter(device))
+-			return adapter;
+-	}
+-
+-	return NULL;
+-}
+-
+ static bool endpoint_properties_exists(const char *uuid,
+ 						struct btd_device *dev,
+ 						void *user_data)
+@@ -1779,6 +1810,7 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 	mp->sender = g_strdup(sender);
+ 	mp->path = g_strdup(path);
+ 	mp->timer = g_timer_new();
++	mp->volume = -1;
+ 
+ 	mp->watch = g_dbus_add_disconnect_watch(conn, sender,
+ 						media_player_exit, mp,
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index dd630d432..53694f4c6 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -33,3 +33,5 @@ void media_unregister(struct btd_adapter *btd_adapter);
+ struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint);
+ const char *media_endpoint_get_uuid(struct media_endpoint *endpoint);
+ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
++
++int8_t media_player_get_device_volume(struct btd_device *device);
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 2ae5118c4..a2c4f7dfb 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -977,7 +977,7 @@ void media_transport_update_device_volume(struct btd_device *dev,
+ {
+ 	GSList *l;
+ 
+-	if (dev == NULL)
++	if (dev == NULL || volume < 0)
+ 		return;
+ 
+ 	for (l = transports; l; l = l->next) {
 -- 
-2.27.0
+2.28.0.rc0.105.gf9edc3c819-goog
 
