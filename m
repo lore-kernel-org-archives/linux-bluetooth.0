@@ -2,72 +2,79 @@ Return-Path: <SRS0=glhu=BC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912CBC433E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 16:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64A2C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 18:32:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A55C20714
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 16:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 963AF22B49
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 18:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595529155;
+	bh=ZDU+EEnAEQWEflbNqthke0jssQz/wTzJgnUV5q4keqw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=QRcSzTAkh4aLeJ7cA4E+NVjZDg8ErQU95prInWMtP8ndBm34DI3UxR4MKGuBGEbj0
+	 j0mci9fYHW6W0GOL2LpGFAtqKuq7Q3plzFWOsy1NEq8yh/YCwHrcxUTW0yUnc1gRYU
+	 s9gYb1uTvlNI0DFL0ufWAuRK00brrMeLAIhJSMM0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgGWQoi (ORCPT
+        id S1727043AbgGWScc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jul 2020 12:44:38 -0400
-Received: from verein.lst.de ([213.95.11.211]:60887 "EHLO verein.lst.de"
+        Thu, 23 Jul 2020 14:32:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49126 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726621AbgGWQoi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jul 2020 12:44:38 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8C74368AFE; Thu, 23 Jul 2020 18:44:32 +0200 (CEST)
-Date:   Thu, 23 Jul 2020 18:44:32 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 04/26] net: add a new sockptr_t type
-Message-ID: <20200723164432.GA20917@lst.de>
-References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-5-hch@lst.de> <CANn89iJ3LKth-iWwh0+P3D3RqtDNv4AyXkkzhXr0oSEvE_JoRQ@mail.gmail.com>
+        id S1726349AbgGWScc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Jul 2020 14:32:32 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F8DA20709;
+        Thu, 23 Jul 2020 18:32:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595529151;
+        bh=ZDU+EEnAEQWEflbNqthke0jssQz/wTzJgnUV5q4keqw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lPrTsHDb+D4Ge6NG31U0z3PeggId4zb7RAYTrqQ0uoyp9RS8ZBkoNO5NnXx3xRSkJ
+         38R+0QYeLVuKc4sOTvJ2+xSXaOLxzaDKj0teqXKCYAHZGZnXnVVQTWjpx2bglXS14p
+         yGIN2/GGK/3PmuUAbZbaLBaP1J4ApF0cF2AlLvFs=
+Date:   Thu, 23 Jul 2020 20:32:35 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        rafael.j.wysocki@intel.com
+Cc:     linux-pm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org, swboyd@chromium.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
+        Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH v5 1/1] power: Emit changed uevent on
+ wakeup_sysfs_add/remove
+Message-ID: <20200723183235.GA3445384@kroah.com>
+References: <20200707172845.4177903-1-abhishekpandit@chromium.org>
+ <20200707102823.v5.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANn89iJ3LKth-iWwh0+P3D3RqtDNv4AyXkkzhXr0oSEvE_JoRQ@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20200707102823.v5.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 09:40:27AM -0700, Eric Dumazet wrote:
-> I am not sure why you chose sockptr_t   for something that really seems generic.
+On Tue, Jul 07, 2020 at 10:28:44AM -0700, Abhishek Pandit-Subedi wrote:
+> Udev rules that depend on the power/wakeup attribute don't get triggered
+> correctly if device_set_wakeup_capable is called after the device is
+> created. This can happen for several reasons (driver sets wakeup after
+> device is created, wakeup is changed on parent device, etc) and it seems
+> reasonable to emit a changed event when adding or removing attributes on
+> the device.
 > 
-> Or is it really meant to be exclusive to setsockopt() and/or getsockopt() ?
-> 
-> If the first user of this had been futex code, we would have used
-> futexptr_t, I guess.
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-It was originally intended to be generic and called uptr_t, based
-on me misunderstanding that Linus wanted a file operation for it,
-which he absolutely didn't and hate with passion.  So the plan is to
-only use it for setsockopt for now, although there are some arguments
-for also using it in sendmsg/recvmsg.  There is no need to use it for
-getsockopt.
+Rafael, any objection to this?  Do you want me to take it through my
+tree, or are you going to take it through yours?  Either is fine for me.
+
+thanks,
+
+greg k-h
