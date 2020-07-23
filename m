@@ -8,64 +8,65 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DF1C433E5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C98AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5123620888
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6540A20825
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t34FZrqp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ueAuxZRV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728792AbgGWMf1 (ORCPT
+        id S1728791AbgGWMfY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jul 2020 08:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59868 "EHLO
+        Thu, 23 Jul 2020 08:35:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbgGWMf0 (ORCPT
+        with ESMTP id S1726109AbgGWMfX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jul 2020 08:35:26 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94590C0619DC
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:26 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id l6so2499204plt.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:26 -0700 (PDT)
+        Thu, 23 Jul 2020 08:35:23 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB68C0619DC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id g67so3030343pgc.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=bwkuLTs6JjWfQ9Oc/vq1HcUJ3U5T2anKNWaBV3h5b4U=;
-        b=t34FZrqpJguHXObyN++EfG8CiEe1r70HOONJmln+mbhgRW+GbH4f1buS8rMj9fSW+g
-         RcOp6eK4BVKBwGlh+a+Smq6qeIg4F4XLDal6X2VUVhn9SJDeoGo4FhB+8UCX7F18pD5u
-         B+aJG9kybl/3NJi8FA+p2Rct5dVLWhHkkfwRG5ds/k3U4T/v+kLijxZwDeuFgXtkfmRo
-         dSZ03ZBSCrjmSTfWM3FiNUVKQDwaDdJcQkiOwKCoK1r1lHBWe1CUEZySpBp91ZyD4O1z
-         7iY0LST6wt2rGB91SPlsyDoRxBCZmXlsCuTgfVzcnLb05XoHniB9AH9j3Cd3/40V5al9
-         ZutA==
+        bh=sagG6XzvqD+5UW5Prg99qLND7K39EzY9lxq7YJmMj5Q=;
+        b=ueAuxZRVROtqPGEVGJ7NwIauUFNArra6i37gxwfBGbgcuMNiGOy+5bnZcqdjybOo4J
+         0D9zDvFvG0Fx+ADL7PahKmUgNAoM0O8UFhuUKMrFAU0gDUPC/K8KU6s3xcpT7zs3D/kN
+         IqhV3MttPce7B9zbdcbPOhQq/J/NM1wntvuoK2ZJuEx3rJH1L7cw9rhB5ks3JzUusTOh
+         ZXGtlFpLKS5hfFGNnI3eEO1J3Pvm29NTjgSuvJ6rXHooZHDUj+RIYlcNATDd9qXlaNQY
+         xzAAlU8SVVrPwUuezalsH+PNLmMS0kOBvkFnVtMVCviWUUXS4EftRj4dzkUte4mY4MGo
+         T9tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=bwkuLTs6JjWfQ9Oc/vq1HcUJ3U5T2anKNWaBV3h5b4U=;
-        b=oQ1ZXZfJTfhJvhYmULIZoJUDoFlacyf+CZod1k04sbTbvCyIqPIiznx5nL1HBQ4eyS
-         lv5ojT2NE1WoqLQgSpy8NbRu4yF3Cs2YtxUdPwk8NIYUI924mrn+LmsPwTjwVHSVRp7N
-         kpPdE0oxgRgooCHGyMTRBJKMgJZE4bhlQV37mxoYgssQijWwI/3mxGVvtfeV7pkqFzAV
-         jE4HrSLLjognxrieNV7Kl1XgknWuWd37maEE4GbPZcLYsh0pXqC+H7gry3ZjFtsQDPNJ
-         Rt4b1mrmZngjXO37nzv1mQpiSC3OnHAmqkZRkfMMEwabnk0dEi8ZbnZGWNi1v9mG9pVR
-         DumQ==
-X-Gm-Message-State: AOAM531Oybrn5QLp2eiXgtIOxMhtITo85IF9UYCdqm9+MJKFWV6FGR5t
-        yaSN4C7j2R1sX3MPY7Wwy0jr1CAEPMADDA==
-X-Google-Smtp-Source: ABdhPJwgU9AyjfneBLNPjhnm1MnH0AufFjYwpW6dkFZFaII5j4d2y7Y6obC+Y/K/Vt32vhcjIxLwwg==
-X-Received: by 2002:a17:902:322:: with SMTP id 31mr3626123pld.33.1595507725921;
-        Thu, 23 Jul 2020 05:35:25 -0700 (PDT)
+        bh=sagG6XzvqD+5UW5Prg99qLND7K39EzY9lxq7YJmMj5Q=;
+        b=fvkDjM6F3020WNfh5eimWLuhkwFAVvxmnx6WpT+OqOcaT75nclQ3dOS2MqAKBOBA6E
+         +5RJwRIDFyiAoiuuSn1fxQDt0nBDLlrGXxNghHZVr2O4O4M9hQgPi7WLyhUifxC91KqL
+         e7IQoHABVF0y63WN1LtJxxVVaA5fMhL3CCIAwXqvI0z/LEXL1aHMOMbyvGCxfwRqUyzw
+         aaT1mwfSi1/CvxsfOs1HWfzgri80pxvyhQWiUi+v2LPJORMKM8jUSLUYfWTVzlEqC2kc
+         W6oQUElWK0MCD1upg9as3jRVIaYVIcof6ynZuahKew2BQ8tXlqwtYoBluNjhIZ6RVAaT
+         dAOg==
+X-Gm-Message-State: AOAM530w2AMPlixRfDbBHBPj9bQDOLeAm+Bi1kAwQ4XZCN0hRWDYMH9N
+        OgNWyTTzkM+8e+5NMaqJ5ZqdiXHedtkbsQ==
+X-Google-Smtp-Source: ABdhPJzbyaP61Sycn73zd2NzweTw9CHvEnFjTM1VPt6jA5L0jfMPrkgJZeh/z8ja/wrYHLgih2cNKw==
+X-Received: by 2002:a62:1d90:: with SMTP id d138mr4001072pfd.159.1595507723125;
+        Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
 Received: from nsathish-Latitude-7480.iind.intel.com ([192.55.54.42])
-        by smtp.gmail.com with ESMTPSA id z11sm2849823pfr.71.2020.07.23.05.35.24
+        by smtp.gmail.com with ESMTPSA id z11sm2849823pfr.71.2020.07.23.05.35.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2020 05:35:25 -0700 (PDT)
+        Thu, 23 Jul 2020 05:35:22 -0700 (PDT)
 From:   Sathish Narasimman <nsathish41@gmail.com>
 X-Google-Original-From: Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH v5 4/8] Bluetooth: Translate additional address type during le_conn
-Date:   Thu, 23 Jul 2020 18:08:59 +0530
-Message-Id: <20200723123903.29337-4-sathish.narasimman@intel.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Sathish Narsimman <sathish.narasimman@intel.com>
+Subject: [PATCH v5 3/8] Bluetooth: Update resolving list when updating whitelist
+Date:   Thu, 23 Jul 2020 18:08:58 +0530
+Message-Id: <20200723123903.29337-3-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200723123903.29337-1-sathish.narasimman@intel.com>
 References: <20200723123903.29337-1-sathish.narasimman@intel.com>
@@ -74,45 +75,90 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When using controller based address resolution, then the new address
-types 0x02 and 0x03 are used. These types need to be converted back into
-either public address or random address types.
+From: Marcel Holtmann <marcel@holtmann.org>
 
-This patch is specially during LE_CREATE_CONN if using own_add_type as 0x02
-or 0x03.
+When the whitelist is updated, then also update the entries of the
+resolving list for devices where IRKs are available.
 
-Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
 ---
- net/bluetooth/hci_event.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ net/bluetooth/hci_request.c | 41 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 61f8c4d12028..6388fb55b4d2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2296,6 +2296,22 @@ static void cs_le_create_conn(struct hci_dev *hdev, bdaddr_t *peer_addr,
- 	if (!conn)
- 		return;
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 7d0ba53ffed0..85de1f356610 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -694,6 +694,21 @@ static void del_from_white_list(struct hci_request *req, bdaddr_t *bdaddr,
+ 	bt_dev_dbg(req->hdev, "Remove %pMR (0x%x) from whitelist", &cp.bdaddr,
+ 		   cp.bdaddr_type);
+ 	hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST, sizeof(cp), &cp);
++
++	if (use_ll_privacy(req->hdev)) {
++		struct smp_irk *irk;
++
++		irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
++		if (irk) {
++			struct hci_cp_le_del_from_resolv_list cp;
++
++			cp.bdaddr_type = bdaddr_type;
++			bacpy(&cp.bdaddr, bdaddr);
++
++			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
++				    sizeof(cp), &cp);
++		}
++	}
+ }
  
-+	/* When using controller based address resolution, then the new
-+	 * address types 0x02 and 0x03 are used. These types need to be
-+	 * converted back into either public address or random address type
-+	 */
-+	if (use_ll_privacy(hdev) &&
-+	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
-+		switch (own_address_type) {
-+		case ADDR_LE_DEV_PUBLIC_RESOLVED:
-+			own_address_type = ADDR_LE_DEV_PUBLIC;
-+			break;
-+		case ADDR_LE_DEV_RANDOM_RESOLVED:
-+			own_address_type = ADDR_LE_DEV_RANDOM;
-+			break;
+ /* Adds connection to white list if needed. On error, returns -1. */
+@@ -714,7 +729,7 @@ static int add_to_white_list(struct hci_request *req,
+ 		return -1;
+ 
+ 	/* White list can not be used with RPAs */
+-	if (!allow_rpa &&
++	if (!allow_rpa && !use_ll_privacy(hdev) &&
+ 	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
+ 		return -1;
+ 	}
+@@ -732,6 +747,28 @@ static int add_to_white_list(struct hci_request *req,
+ 		   cp.bdaddr_type);
+ 	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
+ 
++	if (use_ll_privacy(hdev)) {
++		struct smp_irk *irk;
++
++		irk = hci_find_irk_by_addr(hdev, &params->addr,
++					   params->addr_type);
++		if (irk) {
++			struct hci_cp_le_add_to_resolv_list cp;
++
++			cp.bdaddr_type = params->addr_type;
++			bacpy(&cp.bdaddr, &params->addr);
++			memcpy(cp.peer_irk, irk->val, 16);
++
++			if (hci_dev_test_flag(hdev, HCI_PRIVACY))
++				memcpy(cp.local_irk, hdev->irk, 16);
++			else
++				memset(cp.local_irk, 0, 16);
++
++			hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST,
++				    sizeof(cp), &cp);
 +		}
 +	}
 +
- 	/* Store the initiator and responder address information which
- 	 * is needed for SMP. These values will not change during the
- 	 * lifetime of the connection.
+ 	return 0;
+ }
+ 
+@@ -772,7 +809,7 @@ static u8 update_white_list(struct hci_request *req)
+ 		}
+ 
+ 		/* White list can not be used with RPAs */
+-		if (!allow_rpa &&
++		if (!allow_rpa && !use_ll_privacy(hdev) &&
+ 		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
+ 			return 0x00;
+ 		}
 -- 
 2.17.1
 
