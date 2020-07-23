@@ -8,65 +8,64 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C98AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C82C433EA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6540A20825
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A94120768
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jul 2020 12:35:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ueAuxZRV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qal8nDsq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728791AbgGWMfY (ORCPT
+        id S1728797AbgGWMf3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jul 2020 08:35:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
+        Thu, 23 Jul 2020 08:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbgGWMfX (ORCPT
+        with ESMTP id S1726109AbgGWMf3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jul 2020 08:35:23 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB68C0619DC
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id g67so3030343pgc.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
+        Thu, 23 Jul 2020 08:35:29 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D0CC0619DC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:29 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id 72so2507329ple.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jul 2020 05:35:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=sagG6XzvqD+5UW5Prg99qLND7K39EzY9lxq7YJmMj5Q=;
-        b=ueAuxZRVROtqPGEVGJ7NwIauUFNArra6i37gxwfBGbgcuMNiGOy+5bnZcqdjybOo4J
-         0D9zDvFvG0Fx+ADL7PahKmUgNAoM0O8UFhuUKMrFAU0gDUPC/K8KU6s3xcpT7zs3D/kN
-         IqhV3MttPce7B9zbdcbPOhQq/J/NM1wntvuoK2ZJuEx3rJH1L7cw9rhB5ks3JzUusTOh
-         ZXGtlFpLKS5hfFGNnI3eEO1J3Pvm29NTjgSuvJ6rXHooZHDUj+RIYlcNATDd9qXlaNQY
-         xzAAlU8SVVrPwUuezalsH+PNLmMS0kOBvkFnVtMVCviWUUXS4EftRj4dzkUte4mY4MGo
-         T9tw==
+        bh=6RSAZAZCD/2zvtqQwxc8kimw5YBb8FQUpkwthAppgoM=;
+        b=qal8nDsq0om4u2aaDE6pcQwPdv763EX+ngNdNXdmJc/QkMTCc4pM3LoKF2mUiPaav8
+         4TfWVAAnVYwmrKRrYWcLAo8LQum3tq1iq8cOt0SgpntLPpz4g/t86iO5QXTasYYUrEK2
+         WZKpCQvaJgwShVkNlilQBh/mQSIjVHEkYnSi858k81NGVYECAfmTASzCJRd0unb6Pn1B
+         7QCKT+nNCRNO3tvKkypFdBhYDDZoqr0cT3UG9hOZJzpF8++19hIIV0XJU/einrC8iv9F
+         oSQfUM2Dg6zAfOGJ0ralWP8prXhi4IsXpmwuTabYHmC52WVki0u8wMHxh014pk/2t+R+
+         wlqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=sagG6XzvqD+5UW5Prg99qLND7K39EzY9lxq7YJmMj5Q=;
-        b=fvkDjM6F3020WNfh5eimWLuhkwFAVvxmnx6WpT+OqOcaT75nclQ3dOS2MqAKBOBA6E
-         +5RJwRIDFyiAoiuuSn1fxQDt0nBDLlrGXxNghHZVr2O4O4M9hQgPi7WLyhUifxC91KqL
-         e7IQoHABVF0y63WN1LtJxxVVaA5fMhL3CCIAwXqvI0z/LEXL1aHMOMbyvGCxfwRqUyzw
-         aaT1mwfSi1/CvxsfOs1HWfzgri80pxvyhQWiUi+v2LPJORMKM8jUSLUYfWTVzlEqC2kc
-         W6oQUElWK0MCD1upg9as3jRVIaYVIcof6ynZuahKew2BQ8tXlqwtYoBluNjhIZ6RVAaT
-         dAOg==
-X-Gm-Message-State: AOAM530w2AMPlixRfDbBHBPj9bQDOLeAm+Bi1kAwQ4XZCN0hRWDYMH9N
-        OgNWyTTzkM+8e+5NMaqJ5ZqdiXHedtkbsQ==
-X-Google-Smtp-Source: ABdhPJzbyaP61Sycn73zd2NzweTw9CHvEnFjTM1VPt6jA5L0jfMPrkgJZeh/z8ja/wrYHLgih2cNKw==
-X-Received: by 2002:a62:1d90:: with SMTP id d138mr4001072pfd.159.1595507723125;
-        Thu, 23 Jul 2020 05:35:23 -0700 (PDT)
+        bh=6RSAZAZCD/2zvtqQwxc8kimw5YBb8FQUpkwthAppgoM=;
+        b=AwYc16AyqNs4IDscbTIs68w3oGUbKQyi4FrFZKx28BX3/ADwXcOt9xC+9dINc19hjS
+         LchmpVLM5oFBXgflWrSY2a7+iVk5oUgjckbg8BVxNeZXMM9DKEyG5fg0U/0kWOz3xCly
+         lrF0V3sbPHs7S1c1ogY4EweaBCGQk2v43RSsX0t/C86zhUiKHJwvROLnI5S93y/XnUd6
+         Cg94jS0UOVcleDJdxsLhNAPvdw2xICDCxOsN3LSN4DvY4RJqXg70WM2N4KYFktwd3se8
+         55FNs4DZVVgEfqNha4GhOWYfxmcylRFKNKK0Z+hGCsrvuyWogrsXv9mS9qPoSiKS59xo
+         hcmA==
+X-Gm-Message-State: AOAM531pMBFFGkuBkleoqFrfl5YgAVk/etQfotVsP4jDqVS0C+YyTSSx
+        O4ekQK+u9OaOEZqQV1FoerjeHAkBqUppCw==
+X-Google-Smtp-Source: ABdhPJz78QFN8ZkZLfp1Cze+RNjKlr4DkYy2DTbdaRcpSPZSVg8EMVaPbRHDUqt146KMLZ18i7hYJg==
+X-Received: by 2002:a17:90a:7487:: with SMTP id p7mr178809pjk.233.1595507728801;
+        Thu, 23 Jul 2020 05:35:28 -0700 (PDT)
 Received: from nsathish-Latitude-7480.iind.intel.com ([192.55.54.42])
-        by smtp.gmail.com with ESMTPSA id z11sm2849823pfr.71.2020.07.23.05.35.21
+        by smtp.gmail.com with ESMTPSA id z11sm2849823pfr.71.2020.07.23.05.35.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2020 05:35:22 -0700 (PDT)
+        Thu, 23 Jul 2020 05:35:28 -0700 (PDT)
 From:   Sathish Narasimman <nsathish41@gmail.com>
 X-Google-Original-From: Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Sathish Narsimman <sathish.narasimman@intel.com>
-Subject: [PATCH v5 3/8] Bluetooth: Update resolving list when updating whitelist
-Date:   Thu, 23 Jul 2020 18:08:58 +0530
-Message-Id: <20200723123903.29337-3-sathish.narasimman@intel.com>
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH v5 5/8] Bluetooth: Let controller creates RPA during le create conn
+Date:   Thu, 23 Jul 2020 18:09:00 +0530
+Message-Id: <20200723123903.29337-5-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200723123903.29337-1-sathish.narasimman@intel.com>
 References: <20200723123903.29337-1-sathish.narasimman@intel.com>
@@ -75,90 +74,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Marcel Holtmann <marcel@holtmann.org>
+When address resolution is enabled and set_privacy is enabled let's
+use own address type as 0x03
 
-When the whitelist is updated, then also update the entries of the
-resolving list for devices where IRKs are available.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
+Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
 ---
- net/bluetooth/hci_request.c | 41 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_request.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 7d0ba53ffed0..85de1f356610 100644
+index 85de1f356610..e48f0945a417 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -694,6 +694,21 @@ static void del_from_white_list(struct hci_request *req, bdaddr_t *bdaddr,
- 	bt_dev_dbg(req->hdev, "Remove %pMR (0x%x) from whitelist", &cp.bdaddr,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST, sizeof(cp), &cp);
-+
-+	if (use_ll_privacy(req->hdev)) {
-+		struct smp_irk *irk;
-+
-+		irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
-+		if (irk) {
-+			struct hci_cp_le_del_from_resolv_list cp;
-+
-+			cp.bdaddr_type = bdaddr_type;
-+			bacpy(&cp.bdaddr, bdaddr);
-+
-+			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
-+				    sizeof(cp), &cp);
-+		}
-+	}
- }
+@@ -2242,7 +2242,13 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 	if (use_rpa) {
+ 		int to;
  
- /* Adds connection to white list if needed. On error, returns -1. */
-@@ -714,7 +729,7 @@ static int add_to_white_list(struct hci_request *req,
- 		return -1;
+-		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		/* If Controller supports LL Privacy use own address type is
++		 * 0x03
++		 */
++		if (use_ll_privacy(hdev))
++			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
++		else
++			*own_addr_type = ADDR_LE_DEV_RANDOM;
  
- 	/* White list can not be used with RPAs */
--	if (!allow_rpa &&
-+	if (!allow_rpa && !use_ll_privacy(hdev) &&
- 	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
- 		return -1;
- 	}
-@@ -732,6 +747,28 @@ static int add_to_white_list(struct hci_request *req,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
- 
-+	if (use_ll_privacy(hdev)) {
-+		struct smp_irk *irk;
-+
-+		irk = hci_find_irk_by_addr(hdev, &params->addr,
-+					   params->addr_type);
-+		if (irk) {
-+			struct hci_cp_le_add_to_resolv_list cp;
-+
-+			cp.bdaddr_type = params->addr_type;
-+			bacpy(&cp.bdaddr, &params->addr);
-+			memcpy(cp.peer_irk, irk->val, 16);
-+
-+			if (hci_dev_test_flag(hdev, HCI_PRIVACY))
-+				memcpy(cp.local_irk, hdev->irk, 16);
-+			else
-+				memset(cp.local_irk, 0, 16);
-+
-+			hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST,
-+				    sizeof(cp), &cp);
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -772,7 +809,7 @@ static u8 update_white_list(struct hci_request *req)
- 		}
- 
- 		/* White list can not be used with RPAs */
--		if (!allow_rpa &&
-+		if (!allow_rpa && !use_ll_privacy(hdev) &&
- 		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
- 			return 0x00;
- 		}
+ 		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
+ 		    !bacmp(&hdev->random_addr, &hdev->rpa))
 -- 
 2.17.1
 
