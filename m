@@ -2,127 +2,430 @@ Return-Path: <SRS0=QcUl=BD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A73C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 11:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD94C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 12:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDBE820767
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 11:50:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMOE2zap"
+	by mail.kernel.org (Postfix) with ESMTP id 6BDC920737
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 12:20:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726768AbgGXLuE (ORCPT
+        id S1726329AbgGXMUy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Jul 2020 07:50:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41020 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726411AbgGXLuC (ORCPT
+        Fri, 24 Jul 2020 08:20:54 -0400
+Received: from lucky1.263xmail.com ([211.157.147.134]:47410 "EHLO
+        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726258AbgGXMUy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Jul 2020 07:50:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595591400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6+ChtD0GXCo4LLqaKWKmtcOwT0zGgtGTIGQjamaPLVU=;
-        b=KMOE2zapcVtqQ8kwm8oQF4efmW+DJhXLyTo5cedOfeQSHblAOQmHEA3a8n/5eSd2fAPHu/
-        1JyAfaWAkUXzUAK0SVmlDaV9B6JyCccRILiQfTPETpL8SZOy+TQnFWlpwqtFZA2JUCyLyP
-        XkbUki9fEBVdx3gQ9t0Q19Cgeve/F7A=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-URbMgH0nPSOJnCqFBofrug-1; Fri, 24 Jul 2020 07:49:59 -0400
-X-MC-Unique: URbMgH0nPSOJnCqFBofrug-1
-Received: by mail-wm1-f70.google.com with SMTP id v4so1755616wmh.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2020 04:49:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6+ChtD0GXCo4LLqaKWKmtcOwT0zGgtGTIGQjamaPLVU=;
-        b=o72AZuyE6qm3pppcCKN/nURd+OBGpyFNOQESUR5mo3n7jDQYi62r+Ql9DyrcqPtFGP
-         Midx5I5UIuUfU7WwRMHdC1Rx40kivMXNxOOvVq7n1IfacvO2CkPGQHi9MedJ4jWmsWKw
-         LrHDznt1gU7kN5mr6wMRZf3hhaTdxM9Zx+h+zADpwrRxUyYpuNfX2qrPYutKYorHnHTz
-         e5iDDXhjDXL72G1Zy4GPLi2B19R54+817A4OQMPXJuLodowlD8NbYrEntJCUYQRmnb8e
-         ugThlm75TMdRZHiicyEkD43SG4LzWuhEVezZ8E2qhlL+msHnwPOgjMGbwBkjwYSBWfsh
-         3A1A==
-X-Gm-Message-State: AOAM530A05ERfQp8ZlBoh57MmKyy1l22OhnIslEnNrE5HZPK3g3cf0Ob
-        KdLJ5aRCix6iZyBAosrRNTCgquJrBSWvNZa1AGVrQjvCgUEzkWxLspiHMCj0bPjrILELKrZDwpU
-        BT8H73OUGIf6gRPbyFAitHlyW0/3q
-X-Received: by 2002:a1c:f616:: with SMTP id w22mr8057670wmc.44.1595591397782;
-        Fri, 24 Jul 2020 04:49:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxA9RMYWdAPaTFDYdlul0e8hCah4d4e5ddH+g/hUNmfx6ovHLama1NPhon8tgbN52ktZUIM6Q==
-X-Received: by 2002:a1c:f616:: with SMTP id w22mr8057655wmc.44.1595591397515;
-        Fri, 24 Jul 2020 04:49:57 -0700 (PDT)
-Received: from x1.localdomain ([2a0e:5700:4:11:334c:7e36:8d57:40cb])
-        by smtp.gmail.com with ESMTPSA id u10sm6595252wml.29.2020.07.24.04.49.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jul 2020 04:49:56 -0700 (PDT)
-Subject: Re: [PATCH 1/2] Bluetooth: hci_h5: Set HCI_UART_RESET_ON_INIT to
- correct flags
-To:     Nicolas Boichat <drinkcat@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <6c76582e-5e5d-0977-37b6-82bc84bd81c9@redhat.com>
-Date:   Fri, 24 Jul 2020 13:49:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Fri, 24 Jul 2020 08:20:54 -0400
+Received: from localhost (unknown [192.168.167.209])
+        by lucky1.263xmail.com (Postfix) with ESMTP id F2AC9C0907
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2020 20:20:44 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED: 0
+X-ANTISPAM-LEVEL: 2
+X-ABS-CHECKED: 0
+Received: from localhost.localdomain (unknown [113.57.152.160])
+        by smtp.263.net (postfix) whith ESMTP id P20417T140494254360320S1595593245635670_;
+        Fri, 24 Jul 2020 20:20:46 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <4363d5b6be41cca5a42b152a2cef72e2>
+X-RL-SENDER: chengbo@uniontech.com
+X-SENDER: chengbo@uniontech.com
+X-LOGIN-NAME: chengbo@uniontech.com
+X-FST-TO: linux-bluetooth@vger.kernel.org
+X-SENDER-IP: 113.57.152.160
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+From:   chengbo <515672508@qq.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] src: Event callback registration optimization
+Date:   Fri, 24 Jul 2020 20:20:45 +0800
+Message-Id: <20200724122045.17245-1-515672508@qq.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+After read info complete,too many event registration functions are
+not conducive to subsequent expansion.
+---
+ ...ent-callback-registration-optimizati.patch | 187 ++++++++++++++++++
+ src/adapter.c                                 | 143 ++++----------
+ 2 files changed, 229 insertions(+), 101 deletions(-)
+ create mode 100644 0001-src-adapter.c-Event-callback-registration-optimizati.patch
 
-On 7/21/20 4:37 AM, Nicolas Boichat wrote:
-> HCI_UART_RESET_ON_INIT belongs in hdev_flags, not flags.
-> 
-> Fixes: ce945552fde4a09 ("Bluetooth: hci_h5: Add support for serdev enumerated devices")
-> Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
+diff --git a/0001-src-adapter.c-Event-callback-registration-optimizati.patch b/0001-src-adapter.c-Event-callback-registration-optimizati.patch
+new file mode 100644
+index 000000000..d0f4804c6
+--- /dev/null
++++ b/0001-src-adapter.c-Event-callback-registration-optimizati.patch
+@@ -0,0 +1,187 @@
++From c2bf3d643c8f2eb7b97c0ede4396f879ba6febf8 Mon Sep 17 00:00:00 2001
++From: mac fanqiang <macfqiang@gmail.com>
++Date: Fri, 24 Jul 2020 17:42:37 +0800
++Subject: [PATCH] src/adapter.c : Event callback registration optimization    
++ After read info complete,too many event registration functions are not
++ conducive to subsequent expansion.     If we want to add a new event,
++ according to the previous logic, we must add an event registration function,
++ the code is too redundant.     Therefore, I added a global time callback
++ registration in this submission.     If you want to add event registration
++ later, you only need to add the new event and event callback function to the
++ global table.
++
++---
++ src/adapter.c | 143 +++++++++++++++-----------------------------------
++ 1 file changed, 42 insertions(+), 101 deletions(-)
++
++diff --git a/src/adapter.c b/src/adapter.c
++index 5e896a9f0..7afb4509d 100644
++--- a/src/adapter.c
+++++ b/src/adapter.c
++@@ -298,6 +298,11 @@ struct btd_adapter {
++ 	bool le_simult_roles_supported;
++ };
++ 
+++struct mgmt_callback{
+++		uint16_t event;
+++		mgmt_notify_func_t callback;
+++};
+++
++ typedef enum {
++ 	ADAPTER_AUTHORIZE_DISCONNECTED = 0,
++ 	ADAPTER_AUTHORIZE_CHECK_CONNECTED
++@@ -9163,6 +9168,41 @@ static void read_exp_features(struct btd_adapter *adapter)
++ 	btd_error(adapter->dev_id, "Failed to read exp features info");
++ }
++ 
+++static struct mgmt_callback g_mgmt_callback_table[] = {
+++	{MGMT_EV_NEW_SETTINGS, new_settings_callback},
+++	{MGMT_EV_CLASS_OF_DEV_CHANGED, dev_class_changed_callback},
+++	{MGMT_EV_LOCAL_NAME_CHANGED, local_name_changed_callback},
+++	{MGMT_EV_DISCOVERING, discovering_callback},
+++	{MGMT_EV_DEVICE_FOUND, device_found_callback},
+++	{MGMT_EV_DEVICE_DISCONNECTED, disconnected_callback},
+++	{MGMT_EV_DEVICE_CONNECTED, connected_callback},
+++	{MGMT_EV_CONNECT_FAILED, connect_failed_callback},
+++	{MGMT_EV_DEVICE_UNPAIRED, unpaired_callback},
+++	{MGMT_EV_AUTH_FAILED, auth_failed_callback},
+++	{MGMT_EV_NEW_LINK_KEY, new_link_key_callback},
+++	{MGMT_EV_NEW_LONG_TERM_KEY, new_long_term_key_callback},
+++	{MGMT_EV_NEW_CSRK, new_csrk_callback},
+++	{MGMT_EV_NEW_IRK, new_irk_callback},
+++	{MGMT_EV_NEW_CONN_PARAM, new_conn_param},
+++	{MGMT_EV_DEVICE_BLOCKED, device_blocked_callback},
+++	{MGMT_EV_DEVICE_UNBLOCKED, device_unblocked_callback},
+++	{MGMT_EV_PIN_CODE_REQUEST, pin_code_request_callback},
+++	{MGMT_EV_USER_CONFIRM_REQUEST, user_confirm_request_callback},
+++	{MGMT_EV_USER_PASSKEY_REQUEST, user_passkey_request_callback},
+++	{MGMT_EV_PASSKEY_NOTIFY, user_passkey_notify_callback}
+++};
+++
+++static void mgmt_event_register(struct btd_adapter *adapter)
+++{
+++	int len = sizeof(g_mgmt_callback_table)/sizeof(g_mgmt_callback_table[0]);
+++
+++	for (int i = 0; i < len; i++) {
+++		mgmt_register(adapter->mgmt, g_mgmt_callback_table[i].event, 
+++					adapter->dev_id, g_mgmt_callback_table[i].callback,
+++					adapter, NULL);
+++	}
+++}
+++
++ static void read_info_complete(uint8_t status, uint16_t length,
++ 					const void *param, void *user_data)
++ {
++@@ -9288,107 +9328,8 @@ static void read_info_complete(uint8_t status, uint16_t length,
++ 	 * controller info. From now on they can track updates and
++ 	 * notifications.
++ 	 */
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
++-					new_settings_callback, adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
++-						adapter->dev_id,
++-						dev_class_changed_callback,
++-						adapter, NULL);
++-	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
++-						adapter->dev_id,
++-						local_name_changed_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DISCOVERING,
++-						adapter->dev_id,
++-						discovering_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_FOUND,
++-						adapter->dev_id,
++-						device_found_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_DISCONNECTED,
++-						adapter->dev_id,
++-						disconnected_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED,
++-						adapter->dev_id,
++-						connected_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_CONNECT_FAILED,
++-						adapter->dev_id,
++-						connect_failed_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_UNPAIRED,
++-						adapter->dev_id,
++-						unpaired_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_AUTH_FAILED,
++-						adapter->dev_id,
++-						auth_failed_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_LINK_KEY,
++-						adapter->dev_id,
++-						new_link_key_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_LONG_TERM_KEY,
++-						adapter->dev_id,
++-						new_long_term_key_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_CSRK,
++-						adapter->dev_id,
++-						new_csrk_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_IRK,
++-						adapter->dev_id,
++-						new_irk_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_CONN_PARAM,
++-						adapter->dev_id,
++-						new_conn_param,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_BLOCKED,
++-						adapter->dev_id,
++-						device_blocked_callback,
++-						adapter, NULL);
++-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_UNBLOCKED,
++-						adapter->dev_id,
++-						device_unblocked_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_PIN_CODE_REQUEST,
++-						adapter->dev_id,
++-						pin_code_request_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_USER_CONFIRM_REQUEST,
++-						adapter->dev_id,
++-						user_confirm_request_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_USER_PASSKEY_REQUEST,
++-						adapter->dev_id,
++-						user_passkey_request_callback,
++-						adapter, NULL);
++-
++-	mgmt_register(adapter->mgmt, MGMT_EV_PASSKEY_NOTIFY,
++-						adapter->dev_id,
++-						user_passkey_notify_callback,
++-						adapter, NULL);
++-
+++	mgmt_event_register(adapter);
+++	
++ 	set_dev_class(adapter);
++ 
++ 	set_name(adapter, btd_adapter_get_name(adapter));
++-- 
++2.20.1
++
+diff --git a/src/adapter.c b/src/adapter.c
+index 5e896a9f0..7afb4509d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -298,6 +298,11 @@ struct btd_adapter {
+ 	bool le_simult_roles_supported;
+ };
+ 
++struct mgmt_callback{
++		uint16_t event;
++		mgmt_notify_func_t callback;
++};
++
+ typedef enum {
+ 	ADAPTER_AUTHORIZE_DISCONNECTED = 0,
+ 	ADAPTER_AUTHORIZE_CHECK_CONNECTED
+@@ -9163,6 +9168,41 @@ static void read_exp_features(struct btd_adapter *adapter)
+ 	btd_error(adapter->dev_id, "Failed to read exp features info");
+ }
+ 
++static struct mgmt_callback g_mgmt_callback_table[] = {
++	{MGMT_EV_NEW_SETTINGS, new_settings_callback},
++	{MGMT_EV_CLASS_OF_DEV_CHANGED, dev_class_changed_callback},
++	{MGMT_EV_LOCAL_NAME_CHANGED, local_name_changed_callback},
++	{MGMT_EV_DISCOVERING, discovering_callback},
++	{MGMT_EV_DEVICE_FOUND, device_found_callback},
++	{MGMT_EV_DEVICE_DISCONNECTED, disconnected_callback},
++	{MGMT_EV_DEVICE_CONNECTED, connected_callback},
++	{MGMT_EV_CONNECT_FAILED, connect_failed_callback},
++	{MGMT_EV_DEVICE_UNPAIRED, unpaired_callback},
++	{MGMT_EV_AUTH_FAILED, auth_failed_callback},
++	{MGMT_EV_NEW_LINK_KEY, new_link_key_callback},
++	{MGMT_EV_NEW_LONG_TERM_KEY, new_long_term_key_callback},
++	{MGMT_EV_NEW_CSRK, new_csrk_callback},
++	{MGMT_EV_NEW_IRK, new_irk_callback},
++	{MGMT_EV_NEW_CONN_PARAM, new_conn_param},
++	{MGMT_EV_DEVICE_BLOCKED, device_blocked_callback},
++	{MGMT_EV_DEVICE_UNBLOCKED, device_unblocked_callback},
++	{MGMT_EV_PIN_CODE_REQUEST, pin_code_request_callback},
++	{MGMT_EV_USER_CONFIRM_REQUEST, user_confirm_request_callback},
++	{MGMT_EV_USER_PASSKEY_REQUEST, user_passkey_request_callback},
++	{MGMT_EV_PASSKEY_NOTIFY, user_passkey_notify_callback}
++};
++
++static void mgmt_event_register(struct btd_adapter *adapter)
++{
++	int len = sizeof(g_mgmt_callback_table)/sizeof(g_mgmt_callback_table[0]);
++
++	for (int i = 0; i < len; i++) {
++		mgmt_register(adapter->mgmt, g_mgmt_callback_table[i].event, 
++					adapter->dev_id, g_mgmt_callback_table[i].callback,
++					adapter, NULL);
++	}
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -9288,107 +9328,8 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	 * controller info. From now on they can track updates and
+ 	 * notifications.
+ 	 */
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
+-					new_settings_callback, adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
+-						adapter->dev_id,
+-						dev_class_changed_callback,
+-						adapter, NULL);
+-	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
+-						adapter->dev_id,
+-						local_name_changed_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DISCOVERING,
+-						adapter->dev_id,
+-						discovering_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_FOUND,
+-						adapter->dev_id,
+-						device_found_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_DISCONNECTED,
+-						adapter->dev_id,
+-						disconnected_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED,
+-						adapter->dev_id,
+-						connected_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_CONNECT_FAILED,
+-						adapter->dev_id,
+-						connect_failed_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_UNPAIRED,
+-						adapter->dev_id,
+-						unpaired_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_AUTH_FAILED,
+-						adapter->dev_id,
+-						auth_failed_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_LINK_KEY,
+-						adapter->dev_id,
+-						new_link_key_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_LONG_TERM_KEY,
+-						adapter->dev_id,
+-						new_long_term_key_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_CSRK,
+-						adapter->dev_id,
+-						new_csrk_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_IRK,
+-						adapter->dev_id,
+-						new_irk_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_CONN_PARAM,
+-						adapter->dev_id,
+-						new_conn_param,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_BLOCKED,
+-						adapter->dev_id,
+-						device_blocked_callback,
+-						adapter, NULL);
+-	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_UNBLOCKED,
+-						adapter->dev_id,
+-						device_unblocked_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_PIN_CODE_REQUEST,
+-						adapter->dev_id,
+-						pin_code_request_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_USER_CONFIRM_REQUEST,
+-						adapter->dev_id,
+-						user_confirm_request_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_USER_PASSKEY_REQUEST,
+-						adapter->dev_id,
+-						user_passkey_request_callback,
+-						adapter, NULL);
+-
+-	mgmt_register(adapter->mgmt, MGMT_EV_PASSKEY_NOTIFY,
+-						adapter->dev_id,
+-						user_passkey_notify_callback,
+-						adapter, NULL);
+-
++	mgmt_event_register(adapter);
++	
+ 	set_dev_class(adapter);
+ 
+ 	set_name(adapter, btd_adapter_get_name(adapter));
+-- 
+2.20.1
 
-Patch looks good to me:
 
-Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-Regards,
-
-Hans
-
-
-
-
-> 
-> ---
-> 
->   drivers/bluetooth/hci_h5.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index e60b2e0773db110..e41854e0d79aae2 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -793,7 +793,7 @@ static int h5_serdev_probe(struct serdev_device *serdev)
->   	if (!h5)
->   		return -ENOMEM;
->   
-> -	set_bit(HCI_UART_RESET_ON_INIT, &h5->serdev_hu.flags);
-> +	set_bit(HCI_UART_RESET_ON_INIT, &h5->serdev_hu.hdev_flags);
->   
->   	h5->hu = &h5->serdev_hu;
->   	h5->serdev_hu.serdev = serdev;
-> 
 
