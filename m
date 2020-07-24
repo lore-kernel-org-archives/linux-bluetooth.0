@@ -2,109 +2,79 @@ Return-Path: <SRS0=QcUl=BD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E3FC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 12:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871CCC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 13:15:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53C4920737
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 12:25:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E68D2074B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jul 2020 13:15:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=heine.so header.i=@heine.so header.b="H+Nxlk98"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726485AbgGXMZO (ORCPT
+        id S1727775AbgGXNPA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Jul 2020 08:25:14 -0400
-Received: from lucky1.263xmail.com ([211.157.147.131]:39376 "EHLO
-        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726280AbgGXMZN (ORCPT
+        Fri, 24 Jul 2020 09:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35310 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727045AbgGXNO5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Jul 2020 08:25:13 -0400
-Received: from localhost (unknown [192.168.167.235])
-        by lucky1.263xmail.com (Postfix) with ESMTP id 7A3FDB01C6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2020 20:25:11 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [113.57.152.160])
-        by smtp.263.net (postfix) whith ESMTP id P30362T140065527297792S1595593511218582_;
-        Fri, 24 Jul 2020 20:25:11 +0800 (CST)
-X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <9caa455dffd2153fa76e1e41fd427b7c>
-X-RL-SENDER: luokai@uniontech.com
-X-SENDER: luokai@uniontech.com
-X-LOGIN-NAME: luokai@uniontech.com
-X-FST-TO: linux-bluetooth@vger.kernel.org
-X-SENDER-IP: 113.57.152.160
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From:   luokai <454728735@qq.com>
+        Fri, 24 Jul 2020 09:14:57 -0400
+X-Greylist: delayed 311 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 24 Jul 2020 06:14:57 PDT
+Received: from mail.heine.tech (mail.heine.tech [IPv6:2a01:4f8:1c0c:5073::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93809C0619D3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jul 2020 06:14:57 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B152518195B;
+        Fri, 24 Jul 2020 15:09:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heine.so; s=dkim;
+        t=1595596181; h=from:subject:date:message-id:to:cc:mime-version:
+         content-transfer-encoding; bh=oUDJqp4U9kelY2xZptaoZ5P+NEJJM4T0cxyXAqFjZ14=;
+        b=H+Nxlk98oJjxZZVHIF+mLH2gaSfLDB6KWx8jID58Y7X6Er2g6TY3Aisi9XWBABM2RSi0j/
+        1qJZiRnzZEYlEdj7cuLwB/uoxCbRBi+W4cn0LY8RT2B/L+2sIBu2dsenLsj75WmIAeZQ45
+        g6o9r8+m2Zm2q8qM7gruf+MiVDnEmVY=
+From:   Michael Nosthoff <committed@heine.so>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     luokai <luokai@uniontech.com>
-Subject: [PATCH BlueZ 1/1] src/agent.c : parse_io_capability Function optimization
-Date:   Fri, 24 Jul 2020 20:25:07 +0800
-Message-Id: <20200724122507.27671-1-454728735@qq.com>
-X-Mailer: git-send-email 2.20.1
+Cc:     Michael Nosthoff <committed@heine.so>
+Subject: [PATCH BlueZ] main: add missing comma after AlwaysPairable
+Date:   Fri, 24 Jul 2020 15:09:03 +0200
+Message-Id: <20200724130903.110903-1-committed@heine.so>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: luokai <luokai@uniontech.com>
+Commit 1880b2990866598 added a new key to supported_options but didn't
+add a comma. This leads to the following error message on startup if the
+key 'PairableTimeout' is present:
 
+Unknown key PairableTimeout for group General in /etc/bluetooth/main.conf
+
+This probably also leads to ignoring the setting.
+
+Fixes: 1880b2990866598 ("core: Add AlwaysPairable to main.conf")
 ---
- src/agent.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index e0ffcd22f..82baf608f 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -957,20 +957,24 @@ static void agent_destroy(gpointer data)
- 	agent_unref(agent);
- }
- 
-+static struct capability g_cap[]  = {
-+	{"", IO_CAPABILITY_KEYBOARDDISPLAY},
-+	{"DisplayOnly", IO_CAPABILITY_DISPLAYONLY},
-+	{"DisplayYesNo", IO_CAPABILITY_DISPLAYYESNO},
-+	{"KeyboardOnly", IO_CAPABILITY_KEYBOARDONLY},
-+	{"NoInputNoOutput", IO_CAPABILITY_NOINPUTNOOUTPUT},
-+	{"KeyboardDisplay", IO_CAPABILITY_KEYBOARDDISPLAY}
-+};
-+
- static uint8_t parse_io_capability(const char *capability)
- {
--	if (g_str_equal(capability, ""))
--		return IO_CAPABILITY_KEYBOARDDISPLAY;
--	if (g_str_equal(capability, "DisplayOnly"))
--		return IO_CAPABILITY_DISPLAYONLY;
--	if (g_str_equal(capability, "DisplayYesNo"))
--		return IO_CAPABILITY_DISPLAYYESNO;
--	if (g_str_equal(capability, "KeyboardOnly"))
--		return IO_CAPABILITY_KEYBOARDONLY;
--	if (g_str_equal(capability, "NoInputNoOutput"))
--		return IO_CAPABILITY_NOINPUTNOOUTPUT;
--	if (g_str_equal(capability, "KeyboardDisplay"))
--		return IO_CAPABILITY_KEYBOARDDISPLAY;
-+	size_t count = sizeof(g_cap) / sizeof(g_cap[0]); 
-+	for (size_t i = 0; i < count; i++)
-+	{
-+		if(g_str_equal(capability, g_cap[i].cap)) {
-+			return g_cap[i].parse_capability;
-+		}
-+	}
- 	return IO_CAPABILITY_INVALID;
- }
- 
+diff --git a/src/main.c b/src/main.c
+index ec7a9fbd7..2c083de67 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -79,7 +79,7 @@ static const char *supported_options[] = {
+ 	"Name",
+ 	"Class",
+ 	"DiscoverableTimeout",
+-	"AlwaysPairable"
++	"AlwaysPairable",
+ 	"PairableTimeout",
+ 	"DeviceID",
+ 	"ReverseServiceDiscovery",
 -- 
-2.20.1
-
-
+2.25.1
 
