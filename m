@@ -2,90 +2,86 @@ Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8262C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 13:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF62C433EA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 13:49:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61C652083B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 13:38:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595857096;
-	bh=UQu1gVo9L4rw5zqbtV+t10WaKXY4Uy+PnQiLyriZrwQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=SXwwZ2DyD4qL7d8hwmU/1TfQ+M+Kzcv2AaHHREBBadJH353RIyX1J56tp7D5tVJD2
-	 lr83snfMrIg1NisSSgRKS40xIAuQqvB1M0L8LgMjD4MU31QrzuoVl6yRjQQmsVVcF6
-	 Lx3FMNzAX+Rosgwn1/k/OSerMSi0GnBddgZSKMgc=
+	by mail.kernel.org (Postfix) with ESMTP id 4D4B42073E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 13:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727067AbgG0NiP (ORCPT
+        id S1729165AbgG0NtN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 09:38:15 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:42994 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726298AbgG0NiO (ORCPT
+        Mon, 27 Jul 2020 09:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729032AbgG0NtM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 09:38:14 -0400
-Received: by mail-ot1-f68.google.com with SMTP id v21so5038867otj.9;
-        Mon, 27 Jul 2020 06:38:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GDgvxbFtjoqaUGPEDtkInSIpJVJqkW3IcV+Wtsu5ITc=;
-        b=jhprwpJIoQNfyotKw7z1LMzWKpQo7AV2X/QKY3t2H76Hwhu7eN/1HnzYjb2qh0HDI4
-         CplFkvXn/D3yoviIItBgSxzuAmpst3iBWRHn6zp0WsOVFbvBnXCkpvt4oqP5Vb8LqFnl
-         NQSkw33fARMF841U/77bLsva5Yom0l/k01jZPZPyPQ/T11Cn5s05mYcuoB2faXzUDyPd
-         eIMLFblkpv2PWkmoMarPoJrGoj/Md1oAtrMCx5lxktzoG3wMItCwW4TkFQ7FKdk4wWPI
-         ijV0lWpKg/wzFSCWjj9DPla0Y5ypTH1dbwxubJUYASwrTNHFQbmAwePk9PmOeGvhZfok
-         lmAA==
-X-Gm-Message-State: AOAM5329GVgf1plMyji0Aph1G7BKFPeOmoxxUSeevX50toVbMWXTXEm5
-        Ms5rvLHWvDFB3XCPmzl4w8xXD6iqxbdsSIie1Ys=
-X-Google-Smtp-Source: ABdhPJy3txxI99b+fWzbhQVo+HWM4RYjrP2BIU1Ci2RDTj9GPs21eK4gnxtDjDTfKgLqwvw2gVDmbZ5VIuYYJXomKTc=
-X-Received: by 2002:a05:6830:1e5c:: with SMTP id e28mr2285084otj.118.1595857093698;
- Mon, 27 Jul 2020 06:38:13 -0700 (PDT)
+        Mon, 27 Jul 2020 09:49:12 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDD9C0619D2;
+        Mon, 27 Jul 2020 06:49:12 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k03UE-003g0B-15; Mon, 27 Jul 2020 13:48:14 +0000
+Date:   Mon, 27 Jul 2020 14:48:14 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'David Miller' <davem@davemloft.net>, "hch@lst.de" <hch@lst.de>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>,
+        "daniel@iogearbox.net" <daniel@iogearbox.net>,
+        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "bridge@lists.linux-foundation.org" 
+        <bridge@lists.linux-foundation.org>,
+        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-decnet-user@lists.sourceforge.net" 
+        <linux-decnet-user@lists.sourceforge.net>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "mptcp@lists.01.org" <mptcp@lists.01.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>
+Subject: Re: get rid of the address_space override in setsockopt v2
+Message-ID: <20200727134814.GD794331@ZenIV.linux.org.uk>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200724.154342.1433271593505001306.davem@davemloft.net>
+ <8ae792c27f144d4bb5cbea0c1cce4eed@AcuMS.aculab.com>
 MIME-Version: 1.0
-References: <20200707172845.4177903-1-abhishekpandit@chromium.org>
- <20200707102823.v5.1.I51f5a0be89595b73c4dc17e6cf4cc6f26dc7f2fc@changeid> <20200723183235.GA3445384@kroah.com>
-In-Reply-To: <20200723183235.GA3445384@kroah.com>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Mon, 27 Jul 2020 15:38:02 +0200
-Message-ID: <CAJZ5v0jXcfO3YiMgkc7u=qqZy+jyT=RGagF3yAFnAhiJfyfcuQ@mail.gmail.com>
-Subject: Re: [PATCH v5 1/1] power: Emit changed uevent on wakeup_sysfs_add/remove
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ae792c27f144d4bb5cbea0c1cce4eed@AcuMS.aculab.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 8:32 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Tue, Jul 07, 2020 at 10:28:44AM -0700, Abhishek Pandit-Subedi wrote:
-> > Udev rules that depend on the power/wakeup attribute don't get triggered
-> > correctly if device_set_wakeup_capable is called after the device is
-> > created. This can happen for several reasons (driver sets wakeup after
-> > device is created, wakeup is changed on parent device, etc) and it seems
-> > reasonable to emit a changed event when adding or removing attributes on
-> > the device.
-> >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->
-> Rafael, any objection to this?  Do you want me to take it through my
-> tree, or are you going to take it through yours?  Either is fine for me.
+On Mon, Jul 27, 2020 at 09:51:45AM +0000, David Laight wrote:
 
-It's already there in my tree with the R-by tag from you.
+> I'm sure there is code that processes options in chunks.
+> This probably means it is possible to put a chunk boundary
+> at the end of userspace and continue processing the very start
+> of kernel memory.
+> 
+> At best this faults on the kernel copy code and crashes the system.
 
-Cheers!
+Really?  Care to provide some details, or is it another of your "I can't
+be possibly arsed to check what I'm saying, but it stands for reason
+that..." specials?
