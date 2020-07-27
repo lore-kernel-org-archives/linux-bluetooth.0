@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3913DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F063C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:21:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10FF120729
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED39C208E4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:21:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDuyQSMK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJ0md3Km"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgG0XP5 (ORCPT
+        id S1726538AbgG0XVw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 19:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
+        Mon, 27 Jul 2020 19:21:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726313AbgG0XP5 (ORCPT
+        with ESMTP id S1726272AbgG0XVw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 19:15:57 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29531C061794
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:15:57 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id w17so13599763otl.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:15:57 -0700 (PDT)
+        Mon, 27 Jul 2020 19:21:52 -0400
+Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093DFC061794
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:21:52 -0700 (PDT)
+Received: by mail-oo1-xc43.google.com with SMTP id p26so3465623oos.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:21:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ECEwATKpjiwoPaJQLx1KlRnXodk6DB4h6BgLx+5ivDk=;
-        b=FDuyQSMKy83wjoyim0KV9XMuuPl+hg/lut29FbVqXzwcxXB83DfzCIkwHlgt+DoYag
-         rNx/10nYH6RXmWhMQUz/IKqGJ/ezqKUsPaHAa0lXG+7xyQ8VZp+n+xZ9h2L7hj7XVe2c
-         rH9sToVNXip0xOu0JNmgd2wS96ZyqCkoMVrgl8mLOeCzITHq4szxFJXPP8jnGp7GrQlT
-         wIDG53xsfxqZytIZjvtTnwcMUE0AFCGV7PmS4nPa4vuVDncEO6FJtHxKqb2oTEAotQ9N
-         HAdBBWQ7YggXqkkPzuGur99oLuwzBJDswwUak8h2Gz4W86H5UyWFDbGzyWLzN2ZtTlAr
-         MnVw==
+        bh=Czxsi1VLXDgZxl/6xdZpf6T03KJMWWKGdnz2cw9JQjA=;
+        b=DJ0md3KmCxQU0G1sQfXHC1CzY72SBjgLd6ggNhcocKbdQq33FtSFRBy/Sc8xrF8HTW
+         hi4hjm4AhxrW8cn4EJDN6u6x0grShYwGyFIkBEJaz3EGkwt1O7zrcELFqcAiu8DXIEr5
+         fVexlO04+IJJXaFr2dpaMaStzbWzOPkCZ8SdHcaAVjBIcMJ2WGwWCaWS1CHd1cjM4gRx
+         1tNKhobY6Z9kKePL4oBHJ7TPk2Q7GPaUjNRpvcg2JcPgf+cKvUi/80rffPVXSex3KNlw
+         f3jaLV+B/F8/SbbPKWmnWLYxIWDO3Zs7X5WUnIHGWxj3HXNyRTEkLFkIgYZKn/FbXoH9
+         njag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ECEwATKpjiwoPaJQLx1KlRnXodk6DB4h6BgLx+5ivDk=;
-        b=YyvRQeZTCQGlPtOaLQeV+kjyq7cYL111i1D3GmFSXlK0mljsl9YysPVMoVLeLOz3Ff
-         j38WrDwRoX2wSjfKXhpeJIfIiyJHkZhM0Pyjgug2awhBKn9vnYyK7Xl16ZDGYITaKIBN
-         xkvRTxXLXt/oWHoUhTRTDoaSfQ98oCzHqo7uKbiJ/EihFWuN/jc96wwkecFXhjNNkuEl
-         M5mBuwcqkrFwbKriw3fs9O0cyqYnVUkQWz4r/RL4LEavstWCqHJ7uChA1nD/7GFpPGoH
-         LXYhGGqzahEinzsVF+4E7FSeH+5xzyJ42nb1VJZaoyxnEgU1WOdy57fe4GSFB+51gU42
-         TO8w==
-X-Gm-Message-State: AOAM5307ZdxGeM8uBn6xiQaVFYSwtHhgKo33K1JSWt5AExj90xakaGFe
-        syJ8vUNlY9WbxJ9PZzL/YSJpaswgnYpW9dVm1qHfSqfE
-X-Google-Smtp-Source: ABdhPJxK8zKSnlollauZNCo6kafSUoY2Gh2k/1G0iO1oNMJ/ytYznEdKCcDGX9cQPK2ULOI2iXwmhjcCTENc3m8WeaI=
-X-Received: by 2002:a9d:5e18:: with SMTP id d24mr21585329oti.88.1595891756491;
- Mon, 27 Jul 2020 16:15:56 -0700 (PDT)
+        bh=Czxsi1VLXDgZxl/6xdZpf6T03KJMWWKGdnz2cw9JQjA=;
+        b=hxwb3vtuJ2S6yOZ8xlO5KLe4I2xEhqrX2fEgxcPN6xYZFpXLVcyP0ZZ0GpXSDLSrhB
+         nVzGo0+jaGmqwibSCk6ljmpC4PTZVvcL4edfluUYTKt07WAqYwHr85zCA9sRl+rbykus
+         CsLBVbBBODnYb00w7O8Cj3psawfIYtWnxBrC6vHv5IqJdditGH2vK4s6/ZWx9aAHc75N
+         4Pm65p3XdH3r5P8WaXAqdqEaRedOT+gi77ceZj2h2ea/JiaXojzrVNLl1OtS+hswpg1L
+         bjpWQzvB4oZk4eKYUnf0K6i38yzWAwBL4mzSPhryksXdZcqam86wUWi9nID4Efmy8azj
+         nVPQ==
+X-Gm-Message-State: AOAM5322ltu9Bsbtm3YSCRUzoDxQQbSkiOZdJmRsiSBmedzN+B7x4fU8
+        YYzFOIDkM7yLn1B/wwetHB7TAMWpB04W7V8084o=
+X-Google-Smtp-Source: ABdhPJzsmn8MPvl+4kEstmiHxkwTXAAQW8e/lSK2Yy5KFSHDAGmYoCtFTCIGJdWIH+LEBGpsr/QUbpqrsSyUDokAsuU=
+X-Received: by 2002:a4a:924b:: with SMTP id g11mr726214ooh.9.1595892111409;
+ Mon, 27 Jul 2020 16:21:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200724140305.111507-1-committed@heine.so>
-In-Reply-To: <20200724140305.111507-1-committed@heine.so>
+References: <20200724122507.27671-1-454728735@qq.com>
+In-Reply-To: <20200724122507.27671-1-454728735@qq.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 27 Jul 2020 16:15:46 -0700
-Message-ID: <CABBYNZL-gxf1TJr4Ckt9Zot4v5ZfKHXUS_tWEwndB==AUB24_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] main: add missing comma after AlwaysPairable
-To:     committed@heine.so
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 27 Jul 2020 16:21:40 -0700
+Message-ID: <CABBYNZ+7DuiuNZQ8AZnvSoGPQXD8pG0sVMqwy=xoGp2EWYQLPw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] src/agent.c : parse_io_capability Function optimization
+To:     luokai <454728735@qq.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        luokai <luokai@uniontech.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -72,38 +73,75 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Fri, Jul 24, 2020 at 7:08 AM Michael Nosthoff <committed@heine.so> wrote:
+On Fri, Jul 24, 2020 at 5:27 AM luokai <454728735@qq.com> wrote:
 >
-> Commit 1880b2990866 ("core: Add AlwaysPairable to main.conf") added a new
-> key to supported_options but didn't add a comma. This leads to the
-> following error message on startup if the key 'PairableTimeout' is pesent:
+> From: luokai <luokai@uniontech.com>
 >
-> Unknown key PairableTimeout for group General in /etc/bluetooth/main.conf
->
-> This probably also leads to ignoring the setting.
->
-> Fixes: 1880b2990866 ("core: Add AlwaysPairable to main.conf")
 > ---
->  src/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/agent.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
 >
-> diff --git a/src/main.c b/src/main.c
-> index ec7a9fbd7..2c083de67 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -79,7 +79,7 @@ static const char *supported_options[] = {
->         "Name",
->         "Class",
->         "DiscoverableTimeout",
-> -       "AlwaysPairable"
-> +       "AlwaysPairable",
->         "PairableTimeout",
->         "DeviceID",
->         "ReverseServiceDiscovery",
-> --
-> 2.25.1
+> diff --git a/src/agent.c b/src/agent.c
+> index e0ffcd22f..82baf608f 100644
+> --- a/src/agent.c
+> +++ b/src/agent.c
+> @@ -957,20 +957,24 @@ static void agent_destroy(gpointer data)
+>         agent_unref(agent);
+>  }
+>
+> +static struct capability g_cap[]  = {
+> +       {"", IO_CAPABILITY_KEYBOARDDISPLAY},
+> +       {"DisplayOnly", IO_CAPABILITY_DISPLAYONLY},
+> +       {"DisplayYesNo", IO_CAPABILITY_DISPLAYYESNO},
+> +       {"KeyboardOnly", IO_CAPABILITY_KEYBOARDONLY},
+> +       {"NoInputNoOutput", IO_CAPABILITY_NOINPUTNOOUTPUT},
+> +       {"KeyboardDisplay", IO_CAPABILITY_KEYBOARDDISPLAY}
 
-Applied, thanks.
+We usually spaces after { and before }.
+
+> +};
+> +
+>  static uint8_t parse_io_capability(const char *capability)
+>  {
+> -       if (g_str_equal(capability, ""))
+> -               return IO_CAPABILITY_KEYBOARDDISPLAY;
+> -       if (g_str_equal(capability, "DisplayOnly"))
+> -               return IO_CAPABILITY_DISPLAYONLY;
+> -       if (g_str_equal(capability, "DisplayYesNo"))
+> -               return IO_CAPABILITY_DISPLAYYESNO;
+> -       if (g_str_equal(capability, "KeyboardOnly"))
+> -               return IO_CAPABILITY_KEYBOARDONLY;
+> -       if (g_str_equal(capability, "NoInputNoOutput"))
+> -               return IO_CAPABILITY_NOINPUTNOOUTPUT;
+> -       if (g_str_equal(capability, "KeyboardDisplay"))
+> -               return IO_CAPABILITY_KEYBOARDDISPLAY;
+> +       size_t count = sizeof(g_cap) / sizeof(g_cap[0]);
+
+If I recall correctly we do have macros for ARRAY_SIZE, check
+src/shared/util.h, btw there also seems to be a problem with the
+formatting on the above line:
+
+Applying: src/agent.c : parse_io_capability Function optimization
+.git/rebase-apply/patch:36: trailing whitespace.
+size_t count = sizeof(g_cap) / sizeof(g_cap[0]);
+error: 1 line adds whitespace errors.
+
+
+> +       for (size_t i = 0; i < count; i++)
+> +       {
+> +               if(g_str_equal(capability, g_cap[i].cap)) {
+> +                       return g_cap[i].parse_capability;
+> +               }
+> +       }
+>         return IO_CAPABILITY_INVALID;
+>  }
+>
+> --
+> 2.20.1
+>
+>
+>
+
 
 -- 
 Luiz Augusto von Dentz
