@@ -2,327 +2,161 @@ Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C04C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 05:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C4EC433E8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83C5C207BB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 05:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8DB82075D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726124AbgG0FxE convert rfc822-to-8bit (ORCPT
+        id S1727886AbgG0Jvw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 01:53:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33148 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726006AbgG0FxD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 01:53:03 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Mon, 27 Jul 2020 05:53:00 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: markus@daeschler.name
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-hDkw9vLQ9c@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 27 Jul 2020 05:51:52 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:23867 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727840AbgG0Jvv (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 27 Jul 2020 05:51:51 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-157-rSG2T3OdNGGcdmdBioAAVQ-1; Mon, 27 Jul 2020 10:51:47 +0100
+X-MC-Unique: rSG2T3OdNGGcdmdBioAAVQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 27 Jul 2020 10:51:45 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 27 Jul 2020 10:51:45 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Miller' <davem@davemloft.net>, "hch@lst.de" <hch@lst.de>
+CC:     "kuba@kernel.org" <kuba@kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>,
+        "daniel@iogearbox.net" <daniel@iogearbox.net>,
+        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "bridge@lists.linux-foundation.org" 
+        <bridge@lists.linux-foundation.org>,
+        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-decnet-user@lists.sourceforge.net" 
+        <linux-decnet-user@lists.sourceforge.net>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "mptcp@lists.01.org" <mptcp@lists.01.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>
+Subject: RE: get rid of the address_space override in setsockopt v2
+Thread-Topic: get rid of the address_space override in setsockopt v2
+Thread-Index: AQHWYgvqDt5Xt3HFu0u82UKLVqcKxKkbLTEQ
+Date:   Mon, 27 Jul 2020 09:51:45 +0000
+Message-ID: <8ae792c27f144d4bb5cbea0c1cce4eed@AcuMS.aculab.com>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200724.154342.1433271593505001306.davem@davemloft.net>
+In-Reply-To: <20200724.154342.1433271593505001306.davem@davemloft.net>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+From: David Miller
+> Sent: 24 July 2020 23:44
+> 
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Thu, 23 Jul 2020 08:08:42 +0200
+> 
+> > setsockopt is the last place in architecture-independ code that still
+> > uses set_fs to force the uaccess routines to operate on kernel pointers.
+> >
+> > This series adds a new sockptr_t type that can contained either a kernel
+> > or user pointer, and which has accessors that do the right thing, and
+> > then uses it for setsockopt, starting by refactoring some low-level
+> > helpers and moving them over to it before finally doing the main
+> > setsockopt method.
+> >
+> > Note that apparently the eBPF selftests do not even cover this path, so
+> > the series has been tested with a testing patch that always copies the
+> > data first and passes a kernel pointer.  This is something that works for
+> > most common sockopts (and is something that the ePBF support relies on),
+> > but unfortunately in various corner cases we either don't use the passed
+> > in length, or in one case actually copy data back from setsockopt, or in
+> > case of bpfilter straight out do not work with kernel pointers at all.
+> >
+> > Against net-next/master.
+> >
+> > Changes since v1:
+> >  - check that users don't pass in kernel addresses
+> >  - more bpfilter cleanups
+> >  - cosmetic mptcp tweak
+> 
+> Series applied to net-next, I'm build testing and will push this out when
+> that is done.
 
-markus@daeschler.name changed:
+Hmmm... this code does:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |markus@daeschler.name
+int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+		int optlen)
+{
+	sockptr_t optval;
+	char *kernel_optval = NULL;
+	int err, fput_needed;
+	struct socket *sock;
 
---- Comment #115 from markus@daeschler.name ---
-Thanks for the patch! I tested with v3 in kernel 5.7.10-1-MANJARO. It works for
-me with following issues:
-- connecting worked not so well until I enabled USB port over sysfs completely
-with setting power/control to "on" (enable_autosuspend=0 seems not to be
-sufficient in my case)
-- dongle doesn't support more as one simultan connection. But I think this is a
-firmware problem and not a driver one
+	if (optlen < 0)
+		return -EINVAL;
+
+	err = init_user_sockptr(&optval, user_optval);
+	if (err)
+		return err;
+
+And the called code does:
+	if (copy_from_sockptr(&opt, optbuf, sizeof(opt)))
+		return -EFAULT;
 
 
-My lsusb output:
+Which means that only the base of the user's buffer is checked
+for being in userspace.
 
-Bus 004 Device 017: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
-(HCI mode)
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-  idProduct          0x0001 Bluetooth Dongle (HCI mode)
-  bcdDevice           88.91
-  iManufacturer           0
-  iProduct                2 USB1.1-A䀹嘔
-  iSerial                 0
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength       0x00b1
-    bNumInterfaces          2
-    bConfigurationValue     1
-    iConfiguration          0
-    bmAttributes         0xe0
-      Self Powered
-      Remote Wakeup
-    MaxPower              100mA
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        0
-      bAlternateSetting       0
-      bNumEndpoints           3
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x81  EP 1 IN
-        bmAttributes            3
-          Transfer Type            Interrupt
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0010  1x 16 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x02  EP 2 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x82  EP 2 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       1
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       2
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       3
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       4
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       5
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x003f  1x 63 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x003f  1x 63 bytes
-        bInterval               1
-can't get debug descriptor: Resource temporarily unavailable
-Device Status:     0x0000
-  (Bus Powered)
+I'm sure there is code that processes options in chunks.
+This probably means it is possible to put a chunk boundary
+at the end of userspace and continue processing the very start
+of kernel memory.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+At best this faults on the kernel copy code and crashes the system.
+
+Maybe there wasn't any code that actually incremented the user address.
+But it is hardly robust.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
