@@ -2,84 +2,108 @@ Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2FDC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 22:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3913DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:15:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59F9B20786
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 22:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10FF120729
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:15:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="Oru7qi/6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDuyQSMK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726455AbgG0Wrv (ORCPT
+        id S1726620AbgG0XP5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 18:47:51 -0400
-Received: from hoster906.com ([192.252.156.27]:57740 "EHLO hoster906.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726193AbgG0Wru (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 18:47:50 -0400
-X-Greylist: delayed 402 seconds by postgrey-1.27 at vger.kernel.org; Mon, 27 Jul 2020 18:47:50 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=to:from
-        :subject:message-id:date:mime-version:content-type
-        :content-transfer-encoding; s=dkim; bh=aIGtX9zi9W5zjNuLkOa3D3TfS
-        XfE3Ezgda+99Ph+dbA=; b=Oru7qi/6pyDtuCs8GkpFgKrW2v5viAKQGh+lstEEa
-        1Gm1FkhIx8av2EtdRuQr3OtVb3Ch8R90JEtqffx6NZYierdkYCOeqgYyOhveObq9
-        wJIKc7RH944zG0hoMw+cSOWTWULzmm7NxjF1sewAr+fj8QP6eZKP/wgWSd1IZp1Q
-        uY=
-Received: (qmail 13785 invoked by uid 503); 27 Jul 2020 22:41:08 -0000
-Received: from unknown (HELO ?192.168.254.79?) (pop-before-smtp@162.39.210.203)
-  by hoster906.com with ESMTPA; 27 Jul 2020 22:41:08 -0000
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From:   "Michael N. Moran" <mike@mnmoran.org>
-Subject: Mesh: Continuous Transaction Acknowledgment
-Message-ID: <20d1abee-8400-19a9-6f15-d3011a8a3d0a@mnmoran.org>
-Date:   Mon, 27 Jul 2020 18:41:02 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 27 Jul 2020 19:15:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726313AbgG0XP5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 27 Jul 2020 19:15:57 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29531C061794
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:15:57 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id w17so13599763otl.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:15:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ECEwATKpjiwoPaJQLx1KlRnXodk6DB4h6BgLx+5ivDk=;
+        b=FDuyQSMKy83wjoyim0KV9XMuuPl+hg/lut29FbVqXzwcxXB83DfzCIkwHlgt+DoYag
+         rNx/10nYH6RXmWhMQUz/IKqGJ/ezqKUsPaHAa0lXG+7xyQ8VZp+n+xZ9h2L7hj7XVe2c
+         rH9sToVNXip0xOu0JNmgd2wS96ZyqCkoMVrgl8mLOeCzITHq4szxFJXPP8jnGp7GrQlT
+         wIDG53xsfxqZytIZjvtTnwcMUE0AFCGV7PmS4nPa4vuVDncEO6FJtHxKqb2oTEAotQ9N
+         HAdBBWQ7YggXqkkPzuGur99oLuwzBJDswwUak8h2Gz4W86H5UyWFDbGzyWLzN2ZtTlAr
+         MnVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ECEwATKpjiwoPaJQLx1KlRnXodk6DB4h6BgLx+5ivDk=;
+        b=YyvRQeZTCQGlPtOaLQeV+kjyq7cYL111i1D3GmFSXlK0mljsl9YysPVMoVLeLOz3Ff
+         j38WrDwRoX2wSjfKXhpeJIfIiyJHkZhM0Pyjgug2awhBKn9vnYyK7Xl16ZDGYITaKIBN
+         xkvRTxXLXt/oWHoUhTRTDoaSfQ98oCzHqo7uKbiJ/EihFWuN/jc96wwkecFXhjNNkuEl
+         M5mBuwcqkrFwbKriw3fs9O0cyqYnVUkQWz4r/RL4LEavstWCqHJ7uChA1nD/7GFpPGoH
+         LXYhGGqzahEinzsVF+4E7FSeH+5xzyJ42nb1VJZaoyxnEgU1WOdy57fe4GSFB+51gU42
+         TO8w==
+X-Gm-Message-State: AOAM5307ZdxGeM8uBn6xiQaVFYSwtHhgKo33K1JSWt5AExj90xakaGFe
+        syJ8vUNlY9WbxJ9PZzL/YSJpaswgnYpW9dVm1qHfSqfE
+X-Google-Smtp-Source: ABdhPJxK8zKSnlollauZNCo6kafSUoY2Gh2k/1G0iO1oNMJ/ytYznEdKCcDGX9cQPK2ULOI2iXwmhjcCTENc3m8WeaI=
+X-Received: by 2002:a9d:5e18:: with SMTP id d24mr21585329oti.88.1595891756491;
+ Mon, 27 Jul 2020 16:15:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200724140305.111507-1-committed@heine.so>
+In-Reply-To: <20200724140305.111507-1-committed@heine.so>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 27 Jul 2020 16:15:46 -0700
+Message-ID: <CABBYNZL-gxf1TJr4Ckt9Zot4v5ZfKHXUS_tWEwndB==AUB24_A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] main: add missing comma after AlwaysPairable
+To:     committed@heine.so
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I'm using a clone of bluez master on a Fedora 32 system.
+Hi,
 
-I was using the Fedora 32 bluez-5.54 and bluez-mesh-5.54-1 
-packages, but there are some issues when using mesh-test 
-where opcodes are using the wrong byte-order that has been 
-fixed in master.
+On Fri, Jul 24, 2020 at 7:08 AM Michael Nosthoff <committed@heine.so> wrote:
+>
+> Commit 1880b2990866 ("core: Add AlwaysPairable to main.conf") added a new
+> key to supported_options but didn't add a comma. This leads to the
+> following error message on startup if the key 'PairableTimeout' is pesent:
+>
+> Unknown key PairableTimeout for group General in /etc/bluetooth/main.conf
+>
+> This probably also leads to ignoring the setting.
+>
+> Fixes: 1880b2990866 ("core: Add AlwaysPairable to main.conf")
+> ---
+>  src/main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/main.c b/src/main.c
+> index ec7a9fbd7..2c083de67 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -79,7 +79,7 @@ static const char *supported_options[] = {
+>         "Name",
+>         "Class",
+>         "DiscoverableTimeout",
+> -       "AlwaysPairable"
+> +       "AlwaysPairable",
+>         "PairableTimeout",
+>         "DeviceID",
+>         "ReverseServiceDiscovery",
+> --
+> 2.25.1
 
-Otherwise, mesh was working OK and I was able to provision 
-and configure my device using mesh-cfgclient.
-
-However, running the master branch code I am having a 
-problem where provisioning does not complete and in the end, 
-a Transaction Acknowledgment for my Random PDU is sent 
-endlessly. The bluetooth-meshd does not seem to be sending a 
-LE Set Advertise Enable to DISABLE advertising.
-
-I assume that bluetooth-meshd has a timer that that fires 
-that should disable the advertisement after some period of 
-time (150ms), but the code is a bit opaque to my eyes.
-
-I have a btmon trace the shows the problem if needed.
-
-Also, the btmon trace shows that there are two LE Set 
-Advertise Enable (DISABLE) HCI commands in a row just before 
-the LE Set Advertising Data is issued for the offending 
-Transaction Acknowledgment.
-
-Thoughts?
+Applied, thanks.
 
 -- 
-Michael N. Moran           (h) 770 704 9751
-218 Wilshire Terrace       (c) 678 521 5460
-White, GA, USA 30184       http://mnmoran.org
-
+Luiz Augusto von Dentz
