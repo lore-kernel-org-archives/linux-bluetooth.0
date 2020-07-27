@@ -2,116 +2,158 @@ Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C12C433E8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 18:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F717C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 21:22:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 093082073E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 18:23:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C56A20809
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 21:22:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pxd6lnhA"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fjyHM/wY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729941AbgG0SXI (ORCPT
+        id S1726719AbgG0VW5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 14:23:08 -0400
-Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:46683 "EHLO
-        wnew2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729205AbgG0SXH (ORCPT
+        Mon, 27 Jul 2020 17:22:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46488 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbgG0VW4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 14:23:07 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id D24DDE02;
-        Mon, 27 Jul 2020 14:23:04 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 27 Jul 2020 14:23:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=Afhna7
-        9fjG2N/ESpGlT1yod24pbovs9kG7jTtRp8uec=; b=pxd6lnhAQY6lq36Rw0t2Wr
-        FNTj7Aqv7utLvfCSPVSKK7zYkP/Oi6k9NUUf7rFRtAgNJ4ISpkANzMes5KPdO5xP
-        uQhBAs0exKeEZWKHlguK1wyxAhd7/2StnncNBaDA+r1X7J3jOA/5IUqtqukcS8Zy
-        6b1F7WsC7K7Gxls+h+LpTkFCZf/cBDkEzEii5uRHhbH0he4RqOm0VhtaaNhJ0ONh
-        sA1OegTDCQaheFhFJspfeBf1dkuokHpdFLa9JDtSfErlJ23gF/vUAREvveiVNSbI
-        s2U0p/YcHBpouuo2EToObgfipcm60uYWCoTDshKh/Ld62ZeuhBlR0923rp/WSgug
-        ==
-X-ME-Sender: <xms:hhsfXw256bt5Qvmk7qwJktXsYXMYpGtJEPiP9Uh0o4S3z4J60JG_Ug>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedriedtgdduvdeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedtffekkeefudffveegueejffejhfetgfeuuefgvedtieehudeuueekhfduheel
-    teenucfkphepjeelrddukedurddvrddujeelnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:hhsfX7GUtyQL-qzWlnNrDA6BRLNqA_sVqs6SkDPZ3OFYz2rLpuLPKA>
-    <xmx:hhsfX46tTRqe9_4re0uj3hKI21pc6E5kOG5GBQ_4I2GbhCEFmzhFVQ>
-    <xmx:hhsfX53ly2RhKyVXpSc-AP7Py8h3bUEfu3XyInk15A9EOdXPwhk-DQ>
-    <xmx:iBsfX7VuEFOpnGbNFKVSKt3rokiDITnfnJBSqLDGQ8efu7Vwr-9kkM4RTJM>
-Received: from localhost (bzq-79-181-2-179.red.bezeqint.net [79.181.2.179])
-        by mail.messagingengine.com (Postfix) with ESMTPA id BA5ED328005D;
-        Mon, 27 Jul 2020 14:23:01 -0400 (EDT)
-Date:   Mon, 27 Jul 2020 21:22:59 +0300
-From:   Ido Schimmel <idosch@idosch.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 19/26] net/ipv6: switch ipv6_flowlabel_opt to sockptr_t
-Message-ID: <20200727182259.GA1931870@shredder>
-References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-20-hch@lst.de>
- <20200727121505.GA1804864@shredder>
- <20200727130029.GA26393@lst.de>
- <20200727133331.GA1851348@shredder>
- <20200727161555.GA7817@lst.de>
+        Mon, 27 Jul 2020 17:22:56 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40EBAC0619D2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 14:22:55 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id u185so9805577pfu.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 14:22:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=utU3ypLjQOA4QshSQAJBKI2d0qo7ScTec5y8sMLYM0s=;
+        b=fjyHM/wYzqCrthuAjiCo7Q8zcYcjLGiRwhJ9AljY6LotLvI/TAxBVCdeEe8o82dTpu
+         tAQph9QJ9ehJ+T+sZ50ioIJNGYQLk/rmG7SS6tiJG87XqLQzDfo7o5TzX6VpcTPqW1E3
+         kU68mv5gn2cE+FeTMwF5kOkLrUOCCS0svLBeI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=utU3ypLjQOA4QshSQAJBKI2d0qo7ScTec5y8sMLYM0s=;
+        b=gfUej9JRJ8bAfxomcosUChbo10A6B6APtOlRDgXciYlpGAnaflvJc3lb+xAFgL7p96
+         qUUYoMWAPNscTC9KTOnP0AYPjj4xcERx6VXNjSULGvZB/Kpfryvw2SoUn0bkMbY/Ewv0
+         wtzJZUM/dWdCqsSiuXGqtBqsdCCbObw4ywvYqRXSHD8oGj0+kkzFA5+IcwIE/Rzj6Vyc
+         mO68bluXRMXMtPPXqgm2TUP+UOW8BgyEHnTRQy2ovPCyrp6fmxCi1ehNw90jmzV1sYZD
+         V9f2euTRw7OIjLS5mAVMT2h3Ec/KX6cIxsGRPJfACtpE4QKQHZ3EuXSJEUMofxHepZc9
+         LOBQ==
+X-Gm-Message-State: AOAM531aEBTPn2Hm+u8zkjKxf+ucvITDxubPE5spoUGYt60A2jehB5qD
+        RHrBXtW/4l7TR3J6zC+QaUfzmqBOPmo=
+X-Google-Smtp-Source: ABdhPJxWhcqwAmUemUB9Vs0QMZ9njkmN/7vQG5K6xg/Cea8uqkvrdRSDIdxbslAIlaOTnxtWhXg4Ow==
+X-Received: by 2002:a63:e442:: with SMTP id i2mr21886170pgk.105.1595884974482;
+        Mon, 27 Jul 2020 14:22:54 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id u14sm15601968pgf.51.2020.07.27.14.22.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2020 14:22:53 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH] Bluetooth: Fix suspend notifier race
+Date:   Mon, 27 Jul 2020 14:22:47 -0700
+Message-Id: <20200727142231.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
+X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200727161555.GA7817@lst.de>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 06:15:55PM +0200, Christoph Hellwig wrote:
-> I have to admit I didn't spot the difference between the good and the
-> bad output even after trying hard..
-> 
-> But can you try the patch below?
-> 
-> ---
-> From cce2d2e1b43ecee5f4af7cf116808b74b330080f Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Mon, 27 Jul 2020 17:42:27 +0200
-> Subject: net: remove sockptr_advance
-> 
-> sockptr_advance never properly worked.  Replace it with _offset variants
-> of copy_from_sockptr and copy_to_sockptr.
-> 
-> Fixes: ba423fdaa589 ("net: add a new sockptr_t type")
-> Reported-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> Reported-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Unregister from suspend notifications and cancel suspend preparations
+before running hci_dev_do_close. Otherwise, the suspend notifier may
+race with unregister and cause cmd_timeout even after hdev has been
+freed.
 
-Tested-by: Ido Schimmel <idosch@mellanox.com>
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
+Hi Marcel,
 
-Thanks!
+This fixes a race between hci_unregister_dev and the suspend notifier.
+Without these changes, we encountered the following kernel panic when
+a USB disconnect (with btusb) occurred on resume:
+
+[  832.578518] Bluetooth: hci_core.c:hci_cmd_timeout() hci0: command 0x0c05 tx timeout
+[  832.586200] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  832.586203] #PF: supervisor read access in kernel mode
+[  832.586205] #PF: error_code(0x0000) - not-present page
+[  832.586206] PGD 0 P4D 0
+[  832.586210] PM: suspend exit
+[  832.608870] Oops: 0000 [#1] PREEMPT SMP NOPTI
+[  832.613232] CPU: 3 PID: 10755 Comm: kworker/3:7 Not tainted 5.4.44-04894-g1e9dbb96a161 #1
+[  832.630036] Workqueue: events hci_cmd_timeout [bluetooth]
+[  832.630046] RIP: 0010:__queue_work+0xf0/0x374
+[  832.630051] RSP: 0018:ffff9b5285f1fdf8 EFLAGS: 00010046
+[  832.674033] RAX: ffff8a97681bac00 RBX: 0000000000000000 RCX: ffff8a976a000600
+[  832.681162] RDX: 0000000000000000 RSI: 0000000000000009 RDI: ffff8a976a000748
+[  832.688289] RBP: ffff9b5285f1fe38 R08: 0000000000000000 R09: ffff8a97681bac00
+[  832.695418] R10: 0000000000000002 R11: ffff8a976a0006d8 R12: ffff8a9745107600
+[  832.698045] usb 1-6: new full-speed USB device number 119 using xhci_hcd
+[  832.702547] R13: ffff8a9673658850 R14: 0000000000000040 R15: 000000000000001e
+[  832.702549] FS:  0000000000000000(0000) GS:ffff8a976af80000(0000) knlGS:0000000000000000
+[  832.702550] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  832.702550] CR2: 0000000000000000 CR3: 000000010415a000 CR4: 00000000003406e0
+[  832.702551] Call Trace:
+[  832.702558]  queue_work_on+0x3f/0x68
+[  832.702562]  process_one_work+0x1db/0x396
+[  832.747397]  worker_thread+0x216/0x375
+[  832.751147]  kthread+0x138/0x140
+[  832.754377]  ? pr_cont_work+0x58/0x58
+[  832.758037]  ? kthread_blkcg+0x2e/0x2e
+[  832.761787]  ret_from_fork+0x22/0x40
+[  832.846191] ---[ end trace fa93f466da517212 ]---
+
+The suspend notifier handler seemed to be scheduling commands even after
+it was cleaned up and this was resulting in a panic in cmd_timeout (when
+it tries to requeue the cmd_timer).
+
+This was tested on 5.4 kernel with a suspend+resume stress test for 500+
+iterations. I also confirmed that after a usb disconnect, the suspend
+notifier times out before the USB device is probed again (fixing the
+original race between the usb_disconnect + probe and the notifier).
+
+Thanks
+Abhishek
+
+
+ net/bluetooth/hci_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6509f785dd1481..97221d1fa883d1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3765,9 +3765,10 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
+-	hci_dev_do_close(hdev);
+-
+ 	unregister_pm_notifier(&hdev->suspend_notifier);
++	cancel_work_sync(&hdev->suspend_prepare);
++
++	hci_dev_do_close(hdev);
+ 
+ 	if (!test_bit(HCI_INIT, &hdev->flags) &&
+ 	    !hci_dev_test_flag(hdev, HCI_SETUP) &&
+-- 
+2.28.0.rc0.142.g3c755180ce-goog
+
