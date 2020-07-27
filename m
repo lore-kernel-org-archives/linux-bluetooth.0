@@ -2,158 +2,84 @@ Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F717C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 21:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2FDC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 22:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C56A20809
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 21:22:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59F9B20786
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 22:47:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fjyHM/wY"
+	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="Oru7qi/6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbgG0VW5 (ORCPT
+        id S1726455AbgG0Wrv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 17:22:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46488 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgG0VW4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 17:22:56 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40EBAC0619D2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 14:22:55 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id u185so9805577pfu.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 14:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=utU3ypLjQOA4QshSQAJBKI2d0qo7ScTec5y8sMLYM0s=;
-        b=fjyHM/wYzqCrthuAjiCo7Q8zcYcjLGiRwhJ9AljY6LotLvI/TAxBVCdeEe8o82dTpu
-         tAQph9QJ9ehJ+T+sZ50ioIJNGYQLk/rmG7SS6tiJG87XqLQzDfo7o5TzX6VpcTPqW1E3
-         kU68mv5gn2cE+FeTMwF5kOkLrUOCCS0svLBeI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=utU3ypLjQOA4QshSQAJBKI2d0qo7ScTec5y8sMLYM0s=;
-        b=gfUej9JRJ8bAfxomcosUChbo10A6B6APtOlRDgXciYlpGAnaflvJc3lb+xAFgL7p96
-         qUUYoMWAPNscTC9KTOnP0AYPjj4xcERx6VXNjSULGvZB/Kpfryvw2SoUn0bkMbY/Ewv0
-         wtzJZUM/dWdCqsSiuXGqtBqsdCCbObw4ywvYqRXSHD8oGj0+kkzFA5+IcwIE/Rzj6Vyc
-         mO68bluXRMXMtPPXqgm2TUP+UOW8BgyEHnTRQy2ovPCyrp6fmxCi1ehNw90jmzV1sYZD
-         V9f2euTRw7OIjLS5mAVMT2h3Ec/KX6cIxsGRPJfACtpE4QKQHZ3EuXSJEUMofxHepZc9
-         LOBQ==
-X-Gm-Message-State: AOAM531aEBTPn2Hm+u8zkjKxf+ucvITDxubPE5spoUGYt60A2jehB5qD
-        RHrBXtW/4l7TR3J6zC+QaUfzmqBOPmo=
-X-Google-Smtp-Source: ABdhPJxWhcqwAmUemUB9Vs0QMZ9njkmN/7vQG5K6xg/Cea8uqkvrdRSDIdxbslAIlaOTnxtWhXg4Ow==
-X-Received: by 2002:a63:e442:: with SMTP id i2mr21886170pgk.105.1595884974482;
-        Mon, 27 Jul 2020 14:22:54 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id u14sm15601968pgf.51.2020.07.27.14.22.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2020 14:22:53 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH] Bluetooth: Fix suspend notifier race
-Date:   Mon, 27 Jul 2020 14:22:47 -0700
-Message-Id: <20200727142231.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
+        Mon, 27 Jul 2020 18:47:51 -0400
+Received: from hoster906.com ([192.252.156.27]:57740 "EHLO hoster906.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726193AbgG0Wru (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 27 Jul 2020 18:47:50 -0400
+X-Greylist: delayed 402 seconds by postgrey-1.27 at vger.kernel.org; Mon, 27 Jul 2020 18:47:50 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=to:from
+        :subject:message-id:date:mime-version:content-type
+        :content-transfer-encoding; s=dkim; bh=aIGtX9zi9W5zjNuLkOa3D3TfS
+        XfE3Ezgda+99Ph+dbA=; b=Oru7qi/6pyDtuCs8GkpFgKrW2v5viAKQGh+lstEEa
+        1Gm1FkhIx8av2EtdRuQr3OtVb3Ch8R90JEtqffx6NZYierdkYCOeqgYyOhveObq9
+        wJIKc7RH944zG0hoMw+cSOWTWULzmm7NxjF1sewAr+fj8QP6eZKP/wgWSd1IZp1Q
+        uY=
+Received: (qmail 13785 invoked by uid 503); 27 Jul 2020 22:41:08 -0000
+Received: from unknown (HELO ?192.168.254.79?) (pop-before-smtp@162.39.210.203)
+  by hoster906.com with ESMTPA; 27 Jul 2020 22:41:08 -0000
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From:   "Michael N. Moran" <mike@mnmoran.org>
+Subject: Mesh: Continuous Transaction Acknowledgment
+Message-ID: <20d1abee-8400-19a9-6f15-d3011a8a3d0a@mnmoran.org>
+Date:   Mon, 27 Jul 2020 18:41:02 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Unregister from suspend notifications and cancel suspend preparations
-before running hci_dev_do_close. Otherwise, the suspend notifier may
-race with unregister and cause cmd_timeout even after hdev has been
-freed.
+I'm using a clone of bluez master on a Fedora 32 system.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
-Hi Marcel,
+I was using the Fedora 32 bluez-5.54 and bluez-mesh-5.54-1 
+packages, but there are some issues when using mesh-test 
+where opcodes are using the wrong byte-order that has been 
+fixed in master.
 
-This fixes a race between hci_unregister_dev and the suspend notifier.
-Without these changes, we encountered the following kernel panic when
-a USB disconnect (with btusb) occurred on resume:
+Otherwise, mesh was working OK and I was able to provision 
+and configure my device using mesh-cfgclient.
 
-[  832.578518] Bluetooth: hci_core.c:hci_cmd_timeout() hci0: command 0x0c05 tx timeout
-[  832.586200] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  832.586203] #PF: supervisor read access in kernel mode
-[  832.586205] #PF: error_code(0x0000) - not-present page
-[  832.586206] PGD 0 P4D 0
-[  832.586210] PM: suspend exit
-[  832.608870] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[  832.613232] CPU: 3 PID: 10755 Comm: kworker/3:7 Not tainted 5.4.44-04894-g1e9dbb96a161 #1
-[  832.630036] Workqueue: events hci_cmd_timeout [bluetooth]
-[  832.630046] RIP: 0010:__queue_work+0xf0/0x374
-[  832.630051] RSP: 0018:ffff9b5285f1fdf8 EFLAGS: 00010046
-[  832.674033] RAX: ffff8a97681bac00 RBX: 0000000000000000 RCX: ffff8a976a000600
-[  832.681162] RDX: 0000000000000000 RSI: 0000000000000009 RDI: ffff8a976a000748
-[  832.688289] RBP: ffff9b5285f1fe38 R08: 0000000000000000 R09: ffff8a97681bac00
-[  832.695418] R10: 0000000000000002 R11: ffff8a976a0006d8 R12: ffff8a9745107600
-[  832.698045] usb 1-6: new full-speed USB device number 119 using xhci_hcd
-[  832.702547] R13: ffff8a9673658850 R14: 0000000000000040 R15: 000000000000001e
-[  832.702549] FS:  0000000000000000(0000) GS:ffff8a976af80000(0000) knlGS:0000000000000000
-[  832.702550] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  832.702550] CR2: 0000000000000000 CR3: 000000010415a000 CR4: 00000000003406e0
-[  832.702551] Call Trace:
-[  832.702558]  queue_work_on+0x3f/0x68
-[  832.702562]  process_one_work+0x1db/0x396
-[  832.747397]  worker_thread+0x216/0x375
-[  832.751147]  kthread+0x138/0x140
-[  832.754377]  ? pr_cont_work+0x58/0x58
-[  832.758037]  ? kthread_blkcg+0x2e/0x2e
-[  832.761787]  ret_from_fork+0x22/0x40
-[  832.846191] ---[ end trace fa93f466da517212 ]---
+However, running the master branch code I am having a 
+problem where provisioning does not complete and in the end, 
+a Transaction Acknowledgment for my Random PDU is sent 
+endlessly. The bluetooth-meshd does not seem to be sending a 
+LE Set Advertise Enable to DISABLE advertising.
 
-The suspend notifier handler seemed to be scheduling commands even after
-it was cleaned up and this was resulting in a panic in cmd_timeout (when
-it tries to requeue the cmd_timer).
+I assume that bluetooth-meshd has a timer that that fires 
+that should disable the advertisement after some period of 
+time (150ms), but the code is a bit opaque to my eyes.
 
-This was tested on 5.4 kernel with a suspend+resume stress test for 500+
-iterations. I also confirmed that after a usb disconnect, the suspend
-notifier times out before the USB device is probed again (fixing the
-original race between the usb_disconnect + probe and the notifier).
+I have a btmon trace the shows the problem if needed.
 
-Thanks
-Abhishek
+Also, the btmon trace shows that there are two LE Set 
+Advertise Enable (DISABLE) HCI commands in a row just before 
+the LE Set Advertising Data is issued for the offending 
+Transaction Acknowledgment.
 
+Thoughts?
 
- net/bluetooth/hci_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6509f785dd1481..97221d1fa883d1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3765,9 +3765,10 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 
- 	cancel_work_sync(&hdev->power_on);
- 
--	hci_dev_do_close(hdev);
--
- 	unregister_pm_notifier(&hdev->suspend_notifier);
-+	cancel_work_sync(&hdev->suspend_prepare);
-+
-+	hci_dev_do_close(hdev);
- 
- 	if (!test_bit(HCI_INIT, &hdev->flags) &&
- 	    !hci_dev_test_flag(hdev, HCI_SETUP) &&
 -- 
-2.28.0.rc0.142.g3c755180ce-goog
+Michael N. Moran           (h) 770 704 9751
+218 Wilshire Terrace       (c) 678 521 5460
+White, GA, USA 30184       http://mnmoran.org
 
