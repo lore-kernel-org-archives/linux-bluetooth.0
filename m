@@ -4,107 +4,140 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB040C433E8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DEAC433E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:10:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90B7D2065E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B2CC20792
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgG1HGC convert rfc822-to-8bit (ORCPT
+        id S1727078AbgG1HKX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:06:02 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57429 "EHLO
+        Tue, 28 Jul 2020 03:10:23 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:45014 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726874AbgG1HGC (ORCPT
+        with ESMTP id S1726854AbgG1HKW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:06:02 -0400
+        Tue, 28 Jul 2020 03:10:22 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8AD33CECCC;
-        Tue, 28 Jul 2020 09:16:01 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id AD970CECCD;
+        Tue, 28 Jul 2020 09:20:22 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: Fix suspend notifier race
+Subject: Re: [PATCH v4] Bluetooth: btusb: Fix and detect most of the Chinese
+ Bluetooth controllers
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200727142231.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
-Date:   Tue, 28 Jul 2020 09:05:59 +0200
-Cc:     chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
+In-Reply-To: <0bba3f22-a232-3c07-1b05-73e6d38dab8a@gmail.com>
+Date:   Tue, 28 Jul 2020 09:10:20 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <534A8246-5B96-487F-A042-43F717A1CA24@holtmann.org>
-References: <20200727142231.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Message-Id: <BB91A6AF-35AD-4BFF-BD1A-49292C064A43@holtmann.org>
+References: <0bba3f22-a232-3c07-1b05-73e6d38dab8a@gmail.com>
+To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Ismael,
 
-> Unregister from suspend notifications and cancel suspend preparations
-> before running hci_dev_do_close. Otherwise, the suspend notifier may
-> race with unregister and cause cmd_timeout even after hdev has been
-> freed.
+> For some reason they tend to squat on the very first CSR/
+> Cambridge Silicon Radio VID/PID instead of paying fees.
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> This is an extremely common problem; the issue goes as back as 2013
+> and these devices are only getting more popular, even rebranded by
+> reputable vendors and sold by retailers everywhere.
+> 
+> So, at this point in time there are hundreds of modern dongles reusing
+> the ID of what originally was an early Bluetooth 1.1 controller.
+> 
+> Linux is the only place where they don't work due to spotty checks
+> in our detection code. It only covered a minimum subset.
+> 
+> So what's the big idea? Take advantage of the fact that all CSR
+> chips report the same internal version as both the LMP sub-version and
+> HCI revision number. It always matches, couple that with the manufacturer
+> code, that rarely lies, and we now have a good idea of who is who.
+> 
+> Additionally, by compiling a list of user-reported HCI/lsusb dumps, and
+> searching around for legit CSR dongles in similar product ranges we can
+> find what CSR BlueCore firmware supported which Bluetooth versions.
+> 
+> That way we can narrow down ranges of fakes for each of them.
+> 
+> e.g. Real CSR dongles with LMP subversion 0x73 are old enough that
+>     support BT 1.1 only; so it's a dead giveaway when some
+>     third-party BT 4.0 dongle reuses it.
+> 
+> So, to sum things up; there are multiple classes of fake controllers
+> reusing the same 0A12:0001 VID/PID. This has been broken for a while.
+> 
+> Known 'fake' bcdDevices: 0x0100, 0x0134, 0x1915, 0x2520, 0x7558, 0x8891
+>  IC markings on 0x7558: FR3191AHAL 749H15143 (???)
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=60824
+> 
+> Fixes: 81cac64ba258ae (Deal with USB devices that are faking CSR vendor)
+> Reported-by: Michał Wiśniewski <brylozketrzyn@gmail.com>
+> Tested-by: Mike Johnson <yuyuyak@gmail.com>
+> Tested-by: Ricardo Rodrigues <ekatonb@gmail.com>
+> Tested-by: M.Hanny Sabbagh <mhsabbagh@outlook.com>
+> Tested-by: Oussama BEN BRAHIM <b.brahim.oussama@gmail.com>
+> Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 > ---
-> Hi Marcel,
 > 
-> This fixes a race between hci_unregister_dev and the suspend notifier.
-> Without these changes, we encountered the following kernel panic when
-> a USB disconnect (with btusb) occurred on resume:
+> Changes in v4:
+> * Chain the is_fake conditions with else ifs.
+> * Properly use le16_to_cpu() when needed.
 > 
-> [  832.578518] Bluetooth: hci_core.c:hci_cmd_timeout() hci0: command 0x0c05 tx timeout
-> [  832.586200] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [  832.586203] #PF: supervisor read access in kernel mode
-> [  832.586205] #PF: error_code(0x0000) - not-present page
-> [  832.586206] PGD 0 P4D 0
-> [  832.586210] PM: suspend exit
-> [  832.608870] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [  832.613232] CPU: 3 PID: 10755 Comm: kworker/3:7 Not tainted 5.4.44-04894-g1e9dbb96a161 #1
-> [  832.630036] Workqueue: events hci_cmd_timeout [bluetooth]
-> [  832.630046] RIP: 0010:__queue_work+0xf0/0x374
-> [  832.630051] RSP: 0018:ffff9b5285f1fdf8 EFLAGS: 00010046
-> [  832.674033] RAX: ffff8a97681bac00 RBX: 0000000000000000 RCX: ffff8a976a000600
-> [  832.681162] RDX: 0000000000000000 RSI: 0000000000000009 RDI: ffff8a976a000748
-> [  832.688289] RBP: ffff9b5285f1fe38 R08: 0000000000000000 R09: ffff8a97681bac00
-> [  832.695418] R10: 0000000000000002 R11: ffff8a976a0006d8 R12: ffff8a9745107600
-> [  832.698045] usb 1-6: new full-speed USB device number 119 using xhci_hcd
-> [  832.702547] R13: ffff8a9673658850 R14: 0000000000000040 R15: 000000000000001e
-> [  832.702549] FS:  0000000000000000(0000) GS:ffff8a976af80000(0000) knlGS:0000000000000000
-> [  832.702550] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  832.702550] CR2: 0000000000000000 CR3: 000000010415a000 CR4: 00000000003406e0
-> [  832.702551] Call Trace:
-> [  832.702558]  queue_work_on+0x3f/0x68
-> [  832.702562]  process_one_work+0x1db/0x396
-> [  832.747397]  worker_thread+0x216/0x375
-> [  832.751147]  kthread+0x138/0x140
-> [  832.754377]  ? pr_cont_work+0x58/0x58
-> [  832.758037]  ? kthread_blkcg+0x2e/0x2e
-> [  832.761787]  ret_from_fork+0x22/0x40
-> [  832.846191] ---[ end trace fa93f466da517212 ]---
+> Changes in v3:
+> * Find an even better-er way of detecting which type is which; use the
+>  best parts of v1 and v2 and combine them with previous feedback.
+> * Additionally, detect fakes by comparing against real BlueCore
+>  firmware numbers and their supported protocol versions.
+> * Introduce HCI_QUIRK_BROKEN_ERR_DATA_REPORTING and use it on all
+>  fake chips. It doesn't seem to cause any drawback, and if we
+>  make it too specific a lot of these chips won't work at all,
+>  so it's probably better than nothing. Other user reported
+>  being able to finally pair with their stereo A2DP speaker
+>  with this fix.
+> * Limit the use of btusb_setup_csr() only to cover 0A12:0001.
+> * Use bt_dev_warn for the fake detection notice.
+> * Remove all other noisy bt_dev_info() calls.
 > 
-> The suspend notifier handler seemed to be scheduling commands even after
-> it was cleaned up and this was resulting in a panic in cmd_timeout (when
-> it tries to requeue the cmd_timer).
+> Changes in v2:
+> * Find a better way of detecting which type is which; scrap the wonky
+>> =Bluetooth 1.2 protocol check and instead do what's described above.
+> * Move all the quirk logic to btusb_setup_csr(), simplify it a bit.
+> * Use a switch statement and list all the known broken bcdDevice
+>  instead of trying to penalize the real CSR devices.
+> * Add two bt_dev_info() prints because this may be important in the
+>  future, given the amount of variables we are playing with here.
+> * Try to keep my comments within a 80-column limit.
 > 
-> This was tested on 5.4 kernel with a suspend+resume stress test for 500+
-> iterations. I also confirmed that after a usb disconnect, the suspend
-> notifier times out before the USB device is probed again (fixing the
-> original race between the usb_disconnect + probe and the notifier).
+> Now I'm able to pair with Android devices, A2DP headphones,
+> DS4 controllers and more; whereas previously set up failed
+> and userland software couldn't even scan with it.
+> 
+> This patch probably uncovers other quirks in some of these
+> previously *unusable* dongles, so it's probably a good start
+> point so that other fixes can be implemented on top.
+> 
+> Looking forward to fine-tune these checks in the future.
+> Let me know what you think.
+> 
+> drivers/bluetooth/btusb.c         | 74 ++++++++++++++++++++++++++-----
+> include/net/bluetooth/bluetooth.h |  2 +
+> include/net/bluetooth/hci.h       | 11 +++++
+> net/bluetooth/hci_core.c          |  6 ++-
+> 4 files changed, 81 insertions(+), 12 deletions(-)
 
-Can you please structure the commit message so that the oops is included. It is valuable information Everything after --- is a personal note to the maintainer. And we might want to include a Fixes tag as well.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
