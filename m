@@ -2,161 +2,143 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F57C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 13:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89324C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 13:38:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21A13207E8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 13:19:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WHKpKu2y"
+	by mail.kernel.org (Postfix) with ESMTP id 6D97920663
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 13:38:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729989AbgG1NTG (ORCPT
+        id S1730025AbgG1Nh6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 09:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53024 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729688AbgG1NTF (ORCPT
+        Tue, 28 Jul 2020 09:37:58 -0400
+Received: from mxout03.lancloud.ru ([89.108.73.187]:43812 "EHLO
+        mxout03.lancloud.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729986AbgG1Nhz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 09:19:05 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114AEC061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 06:19:05 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id q7so21099885ljm.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 06:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rHyjrA+5bTHGOMjecP6wQzfdSf8jJn8fGl2/bDi+ny4=;
-        b=WHKpKu2yFN3kOV1u5Da9POVyeeIw0r/VFUYpd7Xp79gqtuHCS4R8F5ZndJEEHgaG9l
-         Vbbwc7UkU67GHo/AGc40v0xDg7uMKo16Zm9INxR1JZZdZ18U4QHAvqs5p5rFatJiF/b4
-         SZAWvLp8uzQPMa6PRmJaqR+jOcmytjGeo8HCSACQlxYv2ODQXkQ5vWbHJ4cv7w5js9L4
-         2E5D+QyI7ZxrPzkyVOBkyWZUTYdl+n0QXsWbEO1VnM/5sCEx1K/9omNY4z79hbmtENh3
-         QPl4Du2PyDIk4VFkKisq43nQKzhH2JWoWNaVfnzX4fWJWpdPhiPqL+1O32l8GIj6waU0
-         cQXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rHyjrA+5bTHGOMjecP6wQzfdSf8jJn8fGl2/bDi+ny4=;
-        b=OpKmql7e0GokiRm2aPHGw+QjJd6JnY05Q1O18rkBZVvnS+vE3XotOkwKvQHvs+1KHk
-         eZ8w4krIb+ZewMJ80/mzEcDy70hJ0doVHoQqH5rvggw1xBmXMy5GMP4JnlyEkC6cOIRq
-         7aDk77YB6Wl1Uwu5jdiTeq+oYTD68ixI1lD2n/5SRsgQKP10umGk6LYLTv12jZrdQCYp
-         uU0bNspzCCCceWnrMawUkOuItnEIIo8nv7fQ4XUfuvxxadj5Yb7/ek015eGqo0GcqNST
-         QY0W0DMDjH3cwsCKo6UEUAj7wdI+mdCHGL9mKjQtP9dSGFcLjk0eQcv/aLMJ2iXCEh93
-         IKlw==
-X-Gm-Message-State: AOAM531FiYrqQiViengZ3k/sqibmxakgLTJYbh61PC2nFaFQB9sWBvwj
-        aKro0BqIGNkUVjqXtSBmg7rBjeikG84+OZ/CN+HjwA==
-X-Google-Smtp-Source: ABdhPJxi0k7kH39QUMobzIvOkUJDJ5bKx1N7wCtfX2/pIt3G1drs62J1umYbZfi51HEJvmI4HE2GGG4hjFr7Kb9l+Nk=
-X-Received: by 2002:a2e:80cc:: with SMTP id r12mr13833054ljg.344.1595942343232;
- Tue, 28 Jul 2020 06:19:03 -0700 (PDT)
+        Tue, 28 Jul 2020 09:37:55 -0400
+X-Greylist: delayed 594 seconds by postgrey-1.27 at vger.kernel.org; Tue, 28 Jul 2020 09:37:51 EDT
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru E6499214C034
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+From:   Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Sergey Shtylyov <s.shtylyov@omprussia.ru>
+CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC] bluetooth: add support for some old headsets
+Thread-Topic: [PATCH RFC] bluetooth: add support for some old headsets
+Thread-Index: AQHWXG4sjdOYdGBw+0mZjynHmJYWq6kSNhiAgAo864CAAGeiAA==
+Date:   Tue, 28 Jul 2020 13:27:54 +0000
+Message-ID: <d9ebfb9e-5abb-0898-b5e1-0ff55a07d79d@omprussia.ru>
+References: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
+ <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
+ <e9f32310-2728-60a2-adc7-3a7418ce54e3@omprussia.ru>
+ <848144D3-85F9-47F8-8CDA-02457FA7530F@holtmann.org>
+ <0c2a8da1-6071-6597-d0d1-32ce1490aba7@omprussia.ru>
+ <6f271bf7-04ee-c971-9c69-de3f696769ed@omprussia.ru>
+ <97E2381A-219D-46AF-962F-CBCD63B911AD@holtmann.org>
+In-Reply-To: <97E2381A-219D-46AF-962F-CBCD63B911AD@holtmann.org>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [192.168.11.147]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3B3EF73FAE4B34449100261C10242FD5@lancloud.ru>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200717020332.Bluez.v3.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
-In-Reply-To: <20200717020332.Bluez.v3.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 28 Jul 2020 09:18:52 -0400
-Message-ID: <CALWDO_UsrzyLFkmxcnE59zaZPjP8ByN3sSOLDse6LwwpTA=ZsQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 1/2] device: add device_remove_bonding function
-To:     Archie Pusaka <apusaka@google.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Friendly ping to maintainers on this one.
-
-Thanks,
-Alain
-
-On Thu, Jul 16, 2020 at 2:04 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> This patch splits the "bonding removal" function in device.c,
-> because we need to remove bonding information when receiving
-> "virtual cable unplug" in HID profile.
->
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> ---
->
-> Changes in v3:
-> - Call device_set_temporary on device_remove_bonding
->
-> Changes in v2: None
->
->  src/device.c | 28 ++++++++++++++++++----------
->  src/device.h |  1 +
->  2 files changed, 19 insertions(+), 10 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 226216235..b23ecb7fd 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4356,6 +4356,20 @@ static void delete_folder_tree(const char *dirname)
->         rmdir(dirname);
->  }
->
-> +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type)
-> +{
-> +       if (bdaddr_type == BDADDR_BREDR)
-> +               device->bredr_state.bonded = false;
-> +       else
-> +               device->le_state.bonded = false;
-> +
-> +       if (!device->bredr_state.bonded && !device->le_state.bonded)
-> +               btd_device_set_temporary(device, true);
-> +
-> +       btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> +                                                       bdaddr_type);
-> +}
-> +
->  static void device_remove_stored(struct btd_device *device)
->  {
->         char device_addr[18];
-> @@ -4364,17 +4378,11 @@ static void device_remove_stored(struct btd_device *device)
->         char *data;
->         gsize length = 0;
->
-> -       if (device->bredr_state.bonded) {
-> -               device->bredr_state.bonded = false;
-> -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> -                                                               BDADDR_BREDR);
-> -       }
-> +       if (device->bredr_state.bonded)
-> +               device_remove_bonding(device, BDADDR_BREDR);
->
-> -       if (device->le_state.bonded) {
-> -               device->le_state.bonded = false;
-> -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> -                                                       device->bdaddr_type);
-> -       }
-> +       if (device->le_state.bonded)
-> +               device_remove_bonding(device, device->bdaddr_type);
->
->         device->bredr_state.paired = false;
->         device->le_state.paired = false;
-> diff --git a/src/device.h b/src/device.h
-> index cb8d884e8..956fec1ae 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -50,6 +50,7 @@ uint16_t btd_device_get_vendor(struct btd_device *device);
->  uint16_t btd_device_get_vendor_src(struct btd_device *device);
->  uint16_t btd_device_get_product(struct btd_device *device);
->  uint16_t btd_device_get_version(struct btd_device *device);
-> +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type);
->  void device_remove(struct btd_device *device, gboolean remove_stored);
->  int device_address_cmp(gconstpointer a, gconstpointer b);
->  int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
-> --
-> 2.27.0.389.gc38d7665816-goog
->
+SGVsbG8gZXZlcnlvbmUsDQoNCkxldCBtZSBhZGQgYSBsaXR0bGUgYml0IG1vcmUgZGV0YWlscyBy
+ZWxhdGVkIHRvIHRoaXMgcGF0Y2guDQoNCkFjY29yZGluZyB0byBCbHVldG9vdGggQ29yZSBTcGVj
+aWZpY2F0aW9uIFZvbCAyIHBhcnQgRiBwYWdlIDc3NiBhbmTCoCBCbHVldG9vdGggQ29yZSBTcGVj
+aWZpY2F0aW9uIFZvbDQgUGFydCBFIHBhZ2UgMTk3OCBhZnRlciBgSENJX1NldHVwX1N5bmNocm9u
+b3VzX0Nvbm5lY3Rpb24oKWAgd2FzIHNlbnQgYEhDSV9Db21tYW5kX1N0YXR1cygpYCBtdXN0IGJl
+IHJlY2VpdmVkIGZyb20gQkRSL0VEUiBjb250cm9sbGVyLg0KDQpBY2NvcmRpbmcgdG8gQmx1ZXRv
+b3RoIENvcmUgU3BlY2lmaWNhdGlvbiBWb2wgMiBwYXJ0IEYgcGFnZSAzNjQgSENJX0NvbW1hbmRf
+U3RhdHVzIGRlc2NyaXB0aW9uOg0KDQoiU29tZSBIQ0kgY29tbWFuZHMgbWF5IGdlbmVyYXRlIGVy
+cm9ycyB0aGF0IG5lZWQgdG8gYmUgcmVwb3J0ZWQgdG8gdGhlIEhvc3QsIGJ1dCB0aGVyZSBpcyBp
+bnN1ZmZpY2llbnQgaW5mb3JtYXRpb24gdG8gZGV0ZXJtaW5lIGhvdyB0aGUgY29tbWFuZCB3b3Vs
+ZCBub3JtYWxseSBiZSBwcm9jZXNzZWQuIEluIHRoaXMgY2FzZSwgdHdvIGV2ZW50cyBjYW4gYmUg
+dXNlZCB0byBpbmRpY2F0ZSB0aGlzIHRvIHRoZSBIb3N0LCB0aGUgSENJX0NvbW1hbmRfQ29tcGxl
+dGUgZXZlbnQgYW5kIEhDSV9Db21tYW5kX1N0YXR1cyBldmVudHMuIFdoaWNoIG9mIHRoZSB0d28g
+ZXZlbnRzIGlzIHVzZWQgaXMgaW1wbGVtZW50YXRpb24tZGVwZW5kZW50LiINCg0KTWVkaWF0ZWsn
+cyBpbXBsZW1lbnRhdGlvbiByZXBvcnRzIGVycm9yIGBVbnN1cHBvcnRlZCBMTVAgZmVhdHVyZWAg
+aW4gYEhDSV9Db21tYW5kX1N0YXR1cygpYCBldmVudCAobm90IGluIGBIQ0lfQ29tbWFuZF9Db21w
+bGV0ZSgpYCBldmVudCBhcyBpbiBvdGhlciBpbXBsZW1lbnRhdGlvbnMpLg0KU28gdGhhdCBiZWhh
+dmlvciBpcyBhIGxpdHRsZSBiaXQgb2RkIGJ1dCBkb24ndCBicmVhayBjb21wYXRpYmlsaXR5IHdp
+dGggQmx1ZXRvb3RoIENvcmUgU3BlY2lmaWNhdGlvbi4gQWN0dWFsbHkgTWVkaWF0ZWsncyBCRFIv
+RURSIGNvbnRyb2xsZXIgcmVwb3J0cyBlcnJvciB3aXRob3V0IHRyeWluZyB0byBhY3R1YWxseSBz
+ZXR1cCBjb25uZWN0aW9uIHdpdGggaGVhZHNldC4NCg0KQnV0IGFjY29yZGluZyB0byBIYW5kcy1G
+cmVlIHByb2ZpbGUgc3BlY2lmaWNhdGlvbiAxLjggcC4gMTEzIFN5bmNocm9ub3VzIENvbm5lY3Rp
+b24gSW50ZXJvcGVyYWJpbGl0eSBSZXF1aXJlbWVudHMgQmx1ZXRvb3RoIEhvc3QgTVVTVCB0cnkg
+YWxsIGZlYXR1cmVzIFQxLT5UMi0+UzEtPlMyLT5EMCBvciBEMSBiZWZvcmUgY29uc2lkZXJpbmcg
+Y29ubmVjdGlvbiBhcyBgZmFpbGVkYC4gQW5kIGl0IGlzIHRydWUgaWYgZXJyb3IgaXMgcmVwb3J0
+ZWQgaW4gYEhDSV9Db21tYW5kX0NvbXBsZXRlKClgIGV2ZW50Lg0KRXZlbnR1YWxseSBJZiBlcnJv
+ciBpcyByZXBvcnRlZCBpbiBgSENJX0NvbW1hbmRfU3RhdHVzKClgIGV2ZW50IGNvbm5lY3Rpb24g
+Y29uc2lkZXJlZCBhcyAnZmFpbGVkJyBqdXN0IGFmdGVyIGZpcnN0IGVycm9yIHdoaWNoIGJyZWFr
+cyBjb21wYXRpYmlsaXR5IHdpdGggSEZQIHByb2ZpbGUgc3BlY2lmaWNhdGlvbiB2MS44IGluIExp
+bnV4IEtlcm5lbC4gVGhhdCBsZWFkcyB0byBwcm9ibGVtcyB3aGVuIFNDby9lU0NPIGNvbm5lY3Rp
+b24gY291bGQgbm90IGJlIGVzdGFibGlzaGVkIHdoZW4gdXNpbmcgTWVkaWF0ZWsncyBCRFIvRURS
+IGNvbnRyb2xsZXJzLg0KDQpTbyB0aGF0IHBhdGNoIHNob3VsZCBhZGQgc3VwcG9ydCBmb3IgY29y
+cmVjdCBTQ08vZVNDTyBjb25uZWN0aW9uIGJlaGF2aW9yIHdoZW4gd29yayB3aXRoIGF0IGxlYXN0
+IE1lZGlhdGVrIGNvbnRyb2xsZXJzLiAoYSBsaXR0bGUgYml0IHBlY3VsaWFyIGJlaGF2aW9yIGJ1
+dCBjb21wYXRpYmxlIHdpdGggQmx1ZXRvb3RoIENvcmUgc3BlYykuDQoNCklmIGFueSBvYmplY3Rp
+b25zIG9yIHF1ZXN0aW9ucyBwbGVhc2UgZmlsbCBmcmVlIHRvIGNvbnRhY3QgbWUgb3IgU2VyZ2V5
+IGFueXRpbWUuDQo+IEhpIFNlcmdleSwNCj4NCj4+Pj4+Pj4gVGhlIE1lZGlhVGVrIEJsdWV0b290
+aCBwbGF0Zm9ybSAoTVQ2NjMwIGV0Yy4pIGhhcyBhIHBlY3VsaWFyIGltcGxlbWVudGF0aW9uDQo+
+Pj4+Pj4+IGZvciB0aGUgZVNDTy9TQ08gY29ubmVjdGlvbiB2aWEgQlQvRURSOiB0aGUgaG9zdCBj
+b250cm9sbGVyIHJldHVybnMgZXJyb3INCj4+Pj4+Pj4gY29kZSAweDIwIChMTVAgZmVhdHVyZSBu
+b3Qgc3VwcG9ydGVkKSBmb3IgSENJX1NldHVwX1N5bmNocm9ub3VzX0Nvbm5lY3Rpb24NCj4+Pj4+
+Pj4gKDB4MDAyOCkgY29tbWFuZCB3aXRob3V0IGFjdHVhbGx5IHRyeWluZyB0byBzZXR1cCBjb25u
+ZWN0aW9uIHdpdGggYSByZW1vdGUNCj4+Pj4+Pj4gZGV2aWNlIGluIGNhc2Ugc3VjaCBkZXZpY2Ug
+KGxpa2UgRGlnbWEgQlQtMTQgaGVhZHNldCkgZGlkbid0IGFkdmVydGlzZSBpdHMNCj4+Pj4+Pj4g
+c3VwcG9ydGVkIGZlYXR1cmVzLiAgRXZlbiB0aG91Z2ggdGhpcyBkb2Vzbid0IGJyZWFrIGNvbXBh
+dGliaWxpdHkgd2l0aCB0aGUNCj4+Pj4+Pj4gQmx1ZXRvb3RoIHN0YW5kYXJkIGl0IGJyZWFrcyB0
+aGUgY29tcGF0aWJpbGl0eSB3aXRoIHRoZSBIYW5kcy1GcmVlIFByb2ZpbGUNCj4+Pj4+Pj4gKEhG
+UCkuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IFRoaXMgcGF0Y2ggcmV0dXJucyB0aGUgY29tcGF0aWJpbGl0
+eSB3aXRoIHRoZSBIRlAgcHJvZmlsZSBhbmQgYWN0dWFsbHkNCj4+Pj4+Pj4gdHJpZXMgdG8gY2hl
+Y2sgYWxsIGF2YWlsYWJsZSBjb25uZWN0aW9uIHBhcmFtZXRlcnMgZGVzcGl0ZSBvZiB0aGUgc3Bl
+Y2lmaWMNCj4+Pj4+Pj4gTWVkaWFUZWsgaW1wbGVtZW50YXRpb24uIFdpdGhvdXQgaXQgb25lIHdh
+cyB1bmFibGUgdG8gZXN0YWJsaXNoIGVTQ08vU0NPDQo+Pj4+Pj4+IGNvbm5lY3Rpb24gd2l0aCBz
+b21lIGhlYWRzZXRzLg0KPj4gWy4uLl0NCj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogU2VyZ2V5IFNo
+dHlseW92IDxzLnNodHlseW92QG9tcHJ1c3NpYS5ydT4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gLS0tDQo+
+Pj4+Pj4+IFRoaXMgcGF0Y2ggaXMgYWdhaW5zdCB0aGUgJ2JsdWV0b290aC1uZXh0LmdpdCcgcmVw
+by4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYyB8ICAgIDggKysr
+KysrKysNCj4+Pj4+Pj4gMSBmaWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKQ0KPj4+Pj4+Pg0K
+Pj4+Pj4+PiBJbmRleDogYmx1ZXRvb3RoLW5leHQvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0K
+Pj4+Pj4+PiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09DQo+Pj4+Pj4+IC0tLSBibHVldG9vdGgtbmV4dC5vcmlnL25ldC9i
+bHVldG9vdGgvaGNpX2V2ZW50LmMNCj4+Pj4+Pj4gKysrIGJsdWV0b290aC1uZXh0L25ldC9ibHVl
+dG9vdGgvaGNpX2V2ZW50LmMNCj4+Pj4+Pj4gQEAgLTIxODcsNiArMjE4NywxMyBAQCBzdGF0aWMg
+dm9pZCBoY2lfY3Nfc2V0dXBfc3luY19jb25uKHN0cnVjDQo+Pj4+Pj4+IAlpZiAoYWNsKSB7DQo+
+Pj4+Pj4+IAkJc2NvID0gYWNsLT5saW5rOw0KPj4+Pj4+PiAJCWlmIChzY28pIHsNCj4+Pj4+Pj4g
+KwkJCWlmIChzdGF0dXMgPT0gMHgyMCAmJiAvKiBVbnN1cHBvcnRlZCBMTVAgUGFyYW1ldGVyIHZh
+bHVlICovDQo+Pj4+Pj4+ICsJCQkgICAgc2NvLT5vdXQpIHsNCj4+PiAgICBBY3R1YWxseSwgSSB3
+YXMgZXhwZWN0aW5nIHRoYXQgeW91J2QgdGVsbCBtZSB0byBjcmVhdGUgYSBIQ0kgcXVpcmsgZm9y
+IHRoaXMgc2l0dWF0aW9uLg0KPj4+IEkgaGF2ZSBhIHBhdGNoIGRvaW5nIHRoYXQgYnV0IEkgaGF2
+ZW4ndCBiZWVuIGFibGUgdG8gbG9jYXRlIHRoZSBkcml2ZXIgaW4gd2hpY2ggdG8gc2V0IHRoaXMN
+Cj4+PiBxdWlyayBmbGFnLi4uDQo+PiAgIEFuZCB0aGF0J3Mgbm8gd29uZGVyISBUaGUgQlQgZHJp
+dmVyIHRoYXQgbmVlZHMgdGhpcyBwYXRjaCBpcyBvdXQtb2YtdHJlZSAoYW5kIG5vdCBldmVuIG9w
+ZW4NCj4+IHNvdXJjZSwgaXQgc2VlbXMpIGFzIHdlIGhhdmUgZmluYWxseSBhc2NlcnRhaW5lZCB3
+aXRoIElsZGFyLi4uIElzIHRoZXJlIGFueSBpbnRlcmVzdCBpbiB0aGUNCj4+ICJwcmVwYXJhdG9y
+eSIgcGF0Y2ggdGhhdCBsb3dlcnMgdGhlIGluZGVudGF0aW9uIGxldmVscyBpbiBoY2lfY3Nfc2V0
+dXBfc3luY19jb25uKCk/DQo+IGhvdyBpcyBpdCBwb3NzaWJsZSB0aGF0IHRoZXJlIGlzIGFuIG91
+dC1vZi10cmVlIEJsdWV0b290aCBkcml2ZXIuIFNlZW1zIG9kZC4gTWF5YmUgd2FudCB0byBzdWJt
+aXQgdGhhdCB1cHN0cmVhbSBmaXJzdC4NCj4NCj4gUmVnYXJkcw0KPg0KPiBNYXJjZWwNCj4NCg0K
