@@ -1,147 +1,207 @@
-Return-Path: <SRS0=Hv/D=BG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F063C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883F3C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 06:58:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED39C208E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jul 2020 23:21:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJ0md3Km"
+	by mail.kernel.org (Postfix) with ESMTP id 6C53820829
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 06:58:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726538AbgG0XVw (ORCPT
+        id S1727001AbgG1G6b convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jul 2020 19:21:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726272AbgG0XVw (ORCPT
+        Tue, 28 Jul 2020 02:58:31 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:48544 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726967AbgG1G6b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jul 2020 19:21:52 -0400
-Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093DFC061794
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:21:52 -0700 (PDT)
-Received: by mail-oo1-xc43.google.com with SMTP id p26so3465623oos.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jul 2020 16:21:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Czxsi1VLXDgZxl/6xdZpf6T03KJMWWKGdnz2cw9JQjA=;
-        b=DJ0md3KmCxQU0G1sQfXHC1CzY72SBjgLd6ggNhcocKbdQq33FtSFRBy/Sc8xrF8HTW
-         hi4hjm4AhxrW8cn4EJDN6u6x0grShYwGyFIkBEJaz3EGkwt1O7zrcELFqcAiu8DXIEr5
-         fVexlO04+IJJXaFr2dpaMaStzbWzOPkCZ8SdHcaAVjBIcMJ2WGwWCaWS1CHd1cjM4gRx
-         1tNKhobY6Z9kKePL4oBHJ7TPk2Q7GPaUjNRpvcg2JcPgf+cKvUi/80rffPVXSex3KNlw
-         f3jaLV+B/F8/SbbPKWmnWLYxIWDO3Zs7X5WUnIHGWxj3HXNyRTEkLFkIgYZKn/FbXoH9
-         njag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Czxsi1VLXDgZxl/6xdZpf6T03KJMWWKGdnz2cw9JQjA=;
-        b=hxwb3vtuJ2S6yOZ8xlO5KLe4I2xEhqrX2fEgxcPN6xYZFpXLVcyP0ZZ0GpXSDLSrhB
-         nVzGo0+jaGmqwibSCk6ljmpC4PTZVvcL4edfluUYTKt07WAqYwHr85zCA9sRl+rbykus
-         CsLBVbBBODnYb00w7O8Cj3psawfIYtWnxBrC6vHv5IqJdditGH2vK4s6/ZWx9aAHc75N
-         4Pm65p3XdH3r5P8WaXAqdqEaRedOT+gi77ceZj2h2ea/JiaXojzrVNLl1OtS+hswpg1L
-         bjpWQzvB4oZk4eKYUnf0K6i38yzWAwBL4mzSPhryksXdZcqam86wUWi9nID4Efmy8azj
-         nVPQ==
-X-Gm-Message-State: AOAM5322ltu9Bsbtm3YSCRUzoDxQQbSkiOZdJmRsiSBmedzN+B7x4fU8
-        YYzFOIDkM7yLn1B/wwetHB7TAMWpB04W7V8084o=
-X-Google-Smtp-Source: ABdhPJzsmn8MPvl+4kEstmiHxkwTXAAQW8e/lSK2Yy5KFSHDAGmYoCtFTCIGJdWIH+LEBGpsr/QUbpqrsSyUDokAsuU=
-X-Received: by 2002:a4a:924b:: with SMTP id g11mr726214ooh.9.1595892111409;
- Mon, 27 Jul 2020 16:21:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200724122507.27671-1-454728735@qq.com>
-In-Reply-To: <20200724122507.27671-1-454728735@qq.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 27 Jul 2020 16:21:40 -0700
-Message-ID: <CABBYNZ+7DuiuNZQ8AZnvSoGPQXD8pG0sVMqwy=xoGp2EWYQLPw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] src/agent.c : parse_io_capability Function optimization
-To:     luokai <454728735@qq.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        luokai <luokai@uniontech.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 28 Jul 2020 02:58:31 -0400
+Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 56BFCCECCC;
+        Tue, 28 Jul 2020 09:08:31 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [Bluez PATCH] main: adding configurable eir_max_name_len
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200727173720.2700327-1-alainm@chromium.org>
+Date:   Tue, 28 Jul 2020 08:58:29 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <17DA93F5-AB77-4C40-A5F2-38D8FE6C98A3@holtmann.org>
+References: <20200727173720.2700327-1-alainm@chromium.org>
+To:     Alain Michaud <alainm@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Alain,
 
-On Fri, Jul 24, 2020 at 5:27 AM luokai <454728735@qq.com> wrote:
->
-> From: luokai <luokai@uniontech.com>
->
+> This change adds support for a configurable eir_max_name_len for
+> platforms which requires a larger than 48 bytes complete name in EIR.
+> 
+> From bluetoothctl:
+> [bluetooth]# system-alias
+> 012345678901234567890123456789012345678901234567890123456789
+> Changing 012345678901234567890123456789012345678901234567890123456789
+> succeeded
+> [CHG] Controller DC:71:96:69:02:89 Alias:
+> 012345678901234567890123456789012345678901234567890123456789
+> 
+> From btmon:
+> < HCI Command: Write Local Name (0x03|0x0013) plen 248             #109
+> [hci0] 88.567990
+>         Name:
+> 012345678901234567890123456789012345678901234567890123456789
+>> HCI Event: Command Complete (0x0e) plen 4                             
+>    #110 [hci0] 88.663854
+>       Write Local Name (0x03|0x0013) ncmd 1
+>         Status: Success (0x00)
+> @ MGMT Event: Local Name Changed (0x0008) plen 260               
+> {0x0004} [hci0] 88.663948
+>         Name:
+> 012345678901234567890123456789012345678901234567890123456789
+>         Short name:
+> < HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241 
+>         FEC: Not required (0x00)
+>         Name (complete):
+> 012345678901234567890123456789012345678901234567890123456789
+>         TX power: 12 dBm
+>         Device ID: Bluetooth SIG assigned (0x0001)
+>           Vendor: Google (224)
+>           Product: 0xc405
+>           Version: 0.5.6 (0x0056)
+>         16-bit Service UUIDs (complete): 7 entries
+>           Generic Access Profile (0x1800)
+>           Generic Attribute Profile (0x1801)
+>           Device Information (0x180a)
+>           A/V Remote Control (0x110e)
+>           A/V Remote Control Target (0x110c)
+>           Handsfree Audio Gateway (0x111f)
+>           Audio Source (0x110a)
+>> HCI Event: Command Complete (0x0e) plen 4                           
+>       Write Extended Inquiry Response (0x03|0x0052) ncmd 1
+>         Status: Success (0x00)
+> 
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> Signed-off-by: Alain Michaud <alainm@chromium.org>
 > ---
->  src/agent.c | 28 ++++++++++++++++------------
->  1 file changed, 16 insertions(+), 12 deletions(-)
->
-> diff --git a/src/agent.c b/src/agent.c
-> index e0ffcd22f..82baf608f 100644
-> --- a/src/agent.c
-> +++ b/src/agent.c
-> @@ -957,20 +957,24 @@ static void agent_destroy(gpointer data)
->         agent_unref(agent);
->  }
->
-> +static struct capability g_cap[]  = {
-> +       {"", IO_CAPABILITY_KEYBOARDDISPLAY},
-> +       {"DisplayOnly", IO_CAPABILITY_DISPLAYONLY},
-> +       {"DisplayYesNo", IO_CAPABILITY_DISPLAYYESNO},
-> +       {"KeyboardOnly", IO_CAPABILITY_KEYBOARDONLY},
-> +       {"NoInputNoOutput", IO_CAPABILITY_NOINPUTNOOUTPUT},
-> +       {"KeyboardDisplay", IO_CAPABILITY_KEYBOARDDISPLAY}
+> 
+> doc/mgmt-api.txt |  1 +
+> src/adapter.c    | 10 +++++++++-
+> src/hcid.h       |  1 +
+> src/main.c       |  5 +++++
+> src/main.conf    |  5 +++++
+> 5 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index ca0d38469..1bc0f0c12 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -3279,6 +3279,7 @@ Read Default System Configuration Command
+> 		0x0019	LE Connection Latency
+> 		0x001a	LE Connection Supervision Timeout
+> 		0x001b	LE Autoconnect Timeout
+> +		0x001c	Max EIR Name Length
 
-We usually spaces after { and before }.
+we can certainly do this, but I prefer that do this for LE and BR/EDR and name it that way as well.
 
-> +};
+> 
+> 	This command can be used at any time and will return a list of
+> 	supported default parameters as well as their current value.
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 5e896a9f0..3adc67b63 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -2375,7 +2375,7 @@ static bool parse_pathloss(DBusMessageIter *value,
+> 	return true;
+> }
+> 
+> -static bool parse_transport(DBusMessageIter *value, 
+> +static bool parse_transport(DBusMessageIter *value,
+> 					struct discovery_filter *filter)
+> {
+> 	char *transport_str;
+> @@ -4435,6 +4435,14 @@ static void load_default_system_params(struct btd_adapter *adapter)
+> 		len += sizeof(params[i].u16);
+> 	}
+> 
+> +	if (main_opts.default_params.eir_max_name_len) {
+> +		params[i].entry.type = 0x001c;
+> +		params[i].entry.length = sizeof(params[i].u16);
+> +		params[i].u16 = main_opts.default_params.eir_max_name_len;
+> +		++i;
+> +		len += sizeof(params[i].u16);
+> +	}
 > +
->  static uint8_t parse_io_capability(const char *capability)
->  {
-> -       if (g_str_equal(capability, ""))
-> -               return IO_CAPABILITY_KEYBOARDDISPLAY;
-> -       if (g_str_equal(capability, "DisplayOnly"))
-> -               return IO_CAPABILITY_DISPLAYONLY;
-> -       if (g_str_equal(capability, "DisplayYesNo"))
-> -               return IO_CAPABILITY_DISPLAYYESNO;
-> -       if (g_str_equal(capability, "KeyboardOnly"))
-> -               return IO_CAPABILITY_KEYBOARDONLY;
-> -       if (g_str_equal(capability, "NoInputNoOutput"))
-> -               return IO_CAPABILITY_NOINPUTNOOUTPUT;
-> -       if (g_str_equal(capability, "KeyboardDisplay"))
-> -               return IO_CAPABILITY_KEYBOARDDISPLAY;
-> +       size_t count = sizeof(g_cap) / sizeof(g_cap[0]);
 
-If I recall correctly we do have macros for ARRAY_SIZE, check
-src/shared/util.h, btw there also seems to be a problem with the
-formatting on the above line:
+Do you really want to keep it as uint16_t or is that just laziness since changing the kernel to support anything other than uint16_t is complicated?
 
-Applying: src/agent.c : parse_io_capability Function optimization
-.git/rebase-apply/patch:36: trailing whitespace.
-size_t count = sizeof(g_cap) / sizeof(g_cap[0]);
-error: 1 line adds whitespace errors.
+On a side note, you need to provide a uint16_t value in little endian to the MGMT wire protocol.
 
+> 	err = mgmt_send(adapter->mgmt, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+> 			adapter->dev_id, len, params, NULL, NULL, NULL);
+> 	if (!err)
+> diff --git a/src/hcid.h b/src/hcid.h
+> index 5f249ebf9..c9b59a374 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -93,6 +93,7 @@ struct main_opts {
+> 		uint16_t	le_conn_latency;
+> 		uint16_t	le_conn_lsto;
+> 		uint16_t	le_autoconnect_timeout;
+> +		uint16_t	eir_max_name_len;
+> 	} default_params;
+> 
+> 
+> diff --git a/src/main.c b/src/main.c
+> index ec7a9fbd7..74876e01d 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -123,6 +123,7 @@ static const char *controller_options[] = {
+> 	"LEConnectionLatency",
+> 	"LEConnectionSupervisionTimeout",
+> 	"LEAutoconnecttimeout",
+> +	"EirMaxNameLength",
+> 	NULL
+> };
+> 
+> @@ -433,6 +434,10 @@ static void parse_controller_config(GKeyFile *config)
+> 		  &main_opts.default_params.le_autoconnect_timeout,
+> 		  0x0001,
+> 		  0x4000},
+> +		{ "EirMaxNameLength",
+> +		  &main_opts.default_params.eir_max_name_len,
+> +		  0x0001,
+> +		  0x00EE},
+> 	};
+> 	uint16_t i;
+> 
+> diff --git a/src/main.conf b/src/main.conf
+> index f41203b96..7ecac5930 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -148,6 +148,11 @@
+> #LEConnectionSupervisionTimeout=
+> #LEAutoconnecttimeout=
+> 
+> +# EIR Max Name. This is the maximum length for the COMPLETE_NAME EIR section.
+> +# If the name length exceeds this size, a SHORT_NAME section is used.
+> +# Default: 48
+> +#EirMaxNameLength = 48
+> +
+> [GATT]
+> # GATT attribute cache.
+> # Possible values:
 
-> +       for (size_t i = 0; i < count; i++)
-> +       {
-> +               if(g_str_equal(capability, g_cap[i].cap)) {
-> +                       return g_cap[i].parse_capability;
-> +               }
-> +       }
->         return IO_CAPABILITY_INVALID;
->  }
->
-> --
-> 2.20.1
->
->
->
+Regards
 
+Marcel
 
--- 
-Luiz Augusto von Dentz
