@@ -2,95 +2,126 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656AEC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE30FC433E8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51DF520825
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:10:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A819C20714
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732239AbgG1SKx (ORCPT
+        id S1732417AbgG1S2p convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 14:10:53 -0400
-Received: from mga07.intel.com ([134.134.136.100]:19385 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728834AbgG1SKx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 14:10:53 -0400
-IronPort-SDR: WmWiqBpKZ97LzAmNOCWdSkirne2J1FrSpqZTUfK/UITGqhUt9qjI9ZhL6d188/JIfCL2lepYgP
- 0smzNtvjHG0w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9696"; a="215796103"
-X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
-   d="scan'208";a="215796103"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2020 11:10:52 -0700
-IronPort-SDR: A6qK79H71M9Uxr+9EIltU83hE1/D66iPcYDMVG2RCIe0ZZBh2586bD4zeWucOOzVEevKqoabhf
- aOfFMTaLTVaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
-   d="scan'208";a="364586885"
-Received: from rmangham-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.254.114.251])
-  by orsmga001.jf.intel.com with ESMTP; 28 Jul 2020 11:10:52 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Fix calculation of model publication period
-Date:   Tue, 28 Jul 2020 11:10:51 -0700
-Message-Id: <20200728181051.22075-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 28 Jul 2020 14:28:45 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:57641 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728179AbgG1S2o (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 28 Jul 2020 14:28:44 -0400
+Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BD006CECD6;
+        Tue, 28 Jul 2020 20:38:43 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v3] Bluetooth: Fix suspend notifier race
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200728095711.v3.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
+Date:   Tue, 28 Jul 2020 20:28:41 +0200
+Cc:     chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D320E0AF-EFF1-47BD-85F6-59168B170F65@holtmann.org>
+References: <20200728095711.v3.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the extraction of bit fields from model publication
-period octet received as part of Congif Publication Set message.
+Hi Abhishek,
 
-The step resolution field is extracted as upper 2 bits (shift by 6)
-and the number of steps field is extracted by masking lower 6 bits.
----
- mesh/model.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+> Unregister from suspend notifications and cancel suspend preparations
+> before running hci_dev_do_close. Otherwise, the suspend notifier may
+> race with unregister and cause cmd_timeout even after hdev has been
+> freed.
+> 
+> Below is the trace from when this panic was seen:
+> 
+> [  832.578518] Bluetooth: hci_core.c:hci_cmd_timeout() hci0: command 0x0c05 tx timeout
+> [  832.586200] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [  832.586203] #PF: supervisor read access in kernel mode
+> [  832.586205] #PF: error_code(0x0000) - not-present page
+> [  832.586206] PGD 0 P4D 0
+> [  832.586210] PM: suspend exit
+> [  832.608870] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [  832.613232] CPU: 3 PID: 10755 Comm: kworker/3:7 Not tainted 5.4.44-04894-g1e9dbb96a161 #1
+> [  832.630036] Workqueue: events hci_cmd_timeout [bluetooth]
+> [  832.630046] RIP: 0010:__queue_work+0xf0/0x374
+> [  832.630051] RSP: 0018:ffff9b5285f1fdf8 EFLAGS: 00010046
+> [  832.674033] RAX: ffff8a97681bac00 RBX: 0000000000000000 RCX: ffff8a976a000600
+> [  832.681162] RDX: 0000000000000000 RSI: 0000000000000009 RDI: ffff8a976a000748
+> [  832.688289] RBP: ffff9b5285f1fe38 R08: 0000000000000000 R09: ffff8a97681bac00
+> [  832.695418] R10: 0000000000000002 R11: ffff8a976a0006d8 R12: ffff8a9745107600
+> [  832.698045] usb 1-6: new full-speed USB device number 119 using xhci_hcd
+> [  832.702547] R13: ffff8a9673658850 R14: 0000000000000040 R15: 000000000000001e
+> [  832.702549] FS:  0000000000000000(0000) GS:ffff8a976af80000(0000) knlGS:0000000000000000
+> [  832.702550] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  832.702550] CR2: 0000000000000000 CR3: 000000010415a000 CR4: 00000000003406e0
+> [  832.702551] Call Trace:
+> [  832.702558]  queue_work_on+0x3f/0x68
+> [  832.702562]  process_one_work+0x1db/0x396
+> [  832.747397]  worker_thread+0x216/0x375
+> [  832.751147]  kthread+0x138/0x140
+> [  832.754377]  ? pr_cont_work+0x58/0x58
+> [  832.758037]  ? kthread_blkcg+0x2e/0x2e
+> [  832.761787]  ret_from_fork+0x22/0x40
+> [  832.846191] ---[ end trace fa93f466da517212 ]---
+> 
+> Fixes: 9952d90ea2885 ("Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND")
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+> Hi Marcel,
+> 
+> This fixes a race between hci_unregister_dev and the suspend notifier.
+> 
+> The suspend notifier handler seemed to be scheduling commands even after
+> it was cleaned up and this was resulting in a panic in cmd_timeout (when
+> it tries to requeue the cmd_timer).
+> 
+> This was tested on 5.4 kernel with a suspend+resume stress test for 500+
+> iterations. I also confirmed that after a usb disconnect, the suspend
+> notifier times out before the USB device is probed again (fixing the
+> original race between the usb_disconnect + probe and the notifier).
+> 
+> Thanks
+> Abhishek
+> 
+> 
+> Changes in v3:
+> * Added fixes tag
+> 
+> Changes in v2:
+> * Moved oops into commit message
+> 
+> net/bluetooth/hci_core.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/mesh/model.c b/mesh/model.c
-index 31197b363..ef7668147 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -170,20 +170,21 @@ static struct mesh_model *get_model(struct mesh_node *node, uint8_t ele_idx,
- 
- static uint32_t pub_period_to_ms(uint8_t pub_period)
- {
--	int n;
-+	int step_res, num_steps;
- 
--	n = pub_period >> 2;
-+	step_res = pub_period >> 6;
-+	num_steps = pub_period & 0x3f;
- 
--	switch (pub_period & 0x3) {
-+	switch (step_res) {
- 	default:
--		return n * 100;
-+		return num_steps * 100;
- 	case 2:
--		n *= 10;
-+		num_steps *= 10;
- 		/* Fall Through */
- 	case 1:
--		return n * 1000;
-+		return num_steps * 1000;
- 	case 3:
--		return n * 10 * 60 * 1000;
-+		return num_steps * 10 * 60 * 1000;
- 	}
- }
- 
--- 
-2.26.2
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
