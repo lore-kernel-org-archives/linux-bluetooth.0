@@ -2,171 +2,95 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CC4C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656AEC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:10:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 610BB20672
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:03:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeIATN/i"
+	by mail.kernel.org (Postfix) with ESMTP id 51DF520825
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:10:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732141AbgG1SDr (ORCPT
+        id S1732239AbgG1SKx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 14:03:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40650 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728598AbgG1SDq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 14:03:46 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E628C061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 11:03:46 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id v13so1651587oiv.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 11:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dv3Q/pRdkfZQAIG5khmRSqIaEoGwwBiiMrsb7/J0js4=;
-        b=XeIATN/iLIc/qj7tkzIxlpfFkjtij9WDXMlB2dtCqqe38hVV8r0kjNVCVgatec6OUG
-         I3STQ94HnuFK8AF5a+Th9pTZ7mi1ndUolhON+3LpzYPC3uUwxDg6M6bgOoMa/ZSI3Ghs
-         bKjTH6aIqqtF/OkhQp/3wwmFV2HLhlMTphOp2CUuntHunUN21yjOFTrHPF5cL4gMImsR
-         pEhl9NkoD8wPxHGoB1Vjd3HlCqMvVe3JcR7BPKALmrMyJvnSMvuJZl9xJqBvvKkzxaHa
-         //1nSxHwCfUvce649mRm1vnd5Cepksp9C4sqrrLf3kAhdvSsNuyFh6qHrZyXMLyKjnwN
-         GHVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dv3Q/pRdkfZQAIG5khmRSqIaEoGwwBiiMrsb7/J0js4=;
-        b=cOnn5NxCArF09H9JmVpFVX8IPQM4qFqErYqQffnaKbQR5Ns2uwHNBFWI/TBPsvJ0Eu
-         HaqfzV1cFVMHEanzgsYs7nsd5kEBs89wYqLAJyOFOqp081n1Lt5nz43q4OhHzlu7YkTm
-         nzyBCGg2xpANOgwZCK8u0OHM7sezfONEKGGLCB1Ym2wTFzK70T8c1W0nfkI93ZFdFmnX
-         rfQsUxW47epL8FKdreVI1b1kWubiM16TQVog59M3UL/wUQyr7imP+3FLPab1eF1A+Uku
-         RwSDVj15uEq6RH1uRce6B5IIczPEsMZ0pIuopGwGJ47jqPrIUBTSKXjrkzM9kT7DvNWL
-         XKOA==
-X-Gm-Message-State: AOAM5333IhzbuHkDQ+sG6ApMF4dv/hmsggYuK3n/vxIoqFosWCnQLLyh
-        e3IZcDagCIoSlbC4rVfUKCWqI3SIdr38nIvoNiA=
-X-Google-Smtp-Source: ABdhPJwpGkAxIF9u5LUtT0+EBcB0ZZlrJEnNDZLI4eWWNeb4xPKldIpI+xwq2MgnLdBduDPuRlWe4a6BDOrqpFSpdVE=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr4304488oix.48.1595959425884;
- Tue, 28 Jul 2020 11:03:45 -0700 (PDT)
+        Tue, 28 Jul 2020 14:10:53 -0400
+Received: from mga07.intel.com ([134.134.136.100]:19385 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728834AbgG1SKx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 28 Jul 2020 14:10:53 -0400
+IronPort-SDR: WmWiqBpKZ97LzAmNOCWdSkirne2J1FrSpqZTUfK/UITGqhUt9qjI9ZhL6d188/JIfCL2lepYgP
+ 0smzNtvjHG0w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9696"; a="215796103"
+X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
+   d="scan'208";a="215796103"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2020 11:10:52 -0700
+IronPort-SDR: A6qK79H71M9Uxr+9EIltU83hE1/D66iPcYDMVG2RCIe0ZZBh2586bD4zeWucOOzVEevKqoabhf
+ aOfFMTaLTVaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
+   d="scan'208";a="364586885"
+Received: from rmangham-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.254.114.251])
+  by orsmga001.jf.intel.com with ESMTP; 28 Jul 2020 11:10:52 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix calculation of model publication period
+Date:   Tue, 28 Jul 2020 11:10:51 -0700
+Message-Id: <20200728181051.22075-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200717020332.Bluez.v3.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
- <CALWDO_UsrzyLFkmxcnE59zaZPjP8ByN3sSOLDse6LwwpTA=ZsQ@mail.gmail.com>
-In-Reply-To: <CALWDO_UsrzyLFkmxcnE59zaZPjP8ByN3sSOLDse6LwwpTA=ZsQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 28 Jul 2020 11:03:36 -0700
-Message-ID: <CABBYNZK5aqhLXttAz6qie3LN5SnzmwuLFt8VtzQURjC+5UNXaQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 1/2] device: add device_remove_bonding function
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     Archie Pusaka <apusaka@google.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+This fixes the extraction of bit fields from model publication
+period octet received as part of Congif Publication Set message.
 
-On Tue, Jul 28, 2020 at 6:19 AM Alain Michaud <alainmichaud@google.com> wrote:
->
-> Friendly ping to maintainers on this one.
->
-> Thanks,
-> Alain
->
-> On Thu, Jul 16, 2020 at 2:04 PM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > From: Archie Pusaka <apusaka@chromium.org>
-> >
-> > This patch splits the "bonding removal" function in device.c,
-> > because we need to remove bonding information when receiving
-> > "virtual cable unplug" in HID profile.
-> >
-> > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > ---
-> >
-> > Changes in v3:
-> > - Call device_set_temporary on device_remove_bonding
-> >
-> > Changes in v2: None
-> >
-> >  src/device.c | 28 ++++++++++++++++++----------
-> >  src/device.h |  1 +
-> >  2 files changed, 19 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/src/device.c b/src/device.c
-> > index 226216235..b23ecb7fd 100644
-> > --- a/src/device.c
-> > +++ b/src/device.c
-> > @@ -4356,6 +4356,20 @@ static void delete_folder_tree(const char *dirname)
-> >         rmdir(dirname);
-> >  }
-> >
-> > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type)
-> > +{
-> > +       if (bdaddr_type == BDADDR_BREDR)
-> > +               device->bredr_state.bonded = false;
-> > +       else
-> > +               device->le_state.bonded = false;
-> > +
-> > +       if (!device->bredr_state.bonded && !device->le_state.bonded)
-> > +               btd_device_set_temporary(device, true);
-> > +
-> > +       btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> > +                                                       bdaddr_type);
-> > +}
-> > +
-> >  static void device_remove_stored(struct btd_device *device)
-> >  {
-> >         char device_addr[18];
-> > @@ -4364,17 +4378,11 @@ static void device_remove_stored(struct btd_device *device)
-> >         char *data;
-> >         gsize length = 0;
-> >
-> > -       if (device->bredr_state.bonded) {
-> > -               device->bredr_state.bonded = false;
-> > -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> > -                                                               BDADDR_BREDR);
-> > -       }
-> > +       if (device->bredr_state.bonded)
-> > +               device_remove_bonding(device, BDADDR_BREDR);
-> >
-> > -       if (device->le_state.bonded) {
-> > -               device->le_state.bonded = false;
-> > -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
-> > -                                                       device->bdaddr_type);
-> > -       }
-> > +       if (device->le_state.bonded)
-> > +               device_remove_bonding(device, device->bdaddr_type);
-> >
-> >         device->bredr_state.paired = false;
-> >         device->le_state.paired = false;
-> > diff --git a/src/device.h b/src/device.h
-> > index cb8d884e8..956fec1ae 100644
-> > --- a/src/device.h
-> > +++ b/src/device.h
-> > @@ -50,6 +50,7 @@ uint16_t btd_device_get_vendor(struct btd_device *device);
-> >  uint16_t btd_device_get_vendor_src(struct btd_device *device);
-> >  uint16_t btd_device_get_product(struct btd_device *device);
-> >  uint16_t btd_device_get_version(struct btd_device *device);
-> > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type);
-> >  void device_remove(struct btd_device *device, gboolean remove_stored);
-> >  int device_address_cmp(gconstpointer a, gconstpointer b);
-> >  int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
-> > --
-> > 2.27.0.389.gc38d7665816-goog
-> >
+The step resolution field is extracted as upper 2 bits (shift by 6)
+and the number of steps field is extracted by masking lower 6 bits.
+---
+ mesh/model.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-Applied, thanks.
-
+diff --git a/mesh/model.c b/mesh/model.c
+index 31197b363..ef7668147 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -170,20 +170,21 @@ static struct mesh_model *get_model(struct mesh_node *node, uint8_t ele_idx,
+ 
+ static uint32_t pub_period_to_ms(uint8_t pub_period)
+ {
+-	int n;
++	int step_res, num_steps;
+ 
+-	n = pub_period >> 2;
++	step_res = pub_period >> 6;
++	num_steps = pub_period & 0x3f;
+ 
+-	switch (pub_period & 0x3) {
++	switch (step_res) {
+ 	default:
+-		return n * 100;
++		return num_steps * 100;
+ 	case 2:
+-		n *= 10;
++		num_steps *= 10;
+ 		/* Fall Through */
+ 	case 1:
+-		return n * 1000;
++		return num_steps * 1000;
+ 	case 3:
+-		return n * 10 * 60 * 1000;
++		return num_steps * 10 * 60 * 1000;
+ 	}
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
