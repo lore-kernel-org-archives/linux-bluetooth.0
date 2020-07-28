@@ -2,131 +2,121 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF47C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0BCC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CDCD207E8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:22:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 552BD22B4B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727863AbgG1HWt convert rfc822-to-8bit (ORCPT
+        id S1727950AbgG1IHQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:22:49 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48954 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727072AbgG1HWs (ORCPT
+        Tue, 28 Jul 2020 04:07:16 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:55110 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727940AbgG1IHQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:22:48 -0400
-Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C8441CECCD;
-        Tue, 28 Jul 2020 09:32:48 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [RFC] Bluetooth: L2CAP: Fix to handling fragmented header
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200728070428.1754257-1-luiz.dentz@gmail.com>
-Date:   Tue, 28 Jul 2020 09:22:46 +0200
-Cc:     linux-bluetooth@vger.kernel.org
+        Tue, 28 Jul 2020 04:07:16 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-122-o5x9Q9SyNzqkeSG6S-qBgw-1; Tue, 28 Jul 2020 09:07:12 +0100
+X-MC-Unique: o5x9Q9SyNzqkeSG6S-qBgw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 28 Jul 2020 09:07:11 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 28 Jul 2020 09:07:11 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Christoph Hellwig' <hch@lst.de>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "bridge@lists.linux-foundation.org" 
+        <bridge@lists.linux-foundation.org>,
+        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-decnet-user@lists.sourceforge.net" 
+        <linux-decnet-user@lists.sourceforge.net>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "mptcp@lists.01.org" <mptcp@lists.01.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Subject: RE: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
+Thread-Topic: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
+Thread-Index: AQHWZDJbUYsuJ1QOc0ujZBN9RDfEqKkcofVA
+Date:   Tue, 28 Jul 2020 08:07:11 +0000
+Message-ID: <908ed73081cc42d58a5b01e0c97dbe47@AcuMS.aculab.com>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200723060908.50081-13-hch@lst.de> <20200727150310.GA1632472@zx2c4.com>
+ <20200727150601.GA3447@lst.de>
+ <CAHmME9ric=chLJayn7Erve7WBa+qCKn-+Gjri=zqydoY6623aA@mail.gmail.com>
+ <20200727162357.GA8022@lst.de>
+In-Reply-To: <20200727162357.GA8022@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-Message-Id: <80073DFD-564E-4B4E-9F23-02ED4075321D@holtmann.org>
-References: <20200728070428.1754257-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Christoph Hellwig
+> Sent: 27 July 2020 17:24
+> 
+> On Mon, Jul 27, 2020 at 06:16:32PM +0200, Jason A. Donenfeld wrote:
+> > Maybe sockptr_advance should have some safety checks and sometimes
+> > return -EFAULT? Or you should always use the implementation where
+> > being a kernel address is an explicit bit of sockptr_t, rather than
+> > being implicit?
+> 
+> I already have a patch to use access_ok to check the whole range in
+> init_user_sockptr.
 
-> Bluetooth Core Specification v5.2, Vol. 3, Part A, section 1.4, table
-> 1.1:
-> 
-> 'Start Fragments always either begin with the first octet of the Basic
->  L2CAP header of a PDU or they have a length of zero (see [Vol 2] Part
->  B, Section 6.6.2).'
-> 
-> This text has been changed recently as it previously stated:
-> 
-> 'Start Fragments always begin with the Basic L2CAP header of a PDU.'
-> 
-> Apparently this was changed by the following errata:
-> 
-> https://www.bluetooth.org/tse/errata_view.cfm?errata_id=10216
-> 
-> In past this has not been a problem but it seems new controllers are
-> apparently doing it as it has been reported in Zephyr:
-> 
-> https://github.com/zephyrproject-rtos/zephyr/issues/26900
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/l2cap_core.c | 104 +++++++++++++++++++++++++++++--------
-> 1 file changed, 83 insertions(+), 21 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ade83e224567..193bea314222 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -8269,6 +8269,63 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> 	mutex_unlock(&conn->chan_lock);
-> }
-> 
-> +/* Append fragment into frame respecting the maximum len of rx_skb */
-> +static int l2cap_recv_frag(struct l2cap_conn *conn, struct sk_buff *skb,
-> +			   u16 len)
-> +{
-> +	if (!conn->rx_skb) {
-> +		/* Allocate skb for the complete frame (with header) */
-> +		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
-> +		if (!conn->rx_skb)
-> +			return -ENOMEM;
-> +		/* Init rx_len */
-> +		conn->rx_len = len;
-> +	}
-> +
-> +	/* Copy as much as the rx_skb can hold */
-> +	len = min_t(u16, len, skb->len);
-> +	skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, len), len);
-> +	skb_pull(skb, len);
-> +	conn->rx_len -= len;
-> +
-> +	return len;
-> +}
-> +
-> +static int l2cap_recv_header(struct l2cap_conn *conn, struct sk_buff *skb)
-> +{
-> +	struct l2cap_hdr *hdr;
-> +	struct sk_buff *rx_skb;
-> +	int len;
-> +
-> +	/* Append just enough to complete the header */
-> +	len = l2cap_recv_frag(conn, skb, L2CAP_HDR_SIZE - conn->rx_skb->len);
-> +
-> +	/* If header could not be read just continue */
-> +	if (len < 0 || conn->rx_skb->len < L2CAP_HDR_SIZE)
-> +		return len;
-> +
-> +	rx_skb = conn->rx_skb;
-> +	conn->rx_skb = NULL;
-> +
-> +	hdr = (struct l2cap_hdr *) rx_skb->data;
+That doesn't make (much) difference to the code paths that ignore
+the user-supplied length.
+OTOH doing the user/kernel check on the base address (not an
+incremented one) means that the correct copy function is always
+selected.
 
-so I think it is pointless to insist on getting the complete header. We really just need the first 2 octets.
+Perhaps the functions should all be passed a 'const sockptr_t'.
+The typedef could be made 'const' - requiring non-const items
+explicitly use the union/struct itself.
 
-struct l2cap_hdr {                                                               
-        __le16     len;                                                          
-        __le16     cid;                                                          
-} __packed;
+	David
 
-Once we have received at least 2 octets, we can get_unaligned_le16(rx_skb->data) and then just continue.
-
-Regards
-
-Marcel
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
