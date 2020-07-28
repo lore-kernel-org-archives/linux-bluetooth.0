@@ -2,166 +2,171 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D83EC433EB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 16:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CC4C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05D642053B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 16:58:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 610BB20672
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 18:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZQHUO2+C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeIATN/i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731677AbgG1Q6O (ORCPT
+        id S1732141AbgG1SDr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 12:58:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58728 "EHLO
+        Tue, 28 Jul 2020 14:03:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731502AbgG1Q6N (ORCPT
+        with ESMTP id S1728598AbgG1SDq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 12:58:13 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4CAC061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 09:58:13 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id f193so850600pfa.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 09:58:13 -0700 (PDT)
+        Tue, 28 Jul 2020 14:03:46 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E628C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 11:03:46 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id v13so1651587oiv.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 11:03:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mwrIihuJNbQiyPto1EhLxqXOv3Ti56A9zl8lU/r4aiE=;
-        b=ZQHUO2+CroLHpqPo+Cj3B3HT8//zhHljYnkiDIsNcb7XPWLQIwuTYDaWAcAzQVBKq/
-         JUlAduT+8Ty1m0zBRGSatQuHVY+Clnh3yX5gb+YaYyOUjdWHfQjKgHRiV83ZjDgQxanX
-         yBWBUToCoLajNehMHXapzmxqp7WH90xU7V2Ts=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dv3Q/pRdkfZQAIG5khmRSqIaEoGwwBiiMrsb7/J0js4=;
+        b=XeIATN/iLIc/qj7tkzIxlpfFkjtij9WDXMlB2dtCqqe38hVV8r0kjNVCVgatec6OUG
+         I3STQ94HnuFK8AF5a+Th9pTZ7mi1ndUolhON+3LpzYPC3uUwxDg6M6bgOoMa/ZSI3Ghs
+         bKjTH6aIqqtF/OkhQp/3wwmFV2HLhlMTphOp2CUuntHunUN21yjOFTrHPF5cL4gMImsR
+         pEhl9NkoD8wPxHGoB1Vjd3HlCqMvVe3JcR7BPKALmrMyJvnSMvuJZl9xJqBvvKkzxaHa
+         //1nSxHwCfUvce649mRm1vnd5Cepksp9C4sqrrLf3kAhdvSsNuyFh6qHrZyXMLyKjnwN
+         GHVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mwrIihuJNbQiyPto1EhLxqXOv3Ti56A9zl8lU/r4aiE=;
-        b=tHrkguboDgePO6q6+yS15ZiSkB9Kny5Mj5tv7CYOT+5qFqkdQy69t8rnK5ny+uV60a
-         BhA0xSbouL7yAxmv7OVXENzUPhuW8Uoqp0dHeCnLD99ua400fK1m1NRcejaS7o2miFzh
-         a+hSudojZlHs7DIdQuSyy9yh5FF7yqAUHeKgx3x0uJ5h7guB49IcKtE/QIpeVpD2EL5b
-         3gdpRs4IXYx4RPXYGYVlLZvJFXHPWRsXfa+5MWV+v5dGrPzZAus7P2wL1UYZUhbr7BWI
-         6aUG88jj84PuoiHnu2EPhgnEpnBiUfRcEdyi8wtmdCgAiFZw50CyDtiwJerMPKXYtumA
-         DDNQ==
-X-Gm-Message-State: AOAM532F5pqQXtNH5gjW/zSkmOacILja0ObW28+FN97P1rkgaL/ggO3T
-        Sjx5mxmeqe1Vjl4gOidm8KJeWsvOk+0=
-X-Google-Smtp-Source: ABdhPJw+nSCGDiE1Ny04kjNuD3elgR8BcdAawE5hI5v4ATe2zTuJ9cQo1efaE0+gcHzHeSLDftFV8w==
-X-Received: by 2002:a63:b511:: with SMTP id y17mr24919808pge.425.1595955492765;
-        Tue, 28 Jul 2020 09:58:12 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id z67sm10032403pfc.162.2020.07.28.09.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2020 09:58:12 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH v3] Bluetooth: Fix suspend notifier race
-Date:   Tue, 28 Jul 2020 09:58:07 -0700
-Message-Id: <20200728095711.v3.1.I7ebe9eaf684ddb07ae28634cb4d28cf7754641f1@changeid>
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dv3Q/pRdkfZQAIG5khmRSqIaEoGwwBiiMrsb7/J0js4=;
+        b=cOnn5NxCArF09H9JmVpFVX8IPQM4qFqErYqQffnaKbQR5Ns2uwHNBFWI/TBPsvJ0Eu
+         HaqfzV1cFVMHEanzgsYs7nsd5kEBs89wYqLAJyOFOqp081n1Lt5nz43q4OhHzlu7YkTm
+         nzyBCGg2xpANOgwZCK8u0OHM7sezfONEKGGLCB1Ym2wTFzK70T8c1W0nfkI93ZFdFmnX
+         rfQsUxW47epL8FKdreVI1b1kWubiM16TQVog59M3UL/wUQyr7imP+3FLPab1eF1A+Uku
+         RwSDVj15uEq6RH1uRce6B5IIczPEsMZ0pIuopGwGJ47jqPrIUBTSKXjrkzM9kT7DvNWL
+         XKOA==
+X-Gm-Message-State: AOAM5333IhzbuHkDQ+sG6ApMF4dv/hmsggYuK3n/vxIoqFosWCnQLLyh
+        e3IZcDagCIoSlbC4rVfUKCWqI3SIdr38nIvoNiA=
+X-Google-Smtp-Source: ABdhPJwpGkAxIF9u5LUtT0+EBcB0ZZlrJEnNDZLI4eWWNeb4xPKldIpI+xwq2MgnLdBduDPuRlWe4a6BDOrqpFSpdVE=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr4304488oix.48.1595959425884;
+ Tue, 28 Jul 2020 11:03:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200717020332.Bluez.v3.1.I1322f6745fa50365c1c88de3e2c50c9c5962c094@changeid>
+ <CALWDO_UsrzyLFkmxcnE59zaZPjP8ByN3sSOLDse6LwwpTA=ZsQ@mail.gmail.com>
+In-Reply-To: <CALWDO_UsrzyLFkmxcnE59zaZPjP8ByN3sSOLDse6LwwpTA=ZsQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 28 Jul 2020 11:03:36 -0700
+Message-ID: <CABBYNZK5aqhLXttAz6qie3LN5SnzmwuLFt8VtzQURjC+5UNXaQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 1/2] device: add device_remove_bonding function
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Archie Pusaka <apusaka@google.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Alain Michaud <alainm@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Unregister from suspend notifications and cancel suspend preparations
-before running hci_dev_do_close. Otherwise, the suspend notifier may
-race with unregister and cause cmd_timeout even after hdev has been
-freed.
+Hi,
 
-Below is the trace from when this panic was seen:
+On Tue, Jul 28, 2020 at 6:19 AM Alain Michaud <alainmichaud@google.com> wrote:
+>
+> Friendly ping to maintainers on this one.
+>
+> Thanks,
+> Alain
+>
+> On Thu, Jul 16, 2020 at 2:04 PM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > This patch splits the "bonding removal" function in device.c,
+> > because we need to remove bonding information when receiving
+> > "virtual cable unplug" in HID profile.
+> >
+> > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > ---
+> >
+> > Changes in v3:
+> > - Call device_set_temporary on device_remove_bonding
+> >
+> > Changes in v2: None
+> >
+> >  src/device.c | 28 ++++++++++++++++++----------
+> >  src/device.h |  1 +
+> >  2 files changed, 19 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/src/device.c b/src/device.c
+> > index 226216235..b23ecb7fd 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -4356,6 +4356,20 @@ static void delete_folder_tree(const char *dirname)
+> >         rmdir(dirname);
+> >  }
+> >
+> > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type)
+> > +{
+> > +       if (bdaddr_type == BDADDR_BREDR)
+> > +               device->bredr_state.bonded = false;
+> > +       else
+> > +               device->le_state.bonded = false;
+> > +
+> > +       if (!device->bredr_state.bonded && !device->le_state.bonded)
+> > +               btd_device_set_temporary(device, true);
+> > +
+> > +       btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+> > +                                                       bdaddr_type);
+> > +}
+> > +
+> >  static void device_remove_stored(struct btd_device *device)
+> >  {
+> >         char device_addr[18];
+> > @@ -4364,17 +4378,11 @@ static void device_remove_stored(struct btd_device *device)
+> >         char *data;
+> >         gsize length = 0;
+> >
+> > -       if (device->bredr_state.bonded) {
+> > -               device->bredr_state.bonded = false;
+> > -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+> > -                                                               BDADDR_BREDR);
+> > -       }
+> > +       if (device->bredr_state.bonded)
+> > +               device_remove_bonding(device, BDADDR_BREDR);
+> >
+> > -       if (device->le_state.bonded) {
+> > -               device->le_state.bonded = false;
+> > -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+> > -                                                       device->bdaddr_type);
+> > -       }
+> > +       if (device->le_state.bonded)
+> > +               device_remove_bonding(device, device->bdaddr_type);
+> >
+> >         device->bredr_state.paired = false;
+> >         device->le_state.paired = false;
+> > diff --git a/src/device.h b/src/device.h
+> > index cb8d884e8..956fec1ae 100644
+> > --- a/src/device.h
+> > +++ b/src/device.h
+> > @@ -50,6 +50,7 @@ uint16_t btd_device_get_vendor(struct btd_device *device);
+> >  uint16_t btd_device_get_vendor_src(struct btd_device *device);
+> >  uint16_t btd_device_get_product(struct btd_device *device);
+> >  uint16_t btd_device_get_version(struct btd_device *device);
+> > +void device_remove_bonding(struct btd_device *device, uint8_t bdaddr_type);
+> >  void device_remove(struct btd_device *device, gboolean remove_stored);
+> >  int device_address_cmp(gconstpointer a, gconstpointer b);
+> >  int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
+> > --
+> > 2.27.0.389.gc38d7665816-goog
+> >
 
-[  832.578518] Bluetooth: hci_core.c:hci_cmd_timeout() hci0: command 0x0c05 tx timeout
-[  832.586200] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  832.586203] #PF: supervisor read access in kernel mode
-[  832.586205] #PF: error_code(0x0000) - not-present page
-[  832.586206] PGD 0 P4D 0
-[  832.586210] PM: suspend exit
-[  832.608870] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[  832.613232] CPU: 3 PID: 10755 Comm: kworker/3:7 Not tainted 5.4.44-04894-g1e9dbb96a161 #1
-[  832.630036] Workqueue: events hci_cmd_timeout [bluetooth]
-[  832.630046] RIP: 0010:__queue_work+0xf0/0x374
-[  832.630051] RSP: 0018:ffff9b5285f1fdf8 EFLAGS: 00010046
-[  832.674033] RAX: ffff8a97681bac00 RBX: 0000000000000000 RCX: ffff8a976a000600
-[  832.681162] RDX: 0000000000000000 RSI: 0000000000000009 RDI: ffff8a976a000748
-[  832.688289] RBP: ffff9b5285f1fe38 R08: 0000000000000000 R09: ffff8a97681bac00
-[  832.695418] R10: 0000000000000002 R11: ffff8a976a0006d8 R12: ffff8a9745107600
-[  832.698045] usb 1-6: new full-speed USB device number 119 using xhci_hcd
-[  832.702547] R13: ffff8a9673658850 R14: 0000000000000040 R15: 000000000000001e
-[  832.702549] FS:  0000000000000000(0000) GS:ffff8a976af80000(0000) knlGS:0000000000000000
-[  832.702550] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  832.702550] CR2: 0000000000000000 CR3: 000000010415a000 CR4: 00000000003406e0
-[  832.702551] Call Trace:
-[  832.702558]  queue_work_on+0x3f/0x68
-[  832.702562]  process_one_work+0x1db/0x396
-[  832.747397]  worker_thread+0x216/0x375
-[  832.751147]  kthread+0x138/0x140
-[  832.754377]  ? pr_cont_work+0x58/0x58
-[  832.758037]  ? kthread_blkcg+0x2e/0x2e
-[  832.761787]  ret_from_fork+0x22/0x40
-[  832.846191] ---[ end trace fa93f466da517212 ]---
+Applied, thanks.
 
-Fixes: 9952d90ea2885 ("Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND")
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
-Hi Marcel,
-
-This fixes a race between hci_unregister_dev and the suspend notifier.
-
-The suspend notifier handler seemed to be scheduling commands even after
-it was cleaned up and this was resulting in a panic in cmd_timeout (when
-it tries to requeue the cmd_timer).
-
-This was tested on 5.4 kernel with a suspend+resume stress test for 500+
-iterations. I also confirmed that after a usb disconnect, the suspend
-notifier times out before the USB device is probed again (fixing the
-original race between the usb_disconnect + probe and the notifier).
-
-Thanks
-Abhishek
-
-
-Changes in v3:
-* Added fixes tag
-
-Changes in v2:
-* Moved oops into commit message
-
- net/bluetooth/hci_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5394ab56c915a9..4ba23b821cbf4a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3767,9 +3767,10 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 
- 	cancel_work_sync(&hdev->power_on);
- 
--	hci_dev_do_close(hdev);
--
- 	unregister_pm_notifier(&hdev->suspend_notifier);
-+	cancel_work_sync(&hdev->suspend_prepare);
-+
-+	hci_dev_do_close(hdev);
- 
- 	if (!test_bit(HCI_INIT, &hdev->flags) &&
- 	    !hci_dev_test_flag(hdev, HCI_SETUP) &&
 -- 
-2.28.0.rc0.142.g3c755180ce-goog
-
+Luiz Augusto von Dentz
