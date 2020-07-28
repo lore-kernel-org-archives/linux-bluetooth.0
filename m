@@ -4,97 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 054F3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D95FC433F1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D84E7207E8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:17:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8141B20792
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:17:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727772AbgG1HRB convert rfc822-to-8bit (ORCPT
+        id S1727772AbgG1HRs convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:17:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41332 "EHLO
+        Tue, 28 Jul 2020 03:17:48 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53580 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726854AbgG1HRA (ORCPT
+        with ESMTP id S1726854AbgG1HRs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:17:00 -0400
+        Tue, 28 Jul 2020 03:17:48 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B94B2CECCD;
-        Tue, 28 Jul 2020 09:27:00 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A4312CECCE;
+        Tue, 28 Jul 2020 09:27:47 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH RFC] bluetooth: add support for some old headsets
+Subject: Re: [PATCH 2/2] Bluetooth: hci_serdev: Only unregister device if it
+ was registered
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <6f271bf7-04ee-c971-9c69-de3f696769ed@omprussia.ru>
-Date:   Tue, 28 Jul 2020 09:16:59 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20200721103652.2.I8a2fdad30d42399fa5afc15d66b460d1738c3946@changeid>
+Date:   Tue, 28 Jul 2020 09:17:46 +0200
+Cc:     Ian Molton <ian@mnementh.co.uk>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
         Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Ildar Kamaletdinov <i.kamaletdinov@omprussia.ru>
+        <linux-bluetooth@vger.kernel.org>, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <97E2381A-219D-46AF-962F-CBCD63B911AD@holtmann.org>
-References: <6f461412-a6c0-aa53-5e74-394e278ee9b1@omprussia.ru>
- <1834765D-52E6-45B8-9923-778C9182CFA9@holtmann.org>
- <e9f32310-2728-60a2-adc7-3a7418ce54e3@omprussia.ru>
- <848144D3-85F9-47F8-8CDA-02457FA7530F@holtmann.org>
- <0c2a8da1-6071-6597-d0d1-32ce1490aba7@omprussia.ru>
- <6f271bf7-04ee-c971-9c69-de3f696769ed@omprussia.ru>
-To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
+Message-Id: <1D8C4C03-727F-4CC4-9FC9-6355A6C778FC@holtmann.org>
+References: <20200721103652.1.Idbc7eddf1f24f750a8bbcbc8e06743736ae3be31@changeid>
+ <20200721103652.2.I8a2fdad30d42399fa5afc15d66b460d1738c3946@changeid>
+To:     Nicolas Boichat <drinkcat@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sergey,
+Hi Nicolas,
 
->>>>>> The MediaTek Bluetooth platform (MT6630 etc.) has a peculiar implementation
->>>>>> for the eSCO/SCO connection via BT/EDR: the host controller returns error
->>>>>> code 0x20 (LMP feature not supported) for HCI_Setup_Synchronous_Connection
->>>>>> (0x0028) command without actually trying to setup connection with a remote
->>>>>> device in case such device (like Digma BT-14 headset) didn't advertise its
->>>>>> supported features.  Even though this doesn't break compatibility with the
->>>>>> Bluetooth standard it breaks the compatibility with the Hands-Free Profile
->>>>>> (HFP).
->>>>>> 
->>>>>> This patch returns the compatibility with the HFP profile and actually
->>>>>> tries to check all available connection parameters despite of the specific
->>>>>> MediaTek implementation. Without it one was unable to establish eSCO/SCO
->>>>>> connection with some headsets.
-> [...]
->>>>>> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
->>>>>> 
->>>>>> ---
->>>>>> This patch is against the 'bluetooth-next.git' repo.
->>>>>> 
->>>>>> net/bluetooth/hci_event.c |    8 ++++++++
->>>>>> 1 file changed, 8 insertions(+)
->>>>>> 
->>>>>> Index: bluetooth-next/net/bluetooth/hci_event.c
->>>>>> ===================================================================
->>>>>> --- bluetooth-next.orig/net/bluetooth/hci_event.c
->>>>>> +++ bluetooth-next/net/bluetooth/hci_event.c
->>>>>> @@ -2187,6 +2187,13 @@ static void hci_cs_setup_sync_conn(struc
->>>>>> 	if (acl) {
->>>>>> 		sco = acl->link;
->>>>>> 		if (sco) {
->>>>>> +			if (status == 0x20 && /* Unsupported LMP Parameter value */
->>>>>> +			    sco->out) {
->> 
->>    Actually, I was expecting that you'd tell me to create a HCI quirk for this situation.
->> I have a patch doing that but I haven't been able to locate the driver in which to set this
->> quirk flag...
+> We should not call hci_unregister_dev if the device was not
+> successfully registered.
 > 
->   And that's no wonder! The BT driver that needs this patch is out-of-tree (and not even open
-> source, it seems) as we have finally ascertained with Ildar... Is there any interest in the
-> "preparatory" patch that lowers the indentation levels in hci_cs_setup_sync_conn()?
+> Fixes: c34dc3bfa7642fd ("Bluetooth: hci_serdev: Introduce hci_uart_unregister_device()")
+> Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
+> 
+> ---
+> 
+> drivers/bluetooth/hci_serdev.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-how is it possible that there is an out-of-tree Bluetooth driver. Seems odd. Maybe want to submit that upstream first.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
