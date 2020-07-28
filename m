@@ -2,243 +2,258 @@ Return-Path: <SRS0=dFGF=BH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15163C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB34C433E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:04:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E903D20829
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:04:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB7AB207F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jul 2020 07:04:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OxureNHL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727037AbgG1HEA convert rfc822-to-8bit (ORCPT
+        id S1727051AbgG1HEb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:04:00 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60583 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbgG1HEA (ORCPT
+        Tue, 28 Jul 2020 03:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726314AbgG1HEb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:04:00 -0400
-Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9E87ACECCC;
-        Tue, 28 Jul 2020 09:13:59 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] Bluetooth: adding configurable eir_max_name_len
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200727174641.1.Ic2cb84fb029a345c9e3901378717d1ab4e9246ab@changeid>
-Date:   Tue, 28 Jul 2020 09:03:57 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A475AABF-D0C9-4D22-9FCC-5D1DD346247E@holtmann.org>
-References: <20200727174641.1.Ic2cb84fb029a345c9e3901378717d1ab4e9246ab@changeid>
-To:     Alain Michaud <alainm@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Tue, 28 Jul 2020 03:04:31 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB039C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 00:04:30 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id b186so126810pfb.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 00:04:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=k3Tti1y5Bjyb7ZPVuwuxQs125pNEWWZEmzoggkjoZa4=;
+        b=OxureNHLzRTRL7rzDdsYfLiC/VdrBDAwKeB/qltP4XNeNMs4TzRmRys7sokkueEbwo
+         v6z+c125itwltj24UbvPz5aBPqWcBBwrB9DspFhR4Ub6EI8cETjHDlUy6BdsDNS2bKLM
+         ZmdtaCs3dBoVtIbPcotQ9OjQRJBmg7vhyaG2zPTKz+wDv9z+iwvFvLBJNSwzlvpkKxkX
+         FBaZUs3kpGv+YklVVUJxQIuqliCge1icGEKqosIYQl4UD+mNUNA9vYa3PtgTkwjF0OxX
+         n2GUj3sr14zH0YNG0xkTU8+8Mg2OgUole1u05Tky3nT1d6TPNFUmnXlSDONc4pFkykNG
+         hC2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=k3Tti1y5Bjyb7ZPVuwuxQs125pNEWWZEmzoggkjoZa4=;
+        b=Ll7PG7vAX8++2qM3N4swI/u1Xaoq0o/4vc5IAlDMyVRLIh93so9eHp0d2y45L75HxF
+         lL3bkcF1FvXcy0Pv6c9QRRLHPZ3UyBRQVb9AGcmB01sc/5ohntQsU6c6tGGk4aEcbiql
+         x0xLlISm/rv3MBjurvxDKxqZztzs1SqlGK0BnIUCCWGP22RhdaXZCmoTQH8NaPJ08mQK
+         UA9dkD1CcRuwvgarWHM4o2lrToZglj4pdjVj1wlGVAfDPizNS5ZkuU8ZLNREwvRXK36A
+         gG7tYX7KigPcdpc/8FIzCNDagvwoFRu1EkcGT8QxLysqiCQWVOE98fvVQ1l6EpNRZkyX
+         gyEg==
+X-Gm-Message-State: AOAM532mWApc9l9usltN6GDJ9HMHnPZSl5UuHKRDjG8bqwDc6u0hufOC
+        1uhZL5ikHLsPMkRYKtj/iIfaFPJR8sI=
+X-Google-Smtp-Source: ABdhPJzi9m740DPVDsOJ9O6zjBNCwwBy0aLqXjCE3Jc+yvGzBJPAEB9wEIEbX6jUDn8WM4EkE8J6oA==
+X-Received: by 2002:a05:6a00:2ba:: with SMTP id q26mr23935437pfs.135.1595919869832;
+        Tue, 28 Jul 2020 00:04:29 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id n2sm17624389pfq.140.2020.07.28.00.04.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2020 00:04:29 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: L2CAP: Fix to handling fragmented header
+Date:   Tue, 28 Jul 2020 00:04:28 -0700
+Message-Id: <20200728070428.1754257-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> This change adds support for a configurable eir_max_name_len for
-> platforms which requires a larger than 48 bytes complete name in EIR.
-> 
-> From bluetoothctl:
-> [bluetooth]# system-alias
-> 012345678901234567890123456789012345678901234567890123456789
-> Changing 012345678901234567890123456789012345678901234567890123456789
-> succeeded
-> [CHG] Controller DC:71:96:69:02:89 Alias:
-> 012345678901234567890123456789012345678901234567890123456789
-> 
-> From btmon:
-> < HCI Command: Write Local Name (0x03|0x0013) plen 248     #109
-> [hci0] 88.567990
->         Name:
-> 012345678901234567890123456789012345678901234567890123456789
->> HCI Event: Command Complete (0x0e) plen 4  #110 [hci0] 88.663854
->       Write Local Name (0x03|0x0013) ncmd 1
->         Status: Success (0x00)
-> @ MGMT Event: Local Name Changed (0x0008) plen 260               
-> {0x0004} [hci0] 88.663948
->         Name:
-> 012345678901234567890123456789012345678901234567890123456789
->         Short name:
-> < HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241
-> #111 [hci0] 88.663977
->         FEC: Not required (0x00)
->         Name (complete):
-> 012345678901234567890123456789012345678901234567890123456789
->         TX power: 12 dBm
->         Device ID: Bluetooth SIG assigned (0x0001)
->           Vendor: Google (224)
->           Product: 0xc405
->           Version: 0.5.6 (0x0056)
->         16-bit Service UUIDs (complete): 7 entries
->           Generic Access Profile (0x1800)
->           Generic Attribute Profile (0x1801)
->           Device Information (0x180a)
->           A/V Remote Control (0x110e)
->           A/V Remote Control Target (0x110c)
->           Handsfree Audio Gateway (0x111f)
->           Audio Source (0x110a)
->> HCI Event: Command Complete (0x0e) plen 4    #112 [hci0] 88.664874
->       Write Extended Inquiry Response (0x03|0x0052) ncmd 1
->         Status: Success (0x00)
-> 
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> 
-> ---
-> 
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         |  1 +
-> net/bluetooth/hci_request.c      | 29 +++++++++++++++++++++--------
-> net/bluetooth/mgmt_config.c      |  5 +++++
-> 4 files changed, 28 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index bee1b4778ccc..e08f92e7a9ca 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -298,6 +298,7 @@ struct hci_dev {
-> 	__u8		dev_name[HCI_MAX_NAME_LENGTH];
-> 	__u8		short_name[HCI_MAX_SHORT_NAME_LENGTH];
-> 	__u8		eir[HCI_MAX_EIR_LENGTH];
-> +	__u16		eir_max_name_len;
-> 	__u16		appearance;
-> 	__u8		dev_class[3];
-> 	__u8		major_class;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 6509f785dd14..b2507bd6613a 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3536,6 +3536,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	hdev->adv_instance_cnt = 0;
-> 	hdev->cur_adv_instance = 0x00;
-> 	hdev->adv_instance_timeout = 0;
-> +	hdev->eir_max_name_len = 48;
-> 
-> 	hdev->sniff_max_interval = 800;
-> 	hdev->sniff_min_interval = 80;
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 7c0c2fda04ad..f4714370b7e7 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -578,17 +578,21 @@ static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
-> static void create_eir(struct hci_dev *hdev, u8 *data)
-> {
-> 	u8 *ptr = data;
-> +	u8 size_remaining = HCI_MAX_EIR_LENGTH;
-> 	size_t name_len;
-> 
-> 	name_len = strlen(hdev->dev_name);
-> 
-> 	if (name_len > 0) {
-> 		/* EIR Data type */
-> -		if (name_len > 48) {
-> -			name_len = 48;
-> +		if (name_len > min_t(u16, (HCI_MAX_EIR_LENGTH - 2),
-> +				     hdev->eir_max_name_len)) {
-> +			name_len = min_t(u16, (HCI_MAX_EIR_LENGTH - 2),
-> +					 hdev->eir_max_name_len);
+Bluetooth Core Specification v5.2, Vol. 3, Part A, section 1.4, table
+1.1:
 
-if we have proper input validation we could just skip this hard to read code.
+ 'Start Fragments always either begin with the first octet of the Basic
+  L2CAP header of a PDU or they have a length of zero (see [Vol 2] Part
+  B, Section 6.6.2).'
 
-> 			ptr[1] = EIR_NAME_SHORT;
-> -		} else
-> +		} else {
-> 			ptr[1] = EIR_NAME_COMPLETE;
-> +		}
-> 
-> 		/* EIR Data length */
-> 		ptr[0] = name_len + 1;
-> @@ -596,17 +600,21 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
-> 		memcpy(ptr + 2, hdev->dev_name, name_len);
-> 
-> 		ptr += (name_len + 2);
-> +		size_remaining -= (name_len + 2);
-> 	}
-> 
-> -	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID) {
-> +	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID &&
-> +	    size_remaining >= 3) {
-> 		ptr[0] = 2;
-> 		ptr[1] = EIR_TX_POWER;
-> 		ptr[2] = (u8) hdev->inq_tx_power;
-> 
-> 		ptr += 3;
-> +		size_remaining -= 3;
-> 	}
-> 
-> -	if (hdev->devid_source > 0) {
-> +	if (hdev->devid_source > 0 &&
-> +	    size_remaining >= 10) {
-> 		ptr[0] = 9;
-> 		ptr[1] = EIR_DEVICE_ID;
-> 
-> @@ -616,11 +624,16 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
-> 		put_unaligned_le16(hdev->devid_version, ptr + 8);
-> 
-> 		ptr += 10;
-> +		size_remaining -= 10;
-> 	}
-> 
-> -	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-> -	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-> -	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-> +	ptr = create_uuid16_list(hdev, ptr, size_remaining);
-> +	size_remaining = HCI_MAX_EIR_LENGTH - (ptr - data);
-> +
-> +	ptr = create_uuid32_list(hdev, ptr, size_remaining);
-> +	size_remaining = HCI_MAX_EIR_LENGTH - (ptr - data);
-> +
-> +	ptr = create_uuid128_list(hdev, ptr, size_remaining);
-> }
-> 
-> void __hci_req_update_eir(struct hci_request *req)
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index b30b571f8caf..420ea322a5b7 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -67,6 +67,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 		HDEV_PARAM_U16(0x001a, le_supv_timeout),
-> 		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
-> 						def_le_autoconnect_timeout),
-> +		HDEV_PARAM_U16(0x001c, eir_max_name_len),
+This text has been changed recently as it previously stated:
 
-We should really have range validation for these parameters. And we should document ranges in mgmt-api.txt as well.
+ 'Start Fragments always begin with the Basic L2CAP header of a PDU.'
 
-> 	};
-> 	struct mgmt_rp_read_def_system_config *rp = (void *)params;
-> 
-> @@ -138,6 +139,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 		case 0x0019:
-> 		case 0x001a:
-> 		case 0x001b:
-> +		case 0x001c:
-> 			if (len != sizeof(u16)) {
-> 				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
-> 					    len, sizeof(u16), type);
-> @@ -251,6 +253,9 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 			hdev->def_le_autoconnect_timeout =
-> 					msecs_to_jiffies(TLV_GET_LE16(buffer));
-> 			break;
-> +		case 0x0001c:
-> +			hdev->eir_max_name_len = TLV_GET_LE16(buffer);
-> +			break;
-> 		default:
-> 			bt_dev_warn(hdev, "unsupported parameter %u", type);
-> 			break;
+Apparently this was changed by the following errata:
 
-Regards
+https://www.bluetooth.org/tse/errata_view.cfm?errata_id=10216
 
-Marcel
+In past this has not been a problem but it seems new controllers are
+apparently doing it as it has been reported in Zephyr:
+
+https://github.com/zephyrproject-rtos/zephyr/issues/26900
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 104 +++++++++++++++++++++++++++++--------
+ 1 file changed, 83 insertions(+), 21 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ade83e224567..193bea314222 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -8269,6 +8269,63 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 	mutex_unlock(&conn->chan_lock);
+ }
+ 
++/* Append fragment into frame respecting the maximum len of rx_skb */
++static int l2cap_recv_frag(struct l2cap_conn *conn, struct sk_buff *skb,
++			   u16 len)
++{
++	if (!conn->rx_skb) {
++		/* Allocate skb for the complete frame (with header) */
++		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
++		if (!conn->rx_skb)
++			return -ENOMEM;
++		/* Init rx_len */
++		conn->rx_len = len;
++	}
++
++	/* Copy as much as the rx_skb can hold */
++	len = min_t(u16, len, skb->len);
++	skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, len), len);
++	skb_pull(skb, len);
++	conn->rx_len -= len;
++
++	return len;
++}
++
++static int l2cap_recv_header(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct l2cap_hdr *hdr;
++	struct sk_buff *rx_skb;
++	int len;
++
++	/* Append just enough to complete the header */
++	len = l2cap_recv_frag(conn, skb, L2CAP_HDR_SIZE - conn->rx_skb->len);
++
++	/* If header could not be read just continue */
++	if (len < 0 || conn->rx_skb->len < L2CAP_HDR_SIZE)
++		return len;
++
++	rx_skb = conn->rx_skb;
++	conn->rx_skb = NULL;
++
++	hdr = (struct l2cap_hdr *) rx_skb->data;
++
++	/* Append existing rx_skb as that allocates only enough for the
++	 * headers.
++	 */
++	len = l2cap_recv_frag(conn, rx_skb,
++			      __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE);
++	kfree_skb(rx_skb);
++
++	return len;
++}
++
++static void l2cap_recv_reset(struct l2cap_conn *conn)
++{
++	kfree_skb(conn->rx_skb);
++	conn->rx_skb = NULL;
++	conn->rx_len = 0;
++}
++
+ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+@@ -8291,19 +8348,19 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 	case ACL_START:
+ 	case ACL_START_NO_FLUSH:
+ 	case ACL_COMPLETE:
+-		if (conn->rx_len) {
++		if (conn->rx_skb) {
+ 			BT_ERR("Unexpected start frame (len %d)", skb->len);
+-			kfree_skb(conn->rx_skb);
+-			conn->rx_skb = NULL;
+-			conn->rx_len = 0;
++			l2cap_recv_reset(conn);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 		}
+ 
+-		/* Start fragment always begin with Basic L2CAP header */
++		/* Start fragment may not contain the L2CAP header so just
++		 * copy the initial byte when that happens.
++		 */
+ 		if (skb->len < L2CAP_HDR_SIZE) {
+-			BT_ERR("Frame is too short (len %d)", skb->len);
+-			l2cap_conn_unreliable(conn, ECOMM);
+-			goto drop;
++			if (l2cap_recv_frag(conn, skb, L2CAP_HDR_SIZE) < 0)
++				goto drop;
++			return;
+ 		}
+ 
+ 		hdr = (struct l2cap_hdr *) skb->data;
+@@ -8324,38 +8381,43 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			goto drop;
+ 		}
+ 
+-		/* Allocate skb for the complete frame (with header) */
+-		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
+-		if (!conn->rx_skb)
++		/* Append fragment into frame (with header) */
++		if (l2cap_recv_frag(conn, skb, len) < 0)
+ 			goto drop;
+ 
+-		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+-					  skb->len);
+-		conn->rx_len = len - skb->len;
+ 		break;
+ 
+ 	case ACL_CONT:
+ 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
+ 
+-		if (!conn->rx_len) {
++		if (!conn->rx_skb) {
+ 			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 			goto drop;
+ 		}
+ 
++		/* Complete the L2CAP header if it has not been read */
++		if (conn->rx_skb->len < L2CAP_HDR_SIZE) {
++			if (l2cap_recv_header(conn, skb) < 0) {
++				l2cap_conn_unreliable(conn, ECOMM);
++				goto drop;
++			}
++
++			/* Header still could not be read just continue */
++			if (conn->rx_skb->len < L2CAP_HDR_SIZE)
++				return;
++		}
++
+ 		if (skb->len > conn->rx_len) {
+ 			BT_ERR("Fragment is too long (len %d, expected %d)",
+ 			       skb->len, conn->rx_len);
+-			kfree_skb(conn->rx_skb);
+-			conn->rx_skb = NULL;
+-			conn->rx_len = 0;
++			l2cap_recv_reset(conn);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 			goto drop;
+ 		}
+ 
+-		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+-					  skb->len);
+-		conn->rx_len -= skb->len;
++		/* Append fragment into frame (with header) */
++		l2cap_recv_frag(conn, skb, skb->len);
+ 
+ 		if (!conn->rx_len) {
+ 			/* Complete frame received. l2cap_recv_frame
+-- 
+2.26.2
 
