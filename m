@@ -2,78 +2,69 @@ Return-Path: <SRS0=Z40G=BI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C20C433EC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jul 2020 01:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7955C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jul 2020 01:55:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03C5D2076E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jul 2020 01:42:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8622120672
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jul 2020 01:55:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Z1OP5tnv"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aTzRitfx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730620AbgG2Bml (ORCPT
+        id S1730428AbgG2Bzr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jul 2020 21:42:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55160 "EHLO
+        Tue, 28 Jul 2020 21:55:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730594AbgG2Bml (ORCPT
+        with ESMTP id S1728401AbgG2Bzr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jul 2020 21:42:41 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AB5C061794
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 18:42:40 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id l63so13366222pge.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 18:42:40 -0700 (PDT)
+        Tue, 28 Jul 2020 21:55:47 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0E8C061794
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 18:55:47 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id t6so11071436plo.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jul 2020 18:55:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=eSNl5guPVSTVFb6xmLUiPtvBabfXpb7A/lKPqGtlYVE=;
-        b=Z1OP5tnvZFehixnm5/zklBzayLRLEJOr/wpWZHZdO9CCj3RzpX4aCf8laptB3LXr7m
-         mMxRRhYsJ9NYel6WVmcmi2xleu2s/YC3hcavNYO2HFM3zX68h7M2aB3KB289JeVoCtd2
-         RT8YAS/tfcxMD+qySCgNPwM64IvQtPQo3uvdA=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0mg8uMGqdODjV0twVLdps/ZZK7k46XwhUkh9iWxwZlk=;
+        b=aTzRitfxz9zopfIM5sf1aA962vCcQ41AV5sAyCoKScsjH8DBz42gqa7qT0+4acAQTl
+         O3gUENOJcN6Nj3BNQpvAtljk8vlMT+RkpJZv0/+UjMvCGDOBNW1m5yQXB2JsFh8UfJnG
+         8G0Uubw1tHMZJ/KXSOTNZI2GR2BWt4JnO5tP8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=eSNl5guPVSTVFb6xmLUiPtvBabfXpb7A/lKPqGtlYVE=;
-        b=mMuDDahuUJjx7SsBXgJ38pVpbbmbuneKaF0fnlqmCzAmBrZKA/iiIgO85QukzIKQ3h
-         faeTi/YiopKOvf8x0MroC8nMhn9iwBr0/CTXeTmX4Jj/EBiKRNYVjPTNhkS9WImxYrog
-         9vtr/Vi9SfclfjKaF6fJSxcHnJNYLb9TitQo9TMEAY7oXJ+euF3DOnxPBPKONRxJ4nHT
-         L7TZlJZ2yL2rYcg0BLWE17Fck47TAP8Zq44Puq4DQJZKsB4FtWxOA6wp2JGs3Bpe/GQX
-         /ULtZz5MSP99GewUFkQ4+uXJjPekAYXpKetulLGrH9hv3hcSC/2D7EgjVm23jixYQ91q
-         Ewlw==
-X-Gm-Message-State: AOAM530A4+/ZTu6PWFwSsRuj+CrfrqgktV6PTk1rXEcq33o/Vrjb8IZ2
-        VUOyVCPEUjQYEmuUhonuYHcAyQ==
-X-Google-Smtp-Source: ABdhPJxmMzqdfhSy+5r+Shhpe9Koc5HP/8a+PhUzDBJ2QPDK9IcuRsnWyLnvvshaymFwOpCL7O2t1g==
-X-Received: by 2002:a63:454d:: with SMTP id u13mr5805629pgk.309.1595986960385;
-        Tue, 28 Jul 2020 18:42:40 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0mg8uMGqdODjV0twVLdps/ZZK7k46XwhUkh9iWxwZlk=;
+        b=aTQdo0V6m3isXEtheAdw56nF3rCTxMp2tpNREgQEkQdRhLFMOuqxtrHbzyt6VmW0R2
+         BkQRQrNrz9GAGBXN84D36WU2sdiaIL4IC240d9Tmu7Umll/nVw1ovAFxccr3U629bfWo
+         dB+lwpN2KmX/157gLXU1H6F3zViLJfej0JYUyKRBOBNu3apcHecrQNvcC6gbaMWJSPDu
+         xci1rZ5p2Lt78pdxskQ1afCBRes2K0dproxfUgp27K8x5JVQ0OyHmuMXav9PjdSh2G0K
+         dfMSht6XxH9fCuaKaGbxy8M7UeGYfDZOTm99tiRxcBL1f+hwg4oqgU/e5GE0miNA2F+9
+         B6GA==
+X-Gm-Message-State: AOAM533MDdlJs3eFuaeHWU9rvPfLfVHZR+qfsqarMmfB8c23Xe84Mk7K
+        HCed7m9fcGPzfSrpL3eXpr2T5g==
+X-Google-Smtp-Source: ABdhPJxhkc0GWRy4AcCb9BdoANI6K3BqmozunmTWCY/XpstZW0eebZ82Nhp2Ej8T4dNGEWBGxeFHOA==
+X-Received: by 2002:a17:90a:d30e:: with SMTP id p14mr7466443pju.72.1595987746779;
+        Tue, 28 Jul 2020 18:55:46 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id e124sm280678pfe.176.2020.07.28.18.42.39
+        by smtp.gmail.com with ESMTPSA id lr1sm371128pjb.27.2020.07.28.18.55.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2020 18:42:39 -0700 (PDT)
+        Tue, 28 Jul 2020 18:55:46 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
+To:     luiz.dentz@gmail.com, marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 1/3] Bluetooth: Add mgmt suspend and resume events
-Date:   Tue, 28 Jul 2020 18:42:23 -0700
-Message-Id: <20200728184205.1.I1b721ef9da5c79d8515018d806801da4eacaf563@changeid>
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [RFC Bluez PATCH 0/3] adapter: Reconnect audio when resuming from suspend
+Date:   Tue, 28 Jul 2020 18:55:37 -0700
+Message-Id: <20200729015540.1848987-1-abhishekpandit@chromium.org>
 X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-In-Reply-To: <20200729014225.1842177-1-abhishekpandit@chromium.org>
-References: <20200729014225.1842177-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -81,88 +72,78 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add the controller suspend and resume events, which will signal when
-Bluetooth has completed preparing for suspend and when it's ready for
-resume.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
----
+Hi Luiz and Marcel,
 
- include/net/bluetooth/hci_core.h |  3 +++
- include/net/bluetooth/mgmt.h     | 11 +++++++++++
- net/bluetooth/mgmt.c             | 24 ++++++++++++++++++++++++
- 3 files changed, 38 insertions(+)
+This is a quality of life improvement for the behavior of audio devices
+during system suspend. This depends on a kernel change that emits
+suspend/resume events:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index bee1b4778ccc96..1b336e6ebe66aa 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1747,6 +1747,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-+void mgmt_suspending(struct hci_dev *hdev, u8 state);
-+void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
-+		   u8 addr_type);
- bool mgmt_powering_down(struct hci_dev *hdev);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
- void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk, bool persistent);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index beae5c3980f03b..d9a88cab379555 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -1028,3 +1028,14 @@ struct mgmt_ev_adv_monitor_added {
- struct mgmt_ev_adv_monitor_removed {
- 	__le16 monitor_handle;
- }  __packed;
-+
-+#define MGMT_EV_CONTROLLER_SUSPEND		0x002d
-+struct mgmt_ev_controller_suspend {
-+	__u8	suspend_state;
-+} __packed;
-+
-+#define MGMT_EV_CONTROLLER_RESUME		0x002e
-+struct mgmt_ev_controller_resume {
-+	__u8	wake_reason;
-+	struct mgmt_addr_info addr;
-+} __packed;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f45105d2de7722..1c89ae819207ac 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -8730,6 +8730,30 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering)
- 	mgmt_event(MGMT_EV_DISCOVERING, hdev, &ev, sizeof(ev), NULL);
- }
- 
-+void mgmt_suspending(struct hci_dev *hdev, u8 state)
-+{
-+	struct mgmt_ev_controller_suspend ev;
-+
-+	ev.suspend_state = state;
-+	mgmt_event(MGMT_EV_CONTROLLER_SUSPEND, hdev, &ev, sizeof(ev), NULL);
-+}
-+
-+void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
-+		   u8 addr_type)
-+{
-+	struct mgmt_ev_controller_resume ev;
-+
-+	ev.wake_reason = reason;
-+	if (bdaddr) {
-+		bacpy(&ev.addr.bdaddr, bdaddr);
-+		ev.addr.type = addr_type;
-+	} else {
-+		memset(&ev.addr, 0, sizeof(ev.addr));
-+	}
-+
-+	mgmt_event(MGMT_EV_CONTROLLER_RESUME, hdev, &ev, sizeof(ev), NULL);
-+}
-+
- static struct hci_mgmt_chan chan = {
- 	.channel	= HCI_CHANNEL_CONTROL,
- 	.handler_count	= ARRAY_SIZE(mgmt_handlers),
+https://patchwork.kernel.org/project/bluetooth/list/?series=325771
+
+Right now, audio devices will be disconnected as part of suspend but
+won't be reconnected when the system resumes without user interaction.
+This is annoying to some users as it causes an interruption to their
+normal work flow.
+
+This change reconnects audio devices that were disconnected for suspend
+using the following logic:
+
+ * In the Device Disconnected management event, if the disconnect reason
+   was 0x5 (Disconnected by Local Host for Suspend) and the device is an
+   audio sink (implements major services Audio + Rendering), then it is
+   queued for reconnect.
+ * When the Controller Resumed management event is seen, we check if
+   an audio device needs to be reconnected. If yes, we queue a delayed
+   callback to do the reconnection. The delay is 5s by default and is
+   meant to allow sufficient time for any Wi-Fi activity that may occur
+   during resume (since Bluetooth connect may adversely affect that).
+
+A reconnect is only attempted once after the controller resumes and the
+delay between resume and reconnect is configurable via the
+ReconnectAudioDelay key in the General settings. The 5s delay was chosen
+arbitrarily and I think anywhere up to 10s is probably ok. A longer
+delay is better to account for spurious wakeups and Wi-Fi reconnection
+time (avoiding any co-ex issues) at the downside of reconnection speed.
+
+Here are the tests I have done with this:
+- Single suspend and verified the headphones reconnect
+- Suspend stress test for 25 iterations and verify both Wi-Fi and
+  Bluetooth audio reconnect on resume. (Ran with wake minimum time of
+  10s)
+- Suspend test with wake time < 5s to verify that BT reconnect isn't
+  attempted. Ran 5 iterations with low wake time and then let it stay
+  awake to confirm reconnect finally completed after 5s+ wake time.
+- Suspend test with wake time between 3s - 6s. Ran with 5 iterations and
+  verified it wasn't connected at the end. A connection attempt was
+  made but not completed due to suspend. A reconnect attempt was not
+  made afterwards, which is by design.
+
+  Luiz@ Marcel@: Does this sound ok (give up after an attempt)?
+
+I've tested this on a Pixelbook Go (AC-9260 controller) and HP
+Chromebook 14a (RTL8822CE controller) with GID6B headset. I'm hoping to
+test this with a few more headsets to make sure this is ok and I'm
+looking for some early feedback.
+
+Thanks
+Abhishek
+
+
+
+Abhishek Pandit-Subedi (3):
+  mgmt: Add controller suspend and resume events
+  monitor: Add btmon support for Suspend and Resume events
+  adapter: Reconnect audio on controller resume
+
+ lib/mgmt.h       | 14 +++++++++
+ monitor/packet.c | 55 ++++++++++++++++++++++++++++++++
+ src/adapter.c    | 82 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.c     | 27 ++++++++++++++++
+ src/device.h     |  2 ++
+ src/main.conf    |  6 ++++
+ 6 files changed, 186 insertions(+)
+
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
