@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0485DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jul 2020 09:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2586DC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jul 2020 09:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD7C120809
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jul 2020 09:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BB102083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jul 2020 09:14:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbgG3JOb (ORCPT
+        id S1729313AbgG3JOc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jul 2020 05:14:31 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47057 "EHLO
+        Thu, 30 Jul 2020 05:14:32 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39750 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728815AbgG3JOa (ORCPT
+        with ESMTP id S1729231AbgG3JOb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jul 2020 05:14:30 -0400
+        Thu, 30 Jul 2020 05:14:31 -0400
 Received: from localhost.localdomain (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D1CB3CECF7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 11:24:28 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1E670CECF9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 11:24:29 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/8] Bluetooth: Enable/Disable address resolution during le create conn
-Date:   Thu, 30 Jul 2020 11:14:19 +0200
-Message-Id: <20200730091421.48847-6-marcel@holtmann.org>
+Subject: [PATCH 8/8] Bluetooth: Enable controller RPA resolution using Experimental feature
+Date:   Thu, 30 Jul 2020 11:14:21 +0200
+Message-Id: <20200730091421.48847-8-marcel@holtmann.org>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -39,224 +39,292 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sathish Narasimman <nsathish41@gmail.com>
 
-In this patch if le_create_conn process is started restrict to
-disable address resolution and same is disabled during
-le_enh_connection_complete
+This patch adds support to enable the use of RPA Address resolution
+using expermental feature mgmt command.
 
 Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_conn.c    |  7 +++++-
- net/bluetooth/hci_event.c   |  4 ++++
- net/bluetooth/hci_request.c | 45 ++++++++++++++++++++++++++++---------
- net/bluetooth/hci_request.h |  3 ++-
- net/bluetooth/mgmt.c        |  2 +-
- 5 files changed, 47 insertions(+), 14 deletions(-)
+ include/net/bluetooth/hci.h |   1 +
+ net/bluetooth/hci_event.c   |   1 +
+ net/bluetooth/hci_request.c |   7 +-
+ net/bluetooth/mgmt.c        | 142 +++++++++++++++++++++++++++++++++++-
+ 4 files changed, 148 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index be67361ff2f0..9832f8445d43 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1003,6 +1003,11 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	struct hci_request req;
- 	int err;
- 
-+	/* This ensures that during disable le_scan address resolution
-+	 * will not be disabled if it is followed by le_create_conn
-+	 */
-+	bool rpa_le_conn = true;
-+
- 	/* Let's make sure that le is enabled.*/
- 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
- 		if (lmp_le_capable(hdev))
-@@ -1103,7 +1108,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * state.
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
--		hci_req_add_le_scan_disable(&req);
-+		hci_req_add_le_scan_disable(&req, rpa_le_conn);
- 		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
- 	}
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index dd82cce77a7a..c8e67042a3b1 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -318,6 +318,7 @@ enum {
+ 	HCI_FORCE_BREDR_SMP,
+ 	HCI_FORCE_STATIC_ADDR,
+ 	HCI_LL_RPA_RESOLUTION,
++	HCI_ENABLE_LL_PRIVACY,
+ 	HCI_CMD_PENDING,
+ 	HCI_FORCE_NO_MITM,
  
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6388fb55b4d2..628831b15c0a 100644
+index 628831b15c0a..33d8458fdd4a 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -5228,6 +5228,10 @@ static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
- 			     le16_to_cpu(ev->interval),
- 			     le16_to_cpu(ev->latency),
+@@ -5230,6 +5230,7 @@ static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
  			     le16_to_cpu(ev->supervision_timeout));
-+
-+	if (use_ll_privacy(hdev) &&
-+	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
-+		hci_req_disable_address_resolution(hdev);
- }
  
- static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
+ 	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
+ 		hci_req_disable_address_resolution(hdev);
+ }
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index e48f0945a417..70e077cc7dfa 100644
+index 70e077cc7dfa..435400a43a78 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -428,7 +428,7 @@ static void __hci_update_background_scan(struct hci_request *req)
- 		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
- 			return;
+@@ -678,8 +678,10 @@ void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
  
--		hci_req_add_le_scan_disable(req);
-+		hci_req_add_le_scan_disable(req, false);
- 
- 		BT_DBG("%s stopping background scanning", hdev->name);
- 	} else {
-@@ -447,7 +447,7 @@ static void __hci_update_background_scan(struct hci_request *req)
- 		 * don't miss any advertising (due to duplicates filter).
- 		 */
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
--			hci_req_add_le_scan_disable(req);
-+			hci_req_add_le_scan_disable(req, false);
- 
- 		hci_req_add_le_passive_scan(req);
- 
-@@ -652,7 +652,7 @@ void __hci_req_update_eir(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
- }
- 
--void hci_req_add_le_scan_disable(struct hci_request *req)
-+void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
- {
- 	struct hci_dev *hdev = req->hdev;
- 
-@@ -676,8 +676,9 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- 	}
- 
-+	/* Disable address resolution */
+ 	/* Disable address resolution */
  	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION)) {
-+	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
++	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
+ 	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
  		__u8 enable = 0x00;
++
  		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
  	}
-@@ -1072,7 +1073,7 @@ static void hci_req_config_le_suspend_scan(struct hci_request *req)
- {
- 	/* Before changing params disable scan if enabled */
- 	if (hci_dev_test_flag(req->hdev, HCI_LE_SCAN))
--		hci_req_add_le_scan_disable(req);
-+		hci_req_add_le_scan_disable(req, false);
- 
- 	/* Configure params and enable scanning */
- 	hci_req_add_le_passive_scan(req);
-@@ -1140,7 +1141,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
- 
- 		/* Disable LE passive scan if enabled */
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
--			hci_req_add_le_scan_disable(&req);
-+			hci_req_add_le_scan_disable(&req, false);
- 
- 		/* Mark task needing completion */
- 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
-@@ -1696,6 +1697,28 @@ int hci_req_update_adv_data(struct hci_dev *hdev, u8 instance)
- 	return hci_req_run(&req, NULL);
  }
- 
-+static void enable_addr_resolution_complete(struct hci_dev *hdev, u8 status,
-+					    u16 opcode)
-+{
-+	BT_DBG("%s status %u", hdev->name, status);
-+}
-+
-+void hci_req_disable_address_resolution(struct hci_dev *hdev)
-+{
-+	struct hci_request req;
-+	__u8 enable = 0x00;
-+
-+	if (!use_ll_privacy(hdev) &&
-+	    !hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add(&req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
-+
-+	hci_req_run(&req, enable_addr_resolution_complete);
-+}
-+
- static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- {
- 	BT_DBG("%s status %u", hdev->name, status);
-@@ -2667,7 +2690,7 @@ static void bg_scan_update(struct work_struct *work)
- 
- static int le_scan_disable(struct hci_request *req, unsigned long opt)
- {
--	hci_req_add_le_scan_disable(req);
-+	hci_req_add_le_scan_disable(req, false);
- 	return 0;
- }
- 
-@@ -2770,7 +2793,7 @@ static int le_scan_restart(struct hci_request *req, unsigned long opt)
- 		return 0;
+@@ -870,8 +872,11 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
+ 		return;
  	}
  
--	hci_req_add_le_scan_disable(req);
-+	hci_req_add_le_scan_disable(req, false);
- 
- 	if (use_ext_scan(hdev)) {
- 		struct hci_cp_le_set_ext_scan_enable ext_enable_cp;
-@@ -2861,7 +2884,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	 * discovery scanning parameters.
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
--		hci_req_add_le_scan_disable(req);
-+		hci_req_add_le_scan_disable(req, false);
- 
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
-@@ -2976,14 +2999,14 @@ bool hci_req_stop_discovery(struct hci_request *req)
- 
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
- 			cancel_delayed_work(&hdev->le_scan_disable);
--			hci_req_add_le_scan_disable(req);
-+			hci_req_add_le_scan_disable(req, false);
- 		}
- 
- 		ret = true;
- 	} else {
- 		/* Passive scanning */
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
--			hci_req_add_le_scan_disable(req);
-+			hci_req_add_le_scan_disable(req, false);
- 			ret = true;
- 		}
+-	if (use_ll_privacy(hdev) && addr_resolv) {
++	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
++	    addr_resolv) {
+ 		u8 enable = 0x01;
++
+ 		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
  	}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index bbe892ab078a..6a12e84c66c4 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -65,11 +65,12 @@ void __hci_req_write_fast_connectable(struct hci_request *req, bool enable);
- void __hci_req_update_name(struct hci_request *req);
- void __hci_req_update_eir(struct hci_request *req);
  
--void hci_req_add_le_scan_disable(struct hci_request *req);
-+void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn);
- void hci_req_add_le_passive_scan(struct hci_request *req);
- 
- void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
- 
-+void hci_req_disable_address_resolution(struct hci_dev *hdev);
- void hci_req_reenable_advertising(struct hci_dev *hdev);
- void __hci_req_enable_advertising(struct hci_request *req);
- void __hci_req_disable_advertising(struct hci_request *req);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f45105d2de77..47bcfe2fb14c 100644
+index 47bcfe2fb14c..4ec0fee80344 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5226,7 +5226,7 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+@@ -795,10 +795,15 @@ static u32 get_supported_settings(struct hci_dev *hdev)
  
- 		hci_req_init(&req, hdev);
+ 	if (lmp_le_capable(hdev)) {
+ 		settings |= MGMT_SETTING_LE;
+-		settings |= MGMT_SETTING_ADVERTISING;
+ 		settings |= MGMT_SETTING_SECURE_CONN;
+ 		settings |= MGMT_SETTING_PRIVACY;
+ 		settings |= MGMT_SETTING_STATIC_ADDRESS;
++
++		/* When the experimental feature for LL Privacy support is
++		 * enabled, then advertising is no longer supported.
++		 */
++		if (!hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++			settings |= MGMT_SETTING_ADVERTISING;
+ 	}
  
--		hci_req_add_le_scan_disable(&req);
-+		hci_req_add_le_scan_disable(&req, false);
- 		hci_req_add_le_passive_scan(&req);
+ 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+@@ -3759,10 +3764,16 @@ static const u8 simult_central_periph_uuid[16] = {
+ 	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
+ };
  
- 		hci_req_run(&req, NULL);
++/* 15c0a148-c273-11ea-b3de-0242ac130004 */
++static const u8 rpa_resolution_uuid[16] = {
++	0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
++	0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
++};
++
+ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				  void *data, u16 data_len)
+ {
+-	char buf[44];
++	char buf[62];	/* Enough space for 3 features */
+ 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
+ 	u16 idx = 0;
+ 	u32 flags;
+@@ -3795,6 +3806,17 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
+ 	}
+ 
++	if (hdev && use_ll_privacy(hdev)) {
++		if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++			flags = BIT(0) | BIT(1);
++		else
++			flags = BIT(1);
++
++		memcpy(rp->features[idx].uuid, rpa_resolution_uuid, 16);
++		rp->features[idx].flags = cpu_to_le32(flags);
++		idx++;
++	}
++
+ 	rp->feature_count = cpu_to_le16(idx);
+ 
+ 	/* After reading the experimental features information, enable
+@@ -3807,6 +3829,21 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				 0, rp, sizeof(*rp) + (20 * idx));
+ }
+ 
++static int exp_ll_privacy_feature_changed(bool enabled, struct hci_dev *hdev,
++					  struct sock *skip)
++{
++	struct mgmt_ev_exp_feature_changed ev;
++
++	memset(&ev, 0, sizeof(ev));
++	memcpy(ev.uuid, rpa_resolution_uuid, 16);
++	ev.flags = cpu_to_le32((enabled ? BIT(0) : 0) | BIT(1));
++
++	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
++				  &ev, sizeof(ev),
++				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
++
++}
++
+ #ifdef CONFIG_BT_FEATURE_DEBUG
+ static int exp_debug_feature_changed(bool enabled, struct sock *skip)
+ {
+@@ -3845,6 +3882,16 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 		}
+ #endif
+ 
++		if (hdev && use_ll_privacy(hdev) && !hdev_is_powered(hdev)) {
++			bool changed = hci_dev_test_flag(hdev,
++							 HCI_ENABLE_LL_PRIVACY);
++
++			hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++
++			if (changed)
++				exp_ll_privacy_feature_changed(false, hdev, sk);
++		}
++
+ 		hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
+ 
+ 		return mgmt_cmd_complete(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
+@@ -3895,6 +3942,69 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 	}
+ #endif
+ 
++	if (!memcmp(cp->uuid, rpa_resolution_uuid, 16)) {
++		bool val, changed;
++		int err;
++		u32 flags;
++
++		/* Command requires to use the controller index */
++		if (!hdev)
++			return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_INDEX);
++
++		/* Changes can only be made when controller is powered down */
++		if (hdev_is_powered(hdev))
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_NOT_POWERED);
++
++		/* Parameters are limited to a single octet */
++		if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_PARAMS);
++
++		/* Only boolean on/off is supported */
++		if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_PARAMS);
++
++		val = !!cp->param[0];
++
++		if (val) {
++			changed = !hci_dev_test_flag(hdev,
++						     HCI_ENABLE_LL_PRIVACY);
++			hci_dev_set_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++			hci_dev_clear_flag(hdev, HCI_ADVERTISING);
++
++			/* Enable LL privacy + supported settings changed */
++			flags = BIT(0) | BIT(1);
++		} else {
++			changed = hci_dev_test_flag(hdev,
++						    HCI_ENABLE_LL_PRIVACY);
++			hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++
++			/* Disable LL privacy + supported settings changed */
++			flags = BIT(1);
++		}
++
++		memcpy(rp.uuid, rpa_resolution_uuid, 16);
++		rp.flags = cpu_to_le32(flags);
++
++		hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++
++		err = mgmt_cmd_complete(sk, hdev->id,
++					MGMT_OP_SET_EXP_FEATURE, 0,
++					&rp, sizeof(rp));
++
++		if (changed)
++			exp_ll_privacy_feature_changed(val, hdev, sk);
++
++		return err;
++	}
++
+ 	return mgmt_cmd_status(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
+ 			       MGMT_OP_SET_EXP_FEATURE,
+ 			       MGMT_STATUS_NOT_SUPPORTED);
+@@ -5040,6 +5150,13 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+ 				       status);
+ 
++	/* Enabling the experimental LL Privay support disables support for
++	 * advertising.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
+ 	if (cp->val != 0x00 && cp->val != 0x01 && cp->val != 0x02)
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+@@ -7112,6 +7229,13 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES,
+ 				       MGMT_STATUS_REJECTED);
+ 
++	/* Enabling the experimental LL Privay support disables support for
++	 * advertising.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	rp_len = sizeof(*rp) + hdev->adv_instance_cnt;
+@@ -7315,6 +7439,13 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				       status);
+ 
++	/* Enabling the experimental LL Privay support disables support for
++	 * advertising.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
+ 	if (cp->instance < 1 || cp->instance > HCI_MAX_ADV_INSTANCES)
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+@@ -7479,6 +7610,13 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
++	/* Enabling the experimental LL Privay support disables support for
++	 * advertising.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (cp->instance && !hci_find_adv_instance(hdev, cp->instance)) {
 -- 
 2.26.2
 
