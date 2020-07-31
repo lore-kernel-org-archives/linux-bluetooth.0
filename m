@@ -2,95 +2,80 @@ Return-Path: <SRS0=UTuE=BK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C144C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 07:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179CAC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 08:44:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DADB12067D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 07:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F37DC2084D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 08:44:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731692AbgGaHmI (ORCPT
+        id S1731912AbgGaIoJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 31 Jul 2020 03:42:08 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39910 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727851AbgGaHmI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 31 Jul 2020 03:42:08 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k1Pfy-0001TP-Sl; Fri, 31 Jul 2020 17:42:00 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 17:41:58 +1000
-Date:   Fri, 31 Jul 2020 17:41:58 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH] Bluetooth: Remove CRYPTO_ALG_INTERNAL flag
-Message-ID: <20200731074158.GA20263@gondor.apana.org.au>
+        Fri, 31 Jul 2020 04:44:09 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:54253 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731374AbgGaIoG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 31 Jul 2020 04:44:06 -0400
+Received: by mail-il1-f197.google.com with SMTP id v13so7942992ila.20
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2020 01:44:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=2MiWhebPAZEwNHbE02ggeQmHTDlIjaaAtS5l21f1BPw=;
+        b=iBXQaP86SCGC6SIP7sne1BNpGX6rpQj+YGVXRMfMyPgtO8oypRGgZBZkacYwqx+S7D
+         o3ZRYyMwvoqWW24RlPm0Vg2P5LjjaSYc7+WRXRgkV205HG8uj59QIP8Zj1ySEpqn6xDA
+         ZdaJ2OEfRnZJUenWX/p4SibmZZ7++44xuQB75NGbZSXZqIUPR3me0xnPdB3DnAFt6iDS
+         I2b8ZI6i9A/9odjwBCZxbXHkD4WAHXpbO/8txkLNC/Gj6ckYluHQXhifV59kjfAeHL9U
+         0BNeH4WP6AgymL63R+vr79gAPKkQyJVLXf8AOVLu+AS820BrHu4mQISdCkAPzVZl46pW
+         FNtw==
+X-Gm-Message-State: AOAM5308J1lqpAHrsIt5q05hDYQO2ZVDN49IoXA+TsJerr74+r74+iXR
+        cOzylYQjP8e3BsSBrXDq2r1Qe5XuujRdXtiToIgK3tPnGT/Z
+X-Google-Smtp-Source: ABdhPJy4Rj2LLEiAspTEtCegum11hHhIEmst76GFNZjb8ziE/nZyOIvy4zdOy45COS+BYVrIBbRSJc0ymQWmZ3YMzOpl0u7SggRq
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Received: by 2002:a6b:7416:: with SMTP id s22mr2545374iog.160.1596185045466;
+ Fri, 31 Jul 2020 01:44:05 -0700 (PDT)
+Date:   Fri, 31 Jul 2020 01:44:05 -0700
+In-Reply-To: <000000000000f6d80505abb42b60@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a1816805abb8caa1@google.com>
+Subject: Re: WARNING in cancel_delayed_work
+From:   syzbot <syzbot+35e70efb794757d7e175@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        johannes.berg@intel.com, johannes@sipsolutions.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        luciano.coelho@intel.com, marcel@holtmann.org,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The flag CRYPTO_ALG_INTERNAL is not meant to be used outside of
-the Crypto API.  It isn't needed here anyway.
+syzbot has bisected this issue to:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+commit fbd05e4a6e82fd573d3aa79e284e424b8d78c149
+Author: Luca Coelho <luciano.coelho@intel.com>
+Date:   Thu Sep 15 15:15:09 2016 +0000
 
-diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
-index 03e3c89c3046..f71c6fa65fb3 100644
---- a/net/bluetooth/selftest.c
-+++ b/net/bluetooth/selftest.c
-@@ -205,7 +205,7 @@ static int __init test_ecdh(void)
- 
- 	calltime = ktime_get();
- 
--	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-+	tfm = crypto_alloc_kpp("ecdh", 0, 0);
- 	if (IS_ERR(tfm)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		err = PTR_ERR(tfm);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index c2c5ab05fa7e..b0d7310b9d16 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1387,7 +1387,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 		goto zfree_smp;
- 	}
- 
--	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-+	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
- 	if (IS_ERR(smp->tfm_ecdh)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		goto free_shash;
-@@ -3282,7 +3282,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 		return ERR_CAST(tfm_cmac);
- 	}
- 
--	tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-+	tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
- 	if (IS_ERR(tfm_ecdh)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		crypto_free_shash(tfm_cmac);
-@@ -3847,7 +3847,7 @@ int __init bt_selftest_smp(void)
- 		return PTR_ERR(tfm_cmac);
- 	}
- 
--	tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-+	tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
- 	if (IS_ERR(tfm_ecdh)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		crypto_free_shash(tfm_cmac);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+    cfg80211: add helper to find an IE that matches a byte-array
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1790af82900000
+start commit:   83bdc727 random32: remove net_rand_state from the latent e..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1050af82900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
+dashboard link: https://syzkaller.appspot.com/bug?extid=35e70efb794757d7e175
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1160faa2900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11816098900000
+
+Reported-by: syzbot+35e70efb794757d7e175@syzkaller.appspotmail.com
+Fixes: fbd05e4a6e82 ("cfg80211: add helper to find an IE that matches a byte-array")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
