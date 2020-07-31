@@ -2,99 +2,95 @@ Return-Path: <SRS0=UTuE=BK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ECAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 06:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C144C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 07:42:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6962A208E4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 06:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DADB12067D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 07:42:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731396AbgGaG3n convert rfc822-to-8bit (ORCPT
+        id S1731692AbgGaHmI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 31 Jul 2020 02:29:43 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51784 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731351AbgGaG3n (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 31 Jul 2020 02:29:43 -0400
-Received: from marcel-macpro.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 33F24CED04;
-        Fri, 31 Jul 2020 08:39:44 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] Bluetooth: use the proper scan params when conn is
- pending
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200731010535.1422455-1-alainm@chromium.org>
-Date:   Fri, 31 Jul 2020 08:29:41 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Yu Liu <yudiliu@google.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C43B1571-6221-4D1A-A4F7-E211FE69F499@holtmann.org>
-References: <20200731010535.1422455-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Fri, 31 Jul 2020 03:42:08 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39910 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727851AbgGaHmI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 31 Jul 2020 03:42:08 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k1Pfy-0001TP-Sl; Fri, 31 Jul 2020 17:42:00 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 17:41:58 +1000
+Date:   Fri, 31 Jul 2020 17:41:58 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [PATCH] Bluetooth: Remove CRYPTO_ALG_INTERNAL flag
+Message-ID: <20200731074158.GA20263@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+The flag CRYPTO_ALG_INTERNAL is not meant to be used outside of
+the Crypto API.  It isn't needed here anyway.
 
-> When an LE connection is requested and an RPA update is needed via
-> hci_connect_le_scan, the default scanning parameters are used rather
-> than the connect parameters.  This leads to significant delays in the
-> connection establishment process when using lower duty cycle scanning
-> parameters.
-> 
-> The patch simply looks at the pended connection list when trying to
-> determine which scanning parameters should be used.
-> 
-> Before:
-> < HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 8
->                             #378 [hci0] 1659.247156
->         Own address type: Public (0x00)
->         Filter policy: Ignore not in white list (0x01)
->         PHYs: 0x01
->         Entry 0: LE 1M
->           Type: Passive (0x00)
->           Interval: 367.500 msec (0x024c)
->           Window: 37.500 msec (0x003c)
-> 
-> After:
-> < HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 8
->                                #39 [hci0] 7.422109
->         Own address type: Public (0x00)
->         Filter policy: Ignore not in white list (0x01)
->         PHYs: 0x01
->         Entry 0: LE 1M
->           Type: Passive (0x00)
->           Interval: 60.000 msec (0x0060)
->           Window: 60.000 msec (0x0060)
-> 
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Yu Liu <yudiliu@google.com>
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-please swap these around, the signed-off-by from the author should come first.
-
-> 
-> ---
-> 
-> Changes in v2:
-> - Fixing Yu's email tag
-> 
-> net/bluetooth/hci_request.c | 24 ++++++++++++++++++++++++
-> 1 file changed, 24 insertions(+)
-
-Patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index 03e3c89c3046..f71c6fa65fb3 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -205,7 +205,7 @@ static int __init test_ecdh(void)
+ 
+ 	calltime = ktime_get();
+ 
+-	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	tfm = crypto_alloc_kpp("ecdh", 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		BT_ERR("Unable to create ECDH crypto context");
+ 		err = PTR_ERR(tfm);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index c2c5ab05fa7e..b0d7310b9d16 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1387,7 +1387,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 		goto zfree_smp;
+ 	}
+ 
+-	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
+ 	if (IS_ERR(smp->tfm_ecdh)) {
+ 		BT_ERR("Unable to create ECDH crypto context");
+ 		goto free_shash;
+@@ -3282,7 +3282,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 		return ERR_CAST(tfm_cmac);
+ 	}
+ 
+-	tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
+ 	if (IS_ERR(tfm_ecdh)) {
+ 		BT_ERR("Unable to create ECDH crypto context");
+ 		crypto_free_shash(tfm_cmac);
+@@ -3847,7 +3847,7 @@ int __init bt_selftest_smp(void)
+ 		return PTR_ERR(tfm_cmac);
+ 	}
+ 
+-	tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
++	tfm_ecdh = crypto_alloc_kpp("ecdh", 0, 0);
+ 	if (IS_ERR(tfm_ecdh)) {
+ 		BT_ERR("Unable to create ECDH crypto context");
+ 		crypto_free_shash(tfm_cmac);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
