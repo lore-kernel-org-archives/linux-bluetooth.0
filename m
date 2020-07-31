@@ -2,51 +2,55 @@ Return-Path: <SRS0=UTuE=BK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34611C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 16:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7532C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 17:04:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 194BC206D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 16:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8BD02083B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 17:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732994AbgGaQyX (ORCPT
+        id S1733072AbgGaREY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 31 Jul 2020 12:54:23 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:48499 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732860AbgGaQyW (ORCPT
+        Fri, 31 Jul 2020 13:04:24 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:38100 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732973AbgGaREX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 31 Jul 2020 12:54:22 -0400
-Received: by mail-io1-f70.google.com with SMTP id r9so21433394ioa.15
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2020 09:54:21 -0700 (PDT)
+        Fri, 31 Jul 2020 13:04:23 -0400
+Received: by mail-io1-f72.google.com with SMTP id a65so12443502iog.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jul 2020 10:04:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=ARDRp3KNxJ0Mur5k39eF0BHl1nLpOy5JRf/QHvN6dFk=;
-        b=I+e46udr2Qsztz6AqpRRQcdTTS2IFeMguELC2o002FWMnQeP+Fx+M1gMUci62Oyg2+
-         EQmwKmLrRz84D29yiJNvbjqOKiZELwS8t0AiUBfrY3GDM+N9ALB/I6UNgm5VFL6r4mll
-         Mcy/eGFT2zNKm7+ZZ6ewKtkFj+YBHXX6/OOyh21/1M3DGRqea3o5N5zHKMFch1WZ3qh0
-         /DPBp2b3tksFTabeBByAuyeoFIexxrhB9oDIQJmNrZqSj56CZQrmEMEYWEpYE0ascW46
-         Clzli/nXilIO449UEWf5OUuQq2Ajs19J0fHDbzccSF52pjeisRDSbdGNl5A93KF7WYal
-         bDyw==
-X-Gm-Message-State: AOAM53333ARAG6im3O+Vwbu0SDoHY+YCjmk3VuRTmI1h7D9lHHZ+cM1s
-        5Mw6oAypdBqbrGu8YCcZXOVdPJhm2dtomuOKx9NBocM9kDkH
-X-Google-Smtp-Source: ABdhPJxP2PbBB8deYKj2Tc4M1SS2BCEM0juaeT3FHB8Zzq3MURwrPnYltjduqem2f6JiZYRpGP2INyzeumkyJnqkAJRd8iw1hVjt
+        bh=ZdAnHGVy9LgoO3SJHEMpX6y3/EdWZ4Nira0XtxekYaE=;
+        b=f95R7Q2yroqz1LnI+l2g/9OTjUischlDqouGY0XpVqZqwiwfzWs/KD28Z7OyJbBI4q
+         Z9tTy/1nlQDsnRxMkS7/nZqaWQqSoxEZZeZgLSYmrm9wRIw84LnK3OU4IDe+2Ye0gQ3b
+         2kvEhrauPPafHRAh5xh7+2X8WibAQ3xMnzys+m5TgsZA5tqQCxz0uNTbt8j6wywXxn0A
+         ofBFu4X4LH86d+D0TruIQ1XQgUZ/qQY7zpzN065CvVnuovsSY1KSt6Ogq2ePUwKWCNLu
+         mnglWGb7ZF3xI6hfhtuBnoXpgroSiYM3RPsorCmT7IGsPTu6jTJbjDjtjnMmS2Y1mVHp
+         6xFw==
+X-Gm-Message-State: AOAM533HmmrMXkA2LMS7Em7DTCZ2ezPGN4SyKJ0Q65a1i3wSpzKV2gJr
+        dqmQKkGA4scx2elX0Px07Jz+dZTjUMkhcakxjO4V4ZK1sJgU
+X-Google-Smtp-Source: ABdhPJxjiOxqxzdFpC1XBmA7iIoooMkgjCPCp2JMxWYhW4zWLMdOs5xQbJ5qjdoB0lxgaA8MJokuspLO3/3N/aulcDJqfFKuv+Qh
 MIME-Version: 1.0
-X-Received: by 2002:a6b:4407:: with SMTP id r7mr4409152ioa.77.1596214461310;
- Fri, 31 Jul 2020 09:54:21 -0700 (PDT)
-Date:   Fri, 31 Jul 2020 09:54:21 -0700
+X-Received: by 2002:a05:6638:13c5:: with SMTP id i5mr6006394jaj.29.1596215062006;
+ Fri, 31 Jul 2020 10:04:22 -0700 (PDT)
+Date:   Fri, 31 Jul 2020 10:04:21 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f3b11a05abbfa345@google.com>
-Subject: INFO: trying to register non-static key in skb_dequeue
-From:   syzbot <syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
+Message-ID: <000000000000c18f1a05abbfc792@google.com>
+Subject: KASAN: null-ptr-deref Write in amp_read_loc_assoc_final_data
+From:   syzbot <syzbot+f4fb0eaafdb51c32a153@syzkaller.appspotmail.com>
+To:     corbet@lwn.net, coreteam@netfilter.org, davem@davemloft.net,
+        johan.hedberg@gmail.com, kaber@trash.net, kadlec@blackhole.kfki.hu,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux@armlinux.org.uk, marcel@holtmann.org, mchehab@kernel.org,
+        mchehab@s-opensource.com, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, pablo@netfilter.org,
         syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -60,60 +64,81 @@ syzbot found the following issue on:
 
 HEAD commit:    83bdc727 random32: remove net_rand_state from the latent e..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=119bc404900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c0cfcf935bcc94d2
-dashboard link: https://syzkaller.appspot.com/bug?extid=fadfba6a911f6bf71842
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ce9270900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1485c092900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=176e5d12900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
+dashboard link: https://syzkaller.appspot.com/bug?extid=f4fb0eaafdb51c32a153
+compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13d5ed24900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1381a56c900000
+
+The issue was bisected to:
+
+commit a4585c31c5018578b4abf699ddfdff719dd1c313
+Author: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Date:   Tue Oct 18 19:44:09 2016 +0000
+
+    [media] marvell-ccic: don't break long lines
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=160d627c900000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=150d627c900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=110d627c900000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com
+Reported-by: syzbot+f4fb0eaafdb51c32a153@syzkaller.appspotmail.com
+Fixes: a4585c31c501 ("[media] marvell-ccic: don't break long lines")
 
-IPVS: ftp: loaded support on port[0] = 21
-INFO: trying to register non-static key.
-the code is fine but needs lockdep annotation.
-turning off the locking correctness validator.
-CPU: 1 PID: 6833 Comm: syz-executor596 Not tainted 5.8.0-rc7-syzkaller #0
+==================================================================
+BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:71 [inline]
+BUG: KASAN: null-ptr-deref in set_bit include/asm-generic/bitops/instrumented-atomic.h:28 [inline]
+BUG: KASAN: null-ptr-deref in amp_read_loc_assoc_final_data+0x115/0x260 net/bluetooth/amp.c:304
+Write of size 8 at addr 0000000000000030 by task kworker/u5:2/6842
+
+CPU: 1 PID: 6842 Comm: kworker/u5:2 Not tainted 5.8.0-rc7-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
 Call Trace:
  __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x18f/0x20d lib/dump_stack.c:118
- assign_lock_key kernel/locking/lockdep.c:894 [inline]
- register_lock_class+0x157d/0x1630 kernel/locking/lockdep.c:1206
- __lock_acquire+0xfa/0x56e0 kernel/locking/lockdep.c:4259
- lock_acquire+0x1f1/0xad0 kernel/locking/lockdep.c:4959
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x8c/0xc0 kernel/locking/spinlock.c:159
- skb_dequeue+0x1c/0x180 net/core/skbuff.c:3038
- skb_queue_purge+0x21/0x30 net/core/skbuff.c:3076
- l2cap_chan_del+0x61d/0x1300 net/bluetooth/l2cap_core.c:657
- l2cap_conn_del+0x46a/0x9e0 net/bluetooth/l2cap_core.c:1890
- l2cap_disconn_cfm net/bluetooth/l2cap_core.c:8159 [inline]
- l2cap_disconn_cfm+0x85/0xa0 net/bluetooth/l2cap_core.c:8152
- hci_disconn_cfm include/net/bluetooth/hci_core.h:1355 [inline]
- hci_conn_hash_flush+0x114/0x220 net/bluetooth/hci_conn.c:1536
- hci_dev_do_close+0x5c6/0x1080 net/bluetooth/hci_core.c:1761
- hci_unregister_dev+0x1a3/0xe20 net/bluetooth/hci_core.c:3606
- vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
- __fput+0x33c/0x880 fs/file_table.c:281
- task_work_run+0xdd/0x190 kernel/task_work.c:135
- exit_task_work include/linux/task_work.h:25 [inline]
- do_exit+0xb72/0x2a40 kernel/exit.c:805
- do_group_exit+0x125/0x310 kernel/exit.c:903
- __do_sys_exit_group kernel/exit.c:914 [inline]
- __se_sys_exit_group kernel/exit.c:912 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:912
- do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:384
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x444fe8
-Code: Bad RIP value.
-RSP: 002b:00007ffde50eda98 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 0000000000444fe8
-RDX: 0000000000000001 RSI: 000000000000003c RDI: 0000000000000001
-RBP: 00000000004cce10 R08: 00000000000000e7 R09: ffffffffffffffd0
-R10: 00007f0c43ebb700 R11: 0000000000000246 R12: 0000000000000001
-R13: 00000000006e0200 R14: 0000000001898850 R15: 0000000000000001
+ dump_stack+0x1f0/0x31e lib/dump_stack.c:118
+ __kasan_report mm/kasan/report.c:517 [inline]
+ kasan_report+0x151/0x1d0 mm/kasan/report.c:530
+ check_memory_region_inline mm/kasan/generic.c:183 [inline]
+ check_memory_region+0x2b5/0x2f0 mm/kasan/generic.c:192
+ instrument_atomic_write include/linux/instrumented.h:71 [inline]
+ set_bit include/asm-generic/bitops/instrumented-atomic.h:28 [inline]
+ amp_read_loc_assoc_final_data+0x115/0x260 net/bluetooth/amp.c:304
+ hci_chan_selected_evt net/bluetooth/hci_event.c:4897 [inline]
+ hci_event_packet+0x8289/0x18240 net/bluetooth/hci_event.c:6164
+ hci_rx_work+0x236/0x9c0 net/bluetooth/hci_core.c:4705
+ process_one_work+0x789/0xfc0 kernel/workqueue.c:2269
+ worker_thread+0xaa4/0x1460 kernel/workqueue.c:2415
+ kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+==================================================================
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 6842 Comm: kworker/u5:2 Tainted: G    B             5.8.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x1f0/0x31e lib/dump_stack.c:118
+ panic+0x264/0x7a0 kernel/panic.c:231
+ end_report mm/kasan/report.c:104 [inline]
+ __kasan_report mm/kasan/report.c:520 [inline]
+ kasan_report+0x1c9/0x1d0 mm/kasan/report.c:530
+ check_memory_region_inline mm/kasan/generic.c:183 [inline]
+ check_memory_region+0x2b5/0x2f0 mm/kasan/generic.c:192
+ instrument_atomic_write include/linux/instrumented.h:71 [inline]
+ set_bit include/asm-generic/bitops/instrumented-atomic.h:28 [inline]
+ amp_read_loc_assoc_final_data+0x115/0x260 net/bluetooth/amp.c:304
+ hci_chan_selected_evt net/bluetooth/hci_event.c:4897 [inline]
+ hci_event_packet+0x8289/0x18240 net/bluetooth/hci_event.c:6164
+ hci_rx_work+0x236/0x9c0 net/bluetooth/hci_core.c:4705
+ process_one_work+0x789/0xfc0 kernel/workqueue.c:2269
+ worker_thread+0xaa4/0x1460 kernel/workqueue.c:2415
+ kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
 ---
@@ -123,5 +148,6 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 syzbot can test patches for this issue, for details see:
 https://goo.gl/tpsmEJ#testing-patches
