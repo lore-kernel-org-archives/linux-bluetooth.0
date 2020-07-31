@@ -5,65 +5,65 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF92CC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 01:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D277C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 01:05:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87E4C208A9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 01:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A481208A9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jul 2020 01:05:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="U1ti9bzZ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C8l0mXCQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730935AbgGaBDs (ORCPT
+        id S1728588AbgGaBFk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jul 2020 21:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40052 "EHLO
+        Thu, 30 Jul 2020 21:05:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728080AbgGaBDq (ORCPT
+        with ESMTP id S1728080AbgGaBFj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jul 2020 21:03:46 -0400
-Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F532C061575
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 18:03:46 -0700 (PDT)
-Received: by mail-ua1-x944.google.com with SMTP id x19so3126785uap.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 18:03:46 -0700 (PDT)
+        Thu, 30 Jul 2020 21:05:39 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD361C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 18:05:39 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id s20so14968169vsq.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jul 2020 18:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=+wYtuIahi8xNh+qop7NMQ+Yr+S+J0oeXKPSMxVb1bcQ=;
-        b=U1ti9bzZVkEsMGU9J987jd2ZK0f6QCFMDKXM9k1cURTKlSGcpWmsd1rMe8Q6ZciIwG
-         5rIvIbku0CzxrRGLkUHvGNomS6Iirng6oNr4/JFCCTBicF1Vl3HCyCLI72l5/LvvJlLq
-         TOHkrIYj0pcr7DRGzkq3Nh1GrRqwCsNPZ2PJI=
+        bh=XL5rU5YC60frM3gP4UMCvKHyUzU+TZFJvAqINKMI6/E=;
+        b=C8l0mXCQI4PP7k7BzBzwn63GljjNdROnpiBppAXoHj8EuD5jzgQeauXCNdEq0bkOyG
+         cQazyxuAMC0HhsLQDMhNoya2W4bAtSN3cjm00MJv55Mvmxqhmsqn0lAihFXIbybfAQk4
+         tw6VM7v6heHmWB6J8p8xfBfPUGGK60CUc485k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=+wYtuIahi8xNh+qop7NMQ+Yr+S+J0oeXKPSMxVb1bcQ=;
-        b=WQISSYEsV06/rYTac5un7lGWnAyFtCrnjml1L17rRurrIbHucVM9qAywermA69yPj9
-         5+eI63iS+BNbvqvVoTqS+6f2ZvYRDARbr91qOcKmV+Wudxy6xnW+etY2+fCn3D4DNo1v
-         F9mZp9GTWQGKh1RUGZX/cFRR1cSgSv9am9rpmLVffOT9R0KCuboC4um72zYpoThrDTd1
-         BsfJJxqsfdjseJvXvZhN6rwQL7uWi0J5d9AIN3+rdwQSeZ+kRy1SoZ9ab7oSJTDeFYUI
-         TCJlA139hEUIQabhu23ThJJ68TBuwTok/zH52IZ8+B6ePQcaBQwqBHx4SQUlF2tPb0Bg
-         M2Kg==
-X-Gm-Message-State: AOAM533u998IYkZavK+NpiXSqFOE7cQ+W5K1pG2VFZJaPl4nDQPGDqex
-        6QgkMjjQJvBYa9yb25MbEGDDTRn6ClQ=
-X-Google-Smtp-Source: ABdhPJzoO0IjdqbCE+WghcbqxucCMzEI6b7DEcMohE032wh0ib5aQDd+oMsfMOXvvGriISz1KPtzLA==
-X-Received: by 2002:ab0:6585:: with SMTP id v5mr1046266uam.73.1596157424888;
-        Thu, 30 Jul 2020 18:03:44 -0700 (PDT)
+        bh=XL5rU5YC60frM3gP4UMCvKHyUzU+TZFJvAqINKMI6/E=;
+        b=jF8dFVfLNDleaLs6zkPUtDxN+iTL25XeE0Hj9b/2FPgywaTa7GELJn2lyPzXQ49pv2
+         RQa7Xs+Z1OCkNLuTALbrgib/uPWWjIO3WdjKcP6W7TKA2PoSN3YRqUq3z+aDJfpObGff
+         FpdMdVLM/65eYrNy+8SedO3M12CY+XaVtL/Fxnk8G/q/77ENn1LzEVNg4WKzRulmGCLZ
+         qPHWixz6eQS36dLYLv3Nl75ya+ojJ12Sk6jjeORj+bM9eAEzEAPsiLX8K14e0LAmt6KM
+         kJ06gdyBpPh+puFC7GhDm2LMP1siuSSKHlJKz/ozD6p/le8qO7X5pShM7CUR130MX6K2
+         xlLg==
+X-Gm-Message-State: AOAM531yRCtb+LSODm2behYTI8HIk4Xv7yEqtCXBvdyTr9xiGK2Ohy4U
+        U3vrlghh5GK5A78xzRL4Zi8KyVwSujo=
+X-Google-Smtp-Source: ABdhPJzrwa6/9L8GG30Dt/jpgz3bqBnMkSBKMB4UmarP2YKaOViUJ7X+/zWSnq40NhBahCLfyA6tGQ==
+X-Received: by 2002:a67:eb92:: with SMTP id e18mr1486085vso.96.1596157538598;
+        Thu, 30 Jul 2020 18:05:38 -0700 (PDT)
 Received: from alain.c.googlers.com.com (252.177.243.35.bc.googleusercontent.com. [35.243.177.252])
-        by smtp.gmail.com with ESMTPSA id r5sm1023993vkf.20.2020.07.30.18.03.43
+        by smtp.gmail.com with ESMTPSA id n62sm1009914vke.12.2020.07.30.18.05.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2020 18:03:44 -0700 (PDT)
+        Thu, 30 Jul 2020 18:05:37 -0700 (PDT)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Yu Liu <yudilu@google.com>
-Subject: [PATCH] Bluetooth: use the proper scan params when conn is pending
-Date:   Fri, 31 Jul 2020 01:03:41 +0000
-Message-Id: <20200731010341.1421926-1-alainm@chromium.org>
+        Yu Liu <yudiliu@google.com>
+Subject: [PATCH v2] Bluetooth: use the proper scan params when conn is pending
+Date:   Fri, 31 Jul 2020 01:05:34 +0000
+Message-Id: <20200731010535.1422455-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.28.0.163.g6104cc2f0b6-goog
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -105,10 +105,13 @@ After:
           Window: 60.000 msec (0x0060)
 
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Yu Liu <yudilu@google.com>
+Reviewed-by: Yu Liu <yudiliu@google.com>
 Signed-off-by: Alain Michaud <alainm@chromium.org>
 
 ---
+
+Changes in v2:
+ - Fixing Yu's email tag
 
  net/bluetooth/hci_request.c | 24 ++++++++++++++++++++++++
  1 file changed, 24 insertions(+)
