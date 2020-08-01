@@ -7,107 +7,79 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D65BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 18:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61365C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 22:56:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 030122076C
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 18:55:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46BED206F6
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 22:56:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbgHASzW (ORCPT
+        id S1727113AbgHAW4L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 1 Aug 2020 14:55:22 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:38132 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725939AbgHASzV (ORCPT
+        Sat, 1 Aug 2020 18:56:11 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:53629 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbgHAW4K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 1 Aug 2020 14:55:21 -0400
-Received: by mail-il1-f197.google.com with SMTP id t79so21844482ild.5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2020 11:55:20 -0700 (PDT)
+        Sat, 1 Aug 2020 18:56:10 -0400
+Received: by mail-io1-f71.google.com with SMTP id f22so15759584iof.20
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2020 15:56:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=qQIA2QYUDlIkIkoCeDn3ShR5eJP9B1EyOlqL+wH8+eg=;
-        b=f7k8Sx3ottF7FZSIbpsuSp4awPqxgAX+SsYGjrrbcisCwvPQJuwX+dePbThL8yllaD
-         UDX8254iRdteKSewil/kPYldtXGrawlyy7qdkeBl0/G8M5oG5dAJanWO+B8Oj7u+ew5f
-         SFnZ1Th/7nIg2xiVxDWtyy+tlO/9sgH0LX/+/vD6ioDGb98v6dOn9wCjGO9Oxnx8c9/H
-         I805pYBE2pfynNZHxEaauhI7nn0tNhulcQO5U6z1qHzEG7VWzzAqXxm8Ms4Cw9NAGXCp
-         AaD2OXg3iOhRb1JD63c4x/RjuPYf6zkH7RNE1Jp4WRbUg02MLzhOFyos/4eW3Uj5olPq
-         tl1A==
-X-Gm-Message-State: AOAM530Udqr8odB65kXaHavMeLefz7mn6BARaXFd8cBqaEI71BVLQRA0
-        3RZezYZjHD/WfQJA2q9NiogFx0L+7ENonpM2xJC9FlnwbX0z
-X-Google-Smtp-Source: ABdhPJyAnxuWi0Ar7UbGU8cFxZxOdqtZIrd/H1i1Lo4eIUgzWQ+QRZgqjc2PIeKovrr2D9XmJyB9FwIQP4/m6yOXch6deouJO2cF
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=dOzePy5yJodn3MAztJ8MjMszFxBpzjO8+9+k54Plw7U=;
+        b=YeFLHyWpCWNCRunyZoFFIOguyNC7DawplTpC40pHOSNglgNZAZzPk/CfE/Op4q6KgL
+         k79EoTLYzV/2cPyMOGju6nnovj3xHo/lRXx222nVxWzeag32B4mrzwJATehVdUv8eVuN
+         kakGXPzvjzrUaGn6sQFnojH8fhBxmy7YHyFIiFoOZ+7HQKcKNtFD/XLR1odc3oTwAc6P
+         z52PRm+gZ+GQPRlDYBqBt8WiCJmz1avMSUsFDN4CMkE6+9/2wgb4BShHjfiq5G4MQDVd
+         +FUWmkyds7UnWmo3k2Qyq/Dn7EznlAYLD+Bqhz+8MdJ/Cx/3NxlU4Utmy0i3Rd5wmvbF
+         z7VQ==
+X-Gm-Message-State: AOAM532ksvmEZV5V8fSmOxA7FqwdapgD9RGaagPDM+DnbxNWWakk1Rw2
+        duNc//lOcfaAcHjhw+9aWWYubG+ApZNH9V3OivQ5fEFs/K5C
+X-Google-Smtp-Source: ABdhPJzoFyfIZQhNRPiFzD4/WN4vVmjC3jcEN/n2QVLjineSWA8YL2dCDfS0uwVot1kHmJxuiejHJRIs+6Vlg9DaPmCCBtbeQtI1
 MIME-Version: 1.0
-X-Received: by 2002:a92:ad01:: with SMTP id w1mr10198997ilh.301.1596308120160;
- Sat, 01 Aug 2020 11:55:20 -0700 (PDT)
-Date:   Sat, 01 Aug 2020 11:55:20 -0700
+X-Received: by 2002:a92:79c4:: with SMTP id u187mr10446904ilc.194.1596322569603;
+ Sat, 01 Aug 2020 15:56:09 -0700 (PDT)
+Date:   Sat, 01 Aug 2020 15:56:09 -0700
+In-Reply-To: <0000000000007450a405abd572a8@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007450a405abd572a8@google.com>
-Subject: WARNING in hci_conn_timeout
+Message-ID: <000000000000b54f9f05abd8cfbb@google.com>
+Subject: Re: WARNING in hci_conn_timeout
 From:   syzbot <syzbot+2446dd3cb07277388db6@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+To:     coreteam@netfilter.org, davem@davemloft.net,
+        devel@driverdev.osuosl.org, forest@alittletooquiet.net,
+        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
+        kaber@trash.net, kadlec@blackhole.kfki.hu, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+        netfilter-devel@vger.kernel.org, pablo@netfilter.org,
+        rvarsha016@gmail.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+syzbot has bisected this issue to:
 
-syzbot found the following issue on:
+commit 3d30311c0e4d834c94e6a27d6242a942d6a76b85
+Author: Varsha Rao <rvarsha016@gmail.com>
+Date:   Sun Oct 9 11:13:56 2016 +0000
 
-HEAD commit:    7dc6fd0f Merge branch 'i2c/for-current' of git://git.kerne..
+    staging: vt6655: Removes unnecessary blank lines.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17023a14900000
+start commit:   7dc6fd0f Merge branch 'i2c/for-current' of git://git.kerne..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a70832900000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14823a14900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10823a14900000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
 dashboard link: https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
 syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f781d4900000
 C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=116a0c14900000
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
 Reported-by: syzbot+2446dd3cb07277388db6@syzkaller.appspotmail.com
+Fixes: 3d30311c0e4d ("staging: vt6655: Removes unnecessary blank lines.")
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 6953 at net/bluetooth/hci_conn.c:412 hci_conn_timeout+0x20f/0x290 net/bluetooth/hci_conn.c:412
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 6953 Comm: kworker/u5:2 Not tainted 5.8.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: hci0 hci_conn_timeout
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1f0/0x31e lib/dump_stack.c:118
- panic+0x264/0x7a0 kernel/panic.c:231
- __warn+0x227/0x250 kernel/panic.c:600
- report_bug+0x1b1/0x2e0 lib/bug.c:198
- handle_bug+0x42/0x80 arch/x86/kernel/traps.c:235
- exc_invalid_op+0x16/0x40 arch/x86/kernel/traps.c:255
- asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:540
-RIP: 0010:hci_conn_timeout+0x20f/0x290 net/bluetooth/hci_conn.c:412
-Code: c7 50 4d 8d 89 e8 71 d0 5f fa 48 8b 35 6a 7c 39 02 bf 40 00 00 00 4c 89 f2 5b 41 5c 41 5e 41 5f e9 46 69 f8 f9 e8 61 c1 20 fa <0f> 0b e9 5c fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 1a fe ff
-RSP: 0018:ffffc90001577cc8 EFLAGS: 00010293
-RAX: ffffffff8753d0ff RBX: 00000000ffffffff RCX: ffff888092948440
-RDX: 0000000000000000 RSI: 00000000ffffffff RDI: 0000000000000000
-RBP: ffff8880a9b7b008 R08: ffffffff8753cf3b R09: ffffed1010da5003
-R10: ffffed1010da5003 R11: 0000000000000000 R12: ffff8880a7290d00
-R13: ffff8880a7290d18 R14: ffff888086d28128 R15: dffffc0000000000
- process_one_work+0x789/0xfc0 kernel/workqueue.c:2269
- worker_thread+0xaa4/0x1460 kernel/workqueue.c:2415
- kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
