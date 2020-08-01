@@ -4,81 +4,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A5FC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 16:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D65BC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 18:55:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A64BC2071E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 16:33:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 030122076C
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Aug 2020 18:55:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727057AbgHAQdH (ORCPT
+        id S1726808AbgHASzW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 1 Aug 2020 12:33:07 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:48561 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726748AbgHAQdG (ORCPT
+        Sat, 1 Aug 2020 14:55:22 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:38132 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbgHASzV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 1 Aug 2020 12:33:06 -0400
-Received: by mail-io1-f69.google.com with SMTP id r9so23382100ioa.15
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2020 09:33:05 -0700 (PDT)
+        Sat, 1 Aug 2020 14:55:21 -0400
+Received: by mail-il1-f197.google.com with SMTP id t79so21844482ild.5
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Aug 2020 11:55:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=SIdCK8Q+4LKw+jmzrptYCoQd/JoF3mumY50X9Ph/hTE=;
-        b=Yp5CxSqrfh5++OZ58NE4K92opZrfKm6sWxb3Sh29nkbmZefsyHQpOvzEiTfT20mvWL
-         Ylhe3sPibXiwVfUgvZrdkbqz8Zr1Nu+xJbQeqDb9tUBAyfKEMNhx3SQ7Ex3WQW8cUk44
-         AQGRxWyP3MGm2V/bGpTA3E/T+l8l1QxEkZ9RzoF6AKlIzIrq6NX/JnoydDnhBLBhtFY6
-         aLiQRCcXxhnDNcvQqGJy6c+TCi/wXwqHqqiXx7r3Z7E2IhDBKu80KjBogAesWguaxiqs
-         vc529Ruw6D747421twHXyXQ71iD9yCYDGdNc8L5j2nyNXTZhIpF+cRGFKdRguHm/xs1h
-         ++hg==
-X-Gm-Message-State: AOAM531ikU1A02RHKRDrBaHjOnF1W2UZte/i+cXMW3XYOgS3zRXjJnaC
-        gApwWs2OzCRPbJGjlF3q4qIBruDp26F8JRzrAYdcorTD0LDg
-X-Google-Smtp-Source: ABdhPJxr/wL4FBG9BjuUQiXlSC8n5B0989oGaJ3+8JI4slsvtNxiaGVvvNeo1Fc/qvwpgTWkAaur6QYbJbGO5vawji+M3kZenXYs
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=qQIA2QYUDlIkIkoCeDn3ShR5eJP9B1EyOlqL+wH8+eg=;
+        b=f7k8Sx3ottF7FZSIbpsuSp4awPqxgAX+SsYGjrrbcisCwvPQJuwX+dePbThL8yllaD
+         UDX8254iRdteKSewil/kPYldtXGrawlyy7qdkeBl0/G8M5oG5dAJanWO+B8Oj7u+ew5f
+         SFnZ1Th/7nIg2xiVxDWtyy+tlO/9sgH0LX/+/vD6ioDGb98v6dOn9wCjGO9Oxnx8c9/H
+         I805pYBE2pfynNZHxEaauhI7nn0tNhulcQO5U6z1qHzEG7VWzzAqXxm8Ms4Cw9NAGXCp
+         AaD2OXg3iOhRb1JD63c4x/RjuPYf6zkH7RNE1Jp4WRbUg02MLzhOFyos/4eW3Uj5olPq
+         tl1A==
+X-Gm-Message-State: AOAM530Udqr8odB65kXaHavMeLefz7mn6BARaXFd8cBqaEI71BVLQRA0
+        3RZezYZjHD/WfQJA2q9NiogFx0L+7ENonpM2xJC9FlnwbX0z
+X-Google-Smtp-Source: ABdhPJyAnxuWi0Ar7UbGU8cFxZxOdqtZIrd/H1i1Lo4eIUgzWQ+QRZgqjc2PIeKovrr2D9XmJyB9FwIQP4/m6yOXch6deouJO2cF
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1343:: with SMTP id i3mr8889517iov.134.1596299585453;
- Sat, 01 Aug 2020 09:33:05 -0700 (PDT)
-Date:   Sat, 01 Aug 2020 09:33:05 -0700
-In-Reply-To: <000000000000f298fc05abb42b70@google.com>
+X-Received: by 2002:a92:ad01:: with SMTP id w1mr10198997ilh.301.1596308120160;
+ Sat, 01 Aug 2020 11:55:20 -0700 (PDT)
+Date:   Sat, 01 Aug 2020 11:55:20 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bf03f305abd37535@google.com>
-Subject: Re: WARNING: ODEBUG bug in cancel_delayed_work
-From:   syzbot <syzbot+338f014a98367a08a114@syzkaller.appspotmail.com>
-To:     bhumirks@gmail.com, coreteam@netfilter.org, davem@davemloft.net,
-        devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
-        johan.hedberg@gmail.com, kaber@trash.net, kadlec@blackhole.kfki.hu,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        pablo@netfilter.org, syzkaller-bugs@googlegroups.com
+Message-ID: <0000000000007450a405abd572a8@google.com>
+Subject: WARNING in hci_conn_timeout
+From:   syzbot <syzbot+2446dd3cb07277388db6@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hello,
 
-commit 43ff7f53de2294a83dcf84b35de6ffa1ffafae9d
-Author: Bhumika Goyal <bhumirks@gmail.com>
-Date:   Thu Oct 6 18:10:01 2016 +0000
+syzbot found the following issue on:
 
-    Staging: vc04_services: vchiq_arm: Remove unused function remote_event_destroy
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=107c810c900000
-start commit:   d8b9faec Merge tag 'drm-fixes-2020-07-31' of git://anongit..
+HEAD commit:    7dc6fd0f Merge branch 'i2c/for-current' of git://git.kerne..
 git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=127c810c900000
-console output: https://syzkaller.appspot.com/x/log.txt?x=147c810c900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c0cfcf935bcc94d2
-dashboard link: https://syzkaller.appspot.com/bug?extid=338f014a98367a08a114
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1111ad5c900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16565d5c900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a70832900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
+dashboard link: https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f781d4900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=116a0c14900000
 
-Reported-by: syzbot+338f014a98367a08a114@syzkaller.appspotmail.com
-Fixes: 43ff7f53de22 ("Staging: vc04_services: vchiq_arm: Remove unused function remote_event_destroy")
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2446dd3cb07277388db6@syzkaller.appspotmail.com
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 6953 at net/bluetooth/hci_conn.c:412 hci_conn_timeout+0x20f/0x290 net/bluetooth/hci_conn.c:412
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 6953 Comm: kworker/u5:2 Not tainted 5.8.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_conn_timeout
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x1f0/0x31e lib/dump_stack.c:118
+ panic+0x264/0x7a0 kernel/panic.c:231
+ __warn+0x227/0x250 kernel/panic.c:600
+ report_bug+0x1b1/0x2e0 lib/bug.c:198
+ handle_bug+0x42/0x80 arch/x86/kernel/traps.c:235
+ exc_invalid_op+0x16/0x40 arch/x86/kernel/traps.c:255
+ asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:540
+RIP: 0010:hci_conn_timeout+0x20f/0x290 net/bluetooth/hci_conn.c:412
+Code: c7 50 4d 8d 89 e8 71 d0 5f fa 48 8b 35 6a 7c 39 02 bf 40 00 00 00 4c 89 f2 5b 41 5c 41 5e 41 5f e9 46 69 f8 f9 e8 61 c1 20 fa <0f> 0b e9 5c fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 1a fe ff
+RSP: 0018:ffffc90001577cc8 EFLAGS: 00010293
+RAX: ffffffff8753d0ff RBX: 00000000ffffffff RCX: ffff888092948440
+RDX: 0000000000000000 RSI: 00000000ffffffff RDI: 0000000000000000
+RBP: ffff8880a9b7b008 R08: ffffffff8753cf3b R09: ffffed1010da5003
+R10: ffffed1010da5003 R11: 0000000000000000 R12: ffff8880a7290d00
+R13: ffff8880a7290d18 R14: ffff888086d28128 R15: dffffc0000000000
+ process_one_work+0x789/0xfc0 kernel/workqueue.c:2269
+ worker_thread+0xaa4/0x1460 kernel/workqueue.c:2415
+ kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
