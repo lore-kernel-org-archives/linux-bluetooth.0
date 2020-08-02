@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A58C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F40C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:46:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACF3120759
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72C0A20722
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbgHBUpl (ORCPT
+        id S1728023AbgHBUqZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Aug 2020 16:45:41 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:37178 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726807AbgHBUpU (ORCPT
+        Sun, 2 Aug 2020 16:46:25 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:55307 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727988AbgHBUqV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Aug 2020 16:45:20 -0400
-Received: by mail-io1-f71.google.com with SMTP id f6so10892609ioa.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Aug 2020 13:45:19 -0700 (PDT)
+        Sun, 2 Aug 2020 16:46:21 -0400
+Received: by mail-il1-f199.google.com with SMTP id i78so20940796ill.22
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Aug 2020 13:46:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=WCj8CYMMQAWzJ6MWSBeZcNE1cIR+npprASii5Yv7VV0=;
-        b=ue383sXVJ9ptUWrdHxbUeVJJTxa5/0U3SvqGQGeC23l7rwNrXdMU9Er1IH5SX5qPuG
-         zpsavTq6SX+5jLwySl9Z5vupqFzuHuQD57T55Ha0q6cseW4FWau/74ZSO7yBf/1CHh6M
-         hsGsaUdZZvRc0+LrhCFNRUrbh8+BAsphHaKyc+gKXX1uK9o0MHSBKfy+3op50gs4u0Dq
-         y5L8JsVTjVSAmexhhh8HvaN6yGnXozrwd3SL5yU3u1S9zpEZBpRD+WOi3LIwmyhzyh52
-         YWzlhA00TzshVsrhxiKW1dzBV6/jV8yI87WhPHeE++kHtKigyCMDjc7yxqTNMne2m15E
-         I+NQ==
-X-Gm-Message-State: AOAM532DED7ilpVhEDEcU2s/C3a5aOuVjVQW0w7AaqeygKlbJ0x/Ke2G
-        y7ATOvXEK92e9SZs8V6F1KTMwPRLDTWnncYncHFzVwoQNKxH
-X-Google-Smtp-Source: ABdhPJxrDcWd2SstCuCwqW3Wn8G3wdsFFZ9beZO0KN/EJRcm6ZJcbbq9Ex6Ya2FXgRS/n7yrwTIrUDsDwpzrGLwErE+N+CulYzQO
+        bh=UR/ZO0hH6TY23jTg0tEYuIZyHB35kzhpcW94c67p/IY=;
+        b=AGfqPpsu60oefJmnJOvjC+lrKwWzDx0oT1SKFlSw68VB2zZ2eR2NuMvxyw7S5nxGgx
+         SPE2LEFUL0+qDa8k4o92P0xV0PFsseelb4GV5I7vTb6bpwrYxLMyg1n/i/5j4lMF0a3l
+         aChwt3xkLdoZpbJvxG/7q2nxr2T6Bt9NLRDDAcfP93ivPvMh2huJ5GFbfJWV/OlHqdSU
+         2g1lUfCC/ai5wcDE2l3w9HYw7XaB0ATh5XK5EpQnL057jHxihUJe3v0jd6e5iew/ut1c
+         IW+Ki4flbBg+11ns9e3k0VgXRlzM8EgXXgFEuQvmjPolKtJz1n26zw8utzDxwHJ/G6Eu
+         Zn0g==
+X-Gm-Message-State: AOAM533PLXHufRuxdLYlhko6Cxjmxn6NQZ3dJMu4OhcN7/CjrMHdHL9C
+        zOTnCfO/8etC+lvBl/Lq4CvxLiN06Oj136aAFF36udgj0YHA
+X-Google-Smtp-Source: ABdhPJz7QroLRzfyvDXIacdc4voPN0fxMrySmyqn0CFftkCfYMBM0YQGazUDxAJijzwoaYNvZzDHqwqhpHTS867zlK7eYtmTskSB
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:348:: with SMTP id x8mr16357883jap.62.1596401119369;
- Sun, 02 Aug 2020 13:45:19 -0700 (PDT)
-Date:   Sun, 02 Aug 2020 13:45:19 -0700
+X-Received: by 2002:a6b:5d0a:: with SMTP id r10mr13874575iob.186.1596401179781;
+ Sun, 02 Aug 2020 13:46:19 -0700 (PDT)
+Date:   Sun, 02 Aug 2020 13:46:19 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a39e4905abeb193f@google.com>
-Subject: general protection fault in hci_phy_link_complete_evt
-From:   syzbot <syzbot+18e38290a2a263b31aa0@syzkaller.appspotmail.com>
+Message-ID: <0000000000003d6e8405abeb1da7@google.com>
+Subject: KASAN: use-after-free Read in hci_send_acl
+From:   syzbot <syzbot+98228e7407314d2d4ba2@syzkaller.appspotmail.com>
 To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@armlinux.org.uk, marcel@holtmann.org, netdev@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -60,56 +60,99 @@ syzbot found the following issue on:
 
 HEAD commit:    ac3a0c84 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ab47ca900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13482904900000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=c0cfcf935bcc94d2
-dashboard link: https://syzkaller.appspot.com/bug?extid=18e38290a2a263b31aa0
+dashboard link: https://syzkaller.appspot.com/bug?extid=98228e7407314d2d4ba2
 compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f3dd0c900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1032a642900000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152f1904900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1482dfca900000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+18e38290a2a263b31aa0@syzkaller.appspotmail.com
+Reported-by: syzbot+98228e7407314d2d4ba2@syzkaller.appspotmail.com
 
-general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 1 PID: 6861 Comm: kworker/u5:1 Not tainted 5.8.0-rc7-syzkaller #0
+==================================================================
+BUG: KASAN: use-after-free in hci_send_acl+0xabe/0xc60 net/bluetooth/hci_core.c:3991
+Read of size 8 at addr ffff8880a6ff8818 by task kworker/u5:2/6855
+
+CPU: 1 PID: 6855 Comm: kworker/u5:2 Not tainted 5.8.0-rc7-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
 Workqueue: hci0 hci_rx_work
-RIP: 0010:hci_phy_link_complete_evt.isra.0+0x23e/0x790 net/bluetooth/hci_event.c:4926
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 3e 05 00 00 48 8b 9d 30 09 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 da 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
-RSP: 0018:ffffc90001897a38 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff871af0e3
-RDX: 0000000000000002 RSI: ffffffff871af0f0 RDI: 0000000000000010
-RBP: ffff88808f25e000 R08: 0000000000000001 R09: ffff8880a1cf6a88
-R10: 0000000000000000 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff8880877f1110 R14: ffff8880926b480b R15: 00000000000000c8
-FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000000 CR3: 00000000a7ccc000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
- hci_event_packet+0x481a/0x86f5 net/bluetooth/hci_event.c:6180
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0xae/0x436 mm/kasan/report.c:383
+ __kasan_report mm/kasan/report.c:513 [inline]
+ kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
+ hci_send_acl+0xabe/0xc60 net/bluetooth/hci_core.c:3991
+ l2cap_send_cmd+0x6d5/0x8a0 net/bluetooth/l2cap_core.c:949
+ l2cap_send_move_chan_cfm_icid net/bluetooth/l2cap_core.c:4917 [inline]
+ l2cap_move_fail net/bluetooth/l2cap_core.c:5401 [inline]
+ l2cap_move_channel_rsp net/bluetooth/l2cap_core.c:5440 [inline]
+ l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:5719 [inline]
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:6418 [inline]
+ l2cap_recv_frame+0x6936/0xae10 net/bluetooth/l2cap_core.c:7660
+ l2cap_recv_acldata+0x7f6/0x8e0 net/bluetooth/l2cap_core.c:8313
+ hci_acldata_packet net/bluetooth/hci_core.c:4520 [inline]
+ hci_rx_work+0x4c7/0xb10 net/bluetooth/hci_core.c:4710
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:291
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+
+Allocated by task 6855:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc.constprop.0+0xc2/0xd0 mm/kasan/common.c:494
+ kmem_cache_alloc_trace+0x14f/0x2d0 mm/slab.c:3551
+ kmalloc include/linux/slab.h:555 [inline]
+ kzalloc include/linux/slab.h:669 [inline]
+ hci_chan_create+0x9b/0x330 net/bluetooth/hci_conn.c:1692
+ l2cap_conn_add.part.0+0x1e/0xe10 net/bluetooth/l2cap_core.c:7699
+ l2cap_conn_add net/bluetooth/l2cap_core.c:8139 [inline]
+ l2cap_connect_cfm+0x23b/0x1090 net/bluetooth/l2cap_core.c:8097
+ hci_connect_cfm include/net/bluetooth/hci_core.h:1340 [inline]
+ hci_remote_features_evt net/bluetooth/hci_event.c:3210 [inline]
+ hci_event_packet+0x3e01/0x86f5 net/bluetooth/hci_event.c:6061
  hci_rx_work+0x22e/0xb10 net/bluetooth/hci_core.c:4705
  process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
  worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
  kthread+0x3b5/0x4a0 kernel/kthread.c:291
  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
-Modules linked in:
----[ end trace 905ef6786a414f06 ]---
-RIP: 0010:hci_phy_link_complete_evt.isra.0+0x23e/0x790 net/bluetooth/hci_event.c:4926
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 3e 05 00 00 48 8b 9d 30 09 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 da 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
-RSP: 0018:ffffc90001897a38 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff871af0e3
-RDX: 0000000000000002 RSI: ffffffff871af0f0 RDI: 0000000000000010
-RBP: ffff88808f25e000 R08: 0000000000000001 R09: ffff8880a1cf6a88
-R10: 0000000000000000 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff8880877f1110 R14: ffff8880926b480b R15: 00000000000000c8
-FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fff77d3f7a7 CR3: 000000009291e000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+Freed by task 6855:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ kasan_set_free_info mm/kasan/common.c:316 [inline]
+ __kasan_slab_free+0xf5/0x140 mm/kasan/common.c:455
+ __cache_free mm/slab.c:3426 [inline]
+ kfree+0x103/0x2c0 mm/slab.c:3757
+ hci_disconn_loglink_complete_evt net/bluetooth/hci_event.c:4999 [inline]
+ hci_event_packet+0x319a/0x86f5 net/bluetooth/hci_event.c:6188
+ hci_rx_work+0x22e/0xb10 net/bluetooth/hci_core.c:4705
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:291
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+
+The buggy address belongs to the object at ffff8880a6ff8800
+ which belongs to the cache kmalloc-128 of size 128
+The buggy address is located 24 bytes inside of
+ 128-byte region [ffff8880a6ff8800, ffff8880a6ff8880)
+The buggy address belongs to the page:
+page:ffffea00029bfe00 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff8880a6ff8c00
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea0002934388 ffff8880aa001540 ffff8880aa000700
+raw: ffff8880a6ff8c00 ffff8880a6ff8000 000000010000000c 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff8880a6ff8700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8880a6ff8780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8880a6ff8800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                            ^
+ ffff8880a6ff8880: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8880a6ff8900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
 ---
