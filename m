@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16FAC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6611CC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 21:36:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D77B420722
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 20:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A39920738
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Aug 2020 21:36:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbgHBUqV (ORCPT
+        id S1727893AbgHBVgW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Aug 2020 16:46:21 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:39572 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727919AbgHBUqU (ORCPT
+        Sun, 2 Aug 2020 17:36:22 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:35265 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbgHBVgV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Aug 2020 16:46:20 -0400
-Received: by mail-il1-f200.google.com with SMTP id i66so17677404ile.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Aug 2020 13:46:19 -0700 (PDT)
+        Sun, 2 Aug 2020 17:36:21 -0400
+Received: by mail-il1-f199.google.com with SMTP id g6so11166177iln.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Aug 2020 14:36:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=gb1bfcM4gWAnNmFB6x9ih5/iUQPdrS6TKSoNqV7OW28=;
-        b=tpH2aGnZn8xKPmm/AkCkz6sPhnh+DWZV8nv/26Bbqn8bFv4EP1F37gNw+6TQ20WQi6
-         srL2QiavAeVG9i1TdFJQh7J2DwZOrVti1MlezMReoQp2MsH+F7q9oQO2C/0/4jdTI5wj
-         lDSqP8W4MjfYcnBRZ18Y1eSrYYs2D+39ZpdgGRqVPZkuKncvKyin3zILQoAFJvoIROcS
-         4pKqb6TlrYPfTQZ0M4nvTHy0FqJoeGY8UdTHegk+rr2YYJtYtMGALLZzGSgBwqLeCj5E
-         2UHDqyi0oc4Q3vJPRf9cE0za4mjyS1p2YDopvWp3JfWlrVCsw99G4hSWbQyhGTlc3BJV
-         HY1Q==
-X-Gm-Message-State: AOAM531OtM3fGPUyRZo9SleFegp5/oI1QmF9qPm70ffiJ9HKIpNu42Ng
-        ILyh6kSAY+pMTBm8VajNytP8rub55jP8VfuRjvdBaucYhOWb
-X-Google-Smtp-Source: ABdhPJz7mj17MBSURQBMv5KS03Lt3OtdtOLBNNjQvilwwvX1G4E5QRCMfbqyg7nZk+NKYsCvDasVLq+D+43TBGEvxDXjyrRQdLdK
+        bh=jE1eXr0aFrBGEBZ/GquO7bRsGe66Rk2RCOW4RqQ0FHw=;
+        b=bizqgwKgdKPMB9UnjLHxAOAGfcmuTz9S8lIm9+JOccZIZOZkR8WMVCNNevwCIUd0FD
+         W5vQUVBJhH6AeHdwjaZYpZaSBLcQlfLjhQ91tnbTpQLv9OCZ+EiYFRe/7ObM56ie4nch
+         jEGyMdKh79K1B/q3ZcFRYazAeddi951yk2vm8JkjzDflFfnCQ31gVMhA56O2Ru+biMx6
+         I+4yJRZGOqABVeZZq0mYTMHxCc8AKgvd33zy1nTufprgrXvZz38WwNC0xBmGC51+j+GE
+         4KFX2RlUCltIGpd1q0I+WdcM5JbHwJxljntyg5pGnUiO2Z4BDNlYLSXgdUK559lepQEK
+         HUYQ==
+X-Gm-Message-State: AOAM531Oo/JLXNnfji5S2MQJDIta7zbMquhBo7mYuG4YiT0jHAl2phnz
+        iYYHERBVGQqFxXMI2G8fQRVFPxPHBBUGdnQQluEqa7Iiqs5G
+X-Google-Smtp-Source: ABdhPJxZzGmFuPg5FmbI2K9VWsx3CzEkSHK5VQYK7Ervj4iVi+5O0dnvvtMgJPr1SY0otVqLq14WPCR2aFZrHo32bi4SmirZ3ajk
 MIME-Version: 1.0
-X-Received: by 2002:a6b:da0d:: with SMTP id x13mr13949462iob.138.1596401179576;
- Sun, 02 Aug 2020 13:46:19 -0700 (PDT)
-Date:   Sun, 02 Aug 2020 13:46:19 -0700
+X-Received: by 2002:a92:c7a1:: with SMTP id f1mr5341536ilk.162.1596404180792;
+ Sun, 02 Aug 2020 14:36:20 -0700 (PDT)
+Date:   Sun, 02 Aug 2020 14:36:20 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003a51d705abeb1d74@google.com>
-Subject: KMSAN: uninit-value in process_adv_report
-From:   syzbot <syzbot+e4244d85e5b777ac4d3d@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, glider@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
+Message-ID: <0000000000001d48cd05abebd088@google.com>
+Subject: WARNING: ODEBUG bug in bt_host_release
+From:   syzbot <syzbot+0ce8a29c6c6469b16632@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcel@holtmann.org, netdev@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
@@ -59,67 +58,72 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    93f54a72 instrumented.h: fix KMSAN support
-git tree:       https://github.com/google/kmsan.git master
-console output: https://syzkaller.appspot.com/x/log.txt?x=13238a42900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa4f3b91169c2501
-dashboard link: https://syzkaller.appspot.com/bug?extid=e4244d85e5b777ac4d3d
+HEAD commit:    ac3a0c84 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11e1da92900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
+dashboard link: https://syzkaller.appspot.com/bug?extid=0ce8a29c6c6469b16632
 compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-userspace arch: i386
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108830ec900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f9336c900000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14f653ca900000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e4244d85e5b777ac4d3d@syzkaller.appspotmail.com
+Reported-by: syzbot+0ce8a29c6c6469b16632@syzkaller.appspotmail.com
 
-Bluetooth: hci0: unknown advertising packet type: 0x2b
-=====================================================
-BUG: KMSAN: uninit-value in hci_bdaddr_is_rpa include/net/bluetooth/hci_core.h:1486 [inline]
-BUG: KMSAN: uninit-value in process_adv_report+0x781/0x2000 net/bluetooth/hci_event.c:5409
-CPU: 0 PID: 2202 Comm: kworker/u5:0 Not tainted 5.8.0-rc5-syzkaller #0
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x80 arch/x86/include/asm/paravirt.h:770
+WARNING: CPU: 1 PID: 20314 at lib/debugobjects.c:488 debug_print_object lib/debugobjects.c:485 [inline]
+WARNING: CPU: 1 PID: 20314 at lib/debugobjects.c:488 __debug_check_no_obj_freed lib/debugobjects.c:967 [inline]
+WARNING: CPU: 1 PID: 20314 at lib/debugobjects.c:488 debug_check_no_obj_freed+0x45c/0x640 lib/debugobjects.c:998
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 20314 Comm: syz-executor.5 Not tainted 5.8.0-rc7-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: hci0 hci_rx_work
 Call Trace:
  __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1df/0x240 lib/dump_stack.c:118
- kmsan_report+0xf7/0x1e0 mm/kmsan/kmsan_report.c:121
- __msan_warning+0x58/0xa0 mm/kmsan/kmsan_instr.c:215
- hci_bdaddr_is_rpa include/net/bluetooth/hci_core.h:1486 [inline]
- process_adv_report+0x781/0x2000 net/bluetooth/hci_event.c:5409
- hci_le_direct_adv_report_evt net/bluetooth/hci_event.c:5837 [inline]
- hci_le_meta_evt net/bluetooth/hci_event.c:5902 [inline]
- hci_event_packet+0x1d08/0x33ee0 net/bluetooth/hci_event.c:6155
- hci_rx_work+0x95f/0xce0 net/bluetooth/hci_core.c:4705
- process_one_work+0x1540/0x1f30 kernel/workqueue.c:2269
- worker_thread+0xed2/0x23f0 kernel/workqueue.c:2415
- kthread+0x515/0x550 kernel/kthread.c:292
- ret_from_fork+0x22/0x30 arch/x86/entry/entry_64.S:293
-
-Uninit was created at:
- kmsan_save_stack_with_flags mm/kmsan/kmsan.c:144 [inline]
- kmsan_internal_poison_shadow+0x66/0xd0 mm/kmsan/kmsan.c:127
- kmsan_slab_alloc+0x8a/0xe0 mm/kmsan/kmsan_hooks.c:80
- slab_alloc_node mm/slub.c:2839 [inline]
- __kmalloc_node_track_caller+0xb40/0x1200 mm/slub.c:4478
- __kmalloc_reserve net/core/skbuff.c:142 [inline]
- __alloc_skb+0x2fd/0xac0 net/core/skbuff.c:210
- alloc_skb include/linux/skbuff.h:1083 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:377 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:165 [inline]
- vhci_write+0x15b/0x800 drivers/bluetooth/hci_vhci.c:285
- call_write_iter include/linux/fs.h:1908 [inline]
- new_sync_write fs/read_write.c:503 [inline]
- vfs_write+0xd98/0x1480 fs/read_write.c:578
- ksys_write+0x267/0x450 fs/read_write.c:631
- __do_sys_write fs/read_write.c:643 [inline]
- __se_sys_write+0x92/0xb0 fs/read_write.c:640
- __ia32_sys_write+0x4a/0x70 fs/read_write.c:640
- do_syscall_32_irqs_on arch/x86/entry/common.c:430 [inline]
- __do_fast_syscall_32+0x2aa/0x400 arch/x86/entry/common.c:477
- do_fast_syscall_32+0x6b/0xd0 arch/x86/entry/common.c:505
- do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:554
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-=====================================================
+ dump_stack+0x1f0/0x31e lib/dump_stack.c:118
+ panic+0x264/0x7a0 kernel/panic.c:231
+ __warn+0x227/0x250 kernel/panic.c:600
+ report_bug+0x1b1/0x2e0 lib/bug.c:198
+ handle_bug+0x42/0x80 arch/x86/kernel/traps.c:235
+ exc_invalid_op+0x16/0x40 arch/x86/kernel/traps.c:255
+ asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:540
+RIP: 0010:debug_print_object lib/debugobjects.c:485 [inline]
+RIP: 0010:__debug_check_no_obj_freed lib/debugobjects.c:967 [inline]
+RIP: 0010:debug_check_no_obj_freed+0x45c/0x640 lib/debugobjects.c:998
+Code: 74 08 4c 89 f7 e8 04 e4 11 fe 4d 8b 06 48 c7 c7 ef b7 14 89 48 c7 c6 fd 95 12 89 48 89 da 89 e9 4d 89 f9 31 c0 e8 64 95 a4 fd <0f> 0b 48 ba 00 00 00 00 00 fc ff df ff 05 86 c1 eb 05 48 8b 5c 24
+RSP: 0018:ffffc90003777b90 EFLAGS: 00010046
+RAX: ffd2d42dae8b6000 RBX: ffffffff8918b660 RCX: ffff888087ef6000
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff815dd389 R09: ffffed1015d241c3
+R10: ffffed1015d241c3 R11: 0000000000000000 R12: ffff8880a131c9ec
+R13: ffffffff8ba5dfb8 R14: ffffffff894edb20 R15: ffffffff814c4b60
+ kfree+0xfc/0x220 mm/slab.c:3756
+ bt_host_release+0x18/0x20 net/bluetooth/hci_sysfs.c:86
+ device_release+0x70/0x1a0 drivers/base/core.c:1575
+ kobject_cleanup lib/kobject.c:693 [inline]
+ kobject_release lib/kobject.c:722 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x15b/0x220 lib/kobject.c:739
+ vhci_release+0x7b/0xc0 drivers/bluetooth/hci_vhci.c:341
+ __fput+0x2f0/0x750 fs/file_table.c:281
+ task_work_run+0x137/0x1c0 kernel/task_work.c:135
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0x601/0x1f80 kernel/exit.c:805
+ do_group_exit+0x161/0x2d0 kernel/exit.c:903
+ __do_sys_exit_group+0x13/0x20 kernel/exit.c:914
+ __se_sys_exit_group+0x10/0x10 kernel/exit.c:912
+ __x64_sys_exit_group+0x37/0x40 kernel/exit.c:912
+ do_syscall_64+0x73/0xe0 arch/x86/entry/common.c:384
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x45cc79
+Code: Bad RIP value.
+RSP: 002b:00007ffe023458d8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000000000045cc79
+RDX: 00000000004166d1 RSI: 0000000000ca85f0 RDI: 0000000000000043
+RBP: 00000000004c2903 R08: 000000000000000b R09: 0000000000000000
+R10: 000000000246f940 R11: 0000000000000246 R12: 0000000000000004
+R13: 00007ffe02345a20 R14: 00000000000b206f R15: 00007ffe02345a30
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
 ---
