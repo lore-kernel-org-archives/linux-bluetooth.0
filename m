@@ -2,83 +2,89 @@ Return-Path: <SRS0=SB5R=BN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 777D5C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 00:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9D0C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 02:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55D6820738
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 00:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F50C2076B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 02:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726989AbgHCAtG (ORCPT
+        id S1726998AbgHCC4D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Aug 2020 20:49:06 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:40748 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727087AbgHCAtF (ORCPT
+        Sun, 2 Aug 2020 22:56:03 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:45734 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726963AbgHCC4D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Aug 2020 20:49:05 -0400
-Received: by mail-io1-f71.google.com with SMTP id t22so16249872iob.7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Aug 2020 17:49:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=zjMjCpZHpZC9oX4mSp6lGsDleX+rgZUM4Hc+zQq53tE=;
-        b=HvSx+YC+FJ6MkO7/aIP1b1m5IdfpPvf61McOYUIUj1pVsEVz7lFuIZNJJqGm7ScFap
-         Ts19JkeyBCxVMXWWpiA2bx1w6LxQpaBrgGGcmS9k3an8JGzgqL0G5e72QMPgEyIbJn+K
-         +/rby+M2QUD2XGJsxHOmfYgJkZlefcfn7LUIgJy2PfUu14XSQmj8kmPRIFgCe/nRFInL
-         rhS9umkJZJip+v/X1Ic/9nFotrvZ+brJHqALQOTplZUJH0yJN/80NvHujcuYz4ubZ334
-         nzIP11N8NnxtNalYn/fSCP733MEg/jJss+FcQQTOIYhxGQX80rgxzoyUlW8m9tmL7M7S
-         02fw==
-X-Gm-Message-State: AOAM532vYDXdJ0Be3UsTYseBLZQQRdrBXeVPxmtFEJbtbHk4yuOOTfYm
-        5hINBb/h4FK9i+K59cgs+hstpJTV0LqxJypRR6ochcNOGmBJ
-X-Google-Smtp-Source: ABdhPJx51fMhfJaafxHzZAN2jjWSIrSl/b5CFIul4+GGQOi4s1mKok/hTo4u9c3s4cBgSHZ/wcwXjrq3H3VFwrd210mpw03EVfqe
+        Sun, 2 Aug 2020 22:56:03 -0400
+Received: from [114.252.213.24] (helo=[192.168.2.106])
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <hui.wang@canonical.com>)
+        id 1k2Qdt-0006Pd-Dl; Mon, 03 Aug 2020 02:56:01 +0000
+Subject: Re: [PATCH] Bluetooth: btusb: Add a module parameter ignore_id for
+ debugging
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+References: <20200802042138.9149-1-hui.wang@canonical.com>
+ <432B3E10-052D-4DCB-84A4-B239D218D4E5@holtmann.org>
+From:   Hui Wang <hui.wang@canonical.com>
+Message-ID: <8c625767-7211-2b41-7673-33e641c2924e@canonical.com>
+Date:   Mon, 3 Aug 2020 10:55:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:15d0:: with SMTP id f16mr168098iow.45.1596415744953;
- Sun, 02 Aug 2020 17:49:04 -0700 (PDT)
-Date:   Sun, 02 Aug 2020 17:49:04 -0700
-In-Reply-To: <000000000000ab11c505abeb19f5@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000064571305abee81ea@google.com>
-Subject: Re: KASAN: use-after-free Write in __sco_sock_close
-From:   syzbot <syzbot+077eca30d3cb7c02b273@syzkaller.appspotmail.com>
-To:     coreteam@netfilter.org, davem@davemloft.net,
-        devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
-        johan.hedberg@gmail.com, kaber@trash.net, kadlec@blackhole.kfki.hu,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        marcel@holtmann.org, mchehab@kernel.org, mchehab@s-opensource.com,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        pablo@netfilter.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <432B3E10-052D-4DCB-84A4-B239D218D4E5@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
 
-commit 43ea43b9d8b27b7acd443ec59319faa3cdb8a616
-Author: Mauro Carvalho Chehab <mchehab@s-opensource.com>
-Date:   Wed Oct 12 11:21:43 2016 +0000
+On 2020/8/2 下午10:58, Marcel Holtmann wrote:
+> Hi Hui,
+>
+>> There is always an on-board usb bluetooth hci on the laptops, if
+>> the bluetooth function doesn't work well like a bt headset can't work
+>> with HSP/HFP mode, we often plug an external usb BT hci to verify if
+>> that headset could work with the exteral BT hci or not, in this
+>> situation, there will be 2 hcis (hci0 and hci1) in the system, and
+>> so far, the gnome can't handle the hci1 well so we met lots of
+>> problems when debugging with hci1 under gnome.
+>>
+>> After adding this new module parameter, we could ban the on-board
+>> usb hci by putting btusb.ignore_id=idVendor,idProduct to the bootargs,
+>> then the external usb hci will be hci0 and there is only one hci
+>> in the system. We could easily debug with the external usb bluetooth
+>> hci after this change.
+>>
+>> Signed-off-by: Hui Wang <hui.wang@canonical.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 11 +++++++++++
+>> 1 file changed, 11 insertions(+)
+> please use this instead.
+>
+> echo “vvvv pppp 0 08fd 0002" > /sys/bus/usb/drivers/foo/new_id
 
-    [media] radio-bcm2048: don't ignore errors
+Thanks,  but to run the command above,  the system should boot up 
+first.  After the system boot up, the btusb is already loaded and and 
+the on-board hci is already driven by btusb. looks like it is too late 
+to run that command for on-board hci.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1036e6a4900000
-start commit:   ac3a0c84 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1236e6a4900000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1436e6a4900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e59ee776d5aa8d55
-dashboard link: https://syzkaller.appspot.com/bug?extid=077eca30d3cb7c02b273
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12cf1904900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10d52e14900000
+Thanks,
 
-Reported-by: syzbot+077eca30d3cb7c02b273@syzkaller.appspotmail.com
-Fixes: 43ea43b9d8b2 ("[media] radio-bcm2048: don't ignore errors")
+Hui.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+>
+> Regards
+>
+> Marcel
+>
