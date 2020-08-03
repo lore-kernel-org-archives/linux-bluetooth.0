@@ -5,24 +5,24 @@ X-Spam-Level:
 X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17946C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 08:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D921C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 09:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E36BF20678
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 08:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE73F20738
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Aug 2020 09:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbgHCIr5 convert rfc822-to-8bit (ORCPT
+        id S1726230AbgHCJDR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Aug 2020 04:47:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37506 "EHLO mail.kernel.org"
+        Mon, 3 Aug 2020 05:03:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41940 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725806AbgHCIr5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Aug 2020 04:47:57 -0400
+        id S1726167AbgHCJDR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 3 Aug 2020 05:03:17 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Mon, 03 Aug 2020 08:47:53 +0000
+Date:   Mon, 03 Aug 2020 09:03:14 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -31,14 +31,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
+X-Bugzilla-Who: aragmor@gmail.com
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-QElPAbm7j1@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-60824-62941-KtteTWpWVc@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -53,22 +53,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
---- Comment #123 from Swyter (swyterzone@gmail.com) ---
-Looks like the last two are fake CSR (i.e. the interesting ones), but because
-they don't initialize properly we can't actually see HCI/LMP/Manufacturer stuff
-we are interested in.
-
-Sounds like a packet capture is the only way of finding these values. So please
-use `btmon -w my.log` (or alternatively `hcidump -X`) to capture the Bluetooth
-traffic as shown in previous comments. The good thing is that they should get
-stuck early on, so I don't expect a lot of traffic once you plug that in.
-
-Search for 'Read Local Version Information' in this thread to see examples.
-
-So yeah, if possible, please include the bcdDevice + hciconfig -a + 'Read Local
-Version Information' packet in your tests. The bigger the corpus of counterfeit
-dongles, the more we can extrapolate and make better workarounds that work for
-everyone.
+--- Comment #124 from Aragmor (aragmor@gmail.com) ---
+Created attachment 290735
+  --> https://bugzilla.kernel.org/attachment.cgi?id=290735&action=edit
+'hcidump -X' while executing 'hciconfig hci0 up'
 
 -- 
 You are receiving this mail because:
