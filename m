@@ -2,128 +2,82 @@ Return-Path: <SRS0=ZUSg=BO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB7FC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 10:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DD6C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 13:01:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B89220656
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 10:41:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOMIs+Ul"
+	by mail.kernel.org (Postfix) with ESMTP id 6D593208A9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 13:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729620AbgHDKly (ORCPT
+        id S1726210AbgHDNBa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Aug 2020 06:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728170AbgHDKly (ORCPT
+        Tue, 4 Aug 2020 09:01:30 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:43631 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726954AbgHDNBH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Aug 2020 06:41:54 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C0EC06174A;
-        Tue,  4 Aug 2020 03:41:53 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id u185so19967793pfu.1;
-        Tue, 04 Aug 2020 03:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dS+3+hYqZ66uBhMhwpE9mDgfqdGREXxXTLcJTBg38DQ=;
-        b=gOMIs+Ulxkf/Kb2dkPeZGEn2TCWU8Lgw9SjOnGHaKWjSB8ENZ356Iq+3vmqhD/sbdQ
-         OFQEoTVcWkrtOfczN3+xZOKCe+ic3JN0BHmTzaB/L7V38v7JFRy9/AJJ3uAPymKpGSP5
-         h3Ok5CKfbYEWt4mN46WHUaN6g0HyTzjs65bjQPPAN3OpYKvrKKKxBcjIN1xtfDD8+DMe
-         ETEwyXFWsSV3J/4pa5bGRR3mcl4N93gr5bNoAa0TZQHmvDp1IevU1FY87ujtQp4vtNlW
-         ZYYGWlhl5el9PAqgdXCvpmfP5CPt7ITxnzsY4hB36NW5H121wgn+tZIpkoOwJNosbMs4
-         iepA==
+        Tue, 4 Aug 2020 09:01:07 -0400
+Received: by mail-il1-f200.google.com with SMTP id f131so9178393ilh.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Aug 2020 06:01:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dS+3+hYqZ66uBhMhwpE9mDgfqdGREXxXTLcJTBg38DQ=;
-        b=MWD1PMjcyXjzeFcw+3ucQqXq4nSqQ5WT0/wF9OoF+huGktoR3F5ZfC0O3EQEbZNbqj
-         D6LsW9bqsaAMKp2/7j8tqI2VAJ93kHnwRMldhU9D5GMt6s8GzqytHcuE6Y1z9wQFGN5p
-         0m4wu+/zKcRgWNRUcZZJk+ATi73X1IAOl7nj8f6t6HWEeOunZrY/dma1SF5hMxmZ0ofg
-         kc4F41a5r/U0sx/TqBvat6Pq9lB2Am+eulnind+CxkVcw18RIbSiI2/KlAeW1kWkm/IQ
-         KBGnp0HyWNzr/im45sQ0NkxldWvj57D05Ar7BBTK16KFgsX28Z43INt0knzqoPpmkCCZ
-         OECw==
-X-Gm-Message-State: AOAM532p9xs+HS2zH50zVnWxM7fvJEJlnOfZv2ORGMmUEX4cmjyZFh0d
-        arwpGFaL2nrQYB2At+CkT3g=
-X-Google-Smtp-Source: ABdhPJwVkry725oBjqKvwKBp+5Fi90O4GOYmW5vJcWNN4EmW2jkEGBAC9qAjuPvRaCJloMFFEN8n8A==
-X-Received: by 2002:a63:1208:: with SMTP id h8mr18942187pgl.128.1596537713384;
-        Tue, 04 Aug 2020 03:41:53 -0700 (PDT)
-Received: from localhost ([2001:e42:102:1532:160:16:113:140])
-        by smtp.gmail.com with ESMTPSA id t63sm15210765pgt.50.2020.08.04.03.41.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 03:41:52 -0700 (PDT)
-From:   Coiby Xu <coiby.xu@gmail.com>
-X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
-Date:   Tue, 4 Aug 2020 18:41:48 +0800
-To:     Greg KH <greg@kroah.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [Linux-kernel-mentees] [PATCH] Bluetooth: Initialize the TX
- queue lock when creating struct l2cap_chan in 6LOWPAN
-Message-ID: <20200804104148.nqxcy4f44uga7wjs@Rk>
-References: <20200804093937.772961-1-coiby.xu@gmail.com>
- <20200804094253.GA2667430@kroah.com>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=06+82rKMp3PGXLDD6Ap7gC365MaLMsLGY5Rl6STa3zE=;
+        b=KGCXRJ6z2NnWqsTugSoBZEddg3by2lWWN+Kz5wRJbnRRo8mmGjU2jK5jplndO2Vh9W
+         BlyyOdkby3QpZqdaczb5f3pfHNh5SOOcBD1uZRRyskqJmkf1O1b3RGOvojrzRcUSASND
+         rpRJRIHe/6Ai6QSPX/nKjGSBVMy9HePVb+Geh3sQaTFCU3R8fBqTQ5c45dHPBvnBSyx2
+         sMEq6e/E2BoMX7bqOlPfkk3RL59K2F/zGBO41uRITcZ99FEB2Y89UMXlMmv2Xo4iXDQb
+         ynFwW+53fjNGiAkQNEPRljb4XIIXep5nDZNadR7ktWGFOnnF0wXyi8pXSNKTc2Scpj/F
+         cZOQ==
+X-Gm-Message-State: AOAM531w39pO3Y6IOapS07GTBZUDzhssAXhsVQNdvk2nnnOlr98hSq74
+        0zzzpnZ0HwRb655VM6wchh4CMhr81EUNEBa7BB0osIRq0vt2
+X-Google-Smtp-Source: ABdhPJysIn/3rq8mJzFBZcPdgkiq5Vci73yhB6VXvAfDq6syCOUZWs4ErkDjGmgAWbCV304S/arGJe8W97c4vCtTU2PHRCJr/z6K
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200804094253.GA2667430@kroah.com>
+X-Received: by 2002:a05:6e02:d51:: with SMTP id h17mr4320234ilj.155.1596546066783;
+ Tue, 04 Aug 2020 06:01:06 -0700 (PDT)
+Date:   Tue, 04 Aug 2020 06:01:06 -0700
+In-Reply-To: <000000000000a7eb5e05abeb197d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002da68705ac0cd9ab@google.com>
+Subject: Re: general protection fault in hci_event_packet
+From:   syzbot <syzbot+0bef568258653cff272f@syzkaller.appspotmail.com>
+To:     a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org,
+        davem@davemloft.net, geert@linux-m68k.org, javier@osg.samsung.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux@armlinux.org.uk, marcel@holtmann.org,
+        mareklindner@neomailbox.ch, netdev@vger.kernel.org,
+        sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Aug 04, 2020 at 11:42:53AM +0200, Greg KH wrote:
->On Tue, Aug 04, 2020 at 05:39:37PM +0800, Coiby Xu wrote:
->> When L2CAP channel is destroyed by hci_unregister_dev, it will
->> acquire the spin lock of the (struct l2cap_chan *)->tx_q list to
->> delete all the buffers. But sometimes when hci_unregister_dev is
->> being called, this lock may have not bee initialized. Initialize
->> the TX queue lock when creating struct l2cap_chan in 6LOWPAN to fix
->> this problem.
->>
->> Reported-by: syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com
->> Link: https://syzkaller.appspot.com/bug?extid=fadfba6a911f6bf71842
->> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
->> ---
->>  net/bluetooth/6lowpan.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
->> index bb55d92691b0..713c618a73df 100644
->> --- a/net/bluetooth/6lowpan.c
->> +++ b/net/bluetooth/6lowpan.c
->> @@ -651,6 +651,7 @@ static struct l2cap_chan *chan_create(void)
->>
->>  	l2cap_chan_set_defaults(chan);
->>
->> +	skb_queue_head_init(&chan->tx_q);
->>  	chan->chan_type = L2CAP_CHAN_CONN_ORIENTED;
->>  	chan->mode = L2CAP_MODE_LE_FLOWCTL;
->>  	chan->imtu = 1280;
->
->Nice, did syzbot verify that this resolves the issue?
->
->thanks,
->
->greg k-h
+syzbot has bisected this issue to:
 
-Yes. Thank you for reminding me. I'll also add an Tested-by: tag next time.
+commit 941992d2944789641470626e9336d663236b1d28
+Author: Javier Martinez Canillas <javier@osg.samsung.com>
+Date:   Mon Sep 12 14:03:34 2016 +0000
 
---
-Best regards,
-Coiby
+    ethernet: amd: use IS_ENABLED() instead of checking for built-in or module
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=155180c2900000
+start commit:   bcf87687 Linux 5.8
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=175180c2900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=135180c2900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4b489d75d0c8859d
+dashboard link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1043af04900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12ca1dea900000
+
+Reported-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
+Fixes: 941992d29447 ("ethernet: amd: use IS_ENABLED() instead of checking for built-in or module")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
