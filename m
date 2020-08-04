@@ -2,342 +2,319 @@ Return-Path: <SRS0=ZUSg=BO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1EEC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 18:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D993C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 20:17:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7187920792
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 18:54:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QtOKEYFa"
+	by mail.kernel.org (Postfix) with ESMTP id E1700207FC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Aug 2020 20:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbgHDSyR (ORCPT
+        id S1726580AbgHDURs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Aug 2020 14:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41642 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726847AbgHDSyR (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Aug 2020 14:54:17 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E45C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Aug 2020 11:54:17 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 93so21217265otx.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Aug 2020 11:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ps2dcnol61iF2JZhyG1S/i1/3uCM6kYo4ZVmCayz3mk=;
-        b=QtOKEYFaITmw8WtiXDBNJl1pCfhTFeeN+q3fvuo5jlOoF4mibmu6fKVmzL9OvpUo58
-         SjWJHIBadllhhfJj+PWuHhgDHxxCdqPhNjJnNDSHSEWWVdXh5lYdNOp0rpHxvClTtfxU
-         EbQvhJVBNNgxNQIQzCbnu375TZ65As5a+lsjYQDLHEu2dMWdrrmaYgDv2VdCWPA6esmD
-         mKKJ8GVRLBN617JIc327MDqZsVzYtEkor+YBgT1Z3DVoAxhtnWy3Pl1p+K+w58y0pZbo
-         tGcV5CEEm2HtHm+gyBpEsCQGnLVStC2qzLh5tm09d7Dl4teKVy69rCk0z1KeDl0R8Bgp
-         F5IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ps2dcnol61iF2JZhyG1S/i1/3uCM6kYo4ZVmCayz3mk=;
-        b=oLrR1F2aR9OTHWN5K6JV28EhOG8z9y3B10spVO2+DozlVHn1kR4jfOZUv/zxtgxKlx
-         Dkr/F0b9Sce8pzHmXaLLJXuNsqVMcF9Io+U8LxJ5Gn51fc59tBHvsWycB9vSphWpkWGu
-         QIjIyhgo6ih5Pt4pnVJOC3l6hJYU0WXfzNH2uMUGUpFadxGhq8AMjxyDkzPzqvSnpsE7
-         Q39KWNbRJRp+pkv506QZF64TGBySN/cyA6Rr9o2V/WixWn1ctuPyqfT/8UBUiuh6HlIm
-         2gxohfe5KyCSrVd/D0UzIaxCNVwKlU8aArdezSFqn7HKhUWlWQxpjDjW3o3LTIAoCy2L
-         8BGA==
-X-Gm-Message-State: AOAM531mp7D2IHGv+hQxZS1dLNGLELRFDSia1e5QYayMDzRDMD6e1gUG
-        2YD2qMHm5kjDHwxbV7amFErlHbz/zYG7zYo7H/Y=
-X-Google-Smtp-Source: ABdhPJw5WlgvZ99C2zsQjJTLnF6S0EUXlaCnDaZg5J1G0PfJhSXm1j3l/EtuOs7FpogDlRxklZZkZbDrOe+vORiOHrM=
-X-Received: by 2002:a9d:39c2:: with SMTP id y60mr18787426otb.91.1596567256419;
- Tue, 04 Aug 2020 11:54:16 -0700 (PDT)
+        Tue, 4 Aug 2020 16:17:48 -0400
+Received: from mga09.intel.com ([134.134.136.24]:64989 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725981AbgHDURr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 4 Aug 2020 16:17:47 -0400
+IronPort-SDR: 65Qd8up8GwcOiaQJWWJeIDBMWwy9t9QNPJf3oUPi8Mlngoo7ky7VopwVn0M0s7ysb+dfAs2R9Y
+ humhvfJqNHmA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="153565369"
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="153565369"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 13:17:46 -0700
+IronPort-SDR: UfvKq+Z6u0vcQ7J4Qm/EdJsJp3283I0FX/vKgqLBHkc1z5PvaR99yTPaAhsvzrabmutLmLlkvw
+ fKA+OaC/SuVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="324783826"
+Received: from unknown (HELO ingas-nuc1.intel.com) ([10.254.118.65])
+  by fmsmga002.fm.intel.com with ESMTP; 04 Aug 2020 13:17:46 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v3 02/10] mesh: Clean up handling of config model binding messages
+Date:   Tue,  4 Aug 2020 13:17:36 -0700
+Message-Id: <20200804201744.23327-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200804201744.23327-1-inga.stotland@intel.com>
+References: <20200804201744.23327-1-inga.stotland@intel.com>
 MIME-Version: 1.0
-References: <20200729015540.1848987-1-abhishekpandit@chromium.org> <5f20d725.1c69fb81.6d882.1d23@mx.google.com>
-In-Reply-To: <5f20d725.1c69fb81.6d882.1d23@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 4 Aug 2020 11:54:06 -0700
-Message-ID: <CABBYNZJMHCWm9-F3R1vpqcaazcieA=Dp9+fppQzmm+_-hfhzcw@mail.gmail.com>
-Subject: Re: [RFC Bluez PATCH 3/3] adapter: Reconnect audio on controller resume
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+This modification allows using a single point for sending out
+the composed status messages by the Config Server.
 
-On Tue, Jul 28, 2020 at 6:55 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
-> During system suspend, all peer devices are disconnected. On resume, HID
-> devices will reconnect but audio devices stay disconnected. As a quality
-> of life improvement, keep track of the last audio device disconnected
-> during suspend and try to reconnect when the controller resumes from
-> suspend.
->
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> ---
-> Hey Luiz,
->
-> On our internal review, two things stood out in this commit that we
-> weren't able to come to a consensus on internally:
->
-> * Is it better to use the audio device class or should we compare to the
->   A2DP, HFP and HSP uuids?
-> * Constructing the dbus message internally before calling dev_connect
->   looks a bit weird. I couldn't figure out how to internally trigger
->   this function (since it seems to require a msg to respond to on
->   success/failure). Any thoughts?
->
->
->  src/adapter.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/device.c  | 27 +++++++++++++++++
->  src/device.h  |  2 ++
->  src/main.conf |  6 ++++
->  4 files changed, 117 insertions(+)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 5e896a9f0..b1073c439 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -90,6 +90,7 @@
->  #define IDLE_DISCOV_TIMEOUT (5)
->  #define TEMP_DEV_TIMEOUT (3 * 60)
->  #define BONDING_TIMEOUT (2 * 60)
-> +#define RECONNECT_AUDIO_DELAY (5)
->
->  #define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
->  #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-> @@ -269,6 +270,15 @@ struct btd_adapter {
->         struct btd_device *connect_le;  /* LE device waiting to be connected */
->         sdp_list_t *services;           /* Services associated to adapter */
->
-> +       /* audio device to reconnect after resuming from suspend */
-> +       struct reconnect_audio_info {
-> +               bdaddr_t addr;
-> +               uint8_t addr_type;
-> +               bool reconnect;
-> +        } reconnect_audio;
-> +       guint reconnect_audio_timeout;  /* timeout for reconnect on resume */
-> +       uint32_t reconnect_audio_delay; /* delay reconnect after resume */
-> +
->         struct btd_gatt_database *database;
->         struct btd_adv_manager *adv_manager;
->
-> @@ -6256,6 +6266,7 @@ static void load_config(struct btd_adapter *adapter)
->         /* Get discoverable mode */
->         adapter->stored_discoverable = g_key_file_get_boolean(key_file,
->                                         "General", "Discoverable", &gerr);
-> +
->         if (gerr) {
->                 adapter->stored_discoverable = false;
->                 g_error_free(gerr);
-> @@ -6271,6 +6282,16 @@ static void load_config(struct btd_adapter *adapter)
->                 gerr = NULL;
->         }
->
-> +       /* Get audio reconnect delay */
-> +       adapter->reconnect_audio_delay = g_key_file_get_integer(
-> +               key_file, "General", "ReconnectAudioDelay", &gerr);
-> +
-> +       if (gerr) {
-> +               adapter->reconnect_audio_delay = RECONNECT_AUDIO_DELAY;
-> +               g_error_free(gerr);
-> +               gerr = NULL;
-> +       }
-> +
->         g_key_file_free(key_file);
->  }
->
-> @@ -7820,6 +7841,15 @@ static void dev_disconnected(struct btd_adapter *adapter,
->         if (device) {
->                 adapter_remove_connection(adapter, device, addr->type);
->                 disconnect_notify(device, reason);
-> +
-> +               if (reason == MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND &&
-> +                   device_class_is_audio(device)) {
-> +                       adapter->reconnect_audio.reconnect = true;
-> +                       adapter->reconnect_audio.addr_type =
-> +                               btd_device_get_bdaddr_type(device);
-> +                       bacpy(&adapter->reconnect_audio.addr,
-> +                             device_get_address(device));
-> +               }
->         }
->
->         bonding_attempt_complete(adapter, &addr->bdaddr, addr->type,
-> @@ -8766,6 +8796,53 @@ static void connected_callback(uint16_t index, uint16_t length,
->         eir_data_free(&eir_data);
->  }
->
-> +static gboolean reconnect_audio_timeout(gpointer user_data)
-> +{
-> +       struct btd_adapter *adapter = user_data;
-> +
-> +       adapter->reconnect_audio_timeout = 0;
-> +
-> +       if (adapter->reconnect_audio.reconnect) {
-> +               struct btd_device *dev = btd_adapter_find_device(
-> +                       adapter, &adapter->reconnect_audio.addr,
-> +                       adapter->reconnect_audio.addr_type);
-> +
-> +               adapter->reconnect_audio.reconnect = false;
-> +
-> +               if (!dev || btd_device_is_connected(dev))
-> +                       return FALSE;
-> +
-> +               device_internal_connect(dev);
-> +       }
-> +
-> +       return FALSE;
-> +}
-> +
-> +static void controller_resume_callback(uint16_t index, uint16_t length,
-> +                                      const void *param, void *user_data)
-> +{
-> +       const struct mgmt_ev_controller_resume *ev = param;
-> +       struct btd_adapter *adapter = user_data;
-> +
-> +       if (length < sizeof(*ev)) {
-> +               btd_error(adapter->dev_id, "Too small device resume event");
-> +               return;
-> +       }
-> +
-> +       DBG("Controller resume with wake event 0x%x", ev->wake_reason);
-> +
-> +       if (adapter->reconnect_audio_timeout > 0) {
-> +               g_source_remove(adapter->reconnect_audio_timeout);
-> +               adapter->reconnect_audio_timeout = 0;
-> +       }
-> +
-> +       if (adapter->reconnect_audio.reconnect) {
-> +               adapter->reconnect_audio_timeout =
-> +                       g_timeout_add_seconds(adapter->reconnect_audio_delay,
-> +                                             reconnect_audio_timeout, adapter);
-> +       }
-> +}
-> +
->  static void device_blocked_callback(uint16_t index, uint16_t length,
->                                         const void *param, void *user_data)
->  {
-> @@ -9389,6 +9466,11 @@ static void read_info_complete(uint8_t status, uint16_t length,
->                                                 user_passkey_notify_callback,
->                                                 adapter, NULL);
->
-> +       mgmt_register(adapter->mgmt, MGMT_EV_CONTROLLER_RESUME,
-> +                                               adapter->dev_id,
-> +                                               controller_resume_callback,
-> +                                               adapter, NULL);
-> +
->         set_dev_class(adapter);
->
->         set_name(adapter, btd_adapter_get_name(adapter));
-> diff --git a/src/device.c b/src/device.c
-> index bb8e07e8f..8b165ffa4 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -747,6 +747,12 @@ gboolean device_is_trusted(struct btd_device *device)
->         return device->trusted;
->  }
->
-> +bool device_class_is_audio(struct btd_device *device)
-> +{
-> +       /* Look for major service classes Audio (0x20) + Rendering (0x4) */
-> +       return ((device->class >> 16) & 0x24) == 0x24;
-> +}
-> +
->  static gboolean dev_property_get_address(const GDBusPropertyTable *property,
->                                         DBusMessageIter *iter, void *data)
->  {
-> @@ -6853,6 +6859,27 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
->         return NULL;
->  }
->
-> +/* Internal function to connect to a device. This fakes the dbus message used to
-> + * call the "Connect" api on the device so that the same function can be called
-> + * by bluez internally.
-> + */
-> +bool device_internal_connect(struct btd_device *dev)
-> +{
-> +       DBusMessage *msg;
-> +
-> +       if (!device_is_connectable(dev))
-> +               return false;
-> +
-> +       msg = dbus_message_new_method_call("org.bluez",
-> +                                               device_get_path(dev),
-> +                                               DEVICE_INTERFACE,
-> +                                               "Connect");
-> +       /* Sending the message usually sets serial. Fake it here. */
-> +       dbus_message_set_serial(msg, 1);
-> +
-> +       dev_connect(dbus_conn, msg, dev);
-> +}
-> +
->  void btd_device_init(void)
->  {
->         dbus_conn = btd_get_dbus_connection();
-> diff --git a/src/device.h b/src/device.h
-> index 956fec1ae..82f97b5bd 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -98,6 +98,7 @@ bool device_is_connectable(struct btd_device *device);
->  bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
->  bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
->  gboolean device_is_trusted(struct btd_device *device);
-> +bool device_class_is_audio(struct btd_device *device);
->  void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
->  void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
->  void btd_device_set_temporary(struct btd_device *device, bool temporary);
-> @@ -186,6 +187,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services);
->  uint32_t btd_device_get_current_flags(struct btd_device *dev);
->  void btd_device_flags_changed(struct btd_device *dev, uint32_t supported_flags,
->                               uint32_t current_flags);
-> +bool device_internal_connect(struct btd_device *dev);
->
->  void btd_device_init(void);
->  void btd_device_cleanup(void);
-> diff --git a/src/main.conf b/src/main.conf
-> index f41203b96..c6bb78a84 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -82,6 +82,12 @@
->  # 0 = disable timer, i.e. never keep temporary devices
->  #TemporaryTimeout = 30
->
-> +# How long to wait after controller resume before reconnecting to last used
-> +# audio device.
-> +# The value is in seconds.
-> +# Default: 5
-> +#ReconnectAudioDelay = 5
-> +
->  [Controller]
->  # The following values are used to load default adapter parameters.  BlueZ loads
->  # the values into the kernel before the adapter is powered if the kernel
-> --
-> 2.28.0.rc0.142.g3c755180ce-goog
+Also, remove unused definitions for binding functions in node.h
+---
+ mesh/cfgmod-server.c | 130 ++++++++++++-------------------------------
+ mesh/model.c         |  16 +-----
+ mesh/node.h          |   4 --
+ 3 files changed, 38 insertions(+), 112 deletions(-)
 
-Usually connection policy is handled by the policy plugin since there
-may be platforms that want implement their own connection policies on
-top of bluetoothd so they can just disable the policy plugin, iirc we
-do have reconnection policies for unexpected disconnect which should
-probably be used in the event a suspend actually trigger a
-disconnection see:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/plugins/policy.c#n761
-
-We might need a reason code to indicate to the policy when a
-disconnect happens due to suspend logic.
-
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index cd0e8b94c..35d0325a9 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -112,8 +112,7 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
+ 	uint16_t ele_addr, idx, ota = UNASSIGNED_ADDRESS;
+ 	const uint8_t *pub_addr;
+ 	uint16_t test_addr;
+-	uint8_t ttl, period;
+-	uint8_t retransmit;
++	uint8_t ttl, period, retransmit;
+ 	int status;
+ 	bool cred_flag;
+ 
+@@ -362,115 +361,56 @@ static uint16_t config_sub_del_all(struct mesh_node *node, const uint8_t *pkt,
+ 	return n;
+ }
+ 
+-static void send_model_app_status(struct mesh_node *node, uint16_t net_idx,
+-					uint16_t src, uint16_t dst,
+-					uint8_t status, uint16_t addr,
+-					uint32_t id, uint16_t idx)
+-{
+-	size_t n = mesh_model_opcode_set(OP_MODEL_APP_STATUS, msg);
+-
+-	msg[n++] = status;
+-	l_put_le16(addr, msg + n);
+-	n += 2;
+-	l_put_le16(idx, msg + n);
+-	n += 2;
+-
+-	if (IS_VENDOR(id)) {
+-		l_put_le16(VENDOR_ID(id), msg + n);
+-		n += 2;
+-	}
+-
+-	l_put_le16(MODEL_ID(id), msg + n);
+-	n += 2;
+-
+-	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
+-								false, msg, n);
+-}
+-
+-static void model_app_list(struct mesh_node *node, uint16_t net_idx,
+-					uint16_t src, uint16_t dst,
++static uint16_t model_app_list(struct mesh_node *node,
+ 					const uint8_t *pkt, uint16_t size)
+ {
+-	uint16_t ele_addr;
++	uint16_t ele_addr, n, bnd_len;
+ 	uint32_t id;
+-	uint8_t *status;
+-	uint16_t n;
+-	int result;
++	int opcode;
+ 
++	opcode = (size == 4) ? OP_MODEL_APP_LIST : OP_VEND_MODEL_APP_LIST;
+ 	ele_addr = l_get_le16(pkt);
+ 
+-	switch (size) {
+-	default:
+-		return;
+-	case 4:
+-		n = mesh_model_opcode_set(OP_MODEL_APP_LIST, msg);
+-		status = msg + n;
+-		id = l_get_le16(pkt + 2);
+-		l_put_le16(ele_addr, msg + 1 + n);
+-		l_put_le16((uint16_t) id, msg + 3 + n);
+-		id = SET_ID(SIG_VENDOR, id);
+-		n += 5;
+-		break;
+-	case 6:
+-		n = mesh_model_opcode_set(OP_VEND_MODEL_APP_LIST, msg);
+-		status = msg + n;
+-		id = SET_ID(l_get_le16(pkt + 2), l_get_le16(pkt + 4));
++	n = mesh_model_opcode_set(opcode, msg);
++	memcpy(msg + n + 1, pkt, size);
+ 
+-		l_put_le16(ele_addr, msg + 1 + n);
+-		l_put_le16((uint16_t) VENDOR_ID(id), msg + 3 + n);
+-		l_put_le16((uint16_t) MODEL_ID(id), msg + 5 + n);
+-		n += 7;
+-		break;
+-	}
++	id = CFG_SET_ID(size == 6, pkt + 2);
+ 
+-	result = mesh_model_get_bindings(node, ele_addr, id, msg + n,
+-						MAX_MSG_LEN - n, &size);
+-	n += size;
++	msg[n] = mesh_model_get_bindings(node, ele_addr, id, msg + n + 1 + size,
++					MAX_MSG_LEN - (n + 1 + size), &bnd_len);
+ 
+-	if (result >= 0) {
+-		*status = result;
+-		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
+-						DEFAULT_TTL, false, msg, n);
+-	}
++	if (msg[n] == MESH_STATUS_SUCCESS)
++		n += bnd_len;
++
++	n += (size + 1);
++	return n;
+ }
+ 
+-static bool model_app_bind(struct mesh_node *node, uint16_t net_idx,
+-					uint16_t src, uint16_t dst,
+-					const uint8_t *pkt, uint16_t size,
+-					bool unbind)
++static uint16_t model_app_bind(struct mesh_node *node, const uint8_t *pkt,
++						uint16_t size, bool unbind)
+ {
+-	uint16_t ele_addr;
++	uint16_t ele_addr, idx, n;
+ 	uint32_t id;
+-	uint16_t idx;
+-	int result;
+ 
+-	switch (size) {
+-	default:
+-		return false;
+ 
+-	case 6:
+-		id = SET_ID(SIG_VENDOR, l_get_le16(pkt + 4));
+-		break;
+-	case 8:
+-		id = SET_ID(l_get_le16(pkt + 4), l_get_le16(pkt + 6));
+-		break;
+-	}
++	idx = l_get_le16(pkt + 2);
++	if (idx > APP_IDX_MASK)
++		return 0;
+ 
+ 	ele_addr = l_get_le16(pkt);
+-	idx = l_get_le16(pkt + 2);
++		id = CFG_SET_ID(size == 8, pkt + 4);
+ 
+-	if (idx > 0xfff)
+-		return false;
++	n = mesh_model_opcode_set(OP_MODEL_APP_STATUS, msg);
+ 
+ 	if (unbind)
+-		result = mesh_model_binding_del(node, ele_addr, id, idx);
++		msg[n] = mesh_model_binding_del(node, ele_addr, id, idx);
+ 	else
+-		result = mesh_model_binding_add(node, ele_addr, id, idx);
++		msg[n] = mesh_model_binding_add(node, ele_addr, id, idx);
+ 
+-	send_model_app_status(node, net_idx, src, dst, result, ele_addr,
+-								id, idx);
++	memcpy(msg + n + 1, pkt, size);
++	n += (size + 1);
+ 
+-	return true;
++	return n;
+ }
+ 
+ static void hb_pub_timeout_func(struct l_timeout *timeout, void *user_data)
+@@ -703,8 +643,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		if (size != 1 || pkt[0] > TTL_MASK || pkt[0] == 1)
+ 			return true;
+ 
+-		if (pkt[0] <= TTL_MASK)
+-			node_default_ttl_set(node, pkt[0]);
++		node_default_ttl_set(node, pkt[0]);
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_DEFAULT_TTL_GET:
+@@ -1048,22 +987,25 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 
+ 	case OP_MODEL_APP_BIND:
+ 	case OP_MODEL_APP_UNBIND:
+-		model_app_bind(node, net_idx, src, dst, pkt, size,
+-				opcode != OP_MODEL_APP_BIND);
++		if (size != 6 && size != 8)
++			return true;
++
++		n = model_app_bind(node, pkt, size,
++						opcode != OP_MODEL_APP_BIND);
+ 		break;
+ 
+ 	case OP_VEND_MODEL_APP_GET:
+ 		if (size != 6)
+ 			return true;
+ 
+-		model_app_list(node, net_idx, src, dst, pkt, size);
++		n = model_app_list(node, pkt, size);
+ 		break;
+ 
+ 	case OP_MODEL_APP_GET:
+ 		if (size != 4)
+ 			return true;
+ 
+-		model_app_list(node, net_idx, src, dst, pkt, size);
++		n = model_app_list(node, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_HEARTBEAT_PUB_SET:
+diff --git a/mesh/model.c b/mesh/model.c
+index 3c9b6577a..e2cadfe36 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -111,13 +111,7 @@ static bool simple_match(const void *a, const void *b)
+ 
+ static bool has_binding(struct l_queue *bindings, uint16_t idx)
+ {
+-	const struct l_queue_entry *l;
+-
+-	for (l = l_queue_get_entries(bindings); l; l = l->next) {
+-		if (L_PTR_TO_UINT(l->data) == idx)
+-			return true;
+-	}
+-	return false;
++	return l_queue_find(bindings, simple_match, L_UINT_TO_PTR(idx)) != NULL;
+ }
+ 
+ static bool find_virt_by_label(const void *a, const void *b)
+@@ -628,7 +622,6 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 						uint16_t app_idx, bool unbind)
+ {
+ 	struct mesh_model *mod;
+-	bool is_present;
+ 	int ele_idx = node_get_element_idx(node, addr);
+ 
+ 	if (ele_idx < 0)
+@@ -645,12 +638,7 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (!appkey_have_key(node_get_net(node), app_idx))
+ 		return MESH_STATUS_INVALID_APPKEY;
+ 
+-	is_present = has_binding(mod->bindings, app_idx);
+-
+-	if (!is_present && unbind)
+-		return MESH_STATUS_SUCCESS;
+-
+-	if (is_present && !unbind)
++	if (unbind ^ has_binding(mod->bindings, app_idx))
+ 		return MESH_STATUS_SUCCESS;
+ 
+ 	if (unbind) {
+diff --git a/mesh/node.h b/mesh/node.h
+index 47c998530..7874b8692 100644
+--- a/mesh/node.h
++++ b/mesh/node.h
+@@ -49,10 +49,6 @@ const uint8_t *node_get_token(struct mesh_node *node);
+ const uint8_t *node_get_device_key(struct mesh_node *node);
+ void node_set_num_elements(struct mesh_node *node, uint8_t num_ele);
+ uint8_t node_get_num_elements(struct mesh_node *node);
+-bool node_add_binding(struct mesh_node *node, uint8_t ele_idx,
+-			uint32_t model_id, uint16_t app_idx);
+-bool node_del_binding(struct mesh_node *node, uint8_t ele_idx,
+-			uint32_t model_id, uint16_t app_idx);
+ uint8_t node_default_ttl_get(struct mesh_node *node);
+ bool node_default_ttl_set(struct mesh_node *node, uint8_t ttl);
+ bool node_set_sequence_number(struct mesh_node *node, uint32_t seq);
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
