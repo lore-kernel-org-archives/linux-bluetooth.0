@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A222FC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Aug 2020 19:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DEDC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Aug 2020 19:21:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88F672075D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Aug 2020 19:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80E16206D4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Aug 2020 19:21:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728586AbgHETUa (ORCPT
+        id S1728888AbgHETUn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Aug 2020 15:20:30 -0400
-Received: from mga05.intel.com ([192.55.52.43]:42218 "EHLO mga05.intel.com"
+        Wed, 5 Aug 2020 15:20:43 -0400
+Received: from mga05.intel.com ([192.55.52.43]:42213 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729011AbgHERsd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:48:33 -0400
-IronPort-SDR: Q5E0MYTINo4cbxVY4MCN83I4ln99/V5qPyP+lbfb5C4cIjZhsnkd1JBv0SUqPQ0DToxuIq31cB
- +HLEt8HcJPKw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9704"; a="237470672"
+        id S1728987AbgHERr2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Aug 2020 13:47:28 -0400
+IronPort-SDR: CCSYNJadoEpWMG6Wxyr0at1auLtruYX53uY15jy2z5e07XzfjJjDq2LrxxZPFfhFQLPpTUO/qz
+ vWUlAdf4R0zQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9704"; a="237470653"
 X-IronPort-AV: E=Sophos;i="5.75,438,1589266800"; 
-   d="scan'208";a="237470672"
+   d="scan'208";a="237470653"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 10:45:02 -0700
-IronPort-SDR: +MZaZ9ic0ukh830t1xE74snLMpFxy5pkt+TGb5EArAMw8zgeONk+hPcjaLTrMLRThC4QhdXhce
- liTCv5OH0y2Q==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 10:45:00 -0700
+IronPort-SDR: WAsY6ol6J9SOdoFWzuZuf7GiSCm9tY9IgAZRGXHmIpHOroj7tY+EFqomV7semR9+C2f8rJalrg
+ TFWjSQD3W62Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,438,1589266800"; 
-   d="scan'208";a="437245790"
+   d="scan'208";a="437245747"
 Received: from unknown (HELO ingas-nuc1.intel.com) ([10.254.118.189])
-  by orsmga004.jf.intel.com with ESMTP; 05 Aug 2020 10:45:02 -0700
+  by orsmga004.jf.intel.com with ESMTP; 05 Aug 2020 10:45:00 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v4 09/10] mesh: Clean up handling of config KR phase messages
-Date:   Wed,  5 Aug 2020 10:44:55 -0700
-Message-Id: <20200805174456.49342-10-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v4 06/10] mesh: Clean up handling of config relay messages
+Date:   Wed,  5 Aug 2020 10:44:52 -0700
+Message-Id: <20200805174456.49342-7-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200805174456.49342-1-inga.stotland@intel.com>
 References: <20200805174456.49342-1-inga.stotland@intel.com>
@@ -53,240 +53,72 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This modification allows using a single point for sending out
 the composed status messages by the Config Server.
-
-Also, this checks for the correct relationship between KR transition
-and KR phase values. Correct error codes are sent on unsuccessful
-requests and malformed requests are ignored.
 ---
- mesh/cfgmod-server.c | 68 +++++++++++++++++++++++++++-----------------
- mesh/mesh-defs.h     |  3 ++
- mesh/net.c           | 53 ++++++++++++----------------------
- mesh/net.h           |  4 +--
- 4 files changed, 65 insertions(+), 63 deletions(-)
+ mesh/cfgmod-server.c | 38 ++++++++++++++++++++++++++------------
+ 1 file changed, 26 insertions(+), 12 deletions(-)
 
 diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 5b3ed3d97..98c04dde7 100644
+index 030f9e744..6ca1c1dd1 100644
 --- a/mesh/cfgmod-server.c
 +++ b/mesh/cfgmod-server.c
-@@ -420,6 +420,43 @@ static uint16_t cfg_relay_msg(struct mesh_node *node, const uint8_t *pkt,
+@@ -396,6 +396,30 @@ static uint16_t model_app_bind(struct mesh_node *node, const uint8_t *pkt,
  	return n;
  }
  
-+static uint16_t cfg_key_refresh_phase(struct mesh_node *node,
-+						const uint8_t *pkt, int opcode)
++static uint16_t cfg_relay_msg(struct mesh_node *node, const uint8_t *pkt,
++								int opcode)
 +{
-+	struct mesh_net *net = node_get_net(node);
-+	uint16_t n, idx = l_get_le16(pkt);
-+	uint8_t phase;
-+	int status;
++	uint8_t count;
++	uint16_t interval;
++	uint16_t n;
 +
-+	n = mesh_model_opcode_set(OP_CONFIG_KEY_REFRESH_PHASE_STATUS, msg);
-+	status = mesh_net_key_refresh_phase_get(net, idx, &phase);
++	if (pkt[0] > 0x01)
++		return 0;
 +
-+	if (status == MESH_STATUS_SUCCESS &&
-+				opcode == OP_CONFIG_KEY_REFRESH_PHASE_SET) {
-+
-+		if (pkt[2] == KEY_REFRESH_TRANS_TWO) {
-+			if (phase == KEY_REFRESH_PHASE_TWO)
-+				goto done;
-+			else if (phase != KEY_REFRESH_PHASE_ONE)
-+				return 0;
-+		}
-+
-+		status = mesh_net_key_refresh_phase_set(net, idx, pkt[2]);
-+		l_debug("Set KR Phase: net=%3.3x transition=%d", idx, pkt[2]);
-+
-+		if (status == MESH_STATUS_SUCCESS)
-+			mesh_net_key_refresh_phase_get(net, idx, &phase);
++	if (opcode == OP_CONFIG_RELAY_SET) {
++		count = (pkt[1] & 0x7) + 1;
++		interval = ((pkt[1] >> 3) + 1) * 10;
++		node_relay_mode_set(node, !!pkt[0], count, interval);
 +	}
 +
-+done:
-+	msg[n] = status;
-+	l_put_le16(idx, msg + n);
-+	msg[n + 2] = (status != MESH_STATUS_SUCCESS) ?
-+						KEY_REFRESH_PHASE_NONE : phase;
++	n = mesh_model_opcode_set(OP_CONFIG_RELAY_STATUS, msg);
 +
-+	return n + 3;
++	msg[n++] = node_relay_mode_get(node, &count, &interval);
++	msg[n++] = (count - 1) + ((interval/10 - 1) << 3);
++
++	return n;
 +}
 +
  static void hb_pub_timeout_func(struct l_timeout *timeout, void *user_data)
  {
  	struct mesh_net *net = user_data;
-@@ -718,8 +755,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	int b_res = MESH_STATUS_SUCCESS;
- 	struct mesh_net_heartbeat *hb;
- 	uint16_t n_idx;
--	uint8_t state, status;
--	uint8_t phase;
-+	uint8_t state;
- 	bool virt = false;
- 	uint16_t n;
- 
-@@ -926,37 +962,17 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+@@ -765,24 +789,14 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
  		break;
  
- 	case OP_CONFIG_KEY_REFRESH_PHASE_SET:
--		if (size != 3 || pkt[2] > 0x03)
-+		if (size != 3 || (pkt[2] != KEY_REFRESH_TRANS_THREE &&
-+					pkt[2] != KEY_REFRESH_TRANS_TWO))
+ 	case OP_CONFIG_RELAY_SET:
+-		if (size != 2 || pkt[0] > 0x01)
++		if (size != 2)
  			return true;
- 
--		b_res = mesh_net_key_refresh_phase_set(net, l_get_le16(pkt),
--							pkt[2]);
--		size = 2;
+-
+-		count = (pkt[1] & 0x7) + 1;
+-		interval = ((pkt[1] >> 3) + 1) * 10;
+-		node_relay_mode_set(node, !!pkt[0], count, interval);
  		/* Fall Through */
- 
- 	case OP_CONFIG_KEY_REFRESH_PHASE_GET:
--		if (size != 2)
-+		if (size != 2 && opcode == OP_CONFIG_KEY_REFRESH_PHASE_GET)
+-
+ 	case OP_CONFIG_RELAY_GET:
+ 		if (opcode == OP_CONFIG_RELAY_GET && size != 0)
  			return true;
  
--		n_idx = l_get_le16(pkt);
+-		n = mesh_model_opcode_set(OP_CONFIG_RELAY_STATUS, msg);
 -
--		n = mesh_model_opcode_set(OP_CONFIG_KEY_REFRESH_PHASE_STATUS,
--						msg);
+-		msg[n++] = node_relay_mode_get(node, &count, &interval);
+-		msg[n++] = (count - 1) + ((interval/10 - 1) << 3);
 -
--		/* State: 0x00-0x03 phase of key refresh */
--		status = mesh_net_key_refresh_phase_get(net, n_idx,
--							&phase);
--		if (status != MESH_STATUS_SUCCESS) {
--			b_res = status;
--			phase = KEY_REFRESH_PHASE_NONE;
--		}
--
--		msg[n++] = b_res;
--		l_put_le16(n_idx, msg + n);
--		n += 2;
--		msg[n++] = phase;
--
--		l_debug("Get/Set Key Refresh State (%d)", msg[n-1]);
-+		n = cfg_key_refresh_phase(node, pkt, opcode);
+-		l_debug("Get/Set Relay Config (%d)", msg[n-1]);
++		n = cfg_relay_msg(node, pkt, opcode);
  		break;
  
- 	case OP_APPKEY_ADD:
-diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
-index bbde53303..6ceeb73f5 100644
---- a/mesh/mesh-defs.h
-+++ b/mesh/mesh-defs.h
-@@ -36,6 +36,9 @@
- #define KEY_REFRESH_PHASE_TWO	0x02
- #define KEY_REFRESH_PHASE_THREE	0x03
- 
-+#define KEY_REFRESH_TRANS_TWO	0x02
-+#define KEY_REFRESH_TRANS_THREE	0x03
-+
- #define DEFAULT_TTL		0xff
- #define TTL_MASK		0x7f
- 
-diff --git a/mesh/net.c b/mesh/net.c
-index b54c647cb..9b4454fee 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2433,6 +2433,10 @@ static int key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
- 		return MESH_STATUS_INVALID_NETKEY;
- 
- 	l_debug("Key refresh procedure phase 2: start using new net TX keys");
-+
-+	if (subnet->kr_phase == KEY_REFRESH_PHASE_TWO)
-+		return MESH_STATUS_SUCCESS;
-+
- 	subnet->key_refresh = 1;
- 	subnet->net_key_tx = subnet->net_key_upd;
- 	/*
-@@ -2445,8 +2449,9 @@ static int key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
- 
- 	l_queue_foreach(net->friends, frnd_kr_phase2, net);
- 
--	mesh_config_net_key_set_phase(node_config_get(net->node), idx,
--						KEY_REFRESH_PHASE_TWO);
-+	if (!mesh_config_net_key_set_phase(node_config_get(net->node), idx,
-+							KEY_REFRESH_PHASE_TWO))
-+		return MESH_STATUS_STORAGE_FAIL;
- 
- 	return MESH_STATUS_SUCCESS;
- }
-@@ -2479,8 +2484,9 @@ static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
- 
- 	l_queue_foreach(net->friends, frnd_kr_phase3, net);
- 
--	mesh_config_net_key_set_phase(node_config_get(net->node), idx,
--							KEY_REFRESH_PHASE_NONE);
-+	if (!mesh_config_net_key_set_phase(node_config_get(net->node), idx,
-+							KEY_REFRESH_PHASE_NONE))
-+		return MESH_STATUS_STORAGE_FAIL;
- 
- 	return MESH_STATUS_SUCCESS;
- }
-@@ -3168,45 +3174,22 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
- 		send_msg_pkt(net, pkt, pkt_len + 1);
- }
- 
--uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t idx,
-+int mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t idx,
- 							uint8_t transition)
- {
--	struct mesh_subnet *subnet;
--
--	if (!net)
--		return MESH_STATUS_UNSPECIFIED_ERROR;
--
--	subnet = l_queue_find(net->subnets, match_key_index,
--							L_UINT_TO_PTR(idx));
--	if (!subnet)
--		return MESH_STATUS_INVALID_NETKEY;
--
--	if (transition == subnet->kr_phase)
--		return MESH_STATUS_SUCCESS;
-+	switch (transition) {
-+	case KEY_REFRESH_TRANS_TWO:
-+		return key_refresh_phase_two(net, idx);
- 
--	if ((transition != 2 && transition != 3) ||
--						transition < subnet->kr_phase)
--		return MESH_STATUS_CANNOT_SET;
-+	case KEY_REFRESH_TRANS_THREE:
-+		return key_refresh_finish(net, idx);
- 
--	switch (transition) {
--	case 2:
--		if (key_refresh_phase_two(net, idx)
--							!= MESH_STATUS_SUCCESS)
--			return MESH_STATUS_CANNOT_SET;
--		break;
--	case 3:
--		if (key_refresh_finish(net, idx)
--							!= MESH_STATUS_SUCCESS)
--			return MESH_STATUS_CANNOT_SET;
--		break;
- 	default:
--		return MESH_STATUS_CANNOT_SET;
-+		return MESH_STATUS_UNSPECIFIED_ERROR;
- 	}
--
--	return MESH_STATUS_SUCCESS;
- }
- 
--uint8_t mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t idx,
-+int mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t idx,
- 								uint8_t *phase)
- {
- 	struct mesh_subnet *subnet;
-diff --git a/mesh/net.h b/mesh/net.h
-index 2673b895a..3d374280f 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -320,9 +320,9 @@ void mesh_friend_sub_add(struct mesh_net *net, uint16_t lpn, uint8_t ele_cnt,
- 							const uint8_t *list);
- void mesh_friend_sub_del(struct mesh_net *net, uint16_t lpn, uint8_t cnt,
- 						const uint8_t *del_list);
--uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t net_idx,
-+int mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t net_idx,
- 							uint8_t transition);
--uint8_t mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t net_idx,
-+int mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t net_idx,
- 							uint8_t *phase);
- void mesh_net_send_seg(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
+ 	case OP_CONFIG_NETWORK_TRANSMIT_SET:
 -- 
 2.26.2
 
