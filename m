@@ -2,115 +2,144 @@ Return-Path: <SRS0=ILT4=BQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCF2C433E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Aug 2020 18:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90931C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Aug 2020 22:21:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0682622D0B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Aug 2020 18:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CA6B221E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Aug 2020 22:21:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPwELL54"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GyumodkG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729979AbgHFSkK (ORCPT
+        id S1726212AbgHFWVd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Aug 2020 14:40:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60454 "EHLO
+        Thu, 6 Aug 2020 18:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729981AbgHFSkI (ORCPT
+        with ESMTP id S1726167AbgHFWVc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Aug 2020 14:40:08 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEEAFC0617A0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2020 11:17:17 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id mt12so7282848pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2020 11:17:17 -0700 (PDT)
+        Thu, 6 Aug 2020 18:21:32 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54080C061574;
+        Thu,  6 Aug 2020 15:21:32 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id p1so111079pls.4;
+        Thu, 06 Aug 2020 15:21:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=QrCSGaZo3W622aXcnbTdNOpWK+XU36Ue7MMISwHaE48=;
-        b=OPwELL54m6rtl08l7IuN5lrL+6LgIu2mHgTOEQ4EIHVwQqa6sHGHonzyMenwmqw9vm
-         KEGmy/EaFgX6TCFJqHHr56AAFPx3BZ8gL3Sw9i+DKLe83nBf78d4v86slQUEHxYvyHGB
-         d98VwaS+wbrpG5ICQ3jBP314AmPrmuE0EPlolPcr8gEbDBZD6UM0hVnqS91yjVmsxpTD
-         wV5WFmNgiw7LofDE2HGZ9KV5mrSK+J0luEwhyEWZYl9AE+1WsldZ1OnDIj93mx9R0wYc
-         J6n9Mmy5h2uighwZB8/2npjSm+Bp/vf2epv/SS7rQ88c7GGvWudaqZptnOCLedpwu7nP
-         jiug==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=t1TN4T3jQ2jrlk3a/d7SaKfk2DJyftZUv6bXnlt6NPQ=;
+        b=GyumodkGmYKsGSwVnzxjXGz3Hc6dDp/7EX3r4spkycDyPVNN0ciFP2qEtF0XPhrBf4
+         +cCI0OWrH6x101NHuYUTOaXPwuCecyhxfEvjJRna72hDnNI+bib+8AzwceW3eJdE75Gn
+         SeIJKEi14my/hEJw+qU/KCE5RSHazXH9KHIfKLNltLm7ADcruE5/tGFOBJjd/g0Mnrl5
+         TD9+5yjblEpGaVz4M1LHrXLmcdWRpP5c2NV1JaW3i6df06bY03MlPUl3EghFXAFM5iLk
+         Ox9KU5vu5QYQH83zkF+ICm8Q2r+16LLLSd84hY8z6dVmhZCgoIg7vDd5Gd8rg9nvzxvN
+         9EXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=QrCSGaZo3W622aXcnbTdNOpWK+XU36Ue7MMISwHaE48=;
-        b=ka2h0T8I/Xvx8cmCmEV9YVAxHEOIWZ9VliotrM0pDmwtAiDWPEwrPEraDP4/ROYGwV
-         HaE8nHOBYBypOrWAd/A14wlLprgC6DBuOZ7Vm0bdEhJgzpUF4n5PJg3coX5a0K9L2YhE
-         cnDOHhT2HxGtmpWepGrnqR6xX+7Z8y1aazEvOtHuvwigOLOjicCtlaoO+nLq1iaxEdto
-         0L/nUHxJE6cI8hva1Og7mVXQn9mHW3Cusvg6EfOnKSAFsTAB4KZJaJ/iaXIqNyRBtcLZ
-         4+nmeGrs4goYRjhqSivKstPIzHO4v3E3LEbWsRJdyl/NTQQ5kDLa91pNHGsVFwU8CpbY
-         ming==
-X-Gm-Message-State: AOAM532okFW73ZDbd3KmaJYYvlC2f05Xaj02mToX9WzWJLDjyKvVSh63
-        SnPnZSqmb85eU1ydYX/C0douDCqD
-X-Google-Smtp-Source: ABdhPJxAvHDYOWeibSFHSpMpOG+Juf4MXbo63ZW3bbqWWr40VCY5GaduLbm/v4E3viMH7YoF1HRYqA==
-X-Received: by 2002:a17:902:7605:: with SMTP id k5mr9226566pll.122.1596737837096;
-        Thu, 06 Aug 2020 11:17:17 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id o16sm10341078pfu.188.2020.08.06.11.17.16
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2020 11:17:16 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: MGMT: Fix not checking if BT_HS is enabled
-Date:   Thu,  6 Aug 2020 11:17:14 -0700
-Message-Id: <20200806181714.3216076-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200806181714.3216076-1-luiz.dentz@gmail.com>
-References: <20200806181714.3216076-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=t1TN4T3jQ2jrlk3a/d7SaKfk2DJyftZUv6bXnlt6NPQ=;
+        b=e1lzyzb0IUfIRzudWXCJ1cnSbrZG3OU8EoVQ0p+kJDkZ1tnLXS6o966fc2KdC6EHeL
+         3SrIF0a5mXVw76vBuseFHDBVjkkqkjlSiZ4ovEVfQAjHNwieeA9kQTFnWW2rC5ZbPf9O
+         XCVz7HUemkpVnapitCxqsMEN6h+Q28m+bBbKFOppxvOEkVHfUzGS1ldj+fNmo5m0qPl1
+         ED2axOJ1D3LUxfVoNB0CC1/auI0H9efPJaH6IlviqbYNd5RQTwLOmmWz2ftkLDDCIrhJ
+         Wdyw2sb/kvUexW2wviff3HtcudiqYhWO/eNEvVHcZJMxGZcVkKXQc7LPLka0fe1Ye8m0
+         FC6w==
+X-Gm-Message-State: AOAM533QHJUjqnXMz8lHoCE9mfaVnnvTe76eDAuB5RQDhG7tKwWbhiP6
+        q6J7leABOdw2O3ozloO5s2k=
+X-Google-Smtp-Source: ABdhPJwdY4ryrXf97t2P6yPCseaEpoaitTdHlZtd60UHAYlnINemi0RFvJHHjsz9ZaSHJyy7n+NjVw==
+X-Received: by 2002:a17:902:45:: with SMTP id 63mr9766294pla.179.1596752491350;
+        Thu, 06 Aug 2020 15:21:31 -0700 (PDT)
+Received: from [10.1.10.11] (c-73-241-150-58.hsd1.ca.comcast.net. [73.241.150.58])
+        by smtp.gmail.com with ESMTPSA id w82sm9912017pff.7.2020.08.06.15.21.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Aug 2020 15:21:30 -0700 (PDT)
+Subject: Re: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
+To:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200723060908.50081-26-hch@lst.de>
+From:   Eric Dumazet <eric.dumazet@gmail.com>
+Message-ID: <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
+Date:   Thu, 6 Aug 2020 15:21:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200723060908.50081-26-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This checks if BT_HS is enabled relecting it on MGMT_SETTING_HS instead
-of always reporting it as supported.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/mgmt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+On 7/22/20 11:09 PM, Christoph Hellwig wrote:
+> Rework the remaining setsockopt code to pass a sockptr_t instead of a
+> plain user pointer.  This removes the last remaining set_fs(KERNEL_DS)
+> outside of architecture specific code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org> [ieee802154]
+> ---
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5bbe71002fb9..5758ccb524ef 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -782,7 +782,8 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 
- 		if (lmp_ssp_capable(hdev)) {
- 			settings |= MGMT_SETTING_SSP;
--			settings |= MGMT_SETTING_HS;
-+			if (IS_ENABLED(CONFIG_BT_HS))
-+				settings |= MGMT_SETTING_HS;
- 		}
- 
- 		if (lmp_sc_capable(hdev))
-@@ -1815,6 +1816,10 @@ static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
- 
-+	if (!IS_ENABLED(CONFIG_BT_HS))
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_HS,
-+				       MGMT_STATUS_NOT_SUPPORTED);
-+
- 	status = mgmt_bredr_support(hdev);
- 	if (status)
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_HS, status);
--- 
-2.26.2
+
+...
+
+> diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+> index 594e01ad670aa6..874f01cd7aec42 100644
+> --- a/net/ipv6/raw.c
+> +++ b/net/ipv6/raw.c
+> @@ -972,13 +972,13 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>  }
+>  
+
+...
+
+>  static int do_rawv6_setsockopt(struct sock *sk, int level, int optname,
+> -			    char __user *optval, unsigned int optlen)
+> +			       sockptr_t optval, unsigned int optlen)
+>  {
+>  	struct raw6_sock *rp = raw6_sk(sk);
+>  	int val;
+>  
+> -	if (get_user(val, (int __user *)optval))
+> +	if (copy_from_sockptr(&val, optval, sizeof(val)))
+>  		return -EFAULT;
+>  
+
+converting get_user(...)   to  copy_from_sockptr(...) really assumed the optlen
+has been validated to be >= sizeof(int) earlier.
+
+Which is not always the case, for example here.
+
+User application can fool us passing optlen=0, and a user pointer of exactly TASK_SIZE-1
+
 
