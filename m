@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE82C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A653C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5F7B20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5231320855
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbgHGBio (ORCPT
+        id S1726232AbgHGBio (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 6 Aug 2020 21:38:44 -0400
 Received: from mga18.intel.com ([134.134.136.126]:44001 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726201AbgHGBim (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Aug 2020 21:38:42 -0400
-IronPort-SDR: B6W4LUokobmJ5obUoKf+X9khfQEd4nHt/H+LDJmohabGmzgMv0t5Xdl5xFP+FS34ueQlyy0H1t
- Yxun+m2DSNcg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="140558047"
+        id S1726205AbgHGBin (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 6 Aug 2020 21:38:43 -0400
+IronPort-SDR: hqPlxLHPANRWYA6VDhO5yN0zK+Lzy7zJlG39GBmfn5ourxD04qxRV9tmJ7GkywpAPRlvz5+DBO
+ 1lPctfE4eXYA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="140558049"
 X-IronPort-AV: E=Sophos;i="5.75,443,1589266800"; 
-   d="scan'208";a="140558047"
+   d="scan'208";a="140558049"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2020 18:38:41 -0700
-IronPort-SDR: 7DEo5aJlG/yNggW9YwePrDRfPi/596QvV/ldC363lNeMU771eW7lSz6GGFRc31NyRPhk+qEUbo
- U4SqfHzt1rZw==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2020 18:38:42 -0700
+IronPort-SDR: d0+DkxrQIk/MRWpMjC+d2blzVC8eWQV9gV8j9RaJSWH4d1DhkdUN4BQWfdAiwvzyBvLOJGGt26
+ gXzz5PevfvvQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,443,1589266800"; 
-   d="scan'208";a="397442090"
+   d="scan'208";a="397442094"
 Received: from unknown (HELO ingas-nuc1.intel.com) ([10.254.119.50])
-  by fmsmga001.fm.intel.com with ESMTP; 06 Aug 2020 18:38:41 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 06 Aug 2020 18:38:42 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v5 07/10] mesh: Clean up handling of config poll timeout message
-Date:   Thu,  6 Aug 2020 18:38:31 -0700
-Message-Id: <20200807013834.123263-8-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v5 08/10] mesh: Clean up handling of config net transmit messages
+Date:   Thu,  6 Aug 2020 18:38:32 -0700
+Message-Id: <20200807013834.123263-9-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200807013834.123263-1-inga.stotland@intel.com>
 References: <20200807013834.123263-1-inga.stotland@intel.com>
@@ -54,84 +54,78 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 This modification allows using a single point for sending out
 the composed status messages by the Config Server.
 ---
- mesh/cfgmod-server.c | 34 +++++++++++++++++++++++-----------
- mesh/cfgmod.h        |  2 +-
- 2 files changed, 24 insertions(+), 12 deletions(-)
+ mesh/cfgmod-server.c | 38 +++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
 diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 8e3da79d5..f3cc18ae0 100644
+index f3cc18ae0..191c5b8ef 100644
 --- a/mesh/cfgmod-server.c
 +++ b/mesh/cfgmod-server.c
-@@ -643,6 +643,25 @@ static uint16_t cfg_get_appkeys_msg(struct mesh_node *node, const uint8_t *pkt)
- 	return n + 3 + sz;
+@@ -662,6 +662,28 @@ static uint16_t cfg_poll_timeout_msg(struct mesh_node *node, const uint8_t *pkt)
+ 	return n;
  }
  
-+static uint16_t cfg_poll_timeout_msg(struct mesh_node *node, const uint8_t *pkt)
++static uint16_t cfg_net_tx_msg(struct mesh_node *node, const uint8_t *pkt,
++								int opcode)
 +{
-+	uint16_t n, addr = l_get_le16(pkt);
-+	uint32_t poll_to;
++	uint8_t cnt;
++	uint16_t interval, n;
++	struct mesh_net *net = node_get_net(node);
 +
-+	if (!IS_UNICAST(addr))
-+		return 0;
++	cnt = (pkt[0] & 0x7) + 1;
++	interval = ((pkt[0] >> 3) + 1) * 10;
 +
-+	n = mesh_model_opcode_set(OP_CONFIG_POLL_TIMEOUT_STATUS, msg);
-+	l_put_le16(addr, msg + n);
-+	n += 2;
++	if (opcode == OP_CONFIG_NETWORK_TRANSMIT_SET &&
++			mesh_config_write_net_transmit(node_config_get(node),
++							cnt, interval))
++		mesh_net_transmit_params_set(net, cnt, interval);
 +
-+	poll_to = mesh_net_friend_timeout(node_get_net(node), addr);
-+	msg[n++] = poll_to;
-+	msg[n++] = poll_to >> 8;
-+	msg[n++] = poll_to >> 16;
++	n = mesh_model_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_STATUS, msg);
++
++	mesh_net_transmit_params_get(net, &cnt, &interval);
++	msg[n++] = (cnt - 1) + ((interval/10 - 1) << 3);
 +	return n;
 +}
 +
  static uint16_t get_composition(struct mesh_node *node, uint8_t page,
  								uint8_t *buf)
  {
-@@ -678,7 +697,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	struct mesh_net *net;
- 	const uint8_t *pkt = data;
- 	struct timeval time_now;
--	uint32_t opcode, tmp32;
-+	uint32_t opcode;
- 	int b_res = MESH_STATUS_SUCCESS;
- 	struct mesh_net_heartbeat *hb;
- 	uint16_t n_idx;
-@@ -1117,18 +1136,11 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 		msg[n++] = hb->sub_max_hops;
- 		break;
+@@ -704,8 +726,6 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	uint8_t state, status;
+ 	uint8_t phase;
+ 	bool virt = false;
+-	uint8_t count;
+-	uint16_t interval;
+ 	uint16_t n;
  
--	case OP_CONFIG_POLL_TIMEOUT_LIST:
--		if (size != 2 || l_get_le16(pkt) == 0 ||
--						l_get_le16(pkt) > 0x7fff)
-+	case OP_CONFIG_POLL_TIMEOUT_GET:
-+		if (size != 2)
+ 	if (app_idx != APP_IDX_DEV_LOCAL)
+@@ -827,25 +847,13 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	case OP_CONFIG_NETWORK_TRANSMIT_SET:
+ 		if (size != 1)
+ 			return true;
+-
+-		count = (pkt[0] & 0x7) + 1;
+-		interval = ((pkt[0] >> 3) + 1) * 10;
+-
+-		if (mesh_config_write_net_transmit(node_config_get(node), count,
+-								interval))
+-			mesh_net_transmit_params_set(net, count, interval);
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_NETWORK_TRANSMIT_GET:
+ 		if (opcode == OP_CONFIG_NETWORK_TRANSMIT_GET && size != 0)
  			return true;
  
--		n = mesh_model_opcode_set(OP_CONFIG_POLL_TIMEOUT_STATUS, msg);
--		l_put_le16(l_get_le16(pkt), msg + n);
--		n += 2;
--		tmp32 = mesh_net_friend_timeout(net, l_get_le16(pkt));
--		msg[n++] = tmp32;
--		msg[n++] = tmp32 >> 8;
--		msg[n++] = tmp32 >> 16;
-+		n = cfg_poll_timeout_msg(node, pkt);
+-		n = mesh_model_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_STATUS,
+-									msg);
+-		mesh_net_transmit_params_get(net, &count, &interval);
+-		msg[n++] = (count - 1) + ((interval/10 - 1) << 3);
+-
+-		l_debug("Get/Set Network Transmit Config");
++		n = cfg_net_tx_msg(node, pkt, opcode);
  		break;
  
- 	case OP_NODE_RESET:
-diff --git a/mesh/cfgmod.h b/mesh/cfgmod.h
-index 7b6a95807..6d73656a7 100644
---- a/mesh/cfgmod.h
-+++ b/mesh/cfgmod.h
-@@ -66,7 +66,7 @@
- #define OP_CONFIG_MODEL_SUB_LIST		0x802A
- #define OP_CONFIG_VEND_MODEL_SUB_GET		0x802B
- #define OP_CONFIG_VEND_MODEL_SUB_LIST		0x802C
--#define OP_CONFIG_POLL_TIMEOUT_LIST		0x802D
-+#define OP_CONFIG_POLL_TIMEOUT_GET		0x802D
- #define OP_CONFIG_POLL_TIMEOUT_STATUS		0x802E
- /* Health opcodes in health-mod.h */
- #define OP_CONFIG_HEARTBEAT_PUB_GET		0x8038
+ 	case OP_CONFIG_PROXY_SET:
 -- 
 2.26.2
 
