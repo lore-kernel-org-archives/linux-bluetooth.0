@@ -2,46 +2,45 @@ Return-Path: <SRS0=11Tl=BR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED050C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5573C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E151820855
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB4AF20855
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 01:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726197AbgHGBil (ORCPT
+        id S1726200AbgHGBim (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Aug 2020 21:38:41 -0400
-Received: from mga18.intel.com ([134.134.136.126]:43978 "EHLO mga18.intel.com"
+        Thu, 6 Aug 2020 21:38:42 -0400
+Received: from mga18.intel.com ([134.134.136.126]:44001 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbgHGBik (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Aug 2020 21:38:40 -0400
-IronPort-SDR: ZzcnPh6Lt501SNsJPhdJR/EhXTcvz6rPyOaqZMM8jKe//6kssTcu3mCxhYH+UHLwDFZD1jMQpE
- AT7HZ2rXm09A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="140558041"
+        id S1726055AbgHGBil (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 6 Aug 2020 21:38:41 -0400
+IronPort-SDR: 20VQxvOQKB9lmPCP++Kwmj2QoYb+PiuACJm2YK93i+kgWmersfuUv3C8H6CXfeRuOgW/8l23iU
+ EhEC4VeasN7Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="140558042"
 X-IronPort-AV: E=Sophos;i="5.75,443,1589266800"; 
-   d="scan'208";a="140558041"
+   d="scan'208";a="140558042"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2020 18:38:40 -0700
-IronPort-SDR: Krc5OgDgSfq50jRfe6RvxcaJaTEqj73WRjAlWjHkYgFY+BZkfqZz9/zQlmi0uD9MwwgNSukT1U
- JmDe9zPR+IkA==
+IronPort-SDR: ciAcmXg7ns3jkrU8LZSFKvvTUkIWhSuEKautbb0W7K7oBtP1QKYjQ0ZlurvlPLha7T64Z1APRb
+ 4nPcP3Hv0ogw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,443,1589266800"; 
-   d="scan'208";a="397442078"
+   d="scan'208";a="397442082"
 Received: from unknown (HELO ingas-nuc1.intel.com) ([10.254.119.50])
-  by fmsmga001.fm.intel.com with ESMTP; 06 Aug 2020 18:38:39 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 06 Aug 2020 18:38:40 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v5 04/10] mesh: Clean up handling of config publication messages
-Date:   Thu,  6 Aug 2020 18:38:28 -0700
-Message-Id: <20200807013834.123263-5-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v5 05/10] mesh: Clean up handling of config net and app key messages
+Date:   Thu,  6 Aug 2020 18:38:29 -0700
+Message-Id: <20200807013834.123263-6-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200807013834.123263-1-inga.stotland@intel.com>
 References: <20200807013834.123263-1-inga.stotland@intel.com>
@@ -54,250 +53,209 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This modification allows using a single point for sending out
 the composed status messages by the Config Server.
-
-Also, return Feature Not Supported errror code when credential
-flag is set, but the node does not support LPN feature
 ---
- mesh/cfgmod-server.c | 99 ++++++++++++++++++--------------------------
- mesh/model.c         |  7 +++-
- mesh/net.h           |  2 -
- 3 files changed, 46 insertions(+), 62 deletions(-)
+ mesh/cfgmod-server.c | 155 +++++++++++++++++++++++--------------------
+ 1 file changed, 83 insertions(+), 72 deletions(-)
 
 diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 82938dc83..6ed5800c0 100644
+index 6ed5800c0..2797de8ab 100644
 --- a/mesh/cfgmod-server.c
 +++ b/mesh/cfgmod-server.c
-@@ -32,6 +32,8 @@
- #include "mesh/mesh-config.h"
- #include "mesh/cfgmod.h"
+@@ -547,6 +547,81 @@ static void node_reset(void *user_data)
+ 	node_remove(node);
+ }
  
-+#define CREDFLAG_MASK	0x1000
++static uint16_t cfg_appkey_msg(struct mesh_node *node, const uint8_t *pkt,
++								int opcode)
++{
++	uint16_t n_idx, a_idx, n;
++	struct mesh_net *net = node_get_net(node);
 +
- #define CFG_GET_ID(vendor, pkt)	((vendor) ?	\
- 		(SET_ID(l_get_le16((pkt)), l_get_le16((pkt) + 2))) :	\
- 		(SET_ID(SIG_VENDOR, l_get_le16(pkt))))
-@@ -44,11 +46,9 @@ static const uint8_t supported_pages[] = {
- 
- static uint8_t msg[MAX_MSG_LEN];
- 
--static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
--			uint16_t src, uint16_t dst,
--			uint8_t status, uint16_t ele_addr, uint32_t id,
--			uint16_t pub_addr, uint16_t idx, bool cred_flag,
--			uint8_t ttl, uint8_t period, uint8_t retransmit)
-+static uint16_t set_pub_status(uint8_t status, uint16_t ele_addr, uint32_t id,
-+				uint16_t pub_addr, uint16_t idx, bool cred_flag,
-+				uint8_t ttl, uint8_t period, uint8_t retransmit)
- {
- 	size_t n;
- 
-@@ -72,46 +72,36 @@ static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
- 		n += 4;
- 	}
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
--								false, msg, n);
-+	return n;
- }
- 
--static void config_pub_get(struct mesh_node *node, uint16_t net_idx,
--					uint16_t src, uint16_t dst,
--					const uint8_t *pkt, uint16_t size)
-+static uint16_t config_pub_get(struct mesh_node *node, const uint8_t *pkt,
-+								bool vendor)
- {
- 	uint32_t id;
- 	uint16_t ele_addr;
- 	struct mesh_model_pub *pub;
- 	int status;
- 
--	if (size == 4) {
--		id = SET_ID(SIG_VENDOR, l_get_le16(pkt + 2));
--	} else if (size == 6) {
--		id = SET_ID(l_get_le16(pkt + 2), l_get_le16(pkt + 4));
--	} else
--		return;
--
- 	ele_addr = l_get_le16(pkt);
-+	id = CFG_GET_ID(vendor, pkt + 2);
++	n_idx = l_get_le16(pkt) & 0xfff;
++	if (n_idx > NET_IDX_MAX)
++		return 0;
 +
- 	pub = mesh_model_pub_get(node, ele_addr, id, &status);
- 
- 	if (pub && status == MESH_STATUS_SUCCESS)
--		send_pub_status(node, net_idx, src, dst, status, ele_addr,
--				id, pub->addr, pub->idx, pub->credential,
--				pub->ttl, pub->period, pub->retransmit);
-+		return set_pub_status(status, ele_addr, id, pub->addr, pub->idx,
-+					pub->credential, pub->ttl, pub->period,
-+					pub->retransmit);
- 	else
--		send_pub_status(node, net_idx, src, dst, status, ele_addr,
--				id, 0, 0, 0, 0, 0, 0);
-+		return set_pub_status(status, ele_addr, id, 0, 0, 0, 0, 0, 0);
- }
- 
--static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
--				uint16_t src, uint16_t dst,
--				const uint8_t *pkt, bool virt, bool vendor)
-+static uint16_t config_pub_set(struct mesh_node *node, const uint8_t *pkt,
-+							bool virt, bool vendor)
++	a_idx = l_get_le16(pkt + 1) >> 4;
++	if (a_idx > APP_IDX_MAX)
++		return 0;
++
++	n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
++
++	if (opcode == OP_APPKEY_ADD)
++		msg[n] = appkey_key_add(net, n_idx, a_idx, pkt + 3);
++	else if (opcode == OP_APPKEY_UPDATE)
++		msg[n] = appkey_key_update(net, n_idx, a_idx, pkt + 3);
++	else
++		msg[n] = appkey_key_delete(net, n_idx, a_idx);
++
++	l_debug("AppKey Command %s: Net_Idx %3.3x, App_Idx %3.3x",
++			(msg[n] == MESH_STATUS_SUCCESS) ? "success" : "fail",
++								n_idx, a_idx);
++
++	memcpy(msg + n + 1, &pkt[0], 3);
++
++	return n + 4;
++}
++
++static uint16_t cfg_netkey_msg(struct mesh_node *node, const uint8_t *pkt,
++								int opcode)
++{
++	uint16_t n_idx, n;
++	struct mesh_net *net = node_get_net(node);
++
++	n_idx = l_get_le16(pkt);
++	if (n_idx > NET_IDX_MAX)
++		return 0;
++
++	n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
++
++	if (opcode == OP_NETKEY_ADD)
++		msg[n] = mesh_net_add_key(net, n_idx, pkt + 2);
++	else if (opcode == OP_NETKEY_UPDATE)
++		msg[n] = mesh_net_update_key(net, n_idx, pkt + 2);
++	else
++		msg[n] = mesh_net_del_key(net, n_idx);
++
++	l_debug("NetKey Command %s: Net_Idx %3.3x",
++			(msg[n] == MESH_STATUS_SUCCESS) ? "success" : "fail",
++									n_idx);
++
++	memcpy(msg + n + 1, &pkt[0], 2);
++
++	return n + 3;
++}
++
++static uint16_t cfg_get_appkeys_msg(struct mesh_node *node, const uint8_t *pkt)
++{
++	uint16_t n_idx, sz, n;
++
++	n_idx = l_get_le16(pkt);
++
++	n = mesh_model_opcode_set(OP_APPKEY_LIST, msg);
++	l_put_le16(n_idx, msg + n + 1);
++
++	msg[n] = appkey_list(node_get_net(node), n_idx, msg + n + 3,
++						MAX_MSG_LEN - (n + 3), &sz);
++
++	return n + 3 + sz;
++}
++
+ static uint16_t get_composition(struct mesh_node *node, uint8_t page,
+ 								uint8_t *buf)
  {
- 	uint32_t id;
--	uint16_t ele_addr, idx, ota = UNASSIGNED_ADDRESS;
-+	uint16_t ele_addr, idx, pub_dst;
- 	const uint8_t *pub_addr;
--	uint16_t test_addr;
- 	uint8_t ttl, period, retransmit;
- 	int status;
- 	bool cred_flag;
-@@ -119,42 +109,35 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
- 	ele_addr = l_get_le16(pkt);
- 	pub_addr = pkt + 2;
- 
--	pkt += (virt ? 14 : 0);
-+	pub_dst = l_get_le16(pub_addr);
- 
--	idx = l_get_le16(pkt + 4);
--	ttl = pkt[6];
--	period = pkt[7];
--	retransmit = pkt[8];
--	id = l_get_le16(pkt + 9);
-+	if (!virt && IS_VIRTUAL(pub_dst))
-+		return 0;
- 
--	if (!vendor)
--		id = SET_ID(SIG_VENDOR, id);
--	else
--		id = SET_ID(id, l_get_le16(pkt + 11));
-+	pkt += (virt ? 14 : 0);
- 
--	/* Don't accept virtual seeming addresses */
--	test_addr = l_get_le16(pub_addr);
--	if (!virt && IS_VIRTUAL(test_addr))
--		return;
-+	idx = l_get_le16(pkt + 4);
-+	if (idx > CREDFLAG_MASK)
-+		return 0;
- 
- 	cred_flag = !!(CREDFLAG_MASK & idx);
- 	idx &= APP_IDX_MASK;
-+	ttl = pkt[6];
-+	period = pkt[7];
-+	retransmit = pkt[8];
-+	id = CFG_GET_ID(vendor, pkt + 9);
- 
- 	status = mesh_model_pub_set(node, ele_addr, id, pub_addr, idx,
- 					cred_flag, ttl, period, retransmit,
--					virt, &ota);
--
--	l_debug("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
--					status, ele_addr, ota, id, idx);
-+					virt, &pub_dst);
- 
--	if (status != MESH_STATUS_SUCCESS) {
--		send_pub_status(node, net_idx, src, dst, status, ele_addr,
--						id, 0, 0, 0, 0, 0, 0);
-+	l_debug("pub_set: status %d, ea %4.4x, ota: %4.4x, id: %x, idx: %3.3x",
-+					status, ele_addr, pub_dst, id, idx);
- 
--		return;
--	}
-+	if (status != MESH_STATUS_SUCCESS)
-+		return set_pub_status(status, ele_addr, id, 0, 0, 0, 0, 0, 0);
- 
--	if (IS_UNASSIGNED(test_addr) && !virt) {
-+	if (IS_UNASSIGNED(pub_dst) && !virt) {
- 		ttl = period = idx = 0;
- 
- 		/* Remove model publication from config file */
-@@ -165,7 +148,7 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
- 	} else {
- 		struct mesh_config_pub db_pub = {
- 			.virt = virt,
--			.addr = ota,
-+			.addr = pub_dst,
- 			.idx = idx,
- 			.ttl = ttl,
- 			.credential = cred_flag,
-@@ -180,12 +163,12 @@ static void config_pub_set(struct mesh_node *node, uint16_t net_idx,
- 		/* Save model publication to config file */
- 		if (!mesh_config_model_pub_add(node_config_get(node), ele_addr,
- 						vendor ? id : MODEL_ID(id),
--							vendor, &db_pub))
-+						vendor, &db_pub))
- 			status = MESH_STATUS_STORAGE_FAIL;
- 	}
- 
--	send_pub_status(node, net_idx, src, dst, status, ele_addr, id, ota,
--				idx, cred_flag, ttl, period, retransmit);
-+	return set_pub_status(status, ele_addr, id, pub_dst, idx, cred_flag,
-+						ttl, period, retransmit);
- }
- 
- static uint16_t cfg_sub_get_msg(struct mesh_node *node, const uint8_t *pkt,
-@@ -667,14 +650,14 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 		if (!virt && (size != 11 && size != 13))
+@@ -585,7 +660,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	uint32_t opcode, tmp32;
+ 	int b_res = MESH_STATUS_SUCCESS;
+ 	struct mesh_net_heartbeat *hb;
+-	uint16_t n_idx, a_idx;
++	uint16_t n_idx;
+ 	uint8_t state, status;
+ 	uint8_t phase;
+ 	bool virt = false;
+@@ -858,60 +933,19 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		if (size != 19)
  			return true;
  
--		config_pub_set(node, net_idx, src, dst, pkt, virt,
--						size == 13 || size == 27);
-+		n = config_pub_set(node, pkt, virt, size == 13 || size == 27);
- 		break;
- 
- 	case OP_CONFIG_MODEL_PUB_GET:
- 		if (size != 4 && size != 6)
- 			return true;
--		config_pub_get(node, net_idx, src, dst, pkt, size);
-+
-+		n = config_pub_get(node, pkt, size == 6);
- 		break;
- 
- 	case OP_CONFIG_VEND_MODEL_SUB_GET:
-diff --git a/mesh/model.c b/mesh/model.c
-index 90192328f..c6ca0db47 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -1076,7 +1076,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
- int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			const uint8_t *pub_addr, uint16_t idx, bool cred_flag,
- 			uint8_t ttl, uint8_t period, uint8_t retransmit,
--			bool is_virt, uint16_t *dst)
-+			bool is_virt, uint16_t *pub_dst)
- {
- 	struct mesh_model *mod;
- 	int status, ele_idx = node_get_element_idx(node, addr);
-@@ -1103,6 +1103,9 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		return MESH_STATUS_SUCCESS;
- 	}
- 
-+	if (cred_flag && node_lpn_mode_get(node) != MESH_MODE_ENABLED)
-+		return MESH_STATUS_FEATURE_NO_SUPPORT;
-+
- 	/* Check if the old publication destination is a virtual label */
- 	if (mod->pub && mod->pub->virt) {
- 		unref_virt(mod->pub->virt);
-@@ -1116,7 +1119,7 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		status = set_virt_pub(mod, pub_addr, idx, cred_flag, ttl,
- 						period, retransmit);
- 
--	*dst = mod->pub->addr;
-+	*pub_dst = mod->pub->addr;
- 
- 	if (status != MESH_STATUS_SUCCESS)
- 		return status;
-diff --git a/mesh/net.h b/mesh/net.h
-index 7117f1a47..2673b895a 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -32,8 +32,6 @@ struct mesh_node;
- 
- #define CTL		0x80
- 
--#define CREDFLAG_MASK	0x1000
+-		n_idx = l_get_le16(pkt) & 0xfff;
+-		a_idx = l_get_le16(pkt + 1) >> 4;
 -
- #define KEY_CACHE_SIZE	64
- #define FRND_CACHE_MAX	32
+-		if (opcode == OP_APPKEY_ADD)
+-			b_res = appkey_key_add(net, n_idx, a_idx, pkt + 3);
+-		else
+-			b_res = appkey_key_update(net, n_idx, a_idx,
+-								pkt + 3);
+-
+-		l_debug("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
+-			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
+-							n_idx, a_idx);
+-
+-
+-		n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
+-
+-		msg[n++] = b_res;
+-		msg[n++] = pkt[0];
+-		msg[n++] = pkt[1];
+-		msg[n++] = pkt[2];
+-		break;
+-
++		/* Fall Through */
+ 	case OP_APPKEY_DELETE:
+-		if (size != 3)
++		if (opcode == OP_APPKEY_DELETE && size != 3)
+ 			return true;
  
+-		n_idx = l_get_le16(pkt) & 0xfff;
+-		a_idx = l_get_le16(pkt + 1) >> 4;
+-		b_res = appkey_key_delete(net, n_idx, a_idx);
+-		l_debug("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
+-			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
+-							n_idx, a_idx);
+-
+-		n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
+-		msg[n++] = b_res;
+-		msg[n++] = pkt[0];
+-		msg[n++] = pkt[1];
+-		msg[n++] = pkt[2];
++		n = cfg_appkey_msg(node, pkt, opcode);
+ 		break;
+ 
+ 	case OP_APPKEY_GET:
+ 		if (size != 2)
+ 			return true;
+ 
+-		n_idx = l_get_le16(pkt);
+-
+-		n = mesh_model_opcode_set(OP_APPKEY_LIST, msg);
+-
+-		status = appkey_list(net, n_idx, msg + n + 3,
+-						MAX_MSG_LEN - n - 3, &size);
+-
+-		msg[n] = status;
+-		l_put_le16(n_idx, msg + n + 1);
+-		n += (size + 3);
++		n = cfg_get_appkeys_msg(node, pkt);
+ 		break;
+ 
+ 	case OP_NETKEY_ADD:
+@@ -919,35 +953,12 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 		if (size != 18)
+ 			return true;
+ 
+-		n_idx = l_get_le16(pkt);
+-
+-		if (opcode == OP_NETKEY_ADD)
+-			b_res = mesh_net_add_key(net, n_idx, pkt + 2);
+-		else
+-			b_res = mesh_net_update_key(net, n_idx, pkt + 2);
+-
+-		l_debug("NetKey Add/Update %s",
+-			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
+-
+-		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
+-		msg[n++] = b_res;
+-		l_put_le16(l_get_le16(pkt), msg + n);
+-		n += 2;
+-		break;
+-
++		/* Fall Through */
+ 	case OP_NETKEY_DELETE:
+-		if (size != 2)
++		if (opcode == OP_NETKEY_DELETE && size != 2)
+ 			return true;
+ 
+-		b_res = mesh_net_del_key(net, l_get_le16(pkt));
+-
+-		l_debug("NetKey delete %s",
+-			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
+-
+-		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
+-		msg[n++] = b_res;
+-		l_put_le16(l_get_le16(pkt), msg + n);
+-		n += 2;
++		n = cfg_netkey_msg(node, pkt, opcode);
+ 		break;
+ 
+ 	case OP_NETKEY_GET:
 -- 
 2.26.2
 
