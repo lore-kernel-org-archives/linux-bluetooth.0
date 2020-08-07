@@ -2,185 +2,151 @@ Return-Path: <SRS0=11Tl=BR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE96EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 14:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD0FC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 16:47:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86C20221E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 14:38:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="apo5YAKK"
+	by mail.kernel.org (Postfix) with ESMTP id 33F9F221E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 16:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726061AbgHGOiV (ORCPT
+        id S1726595AbgHGQr1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Aug 2020 10:38:21 -0400
-Received: from mga02.intel.com ([134.134.136.20]:2918 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725955AbgHGOiT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Aug 2020 10:38:19 -0400
-IronPort-SDR: JBKB/iKG94dz3Q6iSwUEZpGz7SBsYt8uEAuSYMZSq9xks7EIXgHSc6nkHptN/BbA77HHyTWJVy
- /nFuHZY/T6Ig==
-X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="140970079"
-X-IronPort-AV: E=Sophos;i="5.75,446,1589266800"; 
-   d="scan'208";a="140970079"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2020 07:38:17 -0700
-IronPort-SDR: 2VCzMbhwvmdynh76gLo3uoxmRhCgL10N9hJRkGSSlHbUw1vpgxwrxV9CNPV0SoGOIynhJ8yJRm
- 3EH0BNao0BvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,446,1589266800"; 
-   d="scan'208";a="316555900"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga004.fm.intel.com with ESMTP; 07 Aug 2020 07:38:17 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 7 Aug 2020 07:38:16 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 7 Aug 2020 07:38:16 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
- by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 7 Aug 2020 07:38:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GCvEgCh72LtOGPlNcY30CXKp10p3WjYgKPit1X0j4LqXgIKtCaO4QWmbDy7lVBiGeTSzLnS1d4QiDIaQ+LmGgUjz+9jhnubSpgSkqDMpANkIYucamXx32fijOiNZ0vpcyLn99DnbhN9toKaefuy63AlyCz92ztlSOZdUWngmBUAJe9vxcc1ib13DAdHPatfhLbAX1GZrCxd4XqPQPOiw+p2RP2tMRxiWYL308c7jfQIRjBWFYR/af80NkKlm4stWpxXFYcAsrkPLNKDbauN00E0zN3pFRWFiPpJANJ95ckc6CSyUK/Z1Sbrwh+ddHqaJHDZo+4hcjLAkahkB9M0wuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pqvkrfHdYsfZQSezKp9/0eIQaxEIX9aNAXTsKYZSSSg=;
- b=fzEAuX023MBXpL5rZ71mtBWdXTtxaV8Meqz1smzNwL2urE6IQegJD2tXTGS/9U5ZpgOWdHLPAkLz2KAaWbdF0yNnviFf0JlYm0WbOa9ZD3E4Db2ck0lIkeKaIFQ6BSRaSS3tnlI/oK4fhG7/qCzA+zytI/PnzW0WtLsUOACF6y1Vx8ddUOXVY75hoHJrxSlHHUdundvuA4TRG14PCt3O6rasmGLXq+yA0pixVS3Ij4PSA/pNDwyDFGpZI/5Z/HbITOYqY4QplJJzDI1nIk3Eh4JG1BPEcp77/6B+cZu0c+9UmibqDrNp68mIphFGQk4nNO54eKpNqXPjRfHl6jFRMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pqvkrfHdYsfZQSezKp9/0eIQaxEIX9aNAXTsKYZSSSg=;
- b=apo5YAKKVTWVrJWDPq49fjo5/Q4W0QuuqfqjEEKJzgmIPg95ckJSunnCfzv519KuXEzNVSfTyHAbRLWz9r9gxRpcBRD1w9+I5H5HRKFYbgnhzGs2OKobVkDs4IXJVxJJAGSPX9SODP5EzdbLVXofmpLI/E9tB3iZB51n1Ua0OgQ=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MWHPR11MB1904.namprd11.prod.outlook.com (2603:10b6:300:111::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.16; Fri, 7 Aug
- 2020 14:38:13 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::6832:48b9:8cd2:7225]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::6832:48b9:8cd2:7225%6]) with mapi id 15.20.3261.020; Fri, 7 Aug 2020
- 14:38:13 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] mesh: Use correct TTL value to send model
- publication
-Thread-Topic: [PATCH BlueZ] mesh: Use correct TTL value to send model
- publication
-Thread-Index: AQHWbESudHCYPsSHdkuCloOt6dEuzaksuDcA
-Date:   Fri, 7 Aug 2020 14:38:13 +0000
-Message-ID: <c4626c74a850df528c073e981000dbe5e9c13f1d.camel@intel.com>
-References: <20200806225523.109092-1-inga.stotland@intel.com>
-In-Reply-To: <20200806225523.109092-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.34.4 (3.34.4-1.fc31) 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b7dc60e5-0bbe-4d0f-202d-08d83adf83b5
-x-ms-traffictypediagnostic: MWHPR11MB1904:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB190473083F13D8CA3D788EBFE1490@MWHPR11MB1904.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6RnIceUjBxKctpeiM7U9m5IGk8kRABSZghFt3BbLInUH+YuRJ3poDCFHL+WAZ0R3vjos5PDJRZOgG0chlwIIkiKZsR6SPpWmpAGzNpqr82iamS0PtEc9NN+qW0DP5m/X8bOMTeKP+AvfRnnxt5qstsa+EyC3VtEYgCl71JhMQvk40bNMWVjC0pW6RWI1b/uvurUe7myuRQRQiXb6RF+JC7/mrzkcfbuMRBLep20naKZeawHBrDX8bNtopMjq6jl+WaLu/u/ECgv2Ag689wc7b9jvidbnnM2RQnBQXi4bZNythmTE8HTkrvUkuE5lNG8UoZrQuoKsl0zYgVOxudngmw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39860400002)(396003)(376002)(366004)(346002)(478600001)(71200400001)(6636002)(110136005)(8936002)(316002)(6486002)(8676002)(2906002)(186003)(26005)(66446008)(66476007)(66556008)(83380400001)(91956017)(76116006)(36756003)(6506007)(5660300002)(6512007)(2616005)(86362001)(64756008)(66946007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: OyCOzgpcAkx43rSGwE27GoUzKS90AaCvGR4DritoJLWI11reVfVNE7BZPogDwDfU898Ione0s0YNgFrqQyTeTZp3h5PZN2Rd/MKDuD/d04+GHO1vdLIRZ9DL4teN6VN3VSKBWBfzFzwadxU1D9DH9m0+yaYI0QfpAZK9cDASo7AkVeCeJY7LjUosLgq5mZwEwhJ/ozw3CbnvKJAaw8UWCBO5I5XL/7wt1PbLkX707O3hR4sTieAywVyyBP4BkBMdksl9zRGRVPsllF9uk2dlPrxy5cAappcx6kfLg4tQJf9tGKI5CFZUV7m4k49PjCZwtEApirG0v5+/fyUVBpXpXoB/OiyRE1/HerfzUgWxMWX4DCi+4dSWdgMJaqli0PF2A0gm5cYP+5GZlPEvWAlunZI1XGxu5C/Ijg/rab7Us4WtVIsA0JLBXQdGYXo7Ye+NHMShTv1xbO7yQ8K41S/g83gVh0tMM+oBK7j4vLjibY7wB9xpYcV2Fa2RtNaZhhBBH8MT7vUwGBZs5UQuaFh8mKKijfTddHKu1z5vma49FF+3fzs2J8e3EXecMqVU+v4KsidKnt8X9Nxu9Dd58w37SdZXFyiCFhMoUrJk6/wYpGk7EDJlfGSTCp8acsxJkarZXV47BsIAUA5o4rCpJXZS3Q==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7940D0DF24EE424780D3F4F344AF1673@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Fri, 7 Aug 2020 12:47:27 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:41210 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbgHGQrV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 7 Aug 2020 12:47:21 -0400
+Received: by mail-io1-f71.google.com with SMTP id e12so2015178ioc.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2020 09:47:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=0KluU1RLnMxS1ahAPUCEJr4pkzAjGYdf2Vdm5OzbWDw=;
+        b=nMNpu+KgWupHPj8YnHPmdoBdjs+Y871By8zPI26s6q375HRQsrml854obwjTjZ1sUv
+         ByWIxcTGmuLHXQSFGZeRUmuQsMZFC05xqIKtRmgQ3E79Fv9FQ5tffEAAPWzI7xdUOrIS
+         TMdvJLPhk7jRQ9XRz7RIIZnvatXp/lpNilxUIYWPjzIo6yy7euHbQ1Cyy88TDzin13xn
+         eDtVdkcgNKk4ilyyUu4+AGk3ea716PMEkR2/hX4w4ocrjyHM+z3UT6lno8TacMBBkgkw
+         s8tX2K3Pt7EfjX3pd7uRC1UmzVZDXTCGofULdWGeYOOp9HNcUo1WtX7iPj/jV0XcqKgX
+         QGpA==
+X-Gm-Message-State: AOAM532hKaaa6SFSxVgKA0scJJF45OaekiK3Vvss9a3MM1+iMSBxRcTQ
+        8/+WVHmFLXu9BqtV5FplhhzR9/BHrdOr4ZAYnAt+JSsg3Exs
+X-Google-Smtp-Source: ABdhPJy9gDQ/dkV++l/KRRJAxkJGXdXcLdeHJuNBVEFVACUkRdhcTN7YCwWftXQkzglwjGrANSNUIt/g0+1iB6jCOGo0sPn0LESo
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4539.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7dc60e5-0bbe-4d0f-202d-08d83adf83b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2020 14:38:13.3932
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QFqaAbOciOMS2/OTtcbUXaAqveLAG1JrbnWL/A5XbgvvHzc0TWDnK1iXaX2UlN/2YCBXZlutfGx6dGXdkiS1oA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1904
-X-OriginatorOrg: intel.com
+X-Received: by 2002:a92:bada:: with SMTP id t87mr5533456ill.112.1596818840712;
+ Fri, 07 Aug 2020 09:47:20 -0700 (PDT)
+Date:   Fri, 07 Aug 2020 09:47:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c57f2d05ac4c5b8e@google.com>
+Subject: BUG: corrupted list in kobject_add_internal
+From:   syzbot <syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com>
+To:     abhishekpandit@chromium.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        netdev@vger.kernel.org, rafael@kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KT24gVGh1LCAyMDIwLTA4LTA2IGF0IDE1OjU1IC0wNzAwLCBJbmdhIFN0b3RsYW5k
-IHdyb3RlOg0KPiBXaGVuIHNlbmRpbmcgbW9kZWwgcHVibGlzaGluZyBkYXRhLCB1c2UgVFRMIHZh
-bHVlIGNvbmZpZ3VyZWQgZm9yDQo+IHRoYXQgcHVibGljYXRpb24gaW5zdGVhZCBvZiB0aGUgZGVm
-YXVsdCBUVEwgdmFsdWUgdXNlZCBmb3IgcmVndWxhcg0KPiBtZXNzYWdlcy4NCj4gLS0tDQo+ICBt
-ZXNoL21vZGVsLmMgfCAgNCArKy0tDQo+ICBtZXNoL21vZGVsLmggfCAgMiArLQ0KPiAgbWVzaC9u
-b2RlLmMgIHwgMTEgKysrKy0tLS0tLS0NCj4gIDMgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25z
-KCspLCAxMCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9tZXNoL21vZGVsLmMgYi9t
-ZXNoL21vZGVsLmMNCj4gaW5kZXggZWY3NjY4MTQ3Li4wNDNhZDFkNzAgMTAwNjQ0DQo+IC0tLSBh
-L21lc2gvbW9kZWwuYw0KPiArKysgYi9tZXNoL21vZGVsLmMNCj4gQEAgLTEwMjIsNyArMTAyMiw3
-IEBAIGRvbmU6DQo+ICB9DQo+ICANCj4gIGludCBtZXNoX21vZGVsX3B1Ymxpc2goc3RydWN0IG1l
-c2hfbm9kZSAqbm9kZSwgdWludDMyX3QgaWQsIHVpbnQxNl90IHNyYywNCj4gLQkJCQl1aW50OF90
-IHR0bCwgY29uc3Qgdm9pZCAqbXNnLCB1aW50MTZfdCBtc2dfbGVuKQ0KPiArCQkJCQljb25zdCB2
-b2lkICptc2csIHVpbnQxNl90IG1zZ19sZW4pDQo+ICB7DQo+ICAJc3RydWN0IG1lc2hfbmV0ICpu
-ZXQgPSBub2RlX2dldF9uZXQobm9kZSk7DQo+ICAJc3RydWN0IG1lc2hfbW9kZWwgKm1vZDsNCj4g
-QEAgLTEwNjMsNyArMTA2Myw3IEBAIGludCBtZXNoX21vZGVsX3B1Ymxpc2goc3RydWN0IG1lc2hf
-bm9kZSAqbm9kZSwgdWludDMyX3QgaWQsIHVpbnQxNl90IHNyYywNCj4gIA0KPiAgCXJlc3VsdCA9
-IG1zZ19zZW5kKG5vZGUsIG1vZC0+cHViLT5jcmVkZW50aWFsICE9IDAsIHNyYywNCj4gIAkJCQlt
-b2QtPnB1Yi0+YWRkciwgbW9kLT5wdWItPmlkeCwgbmV0X2lkeCwNCj4gLQkJCQlsYWJlbCwgdHRs
-LCBmYWxzZSwgbXNnLCBtc2dfbGVuKTsNCj4gKwkJCQlsYWJlbCwgbW9kLT5wdWItPnR0bCwgZmFs
-c2UsIG1zZywgbXNnX2xlbik7DQo+ICANCj4gIAlyZXR1cm4gcmVzdWx0ID8gTUVTSF9FUlJPUl9O
-T05FIDogTUVTSF9FUlJPUl9GQUlMRUQ7DQo+ICB9DQo+IGRpZmYgLS1naXQgYS9tZXNoL21vZGVs
-LmggYi9tZXNoL21vZGVsLmgNCj4gaW5kZXggMGQ4ZGRkZjkyLi5lNDkwNmUzMzAgMTAwNjQ0DQo+
-IC0tLSBhL21lc2gvbW9kZWwuaA0KPiArKysgYi9tZXNoL21vZGVsLmgNCj4gQEAgLTEwMyw3ICsx
-MDMsNyBAQCBib29sIG1lc2hfbW9kZWxfc2VuZChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50
-MTZfdCBzcmMsIHVpbnQxNl90IGRzdCwNCj4gIAkJCQkJdWludDhfdCB0dGwsIGJvb2wgc2VnbWVu
-dGVkLA0KPiAgCQkJCQljb25zdCB2b2lkICptc2csIHVpbnQxNl90IG1zZ19sZW4pOw0KPiAgaW50
-IG1lc2hfbW9kZWxfcHVibGlzaChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MzJfdCBpZCwg
-dWludDE2X3Qgc3JjLA0KPiAtCQkJCXVpbnQ4X3QgdHRsLCBjb25zdCB2b2lkICptc2csIHVpbnQx
-Nl90IG1zZ19sZW4pOw0KPiArCQkJCQljb25zdCB2b2lkICptc2csIHVpbnQxNl90IG1zZ19sZW4p
-Ow0KPiAgYm9vbCBtZXNoX21vZGVsX3J4KHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIGJvb2wgc3pt
-aWN0LCB1aW50MzJfdCBzZXEwLA0KPiAgCQkJdWludDMyX3Qgc2VxLCB1aW50MzJfdCBpdl9pbmRl
-eCwgdWludDE2X3QgbmV0X2lkeCwNCj4gIAkJCXVpbnQxNl90IHNyYywgdWludDE2X3QgZHN0LCB1
-aW50OF90IGtleV9haWQsDQo+IGRpZmYgLS1naXQgYS9tZXNoL25vZGUuYyBiL21lc2gvbm9kZS5j
-DQo+IGluZGV4IDNkY2E3M2NlZi4uNGI3MDU4N2FlIDEwMDY0NA0KPiAtLS0gYS9tZXNoL25vZGUu
-Yw0KPiArKysgYi9tZXNoL25vZGUuYw0KPiBAQCAtMTk4Myw3ICsxOTgzLDcgQEAgc3RhdGljIHN0
-cnVjdCBsX2RidXNfbWVzc2FnZSAqcHVibGlzaF9jYWxsKHN0cnVjdCBsX2RidXMgKmRidXMsDQo+
-ICAJc3RydWN0IGxfZGJ1c19tZXNzYWdlX2l0ZXIgaXRlcl9kYXRhOw0KPiAgCXVpbnQxNl90IG1v
-ZF9pZCwgc3JjOw0KPiAgCXN0cnVjdCBub2RlX2VsZW1lbnQgKmVsZTsNCj4gLQl1aW50OF90ICpk
-YXRhLCB0dGw7DQo+ICsJdWludDhfdCAqZGF0YTsNCj4gIAl1aW50MzJfdCBsZW4sIGlkOw0KPiAg
-CWludCByZXN1bHQ7DQo+ICANCj4gQEAgLTIwMTAsMTAgKzIwMTAsOCBAQCBzdGF0aWMgc3RydWN0
-IGxfZGJ1c19tZXNzYWdlICpwdWJsaXNoX2NhbGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywNCj4gIAkJ
-cmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX0lOVkFMSURfQVJHUywNCj4gIAkJCQkJ
-CQkiSW5jb3JyZWN0IGRhdGEiKTsNCj4gIA0KPiAtCXR0bCA9IG1lc2hfbmV0X2dldF9kZWZhdWx0
-X3R0bChub2RlLT5uZXQpOw0KPiAtDQo+ICAJaWQgPSBTRVRfSUQoU0lHX1ZFTkRPUiwgbW9kX2lk
-KTsNCj4gLQlyZXN1bHQgPSBtZXNoX21vZGVsX3B1Ymxpc2gobm9kZSwgaWQsIHNyYywgdHRsLCBk
-YXRhLCBsZW4pOw0KPiArCXJlc3VsdCA9IG1lc2hfbW9kZWxfcHVibGlzaChub2RlLCBpZCwgc3Jj
-LCBkYXRhLCBsZW4pOw0KPiAgDQo+ICAJaWYgKHJlc3VsdCAhPSBNRVNIX0VSUk9SX05PTkUpDQo+
-ICAJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgcmVzdWx0LCBOVUxMKTsNCj4gQEAgLTIwMzAsNyAr
-MjAyOCw3IEBAIHN0YXRpYyBzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKnZlbmRvcl9wdWJsaXNoX2Nh
-bGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywNCj4gIAlzdHJ1Y3QgbF9kYnVzX21lc3NhZ2VfaXRlciBp
-dGVyX2RhdGE7DQo+ICAJdWludDE2X3Qgc3JjLCBtb2RfaWQsIHZlbmRvcl9pZDsNCj4gIAlzdHJ1
-Y3Qgbm9kZV9lbGVtZW50ICplbGU7DQo+IC0JdWludDhfdCB0dGwsICpkYXRhID0gTlVMTDsNCj4g
-Kwl1aW50OF90ICpkYXRhID0gTlVMTDsNCj4gIAl1aW50MzJfdCBsZW47DQo+ICAJaW50IHJlc3Vs
-dDsNCj4gIA0KPiBAQCAtMjA1Nyw4ICsyMDU1LDcgQEAgc3RhdGljIHN0cnVjdCBsX2RidXNfbWVz
-c2FnZSAqdmVuZG9yX3B1Ymxpc2hfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiAgCQlyZXR1
-cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfSU5WQUxJRF9BUkdTLA0KPiAgCQkJCQkJCSJJ
-bmNvcnJlY3QgZGF0YSIpOw0KPiAgDQo+IC0JdHRsID0gbWVzaF9uZXRfZ2V0X2RlZmF1bHRfdHRs
-KG5vZGUtPm5ldCk7DQo+IC0JcmVzdWx0ID0gbWVzaF9tb2RlbF9wdWJsaXNoKG5vZGUsIFNFVF9J
-RCh2ZW5kb3JfaWQsIG1vZF9pZCksIHNyYywgdHRsLA0KPiArCXJlc3VsdCA9IG1lc2hfbW9kZWxf
-cHVibGlzaChub2RlLCBTRVRfSUQodmVuZG9yX2lkLCBtb2RfaWQpLCBzcmMsDQo+ICAJCQkJCQkJ
-CWRhdGEsIGxlbik7DQo+ICANCj4gIAlpZiAocmVzdWx0ICE9IE1FU0hfRVJST1JfTk9ORSkNCg==
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    5a30a789 Merge tag 'x86-urgent-2020-08-02' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1660c858900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c0cfcf935bcc94d2
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd768a260f7358adbaf9
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14b73afc900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=124893a4900000
+
+The issue was bisected to:
+
+commit 4f40afc6c76451daff7d0dcfc8a3d113ccf65bfc
+Author: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed Mar 11 15:54:01 2020 +0000
+
+    Bluetooth: Handle BR/EDR devices during suspend
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11cb1e0a900000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13cb1e0a900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15cb1e0a900000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com
+Fixes: 4f40afc6c764 ("Bluetooth: Handle BR/EDR devices during suspend")
+
+debugfs: Directory '200' with parent 'hci0' already present!
+list_add double add: new=ffff88808e9b6418, prev=ffff88808e9b6418, next=ffff8880a973ef00.
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:29!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 6882 Comm: kworker/u5:1 Not tainted 5.8.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+RIP: 0010:__list_add_valid.cold+0x26/0x3c lib/list_debug.c:29
+Code: 57 ff ff ff 4c 89 e1 48 c7 c7 20 92 93 88 e8 b1 f1 c1 fd 0f 0b 48 89 f2 4c 89 e1 48 89 ee 48 c7 c7 60 93 93 88 e8 9a f1 c1 fd <0f> 0b 48 89 f1 48 c7 c7 e0 92 93 88 4c 89 e6 e8 86 f1 c1 fd 0f 0b
+RSP: 0018:ffffc90001777830 EFLAGS: 00010282
+RAX: 0000000000000058 RBX: ffff8880a973ef00 RCX: 0000000000000000
+RDX: ffff888094f1c200 RSI: ffffffff815d4ef7 RDI: fffff520002eeef8
+RBP: ffff88808e9b6418 R08: 0000000000000058 R09: ffff8880ae7318e7
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff8880a973ef00
+R13: ffff888087315270 R14: ffff88808e9b6430 R15: ffff88808e9b6418
+FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffdcd6db747 CR3: 000000009ba09000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ __list_add include/linux/list.h:67 [inline]
+ list_add_tail include/linux/list.h:100 [inline]
+ kobj_kset_join lib/kobject.c:196 [inline]
+ kobject_add_internal+0x18d/0x940 lib/kobject.c:246
+ kobject_add_varg lib/kobject.c:390 [inline]
+ kobject_add+0x150/0x1c0 lib/kobject.c:442
+ device_add+0x35a/0x1be0 drivers/base/core.c:2633
+ hci_conn_add_sysfs+0x84/0xe0 net/bluetooth/hci_sysfs.c:53
+ hci_conn_complete_evt net/bluetooth/hci_event.c:2607 [inline]
+ hci_event_packet+0xe0b/0x86f5 net/bluetooth/hci_event.c:6033
+ hci_rx_work+0x22e/0xb10 net/bluetooth/hci_core.c:4705
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:291
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+Modules linked in:
+---[ end trace b1bcc552c32d25e9 ]---
+RIP: 0010:__list_add_valid.cold+0x26/0x3c lib/list_debug.c:29
+Code: 57 ff ff ff 4c 89 e1 48 c7 c7 20 92 93 88 e8 b1 f1 c1 fd 0f 0b 48 89 f2 4c 89 e1 48 89 ee 48 c7 c7 60 93 93 88 e8 9a f1 c1 fd <0f> 0b 48 89 f1 48 c7 c7 e0 92 93 88 4c 89 e6 e8 86 f1 c1 fd 0f 0b
+RSP: 0018:ffffc90001777830 EFLAGS: 00010282
+RAX: 0000000000000058 RBX: ffff8880a973ef00 RCX: 0000000000000000
+RDX: ffff888094f1c200 RSI: ffffffff815d4ef7 RDI: fffff520002eeef8
+RBP: ffff88808e9b6418 R08: 0000000000000058 R09: ffff8880ae7318e7
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff8880a973ef00
+R13: ffff888087315270 R14: ffff88808e9b6430 R15: ffff88808e9b6418
+FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffdcd6db747 CR3: 0000000009a79000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
