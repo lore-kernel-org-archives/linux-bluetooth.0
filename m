@@ -2,118 +2,116 @@ Return-Path: <SRS0=11Tl=BR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC74C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 02:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B623AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 03:49:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFC7E20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 02:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91B49221E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 03:49:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+smDEOQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbgHGC03 (ORCPT
+        id S1726166AbgHGDtb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Aug 2020 22:26:29 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:51546 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726027AbgHGC01 (ORCPT
+        Thu, 6 Aug 2020 23:49:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60276 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbgHGDtb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Aug 2020 22:26:27 -0400
-Received: by mail-io1-f69.google.com with SMTP id l1so505401ioh.18
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2020 19:26:26 -0700 (PDT)
+        Thu, 6 Aug 2020 23:49:31 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D80C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Aug 2020 20:49:30 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id c12so381086qtn.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Aug 2020 20:49:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=NEu1QocgVLoaGMVACuICewytF2Fj42EX58ouyCXb0sU=;
+        b=q+smDEOQePWETTuwhlfWOGGgqiRxw3AjECzNiPx36dUfQ+IYT/sNol6P2D1uQ2wkyL
+         yk6PCyuhPn+opMDADrTeAF2DU1F2Ul94lOs8KtwYR9DtId5TgkVmR8RpqVxlipA8h/De
+         yHHtCszZVttxHF3dLYCN3w+v3j6IsDeFu7upSepcKyk3ETiVDUxdrL3Th1Nbh6jQkilz
+         5XRqLQDfsqGz3RbCj4w3RUEvV/7k9Xg01rFjMZ6AVnKOis0MYirzOhXWErISqz+VtnOO
+         mFGvoY7TyyVXIrNSoj7VZR1nDK0Bm3dkUqEwN/R4l8bizKez6vFTkxXq/uAED1XqcK9G
+         k50w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=P4HaL8fuExeVT2ON4Wu7436r4YukaeyETCtLgx2utNk=;
-        b=oQXnr9yh3miiJBV5KOmOPj3Lx9fpdydDmCEtj6p1QeEV7wpi83ZoOmhUmEoIauxEu4
-         GNsrQnaSibC+eSIAe6odw0XukskvMNWMTYqFRdjFT0z0bt5vcP8gPxaTgpnhL+zOepwc
-         les1OdtaODQUqHncjSvfrBXSrN6GHIhO39FzX/XES+O4iFGj7gTUl+n442aMP8LNssC1
-         PZ5rGmrs2F3bjCL5IHeUPcxAEz5Syx1WiksO8NfUr/2C6GZ2XrrfMKmLOtev+fP0gN9Y
-         qCc4hvriWdLxVIlcl4Hc4ViVnyku1cGonyHiKcto+nVV7zIGYpyBNfRkbsTN8AKx08Pn
-         YdUg==
-X-Gm-Message-State: AOAM531aelOh+1uBKYG47EmI/+6lxKgsZrzGpcDUMU/2fPLIU2QEWHj8
-        SZgajMOgVwSivxT81yvJvaXVMVW6KhD66ULo6XuMigYLue79
-X-Google-Smtp-Source: ABdhPJxC+84P4eA4etCMj8bj2rNpwjY7+2e8369KBCiLW0ybXGFHpcCp84efsiZ87C3C9o/rgJ/W/0ZmK9AIsZ8STNyY0l/N0nb5
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=NEu1QocgVLoaGMVACuICewytF2Fj42EX58ouyCXb0sU=;
+        b=dX5Y1Ybb01eFlYXcNwB4PF93lBXqYbjkCr6vDXA86vBpnMAT1kvLoQ0O5pUBVCzJTD
+         tPhwc01ykvUovGLLCIUg70NtXNlGPUenAVoCwK+lV9U23cCyJwH5hu//c0HufNgOP5Z2
+         rK4AD81ZazYuJ91l3jVdri2LAOOwD8wtboPeYKIS2n/+soE5FD3HIVRdCanHGdIfmrxL
+         xvWxdLXpMMPDl+0RIjukNhqBGXkeYi8bIiLAMrZnkhyGSeRysG4wAPQTCxjn6CV7FecV
+         SmH5SheCmhqsIxlSHsKN81HJ+wZwaxare78wRdm74GjjotAd1X2wV+nN8vPdUMU7gQc4
+         /fIQ==
+X-Gm-Message-State: AOAM5312X5oJGXdJNw1wLniyCgszIYbM+7KvHkW+0QQ+jLsP1rTFUAwP
+        4q7+fb4Dk8Rb9TeAyKroMd1Xitw/EuY=
+X-Google-Smtp-Source: ABdhPJzkbDq1tPnWARF72l7Z2oDa29QsOv9Hpg5Lx3bFUsxjwuE3P5p9XWPECelkICIcNwrQE1abrg==
+X-Received: by 2002:ac8:1a14:: with SMTP id v20mr12379916qtj.269.1596772169154;
+        Thu, 06 Aug 2020 20:49:29 -0700 (PDT)
+Received: from [172.17.0.2] ([52.251.91.70])
+        by smtp.gmail.com with ESMTPSA id v28sm7491153qtk.28.2020.08.06.20.49.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Aug 2020 20:49:28 -0700 (PDT)
+Message-ID: <5f2ccf48.1c69fb81.6d7c3.7937@mx.google.com>
+Date:   Thu, 06 Aug 2020 20:49:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8324179757018013729=="
 MIME-Version: 1.0
-X-Received: by 2002:a6b:8b10:: with SMTP id n16mr2168652iod.11.1596767185982;
- Thu, 06 Aug 2020 19:26:25 -0700 (PDT)
-Date:   Thu, 06 Aug 2020 19:26:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e8d94d05ac40540a@google.com>
-Subject: WARNING: refcount bug in bt_accept_dequeue
-From:   syzbot <syzbot+6048aa700d088954b0fc@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ,v5,10/10] mesh: Refactor heartbeat pub/sub
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200807013834.123263-11-inga.stotland@intel.com>
+References: <20200807013834.123263-11-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============8324179757018013729==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
 
-HEAD commit:    47ec5303 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1083e7ec900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e0c783f658542f35
-dashboard link: https://syzkaller.appspot.com/bug?extid=6048aa700d088954b0fc
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11c227dc900000
+This is automated email and please do not reply to this email!
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6048aa700d088954b0fc@syzkaller.appspotmail.com
+Dear submitter,
 
-------------[ cut here ]------------
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 1 PID: 3805 at lib/refcount.c:25 refcount_warn_saturate+0x13d/0x1a0 lib/refcount.c:25
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 3805 Comm: krfcommd Not tainted 5.8.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1f0/0x31e lib/dump_stack.c:118
- panic+0x264/0x7a0 kernel/panic.c:231
- __warn+0x227/0x250 kernel/panic.c:600
- report_bug+0x1b1/0x2e0 lib/bug.c:198
- handle_bug+0x42/0x80 arch/x86/kernel/traps.c:235
- exc_invalid_op+0x16/0x40 arch/x86/kernel/traps.c:255
- asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:536
-RIP: 0010:refcount_warn_saturate+0x13d/0x1a0 lib/refcount.c:25
-Code: c7 93 1e 15 89 31 c0 e8 71 0c a9 fd 0f 0b eb a3 e8 88 66 d7 fd c6 05 97 4d ed 05 01 48 c7 c7 ca 1e 15 89 31 c0 e8 53 0c a9 fd <0f> 0b eb 85 e8 6a 66 d7 fd c6 05 7a 4d ed 05 01 48 c7 c7 f6 1e 15
-RSP: 0018:ffffc90001997b80 EFLAGS: 00010246
-RAX: b5077223a4630100 RBX: 0000000000000002 RCX: ffff88809902e380
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: 0000000000000002 R08: ffffffff815dffd9 R09: ffffed1015d262c0
-R10: ffffed1015d262c0 R11: 0000000000000000 R12: ffff88808df4b4b8
-R13: ffff88808df4b080 R14: 0000000000000000 R15: dffffc0000000000
- refcount_add include/linux/refcount.h:205 [inline]
- refcount_inc include/linux/refcount.h:241 [inline]
- sock_hold include/net/sock.h:692 [inline]
- bt_accept_dequeue+0x34e/0x560 net/bluetooth/af_bluetooth.c:206
- l2cap_sock_accept+0x21c/0x430 net/bluetooth/l2cap_sock.c:332
- kernel_accept+0x143/0x410 net/socket.c:3569
- rfcomm_accept_connection net/bluetooth/rfcomm/core.c:1931 [inline]
- rfcomm_process_sessions+0x1c5/0xc540 net/bluetooth/rfcomm/core.c:1990
- rfcomm_run+0x3b5/0x900 net/bluetooth/rfcomm/core.c:2086
- kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkpatch Failed
+
+Outputs:
+WARNING:UNNECESSARY_INT: Prefer 'long' over 'long int' as the int is unnecessary
+#88: FILE: mesh/cfgmod-server.c:485:
++	if (time_now.tv_sec >= (long int) sub->period)
+
+- total: 0 errors, 1 warnings, 784 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+--===============8324179757018013729==--
