@@ -1,108 +1,110 @@
-Return-Path: <SRS0=11Tl=BR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=i5J1=BS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3840C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 21:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F62C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 04:06:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C2332086A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Aug 2020 21:24:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 074B520855
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 04:06:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YLTXn3KD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ImMnrn3Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbgHGVYj (ORCPT
+        id S1725954AbgHHEGn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Aug 2020 17:24:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52670 "EHLO
+        Sat, 8 Aug 2020 00:06:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbgHGVYi (ORCPT
+        with ESMTP id S1725267AbgHHEGm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Aug 2020 17:24:38 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4BF1C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Aug 2020 14:24:37 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id y7so2415445qvj.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Aug 2020 14:24:37 -0700 (PDT)
+        Sat, 8 Aug 2020 00:06:42 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E736C061756;
+        Fri,  7 Aug 2020 21:06:42 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id p4so3635899qkf.0;
+        Fri, 07 Aug 2020 21:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5wEq7H/aTNQaC+MLpK5FtBm7PEKzvcE/3MXY5TiR0Ys=;
-        b=YLTXn3KDoWVX7zL61wg+vMsOZgSPtjTr51oWZbrLqqzqKyIfqXC4GFPtbCERqT1CCs
-         VA+R71NO8RSRnNH9tH/ODzTAqhbP9PfQaUkVo1wEduD8mzCeGgiKxGvx6uey/1ORdHlz
-         Z1IA5b/U6cxZJqSJyPnoabyei0tqTQEUlc+MNSTTefOGCd7A13ZZTavYw4EFAu1KT3sO
-         z/OEzCawQ45+MV1OyrFgRcqOgbmpVw6euOovQ4zp7j2x1//iNIFAy8IvqGrH7oka3beI
-         7awR6Ix5LphIEfJni0C9dFzKDq6zGkgz3Y0aRHt7SmfxxxvCAcWFYlt81oRwuefX18ky
-         fghw==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eBX2STd6CRBk1vKmSlEBQtLB8UUMASbhavMeJ1WJR0A=;
+        b=ImMnrn3Z4k3xH3d5wjuGGYN5dCY5Wg7yTR6mWwxE/0/bqZN2eh0ux/M635crPwEWDO
+         RUqUkjgZ166oTo3IMuMmnuMHsSMhkDzoRms1MNwfTUorcMFXA6UACHWMaal1MUaCARlN
+         RUqIlF2x87k23WZtrRs2/GqwsDiG1blYKkLittDuyJQzNHsFAhC5NfgMSB0kFmP2VIYD
+         2X3iQoriLLXUSbdBDPmnR2S8YGDLWYyiyAjU6JfeQLkoIAcUMa/itMhvlGFDVDWyx3bU
+         osogjoRLH9tdNW8lQiZdZcy9WzfK4K3DIN248WTy1sj5QRBgygAtyaU6lmCPxULnuLC6
+         DqYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5wEq7H/aTNQaC+MLpK5FtBm7PEKzvcE/3MXY5TiR0Ys=;
-        b=kLhrS+OBy7B+Gg/Ri5qzznwW/9a5Ci1p8Snb9D2oFfGKps8UUY1r6CFy36O8jxyMN/
-         ujDF2juTAuy4Wbxe4gWc7hS5Hn0btemVtxB0WkvQZKc6+cmp/2Oikfhbv4ZCAjxo0+K7
-         8p/lWYoe7vVs+/QskiYbjzoRQvfaNrkMQgnSUD0w6UONslP/TEqk/rXJy9nDxglxo5ob
-         sJ/hs+TD6W/YqyYfOARf8GPZkei4weiLZlZQ7k3K5EPRpsJ+E/BoSS8d+eFAB9k0a14R
-         qLXjMJaPea2xeZg9QzsUxUcqUD7PbvbQpnm3vK1n4pw0QRt6F2FhZZpkkqW4UWivZ8No
-         AlvQ==
-X-Gm-Message-State: AOAM532Ye+kXcGlZy65Uqw2TJAy2nH+6HOCiyCFcJR6L5GBumhRB7r1s
-        OKJTk8TzfD9ua74mIqXGgRrc6LF9SC9nrA==
-X-Google-Smtp-Source: ABdhPJzXSkwcXJXmHIWjMQ6VwywoEfsm9VoC3QzWrKQhwFovJgEMB/aFmjst1ySbYhBAPUGbD/yC7GxwT3EI5Q==
-X-Received: by 2002:a0c:cc94:: with SMTP id f20mr16875759qvl.159.1596835476792;
- Fri, 07 Aug 2020 14:24:36 -0700 (PDT)
-Date:   Fri,  7 Aug 2020 14:24:33 -0700
-Message-Id: <20200807142429.BlueZ.1.I588558f1e38231193d6e955a4008ce54712d5c89@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [BlueZ PATCH] Disable auto-connect on cancel pair
-From:   Manish Mandlik <mmandlik@google.com>
-To:     luiz.dentz@gmail.com, marcel@holtmann.org
-Cc:     alainm@chromium.org, chromeos-bluetooth-upstreaming@chromium.org,
-        sonnysasaka@chromium.org, linux-bluetooth@vger.kernel.org,
-        Manish Mandlik <mmandlik@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eBX2STd6CRBk1vKmSlEBQtLB8UUMASbhavMeJ1WJR0A=;
+        b=X8F/7+R/+iOLZpWCkoZZGiEWtCqKhrLp07JmhlwRAMhMeiKzwtceA9z1bxXNv6OUCD
+         cY4M1/wG3Ji18qN2IyUlmTI9Qs9DaVgI5f1HlE0cdYvfddV5B66z0LLXpguJXMHGyRjR
+         fSn6heNYswsJZ8gqsc9nv7g0OoDAKIhsCudvqdxRL8DsYG4JlxOMoO7AoRWIcIhyZv20
+         C83m2htx14OUIYLS2hsn37pQRocNvw+aP7/jKOIbooj2gJUGQYofZYVIX4UlZRD7J6YM
+         R416hKME0SNhHzWGqtXZsU1vAhV1kHvkx9fMPScmuhsE4rhClvXxFXPNY3rg6yQV/ded
+         pVHg==
+X-Gm-Message-State: AOAM533KCDOXIwgVQnuVm7h/kpwsqVHLrPNJ4K0R9w6UdrwadWG4Z0Jn
+        bDE3XyX9MYIC5ZvyPztVPw==
+X-Google-Smtp-Source: ABdhPJyiVi2TyBkfekwvTN8eseV1M60k4LZxF4cWE/pBssVqKoNRkt5Jy/31+Zj0ox2uqwcG0951nA==
+X-Received: by 2002:a37:a503:: with SMTP id o3mr16204813qke.162.1596859601722;
+        Fri, 07 Aug 2020 21:06:41 -0700 (PDT)
+Received: from localhost.localdomain (146-115-88-66.s3894.c3-0.sbo-ubr1.sbo.ma.cable.rcncustomer.com. [146.115.88.66])
+        by smtp.gmail.com with ESMTPSA id i7sm9264630qtb.27.2020.08.07.21.06.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Aug 2020 21:06:41 -0700 (PDT)
+From:   Peilin Ye <yepeilin.cs@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
+        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzkaller-bugs@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [Linux-kernel-mentees] [PATCH net] Bluetooth: Fix NULL pointer dereference in amp_read_loc_assoc_final_data()
+Date:   Sat,  8 Aug 2020 00:04:40 -0400
+Message-Id: <20200808040440.255578-1-yepeilin.cs@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-While pairing process is in progress, service discovery starts in the
-background. If HOG profile is detected, auto connect is enabled for
-that device. This causes future advertisement from that device to
-trigger a pairing even if the user has already cancelled the pairing.
+Prevent amp_read_loc_assoc_final_data() from dereferencing `mgr` as NULL.
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+Reported-and-tested-by: syzbot+f4fb0eaafdb51c32a153@syzkaller.appspotmail.com
+Fixes: 9495b2ee757f ("Bluetooth: AMP: Process Chan Selected event")
+Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
 ---
+ net/bluetooth/amp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- src/device.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/src/device.c b/src/device.c
-index 470596ee4..ab5bb123e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2870,6 +2870,15 @@ static void device_cancel_bonding(struct btd_device *device, uint8_t status)
- 	if (!bonding)
- 		return;
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 9c711f0dfae3..be2d469d6369 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -297,6 +297,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	struct hci_request req;
+ 	int err;
  
-+	/* Auto connect may get enabled during the service discovery even
-+	 * before the pairing process completes. In such case, disable it
-+	 * when the user has cancelled the pairing process.
-+	 */
-+	if (device->auto_connect) {
-+		device->disable_auto_connect = TRUE;
-+		device_set_auto_connect(device, FALSE);
-+	}
++	if (!mgr)
++		return;
 +
- 	ba2str(&device->bdaddr, addr);
- 	DBG("Canceling bonding request for %s", addr);
- 
+ 	cp.phy_handle = hcon->handle;
+ 	cp.len_so_far = cpu_to_le16(0);
+ 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
 -- 
-2.28.0.236.gb10cc79966-goog
+2.25.1
 
