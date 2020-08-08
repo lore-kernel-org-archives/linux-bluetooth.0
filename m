@@ -2,141 +2,179 @@ Return-Path: <SRS0=i5J1=BS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A43BC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 09:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E911AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 13:20:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29B9320855
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 09:46:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF5D720759
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Aug 2020 13:20:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596892847;
+	bh=MlnkqZhAL551l/PW8HGYejBM9HWodDIFRIQwqBTxpDc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=hQbpfcQOooN6yTXVkVbbSUmU2qZOUPK6V78+P1GW6TVVzInTFnd6XydDU8MIsr1xD
+	 M6pk/7puRGQpIhJw3cc+FeGW6KYk3LChKFBy3Nx1I26Wj6GCupc7LHZnfbKX4AMuEG
+	 GZ8iQ/iyHthaAIyzU5N+fDHA8cLIe878tzNtFwfM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726128AbgHHJqY (ORCPT
+        id S1726198AbgHHNUq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 8 Aug 2020 05:46:24 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:46487 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725980AbgHHJqW (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 8 Aug 2020 05:46:22 -0400
-Received: by mail-io1-f70.google.com with SMTP id n1so3478914ion.13
-        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Aug 2020 02:46:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=Mgd7GqjjHZbKTVg1oMh8UpWpxgZW/6tvB9gNkmYnfYE=;
-        b=qOlIUUApVAqZcWxPdyJNZtph60ACPZbwu06mL/X/nY8FOLLEeStAk8pUf3V8ZFSC0n
-         5d3vkoddWrxz/h3PCSuiLlV/CByyGi92klzERwJklkmn3tmZk0JfAJCOXPD1+YPxT1DT
-         43GuCCYwY2VTqlLnhxxAJoPww5OWIXkiSveG2wvxeGVz1vYOBhtJvpqICFBuJEZ9fb4y
-         J16nLfUU6NjWiygeDYiDA0roYVM+A+J20XFtrcLglOB2woummYB/f5GniisZbyCiga3c
-         Qwvw7rAj7+13Xubb//SxB3q9ufR9uYJcR0b+XMZSolmelskgoSqNCVaClIT3yp0M2Lb7
-         6exw==
-X-Gm-Message-State: AOAM5323ABCGU8pnL5tVBy4WtDOMMmPqsXJNe2y5Xc2nJ2RYUdTCOLHr
-        03eoda36lDf4P8tB7xBJ8ckmolSNJ0bt/ZEmRDGm0SlF01qC
-X-Google-Smtp-Source: ABdhPJzW8/kOTaphgcikkhZB1BACCXuyS9i2Q48y8/n1Uc0jg23uS5/J2KZB4W9dkahJKWLM4/ndHDDc3MSj9hj88H1XQl04F5BJ
+        Sat, 8 Aug 2020 09:20:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52766 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726125AbgHHNUq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 8 Aug 2020 09:20:46 -0400
+Received: from pali.im (pali.im [31.31.79.79])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 54EF420723;
+        Sat,  8 Aug 2020 13:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596892845;
+        bh=MlnkqZhAL551l/PW8HGYejBM9HWodDIFRIQwqBTxpDc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xgwdb6TZ4wDkLdouPWsYSaa+QI8f2humJf26itsFeW31+uuO/KR1XCyzH8ox4n6CN
+         eIWZgT/LnpAsShgVV0z83TQaFDHqe0ZjQ1deZux7EmijrDoFwoF+XlArgXn+ptPh1I
+         ZrhPnIk9QRayh57xgAnPzFoGDjvnBaRHACCuhSpc=
+Received: by pali.im (Postfix)
+        id EA56E688; Sat,  8 Aug 2020 15:20:42 +0200 (CEST)
+Date:   Sat, 8 Aug 2020 15:20:42 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        David Heidelberg <david@ixit.cz>
+Subject: Re: [PATCH] Install avinfo utility
+Message-ID: <20200808132042.mma5ykynagwx3ubd@pali>
+References: <20200506193435.3746-1-pali@kernel.org>
+ <CECA6D9A-0F26-40E8-BFDF-A24CD972307D@holtmann.org>
+ <20200610093306.zt3q3s2wmwp3almw@pali>
+ <7672C0A0-AF6A-41B2-B50F-7836B3E5CC73@holtmann.org>
+ <20200611125304.b4mxxuv7rupamfmg@pali>
+ <20200713090913.6duirl4yhrjcyxoh@pali>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:3e04:: with SMTP id l4mr8449851ioa.206.1596879981392;
- Sat, 08 Aug 2020 02:46:21 -0700 (PDT)
-Date:   Sat, 08 Aug 2020 02:46:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000a389a05ac5a9864@google.com>
-Subject: KASAN: null-ptr-deref Write in l2cap_chan_put
-From:   syzbot <syzbot+452e9465a3b2817fa4c2@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200713090913.6duirl4yhrjcyxoh@pali>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Monday 13 July 2020 11:09:13 Pali Rohár wrote:
+> On Thursday 11 June 2020 14:53:04 Pali Rohár wrote:
+> > On Wednesday 10 June 2020 19:31:47 Marcel Holtmann wrote:
+> > > Hi Pali,
+> > > 
+> > > >>> This utility is very useful for determining which A2DP codecs are supported
+> > > >>> by remote side. So install it to system as part of bluez package.
+> > > >>> ---
+> > > >>> Makefile.tools | 4 ++--
+> > > >>> 1 file changed, 2 insertions(+), 2 deletions(-)
+> > > >>> 
+> > > >>> diff --git a/Makefile.tools b/Makefile.tools
+> > > >>> index 9b9236609..d52721612 100644
+> > > >>> --- a/Makefile.tools
+> > > >>> +++ b/Makefile.tools
+> > > >>> @@ -176,9 +176,9 @@ endif
+> > > >>> if TOOLS
+> > > >>> bin_PROGRAMS += tools/rctest tools/l2test tools/l2ping tools/bccmd \
+> > > >>> 			tools/bluemoon tools/hex2hcd tools/mpris-proxy \
+> > > >>> -			tools/btattach
+> > > >>> +			tools/btattach tools/avinfo
+> > > >>> 
+> > > >>> -noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+> > > >>> +noinst_PROGRAMS += tools/bdaddr tools/avtest \
+> > > >>> 			tools/scotest tools/amptest tools/hwdb \
+> > > >>> 			tools/hcieventmask tools/hcisecfilter \
+> > > >>> 			tools/btinfo tools/btconfig \
+> > > >> 
+> > > >> I had no intention to install that tool since it is too limited
+> > > > 
+> > > > Sorry, but I have not seen any limitations with this tool yet. I'm using
+> > > > it very often. And also other people who use it have not mentioned any
+> > > > limitations or problems.
+> > > > 
+> > > > So could you be more specific what are those limitations?
+> > > > 
+> > > > Also it is the first thing which I'm saying people that should run and
+> > > > send me output of it if something related to A2DP does not work.
+> > > > 
+> > > > And because linux distributions do not package this utility and bluez
+> > > > developers (for me for unknown reasons) decided to not install it,
+> > > > result is that people have to always compile bluez from source to run
+> > > > this utility if their A2DP audio does not work or "remote" debugging of
+> > > > A2DP is needed.
+> > > > 
+> > > > So result is that who want to know why A2DP audio does not work is
+> > > > forced to compile & install bluez from sources and not to use from
+> > > > distribution package. And this probably not the expected state.
+> > > > 
+> > > > In any case, nobody reported to me any limitation with one exception
+> > > > that it cannot decode capabilities of some custom vendor codecs. But
+> > > > most of them are already supported as I sent needed patches in past.
+> > > > 
+> > > >> and makes too many assumption.
+> > > > 
+> > > > For example which assumptions?
+> > > 
+> > > that nothing else is happening right now. It backstabs the actual AVDTP and A2DP implementation.
+> > 
+> > Marcel, but this is not a problem. For that one purpose which avinfo
+> > provides it ideal and works fine. Personally I do not see any problem
+> > with it.
+> > 
+> > > >> In addition it has a bad name with no Bluetooth prefix.
+> > > > 
+> > > > So, lets rename it. What about "btavinfo"?
+> > > 
+> > > Lets extend btinfo with all sort of capabilities. Make the av portion just one of. I want to remove the multitudes of test utilities anyway. We have to many tiny utilities that are just scattered around and avinfo is just one of them.
+> > 
+> > This looks like a not-so-trivial task and moreover independent of
+> > providing current version of avinfo to users.
+> > 
+> > avinfo already exists, is already part of bluez project, it is already
+> > compiling during bluez build and is already used by me and lot of other
+> > users and works for that one purpose as expected.
+> > 
+> > > > 
+> > > >> If we think it is useful to have such a test utility, then we need to clean this up first
+> > > > 
+> > > > What exactly to clean up first?
+> > > > 
+> > > > Note that I have already done cleanup of this utility.
+> > > > 
+> > > >> and put this into a larger btinfo work to gather appropriate information from a remote device for debug purposes.
+> > > > 
+> > > > I do not see how btinfo can be used for A2DP purposes. Seems this is
+> > > > utility for local controller info and not for remove A2DP.
+> > > 
+> > > This needs a bit thinking, but pretty much simple things like this:
+> > > 
+> > > 	btinfo local
+> > > 	btinfo avdtp <remote_bdaddr>
+> > > 
+> > > We can create a module handling system so that you can easily links existing tiny utilities into one.
+> > 
+> > I'm not against this change. But this is additional work which needs to
+> > be done. And it would not happen today or tomorrow unless you have
+> > already patches which implement it.
+> > 
+> > As I said avinfo is already there, implemented, it is working and is
+> > part of bluez source code. And is basically the first step when
+> > debugging issues with A2DP audio.
+> > 
+> > So what is the real issue with not only compiling this avinfo tool
+> > during building bluez but also installing it?
+> 
+> Because nobody presented any real issue for more then month and I'm not
+> aware of any, could be avinfo finally enabled during installation?
 
-syzbot found the following issue on:
+PING, two months passed and I have not received any new reply to this patch.
 
-HEAD commit:    5631c5e0 Merge tag 'xfs-5.9-merge-7' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c21934900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=afba7c06f91e56eb
-dashboard link: https://syzkaller.appspot.com/bug?extid=452e9465a3b2817fa4c2
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=131e96aa900000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+452e9465a3b2817fa4c2@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:71 [inline]
-BUG: KASAN: null-ptr-deref in atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
-BUG: KASAN: null-ptr-deref in refcount_sub_and_test include/linux/refcount.h:266 [inline]
-BUG: KASAN: null-ptr-deref in refcount_dec_and_test include/linux/refcount.h:294 [inline]
-BUG: KASAN: null-ptr-deref in kref_put include/linux/kref.h:64 [inline]
-BUG: KASAN: null-ptr-deref in l2cap_chan_put+0x28/0x230 net/bluetooth/l2cap_core.c:502
-Write of size 4 at addr 0000000000000018 by task kworker/0:1/7077
-
-CPU: 0 PID: 7077 Comm: kworker/0:1 Not tainted 5.8.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x18f/0x20d lib/dump_stack.c:118
- __kasan_report mm/kasan/report.c:517 [inline]
- kasan_report.cold+0x5/0x37 mm/kasan/report.c:530
- check_memory_region_inline mm/kasan/generic.c:186 [inline]
- check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
- instrument_atomic_write include/linux/instrumented.h:71 [inline]
- atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
- refcount_sub_and_test include/linux/refcount.h:266 [inline]
- refcount_dec_and_test include/linux/refcount.h:294 [inline]
- kref_put include/linux/kref.h:64 [inline]
- l2cap_chan_put+0x28/0x230 net/bluetooth/l2cap_core.c:502
- l2cap_sock_kill+0xbd/0x180 net/bluetooth/l2cap_sock.c:1217
- l2cap_chan_timeout+0x1c1/0x450 net/bluetooth/l2cap_core.c:438
- process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
- kthread+0x3b5/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-==================================================================
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 0 PID: 7077 Comm: kworker/0:1 Tainted: G    B             5.8.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x18f/0x20d lib/dump_stack.c:118
- panic+0x2e3/0x75c kernel/panic.c:231
- end_report+0x4d/0x53 mm/kasan/report.c:104
- __kasan_report mm/kasan/report.c:520 [inline]
- kasan_report.cold+0xd/0x37 mm/kasan/report.c:530
- check_memory_region_inline mm/kasan/generic.c:186 [inline]
- check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
- instrument_atomic_write include/linux/instrumented.h:71 [inline]
- atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
- refcount_sub_and_test include/linux/refcount.h:266 [inline]
- refcount_dec_and_test include/linux/refcount.h:294 [inline]
- kref_put include/linux/kref.h:64 [inline]
- l2cap_chan_put+0x28/0x230 net/bluetooth/l2cap_core.c:502
- l2cap_sock_kill+0xbd/0x180 net/bluetooth/l2cap_sock.c:1217
- l2cap_chan_timeout+0x1c1/0x450 net/bluetooth/l2cap_core.c:438
- process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
- kthread+0x3b5/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+If there are really no problems, could it be applied?
