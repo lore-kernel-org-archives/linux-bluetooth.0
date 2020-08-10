@@ -5,52 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100E1C433E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3877BC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:16:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBB8822BF3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB4DE207FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:16:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597086597;
-	bh=TWkVTrn4wtXnPeHy9dd1qMkMpuJMdWKnycx+yE2RMEw=;
+	s=default; t=1597086974;
+	bh=2R3z984rFOdN8uqAPoe8cJ/10YD+Q32bNKUVBayTgo8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=r9a9XafyTieBSfKH56Khuen+alT2nrWO6NGZSltDU4PAxS7usZ+9AzKW64uoJ30WY
-	 pZKq54x1BsPZzIXGp84dEg+eivu/dYGydqZSZn6pAstMNgbtJq2RjTAxC2EWAvThis
-	 7L/S7/O0/FCRFToCwH7Aq95LvpBsziSPYWq+dWwI=
+	b=exKTS381WEdg1GdtYiuqNof9HPAckwpFwFCe8dWRnhiZuI4gyZsXo5YUHIH1GM9en
+	 uVId7osUjw5yxtnuTdHrmuSYFI654Bau8xbKjqGefvV7PoE2GxHYKKOpy7xbwzJKv9
+	 0ashYSb6HHd1QiiUQzombJS0eW+FFe/m8//mJtR0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728711AbgHJTJ5 (ORCPT
+        id S1730096AbgHJTOt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:09:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36842 "EHLO mail.kernel.org"
+        Mon, 10 Aug 2020 15:14:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47298 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728698AbgHJTJ4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:09:56 -0400
+        id S1730082AbgHJTOs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 10 Aug 2020 15:14:48 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9B33722D07;
-        Mon, 10 Aug 2020 19:09:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 89F9A22C9E;
+        Mon, 10 Aug 2020 19:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086595;
-        bh=TWkVTrn4wtXnPeHy9dd1qMkMpuJMdWKnycx+yE2RMEw=;
+        s=default; t=1597086887;
+        bh=2R3z984rFOdN8uqAPoe8cJ/10YD+Q32bNKUVBayTgo8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Yvl+W82k+iWq5bnQy2piXwuP2WWEp9opIzE72SrmVUHbzZXCk8OgGI9lB5uoZcFSX
-         3IVdwrQOk0zxNSBFYVGo1Pahx6PLIQ1si799e+i6QXjt9pyqhLFCOjyk7RKQ5CMDse
-         olSkZzpYQHFl2reUZq20RuwE50vUc9ZChyxZH8yY=
+        b=TQd/sxIDtDz2nTZ9Kzjwk8Uuvm8sXBBxmWdKtyaHwSOpvtKqXefEmJN6lxb7iH6PK
+         qpd5BA2XFZhXYzz/J3duEnrcEEk3IgZsOYrohUf2Voj5ws7d/dstZSgFTyVWBhIG7/
+         IaBUrD5uMh7HN0O0h9hAHhV6rlwv/YGKdkjrB8G8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+Cc:     Lihong Kou <koulihong@huawei.com>,
+        syzbot+96414aa0033c363d8458@syzkaller.appspotmail.com,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 41/64] Bluetooth: hci_qca: Bug fixes for SSR
-Date:   Mon, 10 Aug 2020 15:08:36 -0400
-Message-Id: <20200810190859.3793319-41-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 02/16] Bluetooth: add a mutex lock to avoid UAF in do_enale_set
+Date:   Mon, 10 Aug 2020 15:14:29 -0400
+Message-Id: <20200810191443.3795581-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810190859.3793319-1-sashal@kernel.org>
-References: <20200810190859.3793319-1-sashal@kernel.org>
+In-Reply-To: <20200810191443.3795581-1-sashal@kernel.org>
+References: <20200810191443.3795581-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,111 +61,140 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+From: Lihong Kou <koulihong@huawei.com>
 
-[ Upstream commit 3344537f614b966f726c1ec044d1c70a8cabe178 ]
+[ Upstream commit f9c70bdc279b191da8d60777c627702c06e4a37d ]
 
-1.During SSR for command time out if BT SoC goes to inresponsive
-state, power cycling of BT SoC was not happening. Given the fix by
-sending hw error event to reset the BT SoC.
+In the case we set or free the global value listen_chan in
+different threads, we can encounter the UAF problems because
+the method is not protected by any lock, add one to avoid
+this bug.
 
-2.If SSR is triggered then ignore the transmit data requests to
-BT SoC until SSR is completed.
+BUG: KASAN: use-after-free in l2cap_chan_close+0x48/0x990
+net/bluetooth/l2cap_core.c:730
+Read of size 8 at addr ffff888096950000 by task kworker/1:102/2868
 
-Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+CPU: 1 PID: 2868 Comm: kworker/1:102 Not tainted 5.5.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: events do_enable_set
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x1fb/0x318 lib/dump_stack.c:118
+ print_address_description+0x74/0x5c0 mm/kasan/report.c:374
+ __kasan_report+0x149/0x1c0 mm/kasan/report.c:506
+ kasan_report+0x26/0x50 mm/kasan/common.c:641
+ __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:135
+ l2cap_chan_close+0x48/0x990 net/bluetooth/l2cap_core.c:730
+ do_enable_set+0x660/0x900 net/bluetooth/6lowpan.c:1074
+ process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
+ worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
+ kthread+0x332/0x350 kernel/kthread.c:255
+ ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Allocated by task 2870:
+ save_stack mm/kasan/common.c:72 [inline]
+ set_track mm/kasan/common.c:80 [inline]
+ __kasan_kmalloc+0x118/0x1c0 mm/kasan/common.c:515
+ kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
+ kmem_cache_alloc_trace+0x221/0x2f0 mm/slab.c:3551
+ kmalloc include/linux/slab.h:555 [inline]
+ kzalloc include/linux/slab.h:669 [inline]
+ l2cap_chan_create+0x50/0x320 net/bluetooth/l2cap_core.c:446
+ chan_create net/bluetooth/6lowpan.c:640 [inline]
+ bt_6lowpan_listen net/bluetooth/6lowpan.c:959 [inline]
+ do_enable_set+0x6a4/0x900 net/bluetooth/6lowpan.c:1078
+ process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
+ worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
+ kthread+0x332/0x350 kernel/kthread.c:255
+ ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Freed by task 2870:
+ save_stack mm/kasan/common.c:72 [inline]
+ set_track mm/kasan/common.c:80 [inline]
+ kasan_set_free_info mm/kasan/common.c:337 [inline]
+ __kasan_slab_free+0x12e/0x1e0 mm/kasan/common.c:476
+ kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
+ __cache_free mm/slab.c:3426 [inline]
+ kfree+0x10d/0x220 mm/slab.c:3757
+ l2cap_chan_destroy net/bluetooth/l2cap_core.c:484 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ l2cap_chan_put+0x170/0x190 net/bluetooth/l2cap_core.c:498
+ do_enable_set+0x66c/0x900 net/bluetooth/6lowpan.c:1075
+ process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
+ worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
+ kthread+0x332/0x350 kernel/kthread.c:255
+ ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+The buggy address belongs to the object at ffff888096950000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 0 bytes inside of
+ 2048-byte region [ffff888096950000, ffff888096950800)
+The buggy address belongs to the page:
+page:ffffea00025a5400 refcount:1 mapcount:0 mapping:ffff8880aa400e00 index:0x0
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea00027d1548 ffffea0002397808 ffff8880aa400e00
+raw: 0000000000000000 ffff888096950000 0000000100000001 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88809694ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff88809694ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff888096950000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff888096950080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888096950100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+Reported-by: syzbot+96414aa0033c363d8458@syzkaller.appspotmail.com
+Signed-off-by: Lihong Kou <koulihong@huawei.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_qca.c | 40 +++++++++++++++++++++++++++++++++----
- 1 file changed, 36 insertions(+), 4 deletions(-)
+ net/bluetooth/6lowpan.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 81c3c38baba18..3788ec7a4ad6b 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -72,7 +72,8 @@ enum qca_flags {
- 	QCA_DROP_VENDOR_EVENT,
- 	QCA_SUSPENDING,
- 	QCA_MEMDUMP_COLLECTION,
--	QCA_HW_ERROR_EVENT
-+	QCA_HW_ERROR_EVENT,
-+	QCA_SSR_TRIGGERED
- };
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4cd6b8d811ffa..11602902884ba 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -57,6 +57,7 @@ static bool enable_6lowpan;
+ /* We are listening incoming connections via this channel
+  */
+ static struct l2cap_chan *listen_chan;
++static DEFINE_MUTEX(set_lock);
  
- enum qca_capabilities {
-@@ -862,6 +863,13 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 	BT_DBG("hu %p qca enq skb %p tx_ibs_state %d", hu, skb,
- 	       qca->tx_ibs_state);
+ struct lowpan_peer {
+ 	struct list_head list;
+@@ -1195,12 +1196,14 @@ static void do_enable_set(struct work_struct *work)
  
-+	if (test_bit(QCA_SSR_TRIGGERED, &qca->flags)) {
-+		/* As SSR is in progress, ignore the packets */
-+		bt_dev_dbg(hu->hdev, "SSR is in progress");
-+		kfree_skb(skb);
-+		return 0;
-+	}
-+
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+ 	enable_6lowpan = set_enable->flag;
  
-@@ -1128,6 +1136,7 @@ static int qca_controller_memdump_event(struct hci_dev *hdev,
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
++	mutex_lock(&set_lock);
+ 	if (listen_chan) {
+ 		l2cap_chan_close(listen_chan, 0);
+ 		l2cap_chan_put(listen_chan);
+ 	}
  
-+	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
- 	skb_queue_tail(&qca->rx_memdump_q, skb);
- 	queue_work(qca->workqueue, &qca->ctrl_memdump_evt);
+ 	listen_chan = bt_6lowpan_listen();
++	mutex_unlock(&set_lock);
  
-@@ -1488,6 +1497,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
- 	char *memdump_buf = NULL;
- 
-+	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
- 	set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- 	bt_dev_info(hdev, "mem_dump_status: %d", qca->memdump_state);
- 
-@@ -1532,10 +1542,30 @@ static void qca_cmd_timeout(struct hci_dev *hdev)
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
- 
--	if (qca->memdump_state == QCA_MEMDUMP_IDLE)
-+	set_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
-+		set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 		qca_send_crashbuffer(hu);
--	else
--		bt_dev_info(hdev, "Dump collection is in process");
-+		qca_wait_for_dump_collection(hdev);
-+	} else if (qca->memdump_state == QCA_MEMDUMP_COLLECTING) {
-+		/* Let us wait here until memory dump collected or
-+		 * memory dump timer expired.
-+		 */
-+		bt_dev_info(hdev, "waiting for dump to complete");
-+		qca_wait_for_dump_collection(hdev);
-+	}
-+
-+	mutex_lock(&qca->hci_memdump_lock);
-+	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
-+		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
-+		if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-+			/* Inject hw error event to reset the device
-+			 * and driver.
-+			 */
-+			hci_reset_dev(hu->hdev);
-+		}
-+	}
-+	mutex_unlock(&qca->hci_memdump_lock);
+ 	kfree(set_enable);
  }
+@@ -1252,11 +1255,13 @@ static ssize_t lowpan_control_write(struct file *fp,
+ 		if (ret == -EINVAL)
+ 			return ret;
  
- static int qca_wcn3990_init(struct hci_uart *hu)
-@@ -1646,6 +1676,8 @@ static int qca_setup(struct hci_uart *hu)
- 	if (ret)
- 		return ret;
++		mutex_lock(&set_lock);
+ 		if (listen_chan) {
+ 			l2cap_chan_close(listen_chan, 0);
+ 			l2cap_chan_put(listen_chan);
+ 			listen_chan = NULL;
+ 		}
++		mutex_unlock(&set_lock);
  
-+	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+
- 	if (qca_is_wcn399x(soc_type)) {
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
- 
+ 		if (conn) {
+ 			struct lowpan_peer *peer;
 -- 
 2.25.1
 
