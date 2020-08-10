@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 135D4C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F99C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3EA222BF3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:20:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 718062080C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:22:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597087231;
+	s=default; t=1597087354;
 	bh=WpV52KAFDM0xr311bUeYlAhrwM/hcvWw2VepPjQWodA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2HpcEdKPp/GwEVPzEcsixiLtamu9x1vK/9veRu0XTFPG4NLoD9RzZeNp2vS+vh4ax
-	 GhzYDwdkH3N3psv4JRvtS4nGPMzN/w37IOwanf7C7p6hoTwuhGII+wx4IdUDCAzOCs
-	 Su2bci+Y78SMj0dQG84JGTaHaYBqDBroFs3YllIM=
+	b=BGlmf2NTgIm3C/+YMG9NxFbb1hIFs+19oV1Ndb4vLCxc4Ny+bVgCdJMs1gpJLTQ/a
+	 wX1JiLDw1gnUANC+f8Nh84NqkQbPlU6AoQ2lChES0ww29s7DdrTh7Sjs3YGwqFjc1f
+	 SI9emm3wMRR5+uYTAkDb4eTnvwhoPUG25eRBMBtU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729872AbgHJTNu (ORCPT
+        id S1730019AbgHJTW3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:13:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45184 "EHLO mail.kernel.org"
+        Mon, 10 Aug 2020 15:22:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43594 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729858AbgHJTNt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:13:49 -0400
+        id S1729685AbgHJTNF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 10 Aug 2020 15:13:05 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7EFF02224D;
-        Mon, 10 Aug 2020 19:13:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 519C521775;
+        Mon, 10 Aug 2020 19:13:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086828;
+        s=default; t=1597086784;
         bh=WpV52KAFDM0xr311bUeYlAhrwM/hcvWw2VepPjQWodA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=G8s9sivkTJypQYTZtJlZV2Wto+vc3VLNv6YHYaAS/knBXXRP4svKazj6iGegy7y83
-         w5e4kNna4OXDWs5evc4XbqcjuPWhaOOkZ9chuunEmO8IgaxCEtYf4INFQss9WQIYND
-         kjF6h7IoI1Va3uwWrn5m4dZSt7z6ATZSNIQdACfI=
+        b=08KotkF9QfASJRn0L7D1i6PEcAoiMAclukKHA3C6bHNmAVRa24SsL35qb2VuOEKk6
+         kJaxsdogIW1AXhDmxiYp+ZvQBMr/Z7EsGHfJj0HIo+b3Fg5qRVCpHyG9mowrqrTc0n
+         GkT2DtzqoPAFRbXwelr1QerSU5JGwjQs9fKqyMFk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Lihong Kou <koulihong@huawei.com>,
@@ -46,12 +46,12 @@ Cc:     Lihong Kou <koulihong@huawei.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 02/22] Bluetooth: add a mutex lock to avoid UAF in do_enale_set
-Date:   Mon, 10 Aug 2020 15:13:24 -0400
-Message-Id: <20200810191345.3795166-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/31] Bluetooth: add a mutex lock to avoid UAF in do_enale_set
+Date:   Mon, 10 Aug 2020 15:12:31 -0400
+Message-Id: <20200810191259.3794858-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810191345.3795166-1-sashal@kernel.org>
-References: <20200810191345.3795166-1-sashal@kernel.org>
+In-Reply-To: <20200810191259.3794858-1-sashal@kernel.org>
+References: <20200810191259.3794858-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
