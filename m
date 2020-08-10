@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D7AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD434C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:34:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C4992080C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:29:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A159122B4B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Aug 2020 19:34:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597087794;
-	bh=hUo21oQW7nz+fD4ACNrbY5Chug6U6GeExSjug/QP+IE=;
+	s=default; t=1597088048;
+	bh=wNpQYJFvzAHC3btzCqiA6w25nsGp1ZuOBw4d9rOui6k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=bGfXVvbQb7Nx7z4lYLsg7yT3kP5kC8vi55epbPigeGNzDqGGhMEf8L5zayOXjYbgy
-	 4iHKUpOJFlZbQxGZ40+fMiuAnXCzbPRfnegt0mF21/kSBPl1pTgll9/cJFwQemZkYR
-	 ccMGj+sp6ocdqV/4b8IyyKEv3iiHcLRR+STI0JFM=
+	b=P/L625B/HUtiIXwu4ntwGrslrANq40/iNRELi0PLWDS0Y90VqImvd7i8I4GXAH8+I
+	 bYOhKIHCE9mPVS0EZaLE3sN0IPluG2tTIJ9cmeeUCpFwO0wjnHUWcmK+WPFlCBXxc2
+	 PcSZKpkqAVcnvoQ8545MiB4XUw3KGY/IHMqf+SlU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730232AbgHJT3e (ORCPT
+        id S1728892AbgHJTeB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:29:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38002 "EHLO mail.kernel.org"
+        Mon, 10 Aug 2020 15:34:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35232 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729009AbgHJTKh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:10:37 -0400
+        id S1728308AbgHJTJJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 10 Aug 2020 15:09:09 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 175B720639;
-        Mon, 10 Aug 2020 19:10:35 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EC46A22B4E;
+        Mon, 10 Aug 2020 19:09:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086636;
-        bh=hUo21oQW7nz+fD4ACNrbY5Chug6U6GeExSjug/QP+IE=;
+        s=default; t=1597086546;
+        bh=wNpQYJFvzAHC3btzCqiA6w25nsGp1ZuOBw4d9rOui6k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0gYgeByaiD2XHhyVmQ5ZKQJDM5hnsZRVdjzybvYx1ZBgkP1oC6EkBHcu/pNnlabtG
-         K8MPfAbIqGykNLICV/93mDngH59V75jz2UMFYxtO1IuClenY5O1MLJ/PuVea7rFaU1
-         Ea+6Hft3W/zvO/gMoHw42J9WsxxNf/6aSHPebbMQ=
+        b=Uz3ELkLnFDpohYdYAgM+gXIvGOK28Bs5djuZ17sNWKiE/kldOpJ+FYU8htfemuShC
+         taQjJKLf2jzBgfTRbJoJNrz/KT4cTaAwhdjAl3TbkS2BHAqgY7FwWe69OttXJ+/MIg
+         wgHXJ+IMtRHFrTNamn+7GxckUZRLdjK7Xtf516Jw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Lihong Kou <koulihong@huawei.com>,
@@ -46,12 +46,12 @@ Cc:     Lihong Kou <koulihong@huawei.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 05/60] Bluetooth: add a mutex lock to avoid UAF in do_enale_set
-Date:   Mon, 10 Aug 2020 15:09:33 -0400
-Message-Id: <20200810191028.3793884-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.8 05/64] Bluetooth: add a mutex lock to avoid UAF in do_enale_set
+Date:   Mon, 10 Aug 2020 15:08:00 -0400
+Message-Id: <20200810190859.3793319-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810191028.3793884-1-sashal@kernel.org>
-References: <20200810191028.3793884-1-sashal@kernel.org>
+In-Reply-To: <20200810190859.3793319-1-sashal@kernel.org>
+References: <20200810190859.3793319-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -155,7 +155,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 4febc82a7c761..52fb6d6d6d585 100644
+index bb55d92691b06..cff4944d5b663 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
 @@ -50,6 +50,7 @@ static bool enable_6lowpan;
@@ -166,7 +166,7 @@ index 4febc82a7c761..52fb6d6d6d585 100644
  
  struct lowpan_peer {
  	struct list_head list;
-@@ -1070,12 +1071,14 @@ static void do_enable_set(struct work_struct *work)
+@@ -1078,12 +1079,14 @@ static void do_enable_set(struct work_struct *work)
  
  	enable_6lowpan = set_enable->flag;
  
@@ -181,7 +181,7 @@ index 4febc82a7c761..52fb6d6d6d585 100644
  
  	kfree(set_enable);
  }
-@@ -1127,11 +1130,13 @@ static ssize_t lowpan_control_write(struct file *fp,
+@@ -1135,11 +1138,13 @@ static ssize_t lowpan_control_write(struct file *fp,
  		if (ret == -EINVAL)
  			return ret;
  
