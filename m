@@ -2,49 +2,48 @@ Return-Path: <SRS0=5Aiy=BV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97472C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 17:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DC6C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 17:07:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 787EC2076B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 17:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B14D20774
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 17:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729314AbgHKQ7c (ORCPT
+        id S1729350AbgHKRH0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Aug 2020 12:59:32 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:40590 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729150AbgHKQ7T (ORCPT
+        Tue, 11 Aug 2020 13:07:26 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:54374 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729104AbgHKRHP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Aug 2020 12:59:19 -0400
-Received: by mail-il1-f198.google.com with SMTP id z16so11030469ill.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 09:59:18 -0700 (PDT)
+        Tue, 11 Aug 2020 13:07:15 -0400
+Received: by mail-io1-f69.google.com with SMTP id z25so10191877ioh.21
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 10:07:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=l3wlPqr6ipWe8Opm66dLPgisSNnhHiymwvjRBVgKADg=;
-        b=YKpgaBRGCQyiDMClXUIoT3Ixtv4IXe8BoRVWix9otSxZ5nmnwwD9rlV2RrKaXG+0bd
-         Sg8LAiJ6y/J6tyS72YU2pMoXTmQ+LoTsCU40Ft/v7vdaMspaTiVY7UHaxZz3wqjrtuEo
-         ui+9xTkK972hx2Hu2xMJ/5Sq7Lpq2LjD4UjiHShPJOOLzTn5TsuEB+1pDaMmPHoMd4Zn
-         tjFSSmP+ixC/42uknyVnjZwdyoydPs1VFX8uQ3c6fe8Q+P+xMeUuegwQ+ZvGcz98o7FE
-         H1G9tRXKc98nUId5d2uiw4m39EQzLTl+nf+WKzytHUTJr5XCiV+LP4AvkAyp7ttEoO7g
-         YVbQ==
-X-Gm-Message-State: AOAM532shjq0U15qMZlbp2RSs8rtPKmC3dPphPtu1528Zop3tG2DKe25
-        0tf5++fwksbsK1Vm68AYJwKjKUx9B6OESlY/ms05rWKBqEnX
-X-Google-Smtp-Source: ABdhPJxJQUhNpwViTKlqIYQHdVNHdSYbUVL2IQMxAttPZayrs+KLh/wyllEFuWMrDd47AXUX6rFXx/1jkrZkBqrw35YQnudVFt++
+        bh=3ZPRrfgd4U28dH7RCjAGl0xrthCHCi5aVcTRVhPqTvM=;
+        b=iLf+YFDegaDR/4WEaHMfV5OAn5AXU3BbxZyPMzg4dKtviHOOBjsNMknRrf2xNP4fLF
+         0eAfUgZYuDwvmWe4kRnyj/1DnomVjjziwbA9fvYX4Bwly2pE1V7CNSZan3aAavvNqhWd
+         C8hq4hcpI0fKD5Ra5Y+eKBRAQMT7uziVrqD26NUpBDCUG7Pwf+NllqcVZFc77T5TFRuC
+         OKfCMcKb47A7ZC/U8NQR+3hpW/ZwqaIHWnN7qP4pgKwFJlbfbda1epX2AUSAvCBbPWYe
+         TKfjY3MYkmFltACA5J5vS1evqbHRulWUd6qoZQE9Ui92Mnp4ukY6fz0KFdAMc+iVKmlZ
+         455w==
+X-Gm-Message-State: AOAM530l4fUglKNEjE8qVZ/Dq2mcKjZ/pYlALsoeZKtPxNoO43fJIxo/
+        zvmSgdxR9x/1V2mIXDr37KhpEDkOLq0GMFyXjbfwuvTaGUdv
+X-Google-Smtp-Source: ABdhPJxK0j2N8H15/HLiv2i5ZMHye9rsVOvMWhuPkrGjHecyzW74B0tXTaV6lYOkeo5F0GQWDSisUUJz/C8OpJqjHcxr0bZjG/ZI
 MIME-Version: 1.0
-X-Received: by 2002:a02:c919:: with SMTP id t25mr27761316jao.38.1597165157907;
- Tue, 11 Aug 2020 09:59:17 -0700 (PDT)
-Date:   Tue, 11 Aug 2020 09:59:17 -0700
+X-Received: by 2002:a92:d8d2:: with SMTP id l18mr21745562ilo.94.1597165634421;
+ Tue, 11 Aug 2020 10:07:14 -0700 (PDT)
+Date:   Tue, 11 Aug 2020 10:07:14 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e2852705ac9cfd73@google.com>
-Subject: KASAN: slab-out-of-bounds Read in lock_sock_nested
-From:   syzbot <syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com>
+Message-ID: <0000000000004991e705ac9d1a83@google.com>
+Subject: inconsistent lock state in sco_conn_del
+From:   syzbot <syzbot+65684128cd7c35bc66a1@syzkaller.appspotmail.com>
 To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         marcel@holtmann.org, netdev@vger.kernel.org,
@@ -59,117 +58,122 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    bfdd5aaa Merge tag 'Smack-for-5.9' of git://github.com/csc..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=167b4d3a900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7bb894f55faf8242
-dashboard link: https://syzkaller.appspot.com/bug?extid=9a0875bc1b2ca466b484
+HEAD commit:    f80535b9 Add linux-next specific files for 20200810
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=152ffd8a900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2055bd0d83d5ee16
+dashboard link: https://syzkaller.appspot.com/bug?extid=65684128cd7c35bc66a1
 compiler:       gcc (GCC) 10.1.0-syz 20200507
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com
+Reported-by: syzbot+65684128cd7c35bc66a1@syzkaller.appspotmail.com
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in __lock_acquire+0x41d0/0x5640 kernel/locking/lockdep.c:4296
-Read of size 8 at addr ffff8880497850a0 by task kworker/1:2/23918
+================================
+WARNING: inconsistent lock state
+5.8.0-next-20200810-syzkaller #0 Not tainted
+--------------------------------
+inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+syz-executor.5/11793 [HC0[0]:SC0[0]:HE1:SE1] takes:
+ffff8880554ec0a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
+ffff8880554ec0a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at: sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+{IN-SOFTIRQ-W} state was registered at:
+  lock_acquire+0x1f1/0xad0 kernel/locking/lockdep.c:5005
+  __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+  spin_lock include/linux/spinlock.h:354 [inline]
+  sco_sock_timeout+0x24/0x140 net/bluetooth/sco.c:83
+  call_timer_fn+0x1ac/0x760 kernel/time/timer.c:1413
+  expire_timers kernel/time/timer.c:1458 [inline]
+  __run_timers.part.0+0x67c/0xaa0 kernel/time/timer.c:1755
+  __run_timers kernel/time/timer.c:1736 [inline]
+  run_timer_softirq+0xae/0x1a0 kernel/time/timer.c:1768
+  __do_softirq+0x2de/0xa24 kernel/softirq.c:298
+  asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
+  __run_on_irqstack arch/x86/include/asm/irq_stack.h:22 [inline]
+  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:48 [inline]
+  do_softirq_own_stack+0x9d/0xd0 arch/x86/kernel/irq_64.c:77
+  invoke_softirq kernel/softirq.c:393 [inline]
+  __irq_exit_rcu kernel/softirq.c:423 [inline]
+  irq_exit_rcu+0x1f3/0x230 kernel/softirq.c:435
+  sysvec_apic_timer_interrupt+0x51/0xf0 arch/x86/kernel/apic/apic.c:1090
+  asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:581
+  arch_local_irq_enable arch/x86/include/asm/paravirt.h:780 [inline]
+  __local_bh_enable_ip+0x101/0x190 kernel/softirq.c:200
+  spin_unlock_bh include/linux/spinlock.h:399 [inline]
+  batadv_nc_purge_paths+0x2a5/0x3a0 net/batman-adv/network-coding.c:470
+  batadv_nc_worker+0x868/0xe50 net/batman-adv/network-coding.c:721
+  process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+  worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+  kthread+0x3b5/0x4a0 kernel/kthread.c:292
+  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+irq event stamp: 33895
+hardirqs last  enabled at (33895): [<ffffffff81b4172d>] kfree+0x1cd/0x2c0 mm/slab.c:3757
+hardirqs last disabled at (33894): [<ffffffff81b415cf>] kfree+0x6f/0x2c0 mm/slab.c:3746
+softirqs last  enabled at (30344): [<ffffffff88000f2f>] asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
+softirqs last disabled at (30333): [<ffffffff88000f2f>] asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
 
-CPU: 1 PID: 23918 Comm: kworker/1:2 Not tainted 5.8.0-syzkaller #0
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+  <Interrupt>
+    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+
+ *** DEADLOCK ***
+
+3 locks held by syz-executor.5/11793:
+ #0: ffff88805b990f40 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0xf5/0x1080 net/bluetooth/hci_core.c:1720
+ #1: ffff88805b990078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_do_close+0x253/0x1080 net/bluetooth/hci_core.c:1757
+ #2: ffffffff8a9a5c28 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1435 [inline]
+ #2: ffffffff8a9a5c28 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xc7/0x220 net/bluetooth/hci_conn.c:1557
+
+stack backtrace:
+CPU: 0 PID: 11793 Comm: syz-executor.5 Not tainted 5.8.0-next-20200810-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
 Call Trace:
  __dump_stack lib/dump_stack.c:77 [inline]
  dump_stack+0x18f/0x20d lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0xae/0x436 mm/kasan/report.c:383
- __kasan_report mm/kasan/report.c:513 [inline]
- kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
- __lock_acquire+0x41d0/0x5640 kernel/locking/lockdep.c:4296
+ print_usage_bug kernel/locking/lockdep.c:4020 [inline]
+ valid_state kernel/locking/lockdep.c:3361 [inline]
+ mark_lock_irq kernel/locking/lockdep.c:3560 [inline]
+ mark_lock.cold+0x7a/0x7f kernel/locking/lockdep.c:4006
+ mark_usage kernel/locking/lockdep.c:3923 [inline]
+ __lock_acquire+0x8cd/0x5640 kernel/locking/lockdep.c:4380
  lock_acquire+0x1f1/0xad0 kernel/locking/lockdep.c:5005
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
- _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
- spin_lock_bh include/linux/spinlock.h:359 [inline]
- lock_sock_nested+0x3b/0x110 net/core/sock.c:3040
- l2cap_sock_teardown_cb+0x88/0x400 net/bluetooth/l2cap_sock.c:1520
- l2cap_chan_del+0xad/0x1300 net/bluetooth/l2cap_core.c:618
- l2cap_chan_close+0x118/0xb10 net/bluetooth/l2cap_core.c:823
- l2cap_chan_timeout+0x173/0x450 net/bluetooth/l2cap_core.c:436
- process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
- kthread+0x3b5/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-
-Allocated by task 3899:
- save_stack+0x1b/0x40 mm/kasan/common.c:48
- set_track mm/kasan/common.c:56 [inline]
- __kasan_kmalloc.constprop.0+0xc2/0xd0 mm/kasan/common.c:494
- __do_kmalloc mm/slab.c:3656 [inline]
- __kmalloc+0x17a/0x340 mm/slab.c:3665
- kmalloc include/linux/slab.h:560 [inline]
- tomoyo_realpath_from_path+0xc3/0x620 security/tomoyo/realpath.c:254
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_check_open_permission+0x272/0x380 security/tomoyo/file.c:771
- tomoyo_file_open security/tomoyo/tomoyo.c:313 [inline]
- tomoyo_file_open+0xa3/0xd0 security/tomoyo/tomoyo.c:308
- security_file_open+0x52/0x3f0 security/security.c:1574
- do_dentry_open+0x3a0/0x1290 fs/open.c:815
- do_open fs/namei.c:3243 [inline]
- path_openat+0x1bb9/0x2750 fs/namei.c:3360
- do_filp_open+0x17e/0x3c0 fs/namei.c:3387
- do_sys_openat2+0x16f/0x3b0 fs/open.c:1179
- do_sys_open fs/open.c:1195 [inline]
- ksys_open include/linux/syscalls.h:1390 [inline]
- __do_sys_open fs/open.c:1201 [inline]
- __se_sys_open fs/open.c:1199 [inline]
- __x64_sys_open+0x119/0x1c0 fs/open.c:1199
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+ _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+ spin_lock include/linux/spinlock.h:354 [inline]
+ sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+ sco_disconn_cfm net/bluetooth/sco.c:1178 [inline]
+ sco_disconn_cfm+0x62/0x80 net/bluetooth/sco.c:1171
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1438 [inline]
+ hci_conn_hash_flush+0x114/0x220 net/bluetooth/hci_conn.c:1557
+ hci_dev_do_close+0x5c6/0x1080 net/bluetooth/hci_core.c:1770
+ hci_unregister_dev+0x1bd/0xe30 net/bluetooth/hci_core.c:3790
+ vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
+ __fput+0x285/0x920 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:135
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb7d/0x29f0 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:903
+ get_signal+0x40b/0x1ee0 kernel/signal.c:2743
+ arch_do_signal+0x82/0x2520 arch/x86/kernel/signal.c:811
+ exit_to_user_mode_loop kernel/entry/common.c:135 [inline]
+ exit_to_user_mode_prepare+0x15d/0x1c0 kernel/entry/common.c:166
+ syscall_exit_to_user_mode+0x59/0x2b0 kernel/entry/common.c:241
  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Freed by task 3899:
- save_stack+0x1b/0x40 mm/kasan/common.c:48
- set_track mm/kasan/common.c:56 [inline]
- kasan_set_free_info mm/kasan/common.c:316 [inline]
- __kasan_slab_free+0xf5/0x140 mm/kasan/common.c:455
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x103/0x2c0 mm/slab.c:3757
- tomoyo_realpath_from_path+0x191/0x620 security/tomoyo/realpath.c:291
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_check_open_permission+0x272/0x380 security/tomoyo/file.c:771
- tomoyo_file_open security/tomoyo/tomoyo.c:313 [inline]
- tomoyo_file_open+0xa3/0xd0 security/tomoyo/tomoyo.c:308
- security_file_open+0x52/0x3f0 security/security.c:1574
- do_dentry_open+0x3a0/0x1290 fs/open.c:815
- do_open fs/namei.c:3243 [inline]
- path_openat+0x1bb9/0x2750 fs/namei.c:3360
- do_filp_open+0x17e/0x3c0 fs/namei.c:3387
- do_sys_openat2+0x16f/0x3b0 fs/open.c:1179
- do_sys_open fs/open.c:1195 [inline]
- ksys_open include/linux/syscalls.h:1390 [inline]
- __do_sys_open fs/open.c:1201 [inline]
- __se_sys_open fs/open.c:1199 [inline]
- __x64_sys_open+0x119/0x1c0 fs/open.c:1199
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-The buggy address belongs to the object at ffff888049784000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 160 bytes to the right of
- 4096-byte region [ffff888049784000, ffff888049785000)
-The buggy address belongs to the page:
-page:ffffea000125e100 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 head:ffffea000125e100 order:1 compound_mapcount:0
-flags: 0xfffe0000010200(slab|head)
-raw: 00fffe0000010200 ffffea0001c34088 ffffea000122f088 ffff8880aa002000
-raw: 0000000000000000 ffff888049784000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888049784f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888049785000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff888049785080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                               ^
- ffff888049785100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888049785180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+RIP: 0033:0x45ce69
+Code: Bad RIP value.
+RSP: 002b:00007fd132defcf8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+RAX: fffffffffffffe00 RBX: 000000000118bfc8 RCX: 000000000045ce69
+RDX: 0000000000000000 RSI: 0000000000000080 RDI: 000000000118bfc8
+RBP: 000000000118bfc0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000118bfcc
+R13: 00007ffd9693ba5f R14: 00007fd132df09c0 R15: 000000000118bfcc
 
 
 ---
