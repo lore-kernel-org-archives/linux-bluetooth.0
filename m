@@ -2,108 +2,120 @@ Return-Path: <SRS0=5Aiy=BV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB4DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 13:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C5EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 13:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 073C72078E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 13:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 999DB20771
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 13:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="qAopXdLw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiXzMu2Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728614AbgHKNiN (ORCPT
+        id S1728783AbgHKNuN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Aug 2020 09:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42846 "EHLO
+        Tue, 11 Aug 2020 09:50:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728532AbgHKNiN (ORCPT
+        with ESMTP id S1728781AbgHKNuI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Aug 2020 09:38:13 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D728BC06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 06:38:12 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id b30so6668292lfj.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 06:38:12 -0700 (PDT)
+        Tue, 11 Aug 2020 09:50:08 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB593C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 06:50:07 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id k18so9401477qtm.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 06:50:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCyZYPQarluAYNVjuTSqO+Z2+TU6RV9vTCrq9qlBlfY=;
-        b=qAopXdLwEQfbvL/gbWcJKBr5f0NhiW7os3EIIPFK4Vxcf6wUZkj+sUb7dpxPIpy4Ni
-         t9rgScCn4ROyFy02sfsNT7jHleK7T6seKkWJ5xDe1l7a3NUzxQiHo8xDklu/oCSltG1K
-         o3NljsBErJ1vvdKKqJoFY7K76a0fu8lLvK9hGdldkBzDVH21nLn2KTq/h0xkwlLffj0D
-         ndDLZptXvZpSVlzVUn6qeU3oGWPPkeyfwoyVeizZA7oMuB/OwZ2/FofvommeI2NaqiCS
-         QHcs9zp4ZFVlUB/GNSU2VA2mKz/VOnSxrheNfBPzdXyaHArRbQpQTQx9pJ3S6wMPL01+
-         qCoQ==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=w+qODleQQsKHZ1WWrEjUAUHGpfYDNjuEG5I1xgDqiqw=;
+        b=UiXzMu2ZQMNFIUP2BS80wsk1I6I4Vcbcjk7BbrsCYsZ/kdkrxO8KFydAOENZCAgTR0
+         zP7SbgADrXj65RGevnYq5cXm8LtdEsDeAEWJ24EH6s9408IBPvj+8ILkhSgRitY4ZORZ
+         xzRVsRpxlO6bFgJBZnvaJugJc1AOt4leoA/n9vqms2VsxURjnU1CeFu7SuuVWlMRjP8q
+         vhjAK9xDy66Zrstgw3rFADDOMbq6at3WRWhfpxVWHrfBR/ktVqaobJnddDwY5jasu0BU
+         dJs+519UfMGeLNRQWc6HGAtg8KXXtsgfIeI89kV3plTbol1lSP/cvPukX+V0pE2+8uvy
+         T6qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCyZYPQarluAYNVjuTSqO+Z2+TU6RV9vTCrq9qlBlfY=;
-        b=jqOaqTHB65xX6C/2avHcpmmlnWXrO11deH32TPiEwNZ0+epC1cUCUqmlRLMQKah09e
-         87GQ+C6MESKQTj5oZLDXyyUP3469wmhS1Jw19e9IqEfLR0SklYb1Z/5m6V9V2yYcAuma
-         UkkfYjD1oq2lcD2wEQTNtAHAq9N9oCQk2qS0m05Wl3jhsBgwFqbTJMG4RJB/ryDl/uKR
-         qXhbJn2iOIQxk2RPxT95IGIkp+BlVkTiVNcPOAx/+pGrBFF19xyP893m9PwBnaIVyGKC
-         6zoAmM7z2NEwAz9CsqMQ0rNEovkj5MO/G5mJF7pzWaR+sitppGgHs4kOm+/NTnQEwWAt
-         UK3g==
-X-Gm-Message-State: AOAM530FbAy2JuPgtsGzyOCo9peVgoz7Ly7Mo39ApbL6hoRdOftgxNoa
-        t5x3xvAND+RcPRA+bNch/FrmX4zcbQ0=
-X-Google-Smtp-Source: ABdhPJzW1sWoD5Ql3b4dzjt3MsGzqOWO65E4CECvI7zhooM0z/iqis+1OlMJdrGqO0Ae+kKyO+w57A==
-X-Received: by 2002:a19:fc14:: with SMTP id a20mr3310545lfi.0.1597153086267;
-        Tue, 11 Aug 2020 06:38:06 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id w11sm11579622lff.62.2020.08.11.06.38.04
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=w+qODleQQsKHZ1WWrEjUAUHGpfYDNjuEG5I1xgDqiqw=;
+        b=A4t4Yftue9g9jTBg0mKGaR2ZCfZaQTi7TuKxwtHaMmpkgiN6BwSCb6H0S6tF9dgFmc
+         57lMvgA17rC83C4v88T7WZf2NU4Y48cwPU6k7kbOBkSpb0yKBMJJPZz5gLQx95Ogin8J
+         4SgGiv1xUTLafzm3FKWRg7/Jacm6wBl4UNV7OMdUmmC3n2Pju3vZhRe5+waarNvF+t56
+         l4ib/dglx5FYpGx8iPAXCX4mwxyw964MY+OpnVgw9+uCCvlzEaJTIQvanH89qcvMBrBh
+         xrDlVAFgbwHGBwzdY6mhISFNXc5gLfiCMawChVFSOc2tkTHW2CLcyaQOfLydWmMkuhGU
+         RJ6g==
+X-Gm-Message-State: AOAM530/yDAZ8bTgWd5c5FJ3okOp26r8JMxZ1M7jpr/DWLIIVTuFVxdD
+        seC0mjexxPirvXwiA5lIR5hh/xNV6yU=
+X-Google-Smtp-Source: ABdhPJwOqp69NLU1HYy9v1whcIGKYX/g0pMlB3Wl0qD2JfNwwNgQOXJ4LEk2w1FRpC7MvWvcM8aZ/g==
+X-Received: by 2002:aed:3e90:: with SMTP id n16mr1140988qtf.37.1597153805984;
+        Tue, 11 Aug 2020 06:50:05 -0700 (PDT)
+Received: from [172.17.0.2] ([20.36.202.113])
+        by smtp.gmail.com with ESMTPSA id w1sm17910057qkj.90.2020.08.11.06.50.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Aug 2020 06:38:05 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix application key binding lookup
-Date:   Tue, 11 Aug 2020 15:39:07 +0200
-Message-Id: <20200811133907.8249-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.20.1
+        Tue, 11 Aug 2020 06:50:05 -0700 (PDT)
+Message-ID: <5f32a20d.1c69fb81.54e64.69a4@mx.google.com>
+Date:   Tue, 11 Aug 2020 06:50:05 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7420580290351379786=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, michal.lowas-rzechonek@silvair.com
+Subject: RE: [BlueZ] mesh: Fix application key binding lookup
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200811133907.8249-1-michal.lowas-rzechonek@silvair.com>
+References: <20200811133907.8249-1-michal.lowas-rzechonek@silvair.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Because l_queue_find can't distinguish between entry->data equal to zero
-and missing entry, has_binding() fails when we bind app key with index
-0, via L_UINT_TO_PTR.
+--===============7420580290351379786==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkpatch Failed
+
+Outputs:
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit 1a2a6debd00a ("mesh: Clean up handling of config model binding messages")'
+#11: 
 Bug has been introduced in commit 1a2a6debd
----
- mesh/model.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/mesh/model.c b/mesh/model.c
-index 4eaad31be..7d7f1551a 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -140,7 +140,15 @@ static bool simple_match(const void *a, const void *b)
- 
- static bool has_binding(struct l_queue *bindings, uint16_t idx)
- {
--	return l_queue_find(bindings, simple_match, L_UINT_TO_PTR(idx)) != NULL;
-+	/* don't use l_queue_find, it can't distinguish between missing entry
+WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
+#23: FILE: mesh/model.c:115:
 +	 * and entry with data equal to NULL */
-+	const struct l_queue_entry *entry;
-+
-+	for (entry = l_queue_get_entries(bindings); entry; entry = entry->next)
-+		if (L_PTR_TO_INT(entry->data) == idx)
-+			return true;
-+
-+	return false;
- }
- 
- static bool find_virt_by_label(const void *a, const void *b)
--- 
-2.20.1
 
+- total: 1 errors, 1 warnings, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+--===============7420580290351379786==--
