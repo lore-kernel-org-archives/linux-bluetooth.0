@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02744C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD12C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:30:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDE082076C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A23F82076B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:30:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5WK8boW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gjcmiJT4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726164AbgHKS37 (ORCPT
+        id S1725987AbgHKSa3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Aug 2020 14:29:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59696 "EHLO
+        Tue, 11 Aug 2020 14:30:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbgHKS37 (ORCPT
+        with ESMTP id S1725862AbgHKSa2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Aug 2020 14:29:59 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89953C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:29:58 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id a6so2827066oog.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:29:58 -0700 (PDT)
+        Tue, 11 Aug 2020 14:30:28 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 579C8C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:30:28 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id u63so13139778oie.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=fdxJyK64IhcdH2atTzNBdhDwAuEzjFER0OJtA1BgZGU=;
-        b=m5WK8boW+6IbhXIHo3CNYA+M96rVERn6X6w64V9YEdEyOnFLUas6hDWPHx28tLp3uF
-         QmPBxju5QNM2ghp1MHppYx535jP0ZXyEJ3Qmn54Mde+eNDBf8+nQXFJ+AKxwPkvobEue
-         JTWIMygE5WpfDxOFbUYF37UrfQmKFekWUrwbiP6eNqAGkP6NYaKtPftE9pygzsdslGfo
-         thRrKQQ5e1d9VKKlEnlkW+GNybbyRkqIhUNjEyHuEeZJjBSOw0Tdv9q2GfNxC/+FBYci
-         gJXzQPVEhroCUMYkp8Zr6dWemmV2slCDHgBRW3p77g9SY80/fkix9kTWb5QwltcJ3T9h
-         iC9w==
+        bh=bRl+N2lUAUG3eTPKJF5TH+I9ukhRa38Y8HEJ3262t1w=;
+        b=gjcmiJT41mgveIIu4ovS/fBlYB3ML/Qyu6PCXKc6P7yYQK5+wxaLYyz/mag1ZqS81z
+         TTAViQhBpqvkHZRbslXnqmJ/p4d6MDhcjiNOmVMRHg2tCza0/QCGASWQ8rpui+h4Te30
+         v9/05Odn/wRc1VxbNRxCBlyIMEn13L3PwWb4Cl9TjxZ2bAvgVCi9jl537Kk5jKI7ZS7Z
+         pNedzYOuVpt3/k9irXUV+VL0wudKW6J32AkqdyuT9WdbXWj2Rz0xh0kpKrTInQwLE0zh
+         3bQcsLK94cbkmvzVoz6EH42wIVWagqr9QpOA8delYjBeCj4hgptLmkXqcBPMsT77sqTM
+         px7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=fdxJyK64IhcdH2atTzNBdhDwAuEzjFER0OJtA1BgZGU=;
-        b=K+59l8zFPdINpMM5Odifrp66b2FOVG3MgaFUhtEJtWYxo2zwXv4Bvzr32tvVzIVTs3
-         IosBUTBmu01pc1KP9BcY1jfb2adbjbbgUWOg5vstlSxuYbv15w1+2eR13BIU5h4LAZ3O
-         taquKRz5Pf1orFEsX5Yjp7LBxYgIVBdDX5etJu3k/cXDPgz1OGu5VHFwcpusXBUft196
-         TTqU7J9Lf+0Hyn4cNvDqoanlmPySatAKRmVgkBRy7g4CrHqgdhe5FjoYcmLemyvp5cH7
-         YlE2u2wQ5mcbhBxV34flGVH3fUAolOlTI7N4CSjsoM7AR2O1nYYORZLOzwIC/+lMNRzi
-         uYVg==
-X-Gm-Message-State: AOAM531p0yRAz3itPEksyOyGxjSkLtByQw6oD98Sg/GNrnsYlrhthcau
-        X/RXkvEdqOaPSvO1elxR/r/iln1A+1ytasy/lBQ=
-X-Google-Smtp-Source: ABdhPJyEmusZ1QL77ZM5y7NLzbqmJIdQY+gxs7gy82GQZvVYGpAoeCa+gj8D4r4+59TauPAfW4S09gfEQTmvANUe0lo=
-X-Received: by 2002:a4a:380b:: with SMTP id c11mr6433608ooa.17.1597170597877;
- Tue, 11 Aug 2020 11:29:57 -0700 (PDT)
+        bh=bRl+N2lUAUG3eTPKJF5TH+I9ukhRa38Y8HEJ3262t1w=;
+        b=U6LPhi2JyiC5oNXb0kPavEZhLhGXk7zUzX6iIe25ubqX41xl3TYAB4VKZazQE1FKTb
+         F7LusTf0tWitTTdgLd4vvh4rEs851aurr4/pVk3tV6ipt1FcpTPuY/Nr/uMvvn+43fzs
+         rp9IyBJjvxGq7DYKRZ3LpKlD7J2AydsZAuEQlysXisg8dyHbOjaZwWDvDeyEJm/ZWCbE
+         cyrjAEALP/R28p/o/obo+vpxghLxI61wKlC2S0rYmiMg/pJJ759Ojb/qVyoRjLh009x/
+         lB7lJNDsfLpNimKZ3Ep3MNaJlKn00CBn+bUOxn/PZ+x+6NYBbDCLgmnKEvW33XrxfKtA
+         yLMg==
+X-Gm-Message-State: AOAM532WQRGg9tezJZX7pKaR48s5zMXyL3mzWv+h5nzVI2NuLyyAH7H1
+        UxHfzfSAl/3vmsG2jlpCYPa1E432Wdv9hz3IxwYS0Q==
+X-Google-Smtp-Source: ABdhPJxvIYkebtSCWjLpCApcjIoOySUdddnoJ/R/GdfBt9yFL+2v0M/Nt76o5/pj/KJQxWVfnFtJZxy/qy0bShSGNlc=
+X-Received: by 2002:aca:cc50:: with SMTP id c77mr4408361oig.152.1597170626544;
+ Tue, 11 Aug 2020 11:30:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200808193026.29007-1-pali@kernel.org>
-In-Reply-To: <20200808193026.29007-1-pali@kernel.org>
+References: <20200808193014.28951-1-pali@kernel.org>
+In-Reply-To: <20200808193014.28951-1-pali@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 11 Aug 2020 11:29:48 -0700
-Message-ID: <CABBYNZJGQ26oiOqeGyUBvOPSzTWGuJpTumuzq+MPyiLzMkj4HQ@mail.gmail.com>
-Subject: Re: [PATCH] sbcenc: Remove duplicate check for num of channels
+Date:   Tue, 11 Aug 2020 11:30:16 -0700
+Message-ID: <CABBYNZJ0+frWpUWE3J+T+KfobesCnfpmskfOZRO0Lt3rFSfhRw@mail.gmail.com>
+Subject: Re: [PATCH] sbcenc: Add missing error check for unsupported sample rates
 To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -77,25 +77,26 @@ On Sat, Aug 8, 2020 at 12:34 PM Pali Roh=C3=A1r <pali@kernel.org> wrote:
 >
 > Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
 > ---
->  src/sbcenc.c | 1 -
->  1 file changed, 1 deletion(-)
+>  src/sbcenc.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
 > diff --git a/src/sbcenc.c b/src/sbcenc.c
-> index 2a4c240..6f8d794 100644
+> index dabdff4..2a4c240 100644
 > --- a/src/sbcenc.c
 > +++ b/src/sbcenc.c
-> @@ -142,7 +142,6 @@ static void encode(char *filename, int subbands, int =
-bitpool, int joint,
->                                         blocks =3D=3D 12 ? SBC_BLK_12 : S=
-BC_BLK_16;
->         } else {
->                 if (BE_INT(au_hdr.sample_rate) !=3D 16000 ||
-> -                               BE_INT(au_hdr.channels) !=3D 1 ||
->                                 BE_INT(au_hdr.channels) !=3D 1) {
->                         fprintf(stderr, "mSBC requires 16 bits, 16kHz, mo=
-no "
->                                                                 "input\n"=
-);
+> @@ -105,6 +105,10 @@ static void encode(char *filename, int subbands, int=
+ bitpool, int joint,
+>                 case 48000:
+>                         sbc.frequency =3D SBC_FREQ_48000;
+>                         break;
+> +               default:
+> +                       fprintf(stderr, "Unsupported sample rate %ukHz\n"=
+,
+> +                                       BE_INT(au_hdr.sample_rate));
+> +                       goto done;
+>                 }
+>
+>                 srate =3D BE_INT(au_hdr.sample_rate);
 > --
 > 2.20.1
 
