@@ -2,228 +2,121 @@ Return-Path: <SRS0=5Aiy=BV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9FCC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA683C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:23:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEF4620771
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81B0220771
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 18:23:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGYOIwgu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qov1Ikof"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726235AbgHKSQ3 (ORCPT
+        id S1726068AbgHKSXB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Aug 2020 14:16:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57608 "EHLO
+        Tue, 11 Aug 2020 14:23:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726085AbgHKSQ2 (ORCPT
+        with ESMTP id S1725873AbgHKSXA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Aug 2020 14:16:28 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 244A6C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:16:28 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 2so2270013pjx.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:16:28 -0700 (PDT)
+        Tue, 11 Aug 2020 14:23:00 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81528C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:23:00 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id t10so9776122ejs.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 11:23:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=ZuY+8ttpOiBKxERHjcGAwCRhPfgHFomYRLZ89jgaUJI=;
-        b=pGYOIwguiT71kLJwMKFDadxrolB7t7l/kGTIK2b4yFSdlxPgvkMgjf9/DiaFgmR1vT
-         KakZFS77e/12pW8u564C9n+GHBN739eYceqxijFGEOJMtZJIYADja5N60VK3Um+oXsnD
-         Om4fh393zfvyGHRrn0jHco6XC648XCw2GDFDCUV5YDNpPDdKvG0d/UmOu+1LInYe9d/I
-         yJyJkin+1tmKTngljqfNlGT0xVNjSIbMcJ7Thi2p9NpuVnXSM9aD6TQ7zC7pJ0TmN4IX
-         shHiR8yfl6rK0ecSN6zG9dhakEkpQ1ZW9roiral2lDG2UvBA7s59aOiDvywuIJ4ymK1T
-         7P4w==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=80MqzdbmpekdCOXsCwtPy9E0KJ1f3RCz3JzvHIOL3oY=;
+        b=Qov1Ikofkd7DoHpiXC5igXurZ5v0Fvtjl+PLkSmwodk8fciUbwQimTCfxTm/zSRUOY
+         WD4Q2JekSdtbDP0bZ4qoYU1kcFF6focFzeOcL2e3WLdEGHR9MKVJJKlrrTtPQqjhOw0r
+         I+pMLZoCKCCkCOzUuxdAi1Sxch5YKtVeowhCrpJkNI+JlLqMHYZFERed+5kZdH7MA3CH
+         EH1meiLs3l7uuMJs2pNbeuPQtDqzXNuHqW9QrPJZtBHoCjOlOfjb8WIquyqkyH6E9VJd
+         cdvhZp6UdMemlkMwrvxKs94e7VHwjZGjetznnYtjedCYvlXodfuxWoYuevAsfndovGlq
+         nPxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ZuY+8ttpOiBKxERHjcGAwCRhPfgHFomYRLZ89jgaUJI=;
-        b=MW2LIUPodYv7IefrBjWKm5T9d+5Ob9gXRHJ4PmEnJvAO6q0CL+o6i6VyH7xX2VywHx
-         3zArB370RObge9pV2jOxO/KT0+gRmgMbDPOOho15vhk5oS9UhFKjzpxhk1pNeiJ2tJuf
-         konBGUA0ENMsYl692PAXEP5mrklGBVrOwgcFjRYH76WOKnhHmQy4dhWFFtpvjWjnERwq
-         eP6o68q1uniqteNFvfFVQCOPWlG6cxBSVR1VIRg+gr84XQTxyUOx3T2MJLtecZOq0whB
-         RHnxcxTLyQ5lAFdZVcPZGPuvIZnfcC6okv1vu3l5BaCF5LAiuRu7OtpmKJOkH5eTWhsl
-         7Pvg==
-X-Gm-Message-State: AOAM530CHBVJo7H0/MZzIFXLX72oiE2klP4LlR4nOti2NaTLsSncG+fj
-        oQJKlqVkbxAzL6Njz6XF3Tq8x7Ae
-X-Google-Smtp-Source: ABdhPJwZUTeF7RhbZyEQi55oHMef1OMcXh6lE6+MVhSd+UJJAE3rCM6nG0g9VqUusf0ybJjWj6926A==
-X-Received: by 2002:a17:90b:1116:: with SMTP id gi22mr2383393pjb.209.1597169786957;
-        Tue, 11 Aug 2020 11:16:26 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b22sm27011519pfb.213.2020.08.11.11.16.25
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Aug 2020 11:16:25 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH SBC 3/3] sbc/sbc_primitives_sse: Optimize sbc_analyze_8s
-Date:   Tue, 11 Aug 2020 11:16:23 -0700
-Message-Id: <20200811181623.3683374-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200811181623.3683374-1-luiz.dentz@gmail.com>
-References: <20200811181623.3683374-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=80MqzdbmpekdCOXsCwtPy9E0KJ1f3RCz3JzvHIOL3oY=;
+        b=rIEdXzn7uWr7ECLLTLRtmg1WSSxUeJVrnwmKMjHysHLk85DfTFSIYGqOOCg+mERxhr
+         wH2I3WFth7iwDLtRETvf+toiOvz+fqdIz04aq9R3jtYIHahw5IGQ58dMQGMsikfeAn82
+         FdJo5WNmoblhDr8Ferdh9xqC5ERVDp2N5La9s/Evu3dJjvVRWuxQ2wIKSC4X2ESzJIVy
+         t6SMICG/dpgTz7XY9lDv3JIVpoCMgvRnC4/hGMDQg0wL+P8EQlxj+ou2VflIWXBVxSas
+         LsxKgWgMpqniU2vwPOh0ctY/0ZkTr3OKbVIhwkehpbFdUgRRTkuX2jFTTY9090zYNQnt
+         TlWA==
+X-Gm-Message-State: AOAM5337xboVfOzDSfH8nO+7UR8QkAkp5Wc+2WNQNhZbW/g6B6ebXo89
+        OrsM9fWE0B47yk8I9LLGSVv48qwtz/CALdETwjKwbYwzNSs=
+X-Google-Smtp-Source: ABdhPJz7gfcfvfKo7suWvZgVOZYBNf4mG71TTgwLfhwgWewfIVZTES92hBbalSac1fPK52XAEgPevutKUKCZ5VHIbQw=
+X-Received: by 2002:a17:906:e093:: with SMTP id gh19mr11531736ejb.210.1597170177637;
+ Tue, 11 Aug 2020 11:22:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200803235811.2441774-1-yudiliu@google.com> <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+In-Reply-To: <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+From:   Yu Liu <yudiliu@google.com>
+Date:   Tue, 11 Aug 2020 11:22:21 -0700
+Message-ID: <CAHC-ybxKkrDzvtyj3ksyeh4zMuoCGeCOoRodLHi1ADLBYL1efQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 1/1] adapter - D-Bus API for querying the adapter's capability
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Friendly ping for comments, thanks.
 
-This makes use 128 bit XMM registers whenever possible.
 
-$ time src/sbcenc_mmx -s 8 sin_64m.au > /dev/null
-real    0m1.064s
-user    0m1.012s
-sys     0m0.049s
-
-===  After ====
-
-$ time src/sbcenc -s 8 sin_64m.au > /dev/null
-real    0m1.032s
-user    0m0.996s
-sys     0m0.033s
----
- sbc/sbc_primitives_sse.c | 109 ++++++++++++++++-----------------------
- 1 file changed, 44 insertions(+), 65 deletions(-)
-
-diff --git a/sbc/sbc_primitives_sse.c b/sbc/sbc_primitives_sse.c
-index 6471bd5..6f8eb49 100644
---- a/sbc/sbc_primitives_sse.c
-+++ b/sbc/sbc_primitives_sse.c
-@@ -96,80 +96,59 @@ static inline void sbc_analyze_four_sse(const int16_t *in, int32_t *out,
- static inline void sbc_analyze_eight_sse(const int16_t *in, int32_t *out,
- 							const FIXED_T *consts)
- {
--	static const SBC_ALIGNED int32_t round_c[2] = {
-+	static const SBC_ALIGNED int32_t round_c[4] = {
-+		1 << (SBC_PROTO_FIXED8_SCALE - 1),
-+		1 << (SBC_PROTO_FIXED8_SCALE - 1),
- 		1 << (SBC_PROTO_FIXED8_SCALE - 1),
- 		1 << (SBC_PROTO_FIXED8_SCALE - 1),
- 	};
- 	__asm__ volatile (
--		"movq        (%0), %%mm0\n"
--		"movq       8(%0), %%mm1\n"
--		"movq      16(%0), %%mm2\n"
--		"movq      24(%0), %%mm3\n"
--		"pmaddwd     (%1), %%mm0\n"
--		"pmaddwd    8(%1), %%mm1\n"
--		"pmaddwd   16(%1), %%mm2\n"
--		"pmaddwd   24(%1), %%mm3\n"
--		"paddd       (%2), %%mm0\n"
--		"paddd       (%2), %%mm1\n"
--		"paddd       (%2), %%mm2\n"
--		"paddd       (%2), %%mm3\n"
-+		"movdqu      (%0), %%xmm0\n"
-+		"movdqu    16(%0), %%xmm1\n"
-+		"pmaddwd     (%1), %%xmm0\n"
-+		"pmaddwd   16(%1), %%xmm1\n"
-+		"paddd       (%2), %%xmm0\n"
-+		"paddd       (%2), %%xmm1\n"
- 		"\n"
--		"movq      32(%0), %%mm4\n"
--		"movq      40(%0), %%mm5\n"
--		"movq      48(%0), %%mm6\n"
--		"movq      56(%0), %%mm7\n"
--		"pmaddwd   32(%1), %%mm4\n"
--		"pmaddwd   40(%1), %%mm5\n"
--		"pmaddwd   48(%1), %%mm6\n"
--		"pmaddwd   56(%1), %%mm7\n"
--		"paddd      %%mm4, %%mm0\n"
--		"paddd      %%mm5, %%mm1\n"
--		"paddd      %%mm6, %%mm2\n"
--		"paddd      %%mm7, %%mm3\n"
-+		"movdqu    32(%0), %%xmm2\n"
-+		"movdqu    48(%0), %%xmm3\n"
-+		"pmaddwd   32(%1), %%xmm2\n"
-+		"pmaddwd   48(%1), %%xmm3\n"
-+		"paddd     %%xmm2, %%xmm0\n"
-+		"paddd     %%xmm3, %%xmm1\n"
- 		"\n"
--		"movq      64(%0), %%mm4\n"
--		"movq      72(%0), %%mm5\n"
--		"movq      80(%0), %%mm6\n"
--		"movq      88(%0), %%mm7\n"
--		"pmaddwd   64(%1), %%mm4\n"
--		"pmaddwd   72(%1), %%mm5\n"
--		"pmaddwd   80(%1), %%mm6\n"
--		"pmaddwd   88(%1), %%mm7\n"
--		"paddd      %%mm4, %%mm0\n"
--		"paddd      %%mm5, %%mm1\n"
--		"paddd      %%mm6, %%mm2\n"
--		"paddd      %%mm7, %%mm3\n"
-+		"movdqu    64(%0), %%xmm2\n"
-+		"movdqu    80(%0), %%xmm3\n"
-+		"pmaddwd   64(%1), %%xmm2\n"
-+		"pmaddwd   80(%1), %%xmm3\n"
-+		"paddd     %%xmm2, %%xmm0\n"
-+		"paddd     %%xmm3, %%xmm1\n"
- 		"\n"
--		"movq      96(%0), %%mm4\n"
--		"movq     104(%0), %%mm5\n"
--		"movq     112(%0), %%mm6\n"
--		"movq     120(%0), %%mm7\n"
--		"pmaddwd   96(%1), %%mm4\n"
--		"pmaddwd  104(%1), %%mm5\n"
--		"pmaddwd  112(%1), %%mm6\n"
--		"pmaddwd  120(%1), %%mm7\n"
--		"paddd      %%mm4, %%mm0\n"
--		"paddd      %%mm5, %%mm1\n"
--		"paddd      %%mm6, %%mm2\n"
--		"paddd      %%mm7, %%mm3\n"
-+		"movdqu    96(%0), %%xmm2\n"
-+		"movdqu   112(%0), %%xmm3\n"
-+		"pmaddwd   96(%1), %%xmm2\n"
-+		"pmaddwd  112(%1), %%xmm3\n"
-+		"paddd     %%xmm2, %%xmm0\n"
-+		"paddd     %%xmm3, %%xmm1\n"
- 		"\n"
--		"movq     128(%0), %%mm4\n"
--		"movq     136(%0), %%mm5\n"
--		"movq     144(%0), %%mm6\n"
--		"movq     152(%0), %%mm7\n"
--		"pmaddwd  128(%1), %%mm4\n"
--		"pmaddwd  136(%1), %%mm5\n"
--		"pmaddwd  144(%1), %%mm6\n"
--		"pmaddwd  152(%1), %%mm7\n"
--		"paddd      %%mm4, %%mm0\n"
--		"paddd      %%mm5, %%mm1\n"
--		"paddd      %%mm6, %%mm2\n"
--		"paddd      %%mm7, %%mm3\n"
-+		"movdqu    128(%0), %%xmm2\n"
-+		"movdqu    144(%0), %%xmm3\n"
-+		"pmaddwd   128(%1), %%xmm2\n"
-+		"pmaddwd   144(%1), %%xmm3\n"
-+		"paddd      %%xmm2, %%xmm0\n"
-+		"paddd      %%xmm3, %%xmm1\n"
-+		"\n"
-+		"psrad         %4, %%xmm0\n"
-+		"psrad         %4, %%xmm1\n"
- 		"\n"
--		"psrad         %4, %%mm0\n"
--		"psrad         %4, %%mm1\n"
--		"psrad         %4, %%mm2\n"
--		"psrad         %4, %%mm3\n"
-+		"movdqa     %%xmm0, %%xmm2\n"
-+		"movdqa     %%xmm1, %%xmm3\n"
-+		"punpckhqdq %%xmm2, %%xmm2\n"
-+		"punpckhqdq %%xmm3, %%xmm3\n"
-+		"movdq2q    %%xmm0, %%mm0\n"
-+		"movdq2q    %%xmm2, %%mm1\n"
-+		"movdq2q    %%xmm1, %%mm2\n"
-+		"movdq2q    %%xmm3, %%mm3\n"
- 		"\n"
- 		"packssdw   %%mm0, %%mm0\n"
- 		"packssdw   %%mm1, %%mm1\n"
--- 
-2.26.2
-
+On Mon, Aug 3, 2020 at 4:58 PM Yu Liu <yudiliu@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> Initially this is introduced to query whether WBS is supported by the adapter,
+> the API is generic enough to be extended to support querying others in
+> the future.
+>
+> Reviewed-by: sonnysasaka@chromium.org
+>
+> ---
+>
+> Changes in v1:
+> - Initial change
+>
+>  doc/adapter-api.txt | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index 1a7255750..250d0e9b3 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -204,6 +204,23 @@ Methods            void StartDiscovery()
+>                                          org.bluez.Error.NotReady
+>                                          org.bluez.Error.Failed
+>
+> +               dict GetSupportedCapabilities()
+> +
+> +                       This method returns a dictionary of supported
+> +                       capabilities that is populated when the adapter
+> +                       initiated.
+> +
+> +                       The dictionary is following the format
+> +                       {capability : value}, where:
+> +
+> +                       string capability:      The supported capability under
+> +                                               discussion.
+> +                       variant value:          A more detailed description of
+> +                                               the capability.
+> +
+> +                       Possible errors: org.bluez.Error.NotReady
+> +                                        org.bluez.Error.Failed
+> +
+>  Properties     string Address [readonly]
+>
+>                         The Bluetooth device address.
+> --
+> 2.28.0.163.g6104cc2f0b6-goog
+>
