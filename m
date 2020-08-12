@@ -1,114 +1,159 @@
-Return-Path: <SRS0=5Aiy=BV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=iWKJ=BW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AC6C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 20:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E58AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 04:21:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C40F720786
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Aug 2020 20:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6A76206C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 04:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="NHodcNmi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c64mJIYE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbgHKUGP (ORCPT
+        id S1726035AbgHLEVO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Aug 2020 16:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
+        Wed, 12 Aug 2020 00:21:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726700AbgHKUGN (ORCPT
+        with ESMTP id S1725944AbgHLEVO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Aug 2020 16:06:13 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B078DC06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 13:06:12 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id 140so7351422lfi.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 13:06:12 -0700 (PDT)
+        Wed, 12 Aug 2020 00:21:14 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC828C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 21:21:13 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id q19so785542qtp.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Aug 2020 21:21:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UDIw5818LlvGzqFPAaCDNYzmCD84cqoJl5mgh1begB4=;
-        b=NHodcNmiZDOWn+ObWKGqBMNxRMC90r+5TaIFqA966ywcoZVn7PbkYmFG0YtmPyNodx
-         tVCTbK7YQ6CWUEuk+2LHwJPSHqQMZqWOPrpe+LVpslQSFQBRB/3iiR8LTlocNJ0gKbyp
-         S5Try9e4XH3cif4jf8l8XtyEDPE0FFX7EyM8SiifKUFb+kQH/uwcM27GaTLtpURo3MbF
-         w9usw26ONyzlMoyF9M9tnxan8kL5vEb5qONkRV2KYYJ3XPfHHExUR+zoptoJG+UlfHC/
-         8sr5VK2a03CMTuXAjlRRJFjeGcMzco5fY0D3Q8tWYu+Ge8TqYk1+kaul8Xz63s3/T3u+
-         G/wA==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=+D4+SojV3Y/sxfWJh2lOz+64TmUygXb7unMVRm5nVlg=;
+        b=c64mJIYEdJS1vHCGKh56UAFMxMmAInNMzJQy6xeVJP1jnnG+ZcIgxRgocKAX5ia6cp
+         4yMd5nRQFOO5g89miBJz6K2FpthVzGgYiZNhqiakXmW8S4+YinzG7hlAE41vRzQ58bbm
+         05eKUcNvALyZbbk7bbluQbBMcIhzYmNTPPzEgSPSkqBC9NyrItphHDKq8gdONP1qWQMp
+         T9nvx98/m5fOkMW3N5cF8iaOZAXF5gUdLEKoTwCXW/EmDdP1WBBARDsPZ/OwovhF0yxr
+         uN2k4/eEZgmMqLDtnV89hEJJuyGWMrHs3m2D0uA/2wtpxm6YqZOMBGC2LuHxhtWK9Gky
+         4/AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UDIw5818LlvGzqFPAaCDNYzmCD84cqoJl5mgh1begB4=;
-        b=DH92VFnaZJgsE46sxY9lB12ODOzhbZz3Xx4aB6Hh8vwP1R4yBWjhOsI6XQ6QQyl8nH
-         vwxzMr4vQOc+sEW3qIXPTRiPvRxUdlVsmD92EcpcQLvpxf+7kYapnrnc+955bSsWegtB
-         ffsiHdtOx6DttcO5uF2JMD1Z3rkGxOzI6O9/EdnRFJqepXQdOz7iIoI/GTLKB+33YVQt
-         n3qy2Ow9/9J3y0wz1mBsvuYZUMawYZznirdaCtI9Q0aKYZGQcOZ8RcV7nBJ2zkTMXAeZ
-         ToCOcgPUwgdP3dtYLqCt15a0fPbZdFso4iWQ6ubGh9qESjeSWeaZj7qUsmounFnss+Zc
-         83Lw==
-X-Gm-Message-State: AOAM533zgY7dfIkKKYMmMZdKaewhftn35aPd7iywOLJmdtYQBCh/v7hl
-        lRxW1zck3Rmnm6HkTRCttiIgK2ehR7EAqg==
-X-Google-Smtp-Source: ABdhPJxYIz6/B5heg55WcK2Y9HbB70V1JSyfK9zpDj7UI/Dm2fuONjE2JmuW4tQdP09XEG5xHKAL9Q==
-X-Received: by 2002:a19:c206:: with SMTP id l6mr3909340lfc.152.1597176370819;
-        Tue, 11 Aug 2020 13:06:10 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id 132sm11902805lfo.16.2020.08.11.13.06.09
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Aug 2020 13:06:10 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix lookup of non-vendor models in node config
-Date:   Tue, 11 Aug 2020 22:07:12 +0200
-Message-Id: <20200811200712.21083-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=+D4+SojV3Y/sxfWJh2lOz+64TmUygXb7unMVRm5nVlg=;
+        b=ofLSSXjYMRzEImFK5GdBtOJixCUbcn8v6c+DG7o2Fi09dE09NZmEkV4TSO4CwUH2K4
+         MDiDDOZ90f3eGy36MpC9SX7LlNyQuFUXC/d820OmIz1vo2pBFIfVOcGdYnfGvX/9IjLC
+         TLWv9AaenM3cFR4cx4j0v7UJWweOnAVkuti3FOYo/GpmdDN25qKp47/l7RfwEYTYKaNE
+         WLnoSLDAqYbPTbii6UW+JyrF7KSqdLV1rLA+tBpuo/A1rbN7Sk7llnbQEuJq36JgsTD7
+         +cj21qam+WhdT9I65VRBejvT5xs4ryZG3YFT4ern/Z2if4Z2yItZT/IvyCSVR47I6cTM
+         i7NQ==
+X-Gm-Message-State: AOAM532uHSugMHXgi0AMdQxtXtk2SV+aC3IhLlGL3WAi/WQlT7ZDe3UO
+        fBggwyFGZ0El9Yrr2HDsTuf3QbPn5il+OjtJowDoG0na6CsEa5fDL77g61YyoP1e1YpTrZMqYcA
+        ft0E31ojxwb6wAnvLUWUGI/628Y34BMXb2GLOK+eHqtIWDYYe0IVjRlonCtyvMVZTqSY57HQCf+
+        qg
+X-Google-Smtp-Source: ABdhPJw0XULDvdLIOteN/Ki85Ly6P10QFgsxdTVoKyCUAzaA3gGP0W7kMlPaV7w9+BOnPdSZ7KrYwcrZsPXw
+X-Received: by 2002:ad4:462f:: with SMTP id x15mr4837625qvv.180.1597206072767;
+ Tue, 11 Aug 2020 21:21:12 -0700 (PDT)
+Date:   Wed, 12 Aug 2020 12:20:52 +0800
+Message-Id: <20200812121946.Bluez.v1.1.I254123a1c85e8cb22739cbbb1ffa2f56ac41faa8@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
+Subject: [Bluez PATCH v1] input: Don't browse SDP if HIDSDPDisable is set
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In commit 81a0868b082c ("mesh: Move model functionality out of node.c
-to model.c"), we changed the way we handle model ids, resulting
-in vendor mask not being stripped from model id before update_bindings()
-calls mesh_config_model_binding_*().
+From: Archie Pusaka <apusaka@chromium.org>
 
-This resulted in get_element_model not finding the model.
+According to the HID1.1 spec, part 5.3.4.9:
+The HIDSDPDisable attribute is a Boolean value, which indicates
+whether connection to the SDP channel and Control or Interrupt
+channels are mutually exclusive. This feature supports Bluetooth
+HID devices that have minimal resources, and multiplex those
+resources between servicing the initialization (SDP) and runtime
+(Control and Interrupt) channels.
+
+However, Bluez still tries to connect SDP upon HID connection,
+regardless of the existence of the HIDSDPDisable attribute.
+
+This patch prevents the connection of SDP after HID has been
+established, if the device has HIDSDPDisable attribute.
+
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
- mesh/mesh-config-json.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index ae1099fcb..ce8dd5cde 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -170,11 +170,6 @@ static json_object *get_element_model(json_object *jnode, int ele_idx,
- 	size_t len;
- 	char buf[9];
+ profiles/input/device.c | 2 ++
+ src/device.c            | 8 +++++++-
+ src/device.h            | 1 +
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 6ec0a4c63..fac8c6896 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -1373,6 +1373,8 @@ static struct input_device *input_device_new(struct btd_service *service)
+ 	/* Initialize device properties */
+ 	extract_hid_props(idev, rec);
  
--	if (!vendor)
--		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
--	else
--		snprintf(buf, 9, "%8.8x", mod_id);
--
- 	if (!json_object_object_get_ex(jnode, "elements", &jelements))
- 		return NULL;
++	device_set_skip_passive_sdp_discovery(device, idev->disable_sdp);
++
+ 	return idev;
+ }
  
-@@ -190,7 +185,7 @@ static json_object *get_element_model(json_object *jnode, int ele_idx,
- 		return NULL;
+diff --git a/src/device.c b/src/device.c
+index 2237a7670..a67787a2d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -195,6 +195,7 @@ struct btd_device {
+ 	bool		le;
+ 	bool		pending_paired;		/* "Paired" waiting for SDP */
+ 	bool		svc_refreshed;
++	bool		skip_passive_sdp_discovery;
  
- 	if (!vendor) {
--		snprintf(buf, 5, "%4.4x", mod_id);
-+		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
- 		len = 4;
+ 	/* Manage whether this device can wake the system from suspend.
+ 	 * - wake_support: Requires a profile that supports wake (i.e. HID)
+@@ -1472,6 +1473,10 @@ static gboolean dev_property_wake_allowed_exist(
+ 	return device_get_wake_support(device);
+ }
+ 
++void device_set_skip_passive_sdp_discovery(struct btd_device *dev, bool skip)
++{
++	dev->skip_passive_sdp_discovery = skip;
++}
+ 
+ static gboolean disconnect_all(gpointer user_data)
+ {
+@@ -1805,7 +1810,8 @@ done:
+ 				btd_error_failed(dev->connect, strerror(-err)));
  	} else {
- 		snprintf(buf, 9, "%8.8x", mod_id);
+ 		/* Start passive SDP discovery to update known services */
+-		if (dev->bredr && !dev->svc_refreshed)
++		if (dev->bredr && !dev->svc_refreshed &&
++					!dev->skip_passive_sdp_discovery)
+ 			device_browse_sdp(dev, NULL);
+ 		g_dbus_send_reply(dbus_conn, dev->connect, DBUS_TYPE_INVALID);
+ 	}
+diff --git a/src/device.h b/src/device.h
+index cb8d884e8..5348d2652 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -145,6 +145,7 @@ void device_set_wake_override(struct btd_device *device, bool wake_override);
+ void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
+ 			     guint32 id);
+ void device_set_wake_allowed_complete(struct btd_device *device);
++void device_set_skip_passive_sdp_discovery(struct btd_device *dev, bool skip);
+ 
+ typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
+ 					void *user_data);
 -- 
-2.20.1
+2.28.0.236.gb10cc79966-goog
 
