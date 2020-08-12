@@ -2,102 +2,69 @@ Return-Path: <SRS0=iWKJ=BW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CBFC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE223C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 14:44:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FAC207F7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E0FF20756
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 14:44:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="aa0/V+SI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727885AbgHLMso convert rfc822-to-8bit (ORCPT
+        id S1726611AbgHLOot (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Aug 2020 08:48:44 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59109 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726829AbgHLMso (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Aug 2020 08:48:44 -0400
-Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 50943CECDC;
-        Wed, 12 Aug 2020 14:58:47 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH SBC 1/3] sbc: Add initial code for SSE primitives
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200811181623.3683374-1-luiz.dentz@gmail.com>
-Date:   Wed, 12 Aug 2020 14:48:42 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <93FEE5B2-F495-40C4-9386-E44DF132C49D@holtmann.org>
-References: <20200811181623.3683374-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.1)
+        Wed, 12 Aug 2020 10:44:49 -0400
+Received: from hoster906.com ([192.252.156.27]:49204 "EHLO hoster906.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726434AbgHLOot (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 12 Aug 2020 10:44:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=from
+        :subject:to:message-id:date:mime-version:content-type
+        :content-transfer-encoding; s=dkim; bh=1BGXvAlqAjky12gnZjIc2GpJL
+        aEX4ldCWFrER7CRVyc=; b=aa0/V+SIL1b+ug9XOhNFKxjiedeVBl2lTeV38OYT/
+        7B1fmE5/1nGrklnCayOOXYHlxKeNsfDkxySIk8r28s3Bqqbw3LI+Yi/XyFNl9b2K
+        XERS3e4R/RXyezrH3b3VBa4J5pGA7bwLhffAFphlg4zHfD46v5CDo7hhvEkQxG72
+        P0=
+Received: (qmail 3067 invoked by uid 503); 12 Aug 2020 14:44:48 -0000
+Received: from unknown (HELO ?192.168.254.79?) (mike@mnmoran.org@162.39.210.203)
+  by hoster906.com with ESMTPA; 12 Aug 2020 14:44:48 -0000
+From:   "Michael N. Moran" <mike@mnmoran.org>
+Subject: Single-Segment Segmented Mesh Messages
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-ID: <bc77bb7c-4ae6-aa1c-74d1-dfaceb48900b@mnmoran.org>
+Date:   Wed, 12 Aug 2020 10:44:48 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+I've been trying to wrap my head around the mesh d-bus api as described in "doc/mesh-api.txt". In particular, I'm looking at the org.bluez.mesh.Node1 interface Send() and DevKeySend() operations.
 
-> 
-> ---
-> Makefile.am              |   1 +
-> sbc/sbc_primitives.c     |  20 ++-
-> sbc/sbc_primitives_sse.c | 361 +++++++++++++++++++++++++++++++++++++++
-> sbc/sbc_primitives_sse.h |  38 +++++
-> 4 files changed, 417 insertions(+), 3 deletions(-)
-> create mode 100644 sbc/sbc_primitives_sse.c
-> create mode 100644 sbc/sbc_primitives_sse.h
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 342043d..7ff0c7d 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -14,6 +14,7 @@ sbc_headers = sbc/sbc.h
-> 
-> sbc_sources = sbc/sbc.c sbc/sbc_private.h sbc/sbc_math.h sbc/sbc_tables.h \
-> 		sbc/sbc_primitives.h sbc/sbc_primitives.c \
-> +		sbc/sbc_primitives_sse.h sbc/sbc_primitives_sse.c \
-> 		sbc/sbc_primitives_mmx.h sbc/sbc_primitives_mmx.c \
-> 		sbc/sbc_primitives_iwmmxt.h sbc/sbc_primitives_iwmmxt.c \
-> 		sbc/sbc_primitives_neon.h sbc/sbc_primitives_neon.c \
-> diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-> index ff343cf..97a75be 100644
-> --- a/sbc/sbc_primitives.c
-> +++ b/sbc/sbc_primitives.c
-> @@ -33,6 +33,7 @@
-> #include "sbc_tables.h"
-> 
-> #include "sbc_primitives.h"
-> +#include "sbc_primitives_sse.h"
-> #include "sbc_primitives_mmx.h"
-> #include "sbc_primitives_iwmmxt.h"
-> #include "sbc_primitives_neon.h"
-> @@ -590,6 +591,21 @@ static int sbc_calc_scalefactors_j(
-> 	return joint;
-> }
-> 
-> +static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
-> +{
-> +	__builtin_cpu_init();
-> +
-> +#ifdef SBC_BUILD_WITH_MMX_SUPPORT
-> +	if (__builtin_cpu_supports("mmx"))
-> +		sbc_init_primitives_mmx(state);
-> +#endif
-> +
-> +#ifdef SBC_BUILD_WITH_SSE_SUPPORT
-> +	if (__builtin_cpu_supports("sse4.2"))
-> +		sbc_init_primitives_sse(state);
-> +#endif
+I don't see any way for a client application (Access Layer) to specify that a message that would fit into a single lower transport pdu should be sent as a single-segment message.
 
-lets keep the ifdef in the primitive functions they belong. This should be consistent across all primitives and not spread in two places.
+The motivation for this is to be able to test the reassembly capability of an actual mesh node/device.
 
-Regards
+For example, I would like to add an option to the test/test-mesh application to be able to send on/off messages using a single-segment message (if the destination element address is unicast).
 
-Marcel
+As it is, it appears that the bluetooth-meshd makes the decision on its own based on the length of the upper transport layer pdu.
+
+From the Mesh Profile v1.0 spec:
+
+> 3.5.3.1 Segmentation
+> 
+> [...] If the Upper Transport PDU can fit into a single Lower Transport PDU using a Segmented Message format, then the lower transport layer can use a single segmented message to transmit this Upper Transport PDU.
+> 
+> [...] A single-segment segmented message should be used when delivery of an Upper Transport PDU can be more efficiently transmitted using a segmented message than an unsegmented message.
+> 
+> [...] A single-segment segmented message should be used when delivery of an Upper Transport PDU can be more efficiently transmitted using a segmented message than an unsegmented message.
 
