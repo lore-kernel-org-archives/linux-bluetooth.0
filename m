@@ -2,68 +2,93 @@ Return-Path: <SRS0=iWKJ=BW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E4EC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92743C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:13:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E8EB2080C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 733EC207F7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgHLMLY convert rfc822-to-8bit (ORCPT
+        id S1726871AbgHLMNS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Aug 2020 08:11:24 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:46894 "EHLO
+        Wed, 12 Aug 2020 08:13:18 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36496 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726871AbgHLMLY (ORCPT
+        with ESMTP id S1726722AbgHLMNS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Aug 2020 08:11:24 -0400
+        Wed, 12 Aug 2020 08:13:18 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D023CCECDC;
-        Wed, 12 Aug 2020 14:21:27 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id CD672CECDC;
+        Wed, 12 Aug 2020 14:23:21 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [Bluez PATCH v1] input: Don't browse SDP if HIDSDPDisable is set
+Subject: Re: [RFC PATCH v1 1/1] adapter - D-Bus API for querying the adapter's
+ capability
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200812121946.Bluez.v1.1.I254123a1c85e8cb22739cbbb1ffa2f56ac41faa8@changeid>
-Date:   Wed, 12 Aug 2020 14:11:22 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
+In-Reply-To: <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+Date:   Wed, 12 Aug 2020 14:13:16 +0200
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Archie Pusaka <apusaka@chromium.org>, sonnysasaka@chromium.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <DCC53118-15F0-47E1-9539-9484D32593E9@holtmann.org>
-References: <20200812121946.Bluez.v1.1.I254123a1c85e8cb22739cbbb1ffa2f56ac41faa8@changeid>
-To:     Archie Pusaka <apusaka@google.com>
+Message-Id: <7D5EF527-14F0-42C2-B39B-50B55F01BE74@holtmann.org>
+References: <20200803235811.2441774-1-yudiliu@google.com>
+ <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+To:     Yu Liu <yudiliu@google.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Yu,
 
-> According to the HID1.1 spec, part 5.3.4.9:
-> The HIDSDPDisable attribute is a Boolean value, which indicates
-> whether connection to the SDP channel and Control or Interrupt
-> channels are mutually exclusive. This feature supports Bluetooth
-> HID devices that have minimal resources, and multiplex those
-> resources between servicing the initialization (SDP) and runtime
-> (Control and Interrupt) channels.
+> Initially this is introduced to query whether WBS is supported by the adapter,
+> the API is generic enough to be extended to support querying others in
+> the future.
 > 
-> However, Bluez still tries to connect SDP upon HID connection,
-> regardless of the existence of the HIDSDPDisable attribute.
+> Reviewed-by: sonnysasaka@chromium.org
 > 
-> This patch prevents the connection of SDP after HID has been
-> established, if the device has HIDSDPDisable attribute.
+> ---
+> 
+> Changes in v1:
+> - Initial change
+> 
+> doc/adapter-api.txt | 17 +++++++++++++++++
+> 1 file changed, 17 insertions(+)
+> 
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index 1a7255750..250d0e9b3 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -204,6 +204,23 @@ Methods		void StartDiscovery()
+> 					 org.bluez.Error.NotReady
+> 					 org.bluez.Error.Failed
+> 
+> +		dict GetSupportedCapabilities()
+> +
+> +			This method returns a dictionary of supported
+> +			capabilities that is populated when the adapter
+> +			initiated.
+> +
+> +			The dictionary is following the format
+> +			{capability : value}, where:
+> +
+> +			string capability:	The supported capability under
+> +						discussion.
+> +			variant value:		A more detailed description of
+> +						the capability.
+> +
+> +			Possible errors: org.bluez.Error.NotReady
+> +					 org.bluez.Error.Failed
 
-out of curiosity, is a qualification test failing or do you have devices that really enforce the Disable SDP part of the specification. A long long long time ago (we are talking 15+ years) some HID devices only allowed 2 L2CAP channels to be open at the same time. So the PSM 1 for SDP needed to be closed before opening the second HID data channel.
+can’t this be just an array{string} that lists the capabilities?
 
-If this is failing devices, it would be good to include the btmon trace of failure in the commit message so that we archive this.
+And if we introduce it, then lets introduce it also with the first user of it. Otherwise we end up forgetting to comment on the actual possible capabilities.
 
 Regards
 
