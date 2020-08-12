@@ -6,89 +6,96 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92743C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CBFC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:48:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 733EC207F7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3FAC207F7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 12:48:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726871AbgHLMNS convert rfc822-to-8bit (ORCPT
+        id S1727885AbgHLMso convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Aug 2020 08:13:18 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36496 "EHLO
+        Wed, 12 Aug 2020 08:48:44 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59109 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726722AbgHLMNS (ORCPT
+        with ESMTP id S1726829AbgHLMso (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Aug 2020 08:13:18 -0400
+        Wed, 12 Aug 2020 08:48:44 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CD672CECDC;
-        Wed, 12 Aug 2020 14:23:21 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 50943CECDC;
+        Wed, 12 Aug 2020 14:58:47 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [RFC PATCH v1 1/1] adapter - D-Bus API for querying the adapter's
- capability
+Subject: Re: [PATCH SBC 1/3] sbc: Add initial code for SSE primitives
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
-Date:   Wed, 12 Aug 2020 14:13:16 +0200
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Archie Pusaka <apusaka@chromium.org>, sonnysasaka@chromium.org
+In-Reply-To: <20200811181623.3683374-1-luiz.dentz@gmail.com>
+Date:   Wed, 12 Aug 2020 14:48:42 +0200
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <7D5EF527-14F0-42C2-B39B-50B55F01BE74@holtmann.org>
-References: <20200803235811.2441774-1-yudiliu@google.com>
- <20200803165804.RFC.v1.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
-To:     Yu Liu <yudiliu@google.com>
+Message-Id: <93FEE5B2-F495-40C4-9386-E44DF132C49D@holtmann.org>
+References: <20200811181623.3683374-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yu,
+Hi Luiz,
 
-> Initially this is introduced to query whether WBS is supported by the adapter,
-> the API is generic enough to be extended to support querying others in
-> the future.
-> 
-> Reviewed-by: sonnysasaka@chromium.org
 > 
 > ---
+> Makefile.am              |   1 +
+> sbc/sbc_primitives.c     |  20 ++-
+> sbc/sbc_primitives_sse.c | 361 +++++++++++++++++++++++++++++++++++++++
+> sbc/sbc_primitives_sse.h |  38 +++++
+> 4 files changed, 417 insertions(+), 3 deletions(-)
+> create mode 100644 sbc/sbc_primitives_sse.c
+> create mode 100644 sbc/sbc_primitives_sse.h
 > 
-> Changes in v1:
-> - Initial change
+> diff --git a/Makefile.am b/Makefile.am
+> index 342043d..7ff0c7d 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -14,6 +14,7 @@ sbc_headers = sbc/sbc.h
 > 
-> doc/adapter-api.txt | 17 +++++++++++++++++
-> 1 file changed, 17 insertions(+)
+> sbc_sources = sbc/sbc.c sbc/sbc_private.h sbc/sbc_math.h sbc/sbc_tables.h \
+> 		sbc/sbc_primitives.h sbc/sbc_primitives.c \
+> +		sbc/sbc_primitives_sse.h sbc/sbc_primitives_sse.c \
+> 		sbc/sbc_primitives_mmx.h sbc/sbc_primitives_mmx.c \
+> 		sbc/sbc_primitives_iwmmxt.h sbc/sbc_primitives_iwmmxt.c \
+> 		sbc/sbc_primitives_neon.h sbc/sbc_primitives_neon.c \
+> diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+> index ff343cf..97a75be 100644
+> --- a/sbc/sbc_primitives.c
+> +++ b/sbc/sbc_primitives.c
+> @@ -33,6 +33,7 @@
+> #include "sbc_tables.h"
 > 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 1a7255750..250d0e9b3 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -204,6 +204,23 @@ Methods		void StartDiscovery()
-> 					 org.bluez.Error.NotReady
-> 					 org.bluez.Error.Failed
+> #include "sbc_primitives.h"
+> +#include "sbc_primitives_sse.h"
+> #include "sbc_primitives_mmx.h"
+> #include "sbc_primitives_iwmmxt.h"
+> #include "sbc_primitives_neon.h"
+> @@ -590,6 +591,21 @@ static int sbc_calc_scalefactors_j(
+> 	return joint;
+> }
 > 
-> +		dict GetSupportedCapabilities()
+> +static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
+> +{
+> +	__builtin_cpu_init();
 > +
-> +			This method returns a dictionary of supported
-> +			capabilities that is populated when the adapter
-> +			initiated.
+> +#ifdef SBC_BUILD_WITH_MMX_SUPPORT
+> +	if (__builtin_cpu_supports("mmx"))
+> +		sbc_init_primitives_mmx(state);
+> +#endif
 > +
-> +			The dictionary is following the format
-> +			{capability : value}, where:
-> +
-> +			string capability:	The supported capability under
-> +						discussion.
-> +			variant value:		A more detailed description of
-> +						the capability.
-> +
-> +			Possible errors: org.bluez.Error.NotReady
-> +					 org.bluez.Error.Failed
+> +#ifdef SBC_BUILD_WITH_SSE_SUPPORT
+> +	if (__builtin_cpu_supports("sse4.2"))
+> +		sbc_init_primitives_sse(state);
+> +#endif
 
-can’t this be just an array{string} that lists the capabilities?
-
-And if we introduce it, then lets introduce it also with the first user of it. Otherwise we end up forgetting to comment on the actual possible capabilities.
+lets keep the ifdef in the primitive functions they belong. This should be consistent across all primitives and not spread in two places.
 
 Regards
 
