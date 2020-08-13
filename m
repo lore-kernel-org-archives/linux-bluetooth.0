@@ -1,133 +1,90 @@
-Return-Path: <SRS0=iWKJ=BW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=cSIk=BX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 750A1C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 21:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DADC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Aug 2020 00:28:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E85C20774
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Aug 2020 21:24:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B66D2087C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Aug 2020 00:28:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSH3b4Fs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QZCYdxvW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgHLVYn (ORCPT
+        id S1726533AbgHMA2d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Aug 2020 17:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53878 "EHLO
+        Wed, 12 Aug 2020 20:28:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbgHLVYn (ORCPT
+        with ESMTP id S1726518AbgHMA2d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Aug 2020 17:24:43 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFC62C061383
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2020 14:24:42 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id b14so3465205qkn.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2020 14:24:42 -0700 (PDT)
+        Wed, 12 Aug 2020 20:28:33 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9C8C061383
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2020 17:28:33 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id x25so1908509pff.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Aug 2020 17:28:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=oSv9lNjLIcC+dSOR04T0KHy3KMdDW83IZKCS+JX1+YQ=;
-        b=GSH3b4FsClaIQFZjp5TZkpSdI0sWWok33kV84CPaMyGVsG43bYSD+YwjeEnSr6ersQ
-         zalSPLBtKNKBi/xYbdekj9pSCLn4WJpS4+QR5xocb6B9ypNFTklnwcO1MqHV7iOrgSFN
-         b1AVWdWDm8ZmMViHbzHqu0dRxE+ABf86pdt4COz43y6SwhkGtKA4CNQNr8jWn19bRgqW
-         NTWU0JDnonbrPybyPY4yV5fF2qkZAEUKbz+wEfDXNl6UlJ7ebZQpI+ARWJ6Zvds2TjRg
-         jBJlHOGwpWw4HJ9xtwgEyZsvTlvvOCCWvSjqc6AzXoTsES5Xuo3uPt0KVerMintLzMHh
-         3f7Q==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t2jktOp3oLFCxWLPdRedZQlig2hKxvQwaPspKdm/eDI=;
+        b=QZCYdxvWssD+hStyvbPSHpls7j9anvadJrrp94CoajB6/De6t8zv5/n2iSfqbId1lG
+         Kd2qLuUFuYFQgPOxkVdQqH0nCcnrqiuO1XAhYw3VGCqICMKA6Id0wO4iLkmVJNXLNBEd
+         uh5CFAjalU37XFpaDjC2V6m8go5+BgPap/Vq8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=oSv9lNjLIcC+dSOR04T0KHy3KMdDW83IZKCS+JX1+YQ=;
-        b=FY49TmwfN7yXanrgWyspyG80s8YdP5ZxRvkqZHa4y/RfHSLTCZbUjI4hADGGfExu7K
-         aDRg5ATToifb/nbgjuGbc940sA4QyKS8e+g1c1gPV5/THXxV48RGeKRdwEWdNBqTB22x
-         s/w9Rh8B/7vNv/1tgjXqPQTx3/zOS3vcEQXy4TuYoqpRpmfkS4PsvBnK7bBafvjJ7HWK
-         ZB9Qj1AqJtFChfBFkAEKimNpR+UhjFERwnG59fNLeQmISBElS3mkPK7LVrww6XPhyCYR
-         pSzw6xg6g+mN+GB0ppF5c+CSEoQZ812t+1P7zu0Tfuy++ryfIYsVEyOycnSZVY2heRPm
-         3oXQ==
-X-Gm-Message-State: AOAM531dtVJh0IT28kvv2XIyGROh6cNYa2LjB8HqnvHJ1ybo+J2Fl0GO
-        bLn/8WYJvJqmgJOhmSQujdeZR0RKkQs=
-X-Google-Smtp-Source: ABdhPJxiouZnj3zR+EALTDOvyHkBJY/9tnu4FYQGgffoNdssHUeAC3ABJIUrIrP88TYtKAdHFApGWA==
-X-Received: by 2002:a05:620a:13c9:: with SMTP id g9mr1921845qkl.436.1597267481847;
-        Wed, 12 Aug 2020 14:24:41 -0700 (PDT)
-Received: from [172.17.0.2] ([52.247.8.108])
-        by smtp.gmail.com with ESMTPSA id o25sm3311884qkm.42.2020.08.12.14.24.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Aug 2020 14:24:41 -0700 (PDT)
-Message-ID: <5f345e19.1c69fb81.cce10.d6f2@mx.google.com>
-Date:   Wed, 12 Aug 2020 14:24:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7821008023768021923=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t2jktOp3oLFCxWLPdRedZQlig2hKxvQwaPspKdm/eDI=;
+        b=OSfMCcUsD7DoRC0TH5H98oLvhTG2qb7FWumjKCnPU3Pa3omcDulQbpasJ3+81OAaL0
+         rZgCcsEkuSMxtQFT8Zz3S9uRXvlfq3Mnf8EY+woXryDC6wfZQjKvAPHBteZmEyopmxV0
+         LScCj+3sTNeufJs9AOc62kQTTR56tRAreCkNtdzpjRwOu7puPPDsLt/70Q3OCgrG1OxF
+         No+q6Yzy9Gx8JMnD6nsHHAMJ/Sk1rB8bLByOkmhsu/ljHCpYKRMQF1JN95kmAwdNoFN6
+         albjjNCE+fckm32D/m5Ki0yw+lShmm5QHImYLmU/EmzIPOBErjps3wi7pvPhlYO4Of+K
+         VJ/w==
+X-Gm-Message-State: AOAM530yyhB9K2wp1/JbfleG4lDL6Rz26WTqRlgmqQadL5SxZ6CS1keY
+        dnBYf2i6SSA4F+b2Ho29Jeg4BdAHzkQ=
+X-Google-Smtp-Source: ABdhPJwMevQWaXfbcSLDsUqIf/TKNnhc2aV13KJyh/H4+c213T2lKCGb/Xn2EABJMb2/f1je61znmg==
+X-Received: by 2002:a63:af01:: with SMTP id w1mr1546730pge.23.1597278511728;
+        Wed, 12 Aug 2020 17:28:31 -0700 (PDT)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
+        by smtp.gmail.com with ESMTPSA id 2sm3945626pfv.27.2020.08.12.17.28.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Aug 2020 17:28:30 -0700 (PDT)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] checkpatch: Ignore SPDX license tag
+Date:   Wed, 12 Aug 2020 17:28:19 -0700
+Message-Id: <20200813002819.359374-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: [V2,2/3] tools/btpclientctl: Add btpclient test application
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200812204932.25627-2-tedd.an@linux.intel.com>
-References: <20200812204932.25627-2-tedd.an@linux.intel.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7821008023768021923==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkpatch Failed
-
-Outputs:
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#49: FILE: tools/btpclientctl.c:1:
-+/*
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#67: FILE: tools/btpclientctl.c:19:
-+ *  along with this program; if not, write to the Free Software$
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#68: FILE: tools/btpclientctl.c:20:
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA$
-
-WARNING:TYPO_SPELLING: 'arguement' may be misspelled - perhaps 'argument'?
-#215: FILE: tools/btpclientctl.c:167:
-+	bt_shell_printf("Invalid arguement %s\n", argv[1]);
-
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#2124: FILE: tools/btpclientctl.c:2076:
-+static const char *help[] = {
-
-- total: 2 errors, 3 warnings, 2175 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
+BlueZ does not use SPDX license tag on file headers.
 
 ---
-Regards,
-Linux Bluetooth
+ .checkpatch.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
---===============7821008023768021923==--
+diff --git a/.checkpatch.conf b/.checkpatch.conf
+index 419733832..72c3529c3 100644
+--- a/.checkpatch.conf
++++ b/.checkpatch.conf
+@@ -12,3 +12,4 @@
+ --ignore PREFER_PACKED
+ --ignore COMMIT_MESSAGE
+ --ignore SSCANF_TO_KSTRTO
++--ignore SPDX_LICENSE_TAG
+-- 
+2.26.2
+
