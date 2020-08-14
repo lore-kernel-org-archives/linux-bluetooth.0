@@ -5,63 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8195C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0716AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:09:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E50620768
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0F762078D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:09:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="In8sZKHd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cxr1uYhk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726897AbgHNTEP (ORCPT
+        id S1727920AbgHNTJQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 15:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52324 "EHLO
+        Fri, 14 Aug 2020 15:09:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726593AbgHNTEO (ORCPT
+        with ESMTP id S1726196AbgHNTJP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 15:04:14 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23718C061385
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:04:14 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id i92so5967847pje.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:04:14 -0700 (PDT)
+        Fri, 14 Aug 2020 15:09:15 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC54C061385
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:09:15 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id u20so5016648pfn.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:09:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=Sym/AmXhI2hFDD6PNhYTvYIW04BDHmyuqhnUhFDB198=;
-        b=In8sZKHdSEbhLPcwRUfe7iXD7g6GuOB752EKkJMSV9iP16ltG3sgfA9O+Yaof7JYU0
-         yIsj305aKFhCEDRAxvT62nvMk3XlW7dr13kW4pGUOmCWjUs1JoeEDpbefG5xA4XNpmlF
-         97ez5sKMlF9hA/7UR2rKBmR+zGpcmRmkXBiz0=
+        bh=dPKm4oa2dN1Vf5/ovK5Iqwbq1EaqjYUe9CdiX1HO9dI=;
+        b=cxr1uYhkmPFKReP0IqFfPTtHZbZEpvhzHU+z/er4B/I/bSmzdLha1Td+kiyGooZC6q
+         EkJX55wRwyRMIvyOC+DgGtgVqZ70BDD69OvHTGX2npQlkn+T0BGUZD1cPoUd++31gN/q
+         l/IDLVXuDEQsg9VN4PxqQ/56fCpN+AWGBBQ+w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=Sym/AmXhI2hFDD6PNhYTvYIW04BDHmyuqhnUhFDB198=;
-        b=Bzj9Yp6s7EzhKR2tahTb9MOv7++18UlcQQxj8TaT4PO+opwhmGvyfhqxTND6at3g7y
-         t5TvNYVgQ5xhojqZXy/kzRXTytBE0oLceXDUk0slEwYsTAOnTPP/lv2L5TRFuSut+WEL
-         vfrLYi7ZrhQXB6aCdwNWnGXtMmwzNeOgJYbftIcQb9xRCzE+AFnD63XZv9XlDtI23o4c
-         XZ1fWvvYoo69cevjWNJHWse8eXHt0T1QWuS43pIdoWzZ+Hh4zsT0TZDn7UIY+tGkk/yj
-         ay/d8Gqprm4BjJXPE7ZjyRJwSkiafnoxg7reS2XjZpVgNHelPUdFjFwktufRHDtBkxxU
-         mioQ==
-X-Gm-Message-State: AOAM531LRqF2EQojYkBC/i3lHFwOqWBmpc7uqQYpJDTnKu6RXUdPYlO8
-        /gXgtbes47GOSvHoOuPjQ4tG9FJa4RKggw==
-X-Google-Smtp-Source: ABdhPJwMK/6lUhSpFQ4BPd/LzqydFyN1Vx3qtTOaHsE0hZwfzmqu7dffcBqXlPfC/RZcHSUr/Azigw==
-X-Received: by 2002:a17:90a:216a:: with SMTP id a97mr3353255pje.144.1597431853192;
-        Fri, 14 Aug 2020 12:04:13 -0700 (PDT)
+        bh=dPKm4oa2dN1Vf5/ovK5Iqwbq1EaqjYUe9CdiX1HO9dI=;
+        b=H9dWHgJ6KUGo+F5gyEFYcn7ed3lN7AJjTsUZMLhiewCleu2vHpLhqoTQTlHuCLZgF0
+         TYplXwIvy2+HAU4W0hI2JrT8gntJOXY0k9PWdNV3VU587gBfb1uQQqi/eO/D4urmn67U
+         sKdIQERzXUKpy0+k65YDct8Wh8gJxXUKxkv4ii+pq7ZjrKQsfFTKTZL6wVWYyTOxqaJj
+         abp2D7jP7dup9yxia1gcIrYzs7QcyKMIIQHCCR35HvZdWanOpm2/XgRH8TFu7mFo2DPe
+         sZ6uh4RAerMn7oJYPVbE9ee6/ubzrbe8B7cSGaMD1n1uhwrAmSgkJKSDoiRVYTMZVlnD
+         Ib8w==
+X-Gm-Message-State: AOAM530UM6mhEig4EPfPGf66AGxsHoJcf9FPjPgwt0HOFV4SxvRjPblS
+        y4R65wlAkYaR8PsqNxYxSmgzJIw4eSJIDA==
+X-Google-Smtp-Source: ABdhPJwAx4bCFH/vqzup+Sj+BRBqFZHnwKEeyz5teB1/b5fUS7SSusWqHlqAsbCp3d38f6r1HleOfw==
+X-Received: by 2002:a62:ea01:: with SMTP id t1mr2789546pfh.125.1597432154796;
+        Fri, 14 Aug 2020 12:09:14 -0700 (PDT)
 Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id z2sm10125840pfq.46.2020.08.14.12.04.12
+        by smtp.gmail.com with ESMTPSA id f17sm10223112pfq.67.2020.08.14.12.09.13
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Aug 2020 12:04:12 -0700 (PDT)
+        Fri, 14 Aug 2020 12:09:14 -0700 (PDT)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
-Subject: [PATCH] Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
-Date:   Fri, 14 Aug 2020 12:04:06 -0700
-Message-Id: <20200814190406.361415-1-sonnysasaka@chromium.org>
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [PATCH v2] Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+Date:   Fri, 14 Aug 2020 12:09:09 -0700
+Message-Id: <20200814190909.361764-1-sonnysasaka@chromium.org>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -81,6 +82,7 @@ allowlist have been given permission to auto-connect.
 
 Fixes: 4f40afc6c764 ("Bluetooth: Handle BR/EDR devices during suspend")
 Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
 ---
  net/bluetooth/hci_event.c | 17 +++++++++++------
