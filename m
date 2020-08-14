@@ -7,98 +7,164 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE87FC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC36C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:49:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8DE2207DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04D3F2074D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:49:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="utlT8+NZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ML1859Oa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726812AbgHNK2z (ORCPT
+        id S1727807AbgHNKtf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 06:28:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57020 "EHLO
+        Fri, 14 Aug 2020 06:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726735AbgHNK2w (ORCPT
+        with ESMTP id S1727064AbgHNKt2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 06:28:52 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721B0C061383
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:28:51 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id 2so7836263qkf.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:28:51 -0700 (PDT)
+        Fri, 14 Aug 2020 06:49:28 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A0FC061384
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:49:23 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id v13so7746825oiv.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:49:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/1MLXCdEu7siuiOtoRF23IoFTdUDvY1mjVcwi3A7tJU=;
-        b=utlT8+NZB2s1duBya1iLjwGVUaSqOy1FAUr044KBpr9ZCx6JUYw3kV7WvrRgVxjiZs
-         +mT1A01tt0AvlvTaheqCiE5xjWWsxzlNIV3MBviQPO6/oXL+hrw2PHhkhqmt31MEcKwg
-         n0WFuTn32N42D1y3evEoQCl/t4og4M27Z2oOiJQv5EKfn/vLiHNpnUyeur1KWOY/Q2QY
-         R0JmBFwTdsYNTMb3vE6XwNJ5NxT7baN2DdEMqM2qxynbOE11P3PviiETw1OlQeaWWW1G
-         EtiYDsLx9sf2YnfuvWVHevmmhXpgGJXjbKefdwJjfJAVab6bZefzBAtxBIlMJ5QLYwnt
-         EWVg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Q1a9PUcYGX9ux4Mfdps7vP428ddbJQAbnf/pLAoi3NE=;
+        b=ML1859OaZObRxKMk/2VNFzxEVwB2nJYUW59jyN7MUugdjW/tQLlKaL2VNn6cDUaYTb
+         p7iVLIVe19Ph3bWbpBplhfZZi2H8OWHh3rHyOnykbNoSnbRxcT8fXdVmNUQlsGCrcxRy
+         ZM+BABJtrx/EHKIqIRkguzj8t+26wsWSQjSB6qf7kJgRg9Wxi9I8OBvCwiIIw/tBxZih
+         XFwxU+Eoqjq7WDNxq47lJNQclz90LAmUBEhX9L5F7viWrQsgZsgJlKmRGEVwxlPA5avw
+         ky804lWqTFS1qUOPL4VKWWjYorStIS7PyfqJIr+e6PrmsD6uv4UoutfJS/KxvGxDzqPp
+         trFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/1MLXCdEu7siuiOtoRF23IoFTdUDvY1mjVcwi3A7tJU=;
-        b=jzzjdbZCe2YqXaFKdrBXsGGtmk+ZHmyduZE1CiQ8o7+sitZ+5B/hygs1kKFI5b/k+/
-         oQuxf/iNBy3f+8YZp/SR6eb1f1Gg0IMKYVjuDusmzR9b7iLw6vq02t5NsP5WKo2fVNgp
-         ONC53B2ICrXwfgIxTqHdS+7i62wNFvt6al8LryCrHwnRyq8Fm0q0LcVmBE9tkj+ygu0B
-         IL+rr3gjs4eDXLDhf/PC8H5KZkU7bmhxr+Cd0sUHujXEkXiGdEBW9ulBjTEQvdwlqQHb
-         9FpaGkxHNq7E+ti8DonzxuN1BclGb521Guc+btR9pcNKOS+aopjYfdV7QjyIjwxDiZxr
-         LWDw==
-X-Gm-Message-State: AOAM533XAsKRLK/Pi4TeZ1PNpyTdktb1hp+MdIVONqnVzcB4xzL195GR
-        9MJk3/Qct73ZqGHuqlXgczpW5t8sbx22vA==
-X-Google-Smtp-Source: ABdhPJyodE9G//HQ930auQcMl4tBw/YbK5btfavwnl6EFMPM7a+NjwgDGTJQ+kjuKp6f4r/pII45Iw==
-X-Received: by 2002:a37:a503:: with SMTP id o3mr1312425qke.162.1597400929578;
-        Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.254.74.102])
-        by smtp.gmail.com with ESMTPSA id h20sm8225047qkk.79.2020.08.14.03.28.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
-Message-ID: <5f366761.1c69fb81.53a96.12c8@mx.google.com>
-Date:   Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2568234707712340665=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Q1a9PUcYGX9ux4Mfdps7vP428ddbJQAbnf/pLAoi3NE=;
+        b=S5rRaot9Hz0h/bo83/fulCPrbcjA3FyI3aIes9EVj6uai5RglT2ZecT6iogTaRujiy
+         swHJM2hiwPlZLQm9mE2tN4w39Cc6LTda+PCpMNhiUEtt1l33umhqDR9RTwwMSGK6RTFf
+         zrp4cMgWs13hgYPfXkYSrx0cSSvu7FijXmimRCnHgGbuirFixo6JEf+qFWpZ56g+jT15
+         Vg0WaM8uox2cFLzHsk3LLRewzEAZVP0Vaqr11S5Sx2we6bly0yI0b3zHmdUH34d/tUwk
+         ojsE1Z1Yy8qLolj0ysgngk5pd2eKquQYox9c7s4Mnrenc3j9QYRBsE6RxPwn48/DmKLN
+         ufWA==
+X-Gm-Message-State: AOAM531dwWkKfYu70ZkXJEVNiwnA1rjckSD9t0Jf+ljLMOu8uArqOVbk
+        OINDZCsZfLCeD5unQ8nNS8pQrGzpKemCZr2D755JSMe0xCwsag==
+X-Google-Smtp-Source: ABdhPJxYZONl/LYYpixLR3pAvv24CKhn7JLDHImieUooe5qgUUa+13VbXPz/RQ3UZYPk20QeAC38ZULW1qBU+QV8/lE=
+X-Received: by 2002:aca:c38c:: with SMTP id t134mr1110680oif.15.1597402162069;
+ Fri, 14 Aug 2020 03:49:22 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, 515672508@qq.com
-Subject: RE: [BlueZ] adapt:Set property mode failed,memory leak This patch will fix a memory leak,when set property mode,it will send a msg, but if failed,the data'memory do not free
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200814095433.10654-1-515672508@qq.com>
-References: <20200814095433.10654-1-515672508@qq.com>
+References: <edd02903-6460-76c0-7b96-169c15d42699@student.tugraz.at>
+In-Reply-To: <edd02903-6460-76c0-7b96-169c15d42699@student.tugraz.at>
+From:   Emil Lenngren <emil.lenngren@gmail.com>
+Date:   Fri, 14 Aug 2020 12:49:10 +0200
+Message-ID: <CAO1O6sf5WKvFZxzRnRo2UweFSJ-0Z7OkQXyfcu6nc_BTjOGq7w@mail.gmail.com>
+Subject: Re: [BlueZ] BLE Security Mode 2 Support
+To:     Christian Seifert <christian.seifert@student.tugraz.at>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2568234707712340665==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Christian,
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
-CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
-VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
-ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
-KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
-bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
-ZmF1bHQgKHNlZSBgVScpCnNyYy9hZGFwdGVyLmM6IEluIGZ1bmN0aW9uIOKAmHByb3BlcnR5X3Nl
-dF9tb2Rl4oCZOgpzcmMvYWRhcHRlci5jOjI5MTk6MjogZXJyb3I6IHRoaXMg4oCYaWbigJkgY2xh
-dXNlIGRvZXMgbm90IGd1YXJkLi4uIFstV2Vycm9yPW1pc2xlYWRpbmctaW5kZW50YXRpb25dCiAy
-OTE5IHwgIGlmIChtZ210X3NlbmQoYWRhcHRlci0+bWdtdCwgb3Bjb2RlLCBhZGFwdGVyLT5kZXZf
-aWQsIGxlbiwgcGFyYW0sCiAgICAgIHwgIF5+CnNyYy9hZGFwdGVyLmM6MjkyMjozOiBub3RlOiAu
-Li50aGlzIHN0YXRlbWVudCwgYnV0IHRoZSBsYXR0ZXIgaXMgbWlzbGVhZGluZ2x5IGluZGVudGVk
-IGFzIGlmIGl0IHdlcmUgZ3VhcmRlZCBieSB0aGUg4oCYaWbigJkKIDI5MjIgfCAgIHJldHVybjsK
-ICAgICAgfCAgIF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
-cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjkxNjc6IHNyYy9ibHVldG9vdGhkLWFkYXB0ZXIub10g
-RXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQwMTA6IGFsbF0gRXJyb3IgMgoKCgotLS0KUmVn
-YXJkcywKTGludXggQmx1ZXRvb3RoCg==
+Den fre 14 aug. 2020 kl 11:21 skrev Christian Seifert
+<christian.seifert@student.tugraz.at>:
+>
+> Hello,
+>
+> i am trying to implement a communication channel that uses BLE Security
+> Mode 2 Lvl 1 or 2. Both participants that need to communicate are
+> Raspberry Pi's running Raspberry Pi OS and BlueZ as Bluetooth Stack. The
+> data i want to send is already encrypted which makes Data Signing
+> interesting for me.
+>
+> Does BlueZ Support BLE Security Mode 2 Lvl 1/2 and if yes how can i
+> access the functionality?
+>
+> Furthermore in my research to find the answer for this question i always
+> seemed to come across Security Mode 3 mentioned in combination with
+> BlueZ. Does this simply refer to Security Mode 1 Lvl 3?
+>
+> In order to find an answer for this question: I searched the web
+> rigorously / Tried to find an answer in forums / Read the Documentation
+> / Tried to read the source code / Checked the archives
+>
+> As i found nearly nothing regarding this topic my last resort is to ask
+> this E-Mail Chain and i would be extremely gratefull if someone would be
+> able to answer my question or tip me off into the right direction.
+>
+> Thank you very much for your time and help in advance!
+>
+> Best regards,
+> Christian Seifert
+>
+> PS: Please excuse my poor Translation attempts as English is not my
+> first language. I will gladly try to rewrite any confusing or misleading
+> parts in my message if pointed out!
 
---===============2568234707712340665==--
+I have worked with BLE for around six years and I've never heard of
+anyone using security mode 2. It seems like it's one of those
+"wouldn't-it-be-nice-to-have" when they designed this many years ago,
+without understanding the idea is quite bad when security mode 1
+exists which is superior. There are not many benefits of using this
+over security mode 1. There are more cons:
+- Data is not being encrypted, only signed.
+- There's only one single kind of ATT packet that can be signed, the
+"Signed Write Command", which is then used by GATT "Signed Write
+Without Response". This means that no read/write requests,
+notifications/indications or service discovery can be signed. It's
+therefore not possible to sign anything in the direction from a GATT
+server to a GATT client.
+- The signature consists of a 8 bytes CMAC signature followed by a
+32-bit message counter. You can therefore only send up to 12 bytes
+shorter packets for a given MTU.
+- The signature counter must be updated and stored on flash after
+every message, and must be preserved across reconnections and reboots.
+For embedded devices with a limit of write-erase cycles this could
+potentially be a huge issue. With security mode 1 this doesn't happen
+as the link layer packet counter is per connection and direction, and
+can therefore be stored in RAM.
+- A "MITM hacker" could potentially receive a signed message,
+disconnect from the sender, and a few days later connect to the
+intended receiver and deliver the message, without the receiver
+noticing it has been delayed such a long time (assuming it didn't get
+any packet with higher counter in the meantime).
+- Packets can intentionally or unintentionally be dropped, without the
+receiver noticing that there are missing packets (assuming the
+Bluetooth stack doesn't expose the counter to the "application").
+- It requires a specific API for the application to use (signed
+writes). With security mode 1 it's the lower layer that encrypts and
+signes everything and your GATT application can be the same regardless
+if you're unencrypted or encrypted.
+- If you implement this in a GATT server and the GATT client doesn't
+support signed writes, you can't really know or ask the GATT client if
+it supports signed writes. Even though the CSRK might be transferred
+during bonding, you can't know if signed writes are actually supported
+(yes many bluetooth stacks are stupidly made like this).
+
+The only benefit as I see it is that it requires 2.5 less round trips
+than setting up AES-CCM as in security mode 1.
+
+Generally the support in different Bluetooth stacks doesn't seem to be
+that good. For example Nordic Semiconductor's soft device doesn't
+support security mode 2.
+
+It seems the dbus gatt api supports signed writes, by reading the
+documentation and code. Simply set "type" to "command" when executing
+a WriteValue. Signed authenticated writes will be used if the
+characteristic supports it and the link is unencrypted, otherwise
+normal Write Without Responses will be used.
+For the GATT server, set the characteristic flags to include
+"authenticated-signed-writes".
+I'm not sure how to make the bonding and connection setup to actually
+use security mode 2 instead of mode 1 though.
+
+Security mode 3 doesn't exist for BLE. It exists for Bluetooth classic
+though, so maybe that's what they're referring to.
+
+/Emil
