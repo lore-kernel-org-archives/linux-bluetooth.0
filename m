@@ -2,213 +2,133 @@ Return-Path: <SRS0=Aqt4=BY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7903AC433E3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35E2C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:12:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BF87206DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6BD820771
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:12:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjTMQwHr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6BxVt3v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726905AbgHNUHg (ORCPT
+        id S1727773AbgHNUMV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 16:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33812 "EHLO
+        Fri, 14 Aug 2020 16:12:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726265AbgHNUHg (ORCPT
+        with ESMTP id S1726265AbgHNUMV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 16:07:36 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C61C061385;
-        Fri, 14 Aug 2020 13:07:36 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id r21so8507748ota.10;
-        Fri, 14 Aug 2020 13:07:36 -0700 (PDT)
+        Fri, 14 Aug 2020 16:12:21 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A48AC061385
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 13:12:21 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id j7so9173833oij.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 13:12:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=HiYOL/T1huNoqPIDdiz/g4I/4oQL0zNRwFDNOHIA1vU=;
-        b=OjTMQwHr+IuhO5yT3Lfpke+Ef/oxA1iUmTzW9eQjK8CmgwTxrgjaVWSHmC+KMKN1ol
-         ZcnzFRVza9A3CrbMDgrxvQ9U6ucW7IV1fPGg+UxCOs6SwNmu15bkNqI3HlrPzewry3A+
-         CVk1udcph4o4XseIkDw830SDix1aBBSerOhelOf12p0Gs1mOlkGttK6VlSyphlcWbSEV
-         etlPaY29KybfqgmKRMOurZ8x48LOV9/gBPRpfApDHfgNSXUkrBVFdyoS3TTgGGcyNEbu
-         RmvvUoHXw4VFvsfNwvIBX/mj2nqFFLo5ok3UlKBLH59PE8xWZzfFxV1SXP4hTmX4MM3A
-         P67g==
+        bh=JGEIRApH5/p8VsQhcxbCoWl1EO+fqrquJVhKDliJ+14=;
+        b=T6BxVt3vew1+fIyQb/pbzntGpUJesqiMxNhyvtCqSK33JYbAaKXfRyeOdgXWF71kGQ
+         IOKPRWG1np+dSUKIdN+NhEXbHwEYuB8CXXchsiDN3sBvwVfiW5DePh7RFZ6mk6rysmPc
+         PpYkEttRc2qfqr6bb8qVnGpcHzZHlCGEYtKA1Fz4i22nD/OnfLoM9jlehgyuDKAf80HW
+         D0lrs57VKYOxI8nzikRL/EF+hg7hHncXIIiNaeiD4p/lZyT7YW5NOCdoqUUAVaYI2znw
+         SAZNPM2CFp+zPkNRUaMQ0a/4SRUEP/sH58Ds5sYRVswCfJldvdWaVY+lb3yfHV90xtPH
+         itPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HiYOL/T1huNoqPIDdiz/g4I/4oQL0zNRwFDNOHIA1vU=;
-        b=LMxa0hrUB0yeJfzCPvOW4BTRmJlFD/ebH3Gi3a7wOZgHro3roIUPIyr8Dzzdw6tpOG
-         /SdbmPZrlo9YaMCNcxNTnqN46umk1/DsS6uE1MGL+SuA5MydBWFEKvqFo/A0Sxpbrele
-         DJmBjs6JGXgU54+xK4nModNKM9rTFwPPwaB5fGRUzuPznqSAF0yRiIIK5ItFRwIRqnx7
-         AHAC6SjrqrhcplT1Xcj+o5cmweHCRCXzWHbuJJsu91fC0Q/xwk4+5spbVPo68jfZB+36
-         TgHTkW7lC+SjRUoG7y2bHpCw1ed99gWaeYBqAXPL4EO/FLcD5R41NI8kmvNtQTlo0UvF
-         fddg==
-X-Gm-Message-State: AOAM533zyUvyCzErxdVCel0cAqqqKzmLWC1RVAgRtk82u1m8BhwC7WJp
-        nGHw96yFD6jOhDoiQ3n82u3MmS4w1bxw9m/yZikDVGw5238H1Q==
-X-Google-Smtp-Source: ABdhPJxN3wN9ulvlSIWvknHDwGRLtdC5dBgL/A0mhtKTxbAQBOS0rGZzcQ2r/gikFIWbAqJ9JqLK9HsZ1Y1ZlpC8kxg=
-X-Received: by 2002:a9d:24e7:: with SMTP id z94mr3123897ota.91.1597435655540;
- Fri, 14 Aug 2020 13:07:35 -0700 (PDT)
+        bh=JGEIRApH5/p8VsQhcxbCoWl1EO+fqrquJVhKDliJ+14=;
+        b=LA2ASTrDvkQCuYM/hWzME96U6tXBz0E6gdvZ8RhF/xOR2xwSfAxgBk3Ir4nV47v15y
+         1mzt+Ghbf+bXzf5skXykiG6peNTO3vE9xdOJdhXoF/cYhv6V4p6KgDbIBPrs9GqTiVYC
+         W/xnYlnCpMjS2AJP7z1ZJZXj3Jr5TwnvGev1pwfaEk/qt19d/8Fcyln/nSw7MtMkpLPw
+         wn0VdcKV6ORQfTlvVznvmxsr5s00djx9Fsm4GeDRPIxJ3EWx/3D6qUmnGNYnsV7vrriO
+         gFmyyAMfdHvfzkyG+98uB2bHOnXUurromaEji2dC23drORBboEWaSSgzfjofkcfwq17x
+         X1iA==
+X-Gm-Message-State: AOAM533WdahyDv2dNvvydFF0tN3lHIVsJGsOF/8cEZerD/4FS4iXFKrJ
+        ZdmKmoDOAQi2HQm/1F9HroWjbnmSa+x/bOvAwWzEcXCa
+X-Google-Smtp-Source: ABdhPJxYJToXsXo2RhBzxWCjVCXfkAtP9ZwDqDsVvZ0aWOcsmv+I32TgiZtzC5B/Q9tf4U2kbpLp1LNXXpc71dhZtlc=
+X-Received: by 2002:aca:5703:: with SMTP id l3mr2487285oib.48.1597435940117;
+ Fri, 14 Aug 2020 13:12:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200813084129.332730-1-josephsih@chromium.org> <20200813164059.v1.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
-In-Reply-To: <20200813164059.v1.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
+References: <20200812204932.25627-2-tedd.an@linux.intel.com> <5f345e19.1c69fb81.cce10.d6f2@mx.google.com>
+In-Reply-To: <5f345e19.1c69fb81.cce10.d6f2@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 14 Aug 2020 13:07:25 -0700
-Message-ID: <CABBYNZ+GPmHuVe_TCUwCVYuOzH8m0=Nmwv48Tn-by_5PnqqwOg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: define HCI packet sizes of USB Alts
-To:     Joseph Hwang <josephsih@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Joseph Hwang <josephsih@google.com>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Date:   Fri, 14 Aug 2020 13:12:10 -0700
+Message-ID: <CABBYNZ+xikP5s1dBzyHGhJg4JE-Aj8faQtvjUCQJaV1RUnVvrg@mail.gmail.com>
+Subject: Re: [V2,2/3] tools/btpclientctl: Add btpclient test application
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Tedd Ho-Jeong An <tedd.an@linux.intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+Hi Tedd, Marcel,
 
-On Thu, Aug 13, 2020 at 1:42 AM Joseph Hwang <josephsih@chromium.org> wrote:
+On Wed, Aug 12, 2020 at 2:27 PM <bluez.test.bot@gmail.com> wrote:
 >
-> It is desirable to define the HCI packet payload sizes of
-> USB alternate settings so that they can be exposed to user
-> space.
 >
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> While we are preparing for reviewing the patches, we found the following
+> issue/warning.
+>
+> Test Result:
+> checkpatch Failed
+>
+> Outputs:
+> WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+> #49: FILE: tools/btpclientctl.c:1:
+> +/*
+
+It might be a good idea to start using SPDX license identifiers
+though, @Marcel any thoughts on that?
+
+> ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
+> #67: FILE: tools/btpclientctl.c:19:
+> + *  along with this program; if not, write to the Free Software$
+>
+> ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
+> #68: FILE: tools/btpclientctl.c:20:
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA$
+>
+> WARNING:TYPO_SPELLING: 'arguement' may be misspelled - perhaps 'argument'?
+> #215: FILE: tools/btpclientctl.c:167:
+> +       bt_shell_printf("Invalid arguement %s\n", argv[1]);
+>
+> WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+> #2124: FILE: tools/btpclientctl.c:2076:
+> +static const char *help[] = {
+>
+> - total: 2 errors, 3 warnings, 2175 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> Your patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+>
 > ---
->
->  drivers/bluetooth/btusb.c        | 43 ++++++++++++++++++++++++--------
->  include/net/bluetooth/hci_core.h |  1 +
->  2 files changed, 33 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8d2608ddfd0875..df7cadf6385868 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -459,6 +459,22 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
->  #define BTUSB_WAKEUP_DISABLE   14
->  #define BTUSB_USE_ALT1_FOR_WBS 15
->
-> +/* Per core spec 5, vol 4, part B, table 2.1,
-> + * list the hci packet payload sizes for various ALT settings.
-> + * This is used to set the packet length for the wideband speech.
-> + * If a controller does not probe its usb alt setting, the default
-> + * value will be 0. Any clients at upper layers should interpret it
-> + * as a default value and set a proper packet length accordingly.
-> + *
-> + * To calculate the HCI packet payload length:
-> + *   for alternate settings 1 - 5:
-> + *     hci_packet_size = suggested_max_packet_size * 3 (packets) -
-> + *                       3 (HCI header octets)
-> + *   for alternate setting 6:
-> + *     hci_packet_size = suggested_max_packet_size - 3 (HCI header octets)
-> + */
-> +static const int hci_packet_size_usb_alt[] = { 0, 24, 48, 72, 96, 144, 60 };
-> +
->  struct btusb_data {
->         struct hci_dev       *hdev;
->         struct usb_device    *udev;
-> @@ -3958,6 +3974,15 @@ static int btusb_probe(struct usb_interface *intf,
->         hdev->notify = btusb_notify;
->         hdev->prevent_wake = btusb_prevent_wake;
->
-> +       if (id->driver_info & BTUSB_AMP) {
-> +               /* AMP controllers do not support SCO packets */
-> +               data->isoc = NULL;
-> +       } else {
-> +               /* Interface orders are hardcoded in the specification */
-> +               data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> +               data->isoc_ifnum = ifnum_base + 1;
-> +       }
-> +
->  #ifdef CONFIG_PM
->         err = btusb_config_oob_wake(hdev);
->         if (err)
-> @@ -4021,6 +4046,10 @@ static int btusb_probe(struct usb_interface *intf,
->                 hdev->set_diag = btintel_set_diag;
->                 hdev->set_bdaddr = btintel_set_bdaddr;
->                 hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> +
-> +               if (btusb_find_altsetting(data, 6))
-> +                       hdev->sco_pkt_len = hci_packet_size_usb_alt[6];
-> +
->                 set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
->                 set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->                 set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> @@ -4062,15 +4091,6 @@ static int btusb_probe(struct usb_interface *intf,
->                 btusb_check_needs_reset_resume(intf);
->         }
->
-> -       if (id->driver_info & BTUSB_AMP) {
-> -               /* AMP controllers do not support SCO packets */
-> -               data->isoc = NULL;
-> -       } else {
-> -               /* Interface orders are hardcoded in the specification */
-> -               data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> -               data->isoc_ifnum = ifnum_base + 1;
-> -       }
-> -
->         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
->             (id->driver_info & BTUSB_REALTEK)) {
->                 hdev->setup = btrtl_setup_realtek;
-> @@ -4082,9 +4102,10 @@ static int btusb_probe(struct usb_interface *intf,
->                  * (DEVICE_REMOTE_WAKEUP)
->                  */
->                 set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-> -               if (btusb_find_altsetting(data, 1))
-> +               if (btusb_find_altsetting(data, 1)) {
->                         set_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags);
-> -               else
-> +                       hdev->sco_pkt_len = hci_packet_size_usb_alt[1];
-> +               } else
->                         bt_dev_err(hdev, "Device does not support ALT setting 1");
->         }
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 8caac20556b499..0624496328fc09 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -417,6 +417,7 @@ struct hci_dev {
->         unsigned int    acl_pkts;
->         unsigned int    sco_pkts;
->         unsigned int    le_pkts;
-> +       unsigned int    sco_pkt_len;
+> Regards,
+> Linux Bluetooth
 
-Id use sco_mtu to so the following check actually does what it intended to do:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/sco.c#n283
-
-Right now it seems we are using the buffer length as MTU but I think
-we should actually use the packet length if it is lower than the
-buffer length, actually it doesn't seems SCO packets can be fragmented
-so the buffer length must always be big enough to carry a full packet
-so I assume setting the packet length as conn->mtu will always be
-correct.
-
->
->         __u16           block_len;
->         __u16           block_mtu;
-> --
-> 2.28.0.236.gb10cc79966-goog
->
 
 
 -- 
