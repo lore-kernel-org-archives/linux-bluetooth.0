@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BFAC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE87FC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:28:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8351F20781
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8DE2207DA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 10:28:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmsULxZk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="utlT8+NZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbgHNK0Y (ORCPT
+        id S1726812AbgHNK2z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 06:26:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56646 "EHLO
+        Fri, 14 Aug 2020 06:28:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726012AbgHNK0Y (ORCPT
+        with ESMTP id S1726735AbgHNK2w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 06:26:24 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73835C061383
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:26:24 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id b14so7876537qkn.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:26:24 -0700 (PDT)
+        Fri, 14 Aug 2020 06:28:52 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721B0C061383
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:28:51 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id 2so7836263qkf.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 03:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=5mWMT1GNug/0Oyb2iDfnCIU7HkUgJEDm49qTfvOMAYE=;
-        b=TmsULxZkdxqS3p+/5VpEC801kKyEOa4biFDkNfBGz2yFGEIyROYZZYcLfsIN03wd/+
-         xzW0sESEletlDy0nuEoTMPJ80YoWLtkllnsbMCgToFRPINfA0WTcdoiIgZphtMv2LaUc
-         22aVC5Z9vDksL2zSoP0WeWvdzDV5nHisdwI72TwFQHdmgOudEWDa/bk7DYsexER+5d4K
-         JiAMogYAyryR0W/6YuPmP9uIyRlpaGLJ+OxZYK6JY9eDIxUPzW0sEVGoPtdYxoXbTCxq
-         SlOP8bZBJ30DI4S7UbnIM5ij+cHIso2n6wjNtgI6XqH6sYIqY6e7PlDpKuXHF/mSGwMv
-         Szqw==
+        bh=/1MLXCdEu7siuiOtoRF23IoFTdUDvY1mjVcwi3A7tJU=;
+        b=utlT8+NZB2s1duBya1iLjwGVUaSqOy1FAUr044KBpr9ZCx6JUYw3kV7WvrRgVxjiZs
+         +mT1A01tt0AvlvTaheqCiE5xjWWsxzlNIV3MBviQPO6/oXL+hrw2PHhkhqmt31MEcKwg
+         n0WFuTn32N42D1y3evEoQCl/t4og4M27Z2oOiJQv5EKfn/vLiHNpnUyeur1KWOY/Q2QY
+         R0JmBFwTdsYNTMb3vE6XwNJ5NxT7baN2DdEMqM2qxynbOE11P3PviiETw1OlQeaWWW1G
+         EtiYDsLx9sf2YnfuvWVHevmmhXpgGJXjbKefdwJjfJAVab6bZefzBAtxBIlMJ5QLYwnt
+         EWVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=5mWMT1GNug/0Oyb2iDfnCIU7HkUgJEDm49qTfvOMAYE=;
-        b=gzmIFFVOU/qQKKmlKt/33q7FnrZjuI90dF8cTTeSSPMlQ5n7y/ii8kaQNlI2ysrgOo
-         wiLK3rVl0tJR9BdghXteIJJJYqk67pgVlzNZuRx35Yfb6IxCEbkjgMjDW0pjkyIqYF9k
-         qWTB8MSzBP4ExvJIALrlk0Rl3rjyuZGADYj0WNKRLyoKxMF3eb5X06geq08an7e5SpqP
-         +OmeXLbl9FiSBIYhT2h3Lb78ROuzVQrIeEwFHhp+KsDyw+ekXPyxdCrFAparrtFLYY9U
-         C2h0N6VQxeRoS8Js2MECmNeDA4F07kMH6WqRoMi0A0xcuPdNJk7GqxItySVX+aqSBuPu
-         NCKw==
-X-Gm-Message-State: AOAM531+94/KerZPjUoOCLRoN1hLl/4CdSGA4EH20x1qwTBzi/SEJMqy
-        HmkbNd5xRLYwfWp9I0tMfTMdQjeJHCOaKA==
-X-Google-Smtp-Source: ABdhPJwG2pRCon3JYyxXjnzJz484nfFX/2pDTbwl9PmbXrGmGQyZZlrixYtH/daVg9FrM0gESE5E1A==
-X-Received: by 2002:a05:620a:24e:: with SMTP id q14mr1345565qkn.482.1597400782923;
-        Fri, 14 Aug 2020 03:26:22 -0700 (PDT)
+        bh=/1MLXCdEu7siuiOtoRF23IoFTdUDvY1mjVcwi3A7tJU=;
+        b=jzzjdbZCe2YqXaFKdrBXsGGtmk+ZHmyduZE1CiQ8o7+sitZ+5B/hygs1kKFI5b/k+/
+         oQuxf/iNBy3f+8YZp/SR6eb1f1Gg0IMKYVjuDusmzR9b7iLw6vq02t5NsP5WKo2fVNgp
+         ONC53B2ICrXwfgIxTqHdS+7i62wNFvt6al8LryCrHwnRyq8Fm0q0LcVmBE9tkj+ygu0B
+         IL+rr3gjs4eDXLDhf/PC8H5KZkU7bmhxr+Cd0sUHujXEkXiGdEBW9ulBjTEQvdwlqQHb
+         9FpaGkxHNq7E+ti8DonzxuN1BclGb521Guc+btR9pcNKOS+aopjYfdV7QjyIjwxDiZxr
+         LWDw==
+X-Gm-Message-State: AOAM533XAsKRLK/Pi4TeZ1PNpyTdktb1hp+MdIVONqnVzcB4xzL195GR
+        9MJk3/Qct73ZqGHuqlXgczpW5t8sbx22vA==
+X-Google-Smtp-Source: ABdhPJyodE9G//HQ930auQcMl4tBw/YbK5btfavwnl6EFMPM7a+NjwgDGTJQ+kjuKp6f4r/pII45Iw==
+X-Received: by 2002:a37:a503:: with SMTP id o3mr1312425qke.162.1597400929578;
+        Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
 Received: from [172.17.0.2] ([52.254.74.102])
-        by smtp.gmail.com with ESMTPSA id a6sm8434144qka.5.2020.08.14.03.26.22
+        by smtp.gmail.com with ESMTPSA id h20sm8225047qkk.79.2020.08.14.03.28.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Aug 2020 03:26:22 -0700 (PDT)
-Message-ID: <5f3666ce.1c69fb81.4c7cb.1ba3@mx.google.com>
-Date:   Fri, 14 Aug 2020 03:26:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3876638814309108230=="
+        Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
+Message-ID: <5f366761.1c69fb81.53a96.12c8@mx.google.com>
+Date:   Fri, 14 Aug 2020 03:28:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2568234707712340665=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, 515672508@qq.com
@@ -74,31 +74,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3876638814309108230==
-Content-Type: text/plain; charset="us-ascii"
+--===============2568234707712340665==
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 
+ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
+ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
+Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
+ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
+Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
+CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
+VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
+ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
+KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
+bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
+ZmF1bHQgKHNlZSBgVScpCnNyYy9hZGFwdGVyLmM6IEluIGZ1bmN0aW9uIOKAmHByb3BlcnR5X3Nl
+dF9tb2Rl4oCZOgpzcmMvYWRhcHRlci5jOjI5MTk6MjogZXJyb3I6IHRoaXMg4oCYaWbigJkgY2xh
+dXNlIGRvZXMgbm90IGd1YXJkLi4uIFstV2Vycm9yPW1pc2xlYWRpbmctaW5kZW50YXRpb25dCiAy
+OTE5IHwgIGlmIChtZ210X3NlbmQoYWRhcHRlci0+bWdtdCwgb3Bjb2RlLCBhZGFwdGVyLT5kZXZf
+aWQsIGxlbiwgcGFyYW0sCiAgICAgIHwgIF5+CnNyYy9hZGFwdGVyLmM6MjkyMjozOiBub3RlOiAu
+Li50aGlzIHN0YXRlbWVudCwgYnV0IHRoZSBsYXR0ZXIgaXMgbWlzbGVhZGluZ2x5IGluZGVudGVk
+IGFzIGlmIGl0IHdlcmUgZ3VhcmRlZCBieSB0aGUg4oCYaWbigJkKIDI5MjIgfCAgIHJldHVybjsK
+ICAgICAgfCAgIF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
+cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjkxNjc6IHNyYy9ibHVldG9vdGhkLWFkYXB0ZXIub10g
+RXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQwMTA6IGFsbF0gRXJyb3IgMgoKCgotLS0KUmVn
+YXJkcywKTGludXggQmx1ZXRvb3RoCg==
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkgitlint Failed
-
-Outputs:
-1: T1 Title exceeds max length (161>72): "adapt:Set property mode failed,memory leak This patch will fix a memory leak,when set property mode,it will send a msg, but if failed,the data'memory do not free"
-3: B6 Body message is missing
-
-
-
----
-Regards,
-Linux Bluetooth
-
---===============3876638814309108230==--
+--===============2568234707712340665==--
