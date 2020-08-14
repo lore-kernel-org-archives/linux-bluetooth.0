@@ -2,68 +2,47 @@ Return-Path: <SRS0=Aqt4=BY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0716AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30747C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:13:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0F762078D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:09:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cxr1uYhk"
+	by mail.kernel.org (Postfix) with ESMTP id 1213F20768
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727920AbgHNTJQ (ORCPT
+        id S1727957AbgHNTNn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 15:09:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbgHNTJP (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 15:09:15 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC54C061385
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:09:15 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id u20so5016648pfn.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dPKm4oa2dN1Vf5/ovK5Iqwbq1EaqjYUe9CdiX1HO9dI=;
-        b=cxr1uYhkmPFKReP0IqFfPTtHZbZEpvhzHU+z/er4B/I/bSmzdLha1Td+kiyGooZC6q
-         EkJX55wRwyRMIvyOC+DgGtgVqZ70BDD69OvHTGX2npQlkn+T0BGUZD1cPoUd++31gN/q
-         l/IDLVXuDEQsg9VN4PxqQ/56fCpN+AWGBBQ+w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dPKm4oa2dN1Vf5/ovK5Iqwbq1EaqjYUe9CdiX1HO9dI=;
-        b=H9dWHgJ6KUGo+F5gyEFYcn7ed3lN7AJjTsUZMLhiewCleu2vHpLhqoTQTlHuCLZgF0
-         TYplXwIvy2+HAU4W0hI2JrT8gntJOXY0k9PWdNV3VU587gBfb1uQQqi/eO/D4urmn67U
-         sKdIQERzXUKpy0+k65YDct8Wh8gJxXUKxkv4ii+pq7ZjrKQsfFTKTZL6wVWYyTOxqaJj
-         abp2D7jP7dup9yxia1gcIrYzs7QcyKMIIQHCCR35HvZdWanOpm2/XgRH8TFu7mFo2DPe
-         sZ6uh4RAerMn7oJYPVbE9ee6/ubzrbe8B7cSGaMD1n1uhwrAmSgkJKSDoiRVYTMZVlnD
-         Ib8w==
-X-Gm-Message-State: AOAM530UM6mhEig4EPfPGf66AGxsHoJcf9FPjPgwt0HOFV4SxvRjPblS
-        y4R65wlAkYaR8PsqNxYxSmgzJIw4eSJIDA==
-X-Google-Smtp-Source: ABdhPJwAx4bCFH/vqzup+Sj+BRBqFZHnwKEeyz5teB1/b5fUS7SSusWqHlqAsbCp3d38f6r1HleOfw==
-X-Received: by 2002:a62:ea01:: with SMTP id t1mr2789546pfh.125.1597432154796;
-        Fri, 14 Aug 2020 12:09:14 -0700 (PDT)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id f17sm10223112pfq.67.2020.08.14.12.09.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Aug 2020 12:09:14 -0700 (PDT)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
+        Fri, 14 Aug 2020 15:13:43 -0400
+Received: from mga07.intel.com ([134.134.136.100]:2112 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726652AbgHNTNn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Aug 2020 15:13:43 -0400
+IronPort-SDR: z3XemW9hYiGKrHgEB5aSKGWEXKQ2gudejEbXDi+1beMHBsYrQVXvgo9gTA7e8+Em0LjZy53KvL
+ rcO4Ddq+lDhw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9713"; a="218806298"
+X-IronPort-AV: E=Sophos;i="5.76,313,1592895600"; 
+   d="scan'208";a="218806298"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2020 12:13:42 -0700
+IronPort-SDR: Z+GmXw5H+Vnec/Y3umde71aF80CRFaJ7rSCcuRL56QkhSVeebWE0P9y8lqDKfPKECIE89YZOO/
+ ZtyOcrKrlFyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,313,1592895600"; 
+   d="scan'208";a="327983431"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.85.168])
+  by fmsmga002.fm.intel.com with ESMTP; 14 Aug 2020 12:13:42 -0700
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH v2] Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
-Date:   Fri, 14 Aug 2020 12:09:09 -0700
-Message-Id: <20200814190909.361764-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+Cc:     inga.stotland@intel.com, brian.gix@gmail.com,
+        Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ] mesh: fix double-free of outbound tx data
+Date:   Fri, 14 Aug 2020 12:13:39 -0700
+Message-Id: <20200814191339.955528-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -71,60 +50,100 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Currently the code auto-creates hci_conn only if the remote address has
-been discovered before. This may not be the case. For example, the
-remote device may trigger connection after reboot at already-paired
-state so there is no inquiry result found, but it is still correct to
-create the hci_conn when Connection Complete event is received.
-
-A better guard is to check against bredr allowlist. Devices in the
-allowlist have been given permission to auto-connect.
-
-Fixes: 4f40afc6c764 ("Bluetooth: Handle BR/EDR devices during suspend")
-Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-
+Due to the asyncronous multi-step process to send a packet on an HCI
+socket, an outbound packet could be superceded before send procedure
+is completed.  This change ensures that at any stage in the process,
+that the pointer to the packet has been fully disposed.
 ---
- net/bluetooth/hci_event.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ mesh/mesh-io-generic.c | 52 +++++++++++++++++++++++++-----------------
+ 1 file changed, 31 insertions(+), 21 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 33d8458fdd4a..6b83da1790ee 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2566,7 +2566,6 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
- static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+index 4b26b1181..67b13a1b9 100644
+--- a/mesh/mesh-io-generic.c
++++ b/mesh/mesh-io-generic.c
+@@ -329,6 +329,30 @@ static void scan_disable_rsp(const void *buf, uint8_t size,
+ 			set_recv_scan_enable, pvt, NULL);
+ }
+ 
++static bool simple_match(const void *a, const void *b)
++{
++	return a == b;
++}
++
++static bool find_by_ad_type(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	uint8_t ad_type = L_PTR_TO_UINT(b);
++
++	return !ad_type || ad_type == tx->pkt[0];
++}
++
++static bool find_by_pattern(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	const struct tx_pattern *pattern = b;
++
++	if (tx->len < pattern->len)
++		return false;
++
++	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++}
++
+ static bool find_active(const void *a, const void *b)
  {
- 	struct hci_ev_conn_complete *ev = (void *) skb->data;
--	struct inquiry_entry *ie;
- 	struct hci_conn *conn;
+ 	const struct pvt_rx_reg *rx_reg = a;
+@@ -533,8 +557,10 @@ static void set_send_adv_data(const void *buf, uint8_t size,
+ 					&cmd, sizeof(cmd),
+ 					set_send_adv_enable, pvt, NULL);
+ done:
+-	if (tx->delete)
++	if (tx->delete) {
++		l_queue_remove_if(pvt->tx_pkts, simple_match, tx);
+ 		l_free(tx);
++	}
  
- 	BT_DBG("%s", hdev->name);
-@@ -2575,13 +2574,19 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	pvt->tx = NULL;
+ }
+@@ -569,8 +595,11 @@ static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
+ {
+ 	struct bt_hci_cmd_le_set_adv_enable cmd;
  
- 	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
- 	if (!conn) {
--		/* Connection may not exist if auto-connected. Check the inquiry
--		 * cache to see if we've already discovered this bdaddr before.
--		 * If found and link is an ACL type, create a connection class
-+		/* Connection may not exist if auto-connected. Check the bredr
-+		 * allowlist to see if this device is allowed to auto connect.
-+		 * If link is an ACL type, create a connection class
- 		 * automatically.
-+		 *
-+		 * Auto-connect will only occur if the event filter is
-+		 * programmed with a given address. Right now, event filter is
-+		 * only used during suspend.
- 		 */
--		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
--		if (ie && ev->link_type == ACL_LINK) {
-+		if (ev->link_type == ACL_LINK &&
-+		    hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
-+						      &ev->bdaddr,
-+						      BDADDR_BREDR)) {
- 			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr,
- 					    HCI_ROLE_SLAVE);
- 			if (!conn) {
+-	if (pvt->tx && pvt->tx->delete)
++	/* Delete superseded packet in favor of new packet */
++	if (pvt->tx && pvt->tx != tx && pvt->tx->delete) {
++		l_queue_remove_if(pvt->tx_pkts, simple_match, pvt->tx);
+ 		l_free(pvt->tx);
++	}
+ 
+ 	pvt->tx = tx;
+ 	pvt->interval = interval;
+@@ -733,25 +762,6 @@ static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
+ 	return true;
+ }
+ 
+-static bool find_by_ad_type(const void *a, const void *b)
+-{
+-	const struct tx_pkt *tx = a;
+-	uint8_t ad_type = L_PTR_TO_UINT(b);
+-
+-	return !ad_type || ad_type == tx->pkt[0];
+-}
+-
+-static bool find_by_pattern(const void *a, const void *b)
+-{
+-	const struct tx_pkt *tx = a;
+-	const struct tx_pattern *pattern = b;
+-
+-	if (tx->len < pattern->len)
+-		return false;
+-
+-	return (!memcmp(tx->pkt, pattern->data, pattern->len));
+-}
+-
+ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
+ {
+ 	struct mesh_io_private *pvt = io->pvt;
 -- 
-2.26.2
+2.25.4
 
