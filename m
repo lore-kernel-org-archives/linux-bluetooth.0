@@ -7,134 +7,125 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0F1C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 551D0C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:50:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DCB520675
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2974B20675
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 19:50:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F995vKQT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsDhPO8a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728506AbgHNTsk (ORCPT
+        id S1726798AbgHNTuB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 15:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
+        Fri, 14 Aug 2020 15:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726213AbgHNTsj (ORCPT
+        with ESMTP id S1726662AbgHNTuB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 15:48:39 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277B3C061385
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:48:39 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id b22so9108200oic.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:48:38 -0700 (PDT)
+        Fri, 14 Aug 2020 15:50:01 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B1FC061385
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:50:01 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id h16so8486722oti.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 12:50:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AkiSS7C196rcK+zBhAjxtXjYul49ai89IRKHkJgPUbU=;
-        b=F995vKQTNEPsu5A0/o+7LcXSTRllakdBH0deijtTxfBBDjg15XJkAmHaolcqJ+L26F
-         uZZyGTOVgcXkSiiI2kYAKsBBso7zzBEnXfZz9EBPP3SpMqnJbIRbNKKM/pL48Hvth5MV
-         AZpDW+U7aewo5DAbgdJzY0NxtS5gVIKLwJa2cGTgp0hQySKzCNIfAbcvn7O49IPSRMrg
-         4Kp043ACUpY8iXHsWnyaBUur+oZVSI9yOdxt6g2J9D22USOBNtWn+TUDaCzXaGCclNY8
-         hNtXpmDJ+w1hWDelpHkWJDny4+xW8jYHYzIhHYXm1mCqvIpgcwXw8Fnkhi6IWHWj2nHA
-         H49g==
+        bh=F3pZPWea4SVUhsA9E1hMWz0vj5oAgMBKq/U07Pmy2vY=;
+        b=LsDhPO8ahOZ7WNKe7Ym4bWtLQGvbUiExDsIS1kWrZPpbDev3ce4hrtV9chbk1tIE4J
+         r/J8ho4TThlutF4+NohZ8DXMk/UZGro87lX0EVwXXSUIQg71Kx1ZKTVUdlJORVi0iVA6
+         SPjtHGkHIAw017SRLGSCODs6TErTxgEXcG80nlU1HI4SCm9TD/rB36sU0SnCLlVt4Pi3
+         zz70Bj6oXUS+wyYSol38cdzhI0hZXo77BP+0kXYhl29+X7919oDdEi0LgO3OksZSNV9b
+         RjishTVts9xZVMW7XmvQq2MAsG1/FDEXBVy5CIw8kSVXAkzik2i/TUVwRbEhLBTq5jQc
+         /1kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AkiSS7C196rcK+zBhAjxtXjYul49ai89IRKHkJgPUbU=;
-        b=V19HQEmO/qJ970wqF29dYQ1qswuirc1CtH4rZQ+ryNEQvgws/eFih73JhfC4lvRiZy
-         fv+wHszn5ArsAT/VhXALQS15xGw5ZLjDDkQ1MhVT3NgZ0UcMJi2CnVJ8uT3yvqW7fVgf
-         d4LVUqYFk1/diiZTIeZ4qXXkH+suNAGxJdLHF2+KSl9oDjuGmAyKbZ2tmCiSNTurcfMM
-         xqz/+q7FfcOIyiv78AMfjlm4DQsOmDIhXWy57RsCNGvFFiOYElrRHKQ8q+YFDa6KwUn/
-         5A6fNUfZciPv1LRMcyrzxLEYh9e+LppVnQd6VEkLUIIcI34G7JxUDLefgHyzzrRIfMFj
-         EvrA==
-X-Gm-Message-State: AOAM532T/VphO4vLBHhiXelwwz8Cg3T7bBR1jvp3Jd+EFPJ3/HnBJrkq
-        dDGnlCmUqLRYsjbUki65pGjpmZRYsUQSBYbrY7Z9Yk7D
-X-Google-Smtp-Source: ABdhPJyz+Qfgy+rw3xgS7YcdmNxLU2je2gXTPgABj0c0dv0PaSc8PnnJhKTw5HbFqKkExHEJIE3Dhc5vRhvevAxKumU=
-X-Received: by 2002:aca:f504:: with SMTP id t4mr2624914oih.137.1597434517246;
- Fri, 14 Aug 2020 12:48:37 -0700 (PDT)
+        bh=F3pZPWea4SVUhsA9E1hMWz0vj5oAgMBKq/U07Pmy2vY=;
+        b=qfNI4xadBDf7XbDVZNJmDucY9Ll93xmKvLWSafex7MMcKB4UY1eLSJ7BtvBnjbyxT+
+         Ur3RoZsQO9DV22Z3EU6JwYPWSQoq+cJszreE5aEA1eoTAFY4VVA5gSSMcnG0s6YNCCTs
+         LXacYyTENf/yXRekiB2zDWEfAtQUFlQ9NricuAbG2nfmeEbh9VlBx3gz88HC2TP+lqXs
+         UHPr9yo0Gt1qqDE2mieJblqYKXEBAVfafBcD3tYEPXmWXA4FgKb2Bf7h7F13Y5/sip4J
+         w20Vvc0q/GhEJfxHjn/BwFc88VvINRULaCP9OlcVe7h0ZDkPp8XOYC9MBy3lvqly6TM1
+         4uQQ==
+X-Gm-Message-State: AOAM532Uq0dN/SgNvHaa0l0IuilX92RflbA0g8W/X682eQ0Wyeu1Vzuv
+        fz6jvM4BlQWkU/CZ9EG+ixa8azp0Xh3FWzk72Aw=
+X-Google-Smtp-Source: ABdhPJxTDWUgfYrBZu3CStfX8xrinT4Q58vGDPAta0JtFOl1fflG/f9gkQ0fIzB4pHbfCCN3XO7SLVLwQq6uOkQnkRo=
+X-Received: by 2002:a9d:24e7:: with SMTP id z94mr3076355ota.91.1597434600725;
+ Fri, 14 Aug 2020 12:50:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200814100047.11008-1-515672508@qq.com>
-In-Reply-To: <20200814100047.11008-1-515672508@qq.com>
+References: <20200813233952.BlueZ.v1.1.I716fc87b0c97e5349a04766a61ecad1f5b0fd28e@changeid>
+In-Reply-To: <20200813233952.BlueZ.v1.1.I716fc87b0c97e5349a04766a61ecad1f5b0fd28e@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 14 Aug 2020 12:48:27 -0700
-Message-ID: <CABBYNZKeMkbqnn1qswaLVcLxuAmc6OFPjVUidTiYSpAGvna=Rw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] adapt:Set property mode failed,memory leak
-To:     chengbo <515672508@qq.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Fri, 14 Aug 2020 12:49:50 -0700
+Message-ID: <CABBYNZJeK4W2a3JLRZdXD=0bupY+V7DBGEtWiBpaycjWVKcy2g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1] shared/ad: move MAX_ADV_DATA_LEN macro to the header
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Howard Chung <howardchung@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Miao-chen,
 
-On Fri, Aug 14, 2020 at 4:40 AM chengbo <515672508@qq.com> wrote:
+On Thu, Aug 13, 2020 at 11:43 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> This patch will fix a memory leak,when set property mode,it will send a msg,
-> but if failed,the data'memory do not free
-
-Give a look to HACKING documentation on how to properly format patches
-as it looks like you are appending the first version on this one as
-well.
-
+> This moves MAX_ADV_DATA_LEN macro to src/shared/ad.h.
 > ---
->  ...Set-property-mode-failed-memory-leak.patch | 26 +++++++++++++++++++
->  src/adapter.c                                 |  1 +
->  2 files changed, 27 insertions(+)
->  create mode 100644 0001-adapt-Set-property-mode-failed-memory-leak.patch
+> Hi Maintainers,
 >
-> diff --git a/0001-adapt-Set-property-mode-failed-memory-leak.patch b/0001-adapt-Set-property-mode-failed-memory-leak.patch
-> new file mode 100644
-> index 000000000..4994e03a6
-> --- /dev/null
-> +++ b/0001-adapt-Set-property-mode-failed-memory-leak.patch
-> @@ -0,0 +1,26 @@
-> +From 62d56bedbd32662b3f33af99dd464d67958e76d6 Mon Sep 17 00:00:00 2001
-> +From: chengbo <515672508@qq.com>
-> +Date: Fri, 14 Aug 2020 17:09:51 +0800
-> +Subject: [PATCH BlueZ] adapt:Set property mode failed,memory leak This patch
-> + will fix a memory leak,when set property mode,it will send a msg, but if
-> + failed,the data'memory do not free
-> +
-> +---
-> + src/adapter.c | 1 +
-> + 1 file changed, 1 insertion(+)
-> +
-> +diff --git a/src/adapter.c b/src/adapter.c
-> +index 5e896a9f0..cb4cd8b75 100644
-> +--- a/src/adapter.c
-> ++++ b/src/adapter.c
-> +@@ -2918,6 +2918,7 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
-> +
-> +       if (mgmt_send(adapter->mgmt, opcode, adapter->dev_id, len, param,
-> +                       property_set_mode_complete, data, g_free) > 0)
-> ++              g_free(data);
-> +               return;
-> +
-> +       g_free(data);
-> +--
-> +2.20.1
-> +
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 5e896a9f0..cb4cd8b75 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2918,6 +2918,7 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+> In order to avoid duplicate definition of the maximum data length of
+> advertisement for the following series of advertisement monitor API,
+> we'd like to reuse the one in shared/ad.
 >
->         if (mgmt_send(adapter->mgmt, opcode, adapter->dev_id, len, param,
->                         property_set_mode_complete, data, g_free) > 0)
-> +               g_free(data);
->                 return;
+> Thanks,
+> Miao
 >
->         g_free(data);
+>  src/shared/ad.c | 2 --
+>  src/shared/ad.h | 2 ++
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> index 8d276842e..6d882a9b3 100644
+> --- a/src/shared/ad.c
+> +++ b/src/shared/ad.c
+> @@ -33,8 +33,6 @@
+>  #include "src/shared/queue.h"
+>  #include "src/shared/util.h"
+>
+> -#define MAX_ADV_DATA_LEN 31
+> -
+>  struct bt_ad {
+>         int ref_count;
+>         char *name;
+> diff --git a/src/shared/ad.h b/src/shared/ad.h
+> index 19aa1d035..dc92c89bc 100644
+> --- a/src/shared/ad.h
+> +++ b/src/shared/ad.h
+> @@ -27,6 +27,8 @@
+>  #include "lib/bluetooth.h"
+>  #include "lib/uuid.h"
+>
+> +#define MAX_ADV_DATA_LEN 31
+
+Id suggest renaming this to BT_AD_MAX_DATA_LEN or something like that
+so it is consistent with the prefixing we are using for bt_ad related
+defines.
+
+> +
+>  #define BT_AD_FLAGS                    0x01
+>  #define BT_AD_UUID16_SOME              0x02
+>  #define BT_AD_UUID16_ALL               0x03
 > --
-> 2.20.1
->
->
+> 2.26.2
 >
 
 
