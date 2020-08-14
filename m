@@ -2,112 +2,135 @@ Return-Path: <SRS0=Aqt4=BY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A497C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 02:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FDCC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 06:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F386206DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 02:31:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B29FC20774
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 06:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726570AbgHNCb0 convert rfc822-to-8bit (ORCPT
+        id S1726606AbgHNGBV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Aug 2020 22:31:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726564AbgHNCbZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Aug 2020 22:31:25 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 207169] Bluetooth: hci0: command 0x200c tx timeout cause
- suspend failed
-Date:   Fri, 14 Aug 2020 02:31:24 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: youling257@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-207169-62941-DUdeRbQ6wV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-207169-62941@https.bugzilla.kernel.org/>
-References: <bug-207169-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 14 Aug 2020 02:01:21 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:40069 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726006AbgHNGBU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Aug 2020 02:01:20 -0400
+Received: by mail-io1-f69.google.com with SMTP id t22so5625831iob.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Aug 2020 23:01:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=sCmDfjgeHQU2XqasYC2w9/9D2xVFH6ihBv/kfF+e3jw=;
+        b=BmgFJuJRPEtipxNh7wGJERedJYU6TdHPC46CaBxM3s2J+pAN72n4jCXuYi7DdlL6Hm
+         R4VtC+bkNwouBz/acFJlVnSkZO1vwIoQ8ah45gh49QWieK/2CabNZMTx1dmouUwLa0LB
+         YXaoAEbclEstOt9aAJ2+1yZfVNHLKSYfi9Ydk/fK2808QYW6tnPVKd59olNsUwHAnuqU
+         2YFdUbM5WVOBtteKdOOWBeUqtr5GS4bHKCcBj2DMOLQUXOFCNZjQVFZ5T6oKtu5cVh4s
+         FRI/PToT/qi5Akpr4lwbDAu47bs1dZ8a2O2fq37LXmr2UG9cFL471nLII8cpUrM+6FUV
+         AWwQ==
+X-Gm-Message-State: AOAM533FuoD8426DJ11wIyLSIPvcc94r3ICnxBxUsaFSdal1y9mJcJg8
+        Yk4EcVQ/Tzm3dV7dP5f3hUFno8Gf5jg3NtANam3pRNgwp5xs
+X-Google-Smtp-Source: ABdhPJxIBN6j/ZMeKyaWqmCi1FaCp4RvYhD+TKcut9djsRe8PAAgfRTsBpUH9s8I3/LT/c0SXsjPTloEZFBbUzf4VQep43bHcnFr
 MIME-Version: 1.0
+X-Received: by 2002:a6b:591a:: with SMTP id n26mr941583iob.122.1597384879879;
+ Thu, 13 Aug 2020 23:01:19 -0700 (PDT)
+Date:   Thu, 13 Aug 2020 23:01:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000055c63705acd02676@google.com>
+Subject: BUG: corrupted list in hci_chan_del
+From:   syzbot <syzbot+21e61af4106356a893be@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=207169
+Hello,
 
---- Comment #15 from youling257@gmail.com ---
-test linux kernel 5.9 can suspend.
+syzbot found the following issue on:
 
-[  140.585885] PM: suspend entry (s2idle)
-[  140.624364] Filesystems sync: 0.038 seconds
+HEAD commit:    990f2273 Merge tag 's390-5.9-2' of git://git.kernel.org/pu..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16311491900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9c89856ae5fc8b6
+dashboard link: https://syzkaller.appspot.com/bug?extid=21e61af4106356a893be
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+userspace arch: i386
 
-[  142.648683] Bluetooth: hci0: Timed out waiting for suspend events
-[  142.648688] Bluetooth: hci0: Suspend timeout bit: 4
-[  142.648691] Bluetooth: hci0: Suspend notifier action (3) failed: -110
-[  142.648696] Freezing user space processes ...
-[  142.650906] Bluetooth: hci0: command 0x0c1a tx timeout
+Unfortunately, I don't have any reproducer for this issue yet.
 
-[  142.652280] (elapsed 0.003 seconds) done.
-[  142.652290] OOM killer disabled.
-[  142.652292] Freezing remaining freezable tasks ... (elapsed 0.002 seconds)
-done.                                                                          
-                                 [  142.654571] printk: Suspending console(s)
-(use no_console_suspend to debug)
-[  142.720243] rt5640 i2c-10EC5640:00: disabling jack detect before suspend    
-                                                                               
-                               [  142.740141] RTW:  suspend start
-[  142.743909] RTW: rtw_dev_unload: driver not in IPS
-[  142.759916] RTW: rtw suspend success in 20 ms
-[  143.302475] serial 00:02: disabled
-[  143.302513] rtc_cmos 00:00: suspend, ctrl 02
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+21e61af4106356a893be@syzkaller.appspotmail.com
 
-[  153.664622] RTW: resume start                                               
-                                                                               
-                               [  153.665044] RTW: == SDIO Card Info ==
-[  153.665050] RTW:   clock: 50000000 Hz                                       
-                                                                               
-                               [  153.665053] RTW:   timing spec :
-[  153.665055] sd high-speed                                                   
-                                                                               
-                               [  153.665060] RTW:   sd3_bus_mode: FALSE
-[  153.665063] RTW: ================
-[  153.693327] rtc_cmos 00:00: resume, ctrl 02                                 
-                                                                               
-                               [  153.722253] rt5640 i2c-10EC5640:00:
-re-enabling jack detect after resume
-[  153.729674] rt5640 i2c-10EC5640:00: irq status 0x110                        
-                                                                               
-                               [  154.994299] RTW: wlan0- hw port(0) mac_addr
-=8c:18:d9:27:71:71
-[  155.006720] RTW: rtw_resume_common:0 in 1342 ms
-[  155.157170] OOM killer enabled.
-[  155.157173] Restarting tasks ... done.
+list_del corruption. prev->next should be ffff8880a2c52c00, but was 0000000000000000
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:51!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 11221 Comm: syz-executor.0 Not tainted 5.8.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:__list_del_entry_valid.cold+0xf/0x55 lib/list_debug.c:51
+Code: e8 0a af bf fd 0f 0b 48 89 f1 48 c7 c7 60 fe 93 88 4c 89 e6 e8 f6 ae bf fd 0f 0b 48 89 ee 48 c7 c7 00 00 94 88 e8 e5 ae bf fd <0f> 0b 4c 89 ea 48 89 ee 48 c7 c7 40 ff 93 88 e8 d1 ae bf fd 0f 0b
+RSP: 0018:ffffc90008907828 EFLAGS: 00010282
+RAX: 0000000000000054 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff88805eb3a5c0 RSI: ffffffff815dbc57 RDI: fffff52001120ef7
+RBP: ffff8880a2c52c00 R08: 0000000000000054 R09: ffff8880ae7318e7
+R10: 0000000000000000 R11: 000000000004e618 R12: ffff88809421fe00
+R13: ffffffff8920ff20 R14: fffffbfff1522378 R15: ffff888097af65d8
+FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 00007f0f6a6c5000 CR3: 0000000009a8d000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ __list_del_entry include/linux/list.h:132 [inline]
+ list_del_rcu include/linux/rculist.h:158 [inline]
+ hci_chan_del+0x3f/0x190 net/bluetooth/hci_conn.c:1733
+ l2cap_conn_del+0x61b/0x9e0 net/bluetooth/l2cap_core.c:1900
+ l2cap_disconn_cfm net/bluetooth/l2cap_core.c:8160 [inline]
+ l2cap_disconn_cfm+0x85/0xa0 net/bluetooth/l2cap_core.c:8153
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1438 [inline]
+ hci_conn_hash_flush+0x114/0x220 net/bluetooth/hci_conn.c:1557
+ hci_dev_do_close+0x5c6/0x1080 net/bluetooth/hci_core.c:1770
+ hci_unregister_dev+0x1bd/0xe30 net/bluetooth/hci_core.c:3790
+ vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
+ __fput+0x285/0x920 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:135
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb7d/0x29f0 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:903
+ get_signal+0x40b/0x1ee0 kernel/signal.c:2743
+ arch_do_signal+0x82/0x2520 arch/x86/kernel/signal.c:811
+ exit_to_user_mode_loop kernel/entry/common.c:135 [inline]
+ exit_to_user_mode_prepare+0x15d/0x1c0 kernel/entry/common.c:166
+ syscall_exit_to_user_mode+0x59/0x2b0 kernel/entry/common.c:241
+ __do_fast_syscall_32+0x63/0x80 arch/x86/entry/common.c:127
+ do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:149
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+RIP: 0023:0xf7f33569
+Code: Bad RIP value.
+RSP: 002b:00000000f550c12c EFLAGS: 00000292 ORIG_RAX: 00000000000000f0
+RAX: fffffffffffffe00 RBX: 0000000008b9c014 RCX: 0000000000000080
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000008b9c018
+RBP: 00000000f550c228 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+Modules linked in:
 
-[  157.187320] Bluetooth: hci0: Timed out waiting for suspend events
-[  157.187324] Bluetooth: hci0: Suspend timeout bit: 5
-[  157.187328] Bluetooth: hci0: Suspend notifier action (4) failed: -110
-[  157.187332] PM: suspend exit
-[  157.188315] Bluetooth: hci0: command 0x0c05 tx timeout
-[  159.239690] Bluetooth: hci0: command 0x200b tx timeout
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
