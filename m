@@ -2,146 +2,162 @@ Return-Path: <SRS0=Aqt4=BY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76205C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB18C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 22:23:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DD162074D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 20:57:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5305E2074D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Aug 2020 22:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbWjM8o7"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k73o73VN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgHNU5F (ORCPT
+        id S1726834AbgHNWXo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Aug 2020 16:57:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41402 "EHLO
+        Fri, 14 Aug 2020 18:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726623AbgHNU5E (ORCPT
+        with ESMTP id S1726229AbgHNWXo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Aug 2020 16:57:04 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74069C061385
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 13:57:04 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id r21so8609062ota.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 13:57:04 -0700 (PDT)
+        Fri, 14 Aug 2020 18:23:44 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF24BC061385
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 15:23:43 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id ha11so5019870pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Aug 2020 15:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5OTgAFgKEoxzSV29z4pMnxFk0J4VZgiMtd7nFNa4KdY=;
-        b=GbWjM8o7D8CSRP4Vml3v/oCPfSfdOOJeQyzvnn/8jKkzkVn703MCxflUG6uCpTGRTl
-         fI+wtEsCFjfnxHWWDTa24RZzNAXUZ4fC3fljQCfXjUahZzSefhdqtOPhsSrHEOCbw+tS
-         LilN4/UMa5G1ubftgPFypu5DB1l6U24GP9fWCK2SVqJkF3OO/Ol4hdwzo9bV+BDiO3jt
-         MZLwJyD44qgqZmiiEMLH7dL7LxfS20RjULVl0aV1bvuuUw1whaidvxxdyvL5K1pHd7LZ
-         GJDgcImt8rdRua4i2Kmd9mhwCYxPyyorM/e/GK3R8uNBbWFiZ58z7iRapsAQJiuqpOgm
-         mE4Q==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5jRl27RMtgZLeq7b/WHxRkukWBIOKeVCPevK+sNiPhQ=;
+        b=k73o73VNd0qn9M+iiKly87GFMMXb6KyBorDW4eREbb7tWN2jSXYRFziRAoYgSezuUF
+         FLz13Od/1weIFdHYZAkH4EE6DZ2zj7DIZfLAK/em3ojP/RtKqLTLGoQKKszjB6dJ4pV9
+         mte4YoB6Bc6FECyWkOAdnIkWLrrXIYtyO/yYs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5OTgAFgKEoxzSV29z4pMnxFk0J4VZgiMtd7nFNa4KdY=;
-        b=kxiqfNEPy4Z9R8dY6I/QlHbe0SNl91I1uSS+ae8NxqoSqvyG+jTl2K2irZ8rh/uOzF
-         FCS0ygK86Q4LZKMnBZ+5qlCu+80CaolORp8VfaUsobUjEMmOUFVlqwIqFjB9gqqvACHa
-         ZHd9B1vDpZrKaXoLI5g7lKzRYZTff9H7/PKAIKmR/YDPChfSyxr/y2Zj8csN0Ryc/C62
-         DwY758HT3U64ARz6u5CHgoFkCHWqjfL45sLy96ugBa1DDSMpnsqJxzzsAMqyvshgVKzD
-         R9ak4kHCgxJUgWAMHDACmYMnHwM3g8ElFtc6+Y8cX++AsENISmaRSfrmCeaJh3yJHc3l
-         5xGQ==
-X-Gm-Message-State: AOAM531V9NSjsQcgd6u15QDJu8RJtfCEVHjUmlg10beUiAvkDh2987Zb
-        c4wdD45Z9RsK1BdCeWV7VhuPeRY+fWdOTnXkAHxoTubxNQI=
-X-Google-Smtp-Source: ABdhPJysemBbRsxg1OJi9T1j8NWw3ToQqNXPdzZcm+ECMcdcbCFo6mUDKLeb9OFCPcNw4uFN1dLk32gnAYvbwt+ZTEM=
-X-Received: by 2002:a9d:429:: with SMTP id 38mr3079328otc.88.1597438623827;
- Fri, 14 Aug 2020 13:57:03 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5jRl27RMtgZLeq7b/WHxRkukWBIOKeVCPevK+sNiPhQ=;
+        b=kfH5VwKIJ6JMDsEB4dqff15jwwl71xg4WX0Dv7kML/inR6KBKQxofINRGXkDrUHcjq
+         yaL/PRk6ld9Mz7b0DzZLJxMxHNnnx1uTMrjINiL4OapCoLgVtxFIz5aZ/k7iK/ZVeL8A
+         WxaaXMmzE5v27TkuWAQTdbPnJzvZvHbtO6q3oB5IkgIucwIVailXOvMR7hH9P0HOGUAj
+         rrtGQIXhSRWv+d6inTkRzoAcfz3TbWhF3mRinSKtyNErNEAsDD3/3qdHd/i+LlyAvZCk
+         uk0uRFWvYzYzDbrWBJ1D0bFEGaOrCBfBgGOhh6xTNLA6Bgq3JaJUp2NgCL9ux4An6wwQ
+         fwtA==
+X-Gm-Message-State: AOAM531ccmB7MfjXv2qruratjqmmr6f5Y93VkqW7uHe/nrSzm8S+PCV/
+        593nJUH+lsm9ksTL9elKfgAoCg==
+X-Google-Smtp-Source: ABdhPJw4VToGF1Qswjip3GwGa5R4xOuQDDzZR0q80w8U/1h/s8l757szCrDYF3vT/E21VzKADGZyYA==
+X-Received: by 2002:a17:902:82c2:: with SMTP id u2mr3422745plz.239.1597443823248;
+        Fri, 14 Aug 2020 15:23:43 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id a17sm9302460pgi.26.2020.08.14.15.23.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Aug 2020 15:23:42 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH] bluetooth: Set ext scan response only when it exists
+Date:   Fri, 14 Aug 2020 15:23:36 -0700
+Message-Id: <20200814152323.1.Ib022565452fde0c02fbcf619950ef868715dd243@changeid>
+X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
 MIME-Version: 1.0
-References: <20200811181623.3683374-1-luiz.dentz@gmail.com> <93FEE5B2-F495-40C4-9386-E44DF132C49D@holtmann.org>
-In-Reply-To: <93FEE5B2-F495-40C4-9386-E44DF132C49D@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 14 Aug 2020 13:56:53 -0700
-Message-ID: <CABBYNZK0mJCRpkAgKrWQ+TQJbrPDkzEX+AkTum62sUQR0Tw6mg@mail.gmail.com>
-Subject: Re: [PATCH SBC 1/3] sbc: Add initial code for SSE primitives
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Only set extended scan response only when it exists. Otherwise, clear
+the scan response data.
 
-On Wed, Aug 12, 2020 at 5:48 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Luiz,
->
-> >
-> > ---
-> > Makefile.am              |   1 +
-> > sbc/sbc_primitives.c     |  20 ++-
-> > sbc/sbc_primitives_sse.c | 361 +++++++++++++++++++++++++++++++++++++++
-> > sbc/sbc_primitives_sse.h |  38 +++++
-> > 4 files changed, 417 insertions(+), 3 deletions(-)
-> > create mode 100644 sbc/sbc_primitives_sse.c
-> > create mode 100644 sbc/sbc_primitives_sse.h
-> >
-> > diff --git a/Makefile.am b/Makefile.am
-> > index 342043d..7ff0c7d 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -14,6 +14,7 @@ sbc_headers = sbc/sbc.h
-> >
-> > sbc_sources = sbc/sbc.c sbc/sbc_private.h sbc/sbc_math.h sbc/sbc_tables.h \
-> >               sbc/sbc_primitives.h sbc/sbc_primitives.c \
-> > +             sbc/sbc_primitives_sse.h sbc/sbc_primitives_sse.c \
-> >               sbc/sbc_primitives_mmx.h sbc/sbc_primitives_mmx.c \
-> >               sbc/sbc_primitives_iwmmxt.h sbc/sbc_primitives_iwmmxt.c \
-> >               sbc/sbc_primitives_neon.h sbc/sbc_primitives_neon.c \
-> > diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-> > index ff343cf..97a75be 100644
-> > --- a/sbc/sbc_primitives.c
-> > +++ b/sbc/sbc_primitives.c
-> > @@ -33,6 +33,7 @@
-> > #include "sbc_tables.h"
-> >
-> > #include "sbc_primitives.h"
-> > +#include "sbc_primitives_sse.h"
-> > #include "sbc_primitives_mmx.h"
-> > #include "sbc_primitives_iwmmxt.h"
-> > #include "sbc_primitives_neon.h"
-> > @@ -590,6 +591,21 @@ static int sbc_calc_scalefactors_j(
-> >       return joint;
-> > }
-> >
-> > +static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
-> > +{
-> > +     __builtin_cpu_init();
-> > +
-> > +#ifdef SBC_BUILD_WITH_MMX_SUPPORT
-> > +     if (__builtin_cpu_supports("mmx"))
-> > +             sbc_init_primitives_mmx(state);
-> > +#endif
-> > +
-> > +#ifdef SBC_BUILD_WITH_SSE_SUPPORT
-> > +     if (__builtin_cpu_supports("sse4.2"))
-> > +             sbc_init_primitives_sse(state);
-> > +#endif
->
-> lets keep the ifdef in the primitive functions they belong. This should be consistent across all primitives and not spread in two places.
+Per the core spec v5.2, Vol 4, Part E, 7.8.55
 
-I guess you mean moving #ifdef SBC_BUILD_WITH_SSE_SUPPORT into
-sbc_primitives_sse.c, same for mmx, right? I will fix that, although I
-was thinking on not even compiling those files when the config option
-is not enabled which would result in undefined symbols, I can however
-have alternative versions when its options are not enabled which
-basically does nothing.
+If the advertising set is non-scannable and the Host uses this command
+other than to discard existing data, the Controller shall return the
+error code Invalid HCI Command Parameters (0x12).
 
-> Regards
->
-> Marcel
->
+On WCN3991, the controller correctly responds with Invalid Parameters
+when this is sent.  That error causes __hci_req_hci_power_on to fail
+with -EINVAL and LE devices can't connect because background scanning
+isn't configured.
 
+Here is an hci trace of where this issue occurs during power on:
 
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x00
+        Properties: 0x0010
+          Use legacy advertising PDUs: ADV_NONCONN_IND
+        Min advertising interval: 181.250 msec (0x0122)
+        Max advertising interval: 181.250 msec (0x0122)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect...
+        TX power: 127 dbm (0x7f)
+        Primary PHY: LE 1M (0x01)
+        Secondary max skip: 0x00
+        Secondary PHY: LE 1M (0x01)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 5
+      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
+        Status: Success (0x00)
+        TX power (selected): 9 dbm (0x09)
+< HCI Command: LE Set Advertising Set Random Address (0x08|0x0035) plen 7
+        Advertising handle: 0x00
+        Advertising random address: 08:FD:55:ED:22:28 (OUI 08-FD-55)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Advertising Set Random Address (0x08|0x0035) ncmd
+        Status: Success (0x00)
+< HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
+        Handle: 0x00
+        Operation: Complete scan response data (0x03)
+        Fragment preference: Minimize fragmentation (0x01)
+        Data length: 0x0d
+        Name (short): Chromebook
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
+
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+---
+
+ net/bluetooth/hci_request.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e0269192f2e536..e17bc8a1c66ddd 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1533,11 +1533,14 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
+ 
+ 		memset(&cp, 0, sizeof(cp));
+ 
+-		if (instance)
++		/* Extended scan response data doesn't allow a response to be
++		 * set if the instance isn't scannable.
++		 */
++		if (get_adv_instance_scan_rsp_len(hdev, instance))
+ 			len = create_instance_scan_rsp_data(hdev, instance,
+ 							    cp.data);
+ 		else
+-			len = create_default_scan_rsp_data(hdev, cp.data);
++			len = 0;
+ 
+ 		if (hdev->scan_rsp_data_len == len &&
+ 		    !memcmp(cp.data, hdev->scan_rsp_data, len))
 -- 
-Luiz Augusto von Dentz
+2.28.0.220.ged08abb693-goog
+
