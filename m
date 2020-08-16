@@ -2,101 +2,62 @@ Return-Path: <SRS0=zMxM=B2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3372C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 08:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF3DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 09:32:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 917752065C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 08:14:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eP3TePlB"
+	by mail.kernel.org (Postfix) with ESMTP id AFB19206C0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 09:32:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728746AbgHPIOI (ORCPT
+        id S1726847AbgHPJcC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Aug 2020 04:14:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56380 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbgHPIOE (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Aug 2020 04:14:04 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38535C061756;
-        Sun, 16 Aug 2020 01:14:04 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id v4so14241149ljd.0;
-        Sun, 16 Aug 2020 01:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=bcZntAIR5yiduRedyBOkEhWnIQVjSv+jGHpqWFNJEk0=;
-        b=eP3TePlBVUJ/eODfTYNXP1IVxLPaYTu0UrtLqRgS8qLbXhHx3HJWwqJgERuewkWblC
-         x5foXZyrSCswF9iPp8ppApJh0xTLD0Z6fxa2CQCyP1OtWQyvo6mj8k9mYGyXo0m/FmTx
-         9+XGClEILI5Uk0MbOH5CJYaAlvAmx5HTqpM1nFAoKuDiTW2Ip9s4S57F1F7hNIr6D47g
-         RMD3KOnklV+PrKloWLJMeHKIVtppeqMIQVUOovwChl91vVw9uUKBbl8f6sUjrWlI8hTa
-         3/dfYOXZWiiP//nzPI3h9hTSsN13EqBaY8BBic/bgajoEoTvmkYP1uLQ7ChdzFrLSsMR
-         k9iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=bcZntAIR5yiduRedyBOkEhWnIQVjSv+jGHpqWFNJEk0=;
-        b=MeCI4d0Y5Gg1mU+qrsc7JgQll/RFRwRqlNoh+YkRTh5S3n82bfjrM4mIxc4vzOkYPV
-         0RS6hXvsS/JVfDSPniXBdhbkdtmFk+V+FKgR6+GnYBP7SRh0AvH8snhb8ky1BUWd5nla
-         rf/wgU5c/iCmsZHI0ChnpVJsgEjVKCv9bQ5scLw0j+1HDI3kPMEtweh0SK7x0mmv+JKe
-         zMA986kYMHiot1K7U5QuU1B1/8uSKWwcZkssLla8E8huDK9JHN8fI3xL+Kalno6ndT0D
-         Iq5gtYqL+gjMhuMkRygb+QAQVuYBAZYItmlGEgwQaVJoe/HSnRASaD0CB1Lud5+0b9q6
-         RmEw==
-X-Gm-Message-State: AOAM5315oFwe94XBfIghK8U5fbeG4DqDchFKPgkZDmeeKV06X8aJ4xh1
-        B3jSitE9ppxsJll/y/D6+uvsYYf9u90UXtJ4GDULZZbriyEK6tFA
-X-Google-Smtp-Source: ABdhPJz0V5KIQgcAA7RY/i1gNrKWEWz1r1xkvKxD8xBu2aHhkP3VuMF30qAZarvxvQ6hGhvvALz+hfYM24/3t3fzLaw=
-X-Received: by 2002:a05:651c:2cb:: with SMTP id f11mr4594604ljo.431.1597565640647;
- Sun, 16 Aug 2020 01:14:00 -0700 (PDT)
-MIME-Version: 1.0
-From:   Fox Chen <foxhlchen@gmail.com>
-Date:   Sun, 16 Aug 2020 16:13:49 +0800
-Message-ID: <CAC2o3D+g9BHpMNJCj3z5QWt3_+k+sUGaGSww+s-udyPP9tEkUg@mail.gmail.com>
-Subject: HCI_EV_PHY_LINK_COMPLETE in net/bluetooth/hci_event.c
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+        Sun, 16 Aug 2020 05:32:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47682 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726721AbgHPJcB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 16 Aug 2020 05:32:01 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 208915] Regression: issues and hang during PAN network
+ connection
+Date:   Sun, 16 Aug 2020 09:32:01 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: alxchk@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-208915-62941-RGWpSzxGmS@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-208915-62941@https.bugzilla.kernel.org/>
+References: <bug-208915-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear all,
+https://bugzilla.kernel.org/show_bug.cgi?id=208915
 
-I have a question about
+--- Comment #1 from Oleksii Shevchuk (alxchk@gmail.com) ---
+Created attachment 290923
+  --> https://bugzilla.kernel.org/attachment.cgi?id=290923&action=edit
+Perf top
 
-static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-struct sk_buff *skb)
--- HCI_EV_PHY_LINK_COMPLETE event packet handler in hci_even.c:4940
-
-if (ev->status) {
-        hci_conn_del(hcon);                 <--------------
-        hci_dev_unlock(hdev);
-        return;
-}
-
-Is it correct to del hcon here?? Because later on, when we close the
-socket fd, socket_close will call sco_chan_del which will eventually
-call hci_conn_drop. With hcon already deleted by this handler, it will
-crash.
-
-This bug is reported by syzbot in
-https://syzkaller.appspot.com/bug?id=57e98513afbe427bbd65ac295130bcf5bc860dd8
-
-I'm trying to fix that, but I don't know the design nature of
-HCI_EV_PHY_LINK_COMPLETE. Will this scenario happen in real life?? Can
-I remove hci_conn_del(hcon) here (I tested it, which fixes this bug)
-??
-
-
-Thanks,
-Fox
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
