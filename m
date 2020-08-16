@@ -1,128 +1,102 @@
-Return-Path: <SRS0=DQXy=BZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=zMxM=B2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F37AFC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Aug 2020 22:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3372C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 08:14:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D726D206B6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Aug 2020 22:00:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 917752065C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Aug 2020 08:14:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eP3TePlB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728116AbgHOWAK (ORCPT
+        id S1728746AbgHPIOI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Aug 2020 18:00:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45602 "EHLO
+        Sun, 16 Aug 2020 04:14:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728853AbgHOVvh (ORCPT
+        with ESMTP id S1725986AbgHPIOE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Aug 2020 17:51:37 -0400
-Received: from mail-il1-x148.google.com (mail-il1-x148.google.com [IPv6:2607:f8b0:4864:20::148])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1FAC0F26CD
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2020 10:19:25 -0700 (PDT)
-Received: by mail-il1-x148.google.com with SMTP id e12so8795392ile.14
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Aug 2020 10:19:25 -0700 (PDT)
+        Sun, 16 Aug 2020 04:14:04 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38535C061756;
+        Sun, 16 Aug 2020 01:14:04 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id v4so14241149ljd.0;
+        Sun, 16 Aug 2020 01:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=bcZntAIR5yiduRedyBOkEhWnIQVjSv+jGHpqWFNJEk0=;
+        b=eP3TePlBVUJ/eODfTYNXP1IVxLPaYTu0UrtLqRgS8qLbXhHx3HJWwqJgERuewkWblC
+         x5foXZyrSCswF9iPp8ppApJh0xTLD0Z6fxa2CQCyP1OtWQyvo6mj8k9mYGyXo0m/FmTx
+         9+XGClEILI5Uk0MbOH5CJYaAlvAmx5HTqpM1nFAoKuDiTW2Ip9s4S57F1F7hNIr6D47g
+         RMD3KOnklV+PrKloWLJMeHKIVtppeqMIQVUOovwChl91vVw9uUKBbl8f6sUjrWlI8hTa
+         3/dfYOXZWiiP//nzPI3h9hTSsN13EqBaY8BBic/bgajoEoTvmkYP1uLQ7ChdzFrLSsMR
+         k9iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=GpKlYOLTQ3NZOHf3k+bXCS8gLg7b2ROCnIxYzCs9K7Y=;
-        b=hZZ5rjeuraBiLyXJEtf7NMqp6FrZnQM0Mq1EJ78ra384MysBAd4CkhnaI8m7CbWmEq
-         R+gnsoQ60x516mRPVAusXDfoxp7otW+D8Vpvf/bS5IyMKVutJHR18rZTcLAc0UUTaU+O
-         7Qb2u85LxUN2oBLQhIkEiYPwYGMXLgGhJhchxYwSC5DIs2p70q6UZBx17v2koWRxcQBc
-         g2XNEwEzyE8oGfOYYBUPIA6cgHxc9ZcllU202ZrUNhGXDlCgZERctYBSvqlfvNZ0fFsN
-         QMx1sbnxHlj9ua00tMvSHB72Imljofq+a6VRV0iWF7Gpz2EdEKNgxnezg/yNZoA5mcoR
-         Ee7w==
-X-Gm-Message-State: AOAM532H12PHFn8zdGAX1W1r08s77MW+TcjfIhF/rbJ7gDMtcUlCdblk
-        boveot9JhzY9l5q3lHeFeOft9+duqPzFe4MUke84ZWdb4yhJ
-X-Google-Smtp-Source: ABdhPJzgWk0fNRRV9SxWB4STKsUr+rNsP+8+REIA7cb/c2NKeIHdOl1bkAZJR4qeWpTJhROEEuaRmDE7QKSDCrP/+Du82uxCBax8
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=bcZntAIR5yiduRedyBOkEhWnIQVjSv+jGHpqWFNJEk0=;
+        b=MeCI4d0Y5Gg1mU+qrsc7JgQll/RFRwRqlNoh+YkRTh5S3n82bfjrM4mIxc4vzOkYPV
+         0RS6hXvsS/JVfDSPniXBdhbkdtmFk+V+FKgR6+GnYBP7SRh0AvH8snhb8ky1BUWd5nla
+         rf/wgU5c/iCmsZHI0ChnpVJsgEjVKCv9bQ5scLw0j+1HDI3kPMEtweh0SK7x0mmv+JKe
+         zMA986kYMHiot1K7U5QuU1B1/8uSKWwcZkssLla8E8huDK9JHN8fI3xL+Kalno6ndT0D
+         Iq5gtYqL+gjMhuMkRygb+QAQVuYBAZYItmlGEgwQaVJoe/HSnRASaD0CB1Lud5+0b9q6
+         RmEw==
+X-Gm-Message-State: AOAM5315oFwe94XBfIghK8U5fbeG4DqDchFKPgkZDmeeKV06X8aJ4xh1
+        B3jSitE9ppxsJll/y/D6+uvsYYf9u90UXtJ4GDULZZbriyEK6tFA
+X-Google-Smtp-Source: ABdhPJz0V5KIQgcAA7RY/i1gNrKWEWz1r1xkvKxD8xBu2aHhkP3VuMF30qAZarvxvQ6hGhvvALz+hfYM24/3t3fzLaw=
+X-Received: by 2002:a05:651c:2cb:: with SMTP id f11mr4594604ljo.431.1597565640647;
+ Sun, 16 Aug 2020 01:14:00 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:792:: with SMTP id q18mr7200462ils.104.1597511965051;
- Sat, 15 Aug 2020 10:19:25 -0700 (PDT)
-Date:   Sat, 15 Aug 2020 10:19:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000033913705acedbd6b@google.com>
-Subject: memory leak in read_adv_mon_features
-From:   syzbot <syzbot+f7f6e564f4202d8601c6@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+From:   Fox Chen <foxhlchen@gmail.com>
+Date:   Sun, 16 Aug 2020 16:13:49 +0800
+Message-ID: <CAC2o3D+g9BHpMNJCj3z5QWt3_+k+sUGaGSww+s-udyPP9tEkUg@mail.gmail.com>
+Subject: HCI_EV_PHY_LINK_COMPLETE in net/bluetooth/hci_event.c
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Dear all,
 
-syzbot found the following issue on:
+I have a question about
 
-HEAD commit:    7fca4dee Merge tag 'powerpc-5.9-2' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ea92a1900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e320bbff976a5cdc
-dashboard link: https://syzkaller.appspot.com/bug?extid=f7f6e564f4202d8601c6
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1286db9a900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1143ddf6900000
+static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+struct sk_buff *skb)
+-- HCI_EV_PHY_LINK_COMPLETE event packet handler in hci_even.c:4940
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f7f6e564f4202d8601c6@syzkaller.appspotmail.com
+if (ev->status) {
+        hci_conn_del(hcon);                 <--------------
+        hci_dev_unlock(hdev);
+        return;
+}
 
-BUG: memory leak
-unreferenced object 0xffff88812b18e6e0 (size 32):
-  comm "syz-executor286", pid 6490, jiffies 4294993450 (age 13.120s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 20 00 10 00 00 00 00 00  ........ .......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<00000000f286b99c>] kmalloc include/linux/slab.h:559 [inline]
-    [<00000000f286b99c>] read_adv_mon_features+0xa1/0x150 net/bluetooth/mgmt.c:4180
-    [<00000000f0f16504>] hci_mgmt_cmd net/bluetooth/hci_sock.c:1603 [inline]
-    [<00000000f0f16504>] hci_sock_sendmsg+0xb01/0xc60 net/bluetooth/hci_sock.c:1738
-    [<000000001560da71>] sock_sendmsg_nosec net/socket.c:651 [inline]
-    [<000000001560da71>] sock_sendmsg+0x4c/0x60 net/socket.c:671
-    [<000000007d7be9f6>] sock_write_iter+0xc5/0x140 net/socket.c:998
-    [<00000000e3633d41>] call_write_iter include/linux/fs.h:1882 [inline]
-    [<00000000e3633d41>] new_sync_write+0x173/0x210 fs/read_write.c:503
-    [<0000000021a87df2>] vfs_write+0x21d/0x280 fs/read_write.c:578
-    [<0000000003f07ff6>] ksys_write+0xd8/0x120 fs/read_write.c:631
-    [<0000000003a7df09>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-    [<000000005ecd28f6>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+Is it correct to del hcon here?? Because later on, when we close the
+socket fd, socket_close will call sco_chan_del which will eventually
+call hci_conn_drop. With hcon already deleted by this handler, it will
+crash.
 
-BUG: memory leak
-unreferenced object 0xffff88812b18e660 (size 32):
-  comm "syz-executor286", pid 6495, jiffies 4294993998 (age 7.640s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 20 00 10 00 00 00 00 00  ........ .......
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<00000000f286b99c>] kmalloc include/linux/slab.h:559 [inline]
-    [<00000000f286b99c>] read_adv_mon_features+0xa1/0x150 net/bluetooth/mgmt.c:4180
-    [<00000000f0f16504>] hci_mgmt_cmd net/bluetooth/hci_sock.c:1603 [inline]
-    [<00000000f0f16504>] hci_sock_sendmsg+0xb01/0xc60 net/bluetooth/hci_sock.c:1738
-    [<000000001560da71>] sock_sendmsg_nosec net/socket.c:651 [inline]
-    [<000000001560da71>] sock_sendmsg+0x4c/0x60 net/socket.c:671
-    [<000000007d7be9f6>] sock_write_iter+0xc5/0x140 net/socket.c:998
-    [<00000000e3633d41>] call_write_iter include/linux/fs.h:1882 [inline]
-    [<00000000e3633d41>] new_sync_write+0x173/0x210 fs/read_write.c:503
-    [<0000000021a87df2>] vfs_write+0x21d/0x280 fs/read_write.c:578
-    [<0000000003f07ff6>] ksys_write+0xd8/0x120 fs/read_write.c:631
-    [<0000000003a7df09>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-    [<000000005ecd28f6>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+This bug is reported by syzbot in
+https://syzkaller.appspot.com/bug?id=57e98513afbe427bbd65ac295130bcf5bc860dd8
+
+I'm trying to fix that, but I don't know the design nature of
+HCI_EV_PHY_LINK_COMPLETE. Will this scenario happen in real life?? Can
+I remove hci_conn_del(hcon) here (I tested it, which fixes this bug)
+??
 
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Thanks,
+Fox
