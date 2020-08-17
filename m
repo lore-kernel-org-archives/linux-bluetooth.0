@@ -7,83 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B68EC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 23:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E31DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 23:24:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4971D20709
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 23:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5023620709
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 23:24:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JMyMxx3S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJNMagXQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726596AbgHQXRL (ORCPT
+        id S1726273AbgHQXYZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Aug 2020 19:17:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50338 "EHLO
+        Mon, 17 Aug 2020 19:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbgHQXRI (ORCPT
+        with ESMTP id S1726165AbgHQXYY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Aug 2020 19:17:08 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD60C061389
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 16:17:07 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id v6so14769281ota.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 16:17:07 -0700 (PDT)
+        Mon, 17 Aug 2020 19:24:24 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7389C061389
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 16:24:24 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id u63so16341979oie.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 16:24:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=sBN+7DVSoGmRYZdaF0Xc2Fr0jnFu0vtmzUtOMztMCvY=;
-        b=JMyMxx3SP14VqB41O7Upjcma9ejQjvya7OeyvIPEczgYi1SS7ObRGpgxXtbD/7hh6U
-         3SDbCejRF2mPXNkjvn17ogxEKjzGp9o2/eUTZLRjS+QCXdewe7ytHq8+Fr85epKrA8NV
-         jmw5JDcrrIyzVHnoRcIVHePaACGd5RbXtm2larBXbzs1lCpH96bOmz62YSCRLgDBRvkT
-         hp4/1QAHQBN7Re9imjXDv2NzigrnIzq2WQyZ78IDArW3nej0StaJCEq6Lj0MdMZh1MQR
-         62+JmSNI1Egyfhv9FHd9Im2x9KkPyYg06OKHNlbpyOYTK/eUl8eHl+Z3aXtXkxeV3Viq
-         aWpA==
+        bh=YFzSXlNrmd43O0W2NTqrdb9Md3q7gFf2ih/2c/pBQSQ=;
+        b=iJNMagXQPpf8hs7lTRX1o+GAj2t/B69PGNfeQQRA+J22OSRAfuqmOQdOLQ6wCTvdYa
+         RByU487BY+8UeADkn+3kyRBNtYxxzvO8oeo7T82nMnZ6FPOU9+9zCFDmSn+cJ/HXEwih
+         qC2oMcTJkrswg2Pw8HH3GiHiTj0lb6E+qiu6rCYasRRKK8MOEFSViCJ+zX+xdgdf9tFo
+         tfeHn3xu4mfVwoGiYX6P9EmuAr+SJAWfk2EDj1DjNqMA1gbvBY/KhccpBSTZPgElSken
+         tDNeoNMPpcigiVGc8Rt2lzmsRnoKiKL8rh1vKDuxi36YSz57zeC3Yynxzzp/7Px1i4jd
+         +I8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=sBN+7DVSoGmRYZdaF0Xc2Fr0jnFu0vtmzUtOMztMCvY=;
-        b=iYacYCoTqLA5r9acikzoGEgwyaDHLk60XmeKAmeKF98oc42I8gvvr1F2q3jtz/MWSk
-         wyzQCckI7aNCiSxcVY41tmloz0+Ptmx6zfd2IJ7nXimlBacOxw9d7OWpiRr17s9uBZly
-         2vY6cz38H3E62wDP8VXWskF4c1KUkyw9m9Br93dvSD6PreoFsXI++K0N2fM3RXyiXb7H
-         m4Je0O2V6Lul4igqJc7MCjzUY3FllLG3LWxeQqV5eNwYvAU2OqI8B3H9Rrl4IWSb8PcB
-         adcKnL3ymfSqyzuZoWotyzUfPyA18IIpJVD8numRR1SnVC6SorVD+kgQlLdz1DIDiaCy
-         QB3A==
-X-Gm-Message-State: AOAM531Q4ju6qNuR1BVMtl7XaRCyl9SdTBBmetx/bEMmUwA+DGwShnfz
-        rbSFyTWM0iE+8uSDwVGOD4DBi6rY8CGigMaK37p+XCAM
-X-Google-Smtp-Source: ABdhPJxuMnoYx4/tmAqcX1dOUrvBo2AOFjcKcnIr/RBAbf+LSjNAnf0CRuW3EGnV0m/19C/Hj5xcctpV5+ujKS0NfPY=
-X-Received: by 2002:a9d:6053:: with SMTP id v19mr12568844otj.362.1597706224803;
- Mon, 17 Aug 2020 16:17:04 -0700 (PDT)
+        bh=YFzSXlNrmd43O0W2NTqrdb9Md3q7gFf2ih/2c/pBQSQ=;
+        b=ibJWm6IbRVz9fiN5/51Fe1Px58fKtcbnQSKj0/kL/K9fFJD6OLXcL3D8bl9L7vI9Mh
+         UfnVRSaVPpGVGoMkyB1gaJnrgvG6pZmV1mGuWPB6U2aK6tbsNhdOZKWOyeLXdqBy+meS
+         Jz/CiSuI1ZaAREZUETD1XYkNMwgJhXzDT2ylA84+1YZekN3uvjosJClFKR4J6/gOllId
+         CZ6HaQTAAQ+v9kz4RC2jt55HsAn8wg21w0L+QgDlzt5lnp2cAFmf3vyOKurdglu8qmhV
+         Fae9o0n1UlE0quM90mVo/tEnUf++56/hCfj5kaEc/Y1tMgr/cRCnhpD1gz5L54SIpD3C
+         8S7Q==
+X-Gm-Message-State: AOAM533dE1YNXH5632uYCs1989gtDQpxHOuhrasGJ5Aq2lq5OfNJL4M6
+        2t9Ktfg5hs0PdIl/wzKtngltqIX8ukx10m9inzs=
+X-Google-Smtp-Source: ABdhPJyGPpFXuqlXVN796VNfEeHLmWK7nMwA+GAzfczbPwg12QiiGEMmrdeYLbsKViaKe8MNIAjJBoKrUN2PGYtmBQU=
+X-Received: by 2002:aca:5703:: with SMTP id l3mr10517426oib.48.1597706663964;
+ Mon, 17 Aug 2020 16:24:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200817212554.3844965-1-yudiliu@google.com> <20200817142545.RFC.v2.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
-In-Reply-To: <20200817142545.RFC.v2.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+References: <20200817135606.Bluez.v2.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
+In-Reply-To: <20200817135606.Bluez.v2.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 17 Aug 2020 16:16:54 -0700
-Message-ID: <CABBYNZLRqhB6d5Hm7_RqvUqCJo11D4+pgYLCeWj0j=8dZk0Bcg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/1] adapter - D-Bus API for querying the adapter's capabilities
+Date:   Mon, 17 Aug 2020 16:24:13 -0700
+Message-ID: <CABBYNZLfmuLHvvMUwz_-Lg=q5aFYt6S3UEV-SA--ESmRMX4DVQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2] adapter- Device needs to be in the temporary
+ state after pairing failure
 To:     Yu Liu <yudiliu@google.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         ChromeOS Bluetooth Upstreaming 
         <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Yu Liu,
 
-On Mon, Aug 17, 2020 at 4:07 PM Yu Liu <yudiliu@google.com> wrote:
+On Mon, Aug 17, 2020 at 4:04 PM Yu Liu <yudiliu@google.com> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> Initially this is introduced to query whether WBS is supported by the adapter,
-> the API is generic enough to be extended to support querying others in
-> the future.
+> This caused the device hanging around as a discovered device forever
+> even if it is turned off or not in present.
 >
 > Reviewed-by: sonnysasaka@chromium.org
 >
@@ -91,46 +87,40 @@ On Mon, Aug 17, 2020 at 4:07 PM Yu Liu <yudiliu@google.com> wrote:
 > ---
 >
 > Changes in v2:
-> - Return an array of strings instead of a dict
+> - Fix title length and format issue
 >
 > Changes in v1:
 > - Initial change
 >
->  doc/adapter-api.txt | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  src/device.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 1a7255750..8fbcadb54 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -204,6 +204,18 @@ Methods            void StartDiscovery()
->                                          org.bluez.Error.NotReady
->                                          org.bluez.Error.Failed
+> diff --git a/src/device.c b/src/device.c
+> index bb8e07e8f..93e71850c 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -6008,6 +6008,12 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
 >
-> +               array{string} GetCapabilities()
+>         if (status) {
+>                 device_cancel_authentication(device, TRUE);
 > +
-> +                       This method returns a list of supported
-> +                       capabilities that is populated when the adapter
-> +                       initiated.
-> +
-> +                       Possible values:
-> +                               "wbs" - Wide band speech
+> +               // Put the device back to the temporary state so that it will be
+> +               // treated as a newly discovered device.
 
-Btw, should we stick to use wbs terminology here, or we should
-actually use the HCI feature/command, because wbs has actually to be
-implemented by the HFP afaik this is only indicating that the
-controller is able to notify packets drops, etc, with use of erroneous
-command. Perhaps we should actually use the term PLC (Packet Loss
-Concealment) instead since that seems to be the real capability here,
-afaik WBS does not actually require PLC.
+Use C style comments /* */ above.
 
-> +
-> +                       Possible errors: org.bluez.Error.NotReady
-> +                                        org.bluez.Error.Failed
-> +
->  Properties     string Address [readonly]
->
->                         The Bluetooth device address.
+> +               if (!device_is_paired(device, bdaddr_type))
+> +                       btd_device_set_temporary(device, true);
+
+Hmm, are we perhaps removing the temporary flag too early? Or this is
+a result of calling Connect which clears the temporary flag? Then
+perhaps we should at least if the upper layer has marked the device as
+trusted as it should indicate the device object should be kept even if
+not paired.
+
+>                 device_bonding_failed(device, status);
+>                 return;
+>         }
 > --
 > 2.28.0.220.ged08abb693-goog
 >
