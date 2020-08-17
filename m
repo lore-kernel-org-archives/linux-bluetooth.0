@@ -2,105 +2,103 @@ Return-Path: <SRS0=KHjC=B3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4CBC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83995C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:50:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03F8320674
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5840820758
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:50:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NtAgfKUI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="chb7SWs/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726596AbgHQUmC (ORCPT
+        id S1726944AbgHQUu6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Aug 2020 16:42:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54484 "EHLO
+        Mon, 17 Aug 2020 16:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726361AbgHQUmB (ORCPT
+        with ESMTP id S1726165AbgHQUu5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Aug 2020 16:42:01 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A7FC061389
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:42:01 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id l13so19821035ybf.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:42:00 -0700 (PDT)
+        Mon, 17 Aug 2020 16:50:57 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCCDC061389
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:50:56 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id b14so16303307qkn.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:50:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=UNmPgd9kNtZoo9wgw4gsRYDyNuPIjwok9mt363/DTg4=;
-        b=NtAgfKUIXsJ8BR+6PY8e+bttLBBpQL476nDd1QiQpMCDbP+YtSZ3+eLUOnYhSeqOrK
-         KfFa/AI9tex97TLNnfJgbtKZK2ytqPHA0C+a6s6TYz6p5Sv/JqHKeWRDmqD2tK63aEv0
-         AKC8SEQwsQv80pfaiRAynQhSNO3WY+d8Jq6WSdU0On5W06mCM6g3EjiUr7nhGIGHsuY8
-         lCC1TA5ZdUVoWlBHS/mAN1Qd2gYl/Y/f8av7jSOAs9rYUNJNaLgOQKJMPqABwz7jzVs0
-         HUg+SttY8VcC6Ks9zGJPDxKeOWldaPI3VqltP4OzGfseeOhEZ++nNn7f2zdNpOhypJe2
-         0emA==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=vLX1btiv+rxQBwdgZfx93NNh+vu/2OGlrmuq4CHtKIY=;
+        b=chb7SWs/uEj1ggnGkc6qFw921EX87XdZSdulEemXAzo6Vf2/bh2iVGP0jp+gSCn+yE
+         AYKkA0uOErhz3Es3uhXGklrukrje5UD2j2Qgi51ffrzdu983L5+8zuV1BL05p7tfDGRU
+         3rmuixoJpx/NMUoOVSlRKQRtf3395jy2XG7ZaJUs34f5B2y5YWkCVBpkmVAmDI0/2eL8
+         FPSl6mUo/SeClM3UG8YsTBdrtVJ9vzWH/tFLDAfmfDfSWrHimqRdXpGsnf0ee61ru4A3
+         6N5LS3t/HKoIq5sZ3T3nwPnXbYUYyD+nkME710CkP+dHXXv6BWrtZqWQlM8sud6TqfDE
+         9H9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=UNmPgd9kNtZoo9wgw4gsRYDyNuPIjwok9mt363/DTg4=;
-        b=BEkiJkCKv6/MeOA1wTgPSjztZfE1rWFQ41blpykOeuW/xhhc8aq6CLIZ29jKGS4Xpz
-         +FuXDYY5/OGpw/QGaLOE+MxmK7io+6sMlgBNpFkBB6K0GQ+Qjq7Swwm7F7/LB9KdysHg
-         deBwEaRQp8DZjSrQcP2XcvphCHMkJggcxrg+z6Kz1ANPLmUCDfEb2ZE5yM9dqz4y/D94
-         LIpPc31ADG6dAqJp5oApk0LHNVDzM+MiJFs+ASAkJRGQYcJGvlR/GJy9dQh3JIReNGAZ
-         UPTyvz2PAOws1GCmDrBSIQI1oeJDonvq4S3I8rWBSzPmqmMX/XpmuMSUqf63OHZ8fRhK
-         vQxQ==
-X-Gm-Message-State: AOAM532t1YdHytEQvpC69jM+HErB5R2KouZdhQHPbd7Ak7jhsXTyb51m
-        +WbtAE1l2HTamaeGmHLic1gf8CJ6JUWEBEBVEPgYWj9tUQRbjjWDE3mL0DE23A3yPHMpgc9A/m1
-        tx/uobiTp34fT6XyNME3GMsQSLcBpD+0lj2jr7ulwoXKRQO6Y4ntGgW5xVD5eHLEso6OM2SnqTZ
-        r7
-X-Google-Smtp-Source: ABdhPJyc81SBqB4rCPKkD2kKicASI6t/lTWvv4PMPtBCBk+6CPPgYlhRwxK5rv7kmmg25jeoccEtHzgNyraH
-X-Received: by 2002:a25:53c6:: with SMTP id h189mr23476248ybb.469.1597696920076;
- Mon, 17 Aug 2020 13:42:00 -0700 (PDT)
-Date:   Mon, 17 Aug 2020 13:41:53 -0700
-Message-Id: <20200817134133.Bluez.v1.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [Bluez PATCH v1] adapter- Device needs to be in the temporary state
- after pairing failure.
-From:   Yu Liu <yudiliu@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Yu Liu <yudiliu@google.com>, sonnysasaka@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=vLX1btiv+rxQBwdgZfx93NNh+vu/2OGlrmuq4CHtKIY=;
+        b=ejQHtNUiNZ+qFuGKxbsAuQDl8fIRPY8yIup/PidvNp+d+PqUOeVRGGJUteZxNtYa2A
+         kCRyyPS441StuOEMxOM03tuD+14QwVqe7pZsFdcMmcxHB3qhGo8t2UFAegpnlbtFFTUd
+         1nK2s6SEg788B0D2oMYs11qaK4xOaSgP3/FPjASpPupaH6W1SKXE86IkQG3CFyBESj+i
+         0FLTo9zogsd98oLWZgeX+J+LePAsvYMN4vYvR56DwurNCr8dCQ3+LubfJzrhWIn6Ae3q
+         2CLq8p82T/27I2gP3Svr8N7TUBmZ7W3Snju6s1dEN/+iXEPWPLIAm9rSRDrGpsnnwMVU
+         pt6Q==
+X-Gm-Message-State: AOAM530aIlvhQMDN9AapqKxgvxwuuGQ9p+30taGOsbyvgKkum9F2tW7H
+        yLqMnlAR7jBSU3ab/P2a8nyfX4H0eeLuLQ==
+X-Google-Smtp-Source: ABdhPJzzR+OimUti16ML2QZulWg6n90/8OQaq4JaOmu72osXS4AztdrgljjEWOk08Q1Fnnc27uULPg==
+X-Received: by 2002:a05:620a:24e:: with SMTP id q14mr14545163qkn.482.1597697455281;
+        Mon, 17 Aug 2020 13:50:55 -0700 (PDT)
+Received: from [172.17.0.2] ([52.242.93.78])
+        by smtp.gmail.com with ESMTPSA id 65sm19443678qkf.33.2020.08.17.13.50.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2020 13:50:54 -0700 (PDT)
+Message-ID: <5f3aedae.1c69fb81.96718.fbe9@mx.google.com>
+Date:   Mon, 17 Aug 2020 13:50:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5073655635248183269=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yudiliu@google.com
+Subject: RE: [Bluez,v1] adapter- Device needs to be in the temporary state after pairing failure.
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200817134133.Bluez.v1.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
+References: <20200817134133.Bluez.v1.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This caused the device hanging around as a discovered device forever
-even if it is turned off or not in present.
+--===============5073655635248183269==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: sonnysasaka@chromium.org
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkgitlint Failed
+
+Outputs:
+1: T1 Title exceeds max length (73>72): "adapter- Device needs to be in the temporary state after pairing failure."
+1: T3 Title has trailing punctuation (.): "adapter- Device needs to be in the temporary state after pairing failure."
+
+
 
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v1:
-- Initial change
-
- src/device.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/src/device.c b/src/device.c
-index bb8e07e8f..93e71850c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6008,6 +6008,12 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
- 
- 	if (status) {
- 		device_cancel_authentication(device, TRUE);
-+
-+		// Put the device back to the temporary state so that it will be
-+		// treated as a newly discovered device.
-+		if (!device_is_paired(device, bdaddr_type))
-+			btd_device_set_temporary(device, true);
-+
- 		device_bonding_failed(device, status);
- 		return;
- 	}
--- 
-2.28.0.220.ged08abb693-goog
-
+--===============5073655635248183269==--
