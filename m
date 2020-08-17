@@ -2,168 +2,110 @@ Return-Path: <SRS0=KHjC=B3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD6EC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF6CC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 629002065D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 980A92065D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:56:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsYs6t8l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TNurjeIA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726949AbgHQUwq (ORCPT
+        id S1726983AbgHQU43 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Aug 2020 16:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56132 "EHLO
+        Mon, 17 Aug 2020 16:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726948AbgHQUwn (ORCPT
+        with ESMTP id S1726228AbgHQU42 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Aug 2020 16:52:43 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCA1C061389
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:52:41 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id j7so16008569oij.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:52:41 -0700 (PDT)
+        Mon, 17 Aug 2020 16:56:28 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22469C061389
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:56:28 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v11so19666400ybm.22
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:56:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=i1TlfCFtQ6IMhqvDIaQBuJ7PSjmH9A7KNtubVPP5Vy8=;
-        b=nsYs6t8lfteW1b9b7M32XQ2plfYDvWY96zi5FRPslaJhGhNxdxvAH3uDs75t6wvKIz
-         No3YsR/DteReY/XO6/OlrG3N3zP6irjw5zKJwNpQ4FcKlOC6S8jkPP1zsWzbGqdbYSV4
-         gmyUfj0LCeCjLzRDZUx7j0Q47KcXxrS6DEr+SZN6A9wOmZsGp2WMecbVaEIQINvFC9rG
-         aR6jGPSo+duDYkc4e6gsdQ6p32cL/vPYHF+BB+rKL+DkmOYJtFHA7FcjMVR0toubmuRS
-         hDDALkZT442A/381AlagfGjUmWYkOwpFuRK6MsQpWEzaMagQsHUd+THoOIMqs2ZdLweI
-         4fzw==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=xAuvgih+72j9IUIm7iDAaTRlM7+svjQwxUff+8aUj68=;
+        b=TNurjeIAgdwM1HlUV/65hI/+Ydcs0nHzExOPJdZ9NkaFFkq6jQaJgeoMQMNf3jXjod
+         p1ihIIXKAre3BNmA4+hoRwzkmri2+zsiM/2px4AYw2YTKQxpa2TQJtHntfkIOzJCBto0
+         gaiZNNeD24fCr2z5DYVCaUMRdwwJKBeGmFc6S/SvAdINxQq5s4xSPDgh7G3AhAISAIl3
+         z1F6hbrv/UBmM+L02X5q/z7tojQ/5x+srPNe81kjblXMiXFHSV+UguzGLPOPT5F1cbUL
+         O47ract8E0WckuOZ2uSuIHjtt8cPb3AV7nQcB36vglDw/29yNP/zsut3zaS8ZsNnykiK
+         UuLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=i1TlfCFtQ6IMhqvDIaQBuJ7PSjmH9A7KNtubVPP5Vy8=;
-        b=fT1htq/C+8CZxbfKfIy2tiPB50TksrfouaOh5JFZ6GRWYrCj7LXIyfpS415fNxjHJ8
-         pfHMQuY5rUf35LU7S204HzwY2Nq1qRGPOdgkqfqqPb1Z0T0qKG61qK5B3oLn0rQr7GfP
-         m5m4xZXNXb50eoBi9kDbSqB5FZHiq73Ox9+CgGicAs9GICTVxd8eonEdydglp+JQ4Nss
-         KDcRw4cELarGOovleTLWCUIeONsONuhxWnTZ/YJjbl0nGgr2ttOVTQqA6J6A2NvcPsOb
-         yhj8RQoE7nvY6HZM3SmEedLsot5jLC6fhlFk9zDAZiWyzSjgU9koT+awcV9D8SnlGd6m
-         Wesg==
-X-Gm-Message-State: AOAM5331F0duW850toepe1Lg5qg3U9dFiSSg4OE/tZXZYblksVUtDX13
-        DNWppwZXj97K6b8wTNSlfWXGrYYhuojBjDqk9Tg=
-X-Google-Smtp-Source: ABdhPJx/DP+ppyBgWh1MVUhgCmYVsaMyRid2zeBz5wS6ZdpHd0vsYyXVc+Z6ZKYNf8twtzVgHfuE18K9vUX5WKDi+VU=
-X-Received: by 2002:aca:f504:: with SMTP id t4mr11006198oih.137.1597697560997;
- Mon, 17 Aug 2020 13:52:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200807142429.BlueZ.1.I588558f1e38231193d6e955a4008ce54712d5c89@changeid>
- <CABBYNZL4s151e-a+X0fEA73RM54aA--m+on7as4dLrJX0xevQQ@mail.gmail.com> <CAGPPCLDFUgPU+XqNPxUBgH9kKUSEb+DvFO0PhAKTUZUToXCi4Q@mail.gmail.com>
-In-Reply-To: <CAGPPCLDFUgPU+XqNPxUBgH9kKUSEb+DvFO0PhAKTUZUToXCi4Q@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 17 Aug 2020 13:52:30 -0700
-Message-ID: <CABBYNZK_dvQPetyJ=fi_2u3bLzLe9bayBD4PZ7yL0KskN_2nhA@mail.gmail.com>
-Subject: Re: [BlueZ PATCH] Disable auto-connect on cancel pair
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=xAuvgih+72j9IUIm7iDAaTRlM7+svjQwxUff+8aUj68=;
+        b=Z9OyrGrSgeHfIeRnof7cgf4r+jZ5f3mmibnYrXRQbeUxjHC6Zp6oVfGYrPMCdwvsIp
+         wBfUUfMNjOaf3hXQ5d2fcn61uCrDC3gSYsv8UqoN823VsqTrd4Px2QcXpoO8dkUapXQB
+         QWMf24P8Pg8ZeWcbQ/CNtbpmKt7YGWd0PaxohCgopESe2zYjlfDam8ECqZaAqT6I0nd0
+         G0Hxkc3WlXhNgcB9w16HYrCRi9RiNtZsztCXB7GuJyUgbvz6y94LoHo8vfHD/2pzygVE
+         Br1ieg3iF0RKB78J/M5dk4KLyQzdERpSPOLkGbqWqc75QVKVxZA4zuq9TMmLZl4dApgo
+         OyIQ==
+X-Gm-Message-State: AOAM532YOiewqtorFw9qwUcllRj77R0HOod0wGdajhk6NZpmrEAdnTm/
+        C/9aTI3/3YoKHmoYJz0M+GWgCxFfcMR4OlarXS0gE65/3IhY3Kn5UnNQtYOq2/krIeZE9FtB9KK
+        smhgLzEjRb6TqYhcg5LDGFWsZGId9kYUPizdP/WhuLn5PkIst2AhhUSz2r0kVH5rDzz+5OFtI5g
+        dk
+X-Google-Smtp-Source: ABdhPJwqfJPUvnaS/gxS/kqq4BI4zelaOUHhis7TLfeiuYkElIaUgVfKPyzghzSE6h4dxZwnZ7YXyMsH/2z2
+X-Received: by 2002:a25:40d8:: with SMTP id n207mr24159973yba.69.1597697787315;
+ Mon, 17 Aug 2020 13:56:27 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 13:56:23 -0700
+Message-Id: <20200817135606.Bluez.v2.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
+Subject: [Bluez PATCH v2] adapter- Device needs to be in the temporary state
+ after pairing failure
+From:   Yu Liu <yudiliu@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Yu Liu <yudiliu@google.com>, sonnysasaka@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+This caused the device hanging around as a discovered device forever
+even if it is turned off or not in present.
 
-On Mon, Aug 17, 2020 at 12:37 PM Manish Mandlik <mmandlik@google.com> wrote:
->
-> Hi Luiz,
->
-> On Mon, Aug 17, 2020 at 10:11 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>
->> Hi Manish,
->>
->> On Fri, Aug 7, 2020 at 2:24 PM Manish Mandlik <mmandlik@google.com> wrote:
->> >
->> > While pairing process is in progress, service discovery starts in the
->> > background. If HOG profile is detected, auto connect is enabled for
->> > that device. This causes future advertisement from that device to
->> > trigger a pairing even if the user has already cancelled the pairing.
->>
->> So it looks like something is not right if the user cancel the pairing
->> process I would expect the device to be removed if this happens when
->> setting up a new device or at least call Disconnect method which would
->> disable auto_connect if the device is not trusted.
->
->
-> Earlier there was another patch related to pairing cancel issue: https://patchwork.kernel.org/patch/11608271/
-> This patch terminates the link when the user cancels the pairing process. Once the link is terminated, the device is removed by disconnected_callback()->dev_disconnected()->btd_adapter_remove_device().
->
-> However, the device remove code-path doesn't check for or disable autoconnect. In the current bluez code, autoconnect is disabled only if the disconnect is initiated by the user (in dev_disconnect()).
->
-> So, instead of disabling autoconnect while cancel pair, do you think we should disable it during device remove (in device_remove())?
+Reviewed-by: sonnysasaka@chromium.org
 
-I'm not following you on this part, is there something preventing the
-device to be removed? If the devices end up being removed so does its
-autoconnect state, if that is not happening then that is the culprit
-here and should be fixed.
+Signed-off-by: Yu Liu <yudiliu@google.com>
+---
 
-> Or should we disable it in the cancel pair code-path, but with a check if the device is trusted or not as per your suggestion:
->
->         if (device->auto_connect && !device->trusted) {
->                 device->disable_auto_connect = TRUE;
->                 device_set_auto_connect(device, FALSE);
->         }
->
-> Please advise.
->
-> Thank you.
->
->>
->> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
->> >
->> > Signed-off-by: Manish Mandlik <mmandlik@google.com>
->> > ---
->> >
->> >  src/device.c | 9 +++++++++
->> >  1 file changed, 9 insertions(+)
->> >
->> > diff --git a/src/device.c b/src/device.c
->> > index 470596ee4..ab5bb123e 100644
->> > --- a/src/device.c
->> > +++ b/src/device.c
->> > @@ -2870,6 +2870,15 @@ static void device_cancel_bonding(struct btd_device *device, uint8_t status)
->> >         if (!bonding)
->> >                 return;
->> >
->> > +       /* Auto connect may get enabled during the service discovery even
->> > +        * before the pairing process completes. In such case, disable it
->> > +        * when the user has cancelled the pairing process.
->> > +        */
->> > +       if (device->auto_connect) {
->> > +               device->disable_auto_connect = TRUE;
->> > +               device_set_auto_connect(device, FALSE);
->> > +       }
->>
->> BlueZ has the trusted property so upper layer can actually flag if the
->> device is trusted regardless if it is paired on not, so this seems out
->> of place or we should at least check if if the device has been marked
->> as trusted.
->> >         ba2str(&device->bdaddr, addr);
->> >         DBG("Canceling bonding request for %s", addr);
->> >
->> > --
->> > 2.28.0.236.gb10cc79966-goog
->> >
->>
->>
->> --
->> Luiz Augusto von Dentz
+Changes in v2:
+- Fix title length and format issue
 
+Changes in v1:
+- Initial change
 
+ src/device.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/src/device.c b/src/device.c
+index bb8e07e8f..93e71850c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6008,6 +6008,12 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 
+ 	if (status) {
+ 		device_cancel_authentication(device, TRUE);
++
++		// Put the device back to the temporary state so that it will be
++		// treated as a newly discovered device.
++		if (!device_is_paired(device, bdaddr_type))
++			btd_device_set_temporary(device, true);
++
+ 		device_bonding_failed(device, status);
+ 		return;
+ 	}
 -- 
-Luiz Augusto von Dentz
+2.28.0.220.ged08abb693-goog
+
