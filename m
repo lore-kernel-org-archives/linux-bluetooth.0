@@ -2,155 +2,105 @@ Return-Path: <SRS0=KHjC=B3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42829C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 17:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4CBC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:42:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1424B20716
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 17:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03F8320674
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Aug 2020 20:42:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRM/vWqp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NtAgfKUI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731270AbgHQRfR (ORCPT
+        id S1726596AbgHQUmC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Aug 2020 13:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53334 "EHLO
+        Mon, 17 Aug 2020 16:42:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730006AbgHQRfK (ORCPT
+        with ESMTP id S1726361AbgHQUmB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Aug 2020 13:35:10 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47936C061389
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 10:35:09 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id k12so14091992otr.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 10:35:09 -0700 (PDT)
+        Mon, 17 Aug 2020 16:42:01 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A7FC061389
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:42:01 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id l13so19821035ybf.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Aug 2020 13:42:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7F2WR7ZiKtgV6Hbdw4w6WH+wyjdFEO/gsngLlaXW4JY=;
-        b=XRM/vWqpqTA4CCDPEqZlyxy7z/PUa113phRqL8bExZI7c32oenN0l/kRzs6Hn74QV/
-         Mze98FZsPg6js7Lmq2BLCLmuuG9kFk7jmoYRNQGKon3ZfPt85pxIR4D2uQ32SBDhRiWH
-         kxFYzcw9Q+LZRwbI1sUnLO4wUoIHkv5cJrBUY31DB4FyCPK8GAFBQE/6fDAFy8bRE38J
-         2rN4+yljrR11nzSKmLT3frdOLKqQuoTCQv/Pbce66Z+dbrCIKG477dcwn8lH4106OEK5
-         wdyNeSU+XADxKdsxOc/5F4xfxMmig8dvCSnn1ytV2rX6uHIQPwLSN1SHTAf2StIcZCHI
-         9ZkQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=UNmPgd9kNtZoo9wgw4gsRYDyNuPIjwok9mt363/DTg4=;
+        b=NtAgfKUIXsJ8BR+6PY8e+bttLBBpQL476nDd1QiQpMCDbP+YtSZ3+eLUOnYhSeqOrK
+         KfFa/AI9tex97TLNnfJgbtKZK2ytqPHA0C+a6s6TYz6p5Sv/JqHKeWRDmqD2tK63aEv0
+         AKC8SEQwsQv80pfaiRAynQhSNO3WY+d8Jq6WSdU0On5W06mCM6g3EjiUr7nhGIGHsuY8
+         lCC1TA5ZdUVoWlBHS/mAN1Qd2gYl/Y/f8av7jSOAs9rYUNJNaLgOQKJMPqABwz7jzVs0
+         HUg+SttY8VcC6Ks9zGJPDxKeOWldaPI3VqltP4OzGfseeOhEZ++nNn7f2zdNpOhypJe2
+         0emA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7F2WR7ZiKtgV6Hbdw4w6WH+wyjdFEO/gsngLlaXW4JY=;
-        b=cJoVIeZYaY44OOxJRmqjSKy4xmd6zBjuoijlkCvXls3KhI7+hSDDo0tY9KuJ825hDF
-         Jppp6s9DQ5NjREIppup3SkyxrOBpcGUq5TGCnFKpPbyFFGp8bK806m0upRMySlgWb0UN
-         58SJ2PbueF9syOR/DQVWFTM5MrTL79CjXYm8uIU44pIGVhvUrdxCEVdcEGQWivoFF1rx
-         Zg+buJBfvM9+j7DU9b4j+lIQALQjtDHV5RuMK05MWP5ElCfc6QFi5jWIKrLrboE13qvl
-         7YxUPAfoZ590Da01S/X/TVMrcI9fukGnTdUuhzCXYse8ES3/DTUAgMc1Jw/buBkgxAm9
-         Rh2A==
-X-Gm-Message-State: AOAM53104TNpSRjZiWuYQp/9OnG5vxwwu0AUf1MTCt3VZRxfQ4ocYuzp
-        TP+Lk0ieQ7aZ0SmJPww/RPBre/XHn/92RgwjkFFUYnW1
-X-Google-Smtp-Source: ABdhPJyH87GTs0wMxjHNRuNL4f+DnLdAfUPCtnPvlHj5Yy7TdESEPz3r4kScO8M/8MNS+MtMwMYkLgb+4lx6IwTn+tc=
-X-Received: by 2002:a9d:6053:: with SMTP id v19mr11582739otj.362.1597685708584;
- Mon, 17 Aug 2020 10:35:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200814155807.Bluez.1.Ia90c97ad9ec0b51b7aaae1216864e8379c1470d5@changeid>
-In-Reply-To: <20200814155807.Bluez.1.Ia90c97ad9ec0b51b7aaae1216864e8379c1470d5@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 17 Aug 2020 10:34:58 -0700
-Message-ID: <CABBYNZKrRGb7FkCVOix8jmNwr94BQNXrS8U+a8VRBNxHoQ2ArA@mail.gmail.com>
-Subject: Re: [Bluez PATCH] advertising: Fix dbus response for over-advertising
-To:     Daniel Winkler <danielwinkler@google.com>
-Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=UNmPgd9kNtZoo9wgw4gsRYDyNuPIjwok9mt363/DTg4=;
+        b=BEkiJkCKv6/MeOA1wTgPSjztZfE1rWFQ41blpykOeuW/xhhc8aq6CLIZ29jKGS4Xpz
+         +FuXDYY5/OGpw/QGaLOE+MxmK7io+6sMlgBNpFkBB6K0GQ+Qjq7Swwm7F7/LB9KdysHg
+         deBwEaRQp8DZjSrQcP2XcvphCHMkJggcxrg+z6Kz1ANPLmUCDfEb2ZE5yM9dqz4y/D94
+         LIpPc31ADG6dAqJp5oApk0LHNVDzM+MiJFs+ASAkJRGQYcJGvlR/GJy9dQh3JIReNGAZ
+         UPTyvz2PAOws1GCmDrBSIQI1oeJDonvq4S3I8rWBSzPmqmMX/XpmuMSUqf63OHZ8fRhK
+         vQxQ==
+X-Gm-Message-State: AOAM532t1YdHytEQvpC69jM+HErB5R2KouZdhQHPbd7Ak7jhsXTyb51m
+        +WbtAE1l2HTamaeGmHLic1gf8CJ6JUWEBEBVEPgYWj9tUQRbjjWDE3mL0DE23A3yPHMpgc9A/m1
+        tx/uobiTp34fT6XyNME3GMsQSLcBpD+0lj2jr7ulwoXKRQO6Y4ntGgW5xVD5eHLEso6OM2SnqTZ
+        r7
+X-Google-Smtp-Source: ABdhPJyc81SBqB4rCPKkD2kKicASI6t/lTWvv4PMPtBCBk+6CPPgYlhRwxK5rv7kmmg25jeoccEtHzgNyraH
+X-Received: by 2002:a25:53c6:: with SMTP id h189mr23476248ybb.469.1597696920076;
+ Mon, 17 Aug 2020 13:42:00 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 13:41:53 -0700
+Message-Id: <20200817134133.Bluez.v1.1.I21d21871d85db48b07ba847742c7cb933024307c@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
+Subject: [Bluez PATCH v1] adapter- Device needs to be in the temporary state
+ after pairing failure.
+From:   Yu Liu <yudiliu@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Yu Liu <yudiliu@google.com>, sonnysasaka@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
+This caused the device hanging around as a discovered device forever
+even if it is turned off or not in present.
 
-On Fri, Aug 14, 2020 at 4:09 PM Daniel Winkler <danielwinkler@google.com> wrote:
->
-> client_free would always send a dbus method_return to fix the case where
-> a request to Unregister occurred before the MGMT call returned. However,
-> in the code path where too many advertisements are registered, this
-> method_return prevents the failure from being sent properly. This patch
-> makes sure the reference to the register_advertisement DBusMessage is
-> not stored in the client structure until the end of
-> register_advertisement. This ensures that we only respond once, either
-> in register_advertisement or in client_free, not both.
->
-> It also changes the dbus response in the fast unregister_advertisement
-> case from a method_return to a btd_error_failed, since the registration
-> was never allowed to complete, and thus was not successful.
->
-> The patch was tested in the following ways:
->
-> To verify it did not break the segfault fix in
-> caff2b48ca54bbc57b5da3f63317767489aa5b48, I repro'd the failure by
-> quickly unregistering after registering, and verified that the segfault
-> is still fixed with this change.
->
-> Ran through our automated tests that register too many advertisements
-> and verify that the registration fails with the intended "Maximum
-> Advertisements Reached" error response.
->
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
->
-> ---
->
->  src/advertising.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index 076d591b6..e5f25948d 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -119,9 +119,13 @@ static void client_free(void *data)
->         }
->
->         if (client->reg) {
-> -               g_dbus_send_message(btd_get_dbus_connection(),
-> -                               dbus_message_new_method_return(client->reg));
-> +               DBusMessage *reply;
-> +
-> +               reply = btd_error_failed(client->reg,
-> +                                       "Failed to complete registration");
-> +               g_dbus_send_message(btd_get_dbus_connection(), reply);
->                 dbus_message_unref(client->reg);
-> +               client->reg = NULL;
->         }
->
->         if (client->add_adv_id)
-> @@ -1152,8 +1156,6 @@ static struct btd_adv_client *client_create(struct btd_adv_manager *manager,
->         g_dbus_client_set_proxy_handlers(client->client, client_proxy_added,
->                                                         NULL, NULL, client);
->
-> -       client->reg = dbus_message_ref(msg);
-> -
->         client->data = bt_ad_new();
->         if (!client->data)
->                 goto fail;
-> @@ -1216,6 +1218,8 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
->
->         DBG("Registered advertisement at path %s", match.path);
->
-> +       client->reg = dbus_message_ref(msg);
-> +
->         queue_push_tail(manager->clients, client);
->
->         return NULL;
-> --
-> 2.28.0.220.ged08abb693-goog
+Reviewed-by: sonnysasaka@chromium.org
 
-Applied, thanks.
+---
 
+Changes in v1:
+- Initial change
+
+ src/device.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index bb8e07e8f..93e71850c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6008,6 +6008,12 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 
+ 	if (status) {
+ 		device_cancel_authentication(device, TRUE);
++
++		// Put the device back to the temporary state so that it will be
++		// treated as a newly discovered device.
++		if (!device_is_paired(device, bdaddr_type))
++			btd_device_set_temporary(device, true);
++
+ 		device_bonding_failed(device, status);
+ 		return;
+ 	}
 -- 
-Luiz Augusto von Dentz
+2.28.0.220.ged08abb693-goog
+
