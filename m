@@ -2,65 +2,95 @@ Return-Path: <SRS0=EW2K=B4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECE3C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 18:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D7CC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:22:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05CD92076E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 18:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EE0720738
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726576AbgHRSct (ORCPT
+        id S1726810AbgHRWWM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Aug 2020 14:32:49 -0400
-Received: from mga06.intel.com ([134.134.136.31]:35411 "EHLO mga06.intel.com"
+        Tue, 18 Aug 2020 18:22:12 -0400
+Received: from mga11.intel.com ([192.55.52.93]:11540 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726435AbgHRScs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Aug 2020 14:32:48 -0400
-IronPort-SDR: FkBHR5Io9EdyMCvjM321zkpuxcE1xlJ4/4aPKF9tzmbl/UZGqcE0NOPAe57c8MMcxHvSdcj+XF
- VQJdOkLCQjiQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9717"; a="216509878"
-X-IronPort-AV: E=Sophos;i="5.76,328,1592895600"; 
-   d="scan'208";a="216509878"
+        id S1726539AbgHRWWK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Aug 2020 18:22:10 -0400
+IronPort-SDR: 1MvmYClBNo3BUix5PZO0yBa8VRgvbNKJO9qLrrMVRtoAbc13WjNCMLW5Ho4prmiESQzJ+TA8Q3
+ Z55nvmUPMDDg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9717"; a="152634881"
+X-IronPort-AV: E=Sophos;i="5.76,329,1592895600"; 
+   d="scan'208";a="152634881"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2020 11:32:47 -0700
-IronPort-SDR: mcHZD9yR72fMHBZ7Uh1ZiNrimzgYvVEjMT7VF2zjPlfvSsSbWsVOSW7HQ+ZPVWdJ2FXQQSN6Sw
- VlKUKtxOmEuQ==
-X-IronPort-AV: E=Sophos;i="5.76,328,1592895600"; 
-   d="scan'208";a="441320825"
-Received: from jbrandeb-mobl3.amr.corp.intel.com (HELO localhost) ([10.212.158.55])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2020 11:32:47 -0700
-Date:   Tue, 18 Aug 2020 11:32:46 -0700
-From:   Jesse Brandeburg <jesse.brandeburg@intel.com>
-To:     Qingyu Li <ieatmuttonchuan@gmail.com>
-Cc:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <davem@davemloft.net>, <kuba@kernel.org>,
-        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net/bluetooth/hidp/sock.c: add CAP_NET_RAW check.
-Message-ID: <20200818113246.00001f5a@intel.com>
-In-Reply-To: <20200818082103.GA2692@oppo>
-References: <20200818082103.GA2692@oppo>
-X-Mailer: Claws Mail 3.12.0 (GTK+ 2.24.28; i686-w64-mingw32)
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2020 15:22:09 -0700
+IronPort-SDR: Jdcjc6bvwcySXLaDcnnQPXaLA53jNVFaXNsf95PByCDEI0SNE9AEV8/ysrfUl97LdQ2tCH9G3U
+ a2zIal+yhD+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,329,1592895600"; 
+   d="scan'208";a="336764503"
+Received: from ypeng18-mobl.ger.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.255.230.245])
+  by orsmga007.jf.intel.com with ESMTP; 18 Aug 2020 15:22:09 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/2] mesh: Always set net modes based on node feature settings
+Date:   Tue, 18 Aug 2020 15:22:07 -0700
+Message-Id: <20200818222208.50938-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 18 Aug 2020 16:21:03 +0800
-Qingyu Li <ieatmuttonchuan@gmail.com> wrote:
+The network settings such as relay, beacon, proxy and friend are
+always set based on local node feature settings. This change makes
+the net modes intialization unconditional, to include the "No Support"
+setting on node level which should result in the disabled mode in net.c
+---
+ mesh/node.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
-> When creating a raw PF_BLUETOOTH socket,
-> CAP_NET_RAW needs to be checked first.
-> 
-> Signed-off-by: Qingyu Li <ieatmuttonchuan@gmail.com>
+diff --git a/mesh/node.c b/mesh/node.c
+index 1eeffeb8b..ebc111a62 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -399,24 +399,16 @@ static bool init_storage_dir(struct mesh_node *node)
+ 
+ static void update_net_settings(struct mesh_node *node)
+ {
+-	uint8_t mode;
++	struct mesh_net *net = node->net;
+ 
+-	mode = node->proxy;
+-	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
+-		mesh_net_set_proxy_mode(node->net, mode == MESH_MODE_ENABLED);
++	mesh_net_set_proxy_mode(net, node->proxy == MESH_MODE_ENABLED);
+ 
+-	mode = node->friend;
+-	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
+-		mesh_net_set_friend_mode(node->net, mode == MESH_MODE_ENABLED);
++	mesh_net_set_friend_mode(net, node->friend == MESH_MODE_ENABLED);
+ 
+-	mode = node->relay.mode;
+-	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
+-		mesh_net_set_relay_mode(node->net, mode == MESH_MODE_ENABLED,
++	mesh_net_set_relay_mode(net, node->relay.mode == MESH_MODE_ENABLED,
+ 					node->relay.cnt, node->relay.interval);
+ 
+-	mode = node->beacon;
+-	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
+-		mesh_net_set_beacon_mode(node->net, mode == MESH_MODE_ENABLED);
++	mesh_net_set_beacon_mode(net, node->beacon == MESH_MODE_ENABLED);
+ }
+ 
+ static bool init_from_storage(struct mesh_config_node *db_node,
+-- 
+2.26.2
 
-Please see my replies to your previous patches.
