@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E31C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4578C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:29:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C30520738
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D12720786
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:29:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MDyr+hTK"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ELIDr4kP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbgHRW3G (ORCPT
+        id S1726967AbgHRW31 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Aug 2020 18:29:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
+        Tue, 18 Aug 2020 18:29:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbgHRW3F (ORCPT
+        with ESMTP id S1726539AbgHRW30 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Aug 2020 18:29:05 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31521C061389
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:29:05 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id mw10so185944pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:29:05 -0700 (PDT)
+        Tue, 18 Aug 2020 18:29:26 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7DF4C061389
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:29:26 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id t11so9882448plr.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:29:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9kYl3apIlbG/g27MOuyrarzuC+I9/z+Glt//16VTKr8=;
-        b=MDyr+hTKeHX+9bEbrFKqHv14MGjhH8fCV6ff+VCyP7KRYFehLvnlCcrSxQ5lWSUaEX
-         hOBxlSUwQsx9glNzrysXWaOqjwxMTJv6UYml4Q0LZaehFcQx7SzxzmpkfDPNaKhFUi8C
-         HB9L9Rs+yMU4AA7xFY5r5mL0KPFyO6FubWE3c=
+        bh=yuBC8ZYcilKT59d9GC2Zo6Yq4NAlJg5iM805qukCu2s=;
+        b=ELIDr4kP+wC9QUKYuBrn4Uv9W0qWVVTjpIAbhWFRCxbM1Rzw1l3zgcB+jJ1Yg9c+op
+         f6lQ5tRevzAfySjEBosnwkepZcekz8FhkxKHwg8NXoEQSPz3y5vfrq7mfWJ1ptjUvi28
+         gbhCQYEgePQXR+DCG1vBEBMoQP/rLZgIEX2Rk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9kYl3apIlbG/g27MOuyrarzuC+I9/z+Glt//16VTKr8=;
-        b=rYkmiCFXKyUvz1Vo2m4vzkEm0Yx89UouQm60ZbDDquH8JwO+ZU4R5HNeG00RnSZLSN
-         ngnOOZm5NhUZpW943KV6idirC3TNhuGsick/tI9lijm8+1r4u0AJLt04vgA09fPqczV+
-         hlh/dn9O2c/fGjaQpWXdnyFh908P3zURQEdLQnxPsfIyOmOJo2HE8tpvBjnORcx0Bxy6
-         z+h6D/pyaJdIWvnhlEZ4TP22BYpQvZgaawE24zf4tdHA3PgJtSS1xDHJq+UD51nRyg0z
-         XPMwMMQpohFzN/kdyw1smfTg8hUp6GaxbGqWcDpaCZejcHq9SehGi6Ly/Pqy4K/JuUdT
-         muQQ==
-X-Gm-Message-State: AOAM530AoZ04qIUf166aEXV3GlM93UBTA8URtf89Vd3Q9+0GcOWJFKtq
-        noUYfGyW3PeHfb1+A3I7HA5cNcpxmkOhxA==
-X-Google-Smtp-Source: ABdhPJxfO/DzC94MBjdQi5OaizMKSZfBmvdk2rjDc/in+NWXkACuuiVmURd7wCY4E/KQvwKn4cWI5w==
-X-Received: by 2002:a17:902:d907:: with SMTP id c7mr17367789plz.132.1597789744345;
-        Tue, 18 Aug 2020 15:29:04 -0700 (PDT)
+        bh=yuBC8ZYcilKT59d9GC2Zo6Yq4NAlJg5iM805qukCu2s=;
+        b=aYh3NOPLolkEnYmQKc1ZisSae0idSuug+RXAyIXhFe5iLADi32zE9xoQU/8A5sC5db
+         tEpFngZOdScpZkffYGeG4dFdGSh4JlVoFz7Hb5g1dZSanO5lxkPAXC99jX/q94tCI1n1
+         3xk1Un6FcDtNh8/ux1Zh1kinnkCBVtVolWE4SNjKhtl0kiMk7q0f+q3IFayUtf0v+L+n
+         zXxh0Sj+Gqgd/UF1YO6sOE++HApYqF7oRtTIIPHAb0W8OXBhCGjdmNko9/gQwJavnAYG
+         jO60iD9kRWDVY+gxREPV9getmsdGg6Ip7YrXTO+0p3Wwc4Z5bzK1KsTx0DEGxmXVsaik
+         Mk1g==
+X-Gm-Message-State: AOAM530k6K/Oy23WjO0avW88sMKx07IQhW0kr+2dVMQMWO/K5+20N7ld
+        UBvSGSLSzESirXRbl8wi4QQh0mfccGxbEQ==
+X-Google-Smtp-Source: ABdhPJy0JTvg8ebWc+NNgtHD6tFUL7FJCCV+DjlzbKHgJBvw40rWOGYsX3K1uZslyeBpYhaS7ek1Zw==
+X-Received: by 2002:a17:902:43:: with SMTP id 61mr17599611pla.16.1597789764912;
+        Tue, 18 Aug 2020 15:29:24 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id mp3sm14137286pjb.0.2020.08.18.15.29.03
+        by smtp.gmail.com with ESMTPSA id mp3sm14137286pjb.0.2020.08.18.15.29.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Aug 2020 15:29:03 -0700 (PDT)
+        Tue, 18 Aug 2020 15:29:23 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Alain Michaud <alainm@chromium.org>,
         Manish Mandlik <mmandlik@chromium.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Howard Chung <howardchung@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v1 4/7] adv_monitor: Implement UnregisterMonitor()
-Date:   Tue, 18 Aug 2020 15:26:41 -0700
-Message-Id: <20200818152612.BlueZ.v1.4.I335e42ab9a238261c2492c308ce77c959f631483@changeid>
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v1 5/7] adv_monitor: Handle D-Bus client ready events
+Date:   Tue, 18 Aug 2020 15:26:43 -0700
+Message-Id: <20200818152612.BlueZ.v1.5.Id5b1ced1530cb21559bc1dcf29d8764b0c7df825@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
 References: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
@@ -77,79 +76,88 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements the UnregisterMonitor() method handler of ADV monitor
-manager interface.
+This adds a handler of client ready events. The handler replies to the
+RegisterMonitor() method call.
 
 The following tests were performed.
-- Issue a UnregisterMonitor() call with a nonexistent path and expect
-org.bluez.Error.DoesNotExist as the return.
-- Issue a UnregisterMonitor() call with a invalid path and expect
-org.bluez.Error.InvalidArguments as the return.
-- Issue RegisterMonitor() with a path, issue UnregisterMonitor() and
-expect a successful method call return.
+- Call RegisterMonitor() and expect to receive a return.
 
 Reviewed-by: Yun-Hao Chung <howardchung@google.com>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
 
- src/adv_monitor.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ src/adv_monitor.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 3d27ad18b..a9e2e4421 100644
+index a9e2e4421..b5ea5ee99 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -216,13 +216,48 @@ static DBusMessage *register_monitor(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
+@@ -127,9 +127,22 @@ static void app_disconnect_cb(DBusConnection *conn, void *user_data)
+ 		app_destroy(app);
  }
  
-+/* Handles UnregisterMonitor D-Bus call */
-+static DBusMessage *unregister_monitor(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
++/* Handles the ready signal of Adv Monitor app */
++static void app_ready_cb(GDBusClient *client, void *user_data)
 +{
-+	DBusMessageIter args;
-+	struct app_match_data match;
-+	struct adv_monitor_app *app;
-+	struct btd_adv_monitor_manager *manager = user_data;
++	struct adv_monitor_app *app = user_data;
++	uint16_t adapter_id = app->manager->adapter_id;
 +
-+	if (!dbus_message_iter_init(msg, &args))
-+		return btd_error_invalid_args(msg);
++	btd_info(adapter_id, "Path %s reserved for Adv Monitor app %s",
++			app->path, app->owner);
 +
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&args, &match.path);
-+
-+	if (!strlen(match.path) || !g_str_has_prefix(match.path, "/"))
-+		return btd_error_invalid_args(msg);
-+
-+	match.owner = dbus_message_get_sender(msg);
-+
-+	app = queue_find(manager->apps, app_match, &match);
-+	if (!app)
-+		return btd_error_does_not_exist(msg);
-+
-+	queue_remove(manager->apps, app);
-+	app_destroy(app);
-+
-+	btd_info(manager->adapter_id, "Path %s removed along with Adv Monitor "
-+			"app %s", match.path, match.owner);
-+
-+	return dbus_message_new_method_return(msg);
++	app_reply_msg(app, dbus_message_new_method_return(app->reg));
 +}
 +
+ /* Creates an app object, initiates it and sets D-Bus event handlers */
+ static struct adv_monitor_app *app_create(DBusConnection *conn,
+-					const char *sender, const char *path,
++					DBusMessage *msg, const char *sender,
++					const char *path,
+ 					struct btd_adv_monitor_manager *manager)
+ {
+ 	struct adv_monitor_app *app;
+@@ -154,7 +167,9 @@ static struct adv_monitor_app *app_create(DBusConnection *conn,
+ 
+ 	g_dbus_client_set_disconnect_watch(app->client, app_disconnect_cb, app);
+ 	g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL, NULL);
+-	g_dbus_client_set_ready_watch(app->client, NULL, NULL);
++	g_dbus_client_set_ready_watch(app->client, app_ready_cb, app);
++
++	app->reg = dbus_message_ref(msg);
+ 
+ 	return app;
+ }
+@@ -199,7 +214,7 @@ static DBusMessage *register_monitor(DBusConnection *conn, DBusMessage *msg,
+ 	if (queue_find(manager->apps, app_match, &match))
+ 		return btd_error_already_exists(msg);
+ 
+-	app = app_create(conn, match.owner, match.path, manager);
++	app = app_create(conn, msg, match.owner, match.path, manager);
+ 	if (!app) {
+ 		btd_error(manager->adapter_id,
+ 				"Failed to reserve %s for Adv Monitor app %s",
+@@ -210,10 +225,7 @@ static DBusMessage *register_monitor(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	queue_push_tail(manager->apps, app);
+ 
+-	btd_info(manager->adapter_id, "Path %s reserved for Adv Monitor app %s",
+-			match.path, match.owner);
+-
+-	return dbus_message_new_method_return(msg);
++	return NULL;
+ }
+ 
+ /* Handles UnregisterMonitor D-Bus call */
+@@ -252,7 +264,7 @@ static DBusMessage *unregister_monitor(DBusConnection *conn,
+ }
+ 
  static const GDBusMethodTable adv_monitor_methods[] = {
- 	{ GDBUS_METHOD("RegisterMonitor",
+-	{ GDBUS_METHOD("RegisterMonitor",
++	{ GDBUS_ASYNC_METHOD("RegisterMonitor",
  					GDBUS_ARGS({ "application", "o" }),
  					NULL, register_monitor) },
  	{ GDBUS_ASYNC_METHOD("UnregisterMonitor",
- 					GDBUS_ARGS({ "application", "o" }),
--					NULL, NULL) },
-+					NULL, unregister_monitor) },
- 	{ }
- };
- 
 -- 
 2.26.2
 
