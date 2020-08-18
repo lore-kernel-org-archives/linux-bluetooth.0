@@ -8,66 +8,68 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E613C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 08:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C65C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 08:34:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 009BF206B5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 08:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF2ED2067C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 08:34:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+O+y6fH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXXy4d11"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726451AbgHRIVJ (ORCPT
+        id S1726391AbgHRIeD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Aug 2020 04:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49562 "EHLO
+        Tue, 18 Aug 2020 04:34:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726043AbgHRIVI (ORCPT
+        with ESMTP id S1726043AbgHRIeC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Aug 2020 04:21:08 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FEAC061389;
-        Tue, 18 Aug 2020 01:21:08 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id y6so8882586plt.3;
-        Tue, 18 Aug 2020 01:21:08 -0700 (PDT)
+        Tue, 18 Aug 2020 04:34:02 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC6EC061389;
+        Tue, 18 Aug 2020 01:34:01 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id l60so9093507pjb.3;
+        Tue, 18 Aug 2020 01:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=R6UfMfJwqHE+FvqFjrSG5hHKZrDmBk/7qX6MpbTswn4=;
-        b=P+O+y6fHin2i63yQXnz5g3IAJ2NyZIMZ1e9cDB3VdSIrWcUAfL5/9ydchAsgXekI/6
-         nNHfNWZovhWixT/cctY0wawTSq7P3mL8gyCOCJtcvt2Rn9Pskgy6Gt6fR517kpfHPXKM
-         FL8uePTrKBJYJZTFqeGjrRUnMWqMScl/eK3kBuVT9xBeRohWi+4O7ALoUGKDUgH9oV91
-         InGy8RhGQJjYhDKiUXaC9K4itTlqZm0OKqvXKocL0qwuc0YiBdIksHA4KX4dQELsPvvZ
-         JplSArwK3psUnHIdO0iKEMCzwvBsr7NthpCB1DYxdISthYp7QD+NTVdCQFD9Up3+AfbC
-         vtZA==
+        bh=szP+8DM2fo2Wg0FXKp5oArkPY3dRWu1AVOY6u2GDxKg=;
+        b=kXXy4d11xMBXcJj+fsuZKlC40XsOYUs9qFdqzuKei+P99PVGYB4cy5YvPiCQ9SE5gc
+         nwowHtPWMwFGXmPyaIHawdQfK5b06JAnIyDjOBe3YW++Q1BV0EX6kfoY8km/11uZY8hV
+         YprH1emQ2HNL0jUmKDhfxqGEcu+tHvd3Vtkby05p+VNjxGkQZQBEPYl+7IXbofAl6BG3
+         hhOroOHfCMUIFb1yeteG3XTgjOWMSn+dJWzkVa23ynA8tSGk1jcOWqU1t6F/2rg4cH0O
+         Xw3eM1EmBGSLh20rgcywQjdmExvL2tkXvXtQYrrhFcy/p1TGSvWno4qJpYUyybKlEz3c
+         pc1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=R6UfMfJwqHE+FvqFjrSG5hHKZrDmBk/7qX6MpbTswn4=;
-        b=X3xVog0QJIqXEhQfrdGlY+2xbFb6j6d3cEWR11KfEY7u4vfypmgJm4Q9LrjSh8Z/L/
-         kXGa+EtVEQtBSkoXY32rXv0p27zGJDbDKoOpDnlr53QihBtuC7/+TgC8q6G4tQIYvHXg
-         xYmVyTCE/TfNkGvBgDctw6qYLwgpyihdYixfzpG70hpulUSwgGeWQ4ry61embmdcqY+e
-         Qq+bpGKE8SUMuNt9cQV5b6R6fCjPv7p4bZFCehyYy5U9Y33Nf0nSeMrqJvaNpLHg/Crm
-         8xjZGQYK6muG8SMQ5kDT/9CU8jxWL09wl1ahg/htk4nTKaothq1yV1J7Oot/9jID/UdN
-         PfqA==
-X-Gm-Message-State: AOAM533LEMlvPIA3b4C8wCZkxdE/OnJUh4GDBB1CmmfdYhEUo/57D3gu
-        UbBFeyriIRaJJho91CqPWIj2PRAAvxY=
-X-Google-Smtp-Source: ABdhPJw29b/0fFyJtX5wxY8KVFb2zCD7jrzyjFsJtlVcZkoELYesRJIsd5ew9C3u9p0L9p2Qspv+UQ==
-X-Received: by 2002:a17:90b:4a4e:: with SMTP id lb14mr15864480pjb.228.1597738867036;
-        Tue, 18 Aug 2020 01:21:07 -0700 (PDT)
+        bh=szP+8DM2fo2Wg0FXKp5oArkPY3dRWu1AVOY6u2GDxKg=;
+        b=GEUMHkv9et6kytyATo1Bjk5Dq3sclEtC9cwA8XFEEgoWrai68JVpkjmtMOSxliZ256
+         HnyzfqLr6ImkQNkFS0EVN3ZqC3HgbpLZda4OKq5/wpc58oIl6qKyU7GY+uSBHJY3dUPZ
+         FRtwQP/WOI5baBNrBUB20/zbrD7MJ9yL6PkJA54lnkEiCZQCE5jVK61pJf9SfauKXgya
+         REeSCba++qEpCnBmS6l82T4AHLd6vrR/gHGs7l/GVDCmfp6OmxCokmtGH+VsZyn1lvlu
+         +WXfCX9Oy0PqKr1h83i+CkC+DDMeDL15bWIIJ8nxrqoouMBGmPIAa4eyVRpyEZKuSLgU
+         XEFg==
+X-Gm-Message-State: AOAM532HqF4zYRm2aWzo6aDlXBuO6F+5uZ4NwkUzzlkQ0OmEUvcKTDp1
+        gwvheujqq17jGDVP0CIPzpxjKODRq1A=
+X-Google-Smtp-Source: ABdhPJx/UC+X2o5gXzjptm7LMgpeuMJeCeHbSRiXInZVSqmm1lN4kB/ZsnKF8m/DRi8+r0YbjnrTpw==
+X-Received: by 2002:a17:902:bd90:: with SMTP id q16mr14299265pls.196.1597739641056;
+        Tue, 18 Aug 2020 01:34:01 -0700 (PDT)
 Received: from oppo (69-172-89-151.static.imsbiz.com. [69.172.89.151])
-        by smtp.gmail.com with ESMTPSA id u65sm23398632pfb.102.2020.08.18.01.21.05
+        by smtp.gmail.com with ESMTPSA id l78sm23898616pfd.130.2020.08.18.01.33.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Aug 2020 01:21:06 -0700 (PDT)
-Date:   Tue, 18 Aug 2020 16:21:03 +0800
+        Tue, 18 Aug 2020 01:34:00 -0700 (PDT)
+Date:   Tue, 18 Aug 2020 16:33:57 +0800
 From:   Qingyu Li <ieatmuttonchuan@gmail.com>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        kuba@kernel.org
+        kuba@kernel.org, matthieu.baerts@tessares.net,
+        stefan@datenfreihafen.org, arnd@arndb.de, gustavoars@kernel.org,
+        bigeasy@linutronix.de
 Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] net/bluetooth/hidp/sock.c: add CAP_NET_RAW check.
-Message-ID: <20200818082103.GA2692@oppo>
+Subject: [PATCH] net/bluetooth/rfcomm/sock.c: add CAP_NET_RAW check.
+Message-ID: <20200818083357.GA5442@oppo>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -82,23 +84,23 @@ CAP_NET_RAW needs to be checked first.
 
 Signed-off-by: Qingyu Li <ieatmuttonchuan@gmail.com>
 ---
- net/bluetooth/hidp/sock.c | 3 +++
+ net/bluetooth/rfcomm/sock.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 595fb3c9d6c3..3dd9c8e0419a 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -255,6 +255,9 @@ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
- 	if (sock->type != SOCK_RAW)
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index ae6f80730561..d67d49e5aa00 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -321,6 +321,9 @@ static int rfcomm_sock_create(struct net *net, struct socket *sock,
+ 	if (sock->type != SOCK_STREAM && sock->type != SOCK_RAW)
  		return -ESOCKTNOSUPPORT;
 
-+	if (!capable(CAP_NET_RAW))
++	if (sock->type == SOCK_RAW && !kern && !capable(CAP_NET_RAW))
 +		return -EPERM;
 +
- 	sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &hidp_proto, kern);
- 	if (!sk)
- 		return -ENOMEM;
+ 	sock->ops = &rfcomm_sock_ops;
+
+ 	sk = rfcomm_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern);
 --
 2.17.1
 
