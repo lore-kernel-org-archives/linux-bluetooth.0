@@ -7,182 +7,186 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E32AC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 23:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38044C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 23:52:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E1DA20709
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 23:51:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13A3B2065D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 23:52:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R33zsjkD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1wiDErK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbgHRXvo (ORCPT
+        id S1726972AbgHRXw2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Aug 2020 19:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
+        Tue, 18 Aug 2020 19:52:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726847AbgHRXvl (ORCPT
+        with ESMTP id S1726847AbgHRXw1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Aug 2020 19:51:41 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A81CC061389
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 16:51:41 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id j16so4526526ooc.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 16:51:41 -0700 (PDT)
+        Tue, 18 Aug 2020 19:52:27 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88AFFC061389
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 16:52:27 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id o21so19475250oie.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 16:52:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=oDxCTY7BfBW9Pv/dYaiQwuSp8dNOVAO05Nfr5H416ME=;
-        b=R33zsjkDwjbxIyT9Qh0CZvO2RfEhuzPt0E6254aDha7sScFIsooC8LSibHXKqESwAW
-         k4Ce+abpv7C3FwlwjaWrn3fmraECFSiCuYRTppscIc5T7pSBg7s0POIvt/Nlypv7idl5
-         Q01c5rCpkI8mIIynikv73A1dZTsj/PCBhExxIiuLNvHuU1ZKY2glM7NvEzT6lqF84f+4
-         OhHcu0CCdyjCQN6qpOqn50pmr6HuHuEby0rks7/whsrjATAfDmR//NkUlNVLD+K0ydLF
-         /G4OUq+TQf648ZL83YNbjky/0HpCG75WlGPOR4lQV4tIsQ749YXl0FO7KqfqMN1bx9I3
-         oNbg==
+        bh=g7ZFIgm4SrssRH25wt0REgaY4NV3G1qYm3x1OTRlzQw=;
+        b=f1wiDErKi98kZp0IRCVCqe4xLdQ9GcAPFaI3gqTXefAmdBWCRrxvCegthDc5Nwtv1j
+         C5Iap963G0j9vN0lZGtwxkC63ftP3CGaEUfeYEfH6/dluX6NUYBxS2UXBA12jGnR7vai
+         vDXjqB2ptNMnOXoa3xn5z7Gu5heKxldbbjWbDwfyZZQEKZEcQUjXCAPzB2rlhK5bZuuQ
+         JgI0h0tVbVEnOsCLXttpH2m0HqIv884efIuzJ81M9VKNsdI0ieYYJ9O1uUO8PlRR4JyS
+         b34553udP6cookDx/3GEpr0NkMctRNKGoybLiGFZ0bncRHVdCnwP3A9cY9WrE20dW07d
+         yDZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=oDxCTY7BfBW9Pv/dYaiQwuSp8dNOVAO05Nfr5H416ME=;
-        b=nvFADRhUviwYHOjCdnmxn60Tac7/0UGx0+UB/8GdXZ37Z58Lg1WErtSPixR7N5XLWR
-         e8xD6BzoI/VyBmDfXSzEeUB4At/SfI6gsrKKmAUYSvTbfCdmCZiX0FGh2jC2ws1Na/G9
-         +j86qHxznQmBH8FCsr2imTurRmsa//tbynuhHLZD4zKDEtH0EP+/iBjqEp5WXJ2/yxri
-         8170ubO0Jku8sHAKWat8YTQGaaPTxozR/LrO7D4t1afT9Mc2imZayE/D7C4/Z7TRrOxZ
-         H85tZpgadyo+u6frkbdP/MiV6fFFMgX2UTDBP699m6LSdLOvA2Ps6Ybevo4YXbT/PNoC
-         3Wwg==
-X-Gm-Message-State: AOAM533ou2IwAea+WXWwvdiM4Vdboo79a4hXaj1XwskOWAQQKBVtib1K
-        4DRljCTOmVtXHfxCT92PJNl4dL8ddO77PDQTFG0=
-X-Google-Smtp-Source: ABdhPJxNmKShFCpTA77Cg1JH7HLwjPKVLM5vgGNdqZqjTSkxoH8DaOo7MuRw7ccTwCLiR4+iFVCG6nBU5wVL0P6wGss=
-X-Received: by 2002:a4a:380b:: with SMTP id c11mr16684695ooa.17.1597794700230;
- Tue, 18 Aug 2020 16:51:40 -0700 (PDT)
+        bh=g7ZFIgm4SrssRH25wt0REgaY4NV3G1qYm3x1OTRlzQw=;
+        b=jJ1jIAPM9iMzpS7iTsGekq5JEynh27LqmoIDgJnNuGtDwbuc5JBGKfv404+kfWdCuJ
+         nHO3CPmSrWpmxV+S6m+vrkmyTlwVuIXl6azV+IpXkKFudyqN+hn3+4U94upwgdlWlZL+
+         pdBu44NB+iZ/gEsjVpf1EjeR2Vo0mFO5OfvvUo1MNElNTfX8MGPrUWBA8RWRipZ6zw/2
+         q+7RzrOoHtO+2wX1kemCZzdTbJq087FnsparKAywlk2BAj1KkfpoG/apfGy/U48JDv1e
+         H6uNb7QtBpOvoYzpzng21i0Qk1soxQTj9oEE3NIjbPZojzoL8eycG4on4qFtA5q6BAV0
+         nskQ==
+X-Gm-Message-State: AOAM532Fqd0vcDE0FCzWYiuHZv4c1rNUjqomUKBPw0vrSc+XBzulPNQH
+        5+MhR9U5/VxD9zNA0Up+zgTcXZFQaSE0hCP/azI=
+X-Google-Smtp-Source: ABdhPJyX7YD6vmZMsJTwcT958nTvyuF54Nw92ktQLdnE2jjqyIDljGbSHBHLv4mcmGmEr6nFBvfITlfz1vTLCKAw6HQ=
+X-Received: by 2002:aca:cc50:: with SMTP id c77mr1637547oig.152.1597794746808;
+ Tue, 18 Aug 2020 16:52:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200818153257.Bluez.v3.1.I254123a1c85e8cb22739cbbb1ffa2f56ac41faa8@changeid>
-In-Reply-To: <20200818153257.Bluez.v3.1.I254123a1c85e8cb22739cbbb1ffa2f56ac41faa8@changeid>
+References: <20200817231822.BlueZ.v3.1.I716fc87b0c97e5349a04766a61ecad1f5b0fd28e@changeid>
+In-Reply-To: <20200817231822.BlueZ.v3.1.I716fc87b0c97e5349a04766a61ecad1f5b0fd28e@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 18 Aug 2020 16:51:29 -0700
-Message-ID: <CABBYNZJeEB82pDBT4v83T=pnMFyEHxdpoAJ_t-JPSnDTjtGLow@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 1/2] device: Don't browse SDP if HIDSDPDisable is set
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Tue, 18 Aug 2020 16:52:16 -0700
+Message-ID: <CABBYNZ+JLGtby19K0skYJj1r70tF=XwqdwhMP07tS89Wh76A4w@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v3] shared/ad: move MAX_ADV_DATA_LEN macro to the header
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Howard Chung <howardchung@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Manish Mandlik <mmandlik@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Miao-chen,
 
-On Tue, Aug 18, 2020 at 12:34 AM Archie Pusaka <apusaka@google.com> wrote:
+On Mon, Aug 17, 2020 at 11:23 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> According to the HID1.1 spec, part 5.3.4.9:
-> The HIDSDPDisable attribute is a Boolean value, which indicates
-> whether connection to the SDP channel and Control or Interrupt
-> channels are mutually exclusive. This feature supports Bluetooth
-> HID devices that have minimal resources, and multiplex those
-> resources between servicing the initialization (SDP) and runtime
-> (Control and Interrupt) channels.
->
-> However, Bluez still tries to connect SDP upon HID connection,
-> regardless of the existence of the HIDSDPDisable attribute.
->
-> This patch prevents the connection of SDP after HID has been
-> established, if the device has HIDSDPDisable attribute.
->
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> This moves MAX_ADV_DATA_LEN macro to src/shared/ad.h and rename it to
+> BT_AD_MAX_DATA_LEN.
 > ---
+> Hi Maintainers,
 >
-> Changes in v3: None
+> In order to avoid duplicate definition of the maximum data length of
+> advertisement for the following series of advertisement monitor API,
+> we'd like to reuse the one in shared/ad.
+>
+> Thanks,
+> Miao
+>
+> Changes in v3:
+> - Fix occurrences of MAX_ADV_DATA_LEN.
+>
 > Changes in v2:
-> * Renaming passive_sdp_discovery to refresh_discovery
+> - Rename the macro to BT_AD_MAX_DATA_LEN.
 >
->  profiles/input/device.c |  3 +++
->  src/device.c            | 11 +++++++++--
->  src/device.h            |  1 +
->  3 files changed, 13 insertions(+), 2 deletions(-)
+>  src/shared/ad.c | 18 ++++++++----------
+>  src/shared/ad.h |  2 ++
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 >
-> diff --git a/profiles/input/device.c b/profiles/input/device.c
-> index 6ec0a4c63..5e47b88f2 100644
-> --- a/profiles/input/device.c
-> +++ b/profiles/input/device.c
-> @@ -1373,6 +1373,9 @@ static struct input_device *input_device_new(struct btd_service *service)
->         /* Initialize device properties */
->         extract_hid_props(idev, rec);
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> index 8d276842e..14a2709b1 100644
+> --- a/src/shared/ad.c
+> +++ b/src/shared/ad.c
+> @@ -33,8 +33,6 @@
+>  #include "src/shared/queue.h"
+>  #include "src/shared/util.h"
 >
-> +       if (idev->disable_sdp)
-> +               device_set_refresh_discovery(device, false);
-> +
->         return idev;
->  }
->
-> diff --git a/src/device.c b/src/device.c
-> index 2237a7670..52dfea18f 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -195,6 +195,7 @@ struct btd_device {
->         bool            le;
->         bool            pending_paired;         /* "Paired" waiting for SDP */
->         bool            svc_refreshed;
-> +       bool            refresh_discovery;
->
->         /* Manage whether this device can wake the system from suspend.
->          * - wake_support: Requires a profile that supports wake (i.e. HID)
-> @@ -1472,7 +1473,6 @@ static gboolean dev_property_wake_allowed_exist(
->         return device_get_wake_support(device);
->  }
->
+> -#define MAX_ADV_DATA_LEN 31
 > -
->  static gboolean disconnect_all(gpointer user_data)
->  {
->         struct btd_device *device = user_data;
-> @@ -1805,7 +1805,7 @@ done:
->                                 btd_error_failed(dev->connect, strerror(-err)));
->         } else {
->                 /* Start passive SDP discovery to update known services */
-> -               if (dev->bredr && !dev->svc_refreshed)
-> +               if (dev->bredr && !dev->svc_refreshed && dev->refresh_discovery)
->                         device_browse_sdp(dev, NULL);
->                 g_dbus_send_reply(dbus_conn, dev->connect, DBUS_TYPE_INVALID);
+>  struct bt_ad {
+>         int ref_count;
+>         char *name;
+> @@ -257,8 +255,8 @@ static size_t name_length(const char *name, size_t *pos)
+>
+>         len = 2 + strlen(name);
+>
+> -       if (len > MAX_ADV_DATA_LEN - *pos)
+> -               len = MAX_ADV_DATA_LEN - *pos;
+> +       if (len > BT_AD_MAX_DATA_LEN - *pos)
+> +               len = BT_AD_MAX_DATA_LEN - *pos;
+>
+>         return len;
+>  }
+> @@ -426,9 +424,9 @@ static void serialize_name(const char *name, uint8_t *buf, uint8_t *pos)
+>                 return;
+>
+>         len = strlen(name);
+> -       if (len > MAX_ADV_DATA_LEN - (*pos + 2)) {
+> +       if (len > BT_AD_MAX_DATA_LEN - (*pos + 2)) {
+>                 type = BT_AD_NAME_SHORT;
+> -               len = MAX_ADV_DATA_LEN - (*pos + 2);
+> +               len = BT_AD_MAX_DATA_LEN - (*pos + 2);
 >         }
-> @@ -2572,6 +2572,11 @@ done:
->                 browse_request_free(req);
->  }
 >
-> +void device_set_refresh_discovery(struct btd_device *dev, bool refresh)
-> +{
-> +       dev->refresh_discovery = refresh;
-> +}
+>         buf[(*pos)++] = len + 1;
+> @@ -478,7 +476,7 @@ uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length)
+>
+>         *length = calculate_length(ad);
+>
+> -       if (*length > MAX_ADV_DATA_LEN)
+> +       if (*length > BT_AD_MAX_DATA_LEN)
+>                 return NULL;
+>
+>         adv_data = malloc0(*length);
+> @@ -586,7 +584,7 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
+>         if (!ad)
+>                 return false;
+>
+> -       if (len > (MAX_ADV_DATA_LEN - 2 - sizeof(uint16_t)))
+> +       if (len > (BT_AD_MAX_DATA_LEN - 2 - sizeof(uint16_t)))
+>                 return false;
+>
+>         new_data = queue_find(ad->manufacturer_data, manufacturer_id_data_match,
+> @@ -723,7 +721,7 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+>         if (!ad)
+>                 return false;
+>
+> -       if (len > (MAX_ADV_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
+> +       if (len > (BT_AD_MAX_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
+>                 return false;
+>
+>         new_data = queue_find(ad->service_data, service_uuid_match, uuid);
+> @@ -942,7 +940,7 @@ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
+>         if (!ad)
+>                 return false;
+>
+> -       if (len > (MAX_ADV_DATA_LEN - 2))
+> +       if (len > (BT_AD_MAX_DATA_LEN - 2))
+>                 return false;
+>
+>         for (i = 0; i < sizeof(type_blacklist); i++) {
+> diff --git a/src/shared/ad.h b/src/shared/ad.h
+> index 19aa1d035..17e3b631b 100644
+> --- a/src/shared/ad.h
+> +++ b/src/shared/ad.h
+> @@ -27,6 +27,8 @@
+>  #include "lib/bluetooth.h"
+>  #include "lib/uuid.h"
+>
+> +#define BT_AD_MAX_DATA_LEN             31
 > +
->  static void device_set_svc_refreshed(struct btd_device *device, bool value)
->  {
->         if (device->svc_refreshed == value)
-> @@ -4071,6 +4076,8 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
->         device->db_id = gatt_db_register(device->db, gatt_service_added,
->                                         gatt_service_removed, device, NULL);
->
-> +       device->refresh_discovery = true;
-> +
->         return btd_device_ref(device);
->  }
->
-> diff --git a/src/device.h b/src/device.h
-> index cb8d884e8..5ba2d7fe0 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -145,6 +145,7 @@ void device_set_wake_override(struct btd_device *device, bool wake_override);
->  void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
->                              guint32 id);
->  void device_set_wake_allowed_complete(struct btd_device *device);
-> +void device_set_refresh_discovery(struct btd_device *dev, bool refresh);
->
->  typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
->                                         void *user_data);
+>  #define BT_AD_FLAGS                    0x01
+>  #define BT_AD_UUID16_SOME              0x02
+>  #define BT_AD_UUID16_ALL               0x03
 > --
-> 2.28.0.220.ged08abb693-goog
+> 2.26.2
 
 Applied, thanks.
 
