@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CE2C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73896C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 633FB20786
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:28:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4663E20786
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Aug 2020 22:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Sx1sJ4D/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="M2wOo2Q1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbgHRW2V (ORCPT
+        id S1726953AbgHRW2v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Aug 2020 18:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42502 "EHLO
+        Tue, 18 Aug 2020 18:28:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbgHRW2T (ORCPT
+        with ESMTP id S1726904AbgHRW2q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Aug 2020 18:28:19 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0EE9C061389
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:28:19 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id mt12so185013pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:28:19 -0700 (PDT)
+        Tue, 18 Aug 2020 18:28:46 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 799F9C061389
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:28:46 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id m8so10669719pfh.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Aug 2020 15:28:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vKJ+f/QmyMYNU6dao3M/rrJbJatyE8JsrAuSYL+1TOQ=;
-        b=Sx1sJ4D/Jj+OxwB14Esl7d7y4DFtoFs/Dqdf9infowX8dkY6nEsM+egVf5HAH2vw2v
-         aV46lwbw5fJQIdF+U9g1LWjCIT9eY/m5+TjTnwXX5ZaX8EeDjGaXqXAbVrZtnx+AvmDM
-         usHMbCC/r7oQX5PZiB+TkrHoL2ofLksjtw3GI=
+        bh=qgBeGmDbDsXKMizmuz8IVmUgWVZ/TZRiqFyy/OXxz8s=;
+        b=M2wOo2Q1mHEjVvDao3EM++9NBpBWmrrZUIMjULjk+35MUpnSKr14BDNguoviJvQYSy
+         5uEWwJGsLLs0HayNA5kAF5rL+/XCMlkpHbH777ZLE/JVSRhIo/XgVgoFRqAdiTxFD6Sd
+         yhwyim8Ch0ToWrDbGzPf7Cw8V5V/UgK5jY8wM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vKJ+f/QmyMYNU6dao3M/rrJbJatyE8JsrAuSYL+1TOQ=;
-        b=DLHp0iPXgIORaEN2cH8aOGY+yxYQYEb8Ba8X9N8bSILQJ7Fd0p2/yaWQGpBMRsROet
-         syY/pNrDxUsCgbg4+HRIuEL46VUWJDYBCtUXRGGVT5FzlxjOFKKPy3C6jWw0c07bCfAO
-         HTAj4dMwQoufVQ2mfI+U7J2z74aP8Kdo6HpAJyd0GyCfXikdKM+F2kBJMDUpQ+rtxq4n
-         3qBeh3qO0Ol7+y+O08tj10YVBmiHAVhPVdifKo7vGywrxyr8xLUzvSyrzeP/bjSoLFEZ
-         jUfH5jvVjxHueKKw/5Vtge1C1Jsf3p8ppr1Csx302RmGDpKqxo6Q0bB9nARU73iFVtGT
-         3QPw==
-X-Gm-Message-State: AOAM531KThShjQDxW/bvWS6bWQ+lISjw8BCVjX1/hJWsmra/7NV+MBv/
-        PU2Mi+lFOyuSh0YtMQkjUH7EHR4rz414mQ==
-X-Google-Smtp-Source: ABdhPJzkH+85uFFfO7XW7FzfEsmR/amlr1Dbh1aDkPzdkKTJ61ghfRYbiuHqdGExKzQ+P82lxYGKsA==
-X-Received: by 2002:a17:90b:2388:: with SMTP id mr8mr1780184pjb.64.1597789698910;
-        Tue, 18 Aug 2020 15:28:18 -0700 (PDT)
+        bh=qgBeGmDbDsXKMizmuz8IVmUgWVZ/TZRiqFyy/OXxz8s=;
+        b=GKIcIeyW/eRn5QXjyf+gtf0TBTEFBZrLETHNSovuClFzNc7Ie7NthvxIMrz+nLtKje
+         /0yhh27+r9PlRCo+OOooQQW73hZcCg6CSzMUqfZeNG03OTc3ECbTtN16bmycH4gPzVoU
+         se/5GM7ZVE+zorP3n7qm5HPsIeefcTM+lw4WycSYnV/cCBYOavG1S4HJkeHwCpOb111L
+         aUHLnUZppYuYdohmN49JL728DRyyomXNrbRcjEf5mNOdzzlqCdg80cOwbO8atEw19e5N
+         9abQvm5ESXqcM+piWGVVvHop3IbOUl43VgyVzzUc5/ZQDtZsCKAvmwRmmVsdKONAj2YA
+         DMRw==
+X-Gm-Message-State: AOAM533Dcqt6ZzGas0IEle8spJ7tG1fWUkaweM7DyH/NV04gpBK8FIOS
+        HzcUQgB3l9hYmhJBgsrWmrHIcJJ9wxvq2w==
+X-Google-Smtp-Source: ABdhPJyXIihR3jry8GPU/Zkk/ryEnuWI+RtmMjoc6tOzdYztyvKKOytYOnbyK7g2TILNNr08PbrhDg==
+X-Received: by 2002:aa7:8a4d:: with SMTP id n13mr17726102pfa.143.1597789725595;
+        Tue, 18 Aug 2020 15:28:45 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id mp3sm14137286pjb.0.2020.08.18.15.28.17
+        by smtp.gmail.com with ESMTPSA id mp3sm14137286pjb.0.2020.08.18.15.28.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Aug 2020 15:28:18 -0700 (PDT)
+        Tue, 18 Aug 2020 15:28:44 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Alain Michaud <alainm@chromium.org>,
@@ -64,9 +64,9 @@ Cc:     Alain Michaud <alainm@chromium.org>,
         Howard Chung <howardchung@google.com>,
         Miao-chen Chou <mcchou@chromium.org>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v1 2/7] adv_monitor: Implement Get functions of ADV monitor manager properties
-Date:   Tue, 18 Aug 2020 15:26:37 -0700
-Message-Id: <20200818152612.BlueZ.v1.2.I9960e45d36be3edb5f17de025e7eb8257d3cddef@changeid>
+Subject: [BlueZ PATCH v1 3/7] adv_monitor: Implement RegisterMonitor()
+Date:   Tue, 18 Aug 2020 15:26:39 -0700
+Message-Id: <20200818152612.BlueZ.v1.3.I19ff9cdbd40fe453db0e81aec8bf94dd9490dce3@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
 References: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
@@ -77,194 +77,241 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements the Get functions of SupportedMonitorTypes and
-SupportedFeatures.
+This implements the RegisterMonitor() method handler of ADV monitor
+manager interface.
 
-The following test was performed.
-- Issue dbus-send to read SupportedMonitorTypes and SupportedFeatures.
+The following tests were performed.
+- Issue a RegisterMonitor() call with a valid path and expect a
+success as return.
+- Issue a RegisterMonitor() call with an invalid path and expect
+org.bluez.Error.InvalidArguments as return.
+- Issue two Registermonitor() calls with the same path and expect
+org.bluez.Error.AlreadyExists.
+- Verify the values of the registered paths with logging.
+- Verify D-Bus disconnection callback was triggered when the client detach
+from D-Bus.
 
 Reviewed-by: Yun-Hao Chung <howardchung@google.com>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
 
- src/adv_monitor.c | 130 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 125 insertions(+), 5 deletions(-)
+ src/adv_monitor.c | 167 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 166 insertions(+), 1 deletion(-)
 
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 7044d3cca..4d02237e8 100644
+index 4d02237e8..3d27ad18b 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -28,10 +28,14 @@
- #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
+@@ -22,7 +22,9 @@
+ #endif
  
-+#include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
-+
+ #define _GNU_SOURCE
++#include <errno.h>
+ #include <stdint.h>
++#include <string.h>
+ 
+ #include <glib.h>
+ #include <dbus/dbus.h>
+@@ -34,7 +36,9 @@
  #include "adapter.h"
  #include "dbus-common.h"
  #include "log.h"
++#include "src/error.h"
  #include "src/shared/mgmt.h"
-+#include "src/shared/util.h"
++#include "src/shared/queue.h"
+ #include "src/shared/util.h"
  
  #include "adv_monitor.h"
+@@ -52,12 +56,170 @@ struct btd_adv_monitor_manager {
+ 	uint16_t max_num_monitors;
+ 	uint8_t max_num_patterns;
  
-@@ -42,6 +46,12 @@ struct btd_adv_monitor_manager {
- 	struct mgmt *mgmt;
- 	uint16_t adapter_id;
- 	char *path;
-+
-+	uint32_t supported_features;	/* MGMT_ADV_MONITOR_FEATURE_MASK_* */
-+	uint32_t enabled_features;	/* MGMT_ADV_MONITOR_FEATURE_MASK_* */
-+	uint16_t max_num_monitors;
-+	uint8_t max_num_patterns;
-+
++	struct queue *apps;	/* apps who registered for Adv monitoring */
  };
  
- static const GDBusMethodTable adv_monitor_methods[] = {
-@@ -54,9 +64,78 @@ static const GDBusMethodTable adv_monitor_methods[] = {
- 	{ }
- };
- 
-+enum monitor_type {
-+	MONITOR_TYPE_OR_PATTERNS,
++struct adv_monitor_app {
++	struct btd_adv_monitor_manager *manager;
++	char *owner;
++	char *path;
++
++	DBusMessage *reg;
++	GDBusClient *client;
 +};
 +
-+const struct adv_monitor_type {
-+	enum monitor_type type;
-+	const char *name;
-+} supported_types[] = {
-+	{ MONITOR_TYPE_OR_PATTERNS, "or_patterns" },
-+	{ },
++struct app_match_data {
++	const char *owner;
++	const char *path;
 +};
 +
-+/* Gets SupportedMonitorTypes property */
-+static gboolean get_supported_monitor_types(const GDBusPropertyTable *property,
-+						DBusMessageIter *iter,
-+						void *data)
++/* Replies to an app's D-Bus message and unref it */
++static void app_reply_msg(struct adv_monitor_app *app, DBusMessage *reply)
 +{
-+	DBusMessageIter entry;
-+	const struct adv_monitor_type *t;
-+	struct btd_adv_monitor_manager *manager = data;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+						DBUS_TYPE_STRING_AS_STRING,
-+						&entry);
-+
-+	for (t = supported_types; t->name; t++) {
-+		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+						&t->name);
-+	}
-+
-+	dbus_message_iter_close_container(iter, &entry);
-+
-+	return TRUE;
-+}
-+
-+const struct adv_monitor_feature {
-+	uint32_t mask;
-+	const char *name;
-+} supported_features[] = {
-+	{ MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS, "controller-patterns" },
-+	{ }
-+};
-+
-+/* Gets SupportedFeatures property */
-+static gboolean get_supported_features(const GDBusPropertyTable *property,
-+						DBusMessageIter *iter,
-+						void *data)
-+{
-+	DBusMessageIter entry;
-+	const struct adv_monitor_feature *f;
-+	struct btd_adv_monitor_manager *manager = data;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+						DBUS_TYPE_STRING_AS_STRING,
-+						&entry);
-+
-+	for (f = supported_features; f->name; f++) {
-+		if (manager->supported_features & f->mask) {
-+			dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+							&f->name);
-+		}
-+	}
-+
-+	dbus_message_iter_close_container(iter, &entry);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable adv_monitor_properties[] = {
--	{"SupportedMonitorTypes", "as", NULL, NULL, NULL},
--	{"SupportedFeatures", "as", NULL, NULL, NULL},
-+	{"SupportedMonitorTypes", "as", get_supported_monitor_types, NULL,
-+									NULL},
-+	{"SupportedFeatures", "as", get_supported_features, NULL, NULL},
- 	{ }
- };
- 
-@@ -107,6 +186,42 @@ static void manager_destroy(struct btd_adv_monitor_manager *manager)
- 	manager_free(manager);
- }
- 
-+/* Initiates manager's members based on the return of
-+ * MGMT_OP_READ_ADV_MONITOR_FEATURES
-+ */
-+static void read_adv_monitor_features_cb(uint8_t status, uint16_t length,
-+						const void *param,
-+						void *user_data)
-+{
-+	const struct mgmt_rp_read_adv_monitor_features *rp = param;
-+	struct btd_adv_monitor_manager *manager = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS || !param) {
-+		btd_error(manager->adapter_id, "Failed to Read Adv Monitor "
-+				"Features with status 0x%02x", status);
++	if (!app || !app->reg || !reply)
 +		return;
-+	}
 +
-+	if (length < sizeof(*rp)) {
-+		btd_error(manager->adapter_id,
-+				"Wrong size of Read Adv Monitor Features "
-+				"response");
-+		return;
-+	}
-+
-+	manager->supported_features = le32_to_cpu(rp->supported_features);
-+	manager->enabled_features = le32_to_cpu(rp->enabled_features);
-+	manager->max_num_monitors = le16_to_cpu(rp->max_num_handles);
-+	manager->max_num_patterns = rp->max_num_patterns;
-+
-+	btd_info(manager->adapter_id, "Adv Monitor Manager created with "
-+			"supported features:0x%08x, enabled features:0x%08x, "
-+			"max number of supported monitors:%d, "
-+			"max number of supported patterns:%d",
-+			manager->supported_features, manager->enabled_features,
-+			manager->max_num_monitors, manager->max_num_patterns);
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(app->reg);
++	app->reg = NULL;
 +}
 +
- /* Creates a manager and registers its D-Bus interface */
- struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
- 						struct btd_adapter *adapter,
-@@ -130,9 +245,14 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
- 		return NULL;
- 	}
- 
--	btd_info(manager->adapter_id,
--			"Adv Monitor Manager created for adapter %s",
--			adapter_get_path(manager->adapter));
-+	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_MONITOR_FEATURES,
-+			manager->adapter_id, 0, NULL,
-+			read_adv_monitor_features_cb, manager, NULL)) {
-+		btd_error(manager->adapter_id,
-+				"Failed to send Read Adv Monitor Features");
-+		manager_destroy(manager);
++/* Destroys an app object along with related D-Bus handlers */
++static void app_destroy(void *data)
++{
++	struct adv_monitor_app *app = data;
++
++	if (!app)
++		return;
++
++	DBG("Destroy Adv Monitor app %s at path %s", app->owner, app->path);
++
++	if (app->reg) {
++		app_reply_msg(app, btd_error_failed(app->reg,
++						"Adv Monitor app destroyed"));
++	}
++
++	if (app->client) {
++		g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
++		g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL,
++							NULL);
++		g_dbus_client_set_ready_watch(app->client, NULL, NULL);
++		g_dbus_client_unref(app->client);
++		app->client = NULL;
++	}
++
++	g_free(app->owner);
++	app->owner = NULL;
++	g_free(app->path);
++	app->path = NULL;
++
++	g_free(app);
++}
++
++/* Handles a D-Bus disconnection event of an app */
++static void app_disconnect_cb(DBusConnection *conn, void *user_data)
++{
++	struct adv_monitor_app *app = user_data;
++
++	btd_info(app->manager->adapter_id, "Adv Monitor app %s disconnected "
++			"from D-Bus", app->owner);
++	if (app && queue_remove(app->manager->apps, app))
++		app_destroy(app);
++}
++
++/* Creates an app object, initiates it and sets D-Bus event handlers */
++static struct adv_monitor_app *app_create(DBusConnection *conn,
++					const char *sender, const char *path,
++					struct btd_adv_monitor_manager *manager)
++{
++	struct adv_monitor_app *app;
++
++	if (!path || !sender || !manager)
++		return NULL;
++
++	app = g_new0(struct adv_monitor_app, 1);
++	if (!app)
++		return NULL;
++
++	app->owner = g_strdup(sender);
++	app->path = g_strdup(path);
++	app->manager = manager;
++	app->reg = NULL;
++
++	app->client = g_dbus_client_new(conn, sender, path);
++	if (!app->client) {
++		app_destroy(app);
 +		return NULL;
 +	}
++
++	g_dbus_client_set_disconnect_watch(app->client, app_disconnect_cb, app);
++	g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL, NULL);
++	g_dbus_client_set_ready_watch(app->client, NULL, NULL);
++
++	return app;
++}
++
++/* Matches an app based on its owner and path */
++static bool app_match(const void *a, const void *b)
++{
++	const struct adv_monitor_app *app = a;
++	const struct app_match_data *match = b;
++
++	if (match->owner && strcmp(app->owner, match->owner))
++		return false;
++
++	if (match->path && strcmp(app->path, match->path))
++		return false;
++
++	return true;
++}
++
++/* Handles a RegisterMonitor D-Bus call */
++static DBusMessage *register_monitor(DBusConnection *conn, DBusMessage *msg,
++					void *user_data)
++{
++	DBusMessageIter args;
++	struct app_match_data match;
++	struct adv_monitor_app *app;
++	struct btd_adv_monitor_manager *manager = user_data;
++
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &match.path);
++
++	if (!strlen(match.path) || !g_str_has_prefix(match.path, "/"))
++		return btd_error_invalid_args(msg);
++
++	match.owner = dbus_message_get_sender(msg);
++
++	if (queue_find(manager->apps, app_match, &match))
++		return btd_error_already_exists(msg);
++
++	app = app_create(conn, match.owner, match.path, manager);
++	if (!app) {
++		btd_error(manager->adapter_id,
++				"Failed to reserve %s for Adv Monitor app %s",
++				match.path, match.owner);
++		return btd_error_failed(msg,
++					"Failed to create Adv Monitor app");
++	}
++
++	queue_push_tail(manager->apps, app);
++
++	btd_info(manager->adapter_id, "Path %s reserved for Adv Monitor app %s",
++			match.path, match.owner);
++
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable adv_monitor_methods[] = {
+ 	{ GDBUS_METHOD("RegisterMonitor",
+ 					GDBUS_ARGS({ "application", "o" }),
+-					NULL, NULL) },
++					NULL, register_monitor) },
+ 	{ GDBUS_ASYNC_METHOD("UnregisterMonitor",
+ 					GDBUS_ARGS({ "application", "o" }),
+ 					NULL, NULL) },
+@@ -157,6 +319,7 @@ static struct btd_adv_monitor_manager *manager_new(
+ 	manager->mgmt = mgmt_ref(mgmt);
+ 	manager->adapter_id = btd_adapter_get_index(adapter);
+ 	manager->path = g_strdup(adapter_get_path(manager->adapter));
++	manager->apps = queue_new();
  
  	return manager;
  }
+@@ -170,6 +333,8 @@ static void manager_free(struct btd_adv_monitor_manager *manager)
+ 	g_free(manager->path);
+ 	manager->path = NULL;
+ 
++	queue_destroy(manager->apps, app_destroy);
++
+ 	g_free(manager);
+ }
+ 
 -- 
 2.26.2
 
