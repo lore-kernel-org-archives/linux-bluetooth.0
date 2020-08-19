@@ -2,103 +2,86 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B6EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6983C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 13:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FE6C206B5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3252F206FA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 13:28:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8Ooe40a"
+	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="lpI5xi0+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726710AbgHSIuw (ORCPT
+        id S1728119AbgHSN2I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 04:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726702AbgHSIuv (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:50:51 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C30C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 01:50:51 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id 77so20901235qkm.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 01:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=JWWNGW4uLcUJgLR3Lzv+8SY+g1N/Ade7CE0qw+59PWI=;
-        b=T8Ooe40aksqBVpv24YXu4h91x1Cn8XV6jg2YkPBlsIx2syIEfMsqEBXlY0rHw7qTpQ
-         gyr1n8y5vKcu8f3irFx2mXhLXIjDhVekPDBlzpfnzd/lfKwGVnKjRi0KumAoUxTmJBjM
-         ADFEo3PF2ab9aLhcb2eiU9I+zq6fTAE2mvkGnwODrQee6nvwnZ9pSCjUHxcxf0QwlTZl
-         SBc2hoejoKlbvrMtMgR9gNkWHhfjtcY43sdW1T0imm0ZotaMLryBCwBbaa3UrW/3LfFS
-         kXzfnGudM5qYrkJt2VrUDsXRRuA7hbjng0B1B5klAcJnq2J0Dh7vKROd6lIL7t9h29jq
-         uSlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=JWWNGW4uLcUJgLR3Lzv+8SY+g1N/Ade7CE0qw+59PWI=;
-        b=oVeZQtcFBpivVpFRYhNKzVlWqEEWXQVvQ/YiAwANsWwh0D6KZ3Z7ofLkko7WDKvoZy
-         6Ht/r6Y8lmirD3veOaGcxgruW0xRsohsguHgK57qyfEQo8U5l9yvdeQQHyW6pzWyFTd2
-         2rECTFu+n2M5HxS9y9ZNEX51Pllfure+e/YWz+j+2T95YylSKVDW5Pyr5kXlhxpE+WKE
-         t9Cl4c2NuGTfnwOwMik0j61ItlqOsOPTEKZhgGd+7D3CrLTQEz3tcc6rCVwGvVQIyscB
-         gh6JePaNh2dD0y/RceMl9LkfON8oe7ApnEHIYqRMn7bDN7UbNKAn2zQpielDXNYpuIP/
-         AoLA==
-X-Gm-Message-State: AOAM5326IwHW8y5xh+sbMFrruxKvHNiv8ltCNxMS5zItu8OKBHJxRc2t
-        XQZ8r4dtYzzyqPALZYBZt4pwYzAkMql/+g==
-X-Google-Smtp-Source: ABdhPJyPMM5M0W0c1bJUO3dlpUrmWjopO6V32pzm4c0DKN8EevMbE3oV8ueb/SCwMgIOFK5tITU/lA==
-X-Received: by 2002:a37:bdc4:: with SMTP id n187mr21291218qkf.192.1597827049761;
-        Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.251.90.7])
-        by smtp.gmail.com with ESMTPSA id g136sm23635668qke.82.2020.08.19.01.50.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
-Message-ID: <5f3ce7e9.1c69fb81.7987f.0d7e@mx.google.com>
-Date:   Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4289954485751905989=="
+        Wed, 19 Aug 2020 09:28:08 -0400
+Received: from ns.omicron.at ([212.183.10.25]:45256 "EHLO ns.omicron.at"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727992AbgHSN2H (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 Aug 2020 09:28:07 -0400
+X-Greylist: delayed 326 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 Aug 2020 09:28:06 EDT
+Received: from MGW02-ATKLA.omicron.at ([172.25.62.35])
+        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07JDMd7Y020945
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 15:22:39 +0200
+DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07JDMd7Y020945
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=omicronenergy.com;
+        s=default; t=1597843359;
+        bh=ccYcGYY6Mbw1HaaTbPxfuOr7peGZ50PxigpPLEqCJwc=;
+        h=From:To:CC:Subject:Date:From;
+        b=lpI5xi0+LOI7APFxlu1G4JXWK6oKSB9CNe8OdpUIR0mC7RoPrVuw0WIv/7AzVnhON
+         wHISDxCsvOARycfjLUspEnHrZUVnV8Y9FTR/Q8Qc1NniGHGmLSiLAjUKRA7gd+G3Nl
+         kbHTM8MgPWq+17j/I6j3PJgxYRfpRkW8o06fzaqE=
+Received: from MGW02-ATKLA.omicron.at (localhost [127.0.0.1])
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id 4FAB0A0064
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 15:22:38 +0200 (CEST)
+Received: from MGW01-ATKLA.omicron.at (unknown [172.25.62.34])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 4D846A0062
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 15:22:38 +0200 (CEST)
+Received: from EXC04-ATKLA.omicron.at ([172.22.100.189])
+        by MGW01-ATKLA.omicron.at  with ESMTP id 07JDMdeZ021520-07JDMdeb021520
+        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=CAFAIL);
+        Wed, 19 Aug 2020 15:22:39 +0200
+Received: from marmar13.omicron.at (172.22.32.104) by EXC04-ATKLA.omicron.at
+ (172.22.100.189) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 19 Aug
+ 2020 15:22:38 +0200
+From:   Mark Marshall <mark.marshall@omicronenergy.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Mark Marshall <markmarshall14@gmail.com>
+Subject: [PATCH BlueZ 0/2] Fix a couple of endian issues
+Date:   Wed, 19 Aug 2020 15:22:29 +0200
+Message-ID: <20200819132231.22673-1-mark.marshall@omicronenergy.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, daan@dptechnics.com
-Subject: RE: [BlueZ,1/1] Added random address in mesh HCI initialization to prevent error 0x12 when enabling/disabling LE scans
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200819082822.64903-2-daan@dptechnics.com>
-References: <20200819082822.64903-2-daan@dptechnics.com>
+Content-Type: text/plain
+X-Originating-IP: [172.22.32.104]
+X-ClientProxiedBy: EXC04-ATKLA.omicron.at (172.22.100.189) To
+ EXC04-ATKLA.omicron.at (172.22.100.189)
+X-FE-Policy-ID: 1:1:1:SYSTEM
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4289954485751905989==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Mark Marshall <markmarshall14@gmail.com>
 
+I'm running BlueZ on a big-endian platform, and have found a couple of
+small endian issues with the tools code.
 
-This is automated email and please do not reply to this email!
+Mark Marshall (2):
+  btiotest: Correct setting of addr_type for big-endian platforms
+  l2test: Correct the endian handling
 
-Dear submitter,
+ tools/btiotest.c |  7 ++++---
+ tools/l2test.c   | 14 +++++++-------
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
+-- 
+2.17.1
 
-Test Result:
-checkgitlint Failed
-
-Outputs:
-1: T1 Title exceeds max length (102>72): "Added random address in mesh HCI initialization to prevent error 0x12 when enabling/disabling LE scans"
-3: B6 Body message is missing
-
-
-
----
-Regards,
-Linux Bluetooth
-
---===============4289954485751905989==--
