@@ -2,236 +2,166 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E8EC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32637C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:45:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD5D6207DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:37:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BB8nlnEl"
+	by mail.kernel.org (Postfix) with ESMTP id 15FEF207FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:45:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726585AbgHSShV (ORCPT
+        id S1726603AbgHSSpC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 14:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60514 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725997AbgHSShU (ORCPT
+        Wed, 19 Aug 2020 14:45:02 -0400
+Received: from s01.spamexperts.axc.nl ([185.182.56.9]:60145 "EHLO
+        s01.spamexperts.axc.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726211AbgHSSpB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 14:37:20 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9B2C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id q9so19846144oth.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0HeIGZ0DyzgCbL5apsf54ipOledAWW5U3rl6Iv7K7EU=;
-        b=BB8nlnElYvnEtLlxUYqV8iuHSgs85Gg/45Dp9ymnCnHyCPW4ivRcJH3mZxdNCKhAeM
-         4MDNg/t4xEB1XobP3suSRBqHaERKtqck84yTFrrTrxGUUu5DD2CHqqAcqx7FEHyQbQpo
-         ozm3l4V7coBSnhyNj9PiRXY6gbzbGFXmx9yV9/u8KnWELyYJw2KBQRa8Pd6X8Jzgu5N6
-         S35XjLkuvMKnRe7n5goMWpAI016ZQZkKhF/T0pDANZR9GI1zwGM17qpGEqyE2RUsdKgw
-         OH0A5nM4nMIhcGbIXwQQSTAjpzUcSLvO5LwH1b3An2o6Nu6yL9/LX10A9fAfAkDBmEjc
-         iNPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0HeIGZ0DyzgCbL5apsf54ipOledAWW5U3rl6Iv7K7EU=;
-        b=VPHCXyLsCCLBvHCsZrNSwnGSJtaF1WdH0Wis+YDRStxYMJQZE9o9cb+mVWVAEcxsoh
-         +5QczhAaCVUO+aBy5vAmRTZqDE9EUbYH3vO0M2iJNCEzGpsctaJJeKL9U0uOajwTH/o7
-         E2SOgbC+mWmZQqEwJ/QSusCCLOebRkjHH/WT40b6W68BYSC1FE06daNxoHTfUJDtqjvL
-         aC9FWmNJMtuTD/Z1CCJ7dvnSePYCeI/69r3SZYtOmmZ08z4Za7EWbql/nr+J2+9h72Nc
-         xfbfi1xjXBkTWhUBSqRB3jCCHQaBEQfg44XodNveUs0AYoIELiVvQoZAUzSKZKUBMXmt
-         5e2A==
-X-Gm-Message-State: AOAM531NKeQ1PhRRwWgrjTixb3af41kdUSNHxdHw1cDs0jFESJ3I2+jj
-        QJwFTz6v2ZupCdx01FfGKG7p68F/jS1N/HLkuUrU4ZQtmIY=
-X-Google-Smtp-Source: ABdhPJxC8UBCMYG47EEADSQckWecSzJaykg83rAruk57WKUCtMUiwmXxN8tQNglInTal0V8YVvZKIwG7D9JKz6GGqEs=
-X-Received: by 2002:a9d:429:: with SMTP id 38mr18318780otc.88.1597862239111;
- Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
+        Wed, 19 Aug 2020 14:45:01 -0400
+X-Greylist: delayed 6292 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 Aug 2020 14:44:59 EDT
+Received: from vserver85.axc.nl ([185.182.56.185])
+        by s01.spamexperts.axc.nl with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.92)
+        (envelope-from <dave@daveborghuis.nl>)
+        id 1k8RRT-0006rp-HE
+        for linux-bluetooth@vger.kernel.org; Wed, 19 Aug 2020 19:00:06 +0200
+Received: from mail.axc.nl ([185.182.56.42])
+        by vserver85.axc.nl with esmtp (Exim 4.94)
+        (envelope-from <dave@daveborghuis.nl>)
+        id 1k8RRS-00AA0T-1E
+        for linux-bluetooth@vger.kernel.org; Wed, 19 Aug 2020 19:00:02 +0200
+To:     linux-bluetooth@vger.kernel.org
+From:   Dave Borghuis <dave@daveborghuis.nl>
+Autocrypt: addr=dave@daveborghuis.nl; prefer-encrypt=mutual; keydata=
+ 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 0G/D
+Subject: Cant see Android Covid Exposure notification beacon (no problem with
+ iPhone beacons)
+Message-ID: <b39b3395-ad80-bf76-caea-490666cea671@daveborghuis.nl>
+Date:   Wed, 19 Aug 2020 19:00:01 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200819150931.3005-1-mark.marshall@omicronenergy.com> <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
-In-Reply-To: <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 19 Aug 2020 11:37:08 -0700
-Message-ID: <CABBYNZ+OK4EY9KGHn7oasz4GRfBDJdWNcpOhr1GNGc3D+QtZ-g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] src/profile.c: Add a GetProfileInfo method
-To:     Mark Marshall <mark.marshall@omicronenergy.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+PrimaryMX: Accepted email from trusted host.  Hint: This skips spam scanning so make sure other host is not vulnerable
+X-Relay-Host: 185.182.56.42
+SpamTally: Final spam score: 0
+X-AuthUser: 
+X-Originating-IP: 185.182.56.185
+X-SpamExperts-Domain: vserver85.axc.nl
+X-SpamExperts-Username: 185.182.56.185
+Authentication-Results: spamexperts.axc.nl; auth=pass smtp.auth=185.182.56.185@vserver85.axc.nl
+X-SpamExperts-Outgoing-Class: ham
+X-SpamExperts-Outgoing-Evidence: Combined (0.11)
+X-Recommended-Action: accept
+X-Filter-ID: Mvzo4OR0dZXEDF/gcnlw0Uc1Z+hCSaILZIw3vLzlsGSpSDasLI4SayDByyq9LIhVYtIe3Q6Ueykn
+ Pvf+cPo2l0TNWdUk1Ol2OGx3IfrIJKywOmJyM1qr8uRnWBrbSAGDkyaV/HSuvhtrCrYZnJyJprfA
+ vZjgXTjXZ7MYLJNQ9qfEV6mG7REFdc/y+N+WUcRUrHrxZWvesWDvIZD81C02avq2Gb7u1BCYlN7N
+ u1YChzu5cEt3QSU508Q6A7wRhsaYdmq9xo0GjtWFBExS79GWRamHZ7x6u9Brd8pYitTyb+Iigr59
+ rlmv/GHWoLSyMb15AwCaU+JKXuJDa3LaePMOFRkhzVJFWn887ct0NFXnFWKxnGmiI3p9NEdyvIai
+ 1RA3JU4jwn/j8E2/0SgHcP07MMV+dz7akF52ekPgsD93vyq/ACCTOiwBg1W4fRYdQHYhH+5TduRS
+ 72K5pleHE5QR33QmZupE66h/n5scs0KBvjbXs2KsRjKrCowEavDwQuKow/uHSYVMpt/Uo2J0FRFF
+ QZMcLrnY3nGbRXqkywVTWWifU642KNtk4n/u8nyV2xsjehIqUczFWeS6sE8e1b5/Uj/i4hYVfUxI
+ FxiN15g3w5z9HjheqKGe/Xw9Eqs27yPa56U4tSVR+PkAWM7EDktWGqU9EyOgYBbfvk3hETr+b0IH
+ mFDqewO9xyOqCYO8P1aHuylOWoVldtjaf1T8hyYAn+byoVLxqGq1sXT6ejmEoSQMhGfTGKeYohdq
+ JlHBQlshXt8dlQXuSXw6QX3vO2l6zs7fXl7o5hhgRuEQkQsBWeNYzdyzoRUEpYNmzltPrdLiRSrv
+ GBrIgRh1MRcQAKU4P1FfEoXm0/FPF8PR0w363lk0mtdFubkFnXxurL3w551wUWKOQLOVGdmQ+BhN
+ hOPwXKBe7/mqdKAYqg1HpF7XcTyzMeoUaX8fmEyqwIC0fLJSuG6xVdphrUpYQO+Raqyt3AWevvg3
+ 5E1ZQVrEeUBpJbnjGc6oaCkj/CHHhRGXKIbimLNXS3W8YK6tYVOVBH2QeU+HBvHh6GQL5BmhodkO
+ jeg=
+X-Report-Abuse-To: spam@s01.spamexperts.axc.nl
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mark,
+Hi all,
 
-On Wed, Aug 19, 2020 at 8:13 AM Mark Marshall
-<mark.marshall@omicronenergy.com> wrote:
->
-> Add a GetProfileInfo method to org.bluez.ProfileManager1
-> ---
->  doc/profile-api.txt | 13 +++++++
->  src/profile.c       | 93 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 106 insertions(+)
->
-> diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-> index 8c7d0a06d..d13703ab4 100644
-> --- a/doc/profile-api.txt
-> +++ b/doc/profile-api.txt
-> @@ -133,6 +133,19 @@ Object path        /org/bluez
->
->                         Possible errors: org.bluez.Error.DoesNotExist
->
-> +               options GetProfileInfo(object profile, object adapter)
-> +
-> +                       This returns a dictionary of options for the
-> +                       profile.  Values returned are: UUID, Name,
-> +                       Path, Service, Mode and AddressType.  The
-> +                       adapter parameter is optional - if it is
-> +                       non-empty, then two additional values might be
-> +                       returned, if the profile is active on the
-> +                       specified adapter: PSM and Channel.
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.DoesNotExist
-> +
+I don't know if this is the right place to ask, if not feel free to
+forward the mail or point me in the right direction.
 
-If this is really required I would be willing to merge something like this:
+If I look with btmon i see no Covid exposure notification beacons from
+android phones, i see these beacons from a iphone. When I check with a
+ESP32 with a monitor I see both beacons (from iPhone and Android).
 
-https://github.com/Vudentz/BlueZ/commit/9e196f8830511a4102e990d82d06c2e0487b3ad9
+I using Raspberry Pi 4 with  with all software updated. I updated bluez
+to last release (from 5.50 -> 5.54) with same results.
 
-It exposes service objects so you can control exactly what gets
-connect, though now given a second look at this seem to return details
-that the client can query directly on the socket itself like the
-Channel, PSM, Mode, etc, also not sure what is the point on retrieving
-things like UUID, Name, Path if the application is already in control
-of these when registering.
+Used software versions :
 
->  Profile hierarchy
->  =================
-> diff --git a/src/profile.c b/src/profile.c
-> index 10850f305..e287a66d7 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -2509,6 +2509,96 @@ static DBusMessage *unregister_profile(DBusConnection *conn,
->         return dbus_message_new_method_return(msg);
->  }
->
-> +static DBusMessage *get_profile_info(DBusConnection *conn,
-> +                                       DBusMessage *msg, void *user_data)
-> +{
-> +       DBusMessage *reply;
-> +       DBusMessageIter iter, dict;
-> +       const char *path, *adapter, *sender;
-> +       struct ext_profile *ext;
-> +       uint16_t u16;
-> +       GSList *l, *next;
-> +
-> +       sender = dbus_message_get_sender(msg);
-> +
-> +       DBG("sender %s", sender);
-> +
-> +       if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-> +                                  DBUS_TYPE_OBJECT_PATH, &adapter,
-> +                                  DBUS_TYPE_INVALID)) {
-> +               return btd_error_invalid_args(msg);
-> +       }
-> +
-> +       if (adapter && !*adapter)
-> +               adapter = NULL;
-> +
-> +       ext = find_ext_profile(sender, path);
-> +       if (!ext)
-> +               return btd_error_does_not_exist(msg);
-> +
-> +       reply = dbus_message_new_method_return(msg);
-> +
-> +       dbus_message_iter_init_append(reply, &iter);
-> +
-> +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-> +                                        "{sv}", &dict);
-> +
-> +       g_dbus_dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING,
-> +                                &ext->uuid);
-> +       if (ext->name) {
-> +               g_dbus_dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
-> +                                        &ext->name);
-> +       }
-> +       if (ext->path) {
-> +               g_dbus_dict_append_entry(&dict, "Path", DBUS_TYPE_STRING,
-> +                                        &ext->path);
-> +       }
-> +       if (ext->service) {
-> +               g_dbus_dict_append_entry(&dict, "Service", DBUS_TYPE_STRING,
-> +                                        &ext->service);
-> +       }
-> +
-> +       u16 = ext->mode;
-> +       g_dbus_dict_append_entry(&dict, "Mode", DBUS_TYPE_UINT16,
-> +                                &u16);
-> +
-> +       u16 = ext->addr_type;
-> +       g_dbus_dict_append_entry(&dict, "AddressType", DBUS_TYPE_UINT16,
-> +                                &u16);
-> +
-> +       if (adapter) {
-> +               for (l = ext->servers; l != NULL; l = next) {
-> +                       struct ext_io *server = l->data;
-> +                       const char *ctype;
-> +
-> +                       DBG("server:%p  %d %d psm:%d chan:%d",
-> +                           server, server->resolving, server->connected,
-> +                           server->psm, server->chan);
-> +
-> +                       next = g_slist_next(l);
-> +
-> +                       if (strcmp(adapter, adapter_get_path(server->adapter)))
-> +                               continue;
-> +
-> +                       if (server->proto == BTPROTO_L2CAP) {
-> +                               ctype = "PSM";
-> +                               u16 = server->psm;
-> +                       } else if (server->proto == BTPROTO_RFCOMM) {
-> +                               ctype = "Channel";
-> +                               u16 = server->chan;
-> +                       } else {
-> +                               continue;
-> +                       }
-> +                       g_dbus_dict_append_entry(
-> +                               &dict, ctype, DBUS_TYPE_UINT16, &u16);
-> +               }
-> +       }
-> +
-> +       dbus_message_iter_close_container(&iter, &dict);
-> +
-> +       return reply;
-> +}
-> +
->  static const GDBusMethodTable methods[] = {
->         { GDBUS_METHOD("RegisterProfile",
->                         GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
-> @@ -2516,6 +2606,9 @@ static const GDBusMethodTable methods[] = {
->                         NULL, register_profile) },
->         { GDBUS_METHOD("UnregisterProfile", GDBUS_ARGS({ "profile", "o" }),
->                         NULL, unregister_profile) },
-> +       { GDBUS_METHOD("GetProfileInfo",
-> +                       GDBUS_ARGS({ "profile", "o" }, { "adapter", "o" }),
-> +                       GDBUS_ARGS({ "options", "a{sv}" }), get_profile_info) },
->         { }
->  };
->
-> --
-> 2.17.1
->
+Installed image : Raspberry Pi OS (32-bit) with desktop Release date :
+2020-05-27
+
+Bleuz version 5.50 and last release 5.54 (build from source)
+
+If needed I can recompile from source a new version. I tried to find
+source of a more up-to-date developer version then 5.54 but could not
+find this.
+
+So is there something I can do to enable to see Android Covid exposure
+notification ? Do I something wrong or is there a bug in the bluez stack?
+
+Background : I am making a 'CoronaCounter' app in python, I want to
+count the Covid exposure notification that I see. In python i use
+beacontools. I noticed I don't see any android beacons. More about this
+projcect you can find on https://github.com/zeno4ever/CoronaTeller
+
+Regards,
+
+Dave
 
 
--- 
-Luiz Augusto von Dentz
