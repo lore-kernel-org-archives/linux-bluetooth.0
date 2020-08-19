@@ -2,120 +2,155 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5401C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 13:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DB2C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 14:37:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F819204FD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 13:50:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vc5Q4d1I"
+	by mail.kernel.org (Postfix) with ESMTP id 9E3DE2078D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 14:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1597847847;
+	bh=9XcrtgpDa8lRtRYF9tZCoWHfFG44dFLLY6OtC69LqnQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fW5oXeCvKCqhxDQ0mnzdYnrgRcYUFiWoXfvGfYMz4Tme4t6u6g1cg7Ue8q1zC6GLB
+	 b+GLRqwOLB323OIz69RIvjvGI/rcu8J4nA3nj9DudzZJX5ClhStqoekkqyQzNAtRBK
+	 5DHRw+CsC4AJX3JrfT5lVQW3bzBI3rFymHc9Z4EQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728562AbgHSNum (ORCPT
+        id S1728548AbgHSOhV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 09:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44244 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728686AbgHSNu2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 09:50:28 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F988C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 06:50:27 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id dd12so11276678qvb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 06:50:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=5Kq+eO5N+yscRltuzqc1xrjMAGWlhYWTm3daje9xGJk=;
-        b=Vc5Q4d1IUR6s9zJjNj85e++d8iVFv13+P42Bqk7ogPL9OwR5G5TXpPll71t2mC75xj
-         U632lbv/ZpFDtWiMm18wb2wn533dN/uQ3PcC19ZoLduitBiG8HqNLzSI4NtTYz5JKkYQ
-         W8F2S/Z2VEiY3SUqiF3t7H+zv3EJty34zlNw3MJoZ/nXNXy+Nkvlj1NN30/7tn0uMNTj
-         BTPtbHLi5XUTPIr5XSZ1h+5i25+O82q0Ct0dh3kPF9QDtNK8ct1XfvohG2CnHqmlhRIX
-         rlis52MQAatXJv3GNIPOLLRb3d5ZsOVYhqtU9FAnYHGPrhUzdKcsDhGW7cUCLIX9yu4V
-         aw+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=5Kq+eO5N+yscRltuzqc1xrjMAGWlhYWTm3daje9xGJk=;
-        b=gzEFtd4BtnStAPyPjUwpejPwM5Hqz82/4qydzUID2GES9of7nuemNzDRsDGtDTxMsn
-         nwlPyvpi7J/BkE3cxTclBp/V8w/TfysakTLFMyKB3l0EsvsX3p1eUMbE1b3O3dTiC8ue
-         nVpPJfYhxKqzZjnlkNX85G6A6y97c15J7o3aKIOu3LSu6tQcaun5FicvZJ0WmztQOH+P
-         4mLawoXhgN2wMvefKNryd4a3PGuirrxtjmKsaxvEGQvZgdDcfI7UEyxAMf6FgBkp2FGm
-         2im3BTYt2U8A4MhjIVLkuYL4+/2GijYGbDZRJFx9IvLasM/NwmnwnsBO35p4a+0beVz0
-         ALXQ==
-X-Gm-Message-State: AOAM530boI0qLA6HV8Ajthja1M8MLHEmlC+SVqyDwhEbxsCxmXFaosbP
-        ge6iVgPO52Fp0wkrvTDRTJ0jwJocyH4fTw==
-X-Google-Smtp-Source: ABdhPJyAHRb3PU4Xt5Z/2OsCo+zG+PHNDNsA2hMwFBXM58ddDJCH2oer337Lqd6eT34fjhfgqTgckQ==
-X-Received: by 2002:a05:6214:290:: with SMTP id l16mr24139170qvv.187.1597845026600;
-        Wed, 19 Aug 2020 06:50:26 -0700 (PDT)
-Received: from [172.17.0.2] ([20.186.111.146])
-        by smtp.gmail.com with ESMTPSA id u39sm29590481qtc.54.2020.08.19.06.50.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2020 06:50:26 -0700 (PDT)
-Message-ID: <5f3d2e22.1c69fb81.c1d36.72a4@mx.google.com>
-Date:   Wed, 19 Aug 2020 06:50:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5463537467180307820=="
+        Wed, 19 Aug 2020 10:37:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33532 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727827AbgHSOhT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 Aug 2020 10:37:19 -0400
+Received: from pali.im (pali.im [31.31.79.79])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AACFE20738;
+        Wed, 19 Aug 2020 14:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597847838;
+        bh=9XcrtgpDa8lRtRYF9tZCoWHfFG44dFLLY6OtC69LqnQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OowIhNuEd45rf/oFvYaOaETAGF+uvia8dB0Otcx6KfXxpYoM5JxASnYfjSb2YQfgj
+         5Ze4YoRi6VKMI3ZznYjQmc6sLIEd+20Ek70ZpcUQ4IMFkQTGStuQ3EPqkY3420WEdC
+         38xm9QiDDEVR790ymYcElxSonP2HDMCEbqyHXw6k=
+Received: by pali.im (Postfix)
+        id D79AD582; Wed, 19 Aug 2020 16:37:16 +0200 (CEST)
+Date:   Wed, 19 Aug 2020 16:37:16 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Joseph Hwang <josephsih@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Joseph Hwang <josephsih@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 2/2] Bluetooth: sco: expose WBS packet length in
+ socket option
+Message-ID: <20200819143716.iimo4l3uul7lrpjn@pali>
+References: <20200813084129.332730-1-josephsih@chromium.org>
+ <20200813164059.v1.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
+ <CABBYNZJ-nBXeujF2WkMEPYPQhXAphqKCV39gr-QYFdTC3GvjXg@mail.gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mark.marshall@omicronenergy.com
-Subject: RE: [BlueZ,1/2] btiotest: Correct setting of addr_type for big-endian platforms
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <418845b9-28e1-4356-9ce2-b422720bf948@EXC04-ATKLA.omicron.at>
-References: <418845b9-28e1-4356-9ce2-b422720bf948@EXC04-ATKLA.omicron.at>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJ-nBXeujF2WkMEPYPQhXAphqKCV39gr-QYFdTC3GvjXg@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5463537467180307820==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Friday 14 August 2020 12:56:05 Luiz Augusto von Dentz wrote:
+> Hi Joseph,
+> 
+> On Thu, Aug 13, 2020 at 1:42 AM Joseph Hwang <josephsih@chromium.org> wrote:
+> >
+> > It is desirable to expose the wideband speech packet length via
+> > a socket option to the user space so that the user space can set
+> > the value correctly in configuring the sco connection.
+> >
+> > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> > ---
+> >
+> >  include/net/bluetooth/bluetooth.h | 2 ++
+> >  net/bluetooth/sco.c               | 8 ++++++++
+> >  2 files changed, 10 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index 9125effbf4483d..922cc03143def4 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -153,6 +153,8 @@ struct bt_voice {
+> >
+> >  #define BT_SCM_PKT_STATUS      0x03
+> >
+> > +#define BT_SCO_PKT_LEN         17
+> > +
+> >  __printf(1, 2)
+> >  void bt_info(const char *fmt, ...);
+> >  __printf(1, 2)
+> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> > index dcf7f96ff417e6..97e4e7c7b8cf62 100644
+> > --- a/net/bluetooth/sco.c
+> > +++ b/net/bluetooth/sco.c
+> > @@ -67,6 +67,7 @@ struct sco_pinfo {
+> >         __u32           flags;
+> >         __u16           setting;
+> >         __u8            cmsg_mask;
+> > +       __u32           pkt_len;
+> >         struct sco_conn *conn;
+> >  };
+> >
+> > @@ -267,6 +268,8 @@ static int sco_connect(struct sock *sk)
+> >                 sco_sock_set_timer(sk, sk->sk_sndtimeo);
+> >         }
+> >
+> > +       sco_pi(sk)->pkt_len = hdev->sco_pkt_len;
+> > +
+> >  done:
+> >         hci_dev_unlock(hdev);
+> >         hci_dev_put(hdev);
+> > @@ -1001,6 +1004,11 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+> >                         err = -EFAULT;
+> >                 break;
+> >
+> > +       case BT_SCO_PKT_LEN:
+> > +               if (put_user(sco_pi(sk)->pkt_len, (u32 __user *)optval))
+> > +                       err = -EFAULT;
+> > +               break;
+> 
+> Couldn't we expose this via BT_SNDMTU/BT_RCVMTU?
 
+Hello!
 
-This is automated email and please do not reply to this email!
+There is already SCO_OPTIONS sock option, uses struct sco_options and
+contains 'mtu' member.
 
-Dear submitter,
+I think that instead of adding new sock option, existing SCO_OPTIONS
+option should be used.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkpatch Failed
-
-Outputs:
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#21: FILE: tools/btiotest.c:559:
-+static int opt_addr_type = 0;
-
-WARNING:LONG_LINE: line over 80 characters
-#31: FILE: tools/btiotest.c:619:
-+		" prio=%d voice=0x%04x addr_type=%u\n", opt_accept, opt_reject, opt_disconn,
-
-- total: 1 errors, 1 warnings, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
----
-Regards,
-Linux Bluetooth
-
---===============5463537467180307820==--
+> >         default:
+> >                 err = -ENOPROTOOPT;
+> >                 break;
+> > --
+> > 2.28.0.236.gb10cc79966-goog
+> >
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
