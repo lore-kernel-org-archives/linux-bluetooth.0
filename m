@@ -2,105 +2,103 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1225BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B6EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4E9620738
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FE6C206B5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 08:50:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=dptechnics.com header.i=daan@dptechnics.com header.b="FoUF9Ag8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8Ooe40a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbgHSI2o (ORCPT
+        id S1726710AbgHSIuw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 04:28:44 -0400
-Received: from sender4-op-o11.zoho.com ([136.143.188.11]:17155 "EHLO
-        sender4-op-o11.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725275AbgHSI2n (ORCPT
+        Wed, 19 Aug 2020 04:50:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726702AbgHSIuv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:28:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597825721; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=JQOd6sEjLn8ovrXXo4MGubrEV/d6ZJ4JQyFUC5q6U79j7f67R2+W4dihcN1XGitKfUYzz/WVt9ZvjAhL9/y+ZsAjDp5fOKYDusbbyHYPGVv/4k/bes63fEmjwOUl4EqMGhYFaLuUq7chmFG/q4IIHqR+uUFcbiJxAv89bAJWjg4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1597825721; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=d9boOkysEGDCONb3wvtEktaiZH+gsA7O/zLknqluH/s=; 
-        b=R5TC4TVy7c2jiS1bJgg1DMvY3nRbtKfY/koi+n9knU+ZYbRxHAPv0KUM/PXtCyboIYDdMTcOVuuFwk8BPF6IA+fWrReEfCDMnpDEcW9xkzMo7m74emDe2Vfxaw9ZY0l53fgqeXYa+jlh1kSuygTsRYNp4gfsIcHkb9MrT9j3AXE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=dptechnics.com;
-        spf=pass  smtp.mailfrom=daan@dptechnics.com;
-        dmarc=pass header.from=<daan@dptechnics.com> header.from=<daan@dptechnics.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1597825721;
-        s=zoho; d=dptechnics.com; i=daan@dptechnics.com;
-        h=From:To:Cc:Message-ID:Subject:Date:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        bh=d9boOkysEGDCONb3wvtEktaiZH+gsA7O/zLknqluH/s=;
-        b=FoUF9Ag83GWiLjTfMUvGy1HoZREFwU40b75shq6oj5Fh7pDXcUGH4lNVHxtLjr1S
-        OZD8hmxWki9xAO9vRpp/l/Q3oDUtbgycoSnEhTQJZiiRuVYlmooMDl7pUSqyGJW1XX8
-        x3GuSC30R9uhxL7YNPVG/ADWB1pvsuA27Vb87PAg=
-Received: from daan-devbox.dptechnics.local (178-116-74-88.access.telenet.be [178.116.74.88]) by mx.zohomail.com
-        with SMTPS id 1597825718141948.4507996388694; Wed, 19 Aug 2020 01:28:38 -0700 (PDT)
-From:   Daan Pape <daan@dptechnics.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Daan Pape <daan@dptechnics.com>
-Message-ID: <20200819082822.64903-2-daan@dptechnics.com>
-Subject: [PATCH BlueZ 1/1] Added random address in mesh HCI initialization to prevent error 0x12 when enabling/disabling LE scans
-Date:   Wed, 19 Aug 2020 10:28:22 +0200
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200819082822.64903-1-daan@dptechnics.com>
-References: <20200819082822.64903-1-daan@dptechnics.com>
+        Wed, 19 Aug 2020 04:50:51 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C30C061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 01:50:51 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id 77so20901235qkm.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 01:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=JWWNGW4uLcUJgLR3Lzv+8SY+g1N/Ade7CE0qw+59PWI=;
+        b=T8Ooe40aksqBVpv24YXu4h91x1Cn8XV6jg2YkPBlsIx2syIEfMsqEBXlY0rHw7qTpQ
+         gyr1n8y5vKcu8f3irFx2mXhLXIjDhVekPDBlzpfnzd/lfKwGVnKjRi0KumAoUxTmJBjM
+         ADFEo3PF2ab9aLhcb2eiU9I+zq6fTAE2mvkGnwODrQee6nvwnZ9pSCjUHxcxf0QwlTZl
+         SBc2hoejoKlbvrMtMgR9gNkWHhfjtcY43sdW1T0imm0ZotaMLryBCwBbaa3UrW/3LfFS
+         kXzfnGudM5qYrkJt2VrUDsXRRuA7hbjng0B1B5klAcJnq2J0Dh7vKROd6lIL7t9h29jq
+         uSlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=JWWNGW4uLcUJgLR3Lzv+8SY+g1N/Ade7CE0qw+59PWI=;
+        b=oVeZQtcFBpivVpFRYhNKzVlWqEEWXQVvQ/YiAwANsWwh0D6KZ3Z7ofLkko7WDKvoZy
+         6Ht/r6Y8lmirD3veOaGcxgruW0xRsohsguHgK57qyfEQo8U5l9yvdeQQHyW6pzWyFTd2
+         2rECTFu+n2M5HxS9y9ZNEX51Pllfure+e/YWz+j+2T95YylSKVDW5Pyr5kXlhxpE+WKE
+         t9Cl4c2NuGTfnwOwMik0j61ItlqOsOPTEKZhgGd+7D3CrLTQEz3tcc6rCVwGvVQIyscB
+         gh6JePaNh2dD0y/RceMl9LkfON8oe7ApnEHIYqRMn7bDN7UbNKAn2zQpielDXNYpuIP/
+         AoLA==
+X-Gm-Message-State: AOAM5326IwHW8y5xh+sbMFrruxKvHNiv8ltCNxMS5zItu8OKBHJxRc2t
+        XQZ8r4dtYzzyqPALZYBZt4pwYzAkMql/+g==
+X-Google-Smtp-Source: ABdhPJyPMM5M0W0c1bJUO3dlpUrmWjopO6V32pzm4c0DKN8EevMbE3oV8ueb/SCwMgIOFK5tITU/lA==
+X-Received: by 2002:a37:bdc4:: with SMTP id n187mr21291218qkf.192.1597827049761;
+        Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
+Received: from [172.17.0.2] ([52.251.90.7])
+        by smtp.gmail.com with ESMTPSA id g136sm23635668qke.82.2020.08.19.01.50.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
+Message-ID: <5f3ce7e9.1c69fb81.7987f.0d7e@mx.google.com>
+Date:   Wed, 19 Aug 2020 01:50:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4289954485751905989=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
-Content-Type: text/plain; charset=utf8
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, daan@dptechnics.com
+Subject: RE: [BlueZ,1/1] Added random address in mesh HCI initialization to prevent error 0x12 when enabling/disabling LE scans
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200819082822.64903-2-daan@dptechnics.com>
+References: <20200819082822.64903-2-daan@dptechnics.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============4289954485751905989==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
+
+Test Result:
+checkgitlint Failed
+
+Outputs:
+1: T1 Title exceeds max length (102>72): "Added random address in mesh HCI initialization to prevent error 0x12 when enabling/disabling LE scans"
+3: B6 Body message is missing
+
+
+
 ---
- mesh/mesh-io-generic.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 67b13a1b9..67304d201 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -209,6 +209,7 @@ static void configure_hci(struct mesh_io_private *io)
- =09struct bt_hci_cmd_le_set_scan_parameters cmd;
- =09struct bt_hci_cmd_set_event_mask cmd_sem;
- =09struct bt_hci_cmd_le_set_event_mask cmd_slem;
-+=09struct bt_hci_cmd_le_set_random_address cmd_raddr;
-=20
- =09/* Set scan parameters */
- =09cmd.type =3D 0x00; /* Passive Scanning. No scanning PDUs shall be sent =
-*/
-@@ -261,6 +262,10 @@ static void configure_hci(struct mesh_io_private *io)
- =09cmd_slem.mask[6] =3D 0x00;
- =09cmd_slem.mask[7] =3D 0x00;
-=20
-+=09/* Set LE random address */
-+=09l_getrandom(cmd_raddr.addr, 6);
-+=09cmd_raddr.addr[5] |=3D 0xc0;
-+
- =09/* TODO: Move to suitable place. Set suitable masks */
- =09/* Reset Command */
- =09bt_hci_send(io->hci, BT_HCI_CMD_RESET, NULL, 0, hci_generic_callback,
-@@ -282,6 +287,10 @@ static void configure_hci(struct mesh_io_private *io)
- =09bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_EVENT_MASK, &cmd_slem,
- =09=09=09sizeof(cmd_slem), hci_generic_callback, NULL, NULL);
-=20
-+=09/* Set LE random address */
-+=09bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_RANDOM_ADDRESS, &cmd_raddr,
-+=09=09=09sizeof(cmd_raddr), hci_generic_callback, NULL, NULL);
-+
- =09/* Scan Params */
- =09bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS, &cmd,
- =09=09=09=09sizeof(cmd), hci_generic_callback, NULL, NULL);
---=20
-2.20.1
-
-
+--===============4289954485751905989==--
