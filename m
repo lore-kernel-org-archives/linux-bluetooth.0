@@ -2,68 +2,83 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A275C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A797C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:21:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BB442083B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2455E20758
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:21:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQDJHmbp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o2l1Nfy+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726578AbgHSSTQ (ORCPT
+        id S1726810AbgHSSVN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 14:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57720 "EHLO
+        Wed, 19 Aug 2020 14:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725997AbgHSSTO (ORCPT
+        with ESMTP id S1726735AbgHSSVM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 14:19:14 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DF09C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:19:14 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id u24so20707983oic.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:19:14 -0700 (PDT)
+        Wed, 19 Aug 2020 14:21:12 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A84C061757;
+        Wed, 19 Aug 2020 11:21:12 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id x24so19831435otp.3;
+        Wed, 19 Aug 2020 11:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=m0yXXFotQWroHLaVKba/7dhmvFCGNHuFoGGgLqaXvDA=;
-        b=JQDJHmbp5ZXBQhpzSe7Q88DuMFh0mAh3S2t0cvF+7IXcPBibqH5IZLbLonyuV7RMuH
-         UqlBUQjIrXKnGlmjxHH4/rkAntqpJ/W3QvXFdzjcXz8YiKl7f4wyGUG5q9iRopp8xfpQ
-         qirWenKn/6RqJrGDJS2OIVrK+3HGVaS+u5/W2/lsAbtRfiz7RGQjyrAxvbhNUhtp0Gqe
-         S244ojAn5EHaUh+7etuw0XSyTFadcXY6JTaUAg+TWZ2Jyg61vXOpy8esvAbuoKYjtDAi
-         o/6nNsVBUxntciXD8ZOPqqzExd7sA8MWsp5IQYA/yPAQrYNjpjDZbqmcWm0QxJ0PIT/N
-         JOdw==
+        bh=zBMYHGoLqcQIDa75kPEyh/KB+iBrkpptU65EqjbhG7Y=;
+        b=o2l1Nfy+8w9JtCsVwTjWxIgVHG2aUehxoeLFi30efLZOoVWoTEEBaUi5FOCfLKi04y
+         b9mZolDBq8uWo4mIHYQnk61/OsVfF0WQUTy1P5jBSM/ArtN0BnwtUTTMMuDym8emq0E3
+         QvRYmTZu1FR1MR378xPRy2DVifzGjzDaCCcZpIleQBJabDFrDcpaGKvYA+zpOW4y9vm0
+         0xoXH4sDB65Re0fDGtrWucPfe7xdPAVtdJ1d50Jze9/V/alujo9zmKnslM/4bmD/FtpJ
+         GZpCnEHAqQIOPt7fLL1TmMrnAQqEhkgghq7JGTZ02MsEd8dU2v195s4TAiunFEIy/2ow
+         RhgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=m0yXXFotQWroHLaVKba/7dhmvFCGNHuFoGGgLqaXvDA=;
-        b=CXcpJNOqLO2GKYANhD16hugW7rk5vjP/98HuKg2V8ovXVNoYVauf2EpkCYfg0xoSio
-         vbf2qvlwo16y4XeaKjHkwtek1P+l2TwZnAYa9dmCuyFC78KQfGtG6NGskvcCz/LorORg
-         QvBc9vQSRsglk3tRpTyPeMFFd88OsdDIYc26lSUknP1gl+JDf31MqxzxcQ+OKC4G2iGy
-         81T0WLodieC5F9Pirg0xGp8LvNsydfeldYxNMdX6/agw//iGGPSFPEQ4JTAMn/bFtf5L
-         MTjXCxVilqhDE4BnQ4iqB+x4LImzt9aiTBVZhYtOEa19ur9MRIh6/ULYaZkpDnTUWrXf
-         MnnQ==
-X-Gm-Message-State: AOAM530GhBdFvN0q/ZAw/BfwXHDkTGcs+zn4q2vTbz8NDNw3kT5tMhNF
-        uE7fpjP/LqGTZwO8fobWIre6e7MyzvRUOfZhSpcQon0/
-X-Google-Smtp-Source: ABdhPJxMfae1EFRxtxSX00n6JKXpJMdp1Bst+fRKB3P9Q3jVNqtUC/hjjnmOxfmfA9p4tbM/m2rIHkkcq9ZCbuLNnbw=
-X-Received: by 2002:aca:cc50:: with SMTP id c77mr3837149oig.152.1597861152607;
- Wed, 19 Aug 2020 11:19:12 -0700 (PDT)
+        bh=zBMYHGoLqcQIDa75kPEyh/KB+iBrkpptU65EqjbhG7Y=;
+        b=mOwwuyJwUQJ6S1gCczB6LpUQxkerbdzv07Ny/x/jy5qAaewxvOzI0ZLD6lRFVtek43
+         pHCbtYC2b+7CZvuzZoQmyOVueHr0hXa3Gh/uWAc7tCcXQufN8Q/IHc89d/tT5Yd2eT70
+         axK40Oe6m/1MUYvUNeZOkL6wxFcTc239atuGGwrIBQ7WvWgBLrPLhPdRsbG9sdUBM61R
+         v48Pb2myq89weRKNHrCD5rIPVGtq3o6dJmRJW6ERBhJxg3O7jS6s+uX+kO9FkJpeN0JN
+         Z30tsiVEgUSVdC5uBMVYUdMYoOukjM5UMxamMOJRmtPEQ1VL1s/RtMTwbmnMeVZTU+X3
+         8Ntw==
+X-Gm-Message-State: AOAM532VDnceF/HLiggW9K5/T3UIAqFhOx5Ro0UfyTMV9Foj7KcaV5aw
+        XdT2i5unt1wELI1z0bMeFz9uH6f0IDebtBztnwM=
+X-Google-Smtp-Source: ABdhPJyyFtBGtBDQDC0+qpIvbBVOSiO9PH5RJce1zRO3VRRQKtT74SqDuprv6s1YgJttg07Y2wYBSfyUOU1rwvHn3r0=
+X-Received: by 2002:a9d:429:: with SMTP id 38mr18272918otc.88.1597861271397;
+ Wed, 19 Aug 2020 11:21:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <HE1PR05MB3338001B735642B334087FCBFC5D0@HE1PR05MB3338.eurprd05.prod.outlook.com>
-In-Reply-To: <HE1PR05MB3338001B735642B334087FCBFC5D0@HE1PR05MB3338.eurprd05.prod.outlook.com>
+References: <20200813084129.332730-1-josephsih@chromium.org>
+ <20200813164059.v1.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
+ <CABBYNZJ-nBXeujF2WkMEPYPQhXAphqKCV39gr-QYFdTC3GvjXg@mail.gmail.com> <20200819143716.iimo4l3uul7lrpjn@pali>
+In-Reply-To: <20200819143716.iimo4l3uul7lrpjn@pali>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 19 Aug 2020 11:19:02 -0700
-Message-ID: <CABBYNZJ3SG9pNYBNyusDagmwRG4PsEY189k2d31DmC=j9bTDDg@mail.gmail.com>
-Subject: Re: LE Secure Connections: Disconnection after pairing
-To:     =?UTF-8?B?SmFyaSBKw6TDpHNrZWzDpA==?= <Jari.Jaaskela@oulu.fi>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 19 Aug 2020 11:21:00 -0700
+Message-ID: <CABBYNZJVDk6LWqyY7h8=KwpA4Oub+aCb3WEWnxk_AGWPvgmatg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] Bluetooth: sco: expose WBS packet length in socket option
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc:     Joseph Hwang <josephsih@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Joseph Hwang <josephsih@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -71,37 +86,99 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jari,
+Hi Pali,
 
-On Wed, Aug 19, 2020 at 12:33 AM Jari J=C3=A4=C3=A4skel=C3=A4 <Jari.Jaaskel=
-a@oulu.fi> wrote:
+On Wed, Aug 19, 2020 at 7:37 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
 >
-> Hey,
+> On Friday 14 August 2020 12:56:05 Luiz Augusto von Dentz wrote:
+> > Hi Joseph,
+> >
+> > On Thu, Aug 13, 2020 at 1:42 AM Joseph Hwang <josephsih@chromium.org> w=
+rote:
+> > >
+> > > It is desirable to expose the wideband speech packet length via
+> > > a socket option to the user space so that the user space can set
+> > > the value correctly in configuring the sco connection.
+> > >
+> > > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> > > ---
+> > >
+> > >  include/net/bluetooth/bluetooth.h | 2 ++
+> > >  net/bluetooth/sco.c               | 8 ++++++++
+> > >  2 files changed, 10 insertions(+)
+> > >
+> > > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetoot=
+h/bluetooth.h
+> > > index 9125effbf4483d..922cc03143def4 100644
+> > > --- a/include/net/bluetooth/bluetooth.h
+> > > +++ b/include/net/bluetooth/bluetooth.h
+> > > @@ -153,6 +153,8 @@ struct bt_voice {
+> > >
+> > >  #define BT_SCM_PKT_STATUS      0x03
+> > >
+> > > +#define BT_SCO_PKT_LEN         17
+> > > +
+> > >  __printf(1, 2)
+> > >  void bt_info(const char *fmt, ...);
+> > >  __printf(1, 2)
+> > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> > > index dcf7f96ff417e6..97e4e7c7b8cf62 100644
+> > > --- a/net/bluetooth/sco.c
+> > > +++ b/net/bluetooth/sco.c
+> > > @@ -67,6 +67,7 @@ struct sco_pinfo {
+> > >         __u32           flags;
+> > >         __u16           setting;
+> > >         __u8            cmsg_mask;
+> > > +       __u32           pkt_len;
+> > >         struct sco_conn *conn;
+> > >  };
+> > >
+> > > @@ -267,6 +268,8 @@ static int sco_connect(struct sock *sk)
+> > >                 sco_sock_set_timer(sk, sk->sk_sndtimeo);
+> > >         }
+> > >
+> > > +       sco_pi(sk)->pkt_len =3D hdev->sco_pkt_len;
+> > > +
+> > >  done:
+> > >         hci_dev_unlock(hdev);
+> > >         hci_dev_put(hdev);
+> > > @@ -1001,6 +1004,11 @@ static int sco_sock_getsockopt(struct socket *=
+sock, int level, int optname,
+> > >                         err =3D -EFAULT;
+> > >                 break;
+> > >
+> > > +       case BT_SCO_PKT_LEN:
+> > > +               if (put_user(sco_pi(sk)->pkt_len, (u32 __user *)optva=
+l))
+> > > +                       err =3D -EFAULT;
+> > > +               break;
+> >
+> > Couldn't we expose this via BT_SNDMTU/BT_RCVMTU?
 >
-> I encountered this issue in July, and I reported it as a bug here: https:=
-//bugzilla.kernel.org/show_bug.cgi?id=3D208637.
-> See the bug report for logs.
+> Hello!
 >
-> Here's the description:
+> There is already SCO_OPTIONS sock option, uses struct sco_options and
+> contains 'mtu' member.
 >
-> I have been trying to establish secure connection to a gatt service. Pair=
-ing completes successfully (using out-of-band data), and the client can rea=
-d characteristic that has encrypt-authenticated security level, but the con=
-nection is lost soon after pairing (as seen in the btmon log). This seems t=
-o happen because the controller responds with reason Connection Timeout (0x=
-08).
+> I think that instead of adding new sock option, existing SCO_OPTIONS
+> option should be used.
 
-That is normally a link layer problem like link supervision timeout
-which is part of the controller not the host stack, check if you can
-reproduce this using another controller.
+We are moving away from type specific options to so options like
+BT_SNDMTU/BT_RCVMTU should be supported in all socket types.
 
-> Hardware: Raspberry Pi 4 Model B (Bluetooth chip: Cypress CYW43455).
-> Tested on: 4.19.118-v7l+, 5.4.42-v7l.
-> Tested BlueZ: 5.53, 5.54, master (commit 6ea1b038eedeca31c3796ac921e25509=
-d48d70ec)
 >
-> Best regards,
-> Jari J=C3=A4=C3=A4skel=C3=A4
+> > >         default:
+> > >                 err =3D -ENOPROTOOPT;
+> > >                 break;
+> > > --
+> > > 2.28.0.236.gb10cc79966-goog
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
 
 
