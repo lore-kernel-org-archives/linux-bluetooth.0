@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 003E7C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4ACC433E3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDF2A20888
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE59B20882
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="gAY3xwu4"
+	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="kHWR7b2T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727932AbgHSPJ6 (ORCPT
+        id S1727087AbgHSPJ7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 11:09:58 -0400
-Received: from ns.omicron.at ([212.183.10.25]:36798 "EHLO ns.omicron.at"
+        Wed, 19 Aug 2020 11:09:59 -0400
+Received: from ns.omicron.at ([212.183.10.25]:36800 "EHLO ns.omicron.at"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726792AbgHSPJz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:09:55 -0400
+        id S1726929AbgHSPJ4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:09:56 -0400
 Received: from MGW02-ATKLA.omicron.at ([172.25.62.35])
-        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07JF9rv0006632
+        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07JF9rja006636
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
         for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:53 +0200
-DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07JF9rv0006632
+DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07JF9rja006636
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=omicronenergy.com;
         s=default; t=1597849793;
-        bh=xrgN5naBVJKHLCenPyKM1RaJmTZZdhJXPiis7fWj4YY=;
+        bh=Kmfb1ak+O3JR1DK8ZEFZVPytQ63/ubyHrserK1hM8qw=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=gAY3xwu4uagUfGcAczMP9SNDQzzOmBFIT/YBuyqtbRaAPG1FwbDH+YiQnQCkZRKM8
-         fePY/pV23rK8EuWidLlq83zrNbiJY6/45plxjd3VLeGkcQZN90FqVV6jPmdBn4vmVV
-         9z4SCy53ReHh/pUc6+hzJAMRa2N//z8CNurRYIDg=
+        b=kHWR7b2TIebTLFjSjFTxEiFu6XfX+mkoTq5Qo11zE5o9XG1UxofeW5q5zeiN7hHn3
+         qa2/PFusFJuJhr+wQaVyVfXBKdJj86iqC36iTtNyXC9KoPW00j6mVN6lOr/j1cIG9d
+         I/t5jQCft2hufQFjJ6yUjwAmPmsg7VcvlW4zUJso=
 Received: from MGW02-ATKLA.omicron.at (localhost [127.0.0.1])
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id 1B4E1A0054
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id 29114A0062
         for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:52 +0200 (CEST)
 Received: from MGW01-ATKLA.omicron.at (unknown [172.25.62.34])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 1949FA0053
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 26DE2A0053
         for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:52 +0200 (CEST)
 Received: from EXC04-ATKLA.omicron.at ([172.22.100.189])
-        by MGW01-ATKLA.omicron.at  with ESMTP id 07JF9qjn027219-07JF9qjp027219
+        by MGW01-ATKLA.omicron.at  with ESMTP id 07JF9qjn027219-07JF9qjq027219
         (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=CAFAIL)
         for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:53 +0200
 Received: from marmar13.omicron.at (172.22.32.104) by EXC04-ATKLA.omicron.at
  (172.22.100.189) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 19 Aug
- 2020 17:09:44 +0200
+ 2020 17:09:47 +0200
 From:   Mark Marshall <mark.marshall@omicronenergy.com>
 To:     <linux-bluetooth@vger.kernel.org>
 CC:     Mark Marshall <mark.marshall@omicronenergy.com>
-Subject: [PATCH BlueZ 1/2] src/profile.c: Allow the "Address Type" to be set
-Date:   Wed, 19 Aug 2020 17:09:30 +0200
+Subject: [PATCH BlueZ 2/2] src/profile.c: Add a GetProfileInfo method
+Date:   Wed, 19 Aug 2020 17:09:31 +0200
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200819150931.3005-1-mark.marshall@omicronenergy.com>
 References: <20200819150931.3005-1-mark.marshall@omicronenergy.com>
@@ -63,99 +63,154 @@ Content-Type: text/plain
 X-Originating-IP: [172.22.32.104]
 X-ClientProxiedBy: EXC04-ATKLA.omicron.at (172.22.100.189) To
  EXC04-ATKLA.omicron.at (172.22.100.189)
-Message-ID: <98fed7ef-1975-48ca-9ea3-1482d938a806@EXC04-ATKLA.omicron.at>
+Message-ID: <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
 X-FE-Policy-ID: 1:1:1:SYSTEM
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This allows us to have profiles that use LE L2CAP connections.
+Add a GetProfileInfo method to org.bluez.ProfileManager1
 ---
- doc/profile-api.txt | 10 ++++++++++
- src/profile.c       | 18 +++++++++++++++++-
- 2 files changed, 27 insertions(+), 1 deletion(-)
+ doc/profile-api.txt | 13 +++++++
+ src/profile.c       | 93 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 106 insertions(+)
 
 diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-index 183c6c11a..8c7d0a06d 100644
+index 8c7d0a06d..d13703ab4 100644
 --- a/doc/profile-api.txt
 +++ b/doc/profile-api.txt
-@@ -112,6 +112,16 @@ Object path	/org/bluez
+@@ -133,6 +133,19 @@ Object path	/org/bluez
  
- 					Profile features (for SDP record)
+ 			Possible errors: org.bluez.Error.DoesNotExist
  
-+				uint16 AddressType
++		options GetProfileInfo(object profile, object adapter)
 +
-+					Allows the Address Type to be
-+					selected, can be either
-+					BDADDR_BREDR, BDADDR_LE_PUBLIC
-+					or BDADDR_LE_RANDOM.  If an LE
-+					address is selected and the
-+					device is not found, the other
-+					sort of LE address is tried.
++			This returns a dictionary of options for the
++			profile.  Values returned are: UUID, Name,
++			Path, Service, Mode and AddressType.  The
++			adapter parameter is optional - if it is
++			non-empty, then two additional values might be
++			returned, if the profile is active on the
++			specified adapter: PSM and Channel.
 +
- 			Possible errors: org.bluez.Error.InvalidArguments
- 			                 org.bluez.Error.AlreadyExists
++			Possible errors: org.bluez.Error.InvalidArguments
++			                 org.bluez.Error.DoesNotExist
++
  
+ Profile hierarchy
+ =================
 diff --git a/src/profile.c b/src/profile.c
-index 6961a107b..10850f305 100644
+index 10850f305..e287a66d7 100644
 --- a/src/profile.c
 +++ b/src/profile.c
-@@ -677,6 +677,7 @@ struct ext_profile {
- 	guint id;
+@@ -2509,6 +2509,96 @@ static DBusMessage *unregister_profile(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
  
- 	BtIOMode mode;
-+	uint8_t addr_type;
- 	BtIOSecLevel sec_level;
- 	bool authorize;
- 
-@@ -1173,9 +1174,16 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 	struct btd_service *service;
- 	struct ext_io *conn;
- 	GIOCondition cond;
-+	uint8_t addr_type;
- 	char addr[18];
- 
--	device = btd_adapter_find_device(server->adapter, dst, BDADDR_BREDR);
-+	addr_type = server->ext->addr_type;
-+	device = btd_adapter_find_device(server->adapter, dst, addr_type);
-+	if (device == NULL && addr_type != BDADDR_BREDR) {
-+		addr_type ^= (BDADDR_LE_PUBLIC | BDADDR_LE_RANDOM);
-+		device = btd_adapter_find_device(server->adapter, dst,
-+						 addr_type);
++static DBusMessage *get_profile_info(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	DBusMessage *reply;
++	DBusMessageIter iter, dict;
++	const char *path, *adapter, *sender;
++	struct ext_profile *ext;
++	uint16_t u16;
++	GSList *l, *next;
++
++	sender = dbus_message_get_sender(msg);
++
++	DBG("sender %s", sender);
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++				   DBUS_TYPE_OBJECT_PATH, &adapter,
++				   DBUS_TYPE_INVALID)) {
++		return btd_error_invalid_args(msg);
 +	}
- 	if (device == NULL) {
- 		ba2str(dst, addr);
- 		error("%s device %s not found", server->ext->name, addr);
-@@ -1350,6 +1358,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
- 		io = bt_io_listen(connect, confirm, l2cap, NULL, &err,
- 					BT_IO_OPT_SOURCE_BDADDR,
- 					btd_adapter_get_address(adapter),
-+					BT_IO_OPT_SOURCE_TYPE, ext->addr_type,
- 					BT_IO_OPT_MODE, ext->mode,
- 					BT_IO_OPT_PSM, psm,
- 					BT_IO_OPT_SEC_LEVEL, ext->sec_level,
-@@ -1567,6 +1576,8 @@ static int connect_io(struct ext_io *conn, const bdaddr_t *src,
- 		io = bt_io_connect(ext_connect, conn, NULL, &gerr,
- 					BT_IO_OPT_SOURCE_BDADDR, src,
- 					BT_IO_OPT_DEST_BDADDR, dst,
-+					BT_IO_OPT_SOURCE_TYPE, ext->addr_type,
-+					BT_IO_OPT_DEST_TYPE, ext->addr_type,
- 					BT_IO_OPT_SEC_LEVEL, ext->sec_level,
- 					BT_IO_OPT_PSM, conn->psm,
- 					BT_IO_OPT_INVALID);
-@@ -2285,6 +2296,11 @@ static int parse_ext_opt(struct ext_profile *ext, const char *key,
- 		dbus_message_iter_get_basic(value, &str);
- 		free(ext->service);
- 		ext->service = bt_name2string(str);
-+	} else if (strcasecmp(key, "AddressType") == 0) {
-+		if (type != DBUS_TYPE_UINT16)
-+			return -EINVAL;
-+		dbus_message_iter_get_basic(value, &u16);
-+		ext->addr_type = u16;
- 	}
++
++	if (adapter && !*adapter)
++		adapter = NULL;
++
++	ext = find_ext_profile(sender, path);
++	if (!ext)
++		return btd_error_does_not_exist(msg);
++
++	reply = dbus_message_new_method_return(msg);
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++					 "{sv}", &dict);
++
++	g_dbus_dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING,
++				 &ext->uuid);
++	if (ext->name) {
++		g_dbus_dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
++					 &ext->name);
++	}
++	if (ext->path) {
++		g_dbus_dict_append_entry(&dict, "Path", DBUS_TYPE_STRING,
++					 &ext->path);
++	}
++	if (ext->service) {
++		g_dbus_dict_append_entry(&dict, "Service", DBUS_TYPE_STRING,
++					 &ext->service);
++	}
++
++	u16 = ext->mode;
++	g_dbus_dict_append_entry(&dict, "Mode", DBUS_TYPE_UINT16,
++				 &u16);
++
++	u16 = ext->addr_type;
++	g_dbus_dict_append_entry(&dict, "AddressType", DBUS_TYPE_UINT16,
++				 &u16);
++
++	if (adapter) {
++		for (l = ext->servers; l != NULL; l = next) {
++			struct ext_io *server = l->data;
++			const char *ctype;
++
++			DBG("server:%p  %d %d psm:%d chan:%d",
++			    server, server->resolving, server->connected,
++			    server->psm, server->chan);
++
++			next = g_slist_next(l);
++
++			if (strcmp(adapter, adapter_get_path(server->adapter)))
++				continue;
++
++			if (server->proto == BTPROTO_L2CAP) {
++				ctype = "PSM";
++				u16 = server->psm;
++			} else if (server->proto == BTPROTO_RFCOMM) {
++				ctype = "Channel";
++				u16 = server->chan;
++			} else {
++				continue;
++			}
++			g_dbus_dict_append_entry(
++				&dict, ctype, DBUS_TYPE_UINT16, &u16);
++		}
++	}
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
++}
++
+ static const GDBusMethodTable methods[] = {
+ 	{ GDBUS_METHOD("RegisterProfile",
+ 			GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
+@@ -2516,6 +2606,9 @@ static const GDBusMethodTable methods[] = {
+ 			NULL, register_profile) },
+ 	{ GDBUS_METHOD("UnregisterProfile", GDBUS_ARGS({ "profile", "o" }),
+ 			NULL, unregister_profile) },
++	{ GDBUS_METHOD("GetProfileInfo",
++			GDBUS_ARGS({ "profile", "o" }, { "adapter", "o" }),
++			GDBUS_ARGS({ "options", "a{sv}" }), get_profile_info) },
+ 	{ }
+ };
  
- 	return 0;
 -- 
 2.17.1
 
