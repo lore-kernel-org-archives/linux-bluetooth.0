@@ -2,206 +2,236 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E32C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E8EC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:37:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B294A20738
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:25:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD5D6207DE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 18:37:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hE17SsbR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BB8nlnEl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbgHSSZr (ORCPT
+        id S1726585AbgHSShV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 14:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58728 "EHLO
+        Wed, 19 Aug 2020 14:37:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgHSSZp (ORCPT
+        with ESMTP id S1725997AbgHSShU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 14:25:45 -0400
+        Wed, 19 Aug 2020 14:37:20 -0400
 Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F70C061757;
-        Wed, 19 Aug 2020 11:25:45 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id x24so19842704otp.3;
-        Wed, 19 Aug 2020 11:25:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9B2C061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id q9so19846144oth.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Uj2G5qDhsm+bapptHCJ7Bq0u40iHl5V2rOPjbm76rTA=;
-        b=hE17SsbRqQpRbkfOlDKQ7cHbfmXUCJ0VwlKiGbZoC2ttuB63xjWR6C00YVa12lip+H
-         5Asa0XO6gTnbfwrYxuWZ3ol5YiA0QBQdkUPdpJ5TwkCl00rK0Sio3v6UDQCfl3a3OZRC
-         nkVBzNoGfS+3q7RZy4Qep59FvFffEAvV1aMebFGXjGCN9CDSDpVmhHi3gE0WprXGlXir
-         9JMn9lLil/9r56iq7V1W7A/CLbZkGasag9MGOaS7kt0J4tv0m5RzyRMpUXKPa3uYenzy
-         7aHsknBx/m6nOLZBPz4cYKibvDOhl5BUwdrud2oKoxuv88+ERZIeymKB/LtV/hUoguCY
-         Qitw==
+         :cc;
+        bh=0HeIGZ0DyzgCbL5apsf54ipOledAWW5U3rl6Iv7K7EU=;
+        b=BB8nlnElYvnEtLlxUYqV8iuHSgs85Gg/45Dp9ymnCnHyCPW4ivRcJH3mZxdNCKhAeM
+         4MDNg/t4xEB1XobP3suSRBqHaERKtqck84yTFrrTrxGUUu5DD2CHqqAcqx7FEHyQbQpo
+         ozm3l4V7coBSnhyNj9PiRXY6gbzbGFXmx9yV9/u8KnWELyYJw2KBQRa8Pd6X8Jzgu5N6
+         S35XjLkuvMKnRe7n5goMWpAI016ZQZkKhF/T0pDANZR9GI1zwGM17qpGEqyE2RUsdKgw
+         OH0A5nM4nMIhcGbIXwQQSTAjpzUcSLvO5LwH1b3An2o6Nu6yL9/LX10A9fAfAkDBmEjc
+         iNPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Uj2G5qDhsm+bapptHCJ7Bq0u40iHl5V2rOPjbm76rTA=;
-        b=N/Uoss4WLC/vRYkwLdIJTZy8FdlWVEUsS1pOXCt45bhTEl0CQ2neJ7pFXsiSSIU9ry
-         KUJRLBCjZLhiJ8nDYF6n7OY+SR09jUqCvFJuvjAZLugZQJ2KTtZhZXam6pLvA0hWD1hf
-         hjdbalHrwEi+fhcTi0g6gXRpPJR1+N7Aihqo8F+lGkyR9g1+u7fdKhGyLpN8u3+v3+AJ
-         fQayyHsetHgSPuwRqgzgEFpK7naGy6KUsAm1e7Zkqy0BNu2FplEMWyFQvC/2obKnZUh7
-         1bxcXhEbXhj93vnr4H77TcPRZCQqSy7CM8Ds4IchsmDas6wSOJ4T4oMMN6NK3HdMeCTp
-         Yj3w==
-X-Gm-Message-State: AOAM531GTGzzKhOzYS416T1AMdheOC1PWVdmCs4DGGKgY0iV9D6yxPGM
-        aPR0bRp6/7bM1WVgzFATRoEuEVU2X4OjSah1lOs=
-X-Google-Smtp-Source: ABdhPJwJR8sF/ZcOD7xlXzSk86ZIVJ765re8VslROHCqbVK/phzo2qOwJwntqdZES6IBnWgK5FawZmDnJIMv7glO6L8=
-X-Received: by 2002:a9d:24e7:: with SMTP id z94mr19379061ota.91.1597861544816;
- Wed, 19 Aug 2020 11:25:44 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=0HeIGZ0DyzgCbL5apsf54ipOledAWW5U3rl6Iv7K7EU=;
+        b=VPHCXyLsCCLBvHCsZrNSwnGSJtaF1WdH0Wis+YDRStxYMJQZE9o9cb+mVWVAEcxsoh
+         +5QczhAaCVUO+aBy5vAmRTZqDE9EUbYH3vO0M2iJNCEzGpsctaJJeKL9U0uOajwTH/o7
+         E2SOgbC+mWmZQqEwJ/QSusCCLOebRkjHH/WT40b6W68BYSC1FE06daNxoHTfUJDtqjvL
+         aC9FWmNJMtuTD/Z1CCJ7dvnSePYCeI/69r3SZYtOmmZ08z4Za7EWbql/nr+J2+9h72Nc
+         xfbfi1xjXBkTWhUBSqRB3jCCHQaBEQfg44XodNveUs0AYoIELiVvQoZAUzSKZKUBMXmt
+         5e2A==
+X-Gm-Message-State: AOAM531NKeQ1PhRRwWgrjTixb3af41kdUSNHxdHw1cDs0jFESJ3I2+jj
+        QJwFTz6v2ZupCdx01FfGKG7p68F/jS1N/HLkuUrU4ZQtmIY=
+X-Google-Smtp-Source: ABdhPJxC8UBCMYG47EEADSQckWecSzJaykg83rAruk57WKUCtMUiwmXxN8tQNglInTal0V8YVvZKIwG7D9JKz6GGqEs=
+X-Received: by 2002:a9d:429:: with SMTP id 38mr18318780otc.88.1597862239111;
+ Wed, 19 Aug 2020 11:37:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200813084129.332730-1-josephsih@chromium.org>
- <20200813164059.v1.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
- <CABBYNZJ-nBXeujF2WkMEPYPQhXAphqKCV39gr-QYFdTC3GvjXg@mail.gmail.com>
- <20200819143716.iimo4l3uul7lrpjn@pali> <CABBYNZJVDk6LWqyY7h8=KwpA4Oub+aCb3WEWnxk_AGWPvgmatg@mail.gmail.com>
- <20200819182306.wvyht6ocyqpo75tp@pali>
-In-Reply-To: <20200819182306.wvyht6ocyqpo75tp@pali>
+References: <20200819150931.3005-1-mark.marshall@omicronenergy.com> <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
+In-Reply-To: <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 19 Aug 2020 11:25:34 -0700
-Message-ID: <CABBYNZ+F=-YsZoL4B9=XQvHSs9wU=0W3iqbYn4s65JMAJAmAKw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] Bluetooth: sco: expose WBS packet length in socket option
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc:     Joseph Hwang <josephsih@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Joseph Hwang <josephsih@google.com>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Date:   Wed, 19 Aug 2020 11:37:08 -0700
+Message-ID: <CABBYNZ+OK4EY9KGHn7oasz4GRfBDJdWNcpOhr1GNGc3D+QtZ-g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] src/profile.c: Add a GetProfileInfo method
+To:     Mark Marshall <mark.marshall@omicronenergy.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Aug 19, 2020 at 11:23 AM Pali Roh=C3=A1r <pali@kernel.org> wrote:
+Hi Mark,
+
+On Wed, Aug 19, 2020 at 8:13 AM Mark Marshall
+<mark.marshall@omicronenergy.com> wrote:
 >
-> On Wednesday 19 August 2020 11:21:00 Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> >
-> > On Wed, Aug 19, 2020 at 7:37 AM Pali Roh=C3=A1r <pali@kernel.org> wrote=
-:
-> > >
-> > > On Friday 14 August 2020 12:56:05 Luiz Augusto von Dentz wrote:
-> > > > Hi Joseph,
-> > > >
-> > > > On Thu, Aug 13, 2020 at 1:42 AM Joseph Hwang <josephsih@chromium.or=
-g> wrote:
-> > > > >
-> > > > > It is desirable to expose the wideband speech packet length via
-> > > > > a socket option to the user space so that the user space can set
-> > > > > the value correctly in configuring the sco connection.
-> > > > >
-> > > > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > > > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > > > > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> > > > > ---
-> > > > >
-> > > > >  include/net/bluetooth/bluetooth.h | 2 ++
-> > > > >  net/bluetooth/sco.c               | 8 ++++++++
-> > > > >  2 files changed, 10 insertions(+)
-> > > > >
-> > > > > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/blue=
-tooth/bluetooth.h
-> > > > > index 9125effbf4483d..922cc03143def4 100644
-> > > > > --- a/include/net/bluetooth/bluetooth.h
-> > > > > +++ b/include/net/bluetooth/bluetooth.h
-> > > > > @@ -153,6 +153,8 @@ struct bt_voice {
-> > > > >
-> > > > >  #define BT_SCM_PKT_STATUS      0x03
-> > > > >
-> > > > > +#define BT_SCO_PKT_LEN         17
-> > > > > +
-> > > > >  __printf(1, 2)
-> > > > >  void bt_info(const char *fmt, ...);
-> > > > >  __printf(1, 2)
-> > > > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> > > > > index dcf7f96ff417e6..97e4e7c7b8cf62 100644
-> > > > > --- a/net/bluetooth/sco.c
-> > > > > +++ b/net/bluetooth/sco.c
-> > > > > @@ -67,6 +67,7 @@ struct sco_pinfo {
-> > > > >         __u32           flags;
-> > > > >         __u16           setting;
-> > > > >         __u8            cmsg_mask;
-> > > > > +       __u32           pkt_len;
-> > > > >         struct sco_conn *conn;
-> > > > >  };
-> > > > >
-> > > > > @@ -267,6 +268,8 @@ static int sco_connect(struct sock *sk)
-> > > > >                 sco_sock_set_timer(sk, sk->sk_sndtimeo);
-> > > > >         }
-> > > > >
-> > > > > +       sco_pi(sk)->pkt_len =3D hdev->sco_pkt_len;
-> > > > > +
-> > > > >  done:
-> > > > >         hci_dev_unlock(hdev);
-> > > > >         hci_dev_put(hdev);
-> > > > > @@ -1001,6 +1004,11 @@ static int sco_sock_getsockopt(struct sock=
-et *sock, int level, int optname,
-> > > > >                         err =3D -EFAULT;
-> > > > >                 break;
-> > > > >
-> > > > > +       case BT_SCO_PKT_LEN:
-> > > > > +               if (put_user(sco_pi(sk)->pkt_len, (u32 __user *)o=
-ptval))
-> > > > > +                       err =3D -EFAULT;
-> > > > > +               break;
-> > > >
-> > > > Couldn't we expose this via BT_SNDMTU/BT_RCVMTU?
-> > >
-> > > Hello!
-> > >
-> > > There is already SCO_OPTIONS sock option, uses struct sco_options and
-> > > contains 'mtu' member.
-> > >
-> > > I think that instead of adding new sock option, existing SCO_OPTIONS
-> > > option should be used.
-> >
-> > We are moving away from type specific options to so options like
-> > BT_SNDMTU/BT_RCVMTU should be supported in all socket types.
+> Add a GetProfileInfo method to org.bluez.ProfileManager1
+> ---
+>  doc/profile-api.txt | 13 +++++++
+>  src/profile.c       | 93 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 106 insertions(+)
 >
-> Yes, this make sense.
+> diff --git a/doc/profile-api.txt b/doc/profile-api.txt
+> index 8c7d0a06d..d13703ab4 100644
+> --- a/doc/profile-api.txt
+> +++ b/doc/profile-api.txt
+> @@ -133,6 +133,19 @@ Object path        /org/bluez
 >
-> But I guess that SCO_OPTIONS should be provided for backward
-> compatibility as it is already used by lot of userspace applications.
+>                         Possible errors: org.bluez.Error.DoesNotExist
 >
-> So for me it looks like that BT_SNDMTU/BT_RCVMTU should return same
-> value as SCO_OPTIONS.
+> +               options GetProfileInfo(object profile, object adapter)
+> +
+> +                       This returns a dictionary of options for the
+> +                       profile.  Values returned are: UUID, Name,
+> +                       Path, Service, Mode and AddressType.  The
+> +                       adapter parameter is optional - if it is
+> +                       non-empty, then two additional values might be
+> +                       returned, if the profile is active on the
+> +                       specified adapter: PSM and Channel.
+> +
+> +                       Possible errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.DoesNotExist
+> +
 
-Yep, luckily we can do this here because SCO MTU is symmetric.
+If this is really required I would be willing to merge something like this:
 
-> > >
-> > > > >         default:
-> > > > >                 err =3D -ENOPROTOOPT;
-> > > > >                 break;
-> > > > > --
-> > > > > 2.28.0.236.gb10cc79966-goog
-> > > > >
-> > > >
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+https://github.com/Vudentz/BlueZ/commit/9e196f8830511a4102e990d82d06c2e0487b3ad9
+
+It exposes service objects so you can control exactly what gets
+connect, though now given a second look at this seem to return details
+that the client can query directly on the socket itself like the
+Channel, PSM, Mode, etc, also not sure what is the point on retrieving
+things like UUID, Name, Path if the application is already in control
+of these when registering.
+
+>  Profile hierarchy
+>  =================
+> diff --git a/src/profile.c b/src/profile.c
+> index 10850f305..e287a66d7 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -2509,6 +2509,96 @@ static DBusMessage *unregister_profile(DBusConnection *conn,
+>         return dbus_message_new_method_return(msg);
+>  }
+>
+> +static DBusMessage *get_profile_info(DBusConnection *conn,
+> +                                       DBusMessage *msg, void *user_data)
+> +{
+> +       DBusMessage *reply;
+> +       DBusMessageIter iter, dict;
+> +       const char *path, *adapter, *sender;
+> +       struct ext_profile *ext;
+> +       uint16_t u16;
+> +       GSList *l, *next;
+> +
+> +       sender = dbus_message_get_sender(msg);
+> +
+> +       DBG("sender %s", sender);
+> +
+> +       if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
+> +                                  DBUS_TYPE_OBJECT_PATH, &adapter,
+> +                                  DBUS_TYPE_INVALID)) {
+> +               return btd_error_invalid_args(msg);
+> +       }
+> +
+> +       if (adapter && !*adapter)
+> +               adapter = NULL;
+> +
+> +       ext = find_ext_profile(sender, path);
+> +       if (!ext)
+> +               return btd_error_does_not_exist(msg);
+> +
+> +       reply = dbus_message_new_method_return(msg);
+> +
+> +       dbus_message_iter_init_append(reply, &iter);
+> +
+> +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+> +                                        "{sv}", &dict);
+> +
+> +       g_dbus_dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING,
+> +                                &ext->uuid);
+> +       if (ext->name) {
+> +               g_dbus_dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
+> +                                        &ext->name);
+> +       }
+> +       if (ext->path) {
+> +               g_dbus_dict_append_entry(&dict, "Path", DBUS_TYPE_STRING,
+> +                                        &ext->path);
+> +       }
+> +       if (ext->service) {
+> +               g_dbus_dict_append_entry(&dict, "Service", DBUS_TYPE_STRING,
+> +                                        &ext->service);
+> +       }
+> +
+> +       u16 = ext->mode;
+> +       g_dbus_dict_append_entry(&dict, "Mode", DBUS_TYPE_UINT16,
+> +                                &u16);
+> +
+> +       u16 = ext->addr_type;
+> +       g_dbus_dict_append_entry(&dict, "AddressType", DBUS_TYPE_UINT16,
+> +                                &u16);
+> +
+> +       if (adapter) {
+> +               for (l = ext->servers; l != NULL; l = next) {
+> +                       struct ext_io *server = l->data;
+> +                       const char *ctype;
+> +
+> +                       DBG("server:%p  %d %d psm:%d chan:%d",
+> +                           server, server->resolving, server->connected,
+> +                           server->psm, server->chan);
+> +
+> +                       next = g_slist_next(l);
+> +
+> +                       if (strcmp(adapter, adapter_get_path(server->adapter)))
+> +                               continue;
+> +
+> +                       if (server->proto == BTPROTO_L2CAP) {
+> +                               ctype = "PSM";
+> +                               u16 = server->psm;
+> +                       } else if (server->proto == BTPROTO_RFCOMM) {
+> +                               ctype = "Channel";
+> +                               u16 = server->chan;
+> +                       } else {
+> +                               continue;
+> +                       }
+> +                       g_dbus_dict_append_entry(
+> +                               &dict, ctype, DBUS_TYPE_UINT16, &u16);
+> +               }
+> +       }
+> +
+> +       dbus_message_iter_close_container(&iter, &dict);
+> +
+> +       return reply;
+> +}
+> +
+>  static const GDBusMethodTable methods[] = {
+>         { GDBUS_METHOD("RegisterProfile",
+>                         GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
+> @@ -2516,6 +2606,9 @@ static const GDBusMethodTable methods[] = {
+>                         NULL, register_profile) },
+>         { GDBUS_METHOD("UnregisterProfile", GDBUS_ARGS({ "profile", "o" }),
+>                         NULL, unregister_profile) },
+> +       { GDBUS_METHOD("GetProfileInfo",
+> +                       GDBUS_ARGS({ "profile", "o" }, { "adapter", "o" }),
+> +                       GDBUS_ARGS({ "options", "a{sv}" }), get_profile_info) },
+>         { }
+>  };
+>
+> --
+> 2.17.1
+>
 
 
-
---=20
+-- 
 Luiz Augusto von Dentz
