@@ -2,208 +2,98 @@ Return-Path: <SRS0=ZhIC=B5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1FAC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 14:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF0AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 339B620882
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 14:38:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597847905;
-	bh=8xz/VjRVV4BpGcOZYP02Lbcq6ZGKUYnAY0ghh4zsOlA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=EzvIkMceGUP6Joa/raV3hO1SnLM9FSElBUNlF+sROH0fKBGLvoKfqNxnD1EXi6EQs
-	 L/oPx0GlNXptC4SbCvzmuON5502zJhapX2HnMCIe5zf6TG2tVsx4M8KdPk/tuxZKP1
-	 O+Gf4pBUd3pPCI+tAN+XHPuzSGThSW1cZ7NXQqOc=
+	by mail.kernel.org (Postfix) with ESMTP id 99D3420882
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="b8uFkOQU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728660AbgHSOiZ (ORCPT
+        id S1726897AbgHSPJw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Aug 2020 10:38:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34578 "EHLO mail.kernel.org"
+        Wed, 19 Aug 2020 11:09:52 -0400
+Received: from ns.omicron.at ([212.183.10.25]:36752 "EHLO ns.omicron.at"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727854AbgHSOiY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Aug 2020 10:38:24 -0400
-Received: from pali.im (pali.im [31.31.79.79])
+        id S1726792AbgHSPJu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:09:50 -0400
+Received: from MGW02-ATKLA.omicron.at ([172.25.62.35])
+        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07JF9me1006602
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:48 +0200
+DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07JF9me1006602
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=omicronenergy.com;
+        s=default; t=1597849788;
+        bh=iwYDqaF8wLGR9iRaH+BfDezv0AUJ8LlIY9TDOWahSMo=;
+        h=From:To:CC:Subject:Date:From;
+        b=b8uFkOQUAqLbBVKgtpeB0madR6IMa4tX2hlsAqEuyrXuIm/iaHhntARIP8BIEMxoe
+         KDqschd3uxLK4C9eA120yX6YSmWE8uhhXC8eR9580ElXeWst5RLHxEswd2hmz+88ik
+         fBLCFqDcJXTB90uusJ6MsPqjE2F6+R9rBNcQ2juI=
+Received: from MGW02-ATKLA.omicron.at (localhost [127.0.0.1])
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id 1874AA0054
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:47 +0200 (CEST)
+Received: from MGW01-ATKLA.omicron.at (unknown [172.25.62.34])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C7E052078D;
-        Wed, 19 Aug 2020 14:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597847903;
-        bh=8xz/VjRVV4BpGcOZYP02Lbcq6ZGKUYnAY0ghh4zsOlA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eENPuUx2UY0IrjTdTM+/L7V8UqEKWGH2WGYUTFjbzG/Ea4EG5FsYa0nRgUxtjYZ8w
-         c45HBvCYS1DyuV0dlQm2+fLYexE8iLDTpRICGxjhqvoMmnPofCqtiASu85cilezjaM
-         ywPixZjl7BrbKBWJudG8d/5zKpGhtJULKOGyvyQA=
-Received: by pali.im (Postfix)
-        id 197E4582; Wed, 19 Aug 2020 16:38:21 +0200 (CEST)
-Date:   Wed, 19 Aug 2020 16:38:21 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Joseph Hwang <josephsih@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Joseph Hwang <josephsih@google.com>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: define HCI packet sizes of USB
- Alts
-Message-ID: <20200819143821.qptlcrshcamlk4x3@pali>
-References: <20200813084129.332730-1-josephsih@chromium.org>
- <20200813164059.v1.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
- <CABBYNZ+GPmHuVe_TCUwCVYuOzH8m0=Nmwv48Tn-by_5PnqqwOg@mail.gmail.com>
+        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 1660DA0053
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:47 +0200 (CEST)
+Received: from EXC04-ATKLA.omicron.at ([172.22.100.189])
+        by MGW01-ATKLA.omicron.at  with ESMTP id 07JF9l7E027212-07JF9l7G027212
+        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=CAFAIL)
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Aug 2020 17:09:47 +0200
+Received: from marmar13.omicron.at (172.22.32.104) by EXC04-ATKLA.omicron.at
+ (172.22.100.189) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 19 Aug
+ 2020 17:09:41 +0200
+From:   Mark Marshall <mark.marshall@omicronenergy.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Mark Marshall <mark.marshall@omicronenergy.com>
+Subject: [PATCH BlueZ 0/2] Add support for LE profiles (LE-L2CAP)
+Date:   Wed, 19 Aug 2020 17:09:29 +0200
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZ+GPmHuVe_TCUwCVYuOzH8m0=Nmwv48Tn-by_5PnqqwOg@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain
+X-Originating-IP: [172.22.32.104]
+X-ClientProxiedBy: EXC04-ATKLA.omicron.at (172.22.100.189) To
+ EXC04-ATKLA.omicron.at (172.22.100.189)
+Message-ID: <60274e5a-d210-425d-bba5-946119fd4f87@EXC04-ATKLA.omicron.at>
+X-FE-Policy-ID: 1:1:1:SYSTEM
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Friday 14 August 2020 13:07:25 Luiz Augusto von Dentz wrote:
-> Hi Joseph,
-> 
-> On Thu, Aug 13, 2020 at 1:42 AM Joseph Hwang <josephsih@chromium.org> wrote:
-> >
-> > It is desirable to define the HCI packet payload sizes of
-> > USB alternate settings so that they can be exposed to user
-> > space.
-> >
-> > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> > ---
-> >
-> >  drivers/bluetooth/btusb.c        | 43 ++++++++++++++++++++++++--------
-> >  include/net/bluetooth/hci_core.h |  1 +
-> >  2 files changed, 33 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 8d2608ddfd0875..df7cadf6385868 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -459,6 +459,22 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
-> >  #define BTUSB_WAKEUP_DISABLE   14
-> >  #define BTUSB_USE_ALT1_FOR_WBS 15
-> >
-> > +/* Per core spec 5, vol 4, part B, table 2.1,
-> > + * list the hci packet payload sizes for various ALT settings.
-> > + * This is used to set the packet length for the wideband speech.
-> > + * If a controller does not probe its usb alt setting, the default
-> > + * value will be 0. Any clients at upper layers should interpret it
-> > + * as a default value and set a proper packet length accordingly.
-> > + *
-> > + * To calculate the HCI packet payload length:
-> > + *   for alternate settings 1 - 5:
-> > + *     hci_packet_size = suggested_max_packet_size * 3 (packets) -
-> > + *                       3 (HCI header octets)
-> > + *   for alternate setting 6:
-> > + *     hci_packet_size = suggested_max_packet_size - 3 (HCI header octets)
-> > + */
-> > +static const int hci_packet_size_usb_alt[] = { 0, 24, 48, 72, 96, 144, 60 };
-> > +
-> >  struct btusb_data {
-> >         struct hci_dev       *hdev;
-> >         struct usb_device    *udev;
-> > @@ -3958,6 +3974,15 @@ static int btusb_probe(struct usb_interface *intf,
-> >         hdev->notify = btusb_notify;
-> >         hdev->prevent_wake = btusb_prevent_wake;
-> >
-> > +       if (id->driver_info & BTUSB_AMP) {
-> > +               /* AMP controllers do not support SCO packets */
-> > +               data->isoc = NULL;
-> > +       } else {
-> > +               /* Interface orders are hardcoded in the specification */
-> > +               data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> > +               data->isoc_ifnum = ifnum_base + 1;
-> > +       }
-> > +
-> >  #ifdef CONFIG_PM
-> >         err = btusb_config_oob_wake(hdev);
-> >         if (err)
-> > @@ -4021,6 +4046,10 @@ static int btusb_probe(struct usb_interface *intf,
-> >                 hdev->set_diag = btintel_set_diag;
-> >                 hdev->set_bdaddr = btintel_set_bdaddr;
-> >                 hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> > +
-> > +               if (btusb_find_altsetting(data, 6))
-> > +                       hdev->sco_pkt_len = hci_packet_size_usb_alt[6];
-> > +
-> >                 set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-> >                 set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> >                 set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> > @@ -4062,15 +4091,6 @@ static int btusb_probe(struct usb_interface *intf,
-> >                 btusb_check_needs_reset_resume(intf);
-> >         }
-> >
-> > -       if (id->driver_info & BTUSB_AMP) {
-> > -               /* AMP controllers do not support SCO packets */
-> > -               data->isoc = NULL;
-> > -       } else {
-> > -               /* Interface orders are hardcoded in the specification */
-> > -               data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> > -               data->isoc_ifnum = ifnum_base + 1;
-> > -       }
-> > -
-> >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
-> >             (id->driver_info & BTUSB_REALTEK)) {
-> >                 hdev->setup = btrtl_setup_realtek;
-> > @@ -4082,9 +4102,10 @@ static int btusb_probe(struct usb_interface *intf,
-> >                  * (DEVICE_REMOTE_WAKEUP)
-> >                  */
-> >                 set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-> > -               if (btusb_find_altsetting(data, 1))
-> > +               if (btusb_find_altsetting(data, 1)) {
-> >                         set_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags);
-> > -               else
-> > +                       hdev->sco_pkt_len = hci_packet_size_usb_alt[1];
-> > +               } else
-> >                         bt_dev_err(hdev, "Device does not support ALT setting 1");
-> >         }
-> >
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index 8caac20556b499..0624496328fc09 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -417,6 +417,7 @@ struct hci_dev {
-> >         unsigned int    acl_pkts;
-> >         unsigned int    sco_pkts;
-> >         unsigned int    le_pkts;
-> > +       unsigned int    sco_pkt_len;
-> 
-> Id use sco_mtu to so the following check actually does what it intended to do:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/sco.c#n283
-> 
-> Right now it seems we are using the buffer length as MTU but I think
-> we should actually use the packet length if it is lower than the
-> buffer length, actually it doesn't seems SCO packets can be fragmented
-> so the buffer length must always be big enough to carry a full packet
-> so I assume setting the packet length as conn->mtu will always be
-> correct.
+I wanted to create a custom profile that used LE-L2CAP, and I found
+that there were a couple features missing that I needed.
 
-I agree. We should use sco mtu for this purpose.
+1)
+It is not possible to set the Address Type in the profile.  
+2)
+It is not possible to discover the "Auto Chosen" PSM value.
 
-> >
-> >         __u16           block_len;
-> >         __u16           block_mtu;
-> > --
-> > 2.28.0.236.gb10cc79966-goog
-> >
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
+The first patch allows the address type to be specified in the DBus
+API.
+
+The second patch allows information about the profile to be read back.
+This is needed because, on both Andorid and iOS, when using LE-L2CAP,
+the application must inform the OS about which PSM to use.  It is
+possible for the server to advertise this value with GATT, but the
+applciation has to read it from somewhere.
+
+
+Mark Marshall (2):
+  src/profile.c: Allow the "Address Type" to be set
+  src/profile.c: Add a GetProfileInfo method
+
+ doc/profile-api.txt |  23 +++++++++
+ src/profile.c       | 113 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 135 insertions(+), 1 deletion(-)
+
+-- 
+2.17.1
+
