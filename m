@@ -2,266 +2,166 @@ Return-Path: <SRS0=lMkY=B6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A62F5C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Aug 2020 10:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 620B7C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Aug 2020 11:39:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 797E32078D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Aug 2020 10:37:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="g09GrDyi"
+	by mail.kernel.org (Postfix) with ESMTP id 32F46204EA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Aug 2020 11:39:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729922AbgHTKhl (ORCPT
+        id S1729880AbgHTLjQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Aug 2020 06:37:41 -0400
-Received: from ns.omicron.at ([212.183.10.25]:36502 "EHLO ns.omicron.at"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729445AbgHTKSR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Aug 2020 06:18:17 -0400
-X-Greylist: delayed 472 seconds by postgrey-1.27 at vger.kernel.org; Thu, 20 Aug 2020 06:18:16 EDT
-Received: from MGW02-ATKLA.omicron.at ([172.25.62.35])
-        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07KAACRU007799
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 12:10:13 +0200
-DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07KAACRU007799
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=omicronenergy.com;
-        s=default; t=1597918213;
-        bh=tHGzBdpZIrFsEwZDPMin6z/+uonkVMtBxKwEtWOjXkA=;
-        h=Subject:From:To:CC:Date:In-Reply-To:References:From;
-        b=g09GrDyiBS92zyF/HnCIQPYM4yuD7mZXKALGlqdNKKIl91ejo3g0TM/k6gxtYo/nG
-         AtB3yBEY1hWvfHatINAaZQayjVV24orCbPnqwIHR1dppYnbaILev1LXhwgFHzjZc+j
-         zsASQSgfFmcK1H5fcs1B1uirG2LovgmhbjSTvtxw=
-Received: from MGW02-ATKLA.omicron.at (localhost [127.0.0.1])
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id A0659A006D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 12:10:11 +0200 (CEST)
-Received: from MGW01-ATKLA.omicron.at (unknown [172.25.62.34])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 9E2FFA0062
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 12:10:11 +0200 (CEST)
-Received: from EXC04-ATKLA.omicron.at ([172.22.100.189])
-        by MGW01-ATKLA.omicron.at  with ESMTP id 07KAAC8d030797-07KAAC8f030797
-        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=CAFAIL);
-        Thu, 20 Aug 2020 12:10:12 +0200
-Received: from marmar13.omicron.at (172.22.32.104) by EXC04-ATKLA.omicron.at
- (172.22.100.189) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 20 Aug
- 2020 12:10:11 +0200
-Message-ID: <3e98e7dae29ec7be6d67fca6af99f2e0f747375e.camel@omicronenergy.com>
-Subject: Re: [PATCH BlueZ 2/2] src/profile.c: Add a GetProfileInfo method
-From:   Mark Marshall <mark.marshall@omicronenergy.com>
+        Thu, 20 Aug 2020 07:39:16 -0400
+Received: from s01.spamexperts.axc.nl ([185.182.56.9]:44457 "EHLO
+        s01.spamexperts.axc.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729248AbgHTLis (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 20 Aug 2020 07:38:48 -0400
+Received: from vserver85.axc.nl ([185.182.56.185])
+        by s01.spamexperts.axc.nl with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.92)
+        (envelope-from <dave@daveborghuis.nl>)
+        id 1k8iu0-000184-Ov; Thu, 20 Aug 2020 13:38:44 +0200
+Received: from mail.axc.nl ([185.182.56.42])
+        by vserver85.axc.nl with esmtp (Exim 4.94)
+        (envelope-from <dave@daveborghuis.nl>)
+        id 1k8itz-00Dzqn-4h; Thu, 20 Aug 2020 13:38:39 +0200
+Subject: Re: Cant see Android Covid Exposure notification beacon (no problem
+ with iPhone beacons)
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Thu, 20 Aug 2020 12:10:02 +0200
-In-Reply-To: <CABBYNZ+OK4EY9KGHn7oasz4GRfBDJdWNcpOhr1GNGc3D+QtZ-g@mail.gmail.com>
-References: <20200819150931.3005-1-mark.marshall@omicronenergy.com>
-         <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
-         <CABBYNZ+OK4EY9KGHn7oasz4GRfBDJdWNcpOhr1GNGc3D+QtZ-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <b39b3395-ad80-bf76-caea-490666cea671@daveborghuis.nl>
+ <CABBYNZJysyOYZPWVd1Cpq7C055G2Pwdu+x_9WaFfZUzDb-4_YQ@mail.gmail.com>
+From:   Dave Borghuis <dave@daveborghuis.nl>
+Autocrypt: addr=dave@daveborghuis.nl; prefer-encrypt=mutual; keydata=
+ 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 0G/D
+Message-ID: <db7877d0-0a9e-f855-bd18-89ce353e9499@daveborghuis.nl>
+Date:   Thu, 20 Aug 2020 13:38:38 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.22.32.104]
-X-ClientProxiedBy: EXC03-ATKLA.omicron.at (172.22.100.188) To
- EXC04-ATKLA.omicron.at (172.22.100.189)
-X-FE-Policy-ID: 1:1:1:SYSTEM
+In-Reply-To: <CABBYNZJysyOYZPWVd1Cpq7C055G2Pwdu+x_9WaFfZUzDb-4_YQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: nl
+PrimaryMX: Accepted email from trusted host.  Hint: This skips spam scanning so make sure other host is not vulnerable
+X-Relay-Host: 185.182.56.42
+SpamTally: Final spam score: -63
+X-AuthUser: 
+X-Originating-IP: 185.182.56.185
+X-SpamExperts-Domain: vserver85.axc.nl
+X-SpamExperts-Username: 185.182.56.185
+Authentication-Results: spamexperts.axc.nl; auth=pass smtp.auth=185.182.56.185@vserver85.axc.nl
+X-SpamExperts-Outgoing-Class: ham
+X-SpamExperts-Outgoing-Evidence: Combined (0.16)
+X-Recommended-Action: accept
+X-Filter-ID: Mvzo4OR0dZXEDF/gcnlw0Uc1Z+hCSaILZIw3vLzlsGSpSDasLI4SayDByyq9LIhVy72u9v+dq/hO
+ wcZEck9qmkTNWdUk1Ol2OGx3IfrIJKyP9eGNFz9TW9u+Jt8z2T3KbXsLA0HlioK7txFnPQvbtbLk
+ 8R5mlgIwJEelNeTC3y0tOnqq+qab2kdwzh4p3GS5O5cjn8T7dzW71VxAlAoGW3D8zY6MLb0C+wr8
+ sSGhK4Naa40DxZPJuLUk3zkVKd8p4CuEXwMMCcu55/Z5CMTXnK0Y7LCaYwq5D2n+PKAHF2SHOoHk
+ jMut1ww/VHX1ly+ajz2jsX3korpGxdnK+ek4CMztdQUSqk/AeLi65+4s/LrywTM2yEHEhvC9Izsy
+ /NENTMQ3Kg3hL2oXz5A5E5R/dS4GkJ5hfB+qWugfDEytZYqsHHT1RBQQLep6oz6Esv5JPZ42IfQH
+ uktp5FTyHYGk267On8qMjxGbEIr+mFEcSBgsZIsLqaY1UeS+5B0bzsw6rMNJRrRpQSU11Ur/Gkm4
+ amRc11xjO4+/snCCXc1RuVYFnr74N+RNWUFaxHlAaSW5eQX2hj4u3ZszoJwAxH6lxrR1IoyVcpAX
+ xfUeXJw8PSKZyxi/aFboTUAaA09dklP/aIfVaCHpEB6cFH6WJxE4Zn+QHsYhW4W1sTO58EglJ5WC
+ dveE7Y243Xbui/edkaGx5r2tx94jvSB0QQoIKsEAe1d/+NO4YR0A5YIZlsSkH5eOlWoOfH3PRLfk
+ +7v5u57EGlTMCNh/GVYg/nv+z8zJJOeURvP7468+f+EGtWkSZL30hAicGM9TsPk6o5pKicqhH6gt
+ CBe9JhEFklSFD9M9pPvNWU8BvYorU4xuHEB26rPImfuctUHJ3IWIjmuymvwK3R1W5CR9pPgnkojE
+ nIFUcf8Fys7PofM8bqcKCam/1/U3ClTXlSfQV8rvfnHgqk4U9IQInBjPU7D5OqOaSonKoUnIqv6a
+ nXFjYar+fT2UxK+2mhKsoikQ3v+3MBjtrLsOJk4KMrD/VUxugdxDLVa2jg40M5gm6TR9mEGRUtCa
+ fc6PptSRQ17SSMcjhqOgGhuvxypUhWZ7DV/QthUn4wTjFg==
+X-Report-Abuse-To: spam@s01.spamexperts.axc.nl
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 2020-08-19 at 11:37 -0700, Luiz Augusto von Dentz wrote:
-> Hi Mark,
-> 
-> On Wed, Aug 19, 2020 at 8:13 AM Mark Marshall
-> <mark.marshall@omicronenergy.com> wrote:
-> > 
-> > Add a GetProfileInfo method to org.bluez.ProfileManager1
-> > ---
-> >  doc/profile-api.txt | 13 +++++++
-> >  src/profile.c       | 93 +++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 106 insertions(+)
-> > 
-> > diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-> > index 8c7d0a06d..d13703ab4 100644
-> > --- a/doc/profile-api.txt
-> > +++ b/doc/profile-api.txt
-> > @@ -133,6 +133,19 @@ Object path        /org/bluez
-> > 
-> >                         Possible errors: org.bluez.Error.DoesNotExist
-> > 
-> > +               options GetProfileInfo(object profile, object adapter)
-> > +
-> > +                       This returns a dictionary of options for the
-> > +                       profile.  Values returned are: UUID, Name,
-> > +                       Path, Service, Mode and AddressType.  The
-> > +                       adapter parameter is optional - if it is
-> > +                       non-empty, then two additional values might be
-> > +                       returned, if the profile is active on the
-> > +                       specified adapter: PSM and Channel.
-> > +
-> > +                       Possible errors: org.bluez.Error.InvalidArguments
-> > +                                        org.bluez.Error.DoesNotExist
-> > +
-> 
-> If this is really required I would be willing to merge something like this:
-> 
-> https://github.com/Vudentz/BlueZ/commit/9e196f8830511a4102e990d82d06c2e0487b3ad9
-> 
-> It exposes service objects so you can control exactly what gets
-> connect, though now given a second look at this seem to return details
-> that the client can query directly on the socket itself like the
-> Channel, PSM, Mode, etc, also not sure what is the point on retrieving
-> things like UUID, Name, Path if the application is already in control
-> of these when registering.
-> 
+Hi Luiz,
+>> So is there something I can do to enable to see Android Covid exposure
+>> notification ? Do I something wrong or is there a bug in the bluez stack?
+> You probably will need to set some filtering since the advertisement
+> may not be 'visible', you can try with:
+>
+> bluetoothctl> scan.transport le
+> bluetoothctl> scan on
 
-I only returned a full dictionary of items here as I was trying to
-match RegisterProfile, I don't actually need all of this info.  (I
-also thought that the more verbose structure was more useful, but
-it is wasteful).
+I scan now with the filters :
 
-The information that I really need is the PSM (or Channel) number.  
-This information is needed on the server side, and the socket used
-is not exposed to anything outside of bluetoothd, as far as I can
-tell.  (This is the socket returned from bt_io_listen, in profile.c).
+> scan.transport le
+> scan.uuids 0xfd6f
 
-I have my profile auto-select a free PSM, which I thought was the
-preferred method.  In the BR/EDR case, this number gets passed to the
-peer (I assume through SDP), but in the LE case, where I want to use
-LE-L2CAP, there is no defined mechanism to transfer the PSM.  My plan
-was to expose it as a GATT attribute, but this mechanism is not
-standardised, so I didn't think BlueZ would want to be involved?
+This gives the expected result. So the bluetoothstack itself seems to
+work ok. Thanks for the tips.
 
-Would a simpler interface that just returned the PSM or Channel number
-be better?  Is there another way to find out the PSM of a listening
-socket, on the server, before a connection is made?
+Good, now I know I have look at the python layers. I think something in
+the beacontools is going wrong, I will check there of find a
+alternative. already have a plan B, using a external ESP32 that show all
+the beacons.
 
-(From my reading of the above patch, the service object is created
-as a link between a "profile" and a "device".  In my case, I think
-there is no service object yet, as I have no device connection?)
+> Is there any specification available for such beacons?
+
+Sure there is, see :
+https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf
+
+Regards,
+
+Dave
 
 
-> >  Profile hierarchy
-> >  =================
-> > diff --git a/src/profile.c b/src/profile.c
-> > index 10850f305..e287a66d7 100644
-> > --- a/src/profile.c
-> > +++ b/src/profile.c
-> > @@ -2509,6 +2509,96 @@ static DBusMessage *unregister_profile(DBusConnection *conn,
-> >         return dbus_message_new_method_return(msg);
-> >  }
-> > 
-> > +static DBusMessage *get_profile_info(DBusConnection *conn,
-> > +                                       DBusMessage *msg, void *user_data)
-> > +{
-> > +       DBusMessage *reply;
-> > +       DBusMessageIter iter, dict;
-> > +       const char *path, *adapter, *sender;
-> > +       struct ext_profile *ext;
-> > +       uint16_t u16;
-> > +       GSList *l, *next;
-> > +
-> > +       sender = dbus_message_get_sender(msg);
-> > +
-> > +       DBG("sender %s", sender);
-> > +
-> > +       if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-> > +                                  DBUS_TYPE_OBJECT_PATH, &adapter,
-> > +                                  DBUS_TYPE_INVALID)) {
-> > +               return btd_error_invalid_args(msg);
-> > +       }
-> > +
-> > +       if (adapter && !*adapter)
-> > +               adapter = NULL;
-> > +
-> > +       ext = find_ext_profile(sender, path);
-> > +       if (!ext)
-> > +               return btd_error_does_not_exist(msg);
-> > +
-> > +       reply = dbus_message_new_method_return(msg);
-> > +
-> > +       dbus_message_iter_init_append(reply, &iter);
-> > +
-> > +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-> > +                                        "{sv}", &dict);
-> > +
-> > +       g_dbus_dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING,
-> > +                                &ext->uuid);
-> > +       if (ext->name) {
-> > +               g_dbus_dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
-> > +                                        &ext->name);
-> > +       }
-> > +       if (ext->path) {
-> > +               g_dbus_dict_append_entry(&dict, "Path", DBUS_TYPE_STRING,
-> > +                                        &ext->path);
-> > +       }
-> > +       if (ext->service) {
-> > +               g_dbus_dict_append_entry(&dict, "Service", DBUS_TYPE_STRING,
-> > +                                        &ext->service);
-> > +       }
-> > +
-> > +       u16 = ext->mode;
-> > +       g_dbus_dict_append_entry(&dict, "Mode", DBUS_TYPE_UINT16,
-> > +                                &u16);
-> > +
-> > +       u16 = ext->addr_type;
-> > +       g_dbus_dict_append_entry(&dict, "AddressType", DBUS_TYPE_UINT16,
-> > +                                &u16);
-> > +
-> > +       if (adapter) {
-> > +               for (l = ext->servers; l != NULL; l = next) {
-> > +                       struct ext_io *server = l->data;
-> > +                       const char *ctype;
-> > +
-> > +                       DBG("server:%p  %d %d psm:%d chan:%d",
-> > +                           server, server->resolving, server->connected,
-> > +                           server->psm, server->chan);
-> > +
-> > +                       next = g_slist_next(l);
-> > +
-> > +                       if (strcmp(adapter, adapter_get_path(server->adapter)))
-> > +                               continue;
-> > +
-> > +                       if (server->proto == BTPROTO_L2CAP) {
-> > +                               ctype = "PSM";
-> > +                               u16 = server->psm;
-> > +                       } else if (server->proto == BTPROTO_RFCOMM) {
-> > +                               ctype = "Channel";
-> > +                               u16 = server->chan;
-> > +                       } else {
-> > +                               continue;
-> > +                       }
-> > +                       g_dbus_dict_append_entry(
-> > +                               &dict, ctype, DBUS_TYPE_UINT16, &u16);
-> > +               }
-> > +       }
-> > +
-> > +       dbus_message_iter_close_container(&iter, &dict);
-> > +
-> > +       return reply;
-> > +}
-> > +
-> >  static const GDBusMethodTable methods[] = {
-> >         { GDBUS_METHOD("RegisterProfile",
-> >                         GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
-> > @@ -2516,6 +2606,9 @@ static const GDBusMethodTable methods[] = {
-> >                         NULL, register_profile) },
-> >         { GDBUS_METHOD("UnregisterProfile", GDBUS_ARGS({ "profile", "o" }),
-> >                         NULL, unregister_profile) },
-> > +       { GDBUS_METHOD("GetProfileInfo",
-> > +                       GDBUS_ARGS({ "profile", "o" }, { "adapter", "o" }),
-> > +                       GDBUS_ARGS({ "options", "a{sv}" }), get_profile_info) },
-> >         { }
-> >  };
-> > 
-> > --
-> > 2.17.1
-> > 
-> 
-> 
+
+
 
