@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 948E4C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBDBC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 756E320748
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C6D220714
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:33:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pDaGmxfO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VtLle+O+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728223AbgHURWe (ORCPT
+        id S1726846AbgHURdS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Aug 2020 13:22:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42918 "EHLO
+        Fri, 21 Aug 2020 13:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728912AbgHURWa (ORCPT
+        with ESMTP id S1725976AbgHURdQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Aug 2020 13:22:30 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F16AC061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:22:29 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id x1so503254oox.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:22:29 -0700 (PDT)
+        Fri, 21 Aug 2020 13:33:16 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81F9C061573
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id e6so2179118oii.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BnMS2o5L8BK4kKFKX33LOfETEbgs7A+ySsqSj/uBlAA=;
-        b=pDaGmxfOCfEpdi8+54n5D2wf2kxnFfd9eNxwc9BDw4Iuir0mC0n5Z1AS39VmW9+Gs1
-         IEDvYAtXQbR56X03pr4boDSaVL4AYUN5PA/WAMWE9pTO08rs6qgoJF+1cMxCEKopSICh
-         IIK6w3XyFerWbmA79An4cGYHhuWWuqHwPevG6iEVKk4wVmrTeU8bA3IXwkr2iAdrgoVI
-         KyiHeLCuc7mbAkD4RRL8Zq+0uYJsrVC1vbouZY5LTg4OqyGs8fiO8wsI/yEd3oNXIxcE
-         AtJ6L3NW87ECMhrDLBSdPRUUVB9HvBiRjcTS+xaB44yLeg+khw1MRTWgWabOJEeFwdAQ
-         duLA==
+        bh=wQS2uBDhUd3sZz5wY/MnOMF8c1/iiCazEEEhF1oWRBg=;
+        b=VtLle+O+/1zggmOAlP7NhC2a7boxj7Ode0jyk+SXNCH6hMoDPR7dtiS+qsYgXvm6zO
+         2w1NgfPi1//FzObN0LsHqcLdgwy0zi/2nqahU7iSCK+31Oa3ca/a5cj/lcm2f2U+Lxqn
+         H7g8m250LwRjYbjQJbwhuwg+dKOzHPoq9dzHpH6zvEpNUK6mPSN/KaI+UVEd8wYZB13w
+         w+DLzmDjMYKpY0i4cyx7qofBbDPkbEsKieBXoVNgH1QuGUjja9wKGc1ajCGzqKN3wXm3
+         rL/a/HaL9//h/aRo+gGZ1BJxNbH5R8eqHxJyMa8G3qeHhVSKK2YXVB0+ZB92FXkc/LQ2
+         mzdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BnMS2o5L8BK4kKFKX33LOfETEbgs7A+ySsqSj/uBlAA=;
-        b=D6rtBu/LJSif/hyntoTIQRSvto8DGNi+Ivy/7rwiILUE+j7LDIX7klMHZ6+hqR6Gb1
-         7IqPVhLBeEWvbtSM79d0IxXPWgPyzfpJiu4DZRY3p45kI1qLuDenYYTUaekXAPFo42vh
-         cWklKnaFjnpyhLQp2rfNfcBexJn275a1TBUCn/9L1YL4wcU/heZFPwD07mhTplyG8EI6
-         YfUdgh8ktFTNkvh3CFrEXk7ezIGqrBz6gwpHro6ZvWFJGKTt+9ikHBaFn8UNvi1+gG2Q
-         8gp3JTmkuVIJmBROzikVz53es43BnOOeFjRk5En71pw9o8V/168dhi3+RxP17JC99WDk
-         AnkQ==
-X-Gm-Message-State: AOAM5306wqd0qpmMuY0Cjo8pDGHNLb8Fko2m9nyOCstzuTXrCv5KX63z
-        2/MKgYy+bRIQAvi1WjLUrMdxWLgZWtxL0fM/CFI=
-X-Google-Smtp-Source: ABdhPJwLQEy7nXQr6HRV+e1iqWbdoUMrdq2D0BeCN+XcCfNkpUQgxcfUkZFbZlCJQVgFrRr4mkQtJbBAc3FfUUZ09xU=
-X-Received: by 2002:a4a:e88c:: with SMTP id g12mr2847650ooe.49.1598030548520;
- Fri, 21 Aug 2020 10:22:28 -0700 (PDT)
+        bh=wQS2uBDhUd3sZz5wY/MnOMF8c1/iiCazEEEhF1oWRBg=;
+        b=gmT1fy3WeP9eEmVA9kSWDBIvfUmRJjDPaMKobskdp2GTQ/tGIpzZaoYIShERqOR+X/
+         uxB/cUTqsaFVAKb7qUPm2PhEiMun2tPCJ6JgQJyQXgtoq8jq7L5ELvU/vIYAwExCXH8x
+         sKJj4HzkuLlOIHD5IK4VbaT1Pkh5IcInocNGbs1OyTAsc55fB7G7K6QgFX/FdXQvO+YO
+         86wX+RAoie8XuLIj3+hKPZQAGMLwSkMLWWzR2iGMbyL5JUkLFomnd6WoXDuHuW9i6jfp
+         5zVaRgv/mmiqcFlemo150mbnyKHxwq9ul2UiuwuCdiwsuYvc/bp2etoduKAzdoOBI8FC
+         WL9A==
+X-Gm-Message-State: AOAM532IeEI8JesKiq0iapHv1TYt1yOmobe1/xHTxvak/pIBF5FDHUqh
+        5fNLC33DeOKJ2sXtKk9cdnKZCECU3Y1qQebq1ZM=
+X-Google-Smtp-Source: ABdhPJwsVb9fYyVBBGOrOSi0tyNQ9vSwd3IifA15JiZhptruVm87sIxHvip2vQoZD3tk9jFMPI8eX45aSUBDRWiKdKo=
+X-Received: by 2002:aca:cc50:: with SMTP id c77mr2353779oig.152.1598031195003;
+ Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200821064927.17578-1-sonnysasaka@chromium.org>
-In-Reply-To: <20200821064927.17578-1-sonnysasaka@chromium.org>
+References: <20200821070409.18037-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200821070409.18037-1-sonnysasaka@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 21 Aug 2020 10:22:18 -0700
-Message-ID: <CABBYNZKW19qDviuBM-6MdnWnvR2+JO+nZOEpSFo7tVJo80v20w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] adapter: remove eir_data.flags in device_update_last_seen()
+Date:   Fri, 21 Aug 2020 10:33:04 -0700
+Message-ID: <CABBYNZ+XKyqK6gpxhZ_J43Uto+cSMGJAcgPKNtCLoi+whrAh6A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gap: Enable the external flag
 To:     Sonny Sasaka <sonnysasaka@chromium.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Joseph Hwang <josephsih@chromium.org>
@@ -73,63 +73,61 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Sonny,
 
-On Thu, Aug 20, 2020 at 11:52 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+On Fri, Aug 21, 2020 at 12:08 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 >
 > From: Joseph Hwang <josephsih@chromium.org>
 >
-> Bluez has difficulty in pairing with Apple Airpods. This issue is
-> caused by the incorrect selection of BD address type due to two factors:
+> This patch enables the external flag for gap so that the gap service can
+> be exported over D-Bus.
 >
-> (1) The LE advertising reports emitted by Airpods do not carry eir
->     data flags.
-> (2) If the eir data flags is missing, the found device would not be
->     considered as coming with bredr address for some historical
->     obsolete reason.
+> Tested on Chrome OS that this fixes https://crbug.com/722987 so that GAP
+> API can be propagated to Android apps.
 >
-> This patch fixes (2) above.
+> Test Method 1:
+>   - Connect to a peripheral.
+>   - Use dbus methods to query the org.bluez.GattService1
+>     interface in managed objects.
+>   - Confirm that the gap 0x1800 profile was exported like:
+>     GattService1 path: /org/bluez/hci0/dev_xx/service0001
+>     service_props: dbus.String(u'UUID'):
+>         dbus.String(u'00001800-0000-1000-8000-00805f9b34fb'
 >
-> Tested on Chrome OS by pairing with Airpods.
-> Without this patch, the pairing success rate is about 20%.
-> With this patch, the pairing success rate becomes almost 100%.
+> Test Method 2:
+>   - Install BleManager APK attached in C#0 of https://crbug.com/722987
+>     to ARC++ in a chromebook.
+>   - Launch the application.
+>   - Connect to a Dash robot. Confirm that there are 3 services
+>     instead of 2.
+>
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 >
 > ---
->  src/adapter.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+>  profiles/gap/gas.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 5e896a9f0..36bbed2dd 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -6628,14 +6628,8 @@ static void update_found_devices(struct btd_adapter *adapter,
->
->         device_update_last_seen(dev, bdaddr_type);
->
-> -       /*
-> -        * FIXME: We need to check for non-zero flags first because
-> -        * older kernels send separate adv_ind and scan_rsp. Newer
-> -        * kernels send them merged, so once we know which mgmt version
-> -        * supports this we can make the non-zero check conditional.
-> -        */
-> -       if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
-> -                                       !(eir_data.flags & EIR_BREDR_UNSUP)) {
-> +       if (bdaddr_type != BDADDR_BREDR &&
-> +                       !(eir_data.flags & EIR_BREDR_UNSUP)) {
->                 device_set_bredr_support(dev);
->                 /* Update last seen for BR/EDR in case its flag is set */
->                 device_update_last_seen(dev, BDADDR_BREDR);
+> diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+> index dffa31314..abe5341c0 100644
+> --- a/profiles/gap/gas.c
+> +++ b/profiles/gap/gas.c
+> @@ -310,6 +310,7 @@ static int gap_disconnect(struct btd_service *service)
+>  static struct btd_profile gap_profile = {
+>         .name           = "gap-profile",
+>         .remote_uuid    = GAP_UUID,
+> +       .external       = true,
+>         .device_probe   = gap_probe,
+>         .device_remove  = gap_remove,
+>         .accept         = gap_accept,
 > --
 > 2.26.2
 
-While I'm fine with this change we might need to bump the kernel
-version in order to remove the FIXME, also afaik
-beacons/broadcaster/non-connectable advertisement will never have any
-flags set so we need to make sure that doesn't end up updating the
-last seen for BREDR, though if that is how the Airpods are advertising
-then we will need to rethink how we handle the last seen logic to
-select which bearer should be connected first. If the Airpods are also
-responding to inquiry then we can probably check if BR/EDR has been
-marked as supported when the device uses a broadcast advertisement and
-not just mark it right away.
+I guess you will end up exporting every single service at the end, so
+perhaps we should just have an entry to main.conf
+(ExportClaimedServices) where the system can define if services
+claimed by plugins are allowed to be accessed over D-Bus, and we
+should probably add a comment that when doing so it may cause
+conflicts between the daemon and applications (especially GAP/GATT
+service can be very sensitive).
+
 
 -- 
 Luiz Augusto von Dentz
