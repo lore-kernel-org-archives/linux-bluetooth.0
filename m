@@ -7,64 +7,65 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBDBC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AEFC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C6D220714
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85DEC20714
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 17:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VtLle+O+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vC4TYeMF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbgHURdS (ORCPT
+        id S1728023AbgHURgg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Aug 2020 13:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44602 "EHLO
+        Fri, 21 Aug 2020 13:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725976AbgHURdQ (ORCPT
+        with ESMTP id S1725820AbgHURge (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Aug 2020 13:33:16 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81F9C061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id e6so2179118oii.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
+        Fri, 21 Aug 2020 13:36:34 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C72C061573
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:36:34 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id r6so506741oon.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Aug 2020 10:36:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wQS2uBDhUd3sZz5wY/MnOMF8c1/iiCazEEEhF1oWRBg=;
-        b=VtLle+O+/1zggmOAlP7NhC2a7boxj7Ode0jyk+SXNCH6hMoDPR7dtiS+qsYgXvm6zO
-         2w1NgfPi1//FzObN0LsHqcLdgwy0zi/2nqahU7iSCK+31Oa3ca/a5cj/lcm2f2U+Lxqn
-         H7g8m250LwRjYbjQJbwhuwg+dKOzHPoq9dzHpH6zvEpNUK6mPSN/KaI+UVEd8wYZB13w
-         w+DLzmDjMYKpY0i4cyx7qofBbDPkbEsKieBXoVNgH1QuGUjja9wKGc1ajCGzqKN3wXm3
-         rL/a/HaL9//h/aRo+gGZ1BJxNbH5R8eqHxJyMa8G3qeHhVSKK2YXVB0+ZB92FXkc/LQ2
-         mzdw==
+        bh=6dfREwcPDaFqu0NxJIiuzEAM2Q82qJx7DHgfCuuYP78=;
+        b=vC4TYeMFO2ageMrazWQEfEs2z5+LjGRd3G6lKGSxGhsetPSRNiXc/RgTfVpp6/ntyr
+         Dqm9dKU65Wu7JNQQBilu2TEBKo2e9G4g1TbhV05erLnV2PeSeoTxr8F8C7z3d7nOL/y9
+         ij50xKiIOkdIau0FXlPvR7/lFtuSq+uDQmpT/XOJdPhIFtOxPakfYd49/vayTtVp/7Nq
+         TCq+kB3NSt0OxMbLVTx1PMx50jh6zvTR6PCXQYXXDVMvTQCSXh5R+OG+yqPCjjEKDWA1
+         qMyyvd8HDJxQZXw20cmGbfZH5zEHcRH7G2zh4eh+b3C4vXw25hNtEbHvqAPMxeEgx9j9
+         cscw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wQS2uBDhUd3sZz5wY/MnOMF8c1/iiCazEEEhF1oWRBg=;
-        b=gmT1fy3WeP9eEmVA9kSWDBIvfUmRJjDPaMKobskdp2GTQ/tGIpzZaoYIShERqOR+X/
-         uxB/cUTqsaFVAKb7qUPm2PhEiMun2tPCJ6JgQJyQXgtoq8jq7L5ELvU/vIYAwExCXH8x
-         sKJj4HzkuLlOIHD5IK4VbaT1Pkh5IcInocNGbs1OyTAsc55fB7G7K6QgFX/FdXQvO+YO
-         86wX+RAoie8XuLIj3+hKPZQAGMLwSkMLWWzR2iGMbyL5JUkLFomnd6WoXDuHuW9i6jfp
-         5zVaRgv/mmiqcFlemo150mbnyKHxwq9ul2UiuwuCdiwsuYvc/bp2etoduKAzdoOBI8FC
-         WL9A==
-X-Gm-Message-State: AOAM532IeEI8JesKiq0iapHv1TYt1yOmobe1/xHTxvak/pIBF5FDHUqh
-        5fNLC33DeOKJ2sXtKk9cdnKZCECU3Y1qQebq1ZM=
-X-Google-Smtp-Source: ABdhPJwsVb9fYyVBBGOrOSi0tyNQ9vSwd3IifA15JiZhptruVm87sIxHvip2vQoZD3tk9jFMPI8eX45aSUBDRWiKdKo=
-X-Received: by 2002:aca:cc50:: with SMTP id c77mr2353779oig.152.1598031195003;
- Fri, 21 Aug 2020 10:33:15 -0700 (PDT)
+        bh=6dfREwcPDaFqu0NxJIiuzEAM2Q82qJx7DHgfCuuYP78=;
+        b=nIcD03P8PBcz7y4eC6BRsnObllTDLNMxUrBLbaUcmIre7aCvWmQctfBh67QatpuncZ
+         hOpPn973FHCU13GkvykGnZJ6rROQ+OzJ/S1prNMz4MP2J6TCH8oy5ZnyW4DRquB3+hPH
+         4XQVndo2/joptLMzDizw4EwO+lbUbCvvN/FnIrpWCZ40QvZF13PdRxSrcWh8lXU5Y4IK
+         sZ9RDC+QaXJHja1av3NApq47BV+PSWDJKcmX2ioXwoMvF12IQQOjk6d7fOUtnNSFMQLf
+         UbuCc6iQVa3FHUUby3Ba8a2BEYtNG4RhdYXLzk0WByItuuwv9rSdRSrA78QjuXuwqWLW
+         dMCg==
+X-Gm-Message-State: AOAM530O2FH4E7A16J038sORjcghr8Qlc8tmg3t27G7k0krclXVmBrQ8
+        iGylZUWTlz0hgWX/fkeQcQ7ttmGD4S6EqKt9SRE=
+X-Google-Smtp-Source: ABdhPJzY78KkyaeEuzb2fWcW7H51lI4SS5VazAr0XBdUqIuxBdtyrPcg0V/QIQprsG1x74XzIpd/HDHt8wzH57wNS6s=
+X-Received: by 2002:a4a:380b:: with SMTP id c11mr2902526ooa.17.1598031393680;
+ Fri, 21 Aug 2020 10:36:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200821070409.18037-1-sonnysasaka@chromium.org>
-In-Reply-To: <20200821070409.18037-1-sonnysasaka@chromium.org>
+References: <20200821074512.19985-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200821074512.19985-1-sonnysasaka@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 21 Aug 2020 10:33:04 -0700
-Message-ID: <CABBYNZ+XKyqK6gpxhZ_J43Uto+cSMGJAcgPKNtCLoi+whrAh6A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gap: Enable the external flag
+Date:   Fri, 21 Aug 2020 10:36:23 -0700
+Message-ID: <CABBYNZJp2cCqRFa2zrdLnva0UgxvG2eBhYyKr52Rx54sU=znSA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] device: Fix race condition between device
+ connection and disconnection
 To:     Sonny Sasaka <sonnysasaka@chromium.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Joseph Hwang <josephsih@chromium.org>
+        Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -73,61 +74,61 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Sonny,
 
-On Fri, Aug 21, 2020 at 12:08 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+On Fri, Aug 21, 2020 at 12:47 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 >
-> From: Joseph Hwang <josephsih@chromium.org>
+> When Connect() is called and waiting for return, dev_disconnected may be
+> called due to MGMT_EV_DEVICE_DISCONNECTED event from kernel. In that
+> case reply to client that the connection failed otherwise the dbus
+> method will timeout because bluetoothd never replies.
 >
-> This patch enables the external flag for gap so that the gap service can
-> be exported over D-Bus.
+> Tested with simulation of a lot of Connect() to bluetooth devices and
+> check that error is returned from bluetoothd rather than dbus timeout
+> when this race condition happens.
 >
-> Tested on Chrome OS that this fixes https://crbug.com/722987 so that GAP
-> API can be propagated to Android apps.
->
-> Test Method 1:
->   - Connect to a peripheral.
->   - Use dbus methods to query the org.bluez.GattService1
->     interface in managed objects.
->   - Confirm that the gap 0x1800 profile was exported like:
->     GattService1 path: /org/bluez/hci0/dev_xx/service0001
->     service_props: dbus.String(u'UUID'):
->         dbus.String(u'00001800-0000-1000-8000-00805f9b34fb'
->
-> Test Method 2:
->   - Install BleManager APK attached in C#0 of https://crbug.com/722987
->     to ARC++ in a chromebook.
->   - Launch the application.
->   - Connect to a Dash robot. Confirm that there are 3 services
->     instead of 2.
->
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 >
 > ---
->  profiles/gap/gas.c | 1 +
->  1 file changed, 1 insertion(+)
+>  src/device.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
-> diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-> index dffa31314..abe5341c0 100644
-> --- a/profiles/gap/gas.c
-> +++ b/profiles/gap/gas.c
-> @@ -310,6 +310,7 @@ static int gap_disconnect(struct btd_service *service)
->  static struct btd_profile gap_profile = {
->         .name           = "gap-profile",
->         .remote_uuid    = GAP_UUID,
-> +       .external       = true,
->         .device_probe   = gap_probe,
->         .device_remove  = gap_remove,
->         .accept         = gap_accept,
+> diff --git a/src/device.c b/src/device.c
+> index 7b7808405..55e7b4042 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3006,6 +3006,7 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
+>  void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>  {
+>         struct bearer_state *state = get_state(device, bdaddr_type);
+> +       DBusMessage *reply;
+>
+>         if (!state->connected)
+>                 return;
+> @@ -3020,6 +3021,17 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>                 device->disconn_timer = 0;
+>         }
+>
+> +       // This could be executed while the client is waiting for Connect() but
+> +       // att_connect_cb has not been invoked.
+> +       // In that case reply the client that the connection failed.
+
+Please use C style comment /* */
+
+> +       if (device->connect) {
+> +               DBG("connection removed while Connect() is waiting reply");
+> +               reply = btd_error_failed(device->connect, "Disconnected early");
+> +               g_dbus_send_message(dbus_conn, reply);
+> +               dbus_message_unref(device->connect);
+> +               device->connect = NULL;
+> +       }
+> +
+>         while (device->disconnects) {
+>                 DBusMessage *msg = device->disconnects->data;
+>
 > --
 > 2.26.2
+>
 
-I guess you will end up exporting every single service at the end, so
-perhaps we should just have an entry to main.conf
-(ExportClaimedServices) where the system can define if services
-claimed by plugins are allowed to be accessed over D-Bus, and we
-should probably add a comment that when doing so it may cause
-conflicts between the daemon and applications (especially GAP/GATT
-service can be very sensitive).
-
+Otherwise it looks good.
 
 -- 
 Luiz Augusto von Dentz
