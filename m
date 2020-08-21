@@ -7,64 +7,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC5CC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 06:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48BC8C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 06:25:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20F0B2075E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 06:17:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14A3E20738
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Aug 2020 06:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CX0npRCU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="S9PH1WtE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgHUGRB (ORCPT
+        id S1726002AbgHUGZb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Aug 2020 02:17:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52260 "EHLO
+        Fri, 21 Aug 2020 02:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725268AbgHUGRA (ORCPT
+        with ESMTP id S1725268AbgHUGZa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Aug 2020 02:17:00 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A5DC061385
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 23:17:00 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id j13so376121pjd.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 23:17:00 -0700 (PDT)
+        Fri, 21 Aug 2020 02:25:30 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68ADC061385
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 23:25:30 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id mt12so383068pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Aug 2020 23:25:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=51rft0zd8lDE1RWSK7jDf9MZdT3wh7FXXkl7Ry3F10c=;
-        b=CX0npRCU0PzecA4Px8UGqAWigN7MjREnLUFvogq/WcKTMyiSlyl9lr6y2H+thLXBMG
-         wph736DPh8WGMxApMAfr6O5BSycP2LvkohTsL0as4yaxHjsRXSywatD8KOvcuTJg2TEj
-         xNAL9b2JP2Kg7tAMngUimS11N2OR8tFlHsbX4=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bA5MyBizmygKQda+oeo0TYdwB/AeAf0aaD0m7ntaAyk=;
+        b=S9PH1WtEk0y3bdfhwaFG9/XSVmRM+19aPN4lZL6FRZdu8VbFq5a8QIZqBkGDFMsnEQ
+         NFMKJwaNq9scn0TxUm4kXtDUCQPugARpoTZSk3AhTRoupyvzz6rUvIw2xCIc6dgSSbdB
+         L+HULMdm1ovdFHT22J5nLoojPyFHcfTJWSn2Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=51rft0zd8lDE1RWSK7jDf9MZdT3wh7FXXkl7Ry3F10c=;
-        b=RcWQbV4vG56MieykIrXT3CFccts2SYCTdjrT7a1LqzuxL5QgzSrVVZG8u43jaegBSM
-         gtPalSQgJBoEXHC53lNFapTwWKU3z6uGNoH+QCfRsKX5BOV1bqkbISA+6pI8UrcZf49v
-         VjGs/5/tNfQPY1xVjMv1mUu+9a3KYj85Aq7YyR0c2lz1A0GK5XCD2AkYxFFFGtKbQcOg
-         wv7B9AzNyEWVVqSkOKUM9qIKMB7x0SYTEe6vzRGf/28Y8EatVTHz2zipN3bC1txa1m8L
-         ON+IdwDkrWjAIYQoiXLxKNpI6JjupXsuT/P0t4bhhUcZtJ905b7vMi9OlQi+7jy6732a
-         WXCg==
-X-Gm-Message-State: AOAM532JPEYruXjiHXXdxleoHogxCAtphD7QgNCI4S8ZOghhFwBzipXg
-        Sho8PRhlgjTED8kQLSwxzjn5uwFtaViw3g==
-X-Google-Smtp-Source: ABdhPJwLOE3yFWfFPUGWgU8bWD3qlm2BVz3nriWt7I4JaOe7U1pwhJXt0YxCRKB6u3nJlCdVpuRQSg==
-X-Received: by 2002:a17:902:7616:: with SMTP id k22mr1220002pll.25.1597990619465;
-        Thu, 20 Aug 2020 23:16:59 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bA5MyBizmygKQda+oeo0TYdwB/AeAf0aaD0m7ntaAyk=;
+        b=aHqDqmYxcjunYMcnNkfwi/tWZ91PWBT17SQeEWi0+rX7H4xT/l9DFyuvzy6ZZcfl5I
+         vNcoqUIm/pucgugcNuV9eANCA+ZQSRsz7ArBKoWiIYvyNM5j8bky7jNOhn3ZBcS1SSAX
+         Hfu5+VfkIJBVGx4A4LAsUPJXMGLiEGqmQwn43qPjxwVu37QCTAxvG9wOQE/OMKaDLUaL
+         N2iRj2aute/w5H95yAqqoddjywzdmlxXg51xVAUx3m+S1U9pTzc81lQNdcAiSb4kMQUV
+         livQB6S3QOoO37qnQErfRGw0Rp/mMwHLhPN6OxJYE+mIXOSkoeT/reqHTjOS8DWM4Ouh
+         Es0g==
+X-Gm-Message-State: AOAM532Afz8CenBBaOVzAflTSSI9WSaSJDiIei4zdkv/j45epZuX6vrt
+        hf5U8zvTwciuXPHXlybfbraflGRBLtUpeQ==
+X-Google-Smtp-Source: ABdhPJx9w8QmpvzKORFE8qRe83Rgn2YnXKiVeaUGG4jUrNwCmno6uNTcnILf7sey75jWdDEtvGS5OQ==
+X-Received: by 2002:a17:902:c111:: with SMTP id 17mr1341653pli.46.1597991129811;
+        Thu, 20 Aug 2020 23:25:29 -0700 (PDT)
 Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id h1sm927356pgs.77.2020.08.20.23.16.58
+        by smtp.gmail.com with ESMTPSA id c207sm1078895pfc.64.2020.08.20.23.25.29
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Aug 2020 23:16:58 -0700 (PDT)
+        Thu, 20 Aug 2020 23:25:29 -0700 (PDT)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Joseph Hwang <josephsih@chromium.org>
-Subject: [PATCH BlueZ 2/2] doc/gatt-api: Add new error for StartNotify
-Date:   Thu, 20 Aug 2020 23:16:43 -0700
-Message-Id: <20200821061643.16278-2-sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] device: unset disconnecting flag when connection is removed
+Date:   Thu, 20 Aug 2020 23:25:26 -0700
+Message-Id: <20200821062526.16689-1-sonnysasaka@chromium.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200821061643.16278-1-sonnysasaka@chromium.org>
-References: <20200821061643.16278-1-sonnysasaka@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -74,25 +72,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Joseph Hwang <josephsih@chromium.org>
 
-When a device is disconnecting, StartNotify is not allowed. This adds a
-new error type to the doc.
+A disconnecting flag has been used to avoid race condition
+between the service browsing thread and the disconnecting
+thread. We need to unset the flag when connection is removed.
 
 ---
- doc/gatt-api.txt | 1 +
- 1 file changed, 1 insertion(+)
+ src/device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 98fe7487c..04789c6d3 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -186,6 +186,7 @@ Methods		array{byte} ReadValue(dict options)
- 			Possible Errors: org.bluez.Error.Failed
- 					 org.bluez.Error.NotPermitted
- 					 org.bluez.Error.InProgress
-+					 org.bluez.Error.NotConnected
- 					 org.bluez.Error.NotSupported
+diff --git a/src/device.c b/src/device.c
+index 7b7808405..5ab591dd4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3041,6 +3041,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+ 							"Paired");
+ 	}
  
- 		void StopNotify()
++	if (device)
++		set_client_diconnecting(device->client, false);
++
+ 	if (device->bredr_state.connected || device->le_state.connected)
+ 		return;
+ 
 -- 
 2.26.2
 
