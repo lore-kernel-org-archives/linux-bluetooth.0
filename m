@@ -2,132 +2,77 @@ Return-Path: <SRS0=oHmC=CB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EACF3C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Aug 2020 06:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3D7C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Aug 2020 07:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6B7422B43
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Aug 2020 06:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49D0E2075B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Aug 2020 07:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727925AbgHWG6r convert rfc822-to-8bit (ORCPT
+        id S1726429AbgHWHoc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Aug 2020 02:58:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47496 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725771AbgHWG6q (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Aug 2020 02:58:46 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Sun, 23 Aug 2020 06:58:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: mmdesai20@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-iBD1YAZddQ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Sun, 23 Aug 2020 03:44:32 -0400
+Received: from mail.zju.edu.cn ([61.164.42.155]:21746 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726231AbgHWHoc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 23 Aug 2020 03:44:32 -0400
+Received: from localhost.localdomain (unknown [210.32.144.184])
+        by mail-app2 (Coremail) with SMTP id by_KCgDnz55VHkJfniscAg--.14603S4;
+        Sun, 23 Aug 2020 15:44:25 +0800 (CST)
+From:   Dinghao Liu <dinghao.liu@zju.edu.cn>
+To:     dinghao.liu@zju.edu.cn, kjlu@umn.edu
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Fix memleak in btusb_mtk_submit_wmt_recv_urb
+Date:   Sun, 23 Aug 2020 15:44:21 +0800
+Message-Id: <20200823074421.20769-1-dinghao.liu@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: by_KCgDnz55VHkJfniscAg--.14603S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYs7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY02Avz4vE14v_GF4l
+        42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
+        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbhiSPUUUUU==
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgoSBlZdtPnBhAA7sk
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+When kmalloc() on buf fails, urb should be freed just like
+when kmalloc() on dr fails.
 
---- Comment #141 from MMD (mmdesai20@gmail.com) ---
-(In reply to MMD from comment #140)
-> (In reply to Swyter from comment #137)
-> > Hi! There's actually a script that should help with this, at least as
-> > reference:
-> > https://gist.github.com/nevack/6b36b82d715dc025163d9e9124840a07
-> > 
-> > It's for newer kernels, though. So while the btusb.c part should more or
-> > less apply cleanly (because the existing/original CSR workaround stuff has
-> > been there for a while) the ERR_DATA_REPORTING stuff (on hci_core.c) is new
-> > and will need to be stripped out when back-porting the patch.
-> > 
-> > Who knows, maybe it's a good idea to ask someone from Canonical to add it
-> to
-> > Ubuntu, once it's been more battle-tested. Hopefully (as it officially gets
-> > into stable kernels) distros downstream will pick this up, even on super
-> old
-> > Linux versions.
-> > 
-> > Hope that helps. :)
-> 
-> Hi tried this script, but it gives below error
-> cp: cannot stat '/usr/lib/modules/5.8.2-050802-generic/build/.config': No
-> such file or director
-> 
-> I checked there is no such directory and file.
-> 
-> I have Ubuntu 20.04 LTS with Kernel 5.4.0-42-generic. Then updated kernel to
-> hoping that 5.8.2-050802-generic hoping by Bluetooth device will work with
-> this .(As you mentioned this script is accepted in 5.7 and 5.8 version of
-> kernel)
-> With new kernel 5.8.2-050802-generic, it detects logitech M337 mouse , but
-> not able to configure. Then I tried above script and got error
-> cp: cannot stat '/usr/lib/modules/5.8.2-050802-generic/build/.config': No
-> such file or director
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I tried some command as suggested by you on
-https://gist.github.com/nevack/6b36b82d715dc025163d9e9124840a07
-
-Here is the output of its
-
-
-lsusb -vvd 0a12:0001... gives bcdDevice 25.20
-
-dmesg |grep 'CSR clone detected'
-[   75.420911] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds...
-[ 4880.814947] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds...
-[22664.573526] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds...
-[23268.855461] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds...
-
-btmon -w my.log
-Bluetooth monitor ver 5.54
-= Note: Linux version 5.8.2-050802-generic (x86_64)                            
-                                                                               
-          0.574027
-= Note: Bluetooth subsystem version 2.22                                       
-                                                                               
-               0.574029
-= New Index: 00:1A:7D:DA:71:10 (Primary,USB,hci0)                              
-                                                                               
-        [hci0] 0.574030
-@ MGMT Open: bluetoothd (privileged) version 1.17                              
-                                                                               
-      {0x0001} 0.574031
-@ MGMT Open: btmon (privileged) version 1.17
-
-hcidump -X
-HCI sniffer - Bluetooth packet analyzer ver 5.53
-device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8d2608ddfd08..f88968bcdd6a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2896,6 +2896,7 @@ static int btusb_mtk_submit_wmt_recv_urb(struct hci_dev *hdev)
+ 	buf = kmalloc(size, GFP_KERNEL);
+ 	if (!buf) {
+ 		kfree(dr);
++		usb_free_urb(urb);
+ 		return -ENOMEM;
+ 	}
+ 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.17.1
+
