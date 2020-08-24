@@ -2,306 +2,180 @@ Return-Path: <SRS0=dZ4y=CC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF82C433E3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 09:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8843C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 15:04:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C45442074D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 09:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74634206B5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 15:04:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=omicronenergy.com header.i=@omicronenergy.com header.b="a1n57/lw"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="R99cbgnk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730206AbgHXIxg (ORCPT
+        id S1725921AbgHXPEP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Aug 2020 04:53:36 -0400
-Received: from ns.omicron.at ([212.183.10.25]:44154 "EHLO ns.omicron.at"
+        Mon, 24 Aug 2020 11:04:15 -0400
+Received: from mga01.intel.com ([192.55.52.88]:50708 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730192AbgHXIxd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Aug 2020 04:53:33 -0400
-Received: from MGW02-ATKLA.omicron.at ([172.25.62.35])
-        by ns.omicron.at (8.15.2/8.15.2) with ESMTPS id 07O8rSsN004667
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2020 10:53:29 +0200
-DKIM-Filter: OpenDKIM Filter v2.11.0 ns.omicron.at 07O8rSsN004667
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=omicronenergy.com;
-        s=default; t=1598259209;
-        bh=ZJT3fiqNv7I2DTe+Bchc6djTPvtBSe9dbITUr8DTt5M=;
-        h=Subject:From:To:CC:Date:In-Reply-To:References:From;
-        b=a1n57/lwZpPSWlc7Ixfv6IBAoF8dCTAlm6bRXf8Jv6AgJRvqqHRwYdPMI+8ej25eE
-         d3waAKaAvJlcgp2Wxl0Xia2OELcYiA3mh5IQCUGQQ7SLnhOW/fmldDlSly6VWULN1A
-         RmER2X0/9NoVYF9eXFS2CDw6h2/w2hj+NVF+/+tk=
-Received: from MGW02-ATKLA.omicron.at (localhost [127.0.0.1])
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTP id 4F638A0068
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2020 10:53:28 +0200 (CEST)
-Received: from MGW01-ATKLA.omicron.at (unknown [172.25.62.34])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by MGW02-ATKLA.omicron.at (Postfix) with ESMTPS id 4B438A0062
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Aug 2020 10:53:28 +0200 (CEST)
-Received: from EXC04-ATKLA.omicron.at ([172.22.100.189])
-        by MGW01-ATKLA.omicron.at  with ESMTP id 07O8rSue006416-07O8rSug006416
-        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=CAFAIL);
-        Mon, 24 Aug 2020 10:53:28 +0200
-Received: from marmar13.omicron.at (172.22.32.104) by EXC04-ATKLA.omicron.at
- (172.22.100.189) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 24 Aug
- 2020 10:53:26 +0200
-Message-ID: <6293792d2a4971529ff6f6e3327a2497ad7870c3.camel@omicronenergy.com>
-Subject: Re: [PATCH BlueZ 2/2] src/profile.c: Add a GetProfileInfo method
-From:   Mark Marshall <mark.marshall@omicronenergy.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Mon, 24 Aug 2020 10:53:26 +0200
-In-Reply-To: <CABBYNZ+U+Edyb42oKWgsqVKHCZZDzXR4HRRrK0Rb2vEL_A3aiA@mail.gmail.com>
-References: <20200819150931.3005-1-mark.marshall@omicronenergy.com>
-         <2303f692-bb7c-4851-86fa-befde45b4b32@EXC04-ATKLA.omicron.at>
-         <CABBYNZ+OK4EY9KGHn7oasz4GRfBDJdWNcpOhr1GNGc3D+QtZ-g@mail.gmail.com>
-         <3e98e7dae29ec7be6d67fca6af99f2e0f747375e.camel@omicronenergy.com>
-         <CABBYNZ+U+Edyb42oKWgsqVKHCZZDzXR4HRRrK0Rb2vEL_A3aiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+        id S1725781AbgHXPEM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Aug 2020 11:04:12 -0400
+IronPort-SDR: zh6zJ0Z5U2tHlQVa2TPoc7Cf4dH9FQ8LfNNX+1qvHR0GQGJNSfHLJPZKaRYaEqZ2kSzUdDX6N/
+ cO5ET6zrD/VA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9722"; a="173956284"
+X-IronPort-AV: E=Sophos;i="5.76,349,1592895600"; 
+   d="scan'208";a="173956284"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 08:04:07 -0700
+IronPort-SDR: moR5Yp5G/6o3VTmRDM3ez0UtugBjrHycSTu9lteaTIzN++GtXwgOO+ZJSyEDu0vkS9bAQ3EaMG
+ 9wYti9OlmJ7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,349,1592895600"; 
+   d="scan'208";a="336199094"
+Received: from fmsmsx603-2.cps.intel.com (HELO fmsmsx603.amr.corp.intel.com) ([10.18.84.213])
+  by FMSMGA003.fm.intel.com with ESMTP; 24 Aug 2020 08:04:07 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 24 Aug 2020 08:04:06 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 24 Aug 2020 08:04:06 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 24 Aug 2020 08:04:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DPfYB/3QN0KjthoLxHPAJP4Ynl5K/QK+iEf+Y/THk/CTfaWwR/GrDr20G39Umqt4jvjog+32ZOrFibKUUkqYIb58KhbuZA991ReWmRho8RTb4ctQuDIZDXVS9I/r4noOu8xZ8q9yPOqveUJEVapWmBYWOBmeCDWN//MSvOe9WJvuz/8OhQ9LXjIS7GILbViyfP3hSlghhhY5mPN3h7gf7sxIwozSLRJtsRt5vub2Z336O1aKkjshT1x8lMkgAmsP3D0tGosXR/4yvCMd3F04inWss1zFsFMXxUpkFAiCzeT4/p6+pfADlOq+xF9ufroKBnFOQN/kLSZwn2jwQdrgLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aEanj//a9v3pn8naZLf8Gqfmes1X3zWnQLYl8CndmWA=;
+ b=MTvyoee7ot1B2EMAXCQ2+epoPb5oEFLKMqQiz+ao+1zl8TedtMoogRc0jY7nRidQpKN5PXO3+YbCSY+os7tq+TN5wIaAeyR/fnE2H9cBatbqL5e7OuMSTUOV5UfPpEt8yiLlsz/51KwgjXhI3BQyj3k2pIYZJ9XZR4lemwcEJsXvfxG5VKvxEyz6zhOQncoZqIGI63rjT1jKEupqXZoWH9r2dIpWqxI2a457Nm3fdmfLvFTkeCy3KXqvu4Klm8L0/ztAu4KHAu+yfl0Sk1zjVRSYYB1/cBAvyAmAlGiYX/rXbs6fSiW54YzCtMo7dDnHhYvtgFAemIEcBMoz9K1uCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aEanj//a9v3pn8naZLf8Gqfmes1X3zWnQLYl8CndmWA=;
+ b=R99cbgnkThZcCDHrl8lKsnSUaFaXlWrWP/AEN4mNltSe1QtEXvLUIHQfIMuxFlpOorKpca6XESW0n0XLd8XO0wlgNmqKlETFa3EgEHLIkMl7Lj0W68FiipQoicZEZ5uMp7GFYOZLg+cXDnbsUn5sFywbTbd1Tk/H9IoL4MJxnco=
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
+ by MWHPR11MB1438.namprd11.prod.outlook.com (2603:10b6:301:8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Mon, 24 Aug
+ 2020 15:04:05 +0000
+Received: from MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::6832:48b9:8cd2:7225]) by MW3PR11MB4539.namprd11.prod.outlook.com
+ ([fe80::6832:48b9:8cd2:7225%6]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
+ 15:04:05 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+CC:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+Subject: Re: [PATCH BlueZ 1/4] doc/mesh-api: Add "options" dictionary to
+ Send/Publish
+Thread-Topic: [PATCH BlueZ 1/4] doc/mesh-api: Add "options" dictionary to
+ Send/Publish
+Thread-Index: AQHWecpArCBCyLTwGkGlFXRwZUIh1qlHXAgA
+Date:   Mon, 24 Aug 2020 15:04:05 +0000
+Message-ID: <d4d15630945c28e040a68002d91cebed692b2832.camel@intel.com>
+References: <20200824035415.13420-1-inga.stotland@intel.com>
+         <20200824035415.13420-2-inga.stotland@intel.com>
+In-Reply-To: <20200824035415.13420-2-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 631ddbed-6b95-44d8-c443-08d8483ef1cd
+x-ms-traffictypediagnostic: MWHPR11MB1438:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB1438E9551B3A24E00DC13185E1560@MWHPR11MB1438.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yZKdFrJFFFxgmH32fbilFldykqHaj2hRm1vZ7Hz0SYqxvEphxGOcXU2ufr6WaUPlOU6ZBEQpjuvZ5moLl1bPh++P0GKiSWwWgbYgDMJbIHUFxEXcHyQMR73T1xaoxGR0eiuccRcjLY09GGGTq25wNSMJ8b0uzeJm4nU8CnG4Z+Fn73z5xFX7AcC7CW+8mG5Df8kt/APrx5p5iBqVRwHT/zzt5AQEe8OpENMpO6/ErAYMjUoEX63drSjj9WEjCcqhf0Cfod5rIYtl1nfLEkQmL8RxbhqHr+z6PU9Fox3wuF+uSslb9zcxwTSWMhirqzdYalBQQ7sy2zaeiAZXfkHtyA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(136003)(366004)(39860400002)(376002)(2616005)(6506007)(71200400001)(83380400001)(6486002)(6636002)(8936002)(5660300002)(36756003)(86362001)(4326008)(6512007)(8676002)(110136005)(64756008)(91956017)(2906002)(66556008)(66946007)(316002)(26005)(66446008)(478600001)(76116006)(66476007)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: HZTvbjB2A8U2Kz/A614ahNNF24nfhNtSrdFV/6+uv5Re9gN6/fUfsJVpJzL4gmiL+cyDeuwv9KGXpP9lIyOgMIRXsS4f5kdBEjklZW4s6N877ixHteGNwyopHHQhGCVgNZo7lfALOEGHYnExo0v1zdENC9cKjdu0lV43AEBcIiZnEgdkNgtBXqOSSlpoALqWjfFyXa2wpsLhRVSr/8Nvsw018TC2L4hX0+Nh5Zk/DoZ5rXq+qPuzWAeda4Cnz/fr3iNt/eC/i7HS9iShvd0XD5eD2rGOXxhPx1k/0sOmBbLIB3Mxm3V9ZbBK3xanvuYRh8VjACJ+eGEL6nm+6SxpyvsqEtu6YJlILlVBFUttiwMUfMEDSJi3i5p/LoEVkTjK/p1A8jJVm7dXCpHwNRKA3nxWzDK587+yHWncU4ZxSMRYEHBOc37xizJmirnv7hGkGFmOz1VpsgF6woeWYxp3VBG03+OS9e+mUsx2lqCIiQvzLBo2AW7j0nnftw7M06RpgHiOXeNksNf5UdNE13KnpVYOsWAZcE3hOCNGhmPVGPq+irCNL+bpAh8wszzMSrCUwLNFl98KiGVoW9mrxn0Hm4cwE9PTCypAW12wOK75gQP4gwwqJiXAHSDRrgMQQPc1wV3CypyygwFNiXbElGJjZQ==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <802282A8C02B454ABBDB5D514CEE81DE@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.22.32.104]
-X-ClientProxiedBy: EXC04-ATKLA.omicron.at (172.22.100.189) To
- EXC04-ATKLA.omicron.at (172.22.100.189)
-X-FE-Policy-ID: 1:1:1:SYSTEM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4539.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 631ddbed-6b95-44d8-c443-08d8483ef1cd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2020 15:04:05.4244
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hW+VZe6dJ/r4OStTW0hzrRPx4ar93QQCX3e6YpvfOVLQniq6NYAObVXRSA8Tk+fj8B42FotbTrVpNFzPF46ISA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1438
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2020-08-20 at 09:33 -0700, Luiz Augusto von Dentz wrote:
-> Hi Mark,
-> 
-> On Thu, Aug 20, 2020 at 3:10 AM Mark Marshall
-> <mark.marshall@omicronenergy.com> wrote:
-> > 
-> > On Wed, 2020-08-19 at 11:37 -0700, Luiz Augusto von Dentz wrote:
-> > > Hi Mark,
-> > > 
-> > > On Wed, Aug 19, 2020 at 8:13 AM Mark Marshall
-> > > <mark.marshall@omicronenergy.com> wrote:
-> > > > 
-> > > > Add a GetProfileInfo method to org.bluez.ProfileManager1
-> > > > ---
-> > > >  doc/profile-api.txt | 13 +++++++
-> > > >  src/profile.c       | 93 +++++++++++++++++++++++++++++++++++++++++++++
-> > > >  2 files changed, 106 insertions(+)
-> > > > 
-> > > > diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-> > > > index 8c7d0a06d..d13703ab4 100644
-> > > > --- a/doc/profile-api.txt
-> > > > +++ b/doc/profile-api.txt
-> > > > @@ -133,6 +133,19 @@ Object path        /org/bluez
-> > > > 
-> > > >                         Possible errors: org.bluez.Error.DoesNotExist
-> > > > 
-> > > > +               options GetProfileInfo(object profile, object adapter)
-> > > > +
-> > > > +                       This returns a dictionary of options for the
-> > > > +                       profile.  Values returned are: UUID, Name,
-> > > > +                       Path, Service, Mode and AddressType.  The
-> > > > +                       adapter parameter is optional - if it is
-> > > > +                       non-empty, then two additional values might be
-> > > > +                       returned, if the profile is active on the
-> > > > +                       specified adapter: PSM and Channel.
-> > > > +
-> > > > +                       Possible errors: org.bluez.Error.InvalidArguments
-> > > > +                                        org.bluez.Error.DoesNotExist
-> > > > +
-> > > 
-> > > If this is really required I would be willing to merge something like this:
-> > > 
-> > > https://github.com/Vudentz/BlueZ/commit/9e196f8830511a4102e990d82d06c2e0487b3ad9
-> > > 
-> > > It exposes service objects so you can control exactly what gets
-> > > connect, though now given a second look at this seem to return details
-> > > that the client can query directly on the socket itself like the
-> > > Channel, PSM, Mode, etc, also not sure what is the point on retrieving
-> > > things like UUID, Name, Path if the application is already in control
-> > > of these when registering.
-> > > 
-> > 
-> > I only returned a full dictionary of items here as I was trying to
-> > match RegisterProfile, I don't actually need all of this info.  (I
-> > also thought that the more verbose structure was more useful, but
-> > it is wasteful).
-> > 
-> > The information that I really need is the PSM (or Channel) number.
-> > This information is needed on the server side, and the socket used
-> > is not exposed to anything outside of bluetoothd, as far as I can
-> > tell.  (This is the socket returned from bt_io_listen, in profile.c).
-> 
-> The file descriptor passed on NewConnection is the same socket the
-> daemon uses so you can query things like PSM, etc, using getsockopt
-> just like the daemon does, or do you need it before a connection is
-> made? In which case it might be preferable to write the PSM back to
-> the Property.Set method, that said perhaps it is better to have a PSM
-> set instead of leaving that to be auto allocated since you may not
-> want to change if you need to expose over GATT.
-
-The problem is that NewConnection is too late.  This only gets called
-after the remote side has connected.  The reason that I don't think it
-can be a property, is that the PSM is technically a "per adapter"
-number, it's possible (I think) for BlueZ to auto-allocate a
-different PSM for each adapter.
-
-If I do choose a fixed PSM, are there chances of a collision?
-Would such a collision matter?  I have "complete" control over all
-software on the server, but the client devices are not mine.
-What is the best advice about picking a fixed PSM?
-
-> 
-> > I have my profile auto-select a free PSM, which I thought was the
-> > preferred method.  In the BR/EDR case, this number gets passed to the
-> > peer (I assume through SDP), but in the LE case, where I want to use
-> > LE-L2CAP, there is no defined mechanism to transfer the PSM.  My plan
-> > was to expose it as a GATT attribute, but this mechanism is not
-> > standardised, so I didn't think BlueZ would want to be involved?
-> 
-> BlueZ don't need to get involved directly but you can have vendor
-> specific GATT service that expose the PSM so the remote side can learn
-> about it and connect.
-> 
-> > Would a simpler interface that just returned the PSM or Channel number
-> > be better?  Is there another way to find out the PSM of a listening
-> > socket, on the server, before a connection is made?
-> 
-> For auto allocation I would make actually make the properties
-> writable, though it seems we don't have any properties on Profile1 so
-> we would need to create then in order to reflect the options that can
-> be passed over on RegisterProfile.
-> 
-> > (From my reading of the above patch, the service object is created
-> > as a link between a "profile" and a "device".  In my case, I think
-> > there is no service object yet, as I have no device connection?)
-> 
-> 
-> 
-> > 
-> > > >  Profile hierarchy
-> > > >  =================
-> > > > diff --git a/src/profile.c b/src/profile.c
-> > > > index 10850f305..e287a66d7 100644
-> > > > --- a/src/profile.c
-> > > > +++ b/src/profile.c
-> > > > @@ -2509,6 +2509,96 @@ static DBusMessage *unregister_profile(DBusConnection *conn,
-> > > >         return dbus_message_new_method_return(msg);
-> > > >  }
-> > > > 
-> > > > +static DBusMessage *get_profile_info(DBusConnection *conn,
-> > > > +                                       DBusMessage *msg, void *user_data)
-> > > > +{
-> > > > +       DBusMessage *reply;
-> > > > +       DBusMessageIter iter, dict;
-> > > > +       const char *path, *adapter, *sender;
-> > > > +       struct ext_profile *ext;
-> > > > +       uint16_t u16;
-> > > > +       GSList *l, *next;
-> > > > +
-> > > > +       sender = dbus_message_get_sender(msg);
-> > > > +
-> > > > +       DBG("sender %s", sender);
-> > > > +
-> > > > +       if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-> > > > +                                  DBUS_TYPE_OBJECT_PATH, &adapter,
-> > > > +                                  DBUS_TYPE_INVALID)) {
-> > > > +               return btd_error_invalid_args(msg);
-> > > > +       }
-> > > > +
-> > > > +       if (adapter && !*adapter)
-> > > > +               adapter = NULL;
-> > > > +
-> > > > +       ext = find_ext_profile(sender, path);
-> > > > +       if (!ext)
-> > > > +               return btd_error_does_not_exist(msg);
-> > > > +
-> > > > +       reply = dbus_message_new_method_return(msg);
-> > > > +
-> > > > +       dbus_message_iter_init_append(reply, &iter);
-> > > > +
-> > > > +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-> > > > +                                        "{sv}", &dict);
-> > > > +
-> > > > +       g_dbus_dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING,
-> > > > +                                &ext->uuid);
-> > > > +       if (ext->name) {
-> > > > +               g_dbus_dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
-> > > > +                                        &ext->name);
-> > > > +       }
-> > > > +       if (ext->path) {
-> > > > +               g_dbus_dict_append_entry(&dict, "Path", DBUS_TYPE_STRING,
-> > > > +                                        &ext->path);
-> > > > +       }
-> > > > +       if (ext->service) {
-> > > > +               g_dbus_dict_append_entry(&dict, "Service", DBUS_TYPE_STRING,
-> > > > +                                        &ext->service);
-> > > > +       }
-> > > > +
-> > > > +       u16 = ext->mode;
-> > > > +       g_dbus_dict_append_entry(&dict, "Mode", DBUS_TYPE_UINT16,
-> > > > +                                &u16);
-> > > > +
-> > > > +       u16 = ext->addr_type;
-> > > > +       g_dbus_dict_append_entry(&dict, "AddressType", DBUS_TYPE_UINT16,
-> > > > +                                &u16);
-> > > > +
-> > > > +       if (adapter) {
-> > > > +               for (l = ext->servers; l != NULL; l = next) {
-> > > > +                       struct ext_io *server = l->data;
-> > > > +                       const char *ctype;
-> > > > +
-> > > > +                       DBG("server:%p  %d %d psm:%d chan:%d",
-> > > > +                           server, server->resolving, server->connected,
-> > > > +                           server->psm, server->chan);
-> > > > +
-> > > > +                       next = g_slist_next(l);
-> > > > +
-> > > > +                       if (strcmp(adapter, adapter_get_path(server->adapter)))
-> > > > +                               continue;
-> > > > +
-> > > > +                       if (server->proto == BTPROTO_L2CAP) {
-> > > > +                               ctype = "PSM";
-> > > > +                               u16 = server->psm;
-> > > > +                       } else if (server->proto == BTPROTO_RFCOMM) {
-> > > > +                               ctype = "Channel";
-> > > > +                               u16 = server->chan;
-> > > > +                       } else {
-> > > > +                               continue;
-> > > > +                       }
-> > > > +                       g_dbus_dict_append_entry(
-> > > > +                               &dict, ctype, DBUS_TYPE_UINT16, &u16);
-> > > > +               }
-> > > > +       }
-> > > > +
-> > > > +       dbus_message_iter_close_container(&iter, &dict);
-> > > > +
-> > > > +       return reply;
-> > > > +}
-> > > > +
-> > > >  static const GDBusMethodTable methods[] = {
-> > > >         { GDBUS_METHOD("RegisterProfile",
-> > > >                         GDBUS_ARGS({ "profile", "o"}, { "UUID", "s" },
-> > > > @@ -2516,6 +2606,9 @@ static const GDBusMethodTable methods[] = {
-> > > >                         NULL, register_profile) },
-> > > >         { GDBUS_METHOD("UnregisterProfile", GDBUS_ARGS({ "profile", "o" }),
-> > > >                         NULL, unregister_profile) },
-> > > > +       { GDBUS_METHOD("GetProfileInfo",
-> > > > +                       GDBUS_ARGS({ "profile", "o" }, { "adapter", "o" }),
-> > > > +                       GDBUS_ARGS({ "options", "a{sv}" }), get_profile_info) },
-> > > >         { }
-> > > >  };
-> > > > 
-> > > > --
-> > > > 2.17.1
-> > > > 
-> > > 
-> > > 
-> 
-> 
-
+T24gU3VuLCAyMDIwLTA4LTIzIGF0IDIwOjU0IC0wNzAwLCBJbmdhIFN0b3RsYW5kIHdyb3RlOg0K
+PiBUaGlzIG1vZGlmaWVzIFNlbmQsIERldktleVNlbmQsIFB1Ymxpc2ggJiBWZW5kb3JQdWJsaXNo
+IG1ldGhvZHMNCj4gb24gbWVzaC5Ob2RlIGludGVyZmFjZSB0byBpbmNsdWRlIGFkZGl0aW9uYWwg
+YXJndW1lbnQgIm9wdGlvbnMiLg0KPiBUaGlzIG5ldyBhcmd1bWVudCBpcyBhIGRpY3Rpb25hcnkg
+dGhhdCBjdXJyZW50bHkgaGFzIG9ubHkgb25lDQo+IG5ldyBrZXkgd29yZCBkZWZpbmVkOg0KPiAg
+ICAgIkZvcmNlU2VnbWVudGVkIiAtIHRvIGZvcmNlIHNtYWxsIHBheWxvYWRzIHRvIGJlIHNlbnQg
+YXMNCj4gICAgIAkJICAgICAgb25lLXNlZ21lbnQgbWVzc2FnZXMNCj4gDQo+IE90aGVyIGtleSB3
+b3JkcyBtYXkgYmUgZGVmaW5lZCBpbiBmdXR1cmUgdG8gYWNjb21tb2RhdGUgZXZvbHZpbmcNCj4g
+cmVxdWlyZW1lbnRzIG9mIE1lc2ggUHJvZmlsZSBzcGVjaWZpY2F0aW9uLg0KPiAtLS0NCj4gIGRv
+Yy9tZXNoLWFwaS50eHQgfCA0NyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrLS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDQzIGluc2VydGlvbnMoKyksIDQgZGVsZXRp
+b25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZG9jL21lc2gtYXBpLnR4dCBiL2RvYy9tZXNoLWFw
+aS50eHQNCj4gaW5kZXggNDk1Zjk1YjBiLi5mODM2MTQyYTcgMTAwNjQ0DQo+IC0tLSBhL2RvYy9t
+ZXNoLWFwaS50eHQNCj4gKysrIGIvZG9jL21lc2gtYXBpLnR4dA0KPiBAQCAtMjI5LDcgKzIyOSw3
+IEBAIE9iamVjdCBwYXRoCS9vcmcvYmx1ZXovbWVzaC9ub2RlPHV1aWQ+DQo+ICANCj4gIA0KPiAt
+CXZvaWQgUHVibGlzaChvYmplY3QgZWxlbWVudF9wYXRoLCB1aW50MTYgbW9kZWwsIGFycmF5e2J5
+dGV9IGRhdGEpDQo+ICsJdm9pZCBQdWJsaXNoKG9iamVjdCBlbGVtZW50X3BhdGgsIHVpbnQxNiBt
+b2RlbCwgZGljdCBvcHRpb25zLA0KPiArCQkJCQkJCWFycmF5e2J5dGV9IGRhdGEpDQo+ICANCj4g
+IAkJVGhpcyBtZXRob2QgaXMgdXNlZCB0byBzZW5kIGEgcHVibGljYXRpb24gb3JpZ2luYXRlZCBi
+eSBhIGxvY2FsDQo+ICAJCW1vZGVsLiBJZiB0aGUgbW9kZWwgZG9lcyBub3QgZXhpc3QsIG9yIGl0
+IGhhcyBubyBwdWJsaWNhdGlvbg0KPiBAQCAtMzU4LDYgKzM3NSwxNyBAQCBNZXRob2RzOg0KPiAg
+CQlUaGUgbW9kZWwgcGFyYW1ldGVyIGNvbnRhaW5zIGEgbW9kZWwgSUQsIGFzIGRlZmluZWQgYnkg
+dGhlDQo+ICAJCUJsdWV0b290aCBTSUcuDQo+ICANCj4gKwkJVGhlIG9wdGlvbnMgcGFyYW1ldGVy
+IGlzIGEgZGljdGlvbmFyeSB3aXRoIHRoZSBmb2xsb3dpbmcga2V5cw0KPiArCQlkZWZpbmVkOg0K
+PiArDQo+ICsJCQlib29sIEZvcmNlU2VnbWVudGVkDQo+ICsJCQkJU3BlY2lmaWVzIHdoZXRoZXIg
+dG8gZm9yY2Ugc2VuZGluZyBvZiBhIHNob3J0DQo+ICsJCQkJbWVzc2FnZSBhcyBvbmUtc2VnbWVu
+dCBwYXlsb2FkLiBJZiBub3QgcHJlc2VudCwNCj4gKwkJCQl0aGUgZGVmYXVsdCBzZXR0aW5nIGlz
+ICJmYWxzZSIuDQo+ICsNCj4gKwkJVGhlIGRhdGEgcGFyYW1ldGVyIGlzIGFuIG91dGdvaW5nIG1l
+c3NhZ2UgdG8gYmUgZW5jeXB0ZWQgYnkgdGhlDQo+ICsJCW1lc2hkIGRhZW1vbiBhbmQgc2VudCBv
+bi4NCj4gKw0KPiAgCQlTaW5jZSBvbmx5IG9uZSBQdWJsaXNoIHJlY29yZCBtYXkgZXhpc3QgcGVy
+IGVsZW1lbnQtbW9kZWwsIHRoZQ0KPiAgCQlkZXN0aW5hdGlvbiBhbmQga2V5X2luZGV4IGFyZSBv
+YnRhaW5lZCBmcm9tIHRoZSBQdWJsaWNhdGlvbg0KPiAgCQlyZWNvcmQgY2FjaGVkIGJ5IHRoZSBk
+YWVtb24uDQo+IEBAIC0zNjcsNyArMzk1LDcgQEAgTWV0aG9kczoNCj4gIAkJCW9yZy5ibHVlei5t
+ZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMNCj4gIA0KPiAgCXZvaWQgVmVuZG9yUHVibGlzaChv
+YmplY3QgZWxlbWVudF9wYXRoLCB1aW50MTYgdmVuZG9yLCB1aW50MTYgbW9kZWxfaWQsDQo+IC0J
+CQkJCQkJYXJyYXl7Ynl0ZX0gZGF0YSkNCj4gKwkJCQkJCWRpY3Qgb3B0aW9ucywgYXJyYXl7Ynl0
+ZX0gZGF0YSkNCg0KSSB3b25kZXIgaWYgd2Ugc2hvdWxkIHRha2UgdGhpcyBvcHBvcnR1bml0eSB0
+byBlbGltaW5hdGUgdGhpcyBNZXRob2QgaW4gZmF2b3Igb2YgYWRkaW5nIGEgVmVuZG9yIGtleSB0
+byB0aGUgbmV3DQpkaWN0aW9uYXJ5IGluIFB1Ymxpc2goKS4gIElmIHRoZSBrZXkgaXMgbWlzc2lu
+ZywgdGhlbiBmcm9tIHRoZSBkaWN0aW9uYXJ5IGluIFB1Ymxpc2goKSwgdGhlbiBpdCBpcyBhIFNp
+Zw0KZGVmaW5lZCBtb2RlbCwgYW5kIGlmIHByZXNlbnQsIHRoZW4gaXQgb3BlcmF0aW5nIGxpa2Ug
+dGhlIGN1cnJlbnQgUHVibGlzaFZlbmRvcigpLiAgVGhpcyB3b3VsZCBzaW1wbGlmeSB0aGUNCmNv
+ZGUgaW4gdGhlIGRhZW1vbiwgYW5kIG1ha2UgYSBzbWFsbGVyIGNvZGUgZm9vdHByaW50Lg0KDQo+
+ICANCj4gIAkJVGhpcyBtZXRob2QgaXMgdXNlZCB0byBzZW5kIGEgcHVibGljYXRpb24gb3JpZ2lu
+YXRlZCBieSBhIGxvY2FsDQo+ICAJCXZlbmRvciBtb2RlbC4gSWYgdGhlIG1vZGVsIGRvZXMgbm90
+IGV4aXN0LCBvciBpdCBoYXMgbm8NCj4gQEAgLTM4Myw2ICs0MTEsMTcgQEAgTWV0aG9kczoNCj4g
+IAkJVGhlIG1vZGVsX2lkIHBhcmFtZXRlciBpcyBhIDE2LWJpdCB2ZW5kb3ItYXNzaWduZWQgTW9k
+ZWwNCj4gIAkJSWRlbnRpZmllci4NCj4gIA0KPiArCQlUaGUgb3B0aW9ucyBwYXJhbWV0ZXIgaXMg
+YSBkaWN0aW9uYXJ5IHdpdGggdGhlIGZvbGxvd2luZyBrZXlzDQo+ICsJCWRlZmluZWQ6DQo+ICsN
+Cj4gKwkJCWJvb2wgRm9yY2VTZWdtZW50ZWQNCj4gKwkJCQlTcGVjaWZpZXMgd2hldGhlciB0byBm
+b3JjZSBzZW5kaW5nIG9mIGEgc2hvcnQNCj4gKwkJCQltZXNzYWdlIGFzIG9uZS1zZWdtZW50IHBh
+eWxvYWQuIElmIG5vdCBwcmVzZW50LA0KPiArCQkJCXRoZSBkZWZhdWx0IHNldHRpbmcgaXMgImZh
+bHNlIi4NCj4gKw0KPiArDQo=
