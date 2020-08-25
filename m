@@ -1,4 +1,4 @@
-Return-Path: <SRS0=dZ4y=CC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=aWoj=CD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,42 +6,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C39AC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 20:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2701DC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Aug 2020 00:54:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 202B62067C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Aug 2020 20:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11D532087D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Aug 2020 00:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726519AbgHXUJy (ORCPT
+        id S1728371AbgHYAym (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Aug 2020 16:09:54 -0400
-Received: from mga17.intel.com ([192.55.52.151]:59571 "EHLO mga17.intel.com"
+        Mon, 24 Aug 2020 20:54:42 -0400
+Received: from mga02.intel.com ([134.134.136.20]:44191 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725946AbgHXUJy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Aug 2020 16:09:54 -0400
-IronPort-SDR: JBZtKgQJK8KRoRxqoiAfbhNMiRwUy2SRlrRHa7MI3g3V6VJkXZwJpSSADhWw3my+AqpZWy6NPR
- Ne+fgG21KHPw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="136046020"
-X-IronPort-AV: E=Sophos;i="5.76,349,1592895600"; 
-   d="scan'208";a="136046020"
+        id S1728352AbgHYAyk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Aug 2020 20:54:40 -0400
+IronPort-SDR: kdCLiXOH0NePraQIvD2KGxE8WS3IkNSrUV8Htw0FKCM6pti+JmYYuwOQ9QE35zai2Eyw72K9UV
+ SFAzqX7Jxavw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="143797442"
+X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
+   d="scan'208";a="143797442"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 13:09:53 -0700
-IronPort-SDR: wbty+Va7ePbZTVMjxryGzdw4jeuSNoxdjxo3m5o9C1TZSzSx5HW5dqcV6R5MTj64NbPmecHp3p
- zg9FsVsNAfzg==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 17:54:40 -0700
+IronPort-SDR: E4rEponhjLdmNFMt3a6mFfNhCoVcA+rTj0dGUtHrv/TQnK8QV5ujoGsnSTVEtgXBmuDJsr1fn3
+ VjdgS4qhYBRQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,349,1592895600"; 
-   d="scan'208";a="294727631"
+X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
+   d="scan'208";a="474141834"
 Received: from apaharia-mobl.gar.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.255.231.108])
-  by orsmga003.jf.intel.com with ESMTP; 24 Aug 2020 13:09:53 -0700
+  by orsmga005.jf.intel.com with ESMTP; 24 Aug 2020 17:54:39 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Store key indices as integers in node config
-Date:   Mon, 24 Aug 2020 13:09:52 -0700
-Message-Id: <20200824200952.20818-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2 1/4] doc/mesh-api: Add "options" dictionary to Send/Publish
+Date:   Mon, 24 Aug 2020 17:54:32 -0700
+Message-Id: <20200825005435.26566-2-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200825005435.26566-1-inga.stotland@intel.com>
+References: <20200825005435.26566-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -49,206 +51,138 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Store NetKey and AppKey indices as integers instead of hex strings.
-This removes unnecessary sting manipulationswhile not affecting
-configuration file readability.
----
- mesh/mesh-config-json.c | 102 +++++++++++++++-------------------------
- 1 file changed, 38 insertions(+), 64 deletions(-)
+This modifies Send, DevKeySend and Publish methods
+on mesh.Node interface to include additional argument "options".
+This new argument is a dictionary that currently has only one
+new key word defined for Send() and DevKeySend():
+    "ForceSegmented" - to force small payloads to be sent as
+    		      one-segment messages
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 63b6c3988..30c90170d 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -249,21 +249,31 @@ static void jarray_string_del(json_object *jarray, char *str, size_t len)
- 	}
- }
+In case of Publish(), and additional keyword is defined
+     "Vendor" -  16-bit Company ID as defined by the Bluetooth SIG
+
+Other key words may be defined in future to accommodate evolving
+requirements of Mesh Profile specification.
+
+Also, the addition of "options" dictionary to Publish allows to
+eliminate VendorPublish() method (taken care by "Vendor" keyword).
+---
+ doc/mesh-api.txt | 57 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 33 insertions(+), 24 deletions(-)
+
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index 495f95b0b..cae80d694 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -229,7 +229,7 @@ Object path	/org/bluez/mesh/node<uuid>
  
-+static bool get_key_index(json_object *jobj, const char *keyword,
-+								uint16_t *index)
-+{
-+	int idx;
+ Methods:
+ 	void Send(object element_path, uint16 destination, uint16 key_index,
+-							array{byte} data)
++						dict options, array{byte} data)
+ 
+ 		This method is used to send a message originated by a local
+ 		model.
+@@ -248,6 +248,14 @@ Methods:
+ 		this element. Otherwise, org.bluez.mesh.Error.NotAuthorized will
+ 		be returned.
+ 
++		The options parameter is a dictionary with the following keys
++		defined:
 +
-+	if (!get_int(jobj, keyword, &idx))
-+		return false;
++			bool ForceSegmented
++				Specifies whether to force sending of a short
++				message as one-segment payload. If not present,
++				the default setting is "false".
 +
-+	if (!CHECK_KEY_IDX_RANGE(idx))
-+		return false;
+ 		The data parameter is an outgoing message to be encypted by the
+ 		bluetooth-meshd daemon and sent on.
+ 
+@@ -257,7 +265,7 @@ Methods:
+ 			org.bluez.mesh.Error.NotFound
+ 
+ 	void DevKeySend(object element_path, uint16 destination, boolean remote,
+-					uint16 net_index, array{byte} data)
++			uint16 net_index, dict options, array{byte} data)
+ 
+ 		This method is used to send a message originated by a local
+ 		model encoded with the device key of the remote node.
+@@ -279,6 +287,14 @@ Methods:
+ 		The net_index parameter is the subnet index of the network on
+ 		which the message is to be sent.
+ 
++		The options parameter is a dictionary with the following keys
++		defined:
 +
-+	*index = (uint16_t) idx;
-+	return true;
-+}
++			bool ForceSegmented
++				Specifies whether to force sending of a short
++				message as one-segment payload. If not present,
++				the default setting is "false".
 +
- static json_object *get_key_object(json_object *jarray, uint16_t idx)
- {
- 	int i, sz = json_object_array_length(jarray);
+ 		The data parameter is an outgoing message to be encypted by the
+ 		meshd daemon and sent on.
  
- 	for (i = 0; i < sz; ++i) {
--		json_object *jentry, *jvalue;
--		const char *str;
-+		json_object *jentry;
- 		uint16_t jidx;
+@@ -344,7 +360,8 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.NotFound
  
- 		jentry = json_object_array_get_idx(jarray, i);
--		if (!json_object_object_get_ex(jentry, "index", &jvalue))
--			return NULL;
--
--		str = json_object_get_string(jvalue);
--		if (sscanf(str, "%04hx", &jidx) != 1)
-+		if (!get_key_index(jentry, "index", &jidx))
- 			return NULL;
+-	void Publish(object element_path, uint16 model, array{byte} data)
++	void Publish(object element_path, uint16 model, dict options,
++							array{byte} data)
  
- 		if (jidx == idx)
-@@ -273,28 +283,6 @@ static json_object *get_key_object(json_object *jarray, uint16_t idx)
- 	return NULL;
- }
+ 		This method is used to send a publication originated by a local
+ 		model. If the model does not exist, or it has no publication
+@@ -358,30 +375,21 @@ Methods:
+ 		The model parameter contains a model ID, as defined by the
+ 		Bluetooth SIG.
  
--static bool get_key_index(json_object *jobj, const char *keyword,
--								uint16_t *index)
--{
--	uint16_t idx;
--	json_object *jvalue;
--	const char *str;
+-		Since only one Publish record may exist per element-model, the
+-		destination and key_index are obtained from the Publication
+-		record cached by the daemon.
 -
--	if (!json_object_object_get_ex(jobj, keyword, &jvalue))
--		return false;
+-		Possible errors:
+-			org.bluez.mesh.Error.DoesNotExist
+-			org.bluez.mesh.Error.InvalidArguments
 -
--	str = json_object_get_string(jvalue);
+-	void VendorPublish(object element_path, uint16 vendor, uint16 model_id,
+-							array{byte} data)
 -
--	if (sscanf(str, "%04hx", &idx) != 1)
--		return false;
--
--	if (!CHECK_KEY_IDX_RANGE(idx))
--		return false;
--
--	*index = (uint16_t) idx;
--	return true;
--}
--
- static void jarray_key_del(json_object *jarray, int16_t idx)
- {
- 	int i, sz = json_object_array_length(jarray);
-@@ -594,11 +582,23 @@ fail:
- 	return false;
- }
+-		This method is used to send a publication originated by a local
+-		vendor model. If the model does not exist, or it has no
+-		publication record, the method returns
+-		org.bluez.mesh.Error.DoesNotExist error.
++		The options parameter is a dictionary with the following keys
++		defined:
  
-+static bool write_int(json_object *jobj, const char *desc, int val)
-+{
-+	json_object *jvalue;
+-		The element_path parameter is the object path of an element from
+-		a collection of the application elements (see Mesh Application
+-		Hierarchy section).
++			bool ForceSegmented
++				Specifies whether to force sending of a short
++				message as one-segment payload. If not present,
++				the default setting is "false".
++				uint16 Vendor
+ 
+-		The vendor parameter is a 16-bit Bluetooth-assigned Company ID.
++			uint16 Vendor
++				A 16-bit Company ID as defined by the
++				Bluetooth SIG
+ 
+-		The model_id parameter is a 16-bit vendor-assigned Model
+-		Identifier.
++		The data parameter is an outgoing message to be encypted by the
++		meshd daemon and sent on.
+ 
+ 		Since only one Publish record may exist per element-model, the
+ 		destination and key_index are obtained from the Publication
+@@ -391,6 +399,7 @@ Methods:
+ 			org.bluez.mesh.Error.DoesNotExist
+ 			org.bluez.mesh.Error.InvalidArguments
+ 
 +
-+	jvalue = json_object_new_int(val);
-+	if (!jvalue)
-+		return false;
-+
-+	json_object_object_del(jobj, desc);
-+	json_object_object_add(jobj, desc, jvalue);
-+	return true;
-+}
-+
- bool mesh_config_net_key_add(struct mesh_config *cfg, uint16_t idx,
- 							const uint8_t key[16])
- {
--	json_object *jnode, *jarray = NULL, *jentry = NULL, *jstring;
--	char buf[5];
-+	json_object *jnode, *jarray = NULL, *jentry = NULL;
+ Properties:
+ 	dict Features [read-only]
  
- 	if (!cfg)
- 		return false;
-@@ -618,13 +618,9 @@ bool mesh_config_net_key_add(struct mesh_config *cfg, uint16_t idx,
- 	if (!jentry)
- 		return false;
- 
--	snprintf(buf, 5, "%4.4x", idx);
--	jstring = json_object_new_string(buf);
--	if (!jstring)
-+	if (!write_int(jentry, "index", idx))
- 		goto fail;
- 
--	json_object_object_add(jentry, "index", jstring);
--
- 	if (!add_key_value(jentry, "key", key))
- 		goto fail;
- 
-@@ -724,8 +720,7 @@ bool mesh_config_write_token(struct mesh_config *cfg, uint8_t *token)
- bool mesh_config_app_key_add(struct mesh_config *cfg, uint16_t net_idx,
- 					uint16_t app_idx, const uint8_t key[16])
- {
--	json_object *jnode, *jarray = NULL, *jentry = NULL, *jstring = NULL;
--	char buf[5];
-+	json_object *jnode, *jarray = NULL, *jentry = NULL;
- 
- 	if (!cfg)
- 		return false;
-@@ -744,20 +739,12 @@ bool mesh_config_app_key_add(struct mesh_config *cfg, uint16_t net_idx,
- 	if (!jentry)
- 		return false;
- 
--	snprintf(buf, 5, "%4.4x", app_idx);
--	jstring = json_object_new_string(buf);
--	if (!jstring)
-+	if (!write_int(jentry, "index", app_idx))
- 		goto fail;
- 
--	json_object_object_add(jentry, "index", jstring);
--
--	snprintf(buf, 5, "%4.4x", net_idx);
--	jstring = json_object_new_string(buf);
--	if (!jstring)
-+	if (!write_int(jentry, "boundNetKey", net_idx))
- 		goto fail;
- 
--	json_object_object_add(jentry, "boundNetKey", jstring);
--
- 	if (!add_key_value(jentry, "key", key))
- 		goto fail;
- 
-@@ -995,6 +982,7 @@ static struct mesh_config_pub *parse_model_publication(json_object *jpub)
- 	case 32:
- 		if (!str2hex(str, len, pub->virt_addr, 16))
- 			goto fail;
-+
- 		pub->virt = true;
- 		break;
- 	default:
-@@ -1468,19 +1456,6 @@ static bool write_uint32_hex(json_object *jobj, const char *desc, uint32_t val)
- 	return true;
- }
- 
--static bool write_int(json_object *jobj, const char *desc, int val)
--{
--	json_object *jvalue;
--
--	jvalue = json_object_new_int(val);
--	if (!jvalue)
--		return false;
--
--	json_object_object_del(jobj, desc);
--	json_object_object_add(jobj, desc, jvalue);
--	return true;
--}
--
- static const char *mode_to_string(int mode)
- {
- 	switch (mode) {
-@@ -1872,7 +1847,7 @@ bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t ele_addr,
- 	if (!res)
- 		goto fail;
- 
--	if (!write_uint16_hex(jpub, "index", pub->idx))
-+	if (!write_int(jpub, "index", pub->idx))
- 		goto fail;
- 
- 	if (!write_int(jpub, "ttl", pub->ttl))
-@@ -1881,8 +1856,7 @@ bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t ele_addr,
- 	if (!write_int(jpub, "period", pub->period))
- 		goto fail;
- 
--	if (!write_int(jpub, "credentials",
--						pub->credential ? 1 : 0))
-+	if (!write_int(jpub, "credentials", pub->credential ? 1 : 0))
- 		goto fail;
- 
- 	jrtx = json_object_new_object();
 -- 
 2.26.2
 
