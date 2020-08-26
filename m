@@ -2,102 +2,122 @@ Return-Path: <SRS0=or7B=CE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E32C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C110CC433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 22:26:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDBAC207DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:28:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 925C120678
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 22:26:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rh2W6g/r"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Z8h3jmnp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726825AbgHZU2x (ORCPT
+        id S1726929AbgHZW0z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Aug 2020 16:28:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58618 "EHLO
+        Wed, 26 Aug 2020 18:26:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726739AbgHZU2w (ORCPT
+        with ESMTP id S1726802AbgHZW0r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Aug 2020 16:28:52 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AD8C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:28:51 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id n129so3551161qkd.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:28:51 -0700 (PDT)
+        Wed, 26 Aug 2020 18:26:47 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74942C061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 15:26:46 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id q93so1654053pjq.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 15:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=CQhIl4nHHwVJWKs3yK9yKLoxI0mRlCyp2xDolKEbfKw=;
-        b=rh2W6g/rLvSLnlVOlj+1HfRFaE8CdrvTTQ4PbBM/punKjH+fTrGlkPeg+fhmC5Xyj1
-         v5AFwWmw//5v5acHXamTy1w1Oyu/Jf21Ess57OMcyQfixWFqBsvgEKdeaqK3D7UKN4Du
-         xYHXjDYK2zazCblwRH/hsMt4YXkSNd/2hEzsErnCW5X9WYiIaW7Qcvl2eXT3hyTbXbCz
-         FkUnkpOQi7z56pYb+lCh66hCwkaujjxNWhVr5mJVyjuPLgroKIL8DqZP/9w2SJEH4egG
-         tmG+drXhWGvj34ugYsFmz3Ydo4ktW0oKaYPVP9Jv/ThGl71HemtIUaPx7npR3zu26jKN
-         mjow==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PkRfetQcp2SyPXpao4+ZMmtYtLe8fTRZhlCz7rJNi6U=;
+        b=Z8h3jmnpWF7n+FdysrKDsbSu7wBGc3eoFbM9dho9msL4PB9dDMXlpeV0H31eSQU1b5
+         r3Aa61QUvEgghcmBcRl7X0J61lByqkSl+w6XEBC6D9t5MhDazODWG9IPN4xaXe/bqFz8
+         qBNNeC18oZI1SgMDRENNkDP44pLgtiWwwXtr4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=CQhIl4nHHwVJWKs3yK9yKLoxI0mRlCyp2xDolKEbfKw=;
-        b=QFvwBEeNpacBNuJF5fA3+1iRft2bR2+kNTGfRWg7nHCympjl2zFrmsZT3nkVckZ2NK
-         fukyYVdBAsblZRszr5NqV1ZPbFoX1tmbyjFfW2NoeOxZYL3MoG1Ez2tsB79Ip6RkjuSJ
-         hxG00R3uDSQryWdGCidOEUQzAqAMV6uu2kEsXTgEp8aUiwrKzukrif1pLjW9X1JLEXKt
-         ehwNjLPehtWrj5vcAU+TfBFwHnGHbMI+BfznIniDL1Rz5wSaLvi9I2XFMgIjqqL//63B
-         n8y7fN0FfMtZDWqG3Hc6vJNzDAEHcGlXmHqLLuptTq+7z+ZWbmk3Mzj9lqx4UYX54qqP
-         SAlA==
-X-Gm-Message-State: AOAM533q8JUlutT+hz1DCyNL99ym91TMmBEGvbILW0zxtrzAqHkqpqbi
-        t+Y1IyDVza/kjpEKy6eF7uUO4p8QcdQ=
-X-Google-Smtp-Source: ABdhPJwa33zamg473GBXrHBYYGMJ1YY/Aaxljr+qTzvN4ukUuPVHWas80qZOkSsMNA13+tsqB4LLgg==
-X-Received: by 2002:a05:620a:1525:: with SMTP id n5mr15552829qkk.126.1598473730804;
-        Wed, 26 Aug 2020 13:28:50 -0700 (PDT)
-Received: from [172.17.0.2] ([52.254.1.170])
-        by smtp.gmail.com with ESMTPSA id i18sm49404qtv.39.2020.08.26.13.28.50
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PkRfetQcp2SyPXpao4+ZMmtYtLe8fTRZhlCz7rJNi6U=;
+        b=nJJ/iTevoB1xKly+s6VsR/LmNOtIt/vyFYbVWmWSz36036saZLCbscvv2eP6A8cAl3
+         59fDUhHQ4okEGyYBshgP1oQONP//v02kjyaltd7T0TpHX6/dqSiy+wvgxChWdKXfAxhg
+         NEHowJe3xay9K7nJ3vYL+1gP6sE2PFC28v5+rid12syS7gAORuPzPn394WKJfqWbl9d8
+         hcM5hdsaiDVwckunB2ITUlXlG9E5Mw2RGNmrIv2bgDIWbW6GNCrNAcUSgGv0DElH2cXq
+         TtsD/FiA6VtLRUO3YApFl82Nfy3nJ7VuFjdZfHZttd3DU6RxTbgsNRpj+qXu+oiO6AxN
+         02Zg==
+X-Gm-Message-State: AOAM533dDcR6uk4dpXLUQ+mRF33rYkC64KDHNbcXO5l7cH8HMdzqIrRE
+        LKRYLfWzFD2MUoITXhQZKX/d+Q==
+X-Google-Smtp-Source: ABdhPJwtq/aSnkaRCd+AVsIZIusn3TQlRtKEGYCH0S1le5PKTs+SyjZKUXXLlrqQjBHKw/Nd6anXZg==
+X-Received: by 2002:a17:90b:3ce:: with SMTP id go14mr2017340pjb.162.1598480805822;
+        Wed, 26 Aug 2020 15:26:45 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id x19sm204076pfq.43.2020.08.26.15.26.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 13:28:50 -0700 (PDT)
-Message-ID: <5f46c602.1c69fb81.7ac52.04e2@mx.google.com>
-Date:   Wed, 26 Aug 2020 13:28:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5321790126634835349=="
+        Wed, 26 Aug 2020 15:26:45 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH] Bluetooth: Clear suspend tasks on unregister
+Date:   Wed, 26 Aug 2020 15:26:39 -0700
+Message-Id: <20200826152623.1.I24fb6cc377d03d64d74f83cec748afd12ee33e37@changeid>
+X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, danielwinkler@google.com
-Subject: RE: [Bluez,v1,1/3] PRE_UPSTREAM: advertising: Add SupportedFeatures to LEAdvertisingManager1
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200826131103.Bluez.v1.1.Idf2f9f409a4df20b466ba723dd9b729275a5afbf@changeid>
-References: <20200826131103.Bluez.v1.1.Idf2f9f409a4df20b466ba723dd9b729275a5afbf@changeid>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5321790126634835349==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+While unregistering, make sure to clear the suspend tasks before
+cancelling the work. If the unregister is called during resume from
+suspend, this will unnecessarily add 2s to the resume time otherwise.
 
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkgitlint Failed
-
-Outputs:
-1: T1 Title exceeds max length (73>72): "PRE_UPSTREAM: advertising: Add SupportedFeatures to LEAdvertisingManager1"
-
-
-
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
-Regards,
-Linux Bluetooth
+This was discovered with RT8822CE using the btusb driver. This chipset
+will reset on resume during system suspend and was unnecessarily adding
+2s to every resume. Since we're unregistering anyway, there's no harm in
+just clearing the pending events.
 
---===============5321790126634835349==--
+ net/bluetooth/hci_core.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 68bfe57b66250f..ed4cb3479433c0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3442,6 +3442,16 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	}
+ }
+ 
++static void hci_suspend_clear_tasks(struct hci_dev *hdev)
++{
++	int i;
++
++	for (i = 0; i < __SUSPEND_NUM_TASKS; ++i)
++		clear_bit(i, hdev->suspend_tasks);
++
++	wake_up(&hdev->suspend_wait_q);
++}
++
+ static int hci_suspend_wait_event(struct hci_dev *hdev)
+ {
+ #define WAKE_COND                                                              \
+@@ -3785,6 +3795,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	cancel_work_sync(&hdev->power_on);
+ 
+ 	unregister_pm_notifier(&hdev->suspend_notifier);
++	hci_suspend_clear_tasks(hdev);
+ 	cancel_work_sync(&hdev->suspend_prepare);
+ 
+ 	hci_dev_do_close(hdev);
+-- 
+2.28.0.297.g1956fa8f8d-goog
+
