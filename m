@@ -2,112 +2,108 @@ Return-Path: <SRS0=or7B=CE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C11C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF03C433E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11DAE2076C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B89C2076C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="reDgmPuM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YE0+JXZ5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726838AbgHZURe (ORCPT
+        id S1726836AbgHZUUg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Aug 2020 16:17:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
+        Wed, 26 Aug 2020 16:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726809AbgHZURc (ORCPT
+        with ESMTP id S1726820AbgHZUUf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Aug 2020 16:17:32 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03030C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:17:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id y9so4321574ybp.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:17:31 -0700 (PDT)
+        Wed, 26 Aug 2020 16:20:35 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F1EC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:20:34 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id f24so2893265edw.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=PiO+YY0khA5TeZgvkhFxD4wUEHIs5J/uidiQhfjjKHI=;
-        b=reDgmPuMQ+/NY3WaTesgR4ekhIsCpfMhaqBC7u9shCaG39NcHh/PJ+v30oAAXnrLqf
-         EY1oWYTVFzrg1aCIJrUkonr6yVUm2yyV0QSFa+Pl5u9jOKS/17rTwttlmBIyo+bvP+4Z
-         HZctOS1VSPohKpnptG1bHTYLo8BUEeJNJR9MAMvEQ9PZyHdq5QD5N9jzVbQjJ+vii5CE
-         BQiaK38wuRVLdBv1KvjZqO40Ck5agfM6v2teYJphFE2l/fYIzN2H/s7hpfxxBfb5eq4B
-         iiV8g612yRV2iHDb6PzNq4Bc0YiwZWe5YM/sGFxYULxgUPxxPEub3scDZ8GFJi2b4II/
-         7diw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9FyQMjwrR+qRwgsTKniSyNPE9tsU8qToAWdwd9jIpxg=;
+        b=YE0+JXZ5I6p6VvmcTEaMyNIjoxXKBn76HlWhC0VHuRKEO2r4wJwLb+dD0yV7zkLQOR
+         pyGV1q5xxrS62T0DV+TbIHzGfQyjcGpvE9wBljO8JW+uPchwBAM62shW0JrCjx0arZX8
+         dOCQSypaoSJHZWOHN8aXnc29UvrTTWl79SmVzvUx3SKjAldDmcMYdrBVAYZAu+Csl8So
+         u2zrNabp6bHcg2liyjT0c/+2mLazSiHAh7vES69jx/jaGT8T+VBo/+YQ0zECHV23WLuP
+         e+0fII1iKUJU6y+v0UUfm4jyfJY+jW0vW7QR3lYjOBy9vAQofAUY5nyd5tR+8hA+ixuu
+         kJmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=PiO+YY0khA5TeZgvkhFxD4wUEHIs5J/uidiQhfjjKHI=;
-        b=iL/swBjzT2Fn2Z1+T/h37hw6ldPChQORu+YnmC8vf00MIZFZcxEKzXNo2viuhZexiu
-         iXC2wu8ayAsLvl4q9CydF6D+kg09LXWMSCvuokOdy49EDodLaEMVntQFnkCm0MVPEfNg
-         2ONgDCqRLi+jhhx57WmugvxIHnGf3ZYFnBe/kHCUqM6YWN75YrppqVLbTbgPv4rVnvPA
-         8oG6y1m7vHeXaKUSommMpEMK5U9e6TvjYmkHreM7pPj+B7OKgjYSysbr3eAafjrEkhYJ
-         25rOXa4ow3MSAY/nkND5L5na0iF0Me9HDVqxEgEcYQVze9/tG84WtNX5s8ZplOrR3kNG
-         XSug==
-X-Gm-Message-State: AOAM532B7bzHnzu5aKQMGz+LOp5+U7E+dfl5W4mLU2OIJKmwIVGwrMJP
-        7vunmzp2syRPiSbuTIvEe1TBA0XHxdiL2Hf/qDrojuWJDm2CKLlVJaIeyPAn7DgCrjm4lz4afE4
-        h1R1BxI5VQfhERBf97aFxGFWI9+Tw5Jgj/bI0/XOOS55INzBXasborsrg7sH7JgvyqlpNCEmTEI
-        ZDvZUs63mwfwkNmsNa
-X-Google-Smtp-Source: ABdhPJxQn2zN2psowCQc40L2uP+d8b3nXR2+p9YtTcRG/X94z2yQ8+jWr1B2tm/znx1G6e8dg1sb3gWI2VkKCLyoQjr6
-X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a25:c088:: with SMTP id
- c130mr4441613ybf.356.1598473051199; Wed, 26 Aug 2020 13:17:31 -0700 (PDT)
-Date:   Wed, 26 Aug 2020 13:17:14 -0700
-In-Reply-To: <20200826201715.1911816-1-danielwinkler@google.com>
-Message-Id: <20200826131610.Bluez.v1.3.Ieb6522963e3f54b0d63dd88ed3ce24a8942ed73e@changeid>
-Mime-Version: 1.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9FyQMjwrR+qRwgsTKniSyNPE9tsU8qToAWdwd9jIpxg=;
+        b=OzpV/n11Cl8varc1UnAD+d7NPbVacHtXeWi2F2AJRwC30I7nWc3Txt4TLobqe0zxKx
+         m+bnlVKeJSipW/DsksBeHlkBw/khKf7gdA1MIdLyDWZpQO4X0FxSVwqkvBE32+a4EdrN
+         VkBMjQFMfZ10n12lCn6bHxDyO+a2VT63mHT5C9jcZ+E+Yyq4FEVUq3mKU2kIvEA7Bx/X
+         Y0vwooj8PuZbftYkpw0dr9VYURBpTpC3kO9XxMzVzp6L3gsTNgw/FTicLOZVd2RwW17M
+         4AAmnf4vn/e8QXgPE8O0GBo/nx5Ib/jompXNNijrNJJAS/fz0oeJoZzT1t97lpp1Tb3R
+         yXOg==
+X-Gm-Message-State: AOAM532Uc+m4vYx+hhMxiMOUg1qJCxKSRsQNPePP1bbGEkhCaWbBWBc0
+        TQdq5pNQlidMvM2JYwpSd1+qFEiZdTwpStKofZfWDe9uwn3BLw==
+X-Google-Smtp-Source: ABdhPJzziPcDQuz4TQjblMZD1JAXNMLMZpjQmJsS9Rx6AMjaqVgCdPZNzGN0u40sjDCVeQWUx6Dv6ENIvf73m5OaCmk=
+X-Received: by 2002:aa7:df84:: with SMTP id b4mr16204047edy.75.1598473232696;
+ Wed, 26 Aug 2020 13:20:32 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200826201715.1911816-1-danielwinkler@google.com>
-X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [Bluez PATCH v1 3/3] advertising: Add adv SupportedFeatures to doc
+In-Reply-To: <20200826201715.1911816-1-danielwinkler@google.com>
 From:   Daniel Winkler <danielwinkler@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>
+Date:   Wed, 26 Aug 2020 13:20:21 -0700
+Message-ID: <CAP2xMbsk8FO2KM-aBGG7gZoAsmJnmTk_7h+35JOb3bo0SZFKuQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1 0/3] Expose extended adv feature support via
+ bluez API
+To:     BlueZ <linux-bluetooth@vger.kernel.org>
+Cc:     chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
+Hi Maintainers, I accidentally sent a patchset with PRE-UPSTREAM
+commit tags on the commit headings. I have sent another version
+without, so please ignore the former. Thanks for your understanding.
 
- doc/advertising-api.txt | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Best regards,
+Daniel
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index b0565eab2..0c07f349e 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -209,3 +209,21 @@ Properties	byte ActiveInstances
- 			Possible values: "1M"
- 					 "2M"
- 					 "Coded"
-+
-+		array{string} SupportedFeatures [readonly, optional]
-+
-+			List of supported platform features. If no features
-+			are available on the platform, the SupportedFeatures
-+			endpoint will not be populated.
-+
-+			Possible values: "CanSetTxPower"
-+
-+						Indicates whether platform can
-+						specify tx power on each
-+						advertising instance.
-+
-+					 "HardwareOffload"
-+
-+						Indicates whether multiple
-+						advertising will be offloaded
-+						to the controller.
--- 
-2.28.0.297.g1956fa8f8d-goog
 
+On Wed, Aug 26, 2020 at 1:17 PM Daniel Winkler <danielwinkler@google.com> wrote:
+>
+> Hi Maintainers,
+>
+> This change adds a SupportedFeatures member to the LEAdvertisingManager
+> interface, which allows us to expose support for hardware offloading and
+> setting TX power on advertisements.
+>
+> Best,
+> Daniel
+>
+>
+> Daniel Winkler (3):
+>   PRE_UPSTREAM: advertising: Add SupportedFeatures to
+>     LEAdvertisingManager1
+>   PRE_UPSTREAM: advertising: Add adv SupportedFeatures to bluetoothctl
+>   PRE_UPSTREAM: advertising: Add adv SupportedFeatures to doc
+>
+>  client/main.c           |  1 +
+>  doc/advertising-api.txt | 18 +++++++++++++
+>  lib/mgmt.h              |  2 ++
+>  src/advertising.c       | 56 +++++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 75 insertions(+), 2 deletions(-)
+>
+> --
+> 2.28.0.297.g1956fa8f8d-goog
+>
