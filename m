@@ -2,68 +2,73 @@ Return-Path: <SRS0=or7B=CE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D8CC433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 06:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66891C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 09:54:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 326B92071E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 06:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 249362067C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 09:54:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YYsjJEJv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DGZ/T6L9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbgHZGhy (ORCPT
+        id S1728067AbgHZJyn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Aug 2020 02:37:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41992 "EHLO
+        Wed, 26 Aug 2020 05:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727869AbgHZGht (ORCPT
+        with ESMTP id S1727942AbgHZJym (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Aug 2020 02:37:49 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A0AC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2020 23:37:48 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id 31so529638pgy.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Aug 2020 23:37:48 -0700 (PDT)
+        Wed, 26 Aug 2020 05:54:42 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B2BC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 02:54:42 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id i10so794933pgk.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 02:54:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=3zzoAm6sUSyHag4twlxTUJvc8Ko0bHT2KVfZ37UKyfE=;
-        b=YYsjJEJvJh7OGn/tXYsRbZtl7MPAw/IERKcq3mG2Om5PezaBePnLcyFMLg8BD3PTy/
-         PcCKIWiw+CkPQ4Xy2pCCaZamo7PP4lztcGGXKy49kJE6ec1XstHskar28SlkEmT1z8SU
-         CJoa/NwR7TOk2+DlPe5dJY/qt9G0/AbIgcjqA=
+        bh=MFJyxn0sYlOZ7uMd8lMntiT/9xQLuQk8yZ+XjHsuGEI=;
+        b=DGZ/T6L9zlP50gGxSUQguqktO/Pi8kGcUE8UCT3vylg465RFHflFsrNtC324K61672
+         /bX/XL3i6MU81QDNKea8cYq3GI5PR0wITcatvGcENK8Uq8XA+pxLaW7KWbok6pMVHPmZ
+         12kqWoDbHbsUOWcG7VjBZd/R34qpmR2h1preJO9iJhdlve5IkA9fklFPPe0zrHSYejKb
+         1X/0ix+YAjzLDxEMIgaC7uhhF/hEdeNj3AnTkci6GxoCcRrHAHJJQxykyVyjEEdg07Bl
+         4MLqTWRkwxkoe131oQoWpYKDdYfR1w2R+pq/iUjOrQeZptN4IMUSUSLkXQq36Uj3Ldef
+         dEqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=3zzoAm6sUSyHag4twlxTUJvc8Ko0bHT2KVfZ37UKyfE=;
-        b=LhcpHrnmGvr4oj8OJIxi11GD9k7/9IpmEI2woOikhkOoHwrorxlltRONrPKBwQsw5H
-         Fnk1Ze/KRFok/25l1ExlFjp3vncgcWYZ6fLa6pfkqHNoyI+Ym355YBC0e9JrU7KzdHPm
-         gRYlRFwks789tLV2xX/PA9hjx3Zgv/DawXuZQEXjppFCfzQZa+cn+q1+ZwETrUwdS0S5
-         7ku/Duh64WpfCze8+7v2OSujyGliJhwnpAK8wY/o8/uE+aTwjBR305Y4B2oCtuO0s9TS
-         Ez/gtzRXFwdi71enYniWAq9ERSXE2/6BOsLmq7pYO4bLni0xmVPy5Ek967cTyj0JcEZt
-         lv/Q==
-X-Gm-Message-State: AOAM532EMIovKfEbj/ZkTXg+nJ3AMHbnBD8kxmq51DYDOU1nc/vXwd4n
-        3W1fOsvZ87nkvUf3z4wDo6D+wXMoh2IEQg==
-X-Google-Smtp-Source: ABdhPJwAOj3T3sb5HI/2wq6rPObsyEI1fWGlSNQsHCzen/gxESKuOeILNadWdCJz6d/7NKb5SC734w==
-X-Received: by 2002:a62:6497:: with SMTP id y145mr10819614pfb.97.1598423868094;
-        Tue, 25 Aug 2020 23:37:48 -0700 (PDT)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id c3sm1500852pfd.137.2020.08.25.23.37.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Aug 2020 23:37:47 -0700 (PDT)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
+        bh=MFJyxn0sYlOZ7uMd8lMntiT/9xQLuQk8yZ+XjHsuGEI=;
+        b=kQAXMTu8OyJoPAIeADeLg0PGiWA+BUifCZpN7MtIe5jxzvF5HzoHXHCquhId8EIjnW
+         2jNWH5e8pWyT4PlbK9Y7Y7WvqkeLzbe+tky+3MDpDKjO5dNAVVGzU1CRdaAOgvooWHqL
+         rM6h3FWMUgJ7u5WO6vwBzrwkNdTMq+2IeMH0HOUlKinj251nW4ysZD0qrGOLmiDI7Cuw
+         8O97aaCFwquHJSE+xQSoXrWsvHvltzSnLNo9NmMMmSmSO6HMBZx/lvNQmpp1fr/6xMfx
+         Cxy9GRZSYWInTo8/RTHeMo2OPetVr/luIpgsKHICEgK36EXdMEgR58txFYQ+s5AjsagC
+         BvVw==
+X-Gm-Message-State: AOAM531W1C4H8MU5eSZWfq7bsXv8cOgoa9l87uY3lMpgBr5R8R4mVwsQ
+        2jy/ayfTuBrEo2VXSEkKv4xBKALdmlzLwCSa
+X-Google-Smtp-Source: ABdhPJyBmG5k3Y9KZ0ZCu9sR5v2zFqJ1V+FJYJu9ssiRemeAMsFGIh6jJYcMFawgJ6rZP/u6fTYxIQ==
+X-Received: by 2002:a63:6346:: with SMTP id x67mr10035840pgb.121.1598435681601;
+        Wed, 26 Aug 2020 02:54:41 -0700 (PDT)
+Received: from localhost.localdomain ([122.171.201.76])
+        by smtp.gmail.com with ESMTPSA id a10sm2376687pfk.26.2020.08.26.02.54.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2020 02:54:41 -0700 (PDT)
+From:   Kiran K <kiraank@gmail.com>
+X-Google-Original-From: Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Jie Jiang <jiejiang@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Subject: [PATCH BlueZ] gatt: Accept empty array in parse_includes()
-Date:   Tue, 25 Aug 2020 23:37:42 -0700
-Message-Id: <20200826063742.76007-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+Cc:     ravishankar.srivatsa@intel.com, Kiran K <kiran.k@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>
+Subject: [PATCH] Bluetooth: btusb: Update boot parameter specific to SKU
+Date:   Wed, 26 Aug 2020 15:24:32 +0530
+Message-Id: <20200826095432.18825-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -71,58 +76,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jie Jiang <jiejiang@chromium.org>
+boot parameter gets updated during firmware download process. Use the
+updated boot parameter while doing soft reset of controller. This patch
+fixes updating of boot parameter.
 
-Currently parse_includes() will return false if the "Includes" property
-is an empty array. Empty array in the "Includes" property should be
-treated as valid.
-
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-
+Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- src/gatt-database.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ drivers/bluetooth/btusb.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 07d567078..e7e4a36a6 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -2008,6 +2008,7 @@ static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
- 	DBusMessageIter iter;
- 	DBusMessageIter array;
- 	char *obj;
-+	int type;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8d2608ddfd08..414575eccbad 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2338,10 +2338,10 @@ static bool btusb_setup_intel_new_get_fw_name(struct intel_version *ver,
  
- 	/* Includes property is optional */
- 	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
-@@ -2018,9 +2019,9 @@ static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
+ static int btusb_intel_download_firmware(struct hci_dev *hdev,
+ 					 struct intel_version *ver,
+-					 struct intel_boot_params *params)
++					 struct intel_boot_params *params,
++					 u32 *boot_param)
+ {
+ 	const struct firmware *fw;
+-	u32 boot_param;
+ 	char fwname[64];
+ 	int err;
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -2479,7 +2479,7 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
+ 	set_bit(BTUSB_DOWNLOADING, &data->flags);
  
- 	dbus_message_iter_recurse(&iter, &array);
+ 	/* Start firmware downloading and get boot parameter */
+-	err = btintel_download_firmware(hdev, fw, &boot_param);
++	err = btintel_download_firmware(hdev, fw, boot_param);
+ 	if (err < 0) {
+ 		/* When FW download fails, send Intel Reset to retry
+ 		 * FW download.
+@@ -2561,7 +2561,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		return err;
+ 	}
  
--	do {
--		if (dbus_message_iter_get_arg_type(&array) !=
--						DBUS_TYPE_OBJECT_PATH)
-+	while ((type = dbus_message_iter_get_arg_type(&array))
-+					!= DBUS_TYPE_INVALID) {
-+		if (type != DBUS_TYPE_OBJECT_PATH)
- 			return false;
+-	err = btusb_intel_download_firmware(hdev, &ver, &params);
++	err = btusb_intel_download_firmware(hdev, &ver, &params, &boot_param);
+ 	if (err)
+ 		return err;
  
- 		dbus_message_iter_get_basic(&array, &obj);
-@@ -2028,11 +2029,12 @@ static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
- 		if (!queue_push_tail(service->includes, obj)) {
- 			error("Failed to add Includes path in queue\n");
- 			return false;
--
- 		}
- 
- 		incr_attr_count(service, 1);
--	} while (dbus_message_iter_next(&array));
-+
-+		dbus_message_iter_next(&array);
-+	}
- 
- 	return true;
- }
 -- 
-2.26.2
+2.25.1
 
