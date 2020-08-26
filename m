@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3781BC433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83515C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:12:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C3552080C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53B142078D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 20:12:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="X5TlRlIa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="EQBd6Tye"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgHZUMD (ORCPT
+        id S1726878AbgHZUMI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Aug 2020 16:12:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56000 "EHLO
+        Wed, 26 Aug 2020 16:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbgHZUMD (ORCPT
+        with ESMTP id S1726802AbgHZUMH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Aug 2020 16:12:03 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD751C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:12:02 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 83so4357538ybf.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:12:02 -0700 (PDT)
+        Wed, 26 Aug 2020 16:12:07 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00FAC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:12:06 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id c78so1856934ybf.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 13:12:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=x5I31Cx/lCkc6J4SrBA8xYUW95BrqBSHcoi2qMQlDjE=;
-        b=X5TlRlIa/cQZmDjbzYzSWOG3R7OJuKmzdHHBIRHKPM6cDkoxD4j6Fhj+ETUnPd0qpO
-         gPCriLCFZFd9cQjFW11DygRpa0nP56om7X5X/Kn6X7ceLMDBavk6D7E4y5gqATene9WX
-         TlwdZYaRqxeVw/CjFUq7XNU9tjtZkqByYh1TlGZA3vRDsyy/mx2dBVdGUbcv7h/5mNyb
-         5tpVUSquIstollCIcB///kmFxjysjUhBxndZDQ+r/JuTg0l650w7Fiv0zSXSnKK8LtZM
-         B4436xqGhamonzagg8TSwMxfitIJ1Nza+3xS+/I1BlCnh0zZcFtU6ZiYwIXgZ2Z548wT
-         SWRA==
+        bh=8A7xpmrr7m1zruibMkh52mGk5SyAjYE9eZwX3Vft4m0=;
+        b=EQBd6Tyeq7nGzis1g4BsMpKpHXXQw3Ij5YGb0+zOrsUJZbNvZqf+fmpvC1tel3RvVY
+         giCVv8HqtKW25dmKQ4d/Z7zUkpZDKkskipBkxgYC6Gki4cdDoFC4aXCNbenq3k8DvPJz
+         K4fchJ3PPhX9Esy5nzAGQJUMJ+jmyc0Mb6zC4dFGkuTnfyP3iZB0ErtSzaJ/8vdIwRau
+         CmdAELb5o3mTzamCrhFKE+9BocLnEqrto4R1tyiTuMhQpAO9Mwq5BgSe4pG0cD4fe2z6
+         KELMkedpI/hYK9iq4FQ4B7qDPYT8WeAc8RauwGa8ggAPaqq3F7NCvfCDZ30BoWhXpC5o
+         BLQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=x5I31Cx/lCkc6J4SrBA8xYUW95BrqBSHcoi2qMQlDjE=;
-        b=j1beBHTbWLfB9wnUt7X0iy2V7vxUYc26NkR+8fDq6FRgxEbHrBE1OsVKVP1atk1bG0
-         LBbc6YifNWzOaSPiUSh8VuayoaBRGNGYNQrgkz+PCgKBpxLyyTT2Hn/c8FIiukmWq1N9
-         pm3TE3rUBnpfuCKsT3i7QmGdqWBcyH98sSlm68IR01sYFL70VCgc/wF48Hfn2rWqSX0n
-         6ovIDehNoSW5pN5o1p09sCLS5oDN8WySMW0tUe+p+YVsnsRKtaI+ckLyFM5a1ggRgoAW
-         DBwX/9aEobjVuFztH6gV1jllD3rY2HIGSZ+qMe4EcwfH1OT8/hofIv0ABI2rbt2y3ZKV
-         DFVA==
-X-Gm-Message-State: AOAM533iDU3ezvaM4loIES0rjFOK9ca/IguLXd7V8vDZsRn4yuYKQB5V
-        iiO/2akYWwF97w1MALvFBNGDHts5GRLRzptU8oy9JBKqwnTbSJHKv/MIhAAOiznsOjSVZbEP+h3
-        Shrm8fFlC0wzBb0a3neKSO/KK7PJ//k7nulZ5BbV1Iop0NsOtwzlTNs2D9eq31HW0NFskmVCH4x
-        AxxLdM5KN0iSpcMZjC
-X-Google-Smtp-Source: ABdhPJwqPVROgyrD7pYkUsV1/xGbrktwuk/s14Ma2EcuOQZoEw8sy3gErs3HQmoi1wKgSOxsu4yCsxcTWb9NA+YV3R4t
+        bh=8A7xpmrr7m1zruibMkh52mGk5SyAjYE9eZwX3Vft4m0=;
+        b=Uw9pmN0b0tqSZhmrG0yiWxGOrFoHKGPzJMVSVNlC1u3a8LkDrbF7DwlHhieLA9s6Qo
+         u2wkQd6EpsJ536FtOcjpQuit4anKdWIZpVzfYscA9A917oSbjRsldVcXcVs8fhfETP44
+         vRRpuwiwoTgCg3ACdw9WG2SGiQJI5BVjQZGHp4FhlG3t9FCWds6YUqlP0vCu3NdInErO
+         dKFfL/b/gHPZxj+ZBkn51sGgSlpfz0CJcmy2uuGDMrsA0gkr+Ge0La2YfM644nh03ON4
+         8quUqVsZkSRmzAtSnsbDtPbn/uNbyv9oY5Gs4whkfg91jZqtyvXyhee+ZrW/H1jpWah2
+         euLg==
+X-Gm-Message-State: AOAM531MynfkoQF1ws0CTYPKu0HwaNanY1qidbaXfgB/xaOSHEAsnftj
+        WI24+j4nfbp7QNNaNg62TOudxjPdOaHK270S7hcl1Qq2dSzIEZgTd+XFriXwik9x5M++0uC0EWz
+        qzmX/6Z7Z10+K5KxPqmC6/Rq3V8h4DKcRtptGQ9cg8T04R3WSeTjqSSw1D+in09XTMlV2dBZqMx
+        smXhBAgQT6PtoLgvvT
+X-Google-Smtp-Source: ABdhPJwP2sZGJ6OUBXde7GCsc1AQC5fSnaGsJhsGKYRenY4yZG+hm89XcG89mWb/91HD8DOV/hI5Rw4ixSm8IbH2vdpt
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a25:c791:: with SMTP id
- w139mr23204942ybe.345.1598472721893; Wed, 26 Aug 2020 13:12:01 -0700 (PDT)
-Date:   Wed, 26 Aug 2020 13:11:45 -0700
+ (user=danielwinkler job=sendgmr) by 2002:a25:2451:: with SMTP id
+ k78mr24201813ybk.335.1598472725915; Wed, 26 Aug 2020 13:12:05 -0700 (PDT)
+Date:   Wed, 26 Aug 2020 13:11:46 -0700
 In-Reply-To: <20200826201147.1908411-1-danielwinkler@google.com>
-Message-Id: <20200826131103.Bluez.v1.1.Idf2f9f409a4df20b466ba723dd9b729275a5afbf@changeid>
+Message-Id: <20200826131103.Bluez.v1.2.I33cf8432f94675b635ab429b3125f54048c5b66a@changeid>
 Mime-Version: 1.0
 References: <20200826201147.1908411-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [Bluez PATCH v1 1/3] PRE_UPSTREAM: advertising: Add SupportedFeatures
- to LEAdvertisingManager1
+Subject: [Bluez PATCH v1 2/3] PRE_UPSTREAM: advertising: Add adv
+ SupportedFeatures to bluetoothctl
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -77,115 +77,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The new SupportedFeatures member tells advertising clients whether the
-platform has hardware support for advertising or capability to set tx
-power of advertisements.
+This change adds SupportedFeatures to be shown in "show" option of
+bluetoothctl. It was tested with and without kernel support for features
+to verify that they are shown or not shown correctly.
 
-Additionally, fix small typo in "secondary_exists" function name.
-
-Change is tested on hatch and kukui chromebooks by using dbus-send to
-verify that SupportedFeatures are populated when extended
-advertising is available only.
+Change was tested by verifying SupportedFeatures were populated
+correctly in bluetoothctl on hatch and kukui chromebooks
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
- lib/mgmt.h        |  2 ++
- src/advertising.c | 56 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 56 insertions(+), 2 deletions(-)
+ client/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index a800bcab4..38182e576 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -516,6 +516,8 @@ struct mgmt_rp_add_advertising {
- #define MGMT_ADV_FLAG_SEC_1M		(1 << 7)
- #define MGMT_ADV_FLAG_SEC_2M		(1 << 8)
- #define MGMT_ADV_FLAG_SEC_CODED		(1 << 9)
-+#define MGMT_ADV_FLAG_CAN_SET_TX_POWER	(1 << 10)
-+#define MGMT_ADV_FLAG_HW_OFFLOAD	(1 << 11)
- 
- #define MGMT_OP_REMOVE_ADVERTISING	0x003F
- struct mgmt_cp_remove_advertising {
-diff --git a/src/advertising.c b/src/advertising.c
-index e5f25948d..9853baa4e 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1321,7 +1321,8 @@ static void append_secondary(struct btd_adv_manager *manager,
+diff --git a/client/main.c b/client/main.c
+index da877b546..6368cd516 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -933,6 +933,7 @@ static void cmd_show(int argc, char *argv[])
+ 		print_property(adapter->ad_proxy, "SupportedInstances");
+ 		print_property(adapter->ad_proxy, "SupportedIncludes");
+ 		print_property(adapter->ad_proxy, "SupportedSecondaryChannels");
++		print_property(adapter->ad_proxy, "SupportedFeatures");
  	}
- }
  
--static gboolean secondary_exits(const GDBusPropertyTable *property, void *data)
-+static gboolean secondary_exists(const GDBusPropertyTable *property,
-+						void *data)
- {
- 	struct btd_adv_manager *manager = data;
- 
-@@ -1345,12 +1346,63 @@ static gboolean get_supported_secondary(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static struct adv_feature {
-+	int flag;
-+	const char *name;
-+} features[] = {
-+	{ MGMT_ADV_FLAG_CAN_SET_TX_POWER, "CanSetTxPower" },
-+	{ MGMT_ADV_FLAG_HW_OFFLOAD, "HardwareOffload" },
-+	{ },
-+};
-+
-+static gboolean display_features(const GDBusPropertyTable *property,
-+						void *data)
-+{
-+	struct btd_adv_manager *manager = data;
-+
-+	/* Currently, all displayed features are supported if hardware
-+	 * offloading is available, so this is used to determine if we
-+	 * should display the feature list
-+	 */
-+	return manager->supported_flags & (MGMT_ADV_FLAG_HW_OFFLOAD);
-+}
-+
-+static void append_features(struct btd_adv_manager *manager,
-+						DBusMessageIter *iter)
-+{
-+	struct adv_feature *feat;
-+
-+	for (feat = features; feat->name; feat++) {
-+		if (manager->supported_flags & feat->flag)
-+			dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
-+								&feat->name);
-+	}
-+}
-+
-+static gboolean get_supported_features(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_adv_manager *manager = data;
-+	DBusMessageIter entry;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_STRING_AS_STRING, &entry);
-+
-+	append_features(manager, &entry);
-+
-+	dbus_message_iter_close_container(iter, &entry);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable properties[] = {
- 	{ "ActiveInstances", "y", get_active_instances, NULL, NULL },
- 	{ "SupportedInstances", "y", get_instances, NULL, NULL },
- 	{ "SupportedIncludes", "as", get_supported_includes, NULL, NULL },
- 	{ "SupportedSecondaryChannels", "as", get_supported_secondary, NULL,
--							secondary_exits },
-+							secondary_exists },
-+	{ "SupportedFeatures", "as", get_supported_features, NULL,
-+							display_features },
- 	{ }
- };
- 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 -- 
 2.28.0.297.g1956fa8f8d-goog
 
