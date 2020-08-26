@@ -2,104 +2,102 @@ Return-Path: <SRS0=or7B=CE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23937C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 17:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14A4C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 17:26:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC81720737
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 17:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DE5D2075E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Aug 2020 17:26:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OrLmiZ74"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726851AbgHZRIH convert rfc822-to-8bit (ORCPT
+        id S1726971AbgHZR0e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Aug 2020 13:08:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36738 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726783AbgHZRIF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Aug 2020 13:08:05 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 26 Aug 2020 17:08:02 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: b.razmjoo@protonmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-n5QjlI6S9N@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 26 Aug 2020 13:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58160 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726739AbgHZR0c (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 Aug 2020 13:26:32 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EFE6C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 10:26:32 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id o64so2669887qkb.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Aug 2020 10:26:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=R6Td+eEsQ4sKJ7qKWIutZh8XijaZ4gH+hXQd/s0GbWs=;
+        b=OrLmiZ74Fyim8TquXRIIBHBl3qXIxOqFboo3CmWQY+WuIpMqjitN0/D8j2gdGF/LyG
+         u8xqqD9jkPRPMLkIzAbM4s79N0Fo/Xgds11UKC1gb7MBgPd1mMT4Zg6B/7Fzh+bC0B7n
+         V+v0Ee1nqBhJfMZ00Mwwh0LBu3w/VHKAyYn+6tylRhaLPHf7j+uWsgxG1rBANqFLefoK
+         EV0U7pr+BCjTa5gPqvLL1fbimpThmqb9VGAVmvFimPcm3DXVxoaGH1kfFP/DXnhUsh7O
+         juLqsB4Dod0pkAbDtYZT+i1GGkAjetihSmcZJF9idMMzZVOHeyAFCdU9GfuX1ahUSDvl
+         rolw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=R6Td+eEsQ4sKJ7qKWIutZh8XijaZ4gH+hXQd/s0GbWs=;
+        b=QrNyQQpeoWVzEJOTdhOHTeR4JBO6yVmA1ZhCNAJbtwKhWfnLWlSFoGV5mvgAwI3Q+T
+         GfzsAr/yr+hbCbcY/mgCYLVv6AevLrUvWK/2mtEhZB3hK0/nEbuouU9ZsQs6Wm3UVZfq
+         i5zjtl5vNNVuE3kRMUzeZ1pM3H+srglTb0yTbNg4/afuDayBeffk+kZnDTwnA5Kel8d6
+         pJmYMOKThp42JjvhaHXdz43wOp0DKAhrJlQvKEbIa36+waDDBeTrDIrvLM9MXwlyV0AI
+         ApRkXRgH0lMxNkXzywNs4sINE5jMPNDKWJOctbyK33NvXSfgZAaj3b5++mOie19UksMk
+         pWYg==
+X-Gm-Message-State: AOAM5334laJzHw37MiqEwaoIT3jMgLaLS1LJGNxE03/nkqGumijK+Q1P
+        03aZqEC2UAX96IJmbVDD+dd8tJBNnKKVqw==
+X-Google-Smtp-Source: ABdhPJyXnvo3ikWoiW/ycXQxEaHjiGpxFlQuH0bmLzSNVncMtQglASEahyi980BqL5zrTHwk0lwMOQ==
+X-Received: by 2002:a37:680e:: with SMTP id d14mr6100066qkc.234.1598462790527;
+        Wed, 26 Aug 2020 10:26:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.36.161.243])
+        by smtp.gmail.com with ESMTPSA id v202sm2169710qka.5.2020.08.26.10.26.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2020 10:26:30 -0700 (PDT)
+Message-ID: <5f469b46.1c69fb81.4207.bfcf@mx.google.com>
+Date:   Wed, 26 Aug 2020 10:26:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3014515499409848566=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: [BlueZ,v3,1/4] doc/mesh-api: Add "options" dictionary to Send/Publish
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20200826165420.563822-2-brian.gix@intel.com>
+References: <20200826165420.563822-2-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+--===============3014515499409848566==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Babak (b.razmjoo@protonmail.com) changed:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |b.razmjoo@protonmail.com
+This is automated email and please do not reply to this email!
 
---- Comment #146 from Babak (b.razmjoo@protonmail.com) ---
-Hi everyone, I have bought a dongle just like Andres's in
-https://bugzilla.kernel.org/show_bug.cgi?id=60824#c81 and my system has
-problems activating it. This is my system:
+Dear submitter,
 
-Linux localhost.localdomain 5.7.9-200.fc32.x86_64 #1 SMP Fri Jul 17 16:23:37
-UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While we are preparing for reviewing the patches, we found the following
+issue/warning.
 
-These are result of running commands recommended here:
+Test Result:
+checkgitlint Failed
 
-$ hciconfig -a
-hci0:   Type: Primary  Bus: USB
-        BD Address: 00:1A:7D:DA:71:10  ACL MTU: 640:2  SCO MTU: 64:8
-        DOWN 
-        RX bytes:538 acl:0 sco:0 events:25 errors:0
-        TX bytes:338 acl:0 sco:0 commands:25 errors:0
-        Features: 0xff 0xff 0x8f 0xfa 0xdb 0xff 0x5b 0x87
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
+Outputs:
+8: B3 Line contains hard tab characters (\t): "    		      one-segment messages"
 
-Local Version Information from btmon output:
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0             
-                 #5 [hci0] 3.570144
-> HCI Event: Command Complete (0x0e) plen 12                                   
->                  #6 [hci0] 3.572090
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 4.0 (0x06) - Revision 12576 (0x3120)
-        LMP version: Bluetooth 4.0 (0x06) - Subversion 8891 (0x22bb)
-        Manufacturer: Cambridge Silicon Radio (10)
 
-hcidump -X resulted in this :
-https://bugzilla.kernel.org/attachment.cgi?id=292177
 
-btmon -w : https://bugzilla.kernel.org/attachment.cgi?id=292179
+---
+Regards,
+Linux Bluetooth
 
-lsusb : https://bugzilla.kernel.org/attachment.cgi?id=292181
-
-thanks for the great work
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+--===============3014515499409848566==--
