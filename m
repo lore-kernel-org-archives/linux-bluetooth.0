@@ -2,132 +2,129 @@ Return-Path: <SRS0=jcZI=CH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F60C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 00:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29499C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 01:02:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18C7020838
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 00:32:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7AA42098B
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 01:02:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tQAFJl3O"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J//h6N7G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726881AbgH2Aci (ORCPT
+        id S1726446AbgH2BCZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Aug 2020 20:32:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
+        Fri, 28 Aug 2020 21:02:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726775AbgH2Ace (ORCPT
+        with ESMTP id S1726392AbgH2BCT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Aug 2020 20:32:34 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7D3C061264
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2020 17:32:34 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id k18so910742qtm.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2020 17:32:34 -0700 (PDT)
+        Fri, 28 Aug 2020 21:02:19 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DF0C061264
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2020 18:02:19 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id ls14so326398pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Aug 2020 18:02:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=uuWrZLWtxSYZkUAFWX/NXCbA/WuZosou4t8w9PL8goA=;
-        b=tQAFJl3OM64q/BMHstnMGbD3XkE7fRmXbvJ68Jd1Y5uE7vQoGoIF6c08cuMtiuipVY
-         R1J9ZhFZYmEXdRP+4iA5iEY/Lc0Ayd3eApJvR0++h/GPQ1b1NWNBjZI7xeaGAJqQRk0q
-         +ZCvvL2jJA5luj5yqkoBVw4BMbwam1SICUQEWqMneTNom3EeKaDuaDNcHoDiy4BN6QTt
-         +WJo3hQ7SkhwlqYNvNBS4AeIH9IvAQnW9YFradRgeBRci99IwQ/7GvYKd9tOCk01uyrG
-         pFAgDkgBMG6pNQJ4kQjNkEnNZZCEytDEX1KVM2THiyR+nvEZSukyCMIzmv6Qxf0O8l1V
-         OW7Q==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3xXRDB2sGPzoGqKOB+6TwO7ShGY5615JtErKHfxz8fk=;
+        b=J//h6N7GjrFtY2260Hs1jViiPMfa9CkX6rEyGHVXoAzr2/ByhHU4ruyy1eUbKUQVnZ
+         pvV5LRMRoC4f9xx4Yw+M4g7zgVgtBPpqpbp80xgkHsUt37xeGn5xaiFcUzSOfqBoGn4F
+         yiEZk6JnQJ5R2rn4J9yOUMV8M78plctwY+Er4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=uuWrZLWtxSYZkUAFWX/NXCbA/WuZosou4t8w9PL8goA=;
-        b=Y6zdiFONdyfplyWm+V091+BqzNo/2bY9/ZdKxC+pzSOS2upAjWqy3Udd0ry/2G3cRM
-         G7kafmKhAcZw58euAo5auo5h6n9pEnkdtEMgygyRBFKpuQHJuX5Ud8vsCMnraepCMH6x
-         +5cm//u4bKuzd1eDqzA3SYYCzbeOEdvtRSknaTSHSM8/ql7QBmiiinmzbIYjnq0oy0Y9
-         rwTHIq/zHE8OkhnSQLsOoO4zHO84CeITzsrvWW2I49gmW40mDbbXKNC+w9nVLa3+k141
-         i4Mr/66WnWhwf+rP9MfocZIBAX29StMf5ALwyMlsyOB43p0GNf31iJVxp8jmJqJrHEF4
-         KHWg==
-X-Gm-Message-State: AOAM531y0yJJ+/m2exjAYv1QZnPAtVVOC/wf/CBa4meve8AflyD54PZi
-        jUobPihoAy3RgA2tYdYt56CGtJlUbIf7dQ==
-X-Google-Smtp-Source: ABdhPJxk5v5VWzUKpx2QZ2Flz9cPXnxZ9urV4CTvOZPhfMmmCGDsBiswsQEZRMl6lS0mWKiFyEWc4w==
-X-Received: by 2002:ac8:c0e:: with SMTP id k14mr4171818qti.364.1598661152242;
-        Fri, 28 Aug 2020 17:32:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.36.205.85])
-        by smtp.gmail.com with ESMTPSA id v13sm753810qti.64.2020.08.28.17.32.31
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3xXRDB2sGPzoGqKOB+6TwO7ShGY5615JtErKHfxz8fk=;
+        b=StYjNdr4/2g84FdX4crv7bnzHgkYLs2u89SCnIh7rPkqmjxXvnGAF3RntMDr9TL85t
+         rSegutqpJFDJ6F0DIF18ZuxMWsAF886PQqpxLVqAKCiwk/SLTfItPtdAc2cPor/n9otP
+         eBIpYHfJwKwj/+bXYFmN1fVQxM8YSZQBsUrNTqQ5uyruXruem+3KIe9NKvbMg8EM+YIH
+         8jlloGG/pjNd2OfaDFNByJXP0Cmej324b6jE66lGTy81GstcntiUHhBcVG4ZGnKvpPYM
+         JHea4k6lVqsFKc0MCWhClnbRG3C0djLCiSkO9akbP2A9o93GvisGccAANMYFDu293Mzv
+         XRWg==
+X-Gm-Message-State: AOAM530nv+7rMkJah9A87ZbCfAC0dAaWrndzc2IKLC9Ih3cFNbgeT1Ti
+        bjmH22/8m4r2aBbkKsqdzmx9z8aelXL3sA==
+X-Google-Smtp-Source: ABdhPJwNSjzZME0Uxua5lrWAjcNhkGmnvFct4vFvYBJV+jN0jDBnr6vTVdlN6ZSeGmiRa9BYkyexJg==
+X-Received: by 2002:a17:902:d88c:: with SMTP id b12mr594759plz.96.1598662938763;
+        Fri, 28 Aug 2020 18:02:18 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id 78sm630360pfv.200.2020.08.28.18.02.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Aug 2020 17:32:31 -0700 (PDT)
-Message-ID: <5f49a21f.1c69fb81.5e874.40a8@mx.google.com>
-Date:   Fri, 28 Aug 2020 17:32:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3323347324394065462=="
+        Fri, 28 Aug 2020 18:02:18 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     luiz.dentz@gmail.com, marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [Bluez PATCH v3 1/3] mgmt: Add controller suspend and resume events
+Date:   Fri, 28 Aug 2020 18:02:08 -0700
+Message-Id: <20200828180157.Bluez.v3.1.I14a96397d181666c124e1c413b834428faf3db7a@changeid>
+X-Mailer: git-send-email 2.28.0.402.g5ffc5be6b7-goog
+In-Reply-To: <20200829010210.871471-1-abhishekpandit@chromium.org>
+References: <20200829010210.871471-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tedd.an@intel.com
-Subject: RE: [V3,2/3] tools/btpclientctl: Add btpclient test application
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200829000803.20286-2-tedd.an@intel.com>
-References: <20200829000803.20286-2-tedd.an@intel.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3323347324394065462==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add the controller suspend and resume events.
 
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkpatch Failed
-
-Outputs:
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#48: FILE: tools/btpclientctl.c:1:
-+/*
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#66: FILE: tools/btpclientctl.c:19:
-+ *  along with this program; if not, write to the Free Software$
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#67: FILE: tools/btpclientctl.c:20:
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA$
-
-WARNING:TYPO_SPELLING: 'arguement' may be misspelled - perhaps 'argument'?
-#207: FILE: tools/btpclientctl.c:160:
-+	bt_shell_printf("Invalid arguement %s\n", argv[1]);
-
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#2332: FILE: tools/btpclientctl.c:2285:
-+static const char *help[] = {
-
-- total: 2 errors, 3 warnings, 2395 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
---===============3323347324394065462==--
+Changes in v3: None
+Changes in v2: None
+
+ lib/mgmt.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index a800bcab4..46d894ae9 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -772,6 +772,7 @@ struct mgmt_ev_device_connected {
+ #define MGMT_DEV_DISCONN_TIMEOUT	0x01
+ #define MGMT_DEV_DISCONN_LOCAL_HOST	0x02
+ #define MGMT_DEV_DISCONN_REMOTE		0x03
++#define MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND	0x05
+ 
+ #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
+ struct mgmt_ev_device_disconnected {
+@@ -959,6 +960,17 @@ struct mgmt_ev_adv_monitor_removed {
+ 	uint16_t monitor_handle;
+ }  __packed;
+ 
++#define MGMT_EV_CONTROLLER_SUSPEND		0x002d
++struct mgmt_ev_controller_suspend {
++	uint8_t suspend_state;
++} __packed;
++
++#define MGMT_EV_CONTROLLER_RESUME		0x002e
++struct mgmt_ev_controller_resume {
++	struct mgmt_addr_info addr;
++	uint8_t wake_reason;
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1088,6 +1100,8 @@ static const char *mgmt_ev[] = {
+ 	"Device Flags Changed",
+ 	"Advertisement Monitor Added",			/* 0x002b */
+ 	"Advertisement Monitor Removed",
++	"Controller Suspend",
++	"Controller Resume",
+ };
+ 
+ static const char *mgmt_status[] = {
+-- 
+2.28.0.402.g5ffc5be6b7-goog
+
