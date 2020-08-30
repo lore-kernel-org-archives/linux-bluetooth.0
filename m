@@ -2,161 +2,103 @@ Return-Path: <SRS0=5eoE=CI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD11C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 12:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67688C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 13:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEA83214D8
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 12:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32A06206E3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 13:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qn/++4J3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKyZ2eyT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728837AbgH3M0g (ORCPT
+        id S1728765AbgH3NHy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Aug 2020 08:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
+        Sun, 30 Aug 2020 09:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728831AbgH3M0e (ORCPT
+        with ESMTP id S1728761AbgH3NHx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Aug 2020 08:26:34 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F27C061573;
-        Sun, 30 Aug 2020 05:26:33 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id x18so516404pll.6;
-        Sun, 30 Aug 2020 05:26:33 -0700 (PDT)
+        Sun, 30 Aug 2020 09:07:53 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17769C061573
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2020 06:07:52 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id bh1so1748230plb.12
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2020 06:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ejqO87rorFkVXw0/ByXTM9CvLRvpm4qV9tVsBbkXl5I=;
-        b=Qn/++4J3Z/bAbP0hfH0Wek8D4QXU9x5lXBOPjjGgyy3p6+DhkFdVlK0Qvg4sbZbHyi
-         CspnA895diI0L0XAsK24N+J8fESh1feelF5xwmNNhoiSTCepBgdldjloZbw4/vZe2zDP
-         MFGkygHfhqtWNHZh8kpm+fFqiz6gT1qfCwekkFSoTCejD0LBLfreK8URHXDxS9BRd0WL
-         9IGdmslXLCm0sIlbc6e9rhoSWtKYoR17FJ7W7FwGuRs1i7vfZoggNq+0lXyEQ8Z2FnOP
-         cn26BnOtUttf/mNbMH2hNrvEXPEJ7hsA82rYu1pSJEvQ93ItrDGAR4UXt4O4uI5vEPnw
-         Jt8Q==
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=WswOPChdhsXl9yL0PAanxx8W8jatho3LL/ArFA4MIY8=;
+        b=IKyZ2eyTWjmDv8SIGocLuuLcvSfnE8GHJ6Xlz9H/IIUuOeEYTy8TH29C3qjxS8eHY5
+         hN+ShtNUPjPsIN0wk2saJvDeRs0NLP7s0F0G8j4Y7AqXPAFvh72sIz0ta2MSgAUTTw32
+         LpsgJnlt10vRU+QM5OMciTrMtH99OW9nl8Vc4Hdesd8AtMtug1nWja/JlaoFAr+HF8EV
+         240OADuwwF/t5hfl3YM1kv+yhe2QLsCXyB3gToFf+HRQtirSPB2P0UkXWScL5R4OVoVv
+         KMlWd8nzGhM7uRWt92GEW7qK2zFKPnAHKGJVzGb4iEK7QX0qysPevGbOW/rPy/vVd/2k
+         nlVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ejqO87rorFkVXw0/ByXTM9CvLRvpm4qV9tVsBbkXl5I=;
-        b=FWs+QFB9pM+nZa4mQ7tSTToenNuVNBmjhnI+hu5JXsOK1rsa8Se9RfdU/SHMx44uGu
-         oy9qwlkBbOn7CZurJzlnuA0K1CmGR4Ut6mJ5DqzkO0baRGihrg7OXjot85hMtJvc8Tpt
-         MNGdg7WJsfML9RzLoqUxGPUf7S6eQMtv4EiPvxpSoM3tmxZRC9afCJC6rFvpdeR5VJ+B
-         K4zjcMeJ2eERo/+XbU8iwGBTPfS9BLutrpMhXxkXr/gpL8MX1zTdVFbnJVTKgQ8lVOrc
-         Tjy2Wk4ozADuk2NVn+VYwbxQzeWsamOG+eeStZ9Uy6xHuZnsY4Jl9ShW39L4cnGPg5p+
-         JR3Q==
-X-Gm-Message-State: AOAM533FdLyVa2aD9I6SVm7VunlDI5NM42XIiWaXoZI6H1Dr/G/cQabK
-        paKTzjwSon55twUtr5PR1Yw=
-X-Google-Smtp-Source: ABdhPJzZtb1Nfg209xbdteCKN2XIoYQJIeLuvoBWNxezlKGZpJEy+OsTzIZvgQ8YxxVX/yrRKcwePw==
-X-Received: by 2002:a17:902:8347:: with SMTP id z7mr5506118pln.20.1598790391028;
-        Sun, 30 Aug 2020 05:26:31 -0700 (PDT)
-Received: from Thinkpad ([45.118.165.143])
-        by smtp.gmail.com with ESMTPSA id lj3sm4290067pjb.26.2020.08.30.05.26.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Aug 2020 05:26:30 -0700 (PDT)
-Date:   Sun, 30 Aug 2020 17:56:23 +0530
-From:   Anmol Karn <anmol.karan123@gmail.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     syzbot+0bef568258653cff272f@syzkaller.appspotmail.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        kuba@kernel.org, davem@davemloft.net, anmol.karan123@gmail.com
-Subject: Re: [Linux-kernel-mentees] [PATCH] net: bluetooth: Fix null pointer
- deref in hci_phy_link_complete_evt
-Message-ID: <20200830122623.GA235919@Thinkpad>
-References: <20200829124112.227133-1-anmol.karan123@gmail.com>
- <20200829165712.229437-1-anmol.karan123@gmail.com>
- <20200830091917.GB122343@kroah.com>
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=WswOPChdhsXl9yL0PAanxx8W8jatho3LL/ArFA4MIY8=;
+        b=Z1WcqD4ksGRzxocv5p4PsP9nqOEeR0sfOCfggkWFcsFH1MJNzoKgFF9xmaXMEyRHHE
+         e6hlzrueuz9tWOcrJ4tu8U9rzE+C/8lZblI025dzjzWJlxHwlq8pQYNuIjhEMBnKL2Hj
+         2Doy+1aH7LLNUsVqHLoa2Bk5z2d3lrbRoML0/0HqHBDE//6/zihPs/9Xync95Vca02UD
+         xOwMWyr5c7+uVrIyxxh0hSTKrtVW3l58DExaUHRSXh8eeY00m72Sj2sQFaSMRDphqAqA
+         6hn7AKW0rVyAh8KhSJiZSexYNAlDnlgV/6+wCJVCXfZE7V5gVrYVTvmm8FHGHT9utMR8
+         ObdA==
+X-Gm-Message-State: AOAM5335xtpM7qJ3VrcV8IWO2aCsf3UIZST825ZxukwFIDt7OYPnEak/
+        0IKsciAZ9NQrCrIgLNV+eLdngjIYv2GgJ7Yx
+X-Google-Smtp-Source: ABdhPJz38Ybn4jxAcCpy6pg5HQk8fPTPUJ+ETe1SYbwkSDCOO7/zeO2xRxzF2ZCKLDy4x6CupATldg==
+X-Received: by 2002:a17:902:6ac9:: with SMTP id i9mr5631145plt.128.1598792872020;
+        Sun, 30 Aug 2020 06:07:52 -0700 (PDT)
+Received: from ubuntu ([59.64.129.39])
+        by smtp.gmail.com with ESMTPSA id u22sm4418437pgi.85.2020.08.30.06.07.49
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 30 Aug 2020 06:07:51 -0700 (PDT)
+Date:   Sun, 30 Aug 2020 06:07:44 -0700
+From:   zefang han <hanzefang@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] tools/hcidump: fix a out-of-bounds read in
+ le_meta_ev_dump()
+Message-ID: <20200830130744.GA10568@ubuntu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200830091917.GB122343@kroah.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Aug 30, 2020 at 11:19:17AM +0200, Greg KH wrote:
-> On Sat, Aug 29, 2020 at 10:27:12PM +0530, Anmol Karn wrote:
-> > Fix null pointer deref in hci_phy_link_complete_evt, there was no 
-> > checking there for the hcon->amp_mgr->l2cap_conn->hconn, and also 
-> > in hci_cmd_work, for hdev->sent_cmd.
-> > 
-> > To fix this issue Add pointer checking in hci_cmd_work and
-> > hci_phy_link_complete_evt.
-> > [Linux-next-20200827]
-> > 
-> > This patch corrected some mistakes from previous patch.
-> > 
-> > Reported-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-> > Link: https://syzkaller.appspot.com/bug?id=0d93140da5a82305a66a136af99b088b75177b99
-> > Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
-> > ---
-> >  net/bluetooth/hci_core.c  | 5 ++++-
-> >  net/bluetooth/hci_event.c | 4 ++++
-> >  2 files changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 68bfe57b6625..996efd654e7a 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -4922,7 +4922,10 @@ static void hci_cmd_work(struct work_struct *work)
-> >  
-> >  		kfree_skb(hdev->sent_cmd);
-> >  
-> > -		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
-> > +		if (hdev->sent_cmd) {
-> > +			hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
-> > +		}
-> 
-> How can sent_cmd be NULL here?  Are you sure something previous to this
-> shouldn't be fixed instead?
+Check whether the subevent code of le meta event is bigger than
+the size of ev_le_meta_str.
+---
+ tools/parser/hci.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Sir, sent_cmd was freed before this condition check, thats why i checked it,
+diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+index 41f6fe087..acd41be83 100644
+--- a/tools/parser/hci.c
++++ b/tools/parser/hci.c
+@@ -3668,7 +3668,12 @@ static inline void le_meta_ev_dump(int level, struct frame *frm)
+ 	frm->len -= EVT_LE_META_EVENT_SIZE;
+ 
+ 	p_indent(level, frm);
+-	printf("%s\n", ev_le_meta_str[subevent]);
++
++	if (subevent > LE_EV_NUM) {
++		printf("Unknown\n");
++	} else {
++		printf("%s\n", ev_le_meta_str[subevent]);
++	}
+ 
+ 	switch (mevt->subevent) {
+ 	case EVT_LE_CONN_COMPLETE:
+-- 
+2.17.1
 
-i think i should check it before the free of hdev->sent_cmd like,
-
-if (hdev->sent_cmd)
-	kfree_skb(hdev->sent_cmd);
-
-what's your opininon on this.
-
-> 
-> 
-> > +
-> >  		if (hdev->sent_cmd) {
-> >  			if (hci_req_status_pend(hdev))
-> >  				hci_dev_set_flag(hdev, HCI_CMD_PENDING);
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 4b7fc430793c..1e7d9bee9111 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -4941,6 +4941,10 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-> >  		hci_dev_unlock(hdev);
-> >  		return;
-> >  	}
-> > +	if (!(hcon->amp_mgr->l2cap_conn->hcon)) {
-> > +		hci_dev_unlock(hdev);
-> > +		return;
-> > +	}
-> 
-> How can this be triggered?
-
-syzbot showed that this line is accessed irrespective of the null value it contains, so  added a 
-pointer check for that.
-
-please give some opinions on this,
-
-if (!bredr_hcon) {
-	hci_dev_unlock(hdev);
-        return;
-}
-
-Thanks,
-Anmol Karn
