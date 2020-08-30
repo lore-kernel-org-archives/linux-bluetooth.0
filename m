@@ -1,78 +1,71 @@
-Return-Path: <SRS0=jcZI=CH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5eoE=CI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D47C3C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 16:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94131C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 07:11:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF5B520791
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Aug 2020 16:57:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A1322071B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Aug 2020 07:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNYxsNt6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zf1Dz954"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728478AbgH2Q50 (ORCPT
+        id S1726657AbgH3HLf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Aug 2020 12:57:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47270 "EHLO
+        Sun, 30 Aug 2020 03:11:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728403AbgH2Q5X (ORCPT
+        with ESMTP id S1726558AbgH3HL0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Aug 2020 12:57:23 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F9D1C061236;
-        Sat, 29 Aug 2020 09:57:23 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id z18so979728pjr.2;
-        Sat, 29 Aug 2020 09:57:23 -0700 (PDT)
+        Sun, 30 Aug 2020 03:11:26 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB07BC061573
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2020 00:11:25 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id w5so2904373wrp.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Aug 2020 00:11:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=JNi5HVcJ7yBT6DVF4xqHEm9pH1OJge9gkwZUJEYG2kc=;
-        b=MNYxsNt6X9itvJUV8tku0XRaO2RkCQBN/mLZewjUf+5xA4M+6/yPPdjtQMeC03rKJ9
-         /vBExQZIZEJ/8mNV+ATN2E3odhetvXRn7l9QyHP8+42rI56Lfe/pZyP7hzOJcp7nviGZ
-         eV2wAYm2MIa0odEJKZOwYx5+dWqyhYy7c7gfzZvpF+6sArgdZWX43/5Td5xSSdadBQAI
-         UqLS7vU+WQBQB33Y+fG73wRdTYAzCwZC6P+Cw3zj6uciFZgLsWtKw3pLiKGDy0tPj18t
-         HZYa8ri3GqKOo9xgNfDTnVzZPj5A3ouYyVOBecWIQ3cHMy6md3gCkWSEW7fZ2M+731WJ
-         st0g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/ehZDFISSLHPOT/cvMww/3eQrFijdzTCQp0NJi7pzv0=;
+        b=Zf1Dz954a6HkbYPcqQOnZ1aq8bpxtHGD2j1lYEKVMWd6G6YgQgtMD7scbqh49ewxIn
+         ZFDN2wA2mqSNT51mAH2+3/j0K3LQFyF/LTJb/g99D3kwoYwobufVy+iUd9TlplIRlxal
+         9HR6Lx0GOEgXtMN1Kg1eNvY4Yo6hPr/EcPio30lA+nDwPuWqdMaCW3LJRW+rjbIdEo5G
+         IitdRYZfyBo/gR/EgzoLoH04dNIbYfwJZehVqoJ5pP2PPwODkAGylums33xRhz7tyijh
+         92YRkWzpJUUW19f9aOX8ZtlaBlfWYODEkVNooD4NeduE4h9UzzkX1oOVFW+xfAYR4Es2
+         +HSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=JNi5HVcJ7yBT6DVF4xqHEm9pH1OJge9gkwZUJEYG2kc=;
-        b=sl77v/v24McA3OEHQ6zgmMf5MX129/FsSNPVqKA4Gr52DpC3LfjDW8pod+uTiJOnqz
-         SQG3qFm7xQle4AblQBmpChp3udSmJqQ6EIZjOkEJFKS9t3JfKwsgjQK+E/NRovbpHlaY
-         8uHly7JKBWdvFNOd2zQUhpUhVuou58XJ/njk2wmmqvHBzW8aSqgtUXS41a94SsSuN+ZG
-         5uI3VX/H3fMD2Gg3rkI1UesxgVP1+BpCXgSGNLCst2NG7X0In5pz0I4sD/rs3GRxbksg
-         yyid59ryZfsMfn4xpciAIrIVvOViT8X9djF1rPNlUtnIDbX5SXrdw5xzkIGDmc56lxkG
-         iibQ==
-X-Gm-Message-State: AOAM533FNGIS35fsr/iBp4dEGdc+bGS7WD8HcelcGOC/ZI2UgxlBYDx/
-        GpwkADH+Kjrr/mBrD18y8Lw=
-X-Google-Smtp-Source: ABdhPJyJ2xh7VLE9WxChS1XpbZ+c5kNddCKSHHWbjfZPxZl64QPAKow+8XMyVaErBkNl9etlMM2aog==
-X-Received: by 2002:a17:90b:238d:: with SMTP id mr13mr3474738pjb.132.1598720242628;
-        Sat, 29 Aug 2020 09:57:22 -0700 (PDT)
-Received: from localhost.localdomain ([45.118.165.144])
-        by smtp.googlemail.com with ESMTPSA id a200sm3217970pfd.182.2020.08.29.09.57.18
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/ehZDFISSLHPOT/cvMww/3eQrFijdzTCQp0NJi7pzv0=;
+        b=H32KVgREna4JdTMNZue/tyZQ139e0Ajg5iRAUAoN87EQWYXUXm8F3jMMA9BPLXSPRU
+         StWbyf0asfXL99/w3O8wrkZlg8ZPcF3ZpgRBTsVFFnKkLh++QSoBhrnyGrueYwtot4iV
+         JELK7TMv7+q22P2IYOUBc++fryzYuVlArtrk9d4T8bqd48z1tFCaUD/STD+Qu/YyuMbO
+         DAFXS0MXCZa7ZXdTSBtCX6+y9jZ+FD9wQhNZ1T0roINET/S3SKRMVLkDBMmcVjcpryqk
+         kXRfTTjgBZGlNNH+GRD9iCcJSr0WWRo77VujzoInIgKP7OF5fWm3GVhJd1Snd4LUB3KE
+         Z7kw==
+X-Gm-Message-State: AOAM530rAQApK+W9nuKTw+xdfuKNEUQ9pLA4NgxHgegBXaMn9UlPb65E
+        chXStp1yJpC88e0OXmt2lSR9868daEk=
+X-Google-Smtp-Source: ABdhPJzUT+MKgSR9ysGC0LecFZo1aT7NXO+YZEcYZ20Ga0IRDpvG6eELIPkUehm0g3WTuigqgWvtAw==
+X-Received: by 2002:adf:e58b:: with SMTP id l11mr4270631wrm.210.1598771481256;
+        Sun, 30 Aug 2020 00:11:21 -0700 (PDT)
+Received: from thinkabit1.lan (21.81.7.51.dyn.plus.net. [51.7.81.21])
+        by smtp.gmail.com with ESMTPSA id h185sm5197859wme.25.2020.08.30.00.11.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2020 09:57:21 -0700 (PDT)
-From:   Anmol Karn <anmol.karan123@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        kuba@kernel.org, davem@davemloft.net, anmol.karan123@gmail.com,
-        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-Subject: [Linux-kernel-mentees] [PATCH] net: bluetooth: Fix null pointer deref in hci_phy_link_complete_evt
-Date:   Sat, 29 Aug 2020 22:27:12 +0530
-Message-Id: <20200829165712.229437-1-anmol.karan123@gmail.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200829124112.227133-1-anmol.karan123@gmail.com>
-References: <20200829124112.227133-1-anmol.karan123@gmail.com>
+        Sun, 30 Aug 2020 00:11:20 -0700 (PDT)
+From:   Barry Byford <31baz66@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Barry Byford <31baz66@gmail.com>
+Subject: [PATCH BlueZ 0/1] Fix small typo in bluetoothctl
+Date:   Sun, 30 Aug 2020 08:11:07 +0100
+Message-Id: <20200830071108.19777-1-31baz66@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -80,55 +73,14 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix null pointer deref in hci_phy_link_complete_evt, there was no 
-checking there for the hcon->amp_mgr->l2cap_conn->hconn, and also 
-in hci_cmd_work, for hdev->sent_cmd.
+Changing apperance to be appearance
 
-To fix this issue Add pointer checking in hci_cmd_work and
-hci_phy_link_complete_evt.
-[Linux-next-20200827]
+Barry Byford (1):
+  Fix typo in bluetoothctl
 
-This patch corrected some mistakes from previous patch.
+ client/advertising.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reported-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?id=0d93140da5a82305a66a136af99b088b75177b99
-Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
----
- net/bluetooth/hci_core.c  | 5 ++++-
- net/bluetooth/hci_event.c | 4 ++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 68bfe57b6625..996efd654e7a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4922,7 +4922,10 @@ static void hci_cmd_work(struct work_struct *work)
- 
- 		kfree_skb(hdev->sent_cmd);
- 
--		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
-+		if (hdev->sent_cmd) {
-+			hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
-+		}
-+
- 		if (hdev->sent_cmd) {
- 			if (hci_req_status_pend(hdev))
- 				hci_dev_set_flag(hdev, HCI_CMD_PENDING);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4b7fc430793c..1e7d9bee9111 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4941,6 +4941,10 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
- 		hci_dev_unlock(hdev);
- 		return;
- 	}
-+	if (!(hcon->amp_mgr->l2cap_conn->hcon)) {
-+		hci_dev_unlock(hdev);
-+		return;
-+	}
- 
- 	bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
- 
 -- 
-2.28.0
+2.25.1
 
