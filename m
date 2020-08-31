@@ -2,127 +2,118 @@ Return-Path: <SRS0=C8Ye=CJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1037C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 16:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3E9C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 16:52:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5BFF20707
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 16:51:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B7B120866
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 16:52:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UzOsZYDp"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PKX3NGBd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728329AbgHaQvi (ORCPT
+        id S1728798AbgHaQwM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Aug 2020 12:51:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        Mon, 31 Aug 2020 12:52:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726939AbgHaQvh (ORCPT
+        with ESMTP id S1728796AbgHaQwI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Aug 2020 12:51:37 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E740BC061575
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 09:51:36 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id p37so918131pgl.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 09:51:36 -0700 (PDT)
+        Mon, 31 Aug 2020 12:52:08 -0400
+Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32113C061755
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 09:52:08 -0700 (PDT)
+Received: by mail-vs1-xe44.google.com with SMTP id e14so3574257vsa.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 09:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e0vvOvvHJGYF7a0Genu2fCkpngsUdQSUu8uEc44Bpec=;
-        b=UzOsZYDpZRtoa3zdZGrzH2kjQLR4VT+DZn2shy2vnsl06x55wm8y65FeOgjXRxV55e
-         HxkvO7V6BZW0+16tOURbnBnIHu/WjsjRe9An0i0j5mw2bIKBCkKXWhXmb0BSwWQ3b5/h
-         WQ0S+FTtmqLPVmcYWDS4petTsGSqZhWjRFA0I=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=v2wssN0DfVl0Q5ulsK8rehD0qys9A1UTSyxawRAlJec=;
+        b=PKX3NGBdootImldgizkUZ9JNq2aRTpLy+LDPXgaGjN67aJZcX5pKbxjF6UCyW/HP/1
+         1xIphJEPk/1dlpzCnvwdr8psoRTZ4SQXSMEmtmvUrQlJjlhEMVNcqa79KrQe88WEXmBS
+         Tu8vgti347fq8k6r++gj5T7TkTnDDswBF6FeM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e0vvOvvHJGYF7a0Genu2fCkpngsUdQSUu8uEc44Bpec=;
-        b=UB2cRtNwLWEnTscutqUVS8SNT3g2ubkIH25zj+hPTLZmGOF8TtM6ZMrjq85Dw4fJ0V
-         36Ot+0d57KIr8DUxEf62e/Ex7eUmKGLDxj5Bm5xeeMxKGaLXjC5ryYdN8VuIdeZwb1ff
-         q5uAkg8KfXgViC23oDqW0TmvKR/6h1iZOYH88XT82pazXn0Qc4vwno+qjxg4Z17fpu91
-         T+/ruVEh29AYdy/wPGQiI/+5sz5aFH+LRiYGXyxmlh36P83e/4u66le+wcyIPYniJP3O
-         s5wrex7VSPQmTBnVFLUvMlMmA7XkOEZjfuWzJXJbk6U67zjtgNiYryYV2ZckABMMIK11
-         gSUA==
-X-Gm-Message-State: AOAM533U/pmOVxWlDChtxwz4NY4UD6LjvoHcimakG1jb+nzRrlf+urgY
-        qCCJKisjGRudzTx2pqEp1Omm8w==
-X-Google-Smtp-Source: ABdhPJx+lLDch40/FsX48QUf1KjmhYjA47S013g5ttuztFBm4bL4RjoNUNMuail4dby1mDZKmeW8+g==
-X-Received: by 2002:a63:5160:: with SMTP id r32mr2003729pgl.112.1598892696285;
-        Mon, 31 Aug 2020 09:51:36 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id k5sm8189082pgk.78.2020.08.31.09.51.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2020 09:51:35 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=v2wssN0DfVl0Q5ulsK8rehD0qys9A1UTSyxawRAlJec=;
+        b=HlZq5u4jS48QwCwGskxHE71/vn6LKZ6/m7htwyWpirlFHddRBev+MJcP9G4xZj98v4
+         BD2c00Ph62Iemx0x/hKo8FZf7zfXlHzkjJqjJAlkGOWABOEf4xls7q+zgnPW3HHof+4B
+         a+xt/OZBa0C/ngSkwn6CxjshgAgKpa8W5Xk6gc/qMjG10Jrdu2cHgENZihuhqJO9TlzR
+         l8xwzCvGg02S7S4AKcXESjCvfzXymph6kGvGT98o4hx8T9sp/szMtX6tPeShxnP6qgD+
+         0/jvBPG0mvRZCdXqMBcD6ub+CkeUDUf69DzWe7fsrgAXojiPYk5vR166ZxqhtYwu2kUh
+         CFdA==
+X-Gm-Message-State: AOAM533AIwlkdy4wQ/nYsEvnMikuo2jC/uZWCdGmPN44MbWomscZ1Kzp
+        q6kDhPVg0meRqPTLyATDYvYExnRwHaqAbwSMc8JOxA==
+X-Google-Smtp-Source: ABdhPJzRl4IzM+/5e+TD8Pd7j+A6SmKTwYoGY5YNvdrKb+tJbT1J0kMH3uJc5Yi9i1lQvDnOm0uTXj7cCiaXUmoq3bo=
+X-Received: by 2002:a05:6102:1045:: with SMTP id h5mr2083568vsq.42.1598892727414;
+ Mon, 31 Aug 2020 09:52:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200826154719.1.I24fb6cc377d03d64d74f83cec748afd12ee33e37@changeid>
+ <A69701BE-FBB3-4053-8187-618C0BD4B380@holtmann.org>
+In-Reply-To: <A69701BE-FBB3-4053-8187-618C0BD4B380@holtmann.org>
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+Date:   Mon, 31 Aug 2020 09:51:56 -0700
+Message-ID: <CANFp7mXY7--Mziduq69gUj5cgCiZCZ-47JOpBNL6H0bLpN2bbQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Clear suspend tasks on unregister
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH v2] Bluetooth: Clear suspend tasks on unregister
-Date:   Mon, 31 Aug 2020 09:51:27 -0700
-Message-Id: <20200831095119.v2.1.I24fb6cc377d03d64d74f83cec748afd12ee33e37@changeid>
-X-Mailer: git-send-email 2.28.0.402.g5ffc5be6b7-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-While unregistering, make sure to clear the suspend tasks before
-cancelling the work. If the unregister is called during resume from
-suspend, this will unnecessarily add 2s to the resume time otherwise.
+v2 sent with fix.
 
-Fixes: 4e8c36c3b0d73d (Bluetooth: Fix suspend notifier race)
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
-This was discovered with RT8822CE using the btusb driver. This chipset
-will reset on resume during system suspend and was unnecessarily adding
-2s to every resume. Since we're unregistering anyway, there's no harm in
-just clearing the pending events.
-
-Changes in v2:
-- ++i to i++
-
- net/bluetooth/hci_core.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 68bfe57b66250f..efc0fe2b47dac2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3442,6 +3442,16 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	}
- }
- 
-+static void hci_suspend_clear_tasks(struct hci_dev *hdev)
-+{
-+	int i;
-+
-+	for (i = 0; i < __SUSPEND_NUM_TASKS; i++)
-+		clear_bit(i, hdev->suspend_tasks);
-+
-+	wake_up(&hdev->suspend_wait_q);
-+}
-+
- static int hci_suspend_wait_event(struct hci_dev *hdev)
- {
- #define WAKE_COND                                                              \
-@@ -3785,6 +3795,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	cancel_work_sync(&hdev->power_on);
- 
- 	unregister_pm_notifier(&hdev->suspend_notifier);
-+	hci_suspend_clear_tasks(hdev);
- 	cancel_work_sync(&hdev->suspend_prepare);
- 
- 	hci_dev_do_close(hdev);
--- 
-2.28.0.402.g5ffc5be6b7-goog
-
+On Mon, Aug 31, 2020 at 8:49 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Abhishek,
+>
+> > While unregistering, make sure to clear the suspend tasks before
+> > cancelling the work. If the unregister is called during resume from
+> > suspend, this will unnecessarily add 2s to the resume time otherwise.
+> >
+> > Fixes: 4e8c36c3b0d73d (Bluetooth: Fix suspend notifier race)
+> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > ---
+> > This was discovered with RT8822CE using the btusb driver. This chipset
+> > will reset on resume during system suspend and was unnecessarily adding
+> > 2s to every resume. Since we're unregistering anyway, there's no harm in
+> > just clearing the pending events.
+> >
+> > net/bluetooth/hci_core.c | 11 +++++++++++
+> > 1 file changed, 11 insertions(+)
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 68bfe57b66250f..ed4cb3479433c0 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -3442,6 +3442,16 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> >       }
+> > }
+> >
+> > +static void hci_suspend_clear_tasks(struct hci_dev *hdev)
+> > +{
+> > +     int i;
+> > +
+> > +     for (i = 0; i < __SUSPEND_NUM_TASKS; ++i)
+> > +             clear_bit(i, hdev->suspend_tasks);
+>
+> I prefer i++ instead of ++i.
+>
+> Regards
+>
+> Marcel
+>
