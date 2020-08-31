@@ -5,181 +5,134 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DCAC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 17:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB98C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 17:37:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92E6320678
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 17:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D5992071B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Aug 2020 17:37:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlxgEndm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rIRSSgny"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbgHaRfq (ORCPT
+        id S1727944AbgHaRhA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Aug 2020 13:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
+        Mon, 31 Aug 2020 13:37:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbgHaRfp (ORCPT
+        with ESMTP id S1727963AbgHaRg7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Aug 2020 13:35:45 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CBDC061573
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 10:35:45 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id n23so6013646otq.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 10:35:45 -0700 (PDT)
+        Mon, 31 Aug 2020 13:36:59 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBD2C061575
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 10:36:58 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id u126so332113oif.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Aug 2020 10:36:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Z5VXzSpw3QdED1GgJDUjwLnGvGiM8SjQjH0TUfY3Ysc=;
-        b=YlxgEndmh6kJiMlHMARt7f57E5pCD7FKzwAUcgEVAAgKWE2hXYXcPu+KK8mLJUQJH6
-         9ouA/yf5vbhJoP8Km+c8pZB1g/a11gvlHRiab4VW7ZwpD3lF3ktb0w41g1YBw/kTmtjm
-         yUjD5F1DK+5If+pxcyqvB8gO5wVCP5Xaqwa6NvEGw5JT52JQpDdjxLWjz4VYwrsQSIQm
-         Ab/nqFdQ4puQLQS2WnYOwKebp2b1JZa1TMC359Z5ZFD5iA3Fv//1pZ9QssT9yj3kjqjO
-         C7pD6N8FKlK0/pUST6RQIZ3WKvcacMufRoOQ0h6uyxSxvIq8jU9AdP4DYZwFDvGi+JVz
-         L+NQ==
+        bh=Zbf92dZlH3/7ED8fn+BCMplp9D+b1oAEmWrpMrO/yy4=;
+        b=rIRSSgnywAFi6jSB/48FKd4VjhckhDEvnr86SRPG9A2yxljJsYZd4u+D9hYge/4kTk
+         Y5t1JNb5LakG9isGUST4qMEoNO6xrWcX7WpszgPJ5wyD8o6SujFKLmu6EhUOhDPXcvc8
+         pNCXUqrR94rF9un9jf645m6tgpRGh7saEnxbkUL3O8dxpxnuxIPdsVmI4fryb/iW6I9a
+         dNVrhB3gjR+6SF6I88jFQt7CftBdKAK2IGdrjk3G8xV5plUTpsUauXhjFVQiR1rXx1bl
+         bJdCZtZGxRhWTScjZTGckIhzZ9tWGsO94xYLmeaTFq6O4mRYAj4zNHTA9iaqjZrTO4d6
+         kPbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Z5VXzSpw3QdED1GgJDUjwLnGvGiM8SjQjH0TUfY3Ysc=;
-        b=hJAP/K3h48pghN3M8QOyRko0w8Wa20dA4mqe9KG8YoPO7RRarUKCUf4EySX+IjYYod
-         U3ZVW955IP3Cp/6cNMHgKB/nPtbLcFEg0WIqSIbjhY7GTqsEU7iOq0iD9sezVw5zgvme
-         TgMT4ejuDtk9cbLONFQBevA6Vt1PUKWMw92DrkTC5Z5tN2+5Zm6GQ8WA+YXoqStN2z0Q
-         x13o+UnzXS7Jn4eY9nZBwWOroOPa8PcoB8T5nP8ckCYvY/D5pNpmpt3g/DG719+n9AyB
-         ZK/t6h7qapW4r2DGLgDVvTYKeHeT6CK/8x2a3KHzWA4ECrrfI0y2xmCvrwOdiJqqQxYJ
-         C17A==
-X-Gm-Message-State: AOAM530JK14HST5ckPdBPz25HetXXw0n6NnHRXmmnIctbYZtzoykmfSS
-        fKMJlaS6qU8U09F9FasLsQMenzmM4AlneL0eo1A=
-X-Google-Smtp-Source: ABdhPJzLO15tBkAivoQ6Z/upf1o7yj6nWEkEfAtB87tMBE701lCbJOQ8q7qlYtbuoVLieiEPTk5fqvHuWda3imEbKr8=
-X-Received: by 2002:a9d:6053:: with SMTP id v19mr1576552otj.362.1598895344667;
- Mon, 31 Aug 2020 10:35:44 -0700 (PDT)
+        bh=Zbf92dZlH3/7ED8fn+BCMplp9D+b1oAEmWrpMrO/yy4=;
+        b=NS9SoSO+uMjJB2hU4gxZIqNaDIQ0SeeQrgxBf8oHceaKjTmF9FgO3uhO9+1sC4Ulpm
+         0Wykg0dfLxHjyZPmRd+BmgPbrSTViH5sTOVlAqZwj+7N6T4wmNmYF/uaHoQFyGPrRAVF
+         2RKPbL6ogQXEM0QHKy0MY01bliUsWVjJG3YyXFdYgivyrqrsPgved1SIWmNFnmspvfxg
+         xCjTJVEMjJ54/2HKVFu846jYTiRFy/C2SeDrq0c+cG7uT/nATJ04xLtW2BWGWvaoODoY
+         M6U8U2U9ddkSewo8Spv3L1WUDA4DzJfobfwKD5c2ktbZPVRkFU37WWBeJGGY2QXeIBL8
+         MVig==
+X-Gm-Message-State: AOAM531+QCAaAy1UshJAkCvZJNrnuuW4CWzhJW6dHlDrq6EIl72kJ4Ib
+        UuJ1dQY1ypEv62kudfy9RlQ1dYWExXPRy3DQMGs=
+X-Google-Smtp-Source: ABdhPJwKIe3rTpxJjotpg2TcjkqdFlTpTurdtWAcTCBEaWNfO6Yb0JR9s0CloHwBYUuDnoaAvrmV2SxSs2Yq//ixKFg=
+X-Received: by 2002:a05:6808:913:: with SMTP id w19mr270455oih.48.1598895417630;
+ Mon, 31 Aug 2020 10:36:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200831161140.Bluez.v1.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
-In-Reply-To: <20200831161140.Bluez.v1.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
+References: <20200829010210.871471-1-abhishekpandit@chromium.org> <20200828180157.Bluez.v3.1.I14a96397d181666c124e1c413b834428faf3db7a@changeid>
+In-Reply-To: <20200828180157.Bluez.v3.1.I14a96397d181666c124e1c413b834428faf3db7a@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 31 Aug 2020 10:35:34 -0700
-Message-ID: <CABBYNZLTY_cFcttmMdiBH7PNU1xT2bw-eKnOQkHDak3+Y8WrXQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] device: don't wait for timeout if RemoveDevice
- is called
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
+Date:   Mon, 31 Aug 2020 10:36:47 -0700
+Message-ID: <CABBYNZJTr13-XK9KuXOD+UzB6_oSwefvpJ9ptPRf0dygdAhKHw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 1/3] mgmt: Add controller suspend and resume events
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Abhishek,
 
-On Mon, Aug 31, 2020 at 1:12 AM Archie Pusaka <apusaka@google.com> wrote:
+On Fri, Aug 28, 2020 at 6:02 PM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
+> Add the controller suspend and resume events.
 >
-> RemoveDevice on adapter interface used to remove a device, even when
-> the device is connected. However, since the introduction of the new
-> 30 seconds timeout when setting a device as temporary, RemoveDevice
-> doesn't immediately remove a connected device, but only disconnects
-> it and waits for the timer to expire before effectively removes it.
->
-> This patch removes the device as soon as it gets disconnected,
-> provided the disconnection is triggered by a call to RemoveDevice.
-> The regular timeout still applies for other cases.
->
-> Tested manually by calling RemoveDevice on a connected device,
-> and with ChromeOS autotest setup.
->
-> Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 > ---
 >
->  src/adapter.c |  2 --
->  src/adapter.h |  2 ++
->  src/device.c  | 11 +++++++++++
->  3 files changed, 13 insertions(+), 2 deletions(-)
+> Changes in v3: None
+> Changes in v2: None
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 5e896a9f0..d6c65ff69 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -79,8 +79,6 @@
->  #include "advertising.h"
->  #include "eir.h"
+>  lib/mgmt.h | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
-> -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> -
->  #define MODE_OFF               0x00
->  #define MODE_CONNECTABLE       0x01
->  #define MODE_DISCOVERABLE      0x02
-> diff --git a/src/adapter.h b/src/adapter.h
-> index f8ac20261..f835c984f 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -26,6 +26,8 @@
->  #include <dbus/dbus.h>
->  #include <glib.h>
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index a800bcab4..46d894ae9 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -772,6 +772,7 @@ struct mgmt_ev_device_connected {
+>  #define MGMT_DEV_DISCONN_TIMEOUT       0x01
+>  #define MGMT_DEV_DISCONN_LOCAL_HOST    0x02
+>  #define MGMT_DEV_DISCONN_REMOTE                0x03
+> +#define MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND    0x05
 >
-> +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+>  #define MGMT_EV_DEVICE_DISCONNECTED    0x000C
+>  struct mgmt_ev_device_disconnected {
+> @@ -959,6 +960,17 @@ struct mgmt_ev_adv_monitor_removed {
+>         uint16_t monitor_handle;
+>  }  __packed;
+>
+> +#define MGMT_EV_CONTROLLER_SUSPEND             0x002d
+> +struct mgmt_ev_controller_suspend {
+> +       uint8_t suspend_state;
+> +} __packed;
 > +
->  #define MAX_NAME_LENGTH                248
->
->  /* Invalid SSP passkey value used to indicate negative replies */
-> diff --git a/src/device.c b/src/device.c
-> index bb8e07e8f..cee0ddfd2 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3001,6 +3001,7 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
->  void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
->  {
->         struct bearer_state *state = get_state(device, bdaddr_type);
-> +       bool remove_device = false;
->
->         if (!state->connected)
->                 return;
-> @@ -3018,6 +3019,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
->         while (device->disconnects) {
->                 DBusMessage *msg = device->disconnects->data;
->
-> +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-> +                                                               "RemoveDevice"))
-> +                       remove_device = true;
+> +#define MGMT_EV_CONTROLLER_RESUME              0x002e
+> +struct mgmt_ev_controller_resume {
+> +       struct mgmt_addr_info addr;
+> +       uint8_t wake_reason;
+> +} __packed;
 > +
->                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
->                 device->disconnects = g_slist_remove(device->disconnects, msg);
->                 dbus_message_unref(msg);
-> @@ -3043,6 +3048,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>  static const char *mgmt_op[] = {
+>         "<0x0000>",
+>         "Read Version",
+> @@ -1088,6 +1100,8 @@ static const char *mgmt_ev[] = {
+>         "Device Flags Changed",
+>         "Advertisement Monitor Added",                  /* 0x002b */
+>         "Advertisement Monitor Removed",
+> +       "Controller Suspend",
+> +       "Controller Resume",
+>  };
 >
->         g_dbus_emit_property_changed(dbus_conn, device->path,
->                                                 DEVICE_INTERFACE, "Connected");
-> +
-> +       if (remove_device)
-> +               btd_adapter_remove_device(device->adapter, device);
->  }
->
->  guint device_add_disconnect_watch(struct btd_device *device,
-> @@ -4457,6 +4465,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
->                 disconnect_all(device);
->         }
->
-> +       if (device->temporary_timer > 0)
-> +               g_source_remove(device->temporary_timer);
-> +
->         if (device->store_id > 0) {
->                 g_source_remove(device->store_id);
->                 device->store_id = 0;
+>  static const char *mgmt_status[] = {
 > --
 > 2.28.0.402.g5ffc5be6b7-goog
 
-Does not apply:
-
-Applying: device: don't wait for timeout if RemoveDevice is called
-error: patch failed: src/device.c:3001
-error: src/device.c: patch does not apply
-
-
+Patches 1 and 2 of this series were applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
