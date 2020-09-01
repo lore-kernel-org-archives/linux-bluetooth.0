@@ -2,242 +2,187 @@ Return-Path: <SRS0=HAk7=CK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA35DC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A46C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 17:47:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E5F1206C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1454B208CA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 17:47:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GGWUMXRF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0vyufV0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728596AbgIAO5O (ORCPT
+        id S1729688AbgIARrc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Sep 2020 10:57:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49052 "EHLO
+        Tue, 1 Sep 2020 13:47:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728352AbgIAO5I (ORCPT
+        with ESMTP id S1726102AbgIARra (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Sep 2020 10:57:08 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D7F9C061244
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2020 07:57:08 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id q9so1478813wmj.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2020 07:57:08 -0700 (PDT)
+        Tue, 1 Sep 2020 13:47:30 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0637C061244
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Sep 2020 10:47:29 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id j21so1893299oii.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Sep 2020 10:47:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hLDJ+UQsBYKOwVzT7ELuuVL1CsF0kEh5OP6WOxpuSVA=;
-        b=GGWUMXRFzgpBPc/6U2OE2ANTVTMt8sqLniAaYvyzhv6ifIN5v71HwZ7Oc0WSbVB5jz
-         LYyyiytAQz5bAxf9eoYM01pzjanOX7ErZOL/U8rG2S/H++r5cBXF4X93KUuDkqti7Moy
-         yOaqe8En+YtdjpkKIFK2XgVE3jgzyMgNR1YnZD27Yt0sA6cNunaDPg5xogVWQ9FAbpqK
-         KUi1/CQwIgcpvTGdvmwSWITmqCdCJcPDziWi3M6jHKBB4DNoqYoVrfYzR0OduIFpluPp
-         ie6mVbuD0YxKraJ/E0D1giHhOhylyogH0+opE/CO2OcAsNiI5PXX8IGE3vKodCeIVA/U
-         Haaw==
+        bh=OBa4zSsC7mmvdX3MM5YBiZhyDeDh3CNd56AtQwupmoA=;
+        b=X0vyufV04Cvvr6FFJ3aETHrb/NoC3lWzm1Eb9kMd8Kun4dZ93mAoxtOWxEoyUVq3Fz
+         XdiLrRGbKoOrKxAJuJNkuKDOEreMNdUgJUf4WdfbwtAbSSOWx7/JKLalBTEnZOQULgoV
+         y9M0siiBImjaRldkPAnjUXYt19u6e2gxkOZPmYDidWflMgvHeJmAqcjl13i8a8MzKB6d
+         86T/xoFEC33sekkFmTfvvBwEdp+vzx6oMPq7dhM6cK2dvSPrylWgPRW+/W/9pGOdMZk9
+         v88Tpv/GKKqYZQAHOdk2G2XkIvENbMTsaGlwS1R/XX/BmldfwC5DHK2+88oKk9VAOyz6
+         bFGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hLDJ+UQsBYKOwVzT7ELuuVL1CsF0kEh5OP6WOxpuSVA=;
-        b=BdNMDxuWsGkAKmK3dVIW47DGDcZl8FoBLUuhXEY12jI2ML15WVX74QJZEgStEFwf86
-         fK1Ddq6Re0oKBrNTA4DLb7O5Sng8V/YkOa83bUAtQKLkjGf+anVSVLg2CN97fRnMm2Ys
-         tMXJ+YfB+34qo+c4XRY6SCwAwfpb89mc2/mOAy4nc3b8Br4ZsfKKFpbaxt2J12QXMubA
-         bI/SzOcfgiFJ6+8HcRqxNnCNBaWFUFMFs8AFEKiewK9a3AuGv0JY4FwY6XAxs3lk2bQr
-         fpmi0GsNoxHoeM6MAGaV7HmODvQEupDL6mGlWfXmqoC3rz9CagkEUIGS9MvekzGbu/cm
-         URWA==
-X-Gm-Message-State: AOAM530j48ex+gL0Ou13bXDt+qwSUVUUspHtYPPxONHPwJ8pQ1gakmPp
-        4iRWLZD72IS9A5KCSRhgSdWICH9dJgHL7HnzTsE8pa4pzJCRMw==
-X-Google-Smtp-Source: ABdhPJwn8D4wdvBtqGayrcTDAeg7RwvlXYOgqSHIAscRzsDXXAeSjU2fymqsCJaw3qHJtYILA4OGTln6MEsDEnSgkdY=
-X-Received: by 2002:a1c:c20a:: with SMTP id s10mr2183737wmf.55.1598972226635;
- Tue, 01 Sep 2020 07:57:06 -0700 (PDT)
+        bh=OBa4zSsC7mmvdX3MM5YBiZhyDeDh3CNd56AtQwupmoA=;
+        b=mZK5nl/nhr9Jcvt8TlrQXn8UR0Fh/Y0lePu7EoOaNfcVYnEuoigcAkh5jxHrf3APpR
+         z2Fda/OHgMpEJ+ssqe1MxHTJ0mt2pNYnBeq5dSDysS4ZAmCwI01MFnWxsvNwPN4ZGl28
+         0s/5/rFE0JCEOfVlrcwtfdT0kQJzObHqEM2NxMQlsbjhQTRaqV96VAUCjQlrf5s8sd6n
+         ac8k+l9Bg/Z/aF3fDSnYK/J2OoW96hkI1j/rAHKU2XgKPd4/XNHFZiq/m/G6E8jS/sK0
+         Lp9Smwrba5FZpOSG3QueddHg8L+SilM9XtwvcjvW2zm1jVc8eScn7fiIdOvmFT8FlAfg
+         Gf7Q==
+X-Gm-Message-State: AOAM531G9XkolFLzhHbbPGfF/ytG8nyK/RR/+aSbUDmTSsDBgnCbnA0q
+        3LpKhqtAe/cB4yf3dojRwAQMUC2nMvuvtKwFbao=
+X-Google-Smtp-Source: ABdhPJxXL/aJxj8HMruY2b8PhLvLnMf36eDoYI8E6GbEXHXzNDRvIzrYa7A9by477MXaEe30UYAvL8n27xGMjXq/I+s=
+X-Received: by 2002:a05:6808:913:: with SMTP id w19mr1759257oih.48.1598982449016;
+ Tue, 01 Sep 2020 10:47:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200831153544.Bluez.v1.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
- <CABBYNZ+Q84vmEDgfNuoYXAAMi6T3segO_hSkG5Oufc5F_w9Qeg@mail.gmail.com>
- <CAJQfnxHyzFAG6zJfsuneLX_rW8yNkd2ZpKotHu3DV6vZABT-qw@mail.gmail.com>
- <CABBYNZJ4Y-U1nvyBvFwUXf+c0uT-42pBbrNtBG_G4RhLXGYspw@mail.gmail.com>
- <CAJQfnxEauZcut7yr85X7gTRzr7qo3BrBzXG+wHe=74c5c3sCig@mail.gmail.com>
- <CABBYNZL=NfVk3zo9C8g-Urbztx2LKWG28=4qWNbBW+KhJJh=Jw@mail.gmail.com> <CAJQfnxGGmRSWZgvx8VLrTO9KV5hysLjgXMK1ONKCTQKYrQ1uLA@mail.gmail.com>
-In-Reply-To: <CAJQfnxGGmRSWZgvx8VLrTO9KV5hysLjgXMK1ONKCTQKYrQ1uLA@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 1 Sep 2020 22:56:55 +0800
-Message-ID: <CAJQfnxE+p_VYwOMOQxCE=MG=_eV5FoxJVFE54wmQ10iJNbAErQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1 1/2] doc/media-api: Add Press method for MediaPlayer1
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+References: <20200817212554.3844965-1-yudiliu@google.com> <20200817142545.RFC.v2.1.Ibaa1dfd49179a141c19a651f3c2132a28b71b344@changeid>
+ <CABBYNZLRqhB6d5Hm7_RqvUqCJo11D4+pgYLCeWj0j=8dZk0Bcg@mail.gmail.com>
+ <CAHC-ybxshy5zmkAku6suicvjO0Ngofp0+gRyYLX_RXr9YhU94Q@mail.gmail.com>
+ <CAHC-ybxFY_3HWrvnwF5DS-i-YJtYpUuR9K3-MSWJWo=C-CKQHA@mail.gmail.com> <CALWDO_Wsyx3s3SwBejAFdc6SFX=V29DnvPKmo48hd-yy9SqHSg@mail.gmail.com>
+In-Reply-To: <CALWDO_Wsyx3s3SwBejAFdc6SFX=V29DnvPKmo48hd-yy9SqHSg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 1 Sep 2020 10:47:19 -0700
+Message-ID: <CABBYNZJxjYUvui7e-S4TGx21W2U9QvmXhyKNOaWg3RLR4jWg2A@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/1] adapter - D-Bus API for querying the adapter's capabilities
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Yu Liu <yudiliu@google.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
-        Michael Sun <michaelfsun@google.com>
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Alain,
 
-On Tue, 1 Sep 2020 at 14:30, Archie Pusaka <apusaka@google.com> wrote:
+On Tue, Sep 1, 2020 at 8:43 AM Alain Michaud <alainmichaud@google.com> wrote:
 >
-> On Tue, 1 Sep 2020 at 13:42, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Mon, Aug 31, 2020 at 10:33 PM Archie Pusaka <apusaka@google.com> wrote:
-> > >
-> > > Hi Luiz,
-> > >
-> > > On Tue, 1 Sep 2020 at 13:20, Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Archie,
-> > > >
-> > > > On Mon, Aug 31, 2020 at 8:19 PM Archie Pusaka <apusaka@google.com> wrote:
-> > > > >
-> > > > > Hi Luiz,
-> > > > >
-> > > > > The reason we introduced this method is because we need to send some
-> > > > > of AVRCP category 2 passthroughs in order to be able to qualify the
-> > > > > AVRCP absolute volume control as an audio source, despite we don't
-> > > > > actually plan to send any passthrough in the practice.
-> > > >
-> > > > I wonder what those are, are they volume up/down?
-> > > Yes, volume up/down and mute are the ones that are unique to category
-> > > 2, but there are also some other buttons which are included in
-> > > category 2 as well but not unique to it, for example button 0 - 9,
-> > > help, and power.
-> >
-> > Weird, there are dedicated commands for setting absolut volume, not
-> > sure why one would use volume up/down to qualify? Or is that testing
-> > any button that belongs to category 2? Anyway it would be nice to know
-> > what test that is and what is the expected behavior the test case
-> > expects from us.
+> Hi Marcel/Luiz,
 >
-> Weird, yes. Sending absolute volume command capability is declared in
-> the AVRCP ICS 2/50, but it can only be selected if 2/8 is also
-> selected, which is sending passthrough command for category 2.
-> Therefore, we also need to be able to send a category 2 passthrough.
->
-> The test itself is AVRCP/CT/PTT/BV-02-I. This is the test to see
-> whether we can send a category 2 passthrough, not the one to see
-> whether we can send the absolute volume command. The test asks us to
-> send every category 2 passthrough we declared in the ICS file (table
-> 4). There should be at least one passthrough declared.
->
-> >
-> > >
-> > > >
-> > > > > Therefore, which passthrough we send is actually not important (to
-> > > > > us), as long as we can do that to satisfy the requirement.
-> > > > > However, I see that there are over 50 passthroughs across category 1 -
-> > > > > 4, and thought that it would be cumbersome to have a different method
-> > > > > for each key if one day we decided to support them all, hence the
-> > > > > generic method.
-> > > >
-> > > > Yep, but there are button presses so things gets a little more
-> > > > complicated if we need to emulate press/hold/release semantics.
-> > > For now, I don't think having a separate method for each key will make
-> > > it easier if we need to emulate hold and release semantics.
-> > >
-> > > Could we have 3 methods as follows, all have avc_key as a param:
-> > > (a) press. This means BlueZ will auto-release it within a short amount of time
-> > > (b) hold. Bluez wouldn't release it unless it received (c).
-> > > (c) release. Bluez will release the previously held button.
-> > > What do you think?
-> >
-> > I'm fine with that, we might have to start the status of each request
-> > though, also the holding should not last longer than 2 seconds if I
-> > recall correctly.
->
-> Then I shall try to have this implemented.
-> Btw I only took a quick glance, but I did not find the 2 seconds
-> limitation in the spec.
+> I'd be particularly interested in seeing your opinion on whether this could be better described as some form of SCO socket property... even if this is indeed an adapter property.
 
-I found it in the AV/C Panel Subunit specification from 1394 trade
-association. It says we want to support "hold", then we need to
-frequently resend the key with "pressed" state, because if 2 seconds
-passed without the TG receiving it, then the TG will assume a
-"release" state is sent (but is lost).
-Also, the specification doesn't support multiple simultaneous button
-presses, because we are supposed to send "release" before sending a
-new "pressed" key, so I think we don't need to track the status for
-each request.
+Yep, but wasn't that supposed to be what BT_PKT_STATUS is for? I mean
+one can just attempt to read it with getsockopt and in case of returns
+an error it means the controller does not support it, that said it
+doesn't look like we do check the adapter features when using
+BT_PKT_STATUS, should that be checking if HCI_WIDEBAND_SPEECH_ENABLED
+is set?
 
+Also it doesn't seem we have updated userspace to support
+BT_PKT_STATUS, we should probably have something to test it via
+isotest and perhaps create a iso-tester.c to validate all the options.
+
+> Thanks,
+> Alain
 >
-> >
-> > > >
-> > > > > May I have some questions?
-> > > > > (1) Why do you prefer a dedicated method per key?
-> > > > > (2) Let's say I need to add a dedicated method for a single category 2
-> > > > > passthrough key, do you have a key in mind or I can just pick by
-> > > > > myself?
-> > > > >
-> > > > > Thanks,
-> > > > > Archie
-> > > > >
-> > > > >
-> > > > > On Tue, 1 Sep 2020 at 01:16, Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Archie,
-> > > > > >
-> > > > > > On Mon, Aug 31, 2020 at 12:37 AM Archie Pusaka <apusaka@google.com> wrote:
-> > > > > > >
-> > > > > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > > > > >
-> > > > > > > This allows us to send any passthrough command.
-> > > > > > >
-> > > > > > > Reviewed-by: Michael Sun <michaelfsun@google.com>
-> > > > > > > ---
-> > > > > > >
-> > > > > > >  doc/media-api.txt | 8 ++++++++
-> > > > > > >  1 file changed, 8 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
-> > > > > > > index dabc69936..fe7222eef 100644
-> > > > > > > --- a/doc/media-api.txt
-> > > > > > > +++ b/doc/media-api.txt
-> > > > > > > @@ -199,6 +199,14 @@ Methods            void Play()
-> > > > > > >                         Possible Errors: org.bluez.Error.NotSupported
-> > > > > > >                                          org.bluez.Error.Failed
-> > > > > > >
-> > > > > > > +               void Press(byte avc_key)
-> > > > > > > +
-> > > > > > > +                       Press a specific key to send as passthrough command.
-> > > > > > > +
-> > > > > > > +                       Possible Errors: org.bluez.Error.InvalidArguments
-> > > > > > > +                                        org.bluez.Error.NotSupported
-> > > > > > > +                                        org.bluez.Error.Failed
-> > > > > > > +
-> > > > > > >  Properties     string Equalizer [readwrite]
-> > > > > > >
-> > > > > > >                         Possible values: "off" or "on"
-> > > > > > > --
-> > > > > > > 2.28.0.402.g5ffc5be6b7-goog
-> > > > > >
-> > > > > > For now I would prefer to use dedicated method per key or are there
-> > > > > > many keys you would like to use from the upper layer?
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Luiz Augusto von Dentz
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> > >
-> > > Thanks,
-> > > Archie
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+> On Mon, Aug 31, 2020 at 5:44 PM Yu Liu <yudiliu@google.com> wrote:
+>>
+>> +Alain Michaud
+>>
+>> Hi Marcel,
+>>
+>> Can you please comment on the cl as well as Luiz's suggestion? Thanks.
+>>
+>> On Thu, Aug 20, 2020 at 10:20 AM Yu Liu <yudiliu@google.com> wrote:
+>> >
+>> > Friendly ping for comments from Marcel. Thanks.
+>> >
+>> >
+>> > On Mon, Aug 17, 2020 at 4:17 PM Luiz Augusto von Dentz
+>> > <luiz.dentz@gmail.com> wrote:
+>> > >
+>> > > Hi Marcel,
+>> > >
+>> > > On Mon, Aug 17, 2020 at 4:07 PM Yu Liu <yudiliu@google.com> wrote:
+>> > > >
+>> > > > From: Archie Pusaka <apusaka@chromium.org>
+>> > > >
+>> > > > Initially this is introduced to query whether WBS is supported by the adapter,
+>> > > > the API is generic enough to be extended to support querying others in
+>> > > > the future.
+>> > > >
+>> > > > Reviewed-by: sonnysasaka@chromium.org
+>> > > >
+>> > > > Signed-off-by: Yu Liu <yudiliu@google.com>
+>> > > > ---
+>> > > >
+>> > > > Changes in v2:
+>> > > > - Return an array of strings instead of a dict
+>> > > >
+>> > > > Changes in v1:
+>> > > > - Initial change
+>> > > >
+>> > > >  doc/adapter-api.txt | 12 ++++++++++++
+>> > > >  1 file changed, 12 insertions(+)
+>> > > >
+>> > > > diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+>> > > > index 1a7255750..8fbcadb54 100644
+>> > > > --- a/doc/adapter-api.txt
+>> > > > +++ b/doc/adapter-api.txt
+>> > > > @@ -204,6 +204,18 @@ Methods            void StartDiscovery()
+>> > > >                                          org.bluez.Error.NotReady
+>> > > >                                          org.bluez.Error.Failed
+>> > > >
+>> > > > +               array{string} GetCapabilities()
+>> > > > +
+>> > > > +                       This method returns a list of supported
+>> > > > +                       capabilities that is populated when the adapter
+>> > > > +                       initiated.
+>> > > > +
+>> > > > +                       Possible values:
+>> > > > +                               "wbs" - Wide band speech
+>> > >
+>> > > Btw, should we stick to use wbs terminology here, or we should
+>> > > actually use the HCI feature/command, because wbs has actually to be
+>> > > implemented by the HFP afaik this is only indicating that the
+>> > > controller is able to notify packets drops, etc, with use of erroneous
+>> > > command. Perhaps we should actually use the term PLC (Packet Loss
+>> > > Concealment) instead since that seems to be the real capability here,
+>> > > afaik WBS does not actually require PLC.
+>> > >
+>> > > > +
+>> > > > +                       Possible errors: org.bluez.Error.NotReady
+>> > > > +                                        org.bluez.Error.Failed
+>> > > > +
+>> > > >  Properties     string Address [readonly]
+>> > > >
+>> > > >                         The Bluetooth device address.
+>> > > > --
+>> > > > 2.28.0.220.ged08abb693-goog
+>> > > >
+>> > >
+>> > >
+>> > > --
+>> > > Luiz Augusto von Dentz
 
-Thanks,
-Archie
+
+
+-- 
+Luiz Augusto von Dentz
