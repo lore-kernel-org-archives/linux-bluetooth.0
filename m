@@ -2,83 +2,141 @@ Return-Path: <SRS0=HAk7=CK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794CBC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0D9C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:26:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39200214D8
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:14:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=dptechnics.com header.i=daan@dptechnics.com header.b="RKdqKQqF"
+	by mail.kernel.org (Postfix) with ESMTP id 2D829206CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Sep 2020 14:26:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727964AbgIAONE (ORCPT
+        id S1728301AbgIAOZ4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Sep 2020 10:13:04 -0400
-Received: from sender4-op-o11.zoho.com ([136.143.188.11]:17180 "EHLO
-        sender4-op-o11.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727918AbgIALyn (ORCPT
+        Tue, 1 Sep 2020 10:25:56 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:49591 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728060AbgIAOZJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Sep 2020 07:54:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598961272; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=RfGUUsV0XdxEEMFtB9w2PjQgYRCY2Zifxyv+TF4Mkc237LI0/jbnNSlhLJsZfDc4EuVT8P7KTBEXWMvM91C7LiQjM9CvLfH7FxLOT2LJmJ7bUD3nd3pDNStssrmiszLLwRdbZ1dtuTWa7n3+hyPsQaNrNC3ESCCElvEnZQZQci8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1598961272; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=8GE8GX8wfUYkwmZsVMBYy3QaTa9zX1/ZjiY09VRuPTw=; 
-        b=L3mxkcMC+XmtqaPigb9z52KqKG8WRsN4+fIyTqXAnOiO62HnHJXRgVikAOqC4d+4SukUHKEkpYXiXKxGsbOMl2BxHJiKB7CLZzWQlqrLaLoarxxB+TIwW2y594Dh+iNFpPZipH8NzuIFbxZpDfjiwieA3u73HCT2EPxuZJLri/0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=dptechnics.com;
-        spf=pass  smtp.mailfrom=daan@dptechnics.com;
-        dmarc=pass header.from=<daan@dptechnics.com> header.from=<daan@dptechnics.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1598961272;
-        s=zoho; d=dptechnics.com; i=daan@dptechnics.com;
-        h=From:To:Cc:Message-ID:Subject:Date:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        bh=8GE8GX8wfUYkwmZsVMBYy3QaTa9zX1/ZjiY09VRuPTw=;
-        b=RKdqKQqFCcPkvxnmNNgExoyQ+ZWvJhoOEUCe4ijEW7BYG8HaZTsGJCCxwiaVB6X0
-        EKycf1LK8U7OhOoQ9DjBubLlfGEiaRJ/Omd5jiXBlqmn8ItR6tMEylwA8HvhDH/z4/k
-        SKyRg1sG/Nz3h2cEpAEAx+WwJmw8nvAzeXGWdics=
-Received: from daan-devbox.dptechnics.local (178-116-74-88.access.telenet.be [178.116.74.88]) by mx.zohomail.com
-        with SMTPS id 1598961269677786.0220243936628; Tue, 1 Sep 2020 04:54:29 -0700 (PDT)
-From:   Daan Pape <daan@dptechnics.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Daan Pape <daan@dptechnics.com>
-Message-ID: <20200901115418.82056-1-daan@dptechnics.com>
-Subject: [PATCH BlueZ 0/1] Mesh: make SIG model header file locations more consistent
-Date:   Tue,  1 Sep 2020 13:54:17 +0200
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
-Content-Type: text/plain; charset=utf8
+        Tue, 1 Sep 2020 10:25:09 -0400
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 01 Sep 2020 07:24:59 -0700
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 01 Sep 2020 07:24:57 -0700
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 01 Sep 2020 19:54:32 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id E3F8E217CB; Tue,  1 Sep 2020 19:54:30 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v1 1/2] Bluetooth: hci_serdev: Close UART port if NON_PERSISTENT_SETUP is set
+Date:   Tue,  1 Sep 2020 19:54:26 +0530
+Message-Id: <1598970267-7170-2-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1598970267-7170-1-git-send-email-gubbaven@codeaurora.org>
+References: <1598970267-7170-1-git-send-email-gubbaven@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The configuration model header was now in the tools/mesh directory while th=
-e
-Generic OnOff header was in the tools/mesh-gatt directory. In preparation o=
-f=20
-implementing the Generic OnOff client model in the mesh-cfgclient tool and=
-=20
-to make the structure more consistent I renamed and moved the header file o=
-f
-the Generic OnOff model to the tools/mesh directory.
+When HCI_QUIRK_NON_PERSISTENT_SETUP is set by drivers,
+it indicates that BT SoC will be completely powered OFF
+during BT OFF. On next BT ON firmware must be downloaded
+again. Holding UART port open during BT OFF is draining
+the battery. Now during BT OFF, UART port is closed if
+qurik HCI_QUIRK_NON_PERSISTENT_SETUP is set by clearing
+HCI_UART_PROTO_READY proto flag. On next BT ON, UART
+port is opened if HCI_UART_PROTO_READY proto flag is cleared.
 
-Daan Pape (1):
-  Mesh: make SIG model header file locations more consistent
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/hci_serdev.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
- tools/mesh-gatt/onoff-model.c |  2 +-
- tools/mesh-gatt/onoff-model.h | 33 ---------------------------------
- tools/meshctl.c               |  2 +-
- 3 files changed, 2 insertions(+), 35 deletions(-)
- delete mode 100644 tools/mesh-gatt/onoff-model.h
-
---=20
-2.25.1
-
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 3977bba..ef96ad0 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -113,8 +113,22 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
+ {
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	int err;
++
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
++	/* When Quirk HCI_QUIRK_NON_PERSISTENT_SETUP is set by
++	 * driver, BT SoC is completely turned OFF during
++	 * BT OFF. Upon next BT ON UART port should be opened.
++	 */
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++		err = serdev_device_open(hu->serdev);
++		if (err)
++			return err;
++		set_bit(HCI_UART_PROTO_READY, &hu->flags);
++	}
++
+ 	/* Undo clearing this from hci_uart_close() */
+ 	hdev->flush = hci_uart_flush;
+ 
+@@ -124,11 +138,25 @@ static int hci_uart_open(struct hci_dev *hdev)
+ /* Close device */
+ static int hci_uart_close(struct hci_dev *hdev)
+ {
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
+ 	BT_DBG("hdev %p", hdev);
+ 
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return 0;
++
+ 	hci_uart_flush(hdev);
+ 	hdev->flush = NULL;
+ 
++	/* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by driver,
++	 * BT SOC is completely powered OFF during BT OFF, holding port
++	 * open may drain the battery.
++	 */
++	if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		serdev_device_close(hu->serdev);
++	}
++
+ 	return 0;
+ }
+ 
+@@ -354,8 +382,6 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+ 
+-	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-
+ 	cancel_work_sync(&hu->init_ready);
+ 	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		hci_unregister_dev(hdev);
+@@ -364,6 +390,10 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	cancel_work_sync(&hu->write_work);
+ 
+ 	hu->proto->close(hu);
+-	serdev_device_close(hu->serdev);
++
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		serdev_device_close(hu->serdev);
++	}
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
