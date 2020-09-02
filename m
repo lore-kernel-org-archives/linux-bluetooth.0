@@ -2,177 +2,71 @@ Return-Path: <SRS0=7X4B=CL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7CFC433E7
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157C4C433E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 12:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BC9C2065E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED89A2078B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 12:01:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbgIBLXf (ORCPT
+        id S1726791AbgIBMBr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Sep 2020 07:23:35 -0400
-Received: from mga09.intel.com ([134.134.136.24]:22206 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726183AbgIBLXc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Sep 2020 07:23:32 -0400
-IronPort-SDR: OZs/v5oW+sxnuedzK2ZWYU1Ye74M4OsEe5k7ugN0NoSAx1fJ/R0ilLhnocn+XtxC/Bzmy6Wxik
- HhRlD472xVRA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9731"; a="158360807"
-X-IronPort-AV: E=Sophos;i="5.76,381,1592895600"; 
-   d="scan'208";a="158360807"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2020 04:23:31 -0700
-IronPort-SDR: OqNCIjSk4VpEk9lplIyXWdoWV7hgkGe5Iq51Opx0ujwSKJuJVa80CDtRvjRjmjAzIKCfjyV5JS
- kPXG16VU6E3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,381,1592895600"; 
-   d="scan'208";a="331402380"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
-  by orsmga008.jf.intel.com with ESMTP; 02 Sep 2020 04:23:28 -0700
-Received: from andy by smile with local (Exim 4.94)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1kDQrN-00Dhr3-5n; Wed, 02 Sep 2020 14:23:25 +0300
-Date:   Wed, 2 Sep 2020 14:23:25 +0300
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
-        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH 03/10] USB: core: message.c: use usb_control_msg_send()
- in a few places
-Message-ID: <20200902112325.GL1891694@smile.fi.intel.com>
-References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
- <20200902110115.1994491-4-gregkh@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200902110115.1994491-4-gregkh@linuxfoundation.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+        Wed, 2 Sep 2020 08:01:47 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:46776 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726657AbgIBMBl (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Sep 2020 08:01:41 -0400
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 02 Sep 2020 05:01:33 -0700
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 02 Sep 2020 05:01:31 -0700
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 02 Sep 2020 17:31:07 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id C91A721B33; Wed,  2 Sep 2020 17:31:06 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v1] arm64: dts: qcom: sc7180: Remove clock for bluetooth on SC7180 IDP board
+Date:   Wed,  2 Sep 2020 17:31:03 +0530
+Message-Id: <1599048063-6900-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Sep 02, 2020 at 01:01:05PM +0200, Greg Kroah-Hartman wrote:
-> There are a few calls to usb_control_msg() that can be converted to use
-> usb_control_msg_send() instead, so do that in order to make the error
-> checking a bit simpler.
+Removed voting for RPMH_RF_CLK2 which is not required as it is
+getting managed by BT SoC through SW_CTRL line.
 
-Makes sense. Others will take this as a good example of API in use.
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ arch/arm64/boot/dts/qcom/sc7180-idp.dts | 1 -
+ 1 file changed, 1 deletion(-)
 
-> Cc: Alan Stern <stern@rowland.harvard.edu>
-> Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Cc: linux-usb@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
->  drivers/usb/core/message.c | 38 +++++++++++++++++++-------------------
->  1 file changed, 19 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/usb/core/message.c b/drivers/usb/core/message.c
-> index 6aa49b237717..dfd079485c76 100644
-> --- a/drivers/usb/core/message.c
-> +++ b/drivers/usb/core/message.c
-> @@ -1081,7 +1081,7 @@ int usb_set_isoch_delay(struct usb_device *dev)
->  	if (dev->speed < USB_SPEED_SUPER)
->  		return 0;
->  
-> -	return usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-> +	return usb_control_msg_send(dev, 0,
->  			USB_REQ_SET_ISOCH_DELAY,
->  			USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
->  			dev->hub_delay, 0, NULL, 0,
-> @@ -1203,13 +1203,13 @@ int usb_clear_halt(struct usb_device *dev, int pipe)
->  	 * (like some ibmcam model 1 units) seem to expect hosts to make
->  	 * this request for iso endpoints, which can't halt!
->  	 */
-> -	result = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-> -		USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT,
-> -		USB_ENDPOINT_HALT, endp, NULL, 0,
-> -		USB_CTRL_SET_TIMEOUT);
-> +	result = usb_control_msg_send(dev, 0,
-> +				      USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT,
-> +				      USB_ENDPOINT_HALT, endp, NULL, 0,
-> +				      USB_CTRL_SET_TIMEOUT);
->  
->  	/* don't un-halt or force to DATA0 except on success */
-> -	if (result < 0)
-> +	if (result)
->  		return result;
->  
->  	/* NOTE:  seems like Microsoft and Apple don't bother verifying
-> @@ -1558,9 +1558,10 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
->  	if (dev->quirks & USB_QUIRK_NO_SET_INTF)
->  		ret = -EPIPE;
->  	else
-> -		ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-> -				   USB_REQ_SET_INTERFACE, USB_RECIP_INTERFACE,
-> -				   alternate, interface, NULL, 0, 5000);
-> +		ret = usb_control_msg_send(dev, 0,
-> +					   USB_REQ_SET_INTERFACE,
-> +					   USB_RECIP_INTERFACE, alternate,
-> +					   interface, NULL, 0, 5000);
->  
->  	/* 9.4.10 says devices don't need this and are free to STALL the
->  	 * request if the interface only has one alternate setting.
-> @@ -1570,7 +1571,7 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
->  			"manual set_interface for iface %d, alt %d\n",
->  			interface, alternate);
->  		manual = 1;
-> -	} else if (ret < 0) {
-> +	} else if (ret) {
->  		/* Re-instate the old alt setting */
->  		usb_hcd_alloc_bandwidth(dev, NULL, alt, iface->cur_altsetting);
->  		usb_enable_lpm(dev);
-> @@ -1718,11 +1719,10 @@ int usb_reset_configuration(struct usb_device *dev)
->  		mutex_unlock(hcd->bandwidth_mutex);
->  		return retval;
->  	}
-> -	retval = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-> -			USB_REQ_SET_CONFIGURATION, 0,
-> -			config->desc.bConfigurationValue, 0,
-> -			NULL, 0, USB_CTRL_SET_TIMEOUT);
-> -	if (retval < 0)
-> +	retval = usb_control_msg_send(dev, 0, USB_REQ_SET_CONFIGURATION, 0,
-> +				      config->desc.bConfigurationValue, 0,
-> +				      NULL, 0, USB_CTRL_SET_TIMEOUT);
-> +	if (retval)
->  		goto reset_old_alts;
->  	mutex_unlock(hcd->bandwidth_mutex);
->  
-> @@ -2103,10 +2103,10 @@ int usb_set_configuration(struct usb_device *dev, int configuration)
->  	}
->  	kfree(new_interfaces);
->  
-> -	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-> -			      USB_REQ_SET_CONFIGURATION, 0, configuration, 0,
-> -			      NULL, 0, USB_CTRL_SET_TIMEOUT);
-> -	if (ret < 0 && cp) {
-> +	ret = usb_control_msg_send(dev, 0, USB_REQ_SET_CONFIGURATION, 0,
-> +				   configuration, 0, NULL, 0,
-> +				   USB_CTRL_SET_TIMEOUT);
-> +	if (ret && cp) {
->  		/*
->  		 * All the old state is gone, so what else can we do?
->  		 * The device is probably useless now anyway.
-> -- 
-> 2.28.0
-> 
-
+diff --git a/arch/arm64/boot/dts/qcom/sc7180-idp.dts b/arch/arm64/boot/dts/qcom/sc7180-idp.dts
+index 4e9149d..b295d01 100644
+--- a/arch/arm64/boot/dts/qcom/sc7180-idp.dts
++++ b/arch/arm64/boot/dts/qcom/sc7180-idp.dts
+@@ -348,7 +348,6 @@
+ 		vddrf-supply = <&vreg_l2c_1p3>;
+ 		vddch0-supply = <&vreg_l10c_3p3>;
+ 		max-speed = <3200000>;
+-		clocks = <&rpmhcc RPMH_RF_CLK2>;
+ 	};
+ };
+ 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
