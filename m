@@ -2,709 +2,286 @@ Return-Path: <SRS0=7X4B=CL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 472E5C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 12:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5255C433E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 14:35:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9FC12078E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 12:31:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VD0OSq39"
+	by mail.kernel.org (Postfix) with ESMTP id 8C95420767
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 14:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726871AbgIBMbp (ORCPT
+        id S1728122AbgIBOfp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Sep 2020 08:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726400AbgIBMbc (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Sep 2020 08:31:32 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED746C061244;
-        Wed,  2 Sep 2020 05:31:31 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id t11so2227056plr.5;
-        Wed, 02 Sep 2020 05:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nWY+6erNVM6Xl8glEmPwXLUrDWTRISXUW1W403933l8=;
-        b=VD0OSq39q348n1v0uQAp3k88+WIjjZosqgA9X8iTDSWTjcUIiBYN3MZ9VOTTkyBU/Q
-         Q8A5ixCGv3EdEq1ELmY51HVWXGc6dVFfTsdeZMCnFDhjOZa2FlBInUpVq5Vrea0B3Ij5
-         8KFVifnTJ3frLnDMCOfvogXrKpMfrvqfZLCnChDBdXM6iRJ7ccpTaCPtYApB6msTmr5a
-         TnM7Y9wvDxm0xsxg79JeuF/yIcTYKrAts5AAKNZD1I2OSDSdVrPUR2F+rRVe/9YNR+5R
-         Faa2IUmCjlH7Il+4Irn4qnbm9MEs4rRa8geygx0mGNnyegeHbk7GuA/2LUGvi/S/7vF1
-         aabQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nWY+6erNVM6Xl8glEmPwXLUrDWTRISXUW1W403933l8=;
-        b=T8R/J9o7Rx1Lb2PMpTm/M7EP17rwxp8BBwa7K0hkiMvz5s+UVahiGw4BecHsWD7yg8
-         IC6TB31kb3A8rRSY4/JxyzqYOxt5BqY6xIU3ZWLjbwoKdyVo4Fxoye+QLICcn3BrJNTU
-         4Vt7PBXsi5GGw8hdKM3WXzIuYq8l87JnHhDn7Xt/dAkoM8jVspthotP5tqY390VicVol
-         cN5wfWkRgQ/4z9JxDnYy7dPkQ8O4H19ZFJKZVj3PsxoOAYJ6ONrB3zqm6p2ycZKrLi5u
-         83VaJ7KYCjImfADARpW4OMZd0Cr9xHTjOw3QFBEAaAqbFqB82tV3X/D3A+ztCbD3w822
-         qdLw==
-X-Gm-Message-State: AOAM533yV5tqpeXSl1HyD2Yrcxsploa1ag5YPaV6M6rJZnxvP89L2EZb
-        KdJxu++3agDHkLTPtXyhnlw=
-X-Google-Smtp-Source: ABdhPJy5I6Gyc/KFdPbcmJPMUULGfd168li2aLRy3APbEPCpTrTUdoGGSsFGxSMYWgDx+YsfSquKCw==
-X-Received: by 2002:a17:90a:bf8d:: with SMTP id d13mr2160253pjs.100.1599049891350;
-        Wed, 02 Sep 2020 05:31:31 -0700 (PDT)
-Received: from localhost ([2001:e42:102:1532:160:16:113:140])
-        by smtp.gmail.com with ESMTPSA id gx5sm1062511pjb.57.2020.09.02.05.31.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 05:31:30 -0700 (PDT)
-From:   Coiby Xu <coiby.xu@gmail.com>
-X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
-Date:   Wed, 2 Sep 2020 20:31:25 +0800
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        syzkaller-bugs@googlegroups.com,
-        syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: fix "list_add double add" in
- hci_conn_complete_evt
-Message-ID: <20200902122357.ca2fztgah7gwz7yp@Rk>
-References: <000000000000c57f2d05ac4c5b8e@google.com>
- <20200823010022.938532-1-coiby.xu@gmail.com>
- <C0A907BA-9C0D-4124-A2AF-3748055DB062@holtmann.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="yijhrv2ys2svaijk"
-Content-Disposition: inline
-In-Reply-To: <C0A907BA-9C0D-4124-A2AF-3748055DB062@holtmann.org>
+        Wed, 2 Sep 2020 10:35:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57068 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727044AbgIBOfh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Sep 2020 10:35:37 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 4F2C7B1AE;
+        Wed,  2 Sep 2020 14:35:36 +0000 (UTC)
+Date:   Wed, 02 Sep 2020 16:35:33 +0200
+Message-ID: <s5hh7sg9rgq.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     himadrispandya@gmail.com, dvyukov@google.com,
+        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
+        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Eli Billauer <eli.billauer@gmail.com>,
+        Emiliano Ingrassia <ingrassia@epigenesys.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Alexander Tsoy <alexander@tsoy.me>,
+        "Geoffrey D. Bennett" <g@b4.vu>, Jussi Laako <jussi@sonarnerd.net>,
+        Nick Kossifidis <mickflemm@gmail.com>,
+        Dmitry Panchenko <dmitry@d-systems.ee>,
+        Chris Wulff <crwulff@gmail.com>,
+        Jesus Ramos <jesus-ramos@live.com>
+Subject: Re: [PATCH 01/10] USB: move snd_usb_pipe_sanity_check into the USB core
+In-Reply-To: <20200902110115.1994491-2-gregkh@linuxfoundation.org>
+References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
+        <20200902110115.1994491-2-gregkh@linuxfoundation.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
+ (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Wed, 02 Sep 2020 13:01:03 +0200,
+Greg Kroah-Hartman wrote:
+> 
+> snd_usb_pipe_sanity_check() is a great function, so let's move it into
+> the USB core so that other parts of the kernel, including the USB core,
+> can call it.
+> 
+> Name it usb_pipe_type_check() to match the existing
+> usb_urb_ep_type_check() call, which now uses this function.
+> 
+> Cc: Jaroslav Kysela <perex@perex.cz>
+> Cc: Takashi Iwai <tiwai@suse.com>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: Eli Billauer <eli.billauer@gmail.com>
+> Cc: Emiliano Ingrassia <ingrassia@epigenesys.com>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
+> Cc: Alexander Tsoy <alexander@tsoy.me>
+> Cc: "Geoffrey D. Bennett" <g@b4.vu>
+> Cc: Jussi Laako <jussi@sonarnerd.net>
+> Cc: Nick Kossifidis <mickflemm@gmail.com>
+> Cc: Dmitry Panchenko <dmitry@d-systems.ee>
+> Cc: Chris Wulff <crwulff@gmail.com>
+> Cc: Jesus Ramos <jesus-ramos@live.com>
+> Cc: linux-usb@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: alsa-devel@alsa-project.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
---yijhrv2ys2svaijk
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 
-On Mon, Aug 31, 2020 at 06:06:18PM +0200, Marcel Holtmann wrote:
->Hi Coiby,
 
-Hi Marcel,
+thanks,
 
-Thank you for reviewing this patch!
+Takashi
 
->
->> When two HCI_EV_CONN_COMPLETE event packets with status=0 of the same
->> HCI connection are received, device_add would be called twice which
->> leads to kobject_add being called twice. Thus duplicate
->> (struct hci_conn *conn)->dev.kobj.entry would be inserted into
->> (struct hci_conn *conn)->dev.kobj.kset->list.
->>
->> This issue can be fixed by checking (struct hci_conn *conn)->debugfs.
->> If it's not NULL, it means the HCI connection has been completed and we
->> won't duplicate the work as for processing the first
->> HCI_EV_CONN_COMPLETE event.
->
->do you have a btmon trace for this happening?
 
-Please see the attachment "btmon_output" which is a plain text file.
-I couldn't find a way to save traces in btsnoop format (the kernel would
-panic immediately after running the re-producer before QEMU has a chance
-to write the btsnoop file to the disk image).
-
-I've also also attached a simplified re-producer rep9_min.c if it interests you.
->
->> Reported-and-tested-by: syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com
->> Link: https://syzkaller.appspot.com/bug?extid=dd768a260f7358adbaf9
->> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
->> ---
->> net/bluetooth/hci_event.c | 5 +++++
->> 1 file changed, 5 insertions(+)
->>
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 4b7fc430793c..1233739ce760 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -2605,6 +2605,11 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> 	}
->>
->> 	if (!ev->status) {
->> +		if (conn->debugfs) {
->> +			bt_dev_err(hdev, "The connection has been completed");
->> +			goto unlock;
->> +		}
->> +
->
->And instead of doing papering over a hole, I would rather detect that the HCI event is not valid since we already received one for this connection.
-
-To check conn->debugfs is what I think could be used to detect this
-duplicate HCI event. Or you are suggesting this is not sufficient
-and implement something like a state machine instead?
-
->
->Regards
->
->Marcel
->
-
---
-Best regards,
-Coiby
-
---yijhrv2ys2svaijk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=btmon_output
-
-Bluetooth monitor ver 5.54
-= Note: Linux version 5.8.0+ (x86_64)                                  0.447880
-= Note: Bluetooth subsystem version 2.22                               0.447950
-@ MGMT Open: btmon (privileged) version 1.18                  {0x0001} 0.449370
-= New Index: 00:00:00:00:00:00 (Primary,Virtual,hci0)           [hci0] 5.834012
-@ RAW Open: rep9_ (privileged) version 2.22                   {0x0002} 5.840840
-= Open Index: 00:00:00:00:00:00                                 [hci0] 5.843719
-< HCI Command: Reset (0x03|0x0003) plen 0                    #1 [hci0] 5.844689
-> HCI Event: Command Complete (0x0e) plen 252                #2 [hci0] 5.844982
-      Reset (0x03|0x0003) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read Local Supported... (0x04|0x0003) plen 0  #3 [hci0] 5.845194
-> HCI Event: Command Complete (0x0e) plen 252                #4 [hci0] 5.845356
-      Read Local Supported Features (0x04|0x0003) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read Local Version In.. (0x04|0x0001) plen 0  #5 [hci0] 5.845522
-> HCI Event: Command Complete (0x0e) plen 252                #6 [hci0] 5.845593
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0             #7 [hci0] 5.845849
-> HCI Event: Command Complete (0x0e) plen 10                 #8 [hci0] 5.845914
-      Read BD ADDR (0x04|0x0009) ncmd 1
-        Status: Success (0x00)
-[   50.133219][ T8087] kobject_add_internal failed for hci0:200 with -EEXIST, don't try to register things with the same name in the same directory.
-[   50.135031][ T8087] Bluetooth: hci0: failed to register connection device
-        Address: AA:AA:AA:AA:AA:AA (OUI AA-AA-AA)
-< HCI Command: Read Buffer Size (0x04|0x0005) plen 0         #9 [hci0] 5.846623
-> HCI Event: Command Complete (0x0e) plen 11                #10 [hci0] 5.846710
-      Read Buffer Size (0x04|0x0005) ncmd 1
-        Status: Success (0x00)
-        ACL MTU: 1021 ACL max packet: 4
-        SCO MTU: 96   SCO max packet: 6
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0    #11 [hci0] 5.846806
-> HCI Event: Command Complete (0x0e) plen 252               #12 [hci0] 5.846862
-      Read Class of Device (0x03|0x0023) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read Local Name (0x03|0x0014) plen 0         #13 [hci0] 5.893252
-> HCI Event: Command Complete (0x0e) plen 252               #14 [hci0] 5.893318
-      Read Local Name (0x03|0x0014) ncmd 1
-        Status: Success (0x00)
-        Name:
-< HCI Command: Read Voice Setting (0x03|0x0025) plen 0      #15 [hci0] 5.893439
-> HCI Event: Command Complete (0x0e) plen 252               #16 [hci0] 5.893490
-      Read Voice Setting (0x03|0x0025) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read Number of Suppo.. (0x03|0x0038) plen 0  #17 [hci0] 5.893559
-> HCI Event: Command Complete (0x0e) plen 252               #18 [hci0] 5.893600
-      Read Number of Supported IAC (0x03|0x0038) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Read Current IAC LAP (0x03|0x0039) plen 0    #19 [hci0] 5.893666
-> HCI Event: Command Complete (0x0e) plen 252               #20 [hci0] 5.893710
-      Read Current IAC LAP (0x03|0x0039) ncmd 1
-        Status: Success (0x00)
-        Number of IAC: 0
-< HCI Command: Set Event Filter (0x03|0x0005) plen 1        #21 [hci0] 5.893777
-        Type: Clear All Filters (0x00)
-> HCI Event: Command Complete (0x0e) plen 252               #22 [hci0] 5.893818
-      Set Event Filter (0x03|0x0005) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-< HCI Command: Write Connection Acc.. (0x03|0x0016) plen 2  #23 [hci0] 5.893884
-        Timeout: 20000.000 msec (0x7d00)
-> HCI Event: Command Complete (0x0e) plen 252               #24 [hci0] 5.893925
-      Write Connection Accept Timeout (0x03|0x0016) ncmd 1
-        invalid packet size
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-        00 00 00 00 00 00 00 00 00                       .........
-= Index Info: AA:AA:AA:AA:AA.. (Ericsson Technology Licensing)  [hci0] 5.894458
-@ MGMT Event: Index Added (0x0004) plen 0              {0x0001} [hci0] 5.894531
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1       #25 [hci0] 5.895481
-        Scan enable: Page Scan (0x02)
-> HCI Event: Command Complete (0x0e) plen 4                 #26 [hci0] 5.895547
-      Write Scan Enable (0x03|0x001a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Request (0x04) plen 10                 #27 [hci0] 5.895786
-        Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Class: 0x000000
-          Major class: Miscellaneous
-          Minor class: 0x00
-        Link type: ACL (0x01)
-> HCI Event: Connect Complete (0x03) plen 11                #28 [hci0] 5.895828
-        Status: Success (0x00)
-        Handle: 200
-        Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-> HCI Event: Connect Complete (0x03) plen 11                #29 [hci0] 5.895842
-        Status: Success (0x00)
-        Handle: 200
-        Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-@ RAW Close: rep9_                                            {0x0002} 5.951790
-< HCI Command: Accept Connection Re.. (0x01|0x0009) plen 7  #30 [hci0] 6.130913
-        Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Role: Slave (0x01)
-
---yijhrv2ys2svaijk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="rep9_min.c"
-
-// based on the reproducer
-// https://syzkaller.appspot.com/bug?id=f0ec9a394925aafbdf13d0a7e6af4cff860f0ed6
-// wich is autogenerated by syzkaller (https://github.com/google/syzkaller)
-
-#define _GNU_SOURCE
-
-#include <dirent.h>
-#include <endian.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sched.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/epoll.h>
-#include <sys/ioctl.h>
-#include <sys/mount.h>
-#include <sys/prctl.h>
-#include <sys/resource.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <linux/capability.h>
-
-const int kInitNetNsFd = 239;
-
-#define MAX_FDS 30
-
-static long syz_init_net_socket(volatile long domain, volatile long type,
-                                volatile long proto)
-{
-  int netns = open("/proc/self/ns/net", O_RDONLY);
-
-  if (netns == -1)
-    return netns;
-
-  int sock = syscall(__NR_socket, domain, type, proto);
-  int err = errno;
-
-  /** if (setns(netns, 0)) */
-  /**   exit(1); */
-
-  close(netns);
-  errno = err;
-  return sock;
-}
-
-#define BTPROTO_HCI 1
-#define ACL_LINK 1
-#define SCAN_PAGE 2
-
-typedef struct {
-  uint8_t b[6];
-} __attribute__((packed)) bdaddr_t;
-
-#define HCI_COMMAND_PKT 1
-#define HCI_EVENT_PKT 4
-#define HCI_VENDOR_PKT 0xff
-
-struct hci_command_hdr {
-  uint16_t opcode;
-  uint8_t plen;
-} __attribute__((packed));
-
-struct hci_event_hdr {
-  uint8_t evt;
-  uint8_t plen;
-} __attribute__((packed));
-
-#define HCI_EV_CONN_COMPLETE 0x03
-struct hci_ev_conn_complete {
-  uint8_t status;
-  uint16_t handle;
-  bdaddr_t bdaddr;
-  uint8_t link_type;
-  uint8_t encr_mode;
-} __attribute__((packed));
-
-#define HCI_EV_CONN_REQUEST 0x04
-struct hci_ev_conn_request {
-  bdaddr_t bdaddr;
-  uint8_t dev_class[3];
-  uint8_t link_type;
-} __attribute__((packed));
-
-#define HCI_EV_REMOTE_FEATURES 0x0b
-struct hci_ev_remote_features {
-  uint8_t status;
-  uint16_t handle;
-  uint8_t features[8];
-} __attribute__((packed));
-
-#define HCI_EV_CMD_COMPLETE 0x0e
-struct hci_ev_cmd_complete {
-  uint8_t ncmd;
-  uint16_t opcode;
-} __attribute__((packed));
-
-#define HCI_OP_WRITE_SCAN_ENABLE 0x0c1a
-
-#define HCI_OP_READ_BUFFER_SIZE 0x1005
-struct hci_rp_read_buffer_size {
-  uint8_t status;
-  uint16_t acl_mtu;
-  uint8_t sco_mtu;
-  uint16_t acl_max_pkt;
-  uint16_t sco_max_pkt;
-} __attribute__((packed));
-
-#define HCI_OP_READ_BD_ADDR 0x1009
-struct hci_rp_read_bd_addr {
-  uint8_t status;
-  bdaddr_t bdaddr;
-} __attribute__((packed));
-
-#define HCI_EV_LE_META 0x3e
-struct hci_ev_le_meta {
-  uint8_t subevent;
-} __attribute__((packed));
-
-#define HCI_EV_LE_CONN_COMPLETE 0x01
-struct hci_ev_le_conn_complete {
-  uint8_t status;
-  uint16_t handle;
-  uint8_t role;
-  uint8_t bdaddr_type;
-  bdaddr_t bdaddr;
-  uint16_t interval;
-  uint16_t latency;
-  uint16_t supervision_timeout;
-  uint8_t clk_accurancy;
-} __attribute__((packed));
-
-struct hci_dev_req {
-  uint16_t dev_id;
-  uint32_t dev_opt;
-};
-
-struct vhci_vendor_pkt {
-  uint8_t type;
-  uint8_t opcode;
-  uint16_t id;
-};
-
-#define HCIDEVUP _IOW('H', 201, int)
-#define HCISETSCAN _IOW('H', 221, int)
-
-static int vhci_fd = -1;
-
-static void hci_send_event_packet(int fd, uint8_t evt, void* data,
-                                  size_t data_len)
-{
-  struct iovec iv[3];
-  struct hci_event_hdr hdr;
-  hdr.evt = evt;
-  hdr.plen = data_len;
-  uint8_t type = HCI_EVENT_PKT;
-  iv[0].iov_base = &type;
-  iv[0].iov_len = sizeof(type);
-  iv[1].iov_base = &hdr;
-  iv[1].iov_len = sizeof(hdr);
-  iv[2].iov_base = data;
-  iv[2].iov_len = data_len;
-  if (writev(fd, iv, sizeof(iv) / sizeof(struct iovec)) < 0)
-    exit(1);
-}
-
-static void hci_send_event_cmd_complete(int fd, uint16_t opcode, void* data,
-                                        size_t data_len)
-{
-  struct iovec iv[4];
-  struct hci_event_hdr hdr;
-  hdr.evt = HCI_EV_CMD_COMPLETE;
-  hdr.plen = sizeof(struct hci_ev_cmd_complete) + data_len;
-  struct hci_ev_cmd_complete evt_hdr;
-  evt_hdr.ncmd = 1;
-  evt_hdr.opcode = opcode;
-  uint8_t type = HCI_EVENT_PKT;
-  iv[0].iov_base = &type;
-  iv[0].iov_len = sizeof(type);
-  iv[1].iov_base = &hdr;
-  iv[1].iov_len = sizeof(hdr);
-  iv[2].iov_base = &evt_hdr;
-  iv[2].iov_len = sizeof(evt_hdr);
-  iv[3].iov_base = data;
-  iv[3].iov_len = data_len;
-  if (writev(fd, iv, sizeof(iv) / sizeof(struct iovec)) < 0)
-    exit(1);
-}
-
-#define HCI_HANDLE_1 200
-#define HCI_HANDLE_2 201
-
-static void send_complte_ev()
-{
-  struct hci_ev_conn_complete complete;
-  memset(&complete, 0, sizeof(complete));
-  complete.status = 0;
-  complete.handle = HCI_HANDLE_1;
-  memset(&complete.bdaddr, 0xaa, 6);
-  *(uint8_t*)&complete.bdaddr.b[5] = 0x10;
-  complete.link_type = ACL_LINK;
-  complete.encr_mode = 0;
-  hci_send_event_packet(vhci_fd, HCI_EV_CONN_COMPLETE, &complete,
-                        sizeof(complete));
-}
-
-static bool process_command_pkt(int fd, char* buf, ssize_t buf_size)
-{
-  struct hci_command_hdr* hdr = (struct hci_command_hdr*)buf;
-  if (buf_size < (ssize_t)sizeof(struct hci_command_hdr) ||
-      hdr->plen != buf_size - sizeof(struct hci_command_hdr)) {
-    exit(1);
-  }
-  switch (hdr->opcode) {
-  case HCI_OP_WRITE_SCAN_ENABLE: {
-    uint8_t status = 0;
-    hci_send_event_cmd_complete(fd, hdr->opcode, &status, sizeof(status));
-    return true;
-  }
-  case HCI_OP_READ_BD_ADDR: {
-    struct hci_rp_read_bd_addr rp = {0};
-    rp.status = 0;
-    memset(&rp.bdaddr, 0xaa, 6);
-    hci_send_event_cmd_complete(fd, hdr->opcode, &rp, sizeof(rp));
-    return false;
-  }
-  case HCI_OP_READ_BUFFER_SIZE: {
-    struct hci_rp_read_buffer_size rp = {0};
-    rp.status = 0;
-    rp.acl_mtu = 1021;
-    rp.sco_mtu = 96;
-    rp.acl_max_pkt = 4;
-    rp.sco_max_pkt = 6;
-    hci_send_event_cmd_complete(fd, hdr->opcode, &rp, sizeof(rp));
-    return false;
-  }
-  }
-  char dummy[0xf9] = {0};
-  hci_send_event_cmd_complete(fd, hdr->opcode, dummy, sizeof(dummy));
-  return false;
-}
-
-static void* event_thread(void* arg)
-{
-  while (1) {
-    char buf[1024] = {0};
-    ssize_t buf_size = read(vhci_fd, buf, sizeof(buf));
-    if (buf_size < 0)
-      exit(1);
-    if (buf_size > 0 && buf[0] == HCI_COMMAND_PKT) {
-      if (process_command_pkt(vhci_fd, buf + 1, buf_size - 1))
-        break;
-    }
-  }
-  return NULL;
-}
-static void initialize_vhci()
-{
-  int hci_sock = syz_init_net_socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-  if (hci_sock < 0)
-    exit(1);
-
-  vhci_fd = open("/dev/vhci", O_RDWR);
-  if (vhci_fd == -1)
-    exit(1);
-
-  struct vhci_vendor_pkt vendor_pkt;
-  if (read(vhci_fd, &vendor_pkt, sizeof(vendor_pkt)) != sizeof(vendor_pkt))
-    exit(1);
-
-  if (vendor_pkt.type != HCI_VENDOR_PKT)
-    exit(1);
-
-  pthread_t th;
-  if (pthread_create(&th, NULL, event_thread, NULL))
-    exit(1);
-
-  if (ioctl(hci_sock, HCIDEVUP, vendor_pkt.id) && errno != EALREADY)
-    exit(1);
-
-  struct hci_dev_req dr = {0};
-  dr.dev_id = vendor_pkt.id;
-  dr.dev_opt = SCAN_PAGE;
-  if (ioctl(hci_sock, HCISETSCAN, &dr))
-    exit(1);
-  struct hci_ev_conn_request request;
-  memset(&request, 0, sizeof(request));
-  memset(&request.bdaddr, 0xaa, 6);
-  *(uint8_t*)&request.bdaddr.b[5] = 0x10;
-  request.link_type = ACL_LINK;
-  hci_send_event_packet(vhci_fd, HCI_EV_CONN_REQUEST, &request,
-                        sizeof(request));
-
-  send_complte_ev();
-  send_complte_ev();
-  pthread_join(th, NULL);
-  close(hci_sock);
-}
-
-int main(void)
-{
-  initialize_vhci();
-  return 0;
-}
-
---yijhrv2ys2svaijk--
+> ---
+>  drivers/usb/core/urb.c          | 29 ++++++++++++++++++++++-------
+>  include/linux/usb.h             |  1 +
+>  sound/usb/helper.c              | 16 +---------------
+>  sound/usb/helper.h              |  1 -
+>  sound/usb/mixer_scarlett_gen2.c |  2 +-
+>  sound/usb/quirks.c              | 12 ++++++------
+>  6 files changed, 31 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/usb/core/urb.c b/drivers/usb/core/urb.c
+> index 27e83e55a590..45bc2914c1ba 100644
+> --- a/drivers/usb/core/urb.c
+> +++ b/drivers/usb/core/urb.c
+> @@ -192,24 +192,39 @@ static const int pipetypes[4] = {
+>  };
+>  
+>  /**
+> - * usb_urb_ep_type_check - sanity check of endpoint in the given urb
+> - * @urb: urb to be checked
+> + * usb_pipe_type_check - sanity check of a specific pipe for a usb device
+> + * @dev: struct usb_device to be checked
+> + * @pipe: pipe to check
+>   *
+>   * This performs a light-weight sanity check for the endpoint in the
+> - * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
+> - * a negative error code.
+> + * given usb device.  It returns 0 if the pipe is a valid for the specific usb
+> + * device, otherwise a negative error code.
+>   */
+> -int usb_urb_ep_type_check(const struct urb *urb)
+> +int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe)
+>  {
+>  	const struct usb_host_endpoint *ep;
+>  
+> -	ep = usb_pipe_endpoint(urb->dev, urb->pipe);
+> +	ep = usb_pipe_endpoint(dev, pipe);
+>  	if (!ep)
+>  		return -EINVAL;
+> -	if (usb_pipetype(urb->pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
+> +	if (usb_pipetype(pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
+>  		return -EINVAL;
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL_GPL(usb_pipe_type_check);
+> +
+> +/**
+> + * usb_urb_ep_type_check - sanity check of endpoint in the given urb
+> + * @urb: urb to be checked
+> + *
+> + * This performs a light-weight sanity check for the endpoint in the
+> + * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
+> + * a negative error code.
+> + */
+> +int usb_urb_ep_type_check(const struct urb *urb)
+> +{
+> +	return usb_pipe_type_check(urb->dev, urb->pipe);
+> +}
+>  EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
+>  
+>  /**
+> diff --git a/include/linux/usb.h b/include/linux/usb.h
+> index 20c555db4621..0b3963d7ec38 100644
+> --- a/include/linux/usb.h
+> +++ b/include/linux/usb.h
+> @@ -1764,6 +1764,7 @@ static inline int usb_urb_dir_out(struct urb *urb)
+>  	return (urb->transfer_flags & URB_DIR_MASK) == URB_DIR_OUT;
+>  }
+>  
+> +int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe);
+>  int usb_urb_ep_type_check(const struct urb *urb);
+>  
+>  void *usb_alloc_coherent(struct usb_device *dev, size_t size,
+> diff --git a/sound/usb/helper.c b/sound/usb/helper.c
+> index 4c12cc5b53fd..cf92d7110773 100644
+> --- a/sound/usb/helper.c
+> +++ b/sound/usb/helper.c
+> @@ -63,20 +63,6 @@ void *snd_usb_find_csint_desc(void *buffer, int buflen, void *after, u8 dsubtype
+>  	return NULL;
+>  }
+>  
+> -/* check the validity of pipe and EP types */
+> -int snd_usb_pipe_sanity_check(struct usb_device *dev, unsigned int pipe)
+> -{
+> -	static const int pipetypes[4] = {
+> -		PIPE_CONTROL, PIPE_ISOCHRONOUS, PIPE_BULK, PIPE_INTERRUPT
+> -	};
+> -	struct usb_host_endpoint *ep;
+> -
+> -	ep = usb_pipe_endpoint(dev, pipe);
+> -	if (!ep || usb_pipetype(pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
+> -		return -EINVAL;
+> -	return 0;
+> -}
+> -
+>  /*
+>   * Wrapper for usb_control_msg().
+>   * Allocates a temp buffer to prevent dmaing from/to the stack.
+> @@ -89,7 +75,7 @@ int snd_usb_ctl_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
+>  	void *buf = NULL;
+>  	int timeout;
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, pipe))
+> +	if (usb_pipe_type_check(dev, pipe))
+>  		return -EINVAL;
+>  
+>  	if (size > 0) {
+> diff --git a/sound/usb/helper.h b/sound/usb/helper.h
+> index 5e8a18b4e7b9..f5b4c6647e4d 100644
+> --- a/sound/usb/helper.h
+> +++ b/sound/usb/helper.h
+> @@ -7,7 +7,6 @@ unsigned int snd_usb_combine_bytes(unsigned char *bytes, int size);
+>  void *snd_usb_find_desc(void *descstart, int desclen, void *after, u8 dtype);
+>  void *snd_usb_find_csint_desc(void *descstart, int desclen, void *after, u8 dsubtype);
+>  
+> -int snd_usb_pipe_sanity_check(struct usb_device *dev, unsigned int pipe);
+>  int snd_usb_ctl_msg(struct usb_device *dev, unsigned int pipe,
+>  		    __u8 request, __u8 requesttype, __u16 value, __u16 index,
+>  		    void *data, __u16 size);
+> diff --git a/sound/usb/mixer_scarlett_gen2.c b/sound/usb/mixer_scarlett_gen2.c
+> index 0ffff7640892..9609c6d9655c 100644
+> --- a/sound/usb/mixer_scarlett_gen2.c
+> +++ b/sound/usb/mixer_scarlett_gen2.c
+> @@ -1978,7 +1978,7 @@ static int scarlett2_mixer_status_create(struct usb_mixer_interface *mixer)
+>  		return 0;
+>  	}
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, pipe))
+> +	if (usb_pipe_type_check(dev, pipe))
+>  		return -EINVAL;
+>  
+>  	mixer->urb = usb_alloc_urb(0, GFP_KERNEL);
+> diff --git a/sound/usb/quirks.c b/sound/usb/quirks.c
+> index abf99b814a0f..fc3aab04a0bc 100644
+> --- a/sound/usb/quirks.c
+> +++ b/sound/usb/quirks.c
+> @@ -846,7 +846,7 @@ static int snd_usb_accessmusic_boot_quirk(struct usb_device *dev)
+>  	static const u8 seq[] = { 0x4e, 0x73, 0x52, 0x01 };
+>  	void *buf;
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_sndintpipe(dev, 0x05)))
+> +	if (usb_pipe_type_check(dev, usb_sndintpipe(dev, 0x05)))
+>  		return -EINVAL;
+>  	buf = kmemdup(seq, ARRAY_SIZE(seq), GFP_KERNEL);
+>  	if (!buf)
+> @@ -875,7 +875,7 @@ static int snd_usb_nativeinstruments_boot_quirk(struct usb_device *dev)
+>  {
+>  	int ret;
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
+> +	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+>  		return -EINVAL;
+>  	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+>  				  0xaf, USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+> @@ -984,7 +984,7 @@ static int snd_usb_axefx3_boot_quirk(struct usb_device *dev)
+>  
+>  	dev_dbg(&dev->dev, "Waiting for Axe-Fx III to boot up...\n");
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
+> +	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+>  		return -EINVAL;
+>  	/* If the Axe-Fx III has not fully booted, it will timeout when trying
+>  	 * to enable the audio streaming interface. A more generous timeout is
+> @@ -1018,7 +1018,7 @@ static int snd_usb_motu_microbookii_communicate(struct usb_device *dev, u8 *buf,
+>  {
+>  	int err, actual_length;
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_sndintpipe(dev, 0x01)))
+> +	if (usb_pipe_type_check(dev, usb_sndintpipe(dev, 0x01)))
+>  		return -EINVAL;
+>  	err = usb_interrupt_msg(dev, usb_sndintpipe(dev, 0x01), buf, *length,
+>  				&actual_length, 1000);
+> @@ -1030,7 +1030,7 @@ static int snd_usb_motu_microbookii_communicate(struct usb_device *dev, u8 *buf,
+>  
+>  	memset(buf, 0, buf_size);
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_rcvintpipe(dev, 0x82)))
+> +	if (usb_pipe_type_check(dev, usb_rcvintpipe(dev, 0x82)))
+>  		return -EINVAL;
+>  	err = usb_interrupt_msg(dev, usb_rcvintpipe(dev, 0x82), buf, buf_size,
+>  				&actual_length, 1000);
+> @@ -1117,7 +1117,7 @@ static int snd_usb_motu_m_series_boot_quirk(struct usb_device *dev)
+>  {
+>  	int ret;
+>  
+> -	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
+> +	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+>  		return -EINVAL;
+>  	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+>  			      1, USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+> -- 
+> 2.28.0
+> 
