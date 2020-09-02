@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CC1C2BBD0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF84C433E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:02:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1D58207D3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:02:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46B22207D3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Sep 2020 11:02:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599044563;
-	bh=4nciSiJuiLfCNDwthm0DHhCLPxmhbcbA96IVDP+fm5Y=;
+	s=default; t=1599044564;
+	bh=q1GkWLHnrhLyuAuirgakuk07qJQEXB3APlzotDBfAM4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=wxGH87PhV/Ykk2RSpsbiqY0YxNb9Lk0IH/EtNXIQwTkf8h61c3rFovdzaa6ht5iyR
-	 6fNxvaYjO7P+K+1aXrpADRisMPtMeQQ7I4K6zdSEmAoqEXTEjbe3iAbGxMB3ZLD/GF
-	 trTgxbsHj/iPaHKJzhdVY0KoeseFm3dCExUkK2SI=
+	b=qwObfxHr+6ZBgOQ3Z+yVK2vfXsyEpmQkcgC30wjdOd2e9J9IVoLmIiAhYyfwOA1zU
+	 dePnxfl871OjO4JSqy1oDRc79T1ikK685+IGwnYWal40yf9ahVIGLpDOCOUYY5swgC
+	 h1aLR6+dXKPacVr7XDzh5y3duh5L+I71iLedG3Ew=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgIBLCl (ORCPT
+        id S1727058AbgIBLCm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Sep 2020 07:02:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45920 "EHLO mail.kernel.org"
+        Wed, 2 Sep 2020 07:02:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726674AbgIBLB1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Sep 2020 07:01:27 -0400
+        id S1726654AbgIBLBX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Sep 2020 07:01:23 -0400
 Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95EEF215A4;
-        Wed,  2 Sep 2020 11:01:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3E07621548;
+        Wed,  2 Sep 2020 11:01:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599044487;
-        bh=4nciSiJuiLfCNDwthm0DHhCLPxmhbcbA96IVDP+fm5Y=;
+        s=default; t=1599044482;
+        bh=q1GkWLHnrhLyuAuirgakuk07qJQEXB3APlzotDBfAM4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M7HzxDzxQPVsvfs7TUHkC0PUSy8acczLBwrMMXux1FOKUxi9GUr+Y52AGahY94Kf2
-         pAt8zbr/wOgDktGUIPKUh9Ae7Ug0YBjQrH84jIFYDXOg8XCdNQV6mEnQebwjR+NpYo
-         fnoD5k19JxTQHNrvNx3i5LKytO3PuP4S0JKKHOjo=
+        b=ZsA0wR5nOXGHfuvP+1NX07RBGoZ0l9Sw4sGLRoOsFj59Z/PsVVylqeokV6SwPxJu1
+         4N7rpZ4dO2UwWiqS0FMeoKAdHrTkIHWxydh21+rKPnXk1x0MxXAXufh3OFH3LDW3dp
+         KjbsrgZQTsAKStjwEigDpuzcZJCfrmvdtyPMnors=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     himadrispandya@gmail.com, dvyukov@google.com,
         linux-usb@vger.kernel.org
@@ -47,9 +47,9 @@ Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
         johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
         alsa-devel@alsa-project.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 7/9] sound: line6: convert to use new usb control function...
-Date:   Wed,  2 Sep 2020 13:01:10 +0200
-Message-Id: <20200902110115.1994491-9-gregkh@linuxfoundation.org>
+Subject: [PATCH 06/10] sound: usx2y: move to use usb_control_msg_send()
+Date:   Wed,  2 Sep 2020 13:01:08 +0200
+Message-Id: <20200902110115.1994491-7-gregkh@linuxfoundation.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
 References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
@@ -60,216 +60,83 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+The usb_control_msg_send() call can handle data on the stack, as well as
+returning an error if a "short" write happens, so move the driver over
+to using that call instead.  This ends up removing a helper function
+that is no longer needed.
+
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: Takashi Iwai <tiwai@suse.com>
+Cc: alsa-devel@alsa-project.org
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- sound/usb/line6/driver.c   | 69 +++++++++++++++-----------------------
- sound/usb/line6/podhd.c    | 17 ++++------
- sound/usb/line6/toneport.c |  8 ++---
- 3 files changed, 37 insertions(+), 57 deletions(-)
+ sound/usb/usx2y/us122l.c | 42 ++++++++--------------------------------
+ 1 file changed, 8 insertions(+), 34 deletions(-)
 
-diff --git a/sound/usb/line6/driver.c b/sound/usb/line6/driver.c
-index 60674ce4879b..601292c51491 100644
---- a/sound/usb/line6/driver.c
-+++ b/sound/usb/line6/driver.c
-@@ -337,23 +337,18 @@ int line6_read_data(struct usb_line6 *line6, unsigned address, void *data,
- {
- 	struct usb_device *usbdev = line6->usbdev;
- 	int ret;
--	unsigned char *len;
-+	u8 len;
- 	unsigned count;
- 
- 	if (address > 0xffff || datalen > 0xff)
- 		return -EINVAL;
- 
--	len = kmalloc(1, GFP_KERNEL);
--	if (!len)
--		return -ENOMEM;
--
- 	/* query the serial number: */
--	ret = usb_control_msg(usbdev, usb_sndctrlpipe(usbdev, 0), 0x67,
--			      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
--			      (datalen << 8) | 0x21, address,
--			      NULL, 0, LINE6_TIMEOUT * HZ);
--
--	if (ret < 0) {
-+	ret = usb_control_msg_send(usbdev, 0, 0x67,
-+				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
-+				   (datalen << 8) | 0x21, address, NULL, 0,
-+				   LINE6_TIMEOUT * HZ);
-+	if (ret) {
- 		dev_err(line6->ifcdev, "read request failed (error %d)\n", ret);
- 		goto exit;
- 	}
-@@ -362,45 +357,41 @@ int line6_read_data(struct usb_line6 *line6, unsigned address, void *data,
- 	for (count = 0; count < LINE6_READ_WRITE_MAX_RETRIES; count++) {
- 		mdelay(LINE6_READ_WRITE_STATUS_DELAY);
- 
--		ret = usb_control_msg(usbdev, usb_rcvctrlpipe(usbdev, 0), 0x67,
--				      USB_TYPE_VENDOR | USB_RECIP_DEVICE |
--				      USB_DIR_IN,
--				      0x0012, 0x0000, len, 1,
--				      LINE6_TIMEOUT * HZ);
--		if (ret < 0) {
-+		ret = usb_control_msg_recv(usbdev, 0, 0x67,
-+					   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
-+					   0x0012, 0x0000, &len, 1,
-+					   LINE6_TIMEOUT * HZ);
-+		if (ret) {
- 			dev_err(line6->ifcdev,
- 				"receive length failed (error %d)\n", ret);
- 			goto exit;
- 		}
- 
--		if (*len != 0xff)
-+		if (len != 0xff)
- 			break;
- 	}
- 
- 	ret = -EIO;
--	if (*len == 0xff) {
-+	if (len == 0xff) {
- 		dev_err(line6->ifcdev, "read failed after %d retries\n",
- 			count);
- 		goto exit;
--	} else if (*len != datalen) {
-+	} else if (len != datalen) {
- 		/* should be equal or something went wrong */
- 		dev_err(line6->ifcdev,
- 			"length mismatch (expected %d, got %d)\n",
--			(int)datalen, (int)*len);
-+			(int)datalen, len);
- 		goto exit;
- 	}
- 
- 	/* receive the result: */
--	ret = usb_control_msg(usbdev, usb_rcvctrlpipe(usbdev, 0), 0x67,
--			      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
--			      0x0013, 0x0000, data, datalen,
--			      LINE6_TIMEOUT * HZ);
--
--	if (ret < 0)
-+	ret = usb_control_msg_recv(usbdev, 0, 0x67,
-+				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
-+				   0x0013, 0x0000, data, datalen, LINE6_TIMEOUT * HZ);
-+	if (ret)
- 		dev_err(line6->ifcdev, "read failed (error %d)\n", ret);
- 
- exit:
--	kfree(len);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(line6_read_data);
-@@ -423,12 +414,10 @@ int line6_write_data(struct usb_line6 *line6, unsigned address, void *data,
- 	if (!status)
- 		return -ENOMEM;
- 
--	ret = usb_control_msg(usbdev, usb_sndctrlpipe(usbdev, 0), 0x67,
--			      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
--			      0x0022, address, data, datalen,
--			      LINE6_TIMEOUT * HZ);
--
--	if (ret < 0) {
-+	ret = usb_control_msg_send(usbdev, 0, 0x67,
-+				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
-+				   0x0022, address, data, datalen, LINE6_TIMEOUT * HZ);
-+	if (ret) {
- 		dev_err(line6->ifcdev,
- 			"write request failed (error %d)\n", ret);
- 		goto exit;
-@@ -437,14 +426,10 @@ int line6_write_data(struct usb_line6 *line6, unsigned address, void *data,
- 	for (count = 0; count < LINE6_READ_WRITE_MAX_RETRIES; count++) {
- 		mdelay(LINE6_READ_WRITE_STATUS_DELAY);
- 
--		ret = usb_control_msg(usbdev, usb_rcvctrlpipe(usbdev, 0),
--				      0x67,
--				      USB_TYPE_VENDOR | USB_RECIP_DEVICE |
--				      USB_DIR_IN,
--				      0x0012, 0x0000,
--				      status, 1, LINE6_TIMEOUT * HZ);
--
--		if (ret < 0) {
-+		ret = usb_control_msg_recv(usbdev, 0, 0x67,
-+					   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
-+					   0x0012, 0x0000, status, 1, LINE6_TIMEOUT * HZ);
-+		if (ret) {
- 			dev_err(line6->ifcdev,
- 				"receiving status failed (error %d)\n", ret);
- 			goto exit;
-diff --git a/sound/usb/line6/podhd.c b/sound/usb/line6/podhd.c
-index eef45f7fef0d..a1261f55d62b 100644
---- a/sound/usb/line6/podhd.c
-+++ b/sound/usb/line6/podhd.c
-@@ -183,29 +183,25 @@ static const struct attribute_group podhd_dev_attr_group = {
- static int podhd_dev_start(struct usb_line6_podhd *pod)
- {
- 	int ret;
--	u8 *init_bytes;
-+	u8 init_bytes[8];
- 	int i;
- 	struct usb_device *usbdev = pod->line6.usbdev;
- 
--	init_bytes = kmalloc(8, GFP_KERNEL);
--	if (!init_bytes)
--		return -ENOMEM;
--
--	ret = usb_control_msg(usbdev, usb_sndctrlpipe(usbdev, 0),
-+	ret = usb_control_msg_send(usbdev, 0,
- 					0x67, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
- 					0x11, 0,
- 					NULL, 0, LINE6_TIMEOUT * HZ);
--	if (ret < 0) {
-+	if (ret) {
- 		dev_err(pod->line6.ifcdev, "read request failed (error %d)\n", ret);
- 		goto exit;
- 	}
- 
- 	/* NOTE: looks like some kind of ping message */
--	ret = usb_control_msg(usbdev, usb_rcvctrlpipe(usbdev, 0), 0x67,
-+	ret = usb_control_msg_recv(usbdev, 0, 0x67,
- 					USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
- 					0x11, 0x0,
- 					init_bytes, 3, LINE6_TIMEOUT * HZ);
--	if (ret < 0) {
-+	if (ret) {
- 		dev_err(pod->line6.ifcdev,
- 			"receive length failed (error %d)\n", ret);
- 		goto exit;
-@@ -220,13 +216,12 @@ static int podhd_dev_start(struct usb_line6_podhd *pod)
- 			goto exit;
- 	}
- 
--	ret = usb_control_msg(usbdev, usb_sndctrlpipe(usbdev, 0),
-+	ret = usb_control_msg_send(usbdev, 0,
- 					USB_REQ_SET_FEATURE,
- 					USB_TYPE_STANDARD | USB_RECIP_DEVICE | USB_DIR_OUT,
- 					1, 0,
- 					NULL, 0, LINE6_TIMEOUT * HZ);
- exit:
--	kfree(init_bytes);
- 	return ret;
+diff --git a/sound/usb/usx2y/us122l.c b/sound/usb/usx2y/us122l.c
+index f86f7a61fb36..e5c5a0d03d8a 100644
+--- a/sound/usb/usx2y/us122l.c
++++ b/sound/usb/usx2y/us122l.c
+@@ -82,40 +82,13 @@ static int us144_create_usbmidi(struct snd_card *card)
+ 				  &US122L(card)->midi_list, &quirk);
  }
  
-diff --git a/sound/usb/line6/toneport.c b/sound/usb/line6/toneport.c
-index 94dd5e7ab2e6..a9b56085b76a 100644
---- a/sound/usb/line6/toneport.c
-+++ b/sound/usb/line6/toneport.c
-@@ -126,11 +126,11 @@ static int toneport_send_cmd(struct usb_device *usbdev, int cmd1, int cmd2)
+-/*
+- * Wrapper for usb_control_msg().
+- * Allocates a temp buffer to prevent dmaing from/to the stack.
+- */
+-static int us122l_ctl_msg(struct usb_device *dev, unsigned int pipe,
+-			  __u8 request, __u8 requesttype,
+-			  __u16 value, __u16 index, void *data,
+-			  __u16 size, int timeout)
+-{
+-	int err;
+-	void *buf = NULL;
+-
+-	if (size > 0) {
+-		buf = kmemdup(data, size, GFP_KERNEL);
+-		if (!buf)
+-			return -ENOMEM;
+-	}
+-	err = usb_control_msg(dev, pipe, request, requesttype,
+-			      value, index, buf, size, timeout);
+-	if (size > 0) {
+-		memcpy(data, buf, size);
+-		kfree(buf);
+-	}
+-	return err;
+-}
+-
+ static void pt_info_set(struct usb_device *dev, u8 v)
  {
  	int ret;
  
--	ret = usb_control_msg(usbdev, usb_sndctrlpipe(usbdev, 0), 0x67,
--			      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
--			      cmd1, cmd2, NULL, 0, LINE6_TIMEOUT * HZ);
-+	ret = usb_control_msg_send(usbdev, 0, 0x67,
-+				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
-+				   cmd1, cmd2, NULL, 0, LINE6_TIMEOUT * HZ);
+-	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+-			      'I',
+-			      USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+-			      v, 0, NULL, 0, 1000);
++	ret = usb_control_msg_send(dev, 0, 'I',
++				   USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
++				   v, 0, NULL, 0, 1000);
+ 	snd_printdd(KERN_DEBUG "%i\n", ret);
+ }
  
--	if (ret < 0) {
-+	if (ret) {
- 		dev_err(&usbdev->dev, "send failed (error %d)\n", ret);
- 		return ret;
- 	}
+@@ -305,10 +278,11 @@ static int us122l_set_sample_rate(struct usb_device *dev, int rate)
+ 	data[0] = rate;
+ 	data[1] = rate >> 8;
+ 	data[2] = rate >> 16;
+-	err = us122l_ctl_msg(dev, usb_sndctrlpipe(dev, 0), UAC_SET_CUR,
+-			     USB_TYPE_CLASS|USB_RECIP_ENDPOINT|USB_DIR_OUT,
+-			     UAC_EP_CS_ATTR_SAMPLE_RATE << 8, ep, data, 3, 1000);
+-	if (err < 0)
++	err = usb_control_msg_send(dev, 0, UAC_SET_CUR,
++				   USB_TYPE_CLASS|USB_RECIP_ENDPOINT|USB_DIR_OUT,
++				   UAC_EP_CS_ATTR_SAMPLE_RATE << 8, ep, data, 3,
++				   1000);
++	if (err)
+ 		snd_printk(KERN_ERR "%d: cannot set freq %d to ep 0x%x\n",
+ 			   dev->devnum, rate, ep);
+ 	return err;
 -- 
 2.28.0
 
