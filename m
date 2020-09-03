@@ -2,100 +2,135 @@ Return-Path: <SRS0=fWrd=CM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8825CC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Sep 2020 03:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FFDC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Sep 2020 03:50:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5BC582072A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Sep 2020 03:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E903120716
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Sep 2020 03:50:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSezLu9a"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="g1v0faM5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728219AbgICDbm (ORCPT
+        id S1726821AbgICDu6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Sep 2020 23:31:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47930 "EHLO
+        Wed, 2 Sep 2020 23:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728129AbgICDbe (ORCPT
+        with ESMTP id S1726654AbgICDu6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Sep 2020 23:31:34 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FC9C061244
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2020 20:31:33 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id f2so1902844qkh.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2020 20:31:33 -0700 (PDT)
+        Wed, 2 Sep 2020 23:50:58 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA09C061244
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Sep 2020 20:50:57 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p138so1519187yba.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Sep 2020 20:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=4NIdV8/+RibROmbtlr8Z5KvR5vcl5+4en+so/W/D6Ew=;
-        b=CSezLu9a1P5lmpUsdoNcaC2vL85sp45RJ0kZS38M/Qf88KppR+4ZnTUW4Hx1ikf3uw
-         RHJlL6zkL4Zp32mIr1qqN5EgtZRhq3cuOVs1L64IPi7HdW7WZBi8vR/eSxg705xFSBAe
-         /Q2c/pIHvqxZbcr+sDJz8uiGSO0jc3EdVQjSDCupt3dviold4XH9RHSazWFkC7nBrc5z
-         R1xyKA8y4yyqUoHAmJgBqYuUYuMQTedP/f95adbzQQrWG6yEzCE/SPc5cGhMfGK1aScM
-         inp9Z9JRX/agWqSCY/Is2DfDmiasLhpEsk1HFA5BvlDjPsBhrlOwlkeRN+toMEz08A7C
-         W6Yg==
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=/FSgf2EPD/YJcQe1a7i0YAGBtiAsMfHL3A3+v0vuBC0=;
+        b=g1v0faM52Nxm06t0CDxXxgCPDG8S8sAmtCSDegQTQdaB1+peSBjIvCRoMd7aQNEG5O
+         BIohBF933VKvuezgZeMLE9/RCAOb9IIWpBwi8IObl2mrtHu7eYE+hwri3BWFJOgB6awY
+         5RQJS7iCgyC7fRiPeiU8Zwr0hTPXARmO7k7M+F3mzOiHk/WlyuyGqZbwAuZ+WugtPjOh
+         BUdJELaMeb4nlZMm1NM1Gt5ldrtsDDG0gsCfWAYHTNXiu7kprLMU9sQSg1LZYrX9oSvP
+         WXrrvopWxDjwSgAIWG5d1JHwAv+0IBVIQ//mla7Z+87F5wSMLfAvmPolPh9sR0Q5jJGm
+         4phg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=4NIdV8/+RibROmbtlr8Z5KvR5vcl5+4en+so/W/D6Ew=;
-        b=P2oucP1JDE1GDzUJPCaHZeq7cIPIhrbTcu37hI8LqxqYyCAzKThi1ZXQ68a4JtTMAA
-         P13XcT2ah2KfYmj9MZh+jEZvT7UZm2bookowcopjBSOzXIBPt9zFpdRzoTHfHgufE76a
-         VOncN2YRPKo+uUKLAAF5WHUXItKjQYRzCN2HUoCBDu4UTj+YeqkQkwnPOIYq3Xi+b27V
-         sb24VLJ7XEcjDugzbkBHZX/6c37PZ15fQhMy9xpxfOpaY8C1PSzm6rqfeFeqPBQz2E7V
-         qIgyNuoPZyJa6HkMFbBD4W4QLc5HGiwDFihaXaM0OWxq0pxWIjVZpqaU9WNw1ovWT/3D
-         uq8A==
-X-Gm-Message-State: AOAM530ibaJ2Uorz603P7XtY35FB84Hch4OuSlwRzAQKzeX+sEbYOy50
-        jCJ7C2ezUOc7u6hGBNdYTsXbvR2wPlw=
-X-Google-Smtp-Source: ABdhPJzzsJ7Ge1HRAnqNcdJjOL5MzA86CoW8NJzYIvqHwdiA2QyjSeEA+UE+dRmBpWveJ84e/tYZsw==
-X-Received: by 2002:a37:86c1:: with SMTP id i184mr1274217qkd.189.1599103890247;
-        Wed, 02 Sep 2020 20:31:30 -0700 (PDT)
-Received: from [172.17.0.2] ([20.190.246.205])
-        by smtp.gmail.com with ESMTPSA id p205sm1231562qke.2.2020.09.02.20.31.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 20:31:29 -0700 (PDT)
-Message-ID: <5f506391.1c69fb81.cfed7.8845@mx.google.com>
-Date:   Wed, 02 Sep 2020 20:31:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1064658887671059200=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v2,1/2] doc/media-api: Add Press/Hold/Release methods for MediaPlayer1
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200903110031.Bluez.v2.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
-References: <20200903110031.Bluez.v2.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=/FSgf2EPD/YJcQe1a7i0YAGBtiAsMfHL3A3+v0vuBC0=;
+        b=XFjcV2b55tKaG3yA4lHrJttGVF5j1bjCphElQhj2QaQSybDHRDI1UX1yKdvBqg9n0H
+         3jbTglkyjTOXfjA0x2sIsC6xqc7DdwUaY7qrbgCMJZjOtYNLclHxCVFWJkwBYXZS6+u5
+         BJ9QpMKjfYIy4CgRECwOkugBd2umyhy5jjA8ip3Q/CO4ZUfvjVP7syO054dcIAZWU5LX
+         sB6BCSfl5GmSKPCUHCgORcgNAhm2YiNO7fp5RyCeAuqfJl0z2E303tEa1CR2bhWv+PDb
+         fOgAhRO3yaG65qX3D80z82f2DdoOyDZkTUxPC0REsxdsmhSeGcPFuqcV8UeI+NH65g+B
+         mMiA==
+X-Gm-Message-State: AOAM530/kOeaeLJZq0OWY2jnPzrUi7jwm8sTOf2hf6/s0Z5aLwgzH3LC
+        GcDc83Trffbl5OtYF9XKXhJJQcBjkqiMmPJiuoXtsrelPIGLMLoNU76WE1gpvWq1/piuf3KXuwY
+        9VJtPcl0e4vEI5LXG1MGgB+74GAgPh0vYlMqWEwk9XWM+wxVf+d83BgULoQaOPlrht4ojuqanI8
+        1H
+X-Google-Smtp-Source: ABdhPJybbsUs5HOk1fDx9wuuqgx3GoxG4SbzI9tSPChs1O+twa+CMiswd+DiIC9y8QFlrMDEmclcOX/6tx6u
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:2347])
+ (user=apusaka job=sendgmr) by 2002:a25:c004:: with SMTP id
+ c4mr1395166ybf.475.1599105056918; Wed, 02 Sep 2020 20:50:56 -0700 (PDT)
+Date:   Thu,  3 Sep 2020 11:50:37 +0800
+Message-Id: <20200903115020.Bluez.v3.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.402.g5ffc5be6b7-goog
+Subject: [Bluez PATCH v3 1/2] doc/media-api: Add Press/Hold/Release methods
+ for MediaPlayer1
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Michael Sun <michaelfsun@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1064658887671059200==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+From: Archie Pusaka <apusaka@chromium.org>
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
-CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
-VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
-ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
-KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
-bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
-ZmF1bHQgKHNlZSBgVScpCnByb2ZpbGVzL2F1ZGlvL3BsYXllci5jOiBJbiBmdW5jdGlvbiDigJht
-ZWRpYV9wbGF5ZXJfcmVsZWFzZeKAmToKcHJvZmlsZXMvYXVkaW8vcGxheWVyLmM6NjIzOjEwOiBl
-cnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmGF2Y19rZXnigJkgWy1XZXJyb3I9dW51c2VkLXZhcmlh
-YmxlXQogIDYyMyB8ICB1aW50OF90IGF2Y19rZXk7CiAgICAgIHwgICAgICAgICAgXn5+fn5+fgpj
-YzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01h
-a2VmaWxlOjg0ODE6IHByb2ZpbGVzL2F1ZGlvL2JsdWV0b290aGQtcGxheWVyLm9dIEVycm9yIDEK
-bWFrZTogKioqIFtNYWtlZmlsZTo0MDEwOiBhbGxdIEVycm9yIDIKCgoKLS0tClJlZ2FyZHMsCkxp
-bnV4IEJsdWV0b290aAo=
+This allows us to send any passthrough command. The button can also
+be held for an extended amount of time.
 
---===============1064658887671059200==--
+Reviewed-by: Michael Sun <michaelfsun@chromium.org>
+---
+
+(no changes since v2)
+
+Changes in v2:
+* Add Hold and Release methods
+
+ doc/media-api.txt | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index dabc69936..e98573157 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -199,6 +199,35 @@ Methods		void Play()
+ 			Possible Errors: org.bluez.Error.NotSupported
+ 					 org.bluez.Error.Failed
+ 
++		void Press(byte avc_key)
++
++			Press a specific key to send as passthrough command.
++			The key will be released automatically. Use Hold()
++			instead if the intention is to hold down the key.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
++		void Hold(byte avc_key)
++
++			Press and hold a specific key to send as passthrough
++			command. It is your responsibility to make sure that
++			Release() is called after calling this method. The held
++			key will also be released when any other method in this
++			interface is called.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
++		void Release()
++
++			Release the previously held key invoked using Hold().
++
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ Properties	string Equalizer [readwrite]
+ 
+ 			Possible values: "off" or "on"
+-- 
+2.28.0.402.g5ffc5be6b7-goog
+
