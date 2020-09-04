@@ -2,82 +2,142 @@ Return-Path: <SRS0=2wua=CN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C927BC43461
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Sep 2020 14:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C323FC43461
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Sep 2020 22:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91954206F2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Sep 2020 14:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F3102100A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Sep 2020 22:36:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OIOreoCo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730460AbgIDOoO (ORCPT
+        id S1728185AbgIDWgL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Sep 2020 10:44:14 -0400
-Received: from mail-io1-f77.google.com ([209.85.166.77]:52007 "EHLO
-        mail-io1-f77.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730388AbgIDOoK (ORCPT
+        Fri, 4 Sep 2020 18:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728076AbgIDWgL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Sep 2020 10:44:10 -0400
-Received: by mail-io1-f77.google.com with SMTP id q12so4421532iob.18
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2020 07:44:09 -0700 (PDT)
+        Fri, 4 Sep 2020 18:36:11 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34175C061244
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Sep 2020 15:36:08 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id a2so7270308otr.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Sep 2020 15:36:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4NleXdVdbpx9b00tfVBJqgckh877rdnwVriN+/Ekhxw=;
+        b=OIOreoCoXSdHZQi8zB1BiO680FlVNsumY5Hylh8Xzh9Z0HCv62gBs4vZf4zm9Eio0M
+         NviNXDOZlehUi/N0mPVuwnVLOP/AZKfUMAsn1N2HGHGc+3zCn60s8bG5GnUWa1iYgSke
+         doxuezLKFy2T2pu1yY5o+AQW7/S+HPb7UcTozMKl1R4FsI4DPNFnVdnM6P/zw46nfkNB
+         QnQZtsHbRPvYrz0ImGRzVwAVLbnYg19f+2UmXRvfU6Nzftw7jNmy1ls3XX2w6P/52Jos
+         0UcjSnsf0YKekdavDTLmQz8+gH0mpAf3Q9CpVmhRP9Vvk17kke01sTigfyZXJkYNv3ax
+         GO/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=GE20mkCJFx34V9csXbBi5MpSPEm23j5O5gEKMXhuGs4=;
-        b=jTxTV3FSjJPPYofjYJrVk43LQrfKGwPrA+Vjot0+fx7Ymm/iWFUX+y6/+g34qRkKyu
-         LLpDMOof1FDUbqCdPmc0FjCJ5XKSO3JWnN/4a3wpjWdVrKx9gUeqUhnQ44fbwDltAeSy
-         1rGGsomwpIVe4CI4n0Gcp36l3b48ZILA1Wd4soJTGDlan0FzRm7Km62ArxE2fo5QgDmG
-         ofhSWce7UU20kRRTsRqO28QVulJnM0k5vQvWD8fEKA1ykEgt26FJMBWIXPbYbWh3kvKI
-         9/S7p91UnnR4Jh+XdVlvFJJNY6IGO7W6Wi6iH0kDcsAg8wjvD6to9ufJqTroc59pLCkB
-         u3tQ==
-X-Gm-Message-State: AOAM533cd3V59D88TLcfGPJ/YyyZByLYFo+buWgkxwt1WwzF1L6F3ebN
-        SLeWfpB4cB3LVjHgnqijffHtKpSfXQc/F1kHM1kZTEj+fEEn
-X-Google-Smtp-Source: ABdhPJxZCmzJJSBtD6oipaJudDBJ1GQFFB0c3Y+RmR7v/iFXEsAA2X6Ph+jfCB/546LXa6E6JWGbeRIObehShZ2GPeZnQjV295Tv
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4NleXdVdbpx9b00tfVBJqgckh877rdnwVriN+/Ekhxw=;
+        b=eVr8Cek17CO/NhSpylYpOdjcPBcD6wuoOYS1C0CpO3L39ABAF4WHd7AByAuOvYUcta
+         L6kqaNut3hjX9gjQYdnnM21zjmzSgZOUTnNJqwjrLaOeeFjfz96bqM4cLHdam4Wdu67m
+         dzExLmJtMMNUbuKm0XQNL171B6+9TjC1R+DVRrf8ITPXZdL/bDLzGxGEQAfc/0RrU5Jq
+         PdzYmpzBoFUK+JUcsWjxzpqbG9SfNmdCtnUSh4id5ySCaSEalj+6UJnYUvTOlm0J9V2T
+         WnmW3MoEq+IqZZC3jeTN/WwfNTHAI+G+Dixyn6h3K5l4vIKOmdxeamtaeqzc5AkqjdFt
+         8qdQ==
+X-Gm-Message-State: AOAM5309mbd9U9JQ6Wn5xRbahpMCupMjww2Gn8eeKki1OxjApWLlnPu5
+        3Oz5ma3v70CHjGcB7JUQ5UCZxTdtx5oCvK1l9X0=
+X-Google-Smtp-Source: ABdhPJywT5Btr2LUWf8mkdAXicgmQyZz89ZI4VDzln6AxZWvamghCN1nDuveORmpQ3TF3O5SAb5CbcIo7ol+FGVqsp4=
+X-Received: by 2002:a9d:429:: with SMTP id 38mr6743513otc.88.1599258967511;
+ Fri, 04 Sep 2020 15:36:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1303:: with SMTP id g3mr4832562ilr.218.1599230649567;
- Fri, 04 Sep 2020 07:44:09 -0700 (PDT)
-Date:   Fri, 04 Sep 2020 07:44:09 -0700
-In-Reply-To: <00000000000055e1a9059f9e169f@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c8101605ae7de686@google.com>
-Subject: Re: KASAN: use-after-free Write in refcount_warn_saturate
-From:   syzbot <syzbot+7dd7f2f77a7a01d1dc14@syzkaller.appspotmail.com>
-To:     abhishekpandit@chromium.org, alainm@chromium.org,
-        davem@davemloft.net, johan.hedberg@gmail.com,
-        johan.hedberg@intel.com, josua.mayer@jm0.eu,
-        jukka.rissanen@linux.intel.com, keescook@chromium.org,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        mcchou@chromium.org, mike@foundries.io, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+References: <20200903115020.Bluez.v3.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
+In-Reply-To: <20200903115020.Bluez.v3.1.I6767a68b7e7b6cfb6d8046ee8b66c8e7d008d3e6@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 4 Sep 2020 15:35:53 -0700
+Message-ID: <CABBYNZL4wN0mNhSqmCevGnOcFsgbh+FhFrrZLRtkGh97sZhckQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 1/2] doc/media-api: Add Press/Hold/Release
+ methods for MediaPlayer1
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Michael Sun <michaelfsun@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Hi Archie,
 
-commit b83764f9220a4a14525657466f299850bbc98de9
-Author: Miao-chen Chou <mcchou@chromium.org>
-Date:   Tue Jun 30 03:15:00 2020 +0000
+On Wed, Sep 2, 2020 at 8:50 PM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> This allows us to send any passthrough command. The button can also
+> be held for an extended amount of time.
+>
+> Reviewed-by: Michael Sun <michaelfsun@chromium.org>
+> ---
+>
+> (no changes since v2)
+>
+> Changes in v2:
+> * Add Hold and Release methods
+>
+>  doc/media-api.txt | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index dabc69936..e98573157 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -199,6 +199,35 @@ Methods            void Play()
+>                         Possible Errors: org.bluez.Error.NotSupported
+>                                          org.bluez.Error.Failed
+>
+> +               void Press(byte avc_key)
+> +
+> +                       Press a specific key to send as passthrough command.
+> +                       The key will be released automatically. Use Hold()
+> +                       instead if the intention is to hold down the key.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.NotSupported
+> +                                        org.bluez.Error.Failed
+> +
+> +               void Hold(byte avc_key)
+> +
+> +                       Press and hold a specific key to send as passthrough
+> +                       command. It is your responsibility to make sure that
+> +                       Release() is called after calling this method. The held
+> +                       key will also be released when any other method in this
+> +                       interface is called.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.NotSupported
+> +                                        org.bluez.Error.Failed
+> +
+> +               void Release()
+> +
+> +                       Release the previously held key invoked using Hold().
+> +
+> +                       Possible Errors: org.bluez.Error.NotSupported
+> +                                        org.bluez.Error.Failed
+> +
+>  Properties     string Equalizer [readwrite]
+>
+>                         Possible values: "off" or "on"
+> --
+> 2.28.0.402.g5ffc5be6b7-goog
 
-    Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
+Applied, thanks.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10f92e3e900000
-start commit:   c0842fbc random32: move the pseudo-random 32-bit definitio..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cf567e8c7428377e
-dashboard link: https://syzkaller.appspot.com/bug?extid=7dd7f2f77a7a01d1dc14
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b606dc900000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=123e87cc900000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+-- 
+Luiz Augusto von Dentz
