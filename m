@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F60C2BB84
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B36C43461
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C072521473
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D42821481
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599494023;
-	bh=bOtNvPKd1buomuDeBpZzqGRO3R6GMfbAEg8/sDVnLbg=;
+	s=default; t=1599494053;
+	bh=lAWlK3q7dlSU3BX9UUth7FV/aMVc82HxwZZSp4H5Db4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=eu6n1BckDvgNRsvcj1w4vF6XUzJogM8D8sa5afk3mVqln3Hmk9G+KUoUv2rH47X+T
-	 D1bDrFTkhqV42FWkWrO15pU76L/19nkTscvLYnmB83KPIGHEPpSKyOkF8RLSf92fW4
-	 jL8PUqC7muXwhTs2ti+i8oCATtABTwbRJFWbKiUs=
+	b=qkRFvi9GUiYu6ViadqDSm+1z50bF6Fw607+QSOLQ/+EOqcyEWDFql7HFd7Deu075Y
+	 /Nkb7/ObWqYJ7GMCcEl5y3ifXdONrJSIIWVFqxVKHzNpe96N5AerYx7crM9twGEVDf
+	 JIimirKMpT+lrwpDieRNPGfveguFuIn0OzJGsYSg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730227AbgIGPxP (ORCPT
+        id S1730223AbgIGPyH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Sep 2020 11:53:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58686 "EHLO mail.kernel.org"
+        Mon, 7 Sep 2020 11:54:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58486 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730015AbgIGOvt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Sep 2020 10:51:49 -0400
+        id S1730022AbgIGOvH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Sep 2020 10:51:07 -0400
 Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 02F9621924;
-        Mon,  7 Sep 2020 14:51:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DC57B21481;
+        Mon,  7 Sep 2020 14:51:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599490279;
-        bh=bOtNvPKd1buomuDeBpZzqGRO3R6GMfbAEg8/sDVnLbg=;
+        s=default; t=1599490266;
+        bh=lAWlK3q7dlSU3BX9UUth7FV/aMVc82HxwZZSp4H5Db4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1MHmCQfOr4X3wWjX6IQ3rwja05HHJTOw+UvuGXj0aN6axRPVil/jBk5r/UJEAR4aO
-         Ssbim/0ObmcFTIK+FT6ffbI0q1Xr0aQYGv6PpRiWAJcwz7wCDbppmvBgjycqVqWR4J
-         V5iFfXj0xM9h7kuUXf4PoM2CFpwjAufNO9gR0z9k=
+        b=lkNxOAr6D47I4QX0kM9cVJLJb6KQjj/GJaUaWXjiH8FhsjbURGG+G+VMs34hNWDq2
+         CKXS0cBXxyyACxxrXpfI+2fbjTCrWSUOVFlgdW+5vPPtYUCy46eL1TIb4/MsqjF0Z+
+         cMaBbQnw64NbDt9pqzu5Jd5KjbG+heuNRbK61JDA=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     himadrispandya@gmail.com, dvyukov@google.com,
         linux-usb@vger.kernel.org
@@ -46,12 +46,10 @@ Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
         linux-kernel@vger.kernel.org, marcel@holtmann.org,
         johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
         alsa-devel@alsa-project.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Stuber <starblue@users.sourceforge.net>,
-        legousb-devel@lists.sourceforge.net
-Subject: [PATCH v2 05/11] USB: legousbtower: use usb_control_msg_recv()
-Date:   Mon,  7 Sep 2020 16:51:02 +0200
-Message-Id: <20200907145108.3766613-6-gregkh@linuxfoundation.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH v2 10/11] Bluetooth: ath3k: use usb_control_msg_send() and usb_control_msg_recv()
+Date:   Mon,  7 Sep 2020 16:51:07 +0200
+Message-Id: <20200907145108.3766613-11-gregkh@linuxfoundation.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907145108.3766613-1-gregkh@linuxfoundation.org>
 References: <20200907145108.3766613-1-gregkh@linuxfoundation.org>
@@ -62,139 +60,204 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The usb_control_msg_recv() function can handle data on the stack, as
-well as properly detecting short reads, so move to use that function
-instead of the older usb_control_msg() call.  This ends up removing a
-lot of extra lines in the driver.
+The usb_control_msg_send() and usb_control_msg_recv() calls can return
+an error if a "short" write/read happens, and they can handle data off
+of the stack, so move the driver over to using those calls instead,
+saving some logic when dynamically allocating memory.
 
-Cc: Juergen Stuber <starblue@users.sourceforge.net>
-Cc: legousb-devel@lists.sourceforge.net
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
 v2:
  - no change from v1
 
- drivers/usb/misc/legousbtower.c | 60 +++++++++++----------------------
- 1 file changed, 19 insertions(+), 41 deletions(-)
+ drivers/bluetooth/ath3k.c | 90 +++++++++++----------------------------
+ 1 file changed, 26 insertions(+), 64 deletions(-)
 
-diff --git a/drivers/usb/misc/legousbtower.c b/drivers/usb/misc/legousbtower.c
-index f922544056de..c3583df4c324 100644
---- a/drivers/usb/misc/legousbtower.c
-+++ b/drivers/usb/misc/legousbtower.c
-@@ -308,15 +308,9 @@ static int tower_open(struct inode *inode, struct file *file)
- 	int subminor;
- 	int retval = 0;
- 	struct usb_interface *interface;
--	struct tower_reset_reply *reset_reply;
-+	struct tower_reset_reply reset_reply;
- 	int result;
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 4ce270513695..1472cccfd0b3 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -212,19 +212,16 @@ static int ath3k_load_firmware(struct usb_device *udev,
  
--	reset_reply = kmalloc(sizeof(*reset_reply), GFP_KERNEL);
--	if (!reset_reply) {
--		retval = -ENOMEM;
--		goto exit;
--	}
+ 	BT_DBG("udev %p", udev);
+ 
+-	pipe = usb_sndctrlpipe(udev, 0);
 -
- 	nonseekable_open(inode, file);
- 	subminor = iminor(inode);
- 
-@@ -347,15 +341,11 @@ static int tower_open(struct inode *inode, struct file *file)
+ 	send_buf = kmalloc(BULK_SIZE, GFP_KERNEL);
+ 	if (!send_buf) {
+ 		BT_ERR("Can't allocate memory chunk for firmware");
+ 		return -ENOMEM;
  	}
  
- 	/* reset the tower */
--	result = usb_control_msg(dev->udev,
--				 usb_rcvctrlpipe(dev->udev, 0),
--				 LEGO_USB_TOWER_REQUEST_RESET,
--				 USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
--				 0,
--				 0,
--				 reset_reply,
--				 sizeof(*reset_reply),
--				 1000);
-+	result = usb_control_msg_recv(dev->udev, 0,
-+				      LEGO_USB_TOWER_REQUEST_RESET,
-+				      USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
-+				      0, 0,
-+				      &reset_reply, sizeof(reset_reply), 1000);
- 	if (result < 0) {
- 		dev_err(&dev->udev->dev,
- 			"LEGO USB Tower reset control request failed\n");
-@@ -394,7 +384,6 @@ static int tower_open(struct inode *inode, struct file *file)
- 	mutex_unlock(&dev->lock);
- 
- exit:
--	kfree(reset_reply);
- 	return retval;
- }
- 
-@@ -753,7 +742,7 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
- 	struct device *idev = &interface->dev;
- 	struct usb_device *udev = interface_to_usbdev(interface);
- 	struct lego_usb_tower *dev;
--	struct tower_get_version_reply *get_version_reply = NULL;
-+	struct tower_get_version_reply get_version_reply;
- 	int retval = -ENOMEM;
- 	int result;
- 
-@@ -798,34 +787,25 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
- 	dev->interrupt_in_interval = interrupt_in_interval ? interrupt_in_interval : dev->interrupt_in_endpoint->bInterval;
- 	dev->interrupt_out_interval = interrupt_out_interval ? interrupt_out_interval : dev->interrupt_out_endpoint->bInterval;
- 
--	get_version_reply = kmalloc(sizeof(*get_version_reply), GFP_KERNEL);
--	if (!get_version_reply) {
--		retval = -ENOMEM;
--		goto error;
--	}
--
- 	/* get the firmware version and log it */
--	result = usb_control_msg(udev,
--				 usb_rcvctrlpipe(udev, 0),
--				 LEGO_USB_TOWER_REQUEST_GET_VERSION,
--				 USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
--				 0,
--				 0,
--				 get_version_reply,
--				 sizeof(*get_version_reply),
--				 1000);
--	if (result != sizeof(*get_version_reply)) {
--		if (result >= 0)
--			result = -EIO;
-+	result = usb_control_msg_recv(udev, 0,
-+				      LEGO_USB_TOWER_REQUEST_GET_VERSION,
-+				      USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE,
-+				      0,
-+				      0,
-+				      &get_version_reply,
-+				      sizeof(get_version_reply),
-+				      1000);
-+	if (!result) {
- 		dev_err(idev, "get version request failed: %d\n", result);
- 		retval = result;
+-	memcpy(send_buf, firmware->data, FW_HDR_SIZE);
+-	err = usb_control_msg(udev, pipe, USB_REQ_DFU_DNLOAD, USB_TYPE_VENDOR,
+-			      0, 0, send_buf, FW_HDR_SIZE,
+-			      USB_CTRL_SET_TIMEOUT);
+-	if (err < 0) {
++	err = usb_control_msg_send(udev, 0, USB_REQ_DFU_DNLOAD, USB_TYPE_VENDOR,
++				   0, 0, firmware->data, FW_HDR_SIZE,
++				   USB_CTRL_SET_TIMEOUT);
++	if (err) {
+ 		BT_ERR("Can't change to loading configuration err");
  		goto error;
  	}
- 	dev_info(&interface->dev,
- 		 "LEGO USB Tower firmware version is %d.%d build %d\n",
--		 get_version_reply->major,
--		 get_version_reply->minor,
--		 le16_to_cpu(get_version_reply->build_no));
-+		 get_version_reply.major,
-+		 get_version_reply.minor,
-+		 le16_to_cpu(get_version_reply.build_no));
+@@ -259,44 +256,17 @@ static int ath3k_load_firmware(struct usb_device *udev,
  
- 	/* we can register the device now, as it is ready */
- 	usb_set_intfdata(interface, dev);
-@@ -844,11 +824,9 @@ static int tower_probe(struct usb_interface *interface, const struct usb_device_
- 		 USB_MAJOR, dev->minor);
- 
- exit:
--	kfree(get_version_reply);
- 	return retval;
- 
- error:
--	kfree(get_version_reply);
- 	tower_delete(dev);
- 	return retval;
+ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
+ {
+-	int ret, pipe = 0;
+-	char *buf;
+-
+-	buf = kmalloc(sizeof(*buf), GFP_KERNEL);
+-	if (!buf)
+-		return -ENOMEM;
+-
+-	pipe = usb_rcvctrlpipe(udev, 0);
+-	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
+-			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+-			      buf, sizeof(*buf), USB_CTRL_SET_TIMEOUT);
+-
+-	*state = *buf;
+-	kfree(buf);
+-
+-	return ret;
++	return usb_control_msg_recv(udev, 0, ATH3K_GETSTATE,
++				    USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
++				    state, 1, USB_CTRL_SET_TIMEOUT);
  }
+ 
+ static int ath3k_get_version(struct usb_device *udev,
+ 			struct ath3k_version *version)
+ {
+-	int ret, pipe = 0;
+-	struct ath3k_version *buf;
+-	const int size = sizeof(*buf);
+-
+-	buf = kmalloc(size, GFP_KERNEL);
+-	if (!buf)
+-		return -ENOMEM;
+-
+-	pipe = usb_rcvctrlpipe(udev, 0);
+-	ret = usb_control_msg(udev, pipe, ATH3K_GETVERSION,
+-			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+-			      buf, size, USB_CTRL_SET_TIMEOUT);
+-
+-	memcpy(version, buf, size);
+-	kfree(buf);
+-
+-	return ret;
++	return usb_control_msg_recv(udev, 0, ATH3K_GETVERSION,
++				    USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
++				    version, sizeof(*version), USB_CTRL_SET_TIMEOUT);
+ }
+ 
+ static int ath3k_load_fwfile(struct usb_device *udev,
+@@ -316,13 +286,10 @@ static int ath3k_load_fwfile(struct usb_device *udev,
+ 	}
+ 
+ 	size = min_t(uint, count, FW_HDR_SIZE);
+-	memcpy(send_buf, firmware->data, size);
+ 
+-	pipe = usb_sndctrlpipe(udev, 0);
+-	ret = usb_control_msg(udev, pipe, ATH3K_DNLOAD,
+-			USB_TYPE_VENDOR, 0, 0, send_buf,
+-			size, USB_CTRL_SET_TIMEOUT);
+-	if (ret < 0) {
++	ret = usb_control_msg_send(udev, 0, ATH3K_DNLOAD, USB_TYPE_VENDOR, 0, 0,
++				   firmware->data, size, USB_CTRL_SET_TIMEOUT);
++	if (ret) {
+ 		BT_ERR("Can't change to loading configuration err");
+ 		kfree(send_buf);
+ 		return ret;
+@@ -355,23 +322,19 @@ static int ath3k_load_fwfile(struct usb_device *udev,
+ 	return 0;
+ }
+ 
+-static int ath3k_switch_pid(struct usb_device *udev)
++static void ath3k_switch_pid(struct usb_device *udev)
+ {
+-	int pipe = 0;
+-
+-	pipe = usb_sndctrlpipe(udev, 0);
+-	return usb_control_msg(udev, pipe, USB_REG_SWITCH_VID_PID,
+-			USB_TYPE_VENDOR, 0, 0,
+-			NULL, 0, USB_CTRL_SET_TIMEOUT);
++	usb_control_msg_send(udev, 0, USB_REG_SWITCH_VID_PID, USB_TYPE_VENDOR,
++			     0, 0, NULL, 0, USB_CTRL_SET_TIMEOUT);
+ }
+ 
+ static int ath3k_set_normal_mode(struct usb_device *udev)
+ {
+ 	unsigned char fw_state;
+-	int pipe = 0, ret;
++	int ret;
+ 
+ 	ret = ath3k_get_state(udev, &fw_state);
+-	if (ret < 0) {
++	if (ret) {
+ 		BT_ERR("Can't get state to change to normal mode err");
+ 		return ret;
+ 	}
+@@ -381,10 +344,9 @@ static int ath3k_set_normal_mode(struct usb_device *udev)
+ 		return 0;
+ 	}
+ 
+-	pipe = usb_sndctrlpipe(udev, 0);
+-	return usb_control_msg(udev, pipe, ATH3K_SET_NORMAL_MODE,
+-			USB_TYPE_VENDOR, 0, 0,
+-			NULL, 0, USB_CTRL_SET_TIMEOUT);
++	return usb_control_msg_send(udev, 0, ATH3K_SET_NORMAL_MODE,
++				    USB_TYPE_VENDOR, 0, 0, NULL, 0,
++				    USB_CTRL_SET_TIMEOUT);
+ }
+ 
+ static int ath3k_load_patch(struct usb_device *udev)
+@@ -397,7 +359,7 @@ static int ath3k_load_patch(struct usb_device *udev)
+ 	int ret;
+ 
+ 	ret = ath3k_get_state(udev, &fw_state);
+-	if (ret < 0) {
++	if (ret) {
+ 		BT_ERR("Can't get state to change to load ram patch err");
+ 		return ret;
+ 	}
+@@ -408,7 +370,7 @@ static int ath3k_load_patch(struct usb_device *udev)
+ 	}
+ 
+ 	ret = ath3k_get_version(udev, &fw_version);
+-	if (ret < 0) {
++	if (ret) {
+ 		BT_ERR("Can't get version to change to load ram patch err");
+ 		return ret;
+ 	}
+@@ -449,13 +411,13 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	int clk_value, ret;
+ 
+ 	ret = ath3k_get_state(udev, &fw_state);
+-	if (ret < 0) {
++	if (ret) {
+ 		BT_ERR("Can't get state to change to load configuration err");
+ 		return -EBUSY;
+ 	}
+ 
+ 	ret = ath3k_get_version(udev, &fw_version);
+-	if (ret < 0) {
++	if (ret) {
+ 		BT_ERR("Can't get version to change to load ram patch err");
+ 		return ret;
+ 	}
+@@ -529,7 +491,7 @@ static int ath3k_probe(struct usb_interface *intf,
+ 			return ret;
+ 		}
+ 		ret = ath3k_set_normal_mode(udev);
+-		if (ret < 0) {
++		if (ret) {
+ 			BT_ERR("Set normal mode failed");
+ 			return ret;
+ 		}
 -- 
 2.28.0
 
