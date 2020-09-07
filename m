@@ -2,55 +2,36 @@ Return-Path: <SRS0=Nonw=CQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C748DC2BB84
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4696AC43461
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 16:31:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ED6F21473
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599494315;
-	bh=vyE2X1zQKzP1YNOY504/+A2IyiOqZJITaebb9PZflls=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DMVeMtDEebp7lzuA7t1gc24X3HyZI9K3V/muUOZ26CezPPOPrTsS7+9JTm2+F41jW
-	 aebOcdjrYtJ1wMCd8AKQmjwtEHKl9ANI1hLn00vA6nEGKcXukibKaoFpSEwQ1onghn
-	 oykqRbGtw8PYPxjyHI47W09tgGfE9Jp/WjuKvFUI=
+	by mail.kernel.org (Postfix) with ESMTP id 1ABC620757
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 16:31:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730247AbgIGP6A (ORCPT
+        id S1730594AbgIGQbG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Sep 2020 11:58:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58230 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730010AbgIGOua (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Sep 2020 10:50:30 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 02CC821481;
-        Mon,  7 Sep 2020 14:41:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599489714;
-        bh=vyE2X1zQKzP1YNOY504/+A2IyiOqZJITaebb9PZflls=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=c6hSYHs20N7asJxie1tfww4JQBkA2E6D0wkvqfpBxR6REkJBlWNdSnD0BGokzdT4l
-         8FQxIwgIf1zsTzXYN8FnnKoBqJnlW6WjlPKXiD9ZcSdMdk6dD4ajO6FaxA1iJCtkaB
-         l0gAZvE0zqwF3JbPujEb6oKOdpp5kkpqGisnALyw=
-Date:   Mon, 7 Sep 2020 16:42:09 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Takashi Iwai <tiwai@suse.de>
+        Mon, 7 Sep 2020 12:31:06 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:38197 "HELO
+        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S1729801AbgIGOY2 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Sep 2020 10:24:28 -0400
+Received: (qmail 762519 invoked by uid 1000); 7 Sep 2020 10:24:27 -0400
+Date:   Mon, 7 Sep 2020 10:24:27 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc:     himadrispandya@gmail.com, dvyukov@google.com,
         linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
-        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        alsa-devel@alsa-project.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Eli Billauer <eli.billauer@gmail.com>,
         Emiliano Ingrassia <ingrassia@epigenesys.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
         Alexander Tsoy <alexander@tsoy.me>,
         "Geoffrey D. Bennett" <g@b4.vu>, Jussi Laako <jussi@sonarnerd.net>,
         Nick Kossifidis <mickflemm@gmail.com>,
@@ -59,50 +40,36 @@ Cc:     himadrispandya@gmail.com, dvyukov@google.com,
         Jesus Ramos <jesus-ramos@live.com>
 Subject: Re: [PATCH 01/10] USB: move snd_usb_pipe_sanity_check into the USB
  core
-Message-ID: <20200907144209.GA3751762@kroah.com>
+Message-ID: <20200907142427.GB762136@rowland.harvard.edu>
 References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
  <20200902110115.1994491-2-gregkh@linuxfoundation.org>
- <s5hh7sg9rgq.wl-tiwai@suse.de>
+ <20200903004553.GA642955@rowland.harvard.edu>
+ <20200903073230.GA162335@kroah.com>
+ <20200907141634.GA3733019@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <s5hh7sg9rgq.wl-tiwai@suse.de>
+In-Reply-To: <20200907141634.GA3733019@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Sep 02, 2020 at 04:35:33PM +0200, Takashi Iwai wrote:
-> On Wed, 02 Sep 2020 13:01:03 +0200,
-> Greg Kroah-Hartman wrote:
+On Mon, Sep 07, 2020 at 04:16:34PM +0200, Greg Kroah-Hartman wrote:
+> On Thu, Sep 03, 2020 at 09:32:30AM +0200, Greg Kroah-Hartman wrote:
+> > On Wed, Sep 02, 2020 at 08:45:53PM -0400, Alan Stern wrote:
+
+> > > Since this routine is used in only one place in the entire kernel, you 
+> > > might as well inline the code there and get rid of the function 
+> > > entirely.
 > > 
-> > snd_usb_pipe_sanity_check() is a great function, so let's move it into
-> > the USB core so that other parts of the kernel, including the USB core,
-> > can call it.
-> > 
-> > Name it usb_pipe_type_check() to match the existing
-> > usb_urb_ep_type_check() call, which now uses this function.
-> > 
-> > Cc: Jaroslav Kysela <perex@perex.cz>
-> > Cc: Takashi Iwai <tiwai@suse.com>
-> > Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-> > Cc: Eli Billauer <eli.billauer@gmail.com>
-> > Cc: Emiliano Ingrassia <ingrassia@epigenesys.com>
-> > Cc: Alan Stern <stern@rowland.harvard.edu>
-> > Cc: Alexander Tsoy <alexander@tsoy.me>
-> > Cc: "Geoffrey D. Bennett" <g@b4.vu>
-> > Cc: Jussi Laako <jussi@sonarnerd.net>
-> > Cc: Nick Kossifidis <mickflemm@gmail.com>
-> > Cc: Dmitry Panchenko <dmitry@d-systems.ee>
-> > Cc: Chris Wulff <crwulff@gmail.com>
-> > Cc: Jesus Ramos <jesus-ramos@live.com>
-> > Cc: linux-usb@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: alsa-devel@alsa-project.org
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Good idea, will do.
 > 
-> Reviewed-by: Takashi Iwai <tiwai@suse.de>
+> No, wait, the USB sound drivers call it a lot, so it needs to stick
+> around for now until we clean that up.
 
-Thanks for the reviews of all of these.
+Argh.  I must have run "git grep" from within drivers/usb/core.  My 
+mistake.
 
-greg k-h
+Alan Stern
