@@ -2,171 +2,141 @@ Return-Path: <SRS0=Nonw=CQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8344AC43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 14:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C6BC43461
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 14:52:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E283215A4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 14:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 549BF217A0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 14:52:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599488522;
-	bh=+hBkQu9s4/gMzHCxciSjjnQi2QtLKwBklfRKGdDcWQs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fxdKEbL9ySBkowg18ILu5hEbBNNLFXXRWTW3bD4nUzagWRoBKr0a5xKatUShpplbN
-	 kpYxxI6X3B9pa1uUyxtHBgBKC06wFTBVC391qkkecYMTHV5vxeVe2hCJqR5LfmEsiW
-	 hE7NrzXv8ByC2EG2qHEto690sDjyDDBFFUM2qq78=
+	s=default; t=1599490334;
+	bh=7qCTpFFNqVHtpIMDAKfKXUS+bFE7hzcYks7b6ByyYYk=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=TLS1r/4OoPBI86k+GQiTES1tw3f0aDFqcx9yo+5+EwwzLixxVQmDOD24Zo81X/52p
+	 PJNHsX/o15zAkqkWe5djT/0VZKLsmYeodbf4lWp/7TiBbe1gm9fh/2LB4HcBmt0R2s
+	 oTFhmAbO79aGC4SL1NL0UgsMF+EJsjtO2SdfVqks=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729806AbgIGOVZ (ORCPT
+        id S1730031AbgIGOvS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Sep 2020 10:21:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49280 "EHLO mail.kernel.org"
+        Mon, 7 Sep 2020 10:51:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58454 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729594AbgIGOSz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Sep 2020 10:18:55 -0400
+        id S1730019AbgIGOvC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Sep 2020 10:51:02 -0400
 Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8F2292064B;
-        Mon,  7 Sep 2020 14:16:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BE3772176B;
+        Mon,  7 Sep 2020 14:51:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599488180;
-        bh=+hBkQu9s4/gMzHCxciSjjnQi2QtLKwBklfRKGdDcWQs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ubElOFB8q/iIS1SIkvwxPAzakDy+zGpi/JPWEGV+l+oSadsydiBT5sTCirXySPLqt
-         uFcwgKNn3JXhKu8BvcomGRstBQE9qN2SN/qJLdtwM9id25z1Lv/0d/Bbt72IA2dTay
-         GkXCdq92evvVCma8kdDninKnSyiW/ZPpouX25gls=
-Date:   Mon, 7 Sep 2020 16:16:34 +0200
+        s=default; t=1599490261;
+        bh=7qCTpFFNqVHtpIMDAKfKXUS+bFE7hzcYks7b6ByyYYk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=i7cbHqNM8H80YrBKKrffwXGThOtzzgcasGBvFkRfT7FH9nFjKPReIo6OfblvqC8J8
+         dcFzGdDcEzRsAq9FHSI69+mXJXBePLE+tU9T7CxLvPOaFBeO7Qt7ENNJqN0ouv/WHx
+         p+qTucob7AxMxRRcAJKUFp7Nutzrjr2zfrQTAv1Y=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
+To:     himadrispandya@gmail.com, dvyukov@google.com,
+        linux-usb@vger.kernel.org
+Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
         linux-kernel@vger.kernel.org, marcel@holtmann.org,
         johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
         alsa-devel@alsa-project.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Eli Billauer <eli.billauer@gmail.com>,
-        Emiliano Ingrassia <ingrassia@epigenesys.com>,
-        Alexander Tsoy <alexander@tsoy.me>,
-        "Geoffrey D. Bennett" <g@b4.vu>, Jussi Laako <jussi@sonarnerd.net>,
-        Nick Kossifidis <mickflemm@gmail.com>,
-        Dmitry Panchenko <dmitry@d-systems.ee>,
-        Chris Wulff <crwulff@gmail.com>,
-        Jesus Ramos <jesus-ramos@live.com>
-Subject: Re: [PATCH 01/10] USB: move snd_usb_pipe_sanity_check into the USB
- core
-Message-ID: <20200907141634.GA3733019@kroah.com>
-References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
- <20200902110115.1994491-2-gregkh@linuxfoundation.org>
- <20200903004553.GA642955@rowland.harvard.edu>
- <20200903073230.GA162335@kroah.com>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH v2 00/11] USB: new USB control message helper functions
+Date:   Mon,  7 Sep 2020 16:50:57 +0200
+Message-Id: <20200907145108.3766613-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200903073230.GA162335@kroah.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 09:32:30AM +0200, Greg Kroah-Hartman wrote:
-> On Wed, Sep 02, 2020 at 08:45:53PM -0400, Alan Stern wrote:
-> > On Wed, Sep 02, 2020 at 01:01:03PM +0200, Greg Kroah-Hartman wrote:
-> > > snd_usb_pipe_sanity_check() is a great function, so let's move it into
-> > > the USB core so that other parts of the kernel, including the USB core,
-> > > can call it.
-> > > 
-> > > Name it usb_pipe_type_check() to match the existing
-> > > usb_urb_ep_type_check() call, which now uses this function.
-> > > 
-> > > Cc: Jaroslav Kysela <perex@perex.cz>
-> > > Cc: Takashi Iwai <tiwai@suse.com>
-> > > Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-> > > Cc: Eli Billauer <eli.billauer@gmail.com>
-> > > Cc: Emiliano Ingrassia <ingrassia@epigenesys.com>
-> > > Cc: Alan Stern <stern@rowland.harvard.edu>
-> > > Cc: Alexander Tsoy <alexander@tsoy.me>
-> > > Cc: "Geoffrey D. Bennett" <g@b4.vu>
-> > > Cc: Jussi Laako <jussi@sonarnerd.net>
-> > > Cc: Nick Kossifidis <mickflemm@gmail.com>
-> > > Cc: Dmitry Panchenko <dmitry@d-systems.ee>
-> > > Cc: Chris Wulff <crwulff@gmail.com>
-> > > Cc: Jesus Ramos <jesus-ramos@live.com>
-> > > Cc: linux-usb@vger.kernel.org
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Cc: alsa-devel@alsa-project.org
-> > > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > > ---
-> > 
-> > > diff --git a/drivers/usb/core/urb.c b/drivers/usb/core/urb.c
-> > > index 27e83e55a590..45bc2914c1ba 100644
-> > > --- a/drivers/usb/core/urb.c
-> > > +++ b/drivers/usb/core/urb.c
-> > > @@ -192,24 +192,39 @@ static const int pipetypes[4] = {
-> > >  };
-> > >  
-> > >  /**
-> > > - * usb_urb_ep_type_check - sanity check of endpoint in the given urb
-> > > - * @urb: urb to be checked
-> > > + * usb_pipe_type_check - sanity check of a specific pipe for a usb device
-> > > + * @dev: struct usb_device to be checked
-> > > + * @pipe: pipe to check
-> > >   *
-> > >   * This performs a light-weight sanity check for the endpoint in the
-> > > - * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
-> > > - * a negative error code.
-> > > + * given usb device.  It returns 0 if the pipe is a valid for the specific usb
-> > -----------------------------------------------------^
-> > Typo.
-> 
-> Oops, will fix, thanks.
-> 
-> 
-> > 
-> > > + * device, otherwise a negative error code.
-> > >   */
-> > > -int usb_urb_ep_type_check(const struct urb *urb)
-> > > +int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe)
-> > >  {
-> > >  	const struct usb_host_endpoint *ep;
-> > >  
-> > > -	ep = usb_pipe_endpoint(urb->dev, urb->pipe);
-> > > +	ep = usb_pipe_endpoint(dev, pipe);
-> > >  	if (!ep)
-> > >  		return -EINVAL;
-> > > -	if (usb_pipetype(urb->pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
-> > > +	if (usb_pipetype(pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
-> > >  		return -EINVAL;
-> > >  	return 0;
-> > >  }
-> > > +EXPORT_SYMBOL_GPL(usb_pipe_type_check);
-> > > +
-> > > +/**
-> > > + * usb_urb_ep_type_check - sanity check of endpoint in the given urb
-> > > + * @urb: urb to be checked
-> > > + *
-> > > + * This performs a light-weight sanity check for the endpoint in the
-> > > + * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
-> > > + * a negative error code.
-> > > + */
-> > > +int usb_urb_ep_type_check(const struct urb *urb)
-> > > +{
-> > > +	return usb_pipe_type_check(urb->dev, urb->pipe);
-> > > +}
-> > >  EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
-> > 
-> > Since this routine is used in only one place in the entire kernel, you 
-> > might as well inline the code there and get rid of the function 
-> > entirely.
-> 
-> Good idea, will do.
+In a recent discussion about a USB networking bug found by syzbot, and
+fixed by Himadri Pandya, the design of the existing usb_control_msg()
+call was brought up as not being the "nicest" thing to use by Dmitry
+Vyukov:
+        https://lore.kernel.org/r/CACT4Y+YbDODLRFn8M5QcY4CazhpeCaunJnP_udXtAs0rYoASSg@mail.gmail.com
 
-No, wait, the USB sound drivers call it a lot, so it needs to stick
-around for now until we clean that up.
+The function makes it hard to get right, in that it will return the
+number of bytes sent/received, but almost no one checks to see if a
+short read/write happens.  With a malicious, or broken, USB device, this
+can cause drivers to act on data that they did not anticipate, and
+sometimes copy internal kernel data out to userspace.
 
-thanks,
+So let's fix this up by creating two new functions,
+usb_control_msg_send() and usb_control_msg_recv().  These functions
+either complete the full transation, or they return an error, a short
+send/recv is now an error.
+
+They also accept data off of the stack, saving individual drivers the
+pain of having to constantly allocate memory on their own for tiny
+messages, thereby saving overall kernel code space.
+
+The api also does not require a raw USB "pipe" to be sent to the
+function, as we know the direction, so just pass in the endpoint number
+instead, again making it easier on the USB driver author to use.
+
+This series first takes a helper function out of the sound core for
+verifying USB endpoints to be able to use internally, and then adds the
+new functions, converts over some internal USB code to use them, and
+then starts to clean up some drivers using these new functions, as an
+example of the savings that can happen by using these functions.
+
+Thanks to Dmitry and Himadri for the idea on how to do all of this.
 
 greg k-h
+
+Changes from v1:
+	- added acks from Takashi Iwai
+	- dropped changes to one function in patch 04 thanks to review
+	  from Alan Stern
+	- typo fix in comment in patch 01
+	- added new patch 11 to remove some unneeded checks in the sound
+	  drivers for endpoint statuses that would always be true.
+
+*** BLURB HERE ***
+
+Greg Kroah-Hartman (11):
+  USB: move snd_usb_pipe_sanity_check into the USB core
+  USB: add usb_control_msg_send() and usb_control_msg_recv()
+  USB: core: message.c: use usb_control_msg_send() in a few places
+  USB: core: hub.c: use usb_control_msg_send() in a few places
+  USB: legousbtower: use usb_control_msg_recv()
+  sound: usx2y: move to use usb_control_msg_send()
+  sound: 6fire: move to use usb_control_msg_send() and
+    usb_control_msg_recv()
+  sound: line6: move to use usb_control_msg_send() and
+    usb_control_msg_recv()
+  sound: hiface: move to use usb_control_msg_send()
+  Bluetooth: ath3k: use usb_control_msg_send() and
+    usb_control_msg_recv()
+  ALSA: remove calls to usb_pipe_type_check for control endpoints
+
+ drivers/bluetooth/ath3k.c       |  90 +++++------------
+ drivers/usb/core/hub.c          |  99 ++++++++----------
+ drivers/usb/core/message.c      | 171 ++++++++++++++++++++++++++++----
+ drivers/usb/core/urb.c          |  31 ++++--
+ drivers/usb/misc/legousbtower.c |  60 ++++-------
+ include/linux/usb.h             |   7 ++
+ sound/usb/6fire/firmware.c      |  38 +++----
+ sound/usb/helper.c              |  16 +--
+ sound/usb/helper.h              |   1 -
+ sound/usb/hiface/pcm.c          |  14 ++-
+ sound/usb/line6/driver.c        |  69 +++++--------
+ sound/usb/line6/podhd.c         |  17 ++--
+ sound/usb/line6/toneport.c      |   8 +-
+ sound/usb/mixer_scarlett_gen2.c |   2 +-
+ sound/usb/quirks.c              |  12 +--
+ sound/usb/usx2y/us122l.c        |  42 ++------
+ 16 files changed, 335 insertions(+), 342 deletions(-)
+
+-- 
+2.28.0
+
