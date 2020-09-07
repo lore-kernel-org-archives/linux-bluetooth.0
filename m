@@ -2,74 +2,106 @@ Return-Path: <SRS0=Nonw=CQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB6AC43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C50C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:32:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77DF12078E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40B75217A0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 15:32:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599492732;
+	bh=QkHCdP+HSp94bJnlBpjYKa/KAoOjp/oPWOpwsQOF274=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=JcpnGh7FxvZBXQAfDGvwiFtKl+wJHYc2fJPRK+wJaMOAugrNVm+V93uclXWEAgFjz
+	 MrZI0rZhNnqE4AKRsRhmSfIyznK6Y5fM0XGdJhZyxhIuaeXIX/+MGq7QNh4mbF2v4S
+	 c/MBGfdi4IATrhiruEb+Es5gvw3XJ2JWAljBmFPg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730180AbgIGP2k (ORCPT
+        id S1730174AbgIGPcI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Sep 2020 11:28:40 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:39509 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1730115AbgIGPPp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Sep 2020 11:15:45 -0400
-Received: (qmail 763212 invoked by uid 1000); 7 Sep 2020 11:08:58 -0400
-Date:   Mon, 7 Sep 2020 11:08:58 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
-        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v2 04/11] USB: core: hub.c: use usb_control_msg_send() in
- a few places
-Message-ID: <20200907150858.GD762136@rowland.harvard.edu>
+        Mon, 7 Sep 2020 11:32:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58920 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730026AbgIGOvu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Sep 2020 10:51:50 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CF88921D1A;
+        Mon,  7 Sep 2020 14:51:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599490289;
+        bh=QkHCdP+HSp94bJnlBpjYKa/KAoOjp/oPWOpwsQOF274=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=If90dhouW6N4/r8is7BQs/yBjxud6qO6c5+ufUOQf8CXsy3gv1V2w2PGAy49dIHm/
+         G3ml1sY6lzQGW8SXyG1noSerdbf5dAVtP+nfveAVGBwAmVmMOwFsajNut8Ka3mvAIA
+         93XNYS89t/ZaY7XxlmUeAC8YAvdGBivshk5xJf/8=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     himadrispandya@gmail.com, dvyukov@google.com,
+        linux-usb@vger.kernel.org
+Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Takashi Iwai <tiwai@suse.de>
+Subject: [PATCH v2 09/11] sound: hiface: move to use usb_control_msg_send()
+Date:   Mon,  7 Sep 2020 16:51:06 +0200
+Message-Id: <20200907145108.3766613-10-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200907145108.3766613-1-gregkh@linuxfoundation.org>
 References: <20200907145108.3766613-1-gregkh@linuxfoundation.org>
- <20200907145108.3766613-5-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200907145108.3766613-5-gregkh@linuxfoundation.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 04:51:01PM +0200, Greg Kroah-Hartman wrote:
-> There are a few calls to usb_control_msg() that can be converted to use
-> usb_control_msg_send() instead, so do that in order to make the error
-> checking a bit simpler and the code smaller.
-> 
-> Cc: Alan Stern <stern@rowland.harvard.edu>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
-> v2:
->  - dropped changes to usb_req_set_sel() thanks to review from Alan
+The usb_control_msg_send() call can return an error if a "short" write
+happens, so move the driver over to using that call instead.
 
-> @@ -4056,7 +4035,7 @@ static void usb_enable_link_state(struct usb_hcd *hcd, struct usb_device *udev,
->  	 * associated with the link state we're about to enable.
->  	 */
->  	ret = usb_req_set_sel(udev, state);
-> -	if (ret < 0) {
-> +	if (ret) {
->  		dev_warn(&udev->dev, "Set SEL for device-initiated %s failed.\n",
->  				usb3_lpm_names[state]);
->  		return;
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: alsa-devel@alsa-project.org
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+v2:
+ - Added reviewed-by from Takashi
 
-Did this change survive by mistake?
+ sound/usb/hiface/pcm.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-Actually, it looks like usb_req_set_sel needs to check the value 
-returned by usb_control_msg -- a perfect example of the sort of thing 
-you were trying to fix in the first place!
+diff --git a/sound/usb/hiface/pcm.c b/sound/usb/hiface/pcm.c
+index a148caa5f48e..f9c924e3964e 100644
+--- a/sound/usb/hiface/pcm.c
++++ b/sound/usb/hiface/pcm.c
+@@ -156,16 +156,14 @@ static int hiface_pcm_set_rate(struct pcm_runtime *rt, unsigned int rate)
+ 	 * This control message doesn't have any ack from the
+ 	 * other side
+ 	 */
+-	ret = usb_control_msg(device, usb_sndctrlpipe(device, 0),
+-			      HIFACE_SET_RATE_REQUEST,
+-			      USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_OTHER,
+-			      rate_value, 0, NULL, 0, 100);
+-	if (ret < 0) {
++	ret = usb_control_msg_send(device, 0,
++				   HIFACE_SET_RATE_REQUEST,
++				   USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_OTHER,
++				   rate_value, 0, NULL, 0, 100);
++	if (ret)
+ 		dev_err(&device->dev, "Error setting samplerate %d.\n", rate);
+-		return ret;
+-	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static struct pcm_substream *hiface_pcm_get_substream(struct snd_pcm_substream
+-- 
+2.28.0
 
-Alan Stern
