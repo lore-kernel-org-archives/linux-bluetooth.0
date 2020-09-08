@@ -2,612 +2,401 @@ Return-Path: <SRS0=n2jO=CR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1A6C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 17:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6657C43461
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 17:20:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E3E520936
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 17:06:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E67C2087D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 17:20:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uy6ZvZa8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxXz2aEF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732058AbgIHRG1 (ORCPT
+        id S1731779AbgIHRUB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Sep 2020 13:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
+        Tue, 8 Sep 2020 13:20:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730654AbgIHRGT (ORCPT
+        with ESMTP id S1728494AbgIHRTu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Sep 2020 13:06:19 -0400
-Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4971EC061573
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2020 10:06:18 -0700 (PDT)
-Received: by mail-oo1-xc43.google.com with SMTP id z1so4109412ooj.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2020 10:06:18 -0700 (PDT)
+        Tue, 8 Sep 2020 13:19:50 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C1CC061573
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Sep 2020 10:19:50 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id w16so17203524oia.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2020 10:19:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=LDm3kOOwZrm2QQjfz7xq1xnQphD/165ThX8L1IGFITE=;
-        b=Uy6ZvZa8ZthOO0f/XKbVhw1t9cqU6AIiEGtcDEvaGzBfPXp1gGJp0OmtI5yDVDQO4s
-         OTFGVBBsXdCue2Aw9d76UnWGHoNAZcqIlzPfffwneU/3NsXySM3oFu61TAig4X5zsItS
-         X74ML6hRDX2ydUx/XpPponer38INWu0ANApdt71XoONlpBo0CA98llMqwumJvAeCFeX6
-         PJpurLsfBTjn9r8o7EMAChQtIO+t3rjWgfMy9JnA4CII6bXQ+c8TN/dNDlHdUyG3SMyY
-         25oUb8FRfpgZqjZGjgPXt2M1K75HD/tYxgCXrelea0TM1hNePdJk2UqYGJb+eT74uFyI
-         4M/g==
+        bh=D0Tpz6iiGOH9jKWx+vYGwwElkU9D2IqTxybE7t8fGbQ=;
+        b=TxXz2aEFkK9new76IPz1OGB4Uaf37ewDVDcMYsFsyqFCjH5BoL6nxFiaG3HcgCYUTF
+         GRgag4KfiXXh0Nm8u1W6uMgoxOz1CAI0XOgysUIC9g2saeM0NdGVpEa0YByq+u9I+aZz
+         E6PURQCBF6/tLq/zy1p8faVbrFd8dP2f9cT4EhjC21LpxBW7nsaQAMKYdjZp+G1Hyx9w
+         Ct+w1RgS326PbIhyje3pBas3lML2lZdFNNFYUJiuo6haSl33lFQzsE5gjCgIxEu+uqLS
+         CxwEWAQ4Zx8xY29hpYImISkDo+EzWR34WwRKZljYoCipnJ8MZoyjNeIX19pJEqMGOYbh
+         qcMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=LDm3kOOwZrm2QQjfz7xq1xnQphD/165ThX8L1IGFITE=;
-        b=AfXj8aVFUS9EsBKMuijQXY28/cbOjyXB9tL7bVXmVshx3OVnsItRnhyZSGjj+H80y+
-         XQErWxgIG1vRpTtBKeOd6hM/ZOjwz+SNu59QIRDEZHH3WbeRQwkHwrS/vf9MO6OxxZhu
-         2LgBUBFeM8gcJhJmmJArPZiGYBZn1j4KQrGFum0uBdh5WFdvmFWiP/o4oOVGfJbmJTN5
-         GwdrUszFprrFY1tEVCOEgLv12+5L/ixDEdFHrUM6fcyblsa/31AJ41Jbu2QYWDcrWCdQ
-         23CTsyIU+gqlv+xlcaRhhPyquTJg0C2rXJ2g6oH5iRoxiLW8ajGMeHV/Tfm4D6bf7GMr
-         r7fQ==
-X-Gm-Message-State: AOAM532XTDje0dQcbUOS3shNVeTuKLp+gxW8fNdHp7pzd01w7WX8xdVe
-        2bCMbI/fKt/98YmlxokxFaeinO/2d5xAJsUAm2I=
-X-Google-Smtp-Source: ABdhPJy4GveSdvCnUx1V1J+ldUmBHQagnUaKxiNkLrGsyyzuJHaMaxzADGzGgK71aXMiNi3DsjsguquJuHX03zL/J/c=
-X-Received: by 2002:a4a:924b:: with SMTP id g11mr19245760ooh.9.1599584777461;
- Tue, 08 Sep 2020 10:06:17 -0700 (PDT)
+        bh=D0Tpz6iiGOH9jKWx+vYGwwElkU9D2IqTxybE7t8fGbQ=;
+        b=Oyci7oZ+1vOKhqdfXRp3zcDNP4O9otXPxPLUYZBVuDWxl5M0sbRTSj/slNN/q/fte1
+         udywFG9mUy3oBbqxdw5zOcE4WbUYKeRk7S1fws1Hk5bdSItBhwCiWbY7gNLgqm/7wmZ6
+         2XqPk1eKRgX2P+kepF39CgtTqcj0z45MY2UiStliurJ+o9nG+6xUExNesjr/XUhQGQ7/
+         3Py2enb2nUyQuwOnuK0N9boDnmkRoXmNEnyrLPdVF4Couh6a3zvweJGsDqOJDDhamWCo
+         qffjhVYdsT3xU9P8uTQv24Es14nBlwo9oYcZ68OtyewXtPhof+o4KT9ac5XLAnkQCH9C
+         63+w==
+X-Gm-Message-State: AOAM533pmiqbjuHv9AjdQ3Wbwchu3/p3MpQaobh9GTpE9QoM+pcTo2o/
+        jCIxDF/v1Kz/Jivgm60UcBkko1tVDgCV+sXaECU=
+X-Google-Smtp-Source: ABdhPJy4gG3wUMZ3EHdLBh5tlp5OJ9orIYeEEqiRmsLPzGDVee74sBqAYxCYmib4WNJIhF30OQdC4Pagl9Jc4mUsaVk=
+X-Received: by 2002:aca:aad0:: with SMTP id t199mr6800oie.48.1599585589523;
+ Tue, 08 Sep 2020 10:19:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200819121048.BlueZ.v1.1.I3a57ea1eb3e3f5b87abc44ea478fc83817627ffc@changeid>
- <20200819121048.BlueZ.v1.2.I045d6f668c141c6b834ba6b31fc81618c0a7b8e8@changeid>
-In-Reply-To: <20200819121048.BlueZ.v1.2.I045d6f668c141c6b834ba6b31fc81618c0a7b8e8@changeid>
+References: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
+In-Reply-To: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Sep 2020 10:06:06 -0700
-Message-ID: <CABBYNZLeqA=i_JdcJUD-Q-6p_8DtMpmmW=gg4yvQrJ77jRG4sw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v1 2/4] client: Implement more interfaces of ADV
- monitor in bluetoothctl
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+Date:   Tue, 8 Sep 2020 10:19:38 -0700
+Message-ID: <CABBYNZLoGG8_f-8Vr=FW-mVe1uFsz-ob3-=tuk_c90kqhtLMVg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1 1/7] adv_monitor: Introduce org.bluez.AdvertisementMonitorManager1
+ interface
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
         Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>
+        Manish Mandlik <mmandlik@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Miao,
 
-On Tue, Aug 18, 2020 at 9:15 PM Howard Chung <howardchung@google.com> wrote:
+On Tue, Aug 18, 2020 at 3:30 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> This patch creates a submenu in bluetoothctl and implements several
-> commands.
+> This introduces the org.bluez.AdvertisementMonitorManager1 without
+> implementing handlers of methods and properties.
 >
-> new commands:
-> [bluetooth]# menu advmon
-> [bluetooth]# add-pattern-monitor or_patterns -10,10,-30,5 1,2,ab0011
-> Advertisement Monitor 0 added
-> [bluetooth]# get-pattern-monitor all
-> Advertisement Monitor 0
->         path: /org/bluez/adv_monitor_app/0
->         type: or_patterns
->         rssi:
->                 high threshold: -10
->                 high threshold timer: 10
->                 low threshold: -30
->                 low threshold timer: 5
->         pattern 1:
->                 start position: 1
->                 AD data type: 2
->                 content: ab0011
-> [bluetooth]# get-supported-info
-> Supported Features:
-> Supported Moniter Types: or_patterns
-> [bluetooth]# remove-pattern-monitor 0
-> Monitor 0 deleted
+> The following test was performed.
+> - Upon adapter registration, the info line of creating an ADV monitor
+> manager gets printed, and system bus emits the interface events of
+> org.bluez.AdvertisementMonitorManager1.
 >
-> Signed-off-by: Howard Chung <howardchung@google.com>
+> Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
 >
->  client/advertisement_monitor.c | 328 ++++++++++++++++++++++++++++++++-
->  client/advertisement_monitor.h |   4 +
->  client/main.c                  |  70 +++++++
->  3 files changed, 399 insertions(+), 3 deletions(-)
+>  Makefile.am       |   3 +-
+>  src/adapter.c     |  14 +++++
+>  src/adapter.h     |   3 +
+>  src/adv_monitor.c | 149 ++++++++++++++++++++++++++++++++++++++++++++++
+>  src/adv_monitor.h |  32 ++++++++++
+>  5 files changed, 200 insertions(+), 1 deletion(-)
+>  create mode 100644 src/adv_monitor.c
+>  create mode 100644 src/adv_monitor.h
 >
-> diff --git a/client/advertisement_monitor.c b/client/advertisement_monitor.c
-> index bd2309537..ec8f23711 100644
-> --- a/client/advertisement_monitor.c
-> +++ b/client/advertisement_monitor.c
-> @@ -29,6 +29,7 @@
->  #include <string.h>
+> diff --git a/Makefile.am b/Makefile.am
+> index 7719c06f8..b14ee950e 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -293,7 +293,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+>                         src/gatt-client.h src/gatt-client.c \
+>                         src/device.h src/device.c \
+>                         src/dbus-common.c src/dbus-common.h \
+> -                       src/eir.h src/eir.c
+> +                       src/eir.h src/eir.c \
+> +                       src/adv_monitor.h src/adv_monitor.c
+
+Id just name it monitor.{c, h}
+
+>  src_bluetoothd_LDADD = lib/libbluetooth-internal.la \
+>                         gdbus/libgdbus-internal.la \
+>                         src/libshared-glib.la \
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 5e896a9f0..41e9de286 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -77,6 +77,7 @@
+>  #include "attrib-server.h"
+>  #include "gatt-database.h"
+>  #include "advertising.h"
+> +#include "adv_monitor.h"
+>  #include "eir.h"
 >
->  #include "gdbus/gdbus.h"
-> +#include "src/shared/ad.h"
->  #include "src/shared/util.h"
->  #include "src/shared/shell.h"
->  #include "advertisement_monitor.h"
-> @@ -36,6 +37,27 @@
->  #define ADV_MONITOR_APP_PATH "/org/bluez/adv_monitor_app"
->  #define ADV_MONITOR_INTERFACE "org.bluez.AdvertisementMonitor1"
+>  #define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> @@ -272,6 +273,8 @@ struct btd_adapter {
+>         struct btd_gatt_database *database;
+>         struct btd_adv_manager *adv_manager;
 >
-> +struct rssi_setting {
-> +       int16_t high_threshold;
-> +       uint16_t high_timer;
-> +       int16_t low_threshold;
-> +       uint16_t low_timer;
+> +       struct btd_adv_monitor_manager *adv_monitor_manager;
+> +
+>         gboolean initialized;
+>
+>         GSList *pin_callbacks;
+> @@ -6346,6 +6349,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+>         btd_adv_manager_destroy(adapter->adv_manager);
+>         adapter->adv_manager = NULL;
+>
+> +       btd_adv_monitor_manager_destroy(adapter->adv_monitor_manager);
+> +       adapter->adv_monitor_manager = NULL;
+> +
+>         g_slist_free(adapter->pin_callbacks);
+>         adapter->pin_callbacks = NULL;
+>
+> @@ -8623,6 +8629,14 @@ static int adapter_register(struct btd_adapter *adapter)
+>
+>         adapter->adv_manager = btd_adv_manager_new(adapter, adapter->mgmt);
+>
+> +       adapter->adv_monitor_manager = btd_adv_monitor_manager_create(
+> +                                                       adapter, adapter->mgmt);
+> +       if (!adapter->adv_monitor_manager) {
+> +               btd_error(adapter->dev_id,
+> +                       "Failed to create Adv Monitor Manager for adapter");
+> +               return -EINVAL;
+> +       }
+> +
+>         db = btd_gatt_database_get_db(adapter->database);
+>         adapter->db_id = gatt_db_register(db, services_modified,
+>                                                         services_modified,
+> diff --git a/src/adapter.h b/src/adapter.h
+> index f8ac20261..5cb467141 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -26,6 +26,9 @@
+>  #include <dbus/dbus.h>
+>  #include <glib.h>
+>
+> +#include "lib/bluetooth.h"
+> +#include "lib/sdp.h"
+> +
+
+It might be better to have this included locally in a .c file needing them.
+
+>  #define MAX_NAME_LENGTH                248
+>
+>  /* Invalid SSP passkey value used to indicate negative replies */
+> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+> new file mode 100644
+> index 000000000..7044d3cca
+> --- /dev/null
+> +++ b/src/adv_monitor.c
+> @@ -0,0 +1,149 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2020 Google LLC
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#define _GNU_SOURCE
+> +#include <stdint.h>
+> +
+> +#include <glib.h>
+> +#include <dbus/dbus.h>
+> +#include <gdbus/gdbus.h>
+> +
+> +#include "adapter.h"
+> +#include "dbus-common.h"
+> +#include "log.h"
+> +#include "src/shared/mgmt.h"
+> +
+> +#include "adv_monitor.h"
+> +
+> +#define ADV_MONITOR_MGR_INTERFACE      "org.bluez.AdvertisementMonitorManager1"
+> +
+> +struct btd_adv_monitor_manager {
+> +       struct btd_adapter *adapter;
+> +       struct mgmt *mgmt;
+> +       uint16_t adapter_id;
+> +       char *path;
 > +};
 > +
-> +struct pattern {
-> +       uint8_t start_pos;
-> +       uint8_t ad_data_type;
-> +       uint8_t content_len;
-> +       uint8_t content[BT_AD_MAX_DATA_LEN];
+> +static const GDBusMethodTable adv_monitor_methods[] = {
+> +       { GDBUS_METHOD("RegisterMonitor",
+> +                                       GDBUS_ARGS({ "application", "o" }),
+> +                                       NULL, NULL) },
+> +       { GDBUS_ASYNC_METHOD("UnregisterMonitor",
+> +                                       GDBUS_ARGS({ "application", "o" }),
+> +                                       NULL, NULL) },
+> +       { }
 > +};
 > +
-> +struct adv_monitor {
-> +       uint8_t idx;
-> +       char *type;
-> +       struct rssi_setting *rssi;
-> +       GSList *patterns;
+> +static const GDBusPropertyTable adv_monitor_properties[] = {
+> +       {"SupportedMonitorTypes", "as", NULL, NULL, NULL},
+> +       {"SupportedFeatures", "as", NULL, NULL, NULL},
+> +       { }
 > +};
 > +
->  struct adv_monitor_manager {
->         GSList *supported_types;
->         GSList *supported_features;
-> @@ -43,6 +65,9 @@ struct adv_monitor_manager {
->         gboolean app_registered;
->  } manager = { NULL, NULL, NULL, FALSE };
->
-> +static uint8_t adv_mon_idx;
-> +static GSList *adv_mons;
-> +
->  static void set_supported_list(GSList **list, DBusMessageIter *iter)
->  {
->         char *str;
-> @@ -138,7 +163,10 @@ static void unregister_reply(DBusMessage *message, void *user_data)
->
->  void adv_monitor_register_app(DBusConnection *conn)
->  {
-> -       if (manager.supported_types == NULL || manager.app_registered == TRUE ||
-> +       if (manager.app_registered == TRUE) {
-> +               bt_shell_printf("Advertisement Monitor already registered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       } else if (manager.supported_types == NULL ||
->                 g_dbus_proxy_method_call(manager.proxy, "RegisterMonitor",
->                                         register_setup, register_reply,
->                                         NULL, NULL) == FALSE) {
-> @@ -150,8 +178,10 @@ void adv_monitor_register_app(DBusConnection *conn)
->
->  void adv_monitor_unregister_app(DBusConnection *conn)
->  {
-> -       if (manager.app_registered == FALSE ||
-> -               g_dbus_proxy_method_call(manager.proxy, "UnregisterMonitor",
-> +       if (manager.app_registered == FALSE) {
-> +               bt_shell_printf("Advertisement Monitor not registered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       } else if (g_dbus_proxy_method_call(manager.proxy, "UnregisterMonitor",
->                                         unregister_setup, unregister_reply,
->                                         NULL, NULL) == FALSE) {
->                 bt_shell_printf("Failed to unregister Advertisement Monitor\n");
-> @@ -159,3 +189,295 @@ void adv_monitor_unregister_app(DBusConnection *conn)
->         }
->         manager.app_registered = FALSE;
->  }
-> +
-> +static void free_pattern(void *user_data)
+> +/* Allocates a manager object */
+> +static struct btd_adv_monitor_manager *manager_new(
+> +                                               struct btd_adapter *adapter,
+> +                                               struct mgmt *mgmt)
 > +{
-> +       struct pattern *p = user_data;
+> +       struct btd_adv_monitor_manager *manager;
 > +
-> +       g_free(p);
-> +}
-> +
-> +static void free_adv_monitor(void *user_data)
-> +{
-> +       struct adv_monitor *adv_monitor = user_data;
-> +
-> +       g_free(adv_monitor->type);
-> +       g_free(adv_monitor->rssi);
-> +       g_slist_free_full(adv_monitor->patterns, free_pattern);
-> +       g_free(adv_monitor);
-> +}
-> +
-> +static uint8_t str2bytearray(char *str, uint8_t *arr)
-> +{
-> +       int idx, len = strlen(str), arr_len = 0;
-> +
-> +       if (len%2 != 0)
-> +               return 0;
-> +
-> +       for (idx = 0; idx < len; idx += 2) {
-> +               if (sscanf(str+idx, "%2hhx", &arr[arr_len++]) < 1)
-> +                       return 0;
-> +       }
-> +       return arr_len;
-> +}
-> +
-> +static struct rssi_setting *parse_rssi(char *rssi_str)
-> +{
-> +       struct rssi_setting *rssi;
-> +       int16_t high_threshold, low_threshold;
-> +       uint16_t high_timer, low_timer;
-> +
-> +       if (sscanf(rssi_str, "%hd,%hu,%hd,%hu", &high_threshold, &high_timer,
-> +                                       &low_threshold, &low_timer) < 4)
+> +       if (!adapter || !mgmt)
 > +               return NULL;
 > +
-> +       rssi = g_malloc0(sizeof(struct rssi_setting));
+> +       manager = g_new0(struct btd_adv_monitor_manager, 1);
+
+Use new0.
+
+> +       if (!manager)
+> +               return NULL;
 > +
-> +       if (!rssi) {
-> +               bt_shell_printf("Failed to allocate rssi_setting");
-> +               bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       manager->adapter = adapter;
+> +       manager->mgmt = mgmt_ref(mgmt);
+> +       manager->adapter_id = btd_adapter_get_index(adapter);
+> +       manager->path = g_strdup(adapter_get_path(manager->adapter));
+
+If we are doing to reference the adapter we don't really need the
+duplicate its path since we can just use adapter_get_path.
+
+> +
+> +       return manager;
+> +}
+> +
+> +/* Frees a manager object */
+> +static void manager_free(struct btd_adv_monitor_manager *manager)
+> +{
+> +       manager->adapter = NULL;
+
+No need to assign NULL if you are going to free the whole object at the end.
+
+> +       mgmt_unref(manager->mgmt);
+> +       manager->mgmt = NULL;
+
+Ditto.
+
+> +       g_free(manager->path);
+> +       manager->path = NULL;
+
+Ditto.
+
+> +
+> +       g_free(manager);
+> +}
+> +
+> +/* Destroys a manager object and unregisters its D-Bus interface */
+> +static void manager_destroy(struct btd_adv_monitor_manager *manager)
+> +{
+> +       if (!manager)
+> +               return;
+> +
+> +       g_dbus_unregister_interface(btd_get_dbus_connection(),
+> +                                       manager->path,
+> +                                       ADV_MONITOR_MGR_INTERFACE);
+> +
+> +       manager_free(manager);
+> +}
+> +
+> +/* Creates a manager and registers its D-Bus interface */
+> +struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+> +                                               struct btd_adapter *adapter,
+> +                                               struct mgmt *mgmt)
+> +{
+> +       struct btd_adv_monitor_manager *manager;
+> +
+> +       manager = manager_new(adapter, mgmt);
+> +       if (!manager)
+> +               return NULL;
+> +
+> +       if (g_dbus_register_interface(btd_get_dbus_connection(), manager->path,
+> +                                       ADV_MONITOR_MGR_INTERFACE,
+> +                                       adv_monitor_methods, NULL,
+> +                                       adv_monitor_properties, manager, NULL)
+> +               == FALSE) {
+
+We haven't been consistent with boolean checks but lately we start
+using more the ! form instead of == FALSE.
+
+> +               btd_error(manager->adapter_id,
+> +                               "Failed to register "
+> +                               ADV_MONITOR_MGR_INTERFACE);
+> +               manager_free(manager);
 > +               return NULL;
 > +       }
 > +
-> +       rssi->high_threshold = high_threshold;
-> +       rssi->high_timer = high_timer;
-> +       rssi->low_threshold = low_threshold;
-> +       rssi->low_timer = low_timer;
+> +       btd_info(manager->adapter_id,
+> +                       "Adv Monitor Manager created for adapter %s",
+> +                       adapter_get_path(manager->adapter));
 > +
-> +       return rssi;
+> +       return manager;
 > +}
 > +
-> +static struct pattern *parse_pattern(char *pattern)
+> +/* Destroys a manager and unregisters its D-Bus interface */
+> +void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
 > +{
-> +       uint8_t start_pos, ad_data_type;
-> +       char content_str[BT_AD_MAX_DATA_LEN];
-> +       struct pattern *pat;
-> +
-> +       if (sscanf(pattern, "%hhu,%hhu,%s", &start_pos, &ad_data_type,
-> +                                                       content_str) < 3)
-> +               return NULL;
-> +
-> +       pat = g_malloc0(sizeof(struct pattern));
-> +
-> +       if (!pat) {
-> +               bt_shell_printf("Failed to allocate pattern");
-> +               bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +               return NULL;
-> +       }
-> +
-> +       pat->start_pos = start_pos;
-> +       pat->ad_data_type = ad_data_type;
-> +       pat->content_len = str2bytearray(content_str, pat->content);
-> +       if (pat->content_len == 0) {
-> +               free_pattern(pat);
-> +               return NULL;
-> +       }
-> +
-> +       return pat;
-> +}
-> +
-> +static GSList *parse_patterns(char *pattern_list[], int num)
-> +{
-> +       GSList *patterns = NULL;
-> +       int cnt;
-> +
-> +       if (num == 0) {
-> +               bt_shell_printf("No pattern provided\n");
-> +               return NULL;
-> +       }
-> +
-> +       for (cnt = 0; cnt < num; cnt++) {
-> +               struct pattern *pattern;
-> +
-> +               pattern = parse_pattern(pattern_list[cnt]);
-> +               if (pattern == NULL) {
-> +                       g_slist_free_full(patterns, free_pattern);
-> +                       return NULL;
-> +               }
-> +               patterns = g_slist_append(patterns, pattern);
-> +       }
-> +
-> +       return patterns;
-> +}
-> +
-> +static gint cmp_adv_monitor_with_idx(gconstpointer a, gconstpointer b)
-> +{
-> +       const struct adv_monitor *adv_monitor = a;
-> +       uint8_t idx = *(uint8_t *)b;
-> +
-> +       return adv_monitor->idx != idx;
-> +}
-> +
-> +static struct adv_monitor *find_adv_monitor_with_idx(uint8_t monitor_idx)
-> +{
-> +       GSList *list;
-> +
-> +       list = g_slist_find_custom(adv_mons, &monitor_idx,
-> +                                               cmp_adv_monitor_with_idx);
-> +
-> +       if (list)
-> +               return (struct adv_monitor *)list->data;
-> +       return NULL;
-> +}
-> +
-> +static void print_bytearray(char *prefix, uint8_t *arr, uint8_t len)
-> +{
-> +       int idx;
-> +
-> +       bt_shell_printf("%s", prefix);
-> +       for (idx = 0; idx < len; idx++)
-> +               bt_shell_printf("%02hhx", arr[idx]);
-> +       bt_shell_printf("\n");
-> +}
-> +
-> +static void print_adv_monitor(struct adv_monitor *adv_monitor)
-> +{
-> +       GSList *l;
-> +
-> +       bt_shell_printf("Advertisement Monitor %d\n", adv_monitor->idx);
-> +       bt_shell_printf("\ttype: %s\n", adv_monitor->type);
-> +       if (adv_monitor->rssi) {
-> +               bt_shell_printf("\trssi:\n");
-> +               bt_shell_printf("\t\thigh threshold: %hd\n",
-> +                                       adv_monitor->rssi->high_threshold);
-> +               bt_shell_printf("\t\thigh threshold timer: %hu\n",
-> +                                       adv_monitor->rssi->high_timer);
-> +               bt_shell_printf("\t\tlow threshold: %hd\n",
-> +                                       adv_monitor->rssi->low_threshold);
-> +               bt_shell_printf("\t\tlow threshold timer: %hu\n",
-> +                                       adv_monitor->rssi->low_timer);
-> +       }
-> +
-> +       if (adv_monitor->patterns) {
-> +               int idx = 1;
-> +
-> +               for (l = adv_monitor->patterns; l; l = g_slist_next(l), idx++) {
-> +                       struct pattern *pattern = l->data;
-> +
-> +                       bt_shell_printf("\tpattern %d:\n", idx);
-> +                       bt_shell_printf("\t\tstart position: %hhu\n",
-> +                                                       pattern->start_pos);
-> +                       bt_shell_printf("\t\tAD data type: %hhu\n",
-> +                                                       pattern->ad_data_type);
-> +                       print_bytearray("\t\tcontent: ", pattern->content,
-> +                                                       pattern->content_len);
-> +               }
-> +       }
-> +}
-> +
-> +void adv_monitor_add_monitor(DBusConnection *conn, int argc, char *argv[])
-> +{
-> +       struct adv_monitor *adv_monitor;
-> +       struct rssi_setting *rssi;
-> +       GSList *patterns = NULL;
-> +       char *type;
-> +
-> +       if (g_slist_length(adv_mons) >= UINT8_MAX) {
-> +               bt_shell_printf("Number of advertisement monitor exceeds "
-> +                               "the limit");
+> +       if (!manager)
 > +               return;
-> +       }
 > +
-> +       while (find_adv_monitor_with_idx(adv_mon_idx))
-> +               adv_mon_idx += 1;
+> +       btd_info(manager->adapter_id, "Destroy Adv Monitor Manager");
 > +
-> +       type = argv[1];
-> +
-> +       if (strcmp(argv[2], "-") == 0)
-> +               rssi = NULL;
-> +       else {
-> +               rssi = parse_rssi(argv[2]);
-> +               if (rssi == NULL) {
-> +                       bt_shell_printf("RSSIThresholdAndTimers malformed\n");
-> +                       return;
-> +               }
-> +       }
-> +
-> +       patterns = parse_patterns(argv+3, argc-3);
-> +       if (patterns == NULL) {
-> +               bt_shell_printf("pattern-list malformed\n");
-> +               return;
-> +       }
-> +
-> +       adv_monitor = g_malloc0(sizeof(struct adv_monitor));
-> +
-> +       if (!adv_monitor) {
-> +               bt_shell_printf("Failed to allocate adv_monitor");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       adv_monitor->idx = adv_mon_idx;
-> +       adv_monitor->type = g_strdup(type);
-> +       adv_monitor->rssi = rssi;
-> +       adv_monitor->patterns = patterns;
-> +
-> +       adv_mons = g_slist_append(adv_mons, adv_monitor);
-> +       bt_shell_printf("Advertisement Monitor %d added\n", adv_monitor->idx);
+> +       manager_destroy(manager);
 > +}
+> diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+> new file mode 100644
+> index 000000000..69ea348f8
+> --- /dev/null
+> +++ b/src/adv_monitor.h
+> @@ -0,0 +1,32 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2020 Google LLC
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + */
 > +
-> +void adv_monitor_print_monitor(DBusConnection *conn, int monitor_idx)
-> +{
-> +       struct adv_monitor *adv_monitor;
-> +       GSList *l;
+> +#ifndef __ADV_MONITOR_H
+> +#define __ADV_MONITOR_H
 > +
-> +       if (monitor_idx < 0) {
-> +               for (l = adv_mons; l; l = g_slist_next(l)) {
-> +                       adv_monitor = l->data;
-> +                       print_adv_monitor(adv_monitor);
-> +               }
-> +               return;
-> +       }
+> +struct mgmt;
+> +struct btd_adapter;
+> +struct btd_adv_monitor_manager;
 > +
-> +       adv_monitor = find_adv_monitor_with_idx(monitor_idx);
+> +struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+> +                                               struct btd_adapter *adapter,
+> +                                               struct mgmt *mgmt);
+> +void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
 > +
-> +       if (adv_monitor == NULL) {
-> +               bt_shell_printf("Can't find monitor with index %d\n",
-> +                                                               monitor_idx);
-> +               return;
-> +       }
-> +
-> +       print_adv_monitor(adv_monitor);
-> +}
-> +
-> +void adv_monitor_remove_monitor(DBusConnection *conn, int monitor_idx)
-> +{
-> +       struct adv_monitor *adv_monitor;
-> +
-> +       if (monitor_idx < 0) {
-> +               g_slist_free_full(g_steal_pointer(&adv_mons), free_adv_monitor);
-> +               return;
-> +       }
-> +
-> +       adv_monitor = find_adv_monitor_with_idx(monitor_idx);
-> +       if (adv_monitor == NULL) {
-> +               bt_shell_printf("Can't find monitor with index %d\n",
-> +                                                               monitor_idx);
-> +               return;
-> +       }
-> +
-> +       adv_mons = g_slist_remove(adv_mons, adv_monitor);
-> +       free_adv_monitor(adv_monitor);
-> +       bt_shell_printf("Monitor %d deleted\n", monitor_idx);
-> +}
-> +
-> +static void print_supported_list(GSList *list)
-> +{
-> +       GSList *iter;
-> +
-> +       for (iter = list; iter; iter = g_slist_next(iter)) {
-> +               char *data = iter->data;
-> +
-> +               printf(" %s", data);
-> +       }
-> +}
-> +
-> +void adv_monitor_get_supported_info(void)
-> +{
-> +       bt_shell_printf("Supported Features:");
-> +       print_supported_list(manager.supported_features);
-> +       bt_shell_printf("\n");
-> +
-> +       bt_shell_printf("Supported Moniter Types:");
-> +       print_supported_list(manager.supported_types);
-> +       bt_shell_printf("\n");
-> +}
-> diff --git a/client/advertisement_monitor.h b/client/advertisement_monitor.h
-> index 77b0b62c6..f2a0caf77 100644
-> --- a/client/advertisement_monitor.h
-> +++ b/client/advertisement_monitor.h
-> @@ -21,3 +21,7 @@ void adv_monitor_add_manager(DBusConnection *conn, GDBusProxy *proxy);
->  void adv_monitor_remove_manager(DBusConnection *conn);
->  void adv_monitor_register_app(DBusConnection *conn);
->  void adv_monitor_unregister_app(DBusConnection *conn);
-> +void adv_monitor_add_monitor(DBusConnection *conn, int argc, char *argv[]);
-> +void adv_monitor_print_monitor(DBusConnection *conn, int monitor_idx);
-> +void adv_monitor_remove_monitor(DBusConnection *conn, int monitor_idx);
-> +void adv_monitor_get_supported_info(void);
-> diff --git a/client/main.c b/client/main.c
-> index 7ddd13aa0..2b63ee62a 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -2686,6 +2686,53 @@ static void cmd_ad_clear(int argc, char *argv[])
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->  }
->
-> +static void print_add_monitor_usage(void)
-> +{
-> +       bt_shell_usage();
-> +       bt_shell_printf("RSSIThresholdAndTimers format:\n"
-> +                       "\t<high-rssi>,<high-timeout>,<low-rssi>,<low-timeout>\n"
-> +                       "\tor single '-' for not using RSSI as filter\n");
-> +       bt_shell_printf("pattern format:\n"
-> +                       "\t<start_position>,<ad_data_type>,<content_of_pattern>\n");
-> +       bt_shell_printf("e.g.\n"
-> +                       "\tadd-pattern-monitor or_patterns -10,10,-20,20 1,2,01ab55\n");
-
-btshell parameters are space separated not comma.
-
-> +}
-> +
-> +static void cmd_adv_monitor_add_monitor(int argc, char *argv[])
-> +{
-> +       if (argc < 3)
-> +               print_add_monitor_usage();
-> +       else
-> +               adv_monitor_add_monitor(dbus_conn, argc, argv);
-> +}
-> +
-> +static void cmd_adv_monitor_print_monitor(int argc, char *argv[])
-> +{
-> +       int monitor_idx;
-> +
-> +       if (strcmp(argv[1], "all") == 0)
-> +               monitor_idx = -1;
-> +       else
-> +               monitor_idx = atoi(argv[1]);
-> +       adv_monitor_print_monitor(dbus_conn, monitor_idx);
-> +}
-> +
-> +static void cmd_adv_monitor_remove_monitor(int argc, char *argv[])
-> +{
-> +       int monitor_idx;
-> +
-> +       if (strcmp(argv[1], "all") == 0)
-> +               monitor_idx = -1;
-> +       else
-> +               monitor_idx = atoi(argv[1]);
-> +       adv_monitor_remove_monitor(dbus_conn, monitor_idx);
-> +}
-> +
-> +static void cmd_adv_monitor_get_supported_info(int argc, char *argv[])
-> +{
-> +       adv_monitor_get_supported_info();
-> +}
-> +
->  static const struct bt_shell_menu advertise_menu = {
->         .name = "advertise",
->         .desc = "Advertise Options Submenu",
-> @@ -2722,6 +2769,28 @@ static const struct bt_shell_menu advertise_menu = {
->         { } },
->  };
->
-> +static const struct bt_shell_menu advertise_monitor_menu = {
-> +       .name = "advmon",
-
-I'd use monitor instead of advmon here.
-
-> +       .desc = "Advertisement Monitor Options Submenu",
-> +       .entries = {
-> +       { "add-pattern-monitor", "<type-of-monitor/help> "
-> +                               "[RSSIThresholdAndTimers] "
-> +                               "[patterns=pattern1 pattern2 ...]",
-> +                               cmd_adv_monitor_add_monitor,
-> +                               "Add pattern monitor" },
-> +       { "get-pattern-monitor", "<monitor-id/all>",
-> +                               cmd_adv_monitor_print_monitor,
-> +                               "Get advertisement monitor" },
-> +       { "remove-pattern-monitor", "<monitor-id/all>",
-> +                               cmd_adv_monitor_remove_monitor,
-> +                               "Remove advertisement monitor" },
-> +       { "get-supported-info", NULL,
-> +                               cmd_adv_monitor_get_supported_info,
-> +                               "Get advertisement manager supported "
-> +                               "features and supported monitor types" },
-
-We could probably drop the monitor from the commands here which should
-leave us at:
-
-add-pattern
-get-pattern
-remote-pattern
-supported-info
-
-> +       { } },
-> +};
-> +
->  static const struct bt_shell_menu scan_menu = {
->         .name = "scan",
->         .desc = "Scan Options Submenu",
-> @@ -2897,6 +2966,7 @@ int main(int argc, char *argv[])
->         bt_shell_init(argc, argv, &opt);
->         bt_shell_set_menu(&main_menu);
->         bt_shell_add_submenu(&advertise_menu);
-> +       bt_shell_add_submenu(&advertise_monitor_menu);
->         bt_shell_add_submenu(&scan_menu);
->         bt_shell_add_submenu(&gatt_menu);
->         bt_shell_set_prompt(PROMPT_OFF);
+> +#endif /* __ADV_MONITOR_H */
 > --
-> 2.28.0.220.ged08abb693-goog
+> 2.26.2
 >
 
 
