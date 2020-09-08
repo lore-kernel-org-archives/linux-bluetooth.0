@@ -1,75 +1,149 @@
-Return-Path: <SRS0=Nonw=CQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=n2jO=CR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4696AC43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 16:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A28FCC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 07:33:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1ABC620757
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Sep 2020 16:31:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69FF0218AC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Sep 2020 07:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730594AbgIGQbG (ORCPT
+        id S1729525AbgIHHdZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Sep 2020 12:31:06 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:38197 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1729801AbgIGOY2 (ORCPT
+        Tue, 8 Sep 2020 03:33:25 -0400
+Received: from mail-il1-f208.google.com ([209.85.166.208]:36484 "EHLO
+        mail-il1-f208.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729319AbgIHHdV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Sep 2020 10:24:28 -0400
-Received: (qmail 762519 invoked by uid 1000); 7 Sep 2020 10:24:27 -0400
-Date:   Mon, 7 Sep 2020 10:24:27 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Eli Billauer <eli.billauer@gmail.com>,
-        Emiliano Ingrassia <ingrassia@epigenesys.com>,
-        Alexander Tsoy <alexander@tsoy.me>,
-        "Geoffrey D. Bennett" <g@b4.vu>, Jussi Laako <jussi@sonarnerd.net>,
-        Nick Kossifidis <mickflemm@gmail.com>,
-        Dmitry Panchenko <dmitry@d-systems.ee>,
-        Chris Wulff <crwulff@gmail.com>,
-        Jesus Ramos <jesus-ramos@live.com>
-Subject: Re: [PATCH 01/10] USB: move snd_usb_pipe_sanity_check into the USB
- core
-Message-ID: <20200907142427.GB762136@rowland.harvard.edu>
-References: <20200902110115.1994491-1-gregkh@linuxfoundation.org>
- <20200902110115.1994491-2-gregkh@linuxfoundation.org>
- <20200903004553.GA642955@rowland.harvard.edu>
- <20200903073230.GA162335@kroah.com>
- <20200907141634.GA3733019@kroah.com>
+        Tue, 8 Sep 2020 03:33:21 -0400
+Received: by mail-il1-f208.google.com with SMTP id f20so11443703ilg.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Sep 2020 00:33:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=DrM2WCpXJni+pWF+DYDXi6ZPwROH9NKgPGVrwdvcC8Y=;
+        b=looVw3+lPXgeBcfsCzcM4jnfrs8vV5eVAYR1OLIoJqXmk1j1K6DD5kKuLWwUnWVfRG
+         9LWk2N1HxKs1T7x+rXNuu66gBr43YoCM7u/kYyGHElNHwUBrzzIROIVPq/Qz8JMg4Bcu
+         aRe5IxHlEzfhPhcr3EE0jNIySJ3VW61twn31iit9Gu9CT5uc8p8aRBOBCeeNcdzjNdnv
+         h4ZRukTTl/v5HnSndUVpOPZ30qMs4z5NAZKK04QZZ/1q+QNpEWEwCx+PoLJO0U8pcDgF
+         FbAvVdvQL3LYalG2gqbz9WT01g1bnznSLHb662P6RZjgcWYalhpjQ4y3RuAkYGCpCbku
+         dwvA==
+X-Gm-Message-State: AOAM532ma/S1o77YF6rmujjAV9GW4YM3ZFH6i/2oGKRxf2lYSmPJHBpk
+        ncPrsPhB99AqZqW1I3qq0UlQLhTXndFmgazeIs5gVfju6Pur
+X-Google-Smtp-Source: ABdhPJxwxola6tjl5Xs6+98Cwd4t1PyoPXL1Rdc31C+ffEV6FNz4YYMQcG8FHq4dtiLGPk6Dfu1FjSLLkOH+GfEAiInawEhOqtpv
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200907141634.GA3733019@kroah.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Received: by 2002:a6b:e718:: with SMTP id b24mr20719449ioh.9.1599550399960;
+ Tue, 08 Sep 2020 00:33:19 -0700 (PDT)
+Date:   Tue, 08 Sep 2020 00:33:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000063dca305aec85988@google.com>
+Subject: BUG: spinlock bad magic in lock_sock_nested
+From:   syzbot <syzbot+eb47d1a545390e9fd5bf@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 04:16:34PM +0200, Greg Kroah-Hartman wrote:
-> On Thu, Sep 03, 2020 at 09:32:30AM +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Sep 02, 2020 at 08:45:53PM -0400, Alan Stern wrote:
+Hello,
 
-> > > Since this routine is used in only one place in the entire kernel, you 
-> > > might as well inline the code there and get rid of the function 
-> > > entirely.
-> > 
-> > Good idea, will do.
-> 
-> No, wait, the USB sound drivers call it a lot, so it needs to stick
-> around for now until we clean that up.
+syzbot found the following issue on:
 
-Argh.  I must have run "git grep" from within drivers/usb/core.  My 
-mistake.
+HEAD commit:    0f091e43 netlabel: remove unused param from audit_log_form..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1171cbb6900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=61025c6fd3261bb1
+dashboard link: https://syzkaller.appspot.com/bug?extid=eb47d1a545390e9fd5bf
+compiler:       gcc (GCC) 10.1.0-syz 20200507
 
-Alan Stern
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+eb47d1a545390e9fd5bf@syzkaller.appspotmail.com
+
+BUG: spinlock bad magic on CPU#0, kworker/0:2/2721
+ lock: 0xffff88809395b088, .magic: ffff8880, .owner: <none>/-1, .owner_cpu: 4
+CPU: 0 PID: 2721 Comm: kworker/0:2 Not tainted 5.9.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events l2cap_chan_timeout
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
+ do_raw_spin_lock+0x216/0x2b0 kernel/locking/spinlock_debug.c:112
+ spin_lock_bh include/linux/spinlock.h:359 [inline]
+ lock_sock_nested+0x3b/0x110 net/core/sock.c:3034
+ l2cap_sock_teardown_cb+0x88/0x400 net/bluetooth/l2cap_sock.c:1520
+ l2cap_chan_del+0xad/0x1300 net/bluetooth/l2cap_core.c:618
+ l2cap_chan_close+0x118/0xb10 net/bluetooth/l2cap_core.c:823
+ l2cap_chan_timeout+0x173/0x450 net/bluetooth/l2cap_core.c:436
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+general protection fault, probably for non-canonical address 0xff16fb65bf176ca9: 0000 [#1] PREEMPT SMP KASAN
+KASAN: maybe wild-memory-access in range [0xf8b7fb2df8bb6548-0xf8b7fb2df8bb654f]
+CPU: 0 PID: 2721 Comm: kworker/0:2 Not tainted 5.9.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events l2cap_chan_timeout
+RIP: 0010:__pv_queued_spin_lock_slowpath+0x538/0xaf0 kernel/locking/qspinlock.c:471
+Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 50 05 00 00 4a 03 1c e5 00 59 84 89 48 b8 00 00 00 00 00 fc ff df 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 20 05 00 00 4c 8d 6b 14 48 89 6c 24 08 48 8b 2c
+RSP: 0018:ffffc9000947f9c8 EFLAGS: 00010a07
+RAX: dffffc0000000000 RBX: f8b7fb2df8bb654f RCX: ffffffff815b03df
+RDX: 1f16ff65bf176ca9 RSI: 0000000000000002 RDI: ffffffff8984fd38
+RBP: ffff88809395b088 R08: 0000000000000001 R09: ffff88809395b08b
+R10: ffffed101272b611 R11: 0000000000000160 R12: 0000000000001487
+R13: 0000000000000001 R14: 0000000000040000 R15: ffff8880ae636b80
+FS:  0000000000000000(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb5e095ddb8 CR3: 000000005badb000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:656 [inline]
+ queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:51 [inline]
+ queued_spin_lock include/asm-generic/qspinlock.h:85 [inline]
+ do_raw_spin_lock+0x200/0x2b0 kernel/locking/spinlock_debug.c:113
+ spin_lock_bh include/linux/spinlock.h:359 [inline]
+ lock_sock_nested+0x3b/0x110 net/core/sock.c:3034
+ l2cap_sock_teardown_cb+0x88/0x400 net/bluetooth/l2cap_sock.c:1520
+ l2cap_chan_del+0xad/0x1300 net/bluetooth/l2cap_core.c:618
+ l2cap_chan_close+0x118/0xb10 net/bluetooth/l2cap_core.c:823
+ l2cap_chan_timeout+0x173/0x450 net/bluetooth/l2cap_core.c:436
+ process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
+ kthread+0x3b5/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+Modules linked in:
+---[ end trace cdfef0620d680c8c ]---
+RIP: 0010:__pv_queued_spin_lock_slowpath+0x538/0xaf0 kernel/locking/qspinlock.c:471
+Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 50 05 00 00 4a 03 1c e5 00 59 84 89 48 b8 00 00 00 00 00 fc ff df 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 20 05 00 00 4c 8d 6b 14 48 89 6c 24 08 48 8b 2c
+RSP: 0018:ffffc9000947f9c8 EFLAGS: 00010a07
+RAX: dffffc0000000000 RBX: f8b7fb2df8bb654f RCX: ffffffff815b03df
+RDX: 1f16ff65bf176ca9 RSI: 0000000000000002 RDI: ffffffff8984fd38
+RBP: ffff88809395b088 R08: 0000000000000001 R09: ffff88809395b08b
+R10: ffffed101272b611 R11: 0000000000000160 R12: 0000000000001487
+R13: 0000000000000001 R14: 0000000000040000 R15: ffff8880ae636b80
+FS:  0000000000000000(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb5e095ddb8 CR3: 000000005badb000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
