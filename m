@@ -2,115 +2,119 @@ Return-Path: <SRS0=MaJy=CS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F65BC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 15:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AF3C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 16:02:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9C89207DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 15:46:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599666373;
-	bh=gk5ai7/vsUBs2dl7VhzTb79HWtwuO4OdRiCJ/geHW4g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VuhHYZ/NxlShrbFhIVqhrno50XT5n3u29Jdav+z0uzR9YYmGRIez7tEFDtChJ58p0
-	 5Ezlm7pvwj2IcTWlIhhn8z8Y1dJj6Kxhok/ekr/6UOrAiXjM2TRL5CdsPWjzHVlKO2
-	 QTuz0Pqr+I/94E9PrIR4MtB0oTDIyLcXLJ8RzdfQ=
+	by mail.kernel.org (Postfix) with ESMTP id 0E5A82067C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 16:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730491AbgIIPp7 (ORCPT
+        id S1728643AbgIIQCY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Sep 2020 11:45:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46132 "EHLO mail.kernel.org"
+        Wed, 9 Sep 2020 12:02:24 -0400
+Received: from mga06.intel.com ([134.134.136.31]:24720 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730474AbgIIPpe (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Sep 2020 11:45:34 -0400
-Received: from pali.im (pali.im [31.31.79.79])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3EBA1207DE;
-        Wed,  9 Sep 2020 11:11:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599649899;
-        bh=gk5ai7/vsUBs2dl7VhzTb79HWtwuO4OdRiCJ/geHW4g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xt32yCIJZrUnpBjf6/MToHhOH5aK0XvmwKj0BwuSH4Fcsie9nQ0R0tHFTEEnVTFIP
-         29njlrTtNhos9A/wOErrHOF4fNWmUSFQ9GV2x/XbjDPYvt+u9vNWaHJT8TSYsNQWbr
-         xUrm/P+mViuyxOWWowDpQZ7V6BMBiafgTH9hvMDw=
-Received: by pali.im (Postfix)
-        id B61AE7A9; Wed,  9 Sep 2020 13:11:36 +0200 (CEST)
-Date:   Wed, 9 Sep 2020 13:11:36 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Joseph Hwang <josephsih@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, chromeos-bluetooth-upstreaming@chromium.org,
-        josephsih@google.com, Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        id S1730588AbgIIP6l (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Sep 2020 11:58:41 -0400
+IronPort-SDR: HfHz0HYwYzcxBjcfjkD1C9aIUTuzD7kyyKf/NoCG7KuonPhnss/MzaE03t2Et+vm/NeA9j5AiU
+ PwQQb1cg2prA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="219914229"
+X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
+   d="scan'208";a="219914229"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2020 08:58:34 -0700
+IronPort-SDR: IxS2NNZPAt2NRkBv9utGp2ZLBkdzxhLw/E5scRDzqhT/M++Tk2UWKTt0kNUyh6hNiaeJlEgkzL
+ t8tpg9ojlopw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
+   d="scan'208";a="333863841"
+Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
+  by orsmga008.jf.intel.com with ESMTP; 09 Sep 2020 08:58:33 -0700
+Received: from andy by smile with local (Exim 4.94)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1kG2UQ-00FTRF-Ib; Wed, 09 Sep 2020 18:58:30 +0300
+Date:   Wed, 9 Sep 2020 18:58:30 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Bluetooth: sco: expose WBS packet length in
- socket option
-Message-ID: <20200909111136.ghp5p56m4cxfjreo@pali>
-References: <20200909094202.3863687-1-josephsih@chromium.org>
- <20200909174129.v2.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1 1/4] Bluetooth: hci_intel: enable on new platform
+Message-ID: <20200909155830.GE1891694@smile.fi.intel.com>
+References: <20200903184850.53055-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200909174129.v2.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20200903184850.53055-1-andriy.shevchenko@linux.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wednesday 09 September 2020 17:42:02 Joseph Hwang wrote:
-> It is desirable to expose the wideband speech packet length via
-> a socket option to the user space so that the user space can set
-> the value correctly in configuring the sco connection.
-
-Hello! I'm fine with change below, but I would suggest to put more
-details into commit message. This change has nothing to do with wideband
-nor with exporting socket option to userspace -- which is already done
-via SCO_OPTIONS option. Also it is relevant to SCO socket with any codec
-data, not only wideband.
-
-This commit description should rather mention that it defines new
-getsockopt options BT_SNDMTU/BT_RCVMTU for SCO socket to be compatible
-with other bluetooth sockets and that these options return same value as
-option SCO_OPTIONS which is already present on existing kernels.
-
+On Thu, Sep 03, 2020 at 09:48:47PM +0300, Andy Shevchenko wrote:
+> On new Intel platform the device is provided with INT33E3 ID.
+> Append it to the list.
 > 
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> This will require ACPI_GPIO_QUIRK_ONLY_GPIOIO to be enabled because
+> the relevant ASL looks like:
+> 
+> 	UartSerialBusV2 ( ... )
+> 	GpioInt ( ... ) { ... }
+> 	GpioIo ( ... ) { ... }
+> 
+> which means that first GPIO resource is an interrupt, while we are expecting it
+> to be reset one (output). Do the same for host-wake because in case of
+> GpioInt() the platform_get_irq() will do the job and should return correct
+> Linux IRQ number. That said, host-wake GPIO can only be GpioIo() resource.
+> 
+> While here, drop commas in terminator lines.
+
+Any comments?
+
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
+>  drivers/bluetooth/hci_intel.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 > 
-> (no changes since v1)
-> 
->  net/bluetooth/sco.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index dcf7f96ff417e6..79ffcdef0b7ad5 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -1001,6 +1001,12 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
->  			err = -EFAULT;
->  		break;
+> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+> index f1299da6eed8..703d774be5a6 100644
+> --- a/drivers/bluetooth/hci_intel.c
+> +++ b/drivers/bluetooth/hci_intel.c
+> @@ -1076,7 +1076,8 @@ static const struct hci_uart_proto intel_proto = {
+>  #ifdef CONFIG_ACPI
+>  static const struct acpi_device_id intel_acpi_match[] = {
+>  	{ "INT33E1", 0 },
+> -	{ },
+> +	{ "INT33E3", 0 },
+> +	{ }
+>  };
+>  MODULE_DEVICE_TABLE(acpi, intel_acpi_match);
+>  #endif
+> @@ -1138,9 +1139,9 @@ static const struct acpi_gpio_params reset_gpios = { 0, 0, false };
+>  static const struct acpi_gpio_params host_wake_gpios = { 1, 0, false };
 >  
-> +	case BT_SNDMTU:
-> +	case BT_RCVMTU:
-> +		if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
-> +			err = -EFAULT;
-> +		break;
-> +
->  	default:
->  		err = -ENOPROTOOPT;
->  		break;
+>  static const struct acpi_gpio_mapping acpi_hci_intel_gpios[] = {
+> -	{ "reset-gpios", &reset_gpios, 1 },
+> -	{ "host-wake-gpios", &host_wake_gpios, 1 },
+> -	{ },
+> +	{ "reset-gpios", &reset_gpios, 1, ACPI_GPIO_QUIRK_ONLY_GPIOIO },
+> +	{ "host-wake-gpios", &host_wake_gpios, 1, ACPI_GPIO_QUIRK_ONLY_GPIOIO },
+> +	{ }
+>  };
+>  
+>  static int intel_probe(struct platform_device *pdev)
 > -- 
-> 2.28.0.526.ge36021eeef-goog
+> 2.28.0
 > 
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
