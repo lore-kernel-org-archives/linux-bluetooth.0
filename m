@@ -2,102 +2,116 @@ Return-Path: <SRS0=MaJy=CS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D036C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 08:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C113CC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 09:43:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DC8F218AC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 08:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B4D121D79
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 09:43:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lRr0iV7j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729449AbgIIItj (ORCPT
+        id S1730174AbgIIJnC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Sep 2020 04:49:39 -0400
-Received: from mail-il1-f205.google.com ([209.85.166.205]:37449 "EHLO
-        mail-il1-f205.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728647AbgIIItY (ORCPT
+        Wed, 9 Sep 2020 05:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730022AbgIIJml (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Sep 2020 04:49:24 -0400
-Received: by mail-il1-f205.google.com with SMTP id z14so1511822ils.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 01:49:23 -0700 (PDT)
+        Wed, 9 Sep 2020 05:42:41 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322CDC061795
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 02:42:40 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id l126so1676804pfd.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 02:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=cJ2b5yC6U6sZBSPpf2NMndA3c8MuYwyg/EbWONDGDEQ=;
+        b=lRr0iV7jW0zq00Y+PI9+C7cOPYDyM1oIQtYgXGw2Jok5nCprEdhOZiwh5Vp+h7I5bK
+         sDVm/tVXX/1Feq/Yn7thUALZCMh8wcsS13njzNpVOyy+NKgPOQxkgpwOHjheAOj5H8PN
+         jPS12IkBQ5rM8aOk+DU5/JDyzG2RLZTleokG0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=Hmc2r7eesuS8hDT5sY5ndDBpeHvg0B9Mp2Q2pIVeAhQ=;
-        b=uY9Qboi9N/YojYQUYLDvGE7HQAFUt/CBXX17Nyi+Kt2nT9eo9xDxIVeWOBXX2dA4GL
-         d+HAkVX0SIEOnJLJ7ud+hokgJiGUYi4TWUqPHItAKh4kED/R+FW0BjS8C5r427FUYp/z
-         3dCpUTiwY2mv+Lz6ZwT8pdZlqcYsmAEdhcMuaSYa9oJEZ2ubfSXo3ADjL/IhcsWOKv40
-         14hRUQGirj6Fu+Ux6kxy2N4HnoYbXmzM8LNTEcLJU2JXplh2bc7ucwX/6+EOxkxY1NG2
-         p3m7SjvAMv3Ru2jCQ7Hi6qxcqiPUg/V6wj9M1D7R15RCEs3TqmAHNm91+TXvW8sIUrRr
-         jRAQ==
-X-Gm-Message-State: AOAM531EF0dfi3PMGyzj/E5JAqHwZAioXAg7rqeAgnBmrBvAPsDuN/+l
-        whC/BaYpoK1cyZlltuFPM+RYGjUPIUi6efYn1pYYEM1w+103
-X-Google-Smtp-Source: ABdhPJxoMRKRTwWdxdXUfgMHZQIkaFn/xWyh4vyruirgPIBRjn9gLzghekwhJjrYO7UQ2Zc99DWXrwQldvZR/amubDmOOitKbaCk
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cJ2b5yC6U6sZBSPpf2NMndA3c8MuYwyg/EbWONDGDEQ=;
+        b=O8W/dnhycoOGBFZx3n/a7insUjUPIGTPapkacNEvuX3tQtAkkZ/npa6hh1s1rC1uyC
+         yfpWpm+lsdere/S4fcweb5y8zi0qt5TdpO5kIOXCqM10fFeI9swvSc59W/8UPSdAAJbk
+         xqDMtmf76nxb53Tk3SmoeHYJdPlLK3sY7XfK/uFom6oT5KSvzV1nhXnYrwCpgXQboeyX
+         86wLKk2/Icisf5SozlWwTjxjfDNOBEXStSkbjoRWOgRmO6yyIThNV5CZJVRtvzcWxouv
+         yapMKdkPsQkdFkdmCzaudE6qh6paf0Y8Yqv5LX6B721HBKqzoZG9lJ/jc/WSqN6Rtdcg
+         mm3w==
+X-Gm-Message-State: AOAM530RzVmDg2kXZ5/1sOOr0bdDxrbd/wzkvUfblojU4JA4umEm3QBj
+        5btwsNv7Fiks6TsT/Ec5YgH3lgZ781mgh2bN
+X-Google-Smtp-Source: ABdhPJy0kQhiImzPyvMTXIoe3S5XBcVzI1ubsHTbbUHt8tNPKWinvH0asFzNdG96HgDS858kUtEN9w==
+X-Received: by 2002:a17:902:9349:b029:d0:cb2d:f26c with SMTP id g9-20020a1709029349b02900d0cb2df26cmr156960plp.5.1599644559530;
+        Wed, 09 Sep 2020 02:42:39 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:de4a:3eff:fe7d:ff5f])
+        by smtp.gmail.com with ESMTPSA id a23sm1692275pgv.86.2020.09.09.02.42.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2020 02:42:39 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: sco: expose WBS packet length in socket option
+Date:   Wed,  9 Sep 2020 17:42:02 +0800
+Message-Id: <20200909174129.v2.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
+X-Mailer: git-send-email 2.28.0.526.ge36021eeef-goog
+In-Reply-To: <20200909094202.3863687-1-josephsih@chromium.org>
+References: <20200909094202.3863687-1-josephsih@chromium.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c002:: with SMTP id q2mr2827066ild.171.1599641363124;
- Wed, 09 Sep 2020 01:49:23 -0700 (PDT)
-Date:   Wed, 09 Sep 2020 01:49:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003798d705aedd870d@google.com>
-Subject: memory leak in mgmt_cmd_status
-From:   syzbot <syzbot+80f5bab4eb14d14e7386@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+It is desirable to expose the wideband speech packet length via
+a socket option to the user space so that the user space can set
+the value correctly in configuring the sco connection.
 
-syzbot found the following issue on:
-
-HEAD commit:    6f6a73c8 Merge tag 'drm-fixes-2020-09-08' of git://anongit..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=152e3245900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7954285d6e960c0f
-dashboard link: https://syzkaller.appspot.com/bug?extid=80f5bab4eb14d14e7386
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16877335900000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+80f5bab4eb14d14e7386@syzkaller.appspotmail.com
-
-2020/09/09 02:38:52 executed programs: 3
-2020/09/09 02:38:58 executed programs: 5
-2020/09/09 02:39:03 executed programs: 7
-BUG: memory leak
-unreferenced object 0xffff888119d41a00 (size 224):
-  comm "kworker/u5:0", pid 1520, jiffies 4294954656 (age 28.430s)
-  hex dump (first 32 bytes):
-    d0 30 1c 2b 81 88 ff ff d0 30 1c 2b 81 88 ff ff  .0.+.....0.+....
-    00 00 00 00 00 00 00 00 00 30 1c 2b 81 88 ff ff  .........0.+....
-  backtrace:
-    [<000000007a3b2b8a>] __alloc_skb+0x5e/0x250 net/core/skbuff.c:198
-    [<000000003fe180cd>] alloc_skb include/linux/skbuff.h:1094 [inline]
-    [<000000003fe180cd>] mgmt_cmd_status+0x31/0x140 net/bluetooth/mgmt_util.c:102
-    [<00000000a98852de>] mgmt_set_discoverable_complete+0x18e/0x1c0 net/bluetooth/mgmt.c:1351
-    [<000000000d6aa222>] discoverable_update_work+0x7a/0xa0 net/bluetooth/hci_request.c:2595
-    [<00000000159838c7>] process_one_work+0x213/0x4d0 kernel/workqueue.c:2269
-    [<0000000087b95ef0>] worker_thread+0x58/0x4b0 kernel/workqueue.c:2415
-    [<0000000059403542>] kthread+0x164/0x190 kernel/kthread.c:292
-    [<00000000d35ee226>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-
-
-
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+(no changes since v1)
+
+ net/bluetooth/sco.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index dcf7f96ff417e6..79ffcdef0b7ad5 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1001,6 +1001,12 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_SNDMTU:
++	case BT_RCVMTU:
++		if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.28.0.526.ge36021eeef-goog
+
