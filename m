@@ -8,74 +8,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0CAC43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 07:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F792C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 07:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A28321D79
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 07:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16DC82080C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 07:26:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BOZkXJ6/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNAVYHr5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727880AbgIIHSD (ORCPT
+        id S1725991AbgIIH0i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Sep 2020 03:18:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55788 "EHLO
+        Wed, 9 Sep 2020 03:26:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725772AbgIIHR7 (ORCPT
+        with ESMTP id S1725772AbgIIH0d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Sep 2020 03:17:59 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF3AC061573;
-        Wed,  9 Sep 2020 00:17:58 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id l191so1418823pgd.5;
-        Wed, 09 Sep 2020 00:17:58 -0700 (PDT)
+        Wed, 9 Sep 2020 03:26:33 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C6CC061573;
+        Wed,  9 Sep 2020 00:26:32 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id d6so1371411pfn.9;
+        Wed, 09 Sep 2020 00:26:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=64Bt6kd9gxNJLRVuqcxKj5M+pb5+qbe839Gm0r/zIvo=;
-        b=BOZkXJ6/UZfd/Smz8exM0/GCMabLwdZY0S7okls6rxu14xZzEAcX+7DHmsZISbkkg1
-         yI+W8ytZ2T8AY61EhOAtxyLw/FXWXvZ8zE3VvXxr0LX0FbUVdMosXzPdv7nuDZzbWrkz
-         Mq+leo06/a5x3b+9W+6QJAP+RWsyDJrKakDSaqjR+ch+HTVPMwA9vL25n4E5ufexmJfx
-         5RuG0VmZbBZydIVVUfcO+9WXm3igrUCRTWEIvanjZY4RmigvsMwz8KyfXu7TDXj/DuGZ
-         6uQ8GIDFcht7e76ccDGhc/3kIpHbgTIfiJpCWNpM8Bqdg88VJuTWxAKDS8rVfZYDUBLN
-         YyNg==
+        bh=NB8HBUKnl+eWfZNHIQZWAbfkL9C5IcAO+9Z1lg426u8=;
+        b=hNAVYHr5uxDesz7m8yBEg9nTrnbnzLgkuYvjloOejB/N6d8aae8dTdQu2xhhan0Vtl
+         viJO7ZNo030PGxkXyTbUWpTLuecLUIQqkBS8LH3U7RamoG+oAkaDuHOi1A+4PZjSmPqi
+         EoBVK7TpvxlDjdnHPXyH3Yt8wyrKOK8XGgzfYVPpmIKGXeE12M8psa9BW0zZQJ/aHR+4
+         KF/ZtkQjl2s+FQdRkBIGBmzK0/R0Z4NYX3mb0hIpGiLpkbIV26/G31SgEorcqReRRZiM
+         ikR/C5UVkQ4ft+STBWWOMXlnHbrPVrbPt6HloxfdmkPRVFO2/z1j6cGnR0nhUwxzeynF
+         JkHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=64Bt6kd9gxNJLRVuqcxKj5M+pb5+qbe839Gm0r/zIvo=;
-        b=Y4UYQGpzbXyxbhQZ1aliF6qPEQZzplLB6I+ccPiRFr1nycbAdokz4qsPJHczBahpXA
-         xUXkHHDO1cw3CvGQl/OoHuULY0UPRCs+seMKNEY6ToEREgukGt7CoqpEQxGvGCvM9oHH
-         VmDgPQyXFEUiu9WW6UP19dWTdHYjB+/gBwIq8NcljM+nlIDi1kl+n6WyPiiDbu1Qtve0
-         rWJ54RgD4ydPjcLTGtNW0Zq96wylaDzp3794Z6kdzAya83DCyKQmzJiOG4goNNVS3Q8F
-         5cZ4Vkmv44w4oZ6i7v4PM+yHvRo8yPDXUZCqf9eP13GBAHBEh+tviJgSowQxyBJ1nse5
-         YWIQ==
-X-Gm-Message-State: AOAM530UuglL65IWHw1WU0h5LWsBEVIuGGPmzlQ+Pn/18I104/MI1wFP
-        WZTSA7Ze0ZLyjXW9Hyoo1A==
-X-Google-Smtp-Source: ABdhPJxuGhKjFWPHlV7tWVd/A6dvlcDQsvdVZO4mWSI4b/JsVgqaXXITNfUrG/50JWsRL7CjUveweg==
-X-Received: by 2002:a17:902:7203:b029:d0:cbe1:e73a with SMTP id ba3-20020a1709027203b02900d0cbe1e73amr2786781plb.21.1599635878103;
-        Wed, 09 Sep 2020 00:17:58 -0700 (PDT)
+        bh=NB8HBUKnl+eWfZNHIQZWAbfkL9C5IcAO+9Z1lg426u8=;
+        b=t12lx9coJGdoCnAhFce6SBCJ5KTJ+px911baX2lT8OOkEaJBI7YwISalcBHIRJnQPM
+         1ghh+kbzWyfS1NOsc0f8HreEG+nesx+v3DOnEkoyCR2qF/JIrT6t+ImlHlMaA2hlGyvC
+         OH4C6LOSjmFDHcnkLuiqol6/a5ue9ikaZuWj69QEOuMwshx1dwol/LhFJ8o09sD7sCA5
+         ejd9FImKnhExzDMakc9ZQb7im3W4hXMA4oiePsnf3F5oiDJkZ9pXnRk6zrGS7acRBHc6
+         TnsCsinPiS27wMv0a/UW1a/14y4RHlnv+lTef9jM0AWt5QB/JPVUPwg8alb6YrOVTTDP
+         MWhA==
+X-Gm-Message-State: AOAM533U9m8ANTHHsZQ7JFppywn+2ugCSnohk/6FKMLGGdTdZicbJnvd
+        dMjhkviDCGu5N4Vx4//0ww==
+X-Google-Smtp-Source: ABdhPJxgN58H3LqRJckQL6qJXd2ZuTLY65XPV2ud3K7OCYkyiqQA+x1vw7hC5sQIXpCuHOBgInDgkQ==
+X-Received: by 2002:a17:902:c38a:: with SMTP id g10mr2551819plg.23.1599636392271;
+        Wed, 09 Sep 2020 00:26:32 -0700 (PDT)
 Received: from localhost.localdomain (n11212042027.netvigator.com. [112.120.42.27])
-        by smtp.gmail.com with ESMTPSA id y3sm1699661pfb.18.2020.09.09.00.17.55
+        by smtp.gmail.com with ESMTPSA id r10sm1129570pjp.49.2020.09.09.00.26.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2020 00:17:57 -0700 (PDT)
+        Wed, 09 Sep 2020 00:26:31 -0700 (PDT)
 From:   Peilin Ye <yepeilin.cs@gmail.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     Peilin Ye <yepeilin.cs@gmail.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
-Subject: [Linux-kernel-mentees] [PATCH net v2] Bluetooth: Fix slab-out-of-bounds read in hci_le_direct_adv_report_evt()
-Date:   Wed,  9 Sep 2020 03:17:00 -0400
-Message-Id: <20200909071700.1100748-1-yepeilin.cs@gmail.com>
+        syzkaller-bugs@googlegroups.com
+Subject: [Linux-kernel-mentees] [PATCH v2] Bluetooth: Fix memory leak in read_adv_mon_features()
+Date:   Wed,  9 Sep 2020 03:25:51 -0400
+Message-Id: <20200909072551.1101031-1-yepeilin.cs@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200805180902.684024-1-yepeilin.cs@gmail.com>
-References: <20200805180902.684024-1-yepeilin.cs@gmail.com>
+In-Reply-To: <20200908200635.1099360-1-yepeilin.cs@gmail.com>
+References: <20200908200635.1099360-1-yepeilin.cs@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -83,53 +84,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-`num_reports` is not being properly checked. A malformed event packet with
-a large `num_reports` number makes hci_le_direct_adv_report_evt() read out
-of bounds. Fix it.
+read_adv_mon_features() is leaking memory. Free `rp` before returning.
 
-Cc: stable@vger.kernel.org
-Fixes: 2f010b55884e ("Bluetooth: Add support for handling LE Direct Advertising Report events")
-Reported-and-tested-by: syzbot+24ebd650e20bd263ca01@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?extid=24ebd650e20bd263ca01
+Fixes: e5e1e7fd470c ("Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES")
+Reported-and-tested-by: syzbot+f7f6e564f4202d8601c6@syzkaller.appspotmail.com
+Link: https://syzkaller.appspot.com/bug?extid=f7f6e564f4202d8601c6
 Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
 ---
+I forgot the "Link:" tag yesterday. Sorry about that.
+
 Change in v2:
-    - add "Cc: stable@" tag.
+    - add a proper "Link:" tag.
 
- net/bluetooth/hci_event.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ net/bluetooth/mgmt.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4b7fc430793c..aec43ae488d1 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5863,21 +5863,19 @@ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev,
- 					 struct sk_buff *skb)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5bbe71002fb9..f96251f818fc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4157,7 +4157,7 @@ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
  {
- 	u8 num_reports = skb->data[0];
--	void *ptr = &skb->data[1];
-+	struct hci_ev_le_direct_adv_info *ev = (void *)&skb->data[1];
+ 	struct adv_monitor *monitor = NULL;
+ 	struct mgmt_rp_read_adv_monitor_features *rp = NULL;
+-	int handle;
++	int handle, err;
+ 	size_t rp_size = 0;
+ 	__u32 supported = 0;
+ 	__u16 num_handles = 0;
+@@ -4192,9 +4192,13 @@ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+ 	if (num_handles)
+ 		memcpy(&rp->handles, &handles, (num_handles * sizeof(u16)));
  
--	hci_dev_lock(hdev);
-+	if (!num_reports || skb->len < num_reports * sizeof(*ev) + 1)
-+		return;
- 
--	while (num_reports--) {
--		struct hci_ev_le_direct_adv_info *ev = ptr;
-+	hci_dev_lock(hdev);
- 
-+	for (; num_reports; num_reports--, ev++)
- 		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
- 				   ev->bdaddr_type, &ev->direct_addr,
- 				   ev->direct_addr_type, ev->rssi, NULL, 0,
- 				   false);
- 
--		ptr += sizeof(*ev);
--	}
--
- 	hci_dev_unlock(hdev);
+-	return mgmt_cmd_complete(sk, hdev->id,
+-				 MGMT_OP_READ_ADV_MONITOR_FEATURES,
+-				 MGMT_STATUS_SUCCESS, rp, rp_size);
++	err = mgmt_cmd_complete(sk, hdev->id,
++				MGMT_OP_READ_ADV_MONITOR_FEATURES,
++				MGMT_STATUS_SUCCESS, rp, rp_size);
++
++	kfree(rp);
++
++	return err;
  }
  
+ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
 -- 
 2.25.1
 
