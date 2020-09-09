@@ -2,115 +2,110 @@ Return-Path: <SRS0=MaJy=CS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4606C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 16:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7985DC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 19:40:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C52B20C09
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 16:58:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F56921D7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Sep 2020 19:40:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ISt9R3Cu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730674AbgIIQ6M convert rfc822-to-8bit (ORCPT
+        id S1726226AbgIITkQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Sep 2020 12:58:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51918 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730677AbgIIPvT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Sep 2020 11:51:19 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 09 Sep 2020 14:12:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: Maltahlgaming@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-ApvqxbMfJC@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
+        Wed, 9 Sep 2020 15:40:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725772AbgIITkQ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Sep 2020 15:40:16 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB61EC061573
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 12:40:15 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id c78so3258042ybf.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 12:40:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=mVmjxlDiU2KnidTRFEq6fyxwn9W4wZsX/zi+fKeDAo8=;
+        b=ISt9R3Curlc/gQu89vI860EnN4xzu+m2uBESotHk5xyvH7H+7x8cnVdhp2znSG4HCw
+         Ah0Nz9McfvkGVU8Y9l4mqNLTsb68x/NNpY+FRn3HCBN+otXnYDfZtmQl8R7dzyqhs8MR
+         88axNp/W39Wisa+zywVJHmlY+PYOLk4mnTB39yh4ZpjAR+2BvXbRmVzg7nTDpHzbx4Ts
+         GCJf6Zij6I+9jiw8h23y+iIpwagI21TKxmS17AHh26uICxmioCxzw/9+cIuuMlfE59db
+         XvgXv4MMmRveXIDocc4VvvuGd3CBOkn5xq67m4sqJGDY5jlgODD7NzSTBzQQZ34c2YyR
+         NiUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=mVmjxlDiU2KnidTRFEq6fyxwn9W4wZsX/zi+fKeDAo8=;
+        b=RdHpJXmrgav2qRu2+9bLNjODYu4GYYFqQeZMWWMPLSz4KWC40gA+UooUB4McA1lPun
+         TxD8pzO5Li+D4MbCThzERBx99hgZkUIIsVcdBUTsJdddWTSdtoD/lIB67tGdCIO6+AG1
+         0oj1OCr1lXNKVW38CXR0RntrYl0MjgOdoJ+AxqzGAiA8wJ9AWOcI+0k75qxUkHomV6yd
+         DgQKRv7SuXfunJSWKOwaaNLRjsOCMUzBct+WtUFJvBqScYg8ePi0iK722i19ScSRykVI
+         tpupI5l+aMlzWziDTH8/EQW8CfVswu+N7QiYlsZTuOJO9lgPv2Bbk8XE1JXzzhbRgNk3
+         kq4g==
+X-Gm-Message-State: AOAM5301MuAQBFBZHXYxYyYsI/pgS/FH0IwGmFCzMGJ5oTumNEf8pEME
+        LDqDWqKuS7vRpzia4M8rUEu5zzlzxvVJVg==
+X-Google-Smtp-Source: ABdhPJyPoC7UuA9JaWb6Vi5OyCFRUFwLjDUyqI0lV/SpeUarTC8wzOaVoWN9WRFa2KqSb4tq4Aqg32Ow1l3pgQ==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:e50e])
+ (user=mmandlik job=sendgmr) by 2002:a25:e655:: with SMTP id
+ d82mr8569827ybh.347.1599680414871; Wed, 09 Sep 2020 12:40:14 -0700 (PDT)
+Date:   Wed,  9 Sep 2020 12:40:01 -0700
+Message-Id: <20200909123943.BlueZ.v2.1.I588558f1e38231193d6e955a4008ce54712d5c89@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.526.ge36021eeef-goog
+Subject: [BlueZ PATCH v2] Disable auto-connect on device remove
+From:   Manish Mandlik <mmandlik@google.com>
+To:     luiz.dentz@gmail.com, marcel@holtmann.org
+Cc:     alainm@chromium.org, chromeos-bluetooth-upstreaming@chromium.org,
+        sonnysasaka@chromium.org, linux-bluetooth@vger.kernel.org,
+        Manish Mandlik <mmandlik@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+Auto-connect is not disabled when a device is removed. So in case the
+pairing is cancelled, the device is removed, but it stays in the kernel
+auto-connect list. This causes future advertisement from that device to
+trigger a pairing even if the user has already cancelled the pairing.
 
-Maltahlgaming@gmail.com changed:
+This patch disables auto-connect on device remove.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |Maltahlgaming@gmail.com
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+---
 
---- Comment #151 from Maltahlgaming@gmail.com ---
-(In reply to Real Name from comment #150)
-> (In reply to vic from comment #149)
-> > Does anyone here know if it supports BLE on Microsoft Windows?
-> 
-> Mine at least doesn't. Trying to pair a device as BLE device doesn't do
-> anything.
-> 
-> I was assessing if there was anything to get from the Windows driver but it
-> seemingly doesn't have anything new to offer. But I'm far from an expert, so
-> anyone with more knowledge is invited to chime in.
+Changes in v2:
+- Disable auto-connect on device remove instead of pairing cancel as this
+  is the main culprit of the issue.
+- Updated the title from "Disable auto-connect on cancel pair" to "Disable
+  auto-connect on device remove"
 
-I have tried with my own fake CSR Bluetooth 5.0 adapter on Windows 10 and that
-works fine after i manually override the default plug and play driver with the
-generic bluetooth dongle driver in Device Manager. I could connect and use BLE
-devices without issues but on Linux it can see other devices but not connect
-regardless of bluetooth version.
+ src/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Details on the dongle from Linux Kernel 5.8.3
-
->
-Bus 001 Device 020: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
-(HCI mode)
-Couldn't open device, some information will be missing
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-  idProduct          0x0001 Bluetooth Dongle (HCI mode)
-  bcdDevice           88.91
-  iManufacturer           0 
-  iProduct                2 
-  iSerial                 0 
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength       0x00b1
-    bNumInterfaces          2
-    bConfigurationValue     1
-    iConfiguration          0 
-    bmAttributes         0xe0
-      Self Powered
-      Remote Wakeup
-    MaxPower              100mA
->
-
+diff --git a/src/device.c b/src/device.c
+index df440ce09..8f73ce4d3 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4447,6 +4447,11 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ {
+ 	DBG("Removing device %s", device->path);
+ 
++	if (device->auto_connect) {
++		device->disable_auto_connect = TRUE;
++		device_set_auto_connect(device, FALSE);
++	}
++
+ 	if (device->bonding) {
+ 		uint8_t status;
+ 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.28.0.526.ge36021eeef-goog
+
