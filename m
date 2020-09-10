@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E80C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 04:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFEDC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 04:53:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D2AC2076D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 04:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 272302076D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 04:53:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GFYiK871"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="eTDznI5N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbgIJEwp (ORCPT
+        id S1726600AbgIJExM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 00:52:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
+        Thu, 10 Sep 2020 00:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbgIJEwm (ORCPT
+        with ESMTP id S1725981AbgIJExF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 00:52:42 -0400
+        Thu, 10 Sep 2020 00:53:05 -0400
 Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D1DC061573
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 21:52:41 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id u21so6435248ljl.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 21:52:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE63C061573
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 21:53:04 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id u21so6435939ljl.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 21:53:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=HDBgmWxbn9H5Rwy9IbT/P7gu3wkwpD9NyaConvJZ2QQ=;
-        b=GFYiK871pFfywqy5jPo7o5rUokVvPpgBV/dvIlddPN9fmBsp/oGe7hZccaVM8TRDov
-         NCSeAKgAEaK3CN9niHgkWJhgnTQpej6+LhUlLe2iCpCtMFI32Z7qlZ5Gjqeo3L/I9+Gc
-         bQZFr0al4Z6BeVW4dri5vyJ0bbsut407q9MiU=
+        bh=BZNWrm+gtstAC90dpi7HeJQJ7pNUj+SVExRa1Mq75FY=;
+        b=eTDznI5NT6mr2SiIOyQB/yfbffUmIcfbYXRXSqvCJaQJ2RAM91QHNNBODpcB6GA9gV
+         ZQuuEsPnqK0n20YVrIfDuJMeRioT9KbqeCvk45naesraP7C9pBh0qiWHwTS2rfn7D4Uf
+         dwOG1/yKAvfCLaKc0wGYTsGQoMIcQkcvDAcRA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HDBgmWxbn9H5Rwy9IbT/P7gu3wkwpD9NyaConvJZ2QQ=;
-        b=TvzilW3Q6LUgn+SZmN1VDztCvFd1Y0UfbdazxVQMOVpeTsxdi6hx74DiVJwRMV1DRZ
-         tYnkTZIaWP7nKbpaPwGKff+cSUltxFhXTxR1t2OH0v8/s5kkzNN7r+0AjPqD9e/msRyM
-         lsLzMkXWw0jkJUHDukiLuMksCmIZumdhE5Jsc6UFIdFykEM4peISZ5xPoCuIywA9IuZg
-         rbloPrh6/D/1i26F1nW0MKH5N7JVPqdlIpwUEhzs6QTjdGUO/e8gk7Z4OiwQkJsZC3Ze
-         ehq5MQWKw0s3O2W7j12NOqbP+BnvyIGDZYB9B8U/oqx007Qh9CWpK1XSdk7V7a9I5mRM
-         4yOQ==
-X-Gm-Message-State: AOAM533HZtSVj0CbUxE7XV2BXNtxkE1fjLT8Ym788YXHfov8/aPufDSr
-        rIaA4dFRuWAhIDA+FsTNJPknozb59ZMXMLpk0ZXSww==
-X-Google-Smtp-Source: ABdhPJw85A3XmEhpl77VC09n0+DDKSkqdJFNhGhgasZMg4DMWTzs37/TIB6xeLfrrdwl3LaIsP9bFQirQ3X+KhCDXRI=
-X-Received: by 2002:a2e:8552:: with SMTP id u18mr3552639ljj.359.1599713560083;
- Wed, 09 Sep 2020 21:52:40 -0700 (PDT)
+        bh=BZNWrm+gtstAC90dpi7HeJQJ7pNUj+SVExRa1Mq75FY=;
+        b=ifzenaGKrFoqyBKmgL0wQYJxLFc78FbmmOUAuxDHH9V6iGD5LFX44rV3i9ZY24Bevv
+         SUsxK3qZzZ7n/c8z4QTIM8PjNG0gDEqr8HLoUgi4wuoNth0ZK8iIwdF/MXOovfTfj8pE
+         CjEXBRGCCNSv87TTL9hbS4LBnsiwNPbDCFX3Y0NzG7Dp0kn6tcaiMTrmqEcmSsiso7Uo
+         PU8uVRG5Rnhg+3o4BZfrrdXHOz2wXQwA5Ilnx6y1I4SeaReN374Ny7Y2buTs0Dp+uUKL
+         Zq+xYRltV6gqoKP/zknRtXBa2mA+JAiB5qdvY8WG62hpMKlDeYG6+eevIc+3lInd8SOL
+         uoQg==
+X-Gm-Message-State: AOAM531+LwE4jrs4Xu1CQLsaeAKNBwrozfUYoddNzsWFgB9K2jR3XFXz
+        sUULXjFDTv1h1VguRDj2Rg3C9z5h1EgFZZ+zjH9IBw==
+X-Google-Smtp-Source: ABdhPJynf8UEyq3A8ZXh1XrZDFQiN9S4Xm9AoX1kIlJjeJQg9d9U+xR9RQHwkm5xXfvesygT7+YUln4fel/KEtH/aLE=
+X-Received: by 2002:a2e:5d2:: with SMTP id 201mr3406157ljf.73.1599713583095;
+ Wed, 09 Sep 2020 21:53:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200818152612.BlueZ.v1.1.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
- <20200818152612.BlueZ.v1.3.I19ff9cdbd40fe453db0e81aec8bf94dd9490dce3@changeid>
- <CABBYNZ+EgjjuiyiUaFDAhM1tzmvh6+w5ERA4omtfNgYy86ek7A@mail.gmail.com>
-In-Reply-To: <CABBYNZ+EgjjuiyiUaFDAhM1tzmvh6+w5ERA4omtfNgYy86ek7A@mail.gmail.com>
+ <20200818152612.BlueZ.v1.6.I47744c7eef31f44cf393dea2b3e437d7b41cef79@changeid>
+ <CABBYNZJtWjhXZ9YSPLLiuP_KTzfCxox7KCOtJJvgnHY8PMZQwg@mail.gmail.com>
+In-Reply-To: <CABBYNZJtWjhXZ9YSPLLiuP_KTzfCxox7KCOtJJvgnHY8PMZQwg@mail.gmail.com>
 From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Wed, 9 Sep 2020 21:52:29 -0700
-Message-ID: <CABmPvSG67wepg0wggf-r=wRhn_Lp8GgJ8Br5+fJg60=z=A5+yw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v1 3/7] adv_monitor: Implement RegisterMonitor()
+Date:   Wed, 9 Sep 2020 21:52:52 -0700
+Message-ID: <CABmPvSH=EXA+wainX4R=hNTxqkTQ-QzhbB4oo95AFN+ureTbcA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1 6/7] adv_monitor: Handle D-Bus proxy event of an
+ ADV monitor
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
         Alain Michaud <alainm@chromium.org>,
         Manish Mandlik <mmandlik@chromium.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Howard Chung <howardchung@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+        Howard Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -76,257 +76,607 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-On Tue, Sep 8, 2020 at 10:25 AM Luiz Augusto von Dentz
+On Tue, Sep 8, 2020 at 10:36 AM Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
 > Hi Miao,
 >
 > On Tue, Aug 18, 2020 at 3:31 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 > >
-> > This implements the RegisterMonitor() method handler of ADV monitor
-> > manager interface.
+> > This adds two handlers, one for adding and one for removing, of D-Bus proxy
+> > events. The handler of property changes is set to NULL as intended,
+> > since for simplicity no further changes on monitor's properties would
+> > affect the ongoing monitoring.
 > >
-> > The following tests were performed.
-> > - Issue a RegisterMonitor() call with a valid path and expect a
-> > success as return.
-> > - Issue a RegisterMonitor() call with an invalid path and expect
-> > org.bluez.Error.InvalidArguments as return.
-> > - Issue two Registermonitor() calls with the same path and expect
-> > org.bluez.Error.AlreadyExists.
-> > - Verify the values of the registered paths with logging.
-> > - Verify D-Bus disconnection callback was triggered when the client detach
-> > from D-Bus.
+> > The following test steps were performed with bluetoothctl.
+> > - After registering the root path, expose two monitors and verify that
+> > the proxy added event are received.
+> > - Have two monitors added, unexpose the monitors, and verify that the
+> > proxy removed events are received for those two monitors.
+> > - Have two monitors added, unregister the monitors and verify that the
+> > proxy removed events are received for those two monitors.
 > >
 > > Reviewed-by: Yun-Hao Chung <howardchung@google.com>
 > > Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > > ---
 > >
-> >  src/adv_monitor.c | 167 +++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 166 insertions(+), 1 deletion(-)
+> >  src/adv_monitor.c | 492 ++++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 479 insertions(+), 13 deletions(-)
 > >
 > > diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-> > index 4d02237e8..3d27ad18b 100644
+> > index b5ea5ee99..23fbc2b45 100644
 > > --- a/src/adv_monitor.c
 > > +++ b/src/adv_monitor.c
-> > @@ -22,7 +22,9 @@
-> >  #endif
-> >
-> >  #define _GNU_SOURCE
-> > +#include <errno.h>
-> >  #include <stdint.h>
-> > +#include <string.h>
-> >
-> >  #include <glib.h>
-> >  #include <dbus/dbus.h>
-> > @@ -34,7 +36,9 @@
-> >  #include "adapter.h"
+> > @@ -37,14 +37,23 @@
 > >  #include "dbus-common.h"
 > >  #include "log.h"
-> > +#include "src/error.h"
+> >  #include "src/error.h"
+> > +#include "src/shared/ad.h"
 > >  #include "src/shared/mgmt.h"
-> > +#include "src/shared/queue.h"
+> >  #include "src/shared/queue.h"
 > >  #include "src/shared/util.h"
 > >
 > >  #include "adv_monitor.h"
-> > @@ -52,12 +56,170 @@ struct btd_adv_monitor_manager {
-> >         uint16_t max_num_monitors;
-> >         uint8_t max_num_patterns;
 > >
-> > +       struct queue *apps;     /* apps who registered for Adv monitoring */
-> >  };
+> > +#define ADV_MONITOR_INTERFACE          "org.bluez.AdvertisementMonitor1"
+> >  #define ADV_MONITOR_MGR_INTERFACE      "org.bluez.AdvertisementMonitorManager1"
 > >
-> > +struct adv_monitor_app {
-> > +       struct btd_adv_monitor_manager *manager;
-> > +       char *owner;
+> > +#define ADV_MONITOR_UNSET_RSSI         127     /* dBm */
+> > +#define ADV_MONITOR_MAX_RSSI           20      /* dBm */
+> > +#define ADV_MONITOR_MIN_RSSI           -127    /* dBm */
+> > +#define ADV_MONITOR_UNSET_TIMER                0       /* second */
+> > +#define ADV_MONITOR_MIN_TIMER          1       /* second */
+> > +#define ADV_MONITOR_MAX_TIMER          300     /* second */
+> > +
+> >  struct btd_adv_monitor_manager {
+> >         struct btd_adapter *adapter;
+> >         struct mgmt *mgmt;
+> > @@ -66,6 +75,43 @@ struct adv_monitor_app {
+> >
+> >         DBusMessage *reg;
+> >         GDBusClient *client;
+> > +
+> > +       struct queue *monitors;
+> > +};
+> > +
+> > +enum monitor_type {
+> > +       MONITOR_TYPE_NONE,
+> > +       MONITOR_TYPE_OR_PATTERNS,
+> > +};
+> > +
+> > +enum monitor_state {
+> > +       MONITOR_STATE_NEW,      /* New but not yet init'ed with actual values */
+> > +       MONITOR_STATE_FAILED,   /* Failed to be init'ed */
+> > +       MONITOR_STATE_INITED,   /* Init'ed but not yet sent to kernel */
+> > +       MONITOR_STATE_HONORED,  /* Accepted by kernel */
+> > +};
+> > +
+> > +struct pattern {
+> > +       uint8_t ad_type;
+> > +       uint8_t offset;
+> > +       uint8_t length;
+> > +       uint8_t value[BT_AD_MAX_DATA_LEN];
+> > +};
+> > +
+> > +struct adv_monitor {
+> > +       struct adv_monitor_app *app;
+> > +       GDBusProxy *proxy;
 > > +       char *path;
 > > +
-> > +       DBusMessage *reg;
-> > +       GDBusClient *client;
+> > +       enum monitor_state state;       /* MONITOR_STATE_* */
+> > +
+> > +       int8_t high_rssi;               /* high RSSI threshold */
+> > +       uint16_t high_rssi_timeout;     /* high RSSI threshold timeout */
+> > +       int8_t low_rssi;                /* low RSSI threshold */
+> > +       uint16_t low_rssi_timeout;      /* low RSSI threshold timeout */
+> > +
+> > +       enum monitor_type type;         /* MONITOR_TYPE_* */
+> > +       struct queue *patterns;
+> >  };
+> >
+> >  struct app_match_data {
+> > @@ -73,6 +119,14 @@ struct app_match_data {
+> >         const char *path;
+> >  };
+> >
+> > +const struct adv_monitor_type {
+> > +       enum monitor_type type;
+> > +       const char *name;
+> > +} supported_types[] = {
+> > +       { MONITOR_TYPE_OR_PATTERNS, "or_patterns" },
+> > +       { },
 > > +};
 > > +
-> > +struct app_match_data {
-> > +       const char *owner;
-> > +       const char *path;
-> > +};
-> > +
-> > +/* Replies to an app's D-Bus message and unref it */
-> > +static void app_reply_msg(struct adv_monitor_app *app, DBusMessage *reply)
+> >  /* Replies to an app's D-Bus message and unref it */
+> >  static void app_reply_msg(struct adv_monitor_app *app, DBusMessage *reply)
+> >  {
+> > @@ -84,6 +138,52 @@ static void app_reply_msg(struct adv_monitor_app *app, DBusMessage *reply)
+> >         app->reg = NULL;
+> >  }
+> >
+> > +/* Frees a pattern */
+> > +static void pattern_free(void *data)
 > > +{
-> > +       if (!app || !app->reg || !reply)
+> > +       struct pattern *pattern = data;
+> > +
+> > +       if (!pattern)
 > > +               return;
 > > +
-> > +       g_dbus_send_message(btd_get_dbus_connection(), reply);
-> > +       dbus_message_unref(app->reg);
-> > +       app->reg = NULL;
+> > +       g_free(pattern);
 > > +}
 > > +
-> > +/* Destroys an app object along with related D-Bus handlers */
-> > +static void app_destroy(void *data)
+> > +/* Frees a monitor object */
+> > +static void monitor_free(void *data)
 > > +{
-> > +       struct adv_monitor_app *app = data;
+> > +       struct adv_monitor *monitor = data;
 > > +
-> > +       if (!app)
+> > +       if (!monitor)
 > > +               return;
 > > +
-> > +       DBG("Destroy Adv Monitor app %s at path %s", app->owner, app->path);
+> > +       monitor->app = NULL;
+> > +       g_dbus_proxy_unref(monitor->proxy);
+> > +       monitor->proxy = NULL;
+> > +       g_free(monitor->path);
+> > +       monitor->path = NULL;
 > > +
-> > +       if (app->reg) {
-> > +               app_reply_msg(app, btd_error_failed(app->reg,
-> > +                                               "Adv Monitor app destroyed"));
-> > +       }
+> > +       queue_destroy(monitor->patterns, pattern_free);
+> > +       monitor->patterns = NULL;
 > > +
-> > +       if (app->client) {
-> > +               g_dbus_client_set_disconnect_watch(app->client, NULL, NULL);
-> > +               g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL,
-> > +                                                       NULL);
-> > +               g_dbus_client_set_ready_watch(app->client, NULL, NULL);
-> > +               g_dbus_client_unref(app->client);
-> > +               app->client = NULL;
-> > +       }
+> > +       g_free(monitor);
+> > +}
 > > +
-> > +       g_free(app->owner);
-> > +       app->owner = NULL;
-> > +       g_free(app->path);
-> > +       app->path = NULL;
+> > +/* Calls Release() method of the remote Adv Monitor */
+> > +static void monitor_release(void *data, void *user_data)
+> > +{
+> > +       struct adv_monitor *monitor = data;
+> > +
+> > +       if (!monitor)
+> > +               return;
+> > +
+> > +       DBG("Calling Release() on Adv Monitor of owner %s at path %s",
+> > +               monitor->app->owner, monitor->path);
+> > +
+> > +       g_dbus_proxy_method_call(monitor->proxy, "Release", NULL, NULL, NULL,
+> > +                                       NULL);
+> > +}
+> > +
+> >  /* Destroys an app object along with related D-Bus handlers */
+> >  static void app_destroy(void *data)
+> >  {
+> > @@ -94,6 +194,9 @@ static void app_destroy(void *data)
+> >
+> >         DBG("Destroy Adv Monitor app %s at path %s", app->owner, app->path);
+> >
+> > +       queue_foreach(app->monitors, monitor_release, NULL);
+> > +       queue_destroy(app->monitors, monitor_free);
+> > +
+> >         if (app->reg) {
+> >                 app_reply_msg(app, btd_error_failed(app->reg,
+> >                                                 "Adv Monitor app destroyed"));
+> > @@ -139,6 +242,372 @@ static void app_ready_cb(GDBusClient *client, void *user_data)
+> >         app_reply_msg(app, dbus_message_new_method_return(app->reg));
+> >  }
+> >
+> > +/* Allocates an Adv Monitor */
+> > +static struct adv_monitor *monitor_new(struct adv_monitor_app *app,
+> > +                                               GDBusProxy *proxy)
+> > +{
+> > +       struct adv_monitor *monitor;
+> > +
+> > +       if (!app || !proxy)
+> > +               return NULL;
+> > +
+> > +       monitor = g_new0(struct adv_monitor, 1);
 >
-> Same comment as before, if the whole object would be free then there
-> is no need to reset each individual field.
+> new0
 Done.
 >
-> > +
-> > +       g_free(app);
-> > +}
-> > +
-> > +/* Handles a D-Bus disconnection event of an app */
-> > +static void app_disconnect_cb(DBusConnection *conn, void *user_data)
-> > +{
-> > +       struct adv_monitor_app *app = user_data;
-> > +
-> > +       btd_info(app->manager->adapter_id, "Adv Monitor app %s disconnected "
-> > +                       "from D-Bus", app->owner);
-> > +       if (app && queue_remove(app->manager->apps, app))
-> > +               app_destroy(app);
-> > +}
-> > +
-> > +/* Creates an app object, initiates it and sets D-Bus event handlers */
-> > +static struct adv_monitor_app *app_create(DBusConnection *conn,
-> > +                                       const char *sender, const char *path,
-> > +                                       struct btd_adv_monitor_manager *manager)
-> > +{
-> > +       struct adv_monitor_app *app;
-> > +
-> > +       if (!path || !sender || !manager)
+> > +       if (!monitor)
 > > +               return NULL;
 > > +
-> > +       app = g_new0(struct adv_monitor_app, 1);
->
-> Please use new0 instead of g_new0 in new code.
-Done.
->
-> > +       if (!app)
-> > +               return NULL;
+> > +       monitor->app = app;
+> > +       monitor->proxy = g_dbus_proxy_ref(proxy);
+> > +       monitor->path = g_strdup(g_dbus_proxy_get_path(proxy));
 > > +
-> > +       app->owner = g_strdup(sender);
-> > +       app->path = g_strdup(path);
-> > +       app->manager = manager;
-> > +       app->reg = NULL;
+> > +       monitor->state = MONITOR_STATE_NEW;
 > > +
-> > +       app->client = g_dbus_client_new(conn, sender, path);
-> > +       if (!app->client) {
-> > +               app_destroy(app);
-> > +               return NULL;
-> > +       }
+> > +       monitor->high_rssi = ADV_MONITOR_UNSET_RSSI;
+> > +       monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+> > +       monitor->low_rssi = ADV_MONITOR_UNSET_RSSI;
+> > +       monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
 > > +
-> > +       g_dbus_client_set_disconnect_watch(app->client, app_disconnect_cb, app);
-> > +       g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL, NULL);
-> > +       g_dbus_client_set_ready_watch(app->client, NULL, NULL);
+> > +       monitor->type = MONITOR_TYPE_NONE;
+> > +       monitor->patterns = NULL;
 > > +
-> > +       return app;
+> > +       return monitor;
 > > +}
 > > +
-> > +/* Matches an app based on its owner and path */
-> > +static bool app_match(const void *a, const void *b)
+> > +/* Matches a monitor based on its D-Bus path */
+> > +static bool monitor_match(const void *a, const void *b)
 > > +{
-> > +       const struct adv_monitor_app *app = a;
-> > +       const struct app_match_data *match = b;
+> > +       const GDBusProxy *proxy = b;
+> > +       const struct adv_monitor *monitor = a;
 > > +
-> > +       if (match->owner && strcmp(app->owner, match->owner))
+> > +       if (!proxy || !monitor)
 > > +               return false;
 > > +
-> > +       if (match->path && strcmp(app->path, match->path))
+> > +       if (strcmp(g_dbus_proxy_get_path(proxy), monitor->path) != 0)
 > > +               return false;
 > > +
 > > +       return true;
 > > +}
 > > +
-> > +/* Handles a RegisterMonitor D-Bus call */
-> > +static DBusMessage *register_monitor(DBusConnection *conn, DBusMessage *msg,
-> > +                                       void *user_data)
+> > +/* Retrieves Type from the remote Adv Monitor object, verifies the value and
+> > + * update the local Adv Monitor
+> > + */
+> > +static bool parse_monitor_type(struct adv_monitor *monitor, const char *path)
 > > +{
-> > +       DBusMessageIter args;
-> > +       struct app_match_data match;
-> > +       struct adv_monitor_app *app;
-> > +       struct btd_adv_monitor_manager *manager = user_data;
+> > +       DBusMessageIter iter;
+> > +       const struct adv_monitor_type *t;
+> > +       const char *type_str;
+> > +       uint16_t adapter_id = monitor->app->manager->adapter_id;
 > > +
-> > +       if (!dbus_message_iter_init(msg, &args))
-> > +               return btd_error_invalid_args(msg);
-> > +
-> > +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-> > +               return btd_error_invalid_args(msg);
-> > +
-> > +       dbus_message_iter_get_basic(&args, &match.path);
-> > +
-> > +       if (!strlen(match.path) || !g_str_has_prefix(match.path, "/"))
-> > +               return btd_error_invalid_args(msg);
-> > +
-> > +       match.owner = dbus_message_get_sender(msg);
-> > +
-> > +       if (queue_find(manager->apps, app_match, &match))
-> > +               return btd_error_already_exists(msg);
-> > +
-> > +       app = app_create(conn, match.owner, match.path, manager);
-> > +       if (!app) {
-> > +               btd_error(manager->adapter_id,
-> > +                               "Failed to reserve %s for Adv Monitor app %s",
-> > +                               match.path, match.owner);
-> > +               return btd_error_failed(msg,
-> > +                                       "Failed to create Adv Monitor app");
+> > +       if (!g_dbus_proxy_get_property(monitor->proxy, "Type", &iter)) {
+> > +               btd_error(adapter_id, "Failed to retrieve property Type from "
+> > +                       "the Adv Monitor at path %s", path);
+> > +               return false;
 > > +       }
 > > +
-> > +       queue_push_tail(manager->apps, app);
+> > +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+> > +               goto failed;
 > > +
-> > +       btd_info(manager->adapter_id, "Path %s reserved for Adv Monitor app %s",
-> > +                       match.path, match.owner);
+> > +       dbus_message_iter_get_basic(&iter, &type_str);
 > > +
-> > +       return dbus_message_new_method_return(msg);
+> > +       for (t = supported_types; t->name; t++) {
+> > +               if (strcmp(t->name, type_str) == 0) {
+> > +                       monitor->type = t->type;
+> > +                       return true;
+> > +               }
+> > +       }
+> > +
+> > +failed:
+> > +       btd_error(adapter_id, "Invalid argument of property Type of the Adv "
+> > +                       "Monitor at path %s", path);
+> > +
+> > +       return false;
 > > +}
 > > +
-> >  static const GDBusMethodTable adv_monitor_methods[] = {
-> >         { GDBUS_METHOD("RegisterMonitor",
-> >                                         GDBUS_ARGS({ "application", "o" }),
-> > -                                       NULL, NULL) },
-> > +                                       NULL, register_monitor) },
-> >         { GDBUS_ASYNC_METHOD("UnregisterMonitor",
-> >                                         GDBUS_ARGS({ "application", "o" }),
-> >                                         NULL, NULL) },
-> > @@ -157,6 +319,7 @@ static struct btd_adv_monitor_manager *manager_new(
-> >         manager->mgmt = mgmt_ref(mgmt);
-> >         manager->adapter_id = btd_adapter_get_index(adapter);
-> >         manager->path = g_strdup(adapter_get_path(manager->adapter));
-> > +       manager->apps = queue_new();
-> >
-> >         return manager;
-> >  }
-> > @@ -170,6 +333,8 @@ static void manager_free(struct btd_adv_monitor_manager *manager)
-> >         g_free(manager->path);
-> >         manager->path = NULL;
-> >
-> > +       queue_destroy(manager->apps, app_destroy);
+> > +/* Retrieves RSSIThresholdsAndTimers from the remote Adv Monitor object,
+> > + * verifies the values and update the local Adv Monitor
+> > + */
+> > +static bool parse_rssi_and_timeout(struct adv_monitor *monitor,
+> > +                                       const char *path)
+> > +{
+> > +       DBusMessageIter prop_struct, iter;
+> > +       int16_t h_rssi, l_rssi;
+> > +       uint16_t h_rssi_timer, l_rssi_timer;
+> > +       uint16_t adapter_id = monitor->app->manager->adapter_id;
 > > +
-> >         g_free(manager);
-> >  }
+> > +       /* Property RSSIThresholdsAndTimers is optional */
+> > +       if (!g_dbus_proxy_get_property(monitor->proxy,
+> > +                                       "RSSIThresholdsAndTimers",
+> > +                                       &prop_struct)) {
+> > +               DBG("Adv Monitor at path %s provides no RSSI thresholds and "
+> > +                       "timeouts", path);
+> > +               return true;
+> > +       }
+> > +
+> > +       if (dbus_message_iter_get_arg_type(&prop_struct) != DBUS_TYPE_STRUCT)
+> > +               goto failed;
+> > +
+> > +       dbus_message_iter_recurse(&prop_struct, &iter);
+> > +
+> > +       /* Extract HighRSSIThreshold */
+> > +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_INT16)
+> > +               goto failed;
+> > +       dbus_message_iter_get_basic(&iter, &h_rssi);
+> > +       if (!dbus_message_iter_next(&iter))
+> > +               goto failed;
+> > +
+> > +       /* Extract HighRSSIThresholdTimer */
+> > +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT16)
+> > +               goto failed;
+> > +       dbus_message_iter_get_basic(&iter, &h_rssi_timer);
+> > +       if (!dbus_message_iter_next(&iter))
+> > +               goto failed;
+> > +
+> > +       /* Extract LowRSSIThreshold */
+> > +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_INT16)
+> > +               goto failed;
+> > +       dbus_message_iter_get_basic(&iter, &l_rssi);
+> > +       if (!dbus_message_iter_next(&iter))
+> > +               goto failed;
+> > +
+> > +       /* Extract LowRSSIThresholdTimer */
+> > +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT16)
+> > +               goto failed;
+> > +       dbus_message_iter_get_basic(&iter, &l_rssi_timer);
+> > +
+> > +       /* Verify the values of RSSIs and their timers. For simplicity, we
+> > +        * enforce the all-or-none rule to these fields. In other words, either
+> > +        * all are set to the unset values or all are set within valid ranges.
+> > +        */
+> > +       if (h_rssi == ADV_MONITOR_UNSET_RSSI &&
+> > +               l_rssi == ADV_MONITOR_UNSET_RSSI &&
+> > +               h_rssi_timer == ADV_MONITOR_UNSET_TIMER &&
+> > +               l_rssi_timer == ADV_MONITOR_UNSET_TIMER) {
+> > +               goto done;
+> > +       }
+> > +
+> > +       if (h_rssi < ADV_MONITOR_MIN_RSSI || h_rssi > ADV_MONITOR_MAX_RSSI ||
+> > +               l_rssi < ADV_MONITOR_MIN_RSSI ||
+> > +               l_rssi > ADV_MONITOR_MAX_RSSI || h_rssi <= l_rssi) {
+> > +               goto failed;
+> > +       }
+> > +
+> > +       if (h_rssi_timer < ADV_MONITOR_MIN_TIMER ||
+> > +               h_rssi_timer > ADV_MONITOR_MAX_TIMER ||
+> > +               l_rssi_timer < ADV_MONITOR_MIN_TIMER ||
+> > +               l_rssi_timer > ADV_MONITOR_MAX_TIMER) {
+> > +               goto failed;
+> > +       }
+> > +
+> > +       monitor->high_rssi = h_rssi;
+> > +       monitor->low_rssi = l_rssi;
+> > +       monitor->high_rssi_timeout = h_rssi_timer;
+> > +       monitor->low_rssi_timeout = l_rssi_timer;
+> > +
+> > +done:
+> > +       DBG("Adv Monitor at %s initiated with high RSSI threshold %d, high "
+> > +               "RSSI threshold timeout %d, low RSSI threshold %d, low RSSI "
+> > +               "threshold timeout %d", path, monitor->high_rssi,
+> > +               monitor->high_rssi_timeout, monitor->low_rssi,
+> > +               monitor->low_rssi_timeout);
+> > +
+> > +       return true;
+> > +
+> > +failed:
+> > +       monitor->high_rssi = ADV_MONITOR_UNSET_RSSI;
+> > +       monitor->low_rssi = ADV_MONITOR_UNSET_RSSI;
+> > +       monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+> > +       monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+> > +
+> > +       btd_error(adapter_id, "Invalid argument of property "
+> > +                       "RSSIThresholdsAndTimers of the Adv Monitor at path %s",
+> > +                       path);
+> > +
+> > +       return false;
+> > +}
+> > +
+> > +/* Retrieves Patterns from the remote Adv Monitor object, verifies the values
+> > + * and update the local Adv Monitor
+> > + */
+> > +static bool parse_patterns(struct adv_monitor *monitor, const char *path)
+> > +{
+> > +       DBusMessageIter array, array_iter;
+> > +       uint16_t num_patterns = 0;
+> > +       uint16_t adapter_id = monitor->app->manager->adapter_id;
+> > +
+> > +       if (!g_dbus_proxy_get_property(monitor->proxy, "Patterns", &array)) {
+> > +               btd_error(adapter_id, "Failed to retrieve property Patterns "
+> > +                               "from the Adv Monitor at path %s", path);
+> > +               return false;
+> > +       }
+> > +
+> > +       monitor->patterns = queue_new();
+> > +
+> > +       if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_ARRAY ||
+> > +               dbus_message_iter_get_element_type(&array) !=
+> > +               DBUS_TYPE_STRUCT) {
+> > +               goto failed;
+> > +       }
+> > +
+> > +       dbus_message_iter_recurse(&array, &array_iter);
+> > +
+> > +       while (dbus_message_iter_get_arg_type(&array_iter) ==
+> > +               DBUS_TYPE_STRUCT) {
+> > +               int value_len;
+> > +               uint8_t *value;
+> > +               uint8_t offset, ad_type;
+> > +               struct pattern *pattern;
+> > +               DBusMessageIter struct_iter, value_iter;
+> > +
+> > +               dbus_message_iter_recurse(&array_iter, &struct_iter);
+> > +
+> > +               // Extract start position
+> > +               if (dbus_message_iter_get_arg_type(&struct_iter) !=
+> > +                       DBUS_TYPE_BYTE) {
+> > +                       goto failed;
+> > +               }
+> > +               dbus_message_iter_get_basic(&struct_iter, &offset);
+> > +               if (!dbus_message_iter_next(&struct_iter))
+> > +                       goto failed;
+> > +
+> > +               // Extract AD data type
+> > +               if (dbus_message_iter_get_arg_type(&struct_iter) !=
+> > +                       DBUS_TYPE_BYTE) {
+> > +                       goto failed;
+> > +               }
+> > +               dbus_message_iter_get_basic(&struct_iter, &ad_type);
+> > +               if (!dbus_message_iter_next(&struct_iter))
+> > +                       goto failed;
+> > +
+> > +               // Extract value of a pattern
+> > +               if (dbus_message_iter_get_arg_type(&struct_iter) !=
+> > +                       DBUS_TYPE_ARRAY) {
+> > +                       goto failed;
+> > +               }
+> > +               dbus_message_iter_recurse(&struct_iter, &value_iter);
+> > +               dbus_message_iter_get_fixed_array(&value_iter, &value,
+> > +                                                       &value_len);
+> > +
+> > +               // Verify the values
+> > +               if (offset > BT_AD_MAX_DATA_LEN - 1)
+> > +                       goto failed;
+> > +
+> > +               if (ad_type > BT_AD_3D_INFO_DATA &&
+> > +                       ad_type != BT_AD_MANUFACTURER_DATA
+> > +                       || ad_type < BT_AD_FLAGS) {
+> > +                       goto failed;
+> > +               }
+> > +
+> > +               if (!value || value_len <= 0 || value_len > BT_AD_MAX_DATA_LEN)
+> > +                       goto failed;
+> > +
+> > +               pattern = g_new0(struct pattern, 1);
+>
+> new0
+Done.
+>
+> > +               if (!pattern)
+> > +                       goto failed;
+> > +
+> > +               pattern->ad_type = ad_type;
+> > +               pattern->offset = offset;
+> > +               pattern->length = value_len;
+> > +               g_memmove(pattern->value, value, pattern->length);
+>
+> This looks wrong, we shouldn't be changing the memory value points to,
+> this might be equivalent to memcpy so Id just use that instead.
+Done.
+>
+> > +
+> > +               queue_push_tail(monitor->patterns, pattern);
+> > +
+> > +               dbus_message_iter_next(&array_iter);
+> > +       }
+> > +
+> > +       /* There must be at least one pattern. */
+> > +       if (queue_isempty(monitor->patterns))
+> > +               goto failed;
+> > +
+> > +       return true;
+> > +
+> > +failed:
+> > +       queue_destroy(monitor->patterns, pattern_free);
+> > +       monitor->patterns = NULL;
+> > +
+> > +       btd_error(adapter_id, "Invalid argument of property Patterns of the "
+> > +                       "Adv Monitor at path %s", path);
+> > +
+> > +       return false;
+> > +}
+> > +
+> > +/* Processes the content of the remote Adv Monitor */
+> > +static bool monitor_process(struct adv_monitor *monitor,
+> > +                               struct adv_monitor_app *app)
+> > +{
+> > +       const char *path = g_dbus_proxy_get_path(monitor->proxy);
+> > +
+> > +       monitor->state = MONITOR_STATE_FAILED;
+> > +
+> > +       if (!parse_monitor_type(monitor, path))
+> > +               goto done;
+> > +
+> > +       if (!parse_rssi_and_timeout(monitor, path))
+> > +               goto done;
+> > +
+> > +       if (monitor->type == MONITOR_TYPE_OR_PATTERNS &&
+> > +               parse_patterns(monitor, path)) {
+> > +               monitor->state = MONITOR_STATE_INITED;
+> > +       }
+> > +
+> > +done:
+> > +       return monitor->state != MONITOR_STATE_FAILED;
+> > +}
+> > +
+> > +/* Handles an Adv Monitor D-Bus proxy added event */
+> > +static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
+> > +{
+> > +       struct adv_monitor *monitor;
+> > +       struct adv_monitor_app *app = user_data;
+> > +       uint16_t adapter_id = app->manager->adapter_id;
+> > +       const char *path = g_dbus_proxy_get_path(proxy);
+> > +       const char *iface = g_dbus_proxy_get_interface(proxy);
+> > +
+> > +       if (strcmp(iface, ADV_MONITOR_INTERFACE) != 0 ||
+> > +               !g_str_has_prefix(path, app->path)) {
+> > +               return;
+> > +       }
+> > +
+> > +       if (queue_find(app->monitors, monitor_match, proxy)) {
+> > +               btd_error(adapter_id, "Adv Monitor proxy already exists with "
+> > +                               "path %s", path);
+> > +               return;
+> > +       }
+> > +
+> > +       monitor = monitor_new(app, proxy);
+> > +       if (!monitor) {
+> > +               btd_error(adapter_id, "Failed to allocate an Adv Monitor for "
+> > +                               "the object at %s", path);
+> > +               return;
+> > +       }
+> > +
+> > +       if (!monitor_process(monitor, app)) {
+> > +               monitor_release(monitor, NULL);
+> > +               monitor_free(monitor);
+> > +               DBG("Adv Monitor at path %s released due to invalid content",
+> > +                       path);
+> > +               return;
+> > +       }
+> > +
+> > +       queue_push_tail(app->monitors, monitor);
+> > +
+> > +       DBG("Adv Monitor allocated for the object at path %s", path);
+> > +}
+> > +
+> > +/* Handles the removal of an Adv Monitor D-Bus proxy */
+> > +static void monitor_proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+> > +{
+> > +       struct adv_monitor *monitor;
+> > +       struct adv_monitor_app *app = user_data;
+> > +
+> > +       monitor = queue_remove_if(app->monitors, monitor_match, proxy);
+> > +       if (monitor) {
+> > +               DBG("Adv Monitor removed for the object at path %s",
+> > +                       monitor->path);
+> > +
+> > +               /* The object was gone, so we don't need to call Release() */
+> > +               monitor_free(monitor);
+> > +       }
+> > +}
+> > +
+> >  /* Creates an app object, initiates it and sets D-Bus event handlers */
+> >  static struct adv_monitor_app *app_create(DBusConnection *conn,
+> >                                         DBusMessage *msg, const char *sender,
+> > @@ -165,8 +634,17 @@ static struct adv_monitor_app *app_create(DBusConnection *conn,
+> >                 return NULL;
+> >         }
 > >
+> > +       app->monitors = queue_new();
+> > +
+> >         g_dbus_client_set_disconnect_watch(app->client, app_disconnect_cb, app);
+> > -       g_dbus_client_set_proxy_handlers(app->client, NULL, NULL, NULL, NULL);
+> > +
+> > +       /* Note that any property changes on a monitor object would not affect
+> > +        * the content of the corresponding monitor.
+> > +        */
+> > +       g_dbus_client_set_proxy_handlers(app->client, monitor_proxy_added_cb,
+> > +                                               monitor_proxy_removed_cb, NULL,
+> > +                                               app);
+> > +
+> >         g_dbus_client_set_ready_watch(app->client, app_ready_cb, app);
+> >
+> >         app->reg = dbus_message_ref(msg);
+> > @@ -273,18 +751,6 @@ static const GDBusMethodTable adv_monitor_methods[] = {
+> >         { }
+> >  };
+> >
+> > -enum monitor_type {
+> > -       MONITOR_TYPE_OR_PATTERNS,
+> > -};
+> > -
+> > -const struct adv_monitor_type {
+> > -       enum monitor_type type;
+> > -       const char *name;
+> > -} supported_types[] = {
+> > -       { MONITOR_TYPE_OR_PATTERNS, "or_patterns" },
+> > -       { },
+> > -};
+> > -
+> >  /* Gets SupportedMonitorTypes property */
+> >  static gboolean get_supported_monitor_types(const GDBusPropertyTable *property,
+> >                                                 DBusMessageIter *iter,
 > > --
 > > 2.26.2
 > >
