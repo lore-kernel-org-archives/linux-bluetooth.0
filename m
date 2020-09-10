@@ -2,127 +2,103 @@ Return-Path: <SRS0=wtMD=CT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26364C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 20:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B65BC43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:16:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB795214F1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 20:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5EDE208A9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlGQF9Xu"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jfRasZRM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727853AbgIJUuw (ORCPT
+        id S1725468AbgIJXP7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 16:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60508 "EHLO
+        Thu, 10 Sep 2020 19:15:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730068AbgIJO6n (ORCPT
+        with ESMTP id S1725283AbgIJXP6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 10:58:43 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8A8C061795;
-        Thu, 10 Sep 2020 07:58:40 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id k13so1044584plk.3;
-        Thu, 10 Sep 2020 07:58:40 -0700 (PDT)
+        Thu, 10 Sep 2020 19:15:58 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED714C061573
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:15:57 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id md22so1833087pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:15:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=c+jIOhRgqonxn9gWi6l8ZpfFwoQ7z7WBsHFiC8anX4Q=;
-        b=XlGQF9XuctO2DJYPSPyHeW/lhATtADGhO23JHJstE97qMSAVFSOSjRevCHH7cLnmaa
-         jKTk78ZhaxVjcb8GFw6y0ZK8/pc8YFnqe4Lgfvm350Yr4zOuigj1OwYcEZBH3Fa4Hopd
-         f2JXQHcI7zIHWelYGT6BuO83OC2dMWcNELYXUx4ZjPMrYWABvYwXh5wvauERBXEA/KCj
-         zCt73zratrDhMlwwRpv+qOG+TmdiqmVO5iKLq0V6KvZD3HDG8fJW3c7nnv6bHUbecrJX
-         YSQ8qskzWdy9o9G+gn160C00yYczl8y5zKz5xQ/4lfR4AV2VL6BYF64Yo15qph5FiK4V
-         D1Xw==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2F5IK3qZINJFDEk93oe4o+MOz1G8iOkBit6CICWcYW8=;
+        b=jfRasZRMcAvd4x1ZNWM1q00IZXvYjePr/UPbQO/ByaYen9gfVeFY3ku86CfOaFK9zO
+         1zW+VSnpqxBNcVbmL7i6KkDNLsYLsprwxpt33134exD1lttWz0Pt5hKQmjzU9cggkFrw
+         7NC0GbyBtcSXokbtRquCpNmX7j04Zs/qR8xGI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=c+jIOhRgqonxn9gWi6l8ZpfFwoQ7z7WBsHFiC8anX4Q=;
-        b=k1iFeVdRvPFwGcc0KG0CviBRulCH75QjTnk6SXPF0lHxkYlyHfFA19DEGfmF+urN5h
-         H3+B6NPyJ/iuqWO8us4gURIUrpOT7I9F9bUu0mOGWQOIGSOhOgaxyPUANtKjkMB37EoC
-         h3yZDlRt9rtaJN3YFKVCTAb7k06eWGU9ue1hE+QO1x+70mWpEdqRjzCd0EgPDr4ZamVQ
-         R9HN7EsZHB21qcSFH3vjYeoUVeFRheuG6itE/Vljqetj63N5d7XgZ5VSQFCRZU60HYQG
-         4ZPCuvHpMioau1V361I9AxZgGAOXD2o/UE9CU2J9nda9cukoEIdUZjrjXGS+ZJRFWzbr
-         L6og==
-X-Gm-Message-State: AOAM530NfY/T/L/SLP+oICPO8LR/KgGsSoZpsQb8TTs8+9hkzMfSIusK
-        Paor6MEoIkLzDsdjg17/m9c=
-X-Google-Smtp-Source: ABdhPJyTyJInU3Ew5guC7S18EaBMn+CWm5koR7QxwkkRlVYQ2qn3nQcqOq07OGTmQ8ifN6WumFExOg==
-X-Received: by 2002:a17:90a:81:: with SMTP id a1mr336645pja.136.1599749920004;
-        Thu, 10 Sep 2020 07:58:40 -0700 (PDT)
-Received: from Thinkpad ([45.118.165.135])
-        by smtp.gmail.com with ESMTPSA id j2sm5424250pga.12.2020.09.10.07.58.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2020 07:58:39 -0700 (PDT)
-Date:   Thu, 10 Sep 2020 20:28:31 +0530
-From:   Anmol Karn <anmol.karan123@gmail.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        kuba@kernel.org, davem@davemloft.net,
-        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-Subject: Re: [Linux-kernel-mentees] [PATCH] net: bluetooth: Fix null pointer
- dereference in hci_event_packet()
-Message-ID: <20200910145831.GA33757@Thinkpad>
-References: <20200910043424.19894-1-anmol.karan123@gmail.com>
- <20200910104918.GF12635@kadam>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2F5IK3qZINJFDEk93oe4o+MOz1G8iOkBit6CICWcYW8=;
+        b=dwCglpFW+2D4XQJ6QwVupHX3h9Fy9dex3B+WB7zIg5gwUwC7EWCWEk/8vim0aDrfTR
+         Ermpt3DwmvCBWXsRCyjWGUyMsKeSoVAIgxwTbMauRbOjp5Yp+wgGONJYwA4WT7uZZkGi
+         +PXFPTGcl9cbVFJKN6gImW/+r0yq1+ks2aw13897jsqyxFIigGemifArAmtBxlhNFYT7
+         UBQjISWBjs7op/vn83haoEPHQOS0fbxsSU/c8Stu635R44zEupBImHGAVCxKPLbCb7LY
+         ruWk0Wl1AS0p1GJwSED0HnN0fwAgPtfVQ7z12NtAE63yYjoIq2J1wXLLTV9LZnVdLmSb
+         Myew==
+X-Gm-Message-State: AOAM530P4Yn8A2hWFiORs5juj9ENILwNSST9dQqm7/556WiBZf6ZEzj0
+        imOvqB5hovgUIFPDvphJ+gbVCq7VqCpBNQ==
+X-Google-Smtp-Source: ABdhPJzpMByzqa+jMtoioFNTdJjgfYt+tVzwWXGSXdO8JiL9GFXv3cn+VNGz7GfgdTg+wV0y3HDKtQ==
+X-Received: by 2002:a17:90a:a111:: with SMTP id s17mr2175091pjp.28.1599779757122;
+        Thu, 10 Sep 2020 16:15:57 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
+        by smtp.gmail.com with ESMTPSA id k29sm76790pgf.21.2020.09.10.16.15.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Sep 2020 16:15:56 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Howard Chung <howardchung@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v4 1/8] adapter: Remove indirect dependency of headers
+Date:   Thu, 10 Sep 2020 16:15:42 -0700
+Message-Id: <20200910161528.BlueZ.v4.1.Iaa9dc2a66de5fbfa97627e1dbeb800116d3aa91e@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910104918.GF12635@kadam>
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 01:49:18PM +0300, Dan Carpenter wrote:
-> On Thu, Sep 10, 2020 at 10:04:24AM +0530, Anmol Karn wrote:
-> > Prevent hci_phy_link_complete_evt() from dereferencing 'hcon->amp_mgr'
-> > as NULL. Fix it by adding pointer check for it.
-> > 
-> > Reported-and-tested-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-> > Link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f
-> > Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
-> > ---
-> >  net/bluetooth/hci_event.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 4b7fc430793c..871e16804433 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -4936,6 +4936,11 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
-> >  		return;
-> >  	}
-> >  
-> > +	if (IS_ERR_OR_NULL(hcon->amp_mgr)) {
-> 
-> It can't be an error pointer.  Shouldn't we call hci_conn_del() on this
-> path?  Try to find the Fixes tag to explain how this bug was introduced.
-> 
-> (Don't rush to send a v2.  The patch requires quite a bit more digging
-> and detective work before it is ready).
-> 
-> > +		hci_dev_unlock(hdev);
-> > +		return;
-> > +	}
-> > +
-> >  	if (ev->status) {
-> >  		hci_conn_del(hcon);
-> >  		hci_dev_unlock(hdev);
-> 
-> regards,
-> dan carpenter
-> 
+Given that adapter.h refers symbols from lib/bluetooth.h and lib/sdp.h,
+these two headers should be included directly in adapter.h.
 
-Sure sir, will  work on it, thanks for your review.
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+---
 
-Anmol Karn
+(no changes since v1)
+
+ src/adapter.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/adapter.h b/src/adapter.h
+index f8ac20261..c70a7b0da 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -26,6 +26,9 @@
+ #include <dbus/dbus.h>
+ #include <glib.h>
+ 
++#include <lib/bluetooth.h>
++#include <lib/sdp.h>
++
+ #define MAX_NAME_LENGTH		248
+ 
+ /* Invalid SSP passkey value used to indicate negative replies */
+-- 
+2.26.2
+
