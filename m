@@ -2,199 +2,141 @@ Return-Path: <SRS0=wtMD=CT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F08B3C2BB84
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F155AC43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:31:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A022C20770
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599726938;
-	bh=SD0dmJJv6vSBrUN7jvV2f2sRRzybcerT3eKetcVqdQw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VYPbv6NQcCZBD6pccA/5vDLg5yl4Czvefdh9Ak8JMkXQja9QI35JYNn5QHYr2D38S
-	 ZUkM2VtxdLgSKegzwZF8puYRDtHldWGxVNJAmY42kHKnqepKOjPjGrIkDmQhFMBiRk
-	 aZ/SOGXB6fNwK7Q2VkCKqzuX57/Wz/zZ/AKmnFww=
+	by mail.kernel.org (Postfix) with ESMTP id AEE532145D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:31:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730206AbgIJIeQ (ORCPT
+        id S1730413AbgIJKbT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 04:34:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45754 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730233AbgIJISq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 04:18:46 -0400
-Received: from pali.im (pali.im [31.31.79.79])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E79C12067C;
-        Thu, 10 Sep 2020 08:18:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599725925;
-        bh=SD0dmJJv6vSBrUN7jvV2f2sRRzybcerT3eKetcVqdQw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uEINzhZcpaEtvEKwQMgt6n/OBSCCc3nE3T7XkwdRNunnBiXTVTl07NW7DRlLUa5gs
-         nOxa12Qm6wVU+JDb4DLdTBa5ho+WxQrShDZ447/Vpjj57UKaonLgIdbVhfd9mkZ+jx
-         u/fVgau+DWMn+eg09xHeeP5XLzkgCAX7lK9HwGfQ=
-Received: by pali.im (Postfix)
-        id 49AEE582; Thu, 10 Sep 2020 10:18:42 +0200 (CEST)
-Date:   Thu, 10 Sep 2020 10:18:42 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Joseph Hwang <josephsih@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, chromeos-bluetooth-upstreaming@chromium.org,
-        josephsih@google.com, Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: define HCI packet sizes of USB
- Alts
-Message-ID: <20200910081842.yunymr2l4fnle5nl@pali>
-References: <20200910060403.144524-1-josephsih@chromium.org>
- <20200910140342.v3.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910140342.v3.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
-User-Agent: NeoMutt/20180716
+        Thu, 10 Sep 2020 06:31:19 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:15346 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726600AbgIJKbO (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Sep 2020 06:31:14 -0400
+Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
+  by alexa-out.qualcomm.com with ESMTP; 10 Sep 2020 03:31:13 -0700
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg09-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 10 Sep 2020 03:31:12 -0700
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 10 Sep 2020 16:00:44 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id BE530213A1; Thu, 10 Sep 2020 16:00:45 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [RESEND v1 1/2] Bluetooth: hci_serdev: Close UART port if NON_PERSISTENT_SETUP is set
+Date:   Thu, 10 Sep 2020 16:00:42 +0530
+Message-Id: <1599733843-20311-2-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1599733843-20311-1-git-send-email-gubbaven@codeaurora.org>
+References: <1599733843-20311-1-git-send-email-gubbaven@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thursday 10 September 2020 14:04:01 Joseph Hwang wrote:
-> It is desirable to define the HCI packet payload sizes of
-> USB alternate settings so that they can be exposed to user
-> space.
-> 
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> ---
-> 
-> Changes in v3:
-> - Set hdev->sco_mtu to rp->sco_mtu if the latter is smaller.
-> 
-> Changes in v2:
-> - Used sco_mtu instead of a new sco_pkt_len member in hdev.
-> - Do not overwrite hdev->sco_mtu in hci_cc_read_buffer_size
->   if it has been set in the USB interface.
-> 
->  drivers/bluetooth/btusb.c | 45 +++++++++++++++++++++++++++++----------
->  net/bluetooth/hci_event.c | 14 +++++++++++-
->  2 files changed, 47 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fe80588c7bd3a8..651d5731a6c6cf 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -459,6 +459,24 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
->  #define BTUSB_WAKEUP_DISABLE	14
->  #define BTUSB_USE_ALT1_FOR_WBS	15
->  
-> +/* Per core spec 5, vol 4, part B, table 2.1,
-> + * list the hci packet payload sizes for various ALT settings.
-> + * This is used to set the packet length for the wideband speech.
-> + * If a controller does not probe its usb alt setting, the default
-> + * value will be 0. Any clients at upper layers should interpret it
-> + * as a default value and set a proper packet length accordingly.
-> + *
-> + * To calculate the HCI packet payload length:
-> + *   for alternate settings 1 - 5:
-> + *     hci_packet_size = suggested_max_packet_size * 3 (packets) -
-> + *                       3 (HCI header octets)
-> + *   for alternate setting 6:
-> + *     hci_packet_size = suggested_max_packet_size - 3 (HCI header octets)
-> + *   where suggested_max_packet_size is {9, 17, 25, 33, 49, 63}
-> + *   for alt settings 1 - 6.
+When HCI_QUIRK_NON_PERSISTENT_SETUP is set by drivers,
+it indicates that BT SoC will be completely powered OFF
+during BT OFF. On next BT ON firmware must be downloaded
+again. Holding UART port open during BT OFF is draining
+the battery. Now during BT OFF, UART port is closed if
+qurik HCI_QUIRK_NON_PERSISTENT_SETUP is set by clearing
+HCI_UART_PROTO_READY proto flag. On next BT ON, UART
+port is opened if HCI_UART_PROTO_READY proto flag is cleared.
 
-Thank you for update, now I see what you mean!
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/hci_serdev.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-> + */
-> +static const int hci_packet_size_usb_alt[] = { 0, 24, 48, 72, 96, 144, 60 };
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 3977bba..ef96ad0 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -113,8 +113,22 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
+ {
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	int err;
++
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
++	/* When Quirk HCI_QUIRK_NON_PERSISTENT_SETUP is set by
++	 * driver, BT SoC is completely turned OFF during
++	 * BT OFF. Upon next BT ON UART port should be opened.
++	 */
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++		err = serdev_device_open(hu->serdev);
++		if (err)
++			return err;
++		set_bit(HCI_UART_PROTO_READY, &hu->flags);
++	}
++
+ 	/* Undo clearing this from hci_uart_close() */
+ 	hdev->flush = hci_uart_flush;
+ 
+@@ -124,11 +138,25 @@ static int hci_uart_open(struct hci_dev *hdev)
+ /* Close device */
+ static int hci_uart_close(struct hci_dev *hdev)
+ {
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
+ 	BT_DBG("hdev %p", hdev);
+ 
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return 0;
++
+ 	hci_uart_flush(hdev);
+ 	hdev->flush = NULL;
+ 
++	/* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by driver,
++	 * BT SOC is completely powered OFF during BT OFF, holding port
++	 * open may drain the battery.
++	 */
++	if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		serdev_device_close(hu->serdev);
++	}
++
+ 	return 0;
+ }
+ 
+@@ -354,8 +382,6 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+ 
+-	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-
+ 	cancel_work_sync(&hu->init_ready);
+ 	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		hci_unregister_dev(hdev);
+@@ -364,6 +390,10 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	cancel_work_sync(&hu->write_work);
+ 
+ 	hu->proto->close(hu);
+-	serdev_device_close(hu->serdev);
++
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		serdev_device_close(hu->serdev);
++	}
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
-Now the another question, why you are using hci_packet_size_usb_alt[1]
-and hci_packet_size_usb_alt[6] values from this array?
-
-> +
->  struct btusb_data {
->  	struct hci_dev       *hdev;
->  	struct usb_device    *udev;
-> @@ -3959,6 +3977,15 @@ static int btusb_probe(struct usb_interface *intf,
->  	hdev->notify = btusb_notify;
->  	hdev->prevent_wake = btusb_prevent_wake;
->  
-> +	if (id->driver_info & BTUSB_AMP) {
-> +		/* AMP controllers do not support SCO packets */
-> +		data->isoc = NULL;
-> +	} else {
-> +		/* Interface orders are hardcoded in the specification */
-> +		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> +		data->isoc_ifnum = ifnum_base + 1;
-> +	}
-> +
->  #ifdef CONFIG_PM
->  	err = btusb_config_oob_wake(hdev);
->  	if (err)
-> @@ -4022,6 +4049,10 @@ static int btusb_probe(struct usb_interface *intf,
->  		hdev->set_diag = btintel_set_diag;
->  		hdev->set_bdaddr = btintel_set_bdaddr;
->  		hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> +
-> +		if (btusb_find_altsetting(data, 6))
-> +			hdev->sco_mtu = hci_packet_size_usb_alt[6];
-
-Why you are setting this sco_mtu only for Intel adapter? Is not this
-whole code generic to USB?
-
-> +
->  		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
->  		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->  		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> @@ -4063,15 +4094,6 @@ static int btusb_probe(struct usb_interface *intf,
->  		btusb_check_needs_reset_resume(intf);
->  	}
->  
-> -	if (id->driver_info & BTUSB_AMP) {
-> -		/* AMP controllers do not support SCO packets */
-> -		data->isoc = NULL;
-> -	} else {
-> -		/* Interface orders are hardcoded in the specification */
-> -		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> -		data->isoc_ifnum = ifnum_base + 1;
-> -	}
-> -
->  	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
->  	    (id->driver_info & BTUSB_REALTEK)) {
->  		hdev->setup = btrtl_setup_realtek;
-> @@ -4083,9 +4105,10 @@ static int btusb_probe(struct usb_interface *intf,
->  		 * (DEVICE_REMOTE_WAKEUP)
->  		 */
->  		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-> -		if (btusb_find_altsetting(data, 1))
-> +		if (btusb_find_altsetting(data, 1)) {
->  			set_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags);
-> -		else
-> +			hdev->sco_mtu = hci_packet_size_usb_alt[1];
-
-And this part of code which you write is Realtek specific.
-
-I thought that this is something generic to bluetooth usb as you pointed
-to bluetooth documentation "core spec 5, vol 4, part B, table 2.1".
-
-> +		} else
->  			bt_dev_err(hdev, "Device does not support ALT setting 1");
->  	}
-
-Also this patch seems to be for me incomplete or not fully correct as
-USB altsetting is chosen in function btusb_work() and it depends on
-selected AIR mode (which is configured by another setsockopt).
-
-So despite what is written in commit message, this patch looks for me
-like some hack for Intel and Realtek bluetooth adapters and does not
-solve problems in vendor independent manner.
