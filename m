@@ -2,216 +2,118 @@ Return-Path: <SRS0=wtMD=CT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D19C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 06:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F88C43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 08:34:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E20520756
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 06:05:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SQZNXcqU"
+	by mail.kernel.org (Postfix) with ESMTP id 600F72076C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 08:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599726853;
+	bh=+uYj31dIE6aLQLGtOUfoRlwyftNHQyhq7bqNm1EFOzs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RFmQYNSOSuYc4tqiGMqKFp6MY301Yya1J9d/swm/YsjQuIywKd7Rk58oLrSUtC/2y
+	 yFIZIIihmnld55n8x7m06cHTJgO1Ps71vuOH4oXAJ2gqlR8r4tSLyx61ittK4qtBXn
+	 UgJkmyvqKrG77MpYsJaF033SbtDcBPRABwKpwFhQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728936AbgIJGFM (ORCPT
+        id S1730431AbgIJIds (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 02:05:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33748 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726647AbgIJGEP (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 02:04:15 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B2FC061757
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 23:04:15 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id u3so2511270pjr.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 23:04:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=vZWQw2MqezQSjPCg0Dku6/BdcAwBC3dDRSyH4V8pXAg=;
-        b=SQZNXcqU0ZuZn0AJkjqfkWCEklXGWMXhKkzRoLq85tYAhNvLeQZSzS+KpCuZ4KpW72
-         wwTVKXiK5Htjys+hkHZ4/YNhZ+CMji2am9sulpMpqCVjWq14byniLkA0VLeLPIRZJUKi
-         4m85yH8ncqbDTCRcwW9Wx+9C7mtjIdGEjrx54=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vZWQw2MqezQSjPCg0Dku6/BdcAwBC3dDRSyH4V8pXAg=;
-        b=T4t36uruVQ0ZCRnhc3bXqfpnoUOE6p0KJOEMeEbOuEp63RhX75F1wDH+EyJ19rpUwl
-         hsGmBKIXWAfmnL05km4l+7eeGu7mE/OV0lnj4Yb4U1wLG+E9snydpGBAxMVIZJ3weGUB
-         UXPMS6qTaUx4HnGTRBOSNa/YqycSbhVbt7naQzPHxdqvM9S5Z7QALSlQ0WZQaEOmtgvo
-         mTrkXgN+c0TxcqSltvMDDdDA6pDMT9LSvWuLImiQFGiaYI32rZ4JTMK1djikBkERNE6H
-         0GNwcGdifBJgp60yNHtYZZVi8lZez48I5siXNRBPSOfFF2h92iYwiKvcR8v+gsc7EK+/
-         /oQA==
-X-Gm-Message-State: AOAM532TGyOg7cQ1QyQsq0ua3E8frEKftu7lPHhHAFqawrEDD+pZxRxK
-        SBNp47Ub3w3rDb08JVhk9LA6dlgLjRmPbhz7
-X-Google-Smtp-Source: ABdhPJyxgMEM0piakxuNRBDbU1TVf/izPnfSQ3fQIf5qgxZExhxTcQhq8L6R1tcELWl8gyxoUEj3Dg==
-X-Received: by 2002:a17:90b:3105:: with SMTP id gc5mr3924629pjb.225.1599717854210;
-        Wed, 09 Sep 2020 23:04:14 -0700 (PDT)
-Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:de4a:3eff:fe7d:ff5f])
-        by smtp.gmail.com with ESMTPSA id j14sm893236pjz.21.2020.09.09.23.04.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2020 23:04:13 -0700 (PDT)
-From:   Joseph Hwang <josephsih@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
-        Joseph Hwang <josephsih@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
+        Thu, 10 Sep 2020 04:33:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46546 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730273AbgIJIUf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Sep 2020 04:20:35 -0400
+Received: from pali.im (pali.im [31.31.79.79])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9878720732;
+        Thu, 10 Sep 2020 08:20:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599726002;
+        bh=+uYj31dIE6aLQLGtOUfoRlwyftNHQyhq7bqNm1EFOzs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kMedj2nqh7AnwsubKUx2cDGygfPeMZ/DC22/dIFpecBdxjizUINcIlzCJEoaIbbIN
+         UWw0szHE23w4EXoWTQS5bdHpXZJn+r4Qn69vCnYUsWm6z4fAaxGT/Xg3uOtH4R0Mwv
+         MHIGn/OTGcDdKwWYo8ufZTdtJgupVMoBGdzsB9ys=
+Received: by pali.im (Postfix)
+        id 736C6582; Thu, 10 Sep 2020 10:20:00 +0200 (CEST)
+Date:   Thu, 10 Sep 2020 10:20:00 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Joseph Hwang <josephsih@chromium.org>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, chromeos-bluetooth-upstreaming@chromium.org,
+        josephsih@google.com, Alain Michaud <alainm@chromium.org>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v3 1/2] Bluetooth: btusb: define HCI packet sizes of USB Alts
-Date:   Thu, 10 Sep 2020 14:04:01 +0800
-Message-Id: <20200910140342.v3.1.I56de28ec171134cb9f97062e2c304a72822ca38b@changeid>
-X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-In-Reply-To: <20200910060403.144524-1-josephsih@chromium.org>
+Subject: Re: [PATCH v3 2/2] Bluetooth: sco: new getsockopt options
+ BT_SNDMTU/BT_RCVMTU
+Message-ID: <20200910082000.aiw74ll3z776yqgh@pali>
 References: <20200910060403.144524-1-josephsih@chromium.org>
+ <20200910140342.v3.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200910140342.v3.2.I03247d3813c6dcbcdbeab26d068f9fd765edb1f5@changeid>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It is desirable to define the HCI packet payload sizes of
-USB alternate settings so that they can be exposed to user
-space.
+On Thursday 10 September 2020 14:04:02 Joseph Hwang wrote:
+> This patch defines new getsockopt options BT_SNDMTU/BT_RCVMTU
+> for SCO socket to be compatible with other bluetooth sockets.
+> These new options return the same value as option SCO_OPTIONS
+> which is already present on existing kernels.
+> 
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
----
+Looks good,
 
-Changes in v3:
-- Set hdev->sco_mtu to rp->sco_mtu if the latter is smaller.
+Reviewed-by: Pali Rohár <pali@kernel.org>
 
-Changes in v2:
-- Used sco_mtu instead of a new sco_pkt_len member in hdev.
-- Do not overwrite hdev->sco_mtu in hci_cc_read_buffer_size
-  if it has been set in the USB interface.
-
- drivers/bluetooth/btusb.c | 45 +++++++++++++++++++++++++++++----------
- net/bluetooth/hci_event.c | 14 +++++++++++-
- 2 files changed, 47 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fe80588c7bd3a8..651d5731a6c6cf 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -459,6 +459,24 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- #define BTUSB_WAKEUP_DISABLE	14
- #define BTUSB_USE_ALT1_FOR_WBS	15
- 
-+/* Per core spec 5, vol 4, part B, table 2.1,
-+ * list the hci packet payload sizes for various ALT settings.
-+ * This is used to set the packet length for the wideband speech.
-+ * If a controller does not probe its usb alt setting, the default
-+ * value will be 0. Any clients at upper layers should interpret it
-+ * as a default value and set a proper packet length accordingly.
-+ *
-+ * To calculate the HCI packet payload length:
-+ *   for alternate settings 1 - 5:
-+ *     hci_packet_size = suggested_max_packet_size * 3 (packets) -
-+ *                       3 (HCI header octets)
-+ *   for alternate setting 6:
-+ *     hci_packet_size = suggested_max_packet_size - 3 (HCI header octets)
-+ *   where suggested_max_packet_size is {9, 17, 25, 33, 49, 63}
-+ *   for alt settings 1 - 6.
-+ */
-+static const int hci_packet_size_usb_alt[] = { 0, 24, 48, 72, 96, 144, 60 };
-+
- struct btusb_data {
- 	struct hci_dev       *hdev;
- 	struct usb_device    *udev;
-@@ -3959,6 +3977,15 @@ static int btusb_probe(struct usb_interface *intf,
- 	hdev->notify = btusb_notify;
- 	hdev->prevent_wake = btusb_prevent_wake;
- 
-+	if (id->driver_info & BTUSB_AMP) {
-+		/* AMP controllers do not support SCO packets */
-+		data->isoc = NULL;
-+	} else {
-+		/* Interface orders are hardcoded in the specification */
-+		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-+		data->isoc_ifnum = ifnum_base + 1;
-+	}
-+
- #ifdef CONFIG_PM
- 	err = btusb_config_oob_wake(hdev);
- 	if (err)
-@@ -4022,6 +4049,10 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_diag = btintel_set_diag;
- 		hdev->set_bdaddr = btintel_set_bdaddr;
- 		hdev->cmd_timeout = btusb_intel_cmd_timeout;
-+
-+		if (btusb_find_altsetting(data, 6))
-+			hdev->sco_mtu = hci_packet_size_usb_alt[6];
-+
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-@@ -4063,15 +4094,6 @@ static int btusb_probe(struct usb_interface *intf,
- 		btusb_check_needs_reset_resume(intf);
- 	}
- 
--	if (id->driver_info & BTUSB_AMP) {
--		/* AMP controllers do not support SCO packets */
--		data->isoc = NULL;
--	} else {
--		/* Interface orders are hardcoded in the specification */
--		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
--		data->isoc_ifnum = ifnum_base + 1;
--	}
--
- 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
- 	    (id->driver_info & BTUSB_REALTEK)) {
- 		hdev->setup = btrtl_setup_realtek;
-@@ -4083,9 +4105,10 @@ static int btusb_probe(struct usb_interface *intf,
- 		 * (DEVICE_REMOTE_WAKEUP)
- 		 */
- 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
--		if (btusb_find_altsetting(data, 1))
-+		if (btusb_find_altsetting(data, 1)) {
- 			set_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags);
--		else
-+			hdev->sco_mtu = hci_packet_size_usb_alt[1];
-+		} else
- 			bt_dev_err(hdev, "Device does not support ALT setting 1");
- 	}
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 33d8458fdd4adc..1869dc7ebbb5ac 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -730,7 +730,19 @@ static void hci_cc_read_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 
- 	hdev->acl_mtu  = __le16_to_cpu(rp->acl_mtu);
--	hdev->sco_mtu  = rp->sco_mtu;
-+	/* If the host controller interface is USB, the hdev->sco_mtu is
-+	 * set in btusb.c and is not expected to be larger than the max sco
-+	 * buffer size returned from the controller in rp->sco_mtu.
-+	 */
-+	if (hdev->sco_mtu > 0) {
-+		if (rp->sco_mtu < hdev->sco_mtu) {
-+			BT_ERR("sco mtu %d changed to max sco buffer size %d",
-+			       hdev->sco_mtu, rp->sco_mtu);
-+			hdev->sco_mtu = rp->sco_mtu;
-+		}
-+	} else {
-+		hdev->sco_mtu  = rp->sco_mtu;
-+	}
- 	hdev->acl_pkts = __le16_to_cpu(rp->acl_max_pkt);
- 	hdev->sco_pkts = __le16_to_cpu(rp->sco_max_pkt);
- 
--- 
-2.28.0.618.gf4bc123cb7-goog
-
+> ---
+> 
+> Changes in v3:
+> - Fixed the commit message.
+> 
+> Changes in v2:
+> - Used BT_SNDMTU/BT_RCVMTU instead of creating a new opt name.
+> - Used the existing conn->mtu instead of creating a new member
+>   in struct sco_pinfo.
+> - Noted that the old SCO_OPTIONS in sco_sock_getsockopt_old()
+>   would just work as it uses sco_pi(sk)->conn->mtu.
+> 
+>  net/bluetooth/sco.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index dcf7f96ff417e6..79ffcdef0b7ad5 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -1001,6 +1001,12 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+>  			err = -EFAULT;
+>  		break;
+>  
+> +	case BT_SNDMTU:
+> +	case BT_RCVMTU:
+> +		if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
+> +			err = -EFAULT;
+> +		break;
+> +
+>  	default:
+>  		err = -ENOPROTOOPT;
+>  		break;
+> -- 
+> 2.28.0.618.gf4bc123cb7-goog
+> 
