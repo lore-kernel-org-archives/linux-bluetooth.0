@@ -2,119 +2,121 @@ Return-Path: <SRS0=wtMD=CT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18860C43461
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC212C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:40:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1572208FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:30:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93C1C206E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 23:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XTLezDG/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hjq7AZLu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725298AbgIJXa0 (ORCPT
+        id S1725777AbgIJXkb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 19:30:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55938 "EHLO
+        Thu, 10 Sep 2020 19:40:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725290AbgIJXaW (ORCPT
+        with ESMTP id S1725648AbgIJXk1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 19:30:22 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C14FC061573
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:30:21 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id t20so6315306qtr.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:30:21 -0700 (PDT)
+        Thu, 10 Sep 2020 19:40:27 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C27C061573
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:40:26 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id z17so4505579lfi.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 16:40:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=U+i5XPme3vC7jaZs/WDFR2wUocv1CUJ4TPmfGK9KY2E=;
-        b=XTLezDG/JZuCpgWsq5zvIVBiUVAN+YgmfMpYvdqExrhfDExrl/ND0kesHJkVxpHR/G
-         SBJj915893Yh7j6kReroHLI4KO2jtWFM/P2pTDOxL94Kuyyr+v2VlUfy++KvvoTYRPg3
-         eNqqIIu/+wPUhFMkFw/8R+elNrDfHRiqnkBOCwPmcGgxRrFoMprekZfN5QwoH7zRlA3/
-         3MMV8ar4QprAC92yn2geZliooXq2+i7LypXdgLCVvml5SmgtebwoGYbcO3GurvEhhIsd
-         UBuiYxGNPkQgGu8wFuz8wLY2k9Kp/c9z7vAg9KSjsoPs4NV0ZyvxQQ/PbVbT5HZC0eVP
-         3zow==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LL+0tAnbh6vsc5NLzOGUZJ2LiSX5vj0sdF2jqns5ZEk=;
+        b=Hjq7AZLuC2zzMKTEDWd4ZqgkY1LwfdOHUdbuh8Xf6iZsAwfGFujyQAyB2BM4Y2UO+m
+         9wMmuURMrN1oD/ubD4LqETRskgJjN1RHGJydHYgAIYlEyZmJFOoNClTlHs2Qw0nhso8D
+         n3wzp5jcvHCPp982o4qxQyN4loXyJIwJIFmj0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=U+i5XPme3vC7jaZs/WDFR2wUocv1CUJ4TPmfGK9KY2E=;
-        b=eXKluQX56xXDb1TkJGwWkHScPzCpvgFIPUdwGedjZ8mvqLO+cXeoghqGzHVKtLavdV
-         MUBWLlQQcnRZeJiI6bH/X+gxCxikoHJG2IuhDf+AbZGBu+4FjJSdMW3jOFN2CAJis4A/
-         3/byJugOBUTPmtu482rdKl8TmIc0FGoGWl+umoW6k5VEHTwItnDAsm8sM9zqiMl4UQa9
-         VrL/4LzJRDtAWIXEP9BbYuaFtVRZK3soOuQ5i2fGMYunce4S7lwDfO7rjKKJBZzQO17A
-         e7k27ja9DZwGsxqVzTWxnRATz6KqjMQ5bNn1BFmwF9pmV01HSaNkbXxw5OsKDKAIbwD3
-         gn8g==
-X-Gm-Message-State: AOAM532kURIIKkyA304oFrb6Iy6b8IuuUxoXxuIk4KthWlkh5th9jlVp
-        0stQRwO4iQsQT5R5vgbw24UE08vOQAODqA==
-X-Google-Smtp-Source: ABdhPJwq/xcsNxZhY02tkciQgjjpauc/6JPIq+IZnKj+p97jQdi05YpW1t7EKnWSPDWPPLuC9HRHGQ==
-X-Received: by 2002:ac8:743:: with SMTP id k3mr10778540qth.182.1599780620689;
-        Thu, 10 Sep 2020 16:30:20 -0700 (PDT)
-Received: from [172.17.0.2] ([52.247.3.217])
-        by smtp.gmail.com with ESMTPSA id x6sm646155qke.54.2020.09.10.16.30.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2020 16:30:20 -0700 (PDT)
-Message-ID: <5f5ab70c.1c69fb81.12f26.3d94@mx.google.com>
-Date:   Thu, 10 Sep 2020 16:30:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6985360745229033016=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LL+0tAnbh6vsc5NLzOGUZJ2LiSX5vj0sdF2jqns5ZEk=;
+        b=jY30Xw/CjSowTpKRDOQjPQoUocRiePKm6gspJoyvPtuldOmjVojf/0q0vH510q0L6v
+         7UjJuw9jEsILkPoxPCdOw+Ru93QnhjS/utCGL+ss6Zp4Se/RABeh9Pr22cJFG1Z/qyhO
+         E9mYRSG7uABxA+ONB903Smmfa0xGYZyKdH7wahymCfBnTOwDHnIROvIbG6G0AJsUSekP
+         7rPGoWqBgZ9zh83GVxuvD6FdC3g08hlibmdTzRBj0c74N8N1badtizYsaQbn0aEamQWV
+         DF89Lr7qxGv/kEhprwlxCItWM0HrxVk2ha3eCT8Ab670efhmn8EyqT3fKOS1gxQAdlh7
+         AO/w==
+X-Gm-Message-State: AOAM531OzGEQphvvQTLz/T6OlPZRhNY99Q3SdxCYPgbE7ulc/nIA9cxo
+        NevCVvXefA4hAHHbxS9FzfySVThQh1Z18FbeQl9NCWUu2R0=
+X-Google-Smtp-Source: ABdhPJw74mjAXvOR2iBexESgyIU/D6q96PAzM1bifGw0/kisRDVFArMn+CtASOjpHVdofm8I2sALZbu1FSxdJXGa26M=
+X-Received: by 2002:a19:915b:: with SMTP id y27mr5396514lfj.134.1599781225251;
+ Thu, 10 Sep 2020 16:40:25 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mcchou@chromium.org
-Subject: RE: [BlueZ,v4,1/8] adapter: Remove indirect dependency of headers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200910161528.BlueZ.v4.1.Iaa9dc2a66de5fbfa97627e1dbeb800116d3aa91e@changeid>
-References: <20200910161528.BlueZ.v4.1.Iaa9dc2a66de5fbfa97627e1dbeb800116d3aa91e@changeid>
+References: <20200910161528.BlueZ.v4.2.I205718871f4e636958904f3cfb171cfd381c54b1@changeid>
+ <5f5ab67f.1c69fb81.a94e4.274c@mx.google.com>
+In-Reply-To: <5f5ab67f.1c69fb81.a94e4.274c@mx.google.com>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Thu, 10 Sep 2020 16:40:14 -0700
+Message-ID: <CABmPvSF1FhoFoz_1yk+eAo-h+xUo2cT4ZHfjN0y37xFLt7wK=A@mail.gmail.com>
+Subject: Re: [BlueZ,v4,2/8] adv_monitor: Introduce org.bluez.AdvertisementMonitorManager1
+ interface
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Howard Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6985360745229033016==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Luiz,
 
-ClRoaXMgaXMgYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMg
-ZW1haWwhCgpEZWFyIHN1Ym1pdHRlciwKClRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0aGUgcGF0
-Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4KV2hpbGUgd2UgYXJlIHBy
-ZXBhcmluZyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaGVzLCB3ZSBmb3VuZCB0aGUgZm9sbG93aW5n
-Cmlzc3VlL3dhcm5pbmcuCgpUZXN0IFJlc3VsdDoKY2hlY2tidWlsZCBGYWlsZWQKCk91dHB1dHM6
-CmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNlZSBg
-VScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQgKHNl
-ZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1bHQg
-KHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRlZmF1
-bHQgKHNlZSBgVScpCmFyOiBgdScgbW9kaWZpZXIgaWdub3JlZCBzaW5jZSBgRCcgaXMgdGhlIGRl
-ZmF1bHQgKHNlZSBgVScpCnNyYy9hZHZfbW9uaXRvci5jOiBJbiBmdW5jdGlvbiDigJhtb25pdG9y
-X21hdGNo4oCZOgpzcmMvYWR2X21vbml0b3IuYzoyNzY6MzU6IGVycm9yOiBwYXNzaW5nIGFyZ3Vt
-ZW50IDEgb2Yg4oCYZ19kYnVzX3Byb3h5X2dldF9wYXRo4oCZIGRpc2NhcmRzIOKAmGNvbnN04oCZ
-IHF1YWxpZmllciBmcm9tIHBvaW50ZXIgdGFyZ2V0IHR5cGUgWy1XZXJyb3I9ZGlzY2FyZGVkLXF1
-YWxpZmllcnNdCiAgMjc2IHwgIGlmIChzdHJjbXAoZ19kYnVzX3Byb3h5X2dldF9wYXRoKHByb3h5
-KSwgbW9uaXRvci0+cGF0aCkgIT0gMCkKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9hZHZfbW9uaXRvci5jOjMx
-OgouL2dkYnVzL2dkYnVzLmg6MzM2OjEzOiBub3RlOiBleHBlY3RlZCDigJhHREJ1c1Byb3h5ICri
-gJkge2FrYSDigJhzdHJ1Y3QgR0RCdXNQcm94eSAq4oCZfSBidXQgYXJndW1lbnQgaXMgb2YgdHlw
-ZSDigJhjb25zdCBHREJ1c1Byb3h5ICrigJkge2FrYSDigJhjb25zdCBzdHJ1Y3QgR0RCdXNQcm94
-eSAq4oCZfQogIDMzNiB8IGNvbnN0IGNoYXIgKmdfZGJ1c19wcm94eV9nZXRfcGF0aChHREJ1c1By
-b3h5ICpwcm94eSk7CiAgICAgIHwgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNy
-Yy9hZHZfbW9uaXRvci5jOiBJbiBmdW5jdGlvbiDigJhwYXJzZV9wYXR0ZXJuc+KAmToKc3JjL2Fk
-dl9tb25pdG9yLmM6NDg1OjM2OiBlcnJvcjogc3VnZ2VzdCBwYXJlbnRoZXNlcyBhcm91bmQg4oCY
-JibigJkgd2l0aGluIOKAmHx84oCZIFstV2Vycm9yPXBhcmVudGhlc2VzXQogIDQ4NSB8ICAgaWYg
-KGFkX3R5cGUgPiBCVF9BRF8zRF9JTkZPX0RBVEEgJiYKc3JjL2Fkdl9tb25pdG9yLmM6NDI1OjEx
-OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmG51bV9wYXR0ZXJuc+KAmSBbLVdlcnJvcj11bnVz
-ZWQtdmFyaWFibGVdCiAgNDI1IHwgIHVpbnQxNl90IG51bV9wYXR0ZXJucyA9IDA7CiAgICAgIHwg
-ICAgICAgICAgIF5+fn5+fn5+fn5+fgpzcmMvYWR2X21vbml0b3IuYzogSW4gZnVuY3Rpb24g4oCY
-Z2V0X3N1cHBvcnRlZF9tb25pdG9yX3R5cGVz4oCZOgpzcmMvYWR2X21vbml0b3IuYzo3NTM6MzQ6
-IGVycm9yOiB1bnVzZWQgdmFyaWFibGUg4oCYbWFuYWdlcuKAmSBbLVdlcnJvcj11bnVzZWQtdmFy
-aWFibGVdCiAgNzUzIHwgIHN0cnVjdCBidGRfYWR2X21vbml0b3JfbWFuYWdlciAqbWFuYWdlciA9
-IGRhdGE7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fgpj
-YzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01h
-a2VmaWxlOjkyNzI6IHNyYy9ibHVldG9vdGhkLWFkdl9tb25pdG9yLm9dIEVycm9yIDEKbWFrZTog
-KioqIFtNYWtlZmlsZTo0MDE0OiBhbGxdIEVycm9yIDIKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJs
-dWV0b290aAo=
+The style check was modified recently,so we are not sure about this
+particular license warning. Can you provide some guidance here?
 
---===============6985360745229033016==--
+Thanks,
+Miao
+
+On Thu, Sep 10, 2020 at 4:28 PM <bluez.test.bot@gmail.com> wrote:
+>
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> While we are preparing for reviewing the patches, we found the following
+> issue/warning.
+>
+> Test Result:
+> checkpatch Failed
+>
+> Outputs:
+> WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+> #94: FILE: src/adv_monitor.c:1:
+> +/*
+>
+> WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+> #247: FILE: src/adv_monitor.h:1:
+> +/*
+>
+> - total: 0 errors, 2 warnings, 235 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> Your patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
