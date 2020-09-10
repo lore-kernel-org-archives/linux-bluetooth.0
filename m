@@ -7,64 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AF4C43461
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC6EC43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBF942145D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:34:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3F042145D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="hf/8jNuN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="qUhGnMCQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730099AbgIJKep (ORCPT
+        id S1729876AbgIJKe7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Sep 2020 06:34:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
+        Thu, 10 Sep 2020 06:34:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730166AbgIJKeQ (ORCPT
+        with ESMTP id S1730189AbgIJKeW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Sep 2020 06:34:16 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81252C061786
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 03:34:15 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id s33so3831003qth.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 03:34:15 -0700 (PDT)
+        Thu, 10 Sep 2020 06:34:22 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F05DC061795
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 03:34:19 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id i23so3333146pju.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Sep 2020 03:34:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=yqjMGeyvRPcaWoCHc/xHlQCmAUnozMo/7KYsVvNF8Rk=;
-        b=hf/8jNuNyUdSLaIkwfuMpcGCCBuv4mR2r28rhCpUCaOtzaGoWpejmC5I+qR16qfuOB
-         kdXZYruJvFdDZMotXMb//7mq1kE8p8MjFxl4Kr7ih5ArJRXnREFHh/oh+3o5XDDn7z/4
-         jlsy+z9ms26eFlZmNdys/k36dAfJ7TnDwIWP8xhSMDXli9NObsZZmRXZ8VLe6kTuGSIk
-         H+D8/Gjb8FyAFei2EC/tE9PQpHjg+6OWm5BmLQoSGh7YfyHtcHK6KCQPZs4DqkwDWbnZ
-         bDF3urOmu6vU9976ZZTlYZo8T4vBv+k2tK85yVXedQExMTs0XBX/82QxObEOkBfvrqcj
-         c//w==
+        bh=Mz2x8H2u+dcISQMEODChynSBMMwhzWBKqD5b3CthGT4=;
+        b=qUhGnMCQKFD46o0jnL3hhbDCU1tGBAzXBpowlUBYQVGWU0gnGDGIehZudVn+W1SAzi
+         PvQmMGl6OlNrE1pCeC+Q+4DJ7ojRyvby5q6qi4jHHDCREzOGM4f28H5az4uYg/xZtiRY
+         ueZeH2Mue0UlY762ddqCHanOXErpMjBC39g1D+Mf9qCjhSPE8ggTsta+czW53LT153Ne
+         Km++8a52NHJVcftlTDj7V9fGiBg/0TshPd5oiHTrLsWyY8XQzO99IlGrqsFukcRUDtMX
+         BT/XStT9x7eic/XYUIbGa8A9TBo+qvfgsX+kdMEVe9G31GdGUbyP1EEulZLjjkz3Vpmw
+         b7LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=yqjMGeyvRPcaWoCHc/xHlQCmAUnozMo/7KYsVvNF8Rk=;
-        b=W4A4JKPVcOYgiRlsLKt56dCjWrBk65WM2a2L3iyhLmWI2/Jjg7a3vmS3tr+S7WMV+d
-         b7JftzXfAu0JVcJuQA46ITh4IKwOqbUEfDniWpKxKAX+reEuRBYEgLo+rhBQW+RaUR+D
-         S64vj7qvf6EEL6JJ7WmBYao7gEzIKBly04kO41AbBvTMecyY9Mc2Yl19ytgohrrl0SQ/
-         FWbKx1cXqV1aoA54cKeX4jQfRQFp+YBCp8H4eXimWzeCNaraSaxR3odGRrfe5D20Dqn0
-         e62PnPKG2Q8iqsDimc8vWH17HmHhLI0/N+fCoD85ucjyX4jNXYcik2qmf7iBjc30rCZX
-         vqHw==
-X-Gm-Message-State: AOAM532XmWzd9Z+Swr18H+uFobdPgc3vgu/NjbL2UOqeR4XQ9QAosUG5
-        5+0KerZi7K+f1l7C4A/5LTSnOo0x3+71aMxCF8EQk90KZKs4sLMQopGUmsuOIgse3yBfmBTbYZ+
-        MkxLMb9SLvk7jT0ljvsu70w6y5FK5UhrtmjEMXPMhPDJ++by4Gf/OH8cDGnflmjlhwRcznBwRli
-        lNgjxBeD4kDic=
-X-Google-Smtp-Source: ABdhPJxCdKWq9ZotVPwQg72/OSYpzXvq7fTImFLK2DSXv0+f8qjy0qnWvimCTIcAem1IPd1gdMKNEJIfTS0ILYrsuw==
+        bh=Mz2x8H2u+dcISQMEODChynSBMMwhzWBKqD5b3CthGT4=;
+        b=FUHN1lG7AafY2MIzIQ7V3P5ducDDqEVBBviG8P1INaxMGf6M8y58RgeeIfkH2z/OMo
+         Yn8OG50PDdCYNGzc9YyV3ga+WRo+VjoPUhZwZSvI968v1pWRN3UeKbA7Fg8gXQGPayt5
+         4U+cTlFpn0xzIwzBIr/ARHATHrXa242x5Mm8ySrOfg0YSUH5EoBrYDrwhxAUrDS1vxBn
+         I0bkM6snNc1QOGtejTwNqHu5cJnf+19CWEYemNrWTMLIpjuPsWNvCIfr9fgLSUOBgiLx
+         5pXAhHD1C7/LluhpaXjlJ/njWkymJXrknaW9iUim462kqqZi98h97mCiiB/wRPhLfO59
+         3HjQ==
+X-Gm-Message-State: AOAM532plbZi1zOcFEGouZ/yAxn4exgJ6zFsmxhqBUhlJQpBR+bOyrl+
+        srbeU2UnVqIodSOYAV/g4T0HF40wjeafqy+WKfRpIGeR0Ze6m9iWDn4k4lxUHfuivRxym67uSOw
+        vPXJUJcMGov5mdyXMAAjGUH4+9ZE5lH+AcUdFQnYL/Gt3hUI8qCcS2dWVYrIRa/he/chfeq6Nek
+        nilL8rvPNQ2TE=
+X-Google-Smtp-Source: ABdhPJwjGjw9TjJ20kbaO9rR8ecmccjeWVqky0iCLkQP1ZHcbC2vhz5HuSFfv47Xn2sBXJK3ri0V+EEh2Z3F3fM/qQ==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:ad4:42b3:: with SMTP id
- e19mr8349992qvr.6.1599734054647; Thu, 10 Sep 2020 03:34:14 -0700 (PDT)
-Date:   Thu, 10 Sep 2020 18:34:01 +0800
+ (user=howardchung job=sendgmr) by 2002:a17:902:8306:b029:d0:cbe1:e7aa with
+ SMTP id bd6-20020a1709028306b02900d0cbe1e7aamr5041899plb.27.1599734058598;
+ Thu, 10 Sep 2020 03:34:18 -0700 (PDT)
+Date:   Thu, 10 Sep 2020 18:34:02 +0800
 In-Reply-To: <20200910183329.BlueZ.v2.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
-Message-Id: <20200910183329.BlueZ.v2.3.I680cda25cec9c45ca2b2c5ac3a8e437772ea76d9@changeid>
+Message-Id: <20200910183329.BlueZ.v2.4.Ieffbe3452565ace2af46a63501c767c8798fd88c@changeid>
 Mime-Version: 1.0
 References: <20200910183329.BlueZ.v2.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
 X-Mailer: git-send-email 2.28.0.526.ge36021eeef-goog
-Subject: [BlueZ PATCH v2 3/4] PRE-UPSTREAM: client: Expose ADV monitor objects
+Subject: [BlueZ PATCH v2 4/4] PRE-UPSTREAM: core: Add AdvertisementMonitor to bluetooth.conf
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.von.dentz@intel.com, mcchou@chromium.org,
@@ -76,8 +77,8 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds logic to expose user-defined advertisement monitor to dbus and
-also implements methods for exposed objects.
+AdvertisementMonitor must be included in bluetooth.conf in order to
+be able to call Release
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
@@ -85,254 +86,21 @@ Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 
 (no changes since v1)
 
- client/advertisement_monitor.c | 185 ++++++++++++++++++++++++++++++++-
- 1 file changed, 182 insertions(+), 3 deletions(-)
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/client/advertisement_monitor.c b/client/advertisement_monitor.c
-index 0b2f7f407..b83ec823b 100644
---- a/client/advertisement_monitor.c
-+++ b/client/advertisement_monitor.c
-@@ -53,6 +53,7 @@ struct pattern {
- 
- struct adv_monitor {
- 	uint8_t idx;
-+	char *path;
- 	char *type;
- 	struct rssi_setting *rssi;
- 	GSList *patterns;
-@@ -68,6 +69,163 @@ static struct adv_monitor_manager {
- static uint8_t adv_mon_idx;
- static GSList *adv_mons;
- 
-+static void remove_adv_monitor(void *data, void *user_data);
-+
-+static DBusMessage *release_adv_monitor(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+
-+	bt_shell_printf("Advertisement monitor %d released\n",
-+							adv_monitor->idx);
-+	remove_adv_monitor(adv_monitor, conn);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *activate_adv_monitor(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+
-+	bt_shell_printf("Advertisement monitor %d activated\n",
-+							adv_monitor->idx);
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *device_found_adv_monitor(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+	const char *device;
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+							DBUS_TYPE_INVALID);
-+	bt_shell_printf("Advertisement monitor %d found device %s\n",
-+						adv_monitor->idx, device);
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *device_lost_adv_monitor(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+	const char *device;
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+							DBUS_TYPE_INVALID);
-+	bt_shell_printf("Advertisement monitor %d lost device %s\n",
-+						adv_monitor->idx, device);
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable adv_monitor_methods[] = {
-+	{ GDBUS_ASYNC_METHOD("Release", NULL, NULL, release_adv_monitor) },
-+	{ GDBUS_ASYNC_METHOD("Activate", NULL, NULL, activate_adv_monitor) },
-+	{ GDBUS_ASYNC_METHOD("DeviceFound", GDBUS_ARGS({ "device", "o" }),
-+			NULL, device_found_adv_monitor) },
-+	{ GDBUS_ASYNC_METHOD("DeviceLost", GDBUS_ARGS({ "device", "o" }),
-+			NULL, device_lost_adv_monitor) },
-+	{ }
-+};
-+
-+
-+static gboolean get_type(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
-+							&adv_monitor->type);
-+	return TRUE;
-+}
-+
-+static gboolean get_rssi(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+	struct rssi_setting *rssi = adv_monitor->rssi;
-+	DBusMessageIter data_iter;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT,
-+							NULL, &data_iter);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_INT16,
-+							&rssi->high_threshold);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_UINT16,
-+							&rssi->high_timer);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_INT16,
-+							&rssi->low_threshold);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_UINT16,
-+							&rssi->low_timer);
-+	dbus_message_iter_close_container(iter, &data_iter);
-+	return TRUE;
-+}
-+
-+static gboolean rssi_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct adv_monitor *adv_monitor = data;
-+
-+	return adv_monitor->rssi != NULL;
-+}
-+
-+static void append_pattern_content_to_dbus(DBusMessageIter *iter,
-+							struct pattern *pattern)
-+{
-+	DBusMessageIter data_iter;
-+	int idx;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &data_iter);
-+	for (idx = 0; idx < pattern->content_len; idx++)
-+		dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_BYTE,
-+							&pattern->content[idx]);
-+	dbus_message_iter_close_container(iter, &data_iter);
-+}
-+
-+static void append_pattern_to_dbus(void *data, void *user_data)
-+{
-+	struct pattern *pattern = data;
-+	DBusMessageIter *array_iter = user_data;
-+	DBusMessageIter data_iter;
-+
-+	dbus_message_iter_open_container(array_iter, DBUS_TYPE_STRUCT,
-+							NULL, &data_iter);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_BYTE,
-+							&pattern->start_pos);
-+	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_BYTE,
-+							&pattern->ad_data_type);
-+	append_pattern_content_to_dbus(&data_iter, pattern);
-+	dbus_message_iter_close_container(array_iter, &data_iter);
-+}
-+
-+static gboolean get_patterns(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = user_data;
-+	DBusMessageIter array_iter;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "(yyay)",
-+								&array_iter);
-+	g_slist_foreach(adv_monitor->patterns, append_pattern_to_dbus,
-+								&array_iter);
-+	dbus_message_iter_close_container(iter, &array_iter);
-+	return TRUE;
-+}
-+
-+static gboolean pattern_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct adv_monitor *adv_monitor = data;
-+
-+	return adv_monitor->patterns != NULL;
-+}
-+
-+static const GDBusPropertyTable adv_monitor_props[] = {
-+	{ "Type", "s", get_type },
-+	{ "RSSIThresholdsAndTimers", "(nqnq)", get_rssi, NULL, rssi_exists },
-+	{ "Patterns", "a(yyay)", get_patterns, NULL, pattern_exists },
-+	{ }
-+};
-+
- static void set_supported_list(GSList **list, DBusMessageIter *iter)
- {
- 	char *str;
-@@ -201,6 +359,7 @@ static void free_adv_monitor(void *user_data)
- {
- 	struct adv_monitor *adv_monitor = user_data;
- 
-+	g_free(adv_monitor->path);
- 	g_free(adv_monitor->type);
- 	g_free(adv_monitor->rssi);
- 	g_slist_free_full(adv_monitor->patterns, free_pattern);
-@@ -325,6 +484,16 @@ static GSList *parse_patterns(char *pattern_list[], int num)
- 	return patterns;
- }
- 
-+static void remove_adv_monitor(void *data, void *user_data)
-+{
-+	struct adv_monitor *adv_monitor = data;
-+	DBusConnection *conn = user_data;
-+
-+	adv_mons = g_slist_remove(adv_mons, adv_monitor);
-+	g_dbus_unregister_interface(conn, adv_monitor->path,
-+							ADV_MONITOR_INTERFACE);
-+}
-+
- static gint cmp_adv_monitor_with_idx(gconstpointer a, gconstpointer b)
- {
- 	const struct adv_monitor *adv_monitor = a;
-@@ -360,6 +529,7 @@ static void print_adv_monitor(struct adv_monitor *adv_monitor)
- 	GSList *l;
- 
- 	bt_shell_printf("Advertisement Monitor %d\n", adv_monitor->idx);
-+	bt_shell_printf("\tpath: %s\n", adv_monitor->path);
- 	bt_shell_printf("\ttype: %s\n", adv_monitor->type);
- 	if (adv_monitor->rssi) {
- 		bt_shell_printf("\trssi:\n");
-@@ -434,6 +604,16 @@ void adv_monitor_add_monitor(DBusConnection *conn, char *type,
- 	adv_monitor->type = g_strdup(type);
- 	adv_monitor->rssi = rssi;
- 	adv_monitor->patterns = patterns;
-+	adv_monitor->path = g_strdup_printf("%s/%hhu", ADV_MONITOR_APP_PATH,
-+								adv_mon_idx);
-+	if (g_dbus_register_interface(conn, adv_monitor->path,
-+					ADV_MONITOR_INTERFACE,
-+					adv_monitor_methods, NULL,
-+					adv_monitor_props, adv_monitor,
-+					free_adv_monitor) == FALSE) {
-+		bt_shell_printf("Failed to register advertisement monitor\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
- 
- 	adv_mons = g_slist_append(adv_mons, adv_monitor);
- 	bt_shell_printf("Advertisement Monitor %d added\n", adv_monitor->idx);
-@@ -468,7 +648,7 @@ void adv_monitor_remove_monitor(DBusConnection *conn, int monitor_idx)
- 	struct adv_monitor *adv_monitor;
- 
- 	if (monitor_idx < 0) {
--		g_slist_free_full(g_steal_pointer(&adv_mons), free_adv_monitor);
-+		g_slist_foreach(adv_mons, remove_adv_monitor, conn);
- 		return;
- 	}
- 
-@@ -479,8 +659,7 @@ void adv_monitor_remove_monitor(DBusConnection *conn, int monitor_idx)
- 		return;
- 	}
- 
--	adv_mons = g_slist_remove(adv_mons, adv_monitor);
--	free_adv_monitor(adv_monitor);
-+	remove_adv_monitor(adv_monitor, conn);
- 	bt_shell_printf("Monitor %d deleted\n", monitor_idx);
- }
- 
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 8a1e25801..b6c614908 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -10,6 +10,7 @@
+   <policy user="root">
+     <allow own="org.bluez"/>
+     <allow send_destination="org.bluez"/>
++    <allow send_interface="org.bluez.AdvertisementMonitor1"/>
+     <allow send_interface="org.bluez.Agent1"/>
+     <allow send_interface="org.bluez.MediaEndpoint1"/>
+     <allow send_interface="org.bluez.MediaPlayer1"/>
 -- 
 2.28.0.526.ge36021eeef-goog
 
