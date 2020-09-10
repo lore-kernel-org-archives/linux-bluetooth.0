@@ -2,72 +2,71 @@ Return-Path: <SRS0=wtMD=CT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CEA1C43461
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 02:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95516C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 02:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68E5621D80
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 02:47:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FA0821D6C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Sep 2020 02:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SxkcIkqS"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="b0zJlrJ3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730416AbgIJCAc (ORCPT
+        id S1730411AbgIJCAZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Sep 2020 22:00:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
+        Wed, 9 Sep 2020 22:00:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730150AbgIJByT (ORCPT
+        with ESMTP id S1729521AbgIJBk6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Sep 2020 21:54:19 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CD7C061389
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 16:54:08 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id j7so14223plk.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 16:54:08 -0700 (PDT)
+        Wed, 9 Sep 2020 21:40:58 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBE9C061344
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Sep 2020 18:40:58 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id u13so3380400pgh.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Sep 2020 18:40:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=gTez5zBL4O/mFCX1yAYIY6uoJGixvvecrhH5yeefCRU=;
-        b=SxkcIkqSWelb6AuUlXuHUzy1a16hhmWXJWuq8Eo/23y2lOyPcWQDUSskXt1hEJUyn6
-         u1wOiYNDBdX/GAOiEZ/EkYArPHBOHNGFUNcC9AVgOMGKko3iXNgtwmArngx7TwMORv1T
-         Q14fEfQF9K7z06eGlkuJ30cEupLsJdCrymIDQ=
+        b=b0zJlrJ3/FxkSGhXn87cvP+RTMUhelRrCM1riW4kT7+txcP800FsUvP6kSl1Tx+BQ9
+         nlnSbaIdcJf/ctfzMo8lklWjGAlMfBcz670pLHXNIAzEyKNqQRUVeGBFLUGnDrDQvmmo
+         LiL1peql9jifg/8mL5CDMgP9HFRyzTX8uyAco=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=gTez5zBL4O/mFCX1yAYIY6uoJGixvvecrhH5yeefCRU=;
-        b=EdRBASCggXyFS7lNosDGcVA2aKF8VpPkQzRJtxq/S8q7PH+yrZXomR6Zr3Hauzot1o
-         rA/QUgwBz8FGO2Tf+eV3FA9tkyT5XS98usC+CgX06s95ENrZfCPM1Vg8kIWJs2ZZtkUt
-         ft6SRWJwA3WVbw9m1Ouct53orCNgv/I0TfoTMyd+w2JiCj9lzb8EWh0LQC74YO1YvJwm
-         XbzrZhhkVXotxsikOOhzfyQ7uYapAI/4JpDgt33NWI2XYi3qKPooY3e5oVxLaV7JuaNW
-         Ve2apMQFWrYIebi7E8yYwrgaLmCqVwEInp0nDAr7Zaz5qJj8iLRKtF7KzpmuPyyw0V9w
-         4JXw==
-X-Gm-Message-State: AOAM530Q0EN0QLci+fV9gUdpAkfYqaU/9jKjTg0p/OWYWTwF+9qTI4ad
-        f1s0oTVbczN/yrhOUiHvUzRMKA==
-X-Google-Smtp-Source: ABdhPJypCzWo/RzU1A0vkyKGMWGcM+gWL4C+xJq9bpuP3YaGcMPrw6MsySxwiLzgR4TsTQNBxd3ARg==
-X-Received: by 2002:a17:90a:4ec4:: with SMTP id v4mr2793960pjl.62.1599695646992;
-        Wed, 09 Sep 2020 16:54:06 -0700 (PDT)
+        b=EDhYX+8QyW/IqGScP2neKGWshOUoYtFVcd/QLnynfu0FFPgJo51p/VHUeU/XTBe+07
+         9dKGvo+yy3fuJ0qf/jB3ls5dedcfZX8oERz8ivuWXBUaeRZgRDu5dv8u5MBDeXwm8dAh
+         u7uiWo9LpHp9TjAUqbs7PLg3/+e7SLebUq+20Nq7572YltfY44kT6/yUn+vrW7xuseGb
+         mxHWZCjOPGu6fEtqWmXkh+vMEnGX0wS0oh1/z60+2BcdXhWyonJrZ2BqSjOaNzhgIKsZ
+         I9Q9XwhaOuDLaFRBeCs13PtGsU1Nms+v1dZc/mqf4wdA96whncHSIW31YPYeY4zPnedm
+         ZzJw==
+X-Gm-Message-State: AOAM531f2QmpfrkA7KUG1qfWbAo1zUQJqoxuPmlajqcXRQjvKd/nBzTY
+        j74x25QEwlC84nAAv+BZMJIah6r3QzH8CA==
+X-Google-Smtp-Source: ABdhPJzBPsq3OhqI1wKePrmNY399SC3c/Mj0s1LcqZge53ktq1ymQHWKSBttbMamebJGRQYDAMFBPA==
+X-Received: by 2002:a63:d25:: with SMTP id c37mr2501235pgl.403.1599702057352;
+        Wed, 09 Sep 2020 18:40:57 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id h14sm3817937pfe.67.2020.09.09.16.54.06
+        by smtp.gmail.com with ESMTPSA id j19sm3885366pfi.51.2020.09.09.18.40.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2020 16:54:06 -0700 (PDT)
+        Wed, 09 Sep 2020 18:40:56 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jakub Kicinski <kuba@kernel.org>
 Subject: [PATCH] Bluetooth: Re-order clearing suspend tasks
-Date:   Wed,  9 Sep 2020 16:53:59 -0700
-Message-Id: <20200909165317.1.Ie55bb8dde9847e8005f24402f3f2d66ea09cd7b2@changeid>
+Date:   Wed,  9 Sep 2020 18:40:06 -0700
+Message-Id: <20200909183952.1.Ie55bb8dde9847e8005f24402f3f2d66ea09cd7b2@changeid>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
