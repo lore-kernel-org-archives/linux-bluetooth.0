@@ -6,57 +6,67 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A842C43461
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2782EC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC742221EB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8A26221EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725797AbgIKG6k convert rfc822-to-8bit (ORCPT
+        id S1725767AbgIKHCD convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Sep 2020 02:58:40 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:40536 "EHLO
+        Fri, 11 Sep 2020 03:02:03 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42917 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725782AbgIKG6j (ORCPT
+        with ESMTP id S1725468AbgIKHCB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Sep 2020 02:58:39 -0400
+        Fri, 11 Sep 2020 03:02:01 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id EF163CED1A;
-        Fri, 11 Sep 2020 09:05:32 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 530AECED19;
+        Fri, 11 Sep 2020 09:08:55 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH -next] Bluetooth: btmtksdio: use NULL instead of zero
+Subject: Re: [Linux-kernel-mentees] [PATCH v2] Bluetooth: Fix memory leak in
+ read_adv_mon_features()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200905121549.32936-1-yuehaibing@huawei.com>
-Date:   Fri, 11 Sep 2020 08:58:37 +0200
+In-Reply-To: <20200909072551.1101031-1-yepeilin.cs@gmail.com>
+Date:   Fri, 11 Sep 2020 09:01:59 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Sean Wang <sean.wang@mediatek.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+        open list <linux-kernel@vger.kernel.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzkaller-bugs@googlegroups.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <6B0D45D0-7390-4DCF-B85B-8DD0C6EAC8A2@holtmann.org>
-References: <20200905121549.32936-1-yuehaibing@huawei.com>
-To:     YueHaibing <yuehaibing@huawei.com>
+Message-Id: <15999FE1-5227-4D55-8E3C-39142725FDA5@holtmann.org>
+References: <20200908200635.1099360-1-yepeilin.cs@gmail.com>
+ <20200909072551.1101031-1-yepeilin.cs@gmail.com>
+To:     Peilin Ye <yepeilin.cs@gmail.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yue,
+Hi Peilin,
 
-> Fix sparse warnings:
+> read_adv_mon_features() is leaking memory. Free `rp` before returning.
 > 
-> drivers/bluetooth/btmtksdio.c:499:57: warning: Using plain integer as NULL pointer
-> drivers/bluetooth/btmtksdio.c:533:57: warning: Using plain integer as NULL pointer
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> Fixes: e5e1e7fd470c ("Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES")
+> Reported-and-tested-by: syzbot+f7f6e564f4202d8601c6@syzkaller.appspotmail.com
+> Link: https://syzkaller.appspot.com/bug?extid=f7f6e564f4202d8601c6
+> Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
 > ---
-> drivers/bluetooth/btmtksdio.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> I forgot the "Link:" tag yesterday. Sorry about that.
+> 
+> Change in v2:
+>    - add a proper "Link:" tag.
+> 
+> net/bluetooth/mgmt.c | 12 ++++++++----
+> 1 file changed, 8 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
