@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE2AC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB21C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03266221ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:51:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84FEC221EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 06:51:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725795AbgIKGvR (ORCPT
+        id S1725791AbgIKGvR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 11 Sep 2020 02:51:17 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:46408 "EHLO
+Received: from coyote.holtmann.net ([212.227.132.17]:57501 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbgIKGvN (ORCPT
+        with ESMTP id S1725769AbgIKGvN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 11 Sep 2020 02:51:13 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 00165CED1A;
-        Fri, 11 Sep 2020 08:58:07 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 024E7CED19;
+        Fri, 11 Sep 2020 08:58:06 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH v1 2/4] Bluetooth: hci_intel: drop strange le16_to_cpu()
- against u8 values
+Subject: Re: [PATCH v1 3/4] Bluetooth: hci_intel: switch to
+ list_for_each_entry()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200903184850.53055-2-andriy.shevchenko@linux.intel.com>
-Date:   Fri, 11 Sep 2020 08:51:12 +0200
+In-Reply-To: <20200903184850.53055-3-andriy.shevchenko@linux.intel.com>
+Date:   Fri, 11 Sep 2020 08:51:11 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <CD9DE84B-CA69-4420-8D6D-6C51ADEBB84E@holtmann.org>
+Message-Id: <C4F05E7F-B874-4D36-A6CD-0B691DCF27D6@holtmann.org>
 References: <20200903184850.53055-1-andriy.shevchenko@linux.intel.com>
- <20200903184850.53055-2-andriy.shevchenko@linux.intel.com>
+ <20200903184850.53055-3-andriy.shevchenko@linux.intel.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -46,26 +46,13 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Andy,
 
-> Sparse rightfully complains:
-> 
->  hci_intel.c:696:26: warning: cast to restricted __le16
->  hci_intel.c:701:26: warning: cast to restricted __le16
->  hci_intel.c:702:26: warning: cast to restricted __le16
->  hci_intel.c:703:26: warning: cast to restricted __le16
->  hci_intel.c:725:26: warning: cast to restricted __le16
->  hci_intel.c:730:26: warning: cast to restricted __le16
->  hci_intel.c:731:26: warning: cast to restricted __le16
->  hci_intel.c:732:26: warning: cast to restricted __le16
-> 
-> because we access non-restricted types with le16_to_cpu().
-> More confusion is added by using above against u8. On big-endian
-> architecture we will get all zeroes. I bet it's not what should be
-> in such case.
+> There is no need to have list_for_each() followed by list_entry()
+> when we simply may use list_for_each_entry() directly.
 > 
 > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
-> drivers/bluetooth/hci_intel.c | 14 ++++----------
-> 1 file changed, 4 insertions(+), 10 deletions(-)
+> drivers/bluetooth/hci_intel.c | 31 ++++++++++---------------------
+> 1 file changed, 10 insertions(+), 21 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
