@@ -8,68 +8,69 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0595C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E11E5C43461
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:16:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C601221E7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:16:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E23A221E5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:16:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IHfcMdCa"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dkngZxcJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725992AbgIKRPD (ORCPT
+        id S1725786AbgIKRQW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Sep 2020 13:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50590 "EHLO
+        Fri, 11 Sep 2020 13:16:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726306AbgIKRNV (ORCPT
+        with ESMTP id S1726296AbgIKRNR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Sep 2020 13:13:21 -0400
+        Fri, 11 Sep 2020 13:13:17 -0400
 Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3802EC0617A0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:13:15 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id t14so7074160pgl.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:13:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62A1C061798
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:13:12 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id f2so5070721pgd.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:13:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QYynaXim+pXR2WZF/f2L4YViEpHTsA0HAsGlrH1psqM=;
-        b=IHfcMdCaVdMs1n8Gen4SO+2cTFU54AFAZFQqYjyF3NAbYLvmQ/tifJu5KM5kfnBfrD
-         z1PIZNhLjkvC2mCjZY0Y6PXkYKOuuf9mluNkaNGg3orOqxMDvcoIt6dWcd0CzWmMUE1U
-         En8AqvF6KuoC5ZpvxEOxzw3uDraGR8IYBdBF4=
+        bh=Mbot9ybxN7CEBjkJx2/zfixlDiQJfoliZ9FJfemsvkc=;
+        b=dkngZxcJsfiwaoaeeA5ivGItvOj+ltwumQrEg2V2Fb6waCKmwZnjPEH4f4GucgxVLB
+         5dw95RVIXR7dHD+f1E9ucpz2A3/rbkTFTnco1FwjNge2jtemQnNxvrRRKr+KfkzRDqJQ
+         +oLDdyDVAapClSi2quq12dscrXXbs1KAohowQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QYynaXim+pXR2WZF/f2L4YViEpHTsA0HAsGlrH1psqM=;
-        b=hKhM/P1u0dgQ3MRBW1rVw7f+vo7foYfanHCA3up2rwgbpuhpTKgYAqrMZmUzlrCJkz
-         uJ4Pu9zHkoSSs9fsL7eImUEGbNSIOyvWgN3joKgCj2Z8NYGfUzdfnOnR4THv5K3xdsi6
-         ba1Qrfsqqgr+cyn1zWoG0E1uvim0by0PP/Fj3z0mccUTIAbUIvo8s3m311c8ADG0LgMZ
-         nqR1XAM6h+0QVYFiqwfI1gn6zsrXG4lSTNXk4mRyGZAIbkdEC9JB4p/ItNU57T76yS8y
-         L5iEgunLuITCj6e5Zm4iV4g3l2KTjbCk4jutdJOIgoqjho8XSzwtSty4/tYz9ZB6LwLf
-         Kkww==
-X-Gm-Message-State: AOAM533H1sNeMFfwnNvfBmV67WFIKDqm4zqc9Ux6oqWSw0Ey0jx7RwRg
-        3PCg3vssKSzhufsh+gjjOfcTVA==
-X-Google-Smtp-Source: ABdhPJyvFx2DkSx0RCcM/Z9U/Nqid1O7rjskD5qFsSGh0XhkaBezmgGuXBk0csBuB+LMBL2CRJSaJQ==
-X-Received: by 2002:a63:7018:: with SMTP id l24mr2249682pgc.55.1599844394630;
-        Fri, 11 Sep 2020 10:13:14 -0700 (PDT)
+        bh=Mbot9ybxN7CEBjkJx2/zfixlDiQJfoliZ9FJfemsvkc=;
+        b=WmNaBEN22Li/Ww0aqALonc3/tBWS29fPWRjT7AI4NAou82BB8tnOTHWRNIkbLbK0Qj
+         oscxPPbGNNsv5ldg/nG7FkOAJBjDzKEtkiZ2YmNR5HDxpvhxIsvntzlHNVo/DDZMTQ5s
+         QgM46WnhhtJ5OiYAkasfHu+Dkl9O1N+LuNhh2fCe6RuFoCZgKAsp2PtPxYrHbmGelhNL
+         ixsAOAj9GdsCl4DZ/C1/2aAbaJ2tYv996wClesRYcW59Ty7InlCuOqwR+Gz4+lr7AuuA
+         y+Vxhjy/LpHk72AWWdfVMUuKB8hzisWNiUFYalpOoI6TfY5J0BZMxmUQKJr6J15IypZX
+         DaGg==
+X-Gm-Message-State: AOAM5325nj0hG7G1zGA9fIVqqsEtTS3YhbJZcSIawthFBuvuXOCjZazM
+        01HsnPusRi8IpPxlVNuYBOvZJg==
+X-Google-Smtp-Source: ABdhPJxZSSZY4mIQBJ0os+Tl+NKbSD61XqIC+eZsymowPVyQeWCMOMXGMvOnS58X3crxD9bFA3MAlw==
+X-Received: by 2002:a63:b20d:: with SMTP id x13mr385059pge.136.1599844392256;
+        Fri, 11 Sep 2020 10:13:12 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id h9sm2787452pfc.28.2020.09.11.10.13.13
+        by smtp.gmail.com with ESMTPSA id h9sm2787452pfc.28.2020.09.11.10.13.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 10:13:14 -0700 (PDT)
+        Fri, 11 Sep 2020 10:13:11 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         linux-bluetooth@vger.kernel.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jakub Kicinski <kuba@kernel.org>
-Subject: [RESEND PATCH 3/3] Bluetooth: Emit controller suspend and resume events
-Date:   Fri, 11 Sep 2020 10:13:06 -0700
-Message-Id: <20200911101255.RESEND.3.I905caec7d7bf0eb7a3ed9899b5afb9aebaf6f8a8@changeid>
+Subject: [RESEND PATCH 1/3] Bluetooth: Add mgmt suspend and resume events
+Date:   Fri, 11 Sep 2020 10:13:04 -0700
+Message-Id: <20200911101255.RESEND.1.I1b721ef9da5c79d8515018d806801da4eacaf563@changeid>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
 In-Reply-To: <20200911171306.3758642-1-abhishekpandit@chromium.org>
 References: <20200911171306.3758642-1-abhishekpandit@chromium.org>
@@ -80,210 +81,88 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Emit controller suspend and resume events when we are ready for suspend
-and we've resumed from suspend.
-
-The controller suspend event will report whatever suspend state was
-successfully entered. The controller resume event will check the first
-HCI event that was received after we finished preparing for suspend and,
-if it was a connection event, store the address of the peer that caused
-the event. If it was not a connection event, we mark the wake reason as
-an unexpected event.
-
-Here is a sample btmon trace with these events:
-
-@ MGMT Event: Controller Suspended (0x002d) plen 1
-        Suspend state: Page scanning and/or passive scanning (2)
-
-@ MGMT Event: Controller Resumed (0x002e) plen 8
-        Wake reason: Remote wake due to peer device connection (2)
-        LE Address: CD:F3:CD:13:C5:9A (OUI CD-F3-CD)
+Add the controller suspend and resume events, which will signal when
+Bluetooth has completed preparing for suspend and when it's ready for
+resume.
 
 Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
 
- include/net/bluetooth/hci_core.h |  3 ++
- include/net/bluetooth/mgmt.h     |  4 ++
- net/bluetooth/hci_core.c         | 26 +++++++++++-
- net/bluetooth/hci_event.c        | 73 ++++++++++++++++++++++++++++++++
- 4 files changed, 105 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  3 +++
+ include/net/bluetooth/mgmt.h     | 11 +++++++++++
+ net/bluetooth/mgmt.c             | 24 ++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 02a6ee056b2374..9873e1c8cd163b 100644
+index 8caac20556b499..02a6ee056b2374 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -484,6 +484,9 @@ struct hci_dev {
- 	enum suspended_state	suspend_state;
- 	bool			scanning_paused;
- 	bool			suspended;
-+	u8			wake_reason;
-+	bdaddr_t		wake_addr;
-+	u8			wake_addr_type;
- 
- 	wait_queue_head_t	suspend_wait_q;
- 	DECLARE_BITMAP(suspend_tasks, __SUSPEND_NUM_TASKS);
+@@ -1750,6 +1750,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
++void mgmt_suspending(struct hci_dev *hdev, u8 state);
++void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
++		   u8 addr_type);
+ bool mgmt_powering_down(struct hci_dev *hdev);
+ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
+ void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk, bool persistent);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index a4b8935e0db97a..6b55155e05e977 100644
+index 9ad505b9e694e4..e19e33c7b65c34 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -1042,3 +1042,7 @@ struct mgmt_ev_controller_resume {
- 	__u8	wake_reason;
- 	struct mgmt_addr_info addr;
- } __packed;
+@@ -1030,3 +1030,14 @@ struct mgmt_ev_adv_monitor_added {
+ struct mgmt_ev_adv_monitor_removed {
+ 	__le16 monitor_handle;
+ }  __packed;
 +
-+#define MGMT_WAKE_REASON_NON_BT_WAKE		0x0
-+#define MGMT_WAKE_REASON_UNEXPECTED		0x1
-+#define MGMT_WAKE_REASON_REMOTE_WAKE		0x2
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ef32b12f150cd1..8a2645a8330137 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3497,12 +3497,24 @@ static int hci_change_suspend_state(struct hci_dev *hdev,
- 	return hci_suspend_wait_event(hdev);
++#define MGMT_EV_CONTROLLER_SUSPEND		0x002d
++struct mgmt_ev_controller_suspend {
++	__u8	suspend_state;
++} __packed;
++
++#define MGMT_EV_CONTROLLER_RESUME		0x002e
++struct mgmt_ev_controller_resume {
++	__u8	wake_reason;
++	struct mgmt_addr_info addr;
++} __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e1d12494d16e14..1475a47edb080b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8874,6 +8874,30 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ 	mgmt_event(MGMT_EV_DISCOVERING, hdev, &ev, sizeof(ev), NULL);
  }
  
-+static void hci_clear_wake_reason(struct hci_dev *hdev)
++void mgmt_suspending(struct hci_dev *hdev, u8 state)
 +{
-+	hci_dev_lock(hdev);
++	struct mgmt_ev_controller_suspend ev;
 +
-+	hdev->wake_reason = 0;
-+	bacpy(&hdev->wake_addr, BDADDR_ANY);
-+	hdev->wake_addr_type = 0;
-+
-+	hci_dev_unlock(hdev);
++	ev.suspend_state = state;
++	mgmt_event(MGMT_EV_CONTROLLER_SUSPEND, hdev, &ev, sizeof(ev), NULL);
 +}
 +
- static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
- 				void *data)
- {
- 	struct hci_dev *hdev =
- 		container_of(nb, struct hci_dev, suspend_notifier);
- 	int ret = 0;
-+	u8 state = BT_RUNNING;
- 
- 	/* If powering down, wait for completion. */
- 	if (mgmt_powering_down(hdev)) {
-@@ -3523,15 +3535,27 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
- 		 *  - Second, program event filter/whitelist and enable scan
- 		 */
- 		ret = hci_change_suspend_state(hdev, BT_SUSPEND_DISCONNECT);
-+		if (!ret)
-+			state = BT_SUSPEND_DISCONNECT;
- 
- 		/* Only configure whitelist if disconnect succeeded and wake
- 		 * isn't being prevented.
- 		 */
--		if (!ret && !(hdev->prevent_wake && hdev->prevent_wake(hdev)))
-+		if (!ret && !(hdev->prevent_wake && hdev->prevent_wake(hdev))) {
- 			ret = hci_change_suspend_state(hdev,
- 						BT_SUSPEND_CONFIGURE_WAKE);
-+			if (!ret)
-+				state = BT_SUSPEND_CONFIGURE_WAKE;
-+		}
-+
-+		hci_clear_wake_reason(hdev);
-+		mgmt_suspending(hdev, state);
-+
- 	} else if (action == PM_POST_SUSPEND) {
- 		ret = hci_change_suspend_state(hdev, BT_RUNNING);
-+
-+		mgmt_resuming(hdev, hdev->wake_reason, &hdev->wake_addr,
-+			      hdev->wake_addr_type);
- 	}
- 
- done:
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 33d8458fdd4adc..a68be50097ac35 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6000,6 +6000,76 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
- 	return true;
- }
- 
-+static void hci_store_wake_reason(struct hci_dev *hdev, u8 event,
-+				  struct sk_buff *skb)
++void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
++		   u8 addr_type)
 +{
-+	struct hci_ev_le_advertising_info *adv;
-+	struct hci_ev_le_direct_adv_info *direct_adv;
-+	struct hci_ev_le_ext_adv_report *ext_adv;
-+	const struct hci_ev_conn_complete *conn_complete = (void *)skb->data;
-+	const struct hci_ev_conn_request *conn_request = (void *)skb->data;
++	struct mgmt_ev_controller_resume ev;
 +
-+	hci_dev_lock(hdev);
-+
-+	/* If we are currently suspended and this is the first BT event seen,
-+	 * save the wake reason associated with the event.
-+	 */
-+	if (!hdev->suspended || hdev->wake_reason)
-+		goto unlock;
-+
-+	/* Default to remote wake. Values for wake_reason are documented in the
-+	 * Bluez mgmt api docs.
-+	 */
-+	hdev->wake_reason = MGMT_WAKE_REASON_REMOTE_WAKE;
-+
-+	/* Once configured for remote wakeup, we should only wake up for
-+	 * reconnections. It's useful to see which device is waking us up so
-+	 * keep track of the bdaddr of the connection event that woke us up.
-+	 */
-+	if (event == HCI_EV_CONN_REQUEST) {
-+		bacpy(&hdev->wake_addr, &conn_complete->bdaddr);
-+		hdev->wake_addr_type = BDADDR_BREDR;
-+	} else if (event == HCI_EV_CONN_COMPLETE) {
-+		bacpy(&hdev->wake_addr, &conn_request->bdaddr);
-+		hdev->wake_addr_type = BDADDR_BREDR;
-+	} else if (event == HCI_EV_LE_META) {
-+		struct hci_ev_le_meta *le_ev = (void *)skb->data;
-+		u8 subevent = le_ev->subevent;
-+		u8 *ptr = &skb->data[sizeof(*le_ev)];
-+		u8 num_reports = *ptr;
-+
-+		if ((subevent == HCI_EV_LE_ADVERTISING_REPORT ||
-+		     subevent == HCI_EV_LE_DIRECT_ADV_REPORT ||
-+		     subevent == HCI_EV_LE_EXT_ADV_REPORT) &&
-+		    num_reports) {
-+			adv = (void *)(ptr + 1);
-+			direct_adv = (void *)(ptr + 1);
-+			ext_adv = (void *)(ptr + 1);
-+
-+			switch (subevent) {
-+			case HCI_EV_LE_ADVERTISING_REPORT:
-+				bacpy(&hdev->wake_addr, &adv->bdaddr);
-+				hdev->wake_addr_type = adv->bdaddr_type;
-+				break;
-+
-+			case HCI_EV_LE_DIRECT_ADV_REPORT:
-+				bacpy(&hdev->wake_addr, &direct_adv->bdaddr);
-+				hdev->wake_addr_type = direct_adv->bdaddr_type;
-+				break;
-+			case HCI_EV_LE_EXT_ADV_REPORT:
-+				bacpy(&hdev->wake_addr, &ext_adv->bdaddr);
-+				hdev->wake_addr_type = ext_adv->bdaddr_type;
-+				break;
-+			}
-+		}
++	ev.wake_reason = reason;
++	if (bdaddr) {
++		bacpy(&ev.addr.bdaddr, bdaddr);
++		ev.addr.type = addr_type;
 +	} else {
-+		hdev->wake_reason = MGMT_WAKE_REASON_UNEXPECTED;
++		memset(&ev.addr, 0, sizeof(ev.addr));
 +	}
 +
-+unlock:
-+	hci_dev_unlock(hdev);
++	mgmt_event(MGMT_EV_CONTROLLER_RESUME, hdev, &ev, sizeof(ev), NULL);
 +}
 +
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_event_hdr *hdr = (void *) skb->data;
-@@ -6033,6 +6103,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	skb_pull(skb, HCI_EVENT_HDR_SIZE);
- 
-+	/* Store wake reason if we're suspended */
-+	hci_store_wake_reason(hdev, event, skb);
-+
- 	switch (event) {
- 	case HCI_EV_INQUIRY_COMPLETE:
- 		hci_inquiry_complete_evt(hdev, skb);
+ static struct hci_mgmt_chan chan = {
+ 	.channel	= HCI_CHANNEL_CONTROL,
+ 	.handler_count	= ARRAY_SIZE(mgmt_handlers),
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
