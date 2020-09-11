@@ -2,200 +2,160 @@ Return-Path: <SRS0=2FZ9=CU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0C9C43461
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 15:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD36CC43461
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:04:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8626B2075A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 15:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 664BE2075A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 17:04:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfFDLjYV"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dJVxsJcX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726551AbgIKPsX (ORCPT
+        id S1726296AbgIKRD5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Sep 2020 11:48:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36384 "EHLO
+        Fri, 11 Sep 2020 13:03:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726479AbgIKPnj (ORCPT
+        with ESMTP id S1726305AbgIKRD1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Sep 2020 11:43:39 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D40C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 08:43:39 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id g10so8685087otq.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 08:43:38 -0700 (PDT)
+        Fri, 11 Sep 2020 13:03:27 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052A2C061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:03:26 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id n14so7835205pff.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 10:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XzDgWNnuKrqNaQUU+av4P/MQZuzcjuXvW2alEkzqcAM=;
-        b=OfFDLjYVZq93cM8+BpkOhGQw1cPxXC81jWiU+/nucVDw3SCbOdqHuD/FLIDqL58ajM
-         +SApiaXhKPmTlQjjZKNU3IaEjj3UxdXrhN4mDUlYiilGfFMWlIVfePin7V6fxtnALZSr
-         EEgZKNLMEmFKHI4q9UtG9hyzNGMnUHF3Kpeo41PrPV5hbXc9sXdSm8iHMFFbMxVbXgdk
-         KMNWNZiqHyVMjFO8lZQGeai5LyD5qjzLeGRQQE+P1HK3CH197mG38ZBzi8CUUxs0O62o
-         V3zfmKZMmpONTiZPZPDwVNjK5VSw23ghalE0KwwG2nMJp2gXFv19KZXPvsh8pj5zarHM
-         /lKA==
+        d=chromium.org; s=google;
+        h=message-id:from:to:cc:subject:date:mime-version
+         :content-transfer-encoding;
+        bh=qRtDh97ORt4HovJLKdTF3WD92y4b2IDBRblpYLEE9bs=;
+        b=dJVxsJcX8QwG1cCd9nM0kqLVfSwuDe4APIAa8BtNHYsyMYxCBw/p1N7EcZeTKxdpe7
+         cS4veSRiTv6M4LDyxP7mtZ6iQo0YvYef4Kdh/7oPYjo+cKFv0BsACj+S7oXqn69EISpt
+         8NQxsdKS26ru+HxYdjZyNsxGvxZgnuK4jl1Jg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XzDgWNnuKrqNaQUU+av4P/MQZuzcjuXvW2alEkzqcAM=;
-        b=fJVfcgBtOXjBw2o8OVhmf/dY0wFGKXkacbU/v2n3gdtWqVhnk6I5spAhJN5um82r78
-         FtcVehsxpDgKrPVvlpLpSNm0Zl0cCTzumrm5PznWDxMBt3RF+/oko8enogGofOFJJ+/8
-         h4ZEaUSXvY//PLuTOg4NSXFT1HgQL1GshEBEyyo0FVfZd0FL/E6toXTpRRb9QNN8UgmJ
-         WrKqGWJoJYlfsWMOz+BPLpDRv/CO5L5xKLW954et1ZjTgZ2/Rbmxnbo7Og8SXMmPNW4u
-         q25EyyTdaBq/5MQ2oE2DXRj6YxLQnj8usITx0bPvTflG9TywuHmuhg/VvTVkPuQyK4II
-         RiOQ==
-X-Gm-Message-State: AOAM530zohdwmjvBYnG+7zQmNUPYHvnS9sU5Hqyc82x9gYSlIhflDWQv
-        rOzNHdQeDV8wZwGNM28+9VVUOzls1B819wW0Bms=
-X-Google-Smtp-Source: ABdhPJwh6sVu9L6n9x7JEhC/Ei8IrRlZTQuLMXw1B6/hn7VvgDURleyxoc/J0+Zac2Bt0iI/AS2Vh5oVa1MOkNmfITw=
-X-Received: by 2002:a9d:4695:: with SMTP id z21mr1573352ote.91.1599839018223;
- Fri, 11 Sep 2020 08:43:38 -0700 (PDT)
+        h=x-gm-message-state:message-id:from:to:cc:subject:date:mime-version
+         :content-transfer-encoding;
+        bh=qRtDh97ORt4HovJLKdTF3WD92y4b2IDBRblpYLEE9bs=;
+        b=Vl+NcX74+X9/rwMGPmOEGEugnnialN7QTlugpszEGZR5b547jqFYZbJl8zfs0KBqYZ
+         9FeA+RtmSyG2eEnNStPUiXhsvzvG/QygySmxl9XYOJKPRZyil5IAEE+DmH81SNRVH2Ju
+         S3gcFTK/d1MD4BzMW+f7PWrf2PwBuj+PGLlknz8AO5WNoo+Pep/9wKELlA9RkBZxf0Zk
+         /Dy+zqjEkQVZUtiDm8ow40tGGgdr8faBUukZE9/2MSj/62l56aeKGlvbmLekICWCvIzq
+         M0PfljfOONoGX6VaflG+zR+PYPSy+sT/esY0sIKhmKsQ2zzOWHJW1GH4bL3Px8SJTDh3
+         7+1A==
+X-Gm-Message-State: AOAM530DYIynr6vxcloEoaksdY7HKRbeKi62aK+WmCyT2rrBUXwg8DgW
+        KVJ+7/diK3qq2szge0+DJkhnPg==
+X-Google-Smtp-Source: ABdhPJw7sDOAisikq+F/mVJQrRg8pbzocfSBl45sp+09hdh3wWhJ9hDo4+UdBQZMAetb42PEHKjHIw==
+X-Received: by 2002:a63:f1d:: with SMTP id e29mr2319480pgl.358.1599843805452;
+        Fri, 11 Sep 2020 10:03:25 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id q16sm3103738pfj.117.2020.09.11.10.03.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 10:03:24 -0700 (PDT)
+Message-ID: <5f5baddc.1c69fb81.8c960.760a@mx.google.com>
+X-Google-Original-Message-ID: <20200911100258.RESEND Bluez.v2.1.I9181af521cf0fba8f4315c9b89975848d437d6dd@changeid>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [RESEND Bluez PATCH v2] doc: Add Suspend and Resume events
+Date:   Fri, 11 Sep 2020 10:03:17 -0700
+X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
 MIME-Version: 1.0
-References: <20200902125726.Bluez.v1.1.I732df55cd70d552fc48e87686fb53c3f8ccbefa5@changeid>
-In-Reply-To: <20200902125726.Bluez.v1.1.I732df55cd70d552fc48e87686fb53c3f8ccbefa5@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 11 Sep 2020 08:43:27 -0700
-Message-ID: <CABBYNZKtMFwYZFwzoO=G54YQJVMyyyJF45eaPM9pM4_5d9j-dA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] avrcp: Add handler for GET_TOTAL_NUMBER_OF_ITEMS
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>,
-        Michael Sun <michaelfsun@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Add Controller Suspend Event and Controller Resume Event to identify
+suspend or resume of the Bluetooth stack has occurred.
 
-On Tue, Sep 1, 2020 at 9:57 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> According to the AVRCP spec, section 4.5, GetTotalNumberOfItems PDU
-> is mandatory for TG supporting category 1 or 3.
->
-> Reviewed-by: Yun-Hao Chung <howardchung@google.com>
-> Reviewed-by: Michael Sun <michaelfsun@google.com>
-> ---
->
->  profiles/audio/avrcp.c | 58 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 5d0256c52..6da73394f 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -79,6 +79,7 @@
->  #define AVRCP_STATUS_SUCCESS                   0x04
->  #define AVRCP_STATUS_UID_CHANGED               0x05
->  #define AVRCP_STATUS_DOES_NOT_EXIST            0x09
-> +#define AVRCP_STATUS_INVALID_SCOPE             0x0a
->  #define AVRCP_STATUS_OUT_OF_BOUNDS             0x0b
->  #define AVRCP_STATUS_INVALID_PLAYER_ID         0x11
->  #define AVRCP_STATUS_PLAYER_NOT_BROWSABLE      0x12
-> @@ -211,6 +212,12 @@ struct player_item {
->         char name[0];
->  } __attribute__ ((packed));
->
-> +struct get_total_number_of_items_rsp {
-> +       uint8_t status;
-> +       uint16_t uid_counter;
-> +       uint32_t num_items;
-> +} __attribute__ ((packed));
-> +
->  struct avrcp_server {
->         struct btd_adapter *adapter;
->         uint32_t tg_record_id;
-> @@ -566,6 +573,9 @@ static void populate_default_features(void)
->
->         /* supports at least AVRCP 1.4 */
->         default_features[7] |= (1 << 2);
-> +
-> +       /* supports GetTotalNumberOfItems browsing command */
-> +       default_features[8] |= (1 << 3);
->  }
->
->  static unsigned int attr_get_max_val(uint8_t attr)
-> @@ -2048,10 +2058,56 @@ static void avrcp_handle_get_folder_items(struct avrcp *session,
->         case AVRCP_SCOPE_SEARCH:
->         case AVRCP_SCOPE_NOW_PLAYING:
->         default:
-> +               status = AVRCP_STATUS_INVALID_SCOPE;
-> +               goto failed;
-> +       }
-> +
-> +       return;
-> +
-> +failed:
-> +       pdu->params[0] = status;
-> +       pdu->param_len = htons(1);
-> +}
-> +
-> +static void avrcp_handle_media_player_list_num_items(struct avrcp *session,
-> +                               struct avrcp_browsing_header *pdu)
-> +{
-> +       struct avrcp_player *player = target_get_player(session);
-> +       struct get_total_number_of_items_rsp *rsp;
-> +
-> +       rsp = (void *)pdu->params;
-> +       rsp->status = AVRCP_STATUS_SUCCESS;
-> +       rsp->uid_counter = htons(player_get_uid_counter(player));
-> +       rsp->num_items = htonl(g_slist_length(session->server->players));
-> +       pdu->param_len = htons(sizeof(*rsp));
-> +}
-> +
-> +static void avrcp_handle_get_total_number_of_items(struct avrcp *session,
-> +                               struct avrcp_browsing_header *pdu,
-> +                               uint8_t transaction)
-> +{
-> +       uint8_t scope;
-> +       uint8_t status = AVRCP_STATUS_SUCCESS;
-> +
-> +       if (ntohs(pdu->param_len) != 1) {
->                 status = AVRCP_STATUS_INVALID_PARAM;
->                 goto failed;
->         }
->
-> +       scope = pdu->params[0];
-> +
-> +       switch (scope) {
-> +       case AVRCP_SCOPE_MEDIA_PLAYER_LIST:
-> +               avrcp_handle_media_player_list_num_items(session, pdu);
-> +               break;
-> +       case AVRCP_SCOPE_MEDIA_PLAYER_VFS:
-> +       case AVRCP_SCOPE_SEARCH:
-> +       case AVRCP_SCOPE_NOW_PLAYING:
-> +       default:
-> +               status = AVRCP_STATUS_INVALID_SCOPE;
-> +               goto failed;
-> +       }
-> +
->         return;
->
->  failed:
-> @@ -2065,6 +2121,8 @@ static struct browsing_pdu_handler {
->                                                         uint8_t transaction);
->  } browsing_handlers[] = {
->                 { AVRCP_GET_FOLDER_ITEMS, avrcp_handle_get_folder_items },
-> +               { AVRCP_GET_TOTAL_NUMBER_OF_ITEMS,
-> +                               avrcp_handle_get_total_number_of_items },
->                 { },
->  };
->
-> --
-> 2.28.0.402.g5ffc5be6b7-goog
->
+Also update Device Disconnected Event to indicate a new disconnect
+reason: "Connection terminated by local host for suspend"
 
-Applied, thanks.
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
+Re-sending along with kernel changes.
 
+Changes in v2:
+- Moved Wake_Reason to first value
+- Reduced Wake_Reason to not Bluetooth, unexpected event and remote wake
+
+ doc/mgmt-api.txt | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ca0d38469..e7a713824 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3834,6 +3834,7 @@ Device Disconnected Event
+ 		2	Connection terminated by local host
+ 		3	Connection terminated by remote host
+ 		4	Connection terminated due to authentication failure
++		5	Connection terminated by local host for suspend
+ 
+ 	Note that the local/remote distinction just determines which side
+ 	terminated the low-level connection, regardless of the
+@@ -4577,3 +4578,50 @@ Advertisement Monitor Removed Event
+ 
+ 	The event will only be sent to management sockets other than the
+ 	one through which the command was sent.
++
++
++Controller Suspend Event
++========================
++
++	Event code:		0x002d
++	Controller Index:	<controller_id>
++	Event Parameters:	Suspend_State (1 octet)
++
++	This event indicates that the controller is suspended for host suspend.
++
++	Possible values for the Suspend_State parameter:
++		0	Running (not disconnected)
++		1	Disconnected and not scanning
++		2	Page scanning and/or passive scanning.
++
++	The value 0 is used for the running state and may be sent if the
++	controller could not be configured to suspend properly.
++
++	This event will be sent to all management sockets.
++
++
++Controller Resume Event
++=======================
++
++	Event code:		0x002e
++	Controller Index:	<controller_id>
++	Event Parameters:	Wake_Reason (1 octet)
++				Address (6 octets)
++				Address_Type (1 octet)
++
++	This event indicates that the controller has resumed from suspend.
++
++	Possible values for the Wake_Reason parameter:
++		0	Resume from non-Bluetooth wake source
++		1	Wake due to unexpected event
++		2	Remote wake due to peer device connection
++
++	Currently, we expect that only peer reconnections should wake us from
++	the suspended state. Any other events that occurred while the system
++	should have been suspended results in wake due to unexpected event.
++
++	If the Wake_Reason is Remote wake due to connection, the address of the
++	peer device that caused the event will be shared in Address and
++	Address_Type. Otherwise, Address and Address_Type will both be zero.
++
++	This event will be sent to all management sockets.
 -- 
-Luiz Augusto von Dentz
+2.28.0.618.gf4bc123cb7-goog
+
