@@ -6,67 +6,65 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2782EC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B30C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8A26221EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:02:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC6A3221EE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 07:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725767AbgIKHCD convert rfc822-to-8bit (ORCPT
+        id S1725825AbgIKHEd convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Sep 2020 03:02:03 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42917 "EHLO
+        Fri, 11 Sep 2020 03:04:33 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41326 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbgIKHCB (ORCPT
+        with ESMTP id S1725768AbgIKHE3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Sep 2020 03:02:01 -0400
+        Fri, 11 Sep 2020 03:04:29 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 530AECED19;
-        Fri, 11 Sep 2020 09:08:55 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id EAC5BCED19;
+        Fri, 11 Sep 2020 09:11:23 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [Linux-kernel-mentees] [PATCH v2] Bluetooth: Fix memory leak in
- read_adv_mon_features()
+Subject: Re: [PATCH v1 1/4] Bluetooth: hci_intel: enable on new platform
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200909072551.1101031-1-yepeilin.cs@gmail.com>
-Date:   Fri, 11 Sep 2020 09:01:59 +0200
+In-Reply-To: <20200903184850.53055-1-andriy.shevchenko@linux.intel.com>
+Date:   Fri, 11 Sep 2020 09:04:28 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzkaller-bugs@googlegroups.com
+        linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <15999FE1-5227-4D55-8E3C-39142725FDA5@holtmann.org>
-References: <20200908200635.1099360-1-yepeilin.cs@gmail.com>
- <20200909072551.1101031-1-yepeilin.cs@gmail.com>
-To:     Peilin Ye <yepeilin.cs@gmail.com>
+Message-Id: <BB2D5D56-F018-4FF7-8DF8-198B3C8CE025@holtmann.org>
+References: <20200903184850.53055-1-andriy.shevchenko@linux.intel.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Peilin,
+Hi Andy,
 
-> read_adv_mon_features() is leaking memory. Free `rp` before returning.
+> On new Intel platform the device is provided with INT33E3 ID.
+> Append it to the list.
 > 
-> Fixes: e5e1e7fd470c ("Bluetooth: Add handler of MGMT_OP_READ_ADV_MONITOR_FEATURES")
-> Reported-and-tested-by: syzbot+f7f6e564f4202d8601c6@syzkaller.appspotmail.com
-> Link: https://syzkaller.appspot.com/bug?extid=f7f6e564f4202d8601c6
-> Signed-off-by: Peilin Ye <yepeilin.cs@gmail.com>
+> This will require ACPI_GPIO_QUIRK_ONLY_GPIOIO to be enabled because
+> the relevant ASL looks like:
+> 
+> 	UartSerialBusV2 ( ... )
+> 	GpioInt ( ... ) { ... }
+> 	GpioIo ( ... ) { ... }
+> 
+> which means that first GPIO resource is an interrupt, while we are expecting it
+> to be reset one (output). Do the same for host-wake because in case of
+> GpioInt() the platform_get_irq() will do the job and should return correct
+> Linux IRQ number. That said, host-wake GPIO can only be GpioIo() resource.
+> 
+> While here, drop commas in terminator lines.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
-> I forgot the "Link:" tag yesterday. Sorry about that.
-> 
-> Change in v2:
->    - add a proper "Link:" tag.
-> 
-> net/bluetooth/mgmt.c | 12 ++++++++----
-> 1 file changed, 8 insertions(+), 4 deletions(-)
+> drivers/bluetooth/hci_intel.c | 9 +++++----
+> 1 file changed, 5 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
