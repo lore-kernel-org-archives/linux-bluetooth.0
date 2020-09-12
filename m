@@ -2,235 +2,162 @@ Return-Path: <SRS0=izlr=CV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CE3C43461
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 07:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8099CC43461
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 09:10:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 116DE21D79
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 07:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A02620719
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 09:10:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZyEAXGRT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lockxSqe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725832AbgILHgG (ORCPT
+        id S1725845AbgILJKo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Sep 2020 03:36:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42558 "EHLO
+        Sat, 12 Sep 2020 05:10:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725799AbgILHgD (ORCPT
+        with ESMTP id S1725805AbgILJKn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Sep 2020 03:36:03 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78AFC061573;
-        Sat, 12 Sep 2020 00:36:03 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id d6so8887169pfn.9;
-        Sat, 12 Sep 2020 00:36:03 -0700 (PDT)
+        Sat, 12 Sep 2020 05:10:43 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D708C061573;
+        Sat, 12 Sep 2020 02:10:41 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id kk9so2839904pjb.2;
+        Sat, 12 Sep 2020 02:10:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=yYff2w6zlApOTzpZkutXOi9traPBbtwOxlc9tQk8BEM=;
-        b=ZyEAXGRTCfDJ2C44NKeQntFzg/c6PLNgJoZkMV6VfQf9VbcqxSrEyq97A9n2lGEZn9
-         eGVQoslijGaDhRrgoQ0jv1L4ZRyQG4AXI1gdCLlthZmD0ehqrD9NnP0IOTgZt9/m3oua
-         DrgWNWLi0jy1hiddHKq1QcjPRmkMCtUttwKb88zLn5wE9barXBjq7Yk2i0BtNErqBQLC
-         q+X2CNSmvGqAcYvLakhnzI/RXdKM08vyaegXdglMfTQ482cg1BKfeFJHOqrNXTtf30pY
-         G2Ah4X46Yrelys300zVEkzmn6TiTilwP/H1rlHOaVnzvhXQ2BHH+GS5Pfpqo79pykue8
-         xOdA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7PYEesOAlpZ6EGj+ZnorXol6wlG+lLB6E3fRAdDw39I=;
+        b=lockxSqeqPWAPyWQut+klsJTsZpv/mmjtq1Ew3/fyzkXskyq9Dl+ybw70ltuZfRtuX
+         difHzAuL51vYSHWAir+mRZza4wHpdP1pHV46ko9Ga5U8IC05HBFJ/JQLzq0KctECG1wK
+         Uk5zt8nBHZ7qwgxnidBiRryGNMHkruOBUJ84m3Oa1b3ueDgwn7cmfAFA2QyjHJgnDhnK
+         02r7kfVpw8R9LZ9Qa23uE6dTIzKnUBFgwI15ECSB4BWGVugVmo2yL+EHGjWnM2AwOGgM
+         akRHdwx7b97bDLm9VorOZpH96KvLzuFVMCpRGBdU7rrOJwizb1VMv55gBXsQOcDQwg7e
+         fM8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=yYff2w6zlApOTzpZkutXOi9traPBbtwOxlc9tQk8BEM=;
-        b=licDfG0+ufqtgwkCkSxFYVtdKS7aUoDJMBjU0UZE8i5gxKZ53Ssogog09SnAQhBOZS
-         MAQcIEs+l7p2gwd1kEpauFT/Q0/9t+F0BxaXmZwcFG2iX0JD4pO2S1/FfueLjK5mjhH9
-         Axwn/t6WWP77hX1NDpy/Km7JTzWdiWsyIcUgms+uNqJ0kfuOuh54E4848onelXM9OecD
-         aJepIIsEiR6KQjKEnKGa5maDppMcptdZkBLjERBJHYuHYjTZqRoRhlO/sp1NLw2hS3yy
-         S2fH6+SNfIMdAFvsJJZf1eY2VR00fwjUJP+bTWW2wr9oqMlgADpQlwnSQvJZH5XAQ7K7
-         ZVfw==
-X-Gm-Message-State: AOAM531Nvjn6zqw6gu1013X5APgoi0nQWXI17KJFzVgK+76Hg/zZ/vkZ
-        e3rrsh37eQshqd7M9Gfp7Do=
-X-Google-Smtp-Source: ABdhPJxu8IcukOIJI1s0BZL8A6kNS9HU/8+niTwFoTZlQ/bxh93pdbXAW7OLkjrea/0pcLPu4TC0Fw==
-X-Received: by 2002:a63:205d:: with SMTP id r29mr4090921pgm.278.1599896163066;
-        Sat, 12 Sep 2020 00:36:03 -0700 (PDT)
-Received: from [192.168.0.104] ([49.207.202.95])
-        by smtp.gmail.com with ESMTPSA id y25sm4252568pfn.71.2020.09.12.00.35.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Sep 2020 00:36:02 -0700 (PDT)
-Subject: Re: KASAN: use-after-free Read in hci_get_auth_info
-To:     Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+13010b6a10bbd82cc79c@syzkaller.appspotmail.com>
-Cc:     David Miller <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-References: <000000000000e8fb4b05ac58372e@google.com>
- <CACT4Y+Z2Sz8kHxaQNuupfck7X0rUtr4ghDty9ahDTUm2H41Mwg@mail.gmail.com>
-From:   Anant Thazhemadam <anant.thazhemadam@gmail.com>
-Message-ID: <f3724ef6-7c89-5c24-685e-00327046e144@gmail.com>
-Date:   Sat, 12 Sep 2020 13:05:56 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7PYEesOAlpZ6EGj+ZnorXol6wlG+lLB6E3fRAdDw39I=;
+        b=eqHeFpMuZp8NISlnO5jaK+fIQMWR2yWSA31NmK0IWJane6V/33W74F3bc07szdlglA
+         X7NUq9ghhJxjQ3ANY0bmuyLASdkx3i+F1sT81lzyUMQz5kMxuoqkdwDqXQHYVaKPd198
+         WQkAwQlE5JGMNdldcV6sqrr5wV5cPoix8gAWBmxmHLi98FEOD5mD11h66JaE3rR2FCU8
+         85ZzS3YolplvyTrZumNuN96Gh+MvBYCGCb9Qbo6i3mKuQqyP+Smu6JaZtIM1CPhGfHbJ
+         rOrzu5DAJHyqNpyueqjAFZ0AfV3kR055HUAH4uj+Q/LuOCj4fs9GDn/fzeqKz7qkEsfX
+         rzPQ==
+X-Gm-Message-State: AOAM532pz5Fl3XzjOQrztcQVYoobuPubUVIraSM+OICluzNXLNvwffsD
+        J0S+9lEi7DJTDRrztzQB/90=
+X-Google-Smtp-Source: ABdhPJxAqItjHVWxp6Lt4YSjOiMy5z9xtkVG0MWQy8GWhKJivsm6O70ySfZCGPyc1Pzc/2mtPgU9bA==
+X-Received: by 2002:a17:90b:617:: with SMTP id gb23mr5593370pjb.36.1599901837539;
+        Sat, 12 Sep 2020 02:10:37 -0700 (PDT)
+Received: from Thinkpad ([45.118.165.151])
+        by smtp.gmail.com with ESMTPSA id ca6sm3870611pjb.53.2020.09.12.02.10.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Sep 2020 02:10:36 -0700 (PDT)
+Date:   Sat, 12 Sep 2020 14:40:28 +0530
+From:   Anmol Karn <anmol.karan123@gmail.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        kuba@kernel.org, davem@davemloft.net,
+        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
+Subject: Re: [Linux-kernel-mentees] [PATCH] net: bluetooth: Fix null pointer
+ dereference in hci_event_packet()
+Message-ID: <20200912091028.GA67109@Thinkpad>
+References: <20200910043424.19894-1-anmol.karan123@gmail.com>
+ <20200910104918.GF12635@kadam>
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+Z2Sz8kHxaQNuupfck7X0rUtr4ghDty9ahDTUm2H41Mwg@mail.gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200910104918.GF12635@kadam>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Thu, Sep 10, 2020 at 01:49:18PM +0300, Dan Carpenter wrote:
+> On Thu, Sep 10, 2020 at 10:04:24AM +0530, Anmol Karn wrote:
+> > Prevent hci_phy_link_complete_evt() from dereferencing 'hcon->amp_mgr'
+> > as NULL. Fix it by adding pointer check for it.
+> > 
+> > Reported-and-tested-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
+> > Link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f
+> > Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
+> > ---
+> >  net/bluetooth/hci_event.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 4b7fc430793c..871e16804433 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -4936,6 +4936,11 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+> >  		return;
+> >  	}
+> >  
+> > +	if (IS_ERR_OR_NULL(hcon->amp_mgr)) {
+> 
+> It can't be an error pointer.  Shouldn't we call hci_conn_del() on this
+> path?  Try to find the Fixes tag to explain how this bug was introduced.
+> 
+> (Don't rush to send a v2.  The patch requires quite a bit more digging
+> and detective work before it is ready).
+> 
+> > +		hci_dev_unlock(hdev);
+> > +		return;
+> > +	}
+> > +
+> >  	if (ev->status) {
+> >  		hci_conn_del(hcon);
+> >  		hci_dev_unlock(hdev);
+> 
+> regards,
+> dan carpenter
+> 
 
-On 11-09-2020 15:20, Dmitry Vyukov wrote:
-> On Sat, Aug 8, 2020 at 8:56 AM syzbot
-> <syzbot+13010b6a10bbd82cc79c@syzkaller.appspotmail.com> wrote:
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    d6efb3ac Merge tag 'tty-5.9-rc1' of git://git.kernel.org/p..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=14ad2134900000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=61ec43e42a83feae
->> dashboard link: https://syzkaller.appspot.com/bug?extid=13010b6a10bbd82cc79c
->> compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12fd9bc6900000
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+13010b6a10bbd82cc79c@syzkaller.appspotmail.com
-> +Anant who had some questions re this issue.
+Sir,
 
-This bug doesn't seem to be getting triggered anymore for the appropriate kernel(s).
-However, given that neither the cause bisection, nor the fix bisection seem to have
-suceeded, it makes it all the more difficult to zero down on the commit that might've
-fixed this bug. Would it be okay to consider this a one-off, or invalid and close it off?
-(unless someone can point out the commit that fixed this, of course).
+I need little advice in continuing with this Patch,
 
-Thanks for CCing me onto this, Dmitry.
+I have looked into the Bisected logs and the problem occurs from this commit:
 
-Thanks,
-Anant
+941992d29447 ("ethernet: amd: use IS_ENABLED() instead of checking for built-in or module")
 
 
->
->> ==================================================================
->> BUG: KASAN: use-after-free in __mutex_waiter_is_first kernel/locking/mutex.c:200 [inline]
->> BUG: KASAN: use-after-free in __mutex_lock_common+0x12cd/0x2fc0 kernel/locking/mutex.c:1040
->> Read of size 8 at addr ffff88808e668060 by task syz-executor.4/19584
->>
->> CPU: 0 PID: 19584 Comm: syz-executor.4 Not tainted 5.8.0-syzkaller #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->> Call Trace:
->>  __dump_stack lib/dump_stack.c:77 [inline]
->>  dump_stack+0x1f0/0x31e lib/dump_stack.c:118
->>  print_address_description+0x66/0x5a0 mm/kasan/report.c:383
->>  __kasan_report mm/kasan/report.c:513 [inline]
->>  kasan_report+0x132/0x1d0 mm/kasan/report.c:530
->>  __mutex_waiter_is_first kernel/locking/mutex.c:200 [inline]
->>  __mutex_lock_common+0x12cd/0x2fc0 kernel/locking/mutex.c:1040
->>  __mutex_lock kernel/locking/mutex.c:1103 [inline]
->>  mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:1118
->>  hci_get_auth_info+0x69/0x3a0 net/bluetooth/hci_conn.c:1689
->>  hci_sock_bound_ioctl net/bluetooth/hci_sock.c:957 [inline]
->>  hci_sock_ioctl+0x5ae/0x750 net/bluetooth/hci_sock.c:1060
->>  sock_do_ioctl+0x7b/0x260 net/socket.c:1047
->>  sock_ioctl+0x4aa/0x690 net/socket.c:1198
->>  vfs_ioctl fs/ioctl.c:48 [inline]
->>  ksys_ioctl fs/ioctl.c:753 [inline]
->>  __do_sys_ioctl fs/ioctl.c:762 [inline]
->>  __se_sys_ioctl+0xf9/0x160 fs/ioctl.c:760
->>  do_syscall_64+0x31/0x70 arch/x86/entry/common.c:46
->>  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->> RIP: 0033:0x45ccd9
->> Code: 2d b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb b5 fb ff c3 66 2e 0f 1f 84 00 00 00 00
->> RSP: 002b:00007f113a564c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
->> RAX: ffffffffffffffda RBX: 000000000001d300 RCX: 000000000045ccd9
->> RDX: 0000000020000000 RSI: 00000000800448d7 RDI: 0000000000000005
->> RBP: 000000000078bf40 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078bf0c
->> R13: 00007ffd62ea93af R14: 00007f113a5659c0 R15: 000000000078bf0c
->>
->> Allocated by task 6822:
->>  save_stack mm/kasan/common.c:48 [inline]
->>  set_track mm/kasan/common.c:56 [inline]
->>  __kasan_kmalloc+0x103/0x140 mm/kasan/common.c:494
->>  kmem_cache_alloc_trace+0x234/0x300 mm/slab.c:3551
->>  kmalloc include/linux/slab.h:555 [inline]
->>  kzalloc include/linux/slab.h:669 [inline]
->>  hci_alloc_dev+0x4c/0x1aa0 net/bluetooth/hci_core.c:3543
->>  __vhci_create_device drivers/bluetooth/hci_vhci.c:99 [inline]
->>  vhci_create_device+0x113/0x520 drivers/bluetooth/hci_vhci.c:148
->>  process_one_work+0x789/0xfc0 kernel/workqueue.c:2269
->>  worker_thread+0xaa4/0x1460 kernel/workqueue.c:2415
->>  kthread+0x37e/0x3a0 drivers/block/aoe/aoecmd.c:1234
->>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
->>
->> Freed by task 9965:
->>  save_stack mm/kasan/common.c:48 [inline]
->>  set_track mm/kasan/common.c:56 [inline]
->>  kasan_set_free_info mm/kasan/common.c:316 [inline]
->>  __kasan_slab_free+0x114/0x170 mm/kasan/common.c:455
->>  __cache_free mm/slab.c:3426 [inline]
->>  kfree+0x10a/0x220 mm/slab.c:3757
->>  bt_host_release+0x18/0x20 net/bluetooth/hci_sysfs.c:86
->>  device_release+0x70/0x1a0 drivers/base/core.c:1796
->>  kobject_cleanup lib/kobject.c:704 [inline]
->>  kobject_release lib/kobject.c:735 [inline]
->>  kref_put include/linux/kref.h:65 [inline]
->>  kobject_put+0x1a0/0x2c0 lib/kobject.c:752
->>  vhci_release+0x7b/0xc0 drivers/bluetooth/hci_vhci.c:341
->>  __fput+0x2f0/0x750 fs/file_table.c:281
->>  task_work_run+0x137/0x1c0 kernel/task_work.c:135
->>  exit_task_work include/linux/task_work.h:25 [inline]
->>  do_exit+0x5f3/0x1f20 kernel/exit.c:806
->>  do_group_exit+0x161/0x2d0 kernel/exit.c:903
->>  __do_sys_exit_group+0x13/0x20 kernel/exit.c:914
->>  __ia32_sys_exit_group+0x0/0x40 kernel/exit.c:912
->>  __x64_sys_exit_group+0x37/0x40 kernel/exit.c:912
->>  do_syscall_64+0x31/0x70 arch/x86/entry/common.c:46
->>  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> The buggy address belongs to the object at ffff88808e668000
->>  which belongs to the cache kmalloc-8k of size 8192
->> The buggy address is located 96 bytes inside of
->>  8192-byte region [ffff88808e668000, ffff88808e66a000)
->> The buggy address belongs to the page:
->> page:ffffea0002399a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 head:ffffea0002399a00 order:2 compound_mapcount:0 compound_pincount:0
->> flags: 0xfffe0000010200(slab|head)
->> raw: 00fffe0000010200 ffffea000217a208 ffffea0001e6c008 ffff8880aa4021c0
->> raw: 0000000000000000 ffff88808e668000 0000000100000001 0000000000000000
->> page dumped because: kasan: bad access detected
->>
->> Memory state around the buggy address:
->>  ffff88808e667f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>  ffff88808e667f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>> ffff88808e668000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>                                                        ^
->>  ffff88808e668080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>  ffff88808e668100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> ==================================================================
->>
->>
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->> syzbot can test patches for this issue, for details see:
->> https://goo.gl/tpsmEJ#testing-patches
->>
->> --
->> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
->> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
->> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/000000000000e8fb4b05ac58372e%40google.com.
+Here is a diff of patch which i modified from last patch,
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4b7fc430793c..6ce435064e0b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4936,6 +4936,12 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+                return;
+        }
+
++       if (!hcon->amp_mgr) {
++               hci_conn_del(hcon);
++               hci_dev_unlock(hdev);
++               return;
++       }
++
+        if (ev->status) {
+                hci_conn_del(hcon);
+                hci_dev_unlock(hdev);
+
+
+The value of 'hcon->amp_mgr' getting NULL due to hci_conn_hash_lookup_handle call
+, and there is not any checks there for the members of hcon, which enables 
+hci_phy_link_complete_evt() to dereference 'hcon->amp_mgr' as NULL.
+
+please suggest improvements to this patch.
+
+Regards,
+Anmol  
