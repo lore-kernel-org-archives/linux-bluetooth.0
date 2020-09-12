@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E10C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AEAC43461
 	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B577214D8
+	by mail.kernel.org (Postfix) with ESMTP id 285D4214D8
 	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0eNKGxb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RTO6O/MB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725825AbgILGvi (ORCPT
+        id S1725837AbgILGve (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Sep 2020 02:51:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
+        Sat, 12 Sep 2020 02:51:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725832AbgILGv2 (ORCPT
+        with ESMTP id S1725825AbgILGv1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Sep 2020 02:51:28 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEF8C0613ED
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:27 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id g72so12125998qke.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:27 -0700 (PDT)
+        Sat, 12 Sep 2020 02:51:27 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A20C061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:26 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id j10so6351532qvk.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=UNvSwneC3lW+y+Venzokn4WMeSbjIHLO72zq8UysDdY=;
-        b=Y0eNKGxbw2NoO0UhyJ1OhLZvP0QE8nTFaTMN3wLp2cB6bxHMxXw7XO9ukB+oxXnjAF
-         bPe5OJKVessvih5jJEDT/2FtFYivNUz4S8ddpQAe2GLaEUxu5V1TMHnq6Iu/H62nglIl
-         twBuKIIPVu+AeQ1i+o7d6bUJAA+DNpwn+Ex7a5BLgSAKgQVWl9TgTKH4/GISD/neescD
-         1cM4/bFKUGd7/oz55wG+tsj5ThdhGv3Xf7PijJYXF+MN6jhdDVhO1+lr1cs4aCBg6Thp
-         P82/g5FDTPXswQ+3VjGgSKIz2F+mnmahmNg+J2+DOUC5jMcxVqy4r5JS2mbwm/hSYbOG
-         YDmQ==
+        bh=jEo9swi/0dqO3HOSpVsqcg0CYWt3m3OF8SnW99CIgko=;
+        b=RTO6O/MBEYoZDP7CHBMbWHozhmDi8rcBv2N9TBPTraHS1C9WipS5IoBINjw9Yndjy3
+         LNHSQk5tYEkBc6jsKmzyRYOxYzDxmMgjW/TiuiW1gwv4YVbVecEo8F4fR8LtnzQ6UdYV
+         ySF5+7iQkaML6q8+nhwU4fowIENzE29gkO56i9XGwki6fbNUt1+kIVtoNN6GE9y4R4TO
+         sspm0rhE89ogVQt4/0RZpCi1q0WDgh9ecmPdUOnSu+51cWxEC3iukAJax/9R5YjR1Sxh
+         JPTOClcdT/g4irlqiqSX7v43LUp+HWIFtptMs75ZCGIBATwYdycnuE1eVF25l7HNKsae
+         ax8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=UNvSwneC3lW+y+Venzokn4WMeSbjIHLO72zq8UysDdY=;
-        b=JG0b653FmXngP2P0ylcxIP6AFLc/r4Q5nJ7bSvmJDOWXOS3lENTvJFHhNvuLZaSsOX
-         laj7HsBKuTXtNyKUWuKfjRVJVXUZ9IkPXYUlyPwBYXSgtJrnZMHh9OixFxxQF3dfS/QS
-         yr+jNe+FCYI1pLvVskJHJpn119oo2MD8tMFw8On4oTT+PYLVQnmAWXLSh27kiLE+zV4E
-         j4Ufq7jqtNedH1m2ntGnLZ+iIuKC2wbeueUDd6WvP75mWMVIgOi+8XvNxa1tIrR5xYfh
-         RlE5TzBhufvIjVv71iMv94qtWyNyUSsDtGt74DgVUXzksdLVHCwSu0Hd5HEe5POiaDv9
-         X83A==
-X-Gm-Message-State: AOAM532izyPkQX3MlgmaGFR1BJNyFR+kGQABfiXOMCXujblGVWV3sraL
-        BaRd5p16QT9OgxDo2kTrNCAF3fNWjYRWYQ==
-X-Google-Smtp-Source: ABdhPJzNJcQ1+fA1492hFnJDrG28jgCgDHaSJhIjC0OQBceFcwf3jqr6nXJwF8Gsw2dlKEuR3R48Vw==
-X-Received: by 2002:a37:6892:: with SMTP id d140mr4535699qkc.58.1599893483208;
-        Fri, 11 Sep 2020 23:51:23 -0700 (PDT)
+        bh=jEo9swi/0dqO3HOSpVsqcg0CYWt3m3OF8SnW99CIgko=;
+        b=pILKIcONaVRbDXx9kdCd77pv+u/jl8IWsa9m1w0/fBG/KBHdv2Mam5wBEuJ8lnLFik
+         LamrMFgA19YMugLtAa/HSpA7rgy50GNyAgNRbkF0eLLQ34+32Cp+kOC/p8Mo82b/GAne
+         i8bTuu8SJLN84EudKKev7EUIyKsXndP/mUsgijNCKh8wiw9serhp37aQdMD0hG4rgJep
+         nyw8/oWBFPvf6Fn/ubrLe81K9r1MPoyktZvt7QpWeQgTovI4Ek1iQ2vmLdCVZf8LTpb5
+         771CBJBQoVKEc1RfXu03Pn62+t+wtxYtRMp+tycrvKglVuHzUtrtFzr0BFK106u2eEp7
+         HmtA==
+X-Gm-Message-State: AOAM533a30xwZ8FuZv4X8GJE3J60jEQtHNSAzuaVCfTaNhw4MYQNcOH2
+        vqJEAEzCWAxrqIBGJaUXgV+E1krcNMJTOA==
+X-Google-Smtp-Source: ABdhPJwmSsTyfiBacZ+aQzZCl+AxB+JxbKWgxpcUB1UXeVaXm9JwP4lnR/iocL3l6LnR/GTrr78+yg==
+X-Received: by 2002:a0c:c304:: with SMTP id f4mr5301062qvi.8.1599893485177;
+        Fri, 11 Sep 2020 23:51:25 -0700 (PDT)
 Received: from [172.17.0.2] ([40.84.17.224])
-        by smtp.gmail.com with ESMTPSA id b190sm763988qkd.45.2020.09.11.23.51.22
+        by smtp.gmail.com with ESMTPSA id x59sm5891253qte.14.2020.09.11.23.51.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 23:51:22 -0700 (PDT)
-Message-ID: <5f5c6fea.1c69fb81.43f41.1e35@mx.google.com>
-Date:   Fri, 11 Sep 2020 23:51:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3487050300692952400=="
+        Fri, 11 Sep 2020 23:51:24 -0700 (PDT)
+Message-ID: <5f5c6fec.1c69fb81.37dac.f57e@mx.google.com>
+Date:   Fri, 11 Sep 2020 23:51:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2710110518128234941=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: [BlueZ,03/17] btio: Add SPDX License Identifier
+Subject: RE: [BlueZ,05/17] emulator: Add SPDX License Identifier
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200912062357.23926-4-tedd.an@linux.intel.com>
-References: <20200912062357.23926-4-tedd.an@linux.intel.com>
+In-Reply-To: <20200912062357.23926-6-tedd.an@linux.intel.com>
+References: <20200912062357.23926-6-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3487050300692952400==
+--===============2710110518128234941==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,15 +92,79 @@ Test Result:
 checkpatch Failed
 
 Outputs:
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'btio/btio.h', please use '/*' instead
-#31: FILE: btio/btio.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/amp.h', please use '/*' instead
+#54: FILE: emulator/amp.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
 
 WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#31: FILE: btio/btio.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
+#54: FILE: emulator/amp.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
 
-- total: 0 errors, 2 warnings, 8 lines checked
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/btdev.h', please use '/*' instead
+#81: FILE: emulator/btdev.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#81: FILE: emulator/btdev.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/bthost.h', please use '/*' instead
+#99: FILE: emulator/bthost.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#99: FILE: emulator/bthost.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/hciemu.h', please use '/*' instead
+#117: FILE: emulator/hciemu.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#117: FILE: emulator/hciemu.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/le.h', please use '/*' instead
+#144: FILE: emulator/le.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#144: FILE: emulator/le.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/phy.h', please use '/*' instead
+#171: FILE: emulator/phy.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#171: FILE: emulator/phy.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/serial.h', please use '/*' instead
+#189: FILE: emulator/serial.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#189: FILE: emulator/serial.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/server.h', please use '/*' instead
+#207: FILE: emulator/server.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#207: FILE: emulator/server.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'emulator/vhci.h', please use '/*' instead
+#234: FILE: emulator/vhci.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
+#234: FILE: emulator/vhci.h:1:
++// SPDX-License-Identifier: LGPL-2.1-or-later
+
+- total: 0 errors, 18 warnings, 88 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
@@ -118,4 +182,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============3487050300692952400==--
+--===============2710110518128234941==--
