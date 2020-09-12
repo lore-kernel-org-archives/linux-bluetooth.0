@@ -1,230 +1,194 @@
-Return-Path: <SRS0=2FZ9=CU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=izlr=CV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3F6C43461
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 22:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1980C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 01:35:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 800AB22207
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Sep 2020 22:33:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Yd9JMHZ4"
+	by mail.kernel.org (Postfix) with ESMTP id 6813A20731
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 01:35:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725945AbgIKWdb (ORCPT
+        id S1725832AbgILBfk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Sep 2020 18:33:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43844 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725880AbgIKWdY (ORCPT
+        Fri, 11 Sep 2020 21:35:40 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:45592 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725562AbgILBfR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Sep 2020 18:33:24 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1D1C061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 15:33:23 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id y1so1245223pgk.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 15:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iF8TeyEikj2biNaQshg9KmYrlvScdBVXMRfciSkg73c=;
-        b=Yd9JMHZ4gRDa89ZRRST+nnkKT5nMC4F4WZV+lxJDsSchgQvCyDFn/qTDUiuNjvoM5T
-         f74Q0IKIkVbhjKrrDb/TTVAo5MZmTBHEcSd6xcU+/4CPOZrUR/lYXWa6y3eQHZOXrIU5
-         WbIcq2/QrYHhNZS8vhNJiOEZR2gTp7eEP/Nko=
+        Fri, 11 Sep 2020 21:35:17 -0400
+Received: by mail-il1-f200.google.com with SMTP id m80so8399634ilb.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 18:35:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iF8TeyEikj2biNaQshg9KmYrlvScdBVXMRfciSkg73c=;
-        b=qQH9wOguzAnrHE9gIFep2IKmVBxNHsq67gfli5kbTXWA85omQZy4c0aFed74kXOmGG
-         n/4G+ZHap6WfD1j5sWOlVjBHUg0HoOIJPXK6Lq6j7fLSpAUvbSnAROmJ0pW3wRKc7N49
-         Vl0xKxQ0+5q7vv8Edl6o6kz5JPPM3NKTqKnw9JseP7k6ieLjIAEZA+IB6m7feeGgMofO
-         8k3nQsxjHZZI4w8tXdm2BtFEV/rd2+dEl80ofc3M1q7bTrSxs4vCcNjirHJS/LF4Fety
-         KedalSkMfzEa4bnGt/NmlcHBeS4pbrhF1HPuE7imDlLc114+UN83JOTwGM9ehpBStdxl
-         jbeg==
-X-Gm-Message-State: AOAM5339b8e/oz+qkFB5Di/w+HzTU842xOlygbxksL85Lwdxm2gbm3Nh
-        zyAsiqw6aLlEO6FFG5NbEQFh5w==
-X-Google-Smtp-Source: ABdhPJz33TmyqHCPoZmtb9fB7qGdH/76wHh1Tqbf++au1bjlFFSi6FxvuJEn/lmaLEoqiBUxAoCvIA==
-X-Received: by 2002:a63:3d0e:: with SMTP id k14mr3282477pga.219.1599863603371;
-        Fri, 11 Sep 2020 15:33:23 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id n128sm2546314pga.5.2020.09.11.15.33.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 15:33:22 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [RESEND PATCH] Bluetooth: Only mark socket zapped after unlocking
-Date:   Fri, 11 Sep 2020 15:33:18 -0700
-Message-Id: <20200911153256.RESEND.1.Ic1b9d93cf2d393e3efda4c2977639c095d276311@changeid>
-X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=1Au+jF0U9NdQpjmGSupuqP1uY7GjUPeo4ovRK8rNqtg=;
+        b=etFx3k8N2VCLjQln5HhTFfcmrKCkNRz+SPVU1uPRxz3b3j2LoI+erPcx463s+nvmMk
+         +X7LTcIFpBteWHN359zRUYLYZa2FjeOk3ttWK4V/8p7ASWPhfx0T5eFluonC2G1bnnlz
+         ThnQZeDPz8P+kt0lpjEB6jAQfeAmZWbujmnhc8PVc66BIEsxxARZBzt0+LwXSd2sHvkw
+         WA+rs6N/70vdWzicFyO5q+6mRwPa7YZ8rXAi5BF866yneaUBfOopnN8s2hDFJ2LR2Z4j
+         lVNNWNk2vyiXNdFiKTD4dc1yFVmRpcWHEmV4Cj2mapYxtnhPkj91agrNozzF1CZ7qXOu
+         9MmQ==
+X-Gm-Message-State: AOAM531xY66moPzTZNgZPgPaZ6rNQC9b0CRUb3ZeoPPUcwSDRN/xadX8
+        XUUmSMz0PBiTWioaRJ2bt2LmAO6wxk0B3WVMfrjMGwrmelMZ
+X-Google-Smtp-Source: ABdhPJykGvkkfF0TalkCAFdl6JKCUiPAmVhfOt5G9R1UhpC7B/l/0I/FrHN9AfoIj2ouf2dGbvl10ZQCmRDRvIvA/3F/8kp7mqZ8
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:fb0c:: with SMTP id h12mr3621463iog.98.1599874514946;
+ Fri, 11 Sep 2020 18:35:14 -0700 (PDT)
+Date:   Fri, 11 Sep 2020 18:35:14 -0700
+In-Reply-To: <0000000000004991e705ac9d1a83@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000026136505af13d0ab@google.com>
+Subject: Re: inconsistent lock state in sco_conn_del
+From:   syzbot <syzbot+65684128cd7c35bc66a1@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Since l2cap_sock_teardown_cb doesn't acquire the channel lock before
-setting the socket as zapped, it could potentially race with
-l2cap_sock_release which frees the socket. Thus, wait until the cleanup
-is complete before marking the socket as zapped.
+syzbot has found a reproducer for the following issue on:
 
-This race was reproduced on a JBL GO speaker after the remote device
-rejected L2CAP connection due to resource unavailability.
+HEAD commit:    e8878ab8 Merge tag 'spi-fix-v5.9-rc4' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12130759900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c61610091f4ca8c4
+dashboard link: https://syzkaller.appspot.com/bug?extid=65684128cd7c35bc66a1
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121ef0fd900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c3a853900000
 
-Here is a dmesg log with debug logs from a repro of this bug:
-[ 3465.424086] Bluetooth: hci_core.c:hci_acldata_packet() hci0 len 16 handle 0x0003 flags 0x0002
-[ 3465.424090] Bluetooth: hci_conn.c:hci_conn_enter_active_mode() hcon 00000000cfedd07d mode 0
-[ 3465.424094] Bluetooth: l2cap_core.c:l2cap_recv_acldata() conn 000000007eae8952 len 16 flags 0x2
-[ 3465.424098] Bluetooth: l2cap_core.c:l2cap_recv_frame() len 12, cid 0x0001
-[ 3465.424102] Bluetooth: l2cap_core.c:l2cap_raw_recv() conn 000000007eae8952
-[ 3465.424175] Bluetooth: l2cap_core.c:l2cap_sig_channel() code 0x03 len 8 id 0x0c
-[ 3465.424180] Bluetooth: l2cap_core.c:l2cap_connect_create_rsp() dcid 0x0045 scid 0x0000 result 0x02 status 0x00
-[ 3465.424189] Bluetooth: l2cap_core.c:l2cap_chan_put() chan 000000006acf9bff orig refcnt 4
-[ 3465.424196] Bluetooth: l2cap_core.c:l2cap_chan_del() chan 000000006acf9bff, conn 000000007eae8952, err 111, state BT_CONNECT
-[ 3465.424203] Bluetooth: l2cap_sock.c:l2cap_sock_teardown_cb() chan 000000006acf9bff state BT_CONNECT
-[ 3465.424221] Bluetooth: l2cap_core.c:l2cap_chan_put() chan 000000006acf9bff orig refcnt 3
-[ 3465.424226] Bluetooth: hci_core.h:hci_conn_drop() hcon 00000000cfedd07d orig refcnt 6
-[ 3465.424234] BUG: spinlock bad magic on CPU#2, kworker/u17:0/159
-[ 3465.425626] Bluetooth: hci_sock.c:hci_sock_sendmsg() sock 000000002bb0cb64 sk 00000000a7964053
-[ 3465.430330]  lock: 0xffffff804410aac0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
-[ 3465.430332] Causing a watchdog bite!
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+65684128cd7c35bc66a1@syzkaller.appspotmail.com
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
----
-We had some more data available (outside of dmesg and oops) that led us
-to suspect a race between l2cap_sock_teardown_cb and l2cap_sock_release.
-I've left this out of the commit message since it's not an oops or dmesg
-logs.
+================================
+WARNING: inconsistent lock state
+5.9.0-rc4-syzkaller #0 Not tainted
+--------------------------------
+inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+syz-executor675/31233 [HC0[0]:SC0[0]:HE1:SE1] takes:
+ffff8880a75c50a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
+ffff8880a75c50a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at: sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+{IN-SOFTIRQ-W} state was registered at:
+  lock_acquire+0x1f3/0xae0 kernel/locking/lockdep.c:5006
+  __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+  spin_lock include/linux/spinlock.h:354 [inline]
+  sco_sock_timeout+0x24/0x140 net/bluetooth/sco.c:83
+  call_timer_fn+0x1ac/0x760 kernel/time/timer.c:1413
+  expire_timers kernel/time/timer.c:1458 [inline]
+  __run_timers.part.0+0x67c/0xaa0 kernel/time/timer.c:1755
+  __run_timers kernel/time/timer.c:1736 [inline]
+  run_timer_softirq+0xae/0x1a0 kernel/time/timer.c:1768
+  __do_softirq+0x1f7/0xa91 kernel/softirq.c:298
+  asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
+  __run_on_irqstack arch/x86/include/asm/irq_stack.h:22 [inline]
+  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:48 [inline]
+  do_softirq_own_stack+0x9d/0xd0 arch/x86/kernel/irq_64.c:77
+  invoke_softirq kernel/softirq.c:393 [inline]
+  __irq_exit_rcu kernel/softirq.c:423 [inline]
+  irq_exit_rcu+0x235/0x280 kernel/softirq.c:435
+  sysvec_apic_timer_interrupt+0x51/0xf0 arch/x86/kernel/apic/apic.c:1091
+  asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:581
+  unwind_next_frame+0x139a/0x1f90 arch/x86/kernel/unwind_orc.c:607
+  arch_stack_walk+0x81/0xf0 arch/x86/kernel/stacktrace.c:25
+  stack_trace_save+0x8c/0xc0 kernel/stacktrace.c:123
+  kasan_save_stack+0x1b/0x40 mm/kasan/common.c:48
+  kasan_set_track mm/kasan/common.c:56 [inline]
+  __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:461
+  slab_post_alloc_hook mm/slab.h:518 [inline]
+  slab_alloc mm/slab.c:3312 [inline]
+  kmem_cache_alloc+0x13a/0x3a0 mm/slab.c:3482
+  __d_alloc+0x2a/0x950 fs/dcache.c:1709
+  d_alloc+0x4a/0x230 fs/dcache.c:1788
+  d_alloc_parallel+0xe9/0x18e0 fs/dcache.c:2540
+  lookup_open.isra.0+0x9ac/0x1350 fs/namei.c:3030
+  open_last_lookups fs/namei.c:3177 [inline]
+  path_openat+0x96d/0x2730 fs/namei.c:3365
+  do_filp_open+0x17e/0x3c0 fs/namei.c:3395
+  do_sys_openat2+0x16d/0x420 fs/open.c:1168
+  do_sys_open fs/open.c:1184 [inline]
+  __do_sys_open fs/open.c:1192 [inline]
+  __se_sys_open fs/open.c:1188 [inline]
+  __x64_sys_open+0x119/0x1c0 fs/open.c:1188
+  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+irq event stamp: 853
+hardirqs last  enabled at (853): [<ffffffff87f733af>] __raw_spin_unlock_irq include/linux/spinlock_api_smp.h:168 [inline]
+hardirqs last  enabled at (853): [<ffffffff87f733af>] _raw_spin_unlock_irq+0x1f/0x80 kernel/locking/spinlock.c:199
+hardirqs last disabled at (852): [<ffffffff87f73764>] __raw_spin_lock_irq include/linux/spinlock_api_smp.h:126 [inline]
+hardirqs last disabled at (852): [<ffffffff87f73764>] _raw_spin_lock_irq+0xa4/0xd0 kernel/locking/spinlock.c:167
+softirqs last  enabled at (0): [<ffffffff8144c929>] copy_process+0x1a99/0x6920 kernel/fork.c:2018
+softirqs last disabled at (0): [<0000000000000000>] 0x0
 
-Crash stack from CPU4:
---
--24 |spin_bug(
-    |    [X19] lock = 0xFFFFFF810BDB1EC0,
-    |    [X20] msg = 0xFFFFFFD143FD7960)
--25 |debug_spin_lock_before(inline)
-    |  [X19] lock = 0xFFFFFF810BDB1EC0
--25 |do_raw_spin_lock(
-    |    [X19] lock = 0xFFFFFF810BDB1EC0)
--26 |raw_spin_lock_irqsave(
-    |    [X19] lock = 0xFFFFFF810BDB1EC0)
--27 |skb_peek(inline)
--27 |__skb_dequeue(inline)
--27 |skb_dequeue(
-    |    [X20] list = 0xFFFFFF810BDB1EA8)
-    |  [locdesc] flags = 12297829382473034410
--28 |skb_queue_purge(
-    |    [X19] list = 0xFFFFFF810BDB1EA8 -> (
-    |      [D:0xFFFFFF810BDB1EA8] next = 0x0,
-    |      [D:0xFFFFFF810BDB1EB0] prev = 0x0,
-    |      [D:0xFFFFFF810BDB1EB8] qlen = 0,
-    |      [D:0xFFFFFF810BDB1EC0] lock = ([D:0xFFFFFF810BDB1EC0] rlock = ([D:0xFFFFFF810BDB1EC0] raw_lock
-    |  [X0] skb = ???
--29 |l2cap_seq_list_free(inline)
-    |  [locdesc] seq_list = 0xFFFFFF810BDB1ED8 -> (
-    |    [D:0xFFFFFF810BDB1ED8] head = 0,
-    |    [D:0xFFFFFF810BDB1EDA] tail = 0,
-    |    [D:0xFFFFFF810BDB1EDC] mask = 0,
-    |    [D:0xFFFFFF810BDB1EE0] list = 0x0)
--29 |l2cap_chan_del(
-    |    [X19] chan = 0xFFFFFF810BDB1C00,
-    |  ?)
--30 |l2cap_chan_unlock(inline)
--30 |l2cap_connect_create_rsp(inline)
-    |  [X20] conn = 0xFFFFFF81231F2600
-    |  [locdesc] err = 0
-    |  [X27] chan = 0xFFFFFF810BDB1C00
--30 |l2cap_bredr_sig_cmd(inline)
-    |  [X20] conn = 0xFFFFFF81231F2600
-    |  [locdesc] err = 0
--30 |l2cap_sig_channel(inline)
-    |  [X20] conn = 0xFFFFFF81231F2600
-    |  [X19] skb = 0xFFFFFF813DE4C040
-    |  [X28] data = 0xFFFFFF8131582014
-    |  [locdesc] cmd_len = 43690
--30 |l2cap_recv_frame(
-    |    [X20] conn = 0xFFFFFF81231F2600,
-    |    [X19] skb = 0xFFFFFF813DE4C040)
-    |  [locdesc] psm = 43690
--31 |l2cap_recv_acldata(
-    |  ?,
-    |    [X19] skb = 0xFFFFFF813DE4C040,
-    |  ?)
-    |  [X21] len = 16
--32 |hci_rx_work(
-    |  ?)
-    |  [X21] hdev = 0xFFFFFF8133A02000
--33 |__read_once_size(inline)
-    |  [locdesc] size = 4
--33 |atomic_read(inline)
-    |  [locdesc] __u = ([locdesc] __val = -1431655766, [locdesc] __c = (170))
--33 |static_key_count(inline)
--33 |static_key_false(inline)
--33 |trace_workqueue_execute_end(inline)
-    |  [X22] work = 0xFFFFFF8133A02838
--33 |process_one_work(
-    |    [X19] worker = 0xFFFFFF8133FE4500,
-    |    [X22] work = 0xFFFFFF8133A02838)
-    |  [locdesc] work_color = -1431655766
--34 |__read_once_size(inline)
-    |  [locdesc] size = 8
--34 |list_empty(inline)
-    |  [locdesc] __u = ([locdesc] __val = 0xAAAAAAAAAAAAAAAA, [locdesc] __c = (170))
--34 |worker_thread(
-    |    [X19] __worker = 0xFFFFFF8133FE4500)
-    |  [X19] worker = 0xFFFFFF8133FE4500
--35 |kthread(
-    |    [X20] _create = 0xFFFFFF8133FB3A00)
-    |  [X20] create = 0xFFFFFF8133FB3A00
-    |  [X0] ret = ???
--36 |ret_from_fork(asm)
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
- net/bluetooth/l2cap_sock.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+       CPU0
+       ----
+  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+  <Interrupt>
+    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index e1a3e66b175402..e7cfe28140c39b 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1521,8 +1521,6 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
- 
- 	parent = bt_sk(sk)->parent;
- 
--	sock_set_flag(sk, SOCK_ZAPPED);
--
- 	switch (chan->state) {
- 	case BT_OPEN:
- 	case BT_BOUND:
-@@ -1549,8 +1547,11 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
- 
- 		break;
- 	}
--
- 	release_sock(sk);
-+
-+	/* Only zap after cleanup to avoid use after free race */
-+	sock_set_flag(sk, SOCK_ZAPPED);
-+
- }
- 
- static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
--- 
-2.28.0.618.gf4bc123cb7-goog
+ *** DEADLOCK ***
+
+3 locks held by syz-executor675/31233:
+ #0: ffff88809f104f40 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0xf5/0x1080 net/bluetooth/hci_core.c:1720
+ #1: ffff88809f104078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_do_close+0x253/0x1080 net/bluetooth/hci_core.c:1757
+ #2: ffffffff8a9188c8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1435 [inline]
+ #2: ffffffff8a9188c8 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xc7/0x220 net/bluetooth/hci_conn.c:1557
+
+stack backtrace:
+CPU: 1 PID: 31233 Comm: syz-executor675 Not tainted 5.9.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x198/0x1fd lib/dump_stack.c:118
+ print_usage_bug kernel/locking/lockdep.c:4020 [inline]
+ valid_state kernel/locking/lockdep.c:3361 [inline]
+ mark_lock_irq kernel/locking/lockdep.c:3560 [inline]
+ mark_lock.cold+0x7a/0x7f kernel/locking/lockdep.c:4006
+ mark_usage kernel/locking/lockdep.c:3923 [inline]
+ __lock_acquire+0x876/0x5570 kernel/locking/lockdep.c:4380
+ lock_acquire+0x1f3/0xae0 kernel/locking/lockdep.c:5006
+ __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+ _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+ spin_lock include/linux/spinlock.h:354 [inline]
+ sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+ sco_disconn_cfm net/bluetooth/sco.c:1178 [inline]
+ sco_disconn_cfm+0x62/0x80 net/bluetooth/sco.c:1171
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1438 [inline]
+ hci_conn_hash_flush+0x114/0x220 net/bluetooth/hci_conn.c:1557
+ hci_dev_do_close+0x5c6/0x1080 net/bluetooth/hci_core.c:1770
+ hci_unregister_dev+0x1bd/0xe30 net/bluetooth/hci_core.c:3790
+ vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
+ __fput+0x285/0x920 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:141
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb7d/0x29f0 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:903
+ get_signal+0x428/0x1f00 kernel/signal.c:2757
+ arch_do_signal+0x82/0x2520 arch/x86/kernel/signal.c:811
+ exit_to_user_mode_loop kernel/entry/common.c:159 [inline]
+ exit_to_user_mode_prepare+0x1ae/0x200 kernel/entry/common.c:190
+ syscall_exit_to_user_mode+0x7e/0x2e0 kernel/entry/common.c:265
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x447279
+Code: Bad RIP value.
+RSP: 002b:00007fd19f624d88 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+RAX: fffffffffffffe00 RBX: 00000000006dcc28 RCX: 0000000000447279
+RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00000000006dcc28
+RBP: 00000000006dcc20 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000006dcc2c
+R13: 0000000000000004 R14: 0000000000000003 R15: 00007fd19f6256d0
 
