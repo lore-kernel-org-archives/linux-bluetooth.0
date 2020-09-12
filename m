@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6984C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E10C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 937C021D40
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B577214D8
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Sep 2020 06:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9b9GbDH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0eNKGxb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbgILGvc (ORCPT
+        id S1725825AbgILGvi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Sep 2020 02:51:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35488 "EHLO
+        Sat, 12 Sep 2020 02:51:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbgILGv0 (ORCPT
+        with ESMTP id S1725832AbgILGv2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Sep 2020 02:51:26 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8BBC061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:25 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id q10so6373507qvs.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:25 -0700 (PDT)
+        Sat, 12 Sep 2020 02:51:28 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEF8C0613ED
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:27 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id g72so12125998qke.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Sep 2020 23:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=W0otCJb0t2exDZa01G6rEt6eaiFdxQucf1NvvEpIOI8=;
-        b=O9b9GbDHEF1+xpCqb9iWvbaaLMQLrMtAcl38JqT9OHj4evlbCVZTo2+I9NTag9eFwr
-         EM+FhoKKe0FPJu5rPdFxPuE2HafN8sEWHeNED9mH2mTHCsDhdt8Q7SaLdRaxFQF0AKUs
-         CWIKDNVFRjztfWbNoH9okvQf5Y6HewZZ0vn59Z4RL9vitum6uSxEHvdUerBf8cmRiVs4
-         kafo01kQYGBRX7G45aKfz73UFF+UspidGi30f/h3wD7kXYsTnuY3NcukAtVNazrTSBCW
-         mkori1MIYjzE0izkD758mebymITi5ohKjasoNZBmAvIqahcDCY4pWoOeCSln7IRCigiU
-         v98A==
+        bh=UNvSwneC3lW+y+Venzokn4WMeSbjIHLO72zq8UysDdY=;
+        b=Y0eNKGxbw2NoO0UhyJ1OhLZvP0QE8nTFaTMN3wLp2cB6bxHMxXw7XO9ukB+oxXnjAF
+         bPe5OJKVessvih5jJEDT/2FtFYivNUz4S8ddpQAe2GLaEUxu5V1TMHnq6Iu/H62nglIl
+         twBuKIIPVu+AeQ1i+o7d6bUJAA+DNpwn+Ex7a5BLgSAKgQVWl9TgTKH4/GISD/neescD
+         1cM4/bFKUGd7/oz55wG+tsj5ThdhGv3Xf7PijJYXF+MN6jhdDVhO1+lr1cs4aCBg6Thp
+         P82/g5FDTPXswQ+3VjGgSKIz2F+mnmahmNg+J2+DOUC5jMcxVqy4r5JS2mbwm/hSYbOG
+         YDmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=W0otCJb0t2exDZa01G6rEt6eaiFdxQucf1NvvEpIOI8=;
-        b=EcKtu9tPGC0DM3COg/oSZ5OOh0m8SghiDFplYU7XYeepmbCzbVquvaWky4Lax6/fiD
-         hEN3+KPfArLqqyQ/+zrxnmLITM+lOuzw65/pRU7X74D3xzpf8fJjZ5ZLLCzAKuoZUPJD
-         69YH41YZCw2qkciAzYMdcCXJotO87w/4fZ8HYXakJzyinSiyG/bBhmz4LMLcukwdl7N4
-         yHkB/r8v5aQ6SejX/9FrSO4idJ9PeO8g7H5q+EkJ4Kr16Mq7TVWnbuX3FVP0aJBHn14r
-         4XL0m4L9JIRGAQ8RgugTz0UD4GWXp+4dQCnreqDqOppQi6xT5j0h1bt9FVzt0H+lI3Pf
-         O8Rg==
-X-Gm-Message-State: AOAM531KMOcOGYjMADagSGBxCrnn3x5Vli3lDjmJmmbxsbQTVWWjDhed
-        n8+Meo2bXVZkkxjiN0CRd20yGrdsSqIYlQ==
-X-Google-Smtp-Source: ABdhPJyA/54hdT1Q81HZ2cRvVceHyoaGIO4Y7UCb8ruDWGs0bTZZ3LrCHC5NQQrE/W4fuXMTuMWhCw==
-X-Received: by 2002:a0c:e5cf:: with SMTP id u15mr5296017qvm.14.1599893484257;
-        Fri, 11 Sep 2020 23:51:24 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.17.224])
-        by smtp.gmail.com with ESMTPSA id r34sm6310970qtr.18.2020.09.11.23.51.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=UNvSwneC3lW+y+Venzokn4WMeSbjIHLO72zq8UysDdY=;
+        b=JG0b653FmXngP2P0ylcxIP6AFLc/r4Q5nJ7bSvmJDOWXOS3lENTvJFHhNvuLZaSsOX
+         laj7HsBKuTXtNyKUWuKfjRVJVXUZ9IkPXYUlyPwBYXSgtJrnZMHh9OixFxxQF3dfS/QS
+         yr+jNe+FCYI1pLvVskJHJpn119oo2MD8tMFw8On4oTT+PYLVQnmAWXLSh27kiLE+zV4E
+         j4Ufq7jqtNedH1m2ntGnLZ+iIuKC2wbeueUDd6WvP75mWMVIgOi+8XvNxa1tIrR5xYfh
+         RlE5TzBhufvIjVv71iMv94qtWyNyUSsDtGt74DgVUXzksdLVHCwSu0Hd5HEe5POiaDv9
+         X83A==
+X-Gm-Message-State: AOAM532izyPkQX3MlgmaGFR1BJNyFR+kGQABfiXOMCXujblGVWV3sraL
+        BaRd5p16QT9OgxDo2kTrNCAF3fNWjYRWYQ==
+X-Google-Smtp-Source: ABdhPJzNJcQ1+fA1492hFnJDrG28jgCgDHaSJhIjC0OQBceFcwf3jqr6nXJwF8Gsw2dlKEuR3R48Vw==
+X-Received: by 2002:a37:6892:: with SMTP id d140mr4535699qkc.58.1599893483208;
         Fri, 11 Sep 2020 23:51:23 -0700 (PDT)
-Message-ID: <5f5c6feb.1c69fb81.ac4d3.0c03@mx.google.com>
-Date:   Fri, 11 Sep 2020 23:51:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6419365277445898984=="
+Received: from [172.17.0.2] ([40.84.17.224])
+        by smtp.gmail.com with ESMTPSA id b190sm763988qkd.45.2020.09.11.23.51.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 23:51:22 -0700 (PDT)
+Message-ID: <5f5c6fea.1c69fb81.43f41.1e35@mx.google.com>
+Date:   Fri, 11 Sep 2020 23:51:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3487050300692952400=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: [BlueZ,04/17] client: Add SPDX License Identifer
+Subject: RE: [BlueZ,03/17] btio: Add SPDX License Identifier
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200912062357.23926-5-tedd.an@linux.intel.com>
-References: <20200912062357.23926-5-tedd.an@linux.intel.com>
+In-Reply-To: <20200912062357.23926-4-tedd.an@linux.intel.com>
+References: <20200912062357.23926-4-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6419365277445898984==
+--===============3487050300692952400==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,39 +92,15 @@ Test Result:
 checkpatch Failed
 
 Outputs:
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'client/advertising.h', please use '/*' instead
-#38: FILE: client/advertising.h:1:
+WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'btio/btio.h', please use '/*' instead
+#31: FILE: btio/btio.h:1:
 +// SPDX-License-Identifier: GPL-2.0-or-later
 
 WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#38: FILE: client/advertising.h:1:
+#31: FILE: btio/btio.h:1:
 +// SPDX-License-Identifier: GPL-2.0-or-later
 
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'client/agent.h', please use '/*' instead
-#56: FILE: client/agent.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#56: FILE: client/agent.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'client/display.h', please use '/*' instead
-#74: FILE: client/display.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#74: FILE: client/display.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'client/gatt.h', please use '/*' instead
-#92: FILE: client/gatt.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#92: FILE: client/gatt.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
-
-- total: 0 errors, 8 warnings, 36 lines checked
+- total: 0 errors, 2 warnings, 8 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
@@ -142,4 +118,4 @@ NOTE: If any of the errors are false positives, please report
 Regards,
 Linux Bluetooth
 
---===============6419365277445898984==--
+--===============3487050300692952400==--
