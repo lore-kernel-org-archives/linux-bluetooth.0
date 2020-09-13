@@ -2,50 +2,49 @@ Return-Path: <SRS0=7mPt=CW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F22C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 03:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED437C43461
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 03:34:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55B8221BE5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 03:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B04B42177B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 03:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725927AbgIMDeU (ORCPT
+        id S1725928AbgIMDeZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Sep 2020 23:34:20 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59033 "EHLO mga05.intel.com"
+        Sat, 12 Sep 2020 23:34:25 -0400
+Received: from mga05.intel.com ([192.55.52.43]:59036 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725910AbgIMDeJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1725924AbgIMDeJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Sat, 12 Sep 2020 23:34:09 -0400
-IronPort-SDR: IZgXSGH1gMaOAjMsRELmhSq5NNveNtwiTjECmStHiXRU1tUIrnjTcOZUqbq1vhPhS/L7LmYwrm
- k6+u9KU+WNlQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9742"; a="243784905"
+IronPort-SDR: bzTVK7CA/lN0nLMBFIueVDZHcLtcFHzKSjztr3KslkpxM+ybNlSCkFYgD1I7g8e+ZFB2FYC+xU
+ nBiYkH6kG2Xg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9742"; a="243784906"
 X-IronPort-AV: E=Sophos;i="5.76,421,1592895600"; 
-   d="scan'208";a="243784905"
+   d="scan'208";a="243784906"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2020 20:34:01 -0700
-IronPort-SDR: zCJ1Wec+p1aRp0vDE0H2l+uhJSqqlroFNcZqupwZ7XrLFm3pcgbjguKqoLLn//rU8imqy7WY0E
- ++vhxiQNM5jA==
+IronPort-SDR: OFzwL87C2/XOiCqMEMk8V9k7c9kfKSHTbpFSGoylP6Bo8XeutIH88PsUVmFXbRUnxY+Q6ZgrUd
+ tj2vtWnHDl/Q==
 X-IronPort-AV: E=Sophos;i="5.76,421,1592895600"; 
-   d="scan'208";a="301347240"
+   d="scan'208";a="301347243"
 Received: from han1-mobl3.jf.intel.com ([10.251.29.101])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2020 20:34:00 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2020 20:34:01 -0700
 From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [BlueZ v2 16/17] src: Add SPDX License Identifier
-Date:   Sat, 12 Sep 2020 20:33:40 -0700
-Message-Id: <20200913033341.4639-17-tedd.an@linux.intel.com>
+Subject: [BlueZ v2 17/17] tools: Add SPDX License Identifier
+Date:   Sat, 12 Sep 2020 20:33:41 -0700
+Message-Id: <20200913033341.4639-18-tedd.an@linux.intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200913033341.4639-1-tedd.an@linux.intel.com>
 References: <20200913033341.4639-1-tedd.an@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -58,1261 +57,1607 @@ This patch adds SPDX License Identifier.
 -------------------------------------
        License            COUNT
 -------------------------------------
- GPL-2.0-or-later     :     51
- LGPL-2.1-or-later    :     60
- BSD-2-Clause         :      2
+ GPL-2.0-or-later     :    102
+ MIT                  :      2
+ LGPL-2.1-or-later    :     38
+ GPL-2.0-only         :      2
 
 License: GPL-2.0-or-later
-   src/attrib-server.h
-   src/advertising.h
-   src/textfile.c
-   src/attrib-server.c
-   src/uinput.h
-   src/log.h
-   src/eir.h
-   src/sdpd.h
-   src/sdpd-request.c
-   src/service.h
-   src/sdpd-database.c
-   src/adapter.h
-   src/plugin.h
-   src/uuid-helper.h
-   src/plugin.c
-   src/main.c
-   src/sdp-xml.c
-   src/error.h
-   src/oui.c
-   src/device.c
-   src/agent.h
-   src/sdp-client.c
-   src/oui.h
-   src/device.h
-   src/gatt-database.c
-   src/error.c
-   src/backtrace.c
-   src/sdpd-server.c
-   src/adapter.c
-   src/log.c
-   src/agent.c
-   src/backtrace.h
-   src/sdp-xml.h
-   src/hcid.h
-   src/dbus-common.h
-   src/uuid-helper.c
-   src/storage.c
-   src/profile.c
-   src/advertising.c
-   src/storage.h
-   src/dbus-common.c
-   src/profile.h
-   src/sdpd-service.c
-   src/eir.c
-   src/sdp-client.h
-   src/gatt-database.h
-   src/gatt-client.h
-   src/rfkill.c
-   src/gatt-client.c
-   src/service.c
-   src/textfile.h
+   tools/csr_usb.c
+   tools/l2cap-tester.c
+   tools/hcisecfilter.c
+   tools/ciptool.c
+   tools/csr_bcsp.c
+   tools/btsnoop.c
+   tools/check-selftest.c
+   tools/bccmd.c
+   tools/hci-tester.c
+   tools/hcitool.c
+   tools/btiotest.c
+   tools/oobtest.c
+   tools/btinfo.c
+   tools/hwdb.c
+   tools/hciattach_bcm43xx.c
+   tools/mgmt-tester.c
+   tools/hex2hcd.c
+   tools/hciattach_st.c
+   tools/smp-tester.c
+   tools/bluetooth-player.c
+   tools/hciattach_tialt.c
+   tools/gap-tester.c
+   tools/bluemoon.c
+   tools/bneptest.c
+   tools/gatt-service.c
+   tools/csr_3wire.c
+   tools/rctest.c
+   tools/rfcomm-tester.c
+   tools/hcieventmask.c
+   tools/hciattach_ti.c
+   tools/seq2bseq.c
+   tools/scotest.c
+   tools/bcmfw.c
+   tools/hciconfig.c
+   tools/btattach.c
+   tools/l2ping.c
+   tools/obexctl.c
+   tools/l2test.c
+   tools/hciattach_intel.c
+   tools/csr.h
+   tools/hciattach.h
+   tools/create-image.c
+   tools/bnep-tester.c
+   tools/userchan-tester.c
+   tools/rfcomm.c
+   tools/btmon-logger.c
+   tools/hcidump.c
+   tools/csr_hci.c
+   tools/rtlfw.c
+   tools/hciattach_qualcomm.c
+   tools/btproxy.c
+   tools/nokfw.c
+   tools/hciattach_ath3k.c
+   tools/3dsp.c
+   tools/bdaddr.c
+   tools/sco-tester.c
+   tools/hciattach.c
+   tools/amptest.c
+   tools/btgatt-server.c
+   tools/btgatt-client.c
+   tools/cltest.c
+   tools/ibeacon.c
+   tools/mcaptest.c
+   tools/hid2hci.c
+   tools/btmgmt.c
+   tools/advtest.c
+   tools/eddystone.c
+   tools/csr_h4.c
+   tools/avtest.c
+   tools/mpris-proxy.c
+   tools/csr.c
+   tools/avinfo.c
+   tools/sdptool.c
+   tools/btconfig.c
+   tools/parser/parser.h
+   tools/parser/obex.c
+   tools/parser/amp.c
+   tools/parser/sdp.c
+   tools/parser/tcpip.c
+   tools/parser/sap.c
+   tools/parser/cmtp.c
+   tools/parser/avctp.c
+   tools/parser/lmp.c
+   tools/parser/ppp.c
+   tools/parser/rfcomm.h
+   tools/parser/hci.c
+   tools/parser/sdp.h
+   tools/parser/parser.c
+   tools/parser/rfcomm.c
+   tools/parser/avdtp.c
+   tools/parser/avrcp.c
+   tools/parser/ericsson.c
+   tools/parser/hcrp.c
+   tools/parser/bpa.c
+   tools/parser/hidp.c
+   tools/parser/bnep.c
+   tools/parser/capi.c
+   tools/parser/att.c
+   tools/parser/l2cap.c
+   tools/parser/smp.c
+   tools/parser/csr.c
+   tools/parser/l2cap.h
+
+License: MIT
+   tools/ubcsp.c
+   tools/ubcsp.h
 
 License: LGPL-2.1-or-later
-   src/shared/mainloop-glib.c
-   src/shared/btp.c
-   src/shared/tester.c
-   src/shared/btsnoop.c
-   src/shared/gatt-helpers.h
-   src/shared/log.h
-   src/shared/util.h
-   src/shared/mainloop-ell.c
-   src/shared/hci-crypto.c
-   src/shared/mainloop.c
-   src/shared/hfp.h
-   src/shared/mainloop-notify.c
-   src/shared/io-mainloop.c
-   src/shared/btsnoop.h
-   src/shared/uhid.h
-   src/shared/util.c
-   src/shared/ringbuf.c
-   src/shared/btp.h
-   src/shared/shell.h
-   src/shared/io-glib.c
-   src/shared/queue.h
-   src/shared/gatt-server.h
-   src/shared/crypto.c
-   src/shared/crypto.h
-   src/shared/io-ell.c
-   src/shared/timeout-glib.c
-   src/shared/mgmt.c
-   src/shared/gatt-db.c
-   src/shared/mainloop-notify.h
-   src/shared/hfp.c
-   src/shared/timeout-ell.c
-   src/shared/shell.c
-   src/shared/hci.c
-   src/shared/log.c
-   src/shared/ringbuf.h
-   src/shared/gatt-helpers.c
-   src/shared/queue.c
-   src/shared/tty.h
-   src/shared/timeout-mainloop.c
-   src/shared/tester.h
-   src/shared/gap.h
-   src/shared/mgmt.h
-   src/shared/gatt-db.h
-   src/shared/uhid.c
-   src/shared/mainloop.h
-   src/shared/timeout.h
-   src/shared/att-types.h
-   src/shared/pcap.c
-   src/shared/gap.c
-   src/shared/att.c
-   src/shared/pcap.h
-   src/shared/hci.h
-   src/shared/gatt-client.h
-   src/shared/io.h
-   src/shared/gatt-client.c
-   src/shared/ad.c
-   src/shared/att.h
-   src/shared/gatt-server.c
-   src/shared/hci-crypto.h
-   src/shared/ad.h
+   tools/test-runner.c
+   tools/btpclient.c
+   tools/meshctl.c
+   tools/mesh-cfgclient.c
+   tools/mesh/model.h
+   tools/mesh/util.h
+   tools/mesh/config-model.h
+   tools/mesh/cfgcli.h
+   tools/mesh/mesh-db.c
+   tools/mesh/mesh-db.h
+   tools/mesh/keys.c
+   tools/mesh/util.c
+   tools/mesh/agent.h
+   tools/mesh/remote.c
+   tools/mesh/keys.h
+   tools/mesh/agent.c
+   tools/mesh/cfgcli.c
+   tools/mesh/remote.h
+   tools/mesh-gatt/prov.c
+   tools/mesh-gatt/util.h
+   tools/mesh-gatt/prov.h
+   tools/mesh-gatt/net.c
+   tools/mesh-gatt/util.c
+   tools/mesh-gatt/prov-db.h
+   tools/mesh-gatt/crypto.c
+   tools/mesh-gatt/crypto.h
+   tools/mesh-gatt/gatt.c
+   tools/mesh-gatt/config-server.c
+   tools/mesh-gatt/keys.h
+   tools/mesh-gatt/onoff-model.c
+   tools/mesh-gatt/net.h
+   tools/mesh-gatt/gatt.h
+   tools/mesh-gatt/node.c
+   tools/mesh-gatt/config-client.c
+   tools/mesh-gatt/mesh-net.h
+   tools/mesh-gatt/node.h
+   tools/mesh-gatt/onoff-model.h
+   tools/mesh-gatt/prov-db.c
 
-License: BSD-2-Clause
-   src/shared/ecc.h
-   src/shared/ecc.c
+License: GPL-2.0-only
+   tools/obex-server-tool.c
+   tools/obex-client-tool.c
 ---
- src/adapter.c                 | 1 +
- src/adapter.h                 | 1 +
- src/advertising.c             | 1 +
- src/advertising.h             | 1 +
- src/agent.c                   | 1 +
- src/agent.h                   | 1 +
- src/attrib-server.c           | 1 +
- src/attrib-server.h           | 1 +
- src/backtrace.c               | 1 +
- src/backtrace.h               | 1 +
- src/dbus-common.c             | 1 +
- src/dbus-common.h             | 1 +
- src/device.c                  | 1 +
- src/device.h                  | 1 +
- src/eir.c                     | 1 +
- src/eir.h                     | 1 +
- src/error.c                   | 1 +
- src/error.h                   | 1 +
- src/gatt-client.c             | 1 +
- src/gatt-client.h             | 1 +
- src/gatt-database.c           | 1 +
- src/gatt-database.h           | 1 +
- src/hcid.h                    | 1 +
- src/log.c                     | 1 +
- src/log.h                     | 1 +
- src/main.c                    | 1 +
- src/oui.c                     | 1 +
- src/oui.h                     | 1 +
- src/plugin.c                  | 1 +
- src/plugin.h                  | 1 +
- src/profile.c                 | 1 +
- src/profile.h                 | 1 +
- src/rfkill.c                  | 1 +
- src/sdp-client.c              | 1 +
- src/sdp-client.h              | 1 +
- src/sdp-xml.c                 | 1 +
- src/sdp-xml.h                 | 1 +
- src/sdpd-database.c           | 1 +
- src/sdpd-request.c            | 1 +
- src/sdpd-server.c             | 1 +
- src/sdpd-service.c            | 1 +
- src/sdpd.h                    | 1 +
- src/service.c                 | 1 +
- src/service.h                 | 1 +
- src/shared/ad.c               | 1 +
- src/shared/ad.h               | 1 +
- src/shared/att-types.h        | 1 +
- src/shared/att.c              | 1 +
- src/shared/att.h              | 1 +
- src/shared/btp.c              | 1 +
- src/shared/btp.h              | 1 +
- src/shared/btsnoop.c          | 1 +
- src/shared/btsnoop.h          | 1 +
- src/shared/crypto.c           | 1 +
- src/shared/crypto.h           | 1 +
- src/shared/ecc.c              | 1 +
- src/shared/ecc.h              | 1 +
- src/shared/gap.c              | 1 +
- src/shared/gap.h              | 1 +
- src/shared/gatt-client.c      | 1 +
- src/shared/gatt-client.h      | 1 +
- src/shared/gatt-db.c          | 1 +
- src/shared/gatt-db.h          | 1 +
- src/shared/gatt-helpers.c     | 1 +
- src/shared/gatt-helpers.h     | 1 +
- src/shared/gatt-server.c      | 1 +
- src/shared/gatt-server.h      | 1 +
- src/shared/hci-crypto.c       | 1 +
- src/shared/hci-crypto.h       | 1 +
- src/shared/hci.c              | 1 +
- src/shared/hci.h              | 1 +
- src/shared/hfp.c              | 1 +
- src/shared/hfp.h              | 1 +
- src/shared/io-ell.c           | 1 +
- src/shared/io-glib.c          | 1 +
- src/shared/io-mainloop.c      | 1 +
- src/shared/io.h               | 1 +
- src/shared/log.c              | 1 +
- src/shared/log.h              | 1 +
- src/shared/mainloop-ell.c     | 1 +
- src/shared/mainloop-glib.c    | 1 +
- src/shared/mainloop-notify.c  | 1 +
- src/shared/mainloop-notify.h  | 1 +
- src/shared/mainloop.c         | 1 +
- src/shared/mainloop.h         | 1 +
- src/shared/mgmt.c             | 1 +
- src/shared/mgmt.h             | 1 +
- src/shared/pcap.c             | 1 +
- src/shared/pcap.h             | 1 +
- src/shared/queue.c            | 1 +
- src/shared/queue.h            | 1 +
- src/shared/ringbuf.c          | 1 +
- src/shared/ringbuf.h          | 1 +
- src/shared/shell.c            | 1 +
- src/shared/shell.h            | 1 +
- src/shared/tester.c           | 1 +
- src/shared/tester.h           | 1 +
- src/shared/timeout-ell.c      | 1 +
- src/shared/timeout-glib.c     | 1 +
- src/shared/timeout-mainloop.c | 1 +
- src/shared/timeout.h          | 1 +
- src/shared/tty.h              | 1 +
- src/shared/uhid.c             | 1 +
- src/shared/uhid.h             | 1 +
- src/shared/util.c             | 1 +
- src/shared/util.h             | 1 +
- src/storage.c                 | 1 +
- src/storage.h                 | 1 +
- src/textfile.c                | 1 +
- src/textfile.h                | 1 +
- src/uinput.h                  | 1 +
- src/uuid-helper.c             | 1 +
- src/uuid-helper.h             | 1 +
- 113 files changed, 113 insertions(+)
+ tools/3dsp.c                    | 1 +
+ tools/advtest.c                 | 1 +
+ tools/amptest.c                 | 1 +
+ tools/avinfo.c                  | 1 +
+ tools/avtest.c                  | 1 +
+ tools/bccmd.c                   | 1 +
+ tools/bcmfw.c                   | 1 +
+ tools/bdaddr.c                  | 1 +
+ tools/bluemoon.c                | 1 +
+ tools/bluetooth-player.c        | 1 +
+ tools/bnep-tester.c             | 1 +
+ tools/bneptest.c                | 1 +
+ tools/btattach.c                | 1 +
+ tools/btconfig.c                | 1 +
+ tools/btgatt-client.c           | 1 +
+ tools/btgatt-server.c           | 1 +
+ tools/btinfo.c                  | 1 +
+ tools/btiotest.c                | 1 +
+ tools/btmgmt.c                  | 1 +
+ tools/btmon-logger.c            | 1 +
+ tools/btpclient.c               | 1 +
+ tools/btproxy.c                 | 1 +
+ tools/btsnoop.c                 | 1 +
+ tools/check-selftest.c          | 1 +
+ tools/ciptool.c                 | 1 +
+ tools/cltest.c                  | 1 +
+ tools/create-image.c            | 1 +
+ tools/csr.c                     | 1 +
+ tools/csr.h                     | 1 +
+ tools/csr_3wire.c               | 1 +
+ tools/csr_bcsp.c                | 1 +
+ tools/csr_h4.c                  | 1 +
+ tools/csr_hci.c                 | 1 +
+ tools/csr_usb.c                 | 1 +
+ tools/eddystone.c               | 1 +
+ tools/gap-tester.c              | 1 +
+ tools/gatt-service.c            | 1 +
+ tools/hci-tester.c              | 1 +
+ tools/hciattach.c               | 1 +
+ tools/hciattach.h               | 1 +
+ tools/hciattach_ath3k.c         | 1 +
+ tools/hciattach_bcm43xx.c       | 1 +
+ tools/hciattach_intel.c         | 1 +
+ tools/hciattach_qualcomm.c      | 1 +
+ tools/hciattach_st.c            | 1 +
+ tools/hciattach_ti.c            | 1 +
+ tools/hciattach_tialt.c         | 1 +
+ tools/hciconfig.c               | 1 +
+ tools/hcidump.c                 | 1 +
+ tools/hcieventmask.c            | 1 +
+ tools/hcisecfilter.c            | 1 +
+ tools/hcitool.c                 | 1 +
+ tools/hex2hcd.c                 | 1 +
+ tools/hid2hci.c                 | 1 +
+ tools/hwdb.c                    | 1 +
+ tools/ibeacon.c                 | 1 +
+ tools/l2cap-tester.c            | 1 +
+ tools/l2ping.c                  | 1 +
+ tools/l2test.c                  | 1 +
+ tools/mcaptest.c                | 1 +
+ tools/mesh-cfgclient.c          | 1 +
+ tools/mesh-gatt/config-client.c | 1 +
+ tools/mesh-gatt/config-server.c | 1 +
+ tools/mesh-gatt/crypto.c        | 1 +
+ tools/mesh-gatt/crypto.h        | 1 +
+ tools/mesh-gatt/gatt.c          | 1 +
+ tools/mesh-gatt/gatt.h          | 1 +
+ tools/mesh-gatt/keys.h          | 1 +
+ tools/mesh-gatt/mesh-net.h      | 1 +
+ tools/mesh-gatt/net.c           | 1 +
+ tools/mesh-gatt/net.h           | 1 +
+ tools/mesh-gatt/node.c          | 1 +
+ tools/mesh-gatt/node.h          | 1 +
+ tools/mesh-gatt/onoff-model.c   | 1 +
+ tools/mesh-gatt/onoff-model.h   | 1 +
+ tools/mesh-gatt/prov-db.c       | 1 +
+ tools/mesh-gatt/prov-db.h       | 1 +
+ tools/mesh-gatt/prov.c          | 1 +
+ tools/mesh-gatt/prov.h          | 1 +
+ tools/mesh-gatt/util.c          | 1 +
+ tools/mesh-gatt/util.h          | 1 +
+ tools/mesh/agent.c              | 1 +
+ tools/mesh/agent.h              | 1 +
+ tools/mesh/cfgcli.c             | 1 +
+ tools/mesh/cfgcli.h             | 1 +
+ tools/mesh/config-model.h       | 1 +
+ tools/mesh/keys.c               | 1 +
+ tools/mesh/keys.h               | 1 +
+ tools/mesh/mesh-db.c            | 1 +
+ tools/mesh/mesh-db.h            | 1 +
+ tools/mesh/model.h              | 1 +
+ tools/mesh/remote.c             | 1 +
+ tools/mesh/remote.h             | 1 +
+ tools/mesh/util.c               | 1 +
+ tools/mesh/util.h               | 1 +
+ tools/meshctl.c                 | 1 +
+ tools/mgmt-tester.c             | 1 +
+ tools/mpris-proxy.c             | 1 +
+ tools/nokfw.c                   | 1 +
+ tools/obex-client-tool.c        | 1 +
+ tools/obex-server-tool.c        | 1 +
+ tools/obexctl.c                 | 1 +
+ tools/oobtest.c                 | 1 +
+ tools/parser/amp.c              | 1 +
+ tools/parser/att.c              | 1 +
+ tools/parser/avctp.c            | 1 +
+ tools/parser/avdtp.c            | 1 +
+ tools/parser/avrcp.c            | 1 +
+ tools/parser/bnep.c             | 1 +
+ tools/parser/bpa.c              | 1 +
+ tools/parser/capi.c             | 1 +
+ tools/parser/cmtp.c             | 1 +
+ tools/parser/csr.c              | 1 +
+ tools/parser/ericsson.c         | 1 +
+ tools/parser/hci.c              | 1 +
+ tools/parser/hcrp.c             | 1 +
+ tools/parser/hidp.c             | 1 +
+ tools/parser/l2cap.c            | 1 +
+ tools/parser/l2cap.h            | 1 +
+ tools/parser/lmp.c              | 1 +
+ tools/parser/obex.c             | 1 +
+ tools/parser/parser.c           | 1 +
+ tools/parser/parser.h           | 1 +
+ tools/parser/ppp.c              | 1 +
+ tools/parser/rfcomm.c           | 1 +
+ tools/parser/rfcomm.h           | 1 +
+ tools/parser/sap.c              | 1 +
+ tools/parser/sdp.c              | 1 +
+ tools/parser/sdp.h              | 1 +
+ tools/parser/smp.c              | 1 +
+ tools/parser/tcpip.c            | 1 +
+ tools/rctest.c                  | 1 +
+ tools/rfcomm-tester.c           | 1 +
+ tools/rfcomm.c                  | 1 +
+ tools/rtlfw.c                   | 1 +
+ tools/sco-tester.c              | 1 +
+ tools/scotest.c                 | 1 +
+ tools/sdptool.c                 | 1 +
+ tools/seq2bseq.c                | 1 +
+ tools/smp-tester.c              | 1 +
+ tools/test-runner.c             | 1 +
+ tools/ubcsp.c                   | 1 +
+ tools/ubcsp.h                   | 1 +
+ tools/userchan-tester.c         | 1 +
+ 144 files changed, 144 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1435e2bd7..9b4a3523e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
+diff --git a/tools/3dsp.c b/tools/3dsp.c
+index 77a70c037..617bfdfbf 100644
+--- a/tools/3dsp.c
++++ b/tools/3dsp.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/adapter.h b/src/adapter.h
-index f8ac20261..ced0bb6e9 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
+diff --git a/tools/advtest.c b/tools/advtest.c
+index 050b570df..bdc2421ca 100644
+--- a/tools/advtest.c
++++ b/tools/advtest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/amptest.c b/tools/amptest.c
+index 557470781..f452d2471 100644
+--- a/tools/amptest.c
++++ b/tools/amptest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/avinfo.c b/tools/avinfo.c
+index e45b50918..26e9d1431 100644
+--- a/tools/avinfo.c
++++ b/tools/avinfo.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/avtest.c b/tools/avtest.c
+index 59fb1da8a..1a1427b2e 100644
+--- a/tools/avtest.c
++++ b/tools/avtest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bccmd.c b/tools/bccmd.c
+index 2c215ace7..a75415963 100644
+--- a/tools/bccmd.c
++++ b/tools/bccmd.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bcmfw.c b/tools/bcmfw.c
+index 80d8e71a2..9769016ab 100644
+--- a/tools/bcmfw.c
++++ b/tools/bcmfw.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bdaddr.c b/tools/bdaddr.c
+index 952e99077..fb0772c2a 100644
+--- a/tools/bdaddr.c
++++ b/tools/bdaddr.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bluemoon.c b/tools/bluemoon.c
+index 800541110..ff676d32d 100644
+--- a/tools/bluemoon.c
++++ b/tools/bluemoon.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index c1005c9b7..c8553f75e 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bnep-tester.c b/tools/bnep-tester.c
+index ec4ad2668..95176f0a1 100644
+--- a/tools/bnep-tester.c
++++ b/tools/bnep-tester.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/bneptest.c b/tools/bneptest.c
+index 8bc7596b6..694eb4420 100644
+--- a/tools/bneptest.c
++++ b/tools/bneptest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btattach.c b/tools/btattach.c
+index 56315d050..dc9ea642e 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btconfig.c b/tools/btconfig.c
+index c1ef5834a..c7e97d1dd 100644
+--- a/tools/btconfig.c
++++ b/tools/btconfig.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index bc762dba1..c148728bb 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index 5b7857b00..5d44a5bf4 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+diff --git a/tools/btinfo.c b/tools/btinfo.c
+index 5e609739c..93e4d96ec 100644
+--- a/tools/btinfo.c
++++ b/tools/btinfo.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btiotest.c b/tools/btiotest.c
+index 6c778e3c5..bf23a00da 100644
+--- a/tools/btiotest.c
++++ b/tools/btiotest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 48c9e5887..7c658c617 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+index 9c23d3c5e..79cab1e2c 100644
+--- a/tools/btmon-logger.c
++++ b/tools/btmon-logger.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index f9c693056..ad89678b8 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index a98bbb73f..10340da7c 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+index 9f304377c..164bd0fed 100644
+--- a/tools/btsnoop.c
++++ b/tools/btsnoop.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/check-selftest.c b/tools/check-selftest.c
+index 0de6362da..ff8c8740a 100644
+--- a/tools/check-selftest.c
++++ b/tools/check-selftest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/ciptool.c b/tools/ciptool.c
+index b898ae8b7..cc1caffcb 100644
+--- a/tools/ciptool.c
++++ b/tools/ciptool.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/cltest.c b/tools/cltest.c
+index 44a17a892..3629f70e0 100644
+--- a/tools/cltest.c
++++ b/tools/cltest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/create-image.c b/tools/create-image.c
+index ca9d0112c..0afb95873 100644
+--- a/tools/create-image.c
++++ b/tools/create-image.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/csr.c b/tools/csr.c
+index 61bdaa0cf..87f87510a 100644
+--- a/tools/csr.c
++++ b/tools/csr.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/csr.h b/tools/csr.h
+index cc245a550..aeba8bfb3 100644
+--- a/tools/csr.h
++++ b/tools/csr.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/advertising.c b/src/advertising.c
-index e5f25948d..3856ff32d 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
+diff --git a/tools/csr_3wire.c b/tools/csr_3wire.c
+index 33fcf389a..befc4dfa9 100644
+--- a/tools/csr_3wire.c
++++ b/tools/csr_3wire.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/advertising.h b/src/advertising.h
-index 50d86674b..79c559431 100644
---- a/src/advertising.h
-+++ b/src/advertising.h
+diff --git a/tools/csr_bcsp.c b/tools/csr_bcsp.c
+index e3eea34df..5a8cdd2bd 100644
+--- a/tools/csr_bcsp.c
++++ b/tools/csr_bcsp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/csr_h4.c b/tools/csr_h4.c
+index 2dcaec1e5..892685812 100644
+--- a/tools/csr_h4.c
++++ b/tools/csr_h4.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/csr_hci.c b/tools/csr_hci.c
+index d2e4ab9c6..b0425aa32 100644
+--- a/tools/csr_hci.c
++++ b/tools/csr_hci.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index 32fdf1f14..3c7cb922c 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/eddystone.c b/tools/eddystone.c
+index 4764c677c..4303a16ba 100644
+--- a/tools/eddystone.c
++++ b/tools/eddystone.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/gap-tester.c b/tools/gap-tester.c
+index 2aa404267..6c0a4ec0b 100644
+--- a/tools/gap-tester.c
++++ b/tools/gap-tester.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 374a4c9df..c276e4f1a 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hci-tester.c b/tools/hci-tester.c
+index 7873e7aea..6a7e0a63e 100644
+--- a/tools/hci-tester.c
++++ b/tools/hci-tester.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 9a02173bf..7e601563b 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 249aab49e..9965661eb 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/agent.c b/src/agent.c
-index e0ffcd22f..5df15fc7c 100644
---- a/src/agent.c
-+++ b/src/agent.c
+diff --git a/tools/hciattach_ath3k.c b/tools/hciattach_ath3k.c
+index eb2a2aeb6..9e09b2440 100644
+--- a/tools/hciattach_ath3k.c
++++ b/tools/hciattach_ath3k.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  Copyright (c) 2009-2010 Atheros Communications Inc.
+  *
+diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
+index be82cd011..4ebae6744 100644
+--- a/tools/hciattach_bcm43xx.c
++++ b/tools/hciattach_bcm43xx.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/agent.h b/src/agent.h
-index 1438b9e6d..06dc8c765 100644
---- a/src/agent.h
-+++ b/src/agent.h
+diff --git a/tools/hciattach_intel.c b/tools/hciattach_intel.c
+index 0f0b60f2b..e54b4b6ac 100644
+--- a/tools/hciattach_intel.c
++++ b/tools/hciattach_intel.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach_qualcomm.c b/tools/hciattach_qualcomm.c
+index 29d15a5fe..f13768d2a 100644
+--- a/tools/hciattach_qualcomm.c
++++ b/tools/hciattach_qualcomm.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach_st.c b/tools/hciattach_st.c
+index b34964cb7..3163d9e11 100644
+--- a/tools/hciattach_st.c
++++ b/tools/hciattach_st.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
+index 183839443..c254b203d 100644
+--- a/tools/hciattach_ti.c
++++ b/tools/hciattach_ti.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciattach_tialt.c b/tools/hciattach_tialt.c
+index 78498edcf..605888716 100644
+--- a/tools/hciattach_tialt.c
++++ b/tools/hciattach_tialt.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index ddc17c4b5..ddb796c75 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hcidump.c b/tools/hcidump.c
+index 33d429b6c..6d4577d73 100644
+--- a/tools/hcidump.c
++++ b/tools/hcidump.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hcieventmask.c b/tools/hcieventmask.c
+index b5f818d30..e75cfe2e2 100644
+--- a/tools/hcieventmask.c
++++ b/tools/hcieventmask.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hcisecfilter.c b/tools/hcisecfilter.c
+index 18c903334..9c56bf7a3 100644
+--- a/tools/hcisecfilter.c
++++ b/tools/hcisecfilter.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 9250c41f2..e2587b80b 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index 1148bbb46..9a5cbafb5 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 1e0f7aa2a..2110c0624 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * hid2hci : switch the radio on devices that support
+  *           it from HID to HCI and back
+diff --git a/tools/hwdb.c b/tools/hwdb.c
+index 8a42dce39..12e885a45 100644
+--- a/tools/hwdb.c
++++ b/tools/hwdb.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/ibeacon.c b/tools/ibeacon.c
+index 40078d5ed..141f3a9a0 100644
+--- a/tools/ibeacon.c
++++ b/tools/ibeacon.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 1ef4e9213..00df9fd6d 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/l2ping.c b/tools/l2ping.c
+index db120a550..2c980b5c2 100644
+--- a/tools/l2ping.c
++++ b/tools/l2ping.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 0d846ed93..d136d094b 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+index 82663d8de..eeed9f97e 100644
+--- a/tools/mcaptest.c
++++ b/tools/mcaptest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index 3987e3179..e8dbe6aa1 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/config-client.c b/tools/mesh-gatt/config-clien=
+t.c
+index bfc788258..bac767083 100644
+--- a/tools/mesh-gatt/config-client.c
++++ b/tools/mesh-gatt/config-client.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/config-server.c b/tools/mesh-gatt/config-serve=
+r.c
+index 9e9b93959..284726482 100644
+--- a/tools/mesh-gatt/config-server.c
++++ b/tools/mesh-gatt/config-server.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/crypto.c b/tools/mesh-gatt/crypto.c
+index 493b502ca..04d4d1f34 100644
+--- a/tools/mesh-gatt/crypto.c
++++ b/tools/mesh-gatt/crypto.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/crypto.h b/tools/mesh-gatt/crypto.h
+index e8f16f35d..a28754c17 100644
+--- a/tools/mesh-gatt/crypto.h
++++ b/tools/mesh-gatt/crypto.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/gatt.c b/tools/mesh-gatt/gatt.c
+index 1bd9868df..3828c6092 100644
+--- a/tools/mesh-gatt/gatt.c
++++ b/tools/mesh-gatt/gatt.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/gatt.h b/tools/mesh-gatt/gatt.h
+index 2878587b1..9a8377638 100644
+--- a/tools/mesh-gatt/gatt.h
++++ b/tools/mesh-gatt/gatt.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/keys.h b/tools/mesh-gatt/keys.h
+index 477ff1309..1f96b92a4 100644
+--- a/tools/mesh-gatt/keys.h
++++ b/tools/mesh-gatt/keys.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/mesh-net.h b/tools/mesh-gatt/mesh-net.h
+index 76a98224c..405a93436 100644
+--- a/tools/mesh-gatt/mesh-net.h
++++ b/tools/mesh-gatt/mesh-net.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/net.c b/tools/mesh-gatt/net.c
+index d74e1f5a5..5e8d89463 100644
+--- a/tools/mesh-gatt/net.c
++++ b/tools/mesh-gatt/net.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/net.h b/tools/mesh-gatt/net.h
+index b388d616c..30943be1a 100644
+--- a/tools/mesh-gatt/net.h
++++ b/tools/mesh-gatt/net.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/node.c b/tools/mesh-gatt/node.c
+index 6afa6d6ab..7a9340cf7 100644
+--- a/tools/mesh-gatt/node.c
++++ b/tools/mesh-gatt/node.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/node.h b/tools/mesh-gatt/node.h
+index a5b5c7520..3370809fb 100644
+--- a/tools/mesh-gatt/node.h
++++ b/tools/mesh-gatt/node.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
+index be519c969..83a9f6424 100644
+--- a/tools/mesh-gatt/onoff-model.c
++++ b/tools/mesh-gatt/onoff-model.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/onoff-model.h b/tools/mesh-gatt/onoff-model.h
+index 31599056d..a9fdb300e 100644
+--- a/tools/mesh-gatt/onoff-model.h
++++ b/tools/mesh-gatt/onoff-model.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/prov-db.c b/tools/mesh-gatt/prov-db.c
+index 44096e1e1..db8cf8875 100644
+--- a/tools/mesh-gatt/prov-db.c
++++ b/tools/mesh-gatt/prov-db.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/prov-db.h b/tools/mesh-gatt/prov-db.h
+index b8584a8c3..50e88266e 100644
+--- a/tools/mesh-gatt/prov-db.h
++++ b/tools/mesh-gatt/prov-db.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/prov.c b/tools/mesh-gatt/prov.c
+index 598c94ebf..ccde8114a 100644
+--- a/tools/mesh-gatt/prov.c
++++ b/tools/mesh-gatt/prov.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/prov.h b/tools/mesh-gatt/prov.h
+index 2587df8fb..71b40e57c 100644
+--- a/tools/mesh-gatt/prov.h
++++ b/tools/mesh-gatt/prov.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/util.c b/tools/mesh-gatt/util.c
+index 564665e5d..998df6024 100644
+--- a/tools/mesh-gatt/util.c
++++ b/tools/mesh-gatt/util.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh-gatt/util.h b/tools/mesh-gatt/util.h
+index dba2c480b..09f9313ae 100644
+--- a/tools/mesh-gatt/util.h
++++ b/tools/mesh-gatt/util.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/agent.c b/tools/mesh/agent.c
+index 0258a3803..83b7d0af4 100644
+--- a/tools/mesh/agent.c
++++ b/tools/mesh/agent.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/agent.h b/tools/mesh/agent.h
+index 7f95798f1..38609e97a 100644
+--- a/tools/mesh/agent.h
++++ b/tools/mesh/agent.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 292bb7e19..f7d30b092 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/cfgcli.h b/tools/mesh/cfgcli.h
+index 89a67f5de..9e544c71e 100644
+--- a/tools/mesh/cfgcli.h
++++ b/tools/mesh/cfgcli.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/config-model.h b/tools/mesh/config-model.h
+index f08d3b890..c5dbb8c5a 100644
+--- a/tools/mesh/config-model.h
++++ b/tools/mesh/config-model.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/keys.c b/tools/mesh/keys.c
+index c4070cb75..743488a9e 100644
+--- a/tools/mesh/keys.c
++++ b/tools/mesh/keys.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/keys.h b/tools/mesh/keys.h
+index fa51044ef..ebd78a184 100644
+--- a/tools/mesh/keys.h
++++ b/tools/mesh/keys.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
+index 7f2d5b358..12219daa5 100644
+--- a/tools/mesh/mesh-db.c
++++ b/tools/mesh/mesh-db.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
+index 49af33e87..5e6073522 100644
+--- a/tools/mesh/mesh-db.h
++++ b/tools/mesh/mesh-db.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/model.h b/tools/mesh/model.h
+index 35bb80efc..2d78badec 100644
+--- a/tools/mesh/model.h
++++ b/tools/mesh/model.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
+index f68ef4b41..809d55996 100644
+--- a/tools/mesh/remote.c
++++ b/tools/mesh/remote.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/remote.h b/tools/mesh/remote.h
+index 482817c5a..75daeecc8 100644
+--- a/tools/mesh/remote.h
++++ b/tools/mesh/remote.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/util.c b/tools/mesh/util.c
+index 41a629177..788013cd0 100644
+--- a/tools/mesh/util.c
++++ b/tools/mesh/util.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mesh/util.h b/tools/mesh/util.h
+index 3b6a2f521..602be83ff 100644
+--- a/tools/mesh/util.h
++++ b/tools/mesh/util.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/meshctl.c b/tools/meshctl.c
+index 57998fded..1c7cdff18 100644
+--- a/tools/meshctl.c
++++ b/tools/meshctl.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 337a05b45..500159324 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 617f80586..37591a533 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/nokfw.c b/tools/nokfw.c
+index 6209642b5..467656e48 100644
+--- a/tools/nokfw.c
++++ b/tools/nokfw.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
+index 3d61c00d7..3fe70cb95 100644
+--- a/tools/obex-client-tool.c
++++ b/tools/obex-client-tool.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  *
+  *  OBEX library with GLib integration
+diff --git a/tools/obex-server-tool.c b/tools/obex-server-tool.c
+index b20dfaa6b..27a80d19a 100644
+--- a/tools/obex-server-tool.c
++++ b/tools/obex-server-tool.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  *
+  *  OBEX library with GLib integration
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 0709f692c..2efd27508 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/oobtest.c b/tools/oobtest.c
+index c228b65b1..cb1caf723 100644
+--- a/tools/oobtest.c
++++ b/tools/oobtest.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/amp.c b/tools/parser/amp.c
+index 7c85fb96c..aeaf2732e 100644
+--- a/tools/parser/amp.c
++++ b/tools/parser/amp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/att.c b/tools/parser/att.c
+index 688ed48a2..3c8b537fb 100644
+--- a/tools/parser/att.c
++++ b/tools/parser/att.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/avctp.c b/tools/parser/avctp.c
+index 5038443a4..d399e0f3f 100644
+--- a/tools/parser/avctp.c
++++ b/tools/parser/avctp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
+index 18569c895..5130b42af 100644
+--- a/tools/parser/avdtp.c
++++ b/tools/parser/avdtp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/avrcp.c b/tools/parser/avrcp.c
+index dfc6d0580..d9c3f0e7a 100644
+--- a/tools/parser/avrcp.c
++++ b/tools/parser/avrcp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/bnep.c b/tools/parser/bnep.c
+index c3bbae74f..23f3c93a3 100644
+--- a/tools/parser/bnep.c
++++ b/tools/parser/bnep.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/bpa.c b/tools/parser/bpa.c
+index aac010b39..28584dc92 100644
+--- a/tools/parser/bpa.c
++++ b/tools/parser/bpa.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/capi.c b/tools/parser/capi.c
+index ef6ac0664..f0bdd17da 100644
+--- a/tools/parser/capi.c
++++ b/tools/parser/capi.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/cmtp.c b/tools/parser/cmtp.c
+index e7ac4b55c..32d7e6ac6 100644
+--- a/tools/parser/cmtp.c
++++ b/tools/parser/cmtp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/csr.c b/tools/parser/csr.c
+index 718baab32..c751809fd 100644
+--- a/tools/parser/csr.c
++++ b/tools/parser/csr.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/ericsson.c b/tools/parser/ericsson.c
+index d148c93f7..c0ee1d960 100644
+--- a/tools/parser/ericsson.c
++++ b/tools/parser/ericsson.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+index 41f6fe087..72c0e959f 100644
+--- a/tools/parser/hci.c
++++ b/tools/parser/hci.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/hcrp.c b/tools/parser/hcrp.c
+index 7c46cb6ea..1f8999d95 100644
+--- a/tools/parser/hcrp.c
++++ b/tools/parser/hcrp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/hidp.c b/tools/parser/hidp.c
+index 703049a7a..b2624489b 100644
+--- a/tools/parser/hidp.c
++++ b/tools/parser/hidp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
+index e43761cf7..eb7684bac 100644
+--- a/tools/parser/l2cap.c
++++ b/tools/parser/l2cap.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/l2cap.h b/tools/parser/l2cap.h
+index 788aef006..298ce25a6 100644
+--- a/tools/parser/l2cap.h
++++ b/tools/parser/l2cap.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 7c15a4e8f..877179a41 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
+diff --git a/tools/parser/lmp.c b/tools/parser/lmp.c
+index a7879fb37..1f24a39de 100644
+--- a/tools/parser/lmp.c
++++ b/tools/parser/lmp.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/attrib-server.h b/src/attrib-server.h
-index 063cb6621..69d60c1a8 100644
---- a/src/attrib-server.h
-+++ b/src/attrib-server.h
+diff --git a/tools/parser/obex.c b/tools/parser/obex.c
+index 51719aa9c..9830ac588 100644
+--- a/tools/parser/obex.c
++++ b/tools/parser/obex.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/parser.c b/tools/parser/parser.c
+index 61c5b1cda..57ab44b7e 100644
+--- a/tools/parser/parser.c
++++ b/tools/parser/parser.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index b7e1d7568..3b939e1a2 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/backtrace.c b/src/backtrace.c
-index c43873354..c5bbeeaf9 100644
---- a/src/backtrace.c
-+++ b/src/backtrace.c
+diff --git a/tools/parser/ppp.c b/tools/parser/ppp.c
+index 55aaa60fe..90e7304a8 100644
+--- a/tools/parser/ppp.c
++++ b/tools/parser/ppp.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/backtrace.h b/src/backtrace.h
-index b3eef6dd9..3094f1aaa 100644
---- a/src/backtrace.h
-+++ b/src/backtrace.h
+diff --git a/tools/parser/rfcomm.c b/tools/parser/rfcomm.c
+index d800b7e6d..5704d8dd7 100644
+--- a/tools/parser/rfcomm.c
++++ b/tools/parser/rfcomm.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+diff --git a/tools/parser/rfcomm.h b/tools/parser/rfcomm.h
+index a9faa0bf8..fa7df9597 100644
+--- a/tools/parser/rfcomm.h
++++ b/tools/parser/rfcomm.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index 6e2097a2d..f099647bb 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
+diff --git a/tools/parser/sap.c b/tools/parser/sap.c
+index 0a875fc7c..250cbff4b 100644
+--- a/tools/parser/sap.c
++++ b/tools/parser/sap.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/dbus-common.h b/src/dbus-common.h
-index fbf4acd28..f1bbe28d3 100644
---- a/src/dbus-common.h
-+++ b/src/dbus-common.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /* *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-diff --git a/src/device.c b/src/device.c
-index 8f73ce4d3..83f928c30 100644
---- a/src/device.c
-+++ b/src/device.c
+diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
+index 7477037b8..e235dd188 100644
+--- a/tools/parser/sdp.c
++++ b/tools/parser/sdp.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/device.h b/src/device.h
-index 3cd090786..2c081662e 100644
---- a/src/device.h
-+++ b/src/device.h
+diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
+index ed55a23ea..bf329c1ef 100644
+--- a/tools/parser/sdp.h
++++ b/tools/parser/sdp.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/eir.c b/src/eir.c
-index fa52a2bd8..61ce1728d 100644
---- a/src/eir.c
-+++ b/src/eir.c
+diff --git a/tools/parser/smp.c b/tools/parser/smp.c
+index 817e08e85..fa444c6cc 100644
+--- a/tools/parser/smp.c
++++ b/tools/parser/smp.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/eir.h b/src/eir.h
-index c868177a6..929472098 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/error.c b/src/error.c
-index 89517075e..e01636f68 100644
---- a/src/error.c
-+++ b/src/error.c
+diff --git a/tools/parser/tcpip.c b/tools/parser/tcpip.c
+index 8ccfb007c..a96b345a6 100644
+--- a/tools/parser/tcpip.c
++++ b/tools/parser/tcpip.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/error.h b/src/error.h
-index 7c8cad066..158afe556 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 20c3fbec2..d618af607 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
+diff --git a/tools/rctest.c b/tools/rctest.c
+index bc8ed875d..0fac6ebcb 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/gatt-client.h b/src/gatt-client.h
-index 92a925546..e277ed1f8 100644
---- a/src/gatt-client.h
-+++ b/src/gatt-client.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index e7e4a36a6..a83ec336e 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 2d3be27d8..4635ac8d3 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index 154d3243f..9d0de0bbc 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/hcid.h b/src/hcid.h
-index 3624ba6ea..e77c6a030 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/log.c b/src/log.c
-index a42c5941d..76c501809 100644
---- a/src/log.c
-+++ b/src/log.c
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index 177d8f828..4880b0c2d 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/log.h b/src/log.h
-index e83431151..77887088c 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/main.c b/src/main.c
-index b37c32948..73b34d0ce 100644
---- a/src/main.c
-+++ b/src/main.c
+diff --git a/tools/rtlfw.c b/tools/rtlfw.c
+index 375f07592..50bf70480 100644
+--- a/tools/rtlfw.c
++++ b/tools/rtlfw.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/oui.c b/src/oui.c
-index 8059c0a89..32cad253c 100644
---- a/src/oui.c
-+++ b/src/oui.c
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 651fbe01d..594c36619 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/oui.h b/src/oui.h
-index 2ddc27fef..3696a981e 100644
---- a/src/oui.h
-+++ b/src/oui.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/plugin.c b/src/plugin.c
-index 39310a7db..30cc02274 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
+diff --git a/tools/scotest.c b/tools/scotest.c
+index 08bc8a8d2..d48dbe5ca 100644
+--- a/tools/scotest.c
++++ b/tools/scotest.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/plugin.h b/src/plugin.h
-index 89c7b8515..3335ed54d 100644
---- a/src/plugin.h
-+++ b/src/plugin.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/profile.c b/src/profile.c
-index 6961a107b..8f417dbb1 100644
---- a/src/profile.c
-+++ b/src/profile.c
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 3c5d840d9..5c00c69cc 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/profile.h b/src/profile.h
-index 95523e50a..b5dac8e88 100644
---- a/src/profile.h
-+++ b/src/profile.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/rfkill.c b/src/rfkill.c
-index fb2d11306..8f63f464d 100644
---- a/src/rfkill.c
-+++ b/src/rfkill.c
+diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c
+index 9268ecd06..20e91810a 100644
+--- a/tools/seq2bseq.c
++++ b/tools/seq2bseq.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdp-client.c b/src/sdp-client.c
-index b92a083af..e3f26d764 100644
---- a/src/sdp-client.c
-+++ b/src/sdp-client.c
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index c32519e0c..c6bfde920 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdp-client.h b/src/sdp-client.h
-index 3a7212fd2..70d669d07 100644
---- a/src/sdp-client.h
-+++ b/src/sdp-client.h
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index bd3c73001..c735a2ba9 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
++// SPDX-License-Identifier: LGPL-2.1-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 6f831737d..8f7f0c314 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
+diff --git a/tools/ubcsp.c b/tools/ubcsp.c
+index b3f883a03..ff96c3107 100644
+--- a/tools/ubcsp.c
++++ b/tools/ubcsp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: MIT=0D
+ /*=0D
+  *=0D
+  *  BlueZ - Bluetooth protocol stack for Linux=0D
+diff --git a/tools/ubcsp.h b/tools/ubcsp.h
+index 6a74e9a16..2a54146cd 100644
+--- a/tools/ubcsp.h
++++ b/tools/ubcsp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: MIT */=0D
+ /*=0D
+  *=0D
+  *  BlueZ - Bluetooth protocol stack for Linux=0D
+diff --git a/tools/userchan-tester.c b/tools/userchan-tester.c
+index 8fb088827..50cdfb238 100644
+--- a/tools/userchan-tester.c
++++ b/tools/userchan-tester.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdp-xml.h b/src/sdp-xml.h
-index 80a4f446d..bb99b0954 100644
---- a/src/sdp-xml.h
-+++ b/src/sdp-xml.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index 843b6d02b..518ef7a2f 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-index deaed266f..a3d6443ff 100644
---- a/src/sdpd-request.c
-+++ b/src/sdpd-request.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index ef35309ce..a3903ea57 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index c3ee3eb48..bf03082f8 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/sdpd.h b/src/sdpd.h
-index 49cd98a2b..a4dd38e87 100644
---- a/src/sdpd.h
-+++ b/src/sdpd.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/service.c b/src/service.c
-index e4d747a6e..072e937e6 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/service.h b/src/service.h
-index 6f1edfb8f..a56e1be4b 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index 14a2709b1..819b8b4cb 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index 17e3b631b..809e7bbdc 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index 99b108990..5fa0bc7b4 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 58f23dfcb..89500ebc7 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/att.h b/src/shared/att.h
-index ed20bb5b8..401eba9e7 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/btp.c b/src/shared/btp.c
-index 7eea241a2..f5833e42b 100644
---- a/src/shared/btp.c
-+++ b/src/shared/btp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/btp.h b/src/shared/btp.h
-index f0ac3a1ee..f9a1b1dd7 100644
---- a/src/shared/btp.h
-+++ b/src/shared/btp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-index f0d074743..31f671c20 100644
---- a/src/shared/btsnoop.c
-+++ b/src/shared/btsnoop.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-index 5fb084aa2..b20723a64 100644
---- a/src/shared/btsnoop.h
-+++ b/src/shared/btsnoop.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index 5cc88ce4a..430d82573 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-index d17daa835..30749df8d 100644
---- a/src/shared/crypto.h
-+++ b/src/shared/crypto.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/ecc.c b/src/shared/ecc.c
-index 1b45e0d0a..04c7dd9d6 100644
---- a/src/shared/ecc.c
-+++ b/src/shared/ecc.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: BSD-2-Clause
- /*
-  * Copyright (c) 2013, Kenneth MacKay
-  * All rights reserved.
-diff --git a/src/shared/ecc.h b/src/shared/ecc.h
-index 8c15e4ee8..f7b155452 100644
---- a/src/shared/ecc.h
-+++ b/src/shared/ecc.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: BSD-2-Clause */
- /*
-  * Copyright (c) 2013, Kenneth MacKay
-  * All rights reserved.
-diff --git a/src/shared/gap.c b/src/shared/gap.c
-index 0b8d073c5..b9df64139 100644
---- a/src/shared/gap.c
-+++ b/src/shared/gap.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gap.h b/src/shared/gap.h
-index 52c264a8e..dcfefcd1f 100644
---- a/src/shared/gap.h
-+++ b/src/shared/gap.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index f15466673..b596ef3f9 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 10900168b..f3cb6bc47 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index e939ddc3a..b9e4187a5 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 5bf19d302..a15789ef4 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 6b39bb161..75f75ee59 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index dd9dd1c44..4923d27ae 100644
---- a/src/shared/gatt-helpers.h
-+++ b/src/shared/gatt-helpers.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 28ac2d68d..295b1811b 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-index a2492d275..88db54c16 100644
---- a/src/shared/gatt-server.h
-+++ b/src/shared/gatt-server.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hci-crypto.c b/src/shared/hci-crypto.c
-index f7507472b..cd635a670 100644
---- a/src/shared/hci-crypto.c
-+++ b/src/shared/hci-crypto.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hci-crypto.h b/src/shared/hci-crypto.h
-index b090c2410..420626c93 100644
---- a/src/shared/hci-crypto.h
-+++ b/src/shared/hci-crypto.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hci.c b/src/shared/hci.c
-index 262e93d5a..e931e1e03 100644
---- a/src/shared/hci.c
-+++ b/src/shared/hci.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hci.h b/src/shared/hci.h
-index dba0f11db..b44f56f75 100644
---- a/src/shared/hci.h
-+++ b/src/shared/hci.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index f4747b4ca..7da48bd2b 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 2eb783849..859303d95 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/io-ell.c b/src/shared/io-ell.c
-index 6748982c7..47f44475b 100644
---- a/src/shared/io-ell.c
-+++ b/src/shared/io-ell.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index d62de4e10..a518780d7 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-index 2306c3479..0fcb21968 100644
---- a/src/shared/io-mainloop.c
-+++ b/src/shared/io-mainloop.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/io.h b/src/shared/io.h
-index 8bc1111d0..1944470a3 100644
---- a/src/shared/io.h
-+++ b/src/shared/io.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/log.c b/src/shared/log.c
-index 7c8b71220..d8f6442fc 100644
---- a/src/shared/log.c
-+++ b/src/shared/log.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/log.h b/src/shared/log.h
-index c72ab735b..7dab6126c 100644
---- a/src/shared/log.h
-+++ b/src/shared/log.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop-ell.c b/src/shared/mainloop-ell.c
-index 63e254ac6..7bb447378 100644
---- a/src/shared/mainloop-ell.c
-+++ b/src/shared/mainloop-ell.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop-glib.c b/src/shared/mainloop-glib.c
-index 2508a1fb2..4913e544e 100644
---- a/src/shared/mainloop-glib.c
-+++ b/src/shared/mainloop-glib.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop-notify.c b/src/shared/mainloop-notify.c
-index 1de714a0e..f9b1efca5 100644
---- a/src/shared/mainloop-notify.c
-+++ b/src/shared/mainloop-notify.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop-notify.h b/src/shared/mainloop-notify.h
-index 721b5fbed..5b4cf08ac 100644
---- a/src/shared/mainloop-notify.h
-+++ b/src/shared/mainloop-notify.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop.c b/src/shared/mainloop.c
-index 8a8e2c022..0b8f91bb2 100644
---- a/src/shared/mainloop.c
-+++ b/src/shared/mainloop.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mainloop.h b/src/shared/mainloop.h
-index 1ede62797..34cb6d557 100644
---- a/src/shared/mainloop.h
-+++ b/src/shared/mainloop.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 277e361a6..8c356d84d 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
-index 7caeb3844..f80e18364 100644
---- a/src/shared/mgmt.h
-+++ b/src/shared/mgmt.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/pcap.c b/src/shared/pcap.c
-index 0d887e24c..5c41b896d 100644
---- a/src/shared/pcap.c
-+++ b/src/shared/pcap.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/pcap.h b/src/shared/pcap.h
-index b47de62e8..96b927ee3 100644
---- a/src/shared/pcap.h
-+++ b/src/shared/pcap.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index 60df11143..4efb12e23 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/queue.h b/src/shared/queue.h
-index 8cd817cc0..b03ac74ae 100644
---- a/src/shared/queue.h
-+++ b/src/shared/queue.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/ringbuf.c b/src/shared/ringbuf.c
-index 8cf0b5b19..8cc32aac0 100644
---- a/src/shared/ringbuf.c
-+++ b/src/shared/ringbuf.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/ringbuf.h b/src/shared/ringbuf.h
-index adf471a43..4452853fe 100644
---- a/src/shared/ringbuf.h
-+++ b/src/shared/ringbuf.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index d58e2d7d1..30d2fbbb4 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-index e14d58381..8d03dec06 100644
---- a/src/shared/shell.h
-+++ b/src/shared/shell.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 62e5c1aae..eb15694ed 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 96e8dc901..796e57c92 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/timeout-ell.c b/src/shared/timeout-ell.c
-index 8419d4617..5081d2f66 100644
---- a/src/shared/timeout-ell.c
-+++ b/src/shared/timeout-ell.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/timeout-glib.c b/src/shared/timeout-glib.c
-index fd71ca430..91494538c 100644
---- a/src/shared/timeout-glib.c
-+++ b/src/shared/timeout-glib.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
-index 971124a2e..7cbec435f 100644
---- a/src/shared/timeout-mainloop.c
-+++ b/src/shared/timeout-mainloop.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/timeout.h b/src/shared/timeout.h
-index 4930ce162..cab335dd4 100644
---- a/src/shared/timeout.h
-+++ b/src/shared/timeout.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/tty.h b/src/shared/tty.h
-index 66ec09f31..9b7ca9688 100644
---- a/src/shared/tty.h
-+++ b/src/shared/tty.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/uhid.c b/src/shared/uhid.c
-index 71a4e04ba..09d4e2de2 100644
---- a/src/shared/uhid.c
-+++ b/src/shared/uhid.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/uhid.h b/src/shared/uhid.h
-index dbdca852d..0c7e79aa4 100644
---- a/src/shared/uhid.h
-+++ b/src/shared/uhid.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 4ecf31a03..2ba8a2a3a 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 9193068d1..3753ce2c6 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/storage.c b/src/storage.c
-index 8cbb5b270..a764e4a6f 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/storage.h b/src/storage.h
-index 1c0ad57ec..2d766542d 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/textfile.c b/src/textfile.c
-index 371651bd8..4f7ed3d72 100644
---- a/src/textfile.c
-+++ b/src/textfile.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/textfile.h b/src/textfile.h
-index f01629e43..87dfdabd5 100644
---- a/src/textfile.h
-+++ b/src/textfile.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/uinput.h b/src/uinput.h
-index 20e0941d1..3b96b331a 100644
---- a/src/uinput.h
-+++ b/src/uinput.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/uuid-helper.c b/src/uuid-helper.c
-index 2c897d86c..df90c7992 100644
---- a/src/uuid-helper.c
-+++ b/src/uuid-helper.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-diff --git a/src/uuid-helper.h b/src/uuid-helper.h
-index c0d7f9eec..304bc71c3 100644
---- a/src/uuid-helper.h
-+++ b/src/uuid-helper.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
--- 
+--=20
 2.17.1
 
