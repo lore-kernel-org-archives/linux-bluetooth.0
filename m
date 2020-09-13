@@ -2,45 +2,44 @@ Return-Path: <SRS0=7mPt=CW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C85EC43461
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 07:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA2FC43461
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 07:57:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FDD12098B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 07:48:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFB47206BE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Sep 2020 07:57:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725918AbgIMHsb (ORCPT
+        id S1725918AbgIMH5Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 13 Sep 2020 03:48:31 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:35942 "EHLO
+        Sun, 13 Sep 2020 03:57:24 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50350 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725899AbgIMHsa (ORCPT
+        with ESMTP id S1725912AbgIMH5V (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 13 Sep 2020 03:48:30 -0400
+        Sun, 13 Sep 2020 03:57:21 -0400
 Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9362FCECC4;
-        Sun, 13 Sep 2020 09:55:24 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 74188CECC4;
+        Sun, 13 Sep 2020 10:04:15 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [RESEND PATCH] bluetooth: Set ext scan response only when it
- exists
+Subject: Re: [PATCH v2 0/3] Bluetooth: Emit events for suspend/resume
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200911153141.RESEND.1.Ib022565452fde0c02fbcf619950ef868715dd243@changeid>
-Date:   Sun, 13 Sep 2020 09:48:28 +0200
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Daniel Winkler <danielwinkler@google.com>,
+In-Reply-To: <20200911210713.4066465-1-abhishekpandit@chromium.org>
+Date:   Sun, 13 Sep 2020 09:57:19 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jakub Kicinski <kuba@kernel.org>
 Content-Transfer-Encoding: 7bit
-Message-Id: <A3FDD177-8552-4BDD-941A-0BD8FF495AFE@holtmann.org>
-References: <20200911153141.RESEND.1.Ib022565452fde0c02fbcf619950ef868715dd243@changeid>
+Message-Id: <BF8FE78A-77AF-4788-A819-B275D851309A@holtmann.org>
+References: <20200911210713.4066465-1-abhishekpandit@chromium.org>
 To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -50,67 +49,34 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Abhishek,
 
-> Only set extended scan response only when it exists. Otherwise, clear
-> the scan response data.
+> This series adds the suspend/resume events suggested in
+> https://patchwork.kernel.org/patch/11771001/.
 > 
-> Per the core spec v5.2, Vol 4, Part E, 7.8.55
+> I have tested it with some userspace changes that monitors the
+> controller resumed event to trigger audio device reconnection and
+> verified that the events are correctly emitted.
 > 
-> If the advertising set is non-scannable and the Host uses this command
-> other than to discard existing data, the Controller shall return the
-> error code Invalid HCI Command Parameters (0x12).
+> Patch for btmon changes: https://patchwork.kernel.org/patch/11743863/
 > 
-> On WCN3991, the controller correctly responds with Invalid Parameters
-> when this is sent.  That error causes __hci_req_hci_power_on to fail
-> with -EINVAL and LE devices can't connect because background scanning
-> isn't configured.
+> Please take a look.
+> Abhishek
 > 
-> Here is an hci trace of where this issue occurs during power on:
+> Changes in v2:
+> - Added suspend/resume events to list of mgmt events
 > 
-> < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
->        Handle: 0x00
->        Properties: 0x0010
->          Use legacy advertising PDUs: ADV_NONCONN_IND
->        Min advertising interval: 181.250 msec (0x0122)
->        Max advertising interval: 181.250 msec (0x0122)
->        Channel map: 37, 38, 39 (0x07)
->        Own address type: Random (0x01)
->        Peer address type: Public (0x00)
->        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Filter policy: Allow Scan Request from Any, Allow Connect...
->        TX power: 127 dbm (0x7f)
->        Primary PHY: LE 1M (0x01)
->        Secondary max skip: 0x00
->        Secondary PHY: LE 1M (0x01)
->        SID: 0x00
->        Scan request notifications: Disabled (0x00)
->> HCI Event: Command Complete (0x0e) plen 5
->      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
->        Status: Success (0x00)
->        TX power (selected): 9 dbm (0x09)
-> < HCI Command: LE Set Advertising Set Random Address (0x08|0x0035) plen 7
->        Advertising handle: 0x00
->        Advertising random address: 08:FD:55:ED:22:28 (OUI 08-FD-55)
->> HCI Event: Command Complete (0x0e) plen 4
->      LE Set Advertising Set Random Address (0x08|0x0035) ncmd
->        Status: Success (0x00)
-> < HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
->        Handle: 0x00
->        Operation: Complete scan response data (0x03)
->        Fragment preference: Minimize fragmentation (0x01)
->        Data length: 0x0d
->        Name (short): Chromebook
->> HCI Event: Command Complete (0x0e) plen 4
->      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
->        Status: Invalid HCI Command Parameters (0x12)
+> Abhishek Pandit-Subedi (3):
+>  Bluetooth: Add mgmt suspend and resume events
+>  Bluetooth: Add suspend reason for device disconnect
+>  Bluetooth: Emit controller suspend and resume events
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-> ---
-> 
-> net/bluetooth/hci_request.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
+> include/net/bluetooth/hci_core.h |  6 +++
+> include/net/bluetooth/mgmt.h     | 16 +++++++
+> net/bluetooth/hci_core.c         | 26 +++++++++++-
+> net/bluetooth/hci_event.c        | 73 ++++++++++++++++++++++++++++++++
+> net/bluetooth/mgmt.c             | 30 +++++++++++++
+> 5 files changed, 150 insertions(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
+All 3 patches have been applied to bluetooth-next tree.
 
 Regards
 
