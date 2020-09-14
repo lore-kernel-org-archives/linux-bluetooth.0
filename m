@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8CFC43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 15:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9FFC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 15:45:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3209D20E65
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 15:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F190D20719
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 15:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600098306;
-	bh=CYH1CsDc34T5/TtGxDDRATTjQ8lmYfcbJULfT9sMhfA=;
+	s=default; t=1600098331;
+	bh=F6wx4MSBrpIsyo0PjXnFqRdWk4FAf3xNPNdZqRxUOjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qdlCirIFy/u6tl6Lo9yD8sz4uLXZL/H5yOyk3CkvQhjIBfs3oqhlSkGshOf6tOGa+
-	 /F9CVMkyje0I/unrdWOxjuTPen1gV508nG8an3L1ASm+L9l2vxKDhC3SIxB/Lhe2s0
-	 02JhH6xCobYDXpSFoCr+PjI4cZy4+EJc6jLtDbUM=
+	b=o4u/SEdybc8QE+lmsmVCS/BnUmqwSOyT7eO8GgaTtf+7hJyd+anAMX3Alw53peR2W
+	 jVXliYtJaExQj2vjFb+CqDeTnm4FeqyquwM5SjSPicoiqKN3gDwYkuZP7qsk2Ho5zy
+	 kQHtJybV6YgwLRZwOPHSV+Ia6jyh2MGfqDbDEeuQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbgINPo5 (ORCPT
+        id S1726531AbgINPpQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Sep 2020 11:44:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48034 "EHLO mail.kernel.org"
+        Mon, 14 Sep 2020 11:45:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47530 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726031AbgINPiX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Sep 2020 11:38:23 -0400
+        id S1726361AbgINPiR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Sep 2020 11:38:17 -0400
 Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BB2BB21D1B;
-        Mon, 14 Sep 2020 15:38:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9653320756;
+        Mon, 14 Sep 2020 15:37:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600097894;
-        bh=CYH1CsDc34T5/TtGxDDRATTjQ8lmYfcbJULfT9sMhfA=;
+        s=default; t=1600097879;
+        bh=F6wx4MSBrpIsyo0PjXnFqRdWk4FAf3xNPNdZqRxUOjc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OO5CdqsX4I7wtBZYJAWDR7ATAHG4GgHsny6IA9UlBIgUXXkeKY6KUdkufxzkJgcD3
-         iJRCXa0q66paNHfIDTNMWgQoIMjfB1PP5gMUFsITSuCjjEd5Sqtq2rGsm3c79riJ1S
-         GV3cRB75CKBRdjKtTTFjyutxxDcZ65xqetS/CeQQ=
+        b=uxmpb5dAseFTtzeqwU5/m3+f4svSXA6VkUsSSStY8DXLPf1ai8UksyQJ9GmfbAWtc
+         rJjp3DXqYaUYnxNHEz8gLc7K/w1yEX9U+zdZxRPz4G9h/003iWh2WP1xnqgA3OCZc/
+         WRB1JvAe7uoGgXgncKCZGxGOcXZnzJDuIa4j1nsc=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     himadrispandya@gmail.com, dvyukov@google.com,
         linux-usb@vger.kernel.org
@@ -47,12 +47,20 @@ Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
         johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
         alsa-devel@alsa-project.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Eli Billauer <eli.billauer@gmail.com>,
+        Emiliano Ingrassia <ingrassia@epigenesys.com>,
         Alan Stern <stern@rowland.harvard.edu>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v3 03/11] USB: core: message.c: use usb_control_msg_send() in a few places
-Date:   Mon, 14 Sep 2020 17:37:48 +0200
-Message-Id: <20200914153756.3412156-4-gregkh@linuxfoundation.org>
+        Alexander Tsoy <alexander@tsoy.me>,
+        "Geoffrey D. Bennett" <g@b4.vu>, Jussi Laako <jussi@sonarnerd.net>,
+        Nick Kossifidis <mickflemm@gmail.com>,
+        Dmitry Panchenko <dmitry@d-systems.ee>,
+        Chris Wulff <crwulff@gmail.com>,
+        Jesus Ramos <jesus-ramos@live.com>,
+        Takashi Iwai <tiwai@suse.de>
+Subject: [PATCH v3 01/11] USB: move snd_usb_pipe_sanity_check into the USB core
+Date:   Mon, 14 Sep 2020 17:37:46 +0200
+Message-Id: <20200914153756.3412156-2-gregkh@linuxfoundation.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
 References: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
@@ -63,111 +71,238 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are a few calls to usb_control_msg() that can be converted to use
-usb_control_msg_send() instead, so do that in order to make the error
-checking a bit simpler.
+snd_usb_pipe_sanity_check() is a great function, so let's move it into
+the USB core so that other parts of the kernel, including the USB core,
+can call it.
 
+Name it usb_pipe_type_check() to match the existing
+usb_urb_ep_type_check() call, which now uses this function.
+
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: Takashi Iwai <tiwai@suse.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Eli Billauer <eli.billauer@gmail.com>
+Cc: Emiliano Ingrassia <ingrassia@epigenesys.com>
 Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Alexander Tsoy <alexander@tsoy.me>
+Cc: "Geoffrey D. Bennett" <g@b4.vu>
+Cc: Jussi Laako <jussi@sonarnerd.net>
+Cc: Nick Kossifidis <mickflemm@gmail.com>
+Cc: Dmitry Panchenko <dmitry@d-systems.ee>
+Cc: Chris Wulff <crwulff@gmail.com>
+Cc: Jesus Ramos <jesus-ramos@live.com>
 Cc: linux-usb@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: alsa-devel@alsa-project.org
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
 v3:
- - Added Andy's Reviewed-by:
+ - no change from v2
 
 v2:
- - no change from v1
+ - use usb_pipe_type_check() instead of usb_urb_ep_type_check in urb.c
+ - fix typo in function description
+ - both changes thanks to Alan Stern's review comments
+ - added Takashi Iwai's reviewed-by
 
- drivers/usb/core/message.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ drivers/usb/core/urb.c          | 31 +++++++++++++++++++++++--------
+ include/linux/usb.h             |  1 +
+ sound/usb/helper.c              | 16 +---------------
+ sound/usb/helper.h              |  1 -
+ sound/usb/mixer_scarlett_gen2.c |  2 +-
+ sound/usb/quirks.c              | 12 ++++++------
+ 6 files changed, 32 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/usb/core/message.c b/drivers/usb/core/message.c
-index 1dc53b12a26a..1580694e3b95 100644
---- a/drivers/usb/core/message.c
-+++ b/drivers/usb/core/message.c
-@@ -1081,7 +1081,7 @@ int usb_set_isoch_delay(struct usb_device *dev)
- 	if (dev->speed < USB_SPEED_SUPER)
- 		return 0;
+diff --git a/drivers/usb/core/urb.c b/drivers/usb/core/urb.c
+index 27e83e55a590..357b149b20d3 100644
+--- a/drivers/usb/core/urb.c
++++ b/drivers/usb/core/urb.c
+@@ -192,24 +192,39 @@ static const int pipetypes[4] = {
+ };
  
--	return usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
-+	return usb_control_msg_send(dev, 0,
- 			USB_REQ_SET_ISOCH_DELAY,
- 			USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
- 			dev->hub_delay, 0, NULL, 0,
-@@ -1203,13 +1203,13 @@ int usb_clear_halt(struct usb_device *dev, int pipe)
- 	 * (like some ibmcam model 1 units) seem to expect hosts to make
- 	 * this request for iso endpoints, which can't halt!
+ /**
+- * usb_urb_ep_type_check - sanity check of endpoint in the given urb
+- * @urb: urb to be checked
++ * usb_pipe_type_check - sanity check of a specific pipe for a usb device
++ * @dev: struct usb_device to be checked
++ * @pipe: pipe to check
+  *
+  * This performs a light-weight sanity check for the endpoint in the
+- * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
+- * a negative error code.
++ * given usb device.  It returns 0 if the pipe is valid for the specific usb
++ * device, otherwise a negative error code.
+  */
+-int usb_urb_ep_type_check(const struct urb *urb)
++int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe)
+ {
+ 	const struct usb_host_endpoint *ep;
+ 
+-	ep = usb_pipe_endpoint(urb->dev, urb->pipe);
++	ep = usb_pipe_endpoint(dev, pipe);
+ 	if (!ep)
+ 		return -EINVAL;
+-	if (usb_pipetype(urb->pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
++	if (usb_pipetype(pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
+ 		return -EINVAL;
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(usb_pipe_type_check);
++
++/**
++ * usb_urb_ep_type_check - sanity check of endpoint in the given urb
++ * @urb: urb to be checked
++ *
++ * This performs a light-weight sanity check for the endpoint in the
++ * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
++ * a negative error code.
++ */
++int usb_urb_ep_type_check(const struct urb *urb)
++{
++	return usb_pipe_type_check(urb->dev, urb->pipe);
++}
+ EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
+ 
+ /**
+@@ -474,7 +489,7 @@ int usb_submit_urb(struct urb *urb, gfp_t mem_flags)
  	 */
--	result = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
--		USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT,
--		USB_ENDPOINT_HALT, endp, NULL, 0,
--		USB_CTRL_SET_TIMEOUT);
-+	result = usb_control_msg_send(dev, 0,
-+				      USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT,
-+				      USB_ENDPOINT_HALT, endp, NULL, 0,
-+				      USB_CTRL_SET_TIMEOUT);
  
- 	/* don't un-halt or force to DATA0 except on success */
--	if (result < 0)
-+	if (result)
- 		return result;
+ 	/* Check that the pipe's type matches the endpoint's type */
+-	if (usb_urb_ep_type_check(urb))
++	if (usb_pipe_type_check(urb->dev, urb->pipe))
+ 		dev_WARN(&dev->dev, "BOGUS urb xfer, pipe %x != type %x\n",
+ 			usb_pipetype(urb->pipe), pipetypes[xfertype]);
  
- 	/* NOTE:  seems like Microsoft and Apple don't bother verifying
-@@ -1571,9 +1571,10 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
- 	if (dev->quirks & USB_QUIRK_NO_SET_INTF)
- 		ret = -EPIPE;
- 	else
--		ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
--				   USB_REQ_SET_INTERFACE, USB_RECIP_INTERFACE,
--				   alternate, interface, NULL, 0, 5000);
-+		ret = usb_control_msg_send(dev, 0,
-+					   USB_REQ_SET_INTERFACE,
-+					   USB_RECIP_INTERFACE, alternate,
-+					   interface, NULL, 0, 5000);
+diff --git a/include/linux/usb.h b/include/linux/usb.h
+index 20c555db4621..0b3963d7ec38 100644
+--- a/include/linux/usb.h
++++ b/include/linux/usb.h
+@@ -1764,6 +1764,7 @@ static inline int usb_urb_dir_out(struct urb *urb)
+ 	return (urb->transfer_flags & URB_DIR_MASK) == URB_DIR_OUT;
+ }
  
- 	/* 9.4.10 says devices don't need this and are free to STALL the
- 	 * request if the interface only has one alternate setting.
-@@ -1583,7 +1584,7 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
- 			"manual set_interface for iface %d, alt %d\n",
- 			interface, alternate);
- 		manual = 1;
--	} else if (ret < 0) {
-+	} else if (ret) {
- 		/* Re-instate the old alt setting */
- 		usb_hcd_alloc_bandwidth(dev, NULL, alt, iface->cur_altsetting);
- 		usb_enable_lpm(dev);
-@@ -1707,11 +1708,10 @@ int usb_reset_configuration(struct usb_device *dev)
- 		mutex_unlock(hcd->bandwidth_mutex);
- 		return retval;
++int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe);
+ int usb_urb_ep_type_check(const struct urb *urb);
+ 
+ void *usb_alloc_coherent(struct usb_device *dev, size_t size,
+diff --git a/sound/usb/helper.c b/sound/usb/helper.c
+index 4c12cc5b53fd..cf92d7110773 100644
+--- a/sound/usb/helper.c
++++ b/sound/usb/helper.c
+@@ -63,20 +63,6 @@ void *snd_usb_find_csint_desc(void *buffer, int buflen, void *after, u8 dsubtype
+ 	return NULL;
+ }
+ 
+-/* check the validity of pipe and EP types */
+-int snd_usb_pipe_sanity_check(struct usb_device *dev, unsigned int pipe)
+-{
+-	static const int pipetypes[4] = {
+-		PIPE_CONTROL, PIPE_ISOCHRONOUS, PIPE_BULK, PIPE_INTERRUPT
+-	};
+-	struct usb_host_endpoint *ep;
+-
+-	ep = usb_pipe_endpoint(dev, pipe);
+-	if (!ep || usb_pipetype(pipe) != pipetypes[usb_endpoint_type(&ep->desc)])
+-		return -EINVAL;
+-	return 0;
+-}
+-
+ /*
+  * Wrapper for usb_control_msg().
+  * Allocates a temp buffer to prevent dmaing from/to the stack.
+@@ -89,7 +75,7 @@ int snd_usb_ctl_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
+ 	void *buf = NULL;
+ 	int timeout;
+ 
+-	if (snd_usb_pipe_sanity_check(dev, pipe))
++	if (usb_pipe_type_check(dev, pipe))
+ 		return -EINVAL;
+ 
+ 	if (size > 0) {
+diff --git a/sound/usb/helper.h b/sound/usb/helper.h
+index 5e8a18b4e7b9..f5b4c6647e4d 100644
+--- a/sound/usb/helper.h
++++ b/sound/usb/helper.h
+@@ -7,7 +7,6 @@ unsigned int snd_usb_combine_bytes(unsigned char *bytes, int size);
+ void *snd_usb_find_desc(void *descstart, int desclen, void *after, u8 dtype);
+ void *snd_usb_find_csint_desc(void *descstart, int desclen, void *after, u8 dsubtype);
+ 
+-int snd_usb_pipe_sanity_check(struct usb_device *dev, unsigned int pipe);
+ int snd_usb_ctl_msg(struct usb_device *dev, unsigned int pipe,
+ 		    __u8 request, __u8 requesttype, __u16 value, __u16 index,
+ 		    void *data, __u16 size);
+diff --git a/sound/usb/mixer_scarlett_gen2.c b/sound/usb/mixer_scarlett_gen2.c
+index 0ffff7640892..9609c6d9655c 100644
+--- a/sound/usb/mixer_scarlett_gen2.c
++++ b/sound/usb/mixer_scarlett_gen2.c
+@@ -1978,7 +1978,7 @@ static int scarlett2_mixer_status_create(struct usb_mixer_interface *mixer)
+ 		return 0;
  	}
--	retval = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
--			USB_REQ_SET_CONFIGURATION, 0,
--			config->desc.bConfigurationValue, 0,
--			NULL, 0, USB_CTRL_SET_TIMEOUT);
--	if (retval < 0) {
-+	retval = usb_control_msg_send(dev, 0, USB_REQ_SET_CONFIGURATION, 0,
-+				      config->desc.bConfigurationValue, 0,
-+				      NULL, 0, USB_CTRL_SET_TIMEOUT);
-+	if (retval) {
- 		usb_hcd_alloc_bandwidth(dev, NULL, NULL, NULL);
- 		usb_enable_lpm(dev);
- 		mutex_unlock(hcd->bandwidth_mutex);
-@@ -2096,10 +2096,10 @@ int usb_set_configuration(struct usb_device *dev, int configuration)
- 	}
- 	kfree(new_interfaces);
  
--	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
--			      USB_REQ_SET_CONFIGURATION, 0, configuration, 0,
--			      NULL, 0, USB_CTRL_SET_TIMEOUT);
--	if (ret < 0 && cp) {
-+	ret = usb_control_msg_send(dev, 0, USB_REQ_SET_CONFIGURATION, 0,
-+				   configuration, 0, NULL, 0,
-+				   USB_CTRL_SET_TIMEOUT);
-+	if (ret && cp) {
- 		/*
- 		 * All the old state is gone, so what else can we do?
- 		 * The device is probably useless now anyway.
+-	if (snd_usb_pipe_sanity_check(dev, pipe))
++	if (usb_pipe_type_check(dev, pipe))
+ 		return -EINVAL;
+ 
+ 	mixer->urb = usb_alloc_urb(0, GFP_KERNEL);
+diff --git a/sound/usb/quirks.c b/sound/usb/quirks.c
+index 75bbdc691243..1b482848e73b 100644
+--- a/sound/usb/quirks.c
++++ b/sound/usb/quirks.c
+@@ -856,7 +856,7 @@ static int snd_usb_accessmusic_boot_quirk(struct usb_device *dev)
+ 	static const u8 seq[] = { 0x4e, 0x73, 0x52, 0x01 };
+ 	void *buf;
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_sndintpipe(dev, 0x05)))
++	if (usb_pipe_type_check(dev, usb_sndintpipe(dev, 0x05)))
+ 		return -EINVAL;
+ 	buf = kmemdup(seq, ARRAY_SIZE(seq), GFP_KERNEL);
+ 	if (!buf)
+@@ -885,7 +885,7 @@ static int snd_usb_nativeinstruments_boot_quirk(struct usb_device *dev)
+ {
+ 	int ret;
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
++	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+ 		return -EINVAL;
+ 	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+ 				  0xaf, USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+@@ -994,7 +994,7 @@ static int snd_usb_axefx3_boot_quirk(struct usb_device *dev)
+ 
+ 	dev_dbg(&dev->dev, "Waiting for Axe-Fx III to boot up...\n");
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
++	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+ 		return -EINVAL;
+ 	/* If the Axe-Fx III has not fully booted, it will timeout when trying
+ 	 * to enable the audio streaming interface. A more generous timeout is
+@@ -1028,7 +1028,7 @@ static int snd_usb_motu_microbookii_communicate(struct usb_device *dev, u8 *buf,
+ {
+ 	int err, actual_length;
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_sndintpipe(dev, 0x01)))
++	if (usb_pipe_type_check(dev, usb_sndintpipe(dev, 0x01)))
+ 		return -EINVAL;
+ 	err = usb_interrupt_msg(dev, usb_sndintpipe(dev, 0x01), buf, *length,
+ 				&actual_length, 1000);
+@@ -1040,7 +1040,7 @@ static int snd_usb_motu_microbookii_communicate(struct usb_device *dev, u8 *buf,
+ 
+ 	memset(buf, 0, buf_size);
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_rcvintpipe(dev, 0x82)))
++	if (usb_pipe_type_check(dev, usb_rcvintpipe(dev, 0x82)))
+ 		return -EINVAL;
+ 	err = usb_interrupt_msg(dev, usb_rcvintpipe(dev, 0x82), buf, buf_size,
+ 				&actual_length, 1000);
+@@ -1127,7 +1127,7 @@ static int snd_usb_motu_m_series_boot_quirk(struct usb_device *dev)
+ {
+ 	int ret;
+ 
+-	if (snd_usb_pipe_sanity_check(dev, usb_sndctrlpipe(dev, 0)))
++	if (usb_pipe_type_check(dev, usb_sndctrlpipe(dev, 0)))
+ 		return -EINVAL;
+ 	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+ 			      1, USB_TYPE_VENDOR | USB_RECIP_DEVICE,
 -- 
 2.28.0
 
