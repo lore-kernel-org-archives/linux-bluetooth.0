@@ -4,41 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA169C43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 13:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A966DC43461
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 14:17:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 963EB206DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 13:34:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B96C216C4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 14:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbgINNc6 convert rfc822-to-8bit (ORCPT
+        id S1726515AbgINORb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Sep 2020 09:32:58 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50590 "EHLO
+        Mon, 14 Sep 2020 10:17:31 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53460 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726683AbgINN24 (ORCPT
+        with ESMTP id S1726586AbgINN02 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Sep 2020 09:28:56 -0400
+        Mon, 14 Sep 2020 09:26:28 -0400
 Received: from marcel-macpro.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BD319CECDD;
-        Mon, 14 Sep 2020 15:35:50 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id DC189CECDD;
+        Mon, 14 Sep 2020 15:32:44 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
+Subject: Re: [PATCH v1] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
  support
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200914092744.17464-1-rjliao@codeaurora.org>
-Date:   Mon, 14 Sep 2020 15:28:53 +0200
+In-Reply-To: <c177f408186da437db722d855a01c846@codeaurora.org>
+Date:   Mon, 14 Sep 2020 15:25:47 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        mka@chromium.org, linux-bluetooth-owner@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <4FCC6630-8350-4E4A-B156-42B2F3581BFD@holtmann.org>
-References: <0101017457c6b819-d1292819-1fae-43af-8fb8-3bc572f53cd5-000000@us-west-2.amazonses.com>
- <20200914092744.17464-1-rjliao@codeaurora.org>
+Message-Id: <0C779191-3BD1-40BF-83E6-733F9C78EA03@holtmann.org>
+References: <0101017457c6b810-cb8b79ae-4663-436b-83d0-4c70c245bd25-000000@us-west-2.amazonses.com>
+ <2E48211B-D62D-43D8-9C97-014966FBB2CB@holtmann.org>
+ <c177f408186da437db722d855a01c846@codeaurora.org>
 To:     Rocky Liao <rjliao@codeaurora.org>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -48,103 +52,78 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Rocky,
 
-> This patch add support for WCN6855 i.e. patch and nvm download
-> support.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> drivers/bluetooth/btusb.c | 50 ++++++++++++++++++++++++++++++++++-----
-> 1 file changed, 44 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fe80588c7bd3..789e8d5e829e 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
-> #define BTUSB_MEDIATEK		0x200000
-> #define BTUSB_WIDEBAND_SPEECH	0x400000
-> #define BTUSB_VALID_LE_STATES   0x800000
-> +#define BTUSB_QCA_WCN6855	0x1000000
-> 
-> static const struct usb_device_id btusb_table[] = {
-> 	/* Generic Bluetooth USB device */
-> @@ -273,6 +274,10 @@ static const struct usb_device_id blacklist_table[] = {
-> 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
-> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
-> 
-> +	/* QCA WCN6855 chipset */
-> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
-> +						     BTUSB_WIDEBAND_SPEECH },
-> +
-> 	/* Broadcom BCM2035 */
-> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
-> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
-> @@ -3391,6 +3396,26 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
-> 	return 0;
-> }
-> 
-> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
-> +				const bdaddr_t *bdaddr)
-> +{
-> +	struct sk_buff *skb;
-> +	u8 buf[6];
-> +	long ret;
-> +
-> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc14, sizeof(buf), buf, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		ret = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
-> +		return ret;
-> +	}
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +
-> #define QCA_DFU_PACKET_LEN	4096
-> 
-> #define QCA_GET_TARGET_VERSION	0x09
-> @@ -3428,6 +3453,8 @@ static const struct qca_device_info qca_devices_table[] = {
-> 	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
-> 	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
-> 	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
-> +	{ 0x00130100, 40, 4, 18 }, /* WCN6855 1.0 */
-> +	{ 0x00130200, 40, 4, 18 }  /* WCN6855 2.0 */
-> };
-> 
-> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> @@ -3529,8 +3556,8 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-> {
-> 	struct qca_rampatch_version *rver;
-> 	const struct firmware *fw;
-> -	u32 ver_rom, ver_patch;
-> -	u16 rver_rom, rver_patch;
-> +	u32 ver_rom, ver_patch, rver_rom;
-> +	u16 rver_rom_low, rver_rom_high, rver_patch;
-> 	char fwname[64];
-> 	int err;
-> 
-> @@ -3549,9 +3576,16 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-> 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
-> 
-> 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
-> -	rver_rom = le16_to_cpu(rver->rom_version);
-> +	rver_rom_low = le16_to_cpu(rver->rom_version);
-> 	rver_patch = le16_to_cpu(rver->patch_version);
-> 
-> +	if (ver_rom & ~0xffffU) {
-> +		rver_rom_high = le16_to_cpu(*(__le16 *)(fw->data + 16));
-> +		rver_rom = le32_to_cpu(rver_rom_high << 16 | rver_rom_low);
-> +	} else {
-> +		rver_rom = (__force u32)rver_rom_low;
-> +	}
-> +
+>>> This patch add support for WCN6855 i.e. patch and nvm download
+>>> support.
+>>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>>> ---
+>>> drivers/bluetooth/btusb.c | 42 +++++++++++++++++++++++++++++++++++----
+>>> 1 file changed, 38 insertions(+), 4 deletions(-)
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>> index fe80588c7bd3..e51e754ca9b8 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
+>>> #define BTUSB_MEDIATEK		0x200000
+>>> #define BTUSB_WIDEBAND_SPEECH	0x400000
+>>> #define BTUSB_VALID_LE_STATES   0x800000
+>>> +#define BTUSB_QCA_WCN6855	0x1000000
+>>> static const struct usb_device_id btusb_table[] = {
+>>> 	/* Generic Bluetooth USB device */
+>>> @@ -273,6 +274,10 @@ static const struct usb_device_id blacklist_table[] = {
+>>> 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
+>>> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
+>>> +	/* QCA WCN6855 chipset */
+>>> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
+>>> +						     BTUSB_WIDEBAND_SPEECH },
+>>> +
+>>> 	/* Broadcom BCM2035 */
+>>> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+>>> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+>>> @@ -3391,6 +3396,26 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
+>>> 	return 0;
+>>> }
+>>> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+>>> +				const bdaddr_t *bdaddr)
+>>> +{
+>>> +	struct sk_buff *skb;
+>>> +	u8 buf[6];
+>>> +	long ret;
+>>> +
+>>> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
+>>> +
+>>> +	skb = __hci_cmd_sync(hdev, 0xfc14, sizeof(buf), buf, HCI_INIT_TIMEOUT);
+>>> +	if (IS_ERR(skb)) {
+>>> +		ret = PTR_ERR(skb);
+>>> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
+>>> +		return ret;
+>>> +	}
+>>> +	kfree_skb(skb);
+>>> +
+>>> +	return 0;
+>>> +}
+>> What is wrong with using qca_set_bdaddr() function.
+> WCN6855 is using different VSC to set the bt addr
 
-I don’t get this. Is anything wrong with get_unaligned_le32 etc.?
+int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)                 
+{                                                                                
+        struct sk_buff *skb;                                                     
+        int err;                                                                 
+                                                                                 
+        skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,       
+                                HCI_EV_VENDOR, HCI_INIT_TIMEOUT);                
+        if (IS_ERR(skb)) {                                                       
+                err = PTR_ERR(skb);                                              
+                bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);     
+                return err;                                                      
+        }                                                                        
+                                                                                 
+        kfree_skb(skb);                                                          
+                                                                                 
+        return 0;                                                                
+}                                                                                
+EXPORT_SYMBOL_GPL(qca_set_bdaddr);
 
-My brain just hurts with your casting and pointer magic. Maybe the whole rver logic needs a clean up first.
+I see that the other command is using HCI_EV_VENDOR, but is that on purpose or an accident? Might want to confirm with the btmon trace.
 
 Regards
 
