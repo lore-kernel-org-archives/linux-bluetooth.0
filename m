@@ -2,193 +2,348 @@ Return-Path: <SRS0=Sobe=CX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412AC2BBD1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 20:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C78CC43461
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 21:13:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE2F620757
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 20:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EA9C215A4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 21:13:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="Tp3u9yAF"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m3WcWU3I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgINU04 (ORCPT
+        id S1726050AbgINVNq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Sep 2020 16:26:56 -0400
-Received: from mga02.intel.com ([134.134.136.20]:26566 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726110AbgINU0m (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Sep 2020 16:26:42 -0400
-IronPort-SDR: qBdsz+KkdLea0NMLZUdVdqMUIsbDAZNRYfC8hbbk4xby1W5aF2V8JOlNjcrYvK+ZLCIgNvNenl
- pTo2qaL0SYRw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="146847472"
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="146847472"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 13:26:37 -0700
-IronPort-SDR: yCkQfVz25Gwz7JvndaYWPnJxy6WpXPXBmH0iMFv5QOKrfLD3zXdbVOjcWUzKkPMajU4xDKvIjp
- A8PVIa7mUcAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="306307503"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga006.jf.intel.com with ESMTP; 14 Sep 2020 13:26:36 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 14 Sep 2020 13:26:36 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 14 Sep 2020 13:26:36 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Mon, 14 Sep 2020 13:26:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z+oQNzHFLvobEM0uXu1U/BA6GkDobnpdKLaP/af5/UEbPLsHoxOURU72/NLyqFPkLBeP5dzjfE5orYbDpzs2RsRTKkYWqE7KRdMeQVdDmZKGA+w62FLUy1Zo6KXQ4CU1l/goxcWYoPoptnXZ18BY2l9hW2+klZ2JiSxSavyDDrV0KFKKlG4boVtLJDCovMlTNVx//FX2i0YEj4T+K8YohEUjNeFaPlojNzCnewlDL9HCMC0HB9FqwSobIT2+SYZ2DXRY7LsaMJ7OYr4utt6v5rQ4FDIGjgSx9D8LUr05fOkskPD31fj02sdswLir9auhqyyNq14tI6Two36kh3y/8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=05XU9X1DwqNXj1T7WQA8oZt+kjLQsOBzbOpfyZ1iCAQ=;
- b=Dvs92uUe9rzPVxbLyRd4zHTUQISDB6rB8W3JxTMSg9kkmDEvzKe5bgUb+5kqcdiVqsCrW9BTH/rxZ7WjfKfTsRwFz2XGF4Oi6thWkcpHC3AjhnvyGFNWR5aSutwLyMMfbNdeBiX5QYIIGmGaFdHEMJnkkQ5EGHpHwxE6wNmorPRuEzoT0Qm4YtHqIFZGQuPo4RMffMJcLpnTmG+ZtTgh6R82LgTgQ5k8TuY0JIlvp0fJhIce548SAxLhgCe7md6Zpx3bO+DhtAN2ittskEwSg8A4dVv9BGEx/R6YXZOStL7ACpAA7rScgs5i1ZFj2p2xZqIz9Ofc0WhRuyJBHT9gRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=05XU9X1DwqNXj1T7WQA8oZt+kjLQsOBzbOpfyZ1iCAQ=;
- b=Tp3u9yAFufxPKXqVrE0ug7FfMT2z28cCZomsqMoKw4sFpLBfB8bbAzOMl55zdzh7nPg6rGnwcMDWtlf6T/z62PvS8PFtoCueX0pJUp9YbwLNxMb6ncuWPDliyDADhVVlAAXu9y4VFSsLT6fEGA1QtsJ3KRMVtcOgD8klmmqYFCQ=
-Received: from MW3PR11MB4748.namprd11.prod.outlook.com (2603:10b6:303:2e::9)
- by MWHPR11MB1357.namprd11.prod.outlook.com (2603:10b6:300:2b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Mon, 14 Sep
- 2020 20:26:34 +0000
-Received: from MW3PR11MB4748.namprd11.prod.outlook.com
- ([fe80::243f:4543:6dfd:ff22]) by MW3PR11MB4748.namprd11.prod.outlook.com
- ([fe80::243f:4543:6dfd:ff22%4]) with mapi id 15.20.3348.016; Mon, 14 Sep 2020
- 20:26:34 +0000
-From:   "An, Tedd" <tedd.an@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [BlueZ 13/17] plugins: Add SPDX License Identifer
-Thread-Topic: [BlueZ 13/17] plugins: Add SPDX License Identifer
-Thread-Index: AQHWiM1eQSpy2EkukUmtVvat2FRFBaloaIoA//+7LoA=
-Date:   Mon, 14 Sep 2020 20:26:34 +0000
-Message-ID: <A8434ACD-6E35-4A52-93ED-64FC110AF335@intel.com>
-References: <20200912062357.23926-1-tedd.an@linux.intel.com>
- <20200912062357.23926-14-tedd.an@linux.intel.com>
- <CABBYNZLiUJi8qZnZgBAMGwu8bKM1RoeiDcjZ5AK6jfWJ7ShTpw@mail.gmail.com>
-In-Reply-To: <CABBYNZLiUJi8qZnZgBAMGwu8bKM1RoeiDcjZ5AK6jfWJ7ShTpw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/16.40.20081000
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [73.164.224.32]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4101810a-1ee7-4b30-babc-08d858ec797b
-x-ms-traffictypediagnostic: MWHPR11MB1357:
-x-microsoft-antispam-prvs: <MWHPR11MB13572CD73CA9C93528D89CA2FF230@MWHPR11MB1357.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5236;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WrBmDvH/C+psnjJ5ufHcELC/6l2uOPGeDz/antonmMlUVpcului8Bp5/SAj6RDe8awl8JZviP4zWAUzV0jk404gsN4FKU1B6GTWaASB8jsVBagSKEgKrylDPk3+X0bwJtQ/s1JvufnaprhdIMS6H8d4/7mbkgII+2sqe92u5UIEXphgKP9zYRIOSaaiM1M/9dqdy/2bXZBo6yeKFStvnLDSWhfVINu1TPmYddQSzHga+Z2I6dHCLCTAKzyFBAbPnFuateDY6ywgZe3OdqCOmzRL/8gvJ952V9OfGksA6skoZDzDMcvwsfXq0kn4ojt47xON+BimMla1NAkx7SJHhoQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4748.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(136003)(346002)(366004)(39860400002)(110136005)(6506007)(8676002)(5660300002)(71200400001)(66476007)(83380400001)(76116006)(66446008)(64756008)(66556008)(66946007)(2616005)(26005)(6486002)(478600001)(4326008)(186003)(316002)(33656002)(86362001)(36756003)(2906002)(8936002)(53546011)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: wQYSRMotFhFCLtYTiBR4Paxq2Wn0E/kA3lxjfu1FdQiQMuJRtXFZurhLTQ/B0Y1UY9U9g6MLdLH6DLaplyTchGSP+cFNqwaGpd1yCDwecYWS1V5/Pm5AJtVJJ/81JFPRg3yxH9d4pwvkx/6K/DqyxAvgM4KqgmNBjaAMCe8F8tqkknQqFITX6UBRkWDy8vY3VWcb/LhsNpkmvtJsVSZxg+x1dy+9repFQJYaK2atwGjwXW4Y92jg7pUzE/zV0XXy+p89e1Cbb4oF7u2WKO1WOIsFrj/XhpkKyAZhAOe2MKffe+SyBKckMU3aQh3p83bUd6MIAQ/PBA+hqPMStOxyFkSPYRRYWnfuJ2ssx6TD6yDTwhGMX0IqUp7rObdFt6273cAOv9kxhR6imJau2A5wFFKcU/OS2vL0wBOjltaGrzaQqfI/xIiKI8+C/ue159T6hC6cDsg85h/pxq1CXOtxa1jnwF5t31BySHqLJM9vMM6Qf1xdoSD4RFT6t1NGYOoIDA+jILMccDr17Ke2FZR2pFZvWxiOpFc54o5/00Dp6i0evBjD1Hns3yXHWhw1krFSdtGyRbrydtyarZUnPopNBWEuvHFKcm3vhzgoAUt7KYCiYZSab5KYb7FjTJpAET5y/dICFlyMbx8gKsvnIMrx9g==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E40F3A3FA23B9E4985E100B5D0510399@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Mon, 14 Sep 2020 17:13:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725926AbgINVNn (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Sep 2020 17:13:43 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC92AC06174A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2020 14:13:41 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id j185so727747vsc.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Sep 2020 14:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1izYfSwKbgx1WFJ5THQP2t+HL2wzkylz4XkOUpp8gFQ=;
+        b=m3WcWU3IdjOAqZt0dUAzEssHPkHcx3d7HXAZ59qQIsjSM58JxAGvaVuMDyxPnKPIJs
+         UJuzsgGCoz3RcX59gpE7cbUtvwunY9Ovr1vTx1B9T3MLkTCGqYvOwXQYfq1CwPE2InTC
+         MBa6tfykWjbE26PhvhfxF157C9jIHgeWamXgM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1izYfSwKbgx1WFJ5THQP2t+HL2wzkylz4XkOUpp8gFQ=;
+        b=t9IcHR33mA6bxI3FCEIFj5UDZPVsvs2Vza66Tf0uHIK+nUB7TPcbzE6S8FGKTiuewv
+         JIkxPy6x3NMKCoZ7WJOZtkuQP1j8YDkb64cLOfztJXtjfA96eRqqk9a7NrJHPA8Ysf+b
+         GVL0Wy915lTa6IJcH0SZdGslJ70ZrJF4xtQAm7rkROnvrIKdl9sfjA9r4v/stOl76bGl
+         rXxPGWnf2EiAq/W2OeUiYqpASsG/XcEWg4tE6cjUh0EOx2VpyMm6M56bseVgH4cRlA4f
+         qYO4B7ePfZKa2foEEzMW9jycUFOaMgsi4M3ges0Z0Q56U49fv+2vCTtDIIsj2E5OmRaj
+         QZtQ==
+X-Gm-Message-State: AOAM530vbfm5BRLjrHzYR8uWOTe8WfEVQ199EFzLYzloWgzsAEjCW0tw
+        3p8jW2xQkj3VQ/xeEhrhKsJuH7CgglTnUOxcB/LNGg==
+X-Google-Smtp-Source: ABdhPJwcgAGuODq867ZbjR6LoNR1AgjEvHNOVsDw+VAcKlf/u57lk1P3KamynzEAdqeAwn14iAFLrvwoO1OW2R6VegM=
+X-Received: by 2002:a67:ed0d:: with SMTP id l13mr8048884vsp.114.1600118020912;
+ Mon, 14 Sep 2020 14:13:40 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4748.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4101810a-1ee7-4b30-babc-08d858ec797b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2020 20:26:34.6075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6jDKwEH7eekJwodaLML0Ye2j0SX0mpQdwvtLcc6fbm9KVL0ILitSTUroNZUVFklaB7lnCnTTqydGrgcL/E+m6Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1357
-X-OriginatorOrg: intel.com
+References: <20200911223037.4127188-1-abhishekpandit@chromium.org>
+ <20200911153010.Bluez.v4.1.Ib9712d2bf5d4b3f90c5bc835742aea8c7cd239e4@changeid>
+ <CABBYNZKk=tgUgF6UrYfGxS5fv9b9WBbFAo-iZiMe9z1OECJUEQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKk=tgUgF6UrYfGxS5fv9b9WBbFAo-iZiMe9z1OECJUEQ@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 14 Sep 2020 14:13:29 -0700
+Message-ID: <CANFp7mUQy=WYXOH5LLacRnNHkUdFfOL=n6fm+8hW07yfTrQmCQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v4 1/4] adapter: Refactor kernel feature globals
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTHVpeiwNCg0KSSByZWFsaXplZCB0aGF0IHRoZXJlIGlzIG5vIEdQTCAyLjEgb3IgbGF0ZXIu
-DQoNCk9ubHkgZm9yIExHUEwgMi4xIG9yIGxhdGVyLi4uDQpJIHdpbGwga2VlcCBhcyBpcy4NCg0K
-UmVnYXJkcywNClRlZGQNCg0K77u/T24gOS8xNC8yMCwgMTA6MzMgQU0sICJMdWl6IEF1Z3VzdG8g
-dm9uIERlbnR6IiA8bHVpei5kZW50ekBnbWFpbC5jb20+IHdyb3RlOg0KDQogICAgSGkgVGVkZCwN
-Cg0KICAgIE9uIEZyaSwgU2VwIDExLCAyMDIwIGF0IDExOjQxIFBNIDx0ZWRkLmFuQGxpbnV4Lmlu
-dGVsLmNvbT4gd3JvdGU6DQogICAgPg0KICAgID4gRnJvbTogVGVkZCBIby1KZW9uZyBBbiA8dGVk
-ZC5hbkBpbnRlbC5jb20+DQogICAgPg0KICAgID4gVGhpcyBwYXRjaCBhZGRzIFNQRFggTGljZW5z
-ZSBJZGVudGlmaWVyLg0KICAgID4NCiAgICA+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0NCiAgICA+ICAgICAgICBMaWNlbnNlICAgICAgICAgICAgQ09VTlQNCiAgICA+IC0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiAgICA+ICBHUEwtMi4wLW9yLWxh
-dGVyICAgICA6ICAgICAgNw0KDQogICAgSSBndWVzcyBhbGwgR1BMIDIuMCBvciBsYXRlciBjYW4g
-YmUgdXBkYXRlZCB0byBHUEwgMi4xIG9yIGxhdGVyLg0KDQogICAgPiBMaWNlbnNlOiBHUEwtMi4w
-LW9yLWxhdGVyDQogICAgPiAgICBwbHVnaW5zL2F1dG9wYWlyLmMNCiAgICA+ICAgIHBsdWdpbnMv
-aG9zdG5hbWUuYw0KICAgID4gICAgcGx1Z2lucy9uZWFyZC5jDQogICAgPiAgICBwbHVnaW5zL3Bv
-bGljeS5jDQogICAgPiAgICBwbHVnaW5zL3NpeGF4aXMuYw0KICAgID4gICAgcGx1Z2lucy93aWlt
-b3RlLmMNCiAgICA+ICAgIHBsdWdpbnMvZXh0ZXJuYWwtZHVtbXkuYw0KICAgID4gLS0tDQogICAg
-PiAgcGx1Z2lucy9hdXRvcGFpci5jICAgICAgIHwgMSArDQogICAgPiAgcGx1Z2lucy9leHRlcm5h
-bC1kdW1teS5jIHwgMSArDQogICAgPiAgcGx1Z2lucy9ob3N0bmFtZS5jICAgICAgIHwgMSArDQog
-ICAgPiAgcGx1Z2lucy9uZWFyZC5jICAgICAgICAgIHwgMSArDQogICAgPiAgcGx1Z2lucy9wb2xp
-Y3kuYyAgICAgICAgIHwgMSArDQogICAgPiAgcGx1Z2lucy9zaXhheGlzLmMgICAgICAgIHwgMSAr
-DQogICAgPiAgcGx1Z2lucy93aWltb3RlLmMgICAgICAgIHwgMSArDQogICAgPiAgNyBmaWxlcyBj
-aGFuZ2VkLCA3IGluc2VydGlvbnMoKykNCiAgICA+DQogICAgPiBkaWZmIC0tZ2l0IGEvcGx1Z2lu
-cy9hdXRvcGFpci5jIGIvcGx1Z2lucy9hdXRvcGFpci5jDQogICAgPiBpbmRleCAzMDg5NDMwYTgu
-LjM4MWQ5MWM4ZiAxMDA2NDQNCiAgICA+IC0tLSBhL3BsdWdpbnMvYXV0b3BhaXIuYw0KICAgID4g
-KysrIGIvcGx1Z2lucy9hdXRvcGFpci5jDQogICAgPiBAQCAtMSwzICsxLDQgQEANCiAgICA+ICsv
-LyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vci1sYXRlcg0KDQogICAgV2h5IGFy
-ZSB5b3UgdXNpbmcgQysrIC8vIGNvbW1lbnRzIG9uIHRoZSAuYyBmaWxlcyBhbmQgLyogKi8gY29t
-bWVudHMNCiAgICBvbiAuaD8gQWxzbyBpdCBsb29rcyBsaWtlIHlvdSBhcmUga2VlcGluZyB0aGUg
-b2xkIGxpY2Vuc2UgdGV4dCB3aGljaA0KICAgIHNob3VsZCBubyBsb25nZXIgYmUgbmVjZXNzYXJ5
-Lg0KDQogICAgPiAgLyoNCiAgICA+ICAgKg0KICAgID4gICAqICBCbHVlWiAtIEJsdWV0b290aCBw
-cm90b2NvbCBzdGFjayBmb3IgTGludXgNCiAgICA+IGRpZmYgLS1naXQgYS9wbHVnaW5zL2V4dGVy
-bmFsLWR1bW15LmMgYi9wbHVnaW5zL2V4dGVybmFsLWR1bW15LmMNCiAgICA+IGluZGV4IDUzNmFk
-MDY2My4uNzgzNzdiMDIxIDEwMDY0NA0KICAgID4gLS0tIGEvcGx1Z2lucy9leHRlcm5hbC1kdW1t
-eS5jDQogICAgPiArKysgYi9wbHVnaW5zL2V4dGVybmFsLWR1bW15LmMNCiAgICA+IEBAIC0xLDMg
-KzEsNCBAQA0KICAgID4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wLW9yLWxh
-dGVyDQogICAgPiAgLyoNCiAgICA+ICAgKg0KICAgID4gICAqICBCbHVlWiAtIEJsdWV0b290aCBw
-cm90b2NvbCBzdGFjayBmb3IgTGludXgNCiAgICA+IGRpZmYgLS1naXQgYS9wbHVnaW5zL2hvc3Ru
-YW1lLmMgYi9wbHVnaW5zL2hvc3RuYW1lLmMNCiAgICA+IGluZGV4IDRmOWRmZTZkOC4uMzJmMTVi
-M2E1IDEwMDY0NA0KICAgID4gLS0tIGEvcGx1Z2lucy9ob3N0bmFtZS5jDQogICAgPiArKysgYi9w
-bHVnaW5zL2hvc3RuYW1lLmMNCiAgICA+IEBAIC0xLDMgKzEsNCBAQA0KICAgID4gKy8vIFNQRFgt
-TGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wLW9yLWxhdGVyDQogICAgPiAgLyoNCiAgICA+ICAg
-Kg0KICAgID4gICAqICBCbHVlWiAtIEJsdWV0b290aCBwcm90b2NvbCBzdGFjayBmb3IgTGludXgN
-CiAgICA+IGRpZmYgLS1naXQgYS9wbHVnaW5zL25lYXJkLmMgYi9wbHVnaW5zL25lYXJkLmMNCiAg
-ICA+IGluZGV4IDZmZmNkNmUxMC4uMWZlZmM1MDE1IDEwMDY0NA0KICAgID4gLS0tIGEvcGx1Z2lu
-cy9uZWFyZC5jDQogICAgPiArKysgYi9wbHVnaW5zL25lYXJkLmMNCiAgICA+IEBAIC0xLDMgKzEs
-NCBAQA0KICAgID4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wLW9yLWxhdGVy
-DQogICAgPiAgLyoNCiAgICA+ICAgKg0KICAgID4gICAqICBCbHVlWiAtIEJsdWV0b290aCBwcm90
-b2NvbCBzdGFjayBmb3IgTGludXgNCiAgICA+IGRpZmYgLS1naXQgYS9wbHVnaW5zL3BvbGljeS5j
-IGIvcGx1Z2lucy9wb2xpY3kuYw0KICAgID4gaW5kZXggZGU1MWU1OGI5Li44NmViMjVlZTkgMTAw
-NjQ0DQogICAgPiAtLS0gYS9wbHVnaW5zL3BvbGljeS5jDQogICAgPiArKysgYi9wbHVnaW5zL3Bv
-bGljeS5jDQogICAgPiBAQCAtMSwzICsxLDQgQEANCiAgICA+ICsvLyBTUERYLUxpY2Vuc2UtSWRl
-bnRpZmllcjogR1BMLTIuMC1vci1sYXRlcg0KICAgID4gIC8qDQogICAgPiAgICoNCiAgICA+ICAg
-KiAgQmx1ZVogLSBCbHVldG9vdGggcHJvdG9jb2wgc3RhY2sgZm9yIExpbnV4DQogICAgPiBkaWZm
-IC0tZ2l0IGEvcGx1Z2lucy9zaXhheGlzLmMgYi9wbHVnaW5zL3NpeGF4aXMuYw0KICAgID4gaW5k
-ZXggOTM5ZmVkNzU5Li44MzUwZDYzZjggMTAwNjQ0DQogICAgPiAtLS0gYS9wbHVnaW5zL3NpeGF4
-aXMuYw0KICAgID4gKysrIGIvcGx1Z2lucy9zaXhheGlzLmMNCiAgICA+IEBAIC0xLDMgKzEsNCBA
-QA0KICAgID4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wLW9yLWxhdGVyDQog
-ICAgPiAgLyoNCiAgICA+ICAgKg0KICAgID4gICAqICBCbHVlWiAtIEJsdWV0b290aCBwcm90b2Nv
-bCBzdGFjayBmb3IgTGludXgNCiAgICA+IGRpZmYgLS1naXQgYS9wbHVnaW5zL3dpaW1vdGUuYyBi
-L3BsdWdpbnMvd2lpbW90ZS5jDQogICAgPiBpbmRleCAwY2VkMjc1MTQuLjk0NDFhNzY4MSAxMDA2
-NDQNCiAgICA+IC0tLSBhL3BsdWdpbnMvd2lpbW90ZS5jDQogICAgPiArKysgYi9wbHVnaW5zL3dp
-aW1vdGUuYw0KICAgID4gQEAgLTEsMyArMSw0IEBADQogICAgPiArLy8gU1BEWC1MaWNlbnNlLUlk
-ZW50aWZpZXI6IEdQTC0yLjAtb3ItbGF0ZXINCiAgICA+ICAvKg0KICAgID4gICAqDQogICAgPiAg
-ICogIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3RvY29sIHN0YWNrIGZvciBMaW51eA0KICAgID4gLS0N
-CiAgICA+IDIuMjUuNA0KICAgID4NCg0KDQogICAgLS0gDQogICAgTHVpeiBBdWd1c3RvIHZvbiBE
-ZW50eg0KDQo=
+Hi Luiz,
+
+On Mon, Sep 14, 2020 at 12:59 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Abhishek,
+>
+> On Fri, Sep 11, 2020 at 3:30 PM Abhishek Pandit-Subedi
+> <abhishekpandit@chromium.org> wrote:
+> >
+> > Move all the kernel specific feature globals into a single
+> > kernel_features bitfield and replace all uses with the bitfield instead.
+> > ---
+> >
+> > Changes in v4: None
+> > Changes in v3: None
+> > Changes in v2: None
+> >
+> >  src/adapter.c | 59 ++++++++++++++++++++++++++-------------------------
+> >  src/adapter.h |  9 ++++++++
+> >  2 files changed, 39 insertions(+), 29 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 1435e2bd7..e700a78d5 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -116,13 +116,7 @@ static const struct mgmt_blocked_key_info blocked_keys[] = {
+> >
+> >  static DBusConnection *dbus_conn = NULL;
+> >
+> > -static bool kernel_conn_control = false;
+> > -
+> > -static bool kernel_blocked_keys_supported = false;
+> > -
+> > -static bool kernel_set_system_config = false;
+> > -
+> > -static bool kernel_exp_features = false;
+> > +static uint32_t kernel_features = 0;
+> >
+> >  static GList *adapter_list = NULL;
+> >  static unsigned int adapter_remaining = 0;
+> > @@ -678,7 +672,7 @@ static bool set_discoverable(struct btd_adapter *adapter, uint8_t mode,
+> >
+> >         DBG("sending set mode command for index %u", adapter->dev_id);
+> >
+> > -       if (kernel_conn_control) {
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL)) {
+> >                 if (mode)
+> >                         set_mode(adapter, MGMT_OP_SET_CONNECTABLE, mode);
+> >                 else
+> > @@ -1334,7 +1328,7 @@ static void trigger_passive_scanning(struct btd_adapter *adapter)
+> >          * no need to start any discovery. The kernel will keep scanning
+> >          * as long as devices are in its auto-connection list.
+> >          */
+> > -       if (kernel_conn_control)
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         /*
+> > @@ -1385,7 +1379,7 @@ static void stop_passive_scanning_complete(uint8_t status, uint16_t length,
+> >          * no need to stop any discovery. The kernel will handle the
+> >          * auto-connection by itself.
+> >          */
+> > -       if (kernel_conn_control)
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         /*
+> > @@ -2816,7 +2810,7 @@ static void property_set_mode_complete(uint8_t status, uint16_t length,
+> >
+> >  static void clear_discoverable(struct btd_adapter *adapter)
+> >  {
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         if (!(adapter->current_settings & MGMT_SETTING_DISCOVERABLE))
+> > @@ -2876,7 +2870,7 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+> >
+> >                 break;
+> >         case MGMT_SETTING_DISCOVERABLE:
+> > -               if (kernel_conn_control) {
+> > +               if (has_kernel_features(KERNEL_CONN_CONTROL)) {
+> >                         if (mode) {
+> >                                 set_mode(adapter, MGMT_OP_SET_CONNECTABLE,
+> >                                                                         mode);
+> > @@ -4193,7 +4187,8 @@ static void load_default_system_params(struct btd_adapter *adapter)
+> >         size_t len = 0;
+> >         unsigned int err;
+> >
+> > -       if (!main_opts.default_params.num_entries || !kernel_set_system_config)
+> > +       if (!main_opts.default_params.num_entries ||
+> > +           !has_kernel_features(KERNEL_SET_SYSTEM_CONFIG))
+> >                 return;
+> >
+> >         params = malloc0(sizeof(*params) *
+> > @@ -4878,7 +4873,7 @@ int adapter_connect_list_add(struct btd_adapter *adapter,
+> >          * adapter_auto_connect_add() function is used to maintain what to
+> >          * connect.
+> >          */
+> > -       if (kernel_conn_control)
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return 0;
+> >
+> >         if (g_slist_find(adapter->connect_list, device)) {
+> > @@ -4918,7 +4913,7 @@ void adapter_connect_list_remove(struct btd_adapter *adapter,
+> >         if (device == adapter->connect_le)
+> >                 adapter->connect_le = NULL;
+> >
+> > -       if (kernel_conn_control)
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         if (!g_slist_find(adapter->connect_list, device)) {
+> > @@ -4980,7 +4975,7 @@ void adapter_whitelist_add(struct btd_adapter *adapter, struct btd_device *dev)
+> >  {
+> >         struct mgmt_cp_add_device cp;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         memset(&cp, 0, sizeof(cp));
+> > @@ -5019,7 +5014,7 @@ void adapter_whitelist_remove(struct btd_adapter *adapter, struct btd_device *de
+> >  {
+> >         struct mgmt_cp_remove_device cp;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         memset(&cp, 0, sizeof(cp));
+> > @@ -5075,7 +5070,7 @@ void adapter_auto_connect_add(struct btd_adapter *adapter,
+> >         uint8_t bdaddr_type;
+> >         unsigned int id;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         if (g_slist_find(adapter->connect_list, device)) {
+> > @@ -5147,7 +5142,7 @@ void adapter_set_device_wakeable(struct btd_adapter *adapter,
+> >         const bdaddr_t *bdaddr;
+> >         uint8_t bdaddr_type;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         bdaddr = device_get_address(device);
+> > @@ -5224,7 +5219,7 @@ void adapter_auto_connect_remove(struct btd_adapter *adapter,
+> >         uint8_t bdaddr_type;
+> >         unsigned int id;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         if (!g_slist_find(adapter->connect_list, device)) {
+> > @@ -6764,7 +6759,7 @@ connect_le:
+> >          * If kernel background scan is used then the kernel is
+> >          * responsible for connecting.
+> >          */
+> > -       if (kernel_conn_control)
+> > +       if (has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return;
+> >
+> >         /*
+> > @@ -8964,7 +8959,7 @@ static int clear_devices(struct btd_adapter *adapter)
+> >  {
+> >         struct mgmt_cp_remove_device cp;
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 return 0;
+> >
+> >         memset(&cp, 0, sizeof(cp));
+> > @@ -9282,7 +9277,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
+> >                         (missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
+> >                 set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
+> >
+> > -       if (kernel_exp_features)
+> > +       if (has_kernel_features(KERNEL_EXP_FEATURES))
+> >                 read_exp_features(adapter);
+> >
+> >         err = adapter_register(adapter);
+> > @@ -9403,7 +9398,8 @@ static void read_info_complete(uint8_t status, uint16_t length,
+> >
+> >         set_name(adapter, btd_adapter_get_name(adapter));
+> >
+> > -       if (kernel_blocked_keys_supported && !set_blocked_keys(adapter)) {
+> > +       if (has_kernel_features(KERNEL_BLOCKED_KEYS_SUPPORTED) &&
+> > +           !set_blocked_keys(adapter)) {
+> >                 btd_error(adapter->dev_id,
+> >                                 "Failed to set blocked keys for index %u",
+> >                                 adapter->dev_id);
+> > @@ -9414,7 +9410,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
+> >                         !(adapter->current_settings & MGMT_SETTING_BONDABLE))
+> >                 set_mode(adapter, MGMT_OP_SET_BONDABLE, 0x01);
+> >
+> > -       if (!kernel_conn_control)
+> > +       if (!has_kernel_features(KERNEL_CONN_CONTROL))
+> >                 set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x01);
+> >         else if (adapter->current_settings & MGMT_SETTING_CONNECTABLE)
+> >                 set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x00);
+> > @@ -9590,19 +9586,19 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+> >                 switch (op) {
+> >                 case MGMT_OP_ADD_DEVICE:
+> >                         DBG("enabling kernel-side connection control");
+> > -                       kernel_conn_control = true;
+> > +                       kernel_features |= KERNEL_CONN_CONTROL;
+> >                         break;
+> >                 case MGMT_OP_SET_BLOCKED_KEYS:
+> >                         DBG("kernel supports the set_blocked_keys op");
+> > -                       kernel_blocked_keys_supported = true;
+> > +                       kernel_features |= KERNEL_BLOCKED_KEYS_SUPPORTED;
+> >                         break;
+> >                 case MGMT_OP_SET_DEF_SYSTEM_CONFIG:
+> >                         DBG("kernel supports set system confic");
+> > -                       kernel_set_system_config = true;
+> > +                       kernel_features |= KERNEL_SET_SYSTEM_CONFIG;
+> >                         break;
+> >                 case MGMT_OP_READ_EXP_FEATURES_INFO:
+> >                         DBG("kernel supports exp features");
+> > -                       kernel_exp_features = true;
+> > +                       kernel_features |= KERNEL_EXP_FEATURES;
+> >                         break;
+> >                 default:
+> >                         break;
+> > @@ -9768,3 +9764,8 @@ bool btd_le_connect_before_pairing(void)
+> >
+> >         return false;
+> >  }
+> > +
+> > +bool has_kernel_features(uint32_t features)
+> > +{
+> > +       return !!(kernel_features & features);
+>
+> Don't think we need the !! here, the use () should already be enough,
+> or change it to return (kernel_features & features) ? true : false; if
+> you think that is more readable.
+
+Will change this to `return (kernel_features & features)`.
+
+>
+> > +}
+> > diff --git a/src/adapter.h b/src/adapter.h
+> > index f8ac20261..b0ed4915f 100644
+> > --- a/src/adapter.h
+> > +++ b/src/adapter.h
+> > @@ -233,3 +233,12 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
+> >                         void *data);
+> >
+> >  bool btd_le_connect_before_pairing(void);
+> > +
+> > +enum kernel_features {
+> > +       KERNEL_CONN_CONTROL             = 1 << 0,
+> > +       KERNEL_BLOCKED_KEYS_SUPPORTED   = 1 << 1,
+> > +       KERNEL_SET_SYSTEM_CONFIG        = 1 << 2,
+> > +       KERNEL_EXP_FEATURES             = 1 << 3,
+> > +};
+> > +
+> > +bool has_kernel_features(uint32_t feature);
+> > --
+> > 2.28.0.618.gf4bc123cb7-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+Any other concerns in this series? If not, will send the new patch
+series right away.
+
+Abhishek
