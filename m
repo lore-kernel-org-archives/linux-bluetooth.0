@@ -2,268 +2,169 @@ Return-Path: <SRS0=Sobe=CX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 009DCC43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 16:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57CCC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 16:33:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B752021D1A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 16:33:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600101219;
-	bh=XYLL0KUMv9QFPVZiQoCBglWmF6MD1JN+dd5eHYK5nys=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cj80f/2jv7aJU3vLmd7LLrUqChq0dYvJfUbjaK/r1J406UcnCO7iwowZWEO6ApO6x
-	 KLcv1/IhCjXO7zvRfZ5ruxULT2Pebh6kvgfWBTN9dQEK8qgsQo+aQ3Ljk2lI3q2Mc2
-	 manb0EcolVD4aIWO6sGqcM+57xin7thcXeNKN/Q0=
+	by mail.kernel.org (Postfix) with ESMTP id 7C67B214F1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Sep 2020 16:33:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RLRAX6Br"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbgINPpG (ORCPT
+        id S1726137AbgINQd4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Sep 2020 11:45:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48036 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbgINPiX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Sep 2020 11:38:23 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CC3DB21D41;
-        Mon, 14 Sep 2020 15:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600097896;
-        bh=XYLL0KUMv9QFPVZiQoCBglWmF6MD1JN+dd5eHYK5nys=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0RLRsiGw9J2HBRKIUDSkJWq/Wk+SLqdTbiRnMNsax1+8/6zw0h38/xrtWyJsYH7ir
-         j2EtHv9H2WhVDq5qBZLxfUo1+xEFswCPCdKLRRmeMryiXmTolxO5IB2E4cJd1qCTR+
-         5C/KkJF39VnFJy6YJBV/l40mEs1Eju5mU018bPFo=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org
-Cc:     perex@perex.cz, tiwai@suse.com, stern@rowland.harvard.ed,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>
-Subject: [PATCH v3 04/11] USB: core: hub.c: use usb_control_msg_send() in a few places
-Date:   Mon, 14 Sep 2020 17:37:49 +0200
-Message-Id: <20200914153756.3412156-5-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
-References: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
+        Mon, 14 Sep 2020 12:33:56 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:37796 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbgINPoj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Sep 2020 11:44:39 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EFiFC6141963;
+        Mon, 14 Sep 2020 15:44:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=eq4LTC2Yd5sfvcCLwppvKF+HmjZnZ6bst/Dh6vKmwQ4=;
+ b=RLRAX6BrM34Ih+gjIw+Epxc9xBzMUxjRCzA49x9waBmG5ROyH122zIRNrKiJcl9F4jMG
+ o5vlXfAT76qxk9mGooEGm/w6UYM4CCE3WCBuFtR+4iaDo4nWs6vrmB8arGC7QccFXZSe
+ VtHLWWOWHlPYBIcfMkraiW/aC9MBB7N2cvKZt3LkD1WKoJbZL147JheLdjJKGzCnX0Ss
+ IeoCGLYVBe9oQ4aZyDIr/uu9HrZapDkRL6gUQ2umnPvjwv4HxsI4nQKDZdgQARax9ZdL
+ G5UdZXSmS3zQytLdUz5zKalVJIjdKEvbw6goCGJZhgXmGY10EVQtklnmB5CNlCMbejZk Vw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 33j91d916q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 14 Sep 2020 15:44:18 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EFPMNK113211;
+        Mon, 14 Sep 2020 15:44:17 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 33h881tn8s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Sep 2020 15:44:17 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08EFiDnQ017022;
+        Mon, 14 Sep 2020 15:44:14 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Sep 2020 15:44:13 +0000
+Date:   Mon, 14 Sep 2020 18:44:05 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Anmol Karn <anmol.karan123@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        kuba@kernel.org, davem@davemloft.net,
+        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
+Subject: Re: [Linux-kernel-mentees] [PATCH] net: bluetooth: Fix null pointer
+ dereference in hci_event_packet()
+Message-ID: <20200914154405.GC18329@kadam>
+References: <20200910043424.19894-1-anmol.karan123@gmail.com>
+ <20200910104918.GF12635@kadam>
+ <20200912091028.GA67109@Thinkpad>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200912091028.GA67109@Thinkpad>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 adultscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009140125
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 mlxlogscore=999
+ clxscore=1015 adultscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140126
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are a few calls to usb_control_msg() that can be converted to use
-usb_control_msg_send() instead, so do that in order to make the error
-checking a bit simpler and the code smaller.
+On Sat, Sep 12, 2020 at 02:40:28PM +0530, Anmol Karn wrote:
+> On Thu, Sep 10, 2020 at 01:49:18PM +0300, Dan Carpenter wrote:
+> > On Thu, Sep 10, 2020 at 10:04:24AM +0530, Anmol Karn wrote:
+> > > Prevent hci_phy_link_complete_evt() from dereferencing 'hcon->amp_mgr'
+> > > as NULL. Fix it by adding pointer check for it.
+> > > 
+> > > Reported-and-tested-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
+> > > Link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f 
+> > > Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
+> > > ---
+> > >  net/bluetooth/hci_event.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 4b7fc430793c..871e16804433 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -4936,6 +4936,11 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+> > >  		return;
+> > >  	}
+> > >  
+> > > +	if (IS_ERR_OR_NULL(hcon->amp_mgr)) {
+> > 
+> > It can't be an error pointer.  Shouldn't we call hci_conn_del() on this
+> > path?  Try to find the Fixes tag to explain how this bug was introduced.
+> > 
+> > (Don't rush to send a v2.  The patch requires quite a bit more digging
+> > and detective work before it is ready).
+> > 
+> > > +		hci_dev_unlock(hdev);
+> > > +		return;
+> > > +	}
+> > > +
+> > >  	if (ev->status) {
+> > >  		hci_conn_del(hcon);
+> > >  		hci_dev_unlock(hdev);
+> > 
+> > regards,
+> > dan carpenter
+> > 
+> 
+> Sir,
+> 
+> I need little advice in continuing with this Patch,
+> 
+> I have looked into the Bisected logs and the problem occurs from this commit:
+> 
+> 941992d29447 ("ethernet: amd: use IS_ENABLED() instead of checking for built-in or module")
+> 
 
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-v3:
- - drop change in usb_enable_link_state() as it was not needed now
-   thanks to review from Alan
- - minor changes requested by checkpatch.pl
+That's just the patch which made the code testable by syzbot.  It didn't
+introduce the bug.
 
-v2:
- - dropped changes to usb_req_set_sel() thanks to review from Alan
+> 
+> Here is a diff of patch which i modified from last patch,
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 4b7fc430793c..6ce435064e0b 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4936,6 +4936,12 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+>                 return;
+>         }
+> 
+> +       if (!hcon->amp_mgr) {
+> +               hci_conn_del(hcon);
+> +               hci_dev_unlock(hdev);
 
- drivers/usb/core/hub.c | 99 +++++++++++++++++-------------------------
- 1 file changed, 40 insertions(+), 59 deletions(-)
+I have no idea if calling hci_conn_del() is really the correct, thing.
+I don't know the code at all.  Anyway, do some research and figure out
+for sure what the correct thing is.
 
-diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-index 5b768b80d1ee..5742ddeb0455 100644
---- a/drivers/usb/core/hub.c
-+++ b/drivers/usb/core/hub.c
-@@ -410,8 +410,8 @@ static int get_hub_descriptor(struct usb_device *hdev,
-  */
- static int clear_hub_feature(struct usb_device *hdev, int feature)
- {
--	return usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--		USB_REQ_CLEAR_FEATURE, USB_RT_HUB, feature, 0, NULL, 0, 1000);
-+	return usb_control_msg_send(hdev, 0, USB_REQ_CLEAR_FEATURE, USB_RT_HUB,
-+				    feature, 0, NULL, 0, 1000);
- }
- 
- /*
-@@ -419,9 +419,8 @@ static int clear_hub_feature(struct usb_device *hdev, int feature)
-  */
- int usb_clear_port_feature(struct usb_device *hdev, int port1, int feature)
- {
--	return usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--		USB_REQ_CLEAR_FEATURE, USB_RT_PORT, feature, port1,
--		NULL, 0, 1000);
-+	return usb_control_msg_send(hdev, 0, USB_REQ_CLEAR_FEATURE, USB_RT_PORT,
-+				    feature, port1, NULL, 0, 1000);
- }
- 
- /*
-@@ -429,9 +428,8 @@ int usb_clear_port_feature(struct usb_device *hdev, int port1, int feature)
-  */
- static int set_port_feature(struct usb_device *hdev, int port1, int feature)
- {
--	return usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--		USB_REQ_SET_FEATURE, USB_RT_PORT, feature, port1,
--		NULL, 0, 1000);
-+	return usb_control_msg_send(hdev, 0, USB_REQ_SET_FEATURE, USB_RT_PORT,
-+				    feature, port1, NULL, 0, 1000);
- }
- 
- static char *to_led_name(int selector)
-@@ -755,15 +753,14 @@ hub_clear_tt_buffer(struct usb_device *hdev, u16 devinfo, u16 tt)
- 	/* Need to clear both directions for control ep */
- 	if (((devinfo >> 11) & USB_ENDPOINT_XFERTYPE_MASK) ==
- 			USB_ENDPOINT_XFER_CONTROL) {
--		int status = usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--				HUB_CLEAR_TT_BUFFER, USB_RT_PORT,
--				devinfo ^ 0x8000, tt, NULL, 0, 1000);
-+		int status = usb_control_msg_send(hdev, 0,
-+						  HUB_CLEAR_TT_BUFFER, USB_RT_PORT,
-+						  devinfo ^ 0x8000, tt, NULL, 0, 1000);
- 		if (status)
- 			return status;
- 	}
--	return usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--			       HUB_CLEAR_TT_BUFFER, USB_RT_PORT, devinfo,
--			       tt, NULL, 0, 1000);
-+	return usb_control_msg_send(hdev, 0, HUB_CLEAR_TT_BUFFER, USB_RT_PORT,
-+				    devinfo, tt, NULL, 0, 1000);
- }
- 
- /*
-@@ -1049,11 +1046,10 @@ static void hub_activate(struct usb_hub *hub, enum hub_activation_type type)
- 	 */
- 	if (type != HUB_RESUME) {
- 		if (hdev->parent && hub_is_superspeed(hdev)) {
--			ret = usb_control_msg(hdev, usb_sndctrlpipe(hdev, 0),
--					HUB_SET_DEPTH, USB_RT_HUB,
--					hdev->level - 1, 0, NULL, 0,
--					USB_CTRL_SET_TIMEOUT);
--			if (ret < 0)
-+			ret = usb_control_msg_send(hdev, 0, HUB_SET_DEPTH, USB_RT_HUB,
-+						   hdev->level - 1, 0, NULL, 0,
-+						   USB_CTRL_SET_TIMEOUT);
-+			if (ret)
- 				dev_err(hub->intfdev,
- 						"set hub depth failed\n");
- 		}
-@@ -2329,13 +2325,10 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
- 		/* enable HNP before suspend, it's simpler */
- 		if (port1 == bus->otg_port) {
- 			bus->b_hnp_enable = 1;
--			err = usb_control_msg(udev,
--				usb_sndctrlpipe(udev, 0),
--				USB_REQ_SET_FEATURE, 0,
--				USB_DEVICE_B_HNP_ENABLE,
--				0, NULL, 0,
--				USB_CTRL_SET_TIMEOUT);
--			if (err < 0) {
-+			err = usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, 0,
-+						   USB_DEVICE_B_HNP_ENABLE, 0,
-+						   NULL, 0, USB_CTRL_SET_TIMEOUT);
-+			if (err) {
- 				/*
- 				 * OTG MESSAGE: report errors here,
- 				 * customize to match your product.
-@@ -2347,13 +2340,10 @@ static int usb_enumerate_device_otg(struct usb_device *udev)
- 		} else if (desc->bLength == sizeof
- 				(struct usb_otg_descriptor)) {
- 			/* Set a_alt_hnp_support for legacy otg device */
--			err = usb_control_msg(udev,
--				usb_sndctrlpipe(udev, 0),
--				USB_REQ_SET_FEATURE, 0,
--				USB_DEVICE_A_ALT_HNP_SUPPORT,
--				0, NULL, 0,
--				USB_CTRL_SET_TIMEOUT);
--			if (err < 0)
-+			err = usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, 0,
-+						   USB_DEVICE_A_ALT_HNP_SUPPORT, 0,
-+						   NULL, 0, USB_CTRL_SET_TIMEOUT);
-+			if (err)
- 				dev_err(&udev->dev,
- 					"set a_alt_hnp_support failed: %d\n",
- 					err);
-@@ -3121,10 +3111,8 @@ int usb_disable_ltm(struct usb_device *udev)
- 	if (!udev->actconfig)
- 		return 0;
- 
--	return usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--			USB_REQ_CLEAR_FEATURE, USB_RECIP_DEVICE,
--			USB_DEVICE_LTM_ENABLE, 0, NULL, 0,
--			USB_CTRL_SET_TIMEOUT);
-+	return usb_control_msg_send(udev, 0, USB_REQ_CLEAR_FEATURE, USB_RECIP_DEVICE,
-+				    USB_DEVICE_LTM_ENABLE, 0, NULL, 0, USB_CTRL_SET_TIMEOUT);
- }
- EXPORT_SYMBOL_GPL(usb_disable_ltm);
- 
-@@ -3143,10 +3131,8 @@ void usb_enable_ltm(struct usb_device *udev)
- 	if (!udev->actconfig)
- 		return;
- 
--	usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--			USB_REQ_SET_FEATURE, USB_RECIP_DEVICE,
--			USB_DEVICE_LTM_ENABLE, 0, NULL, 0,
--			USB_CTRL_SET_TIMEOUT);
-+	usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, USB_RECIP_DEVICE,
-+			     USB_DEVICE_LTM_ENABLE, 0, NULL, 0, USB_CTRL_SET_TIMEOUT);
- }
- EXPORT_SYMBOL_GPL(usb_enable_ltm);
- 
-@@ -3163,17 +3149,14 @@ EXPORT_SYMBOL_GPL(usb_enable_ltm);
- static int usb_enable_remote_wakeup(struct usb_device *udev)
- {
- 	if (udev->speed < USB_SPEED_SUPER)
--		return usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--				USB_REQ_SET_FEATURE, USB_RECIP_DEVICE,
--				USB_DEVICE_REMOTE_WAKEUP, 0, NULL, 0,
--				USB_CTRL_SET_TIMEOUT);
-+		return usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, USB_RECIP_DEVICE,
-+					    USB_DEVICE_REMOTE_WAKEUP, 0,
-+					    NULL, 0, USB_CTRL_SET_TIMEOUT);
- 	else
--		return usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--				USB_REQ_SET_FEATURE, USB_RECIP_INTERFACE,
--				USB_INTRF_FUNC_SUSPEND,
--				USB_INTRF_FUNC_SUSPEND_RW |
--					USB_INTRF_FUNC_SUSPEND_LP,
--				NULL, 0, USB_CTRL_SET_TIMEOUT);
-+		return usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, USB_RECIP_INTERFACE,
-+					    USB_INTRF_FUNC_SUSPEND,
-+					    USB_INTRF_FUNC_SUSPEND_RW | USB_INTRF_FUNC_SUSPEND_LP,
-+					    NULL, 0, USB_CTRL_SET_TIMEOUT);
- }
- 
- /*
-@@ -3189,15 +3172,13 @@ static int usb_enable_remote_wakeup(struct usb_device *udev)
- static int usb_disable_remote_wakeup(struct usb_device *udev)
- {
- 	if (udev->speed < USB_SPEED_SUPER)
--		return usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--				USB_REQ_CLEAR_FEATURE, USB_RECIP_DEVICE,
--				USB_DEVICE_REMOTE_WAKEUP, 0, NULL, 0,
--				USB_CTRL_SET_TIMEOUT);
-+		return usb_control_msg_send(udev, 0, USB_REQ_CLEAR_FEATURE, USB_RECIP_DEVICE,
-+					    USB_DEVICE_REMOTE_WAKEUP, 0, NULL, 0,
-+					    USB_CTRL_SET_TIMEOUT);
- 	else
--		return usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
--				USB_REQ_SET_FEATURE, USB_RECIP_INTERFACE,
--				USB_INTRF_FUNC_SUSPEND,	0, NULL, 0,
--				USB_CTRL_SET_TIMEOUT);
-+		return usb_control_msg_send(udev, 0, USB_REQ_SET_FEATURE, USB_RECIP_INTERFACE,
-+					    USB_INTRF_FUNC_SUSPEND, 0, NULL, 0,
-+					    USB_CTRL_SET_TIMEOUT);
- }
- 
- /* Count of wakeup-enabled devices at or below udev */
--- 
-2.28.0
+Also look for similar bugs in other places where hcon->amp_mgr is
+dereferenced.  For example, amp_read_loc_assoc_final_data() seems to
+have a similar bug.
+
+regards,
+dan carpenter
 
