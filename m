@@ -2,188 +2,185 @@ Return-Path: <SRS0=CFtH=CY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFF9C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 09:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D70C43461
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 16:57:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EC4821D24
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 09:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C598920936
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 16:57:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="u17xLSH2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUfXU1Ik"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbgIOJ3r (ORCPT
+        id S1726586AbgIOQ5H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Sep 2020 05:29:47 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:58176 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726269AbgIOJ3p (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Sep 2020 05:29:45 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1600162184; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=hHIbfLl6RWvz4DJdAyYziC/fu0CysGUZFrToZk/mxTE=;
- b=u17xLSH27B6rA+QdffKfKNH1/D3bk7e78DCxMztVVI226/FUiOTrprpaCsHhAi8wpeQH1GiD
- P3rO4EmJbPW+q+AQgloDHIKb7GpsuwCGN0FRcTOjrcYVBNsO6mbxuzHONiNXcvArDtHwWuVv
- tAzVFdv9wzBhnHpYAkL77VQIWJY=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 5f60897cd7b4e269137b8d62 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 15 Sep 2020 09:29:32
- GMT
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id B259EC433F0; Tue, 15 Sep 2020 09:29:32 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id DE217C433CA;
-        Tue, 15 Sep 2020 09:29:31 +0000 (UTC)
+        Tue, 15 Sep 2020 12:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727685AbgIOQwa (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 15 Sep 2020 12:52:30 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22778C061788
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 09:51:24 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id c10so3848573otm.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 09:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vZJ5c1oNq+PSxzLvAz6o8y4iFvnbqXrW0+p9q2WgnWU=;
+        b=CUfXU1IkphycK6bsRwjflyuwE1/Em2IzPeqsbuVF34bcaPNQLzbGwk1mMZposk5ytP
+         cBA1etA0WnkgscwRRK9xXLU+xokgCoukPb8T4/VF1Lo4e7F+7bAiTHh1Aje+uv3RRPpT
+         qBEZ60QP2t8zg3JT92AFTllXyhW1FoKu6JmtS57M8OAv8aHQ7nf0ZjilA5Lc+DnZtKBq
+         BSjDC2qrvPzURPONKJxdBgjGh21bTdmaAI6DosdUmCtIg/XpM7CRuOGgiTnHVxcgOyju
+         vCwRSQJWU3tov7sYF6g6cNfsYB3unEEHyDJxMfS69xwS7wWwaQDBkZ2856ezU/PYujoi
+         qJ/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vZJ5c1oNq+PSxzLvAz6o8y4iFvnbqXrW0+p9q2WgnWU=;
+        b=n+OCETZ+pU0ChlSJHVBxkd7K7hDjJ80GX2t9dTPfzBoymHNUSAUdQDD8GQBMKfFZmF
+         eGDOsSsOZI0mOYc7FOgIwvkHfIH+tgphnFBIWndwjSwPkJXoq5/h7RwuGYsuxBKOFPzh
+         ICorghw8EQwbRTdoFDooHaLBxatyV5iTnl1zbSUtnKILW1AwOKbfaIjpHaamJFqmFXU/
+         9GAVH2FzXd+s94hjlD1/TLz0X+IHkKwvZZeflHTJSlgieudTYtli++ar9nD9aeqolglb
+         dViFix3m2CxFGMBGlydWTGowVoRFqnHDP4li+h/QkWTF0sVl+EjCoDcqSf0dT11kpLe3
+         vWQg==
+X-Gm-Message-State: AOAM532l+MLuDU4ALHqU5LFiOHpvjquE1caGTG5alBNqD0v5jTnUImB6
+        PeQxoB5bDyA2rRDfuKowXn40Wj1M0qcdCBrCil4=
+X-Google-Smtp-Source: ABdhPJxhUHXJFxe9onWBC/pAzZbGIRjTdV/gF/IjfEU8TbaxsJC9Ub+nrOO8pPWuR3iCqcpP49s9nZooE8buK3ToCFE=
+X-Received: by 2002:a9d:5a8:: with SMTP id 37mr5439144otd.362.1600188683403;
+ Tue, 15 Sep 2020 09:51:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 15 Sep 2020 17:29:31 +0800
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
- support
-In-Reply-To: <4FCC6630-8350-4E4A-B156-42B2F3581BFD@holtmann.org>
-References: <0101017457c6b819-d1292819-1fae-43af-8fb8-3bc572f53cd5-000000@us-west-2.amazonses.com>
- <20200914092744.17464-1-rjliao@codeaurora.org>
- <4FCC6630-8350-4E4A-B156-42B2F3581BFD@holtmann.org>
-Message-ID: <c9912094c4627b34f49458ae36c9cd25@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
+In-Reply-To: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 15 Sep 2020 09:51:12 -0700
+Message-ID: <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
+ is called
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Archie,
 
-在 2020-09-14 21:28，Marcel Holtmann 写道：
-> Hi Rocky,
-> 
->> This patch add support for WCN6855 i.e. patch and nvm download
->> support.
->> 
->> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
->> ---
->> drivers/bluetooth/btusb.c | 50 ++++++++++++++++++++++++++++++++++-----
->> 1 file changed, 44 insertions(+), 6 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index fe80588c7bd3..789e8d5e829e 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
->> #define BTUSB_MEDIATEK		0x200000
->> #define BTUSB_WIDEBAND_SPEECH	0x400000
->> #define BTUSB_VALID_LE_STATES   0x800000
->> +#define BTUSB_QCA_WCN6855	0x1000000
->> 
->> static const struct usb_device_id btusb_table[] = {
->> 	/* Generic Bluetooth USB device */
->> @@ -273,6 +274,10 @@ static const struct usb_device_id 
->> blacklist_table[] = {
->> 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
->> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
->> 
->> +	/* QCA WCN6855 chipset */
->> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
->> +						     BTUSB_WIDEBAND_SPEECH },
->> +
->> 	/* Broadcom BCM2035 */
->> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
->> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
->> @@ -3391,6 +3396,26 @@ static int btusb_set_bdaddr_ath3012(struct 
->> hci_dev *hdev,
->> 	return 0;
->> }
->> 
->> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
->> +				const bdaddr_t *bdaddr)
->> +{
->> +	struct sk_buff *skb;
->> +	u8 buf[6];
->> +	long ret;
->> +
->> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
->> +
->> +	skb = __hci_cmd_sync(hdev, 0xfc14, sizeof(buf), buf, 
->> HCI_INIT_TIMEOUT);
->> +	if (IS_ERR(skb)) {
->> +		ret = PTR_ERR(skb);
->> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
->> +		return ret;
->> +	}
->> +	kfree_skb(skb);
->> +
->> +	return 0;
->> +}
->> +
->> #define QCA_DFU_PACKET_LEN	4096
->> 
->> #define QCA_GET_TARGET_VERSION	0x09
->> @@ -3428,6 +3453,8 @@ static const struct qca_device_info 
->> qca_devices_table[] = {
->> 	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
->> 	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
->> 	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
->> +	{ 0x00130100, 40, 4, 18 }, /* WCN6855 1.0 */
->> +	{ 0x00130200, 40, 4, 18 }  /* WCN6855 2.0 */
->> };
->> 
->> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
->> request,
->> @@ -3529,8 +3556,8 @@ static int btusb_setup_qca_load_rampatch(struct 
->> hci_dev *hdev,
->> {
->> 	struct qca_rampatch_version *rver;
->> 	const struct firmware *fw;
->> -	u32 ver_rom, ver_patch;
->> -	u16 rver_rom, rver_patch;
->> +	u32 ver_rom, ver_patch, rver_rom;
->> +	u16 rver_rom_low, rver_rom_high, rver_patch;
->> 	char fwname[64];
->> 	int err;
->> 
->> @@ -3549,9 +3576,16 @@ static int btusb_setup_qca_load_rampatch(struct 
->> hci_dev *hdev,
->> 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
->> 
->> 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
->> -	rver_rom = le16_to_cpu(rver->rom_version);
->> +	rver_rom_low = le16_to_cpu(rver->rom_version);
->> 	rver_patch = le16_to_cpu(rver->patch_version);
->> 
->> +	if (ver_rom & ~0xffffU) {
->> +		rver_rom_high = le16_to_cpu(*(__le16 *)(fw->data + 16));
->> +		rver_rom = le32_to_cpu(rver_rom_high << 16 | rver_rom_low);
->> +	} else {
->> +		rver_rom = (__force u32)rver_rom_low;
->> +	}
->> +
-> 
-> I don’t get this. Is anything wrong with get_unaligned_le32 etc.?
-> 
-> My brain just hurts with your casting and pointer magic. Maybe the
-> whole rver logic needs a clean up first.
-> 
-It's not a 4 bytes le data, for example the version stream is 0x13, 
-0x00, 0x00, 0x01 and we need to convert it to 0x00130100. So we have to 
-convert it to 2 u16 value then combine them to a u32.
+On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> RemoveDevice on adapter interface used to remove a device, even when
+> the device is connected. However, since the introduction of the new
+> 30 seconds timeout when setting a device as temporary, RemoveDevice
+> doesn't immediately remove a connected device, but only disconnects
+> it and waits for the timer to expire before effectively removes it.
+>
+> This patch removes the device as soon as it gets disconnected,
+> provided the disconnection is triggered by a call to RemoveDevice.
+> The regular timeout still applies for other cases.
+>
+> Tested manually by calling RemoveDevice on a connected device,
+> and with ChromeOS autotest setup.
+>
+> Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+> ---
+>
+> Changes in v3:
+> * Rebasing again
+>
+> Changes in v2:
+> * Rebasing to HEAD
+>
+>  src/adapter.c |  2 --
+>  src/adapter.h |  2 ++
+>  src/device.c  | 11 +++++++++++
+>  3 files changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index df628a7fd..4e27bd74b 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -80,8 +80,6 @@
+>  #include "adv_monitor.h"
+>  #include "eir.h"
+>
+> -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> -
+>  #define MODE_OFF               0x00
+>  #define MODE_CONNECTABLE       0x01
+>  #define MODE_DISCOVERABLE      0x02
+> diff --git a/src/adapter.h b/src/adapter.h
+> index c70a7b0da..2f1e4b737 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -29,6 +29,8 @@
+>  #include <lib/bluetooth.h>
+>  #include <lib/sdp.h>
+>
+> +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> +
+>  #define MAX_NAME_LENGTH                248
+>
+>  /* Invalid SSP passkey value used to indicate negative replies */
+> diff --git a/src/device.c b/src/device.c
+> index 8f73ce4d3..3e7784034 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>  {
+>         struct bearer_state *state = get_state(device, bdaddr_type);
+>         DBusMessage *reply;
+> +       bool remove_device = false;
+>
+>         if (!state->connected)
+>                 return;
+> @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>         while (device->disconnects) {
+>                 DBusMessage *msg = device->disconnects->data;
+>
+> +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
+> +                                                               "RemoveDevice"))
+> +                       remove_device = true;
+> +
+>                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
+>                 device->disconnects = g_slist_remove(device->disconnects, msg);
+>                 dbus_message_unref(msg);
+> @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+>
+>         g_dbus_emit_property_changed(dbus_conn, device->path,
+>                                                 DEVICE_INTERFACE, "Connected");
+> +
+> +       if (remove_device)
+> +               btd_adapter_remove_device(device->adapter, device);
+>  }
+>
+>  guint device_add_disconnect_watch(struct btd_device *device,
+> @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+>                 disconnect_all(device);
+>         }
+>
+> +       if (device->temporary_timer > 0)
+> +               g_source_remove(device->temporary_timer);
+> +
+>         if (device->store_id > 0) {
+>                 g_source_remove(device->store_id);
+>                 device->store_id = 0;
+> --
+> 2.28.0.618.gf4bc123cb7-goog
+>
 
-> Regards
-> 
-> Marcel
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
