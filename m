@@ -2,69 +2,71 @@ Return-Path: <SRS0=CFtH=CY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C557C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 17:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B2DC43461
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 17:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B96752193E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 17:42:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 943B321974
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Sep 2020 17:43:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iL0KxC3J"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OLQmmhyk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbgIORmU (ORCPT
+        id S1727881AbgIORnY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Sep 2020 13:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36176 "EHLO
+        Tue, 15 Sep 2020 13:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727937AbgIORl5 (ORCPT
+        with ESMTP id S1727962AbgIORmA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Sep 2020 13:41:57 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3109C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 10:41:56 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id bd2so1724050plb.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 10:41:56 -0700 (PDT)
+        Tue, 15 Sep 2020 13:42:00 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB10AC06178B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 10:41:59 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id a9so169573pjg.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Sep 2020 10:41:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mSVukHJaf23dU18xrmYveJEVtHAOgsrL/FM6fto8MZ0=;
-        b=iL0KxC3JRJNuDjTFZsEYYrqoKEgxAtpjRiXqy436MhG07ru7gDqa1a7R3MsDjmDSY8
-         Z6g7JzpYn0N11Lsbz2mjNuYm4QtAT5fH4MuxjHDPYow0U/QeLI765Jox8ermxjrEre1R
-         wuvmzubPUJAi++Wd7AUVbfw0qZSYQSAWblpp4=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=etTtXFZ+lu630ZAqLK4CGu9TZoeAs1sQTeV8Ne2d0us=;
+        b=OLQmmhykEbiDObMY6ZoX0TLRp1ikCpRQyFIyK1sjIC0ENWMNyGSUAxdt+OD97awO3+
+         6YKkwfzsOP2C5Q18SyYf0T8YUUOAxj+g4zbJ5rStZUVB8g/TCbbSRHTR1MNG4Lw9h3eG
+         Q9XkScCXCbLPD0sRs7YQEysLZLNHya8dG2vdg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mSVukHJaf23dU18xrmYveJEVtHAOgsrL/FM6fto8MZ0=;
-        b=c1PkMZS2p820SQcVY8yUh3N7lwUKuyfNeNlpOXu3frJFOUin3+O7WHBQb6bC168OOb
-         qAAKMjq8A7o9PFHbaYpstC1U2c5T0Hr/5/9Yx3DgKH4J/yTb5PDdyCI3Aj+XKeNCD31k
-         B/fkj8MsRQoBZbJxVnVCUbG4k5R9Xh/pKdIiucZzgCV9dXPDM2Wi4+IkWGnO5ng5fV2N
-         rOXNxbyiyTd/KkcryBFrSgnZsqKwssVV8j4GO7Ei5Rsdl9C4ewQvGUWd/cULREliFHv6
-         613nXLKUqe0IqxXA862gwugB8LsmeJbbFQgeaP97OSLzIUp1+L9vbFtGqaCON/XVJrEI
-         gn4w==
-X-Gm-Message-State: AOAM533l7sB3xZOFrQruIPKuKerZ4ipv+0jjAIUV523DsNWkQRvE0m6c
-        W75xiuPb9iqlbHEi2jraZhiFMg==
-X-Google-Smtp-Source: ABdhPJywvk6gs4v3oj8E7xFuwTHAL28fQaX+WXa7jY6xwOS32lw/CwWN5z+fwYDg+dgrvnfAD6tFnQ==
-X-Received: by 2002:a17:90a:cb0f:: with SMTP id z15mr446612pjt.76.1600191716217;
-        Tue, 15 Sep 2020 10:41:56 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=etTtXFZ+lu630ZAqLK4CGu9TZoeAs1sQTeV8Ne2d0us=;
+        b=Wtot8YXLdN29U1UvlsTtXAJwaKoW4NJEeQStue0bkhFXjEnLDq00dpsasPMQHCx3wJ
+         nuB+U76hB7kos1t23Q+H1cACHsjJpVTFufO9R2z2p/2ryOuzRFDJrjqm1XWpcnmDt6YC
+         jdo7xgicp2KSWNbh1TUnQJhKoh5TLDYZgQQme3MEqPhydTTfwLIZcSrMxcgEHRT7juhN
+         KdQCPFlyz/taxOL1K7qUvCq7qjSvuWMXG+IvJDGad0FtTbjgiQ9u/LC/3EnLVi3AwPBJ
+         ukRIujWIZs6hZEXUzQXDMCDcCfVKkHTtsk+pB4MG5WOsurVvIBGtYyRU1GCHltIaJRxA
+         7JnA==
+X-Gm-Message-State: AOAM531IlYzcvUkum+GEw35AGV7lwd1sop1kAxQEdD7tMykdGYiQPKBw
+        EHXmwSU/T4mwjsNmJqCdF3wKOQ==
+X-Google-Smtp-Source: ABdhPJy67haYqzSnqDJzk9iacHskFZpn5BMblVFqIjsigk+6rRYwzns2rmgFVA5iCQcPxWU4wrtgAA==
+X-Received: by 2002:a17:90a:dd46:: with SMTP id u6mr456402pjv.67.1600191719475;
+        Tue, 15 Sep 2020 10:41:59 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id y29sm15490232pfq.207.2020.09.15.10.41.55
+        by smtp.gmail.com with ESMTPSA id y29sm15490232pfq.207.2020.09.15.10.41.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2020 10:41:55 -0700 (PDT)
+        Tue, 15 Sep 2020 10:41:58 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     luiz.dentz@gmail.com, marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         linux-bluetooth@vger.kernel.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [Bluez PATCH v5 0/4] adapter: Reconnect audio when resuming from suspend
-Date:   Tue, 15 Sep 2020 10:41:42 -0700
-Message-Id: <20200915174146.1693687-1-abhishekpandit@chromium.org>
+Subject: [Bluez PATCH v5 3/4] policy: Enable reconnect for a2dp-sink in defaults
+Date:   Tue, 15 Sep 2020 10:41:45 -0700
+Message-Id: <20200915104127.Bluez.v5.3.Ic87c0fbb00fe76356cee8f78a82b29a47fc6d438@changeid>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
+In-Reply-To: <20200915174146.1693687-1-abhishekpandit@chromium.org>
+References: <20200915174146.1693687-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,91 +74,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Add a2dp-sink to default reconnects list.
+---
 
-Hi Luiz and Marcel,
+Changes in v5: None
+Changes in v4: None
+Changes in v3: None
+Changes in v2: None
 
-This is a quality of life improvement for the behavior of audio devices
-during system suspend. This depends on a kernel change that emits
-suspend/resume events:
+ plugins/policy.c | 3 ++-
+ src/main.conf    | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-https://patchwork.kernel.org/project/bluetooth/list/?series=325771
-
-Right now, audio devices will be disconnected as part of suspend but
-won't be reconnected when the system resumes without user interaction.
-This is annoying to some users as it causes an interruption to their
-normal work flow.
-
-This change reconnects audio devices that were disconnected for suspend
-using the following logic:
-
- * In the device disconnect callback, mark any devices with the A2DP
-   service uuid for reconnect. The reconnect will not be queued until
-   resume.
- * In the controller resume callback, queue any policy items that are
-   marked to reconnect on resume for connection with the ResumeDelay
-   value (default = 2s).
-
-A reconnect is queued after the controller resumes and the delay
-between resume and reconnect is configurable via the ResumeDelay key in
-the Policy settings. The 2s delay was chosen arbitrarily and I think
-anywhere up to 10s is probably ok. A longer delay is better to account
-for spurious wakeups and Wi-Fi reconnection time (avoiding any co-ex
-issues) at the downside of reconnection speed.
-
-Here are the tests I have done with this:
-- Single suspend and verified the headphones reconnect
-- Suspend stress test for 25 iterations and verify both Wi-Fi and
-  Bluetooth audio reconnect on resume. (Ran with wake minimum time of
-  10s)
-- Suspend test with wake time = 1s to verify that BT reconnect isn't
-  attempted. Ran 5 iterations with low wake time and then let it stay
-  awake to confirm reconnect finally completed on last resume.
-- Suspend test with wake time between 1s - 4s. Ran with 5 iterations and
-  verified it connected several times in the middle and finally at the
-  end.
-
-I've tested this on a Pixelbook Go (AC-9260 controller) and HP
-Chromebook 14a (RTL8822CE controller) with GID6B headset.
-
-I've also tested this with the Pixel Buds 2. These earbuds actually
-reconnect automatically to the Chromebook (even without this policy
-change) and I verified that the new changes don't break the reconnection
-mechanism.
-
-Thanks
-Abhishek
-
-
-Changes in v5:
-- Remove use of !! in has_kernel_features
-
-Changes in v4:
-- Set reconnect timer in disconnect if resume events aren't supported
-- Only set reconnect timer if adapter matches current notification
-- Refactor changes in src/adapter to its own commit
-- Refactor enabling A2DP_SINK_UUID into its own commit
-
-Changes in v3:
-- Refactored resume notification to use btd_adapter_driver
-- Renamed ReconnectAudioDelay to ResumeDelay and set default to 2
-- Added A2DP_SINK_UUID to default reconnect list
-
-Changes in v2:
-- Refactored to use policy instead of connecting directly in adapter
-
-Abhishek Pandit-Subedi (4):
-  adapter: Refactor kernel feature globals
-  adapter: Handle controller resume and notify drivers
-  policy: Enable reconnect for a2dp-sink in defaults
-  policy: Reconnect audio on controller resume
-
- plugins/policy.c |  87 +++++++++++++++++++++++++++++++++-------
- src/adapter.c    | 102 +++++++++++++++++++++++++++++++++--------------
- src/adapter.h    |  11 +++++
- src/main.c       |   1 +
- src/main.conf    |  11 ++++-
- 5 files changed, 168 insertions(+), 44 deletions(-)
-
+diff --git a/plugins/policy.c b/plugins/policy.c
+index de51e58b9..c18ca8d1f 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -65,7 +65,8 @@ struct reconnect_data {
+ };
+ 
+ static const char *default_reconnect[] = {
+-			HSP_AG_UUID, HFP_AG_UUID, A2DP_SOURCE_UUID, NULL };
++			HSP_AG_UUID, HFP_AG_UUID, A2DP_SOURCE_UUID,
++			A2DP_SINK_UUID, NULL };
+ static char **reconnect_uuids = NULL;
+ 
+ static const size_t default_attempts = 7;
+diff --git a/src/main.conf b/src/main.conf
+index 42f7e41c5..e1d77cc47 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -186,7 +186,7 @@
+ # timeout). The policy plugin should contain a sane set of values by
+ # default, but this list can be overridden here. By setting the list to
+ # empty the reconnection feature gets disabled.
+-#ReconnectUUIDs=00001112-0000-1000-8000-00805f9b34fb,0000111f-0000-1000-8000-00805f9b34fb,0000110a-0000-1000-8000-00805f9b34fb
++#ReconnectUUIDs=00001112-0000-1000-8000-00805f9b34fb,0000111f-0000-1000-8000-00805f9b34fb,0000110a-0000-1000-8000-00805f9b34fb,0000110b-0000-1000-8000-00805f9b34fb
+ 
+ # ReconnectAttempts define the number of attempts to reconnect after a link
+ # lost. Setting the value to 0 disables reconnecting feature.
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
