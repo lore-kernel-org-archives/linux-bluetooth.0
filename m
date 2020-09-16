@@ -2,412 +2,258 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA011C43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CA0C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:43:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7093320731
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:40:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZEpwUI8"
+	by mail.kernel.org (Postfix) with ESMTP id 30C8E221E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:43:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728320AbgIPUkx (ORCPT
+        id S1728410AbgIPUnn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 16:40:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726763AbgIPREy (ORCPT
+        Wed, 16 Sep 2020 16:43:43 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52797 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726692AbgIPRD2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 13:04:54 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EFC4C02C2BD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 09:39:37 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id i17so8792499oig.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 09:39:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4T/t9mVdAvOOOseWLYn1uXmcACQz9WRAYDnt0w3qa7A=;
-        b=gZEpwUI8r8q64JSIi95Zezc5PyFZSnDScfsPsTHS7kiWXC//MZP+d5qWutf0rUwxZr
-         mQjnDtc0ZiId55nWLIcvQfx8ZdzuR2CpPlmtqPow4J4e7FKewsGZ/SjXTyoJhWmS0ltJ
-         lm5dk7wqm5beLpx6QnvHTTr4EaxML5GRF237aTf3kzf/9FzCCAtRLgujZEeFd7csG+iB
-         zCdvMh4y9nSKoF9CO/SiBBmGyNdly0C/VT8OKPZxatCL96jxEpnxLI0u2mOTS0wu/JUr
-         3tMiAKCSJYiypP7yz46nhTNta9MlMHN3/9CjrLz3c+w2OXFp9OgyMbndqn4A99OyrvSK
-         8NJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4T/t9mVdAvOOOseWLYn1uXmcACQz9WRAYDnt0w3qa7A=;
-        b=ibEMA0Nf50if/78FHmxZIcs+P/f2EonxAIE/mCCX4n7+ruCg3Y+8Jdr9Wj66Z4aSiS
-         KfF3aKqtoR+qW33Wf2u8FCF6jECCB9g4SKSRNwna53DFu9MRqeIUrrgNM8zRAUOWQC71
-         OoPpRiTn40YkXUhpZkt2avzvHR2KSGNoOmajAzPGF67QqapQkXPgtkaR9Kx9nfVdN+BN
-         hDVTmHyqPdLseXtH+MlGjviZy0x1R1zP59uI7utPF5LFflmDwhZBSDBfvMAv253Bjb4W
-         IlJoSuPLDbZVDeePhAaOqZMWbV9AUd+FS/bSuv7OnKgyRUydOLlzz/UJZclEqJ3aEMr1
-         0nLg==
-X-Gm-Message-State: AOAM533dcQ2AhRYGfyT7TCPF/+l9ISnlhLOOV8S1f5qVSHjt12FiMXml
-        H9RWFU2QLW9MTm+47cpSSHj+HsaYUCkq2B565sE=
-X-Google-Smtp-Source: ABdhPJxRkasUcGEbrAFpNyhA7vhkICd/wlf0VeC8qqkGysCYse4TsgzYPGCG0J46cfNda8ALPnlOOTE9aSkLq+Rv9SA=
-X-Received: by 2002:aca:38d7:: with SMTP id f206mr3400230oia.48.1600274376210;
- Wed, 16 Sep 2020 09:39:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200916151617.BlueZ.v5.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
-In-Reply-To: <20200916151617.BlueZ.v5.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 16 Sep 2020 09:39:24 -0700
-Message-ID: <CABBYNZJ6ROUaDiRPAZOH4QCD+aPwO0CPqD=DJW1eBw5CsP+=Vg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v5 1/4] client: Implement basic interface of ADV
- monitor in bluetoothctl
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 16 Sep 2020 13:03:28 -0400
+Received: from marcel-macbook.fritz.box (p4ff9f430.dip0.t-ipconnect.de [79.249.244.48])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6372ECED04;
+        Wed, 16 Sep 2020 16:34:38 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH v1] Bluetooth: Use NVM files based on SoC ID for WCN3991
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1600184605-31611-1-git-send-email-gubbaven@codeaurora.org>
+Date:   Wed, 16 Sep 2020 16:27:41 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A07A6C72-55B6-4DE6-BA4A-987ED4DB88E0@holtmann.org>
+References: <1600184605-31611-1-git-send-email-gubbaven@codeaurora.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Venkata,
 
-On Wed, Sep 16, 2020 at 12:20 AM Howard Chung <howardchung@google.com> wrote:
->
-> This patch implements some basic functions for ADV monitor in
-> bluetoothctl
->
-> [bluetooth]# show
-> ...
-> Advertisement Monitor Features:
->         SupportedMonitorTypes: or_patterns
->
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> This change will allow to use different NVM file based
+> on WCN3991 BT SoC ID.Need to use different NVM file based on
+> fab location for WCN3991 BT SoC.
+> 
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 > ---
->
-> Changes in v5:
-> - Rephrase condition == TRUE/FALSE to condition/!condition
-> - Add bt_shell_noninteractive_quit(EXIT_SUCCESS) in register_reply
-> - Remove unused variable 'conn'
-> - Move a change regarding checking the status of app registered from patch 2/4
->   to 1/4
->
-> Changes in v4:
-> - Remove PRE-UPSTREAM in commit title
->
-> Changes in v3:
-> - Rename advertisement_monitor to adv_monitor
->
-> Changes in v2:
-> - Update the add-pattern usage
-> - Fix styling issue in patch 1
-> - Fix storage class declaration issue
->
->  Makefile.tools       |   2 +
->  client/adv_monitor.c | 165 +++++++++++++++++++++++++++++++++++++++++++
->  client/adv_monitor.h |  23 ++++++
->  client/main.c        |  28 ++++++++
->  4 files changed, 218 insertions(+)
->  create mode 100644 client/adv_monitor.c
->  create mode 100644 client/adv_monitor.h
->
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 9b9236609..ed0fbf8a3 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -7,6 +7,8 @@ client_bluetoothctl_SOURCES = client/main.c \
->                                         client/agent.h client/agent.c \
->                                         client/advertising.h \
->                                         client/advertising.c \
-> +                                       client/adv_monitor.h \
-> +                                       client/adv_monitor.c \
->                                         client/gatt.h client/gatt.c
->  client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
->                                 $(GLIB_LIBS) $(DBUS_LIBS) -lreadline
-> diff --git a/client/adv_monitor.c b/client/adv_monitor.c
-> new file mode 100644
-> index 000000000..dda0eaf90
-> --- /dev/null
-> +++ b/client/adv_monitor.c
-> @@ -0,0 +1,165 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2020 Google LLC
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#define _GNU_SOURCE
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <stdint.h>
-> +#include <stdbool.h>
-> +#include <string.h>
-> +
-> +#include "gdbus/gdbus.h"
-> +#include "src/shared/util.h"
-> +#include "src/shared/shell.h"
-> +#include "adv_monitor.h"
-> +
-> +#define ADV_MONITOR_APP_PATH   "/org/bluez/adv_monitor_app"
-> +#define ADV_MONITOR_INTERFACE  "org.bluez.AdvertisementMonitor1"
-> +
-> +static struct adv_monitor_manager {
-> +       GSList *supported_types;
-> +       GSList *supported_features;
-> +       GDBusProxy *proxy;
-> +       gboolean app_registered;
-> +} manager = { NULL, NULL, NULL, FALSE };
-> +
-> +static void set_supported_list(GSList **list, DBusMessageIter *iter)
-> +{
-> +       char *str;
-> +       DBusMessageIter subiter;
-> +
-> +       dbus_message_iter_recurse(iter, &subiter);
-> +       while (dbus_message_iter_get_arg_type(&subiter) ==
-> +                                               DBUS_TYPE_STRING) {
-> +               dbus_message_iter_get_basic(&subiter, &str);
-> +               *list = g_slist_append(*list, str);
-> +               dbus_message_iter_next(&subiter);
-> +       }
-> +}
-> +
-> +void adv_monitor_add_manager(DBusConnection *conn, GDBusProxy *proxy)
-> +{
-> +       DBusMessageIter iter;
-> +
-> +       if (manager.proxy != NULL || manager.supported_types != NULL ||
-> +                                       manager.supported_features != NULL) {
-> +               bt_shell_printf("advertisement monitor manager already "
-> +                               "added\n");
-> +               return;
-> +       }
-> +
-> +       manager.proxy = proxy;
-> +
-> +       if (g_dbus_proxy_get_property(proxy, "SupportedMonitorTypes", &iter))
-> +               set_supported_list(&(manager.supported_types), &iter);
-> +
-> +       if (g_dbus_proxy_get_property(proxy, "SupportedFeatures", &iter))
-> +               set_supported_list(&(manager.supported_features), &iter);
-> +
-> +}
-> +
-> +void adv_monitor_remove_manager(DBusConnection *conn)
-> +{
-> +       if (manager.supported_types != NULL)
-> +               g_slist_free(g_steal_pointer(&(manager.supported_types)));
-> +       if (manager.supported_features != NULL)
-> +               g_slist_free(g_steal_pointer(&(manager.supported_features)));
-> +       manager.proxy = NULL;
-> +       manager.app_registered = FALSE;
-> +}
-> +
-> +static void register_setup(DBusMessageIter *iter, void *user_data)
-> +{
-> +       const char *path = ADV_MONITOR_APP_PATH;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-> +}
-> +
-> +static void register_reply(DBusMessage *message, void *user_data)
-> +{
-> +       DBusError error;
-> +
-> +       dbus_error_init(&error);
-> +
-> +       if (!dbus_set_error_from_message(&error, message)) {
-> +               bt_shell_printf("AdvertisementMonitor path registered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +       }
-> +
-> +       bt_shell_printf("Failed to register path: %s\n", error.name);
-> +       dbus_error_free(&error);
-> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +}
-> +
-> +static void unregister_setup(DBusMessageIter *iter, void *user_data)
-> +{
-> +       const char *path = ADV_MONITOR_APP_PATH;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-> +}
-> +
-> +static void unregister_reply(DBusMessage *message, void *user_data)
-> +{
-> +       DBusError error;
-> +
-> +       dbus_error_init(&error);
-> +
-> +       if (!dbus_set_error_from_message(&error, message)) {
-> +               bt_shell_printf("AdvertisementMonitor path unregistered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +       }
-> +
-> +       bt_shell_printf("Failed to unregister Advertisement Monitor:"
-> +                       " %s\n", error.name);
-> +       dbus_error_free(&error);
-> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +}
-> +
-> +void adv_monitor_register_app(DBusConnection *conn)
-> +{
-> +       if (manager.app_registered) {
-> +               bt_shell_printf("Advertisement Monitor already registered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       } else if (manager.supported_types == NULL ||
-> +               !g_dbus_proxy_method_call(manager.proxy, "RegisterMonitor",
-> +                                       register_setup, register_reply,
-> +                                       NULL, NULL)) {
-> +               bt_shell_printf("Failed to register Advertisement Monitor\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +       manager.app_registered = TRUE;
-> +}
-> +
-> +void adv_monitor_unregister_app(DBusConnection *conn)
-> +{
-> +       if (!manager.app_registered) {
-> +               bt_shell_printf("Advertisement Monitor not registered\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       } else if (!g_dbus_proxy_method_call(manager.proxy, "UnregisterMonitor",
-> +                                       unregister_setup, unregister_reply,
-> +                                       NULL, NULL)) {
-> +               bt_shell_printf("Failed to unregister Advertisement Monitor\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +       manager.app_registered = FALSE;
-> +}
-> diff --git a/client/adv_monitor.h b/client/adv_monitor.h
-> new file mode 100644
-> index 000000000..77b0b62c6
-> --- /dev/null
-> +++ b/client/adv_monitor.h
-> @@ -0,0 +1,23 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2020 Google LLC
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
-> +
-> +void adv_monitor_add_manager(DBusConnection *conn, GDBusProxy *proxy);
-> +void adv_monitor_remove_manager(DBusConnection *conn);
-> +void adv_monitor_register_app(DBusConnection *conn);
-> +void adv_monitor_unregister_app(DBusConnection *conn);
-> diff --git a/client/main.c b/client/main.c
-> index da877b546..75f8bc462 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -41,6 +41,7 @@
->  #include "agent.h"
->  #include "gatt.h"
->  #include "advertising.h"
-> +#include "adv_monitor.h"
->
->  /* String display constants */
->  #define COLORED_NEW    COLOR_GREEN "NEW" COLOR_OFF
-> @@ -58,6 +59,7 @@ static char *auto_register_agent = NULL;
->  struct adapter {
->         GDBusProxy *proxy;
->         GDBusProxy *ad_proxy;
-> +       GDBusProxy *adv_monitor_proxy;
->         GList *devices;
->  };
->
-> @@ -528,6 +530,19 @@ static void ad_manager_added(GDBusProxy *proxy)
->         adapter->ad_proxy = proxy;
->  }
->
-> +static void admon_manager_added(GDBusProxy *proxy)
-> +{
-> +       struct adapter *adapter;
-> +
-> +       adapter = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
-> +       if (!adapter)
-> +               adapter = adapter_new(proxy);
-> +
-> +       adapter->adv_monitor_proxy = proxy;
-> +       adv_monitor_add_manager(dbus_conn, proxy);
-> +       adv_monitor_register_app(dbus_conn);
-> +}
-> +
->  static void proxy_added(GDBusProxy *proxy, void *user_data)
->  {
->         const char *interface;
-> @@ -560,6 +575,9 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
->                 ad_manager_added(proxy);
->         } else if (!strcmp(interface, "org.bluez.Battery1")) {
->                 battery_added(proxy);
-> +       } else if (!strcmp(interface,
-> +                               "org.bluez.AdvertisementMonitorManager1")) {
-> +               admon_manager_added(proxy);
->         }
->  }
->
-> @@ -653,6 +671,9 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
->                 ad_unregister(dbus_conn, NULL);
->         } else if (!strcmp(interface, "org.bluez.Battery1")) {
->                 battery_removed(proxy);
-> +       } else if (!strcmp(interface,
-> +                       "org.bluez.AdvertisementMonitorManager1")) {
-> +               adv_monitor_remove_manager(dbus_conn);
->         }
->  }
->
-> @@ -935,6 +956,13 @@ static void cmd_show(int argc, char *argv[])
->                 print_property(adapter->ad_proxy, "SupportedSecondaryChannels");
->         }
->
-> +       if (adapter->adv_monitor_proxy) {
-> +               bt_shell_printf("Advertisement Monitor Features:\n");
-> +               print_property(adapter->adv_monitor_proxy,
-> +                                               "SupportedMonitorTypes");
-> +               print_property(adapter->adv_monitor_proxy, "SupportedFeatures");
-> +       }
-> +
->         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
->  }
->
-> --
-> 2.28.0.618.gf4bc123cb7-goog
+> drivers/bluetooth/btqca.c   | 41 +++++++++++++++++++++++++----------------
+> drivers/bluetooth/btqca.h   | 13 ++++++++-----
+> drivers/bluetooth/hci_qca.c | 11 +++++------
+> 3 files changed, 38 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index ce9dcff..a7e72f1 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -14,12 +14,11 @@
+> 
+> #define VERSION "0.1"
+> 
+> -int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> +int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+> 			 enum qca_btsoc_type soc_type)
+> {
+> 	struct sk_buff *skb;
+> 	struct edl_event_hdr *edl;
+> -	struct qca_btsoc_version *ver;
+> 	char cmd;
+> 	int err = 0;
+> 	u8 event_type = HCI_EV_VENDOR;
+> @@ -70,9 +69,9 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> 	}
+> 
+> 	if (soc_type >= QCA_WCN3991)
+> -		memmove(&edl->data, &edl->data[1], sizeof(*ver));
+> -
+> -	ver = (struct qca_btsoc_version *)(edl->data);
+> +		memcpy(ver, &edl->data[1], sizeof(*ver));
 
-Applied, thanks.
+any reason to use &edl->data[1] and not just edl->data + 1?
 
--- 
-Luiz Augusto von Dentz
+> +	else
+> +		memcpy(ver, &edl->data, sizeof(*ver));
+> 
+> 	bt_dev_info(hdev, "QCA Product ID   :0x%08x",
+> 		    le32_to_cpu(ver->product_id));
+> @@ -83,13 +82,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> 	bt_dev_info(hdev, "QCA Patch Version:0x%08x",
+> 		    le16_to_cpu(ver->patch_ver));
+> 
+> -	/* QCA chipset version can be decided by patch and SoC
+> -	 * version, combination with upper 2 bytes from SoC
+> -	 * and lower 2 bytes from patch will be used.
+> -	 */
+> -	*soc_version = (le32_to_cpu(ver->soc_id) << 16) |
+> -		       (le16_to_cpu(ver->rom_ver) & 0x0000ffff);
+> -	if (*soc_version == 0)
+> +	if (le32_to_cpu(ver->soc_id) == 0 || le16_to_cpu(ver->rom_ver) == 0)
+> 		err = -EILSEQ;
+> 
+> out:
+> @@ -446,15 +439,25 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+> 
+> int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> -		   enum qca_btsoc_type soc_type, u32 soc_ver,
+> +		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+> 		   const char *firmware_name)
+> {
+> 	struct qca_fw_config config;
+> 	int err;
+> 	u8 rom_ver = 0;
+> +	u32 soc_ver;
+> 
+> 	bt_dev_dbg(hdev, "QCA setup on UART");
+> 
+> +	/* QCA chipset version can be decided by patch and SoC
+> +	 * version, combination with upper 2 bytes from SoC
+> +	 * and lower 2 bytes from patch will be used.
+> +	 */
+> +	soc_ver = (le32_to_cpu(ver.soc_id) << 16) |
+> +		       (le16_to_cpu(ver.rom_ver) & 0x0000ffff);
+
+Please indent this properly.
+
+I am also confused about the 0x0000ffff since it is just 16-bit value in the first place. Also where do you want to shift the 32-bit value to.
+
+Frankly, I find all this version magic kinda questionable.
+
+> +
+> +	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> +
+> 	config.user_baud_rate = baudrate;
+> 
+> 	/* Download rampatch file */
+> @@ -491,9 +494,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> 	if (firmware_name)
+> 		snprintf(config.fwname, sizeof(config.fwname),
+> 			 "qca/%s", firmware_name);
+> -	else if (qca_is_wcn399x(soc_type))
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/crnv%02x.bin", rom_ver);
+> +	else if (qca_is_wcn399x(soc_type)) {
+> +		if (ver.soc_id == QCA_WCN3991_SOC_ID) {
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/crnv%02xu.bin", rom_ver);
+> +		} else {
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/crnv%02x.bin", rom_ver);
+> +		}
+> +	}
+> 	else if (soc_type == QCA_QCA6390)
+> 		snprintf(config.fwname, sizeof(config.fwname),
+> 			 "qca/htnv%02x.bin", rom_ver);
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index d81b74c..d01a9f5 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -34,6 +34,8 @@
+> #define QCA_HCI_CC_OPCODE		0xFC00
+> #define QCA_HCI_CC_SUCCESS		0x00
+> 
+> +#define QCA_WCN3991_SOC_ID		(0x40014320)
+> +
+> enum qca_baudrate {
+> 	QCA_BAUDRATE_115200 	= 0,
+> 	QCA_BAUDRATE_57600,
+> @@ -136,9 +138,9 @@ enum qca_btsoc_type {
+> 
+> int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> -		   enum qca_btsoc_type soc_type, u32 soc_ver,
+> +		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+> 		   const char *firmware_name);
+> -int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> +int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+> 			 enum qca_btsoc_type);
+> int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
+> @@ -155,13 +157,14 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+> }
+> 
+> static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> -				 enum qca_btsoc_type soc_type, u32 soc_ver,
+> -				 const char *firmware_name)
+> +		enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+> +				const char *firmware_name)
+
+Please use proper indentation.
+
+> {
+> 	return -EOPNOTSUPP;
+> }
+> 
+> -static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> +static inline int qca_read_soc_version(struct hci_dev *hdev,
+> +				       struct qca_btsoc_version *ver,
+> 				       enum qca_btsoc_type)
+> {
+> 	return -EOPNOTSUPP;
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 244b8fe..4c32c60 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1649,7 +1649,7 @@ static int qca_setup(struct hci_uart *hu)
+> 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+> 	const char *firmware_name = qca_get_firmware_name(hu);
+> 	int ret;
+> -	int soc_ver = 0;
+> +	struct qca_btsoc_version ver;
+> 
+> 	ret = qca_check_speeds(hu);
+> 	if (ret)
+> @@ -1678,7 +1678,7 @@ static int qca_setup(struct hci_uart *hu)
+> 	if (qca_is_wcn399x(soc_type)) {
+> 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> 
+> -		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
+> +		ret = qca_read_soc_version(hdev, &ver, soc_type);
+> 		if (ret)
+> 			return ret;
+> 	} else {
+> @@ -1697,15 +1697,14 @@ static int qca_setup(struct hci_uart *hu)
+> 
+> 	if (!qca_is_wcn399x(soc_type)) {
+> 		/* Get QCA version information */
+> -		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
+> +		ret = qca_read_soc_version(hdev, &ver, soc_type);
+> 		if (ret)
+> 			return ret;
+> 	}
+> 
+> -	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> 	/* Setup patch / NVM configurations */
+> -	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
+> -			firmware_name);
+> +	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, ver,
+> +			     firmware_name);
+> 	if (!ret) {
+> 		set_bit(QCA_IBS_ENABLED, &qca->flags);
+> 		qca_debugfs_init(hdev);
+
+Regards
+
+Marcel
+
