@@ -2,349 +2,296 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A864FC43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE60C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:28:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D2EA2220B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC78922208
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="INgXm6qm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mp2L3iQv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgIPX0N (ORCPT
+        id S1726373AbgIPX2H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 19:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60234 "EHLO
+        Wed, 16 Sep 2020 19:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726839AbgIPX0M (ORCPT
+        with ESMTP id S1726084AbgIPX2G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 19:26:12 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB20C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:26:12 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id q2so407089ybo.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:26:12 -0700 (PDT)
+        Wed, 16 Sep 2020 19:28:06 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 744FAC06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:28:06 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id 4so111567ooh.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=69uV63sz9ZbKOkQ0qL0A6yR+4VihlUhYQyT6cjQqu5s=;
-        b=INgXm6qmENLTljZ/eb/4QMJH3j5sljg/m2+ENI0fseJ+aOcC1NYbq7LnYyKTz3X/VQ
-         hAH1eKlHmNu4A95rVVAKY/6ZiQnnmp6MyaQmop6veAxPUq4Atgsp1vXCYiLl5K9sKtMI
-         IzHeE/vZt3Ea42wLT9EWowbCdu3TCEXyz75zmbzWgHxK8Jm5BO1t22A5ShPhWy9Wk7cp
-         tt0aE0MuIBvRGS3S7ACUB4KEdaX+9qzZRxn/GSKqs8hj6HPhI4BwunRyTHtkwr5fc84s
-         sq7klySqkIorlnxQ+IRCZLnpf0PuwxR3eeCA70ZEZ+GU46seX9D3KXF+YeFHu0TKzBQy
-         AZWA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3SddsxFv/5tz1O3GGP3NqbO56lrjVtwhe4TX79+z8PE=;
+        b=Mp2L3iQv6rCy2gLpg7XqbisUNJuWUoXNcBhf+d0hP8oMsnJMh2tbyee/D837MkbjZs
+         bjVAmtOBRpFXfl5AMgOu8AUt0axgPDrZXQIQqkjAsQIgN2/bo0i4nKUzdx2hQcbAQqE9
+         4XqFWRn9eBM7y1x9eLODg1tjsc7PaCp7ULDmCrPH5Ne/Vdku+zaIL+lIH8obELsN15m8
+         H6NRUwYLMyLmZvlm7cv4PPrlidEYPbnXy8hE5BNNSaFYFtelujXlmCSJGERmd8BNxHTl
+         Y/xP2E+Ii561IBbEfG28oSrm3Tb7KX/vMROnhDdOfLGXfzUzFvKcXhEuLWZNpgfUB0Mf
+         OQJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=69uV63sz9ZbKOkQ0qL0A6yR+4VihlUhYQyT6cjQqu5s=;
-        b=Q1B5xibDRG1tG33NcAM8LJlZz71zzBiZYZPo506j4idTDhbpwgYpmf8tLxcM3TO+OJ
-         Ros5ym2FlS2erqyOvMYi7n8+Q5qdZFe6bukpE8Cke6ZdpO4Oi1fuGPqSmkUsQZCsnAbm
-         SvJl3AigoEQk9UkED4id4harjxdC6YZt1nrTj9kKtKRiZL/u/Xu4zCZ78DeNuOAMNRww
-         BPzbA/zxgM1ll4f/ulpOJ0nDkBpwzfgPAqkVv2Rr0E0n0YdHDy7JFKEmdkCrw0wrOo0s
-         xpM7JnDLfVNa0oXIDq4kJOOb/DRC9ELO2KbQWKqD+e8UBHOp86gltUHaXkI3Pk8we2+N
-         HorA==
-X-Gm-Message-State: AOAM530HbCaGmPMpB73Hc+EYKkPmxPw7oSTXMxAQ/0tUvi8PEs9j753A
-        CgcDhzxn+mUNe3ITf3OIPKWCzBErL5dqjEj7Lu0p
-X-Google-Smtp-Source: ABdhPJz9oYOKtc754+4qBs/EXI5mjKSt7oGa0zLQAFtdOfuIpLWan3aTC1BoNVSDU75iqFFf1zIoDlRFadJgWXwOQDye
-X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a05:6902:6d4:: with SMTP id
- m20mr8276299ybt.118.1600298771472; Wed, 16 Sep 2020 16:26:11 -0700 (PDT)
-Date:   Wed, 16 Sep 2020 16:25:42 -0700
-In-Reply-To: <20200916232542.1584854-1-danielwinkler@google.com>
-Message-Id: <20200916162155.Bluez.10.If15d3d09724ded2bcc7240d29f6888f2ad12e723@changeid>
-Mime-Version: 1.0
-References: <20200916232542.1584854-1-danielwinkler@google.com>
-X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [Bluez PATCH 10/10] doc/mgmt-api: Add new MGMT interfaces to mgmt-api
-From:   Daniel Winkler <danielwinkler@google.com>
-To:     luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3SddsxFv/5tz1O3GGP3NqbO56lrjVtwhe4TX79+z8PE=;
+        b=sjCYf/O/7AAMAyS6rwHYTuKnct2Rng574CGlIMZLx+YumVkQEkAxW31cOYt5hL2KD0
+         FJ6dw3LN2BEnn4I2p2YkwBciHr02fgcBAveBUFSJls0zmPl3uQiaVvaRRmdWWU2AU1Av
+         KamN/Weu1NaFLozWXwhivgu7+73cgZRDUBrWm9C3wna07GBSmA27AuPQZ1HhRB5CJiAf
+         FLAHvZ02ogSJPkodyjdh4rcBGwJDpmqPbL/8JDkFIdQRuL5Hwir5V58W0Fg7ICT+V2kc
+         7fC8WttxlIX7gaoUM5N0mt7GWIhl7fmKYXHMrl+SgSQG1vrXKgb75qbWMzyZe9+xHCYP
+         PjWQ==
+X-Gm-Message-State: AOAM531oo+XBzzis1QPiFr1O12jshYaF86CafZzB71sgsi/iLfvvj/A8
+        Mc2B6Y7JRldJbyYop9CHsFvlvXNuukdkYq8eCh5MoFlO1Ng=
+X-Google-Smtp-Source: ABdhPJyYLhgzeHwpqUCNuOvDSNaU62jaTyfvjgfBDLkAoKq4wWxgaPmDN4r8y1VBiE386y4JWFpxB3PVkLzUOeB0KSU=
+X-Received: by 2002:a4a:5896:: with SMTP id f144mr4835658oob.49.1600298885333;
+ Wed, 16 Sep 2020 16:28:05 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200916211122.127881-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200916211122.127881-1-sonnysasaka@chromium.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 16 Sep 2020 16:27:54 -0700
+Message-ID: <CABBYNZKwZBM-3=jBvNVL7oHa133GGnZ5f8roNyrAR-hXNOVuhA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] a2dp: Keep track of ref ownership of a2dp_setup
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds the following to mgmt-api:
-- Add Extended Advertising Parameters Command
-- Add Extended Advertising Data Command
-- Read Controller Capabilities Command
-- Advertisement Tx Power Selected Event
+Hi Sonny,
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
----
+On Wed, Sep 16, 2020 at 3:31 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+>
+> Currently transport_cb and abort_cfm make assumption that they have an
+> a2dp_setup reference held as a result of open_ind invocation. In the
+> field this is not always true, for example when the peer device opens an
+> L2CAP channel for AVDTP transport channel without sending AVDTP_OPEN
+> request through the AVDTP signaling channel first. Although in this case
+> the peer device does not behave correctly, we should protect this
+> possible crash from happening by making sure that transport_cb and
+> abort_cfm are really holding a reference of a2dp_setup object before
+> trying to unref them.
+>
+> After grabbing a reference, open_ind stores the pointer in
+> stream->pending_open_data. If this field is set, that means there is a
+> pending AVDTP_OPEN command and it needs to be unref-fed later once and
+> only once: when the transport channel is created (transport_cb) or when
+> the AVDTP_OPEN command is aborted (abort_cfm). If this field is not set,
+> nothing should unref it. This enforces that the reference counting is
+> correct regardless of the behavior of the peer device.
 
- doc/mgmt-api.txt | 243 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+While I agree that we should handle this properly and never crash I
+think we can take a more generic approach by attaching a user_data to
+the stream, see my comments bellow.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ca0d38469..6e8914611 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3574,6 +3574,235 @@ Remove Advertisement Monitor Command
- 				Busy
- 
- 
-+Add Extended Advertising Parameters Command
-+=======================
-+
-+	Command Code:		0x0054
-+	Controller Index:	<controller id>
-+	Command Parameters:	Instance (1 Octet)
-+				Flags (4 Octets)
-+				Params (2 Octets)
-+				Duration (2 Octets)
-+				Timeout (2 Octets)
-+				MinInterval (4 Octets)
-+				MaxInterval (4 Octets)
-+				TxPower (1 Octet)
-+	Return Parameters:	Instance (1 Octet)
-+
-+
-+	This command is used to configure the parameters for Bluetooth Low
-+	Energy advertising instance. This command is expected to be followed
-+	by an Add Extended Advertising Data command to complete and enable
-+	the advertising instance.
-+
-+	Added advertising information with this command will not be visible
-+	immediately if advertising is enabled via the Set Advertising
-+	command. The usage of the Set Advertising command takes precedence
-+	over this command. Instance information is stored and will be
-+	advertised once advertising via Set Advertising has been disabled.
-+
-+	The Instance identifier is a value between 1 and the number of
-+	supported instances. The value 0 is reserved.
-+
-+	With the Flags value the type of advertising is controlled and
-+	the following flags are defined:
-+
-+		0	Switch into Connectable mode
-+		1	Advertise as Discoverable
-+		2	Advertise as Limited Discoverable
-+		3	Add Flags field to Adv_Data
-+		4	Add TX Power field to Adv_Data
-+		5	Add Appearance field to Scan_Rsp
-+		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
-+
-+	When the connectable flag is set, then the controller will use
-+	undirected connectable advertising. The value of the connectable
-+	setting can be overwritten this way. This is useful to switch a
-+	controller into connectable mode only for LE operation. This is
-+	similar to the mode 0x02 from the Set Advertising command.
-+
-+	When the connectable flag is not set, then the controller will
-+	use advertising based on the connectable setting. When using
-+	non-connectable or scannable advertising, the controller will
-+	be programmed with a non-resolvable random address. When the
-+	system is connectable, then the identity address or resolvable
-+	private address will be used.
-+
-+	Using the connectable flag is useful for peripheral mode support
-+	where BR/EDR (and/or LE) is controlled by Add Device. This allows
-+	making the peripheral connectable without having to interfere
-+	with the global connectable setting.
-+
-+	Secondary channel flags can be used to advertise in secondary
-+	channel with the corresponding PHYs. These flag bits are mutually
-+	exclusive and setting multiple will result in Invalid Parameter
-+	error. Choosing either LE 1M or LE 2M will result in using
-+	extended advertising on the primary channel with LE 1M and the
-+	respectively LE 1M or LE 2M on the secondary channel. Choosing
-+	LE Coded will result in using extended advertising on the primary
-+	and secondary channels with LE Coded. Choosing none of these flags
-+	will result in legacy advertising.
-+
-+	To allow future parameters to be optionally extended in this structure,
-+	the Params member is used to specify which of the structure fields were
-+	purposefully set by the caller. Unspecified parameters will be given
-+	sensible defaults by the kernel before the advertisement is registered.
-+	The Params bit field uses the following bit to parameter relationship:
-+
-+		0	The Duration parameter should be used
-+		1	The Timeout parameter should be used
-+		2	The Interval parameters should be used
-+		3	The Tx Power parameter should be used
-+
-+	The Duration parameter configures the length of an Instance. The
-+	value is in seconds. The default is 2 seconds.
-+
-+	If only one advertising Instance has been added, then the Duration
-+	value will be ignored. It only applies for the case where multiple
-+	Instances are configured. In that case every Instance will be
-+	available for the Duration time and after that it switches to
-+	the next one. This is a simple round-robin based approach.
-+
-+	The Timeout parameter configures the life-time of an Instance. In
-+	case the value 0 is used it indicates no expiration time. If a
-+	timeout value is provided, then the advertising Instance will be
-+	automatically removed when the timeout passes. The value for the
-+	timeout is in seconds. Powering down a controller will invalidate
-+	all advertising Instances and it is not possible to add a new
-+	Instance with a timeout when the controller is powered down.
-+
-+	When a Timeout is provided, then the Duration subtracts from
-+	the actual Timeout value of that Instance. For example an Instance
-+	with Timeout of 5 and Duration of 2 will be scheduled exactly 3
-+	times, twice with 2 seconds and once with one second. Other
-+	Instances have no influence on the Timeout.
-+
-+	MinInterval and MaxInterval define the minimum and maximum advertising
-+	intervals, with units as number of .625ms advertising slots. The Max
-+	interval is expected to be greater than or equal to the Min interval,
-+	and both must have values in the range [0x000020, 0xFFFFFF]. If either
-+	condition is not met, the registration will fail.
-+
-+	The provided Tx Power parameter will only be used if the controller
-+	supports it, which can be determined by the presence of the
-+	CanSetTxPower member of the Read Advertising Features command.
-+
-+	The acceptable range for requested Tx Power is defined in the spec
-+	(Version 5.2 | Vol 4, Part E, page 2585) to be [-127, +20] dBm, and the
-+	controller will select a power value up to the requested one. The
-+	transmission power selected by the controller is not guaranteed
-+	to match the requested one, but the caller can determine the power
-+	chosen by the controller by listening for the Tx Power Selected MGMT
-+	event that follows this command. If the requested Tx Power is outside
-+	the valid range, the registration will fail.
-+
-+	Re-adding an already existing instance (i.e. issuing the Add Extended
-+	Advertising Parameters command with an Instance identifier of an
-+	existing instance) will update that instance's configuration.
-+
-+	An instance being added or changed while another instance is
-+	being advertised will not be visible immediately but only when
-+	the new/changed instance is being scheduled by the round robin
-+	advertising algorithm.
-+
-+	Changes to an instance that is currently being advertised will
-+	cancel that instance and switch to the next instance. The changes
-+	will be visible the next time the instance is scheduled for
-+	advertising. In case a single instance is active, this means
-+	that changes will be visible right away.
-+
-+	LE must already be enabled, and the controller must be powered,
-+	otherwise a "rejected" status will be returned.
-+
-+	This command generates a Command Complete event on success or a
-+	Command Status event on failure.
-+
-+	Possible errors:	Failed
-+				Rejected
-+				Not Supported
-+				Invalid Parameters
-+				Busy
-+
-+
-+Add Extended Advertising Data Command
-+=======================
-+
-+	Command Code:		0x0055
-+	Controller Index:	<controller id>
-+	Command Parameters:	Instance (1 Octet)
-+				Advertising Data Length (1 Octet)
-+				Scan Response Length (1 Octet)
-+				Advertising Data (0-255 Octets)
-+				Scan Response (0-255 Octets)
-+	Return Parameters:	Instance (1 Octet)
-+
-+	The Add Extended Advertising Data command is used to update the
-+	advertising data of an existing advertising instance known to the
-+	kernel. It is expected to be called after an Add Extended Advertising
-+	Parameters command, as part of the advertisement registration
-+	process.
-+
-+	If extended advertising is available, this call will initiate HCI
-+	commands to set the instance's advertising data, set scan response
-+	data, and then enable the instance. If extended advertising is
-+	unavailable, the advertising instance structure maintained in kernel
-+	will have its advertising data and scan response updated, and the
-+	instance will either be scheduled immediately or left in the queue
-+	for later advertisement as part of round-robin advertisement rotation
-+	in software.
-+
-+	If Scan_Rsp_Len is zero and the flags defined in Add Extended
-+	Advertising Parameters command do not have connectable flag set and
-+	the global connectable setting is off, then non-connectable
-+	advertising is used. If Scan_Rsp_Len is larger than zero and
-+	connectable flag is not set and the global advertising is off,
-+	then scannable advertising is used. This small difference is
-+	supported to provide less air traffic for devices implementing
-+	broadcaster role.
-+
-+	If the Instance provided does not match a known instance, or if the
-+	provided advertising data or scan response are in an unrecognized
-+	format, an "Invalid Parameters" status will be returned.
-+
-+	If a "Set LE" or Advertising command is still in progress, a "Busy"
-+	status will be returned.
-+
-+	If the controller is not powered, a "rejected" status will be returned.
-+
-+	This command generates a Command Complete event on success or a
-+	Command Status event on failure.
-+
-+	Possible errors:	Failed
-+				Rejected
-+				Invalid Parameters
-+				Busy
-+
-+
-+Read Controller Capabilities Command
-+====================================
-+
-+	Command Code:		0x0056
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Parameter1 {
-+					Capability_Tag (2 Octet)
-+					Value_Length (1 Octet)
-+					Value (0-255 Octets)
-+				}
-+				Parameter2 { }
-+				...
-+
-+	This command is used to read a list of controller capabilities.
-+
-+	Currently defined Capability_Tag values are:
-+
-+		0x0000	Minimum Supported LE Tx Power (dBm)
-+		0x0001	Maximum Supported LE Tx Power (dBm)
-+
-+
- Command Complete Event
- ======================
- 
-@@ -4577,3 +4806,17 @@ Advertisement Monitor Removed Event
- 
- 	The event will only be sent to management sockets other than the
- 	one through which the command was sent.
-+
-+
-+Advertisement Tx Power Selected Event
-+===================================
-+
-+	Event Code:		0x002f
-+	Controller Index:	<controller id>
-+	Event Parameters:	Instance (1 Octet)
-+				TxPower (1 Octet)
-+
-+	This event indicates that the controller selected a transmission
-+	power for an advertising instance. The event is emitted on platforms
-+	that support extended advertising after an Add Extended Advertising
-+	Parameters command is submitted.
-\ No newline at end of file
+> A sample crash stack trace from Chrome OS:
+> * thread #1, stop reason = signal SIGSEGV
+>   * frame #0: 0x0c64f0e8 bluetoothd`queue_remove_all at queue.c:351
+>     frame #1: 0x0c64f086 bluetoothd`queue_destroy at queue.c:73
+>     frame #2: 0x0c6022b0 bluetoothd`setup_unref at a2dp.c:222
+>     frame #3: 0x0c604942 bluetoothd`transport_cb at a2dp.c:2229
+>     frame #4: 0x0c61e35c bluetoothd`accept_cb at btio.c:203
+>     frame #5: 0xf679523c libglib-2.0.so.0`g_main_context_dispatch at gmain.c:3182
+>     frame #6: 0xf67954aa libglib-2.0.so.0`g_main_context_iterate at gmain.c:3920
+>     frame #7: 0xf679569a libglib-2.0.so.0`g_main_loop_run at gmain.c:4116
+>     frame #8: 0x0c65a5a0 bluetoothd`mainloop_run at mainloop-glib.c:79
+>     frame #9: 0x0c65a7ea bluetoothd`mainloop_run_with_signal at mainloop-notify.c:201
+>     frame #10: 0x0c6477ec bluetoothd`main at main.c:772
+>     frame #11: 0xf65bc0a2 libc.so.6`__libc_start_main at libc-start.c:308
+>
+> ---
+>  profiles/audio/a2dp.c  | 24 ++++++++++++++++--------
+>  profiles/audio/avdtp.c | 17 +++++++++++++++++
+>  profiles/audio/avdtp.h |  3 +++
+>  3 files changed, 36 insertions(+), 8 deletions(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 2feea66c0..9e96f8c4b 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -927,10 +927,16 @@ static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+>         else
+>                 DBG("Source %p: Open_Ind", sep);
+>
+> +       if (avdtp_stream_get_pending_open_data(stream)) {
+> +               warn("Pending open data already exists");
+> +               return FALSE;
+> +       }
+> +
+
+Not really clear why you need to check if there is a setup already in
+pending state here, if that is the case then that should be fixed in
+avdtp.c since it is not support to call open again if it is already
+pending.
+
+>         setup = a2dp_setup_get(session);
+>         if (!setup)
+>                 return FALSE;
+>
+> +       avdtp_stream_set_pending_open_data(stream, setup);
+
+Id like this to be handle generically in with something like:
+
+avdtp_stream_set_user_data(session, setup, destroy)
+setup = avdtp_stream_get_user_data(session)
+
+This should avoid lookups in the likes of a2dp_setup_get and ensure
+that the setup lifetime is tied to the stream.
+
+>         setup->stream = stream;
+>
+>         if (!err && setup->chan)
+> @@ -1285,14 +1291,13 @@ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+>                         void *user_data)
+>  {
+>         struct a2dp_sep *a2dp_sep = user_data;
+> -       struct a2dp_setup *setup;
+> +       struct a2dp_setup *setup = avdtp_stream_get_pending_open_data(stream);
+
+Abort can be called while in configured state as well, anyway if we go
+ahead with the idea of attaching the setup to the avdtp_stream then
+this would be just a matter of calling avdtp_stream_get_user_data.
+
+>
+>         if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+>                 DBG("Sink %p: Abort_Cfm", sep);
+>         else
+>                 DBG("Source %p: Abort_Cfm", sep);
+>
+> -       setup = find_setup_by_session(session);
+>         if (!setup)
+>                 return;
+>
+> @@ -1302,6 +1307,7 @@ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+>         }
+>
+>         setup_unref(setup);
+> +       avdtp_stream_set_pending_open_data(stream, NULL);
+
+This would then be avdtp_stream_set_user_data(stream, NULL, NULL), or
+better yet wait the destroy function to be called which should then do
+setup_unref to destroy the setup.
+
+>  }
+>
+>  static gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+> @@ -2216,11 +2222,12 @@ fail:
+>
+>  static void transport_cb(GIOChannel *io, GError *err, gpointer user_data)
+>  {
+> -       struct a2dp_setup *setup = user_data;
+> +       struct avdtp_stream *stream = user_data;
+> +       struct a2dp_setup *setup = avdtp_stream_get_pending_open_data(stream);
+>         uint16_t omtu, imtu;
+>
+> -       if (!g_slist_find(setups, setup)) {
+> -               warn("bt_io_accept: setup %p no longer valid", setup);
+> +       if (!setup) {
+> +               warn("transport_cb: pending open data does not exist");
+>                 g_io_channel_shutdown(io, TRUE, NULL);
+>                 return;
+>         }
+> @@ -2238,8 +2245,7 @@ static void transport_cb(GIOChannel *io, GError *err, gpointer user_data)
+>                 goto drop;
+>         }
+>
+> -       if (!avdtp_stream_set_transport(setup->stream,
+> -                                       g_io_channel_unix_get_fd(io),
+> +       if (!avdtp_stream_set_transport(stream, g_io_channel_unix_get_fd(io),
+>                                         imtu, omtu))
+>                 goto drop;
+>
+> @@ -2249,6 +2255,7 @@ static void transport_cb(GIOChannel *io, GError *err, gpointer user_data)
+>         setup->io = NULL;
+>
+>         setup_unref(setup);
+> +       avdtp_stream_set_pending_open_data(stream, NULL);
+
+Ditto.
+
+>         return;
+>
+> @@ -2297,7 +2304,8 @@ static void confirm_cb(GIOChannel *io, gpointer data)
+>                         goto drop;
+>                 }
+>
+> -               if (!bt_io_accept(io, transport_cb, setup, NULL, &err)) {
+> +               if (!bt_io_accept(io, transport_cb, setup->stream, NULL,
+> +                                       &err)) {
+>                         error("bt_io_accept: %s", err->message);
+>                         g_error_free(err);
+>                         goto drop;
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 782268c08..74b9f8dfa 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -366,6 +366,8 @@ struct avdtp_stream {
+>         GSList *caps;
+>         GSList *callbacks;
+>         struct avdtp_service_capability *codec;
+> +       void *pending_open_data;        /* Data when the transport channel
+> +                                        * opening is pending */
+>         guint io_id;            /* Transport GSource ID */
+>         guint timer;            /* Waiting for other side to close or open
+>                                  * the transport channel */
+> @@ -727,6 +729,11 @@ static void stream_free(void *data)
+>         g_slist_free_full(stream->callbacks, g_free);
+>         g_slist_free_full(stream->caps, g_free);
+>
+> +       /* pending_open_data must have been unref-ed and unset before freeing
+> +        * avdtp_stream. Otherwise, it is a reference leak bug.
+> +        */
+> +       assert(!stream->pending_open_data);
+> +
+>         g_free(stream);
+>  }
+>
+> @@ -3147,6 +3154,16 @@ struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
+>         return NULL;
+>  }
+>
+> +void avdtp_stream_set_pending_open_data(struct avdtp_stream *stream, void *data)
+> +{
+> +       stream->pending_open_data = data;
+> +}
+> +
+> +void *avdtp_stream_get_pending_open_data(struct avdtp_stream *stream)
+> +{
+> +       return stream->pending_open_data;
+> +}
+> +
+>  gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
+>                                                 size_t imtu, size_t omtu)
+>  {
+> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> index 011fea89e..92ce65ed3 100644
+> --- a/profiles/audio/avdtp.h
+> +++ b/profiles/audio/avdtp.h
+> @@ -260,6 +260,9 @@ gboolean avdtp_stream_has_capabilities(struct avdtp_stream *stream,
+>                                         GSList *caps);
+>  struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
+>                                                 struct avdtp_stream *stream);
+> +void avdtp_stream_set_pending_open_data(struct avdtp_stream *stream,
+> +                                       void *data);
+> +void *avdtp_stream_get_pending_open_data(struct avdtp_stream *stream);
+>
+>  unsigned int avdtp_add_state_cb(struct btd_device *dev,
+>                                 avdtp_session_state_cb cb, void *user_data);
+> --
+> 2.26.2
+>
+
+
 -- 
-2.28.0.618.gf4bc123cb7-goog
-
+Luiz Augusto von Dentz
