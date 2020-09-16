@@ -2,131 +2,141 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AAF7C43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 22:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F81C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 22:40:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3603A22227
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 22:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCBFE2087D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 22:40:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bHdM/kQn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H3r6+T3l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726760AbgIPWif (ORCPT
+        id S1726489AbgIPWkO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 18:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
+        Wed, 16 Sep 2020 18:40:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbgIPWie (ORCPT
+        with ESMTP id S1726187AbgIPWkN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 18:38:34 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D7CC06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:38:34 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id q13so59630ejo.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:38:34 -0700 (PDT)
+        Wed, 16 Sep 2020 18:40:13 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0096CC06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:40:12 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id j2so200042eds.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FA/vn/pf1ZmH6gVwWqHYRwnpefavwAOiKTwEHHpEftE=;
-        b=bHdM/kQnKvHwc1ZN+MIc2/ajoKWIMMQtMUTFw2OeqV00Mu0JR46km0ENl9gQ0V5Sc/
-         aQM8L0+vdwxiDiPeP4G0Cux2XOyj0mWoEVbyYNw09USRS1PGEF2GV+Px3t+VQQ6Bq0hM
-         Ahxu72v7CzmkJJrMDO5Qom6LsvxvVDTdRo3DU=
+        bh=Gv5Ym7Y65u7UpAXs48lxQYYvj7ha6lG/xcFtbTRD8zI=;
+        b=H3r6+T3lprSi9LqwoZJK0zuMM9U8FaF/TNFQbuwOTd5OvetcZ6kPTEIbjnl8Ma7QVn
+         st1OLTsPVcGlIsGPOGpCRbTpY/o5hH2XhNmjlNHwvP0kgs7zcZZV1be8+rerIjAmDXpx
+         sO3M3DuF5/ps6BjVRJDuGOLGrsOGcdyafsM7A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FA/vn/pf1ZmH6gVwWqHYRwnpefavwAOiKTwEHHpEftE=;
-        b=TY3qhlRQ+I2V2bqzROlFoGKM2l7cjH2VWsqiedqJZ6jdIonhrGSiDoyKKe0ICEMely
-         BeNEqTImSgZAOUjpud/yBepEbIs2a/UDvg4XiufdtGoNp+K9fzYidBxXekFnPnuZgaAs
-         AgB+s8KQStQCYuX+cXItaXCasppql+v0vSOVpl7IIfm544k3rcmWjsrqARUrgnXomNyI
-         2Xlsd60SAnTZPSaLlaZo0J9e2oKG9ZdQ7klfeyAW4mediwTKrWSuMcrPGBY1eFU6DYBw
-         b/8w/Ofseq687qK6Ainez/Mis3cMV3AufmaB9TnmQrbsXxfZLD3Dja9ypbUz3uv3ohFr
-         Mf9w==
-X-Gm-Message-State: AOAM5305gwUUZI/hLJGtCIZg39nh7ltU0lyLW/pneXl81YQDE81+SZzP
-        Nw36SNGAafdfjqQvdbbV/M/OMKDid2bNGA==
-X-Google-Smtp-Source: ABdhPJw53kG0ZTuX/E9hYMV/Lsu1cXxmoy/NffJJ8CW81facYzBOFP5uqrEqCKYBhHgbZ5bOLN4G2g==
-X-Received: by 2002:a17:907:20d0:: with SMTP id qq16mr4677571ejb.65.1600295907974;
-        Wed, 16 Sep 2020 15:38:27 -0700 (PDT)
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
-        by smtp.gmail.com with ESMTPSA id j10sm13450743ejf.116.2020.09.16.15.38.27
+        bh=Gv5Ym7Y65u7UpAXs48lxQYYvj7ha6lG/xcFtbTRD8zI=;
+        b=bA1MUP7vbeKLN4vD3iYCBbT1AtRCUVaXR+vpWLOrz/Ms0CBKFHsrDsdKN0ge5T3LV8
+         IAFQHxHCYVlXqy3j7NUjCGLDQZFRV2e/KcY3RevfUNLErZ1q52SajbZYL6pe27ekge7Z
+         wRu/ZZSFraI5Q36Fq6aJG7TTOf/Kl61rmHvBaTJRGdceEJWCoS+R77tD4d1NIBzV1LoC
+         K4u1fhtq6xyv3r5ioOXKgE37IDJG6c/X9dP/fEXtBE/VKdXNlxH34Vyy9WRWGa2Ejb+A
+         CT07pGHwntcVXdAY+3ZFTwoRf7HehpsESVEIUSAC8jFuJU3LGE8XLYBwy8qSpplzpyuh
+         3xvQ==
+X-Gm-Message-State: AOAM530aBUxoVkqQfOqk/UbgQYO/HZeREE7oBHvVJBCORrJ9XG3zxcR9
+        odS5BKBrzlCySx0wWKMEOrk0Wk/YqxBnQw==
+X-Google-Smtp-Source: ABdhPJzxK/0kyalzBSHSAUWK8lbvtWwkMQeDWEvdI0Wwt1hLepZFo6a1lXGKcJ/78nYcIm0MirQaPg==
+X-Received: by 2002:aa7:c054:: with SMTP id k20mr30373740edo.224.1600296011255;
+        Wed, 16 Sep 2020 15:40:11 -0700 (PDT)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com. [209.85.128.47])
+        by smtp.gmail.com with ESMTPSA id cf7sm15036479edb.78.2020.09.16.15.40.10
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Sep 2020 15:38:27 -0700 (PDT)
-Received: by mail-wr1-f54.google.com with SMTP id g4so8491308wrs.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:38:27 -0700 (PDT)
-X-Received: by 2002:a5d:5307:: with SMTP id e7mr5881775wrv.215.1600295906572;
- Wed, 16 Sep 2020 15:38:26 -0700 (PDT)
+        Wed, 16 Sep 2020 15:40:10 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id e17so128647wme.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 15:40:10 -0700 (PDT)
+X-Received: by 2002:a05:600c:2312:: with SMTP id 18mr601790wmo.141.1600296009905;
+ Wed, 16 Sep 2020 15:40:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200821061643.16278-1-sonnysasaka@chromium.org>
-In-Reply-To: <20200821061643.16278-1-sonnysasaka@chromium.org>
+References: <20200814190909.361764-1-sonnysasaka@chromium.org>
+In-Reply-To: <20200814190909.361764-1-sonnysasaka@chromium.org>
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Wed, 16 Sep 2020 15:38:15 -0700
-X-Gmail-Original-Message-ID: <CAO271m=UWgjM1nLWzrwfvG4r3V7c6wdPDJk7EvRtW4cgsLXqhg@mail.gmail.com>
-Message-ID: <CAO271m=UWgjM1nLWzrwfvG4r3V7c6wdPDJk7EvRtW4cgsLXqhg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gatt: StartNotify is not allowed when device is disconnecting
+Date:   Wed, 16 Sep 2020 15:39:58 -0700
+X-Gmail-Original-Message-ID: <CAO271m=+2vqnmWK=M5ySfSYYBsKqAJbjmCDnjj4C_BxD3vQ5gQ@mail.gmail.com>
+Message-ID: <CAO271m=+2vqnmWK=M5ySfSYYBsKqAJbjmCDnjj4C_BxD3vQ5gQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix auto-creation of hci_conn at Conn
+ Complete event
 To:     BlueZ <linux-bluetooth@vger.kernel.org>
-Cc:     Joseph Hwang <josephsih@chromium.org>
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear BlueZ maintainers,
+Dear maintainers,
 
 Friendly ping to review this patch. Thanks!
 
-
-On Thu, Aug 20, 2020 at 11:17 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+On Fri, Aug 14, 2020 at 12:09 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 >
-> From: Joseph Hwang <josephsih@chromium.org>
+> Currently the code auto-creates hci_conn only if the remote address has
+> been discovered before. This may not be the case. For example, the
+> remote device may trigger connection after reboot at already-paired
+> state so there is no inquiry result found, but it is still correct to
+> create the hci_conn when Connection Complete event is received.
 >
-> This patch fixed a bluetoothd crash in register_notify_cb(). The
-> crash is incurred by an exception that under some situation, a
-> characteristic may be freed when register_notify_cb() is invoked.
+> A better guard is to check against bredr allowlist. Devices in the
+> allowlist have been given permission to auto-connect.
 >
-> When a device is disconnecting, the device interface would hold valid
-> for a while until the disconnection procedure between the client and
-> the server is completed. If another process happens to request to start
-> notification of a characteristic on the disconnecting device, it may
-> incur a problem. In this case, the client would still send the
-> StartNotify request since the characteristic object is still valid.
-> However, the characteristic may be freed soon and become invalid
-> when the corresponding callback function is invoked later. This
-> leads to the bluetoothd crash due to the segmentation fault.
->
-> To handle the exception, if another process requests to start
-> notification when the device is disconnecting, it should reject the
-> request.
->
-> Tested on Chrome OS that this patch fixes bluetoothd crash in
-> register_notify_cb().
+> Fixes: 4f40afc6c764 ("Bluetooth: Handle BR/EDR devices during suspend")
+> Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 >
 > ---
->  src/gatt-client.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  net/bluetooth/hci_event.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 >
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 20c3fbec2..c706307c7 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1545,6 +1545,12 @@ static DBusMessage *characteristic_start_notify(DBusConnection *conn,
->         const char *sender = dbus_message_get_sender(msg);
->         struct async_dbus_op *op;
->         struct notify_client *client;
-> +       struct btd_device *device = chrc->service->client->device;
-> +
-> +       if (device_is_disconnecting(device)) {
-> +               error("Device is disconnecting. StartNotify is not allowed.");
-> +               return btd_error_not_connected(msg);
-> +       }
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 33d8458fdd4a..6b83da1790ee 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2566,7 +2566,6 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+>         struct hci_ev_conn_complete *ev = (void *) skb->data;
+> -       struct inquiry_entry *ie;
+>         struct hci_conn *conn;
 >
->         if (chrc->notify_io)
->                 return btd_error_not_permitted(msg, "Notify acquired");
+>         BT_DBG("%s", hdev->name);
+> @@ -2575,13 +2574,19 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>
+>         conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
+>         if (!conn) {
+> -               /* Connection may not exist if auto-connected. Check the inquiry
+> -                * cache to see if we've already discovered this bdaddr before.
+> -                * If found and link is an ACL type, create a connection class
+> +               /* Connection may not exist if auto-connected. Check the bredr
+> +                * allowlist to see if this device is allowed to auto connect.
+> +                * If link is an ACL type, create a connection class
+>                  * automatically.
+> +                *
+> +                * Auto-connect will only occur if the event filter is
+> +                * programmed with a given address. Right now, event filter is
+> +                * only used during suspend.
+>                  */
+> -               ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
+> -               if (ie && ev->link_type == ACL_LINK) {
+> +               if (ev->link_type == ACL_LINK &&
+> +                   hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+> +                                                     &ev->bdaddr,
+> +                                                     BDADDR_BREDR)) {
+>                         conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr,
+>                                             HCI_ROLE_SLAVE);
+>                         if (!conn) {
 > --
 > 2.26.2
 >
