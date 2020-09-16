@@ -2,88 +2,204 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDAAC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 09:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB10C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 18:02:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92B6B21D43
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 09:06:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600247209;
-	bh=Dfwbci88DTkyCRzDTgwvZH7qGaycD4hKjVm1q2R6nDI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZG+512nesLGL4/QhD0MAboNrqb1Ejz4wvL3J02XMQPHVlvwU6LGZs5eY0Q6FSmUjr
-	 FIYd4Sm3yU8zaAdnLhwFqzObO+PJP9FGgr6ZJCn2YKXGWWM4PcnhW2P06qgCnijMcO
-	 VVDLLQdCnQc3F1iYBNN6rN8D1ITZYlJ7Eiyl4Z0g=
+	by mail.kernel.org (Postfix) with ESMTP id C25A020872
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 18:02:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RAv+Zcfp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgIPJGe (ORCPT
+        id S1727780AbgIPSCr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 05:06:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46238 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726129AbgIPJGb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 05:06:31 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B20F921974;
-        Wed, 16 Sep 2020 09:06:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600247190;
-        bh=Dfwbci88DTkyCRzDTgwvZH7qGaycD4hKjVm1q2R6nDI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bsWQuzvWoVSuUq700Adg7BMCU+7Pad8dakDZORQGKVPwk48j/EqXdFnRrGzLT44TS
-         oWbbT033KjoAt97oXXS1a6qmCQwJ9WUqELN0czuU7AO8AfvZBv/JXdcnYCjj9M+5kf
-         GQRn/mLUWDrHjqL9HyfVntGTUcmgZZMahsKZZ84w=
-Date:   Wed, 16 Sep 2020 11:06:41 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     himadrispandya@gmail.com, dvyukov@google.com,
-        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
-        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 04/11] USB: core: hub.c: use usb_control_msg_send() in
- a few places
-Message-ID: <20200916090641.GA710715@kroah.com>
-References: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
- <20200914153756.3412156-5-gregkh@linuxfoundation.org>
- <20200914180616.GB972479@rowland.harvard.edu>
+        Wed, 16 Sep 2020 14:02:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37998 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727775AbgIPSCd (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 16 Sep 2020 14:02:33 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049B3C061788
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 11:02:31 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id k15so4409618pfc.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 11:02:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oKK+R4vB+7dRT25SkGFNImJ3MtLBDRDqIznhx0nRzAs=;
+        b=RAv+ZcfpNEyAbGataYWi56XvH+C0d2XlA3emc1lqWb35HAVu5yFwWC1CUAL88Z3rz8
+         O113BD6SSZ7xE1R6gCYR+5Uiv8Wz4wRppiA+tTQym8I/NnqdG+l6StU2B0twqgdGYvAS
+         wUJLqUDnBrTeDpBjWcEAif4I6ydTNJmouwBy4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oKK+R4vB+7dRT25SkGFNImJ3MtLBDRDqIznhx0nRzAs=;
+        b=SVAUL3y72DRxq5z/i8dAqCu066LHHJco9/mFVnTYNov44DDYx0x+s+N2QlYD+VYoMR
+         aOeUqvy8UuaFLrii1mjcKg9SXwXHiKW/JNtxuCfetKu0BzEWprWFCciD3LZTAILEFvFj
+         YtP+fV5gyUPV53XKwlTrOd5y4XpnXKox9kd6BcgR7fv8ungPtbv39D7+SCnZ7iQteTO5
+         7WseGDEo1rwmWg7BSZI/p4r+1WkJmCNyW+ZUiaRuuMr1psMLO1i5spLR999twVSAfQlY
+         HMR+BpRs2xN2V3Nss2IEZTY5giK14GG21cLthKFlWBJsYp5fDCfQoN7BgAKBP73EeLIU
+         q5Bg==
+X-Gm-Message-State: AOAM5328rYZZEh5lR4GMsgKKy3MG4ILUi1FIFsMUi22W3HsqwahWpWMK
+        vInf1fYSEAvgVnfyki+OHzGMgQ==
+X-Google-Smtp-Source: ABdhPJyByD4aTCPLAJcpe/mnCOM1dCgtz7cfGxhzyAuNU3s+nJ2bpn6PbSwbInUI7LZr3ekI7PjsjQ==
+X-Received: by 2002:a62:3044:0:b029:142:2501:398b with SMTP id w65-20020a6230440000b02901422501398bmr7496943pfw.80.1600279350855;
+        Wed, 16 Sep 2020 11:02:30 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:f693:9fff:fef4:e70a])
+        by smtp.gmail.com with ESMTPSA id z1sm17315402pfz.70.2020.09.16.11.02.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Sep 2020 11:02:30 -0700 (PDT)
+Date:   Wed, 16 Sep 2020 11:02:29 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org
+Subject: Re: [PATCH v1] Bluetooth: Use NVM files based on SoC ID for WCN3991
+Message-ID: <20200916180229.GA3560556@google.com>
+References: <1600184605-31611-1-git-send-email-gubbaven@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200914180616.GB972479@rowland.harvard.edu>
+In-Reply-To: <1600184605-31611-1-git-send-email-gubbaven@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 02:06:16PM -0400, Alan Stern wrote:
-> On Mon, Sep 14, 2020 at 05:37:49PM +0200, Greg Kroah-Hartman wrote:
-> > There are a few calls to usb_control_msg() that can be converted to use
-> > usb_control_msg_send() instead, so do that in order to make the error
-> > checking a bit simpler and the code smaller.
-> > 
-> > Cc: Alan Stern <stern@rowland.harvard.edu>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > v3:
-> >  - drop change in usb_enable_link_state() as it was not needed now
-> >    thanks to review from Alan
-> >  - minor changes requested by checkpatch.pl
-> > 
-> > v2:
-> >  - dropped changes to usb_req_set_sel() thanks to review from Alan
-> > 
-> >  drivers/usb/core/hub.c | 99 +++++++++++++++++-------------------------
-> >  1 file changed, 40 insertions(+), 59 deletions(-)
+Hi Venkata,
+
+I agree with Marcel that the version magic is confusing ...
+
+On Tue, Sep 15, 2020 at 09:13:25PM +0530, Venkata Lakshmi Narayana Gubba wrote:
+> This change will allow to use different NVM file based
+> on WCN3991 BT SoC ID.Need to use different NVM file based on
+> fab location for WCN3991 BT SoC.
 > 
-> Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> ---
+>  drivers/bluetooth/btqca.c   | 41 +++++++++++++++++++++++++----------------
+>  drivers/bluetooth/btqca.h   | 13 ++++++++-----
+>  drivers/bluetooth/hci_qca.c | 11 +++++------
+>  3 files changed, 38 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index ce9dcff..a7e72f1 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -14,12 +14,11 @@
+>  
+>  #define VERSION "0.1"
+>  
+> -int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+> +int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+>  			 enum qca_btsoc_type soc_type)
+>  {
+>  	struct sk_buff *skb;
+>  	struct edl_event_hdr *edl;
+> -	struct qca_btsoc_version *ver;
+>  	char cmd;
+>  	int err = 0;
+>  	u8 event_type = HCI_EV_VENDOR;
+> @@ -70,9 +69,9 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+>  	}
+>  
+>  	if (soc_type >= QCA_WCN3991)
+> -		memmove(&edl->data, &edl->data[1], sizeof(*ver));
+> -
+> -	ver = (struct qca_btsoc_version *)(edl->data);
+> +		memcpy(ver, &edl->data[1], sizeof(*ver));
+> +	else
+> +		memcpy(ver, &edl->data, sizeof(*ver));
+>  
+>  	bt_dev_info(hdev, "QCA Product ID   :0x%08x",
+>  		    le32_to_cpu(ver->product_id));
+> @@ -83,13 +82,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+>  	bt_dev_info(hdev, "QCA Patch Version:0x%08x",
+>  		    le16_to_cpu(ver->patch_ver));
+>  
+> -	/* QCA chipset version can be decided by patch and SoC
+> -	 * version, combination with upper 2 bytes from SoC
+> -	 * and lower 2 bytes from patch will be used.
+> -	 */
+> -	*soc_version = (le32_to_cpu(ver->soc_id) << 16) |
+> -		       (le16_to_cpu(ver->rom_ver) & 0x0000ffff);
+> -	if (*soc_version == 0)
+> +	if (le32_to_cpu(ver->soc_id) == 0 || le16_to_cpu(ver->rom_ver) == 0)
+>  		err = -EILSEQ;
+>  
+>  out:
+> @@ -446,15 +439,25 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>  
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> -		   enum qca_btsoc_type soc_type, u32 soc_ver,
+> +		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+>  		   const char *firmware_name)
+>  {
+>  	struct qca_fw_config config;
+>  	int err;
+>  	u8 rom_ver = 0;
+> +	u32 soc_ver;
+>  
+>  	bt_dev_dbg(hdev, "QCA setup on UART");
+>  
+> +	/* QCA chipset version can be decided by patch and SoC
+> +	 * version, combination with upper 2 bytes from SoC
+> +	 * and lower 2 bytes from patch will be used.
+> +	 */
+> +	soc_ver = (le32_to_cpu(ver.soc_id) << 16) |
+> +		       (le16_to_cpu(ver.rom_ver) & 0x0000ffff);
+> +
 
-Thanks for the review!
+Can we at least do the leN_to_cpu conversions in qca_read_soc_version()
+as previously to make this less clunky?
 
-greg k-h
+And/or define a macro to extract 'soc_ver' to unclunkify this further.
+
+> +	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> +
+>  	config.user_baud_rate = baudrate;
+>  
+>  	/* Download rampatch file */
+> @@ -491,9 +494,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	if (firmware_name)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/%s", firmware_name);
+> -	else if (qca_is_wcn399x(soc_type))
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/crnv%02x.bin", rom_ver);
+> +	else if (qca_is_wcn399x(soc_type)) {
+> +		if (ver.soc_id == QCA_WCN3991_SOC_ID) {
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/crnv%02xu.bin", rom_ver);
+> +		} else {
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/crnv%02x.bin", rom_ver);
+> +		}
+> +	}
+>  	else if (soc_type == QCA_QCA6390)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/htnv%02x.bin", rom_ver);
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index d81b74c..d01a9f5 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -34,6 +34,8 @@
+>  #define QCA_HCI_CC_OPCODE		0xFC00
+>  #define QCA_HCI_CC_SUCCESS		0x00
+>  
+> +#define QCA_WCN3991_SOC_ID		(0x40014320)
+
+The QCA_ prefix seems a bit verbose, given that this is a QCA driver and
+WCN3991 uniquely identifies the chip. Having the prefix just needlessly
+clutters conditions, I suggest to just call it SOC_ID_WCN3991.
