@@ -2,108 +2,88 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A66C43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 07:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDAAC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 09:06:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E66E32076C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 07:17:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="mYcGRXqi"
+	by mail.kernel.org (Postfix) with ESMTP id 92B6B21D43
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 09:06:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600247209;
+	bh=Dfwbci88DTkyCRzDTgwvZH7qGaycD4hKjVm1q2R6nDI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ZG+512nesLGL4/QhD0MAboNrqb1Ejz4wvL3J02XMQPHVlvwU6LGZs5eY0Q6FSmUjr
+	 FIYd4Sm3yU8zaAdnLhwFqzObO+PJP9FGgr6ZJCn2YKXGWWM4PcnhW2P06qgCnijMcO
+	 VVDLLQdCnQc3F1iYBNN6rN8D1ITZYlJ7Eiyl4Z0g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726359AbgIPHRW (ORCPT
+        id S1726571AbgIPJGe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 03:17:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49846 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726172AbgIPHRP (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 03:17:15 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7D5C061788
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 00:17:15 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id i196so1156129pgc.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 00:17:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=/616tPVzI5drLVga8v2z0esoWN1KtNkrALjdF3/yzcs=;
-        b=mYcGRXqib4+CZhdWggECEZywwDwXvzm0oXykEa2nbGDBPpfVPAXq0qGO2OvgTtqbaP
-         GT95PHs/sBRaPZDy9qEm1uxfpvW9OE9UeT+0CPO0fnL1c1erb7xsMPaUDib/pWn4m/Sh
-         VQ9//0W9OeaW0COezLyWapGW3XKk3YJGDqVPCrBZ5K5SZNu06kg1VFKsbzvXOrf5d/nL
-         LeVfu+zgobavmjem176REed1F95s4yEZuzZrefiGExABWUlmqWIGknBl+9Wrle4TSjAA
-         +eiFRW7etGRFj+X7nHZJoEHSfmkJNypPmYdpqNj41NCFl1rZGNsdNEhUc3cBGcUTWwsZ
-         QNPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=/616tPVzI5drLVga8v2z0esoWN1KtNkrALjdF3/yzcs=;
-        b=OADmBOPKv1wINQDO247yS4vwQ5FCeiCVa02SEBZSZc662QwmuSKSe8UdEZJj2evo3u
-         qoDOajojU9hENfpPbZRIqyH8s7AuC8a2K4U2M8nbkN3oGWToee6iI7rnmJJpygcC4OpG
-         +EbadDWc6gd7MoqFRzjVAFNZeG5hv7GIxqvLqPx1WKvZYFEphzJNFl0fLWcWPm7o6nxO
-         Q2WV8aTdXYeGpUEOvw0Iw5wqikKGSp+vuPEJ8tRJDUEKFgckas4uIdhYNPJkQBEEv1au
-         taVj6NnIZd0Of6qWW/TAJKk7XDfXQ5kRvSf0y4X6WKAvMBIblQN11IjEsQqpDPYcsR5D
-         NYPw==
-X-Gm-Message-State: AOAM531gVH99F49jL0f4C7s1IJubrnQevfnyW6lVXGWJV7TF2qNUMmlC
-        6Qugh+4MmHbzCklYO3LWw8Z2m+tdRW7HAaMSM6rxp3Gl+4YZpXk5R0QuSUSJuy3TrjV2e9WxO5r
-        Zgk/hymxhZfgdcs0wElHA0y0DBJ2lkqiVaxfCYM8pKOwutCa8u0xZBPWcv4BmOru0TUms3UHs0t
-        OAzponEaAVeSo=
-X-Google-Smtp-Source: ABdhPJw/o1x3aNHEkNFEfrNyiZeKO3ygZO3KZYnijBB8bR+9RY77lZseYqzaK4wYiwoK2oJjOmdWotWyslAXHj1Ubg==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a17:902:c14b:b029:d1:ec9a:aaae with
- SMTP id 11-20020a170902c14bb02900d1ec9aaaaemr2115689plj.62.1600240633333;
- Wed, 16 Sep 2020 00:17:13 -0700 (PDT)
-Date:   Wed, 16 Sep 2020 15:16:52 +0800
-In-Reply-To: <20200916151617.BlueZ.v5.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
-Message-Id: <20200916151617.BlueZ.v5.4.Ieffbe3452565ace2af46a63501c767c8798fd88c@changeid>
-Mime-Version: 1.0
-References: <20200916151617.BlueZ.v5.1.I8e067a74d324751fc788f53e0c14f60923683d01@changeid>
-X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [BlueZ PATCH v5 4/4] core: Add AdvertisementMonitor to bluetooth.conf
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.von.dentz@intel.com, mmandlik@chromium.org,
-        mcchou@chromium.org, alainm@chromium.org,
-        Howard Chung <howardchung@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 16 Sep 2020 05:06:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46238 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726129AbgIPJGb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 16 Sep 2020 05:06:31 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B20F921974;
+        Wed, 16 Sep 2020 09:06:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600247190;
+        bh=Dfwbci88DTkyCRzDTgwvZH7qGaycD4hKjVm1q2R6nDI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bsWQuzvWoVSuUq700Adg7BMCU+7Pad8dakDZORQGKVPwk48j/EqXdFnRrGzLT44TS
+         oWbbT033KjoAt97oXXS1a6qmCQwJ9WUqELN0czuU7AO8AfvZBv/JXdcnYCjj9M+5kf
+         GQRn/mLUWDrHjqL9HyfVntGTUcmgZZMahsKZZ84w=
+Date:   Wed, 16 Sep 2020 11:06:41 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     himadrispandya@gmail.com, dvyukov@google.com,
+        linux-usb@vger.kernel.org, perex@perex.cz, tiwai@suse.com,
+        stern@rowland.harvard.ed, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v3 04/11] USB: core: hub.c: use usb_control_msg_send() in
+ a few places
+Message-ID: <20200916090641.GA710715@kroah.com>
+References: <20200914153756.3412156-1-gregkh@linuxfoundation.org>
+ <20200914153756.3412156-5-gregkh@linuxfoundation.org>
+ <20200914180616.GB972479@rowland.harvard.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200914180616.GB972479@rowland.harvard.edu>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-AdvertisementMonitor must be included in bluetooth.conf in order to
-be able to call Release
+On Mon, Sep 14, 2020 at 02:06:16PM -0400, Alan Stern wrote:
+> On Mon, Sep 14, 2020 at 05:37:49PM +0200, Greg Kroah-Hartman wrote:
+> > There are a few calls to usb_control_msg() that can be converted to use
+> > usb_control_msg_send() instead, so do that in order to make the error
+> > checking a bit simpler and the code smaller.
+> > 
+> > Cc: Alan Stern <stern@rowland.harvard.edu>
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > ---
+> > v3:
+> >  - drop change in usb_enable_link_state() as it was not needed now
+> >    thanks to review from Alan
+> >  - minor changes requested by checkpatch.pl
+> > 
+> > v2:
+> >  - dropped changes to usb_req_set_sel() thanks to review from Alan
+> > 
+> >  drivers/usb/core/hub.c | 99 +++++++++++++++++-------------------------
+> >  1 file changed, 40 insertions(+), 59 deletions(-)
+> 
+> Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
 
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
----
+Thanks for the review!
 
-(no changes since v4)
-
-Changes in v4:
-- Remove PRE-UPSTREAM in commit title
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-
- src/bluetooth.conf | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 8a1e25801..b6c614908 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -10,6 +10,7 @@
-   <policy user="root">
-     <allow own="org.bluez"/>
-     <allow send_destination="org.bluez"/>
-+    <allow send_interface="org.bluez.AdvertisementMonitor1"/>
-     <allow send_interface="org.bluez.Agent1"/>
-     <allow send_interface="org.bluez.MediaEndpoint1"/>
-     <allow send_interface="org.bluez.MediaPlayer1"/>
--- 
-2.28.0.618.gf4bc123cb7-goog
-
+greg k-h
