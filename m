@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15190C43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D46C43461
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:17:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADE3121582
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15D0521582
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 20:17:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="EQRl+RIO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Cr0pbVi/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgIPURi (ORCPT
+        id S1728224AbgIPURy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 16:17:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58980 "EHLO
+        Wed, 16 Sep 2020 16:17:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728326AbgIPUQq (ORCPT
+        with ESMTP id S1727725AbgIPUQq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 16 Sep 2020 16:16:46 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B66AC061220
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 13:16:23 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id di5so5516499qvb.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 13:16:23 -0700 (PDT)
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4C0C06121E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 13:16:21 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id di5so5516448qvb.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 13:16:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=mV/LFuTshHzotksH3grmXFg7Xs0h6PleCimRLiw3IeY=;
-        b=EQRl+RIO/iMmVWfKcZ8ED17Om52TeR9DzT0HzQt62GI8XYzbTx4iSE/e53TWLeRrC4
-         SinrfVtyjrg8237Bs3Z5Y6SWftmvQrUM2sPw4RnMoJ5vk10M2ZWGgSsoXIBGfqPA3DZW
-         dRiCE4KtBUMZZNXBlXikUyz/9lx9HSLDr/p1IjtZnwFCNbEYGhOtEnek7cUlCDGJ81RW
-         byBJJkGtNWPwky/MpFaZ8fHoDZpF4odneqa6wytQFAdaoV5xhvHMH8Nm5kYI/J+BiSyH
-         BThka3ZSKn46911pMjZGg8Q+1xXtdHCnJDIMl/URjQcO3oXG6Fpo6hfqmf9FQwAApsZL
-         mGzw==
+        bh=JEGDhDy0i0NXGVogNpEKp6N3BhWlDVgJ1Ss+eXstDS8=;
+        b=Cr0pbVi/P8EJnHlXGCs6MoDzp6ikdg7g9weO0ajM9wg7h12zQtMVqRq8k4pOdQKwTb
+         7ftjslmmczWg8PBJagPtJ9YFKljqpRsM/Tq1mE0S7ct3bVlz2yJFplk3yr1yt2MbLFFh
+         48LtzIoHhTwfi9ZiDpbVked8e3L3fgkLP16LEULNLeCWqntrU0QbcLmJ/8a2u80xwM7j
+         6Dl/BYP5x0SzYNssjpzXI2IYFxcpiU/0FpYQ2LpioIDHCS+c+uLkt/PduxRB6VWXF3so
+         tpgSjCtFtmdz6ASPmJDX7nJNQGHGMqzE8n1J4lx33fvDS14475vkP83oGOYh/th9RkjT
+         03MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=mV/LFuTshHzotksH3grmXFg7Xs0h6PleCimRLiw3IeY=;
-        b=tLlgR8/VWwIJg4eO58wXER+8OkHlj9HieASLa4di3m5a40duWQ7Iv3b0A+m+rhkPE1
-         mZ/nPR5xzoYoKc7p5gyavK0WNd/tqhbRVNBz5g6GoSQW29jrBcHRo4NSt44Ju2IBqarv
-         OgBilYGJmg8s5Mb6g0jImsNECRlv4wtJrQ6PUAxi+mon2T94Zm87IhUZvtQSrFX+b+Sm
-         e3aL1e9/tLlCsZ4atkcUMWNPHVoH8RgWlyPMBPKffl1pY5FnqIZH/Vg81ou48V7ZItK8
-         15ryixKRF2hLASsJWMtByhnZ79pB8d6vnRFLFhVhWZCNfQJ2iWqQiQ0UJakFiSwpWrzE
-         NjRg==
-X-Gm-Message-State: AOAM530GRZ184EVblYinnAdok9HT3Slz/ovowvCb4vSE1/pdgTNooZ3O
-        JyWD00imF29pHNTWoyE58X2OtpCG/I3Ih4Sz6aCl0W3X71yGqPpX3oY/+CXDETku9YI6MoR8xIE
-        TdEOsJEvotPouViFpC38ozG8yYmvsoEtZe44L5yEe7A6d5uVO3Dlcu7LD1OgFxMM2SPOSjQLfWu
-        b3BGPtSk1QlZMbDTD1
-X-Google-Smtp-Source: ABdhPJx9rr/wInvexTzLGszPhP52de+s7E+VegnMknnOC50bFToSeEmk3oEZlbiKA9jVdE7FHbXQXJRUfSF8TKP5DSid
+        bh=JEGDhDy0i0NXGVogNpEKp6N3BhWlDVgJ1Ss+eXstDS8=;
+        b=a50XGjWSbwPkUYTKXDFF7XOgzE85viLlC4u8FHSpPadUCuen1J4+XPNNRXBmoywMhU
+         whRCpYukEx0NnlKcRUS5FczLVnE1FihXEDhKJ7LBI81PWsR59kC/nPXe/PAHlPIq79Dh
+         uLkoYmCebrSMJearPYYUQDZLsokMS617A8D7OkksAln+4zNrhMM2fyVhw9KkBEDBpbgB
+         0FQ4NFMzc4EdMKf7LFe4VS6t22C+9glwSAhJXOsage1Zk5DV/cmH2sh547NcDmQ/jkns
+         fF2jGFQFkTBOdh+0IIdT+fXbyfR3dSDBqInVEWki/NF0NhrnkE+X7uOHLC6vghOOMaN7
+         MNXQ==
+X-Gm-Message-State: AOAM5310Ewsf/9Tjq8WbRnrsi2i6s5QfJ4iNWvTdFssWoKgLlt0ABLK5
+        J0+n/gmb2goPJBainqX+B4zQN+thTXq3PLGBo9eYyapCK89SVuJljfKUU+GMFVBGeX0PKKiPU+U
+        Pbg1LEJEqEgMj+l1l5K720CuZR7DqIQ9nGOBkk8VZZiBITSFD2LbwLuC96wMWeZEXHXcxvS2LXf
+        WSrQDKH/UTgj/6NxQm
+X-Google-Smtp-Source: ABdhPJwRasF3+ybFhcwR2eBIZaGWRgKaYBBuDmJGK4uF+WJlagHiIvooM9IhAqq257N5hWKnFmDtqegPm4TTFBubAGKI
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a0c:c244:: with SMTP id
- w4mr25344793qvh.12.1600287382444; Wed, 16 Sep 2020 13:16:22 -0700 (PDT)
-Date:   Wed, 16 Sep 2020 13:16:02 -0700
+ (user=danielwinkler job=sendgmr) by 2002:ad4:58aa:: with SMTP id
+ ea10mr8827403qvb.58.1600287380260; Wed, 16 Sep 2020 13:16:20 -0700 (PDT)
+Date:   Wed, 16 Sep 2020 13:16:01 -0700
 In-Reply-To: <20200916201602.1223002-1-danielwinkler@google.com>
-Message-Id: <20200916131430.6.I5068c01cae3cea674a96e103a0cf4d8c81425a4f@changeid>
+Message-Id: <20200916131430.5.Ibedcb7af24f1c01a680de4cc8cc5a98951588393@changeid>
 Mime-Version: 1.0
 References: <20200916201602.1223002-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [PATCH 6/6] Bluetooth: Add MGMT command for controller capabilities
+Subject: [PATCH 5/6] Bluetooth: Query LE tx power on startup
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -80,114 +80,117 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-For advertising, we wish to know the LE tx power capabilities of the
-controller in userspace, so this patch adds a new MGMT command to query
-controller capabilities. The data returned is in TLV format, so it can
-be easily used to convey any data determined to be useful in the future,
-but for now it simply contains LE min and max tx power.
+Queries tx power via HCI_LE_Read_Transmit_Power command when the hci
+device is initialized, and stores resulting min/max LE power in hdev
+struct. If command isn't available (< BT5 support), min/max values
+both default to HCI_TX_POWER_INVALID.
 
-The change was tested by manually verifying that the new MGMT command
-returns the tx power range as expected in userspace.
+This patch is manually verified by ensuring BT5 devices correctly query
+and receive controller tx power range.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Signed-off-by: Daniel Winkler <danielwinkler@google.com>
 ---
 
- include/net/bluetooth/mgmt.h |  9 +++++++++
- net/bluetooth/mgmt.c         | 39 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
+ include/net/bluetooth/hci.h      |  7 +++++++
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         |  8 ++++++++
+ net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
+ 4 files changed, 35 insertions(+)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index db64cf4747554c..9aa792e5efc8d0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -815,6 +815,15 @@ struct mgmt_rp_add_ext_adv_data {
- 	__u8	instance;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c8e67042a3b14c..c1504aa3d9cfd5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1797,6 +1797,13 @@ struct hci_cp_le_set_adv_set_rand_addr {
+ 	bdaddr_t  bdaddr;
  } __packed;
  
-+#define MGMT_CAP_LE_TX_PWR_MIN	0x0000
-+#define MGMT_CAP_LE_TX_PWR_MAX	0x0001
-+
-+#define MGMT_OP_READ_CONTROLLER_CAP	0x0056
-+#define MGMT_OP_READ_CONTROLLER_CAP_SIZE	0
-+struct mgmt_rp_read_controller_cap {
-+	__u8     capabilities[0];
++#define HCI_OP_LE_READ_TRANSMIT_POWER	0x204b
++struct hci_rp_le_read_transmit_power {
++	__u8  status;
++	__s8  min_le_tx_power;
++	__s8  max_le_tx_power;
 +} __packed;
 +
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b9347ff1a1e961..d2e5bc4b3ddb8f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -124,6 +124,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_REMOVE_ADV_MONITOR,
- 	MGMT_OP_ADD_EXT_ADV_PARAMS,
- 	MGMT_OP_ADD_EXT_ADV_DATA,
-+	MGMT_OP_READ_CONTROLLER_CAP,
- };
+ #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
+ struct hci_rp_le_read_buffer_size_v2 {
+ 	__u8    status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 667b9d37099dec..c1f5b5c4109215 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -381,6 +381,8 @@ struct hci_dev {
+ 	__u16		def_page_timeout;
+ 	__u16		def_multi_adv_rotation_duration;
+ 	__u16		def_le_autoconnect_timeout;
++	__s8		min_le_tx_power;
++	__s8		max_le_tx_power;
  
- static const u16 mgmt_events[] = {
-@@ -181,6 +182,7 @@ static const u16 mgmt_untrusted_commands[] = {
- 	MGMT_OP_READ_EXP_FEATURES_INFO,
- 	MGMT_OP_READ_DEF_SYSTEM_CONFIG,
- 	MGMT_OP_READ_DEF_RUNTIME_CONFIG,
-+	MGMT_OP_READ_CONTROLLER_CAP,
- };
+ 	__u16		pkt_type;
+ 	__u16		esco_type;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3a2332f4a9bba2..6bff1c09be3b42 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -741,6 +741,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+ 		}
  
- static const u16 mgmt_untrusted_events[] = {
-@@ -4356,6 +4358,42 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
- 	return err;
++		if (hdev->commands[38] & 0x80) {
++			/* Read LE Min/Max Tx Power*/
++			hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
++				    0, NULL);
++		}
++
+ 		if (hdev->commands[26] & 0x40) {
+ 			/* Read LE White List Size */
+ 			hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE,
+@@ -3654,6 +3660,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->le_num_of_adv_sets = HCI_MAX_ADV_INSTANCES;
+ 	hdev->def_multi_adv_rotation_duration = HCI_DEFAULT_ADV_DURATION;
+ 	hdev->def_le_autoconnect_timeout = HCI_LE_AUTOCONN_TIMEOUT;
++	hdev->min_le_tx_power = HCI_TX_POWER_INVALID;
++	hdev->max_le_tx_power = HCI_TX_POWER_INVALID;
+ 
+ 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 9a24fd99d9e08e..beb35680f3a83a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1202,6 +1202,20 @@ static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
  }
  
-+static int read_controller_cap(struct sock *sk, struct hci_dev *hdev,
-+			       void *data, u16 len)
++static void hci_cc_le_read_transmit_power(struct hci_dev *hdev,
++					  struct sk_buff *skb)
 +{
-+	u8 i = 0;
++	struct hci_rp_le_read_transmit_power *rp = (void *)skb->data;
 +
-+	/* This command will return its data in TVL format. Currently we only
-+	 * wish to include LE tx power parameters, so this struct can be given
-+	 * a fixed size as data types are not changing.
-+	 */
-+	struct {
-+		struct mgmt_tlv entry;
-+		__s8 value;
-+	} __packed cap[2];
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
 +
-+	BT_DBG("request for %s", hdev->name);
-+	memset(cap, 0, sizeof(cap));
++	if (rp->status)
++		return;
 +
-+	hci_dev_lock(hdev);
-+
-+	/* Append LE tx power bounds */
-+	cap[i].entry.type = MGMT_CAP_LE_TX_PWR_MIN;
-+	cap[i].entry.length = sizeof(__s8);
-+	cap[i].value = hdev->min_le_tx_power;
-+	i++;
-+
-+	cap[i].entry.type = MGMT_CAP_LE_TX_PWR_MAX;
-+	cap[i].entry.length = sizeof(__s8);
-+	cap[i].value = hdev->max_le_tx_power;
-+	i++;
-+
-+	hci_dev_unlock(hdev);
-+
-+	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_CONTROLLER_CAP,
-+				 MGMT_STATUS_SUCCESS, cap, sizeof(cap));
++	hdev->min_le_tx_power = rp->min_le_tx_power;
++	hdev->max_le_tx_power = rp->max_le_tx_power;
 +}
 +
- static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
- 				         u16 opcode, struct sk_buff *skb)
+ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
  {
-@@ -8208,6 +8246,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_VAR_LEN },
- 	{ add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
- 						HCI_MGMT_VAR_LEN },
-+	{ read_controller_cap,     MGMT_OP_READ_CONTROLLER_CAP_SIZE },
- };
+ 	__u8 *sent, status = *((__u8 *) skb->data);
+@@ -3577,6 +3591,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_set_adv_set_random_addr(hdev, skb);
+ 		break;
  
- void mgmt_index_added(struct hci_dev *hdev)
++	case HCI_OP_LE_READ_TRANSMIT_POWER:
++		hci_cc_le_read_transmit_power(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
