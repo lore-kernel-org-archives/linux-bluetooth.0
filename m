@@ -2,124 +2,116 @@ Return-Path: <SRS0=qc6f=CZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04749C43461
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F24C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:25:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACEEA22207
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27FAE22208
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Sep 2020 23:25:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AmHXne3Y"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Zh+sW3py"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726397AbgIPXWu (ORCPT
+        id S1726703AbgIPXZy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 19:22:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59692 "EHLO
+        Wed, 16 Sep 2020 19:25:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbgIPXWs (ORCPT
+        with ESMTP id S1726084AbgIPXZw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 19:22:48 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95D71C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:22:47 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id l17so313390edq.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:22:47 -0700 (PDT)
+        Wed, 16 Sep 2020 19:25:52 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA90CC06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:25:51 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id r9so360498ybd.20
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:25:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qMsguu8tJLPB5Vgo+RL9WgHX2Yp6h0a1DLW8ySVT02U=;
-        b=AmHXne3YhBQCkkgDfCre4DBbLLDFt/9aqLpqwbv3EX13EmkJWIISxNslkTbNwI0E++
-         xmKypgK0mzCPBdj4zzrkShsGzaCYPFI4bjp/nUNzLmU7h1eiTEXbjpPQqqdqFUPJardw
-         n/MBBHEFLnr4G+aBI9vUfhmDIVGU1sv2ZiY18=
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=5VqPIiOtUqaGVZkI9SNh9ZvqzIGC8rBwWvJX1ib7LmM=;
+        b=Zh+sW3pyztmP7nAARrr1tB6GMmz6Xsxr8sFItA0pQa4bY/xOG5uMHus4fca2t2ciA0
+         UvywXzjtCMqtb/u3yll4GTmKRzjh94Hd4J+zCjdQzAt3sSCIfd0wiU0iA7MUEGcoFWMW
+         bTyO6jS4ZBP54pZTVLhGyeTiUyIXCm1zn2wC3m3n98lxfFBu3ufni4+YwmYoie08Wp7y
+         53CgAOLcbw3JQHPDlR/n+zp/p1sTGXsIPUbxWfcaR2+ZCK6XsWkmTg/zZwAH2niFAmIT
+         tN5goGtum1rQi4CjsnFcpK8qfTI7CqGeGpT49EzwLlD9MVKWpPVMCNy5sWbICxBOC09r
+         OUGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qMsguu8tJLPB5Vgo+RL9WgHX2Yp6h0a1DLW8ySVT02U=;
-        b=YfsCj/pk5hf1QD9HJvtgNDXAsUdstAi/m4WwSOSSC0hgOICnVclL66Mh4JqMLiVx5S
-         5huhYWZFcNjbSoNDu0SLlR+CCgY+oS9iUoN+G0pmZG3x7OQjx3ZpL2VjblzaJ5y9srf/
-         ngjxP03ww1jMHDRWJzAtH+CYnj93a078CIjWYPEIDq17NOA6zFYNqVUPQ1XO8vdkrWHh
-         kp597Wr2D2C5aXA/6CbB4FIZ4cWe+27iGJFKSOAOYixvbA3B+RPKT1M35kIRED3Iw5m5
-         Pv5jQXJiaA5KKnRqaUGQAz/WnBAtwZ5tMhWr0bMLZoBjjEvQ465wtQh7ti1BERC+vqCb
-         vICw==
-X-Gm-Message-State: AOAM5320FIwJJMHziHbrvsGxeNdtTUyWG+1JF6WKQuw5Dg+WMXn3U70s
-        iuEYFhg71iqkM5apg3D6O/+K1Jwvh3p5LA==
-X-Google-Smtp-Source: ABdhPJyEaHne5vptjZFye8ehjHRADcGAWC818ri9PTeA2BoIIsnDoLrSLP3ara1MizQ5fUC/lsdoTA==
-X-Received: by 2002:a50:fe07:: with SMTP id f7mr31416640edt.173.1600298565174;
-        Wed, 16 Sep 2020 16:22:45 -0700 (PDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com. [209.85.221.45])
-        by smtp.gmail.com with ESMTPSA id r15sm14974237edv.94.2020.09.16.16.22.44
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Sep 2020 16:22:44 -0700 (PDT)
-Received: by mail-wr1-f45.google.com with SMTP id j2so45579wrx.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:22:44 -0700 (PDT)
-X-Received: by 2002:a5d:574c:: with SMTP id q12mr28880581wrw.253.1600298563795;
- Wed, 16 Sep 2020 16:22:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200813002819.359374-1-sonnysasaka@chromium.org>
- <CAO271mneguPsiJRNjW44oGEHZSuYof0og9+cHxByqoOntjevYw@mail.gmail.com> <CABBYNZL1jaVfvxAZ0GVEa2A0i_8bw_=ynYPL7z20H0ZkDVF3xA@mail.gmail.com>
-In-Reply-To: <CABBYNZL1jaVfvxAZ0GVEa2A0i_8bw_=ynYPL7z20H0ZkDVF3xA@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Wed, 16 Sep 2020 16:22:32 -0700
-X-Gmail-Original-Message-ID: <CAO271mmH3r-S-4fDgraQ892JvxbJhwdDsTLKVJMBigm5+aLHfw@mail.gmail.com>
-Message-ID: <CAO271mmH3r-S-4fDgraQ892JvxbJhwdDsTLKVJMBigm5+aLHfw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] checkpatch: Ignore SPDX license tag
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=5VqPIiOtUqaGVZkI9SNh9ZvqzIGC8rBwWvJX1ib7LmM=;
+        b=JLlGXX6cgtythW1Jpi1kVBF7ZAWPQwZmxynuHCqbGUhNUl8mzXYqVEgzPZn6Q8m/ZJ
+         E8u9XWuwdiA7e3tDE9kTNCm6Q3mPhRKLQIikbeUTcuCxSYGXHhj9WkYiYWAzFrohWkaE
+         8zd3FPI041Wvt8TxO+c/N73CJM6900fiv8X+dGg2lxNx3L3CHUfl8s7GZp4te3PF230V
+         6ep6p0w3gvKzDXYUl5rDbrbh2t+m4jr3KfdTWDa+wD0sRPH2AQ+MBoaV5lPGmKIMZKYa
+         l96a0Jt4ai0d+nBUGGiztICV0VLaInrC1T9BDtCvWaYkgG+b8EJAg6edTZE1AHJs+itU
+         8Y0w==
+X-Gm-Message-State: AOAM532yyEdiWPwOoHxqxwzK1pHb1o2/cuoFqgxhM+EU+NkpmU0uKw+K
+        JaAashzRn/MFFJFMiPWTFUsSFAH4vcEhuQ5V7COl
+X-Google-Smtp-Source: ABdhPJxdHxL3Fk3YvsJQjOTENpu98RPKaJSc4Ng2OVqpLMJCCahrSxHb9Y6w4vq6Pyp6AJQR4qHGNde5NHyv9q17uQNJ
+X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
+ (user=danielwinkler job=sendgmr) by 2002:a25:5a56:: with SMTP id
+ o83mr34602706ybb.55.1600298751096; Wed, 16 Sep 2020 16:25:51 -0700 (PDT)
+Date:   Wed, 16 Sep 2020 16:25:32 -0700
+Message-Id: <20200916232542.1584854-1-danielwinkler@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
+Subject: [Bluez PATCH 00/10] Bluetooth: Add new MGMT interface for advertising add
+From:   Daniel Winkler <danielwinkler@google.com>
+To:     luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Daniel Winkler <danielwinkler@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Maintainers,
 
-Thanks for the clarification. Please do ignore this patch then.
+This patch series defines the new two-call MGMT interface in userspace
+for adding advertising instances. Bluez will detect if kernel supports
+the new MGMT commands, and use them if so. Each new advertising instance
+will be configured by a MGMT call to set advertising parameters,
+followed by a MGMT call to set advertising data. The new data pipeline
+is meant to be unnoticeable from the clients' perspective, with the
+exception of new intervals and tx power support, and new exposed
+advertising manager properties.
 
-On Wed, Sep 16, 2020 at 4:05 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sonny,
->
-> On Wed, Sep 16, 2020 at 3:43 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > Dear BlueZ maintainers,
-> >
-> > I saw recent patches that BlueZ started adding SPDX license tags to
-> > file headers. Is this where the convention is going? If so, please
-> > ignore this patch.
->
-> Yes, it is better that way so we don't have to keep up with the
-> license on every file and will probably attempt do some automation to
-> check if SDPX Identifier is proper.
->
-> > On Wed, Aug 12, 2020 at 5:28 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > >
-> > > BlueZ does not use SPDX license tag on file headers.
-> > >
-> > > ---
-> > >  .checkpatch.conf | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/.checkpatch.conf b/.checkpatch.conf
-> > > index 419733832..72c3529c3 100644
-> > > --- a/.checkpatch.conf
-> > > +++ b/.checkpatch.conf
-> > > @@ -12,3 +12,4 @@
-> > >  --ignore PREFER_PACKED
-> > >  --ignore COMMIT_MESSAGE
-> > >  --ignore SSCANF_TO_KSTRTO
-> > > +--ignore SPDX_LICENSE_TAG
-> > > --
-> > > 2.26.2
-> > >
->
->
->
-> --
-> Luiz Augusto von Dentz
+All changes have been tested on hatch (extended advertising) and kukui
+(no extended advertising) chromebooks with manual testing verifying
+correctness of parameters/data in btmon traces, and our automated test
+suite of 25 single- and multi-advertising usage scenarios.
+
+Thank you in advance for your review!
+Daniel Winkler
+
+
+
+Daniel Winkler (10):
+  advertising: Detect if extended advertising mgmt commands are
+    supported
+  advertising: Parse intervals and tx power from adv
+  advertising: Use new mgmt interface for advertising add
+  advertising: Catch tx power selected event and handle it
+  advertising: Query LE TX range at manager initialization
+  advertising: Expose SupportedCapabilities for advertising
+  client: Add SupportedCapabilities to bluetoothctl
+  monitor: Add new MGMT adv commands and events to monitor
+  doc/advertising-api: update API with new interface
+  doc/mgmt-api: Add new MGMT interfaces to mgmt-api
+
+ client/main.c           |   1 +
+ doc/advertising-api.txt |  50 +++++
+ doc/mgmt-api.txt        | 243 ++++++++++++++++++++
+ lib/mgmt.h              |  45 ++++
+ monitor/packet.c        |  84 +++++++
+ src/advertising.c       | 476 ++++++++++++++++++++++++++++++++++++++--
+ 6 files changed, 884 insertions(+), 15 deletions(-)
+
+-- 
+2.28.0.618.gf4bc123cb7-goog
+
