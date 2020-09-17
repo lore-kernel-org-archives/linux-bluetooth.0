@@ -2,276 +2,484 @@ Return-Path: <SRS0=XILz=C2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED11DC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 00:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054E5C43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 957CE221EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 00:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE1AD2075E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 04:30:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/Nxv048"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="eENsEc4G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726079AbgIQASD (ORCPT
+        id S1726055AbgIQEaG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Sep 2020 20:18:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39914 "EHLO
+        Thu, 17 Sep 2020 00:30:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726040AbgIQASA (ORCPT
+        with ESMTP id S1725267AbgIQEaF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Sep 2020 20:18:00 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C7DC06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:58:45 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id y5so251713otg.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 16:58:45 -0700 (PDT)
+        Thu, 17 Sep 2020 00:30:05 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD9DC06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 21:30:05 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id y1so602002pgk.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 21:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=05klGwQ04S9Ub6h6w3OPrfzCfcZrDDETUet72RYGoyw=;
-        b=L/Nxv048HAY469MlzTttW9CqOASARqZovgQ6rwZtluvoWmBGsHaqDvVJqoggINm27c
-         9ODVZcxuy+W5VSuB3gNcb4EcdfHNDlwTPOLS1CnypH7CFSArMlbbeUJ8xKS7SZ5SNd8L
-         ceL0HUrmIN/Br6NXC16TSp0xmN8amIDs75bovRKARZ2pXDmpVkbpEHPyas1G2QsVVPEj
-         gB/Ez8xGRy2mTbTwssxS1yrfeTrHYz7VGAphhfefSXkWgjAEEVK/fXCrKQXWJbo/UuEW
-         7mcRfmkGmLGA93Bo000VSeQ+AwEQjqtAckQW1cJcIfTWsarv6uD4k97W3++6SlHmJoqz
-         aNCQ==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+TD3v7UAVWHCDzf41YKy6vU75ZLiejjugH1t0skQm7g=;
+        b=eENsEc4G6T+1dGFQM99qD3a535oJX7lQVb/ptcArLVIJGLPA1gjZV4AncrFLaoVSAO
+         SXiz9i2HeybAa00zSX+EYk4LTvRpPzJsJDy2D9U55N5ARfQtjYKvDIYEet8dTfUZHTBv
+         1HTMEeF4Tm3xKyNfZhMDviy2MQ9FV8GLPIh+U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=05klGwQ04S9Ub6h6w3OPrfzCfcZrDDETUet72RYGoyw=;
-        b=Z5XAqiQtEIGoc5AswZ9EuzSnxVhx1sIzJ77sBpEbQXy7hBV1ds7hlknkYkEdBZWIf0
-         QeYJTYQNDpKHDzgx+jIO2dfNhon5ZnhCJeELqtAcXcJ7RUxZcYl8FYzTL/KwXAsHEn10
-         CDBMA18v2AE/oejPQtgX2nzy7pVF9oXQwtLHVVIszoKuzwOGHz7HPZSjkWCQIC2K4YcZ
-         vFb0Cfb8/xAgeBGLQ46n8LjvUoScf3IdnUNH7cqr1yW3yev4WmnQq4zhvvRsoXiNvXNn
-         1apPJt6U81EDnRcj/4QAFAyxIyellcyp2RF6VPpNZjwNOnZjgsqdzadVxnluovi8iK6o
-         64pQ==
-X-Gm-Message-State: AOAM533v0dlQ9F+0oxub2KCg8oBfibzAS8tcw1r0xTAG1ydVWCexAhg9
-        BCpbjtcy0Q2hY443IYh9p3RnTjQ6H2ZqwGLqOow=
-X-Google-Smtp-Source: ABdhPJwBoXmqu7ntFh7CLZOAMzGju32Zjzriv5XpESD+4fNNgymN+8LX4N/WqZD4Ujg6OAzTHismZjpTJ9ja6ZcI+P0=
-X-Received: by 2002:a9d:5a8:: with SMTP id 37mr9787445otd.362.1600300724504;
- Wed, 16 Sep 2020 16:58:44 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+TD3v7UAVWHCDzf41YKy6vU75ZLiejjugH1t0skQm7g=;
+        b=EUT043oXnJziOGdxEQZiOuVVDtrcAtJSm4jqNfiqDpBzvZnPavRV9tjK6KWojI1Kf3
+         YFYqsdsauInayGst1Da5gZtMC4j3NS0tNMQTdR9WaYXrWHmPtu62B5CFjXxzU+dS/aNj
+         5+GbdpOnkybaabH+K1modtlEPqlo4+PM0XuEAwrEkw//cjC712X1ZWYm32Mnht4Lm2qa
+         zFMJqjz1bkKJ629Op/xTMkiZN2WN8cOORsvb6D+Xi2cdYrTKngGN5AJ9Ftah3BXGM2Wg
+         qpndIrWYgd1nctGfDDbsrchIRB3/4ly1pv+hdOPKFH+RAayvmSfal2WM+jZ0tnHP9k2E
+         R9yg==
+X-Gm-Message-State: AOAM533FBR1qYZDWnyb1nClyGst1l8gdzvJG0zSTL4u+Lm3QJRANKZ06
+        YOP2ImdHERFgGRKyukaAzCkDeldNOhMSFg==
+X-Google-Smtp-Source: ABdhPJxrKVqVJrVrSQUflTu+0JnbbM/yQNkokFDM4CZWBoMN2hJ+YaxncJOMEkIpk4k4bKReGBDryQ==
+X-Received: by 2002:a05:6a00:14cb:b029:142:2501:34eb with SMTP id w11-20020a056a0014cbb0290142250134ebmr9336088pfu.68.1600317003718;
+        Wed, 16 Sep 2020 21:30:03 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
+        by smtp.gmail.com with ESMTPSA id 99sm4169562pjo.40.2020.09.16.21.30.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Sep 2020 21:30:02 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Alain Michaud <alainm@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v1 1/8] adv_monitor: Implement RSSI Filter logic for background scanning
+Date:   Wed, 16 Sep 2020 21:29:45 -0700
+Message-Id: <20200916212926.BlueZ.v1.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200916232542.1584854-1-danielwinkler@google.com>
- <20200916162155.Bluez.2.Ic4a3667da774f5f34477d5168a68a9280657e2da@changeid>
- <CABBYNZ+5DW4eM_r0xZKRuWGbbA-y64VYnGiFTBo7hu4E7G-qZw@mail.gmail.com> <CAP2xMbsSXX6VVuJTKeqkmgV-AJMdfku3LB7n4yrMdo+2yJk7HQ@mail.gmail.com>
-In-Reply-To: <CAP2xMbsSXX6VVuJTKeqkmgV-AJMdfku3LB7n4yrMdo+2yJk7HQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 16 Sep 2020 16:58:33 -0700
-Message-ID: <CABBYNZ+Tb+pxae+6puQ=NwZD3mSdDxXZBucAwmyMNOJxX++Wrw@mail.gmail.com>
-Subject: Re: [Bluez PATCH 02/10] advertising: Parse intervals and tx power
- from adv
-To:     Daniel Winkler <danielwinkler@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
+From: Manish Mandlik <mmandlik@google.com>
 
-On Wed, Sep 16, 2020 at 4:53 PM Daniel Winkler <danielwinkler@google.com> wrote:
->
-> Hello Luiz,
->
-> The patch allows the client to set an arbitrary TxPower, different from the include property.
+This patch implements the RSSI Filter logic for background scanning.
 
-Does the controller honor this setting? Can we really set a TxPower
-per instance? If it doesn't then this can possibly break proximity
-logic on the scanner side.
+This was unit-tested by running tests in unit/test-adv-monitor.c
 
-> Best,
-> Daniel
->
-> On Wed, Sep 16, 2020 at 4:52 PM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>
->> Hi Daniel,
->>
->> On Wed, Sep 16, 2020 at 4:25 PM Daniel Winkler <danielwinkler@google.com> wrote:
->> >
->> > This change adds parsers for the advertising intervals and tx power
->> > properties of the LEAdvertisement1 object. It validates that each field
->> > adheres to the 5.2 spec, and that min and max intervals are compatible
->> > with each other, i.e. that min interval is less than max interval.
->> >
->> > A note here for maintainers: The tx power that is sent in the hci
->> > parameter command is an int8_t, but as far as I can tell, there is no
->> > clean way to use a signed 8-bit integer in dbus. The dbus byte type
->> > seems incompatible with negative values in high-level languages (python)
->> > without awkward usage manipulation on the client side. For this reason,
->> > I chose to use an int16_t type for the tx power dbus field, which is
->> > then downcasted to the int8_t in bluetoothd, which at least makes the
->> > signed-ness of the type crystal clear to the dbus client that uses it.
->> >
->> > This change is manually verified by ensuring the intervals and tx power
->> > parameters are correctly parsed from the LEAdvertisement1 object, and
->> > that the parse fails if the parameters are incorrect or not compatible
->> > with each other.
->> >
->> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
->> > ---
->> >
->> >  src/advertising.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++
->> >  1 file changed, 89 insertions(+)
->> >
->> > diff --git a/src/advertising.c b/src/advertising.c
->> > index 172a83907..82ee87313 100644
->> > --- a/src/advertising.c
->> > +++ b/src/advertising.c
->> > @@ -63,6 +63,11 @@ struct btd_adv_manager {
->> >  #define AD_TYPE_BROADCAST 0
->> >  #define AD_TYPE_PERIPHERAL 1
->> >
->> > +/* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2585
->> > + * defines tx power value indicating no preference
->> > + */
->> > +#define ADV_TX_POWER_NO_PREFERENCE 0x7F
->> > +
->> >  struct btd_adv_client {
->> >         struct btd_adv_manager *manager;
->> >         char *owner;
->> > @@ -83,6 +88,9 @@ struct btd_adv_client {
->> >         struct bt_ad *data;
->> >         struct bt_ad *scan;
->> >         uint8_t instance;
->> > +       uint32_t min_interval;
->> > +       uint32_t max_interval;
->> > +       int8_t tx_power;
->> >  };
->> >
->> >  struct dbus_obj_match {
->> > @@ -946,6 +954,74 @@ static bool parse_secondary(DBusMessageIter *iter,
->> >         return false;
->> >  }
->> >
->> > +static bool parse_min_interval(DBusMessageIter *iter,
->> > +                                       struct btd_adv_client *client)
->> > +{
->> > +       if (!iter)
->> > +               return false;
->> > +
->> > +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
->> > +               return false;
->> > +
->> > +       dbus_message_iter_get_basic(iter, &client->min_interval);
->> > +
->> > +       /* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2584
->> > +        * defines acceptable interval range
->> > +        */
->> > +       if (client->min_interval < 0x20 || client->min_interval > 0xFFFFFF) {
->> > +               client->min_interval = 0;
->> > +               return false;
->> > +       }
->> > +
->> > +       return true;
->> > +}
->> > +
->> > +static bool parse_max_interval(DBusMessageIter *iter,
->> > +                                       struct btd_adv_client *client)
->> > +{
->> > +       if (!iter)
->> > +               return false;
->> > +
->> > +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
->> > +               return false;
->> > +
->> > +       dbus_message_iter_get_basic(iter, &client->max_interval);
->> > +
->> > +       /* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2584
->> > +        * defines acceptable interval range
->> > +        */
->> > +       if (client->max_interval < 0x20 || client->max_interval > 0xFFFFFF) {
->> > +               client->max_interval = 0;
->> > +               return false;
->> > +       }
->> > +
->> > +       return true;
->> > +}
->> > +
->> > +static bool parse_tx_power(DBusMessageIter *iter,
->> > +                                       struct btd_adv_client *client)
->> > +{
->> > +       int16_t val;
->> > +
->> > +       if (!iter)
->> > +               return false;
->> > +
->> > +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT16)
->> > +               return false;
->> > +
->> > +       dbus_message_iter_get_basic(iter, &val);
->> > +
->> > +       /* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2585
->> > +        * defines acceptable tx power range
->> > +        */
->> > +       if (val < -127 || val > 20)
->> > +               return false;
->> > +
->> > +       client->tx_power = val;
->> > +
->> > +       return true;
->> > +}
->> > +
->> >  static struct adv_parser {
->> >         const char *name;
->> >         bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
->> > @@ -964,6 +1040,9 @@ static struct adv_parser {
->> >         { "Discoverable", parse_discoverable },
->> >         { "DiscoverableTimeout", parse_discoverable_timeout },
->> >         { "SecondaryChannel", parse_secondary },
->> > +       { "MinInterval", parse_min_interval },
->> > +       { "MaxInterval", parse_max_interval },
->>
->> We will need to these to the D-Bus documentation if you want to extend it.
->>
->> > +       { "TxPower", parse_tx_power },
->>
->> TxPower is already part of the include, or you want the ability to set
->> an arbitrary TxPower?
->>
->> >         { },
->> >  };
->> >
->> > @@ -1092,6 +1171,13 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
->> >                 goto fail;
->> >         }
->> >
->> > +       if (client->min_interval > client->max_interval) {
->> > +               /* Min interval must not be bigger than max interval */
->> > +               error("MinInterval must be less than MaxInterval (%lu > %lu)",
->> > +                               client->min_interval, client->max_interval);
->> > +               goto fail;
->> > +       }
->> > +
->> >         err = refresh_adv(client, add_adv_callback, &client->add_adv_id);
->> >         if (!err)
->> >                 return NULL;
->> > @@ -1167,6 +1253,9 @@ static struct btd_adv_client *client_create(struct btd_adv_manager *manager,
->> >
->> >         client->manager = manager;
->> >         client->appearance = UINT16_MAX;
->> > +       client->tx_power = ADV_TX_POWER_NO_PREFERENCE;
->> > +       client->min_interval = 0;
->> > +       client->max_interval = 0;
->> >
->> >         return client;
->> >
->> > --
->> > 2.28.0.618.gf4bc123cb7-goog
->> >
->>
->>
->> --
->> Luiz Augusto von Dentz
+     unit/test-adv-monitor.c file. Verified all tests PASS by running:
+     USE="-bluez-next bluez-upstream" FEATURES=test emerge-hatch bluez
 
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Howard Chung <howardchung@google.com>
+---
 
+ doc/advertisement-monitor-api.txt |   5 +
+ src/adapter.c                     |   1 +
+ src/adv_monitor.c                 | 286 +++++++++++++++++++++++++++++-
+ src/adv_monitor.h                 |   4 +
+ 4 files changed, 292 insertions(+), 4 deletions(-)
 
+diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+index e09b6fd25..92c8ffc38 100644
+--- a/doc/advertisement-monitor-api.txt
++++ b/doc/advertisement-monitor-api.txt
+@@ -70,6 +70,11 @@ Properties	string Type [read-only]
+ 			dBm indicates unset. The valid range of a timer is 1 to
+ 			300 seconds while 0 indicates unset.
+ 
++			If the peer device advertising interval is greater than the
++			HighRSSIThresholdTimer, the device will never be found. Similarly,
++			if it is greater than LowRSSIThresholdTimer, the device will be
++			considered as lost. Consider configuring these values accordingly.
++
+ 		array{(uint8, uint8, array{byte})} Patterns [read-only, optional]
+ 
+ 			If Type is set to 0x01, this must exist and has at least
+diff --git a/src/adapter.c b/src/adapter.c
+index b2bd8b3f1..415d6e06b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1227,6 +1227,7 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
+ 	adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
+ 
+ 	adapter->devices = g_slist_remove(adapter->devices, dev);
++	btd_adv_monitor_device_remove(adapter->adv_monitor_manager, dev);
+ 
+ 	adapter->discovery_found = g_slist_remove(adapter->discovery_found,
+ 									dev);
+diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+index 737da1c90..7baa5317f 100644
+--- a/src/adv_monitor.c
++++ b/src/adv_monitor.c
+@@ -35,6 +35,7 @@
+ 
+ #include "adapter.h"
+ #include "dbus-common.h"
++#include "device.h"
+ #include "log.h"
+ #include "src/error.h"
+ #include "src/shared/ad.h"
+@@ -44,6 +45,8 @@
+ 
+ #include "adv_monitor.h"
+ 
++static void monitor_device_free(void *data);
++
+ #define ADV_MONITOR_INTERFACE		"org.bluez.AdvertisementMonitor1"
+ #define ADV_MONITOR_MGR_INTERFACE	"org.bluez.AdvertisementMonitorManager1"
+ 
+@@ -104,15 +107,36 @@ struct adv_monitor {
+ 
+ 	enum monitor_state state;	/* MONITOR_STATE_* */
+ 
+-	int8_t high_rssi;		/* high RSSI threshold */
+-	uint16_t high_rssi_timeout;	/* high RSSI threshold timeout */
+-	int8_t low_rssi;		/* low RSSI threshold */
+-	uint16_t low_rssi_timeout;	/* low RSSI threshold timeout */
++	int8_t high_rssi;		/* High RSSI threshold */
++	uint16_t high_rssi_timeout;	/* High RSSI threshold timeout */
++	int8_t low_rssi;		/* Low RSSI threshold */
++	uint16_t low_rssi_timeout;	/* Low RSSI threshold timeout */
++	struct queue *devices;		/* List of adv_monitor_device objects */
+ 
+ 	enum monitor_type type;		/* MONITOR_TYPE_* */
+ 	struct queue *patterns;
+ };
+ 
++/* Some data like last_seen, timer/timeout values need to be maintained
++ * per device. struct adv_monitor_device maintains such data.
++ */
++struct adv_monitor_device {
++	struct adv_monitor *monitor;
++	struct btd_device *device;
++
++	time_t high_rssi_first_seen;	/* Start time when RSSI climbs above
++					 * the high RSSI threshold
++					 */
++	time_t low_rssi_first_seen;	/* Start time when RSSI drops below
++					 * the low RSSI threshold
++					 */
++	time_t last_seen;		/* Time when last Adv was received */
++	bool device_found;		/* State of the device - lost/found */
++	guint device_lost_timer;	/* Timer to track if the device goes
++					 * offline/out-of-range
++					 */
++};
++
+ struct app_match_data {
+ 	const char *owner;
+ 	const char *path;
+@@ -159,6 +183,9 @@ static void monitor_free(void *data)
+ 	g_dbus_proxy_unref(monitor->proxy);
+ 	g_free(monitor->path);
+ 
++	queue_destroy(monitor->devices, monitor_device_free);
++	monitor->devices = NULL;
++
+ 	queue_destroy(monitor->patterns, pattern_free);
+ 
+ 	free(monitor);
+@@ -257,6 +284,7 @@ static struct adv_monitor *monitor_new(struct adv_monitor_app *app,
+ 	monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+ 	monitor->low_rssi = ADV_MONITOR_UNSET_RSSI;
+ 	monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
++	monitor->devices = queue_new();
+ 
+ 	monitor->type = MONITOR_TYPE_NONE;
+ 	monitor->patterns = NULL;
+@@ -932,3 +960,253 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
+ 
+ 	manager_destroy(manager);
+ }
++
++/* Matches a device based on btd_device object */
++static bool monitor_device_match(const void *a, const void *b)
++{
++	const struct adv_monitor_device *dev = a;
++	const struct btd_device *device = b;
++
++	if (!dev)
++		return false;
++
++	if (dev->device != device)
++		return false;
++
++	return true;
++}
++
++/* Frees a monitor device object */
++static void monitor_device_free(void *data)
++{
++	struct adv_monitor_device *dev = data;
++
++	if (!dev)
++		return;
++
++	if (dev->device_lost_timer) {
++		g_source_remove(dev->device_lost_timer);
++		dev->device_lost_timer = 0;
++	}
++
++	dev->monitor = NULL;
++	dev->device = NULL;
++
++	g_free(dev);
++}
++
++/* Removes a device from monitor->devices list */
++static void remove_device_from_monitor(void *data, void *user_data)
++{
++	struct adv_monitor *monitor = data;
++	struct btd_device *device = user_data;
++	struct adv_monitor_device *dev = NULL;
++
++	if (!monitor)
++		return;
++
++	dev = queue_remove_if(monitor->devices, monitor_device_match, device);
++	if (dev) {
++		DBG("Device removed from the Adv Monitor at path %s",
++		    monitor->path);
++		monitor_device_free(dev);
++	}
++}
++
++/* Removes a device from every monitor in an app */
++static void remove_device_from_app(void *data, void *user_data)
++{
++	struct adv_monitor_app *app = data;
++	struct btd_device *device = user_data;
++
++	if (!app)
++		return;
++
++	queue_foreach(app->monitors, remove_device_from_monitor, device);
++}
++
++/* Removes a device from every monitor in all apps */
++void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
++				   struct btd_device *device)
++{
++	if (!manager || !device)
++		return;
++
++	queue_foreach(manager->apps, remove_device_from_app, device);
++}
++
++/* Creates a device object to track the per-device information */
++static struct adv_monitor_device *monitor_device_create(
++			struct adv_monitor *monitor,
++			struct btd_device *device)
++{
++	struct adv_monitor_device *dev = NULL;
++
++	dev = g_try_malloc0(sizeof(struct adv_monitor_device));
++	if (!dev)
++		return NULL;
++
++	dev->monitor = monitor;
++	dev->device = device;
++
++	queue_push_tail(monitor->devices, dev);
++
++	return dev;
++}
++
++/* Includes found/lost device's object path into the dbus message */
++static void report_device_state_setup(DBusMessageIter *iter, void *user_data)
++{
++	const char *path = device_get_path(user_data);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
++}
++
++/* Handles a situation where the device goes offline/out-of-range */
++static gboolean handle_device_lost_timeout(gpointer user_data)
++{
++	struct adv_monitor_device *dev = user_data;
++	struct adv_monitor *monitor = dev->monitor;
++	time_t curr_time = time(NULL);
++
++	DBG("Device Lost timeout triggered for device %p "
++	    "for the Adv Monitor at path %s", dev->device, monitor->path);
++
++	dev->device_lost_timer = 0;
++
++	if (dev->device_found && dev->last_seen) {
++		/* We were tracking for the Low RSSI filter. Check if there is
++		 * any Adv received after the timeout function is invoked.
++		 * If not, report the Device Lost event.
++		 */
++		if (difftime(curr_time, dev->last_seen) >=
++		    monitor->low_rssi_timeout) {
++			dev->device_found = false;
++
++			DBG("Calling DeviceLost() on Adv Monitor of owner %s "
++			    "at path %s", monitor->app->owner, monitor->path);
++
++			g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
++						 report_device_state_setup,
++						 NULL, dev->device, NULL);
++		}
++	}
++
++	return FALSE;
++}
++
++/* Filters an Adv based on its RSSI value */
++static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
++				    struct btd_device *device, int8_t rssi)
++{
++	struct adv_monitor_device *dev = NULL;
++	time_t curr_time = time(NULL);
++	uint16_t adapter_id = monitor->app->manager->adapter_id;
++
++	/* If the RSSI thresholds and timeouts are not specified, report the
++	 * DeviceFound() event without tracking for the RSSI as the Adv has
++	 * already matched the pattern filter.
++	 */
++	if (monitor->high_rssi == ADV_MONITOR_UNSET_RSSI &&
++		monitor->low_rssi == ADV_MONITOR_UNSET_RSSI &&
++		monitor->high_rssi_timeout == ADV_MONITOR_UNSET_TIMER &&
++		monitor->low_rssi_timeout == ADV_MONITOR_UNSET_TIMER) {
++		DBG("Calling DeviceFound() on Adv Monitor of owner %s "
++		    "at path %s", monitor->app->owner, monitor->path);
++
++		g_dbus_proxy_method_call(monitor->proxy, "DeviceFound",
++					 report_device_state_setup, NULL,
++					 device, NULL);
++
++		return;
++	}
++
++	dev = queue_find(monitor->devices, monitor_device_match, device);
++	if (!dev)
++		dev = monitor_device_create(monitor, device);
++	if (!dev) {
++		btd_error(adapter_id, "Failed to create Adv Monitor "
++				      "device object.");
++		return;
++	}
++
++	if (dev->device_lost_timer) {
++		g_source_remove(dev->device_lost_timer);
++		dev->device_lost_timer = 0;
++	}
++
++	/* Reset the timings of found/lost if a device has been offline for
++	 * longer than the high/low timeouts.
++	 */
++	if (dev->last_seen) {
++		if (difftime(curr_time, dev->last_seen) >
++		    monitor->high_rssi_timeout) {
++			dev->high_rssi_first_seen = 0;
++		}
++
++		if (difftime(curr_time, dev->last_seen) >
++		    monitor->low_rssi_timeout) {
++			dev->low_rssi_first_seen = 0;
++		}
++	}
++	dev->last_seen = curr_time;
++
++	/* Check for the found devices (if the device is not already found) */
++	if (!dev->device_found && rssi > monitor->high_rssi) {
++		if (dev->high_rssi_first_seen) {
++			if (difftime(curr_time, dev->high_rssi_first_seen) >=
++			    monitor->high_rssi_timeout) {
++				dev->device_found = true;
++
++				DBG("Calling DeviceFound() on Adv Monitor "
++				    "of owner %s at path %s",
++				    monitor->app->owner, monitor->path);
++
++				g_dbus_proxy_method_call(
++					monitor->proxy, "DeviceFound",
++					report_device_state_setup, NULL,
++					dev->device, NULL);
++			}
++		} else {
++			dev->high_rssi_first_seen = curr_time;
++		}
++	} else {
++		dev->high_rssi_first_seen = 0;
++	}
++
++	/* Check for the lost devices (only if the device is already found, as
++	 * it doesn't make any sense to report the Device Lost event if the
++	 * device is not found yet)
++	 */
++	if (dev->device_found && rssi < monitor->low_rssi) {
++		if (dev->low_rssi_first_seen) {
++			if (difftime(curr_time, dev->low_rssi_first_seen) >=
++			    monitor->low_rssi_timeout) {
++				dev->device_found = false;
++
++				DBG("Calling DeviceLost() on Adv Monitor "
++				    "of owner %s at path %s",
++				    monitor->app->owner, monitor->path);
++
++				g_dbus_proxy_method_call(
++					monitor->proxy, "DeviceLost",
++					report_device_state_setup, NULL,
++					dev->device, NULL);
++			}
++		} else {
++			dev->low_rssi_first_seen = curr_time;
++		}
++	} else {
++		dev->low_rssi_first_seen = 0;
++	}
++
++	/* Setup a timer to track if the device goes offline/out-of-range, only
++	 * if we are tracking for the Low RSSI Threshold. If we are tracking
++	 * the High RSSI Threshold, nothing needs to be done.
++	 */
++	if (dev->device_found) {
++		dev->device_lost_timer =
++			g_timeout_add_seconds(monitor->low_rssi_timeout,
++					      handle_device_lost_timeout, dev);
++	}
++}
+diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+index 69ea348f8..14508e7d1 100644
+--- a/src/adv_monitor.h
++++ b/src/adv_monitor.h
+@@ -21,6 +21,7 @@
+ #define __ADV_MONITOR_H
+ 
+ struct mgmt;
++struct btd_device;
+ struct btd_adapter;
+ struct btd_adv_monitor_manager;
+ 
+@@ -29,4 +30,7 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+ 						struct mgmt *mgmt);
+ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
+ 
++void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
++				   struct btd_device *device);
++
+ #endif /* __ADV_MONITOR_H */
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
