@@ -5,70 +5,72 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC26FC43461
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 08:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DC2C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 08:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 770F02083B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 08:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7D072083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 08:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="fgXrxwl5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="msz2NcBE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726526AbgIQIro (ORCPT
+        id S1726609AbgIQIs4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 04:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
+        Thu, 17 Sep 2020 04:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726504AbgIQIrl (ORCPT
+        with ESMTP id S1726474AbgIQIrf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 04:47:41 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387CBC061788
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 01:47:41 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id 139so1058004qkl.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 01:47:41 -0700 (PDT)
+        Thu, 17 Sep 2020 04:47:35 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1682DC06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 01:47:35 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id s204so956872pfs.18
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 01:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=kL2AQmKmQ8DRMKjtBMJBwyEAwBYPLpPCmkHC9nftMgY=;
-        b=fgXrxwl5WGPHQG8YKqyWsKa+CPdKEMhNFS4ZyclxNkVJqc25wKfupVBKvCKG6haRzC
-         0TBWGdEgUhbiblMCalHV7r39WltR8n+867Sh825ejjZPfMAUeAOVcCA8uWA91UdO1q09
-         rBfY0YRvul6BhI5xFScawLndUs39LHNgfoS6sMd2OOQ0BBsL8fWi56CjRgKL7w74mZLT
-         WdjeAueIV0Z9LX+87sesrytlq2Xa6FS3WpVUqbyiukolI7Y/2GE3ArMPaUux2JBaHiQ/
-         SvjeabzpQfozVT//Xr828aSEJVLIVBv+6TtSP5G6PTem8xH83EcFNnwWhXE4XEBLPv6p
-         rWvw==
+        bh=FNIQ4TwzUmm1KHmokSEwCEB+0kpJ2JKM9cy2f0sja/s=;
+        b=msz2NcBEHBn4//yvvlA9BvhRf9AbMQ4vFBBmV31mMDu/xsybwVA8JKpGL8YwGWRTkK
+         C9dMyGQvzuutz7TlFpLoA/NBVj2arKtETcrRIRgihU50mn/CbHx1GuXnNSXeQZToOvKr
+         YfRth3WHQ5gRXi3M9OmExnLIummqxyxMu0WVTQtHleO6IvGYoT/6KrbRB23ajEqNSYlt
+         uwvdVtyB7wgxutDSPNaNMOR1uZ9qjBusTRqcHREfQEbW9EdmF75ccCe/O0rTbmVKNA+L
+         yyMcvXj3zUc1QNX3ERlxjWJfytcDFCAJAYvEwPhE7O8YXBuY/PGfqTB10LGtUyzhK/r0
+         aTsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=kL2AQmKmQ8DRMKjtBMJBwyEAwBYPLpPCmkHC9nftMgY=;
-        b=XRD129lU1D0ZknlZXT16Ra2oFfxAUSiOW8uFTsnTy8nM45IOOW/xRABfRgMIBpsVY/
-         QWUf4T7MZW4Uy4uH/wVuktSaqNx+T5YG7i5S4GTlt9+ElsK9NdqKskdVTTImRAM8fLUc
-         UTpteN5jZQBF8tmj5q8UCkO47oEhSW/1B3udQ22gW5Lhd7HyLYzPgCvn4bw1ZbEU0J5d
-         I/6j0QpHQvXKfOH5o3LnS+ZgvEVQOEsgj0dzEld3fsa5grWzXASSxb/cg2918FKoBJ07
-         9LQN+Bi1jaAvwUy0aN3mrYh2xvUV4ZzGFFQAleA2m0yl5q6qkYLOm4V2UglidYLHRQtJ
-         E2OA==
-X-Gm-Message-State: AOAM5336AsPNCKGaxQ2nfbIr5aG1d1pBQilwAsrdnZhG7d0zXPVITmdq
-        6KQ6lBNBu05HgAu1NCyPnx7JeoBH8zOVI2oyB4ThmlpsDvjR9TnFABjQ621NcA1ItMDSLrdp0h1
-        0LHZMPFeLjIkBZKw9eVBisWk+D8Ru98j9gP1dFr+MjnHH/3jN5QJ+bhkx1RnrdsCLSt5L6E2VUa
-        76szbgrIhKnQE=
-X-Google-Smtp-Source: ABdhPJyNGGCWI5ydqkiZgandDqVu55u47O7nGmUqX2w1Bd9eqbdqO7yMoMa6S7yTGTAh34aYZvpS9plvu9PUEnoVRw==
+        bh=FNIQ4TwzUmm1KHmokSEwCEB+0kpJ2JKM9cy2f0sja/s=;
+        b=CHZ1QYQdlN7RP1c4Wm+Cx1Am5iZT2bc8QWjv/yRL+ZVQPhVZ82tzOoZNfMU54BKdHE
+         fS97S+QEM5oXQ8QNIK8h1XEWdYUokHKHB8VL4HgFZFWe5VTG5zxLOhdDWqCPyGVp6Uaz
+         Zs1xk1+ejGa8Pd5zt6Uq0G8tjpXf5G9+bA75O8oqY3/6h+1DJ3kxjjRw4ZZSnn/5cqr3
+         +k9Zcrdfwm6fE38VkScdsFDTmjMkvkgENmlekwBVFbhzsz0ECDbcNTt9m8TbuGw1miur
+         EPGK6hOjHUBCbZCUUAAeqeTh1FJD2QdGHZYBeDI0NFIGs55B1F4Pqn9+CHobvQsd4fnt
+         oKYw==
+X-Gm-Message-State: AOAM53091YL0FhIb4ajGTjCKIpNCf+5Q4VQi+Kh0grXlywTFJY1mSzyy
+        8pNd+c/o9ZdT8d9/gi0vgwKWJYKYmZSb0IUzyElI+Iy+hkqDF+UbyWN1qt4kuTeOMY3I9RFKO/q
+        aa04eUWyFdITAskV5GZEscAcjfpPIW70+vcwuW+mMhYuZ0p+5/bchVQVDrCEtopGdxbkCcY6KRP
+        if7o0rrO+QpYY=
+X-Google-Smtp-Source: ABdhPJyZ5zr8aCmSNqrsGqhZ7eOqE5l90QCLj+GHKNbZg3/YWweber23RTxxs6jdmYjWgzSEI1Z9EfXTAg39J3fMNw==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:ad4:5a0e:: with SMTP id
- ei14mr12731226qvb.15.1600332460122; Thu, 17 Sep 2020 01:47:40 -0700 (PDT)
-Date:   Thu, 17 Sep 2020 16:47:15 +0800
+ (user=howardchung job=sendgmr) by 2002:a17:90b:941:: with SMTP id
+ dw1mr715085pjb.1.1600332452758; Thu, 17 Sep 2020 01:47:32 -0700 (PDT)
+Date:   Thu, 17 Sep 2020 16:47:13 +0800
 In-Reply-To: <20200917164632.BlueZ.v2.1.I27ef2a783d8920c147458639f3fa91b69f6fd9ea@changeid>
-Message-Id: <20200917164632.BlueZ.v2.6.I756c1fecc03bcc0cd94400b4992cd7e743f4b3e2@changeid>
+Message-Id: <20200917164632.BlueZ.v2.4.I3774a8f0d748c7c6ec3402c4adcead32810c9164@changeid>
 Mime-Version: 1.0
 References: <20200917164632.BlueZ.v2.1.I27ef2a783d8920c147458639f3fa91b69f6fd9ea@changeid>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [BlueZ PATCH v2 6/6] Bluetooth: Add toggle to switch off interleave scan
+Subject: [BlueZ PATCH v2 4/6] Bluetooth: Handle system suspend resume case
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, mmandlik@chromium.org,
         mcchou@chromium.org, howardchung@google.com, alainm@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -78,90 +80,60 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add a configurable parameter to switch off the interleave
-scan feature.
+This patch adds code to handle the system suspension during interleave
+scan. The interleave scan will be canceled when the system is going to
+sleep, and will be restarted after waking up.
 
 Signed-off-by: Howard Chung <howardchung@google.com>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 (no changes since v1)
 
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 1 +
- net/bluetooth/hci_request.c      | 3 ++-
- net/bluetooth/mgmt_config.c      | 6 ++++++
- 4 files changed, 10 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_request.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 179350f869fdb..c3253f1cac0c2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -363,6 +363,7 @@ struct hci_dev {
- 	__u32		clock;
- 	__u16		advmon_allowlist_duration;
- 	__u16		advmon_no_filter_duration;
-+	__u16		enable_advmon_interleave_scan;
- 
- 	__u16		devid_source;
- 	__u16		devid_vendor;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6c8850149265a..4608715860cce 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3595,6 +3595,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	/* The default values will be chosen in the future */
- 	hdev->advmon_allowlist_duration = 300;
- 	hdev->advmon_no_filter_duration = 500;
-+	hdev->enable_advmon_interleave_scan = 0x0001;	/* Default to enable */
- 
- 	hdev->sniff_max_interval = 800;
- 	hdev->sniff_min_interval = 80;
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 1fcf6736811e4..bb38e1dead68f 100644
+index 89443b48d90ce..d9082019b6386 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -500,7 +500,8 @@ static void __hci_update_background_scan(struct hci_request *req)
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
- 			hci_req_add_le_scan_disable(req, false);
+@@ -1081,6 +1081,9 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 		filter_policy |= 0x02;
  
--		if (!update_adv_monitor_scan_state(hdev)) {
-+		if (!hdev->enable_advmon_interleave_scan ||
-+		    !update_adv_monitor_scan_state(hdev)) {
- 			hci_req_add_le_passive_scan(req);
- 			bt_dev_dbg(hdev, "%s starting background scanning",
- 				   hdev->name);
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index 1802f7023158c..b4198c33a1b72 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -69,6 +69,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 						def_le_autoconnect_timeout),
- 		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
- 		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
-+		HDEV_PARAM_U16(0x001f, enable_advmon_interleave_scan),
- 	};
- 	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+ 	if (hdev->suspended) {
++		/* Block suspend notifier on response */
++		set_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
++
+ 		window = hdev->le_scan_window_suspend;
+ 		interval = hdev->le_scan_int_suspend;
+ 	} else if (hci_is_le_conn_scanning(hdev)) {
+@@ -1167,10 +1170,8 @@ static void hci_req_config_le_suspend_scan(struct hci_request *req)
+ 		hci_req_add_le_scan_disable(req, false);
  
-@@ -142,6 +143,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		case 0x001b:
- 		case 0x001d:
- 		case 0x001e:
-+		case 0x001f:
- 			if (len != sizeof(u16)) {
- 				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
- 					    len, sizeof(u16), type);
-@@ -263,6 +265,10 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 			hdev->advmon_no_filter_duration =
- 							TLV_GET_LE16(buffer);
- 			break;
-+		case 0x0001f:
-+			hdev->enable_advmon_interleave_scan =
-+							TLV_GET_LE16(buffer);
-+			break;
- 		default:
- 			bt_dev_warn(hdev, "unsupported parameter %u", type);
- 			break;
+ 	/* Configure params and enable scanning */
+-	hci_req_add_le_passive_scan(req);
++	__hci_update_background_scan(req);
+ 
+-	/* Block suspend notifier on response */
+-	set_bit(SUSPEND_SCAN_ENABLE, req->hdev->suspend_tasks);
+ }
+ 
+ static void cancel_adv_timeout(struct hci_dev *hdev)
+@@ -1282,8 +1283,10 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
+ 
+ 		/* Disable LE passive scan if enabled */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
++			cancel_interleave_scan(hdev);
+ 			hci_req_add_le_scan_disable(&req, false);
++		}
+ 
+ 		/* Mark task needing completion */
+ 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
