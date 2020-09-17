@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67938C43461
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B85C2BBD1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30CA121974
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AE072137B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JzMmoTcW"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="THOmwBKw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726180AbgIQGVF (ORCPT
+        id S1726198AbgIQGVO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 02:21:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
+        Thu, 17 Sep 2020 02:21:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbgIQGVA (ORCPT
+        with ESMTP id S1725267AbgIQGVL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 02:21:00 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B68C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:59 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id gf14so687217pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:59 -0700 (PDT)
+        Thu, 17 Sep 2020 02:21:11 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74837C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:21:11 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id y1so745935pgk.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:21:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=u+E1bUX0uVxPcQEsE71u1Ro0+1uBNDa00K7AzDVg6ww=;
-        b=JzMmoTcWN8r9fSmiCYVyLPGHh/4yWvxDpYqk069/aA0JUhS+nsf6IGucPO3ltdzFJf
-         jASugceVLWrXVfiKMemt1bQEDNMTQMYzcqxO9sljNItL71/ackDP1tql0loY1YvzdZ64
-         /6lCuBdKbw81qjgDCBt1Ma4YGQDcBXd8gt8RI=
+        bh=nI1lwirMpvm4vWon80g2srfXuKwwNNQq9kNumv3r5qY=;
+        b=THOmwBKwB518USHayCzZrRr6x/02THcFpkMElLTjp/ufUahUJfK30pwOyJZVXd5qPn
+         OnIKrS7HkMPcUt1fKWkIRbKRu5umCUlN8DJhNzNxAbHB5JgqFgP/vzRoQwOLba/bfJbM
+         rXMoBpVeor3inCxIIeNmfGQ5G05F/HlYn6P8U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=u+E1bUX0uVxPcQEsE71u1Ro0+1uBNDa00K7AzDVg6ww=;
-        b=GBKqUpsIqgmMz6hE7xKd1a1SUflt95085FsNLZKMd3LWIw41iEcu0O/o8+5EYUTBnb
-         ne10RvCNadO/6k6WRYUb3L6safW6ISa9r/Do3BFPlqB4XtoguLehhsFnRueTVOztvEmr
-         mw7vDvXQvoHD9Dzle48hODoGaeiEuBBdFnqJlvYtg58rRcfKsCMALJybQyrNw7DBmmGa
-         akhDhVA5FjKTNw+QaxrssaYfn0D5BovkkO2xCTLElw6DRpmU33oeaoNGP1VqcY9N+t7q
-         zd1wcKM8rai8OJxY7bPMqZiWNs5YV+9nQMiErJfdibYD9mjwTixplO9yPI19jKSj6uH5
-         pnlg==
-X-Gm-Message-State: AOAM532r4YpaUBrZVBW/Yz6IbZLBP3g7Wh2fOK569oQcJAXwvT7zdkV6
-        NXM3JaJp3yG6KMkH4mNRaBb7UVwULJyCbA==
-X-Google-Smtp-Source: ABdhPJxDipMIHXKpm3c6DmFyUw4IIzmnEx8rFamxqZGXE0sjF0YXtQziINFn+lAgKiCQcbITt0UhEg==
-X-Received: by 2002:a17:90a:297:: with SMTP id w23mr6897687pja.44.1600323658882;
-        Wed, 16 Sep 2020 23:20:58 -0700 (PDT)
+        bh=nI1lwirMpvm4vWon80g2srfXuKwwNNQq9kNumv3r5qY=;
+        b=ZEITvzUR13LKI+X5I78ImR3SiMeLFxGmpMmERzTP6xws7LLbW5wkQQWp3AuIfxB3Q9
+         1yvNqGZf8lUeYVPN6jl7MZGxLdIArxINZow7lUvJZzxrwJFOOKT9RkBc4/Tqpo7tucbb
+         x+3f0O+93geem6JUXzq+BW7bqxrtJF74yvOJxluOSD8GBo6ywsqIP2qpU1KOwINElTgP
+         ++rXL67qvx8Z0x/26i+fGkF10aRpgmcgtK3sfy9dLhEzhlYLRHJ18PIEO+lVKASgUE3s
+         as6weLPonyMYi2EO0KLtf/5GYAj07MDpPf59mBoRyF9TdieYKtiu/AWisl9PYvsi8LkB
+         mUuQ==
+X-Gm-Message-State: AOAM5328QFbm6+koL9vgkaXEXYesT0gqC7H4xBH7EB3bNvyAEL6fVffx
+        ySm48waEBOA5b7q1gOl0200AQLBcJj96tA==
+X-Google-Smtp-Source: ABdhPJxDpG0XjkjxYIVQTvZGbLfHSPGwHaS7+nvDjI+36+/0QTYfmrxRKoLe68xxm3B4pvN9YbY/tw==
+X-Received: by 2002:a63:c543:: with SMTP id g3mr21695867pgd.203.1600323670533;
+        Wed, 16 Sep 2020 23:21:10 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id g23sm19264943pfh.133.2020.09.16.23.20.57
+        by smtp.gmail.com with ESMTPSA id g23sm19264943pfh.133.2020.09.16.23.21.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Sep 2020 23:20:58 -0700 (PDT)
+        Wed, 16 Sep 2020 23:21:09 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
@@ -65,9 +65,9 @@ Cc:     Marcel Holtmann <marcel@holtmann.org>,
         chromeos-bluetooth-upstreaming@chromium.org,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v2 5/8] adapter: Clear all Adv monitors upon bring-up
-Date:   Wed, 16 Sep 2020 23:19:48 -0700
-Message-Id: <20200916231935.BlueZ.v2.5.Id6bfe7838831ae01fddc8605689dd77b51673960@changeid>
+Subject: [BlueZ PATCH v2 6/8] adv_monitor: Implement Add Adv Patterns Monitor cmd handler
+Date:   Wed, 16 Sep 2020 23:19:50 -0700
+Message-Id: <20200916231935.BlueZ.v2.6.Ibbcb11712b613ef95c31b41207c3ea945c830018@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200916231935.BlueZ.v2.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 References: <20200916231935.BlueZ.v2.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
@@ -77,80 +77,123 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This clears all Adv monitors upon daemon bring-up by issuing
-MGMT_OP_REMOVE_ADV_MONITOR command with monitor_handle 0.
+From: Howard Chung <howardchung@google.com>
 
-The following test was performed:
-- Add an Adv Monitor using btmgmt, restart bluetoothd and observe the
-monitor got removed.
+- Send the MGMT_OP command to kernel upon registration of a Adv patterns
+monitor.
+- Call Activate() or Release() to client depending on the reply from
+  kernel
+
+the call through syslog
 
 Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
-Reviewed-by: Howard Chung <howardchung@google.com>
 ---
 
 (no changes since v1)
 
- src/adapter.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ src/adv_monitor.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d33ce7124..191467048 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -9513,6 +9513,43 @@ failed:
- 	btd_adapter_unref(adapter);
+diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+index 4f86384e9..bce99eace 100644
+--- a/src/adv_monitor.c
++++ b/src/adv_monitor.c
+@@ -609,11 +609,59 @@ done:
+ 	return monitor->state != MONITOR_STATE_FAILED;
  }
  
-+static void reset_adv_monitors_complete(uint8_t status, uint16_t length,
++/* Handles the callback of Add Adv Patterns Monitor command */
++static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
 +					const void *param, void *user_data)
 +{
-+	struct mgmt_rp_remove_adv_monitor *rp = param;
++	const struct mgmt_rp_add_adv_patterns_monitor *rp = param;
++	struct adv_monitor *monitor = user_data;
++	uint16_t adapter_id = monitor->app->manager->adapter_id;
 +
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to reset Adv Monitors: %s (0x%02x)",
-+			mgmt_errstr(status), status);
++	if (status != MGMT_STATUS_SUCCESS || !param) {
++		btd_error(adapter_id, "Failed to Add Adv Patterns Monitor "
++				"with status 0x%02x", status);
++		monitor_release(monitor, NULL);
 +		return;
 +	}
 +
 +	if (length < sizeof(*rp)) {
-+		error("Wrong size of remove Adv Monitor response for reset "
-+			"all Adv Monitors");
++		btd_error(adapter_id, "Wrong size of Add Adv Patterns Monitor "
++				"response");
++		monitor_release(monitor, NULL);
 +		return;
 +	}
 +
-+	DBG("Removed all Adv Monitors");
++	monitor->state = MONITOR_STATE_HONORED;
++
++	DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
++		monitor->app->owner, monitor->path);
++
++	g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL, NULL, NULL,
++					NULL);
++
++	DBG("Adv Monitor with handle:0x%04x added",
++					le16_to_cpu(rp->monitor_handle));
 +}
 +
-+static void reset_adv_monitors(uint16_t index)
++static void monitor_copy_patterns(void *data, void *user_data)
 +{
-+	struct mgmt_cp_remove_adv_monitor cp;
++	struct btd_adv_monitor_pattern *pattern = data;
++	struct mgmt_cp_add_adv_monitor *cp = user_data;
 +
-+	DBG("sending remove Adv Monitor command with handle 0");
-+
-+	/* Handle 0 indicates to remove all */
-+	cp.monitor_handle = 0;
-+	if (mgmt_send(mgmt_master, MGMT_OP_REMOVE_ADV_MONITOR, index,
-+			sizeof(cp), &cp, reset_adv_monitors_complete, NULL,
-+			NULL) > 0) {
++	if (!pattern)
 +		return;
-+	}
 +
-+	error("Failed to reset Adv Monitors");
++	memcpy(cp->patterns + cp->pattern_count, pattern, sizeof(*pattern));
++	cp->pattern_count++;
 +}
 +
- static void index_added(uint16_t index, uint16_t length, const void *param,
- 							void *user_data)
+ /* Handles an Adv Monitor D-Bus proxy added event */
+ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
  {
-@@ -9527,6 +9564,8 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
- 		return;
- 	}
+ 	struct adv_monitor *monitor;
+ 	struct adv_monitor_app *app = user_data;
++	struct mgmt_cp_add_adv_monitor *cp = NULL;
++	uint8_t pattern_count, cp_len;
+ 	uint16_t adapter_id = app->manager->adapter_id;
+ 	const char *path = g_dbus_proxy_get_path(proxy);
+ 	const char *iface = g_dbus_proxy_get_interface(proxy);
+@@ -646,7 +694,24 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
  
-+	reset_adv_monitors(index);
+ 	queue_push_tail(app->monitors, monitor);
+ 
++	pattern_count = queue_length(monitor->patterns);
++	cp_len = sizeof(struct mgmt_cp_add_adv_monitor) +
++			pattern_count * sizeof(struct mgmt_adv_pattern);
 +
- 	adapter = btd_adapter_new(index);
- 	if (!adapter) {
- 		btd_error(index,
++	cp = malloc0(cp_len);
++	queue_foreach(monitor->patterns, monitor_copy_patterns, cp);
++
++	if (!mgmt_send(app->manager->mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
++			adapter_id, cp_len, cp, add_adv_patterns_monitor_cb,
++			monitor, NULL)) {
++		error("Unable to send Add Adv Patterns Monitor command");
++		goto done;
++	}
++
+ 	DBG("Adv Monitor allocated for the object at path %s", path);
++
++done:
++	free(cp);
+ }
+ 
+ /* Handles the removal of an Adv Monitor D-Bus proxy */
+@@ -1064,7 +1129,7 @@ static void adv_match_per_monitor(void *data, void *user_data)
+ 	struct adv_monitor *monitor = data;
+ 	struct adv_content_filter_info *info = user_data;
+ 
+-	if (!monitor && monitor->state != MONITOR_STATE_HONORED)
++	if (!monitor || monitor->state != MONITOR_STATE_HONORED)
+ 		return;
+ 
+ 	/* Reset the intermediate matched status */
 -- 
 2.26.2
 
