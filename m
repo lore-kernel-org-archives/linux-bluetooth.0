@@ -2,115 +2,626 @@ Return-Path: <SRS0=XILz=C2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D41C43464
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 21:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C608FC43463
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 21:50:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB02A2075B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 21:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 640662075B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 21:50:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uh5l6VV/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eumneyzn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725987AbgIQVtD (ORCPT
+        id S1725987AbgIQVue (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 17:49:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42476 "EHLO
+        Thu, 17 Sep 2020 17:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725874AbgIQVtD (ORCPT
+        with ESMTP id S1725858AbgIQVud (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 17:49:03 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E79C06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 14:49:02 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id p15so1811121qvk.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 14:49:02 -0700 (PDT)
+        Thu, 17 Sep 2020 17:50:33 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F6BC06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 14:50:33 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id c13so4304018oiy.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 14:50:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=I7JMbI6mhJEkXtALsnZMYNxrFH0u/Eq4oP/lweS505Y=;
-        b=Uh5l6VV/UhIOvB5xZcw9B79q5066Qc9cbcNs9hIakymcKJVP0S+30s/BZRRc8mOLgf
-         cBhZspT5diTbdR5wJioSGLpsdOB+ty6Z4DiXPP5lq0V3QgRser0fS5SztLZbFMqPE2sD
-         TZ3+YVsCXQ7tJnjCymcS3+GmgusF6pFL4ss73WW/Cs10vAsoOQ26V6/QRHNJTYa0+wET
-         yKBv7skZOHYEUregexDs2WkFwPQFVrBl6l0PCPQEq9t7gsUZroptB8WHvT2+zsbcDGVz
-         SNoGAyV9ih7lId7FaiaJwyobTuQqwMQT2fWyUVzFlgu6D76XiAOPPcj9sBXIMaSCSmtQ
-         yqxQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=dcDuhIOEctqtMrFH6PKkvye8CWMXaDHL8OqmOzknPBI=;
+        b=EumneyznLxWcruiV5drfP15DvQzG9CroOActUdJe2VXbrC3BXKYKWSJvP8T71B4ZET
+         PuASyRs7tKzdSKb6uZ/u8E1HyoYCxppAUQHrV/Uwfb4F//s5++GPtjyK0dBjY2TusQWP
+         SSxoiTq9kEN3nsqhjA285VDZKZ4NrCpTvP6RTFukKFS/ourvwjrXjFZBGq23xHz9O5Ut
+         CoA/7yfq0g+dzmIlxAB11ndssVFR/zr7sefMTayftph0ypIfVc6n5q4dDFdCcnh836jE
+         9w7goB4Up+S1wul1kcUNnhNV6J44K3yH+/rC6Y/JGV7t+g01fGpdXQqFs2is7qxmmdUl
+         LkZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=I7JMbI6mhJEkXtALsnZMYNxrFH0u/Eq4oP/lweS505Y=;
-        b=uAXQszvCK/+jYctD0elAB8kCVqK5UHQlFmH9ELvFkhlZixBhQBE+kHJsoQKULIp3zJ
-         LQlJDyHGIfn9ktpqTq6xnTcfqk+cHRN1e3Bqos2/biL3ofcsV4xQWezIDxfqBbY3Xv5d
-         1kt4var/lbPPyBCUZ9fK4qdYfDYGsVkokcsLoH1SfFmuFuZ+w77UKrdUZN9kEnWDW4VH
-         Bw+RV69hXKAnzaQcQ8+kO4cQ7BENmTL9FaQJ4ihdr+p66kzYaiYEADY3eg16GnF3ZBE9
-         GZA7Yjz1iwxqXaPJj8feW+4iHetdWI2xbZ+GLwKxbrIWdNJ4nHgebS6b8F/EN9I8Bdls
-         rPKw==
-X-Gm-Message-State: AOAM533EVCivDAfl3N1+YSBG+S33mNhD0saliUkLlwkvLKLudaKg6EC2
-        h+TWxC0dOvin78vJUqJt6FOv1n2ORPWA/g==
-X-Google-Smtp-Source: ABdhPJwBHiBsY0RHg8qUO1vw9DxpyeOYQlUQFR4wqiyBxZ6hD7DLqE+LrW6VbyV/Wjn39oI+SVmXRg==
-X-Received: by 2002:a0c:c244:: with SMTP id w4mr30898973qvh.12.1600379340668;
-        Thu, 17 Sep 2020 14:49:00 -0700 (PDT)
-Received: from [172.17.0.2] ([20.186.152.21])
-        by smtp.gmail.com with ESMTPSA id d10sm775201qkk.1.2020.09.17.14.48.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2020 14:49:00 -0700 (PDT)
-Message-ID: <5f63d9cc.1c69fb81.8ea44.56ca@mx.google.com>
-Date:   Thu, 17 Sep 2020 14:49:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2336312357875185178=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=dcDuhIOEctqtMrFH6PKkvye8CWMXaDHL8OqmOzknPBI=;
+        b=pMakqVytKJLxcM7U/A1LjU5bf36TLuQMYlp5bDOzsVXdE+FFpmOpwmxW4wEib/XCuK
+         zREL3Ah3DSq1DK8QWyqSNVEcxyHy2GMbP90jBsQUe+noBPFgcE3hJh0HohUdcMtHLKUH
+         hzLMP/GwoRFurEDA5uSgZJJmt4AUJle3CahOykRJKpORRKFkGn/48g5N/1hjMa5k17ra
+         vPqPCCPP5xZVOSeNA5erq2OPEyz6DBz6brqhwxaQvJApUWez1VIxwYpedhQY8obLrPWO
+         /mFaseVVvHfVJ0GpQw+tZkKfzz32Pt1Q/SCDIWomcEVmtVMVbU4W4Mpxk+fkcyuOkEzy
+         Gx3A==
+X-Gm-Message-State: AOAM530cmvEUP6l2Wi1L+jnekoLyxUF0r1Y9HGNL6R1hlZ5hFXnTjRXM
+        rvt2ZAzsVvyrzr+I2M6oTJZ4BsKZzUvBLTiTpom5LeRm
+X-Google-Smtp-Source: ABdhPJwc8RFtYVuMCdSkH3MPHXPVARDRHDjCeRvJ7SToh/COrKUuWPiUb6KDeyObFDhIEdeuxfpryN/ElW++EMT4BCs=
+X-Received: by 2002:aca:1b01:: with SMTP id b1mr7861925oib.137.1600379432736;
+ Thu, 17 Sep 2020 14:50:32 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mcchou@chromium.org
-Subject: RE: [BlueZ,v4,2/8] adv_monitor: Implement unit tests for RSSI Filter
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200917142456.BlueZ.v4.2.I5ae05701b2b792a3ea2ca98f4a5d977645b1afc2@changeid>
-References: <20200917142456.BlueZ.v4.2.I5ae05701b2b792a3ea2ca98f4a5d977645b1afc2@changeid>
+References: <20200819000212.211485-1-luiz.dentz@gmail.com>
+In-Reply-To: <20200819000212.211485-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 17 Sep 2020 14:50:21 -0700
+Message-ID: <CABBYNZ+E-AaS1-GTmq6CJv-GD2+pj5PDm5tuhzPJa-syYZUyXA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] sbc: Add initial code for SSE primitives
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2336312357875185178==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
+On Tue, Aug 18, 2020 at 5:02 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> ---
+>  Makefile.am              |   1 +
+>  sbc/sbc_primitives.c     |  18 +-
+>  sbc/sbc_primitives_mmx.c |  49 +-----
+>  sbc/sbc_primitives_sse.c | 365 +++++++++++++++++++++++++++++++++++++++
+>  sbc/sbc_primitives_sse.h |  38 ++++
+>  5 files changed, 428 insertions(+), 43 deletions(-)
+>  create mode 100644 sbc/sbc_primitives_sse.c
+>  create mode 100644 sbc/sbc_primitives_sse.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 342043d..7ff0c7d 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -14,6 +14,7 @@ sbc_headers = sbc/sbc.h
+>
+>  sbc_sources = sbc/sbc.c sbc/sbc_private.h sbc/sbc_math.h sbc/sbc_tables.h \
+>                 sbc/sbc_primitives.h sbc/sbc_primitives.c \
+> +               sbc/sbc_primitives_sse.h sbc/sbc_primitives_sse.c \
+>                 sbc/sbc_primitives_mmx.h sbc/sbc_primitives_mmx.c \
+>                 sbc/sbc_primitives_iwmmxt.h sbc/sbc_primitives_iwmmxt.c \
+>                 sbc/sbc_primitives_neon.h sbc/sbc_primitives_neon.c \
+> diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+> index ff343cf..c9d1045 100644
+> --- a/sbc/sbc_primitives.c
+> +++ b/sbc/sbc_primitives.c
+> @@ -33,6 +33,7 @@
+>  #include "sbc_tables.h"
+>
+>  #include "sbc_primitives.h"
+> +#include "sbc_primitives_sse.h"
+>  #include "sbc_primitives_mmx.h"
+>  #include "sbc_primitives_iwmmxt.h"
+>  #include "sbc_primitives_neon.h"
+> @@ -590,6 +591,19 @@ static int sbc_calc_scalefactors_j(
+>         return joint;
+>  }
+>
+> +static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
+> +{
+> +       __builtin_cpu_init();
+> +
+> +       if (__builtin_cpu_supports("mmx"))
+> +               sbc_init_primitives_mmx(state);
+> +
+> +#ifdef SBC_BUILD_WITH_SSE_SUPPORT
+> +       if (__builtin_cpu_supports("sse4.2"))
+> +               sbc_init_primitives_sse(state);
+> +#endif
+> +}
+> +
+>  /*
+>   * Detect CPU features and setup function pointers
+>   */
+> @@ -614,9 +628,7 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
+>         state->implementation_info = "Generic C";
+>
+>         /* X86/AMD64 optimizations */
+> -#ifdef SBC_BUILD_WITH_MMX_SUPPORT
+> -       sbc_init_primitives_mmx(state);
+> -#endif
+> +       sbc_init_primitives_x86(state);
+>
+>         /* ARM optimizations */
+>  #ifdef SBC_BUILD_WITH_ARMV6_SUPPORT
+> diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+> index e2c3e56..6984ce5 100644
+> --- a/sbc/sbc_primitives_mmx.c
+> +++ b/sbc/sbc_primitives_mmx.c
+> @@ -350,50 +350,19 @@ static void sbc_calc_scalefactors_mmx(
+>         __asm__ volatile ("emms\n");
+>  }
+>
+> -static int check_mmx_support(void)
+> +void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+>  {
+> -#ifdef __amd64__
+> -       return 1; /* We assume that all 64-bit processors have MMX support */
+> -#else
+> -       int cpuid_feature_information;
+> -       __asm__ volatile (
+> -               /* According to Intel manual, CPUID instruction is supported
+> -                * if the value of ID bit (bit 21) in EFLAGS can be modified */
+> -               "pushf\n"
+> -               "movl     (%%esp),   %0\n"
+> -               "xorl     $0x200000, (%%esp)\n" /* try to modify ID bit */
+> -               "popf\n"
+> -               "pushf\n"
+> -               "xorl     (%%esp),   %0\n"      /* check if ID bit changed */
+> -               "jz       1f\n"
+> -               "push     %%eax\n"
+> -               "push     %%ebx\n"
+> -               "push     %%ecx\n"
+> -               "mov      $1,        %%eax\n"
+> -               "cpuid\n"
+> -               "pop      %%ecx\n"
+> -               "pop      %%ebx\n"
+> -               "pop      %%eax\n"
+> -               "1:\n"
+> -               "popf\n"
+> -               : "=d" (cpuid_feature_information)
+> -               :
+> -               : "cc");
+> -    return cpuid_feature_information & (1 << 23);
+> -#endif
+> +       state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
+> +       if (state->increment == 1)
+> +               state->sbc_analyze_8s = sbc_analyze_1b_8s_mmx_odd;
+> +       else
+> +               state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
+> +       state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+> +       state->implementation_info = "MMX";
+>  }
+>
+> +#else
+>  void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+>  {
+> -       if (check_mmx_support()) {
+> -               state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
+> -               if (state->increment == 1)
+> -                       state->sbc_analyze_8s = sbc_analyze_1b_8s_mmx_odd;
+> -               else
+> -                       state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
+> -               state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+> -               state->implementation_info = "MMX";
+> -       }
+>  }
+> -
+>  #endif
+> diff --git a/sbc/sbc_primitives_sse.c b/sbc/sbc_primitives_sse.c
+> new file mode 100644
+> index 0000000..42cdb03
+> --- /dev/null
+> +++ b/sbc/sbc_primitives_sse.c
+> @@ -0,0 +1,365 @@
+> +/*
+> + *
+> + *  Bluetooth low-complexity, subband codec (SBC) library
+> + *
+> + *  Copyright (C) 2020 Intel Corporation
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#include <stdint.h>
+> +#include <limits.h>
+> +#include "sbc.h"
+> +#include "sbc_math.h"
+> +#include "sbc_tables.h"
+> +
+> +#include "sbc_primitives_sse.h"
+> +
+> +/*
+> + * SSE optimizations
+> + */
+> +
+> +#ifdef SBC_BUILD_WITH_SSE_SUPPORT
+> +
+> +static inline void sbc_analyze_four_sse(const int16_t *in, int32_t *out,
+> +                                       const FIXED_T *consts)
+> +{
+> +       static const SBC_ALIGNED int32_t round_c[2] = {
+> +               1 << (SBC_PROTO_FIXED4_SCALE - 1),
+> +               1 << (SBC_PROTO_FIXED4_SCALE - 1),
+> +       };
+> +       __asm__ volatile (
+> +               "movq        (%0), %%mm0\n"
+> +               "movq       8(%0), %%mm1\n"
+> +               "pmaddwd     (%1), %%mm0\n"
+> +               "pmaddwd    8(%1), %%mm1\n"
+> +               "paddd       (%2), %%mm0\n"
+> +               "paddd       (%2), %%mm1\n"
+> +               "\n"
+> +               "movq      16(%0), %%mm2\n"
+> +               "movq      24(%0), %%mm3\n"
+> +               "pmaddwd   16(%1), %%mm2\n"
+> +               "pmaddwd   24(%1), %%mm3\n"
+> +               "paddd      %%mm2, %%mm0\n"
+> +               "paddd      %%mm3, %%mm1\n"
+> +               "\n"
+> +               "movq      32(%0), %%mm2\n"
+> +               "movq      40(%0), %%mm3\n"
+> +               "pmaddwd   32(%1), %%mm2\n"
+> +               "pmaddwd   40(%1), %%mm3\n"
+> +               "paddd      %%mm2, %%mm0\n"
+> +               "paddd      %%mm3, %%mm1\n"
+> +               "\n"
+> +               "movq      48(%0), %%mm2\n"
+> +               "movq      56(%0), %%mm3\n"
+> +               "pmaddwd   48(%1), %%mm2\n"
+> +               "pmaddwd   56(%1), %%mm3\n"
+> +               "paddd      %%mm2, %%mm0\n"
+> +               "paddd      %%mm3, %%mm1\n"
+> +               "\n"
+> +               "movq      64(%0), %%mm2\n"
+> +               "movq      72(%0), %%mm3\n"
+> +               "pmaddwd   64(%1), %%mm2\n"
+> +               "pmaddwd   72(%1), %%mm3\n"
+> +               "paddd      %%mm2, %%mm0\n"
+> +               "paddd      %%mm3, %%mm1\n"
+> +               "\n"
+> +               "psrad         %4, %%mm0\n"
+> +               "psrad         %4, %%mm1\n"
+> +               "packssdw   %%mm0, %%mm0\n"
+> +               "packssdw   %%mm1, %%mm1\n"
+> +               "\n"
+> +               "movq       %%mm0, %%mm2\n"
+> +               "pmaddwd   80(%1), %%mm0\n"
+> +               "pmaddwd   88(%1), %%mm2\n"
+> +               "\n"
+> +               "movq       %%mm1, %%mm3\n"
+> +               "pmaddwd   96(%1), %%mm1\n"
+> +               "pmaddwd  104(%1), %%mm3\n"
+> +               "paddd      %%mm1, %%mm0\n"
+> +               "paddd      %%mm3, %%mm2\n"
+> +               "\n"
+> +               "movq       %%mm0, (%3)\n"
+> +               "movq       %%mm2, 8(%3)\n"
+> +               :
+> +               : "r" (in), "r" (consts), "r" (&round_c), "r" (out),
+> +                       "i" (SBC_PROTO_FIXED4_SCALE)
+> +               : "cc", "memory");
+> +}
+> +
+> +static inline void sbc_analyze_eight_sse(const int16_t *in, int32_t *out,
+> +                                                       const FIXED_T *consts)
+> +{
+> +       static const SBC_ALIGNED int32_t round_c[2] = {
+> +               1 << (SBC_PROTO_FIXED8_SCALE - 1),
+> +               1 << (SBC_PROTO_FIXED8_SCALE - 1),
+> +       };
+> +       __asm__ volatile (
+> +               "movq        (%0), %%mm0\n"
+> +               "movq       8(%0), %%mm1\n"
+> +               "movq      16(%0), %%mm2\n"
+> +               "movq      24(%0), %%mm3\n"
+> +               "pmaddwd     (%1), %%mm0\n"
+> +               "pmaddwd    8(%1), %%mm1\n"
+> +               "pmaddwd   16(%1), %%mm2\n"
+> +               "pmaddwd   24(%1), %%mm3\n"
+> +               "paddd       (%2), %%mm0\n"
+> +               "paddd       (%2), %%mm1\n"
+> +               "paddd       (%2), %%mm2\n"
+> +               "paddd       (%2), %%mm3\n"
+> +               "\n"
+> +               "movq      32(%0), %%mm4\n"
+> +               "movq      40(%0), %%mm5\n"
+> +               "movq      48(%0), %%mm6\n"
+> +               "movq      56(%0), %%mm7\n"
+> +               "pmaddwd   32(%1), %%mm4\n"
+> +               "pmaddwd   40(%1), %%mm5\n"
+> +               "pmaddwd   48(%1), %%mm6\n"
+> +               "pmaddwd   56(%1), %%mm7\n"
+> +               "paddd      %%mm4, %%mm0\n"
+> +               "paddd      %%mm5, %%mm1\n"
+> +               "paddd      %%mm6, %%mm2\n"
+> +               "paddd      %%mm7, %%mm3\n"
+> +               "\n"
+> +               "movq      64(%0), %%mm4\n"
+> +               "movq      72(%0), %%mm5\n"
+> +               "movq      80(%0), %%mm6\n"
+> +               "movq      88(%0), %%mm7\n"
+> +               "pmaddwd   64(%1), %%mm4\n"
+> +               "pmaddwd   72(%1), %%mm5\n"
+> +               "pmaddwd   80(%1), %%mm6\n"
+> +               "pmaddwd   88(%1), %%mm7\n"
+> +               "paddd      %%mm4, %%mm0\n"
+> +               "paddd      %%mm5, %%mm1\n"
+> +               "paddd      %%mm6, %%mm2\n"
+> +               "paddd      %%mm7, %%mm3\n"
+> +               "\n"
+> +               "movq      96(%0), %%mm4\n"
+> +               "movq     104(%0), %%mm5\n"
+> +               "movq     112(%0), %%mm6\n"
+> +               "movq     120(%0), %%mm7\n"
+> +               "pmaddwd   96(%1), %%mm4\n"
+> +               "pmaddwd  104(%1), %%mm5\n"
+> +               "pmaddwd  112(%1), %%mm6\n"
+> +               "pmaddwd  120(%1), %%mm7\n"
+> +               "paddd      %%mm4, %%mm0\n"
+> +               "paddd      %%mm5, %%mm1\n"
+> +               "paddd      %%mm6, %%mm2\n"
+> +               "paddd      %%mm7, %%mm3\n"
+> +               "\n"
+> +               "movq     128(%0), %%mm4\n"
+> +               "movq     136(%0), %%mm5\n"
+> +               "movq     144(%0), %%mm6\n"
+> +               "movq     152(%0), %%mm7\n"
+> +               "pmaddwd  128(%1), %%mm4\n"
+> +               "pmaddwd  136(%1), %%mm5\n"
+> +               "pmaddwd  144(%1), %%mm6\n"
+> +               "pmaddwd  152(%1), %%mm7\n"
+> +               "paddd      %%mm4, %%mm0\n"
+> +               "paddd      %%mm5, %%mm1\n"
+> +               "paddd      %%mm6, %%mm2\n"
+> +               "paddd      %%mm7, %%mm3\n"
+> +               "\n"
+> +               "psrad         %4, %%mm0\n"
+> +               "psrad         %4, %%mm1\n"
+> +               "psrad         %4, %%mm2\n"
+> +               "psrad         %4, %%mm3\n"
+> +               "\n"
+> +               "packssdw   %%mm0, %%mm0\n"
+> +               "packssdw   %%mm1, %%mm1\n"
+> +               "packssdw   %%mm2, %%mm2\n"
+> +               "packssdw   %%mm3, %%mm3\n"
+> +               "\n"
+> +               "movq       %%mm0, %%mm4\n"
+> +               "movq       %%mm0, %%mm5\n"
+> +               "pmaddwd  160(%1), %%mm4\n"
+> +               "pmaddwd  168(%1), %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm1, %%mm6\n"
+> +               "movq       %%mm1, %%mm7\n"
+> +               "pmaddwd  192(%1), %%mm6\n"
+> +               "pmaddwd  200(%1), %%mm7\n"
+> +               "paddd      %%mm6, %%mm4\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm2, %%mm6\n"
+> +               "movq       %%mm2, %%mm7\n"
+> +               "pmaddwd  224(%1), %%mm6\n"
+> +               "pmaddwd  232(%1), %%mm7\n"
+> +               "paddd      %%mm6, %%mm4\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm3, %%mm6\n"
+> +               "movq       %%mm3, %%mm7\n"
+> +               "pmaddwd  256(%1), %%mm6\n"
+> +               "pmaddwd  264(%1), %%mm7\n"
+> +               "paddd      %%mm6, %%mm4\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm4, (%3)\n"
+> +               "movq       %%mm5, 8(%3)\n"
+> +               "\n"
+> +               "movq       %%mm0, %%mm5\n"
+> +               "pmaddwd  176(%1), %%mm0\n"
+> +               "pmaddwd  184(%1), %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm1, %%mm7\n"
+> +               "pmaddwd  208(%1), %%mm1\n"
+> +               "pmaddwd  216(%1), %%mm7\n"
+> +               "paddd      %%mm1, %%mm0\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm2, %%mm7\n"
+> +               "pmaddwd  240(%1), %%mm2\n"
+> +               "pmaddwd  248(%1), %%mm7\n"
+> +               "paddd      %%mm2, %%mm0\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm3, %%mm7\n"
+> +               "pmaddwd  272(%1), %%mm3\n"
+> +               "pmaddwd  280(%1), %%mm7\n"
+> +               "paddd      %%mm3, %%mm0\n"
+> +               "paddd      %%mm7, %%mm5\n"
+> +               "\n"
+> +               "movq       %%mm0, 16(%3)\n"
+> +               "movq       %%mm5, 24(%3)\n"
+> +               :
+> +               : "r" (in), "r" (consts), "r" (&round_c), "r" (out),
+> +                       "i" (SBC_PROTO_FIXED8_SCALE)
+> +               : "cc", "memory");
+> +}
+> +
+> +static inline void sbc_analyze_4b_4s_sse(struct sbc_encoder_state *state,
+> +               int16_t *x, int32_t *out, int out_stride)
+> +{
+> +       /* Analyze blocks */
+> +       sbc_analyze_four_sse(x + 12, out, analysis_consts_fixed4_simd_odd);
+> +       out += out_stride;
+> +       sbc_analyze_four_sse(x + 8, out, analysis_consts_fixed4_simd_even);
+> +       out += out_stride;
+> +       sbc_analyze_four_sse(x + 4, out, analysis_consts_fixed4_simd_odd);
+> +       out += out_stride;
+> +       sbc_analyze_four_sse(x + 0, out, analysis_consts_fixed4_simd_even);
+> +
+> +       __asm__ volatile ("emms\n");
+> +}
+> +
+> +static inline void sbc_analyze_4b_8s_sse(struct sbc_encoder_state *state,
+> +               int16_t *x, int32_t *out, int out_stride)
+> +{
+> +       /* Analyze blocks */
+> +       sbc_analyze_eight_sse(x + 24, out, analysis_consts_fixed8_simd_odd);
+> +       out += out_stride;
+> +       sbc_analyze_eight_sse(x + 16, out, analysis_consts_fixed8_simd_even);
+> +       out += out_stride;
+> +       sbc_analyze_eight_sse(x + 8, out, analysis_consts_fixed8_simd_odd);
+> +       out += out_stride;
+> +       sbc_analyze_eight_sse(x + 0, out, analysis_consts_fixed8_simd_even);
+> +
+> +       __asm__ volatile ("emms\n");
+> +}
+> +
+> +static inline void sbc_analyze_1b_8s_sse_even(struct sbc_encoder_state *state,
+> +               int16_t *x, int32_t *out, int out_stride);
+> +
+> +static inline void sbc_analyze_1b_8s_sse_odd(struct sbc_encoder_state *state,
+> +               int16_t *x, int32_t *out, int out_stride)
+> +{
+> +       sbc_analyze_eight_sse(x, out, analysis_consts_fixed8_simd_odd);
+> +       state->sbc_analyze_8s = sbc_analyze_1b_8s_sse_even;
+> +
+> +       __asm__ volatile ("emms\n");
+> +}
+> +
+> +static inline void sbc_analyze_1b_8s_sse_even(struct sbc_encoder_state *state,
+> +               int16_t *x, int32_t *out, int out_stride)
+> +{
+> +       sbc_analyze_eight_sse(x, out, analysis_consts_fixed8_simd_even);
+> +       state->sbc_analyze_8s = sbc_analyze_1b_8s_sse_odd;
+> +
+> +       __asm__ volatile ("emms\n");
+> +}
+> +
+> +static void sbc_calc_scalefactors_sse(
+> +       int32_t sb_sample_f[16][2][8],
+> +       uint32_t scale_factor[2][8],
+> +       int blocks, int channels, int subbands)
+> +{
+> +       static const SBC_ALIGNED int32_t consts[2] = {
+> +               1 << SCALE_OUT_BITS,
+> +               1 << SCALE_OUT_BITS,
+> +       };
+> +       int ch, sb;
+> +       intptr_t blk;
+> +       for (ch = 0; ch < channels; ch++) {
+> +               for (sb = 0; sb < subbands; sb += 2) {
+> +                       blk = (blocks - 1) * (((char *) &sb_sample_f[1][0][0] -
+> +                               (char *) &sb_sample_f[0][0][0]));
+> +                       __asm__ volatile (
+> +                               "movq         (%4), %%mm0\n"
+> +                       "1:\n"
+> +                               "movq     (%1, %0), %%mm1\n"
+> +                               "pxor        %%mm2, %%mm2\n"
+> +                               "pcmpgtd     %%mm2, %%mm1\n"
+> +                               "paddd    (%1, %0), %%mm1\n"
+> +                               "pcmpgtd     %%mm1, %%mm2\n"
+> +                               "pxor        %%mm2, %%mm1\n"
+> +
+> +                               "por         %%mm1, %%mm0\n"
+> +
+> +                               "sub            %2, %0\n"
+> +                               "jns            1b\n"
+> +
+> +                               "movd        %%mm0, %k0\n"
+> +                               "psrlq         $32, %%mm0\n"
+> +                               "bsrl          %k0, %k0\n"
+> +                               "subl           %5, %k0\n"
+> +                               "movl          %k0, (%3)\n"
+> +
+> +                               "movd        %%mm0, %k0\n"
+> +                               "bsrl          %k0, %k0\n"
+> +                               "subl           %5, %k0\n"
+> +                               "movl          %k0, 4(%3)\n"
+> +                       : "+r" (blk)
+> +                       : "r" (&sb_sample_f[0][ch][sb]),
+> +                               "i" ((char *) &sb_sample_f[1][0][0] -
+> +                                       (char *) &sb_sample_f[0][0][0]),
+> +                               "r" (&scale_factor[ch][sb]),
+> +                               "r" (&consts),
+> +                               "i" (SCALE_OUT_BITS)
+> +                       : "cc", "memory");
+> +               }
+> +       }
+> +       __asm__ volatile ("emms\n");
+> +}
+> +
+> +void sbc_init_primitives_sse(struct sbc_encoder_state *state)
+> +{
+> +       state->sbc_analyze_4s = sbc_analyze_4b_4s_sse;
+> +       if (state->increment == 1)
+> +               state->sbc_analyze_8s = sbc_analyze_1b_8s_sse_odd;
+> +       else
+> +               state->sbc_analyze_8s = sbc_analyze_4b_8s_sse;
+> +       state->sbc_calc_scalefactors = sbc_calc_scalefactors_sse;
+> +       state->implementation_info = "SSE";
+> +}
+> +
+> +#else
+> +void sbc_init_primitives_sse(struct sbc_encoder_state *state)
+> +{
+> +}
+> +#endif
+> diff --git a/sbc/sbc_primitives_sse.h b/sbc/sbc_primitives_sse.h
+> new file mode 100644
+> index 0000000..8830cfd
+> --- /dev/null
+> +++ b/sbc/sbc_primitives_sse.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + *
+> + *  Bluetooth low-complexity, subband codec (SBC) library
+> + *
+> + *  Copyright (C) 2020  Intel Corporation
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifndef __SBC_PRIMITIVES_SSE_H
+> +#define __SBC_PRIMITIVES_SSE_H
+> +
+> +#include "sbc_primitives.h"
+> +
+> +#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__)) && \
+> +               !defined(SBC_HIGH_PRECISION) && (SCALE_OUT_BITS == 15)
+> +
+> +#define SBC_BUILD_WITH_SSE_SUPPORT
+> +
+> +void sbc_init_primitives_sse(struct sbc_encoder_state *encoder_state);
+> +
+> +#endif
+> +
+> +#endif
+> --
+> 2.26.2
 
-This is automated email and please do not reply to this email!
+Pushed.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkpatch Failed
-
-Outputs:
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#161: FILE: unit/test-adv-monitor.c:1:
-+/*
-
-- total: 0 errors, 1 warnings, 512 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-Your patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
----
-Regards,
-Linux Bluetooth
-
---===============2336312357875185178==--
+-- 
+Luiz Augusto von Dentz
