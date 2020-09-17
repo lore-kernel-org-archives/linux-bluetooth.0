@@ -7,91 +7,170 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E026CC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E66AEC433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:48:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7ECC21973
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:47:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF99D2083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:48:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="GUOxIraY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="UOPSevjb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726265AbgIQGrh (ORCPT
+        id S1726186AbgIQGsZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 02:47:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43520 "EHLO
+        Thu, 17 Sep 2020 02:48:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726142AbgIQGrf (ORCPT
+        with ESMTP id S1726142AbgIQGsX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 02:47:35 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9A33C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:47:34 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id a16so984935qtj.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:47:34 -0700 (PDT)
+        Thu, 17 Sep 2020 02:48:23 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA87C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:48:23 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id q2so796280pfc.17
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=e3Ng92DmlzyUG7acvtBMlEmT/DHSWBCFO/IyCWcsolY=;
-        b=GUOxIraY5bahPU5r353/Z/Njg8JVTU+4ltLFwCaWwOYGnqLjFvoXHey+rlHXfrLSj0
-         mUU36RB5pKDfS8HK4cZw+5qyBHWfBAtvtA437+Se5Ny+cuM9WeAJ3LZBsyy0T30z9Xzl
-         VH0l/ajmMLnoR0k26RtX3G+UW3oZ1qMX5hTWVHG+BbTR+UhoyNyFccuwwgvs2PMEFmGr
-         PqTXbvLonkpEOWPqDMQIRHCiooRpurEPaaMePu35ETu2OSoeV5n38ZGDCmSWxex+9lYq
-         fxfcrir2Ryed8dvRLm5Ej+sFPTMB2sKkeNQFxwRvv5Bmg6FJebcLGTIgUe4QIfn1pYp0
-         u2ag==
+        bh=Ihi2082NxuAZnwPlDWpKybiyW3ApajnMKdIt5g5t49s=;
+        b=UOPSevjbAMTngIb8psMDG/2VcsmQu9QDW4TSaKD3SwVtnxlb0hWdZnls40NMcHw2wQ
+         HBnB9OSbi2YtisRZdy/eGMbEed2U7iVS+e3F4xjXVJ3RRMs0xBs9b+V9Q/X5ovccyL4L
+         Na2l1G5Z2Ln0p5rrSaEbO5muz0x1hs0eaKh0wWjbPgKbI1a3poUb70iu4vLy9G8/AsCD
+         qfWOWZUS3muNM+dWF4gCSv3YtlC+NXtD7W04O4pMaNAescv5mhRjEgGRbb68ZNc8JDbt
+         LNJHtovPpnttbXwUhlUr61rMEhZX8dmQ0gk074DixjTFDo8SjadjAChCQx2a6wfziVsu
+         Pxqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
          :to:cc;
-        bh=e3Ng92DmlzyUG7acvtBMlEmT/DHSWBCFO/IyCWcsolY=;
-        b=ud4SClmQczjVA7jc0hIVvkw290Ve2QLr/CYgtg1TLAbYSDllvJlS2nq2uAY3FnvAlm
-         iDoho5fxp6hnknCMg4cVX437k34m2ad5QrLgjHmawN7t9bHNI8GN6uWzskL00sEeXIUs
-         l/hbAU+YhQvv2T51yosbbD9qH9oWJ9aLXdvcayHc7wK0ZGFyQW5V0DvFVfNJ8Ii5mypw
-         wZ0SQpbHJMu2fCE2k99FWr0T0sRO31AOZRAzBy10e/0/8oB7SGOVLZrxGdeqbanDXpst
-         bCFCRgurrZ8d0uzXXnGZ2mQ0zyGVIylN3NYTBFgpgTwwxEygjV1Cd77XuT1+Oppuiw0M
-         ku5Q==
-X-Gm-Message-State: AOAM5319n01D3dGl5iuMQO5l7AzDWj0Yk4Gp6DPzHPYkN8LPuyKPSpEp
-        BINrbRq40mUQwxzT4y8DUDKdx/owxB+hetCHsr1P6hRQeAwKB/bYRBjzOk9URumMTawfZa8nuaV
-        lc5ZPg0UxB2INlF276Bmetr6/Hplmhh5IqcuYmMWHOKm3AWBE2jJoizQ6y/q/iXvjx7E0Vs9QZC
-        JGECNach2OE/g=
-X-Google-Smtp-Source: ABdhPJz2ZeYqJoAzMv0NEf5Q0uORxxjToMj3h33BAV9zcwX6MrtEnA4FuxVr8N5UbI8Ms9mO4GMfZFt5a4yfK8gacg==
+        bh=Ihi2082NxuAZnwPlDWpKybiyW3ApajnMKdIt5g5t49s=;
+        b=GPDsXtb7mj/NGmApL8sWavwBfT2n4JxAVeAdPFIwTsA6XXdDZRC6faDJamBMevfr3O
+         XxtJNp0DVN+ICdiXmgygJiJ7n3wmmmcNx6MPwaEBc2qrNH85IRzxQvmbRHAXtM7i2l8e
+         99/tw2BdSkQVZZ9UF3p7vjC9jJ+hWolCoKyjZbgqekL+1HGPyutTy/nRggFLUOLOPd+N
+         bFREodNrBADNFddQeJ0LGq6KjYYGrp5e1//WEyL1IMcXQPneYmONGwP8cKLJ4540Jlyn
+         HDLaUGhQ/dqmwf6hm6pwQlZeG8XtvVyyfWW4hzo39kwp1JICR1AlJQtwLSWQqOkSJ3pm
+         U99w==
+X-Gm-Message-State: AOAM5325Eh7kw1CZHmuwAZ+teCcQLQ8PSzI+dIdNPOiqc1ZyYzxTJbea
+        0XBqYnKXT/CFACE+PGd3DbOh7KXFJPM5cagu6iZCDf2D4+8sibFHdoAhK+vkw6c7AKIvJxiQt2v
+        +ThsbV1QufStWR77QNuposmJUrnktuKhfC9nSRMSHKjHB8OdtcVRvvcHbm1OB88R85RdjkZ4nIy
+        zQnkHNLUyogKo=
+X-Google-Smtp-Source: ABdhPJxHpoFRBdAfV8RevCzA9pjqOCASbwDYK5xArVgBdQUhQnHsSYmO6hDumpYRy643bmIbfB+kC2t+u36QsGsnqQ==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:ad4:5745:: with SMTP id
- q5mr27078772qvx.29.1600325253789; Wed, 16 Sep 2020 23:47:33 -0700 (PDT)
-Date:   Thu, 17 Sep 2020 14:47:29 +0800
-Message-Id: <20200917144712.BlueZ.1.I9a1342e299d78f88c2fc8f8ce61fac84baa61a05@changeid>
+ (user=howardchung job=sendgmr) by 2002:aa7:934e:0:b029:13f:d056:593 with SMTP
+ id 14-20020aa7934e0000b029013fd0560593mr20182654pfn.15.1600325303181; Wed, 16
+ Sep 2020 23:48:23 -0700 (PDT)
+Date:   Thu, 17 Sep 2020 14:48:15 +0800
+Message-Id: <20200917144759.BlueZ.1.I1f083629d41c747a33a3937fbc199ea37dccde12@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [BlueZ PATCH] core: Correct namings of LEScanAdvMonitor params
+Subject: [BlueZ PATCH 1/2] core: Add parmas to set interleaving durations
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     alainm@chromium.org, mmandlik@chromium.org, mcchou@chromium.org,
-        luiz.dentz@gmail.com, Howard Chung <howardchung@google.com>
+Cc:     alainm@chromium.org, luiz.dentz@gmail.com, mcchou@chromium.org,
+        mmandlik@chromium.org, Howard Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-LEScan.*AdvMonitor is already used in src/main.c and src/main.conf
+This patch adds parameters to control the durations of allowlist scan
+and no-filter scan when the kernel is doing interleaving scan.
 ---
 
- src/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/adapter.c | 18 ++++++++++++++++++
+ src/hcid.h    |  3 +++
+ src/main.c    | 10 ++++++++++
+ src/main.conf |  7 +++++++
+ 4 files changed, 38 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index b2bd8b3f1d01..c0e95b48a1c4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4431,6 +4431,24 @@ static void load_default_system_params(struct btd_adapter *adapter)
+ 		len += sizeof(params[i].u16);
+ 	}
+ 
++	if (main_opts.default_params.advmon_allowlist_scan_duration) {
++		params[i].entry.type = 0x001d;
++		params[i].entry.length = sizeof(params[i].u16);
++		params[i].u16 =
++			main_opts.default_params.advmon_allowlist_scan_duration;
++		++i;
++		len += sizeof(params[i].u16);
++	}
++
++	if (main_opts.default_params.advmon_no_filter_scan_duration) {
++		params[i].entry.type = 0x001e;
++		params[i].entry.length = sizeof(params[i].u16);
++		params[i].u16 =
++			main_opts.default_params.advmon_no_filter_scan_duration;
++		++i;
++		len += sizeof(params[i].u16);
++	}
++
+ 	err = mgmt_send(adapter->mgmt, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+ 			adapter->dev_id, len, params, NULL, NULL, NULL);
+ 	if (!err)
+diff --git a/src/hcid.h b/src/hcid.h
+index 3624ba6ea163..c3e5fe803543 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -93,6 +93,9 @@ struct main_opts {
+ 		uint16_t	le_conn_latency;
+ 		uint16_t	le_conn_lsto;
+ 		uint16_t	le_autoconnect_timeout;
++
++		uint16_t	advmon_allowlist_scan_duration;
++		uint16_t	advmon_no_filter_scan_duration;
+ 	} default_params;
+ 
+ 
 diff --git a/src/main.c b/src/main.c
-index 038f867b5a6d..d45aed0d9569 100644
+index 038f867b5a6d..e222ed3bf855 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -114,8 +114,8 @@ static const char *controller_options[] = {
- 	"LEScanWindowSuspend",
- 	"LEScanIntervalDiscovery",
- 	"LEScanWindowDiscovery",
--	"LEScanIntervalAdvMonitoring",
--	"LEScanWindowAdvMonitoring",
-+	"LEScanIntervalAdvMonitor",
-+	"LEScanWindowAdvMonitor",
- 	"LEScanIntervalConnect",
- 	"LEScanWindowConnect",
- 	"LEMinConnectionInterval",
+@@ -123,6 +123,8 @@ static const char *controller_options[] = {
+ 	"LEConnectionLatency",
+ 	"LEConnectionSupervisionTimeout",
+ 	"LEAutoconnecttimeout",
++	"AdvMonAllowlistScanDuration",
++	"AdvMonNoFilterScanDuration",
+ 	NULL
+ };
+ 
+@@ -434,6 +436,14 @@ static void parse_controller_config(GKeyFile *config)
+ 		  &main_opts.default_params.le_autoconnect_timeout,
+ 		  0x0001,
+ 		  0x4000},
++		{ "AdvMonAllowlistScanDuration",
++		  &main_opts.default_params.advmon_allowlist_scan_duration,
++		  1,
++		  10000},
++		{ "AdvMonNoFilterScanDuration",
++		  &main_opts.default_params.advmon_no_filter_scan_duration,
++		  1,
++		  10000},
+ 	};
+ 	uint16_t i;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index 8d85702d4316..3b341f44c9cf 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -152,6 +152,13 @@
+ #LEConnectionSupervisionTimeout=
+ #LEAutoconnecttimeout=
+ 
++# Scan duration during interleaving scan. Only used when scanning for ADV
++# monitors. The units are msec.
++# Default: 300
++#AdvMonAllowlistScanDuration=
++# Default: 500
++#AdvMonNoFilterScanDuration=
++
+ [GATT]
+ # GATT attribute cache.
+ # Possible values:
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
