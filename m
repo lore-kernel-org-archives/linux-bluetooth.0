@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8D4C433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B78C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:11:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 381A121D24
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0FE62083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:11:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GDdTL9uE"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dLTJoTzz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbgIQHH1 (ORCPT
+        id S1726290AbgIQHK6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 03:07:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46226 "EHLO
+        Thu, 17 Sep 2020 03:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726218AbgIQHFF (ORCPT
+        with ESMTP id S1726245AbgIQHKn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 03:05:05 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF6AC06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:05:05 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id y6so623557plt.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:05:05 -0700 (PDT)
+        Thu, 17 Sep 2020 03:10:43 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD64C06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:10:43 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id jw11so764549pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:10:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=sDqXCkXQZ7goM0PwAfEYoxwVPgx97yi616G18CFZ3Sk=;
-        b=GDdTL9uEj3UCNT72uLZaYOKc1PuHKWWfKJuaJnljsb6EE7HvyNfLPe39xIYc/oPXI/
-         tiY18wyNGhQLmYLCMc2zmZ4KKdBY7A0mVnKejniU2aUZquWH09VwAc2qPmeGV12Q6JkE
-         vWTdcrCZi9sHJSe/T57iCFI9rRBgvCTI2mqpA=
+        bh=KMSIqu+V+YjNzhdgBvaOXQy1sPDxSNzTGf9LnWQU5i0=;
+        b=dLTJoTzz519qI6K4IdhzgCSpJkntcRAMEvm5v6eTYNvWxY15sXNksO0TyfPo4i4zMq
+         gnUXIEbzQ0scbJ5E98q8Bj8onCvbMmX9Tr5w2RI43AW9QTY0lh+NnSHtgKIApZ+MULPW
+         i4xqiKj+76v2MQMNUXA+hZoeQJefpEHWv8F1Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=sDqXCkXQZ7goM0PwAfEYoxwVPgx97yi616G18CFZ3Sk=;
-        b=qJJ18YpavXGd0LULCm3L8qCMY7QnRR149J7YQ3D15zSKbJaUJK3I9KpH2In/a0qMpz
-         DtHpcg7aMjEBwe3+JStebw2bFVIM/+aGkTKqQaZKFm58xAABqy1ZTCY/pAg/+OmYWUg5
-         JtVUY9SPAU0s7wdHoHepCTLxBQ6xCDvLYNNqDJqCofKWeYYboek0OM9y8ZwkMv9iRqKd
-         jiAStZOud9xiVTFqE8LFyELZ/x3bjmo4ZTZ9Poxv+14MNSXChZauDSgzzc7FSCKFq7Qv
-         8ig+sWqu/WgztOe4a2KxEcR93fF8u/RKlAs1qhsOK2APrqs5xWI+2+ipXf9Dr2EXqvaS
-         qikg==
-X-Gm-Message-State: AOAM530giQtO5NvLRJPeUMbfVzqlEx+JtnptPyXgECStQZLYGXLb+8eC
-        5v08xjHVey+LL9yYAY3e1dlS8zvBN+B9yA==
-X-Google-Smtp-Source: ABdhPJwbPMfTJh4txTCdjsrEdkLYb5/0QUliYmgwfoYRCYOq5RA1ZSaJ0rZSkOyhaq4OfNm1RugkgQ==
-X-Received: by 2002:a17:902:161:b029:d1:9bc8:15f1 with SMTP id 88-20020a1709020161b02900d19bc815f1mr27324878plb.39.1600326304290;
-        Thu, 17 Sep 2020 00:05:04 -0700 (PDT)
+        bh=KMSIqu+V+YjNzhdgBvaOXQy1sPDxSNzTGf9LnWQU5i0=;
+        b=BvjldVM3PwjV7Llg9pju7BCd/i+2Wo86Yt18fyjbbWhsW5/4fCVfJvrlIdXwiz1o9b
+         mZT+bgibp/DeM/OpahNhU3D1zSDb5p5cBzXGAlMSLpNv52EVF7J3O4QQpjruEMH0sPNx
+         5wkllPfDMmVVdiq9BpiW7EG1964s6rs8xtBirw7Sz0ZcMtET1DJ1yxtX9okAF2GOFZ5g
+         ThjoDBbbJjVccXo8nTkrD9AYxsnpKhBMCbs+lc6Vw8O9YHGW5OFftFH+8h2qJwfumUEt
+         KTO2yGuTW3dp6CEamjAxc1mVIoRvC8Wo0gLH+jZUW5aivrX/jOs22E2V8gTdVPPgrRIQ
+         aUsQ==
+X-Gm-Message-State: AOAM533mdSAg88ol6KYvtaZ7iTkSmQuOJWxZHtfyLfs1Dyp8NiVzP1mq
+        NAbVcadvMe1inkqRjgo3RlXOpB8mvnHMmg==
+X-Google-Smtp-Source: ABdhPJxyUhrzfnGjrD04cIsb8SrH06BKkaXFI597rQ8NdukHNzwae4jWi4XCv27juOkyX4i6GzsLrA==
+X-Received: by 2002:a17:90b:4b11:: with SMTP id lx17mr7263778pjb.22.1600326642771;
+        Thu, 17 Sep 2020 00:10:42 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id y197sm5407372pfc.220.2020.09.17.00.05.03
+        by smtp.gmail.com with ESMTPSA id j26sm933478pgl.91.2020.09.17.00.10.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Sep 2020 00:05:03 -0700 (PDT)
+        Thu, 17 Sep 2020 00:10:42 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Howard Chung <howardchung@google.com>,
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Alain Michaud <alainm@chromium.org>,
+        Howard Chung <howardchung@google.com>,
         chromeos-bluetooth-upstreaming@chromium.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Manish Mandlik <mmandlik@chromium.org>,
         Manish Mandlik <mmandlik@google.com>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v3 1/8] adv_monitor: Implement RSSI Filter logic for background scanning
-Date:   Thu, 17 Sep 2020 00:04:53 -0700
-Message-Id: <20200917000448.BlueZ.v3.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+Subject: [BlueZ PATCH v4 1/8] adv_monitor: Implement RSSI Filter logic for background scanning
+Date:   Thu, 17 Sep 2020 00:10:31 -0700
+Message-Id: <20200917001020.BlueZ.v4.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -83,14 +83,14 @@ This patch implements the RSSI Filter logic for background scanning.
 
 This was unit-tested by running tests in unit/test-adv-monitor.c
 
-unit/test-adv-monitor.c file. Verified all tests PASS by running:
-USE="-bluez-next bluez-upstream" FEATURES=test emerge-hatch bluez
-
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Howard Chung <howardchung@google.com>
 ---
+
+Changes in v4:
+- Fix commit message
 
 Changes in v3:
 - Fix commit message
