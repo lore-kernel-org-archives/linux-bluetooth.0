@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ABBC2BBD1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982C4C433E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:07:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D7F2206E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51D8D21D41
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 07:07:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="T4Ookhgk"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mU3QgRhG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726365AbgIQHG1 (ORCPT
+        id S1726249AbgIQHHH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 03:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46428 "EHLO
+        Thu, 17 Sep 2020 03:07:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726106AbgIQHGX (ORCPT
+        with ESMTP id S1726375AbgIQHGu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 03:06:23 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59356C06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:06:16 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id fa1so784307pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:06:16 -0700 (PDT)
+        Thu, 17 Sep 2020 03:06:50 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1420C06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:06:49 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 7so802003pgm.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 00:06:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wXANRElz/qKLo+YPc/C/DfIhCrjha/xK9SJq8ld3Zj4=;
-        b=T4OokhgkkLb70sIJ4Vu1jrs/pSTuQdsCkaJPGUGOguOoSNoousmbf0KR4yE3pzycSf
-         0a8DoDn8SMQRpO/XjeKogSdfA3u3GnhMKRAgl6jJFPAGUy2OBkaR19Z9WfsEQf3m/rwh
-         rAEVqY1pLilDcermnvDjFT/kHgd21M92cUH84=
+        bh=NdeK9jrlbDmnJ07T/Z6f3zn8nKeo+Ri2ioiOM8etDYk=;
+        b=mU3QgRhGh7VqA72Z6FfXfRR7d3d3ExVV0jY6g5UZusp0tHnOdhxE5fyJYI7L7KD9R8
+         E301OSe2P+uI6uH0+c8j8VHoxsHJ/O2RZXIVh/H7Rx/3+vNOgZaGBG9+6m56a23qrWCY
+         nkPVmJIv9i+uaf+HQhZCt8dAy8oQGZlaYlop8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wXANRElz/qKLo+YPc/C/DfIhCrjha/xK9SJq8ld3Zj4=;
-        b=TBihOXZCdg1CtWXmQjdTg7cXWolnztG/JG7eN7PXeiLgn0jFrh8e5DdovU/P1m8H4M
-         Q+QQX5sgqficxOdWBAqTn+MWVqMjzFH1YGfMN0ajedeqacz2s4eAqyf1AaISVeh6SVFw
-         vq+FbAIGbPlmT0kBVBinfsFpoj7Zxe7IHRk4z/ky5bOkuIf+2KBymFNPrzzaye3p5iyv
-         mO8pOHM3uSPnYF1qtmiACzKWFnGG4g8UXs9pv11d61yBZV0zWSVymH2Ksp8vQ14Tay/g
-         UNJyLGEaUTWZZ5SaCS8OVrr/vzDfbraw4Jl2qdm9Xh040GZPGO7u6F+8Gp7hwxm+4qNy
-         ZfLA==
-X-Gm-Message-State: AOAM53110+QNQbPQCxYvG88dOVj93lPkr3MtZG2cBq2AvTuzi8KMXTm8
-        7GrOvYayr5R/7BEzuFw7qp3E0jm/H9QXjA==
-X-Google-Smtp-Source: ABdhPJzkvlJzek6dp6JUIFQVfbsZK1n/uh8OpC8PeOTydIRmCO/QKy2OCyy0WlGCzd6LsuVcA4726g==
-X-Received: by 2002:a17:90a:e02:: with SMTP id v2mr7104250pje.6.1600326374869;
-        Thu, 17 Sep 2020 00:06:14 -0700 (PDT)
+        bh=NdeK9jrlbDmnJ07T/Z6f3zn8nKeo+Ri2ioiOM8etDYk=;
+        b=Lk+l2q/lHNglyfS0bVJs1swXHqolfj/FuIljFt1xZ2ONeF4JLuI4y8r2+mIOBiqw6L
+         HxSrhf6AAZ6+4plaaGrCjPO5lef5x8oqNjfAnPGzcCf58EJx56ZxhZphkmcIj2YG1qlH
+         Hmz8C+Ge1Es9u63s5V+JTpVOThZWBJAIf1YiW65fi0p63ba+IKyOiZHpBd39ni3m6qbS
+         S/LFJiqbygXrvJGripLaadhzfpzrz8qOblPc91TML208Hx8seMjMOVwuzqZCUzAdwP9J
+         TQeSgzN4DuJFDzhWJGtsnJx+pmWdxoLb1KmCw3VeWGUse4y8nlVB24IUl5GOjiW5oxNi
+         yvyg==
+X-Gm-Message-State: AOAM531Q9smGIcfsFfucJtQoYFI+JM9FglATAVr8q3Bvulo6gYTLmoAy
+        k1nbNmSx9phpNiINHxbw7Ez2ez8tiiZQFA==
+X-Google-Smtp-Source: ABdhPJzCj2mdX7DUBKZmn2Ro004df9GNjfmoXTF3DbYgKPRK8nr4eipKPKT2AJ5krVgf+EirCaqD0w==
+X-Received: by 2002:a63:4404:: with SMTP id r4mr19954616pga.29.1600326409123;
+        Thu, 17 Sep 2020 00:06:49 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id y197sm5407372pfc.220.2020.09.17.00.06.13
+        by smtp.gmail.com with ESMTPSA id y197sm5407372pfc.220.2020.09.17.00.06.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Sep 2020 00:06:14 -0700 (PDT)
+        Thu, 17 Sep 2020 00:06:48 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Howard Chung <howardchung@google.com>,
@@ -63,11 +63,10 @@ Cc:     Howard Chung <howardchung@google.com>,
         chromeos-bluetooth-upstreaming@chromium.org,
         Marcel Holtmann <marcel@holtmann.org>,
         Manish Mandlik <mmandlik@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v3 6/8] adv_monitor: Implement Add Adv Patterns Monitor cmd handler
-Date:   Thu, 17 Sep 2020 00:05:03 -0700
-Message-Id: <20200917000448.BlueZ.v3.6.Ibbcb11712b613ef95c31b41207c3ea945c830018@changeid>
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [BlueZ PATCH v3 8/8] adv_monitor: Issue Remove Adv Monitor mgmt call
+Date:   Thu, 17 Sep 2020 00:05:07 -0700
+Message-Id: <20200917000448.BlueZ.v3.8.Ifda683c92ff520bf58ac37c02dc40b8d9598d1b0@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200917000448.BlueZ.v3.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 References: <20200917000448.BlueZ.v3.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
@@ -77,123 +76,218 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Howard Chung <howardchung@google.com>
+From: Alain Michaud <alainm@chromium.org>
 
-- Send the MGMT_OP command to kernel upon registration of a Adv patterns
-monitor.
-- Call Activate() or Release() to client depending on the reply from
-  kernel
+This calls Remove Adv Monitor command to kernel and handles the callback
+during a monitor removal initiated by a D-Bus client. This also
+registers callback for getting notified on Adv Monitor Removed event, so
+that the Adv monitor manager can invalidate the monitor by calling
+Release() on its proxy.
 
-the call through syslog
+The following tests were performed.
+- In bluetoothctl console, add a monitor and remove the monitor by its
+index and verify the removal in both the output of btmgmt and syslog.
+- In bluetoothctl console, add a monitor, remove the monitor via
+btmgmt and verify the removal in syslog.
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+Reviewed-by: Howard Chung <howardchung@google.com>
 ---
 
-(no changes since v1)
+Changes in v3:
+- Fix const qualifier of a pointer
 
- src/adv_monitor.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 66 insertions(+), 1 deletion(-)
+ src/adv_monitor.c | 128 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 120 insertions(+), 8 deletions(-)
 
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 211094c89..deaa1894a 100644
+index b4fe39eff..27da30b51 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -609,11 +609,59 @@ done:
- 	return monitor->state != MONITOR_STATE_FAILED;
+@@ -88,6 +88,7 @@ enum monitor_state {
+ 	MONITOR_STATE_FAILED,	/* Failed to be init'ed */
+ 	MONITOR_STATE_INITED,	/* Init'ed but not yet sent to kernel */
+ 	MONITOR_STATE_HONORED,	/* Accepted by kernel */
++	MONITOR_STATE_REMOVING, /* Removing from kernel */
+ };
+ 
+ struct btd_adv_monitor_pattern {
+@@ -103,6 +104,7 @@ struct adv_monitor {
+ 	char *path;
+ 
+ 	enum monitor_state state;	/* MONITOR_STATE_* */
++	uint16_t monitor_handle;	/* Kernel Monitor Handle */
+ 
+ 	int8_t high_rssi;		/* High RSSI threshold */
+ 	uint16_t high_rssi_timeout;	/* High RSSI threshold timeout */
+@@ -631,6 +633,7 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
+ 		return;
+ 	}
+ 
++	monitor->monitor_handle = le16_to_cpu(rp->monitor_handle);
+ 	monitor->state = MONITOR_STATE_HONORED;
+ 
+ 	DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
+@@ -639,8 +642,7 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
+ 	g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL, NULL, NULL,
+ 					NULL);
+ 
+-	DBG("Adv Monitor with handle:0x%04x added",
+-					le16_to_cpu(rp->monitor_handle));
++	DBG("Adv monitor with handle:0x%04x added", monitor->monitor_handle);
  }
  
-+/* Handles the callback of Add Adv Patterns Monitor command */
-+static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
+ static void monitor_copy_patterns(void *data, void *user_data)
+@@ -714,20 +716,77 @@ done:
+ 	free(cp);
+ }
+ 
++/* Handles the callback of Remove Adv Monitor command */
++static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
++				const void *param, void *user_data)
 +{
-+	const struct mgmt_rp_add_adv_patterns_monitor *rp = param;
 +	struct adv_monitor *monitor = user_data;
++	const struct mgmt_rp_remove_adv_monitor *rp = param;
 +	uint16_t adapter_id = monitor->app->manager->adapter_id;
 +
 +	if (status != MGMT_STATUS_SUCCESS || !param) {
-+		btd_error(adapter_id, "Failed to Add Adv Patterns Monitor "
-+				"with status 0x%02x", status);
-+		monitor_release(monitor, NULL);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		btd_error(adapter_id, "Wrong size of Add Adv Patterns Monitor "
-+				"response");
-+		monitor_release(monitor, NULL);
-+		return;
-+	}
-+
-+	monitor->state = MONITOR_STATE_HONORED;
-+
-+	DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
-+		monitor->app->owner, monitor->path);
-+
-+	g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL, NULL, NULL,
-+					NULL);
-+
-+	DBG("Adv Monitor with handle:0x%04x added",
-+					le16_to_cpu(rp->monitor_handle));
-+}
-+
-+static void monitor_copy_patterns(void *data, void *user_data)
-+{
-+	struct btd_adv_monitor_pattern *pattern = data;
-+	struct mgmt_cp_add_adv_monitor *cp = user_data;
-+
-+	if (!pattern)
-+		return;
-+
-+	memcpy(cp->patterns + cp->pattern_count, pattern, sizeof(*pattern));
-+	cp->pattern_count++;
-+}
-+
- /* Handles an Adv Monitor D-Bus proxy added event */
- static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- {
- 	struct adv_monitor *monitor;
- 	struct adv_monitor_app *app = user_data;
-+	struct mgmt_cp_add_adv_monitor *cp = NULL;
-+	uint8_t pattern_count, cp_len;
- 	uint16_t adapter_id = app->manager->adapter_id;
- 	const char *path = g_dbus_proxy_get_path(proxy);
- 	const char *iface = g_dbus_proxy_get_interface(proxy);
-@@ -646,7 +694,24 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 
- 	queue_push_tail(app->monitors, monitor);
- 
-+	pattern_count = queue_length(monitor->patterns);
-+	cp_len = sizeof(struct mgmt_cp_add_adv_monitor) +
-+			pattern_count * sizeof(struct mgmt_adv_pattern);
-+
-+	cp = malloc0(cp_len);
-+	queue_foreach(monitor->patterns, monitor_copy_patterns, cp);
-+
-+	if (!mgmt_send(app->manager->mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+			adapter_id, cp_len, cp, add_adv_patterns_monitor_cb,
-+			monitor, NULL)) {
-+		error("Unable to send Add Adv Patterns Monitor command");
++		btd_error(adapter_id, "Failed to Remove Adv Monitor with "
++			"status 0x%02x", status);
 +		goto done;
 +	}
 +
- 	DBG("Adv Monitor allocated for the object at path %s", path);
++	if (length < sizeof(*rp)) {
++		btd_error(adapter_id, "Wrong size of Remove Adv Monitor "
++				"response");
++		goto done;
++	}
 +
 +done:
-+	free(cp);
++	queue_remove(monitor->app->monitors, monitor);
++
++	DBG("Adv Monitor removed with handle:0x%04x, path %s",
++		monitor->monitor_handle, monitor->path);
++
++	monitor_free(monitor);
++}
++
++
+ /* Handles the removal of an Adv Monitor D-Bus proxy */
+ static void monitor_proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+ {
+ 	struct adv_monitor *monitor;
++	struct mgmt_cp_remove_adv_monitor cp;
+ 	struct adv_monitor_app *app = user_data;
++	uint16_t adapter_id = app->manager->adapter_id;
+ 
+-	monitor = queue_remove_if(app->monitors, monitor_match, proxy);
+-	if (monitor) {
+-		DBG("Adv Monitor removed for the object at path %s",
+-			monitor->path);
++	monitor = queue_find(app->monitors, monitor_match, proxy);
+ 
+-		/* The object was gone, so we don't need to call Release() */
+-		monitor_free(monitor);
++	/* A monitor removed event from kernel can remove a monitor and notify
++	 * the app on Release() where this callback can be invoked, so we
++	 * simply skip here.
++	 */
++	if (!monitor)
++		return;
++
++	if (monitor->state != MONITOR_STATE_HONORED)
++		goto done;
++
++	monitor->state = MONITOR_STATE_REMOVING;
++
++	cp.monitor_handle = cpu_to_le16(monitor->monitor_handle);
++
++	if (!mgmt_send(app->manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
++			adapter_id, sizeof(cp), &cp, remove_adv_monitor_cb,
++			monitor, NULL)) {
++		btd_error(adapter_id, "Unable to send Remove Advt Monitor "
++				"command");
++		goto done;
+ 	}
++
++	return;
++
++done:
++	queue_remove(app->monitors, monitor);
++
++	DBG("Adv Monitor removed in state %02x with path %s", monitor->state,
++		monitor->path);
++
++	monitor_free(monitor);
  }
  
- /* Handles the removal of an Adv Monitor D-Bus proxy */
-@@ -1063,7 +1128,7 @@ static void adv_match_per_monitor(void *data, void *user_data)
- 	struct adv_monitor *monitor = data;
- 	struct adv_content_filter_info *info = user_data;
+ /* Creates an app object, initiates it and sets D-Bus event handlers */
+@@ -936,6 +995,55 @@ static const GDBusPropertyTable adv_monitor_properties[] = {
+ 	{ }
+ };
  
--	if (!monitor && monitor->state != MONITOR_STATE_HONORED)
-+	if (!monitor || monitor->state != MONITOR_STATE_HONORED)
- 		return;
++/* Matches a monitor based on its handle */
++static bool removed_monitor_match(const void *data, const void *user_data)
++{
++	const struct adv_monitor *monitor = data;
++	const struct mgmt_ev_adv_monitor_removed *ev = user_data;
++
++	return monitor->monitor_handle == ev->monitor_handle;
++}
++
++/* Remove the matched monitor and reports the removal to the app */
++static void app_remove_monitor(void *data, void *user_data)
++{
++	struct adv_monitor_app *app = data;
++	struct adv_monitor *monitor;
++
++	monitor = queue_find(app->monitors, removed_monitor_match, user_data);
++	if (monitor) {
++		if (monitor->state == MONITOR_STATE_HONORED)
++			monitor_release(monitor, NULL);
++
++		queue_remove(app->monitors, monitor);
++
++		DBG("Adv Monitor at path %s removed", monitor->path);
++
++		monitor_free(monitor);
++	}
++}
++
++/* Processes Adv Monitor removed event from kernel */
++static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	const uint16_t adapter_id = manager->adapter_id;
++	struct btd_adv_monitor_manager *manager = user_data;
++	const struct mgmt_ev_adv_monitor_removed *ev = param;
++
++	if (length < sizeof(*ev)) {
++		btd_error(adapter_id, "Wrong size of Adv Monitor Removed "
++				"event");
++		return;
++	}
++
++	/* Traverse the apps to find the monitor */
++	queue_foreach(manager->apps, app_remove_monitor, ev);
++
++	DBG("Adv Monitor removed event with handle 0x%04x processed",
++		ev->monitor_handle);
++}
++
+ /* Allocates a manager object */
+ static struct btd_adv_monitor_manager *manager_new(
+ 						struct btd_adapter *adapter,
+@@ -955,6 +1063,10 @@ static struct btd_adv_monitor_manager *manager_new(
+ 	manager->adapter_id = btd_adapter_get_index(adapter);
+ 	manager->apps = queue_new();
  
- 	/* Reset the intermediate matched status */
++	mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_REMOVED,
++			manager->adapter_id, adv_monitor_removed_callback,
++			manager, NULL);
++
+ 	return manager;
+ }
+ 
 -- 
 2.26.2
 
