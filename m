@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C4EC433E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67938C43461
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 937892137B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:20:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30CA121974
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 06:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="i5xl7K0C"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JzMmoTcW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbgIQGUl (ORCPT
+        id S1726180AbgIQGVF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 02:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39398 "EHLO
+        Thu, 17 Sep 2020 02:21:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbgIQGUk (ORCPT
+        with ESMTP id S1725267AbgIQGVA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 02:20:40 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F412C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:40 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id w7so564558pfi.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:40 -0700 (PDT)
+        Thu, 17 Sep 2020 02:21:00 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B68C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:59 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id gf14so687217pjb.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Sep 2020 23:20:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=urxZ2rQiREysBZDsBfYv1mq1DlCqCzpkhYSxNmpbsOc=;
-        b=i5xl7K0C5CNXkzayq3ed0y1+AXkzc7WG1UWoTzALh69qcaL4WNAyfVqICaxRAdrMzk
-         rwj1bFQl3EL/OGtZFbcV8JypJhXBrY9hYuJdn/SPFWYkUZq+6gLQ44JqlTiiU3Vc9LmG
-         wVtZRdiQkcF0BzGTHQdWRo1TnpTP+jotb4aLI=
+        bh=u+E1bUX0uVxPcQEsE71u1Ro0+1uBNDa00K7AzDVg6ww=;
+        b=JzMmoTcWN8r9fSmiCYVyLPGHh/4yWvxDpYqk069/aA0JUhS+nsf6IGucPO3ltdzFJf
+         jASugceVLWrXVfiKMemt1bQEDNMTQMYzcqxO9sljNItL71/ackDP1tql0loY1YvzdZ64
+         /6lCuBdKbw81qjgDCBt1Ma4YGQDcBXd8gt8RI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=urxZ2rQiREysBZDsBfYv1mq1DlCqCzpkhYSxNmpbsOc=;
-        b=YZFjMcIHkmiifKVM8zxGqidxBUV4evCeupYfpkZfFekoI/1V2f1vokilr7J88aguAS
-         YcRI5X4h3mv1B+DtAh/r+CbGDhFDdmdeCWKMzyaqxN8sXe4aVHlVID2LnQcwdKG1iVVZ
-         MSYYLN4m7bEMcAj64zoFCxxgnKN85dAVfXo5JgngV1BO+Rtm4ZiqJwkznAE21iMY39Sd
-         z/eJpHwMpmeezAED4ge6s3eFS0AzpFMTkEGGfyXx10SV7apmYhmnOXc4tpQEEiX2JwQ9
-         r187eQyU7EoFvzVBsB39oJy10Clqf3hk8wvqC0CxreZQ1b3l1wYKHJUdcjKM0mGkK2lF
-         DzRw==
-X-Gm-Message-State: AOAM531Zh0lkI3akWkC3iWWok+c2KKzDSEYDaDn33h3MTECs/MnIymNF
-        mGyZUP/YyCGxcLCxatDpbf0C2enuWDSrdA==
-X-Google-Smtp-Source: ABdhPJxiML9PQ3edHPyKvJFZQ+AgtCY8EQG5tkuqV+in1yHbEJOBc55w5RN1BZIriYADSl36t58d1Q==
-X-Received: by 2002:a63:4d48:: with SMTP id n8mr22118848pgl.70.1600323639161;
-        Wed, 16 Sep 2020 23:20:39 -0700 (PDT)
+        bh=u+E1bUX0uVxPcQEsE71u1Ro0+1uBNDa00K7AzDVg6ww=;
+        b=GBKqUpsIqgmMz6hE7xKd1a1SUflt95085FsNLZKMd3LWIw41iEcu0O/o8+5EYUTBnb
+         ne10RvCNadO/6k6WRYUb3L6safW6ISa9r/Do3BFPlqB4XtoguLehhsFnRueTVOztvEmr
+         mw7vDvXQvoHD9Dzle48hODoGaeiEuBBdFnqJlvYtg58rRcfKsCMALJybQyrNw7DBmmGa
+         akhDhVA5FjKTNw+QaxrssaYfn0D5BovkkO2xCTLElw6DRpmU33oeaoNGP1VqcY9N+t7q
+         zd1wcKM8rai8OJxY7bPMqZiWNs5YV+9nQMiErJfdibYD9mjwTixplO9yPI19jKSj6uH5
+         pnlg==
+X-Gm-Message-State: AOAM532r4YpaUBrZVBW/Yz6IbZLBP3g7Wh2fOK569oQcJAXwvT7zdkV6
+        NXM3JaJp3yG6KMkH4mNRaBb7UVwULJyCbA==
+X-Google-Smtp-Source: ABdhPJxDipMIHXKpm3c6DmFyUw4IIzmnEx8rFamxqZGXE0sjF0YXtQziINFn+lAgKiCQcbITt0UhEg==
+X-Received: by 2002:a17:90a:297:: with SMTP id w23mr6897687pja.44.1600323658882;
+        Wed, 16 Sep 2020 23:20:58 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id g23sm19264943pfh.133.2020.09.16.23.20.38
+        by smtp.gmail.com with ESMTPSA id g23sm19264943pfh.133.2020.09.16.23.20.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Sep 2020 23:20:38 -0700 (PDT)
+        Wed, 16 Sep 2020 23:20:58 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
@@ -64,11 +64,10 @@ Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Alain Michaud <alainm@chromium.org>,
         chromeos-bluetooth-upstreaming@chromium.org,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v2 4/8] adv_monitor: Implement unit tests for content filter
-Date:   Wed, 16 Sep 2020 23:19:46 -0700
-Message-Id: <20200916231935.BlueZ.v2.4.I7f88b6e4c63c14d77974438eb2f07326aedbfd9b@changeid>
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v2 5/8] adapter: Clear all Adv monitors upon bring-up
+Date:   Wed, 16 Sep 2020 23:19:48 -0700
+Message-Id: <20200916231935.BlueZ.v2.5.Id6bfe7838831ae01fddc8605689dd77b51673960@changeid>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200916231935.BlueZ.v2.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 References: <20200916231935.BlueZ.v2.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
@@ -78,247 +77,80 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements the unit tests for verifying the correctness of
-advertisement data fields matching against a pattern.
+This clears all Adv monitors upon daemon bring-up by issuing
+MGMT_OP_REMOVE_ADV_MONITOR command with monitor_handle 0.
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+The following test was performed:
+- Add an Adv Monitor using btmgmt, restart bluetoothd and observe the
+monitor got removed.
+
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+Reviewed-by: Howard Chung <howardchung@google.com>
 ---
 
-Changes in v2:
-- Cast test data to void *
+(no changes since v1)
 
- doc/test-coverage.txt   |   4 +-
- unit/test-adv-monitor.c | 144 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 146 insertions(+), 2 deletions(-)
+ src/adapter.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index 5296983e6..e15474a44 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -30,9 +30,9 @@ test-gobex-transfer	  36	OBEX transfer handling
- test-gdbus-client	  13	D-Bus client handling
- test-gatt		 180	GATT qualification test cases
- test-hog		   6	HID Over GATT qualification test cases
--test-adv-monitor	   5	Advertisement Monitor test cases
-+test-adv-monitor	   9	Advertisement Monitor test cases
- 			-----
--			 766
-+			 770
+diff --git a/src/adapter.c b/src/adapter.c
+index d33ce7124..191467048 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -9513,6 +9513,43 @@ failed:
+ 	btd_adapter_unref(adapter);
+ }
  
- 
- Automated end-to-end testing
-diff --git a/unit/test-adv-monitor.c b/unit/test-adv-monitor.c
-index 970be84b0..a19a3092b 100644
---- a/unit/test-adv-monitor.c
-+++ b/unit/test-adv-monitor.c
-@@ -40,6 +40,8 @@
- 		if (type == TEST_RSSI_FILTER) {				\
- 			test.rssi_filter_test_data = (void *)&data;	\
- 			test.rssi_filter_test_data->test_info = &test;	\
-+		} else if (type == TEST_CONTENT_FILTER) {		\
-+			test.content_filter_test_data = (void *)&data;	\
- 		}							\
- 		tester_add(name, &test, setup_fn, test_fn, teardown_fn);\
- 	} while (0)
-@@ -94,6 +96,22 @@ struct rssi_filter_test {
- 	} test_steps[];
- };
- 
-+struct content_filter_test {
-+	void *advmon_pattern;		/* btd_adv_monitor_pattern */
++static void reset_adv_monitors_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct mgmt_rp_remove_adv_monitor *rp = param;
 +
-+	bool expected_match;
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to reset Adv Monitors: %s (0x%02x)",
++			mgmt_errstr(status), status);
++		return;
++	}
 +
-+	const struct {
-+		uint8_t ad_type;
-+		uint8_t offset;
-+		uint8_t length;
-+		uint8_t value[BT_AD_MAX_DATA_LEN];
-+	} pattern;
++	if (length < sizeof(*rp)) {
++		error("Wrong size of remove Adv Monitor response for reset "
++			"all Adv Monitors");
++		return;
++	}
 +
-+	uint8_t eir_len;
-+	uint8_t eir[];
-+};
++	DBG("Removed all Adv Monitors");
++}
 +
- /* Parent data structure to hold the test data and information,
-  * used by tester_* functions and callbacks.
-  */
-@@ -103,6 +121,7 @@ struct test_data {
- 
- 	union {
- 		struct rssi_filter_test *rssi_filter_test_data;
-+		struct content_filter_test *content_filter_test_data;
- 	};
- };
- 
-@@ -211,6 +230,62 @@ static struct rssi_filter_test rssi_data_5 = {
- 	},
- };
- 
-+/* Content Filter Test 1:
-+ * The valid EIR data contains the given pattern whose content is a UUID16 AD
-+ * data.
-+ */
-+static struct content_filter_test content_data_1 = {
-+	.expected_match = true,
-+	.pattern = {0x03, 0x02, 0x02, {0x09, 0x18} },
-+	.eir_len = 20,
-+	.eir = {0x02, 0x01, 0x02,				// flags
-+		0x06, 0xff, 0x96, 0xfd, 0xab, 0xcd, 0xef,	// Mfr. Data
-+		0x05, 0x03, 0x0d, 0x18, 0x09, 0x18,		// 16-bit UUIDs
-+		0x05, 0x16, 0x0d, 0x18, 0x12, 0x34},		// Service Data
-+};
++static void reset_adv_monitors(uint16_t index)
++{
++	struct mgmt_cp_remove_adv_monitor cp;
 +
-+/* Content Filter Test 2:
-+ * The valid EIR data does not match the given pattern whose content is a UUID16
-+ * AD data.
-+ */
-+static struct content_filter_test content_data_2 = {
-+	.expected_match = false,
-+	.pattern = {0x03, 0x02, 0x02, {0x0d, 0x18} },
-+	.eir_len = 20,
-+	.eir = {0x02, 0x01, 0x02,				// flags
-+		0x06, 0xff, 0x96, 0xfd, 0xab, 0xcd, 0xef,	// Mfr. Data
-+		0x05, 0x03, 0x0d, 0x18, 0x09, 0x18,		// 16-bit UUIDs
-+		0x05, 0x16, 0x0d, 0x18, 0x12, 0x34},		// Service Data
-+};
++	DBG("sending remove Adv Monitor command with handle 0");
 +
-+/* Content Filter Test 3:
-+ * The valid EIR data does not have the given pattern whose content is a UUID32
-+ * AD data.
-+ */
-+static struct content_filter_test content_data_3 = {
-+	.expected_match = false,
-+	.pattern = {0x05, 0x00, 0x04, {0x09, 0x18, 0x00, 0x00} },
-+	.eir_len = 20,
-+	.eir = {0x02, 0x01, 0x02,				// flags
-+		0x06, 0xff, 0x96, 0xfd, 0xab, 0xcd, 0xef,	// Mfr. Data
-+		0x05, 0x03, 0x0d, 0x18, 0x09, 0x18,		// 16-bit UUIDs
-+		0x05, 0x16, 0x0d, 0x18, 0x12, 0x34},		// Service Data
-+};
++	/* Handle 0 indicates to remove all */
++	cp.monitor_handle = 0;
++	if (mgmt_send(mgmt_master, MGMT_OP_REMOVE_ADV_MONITOR, index,
++			sizeof(cp), &cp, reset_adv_monitors_complete, NULL,
++			NULL) > 0) {
++		return;
++	}
 +
-+/* Content Filter Test 4:
-+ * The valid EIR data does not match the given pattern whose content is a
-+ * UUID16 AD data due to invalid starting position of matching.
-+ */
-+static struct content_filter_test content_data_4 = {
-+	.expected_match = false,
-+	.pattern = {0x03, 0x02, 0x02, {0x09, 0x18} },
-+	.eir_len = 20,
-+	.eir = {0x02, 0x01, 0x02,				// flags
-+		0x06, 0xff, 0x96, 0xfd, 0xab, 0xcd, 0xef,	// Mfr. Data
-+		0x03, 0x03, 0x09, 0x18,				// 16-bit UUIDs
-+		0x05, 0x16, 0x0d, 0x18, 0x12, 0x34},		// Service Data
-+};
++	error("Failed to reset Adv Monitors");
++}
 +
- /* Initialize the data required for RSSI Filter test */
- static void setup_rssi_filter_test(gpointer data)
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
  {
-@@ -343,6 +418,60 @@ static gboolean test_rssi_filter(gpointer data)
- 	return FALSE;
- }
+@@ -9527,6 +9564,8 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 		return;
+ 	}
  
-+/* Initialize the data required for Content Filter test */
-+static void setup_content_filter_test(gpointer data)
-+{
-+	struct content_filter_test *test = data;
-+	struct btd_adv_monitor_pattern *pattern = NULL;
++	reset_adv_monitors(index);
 +
-+	pattern = btd_adv_monitor_test_pattern_create(test->pattern.ad_type,
-+							test->pattern.offset,
-+							test->pattern.length,
-+							test->pattern.value);
-+	if (!pattern) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	test->advmon_pattern = pattern;
-+	tester_setup_complete();
-+}
-+
-+/* Cleanup after the Content Filter test is done */
-+static void teardown_content_filter_test(gpointer data)
-+{
-+	struct content_filter_test *test = data;
-+
-+	if (!test)
-+		tester_teardown_complete();
-+
-+	btd_adv_monitor_test_pattern_destroy(test->advmon_pattern);
-+	test->advmon_pattern = NULL;
-+
-+	tester_teardown_complete();
-+}
-+
-+/* Execute the sub-steps of Content Filter test */
-+static void test_content_filter(gpointer data)
-+{
-+	struct content_filter_test *test = data;
-+	struct btd_adv_monitor_pattern *pattern = test->advmon_pattern;
-+
-+	if (!pattern) {
-+		tester_test_abort();
-+		return;
-+	}
-+
-+	if (btd_adv_monitor_pattern_match(test->eir, test->eir_len,
-+						test->advmon_pattern) ==
-+		test->expected_match) {
-+		tester_test_passed();
-+		return;
-+	}
-+
-+	tester_test_failed();
-+}
-+
- /* Handler function to prepare for a test */
- static void setup_handler(gconstpointer data)
- {
-@@ -350,6 +479,8 @@ static void setup_handler(gconstpointer data)
- 
- 	if (test->test_type == TEST_RSSI_FILTER)
- 		setup_rssi_filter_test(test->rssi_filter_test_data);
-+	else if (test->test_type == TEST_CONTENT_FILTER)
-+		setup_content_filter_test(test->content_filter_test_data);
- }
- 
- /* Handler function to cleanup after the test is done */
-@@ -359,6 +490,8 @@ static void teardown_handler(gconstpointer data)
- 
- 	if (test->test_type == TEST_RSSI_FILTER)
- 		teardown_rssi_filter_test(test->rssi_filter_test_data);
-+	else if (test->test_type == TEST_CONTENT_FILTER)
-+		teardown_content_filter_test(test->content_filter_test_data);
- }
- 
- /* Handler function to execute a test with the given data set */
-@@ -368,6 +501,8 @@ static void test_handler(gconstpointer data)
- 
- 	if (test->test_type == TEST_RSSI_FILTER)
- 		test_rssi_filter(test->rssi_filter_test_data);
-+	else if (test->test_type == TEST_CONTENT_FILTER)
-+		test_content_filter(test->content_filter_test_data);
- }
- 
- int main(int argc, char *argv[])
-@@ -387,5 +522,14 @@ int main(int argc, char *argv[])
- 	define_test("/advmon/rssi/5", TEST_RSSI_FILTER, rssi_data_5,
- 		    setup_handler, test_handler, teardown_handler);
- 
-+	define_test("/advmon/content/1", TEST_CONTENT_FILTER, content_data_1,
-+		    setup_handler, test_handler, teardown_handler);
-+	define_test("/advmon/content/2", TEST_CONTENT_FILTER, content_data_2,
-+		    setup_handler, test_handler, teardown_handler);
-+	define_test("/advmon/content/3", TEST_CONTENT_FILTER, content_data_3,
-+		    setup_handler, test_handler, teardown_handler);
-+	define_test("/advmon/content/4", TEST_CONTENT_FILTER, content_data_4,
-+		    setup_handler, test_handler, teardown_handler);
-+
- 	return tester_run();
- }
+ 	adapter = btd_adapter_new(index);
+ 	if (!adapter) {
+ 		btd_error(index,
 -- 
 2.26.2
 
