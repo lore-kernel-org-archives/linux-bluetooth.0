@@ -7,47 +7,49 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F76C43465
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DBDC43463
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 946A923119
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:21:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07E4A23119
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600395706;
-	bh=4VeEx4Bn4wUKIRHmnGHk6hZdQ1MlXkjkfxA8fr7dEWo=;
+	s=default; t=1600395746;
+	bh=SQaBKSkiYQ6kVs5Ju1rSEjGVPCqXz8ymsFbpTrxbToQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lmIpCgNGOVsltPgqSuf1ReThL2YqIyV3D0N8+KkJbmxuF8vTYcWeHS38Bk7FMm2d6
-	 nMlH150R8cjqpmtPRsmiGCFjVoiSN71jEdjs/3Jm0wPPEVXjhHbXMUWgjVx29N502O
-	 1XQlevEPqrnzsa2oxwERfx33bkVzEBnWGoTFzPrg=
+	b=GZRZTRU+MvJk9dcYC3F0J5sRZBA7nbkH8ADtTi2hdnA39Rd8izwiggY0OVIbHsxfg
+	 8e9zwNxXdbr5I4JzU+mfdbkOQtF4W5Makmo7aKCjqFaxuU7Eg7qHKV4h8ciUg9MBEE
+	 AyrZHxt2fXoXd5cPvFZQwwicBajoZp22WOS7p520=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727824AbgIRCVd (ORCPT
+        id S1729480AbgIRCWI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:21:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48032 "EHLO mail.kernel.org"
+        Thu, 17 Sep 2020 22:22:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47604 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728438AbgIRCRZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:17:25 -0400
+        id S1728995AbgIRCRM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:17:12 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2001E2396F;
-        Fri, 18 Sep 2020 02:17:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AF39C239EB;
+        Fri, 18 Sep 2020 02:17:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395443;
-        bh=4VeEx4Bn4wUKIRHmnGHk6hZdQ1MlXkjkfxA8fr7dEWo=;
+        s=default; t=1600395431;
+        bh=SQaBKSkiYQ6kVs5Ju1rSEjGVPCqXz8ymsFbpTrxbToQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ylj6Zck70uiGvUJhZ05vtNGbwHMzYN2u6mztzeWtpM7iyGQJnWxrdDqd04lmsJzhj
-         xNwPaj1X2o+iB17zK2yaNtI37jcI85m6okLIDZM+UHRQ01rxuk9xd4sDKIS2VuA843
-         KJ7wh5dH2pdGrrht0XYPy5PAbt2cIIGUZYgVOpTw=
+        b=ePcYt4ZAK77l13q3zaCeYJ/6LZj8v/ugf5EVKW+sfJuVEa+0u0Ph0s2K3Cb0IuYYE
+         zlABXnvgQq4HfvP23stSpMBDar+vHWlu1hDtPfL9XonP6Cj8UCHXy4oC9RSFKHcmfg
+         jPjD8TzJy3VCW/G8OATDHIHWnPCFaZUciMYIhblU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Howard Chung <howardchung@google.com>,
+Cc:     Hillf Danton <hdanton@sina.com>,
+        syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com,
+        Manish Mandlik <mmandlik@google.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 32/64] Bluetooth: L2CAP: handle l2cap config request during open state
-Date:   Thu, 17 Sep 2020 22:16:11 -0400
-Message-Id: <20200918021643.2067895-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 22/64] Bluetooth: prefetch channel before killing sock
+Date:   Thu, 17 Sep 2020 22:16:01 -0400
+Message-Id: <20200918021643.2067895-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021643.2067895-1-sashal@kernel.org>
 References: <20200918021643.2067895-1-sashal@kernel.org>
@@ -59,173 +61,58 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Howard Chung <howardchung@google.com>
+From: Hillf Danton <hdanton@sina.com>
 
-[ Upstream commit 96298f640104e4cd9a913a6e50b0b981829b94ff ]
+[ Upstream commit 2a154903cec20fb64ff4d7d617ca53c16f8fd53a ]
 
-According to Core Spec Version 5.2 | Vol 3, Part A 6.1.5,
-the incoming L2CAP_ConfigReq should be handled during
-OPEN state.
+Prefetch channel before killing sock in order to fix UAF like
 
-The section below shows the btmon trace when running
-L2CAP/COS/CFD/BV-12-C before and after this change.
+ BUG: KASAN: use-after-free in l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
+ Read of size 8 at addr ffff8880944904a0 by task syz-fuzzer/9751
 
-=== Before ===
-...
-> ACL Data RX: Handle 256 flags 0x02 dlen 12                #22
-      L2CAP: Connection Request (0x02) ident 2 len 4
-        PSM: 1 (0x0001)
-        Source CID: 65
-< ACL Data TX: Handle 256 flags 0x00 dlen 16                #23
-      L2CAP: Connection Response (0x03) ident 2 len 8
-        Destination CID: 64
-        Source CID: 65
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12                #24
-      L2CAP: Configure Request (0x04) ident 2 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5      #25
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5      #26
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16                #27
-      L2CAP: Configure Request (0x04) ident 3 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00                                            ..
-< ACL Data TX: Handle 256 flags 0x00 dlen 18                #28
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-> HCI Event: Number of Completed Packets (0x13) plen 5      #29
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 14                #30
-      L2CAP: Configure Response (0x05) ident 2 len 6
-        Source CID: 64
-        Flags: 0x0000
-        Result: Success (0x0000)
-> ACL Data RX: Handle 256 flags 0x02 dlen 20                #31
-      L2CAP: Configure Request (0x04) ident 3 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00 91 02 11 11                                ......
-< ACL Data TX: Handle 256 flags 0x00 dlen 14                #32
-      L2CAP: Command Reject (0x01) ident 3 len 6
-        Reason: Invalid CID in request (0x0002)
-        Destination CID: 64
-        Source CID: 65
-> HCI Event: Number of Completed Packets (0x13) plen 5      #33
-        Num handles: 1
-        Handle: 256
-        Count: 1
-...
-=== After ===
-...
-> ACL Data RX: Handle 256 flags 0x02 dlen 12               #22
-      L2CAP: Connection Request (0x02) ident 2 len 4
-        PSM: 1 (0x0001)
-        Source CID: 65
-< ACL Data TX: Handle 256 flags 0x00 dlen 16               #23
-      L2CAP: Connection Response (0x03) ident 2 len 8
-        Destination CID: 64
-        Source CID: 65
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12               #24
-      L2CAP: Configure Request (0x04) ident 2 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5     #25
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5     #26
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16               #27
-      L2CAP: Configure Request (0x04) ident 3 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00                                            ..
-< ACL Data TX: Handle 256 flags 0x00 dlen 18               #28
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-> HCI Event: Number of Completed Packets (0x13) plen 5     #29
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 14               #30
-      L2CAP: Configure Response (0x05) ident 2 len 6
-        Source CID: 64
-        Flags: 0x0000
-        Result: Success (0x0000)
-> ACL Data RX: Handle 256 flags 0x02 dlen 20               #31
-      L2CAP: Configure Request (0x04) ident 3 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        01 00 91 02 11 11                                .....
-< ACL Data TX: Handle 256 flags 0x00 dlen 18               #32
-      L2CAP: Configure Response (0x05) ident 3 len 10
-        Source CID: 65
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-< ACL Data TX: Handle 256 flags 0x00 dlen 12               #33
-      L2CAP: Configure Request (0x04) ident 3 len 4
-        Destination CID: 65
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5     #34
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5     #35
-        Num handles: 1
-        Handle: 256
-        Count: 1
-...
-
-Signed-off-by: Howard Chung <howardchung@google.com>
+Reported-by: syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com
+Fixes: 6c08fc896b60 ("Bluetooth: Fix refcount use-after-free issue")
+Cc: Manish Mandlik <mmandlik@google.com>
+Signed-off-by: Hillf Danton <hdanton@sina.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_sock.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f6112f495a36c..f2db50da8ce2e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4096,7 +4096,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		return 0;
- 	}
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index cb024c25530a3..e562385d9440e 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1189,6 +1189,7 @@ static int l2cap_sock_release(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
+ 	int err;
++	struct l2cap_chan *chan;
  
--	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
-+	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
-+	    chan->state != BT_CONNECTED) {
- 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
- 				       chan->dcid);
- 		goto unlock;
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+ 
+@@ -1198,15 +1199,16 @@ static int l2cap_sock_release(struct socket *sock)
+ 	bt_sock_unlink(&l2cap_sk_list, sk);
+ 
+ 	err = l2cap_sock_shutdown(sock, 2);
++	chan = l2cap_pi(sk)->chan;
+ 
+-	l2cap_chan_hold(l2cap_pi(sk)->chan);
+-	l2cap_chan_lock(l2cap_pi(sk)->chan);
++	l2cap_chan_hold(chan);
++	l2cap_chan_lock(chan);
+ 
+ 	sock_orphan(sk);
+ 	l2cap_sock_kill(sk);
+ 
+-	l2cap_chan_unlock(l2cap_pi(sk)->chan);
+-	l2cap_chan_put(l2cap_pi(sk)->chan);
++	l2cap_chan_unlock(chan);
++	l2cap_chan_put(chan);
+ 
+ 	return err;
+ }
 -- 
 2.25.1
 
