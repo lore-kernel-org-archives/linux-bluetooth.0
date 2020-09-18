@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DBDC43463
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A32DEC43464
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07E4A23119
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5420323119
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 02:22:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600395746;
-	bh=SQaBKSkiYQ6kVs5Ju1rSEjGVPCqXz8ymsFbpTrxbToQ=;
+	s=default; t=1600395748;
+	bh=Hco7q7e69Yo5LGxGMrHGpP4cBxSJ2N88PDO+7MEVdSY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=GZRZTRU+MvJk9dcYC3F0J5sRZBA7nbkH8ADtTi2hdnA39Rd8izwiggY0OVIbHsxfg
-	 8e9zwNxXdbr5I4JzU+mfdbkOQtF4W5Makmo7aKCjqFaxuU7Eg7qHKV4h8ciUg9MBEE
-	 AyrZHxt2fXoXd5cPvFZQwwicBajoZp22WOS7p520=
+	b=AOm4+U8dpo6j2DsY7Z68Pj+zRcM4FZwZI0O1+wBmlZ0UctQaCJp6BpzPmGKTo9NMF
+	 AlFXHt0ELhUByX/dN/Npuo6vb9oO5PPLXD2sVlOi4jYmH9NDVAKBFiKv4LphBGAWGd
+	 Gr4V2PSgEtl5WzJ9Nw9FUW/YXrHNy7v1xhCayFDA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729480AbgIRCWI (ORCPT
+        id S1726818AbgIRCWI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 17 Sep 2020 22:22:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47604 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:48018 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728995AbgIRCRM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:17:12 -0400
+        id S1727937AbgIRCRY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:17:24 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AF39C239EB;
-        Fri, 18 Sep 2020 02:17:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C69F823998;
+        Fri, 18 Sep 2020 02:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395431;
-        bh=SQaBKSkiYQ6kVs5Ju1rSEjGVPCqXz8ymsFbpTrxbToQ=;
+        s=default; t=1600395441;
+        bh=Hco7q7e69Yo5LGxGMrHGpP4cBxSJ2N88PDO+7MEVdSY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ePcYt4ZAK77l13q3zaCeYJ/6LZj8v/ugf5EVKW+sfJuVEa+0u0Ph0s2K3Cb0IuYYE
-         zlABXnvgQq4HfvP23stSpMBDar+vHWlu1hDtPfL9XonP6Cj8UCHXy4oC9RSFKHcmfg
-         jPjD8TzJy3VCW/G8OATDHIHWnPCFaZUciMYIhblU=
+        b=jLJsKRXkggbX/ZIiyujwrA1HhTu8wdqW1P8F/kv0imK/TVQfOkv8DY/YyuDYpdO9S
+         oxK4weFQkka4FKGs++UsIUQW7G0yx9gtAj3V5f1VOJNtFfsJ6gNmlqASrlFtKMomcU
+         7Oo3MVja60txF5eOCx6lLz5HSZkAZk8Q4H19tExQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hillf Danton <hdanton@sina.com>,
-        syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com,
-        Manish Mandlik <mmandlik@google.com>,
+Cc:     Alain Michaud <alainm@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 22/64] Bluetooth: prefetch channel before killing sock
-Date:   Thu, 17 Sep 2020 22:16:01 -0400
-Message-Id: <20200918021643.2067895-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 30/64] Bluetooth: guard against controllers sending zero'd events
+Date:   Thu, 17 Sep 2020 22:16:09 -0400
+Message-Id: <20200918021643.2067895-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021643.2067895-1-sashal@kernel.org>
 References: <20200918021643.2067895-1-sashal@kernel.org>
@@ -61,58 +59,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hillf Danton <hdanton@sina.com>
+From: Alain Michaud <alainm@chromium.org>
 
-[ Upstream commit 2a154903cec20fb64ff4d7d617ca53c16f8fd53a ]
+[ Upstream commit 08bb4da90150e2a225f35e0f642cdc463958d696 ]
 
-Prefetch channel before killing sock in order to fix UAF like
+Some controllers have been observed to send zero'd events under some
+conditions.  This change guards against this condition as well as adding
+a trace to facilitate diagnosability of this condition.
 
- BUG: KASAN: use-after-free in l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
- Read of size 8 at addr ffff8880944904a0 by task syz-fuzzer/9751
-
-Reported-by: syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com
-Fixes: 6c08fc896b60 ("Bluetooth: Fix refcount use-after-free issue")
-Cc: Manish Mandlik <mmandlik@google.com>
-Signed-off-by: Hillf Danton <hdanton@sina.com>
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_sock.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_event.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index cb024c25530a3..e562385d9440e 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1189,6 +1189,7 @@ static int l2cap_sock_release(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
- 	int err;
-+	struct l2cap_chan *chan;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 16cf5633eae3e..04c77747a768d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5230,6 +5230,11 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	u8 status = 0, event = hdr->evt, req_evt = 0;
+ 	u16 opcode = HCI_OP_NOP;
  
- 	BT_DBG("sock %p, sk %p", sock, sk);
++	if (!event) {
++		bt_dev_warn(hdev, "Received unexpected HCI Event 00000000");
++		goto done;
++	}
++
+ 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
+ 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
+ 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+@@ -5441,6 +5446,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		req_complete_skb(hdev, status, opcode, orig_skb);
+ 	}
  
-@@ -1198,15 +1199,16 @@ static int l2cap_sock_release(struct socket *sock)
- 	bt_sock_unlink(&l2cap_sk_list, sk);
- 
- 	err = l2cap_sock_shutdown(sock, 2);
-+	chan = l2cap_pi(sk)->chan;
- 
--	l2cap_chan_hold(l2cap_pi(sk)->chan);
--	l2cap_chan_lock(l2cap_pi(sk)->chan);
-+	l2cap_chan_hold(chan);
-+	l2cap_chan_lock(chan);
- 
- 	sock_orphan(sk);
- 	l2cap_sock_kill(sk);
- 
--	l2cap_chan_unlock(l2cap_pi(sk)->chan);
--	l2cap_chan_put(l2cap_pi(sk)->chan);
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
- 
- 	return err;
- }
++done:
+ 	kfree_skb(orig_skb);
+ 	kfree_skb(skb);
+ 	hdev->stat.evt_rx++;
 -- 
 2.25.1
 
