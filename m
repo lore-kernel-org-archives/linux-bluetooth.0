@@ -1,103 +1,118 @@
-Return-Path: <SRS0=XILz=C2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=JXiH=C3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15297C43464
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 22:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B39C43464
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 01:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6CFD21582
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Sep 2020 22:27:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B318C2087D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 01:10:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P99vaB7D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eH5/cCLH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726159AbgIQW1R (ORCPT
+        id S1726239AbgIRBKp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Sep 2020 18:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48382 "EHLO
+        Thu, 17 Sep 2020 21:10:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726148AbgIQW1P (ORCPT
+        with ESMTP id S1726244AbgIRBKp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Sep 2020 18:27:15 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1464DC06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 15:27:15 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id d20so4071692qka.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 15:27:15 -0700 (PDT)
+        Thu, 17 Sep 2020 21:10:45 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03B2C06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 18:10:44 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id r19so2099097pls.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Sep 2020 18:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/9jdAMRjU/sKH6BoW5zvxbly3xZVYmRR5UC7HJNZphk=;
-        b=P99vaB7D7AkdIWx83xM8k85/yJnEDoO24YXcNYYfbPOC5GwzDCZDjw2HsHywpduB38
-         09i+Yssmg/dlgXeNNf1UALMHP1z2tNlVdPpU8L8zEkJJ87Kvguif9AV1CHdODIBiAo1o
-         GlpdPMTaMix1C7ZfoLeCq5THw2bOOF2/0e2VEp53Dp6WxJ+5ZxpFruqeabZk6xKI5ZCy
-         GiN6H8HzRm4fF6ulrlMePo/ejGgI2tvVxv7f/tAx/DpkI+vg+0z0tyJyOnwIoFTBzFEN
-         vd5Z1Lusz87fCbthaXwuAJYhTERqZI7Db3+9kM+pkbGIwOoJF2dI8IbGxXvNeRDWt8CK
-         Du0A==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q0xM1qNB/p3ifzv7crdTb3hiZTxDeC5+s7eoLwsd2UE=;
+        b=eH5/cCLHfbmch/MgBaNgIBL2EqhLlaOSlPDeHctnRwIYnvgKjMJBXY+olQpMfDlMUs
+         TiSLM3DLd6pOUjtHpGMrIg1RZ1i3TEzl+8tDVApVnJg69aeQA6ThfA5t1QR7lurqbLyI
+         /NfZRbUfeU7xH2DwWqlVyTEqRd8vEUIg0Tw7uEix10a9B18kOv/qPxf8NvpH6XsvYVld
+         A+pOqTeFGyw4VkJ8H/y284gzsoDEqVcyhT5xQzkrAYAsk8tyNAU9VOwhmTQt2mvTucXm
+         gtE5CF7UfP71c49ZzFN/jhJn8q+BEkUv7UwiaMzQU/1ajqd4a7QHNKfq69K1TNIYk3vq
+         VLPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/9jdAMRjU/sKH6BoW5zvxbly3xZVYmRR5UC7HJNZphk=;
-        b=S1U76M4uBkZnTdTlVvNhqliOMAV70XyZsZllwGyGVpbSf0ZuoCuJiNTvhrluhn35uy
-         ofyEEZNQS6Rg+PaFpz1aiQRkrZ0dF4d8gFk6kjiXU3O87DfbL2Xo0cDtjRhIva9Y50We
-         j3abG/8Ty3i02aeq6FDnr6lZF9vpcew6GOEBLZIP8l/gFKwuSnknny+I8otMxaq6XvrL
-         NR6U7d1cXitQeaXoDkVv6W0fJyIaaJ90nCe7/dVt38uniXGeiC2/T2j6zySfjQvB88rS
-         5Z5/NwpxluqMue9lxSHMA5/tHijgbH/j7Hxc7twjL9Tw2gFSzs2FjsgmUicDjRbaAMbh
-         PDnQ==
-X-Gm-Message-State: AOAM532GfEt+oxh+mXP6++9sXviYe/NL8ISayPTFoeMZJPIelO2ZMvFX
-        XDr5WNsi6NEtzO+NTdppNuHS9XiSUZ6E/g==
-X-Google-Smtp-Source: ABdhPJxKOqj50PuwNkBzpDw1ekH2Wyh47BaOXrr2iGO8tqSbxYizZiZC3cY5x61WvFYE/8R5E4sGpA==
-X-Received: by 2002:a37:9c4f:: with SMTP id f76mr30933802qke.250.1600381634064;
-        Thu, 17 Sep 2020 15:27:14 -0700 (PDT)
-Received: from [172.17.0.2] ([52.138.83.123])
-        by smtp.gmail.com with ESMTPSA id o13sm812840qkm.16.2020.09.17.15.27.13
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q0xM1qNB/p3ifzv7crdTb3hiZTxDeC5+s7eoLwsd2UE=;
+        b=YYFvBk22I8cqFa/89FrnwzI5e9u6PQNy/8nsyVBH68NTj+mDnvbkfoE+oVW8Ywxicy
+         Cr74bRWbhuQdwNde5e09B+Ve/uD3efM3y0QWa4trDiFxosRIbv9Rbbxbni7yRRbycwPu
+         M5GOUIB72r0Oo5WrEs9vWj35dd7lO5bIUH3XgJXi7BF4gd7v8RBd6Hh61kdGg6vl8RtA
+         G8keI5D+zk2fqj1by4qrFrodcEhu1HHN0xmiDA7QiVk+8Dh9jDues7RVCLKJ7jnSnkwH
+         Q3oMiuL5vvTwnv/1sKuKHz22iy/dmTxJIoxOrgILPYeWIx2w5G1bKjoJl1YDInUWsIo7
+         tvOg==
+X-Gm-Message-State: AOAM531NcgZXgf1YaTTwEdOyLpPRdcjlAyaxw7lKEmexy/gupnxva85H
+        wIn5pdMYXDFrdwklotYm6GSfdA5Ak+E=
+X-Google-Smtp-Source: ABdhPJz13zmOXwlA4GPpDwzvM4dJHZ6RU5eV3hys5JyOSa6Na6tFcV4tTHXYXKmS6Sy33ZwfXI5axQ==
+X-Received: by 2002:a17:902:9b95:b029:d2:219:e438 with SMTP id y21-20020a1709029b95b02900d20219e438mr3747875plp.76.1600391444048;
+        Thu, 17 Sep 2020 18:10:44 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id gi20sm850005pjb.28.2020.09.17.18.10.43
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Sep 2020 15:27:13 -0700 (PDT)
-Message-ID: <5f63e2c1.1c69fb81.81a86.5be2@mx.google.com>
-Date:   Thu, 17 Sep 2020 15:27:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0979735859871204913=="
+        Thu, 17 Sep 2020 18:10:43 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] avdtp: Fix not checking if stream is already set as pending open
+Date:   Thu, 17 Sep 2020 18:10:42 -0700
+Message-Id: <20200918011042.3141447-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
-Subject: RE: [BlueZ,v2] a2dp: Keep track of ref ownership of a2dp_setup
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200917221034.154218-1-sonnysasaka@chromium.org>
-References: <20200917221034.154218-1-sonnysasaka@chromium.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0979735859871204913==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While we are preparing for reviewing the patches, we found the following
-issue/warning.
-
-Test Result:
-checkgitlint Failed
-
-Outputs:
-28: B1 Line exceeds max length (81>80): "    frame #5: 0xf679523c libglib-2.0.so.0`g_main_context_dispatch at gmain.c:3182"
-32: B1 Line exceeds max length (85>80): "    frame #9: 0x0c65a7ea bluetoothd`mainloop_run_with_signal at mainloop-notify.c:201"
-
-
-
+When receiving a Open command the stream will be set as pending_open but
+the remote may attempt to send yet another Open command in the meantime
+reseting resulting in another setup and yet another timer leaving the
+old timer active which will likely cause a crash when it expires.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/avdtp.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
---===============0979735859871204913==--
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 782268c08..e0c6f44f0 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1687,7 +1687,7 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+ 
+ 	stream = sep->stream;
+ 
+-	if (sep->ind && sep->ind->open) {
++	if (sep->ind && sep->ind->open && !session->pending_open) {
+ 		if (!sep->ind->open(session, sep, stream, &err,
+ 					sep->user_data))
+ 			goto failed;
+@@ -1699,11 +1699,13 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+ 						AVDTP_OPEN, NULL, 0))
+ 		return FALSE;
+ 
+-	stream->open_acp = TRUE;
+-	session->pending_open = stream;
+-	stream->timer = g_timeout_add_seconds(REQ_TIMEOUT,
++	if (!session->pending_open) {
++		stream->open_acp = TRUE;
++		session->pending_open = stream;
++		stream->timer = g_timeout_add_seconds(REQ_TIMEOUT,
+ 						stream_open_timeout,
+ 						stream);
++	}
+ 
+ 	return TRUE;
+ 
+-- 
+2.26.2
+
