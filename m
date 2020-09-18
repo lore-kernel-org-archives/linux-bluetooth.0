@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 848BBC43463
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 21:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EF5C43464
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 21:29:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 145AE222BB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 21:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 844B82311D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Sep 2020 21:29:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726309AbgIRVTC (ORCPT
+        id S1726298AbgIRV3E (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Sep 2020 17:19:02 -0400
-Received: from mga01.intel.com ([192.55.52.88]:64027 "EHLO mga01.intel.com"
+        Fri, 18 Sep 2020 17:29:04 -0400
+Received: from mga01.intel.com ([192.55.52.88]:64721 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbgIRVTC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Sep 2020 17:19:02 -0400
-IronPort-SDR: zhsVoAo5Vk5yF/PicF9xOd+PUiO10M/8fM+v2jFOjVpf54VawT34hFM1M1KoAVG/nVJdfvoze8
- 8IOkqryMMe9A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9748"; a="178125482"
+        id S1726168AbgIRV3D (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Sep 2020 17:29:03 -0400
+IronPort-SDR: YodmiyJ3xZZLuRIqGU2qEjkpgtfWSxK1iEosyRhIQJtc2DuWvcrlmW6fdv/dNUyX9DA9IfU2nl
+ NW6ua4UEtaMw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9748"; a="178125518"
 X-IronPort-AV: E=Sophos;i="5.77,274,1596524400"; 
-   d="scan'208";a="178125482"
+   d="scan'208";a="178125518"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2020 14:09:11 -0700
-IronPort-SDR: 88CINRs4CEhb/X6TWzRdqWo+K9eKN7V6M/cLYHc1rdYWVxEGqFaYJOizXvkNhtphgJ17uTHXob
- lYcxE2WIdULg==
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2020 14:09:26 -0700
+IronPort-SDR: wYxpKbTJnx3ma0XeZAf1jx1rDnmcRV2hnKwD/3f84OCE4cROPcmmxQX0ilIeB/F9iWEqSpjQD5
+ Dms6dzhkZPeQ==
 X-IronPort-AV: E=Sophos;i="5.77,274,1596524400"; 
-   d="scan'208";a="484378068"
+   d="scan'208";a="484378192"
 Received: from han1-mobl3.jf.intel.com ([10.255.229.3])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2020 14:09:10 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2020 14:09:25 -0700
 From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [BlueZ v4 09/20] mesh: Add SPDX License Identifier
-Date:   Fri, 18 Sep 2020 14:08:35 -0700
-Message-Id: <20200918210846.37797-10-tedd.an@linux.intel.com>
+Subject: [BlueZ v4 19/20] test: Add SPDX License Identifier
+Date:   Fri, 18 Sep 2020 14:08:45 -0700
+Message-Id: <20200918210846.37797-20-tedd.an@linux.intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200918210846.37797-1-tedd.an@linux.intel.com>
 References: <20200918210846.37797-1-tedd.an@linux.intel.com>
@@ -57,1357 +57,471 @@ This patch adds SPDX License Identifier and removes the license text.
 -------------------------------------
        License            COUNT
 -------------------------------------
- LGPL-2.1-or-later    :     48
+ LGPL-2.1-or-later    :     35
 
 License: LGPL-2.1-or-later
-   mesh/mesh-mgmt.h
-   mesh/mesh-mgmt.c
-   mesh/net-keys.c
-   mesh/mesh-io-api.h
-   mesh/mesh.h
-   mesh/net-keys.h
-   mesh/model.h
-   mesh/util.h
-   mesh/appkey.c
-   mesh/cfgmod.h
-   mesh/appkey.h
-   mesh/prov.h
-   mesh/prov-acceptor.c
-   mesh/net.c
-   mesh/dbus.h
-   mesh/friend.h
-   mesh/mesh-io-generic.c
-   mesh/main.c
-   mesh/util.c
-   mesh/dbus.c
-   mesh/error.h
-   mesh/mesh-config-json.c
-   mesh/agent.h
-   mesh/pb-adv.c
-   mesh/crypto.c
-   mesh/crypto.h
-   mesh/friend.c
-   mesh/pb-adv.h
-   mesh/provision.h
-   mesh/mesh-config.h
-   mesh/mesh-io-generic.h
-   mesh/agent.c
-   mesh/cfgmod-server.c
-   mesh/mesh-io.h
-   mesh/keyring.h
-   mesh/net.h
-   mesh/keyring.c
-   mesh/mesh-defs.h
-   mesh/mesh.c
-   mesh/rpl.c
-   mesh/manager.c
-   mesh/model.c
-   mesh/mesh-io.c
-   mesh/node.c
-   mesh/prov-initiator.c
-   mesh/rpl.h
-   mesh/node.h
-   mesh/manager.h
+   test/agent.py
+   test/bluezutils.py
+   test/dbusdef.py
+   test/example-advertisement
+   test/example-endpoint
+   test/example-gatt-client
+   test/example-gatt-server
+   test/example-player
+   test/exchange-business-cards
+   test/ftp-client
+   test/get-managed-objects
+   test/get-obex-capabilities
+   test/list-devices
+   test/list-folders
+   test/map-client
+   test/monitor-bluetooth
+   test/opp-client
+   test/pbap-client
+   test/sap_client.py
+   test/simple-endpoint
+   test/simple-obex-agent
+   test/simple-player
+   test/test-adapter
+   test/test-device
+   test/test-discovery
+   test/test-gatt-profile
+   test/test-health
+   test/test-health-sink
+   test/test-hfp
+   test/test-manager
+   test/test-mesh
+   test/test-nap
+   test/test-network
+   test/test-profile
+   test/test-sap-server
 ---
- mesh/agent.c            | 11 +----------
- mesh/agent.h            | 11 +----------
- mesh/appkey.c           | 11 +----------
- mesh/appkey.h           | 11 +----------
- mesh/cfgmod-server.c    | 11 +----------
- mesh/cfgmod.h           | 11 +----------
- mesh/crypto.c           | 11 +----------
- mesh/crypto.h           | 11 +----------
- mesh/dbus.c             | 11 +----------
- mesh/dbus.h             | 11 +----------
- mesh/error.h            | 11 +----------
- mesh/friend.c           | 11 +----------
- mesh/friend.h           | 11 +----------
- mesh/keyring.c          | 11 +----------
- mesh/keyring.h          | 11 +----------
- mesh/main.c             | 11 +----------
- mesh/manager.c          | 11 +----------
- mesh/manager.h          | 11 +----------
- mesh/mesh-config-json.c | 11 +----------
- mesh/mesh-config.h      | 11 +----------
- mesh/mesh-defs.h        | 12 +-----------
- mesh/mesh-io-api.h      | 11 +----------
- mesh/mesh-io-generic.c  | 11 +----------
- mesh/mesh-io-generic.h  | 11 +----------
- mesh/mesh-io.c          | 11 +----------
- mesh/mesh-io.h          | 11 +----------
- mesh/mesh-mgmt.c        | 11 +----------
- mesh/mesh-mgmt.h        | 11 +----------
- mesh/mesh.c             | 11 +----------
- mesh/mesh.h             | 11 +----------
- mesh/model.c            | 11 +----------
- mesh/model.h            | 11 +----------
- mesh/net-keys.c         | 11 +----------
- mesh/net-keys.h         | 11 +----------
- mesh/net.c              | 11 +----------
- mesh/net.h              | 11 +----------
- mesh/node.c             | 11 +----------
- mesh/node.h             | 11 +----------
- mesh/pb-adv.c           | 11 +----------
- mesh/pb-adv.h           | 11 +----------
- mesh/prov-acceptor.c    | 11 +----------
- mesh/prov-initiator.c   | 11 +----------
- mesh/prov.h             | 11 +----------
- mesh/provision.h        | 11 +----------
- mesh/rpl.c              | 11 +----------
- mesh/rpl.h              | 11 +----------
- mesh/util.c             | 11 +----------
- mesh/util.h             | 11 +----------
- 48 files changed, 48 insertions(+), 481 deletions(-)
+ test/agent.py                |  1 +
+ test/bluezutils.py           |  2 ++
+ test/dbusdef.py              |  2 ++
+ test/example-advertisement   |  1 +
+ test/example-endpoint        |  1 +
+ test/example-gatt-client     |  1 +
+ test/example-gatt-server     |  1 +
+ test/example-player          |  1 +
+ test/exchange-business-cards |  1 +
+ test/ftp-client              |  1 +
+ test/get-managed-objects     |  1 +
+ test/get-obex-capabilities   |  1 +
+ test/list-devices            |  1 +
+ test/list-folders            |  1 +
+ test/map-client              |  1 +
+ test/monitor-bluetooth       |  1 +
+ test/opp-client              |  1 +
+ test/pbap-client             |  1 +
+ test/sap_client.py           | 15 +--------------
+ test/simple-agent            |  1 +
+ test/simple-endpoint         |  1 +
+ test/simple-obex-agent       |  1 +
+ test/simple-player           |  1 +
+ test/test-adapter            |  1 +
+ test/test-device             |  1 +
+ test/test-discovery          |  1 +
+ test/test-gatt-profile       |  1 +
+ test/test-health             |  1 +
+ test/test-health-sink        |  1 +
+ test/test-hfp                |  1 +
+ test/test-join               |  1 +
+ test/test-manager            |  1 +
+ test/test-mesh               |  1 +
+ test/test-nap                |  1 +
+ test/test-network            |  1 +
+ test/test-profile            |  1 +
+ test/test-sap-server         |  1 +
+ 37 files changed, 39 insertions(+), 14 deletions(-)
 
-diff --git a/mesh/agent.c b/mesh/agent.c
-index 4d200416f..b0d523d16 100644
---- a/mesh/agent.c
-+++ b/mesh/agent.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/agent.py b/test/agent.py
+index d8e5534d8..b46cd95f4 100755
+--- a/test/agent.py
++++ b/test/agent.py
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/agent.h b/mesh/agent.h
-index 6cc3d0f71..6664c2226 100644
---- a/mesh/agent.h
-+++ b/mesh/agent.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ import sys
+ import dbus
+diff --git a/test/bluezutils.py b/test/bluezutils.py
+index cd8964082..85aa24277 100644
+--- a/test/bluezutils.py
++++ b/test/bluezutils.py
+@@ -1,3 +1,5 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
+ import dbus
  
- struct mesh_agent;
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index a4771bd7d..7efb8f5c4 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ SERVICE_NAME = "org.bluez"
+diff --git a/test/dbusdef.py b/test/dbusdef.py
+index f1cd35adb..d317c18de 100644
+--- a/test/dbusdef.py
++++ b/test/dbusdef.py
+@@ -1,3 +1,5 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
+ import dbus
+ import bluezutils
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/appkey.h b/mesh/appkey.h
-index 23b474a0a..3bb70445b 100644
---- a/mesh/appkey.h
-+++ b/mesh/appkey.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/example-advertisement b/test/example-advertisement
+index 96e410683..5f022ee67 100755
+--- a/test/example-advertisement
++++ b/test/example-advertisement
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- /* TODO: get this number from configuration */
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 2e5da863a..0009a1bee 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import print_function
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/cfgmod.h b/mesh/cfgmod.h
-index 6d73656a7..f47a42c60 100644
---- a/mesh/cfgmod.h
-+++ b/mesh/cfgmod.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/example-endpoint b/test/example-endpoint
+index a5f0348a0..16651c683 100644
+--- a/test/example-endpoint
++++ b/test/example-endpoint
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #define CONFIG_SRV_MODEL	SET_ID(SIG_VENDOR, 0x0000)
-diff --git a/mesh/crypto.c b/mesh/crypto.c
-index 70b96c51b..da227ebbb 100644
---- a/mesh/crypto.c
-+++ b/mesh/crypto.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/crypto.h b/mesh/crypto.h
-index 7d3f89cde..2f31dc3de 100644
---- a/mesh/crypto.h
-+++ b/mesh/crypto.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/example-gatt-client b/test/example-gatt-client
+index b4bbaa9d9..5e6bef9d7 100755
+--- a/test/example-gatt-client
++++ b/test/example-gatt-client
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #include <stdbool.h>
-diff --git a/mesh/dbus.c b/mesh/dbus.c
-index 63ea420ed..a7abdc428 100644
---- a/mesh/dbus.c
-+++ b/mesh/dbus.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019 Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ import dbus
+ try:
+diff --git a/test/example-gatt-server b/test/example-gatt-server
+index 689e86ff7..77231c3ad 100755
+--- a/test/example-gatt-server
++++ b/test/example-gatt-server
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/dbus.h b/mesh/dbus.h
-index 89d6b1d31..8f00434d6 100644
---- a/mesh/dbus.h
-+++ b/mesh/dbus.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ import dbus
+ import dbus.exceptions
+diff --git a/test/example-player b/test/example-player
+index 2beb08e44..1497d1107 100644
+--- a/test/example-player
++++ b/test/example-player
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #define BLUEZ_MESH_PATH "/org/bluez/mesh"
-diff --git a/mesh/error.h b/mesh/error.h
-index 2809915b0..6d9ccdb59 100644
---- a/mesh/error.h
-+++ b/mesh/error.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import print_function
  
- /*
-diff --git a/mesh/friend.c b/mesh/friend.c
-index d27da9592..1e67704b8 100644
---- a/mesh/friend.c
-+++ b/mesh/friend.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/exchange-business-cards b/test/exchange-business-cards
+index 6805cf71e..9a3aa29fb 100755
+--- a/test/exchange-business-cards
++++ b/test/exchange-business-cards
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/friend.h b/mesh/friend.h
-index 2351dee31..ba6053426 100644
---- a/mesh/friend.h
-+++ b/mesh/friend.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ import sys
+ import dbus
+diff --git a/test/ftp-client b/test/ftp-client
+index 4540602a0..ef756ab2b 100755
+--- a/test/ftp-client
++++ b/test/ftp-client
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #define OP_FRND_REQUEST			0x8040
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index e8dd1e463..bbe501063 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/keyring.h b/mesh/keyring.h
-index 2fab6b0dc..c2d38e9ff 100644
---- a/mesh/keyring.h
-+++ b/mesh/keyring.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/get-managed-objects b/test/get-managed-objects
+index 3156f658f..5125ee524 100755
+--- a/test/get-managed-objects
++++ b/test/get-managed-objects
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- struct keyring_net_key {
-diff --git a/mesh/main.c b/mesh/main.c
-index 5a3cbf290..4356e3f65 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/manager.c b/mesh/manager.c
-index 8ef681366..d70993e3b 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/get-obex-capabilities b/test/get-obex-capabilities
+index e8afbad21..a7980a442 100755
+--- a/test/get-obex-capabilities
++++ b/test/get-obex-capabilities
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/manager.h b/mesh/manager.h
-index 5a4c7d94a..a45a1f1c4 100644
---- a/mesh/manager.h
-+++ b/mesh/manager.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ import sys
+ import dbus
+diff --git a/test/list-devices b/test/list-devices
+index 0aac217d1..b112556c3 100755
+--- a/test/list-devices
++++ b/test/list-devices
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- bool manager_dbus_init(struct l_dbus *dbus);
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 30c90170d..ec9ecb786 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
-index 738cff9dd..420775829 100644
---- a/mesh/mesh-config.h
-+++ b/mesh/mesh-config.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/list-folders b/test/list-folders
+index 7321a1527..b4e3f100b 100755
+--- a/test/list-folders
++++ b/test/list-folders
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #define MIN_COMP_SIZE 14
-diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
-index 1a41e987b..43bdf5aab 100644
---- a/mesh/mesh-defs.h
-+++ b/mesh/mesh-defs.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,17 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *
-  */
+ import sys
+ import dbus
+diff --git a/test/map-client b/test/map-client
+index b9695da66..a2d96ae5f 100755
+--- a/test/map-client
++++ b/test/map-client
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #define MESH_AD_TYPE_PROVISION	0x29
-diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
-index 7a5b49c60..61f79f224 100644
---- a/mesh/mesh-io-api.h
-+++ b/mesh/mesh-io-api.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- struct mesh_io_private;
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 67304d201..4eb7f27ce 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/monitor-bluetooth b/test/monitor-bluetooth
+index d9b5472f5..a3977e206 100755
+--- a/test/monitor-bluetooth
++++ b/test/monitor-bluetooth
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/mesh-io-generic.h b/mesh/mesh-io-generic.h
-index 4bf4d5cb7..915e376bf 100644
---- a/mesh/mesh-io-generic.h
-+++ b/mesh/mesh-io-generic.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- extern const struct mesh_io_api mesh_io_generic;
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-index c4eaecefd..62fc5d12e 100644
---- a/mesh/mesh-io.c
-+++ b/mesh/mesh-io.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/opp-client b/test/opp-client
+index 62d5b8454..4f00a41c0 100755
+--- a/test/opp-client
++++ b/test/opp-client
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
-index fc0422020..b11c6c6e1 100644
---- a/mesh/mesh-io.h
-+++ b/mesh/mesh-io.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- struct mesh_io;
-diff --git a/mesh/mesh-mgmt.c b/mesh/mesh-mgmt.c
-index 2cf2ebac2..754093dbc 100644
---- a/mesh/mesh-mgmt.c
-+++ b/mesh/mesh-mgmt.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  SILVAIR sp. z o.o. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/pbap-client b/test/pbap-client
+index 16a786bb1..e6cafdd30 100755
+--- a/test/pbap-client
++++ b/test/pbap-client
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/mesh-mgmt.h b/mesh/mesh-mgmt.h
-index 93ad7995e..90ac14e73 100644
---- a/mesh/mesh-mgmt.h
-+++ b/mesh/mesh-mgmt.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  SILVAIR sp. z o.o. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
- #include <stdbool.h>
+ from __future__ import absolute_import, print_function, unicode_literals
  
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index bc170371d..f29e8b6be 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/sap_client.py b/test/sap_client.py
+index 413424c05..fed13aedc 100644
+--- a/test/sap_client.py
++++ b/test/sap_client.py
+@@ -1,21 +1,8 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ """ Copyright (C) 2010-2011 ST-Ericsson SA """
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/mesh.h b/mesh/mesh.h
-index eb887723d..0f77ebc58 100644
---- a/mesh/mesh.h
-+++ b/mesh/mesh.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ """ Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
  
- #define BLUEZ_MESH_NAME "org.bluez.mesh"
-diff --git a/mesh/model.c b/mesh/model.c
-index 5716f5e22..c8eb8c607 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+-""" This program is free software; you can redistribute it and/or modify """
+-""" it under the terms of the GNU General Public License as published by """
+-""" the Free Software Foundation; either version 2 of the License, or """
+-""" (at your option) any later version. """
+-
+-""" This program is distributed in the hope that it will be useful, """
+-""" but WITHOUT ANY WARRANTY; without even the implied warranty of """
+-""" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the """
+-""" GNU General Public License for more details. """
+-
+-""" You should have received a copy of the GNU General Public License """
+-""" along with this program; if not, write to the Free Software """
+-""" Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA """
+-
+ from array import array
+ from bluetooth import *
+ import time
+diff --git a/test/simple-agent b/test/simple-agent
+index a69299a3e..4fdaff1eb 100755
+--- a/test/simple-agent
++++ b/test/simple-agent
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/model.h b/mesh/model.h
-index 2eec761a0..8df4f205f 100644
---- a/mesh/model.h
-+++ b/mesh/model.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- struct mesh_model;
-diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index 7dfabf922..e42cac70c 100644
---- a/mesh/net-keys.c
-+++ b/mesh/net-keys.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/simple-endpoint b/test/simple-endpoint
+index 78fb5fda5..59ca189ce 100755
+--- a/test/simple-endpoint
++++ b/test/simple-endpoint
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/net-keys.h b/mesh/net-keys.h
-index 4f480fcda..70b3d22c3 100644
---- a/mesh/net-keys.h
-+++ b/mesh/net-keys.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #define BEACON_TYPE_SNB		0x01
-diff --git a/mesh/net.c b/mesh/net.c
-index 6c7311732..01a475d74 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/simple-obex-agent b/test/simple-obex-agent
+index 05ec4eda7..064f6d30b 100755
+--- a/test/simple-obex-agent
++++ b/test/simple-obex-agent
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/net.h b/mesh/net.h
-index 7bec6d0fc..4dbc94b8b 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifndef __packed
-diff --git a/mesh/node.c b/mesh/node.c
-index f7ac5ff67..76d8fd6e9 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2017-2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/simple-player b/test/simple-player
+index 02754c2f4..92682844d 100755
+--- a/test/simple-player
++++ b/test/simple-player
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/node.h b/mesh/node.h
-index 7874b8692..30d53db33 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import print_function
  
- struct mesh_net;
-diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-index ae5b81391..c74dae79f 100644
---- a/mesh/pb-adv.c
-+++ b/mesh/pb-adv.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/test-adapter b/test/test-adapter
+index 959a43703..a216140ba 100755
+--- a/test/test-adapter
++++ b/test/test-adapter
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/pb-adv.h b/mesh/pb-adv.h
-index 80d53d234..5b1e03dae 100644
---- a/mesh/pb-adv.h
-+++ b/mesh/pb-adv.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- bool pb_adv_reg(bool initiator, mesh_prov_open_func_t open_cb,
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index 96f7e15ad..a03ee1ce5 100644
---- a/mesh/prov-acceptor.c
-+++ b/mesh/prov-acceptor.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/test-device b/test/test-device
+index b490d53f4..a1e508166 100755
+--- a/test/test-device
++++ b/test/test-device
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
-index 4de4df62d..8399282ee 100644
---- a/mesh/prov-initiator.c
-+++ b/mesh/prov-initiator.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018-2019  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/prov.h b/mesh/prov.h
-index 11b20b31f..99e864c50 100644
---- a/mesh/prov.h
-+++ b/mesh/prov.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/test-discovery b/test/test-discovery
+index cea77683d..eccc7c7e3 100755
+--- a/test/test-discovery
++++ b/test/test-discovery
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifndef __packed
-diff --git a/mesh/provision.h b/mesh/provision.h
-index 1d78ed8e2..1a11b691b 100644
---- a/mesh/provision.h
-+++ b/mesh/provision.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
+diff --git a/test/test-gatt-profile b/test/test-gatt-profile
+index 995a65913..a973ae14e 100755
+--- a/test/test-gatt-profile
++++ b/test/test-gatt-profile
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
-diff --git a/mesh/rpl.c b/mesh/rpl.c
-index 792c52ad6..7cea8e346 100644
---- a/mesh/rpl.c
-+++ b/mesh/rpl.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/rpl.h b/mesh/rpl.h
-index 2bbbdc9b9..9e988e7c5 100644
---- a/mesh/rpl.h
-+++ b/mesh/rpl.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+diff --git a/test/test-health b/test/test-health
+index 24afa799e..d6b437ed8 100755
+--- a/test/test-health
++++ b/test/test-health
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- struct mesh_rpl {
-diff --git a/mesh/util.c b/mesh/util.c
-index 7d283331a..308e7d998 100644
---- a/mesh/util.c
-+++ b/mesh/util.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
+ # -*- coding: utf-8 -*-
+diff --git a/test/test-health-sink b/test/test-health-sink
+index 37e630a21..57665d2ba 100755
+--- a/test/test-health-sink
++++ b/test/test-health-sink
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- #ifdef HAVE_CONFIG_H
-diff --git a/mesh/util.h b/mesh/util.h
-index 93c2d8687..085ec3330 100644
---- a/mesh/util.h
-+++ b/mesh/util.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,16 +6,6 @@
-  *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-  */
+ from __future__ import absolute_import, print_function, unicode_literals
+ # -*- coding: utf-8 -*-
+diff --git a/test/test-hfp b/test/test-hfp
+index a8060439e..11e328e54 100755
+--- a/test/test-hfp
++++ b/test/test-hfp
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
  
- uint32_t get_timestamp_secs(void);
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+diff --git a/test/test-join b/test/test-join
+index 6dfb2e8c3..969795094 100644
+--- a/test/test-join
++++ b/test/test-join
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ import sys
+ import struct
+diff --git a/test/test-manager b/test/test-manager
+index 4f5994f67..3fa7205a0 100755
+--- a/test/test-manager
++++ b/test/test-manager
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+diff --git a/test/test-mesh b/test/test-mesh
+index 1e1b8724d..9e4783734 100755
+--- a/test/test-mesh
++++ b/test/test-mesh
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ ###################################################################
+ #
+diff --git a/test/test-nap b/test/test-nap
+index ab67a7509..d5c757b79 100755
+--- a/test/test-nap
++++ b/test/test-nap
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+diff --git a/test/test-network b/test/test-network
+index 6f0948649..acc7dff65 100755
+--- a/test/test-network
++++ b/test/test-network
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+diff --git a/test/test-profile b/test/test-profile
+index 27915806f..af1e23f76 100755
+--- a/test/test-profile
++++ b/test/test-profile
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+diff --git a/test/test-sap-server b/test/test-sap-server
+index ff178af22..ddb1efe9b 100755
+--- a/test/test-sap-server
++++ b/test/test-sap-server
+@@ -1,4 +1,5 @@
+ #!/usr/bin/python
++# SPDX-License-Identifier: LGPL-2.1-or-later
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
 -- 
 2.17.1
 
