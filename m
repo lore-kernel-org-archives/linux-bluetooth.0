@@ -7,45 +7,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850DDC4346E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651D5C4346E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 204882086A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E9D9216C4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727231AbgIUTF7 (ORCPT
+        id S1727681AbgIUTGn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Sep 2020 15:05:59 -0400
-Received: from mga06.intel.com ([134.134.136.31]:41531 "EHLO mga06.intel.com"
+        Mon, 21 Sep 2020 15:06:43 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15627 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726969AbgIUTF7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Sep 2020 15:05:59 -0400
-IronPort-SDR: sK86yommw+QAFei+P7y686Kk7ojOCIWV53UWKlec9iKwj6fmSebLaLIdAW6yMeQ7U0LX1Bz4Ze
- 7aCtLl4OpLSA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="222055849"
+        id S1727382AbgIUTGn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 21 Sep 2020 15:06:43 -0400
+IronPort-SDR: xrroyfHe6oY2RJDvM35ewLBBySO/Lsweo3WiZdwgtyG0+rlwUECFIis0epkxS3oUnPmHOI06Ms
+ idOSfntN+FOw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="148216388"
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="222055849"
+   d="scan'208";a="148216388"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:05:56 -0700
-IronPort-SDR: m67agbvupxlTesauMBn4djOshW/cy4g5zhryhPOm0E4KMcKcBBBEhpftXaNVC6J+ajCsNS97+B
- NoES8EtgDVYQ==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:06:23 -0700
+IronPort-SDR: E17W54yW7Av6jjXcox5IVlSIovDLu8YCFtnjeuM/vv91OOgICz2XI/mfZ7Zt2KgFqMmfhau6yV
+ DQhN1BtR1uMw==
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="485626127"
+   d="scan'208";a="485626301"
 Received: from han1-mobl3.jf.intel.com ([10.254.86.223])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:05:56 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:06:23 -0700
 From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [BlueZ V4 RESEND 10/20] monitor: Add SPDX License Identifier
-Date:   Mon, 21 Sep 2020 12:00:30 -0700
-Message-Id: <20200921190040.45309-11-tedd.an@linux.intel.com>
+Subject: [BlueZ V4 RESEND 11/20] obexd: Add SPDX License Identifier
+Date:   Mon, 21 Sep 2020 12:00:31 -0700
+Message-Id: <20200921190040.45309-12-tedd.an@linux.intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200921190040.45309-1-tedd.an@linux.intel.com>
 References: <20200921190040.45309-1-tedd.an@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -58,1516 +57,2084 @@ This patch adds SPDX License Identifier and removes the license text.
 -------------------------------------
        License            COUNT
 -------------------------------------
- LGPL-2.1-or-later    :     47
+ GPL-2.0-or-later     :     65
 
-License: LGPL-2.1-or-later
-   monitor/bt.h
-   monitor/hcidump.h
-   monitor/avdtp.h
-   monitor/crc.c
-   monitor/sdp.c
-   monitor/hwdb.c
-   monitor/intel.h
-   monitor/avctp.c
-   monitor/control.h
-   monitor/display.c
-   monitor/a2dp.c
-   monitor/ll.c
-   monitor/ll.h
-   monitor/jlink.h
-   monitor/broadcom.h
-   monitor/lmp.c
-   monitor/keys.c
-   monitor/ellisys.c
-   monitor/main.c
-   monitor/ellisys.h
-   monitor/hwdb.h
-   monitor/display.h
-   monitor/jlink.c
-   monitor/rfcomm.h
-   monitor/packet.c
-   monitor/crc.h
-   monitor/keys.h
-   monitor/sdp.h
-   monitor/rfcomm.c
-   monitor/avdtp.c
-   monitor/a2dp.h
-   monitor/avctp.h
-   monitor/vendor.h
-   monitor/hcidump.c
-   monitor/intel.c
-   monitor/tty.h
-   monitor/control.c
-   monitor/lmp.h
-   monitor/analyze.c
-   monitor/bnep.c
-   monitor/l2cap.c
-   monitor/vendor.c
-   monitor/packet.h
-   monitor/broadcom.c
-   monitor/analyze.h
-   monitor/l2cap.h
-   monitor/bnep.h
+License: GPL-2.0-or-later
+   obexd/src/mimetype.c
+   obexd/src/transport.h
+   obexd/src/server.c
+   obexd/src/obex.c
+   obexd/src/log.h
+   obexd/src/service.h
+   obexd/src/plugin.h
+   obexd/src/plugin.c
+   obexd/src/main.c
+   obexd/src/mimetype.h
+   obexd/src/transport.c
+   obexd/src/obexd.h
+   obexd/src/obex.h
+   obexd/src/obex-priv.h
+   obexd/src/log.c
+   obexd/src/map_ap.h
+   obexd/src/manager.c
+   obexd/src/service.c
+   obexd/src/server.h
+   obexd/src/manager.h
+   obexd/plugins/opp.c
+   obexd/plugins/vcard.h
+   obexd/plugins/pbap.c
+   obexd/plugins/vcard.c
+   obexd/plugins/messages.h
+   obexd/plugins/phonebook.h
+   obexd/plugins/pcsuite.c
+   obexd/plugins/messages-tracker.c
+   obexd/plugins/phonebook-tracker.c
+   obexd/plugins/irmc.c
+   obexd/plugins/ftp.c
+   obexd/plugins/ftp.h
+   obexd/plugins/filesystem.c
+   obexd/plugins/messages-dummy.c
+   obexd/plugins/phonebook-ebook.c
+   obexd/plugins/syncevolution.c
+   obexd/plugins/bluetooth.c
+   obexd/plugins/phonebook-dummy.c
+   obexd/plugins/filesystem.h
+   obexd/plugins/mas.c
+   obexd/client/transport.h
+   obexd/client/opp.c
+   obexd/client/pbap.c
+   obexd/client/transfer.h
+   obexd/client/opp.h
+   obexd/client/driver.c
+   obexd/client/map-event.h
+   obexd/client/bluetooth.h
+   obexd/client/sync.h
+   obexd/client/transport.c
+   obexd/client/pbap.h
+   obexd/client/driver.h
+   obexd/client/transfer.c
+   obexd/client/ftp.c
+   obexd/client/map.h
+   obexd/client/ftp.h
+   obexd/client/bluetooth.c
+   obexd/client/manager.c
+   obexd/client/session.h
+   obexd/client/session.c
+   obexd/client/map.c
+   obexd/client/sync.c
+   obexd/client/map-event.c
+   obexd/client/mns.c
+   obexd/client/manager.h
 ---
- monitor/a2dp.c     | 15 +--------------
- monitor/a2dp.h     | 15 +--------------
- monitor/analyze.c  | 15 +--------------
- monitor/analyze.h  | 15 +--------------
- monitor/avctp.c    | 15 +--------------
- monitor/avctp.h    | 15 +--------------
- monitor/avdtp.c    | 15 +--------------
- monitor/avdtp.h    | 15 +--------------
- monitor/bnep.c     | 15 +--------------
- monitor/bnep.h     | 15 +--------------
- monitor/broadcom.c | 15 +--------------
- monitor/broadcom.h | 15 +--------------
- monitor/bt.h       | 15 +--------------
- monitor/control.c  | 15 +--------------
- monitor/control.h  | 15 +--------------
- monitor/crc.c      | 15 +--------------
- monitor/crc.h      | 15 +--------------
- monitor/display.c  | 15 +--------------
- monitor/display.h  | 15 +--------------
- monitor/ellisys.c  | 15 +--------------
- monitor/ellisys.h  | 15 +--------------
- monitor/hcidump.c  | 15 +--------------
- monitor/hcidump.h  | 15 +--------------
- monitor/hwdb.c     | 15 +--------------
- monitor/hwdb.h     | 15 +--------------
- monitor/intel.c    | 15 +--------------
- monitor/intel.h    | 15 +--------------
- monitor/jlink.c    | 15 +--------------
- monitor/jlink.h    | 15 +--------------
- monitor/keys.c     | 15 +--------------
- monitor/keys.h     | 15 +--------------
- monitor/l2cap.c    | 15 +--------------
- monitor/l2cap.h    | 15 +--------------
- monitor/ll.c       | 15 +--------------
- monitor/ll.h       | 15 +--------------
- monitor/lmp.c      | 15 +--------------
- monitor/lmp.h      | 15 +--------------
- monitor/main.c     | 15 +--------------
- monitor/packet.c   | 15 +--------------
- monitor/packet.h   | 15 +--------------
- monitor/rfcomm.c   | 15 +--------------
- monitor/rfcomm.h   | 15 +--------------
- monitor/sdp.c      | 15 +--------------
- monitor/sdp.h      | 15 +--------------
- monitor/tty.h      | 15 +--------------
- monitor/vendor.c   | 15 +--------------
- monitor/vendor.h   | 15 +--------------
- 47 files changed, 47 insertions(+), 658 deletions(-)
+ obexd/client/bluetooth.c          | 15 +--------------
+ obexd/client/bluetooth.h          | 15 +--------------
+ obexd/client/driver.c             | 15 +--------------
+ obexd/client/driver.h             | 15 +--------------
+ obexd/client/ftp.c                | 15 +--------------
+ obexd/client/ftp.h                | 15 +--------------
+ obexd/client/manager.c            | 15 +--------------
+ obexd/client/manager.h            | 15 +--------------
+ obexd/client/map-event.c          | 15 +--------------
+ obexd/client/map-event.h          | 15 +--------------
+ obexd/client/map.c                | 15 +--------------
+ obexd/client/map.h                | 15 +--------------
+ obexd/client/mns.c                | 15 +--------------
+ obexd/client/opp.c                | 15 +--------------
+ obexd/client/opp.h                | 15 +--------------
+ obexd/client/pbap.c               | 15 +--------------
+ obexd/client/pbap.h               | 15 +--------------
+ obexd/client/session.c            | 15 +--------------
+ obexd/client/session.h            | 15 +--------------
+ obexd/client/sync.c               | 15 +--------------
+ obexd/client/sync.h               | 15 +--------------
+ obexd/client/transfer.c           | 15 +--------------
+ obexd/client/transfer.h           | 15 +--------------
+ obexd/client/transport.c          | 15 +--------------
+ obexd/client/transport.h          | 15 +--------------
+ obexd/plugins/bluetooth.c         | 15 +--------------
+ obexd/plugins/filesystem.c        | 15 +--------------
+ obexd/plugins/filesystem.h        | 15 +--------------
+ obexd/plugins/ftp.c               | 15 +--------------
+ obexd/plugins/ftp.h               | 15 +--------------
+ obexd/plugins/irmc.c              | 15 +--------------
+ obexd/plugins/mas.c               | 15 +--------------
+ obexd/plugins/messages-dummy.c    | 15 +--------------
+ obexd/plugins/messages-tracker.c  | 15 +--------------
+ obexd/plugins/messages.h          | 15 +--------------
+ obexd/plugins/opp.c               | 15 +--------------
+ obexd/plugins/pbap.c              | 15 +--------------
+ obexd/plugins/pcsuite.c           | 15 +--------------
+ obexd/plugins/phonebook-dummy.c   | 15 +--------------
+ obexd/plugins/phonebook-ebook.c   | 15 +--------------
+ obexd/plugins/phonebook-tracker.c | 15 +--------------
+ obexd/plugins/phonebook.h         | 15 +--------------
+ obexd/plugins/syncevolution.c     | 15 +--------------
+ obexd/plugins/vcard.c             | 15 +--------------
+ obexd/plugins/vcard.h             | 15 +--------------
+ obexd/src/log.c                   | 15 +--------------
+ obexd/src/log.h                   | 15 +--------------
+ obexd/src/main.c                  | 15 +--------------
+ obexd/src/manager.c               | 15 +--------------
+ obexd/src/manager.h               | 15 +--------------
+ obexd/src/map_ap.h                | 15 +--------------
+ obexd/src/mimetype.c              | 15 +--------------
+ obexd/src/mimetype.h              | 15 +--------------
+ obexd/src/obex-priv.h             | 15 +--------------
+ obexd/src/obex.c                  | 15 +--------------
+ obexd/src/obex.h                  | 15 +--------------
+ obexd/src/obexd.h                 | 15 +--------------
+ obexd/src/plugin.c                | 15 +--------------
+ obexd/src/plugin.h                | 15 +--------------
+ obexd/src/server.c                | 15 +--------------
+ obexd/src/server.h                | 15 +--------------
+ obexd/src/service.c               | 15 +--------------
+ obexd/src/service.h               | 15 +--------------
+ obexd/src/transport.c             | 15 +--------------
+ obexd/src/transport.h             | 15 +--------------
+ 65 files changed, 65 insertions(+), 910 deletions(-)
 
-diff --git a/monitor/a2dp.c b/monitor/a2dp.c
-index 4a1d0e1c4..ac2e1a228 100644
---- a/monitor/a2dp.c
-+++ b/monitor/a2dp.c
+diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
+index 0c043e0ac..ca2c023fb 100644
+--- a/obexd/client/bluetooth.c
++++ b/obexd/client/bluetooth.c
 @@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2018  Pali Rohár <pali.rohar@gmail.com>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/a2dp.h b/monitor/a2dp.h
-index 72a8f1f45..814c8ed90 100644
---- a/monitor/a2dp.h
-+++ b/monitor/a2dp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Client
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2015  Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+  *  Copyright (C) 2012 Intel Corporation
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- bool a2dp_codec_cap(uint8_t codec, uint8_t losc, struct l2cap_frame *frame);
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 4dc2891a1..784f9a0a4 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/monitor/analyze.h b/monitor/analyze.h
-index c643d3502..774ac9db5 100644
---- a/monitor/analyze.h
-+++ b/monitor/analyze.h
+diff --git a/obexd/client/bluetooth.h b/obexd/client/bluetooth.h
+index 968e131e0..4d5ba9c21 100644
+--- a/obexd/client/bluetooth.h
++++ b/obexd/client/bluetooth.h
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- void analyze_trace(const char *path);
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 6c2c2cac0..dc03195a8 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/avctp.h b/monitor/avctp.h
-index 2613f14f3..1cca5a756 100644
---- a/monitor/avctp.h
-+++ b/monitor/avctp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- void avctp_packet(const struct l2cap_frame *frame);
-diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index 6a342a282..9fe72d240 100644
---- a/monitor/avdtp.c
-+++ b/monitor/avdtp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Client
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2015  Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+  *  Copyright (C) 2011 Intel Corporation
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/avdtp.h b/monitor/avdtp.h
-index f77d82ee2..1bc4dd03d 100644
---- a/monitor/avdtp.h
-+++ b/monitor/avdtp.h
+ int bluetooth_init(void);
+diff --git a/obexd/client/driver.c b/obexd/client/driver.c
+index 0dae35601..195cdd2f1 100644
+--- a/obexd/client/driver.c
++++ b/obexd/client/driver.c
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Server
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2015  Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- void avdtp_packet(const struct l2cap_frame *frame);
-diff --git a/monitor/bnep.c b/monitor/bnep.c
-index 6af54e0c5..3b8b284a9 100644
---- a/monitor/bnep.c
-+++ b/monitor/bnep.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/monitor/bnep.h b/monitor/bnep.h
-index 38340d6c1..3ccc1b766 100644
---- a/monitor/bnep.h
-+++ b/monitor/bnep.h
+diff --git a/obexd/client/driver.h b/obexd/client/driver.h
+index 0112219d5..cc4cace7b 100644
+--- a/obexd/client/driver.h
++++ b/obexd/client/driver.h
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- void bnep_packet(const struct l2cap_frame *frame);
-diff --git a/monitor/broadcom.c b/monitor/broadcom.c
-index 787ff2950..4f8455583 100644
---- a/monitor/broadcom.c
-+++ b/monitor/broadcom.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/broadcom.h b/monitor/broadcom.h
-index ceda0e18b..5cb51d81d 100644
---- a/monitor/broadcom.h
-+++ b/monitor/broadcom.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 37e81e8a3..aca847d7c 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/control.c b/monitor/control.c
-index 273075888..962da4980 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/control.h b/monitor/control.h
-index ddf485f1f..29616c4f1 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/crc.c b/monitor/crc.c
-index 912b37ebc..8d0e31db9 100644
---- a/monitor/crc.c
-+++ b/monitor/crc.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/crc.h b/monitor/crc.h
-index 772388b80..c59775100 100644
---- a/monitor/crc.h
-+++ b/monitor/crc.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/display.c b/monitor/display.c
-index 990395425..b11b71d5d 100644
---- a/monitor/display.c
-+++ b/monitor/display.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/display.h b/monitor/display.h
-index 98073b99e..f3a614b81 100644
---- a/monitor/display.h
-+++ b/monitor/display.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdbool.h>
-diff --git a/monitor/ellisys.c b/monitor/ellisys.c
-index e533eeceb..61ac24c23 100644
---- a/monitor/ellisys.c
-+++ b/monitor/ellisys.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/ellisys.h b/monitor/ellisys.h
-index 8be888dfe..c0c4ff192 100644
---- a/monitor/ellisys.h
-+++ b/monitor/ellisys.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/hcidump.c b/monitor/hcidump.c
-index 8b6f846d3..690b9b913 100644
---- a/monitor/hcidump.c
-+++ b/monitor/hcidump.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/hcidump.h b/monitor/hcidump.h
-index c90865068..d32b33c81 100644
---- a/monitor/hcidump.h
-+++ b/monitor/hcidump.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- int hcidump_tracing(void);
-diff --git a/monitor/hwdb.c b/monitor/hwdb.c
-index f2431fad8..22de9edfb 100644
---- a/monitor/hwdb.c
-+++ b/monitor/hwdb.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/hwdb.h b/monitor/hwdb.h
-index 79f505a2d..5789b6507 100644
---- a/monitor/hwdb.h
-+++ b/monitor/hwdb.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/intel.c b/monitor/intel.c
-index 41e70ba0c..18840f3e7 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/intel.h b/monitor/intel.h
-index 573b23f3f..bf00ad491 100644
---- a/monitor/intel.h
-+++ b/monitor/intel.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/jlink.c b/monitor/jlink.c
-index afa9d9323..9aaa4ebd8 100644
---- a/monitor/jlink.c
-+++ b/monitor/jlink.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Server
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2018  Codecoup
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/jlink.h b/monitor/jlink.h
-index d7c76704c..e445e553c 100644
---- a/monitor/jlink.h
-+++ b/monitor/jlink.h
+ struct obc_driver {
+diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+index 5e30654af..160e0636a 100644
+--- a/obexd/client/ftp.c
++++ b/obexd/client/ftp.c
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Client
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2018  Codecoup
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- int jlink_init(void);
-diff --git a/monitor/keys.c b/monitor/keys.c
-index e60aa9386..d2fa3b23f 100644
---- a/monitor/keys.c
-+++ b/monitor/keys.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/monitor/keys.h b/monitor/keys.h
-index 61ec50a4c..e40c90fa9 100644
---- a/monitor/keys.h
-+++ b/monitor/keys.h
+diff --git a/obexd/client/ftp.h b/obexd/client/ftp.h
+index 3d9096863..1326c8522 100644
+--- a/obexd/client/ftp.h
++++ b/obexd/client/ftp.h
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 41c766863..ca1997a0c 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 07864caee..e46042db4 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/ll.c b/monitor/ll.c
-index 4b3f567bd..cf93647e0 100644
---- a/monitor/ll.c
-+++ b/monitor/ll.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/ll.h b/monitor/ll.h
-index 98e0bf489..35d631363 100644
---- a/monitor/ll.h
-+++ b/monitor/ll.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/lmp.c b/monitor/lmp.c
-index 3088c5ee2..0d17f5c98 100644
---- a/monitor/lmp.c
-+++ b/monitor/lmp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/lmp.h b/monitor/lmp.h
-index 9564c7779..d29ad8e46 100644
---- a/monitor/lmp.h
-+++ b/monitor/lmp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/main.c b/monitor/main.c
-index 24ec3c567..e6a40703c 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/packet.c b/monitor/packet.c
-index bef134095..d83552f74 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 3a139ecb7..409bf0e54 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index 94d28de31..9b88a3440 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/rfcomm.h b/monitor/rfcomm.h
-index c15735234..81ab55b21 100644
---- a/monitor/rfcomm.h
-+++ b/monitor/rfcomm.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #define RFCOMM_SABM	0x2f
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index 575eda536..10bc0a121 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/monitor/sdp.h b/monitor/sdp.h
-index c8a9bb0cd..4fffb30f9 100644
---- a/monitor/sdp.h
-+++ b/monitor/sdp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- void sdp_packet(const struct l2cap_frame *frame);
-diff --git a/monitor/tty.h b/monitor/tty.h
-index f0ba0c5c0..87b3fd53c 100644
---- a/monitor/tty.h
-+++ b/monitor/tty.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
+  *  OBEX Client
 @@ -5,20 +6,6 @@
-  *  Copyright (C) 2016  Intel Corporation
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #include <stdint.h>
-diff --git a/monitor/vendor.c b/monitor/vendor.c
-index 3dda2ae3b..ecbfcf2eb 100644
---- a/monitor/vendor.c
-+++ b/monitor/vendor.c
+ int ftp_init(void);
+diff --git a/obexd/client/manager.c b/obexd/client/manager.c
+index fbcad6da4..75f1bfb04 100644
+--- a/obexd/client/manager.c
++++ b/obexd/client/manager.c
 @@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX Client
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/monitor/vendor.h b/monitor/vendor.h
-index f5792b3c5..c70552b66 100644
---- a/monitor/vendor.h
-+++ b/monitor/vendor.h
+diff --git a/obexd/client/manager.h b/obexd/client/manager.h
+index e4068de44..d4fdf8a1b 100644
+--- a/obexd/client/manager.h
++++ b/obexd/client/manager.h
 @@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
   *
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ int client_manager_init(void);
+diff --git a/obexd/client/map-event.c b/obexd/client/map-event.c
+index e164e863c..c988ef3dd 100644
+--- a/obexd/client/map-event.c
++++ b/obexd/client/map-event.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
+index 5414b2621..bb127b0f4 100644
+--- a/obexd/client/map-event.h
++++ b/obexd/client/map-event.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obc_session;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 23be2d6b2..74828cddb 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+  *
+  *  Copyright (C) 2011  Bartosz Szatkowski <bulislaw@linux.com> for Comarch
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/map.h b/obexd/client/map.h
+index 86f6b9512..15228ed0a 100644
+--- a/obexd/client/map.h
++++ b/obexd/client/map.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+  *
+  *  Copyright (C) 2011  Bartosz Szatkowski <bulislaw@linux.com> for Comarch
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ int map_init(void);
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index 4912cb90f..e52505642 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/opp.c b/obexd/client/opp.c
+index 92785f66e..90d0c0c8e 100644
+--- a/obexd/client/opp.c
++++ b/obexd/client/opp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2011 Intel Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/opp.h b/obexd/client/opp.h
+index a23e94e00..ecc3e05ed 100644
+--- a/obexd/client/opp.h
++++ b/obexd/client/opp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2011 Intel Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ int opp_init(void);
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 3f5665fcd..1a2bacc9f 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/pbap.h b/obexd/client/pbap.h
+index ce56258b5..8107f81bf 100644
+--- a/obexd/client/pbap.h
++++ b/obexd/client/pbap.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ int pbap_init(void);
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 5bd2d2670..6955a8089 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index b561b7e58..2c646df1a 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #include <stdint.h>
+diff --git a/obexd/client/sync.c b/obexd/client/sync.c
+index 548c318c3..92faf4434 100644
+--- a/obexd/client/sync.c
++++ b/obexd/client/sync.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/sync.h b/obexd/client/sync.h
+index 8adc5f8d6..5d8844c4f 100644
+--- a/obexd/client/sync.h
++++ b/obexd/client/sync.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ int sync_init(void);
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index b53dffa21..744d8f106 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/transfer.h b/obexd/client/transfer.h
+index b6b835d18..323332a62 100644
+--- a/obexd/client/transfer.h
++++ b/obexd/client/transfer.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Client
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2011-2012  BMW Car IT GmbH. All rights reserved.
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obc_transfer;
+diff --git a/obexd/client/transport.c b/obexd/client/transport.c
+index 4cd770672..4e442e9b5 100644
+--- a/obexd/client/transport.c
++++ b/obexd/client/transport.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2012 Intel Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/client/transport.h b/obexd/client/transport.h
+index b035cfc45..e1f1a5c53 100644
+--- a/obexd/client/transport.h
++++ b/obexd/client/transport.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2012 Intel Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ typedef void (*obc_transport_func)(GIOChannel *io, GError *err,
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index ba1e0a99a..d232d3fd5 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/filesystem.c b/obexd/plugins/filesystem.c
+index 48239a8bc..8e53c181c 100644
+--- a/obexd/plugins/filesystem.c
++++ b/obexd/plugins/filesystem.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/filesystem.h b/obexd/plugins/filesystem.h
+index f95773beb..63cda985e 100644
+--- a/obexd/plugins/filesystem.h
++++ b/obexd/plugins/filesystem.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ ssize_t string_read(void *object, void *buf, size_t count);
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 3ee18a619..f60cf143d 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/ftp.h b/obexd/plugins/ftp.h
+index f06de8490..b9934b23b 100644
+--- a/obexd/plugins/ftp.h
++++ b/obexd/plugins/ftp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ void *ftp_connect(struct obex_session *os, int *err);
+diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
+index fcf5340e7..cd143e7a3 100644
+--- a/obexd/plugins/irmc.c
++++ b/obexd/plugins/irmc.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX IrMC Sync Server
+  *
+  *  Copyright (C) 2010  Marcel Mol <marcel@mesa.nl>
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index f73c3e9d8..5d00bc563 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2010-2011  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index 3eca9ef4c..34199fa05 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2010-2011  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/messages-tracker.c b/obexd/plugins/messages-tracker.c
+index 60f3a807e..4ce9f221d 100644
+--- a/obexd/plugins/messages-tracker.c
++++ b/obexd/plugins/messages-tracker.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2010-2011  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/messages.h b/obexd/plugins/messages.h
+index 00a16b1ae..535ec303c 100644
+--- a/obexd/plugins/messages.h
++++ b/obexd/plugins/messages.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2010-2011  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #include <glib.h>
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 5bb766770..860161303 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+index d5a3046ae..efae92cd8 100644
+--- a/obexd/plugins/pbap.c
++++ b/obexd/plugins/pbap.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
+index 43ab409e9..b2232ea09 100644
+--- a/obexd/plugins/pcsuite.c
++++ b/obexd/plugins/pcsuite.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
+index 9279ef29a..4d0b70504 100644
+--- a/obexd/plugins/phonebook-dummy.c
++++ b/obexd/plugins/phonebook-dummy.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/phonebook-ebook.c b/obexd/plugins/phonebook-ebook.c
+index c422585df..30be9d921 100644
+--- a/obexd/plugins/phonebook-ebook.c
++++ b/obexd/plugins/phonebook-ebook.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/phonebook-tracker.c b/obexd/plugins/phonebook-tracker.c
+index c1d14078b..30f945b84 100644
+--- a/obexd/plugins/phonebook-tracker.c
++++ b/obexd/plugins/phonebook-tracker.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  Phonebook access through D-Bus vCard and call history service
+  *
+  *  Copyright (C) 2010  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
+index 70a9cb797..c73ae73b8 100644
+--- a/obexd/plugins/phonebook.h
++++ b/obexd/plugins/phonebook.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #define EOL	"\r\n"
+diff --git a/obexd/plugins/syncevolution.c b/obexd/plugins/syncevolution.c
+index 854505a58..88744f28a 100644
+--- a/obexd/plugins/syncevolution.c
++++ b/obexd/plugins/syncevolution.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/vcard.c b/obexd/plugins/vcard.c
+index dc7c3b3e6..0a727b729 100644
+--- a/obexd/plugins/vcard.c
++++ b/obexd/plugins/vcard.c
+@@ -1,22 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * OBEX Server
+  *
+  * Copyright (C) 2008-2010 Intel Corporation.  All rights reserved.
+  *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/plugins/vcard.h b/obexd/plugins/vcard.h
+index 22c3f6899..880660ffa 100644
+--- a/obexd/plugins/vcard.h
++++ b/obexd/plugins/vcard.h
+@@ -1,22 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  * OBEX Server
+  *
+  * Copyright (C) 2008-2010 Intel Corporation.  All rights reserved.
+  *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ enum phonebook_number_type {
+diff --git a/obexd/src/log.c b/obexd/src/log.c
+index 8e2ebaab2..6c29064e3 100644
+--- a/obexd/src/log.c
++++ b/obexd/src/log.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/log.h b/obexd/src/log.h
+index d9fb8678f..7dc74d542 100644
+--- a/obexd/src/log.h
++++ b/obexd/src/log.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+diff --git a/obexd/src/main.c b/obexd/src/main.c
+index 139f1412c..629a3b4c1 100644
+--- a/obexd/src/main.c
++++ b/obexd/src/main.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index a4af627cb..01741fe62 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/manager.h b/obexd/src/manager.h
+index d709af5a8..8fa12d15d 100644
+--- a/obexd/src/manager.h
++++ b/obexd/src/manager.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #include <dbus/dbus.h>
+diff --git a/obexd/src/map_ap.h b/obexd/src/map_ap.h
+index da108fe6e..59efc49de 100644
+--- a/obexd/src/map_ap.h
++++ b/obexd/src/map_ap.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2010-2011  Nokia Corporation
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ /* List of OBEX application parameters tags as per MAP specification. */
+diff --git a/obexd/src/mimetype.c b/obexd/src/mimetype.c
+index c8b040a43..212f24b18 100644
+--- a/obexd/src/mimetype.c
++++ b/obexd/src/mimetype.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/mimetype.h b/obexd/src/mimetype.h
+index 79529b890..e1c14f405 100644
+--- a/obexd/src/mimetype.h
++++ b/obexd/src/mimetype.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ typedef gboolean (*obex_object_io_func) (void *object, int flags, int err,
+diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
+index 355a7f87b..db409e7e4 100644
+--- a/obexd/src/obex-priv.h
++++ b/obexd/src/obex-priv.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obex_session {
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 2850d3a37..9f992ec18 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/obex.h b/obexd/src/obex.h
+index 67593f11b..755be1caf 100644
+--- a/obexd/src/obex.h
++++ b/obexd/src/obex.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #include <unistd.h>
+diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
+index 42c3c4d97..fe312a65b 100644
+--- a/obexd/src/obexd.h
++++ b/obexd/src/obexd.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #define OBEX_OPP	(1 << 1)
+diff --git a/obexd/src/plugin.c b/obexd/src/plugin.c
+index a1962b91d..0df9d5258 100644
+--- a/obexd/src/plugin.c
++++ b/obexd/src/plugin.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/plugin.h b/obexd/src/plugin.h
+index 13d77695f..703878460 100644
+--- a/obexd/src/plugin.h
++++ b/obexd/src/plugin.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obex_plugin_desc {
+diff --git a/obexd/src/server.c b/obexd/src/server.c
+index db854233b..a8fc45092 100644
+--- a/obexd/src/server.c
++++ b/obexd/src/server.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/server.h b/obexd/src/server.h
+index 278c35fce..c31236ec0 100644
+--- a/obexd/src/server.h
++++ b/obexd/src/server.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -6,20 +7,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obex_server {
+diff --git a/obexd/src/service.c b/obexd/src/service.c
+index c088535e9..0f4e420e8 100644
+--- a/obexd/src/service.c
++++ b/obexd/src/service.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/service.h b/obexd/src/service.h
+index 5d9d325fb..e3aee3bf3 100644
+--- a/obexd/src/service.h
++++ b/obexd/src/service.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #define OBEX_PORT_RANDOM UINT16_MAX
+diff --git a/obexd/src/transport.c b/obexd/src/transport.c
+index 4984643e2..4b5895e5d 100644
+--- a/obexd/src/transport.c
++++ b/obexd/src/transport.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/obexd/src/transport.h b/obexd/src/transport.h
+index 97e10d05f..3a16b7620 100644
+--- a/obexd/src/transport.h
++++ b/obexd/src/transport.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  *
+  *  OBEX Server
+@@ -5,20 +6,6 @@
+  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
+  *
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ struct obex_transport_driver {
 -- 
 2.25.4
 
