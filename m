@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F80C4346E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68459C4346E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:03:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEC4220C09
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3641722574
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:03:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbgIUTCi (ORCPT
+        id S1727286AbgIUTDH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Sep 2020 15:02:38 -0400
-Received: from mga07.intel.com ([134.134.136.100]:22104 "EHLO mga07.intel.com"
+        Mon, 21 Sep 2020 15:03:07 -0400
+Received: from mga03.intel.com ([134.134.136.65]:57864 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727382AbgIUTCi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Sep 2020 15:02:38 -0400
-IronPort-SDR: DUcivvGASZo+Du2qjGmLpLAv4xA+8uOqXBh+5J/fUeLqwM9g75UO3rdfrgbG52uSLJVh6Bmgxl
- lml9/n8K13GQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="224608863"
+        id S1726395AbgIUTDH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 21 Sep 2020 15:03:07 -0400
+IronPort-SDR: LRLJkg56fYuxHa/NpXj+hI5kd5+AafBQ17T6tgrMj25dil2bwUxfj63EUWHJCqrTZjwIsbt4ZI
+ 2Ne7UcwPKOZQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="160524432"
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="224608863"
+   d="scan'208";a="160524432"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:02:36 -0700
-IronPort-SDR: 3aK2AMUVTXG/auNi7q9GJzmfI503MkPLT4cIA2yAYpfArnfME/SIbOGW7j/pISg1llQ03itkVT
- 0iFYn1+U8I9Q==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:03:07 -0700
+IronPort-SDR: oyr83ejzxp1YjnBTMWLOmLH6dk5OEBG25L22LVxVkeNpIHSj2SCeEyTSGHVKwBjwLYWdM2mMLp
+ MX7io6dOihbQ==
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="485623673"
+   d="scan'208";a="485624042"
 Received: from han1-mobl3.jf.intel.com ([10.254.86.223])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:02:36 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:03:06 -0700
 From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [BlueZ V4 RESEND 02/20] attrib: Add SPDX License Identifier
-Date:   Mon, 21 Sep 2020 12:00:22 -0700
-Message-Id: <20200921190040.45309-3-tedd.an@linux.intel.com>
+Subject: [BlueZ V4 RESEND 03/20] btio: Add SPDX License Identifier
+Date:   Mon, 21 Sep 2020 12:00:23 -0700
+Message-Id: <20200921190040.45309-4-tedd.an@linux.intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200921190040.45309-1-tedd.an@linux.intel.com>
 References: <20200921190040.45309-1-tedd.an@linux.intel.com>
@@ -57,78 +57,27 @@ This patch adds SPDX License Identifier and removes the license text.
 -------------------------------------
        License            COUNT
 -------------------------------------
- GPL-2.0-or-later     :     13
+ GPL-2.0-or-later     :      2
 
 License: GPL-2.0-or-later
-   attrib/att-database.h
-   attrib/gattrib.h
-   attrib/gatttool.h
-   attrib/gatt-service.c
-   attrib/interactive.c
-   attrib/utils.c
-   attrib/gatt.c
-   attrib/gattrib.c
-   attrib/gatt-service.h
-   attrib/att.c
-   attrib/gatt.h
-   attrib/att.h
-   attrib/gatttool.c
+   btio/btio.h
+   btio/btio.c
 ---
- attrib/att-database.h | 15 +--------------
- attrib/att.c          | 15 +--------------
- attrib/att.h          | 15 +--------------
- attrib/gatt-service.c | 15 +--------------
- attrib/gatt-service.h | 15 +--------------
- attrib/gatt.c         | 15 +--------------
- attrib/gatt.h         | 15 +--------------
- attrib/gattrib.c      | 15 +--------------
- attrib/gattrib.h      | 15 +--------------
- attrib/gatttool.c     | 15 +--------------
- attrib/gatttool.h     | 15 +--------------
- attrib/interactive.c  | 15 +--------------
- attrib/utils.c        | 15 +--------------
- 13 files changed, 13 insertions(+), 182 deletions(-)
+ btio/btio.c | 15 +--------------
+ btio/btio.h | 15 +--------------
+ 2 files changed, 2 insertions(+), 28 deletions(-)
 
-diff --git a/attrib/att-database.h b/attrib/att-database.h
-index 48c50e385..bb30933ea 100644
---- a/attrib/att-database.h
-+++ b/attrib/att-database.h
-@@ -1,23 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-  *  Copyright (C) 2012 Texas Instruments Corporation
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- /* Requirements for read/write operations */
-diff --git a/attrib/att.c b/attrib/att.c
-index c0438a382..fa53c90aa 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
+diff --git a/btio/btio.c b/btio/btio.c
+index 844d6007f..c18b6a012 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
 @@ -1,3 +1,4 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
 @@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2009-2010  Nokia Corporation
   *
   *
 - *  This program is free software; you can redistribute it and/or modify
@@ -148,17 +97,17 @@ index c0438a382..fa53c90aa 100644
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/attrib/att.h b/attrib/att.h
-index 2311aafb6..13a0c3a31 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
+diff --git a/btio/btio.h b/btio/btio.h
+index 23e0ef72b..f0259cf1d 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
 @@ -1,3 +1,4 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
   *  BlueZ - Bluetooth protocol stack for Linux
 @@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2009-2010  Nokia Corporation
   *
   *
 - *  This program is free software; you can redistribute it and/or modify
@@ -176,308 +125,8 @@ index 2311aafb6..13a0c3a31 100644
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
- 
- #include "src/shared/crypto.h"
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 629d9cfd2..741ff1acb 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/attrib/gatt-service.h b/attrib/gatt-service.h
-index 728d3a8e7..17031d466 100644
---- a/attrib/gatt-service.h
-+++ b/attrib/gatt-service.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- typedef enum {
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 480f87425..46b2ca381 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 63b2940dc..e2c8c90a8 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- /*
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 8aa0f5eff..bc7d4f22c 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 611f95260..c2877d757 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- #ifndef __GATTRIB_H
- #define __GATTRIB_H
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 95bd20a63..6a0ddfaad 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-index 8f0913ceb..20cb42417 100644
---- a/attrib/gatttool.h
-+++ b/attrib/gatttool.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2011  Nokia Corporation
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- int interactive(const char *src, const char *dst, const char *dst_type,
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 9a7976d34..171b95738 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2011  Nokia Corporation
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/attrib/utils.c b/attrib/utils.c
-index a74902959..317331b4b 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2011  Nokia Corporation
-  *
-  *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
+ #ifndef BT_IO_H
+ #define BT_IO_H
 -- 
 2.25.4
 
