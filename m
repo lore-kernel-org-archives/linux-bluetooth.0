@@ -2,302 +2,382 @@ Return-Path: <SRS0=5m6h=C6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AFDCC43465
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 03:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC945C43465
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 04:23:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC3A020795
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 03:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 987F520866
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 04:23:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="aCCVb2N5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v2Z7R8/2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726324AbgIUDEN (ORCPT
+        id S1726297AbgIUEXV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 20 Sep 2020 23:04:13 -0400
-Received: from mga05.intel.com ([192.55.52.43]:54918 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726104AbgIUDEM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 20 Sep 2020 23:04:12 -0400
-IronPort-SDR: 2Zn0NidZr0NStf0tudzIDywcWEAAhHiKYjxF555Ql0OuiVlIJA3LyMhIuxqWHtPoN7HID0spP+
- 6eTPy6lrMPwg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9750"; a="245134170"
-X-IronPort-AV: E=Sophos;i="5.77,285,1596524400"; 
-   d="scan'208";a="245134170"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 20:04:09 -0700
-IronPort-SDR: Lv9dkA8TM4MP09WVuCpgMZDpZzrunECkqyGpZNixutWK0o38IEv+DiI7dU/e85WFvPIVNu3SiO
- dgUPtXPksyTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,285,1596524400"; 
-   d="scan'208";a="321540740"
-Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
-  by orsmga002.jf.intel.com with ESMTP; 20 Sep 2020 20:04:08 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Sun, 20 Sep 2020 20:03:58 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Sun, 20 Sep 2020 20:03:58 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Sun, 20 Sep 2020 20:03:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZDd9vn17WNUQGcush3w0lrNqtJUSq2lyd1TW02m+JRg3wbp0Vz+OO8WZqh7z3hFJJUyuTFuX9D6uUvPCLSMpeRf/2wspEqeaPLyAIyTIfpbuY02no+BENz/JdURW0Ve0wYHFOgJwgGANfpj//Kj3QjtY3TrmFP3BOuK/TGx8CKYSBV+R00543IEQmU0MysAJzC1ZZpxVefm7ZCh+ozHe6W7jX4O5KdoRp1Kl6W+Fmd5S9gCONP9wDaVFAt+RQmkx+CJJdpwIuR6LPrSqOmvgdsKe4WEtCL7jhk5DQ4xdrhpGuipxju8bdTWUPKdnoP1YEQ6KAlMbuyy+GOUJ+HRVEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xUaSbaAN//PPpfk0fApwPF0suG0Sf+jA4NmUJeeVnrE=;
- b=fuqdN8e1XgB6ex4zajzWFN8UOhivdV6omI/0dbT/yrec4iYBrzVZG5JcnMCV798j3nxf25XNobigtBEZLPMkAK+jhORiKDoscZrTF/IBE58bkMqB00IUwMkxYpR5+s+ODghvXecp5x1zgqDrYdMyiFzNh2+0GswqEtCWnpUrwGoQOi+H9HyHQ2CYHrXACvGDh6FDM+duv1UwfUAsbl1xI3t2aOvtbTMPBH96GJgmjUtNEZ/ir28OOZD4WkqzT9taU+qfKF8RX/SNB7hR1O1q9Kl+USZtmSuACi/NRQCvH7HCUGS4ErXrySKilY5kdeKEOArVuoG1F4wUOs2fu+YOUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xUaSbaAN//PPpfk0fApwPF0suG0Sf+jA4NmUJeeVnrE=;
- b=aCCVb2N5XBFL6g1Dk2LznXmpFCZpouw78D6EBdWaL2JhRQa4rllL3YKB00I98ClSsOP4QRGAYuaPx47gNMolOnuCch+9HKarYVZ0d5i7oXn/gUGIimr7w78BXOBW40OeR8CyTLeNLMIiLEpMIGCI8X/FVfwbgFj7CyslubfOxWw=
-Received: from BYAPR11MB3141.namprd11.prod.outlook.com (2603:10b6:a03:8d::13)
- by BYAPR11MB3494.namprd11.prod.outlook.com (2603:10b6:a03:86::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.19; Mon, 21 Sep
- 2020 03:03:54 +0000
-Received: from BYAPR11MB3141.namprd11.prod.outlook.com
- ([fe80::c8d8:a3c5:9876:d589]) by BYAPR11MB3141.namprd11.prod.outlook.com
- ([fe80::c8d8:a3c5:9876:d589%7]) with mapi id 15.20.3391.019; Mon, 21 Sep 2020
- 03:03:54 +0000
-From:   "K, Kiran" <kiran.k@intel.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        "kiraank@gmail.com" <kiraank@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Subject: RE: [bug report] Bluetooth: btintel: Add infrastructure to read
- controller information
-Thread-Topic: [bug report] Bluetooth: btintel: Add infrastructure to read
- controller information
-Thread-Index: AQHWjZ/gVkmoNz+emESKM63nVsqm26lya27g
-Date:   Mon, 21 Sep 2020 03:03:54 +0000
-Message-ID: <BYAPR11MB3141AF55929E6AE9CC0225DDF53A0@BYAPR11MB3141.namprd11.prod.outlook.com>
-References: <20200918093902.GA882111@mwanda>
-In-Reply-To: <20200918093902.GA882111@mwanda>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-authentication-results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [122.182.228.193]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8c1c491e-6d32-4faa-63cb-08d85ddaf992
-x-ms-traffictypediagnostic: BYAPR11MB3494:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR11MB3494E12C3CB75B8DD943B5E3F53A0@BYAPR11MB3494.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: s9joGlFKt1W59naR+OFTdDV7rLZzmwDllxtm24rQQqgdLItPtI9dbPnbpHamHKdTgKeVICiaXqiBGv2JAd7MHRoJsLgPGQBavhBbB9AOdbn6hpTrLWXba/1XOfnCIbX5Y2Rr6UTjuodDyCZ5XYgoQYaEB7qWKt1nmxSW4uAEveBnoXzykpY+LjELo/kUcxRFLkubCArai8XH2SlGeGRco8hiCi4PvoEdJQ4Ekcxl9bED8UItwuGIzzkYWUKebKgKblbSXopCxqHVetkegbwBO6TzbK0NNoECf8dtMLMsZV1Zj9JkW9yXjNb9GnaXgjuOudHIFCnGiABvW4PlBdXkbg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3141.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(136003)(396003)(346002)(366004)(71200400001)(5660300002)(53546011)(6506007)(316002)(107886003)(86362001)(33656002)(8676002)(478600001)(52536014)(55016002)(7696005)(64756008)(186003)(66446008)(4326008)(66556008)(66476007)(54906003)(76116006)(9686003)(8936002)(66946007)(26005)(2906002)(110136005)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: NZNi4JGUoIodIH0EE7sGoUKTPBp8/57ryu5+YoHh2SoGnYS+vCN3U9QogkKTDSdwuXZAfI/feIem/npDmwsYXr16G0QJj1gjol+SG0l2ebzUs+SDctSFuYRnf0SyczDstY516rxBVuaWjAo5Brva0TuwFp+nvNFKUBlOzp9UCn6GWvyIiyQUaoCLSn6xDXjPbPTqC6flL6wUfmxp74Le/UQXMq6CRFQ6a6Ud0NLiwAAiyrhGcNpB2M/dbIicH3fkXzq1o8uw/gaF1G3H1PcyzawCXMpd2y6EIx+mUEJfii4/LN7V528gTykz4nh9+6+kXGZerKTc2ggKSw+YqMpQYN4s3qVCtCfabViXKsJ1/Ea/244N8T/Va4Fc9by7jkDz2gYzxIXSuDI7NKwChArPsjz9wEeCm8AIhnmxxM0EjUd9ylHHAwb+yf8uYA+OqRVOSPy2EhVSeGygqLPtf6vIDBB2W28UVTRLLS9OOICehZ1W/EmWIHDd+hno+7AChD00ffLaikPLgemDX9Uu4w+PZKYMbGAfXiiJ/Epwwg6IIvBs+1fURzKCThSB1C5j8u5Hs5zAfOHrUXvM5G0zx9sjU++Q42dYGyAl5czqhrivnNhUhFmQzzFlWSTyEYkkwTTJDJkAlK82H1nV/d92v1AoDQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3141.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c1c491e-6d32-4faa-63cb-08d85ddaf992
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Sep 2020 03:03:54.1880
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FWIfAMO69FQTh0tvi7hBVrMPPO6ZJnIPdvzzdFf2YvNXvXRDp36j7Ur1GvpHNrhoEoI0P/y/2wjM0MSoAyBQ3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB3494
-X-OriginatorOrg: intel.com
+        Mon, 21 Sep 2020 00:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726221AbgIUEXV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 21 Sep 2020 00:23:21 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DECC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Sep 2020 21:23:21 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id j35so12069448qtk.14
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Sep 2020 21:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=3g+5sRcRx+zydE8jyArP2ZUJ3JXfB06DrKVQlQmrsfs=;
+        b=v2Z7R8/2TESra8dV9i4yZrm8WhqxqdyKcgqxjNQhmPH2IP5lRl+ot0qMEp6XeEyRTN
+         /nU8ZfDVfxPm2N5cmsSM1znYTPtvSSeFiUjiVLP2FlHXtY99PJMCs5lt7t6KTutRBlwD
+         l7lQVvPl/T6jNKUgy2eTEJhH0P7a+ct6asHDmgbwLUNLJNa3JUfaKKS3Mzc8q4y5Otik
+         QtEhWXZgwoJfvSxmT2Ti2QBmMzzeqWB8Vmw3xxf2M1Mp7VpGJjZREiiyKmYbclOf9WBQ
+         mNZrOl8iPr08QgPgiBDxoIp3NbWOwFavn4Hg48hn9KKYWdvfUCVbdK9nnFNduHMcPcjy
+         3Uvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=3g+5sRcRx+zydE8jyArP2ZUJ3JXfB06DrKVQlQmrsfs=;
+        b=t8d3M6Lk8XzoeTnB2YksRf4AYrimlQ7vFqs9ohShapqGsC48+PXhjhdCu8nojAi7ua
+         Oj3lP97rWvrBkF44iiqvOSYvp+mYMp3AwbCQAj41i+czbwnf5cemTfJNdatjuZKldksu
+         BIMl7tQeuM5eB6d3I8cCSOpOIzKjC6KJvq6CWKGyePxPARqob28PF0lVori4eGzqASLG
+         C2j+cIOTR7BSFCn0WMacjd22khTAM3RZNCMpFxxptMyt1Y8j6ufF1v7QpyA+hi0Og0B1
+         uprvsZi52VFETt3yefSYm45stIK9BDa7A+gzsoRDOzT2fuqAR+yX8PSULQEjhb0JfaZa
+         7ODw==
+X-Gm-Message-State: AOAM5302mDfdN4GLlbwPgtjrykp+8NDQgrSSRCBVBlyPLkLVhJP9B0Kc
+        RlrJV3fYpYemOyDMZGxcmDHyQZFPzVomFAbB88kxmeC+bglZq9giaxdEB3/u7ivDi5rGtEWP4o+
+        vhVKZlD6q1hmececXYu6NepEnArSq29AbjTrxqylUlvUcQlaB0OtZUSjDmE8NTtG406q0yWFz2v
+        6ZyOsDH08TBks=
+X-Google-Smtp-Source: ABdhPJyfocm+H2O7GsmOmmx135CTp5XEn6aR/0Blkuk0TSlbdfFJiizpSKXB4VtozgsYaTlxS4PXlNuoXUQTfHJurA==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:a0c:ab4a:: with SMTP id
+ i10mr27943621qvb.39.1600662200242; Sun, 20 Sep 2020 21:23:20 -0700 (PDT)
+Date:   Mon, 21 Sep 2020 12:23:05 +0800
+Message-Id: <20200921122216.v4.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
+Subject: [PATCH v4 1/4] Bluetooth: Interleave with allowlist scan
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     alainm@chromium.org, mcchou@chromium.org, mmandlik@chromium.orgi,
+        Howard Chung <howardchung@google.com>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dan,
+This patch implements the interleaving between allowlist scan and
+no-filter scan. It'll be used to save power when at least one monitor is
+registered and at least one pending connection or one device to be
+scanned for.
 
-Thanks for the comments.  For some reason, the static analysis tool I am us=
-ing didn't report these issues. I will submit a patch soon to address these=
- issues.
+The durations of the allowlist scan and the no-filter scan are
+controlled by MGMT command: Set Default System Configuration. The
+default values are set randomly for now.
 
-Regards,
-Kiran
+Signed-off-by: Howard Chung <howardchung@google.com>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+---
 
-> -----Original Message-----
-> From: Dan Carpenter <dan.carpenter@oracle.com>
-> Sent: Friday, September 18, 2020 3:09 PM
-> To: kiraank@gmail.com
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: [bug report] Bluetooth: btintel: Add infrastructure to read cont=
-roller
-> information
->=20
-> Hello Kiran K,
->=20
-> The patch 57375beef71a: "Bluetooth: btintel: Add infrastructure to read
-> controller information" from Sep 14, 2020, leads to the following static
-> checker warning:
->=20
-> 	drivers/bluetooth/btintel.c:490 btintel_read_version_tlv()
-> 	error: 'tlv->len' from user is not capped properly
->=20
-> drivers/bluetooth/btintel.c
->    426          /* Consume Command Complete Status field */
->    427          skb_pull(skb, 1);
->    428
->    429          /* Event parameters contatin multiple TLVs. Read each of =
-them
->    430           * and only keep the required data. Also, it use existing=
- legacy
->    431           * version field like hw_platform, hw_variant, and fw_var=
-iant
->    432           * to keep the existing setup flow
->    433           */
->    434          while (skb->len) {
->                        ^^^^^^^^
-> I feel like these days we are trying to not trust firmware...  Smatch is
-> complaining because it distrusts all skb->data information, but unless th=
-e
-> devs at Google have a way to connect a fuzzer to this then trusting is
-> probably harmless.  Anyway, the rest of this email assumes that fuzzing i=
-s
-> possible.
->=20
-> If skb->len is less than sizeof(*tlv) then it will read beyond the end of=
- the skb.
->=20
-> while (skb->len >=3D sizeof(struct intel_tlv)) {
->=20
-> But struct intel_tlv is variable length so it's more complicated than jus=
-t testing
-> while we need aditional tests below.
->=20
->    435                  struct intel_tlv *tlv;
->    436
->    437                  tlv =3D (struct intel_tlv *)skb->data;
->=20
-> if (struct_size(tlv->len, val, tvl) > skb->len)
-> 	return -EINVAL;
->=20
-> The length has to be at least 1.
->=20
-> if (tvl->len < 1)
-> 	return -EINVAL;
->=20
->    438                  switch (tlv->type) {
->    439                  case INTEL_TLV_CNVI_TOP:
->=20
-> Ever test which is reads more than 1 byte has to have a check:
->=20
-> if (tvl->len < sizeof(u32))
-> 	return -EINVAL;
->=20
->    440                          version->cnvi_top =3D get_unaligned_le32(=
-tlv->val);
->    441                          break;
->    442                  case INTEL_TLV_CNVR_TOP:
->=20
-> Here too, etc.
->=20
->    443                          version->cnvr_top =3D get_unaligned_le32(=
-tlv->val);
->    444                          break;
->    445                  case INTEL_TLV_CNVI_BT:
->    446                          version->cnvi_bt =3D get_unaligned_le32(t=
-lv->val);
->    447                          break;
->    448                  case INTEL_TLV_CNVR_BT:
->    449                          version->cnvr_bt =3D get_unaligned_le32(t=
-lv->val);
->    450                          break;
->    451                  case INTEL_TLV_DEV_REV_ID:
->    452                          version->dev_rev_id =3D get_unaligned_le1=
-6(tlv->val);
->    453                          break;
->    454                  case INTEL_TLV_IMAGE_TYPE:
->    455                          version->img_type =3D tlv->val[0];
->    456                          break;
->    457                  case INTEL_TLV_TIME_STAMP:
->=20
-> if (tvl->len < sizeof(u16))
-> 	return -EINVAL;
->=20
->    458                          version->timestamp =3D get_unaligned_le16=
-(tlv->val);
->    459                          break;
->    460                  case INTEL_TLV_BUILD_TYPE:
->    461                          version->build_type =3D tlv->val[0];
->    462                          break;
->    463                  case INTEL_TLV_BUILD_NUM:
->    464                          version->build_num =3D get_unaligned_le32=
-(tlv->val);
->    465                          break;
->    466                  case INTEL_TLV_SECURE_BOOT:
->    467                          version->secure_boot =3D tlv->val[0];
->    468                          break;
->    469                  case INTEL_TLV_OTP_LOCK:
->    470                          version->otp_lock =3D tlv->val[0];
->    471                          break;
->    472                  case INTEL_TLV_API_LOCK:
->    473                          version->api_lock =3D tlv->val[0];
->    474                          break;
->    475                  case INTEL_TLV_DEBUG_LOCK:
->    476                          version->debug_lock =3D tlv->val[0];
->    477                          break;
->    478                  case INTEL_TLV_MIN_FW:
->=20
-> if (tvl->len < 3)
-> 	return -EINVAL;
->=20
->    479                          version->min_fw_build_nn =3D tlv->val[0];
->    480                          version->min_fw_build_cw =3D tlv->val[1];
->    481                          version->min_fw_build_yy =3D tlv->val[2];
->    482                          break;
->    483                  case INTEL_TLV_LIMITED_CCE:
->    484                          version->limited_cce =3D tlv->val[0];
->    485                          break;
->    486                  case INTEL_TLV_SBE_TYPE:
->    487                          version->sbe_type =3D tlv->val[0];
->    488                          break;
->    489                  case INTEL_TLV_OTP_BDADDR:
->    490                          memcpy(&version->otp_bd_addr, tlv->val, t=
-lv->len);
->                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
-^^^^^^^^
-> tlv->len comes from the network and it's 0-255.  If it's more than 6
-> then this will corrupt memory.  There is no caller for this function yet =
-in linux-
-> next so if tvl->len is less than 6 will that leave uninitialized memory i=
-n -
-> >otp_bd_addr?
->=20
-> 	if (tlv->len !=3D sizeof(version->otp_bd_addr))
-> 		return -EINVAL;
->=20
->    491                          break;
->    492                  default:
->    493                          /* Ignore rest of information */
->    494                          break;
->    495                  }
->    496                  /* consume the current tlv and move to next*/
->    497                  skb_pull(skb, tlv->len + sizeof(*tlv));
->    498          }
->    499
->    500          kfree_skb(skb);
->    501          return 0;
->=20
-> regards,
-> dan carpenter
+Changes in v4:
+- Rebase to bluetooth-next/master (previous 2 patches are applied)
+- Fix over 80 chars limit in mgmt_config.c
+- Set EnableAdvMonInterleaveScan default to Disable
+
+Changes in v3:
+- Remove 'Bluez' prefix
+
+Changes in v2:
+- remove 'case 0x001c' in mgmt_config.c
+
+ include/net/bluetooth/hci_core.h |  10 +++
+ net/bluetooth/hci_core.c         |   4 +
+ net/bluetooth/hci_request.c      | 137 +++++++++++++++++++++++++++++--
+ net/bluetooth/mgmt_config.c      |  10 +++
+ 4 files changed, 153 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9873e1c8cd163..179350f869fdb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -361,6 +361,8 @@ struct hci_dev {
+ 	__u8		ssp_debug_mode;
+ 	__u8		hw_error_code;
+ 	__u32		clock;
++	__u16		advmon_allowlist_duration;
++	__u16		advmon_no_filter_duration;
+ 
+ 	__u16		devid_source;
+ 	__u16		devid_vendor;
+@@ -542,6 +544,14 @@ struct hci_dev {
+ 	struct delayed_work	rpa_expired;
+ 	bdaddr_t		rpa;
+ 
++	enum {
++		ADV_MONITOR_SCAN_NONE,
++		ADV_MONITOR_SCAN_NO_FILTER,
++		ADV_MONITOR_SCAN_ALLOWLIST
++	} adv_monitor_scan_state;
++
++	struct delayed_work	interleave_adv_monitor_scan;
++
+ #if IS_ENABLED(CONFIG_BT_LEDS)
+ 	struct led_trigger	*power_led;
+ #endif
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f30a1f5950e15..6c8850149265a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3592,6 +3592,10 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->cur_adv_instance = 0x00;
+ 	hdev->adv_instance_timeout = 0;
+ 
++	/* The default values will be chosen in the future */
++	hdev->advmon_allowlist_duration = 300;
++	hdev->advmon_no_filter_duration = 500;
++
+ 	hdev->sniff_max_interval = 800;
+ 	hdev->sniff_min_interval = 80;
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index d2b06f5c93804..89443b48d90ce 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -378,6 +378,57 @@ void __hci_req_write_fast_connectable(struct hci_request *req, bool enable)
+ 		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+ }
+ 
++static void start_interleave_scan(struct hci_dev *hdev)
++{
++	hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NO_FILTER;
++	queue_delayed_work(hdev->req_workqueue,
++			   &hdev->interleave_adv_monitor_scan, 0);
++}
++
++static bool is_interleave_scanning(struct hci_dev *hdev)
++{
++	return hdev->adv_monitor_scan_state != ADV_MONITOR_SCAN_NONE;
++}
++
++static void cancel_interleave_scan(struct hci_dev *hdev)
++{
++	bt_dev_dbg(hdev, "%s cancelling interleave scan", hdev->name);
++
++	cancel_delayed_work_sync(&hdev->interleave_adv_monitor_scan);
++
++	hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NONE;
++}
++
++/* Return true if interleave_scan is running after exiting this function,
++ * otherwise, return false
++ */
++static bool update_adv_monitor_scan_state(struct hci_dev *hdev)
++{
++	if (!hci_is_adv_monitoring(hdev) ||
++	    (list_empty(&hdev->pend_le_conns) &&
++	     list_empty(&hdev->pend_le_reports))) {
++		if (is_interleave_scanning(hdev)) {
++			/* If the interleave condition no longer holds, cancel
++			 * the existed interleave scan.
++			 */
++			cancel_interleave_scan(hdev);
++		}
++		return false;
++	}
++
++	if (!is_interleave_scanning(hdev)) {
++		/* If there is at least one ADV monitors and one pending LE
++		 * connection or one device to be scanned for, we should
++		 * alternate between allowlist scan and one without any filters
++		 * to save power.
++		 */
++		start_interleave_scan(hdev);
++		bt_dev_dbg(hdev, "%s starting interleave scan", hdev->name);
++	}
++
++	return true;
++}
++
+ /* This function controls the background scanning based on hdev->pend_le_conns
+  * list. If there are pending LE connection we start the background scanning,
+  * otherwise we stop it.
+@@ -449,9 +500,11 @@ static void __hci_update_background_scan(struct hci_request *req)
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+ 			hci_req_add_le_scan_disable(req, false);
+ 
+-		hci_req_add_le_passive_scan(req);
+-
+-		BT_DBG("%s starting background scanning", hdev->name);
++		if (!update_adv_monitor_scan_state(hdev)) {
++			hci_req_add_le_passive_scan(req);
++			bt_dev_dbg(hdev, "%s starting background scanning",
++				   hdev->name);
++		}
+ 	}
+ }
+ 
+@@ -844,12 +897,17 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 	}
+ 
+-	/* Once the controller offloading of advertisement monitor is in place,
+-	 * the if condition should include the support of MSFT extension
+-	 * support. If suspend is ongoing, whitelist should be the default to
+-	 * prevent waking by random advertisements.
++	/* Use the allowlist unless the following conditions are all true:
++	 * - We are not currently suspending
++	 * - There are 1 or more ADV monitors registered
++	 * - Interleaved scanning is not currently using the allowlist
++	 *
++	 * Once the controller offloading of advertisement monitor is in place,
++	 * the above condition should include the support of MSFT extension
++	 * support.
+ 	 */
+-	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended)
++	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
++	    hdev->adv_monitor_scan_state != ADV_MONITOR_SCAN_ALLOWLIST)
+ 		return 0x00;
+ 
+ 	/* Select filter policy to use white list */
+@@ -1002,6 +1060,7 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 				      &own_addr_type))
+ 		return;
+ 
++	bt_dev_dbg(hdev, "interleave state %d", hdev->adv_monitor_scan_state);
+ 	/* Adding or removing entries from the white list must
+ 	 * happen before enabling scanning. The controller does
+ 	 * not allow white list modification while scanning.
+@@ -1871,6 +1930,64 @@ static void adv_timeout_expire(struct work_struct *work)
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static int add_le_interleave_adv_monitor_scan(struct hci_request *req,
++					      unsigned long opt)
++{
++	struct hci_dev *hdev = req->hdev;
++	int ret = 0;
++
++	hci_dev_lock(hdev);
++
++	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		hci_req_add_le_scan_disable(req, false);
++	hci_req_add_le_passive_scan(req);
++
++	switch (hdev->adv_monitor_scan_state) {
++	case ADV_MONITOR_SCAN_ALLOWLIST:
++		bt_dev_dbg(hdev, "next state: allowlist");
++		hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NO_FILTER;
++		break;
++	case ADV_MONITOR_SCAN_NO_FILTER:
++		bt_dev_dbg(hdev, "next state: no filter");
++		hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_ALLOWLIST;
++		break;
++	case ADV_MONITOR_SCAN_NONE:
++	default:
++		BT_ERR("unexpected error");
++		ret = -1;
++	}
++
++	hci_dev_unlock(hdev);
++
++	return ret;
++}
++
++static void interleave_adv_monitor_scan_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    interleave_adv_monitor_scan.work);
++	u8 status;
++	unsigned long timeout;
++
++	if (hdev->adv_monitor_scan_state == ADV_MONITOR_SCAN_ALLOWLIST) {
++		timeout = msecs_to_jiffies(hdev->advmon_allowlist_duration);
++	} else if (hdev->adv_monitor_scan_state == ADV_MONITOR_SCAN_NO_FILTER) {
++		timeout = msecs_to_jiffies(hdev->advmon_no_filter_duration);
++	} else {
++		bt_dev_err(hdev, "unexpected error");
++		return;
++	}
++
++	hci_req_sync(hdev, add_le_interleave_adv_monitor_scan, 0,
++		     HCI_CMD_TIMEOUT, &status);
++
++	/* Don't continue interleaving if it was canceled */
++	if (is_interleave_scanning(hdev)) {
++		queue_delayed_work(hdev->req_workqueue,
++				   &hdev->interleave_adv_monitor_scan, timeout);
++	}
++}
++
+ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 			   bool use_rpa, struct adv_info *adv_instance,
+ 			   u8 *own_addr_type, bdaddr_t *rand_addr)
+@@ -3292,6 +3409,8 @@ void hci_request_setup(struct hci_dev *hdev)
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+ 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
++	INIT_DELAYED_WORK(&hdev->interleave_adv_monitor_scan,
++			  interleave_adv_monitor_scan_work);
+ }
+ 
+ void hci_request_cancel_all(struct hci_dev *hdev)
+@@ -3311,4 +3430,6 @@ void hci_request_cancel_all(struct hci_dev *hdev)
+ 		cancel_delayed_work_sync(&hdev->adv_instance_expire);
+ 		hdev->adv_instance_timeout = 0;
+ 	}
++
++	cancel_interleave_scan(hdev);
+ }
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index b30b571f8caf8..2d3ad288c78ac 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -67,6 +67,8 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		HDEV_PARAM_U16(0x001a, le_supv_timeout),
+ 		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
+ 						def_le_autoconnect_timeout),
++		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
++		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
+ 	};
+ 	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+ 
+@@ -138,6 +140,8 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		case 0x0019:
+ 		case 0x001a:
+ 		case 0x001b:
++		case 0x001d:
++		case 0x001e:
+ 			if (len != sizeof(u16)) {
+ 				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
+ 					    len, sizeof(u16), type);
+@@ -251,6 +255,12 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			hdev->def_le_autoconnect_timeout =
+ 					msecs_to_jiffies(TLV_GET_LE16(buffer));
+ 			break;
++		case 0x0001d:
++			hdev->advmon_allowlist_duration = TLV_GET_LE16(buffer);
++			break;
++		case 0x0001e:
++			hdev->advmon_no_filter_duration = TLV_GET_LE16(buffer);
++			break;
+ 		default:
+ 			bt_dev_warn(hdev, "unsupported parameter %u", type);
+ 			break;
+-- 
+2.28.0.681.g6f77f65b4e-goog
+
