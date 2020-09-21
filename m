@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967F1C4346E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D37BC4346E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:04:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 509F421D91
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 336F32086A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Sep 2020 19:04:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727711AbgIUTEN (ORCPT
+        id S1727363AbgIUTE5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Sep 2020 15:04:13 -0400
-Received: from mga18.intel.com ([134.134.136.126]:15404 "EHLO mga18.intel.com"
+        Mon, 21 Sep 2020 15:04:57 -0400
+Received: from mga11.intel.com ([192.55.52.93]:55287 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726395AbgIUTEM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Sep 2020 15:04:12 -0400
-IronPort-SDR: KGHEZx0xjQHCkiVfyImx5LtGxCEIr6ozkORd7FiRD32bkb1lwmHwMacIZDwqbqIH6uWdUXjrkg
- LFE2gJiUWsYw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="148216095"
+        id S1726810AbgIUTE5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 21 Sep 2020 15:04:57 -0400
+IronPort-SDR: RyKoEmoVRwlqHYFH+sB1D7NIDVFscg16RwfE+Q4U2OzbLBlgGOuCdM5fyW+EuVDK0i7DwyMsYW
+ 6FMp0cw+Mpfg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="157832641"
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="148216095"
+   d="scan'208";a="157832641"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:04:10 -0700
-IronPort-SDR: /an2Cdr+4SdAq/rGUh1AEITBJ8maBctMLeZ6rfeNBc4O94Dk3UK5xJuugn+kD4bcCloRaV7jH+
- 2RpMug+2Jsww==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:04:57 -0700
+IronPort-SDR: UWVCBGSj2GQpxEd0JFTnsVFyKlIHFA3D5z6uHSkIoYKtane+AAiqtB9uUxSiveNoXB/AEULT+Z
+ ljIUegMbxZaw==
 X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="485624814"
+   d="scan'208";a="485625375"
 Received: from han1-mobl3.jf.intel.com ([10.254.86.223])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:04:10 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 12:04:56 -0700
 From:   tedd.an@linux.intel.com
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [BlueZ V4 RESEND 05/20] emulator: Add SPDX License Identifier
-Date:   Mon, 21 Sep 2020 12:00:25 -0700
-Message-Id: <20200921190040.45309-6-tedd.an@linux.intel.com>
+Subject: [BlueZ V4 RESEND 07/20] gobex: Add SPDX License Identifier
+Date:   Mon, 21 Sep 2020 12:00:27 -0700
+Message-Id: <20200921190040.45309-8-tedd.an@linux.intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200921190040.45309-1-tedd.an@linux.intel.com>
 References: <20200921190040.45309-1-tedd.an@linux.intel.com>
@@ -57,131 +57,47 @@ This patch adds SPDX License Identifier and removes the license text.
 -------------------------------------
        License            COUNT
 -------------------------------------
- LGPL-2.1-or-later    :     20
- GPL-2.0-or-later     :      2
-
-License: LGPL-2.1-or-later
-   emulator/server.c
-   emulator/amp.c
-   emulator/hciemu.c
-   emulator/vhci.c
-   emulator/btdev.c
-   emulator/serial.h
-   emulator/le.h
-   emulator/le.c
-   emulator/main.c
-   emulator/amp.h
-   emulator/hciemu.h
-   emulator/bthost.h
-   emulator/btdev.h
-   emulator/vhci.h
-   emulator/serial.c
-   emulator/phy.c
-   emulator/smp.c
-   emulator/phy.h
-   emulator/bthost.c
-   emulator/server.h
+ GPL-2.0-or-later     :     12
 
 License: GPL-2.0-or-later
-   emulator/b1ee.c
-   emulator/hfp.c
+   gobex/gobex-defs.h
+   gobex/gobex-transfer.c
+   gobex/gobex.c
+   gobex/gobex-apparam.h
+   gobex/gobex-header.h
+   gobex/gobex-header.c
+   gobex/gobex.h
+   gobex/gobex-packet.h
+   gobex/gobex-defs.c
+   gobex/gobex-debug.h
+   gobex/gobex-apparam.c
+   gobex/gobex-packet.c
 ---
- emulator/amp.c    | 15 +--------------
- emulator/amp.h    | 15 +--------------
- emulator/b1ee.c   | 15 +--------------
- emulator/btdev.c  | 15 +--------------
- emulator/btdev.h  | 15 +--------------
- emulator/bthost.c | 15 +--------------
- emulator/bthost.h | 15 +--------------
- emulator/hciemu.c | 15 +--------------
- emulator/hciemu.h | 15 +--------------
- emulator/hfp.c    | 15 +--------------
- emulator/le.c     | 15 +--------------
- emulator/le.h     | 15 +--------------
- emulator/main.c   | 15 +--------------
- emulator/phy.c    | 15 +--------------
- emulator/phy.h    | 15 +--------------
- emulator/serial.c | 15 +--------------
- emulator/serial.h | 15 +--------------
- emulator/server.c | 15 +--------------
- emulator/server.h | 15 +--------------
- emulator/smp.c    | 15 +--------------
- emulator/vhci.c   | 15 +--------------
- emulator/vhci.h   | 15 +--------------
- 22 files changed, 22 insertions(+), 308 deletions(-)
+ gobex/gobex-apparam.c  | 15 +--------------
+ gobex/gobex-apparam.h  | 15 +--------------
+ gobex/gobex-debug.h    | 15 +--------------
+ gobex/gobex-defs.c     | 15 +--------------
+ gobex/gobex-defs.h     | 15 +--------------
+ gobex/gobex-header.c   | 15 +--------------
+ gobex/gobex-header.h   | 15 +--------------
+ gobex/gobex-packet.c   | 15 +--------------
+ gobex/gobex-packet.h   | 15 +--------------
+ gobex/gobex-transfer.c | 15 +--------------
+ gobex/gobex.c          | 15 +--------------
+ gobex/gobex.h          | 15 +--------------
+ 12 files changed, 12 insertions(+), 168 deletions(-)
 
-diff --git a/emulator/amp.c b/emulator/amp.c
-index 605c6c825..49d2df7b3 100644
---- a/emulator/amp.c
-+++ b/emulator/amp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/amp.h b/emulator/amp.h
-index 189dfb7d4..cee360c44 100644
---- a/emulator/amp.h
-+++ b/emulator/amp.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdbool.h>
-diff --git a/emulator/b1ee.c b/emulator/b1ee.c
-index 377181b01..53b85f221 100644
---- a/emulator/b1ee.c
-+++ b/emulator/b1ee.c
-@@ -1,3 +1,4 @@
+diff --git a/gobex/gobex-apparam.c b/gobex/gobex-apparam.c
+index b16cee11a..818180cb1 100644
+--- a/gobex/gobex-apparam.c
++++ b/gobex/gobex-apparam.c
+@@ -1,23 +1,10 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2012  Intel Corporation.
   *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -200,198 +116,74 @@ index 377181b01..53b85f221 100644
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e9c3811f8..9a8c9b654 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+diff --git a/gobex/gobex-apparam.h b/gobex/gobex-apparam.h
+index 6c0860928..ace615225 100644
+--- a/gobex/gobex-apparam.h
++++ b/gobex/gobex-apparam.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2012  Intel Corporation.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index a9f71b281..7cb265f1c 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+ #ifndef __GOBEX_APPARAM_H
+diff --git a/gobex/gobex-debug.h b/gobex/gobex-debug.h
+index a98653d83..eeb2209f0 100644
+--- a/gobex/gobex-debug.h
++++ b/gobex/gobex-debug.h
+@@ -1,22 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
+  *  OBEX library with GLib integration
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #include <stdint.h>
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 71d5f97bb..1c05c7496 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 2b347136f..3841f98a1 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index ac861cce2..fa8905ed7 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2012-2014  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index 4c8858bb6..c8ec80d8d 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2012-2014  Intel Corporation. All rights reserved.
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdbool.h>
-diff --git a/emulator/hfp.c b/emulator/hfp.c
-index 29ec63e7d..bbf785ee3 100644
---- a/emulator/hfp.c
-+++ b/emulator/hfp.c
-@@ -1,3 +1,4 @@
+ #ifndef __GOBEX_DEBUG_H
+diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
+index 1c7c39a16..811be762b 100644
+--- a/gobex/gobex-defs.c
++++ b/gobex/gobex-defs.c
+@@ -1,23 +1,10 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
 - *  This program is free software; you can redistribute it and/or modify
 - *  it under the terms of the GNU General Public License as published by
@@ -410,366 +202,238 @@ index 29ec63e7d..bbf785ee3 100644
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/le.c b/emulator/le.c
-index 1c8ba280b..4ffe3b16d 100644
---- a/emulator/le.c
-+++ b/emulator/le.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+diff --git a/gobex/gobex-defs.h b/gobex/gobex-defs.h
+index 326e3cb09..84351205d 100644
+--- a/gobex/gobex-defs.h
++++ b/gobex/gobex-defs.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+  */
+ 
+ #ifndef __GOBEX_DEFS_H
+diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+index c594999a5..011d33d1a 100644
+--- a/gobex/gobex-header.c
++++ b/gobex/gobex-header.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *
+  *  OBEX library with GLib integration
+  *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/le.h b/emulator/le.h
-index 5e832e8e5..21d2b4828 100644
---- a/emulator/le.h
-+++ b/emulator/le.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
+index 6600b1b4a..129f35ba1 100644
+--- a/gobex/gobex-header.h
++++ b/gobex/gobex-header.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #include <stdbool.h>
-diff --git a/emulator/main.c b/emulator/main.c
-index 75cb79c7b..cb77025aa 100644
---- a/emulator/main.c
-+++ b/emulator/main.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+ #ifndef __GOBEX_HEADER_H
+diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
+index a89f5b6d3..11937a5a5 100644
+--- a/gobex/gobex-packet.c
++++ b/gobex/gobex-packet.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/phy.c b/emulator/phy.c
-index beb8bbbe4..4517ad107 100644
---- a/emulator/phy.c
-+++ b/emulator/phy.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/phy.h b/emulator/phy.h
-index d5efa5180..9ee8f397c 100644
---- a/emulator/phy.h
-+++ b/emulator/phy.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+diff --git a/gobex/gobex-packet.h b/gobex/gobex-packet.h
+index 1d94ccf20..ed153bac5 100644
+--- a/gobex/gobex-packet.h
++++ b/gobex/gobex-packet.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #include <stdbool.h>
-diff --git a/emulator/serial.c b/emulator/serial.c
-index 1c324d531..b44af0dcc 100644
---- a/emulator/serial.c
-+++ b/emulator/serial.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+ #ifndef __GOBEX_PACKET_H
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index e96e61fbc..c94d018b2 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/serial.h b/emulator/serial.h
-index 4e5a56f88..1dce15f51 100644
---- a/emulator/serial.h
-+++ b/emulator/serial.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/emulator/server.c b/emulator/server.c
-index c28b15ebf..3b07a7156 100644
---- a/emulator/server.c
-+++ b/emulator/server.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/server.h b/emulator/server.h
-index bf725e788..294e86525 100644
---- a/emulator/server.h
-+++ b/emulator/server.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index d68a85eb6..54e3b0814 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1,23 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
-diff --git a/emulator/smp.c b/emulator/smp.c
-index c30de3666..7c05ba342 100644
---- a/emulator/smp.c
-+++ b/emulator/smp.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -5,20 +6,6 @@
-  *  Copyright (C) 2013-2014  Intel Corporation
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
  #ifdef HAVE_CONFIG_H
-diff --git a/emulator/vhci.c b/emulator/vhci.c
-index f79b34f46..84e16330f 100644
---- a/emulator/vhci.c
-+++ b/emulator/vhci.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index a94d9246e..f16e4426c 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -1,23 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
  /*
   *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  OBEX library with GLib integration
   *
+  *  Copyright (C) 2011  Intel Corporation. All rights reserved.
   *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
 - *
-- *  This library is distributed in the hope that it will be useful,
+- *  This program is distributed in the hope that it will be useful,
 - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
 - *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
 - *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 - *
   */
  
- #ifdef HAVE_CONFIG_H
-diff --git a/emulator/vhci.h b/emulator/vhci.h
-index 1ec7191f8..24b36bd60 100644
---- a/emulator/vhci.h
-+++ b/emulator/vhci.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
- /*
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-@@ -6,20 +7,6 @@
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-  */
- 
- #include <stdint.h>
+ #ifndef __GOBEX_H
 -- 
 2.25.4
 
