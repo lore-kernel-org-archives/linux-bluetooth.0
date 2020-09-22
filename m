@@ -2,68 +2,68 @@ Return-Path: <SRS0=LYTB=C7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-22.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBC3C4727C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 07:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 029D0C2D0E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 07:48:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0214623A5C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 07:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99DA523A1E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 07:48:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XNaPLn0t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SaYeIC5H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729972AbgIVHhP (ORCPT
+        id S1730142AbgIVHsG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Sep 2020 03:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58520 "EHLO
+        Tue, 22 Sep 2020 03:48:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729751AbgIVHhO (ORCPT
+        with ESMTP id S1729991AbgIVHsG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Sep 2020 03:37:14 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6CEC061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 00:37:14 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id e17so2265508wme.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 00:37:14 -0700 (PDT)
+        Tue, 22 Sep 2020 03:48:06 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3000C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 00:48:05 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id t10so15911891wrv.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 00:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=f6NEte3lutGwCOE6JLOavb/M9H8I1XfzDGWcZi3Iq7Q=;
-        b=XNaPLn0t+kxDTIOfVoPVBX4FPKsDFUw4iGC5BV0MEuJKWj/BvrlvjgHDauwC0X3iri
-         klyOdAfM43Y3kMVpgvFWfFpwgIgy/4bLbHMv2iaKFjCSacJv5dHinCvYaGYW+H7Anrgo
-         DHcq25ogTZUd/m5pG0b1NjM6JTn/fFVJtDY1E6vPZ89HxAi8vGOVIFVxL7tlHk0Hznp3
-         FDoQs92XNxUgQ80msZD3Axv/B0hTL33ZPIga+06PWwEN4jw3bXdGUlhja3t6o6+NCzHF
-         /3q6zFTs5kMF70vvrisNhfHUbgH90fmb0A5Nz6HggmxQdyRPyUBYqQWE5ndgyOqCXGuP
-         azEQ==
+        bh=q1gQqWOf8efX9sJ/D/OIGJtauHg2OW2WzxS92JQ9fUE=;
+        b=SaYeIC5H1bZZrAM9cTd8lgo4ssxkGmovpX/F7UooYhJY5se0onVq7DcsZWbIEA7P0G
+         vh6ACScYRo58pGOAVob/93wUzZlpzmSqHUQ/vdULPkYQf/Q4douhr+MNNofETAPKutxF
+         BrOnZPs/AJlRF3td8lsmCuI8WCUBiu0d3iULvvf8koDIdQl7BaSR8ObXIR0mJdjYj3pU
+         qducdvrUrXgYbN+dTe2IT/NdrlHAdftvvhJhdq+enO4jVvxE0nvVY3JhradQW6o0n1xW
+         DdTHcekuqGwi4PRoZfDxytwawSu3zG9mj7oAXHyuNSJjv8VJV7OoOckgXCw/KB+P32NF
+         kokA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=f6NEte3lutGwCOE6JLOavb/M9H8I1XfzDGWcZi3Iq7Q=;
-        b=GR8+uutyS4phn6S9oNiAlSrJwdjDmxzUAEPiJdQu5owbg+hVz4X4JHU3668/LCaY9b
-         r0zb4V9Yt77WHuPOhsKkMz5PYci4Ofcj8eFZubgguXnLHH+G7PAfJObX1jSiIVKGXzFb
-         mw0QDxUKbh9cjDps/NmIH+WJTU5EIB1VmuoVzl0bB/8euBBhBGb9hTh6grdgaZIf4NQp
-         vbBuPGdmG9/Liw4CXQMTCApNuoPx+Pht3RBsF/KNBAcgudgX9CiGQUQYDuRb/9yzVjAU
-         W9T40cgZ9Dc3iPc7AdY19vyomjRuEwtTBKTt5ZubLA1vJ/Zwih929XaVpLkEPbO9uNw0
-         XPuw==
-X-Gm-Message-State: AOAM532JNZLWZeXqTvkL+y0Ol4WjDvxObqt/EFUI7loIbV7LFIBBwjum
-        naALKcwlSJD7ejywxEJhBCeENLK8OxeAT/9pw9hKAQ==
-X-Google-Smtp-Source: ABdhPJzVWqCDtrVv7PLgmds+KflwVNovPQCQJ66ow/a2qlmcY4wT3p6qVfV9Z66NlM7m5l2WQeWjU4ZdmDud0sjo51k=
-X-Received: by 2002:a1c:7308:: with SMTP id d8mr3081805wmb.55.1600760232528;
- Tue, 22 Sep 2020 00:37:12 -0700 (PDT)
+        bh=q1gQqWOf8efX9sJ/D/OIGJtauHg2OW2WzxS92JQ9fUE=;
+        b=OxFhsw3gYsEg3J9aSINqTyN+43RGiNlFjc28mK8vOXjMKmDmRtCvP2frRJvQ3vvXjP
+         S8pzXVx+pv4wQpzWDaJxnANMbCzOWWDbeuMP3LiWGmzlW7BzVMiSXURSmYmbzx9LU/Gr
+         B8Syc5fJVgIn4kxYkiddtGLOV8smGsmMwE65hH3PdLns1gm1i4fNp+leY4roW5elJd9g
+         LpbREQh7U+GnebPU+6zAMKdHppuj1R0RWnB1JgETEvEL48/z8LmhLlsAMInOJ7VCuso0
+         W2AhM5SZkAYXjyxH9HI9Sr4fX+m64zuBTbSZyljKA0JTBUoFah+iSvoWTHb+tnv8rHho
+         dlWw==
+X-Gm-Message-State: AOAM530TX5ceAB4gJYsajOvhvoxwDacTIa7c2WPRgsVP4xA7whcfRI/R
+        9l2d+7ltHZk2oLs76siEnF+lozVP4xDZ0yg+mPor/Q==
+X-Google-Smtp-Source: ABdhPJxIFcifPYTJgkB/1B0+MTkMJ8QpqxtS1lOV0sAjIFDXfiY1b5BBtBuYd8Oy1YlH+O1VByBdp+Wk+CK7bzpq3A4=
+X-Received: by 2002:adf:dcc3:: with SMTP id x3mr3778468wrm.120.1600760884252;
+ Tue, 22 Sep 2020 00:48:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200921163021.v1.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
- <CABBYNZJGfDoV+E-f6T=ZQ2RT0doXDdOB7tgVrt=4fpvKcpmH4w@mail.gmail.com>
-In-Reply-To: <CABBYNZJGfDoV+E-f6T=ZQ2RT0doXDdOB7tgVrt=4fpvKcpmH4w@mail.gmail.com>
+References: <20200921155004.v2.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
+ <CABBYNZLTZbwyL0ykmFezWrkNVnHoZt2KPtz+aQwo7TvhdC7TiQ@mail.gmail.com>
+In-Reply-To: <CABBYNZLTZbwyL0ykmFezWrkNVnHoZt2KPtz+aQwo7TvhdC7TiQ@mail.gmail.com>
 From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 22 Sep 2020 15:37:01 +0800
-Message-ID: <CAJQfnxHcvm_-iCP-2Y6GR1vG4ZmMr==ZuMHBua8TeeiNbqAJgA@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Enforce key size of 16 bytes on FIPS level
+Date:   Tue, 22 Sep 2020 15:47:53 +0800
+Message-ID: <CAJQfnxFjL6RicwHyFgYzNp7WPrMePEOa2fgOX9TMju-z5AWsPg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Check for encryption key size on connect
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
@@ -82,65 +82,106 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-On Tue, 22 Sep 2020 at 01:13, Luiz Augusto von Dentz
+On Tue, 22 Sep 2020 at 01:15, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
 > Hi Archie,
 >
-> On Mon, Sep 21, 2020 at 1:31 AM Archie Pusaka <apusaka@google.com> wrote:
+>
+> On Mon, Sep 21, 2020 at 12:56 AM Archie Pusaka <apusaka@google.com> wrote:
 > >
 > > From: Archie Pusaka <apusaka@chromium.org>
 > >
-> > According to the spec Ver 5.2, Vol 3, Part C, Sec 5.2.2.8:
-> > Device in security mode 4 level 4 shall enforce:
-> > 128-bit equivalent strength for link and encryption keys required
-> > using FIPS approved algorithms (E0 not allowed, SAFER+ not allowed,
-> > and P-192 not allowed; encryption key not shortened)
+> > When receiving connection, we only check whether the link has been
+> > encrypted, but not the encryption key size of the link.
 > >
-> > This patch rejects connection with key size below 16 for FIPS level
-> > services.
+> > This patch adds check for encryption key size, and reject L2CAP
+> > connection which size is below the specified threshold (default 7)
+> > with security block.
+> >
+> > Here is some btmon trace.
+> > @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.847722
+> >         Store hint: No (0x00)
+> >         BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
+> >         Key type: Unauthenticated Combination key from P-192 (0x04)
+> >         Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
+> >         PIN length: 0
+> > > HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871537
+> >         Status: Success (0x00)
+> >         Handle: 256
+> >         Encryption: Enabled with E0 (0x01)
+> > < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.871609
+> >         Handle: 256
+> > > HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872524
+> >       Read Encryption Key Size (0x05|0x0008) ncmd 1
+> >         Status: Success (0x00)
+> >         Handle: 256
+> >         Key size: 3
+> >
+> > ////// WITHOUT PATCH //////
+> > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895023
+> >       L2CAP: Connection Request (0x02) ident 3 len 4
+> >         PSM: 4097 (0x1001)
+> >         Source CID: 64
+> > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.895213
+> >       L2CAP: Connection Response (0x03) ident 3 len 8
+> >         Destination CID: 64
+> >         Source CID: 64
+> >         Result: Connection successful (0x0000)
+> >         Status: No further information available (0x0000)
+> >
+> > ////// WITH PATCH //////
+> > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887024
+> >       L2CAP: Connection Request (0x02) ident 3 len 4
+> >         PSM: 4097 (0x1001)
+> >         Source CID: 64
+> > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.887127
+> >       L2CAP: Connection Response (0x03) ident 3 len 8
+> >         Destination CID: 0
+> >         Source CID: 64
+> >         Result: Connection refused - security block (0x0003)
+> >         Status: No further information available (0x0000)
 > >
 > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 > > Reviewed-by: Alain Michaud <alainm@chromium.org>
 > >
 > > ---
+> > Btw, it looks like the patch sent by Alex Lu with the title
+> > [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
+> > also solves the exact same issue.
 > >
-> >  net/bluetooth/l2cap_core.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > Changes in v2:
+> > * Add btmon trace to the commit message
+> >
+> >  net/bluetooth/l2cap_core.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
 > >
 > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index ade83e224567..306616ec26e6 100644
+> > index ade83e224567..b4fc0ad38aaa 100644
 > > --- a/net/bluetooth/l2cap_core.c
 > > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -1515,8 +1515,13 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-> >          * that have no key size requirements. Ensure that the link is
-> >          * actually encrypted before enforcing a key size.
-> >          */
-> > +       int min_key_size = hcon->hdev->min_enc_key_size;
-> > +
-> > +       if (hcon->sec_level == BT_SECURITY_FIPS)
-> > +               min_key_size = 16;
-> > +
-> >         return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-> > -               hcon->enc_key_size >= hcon->hdev->min_enc_key_size);
-> > +               hcon->enc_key_size >= min_key_size);
->
-> While this looks fine to me, it looks like this should be placed
-> elsewhere since it takes an hci_conn and it is not L2CAP specific.
-
-From what I understood, it is permissible to use AES-CCM P-256
-encryption with key length < 16 when encrypting the link, but such a
-connection does not satisfy security level 4, and therefore must not
-be given access to level 4 services. However, I think it is
-permissible to give them access to level 3 services or below.
-
-Should I use l2cap chan->sec_level for this purpose? I'm kind of lost
-on the difference between hcon->sec_level and chan->sec_level.
-
->
-> >  }
+> > @@ -4101,7 +4101,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
 > >
-> >  static void l2cap_do_start(struct l2cap_chan *chan)
+> >         /* Check if the ACL is secure enough (if not SDP) */
+> >         if (psm != cpu_to_le16(L2CAP_PSM_SDP) &&
+> > -           !hci_conn_check_link_mode(conn->hcon)) {
+> > +           (!hci_conn_check_link_mode(conn->hcon) ||
+> > +           !l2cap_check_enc_key_size(conn->hcon))) {
+>
+> I wonder if we couldn't incorporate the check of key size into
+> hci_conn_check_link_mode, like I said in the first patch checking the
+> enc key size should not be specific to L2CAP.
+
+Yes, I could move the check into hci_conn_check_link_mode.
+At first look, this function is also called by AMP which I am not
+familiar with. In addition, I found this patch which moves this check
+outside hci_conn, so I have my doubts there.
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=693cd8ce3f882524a5d06f7800dd8492411877b3
+
+>
+> >                 conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
+> >                 result = L2CAP_CR_SEC_BLOCK;
+> >                 goto response;
 > > --
 > > 2.28.0.681.g6f77f65b4e-goog
 > >
@@ -148,3 +189,6 @@ on the difference between hcon->sec_level and chan->sec_level.
 >
 > --
 > Luiz Augusto von Dentz
+
+Thanks,
+Archie
