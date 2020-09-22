@@ -8,68 +8,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EBAC4727D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 17:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CFBC4727E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 21:52:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BED1823119
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 17:20:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FF6322262
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 21:52:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ek1BIZZy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUlaIHRg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgIVRUD (ORCPT
+        id S1726676AbgIVVwS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Sep 2020 13:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35814 "EHLO
+        Tue, 22 Sep 2020 17:52:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726526AbgIVRUD (ORCPT
+        with ESMTP id S1726652AbgIVVwS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Sep 2020 13:20:03 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D51C061755;
-        Tue, 22 Sep 2020 10:20:03 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id e23so16334811otk.7;
-        Tue, 22 Sep 2020 10:20:03 -0700 (PDT)
+        Tue, 22 Sep 2020 17:52:18 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438A0C061755;
+        Tue, 22 Sep 2020 14:52:18 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id 60so17077374otw.3;
+        Tue, 22 Sep 2020 14:52:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EItoq1kaiHeWVc5lky8YhdzGpyspzkaqvTZAN+0uG8s=;
-        b=ek1BIZZyVl3RntwXpKxZKVRy7AjMYd2t5ZjDu0Gkr+83ZXPJiTnzcLSziQYU5YQi9M
-         zz5wOAudN8qHSec8RMYhz3079Sg2fztpxsFVlYPTbpjJj4NEFIouF6csvy38nV6qdvO4
-         LHFyhEB6+sDeNLM20tDikE0MdOwP+PWOSb8F52houXJNiMI3wO2FMRTniR98K97dgkZ4
-         EtCLz1jHbknfXgrX6t3JeREbjP8noQCnc9wvt1K0D+0uAg6Q1ij30KxXkn+n5pJw/Wot
-         Jh3lFs3CaqraBeH+JP3TFUsIDL8If4ZRXHdII6p6FMHRs1zjGRt8K18vJWC8slKoX1wA
-         E1DQ==
+        bh=rJHrPEHFU9xGNOs6dBT3ctuUX+KiWneaN/TtemOxD48=;
+        b=XUlaIHRgQ/59eTDcn7l5Aty8oF3LuZp8+aNbX8pn5qMwxsJkdZMwDPje5PM3XUex+o
+         xmNbTIeOUZtfmiSW4DmZ5ijuKRVWdLwVSr8gWOf0tv9mAmDO8Geah7jZR4XsSzN0Fame
+         zm+kd20vEQ6bt5h3TQuYjvrwfGrJ+8/ZNQdkR00UsPGNwjaLLpofdjtgaVsUgDKH9Nmo
+         6JEK8XZynhU62XkoKGnXu1opb/h7EHzYRIluQy4enwYc9PfyHDSTvs7BNj0eDWJs+isI
+         WxPOVuuUh6AvJBpPaef4qN26fpn2DjYERZT/WQ+hEpTbuEZ/y++0EQnge8LeI8Bf1H7S
+         T6EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EItoq1kaiHeWVc5lky8YhdzGpyspzkaqvTZAN+0uG8s=;
-        b=l0+h5lLkvRLkkQnFYZ/5cFi7WhDHwLkvwEFVEfINT1DSl/+zies1OznIRuV0Z3BaAm
-         VMW7M1QEcE/c+uYsf4J7xr40L7fWLWvTZCF9QyOlr9Rn+l3Sr9gaJfMBR0JmQs4nVwCO
-         GCnbhXSf+mCRQ9RLoN1YynMgH1+q3YEhCOyQ4eDJU3l28AQaJqoFHRBZeUvM+e9SfW2E
-         /fjlgdJT2fFZQHT9FVJs8cWCK6j+H2i7jYQ5xkljd0rZqTlQoBekJDflzEhHwhBWkCDK
-         6F2H/BMaQ0ow0OL5GQS0lsikYszpOZZ1rr36FOdSX3Bu0sl/MOYZUFXmrlefP7WyjPj2
-         sxMQ==
-X-Gm-Message-State: AOAM531IjbME+drraLp1MfJkm4ZexmoZ4pmEMl0/g0cNPoV07MNnQGYY
-        FARMH/iwbZAPDa7qQcElOtrbgJJ2SAZrguiEfbk=
-X-Google-Smtp-Source: ABdhPJwNcpShFc8c3V/UC1bmKbpnJq1sPySTQ40fTrCHUXJ486Nscbfvc9yXAnnr7C/wr8kImZHNzbiYtV9UD4Td08Q=
-X-Received: by 2002:a9d:4695:: with SMTP id z21mr3525657ote.91.1600795202320;
- Tue, 22 Sep 2020 10:20:02 -0700 (PDT)
+        bh=rJHrPEHFU9xGNOs6dBT3ctuUX+KiWneaN/TtemOxD48=;
+        b=YFE+Ele5sMIvfa77likG2Znosr3e2ud37OruAUOE55ctW9xjPbbhC0FwLYOSd/dyJS
+         Ma7vzRI99Unc7EohvoQJFOb/yJ3+Y6tbQi53lCBvcpWibl+cm5I3tVJsW3gUD+evPd3X
+         IpNnu9vS7k4kpBkbGmdav2ONepr4fMSxys3tN8PBgltMP8U2E6XkPsAG3led6d18n6MS
+         C+fKAQb69K9Ybu+pBiPk/2lnVDUxe2+qpKLBnspoDWef16QEHz69YwfTb3sQ5XehLkUl
+         /NCoDGj8Wl8/ipn7zZxjrKcPPh+AiNvaAkmop6pwjDJjOrfBTkhkHeuJKeJzBfiUIN9L
+         B8wQ==
+X-Gm-Message-State: AOAM533TfDO1dN8ytv4lF9Af2P5FMl09SLUnirGUlNcHgLcTsCnqniWz
+        vZFIYGw0BpFfmBWyiDbiH8tTWDCsBsGNGzVHJXI=
+X-Google-Smtp-Source: ABdhPJxohETf9B11qf8NYpRMANewcjBX3Vy0Zb0EnB+27vbDOutc4ruHVR/zuHUEMJNhUizjvlNVgT7ZIVv+APKwdUQ=
+X-Received: by 2002:a9d:4695:: with SMTP id z21mr4195654ote.91.1600811537405;
+ Tue, 22 Sep 2020 14:52:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200921163021.v1.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
- <CABBYNZJGfDoV+E-f6T=ZQ2RT0doXDdOB7tgVrt=4fpvKcpmH4w@mail.gmail.com> <CAJQfnxHcvm_-iCP-2Y6GR1vG4ZmMr==ZuMHBua8TeeiNbqAJgA@mail.gmail.com>
-In-Reply-To: <CAJQfnxHcvm_-iCP-2Y6GR1vG4ZmMr==ZuMHBua8TeeiNbqAJgA@mail.gmail.com>
+References: <20200921122216.v4.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+In-Reply-To: <20200921122216.v4.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 22 Sep 2020 10:19:50 -0700
-Message-ID: <CABBYNZKuXtf5Z_zHG1h2c6_0to8o2MqvmQvt-8mmX0hdb3_B9g@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Enforce key size of 16 bytes on FIPS level
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+Date:   Tue, 22 Sep 2020 14:52:04 -0700
+Message-ID: <CABBYNZJ5PeecubNH_heeUsO8P4w7_27aFUt_bHFKtSgF36Fcyw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] Bluetooth: Interleave with allowlist scan
+To:     Howard Chung <howardchung@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
         Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>, mmandlik@chromium.orgi,
+        Manish Mandlik <mmandlik@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -80,84 +79,331 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Howard,
 
-On Tue, Sep 22, 2020 at 12:37 AM Archie Pusaka <apusaka@google.com> wrote:
+On Sun, Sep 20, 2020 at 9:23 PM Howard Chung <howardchung@google.com> wrote:
 >
-> Hi Luiz,
+> This patch implements the interleaving between allowlist scan and
+> no-filter scan. It'll be used to save power when at least one monitor is
+> registered and at least one pending connection or one device to be
+> scanned for.
 >
-> On Tue, 22 Sep 2020 at 01:13, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Mon, Sep 21, 2020 at 1:31 AM Archie Pusaka <apusaka@google.com> wrote:
-> > >
-> > > From: Archie Pusaka <apusaka@chromium.org>
-> > >
-> > > According to the spec Ver 5.2, Vol 3, Part C, Sec 5.2.2.8:
-> > > Device in security mode 4 level 4 shall enforce:
-> > > 128-bit equivalent strength for link and encryption keys required
-> > > using FIPS approved algorithms (E0 not allowed, SAFER+ not allowed,
-> > > and P-192 not allowed; encryption key not shortened)
-> > >
-> > > This patch rejects connection with key size below 16 for FIPS level
-> > > services.
-> > >
-> > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > >
-> > > ---
-> > >
-> > >  net/bluetooth/l2cap_core.c | 7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > > index ade83e224567..306616ec26e6 100644
-> > > --- a/net/bluetooth/l2cap_core.c
-> > > +++ b/net/bluetooth/l2cap_core.c
-> > > @@ -1515,8 +1515,13 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-> > >          * that have no key size requirements. Ensure that the link is
-> > >          * actually encrypted before enforcing a key size.
-> > >          */
-> > > +       int min_key_size = hcon->hdev->min_enc_key_size;
-> > > +
-> > > +       if (hcon->sec_level == BT_SECURITY_FIPS)
-> > > +               min_key_size = 16;
-> > > +
-> > >         return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-> > > -               hcon->enc_key_size >= hcon->hdev->min_enc_key_size);
-> > > +               hcon->enc_key_size >= min_key_size);
-> >
-> > While this looks fine to me, it looks like this should be placed
-> > elsewhere since it takes an hci_conn and it is not L2CAP specific.
+> The durations of the allowlist scan and the no-filter scan are
+> controlled by MGMT command: Set Default System Configuration. The
+> default values are set randomly for now.
 >
-> From what I understood, it is permissible to use AES-CCM P-256
-> encryption with key length < 16 when encrypting the link, but such a
-> connection does not satisfy security level 4, and therefore must not
-> be given access to level 4 services. However, I think it is
-> permissible to give them access to level 3 services or below.
+> Signed-off-by: Howard Chung <howardchung@google.com>
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> ---
 >
-> Should I use l2cap chan->sec_level for this purpose? I'm kind of lost
-> on the difference between hcon->sec_level and chan->sec_level.
+> Changes in v4:
+> - Rebase to bluetooth-next/master (previous 2 patches are applied)
+> - Fix over 80 chars limit in mgmt_config.c
+> - Set EnableAdvMonInterleaveScan default to Disable
+>
+> Changes in v3:
+> - Remove 'Bluez' prefix
+>
+> Changes in v2:
+> - remove 'case 0x001c' in mgmt_config.c
+>
+>  include/net/bluetooth/hci_core.h |  10 +++
+>  net/bluetooth/hci_core.c         |   4 +
+>  net/bluetooth/hci_request.c      | 137 +++++++++++++++++++++++++++++--
+>  net/bluetooth/mgmt_config.c      |  10 +++
+>  4 files changed, 153 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 9873e1c8cd163..179350f869fdb 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -361,6 +361,8 @@ struct hci_dev {
+>         __u8            ssp_debug_mode;
+>         __u8            hw_error_code;
+>         __u32           clock;
+> +       __u16           advmon_allowlist_duration;
+> +       __u16           advmon_no_filter_duration;
+>
+>         __u16           devid_source;
+>         __u16           devid_vendor;
+> @@ -542,6 +544,14 @@ struct hci_dev {
+>         struct delayed_work     rpa_expired;
+>         bdaddr_t                rpa;
+>
+> +       enum {
+> +               ADV_MONITOR_SCAN_NONE,
+> +               ADV_MONITOR_SCAN_NO_FILTER,
+> +               ADV_MONITOR_SCAN_ALLOWLIST
+> +       } adv_monitor_scan_state;
+> +
+> +       struct delayed_work     interleave_adv_monitor_scan;
+> +
+>  #if IS_ENABLED(CONFIG_BT_LEDS)
+>         struct led_trigger      *power_led;
+>  #endif
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index f30a1f5950e15..6c8850149265a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3592,6 +3592,10 @@ struct hci_dev *hci_alloc_dev(void)
+>         hdev->cur_adv_instance = 0x00;
+>         hdev->adv_instance_timeout = 0;
+>
+> +       /* The default values will be chosen in the future */
+> +       hdev->advmon_allowlist_duration = 300;
+> +       hdev->advmon_no_filter_duration = 500;
+> +
+>         hdev->sniff_max_interval = 800;
+>         hdev->sniff_min_interval = 80;
+>
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index d2b06f5c93804..89443b48d90ce 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -378,6 +378,57 @@ void __hci_req_write_fast_connectable(struct hci_request *req, bool enable)
+>                 hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+>  }
+>
+> +static void start_interleave_scan(struct hci_dev *hdev)
+> +{
+> +       hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NO_FILTER;
+> +       queue_delayed_work(hdev->req_workqueue,
+> +                          &hdev->interleave_adv_monitor_scan, 0);
+> +}
+> +
+> +static bool is_interleave_scanning(struct hci_dev *hdev)
+> +{
+> +       return hdev->adv_monitor_scan_state != ADV_MONITOR_SCAN_NONE;
+> +}
+> +
+> +static void cancel_interleave_scan(struct hci_dev *hdev)
+> +{
+> +       bt_dev_dbg(hdev, "%s cancelling interleave scan", hdev->name);
+> +
+> +       cancel_delayed_work_sync(&hdev->interleave_adv_monitor_scan);
+> +
+> +       hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NONE;
+> +}
+> +
+> +/* Return true if interleave_scan is running after exiting this function,
+> + * otherwise, return false
+> + */
+> +static bool update_adv_monitor_scan_state(struct hci_dev *hdev)
+> +{
+> +       if (!hci_is_adv_monitoring(hdev) ||
+> +           (list_empty(&hdev->pend_le_conns) &&
+> +            list_empty(&hdev->pend_le_reports))) {
+> +               if (is_interleave_scanning(hdev)) {
+> +                       /* If the interleave condition no longer holds, cancel
+> +                        * the existed interleave scan.
+> +                        */
+> +                       cancel_interleave_scan(hdev);
+> +               }
+> +               return false;
+> +       }
+> +
+> +       if (!is_interleave_scanning(hdev)) {
+> +               /* If there is at least one ADV monitors and one pending LE
+> +                * connection or one device to be scanned for, we should
+> +                * alternate between allowlist scan and one without any filters
+> +                * to save power.
+> +                */
+> +               start_interleave_scan(hdev);
+> +               bt_dev_dbg(hdev, "%s starting interleave scan", hdev->name);
+> +       }
+> +
+> +       return true;
+> +}
+> +
+>  /* This function controls the background scanning based on hdev->pend_le_conns
+>   * list. If there are pending LE connection we start the background scanning,
+>   * otherwise we stop it.
+> @@ -449,9 +500,11 @@ static void __hci_update_background_scan(struct hci_request *req)
+>                 if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+>                         hci_req_add_le_scan_disable(req, false);
+>
+> -               hci_req_add_le_passive_scan(req);
+> -
+> -               BT_DBG("%s starting background scanning", hdev->name);
+> +               if (!update_adv_monitor_scan_state(hdev)) {
+> +                       hci_req_add_le_passive_scan(req);
+> +                       bt_dev_dbg(hdev, "%s starting background scanning",
+> +                                  hdev->name);
+> +               }
 
-The chan->sec_level is L2CAP channel required sec_level while
-hcon->sec_level is the current secure level in effect, at some point I
-guess we assign the hcon->sec_level with chan->sec_level but Im not
-sure if that has already happened here or not.
+We should probably try to follow the same names as used for
+background_scan here, e.g. name it __hci_update_interleaved_scan, also
+perhaps that should fallback to hci_req_add_le_passive_scan on its
+own.
 
-> >
-> > >  }
-> > >
-> > >  static void l2cap_do_start(struct l2cap_chan *chan)
-> > > --
-> > > 2.28.0.681.g6f77f65b4e-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+>         }
+>  }
+>
+> @@ -844,12 +897,17 @@ static u8 update_white_list(struct hci_request *req)
+>                         return 0x00;
+>         }
+>
+> -       /* Once the controller offloading of advertisement monitor is in place,
+> -        * the if condition should include the support of MSFT extension
+> -        * support. If suspend is ongoing, whitelist should be the default to
+> -        * prevent waking by random advertisements.
+> +       /* Use the allowlist unless the following conditions are all true:
+> +        * - We are not currently suspending
+> +        * - There are 1 or more ADV monitors registered
+> +        * - Interleaved scanning is not currently using the allowlist
+> +        *
+> +        * Once the controller offloading of advertisement monitor is in place,
+> +        * the above condition should include the support of MSFT extension
+> +        * support.
+>          */
+> -       if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended)
+> +       if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
+> +           hdev->adv_monitor_scan_state != ADV_MONITOR_SCAN_ALLOWLIST)
+>                 return 0x00;
+>
+>         /* Select filter policy to use white list */
+> @@ -1002,6 +1060,7 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+>                                       &own_addr_type))
+>                 return;
+>
+> +       bt_dev_dbg(hdev, "interleave state %d", hdev->adv_monitor_scan_state);
 
+Is this really needed here, I though hci_req_add_le_passive_scan would
+only be used if interleaved scanning was not used.
+
+>         /* Adding or removing entries from the white list must
+>          * happen before enabling scanning. The controller does
+>          * not allow white list modification while scanning.
+> @@ -1871,6 +1930,64 @@ static void adv_timeout_expire(struct work_struct *work)
+>         hci_dev_unlock(hdev);
+>  }
+>
+> +static int add_le_interleave_adv_monitor_scan(struct hci_request *req,
+> +                                             unsigned long opt)
+
+Rename to hci_req_add_le_interleaved_scan
+
+> +{
+> +       struct hci_dev *hdev = req->hdev;
+> +       int ret = 0;
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+> +               hci_req_add_le_scan_disable(req, false);
+> +       hci_req_add_le_passive_scan(req);
+> +
+> +       switch (hdev->adv_monitor_scan_state) {
+> +       case ADV_MONITOR_SCAN_ALLOWLIST:
+> +               bt_dev_dbg(hdev, "next state: allowlist");
+> +               hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_NO_FILTER;
+> +               break;
+> +       case ADV_MONITOR_SCAN_NO_FILTER:
+> +               bt_dev_dbg(hdev, "next state: no filter");
+> +               hdev->adv_monitor_scan_state = ADV_MONITOR_SCAN_ALLOWLIST;
+> +               break;
+> +       case ADV_MONITOR_SCAN_NONE:
+> +       default:
+> +               BT_ERR("unexpected error");
+> +               ret = -1;
+> +       }
+> +
+> +       hci_dev_unlock(hdev);
+> +
+> +       return ret;
+> +}
+> +
+> +static void interleave_adv_monitor_scan_work(struct work_struct *work)
+
+Rename to interleave_scan_work
+
+> +{
+> +       struct hci_dev *hdev = container_of(work, struct hci_dev,
+> +                                           interleave_adv_monitor_scan.work);
+> +       u8 status;
+> +       unsigned long timeout;
+> +
+> +       if (hdev->adv_monitor_scan_state == ADV_MONITOR_SCAN_ALLOWLIST) {
+> +               timeout = msecs_to_jiffies(hdev->advmon_allowlist_duration);
+> +       } else if (hdev->adv_monitor_scan_state == ADV_MONITOR_SCAN_NO_FILTER) {
+> +               timeout = msecs_to_jiffies(hdev->advmon_no_filter_duration);
+> +       } else {
+> +               bt_dev_err(hdev, "unexpected error");
+> +               return;
+> +       }
+> +
+> +       hci_req_sync(hdev, add_le_interleave_adv_monitor_scan, 0,
+> +                    HCI_CMD_TIMEOUT, &status);
+> +
+> +       /* Don't continue interleaving if it was canceled */
+> +       if (is_interleave_scanning(hdev)) {
+> +               queue_delayed_work(hdev->req_workqueue,
+> +                                  &hdev->interleave_adv_monitor_scan, timeout);
+> +       }
+> +}
+> +
+>  int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+>                            bool use_rpa, struct adv_info *adv_instance,
+>                            u8 *own_addr_type, bdaddr_t *rand_addr)
+> @@ -3292,6 +3409,8 @@ void hci_request_setup(struct hci_dev *hdev)
+>         INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+>         INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+>         INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
+> +       INIT_DELAYED_WORK(&hdev->interleave_adv_monitor_scan,
+> +                         interleave_adv_monitor_scan_work);
+
+We can probably remove adv_monitor term on functions/variables and
+just use interleave_scan.
+
+>  }
+>
+>  void hci_request_cancel_all(struct hci_dev *hdev)
+> @@ -3311,4 +3430,6 @@ void hci_request_cancel_all(struct hci_dev *hdev)
+>                 cancel_delayed_work_sync(&hdev->adv_instance_expire);
+>                 hdev->adv_instance_timeout = 0;
+>         }
+> +
+> +       cancel_interleave_scan(hdev);
+>  }
+> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+> index b30b571f8caf8..2d3ad288c78ac 100644
+> --- a/net/bluetooth/mgmt_config.c
+> +++ b/net/bluetooth/mgmt_config.c
+> @@ -67,6 +67,8 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+>                 HDEV_PARAM_U16(0x001a, le_supv_timeout),
+>                 HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
+>                                                 def_le_autoconnect_timeout),
+> +               HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
+> +               HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
+>         };
+>         struct mgmt_rp_read_def_system_config *rp = (void *)params;
+>
+> @@ -138,6 +140,8 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+>                 case 0x0019:
+>                 case 0x001a:
+>                 case 0x001b:
+> +               case 0x001d:
+> +               case 0x001e:
+>                         if (len != sizeof(u16)) {
+>                                 bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
+>                                             len, sizeof(u16), type);
+> @@ -251,6 +255,12 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+>                         hdev->def_le_autoconnect_timeout =
+>                                         msecs_to_jiffies(TLV_GET_LE16(buffer));
+>                         break;
+> +               case 0x0001d:
+> +                       hdev->advmon_allowlist_duration = TLV_GET_LE16(buffer);
+> +                       break;
+> +               case 0x0001e:
+> +                       hdev->advmon_no_filter_duration = TLV_GET_LE16(buffer);
+> +                       break;
+>                 default:
+>                         bt_dev_warn(hdev, "unsupported parameter %u", type);
+>                         break;
+> --
+> 2.28.0.681.g6f77f65b4e-goog
+>
 
 
 -- 
