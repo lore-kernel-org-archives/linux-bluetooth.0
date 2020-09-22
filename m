@@ -2,222 +2,264 @@ Return-Path: <SRS0=LYTB=C7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8DEC4363D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 05:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0322C4363D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 06:02:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBCEA23A9C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 05:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9C4E23A9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 06:02:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xoq7Fsl5"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="jol4HaDP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727681AbgIVFQ5 (ORCPT
+        id S1729151AbgIVGCi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Sep 2020 01:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbgIVFQ5 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Sep 2020 01:16:57 -0400
-Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 026D7C061755
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2020 22:16:57 -0700 (PDT)
-Received: by mail-oo1-xc43.google.com with SMTP id k13so3851337oor.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Sep 2020 22:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RjVaM5PSRHjTOEGeN+/MmSR4gTJjjQyWdg1LfaUxZTk=;
-        b=Xoq7Fsl5Ruttj7LNNOXNKb3p/E+Oxahfj2BylqbhPV5/f9mT+xoJMj4U97w4Y5I12J
-         2cvIV/7dC2UwYG9G1F3eHU42B+2KJX5D1zU436KsNV1Ir7ZvDJsVbacHwts8sVPgfqGR
-         wj+Revga7umISYdcFAQ7DsJrXigI54R+1PmF0iONH3g6Su3U79FBKiOlnMt2+l5IYAQk
-         UPQRAglU7RrlzZF6t76Dx1ys5yZnrnNVpl8WX88AxBgO6WfYaDU6CNn89RvptE4hUXfU
-         JgwLAtH7gFORWTRGXBENM9VMOzenxJ2ro8a6FgC0W/CcxIbtYKGC+68aaGIKDIlwhTHW
-         b4WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RjVaM5PSRHjTOEGeN+/MmSR4gTJjjQyWdg1LfaUxZTk=;
-        b=YDbqpD4QX2ZXKx8FMgWW0r63oMoxbyKB1F6WTj0QrtTlGXgACN4i2WWz0JNxODZBkT
-         T70/BuX4QCLlqJMtBuZ1AN348VekIpTUKp4jxrwFx335rdsulf6GxUHacdctS+Mlnu2K
-         NXfOnEmpZZQo2iy1/FWewekFS0U4Y9oJvHaki+r0Ze1j2dFA5ItbUIdoilcwE0kOsqw/
-         YYDdmlps1hqjZifxDh1zshIK+CaflA4RwmtEoc3p1EQ+1CP5hZpyvkkFl8fOTTAdq9u9
-         AcUol39r8rCTwYGOovzm8uZpPbgG0MFU7cJa32wdae6F01aEd7fg1EJbzyzN3HAUXM6j
-         noQQ==
-X-Gm-Message-State: AOAM530VmILHgLSzaG63zApWA5leQLOoySYbQknqzSDIwCx7kmHe4VA6
-        SEuuh353eBiX+Gj5vCa3WWEX1ln6Dqadi91dtTRNCP7j
-X-Google-Smtp-Source: ABdhPJwZbchNvarGE+tn5W1qbKmV2AuWHV0nBacxCrD+AhaKVFFBQNggZIoMPLdbU7qqOlkUJ4NEI7pIfd4pi9Pz7u0=
-X-Received: by 2002:a4a:bf12:: with SMTP id r18mr1876346oop.9.1600751816136;
- Mon, 21 Sep 2020 22:16:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <1600747219-11626-1-git-send-email-kiran.k@intel.com>
-In-Reply-To: <1600747219-11626-1-git-send-email-kiran.k@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 21 Sep 2020 22:16:44 -0700
-Message-ID: <CABBYNZKTQeZZkVCGaCvnL661Qsxc1cFGNggEuM3pD7p0S8yRwQ@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel: Fix issue reported by static
+        Tue, 22 Sep 2020 02:02:38 -0400
+Received: from mga18.intel.com ([134.134.136.126]:59467 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726339AbgIVGCi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Sep 2020 02:02:38 -0400
+IronPort-SDR: QHIzMcGyfG+4HbEEAFgdoCLqUQGhkkPTb4NiCR3oXyMD961N4A0MKvEwGLAf5L40RLpe/aG4Ws
+ SwXCPHGikX2Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="148293533"
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+   d="scan'208";a="148293533"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 23:02:36 -0700
+IronPort-SDR: Iu/y91Q6i13fQK0JdBdMgAuylHYy1zjP6sWlz9ZPEv24spmDDE+nl3EEA0SJDfnt6zpiRsGdcL
+ +ZyOAEf9ArOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+   d="scan'208";a="334870681"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP; 21 Sep 2020 23:02:36 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 21 Sep 2020 23:02:35 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 21 Sep 2020 23:02:35 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Mon, 21 Sep 2020 23:02:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OkBE3TdGijT75kXgm6rAO2elIBdfosneu9CDcRUMbLBaxtq1JJU9jYxxZMGff1kH1RA+VoEpFZI4vMOyshFQwqOfW97nh7C4ytZUo/SolFFiObaGDZ2sdxP5hZq2stRqmF22sKjjO2Ek3Sy7siVPTw7Ykeyv3iYRpo9XVkXsEr4ZoohcUldcwNf5CnYh5yW5g0jZQzvXIb6RAs1azcQKrb1a6U6O8dqBxXzqjdCYsAoFwF1t65ccz9UmN7SmEIjz5kiLxeHJBza1yWJMjJq++3sXDaDcY0at34YVufIsV3YvZ27v1a1ZfLcKSn7xPPVSczcr+fCpVXlZ1BlSCq/d/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FemeFjV4BHm8LhBsR+dDLlFukBJe6Eq+dylZ5q0WfvI=;
+ b=WagEMa5D0WFa1B2r/18wQ4AVmS4OOFruOJrIcktzE17grT7mZ9+V6Mca9EoRPm/GmnjNfTOphQ9POKuFlC9RCrP4X7+hX8FSesWOethTDNsFdxX1yZR/TQJrvm8br+jjFDGVGtEAzPBnJrhlZbJWfy5n03phlcGxTh6/fTWOXMNq2KrrgTNwYg7c1bX6hoOp8c9rggD9aqpIZ/ruon9DQL+TZGm25elXv4tnouInjDL6dm6rxamtc2aCHqER6dnC54W29VruStYz90yPbbXGCK4EuFW4RBvISrXYgrovomotVMvL7df3vqF11i8WIgSn6bb6Vgit+P0i/ZnfjEx6jQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FemeFjV4BHm8LhBsR+dDLlFukBJe6Eq+dylZ5q0WfvI=;
+ b=jol4HaDP5PfdYZCMwvIlZgLwZHk5Nq68fg3BIPhz2DdJYQUGqKjRmWQslgPebfClFJq8xJhNnZkLa+X9oM32oqe4g1SHxAokMrQHvxMMWrULvP3JvXq+ZCt8u5x8hJ5HTEsySiZjp1mFYiDCEbKbVrPSwKwDLYHNrphdGDdf/XE=
+Received: from BYAPR11MB3141.namprd11.prod.outlook.com (2603:10b6:a03:8d::13)
+ by BYAPR11MB3527.namprd11.prod.outlook.com (2603:10b6:a03:8b::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.24; Tue, 22 Sep
+ 2020 06:02:31 +0000
+Received: from BYAPR11MB3141.namprd11.prod.outlook.com
+ ([fe80::c8d8:a3c5:9876:d589]) by BYAPR11MB3141.namprd11.prod.outlook.com
+ ([fe80::c8d8:a3c5:9876:d589%7]) with mapi id 15.20.3391.019; Tue, 22 Sep 2020
+ 06:02:31 +0000
+From:   "K, Kiran" <kiran.k@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kiran K <kiraank@gmail.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>
+Subject: RE: [PATCH v1] Bluetooth: btintel: Fix issue reported by static
  analysis tool
-To:     Kiran K <kiraank@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        ravishankar.srivatsa@intel.com, dan.carpenter@oracle.com,
-        Kiran K <kiran.k@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Thread-Topic: [PATCH v1] Bluetooth: btintel: Fix issue reported by static
+ analysis tool
+Thread-Index: AQHWkJUJikI7QCk8XUmiQtbNOopXyql0HfUAgAAGfmA=
+Date:   Tue, 22 Sep 2020 06:02:31 +0000
+Message-ID: <BYAPR11MB3141CF1A1F129710852DD2B8F53B0@BYAPR11MB3141.namprd11.prod.outlook.com>
+References: <1600747219-11626-1-git-send-email-kiran.k@intel.com>
+ <CABBYNZKTQeZZkVCGaCvnL661Qsxc1cFGNggEuM3pD7p0S8yRwQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKTQeZZkVCGaCvnL661Qsxc1cFGNggEuM3pD7p0S8yRwQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [122.179.23.229]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8e2deeb7-6c11-4001-9487-08d85ebd1815
+x-ms-traffictypediagnostic: BYAPR11MB3527:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR11MB352765119AAAE1E492E58ECCF53B0@BYAPR11MB3527.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qp7oDg37fXZ4P9JjKt+SnKGy9b6rNqENRIDP18L57IWb9Pko9/w3JW4zBxczQ4iDEhmRKNPgXFWtAxZY/qwy2xO+bvIB4PMNNAPYv/Gg0+V/VovM1odNdlFnU9A5Vp9UYWMH6Ev3JVqnlrvuAjDJmPqQTlqXa9arOgMTcWlNnsCSPPgENeKEaS7srcwSKBIYzPDC4/fxGEXEzQicu4A9mwN9uDTPniUGK9qXfu2K2zW2GABFo8mkcq31k4Qpe+/TejBBh9guMt2Kasb5Tx4DiIKDLF3krqBzQ1UWY3jhqL1v/SjBeCCT5lNy6Pkl8Oi4xMzaVKF7kIUhnhqWvykFDmKJusNRwp0CsEgnBRvpJ2xfiI/R3vjQnQrEoSLL8OlSpgVVyEy9KcbrZdjKEYMBVw5JYAZgFLjyvvE5G7LCllAlbR/VUoo1u7LFbrMY+k3c1yp7amaEW/n+ScCa+AM/tQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3141.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(366004)(39860400002)(346002)(396003)(4326008)(76116006)(66946007)(52536014)(66476007)(9686003)(64756008)(66556008)(71200400001)(8936002)(5660300002)(83380400001)(66446008)(186003)(478600001)(54906003)(6506007)(2906002)(33656002)(86362001)(55016002)(110136005)(8676002)(26005)(316002)(7696005)(966005)(53546011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: kIwcydMriLpaV5pBRfbUJxbw5Llyc/kaeA8L7q6hlWTykam6JacUucj8iZAcTszZqrGeU7HDyS2hZUtu8nv13Iz+XQ8DZUEXKEVZ3Hq9S2kFSP0kilmabBJ/pl6qgq5DrGCT70qjZD6+zImlyMybuIokYNASxF17Vvk/Osv8cJGeaIq/2yqXIO4cK285f7zA3T6cMqVHPjahq+2deiVOITUkoJa1u8ahURJ/1vrsWcQ5J/c2EUgg1wmJmn1j8mmVeTIOLRjI1NX7sKb1TD6I7J3+1kfO3cTggLXUsFeA7nj4PPWfIUqYWib2zLugNpvY8N7uVb9RRSWcfiZ/Me0zR9WhMriRdJG6WeynlH8ag52b9uO0WbiDQgcT0U4BAEy4fpN59cvEgS+Xu0OpmLeENNCHzh6v5a9HmLousmZvTxW0K6Qc7WqrxxJlMPDBjnsqNqHi7FI3vrYE+DW3u8b2izi1w9C5dq6jEV9gl0BwLSBn/10gtOGGPGZh7Z0enNMnjygDZFStcJJx8XiCVQ5j0d5AMUTOMDzCTJMo8WJmahLPkg2UDXKZLI9Up+QORdZgCZS/31a7lcxDZ9aw6s65p0RPP9I0g2p6QNyY56pE9YhJlr+xuf53NfJ78IW603fewJ7xA2CvjrwoMB1evUlyVg==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3141.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e2deeb7-6c11-4001-9487-08d85ebd1815
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2020 06:02:31.6433
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WfvExdWGqxowjFEQgCTEfyhSjSHT+OKnV3vdpofvOJirGAS/v9pbt8RPRM2V6IJZMSUkKLMFj6TF2K0AdsDYVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB3527
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
-
-On Mon, Sep 21, 2020 at 9:03 PM Kiran K <kiraank@gmail.com> wrote:
->
-> Smatch tool reported the below issue:
->
-> drivers/bluetooth/btintel.c:490 btintel_read_version_tlv()
-> error: 'tlv->len' from user is not capped properly
->
-> Additional details in the below link
-> https://www.spinics.net/lists/linux-bluetooth/msg87786.html
->
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->  drivers/bluetooth/btintel.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 42 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 88ce5f0..47f2b3d 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -431,62 +431,99 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
->          * version field like hw_platform, hw_variant, and fw_variant
->          * to keep the existing setup flow
->          */
-> -       while (skb->len) {
-> +       while (skb->len >= sizeof(struct intel_tlv)) {
->                 struct intel_tlv *tlv;
->
->                 tlv = (struct intel_tlv *)skb->data;
-> +               if (struct_size(tlv, val, tlv->len) > skb->len)
-> +                       goto failed;
-> +
->                 switch (tlv->type) {
->                 case INTEL_TLV_CNVI_TOP:
-> +                       if (tlv->len < sizeof(u32))
-> +                               goto failed;
->                         version->cnvi_top = get_unaligned_le32(tlv->val);
->                         break;
->                 case INTEL_TLV_CNVR_TOP:
-> +                       if (tlv->len < sizeof(u32))
-> +                               goto failed;
->                         version->cnvr_top = get_unaligned_le32(tlv->val);
->                         break;
->                 case INTEL_TLV_CNVI_BT:
-> +                       if (tlv->len < sizeof(u32))
-> +                               goto failed;
->                         version->cnvi_bt = get_unaligned_le32(tlv->val);
->                         break;
->                 case INTEL_TLV_CNVR_BT:
-> +                       if (tlv->len < sizeof(u32))
-> +                               goto failed;
->                         version->cnvr_bt = get_unaligned_le32(tlv->val);
->                         break;
->                 case INTEL_TLV_DEV_REV_ID:
-> +                       if (tlv->len < sizeof(u16))
-> +                               goto failed;
->                         version->dev_rev_id = get_unaligned_le16(tlv->val);
->                         break;
->                 case INTEL_TLV_IMAGE_TYPE:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->img_type = tlv->val[0];
->                         break;
->                 case INTEL_TLV_TIME_STAMP:
-> +                       if (tlv->len < sizeof(u16))
-> +                               goto failed;
->                         version->timestamp = get_unaligned_le16(tlv->val);
->                         break;
->                 case INTEL_TLV_BUILD_TYPE:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->build_type = tlv->val[0];
->                         break;
->                 case INTEL_TLV_BUILD_NUM:
-> +                       if (tlv->len < sizeof(u32))
-> +                               goto failed;
->                         version->build_num = get_unaligned_le32(tlv->val);
->                         break;
->                 case INTEL_TLV_SECURE_BOOT:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->secure_boot = tlv->val[0];
->                         break;
->                 case INTEL_TLV_OTP_LOCK:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->otp_lock = tlv->val[0];
->                         break;
->                 case INTEL_TLV_API_LOCK:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->api_lock = tlv->val[0];
->                         break;
->                 case INTEL_TLV_DEBUG_LOCK:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->debug_lock = tlv->val[0];
->                         break;
->                 case INTEL_TLV_MIN_FW:
-> +                       if (tlv->len < 3)
-> +                               goto failed;
->                         version->min_fw_build_nn = tlv->val[0];
->                         version->min_fw_build_cw = tlv->val[1];
->                         version->min_fw_build_yy = tlv->val[2];
->                         break;
->                 case INTEL_TLV_LIMITED_CCE:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->limited_cce = tlv->val[0];
->                         break;
->                 case INTEL_TLV_SBE_TYPE:
-> +                       if (tlv->len < sizeof(u8))
-> +                               goto failed;
->                         version->sbe_type = tlv->val[0];
->                         break;
->                 case INTEL_TLV_OTP_BDADDR:
-> +                       if (tlv->len != sizeof(version->otp_bd_addr))
-> +                               goto failed;
-
-Do we really want to fail here? The advantage of using a TLV is that
-we can skip if the type is not understood or is malformed but with
-this checks the length becomes useless since the types will always
-have a fixed value, also we cannot extend the types later on since it
-would not be backward compatible if we maintain such strict checks.
-
->                         memcpy(&version->otp_bd_addr, tlv->val, tlv->len);
->                         break;
->                 default:
-> @@ -499,6 +536,10 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
->
->         kfree_skb(skb);
->         return 0;
-> +
-> +failed:
-> +       kfree_skb(skb);
-> +       return -EINVAL;
->  }
->  EXPORT_SYMBOL_GPL(btintel_read_version_tlv);
->
-> --
-> 2.7.4
->
-
-
--- 
-Luiz Augusto von Dentz
+SGkgTHVpeiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1
+Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gU2VudDogVHVlc2RheSwg
+U2VwdGVtYmVyIDIyLCAyMDIwIDEwOjQ3IEFNDQo+IFRvOiBLaXJhbiBLIDxraXJhYW5rQGdtYWls
+LmNvbT4NCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IFR1bWt1ciBOYXJh
+eWFuLCBDaGV0aGFuDQo+IDxjaGV0aGFuLnR1bWt1ci5uYXJheWFuQGludGVsLmNvbT47IFNyaXZh
+dHNhLCBSYXZpc2hhbmthcg0KPiA8cmF2aXNoYW5rYXIuc3JpdmF0c2FAaW50ZWwuY29tPjsgZGFu
+LmNhcnBlbnRlckBvcmFjbGUuY29tOyBLLCBLaXJhbg0KPiA8a2lyYW4ua0BpbnRlbC5jb20+DQo+
+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjFdIEJsdWV0b290aDogYnRpbnRlbDogRml4IGlzc3VlIHJl
+cG9ydGVkIGJ5IHN0YXRpYw0KPiBhbmFseXNpcyB0b29sDQo+IA0KPiBIaSBLaXJhbiwNCj4gDQo+
+IE9uIE1vbiwgU2VwIDIxLCAyMDIwIGF0IDk6MDMgUE0gS2lyYW4gSyA8a2lyYWFua0BnbWFpbC5j
+b20+IHdyb3RlOg0KPiA+DQo+ID4gU21hdGNoIHRvb2wgcmVwb3J0ZWQgdGhlIGJlbG93IGlzc3Vl
+Og0KPiA+DQo+ID4gZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jOjQ5MCBidGludGVsX3JlYWRf
+dmVyc2lvbl90bHYoKQ0KPiA+IGVycm9yOiAndGx2LT5sZW4nIGZyb20gdXNlciBpcyBub3QgY2Fw
+cGVkIHByb3Blcmx5DQo+ID4NCj4gPiBBZGRpdGlvbmFsIGRldGFpbHMgaW4gdGhlIGJlbG93IGxp
+bmsNCj4gPiBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1ibHVldG9vdGgvbXNn
+ODc3ODYuaHRtbA0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogS2lyYW4gSyA8a2lyYW4ua0BpbnRl
+bC5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyB8IDQzDQo+
+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+ICAxIGZp
+bGUgY2hhbmdlZCwgNDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyBiL2RyaXZlcnMvYmx1ZXRvb3Ro
+L2J0aW50ZWwuYw0KPiA+IGluZGV4IDg4Y2U1ZjAuLjQ3ZjJiM2QgMTAwNjQ0DQo+ID4gLS0tIGEv
+ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgv
+YnRpbnRlbC5jDQo+ID4gQEAgLTQzMSw2MiArNDMxLDk5IEBAIGludCBidGludGVsX3JlYWRfdmVy
+c2lvbl90bHYoc3RydWN0IGhjaV9kZXYNCj4gKmhkZXYsIHN0cnVjdCBpbnRlbF92ZXJzaW9uX3Rs
+diAqdmVyDQo+ID4gICAgICAgICAgKiB2ZXJzaW9uIGZpZWxkIGxpa2UgaHdfcGxhdGZvcm0sIGh3
+X3ZhcmlhbnQsIGFuZCBmd192YXJpYW50DQo+ID4gICAgICAgICAgKiB0byBrZWVwIHRoZSBleGlz
+dGluZyBzZXR1cCBmbG93DQo+ID4gICAgICAgICAgKi8NCj4gPiAtICAgICAgIHdoaWxlIChza2It
+Pmxlbikgew0KPiA+ICsgICAgICAgd2hpbGUgKHNrYi0+bGVuID49IHNpemVvZihzdHJ1Y3QgaW50
+ZWxfdGx2KSkgew0KPiA+ICAgICAgICAgICAgICAgICBzdHJ1Y3QgaW50ZWxfdGx2ICp0bHY7DQo+
+ID4NCj4gPiAgICAgICAgICAgICAgICAgdGx2ID0gKHN0cnVjdCBpbnRlbF90bHYgKilza2ItPmRh
+dGE7DQo+ID4gKyAgICAgICAgICAgICAgIGlmIChzdHJ1Y3Rfc2l6ZSh0bHYsIHZhbCwgdGx2LT5s
+ZW4pID4gc2tiLT5sZW4pDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsZWQ7
+DQo+ID4gKw0KPiA+ICAgICAgICAgICAgICAgICBzd2l0Y2ggKHRsdi0+dHlwZSkgew0KPiA+ICAg
+ICAgICAgICAgICAgICBjYXNlIElOVEVMX1RMVl9DTlZJX1RPUDoNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICBpZiAodGx2LT5sZW4gPCBzaXplb2YodTMyKSkNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbGVkOw0KPiA+ICAgICAgICAgICAgICAgICAgICAg
+ICAgIHZlcnNpb24tPmNudmlfdG9wID0gZ2V0X3VuYWxpZ25lZF9sZTMyKHRsdi0+dmFsKTsNCj4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiAgICAgICAgICAgICAgICAgY2Fz
+ZSBJTlRFTF9UTFZfQ05WUl9UT1A6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYgKHRs
+di0+bGVuIDwgc2l6ZW9mKHUzMikpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBnb3RvIGZhaWxlZDsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9uLT5jbnZy
+X3RvcCA9IGdldF91bmFsaWduZWRfbGUzMih0bHYtPnZhbCk7DQo+ID4gICAgICAgICAgICAgICAg
+ICAgICAgICAgYnJlYWs7DQo+ID4gICAgICAgICAgICAgICAgIGNhc2UgSU5URUxfVExWX0NOVklf
+QlQ6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYgKHRsdi0+bGVuIDwgc2l6ZW9mKHUz
+MikpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWxlZDsNCj4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9uLT5jbnZpX2J0ID0gZ2V0X3VuYWxpZ25l
+ZF9sZTMyKHRsdi0+dmFsKTsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4g
+PiAgICAgICAgICAgICAgICAgY2FzZSBJTlRFTF9UTFZfQ05WUl9CVDoNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICBpZiAodGx2LT5sZW4gPCBzaXplb2YodTMyKSkNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbGVkOw0KPiA+ICAgICAgICAgICAgICAgICAg
+ICAgICAgIHZlcnNpb24tPmNudnJfYnQgPSBnZXRfdW5hbGlnbmVkX2xlMzIodGx2LT52YWwpOw0K
+PiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICAgICAgICAgICAgICAgICBj
+YXNlIElOVEVMX1RMVl9ERVZfUkVWX0lEOg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGlm
+ICh0bHYtPmxlbiA8IHNpemVvZih1MTYpKQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgZ290byBmYWlsZWQ7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgdmVyc2lvbi0+
+ZGV2X3Jldl9pZCA9IGdldF91bmFsaWduZWRfbGUxNih0bHYtPnZhbCk7DQo+ID4gICAgICAgICAg
+ICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gICAgICAgICAgICAgICAgIGNhc2UgSU5URUxfVExW
+X0lNQUdFX1RZUEU6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYgKHRsdi0+bGVuIDwg
+c2l6ZW9mKHU4KSkNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFp
+bGVkOw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIHZlcnNpb24tPmltZ190eXBlID0gdGx2
+LT52YWxbMF07DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gICAgICAg
+ICAgICAgICAgIGNhc2UgSU5URUxfVExWX1RJTUVfU1RBTVA6DQo+ID4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgaWYgKHRsdi0+bGVuIDwgc2l6ZW9mKHUxNikpDQo+ID4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBnb3RvIGZhaWxlZDsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
+ICB2ZXJzaW9uLT50aW1lc3RhbXAgPSBnZXRfdW5hbGlnbmVkX2xlMTYodGx2LT52YWwpOw0KPiA+
+ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICAgICAgICAgICAgICAgICBjYXNl
+IElOVEVMX1RMVl9CVUlMRF9UWVBFOg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGlmICh0
+bHYtPmxlbiA8IHNpemVvZih1OCkpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBnb3RvIGZhaWxlZDsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9uLT5idWls
+ZF90eXBlID0gdGx2LT52YWxbMF07DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7
+DQo+ID4gICAgICAgICAgICAgICAgIGNhc2UgSU5URUxfVExWX0JVSUxEX05VTToNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICBpZiAodGx2LT5sZW4gPCBzaXplb2YodTMyKSkNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbGVkOw0KPiA+ICAgICAgICAgICAg
+ICAgICAgICAgICAgIHZlcnNpb24tPmJ1aWxkX251bSA9IGdldF91bmFsaWduZWRfbGUzMih0bHYt
+PnZhbCk7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gICAgICAgICAg
+ICAgICAgIGNhc2UgSU5URUxfVExWX1NFQ1VSRV9CT09UOg0KPiA+ICsgICAgICAgICAgICAgICAg
+ICAgICAgIGlmICh0bHYtPmxlbiA8IHNpemVvZih1OCkpDQo+ID4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBnb3RvIGZhaWxlZDsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2
+ZXJzaW9uLT5zZWN1cmVfYm9vdCA9IHRsdi0+dmFsWzBdOw0KPiA+ICAgICAgICAgICAgICAgICAg
+ICAgICAgIGJyZWFrOw0KPiA+ICAgICAgICAgICAgICAgICBjYXNlIElOVEVMX1RMVl9PVFBfTE9D
+SzoNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBpZiAodGx2LT5sZW4gPCBzaXplb2YodTgp
+KQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsZWQ7DQo+ID4g
+ICAgICAgICAgICAgICAgICAgICAgICAgdmVyc2lvbi0+b3RwX2xvY2sgPSB0bHYtPnZhbFswXTsN
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiAgICAgICAgICAgICAgICAg
+Y2FzZSBJTlRFTF9UTFZfQVBJX0xPQ0s6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYg
+KHRsdi0+bGVuIDwgc2l6ZW9mKHU4KSkNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGdvdG8gZmFpbGVkOw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIHZlcnNpb24tPmFw
+aV9sb2NrID0gdGx2LT52YWxbMF07DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7
+DQo+ID4gICAgICAgICAgICAgICAgIGNhc2UgSU5URUxfVExWX0RFQlVHX0xPQ0s6DQo+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgaWYgKHRsdi0+bGVuIDwgc2l6ZW9mKHU4KSkNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbGVkOw0KPiA+ICAgICAgICAgICAg
+ICAgICAgICAgICAgIHZlcnNpb24tPmRlYnVnX2xvY2sgPSB0bHYtPnZhbFswXTsNCj4gPiAgICAg
+ICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiAgICAgICAgICAgICAgICAgY2FzZSBJTlRF
+TF9UTFZfTUlOX0ZXOg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGlmICh0bHYtPmxlbiA8
+IDMpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWxlZDsNCj4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9uLT5taW5fZndfYnVpbGRfbm4gPSB0bHYt
+PnZhbFswXTsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9uLT5taW5fZndfYnVp
+bGRfY3cgPSB0bHYtPnZhbFsxXTsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9u
+LT5taW5fZndfYnVpbGRfeXkgPSB0bHYtPnZhbFsyXTsNCj4gPiAgICAgICAgICAgICAgICAgICAg
+ICAgICBicmVhazsNCj4gPiAgICAgICAgICAgICAgICAgY2FzZSBJTlRFTF9UTFZfTElNSVRFRF9D
+Q0U6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaWYgKHRsdi0+bGVuIDwgc2l6ZW9mKHU4
+KSkNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbGVkOw0KPiA+
+ICAgICAgICAgICAgICAgICAgICAgICAgIHZlcnNpb24tPmxpbWl0ZWRfY2NlID0gdGx2LT52YWxb
+MF07DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gICAgICAgICAgICAg
+ICAgIGNhc2UgSU5URUxfVExWX1NCRV9UWVBFOg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
+IGlmICh0bHYtPmxlbiA8IHNpemVvZih1OCkpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBnb3RvIGZhaWxlZDsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzaW9u
+LT5zYmVfdHlwZSA9IHRsdi0+dmFsWzBdOw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGJy
+ZWFrOw0KPiA+ICAgICAgICAgICAgICAgICBjYXNlIElOVEVMX1RMVl9PVFBfQkRBRERSOg0KPiA+
+ICsgICAgICAgICAgICAgICAgICAgICAgIGlmICh0bHYtPmxlbiAhPSBzaXplb2YodmVyc2lvbi0+
+b3RwX2JkX2FkZHIpKQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ290byBm
+YWlsZWQ7DQo+IA0KPiBEbyB3ZSByZWFsbHkgd2FudCB0byBmYWlsIGhlcmU/IFRoZSBhZHZhbnRh
+Z2Ugb2YgdXNpbmcgYSBUTFYgaXMgdGhhdCB3ZSBjYW4NCj4gc2tpcCBpZiB0aGUgdHlwZSBpcyBu
+b3QgdW5kZXJzdG9vZCBvciBpcyBtYWxmb3JtZWQgYnV0IHdpdGggdGhpcyBjaGVja3MgdGhlDQo+
+IGxlbmd0aCBiZWNvbWVzIHVzZWxlc3Mgc2luY2UgdGhlIHR5cGVzIHdpbGwgYWx3YXlzIGhhdmUg
+YSBmaXhlZCB2YWx1ZSwgYWxzbw0KDQpBZ3JlZSB0aGF0IHRoZSB0eXBlcyBhcmUgZml4ZWQgaGVy
+ZS4gQnV0IGlmIGR1ZSB0byBzb21lIHJlYXNvbiBpZiBjb250cm9sbGVyIGlzIG5vdCBob25vcmlu
+ZyB0aGUgc2FtZSwgdGhlbiBkcml2ZXIgbWlnaHQgZW5kIHVwIHJlYWRpbmcgdW53YW50ZWQgZGF0
+YS4gVGhlIGNoZWNrIGlzIG1vcmUgYWJvdXQgZHJpdmVyIGJlaW5nIGRlZmVuc2l2ZSByYXRoZXIg
+dGhhbiBiZWxpZXZpbmcgIHdoYXQgY29tZXMgb24gd2lyZS4NCg0KPiB3ZSBjYW5ub3QgZXh0ZW5k
+IHRoZSB0eXBlcyBsYXRlciBvbiBzaW5jZSBpdCB3b3VsZCBub3QgYmUgYmFja3dhcmQNCj4gY29t
+cGF0aWJsZSBpZiB3ZSBtYWludGFpbiBzdWNoIHN0cmljdCBjaGVja3MuDQoNCkkgZGlkbuKAmXQg
+Z2V0IHRoaXMgcGFydC4gQ291bGQgeW91IHBsZWFzZSBiZSBtb3JlIHNwZWNpZmljID8NCg0KPiAN
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBtZW1jcHkoJnZlcnNpb24tPm90cF9iZF9hZGRy
+LCB0bHYtPnZhbCwgdGx2LT5sZW4pOw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFr
+Ow0KPiA+ICAgICAgICAgICAgICAgICBkZWZhdWx0Og0KPiA+IEBAIC00OTksNiArNTM2LDEwIEBA
+IGludCBidGludGVsX3JlYWRfdmVyc2lvbl90bHYoc3RydWN0IGhjaV9kZXYNCj4gPiAqaGRldiwg
+c3RydWN0IGludGVsX3ZlcnNpb25fdGx2ICp2ZXINCj4gPg0KPiA+ICAgICAgICAga2ZyZWVfc2ti
+KHNrYik7DQo+ID4gICAgICAgICByZXR1cm4gMDsNCj4gPiArDQo+ID4gK2ZhaWxlZDoNCj4gPiAr
+ICAgICAgIGtmcmVlX3NrYihza2IpOw0KPiA+ICsgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ID4g
+IH0NCj4gPiAgRVhQT1JUX1NZTUJPTF9HUEwoYnRpbnRlbF9yZWFkX3ZlcnNpb25fdGx2KTsNCj4g
+Pg0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiANCj4gDQo+IC0tDQo+IEx1aXogQXVndXN0byB2
+b24gRGVudHoNCg0KVGhhbmtzLA0KS2lyYW4NCg==
