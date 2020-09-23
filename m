@@ -1,220 +1,87 @@
-Return-Path: <SRS0=LYTB=C7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=ZvEB=DA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E55A6C2D0E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 23:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D0EC4363D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 07:51:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96348221F0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Sep 2020 23:06:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vZT5JI/X"
+	by mail.kernel.org (Postfix) with ESMTP id D4ED723600
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 07:51:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgIVXGl (ORCPT
+        id S1726221AbgIWHv4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Sep 2020 19:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60876 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbgIVXGl (ORCPT
+        Wed, 23 Sep 2020 03:51:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:52155 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726151AbgIWHv4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Sep 2020 19:06:41 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F7FC061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 16:06:41 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id x22so9024241pfo.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Sep 2020 16:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Laiihs0AaECfje2oIsybon2jtD4LrGoqde0EkeWBcm8=;
-        b=vZT5JI/XNcducT0pHahqZmRltPIWSubHo1F+RzHGtpelrZfKwZbsyaPvNbwB5FAqfC
-         OI1l2/g99Klre1ejYlkxV3THKDBSCmBO/ZGYT7h74Hv8sKsL8Vngh6G6K0gf8+984ZC+
-         0Cn/zvU4LOc21Sn6Z7IqqQGXdCpzAANpFzohwG27bjF6hPDgeloOhmd2n+Q/g1ZbizN4
-         /qEeSZSOxyxrSE5P+zVy7dlyxRSWlFN+btxOHo4wgAgKM6q5xlohQzUkD7WlPBmrSaJq
-         EUtt/7Px3EedEszkZoA8ZkrGdxvljDF/fE9BLxaUtO0ZvAziBsQC6sizSySuxZSptjyO
-         xaOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Laiihs0AaECfje2oIsybon2jtD4LrGoqde0EkeWBcm8=;
-        b=UIVc9Xllz0rq8IFw2wKpOS1cV3Atn7TiiDICUXttgLkXW8f809HfoxZkRpL+wwROD9
-         F/kE4MBot9EFx4qUv2642rd1czcN9miYoTI3HyqckplDvcCoqxaSq+JK4Hu4xVXVedzS
-         iDWcWFSFYbeEsVCFjqFI0Eh57qoXShucEgJ2GDmrDKXNy3pACKC2tPbyYFOZtueAhQVj
-         A5fE2sLdp2kr/SiStzwTSxM2B/ZCPoRJjS8BaeqwYYQwv7EMAGD9RgTpKHzVwU3LvXCu
-         YVRgEyaFvzGZEmjFxAuTIKDGDG8NHT5JRN7OocMrKr+isj2gtrV3PFQqKCqyLFXen45U
-         snCQ==
-X-Gm-Message-State: AOAM5325mQPZjbqDA7Rg1ejKrV7dSi6T/S+N2BPhVVp6DFPgcfTJKS2D
-        jNfwz4dS4hIHjIBl5p0bTPumOcMUtPM=
-X-Google-Smtp-Source: ABdhPJwP8BYHpc39GuUOt2oiBU65TGr1smWsde7aUNFRpA/DWOSwqjwAYJF0qAvKOBHtfYF36pRWxA==
-X-Received: by 2002:a63:4416:: with SMTP id r22mr5444989pga.248.1600816000113;
-        Tue, 22 Sep 2020 16:06:40 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y29sm17464823pfq.207.2020.09.22.16.06.39
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2020 16:06:39 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Wed, 23 Sep 2020 03:51:56 -0400
+Received: from [192.168.0.8] ([78.35.53.233]) by mrelayeu.kundenserver.de
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MF39S-1kEKfL080O-00FTJi for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep
+ 2020 09:51:55 +0200
+From:   Bisseling <spam@bisseling.de>
+Subject: [BUG] in tools/hcitool.c:cmd_scan
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] avdtp: Handle case where remote send L2CAP connect ahead of Open
-Date:   Tue, 22 Sep 2020 16:06:37 -0700
-Message-Id: <20200922230637.3524806-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.26.2
+Message-ID: <ec38f619-0785-7814-8f68-11526b59d9a5@bisseling.de>
+Date:   Wed, 23 Sep 2020 09:51:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:FyxajrrV/xT9UNTbJYEEK8cuG6lPGDD0c8gGQDnbH9CqSW0n+Ok
+ gOjMODWkfaAWlR2kMhjNA7cVjEA9kYCztKpUDso8/uyiNHQ4F+vkWS1IWHB1S0EQ96ZShnH
+ JSs3GFKoL8rl8xpnrWPdIn+rBeYT6fKDeme3bzVh3eefENDOriiUlZU5gD7DEZNvoiJdPlf
+ Debp3Kf85cjVcNi0gKLfQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:64IWVAXJEZs=:uAsn9/biWf9yEBEuwS1VGS
+ /upwfn3Bt8GfOlYc/hrUfTN3M/l7zSxx+M3sH8Ek7YQ744MtL/ugaZkWUTGJciDMhE6NY+hmL
+ Tk5yDka3e1V39qKyZ0hL7f2ByXQTYQ6s5fiEne9K2rvDpHcQbbzzpI9riSsi0RXR74W3dJo1h
+ 7/lm9JUlPkYDBL/ByXMzHI8nWPSEOeXjw2V/pmy9/vXjnHt8AI3huMxILKT1MXIFeZd3aBTek
+ ooBLksaYe1VmKXP2FvQFSdRTjSEbQt103L2+/ifRHjeq9yRpY2Hvu3kt6BSq5+zDueD/BvyXY
+ ae4R3cYPlPg7SK9JcvxR8UvG34RHsYCKfMddsipqlvFkbl9ngKQQo0bcuy2s8dsRm1/JKS6gP
+ 5j22dH/Ss/FIgCApboEGi8Ss6eFR1QbtI9DHtpj26jnA1zu3W/6OvOngCiZoyenDw1DtEyJQz
+ puXnhl9B/ORPLAGukea+Oj1kiqHH+nqi3RU+oMJdIHkd4G3tS97X+7qz75QLEcpMNPo3ba8bN
+ 9RS35/A4Tipaa9E4srUXuULW0x5pEhU2fNmaZXBWzLwsHwqIbrkvM8b1aaMT/6HHxV23LdY9o
+ cAYcRxlWFlg1UKIDi2cx5qhj0cvVcTEXvc43g/nkFBjGwwa5vlhiLxre4Fia9Ux2M7t+07yG0
+ ir0oqYA1sg3Hvq4k7v5QBuZ1wzQNgrFoTDxBydG4JkXR7EmVqugER4wz3LhrK20TT8zHnQs3q
+ iJV7sie+fLMwzbUvZTXBKhs3DVCVCUyQ58faYYSbi7tdrMve1isFrjZjoWeUNxXwVjFaj5ub6
+ DxLPvDoCvqKwqBNtPa4voKOzeYCnQ4NXae0urWx/9Bs/YR5zK2oeY5kTE5EubU12j7fTSES
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[BUG] in tools/hcitool.c:cmd_scan
 
-This stores the channel if it had been connected ahead of Open
-procedure so it can later be processed.
----
- profiles/audio/avdtp.c | 75 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 64 insertions(+), 11 deletions(-)
+Hi guys and gals,
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index b44a23c48..ae93fb26f 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -388,6 +388,7 @@ struct avdtp {
- 	GSList *prio_queue; /* Same as req_queue but is processed before it */
- 
- 	struct avdtp_stream *pending_open;
-+	GIOChannel *pending_open_io;
- 
- 	uint32_t phy;
- 	uint16_t imtu;
-@@ -609,11 +610,33 @@ static gboolean stream_open_timeout(gpointer user_data)
- 
- 	stream->session->pending_open = NULL;
- 
-+	if (stream->session->pending_open_io) {
-+		g_io_channel_unref(stream->session->pending_open_io);
-+		stream->session->pending_open_io = NULL;
-+	}
-+
- 	avdtp_abort(stream->session, stream);
- 
- 	return FALSE;
- }
- 
-+static void stream_set_timer(struct avdtp_stream *stream, guint timeout,
-+							GSourceFunc func)
-+{
-+	if (stream->timer)
-+		g_source_remove(stream->timer);
-+
-+	stream->timer = g_timeout_add_seconds(timeout, func, stream);
-+}
-+
-+static void stream_set_pending_open(struct avdtp_stream *stream, GIOChannel *io)
-+{
-+	stream->open_acp = TRUE;
-+	stream->session->pending_open = stream;
-+	stream->session->pending_open_io = io;
-+	stream_set_timer(stream, REQ_TIMEOUT, stream_open_timeout);
-+}
-+
- void avdtp_error_init(struct avdtp_error *err, uint8_t category, int id)
- {
- 	err->category = category;
-@@ -836,6 +859,12 @@ proceed:
- 
- 	stream->io_id = g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
- 					(GIOFunc) transport_cb, stream);
-+
-+	/* Release pending IO */
-+	if (session->pending_open_io) {
-+		g_io_channel_unref(session->pending_open_io);
-+		session->pending_open_io = NULL;
-+	}
- }
- 
- static int pending_req_cmp(gconstpointer a, gconstpointer b)
-@@ -1674,6 +1703,14 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
- 
- 	stream = sep->stream;
- 
-+	/* Check if the stream is pending and there is an IO set already */
-+	if (stream == session->pending_open && session->pending_open_io) {
-+		handle_transport_connect(session, session->pending_open_io,
-+						stream->imtu, stream->omtu);
-+		return avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
-+							AVDTP_OPEN, NULL, 0);
-+	}
-+
- 	if (sep->ind && sep->ind->open && !session->pending_open) {
- 		if (!sep->ind->open(session, sep, stream, &err,
- 					sep->user_data))
-@@ -1686,13 +1723,8 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
- 						AVDTP_OPEN, NULL, 0))
- 		return FALSE;
- 
--	if (!session->pending_open) {
--		stream->open_acp = TRUE;
--		session->pending_open = stream;
--		stream->timer = g_timeout_add_seconds(REQ_TIMEOUT,
--						stream_open_timeout,
--						stream);
--	}
-+	if (!session->pending_open)
-+		stream_set_pending_open(stream, NULL);
- 
- 	return TRUE;
- 
-@@ -3139,18 +3171,39 @@ struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
- gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
- 						size_t imtu, size_t omtu)
- {
--	GIOChannel *io;
-+	GIOChannel *io = g_io_channel_unix_new(fd);
- 
--	if (stream != stream->session->pending_open)
--		return FALSE;
-+	if (stream != stream->session->pending_open) {
-+		uint8_t err;
-+
-+		if (stream->session->pending_open)
-+			goto failed;
-+
-+		/* Attempt to Open there is no pending stream set yet */
-+		if (stream->lsep->ind && stream->lsep->ind->open) {
-+			if (!stream->lsep->ind->open(stream->session,
-+						stream->lsep,
-+						stream, &err,
-+						stream->lsep->user_data))
-+				goto failed;
-+		}
- 
--	io = g_io_channel_unix_new(fd);
-+		stream_set_pending_open(stream, io);
-+		stream->imtu = imtu;
-+		stream->omtu = omtu;
-+
-+		return TRUE;
-+	}
- 
- 	handle_transport_connect(stream->session, io, imtu, omtu);
- 
- 	g_io_channel_unref(io);
- 
- 	return TRUE;
-+
-+failed:
-+	g_io_channel_unref(io);
-+	return FALSE;
- }
- 
- gboolean avdtp_stream_get_transport(struct avdtp_stream *stream, int *sock,
--- 
-2.26.2
+I found a little bug in the above function and would like to have it fixed.
+I could not find any other way to submit a bug than this mailing list.
+
+The function contains the following code:
+
+|
+
+for  (n  =  0;  n  <  248  &&  name[n];  n++)  {
+	if  ((unsigned  char)  name[i]  <  32  ||  name[i]  ==  127)
+		name[i]  =  '.';
+} |
+
+||
+
+||
+
+|It is pretty obvious that the loop should use the index variable n 
+instead of i in all three places. The variable i is the index variable 
+of the outer loop running over all responses. This mistake leads to 
+garbled names and sometimes even to SIGSEGV on x86_AMD64. How would I 
+fork your project and commit a pull request like on github? Thanks in 
+advance Georg |
+
+||
 
