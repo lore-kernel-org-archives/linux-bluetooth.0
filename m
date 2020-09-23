@@ -2,117 +2,99 @@ Return-Path: <SRS0=ZvEB=DA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBD3C4727D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 09:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D6DC2D0A8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 09:41:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B68520719
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 09:23:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UTEylZUZ"
+	by mail.kernel.org (Postfix) with ESMTP id 79C6B235FD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Sep 2020 09:41:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgIWJWq (ORCPT
+        id S1726513AbgIWJlR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Sep 2020 05:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42740 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726676AbgIWJWq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Sep 2020 05:22:46 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66395C0613D5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2020 02:22:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e2so581387ybc.17
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Sep 2020 02:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=OYN0waWCzIpz4ouqNQwOPc0HvVqV4aulKVgXstFC8pM=;
-        b=UTEylZUZ5updRxJyyE1aYQG2MB/kp+pzMWY5DhOtjk4PMP63yPQX5Vh2r0Nx4gPB/1
-         V9zrBiDN+pQkVLjlflvjNSdooxWO4yGD3nHAzZ7CQNQ/gkOk2/DccLeqY0U7p37oAanE
-         HYrMNwgimP/NEksULzdrBxeNR8m+30WlcQf8eUzLQ3oteCOE7BPiRlV0qCmZ77rX7QZJ
-         1w2brV8qQ6HMyZXR6jkJdQsLRBEcefQT3hIXJlOu5K21VItm12/SvWm552hMC42DmvFz
-         hYfl3JtNg2oaINdq4AZSFZzhyIHN4rU3btDdpttPcGEmxPsuGmWKTBXc8BqQ3zcFnme6
-         4sbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=OYN0waWCzIpz4ouqNQwOPc0HvVqV4aulKVgXstFC8pM=;
-        b=JaS7oq/K8vrfZ9DeFS0BYRncEHTwSuFKYZ+atrFZz/c/yVsm+s/SvqptAuSpE6+gs3
-         e79nO5YnLZ3U/rzoOi23II4Kga3xCtduc4dMFGVDsfV7yzkhr3Anj9cRxzlD/poKpq4P
-         MsSzUOfC4KQdtBN6tT2y5j6ExVN0fc+gOznkP+q8GZ+kBZYQn+Gb+rfg9gSkghcWjm1T
-         nCjgQqDCkP7fezXGFmFvJ0MsamWmLOyTP1AcXxJ+rZ92Oi5vOVrXZIKGEjOnVDLqWRm8
-         Wng/YIpY5a4pjMexVlCt4I9Eopx05PcPB0BgtT08+L4tQsk9uv3vW56HUnUptT+FQLlS
-         CKmA==
-X-Gm-Message-State: AOAM532BTt8716l1KLtRcVbhBzQE7z34rdCwlVKeHE8hqWGhLRamFaHe
-        0x3mvmvmWdoIMF5vrTyeHx93K7kgljOwglYooS+WaxwQ3Er5dl4ixmz8PwGSKjQzscoMzZnDdES
-        kssMuS1z8gNa4+s0h6aPeNh1MR72oKoMp0YHuK/Os3oamugcgn+Go04omfg3mnJELriOXLY/8va
-        VrH3yFXDju8LA=
-X-Google-Smtp-Source: ABdhPJzI1T8McZlIoA0sf6bztLH3WBdup6fzS5cp23Ntzzcb/8oA+VMcbFtGnTpIynAxzj4FvQFFnE7BM8+AvHZ9jQ==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a25:8746:: with SMTP id
- e6mr11266110ybn.89.1600852964527; Wed, 23 Sep 2020 02:22:44 -0700 (PDT)
-Date:   Wed, 23 Sep 2020 17:22:31 +0800
-In-Reply-To: <20200923172129.v5.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-Message-Id: <20200923172129.v5.3.I21e5741249e78c560ca377499ba06b56c7214985@changeid>
-Mime-Version: 1.0
-References: <20200923172129.v5.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v5 3/4] Bluetooth: Handle active scan case
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     mmandlik@chromium.orgi, mcchou@chromium.org, alainm@chromium.org,
-        Howard Chung <howardchung@google.com>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        Wed, 23 Sep 2020 05:41:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53092 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726253AbgIWJlR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 23 Sep 2020 05:41:17 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 198919] Xbox (One) Wireless Controller won't connect
+Date:   Wed, 23 Sep 2020 09:41:16 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: hurikhan77+bko@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-198919-62941-ZMY1AV5AH4@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198919-62941@https.bugzilla.kernel.org/>
+References: <bug-198919-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds code to handle the active scan during interleave
-scan. The interleave scan will be canceled when users start active scan,
-and it will be restarted after active scan stopped.
+https://bugzilla.kernel.org/show_bug.cgi?id=198919
 
-Signed-off-by: Howard Chung <howardchung@google.com>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
----
+Kai Krakow (hurikhan77+bko@gmail.com) changed:
 
-(no changes since v1)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |hurikhan77+bko@gmail.com
 
- net/bluetooth/hci_request.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+--- Comment #6 from Kai Krakow (hurikhan77+bko@gmail.com) ---
+Yeah, it seems to get worse with every 5.4 LTS update. Worked almost flawless
+about some months ago (despite taking something from 30-60s to successfully
+connect). But I don't see a correlation to any commits. But now, it's almost
+impossible to connect successfully, it usually disconnects after a 1-2 minutes
+(coincidentally just when entering a game).
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index db44680fbe9c9..4048c82d4257f 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -3083,8 +3083,10 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	 * running. Thus, we should temporarily stop it in order to set the
- 	 * discovery scanning parameters.
- 	 */
--	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
-+	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
- 		hci_req_add_le_scan_disable(req, false);
-+		cancel_interleave_scan(hdev);
-+	}
- 
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
+I usually also see messages like this:
+
+During use of the controller (probably around disconnect time):
+[ 5304.480502] Bluetooth: Unexpected continuation frame (len 52)
+
+When plugging the BT dongle:
+[ 5241.926752] Bluetooth: hci0: unexpected event for opcode 0x0000
+
+While it's in a loop of constantly connecting and disconnecting:
+[ 1120.736530] Bluetooth: hci0: hardware error 0x58
+[ 1120.923550] debugfs: File 'le_min_key_size' in directory 'hci0' already
+present!
+[ 1120.923555] debugfs: File 'le_max_key_size' in directory 'hci0' already
+present!
+[ 1120.923557] debugfs: File 'force_bredr_smp' in directory 'hci0' already
+present!
+
+Other BT devices seem to just work fine tho I don't use a lot of them and only
+occasionally. It seems that the Xbox One S firmware does something strange in
+the BT protocol. It also needs either ERTM disabled to connect. Alternatively,
+one can apply this patch to be able to use ERTM:
+
+https://github.com/kakra/linux/commit/c8b24d83f227a7fecfa9420d6756074e8f9b542c
+
+I'm also feeling there's some internal state getting messed up within the
+controller on each BT pairing: Results are not really reproducible. I managed
+to get it to work flawlessly one time (stable connection despite 20-30s connect
+handshake time), then purged my Bluetooth config from /var/lib, re-paired the
+controller and now it's a mess - still with the same kernel version.
+
 -- 
-2.28.0.681.g6f77f65b4e-goog
-
+You are receiving this mail because:
+You are the assignee for the bug.
