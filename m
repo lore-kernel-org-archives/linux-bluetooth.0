@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96237C4346E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Sep 2020 23:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C29C4346E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Sep 2020 23:20:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 516822371F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Sep 2020 23:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FF7123899
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Sep 2020 23:20:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CDxNFsbu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hq/CgtnC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgIXXRs (ORCPT
+        id S1726702AbgIXXUD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Sep 2020 19:17:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54664 "EHLO
+        Thu, 24 Sep 2020 19:20:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbgIXXRr (ORCPT
+        with ESMTP id S1726397AbgIXXUC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Sep 2020 19:17:47 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFD0C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 16:17:47 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id i17so495314qvj.22
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 16:17:47 -0700 (PDT)
+        Thu, 24 Sep 2020 19:20:02 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50D0C0613CE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 16:20:02 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id y53so572821qth.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 16:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=BRLWzw5KfOjJw5AE9R3gLTg9imcZgd5TO4r9CcaoPCQ=;
-        b=CDxNFsbuqgptnC5RyTR8/pA7twNx/mawY/cqEq85M671xbEzmEQjL+hMUUbxHMyvfg
-         bknEpjXZFP+cLCkJLfOteUWt9AzDoHdegXvs66lumwId1zeb/HctNf6+wixOOHkw571q
-         Ad2Kf/WYrTCSsztAo+QfM52UZl36c4MO8gG2VdJY6PkNAbuAWYD29+q1T2jCGk54ETnJ
-         6a+zdkLA8qIBLtf84nGuIFL/+KOSGyX7EBy7UmVapLS4NOOxRdcYhYTShYxVuLJ6FZav
-         5plQxBL8dBmAWyiFfDvWoCf60nbl+UWsGCorwGCyEjeuKKOAjswrkUM2H77x70KAjO+9
-         pfvQ==
+        bh=CtNAdJymCzf7XlDy5wdKVNQNGbifZpqsFxJiW1M5VxQ=;
+        b=hq/CgtnCB0wG8Y12Hw9IfV/RmhGJnpDSjFoMTP///heap8Y/nGrQ52wcXu4Ry9/moC
+         fp4Um2Q4LWgwZVQuWr5uKQAo44nRnpVJcpBiK+jrKc5VByqZYE9PJUdDyJeeteS/PhZI
+         ftfcVJIBS5NoIT3RgwH4sAcdDQgFeS6JsDvtQpQlprdb2bnWIhmbaCqnU+sXZXkD6Awb
+         BFyzbAkoO6V52sgsAnFqNIpOKn4RNtc1YxX4cVcz5QV8hJLfXvANBJdipSU1r3qp+w2G
+         KYLDgauC5iLGc4TIZrhV5gZh5PUcHwNmpdK+NSj7U79J1XLmNarYNc4Q79ABHudI2hLf
+         YFUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
          :to:cc;
-        bh=BRLWzw5KfOjJw5AE9R3gLTg9imcZgd5TO4r9CcaoPCQ=;
-        b=udtO8FQ6xhrLZh2L9R29j/wE4AIlljGxY3yO8bAUjn3A9ZwZ/ncDBwFWn2b6dbhPqi
-         GsSpLOJiuCljThm7N5amiJwusr2OOiuFW1y1jgvcTZJL5redVWn7lrdcnNeRwaEKcjYy
-         qf/GyAfx9civwz8IcBFoND92uIFdjEASIbYntG0H1/8+bfsShe9A5kxx54WNGMfsS4Dz
-         5ov6CVNEa84HLAZVLiHZE/jYUQGn5r18L4TBXjVFnGjlol2aYwUBQHDUKkWwM4ZeOaOO
-         7Xch0EG5YlFfzL/8oHAcL/M0luLaubwR9Fq5asd+jBYXW7srHVuvn72wZtkNK0GBrBUA
-         MNXg==
-X-Gm-Message-State: AOAM530Vy6NQa5JMBvqxRTNi4PYDIBHm376a69Oh8a0YZ1mA9UxkMzST
-        IdgLN+HzkzpwBsIFKzchOCt+xqh9jCp2c9ZIlVRVKU9Q1lgGOfLAG75L8RzZCGGQGfUcrHtlt4y
-        ml18oXltfSUQEdheiW/HI3129BRjb77FEUw+DxjnWrlPq02SmtulM0yIcyQnoe3gpeEENjDly6a
-        4q
-X-Google-Smtp-Source: ABdhPJxlZcl8HCfrlFHHI2Gikz0Ybj9zHpRLlcm2vQrSrNkHGPLth+C0ocOgBJ+rt2hN7Cl97VZP9jkqzTsq
+        bh=CtNAdJymCzf7XlDy5wdKVNQNGbifZpqsFxJiW1M5VxQ=;
+        b=skoc+MOLsaZkobPZ4THtPP7yTRSYNqsNaBHz5phXINlh1u+GTcD7CUmJvjpJQfuidM
+         CyfgdFwHn9EOGMqN8/tfYk3KyVp/jvj5SXEbaUTkrdJEyx2hAYCJ8XBUNqbiXbsi7AgS
+         kuLxRHXNGpKB/13W2vdwq55TnN/iq5ABq0v7+DXmiofgmHmNV+n42Vg8VALzz1Uj/tBw
+         o/uLq8n7RvETOooMMaITtQ0jhKK36pFhw1EHyjMkXh4LIkSya48jwWGVAw9zF5bDkLjD
+         EyLpolCL8oPSAKqvQsod2FalcuRbg7ZvXdNQAoBdhFqdQ23vnQGCZTUE1YIpMXI8dald
+         QV0Q==
+X-Gm-Message-State: AOAM530mwo9B9k3CG+HYdufpKcSgGb9NEwNMOFf6XUgtxdrYSpwFFh6/
+        m6lAewqf/a2xI1W5uwWLoarP7J1ijwp5zS8KKlaZbEpaPOyy4q7xeIwBojKsLx+mb67TdQnOagC
+        cNRKEsKHD21FYYUR6CUA+mR6E7GdWtyNDtYwzw6DNe6gFADzHZBV+/Cfy68m9DMjPT2Iovm3arW
+        NH
+X-Google-Smtp-Source: ABdhPJw+iTCjPS2478D8FtSTOdxcw0qAhWUHYkKMjHTCVQgNcWX9nbQGUmKe3wdzP2tayE2N4Le5AzfOnIdl
 Sender: "yudiliu via sendgmr" <yudiliu@yudiliu.mtv.corp.google.com>
 X-Received: from yudiliu.mtv.corp.google.com ([2620:15c:202:201:8edc:d4ff:fe53:2823])
- (user=yudiliu job=sendgmr) by 2002:a0c:a482:: with SMTP id
- x2mr1631875qvx.56.1600989466672; Thu, 24 Sep 2020 16:17:46 -0700 (PDT)
-Date:   Thu, 24 Sep 2020 16:17:42 -0700
-Message-Id: <20200924161730.Bluez.v2.1.Iedecbb8c8ebb111b14206dddc5bea3c40dfa1771@changeid>
+ (user=yudiliu job=sendgmr) by 2002:a05:6214:d6b:: with SMTP id
+ 11mr1772084qvs.30.1600989601782; Thu, 24 Sep 2020 16:20:01 -0700 (PDT)
+Date:   Thu, 24 Sep 2020 16:19:58 -0700
+Message-Id: <20200924161949.Bluez.v2.1.Iedecbb8c8ebb111b14206dddc5bea3c40dfa1771@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
 Subject: [Bluez PATCH v2] device: Disable auto connect for temporary devices
@@ -84,11 +84,11 @@ Changes in v2:
 Changes in v1:
 - Initial change
 
- src/device.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/device.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/src/device.c b/src/device.c
-index a4b5968d4..13159d927 100644
+index a4b5968d4..a5ef46730 100644
 --- a/src/device.c
 +++ b/src/device.c
 @@ -5684,6 +5684,10 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary)
@@ -102,17 +102,6 @@ index a4b5968d4..13159d927 100644
  		device->temporary_timer = g_timeout_add_seconds(main_opts.tmpto,
  							device_disappeared,
  							device);
-@@ -6036,8 +6040,9 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
- 		 * treated as a newly discovered device.
- 		 */
- 		if (!device_is_paired(device, bdaddr_type) &&
--				!device_is_trusted(device))
-+				!device_is_trusted(device)) {
- 			btd_device_set_temporary(device, true);
-+		}
- 
- 		device_bonding_failed(device, status);
- 		return;
 -- 
 2.28.0.681.g6f77f65b4e-goog
 
