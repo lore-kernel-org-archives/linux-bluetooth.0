@@ -2,150 +2,243 @@ Return-Path: <SRS0=+RU5=DC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E55C4727E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 08:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB81C4727E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 09:02:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A07712087D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 08:23:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99BA9221E5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 09:02:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="HYBvt2eN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727688AbgIYIXl (ORCPT
+        id S1727777AbgIYJCD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 04:23:41 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:58193 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727068AbgIYIXl (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 04:23:41 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 08P8NRU00031147, This message is accepted by code: ctloc85258
-Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
-        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 08P8NRU00031147
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 25 Sep 2020 16:23:27 +0800
-Received: from RSEXMBS01.realsil.com.cn (172.29.17.195) by
- RSEXMBS01.realsil.com.cn (172.29.17.195) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2044.4; Fri, 25 Sep 2020 16:23:26 +0800
-Received: from RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37]) by
- RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37%7]) with mapi id
- 15.01.2044.004; Fri, 25 Sep 2020 16:23:26 +0800
-From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
-CC:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:USB XHCI DRIVER" <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system resume
-Thread-Topic: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
- resume
-Thread-Index: AdaTFDyzjigV3dr0CE6uDdt266LELw==
-Date:   Fri, 25 Sep 2020 08:23:26 +0000
-Message-ID: <30ce4ee1eede47c09c3e7f277c26918a@realsil.com.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Fri, 25 Sep 2020 05:02:03 -0400
+Received: from z5.mailgun.us ([104.130.96.5]:55958 "EHLO z5.mailgun.us"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727324AbgIYJB7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 25 Sep 2020 05:01:59 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1601024518; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=ihGr2/1LQtp+XJ1GkpNMuUiHJdP+XuIzVWyhGGC9mkg=;
+ b=HYBvt2eNKSPGIWcPEdd46tawQ6skiAit2gSC/WNDdqkIhGaglTZoqtdXbJufFgw7tMRLnaMS
+ AHnobST0VJ6Yhn6qfgDQnpUgMgPijjqHIGoISFa1QdeBQIl9FWrFoNEHE7lU3SJKcWgiPccd
+ v0BTx5rHxaGrA99XzdUjcXxAz1g=
+X-Mailgun-Sending-Ip: 104.130.96.5
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
+ 5f6db1bec00ccaf02885fd80 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 25 Sep 2020 09:00:46
+ GMT
+Sender: rjliao=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 3905CC433FF; Fri, 25 Sep 2020 09:00:46 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2F88BC433C8;
+        Fri, 25 Sep 2020 09:00:45 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 25 Sep 2020 17:00:45 +0800
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        mka@chromium.org, linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
+ support
+In-Reply-To: <0C779191-3BD1-40BF-83E6-733F9C78EA03@holtmann.org>
+References: <0101017457c6b810-cb8b79ae-4663-436b-83d0-4c70c245bd25-000000@us-west-2.amazonses.com>
+ <2E48211B-D62D-43D8-9C97-014966FBB2CB@holtmann.org>
+ <c177f408186da437db722d855a01c846@codeaurora.org>
+ <0C779191-3BD1-40BF-83E6-733F9C78EA03@holtmann.org>
+Message-ID: <7482e21cb10a7e73dd9a9f784e2e5370@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgS2FpLUhlbmcsDQoNCj4gT24gU2VwdGVtYmVyIDI1LCAyMDIwIGF0IDE1OjU2LCBLYWktSGVu
-ZyBGZW5nIHdyb3RlOg0KPiANCj4gSGkgQWxleCwNCj4gDQo+ID4gT24gU2VwIDI1LCAyMDIwLCBh
-dCAxNTo0Miwg6ZmG5pyx5LyfIDxhbGV4X2x1QHJlYWxzaWwuY29tLmNuPiB3cm90ZToNCj4gPg0K
-PiA+IEhpIEthaS1IZW5nLA0KPiA+DQo+ID4+IE9uIDI1IFNlcHRlbWJlciAyMDIwIGF0IDE1OjE0
-LCBLYWktSGVuZyBGZW5nIHdyb3RlOg0KPiA+Pg0KPiA+PiBIaSBBbGV4LA0KPiANCj4gW3NuaXBw
-ZWRdDQo+IA0KPiA+PiBBcHBhcmVudGx5IGZvciBteSBjYXNlLCBSVEw4ODIxQ0UsIGZpcm13YXJl
-IHdhcyBrZXB0IHdpdGhvdXQgc2V0dGluZw0KPiA+PiByZW1vdGUgd2FrZXVwLg0KPiA+DQo+ID4g
-U28geW91IGdvdCB0aGUgYnR1c2IgZGlzY29ubmVjdCBhbmQgcmVwcm9iZSBzZXF1ZW5jZSBhZnRl
-ciByZXN1bWUsIGFuZCAiDQo+IEJsdWV0b290aDogaGNpMDogY29tbWFuZCAweDEwMDEgdHggdGlt
-ZW91dCAiIGJlZm9yZSBmaXJtd2FyZSBkb3dubG9hZGluZyA/DQo+IA0KPiBVU0IgcG93ZXIgd2Fz
-bid0IGxvc3QsIGJ1dCBpdCBnb3QgVVNCIHdhcm0gcmVzZXQgYmVjYXVzZSBidHVzYiBkcml2ZXIN
-Cj4gZXhwbGljaXRseSBmbGFnZ2VkICJyZXNldF9yZXN1bWUgPSAxIi4NCj4gVGhlbiB0aGUgaXNz
-dWUgYXBwZWFyZWQgYXMgIkJsdWV0b290aDogaGNpMDogY29tbWFuZCAweDEwMDEgdHggdGltZW91
-dCIsDQo+IGJlZm9yZSBkb3dubG9hZGluZyBmaXJtd2FyZS4NCj4gDQo+ID4NCj4gPj4gSXMgaXQg
-b2theSB0byBhbHNvIHNldCByZW1vdGUgd2FrZXVwIGZvciBnbG9iYWwgc3VzcGVuZCB0byByZXRh
-aW4gdGhlDQo+ID4+IGZpcm13YXJlPw0KPiA+DQo+ID4gWWVzLCBpdCdzIG9rLg0KPiANCj4gQWJo
-aXNoZWssIGRvZXMgc2V0dGluZyByZW1vdGUgd2FrZXVwIGR1cmluZyBnbG9iYWwgc3VzcGVuZCB3
-b3JrcyBmb3IgeW91Pw0KIA0KSXQgZGVwZW5kcyBvbiB5b3VyIGRlc2lyZSBvbiBwb3dlciBjb25z
-dW1wdGlvbiBkdXJpbmcgZ2xvYmFsIHN1c3BlbmQuDQpUaGUgQlQgY29udHJvbGxlciB0YWtlcyBs
-ZXNzIHBvd2VyIGlmIGZpcm13YXJlIHdhcyBsb3N0IGR1cmluZyBnbG9iYWwgc3VzcGVuZC4NCg0K
-PiANCj4gPg0KPiA+PiBJZiBmaXJtd2FyZSB3YXMgcmV0YWluZWQsIGRvZXMgVVNCIHdhcm0gcmVz
-ZXQgYWZmZWN0IEJUIGNvbnRyb2xsZXIgaW4NCj4gPj4gYW55d2F5Pw0KPiA+DQo+ID4gVVNCIHdh
-cm0gcmVzZXQgc2hvdWxkbid0IGFmZmVjdCBCVCBjb250cm9sbGVyLg0KPiA+IEJ1dCBoY2kgZGV2
-aWNlIHdpbGwgbm90IHdvcmsgYWZ0ZXIgcmVzdW1lLCBiZWNhdXNlIGJ0cnRsIHdpbGwgZmluZCAi
-dW5rbm93bg0KPiBJQyBpbmZvLCBsbXAgc3VidmVydCAuLi4iIGFuZCByZXR1cm4gZXJyb3Igd2hl
-biBoY2kgZGV2aWNlIHNldHVwIGlzIGNhbGxlZC4NCj4gPiBUaXBzOiBUaGUgbG1wIHN1YnZlciBp
-biBjb250cm9sbGVyIGNoYW5nZXMgYWZ0ZXIgZmlybXdhcmUgZG93bmxvYWRpbmcuDQo+IEFuZCBk
-cml2ZXIgd2lsbCBmaW5kICIgdW5rbm93biBJQyBpbmZvLCBsbXAgc3VidmVyICAuLi4iIHdoZW4g
-c2V0dXAgaXMgY2FsbGVkDQo+IHdpdGggZmlybXdhcmUgcmV0YWluZWQuDQo+IA0KPiBUaGlzIHNo
-b3VsZCBhbHJlYWR5IGJlIGZpeGVkIGJ5ICJCbHVldG9vdGg6IGJ0cnRsOiBSZXN0b3JlIG9sZCBs
-b2dpYyB0byBhc3N1bWUNCj4gZmlybXdhcmUgaXMgYWxyZWFkeSBsb2FkZWQiLg0KPiANCj4gS2Fp
-LUhlbmcNCj4gDQo+ID4NCj4gPj4NCj4gPj4gS2FpLUhlbmcNCj4gPj4NCj4gPj4+DQo+ID4+Pj4N
-Cj4gPj4+PiBLYWktSGVuZw0KPiA+Pj4+DQo+ID4+Pj4+DQo+ID4+Pj4+IEBBbGV4IC0tIFdoYXQg
-aXMgdGhlIGNvbW1vbiBiZWhhdmlvciBmb3IgUmVhbHRlayBjb250cm9sbGVycz8NCj4gU2hvdWxk
-DQo+ID4+Pj4+IHdlIHNldCBCVFVTQl9XQUtFVVBfRElTQUJMRSBvbmx5IG9uIFJUTDg4MjJDRSBv
-ciBzaG91bGQgd2UNCj4gdW5zZXQNCj4gPj4gaXQNCj4gPj4+Pj4gb25seSBvbiBSVEw4ODIxQ0U/
-DQo+ID4+Pj4+DQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+PiBJIHdvdWxkIHByZWZlciB0aGlzIGRvZXNu
-J3QgZ2V0IGFjY2VwdGVkIGluIGl0cyBjdXJyZW50IHN0YXRlLg0KPiA+Pj4+Pj4NCj4gPj4+Pj4+
-IE9mIGNvdXJzZS4NCj4gPj4+Pj4+IEkgdGhpbmsgd2UgbmVlZCB0byBmaW5kIHRoZSByb290IGNh
-dXNlIGZvciB5b3VyIGNhc2UgYmVmb3JlIGFwcGx5aW5nDQo+IHRoaXMNCj4gPj4+PiBvbmUuDQo+
-ID4+Pj4+Pg0KPiA+Pj4+Pj4gS2FpLUhlbmcNCj4gPj4+Pj4+DQo+ID4+Pj4+Pj4NCj4gPj4+Pj4+
-PiBBYmhpc2hlaw0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gT24gV2VkLCBTZXAgMjMsIDIwMjAgYXQg
-MTA6NTYgQU0gS2FpLUhlbmcgRmVuZw0KPiA+Pj4+Pj4+IDxrYWkuaGVuZy5mZW5nQGNhbm9uaWNh
-bC5jb20+IHdyb3RlOg0KPiA+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+PiBSZWFsdGVrIGJsdWV0b290aCBj
-b250cm9sbGVyIG1heSBmYWlsIHRvIHdvcmsgYWZ0ZXIgc3lzdGVtIHNsZWVwOg0KPiA+Pj4+Pj4+
-PiBbIDEyNzIuNzA3NjcwXSBCbHVldG9vdGg6IGhjaTA6IGNvbW1hbmQgMHgxMDAxIHR4IHRpbWVv
-dXQNCj4gPj4+Pj4+Pj4gWyAxMjgwLjgzNTcxMl0gQmx1ZXRvb3RoOiBoY2kwOiBSVEw6DQo+IEhD
-SV9PUF9SRUFEX0xPQ0FMX1ZFUlNJT04NCj4gPj4+PiBmYWlsZWQgKC0xMTApDQo+ID4+Pj4+Pj4+
-DQo+ID4+Pj4+Pj4+IElmIHBsYXRmb3JtIGZpcm13YXJlIGRvZXNuJ3QgY3V0IHBvd2VyIG9mZiBk
-dXJpbmcgc3VzcGVuZCwgdGhlDQo+ID4+Pj4gZmlybXdhcmUNCj4gPj4+Pj4+Pj4gaXMgY29uc2lk
-ZXJlZCByZXRhaW5lZCBpbiBjb250cm9sbGVyIGJ1dCB0aGUgZHJpdmVyIGlzIHN0aWxsIGFza2lu
-ZyBVU0INCj4gPj4+Pj4+Pj4gY29yZSB0byBwZXJmb3JtIGEgcmVzZXQtcmVzdW1lLiBUaGlzIGNh
-biBtYWtlIGJsdWV0b290aA0KPiBjb250cm9sbGVyDQo+ID4+Pj4+Pj4+IHVudXNhYmxlLg0KPiA+
-Pj4+Pj4+Pg0KPiA+Pj4+Pj4+PiBTbyBhdm9pZCB1bm5lY2Vzc2FyeSByZXNldCB0byByZXNvbHZl
-IHRoZSBpc3N1ZS4NCj4gPj4+Pj4+Pj4NCj4gPj4+Pj4+Pj4gRm9yIGRldmljZXMgdGhhdCByZWFs
-bHkgbG9zZSBwb3dlciBkdXJpbmcgc3VzcGVuZCwgVVNCIGNvcmUgd2lsbA0KPiA+PiBkZXRlY3QN
-Cj4gPj4+Pj4+Pj4gYW5kIGhhbmRsZSByZXNldC1yZXN1bWUgY29ycmVjdGx5Lg0KPiA+Pj4+Pj4+
-Pg0KPiA+Pj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBLYWktSGVuZyBGZW5nIDxrYWkuaGVuZy5mZW5n
-QGNhbm9uaWNhbC5jb20+DQo+ID4+Pj4+Pj4+IC0tLQ0KPiA+Pj4+Pj4+PiBkcml2ZXJzL2JsdWV0
-b290aC9idHVzYi5jIHwgOCArKystLS0tLQ0KPiA+Pj4+Pj4+PiAxIGZpbGUgY2hhbmdlZCwgMyBp
-bnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiA+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+PiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0
-dXNiLmMNCj4gPj4+Pj4+Pj4gaW5kZXggOGQyNjA4ZGRmZDA4Li5kZTg2ZWY0Mzg4ZjkgMTAwNjQ0
-DQo+ID4+Pj4+Pj4+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPj4+Pj4+Pj4g
-KysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+Pj4+Pj4+PiBAQCAtNDI1NSwxNyAr
-NDI1NSwxNSBAQCBzdGF0aWMgaW50IGJ0dXNiX3N1c3BlbmQoc3RydWN0DQo+ID4+Pj4gdXNiX2lu
-dGVyZmFjZSAqaW50ZiwgcG1fbWVzc2FnZV90IG1lc3NhZ2UpDQo+ID4+Pj4+Pj4+ICAgICAgICAg
-ICAgIGVuYWJsZV9pcnEoZGF0YS0+b29iX3dha2VfaXJxKTsNCj4gPj4+Pj4+Pj4gICAgIH0NCj4g
-Pj4+Pj4+Pj4NCj4gPj4+Pj4+Pj4gLSAgICAgICAvKiBGb3IgZ2xvYmFsIHN1c3BlbmQsIFJlYWx0
-ZWsgZGV2aWNlcyBsb3NlIHRoZSBsb2FkZWQgZncNCj4gPj4+Pj4+Pj4gLSAgICAgICAgKiBpbiB0
-aGVtLiBCdXQgZm9yIGF1dG9zdXNwZW5kLCBmaXJtd2FyZSBzaG91bGQgcmVtYWluLg0KPiA+Pj4+
-Pj4+PiAtICAgICAgICAqIEFjdHVhbGx5LCBpdCBkZXBlbmRzIG9uIHdoZXRoZXIgdGhlIHVzYiBo
-b3N0IHNlbmRzDQo+ID4+Pj4+Pj4+ICsgICAgICAgLyogRm9yIGdsb2JhbCBzdXNwZW5kLCBSZWFs
-dGVrIGRldmljZXMgbG9zZSB0aGUgbG9hZGVkIGZ3IGluDQo+ID4+IHRoZW0NCj4gPj4+PiBpZg0K
-PiA+Pj4+Pj4+PiArICAgICAgICAqIHBsYXRmb3JtIGZpcm13YXJlIGN1dCBwb3dlciBvZmYuIEJ1
-dCBmb3IgYXV0b3N1c3BlbmQsDQo+ID4+Pj4gZmlybXdhcmUNCj4gPj4+Pj4+Pj4gKyAgICAgICAg
-KiBzaG91bGQgcmVtYWluLiAgQWN0dWFsbHksIGl0IGRlcGVuZHMgb24gd2hldGhlciB0aGUgdXNi
-DQo+IGhvc3QNCj4gPj4+PiBzZW5kcw0KPiA+Pj4+Pj4+PiAgICAgICogc2V0IGZlYXR1cmUgKGVu
-YWJsZSB3YWtldXApIG9yIG5vdC4NCj4gPj4+Pj4+Pj4gICAgICAqLw0KPiA+Pj4+Pj4+PiAgICAg
-aWYgKHRlc3RfYml0KEJUVVNCX1dBS0VVUF9ESVNBQkxFLCAmZGF0YS0+ZmxhZ3MpKSB7DQo+ID4+
-Pj4+Pj4+ICAgICAgICAgICAgIGlmIChQTVNHX0lTX0FVVE8obWVzc2FnZSkgJiYNCj4gPj4+Pj4+
-Pj4gICAgICAgICAgICAgICAgIGRldmljZV9jYW5fd2FrZXVwKCZkYXRhLT51ZGV2LT5kZXYpKQ0K
-PiA+Pj4+Pj4+PiAgICAgICAgICAgICAgICAgICAgIGRhdGEtPnVkZXYtPmRvX3JlbW90ZV93YWtl
-dXAgPSAxOw0KPiA+Pj4+Pj4+PiAtICAgICAgICAgICAgICAgZWxzZSBpZiAoIVBNU0dfSVNfQVVU
-TyhtZXNzYWdlKSkNCj4gPj4+Pj4+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YS0+dWRl
-di0+cmVzZXRfcmVzdW1lID0gMTsNCj4gPj4+Pj4+Pj4gICAgIH0NCj4gPj4+Pj4+Pj4NCj4gPj4+
-Pj4+Pj4gICAgIHJldHVybiAwOw0KPiA+Pj4+Pj4+PiAtLQ0KPiA+Pj4+Pj4+PiAyLjE3LjENCj4g
-Pj4+Pg0KPiA+Pj4+DQo+ID4+Pj4gLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVu
-dCBiZWZvcmUgcHJpbnRpbmcgdGhpcyBlLW1haWwuDQoNCg==
+Hi Marcel,
+
+在 2020-09-14 21:25，Marcel Holtmann 写道：
+> Hi Rocky,
+> 
+>>>> This patch add support for WCN6855 i.e. patch and nvm download
+>>>> support.
+>>>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>>>> ---
+>>>> drivers/bluetooth/btusb.c | 42 
+>>>> +++++++++++++++++++++++++++++++++++----
+>>>> 1 file changed, 38 insertions(+), 4 deletions(-)
+>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>> index fe80588c7bd3..e51e754ca9b8 100644
+>>>> --- a/drivers/bluetooth/btusb.c
+>>>> +++ b/drivers/bluetooth/btusb.c
+>>>> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
+>>>> #define BTUSB_MEDIATEK		0x200000
+>>>> #define BTUSB_WIDEBAND_SPEECH	0x400000
+>>>> #define BTUSB_VALID_LE_STATES   0x800000
+>>>> +#define BTUSB_QCA_WCN6855	0x1000000
+>>>> static const struct usb_device_id btusb_table[] = {
+>>>> 	/* Generic Bluetooth USB device */
+>>>> @@ -273,6 +274,10 @@ static const struct usb_device_id 
+>>>> blacklist_table[] = {
+>>>> 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
+>>>> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
+>>>> +	/* QCA WCN6855 chipset */
+>>>> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
+>>>> +						     BTUSB_WIDEBAND_SPEECH },
+>>>> +
+>>>> 	/* Broadcom BCM2035 */
+>>>> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+>>>> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+>>>> @@ -3391,6 +3396,26 @@ static int btusb_set_bdaddr_ath3012(struct 
+>>>> hci_dev *hdev,
+>>>> 	return 0;
+>>>> }
+>>>> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+>>>> +				const bdaddr_t *bdaddr)
+>>>> +{
+>>>> +	struct sk_buff *skb;
+>>>> +	u8 buf[6];
+>>>> +	long ret;
+>>>> +
+>>>> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
+>>>> +
+>>>> +	skb = __hci_cmd_sync(hdev, 0xfc14, sizeof(buf), buf, 
+>>>> HCI_INIT_TIMEOUT);
+>>>> +	if (IS_ERR(skb)) {
+>>>> +		ret = PTR_ERR(skb);
+>>>> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
+>>>> +		return ret;
+>>>> +	}
+>>>> +	kfree_skb(skb);
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>> What is wrong with using qca_set_bdaddr() function.
+>> WCN6855 is using different VSC to set the bt addr
+> 
+> int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> 
+> {
+> 
+>         struct sk_buff *skb;
+> 
+>         int err;
+> 
+> 
+> 
+>         skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6,
+> bdaddr,
+>                                 HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+> 
+>         if (IS_ERR(skb)) {
+> 
+>                 err = PTR_ERR(skb);
+> 
+>                 bt_dev_err(hdev, "QCA Change address cmd failed (%d)",
+> err);
+>                 return err;
+> 
+>         }
+> 
+> 
+> 
+>         kfree_skb(skb);
+> 
+> 
+> 
+>         return 0;
+> 
+> }
+> 
+> EXPORT_SYMBOL_GPL(qca_set_bdaddr);
+> 
+> I see that the other command is using HCI_EV_VENDOR, but is that on
+> purpose or an accident? Might want to confirm with the btmon trace.
+> 
+
+You are right this is an accident, this command for WCN6855 have command 
+complete event return. I will modify this in next patch update. Below is 
+the btmon log:
+
+Bluetooth monitor ver 5.48
+= Note: Linux version 5.8.0-rc6-hsp-upstream+ (x86_64)                 
+0.729933
+= Note: Bluetooth subsystem version 2.22                               
+0.729934
+= New Index: 00:00:00:00:5A:AD (Primary,USB,hci1)               [hci1] 
+0.729935
+= Open Index: 00:00:00:00:5A:AD                                 [hci1] 
+0.729935
+= Index Info: 00:00:00:00:5A:AD (Qualcomm)                      [hci1] 
+0.729935
+= New Index: 00:00:00:00:00:00 (Primary,UART,hci0)              [hci0] 
+0.729936
+@ MGMT Open: bluetoothd (privileged) version 1.18             {0x0002} 
+0.729936
+@ MGMT Open: bluetoothd (privileged) version 1.18             {0x0001} 
+0.729936
+@ MGMT Open: btmon (privileged) version 1.18                  {0x0003} 
+0.729945
+@ RAW Open: hcitool (privileged) version 2.22               {0x0004} 
+122.556176
+@ RAW Close: hcitool                                        {0x0004} 
+122.556200
+@ RAW Open: hcitool (privileged) version 2.22               {0x0004} 
+122.556219
+@ RAW Close: hcitool                                        {0x0004} 
+122.556223
+@ RAW Open: hcitool (privileged) version 2.22        {0x0004} [hci1] 
+122.556242
+< HCI Command: Vendor (0x3f|0x0014) plen 6                 #1 [hci1] 
+122.556643
+         01 02 03 04 05 06                                ......
+> HCI Event: Command Complete (0x0e) plen 4                #2 [hci1] 
+> 122.675312
+       Vendor (0x3f|0x0014) ncmd 1
+         Status: Success (0x00)
+@ RAW Close: hcitool                                 {0x0004} [hci1] 
+122.675545
+@ RAW Open: hcitool (privileged) version 2.22               {0x0004} 
+124.528658
+@ RAW Close: hcitool                                        {0x0004} 
+124.528683
+@ RAW Open: hcitool (privileged) version 2.22               {0x0004} 
+124.528703
+@ RAW Close: hcitool                                        {0x0004} 
+124.528708
+@ RAW Open: hcitool (privileged) version 2.22        {0x0004} [hci1] 
+124.528760
+< HCI Command: Read BD ADDR (0x04|0x0009) plen 0           #3 [hci1] 
+124.529024
+> HCI Event: Command Complete (0x0e) plen 10               #4 [hci1] 
+> 124.530311
+       Read BD ADDR (0x04|0x0009) ncmd 1
+         Status: Success (0x00)
+         Address: 01:02:03:04:05:06 (OUI 01-02-03)
+@ RAW Close: hcitool                                 {0x0004} [hci1] 
+124.530509
+
+
+
+> Regards
+> 
+> Marcel
