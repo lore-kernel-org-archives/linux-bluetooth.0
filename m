@@ -5,67 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC24BC47420
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 00:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C057DC4727E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 00:40:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 538512371F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 00:40:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64B8323A60
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 00:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RRNSN2v/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ltzx186I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbgIYAk0 (ORCPT
+        id S1726986AbgIYAkj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Sep 2020 20:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
+        Thu, 24 Sep 2020 20:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726860AbgIYAkY (ORCPT
+        with ESMTP id S1726921AbgIYAka (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Sep 2020 20:40:24 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C5CC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 17:40:23 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id w126so843426qka.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 17:40:23 -0700 (PDT)
+        Thu, 24 Sep 2020 20:40:30 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3DEC0613CE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 17:40:29 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n13so1035598ybk.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 17:40:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=Z8efH0VT0gu9mhE3Qe4fVs6J3IFKx4DbBtzU2cWSOyc=;
-        b=RRNSN2v/SyaYP2fZsZh2mG7mDOWv4UWpwlF4ah5Ah7pxNRp4gjq5SRIjmzOqEvtuNg
-         o2sZIvQXtBPsbhmZxlSWBHeRJtBCSS/DQpLgpUmZKrrP9dyXTU0506LL192MiSvzY4l2
-         P55P5nHR+wxjI1Gs0ydUIf0fyYUrBmK8XHfyFu/oVSqqsdXZLjYLyGdtBus6B1Plui3C
-         CSJdObmJswm4v5Y8kYvKlCq08vWHXbwA4lohzsyPJ5WcMX8mnTYWlvKJlxpb0vkoSfEY
-         6ovwP5H3ioE2gnIgIBVtS4T5+9afRYesMgJ5C5MXE8gLn+NyaeMfENu8SJHiHwrYMxdj
-         4idQ==
+        bh=9vNEvvUIDBOqKQiSXDRUkR6P7PLe/wNVFPtGBFmmkGE=;
+        b=Ltzx186IEAfhs/TM0zNVgVXblVxhmnDnbLh+h3NX3PcWhWVYnDb7FHwyZN89gHT9/F
+         JcBO/jnp0iV4fMuRgaY1Ruy5D1kXwZdA+w8bzuO5kOP/Ki/hrvSXzDaI2X4GFtqT86bz
+         gds3FfFHyHe8xSOcvZPmv0N7c9Fg1ronyrkVH2R03fj5vbqjbC2KjH5mDJRijkAlBb8T
+         ZLjhuww6ukHgZ6icY0oavEtJN9Rnt+uPL5UNBXVcVkUfVoURdG5iY2IAiLWiLN1Q6P3/
+         eFX1QfSY3xnvB48imWRaQ0tDpLNGkpPkeDuTXXuILz3Fv4T2x9KOlWP2ouCAoYcVOL8v
+         NYdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Z8efH0VT0gu9mhE3Qe4fVs6J3IFKx4DbBtzU2cWSOyc=;
-        b=GtTeRdOC85diAYNq8AKw6DdtfUGqZSob0EfSxTaOZXMZ2X8v+BXrfjjKtu+u57gYYQ
-         hPRq0iNLVkZHndDQU3DOXkYqJArN3zB9PG809M2Gp/QcjQkRvn7L6L8VElH9kcnwFZql
-         ZVGIBZ6IaBu+KyLI7DPheYTTVfmkT7pBcB8Li+UPWdNgHScizWjXWjd1JzpRQmt1nPBn
-         ev7Vwg96swp7VXr4X/MBBcN1TrDNpQP0HtSxXiqLKk2eYtNK+kZufDL5d5Hs6sOtxpIW
-         F6r/ZRBskej7gDV9zkFYqPGs9N0C1SJI8BgWzxCEIwXaHKRN4AfFqHdrziXtO/10Sahi
-         xcmQ==
-X-Gm-Message-State: AOAM5302InPyoZCgwsmaIYZItR37nI7YttExpvmWqmXg5FMLueXtOiCZ
-        4rYKEXKR1HF7FD69cRa6eAN13URG4vaJ5N+KMlbn
-X-Google-Smtp-Source: ABdhPJyV/rAxfDsY0L/wJmbvjNXMni1QAb7QYZR3zx5lVh17Q9z49dofhpNr8cuz5voKcmUTwrMX5BPRRI2y94zqSYmw
+        bh=9vNEvvUIDBOqKQiSXDRUkR6P7PLe/wNVFPtGBFmmkGE=;
+        b=PGZFwKutKmIttf6eSp2+e2DpE78ah3olIEgnJ0PXI1yDXlMJMfBiwVlJS/Hr+EeY84
+         fZ7N1OEl4dsD9cKffV6nM9/ktQ2424SIg4/2i/HWwUXZRLTuDhKeMy50CHY0bFTvCyRQ
+         POJKNz/Eo/g5OkvehUVsehYxlyIPu/dEsJ7cI8U93GtxPQucAUP7C/ltIUwekcro+QpU
+         MUxH1KPGHI/9nfe1PubJqUDS09Pi8SYoqbSo/1MDG5gjXXiqQ2pYKFfmfgk/3/7syjhS
+         KNRFHHOV9RAOScC7pakI9jSbEHEMbYqB+MD8MnVC3q4FGgzTH68e/DYMPRaptjtu8Wt/
+         Q13Q==
+X-Gm-Message-State: AOAM533EIGasYX6OxM5xStBmIJrr6P2q6cfAogis4JI/IdBx3qYZbpsI
+        3VQoItatfkc2tMuZ81BMPH3Wsf0FCL6nKiI31iQ6
+X-Google-Smtp-Source: ABdhPJycwEOeq9SoiVUtSLz9NGhsj5V36ZAhSTBYnN71PhiOT1PfnTNHTpGxsWQ85zjR36NxW/+EvexKxNEv1ymQ7zT2
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:ad4:4f30:: with SMTP id
- fc16mr1922865qvb.6.1600994422858; Thu, 24 Sep 2020 17:40:22 -0700 (PDT)
-Date:   Thu, 24 Sep 2020 17:40:03 -0700
+ (user=danielwinkler job=sendgmr) by 2002:a25:2388:: with SMTP id
+ j130mr2252062ybj.40.1600994429153; Thu, 24 Sep 2020 17:40:29 -0700 (PDT)
+Date:   Thu, 24 Sep 2020 17:40:06 -0700
 In-Reply-To: <20200925004007.2378410-1-danielwinkler@google.com>
-Message-Id: <20200924173752.v3.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
+Message-Id: <20200924173752.v3.4.Ibedcb7af24f1c01a680de4cc8cc5a98951588393@changeid>
 Mime-Version: 1.0
 References: <20200925004007.2378410-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH v3 1/5] Bluetooth: Add helper to set adv data
+Subject: [PATCH v3 4/5] Bluetooth: Query LE tx power on startup
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -81,10 +81,13 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We wish to handle advertising data separately from advertising
-parameters in our new MGMT requests. This change adds a helper that
-allows the advertising data and scan response to be updated for an
-existing advertising instance.
+Queries tx power via HCI_LE_Read_Transmit_Power command when the hci
+device is initialized, and stores resulting min/max LE power in hdev
+struct. If command isn't available (< BT5 support), min/max values
+both default to HCI_TX_POWER_INVALID.
+
+This patch is manually verified by ensuring BT5 devices correctly query
+and receive controller tx power range.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Signed-off-by: Daniel Winkler <danielwinkler@google.com>
@@ -93,66 +96,105 @@ Signed-off-by: Daniel Winkler <danielwinkler@google.com>
 Changes in v3: None
 Changes in v2: None
 
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+ include/net/bluetooth/hci.h      |  7 +++++++
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         |  8 ++++++++
+ net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
+ 4 files changed, 35 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c8e67042a3b14c..c1504aa3d9cfd5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1797,6 +1797,13 @@ struct hci_cp_le_set_adv_set_rand_addr {
+ 	bdaddr_t  bdaddr;
+ } __packed;
+ 
++#define HCI_OP_LE_READ_TRANSMIT_POWER	0x204b
++struct hci_rp_le_read_transmit_power {
++	__u8  status;
++	__s8  min_le_tx_power;
++	__s8  max_le_tx_power;
++} __packed;
++
+ #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
+ struct hci_rp_le_read_buffer_size_v2 {
+ 	__u8    status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9873e1c8cd163b..300b3572d479e1 100644
+index ab168f46b6d909..9463039f85442c 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1291,6 +1291,9 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 			 u16 adv_data_len, u8 *adv_data,
- 			 u16 scan_rsp_len, u8 *scan_rsp_data,
- 			 u16 timeout, u16 duration);
-+int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
-+			 u16 adv_data_len, u8 *adv_data,
-+			 u16 scan_rsp_len, u8 *scan_rsp_data);
- int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
- void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
+@@ -381,6 +381,8 @@ struct hci_dev {
+ 	__u16		def_page_timeout;
+ 	__u16		def_multi_adv_rotation_duration;
+ 	__u16		def_le_autoconnect_timeout;
++	__s8		min_le_tx_power;
++	__s8		max_le_tx_power;
  
+ 	__u16		pkt_type;
+ 	__u16		esco_type;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8a2645a8330137..3f73f147826409 100644
+index 3a2332f4a9bba2..6bff1c09be3b42 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3005,6 +3005,37 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 	return 0;
+@@ -741,6 +741,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+ 		}
+ 
++		if (hdev->commands[38] & 0x80) {
++			/* Read LE Min/Max Tx Power*/
++			hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
++				    0, NULL);
++		}
++
+ 		if (hdev->commands[26] & 0x40) {
+ 			/* Read LE White List Size */
+ 			hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE,
+@@ -3654,6 +3660,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->le_num_of_adv_sets = HCI_MAX_ADV_INSTANCES;
+ 	hdev->def_multi_adv_rotation_duration = HCI_DEFAULT_ADV_DURATION;
+ 	hdev->def_le_autoconnect_timeout = HCI_LE_AUTOCONN_TIMEOUT;
++	hdev->min_le_tx_power = HCI_TX_POWER_INVALID;
++	hdev->max_le_tx_power = HCI_TX_POWER_INVALID;
+ 
+ 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4281f4ac6700d4..de51188a3dc15d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1202,6 +1202,20 @@ static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
  }
  
-+/* This function requires the caller holds hdev->lock */
-+int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
-+			      u16 adv_data_len, u8 *adv_data,
-+			      u16 scan_rsp_len, u8 *scan_rsp_data)
++static void hci_cc_le_read_transmit_power(struct hci_dev *hdev,
++					  struct sk_buff *skb)
 +{
-+	struct adv_info *adv_instance;
++	struct hci_rp_le_read_transmit_power *rp = (void *)skb->data;
 +
-+	adv_instance = hci_find_adv_instance(hdev, instance);
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
 +
-+	/* If advertisement doesn't exist, we can't modify its data */
-+	if (!adv_instance)
-+		return -ENOENT;
++	if (rp->status)
++		return;
 +
-+	if (adv_data_len) {
-+		memset(adv_instance->adv_data, 0,
-+		       sizeof(adv_instance->adv_data));
-+		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
-+		adv_instance->adv_data_len = adv_data_len;
-+	}
-+
-+	if (scan_rsp_len) {
-+		memset(adv_instance->scan_rsp_data, 0,
-+		       sizeof(adv_instance->scan_rsp_data));
-+		memcpy(adv_instance->scan_rsp_data,
-+		       scan_rsp_data, scan_rsp_len);
-+		adv_instance->scan_rsp_len = scan_rsp_len;
-+	}
-+
-+	return 0;
++	hdev->min_le_tx_power = rp->min_le_tx_power;
++	hdev->max_le_tx_power = rp->max_le_tx_power;
 +}
 +
- /* This function requires the caller holds hdev->lock */
- void hci_adv_monitors_clear(struct hci_dev *hdev)
+ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
  {
+ 	__u8 *sent, status = *((__u8 *) skb->data);
+@@ -3574,6 +3588,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_set_adv_set_random_addr(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_READ_TRANSMIT_POWER:
++		hci_cc_le_read_transmit_power(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
 -- 
 2.28.0.709.gb0816b6eb0-goog
 
