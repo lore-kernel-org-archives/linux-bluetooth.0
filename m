@@ -2,222 +2,104 @@ Return-Path: <SRS0=+RU5=DC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D68EC4727C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662A3C4363D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 161F221D7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 184E122B2D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:27:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MDPyV9Jy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eApvrKwI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728371AbgIYMD2 (ORCPT
+        id S1728179AbgIYM1G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 08:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59448 "EHLO
+        Fri, 25 Sep 2020 08:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728171AbgIYMD2 (ORCPT
+        with ESMTP id S1726368AbgIYM1G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 08:03:28 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9371C0613D4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:03:27 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id x23so2781975wmi.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:03:27 -0700 (PDT)
+        Fri, 25 Sep 2020 08:27:06 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCBBC0613CE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:27:06 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id w7so3027282pfi.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:27:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j5bxVuVEiqgVlanRePu6dA6f3zbOwxopbpYSWu4POWk=;
-        b=MDPyV9JyNqYevanfnR1rtU6bGSJi5p22RFCAgfzYRhndYJbn0RxvNFymUBVUq4yloI
-         S4qD6N6aOmqKaKJ3GB85EN9rAv8IUaxoqgdb2mNeMJVMshswtqP8T9ylfJpuZA9UkUn3
-         l7EQm23e1bLg8EJyQYf2M+9sF2W4Lbs7Dfb9HQFMp9OH9hrCRW4UQL1+TesXYm1WCV9n
-         1R7zAWPZCAoRcuosg+vaNhWV4JbAa5ufV/0bCW488jixR38gD9VA8YMaIwYyW4NOEKuE
-         BifDoz1UDzLiL4YUjGcDGeBtDvXAvEHLGETy/hu8aZmzt5HxukVVB+giAbqqqNk+DLw9
-         ov2A==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=b6h9h7KGCgp2Fmjt8/xk5iaXlAGfTMxsta23UpCu97s=;
+        b=eApvrKwIc2nxuMN0p5iMYtBA5BQfZv2BR1n4pXSiLZhDYMv0XGobc0iBkBbtEhA2aW
+         TaXXbC3J7XYW4LtSBEfNYWMRRhvkLvZyO847541HtPmIFSwxGjiYuF9gDvi3nv+7Z2wG
+         rQ5Bs4iZyeEwnevF8UAttBsobuPkwvBWn/fodOvzo2gejKQEVQZdi7qWmHy72Hu79y2f
+         4uerRkuvde/D0JN4ITijIrt6M0g2VEFKxnBEkKIbcwGsClMx162DSF7cARvuph3AUR4a
+         ontwwXSQb7TXDz72uZoBGYsHu1pqSaqcklfDneDGJt5pFs+fUjsokD4bBsMrpIT3kxub
+         yKDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j5bxVuVEiqgVlanRePu6dA6f3zbOwxopbpYSWu4POWk=;
-        b=VGtQqFGMCVe+OtzNAUuDncRCqSpKzJ5wgy9vy7xcPlBPIrMh368hAD+ZMJBm90Jty6
-         P12YcQSAnAaZB9fteZz8ZkAlGkuh+J09GNDbmErNwkRSvAXxXeReZk89QJm8325vwSCv
-         +Mv0Vf3tyNUPsy9JmOEWfUjI+Rfehpu8ZM7+Jb0Vj3tRp2Yxk1HzTG54LcNFqmHS8LQd
-         9a6zHD/O9wujUL1H62wzQ+jjlbDsJj66Ot+6PsjHp/yr9y1AzXXrXQQzMqoTMtnS8+YW
-         wPBbD9hROhCsxBKKEnYY+dTqC12H/9tLgimg8cY9EZWr01kLYK5Kg4triKz2VXDZKG5f
-         wQ9w==
-X-Gm-Message-State: AOAM532C8hGM2BHkwymPnPeOMulY8EwT65Y6AMA6hwjMFLBJeoWJYrEm
-        gBrj13bUO/heivEri1+4tm0o0Z/rhjHKBcNce6RMyw==
-X-Google-Smtp-Source: ABdhPJwVtZag41aA0S3BJWbfmQKAI4dJew+ojCY35ogBbonXZ4WZsj9CG4j40D5B/FOP70hS4l9dJdXHX+9Fd2IJojg=
-X-Received: by 2002:a7b:cd05:: with SMTP id f5mr2753455wmj.116.1601035405961;
- Fri, 25 Sep 2020 05:03:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200921155004.v2.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
- <CABBYNZLTZbwyL0ykmFezWrkNVnHoZt2KPtz+aQwo7TvhdC7TiQ@mail.gmail.com>
- <CAJQfnxFjL6RicwHyFgYzNp7WPrMePEOa2fgOX9TMju-z5AWsPg@mail.gmail.com> <CABBYNZJdY+QBiCk9nBhJ-gUm-K0ZF6U=03f+tqKvs7c+oG=axA@mail.gmail.com>
-In-Reply-To: <CABBYNZJdY+QBiCk9nBhJ-gUm-K0ZF6U=03f+tqKvs7c+oG=axA@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 25 Sep 2020 20:03:14 +0800
-Message-ID: <CAJQfnxEk5aA_N8+-O4bojcirtXPYAtMf0LmFAJ3cF5M_f=uA0A@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Check for encryption key size on connect
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=b6h9h7KGCgp2Fmjt8/xk5iaXlAGfTMxsta23UpCu97s=;
+        b=tOYHbMvfhkDK6e/ujlDD3EkOLPNRxE1pzljeF1OC3+qbYAhI7J0QuCTYuyaZ/dc7WI
+         zFiv/81h1rHlsoXc2gtlcfEgoY4wQ/Qo8vF1Kmr+PvT0kDgQJd0WGAVNUAXftk8uk9gK
+         jP1TXL+y0K4kloSukCO9p46UojDpTpU0V7rb+rxbIlkRV4j2pPth3UIcoo1aAuuwF6La
+         eCXaEoe4f8VhV6OifS+31skilAiICeuGbC9h+LjOC7Y5gQTDDXg9tBgJiOX3gsRgX0ec
+         gJwEjN3i5lAPmQC9+QjdZk3Atn1Fffxa/a9TYzUacGQzXvLu3J58ztocKgj4OY4+YdSC
+         Klfg==
+X-Gm-Message-State: AOAM532JR+pmJzM9kf22zBBzypoP3pI/elBCjY7XoO3UcFs6MtlERjVQ
+        YLH99xmSdClqN5Tjje7p0xvtN/4a2kxphiYE
+X-Google-Smtp-Source: ABdhPJznSqRYlqycZMg8g3bYXOTcKI98VVAvnzpqDwt2MKVFIVjJ8HlchbSj1Fn9H4bGdwRjoioyog==
+X-Received: by 2002:aa7:9518:0:b029:142:2501:35e3 with SMTP id b24-20020aa795180000b0290142250135e3mr3754128pfp.67.1601036825541;
+        Fri, 25 Sep 2020 05:27:05 -0700 (PDT)
+Received: from nsathish-Latitude-7480.iind.intel.com ([134.134.139.76])
+        by smtp.gmail.com with ESMTPSA id a27sm2775956pfk.52.2020.09.25.05.27.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Sep 2020 05:27:04 -0700 (PDT)
+From:   Sathish Narasimman <nsathish41@gmail.com>
+X-Google-Original-From: Sathish Narasimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com,
+        kiran.k@intel.com,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH] Bluetooth: Fix - update own_addr_type if ll_privacy supported
+Date:   Fri, 25 Sep 2020 18:02:15 +0530
+Message-Id: <20200925123215.15569-1-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+During system powercycle when trying to get the random address
+hci_get_random_address set own_addr_type as 0x01. In which if we enable
+ll_privacy it is supposed to be 0x03.
 
-On Wed, 23 Sep 2020 at 01:03, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Tue, Sep 22, 2020 at 12:48 AM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Tue, 22 Sep 2020 at 01:15, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > >
-> > > On Mon, Sep 21, 2020 at 12:56 AM Archie Pusaka <apusaka@google.com> wrote:
-> > > >
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > When receiving connection, we only check whether the link has been
-> > > > encrypted, but not the encryption key size of the link.
-> > > >
-> > > > This patch adds check for encryption key size, and reject L2CAP
-> > > > connection which size is below the specified threshold (default 7)
-> > > > with security block.
-> > > >
-> > > > Here is some btmon trace.
-> > > > @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.847722
-> > > >         Store hint: No (0x00)
-> > > >         BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
-> > > >         Key type: Unauthenticated Combination key from P-192 (0x04)
-> > > >         Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
-> > > >         PIN length: 0
-> > > > > HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871537
-> > > >         Status: Success (0x00)
-> > > >         Handle: 256
-> > > >         Encryption: Enabled with E0 (0x01)
-> > > > < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.871609
-> > > >         Handle: 256
-> > > > > HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872524
-> > > >       Read Encryption Key Size (0x05|0x0008) ncmd 1
-> > > >         Status: Success (0x00)
-> > > >         Handle: 256
-> > > >         Key size: 3
-> > > >
-> > > > ////// WITHOUT PATCH //////
-> > > > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895023
-> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
-> > > >         PSM: 4097 (0x1001)
-> > > >         Source CID: 64
-> > > > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.895213
-> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
-> > > >         Destination CID: 64
-> > > >         Source CID: 64
-> > > >         Result: Connection successful (0x0000)
-> > > >         Status: No further information available (0x0000)
-> > > >
-> > > > ////// WITH PATCH //////
-> > > > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887024
-> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
-> > > >         PSM: 4097 (0x1001)
-> > > >         Source CID: 64
-> > > > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.887127
-> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
-> > > >         Destination CID: 0
-> > > >         Source CID: 64
-> > > >         Result: Connection refused - security block (0x0003)
-> > > >         Status: No further information available (0x0000)
-> > > >
-> > > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > >
-> > > > ---
-> > > > Btw, it looks like the patch sent by Alex Lu with the title
-> > > > [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
-> > > > also solves the exact same issue.
-> > > >
-> > > > Changes in v2:
-> > > > * Add btmon trace to the commit message
-> > > >
-> > > >  net/bluetooth/l2cap_core.c | 3 ++-
-> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > > > index ade83e224567..b4fc0ad38aaa 100644
-> > > > --- a/net/bluetooth/l2cap_core.c
-> > > > +++ b/net/bluetooth/l2cap_core.c
-> > > > @@ -4101,7 +4101,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-> > > >
-> > > >         /* Check if the ACL is secure enough (if not SDP) */
-> > > >         if (psm != cpu_to_le16(L2CAP_PSM_SDP) &&
-> > > > -           !hci_conn_check_link_mode(conn->hcon)) {
-> > > > +           (!hci_conn_check_link_mode(conn->hcon) ||
-> > > > +           !l2cap_check_enc_key_size(conn->hcon))) {
-> > >
-> > > I wonder if we couldn't incorporate the check of key size into
-> > > hci_conn_check_link_mode, like I said in the first patch checking the
-> > > enc key size should not be specific to L2CAP.
-> >
-> > Yes, I could move the check into hci_conn_check_link_mode.
-> > At first look, this function is also called by AMP which I am not
-> > familiar with. In addition, I found this patch which moves this check
-> > outside hci_conn, so I have my doubts there.
-> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=693cd8ce3f882524a5d06f7800dd8492411877b3
->
-> Right, I think we can have it as part of the hci_conn_check_link_mode,
-> that said it is perhaps better to have it as
-> hci_conn_check_enc_key_size instead as it is not L2CAP expecific.
-> Other than that it looks good to me.
+Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+---
+ net/bluetooth/hci_request.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Do you mean we should move l2cap_conn_check_enc_key_size to
-hci_conn_check_enc_key_size? I think that is a good idea.
-We also have hci_conn_check_secure which I am unsure what the purpose
-is. I'll try to merge them together.
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index d2b06f5c9380..6f12bab4d2fa 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1885,7 +1885,13 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 	if (use_rpa) {
+ 		int to;
+ 
+-		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		/* If Controller supports LL Privacy use own address type is
++		 * 0x03
++		 */
++		if (use_ll_privacy(hdev))
++			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
++		else
++			*own_addr_type = ADDR_LE_DEV_RANDOM;
+ 
+ 		if (adv_instance) {
+ 			if (!adv_instance->rpa_expired &&
+-- 
+2.17.1
 
->
-> > >
-> > > >                 conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
-> > > >                 result = L2CAP_CR_SEC_BLOCK;
-> > > >                 goto response;
-> > > > --
-> > > > 2.28.0.681.g6f77f65b4e-goog
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> > Thanks,
-> > Archie
->
->
->
-> --
-> Luiz Augusto von Dentz
-
-Thanks,
-Archie
