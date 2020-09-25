@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8CAC4741F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E03CEC4727D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:37:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59566206E5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 999B920756
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:37:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729294AbgIYQZy convert rfc822-to-8bit (ORCPT
+        id S1729331AbgIYQhd convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 12:25:54 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34083 "EHLO
+        Fri, 25 Sep 2020 12:37:33 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59995 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729123AbgIYQZy (ORCPT
+        with ESMTP id S1728038AbgIYQhd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 12:25:54 -0400
+        Fri, 25 Sep 2020 12:37:33 -0400
 Received: from [172.20.10.2] (dynamic-046-114-136-219.46.114.pool.telefonica.de [46.114.136.219])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 82CBFCECDE;
-        Fri, 25 Sep 2020 18:32:49 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id ABFAECECDE;
+        Fri, 25 Sep 2020 18:44:29 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH v1] Bluetooth: Enforce key size of 16 bytes on FIPS level
+Subject: Re: [PATCH v3] Bluetooth: Check for encryption key size on connect
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200921163021.v1.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
-Date:   Fri, 25 Sep 2020 18:25:48 +0200
+In-Reply-To: <20200922155548.v3.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
+Date:   Fri, 25 Sep 2020 18:37:29 +0200
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        open list <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <4819769E-04AD-42A7-BC2C-9C628EEDE3F3@holtmann.org>
-References: <20200921163021.v1.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
+Message-Id: <BC59363A-B32A-4DAA-BAF5-F7FBA01752E6@holtmann.org>
+References: <20200922155548.v3.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
 To:     Archie Pusaka <apusaka@google.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
@@ -50,42 +50,89 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Archie,
 
-> According to the spec Ver 5.2, Vol 3, Part C, Sec 5.2.2.8:
-> Device in security mode 4 level 4 shall enforce:
-> 128-bit equivalent strength for link and encryption keys required
-> using FIPS approved algorithms (E0 not allowed, SAFER+ not allowed,
-> and P-192 not allowed; encryption key not shortened)
+> When receiving connection, we only check whether the link has been
+> encrypted, but not the encryption key size of the link.
 > 
-> This patch rejects connection with key size below 16 for FIPS level
-> services.
+> This patch adds check for encryption key size, and reject L2CAP
+> connection which size is below the specified threshold (default 7)
+> with security block.
+> 
+> Here is some btmon trace.
+> @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.847722
+>        Store hint: No (0x00)
+>        BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
+>        Key type: Unauthenticated Combination key from P-192 (0x04)
+>        Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
+>        PIN length: 0
+>> HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871537
+>        Status: Success (0x00)
+>        Handle: 256
+>        Encryption: Enabled with E0 (0x01)
+> < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.871609
+>        Handle: 256
+>> HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872524
+>      Read Encryption Key Size (0x05|0x0008) ncmd 1
+>        Status: Success (0x00)
+>        Handle: 256
+>        Key size: 3
+> 
+> ////// WITHOUT PATCH //////
+>> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895023
+>      L2CAP: Connection Request (0x02) ident 3 len 4
+>        PSM: 4097 (0x1001)
+>        Source CID: 64
+> < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.895213
+>      L2CAP: Connection Response (0x03) ident 3 len 8
+>        Destination CID: 64
+>        Source CID: 64
+>        Result: Connection successful (0x0000)
+>        Status: No further information available (0x0000)
+> 
+> ////// WITH PATCH //////
+>> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887024
+>      L2CAP: Connection Request (0x02) ident 3 len 4
+>        PSM: 4097 (0x1001)
+>        Source CID: 64
+> < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.887127
+>      L2CAP: Connection Response (0x03) ident 3 len 8
+>        Destination CID: 0
+>        Source CID: 64
+>        Result: Connection refused - security block (0x0003)
+>        Status: No further information available (0x0000)
 > 
 > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
 > 
 > ---
 > 
-> net/bluetooth/l2cap_core.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
+> Changes in v3:
+> * Move the check to hci_conn_check_link_mode()
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ade83e224567..306616ec26e6 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1515,8 +1515,13 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-> 	 * that have no key size requirements. Ensure that the link is
-> 	 * actually encrypted before enforcing a key size.
-> 	 */
-> +	int min_key_size = hcon->hdev->min_enc_key_size;
+> Changes in v2:
+> * Add btmon trace to the commit message
+> 
+> net/bluetooth/hci_conn.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 9832f8445d43..89085fac797c 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1348,6 +1348,10 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+> 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+> 		return 0;
+> 
+> +	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
+> +	    conn->enc_key_size < conn->hdev->min_enc_key_size)
+> +		return 0;
 > +
-> +	if (hcon->sec_level == BT_SECURITY_FIPS)
-> +		min_key_size = 16;
-> +
-> 	return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-> -		hcon->enc_key_size >= hcon->hdev->min_enc_key_size);
-> +		hcon->enc_key_size >= min_key_size);
+> 	return 1;
 > }
 
-I think this is fine at this position. It is a L2CAP socket requirement to be in FIPS mode since you will set it via socket option. However I would extend the comment above to describe what is going on. And generally the variable declaration might be better placed before the comment.
+I am a bit concerned since we had that check and I on purpose moved it. See commit 693cd8ce3f88 for the change where I removed and commit d5bb334a8e17 where I initially added it.
+
+Naively adding the check in that location caused a major regression with Bluetooth 2.0 devices. This makes me a bit reluctant to re-add it here since I restructured the whole change to check the key size a different location.
+
+Now I have to ask, are you running an upstream kernel with both commits above that address KNOB vulnerability?
 
 Regards
 
