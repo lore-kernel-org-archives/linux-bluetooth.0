@@ -2,227 +2,205 @@ Return-Path: <SRS0=+RU5=DC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDA1C4727F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 07:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 275E8C4363D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 07:56:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D2BB20717
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 07:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C287D23600
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 07:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbgIYHmi (ORCPT
+        id S1727557AbgIYH4I convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 03:42:38 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:53578 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727068AbgIYHmh (ORCPT
+        Fri, 25 Sep 2020 03:56:08 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:57083 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727238AbgIYH4I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 03:42:37 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 08P7gMzK5012950, This message is accepted by code: ctloc85258
-Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
-        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 08P7gMzK5012950
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 25 Sep 2020 15:42:22 +0800
-Received: from RSEXMBS01.realsil.com.cn (172.29.17.195) by
- RSEXMBS01.realsil.com.cn (172.29.17.195) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2044.4; Fri, 25 Sep 2020 15:42:21 +0800
-Received: from RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37]) by
- RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37%7]) with mapi id
- 15.01.2044.004; Fri, 25 Sep 2020 15:42:21 +0800
-From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
-CC:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Fri, 25 Sep 2020 03:56:08 -0400
+Received: from mail-pf1-f198.google.com ([209.85.210.198])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <kai.heng.feng@canonical.com>)
+        id 1kLiaL-00022r-Nr
+        for linux-bluetooth@vger.kernel.org; Fri, 25 Sep 2020 07:56:05 +0000
+Received: by mail-pf1-f198.google.com with SMTP id q5so1518383pfl.16
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 00:56:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=8ugg/DkpzBwuYR7dhD22Q37qdrmr6sS3PgbT3G/CEuk=;
+        b=G34FcPA6D9NUY0hMFfrtihhMRMctvCQTy9vun0Sg7UM/neTdpL1W+jVU2kFO1Iz0jI
+         yp0xT3LKQyglrtV4v2mYJSv/z6CYarqm5aWp5fR70FdYoQEF7e69r13UT0ksaTu6TlG4
+         QEnL8gUF9aKZ0XDk28luxP2icm2tLGoAcsxVzXTcqRmIyyBCFVlY8PpWZYw2JC1Ztcgc
+         /88fCU8HkKwAHCRH4V1pkTse4EmVU6PQNw2cuYJPOVKvyRAuMxTo7IFxG4SQcDb1JXIm
+         XZ1mj8ZcTngZ1a3130M03wWy//sXkM+OtOmjQYbnEEcpO8qKYHl5x7/tryWCYWOknnZx
+         9FfQ==
+X-Gm-Message-State: AOAM531craKIwGODhiWPU4FaV27+tTdCHmcVrAb8bVDn7Ci++PGkBSd0
+        0kKC/PzX49vTv3st2tMz5zMgePbq9ntLOQU41d7uVv2deKWgJtq4tQRLjGgLWXz3eJT+W0taFuZ
+        8hcfRi+LAmNpAlN+3kLwiGHPXiRy/lojh6SkbuSXoZhWsGA==
+X-Received: by 2002:a17:90a:5a48:: with SMTP id m8mr1520792pji.181.1601020563775;
+        Fri, 25 Sep 2020 00:56:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7qLIybDPC6grPZEe6B+ySzbx/Wm55NTGLHpPWYC/v8XxO10A+HeUuxt+dyiXPhfzkExo01A==
+X-Received: by 2002:a17:90a:5a48:: with SMTP id m8mr1520775pji.181.1601020563365;
+        Fri, 25 Sep 2020 00:56:03 -0700 (PDT)
+Received: from [192.168.1.208] (220-133-187-190.HINET-IP.hinet.net. [220.133.187.190])
+        by smtp.gmail.com with ESMTPSA id 27sm1433719pgy.26.2020.09.25.00.56.01
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 25 Sep 2020 00:56:02 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
+ resume
+From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
+In-Reply-To: <70edd6da224048488806d2af89294d3e@realsil.com.cn>
+Date:   Fri, 25 Sep 2020 15:56:00 +0800
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
         "open list:USB XHCI DRIVER" <linux-usb@vger.kernel.org>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEJsdWV0b290aDogYnR1c2I6IEF2b2lkIHVubmVj?= =?utf-8?Q?essary_reset_upon_system_resume?=
-Thread-Topic: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
- resume
-Thread-Index: AdaTCgz9jigV3dr0CE6uDdt266LEL///fL2A//94aZA=
-Date:   Fri, 25 Sep 2020 07:42:21 +0000
-Message-ID: <70edd6da224048488806d2af89294d3e@realsil.com.cn>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B7DF43CE-1BD7-4A2B-838F-2CAC914E209B@canonical.com>
 References: <6b46b6bca9d3486499d0374eb277b00c@realsil.com.cn>
  <4055CF26-9A1F-42E6-A88A-3726B4532669@canonical.com>
-In-Reply-To: <4055CF26-9A1F-42E6-A88A-3726B4532669@canonical.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <70edd6da224048488806d2af89294d3e@realsil.com.cn>
+To:     =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgS2FpLUhlbmcsDQoNCj4gT24gMjUgU2VwdGVtYmVyIDIwMjAgYXQgMTU6MTQsIEthaS1IZW5n
-IEZlbmcgd3JvdGU6DQo+IA0KPiBIaSBBbGV4LA0KPiANCj4gPiBPbiBTZXAgMjUsIDIwMjAsIGF0
-IDE1OjA0LCDpmYbmnLHkvJ8gPGFsZXhfbHVAcmVhbHNpbC5jb20uY24+IHdyb3RlOg0KPiA+DQo+
-ID4gSGkgS2FpLUhlbmcsDQo+ID4NCj4gPj4gT24gU2VwdGVtYmVyIDI1LCAyMDIwIDE0OjA0LCBL
-YWktSGVuZyBGZW5nIHdyb3RlOg0KPiA+Pg0KPiA+PiBIaSBBYmhpc2hlaywNCj4gPj4+IE9uIFNl
-cCAyNSwgMjAyMCwgYXQgMTE6MzMsIEFiaGlzaGVrIFBhbmRpdC1TdWJlZGkNCj4gPj4gPGFiaGlz
-aGVrcGFuZGl0QGNocm9taXVtLm9yZz4gd3JvdGU6DQo+ID4+Pg0KPiA+Pj4gKyBBbGV4IEx1ICh3
-aG8gY29udHJpYnV0ZWQgdGhlIG9yaWdpbmFsIGNoYW5nZSkNCj4gPj4+DQo+ID4+PiBIaSBLYWkt
-SGVuZywNCj4gPj4+DQo+ID4+Pg0KPiA+Pj4gT24gVGh1LCBTZXAgMjQsIDIwMjAgYXQgMTI6MTAg
-QU0gS2FpLUhlbmcgRmVuZw0KPiA+Pj4gPGthaS5oZW5nLmZlbmdAY2Fub25pY2FsLmNvbT4gd3Jv
-dGU6DQo+ID4+Pj4NCj4gPj4+PiBbK0NjIGxpbnV4LXVzYl0NCj4gPj4+Pg0KPiA+Pj4+IEhpIEFi
-aGlzaGVrLA0KPiA+Pj4+DQo+ID4+Pj4+IE9uIFNlcCAyNCwgMjAyMCwgYXQgMDQ6NDEsIEFiaGlz
-aGVrIFBhbmRpdC1TdWJlZGkNCj4gPj4gPGFiaGlzaGVrcGFuZGl0QGNocm9taXVtLm9yZz4gd3Jv
-dGU6DQo+ID4+Pj4+DQo+ID4+Pj4+IEhpIEthaS1IZW5nLA0KPiA+Pj4+Pg0KPiA+Pj4+PiBXaGlj
-aCBSZWFsdGVrIGNvbnRyb2xsZXIgaXMgdGhpcyBvbj8nDQo+ID4+Pj4NCj4gPj4+PiBUaGUgaXNz
-dWUgaGFwcGVucyBvbiA4ODIxQ0UuDQo+ID4+Pj4NCj4gPj4+Pj4NCj4gPj4+Pj4gU3BlY2lmaWNh
-bGx5IGZvciBSVEw4ODIyQ0UsIHdlIHRlc3RlZCB3aXRob3V0IHJlc2V0X3Jlc3VtZSBiZWluZyBz
-ZXQNCj4gPj4+Pj4gYW5kIHRoYXQgd2FzIGNhdXNpbmcgdGhlIGNvbnRyb2xsZXIgYmVpbmcgcmVz
-ZXQgd2l0aG91dCBibHVleiBldmVyDQo+ID4+Pj4+IGxlYXJuaW5nIGFib3V0IGl0IChyZXN1bHRp
-bmcgaW4gZGV2aWNlcyBiZWluZyB1bnVzYWJsZSB3aXRob3V0DQo+ID4+Pj4+IHRvZ2dsaW5nIHRo
-ZSBCVCBwb3dlcikuDQo+ID4+Pj4NCj4gPj4+PiBUaGUgcmVzZXQgaXMgZG9uZSBieSB0aGUga2Vy
-bmVsLCBzbyBob3cgZG9lcyB0aGF0IGFmZmVjdCBibHVlej8NCj4gPj4+Pg0KPiA+Pj4+IEZyb20g
-d2hhdCB5b3UgZGVzY3JpYmVkLCBpdCBzb3VuZHMgbW9yZSBsaWtlIHJ1bnRpbWUgcmVzdW1lIHNp
-bmNlDQo+IGJsdWV6DQo+ID4+IGlzIGFscmVhZHkgcnVubmluZy4NCj4gPj4+PiBJZiB3ZSBuZWVk
-IHJlc2V0IHJlc3VtZSBmb3IgcnVudGltZSByZXN1bWUsIG1heWJlIGl0J3MgYW5vdGhlciBidWcN
-Cj4gPj4gd2hpY2ggbmVlZHMgdG8gYmUgYWRkcmVzc2VkPw0KPiA+Pj4NCj4gPj4+IEZyb20gYnR1
-c2IuYzoNCj4gPj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9n
-aXQvYmx1ZXRvb3RoL2JsdWV0b290aC0NCj4gPj4gbmV4dC5naXQvdHJlZS9kcml2ZXJzL2JsdWV0
-b290aC9idHVzYi5jI240MTg5DQo+ID4+PiAvKiBSZWFsdGVrIGRldmljZXMgbG9zZSB0aGVpciB1
-cGRhdGVkIGZpcm13YXJlIG92ZXIgZ2xvYmFsDQo+ID4+PiAqIHN1c3BlbmQgdGhhdCBtZWFucyBo
-b3N0IGRvZXNuJ3Qgc2VuZCBTRVRfRkVBVFVSRQ0KPiA+Pj4gKiAoREVWSUNFX1JFTU9URV9XQUtF
-VVApDQo+ID4+PiAqLw0KPiA+Pj4NCj4gPj4+IFJ1bnRpbWUgc3VzcGVuZCBhbHdheXMgcmVxdWly
-ZXMgcmVtb3RlIHdha2V1cCB0byBiZSBzZXQgYW5kIHJlc2V0DQo+ID4+PiByZXN1bWUgaXNuJ3Qg
-dXNlZCB0aGVyZS4NCj4gPj4NCj4gPj4gVGhhbmtzIGZvciB0aGUgY2xhcmlmaWNhdGlvbi4NCj4g
-Pj4NCj4gPj4+DQo+ID4+PiBEdXJpbmcgc3lzdGVtIHN1c3BlbmQsIHdoZW4gcmVtb3RlIHdha2V1
-cCBpcyBub3Qgc2V0LCBSVEw4ODIyQ0UNCj4gbG9zZXMNCj4gPj4+IHRoZSBGVyBsb2FkZWQgYnkg
-dGhlIGRyaXZlciBhbmQgYW55IHN0YXRlIGN1cnJlbnRseSBpbiB0aGUgY29udHJvbGxlci4NCj4g
-Pj4+IFRoaXMgY2F1c2VzIHRoZSBrZXJuZWwgYW5kIHRoZSBjb250cm9sbGVyIHN0YXRlIHRvIGdv
-IG91dCBvZiBzeW5jLg0KPiA+Pj4gT25lIG9mIHRoZSBpc3N1ZXMgd2Ugb2JzZXJ2ZWQgb24gdGhl
-IFJlYWx0ZWsgY29udHJvbGxlciB3aXRob3V0IHRoZQ0KPiA+Pj4gcmVzZXQgcmVzdW1lIHF1aXJr
-IHdhcyB0aGF0IHBhaXJlZCBvciBjb25uZWN0ZWQgZGV2aWNlcyB3b3VsZCBqdXN0DQo+ID4+PiBz
-dG9wIHdvcmtpbmcgYWZ0ZXIgcmVzdW1lLg0KPiA+Pj4NCj4gPj4+Pg0KPiA+Pj4+PiBJZiB0aGUg
-ZmlybXdhcmUgZG9lc24ndCBjdXQgb2ZmIHBvd2VyIGR1cmluZyBzdXNwZW5kLCBtYXliZSB5b3UN
-Cj4gPj4+Pj4gc2hvdWxkbid0IHNldCB0aGUgQlRVU0JfV0FLRVVQX0RJU0FCTEUgZmxhZyBmb3Ig
-dGhhdCBjb250cm9sbGVyLg0KPiA+Pj4+DQo+ID4+Pj4gV2UgZG9uJ3Qga25vdyBiZWZvcmVoYW5k
-IGlmIHRoZSBwbGF0Zm9ybSBmaXJtd2FyZSAoQklPUyBmb3IgbXkgY2FzZSkNCj4gPj4gd2lsbCBj
-dXQgcG93ZXIgb2ZmIG9yIG5vdC4NCj4gPj4+Pg0KPiA+Pj4+IEluIGdlbmVyYWwsIGxhcHRvcHMg
-d2lsbCBjdXQgb2ZmIHRoZSBVU0IgcG93ZXIgZHVyaW5nIFMzLg0KPiA+Pj4+IFdoZW4gQUMgaXMg
-cGx1Z2dlZCwgc29tZSBsYXB0b3BzIGN1dHMgVVNCIHBvd2VyIG9mZiBhbmQgc29tZSBkb24ndC4N
-Cj4gPj4gVGhpcyBhbHNvIGFwcGxpZXMgdG8gbWFueSBkZXNrdG9wcy4gTm90IHRvIG1lbnRpb24g
-dGhlcmUgY2FuIGJlIEJJT1MNCj4gPj4gb3B0aW9ucyB0byBjb250cm9sIFVTQiBwb3dlciB1bmRl
-ciBTMy9TNC9TNS4uLg0KPiA+Pj4+DQo+ID4+Pj4gU28gd2UgZG9uJ3Qga25vdyBiZWZvcmVoYW5k
-Lg0KPiA+Pj4+DQo+ID4+Pg0KPiA+Pj4gSSB0aGluayB0aGUgY29uZnVzaW9uIGhlcmUgc3RlbXMg
-ZnJvbSB3aGF0IGlzIGFjdHVhbGx5IGJlaW5nIHR1cm5lZA0KPiA+Pj4gb2ZmIGJldHdlZW4gb3Vy
-IHR3byBib2FyZHMgYW5kIHdoYXQgd2UncmUgcmVmZXJyaW5nIHRvIGFzIGZpcm13YXJlIDopDQo+
-ID4+DQo+ID4+IFllcyA6KQ0KPiA+Pg0KPiA+Pj4NCj4gPj4+IEluIHlvdXIgY2FzZSwgdGhlIFJl
-YWx0ZWsgY29udHJvbGxlciByZXRhaW5zIGZpcm13YXJlIHVubGVzcyB0aGUNCj4gPj4+IHBsYXRm
-b3JtIGN1dHMgb2YgcG93ZXIgdG8gVVNCICh3aGljaCBpdCBkb2VzIGR1cmluZyBTMykuDQo+ID4+
-DQo+ID4+IE5vdCBhbGwgcGxhdGZvcm0gZmlybXdhcmUgKGkuZS4gQklPUyBmb3IgeDg2KSBjdXQg
-VVNCIHBvd2VyIGR1cmluZyBTMywgYXMgSQ0KPiA+PiBkZXNjcmliZSBpbiBsYXN0IHJlcGx5Lg0K
-PiA+Pg0KPiA+Pj4gSW4gbXkgY2FzZSwgdGhlIFJlYWx0ZWsgY29udHJvbGxlciBsb3NlcyBmaXJt
-d2FyZSB3aGVuIFJlbW90ZSBXYWtldXANCj4gPj4+IGlzbid0IHNldCwgZXZlbiBpZiB0aGUgcGxh
-dGZvcm0gZG9lc24ndCBjdXQgcG93ZXIgdG8gVVNCLg0KPiA+Pg0KPiA+PiBUaGFua3MgZm9yIHRo
-ZSBjbGFyaWZpY2F0aW9uLCBJIGJlbGlldmUgaXQncyBhIGNhc2UgdGhhdCBzaG91bGQgdG8gYmUg
-aGFuZGxlZA0KPiA+PiBzZXBhcmF0ZWx5Lg0KPiA+Pg0KPiA+Pj4NCj4gPj4+IEluIHlvdXIgY2Fz
-ZSwgc2luY2UgeW91IGRvbid0IG5lZWQgdG8gZW5mb3JjZSB0aGUgJ1JlbW90ZSBXYWtldXAnIGJp
-dCwNCj4gPj4+IGlmIHlvdSB1bnNldCB0aGUgQlRVU0JfV0FLRVVQX0RJU0FCTEUgZm9yIHRoYXQg
-VklEOlBJRCwgeW91IHNob3VsZA0KPiBnZXQNCj4gPj4+IHRoZSBkZXNpcmFibGUgYmVoYXZpb3Ig
-KHdoaWNoIGlzIGFjdHVhbGx5IHRoZSBkZWZhdWx0IGJlaGF2aW9yOyByZW1vdGUNCj4gPj4+IHdh
-a2Ugd2lsbCBhbHdheXMgYmUgYXNzZXJ0ZWQgaW5zdGVhZCBvZiBvbmx5IGR1cmluZyBSdW50aW1l
-IFN1c3BlbmQpLg0KPiA+Pg0KPiA+PiBTbyB3ZSBoYXZlIHRocmVlIGNhc2VzIGhlcmUuIEFzc3Vt
-aW5nIHJlc2V0X3Jlc3VtZSBpc24ndCBmbGFnZ2VkIGJ5DQo+IGJ0dXNiOg0KPiA+Pg0KPiA+PiAx
-KSBCb3RoIFVTQiBwb3dlciBhbmQgQlQgZmlybXdhcmUgd2VyZSBsb3N0IGR1cmluZyBzdXNwZW5k
-Lg0KPiA+PiBVU0IgY29yZSBmaW5kcyBvdXQgcG93ZXIgd2FzIGxvc3QsIHRyeSB0byByZXNldCBy
-ZXN1bWUgdGhlIGRldmljZS4gU2luY2UNCj4gPj4gYnR1c2IgZG9lc24ndCBoYXZlIHJlc2V0X3Jl
-c3VtZSBjYWxsYmFjaywgVVNCIGNvcmUgY2FsbHMgcHJvYmUgaW5zdGVhZC4NCj4gPj4NCj4gPj4g
-MikgQm90aCBVU0IgcG93ZXIgYW5kIEJUIGZpcm13YXJlIHdlcmUga2VwdCBkdXJpbmcgc3VzcGVu
-ZC4gVGhpcyBpcyBteQ0KPiA+PiBjYXNlLg0KPiA+PiBSZWd1bGFyIHJlc3VtZSBoYW5kbGVzIGV2
-ZXJ5dGhpbmcuDQo+ID4+DQo+ID4+IDMpIFVTQiBwb3dlciB3YXMga2VwdCBidXQgQlQgZmlybXdh
-cmUgd2FzIGxvc3QuIFRoaXMgaXMgeW91ciBjYXNlLg0KPiA+PiBVU0IgY29yZSBmaW5kcyBvdXQg
-cG93ZXIgd2FzIGtlcHQsIHVzZSByZWd1bGFyIHJlc3VtZS4gSG93ZXZlciB0aGUgQlQNCj4gPj4g
-ZmlybXdhcmUgd2FzIGxvc3QsIHNvIHJlc3VtZSBmYWlscy4NCj4gPj4gRm9yIHRoaXMgY2FzZSwg
-bWF5YmUgd2UgY2FuIHVzZSBidHJ0bF9zZXR1cF9yZWFsdGVrKCkgaW4gYnR1c2JfcmVzdW1lKCk/
-DQo+IEl0DQo+ID4+IHdvbid0IHJlLXVwbG9hZCBmaXJtd2FyZSBpZiBmaXJtd2FyZSBpcyByZXRh
-aW5lZCwgYW5kIHdpbGwgZG8gcHJvcGVyDQo+ID4+IGluaXRpYWxpemluZyBpZiBmaXJtd2FyZSB3
-YXMgbG9zdC4NCj4gPg0KPiA+IEluIG15IG9waW5pb25zLA0KPiA+IEZvciB0aGUgMyksIHRoZXJl
-IGFyZSB0d28gY2FzZXMsIG9uZSBpcyB0aGF0IGZpcm13YXJlIHdhcyBsb3N0IGluIGF1dG8NCj4g
-c3VzcGVuZC4gVGhhdCBzaG91bGQgbmV2ZXIgaGFwcGVuLCBiZWNhdXNlIHRoZSBkYXRhLT5pbnRm
-LQ0KPiA+bmVlZHNfcmVtb3RlX3dha2V1cCBpcyBzZXQgaW4gYnR1c2Jfb3BlbigpIGFuZCBidHVz
-Yl9jbG9zZSgpLiBUaGUgZmxhZw0KPiBtZWFucyB0aGF0IGhvc3Qgd2lsbCBzZW5kIHJlbW90ZSB3
-YWtldXAgZHVyaW5nIGF1dG9zdXNwZW5kLCBhbmQgZmlybXdhcmUNCj4gd291bGRuJ3QgZHJvcC4N
-Cj4gPiBBbm90aGVyIGNhc2UgaXMgZmlybXdhcmUgbG9zcyBpbiBnbG9iYWwgc3VzcGVuZC4gSSB0
-aGluayB0aGF0J3Mgbm8gcHJvYmxlbSwNCj4gZHJpdmVyIHNldHMgZGF0YS0+dWRldi0+cmVzZXRf
-cmVzdW1lIGluIGJ0dXNiX3N1c3BlbmQoKSBhbmQgYnR1c2Igd2lsbA0KPiByZXByb2JlIGFmdGVy
-IHJlc3VtZS4NCj4gDQo+IEFwcGFyZW50bHkgZm9yIG15IGNhc2UsIFJUTDg4MjFDRSwgZmlybXdh
-cmUgd2FzIGtlcHQgd2l0aG91dCBzZXR0aW5nDQo+IHJlbW90ZSB3YWtldXAuDQoNClNvIHlvdSBn
-b3QgdGhlIGJ0dXNiIGRpc2Nvbm5lY3QgYW5kIHJlcHJvYmUgc2VxdWVuY2UgYWZ0ZXIgcmVzdW1l
-LCBhbmQgIiBCbHVldG9vdGg6IGhjaTA6IGNvbW1hbmQgMHgxMDAxIHR4IHRpbWVvdXQgIiBiZWZv
-cmUgZmlybXdhcmUgZG93bmxvYWRpbmcgPw0KDQo+IElzIGl0IG9rYXkgdG8gYWxzbyBzZXQgcmVt
-b3RlIHdha2V1cCBmb3IgZ2xvYmFsIHN1c3BlbmQgdG8gcmV0YWluIHRoZQ0KPiBmaXJtd2FyZT8N
-Cg0KWWVzLCBpdCdzIG9rLg0KDQo+IElmIGZpcm13YXJlIHdhcyByZXRhaW5lZCwgZG9lcyBVU0Ig
-d2FybSByZXNldCBhZmZlY3QgQlQgY29udHJvbGxlciBpbg0KPiBhbnl3YXk/DQoNClVTQiB3YXJt
-IHJlc2V0IHNob3VsZG4ndCBhZmZlY3QgQlQgY29udHJvbGxlci4NCkJ1dCBoY2kgZGV2aWNlIHdp
-bGwgbm90IHdvcmsgYWZ0ZXIgcmVzdW1lLCBiZWNhdXNlIGJ0cnRsIHdpbGwgZmluZCAidW5rbm93
-biBJQyBpbmZvLCBsbXAgc3VidmVydCAuLi4iIGFuZCByZXR1cm4gZXJyb3Igd2hlbiBoY2kgZGV2
-aWNlIHNldHVwIGlzIGNhbGxlZC4NClRpcHM6IFRoZSBsbXAgc3VidmVyIGluIGNvbnRyb2xsZXIg
-Y2hhbmdlcyBhZnRlciBmaXJtd2FyZSBkb3dubG9hZGluZy4gQW5kIGRyaXZlciB3aWxsIGZpbmQg
-IiB1bmtub3duIElDIGluZm8sIGxtcCBzdWJ2ZXIgIC4uLiIgd2hlbiBzZXR1cCBpcyBjYWxsZWQg
-d2l0aCBmaXJtd2FyZSByZXRhaW5lZC4NCg0KPiANCj4gS2FpLUhlbmcNCj4gDQo+ID4NCj4gPj4N
-Cj4gPj4gS2FpLUhlbmcNCj4gPj4NCj4gPj4+DQo+ID4+PiBAQWxleCAtLSBXaGF0IGlzIHRoZSBj
-b21tb24gYmVoYXZpb3IgZm9yIFJlYWx0ZWsgY29udHJvbGxlcnM/IFNob3VsZA0KPiA+Pj4gd2Ug
-c2V0IEJUVVNCX1dBS0VVUF9ESVNBQkxFIG9ubHkgb24gUlRMODgyMkNFIG9yIHNob3VsZCB3ZSB1
-bnNldA0KPiBpdA0KPiA+Pj4gb25seSBvbiBSVEw4ODIxQ0U/DQo+ID4+Pg0KPiA+Pj4+Pg0KPiA+
-Pj4+PiBJIHdvdWxkIHByZWZlciB0aGlzIGRvZXNuJ3QgZ2V0IGFjY2VwdGVkIGluIGl0cyBjdXJy
-ZW50IHN0YXRlLg0KPiA+Pj4+DQo+ID4+Pj4gT2YgY291cnNlLg0KPiA+Pj4+IEkgdGhpbmsgd2Ug
-bmVlZCB0byBmaW5kIHRoZSByb290IGNhdXNlIGZvciB5b3VyIGNhc2UgYmVmb3JlIGFwcGx5aW5n
-IHRoaXMNCj4gPj4gb25lLg0KPiA+Pj4+DQo+ID4+Pj4gS2FpLUhlbmcNCj4gPj4+Pg0KPiA+Pj4+
-Pg0KPiA+Pj4+PiBBYmhpc2hlaw0KPiA+Pj4+Pg0KPiA+Pj4+PiBPbiBXZWQsIFNlcCAyMywgMjAy
-MCBhdCAxMDo1NiBBTSBLYWktSGVuZyBGZW5nDQo+ID4+Pj4+IDxrYWkuaGVuZy5mZW5nQGNhbm9u
-aWNhbC5jb20+IHdyb3RlOg0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IFJlYWx0ZWsgYmx1ZXRvb3RoIGNv
-bnRyb2xsZXIgbWF5IGZhaWwgdG8gd29yayBhZnRlciBzeXN0ZW0gc2xlZXA6DQo+ID4+Pj4+PiBb
-IDEyNzIuNzA3NjcwXSBCbHVldG9vdGg6IGhjaTA6IGNvbW1hbmQgMHgxMDAxIHR4IHRpbWVvdXQN
-Cj4gPj4+Pj4+IFsgMTI4MC44MzU3MTJdIEJsdWV0b290aDogaGNpMDogUlRMOiBIQ0lfT1BfUkVB
-RF9MT0NBTF9WRVJTSU9ODQo+ID4+IGZhaWxlZCAoLTExMCkNCj4gPj4+Pj4+DQo+ID4+Pj4+PiBJ
-ZiBwbGF0Zm9ybSBmaXJtd2FyZSBkb2Vzbid0IGN1dCBwb3dlciBvZmYgZHVyaW5nIHN1c3BlbmQs
-IHRoZQ0KPiA+PiBmaXJtd2FyZQ0KPiA+Pj4+Pj4gaXMgY29uc2lkZXJlZCByZXRhaW5lZCBpbiBj
-b250cm9sbGVyIGJ1dCB0aGUgZHJpdmVyIGlzIHN0aWxsIGFza2luZyBVU0INCj4gPj4+Pj4+IGNv
-cmUgdG8gcGVyZm9ybSBhIHJlc2V0LXJlc3VtZS4gVGhpcyBjYW4gbWFrZSBibHVldG9vdGggY29u
-dHJvbGxlcg0KPiA+Pj4+Pj4gdW51c2FibGUuDQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gU28gYXZvaWQg
-dW5uZWNlc3NhcnkgcmVzZXQgdG8gcmVzb2x2ZSB0aGUgaXNzdWUuDQo+ID4+Pj4+Pg0KPiA+Pj4+
-Pj4gRm9yIGRldmljZXMgdGhhdCByZWFsbHkgbG9zZSBwb3dlciBkdXJpbmcgc3VzcGVuZCwgVVNC
-IGNvcmUgd2lsbA0KPiBkZXRlY3QNCj4gPj4+Pj4+IGFuZCBoYW5kbGUgcmVzZXQtcmVzdW1lIGNv
-cnJlY3RseS4NCj4gPj4+Pj4+DQo+ID4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBLYWktSGVuZyBGZW5n
-IDxrYWkuaGVuZy5mZW5nQGNhbm9uaWNhbC5jb20+DQo+ID4+Pj4+PiAtLS0NCj4gPj4+Pj4+IGRy
-aXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCA4ICsrKy0tLS0tDQo+ID4+Pj4+PiAxIGZpbGUgY2hh
-bmdlZCwgMyBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiA+Pj4+Pj4NCj4gPj4+Pj4+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9v
-dGgvYnR1c2IuYw0KPiA+Pj4+Pj4gaW5kZXggOGQyNjA4ZGRmZDA4Li5kZTg2ZWY0Mzg4ZjkgMTAw
-NjQ0DQo+ID4+Pj4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4+Pj4+PiAr
-KysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4+Pj4+PiBAQCAtNDI1NSwxNyArNDI1
-NSwxNSBAQCBzdGF0aWMgaW50IGJ0dXNiX3N1c3BlbmQoc3RydWN0DQo+ID4+IHVzYl9pbnRlcmZh
-Y2UgKmludGYsIHBtX21lc3NhZ2VfdCBtZXNzYWdlKQ0KPiA+Pj4+Pj4gICAgICAgICAgICAgIGVu
-YWJsZV9pcnEoZGF0YS0+b29iX3dha2VfaXJxKTsNCj4gPj4+Pj4+ICAgICAgfQ0KPiA+Pj4+Pj4N
-Cj4gPj4+Pj4+IC0gICAgICAgLyogRm9yIGdsb2JhbCBzdXNwZW5kLCBSZWFsdGVrIGRldmljZXMg
-bG9zZSB0aGUgbG9hZGVkIGZ3DQo+ID4+Pj4+PiAtICAgICAgICAqIGluIHRoZW0uIEJ1dCBmb3Ig
-YXV0b3N1c3BlbmQsIGZpcm13YXJlIHNob3VsZCByZW1haW4uDQo+ID4+Pj4+PiAtICAgICAgICAq
-IEFjdHVhbGx5LCBpdCBkZXBlbmRzIG9uIHdoZXRoZXIgdGhlIHVzYiBob3N0IHNlbmRzDQo+ID4+
-Pj4+PiArICAgICAgIC8qIEZvciBnbG9iYWwgc3VzcGVuZCwgUmVhbHRlayBkZXZpY2VzIGxvc2Ug
-dGhlIGxvYWRlZCBmdyBpbg0KPiB0aGVtDQo+ID4+IGlmDQo+ID4+Pj4+PiArICAgICAgICAqIHBs
-YXRmb3JtIGZpcm13YXJlIGN1dCBwb3dlciBvZmYuIEJ1dCBmb3IgYXV0b3N1c3BlbmQsDQo+ID4+
-IGZpcm13YXJlDQo+ID4+Pj4+PiArICAgICAgICAqIHNob3VsZCByZW1haW4uICBBY3R1YWxseSwg
-aXQgZGVwZW5kcyBvbiB3aGV0aGVyIHRoZSB1c2IgaG9zdA0KPiA+PiBzZW5kcw0KPiA+Pj4+Pj4g
-ICAgICAgKiBzZXQgZmVhdHVyZSAoZW5hYmxlIHdha2V1cCkgb3Igbm90Lg0KPiA+Pj4+Pj4gICAg
-ICAgKi8NCj4gPj4+Pj4+ICAgICAgaWYgKHRlc3RfYml0KEJUVVNCX1dBS0VVUF9ESVNBQkxFLCAm
-ZGF0YS0+ZmxhZ3MpKSB7DQo+ID4+Pj4+PiAgICAgICAgICAgICAgaWYgKFBNU0dfSVNfQVVUTyht
-ZXNzYWdlKSAmJg0KPiA+Pj4+Pj4gICAgICAgICAgICAgICAgICBkZXZpY2VfY2FuX3dha2V1cCgm
-ZGF0YS0+dWRldi0+ZGV2KSkNCj4gPj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgIGRhdGEtPnVk
-ZXYtPmRvX3JlbW90ZV93YWtldXAgPSAxOw0KPiA+Pj4+Pj4gLSAgICAgICAgICAgICAgIGVsc2Ug
-aWYgKCFQTVNHX0lTX0FVVE8obWVzc2FnZSkpDQo+ID4+Pj4+PiAtICAgICAgICAgICAgICAgICAg
-ICAgICBkYXRhLT51ZGV2LT5yZXNldF9yZXN1bWUgPSAxOw0KPiA+Pj4+Pj4gICAgICB9DQo+ID4+
-Pj4+Pg0KPiA+Pj4+Pj4gICAgICByZXR1cm4gMDsNCj4gPj4+Pj4+IC0tDQo+ID4+Pj4+PiAyLjE3
-LjENCj4gPj4NCj4gPj4NCj4gPj4gLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVu
-dCBiZWZvcmUgcHJpbnRpbmcgdGhpcyBlLW1haWwuDQoNCg==
+Hi Alex,
+
+> On Sep 25, 2020, at 15:42, 陆朱伟 <alex_lu@realsil.com.cn> wrote:
+> 
+> Hi Kai-Heng,
+> 
+>> On 25 September 2020 at 15:14, Kai-Heng Feng wrote:
+>> 
+>> Hi Alex,
+
+[snipped]
+
+>> Apparently for my case, RTL8821CE, firmware was kept without setting
+>> remote wakeup.
+> 
+> So you got the btusb disconnect and reprobe sequence after resume, and " Bluetooth: hci0: command 0x1001 tx timeout " before firmware downloading ?
+
+USB power wasn't lost, but it got USB warm reset because btusb driver explicitly flagged "reset_resume = 1".
+Then the issue appeared as "Bluetooth: hci0: command 0x1001 tx timeout", before downloading firmware.
+
+> 
+>> Is it okay to also set remote wakeup for global suspend to retain the
+>> firmware?
+> 
+> Yes, it's ok.
+
+Abhishek, does setting remote wakeup during global suspend works for you?
+
+> 
+>> If firmware was retained, does USB warm reset affect BT controller in
+>> anyway?
+> 
+> USB warm reset shouldn't affect BT controller.
+> But hci device will not work after resume, because btrtl will find "unknown IC info, lmp subvert ..." and return error when hci device setup is called.
+> Tips: The lmp subver in controller changes after firmware downloading. And driver will find " unknown IC info, lmp subver  ..." when setup is called with firmware retained.
+
+This should already be fixed by "Bluetooth: btrtl: Restore old logic to assume firmware is already loaded".
+
+Kai-Heng
+
+> 
+>> 
+>> Kai-Heng
+>> 
+>>> 
+>>>> 
+>>>> Kai-Heng
+>>>> 
+>>>>> 
+>>>>> @Alex -- What is the common behavior for Realtek controllers? Should
+>>>>> we set BTUSB_WAKEUP_DISABLE only on RTL8822CE or should we unset
+>> it
+>>>>> only on RTL8821CE?
+>>>>> 
+>>>>>>> 
+>>>>>>> I would prefer this doesn't get accepted in its current state.
+>>>>>> 
+>>>>>> Of course.
+>>>>>> I think we need to find the root cause for your case before applying this
+>>>> one.
+>>>>>> 
+>>>>>> Kai-Heng
+>>>>>> 
+>>>>>>> 
+>>>>>>> Abhishek
+>>>>>>> 
+>>>>>>> On Wed, Sep 23, 2020 at 10:56 AM Kai-Heng Feng
+>>>>>>> <kai.heng.feng@canonical.com> wrote:
+>>>>>>>> 
+>>>>>>>> Realtek bluetooth controller may fail to work after system sleep:
+>>>>>>>> [ 1272.707670] Bluetooth: hci0: command 0x1001 tx timeout
+>>>>>>>> [ 1280.835712] Bluetooth: hci0: RTL: HCI_OP_READ_LOCAL_VERSION
+>>>> failed (-110)
+>>>>>>>> 
+>>>>>>>> If platform firmware doesn't cut power off during suspend, the
+>>>> firmware
+>>>>>>>> is considered retained in controller but the driver is still asking USB
+>>>>>>>> core to perform a reset-resume. This can make bluetooth controller
+>>>>>>>> unusable.
+>>>>>>>> 
+>>>>>>>> So avoid unnecessary reset to resolve the issue.
+>>>>>>>> 
+>>>>>>>> For devices that really lose power during suspend, USB core will
+>> detect
+>>>>>>>> and handle reset-resume correctly.
+>>>>>>>> 
+>>>>>>>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>>>>>>>> ---
+>>>>>>>> drivers/bluetooth/btusb.c | 8 +++-----
+>>>>>>>> 1 file changed, 3 insertions(+), 5 deletions(-)
+>>>>>>>> 
+>>>>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>>>>> index 8d2608ddfd08..de86ef4388f9 100644
+>>>>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>>>>> @@ -4255,17 +4255,15 @@ static int btusb_suspend(struct
+>>>> usb_interface *intf, pm_message_t message)
+>>>>>>>>             enable_irq(data->oob_wake_irq);
+>>>>>>>>     }
+>>>>>>>> 
+>>>>>>>> -       /* For global suspend, Realtek devices lose the loaded fw
+>>>>>>>> -        * in them. But for autosuspend, firmware should remain.
+>>>>>>>> -        * Actually, it depends on whether the usb host sends
+>>>>>>>> +       /* For global suspend, Realtek devices lose the loaded fw in
+>> them
+>>>> if
+>>>>>>>> +        * platform firmware cut power off. But for autosuspend,
+>>>> firmware
+>>>>>>>> +        * should remain.  Actually, it depends on whether the usb host
+>>>> sends
+>>>>>>>>      * set feature (enable wakeup) or not.
+>>>>>>>>      */
+>>>>>>>>     if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
+>>>>>>>>             if (PMSG_IS_AUTO(message) &&
+>>>>>>>>                 device_can_wakeup(&data->udev->dev))
+>>>>>>>>                     data->udev->do_remote_wakeup = 1;
+>>>>>>>> -               else if (!PMSG_IS_AUTO(message))
+>>>>>>>> -                       data->udev->reset_resume = 1;
+>>>>>>>>     }
+>>>>>>>> 
+>>>>>>>>     return 0;
+>>>>>>>> --
+>>>>>>>> 2.17.1
+>>>> 
+>>>> 
+>>>> ------Please consider the environment before printing this e-mail.
+
