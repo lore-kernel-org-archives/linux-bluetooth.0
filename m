@@ -2,244 +2,222 @@ Return-Path: <SRS0=+RU5=DC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-22.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C467AC4727C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 11:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D68EC4727C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:03:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AD7B221EB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 11:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 161F221D7A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 12:03:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MDPyV9Jy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728274AbgIYLvR convert rfc822-to-8bit (ORCPT
+        id S1728371AbgIYMD2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 07:51:17 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:35157 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728042AbgIYLvP (ORCPT
+        Fri, 25 Sep 2020 08:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728171AbgIYMD2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 07:51:15 -0400
-Received: from mail-pf1-f199.google.com ([209.85.210.199])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1kLmFs-0002vU-Tg
-        for linux-bluetooth@vger.kernel.org; Fri, 25 Sep 2020 11:51:13 +0000
-Received: by mail-pf1-f199.google.com with SMTP id t201so1955347pfc.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 04:51:12 -0700 (PDT)
+        Fri, 25 Sep 2020 08:03:28 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9371C0613D4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:03:27 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id x23so2781975wmi.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 05:03:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j5bxVuVEiqgVlanRePu6dA6f3zbOwxopbpYSWu4POWk=;
+        b=MDPyV9JyNqYevanfnR1rtU6bGSJi5p22RFCAgfzYRhndYJbn0RxvNFymUBVUq4yloI
+         S4qD6N6aOmqKaKJ3GB85EN9rAv8IUaxoqgdb2mNeMJVMshswtqP8T9ylfJpuZA9UkUn3
+         l7EQm23e1bLg8EJyQYf2M+9sF2W4Lbs7Dfb9HQFMp9OH9hrCRW4UQL1+TesXYm1WCV9n
+         1R7zAWPZCAoRcuosg+vaNhWV4JbAa5ufV/0bCW488jixR38gD9VA8YMaIwYyW4NOEKuE
+         BifDoz1UDzLiL4YUjGcDGeBtDvXAvEHLGETy/hu8aZmzt5HxukVVB+giAbqqqNk+DLw9
+         ov2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=5BRkerAIEsczFoqzPwpTd9ZEzsA8kT3a52lgaI3lgaI=;
-        b=LxzYbNIxAfLs5qJt2F+BbUVrbztSWHSIfeNxJarAkS9ZT7PCri4OvId79tHXXePuU2
-         iUORgoxsD8I6px8FCRSNic/pJUsEAvxXQjgHnGlxU8JkwZiXOPezaQyib9mpoZkArkhX
-         f/geq+D56gqmTgLRQGoEYeQm7SXoIqhdc4ulet2G8iBqcRMaGLRv71U6wPoN0yB040hc
-         N2Q7JN9mkm8WZU//2D6c88KnNSkN07+Y3jPp+zyZqvRkAzdSWlxXOpN7vspHa6eZRyQP
-         nVPdZJwuCpvkuMZxAtrB0B2f4zxhHUa0F15UDJO+IUyDXFIu7iJDPwaYQh5DZhoPTUKD
-         maIw==
-X-Gm-Message-State: AOAM530Hfgy2npdnhKj6r4mEUlVRd9v8CCD6r+SMxZIXVk30lV3Ubpj8
-        bpc4BObryCq6HqjKlm2BC40DBgjDO/Y2ltP+cpBF0Pnpqty/xeNr0y5NZxfuItIs7vTeDL2gI6h
-        JRt1DYOwfZIbohpYhIIa9ijKdCvfB+DjH873KNt13gNlXZQ==
-X-Received: by 2002:a62:3001:0:b029:142:2501:39e3 with SMTP id w1-20020a6230010000b0290142250139e3mr3574287pfw.50.1601034670798;
-        Fri, 25 Sep 2020 04:51:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPpS82lcNLbndhVQqetio5q1/5e7ovsnA1ZdIlMT4OZOipe1Yj42p2RePr+Itf158X7qv5dA==
-X-Received: by 2002:a62:3001:0:b029:142:2501:39e3 with SMTP id w1-20020a6230010000b0290142250139e3mr3574263pfw.50.1601034670375;
-        Fri, 25 Sep 2020 04:51:10 -0700 (PDT)
-Received: from [192.168.1.208] (220-133-187-190.HINET-IP.hinet.net. [220.133.187.190])
-        by smtp.gmail.com with ESMTPSA id q20sm2278991pgm.24.2020.09.25.04.51.08
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Sep 2020 04:51:09 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
- resume
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <30ce4ee1eede47c09c3e7f277c26918a@realsil.com.cn>
-Date:   Fri, 25 Sep 2020 19:51:06 +0800
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j5bxVuVEiqgVlanRePu6dA6f3zbOwxopbpYSWu4POWk=;
+        b=VGtQqFGMCVe+OtzNAUuDncRCqSpKzJ5wgy9vy7xcPlBPIrMh368hAD+ZMJBm90Jty6
+         P12YcQSAnAaZB9fteZz8ZkAlGkuh+J09GNDbmErNwkRSvAXxXeReZk89QJm8325vwSCv
+         +Mv0Vf3tyNUPsy9JmOEWfUjI+Rfehpu8ZM7+Jb0Vj3tRp2Yxk1HzTG54LcNFqmHS8LQd
+         9a6zHD/O9wujUL1H62wzQ+jjlbDsJj66Ot+6PsjHp/yr9y1AzXXrXQQzMqoTMtnS8+YW
+         wPBbD9hROhCsxBKKEnYY+dTqC12H/9tLgimg8cY9EZWr01kLYK5Kg4triKz2VXDZKG5f
+         wQ9w==
+X-Gm-Message-State: AOAM532C8hGM2BHkwymPnPeOMulY8EwT65Y6AMA6hwjMFLBJeoWJYrEm
+        gBrj13bUO/heivEri1+4tm0o0Z/rhjHKBcNce6RMyw==
+X-Google-Smtp-Source: ABdhPJwVtZag41aA0S3BJWbfmQKAI4dJew+ojCY35ogBbonXZ4WZsj9CG4j40D5B/FOP70hS4l9dJdXHX+9Fd2IJojg=
+X-Received: by 2002:a7b:cd05:: with SMTP id f5mr2753455wmj.116.1601035405961;
+ Fri, 25 Sep 2020 05:03:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200921155004.v2.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
+ <CABBYNZLTZbwyL0ykmFezWrkNVnHoZt2KPtz+aQwo7TvhdC7TiQ@mail.gmail.com>
+ <CAJQfnxFjL6RicwHyFgYzNp7WPrMePEOa2fgOX9TMju-z5AWsPg@mail.gmail.com> <CABBYNZJdY+QBiCk9nBhJ-gUm-K0ZF6U=03f+tqKvs7c+oG=axA@mail.gmail.com>
+In-Reply-To: <CABBYNZJdY+QBiCk9nBhJ-gUm-K0ZF6U=03f+tqKvs7c+oG=axA@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Fri, 25 Sep 2020 20:03:14 +0800
+Message-ID: <CAJQfnxEk5aA_N8+-O4bojcirtXPYAtMf0LmFAJ3cF5M_f=uA0A@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Check for encryption key size on connect
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:USB XHCI DRIVER" <linux-usb@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <E2E04FDC-C62A-4F8C-A8EF-20868504A2BC@canonical.com>
-References: <30ce4ee1eede47c09c3e7f277c26918a@realsil.com.cn>
-To:     =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-X-Mailer: Apple Mail (2.3608.120.23.2.1)
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alex,
+Hi Luiz,
 
-> On Sep 25, 2020, at 16:23, 陆朱伟 <alex_lu@realsil.com.cn> wrote:
-> 
-> Hi Kai-Heng,
-> 
->> On September 25, 2020 at 15:56, Kai-Heng Feng wrote:
->> 
->> Hi Alex,
->> 
->>> On Sep 25, 2020, at 15:42, 陆朱伟 <alex_lu@realsil.com.cn> wrote:
->>> 
->>> Hi Kai-Heng,
->>> 
->>>> On 25 September 2020 at 15:14, Kai-Heng Feng wrote:
->>>> 
->>>> Hi Alex,
->> 
->> [snipped]
->> 
->>>> Apparently for my case, RTL8821CE, firmware was kept without setting
->>>> remote wakeup.
->>> 
->>> So you got the btusb disconnect and reprobe sequence after resume, and "
->> Bluetooth: hci0: command 0x1001 tx timeout " before firmware downloading ?
->> 
->> USB power wasn't lost, but it got USB warm reset because btusb driver
->> explicitly flagged "reset_resume = 1".
->> Then the issue appeared as "Bluetooth: hci0: command 0x1001 tx timeout",
->> before downloading firmware.
->> 
->>> 
->>>> Is it okay to also set remote wakeup for global suspend to retain the
->>>> firmware?
->>> 
->>> Yes, it's ok.
->> 
->> Abhishek, does setting remote wakeup during global suspend works for you?
-> 
-> It depends on your desire on power consumption during global suspend.
-> The BT controller takes less power if firmware was lost during global suspend.
+On Wed, 23 Sep 2020 at 01:03, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Tue, Sep 22, 2020 at 12:48 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > On Tue, 22 Sep 2020 at 01:15, Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Archie,
+> > >
+> > >
+> > > On Mon, Sep 21, 2020 at 12:56 AM Archie Pusaka <apusaka@google.com> wrote:
+> > > >
+> > > > From: Archie Pusaka <apusaka@chromium.org>
+> > > >
+> > > > When receiving connection, we only check whether the link has been
+> > > > encrypted, but not the encryption key size of the link.
+> > > >
+> > > > This patch adds check for encryption key size, and reject L2CAP
+> > > > connection which size is below the specified threshold (default 7)
+> > > > with security block.
+> > > >
+> > > > Here is some btmon trace.
+> > > > @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.847722
+> > > >         Store hint: No (0x00)
+> > > >         BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
+> > > >         Key type: Unauthenticated Combination key from P-192 (0x04)
+> > > >         Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
+> > > >         PIN length: 0
+> > > > > HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871537
+> > > >         Status: Success (0x00)
+> > > >         Handle: 256
+> > > >         Encryption: Enabled with E0 (0x01)
+> > > > < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.871609
+> > > >         Handle: 256
+> > > > > HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872524
+> > > >       Read Encryption Key Size (0x05|0x0008) ncmd 1
+> > > >         Status: Success (0x00)
+> > > >         Handle: 256
+> > > >         Key size: 3
+> > > >
+> > > > ////// WITHOUT PATCH //////
+> > > > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895023
+> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
+> > > >         PSM: 4097 (0x1001)
+> > > >         Source CID: 64
+> > > > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.895213
+> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
+> > > >         Destination CID: 64
+> > > >         Source CID: 64
+> > > >         Result: Connection successful (0x0000)
+> > > >         Status: No further information available (0x0000)
+> > > >
+> > > > ////// WITH PATCH //////
+> > > > > ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887024
+> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
+> > > >         PSM: 4097 (0x1001)
+> > > >         Source CID: 64
+> > > > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.887127
+> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
+> > > >         Destination CID: 0
+> > > >         Source CID: 64
+> > > >         Result: Connection refused - security block (0x0003)
+> > > >         Status: No further information available (0x0000)
+> > > >
+> > > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > > > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > > >
+> > > > ---
+> > > > Btw, it looks like the patch sent by Alex Lu with the title
+> > > > [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
+> > > > also solves the exact same issue.
+> > > >
+> > > > Changes in v2:
+> > > > * Add btmon trace to the commit message
+> > > >
+> > > >  net/bluetooth/l2cap_core.c | 3 ++-
+> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > > index ade83e224567..b4fc0ad38aaa 100644
+> > > > --- a/net/bluetooth/l2cap_core.c
+> > > > +++ b/net/bluetooth/l2cap_core.c
+> > > > @@ -4101,7 +4101,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+> > > >
+> > > >         /* Check if the ACL is secure enough (if not SDP) */
+> > > >         if (psm != cpu_to_le16(L2CAP_PSM_SDP) &&
+> > > > -           !hci_conn_check_link_mode(conn->hcon)) {
+> > > > +           (!hci_conn_check_link_mode(conn->hcon) ||
+> > > > +           !l2cap_check_enc_key_size(conn->hcon))) {
+> > >
+> > > I wonder if we couldn't incorporate the check of key size into
+> > > hci_conn_check_link_mode, like I said in the first patch checking the
+> > > enc key size should not be specific to L2CAP.
+> >
+> > Yes, I could move the check into hci_conn_check_link_mode.
+> > At first look, this function is also called by AMP which I am not
+> > familiar with. In addition, I found this patch which moves this check
+> > outside hci_conn, so I have my doubts there.
+> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=693cd8ce3f882524a5d06f7800dd8492411877b3
+>
+> Right, I think we can have it as part of the hci_conn_check_link_mode,
+> that said it is perhaps better to have it as
+> hci_conn_check_enc_key_size instead as it is not L2CAP expecific.
+> Other than that it looks good to me.
 
-For my case, the firmware is retained after S3, despite of "reset_resume = 1":
+Do you mean we should move l2cap_conn_check_enc_key_size to
+hci_conn_check_enc_key_size? I think that is a good idea.
+We also have hci_conn_check_secure which I am unsure what the purpose
+is. I'll try to merge them together.
 
-[ 30.164036] ACPI: Waking up from system sleep state S3 
-[ 30.167913] ACPI: EC: interrupt unblocked
-[ 31.284138] ACPI: EC: event unblocked
-...
-[   31.467484] usb 1-14: reset full-speed USB device number 3 using xhci_hcd
-...
-[   32.732934] Bluetooth: hci0: RTL: examining hci_ver=08 hci_rev=826c lmp_ver=08 lmp_subver=a99e
-[   32.732937] Bluetooth: hci0: RTL: unknown IC info, lmp subver a99e, hci rev 826c, hci ver 0008
-[   32.732937] Bluetooth: hci0: RTL: assuming no firmware upload needed
+>
+> > >
+> > > >                 conn->disc_reason = HCI_ERROR_AUTH_FAILURE;
+> > > >                 result = L2CAP_CR_SEC_BLOCK;
+> > > >                 goto response;
+> > > > --
+> > > > 2.28.0.681.g6f77f65b4e-goog
+> > > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+> >
+> > Thanks,
+> > Archie
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Kai-Heng
-
-> 
->> 
->>> 
->>>> If firmware was retained, does USB warm reset affect BT controller in
->>>> anyway?
->>> 
->>> USB warm reset shouldn't affect BT controller.
->>> But hci device will not work after resume, because btrtl will find "unknown
->> IC info, lmp subvert ..." and return error when hci device setup is called.
->>> Tips: The lmp subver in controller changes after firmware downloading.
->> And driver will find " unknown IC info, lmp subver  ..." when setup is called
->> with firmware retained.
->> 
->> This should already be fixed by "Bluetooth: btrtl: Restore old logic to assume
->> firmware is already loaded".
->> 
->> Kai-Heng
->> 
->>> 
->>>> 
->>>> Kai-Heng
->>>> 
->>>>> 
->>>>>> 
->>>>>> Kai-Heng
->>>>>> 
->>>>>>> 
->>>>>>> @Alex -- What is the common behavior for Realtek controllers?
->> Should
->>>>>>> we set BTUSB_WAKEUP_DISABLE only on RTL8822CE or should we
->> unset
->>>> it
->>>>>>> only on RTL8821CE?
->>>>>>> 
->>>>>>>>> 
->>>>>>>>> I would prefer this doesn't get accepted in its current state.
->>>>>>>> 
->>>>>>>> Of course.
->>>>>>>> I think we need to find the root cause for your case before applying
->> this
->>>>>> one.
->>>>>>>> 
->>>>>>>> Kai-Heng
->>>>>>>> 
->>>>>>>>> 
->>>>>>>>> Abhishek
->>>>>>>>> 
->>>>>>>>> On Wed, Sep 23, 2020 at 10:56 AM Kai-Heng Feng
->>>>>>>>> <kai.heng.feng@canonical.com> wrote:
->>>>>>>>>> 
->>>>>>>>>> Realtek bluetooth controller may fail to work after system sleep:
->>>>>>>>>> [ 1272.707670] Bluetooth: hci0: command 0x1001 tx timeout
->>>>>>>>>> [ 1280.835712] Bluetooth: hci0: RTL:
->> HCI_OP_READ_LOCAL_VERSION
->>>>>> failed (-110)
->>>>>>>>>> 
->>>>>>>>>> If platform firmware doesn't cut power off during suspend, the
->>>>>> firmware
->>>>>>>>>> is considered retained in controller but the driver is still asking USB
->>>>>>>>>> core to perform a reset-resume. This can make bluetooth
->> controller
->>>>>>>>>> unusable.
->>>>>>>>>> 
->>>>>>>>>> So avoid unnecessary reset to resolve the issue.
->>>>>>>>>> 
->>>>>>>>>> For devices that really lose power during suspend, USB core will
->>>> detect
->>>>>>>>>> and handle reset-resume correctly.
->>>>>>>>>> 
->>>>>>>>>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->>>>>>>>>> ---
->>>>>>>>>> drivers/bluetooth/btusb.c | 8 +++-----
->>>>>>>>>> 1 file changed, 3 insertions(+), 5 deletions(-)
->>>>>>>>>> 
->>>>>>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>>>>>>>> index 8d2608ddfd08..de86ef4388f9 100644
->>>>>>>>>> --- a/drivers/bluetooth/btusb.c
->>>>>>>>>> +++ b/drivers/bluetooth/btusb.c
->>>>>>>>>> @@ -4255,17 +4255,15 @@ static int btusb_suspend(struct
->>>>>> usb_interface *intf, pm_message_t message)
->>>>>>>>>>            enable_irq(data->oob_wake_irq);
->>>>>>>>>>    }
->>>>>>>>>> 
->>>>>>>>>> -       /* For global suspend, Realtek devices lose the loaded fw
->>>>>>>>>> -        * in them. But for autosuspend, firmware should remain.
->>>>>>>>>> -        * Actually, it depends on whether the usb host sends
->>>>>>>>>> +       /* For global suspend, Realtek devices lose the loaded fw in
->>>> them
->>>>>> if
->>>>>>>>>> +        * platform firmware cut power off. But for autosuspend,
->>>>>> firmware
->>>>>>>>>> +        * should remain.  Actually, it depends on whether the usb
->> host
->>>>>> sends
->>>>>>>>>>     * set feature (enable wakeup) or not.
->>>>>>>>>>     */
->>>>>>>>>>    if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
->>>>>>>>>>            if (PMSG_IS_AUTO(message) &&
->>>>>>>>>>                device_can_wakeup(&data->udev->dev))
->>>>>>>>>>                    data->udev->do_remote_wakeup = 1;
->>>>>>>>>> -               else if (!PMSG_IS_AUTO(message))
->>>>>>>>>> -                       data->udev->reset_resume = 1;
->>>>>>>>>>    }
->>>>>>>>>> 
->>>>>>>>>>    return 0;
->>>>>>>>>> --
->>>>>>>>>> 2.17.1
->>>>>> 
->>>>>> 
->>>>>> ------Please consider the environment before printing this e-mail.
-> 
-
+Thanks,
+Archie
