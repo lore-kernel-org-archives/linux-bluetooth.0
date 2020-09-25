@@ -5,168 +5,240 @@ X-Spam-Level:
 X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B37EAC4727F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 06:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0EFC4727F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 06:47:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FD372389E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 06:40:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA74F235F8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 06:47:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727167AbgIYGkm (ORCPT
+        id S1727216AbgIYGrX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 02:40:42 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:41788 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbgIYGkl (ORCPT
+        Fri, 25 Sep 2020 02:47:23 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:54609 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727135AbgIYGrX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 02:40:41 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 08P6eKQb9016389, This message is accepted by code: ctloc85258
-Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
-        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 08P6eKQb9016389
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 25 Sep 2020 14:40:21 +0800
-Received: from RSEXMBS01.realsil.com.cn (172.29.17.195) by
- RSEXMBS01.realsil.com.cn (172.29.17.195) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2044.4; Fri, 25 Sep 2020 14:40:20 +0800
-Received: from RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37]) by
- RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37%7]) with mapi id
- 15.01.2044.004; Fri, 25 Sep 2020 14:40:20 +0800
-From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>
-CC:     Marcel Holtmann <marcel@holtmann.org>,
+        Fri, 25 Sep 2020 02:47:23 -0400
+Received: from mail-pj1-f69.google.com ([209.85.216.69])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <kai.heng.feng@canonical.com>)
+        id 1kLhVo-0002NN-R3
+        for linux-bluetooth@vger.kernel.org; Fri, 25 Sep 2020 06:47:21 +0000
+Received: by mail-pj1-f69.google.com with SMTP id ic18so1182154pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Sep 2020 23:47:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=1xTU2HZT5ZPNiI5Nnwy9xhPoPtId/zzqXSdxC+Cmcjg=;
+        b=gnpBN3Cv6fYhIS4z7+/tWSbB1lGurfH4uJw9Jxg5SYtwHB6+g/Wdf2dAizxuWySjsn
+         qg9m225SMzPBljWtyeDFViABitUucQtclVA1f+3y8/lezsR3U+A98C0a7xZclKgUn3G6
+         ZhOnBFnHaVRMI7LczXnFWJ6+iD6N+K1u6um8ia3eErkuLL9ITina36sw8H5eqOa3V26C
+         gLXfJf2RPXkbmtZYSzuwJYYLo90+qsB0+QOhKX6TJ6MfFLMf//5FuBdzrkPQ64JEfL1Z
+         PiCJ+qVMkmRy8VLvIBiFxqG6J4CQpCue7KWTZ3ySYRUq5JpNXbgpxuLgOp575Lmde+ep
+         AJTQ==
+X-Gm-Message-State: AOAM533N7NcUDNIPWs9asHBVcCqv5P8d/gA+bZXgZOgoM0ZqIUpb8OSz
+        pozLSX8j8ofAsgPdbmjj2cqcj/C4HucTCtxUYQDxS2gJqPazY4x6XtbCrGQNjXj8fLBfZ815hJ8
+        /rrEvKmp1dW5YrwgHJ6f9rIEL6YgX0fvKqAtsZAITDV/3JA==
+X-Received: by 2002:a63:546:: with SMTP id 67mr2318261pgf.347.1601016438847;
+        Thu, 24 Sep 2020 23:47:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjfwmtj2sXE6v3dl6Fh14Mdhm0zrkN3fRFPdybeheYNQfMQVEIyVo9Gev13sG84NTaS391yg==
+X-Received: by 2002:a63:546:: with SMTP id 67mr2318235pgf.347.1601016438288;
+        Thu, 24 Sep 2020 23:47:18 -0700 (PDT)
+Received: from [192.168.1.208] (220-133-187-190.HINET-IP.hinet.net. [220.133.187.190])
+        by smtp.gmail.com with ESMTPSA id c185sm1423826pfb.123.2020.09.24.23.47.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Sep 2020 23:47:17 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
+ resume
+From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
+In-Reply-To: <2ce180be1cab4400bb792f5ff2384be7@realsil.com.cn>
+Date:   Fri, 25 Sep 2020 14:47:14 +0800
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
         "open list:USB XHCI DRIVER" <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system resume
-Thread-Topic: [PATCH] Bluetooth: btusb: Avoid unnecessary reset upon system
- resume
-Thread-Index: AdaTA82tEjoMhrlwTRmkpK3reTvHgQ==
-Date:   Fri, 25 Sep 2020 06:40:20 +0000
-Message-ID: <2ce180be1cab4400bb792f5ff2384be7@realsil.com.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Message-Id: <73E1E197-21E6-452D-84A0-32B0DCBB8D65@canonical.com>
+References: <2ce180be1cab4400bb792f5ff2384be7@realsil.com.cn>
+To:     =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgQWJoaXNoZWssDQoNCj4gT24gU2VwdGVtYmVyIDI1LCAyMDIwIGF0IDExOjM0LCBBYmhpc2hl
-ayBQYW5kaXQtU3ViZWRpIHdyb3RlOg0KPiANCj4gKyBBbGV4IEx1ICh3aG8gY29udHJpYnV0ZWQg
-dGhlIG9yaWdpbmFsIGNoYW5nZSkNCj4gDQo+IEhpIEthaS1IZW5nLA0KPiANCj4gDQo+IE9uIFRo
-dSwgU2VwIDI0LCAyMDIwIGF0IDEyOjEwIEFNIEthaS1IZW5nIEZlbmcNCj4gPGthaS5oZW5nLmZl
-bmdAY2Fub25pY2FsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBbK0NjIGxpbnV4LXVzYl0NCj4gPg0K
-PiA+IEhpIEFiaGlzaGVrLA0KPiA+DQo+ID4gPiBPbiBTZXAgMjQsIDIwMjAsIGF0IDA0OjQxLCBB
-Ymhpc2hlayBQYW5kaXQtU3ViZWRpDQo+IDxhYmhpc2hla3BhbmRpdEBjaHJvbWl1bS5vcmc+IHdy
-b3RlOg0KPiA+ID4NCj4gPiA+IEhpIEthaS1IZW5nLA0KPiA+ID4NCj4gPiA+IFdoaWNoIFJlYWx0
-ZWsgY29udHJvbGxlciBpcyB0aGlzIG9uPycNCj4gPg0KPiA+IFRoZSBpc3N1ZSBoYXBwZW5zIG9u
-IDg4MjFDRS4NCj4gPg0KPiA+ID4NCj4gPiA+IFNwZWNpZmljYWxseSBmb3IgUlRMODgyMkNFLCB3
-ZSB0ZXN0ZWQgd2l0aG91dCByZXNldF9yZXN1bWUgYmVpbmcgc2V0DQo+ID4gPiBhbmQgdGhhdCB3
-YXMgY2F1c2luZyB0aGUgY29udHJvbGxlciBiZWluZyByZXNldCB3aXRob3V0IGJsdWV6IGV2ZXIN
-Cj4gPiA+IGxlYXJuaW5nIGFib3V0IGl0IChyZXN1bHRpbmcgaW4gZGV2aWNlcyBiZWluZyB1bnVz
-YWJsZSB3aXRob3V0DQo+ID4gPiB0b2dnbGluZyB0aGUgQlQgcG93ZXIpLg0KPiA+DQo+ID4gVGhl
-IHJlc2V0IGlzIGRvbmUgYnkgdGhlIGtlcm5lbCwgc28gaG93IGRvZXMgdGhhdCBhZmZlY3QgYmx1
-ZXo/DQo+ID4NCj4gPiBGcm9tIHdoYXQgeW91IGRlc2NyaWJlZCwgaXQgc291bmRzIG1vcmUgbGlr
-ZSBydW50aW1lIHJlc3VtZSBzaW5jZSBibHVleg0KPiBpcyBhbHJlYWR5IHJ1bm5pbmcuDQo+ID4g
-SWYgd2UgbmVlZCByZXNldCByZXN1bWUgZm9yIHJ1bnRpbWUgcmVzdW1lLCBtYXliZSBpdCdzIGFu
-b3RoZXIgYnVnDQo+IHdoaWNoIG5lZWRzIHRvIGJlIGFkZHJlc3NlZD8NCj4gDQo+IEZyb20gYnR1
-c2IuYzoNCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQv
-Ymx1ZXRvb3RoL2JsdWV0b290aC0NCj4gbmV4dC5naXQvdHJlZS9kcml2ZXJzL2JsdWV0b290aC9i
-dHVzYi5jI240MTg5DQo+IC8qIFJlYWx0ZWsgZGV2aWNlcyBsb3NlIHRoZWlyIHVwZGF0ZWQgZmly
-bXdhcmUgb3ZlciBnbG9iYWwNCj4gKiBzdXNwZW5kIHRoYXQgbWVhbnMgaG9zdCBkb2Vzbid0IHNl
-bmQgU0VUX0ZFQVRVUkUNCj4gKiAoREVWSUNFX1JFTU9URV9XQUtFVVApDQo+ICovDQo+IA0KPiBS
-dW50aW1lIHN1c3BlbmQgYWx3YXlzIHJlcXVpcmVzIHJlbW90ZSB3YWtldXAgdG8gYmUgc2V0IGFu
-ZCByZXNldA0KPiByZXN1bWUgaXNuJ3QgdXNlZCB0aGVyZS4NCj4gDQo+IER1cmluZyBzeXN0ZW0g
-c3VzcGVuZCwgd2hlbiByZW1vdGUgd2FrZXVwIGlzIG5vdCBzZXQsIFJUTDg4MjJDRSBsb3Nlcw0K
-PiB0aGUgRlcgbG9hZGVkIGJ5IHRoZSBkcml2ZXIgYW5kIGFueSBzdGF0ZSBjdXJyZW50bHkgaW4g
-dGhlIGNvbnRyb2xsZXIuDQo+IFRoaXMgY2F1c2VzIHRoZSBrZXJuZWwgYW5kIHRoZSBjb250cm9s
-bGVyIHN0YXRlIHRvIGdvIG91dCBvZiBzeW5jLg0KPiBPbmUgb2YgdGhlIGlzc3VlcyB3ZSBvYnNl
-cnZlZCBvbiB0aGUgUmVhbHRlayBjb250cm9sbGVyIHdpdGhvdXQgdGhlDQo+IHJlc2V0IHJlc3Vt
-ZSBxdWlyayB3YXMgdGhhdCBwYWlyZWQgb3IgY29ubmVjdGVkIGRldmljZXMgd291bGQganVzdA0K
-PiBzdG9wIHdvcmtpbmcgYWZ0ZXIgcmVzdW1lLg0KPiANCj4gPg0KPiA+ID4gSWYgdGhlIGZpcm13
-YXJlIGRvZXNuJ3QgY3V0IG9mZiBwb3dlciBkdXJpbmcgc3VzcGVuZCwgbWF5YmUgeW91DQo+ID4g
-PiBzaG91bGRuJ3Qgc2V0IHRoZSBCVFVTQl9XQUtFVVBfRElTQUJMRSBmbGFnIGZvciB0aGF0IGNv
-bnRyb2xsZXIuDQo+ID4NCj4gPiBXZSBkb24ndCBrbm93IGJlZm9yZWhhbmQgaWYgdGhlIHBsYXRm
-b3JtIGZpcm13YXJlIChCSU9TIGZvciBteSBjYXNlKSB3aWxsDQo+IGN1dCBwb3dlciBvZmYgb3Ig
-bm90Lg0KPiA+DQo+ID4gSW4gZ2VuZXJhbCwgbGFwdG9wcyB3aWxsIGN1dCBvZmYgdGhlIFVTQiBw
-b3dlciBkdXJpbmcgUzMuDQo+ID4gV2hlbiBBQyBpcyBwbHVnZ2VkLCBzb21lIGxhcHRvcHMgY3V0
-cyBVU0IgcG93ZXIgb2ZmIGFuZCBzb21lIGRvbid0LiBUaGlzDQo+IGFsc28gYXBwbGllcyB0byBt
-YW55IGRlc2t0b3BzLiBOb3QgdG8gbWVudGlvbiB0aGVyZSBjYW4gYmUgQklPUyBvcHRpb25zIHRv
-DQo+IGNvbnRyb2wgVVNCIHBvd2VyIHVuZGVyIFMzL1M0L1M1Li4uDQo+ID4NCj4gPiBTbyB3ZSBk
-b24ndCBrbm93IGJlZm9yZWhhbmQuDQo+ID4NCj4gDQo+IEkgdGhpbmsgdGhlIGNvbmZ1c2lvbiBo
-ZXJlIHN0ZW1zIGZyb20gd2hhdCBpcyBhY3R1YWxseSBiZWluZyB0dXJuZWQNCj4gb2ZmIGJldHdl
-ZW4gb3VyIHR3byBib2FyZHMgYW5kIHdoYXQgd2UncmUgcmVmZXJyaW5nIHRvIGFzIGZpcm13YXJl
-IDopDQo+IA0KPiBJbiB5b3VyIGNhc2UsIHRoZSBSZWFsdGVrIGNvbnRyb2xsZXIgcmV0YWlucyBm
-aXJtd2FyZSB1bmxlc3MgdGhlDQo+IHBsYXRmb3JtIGN1dHMgb2YgcG93ZXIgdG8gVVNCICh3aGlj
-aCBpdCBkb2VzIGR1cmluZyBTMykuDQo+IEluIG15IGNhc2UsIHRoZSBSZWFsdGVrIGNvbnRyb2xs
-ZXIgbG9zZXMgZmlybXdhcmUgd2hlbiBSZW1vdGUgV2FrZXVwDQo+IGlzbid0IHNldCwgZXZlbiBp
-ZiB0aGUgcGxhdGZvcm0gZG9lc24ndCBjdXQgcG93ZXIgdG8gVVNCLg0KPiANCj4gSW4geW91ciBj
-YXNlLCBzaW5jZSB5b3UgZG9uJ3QgbmVlZCB0byBlbmZvcmNlIHRoZSAnUmVtb3RlIFdha2V1cCcg
-Yml0LA0KPiBpZiB5b3UgdW5zZXQgdGhlIEJUVVNCX1dBS0VVUF9ESVNBQkxFIGZvciB0aGF0IFZJ
-RDpQSUQsIHlvdSBzaG91bGQgZ2V0DQo+IHRoZSBkZXNpcmFibGUgYmVoYXZpb3IgKHdoaWNoIGlz
-IGFjdHVhbGx5IHRoZSBkZWZhdWx0IGJlaGF2aW9yOyByZW1vdGUNCj4gd2FrZSB3aWxsIGFsd2F5
-cyBiZSBhc3NlcnRlZCBpbnN0ZWFkIG9mIG9ubHkgZHVyaW5nIFJ1bnRpbWUgU3VzcGVuZCkuDQo+
-IA0KPiBAQWxleCAtLSBXaGF0IGlzIHRoZSBjb21tb24gYmVoYXZpb3IgZm9yIFJlYWx0ZWsgY29u
-dHJvbGxlcnM/IFNob3VsZA0KPiB3ZSBzZXQgQlRVU0JfV0FLRVVQX0RJU0FCTEUgb25seSBvbiBS
-VEw4ODIyQ0Ugb3Igc2hvdWxkIHdlIHVuc2V0IGl0DQo+IG9ubHkgb24gUlRMODgyMUNFPw0KPiAN
-Cg0KQWNjb3JkaW5nIHRvIHRoZSBmZWVkYmFjayBmcm9tIG91ciBmaXJtd2FyZSBlbmdpbmVlcnMs
-IGFsbCBSZWFsdGVrIGNvbnRyb2xsZXJzIHNob3VsZCBoYXZlIHRoZSBzYW1lIGJlaGF2aW9yIG9u
-IHN1c3BlbmQgYW5kIHJlc3VtZS4NCkAgS2FpLUhlbmcsICIgQmx1ZXRvb3RoOiBoY2kwOiBjb21t
-YW5kIDB4MTAwMSB0eCB0aW1lb3V0ICIgaXMgaXJyZWxldmFudCB0byBmaXJtd2FyZSBsb3NzIG9y
-IG5vdC4gVGhlIHJvbSBjb2RlIGluIGNvbnRyb2xsZXIgc3VwcG9ydHMgdGhpcyBjb21tYW5kLg0K
-DQo+ID4gPg0KPiA+ID4gSSB3b3VsZCBwcmVmZXIgdGhpcyBkb2Vzbid0IGdldCBhY2NlcHRlZCBp
-biBpdHMgY3VycmVudCBzdGF0ZS4NCj4gPg0KPiA+IE9mIGNvdXJzZS4NCj4gPiBJIHRoaW5rIHdl
-IG5lZWQgdG8gZmluZCB0aGUgcm9vdCBjYXVzZSBmb3IgeW91ciBjYXNlIGJlZm9yZSBhcHBseWlu
-ZyB0aGlzDQo+IG9uZS4NCj4gPg0KPiA+IEthaS1IZW5nDQo+ID4NCj4gPiA+DQo+ID4gPiBBYmhp
-c2hlaw0KPiA+ID4NCj4gPiA+IE9uIFdlZCwgU2VwIDIzLCAyMDIwIGF0IDEwOjU2IEFNIEthaS1I
-ZW5nIEZlbmcNCj4gPiA+IDxrYWkuaGVuZy5mZW5nQGNhbm9uaWNhbC5jb20+IHdyb3RlOg0KPiA+
-ID4+DQo+ID4gPj4gUmVhbHRlayBibHVldG9vdGggY29udHJvbGxlciBtYXkgZmFpbCB0byB3b3Jr
-IGFmdGVyIHN5c3RlbSBzbGVlcDoNCj4gPiA+PiBbIDEyNzIuNzA3NjcwXSBCbHVldG9vdGg6IGhj
-aTA6IGNvbW1hbmQgMHgxMDAxIHR4IHRpbWVvdXQNCj4gPiA+PiBbIDEyODAuODM1NzEyXSBCbHVl
-dG9vdGg6IGhjaTA6IFJUTDogSENJX09QX1JFQURfTE9DQUxfVkVSU0lPTg0KPiBmYWlsZWQgKC0x
-MTApDQo+ID4gPj4NCj4gPiA+PiBJZiBwbGF0Zm9ybSBmaXJtd2FyZSBkb2Vzbid0IGN1dCBwb3dl
-ciBvZmYgZHVyaW5nIHN1c3BlbmQsIHRoZQ0KPiBmaXJtd2FyZQ0KPiA+ID4+IGlzIGNvbnNpZGVy
-ZWQgcmV0YWluZWQgaW4gY29udHJvbGxlciBidXQgdGhlIGRyaXZlciBpcyBzdGlsbCBhc2tpbmcg
-VVNCDQo+ID4gPj4gY29yZSB0byBwZXJmb3JtIGEgcmVzZXQtcmVzdW1lLiBUaGlzIGNhbiBtYWtl
-IGJsdWV0b290aCBjb250cm9sbGVyDQo+ID4gPj4gdW51c2FibGUuDQo+ID4gPj4NCj4gPiA+PiBT
-byBhdm9pZCB1bm5lY2Vzc2FyeSByZXNldCB0byByZXNvbHZlIHRoZSBpc3N1ZS4NCj4gPiA+Pg0K
-PiA+ID4+IEZvciBkZXZpY2VzIHRoYXQgcmVhbGx5IGxvc2UgcG93ZXIgZHVyaW5nIHN1c3BlbmQs
-IFVTQiBjb3JlIHdpbGwgZGV0ZWN0DQo+ID4gPj4gYW5kIGhhbmRsZSByZXNldC1yZXN1bWUgY29y
-cmVjdGx5Lg0KPiA+ID4+DQo+ID4gPj4gU2lnbmVkLW9mZi1ieTogS2FpLUhlbmcgRmVuZyA8a2Fp
-LmhlbmcuZmVuZ0BjYW5vbmljYWwuY29tPg0KPiA+ID4+IC0tLQ0KPiA+ID4+IGRyaXZlcnMvYmx1
-ZXRvb3RoL2J0dXNiLmMgfCA4ICsrKy0tLS0tDQo+ID4gPj4gMSBmaWxlIGNoYW5nZWQsIDMgaW5z
-ZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4gPiA+Pg0KPiA+ID4+IGRpZmYgLS1naXQgYS9k
-cml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+
-ID4+IGluZGV4IDhkMjYwOGRkZmQwOC4uZGU4NmVmNDM4OGY5IDEwMDY0NA0KPiA+ID4+IC0tLSBh
-L2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiA+PiArKysgYi9kcml2ZXJzL2JsdWV0b290
-aC9idHVzYi5jDQo+ID4gPj4gQEAgLTQyNTUsMTcgKzQyNTUsMTUgQEAgc3RhdGljIGludCBidHVz
-Yl9zdXNwZW5kKHN0cnVjdA0KPiB1c2JfaW50ZXJmYWNlICppbnRmLCBwbV9tZXNzYWdlX3QgbWVz
-c2FnZSkNCj4gPiA+PiAgICAgICAgICAgICAgICBlbmFibGVfaXJxKGRhdGEtPm9vYl93YWtlX2ly
-cSk7DQo+ID4gPj4gICAgICAgIH0NCj4gPiA+Pg0KPiA+ID4+IC0gICAgICAgLyogRm9yIGdsb2Jh
-bCBzdXNwZW5kLCBSZWFsdGVrIGRldmljZXMgbG9zZSB0aGUgbG9hZGVkIGZ3DQo+ID4gPj4gLSAg
-ICAgICAgKiBpbiB0aGVtLiBCdXQgZm9yIGF1dG9zdXNwZW5kLCBmaXJtd2FyZSBzaG91bGQgcmVt
-YWluLg0KPiA+ID4+IC0gICAgICAgICogQWN0dWFsbHksIGl0IGRlcGVuZHMgb24gd2hldGhlciB0
-aGUgdXNiIGhvc3Qgc2VuZHMNCj4gPiA+PiArICAgICAgIC8qIEZvciBnbG9iYWwgc3VzcGVuZCwg
-UmVhbHRlayBkZXZpY2VzIGxvc2UgdGhlIGxvYWRlZCBmdyBpbiB0aGVtIGlmDQo+ID4gPj4gKyAg
-ICAgICAgKiBwbGF0Zm9ybSBmaXJtd2FyZSBjdXQgcG93ZXIgb2ZmLiBCdXQgZm9yIGF1dG9zdXNw
-ZW5kLCBmaXJtd2FyZQ0KPiA+ID4+ICsgICAgICAgICogc2hvdWxkIHJlbWFpbi4gIEFjdHVhbGx5
-LCBpdCBkZXBlbmRzIG9uIHdoZXRoZXIgdGhlIHVzYiBob3N0DQo+IHNlbmRzDQo+ID4gPj4gICAg
-ICAgICAqIHNldCBmZWF0dXJlIChlbmFibGUgd2FrZXVwKSBvciBub3QuDQo+ID4gPj4gICAgICAg
-ICAqLw0KPiA+ID4+ICAgICAgICBpZiAodGVzdF9iaXQoQlRVU0JfV0FLRVVQX0RJU0FCTEUsICZk
-YXRhLT5mbGFncykpIHsNCj4gPiA+PiAgICAgICAgICAgICAgICBpZiAoUE1TR19JU19BVVRPKG1l
-c3NhZ2UpICYmDQo+ID4gPj4gICAgICAgICAgICAgICAgICAgIGRldmljZV9jYW5fd2FrZXVwKCZk
-YXRhLT51ZGV2LT5kZXYpKQ0KPiA+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgZGF0YS0+dWRl
-di0+ZG9fcmVtb3RlX3dha2V1cCA9IDE7DQo+ID4gPj4gLSAgICAgICAgICAgICAgIGVsc2UgaWYg
-KCFQTVNHX0lTX0FVVE8obWVzc2FnZSkpDQo+ID4gPj4gLSAgICAgICAgICAgICAgICAgICAgICAg
-ZGF0YS0+dWRldi0+cmVzZXRfcmVzdW1lID0gMTsNCj4gPiA+PiAgICAgICAgfQ0KPiA+ID4+DQo+
-ID4gPj4gICAgICAgIHJldHVybiAwOw0KPiA+ID4+IC0tDQo+ID4gPj4gMi4xNy4xDQo+ID4gPj4N
-Cj4gPg0KPiANCg==
+
+
+> On Sep 25, 2020, at 14:40, 陆朱伟 <alex_lu@realsil.com.cn> wrote:
+> 
+> Hi Abhishek,
+> 
+>> On September 25, 2020 at 11:34, Abhishek Pandit-Subedi wrote:
+>> 
+>> + Alex Lu (who contributed the original change)
+>> 
+>> Hi Kai-Heng,
+>> 
+>> 
+>> On Thu, Sep 24, 2020 at 12:10 AM Kai-Heng Feng
+>> <kai.heng.feng@canonical.com> wrote:
+>>> 
+>>> [+Cc linux-usb]
+>>> 
+>>> Hi Abhishek,
+>>> 
+>>>> On Sep 24, 2020, at 04:41, Abhishek Pandit-Subedi
+>> <abhishekpandit@chromium.org> wrote:
+>>>> 
+>>>> Hi Kai-Heng,
+>>>> 
+>>>> Which Realtek controller is this on?'
+>>> 
+>>> The issue happens on 8821CE.
+>>> 
+>>>> 
+>>>> Specifically for RTL8822CE, we tested without reset_resume being set
+>>>> and that was causing the controller being reset without bluez ever
+>>>> learning about it (resulting in devices being unusable without
+>>>> toggling the BT power).
+>>> 
+>>> The reset is done by the kernel, so how does that affect bluez?
+>>> 
+>>> From what you described, it sounds more like runtime resume since bluez
+>> is already running.
+>>> If we need reset resume for runtime resume, maybe it's another bug
+>> which needs to be addressed?
+>> 
+>> From btusb.c:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-
+>> next.git/tree/drivers/bluetooth/btusb.c#n4189
+>> /* Realtek devices lose their updated firmware over global
+>> * suspend that means host doesn't send SET_FEATURE
+>> * (DEVICE_REMOTE_WAKEUP)
+>> */
+>> 
+>> Runtime suspend always requires remote wakeup to be set and reset
+>> resume isn't used there.
+>> 
+>> During system suspend, when remote wakeup is not set, RTL8822CE loses
+>> the FW loaded by the driver and any state currently in the controller.
+>> This causes the kernel and the controller state to go out of sync.
+>> One of the issues we observed on the Realtek controller without the
+>> reset resume quirk was that paired or connected devices would just
+>> stop working after resume.
+>> 
+>>> 
+>>>> If the firmware doesn't cut off power during suspend, maybe you
+>>>> shouldn't set the BTUSB_WAKEUP_DISABLE flag for that controller.
+>>> 
+>>> We don't know beforehand if the platform firmware (BIOS for my case) will
+>> cut power off or not.
+>>> 
+>>> In general, laptops will cut off the USB power during S3.
+>>> When AC is plugged, some laptops cuts USB power off and some don't. This
+>> also applies to many desktops. Not to mention there can be BIOS options to
+>> control USB power under S3/S4/S5...
+>>> 
+>>> So we don't know beforehand.
+>>> 
+>> 
+>> I think the confusion here stems from what is actually being turned
+>> off between our two boards and what we're referring to as firmware :)
+>> 
+>> In your case, the Realtek controller retains firmware unless the
+>> platform cuts of power to USB (which it does during S3).
+>> In my case, the Realtek controller loses firmware when Remote Wakeup
+>> isn't set, even if the platform doesn't cut power to USB.
+>> 
+>> In your case, since you don't need to enforce the 'Remote Wakeup' bit,
+>> if you unset the BTUSB_WAKEUP_DISABLE for that VID:PID, you should get
+>> the desirable behavior (which is actually the default behavior; remote
+>> wake will always be asserted instead of only during Runtime Suspend).
+>> 
+>> @Alex -- What is the common behavior for Realtek controllers? Should
+>> we set BTUSB_WAKEUP_DISABLE only on RTL8822CE or should we unset it
+>> only on RTL8821CE?
+>> 
+> 
+> According to the feedback from our firmware engineers, all Realtek controllers should have the same behavior on suspend and resume.
+> @ Kai-Heng, " Bluetooth: hci0: command 0x1001 tx timeout " is irrelevant to firmware loss or not. The rom code in controller supports this command.
+
+Does USB warm-reset affect the Bluetooth controller?
+
+Kai-Heng
+
+> 
+>>>> 
+>>>> I would prefer this doesn't get accepted in its current state.
+>>> 
+>>> Of course.
+>>> I think we need to find the root cause for your case before applying this
+>> one.
+>>> 
+>>> Kai-Heng
+>>> 
+>>>> 
+>>>> Abhishek
+>>>> 
+>>>> On Wed, Sep 23, 2020 at 10:56 AM Kai-Heng Feng
+>>>> <kai.heng.feng@canonical.com> wrote:
+>>>>> 
+>>>>> Realtek bluetooth controller may fail to work after system sleep:
+>>>>> [ 1272.707670] Bluetooth: hci0: command 0x1001 tx timeout
+>>>>> [ 1280.835712] Bluetooth: hci0: RTL: HCI_OP_READ_LOCAL_VERSION
+>> failed (-110)
+>>>>> 
+>>>>> If platform firmware doesn't cut power off during suspend, the
+>> firmware
+>>>>> is considered retained in controller but the driver is still asking USB
+>>>>> core to perform a reset-resume. This can make bluetooth controller
+>>>>> unusable.
+>>>>> 
+>>>>> So avoid unnecessary reset to resolve the issue.
+>>>>> 
+>>>>> For devices that really lose power during suspend, USB core will detect
+>>>>> and handle reset-resume correctly.
+>>>>> 
+>>>>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>>>>> ---
+>>>>> drivers/bluetooth/btusb.c | 8 +++-----
+>>>>> 1 file changed, 3 insertions(+), 5 deletions(-)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>> index 8d2608ddfd08..de86ef4388f9 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -4255,17 +4255,15 @@ static int btusb_suspend(struct
+>> usb_interface *intf, pm_message_t message)
+>>>>>               enable_irq(data->oob_wake_irq);
+>>>>>       }
+>>>>> 
+>>>>> -       /* For global suspend, Realtek devices lose the loaded fw
+>>>>> -        * in them. But for autosuspend, firmware should remain.
+>>>>> -        * Actually, it depends on whether the usb host sends
+>>>>> +       /* For global suspend, Realtek devices lose the loaded fw in them if
+>>>>> +        * platform firmware cut power off. But for autosuspend, firmware
+>>>>> +        * should remain.  Actually, it depends on whether the usb host
+>> sends
+>>>>>        * set feature (enable wakeup) or not.
+>>>>>        */
+>>>>>       if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
+>>>>>               if (PMSG_IS_AUTO(message) &&
+>>>>>                   device_can_wakeup(&data->udev->dev))
+>>>>>                       data->udev->do_remote_wakeup = 1;
+>>>>> -               else if (!PMSG_IS_AUTO(message))
+>>>>> -                       data->udev->reset_resume = 1;
+>>>>>       }
+>>>>> 
+>>>>>       return 0;
+>>>>> --
+>>>>> 2.17.1
+
