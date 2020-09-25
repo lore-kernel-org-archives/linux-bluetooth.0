@@ -2,90 +2,209 @@ Return-Path: <SRS0=+RU5=DC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D28AC4363D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 15:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB4DC4727C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:08:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F413D21741
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 15:53:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAjfsCsE"
+	by mail.kernel.org (Postfix) with ESMTP id 904E62371F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Sep 2020 16:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729040AbgIYPxc (ORCPT
+        id S1729122AbgIYQIg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Sep 2020 11:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728932AbgIYPxc (ORCPT
+        Fri, 25 Sep 2020 12:08:36 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60154 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728443AbgIYQIg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Sep 2020 11:53:32 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB88C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 08:53:32 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id o8so2752069otl.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Sep 2020 08:53:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UCknuGYJWuxnT1wYQ+2nO1s2cU7CuDyTwOBzv9jhRo8=;
-        b=fAjfsCsE75WE69WsWKqHzPojqhZ0Z/4IT0bFHkSTzGEMBOffjsMJs0THqRgUebNPjI
-         gnntYGsMyCEP2OJPXI2Vkhv5nB9gdyEakine6Sy/0+lWAUZVGio80CofEVYheFMvuuWV
-         +lYVfntkEcbkAlIFlVf2LodQVTiaO88OPmVDeKWDGwlrDkKxK4/9bbU9oAmjorlOdl83
-         jzTtDAKr5HwTXzaCSIrZlwbmUWDMaAt7r1siJDzgVr+W0JZfmMEB1KbjXKwWkmcWIQyX
-         WibxpIUI3xIpJYAFyWRjzbwZTlW4D2CeNHcVTpGxHIVoj+vMi35kR5VfzEfhqszWj2A5
-         z7gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UCknuGYJWuxnT1wYQ+2nO1s2cU7CuDyTwOBzv9jhRo8=;
-        b=Bu4zhSACB0kMcfX3+Ns5soFIyrdHiBsjgkIaipLy5MNfJYQHgWt1C9wWMr418jYUCk
-         CGqzRY2bNdegVr2gWgp7nJhB+PU0+CvaOhWoL/96uWvMnkpVAqcaPmYFxCuPZ1U/VIVJ
-         KeRYGw4ACXB1s+9DQVPjpXNlxdgr7TeCCpYpowEHpuNdMfrtBIa9+u6kLj1zPX9jFj1E
-         q4hXHKnON3ckeMyQFYb9I+w6RskXNuKtX7DAgAmWDDGlUJd9o8p/OzCl2w/kv6UPAZsd
-         jmKshlzAeJ6oRrU28pxuQJGORDYt8QbV35SQGgMqmzs8TMDwHGlCd46e+n5ajDj+RUlc
-         1vDw==
-X-Gm-Message-State: AOAM530YtYPTuH/x0HsebO/R5YUg9eV/0xWW/zIWQh0+wulovrH898ct
-        LkDl9YTP9kLSiHeloYtSmMLTetegxmmhyRHzfN/sJ9IkHHw=
-X-Google-Smtp-Source: ABdhPJwG3CskydShgbr99ZCcU7lDM8fzg1QPGOItvXfayD0ssIAbtUJnUGff3G0XbcAXTx1llmMg6LDFDdiYFZznWjM=
-X-Received: by 2002:a9d:5a8:: with SMTP id 37mr724672otd.362.1601049211357;
- Fri, 25 Sep 2020 08:53:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <CANozA0gGok3nJgVJehz6tS3iEXDGzd9Rj1QFN=w_xBA5OS-2LA@mail.gmail.com>
-In-Reply-To: <CANozA0gGok3nJgVJehz6tS3iEXDGzd9Rj1QFN=w_xBA5OS-2LA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 25 Sep 2020 08:53:18 -0700
-Message-ID: <CABBYNZ+R45LcY6eN-Ep6vEMCXC4qhyKHHd+UtMJQGDJJn2Z1oQ@mail.gmail.com>
-Subject: Re: Submitting patches to user land components
-To:     Aravind Machiry <machiry@cs.ucsb.edu>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 25 Sep 2020 12:08:36 -0400
+Received: from [172.20.10.2] (dynamic-046-114-136-219.46.114.pool.telefonica.de [46.114.136.219])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1A972CECDD;
+        Fri, 25 Sep 2020 18:15:31 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
+ support
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200925090829.3088-1-rjliao@codeaurora.org>
+Date:   Fri, 25 Sep 2020 18:08:28 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <8296D361-B28F-46CA-86E1-6F7FCE62D97F@holtmann.org>
+References: <20200914092744.17464-1-rjliao@codeaurora.org>
+ <20200925090829.3088-1-rjliao@codeaurora.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Aravind,
+Hi Rocky,
 
-On Fri, Sep 25, 2020 at 7:27 AM Aravind Machiry <machiry@cs.ucsb.edu> wrote:
->
-> Hello,
->
-> Is this the right mailing list to submit patches to bluez user-space components?
->
-> Thanks in advance.
->
-> -Best,
-> Aravind
+> This patch add support for WCN6855 i.e. patch and nvm download
+> support.
 
-Yes it is, please check the HACKING document before submitting:
+please always include the content of /sys/kernel/debug/usb/devices for this hardware.
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/HACKING
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> drivers/bluetooth/btusb.c | 66 +++++++++++++++++++++++++++++++--------
+> 1 file changed, 53 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 9f294b941943..e888e4c02d69 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
+> #define BTUSB_MEDIATEK		0x200000
+> #define BTUSB_WIDEBAND_SPEECH	0x400000
+> #define BTUSB_VALID_LE_STATES   0x800000
+> +#define BTUSB_QCA_WCN6855	0x1000000
+> 
+> static const struct usb_device_id btusb_table[] = {
+> 	/* Generic Bluetooth USB device */
+> @@ -291,6 +292,10 @@ static const struct usb_device_id blacklist_table[] = {
+> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME |
+> 						     BTUSB_WIDEBAND_SPEECH },
+> 
+> +	/* QCA WCN6855 chipset */
+> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
+> +						     BTUSB_WIDEBAND_SPEECH },
+> +
+> 	/* Broadcom BCM2035 */
+> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+> @@ -3409,6 +3414,27 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
+> 	return 0;
+> }
+> 
+> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+> +				const bdaddr_t *bdaddr)
+> +{
+> +	struct sk_buff *skb;
+> +	u8 buf[6];
+> +	long ret;
+> +
+> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
+> +
+> +	skb = __hci_cmd_sync_ev(hdev, 0xfc14, sizeof(buf), buf,
+> +				HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		ret = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
+> +		return ret;
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +
+> #define QCA_DFU_PACKET_LEN	4096
+> 
+> #define QCA_GET_TARGET_VERSION	0x09
+> @@ -3428,7 +3454,8 @@ struct qca_version {
+> } __packed;
+> 
+> struct qca_rampatch_version {
+> -	__le16	rom_version;
+> +	__le16	rom_version_high;
+> +	__le16  rom_version_low;
+> 	__le16	patch_version;
+> } __packed;
 
--- 
-Luiz Augusto von Dentz
+How does this work. The struct now has an extra 16-bit in the middle. Is this backwards compatible?
+
+> 
+> @@ -3440,12 +3467,14 @@ struct qca_device_info {
+> };
+> 
+> static const struct qca_device_info qca_devices_table[] = {
+> -	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
+> -	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
+> -	{ 0x00000200, 28, 4, 18 }, /* Rome 2.0 */
+> -	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
+> -	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
+> -	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
+> +	{ 0x00000100, 20, 4, 8 }, /* Rome 1.0 */
+> +	{ 0x00000101, 20, 4, 8 }, /* Rome 1.1 */
+
+Align it with 8  }
+
+> +	{ 0x00000200, 28, 4, 16 }, /* Rome 2.0 */
+> +	{ 0x00000201, 28, 4, 16 }, /* Rome 2.1 */
+> +	{ 0x00000300, 28, 4, 16 }, /* Rome 3.0 */
+> +	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+> +	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+> +	{ 0x00130200, 40, 4, 16 }  /* WCN6855 2.0 */
+
+And the last one should also be },
+
+> };
+> 
+> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+> @@ -3547,8 +3576,8 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+> {
+> 	struct qca_rampatch_version *rver;
+> 	const struct firmware *fw;
+> -	u32 ver_rom, ver_patch;
+> -	u16 rver_rom, rver_patch;
+> +	u32 ver_rom, ver_patch, rver_rom;
+> +	u16 rver_rom_low, rver_rom_high, rver_patch;
+> 	char fwname[64];
+> 	int err;
+> 
+> @@ -3567,9 +3596,16 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+> 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
+> 
+> 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
+> -	rver_rom = le16_to_cpu(rver->rom_version);
+> +	rver_rom_low = le16_to_cpu(rver->rom_version_low);
+> 	rver_patch = le16_to_cpu(rver->patch_version);
+> 
+> +	if (ver_rom & ~0xffffU) {
+> +		rver_rom_high = le16_to_cpu(rver->rom_version_high);
+> +		rver_rom = le32_to_cpu(rver_rom_high << 16 | rver_rom_low);
+> +	} else {
+> +		rver_rom = rver_rom_low;
+> +	}
+> +
+> 	bt_dev_info(hdev, "QCA: patch rome 0x%x build 0x%x, "
+> 		    "firmware rome 0x%x build 0x%x",
+> 		    rver_rom, rver_patch, ver_rom, ver_patch);
+> @@ -3643,9 +3679,6 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+> 		return err;
+> 
+> 	ver_rom = le32_to_cpu(ver.rom_version);
+> -	/* Don't care about high ROM versions */
+> -	if (ver_rom & ~0xffffU)
+> -		return 0;
+> 
+> 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
+> 		if (ver_rom == qca_devices_table[i].rom_version)
+> @@ -4081,6 +4114,13 @@ static int btusb_probe(struct usb_interface *intf,
+> 		btusb_check_needs_reset_resume(intf);
+> 	}
+> 
+> +	if (id->driver_info & BTUSB_QCA_WCN6855) {
+> +		data->setup_on_usb = btusb_setup_qca;
+> +		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
+> +		hdev->cmd_timeout = btusb_qca_cmd_timeout;
+> +		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> +	}
+> +
+> 	if (id->driver_info & BTUSB_AMP) {
+> 		/* AMP controllers do not support SCO packets */
+> 		data->isoc = NULL;
+
+Regards
+
+Marcel
+
