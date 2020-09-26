@@ -2,166 +2,188 @@ Return-Path: <SRS0=G13S=DD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2B6C4727F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Sep 2020 18:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CC9C47420
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Sep 2020 18:41:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 825592073A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Sep 2020 18:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0429420809
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Sep 2020 18:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vVMFitoq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YNG4b9ji"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730011AbgIZSJE (ORCPT
+        id S1730018AbgIZSly (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Sep 2020 14:09:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55884 "EHLO
+        Sat, 26 Sep 2020 14:41:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729272AbgIZSJE (ORCPT
+        with ESMTP id S1726183AbgIZSly (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Sep 2020 14:09:04 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01630C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2020 11:09:04 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id gc24so1381186pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2020 11:09:03 -0700 (PDT)
+        Sat, 26 Sep 2020 14:41:54 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF81C0613CE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2020 11:41:54 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id k15so7372817wrn.10
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Sep 2020 11:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=3c/59FF6UbpGkMXgjwS6ktZFhTNkfaygiMQu3wJN1UY=;
-        b=vVMFitoqRXXsjBHtjdEbF+ErlbYpYAdQUrfdKS7nxxfXEim/afvY1jGS+LdAWp9ldz
-         F8zzQm6hVxUbeaxhgipYPHlc+ALHhcwc3CLDp9TN/OMdo5PZJ9v+KLqfWQnS4M/N+Bca
-         9d7LzAR8gVcpeMZyn6CKLTjJ0Yia+TmcI5UgAa013eGHu0dNDREuA8rerIaNWcR7+IN7
-         LEQlt47fXtojfvHKKmkrb4tn/eOf3RFFuGS97opaBDMmJEa+zkEBhbeAbh43j+/J4//Q
-         jByyjv2EzxZsJeMmnBaGQAqn6vWaeIJkp5rGxzW+AdJ/8+gbRhQKV7WHvvhazsltHL8V
-         Pk1w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I4dYLd41ZGSY4Tt4CiINz+mTj1y2KoBQ8YuZjcUzXC0=;
+        b=YNG4b9jiouUrFSwXOrLTI4gXmhjnbStLA0C8NXZERPabMTQQNmOhYeMAZbID1f88f8
+         gcF+kY5aR9YeKL7jSdR1ScVcYA67ln8bu/h4PRoOIJAvLEuXESIv7zNQ/5pxgGQVqyO4
+         bufwW91somv/REUGJJSPeQKlPPJ2KZRncXKhOSArrOTdAVc0JidcsNFkI6VgNq1dXv2s
+         OoJi23s2umuykK9Uhg4ce86Aa5IevUnwMCgVSWWOVUyeVOWYyvscbjvYXJftye+I2e3R
+         Qy7mkIQI59ytYugWyKSbZhz2KMNN0IwmCClFZ2oLKnfOAhs4gw0cxFDejxaubJb4gH/Z
+         03Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=3c/59FF6UbpGkMXgjwS6ktZFhTNkfaygiMQu3wJN1UY=;
-        b=fAaNs+kk6bQrhKZvF3E6ap8TAP7VN1jjLhrqrdMvf5S6y2eM5CEeiJig2afAzfAnm6
-         ZynATpwu+jYiz4AXENI77A6BWDourz9+l0wPL/Y2VyKwVDiHrXVLaTCAmnmYTUE1QpDs
-         jaDyrJqq4BJecZMcKS6HxrPY3xJxMSWbRzk2zDAy+sXI7zEjb9QVmRpCWjlT8TLkR6sz
-         9bsyc6p+maQoWuXpwz2gNqr+gifv0gfEDL6jYpxy1CoxC6wWO1y9bJT4vleL4oeDv5ue
-         NbBal2i24Iab0x3hvHZ7AWg2FYIoAXgHciE/rimtpgjE8MPkoq0WkA1yIvl22svkiOS8
-         o7zw==
-X-Gm-Message-State: AOAM532tiWz6H5CvbzE/mPMRaDRmYPIzyT/rDDDZ4kh74iZgAqDCdPhn
-        BZXl3qGSfRoWHNebmF5hK7FAQW7XYbLcW5fyAZuqCK8cMDwazSAAspujI1UqO4isVZ6mvrEl7t3
-        YNpMfEbmlahYRvsSuzflmH/m7PrctXIfniwIPAbDLJNR2hVrTlnkrTovquh5lCR2YHuvFd3d1dt
-        mK
-X-Google-Smtp-Source: ABdhPJxrk/2ljLE5fOhvOgERvCFlvfkBpQCHeJj5wS4X0CbZxpFybq64Cl5AEt1uDPdA0rl6xsRGsKVmIFDe
-Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a17:902:ea82:b029:d1:7ed9:5470 with SMTP
- id x2-20020a170902ea82b02900d17ed95470mr4790733plb.26.1601143743251; Sat, 26
- Sep 2020 11:09:03 -0700 (PDT)
-Date:   Sun, 27 Sep 2020 02:08:57 +0800
-Message-Id: <20200927020823.v2.1.Id1d24a896cd1d20f9ce7a4eb74523fe7896af89d@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v2] Bluetooth: send proper config param to unknown config request
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I4dYLd41ZGSY4Tt4CiINz+mTj1y2KoBQ8YuZjcUzXC0=;
+        b=SpaEcGtCCBSlQHT1F96zmiGy4M4zkUCW83pPTs6sQGFyURIOzbAFxHitSdjTPlfrV8
+         UVK3yE4vGE5iWV8ie0t6t9mMfJtVOx1I7Jn2djCD0l6Iz077y2c4J329qwvpzPLws1c1
+         vcVdg4U9gAJCF6pTZ/Efr0RmNDRCiP+kUEKBlX1TnidMB8DaDdx0EBr+PP5fs0czYjsS
+         TZR82J8fojbXqiyvLfsx3CkQMpC3r+Iu69iFMjCCObL2gWs+uoPtUPRAZ2U2BAoY3EPS
+         ivDxV2qv+96Bl88l7D03jbMRPwepwMi/vaEgo8aTcYEUNaCPv72XOKu93CnS53AQmS8S
+         6ciw==
+X-Gm-Message-State: AOAM5318FjkQFifPEv53raeMuc7ff0vVIwKipS2kL4mLCTLLObr2XSUW
+        TgaGb71Qs1aSGSUHmDYI3p1yZElrW6uP8/7cpMFe3g==
+X-Google-Smtp-Source: ABdhPJwQh72QzsgsfDFHEOxaBPVk7aRYfJwq2jeISqkzTIgdALcJGPRbZjkQhO+nb3VD9XY8QrzwiJH12015JEc2UgY=
+X-Received: by 2002:adf:8544:: with SMTP id 62mr10536553wrh.262.1601145712421;
+ Sat, 26 Sep 2020 11:41:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200922155548.v3.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
+ <BC59363A-B32A-4DAA-BAF5-F7FBA01752E6@holtmann.org>
+In-Reply-To: <BC59363A-B32A-4DAA-BAF5-F7FBA01752E6@holtmann.org>
 From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+Date:   Sun, 27 Sep 2020 02:41:41 +0800
+Message-ID: <CAJQfnxHPDktGp=MQJzY57qmMTO7TPfNZvLHLm7DAyZ-4qM-DnQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Check for encryption key size on connect
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Hi Marcel,
 
-When receiving an L2CAP_CONFIGURATION_REQ with an unknown config
-type, currently we will reply with L2CAP_CONFIGURATION_RSP with
-a list of unknown types as the config param. However, this is not
-a correct format of config param.
+On Sat, 26 Sep 2020 at 00:37, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Archie,
+>
+> > When receiving connection, we only check whether the link has been
+> > encrypted, but not the encryption key size of the link.
+> >
+> > This patch adds check for encryption key size, and reject L2CAP
+> > connection which size is below the specified threshold (default 7)
+> > with security block.
+> >
+> > Here is some btmon trace.
+> > @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.847722
+> >        Store hint: No (0x00)
+> >        BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
+> >        Key type: Unauthenticated Combination key from P-192 (0x04)
+> >        Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
+> >        PIN length: 0
+> >> HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871537
+> >        Status: Success (0x00)
+> >        Handle: 256
+> >        Encryption: Enabled with E0 (0x01)
+> > < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.871609
+> >        Handle: 256
+> >> HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872524
+> >      Read Encryption Key Size (0x05|0x0008) ncmd 1
+> >        Status: Success (0x00)
+> >        Handle: 256
+> >        Key size: 3
+> >
+> > ////// WITHOUT PATCH //////
+> >> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895023
+> >      L2CAP: Connection Request (0x02) ident 3 len 4
+> >        PSM: 4097 (0x1001)
+> >        Source CID: 64
+> > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.895213
+> >      L2CAP: Connection Response (0x03) ident 3 len 8
+> >        Destination CID: 64
+> >        Source CID: 64
+> >        Result: Connection successful (0x0000)
+> >        Status: No further information available (0x0000)
+> >
+> > ////// WITH PATCH //////
+> >> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887024
+> >      L2CAP: Connection Request (0x02) ident 3 len 4
+> >        PSM: 4097 (0x1001)
+> >        Source CID: 64
+> > < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.887127
+> >      L2CAP: Connection Response (0x03) ident 3 len 8
+> >        Destination CID: 0
+> >        Source CID: 64
+> >        Result: Connection refused - security block (0x0003)
+> >        Status: No further information available (0x0000)
+> >
+> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> >
+> > ---
+> >
+> > Changes in v3:
+> > * Move the check to hci_conn_check_link_mode()
+> >
+> > Changes in v2:
+> > * Add btmon trace to the commit message
+> >
+> > net/bluetooth/hci_conn.c | 4 ++++
+> > 1 file changed, 4 insertions(+)
+> >
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 9832f8445d43..89085fac797c 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -1348,6 +1348,10 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+> >           !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+> >               return 0;
+> >
+> > +     if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
+> > +         conn->enc_key_size < conn->hdev->min_enc_key_size)
+> > +             return 0;
+> > +
+> >       return 1;
+> > }
+>
+> I am a bit concerned since we had that check and I on purpose moved it. See commit 693cd8ce3f88 for the change where I removed and commit d5bb334a8e17 where I initially added it.
+>
+> Naively adding the check in that location caused a major regression with Bluetooth 2.0 devices. This makes me a bit reluctant to re-add it here since I restructured the whole change to check the key size a different location.
 
-As described in the bluetooth spec v5.2, Vol 3, Part A, Sec 5,
-the config param should consists of type, length, and optionally
-data.
+I have tried this patch (both v2 and v3) to connect with a Bluetooth
+2.0 device, it doesn't have any connection problem.
+I suppose because in the original patch (d5bb334a8e17), there is no
+check for the HCI_CONN_ENCRYPT flag.
 
-This patch copies the length and data from the received
-L2CAP_CONFIGURATION_REQ and also appends them to the config param
-of the corresponding L2CAP_CONFIGURATION_RSP to match the format
-of the config param according to the spec.
+>
+> Now I have to ask, are you running an upstream kernel with both commits above that address KNOB vulnerability?
 
-Here's some btmon traces.
-//------- Without Patch -------//
-> ACL Data RX: Handle 256 flags 0x02 dlen 24       #58 [hci0] 21.570741
-      L2CAP: Configure Request (0x04) ident 5 len 16
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00 11 02 11 00 12 02 12 00                    ..........
-< ACL Data TX: Handle 256 flags 0x00 dlen 17       #59 [hci0] 21.570892
-      L2CAP: Configure Response (0x05) ident 5 len 9
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x10) [mandatory]
-        12
-// Btmon parses it wrong - we sent 10 11 12 instead of just 12.
+Actually no, I haven't heard of KNOB vulnerability before.
+This patch is written for qualification purposes, specifically to pass
+GAP/SEC/SEM/BI-05-C to BI-08-C.
+However, it sounds like it could also prevent some KNOB vulnerability
+as a bonus.
+>
+> Regards
+>
+> Marcel
+>
 
-//------- With Patch -------//
-> ACL Data RX: Handle 256 flags 0x02 dlen 24       #58 [hci0] 22.188308
-      L2CAP: Configure Request (0x04) ident 9 len 16
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00 11 02 11 00 12 02 12 00                    ..........
-< ACL Data TX: Handle 256 flags 0x00 dlen 26       #59 [hci0] 22.188516
-      L2CAP: Configure Response (0x05) ident 9 len 18
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x10) [mandatory]
-        10 00 11 02 11 00 12 02 12 00                    ..........
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-
----
-
-Changes in v2:
-* Add btmon traces in the commit message
-
- net/bluetooth/l2cap_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1ab27b90ddcb..4e65854b2f1c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3627,7 +3627,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 			if (hint)
- 				break;
- 			result = L2CAP_CONF_UNKNOWN;
--			*((u8 *) ptr++) = type;
-+			l2cap_add_conf_opt(&ptr, type, olen, val,
-+					   endptr - ptr);
- 			break;
- 		}
- 	}
-@@ -3658,7 +3659,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	}
- 
- done:
--	if (chan->mode != rfc.mode) {
-+	if (chan->mode != rfc.mode && result != L2CAP_CONF_UNKNOWN) {
- 		result = L2CAP_CONF_UNACCEPT;
- 		rfc.mode = chan->mode;
- 
--- 
-2.28.0.681.g6f77f65b4e-goog
-
+Thanks,
+Archie
