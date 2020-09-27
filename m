@@ -2,163 +2,189 @@ Return-Path: <SRS0=GKuY=DE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	CHARSET_FARAWAY_HEADER,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F7EC4346E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Sep 2020 05:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4D7C4346E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Sep 2020 12:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27CF8207BC
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Sep 2020 05:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7BF92389F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Sep 2020 12:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730340AbgI0Fr0 (ORCPT
+        id S1726348AbgI0MEv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 27 Sep 2020 01:47:26 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:46222 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbgI0Fr0 (ORCPT
+        Sun, 27 Sep 2020 08:04:51 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36886 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726252AbgI0MEv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 27 Sep 2020 01:47:26 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 08R5lGXn9029044, This message is accepted by code: ctloc85258
-Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
-        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 08R5lGXn9029044
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Sun, 27 Sep 2020 13:47:16 +0800
-Received: from RSEXMBS01.realsil.com.cn (172.29.17.195) by
- RSEXMBS01.realsil.com.cn (172.29.17.195) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2044.4; Sun, 27 Sep 2020 13:47:15 +0800
-Received: from RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37]) by
- RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37%7]) with mapi id
- 15.01.2044.004; Sun, 27 Sep 2020 13:47:15 +0800
-From:   =?gb2312?B?wr3W7M6w?= <alex_lu@realsil.com.cn>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Sun, 27 Sep 2020 08:04:51 -0400
+Received: from [172.20.10.2] (x527179c4.dyn.telefonica.de [82.113.121.196])
+        by mail.holtmann.org (Postfix) with ESMTPSA id EF808CECFF;
+        Sun, 27 Sep 2020 14:11:46 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <004951c574594df68829e1a076bc94da@realsil.com.cn>
+Date:   Sun, 27 Sep 2020 14:04:46 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
         Max Chou <max.chou@realtek.com>
-Subject: Re: [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
-Thread-Topic: [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
-Thread-Index: AdaUkBQIy2pYuQ5jTx2quo4sQQ3NUg==
-Date:   Sun, 27 Sep 2020 05:47:15 +0000
-Message-ID: <004951c574594df68829e1a076bc94da@realsil.com.cn>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A9AD70E3-D2FE-4D9C-9B9B-C7D448A60A30@holtmann.org>
+References: <004951c574594df68829e1a076bc94da@realsil.com.cn>
+To:     =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsLA0KDQo+IE9uIDI2IFNlcHRlbWJlciAyMDIwIGF0IDE6MzQsIE1hcmNlbCBIb2x0
-bWFubiB3cm90ZToNCj4gDQo+IEhpIEFsZXgsDQo+IA0KPiA+Pj4gV2hlbiBzb21lb25lIGF0dGFj
-a3MgdGhlIHNlcnZpY2UgcHJvdmlkZXIsIGl0IGNyZWF0ZXMgY29ubmVjdGlvbiwNCj4gPj4+IGF1
-dGhlbnRpY2F0ZXMuIFRoZW4gaXQgcmVxdWVzdHMga2V5IHNpemUgb2Ygb25lIGJ5dGUgYW5kIGl0
-IGlkZW50aWZpZXMNCj4gPj4+IHRoZSBrZXkgd2l0aCBicnV0ZSBmb3JjZSBtZXRob2RzLg0KPiA+
-Pj4NCj4gPj4+IEFmdGVyIGwyY2FwIGluZm8gcmVxL3Jlc3AgZXhjaGFuZ2UgaXMgY29tcGxldGUu
-IHRoZSBhdHRhY2tlciBzZW5kcyBsMmNhcA0KPiA+Pj4gY29ubmVjdCB3aXRoIHNwZWNpZmljIFBT
-TS4NCj4gPj4+DQo+ID4+PiBJbiBhYm92ZSBwcm9jZWR1cmUsIHRoZXJlIGlzIG5vIGNoYW5jZSBm
-b3IgdGhlIHNlcnZpY2UgcHJvdmlkZXIgdG8gY2hlY2sNCj4gPj4+IHRoZSBlbmNyeXB0aW9uIGtl
-eSBzaXplIGJlZm9yZSBsMmNhcF9jb25uZWN0KCkuIEJlY2F1c2UgdGhlIHN0YXRlIG9mDQo+ID4+
-PiBsMmNhcCBjaGFuIGluIGNvbm4tPmNoYW5fbCBpcyBCVF9MSVNURU4sIHRoZXJlIGlzIG5vIGwy
-Y2FwIGNoYW4gd2l0aCB0aGUNCj4gPj4+IHN0YXRlIG9mIEJUX0NPTk5FQ1Qgb3IgQlRfQ09OTkVD
-VDIuDQo+ID4+Pg0KPiA+Pj4gU28gc2VydmljZSBwcm92aWRlciBzaG91bGQgY2hlY2sgdGhlIGVu
-Y3J5cHRpb24ga2V5IHNpemUgaW4NCj4gPj4+IGwyY2FwX2Nvbm5lY3QoKQ0KPiA+Pj4NCj4gPj4+
-IFNpZ25lZC1vZmYtYnk6IEFsZXggTHUgPGFsZXhfbHVAcmVhbHNpbC5jb20uY24+DQo+ID4+PiAt
-LS0NCj4gPj4+IG5ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jIHwgNyArKysrKysrDQo+ID4+PiAx
-IGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspDQo+ID4+Pg0KPiA+Pj4gZGlmZiAtLWdpdCBh
-L25ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jIGIvbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMN
-Cj4gPj4+IGluZGV4IGFkZTgzZTIyNDU2Ny4uNjNkZjk2MWQ0MDJkIDEwMDY0NA0KPiA+Pj4gLS0t
-IGEvbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMNCj4gPj4+ICsrKyBiL25ldC9ibHVldG9vdGgv
-bDJjYXBfY29yZS5jDQo+ID4+PiBAQCAtNDE1MCw2ICs0MTUwLDEzIEBAIHN0YXRpYyBzdHJ1Y3Qg
-bDJjYXBfY2hhbiAqbDJjYXBfY29ubmVjdChzdHJ1Y3QNCj4gPj4gbDJjYXBfY29ubiAqY29ubiwN
-Cj4gPj4+DQo+ID4+PiAJaWYgKGNvbm4tPmluZm9fc3RhdGUgJiBMMkNBUF9JTkZPX0ZFQVRfTUFT
-S19SRVFfRE9ORSkgew0KPiA+Pj4gCQlpZiAobDJjYXBfY2hhbl9jaGVja19zZWN1cml0eShjaGFu
-LCBmYWxzZSkpIHsNCj4gPj4+ICsJCQlpZiAoIWwyY2FwX2NoZWNrX2VuY19rZXlfc2l6ZShjb25u
-LT5oY29uKSkgew0KPiA+Pj4gKwkJCQlsMmNhcF9zdGF0ZV9jaGFuZ2UoY2hhbiwgQlRfRElTQ09O
-Tik7DQo+ID4+PiArCQkJCV9fc2V0X2NoYW5fdGltZXIoY2hhbiwNCj4gPj4gTDJDQVBfRElTQ19U
-SU1FT1VUKTsNCj4gPj4+ICsJCQkJcmVzdWx0ID0gTDJDQVBfQ1JfU0VDX0JMT0NLOw0KPiA+Pj4g
-KwkJCQlzdGF0dXMgPSBMMkNBUF9DU19OT19JTkZPOw0KPiA+Pj4gKwkJCQlnb3RvIHJlc3BvbnNl
-Ow0KPiA+Pj4gKwkJCX0NCj4gPj4+IAkJCWlmICh0ZXN0X2JpdChGTEFHX0RFRkVSX1NFVFVQLCAm
-Y2hhbi0+ZmxhZ3MpKSB7DQo+ID4+PiAJCQkJbDJjYXBfc3RhdGVfY2hhbmdlKGNoYW4sIEJUX0NP
-Tk5FQ1QyKTsNCj4gPj4+IAkJCQlyZXN1bHQgPSBMMkNBUF9DUl9QRU5EOw0KPiA+Pg0KPiA+PiBJ
-IGFtIG5vdCBmb2xsb3dpbmcgd2hhdCB5b3UgYXJlIHRyeWluZyB0byBmaXggaGVyZS4gQ2FuIHlv
-dSBzaG93IHRoaXMgd2l0aA0KPiBhDQo+ID4+IGJ0bW9uIHRyYWNlIGZyb20gYW4gYXR0YWNraW5n
-IGRldmljZT8NCj4gPj4NCj4gPj4gUmVnYXJkcw0KPiA+Pg0KPiA+PiBNYXJjZWwNCj4gPj4NCj4g
-Pj4NCj4gPg0KPiA+IEknbSBzb3JyeSwgSSBkaWRuJ3QgaGF2ZSBidG1vbiB0cmFjZSBmcm9tIGFu
-IGF0dGFja2luZyBkZXZpY2UuDQo+ID4gSSBkaWRuJ3QgaGF2ZSB0aGUgcmVhbCBhdHRhY2tpbmcg
-ZGV2aWNlLiBJIGp1c3Qgc2ltdWxhdGUgdGhlIGF0dGFja2luZy4NCj4gPiBJIGhhdmUgYSBkZXZp
-Y2UgdGhhdCBjYW4gY3JlYXRlIG9uZSBieXRlIHNpemUgZW5jcnlwdGlvbiBrZXkuDQo+ID4gSXQg
-dXNlcyB0aGUgbGluayBrZXkgdGhhdCB3YXMgcHJvZHVjZWQgYnkgcGFpcmluZyB3aXRoIHRoZSBz
-ZXJ2aWNlIHByb3ZpZGVyLg0KPiBBY3R1YWxseSB0aGUgS05PQiAoS2V5IE5lZ290aWF0aW9uIG9m
-IEJsdWV0b290aCBBdHRhY2spIHNheXMsIHRoZSBsaW5rIGtleSBpcw0KPiB1bm5lY2Vzc2FyeSBm
-b3IgdGhlIHJlY29ubmVjdGlvbi4NCj4gPiBJIHVzZSB0aGlzIGRldmljZSB0byByZWNvbm5lY3Qg
-dG8gc2VydmljZSBwcm92aWRlciwgYW5kIHRoZW4gaW5pdGlhdGUgdGhlIEtleQ0KPiBOZWdvdGlh
-dGlvbiBmb3Igb25lIGJ5dGUgc2l6ZSBlbmNyeXB0aW9uIGtleS4gQWN0dWFsbHkgdGhlIGF0dGFj
-a2VyIGlkZW50aWZpZWQNCj4gdGhlIGVuY3J5cHRpb24ga2V5IHdpdGggc29tZSBicnV0ZSBmb3Jj
-ZSBtZXRob2RzLg0KPiA+DQo+ID4gSSB3YW50IHRvIHByb3ZpZGUgdGhlIHRyYWNlIG9uIHNlcnZp
-Y2UgcHJvdmlkZXIgc2lkZS4NCj4gDQo+IHdoYXQga2VybmVsIHZlcnNpb24gYXJlIHlvdSBydW5u
-aW5nPyBJIHdvbmRlciBpZiB3ZSBzaG91bGQgYWx3YXlzIHJldHVybg0KPiBMMkNBUF9DUl9QRU5E
-IGhlcmUuIERvIHlvdSBoYXZlIGEgcmVwcm9kdWNlciBjb2RlPw0KDQpJJ20gcnVubmluZyBrZXJu
-ZWwgNS44LjAtcmM2IG9uIGFjY2VwdG9yIGFuZCBrZXJuZWwgNS44LjUgb24gdGhlIGluaXRpYXRv
-ciB3aGljaCBhY3RzIGFzIGFuIGF0dGFja2VyLg0KRm9yIHRoZSBhdHRhY2sgc2ltdWxhdGlvbiwg
-c29tZSBjb2RlIG5lZWRzIHRvIGJlIGNoYW5nZWQgb24gZWFjaCBzaXplLg0KT24gdGhlIGFjY2Vw
-dG9yLCB0aGUgbWFzdGVyIHBhcmFtZXRlciBmb3IgYnRfaW9fbGlzdGVuKCkgaW4gYmx1ZXRvb3Ro
-ZCBzaG91bGQgYmUgY2hhbmdlZCB0byBGQUxTRSBpbiBwcm9maWxlcy9hdWRpby9hMmRwLmMgYTJk
-cF9zZXJ2ZXJfbGlzdGVuKCkgYW5kIHByb2ZpbGVzL2F1ZGlvL2F2Y3RwLmMgYXZjdHBfc2VydmVy
-X3NvY2tldCgpLg0KVGhlIGNoYW5nZSBtYWtlcyB0aGUga2VybmVsIG5vdCB0byBjaGFuZ2UgdGhl
-IHJvbGUgdG8gbWFzdGVyIHdoZW4gaXQgcmVjZWl2ZXMgaGNpIGNvbm4gcmVxIGV2ZW50Lg0KSSBk
-aWQgdGhlIGNoYW5nZSBpbiBvcmRlciB0byBtYWtlIHRoZSBjb250cm9sbGVyIHRvIHNlbmQgTE1Q
-X0VOQ1JZUFRJT05fS0VZX1NJWkVfUkVRIFBEVSBmb3Igb25lIGJ5dGUga2V5IHNpemUuDQoNCk9u
-IHRoZSBpbml0aWF0b3IsIHRoZSBiZWxvdyBlbmNyeXB0aW9uIGtleSBzaXplIGNoZWNrIHNob3Vs
-ZCBiZSByZW1vdmVkLg0KQEAgLTE2MjIsMTAgKzE2MjQsMTMgQEAgc3RhdGljIHZvaWQgbDJjYXBf
-Y29ubl9zdGFydChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubikNCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgY29udGludWU7DQogICAgICAgICAgICAgICAgICAgICAgICB9DQogDQotICAg
-ICAgICAgICAgICAgICAgICAgICBpZiAobDJjYXBfY2hlY2tfZW5jX2tleV9zaXplKGNvbm4tPmhj
-b24pKQ0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsMmNhcF9zdGFydF9jb25uZWN0
-aW9uKGNoYW4pOw0KLSAgICAgICAgICAgICAgICAgICAgICAgZWxzZQ0KLSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBsMmNhcF9jaGFuX2Nsb3NlKGNoYW4sIEVDT05OUkVGVVNFRCk7DQor
-ICAgICAgICAgICAgICAgICAgICAgICAvKiBKdXN0IHNpbXVsYXRlIEtOT0IgKi8NCisgICAgICAg
-ICAgICAgICAgICAgICAgIGwyY2FwX3N0YXJ0X2Nvbm5lY3Rpb24oY2hhbik7DQorICAgICAgICAg
-ICAgICAgICAgICAgICAvKiBpZiAobDJjYXBfY2hlY2tfZW5jX2tleV9zaXplKGNvbm4tPmhjb24p
-KQ0KKyAgICAgICAgICAgICAgICAgICAgICAgICogICAgICBsMmNhcF9zdGFydF9jb25uZWN0aW9u
-KGNoYW4pOw0KKyAgICAgICAgICAgICAgICAgICAgICAgICogZWxzZQ0KKyAgICAgICAgICAgICAg
-ICAgICAgICAgICogICAgICBsMmNhcF9jaGFuX2Nsb3NlKGNoYW4sIEVDT05OUkVGVVNFRCk7DQor
-ICAgICAgICAgICAgICAgICAgICAgICAgKi8NCg0KQXQgbGFzdCwgSSBkaWQgdGhlIHRlc3QgYXMg
-YmVsb3c6DQoxLiBPbiB0aGUgaW5pdGlhdG9yLCBwYWlyIGFjY2VwdG9yDQoyLiBSdW4gbDJ0ZXN0
-IC1yIC1QIDMgb24gdGhlIGFjY2VwdG9yDQozLiBSdW4gbDJ0ZXN0IC1uIC1QIDMgPGJkYWRkcj4g
-b24gdGhlIGluaXRpYXRvcg0KDQo+IA0KPiBUaGUgcHJvYmxlbSByZWFsbHkgaXMgdGhhdCB0aGUg
-TUFTS19SRVFfRE9ORSBpbmRpY2F0aW9uIGlzIG5vdCBlbm91Z2ggdG8NCj4gbWFrZSBhIGRlY2lz
-aW9uIGZvciB0aGUga2V5IHNpemUuIFdlIGhhdmUgdG8gZW5zdXJlIHRoYXQgYWxzbyB0aGUga2V5
-IHNpemUgaXMNCj4gYWN0dWFsbHkgYXZhaWxhYmxlLiBJZiB0aGF0IGlzIG5vdCB5ZXQgZG9uZSwg
-dGhlbiB3ZSBzaG91bGQgbm90IGNoZWNrIGl0LiBUaGlzDQo+IG1lYW5zIHRoYXQgYW55IHJlc3Bv
-bnNlIHRvIEwyQ0FQX0Nvbm5lY3RfUmVxdWVzdCBQRFUgbmVlZHMgdG8gYmUNCj4gZGVsYXllZCB1
-bnRpbCB0aGUga2V5IHNpemUgaGFzIGJlZW4gcmVhZC4NCg0KSW4gbXkgdGVzdCBjYXNlLCB0aGUg
-a2V5IHNpemUgaGFzIGJlZW4gcmVhZCBmcm9tIGNvbnRyb2xsZXIgYmVmb3JlIHRoZSBsMmNhcCBj
-b25uIHJlcXVlc3QgUERVIGlzIHJlY2VpdmVkLg0KDQo8IEhDSSBDb21tYW5kOiBSZWFkIEVuY3J5
-cHRpb24gS2V5IFNpemUgKDB4MDV8MHgwMDA4KSBwbGVuIDIgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIzIyIFtoY2kwXSA0My4wODk4NTkNCiAgICAgICAgSGFuZGxlOiAxDQo+IEhDSSBF
-dmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA3ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIzIzIFtoY2kwXSA0My4wOTE1MjgNCiAgICAgIFJl
-YWQgRW5jcnlwdGlvbiBLZXkgU2l6ZSAoMHgwNXwweDAwMDgpIG5jbWQgMg0KICAgICAgICBTdGF0
-dXM6IFN1Y2Nlc3MgKDB4MDApDQogICAgICAgIEhhbmRsZTogMQ0KICAgICAgICBLZXkgc2l6ZTog
-MQ0KPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEwICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMyNCBbaGNpMF0gNDMuMTQwODg4
-DQogICAgICBMMkNBUDogSW5mb3JtYXRpb24gUmVxdWVzdCAoMHgwYSkgaWRlbnQgMSBsZW4gMg0K
-ICAgICAgICBUeXBlOiBFeHRlbmRlZCBmZWF0dXJlcyBzdXBwb3J0ZWQgKDB4MDAwMikNCi4uLi4u
-Lg0KPiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMzNCBbaGNpMF0gNDMuMTQ4NDA1
-DQogICAgICBMMkNBUDogQ29ubmVjdGlvbiBSZXF1ZXN0ICgweDAyKSBpZGVudCAzIGxlbiA0DQog
-ICAgICAgIFBTTTogMyAoMHgwMDAzKQ0KICAgICAgICBTb3VyY2UgQ0lEOiA2NA0KDQo+IA0KPiBS
-ZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA0KDQo=
+Hi Alex,
+
+>>>>> When someone attacks the service provider, it creates connection,
+>>>>> authenticates. Then it requests key size of one byte and it identifies
+>>>>> the key with brute force methods.
+>>>>> 
+>>>>> After l2cap info req/resp exchange is complete. the attacker sends l2cap
+>>>>> connect with specific PSM.
+>>>>> 
+>>>>> In above procedure, there is no chance for the service provider to check
+>>>>> the encryption key size before l2cap_connect(). Because the state of
+>>>>> l2cap chan in conn->chan_l is BT_LISTEN, there is no l2cap chan with the
+>>>>> state of BT_CONNECT or BT_CONNECT2.
+>>>>> 
+>>>>> So service provider should check the encryption key size in
+>>>>> l2cap_connect()
+>>>>> 
+>>>>> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+>>>>> ---
+>>>>> net/bluetooth/l2cap_core.c | 7 +++++++
+>>>>> 1 file changed, 7 insertions(+)
+>>>>> 
+>>>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>>>>> index ade83e224567..63df961d402d 100644
+>>>>> --- a/net/bluetooth/l2cap_core.c
+>>>>> +++ b/net/bluetooth/l2cap_core.c
+>>>>> @@ -4150,6 +4150,13 @@ static struct l2cap_chan *l2cap_connect(struct
+>>>> l2cap_conn *conn,
+>>>>> 
+>>>>> 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+>>>>> 		if (l2cap_chan_check_security(chan, false)) {
+>>>>> +			if (!l2cap_check_enc_key_size(conn->hcon)) {
+>>>>> +				l2cap_state_change(chan, BT_DISCONN);
+>>>>> +				__set_chan_timer(chan,
+>>>> L2CAP_DISC_TIMEOUT);
+>>>>> +				result = L2CAP_CR_SEC_BLOCK;
+>>>>> +				status = L2CAP_CS_NO_INFO;
+>>>>> +				goto response;
+>>>>> +			}
+>>>>> 			if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+>>>>> 				l2cap_state_change(chan, BT_CONNECT2);
+>>>>> 				result = L2CAP_CR_PEND;
+>>>> 
+>>>> I am not following what you are trying to fix here. Can you show this with
+>> a
+>>>> btmon trace from an attacking device?
+>>>> 
+>>>> Regards
+>>>> 
+>>>> Marcel
+>>>> 
+>>>> 
+>>> 
+>>> I'm sorry, I didn't have btmon trace from an attacking device.
+>>> I didn't have the real attacking device. I just simulate the attacking.
+>>> I have a device that can create one byte size encryption key.
+>>> It uses the link key that was produced by pairing with the service provider.
+>> Actually the KNOB (Key Negotiation of Bluetooth Attack) says, the link key is
+>> unnecessary for the reconnection.
+>>> I use this device to reconnect to service provider, and then initiate the Key
+>> Negotiation for one byte size encryption key. Actually the attacker identified
+>> the encryption key with some brute force methods.
+>>> 
+>>> I want to provide the trace on service provider side.
+>> 
+>> what kernel version are you running? I wonder if we should always return
+>> L2CAP_CR_PEND here. Do you have a reproducer code?
+> 
+> I'm running kernel 5.8.0-rc6 on acceptor and kernel 5.8.5 on the initiator which acts as an attacker.
+> For the attack simulation, some code needs to be changed on each size.
+> On the acceptor, the master parameter for bt_io_listen() in bluetoothd should be changed to FALSE in profiles/audio/a2dp.c a2dp_server_listen() and profiles/audio/avctp.c avctp_server_socket().
+> The change makes the kernel not to change the role to master when it receives hci conn req event.
+> I did the change in order to make the controller to send LMP_ENCRYPTION_KEY_SIZE_REQ PDU for one byte key size.
+> 
+> On the initiator, the below encryption key size check should be removed.
+> @@ -1622,10 +1624,13 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                                continue;
+>                        }
+> 
+> -                       if (l2cap_check_enc_key_size(conn->hcon))
+> -                               l2cap_start_connection(chan);
+> -                       else
+> -                               l2cap_chan_close(chan, ECONNREFUSED);
+> +                       /* Just simulate KNOB */
+> +                       l2cap_start_connection(chan);
+> +                       /* if (l2cap_check_enc_key_size(conn->hcon))
+> +                        *      l2cap_start_connection(chan);
+> +                        * else
+> +                        *      l2cap_chan_close(chan, ECONNREFUSED);
+> +                        */
+> 
+> At last, I did the test as below:
+> 1. On the initiator, pair acceptor
+> 2. Run l2test -r -P 3 on the acceptor
+> 3. Run l2test -n -P 3 <bdaddr> on the initiator
+> 
+>> 
+>> The problem really is that the MASK_REQ_DONE indication is not enough to
+>> make a decision for the key size. We have to ensure that also the key size is
+>> actually available. If that is not yet done, then we should not check it. This
+>> means that any response to L2CAP_Connect_Request PDU needs to be
+>> delayed until the key size has been read.
+> 
+> In my test case, the key size has been read from controller before the l2cap conn request PDU is received.
+> 
+> < HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2                                         #22 [hci0] 43.089859
+>        Handle: 1
+>> HCI Event: Command Complete (0x0e) plen 7                                                           #23 [hci0] 43.091528
+>      Read Encryption Key Size (0x05|0x0008) ncmd 2
+>        Status: Success (0x00)
+>        Handle: 1
+>        Key size: 1
+>> ACL Data RX: Handle 1 flags 0x02 dlen 10                                                            #24 [hci0] 43.140888
+>      L2CAP: Information Request (0x0a) ident 1 len 2
+>        Type: Extended features supported (0x0002)
+> ......
+>> ACL Data RX: Handle 1 flags 0x02 dlen 12                                                            #34 [hci0] 43.148405
+>      L2CAP: Connection Request (0x02) ident 3 len 4
+>        PSM: 3 (0x0003)
+>        Source CID: 64
+
+the easiest way to fake this is just to assign a different value than the one returned by Read Encryption Key Size on the acceptor side. No need to mess with LMP details.
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1df95145f574..741b7ad31ff8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3034,7 +3034,7 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+                           handle);
+                conn->enc_key_size = 0;
+        } else {
+-               conn->enc_key_size = rp->key_size;
++               conn->enc_key_size = 1;
+        }
+
+If you add this change to both sides, what are the steps to reproduce this and what does btmon show? You might have to also enable dynamic_debug for l2cap.ko so that we see the function call trace.
+
+I am a bit pedantic with this one, since it is critical to understand where the current changes to handle anything KNOB related have their shortcomings. I spent so much time testing every single corner case. Certainly I could have missed something, but if I really did, this time around I want to either simplify the code or properly comment it at least.
+
+Please see the other email thread / patch from Archie trying to also add another encryption key size check.
+
+Regards
+
+Marcel
+
