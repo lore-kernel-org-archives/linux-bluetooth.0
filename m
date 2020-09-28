@@ -2,255 +2,196 @@ Return-Path: <SRS0=BM5K=DF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,
+	CHARSET_FARAWAY_HEADER,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C243FC4727D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 02:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E85CC4741F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 05:48:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74170221EC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 02:11:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="X6/tplDV"
+	by mail.kernel.org (Postfix) with ESMTP id 192452068E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 05:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbgI1CLX (ORCPT
+        id S1726596AbgI1Fr5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 27 Sep 2020 22:11:23 -0400
-Received: from z5.mailgun.us ([104.130.96.5]:64618 "EHLO z5.mailgun.us"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726406AbgI1CLW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 27 Sep 2020 22:11:22 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1601259081; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=iWhc09D3uoAh+v6CjrqYMN1x/SDldMvdvgNKi1OpHDo=;
- b=X6/tplDVJ/6TboaUYa+pCaYUWNoAwfswF5YgDcZe5isN0dov4cD54OIoqehTcdCaPvKEaLtz
- t1xDXuH65Gp7ytuoZ0616t32J79lNcdR1Tc8jfoFnu6lMR/I7uyz12rstrLdKtA0iXqfLFKs
- OFv5o7BklhbVrsNmP+/M6X7ocho=
-X-Mailgun-Sending-Ip: 104.130.96.5
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 5f714648d106659f82f4fc07 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 28 Sep 2020 02:11:20
- GMT
-Sender: rjliao=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id B1AE9C433FE; Mon, 28 Sep 2020 02:11:20 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B1CFEC433C8;
-        Mon, 28 Sep 2020 02:11:19 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Mon, 28 Sep 2020 10:11:19 +0800
-From:   Rocky Liao <rjliao@codeaurora.org>
+        Mon, 28 Sep 2020 01:47:57 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:35182 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725290AbgI1Fr5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 28 Sep 2020 01:47:57 -0400
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.69 with qID 08S5lhA53024826, This message is accepted by code: ctloc85258
+Received: from RSEXMBS01.realsil.com.cn ([172.29.17.195])
+        by rtits2.realtek.com.tw (8.15.2/2.66/5.86) with ESMTPS id 08S5lhA53024826
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Mon, 28 Sep 2020 13:47:44 +0800
+Received: from RSEXMBS01.realsil.com.cn (172.29.17.195) by
+ RSEXMBS01.realsil.com.cn (172.29.17.195) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2044.4; Mon, 28 Sep 2020 13:47:43 +0800
+Received: from RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37]) by
+ RSEXMBS01.realsil.com.cn ([fe80::e186:b533:fb3:8b37%7]) with mapi id
+ 15.01.2044.004; Mon, 28 Sep 2020 13:47:43 +0800
+From:   =?gb2312?B?wr3W7M6w?= <alex_lu@realsil.com.cn>
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
+CC:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
- support
-In-Reply-To: <8296D361-B28F-46CA-86E1-6F7FCE62D97F@holtmann.org>
-References: <20200914092744.17464-1-rjliao@codeaurora.org>
- <20200925090829.3088-1-rjliao@codeaurora.org>
- <8296D361-B28F-46CA-86E1-6F7FCE62D97F@holtmann.org>
-Message-ID: <d986c0028f7d3c00bc19f7685f0ae81c@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        open list <linux-kernel@vger.kernel.org>,
+        Max Chou <max.chou@realtek.com>
+Subject: Re [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
+Thread-Topic: Re [PATCH] Bluetooth: Fix the vulnerable issue on enc key size
+Thread-Index: AdaVWXT6oH4CpWmNTuafodOPDtcHGQ==
+Date:   Mon, 28 Sep 2020 05:47:42 +0000
+Message-ID: <6000bce133414df79e386e605b8dd1a5@realsil.com.cn>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.29.36.107]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-
-在 2020-09-26 00:08，Marcel Holtmann 写道：
-> Hi Rocky,
-> 
->> This patch add support for WCN6855 i.e. patch and nvm download
->> support.
-> 
-> please always include the content of /sys/kernel/debug/usb/devices for
-> this hardware.
-> 
-OK.
-
->> 
->> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
->> ---
->> drivers/bluetooth/btusb.c | 66 +++++++++++++++++++++++++++++++--------
->> 1 file changed, 53 insertions(+), 13 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 9f294b941943..e888e4c02d69 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
->> #define BTUSB_MEDIATEK		0x200000
->> #define BTUSB_WIDEBAND_SPEECH	0x400000
->> #define BTUSB_VALID_LE_STATES   0x800000
->> +#define BTUSB_QCA_WCN6855	0x1000000
->> 
->> static const struct usb_device_id btusb_table[] = {
->> 	/* Generic Bluetooth USB device */
->> @@ -291,6 +292,10 @@ static const struct usb_device_id 
->> blacklist_table[] = {
->> 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME |
->> 						     BTUSB_WIDEBAND_SPEECH },
->> 
->> +	/* QCA WCN6855 chipset */
->> +	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
->> +						     BTUSB_WIDEBAND_SPEECH },
->> +
->> 	/* Broadcom BCM2035 */
->> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
->> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
->> @@ -3409,6 +3414,27 @@ static int btusb_set_bdaddr_ath3012(struct 
->> hci_dev *hdev,
->> 	return 0;
->> }
->> 
->> +static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
->> +				const bdaddr_t *bdaddr)
->> +{
->> +	struct sk_buff *skb;
->> +	u8 buf[6];
->> +	long ret;
->> +
->> +	memcpy(buf, bdaddr, sizeof(bdaddr_t));
->> +
->> +	skb = __hci_cmd_sync_ev(hdev, 0xfc14, sizeof(buf), buf,
->> +				HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
->> +	if (IS_ERR(skb)) {
->> +		ret = PTR_ERR(skb);
->> +		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
->> +		return ret;
->> +	}
->> +	kfree_skb(skb);
->> +
->> +	return 0;
->> +}
->> +
->> #define QCA_DFU_PACKET_LEN	4096
->> 
->> #define QCA_GET_TARGET_VERSION	0x09
->> @@ -3428,7 +3454,8 @@ struct qca_version {
->> } __packed;
->> 
->> struct qca_rampatch_version {
->> -	__le16	rom_version;
->> +	__le16	rom_version_high;
->> +	__le16  rom_version_low;
->> 	__le16	patch_version;
->> } __packed;
-> 
-> How does this work. The struct now has an extra 16-bit in the middle.
-> Is this backwards compatible?
-> 
-It works with old HW by shift the offset byte in qca_devices_table, from 
-18 to 16.
-So for old HW only rom_version_low is being used and it still points to 
-the correct
-bytes.
-
->> 
->> @@ -3440,12 +3467,14 @@ struct qca_device_info {
->> };
->> 
->> static const struct qca_device_info qca_devices_table[] = {
->> -	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
->> -	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
->> -	{ 0x00000200, 28, 4, 18 }, /* Rome 2.0 */
->> -	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
->> -	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
->> -	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
->> +	{ 0x00000100, 20, 4, 8 }, /* Rome 1.0 */
->> +	{ 0x00000101, 20, 4, 8 }, /* Rome 1.1 */
-> 
-> Align it with 8  }
-> 
-OK.
-
->> +	{ 0x00000200, 28, 4, 16 }, /* Rome 2.0 */
->> +	{ 0x00000201, 28, 4, 16 }, /* Rome 2.1 */
->> +	{ 0x00000300, 28, 4, 16 }, /* Rome 3.0 */
->> +	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->> +	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->> +	{ 0x00130200, 40, 4, 16 }  /* WCN6855 2.0 */
-> 
-> And the last one should also be },
-> 
-OK.
-
->> };
->> 
->> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
->> request,
->> @@ -3547,8 +3576,8 @@ static int btusb_setup_qca_load_rampatch(struct 
->> hci_dev *hdev,
->> {
->> 	struct qca_rampatch_version *rver;
->> 	const struct firmware *fw;
->> -	u32 ver_rom, ver_patch;
->> -	u16 rver_rom, rver_patch;
->> +	u32 ver_rom, ver_patch, rver_rom;
->> +	u16 rver_rom_low, rver_rom_high, rver_patch;
->> 	char fwname[64];
->> 	int err;
->> 
->> @@ -3567,9 +3596,16 @@ static int btusb_setup_qca_load_rampatch(struct 
->> hci_dev *hdev,
->> 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
->> 
->> 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
->> -	rver_rom = le16_to_cpu(rver->rom_version);
->> +	rver_rom_low = le16_to_cpu(rver->rom_version_low);
->> 	rver_patch = le16_to_cpu(rver->patch_version);
->> 
->> +	if (ver_rom & ~0xffffU) {
->> +		rver_rom_high = le16_to_cpu(rver->rom_version_high);
->> +		rver_rom = le32_to_cpu(rver_rom_high << 16 | rver_rom_low);
->> +	} else {
->> +		rver_rom = rver_rom_low;
->> +	}
->> +
->> 	bt_dev_info(hdev, "QCA: patch rome 0x%x build 0x%x, "
->> 		    "firmware rome 0x%x build 0x%x",
->> 		    rver_rom, rver_patch, ver_rom, ver_patch);
->> @@ -3643,9 +3679,6 @@ static int btusb_setup_qca(struct hci_dev *hdev)
->> 		return err;
->> 
->> 	ver_rom = le32_to_cpu(ver.rom_version);
->> -	/* Don't care about high ROM versions */
->> -	if (ver_rom & ~0xffffU)
->> -		return 0;
->> 
->> 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
->> 		if (ver_rom == qca_devices_table[i].rom_version)
->> @@ -4081,6 +4114,13 @@ static int btusb_probe(struct usb_interface 
->> *intf,
->> 		btusb_check_needs_reset_resume(intf);
->> 	}
->> 
->> +	if (id->driver_info & BTUSB_QCA_WCN6855) {
->> +		data->setup_on_usb = btusb_setup_qca;
->> +		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
->> +		hdev->cmd_timeout = btusb_qca_cmd_timeout;
->> +		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->> +	}
->> +
->> 	if (id->driver_info & BTUSB_AMP) {
->> 		/* AMP controllers do not support SCO packets */
->> 		data->isoc = NULL;
-> 
-> Regards
-> 
-> Marcel
+SGkgTWFyY2VsLA0KDQo+IE9uIFNlcHRlbWJlciAyNywgMjAyMCAyMDowNSwgTWFyY2VsIEhvbHRt
+YW5uIHdyb3RlOg0KPiANCj4gSGkgQWxleCwNCj4gDQo+ID4+Pj4+IFdoZW4gc29tZW9uZSBhdHRh
+Y2tzIHRoZSBzZXJ2aWNlIHByb3ZpZGVyLCBpdCBjcmVhdGVzIGNvbm5lY3Rpb24sDQo+ID4+Pj4+
+IGF1dGhlbnRpY2F0ZXMuIFRoZW4gaXQgcmVxdWVzdHMga2V5IHNpemUgb2Ygb25lIGJ5dGUgYW5k
+IGl0IGlkZW50aWZpZXMNCj4gPj4+Pj4gdGhlIGtleSB3aXRoIGJydXRlIGZvcmNlIG1ldGhvZHMu
+DQo+ID4+Pj4+DQo+ID4+Pj4+IEFmdGVyIGwyY2FwIGluZm8gcmVxL3Jlc3AgZXhjaGFuZ2UgaXMg
+Y29tcGxldGUuIHRoZSBhdHRhY2tlciBzZW5kcw0KPiBsMmNhcA0KPiA+Pj4+PiBjb25uZWN0IHdp
+dGggc3BlY2lmaWMgUFNNLg0KPiA+Pj4+Pg0KPiA+Pj4+PiBJbiBhYm92ZSBwcm9jZWR1cmUsIHRo
+ZXJlIGlzIG5vIGNoYW5jZSBmb3IgdGhlIHNlcnZpY2UgcHJvdmlkZXIgdG8NCj4gY2hlY2sNCj4g
+Pj4+Pj4gdGhlIGVuY3J5cHRpb24ga2V5IHNpemUgYmVmb3JlIGwyY2FwX2Nvbm5lY3QoKS4gQmVj
+YXVzZSB0aGUgc3RhdGUgb2YNCj4gPj4+Pj4gbDJjYXAgY2hhbiBpbiBjb25uLT5jaGFuX2wgaXMg
+QlRfTElTVEVOLCB0aGVyZSBpcyBubyBsMmNhcCBjaGFuIHdpdGgNCj4gdGhlDQo+ID4+Pj4+IHN0
+YXRlIG9mIEJUX0NPTk5FQ1Qgb3IgQlRfQ09OTkVDVDIuDQo+ID4+Pj4+DQo+ID4+Pj4+IFNvIHNl
+cnZpY2UgcHJvdmlkZXIgc2hvdWxkIGNoZWNrIHRoZSBlbmNyeXB0aW9uIGtleSBzaXplIGluDQo+
+ID4+Pj4+IGwyY2FwX2Nvbm5lY3QoKQ0KPiA+Pj4+Pg0KPiA+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBB
+bGV4IEx1IDxhbGV4X2x1QHJlYWxzaWwuY29tLmNuPg0KPiA+Pj4+PiAtLS0NCj4gPj4+Pj4gbmV0
+L2JsdWV0b290aC9sMmNhcF9jb3JlLmMgfCA3ICsrKysrKysNCj4gPj4+Pj4gMSBmaWxlIGNoYW5n
+ZWQsIDcgaW5zZXJ0aW9ucygrKQ0KPiA+Pj4+Pg0KPiA+Pj4+PiBkaWZmIC0tZ2l0IGEvbmV0L2Js
+dWV0b290aC9sMmNhcF9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2wyY2FwX2NvcmUuYw0KPiA+Pj4+
+PiBpbmRleCBhZGU4M2UyMjQ1NjcuLjYzZGY5NjFkNDAyZCAxMDA2NDQNCj4gPj4+Pj4gLS0tIGEv
+bmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMNCj4gPj4+Pj4gKysrIGIvbmV0L2JsdWV0b290aC9s
+MmNhcF9jb3JlLmMNCj4gPj4+Pj4gQEAgLTQxNTAsNiArNDE1MCwxMyBAQCBzdGF0aWMgc3RydWN0
+IGwyY2FwX2NoYW4NCj4gKmwyY2FwX2Nvbm5lY3Qoc3RydWN0DQo+ID4+Pj4gbDJjYXBfY29ubiAq
+Y29ubiwNCj4gPj4+Pj4NCj4gPj4+Pj4gCWlmIChjb25uLT5pbmZvX3N0YXRlICYgTDJDQVBfSU5G
+T19GRUFUX01BU0tfUkVRX0RPTkUpIHsNCj4gPj4+Pj4gCQlpZiAobDJjYXBfY2hhbl9jaGVja19z
+ZWN1cml0eShjaGFuLCBmYWxzZSkpIHsNCj4gPj4+Pj4gKwkJCWlmICghbDJjYXBfY2hlY2tfZW5j
+X2tleV9zaXplKGNvbm4tPmhjb24pKQ0KPiB7DQo+ID4+Pj4+ICsJCQkJbDJjYXBfc3RhdGVfY2hh
+bmdlKGNoYW4sDQo+IEJUX0RJU0NPTk4pOw0KPiA+Pj4+PiArCQkJCV9fc2V0X2NoYW5fdGltZXIo
+Y2hhbiwNCj4gPj4+PiBMMkNBUF9ESVNDX1RJTUVPVVQpOw0KPiA+Pj4+PiArCQkJCXJlc3VsdCA9
+IEwyQ0FQX0NSX1NFQ19CTE9DSzsNCj4gPj4+Pj4gKwkJCQlzdGF0dXMgPSBMMkNBUF9DU19OT19J
+TkZPOw0KPiA+Pj4+PiArCQkJCWdvdG8gcmVzcG9uc2U7DQo+ID4+Pj4+ICsJCQl9DQo+ID4+Pj4+
+IAkJCWlmICh0ZXN0X2JpdChGTEFHX0RFRkVSX1NFVFVQLCAmY2hhbi0+ZmxhZ3MpKSB7DQo+ID4+
+Pj4+IAkJCQlsMmNhcF9zdGF0ZV9jaGFuZ2UoY2hhbiwgQlRfQ09OTkVDVDIpOw0KPiA+Pj4+PiAJ
+CQkJcmVzdWx0ID0gTDJDQVBfQ1JfUEVORDsNCj4gPj4+Pg0KPiA+Pj4+IEkgYW0gbm90IGZvbGxv
+d2luZyB3aGF0IHlvdSBhcmUgdHJ5aW5nIHRvIGZpeCBoZXJlLiBDYW4geW91IHNob3cgdGhpcw0K
+PiB3aXRoDQo+ID4+IGENCj4gPj4+PiBidG1vbiB0cmFjZSBmcm9tIGFuIGF0dGFja2luZyBkZXZp
+Y2U/DQo+ID4+Pj4NCj4gPj4+PiBSZWdhcmRzDQo+ID4+Pj4NCj4gPj4+PiBNYXJjZWwNCj4gPj4+
+Pg0KPiA+Pj4+DQo+ID4+Pg0KPiA+Pj4gSSdtIHNvcnJ5LCBJIGRpZG4ndCBoYXZlIGJ0bW9uIHRy
+YWNlIGZyb20gYW4gYXR0YWNraW5nIGRldmljZS4NCj4gPj4+IEkgZGlkbid0IGhhdmUgdGhlIHJl
+YWwgYXR0YWNraW5nIGRldmljZS4gSSBqdXN0IHNpbXVsYXRlIHRoZSBhdHRhY2tpbmcuDQo+ID4+
+PiBJIGhhdmUgYSBkZXZpY2UgdGhhdCBjYW4gY3JlYXRlIG9uZSBieXRlIHNpemUgZW5jcnlwdGlv
+biBrZXkuDQo+ID4+PiBJdCB1c2VzIHRoZSBsaW5rIGtleSB0aGF0IHdhcyBwcm9kdWNlZCBieSBw
+YWlyaW5nIHdpdGggdGhlIHNlcnZpY2UNCj4gcHJvdmlkZXIuDQo+ID4+IEFjdHVhbGx5IHRoZSBL
+Tk9CIChLZXkgTmVnb3RpYXRpb24gb2YgQmx1ZXRvb3RoIEF0dGFjaykgc2F5cywgdGhlIGxpbmsg
+a2V5DQo+IGlzDQo+ID4+IHVubmVjZXNzYXJ5IGZvciB0aGUgcmVjb25uZWN0aW9uLg0KPiA+Pj4g
+SSB1c2UgdGhpcyBkZXZpY2UgdG8gcmVjb25uZWN0IHRvIHNlcnZpY2UgcHJvdmlkZXIsIGFuZCB0
+aGVuIGluaXRpYXRlIHRoZQ0KPiBLZXkNCj4gPj4gTmVnb3RpYXRpb24gZm9yIG9uZSBieXRlIHNp
+emUgZW5jcnlwdGlvbiBrZXkuIEFjdHVhbGx5IHRoZSBhdHRhY2tlcg0KPiBpZGVudGlmaWVkDQo+
+ID4+IHRoZSBlbmNyeXB0aW9uIGtleSB3aXRoIHNvbWUgYnJ1dGUgZm9yY2UgbWV0aG9kcy4NCj4g
+Pj4+DQo+ID4+PiBJIHdhbnQgdG8gcHJvdmlkZSB0aGUgdHJhY2Ugb24gc2VydmljZSBwcm92aWRl
+ciBzaWRlLg0KPiA+Pg0KPiA+PiB3aGF0IGtlcm5lbCB2ZXJzaW9uIGFyZSB5b3UgcnVubmluZz8g
+SSB3b25kZXIgaWYgd2Ugc2hvdWxkIGFsd2F5cyByZXR1cm4NCj4gPj4gTDJDQVBfQ1JfUEVORCBo
+ZXJlLiBEbyB5b3UgaGF2ZSBhIHJlcHJvZHVjZXIgY29kZT8NCj4gPg0KPiA+IEknbSBydW5uaW5n
+IGtlcm5lbCA1LjguMC1yYzYgb24gYWNjZXB0b3IgYW5kIGtlcm5lbCA1LjguNSBvbiB0aGUgaW5p
+dGlhdG9yDQo+IHdoaWNoIGFjdHMgYXMgYW4gYXR0YWNrZXIuDQo+ID4gRm9yIHRoZSBhdHRhY2sg
+c2ltdWxhdGlvbiwgc29tZSBjb2RlIG5lZWRzIHRvIGJlIGNoYW5nZWQgb24gZWFjaCBzaXplLg0K
+PiA+IE9uIHRoZSBhY2NlcHRvciwgdGhlIG1hc3RlciBwYXJhbWV0ZXIgZm9yIGJ0X2lvX2xpc3Rl
+bigpIGluIGJsdWV0b290aGQNCj4gc2hvdWxkIGJlIGNoYW5nZWQgdG8gRkFMU0UgaW4gcHJvZmls
+ZXMvYXVkaW8vYTJkcC5jIGEyZHBfc2VydmVyX2xpc3RlbigpDQo+IGFuZCBwcm9maWxlcy9hdWRp
+by9hdmN0cC5jIGF2Y3RwX3NlcnZlcl9zb2NrZXQoKS4NCj4gPiBUaGUgY2hhbmdlIG1ha2VzIHRo
+ZSBrZXJuZWwgbm90IHRvIGNoYW5nZSB0aGUgcm9sZSB0byBtYXN0ZXIgd2hlbiBpdA0KPiByZWNl
+aXZlcyBoY2kgY29ubiByZXEgZXZlbnQuDQo+ID4gSSBkaWQgdGhlIGNoYW5nZSBpbiBvcmRlciB0
+byBtYWtlIHRoZSBjb250cm9sbGVyIHRvIHNlbmQNCj4gTE1QX0VOQ1JZUFRJT05fS0VZX1NJWkVf
+UkVRIFBEVSBmb3Igb25lIGJ5dGUga2V5IHNpemUuDQo+ID4NCj4gPiBPbiB0aGUgaW5pdGlhdG9y
+LCB0aGUgYmVsb3cgZW5jcnlwdGlvbiBrZXkgc2l6ZSBjaGVjayBzaG91bGQgYmUgcmVtb3ZlZC4N
+Cj4gPiBAQCAtMTYyMiwxMCArMTYyNCwxMyBAQCBzdGF0aWMgdm9pZCBsMmNhcF9jb25uX3N0YXJ0
+KHN0cnVjdCBsMmNhcF9jb25uDQo+ICpjb25uKQ0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBjb250aW51ZTsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgIH0NCj4gPg0KPiA+
+IC0gICAgICAgICAgICAgICAgICAgICAgIGlmIChsMmNhcF9jaGVja19lbmNfa2V5X3NpemUoY29u
+bi0+aGNvbikpDQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsMmNhcF9zdGFy
+dF9jb25uZWN0aW9uKGNoYW4pOw0KPiA+IC0gICAgICAgICAgICAgICAgICAgICAgIGVsc2UNCj4g
+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGwyY2FwX2NoYW5fY2xvc2UoY2hhbiwg
+RUNPTk5SRUZVU0VEKTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAvKiBKdXN0IHNpbXVs
+YXRlIEtOT0IgKi8NCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBsMmNhcF9zdGFydF9jb25u
+ZWN0aW9uKGNoYW4pOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIC8qIGlmIChsMmNhcF9j
+aGVja19lbmNfa2V5X3NpemUoY29ubi0+aGNvbikpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICogICAgICBsMmNhcF9zdGFydF9jb25uZWN0aW9uKGNoYW4pOw0KPiA+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAqIGVsc2UNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgKiAgICAg
+IGwyY2FwX2NoYW5fY2xvc2UoY2hhbiwgRUNPTk5SRUZVU0VEKTsNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgKi8NCj4gPg0KPiA+IEF0IGxhc3QsIEkgZGlkIHRoZSB0ZXN0IGFzIGJlbG93
+Og0KPiA+IDEuIE9uIHRoZSBpbml0aWF0b3IsIHBhaXIgYWNjZXB0b3INCj4gPiAyLiBSdW4gbDJ0
+ZXN0IC1yIC1QIDMgb24gdGhlIGFjY2VwdG9yDQo+ID4gMy4gUnVuIGwydGVzdCAtbiAtUCAzIDxi
+ZGFkZHI+IG9uIHRoZSBpbml0aWF0b3INCj4gPg0KPiA+Pg0KPiA+PiBUaGUgcHJvYmxlbSByZWFs
+bHkgaXMgdGhhdCB0aGUgTUFTS19SRVFfRE9ORSBpbmRpY2F0aW9uIGlzIG5vdCBlbm91Z2gNCj4g
+dG8NCj4gPj4gbWFrZSBhIGRlY2lzaW9uIGZvciB0aGUga2V5IHNpemUuIFdlIGhhdmUgdG8gZW5z
+dXJlIHRoYXQgYWxzbyB0aGUga2V5IHNpemUNCj4gaXMNCj4gPj4gYWN0dWFsbHkgYXZhaWxhYmxl
+LiBJZiB0aGF0IGlzIG5vdCB5ZXQgZG9uZSwgdGhlbiB3ZSBzaG91bGQgbm90IGNoZWNrIGl0LiBU
+aGlzDQo+ID4+IG1lYW5zIHRoYXQgYW55IHJlc3BvbnNlIHRvIEwyQ0FQX0Nvbm5lY3RfUmVxdWVz
+dCBQRFUgbmVlZHMgdG8gYmUNCj4gPj4gZGVsYXllZCB1bnRpbCB0aGUga2V5IHNpemUgaGFzIGJl
+ZW4gcmVhZC4NCj4gPg0KPiA+IEluIG15IHRlc3QgY2FzZSwgdGhlIGtleSBzaXplIGhhcyBiZWVu
+IHJlYWQgZnJvbSBjb250cm9sbGVyIGJlZm9yZSB0aGUgbDJjYXANCj4gY29ubiByZXF1ZXN0IFBE
+VSBpcyByZWNlaXZlZC4NCj4gPg0KPiA+IDwgSENJIENvbW1hbmQ6IFJlYWQgRW5jcnlwdGlvbiBL
+ZXkgU2l6ZSAoMHgwNXwweDAwMDgpIHBsZW4gMg0KPiAjMjIgW2hjaTBdIDQzLjA4OTg1OQ0KPiA+
+ICAgICAgICBIYW5kbGU6IDENCj4gPj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBl
+KSBwbGVuIDcNCj4gIzIzIFtoY2kwXSA0My4wOTE1MjgNCj4gPiAgICAgIFJlYWQgRW5jcnlwdGlv
+biBLZXkgU2l6ZSAoMHgwNXwweDAwMDgpIG5jbWQgMg0KPiA+ICAgICAgICBTdGF0dXM6IFN1Y2Nl
+c3MgKDB4MDApDQo+ID4gICAgICAgIEhhbmRsZTogMQ0KPiA+ICAgICAgICBLZXkgc2l6ZTogMQ0K
+PiA+PiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEwICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIzI0DQo+IFto
+Y2kwXSA0My4xNDA4ODgNCj4gPiAgICAgIEwyQ0FQOiBJbmZvcm1hdGlvbiBSZXF1ZXN0ICgweDBh
+KSBpZGVudCAxIGxlbiAyDQo+ID4gICAgICAgIFR5cGU6IEV4dGVuZGVkIGZlYXR1cmVzIHN1cHBv
+cnRlZCAoMHgwMDAyKQ0KPiA+IC4uLi4uLg0KPiA+PiBBQ0wgRGF0YSBSWDogSGFuZGxlIDEgZmxh
+Z3MgMHgwMiBkbGVuIDEyICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIzM0DQo+IFtoY2kwXSA0My4xNDg0MDUNCj4gPiAgICAgIEwyQ0FQ
+OiBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDIpIGlkZW50IDMgbGVuIDQNCj4gPiAgICAgICAgUFNN
+OiAzICgweDAwMDMpDQo+ID4gICAgICAgIFNvdXJjZSBDSUQ6IDY0DQo+IA0KPiB0aGUgZWFzaWVz
+dCB3YXkgdG8gZmFrZSB0aGlzIGlzIGp1c3QgdG8gYXNzaWduIGEgZGlmZmVyZW50IHZhbHVlIHRo
+YW4gdGhlIG9uZQ0KPiByZXR1cm5lZCBieSBSZWFkIEVuY3J5cHRpb24gS2V5IFNpemUgb24gdGhl
+IGFjY2VwdG9yIHNpZGUuIE5vIG5lZWQgdG8gbWVzcw0KPiB3aXRoIExNUCBkZXRhaWxzLg0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMgYi9uZXQvYmx1ZXRvb3Ro
+L2hjaV9ldmVudC5jDQo+IGluZGV4IDFkZjk1MTQ1ZjU3NC4uNzQxYjdhZDMxZmY4IDEwMDY0NA0K
+PiAtLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQo+ICsrKyBiL25ldC9ibHVldG9vdGgv
+aGNpX2V2ZW50LmMNCj4gQEAgLTMwMzQsNyArMzAzNCw3IEBAIHN0YXRpYyB2b2lkIHJlYWRfZW5j
+X2tleV9zaXplX2NvbXBsZXRlKHN0cnVjdA0KPiBoY2lfZGV2ICpoZGV2LCB1OCBzdGF0dXMsDQo+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhhbmRsZSk7DQo+ICAgICAgICAgICAgICAgICBj
+b25uLT5lbmNfa2V5X3NpemUgPSAwOw0KPiAgICAgICAgIH0gZWxzZSB7DQo+IC0gICAgICAgICAg
+ICAgICBjb25uLT5lbmNfa2V5X3NpemUgPSBycC0+a2V5X3NpemU7DQo+ICsgICAgICAgICAgICAg
+ICBjb25uLT5lbmNfa2V5X3NpemUgPSAxOw0KPiAgICAgICAgIH0NCg0KWWVzLCB5b3UncmUgcmln
+aHQuIEp1c3QgdG8gYXNzaWduIGEgZGlmZmVyZW50IHZhbHVlIGlzIHRoZSBlYXNpZXN0IHdheS4N
+ClByZXZpb3VzbHkgSSBzdHJ1Z2dsZWQgdG8gcHJvdmlkZSBjb21wbGV0ZSBldmlkZW5jZSBmb3Ig
+cXVhbGlmaWNhdGlvbiB0ZXN0LCBzbyBJIG1hZGUgdGhlIGNoYW5nZSBhIGJpdCBtb3JlIGNvbXBs
+aWNhdGVkLg0KSSdtIHNvcnJ5IHRvIG1lc3MgaXQuDQoNCj4gDQo+IElmIHlvdSBhZGQgdGhpcyBj
+aGFuZ2UgdG8gYm90aCBzaWRlcywgd2hhdCBhcmUgdGhlIHN0ZXBzIHRvIHJlcHJvZHVjZSB0aGlz
+IGFuZA0KPiB3aGF0IGRvZXMgYnRtb24gc2hvdz8gWW91IG1pZ2h0IGhhdmUgdG8gYWxzbyBlbmFi
+bGUgZHluYW1pY19kZWJ1ZyBmb3INCj4gbDJjYXAua28gc28gdGhhdCB3ZSBzZWUgdGhlIGZ1bmN0
+aW9uIGNhbGwgdHJhY2UuDQo+IA0KPiBJIGFtIGEgYml0IHBlZGFudGljIHdpdGggdGhpcyBvbmUs
+IHNpbmNlIGl0IGlzIGNyaXRpY2FsIHRvIHVuZGVyc3RhbmQgd2hlcmUgdGhlDQo+IGN1cnJlbnQg
+Y2hhbmdlcyB0byBoYW5kbGUgYW55dGhpbmcgS05PQiByZWxhdGVkIGhhdmUgdGhlaXIgc2hvcnRj
+b21pbmdzLiBJDQo+IHNwZW50IHNvIG11Y2ggdGltZSB0ZXN0aW5nIGV2ZXJ5IHNpbmdsZSBjb3Ju
+ZXIgY2FzZS4gQ2VydGFpbmx5IEkgY291bGQgaGF2ZQ0KPiBtaXNzZWQgc29tZXRoaW5nLCBidXQg
+aWYgSSByZWFsbHkgZGlkLCB0aGlzIHRpbWUgYXJvdW5kIEkgd2FudCB0byBlaXRoZXIgc2ltcGxp
+ZnkNCj4gdGhlIGNvZGUgb3IgcHJvcGVybHkgY29tbWVudCBpdCBhdCBsZWFzdC4NCj4gDQo+IFBs
+ZWFzZSBzZWUgdGhlIG90aGVyIGVtYWlsIHRocmVhZCAvIHBhdGNoIGZyb20gQXJjaGllIHRyeWlu
+ZyB0byBhbHNvIGFkZA0KPiBhbm90aGVyIGVuY3J5cHRpb24ga2V5IHNpemUgY2hlY2suDQoNClRo
+YW5rcyBmb3IgeW91ciByZW1haW5kZXIuIEl0IHNlZW1zIHRoYXQgQXJjaGllIGFuZCBJIGhhdmUg
+ZW5jb3VudGVyZWQgdGhlIHNhbWUgcHJvYmxlbS4gSSBhbHNvIGZvdW5kIHRoaXMgd2hlbiBJIGRp
+ZCB0aGUgcXVhbGlmaWNhdGlvbi4NCg0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQo+IA0K
+PiANCg0K
