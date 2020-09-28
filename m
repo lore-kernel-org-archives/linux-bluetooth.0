@@ -2,96 +2,107 @@ Return-Path: <SRS0=BM5K=DF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E21C2D0A8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 19:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2865DC4727F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 23:21:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 348E120773
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 19:45:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601322312;
-	bh=MswvOek1LM+HkGpz4nTDDYzvgfCkDvIwe1J+Nrq/Mq4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=acE6Hm3wmqar3nDoSJSH3YAAMNafehuwuSpahdxle+oKpQA2wNY3WJ3lM1tIcfD1G
-	 AAL3AhBe+j2be/b5jpOWzEaUJgM03l9kxDK2t3PlMjHBiOkgk7AUMaJvtbSfWJT6y4
-	 ZKt09GNVqY1dtIl+/efMXqa4fXjNoppD0Rs/H07I=
+	by mail.kernel.org (Postfix) with ESMTP id E98F92075F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Sep 2020 23:21:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="stw8dYFM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgI1TpH (ORCPT
+        id S1727055AbgI1XVk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Sep 2020 15:45:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41066 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726281AbgI1TpH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Sep 2020 15:45:07 -0400
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D60972076A;
-        Mon, 28 Sep 2020 19:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601322306;
-        bh=MswvOek1LM+HkGpz4nTDDYzvgfCkDvIwe1J+Nrq/Mq4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=TGcxC8SY6nQsGC+d1XCaaW+LqGCw1qF/RCtbJVib9rPc/HR2YL+9FIc0rHf6EP5px
-         sOgtobaGA5VBIZmIiYsRLr+bjO7jioi0xcbEXDcinIweVUe7SCkjIAFCttYwwC2ec9
-         1/FQA4AzdDgrWZZpKC6F4zpz7VcX1ZsUcjNp5iZ0=
-Date:   Mon, 28 Sep 2020 12:45:04 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Howard Chung <howardchung@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, alainm@chromium.org, mcchou@chromium.org,
-        mmandlik@chromium.orgi, "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v6 4/4] Bluetooth: Add toggle to switch off interleave
- scan
-Message-ID: <20200928124504.617d92da@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20200928154107.v6.4.I756c1fecc03bcc0cd94400b4992cd7e743f4b3e2@changeid>
-References: <20200928154107.v6.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-        <20200928154107.v6.4.I756c1fecc03bcc0cd94400b4992cd7e743f4b3e2@changeid>
+        Mon, 28 Sep 2020 19:21:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726396AbgI1XVk (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 28 Sep 2020 19:21:40 -0400
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC2DC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2020 16:21:40 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id b12so786116oop.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2020 16:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=P9Tur5SWGWaRfVU82rJKG7Il5mr9qSVjS0s3N0jBcN4=;
+        b=stw8dYFMu7tFOasCjw8A6sp2p2IbnpMt7MNFN0WT468iCt1U9OikgNFNpz0qauo+Xy
+         ayLoV1VqmSVmZ4o3vErje4KMbz4UgpXYfUr2jmabLUX9J8GXrGLIkV26KhaiTe37VMnT
+         PH5visu64U5cX6w0wzajGdC94F498bNjtzC4XdqSON7d3vwwBPTuy3kNXBx3oz0CqnPp
+         jGxEObmXeunvbE77vS1tnu8eKkPiLyFpu1c48ZRhQL7DA2b+D/z0aq0hnHGyiYD/0Uvd
+         yBpGjGvupGCm6LoIMI7fQcjZHIkuY53F22QKaLUv7JYYPiFC2jTEXcILwp3EUA+Q6KuK
+         8skA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=P9Tur5SWGWaRfVU82rJKG7Il5mr9qSVjS0s3N0jBcN4=;
+        b=HaEsq88l5+Qw+iWOK8oVAxAtM2j6s0ZwCd2J9JrG5Iod1ZpAP7up9lutJboGHMojHc
+         9twh8vYEwOIJsVEAe2Ihf9GO6Jg2IixW2WGpXR66BMgCCbH39QP3lGHmHGsSt7dOSc9b
+         sC3JvZQyGwVgK4TIklF8+vPP/dSoHnQOUr36UwNSrNPHC3r2Ih4Bc+dV5uy2/Pny2HBV
+         o6Bng3RWmtTL3gBk+0+eJXJ64pv2rNXNoMi7Lc+3wzNoJOkFCq4RkLFYbTxApa/nJPQd
+         +2onQwsxFLpLb4Mbg2uOn4YhNnxfyulZyQxzKxbdmd7hzk3x3KOYIEwBS5Nqfs2mzG/F
+         8jAg==
+X-Gm-Message-State: AOAM530IH3VqZnIfjBKySPYAM/CrkcnHU5f6WcthvmyU3e+kEKCkXGIO
+        SJ7keNlz6o25qRgpXd8K/vyD4oPeKipvZYbaIr6kIkYM
+X-Google-Smtp-Source: ABdhPJw6XYagLb+CwYrQZIuIDXvAp22iXxZZXplxfVpVNSxZEtz/FlHAUrwCNsburVXp9ovndnV2U6xTG7a5mk/zti8=
+X-Received: by 2002:a4a:96a3:: with SMTP id s32mr2530184ooi.17.1601335298956;
+ Mon, 28 Sep 2020 16:21:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20200924161949.Bluez.v2.1.Iedecbb8c8ebb111b14206dddc5bea3c40dfa1771@changeid>
+ <5f6e4534.1c69fb81.cb235.0bb6@mx.google.com>
+In-Reply-To: <5f6e4534.1c69fb81.cb235.0bb6@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 28 Sep 2020 16:21:26 -0700
+Message-ID: <CABBYNZKYct+XCFAiSF9f8-xHheQK8t-2U3kg04nW1RKptmXLoQ@mail.gmail.com>
+Subject: Re: [Bluez,v2] device: Disable auto connect for temporary devices
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yu Liu <yudiliu@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 28 Sep 2020 15:41:21 +0800 Howard Chung wrote:
-> This patch add a configurable parameter to switch off the interleave
-> scan feature.
->=20
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
+Hi Yu Liu,
 
-This seems to cause new warnings on W=3D1 C=3D1 builds:
+On Fri, Sep 25, 2020 at 1:51 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=355131
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - PASS
+>
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-In file included from ../net/bluetooth/mgmt_config.c:7:
-net/bluetooth/mgmt_config.c: In function =E2=80=98set_def_system_config=E2=
-=80=99:
-include/net/bluetooth/bluetooth.h:186:10: warning: format =E2=80=98%zu=E2=
-=80=99 expects argument of type =E2=80=98size_t=E2=80=99, but argument 4 ha=
-s type =E2=80=98int=E2=80=99 [-Wformat=3D]
-  186 |  BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-      |          ^~~~~~
-include/net/bluetooth/bluetooth.h:174:35: note: in definition of macro =E2=
-=80=98BT_WARN=E2=80=99
-  174 | #define BT_WARN(fmt, ...) bt_warn(fmt "\n", ##__VA_ARGS__)
-      |                                   ^~~
-net/bluetooth/mgmt_config.c:165:4: note: in expansion of macro =E2=80=98bt_=
-dev_warn=E2=80=99
-  165 |    bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
-      |    ^~~~~~~~~~~
-net/bluetooth/mgmt_config.c:79:17: warning: incorrect type in initializer (=
-different base types)
-net/bluetooth/mgmt_config.c:79:17:    expected restricted __le16 [usertype]=
- type
-net/bluetooth/mgmt_config.c:79:17:    got int
-net/bluetooth/mgmt_config.c:79:17: warning: incorrect type in initializer (=
-different base types)
-net/bluetooth/mgmt_config.c:79:17:    expected restricted __le16 [usertype]=
- value_le16
-net/bluetooth/mgmt_config.c:79:17:    got unsigned char [usertype]=20
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
