@@ -7,124 +7,116 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B57C4727C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7EDC47420
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12E612083B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:36:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 293EA206A4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601415376;
-	bh=IyUPvHwtwjBwRcNc/SJufenELAwR9GBKSApZpl2oKIk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lSuKqEyF0swvVMZkDszVs4UY/kFtKsHtzwQQ+APF2/AC1bw64ptI59Ejd0k1C752h
-	 1/RRtXsPOB+FyS8bFDAq1YJ/V0ESlowuxG76dSNpvX1VJ7fZvBz05Fz+bXPj5+ObEU
-	 DlrzhN3+Mk/dfqQNwFk2hJi3y4tIZ0WCfTVy/D2I=
+	s=default; t=1601415632;
+	bh=DlscN2yqRbyyGeJN7YrFc+q4f8UfVNS6D0CjSgVFjBk=;
+	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
+	b=E1chgAE7q3M+wZLeER1fdBlzHYOlmj5AU/PGQb1AOzS7paYK+KexTHFSXqtHw7Yk6
+	 dOIRF4KDPGPxytBMm+2du3USb9pjocnyA3XLxuqmmiznJwfkHlobLIIhOK0uLR7kbn
+	 KNhouDZsG8scM+r4rvOayA0r2oFuUGOLnB53taEM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728031AbgI2VgP (ORCPT
+        id S1728004AbgI2Vkb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Sep 2020 17:36:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53042 "EHLO mail.kernel.org"
+        Tue, 29 Sep 2020 17:40:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58152 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727740AbgI2VgP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Sep 2020 17:36:15 -0400
+        id S1727740AbgI2Vkb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 29 Sep 2020 17:40:31 -0400
 Received: from pali.im (pali.im [31.31.79.79])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2C5E32083B;
-        Tue, 29 Sep 2020 21:36:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A32420774
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2020 21:34:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601415374;
-        bh=IyUPvHwtwjBwRcNc/SJufenELAwR9GBKSApZpl2oKIk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I4NSQ8HuYZhkZhFjb2U4jInavU0ouTcjPXMN/r6J7gDZnQouh4bcu+22ElleQklxW
-         WQAXcr073Nfl9W4ezdYN32Uy1xPrK5yc2RSdF60fGk+97QkpAErlquSPU6cX0Z3mot
-         zZL3bcrwCQlhysRCOdYtcAaH/8uZRhIiDAtNKcuY=
+        s=default; t=1601415293;
+        bh=DlscN2yqRbyyGeJN7YrFc+q4f8UfVNS6D0CjSgVFjBk=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=iA1slaAqd8Q1yLAH3bqsoA/dIEZGeYNWiT1NqHsgauHwFW3SVhinehPe9DFRxudCS
+         iM3ZB1vsNAksAOFgdE31u0yR/UmZVAtnZh/w5m4Xyw9GGK4XhfO1h7fvi8AQMepXOR
+         58SlcGVEJC2y5Z53HvTGGqGPX/brniRYY8yIxEtg=
 Received: by pali.im (Postfix)
-        id 0C846AA6; Tue, 29 Sep 2020 23:36:12 +0200 (CEST)
-Date:   Tue, 29 Sep 2020 23:36:11 +0200
+        id F31AEAA6; Tue, 29 Sep 2020 23:34:50 +0200 (CEST)
+Date:   Tue, 29 Sep 2020 23:34:50 +0200
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: Re: [PATCH] sap: Improve error messages
-Message-ID: <20200929213611.6q6hzkg3kr5kvuex@pali>
-References: <20200604232433.4951-1-pali@kernel.org>
- <4237143.LvFx2qVVIh@ix>
- <20200716144008.fcgxcqmqfashnwam@pali>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] avinfo: Print more A/V capabilities
+Message-ID: <20200929213450.evljeiutlvnczpaq@pali>
+References: <20200512165112.24006-1-pali@kernel.org>
+ <20200808132336.opzyojwsyj2txgbp@pali>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200716144008.fcgxcqmqfashnwam@pali>
+In-Reply-To: <20200808132336.opzyojwsyj2txgbp@pali>
 User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thursday 16 July 2020 16:40:08 Pali Rohár wrote:
-> On Monday 15 June 2020 11:48:20 Szymon Janc wrote:
-> > Hi,
-> > 
-> > On Friday, 5 June 2020 01:24:33 CEST Pali Rohár wrote:
-> > > When bluetoohd daemon is starting, it prints following error messages:
-> > > 
-> > > bluetoothd[19117]: profiles/sap/server.c:sap_server_register() Sap driver
-> > > initialization failed. bluetoothd[19117]: sap-server: Operation not
-> > > permitted (1)
-> > > 
-> > > Initialization is failing because sap server is enabled only when
-> > > bluetoothd daemon is started with --experimental option.
-> > > 
-> > > And "Operation not permitted" is result of returning error code -1.
-> > > 
-> > > This patch improves error messages. When --experimental option is not used
-> > > then bluetoothd prints more explaining error message. And in case function
-> > > sap_init() fails then -EOPNOTSUPP "Operation not supported" is returned
-> > > instead of -EPERM (-1).
-> > > ---
-> > >  profiles/sap/server.c | 7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/profiles/sap/server.c b/profiles/sap/server.c
-> > > index 5de682a33..99ff80297 100644
-> > > --- a/profiles/sap/server.c
-> > > +++ b/profiles/sap/server.c
-> > > @@ -1353,9 +1353,14 @@ int sap_server_register(struct btd_adapter *adapter)
-> > >  	GIOChannel *io;
-> > >  	struct sap_server *server;
-> > > 
-> > > +	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-> > > +		error("Sap driver is disabled without --experimental 
-> > option");
-> > > +		return -EOPNOTSUPP;
-> > > +	}
-> > > +
-> > 
-> > Maybe just make sap_init() fail if experimental is not enabled in sap-dummy.c?
-> 
-> I guess this is what is already happening. But failure of sap_init()
-> means that bluetoothd daemon prints error message that initialization
-> failed as I wrote in commit message.
-> 
-> Therefore I added another check for experimental flag with printing
-> different error message which contains information why it failed.
+On Saturday 08 August 2020 15:23:36 Pali Rohár wrote:
+> Hello! I would like to remind also this patch:
 
-Szymon, do you need something more?
+PING
 
-> > This driver is usable only for profile qualification tests and nothing more.
-> > And TBH I'm not sure why distros are enabling SAP in first place...
+> On Tuesday 12 May 2020 18:51:12 Pali Rohár wrote:
+> > ---
+> >  tools/avinfo.c | 27 ++++++++++++++++++++++++---
+> >  1 file changed, 24 insertions(+), 3 deletions(-)
 > > 
-> > >  	if (sap_init() < 0) {
-> > >  		error("Sap driver initialization failed.");
-> > > -		return -1;
-> > > +		return -EOPNOTSUPP;
-> > >  	}
-> > > 
-> > >  	record = create_sap_record(SAP_SERVER_CHANNEL);
-> > 
-> > 
+> > diff --git a/tools/avinfo.c b/tools/avinfo.c
+> > index e45b50918..576981a5e 100644
+> > --- a/tools/avinfo.c
+> > +++ b/tools/avinfo.c
+> > @@ -65,6 +65,7 @@
+> >  #define AVDTP_HEADER_COMPRESSION	0x05
+> >  #define AVDTP_MULTIPLEXING		0x06
+> >  #define AVDTP_MEDIA_CODEC		0x07
+> > +#define AVDTP_DELAY_REPORTING		0x08
+> >  
+> >  /* SEP types definitions */
+> >  #define AVDTP_SEP_TYPE_SOURCE		0x00
+> > @@ -696,13 +697,33 @@ static void print_caps(void *data, int size)
+> >  
+> >  		switch (cap->category) {
+> >  		case AVDTP_MEDIA_TRANSPORT:
+> > +			printf("\tMedia Transport: Supported\n");
+> > +			break;
+> >  		case AVDTP_REPORTING:
+> > +			printf("\tReporting: Supported\n");
+> > +			break;
+> > +		case AVDTP_DELAY_REPORTING:
+> > +			printf("\tDelay Reporting: Supported\n");
+> > +			break;
+> >  		case AVDTP_RECOVERY:
+> > +		case AVDTP_HEADER_COMPRESSION:
+> >  		case AVDTP_MULTIPLEXING:
+> > -			/* FIXME: Add proper functions */
+> > -			break;
+> >  		default:
+> > -			printf("\tUnknown category: %d\n", cap->category);
+> > +			switch (cap->category) {
+> > +			case AVDTP_RECOVERY:
+> > +				printf("\tRecovery:\n");
+> > +				break;
+> > +			case AVDTP_HEADER_COMPRESSION:
+> > +				printf("\tHeader compression:\n");
+> > +				break;
+> > +			case AVDTP_MULTIPLEXING:
+> > +				printf("\tMultiplexing:\n");
+> > +				break;
+> > +			default:
+> > +				printf("\tUnknown category: %d\n", cap->category);
+> > +				break;
+> > +			}
+> > +			/* FIXME: Add proper functions */
+> >  			printf("\t\tData:");
+> >  			for (i = 0; i < cap->length; ++i)
+> >  				printf(" 0x%.02x",
 > > -- 
-> > pozdrawiam
-> > Szymon Janc
-> > 
+> > 2.20.1
 > > 
