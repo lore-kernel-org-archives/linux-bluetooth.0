@@ -2,164 +2,166 @@ Return-Path: <SRS0=RRj3=DG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DACBFC47423
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A2CC4727C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79DA52083B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF02B2075E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:40:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601415635;
-	bh=YxrRfK9Bu9DaJ3+ROAFOgwtQ7uB5WjoeyzWI9wvmpOQ=;
-	h=Date:From:To:Subject:References:In-Reply-To:List-ID:From;
-	b=fy8B1zZtnSo+zelpN5FRNQ7n8a+SEUsq07+LiX+CZeP7ESsUROSRWlGJDOJdhv/bx
-	 +BSB+43spMXhq0xUTAH4Q47g0Z17zBBsdFg0yTmtTLqZ1G09ol9V3RA79sz4BqM3Nr
-	 GVQeGSqJTS+SmNvCRxP56hXSIJTYa+m/hh3oZ94A=
+	s=default; t=1601415638;
+	bh=ywbQMNJ35DCgvZmqfomObXqYwPzB/CNC7+4cQBYCrrU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=CEERp2PItVP/ulU9EcbX1cXXdJwEAnNV0SbWM/hkgs3MEfPa4Ing1DmCdBQHOS9T4
+	 MFAhtM4TNq7giyKTyxKMYq1EJOjOSWaMVeBqmQiauuTnjZzKRS7x1oLS+IFc4384xT
+	 wQvNMdSz519HGQrJll4CioXxbBp0FQDmH/OmfjrQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728195AbgI2Vkc (ORCPT
+        id S1728078AbgI2Vkc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 29 Sep 2020 17:40:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58150 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:58154 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727958AbgI2Vkc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1727922AbgI2Vkc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 29 Sep 2020 17:40:32 -0400
 Received: from pali.im (pali.im [31.31.79.79])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9D01B2076A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2020 21:34:22 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DCD302075E;
+        Tue, 29 Sep 2020 21:32:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601415262;
-        bh=YxrRfK9Bu9DaJ3+ROAFOgwtQ7uB5WjoeyzWI9wvmpOQ=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=VJGr4Wc6wxostVU3XWMWgsh9w3nzj1m5ZAIQ9F22akYrQg5r0Y0MXeych6YdirOEa
-         8ahWNoSYpWKzhGTugs83aBMVkUJ9A4rJCWFiZ3iVqshX2YBUCKntm0fpGsJB6p8axZ
-         RZrxJFekvagWDVArznz79M9cbN4JxkSIiqVhT6mw=
+        s=default; t=1601415177;
+        bh=ywbQMNJ35DCgvZmqfomObXqYwPzB/CNC7+4cQBYCrrU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0h081J+ix9NsmLmWVNHNXM9jL2WT4dYj2nq6wxyGbIX7lpgXIGLMlxEtiLs+2odPl
+         zTwotUR89a9sync30XA32edIWqtSLsxm53E4mz07UKDYRWLjjqCasqPNzP7DaLUHoo
+         t0QCxq1IVwHl6pBQW96n71nd33y73wSKbwjiXkAk=
 Received: by pali.im (Postfix)
-        id 6B239AA6; Tue, 29 Sep 2020 23:34:20 +0200 (CEST)
-Date:   Tue, 29 Sep 2020 23:34:20 +0200
+        id 58E00AA6; Tue, 29 Sep 2020 23:32:54 +0200 (CEST)
+Date:   Tue, 29 Sep 2020 23:32:54 +0200
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20200929213420.zznc4a3yj65kgzq5@pali>
-References: <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
- <20190305122630.gwnaz3y7ckzqfjfq@pali>
- <20190410082924.exo2oihzd7w2oz3e@pali>
- <20190607130739.j25oqqj624anmcqr@pali>
- <20191014110746.n3pmoigtf3ewbmrq@pali>
- <20200209130532.4evozfyutikzwn4a@pali>
- <20200414230015.5ndqz5k5kx5vakj4@pali>
- <20200503111449.k6ugzpaitbv5mggs@pali>
- <20200808132458.2ia4xxfjd5x4d6ds@pali>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        David Heidelberg <david@ixit.cz>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Removal of HCI commands, userspace bluetooth regression?
+Message-ID: <20200929213254.difivzrhapk766xp@pali>
+References: <20191228171212.56anj4d4kvjeqhms@pali>
+ <45BB2908-4E16-4C74-9DB4-8BAD93B42A21@holtmann.org>
+ <20200104102436.bhqagqrfwupj6hkm@pali>
+ <20200209132137.7pi4pgnassosh3ax@pali>
+ <20200414225618.zgh5h4jexahfukdl@pali>
+ <20200808132747.4byefjg5ysddgkel@pali>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200808132458.2ia4xxfjd5x4d6ds@pali>
+In-Reply-To: <20200808132747.4byefjg5ysddgkel@pali>
 User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Saturday 08 August 2020 15:24:58 Pali Rohár wrote:
-> On Sunday 03 May 2020 13:14:49 Pali Rohár wrote:
-> > On Wednesday 15 April 2020 01:00:15 Pali Rohár wrote:
-> > > On Sunday 09 February 2020 14:05:32 Pali Rohár wrote:
-> > > > On Monday 14 October 2019 13:07:46 Pali Rohár wrote:
-> > > > > On Friday 07 June 2019 15:07:39 Pali Rohár wrote:
-> > > > > > On Wednesday 10 April 2019 10:29:24 Pali Rohár wrote:
-> > > > > > > On Tuesday 05 March 2019 13:26:30 Pali Rohár wrote:
-> > > > > > > > On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> > > > > > > > > On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > > > > > > > > > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > > > > > > > > > Hi,
-> > > > > > > > > > > 
-> > > > > > > > > > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > > > > > > > > > Hi Pali, Pasi,
-> > > > > > > > > > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > > > > > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > > > > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > > > > > > > > > Hi Pali,
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > > > > > > > > > {
-> > > > > > > > > > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > > > > > > > > > >                 return "aptX";
-> > > > > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > > > > > > > > > +               return "FastStream";
-> > > > > > > > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > > > > > > > > > +               return "aptX HD";
-> > > > > > > > > > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > > > > > > > > > >                 return "LDAC";
-> > > > > > > > > > > > > > > > >         return "Unknown???;
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > > > > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > > > > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > > > > > > > > > implemented this parsing.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > > > > > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Exactly, people still use hcidump...
-> > > > > > > > > > > > 
-> > > > > > > > > > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > > > > > > > > > 6.x which we would like to do in the very next release, if that
-> > > > > > > > > > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > > > > > > > > > BlueZ 5.x release.
-> > > > > > > > > > > > 
-> > > > > > > > > > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > > > > > > > > > start working on removing the deprecated tools/etc.
-> > > > > > > > > > > > 
-> > > > > > > > > > > 
-> > > > > > > > > > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > > > > > > > > > 
-> > > > > > > > > > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > > > > > > > > > release, can you take this patch?
-> > > > > > > > > >
-> > > > > > > > > 
-> > > > > > > > > How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> > > > > > > > > hcidump then gets removed later whenever the removal of deprecated features/tools starts.
-> > > > > > > > 
-> > > > > > > > So... what are plans for next release?
-> > > > > > > 
-> > > > > > > Marcel, Luiz, can you comment next steps? It is waiting there for your
-> > > > > > > info here for more than 2 months.
-> > > > > > 
-> > > > > > PING!
-> > > > > 
-> > > > > Just a gentle reminder for this thread and patch.
-> > > > > 
-> > > > 
-> > > > Ping, another reminder.
-> > > 
-> > > Ping, could you please give us information what is the state of this
-> > > tool and a linked patch?
-> > 
-> > Ping again, I have not got any reply for this patch for more then year.
-> > Patch can be still cleanly applied on top of git master branch.
-> 
-> Hello! Have you had a time to look at this patch?
+CCing other lists and maintainers, hopefully, somebody would have a time to look at it...
 
-BUMP
+On Saturday 08 August 2020 15:27:47 Pali Rohár wrote:
+> On Wednesday 15 April 2020 00:56:18 Pali Rohár wrote:
+> > On Sunday 09 February 2020 14:21:37 Pali Rohár wrote:
+> > > On Saturday 04 January 2020 11:24:36 Pali Rohár wrote:
+> > > > On Saturday 04 January 2020 10:44:52 Marcel Holtmann wrote:
+> > > > > Hi Pali,
+> > > > > 
+> > > > > > I wrote a simple script "sco_features.pl" which show all supported
+> > > > > > codecs by local HCI bluetooth adapter. Script is available at:
+> > > > > > 
+> > > > > > https://github.com/pali/hsphfpd-prototype/blob/prototype/sco_features.pl
+> > > > > > 
+> > > > > > And I found out that OCF_READ_LOCAL_CODECS HCI command cannot be send by
+> > > > > > non-root user. Kernel returns "Operation not permitted" error.
+> > > > > > 
+> > > > > > What is reason that kernel blocks OCF_READ_LOCAL_CODECS command for
+> > > > > > non-root users? Without it (audio) application does not know which
+> > > > > > codecs local bluetooth adapter supports.
+> > > > > > 
+> > > > > > E.g. OCF_READ_LOCAL_EXT_FEATURES or OCF_READ_VOICE_SETTING commands can
+> > > > > > be send also by non-root user and kernel does not block them.
+> > > > > 
+> > > > > actually the direct access to HCI commands is being removed. So we have no plans to add new commands into the list since that it what the kernel is suppose to handle. If we wanted to expose this, then it has to be via mgmt.
+> > > > 
+> > > > Hi Marcel! Thank you for information. I have not know that this API is
+> > > > "deprecated" and is going to be removed. But userspace audio
+> > > > applications need to know what bluetooth adapter supports, so can you
+> > > > export result of these commands to userspace? My script linked above
+> > > > calls: OCF_READ_VOICE_SETTING, OCF_READ_LOCAL_COMMANDS,
+> > > > OCF_READ_LOCAL_EXT_FEATURES, OCF_READ_LOCAL_CODECS
+> > > 
+> > > Hello! Just a gently reminder for this question. How to retrieve
+> > > information about supported codecs from userspace by non-root user?
+> > > Because running all bluetooth audio applications by root is not really a
+> > > solution. Plus if above API for root user is going to be removed, what
+> > > is a replacement?
+> > 
+> > Hello!
+> > 
+> > I have not got any answer to my email from Marcel for months, so I'm
+> > adding other developers to loop. Could somebody tell me that is the
+> > replacement API if above one is going to be removed?
+> > 
+> > I was not able to find any documentation where could be described this
+> > API nor information about deprecation / removal.
+> > 
+> > And are you aware of the fact that removing of API could potentially
+> > break existing applications?
+> > 
+> > I really need to know which API should I use, because when I use API
+> > which is going to be removed, then my application stops working. And I
+> > really want to avoid it.
+> > 
+> > Also I have not got any response yet, how can I read list of supported
+> > codecs by bluetooth adapter by ordinary non-root user? Audio application
+> > needs to know list of supported codecs and it is really insane to run it
+> > as root.
+> 
+> Hello! This is just another reminder that I have not got any reply to
+> this email.
+> 
+> Does silence mean that audio applications are expected to work only
+> under root account and ordinary users are not able to use audio and list
+> supported codecs?
+
+Hello! I have not got any reply for this issue for 10 months and if you
+are going to remove (or after these 10 months you already did it?)
+existing HCI API from kernel it would break existing and working
+userspace application. How do you want to handle such regressions?
+
+I think that more people in past said that there should not be
+regressions in userspace applications caused by kernel changes (e.g.
+removing of API).
+
+Also, could you please say something about root requirement for listing
+supported codecs? At least clarifying something like
+
+  "kernel allows only processes with uid=0 to access list of supported
+  bluetooth audio codecs, effectively means requirement of bluetooth
+  audio applications to run as root; and kernel developers do not have
+  a time to discuss any future changes on this topic"
+
+would be nice to know what is current state or future, so developers of
+userspace bluetooth applications would know what should they do or
+expect.
+
+
+I really dislike this situation when after 10 months I just get
+information that API for userspace is being removed without any
+replacement and without any discussion how to handle issues and
+transition period.
