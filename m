@@ -2,242 +2,332 @@ Return-Path: <SRS0=RRj3=DG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18471C4346E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 04:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CDEC4727D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 04:48:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7C95208FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 04:24:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4799E20897
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 04:48:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="mSgS8zWl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pn/PgTG9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725550AbgI2EYC (ORCPT
+        id S1725779AbgI2Esl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Sep 2020 00:24:02 -0400
-Received: from z5.mailgun.us ([104.130.96.5]:21783 "EHLO z5.mailgun.us"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725355AbgI2EYC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Sep 2020 00:24:02 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1601353440; h=References: In-Reply-To: Message-Id: Date:
- Subject: Cc: To: From: Sender;
- bh=P8gYl8gLUGbwwjZC8LE+UOZ0BMCTQ1I9NDbu9UvISug=; b=mSgS8zWlFoRUeoMCDCleKajS/R0sP7WusQWjGPVWFRt42HP1zb6j+ytDidBAblFft8ZLJKRg
- pv9L7oAr6YYJpa9Sqmm3m4R/otjRLcGNxC3y4XQILHNi4a+XOJxH5sDQ/B75BhF0qVEC+Vp/
- Hv+ECHwkmK++eEKcCsSydwCh+VY=
-X-Mailgun-Sending-Ip: 104.130.96.5
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
- 5f72b6debe59ebabf3237ed7 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 29 Sep 2020 04:23:58
- GMT
-Sender: rjliao=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 0D8ACC433F1; Tue, 29 Sep 2020 04:23:58 +0000 (UTC)
-Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 8FAF7C433CA;
-        Tue, 29 Sep 2020 04:23:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 8FAF7C433CA
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v4] Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855 support
-Date:   Tue, 29 Sep 2020 12:23:51 +0800
-Message-Id: <20200929042351.2496-1-rjliao@codeaurora.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200925090829.3088-1-rjliao@codeaurora.org>
-References: <20200925090829.3088-1-rjliao@codeaurora.org>
+        Tue, 29 Sep 2020 00:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59742 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbgI2Esk (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 29 Sep 2020 00:48:40 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BB5C0613D0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2020 21:48:40 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id w5so3738667wrp.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Sep 2020 21:48:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qCa7NvwNB2OHxNcmS0KUafgeHTuIS8s8FBTIZtWApes=;
+        b=Pn/PgTG90cuObKB/9pJFYh/CyrmwfSeAAGTRkECFOy9Khn0iv6ztWJ7FpieDhPF4z9
+         heodTsCvGT+gXnpX9LUZuQkyxC+lp0Uxm4JgmY4xYDVXaBvTmWW2Xn2Xy/y0RFH0WtVV
+         /dwM3usiUHKmUyeQidBoxGK/uv3rv53e5+A8BzGzLVc3XUiPqVuGaGstaCX2UlK2d1wc
+         24eTXXr8QRR+kpf/20qSXIJfauc7bea6UE0qh7d7G0CpfgtXLcvsIeNv678WB+lR+tq5
+         xyBgn3x4zv8S+5xhR3NkaYNcsFX5AXr5oraB1mu8Kk+KuQUGQ42s8lQBwjU9e80dM+2j
+         GNLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qCa7NvwNB2OHxNcmS0KUafgeHTuIS8s8FBTIZtWApes=;
+        b=WiGMIADItQv9AoR9O56e4xMMIo7b5jNGPtq9gDQtQuxQtdwpLm3Sn5RJ55OcrixVow
+         exmVMiCYTwcgBrvYpKBK2RHa8k2BUPgMJaT0Zl6PKIid2XxVy0UbyWOOyca5nxOdCU+p
+         3PwFmT/m2QliZmtl+FTfgDxE1TTfDgmqA9EDxltS8zCHEfm3VhUiC8SfssD6OmMR5PLM
+         o1kcYxLNgNajgMkih2rb39DWPclkc1g2SLFMWxeyIYYiUp7ikkGXQWljn7f4cdIgqEOf
+         JPT0B7ZByaPrsmFzZ7HdvjngyRE66wHDLGW0nrT9m6Ti+u+rIrl/4sW82386jtcGonDU
+         NXyw==
+X-Gm-Message-State: AOAM530PyEWrbgfYcUkZW5/ROUBvzfI2juMEOFE9yezHwYKTYOcVpgGe
+        Ik40uLYAoF9FUQtwClF0ySUcHiQ5F9hFGHZY2QqGRQ==
+X-Google-Smtp-Source: ABdhPJweu7jszzTaME9S1m/g2T0McG8WDXFXg5H9jT52NcdnGyRatBPV1ZtaO3fLu4/rPfHZmXWk+sQNnFBphmRd2MQ=
+X-Received: by 2002:adf:fa0c:: with SMTP id m12mr1832109wrr.406.1601354918531;
+ Mon, 28 Sep 2020 21:48:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200922155548.v3.1.I67a8b8cd4def8166970ca37109db46d731b62bb6@changeid>
+ <BC59363A-B32A-4DAA-BAF5-F7FBA01752E6@holtmann.org> <CAJQfnxHPDktGp=MQJzY57qmMTO7TPfNZvLHLm7DAyZ-4qM-DnQ@mail.gmail.com>
+ <6FDED095-BAE4-437D-9A25-37245B8454B1@holtmann.org> <CAJQfnxFbBRfiDF2xmzzPZ7N3qr41ubH29Fa0FDg9+jh-4OQxhg@mail.gmail.com>
+ <E61715A9-7B65-4EB4-8CED-AADE46FF72A1@holtmann.org>
+In-Reply-To: <E61715A9-7B65-4EB4-8CED-AADE46FF72A1@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Tue, 29 Sep 2020 12:48:27 +0800
+Message-ID: <CAJQfnxE2R0ouT+c_Z0TyU-xV=tFCbqBA=n8trwFmZuT=Bp+VDg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Check for encryption key size on connect
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add support for WCN6855 i.e. patch and nvm download
-support.
+Hi Marcel,
 
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e600 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+On Tue, 29 Sep 2020 at 00:43, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Archie,
+>
+> >>>>> When receiving connection, we only check whether the link has been
+> >>>>> encrypted, but not the encryption key size of the link.
+> >>>>>
+> >>>>> This patch adds check for encryption key size, and reject L2CAP
+> >>>>> connection which size is below the specified threshold (default 7)
+> >>>>> with security block.
+> >>>>>
+> >>>>> Here is some btmon trace.
+> >>>>> @ MGMT Event: New Link Key (0x0009) plen 26    {0x0001} [hci0] 5.84=
+7722
+> >>>>>      Store hint: No (0x00)
+> >>>>>      BR/EDR Address: 38:00:25:F7:F1:B0 (OUI 38-00-25)
+> >>>>>      Key type: Unauthenticated Combination key from P-192 (0x04)
+> >>>>>      Link key: 7bf2f68c81305d63a6b0ee2c5a7a34bc
+> >>>>>      PIN length: 0
+> >>>>>> HCI Event: Encryption Change (0x08) plen 4        #29 [hci0] 5.871=
+537
+> >>>>>      Status: Success (0x00)
+> >>>>>      Handle: 256
+> >>>>>      Encryption: Enabled with E0 (0x01)
+> >>>>> < HCI Command: Read Encryp... (0x05|0x0008) plen 2  #30 [hci0] 5.87=
+1609
+> >>>>>      Handle: 256
+> >>>>>> HCI Event: Command Complete (0x0e) plen 7         #31 [hci0] 5.872=
+524
+> >>>>>    Read Encryption Key Size (0x05|0x0008) ncmd 1
+> >>>>>      Status: Success (0x00)
+> >>>>>      Handle: 256
+> >>>>>      Key size: 3
+> >>>>>
+> >>>>> ////// WITHOUT PATCH //////
+> >>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 5.895=
+023
+> >>>>>    L2CAP: Connection Request (0x02) ident 3 len 4
+> >>>>>      PSM: 4097 (0x1001)
+> >>>>>      Source CID: 64
+> >>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 5.89=
+5213
+> >>>>>    L2CAP: Connection Response (0x03) ident 3 len 8
+> >>>>>      Destination CID: 64
+> >>>>>      Source CID: 64
+> >>>>>      Result: Connection successful (0x0000)
+> >>>>>      Status: No further information available (0x0000)
+> >>>>>
+> >>>>> ////// WITH PATCH //////
+> >>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 12        #42 [hci0] 4.887=
+024
+> >>>>>    L2CAP: Connection Request (0x02) ident 3 len 4
+> >>>>>      PSM: 4097 (0x1001)
+> >>>>>      Source CID: 64
+> >>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 16        #43 [hci0] 4.88=
+7127
+> >>>>>    L2CAP: Connection Response (0x03) ident 3 len 8
+> >>>>>      Destination CID: 0
+> >>>>>      Source CID: 64
+> >>>>>      Result: Connection refused - security block (0x0003)
+> >>>>>      Status: No further information available (0x0000)
+> >>>>>
+> >>>>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> >>>>>
+> >>>>> ---
+> >>>>>
+> >>>>> Changes in v3:
+> >>>>> * Move the check to hci_conn_check_link_mode()
+> >>>>>
+> >>>>> Changes in v2:
+> >>>>> * Add btmon trace to the commit message
+> >>>>>
+> >>>>> net/bluetooth/hci_conn.c | 4 ++++
+> >>>>> 1 file changed, 4 insertions(+)
+> >>>>>
+> >>>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >>>>> index 9832f8445d43..89085fac797c 100644
+> >>>>> --- a/net/bluetooth/hci_conn.c
+> >>>>> +++ b/net/bluetooth/hci_conn.c
+> >>>>> @@ -1348,6 +1348,10 @@ int hci_conn_check_link_mode(struct hci_conn=
+ *conn)
+> >>>>>         !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+> >>>>>             return 0;
+> >>>>>
+> >>>>> +     if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
+> >>>>> +         conn->enc_key_size < conn->hdev->min_enc_key_size)
+> >>>>> +             return 0;
+> >>>>> +
+> >>>>>     return 1;
+> >>>>> }
+> >>>>
+> >>>> I am a bit concerned since we had that check and I on purpose moved =
+it. See commit 693cd8ce3f88 for the change where I removed and commit d5bb3=
+34a8e17 where I initially added it.
+> >>>>
+> >>>> Naively adding the check in that location caused a major regression =
+with Bluetooth 2.0 devices. This makes me a bit reluctant to re-add it here=
+ since I restructured the whole change to check the key size a different lo=
+cation.
+> >>>
+> >>> I have tried this patch (both v2 and v3) to connect with a Bluetooth
+> >>> 2.0 device, it doesn't have any connection problem.
+> >>> I suppose because in the original patch (d5bb334a8e17), there is no
+> >>> check for the HCI_CONN_ENCRYPT flag.
+> >>
+> >> while that might be the case, I am still super careful. Especially als=
+o in conjunction with the email / patch from Alex trying to add just anothe=
+r encryption key size check. If we really need them or even both, we have t=
+o audit the whole code since I must have clearly missed something when addi=
+ng the KNOB fix.
+> >>
+> >>>> Now I have to ask, are you running an upstream kernel with both comm=
+its above that address KNOB vulnerability?
+> >>>
+> >>> Actually no, I haven't heard of KNOB vulnerability before.
+> >>> This patch is written for qualification purposes, specifically to pas=
+s
+> >>> GAP/SEC/SEM/BI-05-C to BI-08-C.
+> >>> However, it sounds like it could also prevent some KNOB vulnerability
+> >>> as a bonus.
+> >>
+> >> That part worries me since there should be no gaps that allows an encr=
+yption key size downgrade if our side supports Read Encryption Key Size.
+> >>
+> >> We really have to ensure that any L2CAP communication is stalled until=
+ we have all information from HCI connection setup that we need. So maybe t=
+he change Alex did would work as well, or as I mentioned put any L2CAP conn=
+ection request as pending so that the validation happens in one place.
+> >
+> > I think Alex and I are solving the same problem, either one of the
+> > patches should be enough.
+> >
+> > Here is my test method using BlueZ as both the IUT and the lower test.
+> > (1) Copy the bluez/test/test-profile python script to IUT and lower tes=
+t.
+> > (2) Assign a fake service server to IUT
+> > python test-profile -u 00001fff-0000-1000-2000-123456789abc -s -P 4097
+> > (3) Assign a fake service client to lower test
+> > python test-profile -u 00001fff-0000-1000-2000-123456789abc -c
+> > (4) Make the lower test accept weak encryption key
+> > echo 1 > /sys/kernel/debug/bluetooth/hci0/min_encrypt_key_size
+> > (5) Enable ssp and disable sc on lower test
+> > btmgmt ssp on
+> > btmgmt sc off
+> > (6) Set lower test encryption key size to 1
+> > (7) initiate connection from lower test
+> > dbus-send --system --print-reply --dest=3Dorg.bluez
+> > /org/bluez/hci0/dev_<IUT> org.bluez.Device1.ConnectProfile
+> > string:00001fff-0000-1000-2000-123456789abc
+> >
+> > After MITM authentication, IUT will incorrectly accept the connection,
+> > even though the encryption key used is less than the one specified in
+> > IUT's min_encrypt_key_size.
+>
+> I almost assumed that you two are chasing the same issue here. Problem is=
+ I really don=E2=80=99t yet know where to correctly put that encryption key=
+ size check.
+>
+> There is one case in l2cap_connect() that will not respond with L2CAP_CR_=
+PEND.
+>
+>                                 /* Force pending result for AMP controlle=
+rs.
+>                                  * The connection will succeed after the
+>                                  * physical link is up.
+>                                  */
+>                                 if (amp_id =3D=3D AMP_ID_BREDR) {
+>                                         l2cap_state_change(chan, BT_CONFI=
+G);
+>                                         result =3D L2CAP_CR_SUCCESS;
+>                                 } else {
+>                                         l2cap_state_change(chan, BT_CONNE=
+CT2);
+>                                         result =3D L2CAP_CR_PEND;
+>                                 }
+>                                 status =3D L2CAP_CS_NO_INFO;
+>
+> Most services will actually use FLAG_DEFER_SETUP and then you also don=E2=
+=80=99t run into this issue since at this stage the response is L2CAP_CR_PE=
+ND as well.
+>
+> One question we should answer is if we just always return L2CAP_CR_PEND o=
+r if we actually add the check for the encryption key size here as well. Th=
+is has always been a shortcut to avoid an unneeded round-trip if all inform=
+ation are present. Question really is if all information are present or if =
+this is just pure luck. I don=E2=80=99t see a guarantee that the encryption=
+ key size has been read in any of your patches.
+>
+> Everywhere else in the code we have this sequence of checks:
+>
+>         l2cap_chan_check_security()
+>
+>         l2cap_check_enc_key_size()
+>
+> This is generally how l2cap_do_start() or l2cap_conn_start() do their job=
+. So we might have to restructure l2cap_connect() a little bit for followin=
+g the same principle.
+>
+> Anyhow, before do this, can we try if this patch fixes this as well and c=
+heck the btmon trace for it:
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 1ab27b90ddcb..88e4c1292b98 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4156,17 +4156,8 @@ static struct l2cap_chan *l2cap_connect(struct l2c=
+ap_conn *conn,
+>                                 status =3D L2CAP_CS_AUTHOR_PEND;
+>                                 chan->ops->defer(chan);
+>                         } else {
+> -                               /* Force pending result for AMP controlle=
+rs.
+> -                                * The connection will succeed after the
+> -                                * physical link is up.
+> -                                */
+> -                               if (amp_id =3D=3D AMP_ID_BREDR) {
+> -                                       l2cap_state_change(chan, BT_CONFI=
+G);
+> -                                       result =3D L2CAP_CR_SUCCESS;
+> -                               } else {
+> -                                       l2cap_state_change(chan, BT_CONNE=
+CT2);
+> -                                       result =3D L2CAP_CR_PEND;
+> -                               }
+> +                               l2cap_state_change(chan, BT_CONNECT2);
+> +                               result =3D L2CAP_CR_PEND;
+>                                 status =3D L2CAP_CS_NO_INFO;
+>                         }
+>                 } else {
+>
+> If this fixes your issue and puts the encryption key size check back in p=
+lay, then I just have to think about on how to fix this.
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
----
- drivers/bluetooth/btusb.c | 66 +++++++++++++++++++++++++++++++--------
- 1 file changed, 53 insertions(+), 13 deletions(-)
+That patch alone doesn't fix the issue I have. By applying it, the
+only difference I am aware of is we would first reply "connection
+pending" to the initial SDP request of the peripheral, instead of just
+"connection successful". Subsequent L2CAP connections go to the
+FLAG_DEFER_SETUP branch just a tad above the change in the patch, so
+they are not affected at all.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9f294b941943..1005b6e8ff74 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_MEDIATEK		0x200000
- #define BTUSB_WIDEBAND_SPEECH	0x400000
- #define BTUSB_VALID_LE_STATES   0x800000
-+#define BTUSB_QCA_WCN6855	0x1000000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -291,6 +292,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
-+	/* QCA WCN6855 chipset */
-+	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
-+						     BTUSB_WIDEBAND_SPEECH },
-+
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
-@@ -3409,6 +3414,27 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
- 	return 0;
- }
- 
-+static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
-+				const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	u8 buf[6];
-+	long ret;
-+
-+	memcpy(buf, bdaddr, sizeof(bdaddr_t));
-+
-+	skb = __hci_cmd_sync_ev(hdev, 0xfc14, sizeof(buf), buf,
-+				HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Change address command failed (%ld)", ret);
-+		return ret;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- #define QCA_DFU_PACKET_LEN	4096
- 
- #define QCA_GET_TARGET_VERSION	0x09
-@@ -3428,7 +3454,8 @@ struct qca_version {
- } __packed;
- 
- struct qca_rampatch_version {
--	__le16	rom_version;
-+	__le16	rom_version_high;
-+	__le16  rom_version_low;
- 	__le16	patch_version;
- } __packed;
- 
-@@ -3440,12 +3467,14 @@ struct qca_device_info {
- };
- 
- static const struct qca_device_info qca_devices_table[] = {
--	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
--	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
--	{ 0x00000200, 28, 4, 18 }, /* Rome 2.0 */
--	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
--	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
--	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
-+	{ 0x00000100, 20, 4,  8 }, /* Rome 1.0 */
-+	{ 0x00000101, 20, 4,  8 }, /* Rome 1.1 */
-+	{ 0x00000200, 28, 4, 16 }, /* Rome 2.0 */
-+	{ 0x00000201, 28, 4, 16 }, /* Rome 2.1 */
-+	{ 0x00000300, 28, 4, 16 }, /* Rome 3.0 */
-+	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-+	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-+	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3547,8 +3576,8 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- {
- 	struct qca_rampatch_version *rver;
- 	const struct firmware *fw;
--	u32 ver_rom, ver_patch;
--	u16 rver_rom, rver_patch;
-+	u32 ver_rom, ver_patch, rver_rom;
-+	u16 rver_rom_low, rver_rom_high, rver_patch;
- 	char fwname[64];
- 	int err;
- 
-@@ -3567,9 +3596,16 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	bt_dev_info(hdev, "using rampatch file: %s", fwname);
- 
- 	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
--	rver_rom = le16_to_cpu(rver->rom_version);
-+	rver_rom_low = le16_to_cpu(rver->rom_version_low);
- 	rver_patch = le16_to_cpu(rver->patch_version);
- 
-+	if (ver_rom & ~0xffffU) {
-+		rver_rom_high = le16_to_cpu(rver->rom_version_high);
-+		rver_rom = le32_to_cpu(rver_rom_high << 16 | rver_rom_low);
-+	} else {
-+		rver_rom = rver_rom_low;
-+	}
-+
- 	bt_dev_info(hdev, "QCA: patch rome 0x%x build 0x%x, "
- 		    "firmware rome 0x%x build 0x%x",
- 		    rver_rom, rver_patch, ver_rom, ver_patch);
-@@ -3643,9 +3679,6 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 		return err;
- 
- 	ver_rom = le32_to_cpu(ver.rom_version);
--	/* Don't care about high ROM versions */
--	if (ver_rom & ~0xffffU)
--		return 0;
- 
- 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
- 		if (ver_rom == qca_devices_table[i].rom_version)
-@@ -4081,6 +4114,13 @@ static int btusb_probe(struct usb_interface *intf,
- 		btusb_check_needs_reset_resume(intf);
- 	}
- 
-+	if (id->driver_info & BTUSB_QCA_WCN6855) {
-+		data->setup_on_usb = btusb_setup_qca;
-+		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
-+		hdev->cmd_timeout = btusb_qca_cmd_timeout;
-+		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-+	}
-+
- 	if (id->driver_info & BTUSB_AMP) {
- 		/* AMP controllers do not support SCO packets */
- 		data->isoc = NULL;
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+>
+> Regards
+>
+> Marcel
+>
 
+Thanks,
+Archie
