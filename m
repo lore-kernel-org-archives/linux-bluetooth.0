@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209D7C4727E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 14:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67247C4727E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 14:04:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB75120754
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 14:04:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EA5620754
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 14:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730287AbgI3OEM convert rfc822-to-8bit (ORCPT
+        id S1730294AbgI3OEZ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Sep 2020 10:04:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52806 "EHLO mail.kernel.org"
+        Wed, 30 Sep 2020 10:04:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52932 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728149AbgI3OEM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Sep 2020 10:04:12 -0400
+        id S1728149AbgI3OEZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 30 Sep 2020 10:04:25 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 85161] Bluetooth: hci0 SCO packet for unknown connection handle
  41
-Date:   Wed, 30 Sep 2020 14:04:11 +0000
+Date:   Wed, 30 Sep 2020 14:04:25 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -39,7 +39,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-85161-62941-vzUIBO5Ixj@https.bugzilla.kernel.org/>
+Message-ID: <bug-85161-62941-61eB9JG7Jp@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-85161-62941@https.bugzilla.kernel.org/>
 References: <bug-85161-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -53,8 +53,8 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=85161
 
---- Comment #3 from gandomi (wrl94265@eoopy.com) ---
-https://tarhegandom.com/
+--- Comment #4 from gandomi (wrl94265@eoopy.com) ---
+https://moderntarh.com/
 
 -- 
 You are receiving this mail because:
