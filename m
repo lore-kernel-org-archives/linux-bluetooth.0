@@ -1,110 +1,150 @@
-Return-Path: <SRS0=RRj3=DG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Qmzf=DH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA24C4727C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A345C4741F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 08:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 129AD208B8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Sep 2020 21:52:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1xmow0w"
+	by mail.kernel.org (Postfix) with ESMTP id 5B4A82074A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Sep 2020 08:02:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1601452928;
+	bh=IkuYjh3NLglBPiKsHUdQqIPHL+bEXM/LIKPDB6J6LTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=c0CeP/wo/aK2SW5dmjnSwpEy9XGlOH1edAo2MU3slRqPPAz8Jff8PSNWw/c/gqgMt
+	 tHGXlSJGaSmRPdwjLHulI0mwUmI/U1FetdQp172CD6ct4p8GQaMYiYcRShatSjNMXI
+	 AfxnMw8hXXmmyj8zaSjmY7YfA2wbpLZ2RDucRP3k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728124AbgI2Vwl (ORCPT
+        id S1728321AbgI3ICD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Sep 2020 17:52:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728041AbgI2Vwl (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Sep 2020 17:52:41 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBBAEC061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2020 14:52:40 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id x201so5655563qkb.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Sep 2020 14:52:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=47uCPr90dAinoznNZLuDa0SrxuuTjX8aJTjiN5ykcS4=;
-        b=W1xmow0wiGI2FV9GkuSt83+CLHc5d+qAf+0RCjVL/l1DRWm8KtbNptudXlPw+4wSz8
-         gZQrZFjdQbwBq9ocAN01XNk19wrf6uL/HFzWT+1spWk5QyhJ8kluMDL9ozIPU1jTfTWI
-         fMptHRHnK5XMl3G/USacTa12Yps1y7ljE2qyePGxAbXCCfZztq4AekugdVu9/c3lfQLP
-         pi6m/Ef/5elyn4gmNRkmKU0q25iNwuT16A6oGLNQ9hMYao+zknRgEWI2dQ4Pfism4KIr
-         wRmWCdNS95pVpUZ4xKBFGYOlC8sEtdbj+5M1eoEJxQ3HmNxcvMBLdQRr2DJKJ07lYngA
-         hOPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=47uCPr90dAinoznNZLuDa0SrxuuTjX8aJTjiN5ykcS4=;
-        b=k3A0iOULcMIyzk5JIpOAoOKh1hrUarnAPew0kr/IeKC4W0FMTK62DPKr1Qfe9GzKIF
-         sIF8B2mxIqk40W7GHJZI8V3X7DLfj/ZKkJY0QsLNvguDWX0rUuqTusiYhGiqztINerRL
-         IEKC4oXcYnpj/cVY4v8UqlfBtpXv355i6b5u1cLCAYaTKZFM1Jzf0eUQSZ70J2lkgve1
-         mSOfcErIib6Epyls5PrHSb/BM/f5yQquDH0c/NllfmbNagBxv5bGzuaFFg2z3Haz6nIj
-         yObe0msfN0zZdtBsxcU1Rf68tKznZ3W2tYAqtaaiJUB2HFSZiVqjCykorOVxzo2K3Rd9
-         Xybw==
-X-Gm-Message-State: AOAM533CFtXcpFEX1ALg9m9PqTz1htT/SW4thbTN23jQ1/QD5T08UQl1
-        nb7UQYsR0qFhiS1kf3eVmrn8wRNirHs7ag==
-X-Google-Smtp-Source: ABdhPJxD9Gs983F6EbNlFYGSc+AnkoNqNHREMeJ1B/caNYm/ImIgMrfui0NpdLtxaA8b9x1HSzotvg==
-X-Received: by 2002:a37:aa12:: with SMTP id t18mr6447210qke.236.1601416359970;
-        Tue, 29 Sep 2020 14:52:39 -0700 (PDT)
-Received: from [172.17.0.2] ([40.75.77.140])
-        by smtp.gmail.com with ESMTPSA id t20sm6281993qke.79.2020.09.29.14.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2020 14:52:39 -0700 (PDT)
-Message-ID: <5f73aca7.1c69fb81.2b70f.8dbc@mx.google.com>
-Date:   Tue, 29 Sep 2020 14:52:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0479370802791815974=="
+        Wed, 30 Sep 2020 04:02:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51256 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725776AbgI3ICC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 30 Sep 2020 04:02:02 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 663A42072E;
+        Wed, 30 Sep 2020 08:02:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1601452922;
+        bh=IkuYjh3NLglBPiKsHUdQqIPHL+bEXM/LIKPDB6J6LTM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=j/yceBd3NWE4z+2pZ7zX3Su9m1EGp+rJ4IySmKHzQiGqIunfhRcPGmFonLdhteozv
+         6arawg6zhnrTuGRUg2KOMO+D0nmHV4EGOEEDDsgMPWjONElogUxu5m07MJtrEOMufw
+         N7UZwhOnRgyRY4xSsVh9i9WpDHdiszm8FnEWyo28=
+Date:   Wed, 30 Sep 2020 10:02:05 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        David Heidelberg <david@ixit.cz>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Removal of HCI commands, userspace bluetooth regression?
+Message-ID: <20200930080205.GA1571308@kroah.com>
+References: <20191228171212.56anj4d4kvjeqhms@pali>
+ <45BB2908-4E16-4C74-9DB4-8BAD93B42A21@holtmann.org>
+ <20200104102436.bhqagqrfwupj6hkm@pali>
+ <20200209132137.7pi4pgnassosh3ax@pali>
+ <20200414225618.zgh5h4jexahfukdl@pali>
+ <20200808132747.4byefjg5ysddgkel@pali>
+ <20200929213254.difivzrhapk766xp@pali>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tedd.an@linux.intel.com
-Subject: RE: tools: Add SPDX License Identifier
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20200929212448.64395-1-tedd.an@linux.intel.com>
-References: <20200929212448.64395-1-tedd.an@linux.intel.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200929213254.difivzrhapk766xp@pali>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0479370802791815974==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Sep 29, 2020 at 11:32:54PM +0200, Pali Rohár wrote:
+> CCing other lists and maintainers, hopefully, somebody would have a time to look at it...
+> 
+> On Saturday 08 August 2020 15:27:47 Pali Rohár wrote:
+> > On Wednesday 15 April 2020 00:56:18 Pali Rohár wrote:
+> > > On Sunday 09 February 2020 14:21:37 Pali Rohár wrote:
+> > > > On Saturday 04 January 2020 11:24:36 Pali Rohár wrote:
+> > > > > On Saturday 04 January 2020 10:44:52 Marcel Holtmann wrote:
+> > > > > > Hi Pali,
+> > > > > > 
+> > > > > > > I wrote a simple script "sco_features.pl" which show all supported
+> > > > > > > codecs by local HCI bluetooth adapter. Script is available at:
+> > > > > > > 
+> > > > > > > https://github.com/pali/hsphfpd-prototype/blob/prototype/sco_features.pl
+> > > > > > > 
+> > > > > > > And I found out that OCF_READ_LOCAL_CODECS HCI command cannot be send by
+> > > > > > > non-root user. Kernel returns "Operation not permitted" error.
+> > > > > > > 
+> > > > > > > What is reason that kernel blocks OCF_READ_LOCAL_CODECS command for
+> > > > > > > non-root users? Without it (audio) application does not know which
+> > > > > > > codecs local bluetooth adapter supports.
+> > > > > > > 
+> > > > > > > E.g. OCF_READ_LOCAL_EXT_FEATURES or OCF_READ_VOICE_SETTING commands can
+> > > > > > > be send also by non-root user and kernel does not block them.
+> > > > > > 
+> > > > > > actually the direct access to HCI commands is being removed. So we have no plans to add new commands into the list since that it what the kernel is suppose to handle. If we wanted to expose this, then it has to be via mgmt.
+> > > > > 
+> > > > > Hi Marcel! Thank you for information. I have not know that this API is
+> > > > > "deprecated" and is going to be removed. But userspace audio
+> > > > > applications need to know what bluetooth adapter supports, so can you
+> > > > > export result of these commands to userspace? My script linked above
+> > > > > calls: OCF_READ_VOICE_SETTING, OCF_READ_LOCAL_COMMANDS,
+> > > > > OCF_READ_LOCAL_EXT_FEATURES, OCF_READ_LOCAL_CODECS
+> > > > 
+> > > > Hello! Just a gently reminder for this question. How to retrieve
+> > > > information about supported codecs from userspace by non-root user?
+> > > > Because running all bluetooth audio applications by root is not really a
+> > > > solution. Plus if above API for root user is going to be removed, what
+> > > > is a replacement?
+> > > 
+> > > Hello!
+> > > 
+> > > I have not got any answer to my email from Marcel for months, so I'm
+> > > adding other developers to loop. Could somebody tell me that is the
+> > > replacement API if above one is going to be removed?
+> > > 
+> > > I was not able to find any documentation where could be described this
+> > > API nor information about deprecation / removal.
+> > > 
+> > > And are you aware of the fact that removing of API could potentially
+> > > break existing applications?
+> > > 
+> > > I really need to know which API should I use, because when I use API
+> > > which is going to be removed, then my application stops working. And I
+> > > really want to avoid it.
+> > > 
+> > > Also I have not got any response yet, how can I read list of supported
+> > > codecs by bluetooth adapter by ordinary non-root user? Audio application
+> > > needs to know list of supported codecs and it is really insane to run it
+> > > as root.
+> > 
+> > Hello! This is just another reminder that I have not got any reply to
+> > this email.
+> > 
+> > Does silence mean that audio applications are expected to work only
+> > under root account and ordinary users are not able to use audio and list
+> > supported codecs?
+> 
+> Hello! I have not got any reply for this issue for 10 months and if you
+> are going to remove (or after these 10 months you already did it?)
+> existing HCI API from kernel it would break existing and working
+> userspace application. How do you want to handle such regressions?
 
-This is automated email and please do not reply to this email!
+What git commit caused this regression?
 
-Dear submitter,
+thanks,
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=357381
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0479370802791815974==--
+greg k-h
