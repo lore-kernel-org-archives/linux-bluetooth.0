@@ -4,146 +4,151 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AE1C4741F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FDCC4727E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96E8A2075F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 355982075F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:02:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I8yct7oM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gH6hA2J3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733166AbgJAXCF (ORCPT
+        id S1728090AbgJAXCI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Oct 2020 19:02:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52384 "EHLO
+        Thu, 1 Oct 2020 19:02:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728090AbgJAXCF (ORCPT
+        with ESMTP id S1733275AbgJAXCG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Oct 2020 19:02:05 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD366C0613D0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2020 16:02:04 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id a7so500297ybq.22
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2020 16:02:04 -0700 (PDT)
+        Thu, 1 Oct 2020 19:02:06 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F8BC0613D0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2020 16:02:06 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id f4so71478qta.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2020 16:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=ELyHh4E4M/qxzihfQVWNiDRPB3NtJ1mBapDQ1W8rXwI=;
-        b=I8yct7oM2cYMB1yX8bgUsFfd1SKjZf5n8DHVK+APzYy4OUB/JemHHvwVye4BiYTEy3
-         JIqJf/qihtL8895KQIDhZOxIJ6khimtPStxUUd/7rLGz16lbzYjkasGOqHP6EHwvxOBD
-         ZHa0TX2abvSIUah7vk5nk0oKoirlFAN1aSoksEGhXZ6sxK8h12dhlv80ayBRt9xW0WsL
-         IiROnDZdcNK/TNuYtUR6za4CU02q8pZN7CcVGELYmvU0QfIBr5Kwhl8vXNaQXYrOtMPB
-         QXr5mhkaT4d9UdOJXdu1583cEDqJBi/fm3dsZ5pfh2uaQIrmhdS1C+gfN7C85503BK6L
-         mETA==
+        bh=7hcKSJOws0inHn5BAdCtq4uJyHEUr81OaimuZXQjlLY=;
+        b=gH6hA2J3y+eLevsLjTIpYvUJpwJR4MUCbaQDK0ZHJocj+R4jDkHNpNwS06rYwu9rXC
+         WAb8EFfyLkjDe1fIbaQ49/0sTER4ev0rqr3AW3lT4D1ipZVNW0NdDjKM2CeBtbLlzIO3
+         JF7iguINN5dZT0s4XB2rJx/JtpoUAtmAxIVx8FK5z6Ay7wkaw/cyYDVdNXdL2LOnbN4N
+         Mq+IIcoG5nSuarygt8cA2TSAwWvGNzAkXIlh+9283HZDdhzCfvc8qnYIEOm+SzVZEenw
+         DjmBJfq3Tj+BrGeVHo5uaXT22HYMB4VXJl7QOWjhpE2Zvv+XOkpCiO4UoU4Fxi7CtIqU
+         BhoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ELyHh4E4M/qxzihfQVWNiDRPB3NtJ1mBapDQ1W8rXwI=;
-        b=oNcebsvxO4jY+f84pZ75MAgUsTdi/I5Y9LsqDoUxUNA+6ZBTvgD3zXbwpyRHpi+jd2
-         o7DsLX0T5mzWC2WsydxHFaikiC+GLXIp0mOzC1cmwWVE6wTIse4bnSP+p678osqDLpQx
-         Ir2ZEXvk3SbB+n+nVs5+drGL31RwysW9L7jlbkUTvWRhulx/xsoyV2MwGjjQ4P+BUxbO
-         4O6KFoj3f2Efdp26i8KD8i9hmBVqb43WKu9Z9pjqRZVuOsjh+OJRhlnlqYyb9vECFw+s
-         ljvv65rMvJm8IohkPwb3mCnAnXKpVcvsnOBT28vtueXrNl8y4FQZ9iFe0r4BW5zw4fC9
-         2sSg==
-X-Gm-Message-State: AOAM530lezal+CNcukf+/kHkCh0wTCjfpxOxMMasZEz74QjzvX1VD3vo
-        1nl+m7DRlmDQy4VwbgKckh+24ndxuH8X4z2t5+IE
-X-Google-Smtp-Source: ABdhPJwPcDywewNOkNHs8FD2cHCYGfmIOfzczMdr3IMJ7CgYn5eQOXDLNUpF18O+/C99NIoJmt1pKse3nwYXNM6YPgiU
+        bh=7hcKSJOws0inHn5BAdCtq4uJyHEUr81OaimuZXQjlLY=;
+        b=euuZ9w1HEbuFEncd5oAu0Laeclf68JE285CYKnfT8n/33cbBRNn2q9i1Txh5USEwXH
+         cXxc7S7nxUrj0zHVrUe63uVAr1qsGzjhGoiDanLue7GgDHZQNYanw46Wc/MxEioAs0gW
+         9ergfeZfNc/7RmvnBaLSxVWtnS6verqG2OtnATYCE9twjMTXnjhG+MMjusaG+XBBjwUD
+         nuOMsEtMG7zRXiJB9h5LJCQWsdG5Zc3lxnEjb4fmTyIpOHRZfUrbDdT6/RZYycGIeV8b
+         JQpGXGUjCUbsiofuPbkjcSQvraS+XdAsG+pzEnN68ULP22/8V07KWNVTE59eAaf4uQzX
+         R3gw==
+X-Gm-Message-State: AOAM5302qZhvGdPeVW/qpTnpXX9MLVfjh7Qky2Oj/hqOA10jgE8dp7+k
+        kJE7KrRBC12o4hh0GSyAjeefK6+XD5xJxN29g914
+X-Google-Smtp-Source: ABdhPJwKpjmoPJ2/Rro2zovw2eSzsoaoX3+Om//GvnhSaioC8U5GRdJeXBPk7K3H61rRmTVW7O53abdn3x5e7fXlwpi6
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a05:6902:705:: with SMTP id
- k5mr15288510ybt.63.1601593324066; Thu, 01 Oct 2020 16:02:04 -0700 (PDT)
-Date:   Thu,  1 Oct 2020 16:01:45 -0700
+ (user=danielwinkler job=sendgmr) by 2002:ad4:42c7:: with SMTP id
+ f7mr6689511qvr.11.1601593325815; Thu, 01 Oct 2020 16:02:05 -0700 (PDT)
+Date:   Thu,  1 Oct 2020 16:01:46 -0700
 In-Reply-To: <20201001230152.2422908-1-danielwinkler@google.com>
-Message-Id: <20201001155738.Bluez.v4.3.Iabfcf7ec8ac293130a7d903ee8094414256799b3@changeid>
+Message-Id: <20201001155738.Bluez.v4.4.I50d9faa25e9da6e71d77c83c7d47a5b135e88799@changeid>
 Mime-Version: 1.0
 References: <20201001230152.2422908-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [Bluez PATCH v4 03/10] doc/mgmt-api: Update controller capabilities
- MGMT command in mgmt-api
+Subject: [Bluez PATCH v4 04/10] advertising: Detect if extended advertising
+ mgmt commands are supported
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     luiz.von.dentz@intel.com
 Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>
+        Daniel Winkler <danielwinkler@google.com>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        Alain Michaud <alainm@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch changes Read Security Info MGMT to be called Read Controller
-Capabilities Command
+We need to know if kernel supports the new MGMT interface. To do so, we
+check the return from adapter's MGMT_OP_READ_COMMANDS call for the new
+commands. This will later be used to route our requests for new
+advertisements.
 
+The change is tested by manually verifying that the correct MGMT
+commands are used when the feature is and is not available in kernel.
+
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
 
-Changes in v4:
-- mgmt-api: Move Controller Capabilities MGMT doc into new patch
-- mgmt-api: Tx Power range put into single capabilities entry
-
+Changes in v4: None
 Changes in v3: None
-Changes in v2: None
+Changes in v2:
+- Uses btd_has_kernel_features to detect kernel command support
 
- doc/mgmt-api.txt | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ src/adapter.c     | 4 ++++
+ src/adapter.h     | 1 +
+ src/advertising.c | 3 +++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 7c899a8fe..1aa43d6c3 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3110,19 +3110,19 @@ Set Wideband Speech Command
- 				Invalid Index
+diff --git a/src/adapter.c b/src/adapter.c
+index c0053000a..0e035172e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -9640,6 +9640,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+ 			DBG("kernel supports exp features");
+ 			kernel_features |= KERNEL_EXP_FEATURES;
+ 			break;
++		case MGMT_OP_ADD_EXT_ADV_PARAMS:
++			DBG("kernel supports ext adv commands");
++			kernel_features |= KERNEL_HAS_EXT_ADV_ADD_CMDS;
++			break;
+ 		default:
+ 			break;
+ 		}
+diff --git a/src/adapter.h b/src/adapter.h
+index dcc574857..ace72affd 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -233,6 +233,7 @@ enum kernel_features {
+ 	KERNEL_SET_SYSTEM_CONFIG	= 1 << 2,
+ 	KERNEL_EXP_FEATURES		= 1 << 3,
+ 	KERNEL_HAS_RESUME_EVT		= 1 << 4,
++	KERNEL_HAS_EXT_ADV_ADD_CMDS	= 1 << 5,
+ };
  
+ bool btd_has_kernel_features(uint32_t feature);
+diff --git a/src/advertising.c b/src/advertising.c
+index c03869e50..7c7599552 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -48,6 +48,7 @@ struct btd_adv_manager {
+ 	uint8_t max_ads;
+ 	uint32_t supported_flags;
+ 	unsigned int instance_bitmap;
++	bool extended_add_cmds;
+ };
  
--Read Security Information Command
--=================================
-+Read Controller Capabilities Command
-+====================================
+ #define AD_TYPE_BROADCAST 0
+@@ -1417,6 +1418,8 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+ 	manager->mgmt_index = btd_adapter_get_index(adapter);
+ 	manager->clients = queue_new();
+ 	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
++	manager->extended_add_cmds =
++			btd_has_kernel_features(KERNEL_HAS_EXT_ADV_ADD_CMDS);
  
- 	Command Code:		0x0048
- 	Controller Index:	<controller id>
- 	Command Parameters:
--	Return Parameters:	Security_Data_Length (2 Octets)
--				Security_Data (0-65535 Octets)
-+	Return Parameters:	Capabilities_Data_Length (2 Octets)
-+				Capabilities_Data (0-65535 Octets)
- 
--	This command is used to retrieve the supported security features
-+	This command is used to retrieve the supported capabilities
- 	by the controller or the host stack.
- 
--	The Security_Data_Length and Security_Data parameters provide
-+	The Capabilities_Data_Length and Capabilities_Data parameters provide
- 	a list of security settings, features and information. It uses
- 	the same format as EIR_Data, but with the namespace defined here.
- 
-@@ -3131,6 +3131,7 @@ Read Security Information Command
- 		0x01		Flags
- 		0x02		Max Encryption Key Size (BR/EDR)
- 		0x03		Max Encryption Key Size (LE)
-+		0x04		Supported Tx Power (LE)
- 
- 	Flags (data type 0x01)
- 
-@@ -3146,6 +3147,14 @@ Read Security Information Command
- 		present, then it is unknown what the max encryption key
- 		size of the controller or host is in use.
- 
-+	Supported LE Tx Power (data type 0x04)
-+
-+		When present, this 2-octet field provides the min and max
-+		LE Tx power supported by the controller, respectively, as
-+		reported by the LE Read Transmit Power HCI command. If this
-+		field is not available, it indicates that the LE Read
-+		Transmit Power HCI command was not available.
-+
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
- 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
 -- 
 2.28.0.709.gb0816b6eb0-goog
 
