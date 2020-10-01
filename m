@@ -6,72 +6,58 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA3CC47420
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C2DC4727C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:08:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 929DB2158C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CC2521481
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730378AbgJAHGp convert rfc822-to-8bit (ORCPT
+        id S1730862AbgJAHI0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Oct 2020 03:06:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54538 "EHLO
+        Thu, 1 Oct 2020 03:08:26 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42456 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725918AbgJAHGo (ORCPT
+        with ESMTP id S1725878AbgJAHI0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Oct 2020 03:06:44 -0400
+        Thu, 1 Oct 2020 03:08:26 -0400
 Received: from marcel-macbook.fritz.box (p4fefc7f4.dip0.t-ipconnect.de [79.239.199.244])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8394ECECD2;
-        Thu,  1 Oct 2020 09:13:42 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8D48ECECD2;
+        Thu,  1 Oct 2020 09:15:24 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH] net: bluetooth: Fix null pointer dereference in
- hci_event_packet()
+Subject: Re: [Linux-kernel-mentees][PATCH] bluetooth: hci_h5: close serdev
+ device and free hu in h5_close
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200930141813.410209-1-anmol.karan123@gmail.com>
-Date:   Thu, 1 Oct 2020 09:06:42 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        open list <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6F6EF48D-561E-4628-A4F1-F1AF28743CAF@holtmann.org>
-References: <20200929173231.396261-1-anmol.karan123@gmail.com>
- <20200930141813.410209-1-anmol.karan123@gmail.com>
-To:     Anmol Karn <anmol.karan123@gmail.com>
+In-Reply-To: <20200929185815.12879-1-anant.thazhemadam@gmail.com>
+Date:   Thu, 1 Oct 2020 09:08:24 +0200
+Cc:     linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <9D145813-A4B8-46AB-A55F-54C4AF82FD19@holtmann.org>
+References: <20200929185815.12879-1-anant.thazhemadam@gmail.com>
+To:     Anant Thazhemadam <anant.thazhemadam@gmail.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Anmol,
+Hi Anant,
 
-> AMP_MGR is getting derefernced in hci_phy_link_complete_evt(), when called from hci_event_packet() and there is a possibility, that hcon->amp_mgr may not be found when accessing after initialization of hcon.
+> When h5_close() gets called, the memory allocated for the hu gets 
+> freed only if hu->serdev doesn't exist. This leads to a memory leak.
+> So when h5_close() is requested, close the serdev device instance and
+> free the memory allocated to the hu entirely instead.
 > 
-> - net/bluetooth/hci_event.c:4945
-> The bug seems to get triggered in this line:
-> 
-> bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
-> 
-> Fix it by adding a NULL check for the hcon->amp_mgr before checking the ev-status.
-> 
-> Fixes: d5e911928bd8 ("Bluetooth: AMP: Process Physical Link Complete evt")
-> Reported-and-tested-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com 
-> Link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f 
-> Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
+> Fixes: https://syzkaller.appspot.com/bug?extid=6ce141c55b2f7aafd1c4
+> Reported-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
+> Tested-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
+> Signed-off-by: Anant Thazhemadam <anant.thazhemadam@gmail.com>
 > ---
-> Change in v3:
->  - changed return o; to return; (Reported-by: kernel test robot <lkp@intel.com>
-> )
-> 
-> net/bluetooth/hci_event.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+> drivers/bluetooth/hci_h5.c | 8 ++++++--
+> 1 file changed, 6 insertions(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
