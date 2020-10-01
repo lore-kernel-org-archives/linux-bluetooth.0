@@ -6,78 +6,72 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF660C4727C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA3CC47420
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93C9C21531
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:04:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 929DB2158C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 07:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730785AbgJAHD4 convert rfc822-to-8bit (ORCPT
+        id S1730378AbgJAHGp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Oct 2020 03:03:56 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49914 "EHLO
+        Thu, 1 Oct 2020 03:06:45 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54538 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730732AbgJAHD4 (ORCPT
+        with ESMTP id S1725918AbgJAHGo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Oct 2020 03:03:56 -0400
+        Thu, 1 Oct 2020 03:06:44 -0400
 Received: from marcel-macbook.fritz.box (p4fefc7f4.dip0.t-ipconnect.de [79.239.199.244])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D9A80CECD2;
-        Thu,  1 Oct 2020 09:10:54 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8394ECECD2;
+        Thu,  1 Oct 2020 09:13:42 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [PATCH] Bluetooth: btqca: Add valid le states quirk
+Subject: Re: [PATCH] net: bluetooth: Fix null pointer dereference in
+ hci_event_packet()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200930130108.1.Iaa2fcfb9b4fbfe4b4887464a6b4f12ac4b831c84@changeid>
-Date:   Thu, 1 Oct 2020 09:03:54 +0200
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+In-Reply-To: <20200930141813.410209-1-anmol.karan123@gmail.com>
+Date:   Thu, 1 Oct 2020 09:06:42 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        open list <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        syzbot+0bef568258653cff272f@syzkaller.appspotmail.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <9AEA5BB8-CF7C-4403-89F3-1457B1F6153E@holtmann.org>
-References: <20200930130108.1.Iaa2fcfb9b4fbfe4b4887464a6b4f12ac4b831c84@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Message-Id: <6F6EF48D-561E-4628-A4F1-F1AF28743CAF@holtmann.org>
+References: <20200929173231.396261-1-anmol.karan123@gmail.com>
+ <20200930141813.410209-1-anmol.karan123@gmail.com>
+To:     Anmol Karn <anmol.karan123@gmail.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Anmol,
 
-> WCN3991 supports connectable advertisements so we need to add the valid
-> le states quirk so the 'central-peripheral' role is exposed in
-> userspace.
+> AMP_MGR is getting derefernced in hci_phy_link_complete_evt(), when called from hci_event_packet() and there is a possibility, that hcon->amp_mgr may not be found when accessing after initialization of hcon.
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> - net/bluetooth/hci_event.c:4945
+> The bug seems to get triggered in this line:
+> 
+> bredr_hcon = hcon->amp_mgr->l2cap_conn->hcon;
+> 
+> Fix it by adding a NULL check for the hcon->amp_mgr before checking the ev-status.
+> 
+> Fixes: d5e911928bd8 ("Bluetooth: AMP: Process Physical Link Complete evt")
+> Reported-and-tested-by: syzbot+0bef568258653cff272f@syzkaller.appspotmail.com 
+> Link: https://syzkaller.appspot.com/bug?extid=0bef568258653cff272f 
+> Signed-off-by: Anmol Karn <anmol.karan123@gmail.com>
 > ---
-> Example result showing the central-peripheral role correctly.
+> Change in v3:
+>  - changed return o; to return; (Reported-by: kernel test robot <lkp@intel.com>
+> )
 > 
-> localhost # bluetoothctl show
-> Controller 3C:28:6D:4F:A0:1F (public)
->        Name: BlueZ 5.54
->        Alias: Chromebook_63FC
->        Class: 0x00480000
->        Powered: yes
->        Discoverable: no
->        DiscoverableTimeout: 0x000000b4
->        Pairable: yes
->        UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
->        UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
->        UUID: Handsfree Audio Gateway   (0000111f-0000-1000-8000-00805f9b34fb)
->        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
->        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
->        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
->        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
->        UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
->        Modalias: bluetooth:v00E0pC405d0057
->        Discovering: no
->        Roles: central
->        Roles: peripheral
->        Roles: central-peripheral
-> 
-> drivers/bluetooth/hci_qca.c | 19 +++++++++++++------
-> 1 file changed, 13 insertions(+), 6 deletions(-)
+> net/bluetooth/hci_event.c | 5 +++++
+> 1 file changed, 5 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
