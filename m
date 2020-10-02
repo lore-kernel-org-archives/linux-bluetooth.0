@@ -1,648 +1,488 @@
-Return-Path: <SRS0=rKdx=DI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=UfNv=DJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A69CC4727F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE83EC4363D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Oct 2020 06:52:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B67522075F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Oct 2020 23:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B577206E3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Oct 2020 06:52:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YEHgSwRF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2e7jOLz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387398AbgJAXER (ORCPT
+        id S1726147AbgJBGwl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Oct 2020 19:04:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
+        Fri, 2 Oct 2020 02:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733249AbgJAXEP (ORCPT
+        with ESMTP id S1725948AbgJBGwk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Oct 2020 19:04:15 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FA3C0613E4
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2020 16:04:12 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id t11so36626pgu.22
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2020 16:04:12 -0700 (PDT)
+        Fri, 2 Oct 2020 02:52:40 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6CADC0613D0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Oct 2020 23:52:40 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id e10so32272pfj.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Oct 2020 23:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=rxBMaJePd96IgXSq9LOGeo4fcYxt8NTX6vFaRbMAyJE=;
-        b=YEHgSwRF1JszkLpIe6rvsLOIXY86PLEzXinWueiJ4pvDaXeAF+zICET+jQ+TkxVxIL
-         9+JJH6dx59VlVjvmK/pUeUkmAtzIQFwM9oBwusxHJogCh8Zv+/JeNLjDx4ufv8cAqGG2
-         5ckHaB85gfiCJAs+c3S1CpIheqvnDSGiAplPB/4vvKVQ+L8FlBdFZb2vyVebFH+jsIRL
-         eLR7PU7Yv5hr1HYA27D6v3vb8QyNetTueovaBhPVll03Sl9Oe941eUYpIiJbjCFmII2L
-         vpkQNZW1+PWjPgM05/V3H077qN7leu6mIBNxLWfIdry4/HJIXT0ugkWV10Aj4CTN14k7
-         2iAw==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=eteMFv1WgjnIxogWH4TNf4mIce2oi3TA9bgP1vGLnjU=;
+        b=O2e7jOLzOnMi81oZgMsERPr+mIygAy+5Ap2UH6CDbD8tI+wikOIESpXbuBRhEzvD0S
+         TSuKTt/NUBiwuj7B/MK83mw8qULHBbSuA5Zn1H0fWIN9/a3jF3QkqcfHx2NXPJiSiUi+
+         USUYUp9h9dVZy6SD1gNOTAWCzze9ZT4ZHnd0W3Pm06cqKuzf0tuZ7J8yVh6AedQrLWkG
+         QxgCOsor96H9ilUv+zDszxvJl8Cc+G8lBo6+NkMDZbCXU9zyY5iq1i/Dc7YWfkiYiRIl
+         SGS4GphdO3Pf/W0y9vgwbKPag31EkToPDJ5JP5RolUvdjsyOK4O1TKV0BMjZthiC9F3S
+         E1Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=rxBMaJePd96IgXSq9LOGeo4fcYxt8NTX6vFaRbMAyJE=;
-        b=goAZa1vh0KclMM8WodAKDwHTQDSLWrfvXkl9Wn1Dx6HSYxEbUG1q8u0padD6UF4t9S
-         sUwmhKVfSzBEAjMnLh+aR7Jpi9mT6maTWFJoSCSBixq7VsSoJzhSjzJfRvzONE5Pun+J
-         6XqKeKYpGAv7S1TBkX3uD5n7ap0ADf1UpY8UHgONwGPM2q4KLtZGKMpNuBIhtzx6neos
-         4sZGineRDiTee7NDJgYLpjgHRPod4MTmQnwz1IevD84wYwsrZKH7WEjEjR2sOUlNj2+i
-         X6GyQ6p8IF0lOb9A1o/xQnH3TuvbRa3sRvhshMokciIl5QYrnWw/ZgnUX9wVV8ky+g5p
-         AL5g==
-X-Gm-Message-State: AOAM5304XOFpwEpFamllOWY7rsBTSup0oqCDHH7L60nV3QCM4hcdAp0G
-        UMTy8yiVTLayXTBmRdLSJdpEm2Oc14phRHqksRh3
-X-Google-Smtp-Source: ABdhPJw0BXA79AGtd7OByFBrYsl4M5Rp7H6sm9HJE1OEqQb71ERyGKIHAPoM9cvC6r+hC3xq65G50fYWm4oqaZtBGzIw
-Sender: "danielwinkler via sendgmr" 
-        <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
-X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a63:d841:: with SMTP id
- k1mr8103878pgj.59.1601593452199; Thu, 01 Oct 2020 16:04:12 -0700 (PDT)
-Date:   Thu,  1 Oct 2020 16:04:00 -0700
-In-Reply-To: <20201001230403.2445035-1-danielwinkler@google.com>
-Message-Id: <20201001160305.v4.2.Id8bee28ed00d158d0894b32c0cd94baa5a012605@changeid>
-Mime-Version: 1.0
-References: <20201001230403.2445035-1-danielwinkler@google.com>
-X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH v4 2/5] Bluetooth: Break add adv into two mgmt commands
-From:   Daniel Winkler <danielwinkler@google.com>
-To:     marcel@holtmann.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=eteMFv1WgjnIxogWH4TNf4mIce2oi3TA9bgP1vGLnjU=;
+        b=nneY5797mvfGUJM0UzXWg4SwEpiF7e4/xQLmp3Ci6r2Xp09QLbUVrxNN0AlMcqFvlX
+         XVAtyAXFOted5c8ScDi/Ij5oE7c+L9GsT5aB6Ys8Fbwm4KJ9xHBiExCHsAodF6+M3RqQ
+         VJMdSNfCb9v2zhSqeYHr9wYlgcwjiHFNBnTlHWeQ9dTLbXik3Xm02PD/3uoM7tGJagN3
+         JXY2T07swO0ST9X3gk3xLo5hmRoWwr24/5FnHVPtTf8EQvXJYDwcP3ySiwwOESgVmZPL
+         0P6DGcGmn8yGuJ9Dwi0+vc6nUtnceV9kkaKpYbNk+yLuyoA9lcKV5XMITzfdKaS22Rn0
+         zvCg==
+X-Gm-Message-State: AOAM531a+pVm67my3oNuP7OnUOk3V2ccNwIzLJdK47ugp3HKWeG+ihso
+        rgAPWS5P6Uym5rWk7lng1sggS58Gvt7ixQ==
+X-Google-Smtp-Source: ABdhPJxdZjr+/KUHx1UBdzp88dY8snw0kSzi/DQWNvgVM8Ui3wz67YlHs9xOVpNAp946KiklJTYgDQ==
+X-Received: by 2002:a63:e354:: with SMTP id o20mr752368pgj.317.1601621559737;
+        Thu, 01 Oct 2020 23:52:39 -0700 (PDT)
+Received: from localhost.localdomain ([122.171.53.200])
+        by smtp.gmail.com with ESMTPSA id d128sm680705pfd.94.2020.10.01.23.52.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 01 Oct 2020 23:52:38 -0700 (PDT)
+From:   Kiran K <kiraank@gmail.com>
+X-Google-Original-From: Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     sathish.narasimman@intel.com, chethan.tumkur.narayan@intel.com,
+        ravishankar.srivatsa@intel.com, kiraank@gmail.com,
+        Kiran K <kiran.k@intel.com>, Amit K Bag <amit.k.bag@intel.com>,
+        Raghuram Hegde <raghuram.hegde@intel.com>
+Subject: [PATCH v4] Bluetooth: btintel: Add *setup* function for new generation Intel controllers
+Date:   Fri,  2 Oct 2020 12:22:10 +0530
+Message-Id: <1601621530-2803-1-git-send-email-kiran.k@intel.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds support for the new advertising add interface, with the
-first command setting advertising parameters and the second to set
-advertising data. The set parameters command allows the caller to leave
-some fields "unset", with a params bitfield defining which params were
-purposefully set. Unset parameters will be given defaults when calling
-hci_add_adv_instance. The data passed to the param mgmt command is
-allowed to be flexible, so in the future if bluetoothd passes a larger
-structure with new params, the mgmt command will ignore the unknown
-members at the end.
+From: Kiran K <kiraank@gmail.com>
 
-This change has been validated on both hatch (extended advertising) and
-kukui (no extended advertising) chromebooks running bluetoothd that
-support this new interface. I ran the following manual tests:
-- Set several (3) advertisements using modified test_advertisement.py
-- For each, validate correct data and parameters in btmon trace
-- Verified both for software rotation and extended adv
+1) add a helper function to download firmware
 
-Automatic test suite also run, testing many (25) scenarios of single and
-multi-advertising for data/parameter correctness.
+2) add a function to construct firmware / ddc file name
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-Signed-off-by: Daniel Winkler <danielwinkler@google.com>
+3) add a flag to identify new geneeration Intel controllers
+
+4) define *setup* and hook it up for new genertion Intel controllers
+
+5) map Typhoon Peak controller (PID:0x0032) to new generation controller
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+Reviewed-by: Sathish Narasimman <Sathish.Narasimman@intel.com>
+Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
+ drivers/bluetooth/btintel.h |   6 +
+ drivers/bluetooth/btusb.c   | 324 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 328 insertions(+), 2 deletions(-)
 
-Changes in v4:
-- Add remaining data and scan response length to MGMT params response
-- Moving optional params into 'flags' field of MGMT command
-
-Changes in v3:
-- Adding selected tx power to adv params mgmt response, removing event
-
-Changes in v2: None
-
- include/net/bluetooth/hci_core.h |   2 +
- include/net/bluetooth/mgmt.h     |  34 +++
- net/bluetooth/hci_event.c        |   1 +
- net/bluetooth/mgmt.c             | 379 ++++++++++++++++++++++++++++++-
- 4 files changed, 405 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 300b3572d479e1..48d144ae8b57d6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -238,6 +238,8 @@ struct adv_info {
- #define HCI_MAX_ADV_INSTANCES		5
- #define HCI_DEFAULT_ADV_DURATION	2
- 
-+#define HCI_ADV_TX_POWER_NO_PREFERENCE 0x7F
-+
- struct adv_pattern {
- 	struct list_head list;
- 	__u8 ad_type;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 6b55155e05e977..117578bb88743c 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -574,6 +574,10 @@ struct mgmt_rp_add_advertising {
- #define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
- #define MGMT_ADV_FLAG_CAN_SET_TX_POWER	BIT(10)
- #define MGMT_ADV_FLAG_HW_OFFLOAD	BIT(11)
-+#define MGMT_ADV_PARAM_DURATION		BIT(12)
-+#define MGMT_ADV_PARAM_TIMEOUT		BIT(13)
-+#define MGMT_ADV_PARAM_INTERVALS	BIT(14)
-+#define MGMT_ADV_PARAM_TX_POWER		BIT(15)
- 
- #define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
- 				 MGMT_ADV_FLAG_SEC_CODED)
-@@ -782,6 +786,36 @@ struct mgmt_rp_remove_adv_monitor {
- 	__le16 monitor_handle;
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 09346ae..c4e28a8 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -132,6 +132,12 @@ struct intel_debug_features {
+ 	__u8    page1[16];
  } __packed;
  
-+#define MGMT_OP_ADD_EXT_ADV_PARAMS		0x0054
-+struct mgmt_cp_add_ext_adv_params {
-+	__u8	instance;
-+	__le32	flags;
-+	__le16	duration;
-+	__le16	timeout;
-+	__le32	min_interval;
-+	__le32	max_interval;
-+	__s8	tx_power;
-+} __packed;
-+#define MGMT_ADD_EXT_ADV_PARAMS_MIN_SIZE	18
-+struct mgmt_rp_add_ext_adv_params {
-+	__u8	instance;
-+	__s8	tx_power;
-+	__u8	max_adv_data_len;
-+	__u8	max_scan_rsp_len;
-+} __packed;
++#define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
++#define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
++#define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
++#define INTEL_CNVX_TOP_STEP(cnvx_top)	(((cnvx_top) & 0x0f000000) >> 24)
++#define INTEL_CNVX_TOP_PACK_SWAB(t, s)	__swab16(((__u16)(((t) << 4) | (s))))
 +
-+#define MGMT_OP_ADD_EXT_ADV_DATA		0x0055
-+struct mgmt_cp_add_ext_adv_data {
-+	__u8	instance;
-+	__u8	adv_data_len;
-+	__u8	scan_rsp_len;
-+	__u8	data[];
-+} __packed;
-+#define MGMT_ADD_EXT_ADV_DATA_SIZE	3
-+struct mgmt_rp_add_ext_adv_data {
-+	__u8	instance;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd306ba3ade545..4281f4ac6700d4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1749,6 +1749,7 @@ static void hci_cc_set_ext_adv_param(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 	/* Update adv data as tx power is known now */
- 	hci_req_update_adv_data(hdev, hdev->cur_adv_instance);
-+
- 	hci_dev_unlock(hdev);
- }
+ #if IS_ENABLED(CONFIG_BT_INTEL)
  
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0b711ad80f6bd1..425d04722aa962 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -122,6 +122,8 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_ADV_MONITOR_FEATURES,
- 	MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
- 	MGMT_OP_REMOVE_ADV_MONITOR,
-+	MGMT_OP_ADD_EXT_ADV_PARAMS,
-+	MGMT_OP_ADD_EXT_ADV_DATA,
- };
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1005b6e..5e51749 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -60,6 +60,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
+ #define BTUSB_VALID_LE_STATES   0x800000
+ #define BTUSB_QCA_WCN6855	0x1000000
++#define BTUSB_INTEL_NEWGEN	0x2000000
  
- static const u16 mgmt_events[] = {
-@@ -7198,6 +7200,10 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
- 	flags |= MGMT_ADV_FLAG_MANAGED_FLAGS;
- 	flags |= MGMT_ADV_FLAG_APPEARANCE;
- 	flags |= MGMT_ADV_FLAG_LOCAL_NAME;
-+	flags |= MGMT_ADV_PARAM_DURATION;
-+	flags |= MGMT_ADV_PARAM_TIMEOUT;
-+	flags |= MGMT_ADV_PARAM_INTERVALS;
-+	flags |= MGMT_ADV_PARAM_TX_POWER;
- 
- 	/* In extended adv TX_POWER returned from Set Adv Param
- 	 * will be always valid.
-@@ -7372,6 +7378,31 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -365,7 +366,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEW |
++	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEWGEN |
+ 						     BTUSB_WIDEBAND_SPEECH},
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+@@ -2359,6 +2360,181 @@ static bool btusb_setup_intel_new_get_fw_name(struct intel_version *ver,
  	return true;
  }
  
-+static bool requested_adv_flags_are_valid(struct hci_dev *hdev, u32 adv_flags)
++static void btusb_setup_intel_newgen_get_fw_name(const struct intel_version_tlv *ver_tlv,
++						 char *fw_name, size_t len,
++						 const char *suffix)
 +{
-+	u32 supported_flags, phy_flags;
-+
-+	/* The current implementation only supports a subset of the specified
-+	 * flags. Also need to check mutual exclusiveness of sec flags.
++	/* The firmware file name for new generation controllers will be
++	 * ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step>
 +	 */
-+	supported_flags = get_supported_adv_flags(hdev);
-+	phy_flags = adv_flags & MGMT_ADV_FLAG_SEC_MASK;
-+	if (adv_flags & ~supported_flags ||
-+	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
-+		return false;
-+
-+	return true;
++	snprintf(fw_name, len, "intel/ibt-%04x-%04x.%s",
++		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver_tlv->cnvi_top),
++					  INTEL_CNVX_TOP_STEP(ver_tlv->cnvi_top)),
++		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver_tlv->cnvr_top),
++					  INTEL_CNVX_TOP_STEP(ver_tlv->cnvr_top)),
++		 suffix);
 +}
 +
-+static bool adv_busy(struct hci_dev *hdev)
++static int btusb_intel_download_firmware_newgen(struct hci_dev *hdev,
++						struct intel_version_tlv *ver,
++						u32 *boot_param)
 +{
-+	return (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
-+		pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
-+		pending_find(MGMT_OP_SET_LE, hdev) ||
-+		pending_find(MGMT_OP_ADD_EXT_ADV_PARAMS, hdev) ||
-+		pending_find(MGMT_OP_ADD_EXT_ADV_DATA, hdev));
-+}
++	const struct firmware *fw;
++	char fwname[64];
++	int err;
++	struct btusb_data *data = hci_get_drvdata(hdev);
 +
- static void add_advertising_complete(struct hci_dev *hdev, u8 status,
- 				     u16 opcode)
- {
-@@ -7386,6 +7417,8 @@ static void add_advertising_complete(struct hci_dev *hdev, u8 status,
- 	hci_dev_lock(hdev);
- 
- 	cmd = pending_find(MGMT_OP_ADD_ADVERTISING, hdev);
-+	if (!cmd)
-+		cmd = pending_find(MGMT_OP_ADD_EXT_ADV_DATA, hdev);
- 
- 	list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances, list) {
- 		if (!adv_instance->pending)
-@@ -7430,7 +7463,6 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	struct mgmt_cp_add_advertising *cp = data;
- 	struct mgmt_rp_add_advertising rp;
- 	u32 flags;
--	u32 supported_flags, phy_flags;
- 	u8 status;
- 	u16 timeout, duration;
- 	unsigned int prev_instance_cnt = hdev->adv_instance_cnt;
-@@ -7466,13 +7498,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	timeout = __le16_to_cpu(cp->timeout);
- 	duration = __le16_to_cpu(cp->duration);
- 
--	/* The current implementation only supports a subset of the specified
--	 * flags. Also need to check mutual exclusiveness of sec flags.
--	 */
--	supported_flags = get_supported_adv_flags(hdev);
--	phy_flags = flags & MGMT_ADV_FLAG_SEC_MASK;
--	if (flags & ~supported_flags ||
--	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
-+	if (!requested_adv_flags_are_valid(hdev, flags))
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				       MGMT_STATUS_INVALID_PARAMS);
- 
-@@ -7484,9 +7510,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	if (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
--	    pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
--	    pending_find(MGMT_OP_SET_LE, hdev)) {
-+	if (adv_busy(hdev)) {
- 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				      MGMT_STATUS_BUSY);
- 		goto unlock;
-@@ -7577,6 +7601,335 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	return err;
++	if (!ver || !boot_param)
++		return -EINVAL;
++
++	/* The hardware platform number has a fixed value of 0x37 and
++	 * for now only accept this single value.
++	 */
++	if (INTEL_HW_PLATFORM(ver->cnvi_bt) != 0x37) {
++		bt_dev_err(hdev, "Unsupported Intel hardware platform (0x%2x)",
++			   INTEL_HW_PLATFORM(ver->cnvi_bt));
++		return -EINVAL;
++	}
++
++	/* The firmware variant determines if the device is in bootloader
++	 * mode or is running operational firmware. The value 0x03 identifies
++	 * the bootloader and the value 0x23 identifies the operational
++	 * firmware.
++	 *
++	 * When the operational firmware is already present, then only
++	 * the check for valid Bluetooth device address is needed. This
++	 * determines if the device will be added as configured or
++	 * unconfigured controller.
++	 *
++	 * It is not possible to use the Secure Boot Parameters in this
++	 * case since that command is only available in bootloader mode.
++	 */
++	if (ver->img_type == 0x03) {
++		clear_bit(BTUSB_BOOTLOADER, &data->flags);
++		btintel_check_bdaddr(hdev);
++		return 0;
++	}
++
++	/* Check for supported iBT hardware variants of this firmware
++	 * loading method.
++	 *
++	 * This check has been put in place to ensure correct forward
++	 * compatibility options when newer hardware variants come along.
++	 */
++	switch (INTEL_HW_VARIANT(ver->cnvi_bt)) {
++	case 0x17:	/* TyP */
++	case 0x18:	/* Slr */
++	case 0x19:	/* Slr-F */
++		break;
++	default:
++		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
++			   INTEL_HW_VARIANT(ver->cnvi_bt));
++		return -EINVAL;
++	}
++
++	/* If the device is not in bootloader mode, then the only possible
++	 * choice is to return an error and abort the device initialization.
++	 */
++	if (ver->img_type != 0x01) {
++		bt_dev_err(hdev, "Unsupported Intel firmware variant (0x%x)",
++			   ver->img_type);
++		return -ENODEV;
++	}
++
++	/* It is required that every single firmware fragment is acknowledged
++	 * with a command complete event. If the boot parameters indicate
++	 * that this bootloader does not send them, then abort the setup.
++	 */
++	if (ver->limited_cce != 0x00) {
++		bt_dev_err(hdev, "Unsupported Intel firmware loading method (0x%x)",
++			   ver->limited_cce);
++		return -EINVAL;
++	}
++
++	/* Secure boot engine type should be either 1 (ECDSA) or 0 (RSA) */
++	if (ver->sbe_type > 0x01) {
++		bt_dev_err(hdev, "Unsupported Intel secure boot engine type (0x%x)",
++			   ver->sbe_type);
++		return -EINVAL;
++	}
++
++	/* If the OTP has no valid Bluetooth device address, then there will
++	 * also be no valid address for the operational firmware.
++	 */
++	if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
++		bt_dev_info(hdev, "No device address configured");
++		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++	}
++
++	btusb_setup_intel_newgen_get_fw_name(ver, fwname, sizeof(fwname), "sfi");
++	err = request_firmware(&fw, fwname, &hdev->dev);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to load Intel firmware file (%d)", err);
++		return err;
++	}
++
++	bt_dev_info(hdev, "Found device firmware: %s", fwname);
++
++	if (fw->size < 644) {
++		bt_dev_err(hdev, "Invalid size of firmware file (%zu)",
++			   fw->size);
++		err = -EBADF;
++		goto done;
++	}
++
++	set_bit(BTUSB_DOWNLOADING, &data->flags);
++
++	/* Start firmware downloading and get boot parameter */
++	err = btintel_download_firmware_newgen(hdev, fw, boot_param,
++					       INTEL_HW_VARIANT(ver->cnvi_bt),
++					       ver->sbe_type);
++	if (err < 0) {
++		/* When FW download fails, send Intel Reset to retry
++		 * FW download.
++		 */
++		btintel_reset_to_bootloader(hdev);
++		goto done;
++	}
++	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++
++	bt_dev_info(hdev, "Waiting for firmware download to complete");
++
++	/* Before switching the device into operational mode and with that
++	 * booting the loaded firmware, wait for the bootloader notification
++	 * that all fragments have been successfully received.
++	 *
++	 * When the event processing receives the notification, then the
++	 * BTUSB_DOWNLOADING flag will be cleared.
++	 *
++	 * The firmware loading should not take longer than 5 seconds
++	 * and thus just timeout if that happens and fail the setup
++	 * of this device.
++	 */
++	err = wait_on_bit_timeout(&data->flags, BTUSB_DOWNLOADING,
++				  TASK_INTERRUPTIBLE,
++				  msecs_to_jiffies(5000));
++	if (err == -EINTR) {
++		bt_dev_err(hdev, "Firmware loading interrupted");
++		goto done;
++	}
++
++	if (err) {
++		bt_dev_err(hdev, "Firmware loading timeout");
++		err = -ETIMEDOUT;
++		btintel_reset_to_bootloader(hdev);
++		goto done;
++	}
++
++	if (test_bit(BTUSB_FIRMWARE_FAILED, &data->flags)) {
++		bt_dev_err(hdev, "Firmware loading failed");
++		err = -ENOEXEC;
++		goto done;
++	}
++
++done:
++	release_firmware(fw);
++	return err;
++}
+ static int btusb_intel_download_firmware(struct hci_dev *hdev,
+ 					 struct intel_version *ver,
+ 					 struct intel_boot_params *params,
+@@ -2693,6 +2869,135 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	return 0;
  }
  
-+static void add_ext_adv_params_complete(struct hci_dev *hdev, u8 status,
-+					u16 opcode)
++static int btusb_setup_intel_newgen(struct hci_dev *hdev)
 +{
-+	struct mgmt_pending_cmd *cmd;
-+	struct mgmt_cp_add_ext_adv_params *cp;
-+	struct mgmt_rp_add_ext_adv_params rp;
-+	struct adv_info *adv_instance;
-+	u32 flags;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	cmd = pending_find(MGMT_OP_ADD_EXT_ADV_PARAMS, hdev);
-+	if (!cmd)
-+		goto unlock;
-+
-+	cp = cmd->param;
-+	adv_instance = hci_find_adv_instance(hdev, cp->instance);
-+	if (!adv_instance)
-+		goto unlock;
-+
-+	rp.instance = cp->instance;
-+	rp.tx_power = adv_instance->tx_power;
-+
-+	/* While we're at it, inform userspace of the available space for this
-+	 * advertisement, given the flags that will be used.
-+	 */
-+	flags = __le32_to_cpu(cp->flags);
-+	rp.max_adv_data_len = tlv_data_max_len(hdev, flags, true);
-+	rp.max_scan_rsp_len = tlv_data_max_len(hdev, flags, false);
-+
-+	if (status) {
-+		/* If this advertisement was previously advertising and we
-+		 * failed to update it, we signal that it has been removed and
-+		 * delete its structure
-+		 */
-+		if (!adv_instance->pending)
-+			mgmt_advertising_removed(cmd->sk, hdev, cp->instance);
-+
-+		hci_remove_adv_instance(hdev, cp->instance);
-+
-+		mgmt_cmd_status(cmd->sk, cmd->index, cmd->opcode,
-+				mgmt_status(status));
-+
-+	} else {
-+		mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode,
-+				  mgmt_status(status), &rp, sizeof(rp));
-+	}
-+
-+unlock:
-+	if (cmd)
-+		mgmt_pending_remove(cmd);
-+
-+	hci_dev_unlock(hdev);
-+}
-+
-+static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
-+			      void *data, u16 data_len)
-+{
-+	struct mgmt_cp_add_ext_adv_params *cp = data;
-+	struct mgmt_rp_add_ext_adv_params rp;
-+	struct mgmt_pending_cmd *cmd = NULL;
-+	struct adv_info *adv_instance;
-+	struct hci_request req;
-+	u32 flags, min_interval, max_interval;
-+	u16 timeout, duration;
-+	u8 status;
-+	s8 tx_power;
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	u32 boot_param;
++	char ddcname[64];
++	ktime_t calltime, delta, rettime;
++	unsigned long long duration;
 +	int err;
++	struct intel_debug_features features;
++	struct intel_version_tlv version;
 +
 +	BT_DBG("%s", hdev->name);
 +
-+	status = mgmt_le_support(hdev);
-+	if (status)
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				       status);
-+
-+	if (cp->instance < 1 || cp->instance > hdev->le_num_of_adv_sets)
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				       MGMT_STATUS_INVALID_PARAMS);
-+
-+	/* The purpose of breaking add_advertising into two separate MGMT calls
-+	 * for params and data is to allow more parameters to be added to this
-+	 * structure in the future. For this reason, we verify that we have the
-+	 * bare minimum structure we know of when the interface was defined. Any
-+	 * extra parameters we don't know about will be ignored in this request.
++	/* Set the default boot parameter to 0x0 and it is updated to
++	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
++	 * command while downloading the firmware.
 +	 */
-+	if (data_len < MGMT_ADD_EXT_ADV_PARAMS_MIN_SIZE)
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
-+				       MGMT_STATUS_INVALID_PARAMS);
++	boot_param = 0x00000000;
 +
-+	flags = __le32_to_cpu(cp->flags);
++	calltime = ktime_get();
 +
-+	if (!requested_adv_flags_are_valid(hdev, flags))
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				       MGMT_STATUS_INVALID_PARAMS);
-+
-+	hci_dev_lock(hdev);
-+
-+	/* In new interface, we require that we are powered to register */
-+	if (!hdev_is_powered(hdev)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				      MGMT_STATUS_REJECTED);
-+		goto unlock;
++	/* Read the Intel version information to determine if the device
++	 * is in bootloader mode or if it already has operational firmware
++	 * loaded.
++	 */
++	err = btintel_read_version_tlv(hdev, &version);
++	if (err) {
++		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
++		btintel_reset_to_bootloader(hdev);
++		return err;
 +	}
 +
-+	if (adv_busy(hdev)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				      MGMT_STATUS_BUSY);
-+		goto unlock;
++	btintel_version_info_tlv(hdev, &version);
++
++	err = btusb_intel_download_firmware_newgen(hdev, &version, &boot_param);
++	if (err)
++		return err;
++
++	/* check if controller is already having an operational firmware */
++	if (version.img_type == 0x03)
++		goto finish;
++
++	rettime = ktime_get();
++	delta = ktime_sub(rettime, calltime);
++	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
++
++	bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
++
++	calltime = ktime_get();
++
++	set_bit(BTUSB_BOOTING, &data->flags);
++
++	err = btintel_send_intel_reset(hdev, boot_param);
++	if (err) {
++		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
++		btintel_reset_to_bootloader(hdev);
++		return err;
 +	}
 +
-+	/* Parse defined parameters from request, use defaults otherwise */
-+	timeout = (flags & MGMT_ADV_PARAM_TIMEOUT) ?
-+		  __le16_to_cpu(cp->timeout) : 0;
++	/* The bootloader will not indicate when the device is ready. This
++	 * is done by the operational firmware sending bootup notification.
++	 *
++	 * Booting into operational firmware should not take longer than
++	 * 1 second. However if that happens, then just fail the setup
++	 * since something went wrong.
++	 */
++	bt_dev_info(hdev, "Waiting for device to boot");
 +
-+	duration = (flags & MGMT_ADV_PARAM_DURATION) ?
-+		   __le16_to_cpu(cp->duration) :
-+		   hdev->def_multi_adv_rotation_duration;
++	err = wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
++				  TASK_INTERRUPTIBLE,
++				  msecs_to_jiffies(1000));
 +
-+	min_interval = (flags & MGMT_ADV_PARAM_INTERVALS) ?
-+		       __le32_to_cpu(cp->min_interval) :
-+		       hdev->le_adv_min_interval;
-+
-+	max_interval = (flags & MGMT_ADV_PARAM_INTERVALS) ?
-+		       __le32_to_cpu(cp->max_interval) :
-+		       hdev->le_adv_max_interval;
-+
-+	tx_power = (flags & MGMT_ADV_PARAM_TX_POWER) ?
-+		   cp->tx_power :
-+		   HCI_ADV_TX_POWER_NO_PREFERENCE;
-+
-+	/* Create advertising instance with no advertising or response data */
-+	err = hci_add_adv_instance(hdev, cp->instance, flags,
-+				   0, NULL, 0, NULL, timeout, duration);
-+
-+	if (err < 0) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+				      MGMT_STATUS_FAILED);
-+		goto unlock;
++	if (err == -EINTR) {
++		bt_dev_err(hdev, "Device boot interrupted");
++		return -EINTR;
 +	}
 +
-+	hdev->cur_adv_instance = cp->instance;
-+	/* Submit request for advertising params if ext adv available */
-+	if (ext_adv_capable(hdev)) {
-+		hci_req_init(&req, hdev);
-+		adv_instance = hci_find_adv_instance(hdev, cp->instance);
-+
-+		/* Updating parameters of an active instance will return a
-+		 * Command Disallowed error, so we must first disable the
-+		 * instance if it is active.
-+		 */
-+		if (!adv_instance->pending)
-+			__hci_req_disable_ext_adv_instance(&req, cp->instance);
-+
-+		__hci_req_setup_ext_adv_instance(&req, cp->instance);
-+
-+		err = hci_req_run(&req, add_ext_adv_params_complete);
-+
-+		if (!err)
-+			cmd = mgmt_pending_add(sk, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+					       hdev, data, data_len);
-+		if (!cmd) {
-+			err = -ENOMEM;
-+			hci_remove_adv_instance(hdev, cp->instance);
-+			goto unlock;
-+		}
-+
-+	} else {
-+		rp.instance = cp->instance;
-+		rp.tx_power = HCI_ADV_TX_POWER_NO_PREFERENCE;
-+		err = mgmt_cmd_complete(sk, hdev->id,
-+					MGMT_OP_ADD_EXT_ADV_PARAMS,
-+					MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
++	if (err) {
++		bt_dev_err(hdev, "Device boot timeout");
++		btintel_reset_to_bootloader(hdev);
++		return -ETIMEDOUT;
 +	}
 +
-+unlock:
-+	hci_dev_unlock(hdev);
++	rettime = ktime_get();
++	delta = ktime_sub(rettime, calltime);
++	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
 +
-+	return err;
++	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
++
++	clear_bit(BTUSB_BOOTLOADER, &data->flags);
++
++	btusb_setup_intel_newgen_get_fw_name(&version, ddcname, sizeof(ddcname),
++					     "ddc");
++
++	/* Once the device is running in operational mode, it needs to
++	 * apply the device configuration (DDC) parameters.
++	 *
++	 * The device can work without DDC parameters, so even if it
++	 * fails to load the file, no need to fail the setup.
++	 */
++	btintel_load_ddc_config(hdev, ddcname);
++
++	/* Read the Intel supported features and if new exception formats
++	 * supported, need to load the additional DDC config to enable.
++	 */
++	btintel_read_debug_features(hdev, &features);
++
++	/* Set DDC mask for available debug features */
++	btintel_set_debug_features(hdev, &features);
++
++	/* Read the Intel version information after loading the FW  */
++	err = btintel_read_version_tlv(hdev, &version);
++	if (err)
++		return err;
++
++	btintel_version_info_tlv(hdev, &version);
++
++finish:
++	/* Set the event mask for Intel specific vendor events. This enables
++	 * a few extra events that are useful during general operation. It
++	 * does not enable any debugging related events.
++	 *
++	 * The device will function correctly without these events enabled
++	 * and thus no need to fail the setup.
++	 */
++	btintel_set_event_mask(hdev, false);
++
++	return 0;
 +}
-+
-+static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
-+			    u16 data_len)
-+{
-+	struct mgmt_cp_add_ext_adv_data *cp = data;
-+	struct mgmt_rp_add_ext_adv_data rp;
-+	u8 schedule_instance = 0;
-+	struct adv_info *next_instance;
-+	struct adv_info *adv_instance;
-+	int err = 0;
-+	struct mgmt_pending_cmd *cmd;
-+	struct hci_request req;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	adv_instance = hci_find_adv_instance(hdev, cp->instance);
-+
-+	if (!adv_instance) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
-+				      MGMT_STATUS_INVALID_PARAMS);
-+		goto unlock;
-+	}
-+
-+	/* In new interface, we require that we are powered to register */
-+	if (!hdev_is_powered(hdev)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
-+				      MGMT_STATUS_REJECTED);
-+		goto clear_new_instance;
-+	}
-+
-+	if (adv_busy(hdev)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
-+				      MGMT_STATUS_BUSY);
-+		goto clear_new_instance;
-+	}
-+
-+	/* Validate new data */
-+	if (!tlv_data_is_valid(hdev, adv_instance->flags, cp->data,
-+			       cp->adv_data_len, true) ||
-+	    !tlv_data_is_valid(hdev, adv_instance->flags, cp->data +
-+			       cp->adv_data_len, cp->scan_rsp_len, false)) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
-+				      MGMT_STATUS_INVALID_PARAMS);
-+		goto clear_new_instance;
-+	}
-+
-+	/* Set the data in the advertising instance */
-+	hci_set_adv_instance_data(hdev, cp->instance, cp->adv_data_len,
-+				  cp->data, cp->scan_rsp_len,
-+				  cp->data + cp->adv_data_len);
-+
-+	/* We're good to go, update advertising data, parameters, and start
-+	 * advertising.
-+	 */
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add(&req, HCI_OP_READ_LOCAL_NAME, 0, NULL);
-+
-+	if (ext_adv_capable(hdev)) {
-+		__hci_req_update_adv_data(&req, cp->instance);
-+		__hci_req_update_scan_rsp_data(&req, cp->instance);
-+		__hci_req_enable_ext_advertising(&req, cp->instance);
-+
-+	} else {
-+		/* If using software rotation, determine next instance to use */
-+
-+		if (hdev->cur_adv_instance == cp->instance) {
-+			/* If the currently advertised instance is being changed
-+			 * then cancel the current advertising and schedule the
-+			 * next instance. If there is only one instance then the
-+			 * overridden advertising data will be visible right
-+			 * away
-+			 */
-+			cancel_adv_timeout(hdev);
-+
-+			next_instance = hci_get_next_instance(hdev,
-+							      cp->instance);
-+			if (next_instance)
-+				schedule_instance = next_instance->instance;
-+		} else if (!hdev->adv_instance_timeout) {
-+			/* Immediately advertise the new instance if no other
-+			 * instance is currently being advertised.
-+			 */
-+			schedule_instance = cp->instance;
-+		}
-+
-+		/* If the HCI_ADVERTISING flag is set or there is no instance to
-+		 * be advertised then we have no HCI communication to make.
-+		 * Simply return.
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
-+		    !schedule_instance) {
-+			if (adv_instance->pending) {
-+				mgmt_advertising_added(sk, hdev, cp->instance);
-+				adv_instance->pending = false;
-+			}
-+			rp.instance = cp->instance;
-+			err = mgmt_cmd_complete(sk, hdev->id,
-+						MGMT_OP_ADD_EXT_ADV_DATA,
-+						MGMT_STATUS_SUCCESS, &rp,
-+						sizeof(rp));
-+			goto unlock;
-+		}
-+
-+		err = __hci_req_schedule_adv_instance(&req, schedule_instance,
-+						      true);
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_EXT_ADV_DATA, hdev, data,
-+			       data_len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto clear_new_instance;
-+	}
-+
-+	if (!err)
-+		err = hci_req_run(&req, add_advertising_complete);
-+
-+	if (err < 0) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
-+				      MGMT_STATUS_FAILED);
-+		mgmt_pending_remove(cmd);
-+		goto clear_new_instance;
-+	}
-+
-+	/* We were successful in updating data, so trigger advertising_added
-+	 * event if this is an instance that wasn't previously advertising. If
-+	 * a failure occurs in the requests we initiated, we will remove the
-+	 * instance again in add_advertising_complete
-+	 */
-+	if (adv_instance->pending)
-+		mgmt_advertising_added(sk, hdev, cp->instance);
-+
-+	goto unlock;
-+
-+clear_new_instance:
-+	hci_remove_adv_instance(hdev, cp->instance);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+
-+	return err;
-+}
-+
- static void remove_advertising_complete(struct hci_dev *hdev, u8 status,
- 					u16 opcode)
+ static int btusb_shutdown_intel(struct hci_dev *hdev)
  {
-@@ -7851,6 +8204,10 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ add_adv_patterns_monitor,MGMT_ADD_ADV_PATTERNS_MONITOR_SIZE,
- 						HCI_MGMT_VAR_LEN },
- 	{ remove_adv_monitor,      MGMT_REMOVE_ADV_MONITOR_SIZE },
-+	{ add_ext_adv_params,      MGMT_ADD_EXT_ADV_PARAMS_MIN_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
-+						HCI_MGMT_VAR_LEN },
- };
+ 	struct sk_buff *skb;
+@@ -3969,7 +4274,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	init_usb_anchor(&data->ctrl_anchor);
+ 	spin_lock_init(&data->rxlock);
  
- void mgmt_index_added(struct hci_dev *hdev)
+-	if (id->driver_info & BTUSB_INTEL_NEW) {
++	if ((id->driver_info & BTUSB_INTEL_NEW) ||
++	    (id->driver_info & BTUSB_INTEL_NEWGEN)) {
+ 		data->recv_event = btusb_recv_event_intel;
+ 		data->recv_bulk = btusb_recv_bulk_intel;
+ 		set_bit(BTUSB_BOOTLOADER, &data->flags);
+@@ -4078,6 +4384,20 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+ 	}
+ 
++	if (id->driver_info & BTUSB_INTEL_NEWGEN) {
++		hdev->manufacturer = 2;
++		hdev->send = btusb_send_frame_intel;
++		hdev->setup = btusb_setup_intel_newgen;
++		hdev->shutdown = btusb_shutdown_intel_new;
++		hdev->hw_error = btintel_hw_error;
++		hdev->set_diag = btintel_set_diag;
++		hdev->set_bdaddr = btintel_set_bdaddr;
++		hdev->cmd_timeout = btusb_intel_cmd_timeout;
++		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
++		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
++		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
++	}
++
+ 	if (id->driver_info & BTUSB_MARVELL)
+ 		hdev->set_bdaddr = btusb_set_bdaddr_marvell;
+ 
 -- 
-2.28.0.709.gb0816b6eb0-goog
+2.7.4
 
