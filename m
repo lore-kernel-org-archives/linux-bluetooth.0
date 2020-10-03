@@ -2,156 +2,80 @@ Return-Path: <SRS0=jDol=DK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3C0C46466
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 13:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3452AC47095
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 15:51:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2BD90206CD
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 13:54:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601733250;
-	bh=xMa07e1e6o9GjE+aWDog3EUOHS04coMVzjLbLMskLm0=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=q/iJP97uhAsKkmWervRhDgE9wvLOj77IIyn4j3FzWgvH7t5eZFayweGpMlOrBqwxB
-	 e8TLBZxQbM99X7OPQVyNvrLqYrjQtahBoXzFyTQuH+1gjPp97QB5eXyjVseRq5+TQq
-	 ZpL1CM6WI/RRDozLyXSWPyDVnLZkjeEr1LqklOGM=
+	by mail.kernel.org (Postfix) with ESMTP id 01EEB206DD
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 15:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725794AbgJCNyF (ORCPT
+        id S1725793AbgJCPvG convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 3 Oct 2020 09:54:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40180 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725781AbgJCNyF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 3 Oct 2020 09:54:05 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 80EE4206CD;
-        Sat,  3 Oct 2020 13:54:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601733244;
-        bh=xMa07e1e6o9GjE+aWDog3EUOHS04coMVzjLbLMskLm0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=zCggCUoZ2u6fBZUuURtLlIndJ0ryQbJBkaZeCM8tlBWLh+2yDitGN5l39fnlHiA6N
-         76t9pG/FkqXWaRsdBKRSUqD5++pvBk0FNnbR1h3uRyJFvDFqofhZV2t/cyuhZbEnP9
-         ynIk+GU2pCkr6fJ/e7QNYS1c0EK6YNkXLhP9UBes=
-Date:   Sat, 3 Oct 2020 15:54:49 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sathish Narsimman <sathish.narasimman@intel.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Revert "Bluetooth: Update resolving list when updating
+        Sat, 3 Oct 2020 11:51:06 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36780 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbgJCPvG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 3 Oct 2020 11:51:06 -0400
+Received: from marcel-macpro.fritz.box (p4fefc7f4.dip0.t-ipconnect.de [79.239.199.244])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C28F1CED01;
+        Sat,  3 Oct 2020 17:58:04 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Revert "Bluetooth: Update resolving list when updating
  whitelist"
-Message-ID: <20201003135449.GA2691@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20201003135449.GA2691@kroah.com>
+Date:   Sat, 3 Oct 2020 17:51:03 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Sathish Narsimman <sathish.narasimman@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A1C95238-CBCB-4FD4-B46D-A62AED0C77E5@holtmann.org>
+References: <20201003135449.GA2691@kroah.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2 as it
-breaks all bluetooth connections on my machine.
+Hi Greg,
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Sathish Narsimman <sathish.narasimman@intel.com>
-Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when updating whitelist")
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- net/bluetooth/hci_request.c | 41 ++-----------------------------------
- 1 file changed, 2 insertions(+), 39 deletions(-)
+> This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2 as it
+> breaks all bluetooth connections on my machine.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Sathish Narsimman <sathish.narasimman@intel.com>
+> Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when updating whitelist")
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+> net/bluetooth/hci_request.c | 41 ++-----------------------------------
+> 1 file changed, 2 insertions(+), 39 deletions(-)
+> 
+> This has been bugging me for since 5.9-rc1, when all bluetooth devices
+> stopped working on my desktop system.  I finally got the time to do
+> bisection today, and it came down to this patch.  Reverting it on top of
+> 5.9-rc7 restored bluetooth devices and now my input devices properly
+> work.
+> 
+> As it's almost 5.9-final, any chance this can be merged now to fix the
+> issue?
 
-This has been bugging me for since 5.9-rc1, when all bluetooth devices
-stopped working on my desktop system.  I finally got the time to do
-bisection today, and it came down to this patch.  Reverting it on top of
-5.9-rc7 restored bluetooth devices and now my input devices properly
-work.
+can you be specific what breaks since our guys and I also think the ChromeOS guys have been testing these series of patches heavily.
 
-As it's almost 5.9-final, any chance this can be merged now to fix the
-issue?
+When you run btmon does it indicate any errors?
 
+Do you have a chance to test net-next and see the LL Privacy there might have addressed this?
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index e0269192f2e5..75b0a4776f10 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -697,21 +697,6 @@ static void del_from_white_list(struct hci_request *req, bdaddr_t *bdaddr,
- 	bt_dev_dbg(req->hdev, "Remove %pMR (0x%x) from whitelist", &cp.bdaddr,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST, sizeof(cp), &cp);
--
--	if (use_ll_privacy(req->hdev)) {
--		struct smp_irk *irk;
--
--		irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
--		if (irk) {
--			struct hci_cp_le_del_from_resolv_list cp;
--
--			cp.bdaddr_type = bdaddr_type;
--			bacpy(&cp.bdaddr, bdaddr);
--
--			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
--				    sizeof(cp), &cp);
--		}
--	}
- }
- 
- /* Adds connection to white list if needed. On error, returns -1. */
-@@ -732,7 +717,7 @@ static int add_to_white_list(struct hci_request *req,
- 		return -1;
- 
- 	/* White list can not be used with RPAs */
--	if (!allow_rpa && !use_ll_privacy(hdev) &&
-+	if (!allow_rpa &&
- 	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
- 		return -1;
- 	}
-@@ -750,28 +735,6 @@ static int add_to_white_list(struct hci_request *req,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
- 
--	if (use_ll_privacy(hdev)) {
--		struct smp_irk *irk;
--
--		irk = hci_find_irk_by_addr(hdev, &params->addr,
--					   params->addr_type);
--		if (irk) {
--			struct hci_cp_le_add_to_resolv_list cp;
--
--			cp.bdaddr_type = params->addr_type;
--			bacpy(&cp.bdaddr, &params->addr);
--			memcpy(cp.peer_irk, irk->val, 16);
--
--			if (hci_dev_test_flag(hdev, HCI_PRIVACY))
--				memcpy(cp.local_irk, hdev->irk, 16);
--			else
--				memset(cp.local_irk, 0, 16);
--
--			hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST,
--				    sizeof(cp), &cp);
--		}
--	}
--
- 	return 0;
- }
- 
-@@ -812,7 +775,7 @@ static u8 update_white_list(struct hci_request *req)
- 		}
- 
- 		/* White list can not be used with RPAs */
--		if (!allow_rpa && !use_ll_privacy(hdev) &&
-+		if (!allow_rpa &&
- 		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
- 			return 0x00;
- 		}
--- 
-2.28.0
+Regards
+
+Marcel
 
