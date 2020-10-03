@@ -2,99 +2,98 @@ Return-Path: <SRS0=jDol=DK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E49CC4363D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 18:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C92C41604
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 18:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08004206C1
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 18:11:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cs.ucsb.edu header.i=@cs.ucsb.edu header.b="D1Kqkh+p"
+	by mail.kernel.org (Postfix) with ESMTP id DA82320738
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Oct 2020 18:33:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725812AbgJCSLy (ORCPT
+        id S1725821AbgJCSdU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 3 Oct 2020 14:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgJCSLy (ORCPT
+        Sat, 3 Oct 2020 14:33:20 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56866 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725816AbgJCSdU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 3 Oct 2020 14:11:54 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848EBC0613D0
-        for <linux-bluetooth@vger.kernel.org>; Sat,  3 Oct 2020 11:11:54 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id u3so2876218pjr.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 03 Oct 2020 11:11:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cs.ucsb.edu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=TH7fiZp1eWHMSloLv6SwCJvLezTUHxZ5PrMX/bw7ik8=;
-        b=D1Kqkh+pSSc/UJ3v15JSehN4W7epH2tDtScWY+nR7eAxMblEEszvbxdyH+S20w2Ix4
-         j8nOHjzbp5A8IwbWpxpHqq7wczcnovZbdxPrnGCYyNHqwKdkVcD2SQZyQEkak58tZrYN
-         /etpmSl5boyTcPmitjEzmN7IRvJ2g+0qY/7bslBK/DlqaqwX1WV2815kAOY449jbpT25
-         /8JUe4Is61oNZPrMJ4FE0FrbEYu3Ivs0Ud2ACJpLEPcyXrqa1s8Q1kQ9y0nYiAk+QiDY
-         1nY0VyNZxRvAZeuUoz+znp5UJQ5ckAxSTGM1ZG8zbk4QMP1Kt1+m2+XRhZIU4EI4tFTM
-         JWXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=TH7fiZp1eWHMSloLv6SwCJvLezTUHxZ5PrMX/bw7ik8=;
-        b=hPPFYZjV2WkYhappehepyC+wFwABvazmetfr4CO3X3Zgs8QYzffs/xshpJaOQnp6Lr
-         vEK3M7diTp6vJz+0CQvVCAZFZDLVqV2Sl4UtL9VBrN8y6+N9/eh7uWbYL97i6VnsV66z
-         34q2R+I0S/03sEBj4+Gc9/Ra5FRLWthMFD9TCKVa+HcnR/bBhVuUiIWgQBOnJGDU5ohe
-         Ouk87j/NXvyi215wf83xpo7ArSDhiD9wAq1o/D7RfWDnfNpzQskf9678qXgvJJmaEz8t
-         YnP7COJaxugfij+9jrWosyaTg5qYIPjd6Oq/iGLQWa3iRAeFCuQRhN4qFmwx7t6Etjxt
-         MCIA==
-X-Gm-Message-State: AOAM532WQw9y9abju00RUerG+qGVttbgNzlroWVyPMHCGGl+hJixoLdO
-        veHtAQzxsMpTVlYymhkrwVyUWNkyz7IPhfn2YMqVMyCRiskQsA==
-X-Google-Smtp-Source: ABdhPJxjyYxWmmjaK6nPCSdt2FOWdTaaOmeyuvMs0hmKTKAn7DCL/qTSGyovPhoeXI/Tt3J5kvXED9SGmA9gxc3jyGA=
-X-Received: by 2002:a17:90b:797:: with SMTP id l23mr8364710pjz.176.1601748713894;
- Sat, 03 Oct 2020 11:11:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200928192002.22733-1-machiry@cs.ucsb.edu> <5f7239e2.1c69fb81.dfa65.87a7@mx.google.com>
-In-Reply-To: <5f7239e2.1c69fb81.dfa65.87a7@mx.google.com>
-From:   Aravind Machiry <machiry@cs.ucsb.edu>
-Date:   Sat, 3 Oct 2020 11:11:42 -0700
-Message-ID: <CANozA0hYY6M_We73Zummfodk_g1HhWsyHiLP8Gw17rR+X89dpQ@mail.gmail.com>
-Subject: Re: [BlueZ] lib: Replace malloc/memset(..0..) with malloc0
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 3 Oct 2020 14:33:20 -0400
+Received: from marcel-macpro.fritz.box (p4fefc7f4.dip0.t-ipconnect.de [79.239.199.244])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1C33DCED05;
+        Sat,  3 Oct 2020 20:40:19 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Revert "Bluetooth: Update resolving list when updating
+ whitelist"
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20201003160713.GA1512229@kroah.com>
+Date:   Sat, 3 Oct 2020 20:33:18 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Sathish Narsimman <sathish.narasimman@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <AABC2831-4E88-41A2-8A20-1BFC88895686@holtmann.org>
+References: <20201003135449.GA2691@kroah.com>
+ <A1C95238-CBCB-4FD4-B46D-A62AED0C77E5@holtmann.org>
+ <20201003160713.GA1512229@kroah.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Gentle reminder!
+Hi Greg,
 
-On Mon, Sep 28, 2020 at 12:30 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=356715
->
-> ---Test result---
->
-> ##############################
-> Test: CheckPatch - PASS
->
-> ##############################
-> Test: CheckGitLint - PASS
->
-> ##############################
-> Test: CheckBuild - PASS
->
-> ##############################
-> Test: MakeCheck - PASS
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+>>> This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2 as it
+>>> breaks all bluetooth connections on my machine.
+>>> 
+>>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>>> Cc: Sathish Narsimman <sathish.narasimman@intel.com>
+>>> Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when updating whitelist")
+>>> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>>> ---
+>>> net/bluetooth/hci_request.c | 41 ++-----------------------------------
+>>> 1 file changed, 2 insertions(+), 39 deletions(-)
+>>> 
+>>> This has been bugging me for since 5.9-rc1, when all bluetooth devices
+>>> stopped working on my desktop system.  I finally got the time to do
+>>> bisection today, and it came down to this patch.  Reverting it on top of
+>>> 5.9-rc7 restored bluetooth devices and now my input devices properly
+>>> work.
+>>> 
+>>> As it's almost 5.9-final, any chance this can be merged now to fix the
+>>> issue?
+>> 
+>> can you be specific what breaks since our guys and I also think the
+>> ChromeOS guys have been testing these series of patches heavily.
+> 
+> My bluetooth trackball does not connect at all.  With this reverted, it
+> all "just works".
+> 
+> Same I think for a Bluetooth headset, can check that again if you really
+> need me to, but the trackball is reliable here.
+> 
+>> When you run btmon does it indicate any errors?
+> 
+> How do I run it and where are the errors displayed?
+
+you can do btmon -w trace.log and just let it run like tcdpump.
+
+>> Do you have a chance to test net-next and see the LL Privacy there might have addressed this?
+> 
+> Have a specific set of patches I can test?  It wouldn't be good to have
+> 5.9-final go out with this not working at all.
+
+Of course not, but so far you are the only one reported a problem. Maybe you have some funky hardware in your machine that needs a quirk.
+
+Regards
+
+Marcel
+
