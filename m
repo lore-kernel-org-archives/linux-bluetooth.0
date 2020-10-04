@@ -2,46 +2,38 @@ Return-Path: <SRS0=39yq=DL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16489C46466
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 10:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C98C4727E
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 12:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5048208A9
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 10:52:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601808753;
-	bh=LTFTpf96xiRnQzkHrsJDx2t7cosvHAasmQcVgfkqtmc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CaosSYfiXQDkfAa1vbuWMqjFtvw8/PNHqY6/2ZLtrxKB17JunteqHHUfl7gkMk38s
-	 aeYpn+45R6y+akvBdh1ozwKeUiAXo5fPeZ0/L2pyvQOW6OmqKIvLb37hKAlE1s8id6
-	 /FJm62n58NWxseTk7+OjzW+G9mooKsWwOuW2noyg=
+	by mail.kernel.org (Postfix) with ESMTP id 469CB206A1
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 12:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725980AbgJDKw3 (ORCPT
+        id S1725982AbgJDMSn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 4 Oct 2020 06:52:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53156 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725825AbgJDKw3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 4 Oct 2020 06:52:29 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C549E208A9;
-        Sun,  4 Oct 2020 10:52:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601808748;
-        bh=LTFTpf96xiRnQzkHrsJDx2t7cosvHAasmQcVgfkqtmc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fTFrUfNxvhDhr1lg9I5CPHZmNPwzw7NWNw/E1IzBUMDPl3/MYvGhVKExnHinzKkK3
-         g8rdJGAvgfPaxDJGQKujvh0uZJ98sioqxmbF5hRpDCuF9gUrjuNOsP2o5DgRpDxynU
-         lCWCPDllVX/GvaBxJAbY8LkskvrOdwYwfXyEx+ao=
-Date:   Sun, 4 Oct 2020 12:53:14 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
+        Sun, 4 Oct 2020 08:18:43 -0400
+Received: from mslow2.mail.gandi.net ([217.70.178.242]:45368 "EHLO
+        mslow2.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725840AbgJDMSn (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 4 Oct 2020 08:18:43 -0400
+Received: from relay4-d.mail.gandi.net (unknown [217.70.183.196])
+        by mslow2.mail.gandi.net (Postfix) with ESMTP id 6E95A3AC513;
+        Sun,  4 Oct 2020 12:17:31 +0000 (UTC)
+X-Originating-IP: 82.255.60.242
+Received: from [192.168.0.28] (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
+        (Authenticated sender: hadess@hadess.net)
+        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 213FCE0004;
+        Sun,  4 Oct 2020 12:17:06 +0000 (UTC)
+Message-ID: <04e0af8618f95a4483f5a72ba90d4f8b1d9094bd.camel@hadess.net>
+Subject: Re: [PATCH] Revert "Bluetooth: Update resolving list when updating
+ whitelist"
+From:   Bastien Nocera <hadess@hadess.net>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Sathish Narsimman <sathish.narasimman@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -49,56 +41,68 @@ Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Revert "Bluetooth: Update resolving list when updating
- whitelist"
-Message-ID: <20201004105314.GB2429@kroah.com>
-References: <20201003135449.GA2691@kroah.com>
- <A1C95238-CBCB-4FD4-B46D-A62AED0C77E5@holtmann.org>
- <20201003160713.GA1512229@kroah.com>
- <AABC2831-4E88-41A2-8A20-1BFC88895686@holtmann.org>
- <20201004105124.GA2429@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Date:   Sun, 04 Oct 2020 14:17:06 +0200
 In-Reply-To: <20201004105124.GA2429@kroah.com>
+References: <20201003135449.GA2691@kroah.com>
+         <A1C95238-CBCB-4FD4-B46D-A62AED0C77E5@holtmann.org>
+         <20201003160713.GA1512229@kroah.com>
+         <AABC2831-4E88-41A2-8A20-1BFC88895686@holtmann.org>
+         <20201004105124.GA2429@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.0 (3.38.0-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Oct 04, 2020 at 12:51:24PM +0200, Greg Kroah-Hartman wrote:
+On Sun, 2020-10-04 at 12:51 +0200, Greg Kroah-Hartman wrote:
 > On Sat, Oct 03, 2020 at 08:33:18PM +0200, Marcel Holtmann wrote:
 > > Hi Greg,
 > > 
-> > >>> This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2 as it
-> > >>> breaks all bluetooth connections on my machine.
-> > >>> 
-> > >>> Cc: Marcel Holtmann <marcel@holtmann.org>
-> > >>> Cc: Sathish Narsimman <sathish.narasimman@intel.com>
-> > >>> Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when updating whitelist")
-> > >>> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > >>> ---
-> > >>> net/bluetooth/hci_request.c | 41 ++-----------------------------------
-> > >>> 1 file changed, 2 insertions(+), 39 deletions(-)
-> > >>> 
-> > >>> This has been bugging me for since 5.9-rc1, when all bluetooth devices
-> > >>> stopped working on my desktop system.  I finally got the time to do
-> > >>> bisection today, and it came down to this patch.  Reverting it on top of
-> > >>> 5.9-rc7 restored bluetooth devices and now my input devices properly
-> > >>> work.
-> > >>> 
-> > >>> As it's almost 5.9-final, any chance this can be merged now to fix the
-> > >>> issue?
-> > >> 
-> > >> can you be specific what breaks since our guys and I also think the
-> > >> ChromeOS guys have been testing these series of patches heavily.
+> > > > > This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2
+> > > > > as it
+> > > > > breaks all bluetooth connections on my machine.
+> > > > > 
+> > > > > Cc: Marcel Holtmann <marcel@holtmann.org>
+> > > > > Cc: Sathish Narsimman <sathish.narasimman@intel.com>
+> > > > > Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when
+> > > > > updating whitelist")
+> > > > > Signed-off-by: Greg Kroah-Hartman
+> > > > > <gregkh@linuxfoundation.org>
+> > > > > ---
+> > > > > net/bluetooth/hci_request.c | 41 ++--------------------------
+> > > > > ---------
+> > > > > 1 file changed, 2 insertions(+), 39 deletions(-)
+> > > > > 
+> > > > > This has been bugging me for since 5.9-rc1, when all
+> > > > > bluetooth devices
+> > > > > stopped working on my desktop system.  I finally got the time
+> > > > > to do
+> > > > > bisection today, and it came down to this patch.  Reverting
+> > > > > it on top of
+> > > > > 5.9-rc7 restored bluetooth devices and now my input devices
+> > > > > properly
+> > > > > work.
+> > > > > 
+> > > > > As it's almost 5.9-final, any chance this can be merged now
+> > > > > to fix the
+> > > > > issue?
+> > > > 
+> > > > can you be specific what breaks since our guys and I also think
+> > > > the
+> > > > ChromeOS guys have been testing these series of patches
+> > > > heavily.
 > > > 
-> > > My bluetooth trackball does not connect at all.  With this reverted, it
+> > > My bluetooth trackball does not connect at all.  With this
+> > > reverted, it
 > > > all "just works".
 > > > 
-> > > Same I think for a Bluetooth headset, can check that again if you really
+> > > Same I think for a Bluetooth headset, can check that again if you
+> > > really
 > > > need me to, but the trackball is reliable here.
 > > > 
-> > >> When you run btmon does it indicate any errors?
+> > > > When you run btmon does it indicate any errors?
 > > > 
 > > > How do I run it and where are the errors displayed?
 > > 
@@ -106,14 +110,18 @@ On Sun, Oct 04, 2020 at 12:51:24PM +0200, Greg Kroah-Hartman wrote:
 > 
 > Ok, attached.
 > 
-> The device is not connecting, and then I open the gnome bluetooth dialog
+> The device is not connecting, and then I open the gnome bluetooth
+> dialog
 > and it scans for devices in the area, but does not connect to my
 > existing devices at all.
 > 
+> Any ideas?
 
-And any hints on how to read this file?  'btsnoop' has no man page, and
-the --help options are pretty sparse :(
+Use bluetoothctl instead, the Bluetooth Settings from GNOME also run a
+discovery the whole time the panel is opened, and this breaks a fair
+number of poor quality adapters. This is worked-around in the most
+recent version, but using bluetoothctl is a better debugging option in
+all cases.
 
-thanks,
+Cheers
 
-greg k-h
