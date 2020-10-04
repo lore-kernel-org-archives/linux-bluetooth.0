@@ -2,128 +2,134 @@ Return-Path: <SRS0=39yq=DL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D0CC4363C
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 15:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0179FC4363D
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 17:04:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4AA8206B6
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 15:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B41D1206DD
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Oct 2020 17:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725827AbgJDPSg convert rfc822-to-8bit (ORCPT
+        id S1726085AbgJDQ72 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 4 Oct 2020 11:18:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48606 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725825AbgJDPSg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 4 Oct 2020 11:18:36 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209493] New: Intel 9260 Wifi/BT USB Resets Repeatedly
-Date:   Sun, 04 Oct 2020 15:18:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: parker@finest.io
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-209493-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 4 Oct 2020 12:59:28 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41121 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726077AbgJDQ71 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 4 Oct 2020 12:59:27 -0400
+Received: from marcel-macpro.fritz.box (p4fefc7f4.dip0.t-ipconnect.de [79.239.199.244])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 077F1CED16;
+        Sun,  4 Oct 2020 19:06:25 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH] Revert "Bluetooth: Update resolving list when updating
+ whitelist"
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20201004105124.GA2429@kroah.com>
+Date:   Sun, 4 Oct 2020 18:59:24 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Sathish Narsimman <sathish.narasimman@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+Message-Id: <3F7BDD50-DEA3-4CB0-A9A0-69E7EE2923D5@holtmann.org>
+References: <20201003135449.GA2691@kroah.com>
+ <A1C95238-CBCB-4FD4-B46D-A62AED0C77E5@holtmann.org>
+ <20201003160713.GA1512229@kroah.com>
+ <AABC2831-4E88-41A2-8A20-1BFC88895686@holtmann.org>
+ <20201004105124.GA2429@kroah.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209493
+Hi Greg,
 
-            Bug ID: 209493
-           Summary: Intel 9260 Wifi/BT USB Resets Repeatedly
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.9.0-rc7+
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: parker@finest.io
-        Regression: No
+>>>>> This reverts commit 0eee35bdfa3b472cc986ecc6ad76293fdcda59e2 as it
+>>>>> breaks all bluetooth connections on my machine.
+>>>>> 
+>>>>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>>>>> Cc: Sathish Narsimman <sathish.narasimman@intel.com>
+>>>>> Fixes: 0eee35bdfa3b ("Bluetooth: Update resolving list when updating whitelist")
+>>>>> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>>>>> ---
+>>>>> net/bluetooth/hci_request.c | 41 ++-----------------------------------
+>>>>> 1 file changed, 2 insertions(+), 39 deletions(-)
+>>>>> 
+>>>>> This has been bugging me for since 5.9-rc1, when all bluetooth devices
+>>>>> stopped working on my desktop system.  I finally got the time to do
+>>>>> bisection today, and it came down to this patch.  Reverting it on top of
+>>>>> 5.9-rc7 restored bluetooth devices and now my input devices properly
+>>>>> work.
+>>>>> 
+>>>>> As it's almost 5.9-final, any chance this can be merged now to fix the
+>>>>> issue?
+>>>> 
+>>>> can you be specific what breaks since our guys and I also think the
+>>>> ChromeOS guys have been testing these series of patches heavily.
+>>> 
+>>> My bluetooth trackball does not connect at all.  With this reverted, it
+>>> all "just works".
+>>> 
+>>> Same I think for a Bluetooth headset, can check that again if you really
+>>> need me to, but the trackball is reliable here.
+>>> 
+>>>> When you run btmon does it indicate any errors?
+>>> 
+>>> How do I run it and where are the errors displayed?
+>> 
+>> you can do btmon -w trace.log and just let it run like tcdpump.
+> 
+> Ok, attached.
+> 
+> The device is not connecting, and then I open the gnome bluetooth dialog
+> and it scans for devices in the area, but does not connect to my
+> existing devices at all.
+> 
+> Any ideas?
 
-Created attachment 292807
-  --> https://bugzilla.kernel.org/attachment.cgi?id=292807&action=edit
-Full dmesg log
+the trace file is from -rc7 or from -rc7 with this patch reverted?
 
-On a Lenovo T495 with AMD Ryzen 3700U PRO and Intel 9260 WiFi/BT the BT USB
-resets approximately every 4 seconds. It starts at reboot and happens
-regardless if BT and/or WiFi are in use. 
+I asked, because I see no hint that anything goes wrong. However I have a suspicion if you bisected it to this patch.
 
-BT still works although there is sometimes lag with my Logitech MX Anywhere 2
-BT mouse when it resets.
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e0269192f2e5..94c0daa9f28d 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -732,7 +732,7 @@ static int add_to_white_list(struct hci_request *req,
+                return -1;
+ 
+        /* White list can not be used with RPAs */
+-       if (!allow_rpa && !use_ll_privacy(hdev) &&
++       if (!allow_rpa &&
+            hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
+                return -1;
+        }
+@@ -812,7 +812,7 @@ static u8 update_white_list(struct hci_request *req)
+                }
+ 
+                /* White list can not be used with RPAs */
+-               if (!allow_rpa && !use_ll_privacy(hdev) &&
++               if (!allow_rpa &&
+                    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
+                        return 0x00;
+                }
 
-OS is Debian Bullseye, fully up to date. Issue happens on Distro kernel
-(5.8.0-2) as well as upstream built from git. 
 
-[  200.978296] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  204.882294] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  208.786259] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  212.658660] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  216.562736] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  220.434207] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  224.338571] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  228.210158] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  232.114168] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  236.018643] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  239.890136] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  243.794141] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
-[  247.666226] usb 3-2.4: reset full-speed USB device number 5 using xhci_hcd
+If you just do the above, does thing work for you again?
 
-root@debian-PN:~# lsusb -tv
-/:  Bus 05.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/1p, 480M
-    ID 1d6b:0002 Linux Foundation 2.0 root hub
-/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/1p, 10000M
-    ID 1d6b:0003 Linux Foundation 3.0 root hub
-/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/2p, 480M
-    ID 1d6b:0002 Linux Foundation 2.0 root hub
-    |__ Port 1: Dev 2, If 0, Class=Wireless, Driver=btusb, 12M
-        ID 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
-    |__ Port 1: Dev 2, If 1, Class=Wireless, Driver=btusb, 12M
-        ID 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
-    |__ Port 2: Dev 3, If 0, Class=Hub, Driver=hub/4p, 480M
-        ID 05e3:0610 Genesys Logic, Inc. Hub
-        |__ Port 1: Dev 4, If 0, Class=Video, Driver=uvcvideo, 480M
-            ID 5986:2113 Acer, Inc SunplusIT Integrated Camera
-        |__ Port 1: Dev 4, If 1, Class=Video, Driver=uvcvideo, 480M
-            ID 5986:2113 Acer, Inc SunplusIT Integrated Camera
-        |__ Port 4: Dev 5, If 0, Class=Vendor Specific Class, Driver=, 12M
-            ID 06cb:00bd Synaptics, Inc. Prometheus MIS Touch Fingerprint
-Reader
-/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 10000M
-    ID 1d6b:0003 Linux Foundation 3.0 root hub
-/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 480M
-    ID 1d6b:0002 Linux Foundation 2.0 root hub
+My suspicion is that the use_ll_privacy check is the wrong one here. It only checks if hardware feature is available, not if it is also enabled.
 
-root@debian-PN:~# dmesg |grep iw |grep firmware
-[    4.434848] iwlwifi 0000:01:00.0: loaded firmware version 46.8902351f.0
-9260-th-b0-jf-b0-46.ucode op_mode iwlmvm
+Regards
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Marcel
+
