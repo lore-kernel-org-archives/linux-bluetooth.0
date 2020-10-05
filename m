@@ -2,150 +2,109 @@ Return-Path: <SRS0=3clX=DM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EB5C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Oct 2020 04:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCF7C4363A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Oct 2020 04:41:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63AEB2080A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Oct 2020 04:19:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB3782080C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Oct 2020 04:41:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V55MA0z7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725864AbgJEETl (ORCPT
+        id S1725863AbgJEEl0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Oct 2020 00:19:41 -0400
-Received: from mga01.intel.com ([192.55.52.88]:11656 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725844AbgJEETl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Oct 2020 00:19:41 -0400
-IronPort-SDR: CGnSG1Oa/OUOury7WARpyZPOLDKB5bW0RQ/s/HD6VPKCs7DXkhBKhi5JjGJhy0+pVK4mh18TKI
- f6IbyJaJeg+g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9764"; a="181446331"
-X-IronPort-AV: E=Sophos;i="5.77,338,1596524400"; 
-   d="scan'208";a="181446331"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2020 21:19:41 -0700
-IronPort-SDR: LrI03wyPDNQwN3AopGz4ZvRKXYj5/BMFYowz2ELSNAs1TLqC6vdyMGEOxJZ/H+jNm6c21I9agH
- +hbDd9GL44Tg==
-X-IronPort-AV: E=Sophos;i="5.77,338,1596524400"; 
-   d="scan'208";a="459327569"
-Received: from faghadia-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.251.21.157])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2020 21:19:40 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] shared/timeout-ell: Fix timeout wrapper implementation
-Date:   Sun,  4 Oct 2020 21:19:32 -0700
-Message-Id: <20201005041932.99783-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
+        Mon, 5 Oct 2020 00:41:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbgJEEl0 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 5 Oct 2020 00:41:26 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E5EC0613CE
+        for <linux-bluetooth@vger.kernel.org>; Sun,  4 Oct 2020 21:41:25 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id ef16so5349495qvb.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Oct 2020 21:41:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=vk3qLwcGDmr42iqdisLkvWF3x8lBolY8TWpfQcfJedw=;
+        b=V55MA0z7yiW5BuFUyxSl8+JB34hufc68HHKFPJWzwZ9Iyrfyxol+0gAUqYe73rWvT8
+         vswFagZR8eWN1ZDvF3jqKXCSQRAGF27R70wMmP14uv6XIuK8qQpIYNLOs4NKaqvZqfIB
+         Rf0pjSbov8evQCmGXv9xeK9A2HyLrtuAgVtFeFoUTCdrrYBnqBtcL8eeBTA1Uxq+EbWv
+         WJJ4q1JDxU6gugOB2AxWNaGAvuUWqlxh7yVQLFdLYeALyp4I45Mx94q3dvnNtKSKHBxa
+         BmGHnDuMMJg3Ltaqc7GjS1q1NNUj+Wwz5P0uXfBUC7LaQm4Bf0NDu1Wd93rGY14jQhYj
+         EZZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=vk3qLwcGDmr42iqdisLkvWF3x8lBolY8TWpfQcfJedw=;
+        b=VADiJJ9Ljq9Z8M39+p0wS60jgBtOeJVLKhhJD9Tb1rQaFDQwn60XDqXPE/XcwzpT4m
+         OM71NWzX8EfzpUree53FHlZEZytYgACmvm0vigf8KJcOk9/yGTnaFGsxSJVw5YHnVZ/O
+         7plaIyZXuqYMuPxOpU1IOoR3DkgxW/wVXNMqF9ZFSRZTpuJni40elTv9ba7fPcrSH1DS
+         hU1r6jiipo1fH2bDXBSs/mmu2UEOvksnzCelDXlc1o4iz0dOoRtgtQVKqBkH9Ks8+sT8
+         uGvaq6Elzuq8MzakfX6RzGJNDkrzP/o+VblIV6WOuM7uEdPtyAjoNcDhyvVpyYoruWlp
+         abQQ==
+X-Gm-Message-State: AOAM530neA4lZQFEV7sQ5eJyhUh9BrraVuvZmDb/ogDgdcj7zMLWOHok
+        Mi384jB0MaQtyB5lY+un0XkXHufea4hKzw==
+X-Google-Smtp-Source: ABdhPJyUzrTe6Qy/s29ZZQFm9zhOhcbCbit2TFG8N2M2TI1Lk8YhQyAp074DMdRhoB7inR8KR/JX+Q==
+X-Received: by 2002:a0c:8c4c:: with SMTP id o12mr4613180qvb.46.1601872884942;
+        Sun, 04 Oct 2020 21:41:24 -0700 (PDT)
+Received: from [172.17.0.2] ([52.247.48.60])
+        by smtp.gmail.com with ESMTPSA id t2sm5496847qte.47.2020.10.04.21.41.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Oct 2020 21:41:24 -0700 (PDT)
+Message-ID: <5f7aa3f4.1c69fb81.a103d.1f5d@mx.google.com>
+Date:   Sun, 04 Oct 2020 21:41:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3296642710578557391=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ] shared/timeout-ell: Fix timeout wrapper implementation
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201005041932.99783-1-inga.stotland@intel.com>
+References: <20201005041932.99783-1-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the following issues:
-- Correct user data is passed around to l_timeout_create():
-  locally allocated timeout data is a valid "user data" to
-  associate with a newly created timeout. Previously, user_data
-  passed as an argument to timeout_add() was incorrectly used as
-  an argument to l_timeout_create()
-- To maintain common API and work around the issue when the conversion
-  of a pointer to an unsigned int truncates the initial value, a queue
-  of active timeouts is maintained where pointer each l_timeout structure
-  is associate with a unique id. This id is returned when timeout_create()
-  API is called and can be subsequently used with timeout_remove().
+--===============3296642710578557391==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=359581
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- src/shared/timeout-ell.c | 50 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 45 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/timeout-ell.c b/src/shared/timeout-ell.c
-index c2da387e2..023364069 100644
---- a/src/shared/timeout-ell.c
-+++ b/src/shared/timeout-ell.c
-@@ -12,13 +12,23 @@
- 
- #include "timeout.h"
- 
-+static struct l_queue *timeout_q;
-+
- struct timeout_data {
- 	timeout_func_t func;
- 	timeout_destroy_func_t destroy;
--	unsigned int timeout;
- 	void *user_data;
-+	unsigned int timeout;
- };
- 
-+static bool match_id(const void *a, const void *b)
-+{
-+	unsigned int to_id = L_PTR_TO_UINT(a);
-+	unsigned int id = L_PTR_TO_UINT(b);
-+
-+	return (to_id == id);
-+}
-+
- static void timeout_callback(struct l_timeout *timeout, void *user_data)
- {
- 	struct timeout_data *data = user_data;
-@@ -43,7 +53,12 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
- 			void *user_data, timeout_destroy_func_t destroy)
- {
- 	struct timeout_data *data;
--	uint32_t id;
-+	unsigned int id = 0;
-+	struct l_timeout *to;
-+	int tries = 0;
-+
-+	if (!timeout_q)
-+		timeout_q = l_queue_new();
- 
- 	data = l_new(struct timeout_data, 1);
- 
-@@ -52,12 +67,37 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
- 	data->user_data = user_data;
- 	data->timeout = timeout;
- 
--	id = L_PTR_TO_UINT(l_timeout_create(timeout, timeout_callback,
--						user_data, timeout_destroy));
-+	while (id == 0 && tries < 3) {
-+		to = l_timeout_create(timeout, timeout_callback,
-+							data, timeout_destroy);
-+		if (!to)
-+			break;
-+
-+		tries++;
-+		id = L_PTR_TO_UINT(to);
-+
-+		if (id == 0 ||
-+			l_queue_find(timeout_q, match_id, L_UINT_TO_PTR(id))) {
-+
-+			l_timeout_remove(to);
-+			continue;
-+		}
-+
-+		l_queue_push_tail(timeout_q, to);
-+	}
-+
-+	if (id == 0)
-+		l_free(data);
-+
- 	return id;
- }
- 
- void timeout_remove(unsigned int id)
- {
--	l_timeout_remove(L_UINT_TO_PTR(id));
-+	struct l_timeout *to;
-+
-+	to = l_queue_remove_if(timeout_q, match_id, L_UINT_TO_PTR(id));
-+
-+	if (to)
-+		l_timeout_remove(to);
- }
--- 
-2.26.2
 
+--===============3296642710578557391==--
