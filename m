@@ -7,99 +7,108 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0ECBC4727F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 01:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B612FC4363A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 01:12:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E2D72084C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 01:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D184207F7
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 01:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHtSfjR7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gEYMNDjL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726073AbgJFBMW (ORCPT
+        id S1725881AbgJFBMo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Oct 2020 21:12:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54106 "EHLO
+        Mon, 5 Oct 2020 21:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725872AbgJFBMV (ORCPT
+        with ESMTP id S1725864AbgJFBMn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Oct 2020 21:12:21 -0400
+        Mon, 5 Oct 2020 21:12:43 -0400
 Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A209C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2020 18:12:21 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id m9so10933927qth.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2020 18:12:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA2CC0613CE
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Oct 2020 18:12:43 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id e7so11563119qtj.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Oct 2020 18:12:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=fPr7ZTcd3zy73Q8RmM8pGDr7YaTCmPZjcxMenka1jIA=;
-        b=IHtSfjR7jP1bAR1VmPQP7CT5fa9NrGqhQfs0+32jlUjH/GynMzH3EjLku27Z5E+k9n
-         MuHeUVDiqi0t/ShtgDswugr1E0LsZ0VTsS6FHmiJzxQCiPUo/N8pp/l5A18J/Y3NCftt
-         NK4Ex7UXniKxHlt/WY+qKuVMvQfvu2AtX/IPAHppkbatte0hjJ9A4+Z7qndWK5HZWl5K
-         rdAubfw/PRiIFetHzF/Lud0uOTHGfRy/lPQfuVCM9XhPBjxj1ExjSayNYjs56Lt0JZWE
-         hzebt86S46AtunAPcKnfh/T5e2v9p5nyoJ8YrThFP2yMCzZpBp1zS6EM341sKWavgjgi
-         NsNg==
+        bh=1kLFDLQI9lB5jMNL9SIqTUsmgxHw6Jkgpi+whsAmsFY=;
+        b=gEYMNDjLbEFvPpIk10Q9NYdLquW9/TotcwRdy4n1Vmuyii2l09gYCsHg3O+QE4eOrf
+         i4+9OP/TS0oCB1gVT8di704cWJfsVuXlLYrLFzSFO59J59QT9qjX0x6C8BiHDp5KjCK3
+         HttOhpiZCm6Q36xwpebuLWgFy00FPh8PfHgiys9tEzU7A4kiZJMx1y8qddtX0ovYhmnk
+         LxHnuN/grE0wdPbsRnkS1F9gNxjVqY98xCSjOxJgvfYuxQVz3AW5bo+b/VeEYikGSiwk
+         UM1cK/j1Lgwg8+Zo/9aoqzTxtWzDp0CPDJszGKZu5EOAl77DO9WKBfWgVaHZIKmJbpJY
+         1sig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=fPr7ZTcd3zy73Q8RmM8pGDr7YaTCmPZjcxMenka1jIA=;
-        b=TF0sWSO3x162kSGnzRXXTMKhIp3FamD9M3+aHDUvXkuCA4A54ezyRKzClcFMiMMcaJ
-         pJLTaXUWfEQ1QheNCnM1Nfn9XHknxuFsiIeUbeI1dvphV5siMbJveTypHKSKGl+EnA5y
-         Ys3LXY7Vdi+xqyCA5uD29UfZhSJWZgXlR6RYqYhFtc98eFimMsedhNNulYFVUnxKB16u
-         tTjAzzCnWmhCkL5fFEvpBFUfvp9U4rmGuroOFKd5Mex/og68WORXdO8KobcrSwC43M2R
-         yQiNVVgIsR7TFAUAv+L7zmbcTXBOrTBtzKgxgcpnsh7SqgRhQMmj2kUS/SZc4D+I/bPv
-         5EyQ==
-X-Gm-Message-State: AOAM532/+EA65GoVz/XbFAkbSwH+eKXXYg71DPrx+5wBryZHkReCSa/B
-        dVqH9fIWPXgB8MDJOp49a2fwlBuTc1qrmQ==
-X-Google-Smtp-Source: ABdhPJz7/ur3bcm8MU/wAiIIHhfvVR4L45/FbamIT+N/oRgQLGrPPBF8vFpF09y4KYpRyqX47QUFng==
-X-Received: by 2002:ac8:12c4:: with SMTP id b4mr2872233qtj.224.1601946740510;
-        Mon, 05 Oct 2020 18:12:20 -0700 (PDT)
-Received: from [172.17.0.2] ([20.44.64.237])
-        by smtp.gmail.com with ESMTPSA id l25sm1249194qtf.18.2020.10.05.18.12.19
+        bh=1kLFDLQI9lB5jMNL9SIqTUsmgxHw6Jkgpi+whsAmsFY=;
+        b=IU/xsTT8rnrVPQsfdqyIj2AyTrfptl29wlXZiPdzFA9Bi+qu1knRaKRY3Eqo441dDF
+         ZUZjvLow7ALKtr9b9G3K1OtXbMJOGEExXTwZu3sID+GmefPAVqp1X7rTaTUYCrQrVO7e
+         570YzgbrTKsHFfFy8ChgvPwgvrjvW0JUkEzQ+WwhG/YAzk2L8dgZr7ktDor+FyS08yHI
+         jRLve277WapAusMIK09TGK5NwjR5fwCQZyxL7NBhpi/ZJ+Ex87Bky7KzVAvOz/B6v3t8
+         zzVOMLzlfvGPG6Cd1eFUaq0sGDjX7iEYBZJr+nlJnx9PCeWohSuUBDodNZU66lQcG4bB
+         Oy6Q==
+X-Gm-Message-State: AOAM533TBAoqDmwW0ezzclxCDQuFT7jrq2M/5ZByz8hKZ8v+PUjJjRxZ
+        EpKjjp9PUBe1lOK388SQ8O4FEvgMmp3CtA==
+X-Google-Smtp-Source: ABdhPJxRfJny9yaBnRjRJXca2HwiP8Y2yb7Iryboe0DPncuQevB0H1EscA1LjoFc/2cPgA1KlmwPWQ==
+X-Received: by 2002:aed:23f1:: with SMTP id k46mr2855101qtc.377.1601946762953;
+        Mon, 05 Oct 2020 18:12:42 -0700 (PDT)
+Received: from [172.17.0.2] ([52.167.134.196])
+        by smtp.gmail.com with ESMTPSA id x21sm1521165qkb.78.2020.10.05.18.12.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2020 18:12:19 -0700 (PDT)
-Message-ID: <5f7bc473.1c69fb81.e588e.337c@mx.google.com>
-Date:   Mon, 05 Oct 2020 18:12:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2251213981832328963=="
+        Mon, 05 Oct 2020 18:12:42 -0700 (PDT)
+Message-ID: <5f7bc48a.1c69fb81.347c8.8775@mx.google.com>
+Date:   Mon, 05 Oct 2020 18:12:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1295013325056910575=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, mcchou@chromium.org
-Subject: RE: [BlueZ,v5,1/6] adv_monitor: Implement RSSI Filter logic for background scanning
+Subject: RE: [BlueZ,v5,1/6] PRE-UPSTREAM: adv_monitor: Implement RSSI Filter logic for background scanning
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201005175052.BlueZ.v5.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
-References: <20201005175052.BlueZ.v5.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+In-Reply-To: <20201005174640.BlueZ.v5.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+References: <20201005174640.BlueZ.v5.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2251213981832328963==
-Content-Type: text/plain; charset="utf-8"
+--===============1295013325056910575==
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MzYwMDc3CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-UGF0Y2ggLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tH
-aXRMaW50IC0gUEFTUwoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-QnVpbGQgLSBGQUlMCk91dHB1dDoKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBp
-cyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBE
-JyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNl
-IGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNp
-bmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVk
-IHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKc3JjL2Fkdl9tb25pdG9yLmM6MTA5
-MDoxMzogZXJyb3I6IOKAmGFkdl9tb25pdG9yX2ZpbHRlcl9yc3Np4oCZIGRlZmluZWQgYnV0IG5v
-dCB1c2VkIFstV2Vycm9yPXVudXNlZC1mdW5jdGlvbl0KIDEwOTAgfCBzdGF0aWMgdm9pZCBhZHZf
-bW9uaXRvcl9maWx0ZXJfcnNzaShzdHJ1Y3QgYWR2X21vbml0b3IgKm1vbml0b3IsCiAgICAgIHwg
-ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVp
-bmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo5MjYwOiBzcmMvYmx1
-ZXRvb3RoZC1hZHZfbW9uaXRvci5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDAyMDog
-YWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VD
-aGVjayAtIFNLSVBQRUQKT3V0cHV0OgpjaGVja2J1aWxkIG5vdCBzdWNjZXNzCgoKCi0tLQpSZWdh
-cmRzLApMaW51eCBCbHVldG9vdGgKCg==
+This is automated email and please do not reply to this email!
 
---===============2251213981832328963==--
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=360075
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+PRE-UPSTREAM: adv_monitor: Implement RSSI Filter logic for background scanning
+1: T1 Title exceeds max length (78>72): "PRE-UPSTREAM: adv_monitor: Implement RSSI Filter logic for background scanning"
+
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1295013325056910575==--
