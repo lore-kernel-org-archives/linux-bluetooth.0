@@ -2,100 +2,142 @@ Return-Path: <SRS0=Tswr=DN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 976CEC41604
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 14:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FF2C41604
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 14:48:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE8D1206DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 14:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32D5D2083B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 14:48:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=grimler.se header.i=@grimler.se header.b="geb6CJRK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h6nhieaJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726064AbgJFOeu (ORCPT
+        id S1726317AbgJFOsV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Oct 2020 10:34:50 -0400
-Received: from h01mx15.reliablemail.org ([173.236.5.211]:16650 "EHLO
-        h01mx15.reliablemail.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725947AbgJFOeu (ORCPT
+        Tue, 6 Oct 2020 10:48:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbgJFOsV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Oct 2020 10:34:50 -0400
-X-Greylist: delayed 360 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Oct 2020 10:34:49 EDT
-X-Halon-Out: 3e6bd01e-07e0-11eb-b845-00163c81f1a9
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=grimler.se;
-         s=default; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-        Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=r3iwX3l2VivD81ERmRAV4CarF37vHS5r47MdNOdSuCE=; b=geb6CJRKB+z7GjxyBEvON6Q3Qm
-        DNmqhEDRa7THs2QAp+ZEAueqe/LgSG+X8bCqM+AlRh17NRlQSqscrCcElmTYOC4AzV6R/1Kldihle
-        ky7fe2sDnIp7vblpb3GSL80Rz9xUpkFvdoVsjOM4CD0X8xzr2jQfFHyukb204DD1CRAYIHP/7Ujhu
-        ua4mojH158ZnE4llKR9fL1lidwEDtFhUAzOKmhd+PIYYiB2gMJ0gp+oLm/xa4+09lllubbbxUGHaC
-        raK9OIl3H57dBcIbXmUop/Ir1Pr3pzhjaCr72HCe7Ay5hb302gUJ9bwSUz19WFoiRm+aHLSxpUcLr
-        t6sKXtpQ==;
-From:   Henrik Grimler <henrik@grimler.se>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Henrik Grimler <henrik@grimler.se>
-Subject: [PATCH BlueZ 1/1] tools: fix forgotten index->mgmt_index renaming in btmgmt.c
-Date:   Tue,  6 Oct 2020 16:28:36 +0200
-Message-Id: <20201006142836.123490-1-henrik@grimler.se>
-X-Mailer: git-send-email 2.28.0
+        Tue, 6 Oct 2020 10:48:21 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52780C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 07:48:21 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id v123so16900389qkd.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 07:48:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=aCAl3rSF8g/CMAntbgsY4Mzh+WjUS5MDHg7sTezlhGA=;
+        b=h6nhieaJPwHhZSVuzwpLbqPwVuS8gO3XrQNj54R41jN8GNJhFdWx54w9oBdvRSzyOu
+         MuPfXUeE1JFBiHRN1gNsdvQOmvd3YLiGKckfq5L1/w0B/fL2bfBK+njtnt0FOuCZh6Hb
+         jVt0VMTqzAZNDt2DQBsNExm/hjAiIt1+U06tQfg3D/tHntqoaMNOrL07EXWOCJL7u7Ds
+         NpiFh99zXwYETKlZMeZ8VG3+U6Ux89hdfC4zG9tNxloq/fi+pEgOM4/lK1UQhrty0gSv
+         fuTPSAkuC92SnSaT4FRaZAjnBdB5Criv8PA6P6lXwgrLTqflAwpO2dq7+VLXuHC/jbg/
+         /jKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=aCAl3rSF8g/CMAntbgsY4Mzh+WjUS5MDHg7sTezlhGA=;
+        b=XFZf6I6BTjlJyDM85WDpRbJSPlgIlm6NXfR69a7iUzeXAFll704KxyE1X4tx7ExSjz
+         TWGmk3XbMNyu9tr9SgmcY5kERtpl3zvzSM7jx4t60WWfCQltGXePCCI33lmsdjZMwTTc
+         9SjVXZGWAvaQkTqVTFRWoEIK6p/mVtmg8j/ZmpF6Qu5Rl9Uw/dC2UyywZyIi0Z6Pi9Id
+         Zx2n6FUUIgZmHXEU/ovwxlDfv7t/9F233wmklm3NwyfnQF7xv9QXM8JabGWywSLAmEcX
+         bh2f8w4vSifi+0wGZI0blXMl9YMHAepQ3Tk59myRReFe1gSucJsk1QnFnXNejaxdhumY
+         mXlw==
+X-Gm-Message-State: AOAM530W2Uj5jTUnZXMigeCkX+vvQklXFjzumcsp3rKAISVHS7tjeHSV
+        dyRzyOyZ4EpzQui9b22CUmJTfLHlQ3G70g==
+X-Google-Smtp-Source: ABdhPJxLe2eUiY0bsWFLFcmyYJqQY3FbOt4xNYyWcPiUInwdNsRYvP4VV0fZE3vKCg7B38uaJ2GNrA==
+X-Received: by 2002:ae9:ec14:: with SMTP id h20mr5381802qkg.180.1601995700430;
+        Tue, 06 Oct 2020 07:48:20 -0700 (PDT)
+Received: from [172.17.0.2] ([52.152.231.71])
+        by smtp.gmail.com with ESMTPSA id m3sm2652343qkh.10.2020.10.06.07.48.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2020 07:48:18 -0700 (PDT)
+Message-ID: <5f7c83b2.1c69fb81.9561d.57f5@mx.google.com>
+Date:   Tue, 06 Oct 2020 07:48:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3141479068511050448=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OutGoing-Spam-Status: No, score=-1.0
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cpsrv07.misshosting.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - grimler.se
-X-Get-Message-Sender-Via: cpsrv07.misshosting.com: authenticated_id: henrik@grimler.se
-X-Authenticated-Sender: cpsrv07.misshosting.com: henrik@grimler.se
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, henrik@grimler.se
+Subject: RE: [BlueZ,1/1] tools: fix forgotten index->mgmt_index renaming in btmgmt.c
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201006142836.123490-1-henrik@grimler.se>
+References: <20201006142836.123490-1-henrik@grimler.se>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============3141479068511050448==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=360317
+
+---Test result---
+
+##############################
+Test: CheckPatch - FAIL
+Output:
+tools: fix forgotten index->mgmt_index renaming in btmgmt.c
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'Commit 6523d168a7c1 ("tools/btmgmt: Port to use bt_shell")'
+#6: 
 Commit 6523d168a7c1bdb886fbf42e8a810ed15e5ec0e2 renamed the variable
-index to mgmt_index but missed it in one place.  When trying to
-compile bluez I get:
 
-```
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#11: 
 /data/data/com.termux/files/home/.termux-build/libbluetooth/src/tools/btmgmt.c:1229:34: warning: implicitly declaring library function 'index' with type 'char *(const char *, int)' [-Wimplicit-function-declaration]
-                                config_info_rsp, UINT_TO_PTR(index), NULL)) {
-                                                             ^
-/data/data/com.termux/files/home/.termux-build/libbluetooth/src/tools/btmgmt.c:1229:34: note: include the header <strings.h> or explicitly provide a declaration for 'index'
-[...]
-/data/data/com.termux/files/usr/bin/aarch64-linux-android-ld: tools/btmgmt.o: in function `cmd_config':
-btmgmt.c:(.text+0x544): undefined reference to `index'
-/data/data/com.termux/files/usr/bin/aarch64-linux-android-ld: btmgmt.c:(.text+0x548): undefined reference to `index'
-```
 
-This seem to only happens on system (like android) where the obsolete
-index function is not defined.
+WARNING:LONG_LINE: line over 80 characters
+#33: FILE: tools/btmgmt.c:1216:
++				config_info_rsp, UINT_TO_PTR(mgmt_index), NULL)) {
+
+- total: 1 errors, 2 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+Your patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+tools: fix forgotten index->mgmt_index renaming in btmgmt.c
+8: B1 Line exceeds max length (214>80): "/data/data/com.termux/files/home/.termux-build/libbluetooth/src/tools/btmgmt.c:1229:34: warning: implicitly declaring library function 'index' with type 'char *(const char *, int)' [-Wimplicit-function-declaration]"
+11: B1 Line exceeds max length (172>80): "/data/data/com.termux/files/home/.termux-build/libbluetooth/src/tools/btmgmt.c:1229:34: note: include the header <strings.h> or explicitly provide a declaration for 'index'"
+13: B1 Line exceeds max length (103>80): "/data/data/com.termux/files/usr/bin/aarch64-linux-android-ld: tools/btmgmt.o: in function `cmd_config':"
+15: B1 Line exceeds max length (116>80): "/data/data/com.termux/files/usr/bin/aarch64-linux-android-ld: btmgmt.c:(.text+0x548): undefined reference to `index'"
+
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
 
 ---
- tools/btmgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index b0b837d34..228f94efa 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -1213,7 +1213,7 @@ static void cmd_config(int argc, char **argv)
- 	}
- 
- 	if (!mgmt_send(mgmt, MGMT_OP_READ_CONFIG_INFO, mgmt_index, 0, NULL,
--				config_info_rsp, UINT_TO_PTR(index), NULL)) {
-+				config_info_rsp, UINT_TO_PTR(mgmt_index), NULL)) {
- 		error("Unable to send read_config_info cmd");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
--- 
-2.28.0
 
+--===============3141479068511050448==--
