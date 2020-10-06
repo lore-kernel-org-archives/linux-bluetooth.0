@@ -2,217 +2,104 @@ Return-Path: <SRS0=Tswr=DN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5A0C4727D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 15:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3598C41604
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 15:25:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80F2A206DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 15:20:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F14C206DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 15:25:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="kgE9/imP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=grimler.se header.i=@grimler.se header.b="E6DKhDC+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726138AbgJFPUg (ORCPT
+        id S1726267AbgJFPZ5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Oct 2020 11:20:36 -0400
-Received: from m42-4.mailgun.net ([69.72.42.4]:36994 "EHLO m42-4.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725947AbgJFPUf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Oct 2020 11:20:35 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1601997634; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=VZtluZ0uMsNr7qvIzd32PfxEWPgcdsHHlyK7tcvavwo=; b=kgE9/imP06eGZ9UM/gQPS/rjd9ESWxlxF1EzFZYneOLplpCamYiLamMhST02I3CKmSXrjkoB
- vHliYm4Msv4APbGwxdYuZfsIB2/4U0/q0cC9j9FJgs1BMlHVTwKLFb9f7ZBmGhpQ9LCgR/cE
- qOCG8KLlcglI6nd1vZBvZny49e4=
-X-Mailgun-Sending-Ip: 69.72.42.4
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
- 5f7c8b413711fec7b1f359a9 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 06 Oct 2020 15:20:33
- GMT
-Sender: bgodavar=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 0706EC433F1; Tue,  6 Oct 2020 15:20:33 +0000 (UTC)
-Received: from bgodavar-linux.qualcomm.com (unknown [202.46.22.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C0344C433C8;
-        Tue,  6 Oct 2020 15:20:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org C0344C433C8
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, gubbaven@codeaurora.org,
-        abhishekpandit@chromium.org, rjliao@codeaurora.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Wait for timeout during suspend
-Date:   Tue,  6 Oct 2020 20:50:21 +0530
-Message-Id: <1601997621-12056-1-git-send-email-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Tue, 6 Oct 2020 11:25:57 -0400
+Received: from h04mx15.reliablemail.org ([185.76.67.208]:11511 "EHLO
+        h04mx15.reliablemail.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726137AbgJFPZ4 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Oct 2020 11:25:56 -0400
+X-Greylist: delayed 362 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Oct 2020 11:25:55 EDT
+X-Halon-Out: 61426548-07e7-11eb-ae9c-016faf663c66
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=grimler.se;
+         s=default; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+        Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=MpgtNIMYLlL4bB1Pb4In1NFBTR9GjbE0/qeHo4XPlDo=; b=E6DKhDC+rj92zygarEn5qPPl19
+        eyXiaab/lT+vWoZJSCI6BDwFmMfy2SlH1RRDKAj6ICEyDWtgCOytYHc0MRkmX2HDsDDxJr8wIOUFx
+        f8/xBXsL39m8WZTkVY9C0bNiONKEpmPFt/RyOhdLNQlDLdbreNK0h7sRJbebZUpJUQap5BKWmvJlS
+        6bvuhlefpNAdwLmAr8yKGAA8PGFjFdmIVlKmK2PiF7MVxjOQxJErGPkIS8pWQvOAwaKk6hrBWxEHk
+        u1eGlGRQrMf8UlDS4ZDifeHg/8fZ5C2lW2nG8Qwz9KzNsabcacXjMkKefycghDEu8daM5E7df04rZ
+        dAFK6Wlw==;
+From:   Henrik Grimler <henrik@grimler.se>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Henrik Grimler <henrik@grimler.se>
+Subject: [PATCH BlueZ v2] tools: fix forgotten index->mgmt_index renaming in btmgmt.c
+Date:   Tue,  6 Oct 2020 17:19:43 +0200
+Message-Id: <20201006151943.125484-1-henrik@grimler.se>
+X-Mailer: git-send-email 2.28.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-OutGoing-Spam-Status: No, score=-1.0
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cpsrv07.misshosting.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - grimler.se
+X-Get-Message-Sender-Via: cpsrv07.misshosting.com: authenticated_id: henrik@grimler.se
+X-Authenticated-Sender: cpsrv07.misshosting.com: henrik@grimler.se
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Commit 6523d168a7c1 ("tools/btmgmt: Port to use bt_shell") seem to
+have missed this.  When trying to compile bluez I get:
 
-Currently qca_suspend() is relied on IBS mechanism. During
-FW download and memory dump collections, IBS will be disabled.
-In those cases, driver will allow suspend and still uses the
-serdev port, which results to errors. Now added a wait timeout
-if suspend is triggered during FW download and memory collections.
+```
+tools/btmgmt.c:1229:34: warning: implicitly declaring library function 'index' \
+with type 'char *(const char *, int)' [-Wimplicit-function-declaration]
+                                config_info_rsp, UINT_TO_PTR(index), NULL)) {
+                                                             ^
+tools/btmgmt.c:1229:34: note: include the header <strings.h> or explicitly \
+provide a declaration for 'index'
+[...]
+aarch64-linux-android-ld: tools/btmgmt.o: in function `cmd_config':
+btmgmt.c:(.text+0x544): undefined reference to `index'
+aarch64-linux-android-ld: btmgmt.c:(.text+0x548): undefined reference to `index'
+```
 
-Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Probably only happens on system (like android) where the obsolete
+index function does not exist.
+
 ---
- drivers/bluetooth/hci_qca.c | 48 ++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 39 insertions(+), 9 deletions(-)
+Changes in v2:
+- Update commit message to make lint bot happy
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 3d13002..652a84c 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -50,6 +50,8 @@
- #define IBS_HOST_TX_IDLE_TIMEOUT_MS	2000
- #define CMD_TRANS_TIMEOUT_MS		100
- #define MEMDUMP_TIMEOUT_MS		8000
-+#define IBS_DISABLE_SSR_TIMEOUT_MS	(MEMDUMP_TIMEOUT_MS + 1000)
-+#define FW_DOWNLOAD_TIMEOUT_MS		3000
- 
- /* susclk rate */
- #define SUSCLK_RATE_32KHZ	32768
-@@ -68,12 +70,13 @@
- #define QCA_MEMDUMP_BYTE		0xFB
- 
- enum qca_flags {
--	QCA_IBS_ENABLED,
-+	QCA_IBS_DISABLED,
- 	QCA_DROP_VENDOR_EVENT,
- 	QCA_SUSPENDING,
- 	QCA_MEMDUMP_COLLECTION,
- 	QCA_HW_ERROR_EVENT,
--	QCA_SSR_TRIGGERED
-+	QCA_SSR_TRIGGERED,
-+	QCA_BT_OFF
- };
- 
- enum qca_capabilities {
-@@ -871,7 +874,7 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 	 * Out-Of-Band(GPIOs control) sleep is selected.
- 	 * Don't wake the device up when suspending.
- 	 */
--	if (!test_bit(QCA_IBS_ENABLED, &qca->flags) ||
-+	if (test_bit(QCA_IBS_DISABLED, &qca->flags) ||
- 	    test_bit(QCA_SUSPENDING, &qca->flags)) {
- 		skb_queue_tail(&qca->txq, skb);
- 		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
-@@ -1016,7 +1019,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 			 * the controller to send the dump is 8 seconds. let us
- 			 * start timer to handle this asynchronous activity.
- 			 */
--			clear_bit(QCA_IBS_ENABLED, &qca->flags);
-+			set_bit(QCA_IBS_DISABLED, &qca->flags);
- 			set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 			dump = (void *) skb->data;
- 			dump_size = __le32_to_cpu(dump->dump_size);
-@@ -1620,6 +1623,7 @@ static int qca_power_on(struct hci_dev *hdev)
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 	struct qca_serdev *qcadev;
-+	struct qca_data *qca = hu->priv;
- 	int ret = 0;
- 
- 	/* Non-serdev device usually is powered by external power
-@@ -1639,6 +1643,7 @@ static int qca_power_on(struct hci_dev *hdev)
- 		}
+ tools/btmgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index b0b837d34..228f94efa 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1213,7 +1213,7 @@ static void cmd_config(int argc, char **argv)
  	}
  
-+	clear_bit(QCA_BT_OFF, &qca->flags);
- 	return ret;
- }
- 
-@@ -1658,7 +1663,7 @@ static int qca_setup(struct hci_uart *hu)
- 		return ret;
- 
- 	/* Patch downloading has to be done without IBS mode */
--	clear_bit(QCA_IBS_ENABLED, &qca->flags);
-+	set_bit(QCA_IBS_DISABLED, &qca->flags);
- 
- 	/* Enable controller to do both LE scan and BR/EDR inquiry
- 	 * simultaneously.
-@@ -1707,7 +1712,7 @@ static int qca_setup(struct hci_uart *hu)
- 	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
- 			firmware_name);
- 	if (!ret) {
--		set_bit(QCA_IBS_ENABLED, &qca->flags);
-+		clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 		qca_debugfs_init(hdev);
- 		hu->hdev->hw_error = qca_hw_error;
- 		hu->hdev->cmd_timeout = qca_cmd_timeout;
-@@ -1813,7 +1818,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 	 * data in skb's.
- 	 */
- 	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
--	clear_bit(QCA_IBS_ENABLED, &qca->flags);
-+	set_bit(QCA_IBS_DISABLED, &qca->flags);
- 	qca_flush(hu);
- 	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
- 
-@@ -1833,6 +1838,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 	} else if (qcadev->bt_en) {
- 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	if (!mgmt_send(mgmt, MGMT_OP_READ_CONFIG_INFO, mgmt_index, 0, NULL,
+-				config_info_rsp, UINT_TO_PTR(index), NULL)) {
++				config_info_rsp, UINT_TO_PTR(mgmt_index), NULL)) {
+ 		error("Unable to send read_config_info cmd");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
  	}
-+
-+	set_bit(QCA_BT_OFF, &qca->flags);
- }
- 
- static int qca_power_off(struct hci_dev *hdev)
-@@ -2082,11 +2089,34 @@ static int __maybe_unused qca_suspend(struct device *dev)
- 	bool tx_pending = false;
- 	int ret = 0;
- 	u8 cmd;
-+	u32 wait_timeout = 0;
- 
- 	set_bit(QCA_SUSPENDING, &qca->flags);
- 
--	/* Device is downloading patch or doesn't support in-band sleep. */
--	if (!test_bit(QCA_IBS_ENABLED, &qca->flags))
-+	if (test_bit(QCA_BT_OFF, &qca->flags))
-+		return 0;
-+
-+	if (test_bit(QCA_IBS_DISABLED, &qca->flags)) {
-+		wait_timeout = test_bit(QCA_SSR_TRIGGERED, &qca->flags) ?
-+					IBS_DISABLE_SSR_TIMEOUT_MS :
-+					FW_DOWNLOAD_TIMEOUT_MS;
-+
-+		/* QCA_IBS_DISABLED flag is set to true, During FW download
-+		 * and during memory dump collection. It is reset to false,
-+		 * After FW download complete and after memory dump collections.
-+		 */
-+		wait_on_bit_timeout(&qca->flags, QCA_IBS_DISABLED,
-+			    TASK_UNINTERRUPTIBLE, msecs_to_jiffies(wait_timeout));
-+
-+		if (test_bit(QCA_IBS_DISABLED, &qca->flags)) {
-+			bt_dev_err(hu->hdev, "SSR or FW download time out");
-+			ret = -ETIMEDOUT;
-+			goto error;
-+		}
-+	}
-+
-+	/* After memory dump collection, Controller is powered off.*/
-+	if (test_bit(QCA_BT_OFF, &qca->flags))
- 		return 0;
- 
- 	cancel_work_sync(&qca->ws_awake_device);
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+2.28.0
 
