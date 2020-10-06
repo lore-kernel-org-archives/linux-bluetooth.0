@@ -2,252 +2,109 @@ Return-Path: <SRS0=Tswr=DN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97202C3279D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 20:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A04C4363D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 20:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C09B20760
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 20:35:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF2C9208B6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 20:52:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jf8tT1zv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727181AbgJFUfi (ORCPT
+        id S1727301AbgJFUwW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Oct 2020 16:35:38 -0400
-Received: from mga01.intel.com ([192.55.52.88]:60675 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbgJFUfi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Oct 2020 16:35:38 -0400
-IronPort-SDR: eY2e5ycKXdXsA9y1YPpJOWYIA9OhrC+V+LLkdR/BJTs3XTFDOx0NwRLVJsw57G18/NT2PFvkAC
- WQII6wbp1j/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9766"; a="182135916"
-X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
-   d="scan'208";a="182135916"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 13:35:38 -0700
-IronPort-SDR: 5xTRd9JXGVgJWk0UODU44uxy1mo+WQwKnkwFD/FnNaPwFIo0eCFYUoPZ5M3pY7uNeJyTgrcmtY
- 0Vzo5D2aRtvQ==
-X-IronPort-AV: E=Sophos;i="5.77,343,1596524400"; 
-   d="scan'208";a="388045818"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.212.243.2])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2020 13:35:37 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ] mesh: Re-arrange Join/Create/Import/Attach page saving
-Date:   Tue,  6 Oct 2020 13:35:29 -0700
-Message-Id: <20201006203529.424897-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.25.4
+        Tue, 6 Oct 2020 16:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38282 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727166AbgJFUwV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Oct 2020 16:52:21 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84DA8C061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 13:52:21 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id w12so81186qki.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 13:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=3kSBW4TWTNEYG3hjBkv2hebNoLPLQubvj7f21RxCF/I=;
+        b=jf8tT1zvqh+KGTIqlVm70fp7MWJAwbMZNy+KWNxq8rEoYQSRkKqqeRAhI+QZ+Kwa6g
+         rxqpgxts3Epn77h1izkG9IWq/HmDaaPXdEJa4ZuQRQ+Hx2vTZi79o5eaVruzAYDLk0dG
+         KjD0xLHDKfTHCdgfyoLQzX7nJgTCb0NEJo1TROpRJ9JwLXrRkJIN43apQsUNdd1baGbE
+         dbL0fVbcpW2ftcbSl1ADUJnutl9PiMn4CTpIrebx6DJb91Xrd82fxTRFJqX6tE49CaiD
+         6ZgQuuGgkGm+bCvsGh8Vaz39FyxVLIOKoWwYwI+j+WP+V72+ny01vd1dc4jwDvGIKMxD
+         RC3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=3kSBW4TWTNEYG3hjBkv2hebNoLPLQubvj7f21RxCF/I=;
+        b=gMEhsqxaDswktUT3S4dbbR+gWEjNbS4hJf7tJy2Jl4vXVoP8pZFsTQKzngzZAZybGb
+         7XCv0QhzDpIgABkaW5hmOA7WiXGy/mNmTo7vAtoy2p2wfuvr9MjcaQI1xxGC8JBxr+J5
+         0PLxCuoJTkJRpIjh6xv6JM9MnBPx2UvoY0RwI9DiA6OqPW4hePWW11h5FV0KhGFu6DHw
+         UIwBnGVYJKOa3eA4pN80Bdr/Y27Xsb0F4XhkANzts6VIXxI2RMaEQGU9Wnj5J+7YNEsk
+         T01i/uKj+V/6RgxK5FWIYJZiD0xKDMBP2pP5Wb1s6T3UBZMtJKq6mOfVT+4pes1x0WdG
+         mu2Q==
+X-Gm-Message-State: AOAM530yL+lKiLkVUV4hHKfnQxEydyXzdSoMLzeJb2lr4THwF2n4i0z6
+        KlIzXzKjU2vErB8l0s41CR+dIPrzyz0tfA==
+X-Google-Smtp-Source: ABdhPJxXwkMECPhPZ7Fs6FvQn603/k/GYYkWHeavg0p5Z2ueCzK4/xtmlpm1TSzQ7J1gv7GYW/qEkA==
+X-Received: by 2002:a05:620a:134f:: with SMTP id c15mr6988378qkl.316.1602017540421;
+        Tue, 06 Oct 2020 13:52:20 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.18.159])
+        by smtp.gmail.com with ESMTPSA id 185sm2553946qke.16.2020.10.06.13.52.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Oct 2020 13:52:20 -0700 (PDT)
+Message-ID: <5f7cd904.1c69fb81.b9019.0475@mx.google.com>
+Date:   Tue, 06 Oct 2020 13:52:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1495010758604200329=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: [BlueZ] mesh: Re-arrange Join/Create/Import/Attach page saving
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201006203529.424897-1-brian.gix@intel.com>
+References: <20201006203529.424897-1-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When an App is creating or attaching to a node, it first evaluates the
-validity of the Apps composition. Invalid compositions are not allowed
-to continue.  Valid compositions need to be saved, which means that
-create_node_config() must be called as part of Composition validation.
+--===============1495010758604200329==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=360483
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- mesh/node.c | 147 +++++++++++++++++++++++++++-------------------------
- 1 file changed, 75 insertions(+), 72 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 76d8fd6e9..4170fad58 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -857,6 +857,75 @@ static bool match_page(const void *a, const void *b)
- 	return page->page_num == page_num;
- }
- 
-+static void convert_node_to_storage(struct mesh_node *node,
-+					struct mesh_config_node *db_node)
-+{
-+	const struct l_queue_entry *entry;
-+
-+	db_node->cid = node->comp.cid;
-+	db_node->pid = node->comp.pid;
-+	db_node->vid = node->comp.vid;
-+	db_node->crpl = node->comp.crpl;
-+	db_node->modes.lpn = node->lpn;
-+	db_node->modes.proxy = node->proxy;
-+
-+	db_node->modes.friend = node->friend;
-+	db_node->modes.relay.state = node->relay.mode;
-+	db_node->modes.relay.cnt = node->relay.cnt;
-+	db_node->modes.relay.interval = node->relay.interval;
-+	db_node->modes.beacon = node->beacon;
-+
-+	db_node->ttl = node->ttl;
-+	db_node->seq_number = node->seq_number;
-+
-+	db_node->elements = l_queue_new();
-+
-+	entry = l_queue_get_entries(node->elements);
-+
-+	for (; entry; entry = entry->next) {
-+		struct node_element *ele = entry->data;
-+		struct mesh_config_element *db_ele;
-+
-+		db_ele = l_new(struct mesh_config_element, 1);
-+
-+		db_ele->index = ele->idx;
-+		db_ele->location = ele->location;
-+		db_ele->models = l_queue_new();
-+
-+		mesh_model_convert_to_storage(db_ele->models, ele->models);
-+
-+		l_queue_push_tail(db_node->elements, db_ele);
-+	}
-+
-+}
-+
-+static bool create_node_config(struct mesh_node *node, const uint8_t uuid[16])
-+{
-+	struct mesh_config_node db_node;
-+	const struct l_queue_entry *entry;
-+	const char *storage_dir;
-+
-+	convert_node_to_storage(node, &db_node);
-+	storage_dir = mesh_get_storage_dir();
-+	node->cfg = mesh_config_create(storage_dir, uuid, &db_node);
-+
-+	if (node->cfg)
-+		init_storage_dir(node);
-+
-+	/* Free temporarily allocated resources */
-+	entry = l_queue_get_entries(db_node.elements);
-+
-+	for (; entry; entry = entry->next) {
-+		struct mesh_config_element *db_ele = entry->data;
-+
-+		l_queue_destroy(db_ele->models, l_free);
-+	}
-+
-+	l_queue_destroy(db_node.elements, l_free);
-+
-+	return node->cfg != NULL;
-+}
-+
- bool node_set_comp(struct mesh_node *node, uint8_t page_num,
- 					const uint8_t *data, uint16_t len)
- {
-@@ -865,6 +934,9 @@ bool node_set_comp(struct mesh_node *node, uint8_t page_num,
- 	if (!node || len < MIN_COMP_SIZE)
- 		return false;
- 
-+	if (!node->cfg && !create_node_config(node, node->uuid))
-+		return false;
-+
- 	page = l_queue_remove_if(node->pages, match_page,
- 						L_UINT_TO_PTR(page_num));
- 
-@@ -1107,75 +1179,6 @@ fail:
- 	return false;
- }
- 
--static void convert_node_to_storage(struct mesh_node *node,
--					struct mesh_config_node *db_node)
--{
--	const struct l_queue_entry *entry;
--
--	db_node->cid = node->comp.cid;
--	db_node->pid = node->comp.pid;
--	db_node->vid = node->comp.vid;
--	db_node->crpl = node->comp.crpl;
--	db_node->modes.lpn = node->lpn;
--	db_node->modes.proxy = node->proxy;
--
--	db_node->modes.friend = node->friend;
--	db_node->modes.relay.state = node->relay.mode;
--	db_node->modes.relay.cnt = node->relay.cnt;
--	db_node->modes.relay.interval = node->relay.interval;
--	db_node->modes.beacon = node->beacon;
--
--	db_node->ttl = node->ttl;
--	db_node->seq_number = node->seq_number;
--
--	db_node->elements = l_queue_new();
--
--	entry = l_queue_get_entries(node->elements);
--
--	for (; entry; entry = entry->next) {
--		struct node_element *ele = entry->data;
--		struct mesh_config_element *db_ele;
--
--		db_ele = l_new(struct mesh_config_element, 1);
--
--		db_ele->index = ele->idx;
--		db_ele->location = ele->location;
--		db_ele->models = l_queue_new();
--
--		mesh_model_convert_to_storage(db_ele->models, ele->models);
--
--		l_queue_push_tail(db_node->elements, db_ele);
--	}
--
--}
--
--static bool create_node_config(struct mesh_node *node, const uint8_t uuid[16])
--{
--	struct mesh_config_node db_node;
--	const struct l_queue_entry *entry;
--	const char *storage_dir;
--
--	convert_node_to_storage(node, &db_node);
--	storage_dir = mesh_get_storage_dir();
--	node->cfg = mesh_config_create(storage_dir, uuid, &db_node);
--
--	if (node->cfg)
--		init_storage_dir(node);
--
--	/* Free temporarily allocated resources */
--	entry = l_queue_get_entries(db_node.elements);
--
--	for (; entry; entry = entry->next) {
--		struct mesh_config_element *db_ele = entry->data;
--
--		l_queue_destroy(db_ele->models, l_free);
--	}
--
--	l_queue_destroy(db_node.elements, l_free);
--
--	return node->cfg != NULL;
--}
--
- static bool get_app_properties(struct mesh_node *node, const char *path,
- 					struct l_dbus_message_iter *properties)
- {
-@@ -1516,7 +1519,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 			goto fail;
- 		}
- 
--		if (!create_node_config(node, node->uuid))
-+		if (!node->cfg && !create_node_config(node, node->uuid))
- 			goto fail;
- 
- 		req->join_ready_cb(node, node->agent);
-@@ -1524,7 +1527,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		return;
- 
- 	case REQUEST_TYPE_IMPORT:
--		if (!create_node_config(node, node->uuid))
-+		if (!node->cfg && !create_node_config(node, node->uuid))
- 			goto fail;
- 
- 		import = req->import;
-@@ -1540,7 +1543,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		return;
- 
- 	case REQUEST_TYPE_CREATE:
--		if (!create_node_config(node, node->uuid))
-+		if (!node->cfg && !create_node_config(node, node->uuid))
- 			goto fail;
- 
- 		/* Generate device and primary network keys */
--- 
-2.25.4
 
+--===============1495010758604200329==--
