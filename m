@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CF2C4363D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 21:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F381C41604
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 21:52:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0EA9208B6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 21:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 105252083B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Oct 2020 21:52:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="D0CViFWi"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="j8ntnkFT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727591AbgJFVwI (ORCPT
+        id S1726986AbgJFVwp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Oct 2020 17:52:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47516 "EHLO
+        Tue, 6 Oct 2020 17:52:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726730AbgJFVwG (ORCPT
+        with ESMTP id S1726810AbgJFVwp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Oct 2020 17:52:06 -0400
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EF64C061755
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 14:52:06 -0700 (PDT)
-Received: by mail-vs1-xe41.google.com with SMTP id u74so73914vsc.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 14:52:06 -0700 (PDT)
+        Tue, 6 Oct 2020 17:52:45 -0400
+Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E964C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 14:52:45 -0700 (PDT)
+Received: by mail-vs1-xe42.google.com with SMTP id h2so52410vso.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 14:52:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=+YeppZLiu9tLWSM88xn2T8mZXPgzIZZbq1gb5kP8VyQ=;
-        b=D0CViFWicaJSRMBsvFS4k9lLoXmgiJv4f+Oe3aEX6L4BH+k+fQhTgdb9RxiwKym9Ty
-         AkO2ovhUXu5tvyDDEePWlNObPVa79S2+YzukhMfrJ9jZf1XRLwO3+RjZXEfIgXAWezfA
-         xLAB3c+qvgTS9/AFEvykcnXHHS93FRYNsfSFo=
+        bh=5fBB2dN7PdVdzeo2GaMVbE6RJ04Kn9xtAgetaWZ+zY8=;
+        b=j8ntnkFTswigoDlM2kyeqSJnc2fj4esZFkzvc+ruGDYe/EKQ32ogWQakV7iq525v7z
+         bR0JIdfXxMtuGKKbkC97ikiGOh7EOcbTBoXZXD1aIuwSEEFV/PdWgWZmSjmtXw6A172S
+         AShlaJNKVdo9XefO6oV2tFPa9wc1RaopZv+K4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+YeppZLiu9tLWSM88xn2T8mZXPgzIZZbq1gb5kP8VyQ=;
-        b=YpcKPJQ7WAGo+STc1d1X7vQxclSsrCuUbgtKUd9T4FsF+AkzooWDsrR5MM1FDyNfY7
-         12nGmoTrSyafL+LiilzGBssC1PjE6GDAwLUBTJM2zRJi+3EI7C1qGrcG0aWago3ZaJgL
-         jpTuZxNVriXv6MzJPo9s1ZuedPnbQJrKVI59sMGdD7PNE9IbjlzYHI31p+rK34zG513r
-         PbIgk9Vvk57aC2TsgRwLif6E1SWOabVCFszfkC90OjMdbuUrlh5Tx5zhmpyN6/xQDDKY
-         Wrl8/Kx1GzHjYyMJxCZe+ubGl/BPLsuXl7h01pgnoW9m/9yEQKDYNiEK8ypqOH7L2hZs
-         W+iw==
-X-Gm-Message-State: AOAM533XY219OvOY7FIE9q947j95ePa0k7U2/FaAMYNjbXNCjxijzbzT
-        gpgTiCzCgiN6tAQVeSLownctPtJMqz8KYyrluDPfNA==
-X-Google-Smtp-Source: ABdhPJzae7J4+h5AoXghKCrPweh+Hv6Ybexc6cVhxtGSicYb/I/1mNGUDtRerOoUkrWc9T1RPJH+P6YO7cOVFUSgGYE=
-X-Received: by 2002:a67:8b45:: with SMTP id n66mr72042vsd.45.1602021125669;
- Tue, 06 Oct 2020 14:52:05 -0700 (PDT)
+        bh=5fBB2dN7PdVdzeo2GaMVbE6RJ04Kn9xtAgetaWZ+zY8=;
+        b=BKBiriEbtAZnUqt3wxyeQ6LPhUBiip6ETzcX7GzUrfWLKex/uOizsYPA5SID3QBaOK
+         ROzrqL9w/x/05Z+a7oz0Si3BhQEChxhYf8lZ8kt0c6Mb5GkkhKWTDjN9BuotfFeL8Wm/
+         gBIP1xxUqYeojFbPEgvYWHD+fGZTuTzuw0Jws96gEBL9KhlhEJZcmAlpcShui6K+gUOO
+         13UPnb42mgZe2zdP+IGY0AJGloq8rm+4hqkLFYyxU0qm9zXRYd+D4L4jiMbSHm57EqPG
+         5f2Ly5FJ7Z6Yh3Yrxo4wB3jvZbE3KmIMqT7YcESO0zdNToNG627hZKh5XxuegkLbmTRe
+         HrYA==
+X-Gm-Message-State: AOAM530lz6j9JxNB09FUePYm98x2pZW7fmJ3yNadp8kjGeGYeWFH2B9d
+        sqPBvyXtK/WYDbgAm6ey1jSEO7ymeccJatNosHbp2Q==
+X-Google-Smtp-Source: ABdhPJzneCJCHYv0M1DrM76Ar6uigcbc3WG3NIajdN24GCsJGLRUKR6frfTDFPPkxH5b41lK85jBVXzoSJwinIYY7OI=
+X-Received: by 2002:a67:f857:: with SMTP id b23mr57260vsp.10.1602021164282;
+ Tue, 06 Oct 2020 14:52:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <1601965767-18796-1-git-send-email-bgodavar@codeaurora.org>
-In-Reply-To: <1601965767-18796-1-git-send-email-bgodavar@codeaurora.org>
+References: <1601997621-12056-1-git-send-email-bgodavar@codeaurora.org>
+In-Reply-To: <1601997621-12056-1-git-send-email-bgodavar@codeaurora.org>
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Tue, 6 Oct 2020 14:51:54 -0700
-Message-ID: <CANFp7mXYsK=+aAmHoNwTnE3+b0HbTa+k1NQb_1MD9FaLBYXdug@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enhance retry logic in qca_setup
+Date:   Tue, 6 Oct 2020 14:52:33 -0700
+Message-ID: <CANFp7mWU6DEuHxQqq+hnWfCnqrJLo=kY41J+uM7AfjEpTnzH4A@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Wait for timeout during suspend
 To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Matthias Kaehlcke <mka@chromium.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org,
+        Hemantg <hemantg@codeaurora.org>, linux-arm-msm@vger.kernel.org,
         Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>,
         Rocky Liao <rjliao@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -76,13 +75,16 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-On Mon, Oct 5, 2020 at 11:33 PM Balakrishna Godavarthi
+On Tue, Oct 6, 2020 at 8:20 AM Balakrishna Godavarthi
 <bgodavar@codeaurora.org> wrote:
 >
-> Currently driver only retries to download FW if FW downloading
-> is failed. Sometimes observed command timeout for version request
-> command, if this happen on some platforms during boot time, then
-> a reboot is needed to turn ON BT. Instead to avoid a reboot, now
-> extended retry logic for version request command too.
+> From: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 >
+> Currently qca_suspend() is relied on IBS mechanism. During
+> FW download and memory dump collections, IBS will be disabled.
+> In those cases, driver will allow suspend and still uses the
+> serdev port, which results to errors. Now added a wait timeout
+> if suspend is triggered during FW download and memory collections.
+>
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
