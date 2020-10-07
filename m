@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC5FC4363D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92083C4363D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5E3320739
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CEC520739
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 00:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="etBcQmvn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IbXBCxUF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbgJGAO1 (ORCPT
+        id S1726645AbgJGAOn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Oct 2020 20:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41098 "EHLO
+        Tue, 6 Oct 2020 20:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725972AbgJGAO1 (ORCPT
+        with ESMTP id S1725972AbgJGAOn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Oct 2020 20:14:27 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35EEC061755
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 17:14:25 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id c6so93881plr.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 17:14:25 -0700 (PDT)
+        Tue, 6 Oct 2020 20:14:43 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D75FC061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 17:14:43 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id d23so98279pll.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 17:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/ABTFSGk9V32zqKUi/5xT1u7cfCU5y3189CX+vIYwQ=;
-        b=etBcQmvna8QHMXZQXV0qGeR7401xN3QNBZ8AOieKPLmY0ZoCi7UQxNtKWBmOcJu7r+
-         PJE6+Q1LfCKGRpsH+kzhjD2IPWhrhX8UPjeFJjtk2zCNGL/MP7CmbjSZRtsJtc9kxYmG
-         JwyC1k8Ea1c2jFnkgy5ajfz7yOpiJncuOa2Dw=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=+r599FHAhWvPt7WJozfeRu96qgvTR2YS5E9U7hx3KSk=;
+        b=IbXBCxUF2X/WNv5j4eHCh4QGCK13Q31KDL5En208LHQ7c4RobP2FzkozeC8p3JQJ1n
+         xvZ64uVOitQ0YY5K91dNKEhonMD6jo/qJ3fCoGz/ORLje0eucWYFWDiXxwu4h+OpSL5c
+         zsexF9Asc2Qa0teaon3cvW/AwAgUyPGcKBSVk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/ABTFSGk9V32zqKUi/5xT1u7cfCU5y3189CX+vIYwQ=;
-        b=KrNf9Wuzbemvs/Jb2zUSZB5dgIW094hAdOdBBK46WIvKMC8sJPuG4Q85UnYGlD9Y8n
-         9W7oVcX/6dspRPY3cJ45PJx1S9cXxO7c1OBaaj3geHmzl+ovumy6BKrZNZNyeDIr+O/Q
-         L8LdWw/+zxHHfIP9UbJRNLcu6uymM5fnr6GYaa8bWvf/wTZKsBoVGI5dWhWKqDzOABG9
-         N4awN+LjWdQe7EIaRRFJ/zkMHMLxy57bLL2IBjwODWqvxrNZJdKL81mbsNLpxJeeRtsZ
-         G2VrW8dwxTFvg87z/+Kd0v6sKYHVyLQ9Ad7cFQ/qR9OwIXj/zEqqJ5OXMZRKunzBUMHE
-         uo3g==
-X-Gm-Message-State: AOAM533KHdP1z5JnW35Wiu7+Wu9x2myH5RE49WR9ZROuQYSAFhtikjTj
-        B6JIodWtUwXaG5zzZAhxZSyo8bfB0S0cLA==
-X-Google-Smtp-Source: ABdhPJzWYKDbosUOoha79wAVx8dE20jl19I7CkovJW05YEIa/mXTcAQ5oJOChakLR+GcqZmhcpsR6Q==
-X-Received: by 2002:a17:90a:4b42:: with SMTP id o2mr476695pjl.205.1602029664782;
-        Tue, 06 Oct 2020 17:14:24 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=+r599FHAhWvPt7WJozfeRu96qgvTR2YS5E9U7hx3KSk=;
+        b=W6gHQoFXj0OB+rhrCXD0C3B44x9iay/r5eqLAJV5x0rWPGcdJ8lCpLaUxMwIkXiKZD
+         vXXgXJoUUio3EnJlXWHwhJpf6wVYaS6hcBnGutRucdXfpReWOIhZdQVqc2ViFV4lqftM
+         08ENEEg4Ui2gwtGDHD/4do67Yjjz4yBjyLzLrbVy+WrDC077QFJTVtQg9erKCrmvtPES
+         i716sv3IvSTiqPZy+R3JjlNv5PFGh8i8cwIbAVRHsElFrPVzlX8tRA1MV8tx2tv9GMG4
+         PGOPePFh6E5Qt0b5RNY9ynRmSFfITD63fpey12Z1JMYsnQYWMBJPOsQuLUnAaEKR9wvd
+         7HDw==
+X-Gm-Message-State: AOAM532PquHZ2yDYkUchXnM2wfgKu1wNYPDpd3VLK2gqtkMxlNHsYzeV
+        5Lj0twDZPoALFZRTdlYg9rj6DeKqN6U87Q==
+X-Google-Smtp-Source: ABdhPJxuEbOZ1zXOOhIcU4baV0XKqLAUulsC2slqyCAoHxdmB7udvT/ZFzDfywdkkuD49FkroawGaw==
+X-Received: by 2002:a17:902:be0c:b029:d2:8ceb:f39c with SMTP id r12-20020a170902be0cb02900d28cebf39cmr389200pls.71.1602029682225;
+        Tue, 06 Oct 2020 17:14:42 -0700 (PDT)
 Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id s13sm329722pgo.56.2020.10.06.17.14.23
+        by smtp.gmail.com with ESMTPSA id s13sm329722pgo.56.2020.10.06.17.14.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Oct 2020 17:14:24 -0700 (PDT)
+        Tue, 06 Oct 2020 17:14:41 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
@@ -64,425 +64,430 @@ Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Alain Michaud <alainm@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Manish Mandlik <mmandlik@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v6 1/6] adv_monitor: Implement RSSI Filter logic for background scanning
-Date:   Tue,  6 Oct 2020 17:14:06 -0700
-Message-Id: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+        Miao-chen Chou <mcchou@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [BlueZ PATCH v6 2/6] adv_monitor: Implement Adv matching based on stored monitors
+Date:   Tue,  6 Oct 2020 17:14:08 -0700
+Message-Id: <20201006171333.BlueZ.v6.2.I578ae5e76fcf7243206a27d4f5a25783662a5f14@changeid>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+References: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Manish Mandlik <mmandlik@google.com>
-
-This patch implements the RSSI Filter logic for background scanning.
+This implements create an entry point in adapter to start the matching of
+Adv based on all monitors and invoke the RSSI tracking for Adv reporting.
 
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Howard Chung <howardchung@google.com>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 ---
 
-(no changes since v5)
+Changes in v6:
+- Fix the termination condition of AD data paring and remove unnecessary
+length check
 
 Changes in v5:
-- Remove the use of unit test in commit message
+- Remove unittest helper functions
 
 Changes in v3:
-- Fix commit message
+- Remove unused variables
+- Fix signature of queue_find()
 
- doc/advertisement-monitor-api.txt |   5 +
- src/adapter.c                     |   1 +
- src/adv_monitor.c                 | 286 +++++++++++++++++++++++++++++-
- src/adv_monitor.h                 |   4 +
- 4 files changed, 292 insertions(+), 4 deletions(-)
+ src/adapter.c     |  35 ++++++--
+ src/adv_monitor.c | 219 ++++++++++++++++++++++++++++++++++++++++------
+ src/adv_monitor.h |  12 +++
+ 3 files changed, 234 insertions(+), 32 deletions(-)
 
-diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
-index e09b6fd25..92c8ffc38 100644
---- a/doc/advertisement-monitor-api.txt
-+++ b/doc/advertisement-monitor-api.txt
-@@ -70,6 +70,11 @@ Properties	string Type [read-only]
- 			dBm indicates unset. The valid range of a timer is 1 to
- 			300 seconds while 0 indicates unset.
- 
-+			If the peer device advertising interval is greater than the
-+			HighRSSIThresholdTimer, the device will never be found. Similarly,
-+			if it is greater than LowRSSIThresholdTimer, the device will be
-+			considered as lost. Consider configuring these values accordingly.
-+
- 		array{(uint8, uint8, array{byte})} Patterns [read-only, optional]
- 
- 			If Type is set to 0x01, this must exist and has at least
 diff --git a/src/adapter.c b/src/adapter.c
-index c0053000a..6d0114a6b 100644
+index 6d0114a6b..fdd9b3808 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1214,6 +1214,7 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
- 	adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
+@@ -6601,6 +6601,15 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 	bool name_known, discoverable;
+ 	char addr[18];
+ 	bool duplicate = false;
++	GSList *matched_monitors;
++
++	/* During the background scanning, update the device only when the data
++	 * match at least one Adv monitor
++	 */
++	matched_monitors = btd_adv_monitor_content_filter(
++				adapter->adv_monitor_manager, data, data_len);
++	if (!adapter->discovering && !matched_monitors)
++		return;
  
- 	adapter->devices = g_slist_remove(adapter->devices, dev);
-+	btd_adv_monitor_device_remove(adapter->adv_monitor_manager, dev);
+ 	memset(&eir_data, 0, sizeof(eir_data));
+ 	eir_parse(&eir_data, data, data_len);
+@@ -6646,18 +6655,22 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 		device_store_cached_name(dev, eir_data.name);
  
- 	adapter->discovery_found = g_slist_remove(adapter->discovery_found,
- 									dev);
+ 	/*
+-	 * Only skip devices that are not connected, are temporary and there
+-	 * is no active discovery session ongoing.
++	 * Only skip devices that are not connected, are temporary, and there
++	 * is no active discovery session ongoing and no matched Adv monitors
+ 	 */
+-	if (!btd_device_is_connected(dev) && (device_is_temporary(dev) &&
+-						 !adapter->discovery_list)) {
++	if (!btd_device_is_connected(dev) &&
++		(device_is_temporary(dev) && !adapter->discovery_list) &&
++		!matched_monitors) {
+ 		eir_data_free(&eir_data);
+ 		return;
+ 	}
+ 
+-	/* Don't continue if not discoverable or if filter don't match */
+-	if (!discoverable || (adapter->filtered_discovery &&
+-	    !is_filter_match(adapter->discovery_list, &eir_data, rssi))) {
++	/* If there is no matched Adv monitors, don't continue if not
++	 * discoverable or if active discovery filter don't match.
++	 */
++	if (!matched_monitors && (!discoverable ||
++		(adapter->filtered_discovery && !is_filter_match(
++				adapter->discovery_list, &eir_data, rssi)))) {
+ 		eir_data_free(&eir_data);
+ 		return;
+ 	}
+@@ -6714,6 +6727,14 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 
+ 	eir_data_free(&eir_data);
+ 
++	/* After the device is updated, notify the matched Adv monitors */
++	if (matched_monitors) {
++		btd_adv_monitor_notify_monitors(adapter->adv_monitor_manager,
++						dev, rssi, matched_monitors);
++		g_slist_free(matched_monitors);
++		matched_monitors = NULL;
++	}
++
+ 	/*
+ 	 * Only if at least one client has requested discovery, maintain
+ 	 * list of found devices and name confirming for legacy devices.
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index e441a5566..31ed30a00 100644
+index 31ed30a00..fcb127cd4 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -26,6 +26,7 @@
- 
- #include "adapter.h"
- #include "dbus-common.h"
-+#include "device.h"
+@@ -29,15 +29,12 @@
+ #include "device.h"
  #include "log.h"
  #include "src/error.h"
- #include "src/shared/ad.h"
-@@ -35,6 +36,8 @@
+-#include "src/shared/ad.h"
+ #include "src/shared/mgmt.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
  
  #include "adv_monitor.h"
  
-+static void monitor_device_free(void *data);
-+
+-static void monitor_device_free(void *data);
+-
  #define ADV_MONITOR_INTERFACE		"org.bluez.AdvertisementMonitor1"
  #define ADV_MONITOR_MGR_INTERFACE	"org.bluez.AdvertisementMonitorManager1"
  
-@@ -95,15 +98,36 @@ struct adv_monitor {
- 
- 	enum monitor_state state;	/* MONITOR_STATE_* */
- 
--	int8_t high_rssi;		/* high RSSI threshold */
--	uint16_t high_rssi_timeout;	/* high RSSI threshold timeout */
--	int8_t low_rssi;		/* low RSSI threshold */
--	uint16_t low_rssi_timeout;	/* low RSSI threshold timeout */
-+	int8_t high_rssi;		/* High RSSI threshold */
-+	uint16_t high_rssi_timeout;	/* High RSSI threshold timeout */
-+	int8_t low_rssi;		/* Low RSSI threshold */
-+	uint16_t low_rssi_timeout;	/* Low RSSI threshold timeout */
-+	struct queue *devices;		/* List of adv_monitor_device objects */
- 
- 	enum monitor_type type;		/* MONITOR_TYPE_* */
- 	struct queue *patterns;
+@@ -84,7 +81,7 @@ enum monitor_state {
+ 	MONITOR_STATE_HONORED,	/* Accepted by kernel */
  };
  
-+/* Some data like last_seen, timer/timeout values need to be maintained
-+ * per device. struct adv_monitor_device maintains such data.
-+ */
-+struct adv_monitor_device {
-+	struct adv_monitor *monitor;
-+	struct btd_device *device;
+-struct pattern {
++struct btd_adv_monitor_pattern {
+ 	uint8_t ad_type;
+ 	uint8_t offset;
+ 	uint8_t length;
+@@ -133,6 +130,23 @@ struct app_match_data {
+ 	const char *path;
+ };
+ 
++struct adv_content_filter_info {
++	uint8_t eir_len;
++	const uint8_t *eir;
 +
-+	time_t high_rssi_first_seen;	/* Start time when RSSI climbs above
-+					 * the high RSSI threshold
-+					 */
-+	time_t low_rssi_first_seen;	/* Start time when RSSI drops below
-+					 * the low RSSI threshold
-+					 */
-+	time_t last_seen;		/* Time when last Adv was received */
-+	bool device_found;		/* State of the device - lost/found */
-+	guint device_lost_timer;	/* Timer to track if the device goes
-+					 * offline/out-of-range
-+					 */
++	bool matched;			/* Intermediate state per monitor */
++	GSList *matched_monitors;	/* List of matched monitors */
 +};
 +
- struct app_match_data {
- 	const char *owner;
- 	const char *path;
-@@ -150,6 +174,9 @@ static void monitor_free(void *data)
- 	g_dbus_proxy_unref(monitor->proxy);
- 	g_free(monitor->path);
- 
-+	queue_destroy(monitor->devices, monitor_device_free);
-+	monitor->devices = NULL;
++struct adv_rssi_filter_info {
++	struct btd_device *device;
++	int8_t rssi;
++};
 +
- 	queue_destroy(monitor->patterns, pattern_free);
++static void monitor_device_free(void *data);
++static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
++					struct btd_device *device, int8_t rssi);
++
+ const struct adv_monitor_type {
+ 	enum monitor_type type;
+ 	const char *name;
+@@ -155,7 +169,7 @@ static void app_reply_msg(struct adv_monitor_app *app, DBusMessage *reply)
+ /* Frees a pattern */
+ static void pattern_free(void *data)
+ {
+-	struct pattern *pattern = data;
++	struct btd_adv_monitor_pattern *pattern = data;
  
- 	free(monitor);
-@@ -248,6 +275,7 @@ static struct adv_monitor *monitor_new(struct adv_monitor_app *app,
- 	monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
- 	monitor->low_rssi = ADV_MONITOR_UNSET_RSSI;
- 	monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
-+	monitor->devices = queue_new();
+ 	if (!pattern)
+ 		return;
+@@ -435,6 +449,36 @@ failed:
+ 	return false;
+ }
  
- 	monitor->type = MONITOR_TYPE_NONE;
- 	monitor->patterns = NULL;
-@@ -923,3 +951,253 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
++/* Allocates and initiates a pattern with the given content */
++static struct btd_adv_monitor_pattern *pattern_create(
++	uint8_t ad_type, uint8_t offset, uint8_t length, const uint8_t *value)
++{
++	struct btd_adv_monitor_pattern *pattern;
++
++	if (offset > BT_AD_MAX_DATA_LEN - 1)
++		return NULL;
++
++	if ((ad_type > BT_AD_3D_INFO_DATA &&
++		ad_type != BT_AD_MANUFACTURER_DATA) ||
++		ad_type < BT_AD_FLAGS) {
++		return NULL;
++	}
++
++	if (!value || !length || offset + length > BT_AD_MAX_DATA_LEN)
++		return NULL;
++
++	pattern = new0(struct btd_adv_monitor_pattern, 1);
++	if (!pattern)
++		return NULL;
++
++	pattern->ad_type = ad_type;
++	pattern->offset = offset;
++	pattern->length = length;
++	memcpy(pattern->value, value, pattern->length);
++
++	return pattern;
++}
++
+ /* Retrieves Patterns from the remote Adv Monitor object, verifies the values
+  * and update the local Adv Monitor
+  */
+@@ -464,7 +508,7 @@ static bool parse_patterns(struct adv_monitor *monitor, const char *path)
+ 		int value_len;
+ 		uint8_t *value;
+ 		uint8_t offset, ad_type;
+-		struct pattern *pattern;
++		struct btd_adv_monitor_pattern *pattern;
+ 		DBusMessageIter struct_iter, value_iter;
  
+ 		dbus_message_iter_recurse(&array_iter, &struct_iter);
+@@ -496,28 +540,10 @@ static bool parse_patterns(struct adv_monitor *monitor, const char *path)
+ 		dbus_message_iter_get_fixed_array(&value_iter, &value,
+ 							&value_len);
+ 
+-		// Verify the values
+-		if (offset > BT_AD_MAX_DATA_LEN - 1)
+-			goto failed;
+-
+-		if ((ad_type > BT_AD_3D_INFO_DATA &&
+-			ad_type != BT_AD_MANUFACTURER_DATA) ||
+-			ad_type < BT_AD_FLAGS) {
+-			goto failed;
+-		}
+-
+-		if (!value || value_len <= 0 || value_len > BT_AD_MAX_DATA_LEN)
+-			goto failed;
+-
+-		pattern = new0(struct pattern, 1);
++		pattern = pattern_create(ad_type, offset, value_len, value);
+ 		if (!pattern)
+ 			goto failed;
+ 
+-		pattern->ad_type = ad_type;
+-		pattern->offset = offset;
+-		pattern->length = value_len;
+-		memcpy(pattern->value, value, pattern->length);
+-
+ 		queue_push_tail(monitor->patterns, pattern);
+ 
+ 		dbus_message_iter_next(&array_iter);
+@@ -952,6 +978,149 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
  	manager_destroy(manager);
  }
-+
-+/* Matches a device based on btd_device object */
-+static bool monitor_device_match(const void *a, const void *b)
+ 
++static bool pattern_match(const uint8_t *eir, uint8_t eir_len,
++				const struct btd_adv_monitor_pattern *pattern)
 +{
-+	const struct adv_monitor_device *dev = a;
-+	const struct btd_device *device = b;
++	const uint8_t *data;
++	uint8_t idx = 0;
++	uint8_t field_len, data_len, data_type;
 +
-+	if (!dev)
-+		return false;
++	while (idx < eir_len - 1) {
++		field_len = eir[0];
 +
-+	if (dev->device != device)
-+		return false;
++		/* Check for the end of EIR */
++		if (field_len == 0)
++			break;
 +
-+	return true;
-+}
++		idx += field_len + 1;
 +
-+/* Frees a monitor device object */
-+static void monitor_device_free(void *data)
-+{
-+	struct adv_monitor_device *dev = data;
++		/* Do not continue filtering if got incorrect length */
++		if (idx > eir_len)
++			break;
 +
-+	if (!dev)
-+		return;
++		data = &eir[2];
++		data_type = eir[1];
++		data_len = field_len - 1;
 +
-+	if (dev->device_lost_timer) {
-+		g_source_remove(dev->device_lost_timer);
-+		dev->device_lost_timer = 0;
++		eir += field_len + 1;
++
++		if (data_type != pattern->ad_type)
++			continue;
++
++		if (data_len < pattern->offset + pattern->length)
++			continue;
++
++		if (!memcmp(data + pattern->offset, pattern->value,
++				pattern->length))
++			return true;
 +	}
 +
-+	dev->monitor = NULL;
-+	dev->device = NULL;
-+
-+	g_free(dev);
++	return false;
 +}
 +
-+/* Removes a device from monitor->devices list */
-+static void remove_device_from_monitor(void *data, void *user_data)
++/* Processes the content matching based on a pattern */
++static void adv_match_per_pattern(void *data, void *user_data)
++{
++	struct btd_adv_monitor_pattern *pattern = data;
++	struct adv_content_filter_info *info = user_data;
++
++	if (!pattern || info->matched)
++		return;
++
++	info->matched = pattern_match(info->eir, info->eir_len, pattern);
++}
++
++/* Processes the content matching based pattern(s) of a monitor */
++static void adv_match_per_monitor(void *data, void *user_data)
 +{
 +	struct adv_monitor *monitor = data;
-+	struct btd_device *device = user_data;
-+	struct adv_monitor_device *dev = NULL;
++	struct adv_content_filter_info *info = user_data;
 +
-+	if (!monitor)
++	if (!monitor && monitor->state != MONITOR_STATE_HONORED)
 +		return;
 +
-+	dev = queue_remove_if(monitor->devices, monitor_device_match, device);
-+	if (dev) {
-+		DBG("Device removed from the Adv Monitor at path %s",
-+		    monitor->path);
-+		monitor_device_free(dev);
++	/* Reset the intermediate matched status */
++	info->matched = false;
++
++	if (monitor->type == MONITOR_TYPE_OR_PATTERNS) {
++		queue_foreach(monitor->patterns, adv_match_per_pattern, info);
++		if (info->matched)
++			goto matched;
 +	}
++
++	return;
++
++matched:
++	info->matched_monitors = g_slist_prepend(info->matched_monitors,
++							monitor);
 +}
 +
-+/* Removes a device from every monitor in an app */
-+static void remove_device_from_app(void *data, void *user_data)
++/* Processes the content matching for the monitor(s) of an app */
++static void adv_match_per_app(void *data, void *user_data)
 +{
 +	struct adv_monitor_app *app = data;
-+	struct btd_device *device = user_data;
 +
 +	if (!app)
 +		return;
 +
-+	queue_foreach(app->monitors, remove_device_from_monitor, device);
++	queue_foreach(app->monitors, adv_match_per_monitor, user_data);
 +}
 +
-+/* Removes a device from every monitor in all apps */
-+void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
-+				   struct btd_device *device)
++/* Processes the content matching for every app without RSSI filtering and
++ * notifying monitors. The caller is responsible of releasing the memory of the
++ * list but not the data.
++ * Returns the list of monitors whose content match eir.
++ */
++GSList *btd_adv_monitor_content_filter(struct btd_adv_monitor_manager *manager,
++					const uint8_t *eir, uint8_t eir_len)
 +{
-+	if (!manager || !device)
-+		return;
++	struct adv_content_filter_info info;
 +
-+	queue_foreach(manager->apps, remove_device_from_app, device);
-+}
-+
-+/* Creates a device object to track the per-device information */
-+static struct adv_monitor_device *monitor_device_create(
-+			struct adv_monitor *monitor,
-+			struct btd_device *device)
-+{
-+	struct adv_monitor_device *dev = NULL;
-+
-+	dev = g_try_malloc0(sizeof(struct adv_monitor_device));
-+	if (!dev)
++	if (!manager || !eir || !eir_len)
 +		return NULL;
 +
-+	dev->monitor = monitor;
-+	dev->device = device;
++	info.eir_len = eir_len;
++	info.eir = eir;
++	info.matched_monitors = NULL;
 +
-+	queue_push_tail(monitor->devices, dev);
++	queue_foreach(manager->apps, adv_match_per_app, &info);
 +
-+	return dev;
++	return info.matched_monitors;
 +}
 +
-+/* Includes found/lost device's object path into the dbus message */
-+static void report_device_state_setup(DBusMessageIter *iter, void *user_data)
++/* Wraps adv_monitor_filter_rssi() to processes the content-matched monitor with
++ * RSSI filtering and notifies it on device found/lost event
++ */
++static void monitor_filter_rssi(gpointer a, gpointer b)
 +{
-+	const char *path = device_get_path(user_data);
++	struct adv_monitor *monitor = a;
++	struct adv_rssi_filter_info *info = b;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+}
-+
-+/* Handles a situation where the device goes offline/out-of-range */
-+static gboolean handle_device_lost_timeout(gpointer user_data)
-+{
-+	struct adv_monitor_device *dev = user_data;
-+	struct adv_monitor *monitor = dev->monitor;
-+	time_t curr_time = time(NULL);
-+
-+	DBG("Device Lost timeout triggered for device %p "
-+	    "for the Adv Monitor at path %s", dev->device, monitor->path);
-+
-+	dev->device_lost_timer = 0;
-+
-+	if (dev->device_found && dev->last_seen) {
-+		/* We were tracking for the Low RSSI filter. Check if there is
-+		 * any Adv received after the timeout function is invoked.
-+		 * If not, report the Device Lost event.
-+		 */
-+		if (difftime(curr_time, dev->last_seen) >=
-+		    monitor->low_rssi_timeout) {
-+			dev->device_found = false;
-+
-+			DBG("Calling DeviceLost() on Adv Monitor of owner %s "
-+			    "at path %s", monitor->app->owner, monitor->path);
-+
-+			g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
-+						 report_device_state_setup,
-+						 NULL, dev->device, NULL);
-+		}
-+	}
-+
-+	return FALSE;
-+}
-+
-+/* Filters an Adv based on its RSSI value */
-+static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
-+				    struct btd_device *device, int8_t rssi)
-+{
-+	struct adv_monitor_device *dev = NULL;
-+	time_t curr_time = time(NULL);
-+	uint16_t adapter_id = monitor->app->manager->adapter_id;
-+
-+	/* If the RSSI thresholds and timeouts are not specified, report the
-+	 * DeviceFound() event without tracking for the RSSI as the Adv has
-+	 * already matched the pattern filter.
-+	 */
-+	if (monitor->high_rssi == ADV_MONITOR_UNSET_RSSI &&
-+		monitor->low_rssi == ADV_MONITOR_UNSET_RSSI &&
-+		monitor->high_rssi_timeout == ADV_MONITOR_UNSET_TIMER &&
-+		monitor->low_rssi_timeout == ADV_MONITOR_UNSET_TIMER) {
-+		DBG("Calling DeviceFound() on Adv Monitor of owner %s "
-+		    "at path %s", monitor->app->owner, monitor->path);
-+
-+		g_dbus_proxy_method_call(monitor->proxy, "DeviceFound",
-+					 report_device_state_setup, NULL,
-+					 device, NULL);
-+
++	if (!monitor || !info)
 +		return;
-+	}
 +
-+	dev = queue_find(monitor->devices, monitor_device_match, device);
-+	if (!dev)
-+		dev = monitor_device_create(monitor, device);
-+	if (!dev) {
-+		btd_error(adapter_id, "Failed to create Adv Monitor "
-+				      "device object.");
-+		return;
-+	}
-+
-+	if (dev->device_lost_timer) {
-+		g_source_remove(dev->device_lost_timer);
-+		dev->device_lost_timer = 0;
-+	}
-+
-+	/* Reset the timings of found/lost if a device has been offline for
-+	 * longer than the high/low timeouts.
-+	 */
-+	if (dev->last_seen) {
-+		if (difftime(curr_time, dev->last_seen) >
-+		    monitor->high_rssi_timeout) {
-+			dev->high_rssi_first_seen = 0;
-+		}
-+
-+		if (difftime(curr_time, dev->last_seen) >
-+		    monitor->low_rssi_timeout) {
-+			dev->low_rssi_first_seen = 0;
-+		}
-+	}
-+	dev->last_seen = curr_time;
-+
-+	/* Check for the found devices (if the device is not already found) */
-+	if (!dev->device_found && rssi > monitor->high_rssi) {
-+		if (dev->high_rssi_first_seen) {
-+			if (difftime(curr_time, dev->high_rssi_first_seen) >=
-+			    monitor->high_rssi_timeout) {
-+				dev->device_found = true;
-+
-+				DBG("Calling DeviceFound() on Adv Monitor "
-+				    "of owner %s at path %s",
-+				    monitor->app->owner, monitor->path);
-+
-+				g_dbus_proxy_method_call(
-+					monitor->proxy, "DeviceFound",
-+					report_device_state_setup, NULL,
-+					dev->device, NULL);
-+			}
-+		} else {
-+			dev->high_rssi_first_seen = curr_time;
-+		}
-+	} else {
-+		dev->high_rssi_first_seen = 0;
-+	}
-+
-+	/* Check for the lost devices (only if the device is already found, as
-+	 * it doesn't make any sense to report the Device Lost event if the
-+	 * device is not found yet)
-+	 */
-+	if (dev->device_found && rssi < monitor->low_rssi) {
-+		if (dev->low_rssi_first_seen) {
-+			if (difftime(curr_time, dev->low_rssi_first_seen) >=
-+			    monitor->low_rssi_timeout) {
-+				dev->device_found = false;
-+
-+				DBG("Calling DeviceLost() on Adv Monitor "
-+				    "of owner %s at path %s",
-+				    monitor->app->owner, monitor->path);
-+
-+				g_dbus_proxy_method_call(
-+					monitor->proxy, "DeviceLost",
-+					report_device_state_setup, NULL,
-+					dev->device, NULL);
-+			}
-+		} else {
-+			dev->low_rssi_first_seen = curr_time;
-+		}
-+	} else {
-+		dev->low_rssi_first_seen = 0;
-+	}
-+
-+	/* Setup a timer to track if the device goes offline/out-of-range, only
-+	 * if we are tracking for the Low RSSI Threshold. If we are tracking
-+	 * the High RSSI Threshold, nothing needs to be done.
-+	 */
-+	if (dev->device_found) {
-+		dev->device_lost_timer =
-+			g_timeout_add_seconds(monitor->low_rssi_timeout,
-+					      handle_device_lost_timeout, dev);
-+	}
++	adv_monitor_filter_rssi(monitor, info->device, info->rssi);
 +}
++
++/* Processes every content-matched monitor with RSSI filtering and notifies on
++ * device found/lost event. The caller is responsible of releasing the memory
++ * of matched_monitors list but not its data.
++ */
++void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *manager,
++					struct btd_device *device, int8_t rssi,
++					GSList *matched_monitors)
++{
++	struct adv_rssi_filter_info info;
++
++	if (!manager || !device || !matched_monitors)
++		return;
++
++	info.device = device;
++	info.rssi = rssi;
++
++	g_slist_foreach(matched_monitors, monitor_filter_rssi, &info);
++}
++
+ /* Matches a device based on btd_device object */
+ static bool monitor_device_match(const void *a, const void *b)
+ {
 diff --git a/src/adv_monitor.h b/src/adv_monitor.h
-index 5cb372217..13d5d7282 100644
+index 13d5d7282..e2482e11e 100644
 --- a/src/adv_monitor.h
 +++ b/src/adv_monitor.h
-@@ -12,6 +12,7 @@
+@@ -11,16 +11,28 @@
+ #ifndef __ADV_MONITOR_H
  #define __ADV_MONITOR_H
  
++#include <glib.h>
++
++#include "src/shared/ad.h"
++
  struct mgmt;
-+struct btd_device;
+ struct btd_device;
  struct btd_adapter;
  struct btd_adv_monitor_manager;
++struct btd_adv_monitor_pattern;
  
-@@ -20,4 +21,7 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+ 						struct btd_adapter *adapter,
  						struct mgmt *mgmt);
  void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
  
-+void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
-+				   struct btd_device *device);
++GSList *btd_adv_monitor_content_filter(struct btd_adv_monitor_manager *manager,
++					const uint8_t *eir, uint8_t eir_len);
 +
- #endif /* __ADV_MONITOR_H */
++void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *manager,
++					struct btd_device *device, int8_t rssi,
++					GSList *matched_monitors);
++
+ void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
+ 				   struct btd_device *device);
+ 
 -- 
 2.26.2
 
