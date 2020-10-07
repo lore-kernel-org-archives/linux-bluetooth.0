@@ -2,266 +2,523 @@ Return-Path: <SRS0=7SIp=DO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AEAC4727E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 04:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A8FC4363C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 06:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4089B21531
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 04:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6211A208C7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Oct 2020 06:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZE848Q0d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4yVZihe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbgJGEia (ORCPT
+        id S1726771AbgJGGHy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Oct 2020 00:38:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53388 "EHLO
+        Wed, 7 Oct 2020 02:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726388AbgJGEi1 (ORCPT
+        with ESMTP id S1726312AbgJGGHy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Oct 2020 00:38:27 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FFBAC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 21:38:26 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id q9so995168iow.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 21:38:26 -0700 (PDT)
+        Wed, 7 Oct 2020 02:07:54 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4DCC061755
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Oct 2020 23:07:54 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id e20so740557otj.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 23:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KoWN3z7qMFRYwlT/swD/uz2iy+XEdvNl4brWLiTEUGc=;
-        b=ZE848Q0dFaos8hqbNqRIhxn6jteIUdnTUdkXqQ7v/ZeXhPVF43NM/bL2unVN5j1ajY
-         0olql6hWV9AXKf64yomqZfL/ATxFW4zsu6fv8Y0FppXA7NCP9Q8LKDdCcoa5JNBoTxhi
-         zr01GpirXzSo7I1SwYDwVeqnmQT7GZGkrg9Pk=
+        bh=18e0dITt1eClQxGhV1Dw/dLRwuTUMn3y9lZlRQhWcCg=;
+        b=b4yVZihe0XqZphxm+9bHnfJKQMpRbaoY2+VzN4GNpgbT3R4zp4UfhM62rE5q3fL3Re
+         xmZj8ABre7JWY9L5MxeS1iqbuf4MMHBWb2LGF8pQ6XYmismROD1Bs/JyFcEf0WqTYDka
+         ao3M43j0NaKCHeQFGb3H3ME9kZJ81XFU62S6+BIwYNzDvXUwwmuvepQD+XHOzacKDM0A
+         xXUTTqzTI1lJ84orY8TZ4ot9TgEsuivTBX/v04xxi9eG9tYJTZmx7FPVLVkFipV2YVgJ
+         0ue/yNnxPG+rJE7xcpnQg6BL+ROhCwi+jgLXl87gGph1fhu0g5F//enTQRNa0M+jQw1Q
+         +7Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KoWN3z7qMFRYwlT/swD/uz2iy+XEdvNl4brWLiTEUGc=;
-        b=gItHFMWGDmyVsYfNmaVPP9i7415Ut2hvauxXiUm/EYEyl6rBU8dWHJ0N1TWzrfAiYk
-         xaELF0dIvghQlK65RoyqLwmCwNm1zKljfUqZr7XFmqe3akm6ecXLJtcAugVGapRlwGAY
-         1W7DW5eoazRyeIlbMT3u1CX/6+lZwfLT9YXt6/v5JwEUenz4G4f15dqeqxTT5BjB7usI
-         j5lN9Zzi1NhDdVywavynw77MXrgaqbkrfavePeacukqgFtFbVRGFeCUmLzNsEwa6mysj
-         3liI7VwVbxcRWIxVmfCSQZchY5QYZlUXIIEMY/dwzcaDWlnTHeF0YRF0I8qkINmlQUtV
-         80eA==
-X-Gm-Message-State: AOAM530aWrwh3OdEWKqnpbek0Qa58oBxtM8VNc4VCmpwpups6T6/pBIc
-        NQS2YK82G6736FSNcEJxuwjKjNaUc1r1KA==
-X-Google-Smtp-Source: ABdhPJz75/AcrpzMv1/1zmBA8EX8c3UhC+c2kQInJ3/6f1VAkSh0QSqP+8AyTFb7fjk/EV+1f3cPng==
-X-Received: by 2002:a6b:d606:: with SMTP id w6mr885400ioa.89.1602045504837;
-        Tue, 06 Oct 2020 21:38:24 -0700 (PDT)
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com. [209.85.166.41])
-        by smtp.gmail.com with ESMTPSA id o12sm485490ilh.49.2020.10.06.21.38.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Oct 2020 21:38:23 -0700 (PDT)
-Received: by mail-io1-f41.google.com with SMTP id u6so974587iow.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Oct 2020 21:38:23 -0700 (PDT)
-X-Received: by 2002:a5d:8752:: with SMTP id k18mr941313iol.27.1602045503184;
- Tue, 06 Oct 2020 21:38:23 -0700 (PDT)
+        bh=18e0dITt1eClQxGhV1Dw/dLRwuTUMn3y9lZlRQhWcCg=;
+        b=T0EnIxUhtXRsF/tVwjihK3/1aO/oKy2799tMmuqaiVFLT4TwhBbP+CaQQUndpyn7Fd
+         stbVxScot3CNO5CLVCvQjQ4IHPZLFkY+65k6YunCZ2phHzl1Jjl5iynFH6gkkXuoDbJ/
+         xYKW9WveFZ74lC4TBQl3SJg0lCQ1T7AUxKysxPXAYTL7irkFogUfzhDBayoGWalfkWdK
+         JWU3ysdtgsQnqq0XQ7YNdvvGVpCL61evBgQmJorrpq+Pa2IUlSCqCAJE1UszqzaPqX6Y
+         fOkeL25EGohoFeP6j8WFZgTr4UfK4zABzclKLuC6Mf4XJI8Hj59dTV0UbwPOMKxhWQ3w
+         Qjww==
+X-Gm-Message-State: AOAM531HFO1d2DcjofFxt7Mns9p8hzPdgqhPMjIsEYm6ZhFO5KZGfrJf
+        A1B3oZ+mU5SyqkMocr8vVOe/OLt1yjai2kmLoC8=
+X-Google-Smtp-Source: ABdhPJwZAUVmKiIGAz7Iu2ham0mx1t+cy0cIeiZON44kbZ4FP37mIdZNBmGhXJ8uSjfhKvc54yMtVJHBtIXonN+es7I=
+X-Received: by 2002:a05:6830:400d:: with SMTP id h13mr954471ots.371.1602050873439;
+ Tue, 06 Oct 2020 23:07:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200929080324.632523-1-tientzu@chromium.org>
-In-Reply-To: <20200929080324.632523-1-tientzu@chromium.org>
-From:   Claire Chang <tientzu@chromium.org>
-Date:   Wed, 7 Oct 2020 12:38:12 +0800
-X-Gmail-Original-Message-ID: <CALiNf28k5C48_ivAeRW7sSEEXp0gd-h_1n03YH6jQhYhaCXUDA@mail.gmail.com>
-Message-ID: <CALiNf28k5C48_ivAeRW7sSEEXp0gd-h_1n03YH6jQhYhaCXUDA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Move force_bredr_smp debugfs into hci_debugfs_create_bredr
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        kuba@kernel.org
-Cc:     netdev@vger.kernel.org, BlueZ <linux-bluetooth@vger.kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>
+References: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+In-Reply-To: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 6 Oct 2020 23:07:40 -0700
+Message-ID: <CABBYNZ+D=jO-6vO_XPQQ-1TQmfuOjXtiOm_+v8x+ZsyM=d3WRQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v6 1/6] adv_monitor: Implement RSSI Filter logic for
+ background scanning
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Miao,
 
-This patch is to fix the kernel error
-[   46.271811] debugfs: File 'force_bredr_smp' in directory 'hci0'
-already present!
-
-When powering off and on the bluetooth, the smp_register will try to create the
-force_bredr_smp entry again.
-Move the creation to hci_debugfs_create_bredr so the force_bredr_smp entry will
-only be created when HCI_SETUP and HCI_CONFIG are not set.
-
-Thanks,
-Claire
-
-On Tue, Sep 29, 2020 at 4:03 PM Claire Chang <tientzu@chromium.org> wrote:
+On Tue, Oct 6, 2020 at 5:17 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> Avoid multiple attempts to create the debugfs entry, force_bredr_smp,
-> by moving it from the SMP registration to the BR/EDR controller init
-> section. hci_debugfs_create_bredr is only called when HCI_SETUP and
-> HCI_CONFIG is not set.
+> From: Manish Mandlik <mmandlik@google.com>
 >
-> Signed-off-by: Claire Chang <tientzu@chromium.org>
+> This patch implements the RSSI Filter logic for background scanning.
+>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Reviewed-by: Howard Chung <howardchung@google.com>
 > ---
-> v2: correct a typo in commit message
 >
->  net/bluetooth/hci_debugfs.c | 50 +++++++++++++++++++++++++++++++++++++
->  net/bluetooth/smp.c         | 44 ++------------------------------
->  net/bluetooth/smp.h         |  2 ++
->  3 files changed, 54 insertions(+), 42 deletions(-)
+> (no changes since v5)
 >
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index 5e8af2658e44..4626e0289a97 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -494,6 +494,45 @@ static int auto_accept_delay_get(void *data, u64 *val)
->  DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
->                         auto_accept_delay_set, "%llu\n");
+> Changes in v5:
+> - Remove the use of unit test in commit message
 >
-> +static ssize_t force_bredr_smp_read(struct file *file,
-> +                                   char __user *user_buf,
-> +                                   size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev = file->private_data;
-> +       char buf[3];
+> Changes in v3:
+> - Fix commit message
+>
+>  doc/advertisement-monitor-api.txt |   5 +
+>  src/adapter.c                     |   1 +
+>  src/adv_monitor.c                 | 286 +++++++++++++++++++++++++++++-
+>  src/adv_monitor.h                 |   4 +
+>  4 files changed, 292 insertions(+), 4 deletions(-)
+>
+> diff --git a/doc/advertisement-monitor-api.txt b/doc/advertisement-monitor-api.txt
+> index e09b6fd25..92c8ffc38 100644
+> --- a/doc/advertisement-monitor-api.txt
+> +++ b/doc/advertisement-monitor-api.txt
+> @@ -70,6 +70,11 @@ Properties   string Type [read-only]
+>                         dBm indicates unset. The valid range of a timer is 1 to
+>                         300 seconds while 0 indicates unset.
+>
+> +                       If the peer device advertising interval is greater than the
+> +                       HighRSSIThresholdTimer, the device will never be found. Similarly,
+> +                       if it is greater than LowRSSIThresholdTimer, the device will be
+> +                       considered as lost. Consider configuring these values accordingly.
 > +
-> +       buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP) ? 'Y' : 'N';
-> +       buf[1] = '\n';
-> +       buf[2] = '\0';
-> +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
+>                 array{(uint8, uint8, array{byte})} Patterns [read-only, optional]
+>
+>                         If Type is set to 0x01, this must exist and has at least
+> diff --git a/src/adapter.c b/src/adapter.c
+> index c0053000a..6d0114a6b 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1214,6 +1214,7 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
+>         adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
+>
+>         adapter->devices = g_slist_remove(adapter->devices, dev);
+> +       btd_adv_monitor_device_remove(adapter->adv_monitor_manager, dev);
+>
+>         adapter->discovery_found = g_slist_remove(adapter->discovery_found,
+>                                                                         dev);
+> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+> index e441a5566..31ed30a00 100644
+> --- a/src/adv_monitor.c
+> +++ b/src/adv_monitor.c
+> @@ -26,6 +26,7 @@
+>
+>  #include "adapter.h"
+>  #include "dbus-common.h"
+> +#include "device.h"
+>  #include "log.h"
+>  #include "src/error.h"
+>  #include "src/shared/ad.h"
+> @@ -35,6 +36,8 @@
+>
+>  #include "adv_monitor.h"
+>
+> +static void monitor_device_free(void *data);
 > +
-> +static ssize_t force_bredr_smp_write(struct file *file,
-> +                                    const char __user *user_buf,
-> +                                    size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev = file->private_data;
-> +       bool enable;
-> +       int err;
+>  #define ADV_MONITOR_INTERFACE          "org.bluez.AdvertisementMonitor1"
+>  #define ADV_MONITOR_MGR_INTERFACE      "org.bluez.AdvertisementMonitorManager1"
+>
+> @@ -95,15 +98,36 @@ struct adv_monitor {
+>
+>         enum monitor_state state;       /* MONITOR_STATE_* */
+>
+> -       int8_t high_rssi;               /* high RSSI threshold */
+> -       uint16_t high_rssi_timeout;     /* high RSSI threshold timeout */
+> -       int8_t low_rssi;                /* low RSSI threshold */
+> -       uint16_t low_rssi_timeout;      /* low RSSI threshold timeout */
+> +       int8_t high_rssi;               /* High RSSI threshold */
+> +       uint16_t high_rssi_timeout;     /* High RSSI threshold timeout */
+> +       int8_t low_rssi;                /* Low RSSI threshold */
+> +       uint16_t low_rssi_timeout;      /* Low RSSI threshold timeout */
+> +       struct queue *devices;          /* List of adv_monitor_device objects */
+>
+>         enum monitor_type type;         /* MONITOR_TYPE_* */
+>         struct queue *patterns;
+>  };
+>
+> +/* Some data like last_seen, timer/timeout values need to be maintained
+> + * per device. struct adv_monitor_device maintains such data.
+> + */
+> +struct adv_monitor_device {
+> +       struct adv_monitor *monitor;
+> +       struct btd_device *device;
 > +
-> +       err = kstrtobool_from_user(user_buf, count, &enable);
-> +       if (err)
-> +               return err;
-> +
-> +       err = smp_force_bredr(hdev, enable);
-> +       if (err)
-> +               return err;
-> +
-> +       return count;
-> +}
-> +
-> +static const struct file_operations force_bredr_smp_fops = {
-> +       .open           = simple_open,
-> +       .read           = force_bredr_smp_read,
-> +       .write          = force_bredr_smp_write,
-> +       .llseek         = default_llseek,
+> +       time_t high_rssi_first_seen;    /* Start time when RSSI climbs above
+> +                                        * the high RSSI threshold
+> +                                        */
+> +       time_t low_rssi_first_seen;     /* Start time when RSSI drops below
+> +                                        * the low RSSI threshold
+> +                                        */
+> +       time_t last_seen;               /* Time when last Adv was received */
+> +       bool device_found;              /* State of the device - lost/found */
+> +       guint device_lost_timer;        /* Timer to track if the device goes
+> +                                        * offline/out-of-range
+> +                                        */
+
+I guess we could just drop the device_ term from the last 2 fields, it
+should be implicit from the object itself that is already called
+device.
+
 > +};
 > +
->  static int idle_timeout_set(void *data, u64 val)
->  {
->         struct hci_dev *hdev = data;
-> @@ -589,6 +628,17 @@ void hci_debugfs_create_bredr(struct hci_dev *hdev)
->         debugfs_create_file("voice_setting", 0444, hdev->debugfs, hdev,
->                             &voice_setting_fops);
+>  struct app_match_data {
+>         const char *owner;
+>         const char *path;
+> @@ -150,6 +174,9 @@ static void monitor_free(void *data)
+>         g_dbus_proxy_unref(monitor->proxy);
+>         g_free(monitor->path);
 >
-> +       /* If the controller does not support BR/EDR Secure Connections
-> +        * feature, then the BR/EDR SMP channel shall not be present.
-> +        *
-> +        * To test this with Bluetooth 4.0 controllers, create a debugfs
-> +        * switch that allows forcing BR/EDR SMP support and accepting
-> +        * cross-transport pairing on non-AES encrypted connections.
+> +       queue_destroy(monitor->devices, monitor_device_free);
+> +       monitor->devices = NULL;
+> +
+>         queue_destroy(monitor->patterns, pattern_free);
+>
+>         free(monitor);
+> @@ -248,6 +275,7 @@ static struct adv_monitor *monitor_new(struct adv_monitor_app *app,
+>         monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+>         monitor->low_rssi = ADV_MONITOR_UNSET_RSSI;
+>         monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+> +       monitor->devices = queue_new();
+>
+>         monitor->type = MONITOR_TYPE_NONE;
+>         monitor->patterns = NULL;
+> @@ -923,3 +951,253 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
+>
+>         manager_destroy(manager);
+>  }
+> +
+> +/* Matches a device based on btd_device object */
+> +static bool monitor_device_match(const void *a, const void *b)
+> +{
+> +       const struct adv_monitor_device *dev = a;
+> +       const struct btd_device *device = b;
+> +
+> +       if (!dev)
+> +               return false;
+
+Checks like the above may hide bugs where NULL objects are being added
+to the list, if that is happening then we probably need to fix it.
+
+> +       if (dev->device != device)
+> +               return false;
+> +
+> +       return true;
+> +}
+> +
+> +/* Frees a monitor device object */
+> +static void monitor_device_free(void *data)
+> +{
+> +       struct adv_monitor_device *dev = data;
+> +
+> +       if (!dev)
+> +               return;
+
+Ditto.
+
+> +       if (dev->device_lost_timer) {
+> +               g_source_remove(dev->device_lost_timer);
+> +               dev->device_lost_timer = 0;
+> +       }
+> +
+> +       dev->monitor = NULL;
+> +       dev->device = NULL;
+> +
+> +       g_free(dev);
+> +}
+> +
+> +/* Removes a device from monitor->devices list */
+> +static void remove_device_from_monitor(void *data, void *user_data)
+> +{
+> +       struct adv_monitor *monitor = data;
+> +       struct btd_device *device = user_data;
+> +       struct adv_monitor_device *dev = NULL;
+> +
+> +       if (!monitor)
+> +               return;
+
+Ditto.
+
+> +       dev = queue_remove_if(monitor->devices, monitor_device_match, device);
+> +       if (dev) {
+> +               DBG("Device removed from the Adv Monitor at path %s",
+> +                   monitor->path);
+> +               monitor_device_free(dev);
+> +       }
+> +}
+> +
+> +/* Removes a device from every monitor in an app */
+> +static void remove_device_from_app(void *data, void *user_data)
+> +{
+> +       struct adv_monitor_app *app = data;
+> +       struct btd_device *device = user_data;
+> +
+> +       if (!app)
+> +               return;
+
+Ditto.
+
+> +       queue_foreach(app->monitors, remove_device_from_monitor, device);
+> +}
+> +
+> +/* Removes a device from every monitor in all apps */
+> +void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
+> +                                  struct btd_device *device)
+> +{
+> +       if (!manager || !device)
+> +               return;
+> +
+> +       queue_foreach(manager->apps, remove_device_from_app, device);
+> +}
+> +
+> +/* Creates a device object to track the per-device information */
+> +static struct adv_monitor_device *monitor_device_create(
+> +                       struct adv_monitor *monitor,
+> +                       struct btd_device *device)
+> +{
+> +       struct adv_monitor_device *dev = NULL;
+> +
+> +       dev = g_try_malloc0(sizeof(struct adv_monitor_device));
+
+Please use new0 on new code.
+
+> +       if (!dev)
+> +               return NULL;
+> +
+> +       dev->monitor = monitor;
+> +       dev->device = device;
+> +
+> +       queue_push_tail(monitor->devices, dev);
+> +
+> +       return dev;
+> +}
+> +
+> +/* Includes found/lost device's object path into the dbus message */
+> +static void report_device_state_setup(DBusMessageIter *iter, void *user_data)
+> +{
+> +       const char *path = device_get_path(user_data);
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+> +}
+> +
+> +/* Handles a situation where the device goes offline/out-of-range */
+> +static gboolean handle_device_lost_timeout(gpointer user_data)
+> +{
+> +       struct adv_monitor_device *dev = user_data;
+> +       struct adv_monitor *monitor = dev->monitor;
+> +       time_t curr_time = time(NULL);
+> +
+> +       DBG("Device Lost timeout triggered for device %p "
+> +           "for the Adv Monitor at path %s", dev->device, monitor->path);
+> +
+> +       dev->device_lost_timer = 0;
+> +
+> +       if (dev->device_found && dev->last_seen) {
+> +               /* We were tracking for the Low RSSI filter. Check if there is
+> +                * any Adv received after the timeout function is invoked.
+> +                * If not, report the Device Lost event.
+> +                */
+> +               if (difftime(curr_time, dev->last_seen) >=
+> +                   monitor->low_rssi_timeout) {
+> +                       dev->device_found = false;
+> +
+> +                       DBG("Calling DeviceLost() on Adv Monitor of owner %s "
+> +                           "at path %s", monitor->app->owner, monitor->path);
+> +
+> +                       g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
+> +                                                report_device_state_setup,
+> +                                                NULL, dev->device, NULL);
+> +               }
+> +       }
+> +
+> +       return FALSE;
+> +}
+> +
+> +/* Filters an Adv based on its RSSI value */
+> +static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
+> +                                   struct btd_device *device, int8_t rssi)
+> +{
+> +       struct adv_monitor_device *dev = NULL;
+> +       time_t curr_time = time(NULL);
+> +       uint16_t adapter_id = monitor->app->manager->adapter_id;
+> +
+> +       /* If the RSSI thresholds and timeouts are not specified, report the
+> +        * DeviceFound() event without tracking for the RSSI as the Adv has
+> +        * already matched the pattern filter.
 > +        */
-> +       if (!lmp_sc_capable(hdev))
-> +               debugfs_create_file("force_bredr_smp", 0644, hdev->debugfs,
-> +                                   hdev, &force_bredr_smp_fops);
+> +       if (monitor->high_rssi == ADV_MONITOR_UNSET_RSSI &&
+> +               monitor->low_rssi == ADV_MONITOR_UNSET_RSSI &&
+> +               monitor->high_rssi_timeout == ADV_MONITOR_UNSET_TIMER &&
+> +               monitor->low_rssi_timeout == ADV_MONITOR_UNSET_TIMER) {
+> +               DBG("Calling DeviceFound() on Adv Monitor of owner %s "
+> +                   "at path %s", monitor->app->owner, monitor->path);
 > +
->         if (lmp_ssp_capable(hdev)) {
->                 debugfs_create_file("ssp_debug_mode", 0444, hdev->debugfs,
->                                     hdev, &ssp_debug_mode_fops);
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 433227f96c73..8b817e4358fd 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -3353,31 +3353,8 @@ static void smp_del_chan(struct l2cap_chan *chan)
->         l2cap_chan_put(chan);
->  }
->
-> -static ssize_t force_bredr_smp_read(struct file *file,
-> -                                   char __user *user_buf,
-> -                                   size_t count, loff_t *ppos)
-> +int smp_force_bredr(struct hci_dev *hdev, bool enable)
->  {
-> -       struct hci_dev *hdev = file->private_data;
-> -       char buf[3];
-> -
-> -       buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP) ? 'Y': 'N';
-> -       buf[1] = '\n';
-> -       buf[2] = '\0';
-> -       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> -}
-> -
-> -static ssize_t force_bredr_smp_write(struct file *file,
-> -                                    const char __user *user_buf,
-> -                                    size_t count, loff_t *ppos)
-> -{
-> -       struct hci_dev *hdev = file->private_data;
-> -       bool enable;
-> -       int err;
-> -
-> -       err = kstrtobool_from_user(user_buf, count, &enable);
-> -       if (err)
-> -               return err;
-> -
->         if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
->                 return -EALREADY;
->
-> @@ -3399,16 +3376,9 @@ static ssize_t force_bredr_smp_write(struct file *file,
->
->         hci_dev_change_flag(hdev, HCI_FORCE_BREDR_SMP);
->
-> -       return count;
-> +       return 0;
->  }
->
-> -static const struct file_operations force_bredr_smp_fops = {
-> -       .open           = simple_open,
-> -       .read           = force_bredr_smp_read,
-> -       .write          = force_bredr_smp_write,
-> -       .llseek         = default_llseek,
-> -};
-> -
->  int smp_register(struct hci_dev *hdev)
->  {
->         struct l2cap_chan *chan;
-> @@ -3433,17 +3403,7 @@ int smp_register(struct hci_dev *hdev)
->
->         hdev->smp_data = chan;
->
-> -       /* If the controller does not support BR/EDR Secure Connections
-> -        * feature, then the BR/EDR SMP channel shall not be present.
-> -        *
-> -        * To test this with Bluetooth 4.0 controllers, create a debugfs
-> -        * switch that allows forcing BR/EDR SMP support and accepting
-> -        * cross-transport pairing on non-AES encrypted connections.
-> -        */
->         if (!lmp_sc_capable(hdev)) {
-> -               debugfs_create_file("force_bredr_smp", 0644, hdev->debugfs,
-> -                                   hdev, &force_bredr_smp_fops);
-> -
->                 /* Flag can be already set here (due to power toggle) */
->                 if (!hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
->                         return 0;
-> diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-> index 121edadd5f8d..fc35a8bf358e 100644
-> --- a/net/bluetooth/smp.h
-> +++ b/net/bluetooth/smp.h
-> @@ -193,6 +193,8 @@ bool smp_irk_matches(struct hci_dev *hdev, const u8 irk[16],
->  int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa);
->  int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16]);
->
-> +int smp_force_bredr(struct hci_dev *hdev, bool enable);
+> +               g_dbus_proxy_method_call(monitor->proxy, "DeviceFound",
+> +                                        report_device_state_setup, NULL,
+> +                                        device, NULL);
 > +
->  int smp_register(struct hci_dev *hdev);
->  void smp_unregister(struct hci_dev *hdev);
+> +               return;
+> +       }
+> +
+> +       dev = queue_find(monitor->devices, monitor_device_match, device);
+> +       if (!dev)
+> +               dev = monitor_device_create(monitor, device);
+
+There seems to be missing indentation here as the following if
+statement should be nested otherwise the dev point is always evaluated
+twice which is not optimal.
+
+> +       if (!dev) {
+> +               btd_error(adapter_id, "Failed to create Adv Monitor "
+> +                                     "device object.");
+> +               return;
+> +       }
+
+Id put the code above into a function e.g. monitor_device_get so
+whenever you need to find + create logic you can just use it.
+
+> +
+> +       if (dev->device_lost_timer) {
+> +               g_source_remove(dev->device_lost_timer);
+> +               dev->device_lost_timer = 0;
+> +       }
+> +
+> +       /* Reset the timings of found/lost if a device has been offline for
+> +        * longer than the high/low timeouts.
+> +        */
+> +       if (dev->last_seen) {
+> +               if (difftime(curr_time, dev->last_seen) >
+> +                   monitor->high_rssi_timeout) {
+> +                       dev->high_rssi_first_seen = 0;
+> +               }
+> +
+> +               if (difftime(curr_time, dev->last_seen) >
+> +                   monitor->low_rssi_timeout) {
+> +                       dev->low_rssi_first_seen = 0;
+> +               }
+> +       }
+> +       dev->last_seen = curr_time;
+> +
+> +       /* Check for the found devices (if the device is not already found) */
+> +       if (!dev->device_found && rssi > monitor->high_rssi) {
+> +               if (dev->high_rssi_first_seen) {
+> +                       if (difftime(curr_time, dev->high_rssi_first_seen) >=
+> +                           monitor->high_rssi_timeout) {
+> +                               dev->device_found = true;
+> +
+> +                               DBG("Calling DeviceFound() on Adv Monitor "
+> +                                   "of owner %s at path %s",
+> +                                   monitor->app->owner, monitor->path);
+> +
+> +                               g_dbus_proxy_method_call(
+> +                                       monitor->proxy, "DeviceFound",
+> +                                       report_device_state_setup, NULL,
+> +                                       dev->device, NULL);
+> +                       }
+> +               } else {
+> +                       dev->high_rssi_first_seen = curr_time;
+> +               }
+> +       } else {
+> +               dev->high_rssi_first_seen = 0;
+> +       }
+> +
+> +       /* Check for the lost devices (only if the device is already found, as
+> +        * it doesn't make any sense to report the Device Lost event if the
+> +        * device is not found yet)
+> +        */
+> +       if (dev->device_found && rssi < monitor->low_rssi) {
+> +               if (dev->low_rssi_first_seen) {
+> +                       if (difftime(curr_time, dev->low_rssi_first_seen) >=
+> +                           monitor->low_rssi_timeout) {
+> +                               dev->device_found = false;
+> +
+> +                               DBG("Calling DeviceLost() on Adv Monitor "
+> +                                   "of owner %s at path %s",
+> +                                   monitor->app->owner, monitor->path);
+> +
+> +                               g_dbus_proxy_method_call(
+> +                                       monitor->proxy, "DeviceLost",
+> +                                       report_device_state_setup, NULL,
+> +                                       dev->device, NULL);
+> +                       }
+> +               } else {
+> +                       dev->low_rssi_first_seen = curr_time;
+> +               }
+> +       } else {
+> +               dev->low_rssi_first_seen = 0;
+> +       }
+> +
+> +       /* Setup a timer to track if the device goes offline/out-of-range, only
+> +        * if we are tracking for the Low RSSI Threshold. If we are tracking
+> +        * the High RSSI Threshold, nothing needs to be done.
+> +        */
+> +       if (dev->device_found) {
+> +               dev->device_lost_timer =
+> +                       g_timeout_add_seconds(monitor->low_rssi_timeout,
+> +                                             handle_device_lost_timeout, dev);
+> +       }
+> +}
+> diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+> index 5cb372217..13d5d7282 100644
+> --- a/src/adv_monitor.h
+> +++ b/src/adv_monitor.h
+> @@ -12,6 +12,7 @@
+>  #define __ADV_MONITOR_H
 >
+>  struct mgmt;
+> +struct btd_device;
+>  struct btd_adapter;
+>  struct btd_adv_monitor_manager;
+>
+> @@ -20,4 +21,7 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+>                                                 struct mgmt *mgmt);
+>  void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
+>
+> +void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
+> +                                  struct btd_device *device);
+> +
+>  #endif /* __ADV_MONITOR_H */
 > --
-> 2.28.0.618.gf4bc123cb7-goog
+> 2.26.2
 >
+
+
+-- 
+Luiz Augusto von Dentz
