@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E96C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2D0C4363C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:53:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41F2520B1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:53:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98281217BA
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:53:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6ruV0aT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gxcG9rWo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731386AbgJHPwt (ORCPT
+        id S1730244AbgJHPxH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 11:52:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        Thu, 8 Oct 2020 11:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730221AbgJHPwq (ORCPT
+        with ESMTP id S1730063AbgJHPxG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:52:46 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767BBC0613D2;
-        Thu,  8 Oct 2020 08:52:46 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id y20so2945311pll.12;
-        Thu, 08 Oct 2020 08:52:46 -0700 (PDT)
+        Thu, 8 Oct 2020 11:53:06 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5C1C0613D2;
+        Thu,  8 Oct 2020 08:53:05 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id y14so4314115pfp.13;
+        Thu, 08 Oct 2020 08:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=DykZRLkCtQ9htd/aPPi1KevQSJPPLl8ioPLoUg7iCDU=;
-        b=I6ruV0aT0SbKbNmivtTsSc3QbkRbeqPsS51ghGqK9eiPkZMg3QjJStW025Prflt4yc
-         5t3GBn7dq+YTFhaBRtQMjqxbzHjSTSFlsIV5Icxo2F2moEOEds0sEMRIwoeVoT7j0VOp
-         S/mRYijrhRhVH8qiMP47upCFqrWgA/le2gaYZUdQlrkYmQY3f4+sydP3hGcrx60iSt3Q
-         GkZonckP4MqYqULzu1AtDCbhCN9hxdiYHkwiSEV03s3UMKXKaf7Ix4S98Mdz+l3pEv/C
-         e72eUPxZ4eHZsvgN2KohV6/CkZKOOgqGzl1Yyzhc2ao+yap0bWyEnOUx+BpuDHINElXh
-         wfSQ==
+        bh=T1P3vjpDjU+9KxXxsbq876rgerqwTW2vQ6eqsdtxYn8=;
+        b=gxcG9rWo45rxPYd3ATiq6NxkN2HRkxGSetM4MZUx3RyRAjrTqV2gFtPc3Rphlm4uZ9
+         8OEimP5pwcHT+DW57H5nMxdj6Qw8uhqmRqmtm+6dfWcGpNAdErekMv5/j7jSscgYlbkL
+         YFH9BGgp9i3+UDaBK/d96jInLszHfDJMJ+xfXyx4SCuVWS549HZXF0CLieOPJjREdmUV
+         O1GJ7WMyLNR4KAgnhlimJtgXKSK1RwFUEF7FTuVRn9Skp6OR9AGSXKmhcnZn5aOT0prh
+         QUe+Vjsof+OTsNiZgvy0aiGP6uMwm/ZghylY7hXMT49lLO4XdfpkPLCIaAo50JUlhOuG
+         zyUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=DykZRLkCtQ9htd/aPPi1KevQSJPPLl8ioPLoUg7iCDU=;
-        b=sNAQ3rRNRzx6thadpdZDEZypkq3RXkpAdnVHGJqojUf2/ClMTytu7t/4cZb3X6T/m4
-         HX7nriOfStsj97jU+qOCEkmpqAnuekH1z30/Put65dRGfJr0V3IezPGY46A6exaS1KXC
-         x4cb+o8QHMLar1fj7GqCVls/RKKUFCrEmlDTCqFtwyFUg0uYdzjHhOdr7XYO66LgLZAy
-         6UNF6mELYkS/VFUhn0AWxtWt8AXaOsZHwMLsALtHuouA1TC6l4sfAuQSA5RrEYv4Emgo
-         LAbWM1VuLDyvtxT5lwxi6KUZV7VLHM8Fja/kdUGxutnL+iFq0p3yEIy1zE+NWUgbIR8K
-         i/Mw==
-X-Gm-Message-State: AOAM533XunxXcbyuYeiuxKbgl0seQmZHzt9iqPX2cktxll97gHBBhEnX
-        DzUyHF/gveOx0/d8Roxd3iY=
-X-Google-Smtp-Source: ABdhPJxY7ImE16iT/WCwS+04dw4rq1gkRdo2bGfhtCm8ChQuCPLEtIvdcka7sVONMT+GjoDeE3bT5w==
-X-Received: by 2002:a17:902:7c0d:b029:d3:de09:a3 with SMTP id x13-20020a1709027c0db02900d3de0900a3mr8007289pll.52.1602172366048;
-        Thu, 08 Oct 2020 08:52:46 -0700 (PDT)
+        bh=T1P3vjpDjU+9KxXxsbq876rgerqwTW2vQ6eqsdtxYn8=;
+        b=S/7+v0N3wN9oenbUD8pnxCzMJomHVKerlPrBJ0vs5AeDkdnnwAdlRdjhK4F8oNfP9+
+         MlT7sbtE0Avf06ghKkVFo3mFoqYNCeKjOkrE9GLACm+0H2Xp8jZ6wsSRXDeOG29nngdX
+         UY2T12+lejYpnWGUS/ZausnXt+IARxV4HCy2Gxy9ZSdaxncOKIFiELTkFk322hNQLS9b
+         P2F9fE/fAagPLGy3pq7l3A1IElDkOUopBex+ucH/akxuTgZm25I9+WdPRqyL/Z/Vyjqz
+         MzDQrhjFrrGmz/OG3I1LS5xgdk8IZqgXrLbdCprxYyr8bZyQRLC0Rsiz5+lVPtCwWPa9
+         7s2g==
+X-Gm-Message-State: AOAM531vPNH5DQiVJhRMEa6DZK/OniR1IDDngsCmSyDB7SlRgt2T0f5v
+        ZU3QjMWNfihhnP1++Uad7l0=
+X-Google-Smtp-Source: ABdhPJyfYHS8gv4LvMbGux4K3EspxAEg/9UxdowmVOLtF42yEC9tPtKvux1W1oGeD79M+e84vW5u3w==
+X-Received: by 2002:a17:90a:46c2:: with SMTP id x2mr9008354pjg.60.1602172384733;
+        Thu, 08 Oct 2020 08:53:04 -0700 (PDT)
 Received: from localhost.localdomain ([180.70.143.152])
-        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.52.43
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.53.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 08:52:45 -0700 (PDT)
+        Thu, 08 Oct 2020 08:53:03 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
         wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 008/117] mac80211: set STA_OPS.owner to THIS_MODULE
-Date:   Thu,  8 Oct 2020 15:50:20 +0000
-Message-Id: <20201008155209.18025-8-ap420073@gmail.com>
+Subject: [PATCH net 014/117] mac80211: set force_tx_status_ops.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:50:26 +0000
+Message-Id: <20201008155209.18025-14-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
 References: <20201008155209.18025-1-ap420073@gmail.com>
@@ -78,24 +78,24 @@ If THIS_MODULE is not set, the module would be removed while debugfs is
 being used.
 It eventually makes kernel panic.
 
-Fixes: e9f207f0ff90 ("[MAC80211]: Add debugfs attributes.")
+Fixes: 276d9e82e06c ("mac80211: debugfs option to force TX status frames")
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- net/mac80211/debugfs_sta.c | 1 +
+ net/mac80211/debugfs.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
-index 829dcad69c2c..d3366989c6f9 100644
---- a/net/mac80211/debugfs_sta.c
-+++ b/net/mac80211/debugfs_sta.c
-@@ -34,6 +34,7 @@ static const struct file_operations sta_ ##name## _ops = {		\
- 	.read = sta_##name##_read,					\
- 	.open = simple_open,						\
- 	.llseek = generic_file_llseek,					\
-+	.owner = THIS_MODULE,						\
- }
+diff --git a/net/mac80211/debugfs.c b/net/mac80211/debugfs.c
+index ff690feb56a4..a3f3e3add3c2 100644
+--- a/net/mac80211/debugfs.c
++++ b/net/mac80211/debugfs.c
+@@ -338,6 +338,7 @@ static const struct file_operations force_tx_status_ops = {
+ 	.read = force_tx_status_read,
+ 	.open = simple_open,
+ 	.llseek = default_llseek,
++	.owner = THIS_MODULE,
+ };
  
- #define STA_OPS_RW(name)						\
+ #ifdef CONFIG_PM
 -- 
 2.17.1
 
