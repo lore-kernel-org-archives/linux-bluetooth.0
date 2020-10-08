@@ -8,65 +8,65 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 310FDC433E7
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 16:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1DDC43457
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 16:00:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE3E0217BA
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 16:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4860206F0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 16:00:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="asLmgsKA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WoOrMpBW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731652AbgJHQAi (ORCPT
+        id S1731436AbgJHPxG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 12:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41600 "EHLO
+        Thu, 8 Oct 2020 11:53:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730012AbgJHPxw (ORCPT
+        with ESMTP id S1730244AbgJHPxC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:53:52 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C83C0613D4;
-        Thu,  8 Oct 2020 08:53:51 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id l126so4338313pfd.5;
-        Thu, 08 Oct 2020 08:53:51 -0700 (PDT)
+        Thu, 8 Oct 2020 11:53:02 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E1B1C061755;
+        Thu,  8 Oct 2020 08:53:02 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id k8so4343918pfk.2;
+        Thu, 08 Oct 2020 08:53:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=P9298AG1dm6vfs+dshDdtQyz3vMsR0EKf8MkvhRZOlo=;
-        b=asLmgsKAsat7YqoU7OgFtc4rXWkYd9uCR//A16sXfAY3Ef+sOlkno0v7O54mj26uWU
-         2Q2bMFfZ2pi/22cA/vBL73xy0Au8cqQ7ErwTRDLbfobqnQdJijuU8d/W7e+log/vxCnP
-         LTbMSx6VdwW/efWaVC5QcvAlenVcRZZtb4FTtIbEH/O5BULZK8JVbK90u65SQ2DS00uX
-         SKVdvxQ9QlVClfstF4WG7v0TTDIIkdLZSzJRYH4yuRu0g8vMTTZXD18/Ppg6R3V9669a
-         CFOApXaVIGTKjh0YxzVlIiyraOfrbYiGqa45UDWefZ4ThMl4GOQit8/7dfPsUVHiVEg7
-         wpkw==
+        bh=JACHm6oKXj4X805YMJCH36b46IaUgQQqgzNkmYNvOgM=;
+        b=WoOrMpBWzaUaUTxQR0JEyrIKZxlGcIOZfYHA7+rf0Q76HEjIFAGDXa2ZxcQj96xNqX
+         hi26NuzvEN7mDBh2KIgfU0fq5Hin8PgCzaAX3kw5VEahTcZGHrTB+OJiO+tTxpFWcV8J
+         RCyveWW517PsQAp6qiKONhALSpX7mB6/J1Pp2uv4lXeMG8Odoo8ztXa4QIolvNxOB7Dc
+         CdKQvFgLl9jP/JYNQMBrLpATyYRDpY43+c5Q16Qnis28v3ydyPuAtMhAnMmogcgbZd3z
+         12fhOqpIg/MwIUvCc4RHBv4fGHohgy8M1UtUiqhtr3WR2fyXfd3GcMRDpT/qm1ci32rv
+         jXgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=P9298AG1dm6vfs+dshDdtQyz3vMsR0EKf8MkvhRZOlo=;
-        b=IbH+UoHqUrWR0pivw/6NpM1vj4AldT4ugoJsNKniefXjYHQWQZodkPg4ntkbF/0z7M
-         BYOw1CQ57lL79TuEYK6BbblpAXWwRTA/y7K4pzgt3xsAJa6tiMT13d7ks1MxTxeRu7jf
-         xRujagl1KNhKvihjAXpOCJoBOuQhJYw6Oj5rltTlJMWi81ykOrccU/p7CQ3UaGhJze41
-         V5Oj54jNjXZ8p66Wv114SIJLL9MYaaUNt/n5TtiFFbqCFDOjpMPmP+MKrB+Q0UWpPOIE
-         7TmpUBf27SMkvKuog4reVNlkHL1+07uGnlFE9ZPA06BOd/y+UyZ/8Jtc+L/BwYgcHE+k
-         kpaQ==
-X-Gm-Message-State: AOAM530/PaDJyosxRvgb4DTMWUPJhVpSujsgtjl6eOg84mZr2cFcrw13
-        3hLlRO5M8LH1t/KeRFZTGS4=
-X-Google-Smtp-Source: ABdhPJyCN6uWEoc7pNtVBtqCaj2k7X+qYmBxgweeTk1Lsv/8X70TsV2p31uSpO58w0Yk2LjSoEk87g==
-X-Received: by 2002:a05:6a00:8c5:b029:13e:ce2c:88bd with SMTP id s5-20020a056a0008c5b029013ece2c88bdmr8383825pfu.0.1602172431446;
-        Thu, 08 Oct 2020 08:53:51 -0700 (PDT)
+        bh=JACHm6oKXj4X805YMJCH36b46IaUgQQqgzNkmYNvOgM=;
+        b=TPhVOD8XJJdErpGr9zHDiUg+EoHrzZbeT7Z/hsItw7NTC7WaIF4N7ILbo56zbpFRD0
+         eFI0X5YuCSr9ni0T+Ehld2NJ9kGIEte1iOfUGOkfi3pjdQg/tyowVXGTEj7QVVDz5opf
+         RnejbclWq6oHgInp1ycNdXeNjAo1BatoDe9vzdE08bjy5ArokRK1gCU+l7mFd8qEpQBF
+         7njo3ysl/Ol+QBE/Qbt6nnZrxVPb67vjxj1kwEyHjyIBRuoMxhPFGIGzYMyCpaEceRPS
+         TCg5pdpTW0pQikF04zMiUslMz+u8Je+hwgTkmR0t1ivIPQFlZmcbu5wTAy3xlb26T3jG
+         rq/A==
+X-Gm-Message-State: AOAM5310ZL8ntF5PK8sw6dFxaBGLxnkhesvzKw/IqSOKHg9oMk06YuGL
+        FoZX8knqnrpA87FhElKpgFBVAoq0CPM=
+X-Google-Smtp-Source: ABdhPJzac6JfS6brawVZo1jUEJyMHa8jIGDCvhxgZNpBj6qqDAlOpgXyOVFEou+GUEaqdqlJIaJqsQ==
+X-Received: by 2002:a17:90a:4f0f:: with SMTP id p15mr9126273pjh.10.1602172381666;
+        Thu, 08 Oct 2020 08:53:01 -0700 (PDT)
 Received: from localhost.localdomain ([180.70.143.152])
-        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.53.48
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.52.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 08:53:50 -0700 (PDT)
+        Thu, 08 Oct 2020 08:53:00 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
         wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 029/117] dpaa2-eth: set dpaa2_dbg_cpu_ops.owner to THIS_MODULE
-Date:   Thu,  8 Oct 2020 15:50:41 +0000
-Message-Id: <20201008155209.18025-29-ap420073@gmail.com>
+Subject: [PATCH net 013/117] mac80211: set aql_txq_limit_ops.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:50:25 +0000
+Message-Id: <20201008155209.18025-13-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
 References: <20201008155209.18025-1-ap420073@gmail.com>
@@ -78,24 +78,24 @@ If THIS_MODULE is not set, the module would be removed while debugfs is
 being used.
 It eventually makes kernel panic.
 
-Fixes: 091a19ea6e34 ("dpaa2-eth: add debugfs statistics")
+Fixes: 3ace10f5b5ad ("mac80211: Implement Airtime-based Queue Limit (AQL)")
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth-debugfs.c | 1 +
+ net/mac80211/debugfs.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth-debugfs.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth-debugfs.c
-index 56d9927fbfda..765577386fc7 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth-debugfs.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth-debugfs.c
-@@ -59,6 +59,7 @@ static const struct file_operations dpaa2_dbg_cpu_ops = {
- 	.read = seq_read,
- 	.llseek = seq_lseek,
- 	.release = single_release,
+diff --git a/net/mac80211/debugfs.c b/net/mac80211/debugfs.c
+index 794892fe6622..ff690feb56a4 100644
+--- a/net/mac80211/debugfs.c
++++ b/net/mac80211/debugfs.c
+@@ -285,6 +285,7 @@ static const struct file_operations aql_txq_limit_ops = {
+ 	.read = aql_txq_limit_read,
+ 	.open = simple_open,
+ 	.llseek = default_llseek,
 +	.owner = THIS_MODULE,
  };
  
- static char *fq_type_to_str(struct dpaa2_eth_fq *fq)
+ static ssize_t force_tx_status_read(struct file *file,
 -- 
 2.17.1
 
