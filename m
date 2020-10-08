@@ -8,65 +8,65 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C41BC04EBE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EF3C4727E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2714E215A4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84FEB215A4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeGsgG5Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/yCldQm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731087AbgJHP7A (ORCPT
+        id S1731149AbgJHP65 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 11:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
+        Thu, 8 Oct 2020 11:58:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731923AbgJHP50 (ORCPT
+        with ESMTP id S1729249AbgJHP5c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:57:26 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1213DC0613D3;
-        Thu,  8 Oct 2020 08:57:26 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id 144so4345336pfb.4;
-        Thu, 08 Oct 2020 08:57:26 -0700 (PDT)
+        Thu, 8 Oct 2020 11:57:32 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32756C0613D5;
+        Thu,  8 Oct 2020 08:57:32 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id b26so4352945pff.3;
+        Thu, 08 Oct 2020 08:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ASI6wH+LVV7iTtr5dwHBwqJyLXzURutB+W9jf+xwR/E=;
-        b=FeGsgG5Q7E5CM4RBYmrnBjYW+0i3TPfkuKavrfI98XHsSqyHWrqos2nmTyXgwwa1vw
-         poxktwlq14I+FqycSKin7JkYi4fvhemd0AawwpuQnRv9UMPp7C3JefH8FJ3nQzXg5SJe
-         UpIUEI7Z+dq+MQi3bekJLfV+/eipJZCBZRldS63gsSEKR9/9kkOy/+W17gF6g+NBSlQo
-         CsphCzgqqA0fm4ofiH3LybLrgoO8z3QZlt2yCYIxvE2Sol8l4SIy2ChKF77dGJx4PDhL
-         PXJsZ1euZPglTA6LfwXtDPUyRXm+/DuiPo6OttMww7C24CpFg+GcpJQostdZrNd7icZH
-         buwg==
+        bh=b5XH8VB0Qc/fJW/TLis8ZtXssZ0nTmQ5NAZeJ30/k9k=;
+        b=I/yCldQmgyTcFnF/2uTiFisKzEgLO+jXPAEAFN22uwDyFMcsL8eXy6FrBhze8yHA5G
+         BPfVGCs9yHXlT8RmFOI3INNLn6JRhcc3OyeQKjVIj/2Dc/+ueIg0GzDzZI6fbw8KF+bt
+         A/EKqFRWgnp5PWtsh7vikCBmLgxvd8eTO16X+ef4mP1OgeRUr3K2AO8XGt1K/n6SODSw
+         S2pyAfDYHZbdOEc0uWIcYyznji6FZ8/Vy61T2KM9gnOS6rLa3d68LmgxrAk6sE6rJGOo
+         rzfHYEBoPvYhWlwEDKO6LCiG2WHLlUDkIzCEukyIbTNWegq2ojjnUz6zPzaxUnrfBi8x
+         /Wxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ASI6wH+LVV7iTtr5dwHBwqJyLXzURutB+W9jf+xwR/E=;
-        b=Th0cpY+/d0kJkmLA4bsjrpUij9vhMm3uFIAKiWI7InHkngKj+pn1jfA5VoYY5oLxxC
-         XLyj0VHHGVk8UsDGPNFRQHzvNfHjRCS7r2t99SYDLYapwighHDOvwcIJZ/qIaojBX+Cd
-         13h0RxNxCmxyoEOCthC1y00zVxBeRlZrtYUOLvzd+g+gb8rDDqz6g9NmA8JqpMG1S1yU
-         puhmG+wk2qK8pXpRFCxdF5axQQqp+MqowB+64km+88s/tqihmHKkYrI/lo9LGfIVzE6N
-         x0yvrvCgjohZLwcQj4nT4OiZC328UQABAZ2c+U2n5ETOTiNmY0ErhVk/mUaBT6gMUXJ7
-         iQBQ==
-X-Gm-Message-State: AOAM530KM0flsH797jfuGLHaw3PJe1xpruyfMY/bxQfCtogLFFcFPi9s
-        B77S47TD6ozkK/g3zxFWvlw=
-X-Google-Smtp-Source: ABdhPJwWADfef58g8/KwxAc4cXnxkoiPyYfYEb3d2rOWB0n4k/4PP/oRbJXBUSG3TJb17glV92R4bg==
-X-Received: by 2002:a63:d6:: with SMTP id 205mr7788791pga.309.1602172645650;
-        Thu, 08 Oct 2020 08:57:25 -0700 (PDT)
+        bh=b5XH8VB0Qc/fJW/TLis8ZtXssZ0nTmQ5NAZeJ30/k9k=;
+        b=RjEOEtiHluTXXEFoG7fZHdyjCb2OkU+Ea+y4LVl/z1G4cOq2eF3W2cHjzNCFuHPwAm
+         kzeKCXTKPxzogCrQqUIz3zPb6QZpBOVbeMnHk0uiGURavFmLaOoVr/wnyY69/BFM287I
+         PuX/mU58j5sctXDo60qKBk5vJVGeUaMFOSMweLRgwYvRDPLf53s0S32mx2PeqkODIfqj
+         weg8/XOQRTM2it1ggcNGUsoS8Duwe6zWVlOua2dbTT+yr8BqQ0X58kjsi2xZ++5N+lGV
+         6ZSs2spvtzZmk326tEdWf7iWi00Ar/pqWAvMMz9gp11JPBX/Rw1BcpnmSvAuT5YcYh/M
+         J7og==
+X-Gm-Message-State: AOAM532I41JdDzMYXmRlf/lCehe64BsaqG/eavyVepNM0WJH3pM8k1vg
+        UxrXB0ryXdS5JjxHTh1JF6E=
+X-Google-Smtp-Source: ABdhPJx8EkzDFXVeswhPWDjNIVZU2LLE6jNldSEO99k3w/+DquRYaqMnz5ZD7p5kghXtmn/EaAl83A==
+X-Received: by 2002:a17:90a:1ce:: with SMTP id 14mr8985881pjd.209.1602172651735;
+        Thu, 08 Oct 2020 08:57:31 -0700 (PDT)
 Received: from localhost.localdomain ([180.70.143.152])
-        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.57.22
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.57.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 08:57:24 -0700 (PDT)
+        Thu, 08 Oct 2020 08:57:30 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
         wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 098/117] wireless: mwifiex: set .owner to THIS_MODULE in debugfs.c
-Date:   Thu,  8 Oct 2020 15:51:50 +0000
-Message-Id: <20201008155209.18025-98-ap420073@gmail.com>
+Subject: [PATCH net 100/117] net: mt7601u: set fops_eeprom_param.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:51:52 +0000
+Message-Id: <20201008155209.18025-100-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
 References: <20201008155209.18025-1-ap420073@gmail.com>
@@ -78,38 +78,24 @@ If THIS_MODULE is not set, the module would be removed while debugfs is
 being used.
 It eventually makes kernel panic.
 
-Fixes: 5e6e3a92b9a4 ("wireless: mwifiex: initial commit for Marvell mwifiex driver")
+Fixes: c869f77d6abb ("add mt7601u driver")
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/net/wireless/marvell/mwifiex/debugfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/wireless/mediatek/mt7601u/debugfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/wireless/marvell/mwifiex/debugfs.c b/drivers/net/wireless/marvell/mwifiex/debugfs.c
-index dded92db1f37..641113260439 100644
---- a/drivers/net/wireless/marvell/mwifiex/debugfs.c
-+++ b/drivers/net/wireless/marvell/mwifiex/debugfs.c
-@@ -931,18 +931,21 @@ static const struct file_operations mwifiex_dfs_##name##_fops = {       \
- 	.read = mwifiex_##name##_read,                                  \
- 	.write = mwifiex_##name##_write,                                \
- 	.open = simple_open,                                            \
-+	.owner = THIS_MODULE,						\
+diff --git a/drivers/net/wireless/mediatek/mt7601u/debugfs.c b/drivers/net/wireless/mediatek/mt7601u/debugfs.c
+index 03f7235a90ab..3edf153dc68c 100644
+--- a/drivers/net/wireless/mediatek/mt7601u/debugfs.c
++++ b/drivers/net/wireless/mediatek/mt7601u/debugfs.c
+@@ -143,6 +143,7 @@ static const struct file_operations fops_eeprom_param = {
+ 	.read = seq_read,
+ 	.llseek = seq_lseek,
+ 	.release = single_release,
++	.owner = THIS_MODULE,
  };
  
- #define MWIFIEX_DFS_FILE_READ_OPS(name)                                 \
- static const struct file_operations mwifiex_dfs_##name##_fops = {       \
- 	.read = mwifiex_##name##_read,                                  \
- 	.open = simple_open,                                            \
-+	.owner = THIS_MODULE,						\
- };
- 
- #define MWIFIEX_DFS_FILE_WRITE_OPS(name)                                \
- static const struct file_operations mwifiex_dfs_##name##_fops = {       \
- 	.write = mwifiex_##name##_write,                                \
- 	.open = simple_open,                                            \
-+	.owner = THIS_MODULE,						\
- };
- 
- 
+ void mt7601u_init_debugfs(struct mt7601u_dev *dev)
 -- 
 2.17.1
 
