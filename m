@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4E1C4363C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A20C04EBE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0F2D20B1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2354620B1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGf2tbX7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rKqP7eYm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731728AbgJHPzd (ORCPT
+        id S1731791AbgJHP4O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 11:55:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41846 "EHLO
+        Thu, 8 Oct 2020 11:56:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731648AbgJHPzE (ORCPT
+        with ESMTP id S1731781AbgJHP4M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:55:04 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5904C0613D3;
-        Thu,  8 Oct 2020 08:55:03 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id o25so4677748pgm.0;
-        Thu, 08 Oct 2020 08:55:03 -0700 (PDT)
+        Thu, 8 Oct 2020 11:56:12 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8F2C0613D7;
+        Thu,  8 Oct 2020 08:56:11 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id k8so4351349pfk.2;
+        Thu, 08 Oct 2020 08:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Ca7kCfByCTJZS86pIaQXnoWI1vjQEzd90v0zOCj5y78=;
-        b=eGf2tbX7VuwVzfsGOOfc2HwDBFFpYfg7e4BdXwCIZdtzN3zDwKeSkkiiItygNJs/PM
-         g0x+/9l+sqnyAGnUuAlt9l0e8SiV1x2/lbT+QchRGM2+BgZKLG81H+IeCYGoW/8nn7z5
-         3fhFagK0Dg5V53sDYKWAzDmQlBlOVfREH/RwwdLU65QgSBT1gFuRPAkrTN2L8498apLU
-         VeqgMW4UG+SsE47/LJ0FGRhDXQ5jdrg9TiULOFxL/yhwDFs0WvLfTEWKBMHPVas8Ialc
-         jzmCpkDxkANtQmAepH52JwpJ2/XayxjdVD5EwBoWx56/mB2bPrKtBwfTCE1XLoaUABYI
-         mxfg==
+        bh=Sk5F78VcGPn+w7sgfEi3r97SHb8j3ok8zbS2IeIk1ug=;
+        b=rKqP7eYmgW/tQFTs4r1JB9NYk3ez37im6n/Qlk1lPzoct+Sh5ayv2e4e3pj4RoaXD0
+         xsoo9v951BK4whK1el3HMBiTW1IwS0uK+V6WChVgS3N1wmOvQfhT3CNe3XyGlbxYMX32
+         vwBHz/lk/KJKQJVfg4lsrlUG5Qk+iEjxmLFi8Tz9wq+suumY/tLqtGYdmAlsWWsLjymm
+         nZfixauEonWzu4YNSPv1K2bA4XgOOfQH5GrDyLO/r33PZL0HetiPQvLqr6oi0i2jhhYD
+         LD3ksP7XzN/IskBx4bF2KbabsuMI9KD0lyo8DuyHU2XFSd53XKN2aJ/6AzpkUCfksHmG
+         hzVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Ca7kCfByCTJZS86pIaQXnoWI1vjQEzd90v0zOCj5y78=;
-        b=MxgzWfsauDvAhaH6d2wm6XHXgLLIZxL94kU2C8cOi4c1flg054gRzizXsENjkRsPqG
-         qA+o2/zLwMWiqCpYKOfL77sa4THZ+mRnGitNzHf/l0j1X7iap4LzySVx72PxOPJtlvFn
-         HFFImkE7HaYLuC3egdjCvtRruX2y/dWYJR/NGFkrdXkgwaOcIbtrtLyN0rFZ+Mi+GhjL
-         XsZpFou99cG+hMManhpSjdacnJREUWqvA6XyfRxaeinLTmcMlFvfk9iEtlhdEBJ8knku
-         GvyiHG/nRSmGgMuGM/1iNr2PXlOkPlB7gF9LsarNi3ugSnKCN6RkA54PXN+TWYR59BnD
-         IdiA==
-X-Gm-Message-State: AOAM5306VgRv39bClO79rkLzv4hhLcdiNVlepqgPvnnshFYLq1vptw1f
-        vqF0hB/BzrRxUX564oGd6RA=
-X-Google-Smtp-Source: ABdhPJwmsiqnxFE3xKHM4Z67usj8nyWJL9n2is6V3XD5i9QKKAnUf0Cs1F1Np0QwbMzMgmGKBw86ag==
-X-Received: by 2002:a17:90b:118a:: with SMTP id gk10mr8418460pjb.218.1602172503445;
-        Thu, 08 Oct 2020 08:55:03 -0700 (PDT)
+        bh=Sk5F78VcGPn+w7sgfEi3r97SHb8j3ok8zbS2IeIk1ug=;
+        b=sez5+BVrSA1poAibvklxJSQEwc8mAP8A16Gj0fUBIStkFl5rZtN1Yg9lWxr2AgxKUm
+         ScOzKCHlO0ffM2ABRl8YWHJVW7rxMiRzLzkUCFJj4Ys7jZPvINOtntr6SEJjp9vCU9uz
+         U8lDV4zwUie6kb3ceWLubyq33Hlf1NNrIRlbeMuhNMx/xeby4el552PxsulUPyIscmh5
+         HjJa70RMnCpbBdnrx8KTbrW8giR0hgm14osv0Ca06Ap2fpFJ4t6Q3110WwaiVzp19cA7
+         BplGjI66PkR3mAyW9AIfyOfcyXUOCuWB4kzEO4zMKJ7JEZvs2mowaFcg0sjZh+ytUeZT
+         4Dlw==
+X-Gm-Message-State: AOAM533GoAvrpLlfDSHB5pF0kDOYfCIJ4q5gpVwAE7CrJsWAaeeCVnu3
+        v2prI3M7UXVEou+e+zDGexw=
+X-Google-Smtp-Source: ABdhPJyNg5hR6o1q/hxSe6JG1qvI6LnFfYlPFM+KTr6/VSTtAScCOzjoNQgPn8PWyexy80zoOdKgJA==
+X-Received: by 2002:a63:ba49:: with SMTP id l9mr312005pgu.246.1602172571471;
+        Thu, 08 Oct 2020 08:56:11 -0700 (PDT)
 Received: from localhost.localdomain ([180.70.143.152])
-        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.55.00
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.56.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 08:55:02 -0700 (PDT)
+        Thu, 08 Oct 2020 08:56:10 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
         wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 052/117] iwlwifi: set DEBUGFS_READ_FILE_OPS.owner to THIS_MODULE
-Date:   Thu,  8 Oct 2020 15:51:04 +0000
-Message-Id: <20201008155209.18025-52-ap420073@gmail.com>
+Subject: [PATCH net 074/117] wcn36xx: set fops_wcn36xx_dump.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:51:26 +0000
+Message-Id: <20201008155209.18025-74-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
 References: <20201008155209.18025-1-ap420073@gmail.com>
@@ -78,24 +78,24 @@ If THIS_MODULE is not set, the module would be removed while debugfs is
 being used.
 It eventually makes kernel panic.
 
-Fixes: be663ab67077 ("iwlwifi: split the drivers for agn and legacy devices 3945/4965")
+Fixes: 8e84c2582169 ("wcn36xx: mac80211 driver for Qualcomm WCN3660/WCN3680 hardware")
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/net/wireless/intel/iwlegacy/debug.c | 1 +
+ drivers/net/wireless/ath/wcn36xx/debug.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/wireless/intel/iwlegacy/debug.c b/drivers/net/wireless/intel/iwlegacy/debug.c
-index 4f741b305d96..03571066f580 100644
---- a/drivers/net/wireless/intel/iwlegacy/debug.c
-+++ b/drivers/net/wireless/intel/iwlegacy/debug.c
-@@ -136,6 +136,7 @@ static const struct file_operations il_dbgfs_##name##_ops = {	\
- 	.read = il_dbgfs_##name##_read,				\
- 	.open = simple_open,					\
- 	.llseek = generic_file_llseek,				\
-+	.owner = THIS_MODULE,					\
+diff --git a/drivers/net/wireless/ath/wcn36xx/debug.c b/drivers/net/wireless/ath/wcn36xx/debug.c
+index 6bd874c0a9f5..4b78be5c67e8 100644
+--- a/drivers/net/wireless/ath/wcn36xx/debug.c
++++ b/drivers/net/wireless/ath/wcn36xx/debug.c
+@@ -135,6 +135,7 @@ static ssize_t write_file_dump(struct file *file,
+ static const struct file_operations fops_wcn36xx_dump = {
+ 	.open = simple_open,
+ 	.write =       write_file_dump,
++	.owner = THIS_MODULE,
  };
  
- #define DEBUGFS_WRITE_FILE_OPS(name)				\
+ #define ADD_FILE(name, mode, fop, priv_data)		\
 -- 
 2.17.1
 
