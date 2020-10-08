@@ -2,86 +2,100 @@ Return-Path: <SRS0=KpSE=DP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04509C4CC6F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCEEC2BBD5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE200215A4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36EB120B1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:59:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c346zn0s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731366AbgJHP7h convert rfc822-to-8bit (ORCPT
+        id S1731768AbgJHP7b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 11:59:37 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:60477 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731452AbgJHP7c (ORCPT
+        Thu, 8 Oct 2020 11:59:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42446 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730891AbgJHP6M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:59:32 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-238-6KcKqProOHmg7Vl2R1BbrA-1; Thu, 08 Oct 2020 16:59:28 +0100
-X-MC-Unique: 6KcKqProOHmg7Vl2R1BbrA-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Thu, 8 Oct 2020 16:59:28 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Thu, 8 Oct 2020 16:59:28 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Taehee Yoo' <ap420073@gmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC:     "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "wil6210@qti.qualcomm.com" <wil6210@qti.qualcomm.com>,
-        "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>,
-        "b43-dev@lists.infradead.org" <b43-dev@lists.infradead.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH net 000/117] net: avoid to remove module when its debugfs
- is being used
-Thread-Topic: [PATCH net 000/117] net: avoid to remove module when its debugfs
- is being used
-Thread-Index: AQHWnYreCEbA8QiKJ0qlgP86SUSOo6mN3D7w
-Date:   Thu, 8 Oct 2020 15:59:28 +0000
-Message-ID: <1cbb69d83188424e99b2d2482848ae64@AcuMS.aculab.com>
-References: <20201008155048.17679-1-ap420073@gmail.com>
-In-Reply-To: <20201008155048.17679-1-ap420073@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+        Thu, 8 Oct 2020 11:58:12 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B63BC0613D5;
+        Thu,  8 Oct 2020 08:58:12 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id n14so4345737pff.6;
+        Thu, 08 Oct 2020 08:58:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=4Q3tt6tkPaS/9so7gcfZUREF7SggwCHKWDmvfIExvG8=;
+        b=c346zn0sbGCSVkN8iEd+inCP7K241yzuGSNt1lM9EqoPgFxgaawpV+ovruX03gHk7d
+         3BSaosAf6S17wONIRKKBeR+cFqRnw5hUDlF3/8Nnf8niDCAfi1UkmCtaTdMnrybGRCZu
+         zlqkiUGHUfUpAhdfU4kJWTnUByc6uIREyd3Iqe6B4QaGG8+UQRuqGjpg3JORj4uBytmE
+         aC9mliZmcP75v+rzgTyRjybYKosGSWm4tc7bLOj/EJKdMt8VI6KujAQMPaqVsmZRmh62
+         QPCe9wRTYuPVScSbwtawz3UWWEh1seOy172H0wLjF4sgEgBdjB9wugIArjl+Vrt2gSd8
+         sp+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=4Q3tt6tkPaS/9so7gcfZUREF7SggwCHKWDmvfIExvG8=;
+        b=pY7capGuSeymafHnNVnqrzwdEXC1RHHqy/khU11LSCM/s8LTtQTe8rNmnYXB64Colz
+         pwUWNXHHsk+6QChojE+6LAe0MsnaRh/6rlKToAAbfEQl0j4pGzMtIk0dfSd47G+LcBlH
+         sLk+8rLgSv7iKOgR2JMxkhqvWD+lteeMrE/uyev1TfEDuUeIQA8gcmLyXeD/CrTD8QoT
+         WRZ6cEH5aMCDnIeNzXh9vLU77CNKlMLqSOsSdrO5prV3OMD2C8NYihCEUHqyw5HKkiqS
+         RaQIPIM8ak2vKBWdCjxqKo4gOYxa6QjLdWUOwBAT5RcY87k8ceRtfuSnnqCFJZiDQJMM
+         aNeA==
+X-Gm-Message-State: AOAM533qjgcEgkPzBQ69QJRTpB8XU6Q/KUdQirOtEHV2kCGPutnGYiVK
+        XV5vABdZjUyorfEIQMuh+38=
+X-Google-Smtp-Source: ABdhPJyZaVpQYcmNxbB5NUuhW09qI7iqEDvyEVLvGU++XKAdCpEWTFn15X9ZFlNafwlIx5d5Q9f/Yg==
+X-Received: by 2002:a63:5c07:: with SMTP id q7mr8180649pgb.222.1602172692199;
+        Thu, 08 Oct 2020 08:58:12 -0700 (PDT)
+Received: from localhost.localdomain ([180.70.143.152])
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.58.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Oct 2020 08:58:11 -0700 (PDT)
+From:   Taehee Yoo <ap420073@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
+Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
+        wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH net 113/117] Bluetooth: set ssp_debug_mode_fops.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:52:05 +0000
+Message-Id: <20201008155209.18025-113-ap420073@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
+References: <20201008155209.18025-1-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Taehee Yoo
-> Sent: 08 October 2020 16:49
-> 
-> When debugfs file is opened, its module should not be removed until
-> it's closed.
-> Because debugfs internally uses the module's data.
-> So, it could access freed memory.
-> 
-> In order to avoid panic, it just sets .owner to THIS_MODULE.
-> So that all modules will be held when its debugfs file is opened.
+If THIS_MODULE is not set, the module would be removed while debugfs is
+being used.
+It eventually makes kernel panic.
 
-Can't you fix it in common code?
+Fixes: 6e07231a80de ("Bluetooth: Expose Secure Simple Pairing debug mode setting in debugfs")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+ net/bluetooth/hci_debugfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 4a26cb544635..d162736a5856 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -441,6 +441,7 @@ static const struct file_operations ssp_debug_mode_fops = {
+ 	.open		= simple_open,
+ 	.read		= ssp_debug_mode_read,
+ 	.llseek		= default_llseek,
++	.owner		= THIS_MODULE,
+ };
+ 
+ static int auto_accept_delay_set(void *data, u64 val)
+-- 
+2.17.1
 
