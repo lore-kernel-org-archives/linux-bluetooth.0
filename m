@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5060EC4363C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4E1C4363C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAC38215A4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0F2D20B1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Oct 2020 15:56:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loDdAqkj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGf2tbX7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730650AbgJHP4G (ORCPT
+        id S1731728AbgJHPzd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Oct 2020 11:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42014 "EHLO
+        Thu, 8 Oct 2020 11:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730863AbgJHPz4 (ORCPT
+        with ESMTP id S1731648AbgJHPzE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Oct 2020 11:55:56 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C5EC061755;
-        Thu,  8 Oct 2020 08:55:56 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id k8so4350743pfk.2;
-        Thu, 08 Oct 2020 08:55:56 -0700 (PDT)
+        Thu, 8 Oct 2020 11:55:04 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5904C0613D3;
+        Thu,  8 Oct 2020 08:55:03 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id o25so4677748pgm.0;
+        Thu, 08 Oct 2020 08:55:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pfuo+ODM7s9TgopEFYu+f8EPhwKyR/Vk60BRbvNfbcE=;
-        b=loDdAqkjehHXL2LFmQD05nwtubzD3PrPJApWBJtl3c2DYHeEQFv5S35MzyUH/U+QvR
-         hgRhgjeeR6UorbvN2XhVr+0VPu4fhJ4eAkk5efrCau532lhotQkEbU+cON3Uh2TCupv6
-         wMWYAQrDhgtXORrBCJPHacCRw6h3t31T7+R3spgkD/zsbGUrn9KFsuCjfiTROGjAzdBd
-         siLtih2x0IncE+noW51iH34gElmDmlbICfj/nCkQ7WiLidE+wCBfBg7X+S8bb+N+6YlQ
-         PXldKkPbW+grfNFEnJqqTclwNtt/1eFuNyYh+ia1BvI/kLYrla9xiuYXJudo8YRZKsyz
-         ONxQ==
+        bh=Ca7kCfByCTJZS86pIaQXnoWI1vjQEzd90v0zOCj5y78=;
+        b=eGf2tbX7VuwVzfsGOOfc2HwDBFFpYfg7e4BdXwCIZdtzN3zDwKeSkkiiItygNJs/PM
+         g0x+/9l+sqnyAGnUuAlt9l0e8SiV1x2/lbT+QchRGM2+BgZKLG81H+IeCYGoW/8nn7z5
+         3fhFagK0Dg5V53sDYKWAzDmQlBlOVfREH/RwwdLU65QgSBT1gFuRPAkrTN2L8498apLU
+         VeqgMW4UG+SsE47/LJ0FGRhDXQ5jdrg9TiULOFxL/yhwDFs0WvLfTEWKBMHPVas8Ialc
+         jzmCpkDxkANtQmAepH52JwpJ2/XayxjdVD5EwBoWx56/mB2bPrKtBwfTCE1XLoaUABYI
+         mxfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=pfuo+ODM7s9TgopEFYu+f8EPhwKyR/Vk60BRbvNfbcE=;
-        b=Yz33g8HIEczOJC21KuLLIA43OsYs9a1RzPMQ/41hNEr/9acxYYb+Gq3ZpwmLoDL8Xv
-         Sl4ZkN4vaXLARnds56NL+RDk278YO8xh0fOyW1f6A+PS0h/S/eX9BwDKnS7FRF60eiDQ
-         IWTB2qT16rTb83fe44os+RZRfGwnwE3roAqx+m4pJ2UMY/BGjHUEU74k3Awbh7kep/Qg
-         ePYcPwWJEb/TzST8heOLZvJo3bg57Zj0YR4o4XF2PK8oxDzhYYqkj0ggWCaGAOpWZJbe
-         IYJSYX/erS5OPdUprsrFaG3ybi69rwmcia3Y8yWfR6bYSCGni6N0RLndGDXqPwrWWAoQ
-         ykbA==
-X-Gm-Message-State: AOAM531qoBFuNNETcabH0FWHsM3KmAZrxwy8msDTfuqizMeancFaZALq
-        5+oJO/MpoBfnR3JZRTCrTrI=
-X-Google-Smtp-Source: ABdhPJzkgu6DSC0hnrRv1c8EXy11hP/vhmO0RIAaKy6zzxBp+Imc0CLMpK9h7c272JLzaEItTOefPA==
-X-Received: by 2002:a17:90a:1702:: with SMTP id z2mr8983651pjd.88.1602172555908;
-        Thu, 08 Oct 2020 08:55:55 -0700 (PDT)
+        bh=Ca7kCfByCTJZS86pIaQXnoWI1vjQEzd90v0zOCj5y78=;
+        b=MxgzWfsauDvAhaH6d2wm6XHXgLLIZxL94kU2C8cOi4c1flg054gRzizXsENjkRsPqG
+         qA+o2/zLwMWiqCpYKOfL77sa4THZ+mRnGitNzHf/l0j1X7iap4LzySVx72PxOPJtlvFn
+         HFFImkE7HaYLuC3egdjCvtRruX2y/dWYJR/NGFkrdXkgwaOcIbtrtLyN0rFZ+Mi+GhjL
+         XsZpFou99cG+hMManhpSjdacnJREUWqvA6XyfRxaeinLTmcMlFvfk9iEtlhdEBJ8knku
+         GvyiHG/nRSmGgMuGM/1iNr2PXlOkPlB7gF9LsarNi3ugSnKCN6RkA54PXN+TWYR59BnD
+         IdiA==
+X-Gm-Message-State: AOAM5306VgRv39bClO79rkLzv4hhLcdiNVlepqgPvnnshFYLq1vptw1f
+        vqF0hB/BzrRxUX564oGd6RA=
+X-Google-Smtp-Source: ABdhPJwmsiqnxFE3xKHM4Z67usj8nyWJL9n2is6V3XD5i9QKKAnUf0Cs1F1Np0QwbMzMgmGKBw86ag==
+X-Received: by 2002:a17:90b:118a:: with SMTP id gk10mr8418460pjb.218.1602172503445;
+        Thu, 08 Oct 2020 08:55:03 -0700 (PDT)
 Received: from localhost.localdomain ([180.70.143.152])
-        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.55.53
+        by smtp.gmail.com with ESMTPSA id f1sm5917929pjh.20.2020.10.08.08.55.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2020 08:55:55 -0700 (PDT)
+        Thu, 08 Oct 2020 08:55:02 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 Cc:     ap420073@gmail.com, linux-wireless@vger.kernel.org,
         wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 069/117] ath10k: set fops_quiet_period.owner to THIS_MODULE
-Date:   Thu,  8 Oct 2020 15:51:21 +0000
-Message-Id: <20201008155209.18025-69-ap420073@gmail.com>
+Subject: [PATCH net 052/117] iwlwifi: set DEBUGFS_READ_FILE_OPS.owner to THIS_MODULE
+Date:   Thu,  8 Oct 2020 15:51:04 +0000
+Message-Id: <20201008155209.18025-52-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201008155209.18025-1-ap420073@gmail.com>
 References: <20201008155209.18025-1-ap420073@gmail.com>
@@ -78,26 +78,24 @@ If THIS_MODULE is not set, the module would be removed while debugfs is
 being used.
 It eventually makes kernel panic.
 
-Fixes: 63fb32df9786 ("ath10k: add debugfs entry to configure quiet period")
+Fixes: be663ab67077 ("iwlwifi: split the drivers for agn and legacy devices 3945/4965")
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/net/wireless/ath/ath10k/debug.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/wireless/intel/iwlegacy/debug.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/wireless/ath/ath10k/debug.c b/drivers/net/wireless/ath/ath10k/debug.c
-index 78bbb0380323..9789ef98d25b 100644
---- a/drivers/net/wireless/ath/ath10k/debug.c
-+++ b/drivers/net/wireless/ath/ath10k/debug.c
-@@ -1956,7 +1956,8 @@ static ssize_t ath10k_read_quiet_period(struct file *file, char __user *ubuf,
- static const struct file_operations fops_quiet_period = {
- 	.read = ath10k_read_quiet_period,
- 	.write = ath10k_write_quiet_period,
--	.open = simple_open
-+	.open = simple_open,
-+	.owner = THIS_MODULE,
+diff --git a/drivers/net/wireless/intel/iwlegacy/debug.c b/drivers/net/wireless/intel/iwlegacy/debug.c
+index 4f741b305d96..03571066f580 100644
+--- a/drivers/net/wireless/intel/iwlegacy/debug.c
++++ b/drivers/net/wireless/intel/iwlegacy/debug.c
+@@ -136,6 +136,7 @@ static const struct file_operations il_dbgfs_##name##_ops = {	\
+ 	.read = il_dbgfs_##name##_read,				\
+ 	.open = simple_open,					\
+ 	.llseek = generic_file_llseek,				\
++	.owner = THIS_MODULE,					\
  };
  
- static ssize_t ath10k_write_btcoex(struct file *file,
+ #define DEBUGFS_WRITE_FILE_OPS(name)				\
 -- 
 2.17.1
 
