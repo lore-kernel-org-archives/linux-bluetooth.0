@@ -2,107 +2,217 @@ Return-Path: <SRS0=dXH6=DQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C2FC43457
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Oct 2020 15:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC8AC433DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Oct 2020 20:32:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 136B6222C4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Oct 2020 15:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDB5722251
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Oct 2020 20:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKIp27Hi"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A8XYNUW8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389291AbgJIPeU (ORCPT
+        id S2388298AbgJIUcX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Oct 2020 11:34:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
+        Fri, 9 Oct 2020 16:32:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388473AbgJIPeT (ORCPT
+        with ESMTP id S1732521AbgJIUcX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Oct 2020 11:34:19 -0400
-Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9E2C0613D2;
-        Fri,  9 Oct 2020 08:34:18 -0700 (PDT)
-Received: by mail-yb1-xb44.google.com with SMTP id x8so7520895ybe.12;
-        Fri, 09 Oct 2020 08:34:18 -0700 (PDT)
+        Fri, 9 Oct 2020 16:32:23 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 551D1C0613D2
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Oct 2020 13:32:23 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id g29so8160183pgl.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Oct 2020 13:32:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dhaC4CfBlF6MI4/GCdyxBEo4B/qjNFnWrs/5fzTSDE8=;
-        b=dKIp27HidNSg+q8q4jGKuxlpggHIUEiozaf/GfFDEx0gBSsS12bWnDqSiBTwTetceK
-         un1S6D8s0NnzONZVNAHg1MXEXmqrwezOAA+FbWywPRTC+QLrheoB0qNfszTjmIPXjst9
-         zW9DypCEeIIFaH+BTF2RYtWEZUHGa+kk8OaRmm4ObZnf5+lRbXKu+1wj8CKcXu3L04iu
-         a4Cc6FqCbp5jyHMjFu+Fy4eNyzKGJQ5fukrM8WyJPc5cU9Q2n4grXKqH3ZG2Wr9OimwC
-         QtGTMJe53SA5+xGaOnqYFgZU/uZb8T3j5iJaUltl+3sUM4VYOhEtaK/vSvxZws8JVjuw
-         uDUg==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q+2n+NyZ2VneHzUu3O2ZFqbFaH2GXP/g85/cyhLlDKI=;
+        b=A8XYNUW8Xe/wp8Aw5xuggIjNpSnLeh7BCaGlsN1cdwkCDjJ+bm3AodNUNMj4u7j+qC
+         Fw80OE29KjLbplTmCSepVJeFZrlKkr5wnjlULWeLMim0M4QlOaJ1Lv+qnsNa8Rw0ZGyo
+         v4AORhGBFeS2Bhvi5tEi9mS8B0/n6+tb1m5jI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dhaC4CfBlF6MI4/GCdyxBEo4B/qjNFnWrs/5fzTSDE8=;
-        b=tYi7P/Bdpt9kP0fh2y+XUbosAULUQM2AaWjViGxyKKaF4fpu3YCwg4D4sFi/UpGhQz
-         bXQUjdwuBkm+a1N2NNEAGCB9v+O5jw+90F06dh4PC73dOHYIsHnZ7A7pfxoraZ0X6Kx0
-         6eqe/ZyGHu3INhkhjswKsKJouU5Y7Q4+vHUenjqjmkizVYnv9Rb70r/vHj0nfl5k5uDC
-         Sfg2IQNjdf806gJdDR9LVAVyOSAGQeMmAYONzyBYbbwm2/bZ1g5VK2y8X53dEVUtWX12
-         4meE+K/IFz7PjHm+lK8rOemHm63tCWjJnVISqA1ZyrUhavfNa7KbUKFc+q5yqlJ25W2N
-         0tEA==
-X-Gm-Message-State: AOAM532aFiDudAnaQEcpq6BXdLLvKzo/Q6pmmTQrxastovW3SDNI27Ab
-        gMzqTB73GEpj91Dvbux98k0Q1GFCPcPkzhubpqo=
-X-Google-Smtp-Source: ABdhPJxdTKC82L3IOwN1ItfamDMCaGgZzWZj6raebF9Fbp0Hxzd9YYx3fdVX3uKw5Ru/rNGKU+1wjtJxIB1ujSmM1Kk=
-X-Received: by 2002:a25:dc09:: with SMTP id y9mr2896321ybe.231.1602257657463;
- Fri, 09 Oct 2020 08:34:17 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Q+2n+NyZ2VneHzUu3O2ZFqbFaH2GXP/g85/cyhLlDKI=;
+        b=t1Y9iOaN5PHjLwHA0LSj+PMlbnKioE3k9R9NTxz1jafdRnw+QaoUebY+DkNhxUI9hH
+         C4F7tJDmLT+3PJNo0MhFaTzu/RM36Z620x3QIiQk0ObXoqrZimIxH1uLQfEDkzw15O14
+         Lifnz7CQPc+FycaY/24Rd5vn5vALwmVl1VEg2KLOtlhVP1f5/qrGzYNulqu7VWQLUzMB
+         2GBNTW5bvTSmTuhA4DYwvHuJCVzJ8PZ0BBVWPXU63HKH/eKdbNwB9fFuoR1MMXqU/ony
+         o2Vd2KiwVcQnWxj/x8PFnkczhcUq7XUDYcYnB3Pgvkb2viN8zhWdKA5FtQXLK2erJakq
+         6YBQ==
+X-Gm-Message-State: AOAM531Wxk/QHxMOz/zi97+C875dMylix+A0kE1VSHyAhy50u/71svZs
+        vISBG2xKuSpKIt/n52Xggjdl1A==
+X-Google-Smtp-Source: ABdhPJw6NQLrfDn2TZOVRhHaE/4OISnGsGiedt9Nbd2aFZ9b1GT5NT1UMOuE55luWmrtXwFD8Y2D8Q==
+X-Received: by 2002:a62:2546:0:b029:153:753e:68e3 with SMTP id l67-20020a6225460000b0290153753e68e3mr13234994pfl.61.1602275542760;
+        Fri, 09 Oct 2020 13:32:22 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
+        by smtp.gmail.com with ESMTPSA id m22sm10952251pfk.214.2020.10.09.13.32.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Oct 2020 13:32:22 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, drinkcat@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_h5: Add driver capabilities for RTL8822CS
+Date:   Fri,  9 Oct 2020 13:32:09 -0700
+Message-Id: <20201009133147.1.Ie792480ac24829a48669e83c0045157eb3d46775@changeid>
+X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
 MIME-Version: 1.0
-References: <20201008155048.17679-1-ap420073@gmail.com> <1cbb69d83188424e99b2d2482848ae64@AcuMS.aculab.com>
- <62f6c2bd11ed8b25c1cd4462ebc6db870adc4229.camel@sipsolutions.net>
- <87v9fkgf4i.fsf@suse.de> <fd8aaf06b53f32eae7b5bdcec2f3ea9e1f419b1d.camel@sipsolutions.net>
- <CAMArcTUdGPH5a0RTUiNoLvuQtdnXHOCwStJ+gp_noaNEzgSA1Q@mail.gmail.com> <4a58caee3b6b8975f4ff632bf6d2a6673788157d.camel@sipsolutions.net>
-In-Reply-To: <4a58caee3b6b8975f4ff632bf6d2a6673788157d.camel@sipsolutions.net>
-From:   Steve deRosier <derosier@gmail.com>
-Date:   Fri, 9 Oct 2020 08:33:41 -0700
-Message-ID: <CALLGbRKFOcSDX6yw9W=8fzKJw+GDdL0XSsWYq_kymvDPkz74KQ@mail.gmail.com>
-Subject: Re: [PATCH net 000/117] net: avoid to remove module when its debugfs
- is being used
-To:     Johannes Berg <johannes@sipsolutions.net>
-Cc:     Taehee Yoo <ap420073@gmail.com>, Nicolai Stange <nstange@suse.de>,
-        David Laight <David.Laight@aculab.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "wil6210@qti.qualcomm.com" <wil6210@qti.qualcomm.com>,
-        "brcm80211-dev-list@cypress.com" <brcm80211-dev-list@cypress.com>,
-        "b43-dev@lists.infradead.org" <b43-dev@lists.infradead.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Oct 9, 2020 at 3:22 AM Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> On Fri, 2020-10-09 at 19:15 +0900, Taehee Yoo wrote:
-> >
-> > Okay, as you mentioned earlier in 001/117 patch thread,
-> > I will squash patches into per-driver/subsystem then send them as v2.
->
-> Give me a bit. I think I figured out a less intrusive way that at least
-> means we don't have to do it if the fops doesn't have ->release(), which
-> is the vast majority.
->
+Certain controller capabilities must be exposed by the driver because it
+can't be queried from HCI (wideband speech support, for example). Update
+the match data structure to set the supported capabilities and set the
+proper quirks on hdev after registering the device.
 
-While I'm all for a patch that fixes something at a single level
-instead of touching 100s of files, let me ask a loosely related, but
-more basic, question: Should `->owner` be set properly in each driver?
- Or the flip of that, should we be considering that it isn't a
-semantic error? I don't know the answer myself, I just thought to ask
-the question.
+Also update the 8822CS capabilities to show it supports wideband speech
+and has valid le states (allows central peripheral role).
 
-IMHO, if true that `->owner` should be set for "correctness", and even
-if we fix the debugfs problem elsewhere, perhaps this series (squashed
-of course) should be merged.
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
 
-- Steve
+ drivers/bluetooth/hci_h5.c | 53 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 44 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index a10d710fc3f13e..3833a2d276665f 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -97,6 +97,11 @@ struct h5 {
+ 	struct gpio_desc *device_wake_gpio;
+ };
+ 
++enum h5_capabilities {
++	H5_CAP_WIDEBAND_SPEECH = BIT(0),
++	H5_CAP_VALID_LE_STATES = BIT(1),
++};
++
+ struct h5_vnd {
+ 	int (*setup)(struct h5 *h5);
+ 	void (*open)(struct h5 *h5);
+@@ -106,6 +111,11 @@ struct h5_vnd {
+ 	const struct acpi_gpio_mapping *acpi_gpio_map;
+ };
+ 
++struct h5_device_data {
++	uint32_t capabilities;
++	struct h5_vnd *vnd;
++};
++
+ static void h5_reset_rx(struct h5 *h5);
+ 
+ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+@@ -791,7 +801,10 @@ static const struct hci_uart_proto h5p = {
+ static int h5_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct device *dev = &serdev->dev;
++	struct hci_dev *hdev;
+ 	struct h5 *h5;
++	const struct h5_device_data *data;
++	int err;
+ 
+ 	h5 = devm_kzalloc(dev, sizeof(*h5), GFP_KERNEL);
+ 	if (!h5)
+@@ -808,23 +821,21 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 		if (!match)
+ 			return -ENODEV;
+ 
+-		h5->vnd = (const struct h5_vnd *)match->driver_data;
++		data = (const struct h5_device_data *)match->driver_data;
++		h5->vnd = data->vnd;
+ 		h5->id  = (char *)match->id;
+ 
+ 		if (h5->vnd->acpi_gpio_map)
+ 			devm_acpi_dev_add_driver_gpios(dev,
+ 						       h5->vnd->acpi_gpio_map);
+ 	} else {
+-		const void *data;
+-
+ 		data = of_device_get_match_data(dev);
+ 		if (!data)
+ 			return -ENODEV;
+ 
+-		h5->vnd = (const struct h5_vnd *)data;
++		h5->vnd = data->vnd;
+ 	}
+ 
+-
+ 	h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+ 	if (IS_ERR(h5->enable_gpio))
+ 		return PTR_ERR(h5->enable_gpio);
+@@ -834,7 +845,20 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 	if (IS_ERR(h5->device_wake_gpio))
+ 		return PTR_ERR(h5->device_wake_gpio);
+ 
+-	return hci_uart_register_device(&h5->serdev_hu, &h5p);
++	err = hci_uart_register_device(&h5->serdev_hu, &h5p);
++	if (err)
++		return err;
++
++	hdev = h5->serdev_hu.hdev;
++
++	/* Set match specific quirks */
++	if (data->capabilities & H5_CAP_WIDEBAND_SPEECH)
++		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
++
++	if (data->capabilities & H5_CAP_VALID_LE_STATES)
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++
++	return 0;
+ }
+ 
+ static void h5_serdev_remove(struct serdev_device *serdev)
+@@ -1000,12 +1024,21 @@ static struct h5_vnd rtl_vnd = {
+ 	.resume		= h5_btrtl_resume,
+ 	.acpi_gpio_map	= acpi_btrtl_gpios,
+ };
++
++static const struct h5_device_data h5_data_rtl8822cs = {
++	.capabilities = H5_CAP_WIDEBAND_SPEECH | H5_CAP_VALID_LE_STATES,
++	.vnd = &rtl_vnd,
++};
++
++static const struct h5_device_data h5_data_rtl8723bs = {
++	.vnd = &rtl_vnd,
++};
+ #endif
+ 
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id h5_acpi_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
+-	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
++	{ "OBDA8723", (kernel_ulong_t)&h5_data_rtl8723bs},
+ #endif
+ 	{ },
+ };
+@@ -1019,9 +1052,11 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
+ static const struct of_device_id rtl_bluetooth_of_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
+ 	{ .compatible = "realtek,rtl8822cs-bt",
+-	  .data = (const void *)&rtl_vnd },
++	  .data = &h5_data_rtl8822cs,
++	},
+ 	{ .compatible = "realtek,rtl8723bs-bt",
+-	  .data = (const void *)&rtl_vnd },
++	  .data = &h5_data_rtl8723bs,
++	},
+ #endif
+ 	{ },
+ };
+-- 
+2.28.0.1011.ga647a8990f-goog
+
