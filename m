@@ -1,110 +1,124 @@
-Return-Path: <SRS0=53yU=DR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=+Qjd=DS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED74C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Oct 2020 23:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4421CC433E7
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Oct 2020 05:00:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52427207BC
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Oct 2020 23:33:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCD892078B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Oct 2020 05:00:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pD+ObALX"
+	dkim=pass (2048-bit key) header.d=tcd-ie.20150623.gappssmtp.com header.i=@tcd-ie.20150623.gappssmtp.com header.b="2SyXl+bP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbgJJXdE (ORCPT
+        id S1726184AbgJKFAl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 10 Oct 2020 19:33:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47490 "EHLO
+        Sun, 11 Oct 2020 01:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725855AbgJJXdD (ORCPT
+        with ESMTP id S1725882AbgJKFAl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 10 Oct 2020 19:33:03 -0400
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B50CC0613D0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2020 16:33:04 -0700 (PDT)
-Received: by mail-qt1-x841.google.com with SMTP id c5so10978114qtw.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2020 16:33:04 -0700 (PDT)
+        Sun, 11 Oct 2020 01:00:41 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8205BC0613CE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2020 22:00:40 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id r10so10862431pgb.10
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Oct 2020 22:00:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=IXO8s1FSJPFYxMSzOK1b5Mo6OFU8qq0Dsu04m7ZMRYs=;
-        b=pD+ObALXldoyjJbXh36qa5TdIEOGEIZYka5IMF4U4mkFBmgWT/xcz/Csd8XNcQGNbT
-         wYZ5hwpEm02ruGSkGZ5R6spuLQnJ9fytekEAd2riOy/0Tf6XRKGnPc+V+APPNjC84jlf
-         O97Wvwv3DalFmMxwKf0QSsjru2BqrQTccbFl5qX3EOt/w/SW3Gj7J4kpXcXUFy5RBQ05
-         azHw6J+a0WzKZMk95KDmq8dY/aWDeyZMbRSOboXl0vKSxElLrwyG0vhBwqyig9aZreo3
-         /wO6BhHtaptnuNuIiQ8RVUDxrFfz0FkPGd+XbJoPDAkfnOApB/lX5wgRfL8k+18IMqy3
-         1Bgg==
+        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=eZG5SK7sZHA0lKrpILD/eRTz7bH38IZ6QkwBvzzfKas=;
+        b=2SyXl+bPWdcKTyuwrPRURxD2uUuMcwdFNXEMn2loQguHsdLwf3tzgg0zGUgdI7RrmH
+         Bzlzyp2RswrhyTnUzOHI3f4XuqbbZ/rR26AedS46ebt7NWobCmh9KLYXunHrgIX2oRt6
+         6S55fvbsDcQhxc+Y63Im4PYdEEhTLiVc8XsjsRlM6sORjpNErDgIEkDCwpnRryq5sj6+
+         tdGVl3BUDThCObs+Ss09mkIaAMYj6up/L1HsAYyrEjeE8WblWj9tPCdiVlPDjCCk88GY
+         so2c0YwE25VwEaMkG3I8GnT6D7Xf6liqVYliGwY1B08D4vEqhjnemKVywVfGoYvuLGYH
+         9bYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=IXO8s1FSJPFYxMSzOK1b5Mo6OFU8qq0Dsu04m7ZMRYs=;
-        b=KVGiy6P88x62aD4rni1Kf3k0Ju3SA3OrP8Qp6hILPmoWxIpR4xTE6AQ4wWrmsByYGe
-         U/NrQ7fsot+79y8hxlDB5YY953IA3XtaX7loR/wtzFOPO3s0LUen9zLxJo9qs9v7v9lb
-         mZ+KMdQzHxd3ls6eFjdGfKdb5jus+XQBMyRFX3F5wClnB6C0iPVpbQGFfBY5v0z19keW
-         n4HosaUbYbh0ER46sSMjAUbFd1TeUj4t+3vg82SyPigHxdYs+nfxLV2v7YN5bmCAcZr6
-         R0wjCcDI89iUSOkn2X00IaxdiCIJrwAHY4TeP1AtYG1uFGuFzlL/ST9Aj9UBvH71FLtN
-         DZHg==
-X-Gm-Message-State: AOAM530h5nhotFf3lrmb6ZbMkK1ss0QdgICKjmpjIN0xLWOJjpKnxguE
-        SrqjqBA8viOFwtSFaCdIfryND68EkIMfxQ==
-X-Google-Smtp-Source: ABdhPJwnzir/hX9GsrcQ54ZzbqLoCxqTNKWvJc3tQBdqaP77cozeuyUpqG9+UOYSDKc1UwMVnLVRTQ==
-X-Received: by 2002:aed:35cb:: with SMTP id d11mr4240119qte.324.1602372783044;
-        Sat, 10 Oct 2020 16:33:03 -0700 (PDT)
-Received: from [172.17.0.2] ([52.167.162.52])
-        by smtp.gmail.com with ESMTPSA id l12sm9269950qkg.54.2020.10.10.16.33.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2020 16:33:02 -0700 (PDT)
-Message-ID: <5f8244ae.1c69fb81.ce543.bf05@mx.google.com>
-Date:   Sat, 10 Oct 2020 16:33:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5792907437120680591=="
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=eZG5SK7sZHA0lKrpILD/eRTz7bH38IZ6QkwBvzzfKas=;
+        b=mUGXxUxclAdWdKA6HaYKGzpBL3wuH+VoCzryHbgr8rq/JmfyyiebhgLproHmk1BxzF
+         Elv1aMFNvb2RMth3/BIBG6rR9KJuKVYIfc13NL3rBBbsixsq0anJdv8B47FELZdhgXUK
+         EJScSHw4Q+npP3PdrClXR6PxoH3on18rKjx06gRzL8FvnrmASM6Rai0tk4lSh4NrHT4u
+         OLRqVlSawDnaBZmHJgsagWBttCub1SgUXwjFxvlOXRwD1oAlojW3H4Rmh9x+BOewBpfo
+         7tjiTMJLZ15i1Um+QBvluSS1zAQHC8DR0CEisJeX37l2SBYBiLBP/OgyB5XRGLyyCoyH
+         eR6Q==
+X-Gm-Message-State: AOAM5316IYBwSL0P5eZyM3/MN6wkLSoWn2iUxYqq/UTswp2ZxRnbZG9m
+        iGijG132Cw0zd3z79Jhx8BX5khBybkDyYvgI
+X-Google-Smtp-Source: ABdhPJyHRKP+Ean5/6dkb0GMavh0BrvtwuJm36tTIitfqNt+7MDm3jPpc8HRqLId+4hMS2DITjQLmw==
+X-Received: by 2002:a62:e112:0:b029:152:b36e:b05d with SMTP id q18-20020a62e1120000b0290152b36eb05dmr18416630pfh.3.1602392439630;
+        Sat, 10 Oct 2020 22:00:39 -0700 (PDT)
+Received: from [192.168.2.14] (216-19-182-159.dyn.novuscom.net. [216.19.182.159])
+        by smtp.gmail.com with ESMTPSA id x4sm15348527pfm.86.2020.10.10.22.00.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Oct 2020 22:00:38 -0700 (PDT)
+To:     linux-bluetooth@vger.kernel.org
+From:   Peter Mullen <omaolaip@tcd.ie>
+Subject: Bose QC 35 Battery/ANC Support
+Message-ID: <333e38b3-da26-e3c6-76fb-1ee1caf90299@tcd.ie>
+Date:   Sat, 10 Oct 2020 22:00:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, daniel@simko.xyz
-Subject: RE: [BlueZ] profiles: Fix segfault when using headset controls
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201010222719.439956-1-daniel@simko.xyz>
-References: <20201010222719.439956-1-daniel@simko.xyz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5792907437120680591==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi all,
 
-This is automated email and please do not reply to this email!
+I've been working on a plugin that adds support for battery level 
+reporting and Active Noise Cancelling (ANC) control for the Bose QC 35 
+headphones. The patch is nearly ready to go, but because of the 
+non-standard way it's implemented I figured it might be necessary to get 
+some preliminary feedback on it prior to submission (or to see if it's 
+worth submitting).
 
-Dear submitter,
+As a brief overview of device control, the QC35 has a set of additional 
+controls operating over rfcomm channel 8 where messages are passed back 
+and forth between devices. The messages consist of a 3-byte opcode, a 
+1-byte payload length, and N-bytes of payload. There's some more 
+information on the specifics here: 
+https://blog.davidventura.com.ar/reverse-engineering-the-bose-qc35-bluetooth-protocol.html
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=362639
+As this is a non-standard "profile", there's no profile UUID assigned to 
+it which makes adding a profile somewhat more complicated. My solution 
+here was to add a profile under the iPod Accessory Protocol (iAP) 
+profile UUID which the QC35 lists, and to then filter out devices in the 
+profile probe callback based on manufacturer ID, device class, and 
+product ID. This isn't ideal as the probe will be called for any device 
+listing the iAP UUID, so suggestions for alternative approaches (if 
+necessary) are appreciated.
 
----Test result---
+For session state control, I've hooked into the AVDTP state-change 
+callback. Again, possibly non-standard but this seemed to be the best 
+way to trigger the initiatiation/tearing down of the rfcomm connection.
 
-##############################
-Test: CheckPatch - PASS
+For battery level integration, I've basically just wrapped the dbus 
+interface from the standard GATT battery profile. This has been working 
+fine with my DE; the battery level shows immediately after connection 
+and updates as the level drops.
 
-##############################
-Test: CheckGitLint - PASS
+For ANC integration, I've added a new dbus interface under 
+"org.bluez.Anc1". The interface contains a read-only "Range" property, 
+which indicates the number of discrete values the ANC can be set to, and 
+a read-write property "Level" which gets/sets the level. This interface 
+layout was chosen to be device agnostic, so that ANC support could 
+potentially be added for more devices in future.
 
-##############################
-Test: CheckBuild - PASS
+Let me know if there are any thoughts on this; I can get the patch ready 
+and submitted if desired.
 
-##############################
-Test: MakeCheck - PASS
+Kind regards,
+Peter
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5792907437120680591==--
