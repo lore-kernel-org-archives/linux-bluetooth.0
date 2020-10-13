@@ -2,145 +2,130 @@ Return-Path: <SRS0=CDO+=DV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E48C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 08:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B15A5C43457
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 09:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EBF322200
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 08:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A23620B1F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 09:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tcd-ie.20150623.gappssmtp.com header.i=@tcd-ie.20150623.gappssmtp.com header.b="yTUo3Wv7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6AOGZiE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729850AbgJNIol (ORCPT
+        id S1728786AbgJNJUS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Oct 2020 04:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34360 "EHLO
+        Wed, 14 Oct 2020 05:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729828AbgJNIoi (ORCPT
+        with ESMTP id S1730747AbgJNJUJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Oct 2020 04:44:38 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45A9C041E7A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2020 22:06:31 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id j8so915365pjy.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2020 22:06:31 -0700 (PDT)
+        Wed, 14 Oct 2020 05:20:09 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB14C08EBB3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2020 16:45:38 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id t15so1807459otk.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Oct 2020 16:45:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GTY8OrccYe4mCjbqHOc79Uh42jvP30CMBNpOq0WvvCI=;
-        b=yTUo3Wv7u2Ean1S9AMl9lQKsNz4VYkW3yewlo8IPK+J9dM+UbhYj6apF3Nre0o9JSJ
-         N9rWpioN6+XCBKv7xnHA7M0vQBXnlfaSuLYkCFjjWRU5HTGwaywOpoVp00KsXL51Sfjs
-         odj2GsPWrxTskCFYDMh0pXjy2HUeyDmuuAIHl/jcvgq2yMe+yRe4F5SyDytjKPYueeWn
-         PhKW481+q+g1twTRv2sHrJACMe2qGZ4Kij6nkIeXpwkospERw4iKxo1h1bPdxUgUbOjv
-         olh6I2bqq01XuyJgWmDLmk/0IirPWrcvfX61r30kU3DYzEGzuwByAT0a089HgLV8mTdN
-         NKWA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oY+WpNPdUU2YB9GoxXL00jTxAVM7ebz/LhxA6RTa66c=;
+        b=b6AOGZiE7KwaWXtz7PlErs09see45bH2GErOUMPJuHxV/4hyipHQS/O4tokqZcvU//
+         xRAnh+3JbMwm4kXbjWttnIx7AUIAYUqBwMPVPA9dYjD0xHekViZQKUB1QEfl5xNpzRML
+         axQDMPFpxScS8x+Tl5Bvo32p5fZGnccrjhtXn1vG2K+1x3kZU2WEwYekAKLRbcYA8KFT
+         Qfiwiq4HuqHi/Aoq5bARZkixeHu/8icPXddeGS601SSLxcKd9TpJbUaZ9wc6s+heGRM2
+         XnE9+uUAyWzqtILMCi/c2Tq7fl97jy+nmKJAp64bm4G0oAHXIw9wnDne2qfKbloI1qkU
+         sDYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GTY8OrccYe4mCjbqHOc79Uh42jvP30CMBNpOq0WvvCI=;
-        b=ZZDGE+AJYxeeAix9Z7ceHXlM92FQvmiSL8MgGlKLVTN3Q4kW4samdAaGsTPn08BD2J
-         uj96p7UGyzn5Ak0p0AYMgnuiBO+Cnmghgb/UxaOOAPOC0xWme75V5yD/Besf4exVIPE+
-         WRo1s4jtuxyb4j4n9E+57Y7gK2GHtxuzayNhmXyOtF6H28ybe8PTT94rMb2HEsoE/dps
-         G52gUK72Rpl/Jl8xO8y3ENTqZQdYDwcAqSFYAthdYmqsbhKm0gctQMs3L89GLScEqvIl
-         OkZnv2jwNo8UCgBmu38r3EFKfQGpsmihXAc/LbjTK99a5N6dNDoOKsehSVt4jrSIQ2Bb
-         3sTQ==
-X-Gm-Message-State: AOAM532mOIwNedKrn4LWIQlh5i4Jx7WRLWvK54e7Rj3MRZQWMct/9/BQ
-        nHLQe/bSwZg2P+LudUChUpBPR6kyL8v68HX8
-X-Google-Smtp-Source: ABdhPJxMqXmg8b2Bpuwuz76Me1UhHxq601RCbhro011ncdxEHSpw6hBLF7Hs9mypYa38SecxHJXpEA==
-X-Received: by 2002:a17:902:465:b029:d0:89f1:9e2a with SMTP id 92-20020a1709020465b02900d089f19e2amr2738643ple.6.1602651991033;
-        Tue, 13 Oct 2020 22:06:31 -0700 (PDT)
-Received: from [192.168.2.14] (216-19-182-159.dyn.novuscom.net. [216.19.182.159])
-        by smtp.gmail.com with ESMTPSA id n203sm1608504pfd.81.2020.10.13.22.06.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Oct 2020 22:06:30 -0700 (PDT)
-Subject: Re: Bose QC 35 Battery/ANC Support
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <333e38b3-da26-e3c6-76fb-1ee1caf90299@tcd.ie>
- <CABBYNZLFV6THotUuzATG0YJFgDh9cFoU575QqLD+Q2+EHoiPTA@mail.gmail.com>
-From:   Peter Mullen <omaolaip@tcd.ie>
-Message-ID: <6030b6bc-73f1-6fbd-e5c5-58e2ce4a5d26@tcd.ie>
-Date:   Tue, 13 Oct 2020 22:06:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oY+WpNPdUU2YB9GoxXL00jTxAVM7ebz/LhxA6RTa66c=;
+        b=VqC/My3N8dvM3nINjL9aG16mO+/SsGzUJZMMcGXTEKdIX3kA1knrxU06AQLlkHSAWW
+         t25pe9pq6Q+pV3rEoYUMqwxaXFt1eanFl7WLAdaDVR1UAHkNyA+KUoVHIBu+DTsN2TqP
+         7eSiX4xf0E+bRkcZ4fIGQsz+HLA3tVnKyz8uPlxVNv9OApaXpdn6gnBRud1Py5ubJIWe
+         mgbTN5r/s4XaW4yHLiXztVFm39EGd3P5K7i0V/L2E3POrWXib/jIj2oVGFhy3UeQbMfm
+         JP1GuRCVlXixO+R0PgJAaBxBK/Uh5HllEGmKi4NqGMRqvznr8mRRL8aghQPHqj94x8Ze
+         xZkA==
+X-Gm-Message-State: AOAM532licu3H2Js1RJQ6o7CKDZJEvIH2JNs0Lk306ymRVKyxRture88
+        QY+zlWYpwxySjomA5y2b1Oh4aDtXKC4HlyNiV7c=
+X-Google-Smtp-Source: ABdhPJwZwMgfuEewpaHT4NmDhpGM+0Z/tVzp2G0A1JhkKOb7VUshnkQ2N/USgy6oWZVpmobp4dfiNOphZIfnggT3B6g=
+X-Received: by 2002:a05:6830:134c:: with SMTP id r12mr1475859otq.240.1602632738175;
+ Tue, 13 Oct 2020 16:45:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLFV6THotUuzATG0YJFgDh9cFoU575QqLD+Q2+EHoiPTA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201006171333.BlueZ.v6.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+ <20201006171333.BlueZ.v6.2.I578ae5e76fcf7243206a27d4f5a25783662a5f14@changeid>
+ <CABBYNZ+pmByP5WMibCGQJXTvy7ephJdJdALg=mYagzAjWMLk9w@mail.gmail.com> <CABmPvSE17drmxua9MopjH1yYS0-9Lu0UL9wmcFXCpMC06vC99A@mail.gmail.com>
+In-Reply-To: <CABmPvSE17drmxua9MopjH1yYS0-9Lu0UL9wmcFXCpMC06vC99A@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 13 Oct 2020 16:45:24 -0700
+Message-ID: <CABBYNZJpJneZED3wY7yQvKeHKF2HM2KmJ3UYL9O+GAA=yhu3Vg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v6 2/6] adv_monitor: Implement Adv matching based on
+ stored monitors
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Miao-chen,
 
-On 2020-10-12 9:43 a.m., Luiz Augusto von Dentz wrote:
-> Hi Peter,
-> 
-> On Sun, Oct 11, 2020 at 1:04 PM Peter Mullen <omaolaip@tcd.ie> wrote:
->>
->> Hi all,
->>
->> I've been working on a plugin that adds support for battery level
->> reporting and Active Noise Cancelling (ANC) control for the Bose QC 35
->> headphones. The patch is nearly ready to go, but because of the
->> non-standard way it's implemented I figured it might be necessary to get
->> some preliminary feedback on it prior to submission (or to see if it's
->> worth submitting).
->>
->> As a brief overview of device control, the QC35 has a set of additional
->> controls operating over rfcomm channel 8 where messages are passed back
->> and forth between devices. The messages consist of a 3-byte opcode, a
->> 1-byte payload length, and N-bytes of payload. There's some more
->> information on the specifics here:
->> https://blog.davidventura.com.ar/reverse-engineering-the-bose-qc35-bluetooth-protocol.html
->>
->> As this is a non-standard "profile", there's no profile UUID assigned to
->> it which makes adding a profile somewhat more complicated. My solution
->> here was to add a profile under the iPod Accessory Protocol (iAP)
->> profile UUID which the QC35 lists, and to then filter out devices in the
->> profile probe callback based on manufacturer ID, device class, and
->> product ID. This isn't ideal as the probe will be called for any device
->> listing the iAP UUID, so suggestions for alternative approaches (if
->> necessary) are appreciated.
-> 
-> We could in possibly add pid/vid to btd_profile that way it can be
-> probed by pid/vid in addition to UUID, that way one can make a driver
-> that is specific to a vendor or a product.
-Had a go at that this evening as a proof-of-concept; so far it's working
-well, so this could be viable. I'll finish it off and test it out properly.
+On Mon, Oct 12, 2020 at 2:21 PM Miao-chen Chou <mcchou@chromium.org> wrote:
+>
+> Hi Luiz,
+>
+> I did think of adding pattern to bt_ad at the beginning, but here are
+> reasons why I ended up with hosting the definition of pattern in
+> adv_monitor.
+> (1)  Pattern is specific to monitoring purpose. An advertisement
+> should not include patterns as its fields due to that fact that a
+> pattern hosts an offset. So I wasn't sure about its justification to
+> be placed in shared/ad. But if you foresee that it would be reused,
+> then I am more than happy to add it to shared/ad.
+> (2) Introducing helpers as you suggested below indeed make it more
+> unittestable. However, it also implied that EIR data (this is in fact
+> AD data) needs to be parsed into a new bt_ad for pattern comparison,
+> and I didn't see an obvious benefit of converting EIR data into a
+> bt_ad just for the comparison.
 
->> For session state control, I've hooked into the AVDTP state-change
->> callback. Again, possibly non-standard but this seemed to be the best
->> way to trigger the initiatiation/tearing down of the rfcomm connection.
-> 
-> I would recommend hooking to the btd_service state, like for example
-> the policy plugin is doing.
-I was able to get the plugin working based on the btd_service state cb,
-but had a couple of concerns with it, mainly because we'll be receiving
-events for all services on all devices, so the filtering of unused
-events adds a bit of overhead.
-I was also able to use the AVCTP state callback without issue, which may
-be better suited than the AVDTP one.
+Regarding (1) like I said you will need another struct to store the
+offset and length for doing the pattern matching but otherwise it is
+pretty similar, regarding (2) there is actually a real benefit that we
+could in the future drop the eir_ helpers and unit test just the bt_ad
+including pattern matching as well.
 
->> For ANC integration, I've added a new dbus interface under
->> "org.bluez.Anc1". The interface contains a read-only "Range" property,
->> which indicates the number of discrete values the ANC can be set to, and
->> a read-write property "Level" which gets/sets the level. This interface
->> layout was chosen to be device agnostic, so that ANC support could
->> potentially be added for more devices in future.
-> 
-> I'd probably add Bose to the name of the interface if it is bose specific.
-While the plugin is Bose specific, I had tried to keep the interface
-itself generic so that integration with the DE or similar won't need any
-changes if ANC support is added for other devices later.
+> Maybe we can add a struct bt_ad_pattern in shared/ad.h and introduce
+> the following two functions. What do you think?
+>
+> struct bt_ad_pattern *bt_ad_pattern_new(uint8_t type, size_t offset,
+> size_t len, const void *data);
 
---
-Peter Mullen
+Not sure I follow you here, that doesn't seem to be about the parsing
+of the AD but the creation of an object for matching, not sure we need
+that since you can probably just pass a stack variable directly, in
+any case you would need a free as well.
+
+> /* |data| is one single AD data field so that we can avoid converting
+> EIR data to bt_ad */
+> bool bt_ad_pattern bt_ad_pattern_match(struct bt_ad_pattern *pattern,
+> void *data, size_t len);
+
+You may have more than one entry of the same type, anyway if we do
+have something like bt_ad_new_with_data that means we can pass it
+around and not have to reparse it when doing custom filtering. We
+might as well have a callback that does get called every time there is
+a match, also it may be possible to pass all the pattern at once in
+which case we can pass the pattern which matched along with the data
+thus having the call it multiple times for each monitor.
