@@ -1,199 +1,254 @@
-Return-Path: <SRS0=LHzf=DU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=CDO+=DV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 256D6C433E7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Oct 2020 15:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE557C43467
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 07:18:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA20B2491E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Oct 2020 15:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62E652078A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Oct 2020 07:18:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=windriversystems.onmicrosoft.com header.i=@windriversystems.onmicrosoft.com header.b="EfwZQKfw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728626AbgJMPWO convert rfc822-to-8bit (ORCPT
+        id S1728171AbgJNHSM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Oct 2020 11:22:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33702 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726657AbgJMPWO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Oct 2020 11:22:14 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209659] New: Intel USB bluetooth 8087:0026 device is gone after
- system resume
-Date:   Tue, 13 Oct 2020 15:22:12 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: pawelwod@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-209659-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 14 Oct 2020 03:18:12 -0400
+Received: from mail-mw2nam12on2079.outbound.protection.outlook.com ([40.107.244.79]:24289
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728036AbgJNHSM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Oct 2020 03:18:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N+WjKE+D6p7R2xot61N5fx4I67+WH6R/ojdqrQ8fXrkguV/A1NKNj207hqiv1JV6gwzmcgYonDMcpSyiKxS892Aibd1n7hcETYGnfrJm3zZLDfSeyZg8rzPY8sh/fcChKl9jH5WPUCoAWegxRDydKQrx+dqyNuwMgd+EfYfrTS/obQfykVp/T4s5SYwLTwAOK//kc5yKYqHvVcoQKuhu7MGtguwNhJ5ZdX+r0ZdsKYicZ8ezH3JUpjmXeSlC+k20mSNtWsa+puYMWCW8N6Lp1O1qGLgZgJnOepQ/651yVmvqJhVpoT7TJFxujeZfaNhHBb10sD677fJ56uFE/lY1ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VBvay2xQUnK/FGalhuY8gsp8TfeBgO6gJ+rVKa5doC0=;
+ b=VCk0+ssBZvaqf3EXut796jd/+8X0guc2II6R2PNcBgNkFpVNNIzwY/tMrajZcU6DzNFDQxF7i0S5ZK4FXW2BviDn09rHVE4g5RyTqDeUGEsmaAjmeEUEQKkGskWCqVTP0zksN7xLY0qsrsKlnn6Ud9HenqLVH9Km27bGOfFUoEYyYj7iFrz3W7YR1JwjGAPC3yPIIndqLlEUK/wyq6KFnYNUbAToqGJo0QT6TrMGV9gp1GaZSOrdL5oWJNE6IGy8rhAZjlJ6/pjHXHe+SXl78Li19hz2g2ugBKPZl/cg8OCUX5sVZ8xGCykJ3Cp94RNjabvA8mDLkI/TxmZm0qvA1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=windriversystems.onmicrosoft.com;
+ s=selector2-windriversystems-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VBvay2xQUnK/FGalhuY8gsp8TfeBgO6gJ+rVKa5doC0=;
+ b=EfwZQKfwAzQtuJVlv295R0TaiuqtjvDrwAgrRSA3NRAHyc69o/1SAHx1de8e+PsPFJXGe1oYEZ5nWRvGsykBWYASPTtbMEYdsCbSrulwwCTtkBTJiUZP7c6m7HZikF6UpMzio6n9Rr7EPbX5UF9NK+qN1//aiihTVr+a50TEfRk=
+Authentication-Results: holtmann.org; dkim=none (message not signed)
+ header.d=none;holtmann.org; dmarc=none action=none header.from=windriver.com;
+Received: from BY5PR11MB4241.namprd11.prod.outlook.com (2603:10b6:a03:1ca::13)
+ by BYAPR11MB2917.namprd11.prod.outlook.com (2603:10b6:a03:89::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.28; Wed, 14 Oct
+ 2020 07:18:08 +0000
+Received: from BY5PR11MB4241.namprd11.prod.outlook.com
+ ([fe80::3581:4d13:b613:eb81]) by BY5PR11MB4241.namprd11.prod.outlook.com
+ ([fe80::3581:4d13:b613:eb81%7]) with mapi id 15.20.3455.030; Wed, 14 Oct 2020
+ 07:18:07 +0000
+From:   yanfei.xu@windriver.com
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use lock_sock() when acquiring lock in sco_conn_del
+Date:   Wed, 14 Oct 2020 15:17:31 +0800
+Message-Id: <20201014071731.34279-1-yanfei.xu@windriver.com>
+X-Mailer: git-send-email 2.18.2
+Content-Type: text/plain
+X-Originating-IP: [60.247.85.82]
+X-ClientProxiedBy: HK2PR0401CA0001.apcprd04.prod.outlook.com
+ (2603:1096:202:2::11) To BY5PR11MB4241.namprd11.prod.outlook.com
+ (2603:10b6:a03:1ca::13)
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from pek-lpggp1.wrs.com (60.247.85.82) by HK2PR0401CA0001.apcprd04.prod.outlook.com (2603:1096:202:2::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21 via Frontend Transport; Wed, 14 Oct 2020 07:18:05 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 36dd21f6-659a-4197-13e9-08d870114c94
+X-MS-TrafficTypeDiagnostic: BYAPR11MB2917:
+X-Microsoft-Antispam-PRVS: <BYAPR11MB2917452805C91691164A7432E4050@BYAPR11MB2917.namprd11.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:248;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: m0FuZhFw1a5S03ZsOZsqH4uyeNtPgmJziFzXz050SdmYeYMD4pdMhYjA78Zv0fMGNJ8V8vdY80Kqa6dgH/fcvbb83VlqXsQ2JcyTODrNviaH6ZS7JfdeFc5tNPueEVa5wO403QTwyuwASrlwF6ks9hLAw0QNaGE3HMSTD3T1lRRWtU+S1BlLQ44iiura/EZc8qA3uWUjuu2XrZPQkww3m8kOHaTwMYPl/3DOXvK6D92z9N3ncU+Rp51tELbMZzuNkNa7BiEo41f4xFTGdY5oEzyS2naQGeEXQ4J7nAW0efC27mFMmajn38LtYOuo6FbGOTkc1azI3+T9IcEWhr2lTQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(39850400004)(136003)(346002)(376002)(4326008)(478600001)(2616005)(956004)(6506007)(36756003)(9686003)(2906002)(8676002)(186003)(6666004)(16526019)(52116002)(83380400001)(8936002)(316002)(66946007)(66556008)(66476007)(6486002)(86362001)(26005)(5660300002)(1076003)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: NlAxKmPhmQk6ZrIrGVlHYoFMbWujCvoe82YvoyhoNrRe3RcQwifVY4DQAgqY3A1js1l0viXWK5EWE6VnZJeiWUCOEsGqGCFJJO5vKI3yaK0AsMUSuDY07MN+1R+X9EWz3l181bO1R4Hh8XiHzsq1BwQ/ZuTwVZ76Ia71uD7KoHldnOtoI/h0b/pQX91/vrrZVCMxjzEG+2MnKJt6p1nA9rb3o2fpwVBhtf+91hwKq1A+FXDx96S5YYwjOUeMY0rAsKyh2g3JmAzK4sFG++yEpf6vwE1pGL1R5qYwaMP2NpSXVhlthJzPYj6Rkj9p7BA4DXHAoKnzdDTkhYVdH3fwHAwZ9+L1YvYDHSUhn0AcKeAAdcq0Y3XjDMuQ6+XdSvOX+EjcDdp9pixozKiSmaXyYyQaotZwwj+E/rZYO2R8b5LVzAfn4MvlHrx7V9+yot4B1LPSOQbDF+ojs769EU9F7m99Me27HxutjOAK20gutUrZXsgYDsExzLJG46mZAilM/QcpA6/xiWorMp6hNmUN3XHn0VKn8WfPraKDOTLeMSxYyOY3/ZQxQDnVEPwEC8yt1HZmgaQ4VvRQYOi8hkbKNhEWoty6LhHJU4BrtKFk0uJPk+mgy8/ZjdhjY0I+wryYGUZ0/evxrKdrXFpvMA1IAg==
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36dd21f6-659a-4197-13e9-08d870114c94
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 07:18:07.7921
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MeNI4lx7c1VpqQXeGWXm2TK5w7u3WWVvLa+DVptj0ZRSuGFbqXM1o+Rt8GxMpEoQTSAYUs7ui/5s84pDRD0ceQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB2917
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209659
+From: Yanfei Xu <yanfei.xu@windriver.com>
 
-            Bug ID: 209659
-           Summary: Intel USB bluetooth 8087:0026 device is gone after
-                    system resume
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.9.0-050900
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: blocking
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: pawelwod@gmail.com
-        Regression: No
+Locking slock-AF_BLUETOOTH-BTPROTO_SCO may happen in process context or
+BH context. If in process context, we should use lock_sock(). As blow
+warning, sco_conn_del() is called in process context, so let's use
+lock_sock() instead of bh_lock_sock().
 
-I'm facing an issue that the BT device is gone after I suspend and resume.
-Kernel say that device is disconnected and thats it.
-I tried following options for btusb module
-        enable_autosuspend=0
-        enable_autosuspend=0 reset=1
+================================
+WARNING: inconsistent lock state
+5.9.0-rc4-syzkaller #0 Not tainted
+--------------------------------
+inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+syz-executor675/31233 [HC0[0]:SC0[0]:HE1:SE1] takes:
+ffff8880a75c50a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at:
+spin_lock include/linux/spinlock.h:354 [inline]
+ffff8880a75c50a0 (slock-AF_BLUETOOTH-BTPROTO_SCO){+.?.}-{2:2}, at:
+sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+{IN-SOFTIRQ-W} state was registered at:
+  lock_acquire+0x1f3/0xae0 kernel/locking/lockdep.c:5006
+  __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+  spin_lock include/linux/spinlock.h:354 [inline]
+  sco_sock_timeout+0x24/0x140 net/bluetooth/sco.c:83
+  call_timer_fn+0x1ac/0x760 kernel/time/timer.c:1413
+  expire_timers kernel/time/timer.c:1458 [inline]
+  __run_timers.part.0+0x67c/0xaa0 kernel/time/timer.c:1755
+  __run_timers kernel/time/timer.c:1736 [inline]
+  run_timer_softirq+0xae/0x1a0 kernel/time/timer.c:1768
+  __do_softirq+0x1f7/0xa91 kernel/softirq.c:298
+  asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:706
+  __run_on_irqstack arch/x86/include/asm/irq_stack.h:22 [inline]
+  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:48 [inline]
+  do_softirq_own_stack+0x9d/0xd0 arch/x86/kernel/irq_64.c:77
+  invoke_softirq kernel/softirq.c:393 [inline]
+  __irq_exit_rcu kernel/softirq.c:423 [inline]
+  irq_exit_rcu+0x235/0x280 kernel/softirq.c:435
+  sysvec_apic_timer_interrupt+0x51/0xf0 arch/x86/kernel/apic/apic.c:1091
+  asm_sysvec_apic_timer_interrupt+0x12/0x20
+  arch/x86/include/asm/idtentry.h:581
+  unwind_next_frame+0x139a/0x1f90 arch/x86/kernel/unwind_orc.c:607
+  arch_stack_walk+0x81/0xf0 arch/x86/kernel/stacktrace.c:25
+  stack_trace_save+0x8c/0xc0 kernel/stacktrace.c:123
+  kasan_save_stack+0x1b/0x40 mm/kasan/common.c:48
+  kasan_set_track mm/kasan/common.c:56 [inline]
+  __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:461
+  slab_post_alloc_hook mm/slab.h:518 [inline]
+  slab_alloc mm/slab.c:3312 [inline]
+  kmem_cache_alloc+0x13a/0x3a0 mm/slab.c:3482
+  __d_alloc+0x2a/0x950 fs/dcache.c:1709
+  d_alloc+0x4a/0x230 fs/dcache.c:1788
+  d_alloc_parallel+0xe9/0x18e0 fs/dcache.c:2540
+  lookup_open.isra.0+0x9ac/0x1350 fs/namei.c:3030
+  open_last_lookups fs/namei.c:3177 [inline]
+  path_openat+0x96d/0x2730 fs/namei.c:3365
+  do_filp_open+0x17e/0x3c0 fs/namei.c:3395
+  do_sys_openat2+0x16d/0x420 fs/open.c:1168
+  do_sys_open fs/open.c:1184 [inline]
+  __do_sys_open fs/open.c:1192 [inline]
+  __se_sys_open fs/open.c:1188 [inline]
+  __x64_sys_open+0x119/0x1c0 fs/open.c:1188
+  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+irq event stamp: 853
+hardirqs last  enabled at (853): [<ffffffff87f733af>]
+__raw_spin_unlock_irq include/linux/spinlock_api_smp.h:168 [inline]
+hardirqs last  enabled at (853): [<ffffffff87f733af>]
+_raw_spin_unlock_irq+0x1f/0x80 kernel/locking/spinlock.c:199
+hardirqs last disabled at (852): [<ffffffff87f73764>]
+__raw_spin_lock_irq include/linux/spinlock_api_smp.h:126 [inline]
+hardirqs last disabled at (852): [<ffffffff87f73764>]
+_raw_spin_lock_irq+0xa4/0xd0 kernel/locking/spinlock.c:167
+softirqs last  enabled at (0): [<ffffffff8144c929>]
+copy_process+0x1a99/0x6920 kernel/fork.c:2018
+softirqs last disabled at (0): [<0000000000000000>] 0x0
 
-Also tried set power/persistent = 0/1 but result is still the same. Only reboot
-helps in bringing it back.
-In addition I checked that BT + suspend/resume is working fine under Windows
-10.
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
-Hardware:
-        Lenovo ThinkBook 15 IIL.
+       CPU0
+       ----
+  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+  <Interrupt>
+    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
 
-BIOS is updated to latest one from Lenovo site
-        DJCN18WW 05/08/2020
+ *** DEADLOCK ***
 
-The BT device is
-        Bus 003 Device 005: ID 8087:0026 Intel Corp.
+3 locks held by syz-executor675/31233:
+ #0: ffff88809f104f40 (&hdev->req_lock){+.+.}-{3:3}, at:
+hci_dev_do_close+0xf5/0x1080 net/bluetooth/hci_core.c:1720
+ #1: ffff88809f104078 (&hdev->lock){+.+.}-{3:3}, at:
+hci_dev_do_close+0x253/0x1080 net/bluetooth/hci_core.c:1757
+ #2: ffffffff8a9188c8 (hci_cb_list_lock){+.+.}-{3:3}, at:
+hci_disconn_cfm include/net/bluetooth/hci_core.h:1435 [inline]
+ #2: ffffffff8a9188c8 (hci_cb_list_lock){+.+.}-{3:3}, at:
+hci_conn_hash_flush+0xc7/0x220 net/bluetooth/hci_conn.c:1557
 
-OS is Ubuntu 18.04, issue happens on distro kernel kernel 5.4 and mainline 5.9
+stack backtrace:
+CPU: 1 PID: 31233 Comm: syz-executor675 Not tainted 5.9.0-rc4-syzkaller
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x198/0x1fd lib/dump_stack.c:118
+ print_usage_bug kernel/locking/lockdep.c:4020 [inline]
+ valid_state kernel/locking/lockdep.c:3361 [inline]
+ mark_lock_irq kernel/locking/lockdep.c:3560 [inline]
+ mark_lock.cold+0x7a/0x7f kernel/locking/lockdep.c:4006
+ mark_usage kernel/locking/lockdep.c:3923 [inline]
+ __lock_acquire+0x876/0x5570 kernel/locking/lockdep.c:4380
+ lock_acquire+0x1f3/0xae0 kernel/locking/lockdep.c:5006
+ __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+ _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+ spin_lock include/linux/spinlock.h:354 [inline]
+ sco_conn_del+0x128/0x270 net/bluetooth/sco.c:176
+ sco_disconn_cfm net/bluetooth/sco.c:1178 [inline]
+ sco_disconn_cfm+0x62/0x80 net/bluetooth/sco.c:1171
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1438 [inline]
+ hci_conn_hash_flush+0x114/0x220 net/bluetooth/hci_conn.c:1557
+ hci_dev_do_close+0x5c6/0x1080 net/bluetooth/hci_core.c:1770
+ hci_unregister_dev+0x1bd/0xe30 net/bluetooth/hci_core.c:3790
+ vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
+ __fput+0x285/0x920 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:141
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb7d/0x29f0 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:903
+ get_signal+0x428/0x1f00 kernel/signal.c:2757
+ arch_do_signal+0x82/0x2520 arch/x86/kernel/signal.c:811
+ exit_to_user_mode_loop kernel/entry/common.c:159 [inline]
+ exit_to_user_mode_prepare+0x1ae/0x200 kernel/entry/common.c:190
+ syscall_exit_to_user_mode+0x7e/0x2e0 kernel/entry/common.c:265
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x447279
 
-Here is USB dev tree before suspand:
-$ lsusb -t
-/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/6p, 10000M
-/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/12p, 480M
-    |__ Port 6: Dev 3, If 0, Class=Video, Driver=uvcvideo, 480M
-    |__ Port 6: Dev 3, If 1, Class=Video, Driver=uvcvideo, 480M
-    |__ Port 10: Dev 5, If 0, Class=Wireless, Driver=btusb, 12M
-    |__ Port 10: Dev 5, If 1, Class=Wireless, Driver=btusb, 12M
-/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 10000M
-/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/1p, 480M
+Reported-by: syzbot+65684128cd7c35bc66a1@syzkaller.appspotmail.com
+Signed-off-by: Yanfei Xu <yanfei.xu@windriver.com>
+---
+ net/bluetooth/sco.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-And after resume:
-$ lsusb -t
-/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/6p, 10000M
-/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/12p, 480M
-    |__ Port 6: Dev 3, If 0, Class=Video, Driver=uvcvideo, 480M
-    |__ Port 6: Dev 3, If 1, Class=Video, Driver=uvcvideo, 480M
-/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 10000M
-/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/1p, 480M
-
-# dmesg --follow 
-[ 5577.434207] PM: suspend entry (deep)
-[ 5577.441904] Filesystems sync: 0.007 seconds
-[ 5577.469737] Freezing user space processes ... (elapsed 0.253 seconds) done.
-[ 5577.722933] OOM killer disabled.
-[ 5577.722935] Freezing remaining freezable tasks ... (elapsed 0.001 seconds)
-done.
-[ 5577.724425] printk: Suspending console(s) (use no_console_suspend to debug)
-[ 5577.732989] sd 1:0:0:0: [sda] Synchronizing SCSI cache
-[ 5577.733160] sd 1:0:0:0: [sda] Stopping disk
-[ 5577.876476] ACPI: EC: interrupt blocked
-[ 5577.903742] ACPI: Preparing to enter system sleep state S3
-[ 5577.904817] ACPI: EC: event blocked
-[ 5577.904817] ACPI: EC: EC stopped
-[ 5577.904818] PM: Saving platform NVS memory
-[ 5577.904958] Disabling non-boot CPUs ...
-[ 5577.906547] smpboot: CPU 1 is now offline
-[ 5577.909407] smpboot: CPU 2 is now offline
-[ 5577.912277] smpboot: CPU 3 is now offline
-[ 5577.915730] smpboot: CPU 4 is now offline
-[ 5577.917458] IRQ 122: no longer affine to CPU5
-[ 5577.917468] IRQ 139: no longer affine to CPU5
-[ 5577.918488] smpboot: CPU 5 is now offline
-[ 5577.919933] IRQ 123: no longer affine to CPU6
-[ 5577.919939] IRQ 127: no longer affine to CPU6
-[ 5577.920965] smpboot: CPU 6 is now offline
-[ 5577.922347] IRQ 126: no longer affine to CPU7
-[ 5577.922356] IRQ 138: no longer affine to CPU7
-[ 5577.923374] smpboot: CPU 7 is now offline
-[ 5577.926418] ACPI: Low-level resume complete
-[ 5577.926523] ACPI: EC: EC started
-[ 5577.926523] PM: Restoring platform NVS memory
-[ 5577.927744] Enabling non-boot CPUs ...
-[ 5577.927791] x86: Booting SMP configuration:
-[ 5577.927791] smpboot: Booting Node 0 Processor 1 APIC 0x2
-[ 5577.928147] smpboot: Scheduler frequency invariance went wobbly, disabling!
-[ 5577.928608] CPU1 is up
-[ 5577.928635] smpboot: Booting Node 0 Processor 2 APIC 0x4
-[ 5577.929474] CPU2 is up
-[ 5577.929518] smpboot: Booting Node 0 Processor 3 APIC 0x6
-[ 5577.930334] CPU3 is up
-[ 5577.930358] smpboot: Booting Node 0 Processor 4 APIC 0x1
-[ 5577.931205] CPU4 is up
-[ 5577.931233] smpboot: Booting Node 0 Processor 5 APIC 0x3
-[ 5577.931869] CPU5 is up
-[ 5577.931922] smpboot: Booting Node 0 Processor 6 APIC 0x5
-[ 5577.932693] CPU6 is up
-[ 5577.932731] smpboot: Booting Node 0 Processor 7 APIC 0x7
-[ 5577.933584] CPU7 is up
-[ 5577.937061] ACPI: Waking up from system sleep state S3
-[ 5577.939947] ACPI: EC: interrupt unblocked
-[ 5577.964623] ACPI: EC: event unblocked
-[ 5577.964859] sd 1:0:0:0: [sda] Starting disk
-[ 5577.965667] usb usb1: root hub lost power or was reset
-[ 5577.965668] usb usb2: root hub lost power or was reset
-[ 5577.972953] nvme nvme0: 8/0/0 default/read/poll queues
-[ 5578.192386] usb 3-6: reset high-speed USB device number 3 using xhci_hcd
-[ 5578.275913] ata2: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
-[ 5578.276164] ata2.00: ACPI cmd ef/02:00:00:00:00:a0 (SET FEATURES) succeeded
-[ 5578.276166] ata2.00: ACPI cmd f5/00:00:00:00:00:a0 (SECURITY FREEZE LOCK)
-filtered out
-[ 5578.276168] ata2.00: ACPI cmd ef/10:03:00:00:00:a0 (SET FEATURES) filtered
-out
-[ 5578.276449] ata2.00: ACPI cmd ef/02:00:00:00:00:a0 (SET FEATURES) succeeded
-[ 5578.276450] ata2.00: ACPI cmd f5/00:00:00:00:00:a0 (SECURITY FREEZE LOCK)
-filtered out
-[ 5578.276451] ata2.00: ACPI cmd ef/10:03:00:00:00:a0 (SET FEATURES) filtered
-out
-[ 5578.276536] ata2.00: configured for UDMA/133
-[ 5580.279667] acpi LNXPOWER:05: Turning OFF
-[ 5580.279844] acpi LNXPOWER:04: Turning OFF
-[ 5580.279997] acpi LNXPOWER:03: Turning OFF
-[ 5580.280043] OOM killer enabled.
-[ 5580.280044] Restarting tasks ... 
-[ 5580.280127] usb 3-10: USB disconnect, device number 5
-[ 5580.284916] mei_hdcp 0000:00:16.0-b638ab7e-94e2-4ea2-a552-d1c54b627f04:
-bound 0000:00:02.0 (ops i915_hdcp_component_ops [i915])
-[ 5580.285409] done.
-[ 5580.286759] PM: suspend exit
-[ 5580.344191] Generic FE-GE Realtek PHY r8169-100:00: attached PHY driver
-[Generic FE-GE Realtek PHY] (mii_bus:phy_addr=r8169-100:00, irq=IGNORE)
-[ 5580.472295] r8169 0000:01:00.0 enp1s0: Link is Down
-
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index dcf7f96ff417..559b883c815f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -173,10 +173,10 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	if (sk) {
+ 		sock_hold(sk);
+-		bh_lock_sock(sk);
++		lock_sock(sk);
+ 		sco_sock_clear_timer(sk);
+ 		sco_chan_del(sk, err);
+-		bh_unlock_sock(sk);
++		release_sock(sk);
+ 		sco_sock_kill(sk);
+ 		sock_put(sk);
+ 	}
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.18.2
+
