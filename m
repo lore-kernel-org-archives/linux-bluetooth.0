@@ -2,154 +2,84 @@ Return-Path: <SRS0=NBlN=DW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6A8C433E7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Oct 2020 17:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FBDC433E7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Oct 2020 18:34:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D38B2225E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Oct 2020 17:13:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 878EA2073A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Oct 2020 18:34:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eelJr10E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEjs/0m6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403912AbgJORNJ (ORCPT
+        id S2387766AbgJOSeY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Oct 2020 13:13:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54418 "EHLO
+        Thu, 15 Oct 2020 14:34:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403909AbgJORNI (ORCPT
+        with ESMTP id S1731154AbgJOSeX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Oct 2020 13:13:08 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC659C061755
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2020 10:13:08 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id w141so3908221oia.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2020 10:13:08 -0700 (PDT)
+        Thu, 15 Oct 2020 14:34:23 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6316AC061755
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2020 11:34:23 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id d24so4726118lfa.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Oct 2020 11:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Osw6NqVYNmHUMRwCYRyMfaozlp7BCYpLh7My51/r2BU=;
-        b=eelJr10EjXooFkYvRC0YgTs8c+BXon2D/IIM/MRqfQr36hrPc0lgQSRYolTlQrlbfe
-         JAD40ziRnWrAWDd2t4138cTrOSZ5BJXbVqtLCi5Rv8BiOaULFHma2bG08dOHPIROxfND
-         kJ6I7GNp3QiPS5CEDT8ISe3S4e7yj880NttWAPrYA0ckrWWyVf0UUkaRP9qbivqmUIwE
-         fCmNyPloLyON0luS8ptD1qNQ6eip0Xx0NQ79kbD/PHjd3JCqKqBsJ5mh6jxVM8RbkB61
-         dG/p67jc3wNEz9Aj9YJQtWv+HeYWXwlwP4YBKqRbZ4o6tikDv9AwZmExNBwuyFyTownf
-         QVmQ==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fXumMw6Ct4LQffIPTraW0kvUrjf7lJM7fYG/Hlb1Ns8=;
+        b=SEjs/0m6xvJWyfWondopry3ouLFUWLfeCr6XNOyCPKvUPwoqsq4dzOwfUI8gUS52PZ
+         ZDfpt0TOaEzbyZ8q7TDa9gjYAe+7zqgAXN+dJ4brwQL3GK0szUwzucvnkv7d37FFkjIX
+         Cwuoxq6AOvaTwLNjYVBBWMTrhaNTSv0YOeEPUxZb9ip3APRUySCIn5qZ2mVKmVY99Mos
+         JOwqUsOJP5vnYwUZaMFoFOt2tveB9JBs5Hq/KSMSxqMPLt6b+isneD5j9xyh/Vu2bHhJ
+         hCDUP4g7iiIqwA3CG3UHEENp4xFbuNPSNuXpzE6mSZUec8+hFFpXezt6fzquOuwDlM82
+         /GBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Osw6NqVYNmHUMRwCYRyMfaozlp7BCYpLh7My51/r2BU=;
-        b=Oe83Wq/ZGD0Vo1QJ+T3MuFOUiOteh+IM7WViECuGZv+ws9qwVJ9DgcupCPi82p4Twp
-         Sr9gTls4CjvWsdy7LlV+dEwa7mTIbt+reQZB3+ppF0QvvoUhhJUFwV+zfyRwz5wT1TOC
-         knOdw5uMkItfGZzP8FZb6G+RI8oWnPUT3YUWbWaOmYphrFXqIBuAmL391QMcjgp62BKH
-         icepP+VS2tm6JyvDKu/Xo+Okvpq6D8wSvoOVgB4ZXbU2KruuRRJgRhO9ZTMhaP0elhds
-         GY91d8oM78SgOf05Zc5BmXs33+GJ9hBgZczhDurm7LKUF0prBI9+cw8AUuiFFhn23bQ9
-         4FmA==
-X-Gm-Message-State: AOAM531ym9wRbc8ny1Mo/P0zq+vHeVtSIjG1mY+FhcQwEBXz8rfNvKW5
-        Y3OR9fAGzGHINQtxoSb3iY6NNuh+e5p7RoRs3JZ7WQ24
-X-Google-Smtp-Source: ABdhPJwrALW3OEZCReFmJA9f8BAH86kK1t/fxys600Al92ToxSg/sPXbhg7mrxoom1NUkervZ5/u3PlcF7mZ0TItz3U=
-X-Received: by 2002:aca:4c7:: with SMTP id 190mr2906123oie.58.1602781988041;
- Thu, 15 Oct 2020 10:13:08 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fXumMw6Ct4LQffIPTraW0kvUrjf7lJM7fYG/Hlb1Ns8=;
+        b=G3c5hqRu+HFf3x/lonOKeHAXcw742BbcqxkJxhJ/DivoOEFB2W4gR3Hj8DqaIFs5E2
+         0EegkI6mcMlmlfiEw/Yd+18JFVRKWI3jC7PHfZxh43OxJ+auhpNqZw85zJBjefjAVAq9
+         FufIv6R5qNBUlS/0Jwbt+YbiwMJjJ0NFlTIn5HMGi8wVV5x4G5jtZeVYro9ncA1TUF7G
+         Glv+zpb4zlLhuYHohPYxWQVMM7k0UrL8t4939Rt2lx8jfBD4bpQGxudW+XC0AMCsd4Yg
+         ruIQ7tBecd//WMaMJm7Tm2kjwXhum2WjbjBxNkU4vm3Ev8CZIvSYe64OyQ7w9L3CuGli
+         /B/w==
+X-Gm-Message-State: AOAM531bFZZrUU9968tu/ygiBOC6cUf6UfWdENnyctk8P8UTzyvjN+mt
+        lfbhW9uNBZrE6Z/mBzTcYRmJ6VgKLro9hxMLfTU+PD32BhOu6A==
+X-Google-Smtp-Source: ABdhPJzyNEqTfCDaw3xJHfxOtHtmcX+e2vx3yvVavGQTm2U2RnZ2MxJBTpBK6avSCx9b/ND6m6P8GSJiZT+0phSGlnQ=
+X-Received: by 2002:a19:e014:: with SMTP id x20mr1417359lfg.444.1602786861547;
+ Thu, 15 Oct 2020 11:34:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <f6d623eecc635022b85a31359b2f11b0104267c5.camel@snewbury.org.uk>
-In-Reply-To: <f6d623eecc635022b85a31359b2f11b0104267c5.camel@snewbury.org.uk>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 15 Oct 2020 10:12:57 -0700
-Message-ID: <CABBYNZ+ahHHmZx2dOx8zpQ34LEiYk0btpLQ_6Kv8e6+d_Ko66g@mail.gmail.com>
-Subject: Re: [PATCH] 100% CPU usage on keyboard disconnect
-To:     Steven Newbury <steve@snewbury.org.uk>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From:   Alexandre Augusto <alexandre.a.giron@gmail.com>
+Date:   Thu, 15 Oct 2020 15:34:09 -0300
+Message-ID: <CABLzjm8S1J5MRhrwFu1pbX9fub7X5nXmYRWmtRsmVRObeJOCbw@mail.gmail.com>
+Subject: Entropy source based on the RSSI
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Steven,
+Hello,
 
-On Thu, Oct 15, 2020 at 4:13 AM Steven Newbury <steve@snewbury.org.uk> wrote:
->
-> There are a couple of issues with g_io_channel usage in bluez which
-> cause CPUs to spin on half-closed channels.
->
-> This patch fixes bugs where bluetooth keyboards fail to work on initial
-> connection, and cause 100% cpu on disconnect.
->
-> Also fix bug with similar symptoms triggered by some other HID devices
-> such as Sony PS3 BD Remotes.
->
-> In the previous discussion on the kernel bugzilla below, it was
-> suggested to remove sec_watch, and I attached a follow-up patch to do
-> so, however that change causes problems with current bluez-5 releases
-> where a fd is used after being closed.
->
-> See https://bugzilla.kernel.org/show_bug.cgi?id=204275
->
-> Signed-off-by: Steven Newbury <steve@snewbury.org.uk>
-> ---
->  attrib/interactive.c    | 4 +++-
->  profiles/input/device.c | 3 ++-
->  2 files changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/attrib/interactive.c b/attrib/interactive.c
-> index 9a7976d34..453ff064e 100644
-> --- a/attrib/interactive.c
-> +++ b/attrib/interactive.c
-> @@ -64,6 +64,7 @@ static int opt_psm = 0;
->  static int opt_mtu = 0;
->  static int start;
->  static int end;
-> +static guint gsrc;
->
->  static void cmd_help(int argcp, char **argvp);
->
-> @@ -193,6 +194,7 @@ static void disconnect_io()
->         attrib = NULL;
->         opt_mtu = 0;
->
-> +       g_source_remove(gsrc);
->         g_io_channel_shutdown(iochannel, FALSE, NULL);
->         g_io_channel_unref(iochannel);
->         iochannel = NULL;
-> @@ -415,7 +417,7 @@ static void cmd_connect(int argcp, char **argvp)
->                 error("%s\n", gerr->message);
->                 g_error_free(gerr);
->         } else
-> -               g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
-> +               gsrc = g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
->  }
+based on the motivation that IoT devices do not have many entropy
+sources available, and also on the fact that trusting in a single
+source may be risky, I have researched some additional ways to collect
+randomness for the device, using bluetooth technology for that
+purpose.
 
-I wouldn't bother with the fix above since the attrib part will be
-going away soon.
+For those who are interested in:
 
->  static void cmd_disconnect(int argcp, char **argvp)
-> diff --git a/profiles/input/device.c b/profiles/input/device.c
-> index a711ef527..9abf595f6 100644
-> --- a/profiles/input/device.c
-> +++ b/profiles/input/device.c
-> @@ -982,7 +982,8 @@ static int hidp_add_connection(struct input_device *idev)
->                 }
->
->                 idev->req = req;
-> -               idev->sec_watch = g_io_add_watch(idev->intr_io, G_IO_OUT,
-> +               if (!idev->sec_watch)
-> +                       idev->sec_watch = g_io_add_watch(idev->intr_io, G_IO_IN,
->                                                         encrypt_notify, idev);
+Github: https://github.com/AAGiron/Bluerandom
+Presentation: https://www.youtube.com/watch?v=iAKaKAmqCFo
 
-If this is happening isn't there a idev->req already set and we are
-overwriting it?
-
->                 return 0;
-> --
-> 2.22.0
->
->
-
+I also want to say thanks in advance to Emil Lenngren for his valuable
+comments, here in this mailing list (back in 2019), and also to the
+Bluez community.
 
 -- 
-Luiz Augusto von Dentz
+Alexandre Augusto Giron
