@@ -2,178 +2,127 @@ Return-Path: <SRS0=5gFq=DX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11078C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 12:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 918F0C43467
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 13:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD95E207F7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 12:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31C0720874
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 13:16:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9aH34y8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5961oYo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407845AbgJPMqO (ORCPT
+        id S2407213AbgJPNQB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Oct 2020 08:46:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28823 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2407834AbgJPMqF (ORCPT
+        Fri, 16 Oct 2020 09:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407176AbgJPNQA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Oct 2020 08:46:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602852363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7wF22TtTg52My8GhCH0JEYZmjtj4vDtDc64Kh1Nwbn8=;
-        b=Q9aH34y8gGbejbvleKT6vXY9lbBca1XGinD/2Us08zh/jfwmPlOZrmXr5LkYwaNYQIS/B9
-        TYcfsN+gpT2Ox6+oqabvzbXvAYIzTiDR2nXo2PAZvyNYl9YkcSVAFmd2M/yfGCX/AKC/VZ
-        b5uO4Ei3TjCAEi82TrE/vxiewJevxD4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-0OGLIpoSNPmb-3JQ2nDQHA-1; Fri, 16 Oct 2020 08:46:01 -0400
-X-MC-Unique: 0OGLIpoSNPmb-3JQ2nDQHA-1
-Received: by mail-ed1-f72.google.com with SMTP id ay19so977482edb.23
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2020 05:46:01 -0700 (PDT)
+        Fri, 16 Oct 2020 09:16:00 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90033C061755;
+        Fri, 16 Oct 2020 06:16:00 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id h2so1252036pll.11;
+        Fri, 16 Oct 2020 06:16:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ywZMHMoa9Z2/Mz63aoLeLWbP5S3RUkcpUs/A8T6Yyeg=;
+        b=D5961oYoWjrbxsHHTMOeZKBQ/TRF4he+KTOpPZPu0q9sMdCFZxI2NJkuWh8DjpTdbK
+         Nb5w+7ClTeSeXk/73DZv3Ng3yS/dPJntdavYpMrP62XQwzAJ/WvlX3XPyEh4iQC9M4am
+         HQYBvBfJdwdGYHfnKJC+NGj3FTpdC+uZeSFePGF/Wl6IWdZEJb96qzzH1Qtwg+DHQJvF
+         TwjoIySOE2x9Oz2SP9vf2lY8iBBGmGzkfyv+wQoKccbgN43y38sFaZc57A7hWtvqoe3D
+         Lfjjml5Pr8c3prYFdzy8gGZAxg1b5pQI1P1L3eCV+MGlQQ5YvmRlY1bGRrGAqgwcQFoc
+         B7cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=7wF22TtTg52My8GhCH0JEYZmjtj4vDtDc64Kh1Nwbn8=;
-        b=miF6oa2QXKqDX9YUp6zagacu/swGdxOsu46Bb1YyKH77plh3Tq2Nq39r3R8f9hKCcq
-         2DZ2Mnv21uhZIgC6HneThFWaOwBmgdj71JiWd3k3PscnP1nZTTpDSsB5yPlA/d8aXA1K
-         xTQOo7h/TImBACvfB0crht0Gu20ngOBqg4+/gc5L0VlXyyElfsBrZhFUTBeGPDNg98bh
-         VtEbSbKQB0ttPshgEd+xEkdgGcF3fKC4ZFXYrclqbvhoVNtptZGpjgxgiPRGds7XtHyP
-         ySYyvmA0UPm0JptLD3ejCQ8vPZKJ3JJKmAKh7ICKSwwxXBfz48aCmUxiVmbKtmKE/KN5
-         XQrg==
-X-Gm-Message-State: AOAM533+hz33S/4p01/gB6q9u3CoQxk1yR15oWBgqn0+c2qQUxr9PHHs
-        yTgFWpW9cZbkowLKqbiqEYaLmFhGINvNb/dGyrEU/SefrLH4NTdITtCboe8dB7T4QvuxWPI/TrY
-        pZO14UuEdiAoiDkkIvrB8SJoNpQAf
-X-Received: by 2002:a50:a452:: with SMTP id v18mr3558753edb.143.1602852360553;
-        Fri, 16 Oct 2020 05:46:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxugyAIP9+8mi74NlTjuPZGUD97J50mq+5lrgMH6SXx3HSGmqYhS1uys0MlOWVLz+5l4KUX+g==
-X-Received: by 2002:a50:a452:: with SMTP id v18mr3558722edb.143.1602852360301;
-        Fri, 16 Oct 2020 05:46:00 -0700 (PDT)
-Received: from x1.localdomain (2001-1c00-0c0c-fe00-d2ea-f29d-118b-24dc.cable.dynamic.v6.ziggo.nl. [2001:1c00:c0c:fe00:d2ea:f29d:118b:24dc])
-        by smtp.gmail.com with ESMTPSA id t25sm1345815edt.24.2020.10.16.05.45.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Oct 2020 05:45:59 -0700 (PDT)
-Subject: Re: [PATCH v4] bluetooth: hci_h5: fix memory leak in h5_close
-To:     Anant Thazhemadam <anant.thazhemadam@gmail.com>
-Cc:     linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com,
-        Marcel Holtmann <marcel@holtmann.org>,
+        bh=ywZMHMoa9Z2/Mz63aoLeLWbP5S3RUkcpUs/A8T6Yyeg=;
+        b=G0+GT8vS2Z7ZWmrIsk1ZbKckM9DkKQ5d9BQ3voQ9grNYa+Vz4BHIVuwrMAQ79MIaRv
+         2TiONfu9AC/qHkyDE8AQwWFcqhCwyvASGW7mI4lH20/BSJ2V1jitirHHW2iHtVQ2JfRA
+         h422goSMp3xva2B3HDB4KC1Rr5ubk04oa8HlRGmgVXf1HVnh/WzMY909Usbv7DsaxIul
+         nM6x1Rartg3kMCGvh7Co7iVhNvKDIrA+L5dVnETfjl76Q+AyVagfNEVKztMKY6YCqAFX
+         u2Xuqy2EFD77boUKoA4M0R3v2W3hwnngLoyuS2IOJHCYusft7+6qyuerMgPlL9Rl/FX/
+         0F9g==
+X-Gm-Message-State: AOAM533hkplphf1BqfBBbpYfjFGVRYmpBgnChzPlTqrQrjSQqGEV1hV9
+        o7l8pDtZFM/pfC22Brs3W7E=
+X-Google-Smtp-Source: ABdhPJzZiFySSHjmf9JkgTm5CVtdFe+1MqqCGZN0AwBdYN0l1fJfu9gdvZmcESsUknwi1zG7/fqlYA==
+X-Received: by 2002:a17:902:c254:b029:d4:c2d4:15f with SMTP id 20-20020a170902c254b02900d4c2d4015fmr4055633plg.18.1602854159966;
+        Fri, 16 Oct 2020 06:15:59 -0700 (PDT)
+Received: from localhost.localdomain ([49.207.207.75])
+        by smtp.gmail.com with ESMTPSA id q8sm2988144pfl.100.2020.10.16.06.15.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2020 06:15:59 -0700 (PDT)
+From:   Anant Thazhemadam <anant.thazhemadam@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20201007034803.7554-1-anant.thazhemadam@gmail.com>
- <2a79ece2-c63b-a881-bc19-65b59952344f@redhat.com>
- <dfa15c3a-6081-1072-8c73-ecebc983643d@gmail.com>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <d07b1280-7b5f-f0fd-2892-a89a95712c9b@redhat.com>
-Date:   Fri, 16 Oct 2020 14:45:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        Hans de Goede <hdegoede@redhat.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Anant Thazhemadam <anant.thazhemadam@gmail.com>,
+        syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
+Subject: [PATCH v5] bluetooth: hci_h5: fix memory leak in h5_close
+Date:   Fri, 16 Oct 2020 18:44:47 +0530
+Message-Id: <20201016131447.32107-1-anant.thazhemadam@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <dfa15c3a-6081-1072-8c73-ecebc983643d@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+When h5_close() is called, h5 is directly freed when !hu->serdev.
+However, h5->rx_skb is not freed, which causes a memory leak.
 
-On 10/16/20 1:55 PM, Anant Thazhemadam wrote:
-> 
-> Hi,
-> 
-> On 16/10/20 4:58 pm, Hans de Goede wrote:
->> Hi,
->>
->> On 10/7/20 5:48 AM, Anant Thazhemadam wrote:
->>> If h5_close is called when !hu->serdev, h5 is directly freed.
->>> However, h5->rx_skb is not freed, which causes a memory leak.
->>>
->>> Freeing h5->rx_skb fixes this memory leak.
->>>
->>> In case hu->serdev exists, h5->rx_skb is then set to NULL,
->>> since we do not want to risk a potential NULL pointer 
->>> dereference.
->>>
->>> Fixes: ce945552fde4 ("Bluetooth: hci_h5: Add support for serdev enumerated devices")
->>> Reported-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
->>> Tested-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
->>> Signed-off-by: Anant Thazhemadam <anant.thazhemadam@gmail.com>h5_close v4
->>> ---
->>> Changes in v4:
->>> 	* Free h5->rx_skb even when hu->serdev
->>> 	(Suggested by Hans de Goede <hdegoede@redhat.com>)
->>> 	* If hu->serdev, then assign h5->rx_skb = NULL
->>>
->>> Changes in v3:
->>> 	* Free h5->rx_skb when !hu->serdev, and fix the memory leak
->>> 	* Do not incorrectly and unnecessarily call serdev_device_close()
->>>
->>> Changes in v2:
->>> 	* Fixed the Fixes tag
->>>
->>>  drivers/bluetooth/hci_h5.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
->>> index e41854e0d79a..39f9553caa5c 100644
->>> --- a/drivers/bluetooth/hci_h5.c
->>> +++ b/drivers/bluetooth/hci_h5.c
->>> @@ -245,11 +245,15 @@ static int h5_close(struct hci_uart *hu)
->>>  	skb_queue_purge(&h5->rel);
->>>  	skb_queue_purge(&h5->unrel);
->>>  
->>> +	kfree_skb(h5->rx_skb);
->>> +
->>>  	if (h5->vnd && h5->vnd->close)
->>>  		h5->vnd->close(h5);
->>>  
->>>  	if (!hu->serdev)
->>>  		kfree(h5);
->>> +	else
->>> +		h5->rx_skb = NULL;
->> Please just do this unconditionally directly after
->> the kfree_skb()
-> 
-> Could you also please tell me why this might be necessary?
-> The pointer value stored at h5->rx_skb would be freed anyways when we free h5 (since rx_skb is
-> essentially a member of the structure that h5 points to).
+Freeing h5->rx_skb and setting it to NULL, fixes this memory leak.
 
-It is necessary in the path where the struct h5 points to is not
-free-ed and it is cleaner to just always do it then, as you
-indicate yourself 
+Fixes: ce945552fde4 ("Bluetooth: hci_h5: Add support for serdev enumerated devices")
+Reported-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
+Tested-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
+Signed-off-by: Anant Thazhemadam <anant.thazhemadam@gmail.com>
+---
+Changes in v5:
+	* Set h5->rx_skb = NULL unconditionally - to improve code
+	  readability
+	* Update commit message accordingly
 
-> Also since we're performing the *if* check, the *else* condition wouldn't exactly be taxing either,
-> right?
+Changes in v4:
+	* Free h5->rx_skb even when hu->serdev
+	(Suggested by Hans de Goede <hdegoede@redhat.com>)
+	* If hu->serdev, then assign h5->rx_skb = NULL
 
-For the computer it is not taxing, but for a human reading the code
-and trying to understand the flow it makes things extra complicated
-unnecessarily.
+Changes in v3:
+	* Free h5->rx_skb when !hu->serdev, and fix the memory leak
+	* Do not incorrectly and unnecessarily call serdev_device_close()
 
-> Is there some performance metric that I'm missing where unconditionally setting it to NULL
-> in this manner would be better? (I couldn't find any resources that had any similar analysis
-> performed :/ )
-> Or is this in interest of code readability?
+Changes in v2:
+	* Fixed the Fixes tag
 
-Yes, it is in interest of code readability?
 
-> Also, how about we introduce a h5 = NULL, after freeing h5 when !hu->serdev?
+ drivers/bluetooth/hci_h5.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-That is not necessary, there is no reason to have that in either code path.
-
-Regards,
-
-Hans
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index e41854e0d79a..0ef253136b06 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -245,6 +245,9 @@ static int h5_close(struct hci_uart *hu)
+ 	skb_queue_purge(&h5->rel);
+ 	skb_queue_purge(&h5->unrel);
+ 
++	kfree_skb(h5->rx_skb);
++	h5->rx_skb = NULL;
++
+ 	if (h5->vnd && h5->vnd->close)
+ 		h5->vnd->close(h5);
+ 
+-- 
+2.25.1
 
