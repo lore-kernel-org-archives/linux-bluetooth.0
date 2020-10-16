@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F87C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 22:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE6AC433E7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 22:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F307D2065D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 22:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 496322065D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Oct 2020 22:09:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tcd-ie.20150623.gappssmtp.com header.i=@tcd-ie.20150623.gappssmtp.com header.b="gwhDZMwh"
+	dkim=pass (2048-bit key) header.d=tcd-ie.20150623.gappssmtp.com header.i=@tcd-ie.20150623.gappssmtp.com header.b="OG+1REu9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388841AbgJPWJe (ORCPT
+        id S2388868AbgJPWJj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Oct 2020 18:09:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40864 "EHLO
+        Fri, 16 Oct 2020 18:09:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388807AbgJPWJe (ORCPT
+        with ESMTP id S2388807AbgJPWJi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Oct 2020 18:09:34 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE9C8C061755
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2020 15:09:33 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id hk7so2249502pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2020 15:09:33 -0700 (PDT)
+        Fri, 16 Oct 2020 18:09:38 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE235C061755
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2020 15:09:38 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id x13so2225818pgp.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Oct 2020 15:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=tcd-ie.20150623.gappssmtp.com; s=20150623;
         h=from:subject:to:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=n1+giSsolW0YEWNRCDDe69POzBrY4Vg661V09byvQ1M=;
-        b=gwhDZMwhkvBD1mpqF9lT0hEJgN7e1RoMkyYGvcX8xMH/qKU/jnReOh86d82s8/tKil
-         Zzw8qxn+e0Edfi14Hr4FN+Q5tqBqZzsIaa3dDESNVoZQsaYY4ZfcZRLKLBG2blH4tpiI
-         a1FTn/4cpkWkaXd2wPQrVDFncaL7xA3e24oKnGQU1B7FdQUO/E+1wVhofbWwvcl/CGxX
-         OiaqMSYc77Lc0mAVIrhQk5kor0i/GqING+s4EIqQklmmH2pp8a6tS77jvBADg5h9ioIz
-         iyqY0okw5DVWgjfl/htMpv3kdCIuSve0KxhgiMePMTm/C7A59E3Fv11gOJ8XnHTP46lP
-         rwVA==
+        bh=kt50QO488Fqz+enFM7SXz9VGDepJqY0UVtwdiBU2L1k=;
+        b=OG+1REu9F2CjqMzMFDA0usIIPphkv/KMq7XSVabVvyMXCY/D/Wyd4kJXoH5Y7Q3nEl
+         LrjKEC3TTsZcR1fL1lNsQFHYpep1QWqZsqRO84aDJiwftCfR6T3mHSCfMWOpu9IgFnWs
+         10X7REqAtFMTxncqNYAOVeCpDUpwXERQGYyyBqFvD377d9R1GrsjBFkkU433ERf+hYKd
+         K64KmfMHSchzUoqXz3BixSdB6WjqOFb8DmBVAEBep7aB7Di7x5Ux6kIoIfkGyqFdkU+N
+         fHeoTx2mCtfzgQUMjl08uQaaOhH8TdyRZ59AM5fvzVzc79slL/QDcKEqIw+/ihEGIFLe
+         mm8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:subject:to:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=n1+giSsolW0YEWNRCDDe69POzBrY4Vg661V09byvQ1M=;
-        b=L8hm0cZrTBY5k9abtgy8OxpsbDo1eBVbAo3rwJ4ew7i41rei8/sZNg9Dg3A+Y18gZA
-         AyBpTuJn7SPKm5SA5pJPSewPrRvdxsiCQZ62o/LyVkHKmsK++udPdhxssOYNQau62cwr
-         J/oyynqdmWyn/9RMW0dFCUTUdGNqN3GuQ6yuLcY4i3M4vhPCcDXxqT7Fp1YktGaosU0E
-         5TBBw7uX3LGJYgVTsucfsEE+VSElPkrPgXI77EMNxx7vCfzQZh9CFEdvzW7VzSADZRFX
-         vv429EDScY/OuXTB17P/PXGRuk20G4W3OLaPMjJ28PsWaITE9wyUlX2u7lo6pxGIS7JH
-         2i4w==
-X-Gm-Message-State: AOAM532keU6o6alJc2OU73xMrldAiGXFOvUe0ibbM+YhxdCeMbaPFARr
-        lWCp5CB/yG+v9EG/zwDK8en1KBgItgR3wqEE
-X-Google-Smtp-Source: ABdhPJx3m2gdq/oHubGKAGvyLOgNrR+OM7K4jaCDkoKgAwRuqOlE6ORNIWrywQ5BCiLiYBQ8lXKcQg==
-X-Received: by 2002:a17:902:8348:b029:d3:781a:5857 with SMTP id z8-20020a1709028348b02900d3781a5857mr5940234pln.2.1602886173218;
-        Fri, 16 Oct 2020 15:09:33 -0700 (PDT)
+        bh=kt50QO488Fqz+enFM7SXz9VGDepJqY0UVtwdiBU2L1k=;
+        b=M9/MkD9Djof1fxod3qJjwikFW3jTIPKPDV8onfOf6gf0Zi0yfoAPmvqHjoNO4VJwsG
+         j8sNsPHU0kbfupYLxOrqYjt8KgCTUnUpQYDotzUUs6skeNf3cbxh0Jl4Cn+1cXthEljF
+         /KOYOy8PfsDQ2U4QgJGkKzic9jEunAE4tWQs3a3NsMbT8du2iherzfieQ2HGiGFXaojv
+         d9EwS/3rG2zltprCi2O3GMIMOlq6XWoIjwQKbkfX+bOxcrycFs97Y98p74kRtuh1rC6e
+         qBRFvzlwbEslccy5ktO7Pw5XdaTA6TH4Zz6OW1+MsfWGNVLRcat1ZxueVJ1RfWcnSH5q
+         fuhQ==
+X-Gm-Message-State: AOAM531DJ7stC/R7uXxiRpOn+ASf+GgO6jh4rkk5ohbbN0/bfd7gJQbO
+        VFXNmST/RJfU2xS1CU0wdy094E2HyCDgsCnS
+X-Google-Smtp-Source: ABdhPJxUe5rMav1Vmdvctks5OhdI0plD8xnMrtEaTcdxHFLzTRdxTJmSQDYZJTi62oT7ElClTSPPvQ==
+X-Received: by 2002:a65:628f:: with SMTP id f15mr5119328pgv.168.1602886178086;
+        Fri, 16 Oct 2020 15:09:38 -0700 (PDT)
 Received: from [192.168.2.14] (216-19-182-159.dyn.novuscom.net. [216.19.182.159])
-        by smtp.gmail.com with ESMTPSA id z18sm3780604pfn.158.2020.10.16.15.09.32
+        by smtp.gmail.com with ESMTPSA id s20sm3463811pfu.112.2020.10.16.15.09.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Oct 2020 15:09:32 -0700 (PDT)
+        Fri, 16 Oct 2020 15:09:37 -0700 (PDT)
 From:   Peter Mullen <omaolaip@tcd.ie>
-Subject: [PATCH BlueZ 1/3] profile: Add Vendor/Product ID profile matching
+Subject: [PATCH BlueZ 2/3] policy: Avoid using UUID if field is not set
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-ID: <efec3d63-119b-6956-5345-c9b19c71cbd5@tcd.ie>
-Date:   Fri, 16 Oct 2020 15:09:32 -0700
+Message-ID: <b8547b16-60b8-766a-6e63-ae96bead9f0c@tcd.ie>
+Date:   Fri, 16 Oct 2020 15:09:37 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
@@ -75,105 +75,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Extend the process for matching profiles to devices by adding vid/pid
-fields to btd_profile. If no remote_uuid is supplied, attempt to match
-based on the new fields. If only vid field is set, ignore pid during
-matching.
 ---
-  src/device.c  | 37 ++++++++++++++++++++++++++-----------
-  src/profile.h |  3 +++
-  2 files changed, 29 insertions(+), 11 deletions(-)
+  plugins/policy.c | 26 ++++++++++++++------------
+  1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index a5ef46730..2cb2ceb2e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -329,7 +329,8 @@ static GSList *find_service_with_uuid(GSList *list, 
-char *uuid)
-  		struct btd_service *service = l->data;
-  		struct btd_profile *profile = btd_service_get_profile(service);
-  -		if (bt_uuid_strcmp(profile->remote_uuid, uuid) == 0)
-+		if (profile->remote_uuid &&
-+				bt_uuid_strcmp(profile->remote_uuid, uuid) == 0)
-  			return l;
-  	}
-  @@ -1901,11 +1902,19 @@ static struct btd_service 
-*find_connectable_service(struct btd_device *dev,
-  		struct btd_service *service = l->data;
-  		struct btd_profile *p = btd_service_get_profile(service);
-  -		if (!p->connect || !p->remote_uuid)
-+		if (!p->connect)
-  			continue;
-  -		if (strcasecmp(uuid, p->remote_uuid) == 0)
-+		if (p->remote_uuid && strcasecmp(uuid, p->remote_uuid) == 0)
-  			return service;
-+
-+		if (p->vendor_id && p->vendor_id ==
-+						btd_device_get_vendor(dev)) {
-+			if (p->product_id && p->product_id !=
-+						btd_device_get_product(dev))
-+				continue;
-+			return service;
-+		}
-  	}
-   	return NULL;
-@@ -3800,14 +3809,18 @@ static bool device_match_profile(struct 
-btd_device *device,
-  					struct btd_profile *profile,
-  					GSList *uuids)
-  {
--	if (profile->remote_uuid == NULL)
--		return false;
--
--	if (g_slist_find_custom(uuids, profile->remote_uuid,
--							bt_uuid_strcmp) == NULL)
--		return false;
-+	if (profile->remote_uuid && g_slist_find_custom(uuids,
-+				profile->remote_uuid, bt_uuid_strcmp) != NULL)
-+		return true;
-  -	return true;
-+	if (profile->vendor_id && profile->vendor_id ==
-+						btd_device_get_vendor(device)) {
-+		if (profile->product_id && profile->product_id !=
-+						btd_device_get_product(device))
-+			return false;
-+		return true;
+diff --git a/plugins/policy.c b/plugins/policy.c
+index dac1b7a24..e156c0db2 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -635,17 +635,19 @@ static void service_cb(struct btd_service *service,
+  	struct btd_profile *profile = btd_service_get_profile(service);
+  	struct reconnect_data *reconnect;
+  -	if (g_str_equal(profile->remote_uuid, A2DP_SINK_UUID))
+-		sink_cb(service, old_state, new_state);
+-	else if (g_str_equal(profile->remote_uuid, A2DP_SOURCE_UUID))
+-		source_cb(service, old_state, new_state);
+-	else if (g_str_equal(profile->remote_uuid, AVRCP_REMOTE_UUID))
+-		controller_cb(service, old_state, new_state);
+-	else if (g_str_equal(profile->remote_uuid, AVRCP_TARGET_UUID))
+-		target_cb(service, old_state, new_state);
+-	else if (g_str_equal(profile->remote_uuid, HFP_HS_UUID) ||
+-			g_str_equal(profile->remote_uuid, HSP_HS_UUID))
+-		hs_cb(service, old_state, new_state);
++	if (profile->remote_uuid) {
++		if (g_str_equal(profile->remote_uuid, A2DP_SINK_UUID))
++			sink_cb(service, old_state, new_state);
++		else if (g_str_equal(profile->remote_uuid, A2DP_SOURCE_UUID))
++			source_cb(service, old_state, new_state);
++		else if (g_str_equal(profile->remote_uuid, AVRCP_REMOTE_UUID))
++			controller_cb(service, old_state, new_state);
++		else if (g_str_equal(profile->remote_uuid, AVRCP_TARGET_UUID))
++			target_cb(service, old_state, new_state);
++		else if (g_str_equal(profile->remote_uuid, HFP_HS_UUID) ||
++				g_str_equal(profile->remote_uuid, HSP_HS_UUID))
++			hs_cb(service, old_state, new_state);
 +	}
-+	return false;
-  }
-   static void add_gatt_service(struct gatt_db_attribute *attr, void 
-*user_data)
-@@ -6729,6 +6742,8 @@ void btd_device_set_record(struct btd_device 
-*device, const char *uuid,
-  const sdp_record_t *btd_device_get_record(struct btd_device *device,
-  							const char *uuid)
-  {
-+	if (uuid == NULL)
-+		return NULL;
-  	/* Load records from storage if there is nothing in cache */
-  	if (!device->tmp_records) {
-  		device->tmp_records = read_device_records(device);
-@@ -6881,7 +6896,7 @@ struct btd_service *btd_device_get_service(struct 
-btd_device *dev,
-  		struct btd_service *service = l->data;
-  		struct btd_profile *p = btd_service_get_profile(service);
-  -		if (g_str_equal(p->remote_uuid, remote_uuid))
-+		if (p->remote_uuid && g_str_equal(p->remote_uuid, remote_uuid))
-  			return service;
-  	}
-  diff --git a/src/profile.h b/src/profile.h
-index 6827f8481..fe882a843 100644
---- a/src/profile.h
-+++ b/src/profile.h
-@@ -21,6 +21,9 @@ struct btd_profile {
-  	const char *local_uuid;
-  	const char *remote_uuid;
-  +	uint16_t vendor_id;
-+	uint16_t product_id;
-+
-  	bool auto_connect;
-  	/* Some profiles are considered safe to be handled internally and also
-  	 * be exposed in the GATT API. This flag give such profiles exception
+   	/*
+  	 * Return if the reconnection feature is not enabled (all
+@@ -687,7 +689,7 @@ static void service_cb(struct btd_service *service,
+  	 * be the first profile that's connected so we might have an
+  	 * entry but with the reconnect flag set to false.
+  	 */
+-	if (!reconnect->reconnect)
++	if (!reconnect->reconnect && profile->remote_uuid)
+  		reconnect->reconnect = reconnect_match(profile->remote_uuid);
+   	DBG("Added %s reconnect %u", profile->name, reconnect->reconnect);
 -- 
 2.28.0
 
