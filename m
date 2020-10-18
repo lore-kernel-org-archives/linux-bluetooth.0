@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4E5C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD05C433DF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:38:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AE2422274
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACA87207DE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:38:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603049709;
-	bh=GwReP5S7w2Fjy/LChrZty43c7cfGrzddYTZbZCLqK08=;
+	s=default; t=1603049903;
+	bh=HDCMGJf1kIhpPN93Q61Pxo3Rl/dSL5wdEcz8+ka9Cs8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qEmoTKtshgBT97DUPT+pgnNYyr+6A15KFYsK93L30A24GMtY5u0ZK+IU/M6Opu3WP
-	 THJjOe6KZQMMmBMyfz1Xm1g1bOVEQQgh2Oas3VuELib9ofLxIxGuGBpgKgB4uiYk4Z
-	 gzkKx0OP+fy4OO4d93pDkM+cA8HKNYuCGIiY3zBM=
+	b=2WUTSkfxjgOUw5ZoMx9t3Wh7gGc/4YGq3USrXNp1yfr9jbArCf9HnCUjMp+vgM4sj
+	 I3zafs7OuHpBi1YU4SmFunrdO7+4FfKQ75/wMX99mXLKJ7V83xIABOhaL/8r0RDuIe
+	 gwcWnpSeLtim9TjVsqmgi5lS7faQgNC7LvT3uPBE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731632AbgJRT0T (ORCPT
+        id S1732866AbgJRTiP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:26:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41392 "EHLO mail.kernel.org"
+        Sun, 18 Oct 2020 15:38:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39424 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731618AbgJRT0S (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:26:18 -0400
+        id S1731160AbgJRTZI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 18 Oct 2020 15:25:08 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EE268207DE;
-        Sun, 18 Oct 2020 19:26:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9ACFB222C8;
+        Sun, 18 Oct 2020 19:25:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603049175;
-        bh=GwReP5S7w2Fjy/LChrZty43c7cfGrzddYTZbZCLqK08=;
+        s=default; t=1603049107;
+        bh=HDCMGJf1kIhpPN93Q61Pxo3Rl/dSL5wdEcz8+ka9Cs8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Oi1qaE53fLZ5RauzVJzjcW1Rgacfy2gp6DZ7Z4pW02wt1JeW4v7MKojjpbfpcnPOq
-         R/O9QDKdJSjC4wC/ZVR/8tVaFrOmikExTtka8LDB0w9oRODWcoVv3siBCJWbQavhL0
-         JgzWIpr5u6oYa1kIZoKle8wD873L4RHZWdST8+Io=
+        b=TivyR0MCKlLVV/ttghSQDIf1PWjE61FQ0CbxV+d4hMX0M/KmA65/cRqyJ6axS5o5X
+         wrbHZOds14DmC5ZPi/nGLfpNCctiyBu/vl5TdqpoaoUIjrhNh9NYCsMo701Bij4EUf
+         kLhsM0i1EC/KEcZtTnb75ZgF3adkh4KemFG0HMsY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
@@ -47,12 +47,12 @@ Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 38/52] Bluetooth: Only mark socket zapped after unlocking
-Date:   Sun, 18 Oct 2020 15:25:15 -0400
-Message-Id: <20201018192530.4055730-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 41/56] Bluetooth: Only mark socket zapped after unlocking
+Date:   Sun, 18 Oct 2020 15:24:02 -0400
+Message-Id: <20201018192417.4055228-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201018192530.4055730-1-sashal@kernel.org>
-References: <20201018192530.4055730-1-sashal@kernel.org>
+In-Reply-To: <20201018192417.4055228-1-sashal@kernel.org>
+References: <20201018192417.4055228-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -101,10 +101,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 511a1da6ca971..3c4e56167a760 100644
+index 5572042f04531..eb979532a3839 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1342,8 +1342,6 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+@@ -1341,8 +1341,6 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
  
  	parent = bt_sk(sk)->parent;
  
@@ -113,7 +113,7 @@ index 511a1da6ca971..3c4e56167a760 100644
  	switch (chan->state) {
  	case BT_OPEN:
  	case BT_BOUND:
-@@ -1370,8 +1368,11 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+@@ -1369,8 +1367,11 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
  
  		break;
  	}
