@@ -7,47 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621BBC433E7
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0948C433E7
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:49:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 307AC22267
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7410A22269
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 19:49:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603050480;
-	bh=fLiAoAGyPCd7f6ZiKnIY/1DfUH5bqyP4A7ZYOC0nuHw=;
+	s=default; t=1603050543;
+	bh=Hdo7Sg9N/WT6VNUNXp5/pHKOqAdhhsYSrzrzCREuq6o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cVZjxvd/x8tRPgOVC+Ta6lxeGXdf/qQe0hLB4GqeYf75x6RaeLsDGOYHeN+geGCl/
-	 CePNHf99Cf8E4EAF91p1vw6PBNAxdiX4rCLf1cEJdXPBCBJPvCuxPoCKx8QH721/EO
-	 1RLudg32qrA8YT0CO2GcHj2PhoCXtSvZcw0VGiUU=
+	b=gnDrkYPAnAH+hkXKkdTbEjsF7xmu9taoxf2qAox6CCRLYQK81Dm/f3l2uDnoBfhO/
+	 ilgiBHDF0uVYqnnf3nqMtbhTWLoQdb69Zbf0lzs6POKqEIEhJVr54YbPbJ3sZkofhk
+	 +b27FinGkjRhtlEQ1/LvsaJZ+gBxi4sHpBrtGpvk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729717AbgJRTWK (ORCPT
+        id S2387674AbgJRTs7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:22:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34786 "EHLO mail.kernel.org"
+        Sun, 18 Oct 2020 15:48:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34210 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729712AbgJRTWJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:22:09 -0400
+        id S1729587AbgJRTVt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 18 Oct 2020 15:21:49 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57AB5222EB;
-        Sun, 18 Oct 2020 19:22:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A38622365;
+        Sun, 18 Oct 2020 19:21:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603048929;
-        bh=fLiAoAGyPCd7f6ZiKnIY/1DfUH5bqyP4A7ZYOC0nuHw=;
+        s=default; t=1603048908;
+        bh=Hdo7Sg9N/WT6VNUNXp5/pHKOqAdhhsYSrzrzCREuq6o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HRW6zojNKHcBey3m19XjsgnPE5x0/X4ouGlwPZTheQCEI7w9ntIC+25OU7BmtzAXG
-         dQw3+hwNQGrD5N5IBzJzfhOtD9QeGpmMWwuK3QWzWQeDMXFkJ6rniFZNcPpodwObh8
-         AIc2J1hjNS9agFQeIoZvAYqvgcufNoOJIBWiQgUY=
+        b=oItkHhJMY6KcWNqiBwpom5ellT6AHVixZwjl81Z+TY50CInD9ODXDwlVX0yOQM0Qe
+         faxUvK69kD7P3J0KCp/8nuMjh1mg6D3cK3wD8ylclKjKuK6XAYnddO8WKmw6z/YMZB
+         ssTgM3NJmv/RqVGErVwCownYZOQtCc+EbmkCBN+0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dinghao Liu <dinghao.liu@zju.edu.cn>,
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 085/101] Bluetooth: btusb: Fix memleak in btusb_mtk_submit_wmt_recv_urb
-Date:   Sun, 18 Oct 2020 15:20:10 -0400
-Message-Id: <20201018192026.4053674-85-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.8 068/101] Bluetooth: Only mark socket zapped after unlocking
+Date:   Sun, 18 Oct 2020 15:19:53 -0400
+Message-Id: <20201018192026.4053674-68-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201018192026.4053674-1-sashal@kernel.org>
 References: <20201018192026.4053674-1-sashal@kernel.org>
@@ -59,32 +61,71 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dinghao Liu <dinghao.liu@zju.edu.cn>
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-[ Upstream commit d33fe77bdf75806d785dabf90d21d962122e5296 ]
+[ Upstream commit 20ae4089d0afeb24e9ceb026b996bfa55c983cc2 ]
 
-When kmalloc() on buf fails, urb should be freed just like
-when kmalloc() on dr fails.
+Since l2cap_sock_teardown_cb doesn't acquire the channel lock before
+setting the socket as zapped, it could potentially race with
+l2cap_sock_release which frees the socket. Thus, wait until the cleanup
+is complete before marking the socket as zapped.
 
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+This race was reproduced on a JBL GO speaker after the remote device
+rejected L2CAP connection due to resource unavailability.
+
+Here is a dmesg log with debug logs from a repro of this bug:
+[ 3465.424086] Bluetooth: hci_core.c:hci_acldata_packet() hci0 len 16 handle 0x0003 flags 0x0002
+[ 3465.424090] Bluetooth: hci_conn.c:hci_conn_enter_active_mode() hcon 00000000cfedd07d mode 0
+[ 3465.424094] Bluetooth: l2cap_core.c:l2cap_recv_acldata() conn 000000007eae8952 len 16 flags 0x2
+[ 3465.424098] Bluetooth: l2cap_core.c:l2cap_recv_frame() len 12, cid 0x0001
+[ 3465.424102] Bluetooth: l2cap_core.c:l2cap_raw_recv() conn 000000007eae8952
+[ 3465.424175] Bluetooth: l2cap_core.c:l2cap_sig_channel() code 0x03 len 8 id 0x0c
+[ 3465.424180] Bluetooth: l2cap_core.c:l2cap_connect_create_rsp() dcid 0x0045 scid 0x0000 result 0x02 status 0x00
+[ 3465.424189] Bluetooth: l2cap_core.c:l2cap_chan_put() chan 000000006acf9bff orig refcnt 4
+[ 3465.424196] Bluetooth: l2cap_core.c:l2cap_chan_del() chan 000000006acf9bff, conn 000000007eae8952, err 111, state BT_CONNECT
+[ 3465.424203] Bluetooth: l2cap_sock.c:l2cap_sock_teardown_cb() chan 000000006acf9bff state BT_CONNECT
+[ 3465.424221] Bluetooth: l2cap_core.c:l2cap_chan_put() chan 000000006acf9bff orig refcnt 3
+[ 3465.424226] Bluetooth: hci_core.h:hci_conn_drop() hcon 00000000cfedd07d orig refcnt 6
+[ 3465.424234] BUG: spinlock bad magic on CPU#2, kworker/u17:0/159
+[ 3465.425626] Bluetooth: hci_sock.c:hci_sock_sendmsg() sock 000000002bb0cb64 sk 00000000a7964053
+[ 3465.430330]  lock: 0xffffff804410aac0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+[ 3465.430332] Causing a watchdog bite!
+
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/l2cap_sock.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a5fef9aa419fd..91a0c84d55c97 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2849,6 +2849,7 @@ static int btusb_mtk_submit_wmt_recv_urb(struct hci_dev *hdev)
- 	buf = kmalloc(size, GFP_KERNEL);
- 	if (!buf) {
- 		kfree(dr);
-+		usb_free_urb(urb);
- 		return -ENOMEM;
- 	}
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a995d2c51fa7f..2ea6bcbe6f559 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1521,8 +1521,6 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
  
+ 	parent = bt_sk(sk)->parent;
+ 
+-	sock_set_flag(sk, SOCK_ZAPPED);
+-
+ 	switch (chan->state) {
+ 	case BT_OPEN:
+ 	case BT_BOUND:
+@@ -1549,8 +1547,11 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+ 
+ 		break;
+ 	}
+-
+ 	release_sock(sk);
++
++	/* Only zap after cleanup to avoid use after free race */
++	sock_set_flag(sk, SOCK_ZAPPED);
++
+ }
+ 
+ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
 -- 
 2.25.1
 
