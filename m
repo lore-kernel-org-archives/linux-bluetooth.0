@@ -5,23 +5,23 @@ X-Spam-Level:
 X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED24C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 17:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580B5C433E7
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 17:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0032322240
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 17:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19BD022240
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Oct 2020 17:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgJRRSC convert rfc822-to-8bit (ORCPT
+        id S1726906AbgJRRY5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Oct 2020 13:18:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56108 "EHLO mail.kernel.org"
+        Sun, 18 Oct 2020 13:24:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57256 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726357AbgJRRSC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Oct 2020 13:18:02 -0400
+        id S1725776AbgJRRY5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 18 Oct 2020 13:24:57 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 209717] Bluetooth mouse Logitech M720 doesn't work
-Date:   Sun, 18 Oct 2020 17:18:01 +0000
+Date:   Sun, 18 Oct 2020 17:24:57 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -36,8 +36,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209717-62941-u7DF6k5ZZX@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209717-62941-kGeM6QDeyH@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-209717-62941@https.bugzilla.kernel.org/>
 References: <bug-209717-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -51,24 +51,14 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=209717
 
-Leho Kraav (leho@kraav.com) changed:
+--- Comment #2 from Leho Kraav (leho@kraav.com) ---
+(In reply to Leho Kraav from comment #1)
+> Yes, something is wrong with 5.9 bluetooth stack.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |leho@kraav.com
+PS I went straight to 5.9.1.
 
---- Comment #1 from Leho Kraav (leho@kraav.com) ---
-Yes, something is wrong with 5.9 bluetooth stack.
-
-My DELL keyboard and MX Ergo mouse both stop connecting after upgrading from
-5.8.
-
-I managed to somehow reconnect them once, but after they disconnect in idle,
-they fail to reconnect on their own and no amount of bluetooth toggling gets
-them back.
-
-BT toggling shows "[13543.597906] Bluetooth: hci0: HCI reset during shutdown
-failed" in demsg.
+00:14.3 Network controller: Intel Corporation Killer Wi-Fi 6 AX1650i 160MHz
+Wireless Network Adapter (201NGW) (rev 30) on XPS 7390 2-in-1 Ice Lake.
 
 -- 
 You are receiving this mail because:
