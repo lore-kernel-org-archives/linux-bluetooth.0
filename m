@@ -2,284 +2,118 @@ Return-Path: <SRS0=wTyq=D2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18261C433DF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 20:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9DEC43457
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 21:37:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA0BC223FB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 20:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46E2B223BF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 21:37:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vEFlqqO0"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DSvw3cb/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731389AbgJSUSV (ORCPT
+        id S1733249AbgJSVh5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Oct 2020 16:18:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
+        Mon, 19 Oct 2020 17:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbgJSUSV (ORCPT
+        with ESMTP id S1733246AbgJSVh5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Oct 2020 16:18:21 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26760C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 13:18:21 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id u17so1415332oie.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 13:18:21 -0700 (PDT)
+        Mon, 19 Oct 2020 17:37:57 -0400
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 834F5C0613CE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 14:37:57 -0700 (PDT)
+Received: by mail-ua1-x92d.google.com with SMTP id f15so326140uaq.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 14:37:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xqLU4oOK29Elmk+yTbDCjjGVCmjyNqMveIRrbZ5FjlU=;
-        b=vEFlqqO0dzL/BD4R+dRT1SO7KroOYcqvwGwxFzKVlxlR7BB0drqs24wtKwJKvEedCC
-         fgVwhWKbsjIHu485Ao0P2cZ3lBf4LZJjCk5DFbrhBMuhzXzCMORpLZyPETDG3bd+SJh9
-         F7gUJBOUFY8oATD2r5+YE67XUOS0vHlJTOQnNxWKG8XyNBC8UtV5Y75u4hf/3kE1o1wp
-         yW7d10FRzjS1XDszq6qzy8h5ISnFDAjRoVbxTTlwYXkJRrJVvzNNpLsWHLHdLifsQbYz
-         PdbMWG52BngLwoIc23i3FCxJKlQCLKENuyh2ye6PTmsooTwnGzv6xNuF17Orm+5xBg2T
-         H6Og==
+        bh=yBOWxB2321K0nviHMosmjzEKA9rYfYXfMrodT0hpf7A=;
+        b=DSvw3cb/VokO0aHUeNw3leP/1Ajp6UPkFWHOZmkt7PkJmlaOQq75XG0CmzehL7Ir3b
+         3fnO9XoEQ/d5zVW+ucrBTZDBw0H6yoBqF08Lvheyk2VrUgvCWYj1EN+u0CUiP0rZ7NK7
+         UJu1zuQy/Vixd+KRWgq3tnhuRv/QA1LAa5YFw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xqLU4oOK29Elmk+yTbDCjjGVCmjyNqMveIRrbZ5FjlU=;
-        b=tE1RwKm00qPrztWDRM49n2u8GsKe1OAQvKkHK9xLS5HF+gEryBNvXP6zTrIbMNONnq
-         QafZSSBuxw42oUu99unYxNG9riDkJMJwV4YcLuL5dY2PR4xs1N074mD7G0TvITO9LXyT
-         JNXoAC827yfLD1CKYoqmYj5IDmcMi4EzL6SqdQKgwb1rVfylUOGvPZpPm8+YBcZ/0N3m
-         zpVQBZEYgeailCtzGFUwwllzS8YwdNrK3uDVJ0MyU6LKk9mW6HNw4B1BKwr8cPBMPIGk
-         JV5oYybR4rE06GKOm/rGtNPW2cago7kobpvHHD9qDuaU9Pvt9m6qUDdxDN0hVWDegKSN
-         Dfsg==
-X-Gm-Message-State: AOAM532WFR1Zu0KIj+mdt/BUEXj200rEo/nybngSsL6ONvbfGLoA1RSk
-        P6gtLO3H9usuDLQ7kbJPM7U9SkZZFDmCNsvw0n8=
-X-Google-Smtp-Source: ABdhPJyYQ24WiJ2unNeII/eWus5ksXWbl/Rnzx4TrA/l+GhSvlq3Zw0d3QHx4ALLnYGOb3xu2cBO/KrHnTlC1N7Fzts=
-X-Received: by 2002:aca:4c7:: with SMTP id 190mr827796oie.58.1603138700480;
- Mon, 19 Oct 2020 13:18:20 -0700 (PDT)
+        bh=yBOWxB2321K0nviHMosmjzEKA9rYfYXfMrodT0hpf7A=;
+        b=igGrRpmaZNW0qI/lVgOU8uLwVOTqQEMYes0o1CZAG1qaVaEtALd0ENUcNS9c8Oo/7r
+         UC6/IDbqS3elunuagjFWUjJrtdTXzuQ2PfN4qfUbF6tvLz6oeF8g1bLoQSv6dyjC7HWF
+         g55CBYMHBRC7CSbvayvdSPBsMEGdZ/HWRyIMbnH4LD0LRuoESRbOMEBp0dvZ37dAoQv2
+         9z1LB9c1wEi01w+FaovlPTxqlOWOM2y12GbwhJYaQ2WtCQ0KnhEXaUSA+R/uCZinJlt0
+         b3G7D5rCbEdjyuSpDeKeJ7h2obV5vedwF+aMUMuRcb+TZqzK7UZHyo+9UtWD+dpcwRt4
+         mGrA==
+X-Gm-Message-State: AOAM533dgYvHOLopG3kHGcEhhqpru6W2gBSy7dWvlr3adVw0zOnTdb8n
+        K/MHRzvcbT+it46mjzQ1zL+oD93t+q90B7SykIU4Sg==
+X-Google-Smtp-Source: ABdhPJxOSKFLv6FUdXvwo9Kzlug/3CyRyn12FMtJvyIOznMU9zUml0fNKS/R9+hCxpT/QIBkONVN6WCtnRSRfNkvGrg=
+X-Received: by 2002:ab0:907:: with SMTP id w7mr967440uag.100.1603143476645;
+ Mon, 19 Oct 2020 14:37:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201005041932.99783-1-inga.stotland@intel.com>
- <38633edb6423eabcd54c3b7559117e7ee64cb51b.camel@intel.com> <34814d0a7ad0f0ba19bb85e596f5a47843d2da39.camel@intel.com>
-In-Reply-To: <34814d0a7ad0f0ba19bb85e596f5a47843d2da39.camel@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 19 Oct 2020 13:18:09 -0700
-Message-ID: <CABBYNZ+4G-5CRLwcDX+BJa30K_umaJtoi7bBhXjbD=4Jpjj8nw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/timeout-ell: Fix timeout wrapper implementation
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <b74ea9cb201bb98691ecbfb3893d2a49@codeaurora.org>
+In-Reply-To: <b74ea9cb201bb98691ecbfb3893d2a49@codeaurora.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 19 Oct 2020 14:37:44 -0700
+Message-ID: <CANFp7mXMfvHrAcaJhY7q2oZk3MtqOMxLGOEpNc-hnzVSyA+LZA@mail.gmail.com>
+Subject: Re: Update WCN3991 FW file
+To:     asitshah@codeaurora.org
+List-Id: <linux-firmware.lore.kernel.org>
+Cc:     linux-firmware@kernel.org, jwboyer@kernel.org,
+        Matthias Kaehlcke <mka@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, Hemantg <hemantg@codeaurora.org>,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+Nack.
 
-On Mon, Oct 19, 2020 at 1:00 PM Stotland, Inga <inga.stotland@intel.com> wrote:
->
-> Another ping
->
-> On Fri, 2020-10-09 at 21:03 -0700, Inga Stotland wrote:
->
-> Gentle ping
->
-> On Sun, 2020-10-04 at 21:19 -0700, Inga Stotland wrote:
->
-> This fixes the following issues:
->
-> - Correct user data is passed around to l_timeout_create():
->
->   locally allocated timeout data is a valid "user data" to
->
->   associate with a newly created timeout. Previously, user_data
->
->   passed as an argument to timeout_add() was incorrectly used as
->
->   an argument to l_timeout_create()
->
-> - To maintain common API and work around the issue when the conversion
->
->   of a pointer to an unsigned int truncates the initial value, a queue
->
->   of active timeouts is maintained where pointer each l_timeout structure
->
->   is associate with a unique id. This id is returned when timeout_create()
->
->   API is called and can be subsequently used with timeout_remove().
->
-> ---
->
->  src/shared/timeout-ell.c | 50 ++++++++++++++++++++++++++++++++++++----
->
->  1 file changed, 45 insertions(+), 5 deletions(-)
->
->
-> diff --git a/src/shared/timeout-ell.c b/src/shared/timeout-ell.c
->
-> index c2da387e2..023364069 100644
->
-> --- a/src/shared/timeout-ell.c
->
-> +++ b/src/shared/timeout-ell.c
->
-> @@ -12,13 +12,23 @@
->
->
->
->  #include "timeout.h"
->
->
->
-> +static struct l_queue *timeout_q;
->
-> +
->
->  struct timeout_data {
->
->   timeout_func_t func;
->
->   timeout_destroy_func_t destroy;
->
-> - unsigned int timeout;
->
->   void *user_data;
->
-> + unsigned int timeout;
->
->  };
->
->
->
-> +static bool match_id(const void *a, const void *b)
->
-> +{
->
-> + unsigned int to_id = L_PTR_TO_UINT(a);
->
-> + unsigned int id = L_PTR_TO_UINT(b);
->
-> +
->
-> + return (to_id == id);
->
-> +}
->
-> +
->
->  static void timeout_callback(struct l_timeout *timeout, void *user_data)
->
->  {
->
->   struct timeout_data *data = user_data;
->
-> @@ -43,7 +53,12 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
->
->   void *user_data, timeout_destroy_func_t destroy)
->
->  {
->
->   struct timeout_data *data;
->
-> - uint32_t id;
->
-> + unsigned int id = 0;
->
-> + struct l_timeout *to;
->
-> + int tries = 0;
->
-> +
->
-> + if (!timeout_q)
->
-> + timeout_q = l_queue_new();
->
->
->
->   data = l_new(struct timeout_data, 1);
->
->
->
-> @@ -52,12 +67,37 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
->
->   data->user_data = user_data;
->
->   data->timeout = timeout;
->
->
->
-> - id = L_PTR_TO_UINT(l_timeout_create(timeout, timeout_callback,
->
-> - user_data, timeout_destroy));
->
-> + while (id == 0 && tries < 3) {
->
-> + to = l_timeout_create(timeout, timeout_callback,
->
-> + data, timeout_destroy);
->
-> + if (!to)
->
-> + break;
->
-> +
->
-> + tries++;
->
-> + id = L_PTR_TO_UINT(to);
->
-> +
->
-> + if (id == 0 ||
->
-> + l_queue_find(timeout_q, match_id, L_UINT_TO_PTR(id))) {
->
-> +
->
-> + l_timeout_remove(to);
->
-> + continue;
->
-> + }
->
-> +
->
-> + l_queue_push_tail(timeout_q, to);
->
-> + }
->
-> +
->
-> + if (id == 0)
->
-> + l_free(data);
->
-> +
->
->   return id;
->
->  }
->
->
->
->  void timeout_remove(unsigned int id)
->
->  {
->
-> - l_timeout_remove(L_UINT_TO_PTR(id));
->
-> + struct l_timeout *to;
->
-> +
->
-> + to = l_queue_remove_if(timeout_q, match_id, L_UINT_TO_PTR(id));
->
-> +
->
-> + if (to)
->
-> + l_timeout_remove(to);
->
->  }
+This resulted in a boot loop on ChromeOS. It looks like only
+'crbtfw32.tlv' was changed and not 'crnv32.bin'.
 
-Applied, thanks.
+Abhishek
 
--- 
-Luiz Augusto von Dentz
+On Sat, Oct 17, 2020 at 8:33 AM <asitshah@codeaurora.org> wrote:
+>
+>
+> Hi Team,
+>
+> Please include updated firmware bin for WCN3991.
+>
+> Snapshot of pull request is as below, let me know if anything is
+> missing.
+>
+> >>>>>
+>
+> The following changes since commit
+> 58d41d0facca2478d3e45f6321224361519aee96:
+>
+>    ice: Add comms package file for Intel E800 series driver (2020-10-05
+> 08:09:03 -0400)
+>
+> are available in the git repository at:
+>
+>    https://github.com/shahasit/bt-linux-firmware/tree/master
+>
+> for you to fetch changes up to 8877322c1254f327f47c86ec02c46013b68b9a47:
+>
+>    QCA : Updated firmware file for WCN3991 (2020-10-17 20:53:36 +0530)
+>
+> ----------------------------------------------------------------
+> Asit Shah (1):
+>        QCA : Updated firmware file for WCN3991
+>
+>   qca/crbtfw32.tlv | Bin 126300 -> 126832 bytes
+>   1 file changed, 0 insertions(+), 0 deletions(-)
+>
+> <<<<<<
+>
+> Regards,
+> Asit
