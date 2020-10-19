@@ -8,65 +8,67 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F97C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D09CC433DF
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 17:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B77632224D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 17:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 104F3222EA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Oct 2020 17:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sSKVDHeP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpAZhP0c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726290AbgJSRZd (ORCPT
+        id S1726348AbgJSRZd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 19 Oct 2020 13:25:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41364 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725887AbgJSRZd (ORCPT
+        with ESMTP id S1725952AbgJSRZd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 19 Oct 2020 13:25:33 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E42BC0613CE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 10:25:32 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id d23so103920pll.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 10:25:32 -0700 (PDT)
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1659CC0613D0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 10:25:33 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id bf6so112404plb.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Oct 2020 10:25:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Fov6eMvFBTzpPKVwDUsIN5W3nfPBM+wd92lRKNpimLY=;
-        b=sSKVDHePjFgu9i4jc29FvUXStzBAPtchMcCE8P3KGL+OpwiN4QG8dv59YN5NIRtwP4
-         QTvTiCBzRFhgZxE3Q29PxohPqYyRIbd07wsMujtlLhAaKNKvjt2nYesvI1Lhwa6eV20I
-         qxPMYA5GZV3mQWraqrnwoI/uJe31m6R+gEg9CzYI6k5PwCOXeyaidPf/80T1EnU53kS9
-         Tg014j/oGN7H9LH/ahTEXQ58xgp8hHzDyEU8vVkzs6ccfqv+LNSxTexvsk1mERX2G7nZ
-         yv0Ejig/eudFncC9sINrstPIE8dlHuNcg9vvnze481oNWsGYgzOvP8TvdVQJK2bPUf3q
-         k02w==
+        bh=rdSQv0WqI8XOqcIsRkumiryUop8LX5S6l8HxLs9v6HM=;
+        b=JpAZhP0cOQ0EvgO3bUuJg+8NtAUxG31mgTDoz29/fG1Z0gT8IWvZpt08F2pe7Pr85T
+         LEG8tvjRMx9HobVcT2md3rfVRiXbEvAVscuefz1ifk5DUp8/T5lEjZ0MxSyRtqr9RbWD
+         P3LQmL1RqDFtHbAwVByjPw2PwK869aJ5xyTgHeBhO+WhBvzTOi10lw0yXzHpM8IRCi00
+         mklhJLoZ4j+PDqWMULRJHNoTePkbKC7XWwg2ApH2AmDSTKX3koQpDwWvBeoCTBvQfDEy
+         Mr+OgDooQ1Gw2j7/imI5g7qs7qcuYJBpKtiAuJHtBuv8J2493uwtKPluU8CqjqHznPiw
+         QJyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Fov6eMvFBTzpPKVwDUsIN5W3nfPBM+wd92lRKNpimLY=;
-        b=X7ulc+M9lenQOSH2g191NuppNVCh9hrisFY9LTKoKAQOUuQrckaRJiJs3G7Ubtp4XJ
-         2m0gibPQZ4S10FdtFNHtP9pQK/REfDGwEHBo6/kOJDNoFluxxKIz2w4Sw9e1OlSFXHD5
-         p+wLjkvBna7m5BNP/YU9VtmHPbW0epBDtfPEpyROXjD4sf5nuTPzAltpAlDpHwB7JIZm
-         EPao7/cPgOjghFXb/C7DJLCnIplAAiamZSnXo4RKpgjwkTsjDKZ0sPqAqZhuAFq4Ehln
-         8xsttf5Y+2/agehiT/Dy/JWGZRqSyLgkkN2AMT0RnI6zmds8X0aUjZoRyIm7ZfHKbjbZ
-         R6aQ==
-X-Gm-Message-State: AOAM533bn00N1cvYufp2QXspdiMzRI03RlOMTWNQkffRHwC1NeNY8/7b
-        K2eOuowomIhMABjDJTJoRw1FDJmmmp8Obw==
-X-Google-Smtp-Source: ABdhPJz5rTVA0au3OEaZWF6wu6IUkmfGRIvgQ5MvwAMIcAvnEIMgq9/HQCQB1Rm6DSFQmYeJcu2RMw==
-X-Received: by 2002:a17:902:c3d4:b029:d3:df24:1619 with SMTP id j20-20020a170902c3d4b02900d3df241619mr797802plj.1.1603128331445;
-        Mon, 19 Oct 2020 10:25:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=rdSQv0WqI8XOqcIsRkumiryUop8LX5S6l8HxLs9v6HM=;
+        b=hpiHSoQBp3k/gKp/IfjFVhEsHoXQ4GpS8A+fTA66ZblNL5+7nh4t9MRTqMm7PAQxLU
+         T7FKBe9LyfKeJlg0LQlubDx1WzYdZAvG3XY4fyhOE2EJ/ZVvQ2gVPMfilfiWmlmyqTaq
+         2QlkkKoHXwvGvwvG+rWo2tFub8A4iEIyyXapy2cyOzZvqCq3PKZurkKueBTQmgXDnDJZ
+         GakoJsQrRZMA1WLIZ8g01u7e5LPQxlfoZDlajODfznGBKmBRlTPllNqj1qpTqC6R5PIh
+         nAdVsmbMzp+eVo+kCf+Ec4INKsa68BMCYum5AeH2buxoI3BTGqq2ub8F1RfmkvzHAKdr
+         WIZQ==
+X-Gm-Message-State: AOAM532hNtEMyvAcPLnkQZv8PJcAkJbAeyE6ijcY02lw4Q6ts3qg3kwE
+        9MEXkGDOCnXXvFoINid5j8N3Qp3iE6/Fuw==
+X-Google-Smtp-Source: ABdhPJxaAQlD9guVgCqBGRvgWEKsIhMqa5tJ3m2azoo1HZeALYUrWI0BfWkiJmAeXeyn+owjKJyZ0Q==
+X-Received: by 2002:a17:902:a9ca:b029:d5:dc92:9608 with SMTP id b10-20020a170902a9cab02900d5dc929608mr786360plr.41.1603128332291;
+        Mon, 19 Oct 2020 10:25:32 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h6sm370103pfk.212.2020.10.19.10.25.29
+        by smtp.gmail.com with ESMTPSA id h6sm370103pfk.212.2020.10.19.10.25.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2020 10:25:30 -0700 (PDT)
+        Mon, 19 Oct 2020 10:25:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Fix not checking advertisement bondaries
-Date:   Mon, 19 Oct 2020 10:25:28 -0700
-Message-Id: <20201019172529.1179996-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: A2MP: Fix not setting request ID
+Date:   Mon, 19 Oct 2020 10:25:29 -0700
+Message-Id: <20201019172529.1179996-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201019172529.1179996-1-luiz.dentz@gmail.com>
+References: <20201019172529.1179996-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -75,149 +77,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When receiving advertisements check if the length is actually within
-the skb, this also make use of skb_pull to advance on the skb->data
-instead of a custom ptr that way skb->len shall always indicates how
-much data is remaining and can be used to perform checks if there is
-enough data to parse.
+This fixes not resetting of the request ID when sending
+A2MP_GETAMPASSOC_RSP.
 
-Fixes: a2ec905d1e160a33b2e210e45ad30445ef26ce0e ("Bluetooth: fix kernel oops in store_pending_adv_report")
+Fixes: Bluetooth: A2MP: Fix not initializing all members
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-v2: Fixes rssi parsing.
+ net/bluetooth/a2mp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- net/bluetooth/hci_event.c | 73 ++++++++++++++++++++++++++++++---------
- 1 file changed, 56 insertions(+), 17 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a4c3703f2e94..6925c090a9e0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5599,24 +5599,41 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	u8 num_reports = skb->data[0];
--	void *ptr = &skb->data[1];
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index da7fd7c8c2dc..7a1e0b785f45 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -381,10 +381,11 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	hdev = hci_dev_get(req->id);
+ 	if (!hdev || hdev->amp_type == AMP_TYPE_BREDR || tmp) {
+ 		struct a2mp_amp_assoc_rsp rsp;
+-		rsp.id = req->id;
  
- 	hci_dev_lock(hdev);
+ 		memset(&rsp, 0, sizeof(rsp));
  
-+	skb_pull(skb, sizeof(num_reports));
++		rsp.id = req->id;
 +
- 	while (num_reports--) {
--		struct hci_ev_le_advertising_info *ev = ptr;
-+		struct hci_ev_le_advertising_info *ev;
- 		s8 rssi;
- 
--		if (ev->length <= HCI_MAX_AD_LENGTH) {
--			rssi = ev->data[ev->length];
--			process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
--					   ev->bdaddr_type, NULL, 0, rssi,
--					   ev->data, ev->length, false);
--		} else {
--			bt_dev_err(hdev, "Dropping invalid advertising data");
-+		if (skb->len < sizeof(*ev)) {
-+			bt_dev_err(hdev, "Malformed advertising report");
-+			break;
-+		}
-+
-+		ev = (void *) skb->data;
-+		skb_pull(skb, sizeof(*ev));
-+
-+		if (skb->len < ev->length || ev->length > HCI_MAX_AD_LENGTH) {
-+			bt_dev_err(hdev, "Malformed advertising data");
-+			break;
- 		}
- 
--		ptr += sizeof(*ev) + ev->length + 1;
-+		skb_pull(skb, ev->length);
-+
-+		if (skb->len < sizeof(rssi)) {
-+			bt_dev_err(hdev, "Malformed advertising rssi");
-+			break;
-+		}
-+
-+		rssi = skb->data[0];
-+		skb_pull(skb, sizeof(rssi));
-+
-+		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
-+				   ev->bdaddr_type, NULL, 0, rssi,
-+				   ev->data, ev->length, false);
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -5669,15 +5686,31 @@ static u8 ext_evt_type_to_legacy(struct hci_dev *hdev, u16 evt_type)
- static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	u8 num_reports = skb->data[0];
--	void *ptr = &skb->data[1];
- 
- 	hci_dev_lock(hdev);
- 
-+	skb_pull(skb, sizeof(num_reports));
-+
- 	while (num_reports--) {
--		struct hci_ev_le_ext_adv_report *ev = ptr;
-+		struct hci_ev_le_ext_adv_report *ev;
- 		u8 legacy_evt_type;
- 		u16 evt_type;
- 
-+		if (skb->len < sizeof(*ev)) {
-+			bt_dev_err(hdev, "Malformed ext advertising report");
-+			break;
-+		}
-+
-+		ev = (void *) skb->data;
-+		skb_pull(skb, sizeof(*ev));
-+
-+		if (skb->len < ev->length || ev->length > HCI_MAX_AD_LENGTH) {
-+			bt_dev_err(hdev, "Malformed ext advertising data");
-+			break;
-+		}
-+
-+		skb_pull(skb, ev->length);
-+
- 		evt_type = __le16_to_cpu(ev->evt_type);
- 		legacy_evt_type = ext_evt_type_to_legacy(hdev, evt_type);
- 		if (legacy_evt_type != LE_ADV_INVALID) {
-@@ -5687,7 +5720,6 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 					   !(evt_type & LE_EXT_ADV_LEGACY_PDU));
- 		}
- 
--		ptr += sizeof(*ev) + ev->length;
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -5873,19 +5905,26 @@ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev,
- 					 struct sk_buff *skb)
- {
- 	u8 num_reports = skb->data[0];
--	void *ptr = &skb->data[1];
- 
- 	hci_dev_lock(hdev);
- 
-+	skb_pull(skb, sizeof(num_reports));
-+
- 	while (num_reports--) {
--		struct hci_ev_le_direct_adv_info *ev = ptr;
-+		struct hci_ev_le_direct_adv_info *ev;
-+
-+		if (skb->len < sizeof(*ev)) {
-+			bt_dev_err(hdev, "Malformed direct advertising");
-+			break;
-+		}
-+
-+		ev = (void *) skb->data;
-+		skb_pull(skb, sizeof(*ev));
- 
- 		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
- 				   ev->bdaddr_type, &ev->direct_addr,
- 				   ev->direct_addr_type, ev->rssi, NULL, 0,
- 				   false);
--
--		ptr += sizeof(*ev);
- 	}
- 
- 	hci_dev_unlock(hdev);
+ 		if (tmp) {
+ 			rsp.status = A2MP_STATUS_COLLISION_OCCURED;
+ 			amp_mgr_put(tmp);
 -- 
 2.26.2
 
