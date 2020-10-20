@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD970C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 18:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB28C4363A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 19:20:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4785422244
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 18:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E17682225C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 19:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIBnvO4X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJoI2FaQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437917AbgJTS5T (ORCPT
+        id S2391720AbgJTTUO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Oct 2020 14:57:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53596 "EHLO
+        Tue, 20 Oct 2020 15:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437914AbgJTS5T (ORCPT
+        with ESMTP id S2391532AbgJTTUO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Oct 2020 14:57:19 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DFDC0613CE
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 11:57:18 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id a28so3182231ljn.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 11:57:18 -0700 (PDT)
+        Tue, 20 Oct 2020 15:20:14 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF39C0613CE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 12:20:12 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id a28so3246523ljn.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 12:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=kjdokkT+bfPPVpMzenHKs7+Qeyx8aKmmkfXa9e6xoIQ=;
-        b=CIBnvO4XIBKlsGH83odMJ6ahjguUIej/QMsOMG7sgigECFTWstjR+ArtFDKrblpQxP
-         8aHnKK4oVPIzSd9ycwEszdlS7zq9KaIVP7D7W9dnFqNTXN2QIiq05lmHtj6pKKjL3H+5
-         dpTaNcHU7j7zNr4ZpXKSOh1vJ0b9kyCgl3hgxsbVRs+1VUGMMtn9QSXd8NiUwkY/n6Hu
-         9MZ2r5/72vb3n2OU0EdFe5BnwafNtixe94/eWv7KbpTwAfvMsJqHgAvye2dwCNR8cYX5
-         oPnjSlOpQMgbfvrvCddDGkuwAZFoxPFwa8Wl02kYCRV3z1k77GIXpl5rkSfdKhnPE3QZ
-         YY4Q==
+        bh=7GU1H0h9UBubdWAWqWMxlmAZQoK+Olw+C+P1XGiZZQE=;
+        b=rJoI2FaQ3pkxI7xH6L3mHmcjOwBSF2V4W3WJJaeCNiY4P/QOtOKIVCS5KWKWD9Tvsk
+         m6PWSWFQLaVnFRg/eYnR2YA/IvoMtZQ96boy6GcZcY0kFQ3ukrDAycpbf8jzetR7krtK
+         Ok2RgfBUcxOyjl4dFhT9zccT/1Uh/j/JH+9G8p/k/4oZXa/BET0BMpvfilAQK6Hn9McX
+         QMXeWLzSadm/ieuGytCak30Q1FellkT4y7p8YHiMTehGejxKHbGvRTyz4DRC+vebuRhP
+         RPAW3Eo16i06mAhFA4CXwSH3DWveZknPTKPY9prZKtLWEPcixQADHeYVIu4JwtTmPVY6
+         XlNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kjdokkT+bfPPVpMzenHKs7+Qeyx8aKmmkfXa9e6xoIQ=;
-        b=VvCMxqtCrMppvBXowd55LS2vIYAhby5PRZcz2L+v506yTVdXmKap4IeOKuUiCBpUTj
-         e8HCG9+jtyUwTSxzQmvC3wXRzhhB+NXdgzLEQUAlaAkQMxMedI8cH7QC74DgDYDDHKMr
-         a+qhL+IHE3mW2GGRIXd2azpkhfKIUCFWJR922/Romy5CmFVhfgjBZfMvUNNwA0Tu/H9h
-         A7zrNqQIDLKV72AGjBB90+HMOKciBnYi0bZ6zKctWFYNuKB5JVeLHcZjxCbgcoMRuFPK
-         j1OR6gdV2qOR0GwfvIeQmw7kJekqVvsZGBrFu/fvcgbf+x3eHQw+eS9IWSTC4oR6j/fO
-         IQuA==
-X-Gm-Message-State: AOAM530Q+5qZT0K0M6QZN+R5NjaY7MDoj5I5CU0rAj1kf4yNhFArFmHs
-        sy8UkHwAOmQ8OZDftnbUSU3wchApZArzkp1UeZ+/vlmQ0DI=
-X-Google-Smtp-Source: ABdhPJyM9fojdO3Bkybv1OsnhHtBbqmG89ygdwY1UsAV8ZEeLsaGCeRoj4OiODWCRV/Uu4OWxLujF8bNGmgcpguDK9o=
-X-Received: by 2002:a2e:145c:: with SMTP id 28mr1839345lju.68.1603220237109;
- Tue, 20 Oct 2020 11:57:17 -0700 (PDT)
+        bh=7GU1H0h9UBubdWAWqWMxlmAZQoK+Olw+C+P1XGiZZQE=;
+        b=Eoyp2+ve8N188Fd1SknDSJCpFqHFS+WbFlm8VFnOnjso7tKbQrwQ4kKD42sUSf098h
+         0JXUVPxCqWyEIden2TTd8Kn7RGnwbAQc0S7VOXyghUfxDkhgcT9w5QP4czdBtuSFBxkU
+         GhlnOQCA/HsJrzX/3Tac/pOBmNqRr07Vw2IITLh7HASKfJYO7H7euyccnVRbm7IcRPGX
+         1QojWHbMVoINTPkrBTxzbrL0CQRTTKIlCk68wFtNXYgP2IGDkk8Ec0BdcS2YHacjF00s
+         2OuTw5ZZ64H2zzZ89VioiLKkBc5H0JSndArPFQh7O129L9+IuAjmTrqfAvfls705/NwA
+         hGBg==
+X-Gm-Message-State: AOAM533ox25t++736UUMHPHccyWuAVQ41lSL8Fp532uXi5rpDIovDYhf
+        laO9p5kCErEm3JCloL6jVGcZDT8SIXgtQzjDYa8y9edoBXM=
+X-Google-Smtp-Source: ABdhPJxgdEqkIXGQy3IogWIvWlUp0vYEJHgbHUyKgUy8UNqVJVyv18woifb4GRFTZVJxVz+eFxRUKU13EzJXXdiHJPI=
+X-Received: by 2002:a2e:b528:: with SMTP id z8mr1803374ljm.205.1603221611161;
+ Tue, 20 Oct 2020 12:20:11 -0700 (PDT)
 MIME-Version: 1.0
 References: <CABLzjm8S1J5MRhrwFu1pbX9fub7X5nXmYRWmtRsmVRObeJOCbw@mail.gmail.com>
  <B67F1317-2644-4803-8A16-2A2E7CC425F3@holtmann.org>
 In-Reply-To: <B67F1317-2644-4803-8A16-2A2E7CC425F3@holtmann.org>
 From:   Alexandre Augusto <alexandre.a.giron@gmail.com>
-Date:   Tue, 20 Oct 2020 15:57:04 -0300
-Message-ID: <CABLzjm-S-hp8K2AhB0EX+tdSzkoxSAYF4Jcq1-gnwU3okN9hXA@mail.gmail.com>
+Date:   Tue, 20 Oct 2020 16:19:59 -0300
+Message-ID: <CABLzjm-8-=73XQFxsqoGaqXYS=1E7jA5m_bqsGKmRj8gdt+e+g@mail.gmail.com>
 Subject: Re: Entropy source based on the RSSI
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
@@ -72,11 +72,13 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Sorry, I think I misunderstood your email Marcel, apologies for that.
+But yes, I have a sketch for this as a kernel driver (but still non
+functional).
+Nevertheless, in my repo there is a proof-of-concept version that I
+used in the experiments presented in the video.
 
-excellent. Let me know if any clarification is needed.
-
-Best regards
+Thanks for the feedback.
 
 Em ter., 20 de out. de 2020 =C3=A0s 15:38, Marcel Holtmann
 <marcel@holtmann.org> escreveu:
