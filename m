@@ -2,117 +2,129 @@ Return-Path: <SRS0=VvJN=D3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB28C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 19:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE5AC388F7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 20:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E17682225C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 19:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0050422256
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Oct 2020 20:41:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rJoI2FaQ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GoQ+EVKa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391720AbgJTTUO (ORCPT
+        id S2409589AbgJTUlX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Oct 2020 15:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
+        Tue, 20 Oct 2020 16:41:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391532AbgJTTUO (ORCPT
+        with ESMTP id S2405178AbgJTUlW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Oct 2020 15:20:14 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF39C0613CE
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 12:20:12 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id a28so3246523ljn.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 12:20:12 -0700 (PDT)
+        Tue, 20 Oct 2020 16:41:22 -0400
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF0EC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 13:41:21 -0700 (PDT)
+Received: by mail-vk1-xa2e.google.com with SMTP id s2so804723vks.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Oct 2020 13:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7GU1H0h9UBubdWAWqWMxlmAZQoK+Olw+C+P1XGiZZQE=;
-        b=rJoI2FaQ3pkxI7xH6L3mHmcjOwBSF2V4W3WJJaeCNiY4P/QOtOKIVCS5KWKWD9Tvsk
-         m6PWSWFQLaVnFRg/eYnR2YA/IvoMtZQ96boy6GcZcY0kFQ3ukrDAycpbf8jzetR7krtK
-         Ok2RgfBUcxOyjl4dFhT9zccT/1Uh/j/JH+9G8p/k/4oZXa/BET0BMpvfilAQK6Hn9McX
-         QMXeWLzSadm/ieuGytCak30Q1FellkT4y7p8YHiMTehGejxKHbGvRTyz4DRC+vebuRhP
-         RPAW3Eo16i06mAhFA4CXwSH3DWveZknPTKPY9prZKtLWEPcixQADHeYVIu4JwtTmPVY6
-         XlNg==
+         :cc;
+        bh=8oNb4bPuTPJc9IazjKYiO1BrhZxahR3FAJrD2QNpZEE=;
+        b=GoQ+EVKaGML1O0xuJJyCjTyBiaV9U1ZfOBGG8NL6oeTeU5wmSLXa0hXtERape/LFcS
+         qtAE7eYPxGswSe7yyoFdd27uU/nT8A6GhdRO4zLnhYDUh1mpbyNp66Mfg/QfLYOugVpR
+         H07ef9O5BRyU6uQFsy3Yu6D/+/T9GWoSvHj4U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7GU1H0h9UBubdWAWqWMxlmAZQoK+Olw+C+P1XGiZZQE=;
-        b=Eoyp2+ve8N188Fd1SknDSJCpFqHFS+WbFlm8VFnOnjso7tKbQrwQ4kKD42sUSf098h
-         0JXUVPxCqWyEIden2TTd8Kn7RGnwbAQc0S7VOXyghUfxDkhgcT9w5QP4czdBtuSFBxkU
-         GhlnOQCA/HsJrzX/3Tac/pOBmNqRr07Vw2IITLh7HASKfJYO7H7euyccnVRbm7IcRPGX
-         1QojWHbMVoINTPkrBTxzbrL0CQRTTKIlCk68wFtNXYgP2IGDkk8Ec0BdcS2YHacjF00s
-         2OuTw5ZZ64H2zzZ89VioiLKkBc5H0JSndArPFQh7O129L9+IuAjmTrqfAvfls705/NwA
-         hGBg==
-X-Gm-Message-State: AOAM533ox25t++736UUMHPHccyWuAVQ41lSL8Fp532uXi5rpDIovDYhf
-        laO9p5kCErEm3JCloL6jVGcZDT8SIXgtQzjDYa8y9edoBXM=
-X-Google-Smtp-Source: ABdhPJxgdEqkIXGQy3IogWIvWlUp0vYEJHgbHUyKgUy8UNqVJVyv18woifb4GRFTZVJxVz+eFxRUKU13EzJXXdiHJPI=
-X-Received: by 2002:a2e:b528:: with SMTP id z8mr1803374ljm.205.1603221611161;
- Tue, 20 Oct 2020 12:20:11 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=8oNb4bPuTPJc9IazjKYiO1BrhZxahR3FAJrD2QNpZEE=;
+        b=TwOo5Q2zvStAAICiwIGzCU0zx6FSl5aLO3zNk51FRyor6NOw5YLSkHEdxpynt2DQSd
+         7Yvir2QT82atxm9QhHb999O21/FAKyvgduweCbce3IF7W8XLbpvPTuz3qQUoWqn2n2+0
+         IZfG+zC07Xa1EAWPDrH07e+ByuEglwY765W2jKvJh0LTTZCxnmYrnJXusBOIoAMLQ+rA
+         5sIbg1Gn+Yf93uzlmKXlzFOl7gWVdPkcn9JWE+A7IkaMnxnQ60aHxOc01AD83IcYaMXY
+         2v6e5UPBI6/2VZ1y4Q8cZqYYwi6NNZzC77TwQuWIFos06BXVV44mRJetwzd/wH6W64Vy
+         zJPg==
+X-Gm-Message-State: AOAM530BjgVdFDvKQluHHnh7dfL02Hdorsoqt+cwFXg03MBtJ/A+JnVY
+        KR4Urv24UGUt2+ncERdhLT6Hiq26m8+8pQ7axCyIqQ==
+X-Google-Smtp-Source: ABdhPJzr5l3bDAXW3EOAftEuudCHyMKi5cGy1Hw3cWDeuY2TudVm6cfkI7qnQuUSnjYigue2Up2FbPDYaIBW9jh8e/k=
+X-Received: by 2002:a1f:9d0e:: with SMTP id g14mr2712231vke.2.1603226480594;
+ Tue, 20 Oct 2020 13:41:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <CABLzjm8S1J5MRhrwFu1pbX9fub7X5nXmYRWmtRsmVRObeJOCbw@mail.gmail.com>
- <B67F1317-2644-4803-8A16-2A2E7CC425F3@holtmann.org>
-In-Reply-To: <B67F1317-2644-4803-8A16-2A2E7CC425F3@holtmann.org>
-From:   Alexandre Augusto <alexandre.a.giron@gmail.com>
-Date:   Tue, 20 Oct 2020 16:19:59 -0300
-Message-ID: <CABLzjm-8-=73XQFxsqoGaqXYS=1E7jA5m_bqsGKmRj8gdt+e+g@mail.gmail.com>
-Subject: Re: Entropy source based on the RSSI
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <b74ea9cb201bb98691ecbfb3893d2a49@codeaurora.org> <CANFp7mXMfvHrAcaJhY7q2oZk3MtqOMxLGOEpNc-hnzVSyA+LZA@mail.gmail.com>
+In-Reply-To: <CANFp7mXMfvHrAcaJhY7q2oZk3MtqOMxLGOEpNc-hnzVSyA+LZA@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Tue, 20 Oct 2020 13:41:09 -0700
+Message-ID: <CANFp7mWTPLKx=eKxgZvXGEPi5KbphDJnSGZb12Efe_SWTKdDdg@mail.gmail.com>
+Subject: Re: Update WCN3991 FW file
+To:     asitshah@codeaurora.org
+List-Id: <linux-firmware.lore.kernel.org>
+Cc:     linux-firmware@kernel.org, jwboyer@kernel.org,
+        Matthias Kaehlcke <mka@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, Hemantg <hemantg@codeaurora.org>,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Sorry, I think I misunderstood your email Marcel, apologies for that.
-But yes, I have a sketch for this as a kernel driver (but still non
-functional).
-Nevertheless, in my repo there is a proof-of-concept version that I
-used in the experiments presented in the video.
+It looks like we hadn't merged an earlier update to crnv32.bin in ChromeOS:
+ad1da95 - QCA : Updated firmware files for WCN3991 (3 weeks ago) <Asit Shah>
 
-Thanks for the feedback.
+After merging that commit, everything is working as expected.
+--
 
-Em ter., 20 de out. de 2020 =C3=A0s 15:38, Marcel Holtmann
-<marcel@holtmann.org> escreveu:
+Tested-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+
+On Mon, Oct 19, 2020 at 2:37 PM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
 >
-> Hi Alexandre,
+> Nack.
 >
-> > based on the motivation that IoT devices do not have many entropy
-> > sources available, and also on the fact that trusting in a single
-> > source may be risky, I have researched some additional ways to collect
-> > randomness for the device, using bluetooth technology for that
-> > purpose.
+> This resulted in a boot loop on ChromeOS. It looks like only
+> 'crbtfw32.tlv' was changed and not 'crnv32.bin'.
+>
+> Abhishek
+>
+> On Sat, Oct 17, 2020 at 8:33 AM <asitshah@codeaurora.org> wrote:
 > >
-> > For those who are interested in:
 > >
-> > Github: https://github.com/AAGiron/Bluerandom
-> > Presentation: https://www.youtube.com/watch?v=3DiAKaKAmqCFo
+> > Hi Team,
 > >
-> > I also want to say thanks in advance to Emil Lenngren for his valuable
-> > comments, here in this mailing list (back in 2019), and also to the
-> > Bluez community.
->
-> I would integrate as kernel driver. The Bluetooth stack could just use it=
-s
-> own LE random generator and an initial passive scan to gather RSSI values=
-.
-> No need to push this into user space.
->
-> Regards
->
-> Marcel
->
-
-
---=20
-Alexandre Augusto Giron
-Professor da UTFPR
-Doutorando em Ci=C3=AAncia da Computa=C3=A7=C3=A3o (UFSC)
+> > Please include updated firmware bin for WCN3991.
+> >
+> > Snapshot of pull request is as below, let me know if anything is
+> > missing.
+> >
+> > >>>>>
+> >
+> > The following changes since commit
+> > 58d41d0facca2478d3e45f6321224361519aee96:
+> >
+> >    ice: Add comms package file for Intel E800 series driver (2020-10-05
+> > 08:09:03 -0400)
+> >
+> > are available in the git repository at:
+> >
+> >    https://github.com/shahasit/bt-linux-firmware/tree/master
+> >
+> > for you to fetch changes up to 8877322c1254f327f47c86ec02c46013b68b9a47:
+> >
+> >    QCA : Updated firmware file for WCN3991 (2020-10-17 20:53:36 +0530)
+> >
+> > ----------------------------------------------------------------
+> > Asit Shah (1):
+> >        QCA : Updated firmware file for WCN3991
+> >
+> >   qca/crbtfw32.tlv | Bin 126300 -> 126832 bytes
+> >   1 file changed, 0 insertions(+), 0 deletions(-)
+> >
+> > <<<<<<
+> >
+> > Regards,
+> > Asit
