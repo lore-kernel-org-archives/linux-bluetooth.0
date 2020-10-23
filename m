@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF74C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Oct 2020 09:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B397CC388F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Oct 2020 09:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5296B24182
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Oct 2020 09:50:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48B302225F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Oct 2020 09:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S461723AbgJWJuj convert rfc822-to-8bit (ORCPT
+        id S461752AbgJWJw7 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Oct 2020 05:50:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38684 "EHLO mail.kernel.org"
+        Fri, 23 Oct 2020 05:52:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39066 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S461699AbgJWJuj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Oct 2020 05:50:39 -0400
+        id S461703AbgJWJw7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 23 Oct 2020 05:52:59 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 208965] not working bluetooth mouse low energy rtl8822ce
-Date:   Fri, 23 Oct 2020 09:50:38 +0000
+Date:   Fri, 23 Oct 2020 09:52:58 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -38,7 +38,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-208965-62941-GqCvbfztmU@https.bugzilla.kernel.org/>
+Message-ID: <bug-208965-62941-0CWDnWaYGU@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-208965-62941@https.bugzilla.kernel.org/>
 References: <bug-208965-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -52,11 +52,9 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=208965
 
---- Comment #7 from julian@blk9.net ---
-On my machine (Huawei Matebook 13 2020 AMD), the btrtl driver does not seem to
-be used at all (btusb is used instead). The bluetooth device seem to use the
-1358:c123 USB identifiers which are not listed in the blacklist table of
-drivers/bluetooth/btusb.c. Could this be the problem ?
+--- Comment #8 from julian@blk9.net ---
+Note that other RTL8822CE devices with different USB vendor/device IDs are
+present in the blacklist table.
 
 -- 
 You are receiving this mail because:
