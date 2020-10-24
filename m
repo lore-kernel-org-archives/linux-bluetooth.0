@@ -2,231 +2,109 @@ Return-Path: <SRS0=OoyO=D7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F495C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 22:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDCBC2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 22:33:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE03820A8B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 22:30:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7AED20BED
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 22:33:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTOac0Cg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1762278AbgJXWal convert rfc822-to-8bit (ORCPT
+        id S1762610AbgJXWdU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Oct 2020 18:30:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33852 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1762265AbgJXWal (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Oct 2020 18:30:41 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209841] New: Segfault with A2DP because of a null codec
-Date:   Sat, 24 Oct 2020 22:30:39 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: raphael.kernel@jakse.fr
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-209841-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sat, 24 Oct 2020 18:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1762538AbgJXWdU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 24 Oct 2020 18:33:20 -0400
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C92C0613CE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2020 15:33:20 -0700 (PDT)
+Received: by mail-qv1-xf35.google.com with SMTP id cv1so2640160qvb.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2020 15:33:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=8G6o6kCgmCpwhOco/1Wtng0SjrVarDLhb1/RFi5fnVY=;
+        b=GTOac0Cg2XvQnHfU9kaLx2xjiqTVXkeV12VQzb/VP3pDIY0QlHIj4AtQdQlbk6yB/H
+         xQYKWDYiB0ne4h0ziduy0eHm1Wj5TioODMYQ41VtSWg1ypCbNogYUplCIz6KB++AqYbg
+         g/B5O/UhCQkzO5A+kDNdOQA2ojR4ZAom2QEhhMLFI6wOj6zE36yeVargIMDRrkEiUKT+
+         yepX/Rv0D93yRJPUp37bG1P87HcOw/xORvJoP27oblOY106pJu0kuKEMOx9WmnyIds4M
+         N1Vc+xVLpVaqDQnW84YDzrS+gLuHdDw2EfVt/6LuaNkZDzKFzZfToVCbNOFRB14T8De8
+         G7Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=8G6o6kCgmCpwhOco/1Wtng0SjrVarDLhb1/RFi5fnVY=;
+        b=Jfk5WpXyAl6vV8tcUfURtZBw+P4HynDg+2SonuTiGQg8YL7TRRc2k8+mO92jDI08dz
+         I+VcFgfa26rN+jWK7K7Q8UMw4Ouxrr8lBShNJSntkI5e69cJeEjrmNyEbJwZUqLWEpDY
+         lQACI5K+0ZyVi46YEYd2jmEh28OUuTtuxCEdXqqqhHCwrAr0nN1kq34kHL2pQbHowex+
+         zAz+Ww8mie0z1VTBXK2p8z7bPi/ngUsq+syGD4n906fdPQ4MNdmBLz/RghbnlG76dh0A
+         7MGZ3vO0rIQAcdNA1WUmTKMJsgZOxwHGxk5170OG6rC1Qqt/8ymEbIo9O/crtKo1i0vD
+         TczA==
+X-Gm-Message-State: AOAM532/HkSwD8NPjPqhEh3CmAOt0h2n8tbUru856PNVDwgoeakaiO49
+        VtPspxHt8HAoQfyQah4wHuI8mImLMbmPGQ==
+X-Google-Smtp-Source: ABdhPJzjHeB4yTmDjy//U7X9PfpafkD0j77JQ9hYmKgxM1kqVZwU7Up6J7bIfZ4EtIMThkTU78Yakg==
+X-Received: by 2002:a05:6214:1267:: with SMTP id r7mr5964080qvv.50.1603578799031;
+        Sat, 24 Oct 2020 15:33:19 -0700 (PDT)
+Received: from [172.17.0.2] ([52.138.80.247])
+        by smtp.gmail.com with ESMTPSA id r190sm3686576qkf.101.2020.10.24.15.33.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Oct 2020 15:33:18 -0700 (PDT)
+Message-ID: <5f94abae.1c69fb81.9ad29.53c9@mx.google.com>
+Date:   Sat, 24 Oct 2020 15:33:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4969770525514194950=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marijns95@gmail.com
+Subject: RE: [BlueZ] audio/media: Destroy transport if SetConfiguration fails
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201024220956.3051848-1-marijns95@gmail.com>
+References: <20201024220956.3051848-1-marijns95@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209841
+--===============4969770525514194950==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-            Bug ID: 209841
-           Summary: Segfault with A2DP because of a null codec
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.8.10
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: raphael.kernel@jakse.fr
-        Regression: No
+This is automated email and please do not reply to this email!
 
-Created attachment 293177
-  --> https://bugzilla.kernel.org/attachment.cgi?id=293177&action=edit
-Wireshark record of the Bluetooth connection between the two laptops
+Dear submitter,
 
-I have four devices:
- - a openSUSE Tumbleweed laptop running the 5.8.10-1-default x86_64 kernel
-   (Bus 001 Device 002: ID 8087:0a2b Intel Corp. Bluetooth wireless interface)
- - a Debian Buster laptop also running the 5.7.0-0.bpo.2-amd64 kernel
-   (Bus 002 Device 002: ID 04ca:300d Lite-On Technology Corp. Atheros AR3012
-Bluetooth)
- - a Sony Bluetooth headset
- - an old Android 6 phone
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=369951
 
-Both laptop run Bluez 5.55 and Pulseaudio 13.0.
+---Test result---
 
-The Debian laptop acts as a bluetooth headset (it is supposed to receive sound
-from devices). No GUI is running on it so configuration is manual.
+##############################
+Test: CheckPatch - PASS
 
-The headset connects fine to the phone and the openSUSE laptop. The phone
-connects to both laptops without issue, with sound working using A2DP.
+##############################
+Test: CheckGitLint - PASS
 
-Connecting from the Debian laptop to the openSUSE laptop only allows HSP (A2DP
-is not available).
+##############################
+Test: CheckBuild - PASS
 
-Connecting from the openSUSE laptop to the Debian laptop crashes Bluez on the
-openSUSE laptop (segmentation fault). It does not matter if I connect using the
-KDE Plasma applet or bluetoothctl. 
+##############################
+Test: MakeCheck - PASS
 
-The crash happens because in function store_remote_sep, the service pointer is
-NULL. Adding the following check:
 
-    if (!service) return
-
-right after:
-
-    struct avdtp_service_capability *service = avdtp_get_codec(sep->sep);
-
-allows a successful connection without crash and A2DP is available, however,
-there is no sound.
-
-rewinding the execution, avdtp_register_sep gets a NULL codec_type parameter,
-coming from endpoint->codec in endpoint_init_a2dp_sink, the remaining backtrace
-being:
 
 ---
-#0  0x000000000041e393 in endpoint_init_a2dp_sink (err=<optimized out>,
-delay_reporting=<optimized out>, endpoint=<optimized out>) at
-profiles/audio/media.c:807
-#1  media_endpoint_create (adapter=adapter@entry=0x526cd0,
-sender=sender@entry=0x522468 ":1.463", path=0x522284
-"/MediaEndpoint/A2DPSink/sbc", 
-    uuid=0x5222b8 "0000110b-0000-1000-8000-00805f9b34fb", delay_reporting=0,
-codec=<optimized out>, capabilities=0x52230c "\377\377\002\065", size=4,
-err=0x7fffffffe630)
-    at profiles/audio/media.c:807
-#2  0x000000000041e965 in register_endpoint (conn=<optimized out>,
-msg=0x522030, data=0x526cd0) at profiles/audio/media.c:926
-#3  0x000000000048b509 in process_message (connection=0x519290,
-message=0x522030, method=0x4a69c0 <media_methods>, iface_user_data=<optimized
-out>) at gdbus/object.c:259
-#4  0x00007ffff7dfa501 in _dbus_object_tree_dispatch_and_unlock
-(found_object=<synthetic pointer>, message=<optimized out>, tree=0x5196d0) at
-dbus-object-tree.c:1020
----
+Regards,
+Linux Bluetooth
 
-Here is a Valgrind run:
 
-# valgrind /usr/libexec/bluetooth/bluetoothd -d                                
-                                                                        [0]
-==21579== Memcheck, a memory error detector
-==21579== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==21579== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
-==21579== Command: /usr/libexec/bluetooth/bluetoothd -d
-==21579== 
-==21579== Invalid read of size 1
-==21579==    at 0x12AE86: store_remote_sep (a2dp.c:2652)
-==21579==    by 0x12B75E: UnknownInlinedFun (queue.c:220)
-==21579==    by 0x12B75E: UnknownInlinedFun (queue.c:203)
-==21579==    by 0x12B75E: store_remote_seps (a2dp.c:2688)
-==21579==    by 0x1335F0: discover_cb (a2dp.c:2722)
-==21579==    by 0x12B8CD: finalize_discovery.lto_priv.0 (avdtp.c:1039)
-==21579==    by 0x136D37: UnknownInlinedFun (avdtp.c:2896)
-==21579==    by 0x136D37: UnknownInlinedFun (avdtp.c:2220)
-==21579==    by 0x136D37: session_cb.lto_priv.0 (avdtp.c:2144)
-==21579==    by 0x48D92D6: g_main_dispatch (gmain.c:3309)
-==21579==    by 0x48D92D6: g_main_context_dispatch (gmain.c:3974)
-==21579==    by 0x48D9657: g_main_context_iterate.constprop.0 (gmain.c:4047)
-==21579==    by 0x48D994A: g_main_loop_run (gmain.c:4241)
-==21579==    by 0x128C90: UnknownInlinedFun (mainloop-glib.c:79)
-==21579==    by 0x128C90: UnknownInlinedFun (mainloop-notify.c:201)
-==21579==    by 0x128C90: main (main.c:971)
-==21579==  Address 0x3 is not stack'd, malloc'd or (recently) free'd
-==21579== 
-==21579== 
-==21579== Process terminating with default action of signal 11 (SIGSEGV):
-dumping core
-==21579==  Access not within mapped region at address 0x3
-==21579==    at 0x12AE86: store_remote_sep (a2dp.c:2652)
-==21579==    by 0x12B75E: UnknownInlinedFun (queue.c:220)
-==21579==    by 0x12B75E: UnknownInlinedFun (queue.c:203)
-==21579==    by 0x12B75E: store_remote_seps (a2dp.c:2688)
-==21579==    by 0x1335F0: discover_cb (a2dp.c:2722)
-==21579==    by 0x12B8CD: finalize_discovery.lto_priv.0 (avdtp.c:1039)
-==21579==    by 0x136D37: UnknownInlinedFun (avdtp.c:2896)
-==21579==    by 0x136D37: UnknownInlinedFun (avdtp.c:2220)
-==21579==    by 0x136D37: session_cb.lto_priv.0 (avdtp.c:2144)
-==21579==    by 0x48D92D6: g_main_dispatch (gmain.c:3309)
-==21579==    by 0x48D92D6: g_main_context_dispatch (gmain.c:3974)
-==21579==    by 0x48D9657: g_main_context_iterate.constprop.0 (gmain.c:4047)
-==21579==    by 0x48D994A: g_main_loop_run (gmain.c:4241)
-==21579==    by 0x128C90: UnknownInlinedFun (mainloop-glib.c:79)
-==21579==    by 0x128C90: UnknownInlinedFun (mainloop-notify.c:201)
-==21579==    by 0x128C90: main (main.c:971)
-==21579==  If you believe this happened as a result of a stack
-==21579==  overflow in your program's main thread (unlikely but
-==21579==  possible), you can try to increase the size of the
-==21579==  main thread stack using the --main-stacksize= flag.
-==21579==  The main thread stack size used in this run was 8388608.
-==21579== 
-==21579== HEAP SUMMARY:
-==21579==     in use at exit: 183,968 bytes in 3,876 blocks
-==21579==   total heap usage: 23,145 allocs, 19,269 frees, 7,976,961 bytes
-allocated
-==21579== 
-==21579== LEAK SUMMARY:
-==21579==    definitely lost: 0 bytes in 0 blocks
-==21579==    indirectly lost: 0 bytes in 0 blocks
-==21579==      possibly lost: 0 bytes in 0 blocks
-==21579==    still reachable: 183,968 bytes in 3,876 blocks
-==21579==         suppressed: 0 bytes in 0 blocks
-==21579== Rerun with --leak-check=full to see details of leaked memory
-==21579== 
-==21579== For lists of detected and suppressed errors, rerun with: -s
-==21579== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
-[1]    21579 segmentation fault (core dumped)  valgrind
-/usr/libexec/bluetooth/bluetoothd -d
-
-There could be two problems here:
- - a missing null check
- - a codec incorrectly set to NULL. I've not yet traced back this NULL value.
-This could be caused by a configuration error on my part, but something is
-fishy since the phone successfully connects so it seemingly has the all the
-information information it needs to stream sound (or makes assumption of what
-is supported instead of checking, I don't know). 
-
-I'm attaching:
- - a Wireshark capture of the connection
- - a record of the execution done using rr (`rr replay file` to replay)
-containing the whole execution state.
-
-Notes:
- - In GDB, setting a breakpoint in store_remote_sep makes Bluez not crash.
- - rr itself crashes on my openSUSE laptop when trying to record the execution,
-unless running it in gdb like this: gdb -ex run -ex cont --args rr record
-/usr/libexec/bluetooth/bluetoothd -d
-
-Let me know if I can provide further information. I am very curious about this
-crash.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+--===============4969770525514194950==--
