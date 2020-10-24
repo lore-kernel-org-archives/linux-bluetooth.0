@@ -3,25 +3,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D147C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 07:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0ACC4363A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 09:02:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DCDDF241A4
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 07:49:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D634F20936
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Oct 2020 09:02:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1759938AbgJXHtq convert rfc822-to-8bit (ORCPT
+        id S1756724AbgJXJCd convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Oct 2020 03:49:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44932 "EHLO mail.kernel.org"
+        Sat, 24 Oct 2020 05:02:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40758 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759935AbgJXHtq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Oct 2020 03:49:46 -0400
+        id S1756681AbgJXJCc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 24 Oct 2020 05:02:32 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 208965] not working bluetooth mouse low energy rtl8822ce
-Date:   Sat, 24 Oct 2020 07:49:45 +0000
+Date:   Sat, 24 Oct 2020 09:02:32 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -30,14 +31,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: david.zakarias@gmail.com
+X-Bugzilla-Who: julian@blk9.net
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-208965-62941-s699nJhh3L@https.bugzilla.kernel.org/>
+Message-ID: <bug-208965-62941-PFwIyQ096A@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-208965-62941@https.bugzilla.kernel.org/>
 References: <bug-208965-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -51,15 +52,12 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=208965
 
---- Comment #10 from david.zakarias@gmail.com ---
-My device ID as shown by lsusb:
+--- Comment #11 from julian@blk9.net ---
+I’ve submitted this patch to the linux-bluetooth mailing list:
+https://patchwork.kernel.org/project/bluetooth/patch/20201023231748.56519-1-julian@pidancet.net/
 
-Bus 001 Device 002: ID 0cb5:c547 Realtek Bluetooth Radio
-
-Both btusb and btrtl is loaded but I do not see the rtl8822 firmware being
-loaded in the dmesg output.
-
-The wifi part of the chip works fine.
+David, i suggest you try to apply the same patch to your system, changing the
+USB IDs to what you’re seeing, and see if that solves your issue.
 
 -- 
 You are receiving this mail because:
