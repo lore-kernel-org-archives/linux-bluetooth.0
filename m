@@ -2,200 +2,135 @@ Return-Path: <SRS0=rjyd=EB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF2CC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 05:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC926C388F9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 08:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37C322087C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 05:25:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOVc1Mgs"
+	by mail.kernel.org (Postfix) with ESMTP id 6E7E2223B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 08:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1768514AbgJZFZm (ORCPT
+        id S1771722AbgJZI2z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Oct 2020 01:25:42 -0400
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:34887 "EHLO
-        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1768512AbgJZFZl (ORCPT
+        Mon, 26 Oct 2020 04:28:55 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:44716 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1771719AbgJZI2z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Oct 2020 01:25:41 -0400
-Received: by mail-ot1-f50.google.com with SMTP id n11so6980921ota.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2020 22:25:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lADaFIka9MOeF6+EUbDF6MECLcr4NRcQlLYLeos4eHU=;
-        b=WOVc1MgsAQ+wFyLI6ESpnAXUQmlO9c8ecA8DIrmTpWvM+W+QSFdO9ZLRHoj93Q1yib
-         XCHMR9gNbaIUA8I8OtUuxI55P5pG/1kGzNwtJubq/xSdKzCMKdaGMWmkQYLrYW4y+cbW
-         CdFjW5Zc5F5JR5OMse/PIgNcStXpg9lo1xF0a73SjGua55J8YWq6ciCufaBaFeBjW1Ig
-         Xyae+KxkMCa++/ftavmh7ANyUR1C4QskzW4RjF1//mdrO7tIZBzCZch8doFp/4QYMHFx
-         DDV3opU/BTTAdqS/Anefn8Vc3Pl6JWrm/qd92Ja/5XWuVGZCElPO0+ja0OjoCd+FlcMf
-         T4Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lADaFIka9MOeF6+EUbDF6MECLcr4NRcQlLYLeos4eHU=;
-        b=uMSIcXIQei4nAd8Br3O5LFiVWxNhtxHUvzfhyklc8ma/dOQe4IFX1V1DxiBuw2ttQ4
-         1nH2YT/aO7dxfqt8eX+9EX5Fq7ulZtiB7bt6Egugj+5/d6lDjO4Unl2Dj5WYE4f4w0p1
-         A+Xp8lJPlIdf/Czpo9fEjLFHHbr4Ld2dD8vdyDEQm//JyandYmZsMED0yVWRKMaG0Mos
-         h9Jz3a+UknYaloV20djUWeuXPG3Fbr6+YuQLt+HR1YhYf2r6AotFAd1HirIxEy3AQ3zx
-         ZhNnU6csfGnowuqQkkrOa/zHxVbNXunjlXRHVRw6WlWwXdSNN3sv4J10lPciIhzTaBa3
-         ogQw==
-X-Gm-Message-State: AOAM532sv9CLQe0ptQLq4gazO+IfL+2x2ETFVxF0pAJyKA18cDGO9YdH
-        6LmhlPMMNjXXc/VhyNl/j99m62uaCZRYrn3XXhM=
-X-Google-Smtp-Source: ABdhPJyowuUzgpx6kAV9iEVn+7k6YBdU7U/5wZDhLF1g9KkNF/+wnOHACFHFAuefvtJ7aZ0Ko7B+uIz+jbepxN9kyBA=
-X-Received: by 2002:a05:6830:134c:: with SMTP id r12mr9817357otq.240.1603689940394;
- Sun, 25 Oct 2020 22:25:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <CACUBSc-wspy_yNuV49he6nR7hi-WVquRNAcasfK7MEOs6EB6HA@mail.gmail.com>
-In-Reply-To: <CACUBSc-wspy_yNuV49he6nR7hi-WVquRNAcasfK7MEOs6EB6HA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 25 Oct 2020 22:25:29 -0700
-Message-ID: <CABBYNZJwKk-vxJB-7H+j3SDwosWqhhLkteFx6DLMMoVOfPvTjg@mail.gmail.com>
-Subject: Re: ASHA
-To:     Peter Barrett <vk6fun@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 26 Oct 2020 04:28:55 -0400
+Received: from 61-220-137-37.hinet-ip.hinet.net ([61.220.137.37] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <kai.heng.feng@canonical.com>)
+        id 1kWxrz-0005Rg-Ks; Mon, 26 Oct 2020 08:28:48 +0000
+From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     max.chou@realtek.com, alex_lu@realsil.com.cn,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH DRIVERS),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2] Bluetooth: btrtl: Ask 8821C to drop old firmware
+Date:   Mon, 26 Oct 2020 16:28:38 +0800
+Message-Id: <20201026082838.26532-1-kai.heng.feng@canonical.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Peter,
+Some platforms keep USB power even when they are powered off and in S5,
+this makes Realtek 8821C keep its firmware even after a cold boot, and
+make 8821C never load new firmware.
 
-On Sat, Oct 24, 2020 at 4:46 AM Peter Barrett <vk6fun@gmail.com> wrote:
->
-> Hi thanks for indulging me. Wondering if this hearing aid streaming
-> service can be implemented in the Linux bluetooth stack. So far only
-> found in iPhone and some Android phones
-> There is more information at https://source.android.com/devices/bluetooth/asha
-> I would be happy to help with testing if anyone is interested.
-> I have a Nucleus7 CochlearSpeech Processor and I can connect to it
-> with this RPi4B running 5.4.71-v7l+ with bluetoothd v5.5
-> bluetoothctl v5.49 gives the following output:
->
-> [bluetooth] [0m# list-attributes 84:77:XX:XX:XX:XX
-> Primary Service
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075
-> 0000fdf0-0000-1000-8000-00805f9b34fb
-> Unknown
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char007f
-> 2d410339-82b6-42aa-b34e-e2e01df8cc1a
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char007d
-> 00e4ca9e-ab14-41e4-8823-f9e70c7e91df
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char007a
-> 38663f1a-e711-4cac-b641-326b56404837
-> Vendor specific
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char007a/desc007c
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char0078
-> f0d4de7e-4a88-476c-9d9f-1937b0996cc0
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0075/char0076
-> 6333651e-c481-4a3e-9169-7c902aad37bb
-> Vendor specific
-> Primary Service
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064
-> 3c3c6c6b-c9bc-4704-bb14-2ffd32b5aa31
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0073
-> 18e77d96-c2a2-4da9-a848-436a8aea81ba
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0071
-> 8e5abd16-d6e0-4efb-8881-4d9d257b017a
-> Vendor specific
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char006e
-> 962020af-7715-4f77-b8db-b2ea0e89415b
-> Vendor specific
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char006e/desc0070
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char006b
-> 47c7e464-7bb4-4c8b-9515-3a2141b65300
-> Vendor specific
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char006b/desc006d
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0068
-> 0472ca69-929b-44ad-9821-97078d06c362
-> Vendor specific
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0068/desc006a
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0065
-> 31291857-6a7e-4b77-8655-feb603498758
-> Vendor specific
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0064/char0065/desc0067
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> Primary Service
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a
-> 0000180a-0000-1000-8000-00805f9b34fb
-> Device Information
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char0015
-> 00002a50-0000-1000-8000-00805f9b34fb
-> PnP ID
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char0013
-> 00002a26-0000-1000-8000-00805f9b34fb
-> Firmware Revision String
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char0011
-> 00002a27-0000-1000-8000-00805f9b34fb
-> Hardware Revision String
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char000f
-> 00002a25-0000-1000-8000-00805f9b34fb
-> Serial Number String
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char000d
-> 00002a24-0000-1000-8000-00805f9b34fb
-> Model Number String
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service000a/char000b
-> 00002a29-0000-1000-8000-00805f9b34fb
-> Manufacturer Name String
-> Primary Service
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0001
-> 00001801-0000-1000-8000-00805f9b34fb
-> Generic Attribute Profile
-> Characteristic
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0001/char0002
-> 00002a05-0000-1000-8000-00805f9b34fb
-> Service Changed
-> Descriptor
-> /org/bluez/hci0/dev_84_77_XX_XX_XX_XX/service0001/char0002/desc0004
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
+So use vendor specific HCI command to ask 8821C drop its firmware after
+system shutdown.
 
-It should be possible to implement it, but it probably doesn't make
-sense to implement it as a plugin to bluetoothd given its proprietary
-status it might be better to implement as part of an application.
+Newer firmware doesn't have this issue so we only use this trick for old
+8821C firmware version.
 
+Suggested-by: Max Chou <max.chou@realtek.com>
+Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+---
+v2:
+ - Fix incorrect parAnthesis on le16_to_cpu.
+ - Ensure firmware gets re-uploaded in initialization.
+
+ drivers/bluetooth/btrtl.c | 46 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 3a9afc905f24..37e24bbb2eb4 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -55,6 +55,7 @@ struct btrtl_device_info {
+ 	int fw_len;
+ 	u8 *cfg_data;
+ 	int cfg_len;
++	bool drop_fw;
+ };
+ 
+ static const struct id_table ic_id_table[] = {
+@@ -563,6 +564,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	u16 hci_rev, lmp_subver;
+ 	u8 hci_ver;
+ 	int ret;
++	u16 opcode;
++	u8 cmd[2];
+ 
+ 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
+ 	if (!btrtl_dev) {
+@@ -584,6 +587,49 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	hci_ver = resp->hci_ver;
+ 	hci_rev = le16_to_cpu(resp->hci_rev);
+ 	lmp_subver = le16_to_cpu(resp->lmp_subver);
++
++	if (resp->hci_ver == 0x8 && le16_to_cpu(resp->hci_rev) == 0x826c &&
++	    resp->lmp_ver == 0x8 && le16_to_cpu(resp->lmp_subver) == 0xa99e)
++		btrtl_dev->drop_fw = true;
++
++	if (btrtl_dev->drop_fw) {
++		opcode = hci_opcode_pack(0x3f, 0x66);
++		cmd[0] = opcode & 0xff;
++		cmd[1] = opcode >> 8;
++
++		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
++		if (IS_ERR(skb))
++			goto out_free;
++
++		skb_put_data(skb, cmd, sizeof(cmd));
++		hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++
++		hdev->send(hdev, skb);
++
++		/* Ensure the above vendor command is sent to controller and
++		 * process has done.
++		 */
++		msleep(200);
++
++		/* Read the local version again. Expect to have the vanilla
++		 * version as cold boot.
++		 */
++		skb = btrtl_read_local_version(hdev);
++		if (IS_ERR(skb)) {
++			ret = PTR_ERR(skb);
++			goto err_free;
++		}
++
++		resp = (struct hci_rp_read_local_version *)skb->data;
++		rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
++			     resp->hci_ver, resp->hci_rev,
++			     resp->lmp_ver, resp->lmp_subver);
++
++		hci_ver = resp->hci_ver;
++		hci_rev = le16_to_cpu(resp->hci_rev);
++		lmp_subver = le16_to_cpu(resp->lmp_subver);
++	}
++out_free:
+ 	kfree_skb(skb);
+ 
+ 	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
 -- 
-Luiz Augusto von Dentz
+2.17.1
+
