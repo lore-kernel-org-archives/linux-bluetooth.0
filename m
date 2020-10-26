@@ -2,160 +2,148 @@ Return-Path: <SRS0=rjyd=EB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C32C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 19:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5AEC4363A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 20:15:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B51D420795
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 19:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D055D21D42
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 20:15:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="myJWvHd3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kMIIFKsp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgJZTyT (ORCPT
+        id S1730525AbgJZUPz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Oct 2020 15:54:19 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:45258 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726215AbgJZTyT (ORCPT
+        Mon, 26 Oct 2020 16:15:55 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40781 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730520AbgJZUPz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Oct 2020 15:54:19 -0400
-Received: by mail-ed1-f67.google.com with SMTP id dg9so10773036edb.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2020 12:54:17 -0700 (PDT)
+        Mon, 26 Oct 2020 16:15:55 -0400
+Received: by mail-ot1-f67.google.com with SMTP id f97so9195980otb.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2020 13:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4WPNeJB7BOj3yuObKNDRCgQUlv7kLZly/f4+HB9mbpc=;
-        b=myJWvHd3qcxmbvlp9wAAmk7ZX20WpBEQOIRcBnar/LIdUdEqmDUfkNR/YLOd1yWOfl
-         BPVGPc6ftXhrlSrLd7f9+wEExpmC8h+tlQ2+04AEfVPDEV7+B+SH4nWnjUBGW+lqGSS9
-         aIe/zchABqHjKpV7HDiOtiEoy8kz61jcDu2NYOOnr8PtWyDj7j6+w4FnGJEMlgwk81v1
-         oCXLj6YyPLpTMsSqk77rWyAK3Y2NltIFZQFqpp124U60IfpIDhbnU+SUeBHI82QB/H73
-         Rfgn1W+MJPi2pOnnIrg2cSE0pLMkACw5848Q9uIwf78iAcEcbu3OXsqtCqWavZuIrb+B
-         x0mQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QG4NUmqXGXwIbzx0TIj7UQd+x/Ou6xdFNfX5U+SSxkI=;
+        b=kMIIFKspXKvEHbg9y9bvwBt8fvlSgAxcXkEBXK5yMc0XNVocrwIEQVjk7JBqiNl8r2
+         me4MKMc/rHv3uNnKX3n5rpTDY1gWCKAy5Q8czLyb4CxDNzblGuH0zKWPYHoTx4vy1Q/6
+         Zq0XSsQLxhozhz/C4rqqGw35el5za2khjmWOA95aSNY9OyoCgQXmeTQXhQmMf8SBFMex
+         8Ap2iHa9LECBl9WRdlFV3TqVtv7pwDAxf4ORCOfnojIqvLrFnj3LQ+TDOJK5E5HL1lCY
+         FUde6DJVbLt0Qm+xqvIRE6NGuWPWhUwmkyhB2veHJO3x5uKRZRdUVnavZUDTR9On+YbH
+         60ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4WPNeJB7BOj3yuObKNDRCgQUlv7kLZly/f4+HB9mbpc=;
-        b=lHRt7Zcyy4j6X0d7wClNHwE17V8PJKBN3cguGy7wdVPCagdif/XCX1IuiKgb0wh56h
-         4Zko3vheQP1lGeMtkPBEhg6KJ7Dl4nFQUTB4NR/yrTI462rFn4tMXMEcp/jmD+dCCtaa
-         kBnB8ODHLzNuJTXeypBfoF8lwuTyXRD3ZEaogiy6JUyhWYnwuS+VjRR1xBVO+gUUSDPV
-         VuF49vnYKxeDjaJxyIvhH9LSHaZJye0DhFtsOt3c3UFvuQp5w0FV8fAdZ/arqi33I6V+
-         3r+clttbRPGyp7dQsLgBY6VVtm/iOpwYKRqVSv93i2ZKkcfA2+hiVbLWE0bTjTpMOA9X
-         zO2g==
-X-Gm-Message-State: AOAM532xaD4tOda3E/6g1n5UNzGLEq0RxeTlLyDYNsjGS9iY7cqUjJpC
-        CWJY7oWzAsS0NXzIY082Fp/5uRCHQIU=
-X-Google-Smtp-Source: ABdhPJzf/+S7PXdNSlldHEZ9uudRwQwkxLyS1hmS4PmybJldD3h1J2rmg2Z4wZQTxDM4qhlK5l9WaQ==
-X-Received: by 2002:aa7:c792:: with SMTP id n18mr17488050eds.209.1603742056397;
-        Mon, 26 Oct 2020 12:54:16 -0700 (PDT)
-Received: from Marijn-Arch-PC.localdomain (94-209-165-62.cable.dynamic.v4.ziggo.nl. [94.209.165.62])
-        by smtp.gmail.com with ESMTPSA id i14sm6375089ejy.110.2020.10.26.12.54.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2020 12:54:15 -0700 (PDT)
-From:   Marijn Suijten <marijns95@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, pali@kernel.org,
-        Marijn Suijten <marijns95@gmail.com>
-Subject: [PATCH BlueZ v2] audio/media: Destroy transport if SetConfiguration fails
-Date:   Mon, 26 Oct 2020 20:54:08 +0100
-Message-Id: <20201026195408.2528476-1-marijns95@gmail.com>
-X-Mailer: git-send-email 2.29.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QG4NUmqXGXwIbzx0TIj7UQd+x/Ou6xdFNfX5U+SSxkI=;
+        b=Qpsm7jgI1Yw/GwdgaUiaM1u1pf7Y5FT9BmEuGdLve3pxlrOj2yj5DpAR36XES7E4wV
+         ahKVDTZ1otHn+zUdzIMSXiMaSsPI2GFdcWlL4+Ulr0v6gz4/rjjuLU8yN/yTdhV3nhSx
+         7dLZoOOk0Wvh7OVu8POa60KSgHFf8TYgg79XxJ6d8R84kvF/jYLil9YnIIEfNk+lRDZI
+         RpRoG2MSYSFcpfVdrg+FkxITuBB7faQ3hBKH2An6ZQx8g6KE3TJNv0XtSU41uC1LiYQl
+         nwgiLLE16uREcZlDa7JY3xRTUUrONJPt/1eoyK4dFqfBWSyBgP6Zz0adx41LVwrmvSsW
+         uc6A==
+X-Gm-Message-State: AOAM533+EO27uLHM3SC2zc9qMy2FiyEEG09IwWPvW5a2KxFiOj5K2Uda
+        IuPnIxv2gpARYH0AYeJqF6dPZ/+PjNbYvGe/zuk=
+X-Google-Smtp-Source: ABdhPJzMcgnyq2ZbBM08GeZ8VgsYZOBb7NydSESV2h8zfPVz5MUEgreJptW0IMQiRdZI0sX0YJKZMpsT8nL64uUUJyc=
+X-Received: by 2002:a05:6830:400d:: with SMTP id h13mr16511762ots.371.1603743354557;
+ Mon, 26 Oct 2020 13:15:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201025162730.47247-1-marijns95@gmail.com>
+In-Reply-To: <20201025162730.47247-1-marijns95@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 26 Oct 2020 13:15:43 -0700
+Message-ID: <CABBYNZKxYFQ8iodcHZsKHq3JCuC10EOmBykU4ZsS8ECACQ5ktQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/a2dp: a2dp_channel should have a refcount on
+ avdtp session
+To:     Marijn Suijten <marijns95@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-set_configuration creates a transport before calling SetConfiguration on
-the MediaEndpoint1 DBus interface.  If this DBus call fails the
-transport sticks around while it should instead be cleaned up.
+Hi Marijn,
 
-When the peer retries or reconnects (in case of BlueZ which cuts the
-connection due to a missing recount [1]) set_configuration finds this
-old transport and returns FALSE.  The peer will never succeed this call
-unless it randomly decides to call clear_configuration or BlueZ is
-restarted.
+On Sun, Oct 25, 2020 at 9:27 AM Marijn Suijten <marijns95@gmail.com> wrote:
+>
+> a2dp_channel keeps a reference to an avdtp session without incrementing
+> its refcount.  Not only does this appear wrong, it causes unexpected
+> disconnections when the remote SEP responds with rejections.
+>
+> During testing with an audio application disconnections are observed
+> when a codec config change through MediaEndpoint1.SetConfiguration
+> fails.  As soon as BlueZ receives this failure from the peer the
+> corresponding a2dp_setup object is cleaned up which holds the last
+> refcount to an avdtp session, in turn starting the disconnect process.
+> An eventual open sink/source and transport have already closed by that
+> time and released their refcounts.
+>
+> Adding refcounting semantics around a2dp_channel resolves the
+> disconnections and allows future calls on MediaEndpoint1 to safely
+> access the sesion stored within this channel.
+> ---
+>  profiles/audio/a2dp.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index cc4866b5b..0eac0135f 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -1507,6 +1507,9 @@ static void channel_free(void *data)
+>
+>         avdtp_remove_state_cb(chan->state_id);
+>
+> +       if (chan->session)
+> +               avdtp_unref(chan->session);
+> +
+>         queue_destroy(chan->seps, remove_remote_sep);
+>         free(chan->last_used);
+>         g_free(chan);
+> @@ -2065,7 +2068,7 @@ static void avdtp_state_cb(struct btd_device *dev, struct avdtp *session,
+>                 break;
+>         case AVDTP_SESSION_STATE_CONNECTED:
+>                 if (!chan->session)
+> -                       chan->session = session;
+> +                       chan->session = avdtp_ref(session);
 
-[1]: https://marc.info/?l=linux-bluetooth&m=160364326629847&w=2
----
+Afaik this was done on purpose since we only need a weak reference as
+taking a reference would prevent the session to be disconnected when
+there is no setup in place, so I pretty sure this will cause
+regressions, instead we should probably add a reference when
+reconfiguring is in place and have a grace period for switching to
+another codec.
 
-Changes in v2:
-- Removed incorrect statement about disconnection cause
-- Store reference to transport in endpoint_request instead of retrieving
-  it through find_device_transport
+>                 load_remote_seps(chan);
+>                 break;
+>         }
+> @@ -2145,6 +2148,7 @@ found:
+>                 channel_remove(chan);
+>                 return NULL;
+>         }
+> +       avdtp_ref(chan->session);
+>
+>         return avdtp_ref(chan->session);
+>  }
+> @@ -2165,6 +2169,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+>                         error("Unable to create AVDTP session");
+>                         goto fail;
+>                 }
+> +               avdtp_ref(chan->session);
+>         }
+>
+>         g_io_channel_unref(chan->io);
+> --
+> 2.29.1
+>
+> Marijn Suijten
 
- profiles/audio/media.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 74064d398..c84bbe22d 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -71,6 +71,7 @@ struct media_adapter {
- 
- struct endpoint_request {
- 	struct media_endpoint	*endpoint;
-+	struct media_transport	*transport;
- 	DBusMessage		*msg;
- 	DBusPendingCall		*call;
- 	media_endpoint_cb_t	cb;
-@@ -298,6 +299,15 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
- 			return;
- 		}
- 
-+		if (dbus_message_is_method_call(request->msg,
-+					MEDIA_ENDPOINT_INTERFACE,
-+					"SetConfiguration")) {
-+			if (request->transport == NULL)
-+				error("Expected to destroy transport");
-+			else
-+				media_transport_destroy(request->transport);
-+		}
-+
- 		dbus_error_free(&err);
- 		goto done;
- 	}
-@@ -337,6 +347,7 @@ done:
- 
- static gboolean media_endpoint_async_call(DBusMessage *msg,
- 					struct media_endpoint *endpoint,
-+					struct media_transport *transport,
- 					media_endpoint_cb_t cb,
- 					void *user_data,
- 					GDestroyNotify destroy)
-@@ -358,6 +369,7 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
- 									NULL);
- 
- 	request->endpoint = endpoint;
-+	request->transport = transport;
- 	request->msg = msg;
- 	request->cb = cb;
- 	request->destroy = destroy;
-@@ -393,7 +405,8 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
- 					&capabilities, length,
- 					DBUS_TYPE_INVALID);
- 
--	return media_endpoint_async_call(msg, endpoint, cb, user_data, destroy);
-+	return media_endpoint_async_call(msg, endpoint, NULL,
-+						cb, user_data, destroy);
- }
- 
- static int transport_device_cmp(gconstpointer data, gconstpointer user_data)
-@@ -501,7 +514,8 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
- 
- 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
- 
--	return media_endpoint_async_call(msg, endpoint, cb, user_data, destroy);
-+	return media_endpoint_async_call(msg, endpoint, transport,
-+						cb, user_data, destroy);
- }
- 
- static void release_endpoint(struct media_endpoint *endpoint)
+
 -- 
-2.29.1
-
+Luiz Augusto von Dentz
