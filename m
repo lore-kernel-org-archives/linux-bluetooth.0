@@ -5,61 +5,63 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDA9C4363A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 23:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B867CC4363A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 23:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDEB421D42
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 23:47:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C87820872
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Oct 2020 23:48:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RBv92dGe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlwX5+mK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408563AbgJZXr7 (ORCPT
+        id S2408577AbgJZXsy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Oct 2020 19:47:59 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:39685 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408556AbgJZXr6 (ORCPT
+        Mon, 26 Oct 2020 19:48:54 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:37629 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2408576AbgJZXsx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:47:58 -0400
-Received: by mail-ot1-f67.google.com with SMTP id o14so9615600otj.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2020 16:47:57 -0700 (PDT)
+        Mon, 26 Oct 2020 19:48:53 -0400
+Received: by mail-oi1-f195.google.com with SMTP id f7so12332682oib.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2020 16:48:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=jL+9JS8TXNqOfVVOwdzqDG6oj5ns0nhV8uhR7Rj24Sg=;
-        b=RBv92dGe/F4qsf6ApFTIBin/K+4WsTBOkWnVGZAfbZmkFDFosIZCv8d91Jz6NtfevP
-         mLlONw4uQbbjotaJvp6esWVyU7OfDLOkVWkzPNmkBm1QHSzOkIFAAmu5fyuwULwv0nyy
-         bgQ9RyPKwMm3evSHX1mIdT0CXlv0iGBfq386ifVfDLwvf3DuiiSOJEYUZO9375RA/ERY
-         MaPDOPLRL+9N2vqYdoBkg/Oa2JC7o/0G7m95R94JseMJR8f2Ipyws84krt3k97B2nq9L
-         jjLZz3Ga889wljGfzTEXfwnyeAxBN9zbCCvyEz31euUZwzCbmG5V5/mHdebzR7JKb5rH
-         MLlQ==
+        bh=zGd2LQxS+U848OXrrZAuQHDpYYfl2VBVLBMw6PohnUA=;
+        b=nlwX5+mKgnsP/lFTpF7yZD+c6p6kUNKbv7ZNSQLms3x03F/Bc+Wp0hpxUtDYWQ5B4N
+         s+x4OCq4hAN8jDp9ccJpd34xawNAKwxe7PIIlQxwc02RVOkmmyGfD8iwEms3vqlI1SqE
+         Vs01SwWwU7i0deNdtriLGx6wScgjq6ZLp63Ma4z0XS5gKxJK63UhTcepXLJeJM4seJZB
+         S9Kebf79B2wnPoXixZb7jQ8khhdwSQ4jK/npq6gbWUJuvddK9ieQlA4Lc15jP5YBoi9t
+         D6YEHjzf9qBVvlwU2tZfJg8DoN+FfiYhCGMv/u381hqnbhAnMw3FIit+T6j7QUUYfUiT
+         Pc1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=jL+9JS8TXNqOfVVOwdzqDG6oj5ns0nhV8uhR7Rj24Sg=;
-        b=fVftGbjjsAfUSjQTcZrg5DegIZN7TYLRt23NIGC0Vao60+Vad1hVPFMiAPWyGsRyK8
-         UCqL4aqXyEI0vYCWi9e7CeyZiPmYBbDYy3DT7K50J8sCicgBV0sLDZ11m/KlNJMTAk9H
-         3irehIRjNcwZPRz2/lhBG7M3uXzgyhIjaMJwpON/nuhD4UBFvHR528moIvvRlCT4AOHp
-         xS+M3RNoBb29R5XAp4q4KKgqNhQ5gW5YtrsnuP8BRRWLuGah19HctxzxdX95FQv3IFOh
-         3FycZcsQMsvujeH+6gN6KlxKMm/8MVwoi3sb8dfOQLEkOKhJ6aIl+0IGjnh4tm4iDQz/
-         KQIQ==
-X-Gm-Message-State: AOAM530NWvhrGg02dc9DbvyjPshpy8i3jqQSRk8wWcAopXADYlzRqMLa
-        gdLfobliMD6/l3B+S2yT7uI/YfYlCH7H0/nA/mg=
-X-Google-Smtp-Source: ABdhPJyM2yyz7Civk6yERV6MnT5PjnMLTWPWJMbAouKsqxcG08NUjSChEmUqkRHtsDiMLOVr915pEUyWPoNUF/M3uD0=
-X-Received: by 2002:a05:6830:400d:: with SMTP id h13mr17140545ots.371.1603756077145;
- Mon, 26 Oct 2020 16:47:57 -0700 (PDT)
+        bh=zGd2LQxS+U848OXrrZAuQHDpYYfl2VBVLBMw6PohnUA=;
+        b=GZAuMYbIl7U0pzKuxgHMKMgqD++WwgTCQn9C/dlLZ3UFshHAjEXVRsn7e9nUvnr4qU
+         uxwdo0stdLyXyAnt8LzuWLVeyFh4q88RIbPdntFKG0VFqfpZ07enDgXF3q8Fz0NjAlRi
+         EfZ0/RezegMJpYA7WqCFMMbq2KAlVGHIjTb8v8PXjo6zCDvIlPcLDzmG9XtAVPIMhEGE
+         K2FTnpXgIeP7pZrP63SLqMRcenmAeWJOdB7NAvwepbtRqmGtC7NH/+ZdFupjCv5nS9V9
+         D/k/t0cF0WBQNmpuMhVubnPVBNgsQo6ymGej10Qul8z1L9i2kzfq61Jqk+mxRVMEoeoq
+         h2yA==
+X-Gm-Message-State: AOAM530xA9bjWAjwcTHNpPDu++mJx5x10qIV7C0ZO8jSMIuUolIL35ev
+        wJDZ711B2cPR0lSB5SQeQ89iEt86IJ5E/Yj/E6Xc+OqCpcg=
+X-Google-Smtp-Source: ABdhPJygpZtYWTgzjwiniyysjJliGRMd6Z1FDfTsdyZjgFgXRIY1csJ00jcDO0Wzix7R1Tghbg4JSztM918cHllLta4=
+X-Received: by 2002:aca:cdd8:: with SMTP id d207mr12047180oig.64.1603756130759;
+ Mon, 26 Oct 2020 16:48:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201026195408.2528476-1-marijns95@gmail.com>
-In-Reply-To: <20201026195408.2528476-1-marijns95@gmail.com>
+References: <20201025162730.47247-1-marijns95@gmail.com> <CABBYNZKxYFQ8iodcHZsKHq3JCuC10EOmBykU4ZsS8ECACQ5ktQ@mail.gmail.com>
+ <CANX-K3s41y=w8=Ho_+=ZZ=Brv=6-62Or7v+AL64ThDE_u582YQ@mail.gmail.com>
+ <CABBYNZJ3=e5kFxn-o0_L8j5aKpLDk88CGx=gcKP0eaPjQchO=g@mail.gmail.com> <CANX-K3vn71GLYccbaeqEX4dUgXzUZ8tO9rJaUunpZMssx7b30Q@mail.gmail.com>
+In-Reply-To: <CANX-K3vn71GLYccbaeqEX4dUgXzUZ8tO9rJaUunpZMssx7b30Q@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 26 Oct 2020 16:47:46 -0700
-Message-ID: <CABBYNZJ6dRWGtPst6AZ=U9xTfjueobrEvkh3YLzWEFPx7D9uAA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] audio/media: Destroy transport if
- SetConfiguration fails
+Date:   Mon, 26 Oct 2020 16:48:39 -0700
+Message-ID: <CABBYNZJEZ7vcLkp49cOTFRu+U=AxATv5cNf92CU1gs1xbJ5eHg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/a2dp: a2dp_channel should have a refcount on
+ avdtp session
 To:     Marijn Suijten <marijns95@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
@@ -70,97 +72,181 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marijn,
 
-On Mon, Oct 26, 2020 at 12:54 PM Marijn Suijten <marijns95@gmail.com> wrote:
+On Mon, Oct 26, 2020 at 2:37 PM Marijn Suijten <marijns95@gmail.com> wrote:
 >
-> set_configuration creates a transport before calling SetConfiguration on
-> the MediaEndpoint1 DBus interface.  If this DBus call fails the
-> transport sticks around while it should instead be cleaned up.
+> Hi Luiz,
 >
-> When the peer retries or reconnects (in case of BlueZ which cuts the
-> connection due to a missing recount [1]) set_configuration finds this
-> old transport and returns FALSE.  The peer will never succeed this call
-> unless it randomly decides to call clear_configuration or BlueZ is
-> restarted.
+> On Mon, 26 Oct 2020 at 21:39, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Marijn,
+> >
+> > On Mon, Oct 26, 2020 at 1:22 PM Marijn Suijten <marijns95@gmail.com> wrote:
+> > >
+> > > Hi Luiz,
+> > >
+> > > On Mon, 26 Oct 2020 at 21:15, Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi Marijn,
+> > > >
+> > > > On Sun, Oct 25, 2020 at 9:27 AM Marijn Suijten <marijns95@gmail.com> wrote:
+> > > > >
+> > > > > a2dp_channel keeps a reference to an avdtp session without incrementing
+> > > > > its refcount.  Not only does this appear wrong, it causes unexpected
+> > > > > disconnections when the remote SEP responds with rejections.
+> > > > >
+> > > > > During testing with an audio application disconnections are observed
+> > > > > when a codec config change through MediaEndpoint1.SetConfiguration
+> > > > > fails.  As soon as BlueZ receives this failure from the peer the
+> > > > > corresponding a2dp_setup object is cleaned up which holds the last
+> > > > > refcount to an avdtp session, in turn starting the disconnect process.
+> > > > > An eventual open sink/source and transport have already closed by that
+> > > > > time and released their refcounts.
+> > > > >
+> > > > > Adding refcounting semantics around a2dp_channel resolves the
+> > > > > disconnections and allows future calls on MediaEndpoint1 to safely
+> > > > > access the sesion stored within this channel.
+> > > > > ---
+> > > > >  profiles/audio/a2dp.c | 7 ++++++-
+> > > > >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > > > > index cc4866b5b..0eac0135f 100644
+> > > > > --- a/profiles/audio/a2dp.c
+> > > > > +++ b/profiles/audio/a2dp.c
+> > > > > @@ -1507,6 +1507,9 @@ static void channel_free(void *data)
+> > > > >
+> > > > >         avdtp_remove_state_cb(chan->state_id);
+> > > > >
+> > > > > +       if (chan->session)
+> > > > > +               avdtp_unref(chan->session);
+> > > > > +
+> > > > >         queue_destroy(chan->seps, remove_remote_sep);
+> > > > >         free(chan->last_used);
+> > > > >         g_free(chan);
+> > > > > @@ -2065,7 +2068,7 @@ static void avdtp_state_cb(struct btd_device *dev, struct avdtp *session,
+> > > > >                 break;
+> > > > >         case AVDTP_SESSION_STATE_CONNECTED:
+> > > > >                 if (!chan->session)
+> > > > > -                       chan->session = session;
+> > > > > +                       chan->session = avdtp_ref(session);
+> > > >
+> > > > Afaik this was done on purpose since we only need a weak reference as
+> > > > taking a reference would prevent the session to be disconnected when
+> > > > there is no setup in place, so I pretty sure this will cause
+> > > > regressions, instead we should probably add a reference when
+> > > > reconfiguring is in place and have a grace period for switching to
+> > > > another codec.
+> > >
+> > > Allright, so it's either an in-progress setup or ongoing transport
+> > > keeping the session alive, nothing else?  I guess this is as simple as
+> > > setting a higher dc_timeout when calling set_disconnect_timer in
+> > > avdtp_unref?
+> >
+> > Yep, actually now that you mentioned the dc_timeout that should have
+> > prevented us to disconnect immediately when reconfiguring as we should
+> > have been in AVDTP_SESSION_STATE_CONNECTED state but I think the
+> > problem is that we use avdtp_close to reconfigure which does set the
+> > dc_timeout to 0
 >
-> [1]: https://marc.info/?l=linux-bluetooth&m=160364326629847&w=2
-> ---
+> Yep a2dp_reconfig calls that functionand sets it to 0.
 >
-> Changes in v2:
-> - Removed incorrect statement about disconnection cause
-> - Store reference to transport in endpoint_request instead of retrieving
->   it through find_device_transport
+> > since that is normally used for cleaning up the
+> > session, so I think we may need to restore the dc_timeout to
+> > DISCONNECT_TIMEOUT if we attempt to set a configuration:
 >
->  profiles/audio/media.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
+> My thinking as well, assuming DISCONNECT_TIMEOUT is enough (1s).
 >
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 74064d398..c84bbe22d 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -71,6 +71,7 @@ struct media_adapter {
+> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> > index ae93fb26f..97b4d1b44 100644
+> > --- a/profiles/audio/avdtp.c
+> > +++ b/profiles/audio/avdtp.c
+> > @@ -3498,6 +3498,7 @@ int avdtp_set_configuration(struct avdtp *session,
+> >                 session->streams = g_slist_append(session->streams, new_stream);
+> >                 if (stream)
+> >                         *stream = new_stream;
+> > +               session->dc_timeout = DISCONNECT_TIMEOUT;
+> >         }
+> >
+> >         g_free(req);
+> >
+> >
 >
->  struct endpoint_request {
->         struct media_endpoint   *endpoint;
-> +       struct media_transport  *transport;
->         DBusMessage             *msg;
->         DBusPendingCall         *call;
->         media_endpoint_cb_t     cb;
-> @@ -298,6 +299,15 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
->                         return;
->                 }
+> Thanks, works like a charm!
 >
-> +               if (dbus_message_is_method_call(request->msg,
-> +                                       MEDIA_ENDPOINT_INTERFACE,
-> +                                       "SetConfiguration")) {
-> +                       if (request->transport == NULL)
-> +                               error("Expected to destroy transport");
-> +                       else
-> +                               media_transport_destroy(request->transport);
-> +               }
-> +
->                 dbus_error_free(&err);
->                 goto done;
->         }
-> @@ -337,6 +347,7 @@ done:
+>     profiles/audio/avdtp.c:avdtp_unref() 0x5565f10db6f0: ref=1
+>     profiles/audio/avdtp.c:avdtp_set_configuration() 0x5565f10db6f0:
+> int_seid=8, acp_seid=1
+>     profiles/audio/avdtp.c:session_cb()
+>     profiles/audio/avdtp.c:avdtp_parse_rej() SET_CONFIGURATION request
+> rejected: Configuration not supported (41)
+>     profiles/audio/a2dp.c:setconf_cfm() Source 0x5565f10fc620:
+> Set_Configuration_Cfm
+>     profiles/audio/a2dp.c:setup_ref() 0x5565f110d540: ref=2
+>     profiles/audio/a2dp.c:setup_unref() 0x5565f110d540: ref=1
+>     profiles/audio/a2dp.c:setup_unref() 0x5565f110d540: ref=0
+>     profiles/audio/a2dp.c:setup_free() 0x5565f110d540
+>     profiles/audio/avdtp.c:avdtp_unref() 0x5565f10db6f0: ref=0
+>     profiles/audio/avdtp.c:avdtp_ref() 0x5565f10db6f0: ref=1
+>     profiles/audio/avdtp.c:set_disconnect_timer() timeout 1
+>     profiles/audio/avdtp.c:avdtp_ref() 0x5565f10db6f0: ref=2
+>     profiles/audio/avdtp.c:avdtp_unref() 0x5565f10db6f0: ref=1
+>     profiles/audio/a2dp.c:setup_ref() 0x5565f110d540: ref=1
+>     profiles/audio/avdtp.c:avdtp_set_configuration() 0x5565f10db6f0:
+> int_seid=8, acp_seid=7
+>     profiles/audio/avdtp.c:session_cb()
+>     profiles/audio/avdtp.c:avdtp_parse_resp() SET_CONFIGURATION
+> request succeeded
+>     profiles/audio/a2dp.c:setconf_cfm() Source 0x5565f10fc620:
+> Set_Configuration_Cfm
 >
->  static gboolean media_endpoint_async_call(DBusMessage *msg,
->                                         struct media_endpoint *endpoint,
-> +                                       struct media_transport *transport,
->                                         media_endpoint_cb_t cb,
->                                         void *user_data,
->                                         GDestroyNotify destroy)
-> @@ -358,6 +369,7 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
->                                                                         NULL);
->
->         request->endpoint = endpoint;
-> +       request->transport = transport;
->         request->msg = msg;
->         request->cb = cb;
->         request->destroy = destroy;
-> @@ -393,7 +405,8 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
->                                         &capabilities, length,
->                                         DBUS_TYPE_INVALID);
->
-> -       return media_endpoint_async_call(msg, endpoint, cb, user_data, destroy);
-> +       return media_endpoint_async_call(msg, endpoint, NULL,
-> +                                               cb, user_data, destroy);
->  }
->
->  static int transport_device_cmp(gconstpointer data, gconstpointer user_data)
-> @@ -501,7 +514,8 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
->
->         g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
->
-> -       return media_endpoint_async_call(msg, endpoint, cb, user_data, destroy);
-> +       return media_endpoint_async_call(msg, endpoint, transport,
-> +                                               cb, user_data, destroy);
->  }
->
->  static void release_endpoint(struct media_endpoint *endpoint)
-> --
-> 2.29.1
+> Since you suggested this change I guess it's up to you to write a
+> commit around it and apply it or submit it for additional review, or
+> should I do it and combine it with the original message for a v2?
 
-Applied, thanks.
+I went ahead and applied it myself, thanks for confirming it works properly.
+
+> > > >
+> > > > >                 load_remote_seps(chan);
+> > > > >                 break;
+> > > > >         }
+> > > > > @@ -2145,6 +2148,7 @@ found:
+> > > > >                 channel_remove(chan);
+> > > > >                 return NULL;
+> > > > >         }
+> > > > > +       avdtp_ref(chan->session);
+> > > > >
+> > > > >         return avdtp_ref(chan->session);
+> > > > >  }
+> > > > > @@ -2165,6 +2169,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+> > > > >                         error("Unable to create AVDTP session");
+> > > > >                         goto fail;
+> > > > >                 }
+> > > > > +               avdtp_ref(chan->session);
+> > > > >         }
+> > > > >
+> > > > >         g_io_channel_unref(chan->io);
+> > > > > --
+> > > > > 2.29.1
+> > > > >
+> > > > > Marijn Suijten
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+> > >
+> > > Marijn Suijten
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> Marijn Suijten
+
+
 
 -- 
 Luiz Augusto von Dentz
