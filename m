@@ -2,79 +2,267 @@ Return-Path: <SRS0=ORc3=EC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A15BC56202
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Oct 2020 15:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72872C55178
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Oct 2020 16:32:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F45C22265
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Oct 2020 15:43:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1241221707
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Oct 2020 16:32:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K5xdihYB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1800010AbgJ0Peg convert rfc822-to-8bit (ORCPT
+        id S1809965AbgJ0Qcg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Oct 2020 11:34:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52876 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1800003AbgJ0Pef (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Oct 2020 11:34:35 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Tue, 27 Oct 2020 15:34:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: matias@ufscar.br
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209745-62941-mLcZRDKC9U@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 27 Oct 2020 12:32:36 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:33654 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1802507AbgJ0Ptv (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 27 Oct 2020 11:49:51 -0400
+Received: by mail-lj1-f195.google.com with SMTP id c21so2360841ljj.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2020 08:49:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1ke5nGbA4clAxIjt0JUhDX3ZTydTBVBs4rEWy4zdTpU=;
+        b=K5xdihYBzdmUdNJQ2LLnUYlVrlt+QfwqeoklnM2hogn92aLb8d3vyflsafRufchaeZ
+         CA7MOtlZBygfC8YYTcXvdHyg3H4Uc9aYpFEVh+8Gj/tAroF4BtXrBxUvz4AM/8XZlHHA
+         Zmb9DdL4GELqH5gfrCkRyujlf/GGo8woHmmRa9QWuuIUUJbP+wQZyR9yMlFiys4T0i8A
+         4hN2ipTGzA2WV6CzmbUbf/8AhBTplnO3NMNTMqFlNqilp4nIaexXKzqov+8pb8EnVwqb
+         9imjsPRhep6QFj4/KoNQX9Y8gqUEJUh+gRwDUdG+SKp336qZzHh2M2GTo/x8mSQca1p+
+         KX+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1ke5nGbA4clAxIjt0JUhDX3ZTydTBVBs4rEWy4zdTpU=;
+        b=HNTpN31vrzEVq+zDdEuvf5RS3tzw0xzBkyxk/uYSviJMLGtz4xbucGTDmTTfRaC5wQ
+         +vd8Opvh1RTdPEQbEkLPzlCqsBtvyO7rpfaIoHaJJwxl8E8ka3d9bIHQDjxVYyOcCAkx
+         hE+uhwM7SDucg3lY0X/2FHO2dxm9qNQ8FgnWLPlWmteGPPaZHzKEWtTRLB3Q5yTDTL90
+         duBdZ18Rshg1nesEijrgORr/2HMlk3kN8p0bcFiroAxtGjehYblneBHJp42TPqyVXhkz
+         TW8Ehbm6xs9ToY2WOAjjXyCea4p/cgURE3Bx2KC39vT+c9pE/qcaNYWxUxGRV/csHcus
+         Qs7Q==
+X-Gm-Message-State: AOAM533pyoniAJWC1LyQRi7df8b6DYAGBgWTRpWBO8oNiKUlRfIs83G+
+        kfkfaw68sz5qP0Ow2qc9aoobrdbF9MgMWQHigqn4cQ==
+X-Google-Smtp-Source: ABdhPJwfbeBJF996cAg1thYPCBkpc2GrcJEDHl23TWiE+xUY606hyiNlVhgw1Yb5IR3kgXwZnK/aLsWQ8YU0KFRB1M8=
+X-Received: by 2002:a2e:351a:: with SMTP id z26mr1407846ljz.3.1603813786899;
+ Tue, 27 Oct 2020 08:49:46 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200929080324.632523-1-tientzu@chromium.org> <CALiNf28k5C48_ivAeRW7sSEEXp0gd-h_1n03YH6jQhYhaCXUDA@mail.gmail.com>
+In-Reply-To: <CALiNf28k5C48_ivAeRW7sSEEXp0gd-h_1n03YH6jQhYhaCXUDA@mail.gmail.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Tue, 27 Oct 2020 11:49:35 -0400
+Message-ID: <CALWDO_UqPS2eETieKHN_enJ-x+6C0Y8C7A0Jjg=a+L=of7Fz1w@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Move force_bredr_smp debugfs into hci_debugfs_create_bredr
+To:     Claire Chang <tientzu@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        lkml <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209745
+Friendly ping and adding my review-by tag.
 
-matias (matias@ufscar.br) changed:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |matias@ufscar.br
-
---- Comment #5 from matias (matias@ufscar.br) ---
-Same problem for me since 5.9.0 (remains with 5.9.1).
-
-Adapter: USB, ID 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
-
-Tested with the following Bluetooth devices:
-
-* Logitech MX Anywhere 2S: Requires a re-pair every time the radio goes off
-either at the computer or at the device.
-
-* Logitech MX Anywhere 2: Requires a re-pair every time the radio goes off
-either at the computer or at the device.
-
-* WI-XB400: Does not autoconnect to the computer after turned on, but works
-after manually asking to connect on bluetoothctl. Does not require a re-pair.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+On Wed, Oct 7, 2020 at 12:38 AM Claire Chang <tientzu@chromium.org> wrote:
+>
+> Hi,
+>
+> This patch is to fix the kernel error
+> [   46.271811] debugfs: File 'force_bredr_smp' in directory 'hci0'
+> already present!
+>
+> When powering off and on the bluetooth, the smp_register will try to create the
+> force_bredr_smp entry again.
+> Move the creation to hci_debugfs_create_bredr so the force_bredr_smp entry will
+> only be created when HCI_SETUP and HCI_CONFIG are not set.
+>
+> Thanks,
+> Claire
+>
+> On Tue, Sep 29, 2020 at 4:03 PM Claire Chang <tientzu@chromium.org> wrote:
+> >
+> > Avoid multiple attempts to create the debugfs entry, force_bredr_smp,
+> > by moving it from the SMP registration to the BR/EDR controller init
+> > section. hci_debugfs_create_bredr is only called when HCI_SETUP and
+> > HCI_CONFIG is not set.
+> >
+> > Signed-off-by: Claire Chang <tientzu@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > ---
+> > v2: correct a typo in commit message
+> >
+> >  net/bluetooth/hci_debugfs.c | 50 +++++++++++++++++++++++++++++++++++++
+> >  net/bluetooth/smp.c         | 44 ++------------------------------
+> >  net/bluetooth/smp.h         |  2 ++
+> >  3 files changed, 54 insertions(+), 42 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+> > index 5e8af2658e44..4626e0289a97 100644
+> > --- a/net/bluetooth/hci_debugfs.c
+> > +++ b/net/bluetooth/hci_debugfs.c
+> > @@ -494,6 +494,45 @@ static int auto_accept_delay_get(void *data, u64 *val)
+> >  DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+> >                         auto_accept_delay_set, "%llu\n");
+> >
+> > +static ssize_t force_bredr_smp_read(struct file *file,
+> > +                                   char __user *user_buf,
+> > +                                   size_t count, loff_t *ppos)
+> > +{
+> > +       struct hci_dev *hdev = file->private_data;
+> > +       char buf[3];
+> > +
+> > +       buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP) ? 'Y' : 'N';
+> > +       buf[1] = '\n';
+> > +       buf[2] = '\0';
+> > +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
+> > +}
+> > +
+> > +static ssize_t force_bredr_smp_write(struct file *file,
+> > +                                    const char __user *user_buf,
+> > +                                    size_t count, loff_t *ppos)
+> > +{
+> > +       struct hci_dev *hdev = file->private_data;
+> > +       bool enable;
+> > +       int err;
+> > +
+> > +       err = kstrtobool_from_user(user_buf, count, &enable);
+> > +       if (err)
+> > +               return err;
+> > +
+> > +       err = smp_force_bredr(hdev, enable);
+> > +       if (err)
+> > +               return err;
+> > +
+> > +       return count;
+> > +}
+> > +
+> > +static const struct file_operations force_bredr_smp_fops = {
+> > +       .open           = simple_open,
+> > +       .read           = force_bredr_smp_read,
+> > +       .write          = force_bredr_smp_write,
+> > +       .llseek         = default_llseek,
+> > +};
+> > +
+> >  static int idle_timeout_set(void *data, u64 val)
+> >  {
+> >         struct hci_dev *hdev = data;
+> > @@ -589,6 +628,17 @@ void hci_debugfs_create_bredr(struct hci_dev *hdev)
+> >         debugfs_create_file("voice_setting", 0444, hdev->debugfs, hdev,
+> >                             &voice_setting_fops);
+> >
+> > +       /* If the controller does not support BR/EDR Secure Connections
+> > +        * feature, then the BR/EDR SMP channel shall not be present.
+> > +        *
+> > +        * To test this with Bluetooth 4.0 controllers, create a debugfs
+> > +        * switch that allows forcing BR/EDR SMP support and accepting
+> > +        * cross-transport pairing on non-AES encrypted connections.
+> > +        */
+> > +       if (!lmp_sc_capable(hdev))
+> > +               debugfs_create_file("force_bredr_smp", 0644, hdev->debugfs,
+> > +                                   hdev, &force_bredr_smp_fops);
+> > +
+> >         if (lmp_ssp_capable(hdev)) {
+> >                 debugfs_create_file("ssp_debug_mode", 0444, hdev->debugfs,
+> >                                     hdev, &ssp_debug_mode_fops);
+> > diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> > index 433227f96c73..8b817e4358fd 100644
+> > --- a/net/bluetooth/smp.c
+> > +++ b/net/bluetooth/smp.c
+> > @@ -3353,31 +3353,8 @@ static void smp_del_chan(struct l2cap_chan *chan)
+> >         l2cap_chan_put(chan);
+> >  }
+> >
+> > -static ssize_t force_bredr_smp_read(struct file *file,
+> > -                                   char __user *user_buf,
+> > -                                   size_t count, loff_t *ppos)
+> > +int smp_force_bredr(struct hci_dev *hdev, bool enable)
+> >  {
+> > -       struct hci_dev *hdev = file->private_data;
+> > -       char buf[3];
+> > -
+> > -       buf[0] = hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP) ? 'Y': 'N';
+> > -       buf[1] = '\n';
+> > -       buf[2] = '\0';
+> > -       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
+> > -}
+> > -
+> > -static ssize_t force_bredr_smp_write(struct file *file,
+> > -                                    const char __user *user_buf,
+> > -                                    size_t count, loff_t *ppos)
+> > -{
+> > -       struct hci_dev *hdev = file->private_data;
+> > -       bool enable;
+> > -       int err;
+> > -
+> > -       err = kstrtobool_from_user(user_buf, count, &enable);
+> > -       if (err)
+> > -               return err;
+> > -
+> >         if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
+> >                 return -EALREADY;
+> >
+> > @@ -3399,16 +3376,9 @@ static ssize_t force_bredr_smp_write(struct file *file,
+> >
+> >         hci_dev_change_flag(hdev, HCI_FORCE_BREDR_SMP);
+> >
+> > -       return count;
+> > +       return 0;
+> >  }
+> >
+> > -static const struct file_operations force_bredr_smp_fops = {
+> > -       .open           = simple_open,
+> > -       .read           = force_bredr_smp_read,
+> > -       .write          = force_bredr_smp_write,
+> > -       .llseek         = default_llseek,
+> > -};
+> > -
+> >  int smp_register(struct hci_dev *hdev)
+> >  {
+> >         struct l2cap_chan *chan;
+> > @@ -3433,17 +3403,7 @@ int smp_register(struct hci_dev *hdev)
+> >
+> >         hdev->smp_data = chan;
+> >
+> > -       /* If the controller does not support BR/EDR Secure Connections
+> > -        * feature, then the BR/EDR SMP channel shall not be present.
+> > -        *
+> > -        * To test this with Bluetooth 4.0 controllers, create a debugfs
+> > -        * switch that allows forcing BR/EDR SMP support and accepting
+> > -        * cross-transport pairing on non-AES encrypted connections.
+> > -        */
+> >         if (!lmp_sc_capable(hdev)) {
+> > -               debugfs_create_file("force_bredr_smp", 0644, hdev->debugfs,
+> > -                                   hdev, &force_bredr_smp_fops);
+> > -
+> >                 /* Flag can be already set here (due to power toggle) */
+> >                 if (!hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
+> >                         return 0;
+> > diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+> > index 121edadd5f8d..fc35a8bf358e 100644
+> > --- a/net/bluetooth/smp.h
+> > +++ b/net/bluetooth/smp.h
+> > @@ -193,6 +193,8 @@ bool smp_irk_matches(struct hci_dev *hdev, const u8 irk[16],
+> >  int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa);
+> >  int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16]);
+> >
+> > +int smp_force_bredr(struct hci_dev *hdev, bool enable);
+> > +
+> >  int smp_register(struct hci_dev *hdev);
+> >  void smp_unregister(struct hci_dev *hdev);
+> >
+> > --
+> > 2.28.0.618.gf4bc123cb7-goog
+> >
