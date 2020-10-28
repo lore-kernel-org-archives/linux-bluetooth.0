@@ -2,88 +2,85 @@ Return-Path: <SRS0=NHH5=EE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EA2C388F7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 01:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9D3C55179
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 01:54:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FD90208B8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 01:54:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1DAA206E9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 01:54:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728883AbgJ2Bx5 convert rfc822-to-8bit (ORCPT
+        id S1728674AbgJ2By0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Oct 2020 21:53:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48292 "EHLO mail.kernel.org"
+        Wed, 28 Oct 2020 21:54:26 -0400
+Received: from mga18.intel.com ([134.134.136.126]:14628 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728694AbgJ1V5X (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:57:23 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 208965] not working bluetooth mouse low energy rtl8822ce
-Date:   Wed, 28 Oct 2020 20:37:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: fakecop@yandex.ru
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-208965-62941-bZbEnusq1A@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-208965-62941@https.bugzilla.kernel.org/>
-References: <bug-208965-62941@https.bugzilla.kernel.org/>
+        id S1728219AbgJ1V45 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 28 Oct 2020 17:56:57 -0400
+IronPort-SDR: KWVnsAKbknKgls36eXbo/y333QyPZAmYYCCm29yyQtD/EotLEGr3mWn/cMHnE3F/BbDAqAkV8m
+ o52zIoBsoh4A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9788"; a="156109122"
+X-IronPort-AV: E=Sophos;i="5.77,428,1596524400"; 
+   d="scan'208";a="156109122"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2020 13:53:42 -0700
+IronPort-SDR: zs4ofXDxmzf+PIACNTAeVfIdJ/u0mXupUDiLHRV5kTv0wj1fQUfkvv6mG5Vq8JLLDZe0i91myX
+ GRJT0yUapIpA==
+X-IronPort-AV: E=Sophos;i="5.77,428,1596524400"; 
+   d="scan'208";a="304211743"
+Received: from unknown (HELO han1-XPS-13-9350.jf.intel.com) ([10.54.74.24])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2020 13:53:42 -0700
+Message-ID: <bfffd8d6aa12279163bec589994d03c091434ec1.camel@linux.intel.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for 0cb5:c547 Realtek
+ 8822CE device
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     David Zakarias <david.zakarias@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Wed, 28 Oct 2020 13:53:29 -0700
+In-Reply-To: <CAC_SeizxoD1PkNHWYg1FcV9x6tote2JyJNX3Kwu3XtHkCF+FPQ@mail.gmail.com>
+References: <CAC_SeizxoD1PkNHWYg1FcV9x6tote2JyJNX3Kwu3XtHkCF+FPQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208965
+Hi David,
 
---- Comment #30 from fakecop (fakecop@yandex.ru) ---
-(In reply to Niklas Frank from comment #29)
-> (In reply to Edward Vear from comment #25)
-> > (In reply to david.zakarias from comment #20)
-> > > Is it possible that a newer firmware fixes the problem? I also have
-> version
-> > > 0x09993aa1. 
-> > > Julian what version do you have?
-> > 
-> > Hi David,
-> > 
-> > I ran into the same Set Resolvable Private Address error with my adapter,
-> an
-> > rtl8761b. I submitted a patch here with my understanding of the issue:
-> > https://marc.info/?l=linux-bluetooth&m=160378222632366&w=2. Could you check
-> > to see if that patch helps?
-> > 
-> > I don't believe it is related to the original issue seen in this thread
-> > though.
+On Tue, 2020-10-27 at 21:52 +0100, David Zakarias wrote:
+> My Redmibook 16 AMD laptop contains the RTL8822CE chip having the USB
+> identifier 0cb5:c547. This patch adds this Id to btusb.c's blacklist
+> table, enabling the loading of the Realtek firmware.
+> This, together with another patch by Edward Vear (hci_core: Fix
+> attempting to set RPA timeout when unsupported, see
+> https://marc.info/?l=linux-bluetooth&m=160378222632366&w=2) makes my
+> bluetooth mouse work.
 > 
-> Thanks alot! I am now able to connect to my Bluetooth mouse!
+> Signed-off-by: David Zakarias <david.zakarias@gmail.com>
+> ---
+> --- bluetooth/drivers/bluetooth/btusb.c.orig 2020-10-27 21:24:51.331035974
+> +0100
+> +++ bluetooth/drivers/bluetooth/btusb.c 2020-10-27 21:21:46.000000000 +0100
+> @@ -386,6 +386,7 @@ static const struct usb_device_id blackl
 > 
-> Although I notice that the bluetooth adapter still behaves weird. It
-> sometimes simply stops working and I have to unload and load the `btusb`
-> kernel module to get the adapter working again. 
+>   /* Additional Realtek 8822CE Bluetooth devices */
+>   { USB_DEVICE(0x04ca, 0x4005), .driver_info = BTUSB_REALTEK },
+> + { USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK },
 > 
-> As for Distro/Kernel Version: I am using Manjaro and I have applied the
-> patches on top of Kernel 5.9.3
+>   /* Silicon Wave based devices */
+>   { USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
 
-Hi, please tell me how you managed to apply the patch??
-Thanks
+Please include the content of /sys/kernel/debug/usb/devices for this device in
+the commit message.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Regards,
+
+Tedd Ho-Jeong An
+
