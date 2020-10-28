@@ -2,64 +2,64 @@ Return-Path: <SRS0=FSAH=ED=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE24C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 01:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC295C4363A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3278222384
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 01:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9234D246CD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VXIxzDfA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nzh+ug+m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbgJ1Bik (ORCPT
+        id S1725766AbgJ1Vp7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Oct 2020 21:38:40 -0400
-Received: from mail-il1-f176.google.com ([209.85.166.176]:37005 "EHLO
-        mail-il1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1833051AbgJ0XpK (ORCPT
+        Wed, 28 Oct 2020 17:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726097AbgJ1Vpu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Oct 2020 19:45:10 -0400
-Received: by mail-il1-f176.google.com with SMTP id y17so3111418ilg.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2020 16:45:09 -0700 (PDT)
+        Wed, 28 Oct 2020 17:45:50 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD94C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2020 14:45:50 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id 140so471574qko.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2020 14:45:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:subject:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to;
-        bh=m1UUkXijJnMnnzKxKP14uscpRaaYLhLlNmTV4ZdWBwA=;
-        b=VXIxzDfA3n949Ibl7Q36hiiXDqJleh9Elmdu7S6BkP5h4xD5NopjiMul1F5nto8Xwe
-         54YYkaMGnjTcCIQL1bCIDPQOx7a0sc75v24VKXF2zdXmKE5dQ81xKll7q+b2FgrgUmV3
-         kDbk+9qskMd3hccitumIzlRoPzuA7A1igttF0DBGjQPX/JUQuI1mPJJLA5WMG7FlwzR9
-         t+y9DXAVgC4UzdNC1TFwxkPldX0Dy5uGVp+2NBY+motPs4g0yVSL7AC67xSQz11VrSoN
-         WWbzYJTtveGEMiVE7XEEzyvwU7e93w0spXaLQfhG7rK558nSz7Zai7Pyg8ouTKDncjNC
-         eMBA==
+        h=to:from:autocrypt:subject:message-id:date:user-agent:mime-version;
+        bh=QhF/l8K4YgtBILJEAFqzCpjHuXa8uBGlzWobBoe+kJA=;
+        b=nzh+ug+mVYGHyHA5NwELsbkvKywZ7vdYoS2RCph18tLwk1wA8+QjqEPSZWipFH6Z4k
+         drx1q6JJ52DBAqIcSSCDiNeulFRa+s3BiyrsHHtxMyS9Sk3IycqWBUcfP6Mdio4pq5aA
+         Jz1boaxCbhCLMszLCouGWsgRe3r8Ll6yRgYuboQ/eNihXw5bUKGV2811tIJ2Z/wORoM2
+         kM86oSVsUxUooUhFoW1sj2XqzUFXbd+P9vR1lmN2PhXGxZRUSi8S6CGQsn2Zh3TFd844
+         in6As7z7nct8+t08jbNjSc74kR/yNlCBb/a8kHROReoW9YbaiFj6XtaQBQVPaOfp/ILk
+         YXqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:subject:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to;
-        bh=m1UUkXijJnMnnzKxKP14uscpRaaYLhLlNmTV4ZdWBwA=;
-        b=mVucpFNYEA880+h1LD5wUnx76lp/tMAMSnI8ZeCHbo+qB7GdpnqQ1Fd+L6V2ewMvpx
-         JHMq7MicxcZjI214LGiyzNgOSemSL9TctJkW/8J4JvRK6fHmcaoe10GNyS5ofAyuNnjF
-         srzJYoHd+q6IJYQUAyD0656vuUusCs9sD6DsNE+DO+CmQelcRM2sLx+2mIILMqk8IPIn
-         yAiS3dMli7QgvzcTZazsUwsfZ8kkPZSr4NyjcjcmyetC/bnf8un2olMdMkMUE+Mem221
-         kQGcwnjDdlB5iNdrIVGt+XrSMy65egNigVKWwpiL/ZHsS1vLIFkxpdrIFIPhQBMbnf02
-         H3Mw==
-X-Gm-Message-State: AOAM531IvE5yYa1H2L8aatsdyFfpT09JSsaYtvCFBZ1GHRqxDZyp2dhH
-        DDvagsj/RIAPXXNEphQwSMY=
-X-Google-Smtp-Source: ABdhPJz5C6Gvfz5ehFxcOLkpoJSuZdKwTfp+4wUNy8LHiQzxrpxw8Nbz429BWvhiGxgBdA4RzMee7w==
-X-Received: by 2002:a92:cd45:: with SMTP id v5mr4165998ilq.204.1603842308972;
-        Tue, 27 Oct 2020 16:45:08 -0700 (PDT)
-Received: from ?IPv6:2600:8803:7a80:18d6:b565:bd24:38d9:9e2a? ([2600:8803:7a80:18d6:b565:bd24:38d9:9e2a])
-        by smtp.gmail.com with ESMTPSA id u1sm1811578ili.55.2020.10.27.16.45.07
+        h=x-gm-message-state:to:from:autocrypt:subject:message-id:date
+         :user-agent:mime-version;
+        bh=QhF/l8K4YgtBILJEAFqzCpjHuXa8uBGlzWobBoe+kJA=;
+        b=bVMTuz17zObJWhgeLJlFMVavz2AjktgzsuPjuKZo+ABhhgMcCQqPnUN+i32j8/fKDX
+         V0O7pS1ghmG0hZ8CYOBeUbxeZmOmhM47tVxaI33tG4P8kwuey0ws7ZYCJ9w3APQVogpr
+         UkAGbtg9VdNLdGaWkemCybBDamGu10/FOkjUj1WAp04b+KmRpN+dk3N+FNzC3k3lpPiV
+         rhynzx5C3ty+6nRybtyHUlraRypU62fJvYyS9BH4qkOibWfLQiuAgSRqW9+lewO/hUG7
+         SprNjZv0NT1A8w621Gvxov1+GfdRUIP5HwYdA8E8/WI3l61XJ2dstfYiufiJeHLYEoOw
+         5yQQ==
+X-Gm-Message-State: AOAM5315IeXkxPa8KMxiqweSDUcSz7wL138vvVes8IvJ8rztfrpSfgJq
+        elipn/SPbPot+wLGm2WhKWJs5eT8wlMKVg==
+X-Google-Smtp-Source: ABdhPJzvwJ98FygkPG06bSrI7izItvl/EjaRrFdhUcsRSgVPer6oyniApzguDtzcPMaU+7phP9PXmg==
+X-Received: by 2002:a05:620a:1265:: with SMTP id b5mr7712459qkl.27.1603902579659;
+        Wed, 28 Oct 2020 09:29:39 -0700 (PDT)
+Received: from [10.249.129.62] (nat-216-240-30-11.netapp.com. [216.240.30.11])
+        by smtp.gmail.com with ESMTPSA id n3sm3051993qta.10.2020.10.28.09.29.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Oct 2020 16:45:07 -0700 (PDT)
-To:     127.joschi@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, pali@kernel.org
-References: <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
-Subject: Re: Bluetooth: Allow to use configure SCO socket codec parameters
+        Wed, 28 Oct 2020 09:29:38 -0700 (PDT)
+To:     127.joschi@gmail.com, linux-bluetooth@vger.kernel.org,
+        pali@kernel.org
 From:   Paul Stejskal <paul.stejskal@gmail.com>
 Autocrypt: addr=paul.stejskal@gmail.com; keydata=
  xjMEX15YFxYJKwYBBAHaRw8BAQdABjSNJJDYxDa/ApivdnlfMyMjlDnvR353l2V5he2rnujN
@@ -70,53 +70,41 @@ Autocrypt: addr=paul.stejskal@gmail.com; keydata=
  EAOCr8+e7X2atwJOh7oEBF+8PkUYvzuUMgMBCAfCfgQYFggAJhYhBJ6iZYZmRXXCSVdf9oVp
  Im9DktHIBQJfXlgXBQkFo5qAAhsMAAoJEIVpIm9DktHIE7oA/1MgJMALdF2JMjUokDc2WZAe
  9x25D06HLh+QECZ8uXtzAQC5Vy9Cjxc8rw7Ld1ui1Ls8/Kq46LrjIsG6X+StjxszCA==
-Message-ID: <265f2b10-8a1a-8165-04f9-58024a89d4fc@gmail.com>
-Date:   Tue, 27 Oct 2020 18:45:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.2
+Subject: Re: Bluetooth: Allow to use configure SCO socket codec parameters
+Message-ID: <0a520235-f1be-2b51-b047-4960f58e0715@gmail.com>
+Date:   Wed, 28 Oct 2020 11:29:37 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.3
 MIME-Version: 1.0
-In-Reply-To: <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="2tbz2irKAEOexHQezuPxUu8z8hGscDWbt"
+ boundary="0XRFGi4Ros8IVoGuCFhFPMlOGoq9AV4IZ"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2tbz2irKAEOexHQezuPxUu8z8hGscDWbt
-Content-Type: multipart/mixed; boundary="QULVkOlBN4vLbcQV5oLQAuL9xZGYGRt6J";
+--0XRFGi4Ros8IVoGuCFhFPMlOGoq9AV4IZ
+Content-Type: multipart/mixed; boundary="ms9rO4b1d7oR0WkelR0nUoWrU8JgOyJin";
  protected-headers="v1"
 From: Paul Stejskal <paul.stejskal@gmail.com>
-To: 127.joschi@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, pali@kernel.org
-Message-ID: <265f2b10-8a1a-8165-04f9-58024a89d4fc@gmail.com>
+To: 127.joschi@gmail.com, linux-bluetooth@vger.kernel.org, pali@kernel.org
+Message-ID: <0a520235-f1be-2b51-b047-4960f58e0715@gmail.com>
 Subject: Re: Bluetooth: Allow to use configure SCO socket codec parameters
-References: <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
-In-Reply-To: <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
 
---QULVkOlBN4vLbcQV5oLQAuL9xZGYGRt6J
+--ms9rO4b1d7oR0WkelR0nUoWrU8JgOyJin
 Content-Type: multipart/mixed;
- boundary="------------92270295635D1914519BF705"
-Content-Language: en-US
+ boundary="------------D93D5E93196F7165B7E2AFFB"
 
 This is a multi-part message in MIME format.
---------------92270295635D1914519BF705
-Content-Type: text/plain; charset=utf-8; format=flowed
+--------------D93D5E93196F7165B7E2AFFB
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-> I hope this can be pushed forward. Would make me (and many other) users=
-
-> so happy to finally get wireless headphones working better!
-
-I agree. What is needed to push this forward?
-
-Thank you.
-
-Paul
+What can we do to get this published?
 
 
---------------92270295635D1914519BF705
+--------------D93D5E93196F7165B7E2AFFB
 Content-Type: application/pgp-keys;
  name="OpenPGP_0x8569226F4392D1C8.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -143,21 +131,21 @@ jxc8rw7Ld1ui1Ls8/Kq46LrjIsG6X+StjxszCA=3D=3D
 =3D9569
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------92270295635D1914519BF705--
+--------------D93D5E93196F7165B7E2AFFB--
 
---QULVkOlBN4vLbcQV5oLQAuL9xZGYGRt6J--
+--ms9rO4b1d7oR0WkelR0nUoWrU8JgOyJin--
 
---2tbz2irKAEOexHQezuPxUu8z8hGscDWbt
+--0XRFGi4Ros8IVoGuCFhFPMlOGoq9AV4IZ
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wnsEABYIACMWIQSeomWGZkV1wklXX/aFaSJvQ5LRyAUCX5ixAgUDAAAAAAAKCRCFaSJvQ5LRyPo3
-AP4tCn5vzANzM4utHHANPcLiv9CjHVBq8XU63r97CLHYrAEA9RU8EUh16LttkPDj5vkT6bG94dB9
-It+NbbDlDIJJKQk=
-=ckKM
+wnsEABYIACMWIQSeomWGZkV1wklXX/aFaSJvQ5LRyAUCX5mccQUDAAAAAAAKCRCFaSJvQ5LRyNLZ
+AQDgchp5iElPb7+NSJlVpZw4CSEXedIw6B9g/+McpCd/lwD+OvPit+AvXwAEiKMlDCqSmwX3YeUt
+TYCfX0is8qmtqg0=
+=j4we
 -----END PGP SIGNATURE-----
 
---2tbz2irKAEOexHQezuPxUu8z8hGscDWbt--
+--0XRFGi4Ros8IVoGuCFhFPMlOGoq9AV4IZ--
