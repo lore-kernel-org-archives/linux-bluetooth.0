@@ -2,107 +2,94 @@ Return-Path: <SRS0=FSAH=ED=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_STARTS_WITH_NUMS,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37415C5DF9D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2F0C4363A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3067247EA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:51:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ma9Xx16N"
+	by mail.kernel.org (Postfix) with ESMTP id 631B724743
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728234AbgJ1Vvy (ORCPT
+        id S1728620AbgJ1V4Y convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:51:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728186AbgJ1Vvx (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:51:53 -0400
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031E7C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2020 14:51:53 -0700 (PDT)
-Received: by mail-lf1-x142.google.com with SMTP id 141so721331lfn.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2020 14:51:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:date:in-reply-to:references:user-agent
-         :mime-version:content-transfer-encoding;
-        bh=NeBKMsyaOhwbafDqgThroGDniBUy61UYUZ4SjDBmGjQ=;
-        b=Ma9Xx16Njw7LE73BhulmNWnJNV4g+JmZ7qAqjklqhR0kd5PcngwaviHu/KG9wTQmn5
-         XXR8Dg25DMFPq2R7bzBDYDCxzqF4jYvPslOWiDcgsfmZxWiMI8i/t9fqkbJFmzG1Pqpz
-         LhcRZqmqomMr+oKTeLtj0eyiZCYAHI9tHa5pM2XdLhtbWcfivTNiSrzpuPIIaFU3zmof
-         iM4EpjGwDIU3TzNEfsuiNt3ZSnOPz24ISj6Wth5qHVyCXDiRCGzwuxuoXUSoIDoEojLA
-         vh8cSCgxJFE5+Ae1zeiIa6mw3e9GfcwCHH6ZonPLTyVzHeIhrjejN0km3Cj+cr15wYYU
-         wL3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=NeBKMsyaOhwbafDqgThroGDniBUy61UYUZ4SjDBmGjQ=;
-        b=VpRKIsDyLec0hO+bu853syulzVyddfNLpg4ZbXrOrNucVbeeKzhNzxtgwRJA+MrVTx
-         Y6QXh03VRnbC7BBjNB+oLMCtwtqOv+JeXj1NEeUe2+ni7/Dh0/zJL8ov+dJrjf5Nyf1d
-         1UXS4Kv0U5+8276nK2v4IheADwVpKnTj9auZDyPXoM+a4nkJ3lVU+6lFT7I15dwWXSHw
-         ycBn0qoWsvS38v5Ax4T2oxboJH8mQj0xaoMRIQqqDXxFd4y3frXSarW3K4K3HypZzljr
-         suz+EOnYlQEvnZv+jeD8IRhFx8MWc1NtXO0BCVA0Virt/ykL4IpJkqTAVpR1PPqCN/rL
-         SPPQ==
-X-Gm-Message-State: AOAM530mBqe0+ydN/buGUtuMtU162+mYOE+bP/Sm5PQU+9W2mPvDxS6q
-        IZrHqzrfwS1rA0JIMspEHwYZbTc0L1yaTQ==
-X-Google-Smtp-Source: ABdhPJwsWSQWDsofmkU1mUrgPZ4eFDpcEtyYnBNn8uUNqRWXFkp8of4spcVo81+RIxq76KayukVMog==
-X-Received: by 2002:aa7:d28c:: with SMTP id w12mr726107edq.282.1603916734413;
-        Wed, 28 Oct 2020 13:25:34 -0700 (PDT)
-Received: from jurupari (firewall.seitwerk.net. [80.155.46.66])
-        by smtp.gmail.com with ESMTPSA id b17sm359735edx.89.2020.10.28.13.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2020 13:25:33 -0700 (PDT)
-Message-ID: <847879c75cceebee9f2d414089b527cb5dcdcece.camel@gmail.com>
-Subject: Re: Bluetooth: Allow to use configure SCO socket codec parameters
-From:   Joschi 127 <127.joschi@gmail.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Pali =?ISO-8859-1?Q?Roh=E1r?= <pali@kernel.org>
-Date:   Wed, 28 Oct 2020 21:25:32 +0100
-In-Reply-To: <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
-References: <177c5794-1cd7-8f76-b66f-e9473ed37a31@redhat.com>
-         <CAB5wbS97WQTduY9sKgiLjAnpsmka+9hGQOBDdbAEHgkcwnze1w@mail.gmail.com>
-         <CABBYNZ+TQ+oSYgL1wGsC0rs9faecd0RtQkFE9fbnV89D1r=LOg@mail.gmail.com>
-         <20200516075340.3z37ejs3fuhctunl@pali>
-         <CABBYNZLWsYHeOo3_+hcq4r+gY_0sLBQhftW7My7Y4D1n9o5jxg@mail.gmail.com>
-         <20200518165011.jfarrp5mtqoy3mqz@pali>
-         <6da08b42-34d5-9d20-bfc1-161cc8d0f2ea@igalia.com>
-         <CABBYNZ+myxfFmobLuzGeYfP_G5tM_ptKgCQCmpQCiUkPZYemuQ@mail.gmail.com>
-         <aff611bb-4b38-7614-ce61-fc3e7c012615@igalia.com>
-         <20200604204343.eor47oe3fbzf6rbv@pali>
-         <20200929210452.bus2qqbikvu2xtwy@pali>
-         <f40ad39dad23c813441a3082550ad44f85671f2d.camel@gmail.com>
+        Wed, 28 Oct 2020 17:56:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47634 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728591AbgJ1V4O (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 28 Oct 2020 17:56:14 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 208965] not working bluetooth mouse low energy rtl8822ce
+Date:   Wed, 28 Oct 2020 21:56:14 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: waffen03@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-208965-62941-VuI76IWFuW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-208965-62941@https.bugzilla.kernel.org/>
+References: <bug-208965-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=208965
 
-Am Mittwoch, den 28.10.2020, 11:29 -0500 schrieb Paul Stejskal:
-> What can we do to get this published?
+--- Comment #31 from waffen03@gmail.com ---
+(In reply to fakecop from comment #30)
+> (In reply to Niklas Frank from comment #29)
+> > (In reply to Edward Vear from comment #25)
+> > > (In reply to david.zakarias from comment #20)
+> > > > Is it possible that a newer firmware fixes the problem? I also have
+> > version
+> > > > 0x09993aa1. 
+> > > > Julian what version do you have?
+> > > 
+> > > Hi David,
+> > > 
+> > > I ran into the same Set Resolvable Private Address error with my adapter,
+> > an
+> > > rtl8761b. I submitted a patch here with my understanding of the issue:
+> > > https://marc.info/?l=linux-bluetooth&m=160378222632366&w=2. Could you
+> check
+> > > to see if that patch helps?
+> > > 
+> > > I don't believe it is related to the original issue seen in this thread
+> > > though.
+> > 
+> > Thanks alot! I am now able to connect to my Bluetooth mouse!
+> > 
+> > Although I notice that the bluetooth adapter still behaves weird. It
+> > sometimes simply stops working and I have to unload and load the `btusb`
+> > kernel module to get the adapter working again. 
+> > 
+> > As for Distro/Kernel Version: I am using Manjaro and I have applied the
+> > patches on top of Kernel 5.9.3
 > 
+> Hi, please tell me how you managed to apply the patch??
+> Thanks
 
-As far as I understand Pali is waiting for feedback for his updated
-suggestion from this email 
-https://lore.kernel.org/linux-bluetooth/20191121224455.orhslaa6zdmlwe43@pali/
- with this patch attached 
-https://lore.kernel.org/linux-bluetooth/20191121224455.orhslaa6zdmlwe43@pali/1.2-sco.patch
+You need the source code to compile a modified kernel. If you have it you could
+just go in and edit the file in question manually (net/bluetooth/hci_core.c) or
+apply the patch with the patch command if you find it easier.
 
-And as soon as this approach is confirmed I guess he could provide a
-new updated patch in the required format and updated to the latest
-mainline kernel version?
-
-@Pali: Not sure if I got it right. Maybe you can check yourself and
-confirm or correct me if I'm wrong.
-
-Thanks to all!
-
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
