@@ -2,158 +2,109 @@ Return-Path: <SRS0=NHH5=EE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD5C55178
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 860F0C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E65A2076E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:10:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D08720791
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k9eXKy6+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJ+v4f62"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726235AbgJ2KKE (ORCPT
+        id S1725839AbgJ2Kiv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 06:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        Thu, 29 Oct 2020 06:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726999AbgJ2KKC (ORCPT
+        with ESMTP id S1725774AbgJ2Kiv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Oct 2020 06:10:02 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40D3C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:10:01 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id w16so1657585ply.15
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:10:01 -0700 (PDT)
+        Thu, 29 Oct 2020 06:38:51 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22398C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:38:51 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id p10so2501846ile.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:38:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=YO/jkQ1Xvo2Pu21jszB9gfiRu/kN1DHdIpxIq7BUWuc=;
-        b=k9eXKy6+qxU1yQDJFKC3LWpgI+hJlBrVKphtQqCMF4frZlJFKDhWwMqqoSJ1+jkTBM
-         7BVNZ9JXLCjDK/1+18dLTpGcicgaSDnD+njg5Z7fqmjJuwgkGPXzUo9MUg1hTaMBfG+i
-         02EByLnTrhEvUNUKILh+K/yOjpbLvLicuUNB9iq7eLm5rptyOM2Sj2DdWdw5po+o2E5k
-         UpYf3Gvz1V13QEn7/9ZVjltrREb+6c0lYS/bF4/OJngAxbQVh07gnVhs+Z947/jkk8OM
-         bNDUbNxqrhfXtdFDynujgzXvn9VKrh5EYaJsO73zbZmF3HMxeNorVwahiYAnRNmEbGhM
-         ANPA==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=WcMJy9DyfnhL9GdsrjzdXmeowyjRZ5QFa02p6AxrilM=;
+        b=OJ+v4f62g9zIXcT0aLy27j0/izIofRCpJllUr7vwB3sUSMz1OeoshpSumus3+W3Igt
+         lTtFfTGojfW2PK+whvPYFMX+Y0mwEpcGMUH/JVWF2RGsbK6SqgDkEEbJBZxX1L35F80U
+         CO4Xf3TK2YZyNoS0bBit6plldCqtDo4PrRf/W3nx+qR1z0lRim+c5fUFtDXfEgO9MojA
+         y0ZqplxLnbxIItaTEqay3aGPzcZgn5uPKmCEyRZn9JtijScL4PANhprEml8wePzoGdJH
+         ewtG1a1BHtG79L2o4FLK0kjDzVaQb9iF/o7pQBs8Qz6j8XobbJjwEQskH+UR7W/Ywvp6
+         r2KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=YO/jkQ1Xvo2Pu21jszB9gfiRu/kN1DHdIpxIq7BUWuc=;
-        b=JjHXADAK1MRLxjrN0s1+Ryb5TjQRKpzzXFBa7ljxDtfsUIrgaExFheBkcznqMtWLaF
-         9j0PUUl3zNWqce01nAhq8q/wvNJVKW2WEWRFlrtZB/AcM0EMPh9iKXlF7yQ8up9Tpb8s
-         v746mee8Ou7dj/WaNtj5MKrsG6X5Occ3oxBWdDYDaLEgsRYwMmlRS2OwAc7+/C72l3Fv
-         wV5JIDX/MCWrcm4OixKgxe3kwRd8rN5ZcwOJzvT9m1YOiTpJeFkQT7kioSOs6qAEphsm
-         PfauVJ68mYQYj/KvHTij+jmDSKUBxj/iO3MN3ANzEQD9QKH/vrrvfQBwjnYEkqaEMGmt
-         K9sg==
-X-Gm-Message-State: AOAM532thTkHj9AVqi7949KgAex3YVrXekJ/sv/sQY31RJop+deswc+x
-        unEdGjk6c2oGHHZgogT5uXaBFhtK5+jpHDf/P2CcAJ5h1PwrUeqXprUpJEV+sTPKL2UcWDWZqNH
-        y4QrV1lHIJ+j6mI1kbUMrsxtzkg7xm83aZ+JCqmXfiXmFhHblISbBqFwFpZvaKwzsRbkrBPv8Gj
-        Zs+meucov7SeQ=
-X-Google-Smtp-Source: ABdhPJzHpexJHMKPvKC92yvhH7SEdCiI3T2io2Hr7LKKdU4IyioofEZZjWPIxam7CjASLUYNsdFOOzTVQ3vr90bOnQ==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a17:90b:f85:: with SMTP id
- ft5mr1128pjb.1.1603966201148; Thu, 29 Oct 2020 03:10:01 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 18:09:45 +0800
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=WcMJy9DyfnhL9GdsrjzdXmeowyjRZ5QFa02p6AxrilM=;
+        b=I66ATHiF1MwL623GEqh79qIvqJueLt6dUg3BWwDR3/T6bcR8lKRfmGhHt5c7dpT20i
+         AVq0sst7tvbg4rhJ8HPl8saIW2S0X1DWvTRvwQ8s38Iyv31nvTYTL/JH6EDJjhhpHKXC
+         YAc6ergUmPzNn9vuNAA3anPouivUJhyFXVMndtuAE43kNIKwK2NzHCcZnJYQYIxcSfDU
+         DeBwrxYqFKm52qqxbNjXQnLKM8fKCD+3X3yzNINsUE/ogmCgcBNV3CQr4Q5h5Pk3YtMZ
+         3D0ndThJq6tXEmvfeoRsFxXGD0qn03fQ0gEoiCWDQu5U30LASF3Vf3sLexE5H3lREPPc
+         TQ+g==
+X-Gm-Message-State: AOAM531qIzlJLxAecwfFNzs9+UFwOZecllA0lnnEv9xWKZqGNFOE9F/4
+        WZ9I5GTJPp61a8EzY1MP8tLwwR95R32bQw==
+X-Google-Smtp-Source: ABdhPJxiG6L5fGIYtG6ZS1pJJolY/IxxjAS94D8XLVcsgMsjx9HmztjPOEm7csTTwMEg37ymkVmr9Q==
+X-Received: by 2002:a92:1f90:: with SMTP id f16mr2592230ilf.296.1603967930257;
+        Thu, 29 Oct 2020 03:38:50 -0700 (PDT)
+Received: from [172.17.0.2] ([40.70.76.178])
+        by smtp.gmail.com with ESMTPSA id o13sm1715207iop.46.2020.10.29.03.38.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Oct 2020 03:38:49 -0700 (PDT)
+Message-ID: <5f9a9bb9.1c69fb81.ed651.85c4@mx.google.com>
+Date:   Thu, 29 Oct 2020 03:38:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2650172682000502684=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: [BlueZ,1/3] monitor: Decode ADV Monitor read feature command
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20201029180756.BlueZ.1.I3e9cc07cf60d04d69c8045c442b6cf9f0c3292e7@changeid>
-Message-Id: <20201029180756.BlueZ.3.I949a055ddf471aba93424ebaa7eb65c2d7f58682@changeid>
-Mime-Version: 1.0
 References: <20201029180756.BlueZ.1.I3e9cc07cf60d04d69c8045c442b6cf9f0c3292e7@changeid>
-X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [BlueZ PATCH 3/3] monitor: Decode Remove ADV Monitor
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     alainm@chromium.org, luiz.dentz@gmail.com, mcchou@chromium.org,
-        mmandlik@chromium.org, Howard Chung <howardchung@google.com>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for Remove Advertisement Monitor MGMT command and event.
+--===============2650172682000502684==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-@ MGMT Command: Remove Advertisement Monitor (0x0053) plen 2
-	Handle: 1
-@ MGMT Event: Advertisement Monitor Added (0x002c) plen 2
-        Handle: 1
-@ MGMT Event: Command Complete (0x0001) plen 5
-      Remove Advertisement Monitor (0x0053) plen 2
-        Status: Success (0x00)
-        Handle: 1
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=372967
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- monitor/packet.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b3a6ed24d5fc..dcbed9f0f287 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -13232,6 +13232,22 @@ static void mgmt_add_adv_monitor_patterns_rsp(const void *data, uint16_t size)
- 	print_field("Handle: %d", handle);
- }
- 
-+static void mgmt_remove_adv_monitor_patterns_cmd(const void *data,
-+								uint16_t size)
-+{
-+	uint16_t handle = get_le16(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
-+static void mgmt_remove_adv_monitor_patterns_rsp(const void *data,
-+								uint16_t size)
-+{
-+	uint16_t handle = get_le16(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -13469,6 +13485,9 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x0052, "Add Advertisement Monitor",
- 				mgmt_add_adv_monitor_patterns_cmd, 1, false,
- 				mgmt_add_adv_monitor_patterns_rsp, 2, true},
-+	{ 0x0053, "Remove Advertisement Monitor",
-+				mgmt_remove_adv_monitor_patterns_cmd, 2, true,
-+				mgmt_remove_adv_monitor_patterns_rsp, 2, true},
- 	{ }
- };
- 
-@@ -13880,6 +13899,13 @@ static void mgmt_adv_monitor_added_evt(const void *data, uint16_t size)
- 	print_field("Handle: %d", handle);
- }
- 
-+static void mgmt_adv_monitor_removed_evt(const void *data, uint16_t size)
-+{
-+	uint16_t handle = get_le16(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- static void mgmt_controller_suspend_evt(const void *data, uint16_t size)
- {
- 	uint8_t state = get_u8(data);
-@@ -14011,6 +14037,8 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_device_flags_changed_evt, 15, true },
- 	{ 0x002b, "Advertisement Monitor Added",
- 			mgmt_adv_monitor_added_evt, 2, true },
-+	{ 0x002c, "Advertisement Monitor Added",
-+			mgmt_adv_monitor_removed_evt, 2, true },
- 	{ 0x002d, "Controller Suspended",
- 			mgmt_controller_suspend_evt, 1, true },
- 	{ 0x002e, "Controller Resumed",
--- 
-2.29.1.341.ge80a0c044ae-goog
-
+--===============2650172682000502684==--
