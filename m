@@ -8,65 +8,64 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74080C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45198C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02DF420791
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D05C92076D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B14D4eIS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qOgCOL+d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbgJ2XGo (ORCPT
+        id S1725993AbgJ2XGq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 19:06:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33106 "EHLO
+        Thu, 29 Oct 2020 19:06:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725379AbgJ2XGo (ORCPT
+        with ESMTP id S1725379AbgJ2XGq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Oct 2020 19:06:44 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15C5C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:42 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id z22so2859237qtn.15
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:42 -0700 (PDT)
+        Thu, 29 Oct 2020 19:06:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9D2C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:44 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id h20so3046028plr.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=zuhfLKEUtEGEMJqXrvXVRjdqHiNaZBiPcKeWfhMqNFc=;
-        b=B14D4eISaonpGZm/V642/LoEDYIOBDzqy3a+XaGfDYivbnhT7Uxa1bLyVQ8G8Kik8m
-         +VSR9X2/gi/ew3Ndx9PvrFv0UvOvTGygH3v2z/FUR3bPq2kPKnLXppvYFewZzLPgyFDh
-         qCt1G8dqmhuC30Z/O0ZWesfZndTYEdqhg7c21mhhlO7W4cG3dUxBPEkdYsvQKrtsj+Wg
-         DtDlZxsZD+XRsoTqILHHhMSupsCvhFcdL/ZqhquxuGyyBslU3DRDItz1j+EedNuxxMY8
-         Ng/RRfl9bvh5YlqcqkHq21L6dtsqTZlJN4JHnsqccgrM0XqP8rKG/JlhpSLk2mxVvO+q
-         jRVw==
+        bh=g4PW5RzbK7Ij0OSBdI/okxbzAFUw1O+1dvC3Arqh7Q0=;
+        b=qOgCOL+dFH2AnBk0T3dwC3B7ZveyCsoM8MaRz/K/ilJjEy3zMBJylQYUNfNQR0ZqLq
+         fWZb8PzJkw5zor0xzuZbxXb3AwwVVqMj6bgEm+CGMGNdF+gOkQMi024/1ipztAfUBKZt
+         8NUhtDyHoBBY1yBdGSF9GuCJTZZb2iRwuXTMzceVKBLi6MOPg2GTIjTGgU9J8X4IrK2X
+         wCYBTFXXKZ/UKI012ZvYSP6ocPZ9DliYj78l2vUA7c4eLIhYFQ7x8UojL+v1wTk3iXg+
+         e3o/VKWhoptLgRw0n2coK0/P6eKdGn7SOzTzBH+fHlTG0RUhjdc987WbPdcUt9mIJYNo
+         +XEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zuhfLKEUtEGEMJqXrvXVRjdqHiNaZBiPcKeWfhMqNFc=;
-        b=RuHtnwRdkZT0mBCZPf2RcCmvvmJIN5/oCkS2BqtxniTevWL+eVokV/9WdOEYZsuJAh
-         aXa5WPlAenPTsayfzPWkS8BsKKUZJg8McTcIBoG0i2X4RGRK59IqEffeCvozupUnzK6l
-         9pPyhnft5+Zw+V9nDXgvcao4eZFdqcwgC6qiN4/XETRGVkNoiY4O5EuCx17lUC3eEbZg
-         0x/tsMWu2KcZaRM1doXZYcUT9M0g3MoD3zSkbkIxcSjqJV0fOXokVXniW1L5p6nQQc0a
-         yEPFnCj69sIOyV6T9G4vGHLEFWeBulBl8JBZ+Xp9U1hSZW8xBZOwitK2xDWLX6MoM4U6
-         LKdw==
-X-Gm-Message-State: AOAM530PPzT6ZxscP5A35cRE5mAo501g2QIdgj7MouTddm6L+k3s+/7p
-        bzSVSqPJlUi1/vbCq+FotFcWz0Q6LKjO2W//9+zV
-X-Google-Smtp-Source: ABdhPJwQHBKDgVaJhnOYalcUVE0Kqs1QlwriiXTyr1w1gm4cX3QQ85IjHnL+UKCW95MBVLonhtuTWxs+fv3imwQHsA0Y
+        bh=g4PW5RzbK7Ij0OSBdI/okxbzAFUw1O+1dvC3Arqh7Q0=;
+        b=ZQNWO5mssAO5/Wc3K3rktTrMqzdNUis2EB1rQRWNkjpRj0MTsueQlOCptBaF1vN/6/
+         lnvSdEsza6i2RXZGzkXhebyQpPMd6RpfEba/Abzx1m5z4/sElu1EE01c5uUDclCCxuC4
+         UW2UqxjR9OiA/4hDDPasnG38/1NCVS2pdcmnpGjEe+RWo4oxRnk/zTjR0M8DipCmqzzp
+         XPLExmrD9G2nEqcEhmiulgM6hKF33vtc7vGn9hcB8VhaW5meDbqVcR7KsPLm8KHUZRxP
+         +IgU5W8VAQWTHmJq3kIxUPQUawD5CYCVfgCcxIRVfeJAxLTJlNp24wXbGTSJ8A703L+c
+         QmdA==
+X-Gm-Message-State: AOAM530/oFUna4PA72uclSh9lZafhG2BD6AcLwYHKqXMJzlzYy9aiGO/
+        OFvuHCnewiYQWH9Xj1PnKGQt0lwzcsB1xNxBErDq
+X-Google-Smtp-Source: ABdhPJxXU6QDDmPvm1OOZ1les0E8tWSQKvnQ1PbqPbZMXjNTXhCsBtAZ+VHg0L76zGh1yfmJACyY1QfFcPmKbsWSYYxX
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a05:6214:184c:: with SMTP id
- d12mr6643853qvy.11.1604012801857; Thu, 29 Oct 2020 16:06:41 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 16:06:18 -0700
+ (user=danielwinkler job=sendgmr) by 2002:a17:90a:5991:: with SMTP id
+ l17mr125427pji.0.1604012804039; Thu, 29 Oct 2020 16:06:44 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 16:06:19 -0700
 In-Reply-To: <20201029230623.3630069-1-danielwinkler@google.com>
-Message-Id: <20201029160317.Bluez.v6.6.Ia49df7ccded97ceb4ff1d1b0decc49d03d088a84@changeid>
+Message-Id: <20201029160317.Bluez.v6.7.I187f71748b9bd93f6bf97ec4a195216109c3ea06@changeid>
 Mime-Version: 1.0
 References: <20201029230623.3630069-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [Bluez PATCH v6 06/10] advertising: Use new mgmt interface for
- advertising add
+Subject: [Bluez PATCH v6 07/10] advertising: Query LE TX range at manager initialization
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     luiz.von.dentz@intel.com
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -79,421 +78,222 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch allows bluetoothd to use the new extended advertising add
-mgmt interface if it is available. The new interface will be used by
-default, as it allows the client to set advertising intervals, and tx
-power if the controller and kernel support extended advertising.
+This patch calls the new MGMT command to get controller capabilities,
+and parses the min and max LE tx power range when the manager is
+initialized. This will be used to populate a client-facing dbus entry so
+that the client will know the advertising capabilities of the controller
+before registering an advertisement.
 
-Each new registered advertisement will submit two requests to kernel;
-the first sets the advertising parameters for the advertising instance,
-and the second sets the advertising data and scan response for the
-instance.
-
-The parameters MGMT request will return the tx power selected by the
-controller (if applicable), which is propagated to the client via a dbus
-Set method.
-
-Note: This patch also fixes a small bug in the packet monitor, where the
-tx power value 0xff is considered as "Host has no preference". However,
-the spec states this value to be 0x7f. It is corrected in this patch
-
-This change has been tested extensively on Hatch (extended advertising)
-and Kukui (no extended advertising) chromebooks. Manual tests do the
-following:
-- Configure advertisement with custom intervals, tx power with valid and
-  invalid values and combinations
-- Ensure that with valid parameters, they are propagated and set in hci
-  requests. With invalid parameters, ensure that the registration fails.
-
-Automatic tests verify 25 advertising usage scenarios involving single
-and multi-advertising registration, over-registration, parameter
-validation, etc. These tests don't test new intervals and tx power, but
-validate that the new MGMT interface does not regress compatibility in
-these 25 scenarios.
+This patch is tested by manually verifying the data is parsed correctly
+from the MGMT response.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
 
 Changes in v6: None
-Changes in v5: None
+Changes in v5:
+- Verify capabilities MGMT command is supported before calling it
+
 Changes in v4:
-- Moved optional params into flags field
-- Use returned max data length in adv data length check
+- Move tx power range into single capability field
 
-Changes in v3:
-- Added selected tx power to MGMT params response
+Changes in v3: None
+Changes in v2: None
 
-Changes in v2:
-- Cleaned fail path in add_adv_params_callback
-
- lib/mgmt.h        |  28 ++++++
- monitor/packet.c  |   4 +-
- src/advertising.c | 223 ++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 238 insertions(+), 17 deletions(-)
+ lib/mgmt.h        | 14 ++++++++----
+ src/adapter.c     |  4 ++++
+ src/adapter.h     |  1 +
+ src/advertising.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++
+ tools/btmgmt.c    | 12 +++++-----
+ 5 files changed, 77 insertions(+), 10 deletions(-)
 
 diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 59608e7ea..7ab4fb797 100644
+index 7ab4fb797..f37f7e654 100644
 --- a/lib/mgmt.h
 +++ b/lib/mgmt.h
-@@ -503,6 +503,10 @@ struct mgmt_rp_add_advertising {
- #define MGMT_ADV_FLAG_SEC_1M		(1 << 7)
- #define MGMT_ADV_FLAG_SEC_2M		(1 << 8)
- #define MGMT_ADV_FLAG_SEC_CODED		(1 << 9)
-+#define MGMT_ADV_PARAM_DURATION		(1 << 12)
-+#define MGMT_ADV_PARAM_TIMEOUT		(1 << 13)
-+#define MGMT_ADV_PARAM_INTERVALS	(1 << 14)
-+#define MGMT_ADV_PARAM_TX_POWER		(1 << 15)
- 
- #define MGMT_OP_REMOVE_ADVERTISING	0x003F
- struct mgmt_cp_remove_advertising {
-@@ -701,8 +705,32 @@ struct mgmt_rp_remove_adv_monitor {
+@@ -599,10 +599,16 @@ struct mgmt_cp_set_blocked_keys {
+ 	struct mgmt_blocked_key_info keys[0];
  } __packed;
  
- #define MGMT_OP_ADD_EXT_ADV_PARAMS		0x0054
-+struct mgmt_cp_add_ext_adv_params {
-+	uint8_t		instance;
-+	uint32_t	flags;
-+	uint16_t	duration;
-+	uint16_t	timeout;
-+	uint32_t	min_interval;
-+	uint32_t	max_interval;
-+	int8_t		tx_power;
-+} __packed;
-+struct mgmt_rp_add_ext_adv_params {
-+	uint8_t	instance;
-+	int8_t	tx_power;
-+	uint8_t	max_adv_data_len;
-+	uint8_t	max_scan_rsp_len;
-+} __packed;
+-#define MGMT_OP_READ_SECURITY_INFO	0x0048
+-struct mgmt_rp_read_security_info {
+-	uint16_t sec_len;
+-	uint8_t  sec[0];
++#define MGMT_CAP_SEC_FLAGS		0x01
++#define MGMT_CAP_MAX_ENC_KEY_SIZE	0x02
++#define MGMT_CAP_SMP_MAX_ENC_KEY_SIZE	0x03
++#define MGMT_CAP_LE_TX_PWR		0x04
++
++#define MGMT_OP_READ_CONTROLLER_CAP	0x0048
++#define MGMT_READ_CONTROLLER_CAP_SIZE	0
++struct mgmt_rp_read_controller_cap {
++	uint16_t cap_len;
++	uint8_t cap[0];
+ } __packed;
  
- #define MGMT_OP_ADD_EXT_ADV_DATA		0x0055
-+struct mgmt_cp_add_ext_adv_data {
-+	uint8_t	instance;
-+	uint8_t	adv_data_len;
-+	uint8_t	scan_rsp_len;
-+	uint8_t	data[0];
-+} __packed;
-+struct mgmt_rp_add_ext_adv_data {
-+	uint8_t	instance;
-+} __packed;
- 
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
-diff --git a/monitor/packet.c b/monitor/packet.c
-index dcbed9f0f..a97f2af52 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -6980,8 +6980,8 @@ static void le_set_ext_adv_params_cmd(const void *data, uint8_t size)
- 	print_peer_addr_type("Peer address type", cmd->peer_addr_type);
- 	print_addr("Peer address", cmd->peer_addr, cmd->peer_addr_type);
- 	print_adv_filter_policy("Filter policy", cmd->filter_policy);
--	if (cmd->tx_power == 0xff)
--		print_field("TX power: Host has no preference (0xff)");
-+	if (cmd->tx_power == 0x7f)
-+		print_field("TX power: Host has no preference (0x7f)");
- 	else
- 		print_power_level(cmd->tx_power, NULL);
- 
-diff --git a/src/advertising.c b/src/advertising.c
-index 8443251bd..e0de31098 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -82,6 +82,7 @@ struct btd_adv_client {
- 	uint32_t min_interval;
- 	uint32_t max_interval;
- 	int8_t tx_power;
-+	mgmt_request_func_t refresh_done_func;
- };
- 
- struct dbus_obj_match {
-@@ -788,19 +789,9 @@ static uint8_t *generate_scan_rsp(struct btd_adv_client *client,
- 	return bt_ad_generate(client->scan, len);
- }
- 
--static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func,
--						unsigned int *mgmt_id)
-+static int get_adv_flags(struct btd_adv_client *client)
- {
--	struct mgmt_cp_add_advertising *cp;
--	uint8_t param_len;
--	uint8_t *adv_data;
--	size_t adv_data_len;
--	uint8_t *scan_rsp;
--	size_t scan_rsp_len = -1;
- 	uint32_t flags = 0;
--	unsigned int mgmt_ret;
--
--	DBG("Refreshing advertisement: %s", client->path);
- 
- 	if (client->type == AD_TYPE_PERIPHERAL) {
- 		flags = MGMT_ADV_FLAG_CONNECTABLE;
-@@ -812,6 +803,26 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func,
- 
- 	flags |= client->flags;
- 
-+	return flags;
-+}
-+
-+static int refresh_legacy_adv(struct btd_adv_client *client,
-+				mgmt_request_func_t func,
-+				unsigned int *mgmt_id)
-+{
-+	struct mgmt_cp_add_advertising *cp;
-+	uint8_t param_len;
-+	uint8_t *adv_data;
-+	size_t adv_data_len;
-+	uint8_t *scan_rsp;
-+	size_t scan_rsp_len = -1;
-+	uint32_t flags = 0;
-+	unsigned int mgmt_ret;
-+
-+	DBG("Refreshing advertisement: %s", client->path);
-+
-+	flags = get_adv_flags(client);
-+
- 	adv_data = generate_adv_data(client, &flags, &adv_data_len);
- 	if (!adv_data || (adv_data_len > calc_max_adv_len(client, flags))) {
- 		error("Advertising data too long or couldn't be generated.");
-@@ -864,6 +875,75 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func,
- 	return 0;
- }
- 
-+static void add_adv_params_callback(uint8_t status, uint16_t length,
-+				    const void *param, void *user_data);
-+
-+static int refresh_extended_adv(struct btd_adv_client *client,
-+				mgmt_request_func_t func, unsigned int *mgmt_id)
-+{
-+	struct mgmt_cp_add_ext_adv_params cp;
-+	uint32_t flags = 0;
-+	uint16_t included_params = 0;
-+	unsigned int mgmt_ret = 0;
-+
-+	DBG("Refreshing advertisement parameters: %s", client->path);
-+
-+	flags = get_adv_flags(client);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.instance = client->instance;
-+
-+	/* Not all advertising instances will use all possible parameters. The
-+	 * included_params bit field tells the kernel which parameters are
-+	 * relevant, and sensible defaults will be used for the rest
-+	 */
-+
-+	if (client->duration) {
-+		cp.duration = client->duration;
-+		flags |= MGMT_ADV_PARAM_DURATION;
-+	}
-+
-+	if (client->min_interval && client->max_interval) {
-+		cp.min_interval = client->min_interval;
-+		cp.max_interval = client->max_interval;
-+		flags |= MGMT_ADV_PARAM_INTERVALS;
-+	}
-+
-+	if (client->tx_power != ADV_TX_POWER_NO_PREFERENCE) {
-+		cp.tx_power = client->tx_power;
-+		flags |= MGMT_ADV_PARAM_TX_POWER;
-+	}
-+
-+	cp.flags = htobl(flags);
-+
-+	mgmt_ret = mgmt_send(client->manager->mgmt, MGMT_OP_ADD_EXT_ADV_PARAMS,
-+			client->manager->mgmt_index, sizeof(cp), &cp,
-+			add_adv_params_callback, client, NULL);
-+
-+	if (!mgmt_ret) {
-+		error("Failed to request extended advertising parameters");
-+		return -EINVAL;
-+	}
-+
-+	/* Store callback, called after we set advertising data */
-+	client->refresh_done_func = func;
-+
-+	if (mgmt_id)
-+		*mgmt_id = mgmt_ret;
-+
-+
-+	return 0;
-+}
-+
-+static int refresh_advertisement(struct btd_adv_client *client,
-+			mgmt_request_func_t func, unsigned int *mgmt_id)
-+{
-+	if (client->manager->extended_add_cmds)
-+		return refresh_extended_adv(client, func, mgmt_id);
-+
-+	return refresh_legacy_adv(client, func, mgmt_id);
-+}
-+
- static gboolean client_discoverable_timeout(void *user_data)
- {
- 	struct btd_adv_client *client = user_data;
-@@ -874,7 +954,7 @@ static gboolean client_discoverable_timeout(void *user_data)
- 
- 	bt_ad_clear_flags(client->data);
- 
--	refresh_adv(client, NULL, NULL);
-+	refresh_advertisement(client, NULL, NULL);
- 
- 	return FALSE;
- }
-@@ -1070,7 +1150,8 @@ static void properties_changed(GDBusProxy *proxy, const char *name,
- 			continue;
- 
- 		if (parser->func(iter, client)) {
--			refresh_adv(client, NULL, NULL);
-+			refresh_advertisement(client, NULL, NULL);
-+
+ #define MGMT_OP_READ_EXP_FEATURES_INFO	0x0049
+diff --git a/src/adapter.c b/src/adapter.c
+index 90beb897f..cac90b01b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -9570,6 +9570,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+ 			DBG("kernel supports ext adv commands");
+ 			kernel_features |= KERNEL_HAS_EXT_ADV_ADD_CMDS;
+ 			break;
++		case MGMT_OP_READ_CONTROLLER_CAP:
++			DBG("kernel supports controller cap command");
++			kernel_features |= KERNEL_HAS_CONTROLLER_CAP_CMD;
++			break;
+ 		default:
  			break;
  		}
- 	}
-@@ -1133,6 +1214,112 @@ done:
- 	add_client_complete(client, status);
+diff --git a/src/adapter.h b/src/adapter.h
+index ace72affd..e5750a37b 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -234,6 +234,7 @@ enum kernel_features {
+ 	KERNEL_EXP_FEATURES		= 1 << 3,
+ 	KERNEL_HAS_RESUME_EVT		= 1 << 4,
+ 	KERNEL_HAS_EXT_ADV_ADD_CMDS	= 1 << 5,
++	KERNEL_HAS_CONTROLLER_CAP_CMD	= 1 << 6,
+ };
+ 
+ bool btd_has_kernel_features(uint32_t feature);
+diff --git a/src/advertising.c b/src/advertising.c
+index e0de31098..9008b7813 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -49,6 +49,8 @@ struct btd_adv_manager {
+ 	uint32_t supported_flags;
+ 	unsigned int instance_bitmap;
+ 	bool extended_add_cmds;
++	int8_t min_tx_power;
++	int8_t max_tx_power;
+ };
+ 
+ #define AD_TYPE_BROADCAST 0
+@@ -1701,6 +1703,49 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 		remove_advertising(manager, 0);
  }
  
-+static void add_adv_params_callback(uint8_t status, uint16_t length,
-+					  const void *param, void *user_data)
++static void read_controller_cap_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct btd_adv_client *client = user_data;
-+	const struct mgmt_rp_add_ext_adv_params *rp = param;
-+	struct mgmt_cp_add_ext_adv_data *cp = NULL;
-+	uint8_t param_len;
-+	uint8_t *adv_data = NULL;
-+	size_t adv_data_len;
-+	uint8_t *scan_rsp = NULL;
-+	size_t scan_rsp_len = -1;
-+	uint32_t flags = 0;
-+	unsigned int mgmt_ret;
-+	dbus_int16_t tx_power;
++	struct btd_adv_manager *manager = user_data;
++	const struct mgmt_rp_read_controller_cap *rp = param;
++	const uint8_t *ptr = rp->cap;
++	size_t offset = 0;
++	uint8_t tag_len;
++	uint8_t tag_type;
 +
-+	if (status)
-+		goto fail;
-+
-+	if (!param || length < sizeof(*rp)) {
-+		status = MGMT_STATUS_FAILED;
-+		goto fail;
++	if (status || !param) {
++		error("Failed to read advertising features: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
 +	}
 +
-+	DBG("Refreshing advertisement data: %s", client->path);
-+
-+	/* Update tx power held by client */
-+	tx_power = rp->tx_power;
-+	if (tx_power != ADV_TX_POWER_NO_PREFERENCE)
-+		g_dbus_proxy_set_property_basic(client->proxy, "TxPower",
-+				DBUS_TYPE_INT16, &tx_power, NULL, NULL, NULL);
-+
-+	client->instance = rp->instance;
-+
-+	flags = get_adv_flags(client);
-+
-+	adv_data = generate_adv_data(client, &flags, &adv_data_len);
-+	if (!adv_data || (adv_data_len > rp->max_adv_data_len)) {
-+		error("Advertising data too long or couldn't be generated.");
-+		goto fail;
++	if (sizeof(rp->cap_len) + rp->cap_len != length) {
++		error("Controller capabilities malformed, size %lu != %u",
++				sizeof(rp->cap_len) + rp->cap_len, length);
++		return;
 +	}
 +
-+	scan_rsp = generate_scan_rsp(client, &flags, &scan_rsp_len);
-+	if ((!scan_rsp && scan_rsp_len) ||
-+			scan_rsp_len > rp->max_scan_rsp_len) {
-+		error("Scan data couldn't be generated.");
-+		goto fail;
++	while (offset < rp->cap_len) {
++		tag_len = ptr[offset++];
++		tag_type = ptr[offset++];
++
++		switch (tag_type) {
++		case MGMT_CAP_LE_TX_PWR:
++			if ((tag_len - sizeof(tag_type)) !=
++					2*sizeof(manager->min_tx_power)) {
++				error("TX power had unexpected length %d",
++					tag_len);
++				break;
++			}
++			memcpy(&manager->min_tx_power, &ptr[offset], tag_len);
++			memcpy(&manager->max_tx_power, &ptr[offset+1], tag_len);
++		}
++
++		/* Step to the next entry */
++		offset += (tag_len - sizeof(tag_type));
 +	}
-+
-+	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
-+							scan_rsp_len;
-+
-+	cp = malloc0(param_len);
-+	if (!cp) {
-+		error("Couldn't allocate for MGMT!");
-+		goto fail;
-+	}
-+
-+	cp->instance = client->instance;
-+	cp->adv_data_len = adv_data_len;
-+	cp->scan_rsp_len = scan_rsp_len;
-+	memcpy(cp->data, adv_data, adv_data_len);
-+	memcpy(cp->data + adv_data_len, scan_rsp, scan_rsp_len);
-+
-+	free(adv_data);
-+	free(scan_rsp);
-+	adv_data = NULL;
-+	scan_rsp = NULL;
-+
-+	/* Submit request to update instance data */
-+	mgmt_ret = mgmt_send(client->manager->mgmt, MGMT_OP_ADD_EXT_ADV_DATA,
-+			     client->manager->mgmt_index, param_len, cp,
-+			     client->refresh_done_func, client, NULL);
-+
-+	/* Clear the callback */
-+	client->refresh_done_func = NULL;
-+
-+	if (!mgmt_ret) {
-+		error("Failed to add Advertising Data");
-+		goto fail;
-+	}
-+
-+	if (client->add_adv_id)
-+		client->add_adv_id = mgmt_ret;
-+
-+	free(cp);
-+	cp = NULL;
-+
-+	return;
-+
-+fail:
-+	if (adv_data)
-+		free(adv_data);
-+
-+	if (scan_rsp)
-+		free(scan_rsp);
-+
-+	if (cp)
-+		free(cp);
-+
-+	if (!status)
-+		status = -EINVAL;
-+
-+	/* Failure for any reason ends this advertising request */
-+	add_client_complete(client, status);
 +}
 +
- static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+ 						struct mgmt *mgmt)
  {
- 	struct adv_parser *parser;
-@@ -1191,7 +1378,9 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+@@ -1722,6 +1767,8 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+ 	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
+ 	manager->extended_add_cmds =
+ 			btd_has_kernel_features(KERNEL_HAS_EXT_ADV_ADD_CMDS);
++	manager->min_tx_power = ADV_TX_POWER_NO_PREFERENCE;
++	manager->max_tx_power = ADV_TX_POWER_NO_PREFERENCE;
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
+@@ -1738,6 +1785,15 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
  		goto fail;
  	}
  
--	err = refresh_adv(client, add_adv_callback, &client->add_adv_id);
-+	err = refresh_advertisement(client, add_adv_callback,
-+					&client->add_adv_id);
++	/* Query controller capabilities. This will be used to display valid
++	 * advertising tx power range to the client.
++	 */
++	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL &&
++			btd_has_kernel_features(KERNEL_HAS_CONTROLLER_CAP_CMD))
++		mgmt_send(manager->mgmt, MGMT_OP_READ_CONTROLLER_CAP,
++			manager->mgmt_index, 0, NULL,
++			read_controller_cap_complete, manager, NULL);
 +
- 	if (!err)
- 		return NULL;
- 
-@@ -1270,6 +1459,8 @@ static struct btd_adv_client *client_create(struct btd_adv_manager *manager,
- 	client->min_interval = 0;
- 	client->max_interval = 0;
- 
-+	client->refresh_done_func = NULL;
-+
- 	return client;
+ 	return manager;
  
  fail:
-@@ -1586,7 +1777,9 @@ void btd_adv_manager_destroy(struct btd_adv_manager *manager)
- 
- static void manager_refresh(void *data, void *user_data)
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index b0b837d34..2f7cb2efc 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1518,7 +1518,7 @@ static void cmd_extinfo(int argc, char **argv)
+ static void sec_info_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
  {
--	refresh_adv(data, user_data, NULL);
-+	struct btd_adv_client *client = data;
-+
-+	refresh_advertisement(client, user_data, NULL);
- }
+-	const struct mgmt_rp_read_security_info *rp = param;
++	const struct mgmt_rp_read_controller_cap *rp = param;
+ 	uint16_t index = PTR_TO_UINT(user_data);
  
- void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+ 	if (status != 0) {
+@@ -1533,7 +1533,7 @@ static void sec_info_rsp(uint8_t status, uint16_t len, const void *param,
+ 	}
+ 
+ 	print("Primary controller (hci%u)", index);
+-	print("\tSecurity info length: %u", le16_to_cpu(rp->sec_len));
++	print("\tSecurity info length: %u", le16_to_cpu(rp->cap_len));
+ 
+ done:
+ 	pending_index--;
+@@ -1576,11 +1576,11 @@ static void sec_index_rsp(uint8_t status, uint16_t len, const void *param,
+ 		if (rp->entry[i].type != 0x00)
+ 			continue;
+ 
+-		if (!mgmt_send(mgmt, MGMT_OP_READ_SECURITY_INFO,
++		if (!mgmt_send(mgmt, MGMT_OP_READ_CONTROLLER_CAP,
+ 						index, 0, NULL, sec_info_rsp,
+ 						UINT_TO_PTR(index), NULL)) {
+-				error("Unable to send read_security_info cmd");
+-				return bt_shell_noninteractive_quit(EXIT_FAILURE);
++			error("Unable to send read_security_info cmd");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 		pending_index++;
+ 	}
+@@ -1602,7 +1602,7 @@ static void cmd_secinfo(int argc, char **argv)
+ 		return;
+ 	}
+ 
+-	if (!mgmt_send(mgmt, MGMT_OP_READ_SECURITY_INFO, mgmt_index, 0, NULL,
++	if (!mgmt_send(mgmt, MGMT_OP_READ_CONTROLLER_CAP, mgmt_index, 0, NULL,
+ 					sec_info_rsp,
+ 					UINT_TO_PTR(mgmt_index), NULL)) {
+ 		error("Unable to send read_security_info cmd");
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
