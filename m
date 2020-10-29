@@ -2,186 +2,171 @@ Return-Path: <SRS0=NHH5=EE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88000C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 08:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1260C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:09:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D94C20757
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 08:34:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48C7220790
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 10:09:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RQLb7sn7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728379AbgJ2Idu (ORCPT
+        id S1725773AbgJ2KJy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 04:33:50 -0400
-Received: from mga11.intel.com ([192.55.52.93]:52842 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728285AbgJ2Idj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Oct 2020 04:33:39 -0400
-IronPort-SDR: M5B9+Fq/J4g2akk91kP2j4KltpBdkczRzfE7EujcY0mwd9mNLlh+kvOZ4FRBhbTeU0oo8n0+AB
- n7hN3VHtTVVA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9788"; a="164883117"
-X-IronPort-AV: E=Sophos;i="5.77,429,1596524400"; 
-   d="scan'208";a="164883117"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2020 22:28:10 -0700
-IronPort-SDR: i5Jp1GUQmhvyM5LR2bHnmt0DpTlKqJdzd9+eW5EZxY4ewmyLQv5vxJOqE4wAY2P11CUBnKBYmf
- LmsCwFLbSf4w==
-X-IronPort-AV: E=Sophos;i="5.77,429,1596524400"; 
-   d="scan'208";a="323593911"
-Received: from jbottles-mobl.amr.corp.intel.com (HELO linux.intel.com) ([10.254.103.214])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2020 22:28:10 -0700
-Date:   Wed, 28 Oct 2020 22:28:08 -0700
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Sathish Narasimman <nsathish41@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
-        ravishankar.srivatsa@intel.com, kiran.k@intel.com,
-        Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: Re: [PATCH 2/3] Bluetooth: btintel: Introducing new btintel read
- version
-Message-ID: <20201029052808.GB3990@linux.intel.com>
-References: <20201022082435.31831-1-sathish.narasimman@intel.com>
- <20201022082435.31831-3-sathish.narasimman@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201022082435.31831-3-sathish.narasimman@intel.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+        Thu, 29 Oct 2020 06:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgJ2KJx (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Oct 2020 06:09:53 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D86EC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:09:51 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id j10so2129883ybl.19
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 03:09:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=sW5mHlAap6rTyxjFI3mUs22oFcWFkQ9PYJatsj0rvu4=;
+        b=RQLb7sn79a/WRVWhH37CpoY4AAsRR9BQf3cEtp5+vgBYfYCVKGl2yjwYJsN4d/GxlB
+         Xrmb00vU16iXWWrveoKI6VLiKMDQr5PAhrBBpEDJu7XsZqTR+2wHGCKxz1ROp7zjRZ6R
+         ADwxMh4l2qAQm2fUdLQ0raB2r8zE8pRB/ZtMLGXhEaY/g8Ks4D7TiBFM16HlePMxujaq
+         skpitFJHPEhIuEjC8v+6y6nyP2byP1nQ109/alffeyOS+znnVMsYE62NrK3PMo1HX6r3
+         rLgt1lx7roXPOzXIUX4BtnBc1YAi3bBwokCwRFnsoe2Ber7i6or+OezaptMeA18Ru2Ka
+         NflQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=sW5mHlAap6rTyxjFI3mUs22oFcWFkQ9PYJatsj0rvu4=;
+        b=TEFhVn4Xt0Ful5CodrjkOMkrFiG+F+Wa7Fuhw5KkXOp5sszhcawQBgS7qiLhHFzhbI
+         P+NvD8CnA+v7yWEkrr93YWecGC3Lu+r1xoHzO6twxD6GNrAL/YiKdEIexSuZzsmvLxKS
+         Suan7J1k1d0Tk0vrBXJ3APtHnIyccOBVozsUYuuwnkvUE7JfHaEIkh4F9CJYFgdQPmft
+         6NClMrr2olpgdSsaXuvWeQHbBT0PpDasw0tLGxAcgZO7KlsLQFc+SViiiemaQmh/8ov0
+         S6KmCRiXtVxIdP676pLFlu9ptxtOAHX69eg6RWX+QJotf5wvDg4irqIbbGgbX1yC4KHs
+         FteA==
+X-Gm-Message-State: AOAM530mKPT3+0X1ZCprauhYN1KyA8TquseP3eB1aQ+1iX+4NDguEYJB
+        mfYne2Vul24j5T88dJspaP1PEFNCySGV8OIrmtAgGhMRZjYThYSf/thFEQ9mxp3Ihgw9GKyFnGX
+        cmyOGGfwoEMbs0uONb1TKZDZNdJQ5AAxOabjVp18TXdo7f077aug6jHF/EkwbLn1QDpLpun+q8r
+        hZmT7Zf43o448=
+X-Google-Smtp-Source: ABdhPJwzl6cPgb+iRjL6LVz6IcKWJkaGL7gIxBx8Qt90UqOicW1GghKM1LdomEAkX4Gs6jN6n5FpX4e27+6LN2lZWg==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:a5b:ec2:: with SMTP id
+ a2mr4719844ybs.13.1603966190734; Thu, 29 Oct 2020 03:09:50 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 18:09:43 +0800
+Message-Id: <20201029180756.BlueZ.1.I3e9cc07cf60d04d69c8045c442b6cf9f0c3292e7@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
+Subject: [BlueZ PATCH 1/3] monitor: Decode ADV Monitor read feature command
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     alainm@chromium.org, luiz.dentz@gmail.com, mcchou@chromium.org,
+        mmandlik@chromium.org, Howard Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+Add support for Read Advertisement Monitor Features mgmt operation.
 
-On 2020-10-22 at 13:54:34 +0530, Sathish Narasimman wrote:
-> The new btintel read version supports the latest intel read version
-> command and also supports the TLV structure parsing. It still
-> handles the legacy read version
-> 
-> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
-> ---
->  drivers/bluetooth/btintel.c | 51 +++++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/btintel.h | 15 +++++++++++
->  2 files changed, 66 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index cc8e6c4e3205..ddd3c4bbdd6f 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -476,6 +476,57 @@ static void btintel_parse_tlv(struct sk_buff *skb,
->  	}
->  }
->  
-> +int btintel_read_version_new(struct hci_dev *hdev, struct btintel_version *ver)
-> +{
-> +	struct sk_buff *skb;
-> +	struct intel_version *version = &ver->ver;
-> +	const u8 param[1] = { 0xFF };
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Reading Intel version info failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->data[0]) {
-> +		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
-> +			   skb->data[0]);
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	/* The new Intel read version is backward compatible for Thp and CcP
-> +	 * type cards. when the controller is in bootloader mode the controller
-> +	 * response remains same as old intel_read version. For ThP/CcP cards
-> +	 * TLV stucture supports only during the Operation Mode. The best way
+@ MGMT Command: Read Advertisement Monitor Features (0x0051) plen 0
+@ MGMT Event: Command Complete (0x0001) plen 20
+      Read Advertisement Monitor Features (0x0051) plen 17
+        Status: Success (0x00)
+        Supported Features: 0x00000000
+        Enabled Features: 0x00000000
+        Max number of handles: 32
+        Max number of patterns: 16
+        Number of handles: 2
+          Handle: 1
+          Handle: 3
 
-misspelled structure
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
 
-> +	 * to differentiate the read_version response is to check the length
-> +	 * parameter and first byte of the payload, which is a fixed value.
-> +	 * After the status parameter if the payload starts with 0x37(This is
-> +	 * a fixed value) and length of the payload is 10 then it is identified
-> +	 * as legacy struct intel_version. In the latest firmweare the support
-> +	 * of TLV structure is added during Operational Firmware.
-> +	 */
-> +	if (skb->len == sizeof(*version) && skb->data[1] == 0x37) {
-> +		memcpy(version, skb->data, sizeof(*version));
-> +		ver->tlv_format = false;
-> +		goto finish;
-> +	}
-> +
-> +	/* Consume Command Complete Status field */
-> +	skb_pull(skb, 1);
-> +
-> +	ver->tlv_format = true;
-> +
-> +	bt_dev_info(hdev, "Parsing TLV Supported intel read version");
-> +	btintel_parse_tlv(skb, &ver->ver_tlv);
-> +
-> +finish:
-> +	kfree_skb(skb);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_read_version_new);
-> +
->  int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
->  {
->  	struct sk_buff *skb;
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 09346ae308eb..08406ef935a3 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -132,6 +132,14 @@ struct intel_debug_features {
->  	__u8    page1[16];
->  } __packed;
->  
-> +struct btintel_version {
-> +	bool tlv_format;
-> +	union {
-> +		struct intel_version ver; /*Legacy Intel read version*/
-> +		struct intel_version_tlv ver_tlv;
-> +	};
-> +};
+ monitor/packet.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-Add __packed;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index d83552f74f5b..2516cf970f9f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -88,6 +88,7 @@
+ #define COLOR_UNKNOWN_ADV_FLAG		COLOR_WHITE_BG
+ #define COLOR_UNKNOWN_PHY		COLOR_WHITE_BG
+ #define COLOR_UNKNOWN_ADDED_DEVICE_FLAG	COLOR_WHITE_BG
++#define COLOR_UNKNOWN_ADVMON_FEATURES	COLOR_WHITE_BG
+ 
+ #define COLOR_PHY_PACKET		COLOR_BLUE
+ 
+@@ -13151,6 +13152,50 @@ static void mgmt_set_device_flags_rsp(const void *data, uint16_t size)
+ 	mgmt_print_address(data, type);
+ }
+ 
++static const struct bitfield_data mgmt_adv_monitor_features_table[] = {
++	{ 1, "OR Patterns"	},
++	{ }
++};
++
++static void mgmt_print_adv_monitor_features(char *label, uint32_t flags)
++{
++	uint32_t mask;
++
++	print_field("%s: 0x%8.8x", label, flags);
++	mask = print_bitfield(2, flags, mgmt_adv_monitor_features_table);
++	if (mask)
++		print_text(COLOR_UNKNOWN_ADVMON_FEATURES,
++			   "  Unknown Flags (0x%8.8x)", mask);
++}
++
++static void mgmt_print_adv_monitor_handles(const void *data, uint8_t len)
++{
++	uint8_t idx = 0;
++
++	while (idx + 2 <= len) {
++		print_field("  Handle: %d", get_le16(data + idx));
++		idx += 2;
++	}
++}
++
++static void mgmt_read_adv_monitor_features_rsp(const void *data, uint16_t size)
++{
++	uint32_t supported_features = get_le32(data);
++	uint32_t enabled_features = get_le32(data + 4);
++	uint16_t max_num_handles = get_le16(data + 8);
++	uint8_t max_num_patterns = get_u8(data + 10);
++	uint16_t num_handles = get_le16(data + 11);
++
++	mgmt_print_adv_monitor_features("Supported Features",
++							supported_features);
++	mgmt_print_adv_monitor_features("Enabled Features",
++							enabled_features);
++	print_field("Max number of handles: %d", max_num_handles);
++	print_field("Max number of patterns: %d", max_num_patterns);
++	print_field("Number of handles: %d", num_handles);
++	mgmt_print_adv_monitor_handles(data + 13, size - 13);
++}
++
+ struct mgmt_data {
+ 	uint16_t opcode;
+ 	const char *str;
+@@ -13382,6 +13427,9 @@ static const struct mgmt_data mgmt_command_table[] = {
+ 	{ 0x0050, "Set Device Flags",
+ 				mgmt_set_device_flags_cmd, 11, true,
+ 				mgmt_set_device_flags_rsp, 7, true},
++	{ 0x0051, "Read Advertisement Monitor Features",
++				mgmt_null_cmd, 0, true,
++				mgmt_read_adv_monitor_features_rsp, 13, false},
+ 	{ }
+ };
+ 
+-- 
+2.29.1.341.ge80a0c044ae-goog
 
-> +
->  #if IS_ENABLED(CONFIG_BT_INTEL)
->  
->  int btintel_check_bdaddr(struct hci_dev *hdev);
-> @@ -151,6 +159,7 @@ int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
->  int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
->  int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
->  int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver);
-> +int btintel_read_version_new(struct hci_dev *hdev, struct btintel_version *ver);
->  
->  struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
->  				   u16 opcode_write);
-> @@ -248,6 +257,12 @@ static inline int btintel_read_version_tlv(struct hci_dev *hdev,
->  	return -EOPNOTSUPP;
->  }
->  
-> +static inline int btintel_read_version_new(struct hci_dev *hdev,
-> +					   struct btintel_version *ver)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
->  static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
->  						 u16 opcode_read,
->  						 u16 opcode_write)
-> -- 
-> 2.17.1
-> 
-
-I think you can combine your 3 patches into one patch.
-
-Regards,
-
-Tedd
