@@ -8,65 +8,64 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE41BC4742C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AA3C55178
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 825A6214F1
+	by mail.kernel.org (Postfix) with ESMTP id 369FB2076D
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKFkdBr3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h60+CZ1G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbgJ2XGu (ORCPT
+        id S1726026AbgJ2XGt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 19:06:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33132 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726014AbgJ2XGt (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 29 Oct 2020 19:06:49 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E47C0613D2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:48 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id r16so3027729pls.19
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:48 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33124 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725379AbgJ2XGs (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Oct 2020 19:06:48 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14BCEC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:47 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id e19so2841412qtq.17
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=iWeiI3PZKNM3ytVVwyt4UkTp4eBynwSbJGDIwrznYV4=;
-        b=jKFkdBr3ZIQYpsDYVpP4jgBhV2Mn8bTJGZP82UDaiH9JODl7Eoa3yMVviEsM6n3Vpw
-         DgKSYxhwN9Rt7/RiT9vCJP+Bb9mPQqweuo4TbORNEQpxn0zaTvp1w/mZmT6T0kK0Hk5H
-         cDYZ2a7jVcv8jUJAHy5+YEYZ0fuYFXKCe3Qrv3YFD0fOY6z/qTLb/pRUaKYypnScaJXK
-         I4+nNaBhJPOrzI2KNIh9ePo752qqEQgt5sdf53XrbgXuPBlN3KfQNUCzCO58+gGoyTVv
-         cqe4b6gtkE/Eguv6QZPPc6geJfVcBcXVxkAqqh/lbnJZghRshBrsLJdvls5UnRuPFzg4
-         eEzw==
+        bh=lKz2fQJlTyrs0uo8QPGYuVg2z+i8x82ZYum7zKbfLmY=;
+        b=h60+CZ1GA8S7ghm4MOnfBRYDMtpecWq0kDjhGG32WYKiW8U6tX6eEzF3dPcd6gasJg
+         RLWJqRMcnK6tTo2zpiG5OZ7FaqYr6Ab8+240qainQ7OnjqhBTOQ2r5gfLGnjRUtLlGq8
+         s+Zr9gYf5SQ7LwTjI7KQxJG2wccV3CnOHrGv7ULU4ZQaaW+6Zg3z7h1ZCaCIg10k61W6
+         QNEqNsk2D7l5gEqH0DqM5byXe+Cp9DZGuLMuH7cDtOkmPkDmFOHMzYfFVtM1h2H9NqY3
+         Ny6lKcZZcun9/fVAUVhFZ3ChAt6rw9KPcSVEHMcEN2kTOcLyV4/WjVOOWgmg+53VAqRW
+         oMag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=iWeiI3PZKNM3ytVVwyt4UkTp4eBynwSbJGDIwrznYV4=;
-        b=klZYrbr/9Eli9RHP0R0CUStVCrwtqKDsH9K/BORLXWTFJCxZiyskRuQlYufkQKncCn
-         2GyZJ6UEYswYYwFeRr/WakI7Q85DXK9mxHIqYkBEzqJYC1DNkiGgyeKNYcOgW+pPBz0V
-         iNno73ejVH2ggNpNqE/eJyx9W7gzx84WVokIEttiU+yxLIVlSesTzI6dLsXtq0EwTK3Z
-         9U2y8Zhn/O0R6Rzih3RW2H1lVI4EUwA48hGMqf107i3hu/ojH3l01j9H0o3rT6djiuWL
-         K15sRWX7Eh8sQrF5dniUd+aVur+CB0UdElfTG4WLhkd88IEP2hGWR1Squ8JxHRrZm16K
-         v5MA==
-X-Gm-Message-State: AOAM5326YvDf6BF7VdRbE31r6oIzbQvLvItuTkgJ7VqMDkFCzaP8D6Jg
-        ddoGs9aYXoIJLSqK1ejt3PrWoL1PjD88fIdmRx7C
-X-Google-Smtp-Source: ABdhPJw2LtNdI+YrgWl+iMx1BoTyBB+HoRFk+Li0sPAD8Ir5427Jd9+zLx9fNKAo42E0VRL2nJUuGVARC6JOhCY1/ZsZ
+        bh=lKz2fQJlTyrs0uo8QPGYuVg2z+i8x82ZYum7zKbfLmY=;
+        b=qY5qPqEuQbze62TqwESKbOgLDiXi60vCvUoKzazarW05CRFmEp4lUKe4db7lmVEatz
+         2WBD7HRyAhODbCB0YFYTugf6iobSRYhbv6NLjhvw9Q4IzyB6X2kizm55b4D1o4yTqCU0
+         +/8K0Uilk+PefA/y5kGDS1HRRmZL4oV02UjlQFqbKBhiOVA5Ar1UVa6Y15xFZAo1EKex
+         WIci7eVAo4AtpLBcwlx/CrdMrsopo3vTVEoDY+dhl4ay6hpl8jh+F7b0vILIfcOcAPdu
+         t8QK2qvW/lH3Luezt87T4fF6hIj7BNB5c53ENdIv1TF5ibkmmhN8TsxDflEzwiYBcnOU
+         XRVQ==
+X-Gm-Message-State: AOAM5304ArgO3s2UAz19DFbPsMG9IB8G3w0Yzq8slYttOklNV25SOaZy
+        hZBlLTEFOlvWgs8xSAMYuFCWjFaeFhZTn5HE5VCU
+X-Google-Smtp-Source: ABdhPJxoe4Ha0Kx/MNnuNMpn6ZQYFE58/kXAJzWWGXdw3v96vjElDIIPctPITOxNDe32Uert9M+sKMhaABt2Qycu12US
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a62:7a8f:0:b029:163:d0b3:ac18 with
- SMTP id v137-20020a627a8f0000b0290163d0b3ac18mr7107078pfc.9.1604012808348;
- Thu, 29 Oct 2020 16:06:48 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 16:06:21 -0700
+ (user=danielwinkler job=sendgmr) by 2002:ad4:4e73:: with SMTP id
+ ec19mr6637357qvb.58.1604012806257; Thu, 29 Oct 2020 16:06:46 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 16:06:20 -0700
 In-Reply-To: <20201029230623.3630069-1-danielwinkler@google.com>
-Message-Id: <20201029160317.Bluez.v6.9.Ic9eec7749b769aa5bf73a0d8e9a31be83f232f1c@changeid>
+Message-Id: <20201029160317.Bluez.v6.8.I4e536cf2c9b6c5571b4b3800dfb8338fce8e4421@changeid>
 Mime-Version: 1.0
 References: <20201029230623.3630069-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [Bluez PATCH v6 09/10] client: Add SupportedCapabilities to bluetoothctl
+Subject: [Bluez PATCH v6 08/10] advertising: Expose SupportedCapabilities for advertising
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     luiz.von.dentz@intel.com
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -79,37 +78,90 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds the new "SupportedCapabilities" property to the
-bluetoothctl "show" view.
+To help our advertising clients understand the device capabilities, this
+patch adds a SupportedCapabilities dbus endpoint for the advertising
+manager. The primary reason behind this is to provide the valid LE tx
+power range the controller supports (populated if controller supports
+BT5), so a client can know the valid power range before requesting a tx
+power for their advertisement.
 
-The change is tested by verifying bluetoothctl shows the desired
-properties.
+I also thought it would be useful to indicate the max advertising data
+length and scan response length in this endpoint, since some clients
+will find it useful to set their advertising data (currently
+experimental feature) or scan response data (possible future feature)
+directly.
+
+This patch has been tested on Hatch (BT5 support) and Kukui (No BT5
+support) chromebooks to verify that the dbus endpoint contains the
+correct data.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
 
 Changes in v6: None
-Changes in v5: None
+Changes in v5:
+- Make SupportedCapabilities experimental
+
 Changes in v4: None
 Changes in v3: None
 Changes in v2: None
 
- client/main.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/advertising.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/client/main.c b/client/main.c
-index 60f1eb86e..9403f1af6 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -941,6 +941,7 @@ static void cmd_show(int argc, char *argv[])
- 		print_property(adapter->ad_proxy, "SupportedInstances");
- 		print_property(adapter->ad_proxy, "SupportedIncludes");
- 		print_property(adapter->ad_proxy, "SupportedSecondaryChannels");
-+		print_property(adapter->ad_proxy, "SupportedCapabilities");
- 	}
+diff --git a/src/advertising.c b/src/advertising.c
+index 9008b7813..9a0c70ff1 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1641,12 +1641,47 @@ static gboolean get_supported_secondary(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
- 	if (adapter->adv_monitor_proxy) {
++static gboolean get_supported_cap(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_adv_manager *manager = data;
++	DBusMessageIter dict;
++	int16_t min_tx_power = manager->min_tx_power;
++	int16_t max_tx_power = manager->max_tx_power;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&dict);
++
++	if (min_tx_power != ADV_TX_POWER_NO_PREFERENCE)
++		dict_append_entry(&dict, "MinTxPower", DBUS_TYPE_INT16,
++				&min_tx_power);
++
++	if (max_tx_power != ADV_TX_POWER_NO_PREFERENCE)
++		dict_append_entry(&dict, "MaxTxPower", DBUS_TYPE_INT16,
++				&max_tx_power);
++
++	dict_append_entry(&dict, "MaxAdvLen", DBUS_TYPE_BYTE,
++			&manager->max_adv_len);
++	dict_append_entry(&dict, "MaxScnRspLen", DBUS_TYPE_BYTE,
++			&manager->max_scan_rsp_len);
++
++	dbus_message_iter_close_container(iter, &dict);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable properties[] = {
+ 	{ "ActiveInstances", "y", get_active_instances, NULL, NULL },
+ 	{ "SupportedInstances", "y", get_instances, NULL, NULL },
+ 	{ "SupportedIncludes", "as", get_supported_includes, NULL, NULL },
+ 	{ "SupportedSecondaryChannels", "as", get_supported_secondary, NULL,
+ 							secondary_exits },
++	{ "SupportedCapabilities", "a{sv}", get_supported_cap, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
+ 	{ }
+ };
+ 
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
