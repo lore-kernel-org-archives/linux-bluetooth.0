@@ -8,66 +8,65 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EE5C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4987C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1729020791
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41A7B20791
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Oct 2020 23:06:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GYZVbKB6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uhqd6dBZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725899AbgJ2XGi (ORCPT
+        id S1725943AbgJ2XGk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 19:06:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33092 "EHLO
+        Thu, 29 Oct 2020 19:06:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725379AbgJ2XGi (ORCPT
+        with ESMTP id S1725379AbgJ2XGk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Oct 2020 19:06:38 -0400
+        Thu, 29 Oct 2020 19:06:40 -0400
 Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AFF7C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:38 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id z125so3308425pfc.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A14CC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:40 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id q16so3308326pfj.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 16:06:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=Gf+F7yz3pMTj+KLx0gpbm0RJJgxj62/31jS9n0rFRmc=;
-        b=GYZVbKB6FktK+aRbv/T54kPhf4DZ/6/AYpRT4qcM8Bk1a8lWgRvLY0cMo7Tlv8ScRu
-         qM0Mt2+Rvc21U/vOYeKh0MZtOFt3paY583Dk9EJlpEmm3TIJ9PhQa9SRHCkAc0KAIyKI
-         FBwh9h3aDNa5IHw0Ex/l8INVwjSrisap38cHb2Fp5nga8RbZZmPYCo3qfAYNH6ThcSJW
-         4p1LgEEf4X2rpiuz7Nv/J2zPU/nFF3Klrb/7qq8XJNBJYoyh25IM39Pjtb17HL67tKop
-         d+2ZMIYDyF611sCVfbUU5PJh3xDvigVpc0SogkGCxl9Zw/hjRTTk0vkfV50GQ6X63s/R
-         KrKQ==
+        bh=EOx3zY4sv78PXdbq3qCGZpKmBh3t/np3IO11o3dWgy0=;
+        b=Uhqd6dBZq6Hf4V+X9j4eCYKiH+Z1xCOVIFLmZBOZAR7tDDmY1+Cl8uLM0Ka5F2Qw/3
+         1TahHs4im8yb50JGtKmsXrvIheUEnCSoI61yvR6WUNKkvsF4jB5WWRrmV3woUw1OhwVu
+         FkChaWNUtB0qHyxfGaUJ05ScjUA6SRPp/qpAu7YZKm+JiypYlt3QbNt1Kh7E9i1oyVoY
+         VQ79BlOif8oVJq+VsxzMC0y5CAGPJPmXKOV5mtk3kQjVwpzK1FA9avSlxKF6b6MxDbT9
+         OhVkcoCmm4jKIxzYKscWuo7+rQgRd8q0gjBqWXzwtwFgNvgz+eL57jgSRmPMMMOfGzxS
+         komQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Gf+F7yz3pMTj+KLx0gpbm0RJJgxj62/31jS9n0rFRmc=;
-        b=ss4Bjzi1dO7IuX0Kxr8I1JruIE6zegwni97TO453p0SxZHD4Wto9pDjiFlTIkkR35e
-         vyCol7toHEWrb1csx2SCMTAZ+hX8P0qKd8WeMxAJv/tZNA8k4GCxX/XZsuqbxNRLz9+8
-         n6lOX6RAkBDwKgvD9W3AeJ4ajoTurrmwfTFK5I+sX0nPKyfDljJ2DGiCXhzPG5plPzcK
-         aY+78ry4Y0ALXXgGdiM8i5BTKAyS3AfYje5uH/pfqjLuPbkexDIP+2q4EnnhEp3feL+M
-         suaV7uRodI6YuM2Qcrlx7zG+Zj4Jwxz3NH3gndp9giDzAn0KmqNu3gWD8GxAwZsYgB6P
-         NGqA==
-X-Gm-Message-State: AOAM5300l5bgg6xcPjY5etLpTINzCIMeEmtwlMactkKn7UUJNf7roEM8
-        9/8RU43jTbICItNIK2TQdIm2cuXL93B/O48rM8z9
-X-Google-Smtp-Source: ABdhPJxiMCdCeAnUicOTkszo9rYSQ7AntB4xZMT1oyRNOLv9KJFQmgn8brrsX7KizjyI8PaWio9vlWlijiG0lUZ2O1IF
+        bh=EOx3zY4sv78PXdbq3qCGZpKmBh3t/np3IO11o3dWgy0=;
+        b=Bd5fJNcxa4bdrFyw7bgfhU3EUEoqxXhfHs0DPN/paANfjL91Eb6240LrjRmMvbr/U6
+         f8EO4zEAUrbYU54FiqiWXQWEOCNTZ5rjQ1V9m8gBhnlYZWSSEa1Ys1Q7YEXaJLrBzTcg
+         tFPV+EwuySdfxISykOO/SXsiPjszQdFa2tPtgHI/nLHwoldNCoZTKwnJwHCFKziq0v+M
+         cqQ95MBbnZILSWhR4uJD2sE/MYoGnpKZ4rID4oP4wxs43VKcKT8J9b2RZWjFzAt52FDZ
+         wJRI48S5VNvRAUd/WLXs8dXEPgnve4E5sUcpy2JH31Iwy3FsZRUAhow62O/HUpjPWh12
+         7y0g==
+X-Gm-Message-State: AOAM53338foqq6g5YVct1WxxEgwbYzHO67pij/29xYKxsCiHv4wE9PCj
+        IUpGficiU2TLw8QUj6N8GgeHo2X5Sps076I3EBLJ
+X-Google-Smtp-Source: ABdhPJxUhr3D2sErvjpMqpj49afJtE6mzHcLU2TTJXMXyZxuzu2fRKgTdV9LGSjFUv55zgSyRiIrExZUi2ErBFVCrrU5
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:aa7:9a1b:0:b029:163:edfa:64a2 with
- SMTP id w27-20020aa79a1b0000b0290163edfa64a2mr6177344pfj.70.1604012797629;
- Thu, 29 Oct 2020 16:06:37 -0700 (PDT)
-Date:   Thu, 29 Oct 2020 16:06:16 -0700
+ (user=danielwinkler job=sendgmr) by 2002:aa7:93b6:0:b029:155:3b0b:d47a with
+ SMTP id x22-20020aa793b60000b02901553b0bd47amr6484486pff.47.1604012799701;
+ Thu, 29 Oct 2020 16:06:39 -0700 (PDT)
+Date:   Thu, 29 Oct 2020 16:06:17 -0700
 In-Reply-To: <20201029230623.3630069-1-danielwinkler@google.com>
-Message-Id: <20201029160317.Bluez.v6.4.I50d9faa25e9da6e71d77c83c7d47a5b135e88799@changeid>
+Message-Id: <20201029160317.Bluez.v6.5.Ic4a3667da774f5f34477d5168a68a9280657e2da@changeid>
 Mime-Version: 1.0
 References: <20201029230623.3630069-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [Bluez PATCH v6 04/10] advertising: Detect if extended advertising
- mgmt commands are supported
+Subject: [Bluez PATCH v6 05/10] advertising: Parse intervals and tx power from adv
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     luiz.von.dentz@intel.com
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -80,96 +79,197 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We need to know if kernel supports the new MGMT interface. To do so, we
-check the return from adapter's MGMT_OP_READ_COMMANDS call for the new
-commands. This will later be used to route our requests for new
-advertisements.
+This change adds parsers for the advertising intervals and tx power
+properties of the LEAdvertisement1 object. It validates that each field
+adheres to the 5.2 spec, and that min and max intervals are compatible
+with each other, i.e. that min interval is less than max interval.
 
-The change is tested by manually verifying that the correct MGMT
-commands are used when the feature is and is not available in kernel.
+A note here for maintainers: The tx power that is sent in the hci
+parameter command is an int8_t, but as far as I can tell, there is no
+clean way to use a signed 8-bit integer in dbus. The dbus byte type
+seems incompatible with negative values in high-level languages (python)
+without awkward usage manipulation on the client side. For this reason,
+I chose to use an int16_t type for the tx power dbus field, which is
+then downcasted to the int8_t in bluetoothd, which at least makes the
+signed-ness of the type crystal clear to the dbus client that uses it.
+
+This change is manually verified by ensuring the intervals and tx power
+parameters are correctly parsed from the LEAdvertisement1 object, and
+that the parse fails if the parameters are incorrect or not compatible
+with each other.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 ---
 
-Changes in v6:
-- Reserve new MGMT codes earlier in series to detect support
+Changes in v6: None
+Changes in v5:
+- Only parse new properties if experimental flag is set
 
-Changes in v5: None
 Changes in v4: None
 Changes in v3: None
-Changes in v2:
-- Uses btd_has_kernel_features to detect kernel command support
+Changes in v2: None
 
- lib/mgmt.h        | 4 ++++
- src/adapter.c     | 4 ++++
- src/adapter.h     | 1 +
- src/advertising.c | 3 +++
- 4 files changed, 12 insertions(+)
+ src/advertising.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 6aa0f5f88..59608e7ea 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -700,6 +700,10 @@ struct mgmt_rp_remove_adv_monitor {
- 	uint16_t monitor_handle;
- } __packed;
- 
-+#define MGMT_OP_ADD_EXT_ADV_PARAMS		0x0054
-+
-+#define MGMT_OP_ADD_EXT_ADV_DATA		0x0055
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	uint16_t opcode;
-diff --git a/src/adapter.c b/src/adapter.c
-index 1f075ef5f..90beb897f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -9566,6 +9566,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
- 			DBG("kernel supports exp features");
- 			kernel_features |= KERNEL_EXP_FEATURES;
- 			break;
-+		case MGMT_OP_ADD_EXT_ADV_PARAMS:
-+			DBG("kernel supports ext adv commands");
-+			kernel_features |= KERNEL_HAS_EXT_ADV_ADD_CMDS;
-+			break;
- 		default:
- 			break;
- 		}
-diff --git a/src/adapter.h b/src/adapter.h
-index dcc574857..ace72affd 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -233,6 +233,7 @@ enum kernel_features {
- 	KERNEL_SET_SYSTEM_CONFIG	= 1 << 2,
- 	KERNEL_EXP_FEATURES		= 1 << 3,
- 	KERNEL_HAS_RESUME_EVT		= 1 << 4,
-+	KERNEL_HAS_EXT_ADV_ADD_CMDS	= 1 << 5,
- };
- 
- bool btd_has_kernel_features(uint32_t feature);
 diff --git a/src/advertising.c b/src/advertising.c
-index c03869e50..7c7599552 100644
+index 7c7599552..8443251bd 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -48,6 +48,7 @@ struct btd_adv_manager {
- 	uint8_t max_ads;
- 	uint32_t supported_flags;
- 	unsigned int instance_bitmap;
-+	bool extended_add_cmds;
+@@ -54,6 +54,11 @@ struct btd_adv_manager {
+ #define AD_TYPE_BROADCAST 0
+ #define AD_TYPE_PERIPHERAL 1
+ 
++/* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2585
++ * defines tx power value indicating no preference
++ */
++#define ADV_TX_POWER_NO_PREFERENCE 0x7F
++
+ struct btd_adv_client {
+ 	struct btd_adv_manager *manager;
+ 	char *owner;
+@@ -74,6 +79,9 @@ struct btd_adv_client {
+ 	struct bt_ad *data;
+ 	struct bt_ad *scan;
+ 	uint8_t instance;
++	uint32_t min_interval;
++	uint32_t max_interval;
++	int8_t tx_power;
  };
  
- #define AD_TYPE_BROADCAST 0
-@@ -1417,6 +1418,8 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
- 	manager->mgmt_index = btd_adapter_get_index(adapter);
- 	manager->clients = queue_new();
- 	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
-+	manager->extended_add_cmds =
-+			btd_has_kernel_features(KERNEL_HAS_EXT_ADV_ADD_CMDS);
+ struct dbus_obj_match {
+@@ -937,6 +945,96 @@ static bool parse_secondary(DBusMessageIter *iter,
+ 	return false;
+ }
  
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					adapter_get_path(manager->adapter),
++static bool parse_min_interval(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	uint32_t min_interval_ms;
++
++	/* Only consider this property if experimental setting is applied */
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
++		return true;
++
++	if (!iter)
++		return false;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &min_interval_ms);
++
++	/* Convert ms to jiffies to be used in adv request */
++	client->min_interval = min_interval_ms / 0.625;
++
++	/* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2584
++	 * defines acceptable interval range
++	 */
++	if (client->min_interval < 0x20 || client->min_interval > 0xFFFFFF) {
++		client->min_interval = 0;
++		return false;
++	}
++
++	return true;
++}
++
++static bool parse_max_interval(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	uint32_t max_interval_ms;
++
++	/* Only consider this property if experimental setting is applied */
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
++		return true;
++
++	if (!iter)
++		return false;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &max_interval_ms);
++
++	/* Convert ms to jiffies to be used in adv request */
++	client->max_interval = max_interval_ms / 0.625;
++
++	/* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2584
++	 * defines acceptable interval range
++	 */
++	if (client->max_interval < 0x20 || client->max_interval > 0xFFFFFF) {
++		client->max_interval = 0;
++		return false;
++	}
++
++	return true;
++}
++
++static bool parse_tx_power(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	int16_t val;
++
++	/* Only consider this property if experimental setting is applied */
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
++		return true;
++
++	if (!iter)
++		return false;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT16)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &val);
++
++	/* BLUETOOTH SPECIFICATION Version 5.2 | Vol 4, Part E, page 2585
++	 * defines acceptable tx power range
++	 */
++	if (val < -127 || val > 20)
++		return false;
++
++	client->tx_power = val;
++
++	return true;
++}
++
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -955,6 +1053,9 @@ static struct adv_parser {
+ 	{ "Discoverable", parse_discoverable },
+ 	{ "DiscoverableTimeout", parse_discoverable_timeout },
+ 	{ "SecondaryChannel", parse_secondary },
++	{ "MinInterval", parse_min_interval },
++	{ "MaxInterval", parse_max_interval },
++	{ "TxPower", parse_tx_power },
+ 	{ },
+ };
+ 
+@@ -1083,6 +1184,13 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		goto fail;
+ 	}
+ 
++	if (client->min_interval > client->max_interval) {
++		/* Min interval must not be bigger than max interval */
++		error("MinInterval must be less than MaxInterval (%lu > %lu)",
++				client->min_interval, client->max_interval);
++		goto fail;
++	}
++
+ 	err = refresh_adv(client, add_adv_callback, &client->add_adv_id);
+ 	if (!err)
+ 		return NULL;
+@@ -1158,6 +1266,9 @@ static struct btd_adv_client *client_create(struct btd_adv_manager *manager,
+ 
+ 	client->manager = manager;
+ 	client->appearance = UINT16_MAX;
++	client->tx_power = ADV_TX_POWER_NO_PREFERENCE;
++	client->min_interval = 0;
++	client->max_interval = 0;
+ 
+ 	return client;
+ 
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
