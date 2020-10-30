@@ -2,175 +2,257 @@ Return-Path: <SRS0=Q1DV=EF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DE5C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Oct 2020 00:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F71C00A89
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Oct 2020 09:08:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B654D2071A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Oct 2020 00:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C66182076E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Oct 2020 09:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMxnlvZR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u5NV+RO3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725943AbgJ3Arr (ORCPT
+        id S1726243AbgJ3JIw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Oct 2020 20:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48606 "EHLO
+        Fri, 30 Oct 2020 05:08:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725372AbgJ3Arr (ORCPT
+        with ESMTP id S1726238AbgJ3JIt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Oct 2020 20:47:47 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAABEC0613D2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 17:47:46 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id c72so5033883oig.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2020 17:47:46 -0700 (PDT)
+        Fri, 30 Oct 2020 05:08:49 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C410EC0613D4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 02:08:49 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id 30so3349297qvc.15
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 02:08:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qNS1iXRP7m0LtHaHqd0Pe+LsJDurJu8OyJChE/LO9pE=;
-        b=sMxnlvZR2SYpAZO/T0ssFd4Y+cJrtNJeUFi87fhldVcGkjnDyA0m7FrxXO+Dc4cH1b
-         R9EmIS1NOJMP6PGftYSxA6aNseF95BekO/r+rKANehcoHAMa4o3VICBln0lLM8pH1VTv
-         bgrDf7gc1QBSV9DYW6pA9XktaMVDwdsY/vfSgUOwrYS6rz9bYG2FdURVFGOI97L7lWnD
-         Jc+sWBVn4GzvLLA9+J+huK2FhfCNwfJB1c9+rYOGdS/c26cfyc23ULJL375Fa8SfeSA5
-         rhq401HIQt2fVzFFdLNldDy4f7ZrnG6I1qU7kVDDsks3Sxm3enmjWv+B3+1n4h7BXRho
-         ysFw==
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=KtbE6nMcNhkFfnYmXD75bl9cz6XAUMFXbaKaYlZrCSA=;
+        b=u5NV+RO3nBPcFMe9o0qbyiXFfM1VRxjZKzHEaSzLPQpgP+K1dYhdIewW+KncAVJ+e7
+         IFBvULH/5I3APa0uNg84QaeZ1+Tit0YNcPlG7S6XPjIeK8H6KaixKEkLTAu9e2Qz8VSb
+         xOiu18VFDnEvhzcfhO1uvUv/ii/UEVF3UP+7ttIvy7C/thYbFThcuOloYoFWf5wkLhKK
+         dgUaqpq4pI/+kAs8LDCxZMIlCNbUkwIqpwWVy1MHfgD+0B97vuffxOR8MeLOMUJiZLc9
+         HdCg9k4AM8q8gLe7RsGNxDnjj3hEtysQt7Nl9E5r2mY7ZcEPdCmJXlBPD4D1KIf8JyUi
+         nRUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qNS1iXRP7m0LtHaHqd0Pe+LsJDurJu8OyJChE/LO9pE=;
-        b=HXHjMrVQAm9ASw9q0u/HMLRYLXr+3nsfzjI/tjZzfRhG9vUlVa5zL/dRB1Qduxn0PN
-         inAUM/I+s+TjZjfa9HZJQTkRM4G0vLhqeQ7lxqHnx98ZQomwvd3jDQ9zkgFVwTJwnc/q
-         tBzb4ORJ/qgtNEaMCWVLfOE3V9o6wVYiNITD3O9ikDMh+75T/AsryFyMv3Ud/qgaCQt9
-         mC0/NEfbafpwQfhG4LKpUoTyUTpXuGS0YEAGnRSOEYFBcUNluSPEv60vGc8PEY0ejJj8
-         Yr21FqIWjbUHtafYMgEY2ovmgMipjxuu0fjdPDmMjr0nckWnACiLQsf8zylzc1uye0xe
-         kXBA==
-X-Gm-Message-State: AOAM532V/mD5suox8Yupgrr2YhCnRsvouGglwakEyGcupaOv9Tez5Vr2
-        LAVdUzaPzq8fcTcOrYVvG3XYZi44iKPDTwkhYXo=
-X-Google-Smtp-Source: ABdhPJx+lgKowcpA1h2HWvfxLMhcKodh52zbrDX5IHcdh60edjMzpvqPxJREbS+QqzF3TVA537YAIwSFettURsj5Dg4=
-X-Received: by 2002:aca:cdd8:: with SMTP id d207mr1262780oig.64.1604018866253;
- Thu, 29 Oct 2020 17:47:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201029230623.3630069-1-danielwinkler@google.com> <20201029160317.Bluez.v6.1.Ifaa96e71a871158e5d9d454073b2b6846eae339f@changeid>
-In-Reply-To: <20201029160317.Bluez.v6.1.Ifaa96e71a871158e5d9d454073b2b6846eae339f@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 29 Oct 2020 17:47:35 -0700
-Message-ID: <CABBYNZLqmmhjud_qW9amrtSH7XAS5mD-goT7H4bTAh-U9aG7Fw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v6 01/10] doc/advertising-api: update API with new interface
-To:     Daniel Winkler <danielwinkler@google.com>
-Cc:     Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=KtbE6nMcNhkFfnYmXD75bl9cz6XAUMFXbaKaYlZrCSA=;
+        b=XCkGD9LfkTCTPEv6P8n6NSo/JxFDOg3OvEx0WnD/ncI0Prkb9B2won1hnq/eDkBuc9
+         7kURjpp+zMIJYDy9wVn2Qc/SwXYOEMKRh+Iu/IDlqoCeBM8Pr4swLmHCigMbr5+y3LN6
+         qmpCjfL40+Usm6CoIeoogXo/XrF7Yc4vI6zyOBRc20Pg1oE9SbeptbS0GoYd5wUQY/C/
+         oe01U4Q9ZtdRfIcp0AfKs7jN37C6KYzCyKOf7HVOxn9BB/0WmQ/31HgscsgqSIgkgpo/
+         mt/u8Iz3+BT5xDIRj7ngVcWkfPCQdqO4cVv+nQUph8gY/v6BPijlkIvSxJDhlMX7wvMQ
+         W+yA==
+X-Gm-Message-State: AOAM530JNkhpDPq5XreXrG9sU+Z6yLr10k5W/0r6fuqAGnx0yILjXXxP
+        UkhJA9hXHW6A4dh6yDb4YzSov4E6iO1Nx0VU5ELtpiqOOa9V4/tU+/qkoO7rXCbyc2W8mD8NACK
+        cOibfjZ+IA84IBTM4zx6K6uNYyZN7rTl8iXPVrwZbix+Fc6G4IH+Mx4XUAzB41vNcD6bkZZvJb6
+        SkyrES8PilnTs=
+X-Google-Smtp-Source: ABdhPJzANVjapTvjg69+DD+VcuDXXWNcwgPBJl62CSVt6W19pQkgY0SnWeinalPoJW1be1Fbn0nPv/KteXaGcKQH4g==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:ad4:40c6:: with SMTP id
+ x6mr8378031qvp.20.1604048928877; Fri, 30 Oct 2020 02:08:48 -0700 (PDT)
+Date:   Fri, 30 Oct 2020 17:08:26 +0800
+In-Reply-To: <20201030163529.v6.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+Message-Id: <20201030163529.v6.4.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
+Mime-Version: 1.0
+References: <20201030163529.v6.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
+Subject: [PATCH v6 4/5] mgmt: Add supports of variable length parameter in mgmt_config
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     alainm@chromium.org, mmandlik@chromium.orgi, mcchou@chromium.org,
+        Howard Chung <howardchung@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
+This adds support of variable length parameter in mgmt_config.
 
-On Thu, Oct 29, 2020 at 4:09 PM Daniel Winkler <danielwinkler@google.com> wrote:
->
-> This updates the advertising documentation to include the following
-> features:
->
-> LE Advertising Manager:
-> - New SupportedCapabilities property
->
-> LE Advertisement:
-> - New min/max interval properties
-> - New tx power property
->
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> ---
->
-> Changes in v6: None
-> Changes in v5:
-> - Changed interval API from jiffies to milliseconds for clarity
-> - Changed new dbus endpoints to be experimental
->
-> Changes in v4: None
-> Changes in v3: None
-> Changes in v2: None
->
->  doc/advertising-api.txt | 48 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index b0565eab2..541c57004 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -138,6 +138,31 @@ Properties string Type
->                                         "2M"
->                                         "Coded"
->
-> +               uint32 MinInterval [Experimental]
-> +
-> +                       Minimum advertising interval to be used by the
-> +                       advertising set, in milliseconds. Acceptable values
-> +                       are in the range [20ms, 10,485s]. If the provided
-> +                       MinInterval is larger than the provided MaxInterval,
-> +                       the registration will return failure.
-> +
-> +               uint32 MaxInterval [Experimental]
-> +
-> +                       Maximum advertising interval to be used by the
-> +                       advertising set, in milliseconds. Acceptable values
-> +                       are in the range [20ms, 10,485s]. If the provided
-> +                       MinInterval is larger than the provided MaxInterval,
-> +                       the registration will return failure.
-> +
-> +               int16 TxPower [Experimental]
-> +
-> +                       Requested transmission power of this advertising set.
-> +                       The provided value is used only if the "CanSetTxPower"
-> +                       feature is enabled on the Advertising Manager. The
-> +                       provided value must be in range [-127 to +20], where
-> +                       units are in dBm.
-> +
-> +
->  LE Advertising Manager hierarchy
->  ================================
->
-> @@ -209,3 +234,26 @@ Properties byte ActiveInstances
->                         Possible values: "1M"
->                                          "2M"
->                                          "Coded"
-> +
-> +               dict SupportedCapabilities [Experimental]
-> +
-> +                       Enumerates Advertising-related controller capabilities
-> +                       useful to the client.
-> +
-> +                       Possible Values:
-> +
-> +                               byte MaxAdvLen
-> +
-> +                                       Max advertising data length
-> +
-> +                               byte MaxScnRspLen
-> +
-> +                                       Max advertising scan response length
-> +
-> +                               int16 MinTxPower
-> +
-> +                                       Min advertising tx power (dBm)
-> +
-> +                               int16 MaxTxPower
-> +
-> +                                       Max advertising tx power (dBm)
-> --
-> 2.29.1.341.ge80a0c044ae-goog
+Signed-off-by: Howard Chung <howardchung@google.com>
+---
 
-Applied, thanks.
+(no changes since v1)
 
+ net/bluetooth/mgmt_config.c | 140 +++++++++++++++++++++---------------
+ 1 file changed, 84 insertions(+), 56 deletions(-)
+
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index 2d3ad288c78ac..b735e59c7fd51 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -11,72 +11,100 @@
+ #include "mgmt_util.h"
+ #include "mgmt_config.h"
+ 
+-#define HDEV_PARAM_U16(_param_code_, _param_name_) \
+-{ \
+-	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+-	{ cpu_to_le16(hdev->_param_name_) } \
+-}
++#define HDEV_PARAM_U16(_param_name_) \
++	struct {\
++		struct mgmt_tlv entry; \
++		__le16 value; \
++	} __packed _param_name_
+ 
+-#define HDEV_PARAM_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
+-{ \
+-	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+-	{ cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) } \
+-}
++#define TLV_SET_U16(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		  cpu_to_le16(hdev->_param_name_) \
++	}
++
++#define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		  cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) \
++	}
+ 
+ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			   u16 data_len)
+ {
+-	struct {
+-		struct mgmt_tlv entry;
+-		union {
+-			/* This is a simplification for now since all values
+-			 * are 16 bits.  In the future, this code may need
+-			 * refactoring to account for variable length values
+-			 * and properly calculate the required buffer size.
+-			 */
+-			__le16 value;
+-		};
+-	} __packed params[] = {
++	int ret;
++	struct mgmt_rp_read_def_system_config {
+ 		/* Please see mgmt-api.txt for documentation of these values */
+-		HDEV_PARAM_U16(0x0000, def_page_scan_type),
+-		HDEV_PARAM_U16(0x0001, def_page_scan_int),
+-		HDEV_PARAM_U16(0x0002, def_page_scan_window),
+-		HDEV_PARAM_U16(0x0003, def_inq_scan_type),
+-		HDEV_PARAM_U16(0x0004, def_inq_scan_int),
+-		HDEV_PARAM_U16(0x0005, def_inq_scan_window),
+-		HDEV_PARAM_U16(0x0006, def_br_lsto),
+-		HDEV_PARAM_U16(0x0007, def_page_timeout),
+-		HDEV_PARAM_U16(0x0008, sniff_min_interval),
+-		HDEV_PARAM_U16(0x0009, sniff_max_interval),
+-		HDEV_PARAM_U16(0x000a, le_adv_min_interval),
+-		HDEV_PARAM_U16(0x000b, le_adv_max_interval),
+-		HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
+-		HDEV_PARAM_U16(0x000d, le_scan_interval),
+-		HDEV_PARAM_U16(0x000e, le_scan_window),
+-		HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
+-		HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
+-		HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
+-		HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
+-		HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
+-		HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
+-		HDEV_PARAM_U16(0x0015, le_scan_int_connect),
+-		HDEV_PARAM_U16(0x0016, le_scan_window_connect),
+-		HDEV_PARAM_U16(0x0017, le_conn_min_interval),
+-		HDEV_PARAM_U16(0x0018, le_conn_max_interval),
+-		HDEV_PARAM_U16(0x0019, le_conn_latency),
+-		HDEV_PARAM_U16(0x001a, le_supv_timeout),
+-		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
+-						def_le_autoconnect_timeout),
+-		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
+-		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
++		HDEV_PARAM_U16(def_page_scan_type);
++		HDEV_PARAM_U16(def_page_scan_int);
++		HDEV_PARAM_U16(def_page_scan_window);
++		HDEV_PARAM_U16(def_inq_scan_type);
++		HDEV_PARAM_U16(def_inq_scan_int);
++		HDEV_PARAM_U16(def_inq_scan_window);
++		HDEV_PARAM_U16(def_br_lsto);
++		HDEV_PARAM_U16(def_page_timeout);
++		HDEV_PARAM_U16(sniff_min_interval);
++		HDEV_PARAM_U16(sniff_max_interval);
++		HDEV_PARAM_U16(le_adv_min_interval);
++		HDEV_PARAM_U16(le_adv_max_interval);
++		HDEV_PARAM_U16(def_multi_adv_rotation_duration);
++		HDEV_PARAM_U16(le_scan_interval);
++		HDEV_PARAM_U16(le_scan_window);
++		HDEV_PARAM_U16(le_scan_int_suspend);
++		HDEV_PARAM_U16(le_scan_window_suspend);
++		HDEV_PARAM_U16(le_scan_int_discovery);
++		HDEV_PARAM_U16(le_scan_window_discovery);
++		HDEV_PARAM_U16(le_scan_int_adv_monitor);
++		HDEV_PARAM_U16(le_scan_window_adv_monitor);
++		HDEV_PARAM_U16(le_scan_int_connect);
++		HDEV_PARAM_U16(le_scan_window_connect);
++		HDEV_PARAM_U16(le_conn_min_interval);
++		HDEV_PARAM_U16(le_conn_max_interval);
++		HDEV_PARAM_U16(le_conn_latency);
++		HDEV_PARAM_U16(le_supv_timeout);
++		HDEV_PARAM_U16(def_le_autoconnect_timeout);
++		HDEV_PARAM_U16(advmon_allowlist_duration);
++		HDEV_PARAM_U16(advmon_no_filter_duration);
++	} __packed rp = {
++		TLV_SET_U16(0x0000, def_page_scan_type),
++		TLV_SET_U16(0x0001, def_page_scan_int),
++		TLV_SET_U16(0x0002, def_page_scan_window),
++		TLV_SET_U16(0x0003, def_inq_scan_type),
++		TLV_SET_U16(0x0004, def_inq_scan_int),
++		TLV_SET_U16(0x0005, def_inq_scan_window),
++		TLV_SET_U16(0x0006, def_br_lsto),
++		TLV_SET_U16(0x0007, def_page_timeout),
++		TLV_SET_U16(0x0008, sniff_min_interval),
++		TLV_SET_U16(0x0009, sniff_max_interval),
++		TLV_SET_U16(0x000a, le_adv_min_interval),
++		TLV_SET_U16(0x000b, le_adv_max_interval),
++		TLV_SET_U16(0x000c, def_multi_adv_rotation_duration),
++		TLV_SET_U16(0x000d, le_scan_interval),
++		TLV_SET_U16(0x000e, le_scan_window),
++		TLV_SET_U16(0x000f, le_scan_int_suspend),
++		TLV_SET_U16(0x0010, le_scan_window_suspend),
++		TLV_SET_U16(0x0011, le_scan_int_discovery),
++		TLV_SET_U16(0x0012, le_scan_window_discovery),
++		TLV_SET_U16(0x0013, le_scan_int_adv_monitor),
++		TLV_SET_U16(0x0014, le_scan_window_adv_monitor),
++		TLV_SET_U16(0x0015, le_scan_int_connect),
++		TLV_SET_U16(0x0016, le_scan_window_connect),
++		TLV_SET_U16(0x0017, le_conn_min_interval),
++		TLV_SET_U16(0x0018, le_conn_max_interval),
++		TLV_SET_U16(0x0019, le_conn_latency),
++		TLV_SET_U16(0x001a, le_supv_timeout),
++		TLV_SET_U16_JIFFIES_TO_MSECS(0x001b,
++					     def_le_autoconnect_timeout),
++		TLV_SET_U16(0x001d, advmon_allowlist_duration),
++		TLV_SET_U16(0x001e, advmon_no_filter_duration),
+ 	};
+-	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
+-	return mgmt_cmd_complete(sk, hdev->id,
+-				 MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+-				 0, rp, sizeof(params));
++	ret = mgmt_cmd_complete(sk, hdev->id,
++				MGMT_OP_READ_DEF_SYSTEM_CONFIG,
++				0, &rp, sizeof(rp));
++	return ret;
+ }
+ 
+ #define TO_TLV(x)		((struct mgmt_tlv *)(x))
 -- 
-Luiz Augusto von Dentz
+2.29.1.341.ge80a0c044ae-goog
+
