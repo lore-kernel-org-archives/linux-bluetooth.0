@@ -2,305 +2,541 @@ Return-Path: <SRS0=4lpm=EG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A214C00A89
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Oct 2020 00:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DC0C00A89
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Oct 2020 01:05:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1DE1221EB
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Oct 2020 00:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2681B208B6
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Oct 2020 01:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="drnWc/4/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="M6lKJpf7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725929AbgJaAzu (ORCPT
+        id S1725562AbgJaBFJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Oct 2020 20:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47668 "EHLO
+        Fri, 30 Oct 2020 21:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgJaAzt (ORCPT
+        with ESMTP id S1725446AbgJaBFJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Oct 2020 20:55:49 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA18C0613D5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 17:55:49 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id r10so6549775pgb.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 17:55:49 -0700 (PDT)
+        Fri, 30 Oct 2020 21:05:09 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1315C0613D5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 18:05:08 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id m16so8773129ljo.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2020 18:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=vdaUfJz7jmPFx2W5HccvMKbsFaBAEhWGV3O/WxZs7oI=;
-        b=drnWc/4/MtEWrmmqokp7IdUs/SXhYoPoVNnhtRsnx7jNh4dbqtAtXUwNEWsve76+n9
-         3PX3zAg3aRefdv/wWxVoMtq4kN1tkZGhshwy7CWLN3nE2lgqNRSuOs5womGD57isKu1/
-         //OQcI0AA07BIJ7QcC+1hTy9kcqE8Y6t0AWCw=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=m3cyTtL3gE60MdkRjTURo3nC5k2de6f+n1Y9Vqufd2E=;
+        b=M6lKJpf7996COSv7aisxfQGVYVgLSZn4d8Y5Msu67LvHXFsdaLx+Fji2M1Aqe8yj7B
+         4IlWFkbuzjhMvX1vCKUycJTaomTSnLTGVINFf/J7ubB2ng4NntsOn3M3VrXlc1qsd001
+         SKiaQoOrKgEZyEYIyW3ReZ8PPFwUVJJUVEVI8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vdaUfJz7jmPFx2W5HccvMKbsFaBAEhWGV3O/WxZs7oI=;
-        b=tiyrYclakxXoivEMIb4oG7rCu5bBiETxYDLZjLRc0YzO4GDRNw7QDfrkbTHV0uCGQF
-         4DNYYtecqD+ZCrbXXCOaEwpqSxYdjX2Zhj+nOPjGjlWanHWgmJXUWW8YgJ9SGWT3/xtn
-         3s1BBrxVxMC/hlfDhB9k6JLjWCCASGe+Hvth3pQeWsPu8NcFn+9rFJLz10jqHpZWwPu7
-         j1sEuIhHNoyY7ykuLBM7qP5yTqTWxLByXbDricaRNMTlS5QHAasUrq9rx4Pe2b2osu1R
-         ZU+hoRonX5bKXzQFaU56HfERTS87XCtU5jq0R0mKxdD0502Lsx7O9xTs4KYcCiO3Yn6y
-         Lyug==
-X-Gm-Message-State: AOAM533rR9Tj+C6hT5gxd9NYhCFoLo6BLyH3QtbN4Smwwn5KOejqyLMd
-        6v0aAYg54l4Rx90GDyuqBkIn7Xsoxpzt6w==
-X-Google-Smtp-Source: ABdhPJzXVHmhegh4q4aJbuuRXI8ZTgpGXjD7a/E5GNucvzN1GyEYw7mG0E/GlZD7EwK+yoz7nt/w1A==
-X-Received: by 2002:a63:731e:: with SMTP id o30mr4257264pgc.179.1604105748955;
-        Fri, 30 Oct 2020 17:55:48 -0700 (PDT)
-Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id p22sm4394292pju.48.2020.10.30.17.55.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Oct 2020 17:55:48 -0700 (PDT)
-From:   Miao-chen Chou <mcchou@chromium.org>
-To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Howard Chung <howardchung@google.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [BlueZ PATCH v8 6/6] adv_monitor: Issue Remove Adv Monitor mgmt call
-Date:   Fri, 30 Oct 2020 17:52:56 -0700
-Message-Id: <20201030175219.BlueZ.v8.6.Ifda683c92ff520bf58ac37c02dc40b8d9598d1b0@changeid>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201030175219.BlueZ.v8.1.Ie670925d87068d24a6e5c2e7dd9dd0e88c89a7da@changeid>
-References: <20201030175219.BlueZ.v8.1.Ie670925d87068d24a6e5c2e7dd9dd0e88c89a7da@changeid>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=m3cyTtL3gE60MdkRjTURo3nC5k2de6f+n1Y9Vqufd2E=;
+        b=HKHgHdW/YkxnrCo+7emTNQZIRSQfqSFLYGfL6qGvhGOw8RCqiLRyQ9DruL9triWZXJ
+         b7A4Xl8FRhDm1bYVGuIIBCJuIrh0SSkrFvVaYvFRDGgBFXp/Fe22ghoOspuMpDxnszDh
+         UJk2THQd39dScebEDZq9722bKPa7/39O2YWUjmCB1N6VgH6eXWOkSaaJmPoLUuBUYSj4
+         5YpsjsMWxLXNqf9Mi9r5QNk/vv4RzsBnx3aJOgUK48Doz4BPvOPwIAIlOSrNfpoi1QtS
+         QbyLg/Dc3o8dsafs4DihZq8D3h4VmOiNlPy5mJ+rUA5prDqzzifN/vIZaAMp3cotYeem
+         ke3g==
+X-Gm-Message-State: AOAM533ajSbSxlUpbMpv14LCVrBct/tJvyf0fJ/K5b3/HcL+gl+aZ3rj
+        oEZwRdcGT4vPwTsM4W2Lra2R55BztPP1hqpedXIZ2A==
+X-Google-Smtp-Source: ABdhPJwrAzJpARZlYwap64mfGibHAnqe01EOTcac7juge2Xkb6Dm04JC5smOO7E7U4dwXVUARy4EU5psZCMCFM2XCBU=
+X-Received: by 2002:a2e:5049:: with SMTP id v9mr2253038ljd.273.1604106306934;
+ Fri, 30 Oct 2020 18:05:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201028160433.BlueZ.v7.1.I2830b9c1212a64b062201ed9f2b71294f50ad22d@changeid>
+ <20201028160433.BlueZ.v7.3.I578ae5e76fcf7243206a27d4f5a25783662a5f14@changeid>
+ <CABBYNZ+VUGUDGo7qu5p21CLDpn7KhCFBPTdkLuv=fWLfzqFWGQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+VUGUDGo7qu5p21CLDpn7KhCFBPTdkLuv=fWLfzqFWGQ@mail.gmail.com>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Fri, 30 Oct 2020 18:04:56 -0700
+Message-ID: <CABmPvSETi7p4KGt9p-udH8Yvn+8jwpkZ1f76bZD=o1E8ao04mg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v7 3/7] adv_monitor: Implement Adv matching based on
+ stored monitors
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "An, Tedd" <tedd.an@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Alain Michaud <alainm@chromium.org>
+Hi Luiz,
 
-This calls Remove Adv Monitor command to kernel and handles the callback
-during a monitor removal initiated by a D-Bus client. This also
-registers callback for getting notified on Adv Monitor Removed event, so
-that the Adv monitor manager can invalidate the monitor by calling
-Release() on its proxy.
+On Thu, Oct 29, 2020 at 10:25 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Miao,
+>
+> On Thu, Oct 29, 2020 at 12:54 AM Miao-chen Chou <mcchou@chromium.org> wro=
+te:
+> >
+> > This implements create an entry point in adapter to start the matching =
+of
+> > Adv based on all monitors and invoke the RSSI tracking for Adv reportin=
+g.
+> >
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> > ---
+> >
+> > Changes in v7:
+> > - Replace the use of GSList with struct queue
+> > - Adopt bt_ad_pattern from shared/ad
+> > - Add error logs
+> >
+> > Changes in v6:
+> > - Fix the termination condition of AD data paring and remove unnecessar=
+y
+> > length check
+> >
+> > Changes in v5:
+> > - Remove unittest helper functions
+> >
+> > Changes in v3:
+> > - Remove unused variables
+> > - Fix signature of queue_find()
+> >
+> >  src/adapter.c     |  44 +++++++++++---
+> >  src/adv_monitor.c | 151 +++++++++++++++++++++++++++++++++++-----------
+> >  src/adv_monitor.h |  14 +++++
+> >  3 files changed, 167 insertions(+), 42 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 6d0114a6b..0e3fd57f3 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -6597,10 +6597,28 @@ static void update_found_devices(struct btd_ada=
+pter *adapter,
+> >                                         const uint8_t *data, uint8_t da=
+ta_len)
+> >  {
+> >         struct btd_device *dev;
+> > +       struct bt_ad *ad =3D NULL;
+> >         struct eir_data eir_data;
+> >         bool name_known, discoverable;
+> >         char addr[18];
+> >         bool duplicate =3D false;
+> > +       struct queue *matched_monitors =3D NULL;
+> > +
+> > +       if (bdaddr_type !=3D BDADDR_BREDR)
+> > +               ad =3D bt_ad_new_with_data(data_len, data);
+> > +
+> > +       /* During the background scanning, update the device only when =
+the data
+> > +        * match at least one Adv monitor
+> > +        */
+> > +       if (ad) {
+> > +               matched_monitors =3D btd_adv_monitor_content_filter(
+> > +                                       adapter->adv_monitor_manager, a=
+d);
+> > +               bt_ad_unref(ad);
+> > +               ad =3D NULL;
+> > +       }
+> > +
+> > +       if (!adapter->discovering && !matched_monitors)
+> > +               return;
+> >
+> >         memset(&eir_data, 0, sizeof(eir_data));
+> >         eir_parse(&eir_data, data, data_len);
+> > @@ -6646,18 +6664,22 @@ static void update_found_devices(struct btd_ada=
+pter *adapter,
+> >                 device_store_cached_name(dev, eir_data.name);
+> >
+> >         /*
+> > -        * Only skip devices that are not connected, are temporary and =
+there
+> > -        * is no active discovery session ongoing.
+> > +        * Only skip devices that are not connected, are temporary, and=
+ there
+> > +        * is no active discovery session ongoing and no matched Adv mo=
+nitors
+> >          */
+> > -       if (!btd_device_is_connected(dev) && (device_is_temporary(dev) =
+&&
+> > -                                                !adapter->discovery_li=
+st)) {
+> > +       if (!btd_device_is_connected(dev) &&
+> > +               (device_is_temporary(dev) && !adapter->discovery_list) =
+&&
+> > +               !matched_monitors) {
+> >                 eir_data_free(&eir_data);
+> >                 return;
+> >         }
+> >
+> > -       /* Don't continue if not discoverable or if filter don't match =
+*/
+> > -       if (!discoverable || (adapter->filtered_discovery &&
+> > -           !is_filter_match(adapter->discovery_list, &eir_data, rssi))=
+) {
+> > +       /* If there is no matched Adv monitors, don't continue if not
+> > +        * discoverable or if active discovery filter don't match.
+> > +        */
+> > +       if (!matched_monitors && (!discoverable ||
+> > +               (adapter->filtered_discovery && !is_filter_match(
+> > +                               adapter->discovery_list, &eir_data, rss=
+i)))) {
+> >                 eir_data_free(&eir_data);
+> >                 return;
+> >         }
+> > @@ -6714,6 +6736,14 @@ static void update_found_devices(struct btd_adap=
+ter *adapter,
+> >
+> >         eir_data_free(&eir_data);
+> >
+> > +       /* After the device is updated, notify the matched Adv monitors=
+ */
+> > +       if (matched_monitors) {
+> > +               btd_adv_monitor_notify_monitors(adapter->adv_monitor_ma=
+nager,
+> > +                                               dev, rssi, matched_moni=
+tors);
+> > +               queue_destroy(matched_monitors, NULL);
+> > +               matched_monitors =3D NULL;
+> > +       }
+> > +
+> >         /*
+> >          * Only if at least one client has requested discovery, maintai=
+n
+> >          * list of found devices and name confirming for legacy devices=
+.
+> > diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+> > index 74351d91e..9a04da6e1 100644
+> > --- a/src/adv_monitor.c
+> > +++ b/src/adv_monitor.c
+> > @@ -29,15 +29,12 @@
+> >  #include "device.h"
+> >  #include "log.h"
+> >  #include "src/error.h"
+> > -#include "src/shared/ad.h"
+> >  #include "src/shared/mgmt.h"
+> >  #include "src/shared/queue.h"
+> >  #include "src/shared/util.h"
+> >
+> >  #include "adv_monitor.h"
+> >
+> > -static void monitor_device_free(void *data);
+> > -
+> >  #define ADV_MONITOR_INTERFACE          "org.bluez.AdvertisementMonitor=
+1"
+> >  #define ADV_MONITOR_MGR_INTERFACE      "org.bluez.AdvertisementMonitor=
+Manager1"
+> >
+> > @@ -84,13 +81,6 @@ enum monitor_state {
+> >         MONITOR_STATE_HONORED,  /* Accepted by kernel */
+> >  };
+> >
+> > -struct pattern {
+> > -       uint8_t ad_type;
+> > -       uint8_t offset;
+> > -       uint8_t length;
+> > -       uint8_t value[BT_AD_MAX_DATA_LEN];
+> > -};
+> > -
+> >  struct adv_monitor {
+> >         struct adv_monitor_app *app;
+> >         GDBusProxy *proxy;
+> > @@ -105,7 +95,7 @@ struct adv_monitor {
+> >         struct queue *devices;          /* List of adv_monitor_device o=
+bjects */
+> >
+> >         enum monitor_type type;         /* MONITOR_TYPE_* */
+> > -       struct queue *patterns;
+> > +       struct queue *patterns;         /* List of bt_ad_pattern object=
+s */
+> >  };
+> >
+> >  /* Some data like last_seen, timer/timeout values need to be maintaine=
+d
+> > @@ -133,6 +123,20 @@ struct app_match_data {
+> >         const char *path;
+> >  };
+> >
+> > +struct adv_content_filter_info {
+> > +       struct bt_ad *ad;
+> > +       struct queue *matched_monitors; /* List of matched monitors */
+> > +};
+> > +
+> > +struct adv_rssi_filter_info {
+> > +       struct btd_device *device;
+> > +       int8_t rssi;
+> > +};
+> > +
+> > +static void monitor_device_free(void *data);
+> > +static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
+> > +                                       struct btd_device *device, int8=
+_t rssi);
+> > +
+> >  const struct adv_monitor_type {
+> >         enum monitor_type type;
+> >         const char *name;
+> > @@ -155,10 +159,7 @@ static void app_reply_msg(struct adv_monitor_app *=
+app, DBusMessage *reply)
+> >  /* Frees a pattern */
+> >  static void pattern_free(void *data)
+> >  {
+> > -       struct pattern *pattern =3D data;
+> > -
+> > -       if (!pattern)
+> > -               return;
+> > +       struct bt_ad_pattern *pattern =3D data;
+> >
+> >         free(pattern);
+> >  }
+> > @@ -464,7 +465,7 @@ static bool parse_patterns(struct adv_monitor *moni=
+tor, const char *path)
+> >                 int value_len;
+> >                 uint8_t *value;
+> >                 uint8_t offset, ad_type;
+> > -               struct pattern *pattern;
+> > +               struct bt_ad_pattern *pattern;
+> >                 DBusMessageIter struct_iter, value_iter;
+> >
+> >                 dbus_message_iter_recurse(&array_iter, &struct_iter);
+> > @@ -496,28 +497,10 @@ static bool parse_patterns(struct adv_monitor *mo=
+nitor, const char *path)
+> >                 dbus_message_iter_get_fixed_array(&value_iter, &value,
+> >                                                         &value_len);
+> >
+> > -               // Verify the values
+> > -               if (offset > BT_AD_MAX_DATA_LEN - 1)
+> > -                       goto failed;
+> > -
+> > -               if ((ad_type > BT_AD_3D_INFO_DATA &&
+> > -                       ad_type !=3D BT_AD_MANUFACTURER_DATA) ||
+> > -                       ad_type < BT_AD_FLAGS) {
+> > -                       goto failed;
+> > -               }
+> > -
+> > -               if (!value || value_len <=3D 0 || value_len > BT_AD_MAX=
+_DATA_LEN)
+> > -                       goto failed;
+> > -
+> > -               pattern =3D new0(struct pattern, 1);
+> > +               pattern =3D bt_ad_pattern_new(ad_type, offset, value_le=
+n, value);
+> >                 if (!pattern)
+> >                         goto failed;
+> >
+> > -               pattern->ad_type =3D ad_type;
+> > -               pattern->offset =3D offset;
+> > -               pattern->length =3D value_len;
+> > -               memcpy(pattern->value, value, pattern->length);
+> > -
+> >                 queue_push_tail(monitor->patterns, pattern);
+> >
+> >                 dbus_message_iter_next(&array_iter);
+> > @@ -952,6 +935,104 @@ void btd_adv_monitor_manager_destroy(struct btd_a=
+dv_monitor_manager *manager)
+> >         manager_destroy(manager);
+> >  }
+> >
+> > +/* Processes the content matching based pattern(s) of a monitor */
+> > +static void adv_match_per_monitor(void *data, void *user_data)
+> > +{
+> > +       struct adv_monitor *monitor =3D data;
+> > +       struct adv_content_filter_info *info =3D user_data;
+> > +
+> > +       if (!monitor) {
+> > +               error("Unexpected NULL adv_monitor object upon match");
+> > +               return;
+> > +       }
+> > +
+> > +       if (monitor->state !=3D MONITOR_STATE_HONORED)
+> > +               return;
+> > +
+> > +       if (monitor->type =3D=3D MONITOR_TYPE_OR_PATTERNS &&
+> > +               bt_ad_pattern_match(info->ad, monitor->patterns)) {
+> > +               goto matched;
+> > +       }
+> > +
+> > +       return;
+> > +
+> > +matched:
+> > +       if (!info->matched_monitors)
+> > +               info->matched_monitors =3D queue_new();
+> > +
+> > +       queue_push_tail(info->matched_monitors, monitor);
+> > +}
+> > +
+> > +/* Processes the content matching for the monitor(s) of an app */
+> > +static void adv_match_per_app(void *data, void *user_data)
+> > +{
+> > +       struct adv_monitor_app *app =3D data;
+> > +
+> > +       if (!app) {
+> > +               error("Unexpected NULL adv_monitor_app object upon matc=
+h");
+> > +               return;
+> > +       }
+> > +
+> > +       queue_foreach(app->monitors, adv_match_per_monitor, user_data);
+> > +}
+> > +
+> > +/* Processes the content matching for every app without RSSI filtering=
+ and
+> > + * notifying monitors. The caller is responsible of releasing the memo=
+ry of the
+> > + * list but not the ad data.
+> > + * Returns the list of monitors whose content match the ad data.
+> > + */
+> > +struct queue *btd_adv_monitor_content_filter(
+> > +                               struct btd_adv_monitor_manager *manager=
+,
+> > +                               struct bt_ad *ad)
+> > +{
+> > +       struct adv_content_filter_info info;
+> > +
+> > +       if (!manager || !ad)
+> > +               return NULL;
+> > +
+> > +       info.ad =3D ad;
+> > +       info.matched_monitors =3D NULL;
+> > +
+> > +       queue_foreach(manager->apps, adv_match_per_app, &info);
+> > +
+> > +       return info.matched_monitors;
+> > +}
+> > +
+> > +/* Wraps adv_monitor_filter_rssi() to processes the content-matched mo=
+nitor with
+> > + * RSSI filtering and notifies it on device found/lost event
+> > + */
+> > +static void monitor_filter_rssi(void *data, void *user_data)
+> > +{
+> > +       struct adv_monitor *monitor =3D data;
+> > +       struct adv_rssi_filter_info *info =3D user_data;
+> > +
+> > +       if (!monitor || !info)
+> > +               return;
+> > +
+> > +       adv_monitor_filter_rssi(monitor, info->device, info->rssi);
+> > +}
+> > +
+> > +/* Processes every content-matched monitor with RSSI filtering and not=
+ifies on
+> > + * device found/lost event. The caller is responsible of releasing the=
+ memory
+> > + * of matched_monitors list but not its data.
+> > + */
+> > +void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *m=
+anager,
+> > +                                       struct btd_device *device, int8=
+_t rssi,
+> > +                                       struct queue *matched_monitors)
+> > +{
+> > +       struct adv_rssi_filter_info info;
+> > +
+> > +       if (!manager || !device || !matched_monitors ||
+> > +               queue_isempty(matched_monitors)) {
+> > +               return;
+> > +       }
+> > +
+> > +       info.device =3D device;
+> > +       info.rssi =3D rssi;
+> > +
+> > +       queue_foreach(matched_monitors, monitor_filter_rssi, &info);
+> > +}
+> > +
+> >  /* Matches a device based on btd_device object */
+> >  static bool monitor_device_match(const void *a, const void *b)
+> >  {
+> > diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+> > index 13d5d7282..2b4f68abf 100644
+> > --- a/src/adv_monitor.h
+> > +++ b/src/adv_monitor.h
+> > @@ -11,16 +11,30 @@
+> >  #ifndef __ADV_MONITOR_H
+> >  #define __ADV_MONITOR_H
+> >
+> > +#include <glib.h>
+> > +
+> > +#include "src/shared/ad.h"
+> > +
+> >  struct mgmt;
+> > +struct queue;
+> >  struct btd_device;
+> >  struct btd_adapter;
+> >  struct btd_adv_monitor_manager;
+> > +struct btd_adv_monitor_pattern;
+> >
+> >  struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+> >                                                 struct btd_adapter *ada=
+pter,
+> >                                                 struct mgmt *mgmt);
+> >  void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *m=
+anager);
+> >
+> > +struct queue *btd_adv_monitor_content_filter(
+> > +                               struct btd_adv_monitor_manager *manager=
+,
+> > +                               struct bt_ad *ad);
+> > +
+> > +void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *m=
+anager,
+> > +                                       struct btd_device *device, int8=
+_t rssi,
+> > +                                       struct queue *matched_monitors)=
+;
+> > +
+> >  void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *man=
+ager,
+> >                                    struct btd_device *device);
+> >
+> > --
+> > 2.26.2
+>
+> If I compile patch by patch this one fails:
+>
+> [detached HEAD 5a221084c] adv_monitor: Implement Adv matching based on
+> stored monitors
+>  Author: Miao-chen Chou <mcchou@chromium.org>
+>  Date: Wed Oct 28 16:05:30 2020 -0700
+>  3 files changed, 167 insertions(+), 42 deletions(-)
+> Executing: make -j12
+> make --no-print-directory all-am
+>   CC       src/bluetoothd-adapter.o
+>   CC       src/bluetoothd-adv_monitor.o
+> src/adv_monitor.c:137:13: error: =E2=80=98adv_monitor_filter_rssi=E2=80=
+=99 used but
+> never defined [-Werror]
+>   137 | static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
+>       |             ^~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+>
+> You might want to move these functions to the patch they start use
+> them so we don't break bisect, you can test them with something like:
+>
+> git rebase -i origin/master --exec=3Dmake
+>
+> @An, Tedd We should probably update the CI to do something like the
+> above so it can detect when a set would introduce a patch that doesn't
+> build.
+>
+Since the RSSI filtering patch introduces some functions that will be
+used by the following patch, so I merge this commit with the other one
+where it is used in v8.
+> --
+> Luiz Augusto von Dentz
 
-The following tests were performed.
-- In bluetoothctl console, add a monitor and remove the monitor by its
-index and verify the removal in both the output of btmgmt and syslog.
-- In bluetoothctl console, add a monitor, remove the monitor via
-btmgmt and verify the removal in syslog.
-
-Reviewed-by: Howard Chung <howardchung@google.com>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
----
-
-(no changes since v7)
-
-Changes in v7:
-- Rename MONITOR_STATE_HONORED to MONITOR_STATE_ACTIVE
-
-Changes in v4:
-- Fix build error
-
-Changes in v3:
-- Fix const qualifier of a pointer
-
- src/adv_monitor.c | 132 +++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 124 insertions(+), 8 deletions(-)
-
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index dbc3b2a92..c786015c8 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -79,6 +79,7 @@ enum monitor_state {
- 	MONITOR_STATE_FAILED,	/* Failed to be init'ed */
- 	MONITOR_STATE_INITED,	/* Init'ed but not yet sent to kernel */
- 	MONITOR_STATE_ACTIVE,	/* Accepted by kernel */
-+	MONITOR_STATE_REMOVING,	/* Removing from kernel */
- };
- 
- struct adv_monitor {
-@@ -87,6 +88,7 @@ struct adv_monitor {
- 	char *path;
- 
- 	enum monitor_state state;	/* MONITOR_STATE_* */
-+	uint16_t monitor_handle;	/* Kernel Monitor Handle */
- 
- 	int8_t high_rssi;		/* High RSSI threshold */
- 	uint16_t high_rssi_timeout;	/* High RSSI threshold timeout */
-@@ -567,6 +569,7 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
-+	monitor->monitor_handle = le16_to_cpu(rp->monitor_handle);
- 	monitor->state = MONITOR_STATE_ACTIVE;
- 
- 	DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
-@@ -575,8 +578,7 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
- 	g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL, NULL, NULL,
- 					NULL);
- 
--	DBG("Adv Monitor with handle:0x%04x added",
--					le16_to_cpu(rp->monitor_handle));
-+	DBG("Adv monitor with handle:0x%04x added", monitor->monitor_handle);
- }
- 
- static void monitor_copy_patterns(void *data, void *user_data)
-@@ -650,20 +652,77 @@ done:
- 	free(cp);
- }
- 
-+/* Handles the callback of Remove Adv Monitor command */
-+static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
-+				const void *param, void *user_data)
-+{
-+	struct adv_monitor *monitor = user_data;
-+	const struct mgmt_rp_remove_adv_monitor *rp = param;
-+	uint16_t adapter_id = monitor->app->manager->adapter_id;
-+
-+	if (status != MGMT_STATUS_SUCCESS || !param) {
-+		btd_error(adapter_id, "Failed to Remove Adv Monitor with "
-+			"status 0x%02x", status);
-+		goto done;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		btd_error(adapter_id, "Wrong size of Remove Adv Monitor "
-+				"response");
-+		goto done;
-+	}
-+
-+done:
-+	queue_remove(monitor->app->monitors, monitor);
-+
-+	DBG("Adv Monitor removed with handle:0x%04x, path %s",
-+		monitor->monitor_handle, monitor->path);
-+
-+	monitor_free(monitor);
-+}
-+
-+
- /* Handles the removal of an Adv Monitor D-Bus proxy */
- static void monitor_proxy_removed_cb(GDBusProxy *proxy, void *user_data)
- {
- 	struct adv_monitor *monitor;
-+	struct mgmt_cp_remove_adv_monitor cp;
- 	struct adv_monitor_app *app = user_data;
-+	uint16_t adapter_id = app->manager->adapter_id;
- 
--	monitor = queue_remove_if(app->monitors, monitor_match, proxy);
--	if (monitor) {
--		DBG("Adv Monitor removed for the object at path %s",
--			monitor->path);
-+	monitor = queue_find(app->monitors, monitor_match, proxy);
- 
--		/* The object was gone, so we don't need to call Release() */
--		monitor_free(monitor);
-+	/* A monitor removed event from kernel can remove a monitor and notify
-+	 * the app on Release() where this callback can be invoked, so we
-+	 * simply skip here.
-+	 */
-+	if (!monitor)
-+		return;
-+
-+	if (monitor->state != MONITOR_STATE_ACTIVE)
-+		goto done;
-+
-+	monitor->state = MONITOR_STATE_REMOVING;
-+
-+	cp.monitor_handle = cpu_to_le16(monitor->monitor_handle);
-+
-+	if (!mgmt_send(app->manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
-+			adapter_id, sizeof(cp), &cp, remove_adv_monitor_cb,
-+			monitor, NULL)) {
-+		btd_error(adapter_id, "Unable to send Remove Advt Monitor "
-+				"command");
-+		goto done;
- 	}
-+
-+	return;
-+
-+done:
-+	queue_remove(app->monitors, monitor);
-+
-+	DBG("Adv Monitor removed in state %02x with path %s", monitor->state,
-+		monitor->path);
-+
-+	monitor_free(monitor);
- }
- 
- /* Creates an app object, initiates it and sets D-Bus event handlers */
-@@ -872,6 +931,59 @@ static const GDBusPropertyTable adv_monitor_properties[] = {
- 	{ }
- };
- 
-+/* Matches a monitor based on its handle */
-+static bool removed_monitor_match(const void *data, const void *user_data)
-+{
-+	const uint16_t *handle = user_data;
-+	const struct adv_monitor *monitor = data;
-+
-+	if (!data || !handle)
-+		return false;
-+
-+	return monitor->monitor_handle == *handle;
-+}
-+
-+/* Remove the matched monitor and reports the removal to the app */
-+static void app_remove_monitor(void *data, void *user_data)
-+{
-+	struct adv_monitor_app *app = data;
-+	struct adv_monitor *monitor;
-+
-+	monitor = queue_find(app->monitors, removed_monitor_match, user_data);
-+	if (monitor) {
-+		if (monitor->state == MONITOR_STATE_ACTIVE)
-+			monitor_release(monitor, NULL);
-+
-+		queue_remove(app->monitors, monitor);
-+
-+		DBG("Adv Monitor at path %s removed", monitor->path);
-+
-+		monitor_free(monitor);
-+	}
-+}
-+
-+/* Processes Adv Monitor removed event from kernel */
-+static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_adv_monitor_manager *manager = user_data;
-+	const struct mgmt_ev_adv_monitor_removed *ev = param;
-+	uint16_t handle = ev->monitor_handle;
-+	const uint16_t adapter_id = manager->adapter_id;
-+
-+	if (length < sizeof(*ev)) {
-+		btd_error(adapter_id, "Wrong size of Adv Monitor Removed "
-+				"event");
-+		return;
-+	}
-+
-+	/* Traverse the apps to find the monitor */
-+	queue_foreach(manager->apps, app_remove_monitor, &handle);
-+
-+	DBG("Adv Monitor removed event with handle 0x%04x processed",
-+		ev->monitor_handle);
-+}
-+
- /* Allocates a manager object */
- static struct btd_adv_monitor_manager *manager_new(
- 						struct btd_adapter *adapter,
-@@ -891,6 +1003,10 @@ static struct btd_adv_monitor_manager *manager_new(
- 	manager->adapter_id = btd_adapter_get_index(adapter);
- 	manager->apps = queue_new();
- 
-+	mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_REMOVED,
-+			manager->adapter_id, adv_monitor_removed_callback,
-+			manager, NULL);
-+
- 	return manager;
- }
- 
--- 
-2.26.2
-
+Thanks,
+Miao
