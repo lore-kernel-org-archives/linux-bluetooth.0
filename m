@@ -2,179 +2,325 @@ Return-Path: <SRS0=F55x=EI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4039C00A89
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 13:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F7AC388F9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 17:55:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74A22223BE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 13:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BAC021D91
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 17:55:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdA00Ypc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725845AbgKBNcl convert rfc822-to-8bit (ORCPT
+        id S1726216AbgKBRzr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Nov 2020 08:32:41 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:48917 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbgKBNcl (ORCPT
+        Mon, 2 Nov 2020 12:55:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725791AbgKBRzq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Nov 2020 08:32:41 -0500
-Received: from mail-pg1-f199.google.com ([209.85.215.199])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1kZZwt-0007uN-5H
-        for linux-bluetooth@vger.kernel.org; Mon, 02 Nov 2020 13:32:39 +0000
-Received: by mail-pg1-f199.google.com with SMTP id r4so9202372pgl.20
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 05:32:39 -0800 (PST)
+        Mon, 2 Nov 2020 12:55:46 -0500
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B546CC0617A6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 09:55:46 -0800 (PST)
+Received: by mail-ot1-x341.google.com with SMTP id 79so5958478otc.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 09:55:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9J+2kaBauYF/sB5Ci9b7Cub0G0NBKhvBLjAlByvt+IA=;
+        b=IdA00YpcWdDeRwoOwNhLzc3LKhjJj7Dx1TVz7CGGxCr5W2RC1lOjUe+FxO2Z5b7Gqq
+         skWA9sUzueYWtfjYwDzhmT0hpmuNHFYkjzner7L4DT+JQLA9cFu88M5tkaoXxb0y/8BL
+         TGzoD8kK+KMWeAsNYLLBK629QPukwbHh6GDxiUqYXR/Jcyv2vPN50vuOdbf5G1K2A7+4
+         07m8OGXymAiIidD8PXidLtclOz1bSmyxdIohx0Ba+y9EPBrGmzyKVMOY7EmelRyyZk4w
+         ynwnpvaBhLu6GWt7lc82VFznWvIfpQ33Z+RB9rS9qMSC5iLc5Ho2mRCty6EXjtOEGVay
+         teIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=cjErvK8MUSGh8IOlHd2RporU2vNgl3pwXHEZ7poNC7M=;
-        b=proTV5XTBQwpiHGLmDSK1V7JIu2lK9tu8YHW+LKItmLaLHOZl8XV6XqiaJQnccc515
-         noPDhmwLaXA7n7lm4E9rx64E43ldT6q209eGPCOmvOwyIGzXm+/TmrpLIleM9Gx5Rh5e
-         xFumInm0VnjW4TYHdTSNbMZ7PEPnAu9jfE/HyUr7G1z0fTA0SBWmwHn4LJ3zDXfltorH
-         Sd17XWM+M2tqHXkz3IWGM6S+tb3Oz4RA/PxV6J64NdmOK42z/dFMK/bsxZvKsX30lzjI
-         Q7z8MnTtvWcLSBHJeLy5bZBdpfXRA1h1ym+lv04ovv1u+jBvy7nUPO6BaGqCdEmdF5Qj
-         F3hQ==
-X-Gm-Message-State: AOAM531ES83ti3We/1F0SBV8w5Nxl74nlJNN70LsOUtLypVLbjoX+9jC
-        RLSpQ+BsukeM20YkeOnDIKsd2PKztuPXMt1F7HhQkAOBZ27iMLInaVCbhj0aY3zwQlQ64GFKBKw
-        jN2GdZidOqulizCMoX2FvjRvam9A/2Ey4TVvn+PqhP6UljQ==
-X-Received: by 2002:a63:5625:: with SMTP id k37mr6523265pgb.136.1604323957751;
-        Mon, 02 Nov 2020 05:32:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJySGvdT/8hMRJms3GyjVRZl5ToYxCQ0yX2k5LZ+DuJ2jVwevCJI0Rfr73MvSF/Cirhq+CZbjA==
-X-Received: by 2002:a63:5625:: with SMTP id k37mr6523245pgb.136.1604323957331;
-        Mon, 02 Nov 2020 05:32:37 -0800 (PST)
-Received: from [192.168.1.208] (220-133-187-190.HINET-IP.hinet.net. [220.133.187.190])
-        by smtp.gmail.com with ESMTPSA id z13sm12933775pgc.44.2020.11.02.05.32.35
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Nov 2020 05:32:36 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v2] Bluetooth: btrtl: Ask 8821C to drop old firmware
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <20201026082838.26532-1-kai.heng.feng@canonical.com>
-Date:   Mon, 2 Nov 2020 21:32:33 +0800
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <1A6AB99C-425D-42D5-B1F4-818AD7525F53@canonical.com>
-References: <20201026082838.26532-1-kai.heng.feng@canonical.com>
-To:     Max Chou <max.chou@realtek.com>, alex_lu <alex_lu@realsil.com.cn>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9J+2kaBauYF/sB5Ci9b7Cub0G0NBKhvBLjAlByvt+IA=;
+        b=G4lAbYdvwI7SPHy+G5fQL2OmB8vvS/qjPIZmV8SmSKa4nqzs65BXGBMm/1+4niWCFO
+         kNNdkQww8uhDh5pkId+HNGdFygidg3NhdHeHZ3AYB8xkbZZY2QTgUjdtN9hLaM9SMS06
+         zRTqkRrX3cJ+QxayP1NLHM+4dNgHvKKsqINUDf1+KxAIKcAKuzVlcY3C8+N8a3je+iyl
+         lF/pr/AKTutfP9jrP6Jj7X6bUleqN+jyQrcEofGlte8WxxzzSIFK/tA8uNz+4JNWXBEE
+         jG6ul9NDC4m2cPbik+SsXjAdcA5M8WHWHAu1NB7N4RPbzPjKtkbPA8GKWuSNSgX8FViT
+         oBrQ==
+X-Gm-Message-State: AOAM530PFkyF33wQHczYDlCEweq10abwwnSGF5hXV/MfB2rR/esiJcid
+        gPtvkY8T7g9Qs59Xq9t97P85slN4go1F687LLxg=
+X-Google-Smtp-Source: ABdhPJy5jgrtJ3iyEEMjWkDGxr29KjUZtwco0+MYLUrXXx7/nINzAe4owMI8NYHYWhFF+M59yiMIR5sC8gIQJjjnP6Y=
+X-Received: by 2002:a9d:1a9:: with SMTP id e38mr5370708ote.240.1604339746018;
+ Mon, 02 Nov 2020 09:55:46 -0800 (PST)
+MIME-Version: 1.0
+References: <20201030175219.BlueZ.v8.1.Ie670925d87068d24a6e5c2e7dd9dd0e88c89a7da@changeid>
+In-Reply-To: <20201030175219.BlueZ.v8.1.Ie670925d87068d24a6e5c2e7dd9dd0e88c89a7da@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 2 Nov 2020 09:55:35 -0800
+Message-ID: <CABBYNZLOkKjgroVxCOyzg194iHVR1z6KkxaEoP5k8kLo35C1uQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v8 1/6] shared/ad: Add support of bt_ad_pattern
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Howard Chung <howardchung@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Miao,
 
-
-> On Oct 26, 2020, at 16:28, Kai-Heng Feng <kai.heng.feng@canonical.com> wrote:
-> 
-> Some platforms keep USB power even when they are powered off and in S5,
-> this makes Realtek 8821C keep its firmware even after a cold boot, and
-> make 8821C never load new firmware.
-> 
-> So use vendor specific HCI command to ask 8821C drop its firmware after
-> system shutdown.
-> 
-> Newer firmware doesn't have this issue so we only use this trick for old
-> 8821C firmware version.
-> 
-> Suggested-by: Max Chou <max.chou@realtek.com>
-> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
-
-Max and Alex,
-
-Can you please ack or review the patch?
-
-Kai-Heng
-
+On Fri, Oct 30, 2020 at 5:56 PM Miao-chen Chou <mcchou@chromium.org> wrote:
+>
+> This adds struct bt_ad_pattern and helpers functions to facilitate
+> pattern matching.
+>
+> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> Reviewed-by: Howard Chung <howardchung@google.com>
 > ---
-> v2:
-> - Fix incorrect parAnthesis on le16_to_cpu.
-> - Ensure firmware gets re-uploaded in initialization.
-> 
-> drivers/bluetooth/btrtl.c | 46 +++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 46 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 3a9afc905f24..37e24bbb2eb4 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -55,6 +55,7 @@ struct btrtl_device_info {
-> 	int fw_len;
-> 	u8 *cfg_data;
-> 	int cfg_len;
-> +	bool drop_fw;
-> };
-> 
-> static const struct id_table ic_id_table[] = {
-> @@ -563,6 +564,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
-> 	u16 hci_rev, lmp_subver;
-> 	u8 hci_ver;
-> 	int ret;
-> +	u16 opcode;
-> +	u8 cmd[2];
-> 
-> 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
-> 	if (!btrtl_dev) {
-> @@ -584,6 +587,49 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
-> 	hci_ver = resp->hci_ver;
-> 	hci_rev = le16_to_cpu(resp->hci_rev);
-> 	lmp_subver = le16_to_cpu(resp->lmp_subver);
+>
+> Changes in v8:
+> - Modify signature of ad_replace_data() to avoid memory copy
+>
+>  src/shared/ad.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  src/shared/ad.h |  16 +++++
+>  2 files changed, 166 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> index a34d7a147..23c8c34f4 100644
+> --- a/src/shared/ad.c
+> +++ b/src/shared/ad.c
+> @@ -31,6 +31,12 @@ struct bt_ad {
+>         struct queue *data;
+>  };
+>
+> +struct pattern_match_info {
+> +       struct bt_ad *ad;
+> +       struct bt_ad_pattern *current_pattern;
+> +       struct bt_ad_pattern *matched_pattern;
+> +};
 > +
-> +	if (resp->hci_ver == 0x8 && le16_to_cpu(resp->hci_rev) == 0x826c &&
-> +	    resp->lmp_ver == 0x8 && le16_to_cpu(resp->lmp_subver) == 0xa99e)
-> +		btrtl_dev->drop_fw = true;
+>  struct bt_ad *bt_ad_new(void)
+>  {
+>         struct bt_ad *ad;
+> @@ -46,6 +52,65 @@ struct bt_ad *bt_ad_new(void)
+>         return bt_ad_ref(ad);
+>  }
+>
+> +static bool ad_replace_data(struct bt_ad *ad, uint8_t type, const void *data,
+> +                                                       size_t len);
 > +
-> +	if (btrtl_dev->drop_fw) {
-> +		opcode = hci_opcode_pack(0x3f, 0x66);
-> +		cmd[0] = opcode & 0xff;
-> +		cmd[1] = opcode >> 8;
+> +static bool ad_is_type_valid(uint8_t type)
+> +{
+> +       if (type > BT_AD_3D_INFO_DATA && type != BT_AD_MANUFACTURER_DATA)
+> +               return false;
+> +       if (type < BT_AD_FLAGS)
+> +               return false;
 > +
-> +		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> +		if (IS_ERR(skb))
-> +			goto out_free;
+> +       return true;
+> +}
 > +
-> +		skb_put_data(skb, cmd, sizeof(cmd));
-> +		hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> +struct bt_ad *bt_ad_new_with_data(size_t len, const uint8_t *data)
+> +{
+> +       struct bt_ad *ad;
+> +       uint16_t parsed_len = 0;
 > +
-> +		hdev->send(hdev, skb);
+> +       if (data == NULL || !len)
+> +               return NULL;
 > +
-> +		/* Ensure the above vendor command is sent to controller and
-> +		 * process has done.
-> +		 */
-> +		msleep(200);
+> +       ad = bt_ad_new();
+> +       if (!ad)
+> +               return NULL;
 > +
-> +		/* Read the local version again. Expect to have the vanilla
-> +		 * version as cold boot.
-> +		 */
-> +		skb = btrtl_read_local_version(hdev);
-> +		if (IS_ERR(skb)) {
-> +			ret = PTR_ERR(skb);
-> +			goto err_free;
-> +		}
+> +       while (parsed_len < len - 1) {
+> +               uint8_t d_len;
+> +               uint8_t d_type;
+> +               const uint8_t *d;
+> +               uint8_t field_len = data[0];
 > +
-> +		resp = (struct hci_rp_read_local_version *)skb->data;
-> +		rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
-> +			     resp->hci_ver, resp->hci_rev,
-> +			     resp->lmp_ver, resp->lmp_subver);
+> +               if (field_len == 0)
+> +                       break;
 > +
-> +		hci_ver = resp->hci_ver;
-> +		hci_rev = le16_to_cpu(resp->hci_rev);
-> +		lmp_subver = le16_to_cpu(resp->lmp_subver);
-> +	}
-> +out_free:
-> 	kfree_skb(skb);
-> 
-> 	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
-> -- 
-> 2.17.1
-> 
+> +               parsed_len += field_len + 1;
+> +
+> +               if (parsed_len > len)
+> +                       break;
+> +
+> +               d = &data[2];
+> +               d_type = data[1];
+> +               d_len = field_len - 1;
+> +
+> +               if (!ad_is_type_valid(d_type))
+> +                       goto failed;
+> +
+> +               if (!ad_replace_data(ad, d_type, d, d_len))
+> +                       goto failed;
+> +
+> +               data += field_len + 1;
+> +       }
+> +
+> +       return ad;
+> +
+> +failed:
+> +       bt_ad_unref(ad);
+> +       return NULL;
+> +}
+> +
+>  struct bt_ad *bt_ad_ref(struct bt_ad *ad)
+>  {
+>         if (!ad)
+> @@ -126,7 +191,7 @@ static bool data_type_match(const void *data, const void *user_data)
+>         return a->type == type;
+>  }
+>
+> -static bool ad_replace_data(struct bt_ad *ad, uint8_t type, void *data,
+> +static bool ad_replace_data(struct bt_ad *ad, uint8_t type, const void *data,
+>                                                         size_t len)
+>  {
+>         struct bt_ad_data *new_data;
+> @@ -994,3 +1059,87 @@ void bt_ad_clear_data(struct bt_ad *ad)
+>
+>         queue_remove_all(ad->data, NULL, NULL, data_destroy);
+>  }
+> +
+> +struct bt_ad_pattern *bt_ad_pattern_new(uint8_t type, size_t offset, size_t len,
+> +                                                       const uint8_t *data)
+> +{
+> +       struct bt_ad_pattern *pattern;
+> +
+> +       if (!data || !len || offset >= BT_AD_MAX_DATA_LEN ||
+> +               len > BT_AD_MAX_DATA_LEN || offset + len > BT_AD_MAX_DATA_LEN) {
+> +               return NULL;
+> +       }
+> +
+> +       if (!ad_is_type_valid(type))
+> +               return NULL;
+> +
+> +       pattern = new0(struct bt_ad_pattern, 1);
+> +       if (!pattern)
+> +               return NULL;
+> +
+> +       pattern->len = len;
+> +       pattern->type = type;
+> +       pattern->offset = offset;
+> +       memcpy(pattern->data, data, len);
+> +
+> +       return pattern;
+> +}
+> +
+> +static void pattern_ad_data_match(void *data, void *user_data)
+> +{
+> +       struct bt_ad_data *ad_data = data;
+> +       struct pattern_match_info *info = user_data;
+> +       struct bt_ad_pattern *pattern;
+> +
+> +       if (!ad_data || !info)
+> +               return;
+> +
+> +       if (info->matched_pattern)
+> +               return;
+> +
+> +       pattern = info->current_pattern;
+> +
+> +       if (!pattern || ad_data->type != pattern->type)
+> +               return;
+> +
+> +       if (ad_data->len < pattern->offset + pattern->len)
+> +               return;
+> +
+> +       if (!memcmp(ad_data->data + pattern->offset, pattern->data,
+> +                                                               pattern->len)) {
+> +               info->matched_pattern = pattern;
+> +       }
+> +}
+> +
+> +static void pattern_match(void *data, void *user_data)
+> +{
+> +       struct bt_ad_pattern *pattern = data;
+> +       struct pattern_match_info *info = user_data;
+> +
+> +       if (!pattern || !info)
+> +               return;
+> +
+> +       if (info->matched_pattern)
+> +               return;
+> +
+> +       info->current_pattern = pattern;
+> +
+> +       bt_ad_foreach_data(info->ad, pattern_ad_data_match, info);
+> +}
+> +
+> +struct bt_ad_pattern *bt_ad_pattern_match(struct bt_ad *ad,
+> +                                                       struct queue *patterns)
+> +{
+> +       struct pattern_match_info info;
+> +
+> +       if (!ad || queue_isempty(patterns))
+> +               return NULL;
+> +
+> +       info.ad = ad;
+> +       info.matched_pattern = NULL;
+> +       info.current_pattern = NULL;
+> +
+> +       queue_foreach(patterns, pattern_match, &info);
+> +
+> +       return info.matched_pattern;
+> +}
+> diff --git a/src/shared/ad.h b/src/shared/ad.h
+> index 83eacab66..13adcb406 100644
+> --- a/src/shared/ad.h
+> +++ b/src/shared/ad.h
+> @@ -68,6 +68,7 @@
+>  typedef void (*bt_ad_func_t)(void *data, void *user_data);
+>
+>  struct bt_ad;
+> +struct queue;
+>
+>  struct bt_ad_manufacturer_data {
+>         uint16_t manufacturer_id;
+> @@ -87,8 +88,17 @@ struct bt_ad_data {
+>         size_t len;
+>  };
+>
+> +struct bt_ad_pattern {
+> +       uint8_t type;
+> +       uint8_t offset;
+> +       uint8_t len;
+> +       uint8_t data[BT_AD_MAX_DATA_LEN];
+> +};
+> +
+>  struct bt_ad *bt_ad_new(void);
+>
+> +struct bt_ad *bt_ad_new_with_data(size_t len, const uint8_t *data);
+> +
+>  struct bt_ad *bt_ad_ref(struct bt_ad *ad);
+>
+>  void bt_ad_unref(struct bt_ad *ad);
+> @@ -156,3 +166,9 @@ void bt_ad_foreach_data(struct bt_ad *ad, bt_ad_func_t func, void *user_data);
+>  bool bt_ad_remove_data(struct bt_ad *ad, uint8_t type);
+>
+>  void bt_ad_clear_data(struct bt_ad *ad);
+> +
+> +struct bt_ad_pattern *bt_ad_pattern_new(uint8_t type, size_t offset,
+> +                                       size_t len, const uint8_t *data);
+> +
+> +struct bt_ad_pattern *bt_ad_pattern_match(struct bt_ad *ad,
+> +                                                       struct queue *patterns);
+> --
+> 2.26.2
 
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
