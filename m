@@ -2,131 +2,103 @@ Return-Path: <SRS0=F55x=EI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DD3C388F2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 08:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C84C3C00A89
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 13:27:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED2E22272
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 08:13:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73D872054F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 13:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=endlessos.org header.i=@endlessos.org header.b="rTYOIXoa"
+	dkim=pass (1024-bit key) header.d=spotify.com header.i=@spotify.com header.b="YF8ux7ux"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728078AbgKBINN (ORCPT
+        id S1725824AbgKBN1i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Nov 2020 03:13:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
+        Mon, 2 Nov 2020 08:27:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727806AbgKBIME (ORCPT
+        with ESMTP id S1725801AbgKBN1h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Nov 2020 03:12:04 -0500
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AECC0617A6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 00:12:04 -0800 (PST)
-Received: by mail-pg1-x543.google.com with SMTP id t14so10138911pgg.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 00:12:04 -0800 (PST)
+        Mon, 2 Nov 2020 08:27:37 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775B2C0617A6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 05:27:37 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 126so17424107lfi.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 05:27:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=endlessos.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=A2lbRxRCm6YJ/XgJATRJyEyLX4vRUjWqIBI7bdt9ix0=;
-        b=rTYOIXoaERUMqqFWrKz5r963tOK5UvxmwILHg/dNBgIyFKveGTlbRc0W1MgBlZcvtH
-         xS9BXyhubL7euN/5c5vZt8N8Rx0hDfpaR/bCaCM8U2BI6f5ylc7QWpsYeacF4CEkHV3r
-         gH9Yuf1GSBDKSjaVJGjkUR4ojpI2GvlpGStZwpr3FsA+U5wm9Wj3KkdSP2fuNiXvG3mj
-         AkGqzhbpeU08Ix6nU+8Lzs2QhDUMttrQ946on4pzF4gyqHmAYNggwEbmVkDC2LDzULke
-         GzP+ooh50vwcK+2Lezl5a7CeZRCdlxlmhI2oT/qvz3cO5nL0Txj2/XnBWR5hnYzJuyJX
-         HWhA==
+        d=spotify.com; s=google;
+        h=date:from:to:subject:message-id:mime-version:content-disposition;
+        bh=zbHMo4BUNx71IZo55HUEi+rmpDEOmOephdzmb49uG3w=;
+        b=YF8ux7uxpJ5DYHRIIi+AtrzeKh2Ov0ukaZ1eW7oGezCsLlYY7Ei9E6TS1D26PSNInI
+         2A+EkfT0ofBuWrGMCYbgTo6brtmbaGZNefXYTn4g14L61+U1u56qsOUdaro8nJVzzply
+         247IonboN6LsFv0ZXGYSqJGylfPuSwx85C6Uw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=A2lbRxRCm6YJ/XgJATRJyEyLX4vRUjWqIBI7bdt9ix0=;
-        b=XfgbrOjEoaxBIJMkph54Q3Dj2OB4QaVI6uB4p82qtXpGYfyQpb1HZTsjw0Z5FU2O8h
-         +R1EgZfjRs+0IDa+/lErZsevTs0vSTuKQz/WS+0ibzztxNE4ZfmUb3sQkwzbbFssF0Aq
-         xyM33wR9buKyhe/6JbbeJiUAU/2FygNVP5PAukIjZLhbB1CQ2JpPy1lFT2lgAYZz62Ur
-         o718WUYcZohNV9333hdXHUkHsyZyS544uJE3QA3qhqbm75LC/73lUc8I9wR/iq4mEvee
-         2/TTv02byut3EGSFMluWfxsMGKta+aafzeWE8Lu+TrBkSbHLkV6owlkdMF7cPx3Q8a9I
-         kLVg==
-X-Gm-Message-State: AOAM5300RdlR0R8RQw04/Dm6xN5BDl8c3YaYDI5CvzyaauW9c5EQqGYi
-        x5IBjhxz+LhQP7AqpiyfejIEMA==
-X-Google-Smtp-Source: ABdhPJzhWRwM9T+K7YXOdYW/f/MLs7UkfWf9rR7zJarQUKacM61QVlTaewhaM0+Q2A5PdiGqQnNf2Q==
-X-Received: by 2002:aa7:931a:0:b029:164:115:33ca with SMTP id 26-20020aa7931a0000b0290164011533camr21021035pfj.62.1604304724131;
-        Mon, 02 Nov 2020 00:12:04 -0800 (PST)
-Received: from endless.endlessm-sf.com (ec2-34-209-191-27.us-west-2.compute.amazonaws.com. [34.209.191.27])
-        by smtp.googlemail.com with ESMTPSA id a18sm13885502pfg.54.2020.11.02.00.12.01
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition;
+        bh=zbHMo4BUNx71IZo55HUEi+rmpDEOmOephdzmb49uG3w=;
+        b=a0lZGK0GTypy4hPTdwa232P1Sbarg5sWSpiwEkzSwKVIkO4nhAghnGfE8UnwvDHE/i
+         FOhH9qTlbhxiCNev5EXVw4SEHJhqGtF4f7BnBA61Ga17aImquiW2HBx2tBuWjB0jzYiq
+         Whd5OcU+YkHp0bSVMoCKCMX0KslJrAf7hifB83v8ZYhOAOlfW80cVNiAI1Q9Bj6Clz/r
+         Sp3DurMSSL3yBk+HG8UKNLZY2O7nRayUNQMijuVD4MweDIWcM9IGDVJfLG4c60HCZUAd
+         1Okrc77rRaT2esFGYPNULktumCq0aqI7vrdEKrKk12HxmJjCQp7hcyqIaBkJO7aQuJEu
+         ZvoA==
+X-Gm-Message-State: AOAM532d5C9vcUxFleu++k9SnRHZn15pBSZvMkVpI6wrxOtPdV5GHhhx
+        8eiqp/d2ILvlqdgxHnVkS9gyJv2UD62HbI8=
+X-Google-Smtp-Source: ABdhPJz8EOY8ZNVW+LfbmOIn3YWD33mHXeNmBuBirsZqwKukuZuPKZZmxkvMGDHlXyT00bh3Gga/3g==
+X-Received: by 2002:a19:68c:: with SMTP id 134mr6328897lfg.188.1604323655732;
+        Mon, 02 Nov 2020 05:27:35 -0800 (PST)
+Received: from jimmy-ryzen-home (c-8713e055.76534-0-69706f6e6c79.bbcust.telenor.se. [85.224.19.135])
+        by smtp.gmail.com with ESMTPSA id i63sm2303115lfi.53.2020.11.02.05.27.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 00:12:03 -0800 (PST)
-From:   Chris Chiu <chiu@endlessos.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@endlessos.org, Chris Chiu <chiu@endlessos.org>
-Subject: [PATCH] Bluetooth: btusb: Add support for 13d3:3560 MediaTek MT7615E device
-Date:   Mon,  2 Nov 2020 16:11:57 +0800
-Message-Id: <20201102081157.25012-1-chiu@endlessos.org>
-X-Mailer: git-send-email 2.20.1
+        Mon, 02 Nov 2020 05:27:34 -0800 (PST)
+Date:   Mon, 2 Nov 2020 14:27:33 +0100
+From:   Jimmy Wahlberg <jimmywa@spotify.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, davem@davemloft.net, kuba@kernel.org
+Subject: [PATCH] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C.
+Message-ID: <20201102132733.GA77385@jimmy-ryzen-home>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The ASUS X532EQ laptop contains AzureWave AW-CB434NF module with an
-associated MT7615E BT chip using a USB ID of 13d3:3560.
+This test case is meant to verify that multiple
+unknown options is included in the response.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=09 Cnt=02 Dev#=  3 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3560 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+Unknown options shall be in the response if
+they are not hints according to Bluetooth Core
+Spec v5.2. See chapter 4.5 L2CAP_CONFIGURATION_RSP
 
-Signed-off-by: Chris Chiu <chiu@endlessos.org>
+Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5af2e3f30a5e..a0bfd41fdfee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -367,6 +367,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* MediaTek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
- 	  .driver_info = BTUSB_MEDIATEK },
-+	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1ab27b90ddcb..16956f323688 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3627,7 +3627,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			if (hint)
+ 				break;
+ 			result = L2CAP_CONF_UNKNOWN;
+-			*((u8 *) ptr++) = type;
++			l2cap_add_conf_opt(&ptr, (u8)type, sizeof(u8), type, endptr - ptr);
+ 			break;
+ 		}
+ 	}
 -- 
-2.20.1
+2.25.1
 
+Hi,
+
+While running tests I encountered this one test that I could not pass. After some troubleshooting I landed in this patch. Please let me know what you think.
+
+Best regards
+Jimmy
