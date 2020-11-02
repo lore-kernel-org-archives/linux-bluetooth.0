@@ -5,67 +5,70 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89AAC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC5AC00A89
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6ED662225E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A75152225E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q3BaXOtS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ds50etqN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726456AbgKBTMg (ORCPT
+        id S1726473AbgKBTMh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Nov 2020 14:12:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37034 "EHLO
+        Mon, 2 Nov 2020 14:12:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726433AbgKBTMf (ORCPT
+        with ESMTP id S1726433AbgKBTMg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Nov 2020 14:12:35 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC347C0617A6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 11:12:35 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id z24so11631394pgk.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 11:12:35 -0800 (PST)
+        Mon, 2 Nov 2020 14:12:36 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55F2C0617A6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 11:12:36 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id w11so7301351pll.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 11:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=UOqgW6gYJUJOpOWSWevnjNEwQyetSI3mUh93Pehd4Ik=;
-        b=Q3BaXOtSsZg7LeEnYM2dPQRmpUH+5STQunUWi7sMjhfcx2TeUTtdMfyNCAErtrFRu4
-         WYoYPyDmx9ob2VTQR17SdphwQ+uJfikOcA8+kErMXNG1mKSoGktrENENOHa9mhdejtIH
-         hcG2n8Cea02tEY88APsBKTuVxgjyAGPE3kVVhtsKMeycjyLm9cI5QMyF+q9+wHHABD7f
-         S3Qp/DM34Fy3UCvAWQ1RJCEC6d5kUZQeoZ52xzQPEeEC8AAvVm5Tocev66v1Ld1JnjY/
-         e4KG3ACzUSCD1A+StN/bbntIFpi6eo83pVR9/rT8EqA//jy/u0ozodaEkY2imgRnOXFA
-         oceg==
+        bh=AJ40uhAUVOG4HQ6xubmwRqCHUzL28Zk1s0d9ENX1l90=;
+        b=Ds50etqNZ3UPYsIZgm+8agmXVwCuGlFK5GoUWXdyJ4kIJdXfEIK4AHwADtYAd3GW9I
+         jjqplUxZEynDFyaEh7HulhMHqzYY9s7gyGszRy/lvpgsQpmB7uRbGlAfUySziiRknn/Y
+         WdxuaLbLBGnFnbdjLztp2dLEGC/doR/ozdlyopCi1i8dbt0+YpybyhFnxGSkECm0vXuh
+         38HIb6HIv1oXauPvD6sc/djwdpQjpoOEn7MFFDDgq41cRihGHmPPqiE2y+yyBfJYX+sy
+         Xz+/JI8wGnazGtppZJESdPWBLwuWdrnKBK5tHVMdLhDrEXISZkquh1XMqlH1yUXy7VyC
+         meIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=UOqgW6gYJUJOpOWSWevnjNEwQyetSI3mUh93Pehd4Ik=;
-        b=RbltOI8SUaU6AcBm4QJdedONxh+rg7jYMjNq57xXxujGedEfIQ9viEMcCv3PIx/k5f
-         31k1/riFko7zz0d74p66Lds1kxmC5L3NmWxUoDtcWewspMHbkuUapNDElAIbpjgpirf8
-         mKGVKtobEByvKx/yxLtirb0ZQxFAOV5un+0xfNp/VEwOb0d6ZrnpG+FieucXOYDvxE/h
-         NklwgFo4Pf9Ky+9Be3L7EL4qfl/ZzQN5oKrl+weUBCHlYb6Z0OMHz9pUOyn9CQhdCm/I
-         doZe6CIi0fXP6m3iBMxU1jMBP8md83NjWuXxMwXKgKt8GGpRCCupEzuraQcrbXHvCqAl
-         eydQ==
-X-Gm-Message-State: AOAM533BDXquy1Z4NgSUt/RCAS34xNN8W/OK7vnyvN2pP9do6vzmGqbq
-        uO7twwwoz2KYSA6dOUNsR1IiXB3Jay2AnQ==
-X-Google-Smtp-Source: ABdhPJz5xeqDea/ZsS1ebfuTFA7h1K9WNQOpf+Ut1QYxjrgcG8McHhuNQLckGg/tf3LGF4EdEYFzuw==
-X-Received: by 2002:a17:90a:34cd:: with SMTP id m13mr19449866pjf.201.1604344354806;
-        Mon, 02 Nov 2020 11:12:34 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=AJ40uhAUVOG4HQ6xubmwRqCHUzL28Zk1s0d9ENX1l90=;
+        b=jZdV87GgXNEwg5En8cCjbnW/LGZa4pM8ZmUn3rR6SSgBQLWayC0iCzuOLlMh8NTgK9
+         BYONJxUOx+LX5/RE/PNhRv6ylgSvn0/+QT+jqqPwWP0AcI/zU9G99DjOQt3hknOtrOyZ
+         aFKE9VU4Aa8hmH9KVCc4R97zF7jcAIKi7VrbXBeD8N3rpu+GIE5N2nQm8ay2+T5gyZsn
+         xo4O5qc5qLNc31qDkLPespmzdYtABotawRE0RWKlNvD1vLa0tlQbIIb/8zrnFnPUS/Pe
+         OOZV2QZq2bmZTdc/k/uwsNqMwpDTic+fvxKATOSYIF/3eMJt4Xq5iVSy0O82/Y18l3m8
+         t3BA==
+X-Gm-Message-State: AOAM5333eVmvh1abP/YAU8kCx6ci3ryDW6IMucQpmsSSeZ0J+YfeWCr1
+        6jpJHjrN5vmE4WnrMgsDFMgq2e06L1HWnQ==
+X-Google-Smtp-Source: ABdhPJxL5bj4v6pqD0CglvjBmgiMPG2+wfnufMvsxMaSQEaAzBum8+qIKGNKg6gQqcj+dvkEycUeeg==
+X-Received: by 2002:a17:902:8608:b029:d4:c459:f1e8 with SMTP id f8-20020a1709028608b02900d4c459f1e8mr21804171plo.36.1604344356078;
+        Mon, 02 Nov 2020 11:12:36 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z10sm14589716pff.218.2020.11.02.11.12.33
+        by smtp.gmail.com with ESMTPSA id z10sm14589716pff.218.2020.11.02.11.12.34
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 11:12:33 -0800 (PST)
+        Mon, 02 Nov 2020 11:12:35 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/11] emulator/btdev: Add debug support
-Date:   Mon,  2 Nov 2020 11:12:22 -0800
-Message-Id: <20201102191232.1848737-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 02/11] emulator/bthost: Add debug support
+Date:   Mon,  2 Nov 2020 11:12:23 -0800
+Message-Id: <20201102191232.1848737-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201102191232.1848737-1-luiz.dentz@gmail.com>
+References: <20201102191232.1848737-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -74,232 +77,227 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds btdev_set_debug which can be used to debug internals of
-btdev.
+This adds bthost_set_debug which can be used to debug internals of
+bthost.
 ---
- emulator/btdev.c | 99 +++++++++++++++++++++++++-----------------------
- emulator/btdev.h |  5 +++
- 2 files changed, 57 insertions(+), 47 deletions(-)
+ emulator/bthost.c | 73 ++++++++++++++++++++++++++++++++++++++++-------
+ emulator/bthost.h |  5 ++++
+ 2 files changed, 68 insertions(+), 10 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index ca87681a6..c89815b3e 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -144,6 +144,10 @@ struct btdev {
- 	uint8_t  sync_train_service_data;
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 1c05c7496..f5b09bc4f 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -24,6 +24,7 @@
+ #include "lib/bluetooth.h"
  
- 	uint16_t le_ext_adv_type;
+ #include "src/shared/util.h"
++#include "src/shared/tester.h"
+ #include "monitor/bt.h"
+ #include "monitor/rfcomm.h"
+ #include "bthost.h"
+@@ -213,6 +214,10 @@ struct bthost {
+ 	bool conn_init;
+ 	bool le;
+ 	bool sc;
 +
-+	btdev_debug_func_t debug_callback;
-+	btdev_destroy_func_t debug_destroy;
++	bthost_debug_func_t debug_callback;
++	bthost_destroy_func_t debug_destroy;
 +	void *debug_data;
  };
  
- struct inquiry_data {
-@@ -257,45 +261,6 @@ static inline struct btdev *find_btdev_by_bdaddr_type(const uint8_t *bdaddr,
- 	return NULL;
- }
- 
--static void hexdump(const unsigned char *buf, uint16_t len)
--{
--	static const char hexdigits[] = "0123456789abcdef";
--	char str[68];
--	uint16_t i;
--
--	if (!len)
--		return;
--
--	for (i = 0; i < len; i++) {
--		str[((i % 16) * 3) + 0] = hexdigits[buf[i] >> 4];
--		str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
--		str[((i % 16) * 3) + 2] = ' ';
--		str[(i % 16) + 49] = isprint(buf[i]) ? buf[i] : '.';
--
--		if ((i + 1) % 16 == 0) {
--			str[47] = ' ';
--			str[48] = ' ';
--			str[65] = '\0';
--			printf("%-12c%s\n", ' ', str);
--			str[0] = ' ';
--		}
--	}
--
--	if (i % 16 > 0) {
--		uint16_t j;
--		for (j = (i % 16); j < 16; j++) {
--			str[(j * 3) + 0] = ' ';
--			str[(j * 3) + 1] = ' ';
--			str[(j * 3) + 2] = ' ';
--			str[j + 49] = ' ';
--		}
--		str[47] = ' ';
--		str[48] = ' ';
--		str[65] = '\0';
--		printf("%-12c%s\n", ' ', str);
--	}
--}
--
- static void get_bdaddr(uint16_t id, uint8_t index, uint8_t *bdaddr)
- {
- 	bdaddr[0] = id & 0xff;
-@@ -768,6 +733,22 @@ void btdev_destroy(struct btdev *btdev)
- 	free(btdev);
- }
- 
-+bool btdev_set_debug(struct btdev *btdev, btdev_debug_func_t callback,
-+			void *user_data, btdev_destroy_func_t destroy)
-+{
-+	if (!btdev)
-+		return false;
-+
-+	if (btdev->debug_destroy)
-+		btdev->debug_destroy(btdev->debug_data);
-+
-+	btdev->debug_callback = callback;
-+	btdev->debug_destroy = destroy;
-+	btdev->debug_data = user_data;
-+
-+	return true;
-+}
-+
- const uint8_t *btdev_get_bdaddr(struct btdev *btdev)
- {
- 	return btdev->bdaddr;
-@@ -824,9 +805,20 @@ void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
- static void send_packet(struct btdev *btdev, const struct iovec *iov,
+ struct bthost *bthost_create(void)
+@@ -487,9 +492,20 @@ static void queue_command(struct bthost *bthost, const struct iovec *iov,
+ static void send_packet(struct bthost *bthost, const struct iovec *iov,
  								int iovlen)
  {
 +	int i;
 +
- 	if (!btdev->send_handler)
+ 	if (!bthost->send_handler)
  		return;
  
 +	for (i = 0; i < iovlen; i++) {
 +		if (!i)
 +			util_hexdump('<', iov[i].iov_base, iov[i].iov_len,
-+				btdev->debug_callback, btdev->debug_data);
++				bthost->debug_callback, bthost->debug_data);
 +		else
 +			util_hexdump(' ', iov[i].iov_base, iov[i].iov_len,
-+				btdev->debug_callback, btdev->debug_data);
++				bthost->debug_callback, bthost->debug_data);
 +	}
 +
- 	btdev->send_handler(iov, iovlen, btdev->send_data);
+ 	bthost->send_handler(iov, iovlen, bthost->send_data);
  }
  
-@@ -837,6 +829,9 @@ static void send_event(struct btdev *btdev, uint8_t event,
+@@ -675,6 +691,9 @@ static void send_command(struct bthost *bthost, uint16_t opcode,
+ 	uint8_t pkt = BT_H4_CMD_PKT;
  	struct iovec iov[3];
- 	uint8_t pkt = BT_H4_EVT_PKT;
  
-+	util_debug(btdev->debug_callback, btdev->debug_data,
-+				"event 0x%02x", event);
++	util_debug(bthost->debug_callback, bthost->debug_data,
++				"command 0x%02x", opcode);
 +
  	iov[0].iov_base = &pkt;
  	iov[0].iov_len = sizeof(pkt);
  
-@@ -863,6 +858,9 @@ static void send_cmd(struct btdev *btdev, uint8_t evt, uint16_t opcode,
- 	uint8_t pkt = BT_H4_EVT_PKT;
- 	int i;
+@@ -759,6 +778,22 @@ void bthost_notify_ready(struct bthost *bthost, bthost_ready_cb cb)
+ 	bthost->ready_cb = cb;
+ }
  
-+	util_debug(btdev->debug_callback, btdev->debug_data,
-+				"event 0x%02x opcode 0x%04x", evt, opcode);
++bool bthost_set_debug(struct bthost *bthost, bthost_debug_func_t callback,
++			void *user_data, bthost_destroy_func_t destroy)
++{
++	if (!bthost)
++		return false;
 +
- 	iov2[0].iov_base = &pkt;
- 	iov2[0].iov_len = sizeof(pkt);
- 
-@@ -921,6 +919,9 @@ static void le_meta_event(struct btdev *btdev, uint8_t event,
- {
- 	void *pkt_data;
- 
-+	util_debug(btdev->debug_callback, btdev->debug_data,
-+				"meta event 0x%02x", event);
++	if (bthost->debug_destroy)
++		bthost->debug_destroy(bthost->debug_data);
 +
- 	pkt_data = alloca(1 + len);
- 	if (!pkt_data)
- 		return;
-@@ -2089,7 +2090,6 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
- 					uint16_t type, bool is_scan_rsp)
++	bthost->debug_callback = callback;
++	bthost->debug_destroy = destroy;
++	bthost->debug_data = user_data;
++
++	return true;
++}
++
+ static void read_local_features_complete(struct bthost *bthost,
+ 						const void *data, uint8_t len)
  {
- 	struct __packed {
--		uint8_t subevent;
- 		uint8_t num_reports;
- 		union {
- 			struct bt_hci_le_ext_adv_report lear;
-@@ -2097,8 +2097,6 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
- 		};
- 	} meta_event;
- 
--	meta_event.subevent = BT_HCI_EVT_LE_EXT_ADV_REPORT;
--
- 	memset(&meta_event.lear, 0, sizeof(meta_event.lear));
- 	meta_event.num_reports = 1;
- 	meta_event.lear.event_type = cpu_to_le16(type);
-@@ -2121,8 +2119,8 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
- 						meta_event.lear.data_len);
+@@ -835,7 +870,8 @@ static void evt_cmd_complete(struct bthost *bthost, const void *data,
+ 	case BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE:
+ 		break;
+ 	default:
+-		printf("Unhandled cmd_complete opcode 0x%04x\n", opcode);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unhandled cmd_complete opcode 0x%04x", opcode);
+ 		break;
  	}
  
--	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, &meta_event,
--					1 + 1 + 24 + meta_event.lear.data_len);
-+	le_meta_event(btdev, BT_HCI_EVT_LE_EXT_ADV_REPORT, &meta_event,
-+					1 + 24 + meta_event.lear.data_len);
- }
- 
- static uint8_t get_adv_report_type(uint8_t adv_type)
-@@ -3952,8 +3950,8 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	return;
- 
- unsupported:
--	printf("Unsupported command 0x%4.4x\n", opcode);
--	hexdump(data, len);
-+	util_debug(btdev->debug_callback, btdev->debug_data,
-+			"Unsupported command 0x%4.4x\n", opcode);
- 	cmd_status(btdev, BT_HCI_ERR_UNKNOWN_COMMAND, opcode);
- }
- 
-@@ -4267,6 +4265,9 @@ static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
- 	callback.data = data + sizeof(*hdr);
- 	callback.len = hdr->plen;
- 
-+	util_debug(btdev->debug_callback, btdev->debug_data,
-+				"command 0x%04x", callback.opcode);
-+
- 	if (btdev->command_handler)
- 		btdev->command_handler(callback.opcode,
- 					callback.data, callback.len,
-@@ -4331,6 +4332,9 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
+@@ -1242,6 +1278,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
  	if (len < 1)
  		return;
  
-+	util_hexdump('>', data, len, btdev->debug_callback,
-+					btdev->debug_data);
++	util_debug(bthost->debug_callback, bthost->debug_data,
++				"event 0x%02x", *event);
++
+ 	switch (*event) {
+ 	case BT_HCI_EVT_LE_CONN_COMPLETE:
+ 		evt_le_conn_complete(bthost, evt_data, len - 1);
+@@ -1259,7 +1298,8 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 		evt_le_ext_conn_complete(bthost, evt_data, len - 1);
+ 		break;
+ 	default:
+-		printf("Unsupported LE Meta event 0x%2.2x\n", *event);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unsupported LE Meta event 0x%2.2x", *event);
+ 		break;
+ 	}
+ }
+@@ -1277,6 +1317,9 @@ static void process_evt(struct bthost *bthost, const void *data, uint16_t len)
+ 
+ 	param = data + sizeof(*hdr);
+ 
++	util_debug(bthost->debug_callback, bthost->debug_data,
++				"event 0x%02x", hdr->evt);
++
+ 	switch (hdr->evt) {
+ 	case BT_HCI_EVT_CMD_COMPLETE:
+ 		evt_cmd_complete(bthost, param, hdr->plen);
+@@ -1343,7 +1386,8 @@ static void process_evt(struct bthost *bthost, const void *data, uint16_t len)
+ 		break;
+ 
+ 	default:
+-		printf("Unsupported event 0x%2.2x\n", hdr->evt);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unsupported event 0x%2.2x", hdr->evt);
+ 		break;
+ 	}
+ }
+@@ -1674,7 +1718,8 @@ static void l2cap_sig(struct bthost *bthost, struct btconn *conn,
+ 		break;
+ 
+ 	default:
+-		printf("Unknown L2CAP code 0x%02x\n", hdr->code);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unknown L2CAP code 0x%02x", hdr->code);
+ 		ret = false;
+ 	}
+ 
+@@ -1892,7 +1937,8 @@ static void l2cap_le_sig(struct bthost *bthost, struct btconn *conn,
+ 		break;
+ 
+ 	default:
+-		printf("Unknown L2CAP code 0x%02x\n", hdr->code);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unknown L2CAP code 0x%02x", hdr->code);
+ 		ret = false;
+ 	}
+ 
+@@ -2232,7 +2278,8 @@ static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
+ 		rfcomm_uih_recv(bthost, conn, l2conn, data, len);
+ 		break;
+ 	default:
+-		printf("Unknown frame type\n");
++		util_debug(bthost->debug_callback, bthost->debug_data,
++					"Unknown frame type");
+ 		break;
+ 	}
+ }
+@@ -2257,7 +2304,8 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
+ 	handle = acl_handle(acl_hdr->handle);
+ 	conn = bthost_find_conn(bthost, handle);
+ 	if (!conn) {
+-		printf("ACL data for unknown handle 0x%04x\n", handle);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"ACL data for unknown handle 0x%04x", handle);
+ 		return;
+ 	}
+ 
+@@ -2293,8 +2341,9 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
+ 		if (l2conn && l2conn->psm == 0x0003)
+ 			process_rfcomm(bthost, conn, l2conn, l2_data, l2_len);
+ 		else
+-			printf("Packet for unknown CID 0x%04x (%u)\n", cid,
+-									cid);
++			util_debug(bthost->debug_callback, bthost->debug_data,
++					"Packet for unknown CID 0x%04x (%u)",
++					cid, cid);
+ 		break;
+ 	}
+ }
+@@ -2309,6 +2358,9 @@ void bthost_receive_h4(struct bthost *bthost, const void *data, uint16_t len)
+ 	if (len < 1)
+ 		return;
+ 
++	util_hexdump('>', data, len, bthost->debug_callback,
++					bthost->debug_data);
 +
  	pkt_type = ((const uint8_t *) data)[0];
  
  	switch (pkt_type) {
-@@ -4348,7 +4352,8 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
- 			send_iso(btdev->conn, data, len);
+@@ -2319,7 +2371,8 @@ void bthost_receive_h4(struct bthost *bthost, const void *data, uint16_t len)
+ 		process_acl(bthost, data + 1, len - 1);
  		break;
  	default:
 -		printf("Unsupported packet 0x%2.2x\n", pkt_type);
-+		util_debug(btdev->debug_callback, btdev->debug_data,
-+				"Unsupported packet 0x%2.2x\n", pkt_type);
++		util_debug(bthost->debug_callback, bthost->debug_data,
++				"Unsupported packet 0x%2.2x", pkt_type);
  		break;
  	}
  }
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 7cb265f1c..f7cba149a 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -66,6 +66,11 @@ struct btdev;
- struct btdev *btdev_create(enum btdev_type type, uint16_t id);
- void btdev_destroy(struct btdev *btdev);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 3841f98a1..77f17fd69 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -23,6 +23,11 @@ void bthost_destroy(struct bthost *bthost);
+ typedef void (*bthost_ready_cb) (void);
+ void bthost_notify_ready(struct bthost *bthost, bthost_ready_cb cb);
  
-+typedef void (*btdev_debug_func_t)(const char *str, void *user_data);
-+typedef void (*btdev_destroy_func_t)(void *user_data);
-+bool btdev_set_debug(struct btdev *btdev, btdev_debug_func_t callback,
-+			void *user_data, btdev_destroy_func_t destroy);
++typedef void (*bthost_debug_func_t)(const char *str, void *user_data);
++typedef void (*bthost_destroy_func_t)(void *user_data);
++bool bthost_set_debug(struct bthost *bthost, bthost_debug_func_t callback,
++			void *user_data, bthost_destroy_func_t destroy);
 +
- const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
- uint8_t *btdev_get_features(struct btdev *btdev);
+ void bthost_set_send_handler(struct bthost *bthost, bthost_send_func handler,
+ 							void *user_data);
  
 -- 
 2.26.2
