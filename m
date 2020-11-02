@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25768C00A89
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C520C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C80C5222BA
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0320222BA
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Nov 2020 19:12:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZVGCdZEN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6/spdxv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbgKBTMj (ORCPT
+        id S1726501AbgKBTMk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Nov 2020 14:12:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37048 "EHLO
+        Mon, 2 Nov 2020 14:12:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbgKBTMi (ORCPT
+        with ESMTP id S1725805AbgKBTMj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Nov 2020 14:12:38 -0500
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03B0C0617A6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 11:12:38 -0800 (PST)
-Received: by mail-pl1-x643.google.com with SMTP id x23so7319683plr.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 11:12:38 -0800 (PST)
+        Mon, 2 Nov 2020 14:12:39 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9072DC0617A6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2020 11:12:39 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id c20so11959662pfr.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2020 11:12:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Y5r28XmAxF0NNbIcT2BD4Vqev34gsw4BOZU4JB5iY+o=;
-        b=ZVGCdZENno/uNUOa5iU8Tx5ComRRtvsWg5Pr990rirb5T2n9pRgYu5LOk7hE6g4NTS
-         3HfnAIHsTfFQ6B2PpXHAb3djDYpEn1UX/xWaZD4fNFfS8MkGu65UskLoSKOB/tO2NMlt
-         1UelIIpYJNvf0UNQcQXUl1CS8SN2rV+AYzSDCBOV87UzC5jN2lvcidD0iRuAn5j3F1Ej
-         sLL/KIYYctqKUitf3dEQQqU7nk2xJmc6eA75c48Dec542/zidFza5lQQy5/3FkBBFGLk
-         o8t/obBjWBi/XROLnL/THbmkqbccElme5RbR4CUx1g590ppuB6Ek9PnMyb2jUzs39E/r
-         mVhQ==
+        bh=Y7gtfVrPuzt8dCsXuLb6bKQr3QEbKfNBjjypNUaqPo4=;
+        b=G6/spdxviYtr8/qPQwltWT5gZ3sRIPUIpG+7xvSTyXfCCf8+0KjkwvlnjyLsvlIYZn
+         vcSO7z7WoDyhBzrA5mI54t4+Oo2ThPQr5c0rwMyToY+tY7WX6F+wmro4gyMvRN7LqYHf
+         5I+IApOyaT0UnLFYRrMuDhjQq6ZuxoETe+GVPzp6Ahs0U0WWYJqNKAiatJBDko9WEZAv
+         FnyOmYE5D8wQu7wV5AFaoEJJ8TkminlFZn+Gz3aj5Y0DjWpKx8KbVVXruOjiEAksZmFg
+         S5/rDEZ4mpugcQu3Y2PswmB43c1r90D7e8qTV56Xdw08FSdBamszlr8MO1JkJZ1WkblU
+         +nRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Y5r28XmAxF0NNbIcT2BD4Vqev34gsw4BOZU4JB5iY+o=;
-        b=jMX0u8KL5GITh22QmKijqOnssv/8Nfd0i3gwgh/azudVceenEPchMwXxpOAbVuyr1S
-         Q023DZFrhpYq22rCIjjLiKXI3j2qjN2YI+JG2wrYjTqFCEUcByK5/oQJh5Lc3bCbpTIb
-         KvjqYgSUCq17+HWgTIFw6dbfLPZwUokeSPuNohqzD7BPY1mYJ2HA+YtDYmqyRz7IgZBY
-         NYwbOdDLDSO++buoafZ51DiQGUMNuGevhncZZCvIR5OfRmBADbIVkdGr70jMESTpLOKj
-         j2nnMqdyDOyZn65dyuWJW2mj5EyLxA1Zg2vet1gIZEstgTrLS/u1KcWLG8ztzDw8V5hZ
-         m9TQ==
-X-Gm-Message-State: AOAM532QSJIZozGu5UWfOg4m3u9p9eFwHFLgKJ8XT96amXaHd72T6x8/
-        BBurpU3hHyikcLCGx34XjXSjD8T5XHP5Bg==
-X-Google-Smtp-Source: ABdhPJzTQapwz61h0mQsqZ20w783VMN1baMIrsxmz2Bw6q93/7xzKyWHG8vgiFtMSaYiXEHy5wHYhQ==
-X-Received: by 2002:a17:902:9a89:b029:d6:c37c:7c69 with SMTP id w9-20020a1709029a89b02900d6c37c7c69mr9012957plp.11.1604344358070;
+        bh=Y7gtfVrPuzt8dCsXuLb6bKQr3QEbKfNBjjypNUaqPo4=;
+        b=ThhvuPt5KYSwQ2XQYYH1+jY6DzjVn+Zks6zIG8j0wwEWR1C9BQXpc62FEkJfGeID2s
+         IzNWfGnxuhNbfP7mRvr4UWkve8zfV0uI89w2sBtRCWdVwa7rM4a+Otp1dtcBETEPPRcv
+         IM1YkDacgLMTkExhSLI7x02tjodYFGckIMe67tCUPSkuoLgPbTgzz+mXn6F6Ra8d4dFY
+         6NpMcb4wAcFl0VaH9eXlXGhxGEKmcdZX4dHdtzNP8eCxSYkGrWKoL6i+D5lYvhffLzda
+         6W5v7wlQU/jFmyU1jSstHgGgBnKV1vRxEyoPS28/JM8DsagXKNy6OFCe1lmuaB6tgNLp
+         PtSg==
+X-Gm-Message-State: AOAM530b4pfHLpeMN3DKNXr8IG/qNqgDX0fn1Pn68DnBbfIqbXqZ1lDB
+        GACusZspigLOaYn9yEjxXPN4rUFyWhoj0Q==
+X-Google-Smtp-Source: ABdhPJy1G9tg+mYVT3yJG0stAopuktMvaqUyCaOPA2J5REYpOEL3X4j7le5JcazGX1l8u0nTc0MIEw==
+X-Received: by 2002:a17:90a:5906:: with SMTP id k6mr13743739pji.173.1604344358881;
         Mon, 02 Nov 2020 11:12:38 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z10sm14589716pff.218.2020.11.02.11.12.37
+        by smtp.gmail.com with ESMTPSA id z10sm14589716pff.218.2020.11.02.11.12.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2020 11:12:37 -0800 (PST)
+        Mon, 02 Nov 2020 11:12:38 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 04/11] emulator: Fix not gerating proper advertisement
-Date:   Mon,  2 Nov 2020 11:12:25 -0800
-Message-Id: <20201102191232.1848737-4-luiz.dentz@gmail.com>
+Subject: [PATCH v2 05/11] emulator/bthost: Add support for LE CIS Request
+Date:   Mon,  2 Nov 2020 11:12:26 -0800
+Message-Id: <20201102191232.1848737-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201102191232.1848737-1-luiz.dentz@gmail.com>
 References: <20201102191232.1848737-1-luiz.dentz@gmail.com>
@@ -76,56 +76,47 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When a btdev instance advertise using the legacy command and the other
-instance uses the extended version to scan the report type are not
-actually setting the legacy PDU properly.
+This enables bthost to act as acceptor of LE CIS Request.
 ---
- emulator/btdev.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ emulator/bthost.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c89815b3e..42276a2ce 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -2154,6 +2154,29 @@ static uint8_t get_ext_adv_type(uint8_t ext_adv_type)
- 	return ext_adv_type;
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index f5b09bc4f..32676e179 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1269,6 +1269,21 @@ static void evt_le_ltk_request(struct bthost *bthost, const void *data,
+ 								sizeof(cp));
  }
  
-+static uint16_t ext_legacy_adv_type(uint8_t type)
++static void evt_le_cis_req(struct bthost *bthost, const void *data, uint8_t len)
 +{
-+	switch (type) {
-+	case 0x00:
-+		/* Connectable undirected - ADV_IND" */
-+		return 0x0013;
-+	case 0x01:
-+		/* Connectable directed - ADV_DIRECT_IND */
-+		return 0x0015;
-+	case 0x02:
-+		/* Scannable undirected - ADV_SCAN_IND */
-+		return 0x0012;
-+	case 0x03:
-+		/* Non connectable undirected - ADV_NONCONN_IND */
-+		return 0x0010;
-+	case 0x04:
-+		/* Scan response - SCAN_RSP */
-+		return 0x0012;
-+	}
++	const struct bt_hci_evt_le_cis_req *ev = data;
++	struct bt_hci_cmd_le_accept_cis cmd;
 +
-+	return 0x0000;
++	if (len < sizeof(*ev))
++		return;
++
++	memset(&cmd, 0, sizeof(cmd));
++
++	cmd.handle = ev->cis_handle;
++
++	send_command(bthost, BT_HCI_CMD_LE_ACCEPT_CIS, &cmd, sizeof(cmd));
 +}
 +
- static void le_set_adv_enable_complete(struct btdev *btdev)
+ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 								uint8_t len)
  {
- 	uint8_t report_type;
-@@ -3413,6 +3436,8 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 
- 		lsap = data;
- 		btdev->le_adv_type = lsap->type;
-+		/* Use Legacy PDU if the remote is using EXT Scan */
-+		btdev->le_ext_adv_type = ext_legacy_adv_type(lsap->type);
- 		btdev->le_adv_own_addr = lsap->own_addr_type;
- 		btdev->le_adv_direct_addr_type = lsap->direct_addr_type;
- 		memcpy(btdev->le_adv_direct_addr, lsap->direct_addr, 6);
+@@ -1297,6 +1312,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
+ 		evt_le_ext_conn_complete(bthost, evt_data, len - 1);
+ 		break;
++	case BT_HCI_EVT_LE_CIS_REQ:
++		evt_le_cis_req(bthost, evt_data, len - 1);
++		break;
+ 	default:
+ 		util_debug(bthost->debug_callback, bthost->debug_data,
+ 				"Unsupported LE Meta event 0x%2.2x", *event);
 -- 
 2.26.2
 
