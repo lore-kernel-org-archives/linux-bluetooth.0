@@ -4,124 +4,138 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B787C388F7
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 21:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3633EC2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 23:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59D5222384
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 21:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D69DC223EA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 23:19:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WM5fPISi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U4z2eriG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732656AbgKCVnO (ORCPT
+        id S1728821AbgKCXTu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Nov 2020 16:43:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
+        Tue, 3 Nov 2020 18:19:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732645AbgKCVnM (ORCPT
+        with ESMTP id S1728026AbgKCXTu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Nov 2020 16:43:12 -0500
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5122C0617A6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 13:43:12 -0800 (PST)
-Received: by mail-ot1-x343.google.com with SMTP id z16so12235689otq.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 13:43:12 -0800 (PST)
+        Tue, 3 Nov 2020 18:19:50 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE92DC0613D1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 15:19:49 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id r10so14910896pgb.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 15:19:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NWf2NZ99kOkbxYABqeVpLhtjgrRu45jhowcsEYogcsE=;
-        b=WM5fPISiWUBn6cZeo9odQpFHEvi0x3TEJ6/L/R286zZrj8ewHzGwOKtRPQtsz5SRsL
-         0qWnHj9kVe7ZnN+oKOl+A21d7RcJKawAts5J4s5B3cqa8nn+rxVqOzvFeRIc0GVvfj7T
-         XCLQR//OBai4kNxKAu+zKvFoAFFvM+yNeO7O87Rm3xX54iStnL7tHEtXUHfcBWbi9FMv
-         fFPpsTpI3HLLusylmRgNc7Xwe/CixrkoubS3YWuvUd/V1Uw1TADwYW7u/QUt6O3MoAnl
-         u3iNX2a2E3lo/+3WuTtW7xux5je2CO382XuO4xhgXpGxAvXcEiLfF8mLVRKkeUqLxvUV
-         7EiA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=keox1HEiUoj/RxUdrmJZB4KSQqLdljvvXfph5b9xClc=;
+        b=U4z2eriGV4fAWZfadf2PE9x8Jl2Sr0VvN2anrPe7zhGpsgk0C3jwvxS+9xHcG8DmXk
+         Wrxm+9ywktScd/ySpsnh/wZ+h9VGmhVr9Xjt0ILhBoN66++Reegrk5KS443KfxORANNd
+         SUht5U0tNuL2D/EU5OSECtxzQGBMSZBaOGf0FXRuGCoq7nWec0valvOeQ9RB2r9+SCVL
+         nxrN396kSyBghvsfakACEx/pHlD9pNzyJTNbGqBYzW9rMYZTWEYaN6gROcG943DQmrpW
+         +3+05nZkXkDILkjw/9ADtzyvwUFxDf+2T0sDM+TQyhB9vpBscziSnmJpdM3bs3MMLOOL
+         yXoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NWf2NZ99kOkbxYABqeVpLhtjgrRu45jhowcsEYogcsE=;
-        b=gOcHbbdLsxwjeiFuZwF+3Ga6WNr0y9Om9+HJsDCtdOXsxHr8BVo8fL7m1Md0f1k1js
-         01zqSWv5v13GAzSEbZyw4ulAc0YFXQ6ouEzmWwJ/uQIETpwiyS3J6QDpjzmyJ8f1i96o
-         fR9E7d418oKPKEHcvdUOoNoCPLiqV4+8Fuy/Nj8Jd1iF1Y52fz8y+cF82L7rtRTCLhg1
-         TOHuvqahnsk13Ka4ON/fqub1KF0+JQRClEaCXtJnVXT97+BwlmZpKv9JDCNPZceFHOCT
-         Yzz3T51+BtLyBDV4Av5wYnVK1Pshv6G2oAYY9jw+WOXpYC/+cEU2/unA4pH/otSC7qoY
-         EW4Q==
-X-Gm-Message-State: AOAM531XVqXtDPHkCr5N8IPBlUb7bv73NMVLgVuePubowSLyC+QpXZKv
-        o4dE7s9nXW5Spn8VSOEiOZJeSfXD2O33VXkqZUQ=
-X-Google-Smtp-Source: ABdhPJyeYC/ZTx6Cx5lHSwE2tAKd++IBVZRF9GTMsZU+cYIcVdDfAO1ZEHr4vUNY6aw3WrQjp4y+KtxLmlM5o097d5E=
-X-Received: by 2002:a9d:6a0a:: with SMTP id g10mr17218621otn.44.1604439792115;
- Tue, 03 Nov 2020 13:43:12 -0800 (PST)
-MIME-Version: 1.0
-References: <20201102132733.GA77385@jimmy-ryzen-home>
-In-Reply-To: <20201102132733.GA77385@jimmy-ryzen-home>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=keox1HEiUoj/RxUdrmJZB4KSQqLdljvvXfph5b9xClc=;
+        b=dy5dIJiuoIhIYAzN+q90xImeRwRmYfja0pwRRALR0+waGv6GRu2aqw7Pn9Dd6KrZlf
+         R8afrkORWHr7hlOyL1A6KeKee2qtYTc6+75UANURB2pocdhq55+wQJwt6IvYTPqrNbj0
+         26MOAwoqUbJGG4XcMlnUUOdGCDEgOv5knZDGeiEKpryUofARcOkyxon+eunTr+Ds+BLi
+         XlL1BknTfjghLXyVJ8jbCXh7iL4+fs/HBA4RRKAxwmc+qQbblIpDHGmMUfsurVmFgZh0
+         okloWX4KY8+GlBAyXtdFLmD1GlGZ/etX/NTxdXZQPI78LWWhLZWF/2xiWod7XbLDQHGw
+         oQGQ==
+X-Gm-Message-State: AOAM532yp0YJ96q5vdPKy7MRTbYlFumfMytiRw5MErX9gBLLyfIZKCdI
+        wjeiqCMMdU5xN/MRFo49gyrlPPH2Kmsf9A==
+X-Google-Smtp-Source: ABdhPJzhKSbxTfNj/8p5IZLRhngCXIEX5ZeoQpJZL4coa8nwyptTORiOVOMNV0qtejaJTnpIm6NDxw==
+X-Received: by 2002:a05:6a00:16c7:b029:163:ce86:1d5d with SMTP id l7-20020a056a0016c7b0290163ce861d5dmr27060681pfc.80.1604445589196;
+        Tue, 03 Nov 2020 15:19:49 -0800 (PST)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id f7sm182185pfd.111.2020.11.03.15.19.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Nov 2020 15:19:48 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 3 Nov 2020 13:43:01 -0800
-Message-ID: <CABBYNZJV_59_VqF_W5dOo9hQDAjv2T14wQQObwxd7AQ7o=G6qA@mail.gmail.com>
-Subject: Re: [PATCH] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C.
-To:     Jimmy Wahlberg <jimmywa@spotify.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] doc: Add tester.config
+Date:   Tue,  3 Nov 2020 15:19:46 -0800
+Message-Id: <20201103231947.2053274-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jimmy,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Nov 2, 2020 at 5:33 AM Jimmy Wahlberg <jimmywa@spotify.com> wrote:
->
-> This test case is meant to verify that multiple
-> unknown options is included in the response.
->
-> Unknown options shall be in the response if
-> they are not hints according to Bluetooth Core
-> Spec v5.2. See chapter 4.5 L2CAP_CONFIGURATION_RSP
+This adds tester.config which can be used as a reference to create
+kernel images to be run with test-runner.
+---
+ doc/tester.config | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+ create mode 100644 doc/tester.config
 
-Can you add the HCI trace (btmon) with and without the patch. Also
-perhaps we should have a comment why this is needed on the code:
-
-  'On an unknown option failure (Result=0x0003), the option(s) that contain an
-  option type field that is not understood by the recipient of the
-  L2CAP_CONFIGURATION_REQ packet shall be included in the
-  L2CAP_CONFIGURATION_RSP packet unless they are hints.'
-
-> Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
-> ---
->  net/bluetooth/l2cap_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 1ab27b90ddcb..16956f323688 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3627,7 +3627,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
->                         if (hint)
->                                 break;
->                         result = L2CAP_CONF_UNKNOWN;
-> -                       *((u8 *) ptr++) = type;
-> +                       l2cap_add_conf_opt(&ptr, (u8)type, sizeof(u8), type, endptr - ptr);
->                         break;
->                 }
->         }
-> --
-> 2.25.1
->
-> Hi,
->
-> While running tests I encountered this one test that I could not pass. After some troubleshooting I landed in this patch. Please let me know what you think.
->
-> Best regards
-> Jimmy
-
-
-
+diff --git a/doc/tester.config b/doc/tester.config
+new file mode 100644
+index 000000000..e90899714
+--- /dev/null
++++ b/doc/tester.config
+@@ -0,0 +1,48 @@
++CONFIG_VIRTIO=y
++CONFIG_VIRTIO_PCI=y
++
++CONFIG_NET=y
++CONFIG_INET=y
++
++CONFIG_NET_9P=y
++CONFIG_NET_9P_VIRTIO=y
++
++CONFIG_9P_FS=y
++CONFIG_9P_FS_POSIX_ACL=y
++
++CONFIG_SERIAL_8250=y
++CONFIG_SERIAL_8250_CONSOLE=y
++CONFIG_SERIAL_8250_PCI=y
++CONFIG_SERIAL_8250_NR_UARTS=4
++
++CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_XATTR=y
++
++CONFIG_DEVTMPFS=y
++CONFIG_DEBUG_FS=y
++
++CONFIG_BT=y
++CONFIG_BT_BREDR=y
++CONFIG_BT_RFCOMM=y
++CONFIG_BT_BNEP=y
++CONFIG_BT_HIDP=y
++CONFIG_BT_LE=y
++
++CONFIG_BT_HCIVHCI=y
++
++CONFIG_CRYPTO_CMAC=y
++CONFIG_CRYPTO_USER_API=y
++CONFIG_CRYPTO_USER_API_HASH=y
++CONFIG_CRYPTO_USER_API_SKCIPHER=y
++
++CONFIG_UNIX=y
++
++CONFIG_UHID=y
++
++CONFIG_LOCKDEP_SUPPORT=y
++CONFIG_DEBUG_SPINLOCK=y
++CONFIG_DEBUG_LOCK_ALLOC=y
++CONFIG_PROVE_LOCKING=y
++CONFIG_LOCKDEP=y
++CONFIG_DEBUG_MUTEXES=y
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
