@@ -5,68 +5,70 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3633EC2D0A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD583C388F9
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 23:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D69DC223EA
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 23:19:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F8F0223EA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Nov 2020 23:19:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U4z2eriG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdH6Uj6A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728821AbgKCXTu (ORCPT
+        id S1729110AbgKCXTv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Nov 2020 18:19:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45556 "EHLO
+        Tue, 3 Nov 2020 18:19:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
         with ESMTP id S1728026AbgKCXTu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 3 Nov 2020 18:19:50 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE92DC0613D1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 15:19:49 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id r10so14910896pgb.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 15:19:49 -0800 (PST)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC87FC0613D1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 15:19:50 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id w65so15698753pfd.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 15:19:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=keox1HEiUoj/RxUdrmJZB4KSQqLdljvvXfph5b9xClc=;
-        b=U4z2eriGV4fAWZfadf2PE9x8Jl2Sr0VvN2anrPe7zhGpsgk0C3jwvxS+9xHcG8DmXk
-         Wrxm+9ywktScd/ySpsnh/wZ+h9VGmhVr9Xjt0ILhBoN66++Reegrk5KS443KfxORANNd
-         SUht5U0tNuL2D/EU5OSECtxzQGBMSZBaOGf0FXRuGCoq7nWec0valvOeQ9RB2r9+SCVL
-         nxrN396kSyBghvsfakACEx/pHlD9pNzyJTNbGqBYzW9rMYZTWEYaN6gROcG943DQmrpW
-         +3+05nZkXkDILkjw/9ADtzyvwUFxDf+2T0sDM+TQyhB9vpBscziSnmJpdM3bs3MMLOOL
-         yXoA==
+        bh=Yytsr00+6Kp33M5vY3Jf40tOEkQR8081Jx2QjpPNKpM=;
+        b=YdH6Uj6ABsMNcPojZFvSal1HoAr0+soOeyiMsfYrK2X5dV7xyrAuxBpIr0/J+3yjCV
+         /K/ANgwz9ng1gQ3C50LigVNNluwbZ2XJAYgdYqZYbYwdFRmEZnOS0ePhRbePBVu7eXa8
+         cMN6iSRcmiXeR5GaYArEXDqdvSlFhwTBGftHKl+rsfxYd6i66DKn5jQXdyM6yyPYLR+C
+         JBFKDHWF78nopGE/j2CWJZHARec8ccpiTrjEVFYvb0Aci0XMcsV4roRgKf4VTjdoshmf
+         rMhDqDq7Fy2+o6Bewduce4va2xbY4wkQRGCvnD2NlPclLtJoy/Nkom4OgGC96zCjYTE9
+         UF8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=keox1HEiUoj/RxUdrmJZB4KSQqLdljvvXfph5b9xClc=;
-        b=dy5dIJiuoIhIYAzN+q90xImeRwRmYfja0pwRRALR0+waGv6GRu2aqw7Pn9Dd6KrZlf
-         R8afrkORWHr7hlOyL1A6KeKee2qtYTc6+75UANURB2pocdhq55+wQJwt6IvYTPqrNbj0
-         26MOAwoqUbJGG4XcMlnUUOdGCDEgOv5knZDGeiEKpryUofARcOkyxon+eunTr+Ds+BLi
-         XlL1BknTfjghLXyVJ8jbCXh7iL4+fs/HBA4RRKAxwmc+qQbblIpDHGmMUfsurVmFgZh0
-         okloWX4KY8+GlBAyXtdFLmD1GlGZ/etX/NTxdXZQPI78LWWhLZWF/2xiWod7XbLDQHGw
-         oQGQ==
-X-Gm-Message-State: AOAM532yp0YJ96q5vdPKy7MRTbYlFumfMytiRw5MErX9gBLLyfIZKCdI
-        wjeiqCMMdU5xN/MRFo49gyrlPPH2Kmsf9A==
-X-Google-Smtp-Source: ABdhPJzhKSbxTfNj/8p5IZLRhngCXIEX5ZeoQpJZL4coa8nwyptTORiOVOMNV0qtejaJTnpIm6NDxw==
-X-Received: by 2002:a05:6a00:16c7:b029:163:ce86:1d5d with SMTP id l7-20020a056a0016c7b0290163ce861d5dmr27060681pfc.80.1604445589196;
-        Tue, 03 Nov 2020 15:19:49 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Yytsr00+6Kp33M5vY3Jf40tOEkQR8081Jx2QjpPNKpM=;
+        b=hC33Wrvaq46sY6iXkJ3zjj6yLW3UAVVMQYKe8htpnJu9jHy2I9Ji76x8RrUoSdwfJM
+         CldsHAugnBVaC8nRzj1CEn4tooaBEfjTXkJwyLiScdvPWH1R82MtaTOQXeyZVds4mdpD
+         4tqzx44O8U3RSSGfxrn4TadwGHenE7Z4di+cnhkLWYCBffVWeuJq+T4u782Q++SmODup
+         GzcO2tFGijeSZQNIpi5vS4CHJZ7PoY15w1zkMVsHUXfMWzZ/vhg32A9MobXXCY94epLT
+         pLgiKtjsTIdxqkhSy4SY4Dw6Q2/J5kyK7auJ/toDhB0fLGSvLhLf/xl0/51D6x97OgLq
+         ggCg==
+X-Gm-Message-State: AOAM532f0ewg0g9jcrCxxiCuuCyBuj5FkPGydSAyQNCZqbRB13da2BDx
+        2oMU7ArkXwlFPgwtQdk3/g6f2gdjjzbnlg==
+X-Google-Smtp-Source: ABdhPJzB8ztgYcyzJ4IfP9dqGHgN4twtoMS3hB051zpLeIK/m8Bu5mf6DeJGaQLUEvYNSeYcgAYYtw==
+X-Received: by 2002:a63:4916:: with SMTP id w22mr18330636pga.353.1604445590213;
+        Tue, 03 Nov 2020 15:19:50 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f7sm182185pfd.111.2020.11.03.15.19.48
+        by smtp.gmail.com with ESMTPSA id f7sm182185pfd.111.2020.11.03.15.19.49
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2020 15:19:48 -0800 (PST)
+        Tue, 03 Nov 2020 15:19:49 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] doc: Add tester.config
-Date:   Tue,  3 Nov 2020 15:19:46 -0800
-Message-Id: <20201103231947.2053274-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] tools/test-runner: Fix using removed options
+Date:   Tue,  3 Nov 2020 15:19:47 -0800
+Message-Id: <20201103231947.2053274-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201103231947.2053274-1-luiz.dentz@gmail.com>
+References: <20201103231947.2053274-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -75,67 +77,35 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds tester.config which can be used as a reference to create
-kernel images to be run with test-runner.
----
- doc/tester.config | 48 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
- create mode 100644 doc/tester.config
+This removes -nodefconfig and -balloon which are not longer valid
+options:
 
-diff --git a/doc/tester.config b/doc/tester.config
-new file mode 100644
-index 000000000..e90899714
---- /dev/null
-+++ b/doc/tester.config
-@@ -0,0 +1,48 @@
-+CONFIG_VIRTIO=y
-+CONFIG_VIRTIO_PCI=y
-+
-+CONFIG_NET=y
-+CONFIG_INET=y
-+
-+CONFIG_NET_9P=y
-+CONFIG_NET_9P_VIRTIO=y
-+
-+CONFIG_9P_FS=y
-+CONFIG_9P_FS_POSIX_ACL=y
-+
-+CONFIG_SERIAL_8250=y
-+CONFIG_SERIAL_8250_CONSOLE=y
-+CONFIG_SERIAL_8250_PCI=y
-+CONFIG_SERIAL_8250_NR_UARTS=4
-+
-+CONFIG_TMPFS=y
-+CONFIG_TMPFS_POSIX_ACL=y
-+CONFIG_TMPFS_XATTR=y
-+
-+CONFIG_DEVTMPFS=y
-+CONFIG_DEBUG_FS=y
-+
-+CONFIG_BT=y
-+CONFIG_BT_BREDR=y
-+CONFIG_BT_RFCOMM=y
-+CONFIG_BT_BNEP=y
-+CONFIG_BT_HIDP=y
-+CONFIG_BT_LE=y
-+
-+CONFIG_BT_HCIVHCI=y
-+
-+CONFIG_CRYPTO_CMAC=y
-+CONFIG_CRYPTO_USER_API=y
-+CONFIG_CRYPTO_USER_API_HASH=y
-+CONFIG_CRYPTO_USER_API_SKCIPHER=y
-+
-+CONFIG_UNIX=y
-+
-+CONFIG_UHID=y
-+
-+CONFIG_LOCKDEP_SUPPORT=y
-+CONFIG_DEBUG_SPINLOCK=y
-+CONFIG_DEBUG_LOCK_ALLOC=y
-+CONFIG_PROVE_LOCKING=y
-+CONFIG_LOCKDEP=y
-+CONFIG_DEBUG_MUTEXES=y
+  qemu-system-x86_64: -nodefconfig: invalid option
+  qemu-system-x86_64: -balloon: invalid option
+---
+ tools/test-runner.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 6b7c33734..5d2dbb992 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -181,7 +181,6 @@ static void prepare_sandbox(void)
+ static char *const qemu_argv[] = {
+ 	"",
+ 	"-nodefaults",
+-	"-nodefconfig",
+ 	"-no-user-config",
+ 	"-monitor", "none",
+ 	"-display", "none",
+@@ -190,7 +189,6 @@ static char *const qemu_argv[] = {
+ 	"-nographic",
+ 	"-vga", "none",
+ 	"-net", "none",
+-	"-balloon", "none",
+ 	"-no-acpi",
+ 	"-no-hpet",
+ 	"-no-reboot",
 -- 
 2.26.2
 
