@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156ECC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B62AAC2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACF772080D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61249206FA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9o3ppFy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtqeCsly"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730732AbgKDTWi (ORCPT
+        id S1730812AbgKDTWs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 14:22:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
+        Wed, 4 Nov 2020 14:22:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726849AbgKDTWi (ORCPT
+        with ESMTP id S1726849AbgKDTWr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 14:22:38 -0500
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B61BC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 11:22:38 -0800 (PST)
-Received: by mail-qk1-x72f.google.com with SMTP id 11so833273qkd.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 11:22:38 -0800 (PST)
+        Wed, 4 Nov 2020 14:22:47 -0500
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B5FC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 11:22:47 -0800 (PST)
+Received: by mail-qk1-x734.google.com with SMTP id g125so3106725qke.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 11:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=MOxMUR8OejH05CQEChPHQphRigjuu/iCnVq/We+7eMc=;
-        b=j9o3ppFyTJ/4W4pSuxShZXTvfcmI+CnDiI5heeJxItLaaIEl1UdbNXVha/JKGMtcWp
-         kweTnSXyY2yhFBNbsahSGWRfh+PTMHVV98Inaw8koztxl6Aj06mBS9vr6poG2GhN77G0
-         D0HmCIsNHAM35TfQv/A4NQURHKTnHvHlz17gZ7rMiHlcBZRTOz+HUzPaYofy1Iu+6HGd
-         l3tC8tSYGlqmBG7DFS8cmBKJtMVNd4q22FmwYdrAtlToZpM6IZi3yKQocZXOwz8N2oou
-         zqcNwHCGGqUBzpGt1H2uJWHMGa8sN5QgkdYXrvC6qnAeC4ToDr4UVJh2M9t2LtSXO/gq
-         rCeQ==
+        bh=ObmFdftwbllLgQc7E/luMpdWYXso/PiSXnObdJ1tEWo=;
+        b=EtqeCslyW0Xop1T2aUQT8gjPL7iiskJBaH8ymff0eLv9IkCrHDLCv2Dm+uZx+BIcko
+         eOo6AponoXBGo2vw1/YGOR3XBJZSwsbcBqUR6UM3vFQinxyLlhtKX2A3PZ1Q03ayM9br
+         kjCszWpFHPy54YC5k4MAQx5SfW+RyAxsJ0qi8CPOq9Q2HEvQ08C6HAQaBImQMQ7h8oFx
+         oxLukyAfjNPvAVcYLcKwIMxoLNZgCVULiQ309FxDoNxFPdlg/uYDsoqldcaWfH8pWm7V
+         IbOwSy1e71yoTxk3kiz/dUpwQIHVvviC+DOFK6hd1bTu7kS3TtsuSt7EGhOFcls854KL
+         wohQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=MOxMUR8OejH05CQEChPHQphRigjuu/iCnVq/We+7eMc=;
-        b=QtmVKSB/oK05rQSSx6jBRGxcLjCSK9c7800A6ss8MRN3LOmr0E3l61+nx6UM9FYb3c
-         E9YB/NYRKV/8vdoqQxWyI0ZDCWt9Fs473UccKxM2tuPCNKpRpjf1DL+uBwx2xJ570kTb
-         oRDhKjtqfEAGARwI76DL2VLrg2MZaJ0o1AhWd4U5IkyURCjxYsFePRdHstdTcyRRzauD
-         f73vGE8k9IfwpiHHJE2+2GWdFghQoodl4Jn2rDjtFzxaSwJdfkW29uMVTCehHXs+neES
-         SS5kzX+IdGCPuGhQBw1F/3K+kBzy/6EdJ1JCCi5XGqzuSF4sEUiBh2owGpfMuNFE7VTS
-         YtYg==
-X-Gm-Message-State: AOAM531TSbqgHV2ILEuCLa9/tUQZsajqJXEY1w1H0pez7q24/R2zamWb
-        KPju1WVjRpvHlq5gUPR6njws0JU6AoI0AA==
-X-Google-Smtp-Source: ABdhPJwe+i+tl03lwlZcwX11XW/Yy0nSxVZjbetRCI9ur3G17ANRISg9wwdPgBV6uBJladnlZ2eFng==
-X-Received: by 2002:a37:7e41:: with SMTP id z62mr26830328qkc.495.1604517757089;
-        Wed, 04 Nov 2020 11:22:37 -0800 (PST)
-Received: from [172.17.0.2] ([13.77.95.78])
-        by smtp.gmail.com with ESMTPSA id t60sm865546qtd.65.2020.11.04.11.22.36
+        bh=ObmFdftwbllLgQc7E/luMpdWYXso/PiSXnObdJ1tEWo=;
+        b=h6STwSQIkRaxxkLkbUY8e19ji2FSvCo35IWgXYdkGCG4ktyDJnOjZZbLyCPdvw/uPf
+         +X7HaGldOzKCEJyan6nUul5uL+jq8EK0GGIP+vW0oeNKm/QjS3Ux3OoWytv2KjRma6St
+         +Lh9M/b/mUtdiI25+HHaXHZN1ugpUXPJ+5bIbKWDn2mmfdEFacWIvYTPHR382ugso6yM
+         ci/oAVdyCqbASvdjMVbW+YpdeVzQUuom0BQxW35inrAkwcFQso4QxWI0vYXKcLVSnu9s
+         Ni4YRMLR3srSjI50jbUFZMas4+P6pPaA2+4vVOUhGueWb2abV4GQK2ppHyo9T/AvImqy
+         6qgA==
+X-Gm-Message-State: AOAM530jEi3HmvwtCU/gH0O2rd5z76mBX4eKegiAE7EAYxllY0DQ09Ag
+        oO0MzpujYS9d5majWjANzgTOWYXx/yrVNw==
+X-Google-Smtp-Source: ABdhPJw84TLkoqXela9uuQHDLDoEhO2ukeextkbZvGmx9whvYvwmwJEWb+6j4qBUqrLsg7Te1HFoCA==
+X-Received: by 2002:ae9:dc45:: with SMTP id q66mr26340074qkf.407.1604517766882;
+        Wed, 04 Nov 2020 11:22:46 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.62.8])
+        by smtp.gmail.com with ESMTPSA id m2sm896407qtu.62.2020.11.04.11.22.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2020 11:22:36 -0800 (PST)
-Message-ID: <5fa2ff7c.1c69fb81.c85ff.56eb@mx.google.com>
-Date:   Wed, 04 Nov 2020 11:22:36 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1003699706878902953=="
+        Wed, 04 Nov 2020 11:22:46 -0800 (PST)
+Message-ID: <5fa2ff86.1c69fb81.a03e0.59c4@mx.google.com>
+Date:   Wed, 04 Nov 2020 11:22:46 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1539921034133036372=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v1,1/3] policy: add checks before connecting
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] doc: Add tester.config
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
-References: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+In-Reply-To: <20201103231947.2053274-1-luiz.dentz@gmail.com>
+References: <20201103231947.2053274-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1003699706878902953==
+--===============1539921034133036372==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -84,7 +84,7 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=377031
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=376931
 
 ---Test result---
 
@@ -107,4 +107,4 @@ Regards,
 Linux Bluetooth
 
 
---===============1003699706878902953==--
+--===============1539921034133036372==--
