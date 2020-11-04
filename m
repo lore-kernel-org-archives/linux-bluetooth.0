@@ -2,109 +2,119 @@ Return-Path: <SRS0=3U9n=EK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B62AAC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA0EC4741F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 21:03:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61249206FA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 19:22:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05BAB2080D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 21:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtqeCsly"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byJEcqDd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730812AbgKDTWs (ORCPT
+        id S1731436AbgKDVDb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 14:22:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35366 "EHLO
+        Wed, 4 Nov 2020 16:03:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726849AbgKDTWr (ORCPT
+        with ESMTP id S1726969AbgKDVDa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 14:22:47 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B5FC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 11:22:47 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id g125so3106725qke.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 11:22:47 -0800 (PST)
+        Wed, 4 Nov 2020 16:03:30 -0500
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83FFCC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 13:03:30 -0800 (PST)
+Received: by mail-oi1-x244.google.com with SMTP id u127so23663238oib.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 13:03:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ObmFdftwbllLgQc7E/luMpdWYXso/PiSXnObdJ1tEWo=;
-        b=EtqeCslyW0Xop1T2aUQT8gjPL7iiskJBaH8ymff0eLv9IkCrHDLCv2Dm+uZx+BIcko
-         eOo6AponoXBGo2vw1/YGOR3XBJZSwsbcBqUR6UM3vFQinxyLlhtKX2A3PZ1Q03ayM9br
-         kjCszWpFHPy54YC5k4MAQx5SfW+RyAxsJ0qi8CPOq9Q2HEvQ08C6HAQaBImQMQ7h8oFx
-         oxLukyAfjNPvAVcYLcKwIMxoLNZgCVULiQ309FxDoNxFPdlg/uYDsoqldcaWfH8pWm7V
-         IbOwSy1e71yoTxk3kiz/dUpwQIHVvviC+DOFK6hd1bTu7kS3TtsuSt7EGhOFcls854KL
-         wohQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eE9d8nlvVO8qmuHS7py/a6wYJyKs26M0XqX6HszSxm0=;
+        b=byJEcqDd9u+qktRPBX6NTjgMVgXV21bvpc72G0WemN4Nv9FGciNIw+cXuA1/wX/sDE
+         lINxZoW1cHkIiIYJ9Fov1/8VRxKLYHll2jxHDFzNMRy8GcqPKcWiNq6pjtSXRfUnMmDZ
+         v412IVgRsheqXM1X4iwtD0q9NjP+Nq9obIhh362eINrQCh81wmPmSgHSID0wFOGxUtb7
+         ZzGHpFtCINo58L4Zg9dLJn/4E5uTEFfBXaCE3HaiqEHpXsrLnSV2n7sss8EowPyYLV1Y
+         MNeDNZOdqWP0aZG1H3DoqUx8XHpm1O0zC4GNAwN84AWm1vsVTyRyZqDzM4XXiVQuCPIN
+         NiHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ObmFdftwbllLgQc7E/luMpdWYXso/PiSXnObdJ1tEWo=;
-        b=h6STwSQIkRaxxkLkbUY8e19ji2FSvCo35IWgXYdkGCG4ktyDJnOjZZbLyCPdvw/uPf
-         +X7HaGldOzKCEJyan6nUul5uL+jq8EK0GGIP+vW0oeNKm/QjS3Ux3OoWytv2KjRma6St
-         +Lh9M/b/mUtdiI25+HHaXHZN1ugpUXPJ+5bIbKWDn2mmfdEFacWIvYTPHR382ugso6yM
-         ci/oAVdyCqbASvdjMVbW+YpdeVzQUuom0BQxW35inrAkwcFQso4QxWI0vYXKcLVSnu9s
-         Ni4YRMLR3srSjI50jbUFZMas4+P6pPaA2+4vVOUhGueWb2abV4GQK2ppHyo9T/AvImqy
-         6qgA==
-X-Gm-Message-State: AOAM530jEi3HmvwtCU/gH0O2rd5z76mBX4eKegiAE7EAYxllY0DQ09Ag
-        oO0MzpujYS9d5majWjANzgTOWYXx/yrVNw==
-X-Google-Smtp-Source: ABdhPJw84TLkoqXela9uuQHDLDoEhO2ukeextkbZvGmx9whvYvwmwJEWb+6j4qBUqrLsg7Te1HFoCA==
-X-Received: by 2002:ae9:dc45:: with SMTP id q66mr26340074qkf.407.1604517766882;
-        Wed, 04 Nov 2020 11:22:46 -0800 (PST)
-Received: from [172.17.0.2] ([40.84.62.8])
-        by smtp.gmail.com with ESMTPSA id m2sm896407qtu.62.2020.11.04.11.22.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2020 11:22:46 -0800 (PST)
-Message-ID: <5fa2ff86.1c69fb81.a03e0.59c4@mx.google.com>
-Date:   Wed, 04 Nov 2020 11:22:46 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1539921034133036372=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eE9d8nlvVO8qmuHS7py/a6wYJyKs26M0XqX6HszSxm0=;
+        b=eQf6rEOlmjSNiy1C+XsS9SPyWhIuAeyPwqxHVxCG5hkaxCgiD18uarmgrovOJLQ5BR
+         7+Ct60YTm852w+FdJG7aLI2djOGvXaScBRsGTRtXwLy+UG2NIPYBNOe13KViyPkCstsy
+         AmEKV/EuKuOSOMdKBJMI4KsFSKZ8frlQnmgiuSsQY0uXNkMLII5C7wQH1OLQ/8EM+VcS
+         mwT827vV2s6/e3rI8rgOx4Vr6a+J/Mn7QgMo4IOvmvU5BXtepqc7dm8M9Rn+GdKkj6XT
+         MuVdFIXId8BJBSA6rhkeA8hUuN2pIY3qFFsmfN8GzP+AaU3WjOEFZwbX5Lp0TjuYaPRU
+         FpzA==
+X-Gm-Message-State: AOAM530Gi3TSPXOskDlN+fzTpyN+XN6s0wghD1wNgYwYyEA1jdqA9js+
+        R4fcxkOKrk0ITNSYrQ0XinntiPKJ/3++UD0Y0U4=
+X-Google-Smtp-Source: ABdhPJyW8ZfyeS1DmmpmcD4LF+dbpV9SnlGT/EGQVQ0qNTzWHF/YxRVqEv2jOtInJEta9wuQkvBAF+tdZcRlz3pZlzA=
+X-Received: by 2002:aca:c70b:: with SMTP id x11mr3895019oif.58.1604523808488;
+ Wed, 04 Nov 2020 13:03:28 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] doc: Add tester.config
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201103231947.2053274-1-luiz.dentz@gmail.com>
-References: <20201103231947.2053274-1-luiz.dentz@gmail.com>
+References: <20201103073032.4532-1-sathish.narasimman@intel.com>
+In-Reply-To: <20201103073032.4532-1-sathish.narasimman@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 4 Nov 2020 13:03:17 -0800
+Message-ID: <CABBYNZKYVF+gXS91-DSs8yh6DGcNz6YL0x3Aj8moXoBEzV8pdQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH] profile: GOEP Set IMTU to 32k
+To:     Sathish Narasimman <nsathish41@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        ravishankar.srivatsa@intel.com,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1539921034133036372==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sathish,
 
-This is automated email and please do not reply to this email!
+On Mon, Nov 2, 2020 at 11:30 PM Sathish Narasimman <nsathish41@gmail.com> wrote:
+>
+> OPP-RX Throughput is low Due to Low MTU value in case of OBEX
+> over L2CAP. Changing the default L2CAP MTU from 672 to 32767.
+>
+> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> ---
+>  src/profile.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 5e460b639..99a5e1a4a 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -41,6 +41,8 @@
+>  #include "profile.h"
+>  #include "service.h"
+>
+> +#define BTRX_MTU               32767
+> +
+>  #define DUN_DEFAULT_CHANNEL    1
+>  #define SPP_DEFAULT_CHANNEL    3
+>  #define HSP_HS_DEFAULT_CHANNEL 6
+> @@ -1358,6 +1360,11 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
+>                         l2cap->adapter = btd_adapter_ref(adapter);
+>                         ext->servers = g_slist_append(ext->servers, l2cap);
+>                         DBG("%s listening on PSM %u", ext->name, psm);
+> +                       if (g_strcmp0(ext->name, "Object Push") == 0) {
+> +                               if (!bt_io_set(io, NULL, BT_IO_OPT_IMTU, BTRX_MTU,
+> +                                   BT_IO_OPT_INVALID))
+> +                                       DBG("ERROR bt_io_set Unable to set MTU");
+> +                       }
+>                 }
+>         }
+>
+> --
+> 2.17.1
 
-Dear submitter,
+Perhaps it would be better to have the MTU added to RegisterProfile
+options so any user of this API can set the Input MTU.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=376931
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1539921034133036372==--
+-- 
+Luiz Augusto von Dentz
