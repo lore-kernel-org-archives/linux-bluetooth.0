@@ -2,125 +2,113 @@ Return-Path: <SRS0=3U9n=EK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282B9C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 21:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FBCC4741F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 23:42:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF3092083B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 21:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49D5B20786
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 23:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q6NRaUEw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qkW8lYDo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727098AbgKDVNv (ORCPT
+        id S1732890AbgKDXml (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 16:13:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52752 "EHLO
+        Wed, 4 Nov 2020 18:42:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726777AbgKDVNv (ORCPT
+        with ESMTP id S1732863AbgKDXmi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 16:13:51 -0500
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFDCC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 13:13:51 -0800 (PST)
-Received: by mail-ot1-x341.google.com with SMTP id i18so128108ots.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 13:13:50 -0800 (PST)
+        Wed, 4 Nov 2020 18:42:38 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF881C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 15:42:38 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id e21so173639pgr.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 15:42:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Du2JXkZDjjUO3w58gMtgZA9BL3as/j/kfsHWoUR1SQ4=;
-        b=Q6NRaUEwnogctSkqhm5DeOyHPK2mactl4UvVTN3DaunNHSRuzWF4aF9T1X07dQjzSs
-         MeJg+DVNfr5vJ2lgkFge/pRwhB5Q2AA5cb/e7518GWX28VZVIkVqj/AkaMckEN9L3B63
-         tiu0GSAA/XB16WiWVKs6hHzOK2C7bJyzr0mMgeGtEZpQ2K8bBLMQ7tecES5Fn75YaOLg
-         TAbDI12VgT5fal8v5vXzLXjMDDeg3FZkQM6Od1deiO2SRzTkpDNwDYPuymoSUBDsRzH3
-         9yT2OlTNxIRlc9fS82NA8JgMsqc63In1Z55dKImVqkva7ZpXAVslQOpsuY/7QXYQIt++
-         6O8g==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=I2wQWVcRf4N1MbmSoTwL5Uo3W0ejdtifRaxI4lK0kZs=;
+        b=qkW8lYDoV7WuTPOHPOZotJEFhAwYuLE10hYXYqhZtJOTIe+VomAM8+zQHoWZQKGhwi
+         QX/OY9M9xMF81G7F60q3kne55QDJfdFORPWPtmJB96vZjL23ehQbeHv/dQGw7c/dZ8ot
+         4x9ErtNgjdNH1kveDgWDZtHJzxPHwf4kA0yzTCSmVzwHXY/37FxR8e43MBl8xeVZwhs1
+         AdvxGHgKAwNRI0JRxlJYpXZDxNpy4y50IF+FPGV0pzGs/kPct1i4oq+FEBTUJfgEbmxm
+         jAHd4ouKLBf0RFG34Ao6oGEiNeSxNHN+FKcb5UcLhXdTmLOhShKFHVhDOSX+tfNZBuKb
+         va+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Du2JXkZDjjUO3w58gMtgZA9BL3as/j/kfsHWoUR1SQ4=;
-        b=K5fSn7z9CRfif1U07ZO3iXXYEs5V3lytSp9bDbyQMAtv4KB2R6DjBFbWEWIBQsKt95
-         K62JruyOOtSo/F2yZK2fAzwpO/P4BuEfHCDnPXfg1k0U6jzsjG8OEGEpvLKnoM0Q7+wo
-         puSK0QRF6fJfBppHmMkhnJojn1CPJt+THhPFxwYAauZHJrqRm1Ajggq3OusZCTa7V3rX
-         s1CP8K7i9FOGxEptbTyN1xC3pg1fDC51A/9Z5XNOJfpZeVyIsYBktmQTk9lMVCysDDB9
-         u+Ic+t5Qi3DTXKbFq123NiuIpM06O+FRwMcTXjTWATdyXeF/f3otPWmygN9qUV0pl2sa
-         J4yg==
-X-Gm-Message-State: AOAM533kFg2d/neR5MmQyUEKkjhvV3EwKRDuCgLEFMhjkhiEahC7lw5B
-        7rrhOh1tcCJ+aVO6PBRchb0H72jLtVuu5H9PTIA=
-X-Google-Smtp-Source: ABdhPJxWZCq3pmSvc9NynZQ6nB8AxHQCXxPMqhO2d4w93tb2E2L7EiuTkjz/GenAyKrkQ2GS1ip4Btd3FxMJmf75qAg=
-X-Received: by 2002:a05:6830:400d:: with SMTP id h13mr20857831ots.371.1604524430314;
- Wed, 04 Nov 2020 13:13:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
-In-Reply-To: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=I2wQWVcRf4N1MbmSoTwL5Uo3W0ejdtifRaxI4lK0kZs=;
+        b=i0q6hutbU+cjF7rE7LVvravDDfmtbDLOewUUgPKJx6Qlm92WkbeWZB8UY7WD6zA6O5
+         JLqG/baevrqz9d3LcICGOC5X516GAaUP22Kmp+F/drwV/D+d1Dkxv+MIxQU0wK9VAY9K
+         J/ufkFuR8s/O1l770yvTLtSeyAF0ju6Dl3JCr07+gBkfCg3GxIYlKu2kAUWXW/QyVEwO
+         DnJboT4IQ+uXv5BGsWWDN7I/BKWIuxaui9LSECPlbNsjbcNPlr7BalIA77M5QOxwNspd
+         OeReCaI5xjJlvZk/8+aANclu8nyk8e3xtzg3j/JfxZHwWetCqi6MoO4zKjXtwcSrMesE
+         Ow8g==
+X-Gm-Message-State: AOAM53196syF0lBFAxvuXAPl1jJQIyrLmhjoaXinfuZaOOZY1pbow8s4
+        QJ62Nju3CEVvvQjumNnttEj5DPPsIB6BUw==
+X-Google-Smtp-Source: ABdhPJwC/SlJUUY3MFkYXHq5q/F5ROIyunnTaWpmFDfd71hUL461xeW1Z7Ccuh5La5SqoYnBEFGx+Q==
+X-Received: by 2002:a62:7883:0:b029:18a:e054:edf1 with SMTP id t125-20020a6278830000b029018ae054edf1mr386669pfc.70.1604533358170;
+        Wed, 04 Nov 2020 15:42:38 -0800 (PST)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id 30sm3361513pgl.45.2020.11.04.15.42.37
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2020 15:42:37 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 4 Nov 2020 13:13:39 -0800
-Message-ID: <CABBYNZKRhGcqtd1eUhE2AbF98RNnDkEfTHcg8p38JSB=ENXy1Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1 1/3] policy: add checks before connecting
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 8/8] emulator: Return error for ext adv feature not supported
+Date:   Wed,  4 Nov 2020 15:42:28 -0800
+Message-Id: <20201104234228.2257427-8-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201104234228.2257427-1-luiz.dentz@gmail.com>
+References: <20201104234228.2257427-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Nov 3, 2020 at 9:35 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> When policy_connect() is called, there might be a case where the
-> device is not ready, or even the adapter is down. Add some checks
-> by calling btd_device_connect_services() instead of directly calling
-> btd_service_connect().
+This return an error if LE Set Extended Advertising Enable is used with
+unsupported features.
+---
+ emulator/btdev.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-But we could perform these checks in btd_service_connect or you also
-intended to use the pending list? Im a little hesitant with such a
-change though because there could be a pending connect already causing
-it to fail instead of just connecting in parallel.
-
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> ---
->
->  plugins/policy.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/plugins/policy.c b/plugins/policy.c
-> index ba9e1be020..42b15cb65f 100644
-> --- a/plugins/policy.c
-> +++ b/plugins/policy.c
-> @@ -106,6 +106,7 @@ static void policy_connect(struct policy_data *data,
->  {
->         struct btd_profile *profile = btd_service_get_profile(service);
->         struct reconnect_data *reconnect;
-> +       GSList *l = NULL;
->
->         reconnect = reconnect_find(btd_service_get_device(service));
->         if (reconnect && reconnect->active)
-> @@ -113,7 +114,9 @@ static void policy_connect(struct policy_data *data,
->
->         DBG("%s profile %s", device_get_path(data->dev), profile->name);
->
-> -       btd_service_connect(service);
-> +       l = g_slist_prepend(l, service);
-> +       btd_device_connect_services(data->dev, l);
-> +       g_slist_free(l);
->  }
->
->  static void policy_disconnect(struct policy_data *data,
-> --
-> 2.29.1.341.ge80a0c044ae-goog
->
-
-
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 42276a2ce..a36493346 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -3760,8 +3760,19 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		if (btdev->le_adv_enable == lseae->enable)
+ 			status = BT_HCI_ERR_COMMAND_DISALLOWED;
+ 		else {
+-			btdev->le_adv_enable = lseae->enable;
+-			status = BT_HCI_ERR_SUCCESS;
++			const struct bt_hci_cmd_ext_adv_set *eas;
++
++			if (lseae->num_of_sets) {
++				eas = data + sizeof(*lseae);
++				if (eas->duration || lseae->num_of_sets > 1)
++					status = BT_HCI_ERR_INVALID_PARAMETERS;
++				else
++					status = BT_HCI_ERR_SUCCESS;
++			} else
++				status = BT_HCI_ERR_SUCCESS;
++
++			if (status == BT_HCI_ERR_SUCCESS)
++				btdev->le_adv_enable = lseae->enable;
+ 		}
+ 		cmd_complete(btdev, opcode, &status, sizeof(status));
+ 		if (status == BT_HCI_ERR_SUCCESS && btdev->le_adv_enable)
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
