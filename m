@@ -8,63 +8,65 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9167C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 05:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9B7C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 07:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7495A223C6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 05:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B703D22384
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 07:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V6o3wD3a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ImAPgtRi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725812AbgKDFfo (ORCPT
+        id S1728304AbgKDH2x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 00:35:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47042 "EHLO
+        Wed, 4 Nov 2020 02:28:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725535AbgKDFfo (ORCPT
+        with ESMTP id S1726152AbgKDH2x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 00:35:44 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B817C061A4D
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 21:35:44 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id n10so12294022plk.14
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 21:35:44 -0800 (PST)
+        Wed, 4 Nov 2020 02:28:53 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2105C061A4D
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 23:28:52 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id a184so20762637ybg.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 23:28:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=Ej2iTrt9Z1IFwb0BU/LPIeKtR6sJNiV3QsPClggI+HA=;
-        b=V6o3wD3awKWyIw0FPmznha1mkX9kLWG+V85HkaoZeC+ucTjgSWvxaPlNRNjAY3GYfs
-         4vY6miGjVSevYhgZenMMOb175WkS1tpNg9lVkPGb+/QnKL5l1QLOInpeY+4KGqvyD/5q
-         1hvxCbCPQtXhZLheHuVHlWphv4jJe1euBoO0Q3qr+JZH/hstsg1kT3aZoZFcmHBgUuu6
-         UJhM0nAUTDj/QUKOxD7jZtRqj5F29wksU1EVV1ZW0XRmfMR6CZJtwWXL/0U+SBvt0lNT
-         72XxO7mvmVsGmBW9LkIyKqSLiIteM6NdfPr+i5R02ncGeDmEkiF4UAhiIuiy78oSmKrG
-         Qb4g==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=MvHC64F7MCyUUsOrtg57NOsgameuY0hHXKFdMfRhW2Q=;
+        b=ImAPgtRiVrdwFF5Tj2iF8DyRup7BhWjmT5BnH2Y79ARBqfwZFI2750e+UX22Yv/X8/
+         Wwyv/iYcxLG5ct0f5fpz1G/EeHi+nu+2NCr5tVGrrF9+PaRR5G7i5qaxtVTJ/gtPuLLl
+         wgzgUJQdHs9NroY3S0YcOAy4WJVC2DcHErR9qhDyyL1H6fwuDSoDtVI/PLgmOQRrPkpU
+         /O+ySA7QjINLPV16bm4Vp5Na6HXKdfm/rX459DRxb7AhVMNVdpaPQX/FSPwsIgmw78PO
+         kFWMAzqeoWVLtHGfWicfiN1slUSduzcLMNEbMyTGiDHYMY8IRD9kiXbas6vN9sxo0R7b
+         C/5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=Ej2iTrt9Z1IFwb0BU/LPIeKtR6sJNiV3QsPClggI+HA=;
-        b=Gj/TlcMTVfmM+H8tr9THwzbGym6PExM7ffgs0y3sEUEMKw0D3F4foamxk3I8K3O1M5
-         ZJLV0u7rM2MOjeezZdDBwqkfcaC3Ohn7DatgrmZ6z6EIajWGf3g8I/t3U/hq6TpROkcs
-         kUTP8Gs2QlDg0fRq7VLmIyz15fJiZrBSYKQxHRGRizJdWz6nt+ND1NvtJUzzHsMoVByU
-         Xx0UOYYLO7YW3yNb3xHbA23VKoz+zGgRrfnvn4pK0YZu6TLzoq0QZrK4s3ocCqPvUCis
-         unISGekYqszrxqlXX7TdhabzQicY6p3zR+uCOCbLpjFaSVMNZPjG6xxfAQG8grWLLJJh
-         rmVw==
-X-Gm-Message-State: AOAM5306tF7Bd04RXYC/e4386M8a2wUB5cYs+uYQcv7a5ecfxSJN0YjC
-        K95ySoCeEuZOS/kbXEEhhO+KZyceK89tVxmYJ5UhXrob6Hu3g4AjCHpTMjzCesTaXkgG2ob8/qn
-        fx9yvMpon1anYrnxdTHAww58fxbeor8EXEwl71EPyypR6jlJC0F5e8DGguB4gIitEeEjAtQFZtg
-        9Y
-X-Google-Smtp-Source: ABdhPJzG5TYQdYHlC5/8RkcrIHQ+kLFviBRkE7pOo//ZyQcmzmqIF+40AtGA2L/K6GlD+9MyrnIdQt+dmla0
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=MvHC64F7MCyUUsOrtg57NOsgameuY0hHXKFdMfRhW2Q=;
+        b=MUv/VZh8/DUSd+2W95zHh2QJ1y9St500hViWY223a8vZIis2S3k+U5vIjjt6aQ2RQE
+         tLvGWnnLTwt1wwoj7WmrQRWW5piYXAEtQmiPjsaz93KjXbuhwuYMoSSX53DwP91AdYGA
+         k1Y/HsRv2ocC7AnIVRiLfIx4674rnTTpOiRedc2GWTHEgxbQCwEGONxwkwtV7nCLDBpN
+         e5K5jsPcVnC8Il7LrLmuG3jY+qesMHxi43XAYbiX4yFex+0LRA3Ykn3tChXM5BABqI7C
+         /d5CleckBSmdLebZLoL2VxWaRuuHG2VFZn+58BqFQh9IWK+po+SMRZ1w5dD++u2YGkLp
+         y1Yg==
+X-Gm-Message-State: AOAM531FhFJNUrJV8coIJUo+Q8EaLSRm8n2rkTL1HzKGD7g//hDwz7VT
+        wyiwHGfS3xIdCIQzTrxyozV1NJMHtvmNgm3l83eiH6T7hiLE6rwh0K2Q5RMpYnD1j1HI484v5/H
+        zK2hQ99aQix9YFbWqkGgDgDNsD+Y8kS09oUWOS5i8eRkfvupvD3KtHyd69fhbj+aTHg4RIvgd//
+        LN
+X-Google-Smtp-Source: ABdhPJyQzsqiuT1rCKeEeKHCmJgErykx28DG9KtGFln8enVo97sHV+G28uJxxp/AXAjqsfIbtxhWL9qK3uKA
 Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a62:1a48:0:b029:18a:b64f:44eb with SMTP id
- a69-20020a621a480000b029018ab64f44ebmr16569409pfa.79.1604468143265; Tue, 03
- Nov 2020 21:35:43 -0800 (PST)
-Date:   Wed,  4 Nov 2020 13:35:26 +0800
-Message-Id: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+ (user=apusaka job=sendgmr) by 2002:a25:2bc7:: with SMTP id
+ r190mr33610277ybr.497.1604474932023; Tue, 03 Nov 2020 23:28:52 -0800 (PST)
+Date:   Wed,  4 Nov 2020 13:35:27 +0800
+In-Reply-To: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+Message-Id: <20201104133318.Bluez.v1.2.I4c872b9b8fdee53a335db41acbb6e59fe9692cc5@changeid>
 Mime-Version: 1.0
+References: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [Bluez PATCH v1 1/3] policy: add checks before connecting
+Subject: [Bluez PATCH v1 2/3] audio: unref session when failed to setup
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -78,40 +80,50 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-When policy_connect() is called, there might be a case where the
-device is not ready, or even the adapter is down. Add some checks
-by calling btd_device_connect_services() instead of directly calling
-btd_service_connect().
+There is a possibility to miss unref-ing when source/sink fails at
+setup.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
 
- plugins/policy.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ profiles/audio/sink.c   | 5 ++++-
+ profiles/audio/source.c | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index ba9e1be020..42b15cb65f 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -106,6 +106,7 @@ static void policy_connect(struct policy_data *data,
- {
- 	struct btd_profile *profile = btd_service_get_profile(service);
- 	struct reconnect_data *reconnect;
-+	GSList *l = NULL;
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 134d157bc6..d672670e25 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -258,8 +258,11 @@ gboolean sink_setup_stream(struct btd_service *service, struct avdtp *session)
  
- 	reconnect = reconnect_find(btd_service_get_device(service));
- 	if (reconnect && reconnect->active)
-@@ -113,7 +114,9 @@ static void policy_connect(struct policy_data *data,
+ 	sink->connect_id = a2dp_discover(sink->session, discovery_complete,
+ 								sink);
+-	if (sink->connect_id == 0)
++	if (sink->connect_id == 0) {
++		avdtp_unref(sink->session);
++		sink->session = NULL;
+ 		return FALSE;
++	}
  
- 	DBG("%s profile %s", device_get_path(data->dev), profile->name);
- 
--	btd_service_connect(service);
-+	l = g_slist_prepend(l, service);
-+	btd_device_connect_services(data->dev, l);
-+	g_slist_free(l);
+ 	return TRUE;
  }
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index fca85d4cb3..c706c928a7 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -259,8 +259,11 @@ gboolean source_setup_stream(struct btd_service *service,
  
- static void policy_disconnect(struct policy_data *data,
+ 	source->connect_id = a2dp_discover(source->session, discovery_complete,
+ 								source);
+-	if (source->connect_id == 0)
++	if (source->connect_id == 0) {
++		avdtp_unref(source->session);
++		source->session = NULL;
+ 		return FALSE;
++	}
+ 
+ 	return TRUE;
+ }
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
