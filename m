@@ -2,114 +2,237 @@ Return-Path: <SRS0=3U9n=EK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3BBFC388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 07:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C457C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 12:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88BE32225B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 07:28:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uiHfAt9B"
+	by mail.kernel.org (Postfix) with ESMTP id D47A8223AB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Nov 2020 12:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728766AbgKDH26 (ORCPT
+        id S1729481AbgKDME3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 02:28:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726152AbgKDH26 (ORCPT
+        Wed, 4 Nov 2020 07:04:29 -0500
+Received: from rtits2.realtek.com ([211.75.126.72]:39303 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728287AbgKDME2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 02:28:58 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E719DC061A4D
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2020 23:28:57 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id y11so20747356ybm.22
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2020 23:28:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=VMs0RSuZYJWQYM2qY1Ay9hJIl+DoSw5tv9blGU6QQN0=;
-        b=uiHfAt9BJ0NCbEzNQPhIL4OLo+7Tk8TzZ4R73OHHL/wd9avKZ8N8oJqyqdoqpHltHD
-         z0d8cSfTLphmDhVDCURGsMfgvknt6y/3EhzdisZ5wnTbCguzAEOwiixj4zKdYhfXQV7v
-         IY6wlMzsUtOblw2JiEnb7O1vXPE8TLzPFnId0eyegrWGKnYqqjlh7H6YASpuEOOnY8G+
-         wENApKX9Fm5/AaGQ3cOqv9rGaXqb4XscE2lhVlpo9nC0VWRZX8X+i7tIq/vtKDniEEA/
-         rlpPYrrnA5wJ++w//I0HyhiCGd7B4GbZER+hKwESq/DPghkcc9dZN2G33B4+jeKfPy2G
-         rS1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=VMs0RSuZYJWQYM2qY1Ay9hJIl+DoSw5tv9blGU6QQN0=;
-        b=fdHJkpxhgAwVy4crjI5GQXg0ciwra2cc+VtoFfgGSRiMmq0x2HhPYkqNSZPH5LE0Cu
-         vJXkdXKoaO0P2UW7z0o87Yk/+2lV2Ye5XMnuaILbYRUwUz8FICgKDuZhNitSC3ZTm6uB
-         /YvSMl6hgXGmq8qOupg8L+i4uATu3bT4lYoPgUeBAK7oJ+fEiphZTaYNdnhBXlYn3+FH
-         kpVdfmEa/qywxQsO0k3i/G4bRMeXa+hjMOEV9GJqzu+R/AuexSbtLmzhi0XhUoVlJvpG
-         CYcbHJgkV6YBnlynPRwTPG7CKlVUcWpu2ykKjD2BAlcfP4XHg/JbKSi1AkvB3f7Gg3fs
-         ApgQ==
-X-Gm-Message-State: AOAM532vRsARK526+DLBO35IlytDl56SuWArkMzJKxXTWtjMmT5Ftp13
-        JF5FTOnS7TtgJNRzwuYbvO9BPyOWk/IHZYosxGrVIuLrsE0b4TA/fCSqttV1jbPgCbe4jlILyzw
-        zweJZfI01e2gBaAUh9eRUis4MXRucgFwZhE6xP87BOnnZjk5297g8V8ncbc/82hW73+LKk6QvTQ
-        dE
-X-Google-Smtp-Source: ABdhPJxglpyt6TYpC2KO4CsIfV1AvL/yTLi6fLlIYdvGYNA/rqtZA77wk5PVihuJt/EcaBvCm4wVJaBtlV7S
-Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a25:2614:: with SMTP id
- m20mr33872111ybm.196.1604474937100; Tue, 03 Nov 2020 23:28:57 -0800 (PST)
-Date:   Wed,  4 Nov 2020 13:35:28 +0800
-In-Reply-To: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
-Message-Id: <20201104133318.Bluez.v1.3.Ib69ea31cb69840b941b725a1d889473c5e6cac97@changeid>
-Mime-Version: 1.0
-References: <20201104133318.Bluez.v1.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
-X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [Bluez PATCH v1 3/3] audio/avdtp: Report failure in disconnected state
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 4 Nov 2020 07:04:28 -0500
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 0A4C4IES0003516, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmb01.realtek.com.tw[172.21.6.94])
+        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 0A4C4IES0003516
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Wed, 4 Nov 2020 20:04:18 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.34) by
+ RTEXMB01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2044.4; Wed, 4 Nov 2020 20:04:18 +0800
+Received: from localhost.localdomain (172.21.132.186) by
+ RTEXMBS03.realtek.com.tw (172.21.6.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 4 Nov 2020 20:04:18 +0800
+From:   <max.chou@realtek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <alex_lu@realsil.com.cn>, <hildawu@realtek.com>
+CC:     <kidman@realtek.com>, <max.chou@realtek.com>
+Subject: [PATCH] Bluetooth: btrtl: Refine the ic_id_table for clearer and more regular
+Date:   Wed, 4 Nov 2020 20:04:14 +0800
+Message-ID: <20201104120414.12772-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.186]
+X-ClientProxiedBy: RTEXMB03.realtek.com.tw (172.21.6.96) To
+ RTEXMBS03.realtek.com.tw (172.21.6.34)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+From: Max Chou <max.chou@realtek.com>
 
-A2DP are relying on the disconnected state callback to do cleanup.
-If failure occurs when AVDTP are already in the disconnected state,
-we didn't make any transition state, therefore A2DP would miss this
-event.
+Enhance the ic_id_table that it's able to maintain regularly.
+To judge which chip should be initialized by LMP subversion, HCI revision,
+ HCI version and HCI bus which were given in the ic_id_table.
+Also, refine the incorrect LMP subversion of ROM for RTL8723D and
+RTL8723A.
 
-This patch allows the transition to disconnected state, even though
-we are previously already in the disconnected state.
-
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Suggested-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 ---
+ drivers/bluetooth/btrtl.c | 65 ++++++++++++---------------------------
+ 1 file changed, 19 insertions(+), 46 deletions(-)
 
- profiles/audio/avdtp.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 4c39088b8f..16fa20bba7 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -2612,6 +2612,11 @@ static int send_req(struct avdtp *session, gboolean priority,
- 	if (session->state == AVDTP_SESSION_STATE_DISCONNECTED) {
- 		session->io = l2cap_connect(session);
- 		if (!session->io) {
-+			/* Report disconnection anyways, as the other layers
-+			 * are using this state for cleanup.
-+			 */
-+			avdtp_set_state(session,
-+					AVDTP_SESSION_STATE_DISCONNECTED);
- 			err = -EIO;
- 			goto failed;
- 		}
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 3a9afc905f24..1ab9f27e4fa7 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -18,10 +18,8 @@
+ #define VERSION "0.1"
+ 
+ #define RTL_EPATCH_SIGNATURE	"Realtech"
+-#define RTL_ROM_LMP_3499	0x3499
+ #define RTL_ROM_LMP_8723A	0x1200
+ #define RTL_ROM_LMP_8723B	0x8723
+-#define RTL_ROM_LMP_8723D	0x8873
+ #define RTL_ROM_LMP_8821A	0x8821
+ #define RTL_ROM_LMP_8761A	0x8761
+ #define RTL_ROM_LMP_8822B	0x8822
+@@ -31,10 +29,13 @@
+ #define IC_MATCH_FL_HCIREV	(1 << 1)
+ #define IC_MATCH_FL_HCIVER	(1 << 2)
+ #define IC_MATCH_FL_HCIBUS	(1 << 3)
+-#define IC_INFO(lmps, hcir) \
+-	.match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV, \
++#define IC_INFO(lmps, hcir, hciv, bus) \
++	.match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV | \
++		       IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS, \
+ 	.lmp_subver = (lmps), \
+-	.hci_rev = (hcir)
++	.hci_rev = (hcir), \
++	.hci_ver = (hciv), \
++	.hci_bus = (bus)
+ 
+ struct id_table {
+ 	__u16 match_flags;
+@@ -58,112 +59,85 @@ struct btrtl_device_info {
+ };
+ 
+ static const struct id_table ic_id_table[] = {
+-	{ IC_MATCH_FL_LMPSUBV, RTL_ROM_LMP_8723A, 0x0,
+-	  .config_needed = false,
+-	  .has_rom_version = false,
+-	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
+-	  .cfg_name = NULL },
+-
+-	{ IC_MATCH_FL_LMPSUBV, RTL_ROM_LMP_3499, 0x0,
++	/* 8723A */
++	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = false,
+ 	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
+ 	  .cfg_name = NULL },
+ 
+ 	/* 8723BS */
+-	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+-			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
+-	  .lmp_subver = RTL_ROM_LMP_8723B,
+-	  .hci_rev = 0xb,
+-	  .hci_ver = 6,
+-	  .hci_bus = HCI_UART,
++	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8723bs_config" },
+ 
+ 	/* 8723B */
+-	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb),
++	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8723b_config" },
+ 
+ 	/* 8723D */
+-	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd),
++	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8723d_config" },
+ 
+ 	/* 8723DS */
+-	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+-			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
+-	  .lmp_subver = RTL_ROM_LMP_8723B,
+-	  .hci_rev = 0xd,
+-	  .hci_ver = 8,
+-	  .hci_bus = HCI_UART,
++	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8723ds_config" },
+ 
+-	/* 8723DU */
+-	{ IC_INFO(RTL_ROM_LMP_8723D, 0x826C),
+-	  .config_needed = true,
+-	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723d_config" },
+-
+ 	/* 8821A */
+-	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa),
++	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8821a_config" },
+ 
+ 	/* 8821C */
+-	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc),
++	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8821c_config" },
+ 
+ 	/* 8761A */
+-	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa),
++	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8761a_config" },
+ 
+ 	/* 8761B */
+-	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb),
++	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761b_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8761b_config" },
+ 
+ 	/* 8822C with UART interface */
+-	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+-			 IC_MATCH_FL_HCIBUS,
+-	  .lmp_subver = RTL_ROM_LMP_8822B,
+-	  .hci_rev = 0x000c,
+-	  .hci_ver = 0x0a,
+-	  .hci_bus = HCI_UART,
++	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8822cs_config" },
+ 
+ 	/* 8822C with USB interface */
+-	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc),
++	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8822cu_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8822cu_config" },
+ 
+ 	/* 8822B */
+-	{ IC_INFO(RTL_ROM_LMP_8822B, 0xb),
++	{ IC_INFO(RTL_ROM_LMP_8822B, 0xb, 0x7, HCI_USB),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8822b_fw.bin",
+@@ -654,7 +628,6 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 
+ 	switch (btrtl_dev->ic_info->lmp_subver) {
+ 	case RTL_ROM_LMP_8723A:
+-	case RTL_ROM_LMP_3499:
+ 		return btrtl_setup_rtl8723a(hdev, btrtl_dev);
+ 	case RTL_ROM_LMP_8723B:
+ 	case RTL_ROM_LMP_8821A:
 -- 
-2.29.1.341.ge80a0c044ae-goog
+2.17.1
 
