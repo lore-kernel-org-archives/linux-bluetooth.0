@@ -2,103 +2,120 @@ Return-Path: <SRS0=JOhI=EL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7667C00A89
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95318C00A89
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:45:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 893812080D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29DAA21556
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:45:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="qx/CgSDx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1XlC9Y+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727731AbgKEHGE (ORCPT
+        id S1729536AbgKEHpu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Nov 2020 02:06:04 -0500
-Received: from z5.mailgun.us ([104.130.96.5]:13512 "EHLO z5.mailgun.us"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725298AbgKEHGE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Nov 2020 02:06:04 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1604559964; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=1Pctgo6qoLaBH5cW9YYonDcMS4/9/r69lL2AMog1LQI=; b=qx/CgSDxOqqHFeAYwr6tJ0AmtWxpN8VlzlCZUiqO/s7CKoUcWd7GxefcaBwgwYLsAtf8ti2k
- Rkh3V3Wakpw0QNxuU938soF7rr4s4kPhaMYDB6d7iWHRWnWwqlWo6PKqvTSSAzY3102YlPk2
- AERCPKQgw0Y6wF3TCxO21Z6zeP0=
-X-Mailgun-Sending-Ip: 104.130.96.5
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 5fa3a45ba6bf6cdf63ff63b6 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 05 Nov 2020 07:06:03
- GMT
-Sender: asitshah=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id DAFAFC433CB; Thu,  5 Nov 2020 07:06:02 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: asitshah)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 645CAC433C6;
-        Thu,  5 Nov 2020 07:06:02 +0000 (UTC)
+        Thu, 5 Nov 2020 02:45:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726756AbgKEHpu (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Nov 2020 02:45:50 -0500
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28682C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 23:45:50 -0800 (PST)
+Received: by mail-il1-x12e.google.com with SMTP id p10so558763ile.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 23:45:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=18Y3ycgavilN7j6CbEu7/76pjavpv91fLbqRbqPVj+Y=;
+        b=K1XlC9Y+TQScea+3fw3ZwuZW/xQfco+hrauIUGTGdDwLDwX5YuQ1yp01Qp4bxTmQNF
+         e9KFOse/H1LfP4FUgpEVD4AALSqO9twjIqOoX2ijuN51sEAUEdQWK1mh8ROZy1k0Tg5Y
+         xV6oZ8eUPgL4wiA5STTwC2QH1Ayejd3KBWfcUhO9hr3q6UEmZJB3Ip3PdEHNKbP0Fw75
+         qj69abSx1NLJ1F13dlSgkp0lfbl2G5DXfpQ27KS7YW3jKY5Y/byoHUFWiILC9nwHISJg
+         k/9KUD0TDqugRQuIJeJrPINRqkxSgH4Irjxdhgxq4YAkRA3PlGgxQzOPGXBtFwW6x8dh
+         ihVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=18Y3ycgavilN7j6CbEu7/76pjavpv91fLbqRbqPVj+Y=;
+        b=S78pCj9mObWma+fp9G6jeiAjdbCD9s2yO6cq6UkFdISIe6FQo5yq0cuoVWtjYVc+4B
+         GqAPjdJgA+njVC5rUY81HWzlskobuR+yhTTisa9Yf5DzYTcZRJX9q4L85quD2xU0ZAiF
+         290vA0gvzmN+ES/IyTvrZL2t2JGY4Il5Afqt1mTSIECxyGMp2eGb6awNzxGNuEKjDzsX
+         Ybv5228xKTAMNW+S/+wDyQLQ+KcmsRRp6B/sQvTOYXIwgGxguePkiijPVMnKpqfbeUjF
+         PPnpYE+7xc7+WNkuJRFeIYiTNyiExz8xJIY69PmWIsHDx0E++czkLsRrxjPF44818ABA
+         vzQA==
+X-Gm-Message-State: AOAM532JPu5tvBlvpGOV6T+WipBCvjVQk7R3XjDEn3j63ErBhB/AoI/y
+        vvoYkQyJUFF6XlgMk1KSfSACx886YTKVOg==
+X-Google-Smtp-Source: ABdhPJwO0fIhDjB98dDttL+FqJSbxMUgcOm+0WJ2J+VrTeRDQU7u+3ATYlNmLjl/nxeNdMmjRbgbwQ==
+X-Received: by 2002:a92:c5ce:: with SMTP id s14mr1010410ilt.40.1604562349473;
+        Wed, 04 Nov 2020 23:45:49 -0800 (PST)
+Received: from [172.17.0.2] ([40.79.28.251])
+        by smtp.gmail.com with ESMTPSA id u8sm581152ilm.36.2020.11.04.23.45.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2020 23:45:49 -0800 (PST)
+Message-ID: <5fa3adad.1c69fb81.2ac37.1e15@mx.google.com>
+Date:   Wed, 04 Nov 2020 23:45:49 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8190719558827019175=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 05 Nov 2020 12:36:02 +0530
-From:   asitshah@codeaurora.org
-List-Id: <linux-firmware.lore.kernel.org>
-To:     linux-firmware@kernel.org, jwboyer@kernel.org
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        hemantg@codeaurora.org, gubbaven@codeaurora.org,
-        abhishekpandit@chromium.org, bgodavar@codeaurora.org
-Subject: Request to Update WCN3991 FW file
-Message-ID: <71acb08c5c7e7b10f4112b350707ee82@codeaurora.org>
-X-Sender: asitshah@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, nsathish41@gmail.com
+Subject: RE: [v2] Bluetooth: btintel parse TLV structure
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201029062329.29246-1-sathish.narasimman@intel.com>
+References: <20201029062329.29246-1-sathish.narasimman@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Team,
+--===============8190719558827019175==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Please include updated firmware bins for WCN3991. Change includes 
-updated TLV file to fix BT SSR.
+This is automated email and please do not reply to this email!
 
-Snapshot of pull request is as below, let me know if anything is 
-missing.
+Dear submitter,
 
->>>>> 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=372797
 
-The following changes since commit 
-dae4b4cd084102cd49c37aa8b579b208028ab025:
+---Test result---
 
-   Merge branch 'v1.1.5' of 
-https://github.com/irui-wang/linux_fw_vpu_v1.1.5 into main (2020-10-23 
-08:10:37 -0400)
+##############################
+Test: CheckPatch - FAIL
+Output:
+Bluetooth: btintel parse TLV structure
+WARNING: From:/Signed-off-by: email address mismatch: 'From: Sathish Narasimman <nsathish41@gmail.com>' != 'Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>'
 
-are available in the git repository at:
+total: 0 errors, 1 warnings, 234 lines checked
 
-   https://github.com/shahasit/bt-linux-firmware.git master
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-for you to fetch changes up to d7793e53b156126f6ea09c8d6e17cc9a8fe0ca77:
+"[PATCH] Bluetooth: btintel parse TLV structure" has style problems, please review.
 
-   QCA : Fixed BT SSR due to command timeout / IO fatal error (2020-11-05 
-12:26:32 +0530)
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-----------------------------------------------------------------
-Asit Shah (1):
-       QCA : Fixed BT SSR due to command timeout / IO fatal error
 
-  qca/crbtfw32.tlv | Bin 126832 -> 126892 bytes
-  1 file changed, 0 insertions(+), 0 deletions(-)
+##############################
+Test: CheckGitLint - PASS
 
-<<<<<
+##############################
+Test: CheckBuildK - PASS
 
+
+
+---
 Regards,
-Asit
+Linux Bluetooth
+
+
+--===============8190719558827019175==--
