@@ -2,109 +2,103 @@ Return-Path: <SRS0=JOhI=EL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63479C00A89
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 06:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7667C00A89
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:06:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E892B2087D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 06:47:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 893812080D
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 07:06:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="orcB8k+I"
+	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="qx/CgSDx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726152AbgKEGr5 (ORCPT
+        id S1727731AbgKEHGE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Nov 2020 01:47:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725287AbgKEGr4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Nov 2020 01:47:56 -0500
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7EEC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 22:47:56 -0800 (PST)
-Received: by mail-io1-xd33.google.com with SMTP id s24so692992ioj.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 22:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=kM1G/smUGEA/A3kiMHw/wyrvQPCvTUypk9xfWXglcPY=;
-        b=orcB8k+IJzlsCK9/CKtplBpB5btd0MZvPLnS3Zckbuxqrt0zp1IhSBbF+GgU7c70AU
-         hqwjGl5bxBtqhQv0Cw3tZ91Na20UlL9pBWnt4qKzj7E3h3v0MYXmv/CiOiyjLopXsCFM
-         q970M18yeRCppW9ZAzy1c3BIN53tHszRc9gE6X4lV6S3wQCTBam5k/+YdO0S979eU819
-         6ZYPWycAPrt5olZ17gS5J8qLMzXxDLgvzHx07+uCu+kkmB2coQez+LpVksRMcot/CisJ
-         tBd8QV2CYH7VmlAIoZHnGK7gGxpZAYBJt8pLVmSBcubjXmM2WXO8ETTXqbS5wDcwn6fE
-         PWWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=kM1G/smUGEA/A3kiMHw/wyrvQPCvTUypk9xfWXglcPY=;
-        b=Kl5P0a7CG1ZnyzNFvAVGrcOj/VZIER5CZxameZSd8pvUKyemg052JaWOmDZyfgTRjR
-         Uc/2FnhARbfX4k8G5sEjjqLibS7chX72wS6ozJStJ5xGHWL3W2SXgofAX7xBtT2GTzhd
-         3RzOaNeNmV3VXXe3Y3X0sarOG/rSH8WGapgVCKSV4zOjrFo/8AWxAMQXhytTuEBsN/ms
-         JGuvJJ0nVXG1UEPUIwa9JGqtBaJYjXfxTdeh49Dm5q7DVHiANCGXB51aP1aSkQI2QX29
-         gQTMsWZCWqGi3Y1e0jtCrmoVDk67O7hKw2D8PsqDKD9aucuI1DtVB2Imh7/pqLmyO5mR
-         fEXA==
-X-Gm-Message-State: AOAM532GTUjIpZRZHRrZ+fSqzpyaWnpAv00T5FZ5sF/VuPiLb4024apv
-        nLUeVISp9dxQoAKKGpxZY+spMuMGMs923g==
-X-Google-Smtp-Source: ABdhPJxcizt3UCx7uHUdVykSnLh7vXVEn+5j3vp3IkKBP7nv0hc3IsvGnqCVPdzMzaIP+pRzL5Dyfw==
-X-Received: by 2002:a05:6638:24cc:: with SMTP id y12mr960327jat.144.1604558875648;
-        Wed, 04 Nov 2020 22:47:55 -0800 (PST)
-Received: from [172.17.0.2] ([52.251.32.30])
-        by smtp.gmail.com with ESMTPSA id 9sm486524ila.61.2020.11.04.22.47.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2020 22:47:55 -0800 (PST)
-Message-ID: <5fa3a01b.1c69fb81.6a162.1904@mx.google.com>
-Date:   Wed, 04 Nov 2020 22:47:55 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8218745407138465572=="
+        Thu, 5 Nov 2020 02:06:04 -0500
+Received: from z5.mailgun.us ([104.130.96.5]:13512 "EHLO z5.mailgun.us"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725298AbgKEHGE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Nov 2020 02:06:04 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1604559964; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=1Pctgo6qoLaBH5cW9YYonDcMS4/9/r69lL2AMog1LQI=; b=qx/CgSDxOqqHFeAYwr6tJ0AmtWxpN8VlzlCZUiqO/s7CKoUcWd7GxefcaBwgwYLsAtf8ti2k
+ Rkh3V3Wakpw0QNxuU938soF7rr4s4kPhaMYDB6d7iWHRWnWwqlWo6PKqvTSSAzY3102YlPk2
+ AERCPKQgw0Y6wF3TCxO21Z6zeP0=
+X-Mailgun-Sending-Ip: 104.130.96.5
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
+ 5fa3a45ba6bf6cdf63ff63b6 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 05 Nov 2020 07:06:03
+ GMT
+Sender: asitshah=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id DAFAFC433CB; Thu,  5 Nov 2020 07:06:02 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: asitshah)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 645CAC433C6;
+        Thu,  5 Nov 2020 07:06:02 +0000 (UTC)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v3,1/3] service: add adapter powered check before connecting
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201105144005.Bluez.v3.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
-References: <20201105144005.Bluez.v3.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 05 Nov 2020 12:36:02 +0530
+From:   asitshah@codeaurora.org
+List-Id: <linux-firmware.lore.kernel.org>
+To:     linux-firmware@kernel.org, jwboyer@kernel.org
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        hemantg@codeaurora.org, gubbaven@codeaurora.org,
+        abhishekpandit@chromium.org, bgodavar@codeaurora.org
+Subject: Request to Update WCN3991 FW file
+Message-ID: <71acb08c5c7e7b10f4112b350707ee82@codeaurora.org>
+X-Sender: asitshah@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8218745407138465572==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Team,
 
-This is automated email and please do not reply to this email!
+Please include updated firmware bins for WCN3991. Change includes 
+updated TLV file to fix BT SSR.
 
-Dear submitter,
+Snapshot of pull request is as below, let me know if anything is 
+missing.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=377913
+>>>>> 
 
----Test result---
+The following changes since commit 
+dae4b4cd084102cd49c37aa8b579b208028ab025:
 
-##############################
-Test: CheckPatch - PASS
+   Merge branch 'v1.1.5' of 
+https://github.com/irui-wang/linux_fw_vpu_v1.1.5 into main (2020-10-23 
+08:10:37 -0400)
 
-##############################
-Test: CheckGitLint - PASS
+are available in the git repository at:
 
-##############################
-Test: CheckBuild - PASS
+   https://github.com/shahasit/bt-linux-firmware.git master
 
-##############################
-Test: MakeCheck - PASS
+for you to fetch changes up to d7793e53b156126f6ea09c8d6e17cc9a8fe0ca77:
 
+   QCA : Fixed BT SSR due to command timeout / IO fatal error (2020-11-05 
+12:26:32 +0530)
 
+----------------------------------------------------------------
+Asit Shah (1):
+       QCA : Fixed BT SSR due to command timeout / IO fatal error
 
----
+  qca/crbtfw32.tlv | Bin 126832 -> 126892 bytes
+  1 file changed, 0 insertions(+), 0 deletions(-)
+
+<<<<<
+
 Regards,
-Linux Bluetooth
-
-
---===============8218745407138465572==--
+Asit
