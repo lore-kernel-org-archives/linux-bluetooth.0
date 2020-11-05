@@ -2,214 +2,107 @@ Return-Path: <SRS0=JOhI=EL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61E5C4741F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 18:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E11C4741F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 18:53:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EDF6206C1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 18:46:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B4372078E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 18:53:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FP8A7+op"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwmW4aj0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731149AbgKESqi (ORCPT
+        id S1727376AbgKESxo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Nov 2020 13:46:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56868 "EHLO
+        Thu, 5 Nov 2020 13:53:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727376AbgKESqh (ORCPT
+        with ESMTP id S1726996AbgKESxo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Nov 2020 13:46:37 -0500
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A995BC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2020 10:46:37 -0800 (PST)
-Received: by mail-oo1-xc42.google.com with SMTP id v123so680000ooa.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2020 10:46:37 -0800 (PST)
+        Thu, 5 Nov 2020 13:53:44 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7961CC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2020 10:53:44 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id n15so2394204otl.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2020 10:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=q8t9KS2qHyeChpe+/aXEEd5vx3s5DgUjsPKIGwSLJCQ=;
-        b=FP8A7+opYW/IeGYoMaXsNuEaLh0EMFqyya0eoKbbnw2Nvy5DGVa9g9FSeel7v5NMwT
-         9O41k8GHHhZo2tg24jr/kaphd5qHg8uTrzHegy8/jccVbapSQGY+e0Zp3ikS8WjxNWbv
-         Q5dC3v/uVru4ZXbQMGDqJ7BmQEtydm8WKx3iyppf/7O33Suuu+hAPYYl4ZvD1i19cMTz
-         VMNy8UPg6Uqe3WtIILshbiqkAXfnCLCg2CDJNezP4rNuFiFDr7YGo0cekpSlRoL7O5c8
-         wwdOGeCLtVxZChEZg+zyLoa9Yft/n6ldB3qYjy5I1BEZaXNwPvMBl9oaRsxHvrBO74HU
-         REIQ==
+        bh=FPEbf7S2u/2Zv6e/kNFdEUPt9P0iZfzML0Ghh790GjI=;
+        b=dwmW4aj0ApmBD1r215OtfS1KIqWrBwURPjlSSbyBSmta9TZBLg0DU/qiRXgxYPCj5V
+         dslLf/DfDvWeOXWPCsJuCNaVf5UQPi3kWFAd6BJcyUCAjZw8zZMkRx8/35ejxIiHDcXC
+         LXbvjQUFlVuLRehIPKnrZ5ZwU3VcnqQPKLGeIl5Jruoz3yiEUR7dwUivLpvB5TwS9o/y
+         /jBxFqZ4n39XmPrfOp+poM2H6QUDcIaWN3Um8diqI/yxFmzaDnFxOabZZuR8A00B4dxx
+         nJlCxlInHaXC2A7oy3106VvTVBsSEJP3n1jjZXGM1lPzLTanNF5pgTV1bwqclrTlE2i5
+         38Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=q8t9KS2qHyeChpe+/aXEEd5vx3s5DgUjsPKIGwSLJCQ=;
-        b=ZfbbLI9O6VLEQxBsLpgQ5IDfIXBAs6w0yfV4MTxsUNEG7HEo9nHh0rs8ancy7HgQjr
-         K/9s2hBQ0XqJOWpBFQFrBww034NZamMktekfjaTFC+tUav0QFHWWNOq44aXqGHKP7/WX
-         3IirU8/qUbsnpm9SeWPuRpsRJitDm+8SircaVNH+yib5fQKbGizJSZCM12Wg25VOXvx+
-         rgV95MMiiF/hxUAwVYrdPwjptnr0kWs5UFAI9pN7U7JxA6GEC9VSmLKC+NpC10T99V8Q
-         FUKuyH8vdomRcYsiiOAUjD4nVCgzccVZU/9y8lIknYKS8NaC2Io1UZu9Ve2A+Vsd/0xn
-         Sfaw==
-X-Gm-Message-State: AOAM530f0nAjady4HjmVAfOyHu+BUeX7AqhPDUrE94vqTTXfGcvyLrCv
-        AsQ1lkv+NHCUdjPx0fjMlX1xW02NPkVcGm6uW/vYLzaUtoQ=
-X-Google-Smtp-Source: ABdhPJweagjZINW97TJFf3sbGwLn2OC8GEssSmgxFJBK3TM7zvhjoCx11iRAK1gvVVWwfP1d8MeXdJk2ep7S4fIogF4=
-X-Received: by 2002:a4a:e04a:: with SMTP id v10mr2762252oos.24.1604601996497;
- Thu, 05 Nov 2020 10:46:36 -0800 (PST)
+        bh=FPEbf7S2u/2Zv6e/kNFdEUPt9P0iZfzML0Ghh790GjI=;
+        b=YLiO6iAU8z0CQD457cUJUviZbbqwbrAKhwZZ50B6lV6CDLC8WGfPrI0cMC6dMNONLk
+         392dctoPLA7MIiDc4+kgwTaOcU4IT0yLr2mjqLNYKNPb87QiMcENdddb6vYcL+Q4uZHf
+         4yFGgWqNP6JGF2Y5xlSK8uUaTWWbmN82s3O95UL92DSsRM2Jeg2s4FyDtVmuByI60y+w
+         rHzZscQJoUFscig6sD3MVXp94GAKlvFZW/JFaWZ36xkrxD0fWrxmJSnmdRGkYdt6wL/+
+         RtdmGov5qsKHM1pXSp19faTGMFaF4ZodL5+8G7373EEKewe6GokmFSkFiap85XIeI7sV
+         0YsQ==
+X-Gm-Message-State: AOAM532S5yVyUcJj62d0okaOafhkmAX9uU/k1v81UayPZ0W2WpWMwU9s
+        Bna+Nt8BEJVUlpoqkqQcpu9ECqiUQFeCi/nldqiltTGC9x0=
+X-Google-Smtp-Source: ABdhPJzCdA67Qv+6SXiSGOg0UA+OpTLdwLK2VPgDabVWhqO8Kr31vHzzuGtuGjjszCcLURi5fkKyRi9GZXeDimIwOow=
+X-Received: by 2002:a05:6830:400d:: with SMTP id h13mr2730543ots.371.1604602423589;
+ Thu, 05 Nov 2020 10:53:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20201105002412.37720-1-sonnysasaka@chromium.org>
-In-Reply-To: <20201105002412.37720-1-sonnysasaka@chromium.org>
+References: <20201105144005.Bluez.v3.1.Ibb93fb0188187d11151855d2dcc737640b2b81da@changeid>
+ <5fa3a01b.1c69fb81.6a162.1904@mx.google.com>
+In-Reply-To: <5fa3a01b.1c69fb81.6a162.1904@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 5 Nov 2020 10:46:25 -0800
-Message-ID: <CABBYNZ+=wukeRdRD9p=46NAeHhmSVSkAieJCya2UvMz-=zf3sg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt-client: Do not continue service discovery if disconnected
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Thu, 5 Nov 2020 10:53:32 -0800
+Message-ID: <CABBYNZKoFMtnMFuiwpXwTun9d2d32XmEyKicf3p_QMRvm6h+fQ@mail.gmail.com>
+Subject: Re: [Bluez,v3,1/3] service: add adapter powered check before connecting
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Archie Pusaka <apusaka@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+Hi Archie,
 
-On Wed, Nov 4, 2020 at 10:01 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+On Wed, Nov 4, 2020 at 10:49 PM <bluez.test.bot@gmail.com> wrote:
 >
-> If device is disconnected, discovery_complete_op should not continue
-> processing since this can lead to a crash because the GATT-related
-> objects may already be freed.
+> This is automated email and please do not reply to this email!
 >
-> Sample crash stack trace:
-> 0  gatt_db_service_get_handles (service=0x1751130, service=0x1751130, end_handle=0x7ffcd600806e, start_handle=0x7ffcd600806c) at src/shared/gatt-db.c:569
-> 1  gatt_db_attribute_get_service_data (attrib=<optimized out>, start_handle=0x7ffcd600806c, end_handle=0x7ffcd600806e, primary=0x0, uuid=0x0) at src/shared/gatt-db.c:1657
-> 2  0x00000000004983a8 in discovery_op_complete (op=op@entry=0x173b320, success=<optimized out>, err=err@entry=10 '\n') at src/shared/gatt-client.c:406
-> 3  0x000000000049a548 in discover_descs_cb (success=<optimized out>, att_ecode=<optimized out>, result=<optimized out>, user_data=0x173b320) at src/shared/gatt-client.c:915
-> 4  0x00000000004a1d87 in discovery_op_complete (op=0x1748450, success=<optimized out>, ecode=<optimized out>) at src/shared/gatt-helpers.c:615
-> 5  0x00000000004a2379 in discover_descs_cb (opcode=<optimized out>, pdu=0x174d551, length=<optimized out>, user_data=0x1748450) at src/shared/gatt-helpers.c:1465
-> 6  0x00000000004966db in handle_rsp (pdu_len=4, pdu=<optimized out>, opcode=<optimized out>, chan=0x17483c0) at src/shared/att.c:814
-> 7  can_read_data (io=<optimized out>, user_data=0x17483c0) at src/shared/att.c:1011
-
-Weird, are you still receiving data after the device is disconnected?
-
-> 8  0x00000000004a0853 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:157
-> 9  0x00007fb3f2d7fe87 in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-> 10 0x00007fb3f2d80230 in ?? () from /usr/lib64/libglib-2.0.so.0
-> 11 0x00007fb3f2d80542 in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
-> 12 0x00000000004a0e25 in mainloop_run () at src/shared/mainloop-glib.c:66
-> 13 0x00000000004a11f2 in mainloop_run_with_signal (func=func@entry=0x43f200 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-notify.c:188
-> 14 0x000000000040c72e in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:959
+> Dear submitter,
 >
-> Reviewed-By: Archie Pusaka <apusaka@chromium.org>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=377913
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - PASS
+>
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
 >
 > ---
->  src/device.c             |  3 +++
->  src/shared/gatt-client.c | 20 ++++++++++++++++++++
->  src/shared/gatt-client.h |  2 ++
->  3 files changed, 25 insertions(+)
->
-> diff --git a/src/device.c b/src/device.c
-> index a5ef46730..9dad746eb 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -586,6 +586,9 @@ static void gatt_client_cleanup(struct btd_device *device)
->                 device->gatt_ready_id = 0;
->         }
->
-> +       /* Make sure that service discovery is stopped if any is in progress */
-> +       bt_gatt_client_reset_in_discovery(device->client);
+> Regards,
+> Linux Bluetooth
 
-Does this means that other references will also get interrupted? That
-is something very weird here since when disconnected the bt_att
-instance should actually have informed the bt_gatt_client and the
-cleanup should had happened there.
-
-> +
->         bt_gatt_client_unref(device->client);
->         device->client = NULL;
->  }
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 8becf1c6c..2ba6efe9a 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -104,6 +104,9 @@ struct bt_gatt_client {
->
->         struct bt_gatt_request *discovery_req;
->         unsigned int mtu_req_id;
-> +
-> +       /* Whether there is a service discovery operation ongoing */
-> +       bool in_discovery;
->  };
->
->  struct request {
-> @@ -381,6 +384,12 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
->  {
->         const struct queue_entry *svc;
->
-> +       /* Service discovery may be reset due to disconnection */
-> +       if (!op->client->in_discovery)
-> +               return;
-> +
-> +       op->client->in_discovery = false;
-> +
->         op->success = success;
->
->         /* Read database hash if discovery has been successful */
-> @@ -1857,6 +1866,9 @@ static void process_service_changed(struct bt_gatt_client *client,
->  {
->         struct discovery_op *op;
->
-> +       if (client->in_discovery)
-> +               goto fail;
-> +
->         op = discovery_op_create(client, start_handle, end_handle,
->                                                 service_changed_complete,
->                                                 service_changed_failure);
-> @@ -1869,6 +1881,7 @@ static void process_service_changed(struct bt_gatt_client *client,
->                                                 discovery_op_ref(op),
->                                                 discovery_op_unref);
->         if (client->discovery_req) {
-> +               client->in_discovery = true;
->                 client->in_svc_chngd = true;
->                 return;
->         }
-> @@ -2057,6 +2070,7 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
->                 return false;
->         }
->
-> +       client->in_discovery = true;
->         client->in_init = true;
->
->         return true;
-> @@ -2080,6 +2094,7 @@ discover:
->         }
->
->  done:
-> +       client->in_discovery = true;
->         client->in_init = true;
->         return true;
->  }
-> @@ -3694,3 +3709,8 @@ int bt_gatt_client_get_security(struct bt_gatt_client *client)
->
->         return bt_att_get_security(client->att, NULL);
->  }
-> +
-> +void bt_gatt_client_reset_in_discovery(struct bt_gatt_client *client)
-> +{
-> +       client->in_discovery = false;
-> +}
-> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-> index dc5102394..dcd8e5cf6 100644
-> --- a/src/shared/gatt-client.h
-> +++ b/src/shared/gatt-client.h
-> @@ -126,3 +126,5 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
->
->  bool bt_gatt_client_set_security(struct bt_gatt_client *client, int level);
->  int bt_gatt_client_get_security(struct bt_gatt_client *client);
-> +
-> +void bt_gatt_client_reset_in_discovery(struct bt_gatt_client *client);
-> --
-> 2.26.2
->
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
