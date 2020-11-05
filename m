@@ -2,197 +2,146 @@ Return-Path: <SRS0=JOhI=EL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB933C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 00:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5167C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 00:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DB38208C7
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 00:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8152621734
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Nov 2020 00:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kjGiHj+1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iUyLhPPa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732661AbgKEAY2 (ORCPT
+        id S1732746AbgKEAxt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Nov 2020 19:24:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54358 "EHLO
+        Wed, 4 Nov 2020 19:53:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732656AbgKEAY0 (ORCPT
+        with ESMTP id S1730623AbgKEAxt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Nov 2020 19:24:26 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC8EC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 16:24:24 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id 133so48817pfx.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 16:24:24 -0800 (PST)
+        Wed, 4 Nov 2020 19:53:49 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB57C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2020 16:53:49 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id h12so23097qtu.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2020 16:53:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=G1039XuaJxx9CrTyLd/jowS0nRTYMEXBJ14B8CPT+hA=;
-        b=kjGiHj+1CIU6uw2bKs6oBqEL3aG59J9u1fRzdjr8/QfZFRF6jhl34cW63s+dfllPPT
-         Rw/6k9VroUB4mxwSZiXDr7xCYCK3g55/jzl+0QynlOiB7ZxycrhBwkpfB7Mli8akAEJp
-         +Kmhl6wCmMOlorklL4HCot+M2kTQrFsk6n/y0=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=lXf6+nA947DTqqyE+5/hnw1R1r16mxdr4M9peAEhwXQ=;
+        b=iUyLhPPamoJEjbyIj/Ob6VFU5LUQ0aEYOT1HTEiOkfZKogHQZZmPNvxPmhjAvLOvjL
+         5F7/wlbg2eSWyUtiLaPYFZ+SoYgoXNNBWuT0NlmbVjb31priLKsILQOXHema4o63msta
+         cRdJ0L29/K+4OYlel7UgV+lZpdTOlRTTvO1Rcpk1aJk1qck+vpj5gljyIPgmvD4J7mu4
+         uJhGq36M5Ljh2b/sLisd+9WzTAJTOsHjbPG+b6NYffRWChqC+42yZS+SF3S3xKRGJoSt
+         Tk/SYdvmRRidB8om+SK9Cs+Jk5kmFaUne5K9ww9FKO2F0iTJ1Y7Cw1y6rN/TzUMxwjwH
+         FURw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=G1039XuaJxx9CrTyLd/jowS0nRTYMEXBJ14B8CPT+hA=;
-        b=iXiegOabyZBdGJdW+NONC0uxm4wKzI9+exVn2lZf0uYAJIkkx8kP2bjA+uX65fkSGo
-         kBQvMi9tRyz3PemI0lXiUXSKyA2QzgjljiqVwgA9DD+TiqxkO5Vd9eF7oE5K8OqYDaqm
-         bZqJ3uEHSDwOFoKo/1/woEqplXO1HjfuV6lw+bCmrysmE6yQEQGDa7LXSeSjzoqTDPCE
-         qnRZxPDCP6SnAFLZT0VEOD4hErJbZpaUV/oWmPJ+5FKeOi4RGVExwTBK/TBoIJGsJ1C3
-         eHRWZBRobQmAKa3vKYxU6c7sJZ2DzsX8TM3K74jNXA3GbMs/OqcSimBzUua3nssyu77o
-         77NQ==
-X-Gm-Message-State: AOAM531ibMeBDtedH7Hf/FmuVGzbzkIjVTdgcrlvkJWmTDPEQ2DhToZ/
-        IQdATz8n6htMcoq+c4FqDYk6a5kSzFSYNw==
-X-Google-Smtp-Source: ABdhPJzwmGSr7HM47llfSBacn8bil8lbK72NYcJO/aL5GmxfTCVjOLn3j5ihQsGOo4VIYco+5ELdXw==
-X-Received: by 2002:a63:2ec7:: with SMTP id u190mr491766pgu.21.1604535863757;
-        Wed, 04 Nov 2020 16:24:23 -0800 (PST)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id e6sm3567052pgn.9.2020.11.04.16.24.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Nov 2020 16:24:23 -0800 (PST)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Subject: [PATCH BlueZ] gatt-client: Do not continue service discovery if disconnected
-Date:   Wed,  4 Nov 2020 16:24:12 -0800
-Message-Id: <20201105002412.37720-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=lXf6+nA947DTqqyE+5/hnw1R1r16mxdr4M9peAEhwXQ=;
+        b=DvrjbgmL3p3/krCOgW+4nzKKu9aGe0p3JaKx9dAZw7ue+3jalVWFeRTH9ELWdw8j/b
+         KHNiRHV/vLX7czdDKd4/ePUwQmctwyF/6LMpSVXWiwmhl9QnabwI4Id9NIFu5lpeD3V3
+         IGhn//JT6DUy20aorQG3e5cbZwMngW2WF4iJvSrc/z+khh1XdsxmlUE/bF/smrXdr/vi
+         mz/EifyzzUwDVv1ObBKCLIm0AhJLdStfoaTAnrE/BYbln/yJmzBvmU4Teu5EbhcPzk5h
+         ndRNzzOtPrs9h4W1sJUgBHlzG/KUBXGthurblrG/nIvyftsfiDzZsxRW5upAehpFfCDp
+         FAog==
+X-Gm-Message-State: AOAM531/NOQDsLY6nqp9uZuk8ZhXYwMvTrs053/quLY3gYzEA12DsTRs
+        2MIo4bv3hfRwUAI4tWeV0KOqQ5G5tU+1+Q==
+X-Google-Smtp-Source: ABdhPJyxLsRy99Ro1w5G8FwORdGiFopqNZ3oFtPnR2e5QyB4kbAEsEZXyYN303rzsolpscErOSwWqA==
+X-Received: by 2002:a05:622a:18f:: with SMTP id s15mr725399qtw.160.1604537628356;
+        Wed, 04 Nov 2020 16:53:48 -0800 (PST)
+Received: from [172.17.0.2] ([52.251.57.101])
+        by smtp.gmail.com with ESMTPSA id q3sm4051237qkf.24.2020.11.04.16.53.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2020 16:53:47 -0800 (PST)
+Message-ID: <5fa34d1b.1c69fb81.5765.5fbb@mx.google.com>
+Date:   Wed, 04 Nov 2020 16:53:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2630476086937727165=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
+Subject: RE: [BlueZ] gatt-client: Do not continue service discovery if disconnected
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201105002412.37720-1-sonnysasaka@chromium.org>
+References: <20201105002412.37720-1-sonnysasaka@chromium.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If device is disconnected, discovery_complete_op should not continue
-processing since this can lead to a crash because the GATT-related
-objects may already be freed.
+--===============2630476086937727165==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Sample crash stack trace:
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=377767
+
+---Test result---
+
+##############################
+Test: CheckPatch - FAIL
+Output:
+gatt-client: Do not continue service discovery if disconnected
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#12: 
 0  gatt_db_service_get_handles (service=0x1751130, service=0x1751130, end_handle=0x7ffcd600806e, start_handle=0x7ffcd600806c) at src/shared/gatt-db.c:569
-1  gatt_db_attribute_get_service_data (attrib=<optimized out>, start_handle=0x7ffcd600806c, end_handle=0x7ffcd600806e, primary=0x0, uuid=0x0) at src/shared/gatt-db.c:1657
-2  0x00000000004983a8 in discovery_op_complete (op=op@entry=0x173b320, success=<optimized out>, err=err@entry=10 '\n') at src/shared/gatt-client.c:406
-3  0x000000000049a548 in discover_descs_cb (success=<optimized out>, att_ecode=<optimized out>, result=<optimized out>, user_data=0x173b320) at src/shared/gatt-client.c:915
-4  0x00000000004a1d87 in discovery_op_complete (op=0x1748450, success=<optimized out>, ecode=<optimized out>) at src/shared/gatt-helpers.c:615
-5  0x00000000004a2379 in discover_descs_cb (opcode=<optimized out>, pdu=0x174d551, length=<optimized out>, user_data=0x1748450) at src/shared/gatt-helpers.c:1465
-6  0x00000000004966db in handle_rsp (pdu_len=4, pdu=<optimized out>, opcode=<optimized out>, chan=0x17483c0) at src/shared/att.c:814
-7  can_read_data (io=<optimized out>, user_data=0x17483c0) at src/shared/att.c:1011
-8  0x00000000004a0853 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:157
-9  0x00007fb3f2d7fe87 in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-10 0x00007fb3f2d80230 in ?? () from /usr/lib64/libglib-2.0.so.0
-11 0x00007fb3f2d80542 in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
-12 0x00000000004a0e25 in mainloop_run () at src/shared/mainloop-glib.c:66
-13 0x00000000004a11f2 in mainloop_run_with_signal (func=func@entry=0x43f200 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-notify.c:188
-14 0x000000000040c72e in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:959
 
+WARNING:BAD_SIGN_OFF: 'Reviewed-by:' is the preferred signature form
+#28: 
 Reviewed-By: Archie Pusaka <apusaka@chromium.org>
 
+- total: 0 errors, 2 warnings, 73 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] gatt-client: Do not continue service discovery if" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+gatt-client: Do not continue service discovery if disconnected
+8: B1 Line exceeds max length (153>80): "0  gatt_db_service_get_handles (service=0x1751130, service=0x1751130, end_handle=0x7ffcd600806e, start_handle=0x7ffcd600806c) at src/shared/gatt-db.c:569"
+9: B1 Line exceeds max length (170>80): "1  gatt_db_attribute_get_service_data (attrib=<optimized out>, start_handle=0x7ffcd600806c, end_handle=0x7ffcd600806e, primary=0x0, uuid=0x0) at src/shared/gatt-db.c:1657"
+10: B1 Line exceeds max length (150>80): "2  0x00000000004983a8 in discovery_op_complete (op=op@entry=0x173b320, success=<optimized out>, err=err@entry=10 '\n') at src/shared/gatt-client.c:406"
+11: B1 Line exceeds max length (172>80): "3  0x000000000049a548 in discover_descs_cb (success=<optimized out>, att_ecode=<optimized out>, result=<optimized out>, user_data=0x173b320) at src/shared/gatt-client.c:915"
+12: B1 Line exceeds max length (142>80): "4  0x00000000004a1d87 in discovery_op_complete (op=0x1748450, success=<optimized out>, ecode=<optimized out>) at src/shared/gatt-helpers.c:615"
+13: B1 Line exceeds max length (161>80): "5  0x00000000004a2379 in discover_descs_cb (opcode=<optimized out>, pdu=0x174d551, length=<optimized out>, user_data=0x1748450) at src/shared/gatt-helpers.c:1465"
+14: B1 Line exceeds max length (132>80): "6  0x00000000004966db in handle_rsp (pdu_len=4, pdu=<optimized out>, opcode=<optimized out>, chan=0x17483c0) at src/shared/att.c:814"
+15: B1 Line exceeds max length (83>80): "7  can_read_data (io=<optimized out>, user_data=0x17483c0) at src/shared/att.c:1011"
+16: B1 Line exceeds max length (142>80): "8  0x00000000004a0853 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:157"
+17: B1 Line exceeds max length (84>80): "9  0x00007fb3f2d7fe87 in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0"
+21: B1 Line exceeds max length (161>80): "13 0x00000000004a11f2 in mainloop_run_with_signal (func=func@entry=0x43f200 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-notify.c:188"
+22: B1 Line exceeds max length (92>80): "14 0x000000000040c72e in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:959"
+
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- src/device.c             |  3 +++
- src/shared/gatt-client.c | 20 ++++++++++++++++++++
- src/shared/gatt-client.h |  2 ++
- 3 files changed, 25 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/device.c b/src/device.c
-index a5ef46730..9dad746eb 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -586,6 +586,9 @@ static void gatt_client_cleanup(struct btd_device *device)
- 		device->gatt_ready_id = 0;
- 	}
- 
-+	/* Make sure that service discovery is stopped if any is in progress */
-+	bt_gatt_client_reset_in_discovery(device->client);
-+
- 	bt_gatt_client_unref(device->client);
- 	device->client = NULL;
- }
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 8becf1c6c..2ba6efe9a 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -104,6 +104,9 @@ struct bt_gatt_client {
- 
- 	struct bt_gatt_request *discovery_req;
- 	unsigned int mtu_req_id;
-+
-+	/* Whether there is a service discovery operation ongoing */
-+	bool in_discovery;
- };
- 
- struct request {
-@@ -381,6 +384,12 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
- {
- 	const struct queue_entry *svc;
- 
-+	/* Service discovery may be reset due to disconnection */
-+	if (!op->client->in_discovery)
-+		return;
-+
-+	op->client->in_discovery = false;
-+
- 	op->success = success;
- 
- 	/* Read database hash if discovery has been successful */
-@@ -1857,6 +1866,9 @@ static void process_service_changed(struct bt_gatt_client *client,
- {
- 	struct discovery_op *op;
- 
-+	if (client->in_discovery)
-+		goto fail;
-+
- 	op = discovery_op_create(client, start_handle, end_handle,
- 						service_changed_complete,
- 						service_changed_failure);
-@@ -1869,6 +1881,7 @@ static void process_service_changed(struct bt_gatt_client *client,
- 						discovery_op_ref(op),
- 						discovery_op_unref);
- 	if (client->discovery_req) {
-+		client->in_discovery = true;
- 		client->in_svc_chngd = true;
- 		return;
- 	}
-@@ -2057,6 +2070,7 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
- 		return false;
- 	}
- 
-+	client->in_discovery = true;
- 	client->in_init = true;
- 
- 	return true;
-@@ -2080,6 +2094,7 @@ discover:
- 	}
- 
- done:
-+	client->in_discovery = true;
- 	client->in_init = true;
- 	return true;
- }
-@@ -3694,3 +3709,8 @@ int bt_gatt_client_get_security(struct bt_gatt_client *client)
- 
- 	return bt_att_get_security(client->att, NULL);
- }
-+
-+void bt_gatt_client_reset_in_discovery(struct bt_gatt_client *client)
-+{
-+	client->in_discovery = false;
-+}
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index dc5102394..dcd8e5cf6 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -126,3 +126,5 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 
- bool bt_gatt_client_set_security(struct bt_gatt_client *client, int level);
- int bt_gatt_client_get_security(struct bt_gatt_client *client);
-+
-+void bt_gatt_client_reset_in_discovery(struct bt_gatt_client *client);
--- 
-2.26.2
 
+--===============2630476086937727165==--
