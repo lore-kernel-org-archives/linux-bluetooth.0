@@ -2,317 +2,109 @@ Return-Path: <SRS0=OtJ6=EM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A2CC388F2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 07:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A85EC2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 07:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9DCD120825
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 07:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFD1620825
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 07:26:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iz2IfIOi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725842AbgKFHLD (ORCPT
+        id S1726406AbgKFH0q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Nov 2020 02:11:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:29535 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbgKFHLC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Nov 2020 02:11:02 -0500
-IronPort-SDR: koeWyrcn31EDXuzPETp3359AY/E85rtaGize9nTr21uzKXgEylD3cc6up10h5JYuLqfC31IhL9
- gF2B5ldxaWeQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="157291596"
-X-IronPort-AV: E=Sophos;i="5.77,455,1596524400"; 
-   d="scan'208";a="157291596"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 23:11:02 -0800
-IronPort-SDR: yC6L8zXfjXvpHhG8+qkep1OERUFTNc69DipMCrGQMPLV+eYIq10+wbqdgHVuu9mb+Gq/ewxGt1
- GtYV1vvrl8oA==
-X-IronPort-AV: E=Sophos;i="5.77,455,1596524400"; 
-   d="scan'208";a="471969346"
-Received: from phillipn-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.212.109.190])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2020 23:11:01 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Fix errors found by static analysis
-Date:   Thu,  5 Nov 2020 23:10:53 -0800
-Message-Id: <20201106071053.122820-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
+        Fri, 6 Nov 2020 02:26:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725848AbgKFH0q (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Nov 2020 02:26:46 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2689C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2020 23:26:45 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id s10so508772ioe.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2020 23:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=f01fablFiiOL8UmdUe9Qt85fdCKUuFQOnHGdSR0VxK8=;
+        b=Iz2IfIOi2oTGms4lhQEwV48KAOTudMeMwa7XlQShnoAhCcFhWAQkEwyAq4MzykP0OJ
+         ny7tHNlHJS7ldndWXyNH0SvQ9gq/LlH8Qe+QhRVOzz4+rb6u1aFvn1NGX7wMrM7IrTXv
+         p+DcV31v9XSRIR9t8wuuyQByH4NT01xoxPJh+KqPfCSjH5u7SN8ARwTQmLBAEf3zG4Je
+         ayYwOvEXtBjGfJY/zTRlc+y9EyPogOwox+fy5xWq0vFfwT/McXToV96yjo43uJGKDkZf
+         /wVu8C5zmVJbBdlNtdDU08IlYrb83/cy7eZj9tHccBg80HKpUNv0dRAJuZsdKN8Icsis
+         KTVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=f01fablFiiOL8UmdUe9Qt85fdCKUuFQOnHGdSR0VxK8=;
+        b=t3cU9+Zdm2tAVgMEl7VA2RCANG6IBbG3GHblJ8JX7dW6rSPU1Ia7tpm2j5Hbt0v4+D
+         jLQLROUIuCx/C9n8wdKDTsg/x9gNVJNo8IIXisWkVwrGsrEqMwp6e5NwDXlZEv6gizvT
+         yCWD6yzLa0XKkQHWX+PFoJgjHb8uE/N92tOZKtvDluxrfIcJGPm0zB6E8JibGVA8sUoJ
+         mhFX3h2+hOz+zziO1fvClSdZhw95n6TxCh8nbW/QQuLt39s6xhPrV5A6IubRYlicVP1V
+         eAUUzdCEZLazqV2F7cN+BcmrlQfJ7zPSFXjd/GqBV4qhwPBECOQ1h3u7JbH9rIe/trp5
+         9XJA==
+X-Gm-Message-State: AOAM531nHx9U4wOrRqhv38kuce+7Kx84jYyBWf4DI4DfrEhmYh1pQ5CE
+        Z1uPxasNknna+oK6C6IZzc2ShjdQ9n8=
+X-Google-Smtp-Source: ABdhPJxcBVixEFKGZOIquk1jXOLDQo1S4nIkRMKkPZT4KA+PQ2MZ45qfydHtaTMGlWGoJbFvTHKyaQ==
+X-Received: by 2002:a5d:9615:: with SMTP id w21mr539641iol.59.1604647604409;
+        Thu, 05 Nov 2020 23:26:44 -0800 (PST)
+Received: from [172.17.0.2] ([40.70.0.151])
+        by smtp.gmail.com with ESMTPSA id x85sm489559ilk.64.2020.11.05.23.26.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2020 23:26:43 -0800 (PST)
+Message-ID: <5fa4fab3.1c69fb81.cf6a0.1db2@mx.google.com>
+Date:   Thu, 05 Nov 2020 23:26:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4076533351794930119=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ] mesh: Fix errors found by static analysis
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201106071053.122820-1-inga.stotland@intel.com>
+References: <20201106071053.122820-1-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes a NULL pointer dereference error (cfgmod-server.c)
-and miscellaneous issues related to unchecked return status.
+--===============4076533351794930119==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=378771
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- mesh/agent.c         | 43 ++++++++++++++++++++++++++++---------------
- mesh/appkey.c        |  6 +++---
- mesh/cfgmod-server.c | 12 +++---------
- mesh/keyring.c       | 38 ++++++++++++++++++++++++--------------
- 4 files changed, 58 insertions(+), 41 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/agent.c b/mesh/agent.c
-index b0d523d16..5058d0d8d 100644
---- a/mesh/agent.c
-+++ b/mesh/agent.c
-@@ -95,7 +95,7 @@ static bool simple_match(const void *a, const void *b)
- 	return a == b;
- }
- 
--static void parse_prov_caps(struct mesh_agent_prov_caps *caps,
-+static bool parse_prov_caps(struct mesh_agent_prov_caps *caps,
- 				struct l_dbus_message_iter *property)
- {
- 	struct l_dbus_message_iter iter_caps;
-@@ -103,7 +103,7 @@ static void parse_prov_caps(struct mesh_agent_prov_caps *caps,
- 	uint32_t i;
- 
- 	if (!l_dbus_message_iter_get_variant(property, "as", &iter_caps))
--		return;
-+		return false;
- 
- 	while (l_dbus_message_iter_next_entry(&iter_caps, &str)) {
- 		for (i = 0; i < L_ARRAY_SIZE(cap_table); i++) {
-@@ -129,9 +129,10 @@ static void parse_prov_caps(struct mesh_agent_prov_caps *caps,
- 			caps->static_type = 1;
- 	}
- 
-+	return true;
- }
- 
--static void parse_oob_info(struct mesh_agent_prov_caps *caps,
-+static bool parse_oob_info(struct mesh_agent_prov_caps *caps,
- 				struct l_dbus_message_iter *property)
- {
- 	struct l_dbus_message_iter iter_oob;
-@@ -139,7 +140,7 @@ static void parse_oob_info(struct mesh_agent_prov_caps *caps,
- 	const char *str;
- 
- 	if (!l_dbus_message_iter_get_variant(property, "as", &iter_oob))
--		return;
-+		return false;
- 
- 	while (l_dbus_message_iter_next_entry(&iter_oob, &str)) {
- 		for (i = 0; i < L_ARRAY_SIZE(oob_table); i++) {
-@@ -148,9 +149,11 @@ static void parse_oob_info(struct mesh_agent_prov_caps *caps,
- 			caps->oob_info |= oob_table[i].mask;
- 		}
- 	}
-+
-+	return true;
- }
- 
--static void parse_properties(struct mesh_agent *agent,
-+static bool parse_properties(struct mesh_agent *agent,
- 					struct l_dbus_message_iter *properties)
- {
- 	const char *key, *uri_string;
-@@ -160,15 +163,20 @@ static void parse_properties(struct mesh_agent *agent,
- 
- 	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
- 		if (!strcmp(key, "Capabilities")) {
--			parse_prov_caps(&agent->caps, &variant);
-+			if (!parse_prov_caps(&agent->caps, &variant))
-+				return false;
- 		} else if (!strcmp(key, "URI")) {
--			l_dbus_message_iter_get_variant(&variant, "s",
--								&uri_string);
-+			if (!l_dbus_message_iter_get_variant(&variant, "s",
-+								&uri_string))
-+				return false;
- 			/* TODO: compute hash */
- 		} else if (!strcmp(key, "OutOfBandInfo")) {
--			parse_oob_info(&agent->caps, &variant);
-+			if (!parse_oob_info(&agent->caps, &variant))
-+				return false;
- 		}
- 	}
-+
-+	return true;
- }
- 
- static void agent_free(void *agent_data)
-@@ -253,7 +261,10 @@ struct mesh_agent *mesh_agent_create(const char *path, const char *owner,
- 	agent->owner = l_strdup(owner);
- 	agent->path = l_strdup(path);
- 
--	parse_properties(agent, properties);
-+	if (!parse_properties(agent, properties)) {
-+		l_free(agent);
-+		return NULL;
-+	}
- 
- 	l_queue_push_tail(agents, agent);
- 
-@@ -312,15 +323,17 @@ static void properties_reply(struct l_dbus_message *reply, void *user_data)
- 	err = get_reply_error(reply);
- 
- 	if (err != MESH_ERROR_NONE)
--		goto fail;
-+		goto done;
- 
- 	if (!l_dbus_message_get_arguments(reply, "a{sv}", &properties)) {
- 		err = MESH_ERROR_FAILED;
--		goto fail;
-+		goto done;
- 	}
- 
--	parse_properties(agent, &properties);
--fail:
-+	if (!parse_properties(agent, &properties))
-+		err = MESH_ERROR_FAILED;
-+
-+done:
- 	if (req->cb) {
- 		cb = req->cb;
- 		cb(req->user_data, err);
-@@ -425,7 +438,7 @@ static void key_reply(struct l_dbus_message *reply, void *user_data)
- 	mesh_agent_key_cb_t cb;
- 	struct l_dbus_message_iter iter_array;
- 	uint32_t n = 0, expected_len = 0;
--	uint8_t *buf;
-+	uint8_t *buf = NULL;
- 	int err;
- 
- 	if (!l_queue_find(agents, simple_match, agent) || !agent->req)
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 7efb8f5c4..549f5a80d 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -100,11 +100,11 @@ bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 	if (!app_keys)
- 		return NULL;
- 
--	key = app_key_new();
--	if (!key)
-+	if (!mesh_net_have_key(net, net_idx))
- 		return false;
- 
--	if (!mesh_net_have_key(net, net_idx))
-+	key = app_key_new();
-+	if (!key)
- 		return false;
- 
- 	key->net_idx = net_idx;
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 0009a1bee..5eefedc4d 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -80,13 +80,12 @@ static uint16_t config_pub_get(struct mesh_node *node, const uint8_t *pkt,
- 
- 	pub = mesh_model_pub_get(node, ele_addr, id, &status);
- 
--	rtx = pub->rtx.cnt + (((pub->rtx.interval / 50) - 1) << 3);
--
--	if (pub && status == MESH_STATUS_SUCCESS)
-+	if (pub && status == MESH_STATUS_SUCCESS) {
-+		rtx = pub->rtx.cnt + (((pub->rtx.interval / 50) - 1) << 3);
- 		return set_pub_status(status, ele_addr, id, pub->addr, pub->idx,
- 					pub->credential, pub->ttl, pub->period,
- 					rtx);
--	else
-+	} else
- 		return set_pub_status(status, ele_addr, id, 0, 0, 0, 0, 0, 0);
- }
- 
-@@ -592,12 +591,7 @@ static uint16_t cfg_appkey_msg(struct mesh_node *node, const uint8_t *pkt,
- 	struct mesh_net *net = node_get_net(node);
- 
- 	n_idx = l_get_le16(pkt) & 0xfff;
--	if (n_idx > NET_IDX_MAX)
--		return 0;
--
- 	a_idx = l_get_le16(pkt + 1) >> 4;
--	if (a_idx > APP_IDX_MAX)
--		return 0;
- 
- 	n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
- 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index bbe501063..1ef4fc3ef 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -50,18 +50,22 @@ bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
- 		return false;
- 
- 	snprintf(key_file, PATH_MAX, "%s%s", node_path, net_key_dir);
--	mkdir(key_file, 0755);
-+
-+	if (!mkdir(key_file, 0755))
-+		return false;
-+
- 	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
- 								net_idx);
- 	l_debug("Put Net Key %s", key_file);
- 
- 	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
--	if (fd >= 0) {
--		if (write(fd, key, sizeof(*key)) == sizeof(*key))
--			result = true;
-+	if (fd < 0)
-+		return false;
- 
--		close(fd);
--	}
-+	if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+		result = true;
-+
-+	close(fd);
- 
- 	return result;
- }
-@@ -83,7 +87,10 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 		return false;
- 
- 	snprintf(key_file, PATH_MAX, "%s%s", node_path, app_key_dir);
--	mkdir(key_file, 0755);
-+
-+	if (!mkdir(key_file, 0755))
-+		return false;
-+
- 	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
- 								app_idx);
- 	l_debug("Put App Key %s", key_file);
-@@ -100,16 +107,17 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 		}
- 
- 		lseek(fd, 0, SEEK_SET);
--	} else
-+	} else {
- 		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC,
- 							S_IRUSR | S_IWUSR);
-+		if (fd < 0)
-+			return false;
-+	}
- 
--	if (fd >= 0) {
--		if (write(fd, key, sizeof(*key)) == sizeof(*key))
--			result = true;
-+	if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+		result = true;
- 
--		close(fd);
--	}
-+	close(fd);
- 
- 	return result;
- }
-@@ -198,7 +206,9 @@ bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 		return false;
- 
- 	snprintf(key_file, PATH_MAX, "%s%s", node_path, dev_key_dir);
--	mkdir(key_file, 0755);
-+
-+	if (!mkdir(key_file, 0755))
-+		return false;
- 
- 	for (i = 0; i < count; i++) {
- 		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
--- 
-2.26.2
 
+--===============4076533351794930119==--
