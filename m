@@ -2,319 +2,106 @@ Return-Path: <SRS0=OtJ6=EM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 920FFC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 09:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A03C388F2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 09:49:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 367D720936
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 09:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2C9820B80
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 09:49:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3+/8sTN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbgKFJPg (ORCPT
+        id S1726621AbgKFJtp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Nov 2020 04:15:36 -0500
-Received: from mga09.intel.com ([134.134.136.24]:5752 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725868AbgKFJPg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Nov 2020 04:15:36 -0500
-IronPort-SDR: z562plbmu72qCLTAe55od1L+oAb6y9AW5ysEqXD4lmiVHBS33tG1Cp3IwpsdWNgwXznVkC7rP8
- 5QCEbjKso3Zw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="169671587"
-X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="169671587"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 01:15:34 -0800
-IronPort-SDR: 2pr3fiL1hRyA2RF+Nq7ydAr13u/pOxqqeySufrCwCRH+3RxET3/iZMnCezUgR9FKHd0ZIWrSpg
- RpB6QrivsM9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="397525115"
-Received: from nsathish-latitude-7480.iind.intel.com ([10.224.186.105])
-  by orsmga001.jf.intel.com with ESMTP; 06 Nov 2020 01:15:32 -0800
-From:   Sathish Narasimman <sathish.narasimman@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com,
-        Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel parse TLV structure
-Date:   Fri,  6 Nov 2020 14:51:19 +0530
-Message-Id: <20201106092119.20486-1-sathish.narasimman@intel.com>
-X-Mailer: git-send-email 2.17.1
+        Fri, 6 Nov 2020 04:49:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56266 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726074AbgKFJto (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Nov 2020 04:49:44 -0500
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5AEC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2020 01:49:44 -0800 (PST)
+Received: by mail-il1-x12e.google.com with SMTP id k1so541542ilc.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2020 01:49:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=LpwrchydlQV2fCCnSRVtV9uvMREweeooIoa8Iz9Bd+A=;
+        b=b3+/8sTNdzxNia25fBN0ym272DjqD7zEphUdIYOFpYXejOdk277988fJ1wzUoF92TX
+         dre0DDCG7Bix4ac5dhOef99gz44/8Tl0aZ2XYLiEafJkrmuEQy8y9WIR3xPiZX/dhypW
+         hXA2C3NzGqPTY904VdRaEtYB5kg+eCsueGYLC1oiuizih1Zmeo4xCwDyjtcOa9lLh/lb
+         MxN4qTPQ2ao5hI6atND/KgBgQiMrVliWv7Pg3//9jPvDn2JVgyS3weXDNoD/LyegMrr1
+         c5bBj3jTMm6Ej5T6VQp1iHdo+VZXN6r5Zb8/GTQOUYny12IlHYARLBtQqenGRPhHNr7x
+         wXVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=LpwrchydlQV2fCCnSRVtV9uvMREweeooIoa8Iz9Bd+A=;
+        b=MfeTmLMd33XFG9tlntueRapDvxZLlngU6reyW58FcjQM+Z08gFmkv3Bssvhg4sMlB1
+         VHiui27Vm/M+WZOTAUW9+U/U8ywr74jy8WFOZV8JZbkfqLNbUY0hAr0QQI4KYCPKYS7g
+         RxiSjX86hZPfb4DmfihnYapErlcutXvkjKDVnJ8G86yC1oyR96dGfoLEUncrCJnRl8cP
+         J0iwkmfX62YpkPfUFmQ2hb5SYS/mjO2YG6htHYZ4rSTxL3XV8QnmkndhFYj+GV/c/YvZ
+         d9vgsAJWjSRNs0In7KTdK5NOdM+gswQ6R5acIm8N/O65Q4zjdIbzLtAovDg+nylKedSC
+         lTEw==
+X-Gm-Message-State: AOAM531vmi0n3EUYJblnpGI3ln46YIix93O/bWzCicDsx4q/OOFX1RPi
+        k9qk+JZiwlyGBo50KkXZoT0A+FIm1gQ=
+X-Google-Smtp-Source: ABdhPJyNVNujTYLZszvZ/nQuOBuq1NvtSThSgdkw+UaW1uV/eZULhTFtAN/kG28WyB29zU9KrMJnsg==
+X-Received: by 2002:a92:5f1a:: with SMTP id t26mr852044ilb.0.1604656183967;
+        Fri, 06 Nov 2020 01:49:43 -0800 (PST)
+Received: from [172.17.0.2] ([40.79.16.30])
+        by smtp.gmail.com with ESMTPSA id f8sm527191ioc.24.2020.11.06.01.49.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2020 01:49:43 -0800 (PST)
+Message-ID: <5fa51c37.1c69fb81.44934.1e7d@mx.google.com>
+Date:   Fri, 06 Nov 2020 01:49:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8899448384011661364=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
+Subject: RE: Bluetooth: btintel parse TLV structure
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201106092024.20430-1-sathish.narasimman@intel.com>
+References: <20201106092024.20430-1-sathish.narasimman@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Latest intel firmware supports TLV structure in operational mode for intel
-read version. so made changes accordingly to support both bootloader
-and operational mode . These changes are only to specific intel bluetooth
-controller for example ThP, CcP.
+--===============8899448384011661364==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=378871
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
 ---
- drivers/bluetooth/btintel.c | 105 +++++++++++++++++++++++++++---------
- drivers/bluetooth/btintel.h |  16 ++++++
- drivers/bluetooth/btusb.c   |  41 ++++++++++----
- 3 files changed, 129 insertions(+), 33 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 88ce5f0ffc4b..67267afc83e1 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -401,31 +401,9 @@ void btintel_version_info_tlv(struct hci_dev *hdev, struct intel_version_tlv *ve
- }
- EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
- 
--int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
-+static void btintel_parse_tlv(struct sk_buff *skb,
-+			      struct intel_version_tlv *version)
- {
--	struct sk_buff *skb;
--	const u8 param[1] = { 0xFF };
--
--	if (!version)
--		return -EINVAL;
--
--	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
--			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (skb->data[0]) {
--		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
--			   skb->data[0]);
--		kfree_skb(skb);
--		return -EIO;
--	}
--
--	/* Consume Command Complete Status field */
--	skb_pull(skb, 1);
--
- 	/* Event parameters contatin multiple TLVs. Read each of them
- 	 * and only keep the required data. Also, it use existing legacy
- 	 * version field like hw_platform, hw_variant, and fw_variant
-@@ -496,6 +474,85 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
- 		/* consume the current tlv and move to next*/
- 		skb_pull(skb, tlv->len + sizeof(*tlv));
- 	}
-+}
-+
-+int btintel_read_version_new(struct hci_dev *hdev, struct btintel_version *ver)
-+{
-+	struct sk_buff *skb;
-+	struct intel_version *version = &ver->ver;
-+	const u8 param[1] = { 0xFF };
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading Intel version info failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->data[0]) {
-+		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
-+			   skb->data[0]);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	/* The new Intel read version is backward compatible for Thp and CcP
-+	 * type cards. when the controller is in bootloader mode the controller
-+	 * response remains same as old intel_read version. For ThP/CcP cards
-+	 * TLV structure supports only during the Operation Mode. The best way
-+	 * to differentiate the read_version response is to check the length
-+	 * parameter and the first byte of the payload, which is a fixed value.
-+	 * After the status parameter if the payload starts with 0x37(This is
-+	 * a fixed value) and length of the payload is 10 then it is identified
-+	 * as legacy struct intel_version. In the latest firmware the support
-+	 * of TLV structure is added during Operational Firmware.
-+	 */
-+	if (skb->len == sizeof(*version) && skb->data[1] == 0x37) {
-+		memcpy(version, skb->data, sizeof(*version));
-+		ver->tlv_format = false;
-+		goto finish;
-+	}
-+
-+	/* Consume Command Complete Status field */
-+	skb_pull(skb, 1);
-+
-+	ver->tlv_format = true;
-+
-+	bt_dev_info(hdev, "Parsing TLV Supported intel read version");
-+	btintel_parse_tlv(skb, &ver->ver_tlv);
-+
-+finish:
-+	kfree_skb(skb);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_read_version_new);
-+
-+int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
-+{
-+	struct sk_buff *skb;
-+	const u8 param[1] = { 0xFF };
-+
-+	if (!version)
-+		return -EINVAL;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->data[0]) {
-+		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
-+			   skb->data[0]);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	/* Consume Command Complete Status field */
-+	skb_pull(skb, 1);
-+
-+	btintel_parse_tlv(skb, version);
- 
- 	kfree_skb(skb);
- 	return 0;
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 09346ae308eb..952da44b79de 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -132,6 +132,15 @@ struct intel_debug_features {
- 	__u8    page1[16];
- } __packed;
- 
-+struct btintel_version {
-+	bool tlv_format;
-+	union {
-+		struct intel_version ver; /*Legacy Intel read version*/
-+		struct intel_version_tlv ver_tlv;
-+	};
-+} __packed;
-+
-+#define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
-@@ -151,6 +160,7 @@ int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
- int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
- int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
- int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver);
-+int btintel_read_version_new(struct hci_dev *hdev, struct btintel_version *ver);
- 
- struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
- 				   u16 opcode_write);
-@@ -248,6 +258,12 @@ static inline int btintel_read_version_tlv(struct hci_dev *hdev,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_read_version_new(struct hci_dev *hdev,
-+					   struct btintel_version *ver)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
- 						 u16 opcode_read,
- 						 u16 opcode_write)
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1005b6e8ff74..c63bc8a0c84f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2554,7 +2554,8 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
- static int btusb_setup_intel_new(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
--	struct intel_version ver;
-+	struct btintel_version bt_ver;
-+	u8 hw_variant;
- 	struct intel_boot_params params;
- 	u32 boot_param;
- 	char ddcname[64];
-@@ -2577,19 +2578,33 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 * is in bootloader mode or if it already has operational firmware
- 	 * loaded.
- 	 */
--	err = btintel_read_version(hdev, &ver);
-+	err = btintel_read_version_new(hdev, &bt_ver);
- 	if (err) {
- 		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
- 		btintel_reset_to_bootloader(hdev);
- 		return err;
- 	}
- 
--	err = btusb_intel_download_firmware(hdev, &ver, &params, &boot_param);
-+	/* If TLV format is supported then it is in Operational Firmware. TLV
-+	 * structure is supported only in operational mode in latest Firmware.
-+	 */
-+	if (bt_ver.tlv_format && bt_ver.ver_tlv.img_type == 0x03) {
-+		btintel_version_info_tlv(hdev, &bt_ver.ver_tlv);
-+		clear_bit(BTUSB_BOOTLOADER, &data->flags);
-+		goto finish;
-+	}
-+
-+	err = btusb_intel_download_firmware(hdev, &bt_ver.ver,  &params,
-+					    &boot_param);
- 	if (err)
- 		return err;
- 
--	/* controller is already having an operational firmware */
--	if (ver.fw_variant == 0x23)
-+	/* In case if old firmware is used, it should be backward compatible
-+	 * to check for operational firmware. only on latest firmware the
-+	 * support for TLV structure is added. so check for tlv is not
-+	 * required here.
-+	 */
-+	if (bt_ver.ver.fw_variant == 0x23)
- 		goto finish;
- 
- 	rettime = ktime_get();
-@@ -2641,7 +2656,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 
- 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
- 
--	err = btusb_setup_intel_new_get_fw_name(&ver, &params, ddcname,
-+	err = btusb_setup_intel_new_get_fw_name(&bt_ver.ver, &params, ddcname,
- 						sizeof(ddcname), "ddc");
- 
- 	if (!err) {
-@@ -2665,17 +2680,25 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	btintel_set_debug_features(hdev, &features);
- 
- 	/* Read the Intel version information after loading the FW  */
--	err = btintel_read_version(hdev, &ver);
-+	err = btintel_read_version_new(hdev, &bt_ver);
- 	if (err)
- 		return err;
- 
--	btintel_version_info(hdev, &ver);
-+	if (bt_ver.tlv_format)
-+		btintel_version_info_tlv(hdev, &bt_ver.ver_tlv);
-+	else
-+		btintel_version_info(hdev, &bt_ver.ver);
- 
- finish:
- 	/* All Intel controllers that support the Microsoft vendor
- 	 * extension are using 0xFC1E for VsMsftOpCode.
- 	 */
--	switch (ver.hw_variant) {
-+	if (!bt_ver.tlv_format)
-+		hw_variant = bt_ver.ver.hw_variant;
-+	else
-+		hw_variant = INTEL_HW_VARIANT(bt_ver.ver_tlv.cnvi_bt);
-+
-+	switch (hw_variant) {
- 	case 0x12:	/* ThP */
- 		hci_set_msft_opcode(hdev, 0xFC1E);
- 		break;
--- 
-2.17.1
 
+--===============8899448384011661364==--
