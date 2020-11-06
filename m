@@ -2,229 +2,231 @@ Return-Path: <SRS0=OtJ6=EM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3616AC2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 10:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0B7C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 22:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEFBB20720
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 10:14:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=spotify.com header.i=@spotify.com header.b="Ojyzao47"
+	by mail.kernel.org (Postfix) with ESMTP id DBFA4206F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 22:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726345AbgKFKOW (ORCPT
+        id S1728891AbgKFWWz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Nov 2020 05:14:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbgKFKOW (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Nov 2020 05:14:22 -0500
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49792C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2020 02:14:20 -0800 (PST)
-Received: by mail-lj1-x244.google.com with SMTP id m16so794988ljo.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2020 02:14:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=spotify.com; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KGwZnEkMi0F/dDX4tBoY7EHEj1W1dGm+OTmCZ1P8il4=;
-        b=Ojyzao47DKf2Uyaccnw1P8PqV5aR8QuZJLhn+DRyFt9WU4D7fQ+xPlH1D5wOu0tXHU
-         9yRtptto4C+5UiF0BbpA09ahjWQ1JZBoPhxC3QWliz89d+FWNUzQR5o/mZURKPPPP82c
-         5Ynruq4TJ1f1EwOTQIJO3E+vB9SeIjlHNTMGs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KGwZnEkMi0F/dDX4tBoY7EHEj1W1dGm+OTmCZ1P8il4=;
-        b=E6uTXqQuKLvF1p/9QNkvxJguxx317Oqf0fkjcRPjqazU9CJpF1gouH0vgKWpCR8NsA
-         StO9N8MjsU1KNIMG8/0tQLwnzQ2xvdYke9Ybc4W7U3I6OXO4Oo946nRUKzikaNl6C2wy
-         mW2ljKsC6l3Q/eFB9VDnmJ/IZs9YHsfVJ9EXXg8G3jjBMI0LOT6IkNWQPm2hNWB9IYT3
-         fLLPKZItJxEwDcGhaHNGmihMVHard9W4C9ZqbKiK0A9mKCBLDJXUmfes/yjcVn/CVgPU
-         U2ItV7dlWSKp7zF7JqGtdsx9ovCrg9pVMBsjSXd7XGx/V+y9naw6emfOkSaK8M70Du71
-         HK4w==
-X-Gm-Message-State: AOAM532PNPW/WNZptmTxVfq/+A8BgzShdZ/M6y19+kvSzwJcopI2zglg
-        vXvfN5FXQFwmW3sCLuyPCF9t
-X-Google-Smtp-Source: ABdhPJypqV3s6FNPmrH3HSi1J8oYeYeHu6gKbbjK1omn2J9opt3DeXqioDFefJ4izkFh/AOvBHEJaw==
-X-Received: by 2002:a2e:1607:: with SMTP id w7mr459733ljd.419.1604657658578;
-        Fri, 06 Nov 2020 02:14:18 -0800 (PST)
-Received: from jimmy-ryzen-home (c-8713e055.76534-0-69706f6e6c79.bbcust.telenor.se. [85.224.19.135])
-        by smtp.gmail.com with ESMTPSA id 18sm97270ljq.0.2020.11.06.02.14.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2020 02:14:17 -0800 (PST)
-Date:   Fri, 6 Nov 2020 11:14:16 +0100
-From:   Jimmy Wahlberg <jimmywa@spotify.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C.
-Message-ID: <20201106101416.GA263905@jimmy-ryzen-home>
-References: <20201102132733.GA77385@jimmy-ryzen-home>
- <CABBYNZJV_59_VqF_W5dOo9hQDAjv2T14wQQObwxd7AQ7o=G6qA@mail.gmail.com>
+        Fri, 6 Nov 2020 17:22:55 -0500
+Received: from mga12.intel.com ([192.55.52.136]:51363 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728831AbgKFWWy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Nov 2020 17:22:54 -0500
+IronPort-SDR: lDBlG4a219rlbryTquIOgAuq1hdo32hXqrLYYPW26ovJnkIZuJ7f9U/DKMhNhU53k3uOo4u009
+ QGU0proU11cA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9797"; a="148888570"
+X-IronPort-AV: E=Sophos;i="5.77,457,1596524400"; 
+   d="scan'208";a="148888570"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 14:22:54 -0800
+IronPort-SDR: /SRzxm8sZNlOi2G1KZsXCJM2yQiKDi7bcsWBpocz3wJePcBLOaFMXm5PU9ySAeFb3Rv6dPCZ04
+ xjiUrQ7/so7Q==
+X-IronPort-AV: E=Sophos;i="5.77,457,1596524400"; 
+   d="scan'208";a="472218718"
+Received: from davidche-mobl1.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.213.177.187])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 14:22:54 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh/mesh-config-json: Fix errors found by static analysis
+Date:   Fri,  6 Nov 2020 14:22:45 -0800
+Message-Id: <20201106222245.137189-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZJV_59_VqF_W5dOo9hQDAjv2T14wQQObwxd7AQ7o=G6qA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 03, 2020 at 01:43:01PM -0800, Luiz Augusto von Dentz wrote:
-> Hi Jimmy,
-> 
-> On Mon, Nov 2, 2020 at 5:33 AM Jimmy Wahlberg <jimmywa@spotify.com> wrote:
-> >
-> > This test case is meant to verify that multiple
-> > unknown options is included in the response.
-> >
-> > Unknown options shall be in the response if
-> > they are not hints according to Bluetooth Core
-> > Spec v5.2. See chapter 4.5 L2CAP_CONFIGURATION_RSP
-> 
-> Can you add the HCI trace (btmon) with and without the patch. Also
-> perhaps we should have a comment why this is needed on the code:
+This fixes miscellaneous issues related to unchecked return status
+and (temporary) allocated memory leaks due to daemon's exit on startup
+failure.
+---
+ mesh/mesh-config-json.c | 62 ++++++++++++++++++++++-------------------
+ 1 file changed, 33 insertions(+), 29 deletions(-)
 
-Hi, thank you for the feedback. Here is some btmon output without the
-patch. 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index ec9ecb786..f142f0e1f 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -475,6 +475,7 @@ static bool read_app_keys(json_object *jobj, struct mesh_config_node *node)
+ 		struct mesh_config_appkey *appkey;
+ 
+ 		appkey = l_new(struct mesh_config_appkey, 1);
++		l_queue_push_tail(node->appkeys, appkey);
+ 
+ 		jtemp = json_object_array_get_idx(jarray, i);
+ 
+@@ -496,8 +497,6 @@ static bool read_app_keys(json_object *jobj, struct mesh_config_node *node)
+ 
+ 		if (!str2hex(str, strlen(str), appkey->key, 16))
+ 			goto fail;
+-
+-		l_queue_push_tail(node->appkeys, appkey);
+ 	}
+ 
+ 	return true;
+@@ -532,6 +531,8 @@ static bool read_net_keys(json_object *jobj, struct mesh_config_node *node)
+ 
+ 		netkey = l_new(struct mesh_config_netkey, 1);
+ 
++		l_queue_push_tail(node->netkeys, netkey);
++
+ 		jtemp = json_object_array_get_idx(jarray, i);
+ 
+ 		if (!get_key_index(jtemp, "index", &netkey->idx))
+@@ -561,8 +562,6 @@ static bool read_net_keys(json_object *jobj, struct mesh_config_node *node)
+ 
+ 		if (!str2hex(str, strlen(str), netkey->key, 16))
+ 			goto fail;
+-
+-		l_queue_push_tail(node->netkeys, netkey);
+ 	}
+ 
+ 	return true;
+@@ -1036,7 +1035,7 @@ static bool parse_model_subscriptions(json_object *jsubs,
+ 
+ 		jvalue = json_object_array_get_idx(jsubs, i);
+ 		if (!jvalue)
+-			return false;
++			goto fail;
+ 
+ 		str = (char *)json_object_get_string(jvalue);
+ 		len = strlen(str);
+@@ -1045,7 +1044,7 @@ static bool parse_model_subscriptions(json_object *jsubs,
+ 		case 4:
+ 			if (sscanf(str, "%04hx", &subs[i].addr.grp) != 1)
+ 				goto fail;
+-		break;
++			break;
+ 		case 32:
+ 			if (!str2hex(str, len, subs[i].addr.label, 16))
+ 				goto fail;
+@@ -1086,6 +1085,8 @@ static bool parse_models(json_object *jmodels, struct mesh_config_element *ele)
+ 
+ 		mod = l_new(struct mesh_config_model, 1);
+ 
++		l_queue_push_tail(ele->models, mod);
++
+ 		if (!json_object_object_get_ex(jmodel, "modelId", &jvalue))
+ 			goto fail;
+ 
+@@ -1093,13 +1094,9 @@ static bool parse_models(json_object *jmodels, struct mesh_config_element *ele)
+ 
+ 		len = strlen(str);
+ 
+-		if (len != 4 && len != 8)
+-			goto fail;
+-
+ 		if (len == 4) {
+ 			if (sscanf(str, "%04x", &id) != 1)
+ 				goto fail;
+-
+ 		} else if (len == 8) {
+ 			if (sscanf(str, "%08x", &id) != 1)
+ 				goto fail;
+@@ -1135,8 +1132,6 @@ static bool parse_models(json_object *jmodels, struct mesh_config_element *ele)
+ 			if (!parse_model_subscriptions(jarray, mod))
+ 				goto fail;
+ 		}
+-
+-		l_queue_push_tail(ele->models, mod);
+ 	}
+ 
+ 	return true;
+@@ -1584,16 +1579,19 @@ static void add_model(void *a, void *b)
+ {
+ 	struct mesh_config_model *mod = a;
+ 	json_object *jmodels = b, *jmodel, *jval;
++	bool result;
+ 
+ 	jmodel = json_object_new_object();
+ 	if (!jmodel)
+ 		return;
+ 
+-	if (!mod->vendor)
+-		write_uint16_hex(jmodel, "modelId",
+-						(uint16_t) mod->id);
+-	else
+-		write_uint32_hex(jmodel, "modelId", mod->id);
++	result = (mod->vendor) ? write_uint32_hex(jmodel, "modelId", mod->id) :
++			write_uint16_hex(jmodel, "modelId", (uint16_t) mod->id);
++
++	if (!result) {
++		json_object_put(jmodel);
++		return;
++	}
+ 
+ 	jval = json_object_new_boolean(mod->sub_enabled);
+ 	json_object_object_add(jmodel, "subEnabled", jval);
+@@ -1671,24 +1669,24 @@ static struct mesh_config *create_config(const char *cfg_path,
+ 
+ 		jelement = json_object_new_object();
+ 
+-		if (!jelement) {
+-			json_object_put(jelems);
+-			return NULL;
+-		}
++		if (!jelement)
++			goto fail;
+ 
+-		write_int(jelement, "elementIndex", ele->index);
+-		write_uint16_hex(jelement, "location", ele->location);
+ 		json_object_array_add(jelems, jelement);
+ 
++		if (!write_int(jelement, "elementIndex", ele->index))
++			goto fail;
++
++		if (!write_uint16_hex(jelement, "location", ele->location))
++			goto fail;
++
+ 		/* Models */
+ 		if (l_queue_isempty(ele->models))
+ 			continue;
+ 
+ 		jmodels = json_object_new_array();
+-		if (!jmodels) {
+-			json_object_put(jelems);
+-			return NULL;
+-		}
++		if (!jmodels)
++			goto fail;
+ 
+ 		json_object_object_add(jelement, "models", jmodels);
+ 		l_queue_foreach(ele->models, add_model, jmodels);
+@@ -1706,6 +1704,10 @@ static struct mesh_config *create_config(const char *cfg_path,
+ 	gettimeofday(&cfg->write_time, NULL);
+ 
+ 	return cfg;
++
++fail:
++		json_object_put(jelems);
++		return NULL;
+ }
+ 
+ struct mesh_config *mesh_config_create(const char *cfgdir_name,
+@@ -2404,8 +2406,10 @@ static void idle_save_config(struct l_idle *idle, void *user_data)
+ 
+ 	if (result) {
+ 		remove(fname_bak);
+-		rename(fname_cfg, fname_bak);
+-		rename(fname_tmp, fname_cfg);
++
++		if (rename(fname_cfg, fname_bak) < 0 ||
++					rename(fname_tmp, fname_cfg) < 0)
++			result = false;
+ 	}
+ 
+ 	remove(fname_tmp);
+-- 
+2.26.2
 
-> ACL Data RX: Handle 11 flags 0x02 dlen 16                #50 [hci0] 72.519062
-      L2CAP: Configure Request (0x04) ident 16 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00                                            ..              
-< ACL Data TX: Handle 11 flags 0x00 dlen 15                #51 [hci0] 72.519162
-      L2CAP: Configure Response (0x05) ident 16 len 7
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        10                                               .               
-> ACL Data RX: Handle 11 flags 0x02 dlen 20                #52 [hci0] 72.634066
-      L2CAP: Configure Request (0x04) ident 17 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        10 00 11 02 11 00                                ......          
-< ACL Data TX: Handle 11 flags 0x00 dlen 15                #53 [hci0] 72.634178
-      L2CAP: Configure Response (0x05) ident 17 len 7
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        11                                               .               
-> HCI Event: Number of Completed Packets (0x13) plen 5     #54 [hci0] 72.656717
-        Num handles: 1
-        Handle: 11
-        Count: 2
-> ACL Data RX: Handle 11 flags 0x02 dlen 24                #55 [hci0] 72.764088
-      L2CAP: Configure Request (0x04) ident 18 len 16
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00 11 02 11 00 12 02 12 00                    ..........      
-< ACL Data TX: Handle 11 flags 0x00 dlen 17                #56 [hci0] 72.764235
-      L2CAP: Configure Response (0x05) ident 18 len 9
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x10) [mandatory]
-        12
-
-Here is btmon output with the patch. Both outputs are from running the
-test case in subject.
-
-> ACL Data RX: Handle 11 flags 0x02 dlen 16               #89 [hci0] 388.666111
-      L2CAP: Configure Request (0x04) ident 3 len 8
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00                                            ..
-< ACL Data TX: Handle 11 flags 0x00 dlen 17               #90 [hci0] 388.666216
-      L2CAP: Configure Response (0x05) ident 3 len 9
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x10) [mandatory]
-        10                                               .
-> HCI Event: Number of Completed Packets (0x13) plen 5    #91 [hci0] 388.804992
-        Num handles: 1
-        Handle: 11
-        Count: 1
-> ACL Data RX: Handle 11 flags 0x02 dlen 20               #92 [hci0] 390.763564
-      L2CAP: Configure Request (0x04) ident 4 len 12
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [hint]
-        10 00 11 02 11 00                                ......
-< ACL Data TX: Handle 11 flags 0x00 dlen 17               #93 [hci0] 390.763727
-      L2CAP: Configure Response (0x05) ident 4 len 9
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x11) [mandatory]
-        11                                               .
-> HCI Event: Number of Completed Packets (0x13) plen 5    #94 [hci0] 390.930118
-        Num handles: 1
-        Handle: 11
-        Count: 1
-> ACL Data RX: Handle 11 flags 0x02 dlen 24               #95 [hci0] 392.863591
-      L2CAP: Configure Request (0x04) ident 5 len 16
-        Destination CID: 64
-        Flags: 0x0000
-        Option: Unknown (0x10) [mandatory]
-        10 00 11 02 11 00 12 02 12 00                    ..........
-< ACL Data TX: Handle 11 flags 0x00 dlen 23               #96 [hci0] 392.863742
-      L2CAP: Configure Response (0x05) ident 5 len 15
-        Source CID: 64
-        Flags: 0x0000
-        Result: Failure - unknown options (0x0003)
-        Option: Unknown (0x10) [mandatory]
-        10 11 01 11 12 01 12
-
-Regarding adding a comment. I will gladly add this comment if you think
-it's important. 
-
-> 
->   'On an unknown option failure (Result=0x0003), the option(s) that contain an
->   option type field that is not understood by the recipient of the
->   L2CAP_CONFIGURATION_REQ packet shall be included in the
->   L2CAP_CONFIGURATION_RSP packet unless they are hints.'
-> 
-> > Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 1ab27b90ddcb..16956f323688 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -3627,7 +3627,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> >                         if (hint)
-> >                                 break;
-> >                         result = L2CAP_CONF_UNKNOWN;
-> > -                       *((u8 *) ptr++) = type;
-> > +                       l2cap_add_conf_opt(&ptr, (u8)type, sizeof(u8), type, endptr - ptr);
-> >                         break;
-> >                 }
-> >         }
-> > --
-> > 2.25.1
-> >
-> > Hi,
-> >
-> > While running tests I encountered this one test that I could not pass. After some troubleshooting I landed in this patch. Please let me know what you think.
-> >
-> > Best regards
-> > Jimmy
-> 
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
