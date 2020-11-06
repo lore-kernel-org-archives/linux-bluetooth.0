@@ -2,88 +2,215 @@ Return-Path: <SRS0=OtJ6=EM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F714C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 22:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49935C55179
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 23:20:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFD0A206D4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 22:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E241420867
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Nov 2020 23:20:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="urrVHUUo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dpcsma2w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728685AbgKFWxJ (ORCPT
+        id S1728111AbgKFXUg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Nov 2020 17:53:09 -0500
-Received: from hoster906.com ([192.252.156.27]:38650 "EHLO hoster906.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728111AbgKFWxH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Nov 2020 17:53:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=subject
-        :from:to:references:message-id:date:mime-version:in-reply-to
-        :content-type:content-transfer-encoding; s=dkim; bh=Vh2kFVTD94If
-        LC7ksKz3ILzaMfiSlwrtB6Y2WEJ57Uk=; b=urrVHUUoJrfsXGrWCV2F1ANSLSbk
-        XTBP8rBYMmM/JqaC+ZuVsqoqNZf6Dh0lj5pwCYBAhmn0m52Edpy9lRKyfP2isQoA
-        IHP/AwJAo+ceGSTJXi4LgGDENI75A66HrGEYaRfpig3Evx1z7SnvCnF5Xz0zhREO
-        mHzLNZ2+SjP4B9A=
-Received: (qmail 38253 invoked by uid 503); 6 Nov 2020 22:53:04 -0000
-Received: from unknown (HELO ?192.168.254.79?) (mike@mnmoran.org@40.134.89.129)
-  by hoster906.com with ESMTPA; 6 Nov 2020 22:53:04 -0000
-Subject: Re: bluetooth-meshd: Leave borks bluetooth-meshd
-From:   "Michael N. Moran" <mike@mnmoran.org>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <12e1bb50-64da-7e72-c13d-f7486fbd3283@mnmoran.org>
-Message-ID: <d7942a2c-9198-f312-c4e3-86d3ec2dea58@mnmoran.org>
-Date:   Fri, 6 Nov 2020 17:53:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <12e1bb50-64da-7e72-c13d-f7486fbd3283@mnmoran.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Fri, 6 Nov 2020 18:20:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727859AbgKFXUg (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Nov 2020 18:20:36 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A00AC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2020 15:20:34 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id f126so1798124qke.17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2020 15:20:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=qCKTIk6ok2nzyOjT+W8oFEMA5y5me/um1ag42Yf+6JI=;
+        b=dpcsma2wgTVriYQHC6IHei1h9amIcKsTw4Q/mORO0om4L6LrnXNZMGYqI4hsDl52gX
+         RKaCieFlwr49xdQApbYQNOy5YAUii/mDjya1B/vV0nh/Ii7srPCpRK1hQ6YxF8gujFZx
+         0JIRJ5MevFVKr9TVW3RMPLIAgaNHL2DuonyqIrv6RM3foOPcr/RTfj1bUl3pHYskMaJw
+         lxUCCBzWO3ezRtZE6tvLYv+o+RoPSbbBK7h+0zQYcmH4alNZFHEmIFTk8SCv6k/svgef
+         nks7zi6xTsb6DQ/cUp+/goY+worUKmvbETSzcWdXBvkTtjgk1ZTQq5Um/YPkZpKf1dKo
+         72xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=qCKTIk6ok2nzyOjT+W8oFEMA5y5me/um1ag42Yf+6JI=;
+        b=efJ8bxQ6AIHHJO/rH/BATQkucv1JrvzbYz0XzAJ0/LNE4I0kUHIpnfPb9jmJu65TlM
+         8Wxy6VX7guJChoMAuP7QZKwav0gwmMHVscDaKO91PbC7v8agFaTUXEBaB2FlsKLOkN3w
+         zXubOHiYFFUsdvPdixXbGPJYhkC6UnMcsmdoyxLlieIoDpl4RZDXhTaC8XVZ8ppClvUP
+         VttL34TU9/Lm7sgCwBUK9aWHCduOfJ5FBKS+/cMFUAgzX9Hh/UH79CY/Z4qbYEUdpTMS
+         EmR8w22OVFDNrLVTkb2FctTBNkpRxnFTxvdE0umjgqRDbskQQ1mgSxcCygxrH1DC4Mvj
+         7qUw==
+X-Gm-Message-State: AOAM53181T59fjT3VmP9ZInF9EBdEoaaMwyrd3I9jA+Otzq5exHYJMni
+        Dsp3vh9Km7F/VP2ghz57w0VD+Ek7YQqWWvlLo7kf
+X-Google-Smtp-Source: ABdhPJzKUpTPGKEo90bduIJh7AIB7W76777TiJsPZsctXcwbqJ9wLcjlt7quOpcVkxW/faOTr2RuKGm4ksAcmO1ogFmO
+Sender: "danielwinkler via sendgmr" 
+        <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
+X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
+ (user=danielwinkler job=sendgmr) by 2002:a05:6214:1787:: with SMTP id
+ ct7mr3997641qvb.58.1604704833583; Fri, 06 Nov 2020 15:20:33 -0800 (PST)
+Date:   Fri,  6 Nov 2020 15:20:19 -0800
+Message-Id: <20201106151937.1.I8362b4cedb0f34b7a88b8dbd3a62155085e02ea7@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
+Subject: [PATCH] Bluetooth: Resume advertising after LE connection
+From:   Daniel Winkler <danielwinkler@google.com>
+To:     marcel@holtmann.org
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Daniel Winkler <danielwinkler@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I submitted a patch that fixes this issue.
+When an LE connection request is made, advertising is disabled and never
+resumed. When a client has an active advertisement, this is disruptive.
+This change adds resume logic for client-configured (non-directed)
+advertisements after the connection attempt.
 
-On 11/5/20 3:23 PM, Michael N. Moran wrote:
-> Hi Meshers,
-> 
-> My provisioning/configuration application supports multiple networks.
-> 
-> In general, everything works great [1] for adding, provisioning and configuring the networks.
-> 
-> I recently added the org.bluez.mesh.Network1 Leave(token) to delete a network. The Leave() operation succeeds. However, when I subsequently try to use DevKeySend() on a different network,
-> the DevKeySend() succeeds but I never receive any responses from the addressed node.
-> 
-> If I restart my application, nothing changes.
-> 
-> If I restart the bluetooth-meshd, then it all starts working again
-> until I use Leave() again.
-> 
-> The mesh-cfgclient does not seem to support Leave(), which is not
-> too surprising since it only supports a single network.
-> 
-> This leads me to believe that the Leave() function in the bluetoot-meshd
-> is not very well tested. Please correct me if I'm wrong.
-> 
-> I'm willing to poke around in the bluetooth-meshd code if I can get some
-> pointers from the bluetooth-meshd experts. :-)
-> 
-> Answers:
-> * I am using the bluez git tip. Rebased today.
-> 
-> [1] Occasionaly, bluetooth-meshd seems to get into a similar state "overnight".
-> 
+The patch was tested by registering an advertisement, initiating an LE
+connection from a remote peer, and verifying that the advertisement is
+re-activated after the connection is established. This is performed on
+Hatch and Kukui Chromebooks.
 
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Daniel Winkler <danielwinkler@google.com>
 
+---
+
+ net/bluetooth/hci_conn.c    | 12 ++++++++++--
+ net/bluetooth/hci_request.c | 21 ++++++++++++++++-----
+ net/bluetooth/hci_request.h |  2 ++
+ 3 files changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d0c1024bf60083..4f1cd8063e720a 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -758,6 +758,9 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 
+ 	conn = hci_lookup_le_connect(hdev);
+ 
++	if (hdev->adv_instance_cnt)
++		hci_req_resume_adv_instances(hdev);
++
+ 	if (!status) {
+ 		hci_connect_le_scan_cleanup(conn);
+ 		goto done;
+@@ -1067,10 +1070,11 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	 * connections most controllers will refuse to connect if
+ 	 * advertising is enabled, and for slave role connections we
+ 	 * anyway have to disable it in order to start directed
+-	 * advertising.
++	 * advertising. Any registered advertisements will be
++	 * re-enabled after the connection attempt is finished.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-		 __hci_req_disable_advertising(&req);
++		__hci_req_pause_adv_instances(&req);
+ 
+ 	/* If requested to connect as slave use directed advertising */
+ 	if (conn->role == HCI_ROLE_SLAVE) {
+@@ -1118,6 +1122,10 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	err = hci_req_run(&req, create_le_conn_complete);
+ 	if (err) {
+ 		hci_conn_del(conn);
++
++		if (hdev->adv_instance_cnt)
++			hci_req_resume_adv_instances(hdev);
++
+ 		return ERR_PTR(err);
+ 	}
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 6f12bab4d2fa6b..fdc6eccef9d107 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1123,9 +1123,9 @@ static void cancel_adv_timeout(struct hci_dev *hdev)
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+-static void hci_suspend_adv_instances(struct hci_request *req)
++void __hci_req_pause_adv_instances(struct hci_request *req)
+ {
+-	bt_dev_dbg(req->hdev, "Suspending advertising instances");
++	bt_dev_dbg(req->hdev, "Pausing advertising instances");
+ 
+ 	/* Call to disable any advertisements active on the controller.
+ 	 * This will succeed even if no advertisements are configured.
+@@ -1138,7 +1138,7 @@ static void hci_suspend_adv_instances(struct hci_request *req)
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+-static void hci_resume_adv_instances(struct hci_request *req)
++static void __hci_req_resume_adv_instances(struct hci_request *req)
+ {
+ 	struct adv_info *adv;
+ 
+@@ -1161,6 +1161,17 @@ static void hci_resume_adv_instances(struct hci_request *req)
+ 	}
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++int hci_req_resume_adv_instances(struct hci_dev *hdev)
++{
++	struct hci_request req;
++
++	hci_req_init(&req, hdev);
++	__hci_req_resume_adv_instances(&req);
++
++	return hci_req_run(&req, NULL);
++}
++
+ static void suspend_req_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	bt_dev_dbg(hdev, "Request complete opcode=0x%x, status=0x%x", opcode,
+@@ -1214,7 +1225,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 
+ 		/* Pause other advertisements */
+ 		if (hdev->adv_instance_cnt)
+-			hci_suspend_adv_instances(&req);
++			__hci_req_pause_adv_instances(&req);
+ 
+ 		hdev->advertising_paused = true;
+ 		hdev->advertising_old_state = old_state;
+@@ -1279,7 +1290,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 
+ 		/* Resume other advertisements */
+ 		if (hdev->adv_instance_cnt)
+-			hci_resume_adv_instances(&req);
++			__hci_req_resume_adv_instances(&req);
+ 
+ 		/* Unpause discovery */
+ 		hdev->discovery_paused = false;
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 6a12e84c66c404..39ee8a18087a28 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -71,6 +71,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req);
+ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
+ 
+ void hci_req_disable_address_resolution(struct hci_dev *hdev);
++void __hci_req_pause_adv_instances(struct hci_request *req);
++int hci_req_resume_adv_instances(struct hci_dev *hdev);
+ void hci_req_reenable_advertising(struct hci_dev *hdev);
+ void __hci_req_enable_advertising(struct hci_request *req);
+ void __hci_req_disable_advertising(struct hci_request *req);
 -- 
-Michael N. Moran           (h) 770 704 9751
-218 Wilshire Terrace       (c) 678 521 5460
-White, GA, USA 30184       http://mnmoran.org
+2.29.2.222.g5d2a92d10f8-goog
 
