@@ -2,191 +2,157 @@ Return-Path: <SRS0=aRPM=EN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A279C55179
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 17:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883ABC388F7
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 17:48:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDB88208C7
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 17:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB0F208FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 17:48:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bfZ9C5/Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYp4snQa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727218AbgKGRlL (ORCPT
+        id S1727454AbgKGRse (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Nov 2020 12:41:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42996 "EHLO
+        Sat, 7 Nov 2020 12:48:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727440AbgKGRlL (ORCPT
+        with ESMTP id S1726614AbgKGRse (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Nov 2020 12:41:11 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D4EC0613D2
-        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2020 09:41:10 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id oq3so6417499ejb.7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2020 09:41:10 -0800 (PST)
+        Sat, 7 Nov 2020 12:48:34 -0500
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE50C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2020 09:48:34 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id h15so4212259qkl.13
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2020 09:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:to:cc:date:message-id:in-reply-to:references:user-agent
-         :subject:mime-version;
-        bh=GbxjzgZIzO0+jqSMowxWW50H5op+cEIgEm7Nok+2ZPk=;
-        b=bfZ9C5/Y2dG3VyxB4sMrgYUEpwgZgFd3sZiTqIcZQGzaiDPJKJXmBmxWMSEch1erEK
-         94UO784DJlLVKr6QNn2ZOzZnLJhzVxBQ8nVSZB1YW4Wrdx602V6KFF/hRmqtqH/292CR
-         UmOGVjB+zsxE7DxUTrJNhCHBKg4+Rd5WCrIIY=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=7JLt1dx/fMC7josmqv/DioQ92kyDg7OmQm52GlsIyg8=;
+        b=QYp4snQa33Q5wC0hoWR2ohXttIDT1T0YgKtRo3axSDj+juac4AJ0s+5nh56+b31ylL
+         fko//HuO47OnjByOhnocl5jmTimgO5YkrBsEB9iFwrNXVjwWZBrTr0i3K+lDW8BvTmig
+         Dwy+3fuaLFD8JKQEwWvOjd8Ba5vTWNGi4maH/LCFLE1UKtMo9fNbt6btKBXeKO3z+cwJ
+         +7c8/IQC2Q+aOL3dcCNZhlwRvTdXOF9fBO9vWDxHcJlo395WVBkrNiX+oB3trTj88rAn
+         jp5j8JMkJk2vI7qoDEtLfOwauHD762igZpA1EJiqvWLNBcpu7InU76C133LMUvMTXwZW
+         akzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:date:message-id:in-reply-to
-         :references:user-agent:subject:mime-version;
-        bh=GbxjzgZIzO0+jqSMowxWW50H5op+cEIgEm7Nok+2ZPk=;
-        b=csr9I5nASR5IfPDe/crqg3WBKQm9uUxbl7rdm15edt71Eq773GeRqV4D9lyammXpXp
-         xzvQDOOy6ziTTOfWXHRemlPImo0l5+EQYOobdMLVW4Fb4j4WVHR8ehU4/Qvaslff6Vvr
-         fxZ7Tk0mrFRbsFnKvMtzj8QTYX+yc37yvZNu+2GFXNh37y+tgk3pMgQs9B2BxSIAIalm
-         88QrLdQ+YaKm2beabbTt/YtxyOEC/ytE3w1C9mcm9vMLKsJm7+qvkXGWdGwvgs/8CG5B
-         6zEJ+Q95ZSWtJ4dEM1c04HlNM5YMMPw1HWYmvhUYv7WoVbavnF8by0udC5cRACeVzPkw
-         FsEA==
-X-Gm-Message-State: AOAM532TcVHuQay2VcD+L0EVTLftUTqkXJIBhm/c8/mI7v8HZ9zutwSz
-        bnIpIhOL7/uVCqoDdhbhyGkEWQ==
-X-Google-Smtp-Source: ABdhPJwU9fMGMzO9i/4Z1qpFgUAquj83Yz+EboNVG5jYH44Y0/UPzgDumj1Fiubuz7gTYSmwG7e4XQ==
-X-Received: by 2002:a17:906:57cc:: with SMTP id u12mr7789863ejr.163.1604770869001;
-        Sat, 07 Nov 2020 09:41:09 -0800 (PST)
-Received: from [192.168.178.38] (f140230.upc-f.chello.nl. [80.56.140.230])
-        by smtp.gmail.com with ESMTPSA id a10sm3826517edn.77.2020.11.07.09.41.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 07 Nov 2020 09:41:08 -0800 (PST)
-From:   Arend Van Spriel <arend.vanspriel@broadcom.com>
-To:     Taehee Yoo <ap420073@gmail.com>, <davem@davemloft.net>,
-        <kuba@kernel.org>, <netdev@vger.kernel.org>
-CC:     <David.Laight@aculab.com>, <johannes@sipsolutions.net>,
-        <nstange@suse.de>, <derosier@gmail.com>, <kvalo@codeaurora.org>,
-        <linux-wireless@vger.kernel.org>, <wil6210@qti.qualcomm.com>,
-        <b43-dev@lists.infradead.org>, <linux-bluetooth@vger.kernel.org>,
-        <michael.hennerich@analog.com>, <linux-wpan@vger.kernel.org>,
-        <stefan@datenfreihafen.org>, <inaky.perez-gonzalez@intel.com>,
-        <linux-wimax@intel.com>, <emmanuel.grumbach@intel.com>,
-        <luciano.coelho@intel.com>, <stf_xl@wp.pl>, <pkshih@realtek.com>,
-        <ath11k@lists.infradead.org>, <ath10k@lists.infradead.org>,
-        <wcn36xx@lists.infradead.org>, <merez@codeaurora.org>,
-        <pizza@shaftnet.org>, <Larry.Finger@lwfinger.net>,
-        <amitkarwar@gmail.com>, <ganapathi.bhat@nxp.com>,
-        <huxinming820@gmail.com>, <marcel@holtmann.org>,
-        <johan.hedberg@gmail.com>, <alex.aring@gmail.com>,
-        <jukka.rissanen@linux.intel.com>, <franky.lin@broadcom.com>,
-        <hante.meuleman@broadcom.com>, <chung-hsien.hsu@infineon.com>,
-        <wright.feng@infineon.com>, <chi-hsien.lin@infineon.com>
-Date:   Sat, 07 Nov 2020 18:41:07 +0100
-Message-ID: <175a3cc2738.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <20201107172152.828-18-ap420073@gmail.com>
-References: <20201107172152.828-1-ap420073@gmail.com>
- <20201107172152.828-18-ap420073@gmail.com>
-User-Agent: AquaMail/1.27.0-1705 (build: 102700004)
-Subject: Re: [PATCH net v2 17/21] brcmfmac: set .owner to THIS_MODULE
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=7JLt1dx/fMC7josmqv/DioQ92kyDg7OmQm52GlsIyg8=;
+        b=Tf9AKKANwxFL2CIooDGeJQ/krSL1dSOTQLW3zYwsPqxt9JtivFnzzr2HN6DTrMfPaq
+         kLj0Ncosw/NcG6iF1wvJnA3M8avK4mZRJ5CvkVdZo8+rKkfggTPoIFa9FHysdBXLHaOT
+         cIJykyPc4YehmPibxlqZMvIOm3dkMSrktotD4uQPyOjrzM2CgKorBk+aHLlij4ak8rDp
+         PKtuHNMjs6lhySnv5I5a6ewtnxqKJklCsQFalhyzzhEPi/hlcRbp/sWOFyvSS4C5zOAJ
+         v0nUGCjUjLDVJXgRXmm5xvbGlIiQWHQ41KOXRpCmQrP/OLsif18t2E5FYfXkPZ3Q/w0c
+         vofg==
+X-Gm-Message-State: AOAM5322eLEH8m/74SqRg3iaaRQ4bntk4HNwXoXXIgJR3NbkmqayRA/+
+        CUmsJneBahAjp/gcg+JFqk4h9ydDQBAvZA==
+X-Google-Smtp-Source: ABdhPJwmnl6LoCJWONUcMRAcZqcTrj4GmuAEMIJL8NjLZvZ8W6AQpD8sM3PwPMOQ6YJWkjY4f5FUwQ==
+X-Received: by 2002:a37:4e8e:: with SMTP id c136mr6777250qkb.462.1604771313349;
+        Sat, 07 Nov 2020 09:48:33 -0800 (PST)
+Received: from [172.17.0.2] ([13.77.104.25])
+        by smtp.gmail.com with ESMTPSA id x72sm2336718qkb.90.2020.11.07.09.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Nov 2020 09:48:32 -0800 (PST)
+Message-ID: <5fa6ddf0.1c69fb81.48e29.f445@mx.google.com>
+Date:   Sat, 07 Nov 2020 09:48:32 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0602865746557940013=="
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000009f695105b387d554"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, ap420073@gmail.com
+Subject: RE: net: avoid to remove module when its debugfs is being used
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201107172152.828-2-ap420073@gmail.com>
+References: <20201107172152.828-2-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---0000000000009f695105b387d554
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+--===============0602865746557940013==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On November 7, 2020 6:25:15 PM Taehee Yoo <ap420073@gmail.com> wrote:
+This is automated email and please do not reply to this email!
 
-> If THIS_MODULE is not set, the module would be removed while debugfs is
-> being used.
-> It eventually makes kernel panic.
+Dear submitter,
 
-Is this really a valid concern in the context of debugs? I tend to say it 
-is not. Whenever I am using debugs to debug my driver I make sure to avoid 
-removing it.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=379653
 
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+net: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (90>80): "Fixes: 9e466250ede3 ("batman-adv: Prefix bat_debugfs local static functions with batadv_")"
+
+mac80211: set .owner to THIS_MODULE
+15: B1 Line exceeds max length (84>80): "Fixes: e322c07f8371 ("mac80211: debugfs: improve airtime_flags handler readability")"
+
+cfg80211: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (90>80): "Fixes: 1ac61302dcd1 ("mac80211/cfg80211: move wiphy specific debugfs entries to cfg80211")"
+
+netdevsim: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (87>80): "Fixes: 82c93a87bf8b ("netdevsim: implement couple of testing devlink health reporters")"
+9: B1 Line exceeds max length (85>80): "Fixes: 4418f862d675 ("netdevsim: implement support for devlink region and snapshots")"
+
+wlcore: set .owner to THIS_MODULE
+8: B1 Line exceeds max length (84>80): "Fixes: bcca1bbdd412 ("wlcore: add debugfs macro to help print fw statistics arrays")"
+
+iwlwifi: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (83>80): "Fixes: 5ae212c9273d ("[PATCH] iwlwifi: add read rate scale table debugfs function")"
+
+iwlegacy: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (87>80): "Fixes: be663ab67077 ("iwlwifi: split the drivers for agn and legacy devices 3945/4965")"
+8: B1 Line exceeds max length (96>80): "Fixes: 4bc85c1324aa ("Revert "iwlwifi: split the drivers for agn and legacy devices 3945/4965"")"
+
+ath10k: set .owner to THIS_MODULE
+9: B1 Line exceeds max length (84>80): "Fixes: 844fa5722712 ("ath10k: debugfs file to enable Bluetooth coexistence feature")"
+11: B1 Line exceeds max length (85>80): "Fixes: cc61a1bbbc0e ("ath10k: enable debugfs provision to enable Peer Stats feature")"
+
+wcn36xx: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (86>80): "Fixes: 8e84c2582169 ("wcn36xx: mac80211 driver for Qualcomm WCN3660/WCN3680 hardware")"
+
+cw1200: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (85>80): "Fixes: a910e4a94f69 ("cw1200: add driver for the ST-E CW1100 & CW1200 WLAN chipsets")"
+
+b43legacy: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (89>80): "Fixes: 75388acd0cd8 ("[B43LEGACY]: add mac80211-based driver for legacy BCM43xx devices")"
+
+b43: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (83>80): "Fixes: e4d6b7951812 ("[B43]: add mac80211-based driver for modern BCM43xx devices")"
+
+mwifiex: mwifiex: set .owner to THIS_MODULE
+7: B1 Line exceeds max length (84>80): "Fixes: 5e6e3a92b9a4 ("wireless: mwifiex: initial commit for Marvell mwifiex driver")"
+
+Bluetooth: set .owner to THIS_MODULE
+8: B1 Line exceeds max length (87>80): "Fixes: 4b4113d6dbdb ("Bluetooth: Add debugfs entry for setting vendor diagnostic mode")"
+9: B1 Line exceeds max length (87>80): "Fixes: 300acfdec916 ("Bluetooth: Introduce force_bredr_smp debugfs option for testing")"
+12: B1 Line exceeds max length (89>80): "Fixes: 134c2a89af22 ("Bluetooth: Add debugfs entry to show Secure Connections Only mode")"
+14: B1 Line exceeds max length (93>80): "Fixes: 6e07231a80de ("Bluetooth: Expose Secure Simple Pairing debug mode setting in debugfs")"
+15: B1 Line exceeds max length (81>80): "Fixes: ac345813c4ac ("Bluetooth: Expose current identity information in debugfs")"
+17: B1 Line exceeds max length (95>80): "Fixes: 6b8d4a6a0314 ("Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed one")"
+
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
+---
 Regards,
-Arend
+Linux Bluetooth
 
 
-
---0000000000009f695105b387d554
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-pra5sIx/TR6gNtLG9MpND9zQt5j42hInkP81vqu9DG8lovoPMuR0JVpFRbPjHZ07cLqqbFMVS/8z
-53iSewIDAQABo4IB0zCCAc8wDgYDVR0PAQH/BAQDAgWgMIGeBggrBgEFBQcBAQSBkTCBjjBNBggr
-BgEFBQcwAoZBaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NwZXJzb25hbHNp
-Z24yc2hhMmczb2NzcC5jcnQwPQYIKwYBBQUHMAGGMWh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNv
-bS9nc3BlcnNvbmFsc2lnbjJzaGEyZzMwTQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYB
-BQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc3BlcnNvbmFsc2ln
-bjJzaGEyZzMuY3JsMCcGA1UdEQQgMB6BHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wEwYD
-VR0lBAwwCgYIKwYBBQUHAwQwHwYDVR0jBBgwFoAUaXKCYjFnlUSFd5GAxAQ2SZ17C2EwHQYDVR0O
-BBYEFHAaaA+cRo3vYiA6aKVu1bOs4YAYMA0GCSqGSIb3DQEBCwUAA4IBAQCYLdyC8SuyQV6oa5uH
-kGtqz9FCJC/9gSclQLM8dZLHF3FYX8LlcQg/3Ct5I29YLK3T/r35B2zGljtXqVOIeSEz7sDXfGNy
-3dnLIafB1y04e7aR+thVn5Rp1YTF01FUWYbZrixlVuKvjn8vtKC+HhAoDCxvqnqEuA/8Usn7B0/N
-uOA46oQTLe3kjdIgXWJ29JWVqFUavYdcK0+0zyfeMBCTO6heYABeMP3wzYHfcuFDhqldTCpumqhZ
-WwHVQUbAn+xLMIQpycIQFoJIGJX4MeaTSMfLNP2w7nP2uLNgIeleF284vS0XVkBXSCgIGylP4SN+
-HQYrv7fVCbtp+c7nFvP7MYICbzCCAmsCAQEwbTBdMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xv
-YmFsU2lnbiBudi1zYTEzMDEGA1UEAxMqR2xvYmFsU2lnbiBQZXJzb25hbFNpZ24gMiBDQSAtIFNI
-QTI1NiAtIEczAgxR3m7Pj6LvQiWjJy0wDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIE
-II6JHUbkEtguPaalgdWY0fGFyx7fPz6w+pxmBTBUSVgtMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
-BwEwHAYJKoZIhvcNAQkFMQ8XDTIwMTEwNzE3NDEwOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgB
-ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQow
-CwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAbWb7+qoWRifzBfakC
-SmnIgmP8Z1+V+kH1UxWZMv+i5S7d3VdQm3EXvlojysdC+nF4//ECr3KaR6mXurjZ6UfpUzP/S/L4
-VWDyeywrfF54ZcaIasjCbNYCl4Ydoeqje7EN/ozeoJxj3vO2VrNp0ipfeBK1sHJLpaZ06qZENHy3
-SuoS7h8+serEeE41NcxpkwGv1vRBoPM/6uQEzyvWufZXolVpSTDw3q1hImXJPoklQMl0qpW9s273
-YXfve+WY4N921glGiO9lfo3ekQil3q1mVRbRCC2jUjXga0Te1z5GBcXDPly1poraGbpmuZASuF0Z
-3oVAZmSRmWg5azN/kre1
---0000000000009f695105b387d554--
+--===============0602865746557940013==--
