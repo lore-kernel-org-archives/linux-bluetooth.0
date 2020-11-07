@@ -2,45 +2,44 @@ Return-Path: <SRS0=aRPM=EN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46197C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 07:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8C6C388F7
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 07:03:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2044206F9
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 07:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7C1E20872
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 07:03:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727753AbgKGHD1 (ORCPT
+        id S1727782AbgKGHD2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Nov 2020 02:03:27 -0500
+        Sat, 7 Nov 2020 02:03:28 -0500
 Received: from mga17.intel.com ([192.55.52.151]:45622 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725985AbgKGHD1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Nov 2020 02:03:27 -0500
-IronPort-SDR: qDb5PYy7FYbRLeAlID2TslUgeV5iZxtOFGKg0QEghQ5l545GyO+kV5nJ63fV++j7cRZJoIUEgB
- 7z5Nm9kDbjww==
-X-IronPort-AV: E=McAfee;i="6000,8403,9797"; a="149485511"
+        id S1725985AbgKGHD2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 7 Nov 2020 02:03:28 -0500
+IronPort-SDR: wyasE71KPo0eUcG4AqHbzY0ugW5CLsYQDU5JP+XXUDgNG6t4u310LAcBTjpinmXS2Ztwp7dF1Q
+ drDXn0tZvzwA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9797"; a="149485512"
 X-IronPort-AV: E=Sophos;i="5.77,458,1596524400"; 
-   d="scan'208";a="149485511"
+   d="scan'208";a="149485512"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 23:03:27 -0800
-IronPort-SDR: pl1sFTxNSin2d6giilZyC+SJkK9cjt0RfLsaYByFqFKbDJdEAczKchlF/lwo0zcPPPdmgzIWDH
- G4b5zzRYpLiw==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 23:03:28 -0800
+IronPort-SDR: c5se3co84ifBSvm+gv09c1avxfVwsZnS8Xy9hA98/4ar+xuSxSnAXzdTGsqwgtQ5Ik5mnVEpBp
+ mGa+ZOp92kpA==
 X-IronPort-AV: E=Sophos;i="5.77,458,1596524400"; 
-   d="scan'208";a="359032008"
+   d="scan'208";a="359032011"
 Received: from ralassax-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.209.101.141])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 23:03:26 -0800
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 23:03:27 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.von.dentz@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [RFC PATCH BlueZ 01/10] shared/tester-ell: Create ell-based version of tester code
-Date:   Fri,  6 Nov 2020 23:03:03 -0800
-Message-Id: <20201107070312.8561-2-inga.stotland@intel.com>
+Subject: [RFC PATCH BlueZ 02/10] emulator/hciemu: Create ELL based version of hciemu
+Date:   Fri,  6 Nov 2020 23:03:04 -0800
+Message-Id: <20201107070312.8561-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201107070312.8561-1-inga.stotland@intel.com>
 References: <20201107070312.8561-1-inga.stotland@intel.com>
@@ -50,54 +49,19 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Create a version of tester that uses ell primitives instead of glib:
-tester-ell.c. This source is included to generate lishared-ell library.
-The original tester.c is built as part of libshared-glib library.
+This adds a separate implementtion of hciemu code, hciemu-ell.c,
+that uses ELL library primitives.
 ---
- Makefile.am             |   8 +-
- src/shared/tester-ell.c | 875 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 880 insertions(+), 3 deletions(-)
- create mode 100644 src/shared/tester-ell.c
+ emulator/hciemu-ell.c | 564 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 564 insertions(+)
+ create mode 100644 emulator/hciemu-ell.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 69b95828f..952b9cc5b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -191,7 +191,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/crypto.h src/shared/crypto.c \
- 			src/shared/ecc.h src/shared/ecc.c \
- 			src/shared/ringbuf.h src/shared/ringbuf.c \
--			src/shared/tester.h src/shared/tester.c \
-+			src/shared/tester.h\
- 			src/shared/hci.h src/shared/hci.c \
- 			src/shared/hci-crypto.h src/shared/hci-crypto.c \
- 			src/shared/hfp.h src/shared/hfp.c \
-@@ -218,7 +218,8 @@ src_libshared_glib_la_SOURCES = $(shared_sources) \
- 				src/shared/timeout-glib.c \
- 				src/shared/mainloop-glib.c \
- 				src/shared/mainloop-notify.h \
--				src/shared/mainloop-notify.c
-+				src/shared/mainloop-notify.c \
-+				src/shared/tester.c
- 
- src_libshared_mainloop_la_SOURCES = $(shared_sources) \
- 				src/shared/io-mainloop.c \
-@@ -232,7 +233,8 @@ src_libshared_ell_la_SOURCES = $(shared_sources) \
- 				src/shared/io-ell.c \
- 				src/shared/timeout-ell.c \
- 				src/shared/mainloop.h \
--				src/shared/mainloop-ell.c
-+				src/shared/mainloop-ell.c \
-+				src/shared/tester-ell.c
- endif
- 
- attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
-diff --git a/src/shared/tester-ell.c b/src/shared/tester-ell.c
+diff --git a/emulator/hciemu-ell.c b/emulator/hciemu-ell.c
 new file mode 100644
-index 000000000..4d7b794b9
+index 000000000..40342e99b
 --- /dev/null
-+++ b/src/shared/tester-ell.c
-@@ -0,0 +1,875 @@
++++ b/emulator/hciemu-ell.c
+@@ -0,0 +1,564 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
@@ -113,865 +77,554 @@ index 000000000..4d7b794b9
 +#endif
 +
 +#define _GNU_SOURCE
-+#include <getopt.h>
 +#include <stdio.h>
-+#include <errno.h>
-+#include <syslog.h>
++#include <fcntl.h>
 +#include <unistd.h>
 +#include <stdlib.h>
 +#include <string.h>
-+#include <signal.h>
-+#include <sys/signalfd.h>
++#include <stdbool.h>
++#include <errno.h>
 +#include <sys/socket.h>
-+#include <sys/time.h>
 +
 +#include <ell/ell.h>
 +
 +#include "lib/bluetooth.h"
 +#include "lib/hci.h"
 +
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+#include <valgrind/memcheck.h>
-+#endif
-+
-+#include "src/shared/mainloop.h"
++#include "monitor/bt.h"
++#include "emulator/btdev.h"
++#include "emulator/bthost.h"
 +#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/shared/log.h"
++#include "src/shared/queue.h"
++#include "emulator/hciemu.h"
 +
-+#define COLOR_OFF	"\x1B[0m"
-+#define COLOR_BLACK	"\x1B[0;30m"
-+#define COLOR_RED	"\x1B[0;31m"
-+#define COLOR_GREEN	"\x1B[0;32m"
-+#define COLOR_YELLOW	"\x1B[0;33m"
-+#define COLOR_BLUE	"\x1B[0;34m"
-+#define COLOR_MAGENTA	"\x1B[0;35m"
-+#define COLOR_CYAN	"\x1B[0;36m"
-+#define COLOR_WHITE	"\x1B[0;37m"
-+#define COLOR_HIGHLIGHT	"\x1B[1;39m"
++struct hciemu {
++	int ref_count;
++	enum btdev_type btdev_type;
++	struct bthost *host_stack;
++	struct btdev *master_dev;
++	struct btdev *client_dev;
++	struct l_io *host_io;
++	struct l_io *master_io;
++	struct l_io *client_io;
++	struct queue *post_command_hooks;
++	char bdaddr_str[18];
 +
-+#define print_text(color, fmt, args...) \
-+		tester_log(color fmt COLOR_OFF, ## args)
-+
-+#define print_summary(label, color, value, fmt, args...) \
-+		tester_log("%-52s " color "%-10s" COLOR_OFF fmt, \
-+							label, value, ## args)
-+
-+#define print_progress(name, color, fmt, args...) \
-+		tester_log(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
-+				color fmt COLOR_OFF, name, ## args)
-+
-+enum test_result {
-+	TEST_RESULT_NOT_RUN,
-+	TEST_RESULT_PASSED,
-+	TEST_RESULT_FAILED,
-+	TEST_RESULT_TIMED_OUT,
++	hciemu_debug_func_t debug_callback;
++	hciemu_destroy_func_t debug_destroy;
++	void *debug_data;
 +};
 +
-+enum test_stage {
-+	TEST_STAGE_INVALID,
-+	TEST_STAGE_PRE_SETUP,
-+	TEST_STAGE_SETUP,
-+	TEST_STAGE_RUN,
-+	TEST_STAGE_TEARDOWN,
-+	TEST_STAGE_POST_TEARDOWN,
-+};
-+
-+struct test_case {
-+	char *name;
-+	enum test_result result;
-+	enum test_stage stage;
-+	const void *test_data;
-+	tester_data_func_t pre_setup_func;
-+	tester_data_func_t setup_func;
-+	tester_data_func_t test_func;
-+	tester_data_func_t teardown_func;
-+	tester_data_func_t post_teardown_func;
-+	double start_time;
-+	double end_time;
-+	unsigned int timeout;
-+	struct l_timeout *run_timer;
-+	tester_destroy_func_t destroy;
++struct hciemu_command_hook {
++	hciemu_command_func_t function;
 +	void *user_data;
-+	bool teardown;
 +};
 +
-+static char *tester_name;
++static void destroy_command_hook(void *data)
++{
++	struct hciemu_command_hook *hook = data;
 +
-+static struct l_queue *test_list;
-+static const struct l_queue_entry *test_entry;
-+static struct timeval tester_start;
++	free(hook);
++}
 +
-+static bool option_quiet;
-+static bool option_debug;
-+static bool option_monitor;
-+static bool option_list;
-+static const char *option_prefix;
-+
-+struct monitor_hdr {
++struct run_data {
 +	uint16_t opcode;
-+	uint16_t index;
-+	uint16_t len;
-+	uint8_t  priority;
-+	uint8_t  ident_len;
-+} __attribute__((packed));
++	const void *data;
++	uint8_t len;
++};
 +
-+struct monitor_l2cap_hdr {
-+	uint16_t cid;
-+	uint16_t psm;
-+} __attribute__((packed));
-+
-+static void test_destroy(void *data)
++static void run_command_hook(void *data, void *user_data)
 +{
-+	struct test_case *test = data;
++	struct hciemu_command_hook *hook = data;
++	struct run_data *run_data = user_data;
 +
-+	l_timeout_remove(test->run_timer);
-+
-+	if (test->destroy)
-+		test->destroy(test->user_data);
-+
-+	l_free(test->name);
-+	l_free(test);
++	if (hook->function)
++		hook->function(run_data->opcode, run_data->data,
++					run_data->len, hook->user_data);
 +}
 +
-+static void tester_vprintf(const char *format, va_list ap)
++static void master_command_callback(uint16_t opcode,
++				const void *data, uint8_t len,
++				btdev_callback callback, void *user_data)
 +{
-+	if (tester_use_quiet())
++	struct hciemu *hciemu = user_data;
++	struct run_data run_data = { .opcode = opcode,
++						.data = data, .len = len };
++
++	btdev_command_default(callback);
++
++	queue_foreach(hciemu->post_command_hooks, run_command_hook, &run_data);
++}
++
++static void client_command_callback(uint16_t opcode,
++				const void *data, uint8_t len,
++				btdev_callback callback, void *user_data)
++{
++	btdev_command_default(callback);
++}
++
++static void writev_callback(const struct iovec *iov, int iovlen,
++								void *user_data)
++{
++	struct l_io *io = user_data;
++	ssize_t written;
++	int fd;
++
++	fd = l_io_get_fd(io);
++
++	written = writev(fd, iov, iovlen);
++	if (written < 0)
 +		return;
-+
-+	printf("  %s", COLOR_WHITE);
-+	vprintf(format, ap);
-+	printf("%s\n", COLOR_OFF);
 +}
 +
-+static void tester_log(const char *format, ...)
++static bool receive_bthost(struct l_io *io, void *user_data)
 +{
-+	va_list ap;
++	struct bthost *bthost = user_data;
++	unsigned char buf[4096];
++	ssize_t len;
++	int fd;
 +
-+	va_start(ap, format);
-+	vprintf(format, ap);
-+	printf("\n");
-+	va_end(ap);
++	fd = l_io_get_fd(io);
 +
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
-+	va_end(ap);
++	len = read(fd, buf, sizeof(buf));
++	if (len < 0)
++		return false;
++
++	bthost_receive_h4(bthost, buf, len);
++
++	return true;
 +}
 +
-+void tester_print(const char *format, ...)
++static struct l_io *create_io_bthost(int fd, struct bthost *bthost)
 +{
-+	va_list ap;
++	struct l_io *io;
 +
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
++	io = l_io_new(fd);
 +
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
-+	va_end(ap);
++	l_io_set_close_on_destroy(io, true);
++
++	bthost_set_send_handler(bthost, writev_callback, io);
++
++	l_io_set_read_handler(io, receive_bthost, bthost, NULL);
++
++	return io;
 +}
 +
-+void tester_debug(const char *format, ...)
++static bool receive_btdev(struct l_io *io, void *user_data)
++
 +{
-+	va_list ap;
++	struct btdev *btdev = user_data;
++	unsigned char buf[4096];
++	ssize_t len;
++	int fd;
 +
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
++	fd = l_io_get_fd(io);
 +
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_DEBUG, format, ap);
-+	va_end(ap);
-+}
++	len = read(fd, buf, sizeof(buf));
++	if (len < 0) {
++		if (errno == EAGAIN || errno == EINTR)
++			return true;
 +
-+void tester_warn(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_WARNING, format, ap);
-+	va_end(ap);
-+}
-+
-+static void monitor_debug(const char *str, void *user_data)
-+{
-+	const char *label = user_data;
-+
-+	tester_debug("%s: %s", label, str);
-+}
-+
-+static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	struct iovec iov[3];
-+	struct monitor_l2cap_hdr hdr;
-+	uint8_t term = 0x00;
-+	char label[16];
-+
-+	if (snprintf(label, sizeof(label), "%c %s", dir, tester_name) < 0)
-+		return;
-+
-+	hdr.cid = cpu_to_le16(cid);
-+	hdr.psm = cpu_to_le16(psm);
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = sizeof(hdr);
-+
-+	iov[1].iov_base = (void *) data;
-+	iov[1].iov_len = len;
-+
-+	/* Kernel won't forward if data is no NULL terminated */
-+	iov[2].iov_base = &term;
-+	iov[2].iov_len = sizeof(term);
-+
-+	bt_log_sendmsg(HCI_DEV_NONE, label, LOG_INFO, iov, 3);
-+}
-+
-+void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	monitor_log(dir, cid, psm, data, len);
-+
-+	if (!tester_use_debug())
-+		return;
-+
-+	util_hexdump(dir, data, len, monitor_debug, (void *) tester_name);
-+}
-+
-+static void default_pre_setup(const void *test_data)
-+{
-+	tester_pre_setup_complete();
-+}
-+
-+static void default_setup(const void *test_data)
-+{
-+	tester_setup_complete();
-+}
-+
-+static void default_teardown(const void *test_data)
-+{
-+	tester_teardown_complete();
-+}
-+
-+static void default_post_teardown(const void *test_data)
-+{
-+	tester_post_teardown_complete();
-+}
-+
-+void tester_add_full(const char *name, const void *test_data,
-+				tester_data_func_t pre_setup_func,
-+				tester_data_func_t setup_func,
-+				tester_data_func_t test_func,
-+				tester_data_func_t teardown_func,
-+				tester_data_func_t post_teardown_func,
-+				unsigned int timeout,
-+				void *user_data, tester_destroy_func_t destroy)
-+{
-+	struct test_case *test;
-+
-+	if (!test_func)
-+		return;
-+
-+	if (option_prefix && !l_str_has_prefix(name, option_prefix)) {
-+		if (destroy)
-+			destroy(user_data);
-+		return;
++		return false;
 +	}
 +
-+	if (option_list) {
-+		tester_log("%s", name);
-+		if (destroy)
-+			destroy(user_data);
-+		return;
++	if (len < 1)
++		return false;
++
++	switch (buf[0]) {
++	case BT_H4_CMD_PKT:
++	case BT_H4_ACL_PKT:
++	case BT_H4_SCO_PKT:
++		btdev_receive_h4(btdev, buf, len);
++		break;
 +	}
 +
-+	test = l_new(struct test_case, 1);
-+	test->name = l_strdup(name);
-+	test->result = TEST_RESULT_NOT_RUN;
-+	test->stage = TEST_STAGE_INVALID;
-+
-+	test->test_data = test_data;
-+
-+	if (pre_setup_func)
-+		test->pre_setup_func = pre_setup_func;
-+	else
-+		test->pre_setup_func = default_pre_setup;
-+
-+	if (setup_func)
-+		test->setup_func = setup_func;
-+	else
-+		test->setup_func = default_setup;
-+
-+	test->test_func = test_func;
-+
-+	if (teardown_func)
-+		test->teardown_func = teardown_func;
-+	else
-+		test->teardown_func = default_teardown;
-+
-+	if (post_teardown_func)
-+		test->post_teardown_func = post_teardown_func;
-+	else
-+		test->post_teardown_func = default_post_teardown;
-+
-+	test->timeout = timeout;
-+
-+	test->destroy = destroy;
-+	test->user_data = user_data;
-+
-+	l_queue_push_tail(test_list, test);
++	return true;
 +}
 +
-+void tester_add(const char *name, const void *test_data,
-+					tester_data_func_t setup_func,
-+					tester_data_func_t test_func,
-+					tester_data_func_t teardown_func)
++static struct l_io *create_io_btdev(int fd, struct btdev *btdev)
 +{
-+	tester_add_full(name, test_data, NULL, setup_func, test_func,
-+					teardown_func, NULL, 0, NULL, NULL);
++	struct l_io *io;
++
++	io = l_io_new(fd);
++
++	l_io_set_close_on_destroy(io, true);
++
++	btdev_set_send_handler(btdev, writev_callback, io);
++
++	l_io_set_read_handler(io, receive_btdev, btdev, NULL);
++
++	return io;
 +}
 +
-+void *tester_get_data(void)
++static bool create_vhci(struct hciemu *hciemu)
 +{
-+	struct test_case *test;
++	struct btdev *btdev;
++	uint8_t create_req[2];
++	ssize_t written;
++	int fd;
 +
-+	if (!test_entry)
++	btdev = btdev_create(hciemu->btdev_type, 0x00);
++	if (!btdev)
++		return false;
++
++	btdev_set_command_handler(btdev, master_command_callback, hciemu);
++
++	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
++	if (fd < 0) {
++		perror("Opening /dev/vhci failed");
++		btdev_destroy(btdev);
++		return false;
++	}
++
++	create_req[0] = HCI_VENDOR_PKT;
++	create_req[1] = HCI_PRIMARY;
++
++	written = write(fd, create_req, sizeof(create_req));
++	if (written < 0) {
++		close(fd);
++		btdev_destroy(btdev);
++		return false;
++	}
++
++	hciemu->master_dev = btdev;
++
++	hciemu->master_io = create_io_btdev(fd, btdev);
++
++	return true;
++}
++
++struct bthost *hciemu_client_get_host(struct hciemu *hciemu)
++{
++	if (!hciemu)
 +		return NULL;
 +
-+	test = test_entry->data;
-+
-+	return test->user_data;
++	return hciemu->host_stack;
 +}
 +
-+static double get_elapsed_time(struct timeval *base)
++static bool create_stack(struct hciemu *hciemu)
 +{
-+	static struct timeval now, elapsed;
++	struct btdev *btdev;
++	struct bthost *bthost;
++	int sv[2];
 +
-+	gettimeofday(&now, NULL);
-+	timersub(&now, base, &elapsed);
++	btdev = btdev_create(hciemu->btdev_type, 0x00);
++	if (!btdev)
++		return false;
 +
-+	return elapsed.tv_sec + ((double) elapsed.tv_usec) / 1000000;
-+}
-+
-+static int tester_summarize(void)
-+{
-+	unsigned int not_run = 0, passed = 0, failed = 0;
-+	double execution_time;
-+	const struct l_queue_entry *entry;
-+
-+	tester_log("");
-+	print_text(COLOR_HIGHLIGHT, "");
-+	print_text(COLOR_HIGHLIGHT, "Test Summary");
-+	print_text(COLOR_HIGHLIGHT, "------------");
-+
-+	entry = l_queue_get_entries(test_list);
-+
-+	for (; entry; entry = entry->next) {
-+		struct test_case *test = entry->data;
-+		double exec_time;
-+
-+		exec_time = test->end_time - test->start_time;
-+
-+		switch (test->result) {
-+		case TEST_RESULT_NOT_RUN:
-+			print_summary(test->name, COLOR_YELLOW, "Not Run", "");
-+			not_run++;
-+			break;
-+		case TEST_RESULT_PASSED:
-+			print_summary(test->name, COLOR_GREEN, "Passed",
-+						"%8.3f seconds", exec_time);
-+			passed++;
-+			break;
-+		case TEST_RESULT_FAILED:
-+			print_summary(test->name, COLOR_RED, "Failed",
-+						"%8.3f seconds", exec_time);
-+			failed++;
-+			break;
-+		case TEST_RESULT_TIMED_OUT:
-+			print_summary(test->name, COLOR_RED, "Timed out",
-+						"%8.3f seconds", exec_time);
-+			failed++;
-+			break;
-+		}
++	bthost = bthost_create();
++	if (!bthost) {
++		btdev_destroy(btdev);
++		return false;
 +	}
 +
-+	tester_log("Total: %d, "
-+		COLOR_GREEN "Passed: %d (%.1f%%)" COLOR_OFF ", "
-+		COLOR_RED "Failed: %d" COLOR_OFF ", "
-+		COLOR_YELLOW "Not Run: %d" COLOR_OFF,
-+			not_run + passed + failed, passed,
-+			(not_run + passed + failed) ?
-+			(float) passed * 100 / (not_run + passed + failed) : 0,
-+			failed, not_run);
++	btdev_set_command_handler(btdev, client_command_callback, hciemu);
 +
-+	execution_time = get_elapsed_time(&tester_start);
-+	tester_log("Overall execution time: %.3g seconds", execution_time);
-+
-+	return failed;
-+}
-+
-+static void teardown_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->stage = TEST_STAGE_TEARDOWN;
-+	test->teardown = false;
-+
-+	print_progress(test->name, COLOR_MAGENTA, "teardown");
-+	test->teardown_func(test->test_data);
-+
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+	VALGRIND_DO_ADDED_LEAK_CHECK;
-+#endif
-+}
-+
-+static void test_timeout(struct l_timeout *timer, void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	l_timeout_remove(timer);
-+	test->run_timer = NULL;
-+
-+	test->result = TEST_RESULT_TIMED_OUT;
-+	print_progress(test->name, COLOR_RED, "test timed out");
-+
-+	l_idle_oneshot(teardown_callback, test, NULL);
-+}
-+
-+static void next_test_case(void)
-+{
-+	struct test_case *test;
-+
-+	if (test_entry)
-+		test_entry = test_entry->next;
-+	else
-+		test_entry = l_queue_get_entries(test_list);
-+
-+	if (!test_entry) {
-+		mainloop_quit();
-+		return;
++	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
++								0, sv) < 0) {
++		bthost_destroy(bthost);
++		btdev_destroy(btdev);
++		return false;
 +	}
 +
-+	test = test_entry->data;
++	hciemu->client_dev = btdev;
++	hciemu->host_stack = bthost;
 +
-+	tester_log("");
-+	print_progress(test->name, COLOR_BLACK, "init");
++	hciemu->client_io = create_io_btdev(sv[0], btdev);
++	hciemu->host_io = create_io_bthost(sv[1], bthost);
 +
-+	test->start_time = get_elapsed_time(&tester_start);
-+
-+	if (test->timeout > 0)
-+		test->run_timer = l_timeout_create(test->timeout, test_timeout,
-+								test, NULL);
-+
-+	test->stage = TEST_STAGE_PRE_SETUP;
-+
-+	test->pre_setup_func(test->test_data);
++	return true;
 +}
 +
-+static void setup_callback(void *user_data)
++static void start_stack(void *user_data)
 +{
-+	struct test_case *test = user_data;
++	struct hciemu *hciemu = user_data;
 +
-+	test->stage = TEST_STAGE_SETUP;
-+
-+	print_progress(test->name, COLOR_BLUE, "setup");
-+	test->setup_func(test->test_data);
++	bthost_start(hciemu->host_stack);
 +}
 +
-+static void run_callback(void *user_data)
++struct hciemu *hciemu_new(enum hciemu_type type)
 +{
-+	struct test_case *test = user_data;
++	struct hciemu *hciemu;
 +
-+	test->stage = TEST_STAGE_RUN;
++	hciemu = new0(struct hciemu, 1);
++	if (!hciemu)
++		return NULL;
 +
-+	print_progress(test->name, COLOR_BLACK, "run");
-+	test->test_func(test->test_data);
-+}
-+
-+static void done_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->end_time = get_elapsed_time(&tester_start);
-+
-+	print_progress(test->name, COLOR_BLACK, "done");
-+	next_test_case();
-+}
-+
-+void tester_pre_setup_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_PRE_SETUP)
-+		return;
-+
-+	l_idle_oneshot(setup_callback, test, NULL);
-+}
-+
-+void tester_pre_setup_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_PRE_SETUP)
-+		return;
-+
-+	print_progress(test->name, COLOR_RED, "pre setup failed");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+void tester_setup_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_SETUP)
-+		return;
-+
-+	print_progress(test->name, COLOR_BLUE, "setup complete");
-+
-+	l_idle_oneshot(run_callback, test, NULL);
-+}
-+
-+void tester_setup_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_SETUP)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	l_timeout_remove(test->run_timer);
-+	test->run_timer = NULL;
-+
-+	print_progress(test->name, COLOR_RED, "setup failed");
-+	print_progress(test->name, COLOR_MAGENTA, "teardown");
-+
-+	test->post_teardown_func(test->test_data);
-+}
-+
-+static void test_result(enum test_result result)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_RUN)
-+		return;
-+
-+	l_timeout_remove(test->run_timer);
-+	test->run_timer = NULL;
-+
-+	test->result = result;
-+	switch (result) {
-+	case TEST_RESULT_PASSED:
-+		print_progress(test->name, COLOR_GREEN, "test passed");
++	switch (type) {
++	case HCIEMU_TYPE_BREDRLE:
++		hciemu->btdev_type = BTDEV_TYPE_BREDRLE;
 +		break;
-+	case TEST_RESULT_FAILED:
-+		print_progress(test->name, COLOR_RED, "test failed");
++	case HCIEMU_TYPE_BREDR:
++		hciemu->btdev_type = BTDEV_TYPE_BREDR;
 +		break;
-+	case TEST_RESULT_NOT_RUN:
-+		print_progress(test->name, COLOR_YELLOW, "test not run");
++	case HCIEMU_TYPE_LE:
++		hciemu->btdev_type = BTDEV_TYPE_LE;
 +		break;
-+	case TEST_RESULT_TIMED_OUT:
-+		print_progress(test->name, COLOR_RED, "test timed out");
++	case HCIEMU_TYPE_LEGACY:
++		hciemu->btdev_type = BTDEV_TYPE_BREDR20;
 +		break;
-+	}
-+
-+	if (test->teardown)
-+		return;
-+
-+	test->teardown = true;
-+
-+	l_idle_oneshot(teardown_callback, test, NULL);
-+}
-+
-+void tester_test_passed(void)
-+{
-+	test_result(TEST_RESULT_PASSED);
-+}
-+
-+void tester_test_failed(void)
-+{
-+	test_result(TEST_RESULT_FAILED);
-+}
-+
-+void tester_test_abort(void)
-+{
-+	test_result(TEST_RESULT_NOT_RUN);
-+}
-+
-+void tester_teardown_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_TEARDOWN)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	test->post_teardown_func(test->test_data);
-+}
-+
-+void tester_teardown_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_TEARDOWN)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	tester_post_teardown_failed();
-+}
-+
-+void tester_post_teardown_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_POST_TEARDOWN)
-+		return;
-+
-+	print_progress(test->name, COLOR_MAGENTA, "teardown complete");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+void tester_post_teardown_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_POST_TEARDOWN)
-+		return;
-+
-+	print_progress(test->name, COLOR_RED, "teardown failed");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+static void start_tester(void *user_data)
-+{
-+	gettimeofday(&tester_start, NULL);
-+	next_test_case();
-+}
-+
-+struct wait_data {
-+	unsigned int seconds;
-+	struct test_case *test;
-+	tester_wait_func_t func;
-+	void *user_data;
-+};
-+
-+static void wait_callback(struct l_timeout *timer, void *user_data)
-+{
-+	struct wait_data *wait = user_data;
-+	struct test_case *test = wait->test;
-+
-+	wait->seconds--;
-+
-+	if (wait->seconds > 0) {
-+		print_progress(test->name, COLOR_BLACK, "%u seconds left",
-+								wait->seconds);
-+		return;
-+	}
-+
-+	print_progress(test->name, COLOR_BLACK, "waiting done");
-+
-+	wait->func(wait->user_data);
-+
-+	free(wait);
-+
-+	l_timeout_remove(timer);
-+}
-+
-+void tester_wait(unsigned int seconds, tester_wait_func_t func,
-+							void *user_data)
-+{
-+	struct test_case *test;
-+	struct wait_data *wait;
-+
-+	if (!func || seconds < 1)
-+		return;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	wait = new0(struct wait_data, 1);
-+	wait->seconds = seconds;
-+	wait->test = test;
-+	wait->func = func;
-+	wait->user_data = user_data;
-+
-+	l_timeout_create(1000, wait_callback, wait, NULL);
-+
-+	print_progress(test->name, COLOR_BLACK, "waiting %u seconds", seconds);
-+}
-+
-+static void signal_callback(int signum, void *user_data)
-+{
-+	static bool terminated = false;
-+
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		if (!terminated)
-+			mainloop_quit();
-+
-+		terminated = true;
++	case HCIEMU_TYPE_BREDRLE50:
++		hciemu->btdev_type = BTDEV_TYPE_BREDRLE50;
 +		break;
-+	}
-+}
-+
-+bool tester_use_quiet(void)
-+{
-+	return option_quiet;
-+}
-+
-+bool tester_use_debug(void)
-+{
-+	return option_debug;
-+}
-+
-+static const struct option options[] = {
-+	{ "version",	no_argument,		NULL, 'v' },
-+	{ "quiet",	no_argument,		NULL, 'q' },
-+	{ "debug",	no_argument,		NULL, 'd' },
-+	{ "monitor",	no_argument,		NULL, 'm' },
-+	{ "list",	no_argument,		NULL, 'l' },
-+	{ "prefix",	required_argument,	NULL, 'p' },
-+	{ }
-+};
-+
-+static void usage(void)
-+{
-+	fprintf(stderr,
-+		"Usage:\n"
-+		"\%s [options]\n", tester_name);
-+	fprintf(stderr,
-+		"Options:\n"
-+		"\t--version	Show version information and exit\n"
-+		"\t--quiet	Run tests without logging\n"
-+		"\t--debug	Run tests with debug output\n"
-+		"\t--monitor	Enable monitor output\n"
-+		"\t--list	Only list the tests to be run\n"
-+		"\t--prefix	Run tests matching provided prefix\n");
-+}
-+
-+void tester_init(int *argc, char ***argv)
-+{
-+	tester_name = strrchr(*argv[0], '/');
-+	if (!tester_name)
-+		tester_name = strdup(*argv[0]);
-+	else
-+		tester_name = strdup(++tester_name);
-+
-+	for (;;) {
-+		int opt;
-+
-+		opt = getopt_long(*argc, *argv, "p:vqdml", options, NULL);
-+		if (opt < 0)
-+			break;
-+
-+		switch (opt) {
-+		case 'v':
-+			printf("%s\n", VERSION);
-+			exit(EXIT_SUCCESS);
-+		case 'q':
-+			option_quiet = true;
-+			break;
-+		case 'd':
-+			option_debug = true;
-+			break;
-+		case 'm':
-+			option_monitor = true;
-+			break;
-+		case 'l':
-+			option_list = true;
-+			break;
-+		case 'p':
-+			option_prefix = optarg;
-+			break;
-+		default:
-+			usage();
-+			exit(EXIT_SUCCESS);
-+		}
++	case HCIEMU_TYPE_BREDRLE52:
++		hciemu->btdev_type = BTDEV_TYPE_BREDRLE52;
++		break;
++	default:
++		return NULL;
 +	}
 +
-+	mainloop_init();
-+
-+	test_list = l_queue_new();
-+}
-+
-+int tester_run(void)
-+{
-+	int ret;
-+
-+	if (option_list) {
-+		mainloop_quit();
-+		return EXIT_SUCCESS;
++	hciemu->post_command_hooks = queue_new();
++	if (!hciemu->post_command_hooks) {
++		free(hciemu);
++		return NULL;
 +	}
 +
-+	l_idle_oneshot(start_tester, NULL, NULL);
++	if (!create_vhci(hciemu)) {
++		queue_destroy(hciemu->post_command_hooks, NULL);
++		free(hciemu);
++		return NULL;
++	}
 +
-+	mainloop_run_with_signal(signal_callback, NULL);
++	if (!create_stack(hciemu)) {
++		l_io_destroy(hciemu->master_io);
++		btdev_destroy(hciemu->master_dev);
++		queue_destroy(hciemu->post_command_hooks, NULL);
++		free(hciemu);
++		return NULL;
++	}
 +
-+	ret = tester_summarize();
++	l_idle_oneshot(start_stack, hciemu, NULL);
 +
-+	l_queue_destroy(test_list, test_destroy);
++	return hciemu_ref(hciemu);
++}
 +
-+	if (option_monitor)
-+		bt_log_close();
++struct hciemu *hciemu_ref(struct hciemu *hciemu)
++{
++	if (!hciemu)
++		return NULL;
 +
-+	return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
++	__sync_fetch_and_add(&hciemu->ref_count, 1);
++
++	return hciemu;
++}
++
++void hciemu_unref(struct hciemu *hciemu)
++{
++	if (!hciemu)
++		return;
++
++	if (__sync_sub_and_fetch(&hciemu->ref_count, 1))
++		return;
++
++	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
++
++	l_io_destroy(hciemu->host_io);
++	l_io_destroy(hciemu->client_io);
++	l_io_destroy(hciemu->master_io);
++
++	bthost_destroy(hciemu->host_stack);
++	btdev_destroy(hciemu->client_dev);
++	btdev_destroy(hciemu->master_dev);
++
++	free(hciemu);
++}
++
++static void bthost_debug(const char *str, void *user_data)
++{
++	struct hciemu *hciemu = user_data;
++
++	util_debug(hciemu->debug_callback, hciemu->debug_data,
++					"bthost: %s", str);
++}
++
++static void btdev_master_debug(const char *str, void *user_data)
++{
++	struct hciemu *hciemu = user_data;
++
++	util_debug(hciemu->debug_callback, hciemu->debug_data,
++					"btdev: %s", str);
++}
++
++static void btdev_client_debug(const char *str, void *user_data)
++{
++	struct hciemu *hciemu = user_data;
++
++	util_debug(hciemu->debug_callback, hciemu->debug_data,
++					"btdev[bthost]: %s", str);
++}
++
++bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
++			void *user_data, hciemu_destroy_func_t destroy)
++{
++	if (!hciemu)
++		return false;
++
++	if (hciemu->debug_destroy)
++		hciemu->debug_destroy(hciemu->debug_data);
++
++	hciemu->debug_callback = callback;
++	hciemu->debug_destroy = destroy;
++	hciemu->debug_data = user_data;
++
++	btdev_set_debug(hciemu->master_dev, btdev_master_debug, hciemu, NULL);
++	btdev_set_debug(hciemu->client_dev, btdev_client_debug, hciemu, NULL);
++	bthost_set_debug(hciemu->host_stack, bthost_debug, hciemu, NULL);
++
++	return true;
++}
++
++const char *hciemu_get_address(struct hciemu *hciemu)
++{
++	const uint8_t *addr;
++
++	if (!hciemu || !hciemu->master_dev)
++		return NULL;
++
++	addr = btdev_get_bdaddr(hciemu->master_dev);
++	sprintf(hciemu->bdaddr_str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
++			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
++	return hciemu->bdaddr_str;
++}
++
++uint8_t *hciemu_get_features(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return NULL;
++
++	return btdev_get_features(hciemu->master_dev);
++}
++
++const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return NULL;
++
++	return btdev_get_bdaddr(hciemu->master_dev);
++}
++
++const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->client_dev)
++		return NULL;
++
++	return btdev_get_bdaddr(hciemu->client_dev);
++}
++
++uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return 0;
++
++	return btdev_get_scan_enable(hciemu->master_dev);
++}
++
++uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return 0;
++
++	return btdev_get_le_scan_enable(hciemu->master_dev);
++}
++
++void hciemu_set_master_le_states(struct hciemu *hciemu,
++						const uint8_t *le_states)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return;
++
++	btdev_set_le_states(hciemu->master_dev, le_states);
++}
++
++bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
++			hciemu_command_func_t function, void *user_data)
++{
++	struct hciemu_command_hook *hook;
++
++	if (!hciemu)
++		return false;
++
++	hook = new0(struct hciemu_command_hook, 1);
++	if (!hook)
++		return false;
++
++	hook->function = function;
++	hook->user_data = user_data;
++
++	if (!queue_push_tail(hciemu->post_command_hooks, hook)) {
++		free(hook);
++		return false;
++	}
++
++	return true;
++}
++
++bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu)
++{
++	if (!hciemu)
++		return false;
++
++	queue_remove_all(hciemu->post_command_hooks,
++					NULL, NULL, destroy_command_hook);
++	return true;
++}
++
++int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++				uint16_t opcode, hciemu_hook_func_t function,
++				void *user_data)
++{
++	enum btdev_hook_type hook_type;
++
++	if (!hciemu)
++		return -1;
++
++	switch (type) {
++	case HCIEMU_HOOK_PRE_CMD:
++		hook_type = BTDEV_HOOK_PRE_CMD;
++		break;
++	case HCIEMU_HOOK_POST_CMD:
++		hook_type = BTDEV_HOOK_POST_CMD;
++		break;
++	case HCIEMU_HOOK_PRE_EVT:
++		hook_type = BTDEV_HOOK_PRE_EVT;
++		break;
++	case HCIEMU_HOOK_POST_EVT:
++		hook_type = BTDEV_HOOK_POST_EVT;
++		break;
++	default:
++		return -1;
++	}
++
++	return btdev_add_hook(hciemu->master_dev, hook_type, opcode, function,
++								user_data);
++}
++
++bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++								uint16_t opcode)
++{
++	enum btdev_hook_type hook_type;
++
++	if (!hciemu)
++		return false;
++
++	switch (type) {
++	case HCIEMU_HOOK_PRE_CMD:
++		hook_type = BTDEV_HOOK_PRE_CMD;
++		break;
++	case HCIEMU_HOOK_POST_CMD:
++		hook_type = BTDEV_HOOK_POST_CMD;
++		break;
++	case HCIEMU_HOOK_PRE_EVT:
++		hook_type = BTDEV_HOOK_PRE_EVT;
++		break;
++	case HCIEMU_HOOK_POST_EVT:
++		hook_type = BTDEV_HOOK_POST_EVT;
++		break;
++	default:
++		return false;
++	}
++
++	return btdev_del_hook(hciemu->master_dev, hook_type, opcode);
 +}
 -- 
 2.26.2
