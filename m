@@ -1,141 +1,82 @@
-Return-Path: <SRS0=aRPM=EN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=W52z=EO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF53FC388F9
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 19:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDB7C5517A
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Nov 2020 22:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 818A42087E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Nov 2020 19:53:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="El52qMHl"
+	by mail.kernel.org (Postfix) with ESMTP id F30A4206E3
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Nov 2020 22:55:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728388AbgKGTxI (ORCPT
+        id S1728937AbgKHWzG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Nov 2020 14:53:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35152 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725846AbgKGTxI (ORCPT
+        Sun, 8 Nov 2020 17:55:06 -0500
+Received: from mail-io1-f70.google.com ([209.85.166.70]:33722 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727929AbgKHWzG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Nov 2020 14:53:08 -0500
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D505DC0613CF;
-        Sat,  7 Nov 2020 11:53:07 -0800 (PST)
-Received: by mail-lj1-x241.google.com with SMTP id l10so5252744lji.4;
-        Sat, 07 Nov 2020 11:53:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1o9pISsOLKLuLtURoN/jnEm2wPXUEDDs1LQ4SBnuv20=;
-        b=El52qMHlK3MmWAXIrGCcZHxQIfc1q81rwO6le4QwHD/xXbmWA8U0PntusgytJgiQad
-         scRDACJ6mc66sDWyvvoEN7Ah1YmiYAV4SwLvD7JYXr+HMNiiQ4EkUnBnQFSo7J1nZOao
-         5K+3WJyNDWCYlsqmHYru5tGxf4iZdzzYgBtXpZz3qwtl9L/scIfAtrBvrbHrM14Rl53K
-         ayBmny8yHgNN4sDnlE3eJQvXHY3etdCunef3XnC9czygFjss3XpjLYZFzaAj5YEtuzic
-         woD8c3uL0M/z2/5pA57b3UnJ2SLPsMFRCnyUkw5DYLoxggRFLQ03u/SGTRiWQiAw7Qn4
-         XaWg==
+        Sun, 8 Nov 2020 17:55:06 -0500
+Received: by mail-io1-f70.google.com with SMTP id d202so4495336iof.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2020 14:55:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1o9pISsOLKLuLtURoN/jnEm2wPXUEDDs1LQ4SBnuv20=;
-        b=Y0I3FCJjSRPPH5WA6qa3xmuPKeh2eGyarVvePGOfHvU0qSqUwbD44tlrjzbCr0zJoR
-         MQI3XwgV3Qh55B/08TjNYY7JngIa75a1m+73l0pbyD0LBxZUwKsnICGjNXW7NLy4du1W
-         Ii2zQdxv/zJxgpyTdpGuxobKovGbz7aAIFHBf60kFy5AVeT6zhkiFqRij2uj9whH/Bgs
-         D2jdsvA+S08twyipjDzVkf5Au4CDYdESoJySQ2Ytnyadd+2NGkgvlBMvFH5NyjKSCFiB
-         ugV/mgINTVwvwBt5nbP3z6O2CZvoTPQYiCqdYypFu/RhDw6SgNXdqIqrlDXFVwbTa92+
-         LBdQ==
-X-Gm-Message-State: AOAM530bPWQ4GKIVsql5xW5tX7tl2v96rBMPU+7dxYCN4RZnjGGSECcy
-        EToUB/xIo1Jc59By71ijFFm0ilRlwj7n0ZYOVkM=
-X-Google-Smtp-Source: ABdhPJxlXh7cBfmapt5+aqZfn7Dpu+wE522gccaU0uquXhqKfkUeizFG7DF6WiiH9k5gzcJ2mgmwSRJYM89qyMT2N3g=
-X-Received: by 2002:a2e:8110:: with SMTP id d16mr2715059ljg.280.1604778786156;
- Sat, 07 Nov 2020 11:53:06 -0800 (PST)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Mk8JTr7hVOq3EefkDcYJtK1cseL+MNVUi7YjoZxo834=;
+        b=rA3Vu57JPJe1xcs0jHt3EiLk6xWWrUmRu7zYlfmQSKLwO/1UQRvmJeMjxifIhQHXTQ
+         bC71a+oU9xZopoMdYLAbB4nCInQV8bcE+3dwfk1zjYjgcft+6nXZMOJtA/S7tDmYCeSD
+         SWs8u165hdDyKwV2G4q/D+5CGRclddygBpJIHH1r7d72NtuqDQvKrIgv20eZ83ZMmTl5
+         Kfj3YewsLafT5qQPDNknZ43oUp0DKOH6NmB1FCS7Ci0iECVeBDDp+gUMGOcQPCJ4JPA1
+         vmup9iBc8+UJqIOgqU1sCtP4RRcXNRb/rbrejRoH56F/7Pm5paldtNzjWqQRwpRrCDOv
+         874Q==
+X-Gm-Message-State: AOAM533qKWRgl86a/QD5vYeLNDNYHo5yTOuvDPrDcAGf/3vzKEAwyTld
+        8cRDbvYUvBIjlYo+evbMgU1VJyIdEaHdRFSbXxiiAn/vr/1O
+X-Google-Smtp-Source: ABdhPJz46elvAlGQb+4iBu5GDJETkvSCwZYY3fQO4J1bsg3UipRMv59OOfwhgZstYtR/XAJyLUrU+ZktTcqi0Zw4wr4tBtTIjClC
 MIME-Version: 1.0
-References: <20201107172152.828-1-ap420073@gmail.com> <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-From:   Taehee Yoo <ap420073@gmail.com>
-Date:   Sun, 8 Nov 2020 04:52:55 +0900
-Message-ID: <CAMArcTXNMpjEnVA8sz82CTTnCofqEK+hUSSq27mvjqV6QCiAOQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 00/21] net: avoid to remove module when its debugfs
- is being used
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     David Miller <davem@davemloft.net>,
-        Netdev <netdev@vger.kernel.org>,
-        David Laight <David.Laight@aculab.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Nicolai Stange <nstange@suse.de>, derosier@gmail.com,
-        Kalle Valo <kvalo@codeaurora.org>,
-        linux-wireless@vger.kernel.org, wil6210@qti.qualcomm.com,
-        b43-dev@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-        michael.hennerich@analog.com, linux-wpan@vger.kernel.org,
-        stefan@datenfreihafen.org, inaky.perez-gonzalez@intel.com,
-        linux-wimax@intel.com, emmanuel.grumbach@intel.com,
-        Luciano Coelho <luciano.coelho@intel.com>, stf_xl@wp.pl,
-        pkshih@realtek.com, ath11k@lists.infradead.org,
-        ath10k@lists.infradead.org, wcn36xx@lists.infradead.org,
-        merez@codeaurora.org, pizza@shaftnet.org,
-        Larry Finger <Larry.Finger@lwfinger.net>, amitkarwar@gmail.com,
-        ganapathi.bhat@nxp.com, huxinming820@gmail.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, alex.aring@gmail.com,
-        jukka.rissanen@linux.intel.com,
-        Arend Van Spriel <arend.vanspriel@broadcom.com>,
-        franky.lin@broadcom.com, hante.meuleman@broadcom.com,
-        chung-hsien.hsu@infineon.com, wright.feng@infineon.com,
-        chi-hsien.lin@infineon.com
+X-Received: by 2002:a02:b1cb:: with SMTP id u11mr8883124jah.95.1604876105313;
+ Sun, 08 Nov 2020 14:55:05 -0800 (PST)
+Date:   Sun, 08 Nov 2020 14:55:05 -0800
+In-Reply-To: <000000000000c57f2d05ac4c5b8e@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002a736805b3a05697@google.com>
+Subject: Re: BUG: corrupted list in kobject_add_internal
+From:   syzbot <syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com>
+To:     abhishekpandit@chromium.org, coiby.xu@gmail.com,
+        davem@davemloft.net, dvyukov@google.com,
+        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        netdev@vger.kernel.org, rafael@kernel.org,
+        sonnysasaka@chromium.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, 8 Nov 2020 at 04:05, Jakub Kicinski <kuba@kernel.org> wrote:
->
+syzbot suspects this issue was fixed by commit:
 
-Hi Jakub,
-Thank you for the review!
+commit a46b7ed4d52d09bd6c7ab53b2217d04fc2f02c65
+Author: Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Fri Aug 14 19:09:09 2020 +0000
 
-> On Sat,  7 Nov 2020 17:21:31 +0000 Taehee Yoo wrote:
-> > When debugfs file is opened, its module should not be removed until
-> > it's closed.
-> > Because debugfs internally uses the module's data.
-> > So, it could access freed memory.
-> >
-> > In order to avoid panic, it just sets .owner to THIS_MODULE.
-> > So that all modules will be held when its debugfs file is opened.
->
-> Hm, looks like some of the patches need to be revised because
-> .owner is already set in the ops, and a warning gets generated.
+    Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
 
-Thanks, I found my mistake via patchwork.
-I will fix this problem.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13d75792500000
+start commit:   d6efb3ac Merge tag 'tty-5.9-rc1' of git://git.kernel.org/p..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ff87594cecb7e666
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd768a260f7358adbaf9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105054aa900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ab6976900000
 
->
-> Also it'd be good to mention why Johannes's approach was abandoned.
+If the result looks correct, please mark the issue as fixed by replying with:
 
-I'm sorry about skipping the explanation of the situation,
-Johannes sent RFC[1], which fixes this problem in the debugfs core logic.
-I tested it and it actually avoids this problem well.
-And I think there would be more discussion.
-So, I thought this series' approach is reasonable right now.
-I think setting .owner to THIS_MODULE is a common behavior and it
-doesn't hurt our logic even if Johannes's approach is merged.
-I'm expecting that both approaches of this series and Johannes are
-doing separately.
+#syz fix: Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
 
-[1] https://www.spinics.net/lists/linux-wireless/msg204171.html
-
->
-> When you repost please separate out all the patches for
-> drivers/net/wireless/ and send that to Kalle's wireless drivers tree.
-> Patch 1 needs to be split in two. Patches 2 and 3 would go via Johannes.
-> The wimax patch needs to go to staging (wimax code has been moved).
-> The remaining patches can be posted individually, not as a series.
-
-Okay, I will do this.
-
-Thanks a lot!
-Taehee Yoo
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
