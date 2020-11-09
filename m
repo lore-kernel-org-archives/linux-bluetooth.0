@@ -2,83 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD31C2D0A3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 19:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDECC2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 19:47:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A12282065D
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 19:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B42E206D8
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 19:47:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mz+4UeTM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729831AbgKIT1v (ORCPT
+        id S1729673AbgKITrW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Nov 2020 14:27:51 -0500
-Received: from mga04.intel.com ([192.55.52.120]:2020 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726691AbgKIT1u (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Nov 2020 14:27:50 -0500
-IronPort-SDR: O4ArIejYN8tvLpJXZYcdUSJCkO4wcI5tIZqJ60pRnuWg2ZXycHSsQxV7OUlJ6nNY72uPgjt8jL
- jq+o521nhepg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9800"; a="167271647"
-X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
-   d="scan'208";a="167271647"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 11:27:50 -0800
-IronPort-SDR: 4B0A76vp/SN/iSpFYoOA7ynbaAIaqNgZrWOeXaqfwTWQ9JVBBabpH40RzIPriYFR9r/aJUw/Wl
- oPKpakdhBhEQ==
-X-IronPort-AV: E=Sophos;i="5.77,464,1596524400"; 
-   d="scan'208";a="473110092"
-Received: from weidongc-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.212.33.54])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2020 11:27:50 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.von.dentz@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] client: Remove reference to g_steal_pointer()
-Date:   Mon,  9 Nov 2020 11:27:42 -0800
-Message-Id: <20201109192742.42207-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
+        Mon, 9 Nov 2020 14:47:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56128 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729336AbgKITrW (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 9 Nov 2020 14:47:22 -0500
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8B6C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2020 11:47:21 -0800 (PST)
+Received: by mail-qv1-xf2c.google.com with SMTP id e5so2971724qvs.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2020 11:47:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ea08/43/IZTMCsvqtrON3uOsex08EXUptVByx33VTfw=;
+        b=mz+4UeTMPquVcl/FDvA00LuUu0cSb+fXfx50fO7dFIffMwAi/klomMQSAocx7h7tSv
+         91yzlKtN6GiJ7SiF80EG0h/4mc+MB5WD7YwTXdvZDQUJqzDmOeuPgDjJ6fJUT1yAsPRE
+         nhUQLHtIDF3CVaTBmo+BlioVGBDsNnwMm6WPE9wiMWMvG8qjqVBW4IgEqkNU3u6+ra/v
+         Z5ya8lxNYx+duv1EF2+BjE+3OEnHXZ+pmdX7lhZFXIwxWkXiiZpHKH5wzpWaYhjGeWsp
+         6k7cb26Wy2KABYxrobedakL0ARSCJLEHrUnm4HfiHnxPUHMJE3AgkOx/ZCviskvRemtN
+         YoqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ea08/43/IZTMCsvqtrON3uOsex08EXUptVByx33VTfw=;
+        b=BjVh/mDENyweP2mBSCT3vi8u6WAkMoJ1/PRZMdCeH5ixe3QHzIGjwF0kbX5Yk0roRt
+         St+Un9VbHdRvy10bkVqiE3ZytOHn3mZ6DdKlcBjhuQLdx6Z9eGnoXjeyahzFZmX6qu0N
+         3Y+9tKqsZRzAemkLgPB0CFEVzTwFnaBkmLbwreB9M71wMoLeFYzosBVSQwMGyUhtFUOm
+         /Ltyb3CSTAmN46wShNUELr2jPMBwVUDN6+/VqFWVmNnnzM7fPdbG8RV9qL23il8dzV1U
+         wLYLAE+I4eh0daX9jHT8hFpSwCfr7sku3+V7nt1MA0ycK/iCc+GMWaOaeb8lqmkttDQC
+         sgwQ==
+X-Gm-Message-State: AOAM533krwBK0GvQOGgEguAkyMnPGr/HXaQnyr4dPpIUn+sj3aoa+U8/
+        8HhhXX6J3rV5EcPmtZErU0h8O+EzeMfjbA==
+X-Google-Smtp-Source: ABdhPJx8WTPJviUtf49juNr9B1mKUrfbsBFfQ44/UZdRJau9qxIlfUJzCLjPZDYt5btCZQY5ZnMPdw==
+X-Received: by 2002:a0c:8143:: with SMTP id 61mr15765944qvc.6.1604951240799;
+        Mon, 09 Nov 2020 11:47:20 -0800 (PST)
+Received: from [172.17.0.2] ([52.167.139.168])
+        by smtp.gmail.com with ESMTPSA id z6sm6213144qti.88.2020.11.09.11.47.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2020 11:47:20 -0800 (PST)
+Message-ID: <5fa99cc8.1c69fb81.73e40.7565@mx.google.com>
+Date:   Mon, 09 Nov 2020 11:47:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6952117095522571081=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ] client: Remove reference to g_steal_pointer()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201109192742.42207-1-inga.stotland@intel.com>
+References: <20201109192742.42207-1-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In order to avoid requiring higher version of GLib, replace
-g_steal_pointer() with explicitly setting the pointer value
-to NULL.
+--===============6952117095522571081==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=380609
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- client/adv_monitor.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/adv_monitor.c b/client/adv_monitor.c
-index 90ab0be09..8e81857af 100644
---- a/client/adv_monitor.c
-+++ b/client/adv_monitor.c
-@@ -254,10 +254,16 @@ void adv_monitor_add_manager(DBusConnection *conn, GDBusProxy *proxy)
- 
- void adv_monitor_remove_manager(DBusConnection *conn)
- {
--	if (manager.supported_types != NULL)
--		g_slist_free(g_steal_pointer(&(manager.supported_types)));
--	if (manager.supported_features != NULL)
--		g_slist_free(g_steal_pointer(&(manager.supported_features)));
-+	if (manager.supported_types != NULL) {
-+		g_slist_free(manager.supported_types);
-+		manager.supported_types = NULL;
-+	}
-+
-+	if (manager.supported_features != NULL) {
-+		g_slist_free(manager.supported_features);
-+		manager.supported_features = NULL;
-+	}
-+
- 	manager.proxy = NULL;
- 	manager.app_registered = FALSE;
- }
--- 
-2.26.2
 
+--===============6952117095522571081==--
