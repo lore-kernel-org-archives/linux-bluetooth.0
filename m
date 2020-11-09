@@ -5,76 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6729FC61DD8
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 07:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240E0C2D0A3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 07:57:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C74F20853
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 07:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC41121D91
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 07:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dCjzCsA1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H/kwDC0p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729756AbgKIH5m (ORCPT
+        id S1729786AbgKIH5s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Nov 2020 02:57:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58322 "EHLO
+        Mon, 9 Nov 2020 02:57:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729737AbgKIH5l (ORCPT
+        with ESMTP id S1729778AbgKIH5r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Nov 2020 02:57:41 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8822C0613D4
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2020 23:57:39 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id l3so3600232ply.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2020 23:57:39 -0800 (PST)
+        Mon, 9 Nov 2020 02:57:47 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D0AEC0613D4
+        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2020 23:57:47 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id es11so5002968qvb.10
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2020 23:57:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=fZu+i/Tey4YuHE3nmf4R/J6pPaT130pHwxhtyujUvT8=;
-        b=dCjzCsA1NNS5/KnUDsa0Jo9Dx9F/NoCnQ4fUtHSJ3jy8SfMB2iffkzAlNmiBxpzv93
-         R8ZrvAVK+qwQRQUxZQRiK860r1KKiIKzQ+nptmBAeWZnER6ixDejzjWrxfsbWFpesO6q
-         fB71JL3uHFwx0yIrjmqmv5VYlPmuW5aCek6SG27rcHvOFQV0j0WxgMXOrlUE+n1xTftI
-         OHCOBgQEZVDC5lZb7tRT8yFBV/Gt3ZchznUFo3od037F1uwp66wZ75bXDf54oAqfj7yM
-         N8xngeORkWvr2OYCBwvOLu+0y8745+A2Jt+u6PFMd1EFREprQq6wAtKOBt0tEHYPFgD+
-         +gVA==
+        bh=O4Vdvs4gs6fv/dABG14CW8ji62lq3ZykXhH4Ino64SY=;
+        b=H/kwDC0pmsvgy052BOqSSz6q89DPMl+Ot3RC7ktvClnghvtiLyt/avgoi/RHbj4aqU
+         C6gZH+5TWtFcCosSn8dhTPvJUB89nr9H+ITCz8jX/8OfRM/O5TYP4e86ZI1BNfT32ur+
+         jEL7rNULoFUq/3IBXVb9opDbqQWktpi87iDAruwOYwQFOs38Bsf+84w8HaaFEnTiSY0R
+         dl31fPXX4dS64nd2bl9P4SPW1ayDJyRIMvlj+NejdFY60UwzVm9LqrXTEixHfgqWkgwI
+         Q4dQkvVnkOw12cqYMc/KULqgDA0+SzmjGa1O2rLYXNE9MOPGT0XrUeESq9GZhkxyFZl2
+         DAEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fZu+i/Tey4YuHE3nmf4R/J6pPaT130pHwxhtyujUvT8=;
-        b=EKQ5Pq5GVcbmH14a1wNiBeJnPbJa51dIn+3VZcatLouzNsodceiKgscaE9IDJwtaFB
-         riJnML2rj1P2hQqFxYrTR2zH05PvxgdYjS0S6YqI7ADwN7DgRDztGn2peLPYRQEeDfN1
-         CVEr/goOsBUTSk51/d+wKux74r26QMsZEJA6Rm9QQw8t5MInOp5VNS3LTI5D3GxBuF5o
-         D+NCu8CFRjGQDUeH6MrdSB2DN6UY6W6u+6ijIFLpiPqCo1AVGbGv6Q6B62JnECnsRtf0
-         HIshrCxAoQrywoURv7JbdfvDru2UrYU3dAWPysS7+TEpgEK6qjs7CnlUESheFkPFczpJ
-         qYGQ==
-X-Gm-Message-State: AOAM530z9ONXMuOcF6H+FvamgBXiZzvrq/bRRqn1UXvBhqI3VcP+7VeY
-        gmvGv2n2c3+gqVNxP//AoAH/MsNpTwaHvCCw7rIn0sFyygqC8fD+hYwDp7FO9tgd7AImncnE3D5
-        BaW6f6nYw+VJdyuSgHYOjC1cZPPmMNcrw6pLwX1Uh5KQ71n+43UbkwhICZyW0kw94dhoR1GCMJ1
-        h0AlkGlI2AEHA=
-X-Google-Smtp-Source: ABdhPJzvhFDG65ja4IDNja/+FMSLFMnHzO5O5WnBrF0c4Jy+9ZC4DC5CJtt2ggr4upsCUOF7GrFvI0b/S+/8uHHW3g==
+        bh=O4Vdvs4gs6fv/dABG14CW8ji62lq3ZykXhH4Ino64SY=;
+        b=XGbSwH3fb1OwA+mv4KqxrBDgt7QHGW565wRg9LU4M9iPWIZQ67uwuzNH6Lp7ocTZYa
+         nu4eLy4o70QfuyIN2UGzDqFLaMvJy3GZtnsGiSoEBj83/36wTmOdRUTUf7/sQkjxtPa9
+         HbD9NIKWO789Hvp+Mxeh4siW31x1kto8KdG0a18upRvIeD1gKr0kW5OyiMdu7UveydsV
+         x6gmaEyBSXIlQ3Slb+dw1hlYFGCWIFR0lFvpdhTcPFEGlPINEe5crGfGpLg/7XSyWTIZ
+         BPv3Jc1CkKvtcERLoQhJaHuo6T7/7MNCjYE2qlt72Bc7QfHcpm7tQAPyiXeLfEv2Di6s
+         FijA==
+X-Gm-Message-State: AOAM533qdktDqW+kiu62PLkoBRg34SJom13TXKT9QWbh0jNWl4azCSfb
+        A/nPB/9+pe84g7vSjgWnxk5A7XzTTclWyHmTKC/kjApkgceRiYLshTqbR11iYlCJTAgn9YxxNLg
+        7ka+zhE/f3BpFWDpJ/C4rEFSI7BPdXNd8suPeKEC1/ChMuaErAkV6j9t8SV9wFP7rAsQoeAVSMg
+        zyorWWbhM0gzs=
+X-Google-Smtp-Source: ABdhPJwDCS4rAZMBxt7r1yBkyLMA0Dnh06fbNnMPKV4jj6rRnzqJMY3frTgs7pgWicOmxcLFXS8TDeMx0TW2rE1N5A==
 Sender: "howardchung via sendgmr" 
         <howardchung@howardchung-p920.tpe.corp.google.com>
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a17:902:8e87:b029:d6:8dde:138b with
- SMTP id bg7-20020a1709028e87b02900d68dde138bmr11541206plb.83.1604908659272;
- Sun, 08 Nov 2020 23:57:39 -0800 (PST)
-Date:   Mon,  9 Nov 2020 15:57:23 +0800
+ (user=howardchung job=sendgmr) by 2002:ad4:4105:: with SMTP id
+ i5mr12882317qvp.47.1604908666286; Sun, 08 Nov 2020 23:57:46 -0800 (PST)
+Date:   Mon,  9 Nov 2020 15:57:25 +0800
 In-Reply-To: <20201109155659.v7.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-Message-Id: <20201109155659.v7.2.I3774a8f0d748c7c6ec3402c4adcead32810c9164@changeid>
+Message-Id: <20201109155659.v7.4.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
 Mime-Version: 1.0
 References: <20201109155659.v7.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
 X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
-Subject: [PATCH v7 2/5] Bluetooth: Handle system suspend resume case
+Subject: [PATCH v7 4/5] mgmt: Add supports of variable length parameter in mgmt_config
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com
 Cc:     mmandlik@chromium.org, alainm@chromium.org, mcchou@chromium.org,
         Howard Chung <howardchung@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -84,41 +82,177 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds code to handle the system suspension during interleave
-scan. The interleave scan will be canceled when the system is going to
-sleep, and will be restarted after waking up.
-
-Commit-changes 5:
-- Remove the change in hci_req_config_le_suspend_scan
+This adds support of variable length parameter in mgmt_config.
 
 Signed-off-by: Howard Chung <howardchung@google.com>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 (no changes since v1)
 
- net/bluetooth/hci_request.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt_config.c | 140 +++++++++++++++++++++---------------
+ 1 file changed, 84 insertions(+), 56 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 70ea126f56282..b615b981be9d6 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1284,8 +1284,10 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
- 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index 2d3ad288c78ac..b735e59c7fd51 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -11,72 +11,100 @@
+ #include "mgmt_util.h"
+ #include "mgmt_config.h"
  
- 		/* Disable LE passive scan if enabled */
--		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
-+		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+			cancel_interleave_scan(hdev);
- 			hci_req_add_le_scan_disable(&req, false);
-+		}
+-#define HDEV_PARAM_U16(_param_code_, _param_name_) \
+-{ \
+-	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+-	{ cpu_to_le16(hdev->_param_name_) } \
+-}
++#define HDEV_PARAM_U16(_param_name_) \
++	struct {\
++		struct mgmt_tlv entry; \
++		__le16 value; \
++	} __packed _param_name_
  
- 		/* Mark task needing completion */
- 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
+-#define HDEV_PARAM_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
+-{ \
+-	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+-	{ cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) } \
+-}
++#define TLV_SET_U16(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		  cpu_to_le16(hdev->_param_name_) \
++	}
++
++#define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		  cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) \
++	}
+ 
+ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			   u16 data_len)
+ {
+-	struct {
+-		struct mgmt_tlv entry;
+-		union {
+-			/* This is a simplification for now since all values
+-			 * are 16 bits.  In the future, this code may need
+-			 * refactoring to account for variable length values
+-			 * and properly calculate the required buffer size.
+-			 */
+-			__le16 value;
+-		};
+-	} __packed params[] = {
++	int ret;
++	struct mgmt_rp_read_def_system_config {
+ 		/* Please see mgmt-api.txt for documentation of these values */
+-		HDEV_PARAM_U16(0x0000, def_page_scan_type),
+-		HDEV_PARAM_U16(0x0001, def_page_scan_int),
+-		HDEV_PARAM_U16(0x0002, def_page_scan_window),
+-		HDEV_PARAM_U16(0x0003, def_inq_scan_type),
+-		HDEV_PARAM_U16(0x0004, def_inq_scan_int),
+-		HDEV_PARAM_U16(0x0005, def_inq_scan_window),
+-		HDEV_PARAM_U16(0x0006, def_br_lsto),
+-		HDEV_PARAM_U16(0x0007, def_page_timeout),
+-		HDEV_PARAM_U16(0x0008, sniff_min_interval),
+-		HDEV_PARAM_U16(0x0009, sniff_max_interval),
+-		HDEV_PARAM_U16(0x000a, le_adv_min_interval),
+-		HDEV_PARAM_U16(0x000b, le_adv_max_interval),
+-		HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
+-		HDEV_PARAM_U16(0x000d, le_scan_interval),
+-		HDEV_PARAM_U16(0x000e, le_scan_window),
+-		HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
+-		HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
+-		HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
+-		HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
+-		HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
+-		HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
+-		HDEV_PARAM_U16(0x0015, le_scan_int_connect),
+-		HDEV_PARAM_U16(0x0016, le_scan_window_connect),
+-		HDEV_PARAM_U16(0x0017, le_conn_min_interval),
+-		HDEV_PARAM_U16(0x0018, le_conn_max_interval),
+-		HDEV_PARAM_U16(0x0019, le_conn_latency),
+-		HDEV_PARAM_U16(0x001a, le_supv_timeout),
+-		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
+-						def_le_autoconnect_timeout),
+-		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
+-		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
++		HDEV_PARAM_U16(def_page_scan_type);
++		HDEV_PARAM_U16(def_page_scan_int);
++		HDEV_PARAM_U16(def_page_scan_window);
++		HDEV_PARAM_U16(def_inq_scan_type);
++		HDEV_PARAM_U16(def_inq_scan_int);
++		HDEV_PARAM_U16(def_inq_scan_window);
++		HDEV_PARAM_U16(def_br_lsto);
++		HDEV_PARAM_U16(def_page_timeout);
++		HDEV_PARAM_U16(sniff_min_interval);
++		HDEV_PARAM_U16(sniff_max_interval);
++		HDEV_PARAM_U16(le_adv_min_interval);
++		HDEV_PARAM_U16(le_adv_max_interval);
++		HDEV_PARAM_U16(def_multi_adv_rotation_duration);
++		HDEV_PARAM_U16(le_scan_interval);
++		HDEV_PARAM_U16(le_scan_window);
++		HDEV_PARAM_U16(le_scan_int_suspend);
++		HDEV_PARAM_U16(le_scan_window_suspend);
++		HDEV_PARAM_U16(le_scan_int_discovery);
++		HDEV_PARAM_U16(le_scan_window_discovery);
++		HDEV_PARAM_U16(le_scan_int_adv_monitor);
++		HDEV_PARAM_U16(le_scan_window_adv_monitor);
++		HDEV_PARAM_U16(le_scan_int_connect);
++		HDEV_PARAM_U16(le_scan_window_connect);
++		HDEV_PARAM_U16(le_conn_min_interval);
++		HDEV_PARAM_U16(le_conn_max_interval);
++		HDEV_PARAM_U16(le_conn_latency);
++		HDEV_PARAM_U16(le_supv_timeout);
++		HDEV_PARAM_U16(def_le_autoconnect_timeout);
++		HDEV_PARAM_U16(advmon_allowlist_duration);
++		HDEV_PARAM_U16(advmon_no_filter_duration);
++	} __packed rp = {
++		TLV_SET_U16(0x0000, def_page_scan_type),
++		TLV_SET_U16(0x0001, def_page_scan_int),
++		TLV_SET_U16(0x0002, def_page_scan_window),
++		TLV_SET_U16(0x0003, def_inq_scan_type),
++		TLV_SET_U16(0x0004, def_inq_scan_int),
++		TLV_SET_U16(0x0005, def_inq_scan_window),
++		TLV_SET_U16(0x0006, def_br_lsto),
++		TLV_SET_U16(0x0007, def_page_timeout),
++		TLV_SET_U16(0x0008, sniff_min_interval),
++		TLV_SET_U16(0x0009, sniff_max_interval),
++		TLV_SET_U16(0x000a, le_adv_min_interval),
++		TLV_SET_U16(0x000b, le_adv_max_interval),
++		TLV_SET_U16(0x000c, def_multi_adv_rotation_duration),
++		TLV_SET_U16(0x000d, le_scan_interval),
++		TLV_SET_U16(0x000e, le_scan_window),
++		TLV_SET_U16(0x000f, le_scan_int_suspend),
++		TLV_SET_U16(0x0010, le_scan_window_suspend),
++		TLV_SET_U16(0x0011, le_scan_int_discovery),
++		TLV_SET_U16(0x0012, le_scan_window_discovery),
++		TLV_SET_U16(0x0013, le_scan_int_adv_monitor),
++		TLV_SET_U16(0x0014, le_scan_window_adv_monitor),
++		TLV_SET_U16(0x0015, le_scan_int_connect),
++		TLV_SET_U16(0x0016, le_scan_window_connect),
++		TLV_SET_U16(0x0017, le_conn_min_interval),
++		TLV_SET_U16(0x0018, le_conn_max_interval),
++		TLV_SET_U16(0x0019, le_conn_latency),
++		TLV_SET_U16(0x001a, le_supv_timeout),
++		TLV_SET_U16_JIFFIES_TO_MSECS(0x001b,
++					     def_le_autoconnect_timeout),
++		TLV_SET_U16(0x001d, advmon_allowlist_duration),
++		TLV_SET_U16(0x001e, advmon_no_filter_duration),
+ 	};
+-	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
+-	return mgmt_cmd_complete(sk, hdev->id,
+-				 MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+-				 0, rp, sizeof(params));
++	ret = mgmt_cmd_complete(sk, hdev->id,
++				MGMT_OP_READ_DEF_SYSTEM_CONFIG,
++				0, &rp, sizeof(rp));
++	return ret;
+ }
+ 
+ #define TO_TLV(x)		((struct mgmt_tlv *)(x))
 -- 
 2.29.2.222.g5d2a92d10f8-goog
 
