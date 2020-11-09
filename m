@@ -7,100 +7,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C47C4741F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 12:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84230C4741F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 12:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC61220789
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 12:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CA6F20789
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Nov 2020 12:43:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729451AbgKIMm4 (ORCPT
+        id S1729553AbgKIMnq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Nov 2020 07:42:56 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:50310 "EHLO
+        Mon, 9 Nov 2020 07:43:46 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:33027 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgKIMm4 (ORCPT
+        with ESMTP id S1727077AbgKIMnp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Nov 2020 07:42:56 -0500
+        Mon, 9 Nov 2020 07:43:45 -0500
 Received: from marcel-macbook.fritz.box (p4fefcf0f.dip0.t-ipconnect.de [79.239.207.15])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5ED66CECC5;
-        Mon,  9 Nov 2020 13:50:03 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id B9328CECC5;
+        Mon,  9 Nov 2020 13:50:52 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for 13d3:3560 MediaTek
- MT7615E device
+Subject: Re: [PATCH] Bluetooth: hci_ll: add a small delay for wl1271 enable
+ bt_en
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201102081157.25012-1-chiu@endlessos.org>
-Date:   Mon, 9 Nov 2020 13:42:54 +0100
+In-Reply-To: <PH0PR11MB5077A86EEA660BD3E7B2F7BE95100@PH0PR11MB5077.namprd11.prod.outlook.com>
+Date:   Mon, 9 Nov 2020 13:43:43 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@endlessos.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <E5D636E2-036E-4A9B-A09D-90292E377861@holtmann.org>
-References: <20201102081157.25012-1-chiu@endlessos.org>
-To:     Chris Chiu <chiu@endlessos.org>
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <93858CE1-A293-4331-8B72-48BBAF7821D3@holtmann.org>
+References: <PH0PR11MB5077A86EEA660BD3E7B2F7BE95100@PH0PR11MB5077.namprd11.prod.outlook.com>
+To:     "Wang, Xiaolei" <Xiaolei.Wang@windriver.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Chris,
+Hi Xiaolei,
 
-> The ASUS X532EQ laptop contains AzureWave AW-CB434NF module with an
-> associated MT7615E BT chip using a USB ID of 13d3:3560.
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=09 Cnt=02 Dev#=  3 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3560 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Signed-off-by: Chris Chiu <chiu@endlessos.org>
+> When using the wl1271 Bluetooth function of am335x, it is found that the Bluetooth module cannot respond in time after Bluetooth is enabled, and a small delay is needed to work normally, so whether to add a small mdelay.
+>  
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
 > ---
-> drivers/bluetooth/btusb.c | 1 +
+> drivers/bluetooth/hci_ll.c | 1 +
 > 1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 5af2e3f30a5e..a0bfd41fdfee 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -367,6 +367,7 @@ static const struct usb_device_id blacklist_table[] = {
-> 	/* MediaTek Bluetooth devices */
-> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
-> 	  .driver_info = BTUSB_MEDIATEK },
-> +	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
+>  
+> diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c index 8bfe024d1fcd..eb1e736efeeb 100644
+> --- a/drivers/bluetooth/hci_ll.c
+> +++ b/drivers/bluetooth/hci_ll.c
+> @@ -626,6 +626,7 @@ static int ll_setup(struct hci_uart *hu)
+>                                gpiod_set_value_cansleep(lldev->enable_gpio, 0);
+>                                msleep(5);
+>                                gpiod_set_value_cansleep(lldev->enable_gpio, 1);
+> +                             mdelay(100);
+>                                err = serdev_device_wait_for_cts(serdev, true, 200);
+>                                if (err) {
+>                                                bt_dev_err(hu->hdev, "Failed to get CTS");
 
-please put a comment above which device this is like we did for the others.
+please submit patches in the proper format and encoding.
 
-Regards
+Regardes
 
 Marcel
 
