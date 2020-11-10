@@ -2,97 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADDAC5517A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 781ABC388F7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:33:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E22122080A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:21:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 246D620829
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728905AbgKJIVt (ORCPT
+        id S1726986AbgKJIdK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Nov 2020 03:21:49 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:58806 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgKJIVt (ORCPT
+        Tue, 10 Nov 2020 03:33:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33318 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726462AbgKJIdJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Nov 2020 03:21:49 -0500
-Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id DA7F8CECDB;
-        Tue, 10 Nov 2020 09:28:54 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH] Bluetooth: btusb: btrtl: Add support for RTL8852A
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201110033837.19373-1-max.chou@realtek.com>
-Date:   Tue, 10 Nov 2020 09:21:45 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org,
-        Alex Lu <alex_lu@realsil.com.cn>, hildawu@realtek.com,
-        kidman@realtek.com
+        Tue, 10 Nov 2020 03:33:09 -0500
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92704C0613CF;
+        Tue, 10 Nov 2020 00:33:09 -0800 (PST)
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.94)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1kcP5A-004ok0-0t; Tue, 10 Nov 2020 09:32:52 +0100
+Message-ID: <29adbaa7a7f200589e56566069270c857fcba015.camel@sipsolutions.net>
+Subject: Re: [PATCH net v2 00/21] net: avoid to remove module when its
+ debugfs is being used
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     Jakub Kicinski <kuba@kernel.org>, Taehee Yoo <ap420073@gmail.com>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org,
+        David.Laight@aculab.com, nstange@suse.de, derosier@gmail.com,
+        kvalo@codeaurora.org, linux-wireless@vger.kernel.org,
+        wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, michael.hennerich@analog.com,
+        linux-wpan@vger.kernel.org, stefan@datenfreihafen.org,
+        inaky.perez-gonzalez@intel.com, linux-wimax@intel.com,
+        emmanuel.grumbach@intel.com, luciano.coelho@intel.com,
+        stf_xl@wp.pl, pkshih@realtek.com, ath11k@lists.infradead.org,
+        ath10k@lists.infradead.org, wcn36xx@lists.infradead.org,
+        merez@codeaurora.org, pizza@shaftnet.org,
+        Larry.Finger@lwfinger.net, amitkarwar@gmail.com,
+        ganapathi.bhat@nxp.com, huxinming820@gmail.com,
+        marcel@holtmann.org, johan.hedberg@gmail.com, alex.aring@gmail.com,
+        jukka.rissanen@linux.intel.com, arend.vanspriel@broadcom.com,
+        franky.lin@broadcom.com, hante.meuleman@broadcom.com,
+        chung-hsien.hsu@infineon.com, wright.feng@infineon.com,
+        chi-hsien.lin@infineon.com
+Date:   Tue, 10 Nov 2020 09:32:49 +0100
+In-Reply-To: <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+References: <20201107172152.828-1-ap420073@gmail.com>
+         <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <3F294B82-64EF-47B7-A0C5-9D4675D96DE3@holtmann.org>
-References: <20201110033837.19373-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+X-malware-bazaar: not-scanned
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
-
-> Add the support for RTL8852A BT controller on USB interface.
-> The necessary firmware will be submitted to linux-firmware project.
+On Sat, 2020-11-07 at 11:05 -0800, Jakub Kicinski wrote:
+> On Sat,  7 Nov 2020 17:21:31 +0000 Taehee Yoo wrote:
+> > When debugfs file is opened, its module should not be removed until
+> > it's closed.
+> > Because debugfs internally uses the module's data.
+> > So, it could access freed memory.
+> > 
+> > In order to avoid panic, it just sets .owner to THIS_MODULE.
+> > So that all modules will be held when its debugfs file is opened.
 > 
-> The device info from /sys/kernel/debug/usb/devices as below.
+> Hm, looks like some of the patches need to be revised because
+> .owner is already set in the ops, and a warning gets generated.
 > 
-> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#= 10 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0bda ProdID=c852 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> ---
-> drivers/bluetooth/btrtl.c | 12 ++++++++++++
-> drivers/bluetooth/btusb.c |  4 ++++
-> 2 files changed, 16 insertions(+)
+> Also it'd be good to mention why Johannes's approach was abandoned.
 
-patch has been applied to bluetooth-next tree.
+Well, I had two.
 
-Regards
+One was awful, and worked in all cases.
 
-Marcel
+The other was less awful, and didn't work in all cases.
+
+I think both gave Al Viro hives ;-)
+
+> Patch 1 needs to be split in two. Patches 2 and 3 would go via Johannes.
+
+FWIW, I'm happy for you to take patches 2 and 3 as well, but I guess if
+patch 1 needs to be split there's a resend coming anyway, so then I'll
+be happy to take the patches 2/3 from a separate set.
+
+johannes
+
 
