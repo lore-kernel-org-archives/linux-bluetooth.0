@@ -8,71 +8,73 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9789EC55ABD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 10:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED05C4741F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 10:19:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40244207BB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 10:19:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A98D420639
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 10:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fN+dlOtt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yybuizz6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730457AbgKJKSy (ORCPT
+        id S1730242AbgKJKSu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Nov 2020 05:18:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
+        Tue, 10 Nov 2020 05:18:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730654AbgKJKSx (ORCPT
+        with ESMTP id S1729630AbgKJKSs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Nov 2020 05:18:53 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E0EC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 02:18:52 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id k7so14244353ybm.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 02:18:52 -0800 (PST)
+        Tue, 10 Nov 2020 05:18:48 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EFDC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 02:18:48 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id l188so8945198pfl.23
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 02:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=C95huzuAXxK/Q/ur78yeB7NRb6+ErTiDkKW1OinYBEM=;
-        b=fN+dlOttk59kV4mLEiOPuNPqRVO5JnVN+aLCHgK4Ide9SzT2SQ3I1Yp3N5t72yFdir
-         34VUGkP4Cvs7PgQaYEmHpmbygeZ3AOQw1Pcu5X64sVf/KYR3/Zvp+Jtqmky9LNAMiyK9
-         yHgzL0q3RFCeESLtPDPRlS44QRMGM03aVf5L8qeRpxeY5wq2LY2FbBI5YCagY3N/ML8h
-         7alq99rz5kLQbnA2mlTGvhGpeRazuasVf4ZJpuJ1N3j4IJGh2yI0rCnyhq2a0ybp/N67
-         JJaJ8aXsthHSK58MdaYjLmplXIPzz9REb/KjTV4SQfWagMuVv38m6r4oJ1Y95ua6bjPa
-         Kodw==
+        bh=/ezy6lAqc7MUpQhd7aVdTsjzC/c2bjGSDjWe3QgakvQ=;
+        b=Yybuizz6Mc33yHPec9FElLcYFRiTkf1aiM2CvR0ktL7KzOSRcV1EUd13NWQYKcgjth
+         k/z9RoC4BvYZnVprvkFJnxbcC7jPYLSKr5o9x8JTiqOVDN/XbxinyH/QFjWPBLxRJUiq
+         pdIK/Pf+WRRKrh4C7aQv9oIssB+aI+qiGK3f4e6TgCwpm62QQtogpDPx+XXbFJcgHBOk
+         ABxC8JtX8UODMqGw1L4b1X7iyGFHjKfTIaIjxtmjT+YVNny8S8Kr9clHEQ2jJiJ6yq9I
+         Ltas9d24vQ5N/dfDcnuUIZp6VyJm4BHX6mscE6cAo8ha+e2/ycACkuyIEhBSIcN6n8HI
+         QOpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=C95huzuAXxK/Q/ur78yeB7NRb6+ErTiDkKW1OinYBEM=;
-        b=QuOjucivFEY15lLv1itj4bvQfG3dSq5ev2V1KOOtuITXn+NJmRM7PBeVgXjeVC+52N
-         Qh5s5DI++b47Qk+bjid9JltjM/AVUmozJBLnwjoXIufY0Jkc3yUacfdQZd9NWDTSNYzt
-         giWW7TJYl/LIbqqXu9uFZR6tt09su/X4Xazkpx3BtNqApLm1jWIWekdvFU/b/FNXBS6J
-         ZTAq2IH5jiZn6tP/S6tiT/qUpOt9Zgx6r1Ony0b/Ls4Pc4CqvcRzuGfqZjy4Qd+Yqyf2
-         2P7P13ljfHkVf9yhnGh9T6ouYQFo5dGAcIo2kAGRvJZfi/qNb2jPP3/1wf9bbYizuWoi
-         DDZw==
-X-Gm-Message-State: AOAM5316gsyLbS9nd4m3fKyN1phCniLodcA+nDT9QDKz8Piy1WWzFf8O
-        YoZ2JGYTNC2q75qcKWypLuaZRS1XF04vIzBPLbJFuT57eUYVv3ApU4mRCCOx/HnzGVHy00ufMe9
-        egBQv2s3J5/mYq0orMcaHNzEFP73ToGZhYCIRT0CyV4xDKo/wbIFkFs/yEjkKgATTwOT5oBO2ak
-        nQidedXIi9t+o=
-X-Google-Smtp-Source: ABdhPJx69PbWxwCICMrL7Wj6VOTH3H80JJyY09ctMYN6Hw9Hg3URXQvI6M3r7B32IDzklPSaZONPScF2und96eg5ZQ==
+        bh=/ezy6lAqc7MUpQhd7aVdTsjzC/c2bjGSDjWe3QgakvQ=;
+        b=hxqhOPgp2n0/YmxmqP/c98uHknVpZpRZb0ZZLrE9ZjQC0jFYrlaQY7k/zfWVEum13O
+         Bugdbh4eClAqKo4OkMlctIRGl4sRFJfOHPYsHdmmXCd49vuD1mSaJ4jcKTKVLbfDVjHo
+         ND+75dbvxOdqNE3gBSf50l/yiTdeYSrABfiOAK0wEgB7HRMmZ5GT0Xxhs7Mn81l0DmjV
+         aDV7EJnimhziBrJiTVM5jKSUuJUNSUYUn3yYx3NpGD5TEo6vNjjUP+RfXWsxfs5tOMuw
+         zpH5Uqt/UtHFKGDuXfa/D8P0UybgsIAnI//rBmbEaKmIrLon9Ion1d9nMtXh94Xl/HwG
+         QoDg==
+X-Gm-Message-State: AOAM532FIU5er013HiTwDMEALe1xhLdyE6qwltLdcfN1ujWiurYkqNi4
+        EIqr1Vj1u4Tu+GOdXFCgscAiHP2Tq+l9QV256FvSr7QOrC7dFcpCepcdjrK0Q1b/fR5qTMobUfH
+        mHIZOaeZNe8aEU+7ENp8bFnzhyVfIhpnWBoZxOl3eBqjrD2W0ZNvo+N6GSRRfVuiAKXWZW6d7JV
+        n5zLUYNW4XYkE=
+X-Google-Smtp-Source: ABdhPJwHkpKNrKFUFMOYgnQsqYxdKy56iUBJN/YTKnaGpMPdfnI8Y8AqTrIkm02d8C1B5pRTr8rM/OLutcE/QTwGeA==
 Sender: "howardchung via sendgmr" 
         <howardchung@howardchung-p920.tpe.corp.google.com>
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a25:ac23:: with SMTP id
- w35mr26697654ybi.171.1605003531984; Tue, 10 Nov 2020 02:18:51 -0800 (PST)
-Date:   Tue, 10 Nov 2020 18:17:53 +0800
+ (user=howardchung job=sendgmr) by 2002:a05:6a00:16c7:b029:163:ce86:1d5d with
+ SMTP id l7-20020a056a0016c7b0290163ce861d5dmr17262650pfc.80.1605003528100;
+ Tue, 10 Nov 2020 02:18:48 -0800 (PST)
+Date:   Tue, 10 Nov 2020 18:17:52 +0800
 In-Reply-To: <20201110181740.v8.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
-Message-Id: <20201110181740.v8.4.I21e5741249e78c560ca377499ba06b56c7214985@changeid>
+Message-Id: <20201110181740.v8.3.I3774a8f0d748c7c6ec3402c4adcead32810c9164@changeid>
 Mime-Version: 1.0
 References: <20201110181740.v8.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
 X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
-Subject: [PATCH v8 4/6] Bluetooth: Handle active scan case
+Subject: [PATCH v8 3/6] Bluetooth: Handle system suspend resume case
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com
 Cc:     mmandlik@chromium.org, mcchou@chromium.org, alainm@chromium.org,
         Howard Chung <howardchung@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -82,36 +84,41 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds code to handle the active scan during interleave
-scan. The interleave scan will be canceled when users start active scan,
-and it will be restarted after active scan stopped.
+This patch adds code to handle the system suspension during interleave
+scan. The interleave scan will be canceled when the system is going to
+sleep, and will be restarted after waking up.
 
 Signed-off-by: Howard Chung <howardchung@google.com>
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
-(no changes since v1)
+(no changes since v5)
+
+Changes in v5:
+- Remove the change in hci_req_config_le_suspend_scan
 
  net/bluetooth/hci_request.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index d943ad2885aa0..172ccbf4f0cd2 100644
+index 2fd56ee21d31f..d943ad2885aa0 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -3099,8 +3099,10 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	 * running. Thus, we should temporarily stop it in order to set the
- 	 * discovery scanning parameters.
- 	 */
--	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
-+	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
- 		hci_req_add_le_scan_disable(req, false);
-+		cancel_interleave_scan(hdev);
-+	}
+@@ -1293,8 +1293,10 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
  
- 	/* All active scans will be done with either a resolvable private
- 	 * address (when privacy feature has been enabled) or non-resolvable
+ 		/* Disable LE passive scan if enabled */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
++			cancel_interleave_scan(hdev);
+ 			hci_req_add_le_scan_disable(&req, false);
++		}
+ 
+ 		/* Mark task needing completion */
+ 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
 -- 
 2.29.2.222.g5d2a92d10f8-goog
 
