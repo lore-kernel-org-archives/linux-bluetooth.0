@@ -2,96 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 781ABC388F7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 993E5C388F7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:46:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 246D620829
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3188720780
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 08:46:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZL17sMA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726986AbgKJIdK (ORCPT
+        id S1727098AbgKJIqo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Nov 2020 03:33:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33318 "EHLO
+        Tue, 10 Nov 2020 03:46:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgKJIdJ (ORCPT
+        with ESMTP id S1726462AbgKJIqo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Nov 2020 03:33:09 -0500
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92704C0613CF;
-        Tue, 10 Nov 2020 00:33:09 -0800 (PST)
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.94)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1kcP5A-004ok0-0t; Tue, 10 Nov 2020 09:32:52 +0100
-Message-ID: <29adbaa7a7f200589e56566069270c857fcba015.camel@sipsolutions.net>
-Subject: Re: [PATCH net v2 00/21] net: avoid to remove module when its
- debugfs is being used
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Jakub Kicinski <kuba@kernel.org>, Taehee Yoo <ap420073@gmail.com>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        David.Laight@aculab.com, nstange@suse.de, derosier@gmail.com,
-        kvalo@codeaurora.org, linux-wireless@vger.kernel.org,
-        wil6210@qti.qualcomm.com, b43-dev@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, michael.hennerich@analog.com,
-        linux-wpan@vger.kernel.org, stefan@datenfreihafen.org,
-        inaky.perez-gonzalez@intel.com, linux-wimax@intel.com,
-        emmanuel.grumbach@intel.com, luciano.coelho@intel.com,
-        stf_xl@wp.pl, pkshih@realtek.com, ath11k@lists.infradead.org,
-        ath10k@lists.infradead.org, wcn36xx@lists.infradead.org,
-        merez@codeaurora.org, pizza@shaftnet.org,
-        Larry.Finger@lwfinger.net, amitkarwar@gmail.com,
-        ganapathi.bhat@nxp.com, huxinming820@gmail.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, alex.aring@gmail.com,
-        jukka.rissanen@linux.intel.com, arend.vanspriel@broadcom.com,
-        franky.lin@broadcom.com, hante.meuleman@broadcom.com,
-        chung-hsien.hsu@infineon.com, wright.feng@infineon.com,
-        chi-hsien.lin@infineon.com
-Date:   Tue, 10 Nov 2020 09:32:49 +0100
-In-Reply-To: <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-References: <20201107172152.828-1-ap420073@gmail.com>
-         <20201107110522.2a796f1d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        Tue, 10 Nov 2020 03:46:44 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD21C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 00:46:44 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id n129so13016199iod.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 00:46:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Csd+m5HsJcGMllXNC7thQcEsc+NBW1HHs8rOS2FXWfI=;
+        b=oZL17sMAvUCgvJ8kU/WxmKOfauvgHs+Fg7k/quJhrOML05WZQc5nbR1Kz8PxyUq9SN
+         SXOLyLthVEsza29vsmYwVJDlrYZWXN+Di/0TcSaej0HNr5JQsUb7WSiwA/VKOlJgpX9M
+         Fx2KcPYmqz7/rnfBI/cv2pbkAEAR/tXWS77aMGk0T93/QXBLi0tX6gMREJy9HMKLgG8j
+         o2Jd/nYdvV/f8yED3BfoaXT0tqq0lo7RqXTtwuKc0PXUtIgpAGojRMk7MOUL/+wX/oEK
+         88XwUp543Yzgu3kJlEnp+98102Go3EoK1JlZlv6sD9PT5TUmLos0yWkKIgi4NoQmMAC7
+         Lz3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Csd+m5HsJcGMllXNC7thQcEsc+NBW1HHs8rOS2FXWfI=;
+        b=UQWa4pqFdwangawN9ycdCXhNbTatc0tI77Iy/2i1LJfmn4tbatt5aVVXbLqQBVHL0f
+         R2V7xR41Fxs60RoU5GfyqIO5tcQy7ad47ymqsnBiY7VeebzNplcSS2jnqMFBpDWVjhPy
+         fXjwJDFDX75HrGnk0h1MswHU7W0mG66x7dCECVM1iAPnV1buJL8G6NpOmGawZDieYh4t
+         8YESm2V8dvng7lMNtG2mKL0XPxmKlil+WMFtNndD6KxcRJkxoXk4FDaOR0f7ex+JA276
+         ExVTi0LgswA3HErEfz1bSnZ0MX6jRzk2+vVoqCz86IW3vot4Xjr7aF869thCF/uDIA7k
+         MpQg==
+X-Gm-Message-State: AOAM533/Zo0QZ1R/01KPC/0odmr4ngid+2cQX/4KfW/Nq4SLPC8SQb7r
+        4bORkeUDh8kEiMpDD6J0A/Ie6Wbll2U=
+X-Google-Smtp-Source: ABdhPJw6h6ZtdoinhcOxo5XLDvQazYZbiRHzMizjx85P4IljPzgJyrJWuEAoB/hiQLMuwX8lSKcsAA==
+X-Received: by 2002:a05:6602:2d49:: with SMTP id d9mr12937140iow.39.1604998003656;
+        Tue, 10 Nov 2020 00:46:43 -0800 (PST)
+Received: from [172.17.0.2] ([40.70.247.128])
+        by smtp.gmail.com with ESMTPSA id e4sm8306112ils.75.2020.11.10.00.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2020 00:46:43 -0800 (PST)
+Message-ID: <5faa5373.1c69fb81.c638b.fab4@mx.google.com>
+Date:   Tue, 10 Nov 2020 00:46:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6526232405211076200=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-malware-bazaar: not-scanned
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, julian@pidancet.net
+Subject: RE: [v2] Bluetooth: btusb: Add support for 1358:c123 Realtek 8822CE device
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201109164722.23501-1-julian@pidancet.net>
+References: <20201109164722.23501-1-julian@pidancet.net>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, 2020-11-07 at 11:05 -0800, Jakub Kicinski wrote:
-> On Sat,  7 Nov 2020 17:21:31 +0000 Taehee Yoo wrote:
-> > When debugfs file is opened, its module should not be removed until
-> > it's closed.
-> > Because debugfs internally uses the module's data.
-> > So, it could access freed memory.
-> > 
-> > In order to avoid panic, it just sets .owner to THIS_MODULE.
-> > So that all modules will be held when its debugfs file is opened.
-> 
-> Hm, looks like some of the patches need to be revised because
-> .owner is already set in the ops, and a warning gets generated.
-> 
-> Also it'd be good to mention why Johannes's approach was abandoned.
+--===============6526232405211076200==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Well, I had two.
+This is automated email and please do not reply to this email!
 
-One was awful, and worked in all cases.
+Dear submitter,
 
-The other was less awful, and didn't work in all cases.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=380475
 
-I think both gave Al Viro hives ;-)
+---Test result---
 
-> Patch 1 needs to be split in two. Patches 2 and 3 would go via Johannes.
+##############################
+Test: CheckPatch - FAIL
+Output:
+Bluetooth: btusb: Add support for 1358:c123 Realtek 8822CE device
+WARNING: 'equiped' may be misspelled - perhaps 'equipped'?
+#8: 
+are equiped with a RTL8822CE chip using the 1358:c123 USB identifiers.
 
-FWIW, I'm happy for you to take patches 2 and 3 as well, but I guess if
-patch 1 needs to be split there's a resend coming anyway, so then I'll
-be happy to take the patches 2/3 from a separate set.
+total: 0 errors, 1 warnings, 8 lines checked
 
-johannes
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] Bluetooth: btusb: Add support for 1358:c123 Realtek 8822CE" has style problems, please review.
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6526232405211076200==--
