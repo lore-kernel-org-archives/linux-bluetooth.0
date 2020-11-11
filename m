@@ -4,57 +4,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9978C56201
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547EBC5517A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:15:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CDE9207D3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:13:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC8B12074B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726457AbgKKLMu convert rfc822-to-8bit (ORCPT
+        id S1726181AbgKKLPR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 06:12:50 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:52581 "EHLO
+        Wed, 11 Nov 2020 06:15:17 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:33378 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726125AbgKKLMf (ORCPT
+        with ESMTP id S1725965AbgKKLPQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 06:12:35 -0500
+        Wed, 11 Nov 2020 06:15:16 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BFDE9CECFF;
-        Wed, 11 Nov 2020 12:19:32 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2D2CDCECFE;
+        Wed, 11 Nov 2020 12:22:23 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH 1/2] bluetooth: hci_event: consolidate error paths in
- hci_phy_link_complete_evt()
+Subject: Re: [PATCH v9 1/6] Bluetooth: Replace BT_DBG with bt_dev_dbg in HCI
+ request
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b508265e-f08f-ea24-2815-bc2a5ec10d8d@omprussia.ru>
-Date:   Wed, 11 Nov 2020 12:12:22 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+In-Reply-To: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
+Date:   Wed, 11 Nov 2020 12:15:13 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Alain Michaud <alainm@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <EA8EC09F-6AB5-45DD-9889-C05D1FC9AAE6@holtmann.org>
-References: <bbdd9cbe-b65e-b309-1188-71a3a4ca6fdc@omprussia.ru>
- <b508265e-f08f-ea24-2815-bc2a5ec10d8d@omprussia.ru>
-To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <930CC61B-FFE0-44A4-93E4-D48C07793324@holtmann.org>
+References: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
+To:     Howard Chung <howardchung@google.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sergey,
+Hi Howard,
 
-> hci_phy_link_complete_evt() has several duplicate error paths -- consolidate
-> them, using the *goto* statements.
+> This replaces the BT_DBG function to bt_dev_dbg as it is cleaner to show
+> the controller index in the debug message.
 > 
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
-> 
+> Signed-off-by: Howard Chung <howardchung@google.com>
 > ---
-> net/bluetooth/hci_event.c |   16 ++++++----------
-> 1 file changed, 6 insertions(+), 10 deletions(-)
+> 
+> Changes in v9:
+> - Fix compile warning on patch 6/6
+> 
+> Changes in v8:
+> - Simplified logic in __hci_update_interleaved_scan
+> - Remove hdev->name when calling bt_dev_dbg
+> - Remove 'default' in hci_req_add_le_interleaved_scan switch block
+> - Remove {} around :1915
+> - Update commit message and title in v7 4/5
+> - Add a cleanup patch for replacing BT_DBG with bt_dev_dbg
+> 
+> Changes in v7:
+> - Fix bt_dev_warn argument type warning
+> 
+> Changes in v6:
+> - Set parameter EnableAdvMonInterleaveScan to 1 byte long
+> 
+> Changes in v5:
+> - Rename 'adv_monitor' from many functions/variables
+> - Move __hci_update_interleaved_scan into hci_req_add_le_passive_scan
+> - Update the logic of update_adv_monitor_scan_state
+> 
+> Changes in v4:
+> - Rebase to bluetooth-next/master (previous 2 patches are applied)
+> - Fix over 80 chars limit in mgmt_config.c
+> - Set EnableAdvMonInterleaveScan default to Disable
+> 
+> Changes in v3:
+> - Remove 'Bluez' prefix
+> 
+> Changes in v2:
+> - remove 'case 0x001c' in mgmt_config.c
+> 
+> net/bluetooth/hci_request.c | 52 ++++++++++++++++++-------------------
+> 1 file changed, 26 insertions(+), 26 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
