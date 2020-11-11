@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE2FC61DD8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CD3C388F9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B34320809
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07B032076E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pKAfaeBm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqkAHzLQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728551AbgKLBdK (ORCPT
+        id S1728544AbgKLBdI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 20:33:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57846 "EHLO
+        Wed, 11 Nov 2020 20:33:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727768AbgKKXG1 (ORCPT
+        with ESMTP id S1727732AbgKKXEb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 18:06:27 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC4DC061A04
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:31 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id z3so2675421pfb.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:31 -0800 (PST)
+        Wed, 11 Nov 2020 18:04:31 -0500
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE1ABC0617A7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:30 -0800 (PST)
+Received: by mail-pl1-x641.google.com with SMTP id b3so1744010pls.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=DUsmgDMGWi0gwJpZndlTa8QMK8I/mdJWRyhl7CRKULU=;
-        b=pKAfaeBmAUJaaz9jLXeL/KXps8oTLQAcvDlfoebETtKjOjyR0K/KmKIUm2Ic0NJ8/m
-         mkPi/863S1yHVdTOwgDvSB8T8yrZQdvZYzGpSdLExPQUaH/hyUQddfe4ehL6E277rKRZ
-         boLlqKxBOPuG0kRsJXk7zbCzW83JNnKiiGUBumYEM6f6QvszYR5egNxxr3dPoH3tYYeJ
-         //6BS1XSX/bxF0scl2UNgnte0hBQqEg6JQt8hvN175mGXJBQ3URAPflRPvHnV8dh3ZXy
-         y7jngWvgYjLafRoQPZSgRdxpAriMiOm16DeKvEhISZ58mFiUc3VJQhlkPG0diwO6NImd
-         qLcQ==
+        bh=msDZd2qOGah4QB3072sVg4wOX4q/SRtp2lmh0VCdYYs=;
+        b=NqkAHzLQXxNMyOjZdTKYHT0DMRy7VIydx+fAKwnNr0tXkKChuXJYj15tQrFxSDnawl
+         J4hQ2yyitL73xe1mMrNzPVdY8sK4EGo+5XiRQHlItZhqUczrGmxC+go1zMzn7IJ8U8lf
+         q54cwxqRjc964h70Kt7rWk9BzQT+/zBdgPbur81xy6pM5GMauvLuikYB4+WXGb1OLn72
+         5yHU6ggm8rD12dqmJReP+lhP176cz+1sk1ejSJQQkmES4jBFArGVSkJ3jUR4U3tI9xoZ
+         h2oDv4ZOfKuHqRSiay3fNoDqYLJoiiEHfmlFlvaCkKpK6QdiwjUCmTklrhLYyRS03YE8
+         WgGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=DUsmgDMGWi0gwJpZndlTa8QMK8I/mdJWRyhl7CRKULU=;
-        b=pWulaQ+Fov1dnSoHdvQaYvdDGwM4Q0k8LHmZkFNojxCrYBqmOQ4D6ILMnmpkEMuZM7
-         YT+jPAc6N/o8ZPeZhw2yhyXbFtiFyc+VyaVnmi7OuphPjfWM9B6G53AeTn8B9y8+U13X
-         U5XL1CeO4vUoXqORFMws9aQZnGtOkq0cqzcMulK5ekAb2sQo9o+l4bZQhlUhF2g+KvQg
-         8kqQshD25yYtWzhb8VawWrgCRuKhTz+yrTViBmI373/scuU18MLInL3Kf1PmX+d8MQOo
-         IrZ3YD1DgnZYJ4v6M7Ph4uWj/R+ILqQSmaB1X/ZOVn9ZavxEt5FDauy6EF5q6I1KIPds
-         4HlQ==
-X-Gm-Message-State: AOAM532jkTdJSQlb4syrunYg7UXqfEP/2bLdiCHZc6VrWmZlZ+0oLJTh
-        A32Ok+2E8m2v4Uo6CeaxBVaatj2/yrEpdg==
-X-Google-Smtp-Source: ABdhPJy4rkP9hIA+ymodNYAIRjyZONNDZ9IuiYfgRUk9WXYqmbOSpZFyAUrYFK0xGTGAks25LZl8fw==
-X-Received: by 2002:aa7:808a:0:b029:160:167d:d332 with SMTP id v10-20020aa7808a0000b0290160167dd332mr13965929pff.1.1605135870596;
-        Wed, 11 Nov 2020 15:04:30 -0800 (PST)
+        bh=msDZd2qOGah4QB3072sVg4wOX4q/SRtp2lmh0VCdYYs=;
+        b=qDC81m2JyITl6B02g30H9NmqhiKnXMqkGEv4UgCN0HCxalUUC5llPZo1NlhrsKf6u/
+         Zor0SwprAX6h/korKQ6E6KKU6Yw1CItovOVsNDO2L0ufRTPfV14R9OOMpFCTOnYeRjT2
+         SCTPEWifKEVlDdQogz8/nHVjCpkhCfvhNIsU/rrqU6iDow4uSmik81DHQZWmsRe2lRMK
+         Z0ilacyZ9QQAI/Rjta2Ws9MpwFIuxRyo/qP4ZS16usTHVMb0SQZlAY8ryWn5Sk6JKM76
+         coRU0DlwJK0XbYzHKD9RLTKl8MYF7DHJydTFt5OewTtqDH9tvMwXefAZ9wyKkBpgx4oZ
+         zBkw==
+X-Gm-Message-State: AOAM530MnbXi5ZEe7OhEoletHczu/nHJCdGSR34FYuMrVH5ztrXglBkR
+        4+DEcnmsNXoL72Dq6Vpjn0nGBaDCcPK9qg==
+X-Google-Smtp-Source: ABdhPJyjakadasno1141qwDPJAG9qMgdg3vZA5SAbgHzSWWldiUr1uakSl/+Ia6WIpzZFuUXvLK3CA==
+X-Received: by 2002:a17:902:7482:b029:d6:682d:5c6c with SMTP id h2-20020a1709027482b02900d6682d5c6cmr22439170pll.84.1605135869745;
+        Wed, 11 Nov 2020 15:04:29 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n27sm3867767pfq.59.2020.11.11.15.04.29
+        by smtp.gmail.com with ESMTPSA id n27sm3867767pfq.59.2020.11.11.15.04.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2020 15:04:30 -0800 (PST)
+        Wed, 11 Nov 2020 15:04:29 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 05/10] shared/tester: Add option to filter by string
-Date:   Wed, 11 Nov 2020 15:04:16 -0800
-Message-Id: <20201111230421.3364932-6-luiz.dentz@gmail.com>
+Subject: [PATCH v2 04/10] smp-tester: Fix not registering for MGMT_EV_USER_CONFIRM_REQUEST
+Date:   Wed, 11 Nov 2020 15:04:15 -0800
+Message-Id: <20201111230421.3364932-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201111230421.3364932-1-luiz.dentz@gmail.com>
 References: <20201111230421.3364932-1-luiz.dentz@gmail.com>
@@ -77,46 +77,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option to filter by string which does not require to enter
-the entire prefix.
+For client test MGMT_EV_USER_CONFIRM_REQUEST shall be resgistered as
+well as the kernel has been updated to request user confirmation even
+when acting as initiator.
 ---
- src/shared/tester.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tools/smp-tester.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index bd42c8bad..0c31e8b1c 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -106,6 +106,7 @@ static gboolean option_debug = FALSE;
- static gboolean option_monitor = FALSE;
- static gboolean option_list = FALSE;
- static const char *option_prefix = NULL;
-+static const char *option_string = NULL;
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index 7823b6b17..644c451c2 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -501,6 +501,10 @@ static void setup_powered_client(const void *test_data)
+ 	const struct smp_data *smp = data->test_data;
+ 	unsigned char param[] = { 0x01 };
  
- struct monitor_hdr {
- 	uint16_t opcode;
-@@ -285,6 +286,12 @@ void tester_add_full(const char *name, const void *test_data,
- 		return;
- 	}
- 
-+	if (option_string && !strstr(name, option_string)) {
-+		if (destroy)
-+			destroy(user_data);
-+		return;
-+	}
++	mgmt_register(data->mgmt, MGMT_EV_USER_CONFIRM_REQUEST,
++			data->mgmt_index, user_confirm_request_callback,
++			data, NULL);
 +
- 	if (option_list) {
- 		tester_log("%s", name);
- 		if (destroy)
-@@ -804,6 +811,8 @@ static GOptionEntry options[] = {
- 				"Only list the tests to be run" },
- 	{ "prefix", 'p', 0, G_OPTION_ARG_STRING, &option_prefix,
- 				"Run tests matching provided prefix" },
-+	{ "string", 's', 0, G_OPTION_ARG_STRING, &option_string,
-+				"Run tests matching provided string" },
- 	{ NULL },
- };
+ 	tester_print("Powering on controller");
  
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
 -- 
 2.26.2
 
