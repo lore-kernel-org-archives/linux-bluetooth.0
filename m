@@ -7,102 +7,92 @@ X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 661D4C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160E4C388F9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 13:11:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08EE72074B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:23:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3E3F2068D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 13:11:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TJjO8cBz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I1yU2uIG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726264AbgKKLW5 (ORCPT
+        id S1726251AbgKKNLP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 06:22:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33440 "EHLO
+        Wed, 11 Nov 2020 08:11:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726204AbgKKLWz (ORCPT
+        with ESMTP id S1725912AbgKKNLP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 06:22:55 -0500
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D1FC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 03:22:55 -0800 (PST)
-Received: by mail-qt1-x842.google.com with SMTP id i12so1017249qtj.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 03:22:55 -0800 (PST)
+        Wed, 11 Nov 2020 08:11:15 -0500
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8BCC0613D1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 05:11:14 -0800 (PST)
+Received: by mail-qk1-x742.google.com with SMTP id v143so1550912qkb.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 05:11:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=a+0hvWNZjuGzR2yuBkOrthU1shgFfePvt4BkuauBxXY=;
-        b=TJjO8cBzKT2rHIMjTFeHyNQ6EvDH4DKhPDmsFzKSLrGZ/Q8IyNQbicX1fyF54q4j8m
-         IQBVC1sm2Vv12ZD75TApN/8T0uvgHnJS/JPsd6smNt/Mph5p4+mTpuPwf/i5tD5n9eKM
-         C9rX+qkd4yZ3xpbh/oWM/cK4tEExKHE5llKm8dkD65h+a3Uogt6odU6p7ukYgKsVwJnG
-         TuPt8CAxoENWh63Umn3BxEjUigoUPXYQFBzhCRkaFAt+nRmvVQMw4qjWGgjFLrZ+vTED
-         kB80zM7rWDaSkzPTA0wDslSNY6/661lGnBOZnGNFkTVxZfDQqGzKX+F0HGUUvV0bmBmo
-         +7Vw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=GjFdEigLvXfDvlbjJo1wDn3OLDS9qQ6oorF/luuVY5Q=;
+        b=I1yU2uIGDyGfUl0OL1K+/AAYTzHtxCSGD9rN1EqjliZMD8lAPY4vwY+5lTgfmeIMsj
+         5fwCe4pcwCsgjDIkeehkbUP2ZPm7tC/kPTiemQ2Bpc36ITMdgHQEkns8kU5pM+3cPEWe
+         xUAT6eqe3Ar2yFVmO5JQAdLFADvaNKnRvkszrSt9vF8VRXRoGHRHNa1f3xb/C6AgQCEM
+         biIWa1uMqymgVZIOk4iH4WEiS4xgUDF5BVY8iX8V73BjdBUgSC1EXwCHSKkoyfQCCzLC
+         3F9w+h7djQqmxx6d/okhonh1VUlVDFsW5+OHRLWpKNsWCgKzJhCvjwp/luSr7n3lKVwb
+         Io5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=a+0hvWNZjuGzR2yuBkOrthU1shgFfePvt4BkuauBxXY=;
-        b=p2lUT1RHyRy/+9oZ/S0Qkm00UI6IyeCdxJLrfa9kpPjU6Ni1n8qNqV30TcLAGUsSX4
-         KRyPsofAPl6BsFckS/vDuAMTMy2rvPeZgzAKx6IBY/gqCKPbO1LcfTdcTgfkxhzptxlw
-         sibzsU1RWcZVTgR/qnYRJ86X4ITyHAusxX2t7/OKg2DMrs2+W5on4d89jJDqJNRQ5/Gr
-         YK1CXbMgpSsOyBlfxKtmzUuW1VX3aQBYtcFkr5JvcVw6FanDowGGXEHwQBt0FrEPAgTT
-         DN8uR9GUkgLYZXBakLxTQJIzrlOS117wXHp1At51HApWh5KBSzkhZMZOEK5n5SqpwDMI
-         xk/A==
-X-Gm-Message-State: AOAM530un1XmGFN7AKSVbO1bwkNh/y8F6c2MidhgyHzsCdMrNbZq8iHR
-        iJhFlJZBMJ9QvG5xc50E9stxDM0xdywMff3ifGNMZQ==
-X-Google-Smtp-Source: ABdhPJwLNYMg/E8M6NNNJsIV8jVxHNKK8b1huFHUn20uWGl5RATA0MNnH+Vn1aZZtb41l988fqwX7EwaS8SrxwXPrto=
-X-Received: by 2002:ac8:37f2:: with SMTP id e47mr22634777qtc.290.1605093774733;
- Wed, 11 Nov 2020 03:22:54 -0800 (PST)
+         :message-id:subject:to;
+        bh=GjFdEigLvXfDvlbjJo1wDn3OLDS9qQ6oorF/luuVY5Q=;
+        b=R3dXQ8IMwUvmZ9GroPOo3xJNcWBL63jgxfbg122UiY2aMfzknBvDcVKshQZOtl8/AB
+         l7jzzEk03GC+JvSBGH9QtZkgI5uU3Kv6+TOJy+emNL1fg29gLY6LvqyB6IeAbGDw+FP2
+         Kpessnz4rSUNG9Zr2yQznQWPHe1waT/dUn+wnWtPJPk1kUoih4Flv/WQkg2y7j7GdclW
+         8kKk0CH+uPpXnvWiu5GRrh2aLdPxTCG518jNyS/rlaoGjRE8csiF+5EIT7ooF7Sn6AUt
+         oihdde+vtvwqGA/5g48QtdmP3g/nfQUE7SzlyxwpQolYNfjcrWQpCtenSNkUVaIvqR9Z
+         Op4g==
+X-Gm-Message-State: AOAM532164JW/9N35FjcjdSPmmQl5TQF8DfdZkyAk/18FzHGWROHyOzX
+        EmFMCnDrwFYwWHyyHLPfAJrKvpBfDq1zIIGfGEsKMA==
+X-Google-Smtp-Source: ABdhPJwRO21Z+SE9Hv8PFSbNwJRKHETxvGdQhKfZKY481gKFf7Z2JAHlnk9D7itLlDAZ1GN1BvOVI3UFlHijiwnfEXs=
+X-Received: by 2002:a37:9747:: with SMTP id z68mr23902083qkd.424.1605100273754;
+ Wed, 11 Nov 2020 05:11:13 -0800 (PST)
 MIME-Version: 1.0
-References: <000000000000c57f2d05ac4c5b8e@google.com> <0000000000002a736805b3a05697@google.com>
-In-Reply-To: <0000000000002a736805b3a05697@google.com>
+References: <0000000000008b9e0705a38afe52@google.com> <000000000000a3de6505ae9e6831@google.com>
+In-Reply-To: <000000000000a3de6505ae9e6831@google.com>
 From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Wed, 11 Nov 2020 12:22:43 +0100
-Message-ID: <CACT4Y+bTDLYNe2_5qbLNR7PaFmKR1Nz7mg+S95XwjUdp=zMc3Q@mail.gmail.com>
-Subject: Re: BUG: corrupted list in kobject_add_internal
-To:     syzbot <syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com>
-Cc:     abhishekpandit@chromium.org, Coiby Xu <coiby.xu@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
+Date:   Wed, 11 Nov 2020 14:11:02 +0100
+Message-ID: <CACT4Y+bJevNFi6P9kYEEQshTuNhpzLyHL1Q_NatjyS90dMHwqw@mail.gmail.com>
+Subject: Re: WARNING: refcount bug in do_enable_set
+To:     syzbot <syzbot+2e9900a1e1b3c9c96a77@syzkaller.appspotmail.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>, sonnysasaka@chromium.org,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Nov 8, 2020 at 11:55 PM syzbot
-<syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com> wrote:
+On Sun, Sep 6, 2020 at 7:31 AM syzbot
+<syzbot+2e9900a1e1b3c9c96a77@syzkaller.appspotmail.com> wrote:
 >
 > syzbot suspects this issue was fixed by commit:
 >
-> commit a46b7ed4d52d09bd6c7ab53b2217d04fc2f02c65
-> Author: Sonny Sasaka <sonnysasaka@chromium.org>
-> Date:   Fri Aug 14 19:09:09 2020 +0000
+> commit b83764f9220a4a14525657466f299850bbc98de9
+> Author: Miao-chen Chou <mcchou@chromium.org>
+> Date:   Tue Jun 30 03:15:00 2020 +0000
 >
->     Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+>     Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
 >
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13d75792500000
-> start commit:   d6efb3ac Merge tag 'tty-5.9-rc1' of git://git.kernel.org/p..
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=115a4245900000
+> start commit:   fffe3ae0 Merge tag 'for-linus-hmm' of git://git.kernel.org..
 > git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ff87594cecb7e666
-> dashboard link: https://syzkaller.appspot.com/bug?extid=dd768a260f7358adbaf9
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105054aa900000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ab6976900000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=226c7a97d80bec54
+> dashboard link: https://syzkaller.appspot.com/bug?extid=2e9900a1e1b3c9c96a77
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b3efea900000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11131284900000
 >
 > If the result looks correct, please mark the issue as fixed by replying with:
 >
-> #syz fix: Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+> #syz fix: Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
 >
 > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-#syz fix: Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+#syz fix: Bluetooth: Fix kernel oops triggered by hci_adv_monitors_clear()
