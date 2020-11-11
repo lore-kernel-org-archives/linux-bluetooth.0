@@ -2,238 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF8CC5517A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661D4C388F9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28BDC2074B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08EE72074B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:23:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TJjO8cBz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726279AbgKKLUa convert rfc822-to-8bit (ORCPT
+        id S1726264AbgKKLW5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 06:20:30 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55225 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726175AbgKKLU3 (ORCPT
+        Wed, 11 Nov 2020 06:22:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726204AbgKKLWz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 06:20:29 -0500
-Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 16C6FCECFE;
-        Wed, 11 Nov 2020 12:27:35 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v9 5/6] Bluetooth: Refactor read default sys config for
- various types
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201111150115.v9.5.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
-Date:   Wed, 11 Nov 2020 12:20:25 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        alainm@chromium.org, mmandlik@chromium.org, mcchou@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        Wed, 11 Nov 2020 06:22:55 -0500
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D1FC0613D6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 03:22:55 -0800 (PST)
+Received: by mail-qt1-x842.google.com with SMTP id i12so1017249qtj.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 03:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a+0hvWNZjuGzR2yuBkOrthU1shgFfePvt4BkuauBxXY=;
+        b=TJjO8cBzKT2rHIMjTFeHyNQ6EvDH4DKhPDmsFzKSLrGZ/Q8IyNQbicX1fyF54q4j8m
+         IQBVC1sm2Vv12ZD75TApN/8T0uvgHnJS/JPsd6smNt/Mph5p4+mTpuPwf/i5tD5n9eKM
+         C9rX+qkd4yZ3xpbh/oWM/cK4tEExKHE5llKm8dkD65h+a3Uogt6odU6p7ukYgKsVwJnG
+         TuPt8CAxoENWh63Umn3BxEjUigoUPXYQFBzhCRkaFAt+nRmvVQMw4qjWGgjFLrZ+vTED
+         kB80zM7rWDaSkzPTA0wDslSNY6/661lGnBOZnGNFkTVxZfDQqGzKX+F0HGUUvV0bmBmo
+         +7Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a+0hvWNZjuGzR2yuBkOrthU1shgFfePvt4BkuauBxXY=;
+        b=p2lUT1RHyRy/+9oZ/S0Qkm00UI6IyeCdxJLrfa9kpPjU6Ni1n8qNqV30TcLAGUsSX4
+         KRyPsofAPl6BsFckS/vDuAMTMy2rvPeZgzAKx6IBY/gqCKPbO1LcfTdcTgfkxhzptxlw
+         sibzsU1RWcZVTgR/qnYRJ86X4ITyHAusxX2t7/OKg2DMrs2+W5on4d89jJDqJNRQ5/Gr
+         YK1CXbMgpSsOyBlfxKtmzUuW1VX3aQBYtcFkr5JvcVw6FanDowGGXEHwQBt0FrEPAgTT
+         DN8uR9GUkgLYZXBakLxTQJIzrlOS117wXHp1At51HApWh5KBSzkhZMZOEK5n5SqpwDMI
+         xk/A==
+X-Gm-Message-State: AOAM530un1XmGFN7AKSVbO1bwkNh/y8F6c2MidhgyHzsCdMrNbZq8iHR
+        iJhFlJZBMJ9QvG5xc50E9stxDM0xdywMff3ifGNMZQ==
+X-Google-Smtp-Source: ABdhPJwLNYMg/E8M6NNNJsIV8jVxHNKK8b1huFHUn20uWGl5RATA0MNnH+Vn1aZZtb41l988fqwX7EwaS8SrxwXPrto=
+X-Received: by 2002:ac8:37f2:: with SMTP id e47mr22634777qtc.290.1605093774733;
+ Wed, 11 Nov 2020 03:22:54 -0800 (PST)
+MIME-Version: 1.0
+References: <000000000000c57f2d05ac4c5b8e@google.com> <0000000000002a736805b3a05697@google.com>
+In-Reply-To: <0000000000002a736805b3a05697@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Wed, 11 Nov 2020 12:22:43 +0100
+Message-ID: <CACT4Y+bTDLYNe2_5qbLNR7PaFmKR1Nz7mg+S95XwjUdp=zMc3Q@mail.gmail.com>
+Subject: Re: BUG: corrupted list in kobject_add_internal
+To:     syzbot <syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com>
+Cc:     abhishekpandit@chromium.org, Coiby Xu <coiby.xu@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A5A4227D-58B7-4C08-AFC9-BC8A8D469179@holtmann.org>
-References: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
- <20201111150115.v9.5.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
-To:     Howard Chung <howardchung@google.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        netdev <netdev@vger.kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>, sonnysasaka@chromium.org,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+On Sun, Nov 8, 2020 at 11:55 PM syzbot
+<syzbot+dd768a260f7358adbaf9@syzkaller.appspotmail.com> wrote:
+>
+> syzbot suspects this issue was fixed by commit:
+>
+> commit a46b7ed4d52d09bd6c7ab53b2217d04fc2f02c65
+> Author: Sonny Sasaka <sonnysasaka@chromium.org>
+> Date:   Fri Aug 14 19:09:09 2020 +0000
+>
+>     Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13d75792500000
+> start commit:   d6efb3ac Merge tag 'tty-5.9-rc1' of git://git.kernel.org/p..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=ff87594cecb7e666
+> dashboard link: https://syzkaller.appspot.com/bug?extid=dd768a260f7358adbaf9
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105054aa900000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ab6976900000
+>
+> If the result looks correct, please mark the issue as fixed by replying with:
+>
+> #syz fix: Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-> Refactor read default system configuration function so that it's capable
-> of returning different types than u16
-> 
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> 
-> (no changes since v8)
-> 
-> Changes in v8:
-> - Update the commit title and message
-> 
-> net/bluetooth/mgmt_config.c | 140 +++++++++++++++++++++---------------
-> 1 file changed, 84 insertions(+), 56 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index 2d3ad288c78ac..282fbf82f3192 100644
-> --- a/net/bluetooth/mgmt_config.c
-> +++ b/net/bluetooth/mgmt_config.c
-> @@ -11,72 +11,100 @@
-> #include "mgmt_util.h"
-> #include "mgmt_config.h"
-> 
-> -#define HDEV_PARAM_U16(_param_code_, _param_name_) \
-> -{ \
-> -	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
-> -	{ cpu_to_le16(hdev->_param_name_) } \
-> -}
-> +#define HDEV_PARAM_U16(_param_name_) \
-> +	struct {\
-> +		struct mgmt_tlv entry; \
-> +		__le16 value; \
-> +	} __packed _param_name_
-> 
-> -#define HDEV_PARAM_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
-> -{ \
-> -	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
-> -	{ cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) } \
-> -}
-> +#define TLV_SET_U16(_param_code_, _param_name_) \
-> +	{ \
-> +		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
-> +		cpu_to_le16(hdev->_param_name_) \
-> +	}
-> +
-> +#define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
-> +	{ \
-> +		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
-> +		cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) \
-> +	}
-> 
-> int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 			   u16 data_len)
-> {
-> -	struct {
-> -		struct mgmt_tlv entry;
-> -		union {
-> -			/* This is a simplification for now since all values
-> -			 * are 16 bits.  In the future, this code may need
-> -			 * refactoring to account for variable length values
-> -			 * and properly calculate the required buffer size.
-> -			 */
-> -			__le16 value;
-> -		};
-> -	} __packed params[] = {
-> +	int ret;
-> +	struct mgmt_rp_read_def_system_config {
-> 		/* Please see mgmt-api.txt for documentation of these values */
-> -		HDEV_PARAM_U16(0x0000, def_page_scan_type),
-> -		HDEV_PARAM_U16(0x0001, def_page_scan_int),
-> -		HDEV_PARAM_U16(0x0002, def_page_scan_window),
-> -		HDEV_PARAM_U16(0x0003, def_inq_scan_type),
-> -		HDEV_PARAM_U16(0x0004, def_inq_scan_int),
-> -		HDEV_PARAM_U16(0x0005, def_inq_scan_window),
-> -		HDEV_PARAM_U16(0x0006, def_br_lsto),
-> -		HDEV_PARAM_U16(0x0007, def_page_timeout),
-> -		HDEV_PARAM_U16(0x0008, sniff_min_interval),
-> -		HDEV_PARAM_U16(0x0009, sniff_max_interval),
-> -		HDEV_PARAM_U16(0x000a, le_adv_min_interval),
-> -		HDEV_PARAM_U16(0x000b, le_adv_max_interval),
-> -		HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
-> -		HDEV_PARAM_U16(0x000d, le_scan_interval),
-> -		HDEV_PARAM_U16(0x000e, le_scan_window),
-> -		HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
-> -		HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
-> -		HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
-> -		HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
-> -		HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
-> -		HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
-> -		HDEV_PARAM_U16(0x0015, le_scan_int_connect),
-> -		HDEV_PARAM_U16(0x0016, le_scan_window_connect),
-> -		HDEV_PARAM_U16(0x0017, le_conn_min_interval),
-> -		HDEV_PARAM_U16(0x0018, le_conn_max_interval),
-> -		HDEV_PARAM_U16(0x0019, le_conn_latency),
-> -		HDEV_PARAM_U16(0x001a, le_supv_timeout),
-> -		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
-> -						def_le_autoconnect_timeout),
-> -		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
-> -		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
-> +		HDEV_PARAM_U16(def_page_scan_type);
-> +		HDEV_PARAM_U16(def_page_scan_int);
-> +		HDEV_PARAM_U16(def_page_scan_window);
-> +		HDEV_PARAM_U16(def_inq_scan_type);
-> +		HDEV_PARAM_U16(def_inq_scan_int);
-> +		HDEV_PARAM_U16(def_inq_scan_window);
-> +		HDEV_PARAM_U16(def_br_lsto);
-> +		HDEV_PARAM_U16(def_page_timeout);
-> +		HDEV_PARAM_U16(sniff_min_interval);
-> +		HDEV_PARAM_U16(sniff_max_interval);
-> +		HDEV_PARAM_U16(le_adv_min_interval);
-> +		HDEV_PARAM_U16(le_adv_max_interval);
-> +		HDEV_PARAM_U16(def_multi_adv_rotation_duration);
-> +		HDEV_PARAM_U16(le_scan_interval);
-> +		HDEV_PARAM_U16(le_scan_window);
-> +		HDEV_PARAM_U16(le_scan_int_suspend);
-> +		HDEV_PARAM_U16(le_scan_window_suspend);
-> +		HDEV_PARAM_U16(le_scan_int_discovery);
-> +		HDEV_PARAM_U16(le_scan_window_discovery);
-> +		HDEV_PARAM_U16(le_scan_int_adv_monitor);
-> +		HDEV_PARAM_U16(le_scan_window_adv_monitor);
-> +		HDEV_PARAM_U16(le_scan_int_connect);
-> +		HDEV_PARAM_U16(le_scan_window_connect);
-> +		HDEV_PARAM_U16(le_conn_min_interval);
-> +		HDEV_PARAM_U16(le_conn_max_interval);
-> +		HDEV_PARAM_U16(le_conn_latency);
-> +		HDEV_PARAM_U16(le_supv_timeout);
-> +		HDEV_PARAM_U16(def_le_autoconnect_timeout);
-> +		HDEV_PARAM_U16(advmon_allowlist_duration);
-> +		HDEV_PARAM_U16(advmon_no_filter_duration);
-> +	} __packed rp = {
-> +		TLV_SET_U16(0x0000, def_page_scan_type),
-> +		TLV_SET_U16(0x0001, def_page_scan_int),
-> +		TLV_SET_U16(0x0002, def_page_scan_window),
-> +		TLV_SET_U16(0x0003, def_inq_scan_type),
-> +		TLV_SET_U16(0x0004, def_inq_scan_int),
-> +		TLV_SET_U16(0x0005, def_inq_scan_window),
-> +		TLV_SET_U16(0x0006, def_br_lsto),
-> +		TLV_SET_U16(0x0007, def_page_timeout),
-> +		TLV_SET_U16(0x0008, sniff_min_interval),
-> +		TLV_SET_U16(0x0009, sniff_max_interval),
-> +		TLV_SET_U16(0x000a, le_adv_min_interval),
-> +		TLV_SET_U16(0x000b, le_adv_max_interval),
-> +		TLV_SET_U16(0x000c, def_multi_adv_rotation_duration),
-> +		TLV_SET_U16(0x000d, le_scan_interval),
-> +		TLV_SET_U16(0x000e, le_scan_window),
-> +		TLV_SET_U16(0x000f, le_scan_int_suspend),
-> +		TLV_SET_U16(0x0010, le_scan_window_suspend),
-> +		TLV_SET_U16(0x0011, le_scan_int_discovery),
-> +		TLV_SET_U16(0x0012, le_scan_window_discovery),
-> +		TLV_SET_U16(0x0013, le_scan_int_adv_monitor),
-> +		TLV_SET_U16(0x0014, le_scan_window_adv_monitor),
-> +		TLV_SET_U16(0x0015, le_scan_int_connect),
-> +		TLV_SET_U16(0x0016, le_scan_window_connect),
-> +		TLV_SET_U16(0x0017, le_conn_min_interval),
-> +		TLV_SET_U16(0x0018, le_conn_max_interval),
-> +		TLV_SET_U16(0x0019, le_conn_latency),
-> +		TLV_SET_U16(0x001a, le_supv_timeout),
-> +		TLV_SET_U16_JIFFIES_TO_MSECS(0x001b,
-> +					     def_le_autoconnect_timeout),
-> +		TLV_SET_U16(0x001d, advmon_allowlist_duration),
-> +		TLV_SET_U16(0x001e, advmon_no_filter_duration),
-> 	};
-> -	struct mgmt_rp_read_def_system_config *rp = (void *)params;
-> 
-> 	bt_dev_dbg(hdev, "sock %p", sk);
-> 
-> -	return mgmt_cmd_complete(sk, hdev->id,
-> -				 MGMT_OP_READ_DEF_SYSTEM_CONFIG,
-> -				 0, rp, sizeof(params));
-> +	ret = mgmt_cmd_complete(sk, hdev->id,
-> +				MGMT_OP_READ_DEF_SYSTEM_CONFIG,
-> +				0, &rp, sizeof(rp));
-> +	return ret;
-> }
-> 
-
-frankly I would prefer if we do the re-factoring first and only then add new
-parameters.
-
-While I am looking at this, I am also really confused about this
-JIFFIES_TO_MSEC business. We should actually not store anything in jiffies
-or use it in an API. Is there a good reason to keep storing things in
-jiffies internally?
-
-Regards
-
-Marcel
-
+#syz fix: Bluetooth: Fix auto-creation of hci_conn at Conn Complete event
