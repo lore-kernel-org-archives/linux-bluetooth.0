@@ -2,137 +2,160 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393AEC388F7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6A2C388F7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:47:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEB4121D46
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:47:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C1E521D46
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:47:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vX9hHb/a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732366AbgKKArk convert rfc822-to-8bit (ORCPT
+        id S1732504AbgKKAr6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Nov 2020 19:47:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40628 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732174AbgKKArk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Nov 2020 19:47:40 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 210141] New: Bluetooth device rtw_8822ce is lost after suspend
- to RAM
-Date:   Wed, 11 Nov 2020 00:47:39 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: funtoos@yahoo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-210141-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 10 Nov 2020 19:47:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732174AbgKKAr5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Nov 2020 19:47:57 -0500
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 547D9C0613D1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 16:47:56 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id 199so210496qkg.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 16:47:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=oLRto+qDWLJa9FhjE4edpJRrOv0oDRszMESB9MnsU20=;
+        b=vX9hHb/askhRfwRXOgMhqSNdPFzaI/NYquYUoNmwglUnh/2sOyqclJbmqIk2glzoR+
+         JBnD/ZUeEnd65opFwqSgQH5SmHllRKPjm1drxGfzuneTt8M6MmkreY8bLSdoJgcg3eov
+         Qb1qm3SGDVYScwobzHrbjDp/SVMKLFt/FQaspCKowSwqayIf5XduYGbPg3RsCevrLL2Z
+         vFXsRAxq5PkwmgJVN7uWTlbPZQ869FZLKQnt8PCbbad+g2mYadEeBlErfuNnnYNqmSSi
+         +8aFDET1aw8ckjl1EBNevz/s2yuFH8fEMsVviRgnjhsiVqt66SNrIL5nDV6MRtpYwIoK
+         WRlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=oLRto+qDWLJa9FhjE4edpJRrOv0oDRszMESB9MnsU20=;
+        b=UVYHh++I9v2LR2ZIztkubEfazCYMSWhsnuaRvqXH+J4BFeNDIaOIP7WwnGH1NFfho0
+         IVqnJggVI3WpL76PUWujiXKCutJ6RMRkLCSNz3NuOSs7+F1/piHs/bCfZXEBgNAtvg36
+         JjLV+20ZvTzE9EEbqiu7xS1tmUDtK/t3sP82npMbTi50HU4+lB+yx/vZ/c6JRndEUp2I
+         BTTEepghMIIluN4nRleO0GZoCEBmeCnjU0d8JehdBvyRW4+vkTYohSo5IdHwq9kYEhkg
+         Vb4WD/DHKHMXLhRJ65S9tUa4ddxEvnk+aHpe4JyLsyOmeBHQRQ4CU22kQWl4K3oXc64v
+         Qwrg==
+X-Gm-Message-State: AOAM5309ui+3Cy/aYqJpMDFSkuGrJaJ3Q7dKKZWinzL4pQWLSHkzz5Tc
+        H87K9X+I0wYrFvc1PWbT+bDBaW3rmG2ptQ==
+X-Google-Smtp-Source: ABdhPJxE319Iofw5Xr3VmHRIEIMqRzKFqKcN5aVJ8O5DTh4EbLR5TpDs7RNt6g5SaIPMaB5p3CdA0A==
+X-Received: by 2002:a37:56c3:: with SMTP id k186mr18368774qkb.232.1605055675330;
+        Tue, 10 Nov 2020 16:47:55 -0800 (PST)
+Received: from [172.17.0.2] ([20.36.160.110])
+        by smtp.gmail.com with ESMTPSA id q11sm577821qtp.47.2020.11.10.16.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2020 16:47:54 -0800 (PST)
+Message-ID: <5fab34ba.1c69fb81.ff410.3013@mx.google.com>
+Date:   Tue, 10 Nov 2020 16:47:54 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3625078104966636215=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
+Subject: RE: Battery Provider API
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201111003720.1727-2-sonnysasaka@chromium.org>
+References: <20201111003720.1727-2-sonnysasaka@chromium.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210141
+--===============3625078104966636215==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-            Bug ID: 210141
-           Summary: Bluetooth device rtw_8822ce is lost after suspend to
-                    RAM
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.9.7
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: blocking
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: funtoos@yahoo.com
-        Regression: No
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MzgxNjAxCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+UGF0Y2ggLSBGQUlMCk91dHB1dDoKYmF0dGVyeTogQWRkIHRoZSBpbnRlcm5hbCBCYXR0ZXJ5IEFQ
+SQpFUlJPUjpJTklUSUFMSVNFRF9TVEFUSUM6IGRvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgdG8g
+TlVMTAojNzA6IEZJTEU6IHNyYy9iYXR0ZXJ5LmM6Mzc6CitzdGF0aWMgc3RydWN0IHF1ZXVlICpi
+YXR0ZXJpZXMgPSBOVUxMOwoKRVJST1I6T1BFTl9CUkFDRTogb3BlbiBicmFjZSAneycgZm9sbG93
+aW5nIGZ1bmN0aW9uIGRlZmluaXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzcyOiBGSUxFOiBz
+cmMvYmF0dGVyeS5jOjM5Ogorc3RhdGljIHZvaWQgYmF0dGVyeV9hZGQoc3RydWN0IGJ0ZF9iYXR0
+ZXJ5ICpiYXR0ZXJ5KSB7CgpFUlJPUjpPUEVOX0JSQUNFOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dp
+bmcgZnVuY3Rpb24gZGVmaW5pdGlvbnMgZ28gb24gdGhlIG5leHQgbGluZQojNzk6IEZJTEU6IHNy
+Yy9iYXR0ZXJ5LmM6NDY6CitzdGF0aWMgdm9pZCBiYXR0ZXJ5X3JlbW92ZShzdHJ1Y3QgYnRkX2Jh
+dHRlcnkgKmJhdHRlcnkpIHsKCi0gdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTIgbGlu
+ZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNr
+cGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5
+cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCiJbUEFUQ0hdIGJhdHRl
+cnk6IEFkZCB0aGUgaW50ZXJuYWwgQmF0dGVyeSBBUEkiIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0Ug
+Q09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdO
+X09GRiBQUkVGRVJfUEFDS0VEIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJ
+ZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAg
+ICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKdGVzdDogQWRkIHRlc3QgYXBwIGZvciBCYXR0ZXJ5IFByb3ZpZGVyIEFQSQpFUlJPUjpFWEVD
+VVRFX1BFUk1JU1NJT05TOiBkbyBub3Qgc2V0IGV4ZWN1dGUgcGVybWlzc2lvbnMgZm9yIHNvdXJj
+ZSBmaWxlcwojMTI6IEZJTEU6IHRlc3QvZXhhbXBsZS1iYXR0ZXJ5LXByb3ZpZGVyCgotIHRvdGFs
+OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjMwIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21l
+IG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAg
+IG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9y
+IC0tZml4LWlucGxhY2UuCgoiW1BBVENIXSB0ZXN0OiBBZGQgdGVzdCBhcHAgZm9yIEJhdHRlcnkg
+UHJvdmlkZXIgQVBJIiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJ
+Z25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1Rf
+U1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBT
+UExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMg
+YXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgojIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tHaXRMaW50IC0gUEFTUwoKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrQnVpbGQgLSBGQUlMCk91dHB1dDoKYXI6IGB1JyBt
+b2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6IGB1
+JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykKYXI6
+IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBVJykK
+YXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2VlIGBV
+JykKYXI6IGB1JyBtb2RpZmllciBpZ25vcmVkIHNpbmNlIGBEJyBpcyB0aGUgZGVmYXVsdCAoc2Vl
+IGBVJykKc3JjL2JhdHRlcnkuYzoxNTY6MjE6IGVycm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlv
+biBmb3Ig4oCYYnRkX2JhdHRlcnlfcmVnaXN0ZXLigJkgWy1XZXJyb3I9bWlzc2luZy1kZWNsYXJh
+dGlvbnNdCiAgMTU2IHwgc3RydWN0IGJ0ZF9iYXR0ZXJ5ICpidGRfYmF0dGVyeV9yZWdpc3Rlcihj
+b25zdCBjaGFyICpwYXRoLCBjb25zdCBjaGFyICpzb3VyY2UsCiAgICAgIHwgICAgICAgICAgICAg
+ICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvYmF0dGVyeS5jOjE5Mzo2OiBlcnJvcjog
+bm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0ZF9iYXR0ZXJ5X3VucmVnaXN0ZXLigJkg
+Wy1XZXJyb3I9bWlzc2luZy1kZWNsYXJhdGlvbnNdCiAgMTkzIHwgYm9vbCBidGRfYmF0dGVyeV91
+bnJlZ2lzdGVyKHN0cnVjdCBidGRfYmF0dGVyeSAqYmF0dGVyeSkKICAgICAgfCAgICAgIF5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL2JhdHRlcnkuYzoyMTc6NjogZXJyb3I6IG5vIHByZXZpb3Vz
+IGRlY2xhcmF0aW9uIGZvciDigJhidGRfYmF0dGVyeV91cGRhdGXigJkgWy1XZXJyb3I9bWlzc2lu
+Zy1kZWNsYXJhdGlvbnNdCiAgMjE3IHwgYm9vbCBidGRfYmF0dGVyeV91cGRhdGUoc3RydWN0IGJ0
+ZF9iYXR0ZXJ5ICpiYXR0ZXJ5LCB1aW50OF90IHBlcmNlbnRhZ2UpCiAgICAgIHwgICAgICBefn5+
+fn5+fn5+fn5+fn5+fn4Kc3JjL2JhdHRlcnkuYzogSW4gZnVuY3Rpb24g4oCYcmVnaXN0ZXJfYmF0
+dGVyeV9wcm92aWRlcuKAmToKc3JjL2JhdHRlcnkuYzo0NjM6MjogZXJyb3I6IElTTyBDOTAgZm9y
+YmlkcyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0
+ZXItc3RhdGVtZW50XQogIDQ2MyB8ICBzdHJ1Y3QgYmF0dGVyeV9wcm92aWRlciAqcHJvdmlkZXIg
+PQogICAgICB8ICBefn5+fn4Kc3JjL2JhdHRlcnkuYzogQXQgdG9wIGxldmVsOgpzcmMvYmF0dGVy
+eS5jOjUyODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmG1hbmFnZXJf
+ZnJlZeKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KICA1MjggfCB2b2lkIG1hbmFn
+ZXJfZnJlZShzdHJ1Y3QgYnRkX2JhdHRlcnlfcHJvdmlkZXJfbWFuYWdlciAqbWFuYWdlcikKICAg
+ICAgfCAgICAgIF5+fn5+fn5+fn5+fgpzcmMvYmF0dGVyeS5jOjU0MToxOiBlcnJvcjogbm8gcHJl
+dmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0ZF9iYXR0ZXJ5X3Byb3ZpZGVyX21hbmFnZXJfY3Jl
+YXRl4oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFyYXRpb25zXQogIDU0MSB8IGJ0ZF9iYXR0ZXJ5
+X3Byb3ZpZGVyX21hbmFnZXJfY3JlYXRlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKICAg
+ICAgfCBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvYmF0dGVyeS5jOjU2
+Nzo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0ZF9iYXR0ZXJ5X3By
+b3ZpZGVyX21hbmFnZXJfZGVzdHJveeKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10K
+ICA1NjcgfCB2b2lkIGJ0ZF9iYXR0ZXJ5X3Byb3ZpZGVyX21hbmFnZXJfZGVzdHJveSgKICAgICAg
+fCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJu
+aW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjkyODA6
+IHNyYy9ibHVldG9vdGhkLWJhdHRlcnkub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQw
+MjM6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBN
+YWtlQ2hlY2sgLSBTS0lQUEVECk91dHB1dDoKY2hlY2tidWlsZCBub3Qgc3VjY2VzcwoKCgotLS0K
+UmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-This is on an HP 14" laptop model: HP 14-dq1xxx with rtw_8822ce driver drives
-the wifi and bluetooth.
-
-So, everything works fine until I suspend to RAM. After waking from suspend,
-the bluetooth adapter just disappears. I can see in the 'dmesg' the USB device
-gets disconnected but no reason is mentioned.
-
-Before suspend:
-
-[    6.937836] usb 1-10: new full-speed USB device number 5 using xhci_hcd
-[    7.065627] usb 1-10: New USB device found, idVendor=0bda, idProduct=b00c,
-bcdDevice= 0.00
-[    7.065630] usb 1-10: New USB device strings: Mfr=1, Product=2,
-SerialNumber=3
-[    7.065632] usb 1-10: Product: Bluetooth Radio 
-[    7.065633] usb 1-10: Manufacturer: Realtek
-
-After resume, it is gone:
-
-[  329.512699] Restarting tasks ... done.
-[  329.515898] usb 1-10: USB disconnect, device number 5
-[  329.585469] PM: suspend exit
-[  329.585559] elogind-daemon[7406]: System resumed.
-
-# lspci
-00:00.0 Host bridge: Intel Corporation Device 8a02 (rev 03)
-00:02.0 VGA compatible controller: Intel Corporation Iris Plus Graphics G1 (Ice
-Lake) (rev 07)
-00:04.0 Signal processing controller: Intel Corporation Device 8a03 (rev 03)
-00:14.0 USB controller: Intel Corporation Ice Lake-LP USB 3.1 xHCI Host
-Controller (rev 30)
-00:14.2 RAM memory: Intel Corporation Device 34ef (rev 30)
-00:15.0 Serial bus controller [0c80]: Intel Corporation Ice Lake-LP Serial IO
-I2C Controller #0 (rev 30)
-00:15.1 Serial bus controller [0c80]: Intel Corporation Ice Lake-LP Serial IO
-I2C Controller #1 (rev 30)
-00:16.0 Communication controller: Intel Corporation Management Engine Interface
-(rev 30)
-00:17.0 RAID bus controller: Intel Corporation 82801 Mobile SATA Controller
-[RAID mode] (rev 30)
-00:1c.0 PCI bridge: Intel Corporation Device 34bf (rev 30)
-00:1f.0 ISA bridge: Intel Corporation Ice Lake-LP LPC Controller (rev 30)
-00:1f.3 Audio device: Intel Corporation Smart Sound Technology Audio Controller
-(rev 30)
-00:1f.4 SMBus: Intel Corporation Ice Lake-LP SMBus Controller (rev 30)
-00:1f.5 Serial bus controller [0c80]: Intel Corporation Ice Lake-LP SPI
-Controller (rev 30)
-01:00.0 Network controller: Realtek Semiconductor Co., Ltd. RTL8822CE 802.11ac
-PCIe Wireless Network Adapter
-
-# lsusb
-Bus 002 Device 002: ID 05e3:0626 Genesys Logic, Inc. USB3.1 Hub
-Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-Bus 001 Device 003: ID 13d3:56c9 IMC Networks HP TrueVision HD Camera
-Bus 001 Device 008: ID 046d:c52b Logitech, Inc. Unifying Receiver
-Bus 001 Device 007: ID 413c:2011 Dell Computer Corp. Multimedia Pro Keyboard
-Bus 001 Device 006: ID 413c:1005 Dell Computer Corp. Multimedia Pro Keyboard
-Hub
-Bus 001 Device 004: ID 0c45:64ab Microdia Integrated Camera
-Bus 001 Device 002: ID 05e3:0610 Genesys Logic, Inc. Hub
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-Device 5 is gone from lsusb.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+--===============3625078104966636215==--
