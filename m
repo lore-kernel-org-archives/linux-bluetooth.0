@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00B1C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58379C56201
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A034C205ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBB002076E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 01:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZA5C5TAJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KiHl9Rrs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728565AbgKLBdQ (ORCPT
+        id S1728558AbgKLBdP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 20:33:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57856 "EHLO
+        Wed, 11 Nov 2020 20:33:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727790AbgKKXG3 (ORCPT
+        with ESMTP id S1727798AbgKKXG3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 11 Nov 2020 18:06:29 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3437AC061A4A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:35 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id k7so1769632plk.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:35 -0800 (PST)
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B680C061A48
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:33 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id r186so2515822pgr.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 15:04:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=83p4V2mr5pRBnhwAKvGaj5JJU8zNRKrOY+gpm6vhs1c=;
-        b=ZA5C5TAJA6I+ikGjRKPBEnIT/b23oToZRItTUcJ7mHTo9h8Qjhe71lznltYqjkbhB9
-         JkZ/vYqdvArMgOpCaFn8b/ouu5jQov6DkOruh87NgPg77Z6l+xvEOjuPsneGiaN4H/xS
-         7VOSYljEZ+/PjuEa8fhotQpVQ6BCJvavI6/dLWJLZ0tR8VNS1u41CAN3dccSk272gC+Z
-         VJCSvbdDhZxFUISS6mkyhEnVf6HTN4Q7pMqv8sGO3vl8djevnH6tWeHkdoU9JG1DDrzS
-         CRAox9tAlxDxRi733lKn7TfZzJ3Um+54wNUHChu8yLi9sWXNAgru65rWocJFk4ZYrjxQ
-         wMLw==
+        bh=nmK9sTU3Y2ZaVXAhCNryT5bZnp8+Duh8MrQV2hMbzXs=;
+        b=KiHl9RrsD+wlut3vZGF7w3E9JYOWvjq9p4LWVH8jtyHZ2Y8xw8ZSKD2BtPdlMZj15x
+         gE7sqpVJ7OzaHdR8L9ZMdjzdn7LJedUz/t09KMR2xKgNJqI7JVe6JiJUwTnaISJFyple
+         KXvkjzZ3PBmTtvFD1lSr5K+EC0RQgdjRSSrtnITTi+H4FrMS5HcHvRAPqOU3dRbTDcZj
+         fimi/YCEXD2RmAUicEGN/cr0WjOgyrtX5AGAlwFLK8vwzL/WjSxIqOQL03mgaHN/wJJh
+         QPIbunirMItS/2dsME452Yl0HP/UbpbvOJxQPmLwlYbYHxOoOWBS8kL4gKwBZcMRtuQV
+         rmyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=83p4V2mr5pRBnhwAKvGaj5JJU8zNRKrOY+gpm6vhs1c=;
-        b=B3mhj0Gtb08g9ionVsr7cFJAsvurdPEvf0cseojgA45WASh5SVTe27tnfRRbxOW5te
-         1cT+7jtIUBys04OgZccGaUzj7Aa6CjXTeHhazH/Lp1mNu50ZHUqzsmjH1LZ9M+OXj522
-         vmcYE+O4z5oaToQHjWVec4Jamsd+AIaP1kw4ewFH+VgJ/v6Fp669P9N8mIKbmqhNrXfX
-         VP5joKU8r5qlAbX3kiZd57qDLNA7M7VBoWQkLl0kom1lrNSBV1YLGKBi2DvvF49Y0qpP
-         CDjamTRHYauIz0UZBzyAFgU2bC6BMM9E0DHgt9S5OTGf4BNW1CJ53YuO3FwSv9LJZcWW
-         QY7Q==
-X-Gm-Message-State: AOAM532qPgn4kjgApjM/kGo9MlWSbiGga91IfjL2oez5ArHQjgQg/alH
-        TwTa7mej6etKB3w+816ZkuTgn/21eCp+wA==
-X-Google-Smtp-Source: ABdhPJzf1L1UHYYgSeZHtS2cS0QjebiNNC4P5zIyMYnERjASN7C+wA6ZoJJ6LEtN00c+l3kvrleePw==
-X-Received: by 2002:a17:902:b688:b029:d6:ad52:ffab with SMTP id c8-20020a170902b688b02900d6ad52ffabmr12647461pls.61.1605135874525;
-        Wed, 11 Nov 2020 15:04:34 -0800 (PST)
+        bh=nmK9sTU3Y2ZaVXAhCNryT5bZnp8+Duh8MrQV2hMbzXs=;
+        b=V9BGy5zghrze4mK7rcOVns83EJKwE1Aer7DXFpoQ/oeJVWYw20pYy23oePha+Vlozt
+         q2CtLShfVnMJ5U1PfOC377pA4VnaWzDWrninHnvyZ4R9OpRK6dlgBAGZRkro50ChtRbM
+         U/1zKKZPfQBV2yBFyd1z+08Mw5LLnbaX+WyAGogiHHxDyQJSgMlhwVmeAtxUz1WQaBP0
+         7rAXjS7BAKkEEoy+P2gz1wkbR3gayQycjsE3y40ZGLk7JvEkhwWKGTGgIVOTIsbO7t1S
+         Nun0OELLPw8p0peYtTtdYDHSrxzVlMGDUoPTWT/r9QoCGYOt9MAPliEMAjFAPtuCCged
+         RDMw==
+X-Gm-Message-State: AOAM530xhRrOlNLzX63R1SPWiJteClRes5j0Yx57C/PX8jF+OlhrCS5g
+        7kciHy93Xthutbte7NM3SRErMF2waxIRMQ==
+X-Google-Smtp-Source: ABdhPJz+9MN6fSv19A9U8ZT4mJ8rPZynaF1HjfX+tsHESnb8S6haDB4VUcFrg5iKmoKi8j3D2o9vpQ==
+X-Received: by 2002:aa7:83c9:0:b029:158:11ce:4672 with SMTP id j9-20020aa783c90000b029015811ce4672mr24916131pfn.23.1605135872567;
+        Wed, 11 Nov 2020 15:04:32 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n27sm3867767pfq.59.2020.11.11.15.04.33
+        by smtp.gmail.com with ESMTPSA id n27sm3867767pfq.59.2020.11.11.15.04.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2020 15:04:33 -0800 (PST)
+        Wed, 11 Nov 2020 15:04:31 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/10] hciemu: Fix crash when test is aborted during pre setup
-Date:   Wed, 11 Nov 2020 15:04:20 -0800
-Message-Id: <20201111230421.3364932-10-luiz.dentz@gmail.com>
+Subject: [PATCH v2 07/10] mgmt-tester: Print unexpected command responses
+Date:   Wed, 11 Nov 2020 15:04:18 -0800
+Message-Id: <20201111230421.3364932-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201111230421.3364932-1-luiz.dentz@gmail.com>
 References: <20201111230421.3364932-1-luiz.dentz@gmail.com>
@@ -77,70 +77,26 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the tester_pre_setup_failed is called all timeout related to the
-test must be cancelled as the test should have been freed by the
-application and the next test is about to start.
+This prints the difference between the command response and the
+expected command response to make it easier to debug.
 ---
- emulator/hciemu.c   | 8 +++++++-
- src/shared/tester.c | 5 +++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ tools/mgmt-tester.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index fd6029deb..961de6359 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -43,6 +43,7 @@ struct hciemu {
- 	guint host_source;
- 	guint master_source;
- 	guint client_source;
-+	guint start_source;
- 	struct queue *post_command_hooks;
- 	char bdaddr_str[18];
- 
-@@ -297,6 +298,8 @@ static gboolean start_stack(gpointer user_data)
- {
- 	struct hciemu *hciemu = user_data;
- 
-+	hciemu->start_source = 0;
-+
- 	bthost_start(hciemu->host_stack);
- 
- 	return FALSE;
-@@ -353,7 +356,7 @@ struct hciemu *hciemu_new(enum hciemu_type type)
- 		return NULL;
- 	}
- 
--	g_idle_add(start_stack, hciemu);
-+	hciemu->start_source = g_idle_add(start_stack, hciemu);
- 
- 	return hciemu_ref(hciemu);
- }
-@@ -378,6 +381,9 @@ void hciemu_unref(struct hciemu *hciemu)
- 
- 	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
- 
-+	if (hciemu->start_source)
-+		g_source_remove(hciemu->start_source);
-+
- 	g_source_remove(hciemu->host_source);
- 	g_source_remove(hciemu->client_source);
- 	g_source_remove(hciemu->master_source);
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 0c31e8b1c..af33a79cd 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -541,6 +541,11 @@ void tester_pre_setup_failed(void)
- 	if (test->stage != TEST_STAGE_PRE_SETUP)
- 		return;
- 
-+	if (test->timeout_id > 0) {
-+		g_source_remove(test->timeout_id);
-+		test->timeout_id = 0;
-+	}
-+
- 	print_progress(test->name, COLOR_RED, "pre setup failed");
- 
- 	g_idle_add(done_callback, test);
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index a5bfa1ce1..bb8eb578c 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -6315,6 +6315,9 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 		if (expect_param && expect_len > 0 &&
+ 					memcmp(param, expect_param, length)) {
+ 			tester_warn("Unexpected cmd response parameter value");
++			util_hexdump('>', param, length, print_debug, "");
++			util_hexdump('!', expect_param, length, print_debug,
++								"");
+ 			tester_test_failed();
+ 			return;
+ 		}
 -- 
 2.26.2
 
