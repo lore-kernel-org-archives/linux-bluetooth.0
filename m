@@ -2,133 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBE8C55ABD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 22:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748C4C388F7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:37:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56C2B2074B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Nov 2020 22:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 065B8221F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 00:37:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/M36lQ6"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ObqqyTR7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732196AbgKJW0K (ORCPT
+        id S1732235AbgKKAhk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Nov 2020 17:26:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50736 "EHLO
+        Tue, 10 Nov 2020 19:37:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731919AbgKJW0J (ORCPT
+        with ESMTP id S1732213AbgKKAhj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Nov 2020 17:26:09 -0500
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D1B0C0613D1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 14:26:08 -0800 (PST)
-Received: by mail-qt1-x834.google.com with SMTP id i12so9856485qtj.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 14:26:08 -0800 (PST)
+        Tue, 10 Nov 2020 19:37:39 -0500
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3D0C0613D1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 16:37:38 -0800 (PST)
+Received: by mail-pf1-x441.google.com with SMTP id q10so468003pfn.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 16:37:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=hCAMeKEKKokxHyHUOi8qYlA1ZqZRjCtfv5gyF32v/hs=;
-        b=R/M36lQ6g0he0z3FzxcrXTwJRgfj6ul9PQxm0rIlNMIkPuGphY0C8b0psinfL7uJ2Q
-         Kt0NgocnsITAiaDogtuuYwTvGssYaEfwZpyBXWvKMWb8MK9Z7bt2I4j0ynGWWh0pZo6F
-         ZIXNTIac3XOAzPMY5aicAtC6S8W/s0V7rMMkHUfp/gtI9J+9RUntjvj5DE4jJDBMGI7x
-         FwQ25lumigpmHr/2bqB1ao12HMdYBPk9mISkqJ2eKYQWRVV4tRF/vLA0Nex3H48CRIIu
-         nvmUMxJ+QVkLnJ64ca7dhAg0SAu/zbfril5p5pUerCtcmE0uneZQrWUgCgqJFNPXoPK3
-         YFgg==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9hRqRMyL+AzvEMmu5hr5eKBiDaSSQBxLBJXxmPAp2yE=;
+        b=ObqqyTR74lUG1ZoeuL13SS0+REKbyD8yMSSSvf/2hKJ+dZbwfvy8DA8c1nxy5ZiSOu
+         KiaNpe7O+kJ9RisFgJPv636YLTNjhXCnSwjIuzsGd/g2gCVH5Ayxzz7iecsBvTUYXXko
+         4IXcXcLfotQanJ6T0PfSGbRs4i71zYoD4gx9o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=hCAMeKEKKokxHyHUOi8qYlA1ZqZRjCtfv5gyF32v/hs=;
-        b=YdLfGNaZCznvsyugDlko5r88M93tZnobmRikxxjsZklhm0/09qMr0PvQjLS4mRO2D+
-         w1jqkSp1XZTF+rRBG6BtuedK5epOB6LfUwurSyRQlm9WrIdHgUJcBvWldM1nW1vCBQ3x
-         QiIoLGpQ7z65gxJtCCv4cPYymbB/qwMS6vVOzT1S84NKboRs41pRSUTM6CiHJlgjm5Nq
-         2BS0qp6IpHu78Nv7VPS0ylwG1pD+fNexsbCIV4letYQFyUNmJKzfz2VIv+4JZH+Nshdq
-         CSNMkGXteyhcVr6vEZlX85Wl1fEM7jrK+N1jkVQYDoyWVtuEKyxKhXVAuZAgR+yVlm/6
-         ejyQ==
-X-Gm-Message-State: AOAM530OfW+LMiVdLm0o5cnF9CRFcaHxhW5oY8T+DVDna7ZXfr2OAR0T
-        jUQT/ei16geA0Rh6jDd5SgRnm3kk/jumqA==
-X-Google-Smtp-Source: ABdhPJx4cmP9eDdP5RsfPCh90iJqfBSC3uL7b9qDKVMvyYtUUCHUG2nH8BwWAv+IUGokOJAbMR8gWw==
-X-Received: by 2002:ac8:23fb:: with SMTP id r56mr19672139qtr.371.1605047167403;
-        Tue, 10 Nov 2020 14:26:07 -0800 (PST)
-Received: from [172.17.0.2] ([52.177.179.0])
-        by smtp.gmail.com with ESMTPSA id g70sm213953qke.8.2020.11.10.14.26.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2020 14:26:07 -0800 (PST)
-Message-ID: <5fab137f.1c69fb81.51a46.129b@mx.google.com>
-Date:   Tue, 10 Nov 2020 14:26:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3856725255871919160=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9hRqRMyL+AzvEMmu5hr5eKBiDaSSQBxLBJXxmPAp2yE=;
+        b=J73udS2yVOKuuPF6yn6Z7W1xLSv4djKCsrGpxlEfBmto28vVbIvSsj7PdKy2s08mzn
+         cjfoGddhz3ODqgZ4RjyX6ebt82OpZzJdMbUTW2YR2o6oO7AJe1rgnLp+OwNwhesWXsHW
+         rZ4H+VF1zIM5y03sTcwgC8JUx+qPl4jTJD+ZNz/MpNtoJXmdJtxgpm6w5QbFOa+u0upR
+         lQZm5nxVPmepq+7FXrFZnc8Q2IxYBEuEIQOlQeP+m9fN3oH1IVsYoWUeKh+48nqlwmHz
+         +SC1MQuInvTQsX7TZqbgPQJH4ViSnMqGPc5Ft893mx3yJLKuRCGrin7a8yV9CfK6Jzny
+         zVoQ==
+X-Gm-Message-State: AOAM532ReUZ4QLr/TzYh7xbT4Kc6Z+Clwqd/gdab8Wn905VaAyUC34UF
+        PZ+hNShdWP2YXB/a42XpiNQ8egnu9hxZOw==
+X-Google-Smtp-Source: ABdhPJx7juA+8hwZEs47c9hmAgPjYtk+o7SRwWHS1/0D8KAT9/MoES3UhmCKtcvogY5lgG2jHWs/eg==
+X-Received: by 2002:a17:90b:784:: with SMTP id l4mr916731pjz.146.1605055057746;
+        Tue, 10 Nov 2020 16:37:37 -0800 (PST)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
+        by smtp.gmail.com with ESMTPSA id b16sm180655pju.16.2020.11.10.16.37.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 10 Nov 2020 16:37:37 -0800 (PST)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ 0/7] Battery Provider API
+Date:   Tue, 10 Nov 2020 16:37:13 -0800
+Message-Id: <20201111003720.1727-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] emulator: Rework command handling
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201110214205.3092997-1-luiz.dentz@gmail.com>
-References: <20201110214205.3092997-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3856725255871919160==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi BlueZ Maintainers,
 
-This is automated email and please do not reply to this email!
+This is a patch series that introduces Battery Provider API, a means for
+external clients to feed battery reporting to BlueZ if they can decode
+it from a profile/protocol. A sample use case would be for HFP handlers
+(e.g. pulseaudio commonly in Linux system or CRAS in Chrome OS) that has
+the battery information reported via HFP extensions.
 
-Dear submitter,
+This patch series also refactors the existing battery API to be split
+into internal API rather than GATT BAS specific. This way internal
+plugins can also make use of convenient functions to reliable register
+battery objects.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=381525
+The battery information is then exposed via the existing Battery1 API.
+Many UI components already consume this so they will be able to display
+many Bluetooth peripherals' battery information via a unified BlueZ API.
 
----Test result---
+Sonny Sasaka (7):
+  battery: Add the internal Battery API
+  profiles/battery: Refactor to use battery library
+  battery: Add Source property to Battery API
+  doc: Add Battery Provider API doc
+  test: Add test app for Battery Provider API
+  adapter: Add a public function to find a device by path
+  battery: Implement Battery Provider API
 
-##############################
-Test: CheckPatch - FAIL
-Output:
-emulator: Rework command handling
-ERROR:SPACING: need consistent spacing around '-' (ctx:WxV)
-#100: FILE: emulator/btdev.c:336:
-+	if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, iov[i -1].iov_base,
- 	                                                        ^
+ Makefile.am                   |   3 +-
+ doc/battery-api.txt           |  55 ++++
+ profiles/battery/battery.c    |  52 +--
+ src/adapter.c                 |  44 ++-
+ src/adapter.h                 |   2 +
+ src/battery.c                 | 580 ++++++++++++++++++++++++++++++++++
+ src/battery.h                 |  22 ++
+ test/example-battery-provider | 230 ++++++++++++++
+ 8 files changed, 942 insertions(+), 46 deletions(-)
+ create mode 100644 src/battery.c
+ create mode 100644 src/battery.h
+ create mode 100755 test/example-battery-provider
 
-ERROR:SPACING: need consistent spacing around '-' (ctx:WxV)
-#101: FILE: emulator/btdev.c:337:
-+							iov[i -1].iov_len))
- 							      ^
+-- 
+2.26.2
 
-- total: 2 errors, 0 warnings, 7681 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] emulator: Rework command handling" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3856725255871919160==--
