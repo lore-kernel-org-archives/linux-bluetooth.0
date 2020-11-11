@@ -2,173 +2,245 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC557C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 14:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC68C4742C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 17:49:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C8A82074B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 14:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D47FE2072C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 17:49:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oye/pQNb"
+	dkim=pass (2048-bit key) header.d=doubly.so header.i=@doubly.so header.b="u42HclEq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726725AbgKKOOi (ORCPT
+        id S1726925AbgKKRtp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 09:14:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60328 "EHLO
+        Wed, 11 Nov 2020 12:49:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726647AbgKKOOd (ORCPT
+        with ESMTP id S1725933AbgKKRto (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 09:14:33 -0500
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216EBC0613D1;
-        Wed, 11 Nov 2020 06:14:33 -0800 (PST)
-Received: by mail-qv1-xf41.google.com with SMTP id dj6so936638qvb.3;
-        Wed, 11 Nov 2020 06:14:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=+uOO1jG6R6/kmtXI81fJp8TFDMqWgjiBfjiGKiiaI+k=;
-        b=Oye/pQNbGK8s347l0OM9EuuqNiNFlxLHIVrKHS05RdEZQ9PGSaR9vw+fgkh7yUeoao
-         GtQr++RHGME5XvkvNqq9hVDn2iT6IUMAFAr4g9fQYjed5Q0MhM8aQPJalYVAfye+X1oL
-         n6j8zeuUUCS2K12TfEZxxIdyPYBuitCCbwYH5hHP0tARzXRcqTipxB4ZrS4dIKcLcJio
-         ESXTUpQFvLK+xMlNdZ67UDGAjpJDWOrFiQYTdE8sL7QXhkYwFhBFs3msMf6tS+rQleaP
-         HJJO3ITSMtOmSJVUDuVRmpGXqQqrxMng8RyfRK872XvDrSBelNAivbBhfPbLt0J5T19N
-         idmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=+uOO1jG6R6/kmtXI81fJp8TFDMqWgjiBfjiGKiiaI+k=;
-        b=LYXZg1rgON2X+zdwlSGar9+5ln0qEAGs5RtCgm4EhsHd/QbQjvZpFB8eBnKKhnRWpp
-         WXaBpR00myiDKn4EQSuplm3nB9YEUJNlIKiiOaxWU1TiwsCy/clCQNL+02SA1njCbENE
-         3SYrXjGrL+isC6ZWXQBgXmd7ip6W3KKUNUenizcrk1RULGM9rBCYYy2pToqNxC+LcmeU
-         hfUDGRoO95E63NxcyjYZDFJoLjwsLm7UPkypaVW2wDl3zC4lCQ3oWqD/fjD2IO19+WKy
-         61F8j1C9CVneHFrHHbidfo8MOAmRjtFMupPooxhdSx87ptK8jBECqqdkuixGKQjGBJk2
-         i/xg==
-X-Gm-Message-State: AOAM530kZvTo6CBQ2nZlLfSwHeMRSTpjF4ev4dO5JFAIS4YM9gLWnXpU
-        JQUoYcF9wrOTqiYvhbgh/SYwlPncCxa0NYHTcNs=
-X-Google-Smtp-Source: ABdhPJz7bSEACiPKTiuodSTNM19EZ7bMCoGaphBKa/uqbrmvVhhkGH7C0cZF/xycSHQ6CoSCiYpKGw==
-X-Received: by 2002:ad4:4142:: with SMTP id z2mr12177814qvp.48.1605104072162;
-        Wed, 11 Nov 2020 06:14:32 -0800 (PST)
-Received: from fedora-project (cpe-68-173-33-86.nyc.res.rr.com. [68.173.33.86])
-        by smtp.gmail.com with ESMTPSA id 199sm2103332qkm.62.2020.11.11.06.14.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2020 06:14:31 -0800 (PST)
-Date:   Wed, 11 Nov 2020 09:14:29 -0500
-From:   Nigel Christian <nigel.l.christian@gmail.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, kernel-janitors@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH][v2] Bluetooth: hci_qca: resolve various warnings
-Message-ID: <20201111141429.GA3821@fedora-project>
-References: <20201111045538.GA90261@fedora-project>
- <187b1016-06cf-9f6c-eeac-4bac8c970d58@wanadoo.fr>
+        Wed, 11 Nov 2020 12:49:44 -0500
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [IPv6:2001:67c:2050::465:101])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0223C0613D1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 09:49:44 -0800 (PST)
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4CWXLB1qlZzQlLY
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2020 18:49:38 +0100 (CET)
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=doubly.so; s=MBO0001;
+        t=1605116976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kJDLXWltpms+dqRzEecHjuGf9Up0lyL4pwgly4dY718=;
+        b=u42HclEqJNlIi/urY/NQzyQn5q4fG/oZK3tCpr+/+M15pVJZgZqGRIqhQekzVW3z6btMxU
+        CnMqiFkNHy/0nYMIdYJidHMghCD5aLuKL92MJP9pJe1Pwt5XBsIneWSUr44rIoA0kho7me
+        Fl1914UGUKynVx3mnwAzxijXN+hYxpcTbcD2oFmVhB0di7as9LQLvatzow4m4C0BHme7an
+        NJRXmPi0jaeXsZr6kxubBLa29+x+VzrUcyIZJsIKcGMRwFqE9umUDYOCSqMAJGVPzhW57U
+        vpAiwIYCeeZPl4auGT3E85YFLDAnWHxrCQC4UC3h0MI2CPN9bjsaivf1KhYOfA==
+Received: from smtp1.mailbox.org ([80.241.60.240])
+        by spamfilter02.heinlein-hosting.de (spamfilter02.heinlein-hosting.de [80.241.56.116]) (amavisd-new, port 10030)
+        with ESMTP id YctHdFxXM4Ie for <linux-bluetooth@vger.kernel.org>;
+        Wed, 11 Nov 2020 18:49:35 +0100 (CET)
+To:     linux-bluetooth@vger.kernel.org
+From:   Devin Bayer <dev@doubly.so>
+Subject: LE Advertising: Command Disallowed
+Message-ID: <d343e320-b368-e85b-d428-d5c000eb69df@doubly.so>
+Date:   Wed, 11 Nov 2020 18:49:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <187b1016-06cf-9f6c-eeac-4bac8c970d58@wanadoo.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-MBO-SPAM-Probability: 
+X-Rspamd-Score: -4.87 / 15.00 / 15.00
+X-Rspamd-Queue-Id: 35792181E
+X-Rspamd-UID: a9b966
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 11:47:48AM +0100, Christophe JAILLET wrote:
-> Le 11/11/2020 à 05:55, Nigel Christian a écrit :
-> > Replace symbolic permissions with octal values. Use usleep_range
-> > for small msec values due to the fact that msleep() less than
-> > 20ms may have unexpected behavior/sleep longer.
-> > 
-> > - https://lkml.org/lkml/2016/8/2/1945
-> > - Documentation/timers/timers-howto.rst
-> > 
-> > Signed-off-by: Nigel Christian <nigel.l.christian@gmail.com>
-> > ---
-> >   drivers/bluetooth/hci_qca.c | 8 ++++----
-> >   1 file changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index 2d3f1f179a1e..039fb117bd8f 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -631,7 +631,7 @@ static void qca_debugfs_init(struct hci_dev *hdev)
-> >   	ibs_dir = debugfs_create_dir("ibs", hdev->debugfs);
-> >   	/* read only */
-> > -	mode = S_IRUGO;
-> > +	mode = 0444;
-> >   	debugfs_create_u8("tx_ibs_state", mode, ibs_dir, &qca->tx_ibs_state);
-> >   	debugfs_create_u8("rx_ibs_state", mode, ibs_dir, &qca->rx_ibs_state);
-> >   	debugfs_create_u64("ibs_sent_sleeps", mode, ibs_dir,
-> > @@ -658,7 +658,7 @@ static void qca_debugfs_init(struct hci_dev *hdev)
-> >   	debugfs_create_u32("vote_off_ms", mode, ibs_dir, &qca->vote_off_ms);
-> >   	/* read/write */
-> > -	mode = S_IRUGO | S_IWUSR;
-> > +	mode = 0644;
-> >   	debugfs_create_u32("wake_retrans", mode, ibs_dir, &qca->wake_retrans);
-> >   	debugfs_create_u32("tx_idle_delay", mode, ibs_dir,
-> >   			   &qca->tx_idle_delay);
-> > @@ -1302,7 +1302,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
-> >   	/* Give the controller time to process the request */
-> >   	if (qca_is_wcn399x(qca_soc_type(hu)))
-> > -		msleep(10);
-> > +		usleep_range(1000, 10000);
-> This...
-> >   	else
-> >   		msleep(300);
-> > @@ -1350,7 +1350,7 @@ static int qca_send_power_pulse(struct hci_uart *hu, bool on)
-> >   	if (on)
-> >   		msleep(100);
-> >   	else
-> > -		msleep(10);
-> > +		usleep_range(1000, 10000);
-> and this change change a delay which is expected to be 10 ms, and will
-> likely be ~20 ms, into a delay which can be down to 1 ms.
-> Is it intended or tested?
-> 
-> I've not looked at the datasheet, but it looks spurious.
-> 
-> Just my 2c.
-> 
-> CJ
-> 
-> >   	return 0;
-> >   }
-> > 
-> 
+Hello,
 
-I see, so usleep_range(10000, 11000) so that the 10ms minimum is maintained
-closer to the intended delay? Testing with info below:
+I am trying to figure out why I'm getting "Command Disallowed" for the HCI
+commands "LE Set Advertise Enable" and "LE Set Advertising Parameters". I've
+been trying for a few days to get a GATT service running; first with the D-BUS
+API, which occasionally worked but was very unstable. Now I'm trying with HCI
+directly with the pybleno / bleno libraries.
 
-Pixel 3a bluetooth tether
-TOZO-T10-R bluetooth earbuds
+I have bluetoothd disabled and I have tried an `hciconfig reset` and reboot.
+Unsure what else I can do, I'm asking here.
 
-Fedora 33
-Kernel version = 5.10.0-rc3-next-20201110
-System         = ASUSTeK COMPUTER INC. 1.0        UX330UAK
-BIOS           = UX330UAK.302
-Boot mode      = UEFI
-CPU model      = Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+The errors are these:
 
-dmesg -t -k > 
+> HCI Event: Command Complete (0x0e) plen 4      #14 [hci0] 3.406377
+      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+        Status: Command Disallowed (0x0c)
 
-Bluetooth: Core ver 2.22
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: SCO socket layer initialized
-Bluetooth: hci0: Firmware revision 0.0 build 10 week 41 2018
-Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-Bluetooth: BNEP filters: protocol multicast
-Bluetooth: BNEP socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM ver 1.11
+> HCI Event: Command Complete (0x0e) plen 4      #16 [hci0] 3.407380
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+        Status: Command Disallowed (0x0c)
 
+The complete log follows:
 
+Bluetooth monitor ver 5.53
+= Note: Linux version 5.8.0-26-generic (x86_64)             0.408833
+= Note: Bluetooth subsystem version 2.22                    0.408835
+= New Index: DC:FB:48:24:13:5E (Primary,USB,hci0)    [hci0] 0.408836
+= Open Index: DC:FB:48:24:13:5E                      [hci0] 0.408836
+= Index Info: DC:FB:48:24:13:5E (Intel Corp.)        [hci0] 0.408837
+@ MGMT Open: btmon (privileged) version 1.17       {0x0001} 0.408979
+@ RAW Open: py.. (privileged) version 2.22  {0x0002} [hci0] 1.487478
+< HCI Command: Set Event... (0x03|0x0001) plen 8  #1 [hci0] 1.487682
+        Mask: 0x3dbff807fffbffff
+          Inquiry Complete
+          Inquiry Result
+          Connection Complete
+          Connection Request
+          Disconnection Complete
+          Authentication Complete
+          Remote Name Request Complete
+          Encryption Change
+          Change Connection Link Key Complete
+          Master Link Key Complete
+          Read Remote Supported Features Complete
+          Read Remote Version Information Complete
+          QoS Setup Complete
+          Command Complete
+          Command Status
+          Hardware Error
+          Flush Occurred
+          Role Change
+          Mode Change
+          Return Link Keys
+          PIN Code Request
+          Link Key Request
+          Link Key Notification
+          Loopback Command
+          Data Buffer Overflow
+          Max Slots Change
+          Read Clock Offset Complete
+          Connection Packet Type Changed
+          QoS Violation
+          Page Scan Mode Change
+          Page Scan Repetition Mode Change
+          Flow Specification Complete
+          Inquiry Result with RSSI
+          Read Remote Extended Features Complete
+          Synchronous Connection Complete
+          Synchronous Connection Changed
+          Sniff Subrating
+          Extended Inquiry Result
+          Encryption Key Refresh Complete
+          IO Capability Request
+          IO Capability Request Reply
+          User Confirmation Request
+          User Passkey Request
+          Remote OOB Data Request
+          Simple Pairing Complete
+          Link Supervision Timeout Changed
+          Enhanced Flush Complete
+          User Passkey Notification
+          Keypress Notification
+          Remote Host Supported Features Notification
+          LE Meta
+> HCI Event: Command Complete (0x0e) plen 4       #2 [hci0] 1.605102
+      Set Event Mask (0x03|0x0001) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Eve.. (0x08|0x0001) plen 8  #3 [hci0] 1.605163
+        Mask: 0x000000000000001f
+          LE Connection Complete
+          LE Advertising Report
+          LE Connection Update Complete
+          LE Read Remote Used Features Complete
+          LE Long Term Key Request
+> HCI Event: Command Complete (0x0e) plen 4       #4 [hci0] 1.605858
+      LE Set Event Mask (0x08|0x0001) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Read Local.. (0x04|0x0001) plen 0  #5 [hci0] 1.605905
+> HCI Event: Command Complete (0x0e) plen 12      #6 [hci0] 1.606854
+      Read Local Version Information (0x04|0x0001) ncmd 1
+        Status: Success (0x00)
+        HCI version: Bluetooth 5.1 (0x0a) - Revision 256 (0x0100)
+        LMP version: Bluetooth 5.1 (0x0a) - Subversion 256 (0x0100)
+        Manufacturer: Intel Corp. (2)
+< HCI Command: Write LE H.. (0x03|0x006d) plen 2  #7 [hci0] 1.606900
+        Supported: 0x01
+        Simultaneous: 0x00
+> HCI Event: Command Complete (0x0e) plen 4       #8 [hci0] 1.607854
+      Write LE Host Supported (0x03|0x006d) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Read LE Ho.. (0x03|0x006c) plen 0  #9 [hci0] 1.607863
+> HCI Event: Command Complete (0x0e) plen 6      #10 [hci0] 1.608862
+      Read LE Host Supported (0x03|0x006c) ncmd 1
+        Status: Success (0x00)
+        Supported: 0x01
+        Simultaneous: 0x00
+< HCI Command: Read BD A.. (0x04|0x0009) plen 0  #11 [hci0] 1.608916
+> HCI Event: Command Complete (0x0e) plen 10     #12 [hci0] 1.610004
+      Read BD ADDR (0x04|0x0009) ncmd 1
+        Status: Success (0x00)
+        Address: DC:FB:48:24:13:5E (Intel Corporate)
+< HCI Command: LE Set Ad.. (0x08|0x000a) plen 1  #13 [hci0] 1.610132
+        Advertising: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4      #14 [hci0] 1.610811
+      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set A.. (0x08|0x0006) plen 15  #15 [hci0] 1.610893
+        Min advertising interval: 100.000 msec (0x00a0)
+        Max advertising interval: 100.000 msec (0x00a0)
+        Type: Connectable undirected - ADV_IND (0x00)
+        Own address type: Public (0x00)
+        Direct address type: Public (0x00)
+        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Channel map: 37, 38, 39 (0x07)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from
+Any (0x00)
+> HCI Event: Command Complete (0x0e) plen 4      #16 [hci0] 1.611979
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set S.. (0x08|0x0009) plen 32  #17 [hci0] 1.612322
+        Length: 6
+        Name (short): echo
+> HCI Event: Command Complete (0x0e) plen 4      #18 [hci0] 1.612880
+      LE Set Scan Response Data (0x08|0x0009) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set A.. (0x08|0x0008) plen 32  #19 [hci0] 1.613007
+        Length: 7
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        16-bit Service UUIDs (complete): 1 entry
+          Unknown (0xec00)
+> HCI Event: Command Complete (0x0e) plen 4      #20 [hci0] 1.613980
+      LE Set Advertising Data (0x08|0x0008) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set Ad.. (0x08|0x000a) plen 1  #21 [hci0] 1.614025
+        Advertising: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4      #22 [hci0] 1.614830
+      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set S.. (0x08|0x0009) plen 32  #23 [hci0] 1.614913
+        Length: 6
+        Name (short): echo
+> HCI Event: Command Complete (0x0e) plen 4      #24 [hci0] 1.615974
+      LE Set Scan Response Data (0x08|0x0009) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: LE Set A.. (0x08|0x0008) plen 32  #25 [hci0] 1.616018
+        Length: 7
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        16-bit Service UUIDs (complete): 1 entry
+          Unknown (0xec00)
+> HCI Event: Command Complete (0x0e) plen 4      #26 [hci0] 1.616985
+      LE Set Advertising Data (0x08|0x0008) ncmd 1
+        Status: Command Disallowed (0x0c)
+
+Any help / pointers is much appreciated.
+
+~ Dev
