@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D32C1C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF8CC5517A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:20:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E7B620756
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28BDC2074B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:20:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726309AbgKKLSV convert rfc822-to-8bit (ORCPT
+        id S1726279AbgKKLUa convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 06:18:21 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:37843 "EHLO
+        Wed, 11 Nov 2020 06:20:30 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55225 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbgKKLSS (ORCPT
+        with ESMTP id S1726175AbgKKLU3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 06:18:18 -0500
+        Wed, 11 Nov 2020 06:20:29 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 06C39CECFE;
-        Wed, 11 Nov 2020 12:25:23 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 16C6FCECFE;
+        Wed, 11 Nov 2020 12:27:35 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v9 2/6] Bluetooth: Interleave with allowlist scan
+Subject: Re: [PATCH v9 5/6] Bluetooth: Refactor read default sys config for
+ various types
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201111150115.v9.2.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-Date:   Wed, 11 Nov 2020 12:18:14 +0100
+In-Reply-To: <20201111150115.v9.5.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
+Date:   Wed, 11 Nov 2020 12:20:25 +0100
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         alainm@chromium.org, mmandlik@chromium.org, mcchou@chromium.org,
@@ -39,9 +39,9 @@ Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <8A8B9E30-CA36-4996-A0C2-9F4E30751C0B@holtmann.org>
+Message-Id: <A5A4227D-58B7-4C08-AFC9-BC8A8D469179@holtmann.org>
 References: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
- <20201111150115.v9.2.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+ <20201111150115.v9.5.I9231b35b0be815c32c3a3ec48dcd1d68fa65daf4@changeid>
 To:     Howard Chung <howardchung@google.com>
 X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
@@ -50,300 +50,188 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Howard,
 
-> This patch implements the interleaving between allowlist scan and
-> no-filter scan. It'll be used to save power when at least one monitor is
-> registered and at least one pending connection or one device to be
-> scanned for.
-> 
-> The durations of the allowlist scan and the no-filter scan are
-> controlled by MGMT command: Set Default System Configuration. The
-> default values are set randomly for now.
+> Refactor read default system configuration function so that it's capable
+> of returning different types than u16
 > 
 > Signed-off-by: Howard Chung <howardchung@google.com>
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 > ---
 > 
 > (no changes since v8)
 > 
 > Changes in v8:
-> - Simplified logic in __hci_update_interleaved_scan
-> - remove hdev->name when calling bt_dev_dbg
-> - remove 'default' in hci_req_add_le_interleaved_scan switch block
-> - remove {} around :1915
+> - Update the commit title and message
 > 
-> include/net/bluetooth/hci_core.h |  10 +++
-> net/bluetooth/hci_core.c         |   4 +
-> net/bluetooth/hci_request.c      | 128 +++++++++++++++++++++++++++++--
-> net/bluetooth/mgmt_config.c      |  10 +++
-> 4 files changed, 145 insertions(+), 7 deletions(-)
+> net/bluetooth/mgmt_config.c | 140 +++++++++++++++++++++---------------
+> 1 file changed, 84 insertions(+), 56 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 9873e1c8cd163..cfede18709d8f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -361,6 +361,8 @@ struct hci_dev {
-> 	__u8		ssp_debug_mode;
-> 	__u8		hw_error_code;
-> 	__u32		clock;
-> +	__u16		advmon_allowlist_duration;
-> +	__u16		advmon_no_filter_duration;
-> 
-> 	__u16		devid_source;
-> 	__u16		devid_vendor;
-> @@ -542,6 +544,14 @@ struct hci_dev {
-> 	struct delayed_work	rpa_expired;
-> 	bdaddr_t		rpa;
-> 
-> +	enum {
-> +		INTERLEAVE_SCAN_NONE,
-> +		INTERLEAVE_SCAN_NO_FILTER,
-> +		INTERLEAVE_SCAN_ALLOWLIST
-> +	} interleave_scan_state;
-> +
-> +	struct delayed_work	interleave_scan;
-> +
-> #if IS_ENABLED(CONFIG_BT_LEDS)
-> 	struct led_trigger	*power_led;
-> #endif
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 502552d6e9aff..65b7b74baba4c 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3592,6 +3592,10 @@ struct hci_dev *hci_alloc_dev(void)
-> 	hdev->cur_adv_instance = 0x00;
-> 	hdev->adv_instance_timeout = 0;
-> 
-> +	/* The default values will be chosen in the future */
-
-this comment is misleading. You are choosing the default values right now. So just scrap it.
-
-> +	hdev->advmon_allowlist_duration = 300;
-> +	hdev->advmon_no_filter_duration = 500;
-> +
-> 	hdev->sniff_max_interval = 800;
-> 	hdev->sniff_min_interval = 80;
-> 
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 048d4db9d4ea5..2fd56ee21d31f 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -378,6 +378,53 @@ void __hci_req_write_fast_connectable(struct hci_request *req, bool enable)
-> 		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-> }
-> 
-> +static void start_interleave_scan(struct hci_dev *hdev)
-> +{
-> +	hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
-> +	queue_delayed_work(hdev->req_workqueue,
-> +			   &hdev->interleave_scan, 0);
-> +}
-> +
-> +static bool is_interleave_scanning(struct hci_dev *hdev)
-> +{
-> +	return hdev->interleave_scan_state != INTERLEAVE_SCAN_NONE;
-> +}
-> +
-> +static void cancel_interleave_scan(struct hci_dev *hdev)
-> +{
-> +	bt_dev_dbg(hdev, "cancelling interleave scan");
-> +
-> +	cancel_delayed_work_sync(&hdev->interleave_scan);
-> +
-> +	hdev->interleave_scan_state = INTERLEAVE_SCAN_NONE;
-> +}
-> +
-> +/* Return true if interleave_scan wasn't started until exiting this function,
-> + * otherwise, return false
-> + */
-> +static bool __hci_update_interleaved_scan(struct hci_dev *hdev)
-> +{
-> +	/* If there is at least one ADV monitors and one pending LE connection
-> +	 * or one device to be scanned for, we should alternate between
-> +	 * allowlist scan and one without any filters to save power.
-> +	 */
-> +	bool should_interleaving = hci_is_adv_monitoring(hdev) &&
-> +				   !(list_empty(&hdev->pend_le_conns) &&
-> +				     list_empty(&hdev->pend_le_reports));
-
-the name should_interleaving is not sitting right with me. Can we find a
-naming that sounds a bit more like proper English. Do you actually mean
-use_interleaving in this case?
-
-> +	bool is_interleaving = is_interleave_scanning(hdev);
-> +
-> +	if (should_interleaving && !is_interleaving) {
-> +		start_interleave_scan(hdev);
-> +		bt_dev_dbg(hdev, "starting interleave scan");
-> +		return true;
-> +	}
-> +
-> +	if (!should_interleaving && is_interleaving)
-> +		cancel_interleave_scan(hdev);
-> +
-> +	return false;
-> +}
-> +
-> /* This function controls the background scanning based on hdev->pend_le_conns
->  * list. If there are pending LE connection we start the background scanning,
->  * otherwise we stop it.
-> @@ -450,8 +497,7 @@ static void __hci_update_background_scan(struct hci_request *req)
-> 			hci_req_add_le_scan_disable(req, false);
-> 
-> 		hci_req_add_le_passive_scan(req);
-> -
-> -		BT_DBG("%s starting background scanning", hdev->name);
-> +		bt_dev_dbg(hdev, "starting background scanning");
-> 	}
-> }
-> 
-> @@ -848,12 +894,17 @@ static u8 update_white_list(struct hci_request *req)
-> 			return 0x00;
-> 	}
-> 
-> -	/* Once the controller offloading of advertisement monitor is in place,
-> -	 * the if condition should include the support of MSFT extension
-> -	 * support. If suspend is ongoing, whitelist should be the default to
-> -	 * prevent waking by random advertisements.
-> +	/* Use the allowlist unless the following conditions are all true:
-> +	 * - We are not currently suspending
-> +	 * - There are 1 or more ADV monitors registered
-> +	 * - Interleaved scanning is not currently using the allowlist
-> +	 *
-> +	 * Once the controller offloading of advertisement monitor is in place,
-> +	 * the above condition should include the support of MSFT extension
-> +	 * support.
-> 	 */
-> -	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended)
-> +	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
-> +	    hdev->interleave_scan_state != INTERLEAVE_SCAN_ALLOWLIST)
-> 		return 0x00;
-> 
-> 	/* Select filter policy to use white list */
-> @@ -1006,6 +1057,10 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
-> 				      &own_addr_type))
-> 		return;
-> 
-> +	if (__hci_update_interleaved_scan(hdev))
-> +		return;
-> +
-> +	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
-> 	/* Adding or removing entries from the white list must
-> 	 * happen before enabling scanning. The controller does
-> 	 * not allow white list modification while scanning.
-> @@ -1886,6 +1941,62 @@ static void adv_timeout_expire(struct work_struct *work)
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> +static int hci_req_add_le_interleaved_scan(struct hci_request *req,
-> +					   unsigned long opt)
-> +{
-> +	struct hci_dev *hdev = req->hdev;
-> +	int ret = 0;
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
-> +		hci_req_add_le_scan_disable(req, false);
-> +	hci_req_add_le_passive_scan(req);
-> +
-> +	switch (hdev->interleave_scan_state) {
-> +	case INTERLEAVE_SCAN_ALLOWLIST:
-> +		bt_dev_dbg(hdev, "next state: allowlist");
-> +		hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
-> +		break;
-> +	case INTERLEAVE_SCAN_NO_FILTER:
-> +		bt_dev_dbg(hdev, "next state: no filter");
-> +		hdev->interleave_scan_state = INTERLEAVE_SCAN_ALLOWLIST;
-> +		break;
-> +	case INTERLEAVE_SCAN_NONE:
-> +		BT_ERR("unexpected error");
-> +		ret = -1;
-> +	}
-> +
-> +	hci_dev_unlock(hdev);
-> +
-> +	return ret;
-> +}
-> +
-> +static void interleave_scan_work(struct work_struct *work)
-> +{
-> +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> +					    interleave_scan.work);
-> +	u8 status;
-> +	unsigned long timeout;
-> +
-> +	if (hdev->interleave_scan_state == INTERLEAVE_SCAN_ALLOWLIST) {
-> +		timeout = msecs_to_jiffies(hdev->advmon_allowlist_duration);
-> +	} else if (hdev->interleave_scan_state == INTERLEAVE_SCAN_NO_FILTER) {
-> +		timeout = msecs_to_jiffies(hdev->advmon_no_filter_duration);
-> +	} else {
-> +		bt_dev_err(hdev, "unexpected error");
-> +		return;
-> +	}
-> +
-> +	hci_req_sync(hdev, hci_req_add_le_interleaved_scan, 0,
-> +		     HCI_CMD_TIMEOUT, &status);
-> +
-> +	/* Don't continue interleaving if it was canceled */
-> +	if (is_interleave_scanning(hdev))
-> +		queue_delayed_work(hdev->req_workqueue,
-> +				   &hdev->interleave_scan, timeout);
-> +}
-> +
-> int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-> 			   bool use_rpa, struct adv_info *adv_instance,
-> 			   u8 *own_addr_type, bdaddr_t *rand_addr)
-> @@ -3313,6 +3424,7 @@ void hci_request_setup(struct hci_dev *hdev)
-> 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-> 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
-> 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
-> +	INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
-> }
-> 
-> void hci_request_cancel_all(struct hci_dev *hdev)
-> @@ -3332,4 +3444,6 @@ void hci_request_cancel_all(struct hci_dev *hdev)
-> 		cancel_delayed_work_sync(&hdev->adv_instance_expire);
-> 		hdev->adv_instance_timeout = 0;
-> 	}
-> +
-> +	cancel_interleave_scan(hdev);
-> }
 > diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-> index b30b571f8caf8..2d3ad288c78ac 100644
+> index 2d3ad288c78ac..282fbf82f3192 100644
 > --- a/net/bluetooth/mgmt_config.c
 > +++ b/net/bluetooth/mgmt_config.c
-> @@ -67,6 +67,8 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 		HDEV_PARAM_U16(0x001a, le_supv_timeout),
-> 		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
-> 						def_le_autoconnect_timeout),
-> +		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
-> +		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
-> 	};
-> 	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+> @@ -11,72 +11,100 @@
+> #include "mgmt_util.h"
+> #include "mgmt_config.h"
 > 
-> @@ -138,6 +140,8 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 		case 0x0019:
-> 		case 0x001a:
-> 		case 0x001b:
-> +		case 0x001d:
-> +		case 0x001e:
-> 			if (len != sizeof(u16)) {
-> 				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
-> 					    len, sizeof(u16), type);
-> @@ -251,6 +255,12 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
-> 			hdev->def_le_autoconnect_timeout =
-> 					msecs_to_jiffies(TLV_GET_LE16(buffer));
-> 			break;
-> +		case 0x0001d:
-> +			hdev->advmon_allowlist_duration = TLV_GET_LE16(buffer);
-> +			break;
-> +		case 0x0001e:
-> +			hdev->advmon_no_filter_duration = TLV_GET_LE16(buffer);
-> +			break;
-> 		default:
-> 			bt_dev_warn(hdev, "unsupported parameter %u", type);
-> 			break;
+> -#define HDEV_PARAM_U16(_param_code_, _param_name_) \
+> -{ \
+> -	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+> -	{ cpu_to_le16(hdev->_param_name_) } \
+> -}
+> +#define HDEV_PARAM_U16(_param_name_) \
+> +	struct {\
+> +		struct mgmt_tlv entry; \
+> +		__le16 value; \
+> +	} __packed _param_name_
+> 
+> -#define HDEV_PARAM_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
+> -{ \
+> -	{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+> -	{ cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) } \
+> -}
+> +#define TLV_SET_U16(_param_code_, _param_name_) \
+> +	{ \
+> +		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+> +		cpu_to_le16(hdev->_param_name_) \
+> +	}
+> +
+> +#define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
+> +	{ \
+> +		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+> +		cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) \
+> +	}
+> 
+> int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+> 			   u16 data_len)
+> {
+> -	struct {
+> -		struct mgmt_tlv entry;
+> -		union {
+> -			/* This is a simplification for now since all values
+> -			 * are 16 bits.  In the future, this code may need
+> -			 * refactoring to account for variable length values
+> -			 * and properly calculate the required buffer size.
+> -			 */
+> -			__le16 value;
+> -		};
+> -	} __packed params[] = {
+> +	int ret;
+> +	struct mgmt_rp_read_def_system_config {
+> 		/* Please see mgmt-api.txt for documentation of these values */
+> -		HDEV_PARAM_U16(0x0000, def_page_scan_type),
+> -		HDEV_PARAM_U16(0x0001, def_page_scan_int),
+> -		HDEV_PARAM_U16(0x0002, def_page_scan_window),
+> -		HDEV_PARAM_U16(0x0003, def_inq_scan_type),
+> -		HDEV_PARAM_U16(0x0004, def_inq_scan_int),
+> -		HDEV_PARAM_U16(0x0005, def_inq_scan_window),
+> -		HDEV_PARAM_U16(0x0006, def_br_lsto),
+> -		HDEV_PARAM_U16(0x0007, def_page_timeout),
+> -		HDEV_PARAM_U16(0x0008, sniff_min_interval),
+> -		HDEV_PARAM_U16(0x0009, sniff_max_interval),
+> -		HDEV_PARAM_U16(0x000a, le_adv_min_interval),
+> -		HDEV_PARAM_U16(0x000b, le_adv_max_interval),
+> -		HDEV_PARAM_U16(0x000c, def_multi_adv_rotation_duration),
+> -		HDEV_PARAM_U16(0x000d, le_scan_interval),
+> -		HDEV_PARAM_U16(0x000e, le_scan_window),
+> -		HDEV_PARAM_U16(0x000f, le_scan_int_suspend),
+> -		HDEV_PARAM_U16(0x0010, le_scan_window_suspend),
+> -		HDEV_PARAM_U16(0x0011, le_scan_int_discovery),
+> -		HDEV_PARAM_U16(0x0012, le_scan_window_discovery),
+> -		HDEV_PARAM_U16(0x0013, le_scan_int_adv_monitor),
+> -		HDEV_PARAM_U16(0x0014, le_scan_window_adv_monitor),
+> -		HDEV_PARAM_U16(0x0015, le_scan_int_connect),
+> -		HDEV_PARAM_U16(0x0016, le_scan_window_connect),
+> -		HDEV_PARAM_U16(0x0017, le_conn_min_interval),
+> -		HDEV_PARAM_U16(0x0018, le_conn_max_interval),
+> -		HDEV_PARAM_U16(0x0019, le_conn_latency),
+> -		HDEV_PARAM_U16(0x001a, le_supv_timeout),
+> -		HDEV_PARAM_U16_JIFFIES_TO_MSECS(0x001b,
+> -						def_le_autoconnect_timeout),
+> -		HDEV_PARAM_U16(0x001d, advmon_allowlist_duration),
+> -		HDEV_PARAM_U16(0x001e, advmon_no_filter_duration),
+> +		HDEV_PARAM_U16(def_page_scan_type);
+> +		HDEV_PARAM_U16(def_page_scan_int);
+> +		HDEV_PARAM_U16(def_page_scan_window);
+> +		HDEV_PARAM_U16(def_inq_scan_type);
+> +		HDEV_PARAM_U16(def_inq_scan_int);
+> +		HDEV_PARAM_U16(def_inq_scan_window);
+> +		HDEV_PARAM_U16(def_br_lsto);
+> +		HDEV_PARAM_U16(def_page_timeout);
+> +		HDEV_PARAM_U16(sniff_min_interval);
+> +		HDEV_PARAM_U16(sniff_max_interval);
+> +		HDEV_PARAM_U16(le_adv_min_interval);
+> +		HDEV_PARAM_U16(le_adv_max_interval);
+> +		HDEV_PARAM_U16(def_multi_adv_rotation_duration);
+> +		HDEV_PARAM_U16(le_scan_interval);
+> +		HDEV_PARAM_U16(le_scan_window);
+> +		HDEV_PARAM_U16(le_scan_int_suspend);
+> +		HDEV_PARAM_U16(le_scan_window_suspend);
+> +		HDEV_PARAM_U16(le_scan_int_discovery);
+> +		HDEV_PARAM_U16(le_scan_window_discovery);
+> +		HDEV_PARAM_U16(le_scan_int_adv_monitor);
+> +		HDEV_PARAM_U16(le_scan_window_adv_monitor);
+> +		HDEV_PARAM_U16(le_scan_int_connect);
+> +		HDEV_PARAM_U16(le_scan_window_connect);
+> +		HDEV_PARAM_U16(le_conn_min_interval);
+> +		HDEV_PARAM_U16(le_conn_max_interval);
+> +		HDEV_PARAM_U16(le_conn_latency);
+> +		HDEV_PARAM_U16(le_supv_timeout);
+> +		HDEV_PARAM_U16(def_le_autoconnect_timeout);
+> +		HDEV_PARAM_U16(advmon_allowlist_duration);
+> +		HDEV_PARAM_U16(advmon_no_filter_duration);
+> +	} __packed rp = {
+> +		TLV_SET_U16(0x0000, def_page_scan_type),
+> +		TLV_SET_U16(0x0001, def_page_scan_int),
+> +		TLV_SET_U16(0x0002, def_page_scan_window),
+> +		TLV_SET_U16(0x0003, def_inq_scan_type),
+> +		TLV_SET_U16(0x0004, def_inq_scan_int),
+> +		TLV_SET_U16(0x0005, def_inq_scan_window),
+> +		TLV_SET_U16(0x0006, def_br_lsto),
+> +		TLV_SET_U16(0x0007, def_page_timeout),
+> +		TLV_SET_U16(0x0008, sniff_min_interval),
+> +		TLV_SET_U16(0x0009, sniff_max_interval),
+> +		TLV_SET_U16(0x000a, le_adv_min_interval),
+> +		TLV_SET_U16(0x000b, le_adv_max_interval),
+> +		TLV_SET_U16(0x000c, def_multi_adv_rotation_duration),
+> +		TLV_SET_U16(0x000d, le_scan_interval),
+> +		TLV_SET_U16(0x000e, le_scan_window),
+> +		TLV_SET_U16(0x000f, le_scan_int_suspend),
+> +		TLV_SET_U16(0x0010, le_scan_window_suspend),
+> +		TLV_SET_U16(0x0011, le_scan_int_discovery),
+> +		TLV_SET_U16(0x0012, le_scan_window_discovery),
+> +		TLV_SET_U16(0x0013, le_scan_int_adv_monitor),
+> +		TLV_SET_U16(0x0014, le_scan_window_adv_monitor),
+> +		TLV_SET_U16(0x0015, le_scan_int_connect),
+> +		TLV_SET_U16(0x0016, le_scan_window_connect),
+> +		TLV_SET_U16(0x0017, le_conn_min_interval),
+> +		TLV_SET_U16(0x0018, le_conn_max_interval),
+> +		TLV_SET_U16(0x0019, le_conn_latency),
+> +		TLV_SET_U16(0x001a, le_supv_timeout),
+> +		TLV_SET_U16_JIFFIES_TO_MSECS(0x001b,
+> +					     def_le_autoconnect_timeout),
+> +		TLV_SET_U16(0x001d, advmon_allowlist_duration),
+> +		TLV_SET_U16(0x001e, advmon_no_filter_duration),
+> 	};
+> -	struct mgmt_rp_read_def_system_config *rp = (void *)params;
+> 
+> 	bt_dev_dbg(hdev, "sock %p", sk);
+> 
+> -	return mgmt_cmd_complete(sk, hdev->id,
+> -				 MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+> -				 0, rp, sizeof(params));
+> +	ret = mgmt_cmd_complete(sk, hdev->id,
+> +				MGMT_OP_READ_DEF_SYSTEM_CONFIG,
+> +				0, &rp, sizeof(rp));
+> +	return ret;
+> }
+> 
+
+frankly I would prefer if we do the re-factoring first and only then add new
+parameters.
+
+While I am looking at this, I am also really confused about this
+JIFFIES_TO_MSEC business. We should actually not store anything in jiffies
+or use it in an API. Is there a good reason to keep storing things in
+jiffies internally?
 
 Regards
 
