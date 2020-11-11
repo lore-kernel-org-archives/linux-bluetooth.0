@@ -6,61 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 549DDC5517A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9978C56201
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:13:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 074002074B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CDE9207D3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 11:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726265AbgKKLIn convert rfc822-to-8bit (ORCPT
+        id S1726457AbgKKLMu convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 06:08:43 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:47375 "EHLO
+        Wed, 11 Nov 2020 06:12:50 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52581 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726198AbgKKLIn (ORCPT
+        with ESMTP id S1726125AbgKKLMf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 06:08:43 -0500
+        Wed, 11 Nov 2020 06:12:35 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 6C76ECECFD;
-        Wed, 11 Nov 2020 12:15:50 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BFDE9CECFF;
+        Wed, 11 Nov 2020 12:19:32 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Wait for timeout during suspend
+Subject: Re: [PATCH 1/2] bluetooth: hci_event: consolidate error paths in
+ hci_phy_link_complete_evt()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1601997621-12056-1-git-send-email-bgodavar@codeaurora.org>
-Date:   Wed, 11 Nov 2020 12:08:40 +0100
+In-Reply-To: <b508265e-f08f-ea24-2815-bc2a5ec10d8d@omprussia.ru>
+Date:   Wed, 11 Nov 2020 12:12:22 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        rjliao@codeaurora.org
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <D8614A63-5367-4BFF-AE03-3B639A2216A8@holtmann.org>
-References: <1601997621-12056-1-git-send-email-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Message-Id: <EA8EC09F-6AB5-45DD-9889-C05D1FC9AAE6@holtmann.org>
+References: <bbdd9cbe-b65e-b309-1188-71a3a4ca6fdc@omprussia.ru>
+ <b508265e-f08f-ea24-2815-bc2a5ec10d8d@omprussia.ru>
+To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
 X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Sergey,
 
-> Currently qca_suspend() is relied on IBS mechanism. During
-> FW download and memory dump collections, IBS will be disabled.
-> In those cases, driver will allow suspend and still uses the
-> serdev port, which results to errors. Now added a wait timeout
-> if suspend is triggered during FW download and memory collections.
+> hci_phy_link_complete_evt() has several duplicate error paths -- consolidate
+> them, using the *goto* statements.
 > 
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
+> 
 > ---
-> drivers/bluetooth/hci_qca.c | 48 ++++++++++++++++++++++++++++++++++++---------
-> 1 file changed, 39 insertions(+), 9 deletions(-)
+> net/bluetooth/hci_event.c |   16 ++++++----------
+> 1 file changed, 6 insertions(+), 10 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
