@@ -5,66 +5,69 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D97C388F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 07:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 996EAC388F9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 07:03:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DF22206F1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 07:02:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 363E4206F1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 07:03:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RXn91e2j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qtEy1ym+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726028AbgKKHCn (ORCPT
+        id S1725947AbgKKHDA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 02:02:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47274 "EHLO
+        Wed, 11 Nov 2020 02:03:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725867AbgKKHCk (ORCPT
+        with ESMTP id S1726020AbgKKHC5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 02:02:40 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F14EC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 23:02:38 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id u2so276832pje.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 23:02:38 -0800 (PST)
+        Wed, 11 Nov 2020 02:02:57 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F022C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 23:02:57 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id t71so1448436ybi.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2020 23:02:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=lnaRSMi6SGtfb6r1uIy7QzCOHnqWhtlpEO07b9w70Mg=;
-        b=RXn91e2jhwB3l558eGF4DTgjSRRcNH9VWEnY7QAr56TF3wmh0eyFDWGFPbNz8G9KT4
-         5Ea4DAwicYsWVoJNyhbbIMXp4QaPNG/O/LrN7W/UhWWSa1jY/skexhDsDrPe5wUI3FEu
-         DaUxDJJEcTIlRi/ROrY/NY5Gg5g541H/8FPrg4c4sTbMaqk7AefkXpbsm6/5C040iu93
-         C0Ax+rnYWeFKidg36XKXKBS6jyRGimK5QV7CPBx0xblN8DeSNBQPOPdbHf24KTVh3OPt
-         77rQTOWq8bEmLyeeiDctZ9T3CG7/+QPNZhQhppygAFPYk0MmFjwWLRpKjkNH8Qr7F6lF
-         uLQw==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=0BLblQY5wrVo/fV4Esb72ZfcDIufvpzhr8oLTdedeD8=;
+        b=qtEy1ym+hJuQ8GZ7r5v/LMDnwiFdZ4FI3VSHHVJwtvexpWksX2rDQYYqOsLsQ/XUv3
+         /Pteu55fSW0Hgq1lDhIhVezZGhxcl2m5WaUpt4jQREUGjVEBWmaILzJb8ge6YSn3O8Be
+         +LOhz18qwGG9cSnc2k1tzh/MSaLQTDHt1iQMPlaSUxidpOC6XoMM3Zff2dVtAQuXIvNT
+         MSRhCkDerGtA9bdw8qAPGeof+F4kq72mYXt5M6OsacnHeG6nk3dfDq+OC7wzJLb+UHl/
+         EEIVTJKuR35FcTBKeeipxp+sElXlBTz1Xw/t33g+mbfA69yThqfhTSZpCyWjLRrOV5+3
+         uNhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=lnaRSMi6SGtfb6r1uIy7QzCOHnqWhtlpEO07b9w70Mg=;
-        b=tyehaPqSp9VhMVM/bPPenPcz8qwWWAr5A8xdbg2oLMT52NyaIuhysC8tI7u9+zdw5j
-         LjBB1dh1yIWva2BW7cXPyEejD4Hcol/eSw7C1am6eh+RZtAyMdc3rfFCKC2XfwQ+ssCf
-         qRWyliM8K54RtpTDlazwDwhWQpGqW62XFVsWEZrFUsLaS5KSd7rMsS+maVEnMcq74hXu
-         E98Ea2oJYCXRI88SjV6P1k+vKty8tNL6ZBXoSf+KYUbv3NggvrslX7ZwYq8xI08NAWGU
-         yi77vzqF6ABu2TtASmgQHvv9dyEJeQ+BAUWXqriO3Q7NHQhzzaJcPgiBPQmNNBYZK8qX
-         wfdw==
-X-Gm-Message-State: AOAM5331RMN3Ob4LORHkJ4EjxJWso9PbJXUFRL+t5srg6KNOLXwmy9D8
-        xOHjtbE6Sn6QLfhfvLM6CuiDeBMsY+GVawgAtIo2HoI+J2NHgI5JxQVFn/iEtsUT+EjV3HHDCX7
-        Lu72MZxsSXYkUcJE1ZKo/Nkw/rhV5ipyNdOozyo11VR8LH715PYqao/mxVoOlntxzNGBZVU7fQ0
-        5RnrNsOrgGa1M=
-X-Google-Smtp-Source: ABdhPJzOFiST3r6PRT1pWu5lsFnm1OWPCuxpm6A2Eir+V8qxhc9/fVvkIYWbKggX2nNbJDmyMd6HwG+stTK5c0Nekw==
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=0BLblQY5wrVo/fV4Esb72ZfcDIufvpzhr8oLTdedeD8=;
+        b=As8WlzG0UoA5JOK6o9y3vYNPhuY37W3P3R8vpqD1K1Tpo+uxP0tzPQieVfEYnqorjD
+         id3m6fctq4EMlNP10ma4hIZ6AiWZYGYL7e63IYf7z6fvWup7QxgzJ5yiJrcx/bUlEri3
+         bTV2MCzvJEpP9fMvfdtt7XwmYRoEJFi8RBkG6Cvpq953nCfOz//mJnqId2Oi1M75CV/x
+         v5t2qsALvQwFjLNdKfb8sI/yB3uqiLo5R1sbEgn7qyRIDmU/7qVjCK8rNJMNbSXwOwWN
+         xbrIXag9fr6BRiJrStdwZGA4wB/eOAKgdU/HK0drkxOg51ziqsmsvLMjgXDMNV5i7h/i
+         xD1A==
+X-Gm-Message-State: AOAM532kKnHYVNuVE6Kr6ljO/mU8xi76DGzLYEYBId12n3qzLV+pUmrt
+        vWJQ91c0gxErZe7CNMna8Xz1Ps0YaL7XcdHCbA65kwZh69+Fc1r8QGeI3HUWxoHiuFiun7jxMcI
+        PSVCtMyEiIQROZmBq/T9+Nv+P8u2IRjJ9UuAiMbqzeqr1mUf1lnw4+VirXkJqUn0uFwOYhtphXI
+        tXGixNgK7NAho=
+X-Google-Smtp-Source: ABdhPJzdpnwSyw8bJ6trSORlaz0L9j7EKDEBfMG2827Ib3CUiD6YWliIYT6yrLt+TpkS0cGVW3g61cL+TGqEWfT7Zg==
 Sender: "howardchung via sendgmr" 
         <howardchung@howardchung-p920.tpe.corp.google.com>
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a17:90a:9b15:: with SMTP id
- f21mr272721pjp.0.1605078157459; Tue, 10 Nov 2020 23:02:37 -0800 (PST)
-Date:   Wed, 11 Nov 2020 15:02:19 +0800
-Message-Id: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
+ (user=howardchung job=sendgmr) by 2002:a5b:78d:: with SMTP id
+ b13mr28739061ybq.493.1605078176284; Tue, 10 Nov 2020 23:02:56 -0800 (PST)
+Date:   Wed, 11 Nov 2020 15:02:24 +0800
+In-Reply-To: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
+Message-Id: <20201111150115.v9.6.I756c1fecc03bcc0cd94400b4992cd7e743f4b3e2@changeid>
 Mime-Version: 1.0
+References: <20201111150115.v9.1.I55fa38874edc240d726c1de6e82b2ce57b64f5eb@changeid>
 X-Mailer: git-send-email 2.29.2.222.g5d2a92d10f8-goog
-Subject: [PATCH v9 1/6] Bluetooth: Replace BT_DBG with bt_dev_dbg in HCI request
+Subject: [PATCH v9 6/6] Bluetooth: Add toggle to switch off interleave scan
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com
@@ -79,279 +82,176 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This replaces the BT_DBG function to bt_dev_dbg as it is cleaner to show
-the controller index in the debug message.
+This patch add a configurable parameter to switch off the interleave
+scan feature.
 
+Reviewed-by: Alain Michaud <alainm@chromium.org>
 Signed-off-by: Howard Chung <howardchung@google.com>
 ---
 
 Changes in v9:
-- Fix compile warning on patch 6/6
-
-Changes in v8:
-- Simplified logic in __hci_update_interleaved_scan
-- Remove hdev->name when calling bt_dev_dbg
-- Remove 'default' in hci_req_add_le_interleaved_scan switch block
-- Remove {} around :1915
-- Update commit message and title in v7 4/5
-- Add a cleanup patch for replacing BT_DBG with bt_dev_dbg
+- Update and rename the macro TLV_GET_LE8
 
 Changes in v7:
-- Fix bt_dev_warn argument type warning
+- Fix bt_dev_warn arguemnt type warning
 
 Changes in v6:
-- Set parameter EnableAdvMonInterleaveScan to 1 byte long
-
-Changes in v5:
-- Rename 'adv_monitor' from many functions/variables
-- Move __hci_update_interleaved_scan into hci_req_add_le_passive_scan
-- Update the logic of update_adv_monitor_scan_state
+- Set EnableAdvMonInterleaveScan to 1 byte long
 
 Changes in v4:
-- Rebase to bluetooth-next/master (previous 2 patches are applied)
-- Fix over 80 chars limit in mgmt_config.c
 - Set EnableAdvMonInterleaveScan default to Disable
+- Fix 80 chars limit in mgmt_config.c
 
-Changes in v3:
-- Remove 'Bluez' prefix
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         |  1 +
+ net/bluetooth/hci_request.c      |  3 ++-
+ net/bluetooth/mgmt_config.c      | 41 +++++++++++++++++++++++++-------
+ 4 files changed, 37 insertions(+), 9 deletions(-)
 
-Changes in v2:
-- remove 'case 0x001c' in mgmt_config.c
-
- net/bluetooth/hci_request.c | 52 ++++++++++++++++++-------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cfede18709d8f..63c6d656564a1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -363,6 +363,7 @@ struct hci_dev {
+ 	__u32		clock;
+ 	__u16		advmon_allowlist_duration;
+ 	__u16		advmon_no_filter_duration;
++	__u8		enable_advmon_interleave_scan;
+ 
+ 	__u16		devid_source;
+ 	__u16		devid_vendor;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 65b7b74baba4c..b7cb7bfe250bd 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3595,6 +3595,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	/* The default values will be chosen in the future */
+ 	hdev->advmon_allowlist_duration = 300;
+ 	hdev->advmon_no_filter_duration = 500;
++	hdev->enable_advmon_interleave_scan = 0x00;	/* Default to disable */
+ 
+ 	hdev->sniff_max_interval = 800;
+ 	hdev->sniff_min_interval = 80;
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 6a74097c50d34..048d4db9d4ea5 100644
+index 172ccbf4f0cd2..28520c4d2d229 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -58,7 +58,7 @@ static int req_run(struct hci_request *req, hci_req_complete_t complete,
- 	struct sk_buff *skb;
- 	unsigned long flags;
- 
--	BT_DBG("length %u", skb_queue_len(&req->cmd_q));
-+	bt_dev_dbg(hdev, "length %u", skb_queue_len(&req->cmd_q));
- 
- 	/* If an error occurred during request building, remove all HCI
- 	 * commands queued on the HCI request queue.
-@@ -102,7 +102,7 @@ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete)
- static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 				  struct sk_buff *skb)
- {
--	BT_DBG("%s result 0x%2.2x", hdev->name, result);
-+	bt_dev_dbg(hdev, "result 0x%2.2x", result);
- 
- 	if (hdev->req_status == HCI_REQ_PEND) {
- 		hdev->req_result = result;
-@@ -115,7 +115,7 @@ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 
- void hci_req_sync_cancel(struct hci_dev *hdev, int err)
- {
--	BT_DBG("%s err 0x%2.2x", hdev->name, err);
-+	bt_dev_dbg(hdev, "err 0x%2.2x", err);
- 
- 	if (hdev->req_status == HCI_REQ_PEND) {
- 		hdev->req_result = err;
-@@ -131,7 +131,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 	struct sk_buff *skb;
- 	int err = 0;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	hci_req_init(&req, hdev);
- 
-@@ -167,7 +167,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 	skb = hdev->req_skb;
- 	hdev->req_skb = NULL;
- 
--	BT_DBG("%s end: err %d", hdev->name, err);
-+	bt_dev_dbg(hdev, "end: err %d", err);
- 
- 	if (err < 0) {
- 		kfree_skb(skb);
-@@ -196,7 +196,7 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 	struct hci_request req;
- 	int err = 0;
- 
--	BT_DBG("%s start", hdev->name);
-+	bt_dev_dbg(hdev, "start");
- 
- 	hci_req_init(&req, hdev);
- 
-@@ -260,7 +260,7 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 	hdev->req_skb = NULL;
- 	hdev->req_status = hdev->req_result = 0;
- 
--	BT_DBG("%s end: err %d", hdev->name, err);
-+	bt_dev_dbg(hdev, "end: err %d", err);
- 
- 	return err;
- }
-@@ -300,7 +300,7 @@ struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
- 	if (plen)
- 		skb_put_data(skb, param, plen);
- 
--	BT_DBG("skb len %d", skb->len);
-+	bt_dev_dbg(hdev, "skb len %d", skb->len);
- 
- 	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
- 	hci_skb_opcode(skb) = opcode;
-@@ -315,7 +315,7 @@ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
- 	struct hci_dev *hdev = req->hdev;
- 	struct sk_buff *skb;
- 
--	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
-+	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
- 
- 	/* If an error occurred during request building, there is no point in
- 	 * queueing the HCI command. We can simply return.
-@@ -413,8 +413,8 @@ static void __hci_update_background_scan(struct hci_request *req)
- 	 */
- 	hci_discovery_filter_clear(hdev);
- 
--	BT_DBG("%s ADV monitoring is %s", hdev->name,
--	       hci_is_adv_monitoring(hdev) ? "on" : "off");
-+	bt_dev_dbg(hdev, "ADV monitoring is %s",
-+		   hci_is_adv_monitoring(hdev) ? "on" : "off");
- 
- 	if (list_empty(&hdev->pend_le_conns) &&
- 	    list_empty(&hdev->pend_le_reports) &&
-@@ -430,7 +430,7 @@ static void __hci_update_background_scan(struct hci_request *req)
- 
- 		hci_req_add_le_scan_disable(req, false);
- 
--		BT_DBG("%s stopping background scanning", hdev->name);
-+		bt_dev_dbg(hdev, "stopping background scanning");
- 	} else {
- 		/* If there is at least one pending LE connection, we should
- 		 * keep the background scan running.
-@@ -1826,7 +1826,7 @@ void hci_req_disable_address_resolution(struct hci_dev *hdev)
- 
- static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- {
--	BT_DBG("%s status %u", hdev->name, status);
-+	bt_dev_dbg(hdev, "status %u", status);
- }
- 
- void hci_req_reenable_advertising(struct hci_dev *hdev)
-@@ -1863,7 +1863,7 @@ static void adv_timeout_expire(struct work_struct *work)
- 	struct hci_request req;
- 	u8 instance;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	hci_dev_lock(hdev);
- 
-@@ -2347,7 +2347,7 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
- 	    hci_lookup_le_connect(hdev)) {
--		BT_DBG("Deferring random address update");
-+		bt_dev_dbg(hdev, "Deferring random address update");
- 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+@@ -1057,7 +1057,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 				      &own_addr_type))
  		return;
+ 
+-	if (__hci_update_interleaved_scan(hdev))
++	if (hdev->enable_advmon_interleave_scan &&
++	    __hci_update_interleaved_scan(hdev))
+ 		return;
+ 
+ 	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
+diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
+index 282fbf82f3192..1deb0ca7a9297 100644
+--- a/net/bluetooth/mgmt_config.c
++++ b/net/bluetooth/mgmt_config.c
+@@ -17,12 +17,24 @@
+ 		__le16 value; \
+ 	} __packed _param_name_
+ 
++#define HDEV_PARAM_U8(_param_name_) \
++	struct {\
++		struct mgmt_tlv entry; \
++		__u8 value; \
++	} __packed _param_name_
++
+ #define TLV_SET_U16(_param_code_, _param_name_) \
+ 	{ \
+ 		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+ 		cpu_to_le16(hdev->_param_name_) \
  	}
-@@ -2572,7 +2572,7 @@ void __hci_req_update_class(struct hci_request *req)
- 	struct hci_dev *hdev = req->hdev;
- 	u8 cod[3];
  
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
++#define TLV_SET_U8(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u8) }, \
++		hdev->_param_name_ \
++	}
++
+ #define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
+ 	{ \
+ 		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
+@@ -65,6 +77,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		HDEV_PARAM_U16(def_le_autoconnect_timeout);
+ 		HDEV_PARAM_U16(advmon_allowlist_duration);
+ 		HDEV_PARAM_U16(advmon_no_filter_duration);
++		HDEV_PARAM_U8(enable_advmon_interleave_scan);
+ 	} __packed rp = {
+ 		TLV_SET_U16(0x0000, def_page_scan_type),
+ 		TLV_SET_U16(0x0001, def_page_scan_int),
+@@ -97,6 +110,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 					     def_le_autoconnect_timeout),
+ 		TLV_SET_U16(0x001d, advmon_allowlist_duration),
+ 		TLV_SET_U16(0x001e, advmon_no_filter_duration),
++		TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
+ 	};
  
- 	if (!hdev_is_powered(hdev))
- 		return;
-@@ -2741,7 +2741,7 @@ void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
- static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- {
- 	if (status)
--		BT_DBG("Failed to abort connection: status 0x%2.2x", status);
-+		bt_dev_dbg(hdev, "Failed to abort connection: status 0x%2.2x", status);
- }
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -109,6 +123,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
  
- int hci_abort_conn(struct hci_conn *conn, u8 reason)
-@@ -2804,7 +2804,7 @@ static int bredr_inquiry(struct hci_request *req, unsigned long opt)
- 	const u8 liac[3] = { 0x00, 0x8b, 0x9e };
- 	struct hci_cp_inquiry cp;
+ #define TO_TLV(x)		((struct mgmt_tlv *)(x))
+ #define TLV_GET_LE16(tlv)	le16_to_cpu(*((__le16 *)(TO_TLV(tlv)->value)))
++#define TLV_GET_U8(tlv)		(*((__u8 *)(TO_TLV(tlv)->value)))
  
--	BT_DBG("%s", req->hdev->name);
-+	bt_dev_dbg(req->hdev, "");
+ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 data_len)
+@@ -125,6 +140,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	/* First pass to validate the tlv */
+ 	while (buffer_left >= sizeof(struct mgmt_tlv)) {
+ 		const u8 len = TO_TLV(buffer)->length;
++		size_t exp_type_len;
+ 		const u16 exp_len = sizeof(struct mgmt_tlv) +
+ 				    len;
+ 		const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
+@@ -170,20 +186,26 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		case 0x001b:
+ 		case 0x001d:
+ 		case 0x001e:
+-			if (len != sizeof(u16)) {
+-				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
+-					    len, sizeof(u16), type);
+-
+-				return mgmt_cmd_status(sk, hdev->id,
+-					MGMT_OP_SET_DEF_SYSTEM_CONFIG,
+-					MGMT_STATUS_INVALID_PARAMS);
+-			}
++			exp_type_len = sizeof(u16);
++			break;
++		case 0x001f:
++			exp_type_len = sizeof(u8);
+ 			break;
+ 		default:
++			exp_type_len = 0;
+ 			bt_dev_warn(hdev, "unsupported parameter %u", type);
+ 			break;
+ 		}
  
- 	hci_dev_lock(req->hdev);
- 	hci_inquiry_cache_flush(req->hdev);
-@@ -2830,7 +2830,7 @@ static void le_scan_disable_work(struct work_struct *work)
- 					    le_scan_disable.work);
- 	u8 status;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
- 		return;
-@@ -2926,7 +2926,7 @@ static void le_scan_restart_work(struct work_struct *work)
- 	unsigned long timeout, duration, scan_start, now;
- 	u8 status;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	hci_req_sync(hdev, le_scan_restart, 0, HCI_CMD_TIMEOUT, &status);
- 	if (status) {
-@@ -2980,7 +2980,7 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	bool addr_resolv = false;
- 	int err;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	/* If controller is scanning, it means the background scanning is
- 	 * running. Thus, we should temporarily stop it in order to set the
-@@ -3008,7 +3008,7 @@ static int interleaved_discov(struct hci_request *req, unsigned long opt)
- {
- 	int err;
- 
--	BT_DBG("%s", req->hdev->name);
-+	bt_dev_dbg(req->hdev, "");
- 
- 	err = active_scan(req, opt);
- 	if (err)
-@@ -3021,7 +3021,7 @@ static void start_discovery(struct hci_dev *hdev, u8 *status)
- {
- 	unsigned long timeout;
- 
--	BT_DBG("%s type %u", hdev->name, hdev->discovery.type);
-+	bt_dev_dbg(hdev, "type %u", hdev->discovery.type);
- 
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_BREDR:
-@@ -3069,7 +3069,7 @@ static void start_discovery(struct hci_dev *hdev, u8 *status)
- 	if (*status)
- 		return;
- 
--	BT_DBG("%s timeout %u ms", hdev->name, jiffies_to_msecs(timeout));
-+	bt_dev_dbg(hdev, "timeout %u ms", jiffies_to_msecs(timeout));
- 
- 	/* When service discovery is used and the controller has a
- 	 * strict duplicate filter, it is important to remember the
-@@ -3094,7 +3094,7 @@ bool hci_req_stop_discovery(struct hci_request *req)
- 	struct inquiry_entry *e;
- 	bool ret = false;
- 
--	BT_DBG("%s state %u", hdev->name, hdev->discovery.state);
-+	bt_dev_dbg(hdev, "state %u", hdev->discovery.state);
- 
- 	if (d->state == DISCOVERY_FINDING || d->state == DISCOVERY_STOPPING) {
- 		if (test_bit(HCI_INQUIRY, &hdev->flags))
-@@ -3174,7 +3174,7 @@ static void discov_off(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    discov_off.work);
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	hci_dev_lock(hdev);
- 
++		if (exp_type_len && len != exp_type_len) {
++			bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
++				    len, exp_type_len, type);
++
++			return mgmt_cmd_status(sk, hdev->id,
++				MGMT_OP_SET_DEF_SYSTEM_CONFIG,
++				MGMT_STATUS_INVALID_PARAMS);
++		}
++
+ 		buffer_left -= exp_len;
+ 		buffer += exp_len;
+ 	}
+@@ -289,6 +311,9 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		case 0x0001e:
+ 			hdev->advmon_no_filter_duration = TLV_GET_LE16(buffer);
+ 			break;
++		case 0x0001f:
++			hdev->enable_advmon_interleave_scan = TLV_GET_U8(buffer);
++			break;
+ 		default:
+ 			bt_dev_warn(hdev, "unsupported parameter %u", type);
+ 			break;
 -- 
 2.29.2.222.g5d2a92d10f8-goog
 
