@@ -6,71 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3958C61DD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 09:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4B2C56201
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 09:54:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 701B720756
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 09:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98D002064B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Nov 2020 09:54:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727227AbgKKJww (ORCPT
+        id S1726603AbgKKJyC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Nov 2020 04:52:52 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:39338 "EHLO
+        Wed, 11 Nov 2020 04:54:02 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46668 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725995AbgKKJwv (ORCPT
+        with ESMTP id S1725995AbgKKJyB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Nov 2020 04:52:51 -0500
+        Wed, 11 Nov 2020 04:54:01 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.201.106])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E8D0ACECFA;
-        Wed, 11 Nov 2020 10:59:57 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3426DCECFA;
+        Wed, 11 Nov 2020 11:01:08 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v2] Bluetooth: Enforce key size of 16 bytes on FIPS level
+Subject: Re: [Resend v1] Bluetooth: hci_qca: Enhance retry logic in qca_setup
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201111142947.v2.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
-Date:   Wed, 11 Nov 2020 10:52:48 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <1605071653-5088-1-git-send-email-bgodavar@codeaurora.org>
+Date:   Wed, 11 Nov 2020 10:53:58 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
         open list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        seanpaul@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        rjliao@codeaurora.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <4150D57E-480B-4A41-9F18-3E76A23BEB78@holtmann.org>
-References: <20201111142947.v2.1.Id3160295d33d44a59fa3f2a444d74f40d132ea5c@changeid>
-To:     Archie Pusaka <apusaka@google.com>
+Message-Id: <39C5224B-C574-4D19-A6D5-F3CECD1ADB66@holtmann.org>
+References: <1605071653-5088-1-git-send-email-bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Balakrishna,
 
-> According to the spec Ver 5.2, Vol 3, Part C, Sec 5.2.2.8:
-> Device in security mode 4 level 4 shall enforce:
-> 128-bit equivalent strength for link and encryption keys required
-> using FIPS approved algorithms (E0 not allowed, SAFER+ not allowed,
-> and P-192 not allowed; encryption key not shortened)
+> Currently driver only retries to download FW if FW downloading
+> is failed. Sometimes observed command timeout for version request
+> command, if this happen on some platforms during boot time, then
+> a reboot is needed to turn ON BT. Instead to avoid a reboot, now
+> extended retry logic for version request command too.
 > 
-> This patch rejects connection with key size below 16 for FIPS
-> level services.
-> 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
-> 
-> Sorry for the long delay. This patch fell out of my radar.
-> 
-> Changes in v2:
-> * Add comment on enforcing 16 bytes key size
-> 
-> net/bluetooth/l2cap_core.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++----------------
+> 1 file changed, 18 insertions(+), 16 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
