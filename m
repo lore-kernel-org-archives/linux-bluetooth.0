@@ -2,65 +2,57 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE5A4C63699
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 16:22:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22F8C55ABD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 16:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AD9320797
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 16:22:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6491C21D1A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 16:54:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726821AbgKMQVy convert rfc822-to-8bit (ORCPT
+        id S1726309AbgKMQy7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Nov 2020 11:21:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38552 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726781AbgKMQVw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Nov 2020 11:21:52 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Fri, 13 Nov 2020 16:21:51 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: serar.naoi@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209745-62941-qNYKr3NL0R@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 13 Nov 2020 11:54:59 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:42507 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726080AbgKMQy6 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 13 Nov 2020 11:54:58 -0500
+Received: from [192.168.0.8] ([87.78.178.235]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MG9Pg-1kVrW02U3Q-00Gd57; Fri, 13 Nov 2020 17:54:56 +0100
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+From:   Bisseling <spam@bisseling.de>
+Subject: [PATCH] tools/hcitool.c
+Message-ID: <96d6eb8d-cf31-7cae-3e78-6761cb74961a@bisseling.de>
+Date:   Fri, 13 Nov 2020 17:54:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:G72Kcs+41o+DNPN4TEpQcJI5+P/uAZo6Yx1ZUaMGQEKq+ffbr6M
+ Y4QQpSD2iwh036qtSqOlQFj+gW1+IK/ZX/5jGKXAxfjfXGJKLat/DAod/hQHRmjZk3AHcDE
+ WRk3J7d3ltTShc9P8cVQ8wVQj8jrVMc20iFwoUdg3gvCcwRpjY6NfPE2RX9tamDrH8cKaAD
+ RuR2+p8BwczHeIbLVzn+A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pgX1QTVrfSw=:6BgJiyF5xPdENWpRqS+qgv
+ hYnJ52rPZXtyYDPRAI8RVRuQ8pLtr/UmqQkiP6fJG8oFYDL1sEldS1G8bQuyLNYFjd+34auZK
+ YTGH6fAJE4+rmm0q1D1hEHcY9jlNOEPqZS0RaRoDQMzvjbumvqq+woYo6bLGhoLmEFiVWztCy
+ oS4jtCPn15yp38x8OhNqZelzcGH5Ppi27HoXjf9p9sXjNmNIPj/Dt9RNDELFeLav1xmo7AkKy
+ FftF1Xa2ochYEBi/MqhDU1vU0/A8i1n3C+8Sok90H4m5ep0hA0ywyUU+MRZREJUyScj72Mqxz
+ jV5KuS8cev3c3q58YBzhobwCT8Qz7Skf1RvNBXqWuBpkDZIX65BTnbXI/5csbJXNVGfxoSplT
+ A4rKVpIQgCZiJ9Li5ZnaYo1FP7ECqtSCly034kFfi+aCsAYa2S+qzC4RjPLUBTxhW2E0HaSbN
+ ym1Lkst96A==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209745
+Please review and pull:
 
-ripetrescu (serar.naoi@gmail.com) changed:
+https://github.com/GeorgBisseling/bluez/commit/69b61d7c71d08ddfd1b5b0f1862e456601264a01
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |serar.naoi@gmail.com
 
---- Comment #9 from ripetrescu (serar.naoi@gmail.com) ---
-Same problem for me after 5.9.+, with a Logitech Master MX 3.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
