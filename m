@@ -2,167 +2,160 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBFB3C5519F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 16:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F61C388F7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 11:58:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 499E720B80
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Nov 2020 16:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7C252224B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Nov 2020 11:58:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=doubly.so header.i=@doubly.so header.b="SE7oORnl"
+	dkim=pass (2048-bit key) header.d=rajagiritech-edu-in.20150623.gappssmtp.com header.i=@rajagiritech-edu-in.20150623.gappssmtp.com header.b="m0diz1Ca"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728742AbgKLQYm (ORCPT
+        id S1726890AbgKMLwz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Nov 2020 11:24:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        Fri, 13 Nov 2020 06:52:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728653AbgKLQYm (ORCPT
+        with ESMTP id S1726876AbgKMLum (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Nov 2020 11:24:42 -0500
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [IPv6:2001:67c:2050::465:102])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B28C0613D1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2020 08:24:42 -0800 (PST)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4CX6Pg51NszQlVP;
-        Thu, 12 Nov 2020 17:24:39 +0100 (CET)
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=doubly.so; s=MBO0001;
-        t=1605198278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oIc0TqkmLC+M9zSCkLOlwLPkn7B296OTaZ80qiXyVwU=;
-        b=SE7oORnlRXEcVYwzyQsgOvNEfO9edboT7ZLuSYeE5lhkzhO6ph0HFYI3W5Txyqq3kkXJ5p
-        8BsT9NJYRIS5bPT5RFm0lJ3AIuQsdw7Te/Bj0dbYduibQjjSqs8P0rq5xX/axajlPcK+ro
-        khQ/aoFNTN6JhJw9PB1syZPcS6VB2Sup9/lE434a+gkh0rwmq5XlxnVkZUfGE7AGwB6S2H
-        wk/YNxd7ts0T8pWMRwqb3e+iCos4rev511TNpbGgm+Zsk3OOZhcEQ5gN4da+ITUdo8Tnjn
-        gKbREsjfQ4RXKPxWiLbFEF5aUyc5BhGrTJewOB68F4iNI7LCpi/u0B+380UFTw==
-Received: from smtp1.mailbox.org ([80.241.60.240])
-        by spamfilter04.heinlein-hosting.de (spamfilter04.heinlein-hosting.de [80.241.56.122]) (amavisd-new, port 10030)
-        with ESMTP id Cs8gZMFXUhdw; Thu, 12 Nov 2020 17:24:36 +0100 (CET)
-Date:   Thu, 12 Nov 2020 17:24:35 +0100
-From:   Devin Bayer <dev@doubly.so>
-To:     Emil Lenngren <emil.lenngren@gmail.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "Michael N. Moran" <mike@mnmoran.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: LE Advertising: Command Disallowed
-Message-ID: <20201112162435.z6yty3uuijp5zywg@orac>
-References: <d343e320-b368-e85b-d428-d5c000eb69df@doubly.so>
- <b86e5449-d784-deee-87d8-4bcf1b4b6308@mnmoran.org>
- <d2ebb802-3bb6-63ed-de42-e1a2b0c38f36@doubly.so>
- <CABBYNZKh2FBwVamTqznqaEO=1ksuhY=K9D4pQTbDszneLg1dag@mail.gmail.com>
- <cfee49fe-f4c1-e37a-64e2-94e2df927999@doubly.so>
- <CAO1O6sefGxgwcesfu8qEFSX_HDRFFf8NW7ugyvXT=rSBVUMGYw@mail.gmail.com>
- <20201112121614.c5kko4iofg32ckxs@orac>
- <CAO1O6se6UF9Ao516xudciGBYtA9j=i-PMEbrsAhjga10ujxacg@mail.gmail.com>
+        Fri, 13 Nov 2020 06:50:42 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F05C0617A6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2020 03:50:35 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id w6so7453285pfu.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2020 03:50:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rajagiritech-edu-in.20150623.gappssmtp.com; s=20150623;
+        h=message-id:subject:from:to:cc:date:user-agent:mime-version;
+        bh=kDk4k3ktWc4jZ761NQpEZTEQU25sVU04767ergPc1vc=;
+        b=m0diz1Caj8PRX7P/YxjIzkKMFDiMkBx29mHLco+NTPfYZCiN4xjH/fTahCdbvhshlB
+         lnu5skRqcs3DcPgDyJSNnlHPZcr8dIzJ/cmaecFZ8Wgh2X0oW/E4eqCFNaO/HhoqOBS8
+         jnkAbcZ6SkJCtdBHQi4y8tMWckW+lpwDavrnCS4NXrB/9LHC9GflPu1Pw5FCSoNduAUA
+         SQJyjm+oMfBXZ/jMh0aXmIN4IBwcaZukqpwhSzyU11+2sJc1EDKXEe7HMVyZdp90Ahan
+         5XSUmHJ5Ze+UPQE3wjv0hBWMCwABVO4JCHSEjQ+LITEYjWb2Tfk9nZVQC4voLaq66k0M
+         X4ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:user-agent
+         :mime-version;
+        bh=kDk4k3ktWc4jZ761NQpEZTEQU25sVU04767ergPc1vc=;
+        b=MFe/jqjbWNpHhGMnVJ8m5GlHibiz1+9QxUOnUXcxsVnAJ1eLFg8PfItlTmpHColLP0
+         BcHfRKLPJkdypHQK3jgaD416x8IwVOO3cUM1+RHeW3OBrfuASi4HggUpfHivX0FQbr00
+         8XAC6+oV48jxskEomnTnFuzRUe+6WEeU2DCYq4qbpnjmCCr0azfN/+trK2UUAFkYjZnc
+         MMnuVxkniesFZuAT2v8kB0dQwK7qS6gx/TfZZxjtZr0vjVKy3PxuYOELQlRBxw2ttn0i
+         JajY/eR//HR8PIT74XThzxLUpQMIK2bjl7t5TvPzJSHNg+wqknPnlqL7cqoVfFFBwTnX
+         nVOA==
+X-Gm-Message-State: AOAM5319BXpuHFO6/iKSkTHK/DVdneUnX4ehNiKBVXtcnAuzA1Nit0kH
+        /yvyRmRcdoMy2c16ZnElQguq1A==
+X-Google-Smtp-Source: ABdhPJwMxOupwStmBP/iF82tceehZlMJCrat49gtrMKdE26wwaU/sRWLaPsJJ441sZI/DFFnWQtOmQ==
+X-Received: by 2002:aa7:8586:0:b029:18c:3aa6:b8bb with SMTP id w6-20020aa785860000b029018c3aa6b8bbmr1651535pfn.39.1605268235333;
+        Fri, 13 Nov 2020 03:50:35 -0800 (PST)
+Received: from debian ([122.164.70.52])
+        by smtp.gmail.com with ESMTPSA id u24sm10485501pfm.81.2020.11.13.03.50.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Nov 2020 03:50:34 -0800 (PST)
+Message-ID: <4fcb3c2f343eb1eafb2e5c95acc44fbab74a31f0.camel@rajagiritech.edu.in>
+Subject: [ERROR] Bluetooth: hci0: don't support firmware
+From:   Jeffrin Jose T <jeffrin@rajagiritech.edu.in>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        matthias.bgg@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org,
+        lkml <linux-kernel@vger.kernel.org>
+Date:   Fri, 13 Nov 2020 17:20:30 +0530
+Content-Type: multipart/mixed; boundary="=-1/CxL7Ya9sTnZ3nBk02A"
+User-Agent: Evolution 3.36.4-2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO1O6se6UF9Ao516xudciGBYtA9j=i-PMEbrsAhjga10ujxacg@mail.gmail.com>
-X-MBO-SPAM-Probability: 
-X-Rspamd-Score: -1.88 / 15.00 / 15.00
-X-Rspamd-Queue-Id: 9613B17EB
-X-Rspamd-UID: 9fac2f
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Nov 12, 2020 at 02:53:05PM +0100, Emil Lenngren wrote:
-> 
-> It's as Luiz said, you're mixing two different stacks and hence mixing
-> legacy advertising commands with extended ones. The HCI standard says:
-> 
-> "If, since the last power-on or reset, the Host has ever issued a legacy
-> advertising command and then issues an extended advertising command, or
-> has ever issued an extended advertising command and then issues a legacy
-> advertising command, the Controller shall return the error code Command
-> Disallowed (0x0C)."
-> 
-> After Reset, you can see "LE Set Extended Advertising Parameters"
-> during the `hciconfig` runs. Then later, when `python` runs, a "LE Set
-> Advertise Enable" is sent. This is disallowed behaviour.
-> 
-> One solution is that your python program sends a "Reset" command as
-> the first thing, otherwise you don't know which state the controller
-> is in. The other solution is to use BlueZ only.
-> 
 
-Thanks Emil,
+--=-1/CxL7Ya9sTnZ3nBk02A
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-that did help and I was able to finally get a basic service working. I
-would be happy to use BlueZ but I was never able to get discovery /
-connection to work more than 10% of the time, so that's why I'm trying
-something else.
+hello,
 
-I was also getting disconnects every 3 seconds from an unknown source. I
-think I fixed that with the module parameter enable_autosuspend=N. 
+i got this stuff from "sudo dmesg -l err"
+------------------------x--------------------------x----
+[   40.919919] Bluetooth: hci0: don't support firmware rome 0x31010100
+-------------------------x-------------------------x----
 
-This was also a subsequent "Set Extended Advertising Parameters"
-command. These aren't sent from my program and nothing running on my
-system seems to be talking to bluetooth.
+$uname -a
+Linux debian 5.10.0-rc3+ #1 SMP Thu Nov 12 23:37:27 IST 2020 x86_64
+GNU/Linux
+$
 
-Is this part of the BlueZ stack that's running in the kernel?
-Can it be disabled?
+$sudo hcitool dev
+Devices:
+$
 
-This is the last command received:
+GNU C               	10
+GNU Make            	4.3
+Binutils            	2.35.1
+Util-linux          	2.36
+Mount               	2.36
+Bison               	3.7.3
+Flex                	2.6.4
+Dynamic linker (ldd)	2.31
+Procps              	3.3.16
+Kbd                 	2.3.0
+Console-tools       	2.3.0
+Sh-utils            	8.32
+Udev                	246
 
-> HCI Event: LE Meta Event (0x3e) plen 10                              #413 [hci0] 1319.142290
-      LE Connection Update Complete (0x03)
-        Status: Success (0x00)
-        Handle: 3585
-        Connection interval: 45.00 msec (0x0024)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 5000 msec (0x01f4)
+file bstatus.txt attached.
 
-Then after 3 seconds (consistently):
 
-< HCI Command: Disconnect (0x01|0x0006) plen 3                         #414 [hci0] 1322.227590
-        Handle: 3585
-        Reason: Remote User Terminated Connection (0x13)
-> HCI Event: Command Status (0x0f) plen 4                              #415 [hci0] 1322.346055
-      Disconnect (0x01|0x0006) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Disconnect Complete (0x05) plen 4                         #416 [hci0] 1322.472321
-        Status: Success (0x00)
-        Handle: 3585
-        Reason: Connection Terminated By Local Host (0x16)
-@ MGMT Event: Device Disconnected (0x000c) plen 8                  {0x0001} [hci0] 1322.472381
-        LE Address: 40:AD:0E:98:D7:F6 (Resolvable)
-        Reason: Connection terminated by local host (0x02)
-< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1            #417 [hci0] 1322.519512
-        Advertising: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                            #418 [hci0] 1322.521048
-      LE Set Advertise Enable (0x08|0x000a) ncmd 2
-        Status: Success (0x00)
-< HCI Command: LE Set Extended Advertising Pa.. (0x08|0x0036) plen 25  #419 [hci0] 1322.521089
-        Handle: 0x00
-        Properties: 0x0013
-          Connectable
-          Scannable
-          Use legacy advertising PDUs: ADV_IND
-        Min advertising interval: 1280.000 msec (0x0800)
-        Max advertising interval: 1280.000 msec (0x0800)
-        Channel map: 37, 38, 39 (0x07)
-        Own address type: Public (0x00)
-        Peer address type: Public (0x00)
-        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
-        TX power: 127 dbm (0x7f)
-        Primary PHY: LE 1M (0x01)
-        Secondary max skip: 0x00
-        Secondary PHY: LE 1M (0x01)
-        SID: 0x00
-        Scan request notifications: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 5                            #420 [hci0] 1322.522027
-      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
-        Status: Command Disallowed (0x0c)
-        TX power (selected): 48 dbm (0x30)
+Reported-by: Jeffrin Jose T <jeffrin@rajagiritech.edu.in>
 
-~ Devin
+-- 
+software engineer
+rajagiri school of engineering and technology -  autonomous
+
+
+
+--=-1/CxL7Ya9sTnZ3nBk02A
+Content-Disposition: attachment; filename="bstatus.txt"
+Content-Type: text/plain; name="bstatus.txt"; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+4pePIGJsdWV0b290aC5zZXJ2aWNlIC0gQmx1ZXRvb3RoIHNlcnZpY2UKICAgICBMb2FkZWQ6IGxv
+YWRlZCAoL2xpYi9zeXN0ZW1kL3N5c3RlbS9ibHVldG9vdGguc2VydmljZTsgZW5hYmxlZDsgdmVu
+ZG9yIHByZXNldDogZW5hYmxlZCkKICAgICBBY3RpdmU6IGFjdGl2ZSAocnVubmluZykgc2luY2Ug
+RnJpIDIwMjAtMTEtMTMgMTY6MDg6NTggSVNUOyA1NG1pbiBhZ28KICAgICAgIERvY3M6IG1hbjpi
+bHVldG9vdGhkKDgpCiAgIE1haW4gUElEOiA1ODIgKGJsdWV0b290aGQpCiAgICAgU3RhdHVzOiAi
+UnVubmluZyIKICAgICAgVGFza3M6IDEgKGxpbWl0OiA0MDE1KQogICAgIE1lbW9yeTogMi45TQog
+ICAgIENHcm91cDogL3N5c3RlbS5zbGljZS9ibHVldG9vdGguc2VydmljZQogICAgICAgICAgICAg
+4pSU4pSANTgyIC91c3IvbGliZXhlYy9ibHVldG9vdGgvYmx1ZXRvb3RoZAoKTm92IDEzIDE2OjA4
+OjU0IGRlYmlhbiBibHVldG9vdGhkWzU4Ml06IHNyYy9tYWluLmM6cGFyc2VfY29udHJvbGxlcl9j
+b25maWcoKSBLZXkgZmlsZSBkb2VzIG5vdCBoYXZlIGtleSDigJxMRVNjYW5JbnRlcnZhbENvbm5l
+Y3TigJ0gaW4gZ3JvdXAg4oCcQ29udHJvbGxlcuKAnQpOb3YgMTMgMTY6MDg6NTQgZGViaWFuIGJs
+dWV0b290aGRbNTgyXTogc3JjL21haW4uYzpwYXJzZV9jb250cm9sbGVyX2NvbmZpZygpIEtleSBm
+aWxlIGRvZXMgbm90IGhhdmUga2V5IOKAnExFU2NhbldpbmRvd0Nvbm5lY3TigJ0gaW4gZ3JvdXAg
+4oCcQ29udHJvbGxlcuKAnQpOb3YgMTMgMTY6MDg6NTQgZGViaWFuIGJsdWV0b290aGRbNTgyXTog
+c3JjL21haW4uYzpwYXJzZV9jb250cm9sbGVyX2NvbmZpZygpIEtleSBmaWxlIGRvZXMgbm90IGhh
+dmUga2V5IOKAnExFTWluQ29ubmVjdGlvbkludGVydmFs4oCdIGluIGdyb3VwIOKAnENvbnRyb2xs
+ZXLigJ0KTm92IDEzIDE2OjA4OjU0IGRlYmlhbiBibHVldG9vdGhkWzU4Ml06IHNyYy9tYWluLmM6
+cGFyc2VfY29udHJvbGxlcl9jb25maWcoKSBLZXkgZmlsZSBkb2VzIG5vdCBoYXZlIGtleSDigJxM
+RU1heENvbm5lY3Rpb25JbnRlcnZhbOKAnSBpbiBncm91cCDigJxDb250cm9sbGVy4oCdCk5vdiAx
+MyAxNjowODo1NCBkZWJpYW4gYmx1ZXRvb3RoZFs1ODJdOiBzcmMvbWFpbi5jOnBhcnNlX2NvbnRy
+b2xsZXJfY29uZmlnKCkgS2V5IGZpbGUgZG9lcyBub3QgaGF2ZSBrZXkg4oCcTEVDb25uZWN0aW9u
+TGF0ZW5jeeKAnSBpbiBncm91cCDigJxDb250cm9sbGVy4oCdCk5vdiAxMyAxNjowODo1NCBkZWJp
+YW4gYmx1ZXRvb3RoZFs1ODJdOiBzcmMvbWFpbi5jOnBhcnNlX2NvbnRyb2xsZXJfY29uZmlnKCkg
+S2V5IGZpbGUgZG9lcyBub3QgaGF2ZSBrZXkg4oCcTEVDb25uZWN0aW9uU3VwZXJ2aXNpb25UaW1l
+b3V04oCdIGluIGdyb3VwIOKAnENvbnRyb2xsZXLigJ0KTm92IDEzIDE2OjA4OjU0IGRlYmlhbiBi
+bHVldG9vdGhkWzU4Ml06IHNyYy9tYWluLmM6cGFyc2VfY29udHJvbGxlcl9jb25maWcoKSBLZXkg
+ZmlsZSBkb2VzIG5vdCBoYXZlIGtleSDigJxMRUF1dG9jb25uZWN0dGltZW91dOKAnSBpbiBncm91
+cCDigJxDb250cm9sbGVy4oCdCk5vdiAxMyAxNjowODo1OCBkZWJpYW4gc3lzdGVtZFsxXTogU3Rh
+cnRlZCBCbHVldG9vdGggc2VydmljZS4KTm92IDEzIDE2OjA4OjU4IGRlYmlhbiBibHVldG9vdGhk
+WzU4Ml06IFN0YXJ0aW5nIFNEUCBzZXJ2ZXIKTm92IDEzIDE2OjA5OjAwIGRlYmlhbiBibHVldG9v
+dGhkWzU4Ml06IEJsdWV0b290aCBtYW5hZ2VtZW50IGludGVyZmFjZSAxLjE4IGluaXRpYWxpemVk
+Cg==
+
+
+--=-1/CxL7Ya9sTnZ3nBk02A--
+
