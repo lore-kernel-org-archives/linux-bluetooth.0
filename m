@@ -2,98 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D02FC2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Nov 2020 08:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74392C55ABD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Nov 2020 10:27:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DCB3B20797
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Nov 2020 08:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2ED8C24137
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Nov 2020 10:27:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQrq0ITA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726588AbgKOICX convert rfc822-to-8bit (ORCPT
+        id S1726789AbgKOK1X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 15 Nov 2020 03:02:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45940 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726491AbgKOICV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 15 Nov 2020 03:02:21 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 210205] New: Repairing for btle-devices fail
-Date:   Sun, 15 Nov 2020 08:02:21 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: marko.lavikainen@netkoti.fi
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-210205-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Sun, 15 Nov 2020 05:27:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbgKOK1W (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 15 Nov 2020 05:27:22 -0500
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80151C0613D1;
+        Sun, 15 Nov 2020 02:27:22 -0800 (PST)
+Received: by mail-pg1-x544.google.com with SMTP id m9so678565pgb.4;
+        Sun, 15 Nov 2020 02:27:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=rMHvhhCmzGV9BISyaqavP076DKPv4LbP5/GgC+7100M=;
+        b=fQrq0ITAskjPmYBsKXipLYR+elBVHv30YNSVWbS/5Ez+mKlBCTsTBtWWJGZBqZd47t
+         Eu4vfptam1ag5tdtTLztsaJjNj/x2UBxPuXmNWODJ3dVU8crkR60AN7UxmjvHQ+fRfa8
+         Lb2WwEWEdsBmqaXgob2x8QrOr/7FjfMFlIDeH79Azp0zdpLC7deSYcJZYlvWCAGB+8/0
+         u16ApGgpqntEEye5M1WoL2TpQl9b8SEZCE5mP50PsBGak4bM4Q9yGAL6TGZuyBsGiAeg
+         mBmqo403L48IH26OTJZ6fCUl7G82QR1laun547ddOBJGWQ6szCQSKuaKuchkyLhBnKi8
+         /K3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=rMHvhhCmzGV9BISyaqavP076DKPv4LbP5/GgC+7100M=;
+        b=lIrVMnT0a8jTGbdtnILNKE0xWXGs8/6RKsIVSknO2KY2/HiyQRImsRNUuU4+MfysFg
+         m4HYFZeMZjjFqpjg6Oo4NooncrPLHW1gOzK1Kdx8t5S0bL2sm3648ItjQNB1tfnYUzZj
+         aDLL685RKk7kc4GTWjzAF1urzwDzzVYIHtazhNxrBGSVTmXhD6AlO9kiO/3DG6z0I73O
+         LaIBtMjH6VmjoAa5leSbBDGv6fwnS93L/YhdGkQRU53+s9250zJ949atAlb98nWGxhu+
+         xqwywQyr1c0Vr6Xgr5lRSkpNRrSdQXXBNjmHmdVMT+eqHUnj7aABWAx7xnTOXdFGCtUa
+         65qA==
+X-Gm-Message-State: AOAM530Op/ZVK+pucMJy626yDTOsrVeXKdTXznGqolibXm/3OaYMpHK4
+        bD1/Lux+smC2tW5v7sajcQO9xwu+Gzs=
+X-Google-Smtp-Source: ABdhPJxJ3nX0S9cyu+NF375zhDK8QY1W+TKLGnKX6lNVRJSbjl2ZbORa0PSVNVJNGGGKgPrJV6PrRw==
+X-Received: by 2002:a62:de44:0:b029:18a:ae59:4d74 with SMTP id h65-20020a62de440000b029018aae594d74mr9225816pfg.72.1605436042033;
+        Sun, 15 Nov 2020 02:27:22 -0800 (PST)
+Received: from localhost.localdomain ([49.173.165.44])
+        by smtp.gmail.com with ESMTPSA id j1sm7211117pji.22.2020.11.15.02.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Nov 2020 02:27:21 -0800 (PST)
+From:   Taehee Yoo <ap420073@gmail.com>
+To:     alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc:     ap420073@gmail.com
+Subject: [PATCH v3 net] 6lowpan: set .owner to THIS_MODULE
+Date:   Sun, 15 Nov 2020 10:27:14 +0000
+Message-Id: <20201115102714.30412-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210205
+If THIS_MODULE is not set, the module would be removed while debugfs is
+being used.
+It eventually makes kernel panic.
 
-            Bug ID: 210205
-           Summary: Repairing for btle-devices fail
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: Ubuntu 5.10.0-3-generic
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: marko.lavikainen@netkoti.fi
-        Regression: No
+Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
 
-Created attachment 293677
-  --> https://bugzilla.kernel.org/attachment.cgi?id=293677&action=edit
-Log from bluetoothctl
+v3:
+ - Separate from one big series
 
-I have recently bought two Bluetooth devices:
+v2:
+ - Change headline
+ - Squash patches into per-driver/subsystem
 
- - Microsoft Bluetooth Mouse 3600 (requires confirmation for pairing)
- - Microsoft Surface Keyboard (requires passcode for pairing)
+ net/6lowpan/debugfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Both devices pair with the system and work fine. However, at random times
-(maybe when idling) both devices change their mac-addresses to a new one.
-
-This is a problem, because pairing disconnects, and bluez sees those devices as
-new devices. Thus I need to manually repair them and... well, it should not be
-like that.
-
-I did make a bit crude python-script that communicates with 'bluetoothctl' and
-repairs the mouse whenever it is discovered as a new device. But that does not
-work with the keyboard because of the passcode requirement.
-
-I attached some log from 'bluetoothctl'.
-
-Is it possible to detect in the device driver that newly discovered device is
-actually the same but with different mac-address and repair it automatically?
-
-Bluetoothctl version is 5.53
-
+diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+index 1c140af06d52..2f791ccc783b 100644
+--- a/net/6lowpan/debugfs.c
++++ b/net/6lowpan/debugfs.c
+@@ -161,6 +161,7 @@ static const struct file_operations lowpan_ctx_pfx_fops = {
+ 	.write		= lowpan_ctx_pfx_write,
+ 	.llseek		= seq_lseek,
+ 	.release	= single_release,
++	.owner          = THIS_MODULE,
+ };
+ 
+ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.17.1
+
