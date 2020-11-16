@@ -8,447 +8,226 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C555CC64EBC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 17:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33685C4742C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 18:26:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CF6722265
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 17:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F23E2206F9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 18:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M/ctiKcf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yexe/DiT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733120AbgKPRix (ORCPT
+        id S1731353AbgKPS0c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Nov 2020 12:38:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
+        Mon, 16 Nov 2020 13:26:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731425AbgKPRiw (ORCPT
+        with ESMTP id S1729555AbgKPS0c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Nov 2020 12:38:52 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084E5C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 09:38:51 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id y8so11186738qvu.22
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 09:38:50 -0800 (PST)
+        Mon, 16 Nov 2020 13:26:32 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD7F6C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 10:26:30 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id m186so7497709ybm.22
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 10:26:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=hKeiINDda9FuuYrJ4vCD3C8Hhuflf5hO3cNGoJL11MA=;
-        b=M/ctiKcfSVdH+m5c+dhuztP3nYMI/uvla/m3I7gmxmhNuB7ams/mda5KXXk+b1lVke
-         fotUL9pfFSuCreLuosSTS0aaMlzBv149EQogG4bEPNbjLQepBIftvEBeQHoi5TqMD78U
-         drPRwDt0Esl4rZnZj0uxg2qxV4EYAxxxc7eDrljxEhHUeCnNMgpt6ahy9mrYu4nvajnL
-         7i4kpW/PVAexE8y4krdiNPywo/vumemBy1bXLqxFUacGd762DNPtb2R0joRSDmjRFxCt
-         mcDghzMzDCdxJPj/Lgrkc1lGy1Fhv8mAN1ZqTrVy8VlNZkihyhJOnymB+L1gijQy/cC7
-         h9Lw==
+        bh=tO18+90EOV2bHOTSdvoYawjZxj6UFLMMK348UGkcVfY=;
+        b=Yexe/DiT8zwIxXCi4QezLU2wpijCrDrRD3D9KijcNAi0wm4v5kJq4OFaG/WDPCHTm9
+         gWKNe5H7z8K7qy1BJjpp7cWezr5gsd5XUjA18bcVJeblkG77L/2B+U6IcGtaXlg9Eg0E
+         MRE6zmzGALrOBhtqeEt3BVE0dyQqmWMHyk92Q7Sdf076oUudUSbbkVIY8vArCotE3NSl
+         YbuxTEqnuLQj2iLfS9AgLhVfYI7R+3ZtrtRIgQ+l1WSBC6Ute/tirWUN2QuZ0+jrnvpT
+         +qHN/NS8e/jAYEhQeyoHi5UC5KMQccnWjigKrfiR1eUEYA05jrdP4YJqkllzZGX+iK9A
+         yHkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
          :to:cc;
-        bh=hKeiINDda9FuuYrJ4vCD3C8Hhuflf5hO3cNGoJL11MA=;
-        b=lRmbIVBCHCaJUcr1zHx7RjPchE2uK8j38FF7CPUglKajiCE7Lou+uWJNyFDMQ7rOro
-         kDFNRHJQA1QoxClBMfePQZfwY2PLkPKtBrd8isskfFVKnMEraxDgt5zfDHkGx+6m1eKH
-         PdcYUACYT7Kejq/flaGbyuk04uOHzcZsh34Te8NBlhcdIu4C6+xwrNxbofR05OF36kTe
-         LQGQ/odCpBIEVlKpIj0Q80JGe1uCvi6ScpPZYaOvJJNszEseSK1BPo68gY8Zb1uf3coz
-         BR8vZg75z25io03dxfQBss7nT9NxDF1kGp5T7KfxjXRv27PqjYInHtjy7+6p4YXLOi8i
-         5Gfg==
-X-Gm-Message-State: AOAM533CWssbD2Su08NJAJ+fZC6FzqUb3nrcilvgc7rBf2AhH0k1DcDM
-        2Cn4Hn/JyygOgFxgwfQWPOahlAXsbmHbeg==
-X-Google-Smtp-Source: ABdhPJwEkWadVQMQsr7KDaVhc/8c+FrR3oE/dEk5bLb+q+IVd7Trgg31l0IF6TdcZMWXzLQoS8S0Dl9DUBZPnQ==
+        bh=tO18+90EOV2bHOTSdvoYawjZxj6UFLMMK348UGkcVfY=;
+        b=IrJ/omu9dzaWXDipNpHuZFwpksyCXdoRX4sOPBSX++2H+0J9yT7rnKlsyAT8ISerR/
+         D7+kJvU8wFg8ECVf6gqQgJYs3ReJMNC8c5chAy3cqPhBuJf04eeSAtlB/MQyu7JQESv5
+         sZnBVCdWNrTNChtDDYz/jhpRsACYRG1T4qn7kYGBmVvLXLpYsnd0OtIpAvcFUiRGHDca
+         31mP8LkJu9cS2pVhDMzaI3I/b13+40HGf+Rn9say0MDw+0658YjrVGMH4ESZqcA/itTe
+         F71EijAk8R7H0MXY0bUcK5aSaOJcy+t8TUZEPZbnWR3ck0W4jMZwowtR3bHJvEW2LCEG
+         My2A==
+X-Gm-Message-State: AOAM531OrkXH0M9/waP4A5t9M70eL2qKGGTKVx73w/13yaFfi4J/WnJP
+        mJol/xWdxiuX+RMGU/5QzsAz2oZwM+eIDA==
+X-Google-Smtp-Source: ABdhPJzTs+oxz+A+qv8jRchWxZcOaiHb2hWYXuHctkrZRWHmFsNSCusffqJ3Tm+toeD8FuF4Dln4mVzvRDerrw==
 Sender: "mmandlik via sendgmr" <mmandlik@mmandlik.mtv.corp.google.com>
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:e50e])
- (user=mmandlik job=sendgmr) by 2002:ad4:46f2:: with SMTP id
- h18mr11609806qvw.4.1605548330198; Mon, 16 Nov 2020 09:38:50 -0800 (PST)
-Date:   Mon, 16 Nov 2020 09:38:38 -0800
-Message-Id: <20201116093746.bluez.v1.1.If5b2e2990c2c57e237708d8cbbf038e376ad0c7a@changeid>
+ (user=mmandlik job=sendgmr) by 2002:a25:8884:: with SMTP id
+ d4mr22486683ybl.58.1605551190073; Mon, 16 Nov 2020 10:26:30 -0800 (PST)
+Date:   Mon, 16 Nov 2020 10:25:53 -0800
+Message-Id: <20201116102547.bluez.v1.1.I4dd1c737d5f8806fe2aa99b8c2d8154fe58871ed@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.29.2.299.gdc1121823c-goog
-Subject: [bluez PATCH v1] adv_monitor: Fix remove monitor from the kernel
+Subject: [bluez PATCH v1] adv_monitor: Update log messages
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     mcchou@chromium.org, alainm@chromium.org,
+Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Manish Mandlik <mmandlik@google.com>, howardchung@google.com
+        Manish Mandlik <mmandlik@google.com>, mcchou@chromium.org,
+        alainm@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-A monitor is removed in the following scenarios:
-- monitor dbus object removed by the app
-- monitor removed by the kernel
-- client app invokes UnregisterMonitor()
-- client app is killed/disconnected
-- AdvMonitorManager is destroyed
+Update log messages to avoid breaking of user-visible log strings
+to make it easy to grep for them.
 
-In the first case, we need to remove the corresponding monitor from the
-kernel and free the bluez monitor object.
-
-In the second case, we need to call the Release() method on the
-corresponding dbus monitor object and free the bluez monitor object.
-
-Kernel may remove all monitors and send MGMT_EV_ADV_MONITOR_REMOVED
-event to bluez. In such case, we need to call Release() method on all
-monitors from all registered apps, and free the bluez monitor objects.
-
-In the third case, we need to call the Release() method on the monitor
-objects created by the app, remove corresponding monitors from the
-kernel and then free the bluez monitor object.
-
-In the fourth case, since the app is not available, all the dbus monitor
-objects created by that app are also unavailable. So, we just need to
-remove corresponding monitors from the kernel and then free the bluez
-monitor objects.
-
-In the fifth case, we need to call Release() method on all monitors from
-all registered apps, remove corresponding monitors from the kernel and
-then free the bluez monitor objects.
-
-When app exits or gets killed without removing the dbus monitor objects
-and without invoking the UnregisterMonitor() method, a race condition
-could happen between app_destroy and monitor_proxy_removed since dbus
-objects hosted by the app are destroyed on app exit.
-
-This patch fixes the first, second and fourth cases ensuring that
-monitors from the kernel are removed correctly, Release() method is
-invoked whenever necessary and bluez monitor objects are freed only
-once.
-
-Reviewed-by: alainm@chromium.org
 Reviewed-by: mcchou@chromium.org
-Reviewed-by: howardchung@google.com
+Reviewed-by: alainm@chromium.org
 Signed-off-by: Manish Mandlik <mmandlik@google.com>
 ---
 
- src/adv_monitor.c | 212 ++++++++++++++++++++++++++++------------------
- 1 file changed, 131 insertions(+), 81 deletions(-)
+ src/adv_monitor.c | 58 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 34 insertions(+), 24 deletions(-)
 
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index c786015c8..606f1d3e4 100644
+index c786015c8..d4300c033 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -79,7 +79,8 @@ enum monitor_state {
- 	MONITOR_STATE_FAILED,	/* Failed to be init'ed */
- 	MONITOR_STATE_INITED,	/* Init'ed but not yet sent to kernel */
- 	MONITOR_STATE_ACTIVE,	/* Accepted by kernel */
--	MONITOR_STATE_REMOVING,	/* Removing from kernel */
-+	MONITOR_STATE_REMOVED,	/* Removed from kernel */
-+	MONITOR_STATE_RELEASED,	/* Dbus Object removed by app */
- };
- 
- struct adv_monitor {
-@@ -167,13 +168,8 @@ static void pattern_free(void *data)
- }
- 
- /* Frees a monitor object */
--static void monitor_free(void *data)
-+static void monitor_free(struct adv_monitor *monitor)
- {
--	struct adv_monitor *monitor = data;
--
--	if (!monitor)
--		return;
--
- 	g_dbus_proxy_unref(monitor->proxy);
- 	g_free(monitor->path);
- 
-@@ -186,12 +182,18 @@ static void monitor_free(void *data)
- }
- 
- /* Calls Release() method of the remote Adv Monitor */
--static void monitor_release(void *data, void *user_data)
-+static void monitor_release(struct adv_monitor *monitor)
- {
--	struct adv_monitor *monitor = data;
--
--	if (!monitor)
-+	/* Release() method on a monitor can be called when -
-+	 * 1. monitor initialization failed
-+	 * 2. app calls UnregisterMonitor and monitors held by app are released
-+	 * 3. monitor is removed by kernel
-+	 */
-+	if (monitor->state != MONITOR_STATE_FAILED &&
-+	    monitor->state != MONITOR_STATE_ACTIVE &&
-+	    monitor->state != MONITOR_STATE_REMOVED) {
- 		return;
-+	}
- 
- 	DBG("Calling Release() on Adv Monitor of owner %s at path %s",
- 		monitor->app->owner, monitor->path);
-@@ -200,6 +202,71 @@ static void monitor_release(void *data, void *user_data)
- 					NULL);
- }
- 
-+/* Handles the callback of Remove Adv Monitor command */
-+static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
-+				const void *param, void *user_data)
-+{
-+	struct btd_adv_monitor_manager *manager = user_data;
-+	const struct mgmt_rp_remove_adv_monitor *rp = param;
-+
-+	if (status != MGMT_STATUS_SUCCESS || !param) {
-+		error("Failed to Remove Adv Monitor with status 0x%02x",
-+				status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of Remove Adv Monitor response");
-+		return;
-+	}
-+
-+	DBG("Adv monitor with handle:0x%04x removed from kernel",
-+		le16_to_cpu(rp->monitor_handle));
-+}
-+
-+/* Sends Remove Adv Monitor command to the kernel */
-+static void monitor_remove(struct adv_monitor *monitor)
-+{
-+	struct adv_monitor_app *app = monitor->app;
-+	uint16_t adapter_id = app->manager->adapter_id;
-+	struct mgmt_cp_remove_adv_monitor cp;
-+
-+	/* Monitor from kernel can be removed when -
-+	 * 1. already activated monitor object is deleted by app
-+	 * 2. app is destroyed and monitors held by app are marked as released
-+	 */
-+	if (monitor->state != MONITOR_STATE_ACTIVE &&
-+	    monitor->state != MONITOR_STATE_RELEASED) {
-+		return;
-+	}
-+
-+	monitor->state = MONITOR_STATE_REMOVED;
-+
-+	cp.monitor_handle = cpu_to_le16(monitor->monitor_handle);
-+
-+	if (!mgmt_send(app->manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
-+			adapter_id, sizeof(cp), &cp, remove_adv_monitor_cb,
-+			app->manager, NULL)) {
-+		btd_error(adapter_id,
-+				"Unable to send Remove Advt Monitor command");
-+	}
-+}
-+
-+/* Destroys a monitor object */
-+static void monitor_destroy(void *data)
-+{
-+	struct adv_monitor *monitor = data;
-+
-+	if (!monitor)
-+		return;
-+
-+	queue_remove(monitor->app->monitors, monitor);
-+
-+	monitor_release(monitor);
-+	monitor_remove(monitor);
-+	monitor_free(monitor);
-+}
-+
- /* Destroys an app object along with related D-Bus handlers */
- static void app_destroy(void *data)
- {
-@@ -210,8 +277,7 @@ static void app_destroy(void *data)
- 
- 	DBG("Destroy Adv Monitor app %s at path %s", app->owner, app->path);
- 
--	queue_foreach(app->monitors, monitor_release, NULL);
--	queue_destroy(app->monitors, monitor_free);
-+	queue_destroy(app->monitors, monitor_destroy);
- 
- 	if (app->reg) {
- 		app_reply_msg(app, btd_error_failed(app->reg,
-@@ -232,15 +298,34 @@ static void app_destroy(void *data)
- 	free(app);
- }
- 
-+/* Updates monitor state to 'released' */
-+static void monitor_state_released(void *data, void *user_data)
-+{
-+	struct adv_monitor *monitor = data;
-+
-+	if (!monitor && monitor->state != MONITOR_STATE_ACTIVE)
-+		return;
-+
-+	monitor->state = MONITOR_STATE_RELEASED;
-+}
-+
- /* Handles a D-Bus disconnection event of an app */
- static void app_disconnect_cb(DBusConnection *conn, void *user_data)
+@@ -237,8 +237,9 @@ static void app_disconnect_cb(DBusConnection *conn, void *user_data)
  {
  	struct adv_monitor_app *app = user_data;
  
-+	if (!app) {
-+		error("Unexpected NULL app object upon app disconnect");
-+		return;
-+	}
-+
- 	btd_info(app->manager->adapter_id, "Adv Monitor app %s disconnected "
- 			"from D-Bus", app->owner);
--	if (app && queue_remove(app->manager->apps, app))
-+
-+	if (queue_remove(app->manager->apps, app)) {
-+		queue_foreach(app->monitors, monitor_state_released, NULL);
+-	btd_info(app->manager->adapter_id, "Adv Monitor app %s disconnected "
+-			"from D-Bus", app->owner);
++	btd_info(app->manager->adapter_id,
++			"Adv Monitor app %s disconnected from D-Bus",
++			app->owner);
+ 	if (app && queue_remove(app->manager->apps, app))
  		app_destroy(app);
-+	}
  }
+@@ -312,8 +313,9 @@ static bool parse_monitor_type(struct adv_monitor *monitor, const char *path)
+ 	uint16_t adapter_id = monitor->app->manager->adapter_id;
  
- /* Handles the ready signal of Adv Monitor app */
-@@ -558,14 +643,16 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
- 	if (status != MGMT_STATUS_SUCCESS || !param) {
- 		btd_error(adapter_id, "Failed to Add Adv Patterns Monitor "
- 				"with status 0x%02x", status);
--		monitor_release(monitor, NULL);
-+		monitor->state = MONITOR_STATE_FAILED;
-+		monitor_destroy(monitor);
- 		return;
+ 	if (!g_dbus_proxy_get_property(monitor->proxy, "Type", &iter)) {
+-		btd_error(adapter_id, "Failed to retrieve property Type from "
+-			"the Adv Monitor at path %s", path);
++		btd_error(adapter_id,
++				"Failed to retrieve property Type from the "
++				"Adv Monitor at path %s", path);
+ 		return false;
  	}
  
- 	if (length < sizeof(*rp)) {
- 		btd_error(adapter_id, "Wrong size of Add Adv Patterns Monitor "
- 				"response");
--		monitor_release(monitor, NULL);
-+		monitor->state = MONITOR_STATE_FAILED;
-+		monitor_destroy(monitor);
- 		return;
+@@ -330,8 +332,9 @@ static bool parse_monitor_type(struct adv_monitor *monitor, const char *path)
  	}
  
-@@ -623,8 +710,7 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 	}
+ failed:
+-	btd_error(adapter_id, "Invalid argument of property Type of the Adv "
+-			"Monitor at path %s", path);
++	btd_error(adapter_id,
++			"Invalid argument of property Type of the Adv Monitor "
++			"at path %s", path);
  
- 	if (!monitor_process(monitor, app)) {
--		monitor_release(monitor, NULL);
--		monitor_free(monitor);
-+		monitor_destroy(monitor);
- 		DBG("Adv Monitor at path %s released due to invalid content",
+ 	return false;
+ }
+@@ -431,8 +434,9 @@ failed:
+ 	monitor->high_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+ 	monitor->low_rssi_timeout = ADV_MONITOR_UNSET_TIMER;
+ 
+-	btd_error(adapter_id, "Invalid argument of property "
+-			"RSSIThresholdsAndTimers of the Adv Monitor at path %s",
++	btd_error(adapter_id,
++			"Invalid argument of property RSSIThresholdsAndTimers "
++			"of the Adv Monitor at path %s",
  			path);
- 		return;
-@@ -652,77 +738,22 @@ done:
- 	free(cp);
- }
  
--/* Handles the callback of Remove Adv Monitor command */
--static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
--				const void *param, void *user_data)
--{
--	struct adv_monitor *monitor = user_data;
--	const struct mgmt_rp_remove_adv_monitor *rp = param;
--	uint16_t adapter_id = monitor->app->manager->adapter_id;
--
--	if (status != MGMT_STATUS_SUCCESS || !param) {
--		btd_error(adapter_id, "Failed to Remove Adv Monitor with "
--			"status 0x%02x", status);
--		goto done;
--	}
--
--	if (length < sizeof(*rp)) {
--		btd_error(adapter_id, "Wrong size of Remove Adv Monitor "
--				"response");
--		goto done;
--	}
--
--done:
--	queue_remove(monitor->app->monitors, monitor);
--
--	DBG("Adv Monitor removed with handle:0x%04x, path %s",
--		monitor->monitor_handle, monitor->path);
--
--	monitor_free(monitor);
--}
--
--
- /* Handles the removal of an Adv Monitor D-Bus proxy */
- static void monitor_proxy_removed_cb(GDBusProxy *proxy, void *user_data)
- {
- 	struct adv_monitor *monitor;
--	struct mgmt_cp_remove_adv_monitor cp;
- 	struct adv_monitor_app *app = user_data;
--	uint16_t adapter_id = app->manager->adapter_id;
+ 	return false;
+@@ -447,8 +451,9 @@ static bool parse_patterns(struct adv_monitor *monitor, const char *path)
+ 	uint16_t adapter_id = monitor->app->manager->adapter_id;
  
- 	monitor = queue_find(app->monitors, monitor_match, proxy);
- 
--	/* A monitor removed event from kernel can remove a monitor and notify
--	 * the app on Release() where this callback can be invoked, so we
--	 * simply skip here.
--	 */
- 	if (!monitor)
- 		return;
- 
--	if (monitor->state != MONITOR_STATE_ACTIVE)
--		goto done;
--
--	monitor->state = MONITOR_STATE_REMOVING;
--
--	cp.monitor_handle = cpu_to_le16(monitor->monitor_handle);
--
--	if (!mgmt_send(app->manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
--			adapter_id, sizeof(cp), &cp, remove_adv_monitor_cb,
--			monitor, NULL)) {
--		btd_error(adapter_id, "Unable to send Remove Advt Monitor "
--				"command");
--		goto done;
--	}
--
--	return;
--
--done:
--	queue_remove(app->monitors, monitor);
--
- 	DBG("Adv Monitor removed in state %02x with path %s", monitor->state,
- 		monitor->path);
- 
--	monitor_free(monitor);
-+	monitor_state_released(monitor, NULL);
-+	monitor_destroy(monitor);
- }
- 
- /* Creates an app object, initiates it and sets D-Bus event handlers */
-@@ -943,22 +974,41 @@ static bool removed_monitor_match(const void *data, const void *user_data)
- 	return monitor->monitor_handle == *handle;
- }
- 
-+/* Updates monitor state to 'removed' */
-+static void monitor_state_removed(void *data, void *user_data)
-+{
-+	struct adv_monitor *monitor = data;
-+
-+	if (!monitor && monitor->state != MONITOR_STATE_ACTIVE)
-+		return;
-+
-+	monitor->state = MONITOR_STATE_REMOVED;
-+
-+	DBG("Adv monitor with handle:0x%04x removed by kernel",
-+		monitor->monitor_handle);
-+}
-+
- /* Remove the matched monitor and reports the removal to the app */
- static void app_remove_monitor(void *data, void *user_data)
- {
- 	struct adv_monitor_app *app = data;
- 	struct adv_monitor *monitor;
-+	uint16_t *handle = user_data;
- 
--	monitor = queue_find(app->monitors, removed_monitor_match, user_data);
--	if (monitor) {
--		if (monitor->state == MONITOR_STATE_ACTIVE)
--			monitor_release(monitor, NULL);
-+	if (handle && *handle == 0) {
-+		/* handle = 0 indicates kernel has removed all monitors */
-+		queue_foreach(app->monitors, monitor_state_removed, NULL);
-+		queue_destroy(app->monitors, monitor_destroy);
- 
--		queue_remove(app->monitors, monitor);
-+		return;
-+	}
- 
-+	monitor = queue_find(app->monitors, removed_monitor_match, handle);
-+	if (monitor) {
- 		DBG("Adv Monitor at path %s removed", monitor->path);
- 
--		monitor_free(monitor);
-+		monitor_state_removed(monitor, NULL);
-+		monitor_destroy(monitor);
+ 	if (!g_dbus_proxy_get_property(monitor->proxy, "Patterns", &array)) {
+-		btd_error(adapter_id, "Failed to retrieve property Patterns "
+-				"from the Adv Monitor at path %s", path);
++		btd_error(adapter_id,
++				"Failed to retrieve property Patterns from the "
++				"Adv Monitor at path %s", path);
+ 		return false;
  	}
- }
  
+@@ -556,8 +561,9 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
+ 	uint16_t adapter_id = monitor->app->manager->adapter_id;
+ 
+ 	if (status != MGMT_STATUS_SUCCESS || !param) {
+-		btd_error(adapter_id, "Failed to Add Adv Patterns Monitor "
+-				"with status 0x%02x", status);
++		btd_error(adapter_id,
++				"Failed to Add Adv Patterns Monitor with status"
++				" 0x%02x", status);
+ 		monitor_release(monitor, NULL);
+ 		return;
+ 	}
+@@ -610,15 +616,17 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
+ 	}
+ 
+ 	if (queue_find(app->monitors, monitor_match, proxy)) {
+-		btd_error(adapter_id, "Adv Monitor proxy already exists with "
+-				"path %s", path);
++		btd_error(adapter_id,
++				"Adv Monitor proxy already exists with path %s",
++				path);
+ 		return;
+ 	}
+ 
+ 	monitor = monitor_new(app, proxy);
+ 	if (!monitor) {
+-		btd_error(adapter_id, "Failed to allocate an Adv Monitor for "
+-				"the object at %s", path);
++		btd_error(adapter_id,
++				"Failed to allocate an Adv Monitor for the "
++				"object at %s", path);
+ 		return;
+ 	}
+ 
+@@ -852,8 +860,9 @@ static DBusMessage *unregister_monitor(DBusConnection *conn,
+ 	queue_remove(manager->apps, app);
+ 	app_destroy(app);
+ 
+-	btd_info(manager->adapter_id, "Path %s removed along with Adv Monitor "
+-			"app %s", match.path, match.owner);
++	btd_info(manager->adapter_id,
++			"Path %s removed along with Adv Monitor app %s",
++			match.path, match.owner);
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+@@ -972,8 +981,8 @@ static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
+ 	const uint16_t adapter_id = manager->adapter_id;
+ 
+ 	if (length < sizeof(*ev)) {
+-		btd_error(adapter_id, "Wrong size of Adv Monitor Removed "
+-				"event");
++		btd_error(adapter_id,
++				"Wrong size of Adv Monitor Removed event");
+ 		return;
+ 	}
+ 
+@@ -1044,8 +1053,9 @@ static void read_adv_monitor_features_cb(uint8_t status, uint16_t length,
+ 	struct btd_adv_monitor_manager *manager = user_data;
+ 
+ 	if (status != MGMT_STATUS_SUCCESS || !param) {
+-		btd_error(manager->adapter_id, "Failed to Read Adv Monitor "
+-				"Features with status 0x%02x", status);
++		btd_error(manager->adapter_id,
++				"Failed to Read Adv Monitor Features with "
++				"status 0x%02x", status);
+ 		return;
+ 	}
+ 
+@@ -1387,8 +1397,8 @@ static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
+ 	if (!dev) {
+ 		dev = monitor_device_create(monitor, device);
+ 		if (!dev) {
+-			btd_error(adapter_id, "Failed to create Adv Monitor "
+-					      "device object.");
++			btd_error(adapter_id,
++				"Failed to create Adv Monitor device object.");
+ 			return;
+ 		}
+ 	}
 -- 
 2.29.2.299.gdc1121823c-goog
 
