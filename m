@@ -2,104 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 289F1C61DD8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 13:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0BFAC5519F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 15:56:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD3F822280
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 13:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79F48221F9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Nov 2020 15:56:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=spotify.com header.i=@spotify.com header.b="jNtDcQXb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728473AbgKPNTo (ORCPT
+        id S1730591AbgKPP4b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Nov 2020 08:19:44 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7544 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728281AbgKPNTo (ORCPT
+        Mon, 16 Nov 2020 10:56:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730305AbgKPP4a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Nov 2020 08:19:44 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CZV67296vzhXs1;
-        Mon, 16 Nov 2020 21:19:27 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 16 Nov 2020 21:19:29 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     =?UTF-8?q?Marcel=20Holtmann=20Johan=20Hedberg=20Jakub=20Kicinski=20Joseph=20Hwang=20Alain=20Michaud=20Abhishek=20Pandit-Subedi=20Pali=20Roh=C3=A1r?= 
-        <"marcel@holtmann.orgjohan.hedberg@gmail.comkuba@kernel.orgjosephsih@chromium.orgalainm@chromium.orgabhishekpandit@chromium.orgpali"@kernel.org>
-CC:     Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH] Bluetooth: sco: Fix crash when using BT_SNDMTU/BT_RCVMTU option
-Date:   Mon, 16 Nov 2020 21:24:21 +0800
-Message-ID: <20201116132421.94624-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 16 Nov 2020 10:56:30 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76672C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 07:56:30 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id 11so20729804ljf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 07:56:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=spotify.com; s=google;
+        h=date:from:to:subject:message-id:mime-version:content-disposition;
+        bh=UCndNIOPXgrL83E/2cFzjq78MdhEPHg0bfsEyvdJ/3A=;
+        b=jNtDcQXbskY+139SnsNf93aTuxrTXbIIVhNOHkfO8O5gKhOzEUt9AG4YrBRRAbLNdL
+         eccS9qxbTo+FxAuf7squu926OXF8vnmABC/K40X7BbCSOBWq1JOirwF+fx/+fA2/8ino
+         pLFu+Ig9hLe/ErSrqTaHDFH2gWVXs2m8h4tRE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition;
+        bh=UCndNIOPXgrL83E/2cFzjq78MdhEPHg0bfsEyvdJ/3A=;
+        b=NnUJ/CYNeeea8GOq5dxLnLtHfwXB+YAPJPoDNjPXD0l7aGdAK6RBsYZJZBvr5kNuJ+
+         yCRvz//2VVi6jTQafKWS3s1s06uZzF2MyENMChz/4naF9jT2ru47dVBGWZpUrJVhkCFw
+         yUM+7nA21Uq2xPi2y2+MSvLiQZCyvd+2PgNy3fZK3+v3579YX9wQtT13ZfcMZDEQgkWw
+         hsXncL9PeXXbHOc/AVVrYE+/hJI1DSb2I7soGqPkDuGY2czPu5oHMBxn4baVF/5pDJp0
+         DsZSAgkdGJ861umeBIWyA+Vj76J7XniTHtJbHZ1ZeGSFoTCcflRDsweY9sTHX5/wBRnl
+         I28w==
+X-Gm-Message-State: AOAM5338URrOub9oqJjv/mZD3bthfwmBIAaAxFtKz551tS7hDubvifzS
+        Y/I8cStwnYLzGxDH3S8f29mG
+X-Google-Smtp-Source: ABdhPJwGTbkrbodTnSO1/6Q3XpZy/G9RvRn/jz/8vN/8K7ZdsQUs8k2ksbg+qrQItvfZgS6EFeJrgQ==
+X-Received: by 2002:a2e:8718:: with SMTP id m24mr4666lji.79.1605542188612;
+        Mon, 16 Nov 2020 07:56:28 -0800 (PST)
+Received: from jimmy-ryzen-home (c-8713e055.76534-0-69706f6e6c79.bbcust.telenor.se. [85.224.19.135])
+        by smtp.gmail.com with ESMTPSA id v28sm2786356lfo.43.2020.11.16.07.56.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Nov 2020 07:56:28 -0800 (PST)
+Date:   Mon, 16 Nov 2020 16:56:26 +0100
+From:   Jimmy Wahlberg <jimmywa@spotify.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [Patch v3] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C
+Message-ID: <20201116155626.GA27472@jimmy-ryzen-home>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This commit add the invalid check for connected socket, without it will
-causes the following crash due to sco_pi(sk)->conn being NULL:
+This test case is meant to verify that multiple
+unknown options is included in the response.
 
-KASAN: null-ptr-deref in range [0x0000000000000050-0x0000000000000057]
-CPU: 3 PID: 4284 Comm: test_sco Not tainted 5.10.0-rc3+ #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1 04/01/2014
-RIP: 0010:sco_sock_getsockopt+0x45d/0x8e0
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 ca 03 00 00 49 8b 9d f8 04 00 00 48 b8 00
-      00 00 00 00 fc ff df 48 8d 7b 50 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84
-      c0 74 08 3c 03 0f 8e b5 03 00 00 8b 43 50 48 8b 0c
-RSP: 0018:ffff88801bb17d88 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff83a4ecdf
-RDX: 000000000000000a RSI: ffffc90002fce000 RDI: 0000000000000050
-RBP: 1ffff11003762fb4 R08: 0000000000000001 R09: ffff88810e1008c0
-R10: ffffffffbd695dcf R11: fffffbfff7ad2bb9 R12: 0000000000000000
-R13: ffff888018ff1000 R14: dffffc0000000000 R15: 000000000000000d
-FS:  00007fb4f76c1700(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005555e3b7a938 CR3: 00000001117be001 CR4: 0000000000770ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- ? sco_skb_put_cmsg+0x80/0x80
- ? sco_skb_put_cmsg+0x80/0x80
- __sys_getsockopt+0x12a/0x220
- ? __ia32_sys_setsockopt+0x150/0x150
- ? syscall_enter_from_user_mode+0x18/0x50
- ? rcu_read_lock_bh_held+0xb0/0xb0
- __x64_sys_getsockopt+0xba/0x150
- ? syscall_enter_from_user_mode+0x1d/0x50
- do_syscall_64+0x33/0x40
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
+BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part A
+page 1057
 
-Fixes: 0fc1a726f897 ("Bluetooth: sco: new getsockopt options BT_SNDMTU/BT_RCVMTU")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+'On an unknown option failure (Result=0x0003),
+the option(s) that contain anoption type field that is not
+understood by the recipient of the L2CAP_CONFIGURATION_REQ
+packet shall be included in the L2CAP_CONFIGURATION_RSP
+packet unless they are hints.'
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 79ffcdef0b7a..22a110f37abc 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1003,6 +1003,11 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- 	case BT_SNDMTU:
- 	case BT_RCVMTU:
-+		if (sk->sk_state != BT_CONNECTED) {
-+			err = -ENOTCONN;
-+			break;
-+		}
-+
- 		if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
- 			err = -EFAULT;
- 		break;
+Before this patch:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 24
+      L2CAP: Configure Request (0x04) ident 18 len 16
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [mandatory]
+        10 00 11 02 11 00 12 02 12 00
+< ACL Data TX: Handle 11 flags 0x00 dlen 17
+      L2CAP: Configure Response (0x05) ident 18 len 9
+        Source CID: 64
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        Option: Unknown (0x10) [mandatory]
+        12
+
+After this patch:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 24
+      L2CAP: Configure Request (0x04) ident 5 len 16
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Unknown (0x10) [mandatory]
+        10 00 11 02 11 00 12 02 12 00
+< ACL Data TX: Handle 11 flags 0x00 dlen 23
+      L2CAP: Configure Response (0x05) ident 5 len 15
+        Source CID: 64
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        Option: Unknown (0x10) [mandatory]
+        10 11 01 11 12 01 12
+
+Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
+---
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1ab27b90ddcb..16956f323688 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3627,7 +3627,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			if (hint)
+ 				break;
+ 			result = L2CAP_CONF_UNKNOWN;
+-			*((u8 *) ptr++) = type;
++			l2cap_add_conf_opt(&ptr, (u8)type, sizeof(u8), type, endptr - ptr);
+ 			break;
+ 		}
+ 	}
 -- 
 2.25.1
+
+Updated commit message to follow this feedback from bluez.test.bot
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C.
+1: T3 Title has trailing punctuation (.): "Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C."
+
 
