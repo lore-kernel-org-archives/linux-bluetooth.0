@@ -5,136 +5,155 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A8CC63777
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Nov 2020 00:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F03C5519F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Nov 2020 00:01:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D71C2465A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Nov 2020 00:01:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F0D424656
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Nov 2020 00:01:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsL0sYtF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIw8rRyB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728291AbgKQABL (ORCPT
+        id S1730424AbgKQABv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Nov 2020 19:01:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49406 "EHLO
+        Mon, 16 Nov 2020 19:01:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728095AbgKQABL (ORCPT
+        with ESMTP id S1730322AbgKQABv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Nov 2020 19:01:11 -0500
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B97C0613CF;
-        Mon, 16 Nov 2020 16:01:11 -0800 (PST)
-Received: by mail-oi1-x241.google.com with SMTP id t16so20672570oie.11;
-        Mon, 16 Nov 2020 16:01:11 -0800 (PST)
+        Mon, 16 Nov 2020 19:01:51 -0500
+Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 631C1C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 16:01:51 -0800 (PST)
+Received: by mail-oo1-xc42.google.com with SMTP id y3so4327674ooq.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2020 16:01:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=43DQzCg5Fh/e80j18iTB14KX1KqVOE9LtzMgiPsxv38=;
-        b=PsL0sYtFCpYFJEeN/zR/L+McjGTROMEXrUz6g6LwC8cK72WwqZ0oAPQoC0Bfv4gemN
-         AeYl+9xSiuhuRzrOnZh1WRvRknXwje9Q6jCojfKS2TeY2ogrxezzYn0OjRp/3fSaBLvC
-         +jKawWvRxGE7tHXVt6FiTdu6uEnfvaPpcGoVrLflbwmKJxGM9RiZGnFONpy+mr8w+Shl
-         A8ACQ+17PIthCUuOruJc34guw8gZy7m18OWCFugC6ZN0M1Y/hn3Xf0pb/OG4zCYpWlMX
-         0iUe7UrWClidkDUqPb6OGHeYkW8V0IvKQmFKe5C81rmXtR38mOAWZMpBjJ1y1TwhC3UT
-         JQgA==
+        bh=7NiMWLEJb2s/dvDOZLVQDzFbYe7xKxbCy6Esm03ot5g=;
+        b=XIw8rRyBRvsQqeiOX3kjA4pwh8/QDR60g//WcGvAcIWEJeovtwY8pqMAeYdsToev8k
+         31IIOgMEFdLNcNVR+aW0IINx8n4AoeuH2At4LawEBRb0wcemqMbw1k1Yha/RksbCroQr
+         6zkWOhldW1iSdEVvtP1rKCfLcb6SJs8EcbF5pCngOe6zSQc0LSJzPEGa794Z5CPk86+h
+         H6D9VRBf/SdW65SP0VhGdbQY4yHEz2H/LFxKwpsUGi5oDIBGLFBNulbi3Uh11IGjO0hP
+         ho8R6I6QHi0yP2UNQ/kH4Re8cQIhed85QU1qjuCDgUnnK/osei+4cCM5S2R4ei458hn+
+         7fKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=43DQzCg5Fh/e80j18iTB14KX1KqVOE9LtzMgiPsxv38=;
-        b=bRHDLMaOz3QxRCOARK590iprwuVmANFpdIesIHgn0MVymrewVNWjlvN1EN9BnDj5bf
-         NSQKgVgPOHjVScjZSvYqFJi76e7hin6cS+wdXymF4hmyjM4xj0ASO9g4N9m3Bfi5hnci
-         onjKYxcLzGfgC6r/tXGeVhBMLZTejKC9wEmMGcWACrc2BTBGO7Cv64rz/cMKwq46hOD7
-         sn101R1sqqUL58JM8IxQfw0JhJlamgtNGmrYj9vlgR4O+v5qTfix4VSexGkY9OMZjmnx
-         T69AYgkoAUBbZig8JG1S6SQBiO5caPD0TZzirQ5KM259HTjm8OFjpPk5v9dcQ6a7l6z2
-         a1JA==
-X-Gm-Message-State: AOAM530vdjkySS+ImENJeIrm2Ui9MP3dfOKr1nNmCiIno3Ko+tWF/SWi
-        Z/SlOzPW0oKAUXpK8sIQPKM3CNIhiriNo4NVvfk=
-X-Google-Smtp-Source: ABdhPJxmLZRBQLvUFxoYDhs/loQsOlCbnoqq8SXRB09DsBSVyRnMhSwE5Q7YTKnPZJrjX8Te1KqotXQYjuk7jSatQws=
-X-Received: by 2002:aca:c70b:: with SMTP id x11mr821929oif.58.1605571270718;
- Mon, 16 Nov 2020 16:01:10 -0800 (PST)
+        bh=7NiMWLEJb2s/dvDOZLVQDzFbYe7xKxbCy6Esm03ot5g=;
+        b=PkeqsZnda4eITrCkk769MhXIDtUTn8ewJm/KX7ZqoGamKdzLBb0CEoZ9g5LWvv1+r9
+         nZKsIkHlGV3VHexzMHt0tnhnpudTKy6YT49TzojrPiOCkizakrc/gskw65166Zaewv/w
+         waMIHdub2jl+KpjHyL4P8aqDgJAL3PQiDN3r7ajB1PAGrSnIyx+kv2PdlsTrCKuv7+vY
+         aI83xNhdjA8JPQ2mYPEFa7YhQnquE3N+pDUVTkonduAA1d6XMD1o5BjjrlGjUfxGJwsz
+         GZ97MpkCNlsot7hb+aCEJAGmQGcfZCxIoSsi6kCoEaOFOCYq/eV9cV6z8r3upgLmKLRU
+         /fJA==
+X-Gm-Message-State: AOAM531c86JBJ8eWpOighdNLbceMhSiQ1Xbjpbh2QSAlNYEFcjvGSRnp
+        7mc2sWRHLywhK0gI7BVbuiBnbY+iGPE+TFvSx/s=
+X-Google-Smtp-Source: ABdhPJy7TMTj/jeX6v9tomT1Ppfx6yiJZyMiAX0AcpjV3dviGGdEJePFWTn6IBkh8hBqD9IHCb+CzWw4UBSWmRUtcuY=
+X-Received: by 2002:a4a:a542:: with SMTP id s2mr1303282oom.24.1605571310809;
+ Mon, 16 Nov 2020 16:01:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20201116132421.94624-1-weiyongjun1@huawei.com>
-In-Reply-To: <20201116132421.94624-1-weiyongjun1@huawei.com>
+References: <20201116155626.GA27472@jimmy-ryzen-home>
+In-Reply-To: <20201116155626.GA27472@jimmy-ryzen-home>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 16 Nov 2020 16:00:59 -0800
-Message-ID: <CABBYNZLAn2ps7MuqeKPFA6QNnVzjmTCOHxTCcK9KzLD34OOpcg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: sco: Fix crash when using BT_SNDMTU/BT_RCVMTU option
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Hulk Robot <hulkci@huawei.com>
+Date:   Mon, 16 Nov 2020 16:01:40 -0800
+Message-ID: <CABBYNZJNipW9PGWGXEK_gu1r2tFDLZ14WNxkg92J7Zu4yUAmiw@mail.gmail.com>
+Subject: Re: [Patch v3] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C
+To:     Jimmy Wahlberg <jimmywa@spotify.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Jimmy.
 
-On Mon, Nov 16, 2020 at 5:22 AM Wei Yongjun <weiyongjun1@huawei.com> wrote:
+On Mon, Nov 16, 2020 at 8:01 AM Jimmy Wahlberg <jimmywa@spotify.com> wrote:
 >
-> This commit add the invalid check for connected socket, without it will
-> causes the following crash due to sco_pi(sk)->conn being NULL:
+> This test case is meant to verify that multiple
+> unknown options is included in the response.
 >
-> KASAN: null-ptr-deref in range [0x0000000000000050-0x0000000000000057]
-> CPU: 3 PID: 4284 Comm: test_sco Not tainted 5.10.0-rc3+ #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1 04/01/2014
-> RIP: 0010:sco_sock_getsockopt+0x45d/0x8e0
-> Code: 48 c1 ea 03 80 3c 02 00 0f 85 ca 03 00 00 49 8b 9d f8 04 00 00 48 b8 00
->       00 00 00 00 fc ff df 48 8d 7b 50 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84
->       c0 74 08 3c 03 0f 8e b5 03 00 00 8b 43 50 48 8b 0c
-> RSP: 0018:ffff88801bb17d88 EFLAGS: 00010206
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff83a4ecdf
-> RDX: 000000000000000a RSI: ffffc90002fce000 RDI: 0000000000000050
-> RBP: 1ffff11003762fb4 R08: 0000000000000001 R09: ffff88810e1008c0
-> R10: ffffffffbd695dcf R11: fffffbfff7ad2bb9 R12: 0000000000000000
-> R13: ffff888018ff1000 R14: dffffc0000000000 R15: 000000000000000d
-> FS:  00007fb4f76c1700(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00005555e3b7a938 CR3: 00000001117be001 CR4: 0000000000770ee0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  ? sco_skb_put_cmsg+0x80/0x80
->  ? sco_skb_put_cmsg+0x80/0x80
->  __sys_getsockopt+0x12a/0x220
->  ? __ia32_sys_setsockopt+0x150/0x150
->  ? syscall_enter_from_user_mode+0x18/0x50
->  ? rcu_read_lock_bh_held+0xb0/0xb0
->  __x64_sys_getsockopt+0xba/0x150
->  ? syscall_enter_from_user_mode+0x1d/0x50
->  do_syscall_64+0x33/0x40
->  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part A
+> page 1057
 >
-> Fixes: 0fc1a726f897 ("Bluetooth: sco: new getsockopt options BT_SNDMTU/BT_RCVMTU")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> 'On an unknown option failure (Result=0x0003),
+> the option(s) that contain anoption type field that is not
+> understood by the recipient of the L2CAP_CONFIGURATION_REQ
+> packet shall be included in the L2CAP_CONFIGURATION_RSP
+> packet unless they are hints.'
+>
+> Before this patch:
+>
+> > ACL Data RX: Handle 11 flags 0x02 dlen 24
+>       L2CAP: Configure Request (0x04) ident 18 len 16
+>         Destination CID: 64
+>         Flags: 0x0000
+>         Option: Unknown (0x10) [mandatory]
+>         10 00 11 02 11 00 12 02 12 00
+> < ACL Data TX: Handle 11 flags 0x00 dlen 17
+>       L2CAP: Configure Response (0x05) ident 18 len 9
+>         Source CID: 64
+>         Flags: 0x0000
+>         Result: Failure - unknown options (0x0003)
+>         Option: Unknown (0x10) [mandatory]
+>         12
+>
+> After this patch:
+>
+> > ACL Data RX: Handle 11 flags 0x02 dlen 24
+>       L2CAP: Configure Request (0x04) ident 5 len 16
+>         Destination CID: 64
+>         Flags: 0x0000
+>         Option: Unknown (0x10) [mandatory]
+>         10 00 11 02 11 00 12 02 12 00
+> < ACL Data TX: Handle 11 flags 0x00 dlen 23
+>       L2CAP: Configure Response (0x05) ident 5 len 15
+>         Source CID: 64
+>         Flags: 0x0000
+>         Result: Failure - unknown options (0x0003)
+>         Option: Unknown (0x10) [mandatory]
+>         10 11 01 11 12 01 12
+>
+> Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
 
 Reviewed-by: Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
 
+> ---
+>  net/bluetooth/l2cap_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 79ffcdef0b7a..22a110f37abc 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -1003,6 +1003,11 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
->
->         case BT_SNDMTU:
->         case BT_RCVMTU:
-> +               if (sk->sk_state != BT_CONNECTED) {
-> +                       err = -ENOTCONN;
-> +                       break;
-> +               }
-> +
->                 if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
->                         err = -EFAULT;
->                 break;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 1ab27b90ddcb..16956f323688 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3627,7 +3627,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+>                         if (hint)
+>                                 break;
+>                         result = L2CAP_CONF_UNKNOWN;
+> -                       *((u8 *) ptr++) = type;
+> +                       l2cap_add_conf_opt(&ptr, (u8)type, sizeof(u8), type, endptr - ptr);
+>                         break;
+>                 }
+>         }
 > --
 > 2.25.1
+>
+> Updated commit message to follow this feedback from bluez.test.bot
+>
+> ##############################
+> Test: CheckGitLint - FAIL
+> Output:
+> Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C.
+> 1: T3 Title has trailing punctuation (.): "Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C."
+>
 >
 
 
