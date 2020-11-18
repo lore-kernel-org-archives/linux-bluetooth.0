@@ -2,79 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28D5C5519F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 17:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B57BC5519F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 19:56:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60FEF20719
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 17:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43227246A6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 19:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbgKRRe3 (ORCPT
+        id S1726300AbgKRT4I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Nov 2020 12:34:29 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:40887 "EHLO
-        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbgKRRe2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Nov 2020 12:34:28 -0500
-X-Greylist: delayed 110572 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Nov 2020 12:34:28 EST
-X-Originating-IP: 82.255.60.242
-Received: from [192.168.0.28] (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
-        (Authenticated sender: hadess@hadess.net)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id EA32CFF804;
-        Wed, 18 Nov 2020 17:34:26 +0000 (UTC)
-Message-ID: <922ebf50e343c6116b618ec966def51ece708dcf.camel@hadess.net>
-Subject: Re: [PATCH] tools/hcitool.c
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Bisseling <spam@bisseling.de>, linux-bluetooth@vger.kernel.org,
-        marcel@holtmann.org
-Date:   Wed, 18 Nov 2020 18:34:26 +0100
-In-Reply-To: <1a8fb695-c92d-03fe-3347-6e98480be830@bisseling.de>
-References: <96d6eb8d-cf31-7cae-3e78-6761cb74961a@bisseling.de>
-         <38dcad476ea9efa71eff2065cdd7d57c184bd6b6.camel@hadess.net>
-         <24eb6e46-0563-92fc-5394-f1de9d9e0135@bisseling.de>
-         <1a8fb695-c92d-03fe-3347-6e98480be830@bisseling.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.1 (3.38.1-1.fc33) 
+        Wed, 18 Nov 2020 14:56:08 -0500
+Received: from mga18.intel.com ([134.134.136.126]:13507 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726105AbgKRT4I (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Nov 2020 14:56:08 -0500
+IronPort-SDR: +r35S/HI0wVJeviWfe/DLi0PIUkicx580dMkgOw7lB7blCbiacLF52M/4lEKmuiqxlBMWmasgW
+ vPUMncmKBA5A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9809"; a="158948744"
+X-IronPort-AV: E=Sophos;i="5.77,488,1596524400"; 
+   d="scan'208";a="158948744"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2020 11:56:08 -0800
+IronPort-SDR: n8Y+mORac1lAG+K9sr6LJ3+l1CT4CTt18JzkMLXPSpxAClU+H+BJprA4lGSl1gkN3HOahM8w2C
+ VwdMPANrsOgw==
+X-IronPort-AV: E=Sophos;i="5.77,488,1596524400"; 
+   d="scan'208";a="359628079"
+Received: from sthakkar-mobl.amr.corp.intel.com (HELO ingas-nuc1.intel.com) ([10.209.4.203])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2020 11:56:07 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, sbrown@ewol.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix regression error in HB subscription set
+Date:   Wed, 18 Nov 2020 11:56:00 -0800
+Message-Id: <20201118195600.30267-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 2020-11-18 at 17:35 +0100, Bisseling wrote:
-> Now a robot tells me to do offer my patch via email to this mailing 
-> list. How very frustrating.
+This fixes a regression introduced in commit c77bb848a9fb
+("mesh: Refactor heartbeat pub/sub"):
+Heartbeat subscription should be enabled unless either source or
+destination are unassigned addresses or period log is zero.
 
-I don't think that the fact that PRs weren't going to get merged was
-announced after the github repo was. I would have got bitten as well.
+Also, decrement ref count on group destination address if period log
+is zer since the subscription is not supposed to be processed.
+---
+ mesh/net.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-Sorry about that.
-
-> 
-> On 17.11.20 16:30, Bisseling wrote:
-> > Hope I got that pull request right.
-> > 
-> > Thanks
-> > 
-> > On 13.11.20 18:00, Bastien Nocera wrote:
-> > > On Fri, 2020-11-13 at 17:54 +0100, Bisseling wrote:
-> > > > Please review and pull:
-> > > > 
-> > > > https://github.com/GeorgBisseling/bluez/commit/69b61d7c71d08ddfd1b5b0f1862e456601264a01
-> > > >  
-> > > > 
-> > > > 
-> > > > 
-> > > You can create a pull request against:
-> > > https://github.com/bluez/bluez/pulls
-> > > 
-> > > Otherwise you'll need to use git-sendemail to send the patch
-> > > itself to
-> > > the list.
-> > > 
-
+diff --git a/mesh/net.c b/mesh/net.c
+index 9e0ea860f..b24cdba77 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -3582,16 +3582,21 @@ int mesh_net_set_heartbeat_sub(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		sub->max_hops = 0;
+ 
+ 	} else if (!period_log && src == sub->src && dst == sub->dst) {
++		if (IS_GROUP(sub->dst))
++			mesh_net_dst_unreg(net, sub->dst);
++
+ 		/* Preserve collected data, but disable */
+ 		sub->enabled = false;
+ 		sub->period = 0;
+ 
+-	} else if (sub->dst != dst) {
+-		if (IS_GROUP(sub->dst))
+-			mesh_net_dst_unreg(net, sub->dst);
++	} else {
++		if (sub->dst != dst) {
++			if (IS_GROUP(sub->dst))
++				mesh_net_dst_unreg(net, sub->dst);
+ 
+-		if (IS_GROUP(dst))
+-			mesh_net_dst_reg(net, dst);
++			if (IS_GROUP(dst))
++				mesh_net_dst_reg(net, dst);
++		}
+ 
+ 		sub->enabled = !!period_log;
+ 		sub->src = src;
+-- 
+2.26.2
 
