@@ -2,109 +2,156 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C604C5519F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 04:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4889C5519F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 12:53:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94D3024181
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 04:31:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nadtlfrD"
+	by mail.kernel.org (Postfix) with ESMTP id 7A5B124180
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 12:53:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726792AbgKREbF (ORCPT
+        id S1726363AbgKRMwx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Nov 2020 23:31:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59782 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726392AbgKREbE (ORCPT
+        Wed, 18 Nov 2020 07:52:53 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:23005 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725767AbgKRMwx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Nov 2020 23:31:04 -0500
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49CC7C0613D4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2020 20:31:03 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id v20so440315qvx.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2020 20:31:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ytaNC1ix2ISUJ2HDuLlDQd3ZArsvqrrRkJU2d+sc728=;
-        b=nadtlfrDUc575QP1W/RhtQmLEsvyEzdcBMmDFzkKwzxRcqgtY09qaPS9mb5LWdrD4B
-         NtJz+/df6L5MgUtKdj3sCTx4Vy0/Uw400ssqaMTNm7zysJ3vW3/AFF3V9kTOakfj778d
-         dyXZsnBPQsB+1+WV+d1BOwkTqrEiOrqWg89jyCMCURSoXJwLwAM0TrkcjWe4FZg32Tyi
-         1rzG3ud8OEDqHT5yEMKku/umRAJqGL6bSQ4OauWS71lbfjXCiaakqdqGZU9VdwmYc49F
-         nFvI41Gmqcl1jc/kPAzYrfwxrRqKnRBAlZ47vNXrabI5k7Pdq3/1kFWTOnlJvDnafm48
-         2GHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ytaNC1ix2ISUJ2HDuLlDQd3ZArsvqrrRkJU2d+sc728=;
-        b=rw6HK9lNOYoUDyKae0LbxrF50jhyvJgEugymNcPgOUl3COBsiyk6tmCX7gJQ3VEN6N
-         ozqtql4Je0Q0kqgBIjj5pMGXkzW/dqaWdGxdbMozLg7Zrphr/KpNu4An5k7V7FTehdvU
-         KHU3ZxLeBobI7tNaFG+FpTvwnjyVjrdw40zAfS9HIm0QDuVmMji4aSMBXSFDcei3bY6R
-         8Kq2VAOhSTptiifE+kpz21fcsJk0Rwt+w/+xF2LvxPNZh6EaZoqnbmxW2rTjhiltoTBR
-         vPf5bK7tEC6UrTrEP+p3uJLpAB94sEy6ExAVZhfeQlRfritcgN+6vERhm1WWHP+Xybaq
-         DXPQ==
-X-Gm-Message-State: AOAM532+RXDudxhb/sgdPxruQuSytv9PT5eZJpx3+AQxm21+4f/lm4MT
-        SoJ+mwJD16fu4MPxUhKghxnJOuv/QbXMAA==
-X-Google-Smtp-Source: ABdhPJw89doGwQqFXKa9F2VfntywPBKkJZt5FMQ1Ut97awKiyl7/KnkXIAX1Uu442gb6nuyOjuW/3w==
-X-Received: by 2002:a05:6214:a8f:: with SMTP id ev15mr2892498qvb.20.1605673862509;
-        Tue, 17 Nov 2020 20:31:02 -0800 (PST)
-Received: from [172.17.0.2] ([52.179.140.15])
-        by smtp.gmail.com with ESMTPSA id s68sm15851199qkc.43.2020.11.17.20.31.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2020 20:31:01 -0800 (PST)
-Message-ID: <5fb4a385.1c69fb81.8211d.fb7b@mx.google.com>
-Date:   Tue, 17 Nov 2020 20:31:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6056985342566680600=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: core: Align parameters name of ScanAdvMonitoring
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201118114650.1.Ib657f37256b0e7adf3915ac5341c9d20db2fd2ef@changeid>
-References: <20201118114650.1.Ib657f37256b0e7adf3915ac5341c9d20db2fd2ef@changeid>
+        Wed, 18 Nov 2020 07:52:53 -0500
+Received: from ironmsg07-lv.qualcomm.com (HELO ironmsg07-lv.qulacomm.com) ([10.47.202.151])
+  by alexa-out.qualcomm.com with ESMTP; 18 Nov 2020 04:52:52 -0800
+X-QCInternal: smtphost
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg07-lv.qulacomm.com with ESMTP/TLS/AES256-SHA; 18 Nov 2020 04:52:50 -0800
+X-QCInternal: smtphost
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 18 Nov 2020 18:22:26 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id 4184A21D6E; Wed, 18 Nov 2020 18:22:25 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v2] Bluetooth: btqca: Add support to read FW build version for WCN3991 BTSoC
+Date:   Wed, 18 Nov 2020 18:22:23 +0530
+Message-Id: <1605703943-25980-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6056985342566680600==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add support to read FW build version for WCN3991 BTSoC
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=386479
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btqca.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btqca.h |  3 +++
+ 2 files changed, 60 insertions(+)
 
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ce9dcff..dfd7ff7 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -101,6 +101,56 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+ }
+ EXPORT_SYMBOL_GPL(qca_read_soc_version);
+ 
++static int qca_read_fw_build_info(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct edl_event_hdr *edl;
++	char cmd;
++	int err = 0;
++	char build_label[QCA_FW_BUILD_VER_LEN];
++	int build_lbl_len;
++
++	bt_dev_dbg(hdev, "QCA read fw build info");
++
++	cmd = EDL_GET_BUILD_INFO_CMD;
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++				&cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Reading QCA fw build info failed (%d)",
++			   err);
++		return err;
++	}
++
++	edl = (struct edl_event_hdr *)(skb->data);
++	if (!edl) {
++		bt_dev_err(hdev, "QCA read fw build info with no header");
++		err = -EILSEQ;
++		goto out;
++	}
++
++	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++	    edl->rtype != EDL_GET_BUILD_INFO_CMD) {
++		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
++			   edl->rtype);
++		err = -EIO;
++		goto out;
++	}
++
++	build_lbl_len = edl->data[0];
++	memcpy(build_label, &edl->data[1], build_lbl_len);
++	*(build_label + build_lbl_len) = '\0';
++
++	bt_dev_info(hdev, "BT SoC FW Build info: %s", build_label);
++
++out:
++	kfree_skb(skb);
++	if (err)
++		bt_dev_err(hdev, "QCA read fw build info failed (%d)", err);
++
++	return err;
++}
++
+ static int qca_send_reset(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -520,6 +570,13 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		return err;
+ 	}
+ 
++	if (soc_type == QCA_WCN3991) {
++		/* get fw build info */
++		err = qca_read_fw_build_info(hdev);
++		if (err < 0)
++			return err;
++	}
++
+ 	bt_dev_info(hdev, "QCA setup on UART is completed");
+ 
+ 	return 0;
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index d81b74c..375c7fc 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -11,6 +11,7 @@
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
++#define EDL_GET_BUILD_INFO_CMD		(0x20)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+ #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+@@ -34,6 +35,8 @@
+ #define QCA_HCI_CC_OPCODE		0xFC00
+ #define QCA_HCI_CC_SUCCESS		0x00
+ 
++#define QCA_FW_BUILD_VER_LEN		255
++
+ enum qca_baudrate {
+ 	QCA_BAUDRATE_115200 	= 0,
+ 	QCA_BAUDRATE_57600,
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
---===============6056985342566680600==--
