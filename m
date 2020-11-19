@@ -2,133 +2,188 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9FDC63777
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3907C6379F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 23:56:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2217221F8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DB0F22240
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 23:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxeEgKOS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkE+4W39"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbgKSWbF (ORCPT
+        id S1727104AbgKSX4X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Nov 2020 17:31:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
+        Thu, 19 Nov 2020 18:56:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726529AbgKSWbF (ORCPT
+        with ESMTP id S1727098AbgKSX4X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Nov 2020 17:31:05 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70BCC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:31:04 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id z3so5702364qtw.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:31:04 -0800 (PST)
+        Thu, 19 Nov 2020 18:56:23 -0500
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060EBC0613D4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 15:56:23 -0800 (PST)
+Received: by mail-ot1-x342.google.com with SMTP id n11so7130316ota.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 15:56:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=OgfgMV90FrfcNlmq7PMhIrjYz/cECRvnO8+rOQSqNTU=;
-        b=BxeEgKOS+GoZWA9poiD0muTIMWI1tB+34hfypqnCw6GDVoKs7fPbeIRZDq+No324/h
-         k9KM2Lye1FjSXzLwX1/0tHTcx1Ou4HhKJp9ZDg+HRuKqH7WiYxO7T0W94zBmKZe6d+oP
-         ST03GsYMwWonrlnTydwSZwW/VB1DoJBP7CoQZhat3Z5CQNFjZPYX/4Bntn0TH/MunVgc
-         SN0f+9s6C5v1gCaDnkqfgoIm+m6iQGMlk2W/5rRfDw4Pr0zo69wDNr1h1YMuziT4bH21
-         zXgdaOAO7TY4GwRULt28u5nGOmheit+d0Cl+Ed47KGQw7QleX/dmzrbw+gcEA3BEnA+8
-         /PeQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LKwvJrSAqDwJVWrXdQ2j2YKSRZdnkIRpsnYMAkNM7Kg=;
+        b=KkE+4W39DDOxozFRy6Nk4k+fmZjXCgxFnSeLm1gfEHfIzQnFCfk3WvMIbOa+DGN5xO
+         BQq2UMiKf7RNIhkBO6e7kYyB34mpaqUkISxVM0z5hDWebGDb7P6M7aYB/eu3uTGMN1Fs
+         FyY80PwtOw6/HX90wrCoT0MnoN1fhquvl+xeCpTgxi0gjQUZicneW9S091WX1HUj8TL4
+         B8giKbSg+pEZFJPhmY9w89aMwcM0iISAjF8ZOZMc4ct8fu+v9mZVqE+VRZtqBy41BLKW
+         vjJJf7EkX/TIAJkJckKzCiIzOAkEmYW1ieRJxp3uCsEzW/0GEl+YIxfkL7wmYL3DDrNI
+         4CZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=OgfgMV90FrfcNlmq7PMhIrjYz/cECRvnO8+rOQSqNTU=;
-        b=XPuCt/exmbAo9+W2IILm3W0dDiLdbefbcoETU3jHrmwj7aEhEqKl5p1xRg625pnlPF
-         ThU6WgBMZsKZRdC5/+UyHTBZit3TXT9wcXVpwmaLKu2QvqcYMekXqP6Vj83hmJ57og8E
-         95QDiysz3O/RdkkEog4O/DJ/BAoWceROeOi+wNzjjlzf0UHnPYK+QnmhUNysWYtUysku
-         jJUVSbuY9WCPf8Rs5Lct6nyOWowsxsHnza3k4jQpyzNOKR4u3nPXuabzYdNjBNpZA8t6
-         JgPmja18qxFB3VOTACydncBOfQzXKfn3GhcV8UvyO+GhHWQ7SzLOFacjNmXms+zVRIsG
-         6pkA==
-X-Gm-Message-State: AOAM533UD8qinsxnL4NpWecQx3PWcszYbyKlP1vSJeCKhKIq7FGw6cWU
-        bbDQ3yo7rx37sbHAf7GmdyJiN/z2oZUWXA==
-X-Google-Smtp-Source: ABdhPJxQsYK4kD0aimMLbkFQ67Y71mx0kaXLmDGt7XmePZr2XdLdyISPSKN0TvCpKRivxTzQ5obbJg==
-X-Received: by 2002:aed:22c5:: with SMTP id q5mr13168227qtc.234.1605825063743;
-        Thu, 19 Nov 2020 14:31:03 -0800 (PST)
-Received: from [172.17.0.2] ([40.84.31.250])
-        by smtp.gmail.com with ESMTPSA id g8sm849227qkk.131.2020.11.19.14.31.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2020 14:31:03 -0800 (PST)
-Message-ID: <5fb6f227.1c69fb81.e0c3d.64e1@mx.google.com>
-Date:   Thu, 19 Nov 2020 14:31:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============9010907479655645353=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LKwvJrSAqDwJVWrXdQ2j2YKSRZdnkIRpsnYMAkNM7Kg=;
+        b=bhBB4ZxBCqqPgxCdb9FtGVXvSnPrg/O9x7Oldi0E84eFwYKjIxjs310q/cyo4zt6vE
+         C4LDrAw2DHkYL4idhUZWHiBIlNqgJrCFzrdzFsON1fU5DN2xlegskbbiyJdKSAWSEVvA
+         8LHotItZRyXwHbnJnmcrK+UxFeHuNMIwQiz0SR9jCwzN3/uOCwf0rdSjN3sy5ljvUYFI
+         P0xAM1gyrj0RAFxv6NBnCS8UwEjkhgzu3TopOXDyT+WaZDlc9RmwLaP5j6bPDr1vBA/s
+         jZBbCusXzBLjcKA04qxIAwsXm+BXqYTa2wZ/2t5kJSS7acncRIvvqSPz1HD6ZGCmyzyi
+         tSeA==
+X-Gm-Message-State: AOAM531e4jKcoPYJG02k8RXoYTnFeQvBFI9H7lDsPRzHoNrdjXeRatxy
+        yCjpwoBRQJWA8j88mI9V7nrP0fREJwlhXjUES4IAhVJ1zbw=
+X-Google-Smtp-Source: ABdhPJySnek7pgDm4BsFu4dsEmkUevLc7TbEWjfgQrikVxK7WFRNPzbUbCeahWzlURZpivlS4SNWDafJNq13pM/+3IA=
+X-Received: by 2002:a9d:4b81:: with SMTP id k1mr12285314otf.371.1605830182229;
+ Thu, 19 Nov 2020 15:56:22 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pavelm@google.com
-Subject: RE: Fix duplicate free for GATT service includes
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201119214337.3886160-1-pavelm@google.com>
-References: <20201119214337.3886160-1-pavelm@google.com>
+References: <20201111011745.2016-1-sonnysasaka@chromium.org>
+ <20201111011745.2016-7-sonnysasaka@chromium.org> <aa1c080e8a7813299e6a093608211684e074e427.camel@hadess.net>
+ <CAO271m=O3hyS6Pp4fQ1pnsir7wYbLFwDm7f-a5yd0o4NTUUewA@mail.gmail.com>
+ <CABBYNZJjgdjsDXOQk=v4wJ7PLyHr-u2w6d+jgLKgwxV9J5OYdQ@mail.gmail.com> <CAO271m=L8yoD0JO70kVJqmH0+gBkCL=_dtpTKNDZ7ei5jfPz6w@mail.gmail.com>
+In-Reply-To: <CAO271m=L8yoD0JO70kVJqmH0+gBkCL=_dtpTKNDZ7ei5jfPz6w@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 19 Nov 2020 15:56:11 -0800
+Message-ID: <CABBYNZ+FBdCzqqcOuaKou-A5S_QCZsgHvj0ygyZP3L3v90L_8A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 7/7] battery: Implement Battery Provider API
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     Bastien Nocera <hadess@hadess.net>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============9010907479655645353==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sonny,
 
-This is automated email and please do not reply to this email!
+On Thu, Nov 19, 2020 at 12:15 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+>
+> Hi Luiz,
+>
+>
+> On Tue, Nov 17, 2020 at 2:26 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Sonny,
+> >
+> > On Tue, Nov 17, 2020 at 2:20 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > >
+> > > Hi Bastien,
+> > >
+> > > Thank you for the feedback. Please find my answers below.
+> > >
+> > > On Tue, Nov 17, 2020 at 2:51 AM Bastien Nocera <hadess@hadess.net> wrote:
+> > > >
+> > > > Hey Sonny,
+> > > >
+> > > > On Tue, 2020-11-10 at 17:17 -0800, Sonny Sasaka wrote:
+> > > > > This patch implements the BatteryProvider1 and
+> > > > > BatteryProviderManager1
+> > > > > API. This is a means for external clients to feed battery information
+> > > > > to
+> > > > > BlueZ if they handle some profile and can decode battery reporting.
+> > > > >
+> > > > > The battery information is then exposed externally via the existing
+> > > > > Battery1 interface. UI components can consume this API to display
+> > > > > Bluetooth peripherals' battery via a unified BlueZ API.
+> > > >
+> > > > Was this patch reviewed for potential security problems? From the top
+> > > > of my head, the possible problems would be:
+> > > > - I don't see any filters on which user could register battery
+> > > > providers, so on a multi user system, you could have a user logged in
+> > > > via SSH squatting all the battery providers, while the user "at the
+> > > > console" can't have their own providers. Also, what happens if the user
+> > > > at the console changes (fast user switching)?
+> > > > - It looks like battery providers don't check for paired, trusted or
+> > > > even connected devices, so I would be able to create nearly unbound
+> > > > number of battery providers depending on how big the cache for "seen"
+> > > > devices is.
+> > > For security, the API can be access-limited at D-Bus level using D-Bus
+> > > configuration files. For example, we can let only trusted UNIX users
+> > > as the callers for this API. This D-Bus config file would be
+> > > distribution-specific. In Chrome OS, for example, only the "audio" and
+> > > "power" users are allowed to call this API. This way we can make sure
+> > > that the callers do not abuse the API for denial-of-service kind of
+> > > attack.
+> >
+> > I guess there is still some the risk of conflicts even with the use of
+> > D-Bus policy blocking roge applications, there could still be multiple
+> > entities providing the battery status from the same source, which is
+> > why I suggested we couple the Battery1 with the Profile1, so only the
+> > entity that has registered to handle let say HFP can provide a battery
+> > status and we automatically deduce the source is from HFP.
+>
+> These are two different issues. The issue with bad applications can be
+> overcome with D-Bus policy. The issue with multiple providers is
+> inherent: we have to have a duplicate resolution because one device
+> may report battery from different sources, e.g. via HFP and A2DP at
+> the same time. The latter case is rare in practice but still possible,
+> so I propose the simplest duplication resolution which is accept the
+> first provider registered (of that specific device) and ignore the
+> rest.
+>
+> Coupling Battery1 with Profile1 will limit the flexibility of this
+> feature. For example, some speakers report battery status via a
+> separate LE channel (GATT). If we require Battery provider to be also
+> a registered Profile, we won't be able to support these cases since
+> GATT clients do not register any profile.
 
-Dear submitter,
+Actually it is a good policy to provide GattProfile1 if you are
+interested in enabling auto-connect, which I suppose most third-party
+services would like to enable:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=387933
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n367
 
----Test result---
+Note that we are doing to avoid complicate conflict resolution since
+profiles by design can only be registered once that means Battery
+sources will also be limited to one per profile, Im fine if you choose
+not to have this integration in the first version .
 
-##############################
-Test: CheckPatch - FAIL
-Output:
-Fix duplicate free for GATT service includes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#14: 
-bluetoothd: src/gatt-database.c:gatt_db_service_removed() Local GATT service removed
-
-- total: 0 errors, 1 warnings, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] Fix duplicate free for GATT service includes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - FAIL
-Output:
-Fix duplicate free for GATT service includes
-11: B1 Line exceeds max length (84>80): "bluetoothd: src/gatt-database.c:gatt_db_service_removed() Local GATT service removed"
-14: B1 Line exceeds max length (94>80): "bluetoothd: src/sdpd-service.c:remove_record_from_server() Removing record with handle 0x10006"
-15: B1 Line exceeds max length (94>80): "bluetoothd: src/gatt-database.c:proxy_removed_cb() Proxy removed - removing service: /service1"
-
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
+>
+> >
+> > > >
+> > > > Given that the interface between upower and bluez is supposedly
+> > > > trusted, it might be good to ensure that there are no fuzzing problems
+> > > > on the bluez API side that could translate to causing problems in
+> > > > upower itself.
+> > > Could you give an example of what potential problems of upower can be
+> > > caused by communicating with BlueZ through this API?
+> > >
+> > > >
+> > > > I didn't review the code in depth, but, having written this mechanism
+> > > > for Bluetooth battery reporting, I think that this is the right way to
+> > > > go to allow daemons like pulseaudio to report battery status.
+> > > >
+> > > > Cheers
+> > > >
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============9010907479655645353==--
+-- 
+Luiz Augusto von Dentz
