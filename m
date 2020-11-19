@@ -2,145 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0D5C64E7D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 23:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0ADC2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 05:16:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 474E6246CB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Nov 2020 23:44:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="N9sqPWGr"
+	by mail.kernel.org (Postfix) with ESMTP id 1FC4F246EB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 05:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726641AbgKRXoF (ORCPT
+        id S1725816AbgKSFQB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Nov 2020 18:44:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726162AbgKRXoE (ORCPT
+        Thu, 19 Nov 2020 00:16:01 -0500
+Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:42089 "EHLO
+        wout4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725648AbgKSFQA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Nov 2020 18:44:04 -0500
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9DE5C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2020 15:44:04 -0800 (PST)
-Received: by mail-pl1-x643.google.com with SMTP id u2so1897282pls.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2020 15:44:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FtRxO4GemGjvQrMlES911DtV5VS1GNyC2f2uIjqIY44=;
-        b=N9sqPWGrOl4w0sTA0YeGv0oEUvPcX29fc3q7s9Lc6kKxI1cin/1FGLDsPklUFx3WH4
-         Ndz3RykX+GS/Umt850AWO/UZmdJ6w8noHEcBr13whNVSIyFNUAiDVC73BcdUMd5gUGK5
-         KhCWhrKUWg8O8mCW6g3b4mzekeBcI7oVzT3qU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FtRxO4GemGjvQrMlES911DtV5VS1GNyC2f2uIjqIY44=;
-        b=uTfgr0uuf3fZYeIGteyMT+sEZDSPA/VVSQgrRPlen3oNdhRMEa0ndAiR8ciobx3yFL
-         lla9AYX33NZI07p2RfiFXA96ZvJpWP30QkGM8B6Qe6ckcfL8OML8k54hOOyQSGtFioFC
-         RjqSl0beRxGJ5smkP1EpiFuKGMVJ1Zrv7hNW2Bp4SahhyzagvlTwTwxQg4gSmPIITUG+
-         28iveooPPCDHSFDmTR/iSC2WZ35mnQNy/+xU50aikqNxrGijXX0fxMPK51Y0aJyN0AsS
-         KmhVFTMFEPfuB0w0mHU9r/Tc2nnLne1nossWnR46KXXcx40WJMfun3XVeC+eS4QlneZn
-         tMLg==
-X-Gm-Message-State: AOAM53088xSwEpES40NXyUv3QeguzUZB3ELvCqRvkleNSjmdnmGU3Nfg
-        vgB3zGQ3/KdOQiANuWpvm719zQ==
-X-Google-Smtp-Source: ABdhPJw3KGa/xIgwjgSmYgn2Vm5bx1X/lCf6LYoKrbV+HuKqVFwlSCwMEaLLx1mEESdUQH/XI5qWLw==
-X-Received: by 2002:a17:902:be07:b029:d8:afa1:3d76 with SMTP id r7-20020a170902be07b02900d8afa13d76mr6507615pls.14.1605743044245;
-        Wed, 18 Nov 2020 15:44:04 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id f6sm21437435pgi.70.2020.11.18.15.44.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2020 15:44:03 -0800 (PST)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+        Thu, 19 Nov 2020 00:16:00 -0500
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id D1956AD6;
+        Thu, 19 Nov 2020 00:15:59 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Thu, 19 Nov 2020 00:16:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cadelwatson.com;
+         h=from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm2; bh=AO2CRwjJdfu5W/mjJyJZANVItq
+        JbZcykrD0Y22tWCgU=; b=USb7T/or/NtE5vWFhvMjip2wdD5GBFqefqF+VsWQ2w
+        orrII4LW0zZvvUZ6cZY+pz0CzdjkZJ8CGHn8vgP6wtxUMyztasWN/O9725lXD821
+        dpfU3aGAQXeQmRz6Gy9XJ/ab39TK4EPpYpInaTdf+CrNzCqRl+21zwqwXx7hFWBd
+        vjm8r8ll5jmbLYC2kcdmjwQQiTb7OSsZEE64zKpIN/1TECYYsz3GU6H4DLSzuCPO
+        3kgGLMDGwUyiLqjswWoj0oUFDBSAe8hxQp8X4qeJae9cp9Ahjh2+YXaed4rDWxSB
+        mWaBkvceGFepjsZbPM6RFWCITWi5HYx5BrMs1Hio1cdA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=AO2CRwjJdfu5W/mjJ
+        yJZANVItqJbZcykrD0Y22tWCgU=; b=XVJUUjLxiYBaPGLdB9wNgtFs4wYkp0yw3
+        IMrTdrP6OTygEvIJ3036RxOeT2oj2fx0uDIGNWLmX2vGHA+XxeygkOw45a6kmZqX
+        89IoCBPw4LzATdlNiV5Pl4ahn6DamKaSZZm71KvteDi3JbRtcUuTu09uqHFgpv9r
+        IQp8yoTWLjkcYrpV6mR/igUyeopkQxV30bhTtyz5RhWameLmDr3L33lKRus7DGGE
+        ZGhn6F4KSq+iLO98Uk+EReocwZxb3lbUHHRtRqO1KDnGmu7pnQiHIs8eZWrFzF9/
+        lXYOaigiWip8LxDU60TzgN8tGd+gJvDLxrvhZc29WKjRUpbgP/7bQ==
+X-ME-Sender: <xms:j_-1X1b8CmZC_8XFeI1x0oP2xgZuqU2cuUQvWEf7gk9MQJtBGuZwQg>
+    <xme:j_-1X8bQoMxN2C6hIpt4ps4e7DkXBkSIM_PI6t9jdPodaPd_RcPU3N0MypvosYVWN
+    0l8exJlxamZ3DyOTgg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudefiedgkedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgggfestdekredtre
+    dttdenucfhrhhomhepvegruggvlhcuhggrthhsohhnuceotggruggvlhestggruggvlhif
+    rghtshhonhdrtghomheqnecuggftrfgrthhtvghrnhepvdffvdefueevjeduudfgueeile
+    efvddutdffjeeujeeggfefudektdejkedugeelnecukfhppeduuddurddvvddtrddvtddr
+    vddtudenucevlhhushhtvghrufhiiigvpedunecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gtrgguvghlsegtrgguvghlfigrthhsohhnrdgtohhm
+X-ME-Proxy: <xmx:j_-1X38g873V-4Mv8rLX34Phg0eXyGFrKzSchUEbq18X7c0wp3Nesw>
+    <xmx:j_-1XzpcrqtCeOUCyh0dg0XkDOWo5AJRKfZ6dqj3h-zvnQQmPOF2zw>
+    <xmx:j_-1Xwol1U13Rk6VUG6ASrrc9e78JnFOtWkRG-9zxW7DTgLaQEpZyw>
+    <xmx:j_-1X3QuLjnfXxzrO5nW3iTfQMu8MEJ1BA3JQ2QX1xfRm4-YKfzS3Q>
+Received: from localhost.localdomain (111-220-20-201.dyn.dodo.net.au [111.220.20.201])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 672FA3064AAE;
+        Thu, 19 Nov 2020 00:15:57 -0500 (EST)
+From:   Cadel Watson <cadel@cadelwatson.com>
 To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org, mcchou@chromium.org,
-        danielwinkler@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 0/3] Bluetooth: Power down controller when suspending
-Date:   Wed, 18 Nov 2020 15:43:49 -0800
-Message-Id: <20201118234352.2138694-1-abhishekpandit@chromium.org>
-X-Mailer: git-send-email 2.29.2.299.gdc1121823c-goog
+Cc:     Cadel Watson <cadel@cadelwatson.com>
+Subject: [PATCH] Bluetooth: btusb: Support 0bda:c123 Realtek 8822CE device
+Date:   Thu, 19 Nov 2020 16:16:25 +1100
+Message-Id: <20201119051625.2622105-1-cadel@cadelwatson.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Some Lenovo Ideapad laptop models use the 0bda:c123 USB identifier for
+their Bluetooth device, so load the appropriate firmware for Realtek
+8822CE.
 
-Hi Marcel and linux-bluetooth,
+-Device(0bda:c123) from /sys/kernel/debug/usb/devices
+T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=c123 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-This patch series adds support for a quirk that will power down the
-Bluetooth controller when suspending and power it back up when resuming.
+Signed-off-by: Cadel Watson <cadel@cadelwatson.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Marvell SDIO Bluetooth controllers (SD8897 and SD8997), we are seeing
-a large number of suspend failures with the following log messages:
-
-[ 4764.773873] Bluetooth: hci_cmd_timeout() hci0 command 0x0c14 tx timeout
-[ 4767.777897] Bluetooth: btmrvl_enable_hs() Host sleep enable command failed
-[ 4767.777920] Bluetooth: btmrvl_sdio_suspend() HS not actived, suspend failed!
-[ 4767.777946] dpm_run_callback(): pm_generic_suspend+0x0/0x48 returns -16
-[ 4767.777963] call mmc2:0001:2+ returned -16 after 4882288 usecs
-
-The daily failure rate with this signature is quite significant and
-users are likely facing this at least once a day (and some unlucky users
-are likely facing it multiple times a day).
-
-Given the severity, we'd like to power off the controller during suspend
-so the driver doesn't need to take any action (or block in any way) when
-suspending and power on during resume. This will break wake-on-bt for
-users but should improve the reliability of suspend.
-
-We don't want to force all users of MVL8897 and MVL8997 to encounter
-this behavior if they're not affected (especially users that depend on
-Bluetooth for keyboard/mouse input) so the new behavior is enabled via
-module param. We are limiting this quirk to only Chromebooks (i.e.
-laptop). Chromeboxes will continue to have the old behavior since users
-may depend on BT HID to wake and use the system.
-
-These changes were tested in the following ways on a Chromebook running
-the 4.19 kernel and a MVL-SD8897 chipset. We added the module param in
-/etc/modprobe.d/btmrvl_sdio.conf with the contents
-  "options btmrvl_sdio power_down_suspend=Y".
-
-Tests run:
-
-With no devices paired:
-- suspend_stress_test --wake_min 10 --suspend_min 10 --count 500
-
-With an LE keyboard paired:
-- suspend_stress_test --wake_min 10 --suspend_min 10 --count 500
-
-Using the ChromeOS AVL test suite (stress tests are 25 iterations):
-- bluetooth_AdapterSRHealth (basic suite)
-- bluetooth_AdapterSRHealth.sr_reconnect_classic_hid_stress
-- bluetooth_AdapterSRHealth.sr_reconnect_le_hid_stress
-
-Thanks,
-Abhishek
-
-
-Abhishek Pandit-Subedi (3):
-  Bluetooth: Rename and move clean_up_hci_state
-  Bluetooth: Add quirk to power down on suspend
-  Bluetooth: btmrvl_sdio: Power down when suspending
-
- drivers/bluetooth/btmrvl_sdio.c  | 10 ++++
- include/net/bluetooth/hci.h      |  7 +++
- include/net/bluetooth/hci_core.h |  6 +++
- net/bluetooth/hci_core.c         | 93 +++++++++++++++++++++++++++++++-
- net/bluetooth/hci_request.c      | 26 ++++++++-
- net/bluetooth/mgmt.c             | 46 +---------------
- 6 files changed, 140 insertions(+), 48 deletions(-)
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 71f62d532481..b515b17f4504 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -450,6 +450,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x1358, 0xc123), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0xc123), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Silicon Wave based devices */
+ 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
 -- 
-2.29.2.299.gdc1121823c-goog
+2.29.2
 
