@@ -2,98 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8362BC64E7A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9FDC63777
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:31:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EA942225E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:05:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2217221F8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Nov 2020 22:31:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URNVyvSg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxeEgKOS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726711AbgKSWFh (ORCPT
+        id S1726788AbgKSWbF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Nov 2020 17:05:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49774 "EHLO
+        Thu, 19 Nov 2020 17:31:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgKSWFh (ORCPT
+        with ESMTP id S1726529AbgKSWbF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Nov 2020 17:05:37 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0253C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:05:36 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id 23so8003632wrc.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:05:36 -0800 (PST)
+        Thu, 19 Nov 2020 17:31:05 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70BCC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:31:04 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id z3so5702364qtw.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2020 14:31:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=AgftX2/yu/R3iHNc+sTHzRatVUvqA77cZnTgup76lYs=;
-        b=URNVyvSg4CFbpHk+LEscgYCs2OpkDTdeqlsYUetOo9K1u4waq9ifbalaSXM9pquwFz
-         VFJOHVeFX1Ekn9vohYp0xzMxughlUYiYrFzPso6CRo6qr0Yfumdx3vtF9YI1xvPQUMdF
-         PiW4k0VGwGH1SLMCUe10liaV3EkqvFfQywaHH5UavbLLS6eC8edm3ZXpGfpR6ba4jpwO
-         aNd7Mxf4q4S0qRKcD5Hgrxhxw0za5AZ2yt8RYIi5FdwHuuHEkzhygafkI9veY5LDAyzx
-         TgEMm4GstW0mhesSW/KYgqtKuOVrWb2LgoMbpUe3kOhTbYiWbyEQ1f3Y0/Qi6fNglWFR
-         6KCQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=OgfgMV90FrfcNlmq7PMhIrjYz/cECRvnO8+rOQSqNTU=;
+        b=BxeEgKOS+GoZWA9poiD0muTIMWI1tB+34hfypqnCw6GDVoKs7fPbeIRZDq+No324/h
+         k9KM2Lye1FjSXzLwX1/0tHTcx1Ou4HhKJp9ZDg+HRuKqH7WiYxO7T0W94zBmKZe6d+oP
+         ST03GsYMwWonrlnTydwSZwW/VB1DoJBP7CoQZhat3Z5CQNFjZPYX/4Bntn0TH/MunVgc
+         SN0f+9s6C5v1gCaDnkqfgoIm+m6iQGMlk2W/5rRfDw4Pr0zo69wDNr1h1YMuziT4bH21
+         zXgdaOAO7TY4GwRULt28u5nGOmheit+d0Cl+Ed47KGQw7QleX/dmzrbw+gcEA3BEnA+8
+         /PeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-transfer-encoding;
-        bh=AgftX2/yu/R3iHNc+sTHzRatVUvqA77cZnTgup76lYs=;
-        b=gYm5s8G4559E39DUkOUtYamr6sMQEChFPE7KMKnsof1XqxEaIFNjHqJJBC7RDRHBi5
-         mJyUv8FOGU5r3bV6Zik0g7x9Ycu14gzCX6usFzvWTWbi+r/R4w3SPxPahINY9jV18rUo
-         TBqUjDjHPyxq4AW+5BYuyPfsYR0OStm71UIGRERqdxdULBqf0f6cWUq6yxXKZM2DZxuG
-         hSZ1BKHE02bcfAPheg0ksqigbGtJLIRcsckJ3f6GUGneiYX4P8ey/y+3lCBVayzSYz7P
-         4mdadkgucxeX6dSazNa5udUDmVERXj9E1iWHfjqDL6vhhy20Ypnh3RGuarS8w91w74mZ
-         AhFg==
-X-Gm-Message-State: AOAM531A5V4XuJtJkoSc4WSETC5LV55PG9IjxmdtiQMp3p+b4DCBK2zt
-        1suEcXOk5ow5LiQuF+t7fghF65Nb+g/oBQ==
-X-Google-Smtp-Source: ABdhPJz+qj1DwawkNtd8GCG1V87OYxCCiBRlkaJe4KnfjOX+z0apqx/l02KKZVFVmPd8fF7a2r5C4g==
-X-Received: by 2002:adf:f24a:: with SMTP id b10mr12663298wrp.352.1605823535422;
-        Thu, 19 Nov 2020 14:05:35 -0800 (PST)
-Received: from ?IPv6:2003:ea:8f23:2800:6d7c:9ea3:dfaa:d617? (p200300ea8f2328006d7c9ea3dfaad617.dip0.t-ipconnect.de. [2003:ea:8f23:2800:6d7c:9ea3:dfaa:d617])
-        by smtp.googlemail.com with ESMTPSA id u6sm1771886wmj.40.2020.11.19.14.05.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Nov 2020 14:05:35 -0800 (PST)
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>
-From:   Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Updated fw versions ignored for Intel devices?
-Message-ID: <0011e099-4ab0-4705-de1e-cb03953f11ef@gmail.com>
-Date:   Thu, 19 Nov 2020 23:05:30 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=OgfgMV90FrfcNlmq7PMhIrjYz/cECRvnO8+rOQSqNTU=;
+        b=XPuCt/exmbAo9+W2IILm3W0dDiLdbefbcoETU3jHrmwj7aEhEqKl5p1xRg625pnlPF
+         ThU6WgBMZsKZRdC5/+UyHTBZit3TXT9wcXVpwmaLKu2QvqcYMekXqP6Vj83hmJ57og8E
+         95QDiysz3O/RdkkEog4O/DJ/BAoWceROeOi+wNzjjlzf0UHnPYK+QnmhUNysWYtUysku
+         jJUVSbuY9WCPf8Rs5Lct6nyOWowsxsHnza3k4jQpyzNOKR4u3nPXuabzYdNjBNpZA8t6
+         JgPmja18qxFB3VOTACydncBOfQzXKfn3GhcV8UvyO+GhHWQ7SzLOFacjNmXms+zVRIsG
+         6pkA==
+X-Gm-Message-State: AOAM533UD8qinsxnL4NpWecQx3PWcszYbyKlP1vSJeCKhKIq7FGw6cWU
+        bbDQ3yo7rx37sbHAf7GmdyJiN/z2oZUWXA==
+X-Google-Smtp-Source: ABdhPJxQsYK4kD0aimMLbkFQ67Y71mx0kaXLmDGt7XmePZr2XdLdyISPSKN0TvCpKRivxTzQ5obbJg==
+X-Received: by 2002:aed:22c5:: with SMTP id q5mr13168227qtc.234.1605825063743;
+        Thu, 19 Nov 2020 14:31:03 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.31.250])
+        by smtp.gmail.com with ESMTPSA id g8sm849227qkk.131.2020.11.19.14.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2020 14:31:03 -0800 (PST)
+Message-ID: <5fb6f227.1c69fb81.e0c3d.64e1@mx.google.com>
+Date:   Thu, 19 Nov 2020 14:31:03 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============9010907479655645353=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pavelm@google.com
+Subject: RE: Fix duplicate free for GATT service includes
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201119214337.3886160-1-pavelm@google.com>
+References: <20201119214337.3886160-1-pavelm@google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In btusb.c we have the following code. I interpret this in a way
-that once firmware was loaded the driver will never check for
-updated firmware.
-Shouldn't the driver always read the firmware file available on
-the system and check its version against the firmware version
-the device has (and apply it if it's newer)?
-But maybe I miss something ..
+--===============9010907479655645353==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
-	    ver.hw_platform, ver.hw_variant, ver.hw_revision,
-	    ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
-	    ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+This is automated email and please do not reply to this email!
 
-/* fw_patch_num indicates the version of patch the device currently
- * have. If there is no patch data in the device, it is always 0x00.
- * So, if it is other than 0x00, no need to patch the device again.
- */
-if (ver.fw_patch_num) {
-	bt_dev_info(hdev, "Intel device is already patched. "
-		    "patch num: %02x", ver.fw_patch_num);
-	goto complete;
-}
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=387933
+
+---Test result---
+
+##############################
+Test: CheckPatch - FAIL
+Output:
+Fix duplicate free for GATT service includes
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#14: 
+bluetoothd: src/gatt-database.c:gatt_db_service_removed() Local GATT service removed
+
+- total: 0 errors, 1 warnings, 19 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] Fix duplicate free for GATT service includes" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+Fix duplicate free for GATT service includes
+11: B1 Line exceeds max length (84>80): "bluetoothd: src/gatt-database.c:gatt_db_service_removed() Local GATT service removed"
+14: B1 Line exceeds max length (94>80): "bluetoothd: src/sdpd-service.c:remove_record_from_server() Removing record with handle 0x10006"
+15: B1 Line exceeds max length (94>80): "bluetoothd: src/gatt-database.c:proxy_removed_cb() Proxy removed - removing service: /service1"
+
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============9010907479655645353==--
