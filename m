@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A436C56202
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Nov 2020 20:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56820C2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Nov 2020 20:07:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0692C2240A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Nov 2020 20:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9E272240A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Nov 2020 20:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q2hIClu+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TM3P67qj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730342AbgKTUHb (ORCPT
+        id S1730361AbgKTUHc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Nov 2020 15:07:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56490 "EHLO
+        Fri, 20 Nov 2020 15:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728762AbgKTUHb (ORCPT
+        with ESMTP id S1730347AbgKTUHc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Nov 2020 15:07:31 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B39C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 12:07:31 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id g7so8928875pfc.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 12:07:31 -0800 (PST)
+        Fri, 20 Nov 2020 15:07:32 -0500
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A86C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 12:07:32 -0800 (PST)
+Received: by mail-pf1-x441.google.com with SMTP id 131so8911305pfb.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 12:07:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references:reply-to
          :mime-version:content-transfer-encoding;
-        bh=uz5Je2GO4Y4lUeU8Nm3qiNFyYWK2y4YsXzOtpUfdpFg=;
-        b=Q2hIClu+OqOvox7gD5M1jE0DKSJSYKiMcGkB7/b8L3vEF3quGc+YY8Aj7hfEFgB6c6
-         AGp5YlcnAWJhzdYpvxd0erXiAQS9vbACB6G1HGEGgdAO5FSn+zuAcrCO43ZsNbdZjUM7
-         4Wlvf+NF0+g1VvxR9hAQ7nx2BmNAJJ9HhaZlUIKj5PWaLLzFrB+w2Has/gFceaI1vYgW
-         6C8rhiKXvmUmjOVPokgylY2qys6UnwSQEwACyi7hTFKGcBtfdBR6lxpg5IOtc3hUNYft
-         pk/IV8FDHowA8W9b0aZN6IBR0Dm15p+5Sk3ZTKzDE+m0RNxs/vN3qbG94p3jdTgDATOk
-         6SkQ==
+        bh=e2hnhdDfJx56jcdkepK95+QfBU/VLT0jLXe4tjVzKSI=;
+        b=TM3P67qjTgQmZtA5leof3ZRMHSv5yvmr1p1PpaJGq+fsSnrqY64BUi8Z2j75XzXY0W
+         xt57ksYXmeYwDyhtwQ0TYF0hb0M4oLfMoUT0GKOYouKEvlgDVOpdCnM9Z3B+kTtZ51YB
+         8BrwC91ZsFKp4xZfAyeWGc9r6/rkgHfr2y4SFK5lBS1+aG3x0259CJzzcfSGtUPYKOmK
+         uwjF41TqvyeJVP+jYe1qCzEGRAv5cMxhTYem2PF4XDbNxuV7QxnPW9uvQOSJ3XbVUfxf
+         ccd5UrXW1kbFJYFo0KvIeQ8uZB1Tvz6RkL1dOqiBuTSa43i0COK/ktigrqgIKVxRVr3c
+         gG4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:reply-to:mime-version:content-transfer-encoding;
-        bh=uz5Je2GO4Y4lUeU8Nm3qiNFyYWK2y4YsXzOtpUfdpFg=;
-        b=k/A4818a+aqirt0oaQSyX44SorMJKtByZPqtmwvp9rH8MyRg0v7+TuJD1jdglGoQ0P
-         vPVfkDfope3zXP8CAgPQvsaGH/c/bhgXQqwtwSHuAJMSpHCIzkqyPg5LxnHWMl6wWloX
-         ISwWIbY3h3SlPTLeCAznzA8sW/lVLENM/+Aak3qWbeiDntpItODkiW7F4dX0x/1ts1sd
-         DfJ8Qm25zM3bCUlkS3qRvWXYtq7RcDF2yrbLqtwWlTJ7D5RwAzvo/77+OUDUSFXowtDO
-         e2hJSGPAJwuNZ4Ckm+w750Td9j4ED/tFGsYlNKN4Z7yo3erk4o39Q9QymW3XegkcJo0F
-         FaXA==
-X-Gm-Message-State: AOAM533HASroFKkHC72p5/ZeYW4ILE+peecHUnZ++O11DsKJH4QHU2PF
-        2n2bI97eqo//kBzT6UcxACKJ8zHCA3E7rw==
-X-Google-Smtp-Source: ABdhPJwRX5ukqWMhML/QTisBNgKvVYnJiDXbb4F0YOV1tAwVfPHgdVy2l48jeX1R6JJSNUFSFVwwbQ==
-X-Received: by 2002:a05:6a00:2305:b029:197:a56b:899f with SMTP id h5-20020a056a002305b0290197a56b899fmr10483799pfh.52.1605902850813;
-        Fri, 20 Nov 2020 12:07:30 -0800 (PST)
+        bh=e2hnhdDfJx56jcdkepK95+QfBU/VLT0jLXe4tjVzKSI=;
+        b=R1bZaewjFHNkZf8BKRhvo3/1+7FTq/GMpAV41E0gVvLHwZNN01s+9f4I9hPD2qe5B0
+         A951p8y9qtF19wrD6MoDJpBtU7t8QlrOdCUCmuE18KfNnGEt2j0lDCdKkIcVSP7V6MPT
+         7FJNjGbxzhAWRz7DNvEE1RY5EIiz39ohDYF8Ctuz7sCD4kdwkA5tAzsUOhhgBJSts0CL
+         13PUBlO5qwCoHFJ+25od2Y91Bl/1D/jxk4/KykFDW9EUM5ZSXsaoJrAslv1xqOwPUgPr
+         ckwiVc4tg5jlVrXssneGNpa7YNP88EQy8qXFq6XmpJd4nyRQv78FAs4roDHADgM4V6tf
+         y9Ew==
+X-Gm-Message-State: AOAM5306RgilmZ6x2pFjlH+/JzZdt+cVyn6+P56joUrnS4LPHW1eSA9s
+        0y2SZapmKwGcL7UQfFvcuprQdf2ZEM72XA==
+X-Google-Smtp-Source: ABdhPJyB8fhw555bQzFJBCcuEbE3DhHkY6rIgk1574JKglmQAip6msYHUd/5sHBvF+dhb4TQdhj5Ag==
+X-Received: by 2002:a17:90b:e86:: with SMTP id fv6mr12614856pjb.196.1605902851724;
+        Fri, 20 Nov 2020 12:07:31 -0800 (PST)
 Received: from han1-mobl3.jf.net (c-73-164-224-32.hsd1.or.comcast.net. [73.164.224.32])
-        by smtp.gmail.com with ESMTPSA id t5sm3979267pgt.15.2020.11.20.12.07.29
+        by smtp.gmail.com with ESMTPSA id t5sm3979267pgt.15.2020.11.20.12.07.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 12:07:30 -0800 (PST)
+        Fri, 20 Nov 2020 12:07:31 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 X-Google-Original-From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     tedd.an@intel.com
-Subject: [PATCH 3/6] btio: Fix the unchecked return value
-Date:   Fri, 20 Nov 2020 12:07:09 -0800
-Message-Id: <20201120200712.491219-3-tedd.an@intel.com>
+Subject: [PATCH 4/6] emulator: Fix the unchecked return value
+Date:   Fri, 20 Nov 2020 12:07:10 -0800
+Message-Id: <20201120200712.491219-4-tedd.an@intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20201120200712.491219-1-tedd.an@intel.com>
 References: <20201120200712.491219-1-tedd.an@intel.com>
@@ -78,41 +78,55 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This patch fixes the unchecked return value.
 ---
- btio/btio.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ emulator/phy.c    | 10 ++++++++--
+ emulator/server.c |  6 +++++-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index c18b6a012..8230212b4 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -1701,8 +1701,11 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
+diff --git a/emulator/phy.c b/emulator/phy.c
+index 4517ad107..2ae6ad3a2 100644
+--- a/emulator/phy.c
++++ b/emulator/phy.c
+@@ -115,7 +115,10 @@ static int create_rx_socket(void)
+ 	if (fd < 0)
+ 		return -1;
  
- 	/* Use DEFER_SETUP when connecting using Ext-Flowctl */
- 	if (opts.mode == BT_IO_MODE_EXT_FLOWCTL && opts.defer) {
--		setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP, &opts.defer,
--							sizeof(opts.defer));
-+		if (setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP,
-+					&opts.defer, sizeof(opts.defer)) < 0) {
-+			ERROR_FAILED(gerr, "setsockopt(BT_DEFER_SETUP)", errno);
-+			return NULL;
-+		}
+-	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
++	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
++		close(fd);
++		return -1;
++	}
+ 
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sin_family = AF_INET;
+@@ -138,7 +141,10 @@ static int create_tx_socket(void)
+ 	if (fd < 0)
+ 		return -1;
+ 
+-	setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
++	if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt)) < 0) {
++		close(fd);
++		return -1;
++	}
+ 
+ 	return fd;
+ }
+diff --git a/emulator/server.c b/emulator/server.c
+index 3b07a7156..ceb417a40 100644
+--- a/emulator/server.c
++++ b/emulator/server.c
+@@ -322,7 +322,11 @@ static int open_tcp(void)
+ 		return -1;
  	}
  
- 	switch (opts.type) {
-@@ -1761,8 +1764,11 @@ GIOChannel *bt_io_listen(BtIOConnect connect, BtIOConfirm confirm,
- 	sock = g_io_channel_unix_get_fd(io);
+-	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
++	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
++		perror("Failed to set socket option");
++		close(fd);
++		return -1;
++	}
  
- 	if (confirm)
--		setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP, &opts.defer,
--							sizeof(opts.defer));
-+		if (setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP,
-+					&opts.defer, sizeof(opts.defer)) < 0) {
-+			ERROR_FAILED(err, "setsockopt(BT_DEFER_SETUP)", errno);
-+			return NULL;
-+		}
- 
- 	if (listen(sock, 5) < 0) {
- 		ERROR_FAILED(err, "listen", errno);
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sin_family = AF_INET;
 -- 
 2.25.4
 
