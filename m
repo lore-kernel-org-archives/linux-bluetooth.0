@@ -2,78 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A28C56202
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Nov 2020 01:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD151C5519F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Nov 2020 01:32:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61ABE2237B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Nov 2020 01:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67E2A22403
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Nov 2020 01:32:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCUI91me"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTSdPKPf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728730AbgKUBcK (ORCPT
+        id S1728748AbgKUBcX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Nov 2020 20:32:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50414 "EHLO
+        Fri, 20 Nov 2020 20:32:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725890AbgKUBcJ (ORCPT
+        with ESMTP id S1728054AbgKUBcX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Nov 2020 20:32:09 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF425C061A04
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 17:32:07 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id n132so10933510qke.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 17:32:07 -0800 (PST)
+        Fri, 20 Nov 2020 20:32:23 -0500
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287FEC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 17:32:23 -0800 (PST)
+Received: by mail-qt1-x841.google.com with SMTP id f93so8599481qtb.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2020 17:32:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=DncRpalLmfQ/uB9cu0SovFuFObJcu8/yEbCOigbodos=;
-        b=lCUI91meTmx8AN8ZBowXTOff6Dh2ROcbkfczJhhDRp5sLo7o7c+4/dHRhasVio10Wz
-         RiKEPXadBVwYawjIKzVyVoB8whJxOdw3Ndhv203+bXIhymI7lzNjIiwcp1YX8Mc/Lwl1
-         WVCQeMPTV9EVJLMyHn9rQ9O86jqD5IiuGTxPsEsJVdi3MXIETguAzzIRwikp3ijb/YsH
-         veB3FKOmQ/cwjnJFRsKCA1XyG10hTHXAhp5o9DRsW4FBoORwoPYrOSwAEN99KWGMtrPM
-         rN1NJxzi2idFHW5yKbBHz07rERdnpx3Odqq/8YkIi6W6Jw9QdT0NdxUfhyr+tuP7EWZv
-         Pefg==
+        bh=aObdG6Nn57p+ixQeQ4/HnIPGn0MADVk4r/1P1xOZ2Vk=;
+        b=WTSdPKPfW14kIBHirR7zKhMMPBwNnEPaE8rDNRqtdC/3vPREKTsUOYI+p/VRC7WKHB
+         FA7BC0uWFCk9sKCifKgYk51q0Rn1DPogJJkG8QHIljYsAxFUiGSwkUZOtQqLmt06+UX0
+         YH1MD0M/JLBqT9HVw+cliXNlRKkzzkQ4c/3irSeqMvfhtBDRjjpSWQtyjUnK9WW4JuHZ
+         iknyWjGvfHz3esMCt5cucM3Of8oqb7bh+TuIS/IJZQu0d/dSxaKuMfWQi/BGgxQ0DY/4
+         P8xZaMkv0lZ7s2pGeq90t4M38K2DkCfEd3+vAYXWumuMEUy4epHJJubl82CMIccQKzne
+         2POg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=DncRpalLmfQ/uB9cu0SovFuFObJcu8/yEbCOigbodos=;
-        b=Tr4LFksM7gTT9kKqi1iBeGskNkk3q4Re9j+qBaqWb44iQTd86yqkj4Mxvdo2BPVwRp
-         Rb+OjFjhqautmbRPtyK8PF9ZsJBKmRoVjekc0JhUcE1meoSTkjxiBpsMqbvgVcZoOwlL
-         5JKPVzNSZ1Nf/RBMHGYT/qyakNcVQ2WvcAbml0Q1VpNKgGSO7NFVdBsBFWaj1G2gZPIZ
-         fnzfui50dqtjjdADf/EHMBnXMSkX7Y2ETZZRKdEsZ9vKRawFN7AZsJz4s4fknECWD650
-         F1Me5h1+OoTmwEi/AlFQGxKa6YeI7itGU29kc6lrNl+8YDGOTbGDFRhiqap8entFhToh
-         UDjA==
-X-Gm-Message-State: AOAM5303A6fUsmaCy+LxTqUjOYB35+W0ohuXL6fwkDJdkQye6JTu9RUP
-        H+kHTpWZq89RRm6snEh1Zt86I+8gQ7Lu4A==
-X-Google-Smtp-Source: ABdhPJx0N03rQkBwtrsdW5acOOBNWIB/LoezgerMPFW2y4xTVnBh67i3Aj3oJoyL5UU6/JTImU7uGA==
-X-Received: by 2002:ae9:dc81:: with SMTP id q123mr20007867qkf.426.1605922326988;
-        Fri, 20 Nov 2020 17:32:06 -0800 (PST)
-Received: from [172.17.0.2] ([104.209.136.33])
-        by smtp.gmail.com with ESMTPSA id j17sm3124620qtn.2.2020.11.20.17.32.06
+        bh=aObdG6Nn57p+ixQeQ4/HnIPGn0MADVk4r/1P1xOZ2Vk=;
+        b=gVo6q85UF3u2QA4rIcWkZWYAFTFoRyoqI6mHR/gt6JEpcbqlXpgH2peLcUmDqMBQ/k
+         roYM2j+nXODvjqRTw6tAKb7DQaJjXBzRpDIXOevJWsSq8oGVjCd85u4BHphPq1P0OhdQ
+         8VcJcaYA4oSBXCIqWfkHmMa4yt9/uoQiJfHTkF6MQv2Sw3HcDJC3Swble0fyL7p9akaU
+         LBp5dpzsZWZ+f4yudpw4kgOEsVOo2Bvvlle4cqy+A9XoDsg67eJPKfSxvMT/uIKLxUFt
+         6j88f3CdouD+jm/GViVZkBnZA6Rxvwt9RIeUE9B3E9EcKK93xg/RuWQxYfjk3z32KiuB
+         iEDg==
+X-Gm-Message-State: AOAM532/BB5quwxLdAkTBEfQASo3BEqxvI+V7UqF9cqU2dIhJPZd6cHk
+        MsVxxVQNUZ7bAeUxYFWKDn9UrYpa0lMjaw==
+X-Google-Smtp-Source: ABdhPJynXbtCUZzgaHmhV8j8UF1ITIBofs4Zp9GgeMNEUZidrobae5sBTV+s/qL8tSWm9ogOhxdXHg==
+X-Received: by 2002:ac8:734c:: with SMTP id q12mr8208397qtp.239.1605922342326;
+        Fri, 20 Nov 2020 17:32:22 -0800 (PST)
+Received: from [172.17.0.2] ([40.65.207.225])
+        by smtp.gmail.com with ESMTPSA id v204sm3385018qka.4.2020.11.20.17.32.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 17:32:06 -0800 (PST)
-Message-ID: <5fb86e16.1c69fb81.ffd26.4f12@mx.google.com>
-Date:   Fri, 20 Nov 2020 17:32:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0158295877519543502=="
+        Fri, 20 Nov 2020 17:32:22 -0800 (PST)
+Message-ID: <5fb86e26.1c69fb81.5f9ba.6a19@mx.google.com>
+Date:   Fri, 20 Nov 2020 17:32:22 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4728931249238719307=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, cadel@cadelwatson.com
-Subject: RE: Bluetooth: btusb: Support 0bda:c123 Realtek 8822CE device
+To:     linux-bluetooth@vger.kernel.org, reoshiseki@gmail.com
+Subject: RE: include/net/bluetooth/mgmt.h: fix typo in struct name
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201119051625.2622105-1-cadel@cadelwatson.com>
-References: <20201119051625.2622105-1-cadel@cadelwatson.com>
+In-Reply-To: <20201119071038.380502-1-reoshiseki@gmail.com>
+References: <20201119071038.380502-1-reoshiseki@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0158295877519543502==
+--===============4728931249238719307==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -84,12 +84,28 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=387239
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=387293
 
 ---Test result---
 
 ##############################
-Test: CheckPatch - PASS
+Test: CheckPatch - FAIL
+Output:
+include/net/bluetooth/mgmt.h: fix typo in struct name
+WARNING: Missing commit description - Add an appropriate one
+
+WARNING: From:/Signed-off-by: email name mismatch: 'From: Reo Shiseki <reoshiseki@gmail.com>' != 'Signed-off-by: n01e0 <reoshiseki@gmail.com>'
+
+total: 0 errors, 2 warnings, 0 checks, 32 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] include/net/bluetooth/mgmt.h: fix typo in struct name" has style problems, please review.
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
 
 ##############################
 Test: CheckGitLint - PASS
@@ -104,4 +120,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0158295877519543502==--
+--===============4728931249238719307==--
