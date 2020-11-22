@@ -2,71 +2,70 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,TRACKER_ID,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B05CC64E90
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 16:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E126C64E8A
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 16:33:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A5CE2076E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 16:11:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2269D20789
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 16:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuTdFtHh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StCMHC/H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728005AbgKVQLM (ORCPT
+        id S1728316AbgKVQda (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Nov 2020 11:11:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39170 "EHLO
+        Sun, 22 Nov 2020 11:33:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58132 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727907AbgKVQLF (ORCPT
+        by vger.kernel.org with ESMTP id S1728320AbgKVQd0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Nov 2020 11:11:05 -0500
+        Sun, 22 Nov 2020 11:33:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606061463;
+        s=mimecast20190719; t=1606062804;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=D4o3+oRulyAmQWJaTM5GlynW0/tmbkOzx3PzhPB5iTg=;
-        b=JuTdFtHhsclSCFUt685nObhejVSN718q0xDzBI7qCmYl4/ObRaglwiPh1kkjwftUYKtjGT
-        F9V7hg+6Ged1Ypc78HlKhU8yURVG+HfY97vOU+FDQTH2+EktMkCoujoBzuPIEBmLFdUcTH
-        U0gcN5s+aBBBeO3IQtZ/9hGSdS8be9I=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-TYfkXirGPfeqywIas6PLDg-1; Sun, 22 Nov 2020 11:11:00 -0500
-X-MC-Unique: TYfkXirGPfeqywIas6PLDg-1
-Received: by mail-qt1-f197.google.com with SMTP id r16so1127209qtn.19
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2020 08:11:00 -0800 (PST)
+        bh=eSFXaX0DZkpNbOwM/RCeF/BEd3n14fz/kurtk7pTmoY=;
+        b=StCMHC/HyCDcHG808p/9thQCbNHLB97ek1T9oforhFojh55MW9LfrBZih5vkd7qgZ43dSF
+        OZ3JOWRoVWjL7zUSFlP0LDpmoWD2sc3F8Zm34Dd/PaZ0RswUInINC4teeaarn0nRRR/QOI
+        +dDEJjm8SJb3l7vs6UWTL1dZHykwyjY=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-VvTKNt8XNbWvAZbfRkxpMA-1; Sun, 22 Nov 2020 11:33:22 -0500
+X-MC-Unique: VvTKNt8XNbWvAZbfRkxpMA-1
+Received: by mail-qv1-f72.google.com with SMTP id d41so11195631qvc.23
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2020 08:33:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=D4o3+oRulyAmQWJaTM5GlynW0/tmbkOzx3PzhPB5iTg=;
-        b=VClaRKYhurO+99fdvzQ9pI1mThsj/Ok0IzYDS6+mIN2rs/6yy4UoMcdjQHIRLIWYfz
-         4KAZJjG9phaz4uHa0es1cp0aD2KDEuqsvBssPEzGK3zpPhG6Dx4/ZQOmNKFLvNECO7hs
-         3WSZjcK0cpFA6oZIkBLtCsiOT3mw3KjexKe+jywvL5hk9Vu+Pai+BMRWHOFMeE86G6ua
-         17L4GTEhXm4HIjngrmWIYiTXxDWCfIgh1FxVNDR6AYt2IYiz44T38vKz972xZz9Hnjr+
-         Ms3tpa6yqQ1/FUAGYGqvnsP6vIx3PRAyBypf1sZANjCBQKdjVmGihU8hZ8vbzMLMy/2S
-         6sQw==
-X-Gm-Message-State: AOAM530wPjB35yeXIeNSKXljlWL9D+U7hkW8RLZVi2KSZAmlPjlfmkGV
-        ieKLNDMjrp600rERQ0/U3GcuU5HRE0Wt4eg3ZjM2ktKSqYDltcVXYaG3KjR0vVwsbfJMUbgI0rW
-        kqHqgxfVnpRAcwmbK0f4col9Z5ucm
-X-Received: by 2002:ac8:5a8c:: with SMTP id c12mr23364818qtc.97.1606061459266;
-        Sun, 22 Nov 2020 08:10:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw6JfmMkGlJyoaKx6ihYsYbDuDsWkyDwIosiC/apv5eylMrcIvHPxlHVgnFDCnun9WXh4UZ3w==
-X-Received: by 2002:ac8:5a8c:: with SMTP id c12mr23364770qtc.97.1606061458997;
-        Sun, 22 Nov 2020 08:10:58 -0800 (PST)
+        bh=eSFXaX0DZkpNbOwM/RCeF/BEd3n14fz/kurtk7pTmoY=;
+        b=rl28K5WxZ9zNFX/cOGIyFlwJ81fZHVJgQ9Fxk2KgSZQ+Sl55ITmn4B9ttOjJ2QfZix
+         Ds1QvzlSCuFCPa4Xv9VOn2f5SEkdxwqNANB0UPB3Oo43oylXkmPLy90MMcREzpLjpuxD
+         QZt1HaPXwb9dx2Yc0mcKMLEV+Jlo9TTWm6UBWO27fN68AG8e0MTLaR4NiyBNxkS+FCBE
+         4DKjoSm2f/PM5Zl0oNvzvkZkJsZe8nRe4+tcY169aEcvOhBZwgcvJWCd5tXQMeHK706g
+         RcUsbtv+CUYOn5uyXopzz7F6ZaPu8ZvvIp7Gos5MBr4sKkGvRIZgH0EqBZTm8uNUtJYt
+         apfQ==
+X-Gm-Message-State: AOAM533CJf9nWk5tS6humy/giQ6iKAWE5c5tGnWH1OflgmQhWSclf8zd
+        iK80CtzavYYWUgbumhIKBRZjlBXjRitFLKXiNaiTZ06K0XHJ5Jh3b7OD2UdU6HI9teXeEDCKcox
+        lOegajsEjXcyWcqxvHkIauG3VE+Hr
+X-Received: by 2002:a37:a783:: with SMTP id q125mr25815215qke.10.1606062801576;
+        Sun, 22 Nov 2020 08:33:21 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx2n++9V878KrbbQS+4X3uFT/lj12S/EG8yAhFKA6vFd9PzTR06otQkDsZPYmv5N+Hbwviu/A==
+X-Received: by 2002:a37:a783:: with SMTP id q125mr25815168qke.10.1606062801138;
+        Sun, 22 Nov 2020 08:33:21 -0800 (PST)
 Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id l3sm2779806qth.13.2020.11.22.08.10.54
+        by smtp.gmail.com with ESMTPSA id 9sm7113466qke.6.2020.11.22.08.33.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Nov 2020 08:10:58 -0800 (PST)
+        Sun, 22 Nov 2020 08:33:20 -0800 (PST)
 Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     joe@perches.com, clang-built-linux@googlegroups.com,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Joe Perches <joe@perches.com>, clang-built-linux@googlegroups.com
+Cc:     linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
         xen-devel@lists.xenproject.org, tboot-devel@lists.sourceforge.net,
         kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-acpi@vger.kernel.org, devel@acpica.org,
@@ -84,16 +83,14 @@ Cc:     joe@perches.com, clang-built-linux@googlegroups.com,
         bpf@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-nfs@vger.kernel.org, patches@opensource.cirrus.com
 References: <20201121165058.1644182-1-trix@redhat.com>
- <20201122032304.GE4327@casper.infradead.org>
- <ddb08a27-3ca1-fb2e-d51f-4b471f1a56a3@redhat.com>
- <20201122145635.GG4327@casper.infradead.org>
+ <2105f0c05e9eae8bee8e17dcc5314474b3c0bc73.camel@perches.com>
 From:   Tom Rix <trix@redhat.com>
-Message-ID: <0819ce06-c462-d4df-d3d9-14931dc5aefc@redhat.com>
-Date:   Sun, 22 Nov 2020 08:10:53 -0800
+Message-ID: <6e8c1926-4209-8f10-d0f9-72c875a85a88@redhat.com>
+Date:   Sun, 22 Nov 2020 08:33:16 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201122145635.GG4327@casper.infradead.org>
+In-Reply-To: <2105f0c05e9eae8bee8e17dcc5314474b3c0bc73.camel@perches.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -102,47 +99,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
-On 11/22/20 6:56 AM, Matthew Wilcox wrote:
-> On Sun, Nov 22, 2020 at 06:46:46AM -0800, Tom Rix wrote:
->> On 11/21/20 7:23 PM, Matthew Wilcox wrote:
->>> On Sat, Nov 21, 2020 at 08:50:58AM -0800, trix@redhat.com wrote:
->>>> The fixer review is
->>>> https://reviews.llvm.org/D91789
->>>>
->>>> A run over allyesconfig for x86_64 finds 62 issues, 5 are false positives.
->>>> The false positives are caused by macros passed to other macros and by
->>>> some macro expansions that did not have an extra semicolon.
->>>>
->>>> This cleans up about 1,000 of the current 10,000 -Wextra-semi-stmt
->>>> warnings in linux-next.
->>> Are any of them not false-positives?  It's all very well to enable
->>> stricter warnings, but if they don't fix any bugs, they're just churn.
->>>
->> While enabling additional warnings may be a side effect of this effort
+On 11/21/20 9:10 AM, Joe Perches wrote:
+> On Sat, 2020-11-21 at 08:50 -0800, trix@redhat.com wrote:
+>> A difficult part of automating commits is composing the subsystem
+>> preamble in the commit log.  For the ongoing effort of a fixer producing
+>> one or two fixes a release the use of 'treewide:' does not seem appropriate.
 >>
->> the primary goal is to set up a cleaning robot. After that a refactoring robot.
-> Why do we need such a thing?  Again, it sounds like more churn.
-> It's really annoying when I'm working on something important that gets
-> derailed by pointless churn.  Churn also makes it harder to backport
-> patches to earlier kernels.
+>> It would be better if the normal prefix was used.  Unfortunately normal is
+>> not consistent across the tree.
+>>
+>> So I am looking for comments for adding a new tag to the MAINTAINERS file
+>>
+>> 	D: Commit subsystem prefix
+>>
+>> ex/ for FPGA DFL DRIVERS
+>>
+>> 	D: fpga: dfl:
+> I'm all for it.  Good luck with the effort.  It's not completely trivial.
 >
-A refactoring example on moving to treewide, consistent use of a new api may help.
+> From a decade ago:
+>
+> https://lore.kernel.org/lkml/1289919077.28741.50.camel@Joe-Laptop/
+>
+> (and that thread started with extra semicolon patches too)
 
-Consider
+Reading the history, how about this.
 
-2efc459d06f1630001e3984854848a5647086232
+get_mataintainer.pl outputs a single prefix, if multiple files have the same prefix it works, if they don't its an error.
 
-sysfs: Add sysfs_emit and sysfs_emit_at to format sysfs output
+Another script 'commit_one_file.sh' does the call to get_mainainter.pl to get the prefix and be called by run-clang-tools.py to get the fixer specific message.
 
-A new api for printing in the sysfs.  How do we use it treewide ?
+Defer minimizing the commits by combining similar subsystems till later.
 
-Done manually, it would be a heroic effort requiring high level maintainers pushing and likely only get partially done.
+In a steady state case, this should be uncommon.
 
-If a refactoring programatic fixit is done and validated on a one subsystem, it can run on all the subsystems.
 
-The effort is a couple of weeks to write and validate the fixer, hours to run over the tree.
+>
+>> Continuing with cleaning up clang's -Wextra-semi-stmt
+>> diff --git a/Makefile b/Makefile
+> []
+>> @@ -1567,20 +1567,21 @@ help:
+>>  	 echo  ''
+>>  	@echo  'Static analysers:'
+>>  	@echo  '  checkstack      - Generate a list of stack hogs'
+>>  	@echo  '  versioncheck    - Sanity check on version.h usage'
+>>  	@echo  '  includecheck    - Check for duplicate included header files'
+>>  	@echo  '  export_report   - List the usages of all exported symbols'
+>>  	@echo  '  headerdep       - Detect inclusion cycles in headers'
+>>  	@echo  '  coccicheck      - Check with Coccinelle'
+>>  	@echo  '  clang-analyzer  - Check with clang static analyzer'
+>>  	@echo  '  clang-tidy      - Check with clang-tidy'
+>> +	@echo  '  clang-tidy-fix  - Check and fix with clang-tidy'
+> A pity the ordering of the code below isn't the same as the above.
 
-It won't be perfect but will be better than doing it manually.
+Taken care thanks!
 
 Tom
+
 
