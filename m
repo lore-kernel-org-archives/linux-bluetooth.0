@@ -2,84 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D3AC63798
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 10:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA7FC63777
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 10:57:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83BB120936
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 10:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1DD4212CC
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Nov 2020 10:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAjN5TUu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KB01HnW3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727715AbgKVKdc (ORCPT
+        id S1727685AbgKVK5o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Nov 2020 05:33:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39781 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727306AbgKVKdb (ORCPT
+        Sun, 22 Nov 2020 05:57:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47012 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727391AbgKVK5n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Nov 2020 05:33:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606041210;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fxcvHjURjgzH+4pBBaaisAcLqolTuB7e53inDOUpc5k=;
-        b=hAjN5TUuH0FwKdYE9AY6ysU52DNbwOq22Jcx15B53jZiv0z7JF4qfvt3LY/VNqO/T7ono8
-        vLG1rm6NCcQi4pCo3DnZNKHcz9LiMxOTtHw2MAbOvI9QAhBsxE8zAbhdY2Lz1rPhCz27XA
-        i418OVmfUFQ1kDItNyNE3QglRfRc/JI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-vYtbeY8YOkuROV_2KEyhtQ-1; Sun, 22 Nov 2020 05:33:27 -0500
-X-MC-Unique: vYtbeY8YOkuROV_2KEyhtQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9DE21005D70;
-        Sun, 22 Nov 2020 10:33:26 +0000 (UTC)
-Received: from x1.localdomain.com (ovpn-112-104.ams2.redhat.com [10.36.112.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8F761F453;
-        Sun, 22 Nov 2020 10:33:25 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_h5: Add OBDA0623 ACPI HID
-Date:   Sun, 22 Nov 2020 11:33:23 +0100
-Message-Id: <20201122103323.26116-1-hdegoede@redhat.com>
+        Sun, 22 Nov 2020 05:57:43 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B39AC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2020 02:57:43 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id k8so2480247ilr.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2020 02:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=X+oAHiED3EqxBS4hJ3dAv6kV8uKh0SiSRJOiDAx52tk=;
+        b=KB01HnW3Xqqhuql1fzy4qsYogBkFuOfnsqmSdc5a7BEqqmdAgHYUWkGfuxbkK+nkWI
+         q6PFo4+I4MojxHqSIhV1o3cX7J1AbsD6HrbTi1PTlGMtE/QwrDb0h9cbaTYnfQTzOveF
+         3ZkYsTSGGFiGfix5gars7gPatpA5fInC3WUKzO6oQF3fxFUhxqj3+ayNDHs24Cg8MdCD
+         F2wzB29231JLb1iGx1pcbHiamgW7FCsA2kSy+m0/iFDx/bjvK55U+cTquJp66N5Z5+m9
+         eMGKzCQInPq31DqtmZXvgezXIblDH4drcsF96UE8bduR/E6Hc3csnoO7dbpB9nZIP8MC
+         4eYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=X+oAHiED3EqxBS4hJ3dAv6kV8uKh0SiSRJOiDAx52tk=;
+        b=f1RyhhGS6oyjDUmBUApH+MoxgbTw1hU4WB7NBaIUDhvsXB7KeXSEb0YL+vNmyINDmz
+         ObtrGKmgqlF8NvLL2f86H1XONJ695BHjetLqS0+aiMZtDBSl7Tg0ArFIkcGvKahxaA6t
+         jchso9xY85kcrb20hk5fI1hQDk291CVVE8hb7rZUDQPyF90iUNEoeB+lliNxBSjep2uh
+         EQ8JlZPUExWNwlmFnHb4LNRBmfxgtTBcMexgP0hN4Ad2rXde7vD2OaQo8xAjuRnTzroS
+         iK6sY01qkqRpdhO6uLzmi39Q9g8WeqY4gHaYAw3ZZlQQACy3ecu/tqkTImBjk9t/8O1M
+         sAcw==
+X-Gm-Message-State: AOAM531dVg+VN/d3cwXZ9LXyemONGCuFyxssYBDeA5YJDZHk0FlnfKXQ
+        kvHLGYBHLczZdB+90dDBWwmA0EPqWcw=
+X-Google-Smtp-Source: ABdhPJwEohibNNU9k6Ks7Znn/BvJQH/2BPcLjLeFCngbOxqtu3qpkwusiziFYp8M0er16ziKpF+XZQ==
+X-Received: by 2002:a05:6e02:e8c:: with SMTP id t12mr7130147ilj.302.1606042662653;
+        Sun, 22 Nov 2020 02:57:42 -0800 (PST)
+Received: from [172.17.0.2] ([20.36.196.114])
+        by smtp.gmail.com with ESMTPSA id s16sm5647202ilp.43.2020.11.22.02.57.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Nov 2020 02:57:42 -0800 (PST)
+Message-ID: <5fba4426.1c69fb81.a3572.30e5@mx.google.com>
+Date:   Sun, 22 Nov 2020 02:57:42 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8937711951317612544=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
+Subject: RE: Bluetooth: hci_h5: Add OBDA0623 ACPI HID
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201122103323.26116-1-hdegoede@redhat.com>
+References: <20201122103323.26116-1-hdegoede@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add OBDA0623 ACPI HID to the acpi_device_id table. This HID is used
-for the RTL8723BS Bluetooth part on the Acer Switch 10E SW3-016.
+--===============8937711951317612544==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1665610
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=389063
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
 ---
- drivers/bluetooth/hci_h5.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 981d96cc7695..179a757f9fdc 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -1001,6 +1001,7 @@ static struct h5_vnd rtl_vnd = {
- #ifdef CONFIG_ACPI
- static const struct acpi_device_id h5_acpi_match[] = {
- #ifdef CONFIG_BT_HCIUART_RTL
-+	{ "OBDA0623", (kernel_ulong_t)&rtl_vnd },
- 	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
- #endif
- 	{ },
--- 
-2.28.0
 
+--===============8937711951317612544==--
