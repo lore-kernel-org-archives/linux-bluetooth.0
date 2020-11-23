@@ -4,52 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B917C56202
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D04C2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:31:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12A2920738
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2A8F207FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728860AbgKWL2e (ORCPT
+        id S1728639AbgKWLbV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Nov 2020 06:28:34 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56293 "EHLO
+        Mon, 23 Nov 2020 06:31:21 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:54870 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728809AbgKWL2e (ORCPT
+        with ESMTP id S1726529AbgKWLbV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Nov 2020 06:28:34 -0500
+        Mon, 23 Nov 2020 06:31:21 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2E330CECCF;
-        Mon, 23 Nov 2020 12:35:44 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 91E23CECCF;
+        Mon, 23 Nov 2020 12:38:28 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [PATCH] include/net/bluetooth/mgmt.h: fix typo in struct name
+Subject: Re: [PATCH v2] Bluetooth: Use NVM files based on SoC ID for WCN3991
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201119073710.385004-1-reoshiseki@gmail.com>
-Date:   Mon, 23 Nov 2020 12:28:31 +0100
-Cc:     linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+In-Reply-To: <1605790449-7250-1-git-send-email-gubbaven@codeaurora.org>
+Date:   Mon, 23 Nov 2020 12:31:15 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <16B64FCB-A028-435A-A522-8B2ECEEDC3A4@holtmann.org>
-References: <20201119073710.385004-1-reoshiseki@gmail.com>
-To:     n01e0 <reoshiseki@gmail.com>
+Message-Id: <E4A3BCAC-E6C1-4ED4-885B-FC2918ACC315@holtmann.org>
+References: <1605790449-7250-1-git-send-email-gubbaven@codeaurora.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Venkata,
 
-> Signed-off-by: n01e0 <reoshiseki@gmail.com>
+> This change will allow to use different NVM file based
+> on WCN3991 BT SoC ID.Need to use different NVM file based on
+> fab location for WCN3991 BT SoC.
+> 
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 > ---
-> include/net/bluetooth/mgmt.h | 4 ++--
-> net/bluetooth/mgmt.c         | 4 ++--
-> 2 files changed, 4 insertions(+), 4 deletions(-)
+> drivers/bluetooth/btqca.c   | 36 ++++++++++++++++++++----------------
+> drivers/bluetooth/btqca.h   | 22 ++++++++++++++++++----
+> drivers/bluetooth/hci_qca.c |  9 ++++-----
+> 3 files changed, 42 insertions(+), 25 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
