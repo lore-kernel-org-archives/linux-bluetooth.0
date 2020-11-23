@@ -4,97 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC5AC2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F64C2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F4E4206FB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:55:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 682A62076E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728957AbgKWLzR (ORCPT
+        id S1728857AbgKWL6P convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Nov 2020 06:55:17 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33125 "EHLO
+        Mon, 23 Nov 2020 06:58:15 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46490 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728696AbgKWLzQ (ORCPT
+        with ESMTP id S1728524AbgKWL6O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Nov 2020 06:55:16 -0500
+        Mon, 23 Nov 2020 06:58:14 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A86B7CECD0;
-        Mon, 23 Nov 2020 13:02:26 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9EA1ACECD0;
+        Mon, 23 Nov 2020 13:05:23 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [Patch v3] Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C
+Subject: Re: [PATCH net] Bluetooth: Fix potential null pointer dereference in
+ create_le_conn_complete
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201116155626.GA27472@jimmy-ryzen-home>
-Date:   Mon, 23 Nov 2020 12:55:13 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <CB6C0CB2-89E2-451B-9EC1-1DA6978DC945@holtmann.org>
-References: <20201116155626.GA27472@jimmy-ryzen-home>
-To:     Jimmy Wahlberg <jimmywa@spotify.com>
+In-Reply-To: <20201113113956.52187-1-wanghai38@huawei.com>
+Date:   Mon, 23 Nov 2020 12:58:10 +0100
+Cc:     "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>, jpawlowski@google.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2E78F25D-78D0-410A-8EAD-76BA4466975B@holtmann.org>
+References: <20201113113956.52187-1-wanghai38@huawei.com>
+To:     Wang Hai <wanghai38@huawei.com>
 X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jimmy,
+Hi Wang,
 
-> This test case is meant to verify that multiple
-> unknown options is included in the response.
+> The pointer 'conn' may be null. Before being used by
+> hci_connect_le_scan_cleanup(), The pointer 'conn' must be
+> checked whether it is null.
 > 
-> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part A
-> page 1057
-> 
-> 'On an unknown option failure (Result=0x0003),
-> the option(s) that contain anoption type field that is not
-> understood by the recipient of the L2CAP_CONFIGURATION_REQ
-> packet shall be included in the L2CAP_CONFIGURATION_RSP
-> packet unless they are hints.'
-> 
-> Before this patch:
-> 
->> ACL Data RX: Handle 11 flags 0x02 dlen 24
->      L2CAP: Configure Request (0x04) ident 18 len 16
->        Destination CID: 64
->        Flags: 0x0000
->        Option: Unknown (0x10) [mandatory]
->        10 00 11 02 11 00 12 02 12 00
-> < ACL Data TX: Handle 11 flags 0x00 dlen 17
->      L2CAP: Configure Response (0x05) ident 18 len 9
->        Source CID: 64
->        Flags: 0x0000
->        Result: Failure - unknown options (0x0003)
->        Option: Unknown (0x10) [mandatory]
->        12
-> 
-> After this patch:
-> 
->> ACL Data RX: Handle 11 flags 0x02 dlen 24
->      L2CAP: Configure Request (0x04) ident 5 len 16
->        Destination CID: 64
->        Flags: 0x0000
->        Option: Unknown (0x10) [mandatory]
->        10 00 11 02 11 00 12 02 12 00
-> < ACL Data TX: Handle 11 flags 0x00 dlen 23
->      L2CAP: Configure Response (0x05) ident 5 len 15
->        Source CID: 64
->        Flags: 0x0000
->        Result: Failure - unknown options (0x0003)
->        Option: Unknown (0x10) [mandatory]
->        10 11 01 11 12 01 12
-> 
-> Signed-off-by: Jimmy Wahlberg <jimmywa@spotify.com>
+> Fixes: 28a667c9c279 ("Bluetooth: advertisement handling in new connect procedure")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
 > ---
-> net/bluetooth/l2cap_core.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/hci_conn.c | 5 ++---
+> 1 file changed, 2 insertions(+), 3 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+please send a version that applies cleanly against bluetooth-next tree.
 
 Regards
 
