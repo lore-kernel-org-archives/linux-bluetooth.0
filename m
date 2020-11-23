@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D50C63798
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 10:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3496EC64E75
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 10:13:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54ABA2078E
+	by mail.kernel.org (Postfix) with ESMTP id D677421D81
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 10:13:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWGEvR00"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQkrPQUm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728203AbgKWKNS (ORCPT
+        id S1728491AbgKWKNU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Nov 2020 05:13:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27813 "EHLO
+        Mon, 23 Nov 2020 05:13:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55309 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727849AbgKWKNS (ORCPT
+        by vger.kernel.org with ESMTP id S1728471AbgKWKNU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Nov 2020 05:13:18 -0500
+        Mon, 23 Nov 2020 05:13:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606126397;
+        s=mimecast20190719; t=1606126399;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7iXeg+d369Z9iAeCZ8VXKpQ+G+cpYya/oh3Qpx6294E=;
-        b=PWGEvR00hfOpS2IWdjEDvJjq/JG0WcegOEclJQWyOZlcYfiL6Atj3eabRQLJkoSgSm+dWE
-        AFs0rfU+e7xnS8B4ylSOzSXE/UU+0lkio3fFOqmovUhk4G9qjPQ/xxfsddjp3jlVCBZ+05
-        TjBwDG1SwwqlB37D3Pf+ZY5Z+m2gloM=
+        bh=PjefuY0KlyU8PcQEa1Z+I3eC/OJuTl4GWD0T/J2yCBM=;
+        b=CQkrPQUmGnJ54SMZQFPwk3x+zwIATm/UpmRuUhup6uNIeu2bVYLRaALrX7xwmbqV07z8Rx
+        jrMIWD4UOSZcSgPEgw8jmeZr7+dceXLo3NKSJZmX5SPoUG7mIFtX4nkJ/56VpbQdMcmU84
+        Id20gIyHiFPXsktYCV8fq4lEwUxetGM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-516-YFKLac0KO8CCtsyrX1seCA-1; Mon, 23 Nov 2020 05:13:15 -0500
-X-MC-Unique: YFKLac0KO8CCtsyrX1seCA-1
+ us-mta-140-fhP-iKRgMVuLnTtngCzeAw-1; Mon, 23 Nov 2020 05:13:16 -0500
+X-MC-Unique: fhP-iKRgMVuLnTtngCzeAw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CCBA185A0F7;
-        Mon, 23 Nov 2020 10:13:14 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1B77185A0CE;
+        Mon, 23 Nov 2020 10:13:15 +0000 (UTC)
 Received: from x1.localdomain.com (ovpn-113-27.ams2.redhat.com [10.36.113.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CBF56086F;
-        Mon, 23 Nov 2020 10:13:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D33AA6086F;
+        Mon, 23 Nov 2020 10:13:14 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     Hans de Goede <hdegoede@redhat.com>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: btusb: Fix detection of some fake CSR controllers with a bcdDevice val of 0x0134
-Date:   Mon, 23 Nov 2020 11:13:07 +0100
-Message-Id: <20201123101308.7291-2-hdegoede@redhat.com>
+Subject: [PATCH v2 2/2] Bluetooth: btusb: Add workaround for remote-wakeup issues with some fake CSR controllers
+Date:   Mon, 23 Nov 2020 11:13:08 +0100
+Message-Id: <20201123101308.7291-3-hdegoede@redhat.com>
 In-Reply-To: <20201123101308.7291-1-hdegoede@redhat.com>
 References: <20201123101308.7291-1-hdegoede@redhat.com>
 MIME-Version: 1.0
@@ -62,55 +62,99 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit cde1a8a99287 ("Bluetooth: btusb: Fix and detect most of the
-Chinese Bluetooth controllers") made the detection of fake controllers
-more generic fixing it for much of the newer fakes / clones.
+With the recent btusb change to detect and deal with more fake CSR
+controllers, I decided to see if one of the fakes which I have
+lying around would now work.
 
-But this does not work for a fake CSR controller with a bcdDevice
-value of 0x0134, which was correctly identified as fake before
-this change.
+After much experimentation I came to the conclusion that it works, if I
+have autosuspend enabled initially and then disable it after the device
+has suspended at least once. Yes this is very weird, but I've tried many
+things, like manually clearing the remote-wakeup feature. Doing a
+runtime-resume + runtime suspend is the only way to get the receiver
+to actually report received data (and/or pairing info) through its
+bulk rx endpoint.
 
-Add an extra check for this special case, checking for a combination
-of a bcdDevice value of 0x0134, together with a lmp_subver of 0x0c5c
-and a hci_ver of BLUETOOTH_VER_2_0.
+But the funkyness of the bulk-endpoint does not stop there, I mainly
+found out about this problem, because with autosuspend enabled
+(which usually ensures the suspend at least once condition is met),
+the receiver stops reporting received data through its bulk rx endpoint
+as soon as autosuspend kicks in. So I initially just disabled
+autosuspend, but then the receiver does not work at all.
 
-The chip inside this fake dongle is marked as with "clockwise cw6629d".
+This was with a fake CSR receiver with a bcdDevice value of 0x8891,
+a lmp_subver of 0x0x1012, a hci_rev of 0x0810 and a hci_ver of
+BLUETOOTH_VER_4_0.
 
-Fixes: cde1a8a99287 ("Bluetooth: btusb: Fix and detect most of the Chinese Bluetooth controllers")
+Summarizing this specific fake CSR receiver has the following 2 issues:
+
+1. The bulk rx endpoint will never report any data unless
+the device was suspended at least once.
+
+2. They will not wakeup when autosuspended and receiving data on their
+bulk rx endpoint from e.g. a keyboard or mouse (IOW remote-wakeup support
+is broken for the bulk endpoint).
+
+Add a workaround for 1. which enables runtime-suspend, force-suspends
+the hci and then wakes-it up by disabling runtime-suspend again.
+
+Add a workaround for 2. which clears the hci's can_wake flag, this way
+the hci will still be autosuspended when it is not open.
+
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
-Changes in v2:
--Add description of chip inside the fake dongle to the commit message
----
- drivers/bluetooth/btusb.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/bluetooth/btusb.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1005b6e8ff74..ac7fede4f951 100644
+index ac7fede4f951..48e404dfa246 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -1763,6 +1763,8 @@ static int btusb_setup_bcm92035(struct hci_dev *hdev)
- 
- static int btusb_setup_csr(struct hci_dev *hdev)
- {
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	u16 bcdDevice = le16_to_cpu(data->udev->descriptor.bcdDevice);
+@@ -1768,6 +1768,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
  	struct hci_rp_read_local_version *rp;
  	struct sk_buff *skb;
  	bool is_fake = false;
-@@ -1832,6 +1834,12 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 		 le16_to_cpu(rp->hci_ver) > BLUETOOTH_VER_4_0)
- 		is_fake = true;
++	int ret;
  
-+	/* Other clones which beat all the above checks */
-+	else if (bcdDevice == 0x0134 &&
-+		 le16_to_cpu(rp->lmp_subver) == 0x0c5c &&
-+		 le16_to_cpu(rp->hci_ver) == BLUETOOTH_VER_2_0)
-+		is_fake = true;
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -1856,6 +1857,37 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 		 */
+ 		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+ 		clear_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
 +
- 	if (is_fake) {
- 		bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; adding workarounds...");
++		/*
++		 * Some of these clones are really messed-up:
++		 * 1. Their bulk rx endpoint will never report any data unless
++		 * the device was suspended at least once (yes really).
++		 * 2. They will not wakeup when autosuspended and receiving data
++		 * on their bulk rx endpoint from e.g. a keyboard or mouse
++		 * (IOW remote-wakeup support is broken for the bulk endpoint).
++		 *
++		 * To fix 1. enable runtime-suspend, force-suspend the
++		 * hci and then wake-it up by disabling runtime-suspend.
++		 *
++		 * To fix 2. clear the hci's can_wake flag, this way the hci
++		 * will still be autosuspended when it is not open.
++		 */
++		if (device_can_wakeup(&data->udev->dev)) {
++			pm_runtime_allow(&data->udev->dev);
++
++			ret = pm_runtime_suspend(&data->udev->dev);
++			if (ret >= 0)
++				msleep(200);
++			else
++				bt_dev_warn(hdev, "Failed to suspend the device for CSR clone receive-issue workaround\n");
++
++			pm_runtime_forbid(&data->udev->dev);
++
++			device_set_wakeup_capable(&data->udev->dev, false);
++			/* Re-enable autosuspend if this was requested */
++			if (enable_autosuspend)
++				usb_enable_autosuspend(data->udev);
++		}
+ 	}
  
+ 	kfree_skb(skb);
 -- 
 2.28.0
 
