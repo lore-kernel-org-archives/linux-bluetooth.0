@@ -7,58 +7,62 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F64C2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC33C6379D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 682A62076E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BC59208C3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Nov 2020 11:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728857AbgKWL6P convert rfc822-to-8bit (ORCPT
+        id S1729249AbgKWL6r convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Nov 2020 06:58:15 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:46490 "EHLO
+        Mon, 23 Nov 2020 06:58:47 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:36804 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728524AbgKWL6O (ORCPT
+        with ESMTP id S1728524AbgKWL6r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Nov 2020 06:58:14 -0500
+        Mon, 23 Nov 2020 06:58:47 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9EA1ACECD0;
-        Mon, 23 Nov 2020 13:05:23 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 87222CECD0;
+        Mon, 23 Nov 2020 13:05:56 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [PATCH net] Bluetooth: Fix potential null pointer dereference in
- create_le_conn_complete
+Subject: Re: [PATCH 1/2] bluetooth: hci_event: consolidate error paths in
+ hci_phy_link_complete_evt()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201113113956.52187-1-wanghai38@huawei.com>
-Date:   Mon, 23 Nov 2020 12:58:10 +0100
-Cc:     "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>, jpawlowski@google.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+In-Reply-To: <c7579df5-a69b-d9e7-ccb6-6a7b2fc23d4a@omprussia.ru>
+Date:   Mon, 23 Nov 2020 12:58:44 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2E78F25D-78D0-410A-8EAD-76BA4466975B@holtmann.org>
-References: <20201113113956.52187-1-wanghai38@huawei.com>
-To:     Wang Hai <wanghai38@huawei.com>
+Message-Id: <69CEE0E0-E71B-480E-B009-5B5E9475B510@holtmann.org>
+References: <bbdd9cbe-b65e-b309-1188-71a3a4ca6fdc@omprussia.ru>
+ <b508265e-f08f-ea24-2815-bc2a5ec10d8d@omprussia.ru>
+ <EA8EC09F-6AB5-45DD-9889-C05D1FC9AAE6@holtmann.org>
+ <c7579df5-a69b-d9e7-ccb6-6a7b2fc23d4a@omprussia.ru>
+To:     Sergey Shtylyov <s.shtylyov@omprussia.ru>
 X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wang,
+Hi Sergey,
 
-> The pointer 'conn' may be null. Before being used by
-> hci_connect_le_scan_cleanup(), The pointer 'conn' must be
-> checked whether it is null.
+>>> hci_phy_link_complete_evt() has several duplicate error paths -- consolidate
+>>> them, using the *goto* statements.
+>>> 
+>>> Signed-off-by: Sergey Shtylyov <s.shtylyov@omprussia.ru>
+>>> 
+>>> ---
+>>> net/bluetooth/hci_event.c |   16 ++++++----------
+>>> 1 file changed, 6 insertions(+), 10 deletions(-)
+>> patch has been applied to bluetooth-next tree.
 > 
-> Fixes: 28a667c9c279 ("Bluetooth: advertisement handling in new connect procedure")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> ---
-> net/bluetooth/hci_conn.c | 5 ++---
-> 1 file changed, 2 insertions(+), 3 deletions(-)
+>   What about the 2nd patch?
 
-please send a version that applies cleanly against bluetooth-next tree.
+must have been slipping somehow. Can you please re-send against bluetooth-next.
 
 Regards
 
