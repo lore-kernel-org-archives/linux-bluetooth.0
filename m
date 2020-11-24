@@ -2,109 +2,210 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E34C6379D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 11:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC776C63777
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 16:57:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E6172073C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 11:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E39F206F9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 16:57:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="duv5qvO/"
+	dkim=pass (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="JN5Mm8na"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732864AbgKXL2n (ORCPT
+        id S2390712AbgKXQ5S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Nov 2020 06:28:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732711AbgKXL2m (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Nov 2020 06:28:42 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4291C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 03:28:42 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id s10so21582081ioe.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 03:28:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=3FjpitTXVFRrRASQw/DfWE5kfWKOmgJ3sb2eGrxq+F8=;
-        b=duv5qvO/W6lFJp5eWfnvr4P7KaOe++rP5wC8N1Tk16ORlbYbM1X9KXqnGPEv+Zljlc
-         PD7JgzrxJrCOy/zhjNuXJOaQtodkvGDk5uGcXEk5WPb+1fHkFjYP/Su/9y0mkyHO2aqO
-         DUIu+HIjOB4rj059XPHerPJSqQ/c1NhvfaHJt+NQbMhC1dweYZx3MYSI1zC/pHX1Ysvv
-         A5RPZBG2qLSuegoESC20QRbjo1LuRfvVyhLC4hnDY+H2rN0O5fUhNYOz3dFAiGTTXC8q
-         3xtg5xgP6dPgWSpDtXvr1bWSShVaQ24AAqrYloqGFGoCsy/4AydZwqt5/QE6Gkitu3P5
-         ccPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=3FjpitTXVFRrRASQw/DfWE5kfWKOmgJ3sb2eGrxq+F8=;
-        b=kegqwAnQKSQ2z+rHV9bybknUGiZxscTNX+BpSOLWS/4sNs3klTuATZNtomRIzfnY+S
-         AE0Ab+Qa5XaoW1XDBqthGAnO86xb0WAlXYUMFjahYNoTq2mNhGp3fwOTtppanz04z4a2
-         unWi2K0OKAdEb/GNlX/JLjDE5fcDD7AV27c4uVLE7kZnBUsxTOp2QezuUcsYqvfuPltR
-         53WfyzIF/Ujnc2J47XdTT4v/WLArjwuYT22A1wow2KKWnUENxiL5pp9b0D68bDmjVz8s
-         g/DTH34Frw3M4VJd3iUNM1Lh71/NOoa0UDSMBxd+tSVQEwDPBhXoXFm1H7uhfKrshMSs
-         Us3Q==
-X-Gm-Message-State: AOAM532eHU+4kpo5oUGlGSH2pN9aazZU4Ej6VmTfkduUkX4Zq2+tquw8
-        8mL6QQkMuE2kfLwcHozUMoXuR7Tj9CQ=
-X-Google-Smtp-Source: ABdhPJzt8cDjdSJ9pEtIZvdUFc4Bon5uzTrVtGxNdgMsU9EzLD0u5uV9WTAxY6tVObZpaVF3/MGoZw==
-X-Received: by 2002:a05:6602:2c8f:: with SMTP id i15mr3798187iow.66.1606217322010;
-        Tue, 24 Nov 2020 03:28:42 -0800 (PST)
-Received: from [172.17.0.2] ([52.251.112.138])
-        by smtp.gmail.com with ESMTPSA id h16sm9407363ile.14.2020.11.24.03.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 03:28:41 -0800 (PST)
-Message-ID: <5fbcee69.1c69fb81.4dcad.1cb1@mx.google.com>
-Date:   Tue, 24 Nov 2020 03:28:41 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7069138237830425459=="
+        Tue, 24 Nov 2020 11:57:18 -0500
+Received: from z5.mailgun.us ([104.130.96.5]:18532 "EHLO z5.mailgun.us"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390669AbgKXQ5S (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 24 Nov 2020 11:57:18 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1606237037; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=ZqaDzmaQdZPt9r/+HWJzSzMb1fb/lC/ceBW8DiHJrBk=;
+ b=JN5Mm8naPAAsUkFc66BoHTMgc+7iDdkSM9GM7UhlTsVh2TLW5Ixd3Oj45aSXQBlIKZCM2QPn
+ ADc884XfvTq7GiKipoyJ/yiIQstmlcSQM4K0BXotizMaZ4KkKcqFYqLXWMi9ZDI8QfumNT3O
+ yDUxyqGYe37qvFyKA+dcQa2fw2I=
+X-Mailgun-Sending-Ip: 104.130.96.5
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 5fbd3b5cc6fdb18c63cc8c3d (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 24 Nov 2020 16:57:00
+ GMT
+Sender: gubbaven=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 1C72EC433C6; Tue, 24 Nov 2020 16:57:00 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: gubbaven)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id ED6B0C433ED;
+        Tue, 24 Nov 2020 16:56:58 +0000 (UTC)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, maitysanchayan@gmail.com
-Subject: RE: test: simple-endpoint: Add support for LDAC
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201124105733.85025-2-sanchayan@asymptotic.io>
-References: <20201124105733.85025-2-sanchayan@asymptotic.io>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 24 Nov 2020 22:26:58 +0530
+From:   gubbaven@codeaurora.org
+To:     Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org
+Subject: Re: [PATCH v2] Bluetooth: btqca: Add support to read FW build version
+ for WCN3991 BTSoC
+In-Reply-To: <20201118145725.GI8532@builder.lan>
+References: <1605703943-25980-1-git-send-email-gubbaven@codeaurora.org>
+ <20201118145725.GI8532@builder.lan>
+Message-ID: <2366096dae31651769bfe1f7f3796a16@codeaurora.org>
+X-Sender: gubbaven@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7069138237830425459==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=390145
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
+Hi Bjorn,
+On 2020-11-18 20:27, Bjorn Andersson wrote:
+> On Wed 18 Nov 06:52 CST 2020, Venkata Lakshmi Narayana Gubba wrote:
+> 
+>> Add support to read FW build version for WCN3991 BTSoC
+> 
+> Your commit message doesn't describe why you need/want this? Is it
+> somehow required for BT to come up or is it simply 57 lines of code to
+> print a line of build info in the kernel log?
+> 
+> 
+> 
+> Note that most people reading the kernel log won't care about what
+> firmware version their BT chip is running, so if it's only for your own
+> debugging purpose I would prefer if you make this available in sysfs or
+> debugfs.
+> 
+> Regards,
+> Bjorn
+> 
+[Venkata] :
+Yes, this code is to print build info in kernel log for debugging 
+purpose.
+I will add this in debugfs and will post the updated patch.
+>> 
+>> Signed-off-by: Venkata Lakshmi Narayana Gubba 
+>> <gubbaven@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btqca.c | 57 
+>> +++++++++++++++++++++++++++++++++++++++++++++++
+>>  drivers/bluetooth/btqca.h |  3 +++
+>>  2 files changed, 60 insertions(+)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index ce9dcff..dfd7ff7 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -101,6 +101,56 @@ int qca_read_soc_version(struct hci_dev *hdev, 
+>> u32 *soc_version,
+>>  }
+>>  EXPORT_SYMBOL_GPL(qca_read_soc_version);
+>> 
+>> +static int qca_read_fw_build_info(struct hci_dev *hdev)
+>> +{
+>> +	struct sk_buff *skb;
+>> +	struct edl_event_hdr *edl;
+>> +	char cmd;
+>> +	int err = 0;
+>> +	char build_label[QCA_FW_BUILD_VER_LEN];
+>> +	int build_lbl_len;
+>> +
+>> +	bt_dev_dbg(hdev, "QCA read fw build info");
+>> +
+>> +	cmd = EDL_GET_BUILD_INFO_CMD;
+>> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, 
+>> EDL_PATCH_CMD_LEN,
+>> +				&cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+>> +	if (IS_ERR(skb)) {
+>> +		err = PTR_ERR(skb);
+>> +		bt_dev_err(hdev, "Reading QCA fw build info failed (%d)",
+>> +			   err);
+>> +		return err;
+>> +	}
+>> +
+>> +	edl = (struct edl_event_hdr *)(skb->data);
+>> +	if (!edl) {
+>> +		bt_dev_err(hdev, "QCA read fw build info with no header");
+>> +		err = -EILSEQ;
+>> +		goto out;
+>> +	}
+>> +
+>> +	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+>> +	    edl->rtype != EDL_GET_BUILD_INFO_CMD) {
+>> +		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
+>> +			   edl->rtype);
+>> +		err = -EIO;
+>> +		goto out;
+>> +	}
+>> +
+>> +	build_lbl_len = edl->data[0];
+>> +	memcpy(build_label, &edl->data[1], build_lbl_len);
+>> +	*(build_label + build_lbl_len) = '\0';
+>> +
+>> +	bt_dev_info(hdev, "BT SoC FW Build info: %s", build_label);
+>> +
+>> +out:
+>> +	kfree_skb(skb);
+>> +	if (err)
+>> +		bt_dev_err(hdev, "QCA read fw build info failed (%d)", err);
+>> +
+>> +	return err;
+>> +}
+>> +
+>>  static int qca_send_reset(struct hci_dev *hdev)
+>>  {
+>>  	struct sk_buff *skb;
+>> @@ -520,6 +570,13 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  		return err;
+>>  	}
+>> 
+>> +	if (soc_type == QCA_WCN3991) {
+>> +		/* get fw build info */
+>> +		err = qca_read_fw_build_info(hdev);
+>> +		if (err < 0)
+>> +			return err;
+>> +	}
+>> +
+>>  	bt_dev_info(hdev, "QCA setup on UART is completed");
+>> 
+>>  	return 0;
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index d81b74c..375c7fc 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -11,6 +11,7 @@
+>>  #define EDL_PATCH_CMD_LEN		(1)
+>>  #define EDL_PATCH_VER_REQ_CMD		(0x19)
+>>  #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+>> +#define EDL_GET_BUILD_INFO_CMD		(0x20)
+>>  #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+>>  #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+>>  #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+>> @@ -34,6 +35,8 @@
+>>  #define QCA_HCI_CC_OPCODE		0xFC00
+>>  #define QCA_HCI_CC_SUCCESS		0x00
+>> 
+>> +#define QCA_FW_BUILD_VER_LEN		255
+>> +
+>>  enum qca_baudrate {
+>>  	QCA_BAUDRATE_115200 	= 0,
+>>  	QCA_BAUDRATE_57600,
+>> --
+>> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a 
+>> member
+>> of Code Aurora Forum, hosted by The Linux Foundation
+>> 
 Regards,
-Linux Bluetooth
-
-
---===============7069138237830425459==--
+Lakshmi Narayana.
