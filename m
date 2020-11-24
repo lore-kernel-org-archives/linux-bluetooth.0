@@ -2,174 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9EC6C56202
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 21:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1733BC63777
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 21:22:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87EE02086A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 21:21:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0A0920857
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 21:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bpMpN+Eb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kvb7EynX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731369AbgKXVVX (ORCPT
+        id S1731465AbgKXVWS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Nov 2020 16:21:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
+        Tue, 24 Nov 2020 16:22:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731133AbgKXVVW (ORCPT
+        with ESMTP id S1731384AbgKXVWS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Nov 2020 16:21:22 -0500
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6020BC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 13:21:22 -0800 (PST)
-Received: by mail-oi1-x244.google.com with SMTP id s18so312679oih.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 13:21:22 -0800 (PST)
+        Tue, 24 Nov 2020 16:22:18 -0500
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E45C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 13:22:16 -0800 (PST)
+Received: by mail-oi1-x242.google.com with SMTP id v202so268656oia.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 13:22:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=aum/X9Od4wA35Sx6OJZNb0T9DuxiNcfT+bG/Xc9nyZY=;
-        b=bpMpN+Eb5Pmk+ychZYLJfJ65P/YsY91xcA5N5xCODMeI7vTAhhWcGIbOTouRKVLjml
-         o9VuSFulNiYCgYCrNvrXSgBvGcOLuIdbYEiCvFHF8aDe6//wt3N0J5fbLkG/DcqD0euV
-         oYsC5dl7WR9YcMDueiNk7yYqQhohJCXcfUCBBlVvUfup2vMJCLcrGUB8jyEVwkrsXO/i
-         zirCDAp78u8ygLIhnEDHHd85jMjSe+5Zbnnjo32GGd4kO5zHwlKs+U2d/DONeJcPpDgY
-         wBBVLMvCcBgO5UEBz3bmhRgB0B31+WvXkT+rNQ3hJHC20Md/KEotPOALKZQtE2/BqBi9
-         KvuQ==
+        bh=35G4dJOub1syQqdRMIT8ImrbhxdoVX4zVggXu5TO8Cs=;
+        b=Kvb7EynXLb335mYcQNe4EwYQJj5SnkWoSvrnCpXA6Wbw3gf1U4nx7Wc9qm4k3NF5bQ
+         Ma11eJ61DfjUWfPY7JNom38gP59tx1rAbYKKNigF4NHnb91jMLwbRGLkxdiYSlgNjN44
+         AsSxksG2B3Bde4kWmOWT7BUNbWEu7nzofrRKEq62w/9FKKMFzSg77yMgbZbYt2T1O10s
+         Qsgv/nws121jVA/tCGNAoattCr95ZiDtuh5DuKyCV/DeRDXSJMOad9lOUqv085MDOvWG
+         GAb5ori3yWMcZh/NSRHuEI6baNFjWhwSGdNYWzoje1quWB4l3oJm5cJaZDPRxdPjP34D
+         ccog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=aum/X9Od4wA35Sx6OJZNb0T9DuxiNcfT+bG/Xc9nyZY=;
-        b=WzGBbj5gYh0wBM6WnLHliz9KdbbCZzR4FxkDCAyEWpf76srmlASHCWxrStBOk9z8Dg
-         kkOgBh+FPbhH48CyVYk8H6NtRP4NAC5MIeWQ4dQ5BsLoC80fMTVczN8+MC9eH6JwG/5f
-         8v5zK4gfVeaZ/xXL+MPCr4RJ9w5zM3LtGQTBhcS9X3Ax774O0EoB5sY27d61PIBmN9N3
-         64WcRk921szRT3Z33dsdz4M1S+8mBBMeJxv4bUjAvAfUqIZ9ZRIU9T/wf8O5imOOGEqP
-         eL684TQoaqrusiePgMrrki9NPBdCOtYShyfTIi9bmBMdHuytb1ueC2yvk8zh8NrdjYsJ
-         TdCA==
-X-Gm-Message-State: AOAM532RL0mYPxBxZTBFxtd/i7X6/vRjXIBQizKrdkb63jL+9PjVIpVc
-        kZHyPQEnYU8+PXpdqiGRO3KaDVGqwTZ1WroaVmM=
-X-Google-Smtp-Source: ABdhPJw+dp6iAzOD799tPufevPHOfPVt9ihPPpH0ICtMXt2rMJS+JzeyrqBrU/H1rddBCaA0Uk+ncNsi9/sOxcKYrZw=
-X-Received: by 2002:aca:cc08:: with SMTP id c8mr99044oig.161.1606252881694;
- Tue, 24 Nov 2020 13:21:21 -0800 (PST)
+        bh=35G4dJOub1syQqdRMIT8ImrbhxdoVX4zVggXu5TO8Cs=;
+        b=GrF9lI9R5hN6wDS5+/Qm2UMBfmkBZhkKypJIHDCqxxbMnAD5LmCcFhKgYn1cUIXBKM
+         cI8iGM26a/VgnxF8TIodMxG5RKLN+o4RI4NdZkiQvb72ivmMwkabsaRQ/9Qr3yD5zb38
+         pNATHTXvUumLmr1jz6fc33P7efyINW4fK3rrsz33cSykSBW7NpFP9ylfji1rXjAErP4q
+         GSRbIXv0Wk4+3oaMlpJxKQToeMgiUUSAN6Xo6m0GFRbfACzEnQGxLjAZ+fwq8cqSoopJ
+         ntneW9BLD6IBbKezngjJcWCmnMbg6cs8BaVSw3GRSFPZ2mfSJcx1BrO17ILDZlCF+e3S
+         zNKg==
+X-Gm-Message-State: AOAM5339slkJo2gRRVDwngZOEas46wH9lfW+UDz6zmO0cis9EC6MFIgg
+        yZ3sfsTOh4KdzFwJ5bw83p90JYHPB6rjHo0fYkucwVE7
+X-Google-Smtp-Source: ABdhPJwqZOPGlFyI2Y541IBXsjIV5KNw5IacrFmNmDPC4EbFSbPAGLU5bgqpwC+5kCP1aXnsJXuwVDbsu0mMJrVt/0g=
+X-Received: by 2002:aca:cc08:: with SMTP id c8mr101318oig.161.1606252935695;
+ Tue, 24 Nov 2020 13:22:15 -0800 (PST)
 MIME-Version: 1.0
-References: <20201120205728.339325-1-sonnysasaka@chromium.org> <20201120205728.339325-4-sonnysasaka@chromium.org>
-In-Reply-To: <20201120205728.339325-4-sonnysasaka@chromium.org>
+References: <20201120200712.491219-1-tedd.an@intel.com> <5fb826af.1c69fb81.2b100.279a@mx.google.com>
+In-Reply-To: <5fb826af.1c69fb81.2b100.279a@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 24 Nov 2020 13:21:10 -0800
-Message-ID: <CABBYNZLsGs5KDC8kGY4ahfA1Bmdhz1XaR9kNRBKNxN7dTZoFHw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 4/7] doc: Add Battery Provider API doc
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>
+Date:   Tue, 24 Nov 2020 13:22:04 -0800
+Message-ID: <CABBYNZKMJ-PSUPP7duG7W0_=w8tQf4tAZxuJ5i5hLi4gNRaFKA@mail.gmail.com>
+Subject: Re: [1/6] monitor: Fix potential memory leak
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     hj.tedd.an@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+Hi Tedd,
 
-On Fri, Nov 20, 2020 at 1:00 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+On Fri, Nov 20, 2020 at 12:31 PM <bluez.test.bot@gmail.com> wrote:
 >
-> This patch add the documentation of the Battery Provider which lets
-> external clients feed battery information to BlueZ if they are able to
-> decode battery reporting via any profile. BlueZ UI clients can then use
-> the org.bluez.Battery1 API as a single source of battery information
-> coming from many different profiles.
+> This is automated email and please do not reply to this email!
 >
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=388665
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - FAIL
+> Output:
+> monitor: Fix potential memory leak
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+> #12:
+>    ==258684== 1,500 bytes in 1 blocks are definitely lost in loss record 3 of 3
+>
+> - total: 0 errors, 1 warnings, 64 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> "[PATCH] monitor: Fix potential memory leak" has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
 >
 > ---
-> Changes in v3:
-> * Remove doc duplication in BatteryProvider1 and mention that it's the
->   same as Battery1 instead.
-> * Suggest profile UUID in Source property.
->
->  doc/battery-api.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
->
-> diff --git a/doc/battery-api.txt b/doc/battery-api.txt
-> index dc7dbeda2..b5c9a7be1 100644
-> --- a/doc/battery-api.txt
-> +++ b/doc/battery-api.txt
-> @@ -12,3 +12,52 @@ Object path  [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
->  Properties     byte Percentage [readonly]
->
->                         The percentage of battery left as an unsigned 8-bit integer.
-> +
-> +               string Source [readonly, optional, experimental]
-> +
-> +                       Describes where the battery information comes from
-> +                       This property is informational only and may be useful
-> +                       for debugging purposes.
-> +                       Providers from BatteryProvider1 may make use of this
-> +                       property to indicate where the battery report comes from
-> +                       (e.g. "HFP 1.7", "HID", or the profile UUID).
+> Regards,
+> Linux Bluetooth
 
-We might need to remove the version number here since there is no
-equivalent on UUID, in fact friendly names may be a bad idea after all
-since for new profiles we may not have a friendly name to do the
-translation and since this is property that would be hard to notify
-the provider that we don't understand what is the Source while UUIDs,
-if well formatted, should not have this problem so Id just get rid of
-the use of friendly names altogether and expect the Source to be a
-128bits UUID in string format.
-
-> +
-> +
-> +Battery Provider Manager hierarchy
-> +==================================
-> +A battery provider starts by registering itself as a battery provider with the
-> +RegisterBatteryProvider method passing an object path as the provider ID. Then,
-> +it can start exposing org.bluez.BatteryProvider1 objects having the path
-> +starting with the given provider ID. It can also remove objects at any time.
-> +The objects and their properties exposed by battery providers will be reflected
-> +on org.bluez.Battery1 interface.
-> +
-> +BlueZ will stop monitoring these exposed and removed objects after
-> +UnregisterBatteryProvider is called for that provider ID.
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.BatteryProviderManager1 [experimental]
-> +Object path    /org/bluez/{hci0,hci1,...}
-> +
-> +Methods                void RegisterBatteryProvider(object provider)
-> +
-> +                       This registers a battery provider. A registered
-> +                       battery provider can then expose objects with
-> +                       org.bluez.BatteryProvider1 interface described below.
-
-We should probably mention this expects an object implementing
-ObjectManaged in order to list the Battery1 provider.
-
-> +               void UnregisterBatteryProvider(object provider)
-> +
-> +                       This unregisters a battery provider. After
-> +                       unregistration, the BatteryProvider1 objects provided
-> +                       by this client are ignored by BlueZ.
-> +
-> +
-> +Battery Provider hierarchy
-> +==========================
-> +
-> +Service                <client D-Bus address>
-> +Interface      org.bluez.BatteryProvider1 [experimental]
-> +Object path    {provider_root}/org/bluez/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-
-If this is on the client the object path does not necessarily need to
-follow our object hierarchy.
-
-> +
-> +Properties     Objects provided on this interface contain the same properties
-> +               as org.bluez.Battery1 interface.
-> --
-> 2.26.2
-
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
