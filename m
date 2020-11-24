@@ -2,106 +2,188 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD891C2D0E4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC923C63777
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 19:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FE6A20857
+	by mail.kernel.org (Postfix) with ESMTP id 7D496208DB
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 19:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="twmKEcI6"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dhla6vIb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404058AbgKXTEy (ORCPT
+        id S2390946AbgKXTFN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Nov 2020 14:04:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57778 "EHLO
+        Tue, 24 Nov 2020 14:05:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390880AbgKXTEy (ORCPT
+        with ESMTP id S2390880AbgKXTFM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Nov 2020 14:04:54 -0500
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189B2C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 11:04:54 -0800 (PST)
-Received: by mail-qk1-x729.google.com with SMTP id b144so7522344qkc.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 11:04:54 -0800 (PST)
+        Tue, 24 Nov 2020 14:05:12 -0500
+Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A763C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 11:05:12 -0800 (PST)
+Received: by mail-ua1-x941.google.com with SMTP id x13so7155633uar.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 11:05:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=CytuxqTV7c9H0mKCVt2fD7EAZ4yUXjv6HF8BNx+NaEc=;
-        b=twmKEcI6Z9H/jPmNp4bFP/FZvwaQ4lkF9I89k1A2SiJn9ZVh829T3R2fKQNlMq4WJd
-         TDRHbL+6M3RiCQQuvzeptb9XT4jdqi7iulhiQ6d8VrDhjpywn6+53RbUl01DhJmJt2fy
-         PxbLVJsAJXkFeZAQE4CsoX6v00MYGpesCZdxjp5mdQL+/d2JAeQGP9SKL8HdKyof9aAP
-         yro0XKBXqu4xWUL0Zq3IGc8has52LmY9979GqcGRRI59l52E18HpObA9ZgZAxarrLBKi
-         80XzlcTotevbboC9fHK9Af4Kn2I8u+Dl12TrC8XmURufbHyFblRQSRwd6+BJGkFbRHD6
-         Nf+Q==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=+W7jJwGCb4X3aPAYb2bHPal61y/DMNXzXOlkAo3IyKk=;
+        b=dhla6vIb81DplBpzZLwmgSqIMb8/g00dQOHCA8f7CzfLhqNexO5v1F9qzMupZ/M44P
+         JDyHyiO1hLjhNR86YyCqljUxDMrfYV0ZHB5zX8efRxxgVDl4JEfFDEvOYJSK+Aq5VWk1
+         iQYuKHw1wr+jCurwMWlFlJs+R16OqgXWjn7vE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=CytuxqTV7c9H0mKCVt2fD7EAZ4yUXjv6HF8BNx+NaEc=;
-        b=rTL8kZNdsrL1FJZvdzFNZ4ASC51WrNJ6Sst2TKgmB/78LlYUG4+raedwXwi+cpaViD
-         B+g6nGYJ8ACKFgQpvTX7UbCvfK58noE2kWrVNeBj0SAzT5dH27T+vnFWHr/AOmXuDKpR
-         6j1creR9I0ODNQZzsK/EilB2PMPBH+Kl6umDo7a9IHtencZMwnz/zeE4nwgERdozE8/2
-         fj5tZK1+nakCkAimJratOOqPkPV0sgmAPtjjNmqwWBSZeEjiFrd45Zkxp3+wsXZB8TjA
-         Vod8XDoD0zJnkfbV9Xsf4H6O6DkwUbLJjyUXCWui4HEnPRix0PvVlIoa4Vezp7ptr1D2
-         uryg==
-X-Gm-Message-State: AOAM533Pc3TF0DkTbc7lZZr28nvF5tulxVUBs2oQ0O3ZHEFHiqatgfH8
-        E+cuHowrQBKRRIsPd/ape3cySxEuJ1/8Qw==
-X-Google-Smtp-Source: ABdhPJx3nzmpHtncPuf0PCkWFbXSjiI3uO1HhBx2UiPqS511a6qFYwu98SMROZZRGZEbtDE2sdA8KQ==
-X-Received: by 2002:a05:620a:62b:: with SMTP id 11mr6548081qkv.229.1606244693089;
-        Tue, 24 Nov 2020 11:04:53 -0800 (PST)
-Received: from [172.17.0.2] ([20.36.179.225])
-        by smtp.gmail.com with ESMTPSA id v15sm6015175qti.92.2020.11.24.11.04.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 11:04:52 -0800 (PST)
-Message-ID: <5fbd5954.1c69fb81.1a799.7a8f@mx.google.com>
-Date:   Tue, 24 Nov 2020 11:04:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6369109100804832132=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+W7jJwGCb4X3aPAYb2bHPal61y/DMNXzXOlkAo3IyKk=;
+        b=hyFT+tfKcC3meF78Eklx6z7Kh3ztDfedRJeLv9YIP99DH2hxj8oymQvNqvPAJSkLum
+         wwwAdlJl+RQUQo3YGWuTI2I27YUTV/3kBw8dz3qq/svE5XJyPTGPOQ2Y5OWwcCVq3s9y
+         PmxWfJSQ0K8hf+FlIZ15AK4WnI1TqqX06eR/r1fQsJahbGkyzTWWMrx2skcb/dRt32vd
+         nEiRdkDje8eE5yvpC7qgXfW4H8c3XmhFHrXZj4klWn2cDksGUAijd9IbweetXJQo7SE7
+         +jYvDewCIZqZHRJFr/AkSe4V4M7lN68H4eh80i8hAdnD94VcifKHVJP07otA1d8yczIm
+         iJtQ==
+X-Gm-Message-State: AOAM533mVRn7egP936xAXClfzpl6lKCVY90yqBRoWsC400jDC5RKnYrl
+        W+yDhyKmzBm6YwdF4byZSX6AR8wFqTghZNBZbSbPCQ==
+X-Google-Smtp-Source: ABdhPJyHTtIH9cQFnt3Xhe+ipjomhQWZ5hH5ArFW70nlKMDCzYjQRa9WqWHfKD2+DwU4kKasH0oOSf7Cdzg9e/Slh/c=
+X-Received: by 2002:ab0:104c:: with SMTP id g12mr4823113uab.136.1606244710878;
+ Tue, 24 Nov 2020 11:05:10 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, danielwinkler@google.com
-Subject: RE: Bluetooth: Add new MGMT interface for advertising add
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201124100610.v5.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
-References: <20201124100610.v5.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
+References: <20201118234352.2138694-1-abhishekpandit@chromium.org>
+ <7235CD4E-963C-4BCB-B891-62494AD7F10D@holtmann.org> <CANFp7mVSGNbwCkWCj=bVzbE8L38nwu0+UMR9jkOYcYQmGBaAEw@mail.gmail.com>
+In-Reply-To: <CANFp7mVSGNbwCkWCj=bVzbE8L38nwu0+UMR9jkOYcYQmGBaAEw@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Tue, 24 Nov 2020 11:04:59 -0800
+Message-ID: <CANFp7mU_5rU1VdgBFcyWtNH-TD1n3wOpAh5o_aAN_3s1+AkaFw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Bluetooth: Power down controller when suspending
+To:     Marcel Holtmann <marcel@holtmann.org>, chin-ran.lo@nxp.com,
+        amitkumar.karwar@nxp.com
+Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Daniel Winkler <danielwinkler@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6369109100804832132==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=390431
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuildK - PASS
+Re-send to NXP email addresses for Chin-Ran Lo and Amitkumar Karwar
+(Marvell wireless IP acquired by NXP)
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============6369109100804832132==--
+On Tue, Nov 24, 2020 at 11:02 AM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
+>
+> Hi Marcel,
+>
+>
+> On Mon, Nov 23, 2020 at 3:46 AM Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> >
+> > Hi Abhishek,
+> >
+> > > This patch series adds support for a quirk that will power down the
+> > > Bluetooth controller when suspending and power it back up when resumi=
+ng.
+> > >
+> > > On Marvell SDIO Bluetooth controllers (SD8897 and SD8997), we are see=
+ing
+> > > a large number of suspend failures with the following log messages:
+> > >
+> > > [ 4764.773873] Bluetooth: hci_cmd_timeout() hci0 command 0x0c14 tx ti=
+meout
+> > > [ 4767.777897] Bluetooth: btmrvl_enable_hs() Host sleep enable comman=
+d failed
+> > > [ 4767.777920] Bluetooth: btmrvl_sdio_suspend() HS not actived, suspe=
+nd failed!
+> > > [ 4767.777946] dpm_run_callback(): pm_generic_suspend+0x0/0x48 return=
+s -16
+> > > [ 4767.777963] call mmc2:0001:2+ returned -16 after 4882288 usecs
+> > >
+> > > The daily failure rate with this signature is quite significant and
+> > > users are likely facing this at least once a day (and some unlucky us=
+ers
+> > > are likely facing it multiple times a day).
+> > >
+> > > Given the severity, we'd like to power off the controller during susp=
+end
+> > > so the driver doesn't need to take any action (or block in any way) w=
+hen
+> > > suspending and power on during resume. This will break wake-on-bt for
+> > > users but should improve the reliability of suspend.
+> > >
+> > > We don't want to force all users of MVL8897 and MVL8997 to encounter
+> > > this behavior if they're not affected (especially users that depend o=
+n
+> > > Bluetooth for keyboard/mouse input) so the new behavior is enabled vi=
+a
+> > > module param. We are limiting this quirk to only Chromebooks (i.e.
+> > > laptop). Chromeboxes will continue to have the old behavior since use=
+rs
+> > > may depend on BT HID to wake and use the system.
+> >
+> > I don=E2=80=99t have a super great feeling with this change.
+> >
+> > So historically only hciconfig hci0 up/down was doing a power cycle of =
+the controller and when adding the mgmt interface we moved that to the mgmt=
+ interface. In addition we added a special case of power up via hdev->setup=
+. We never had an intention that the kernel otherwise can power up/down the=
+ controller as it pleases.
+>
+> Aside from the powered setting, the stack is resilient to the
+> controller crashing (which would be akin to a power off and power on).
+> From the view of bluez, adapter lost and power down should be almost
+> equivalent right? ChromeOS has several platforms where Bluetooth has
+> been reset after suspend, usually due USB being powered off in S3, and
+> the stack is still well-behaving when that occurs.
+>
+> >
+> > Can we ask Marvell first to investigate why this is fundamentally broke=
+n with their hardware?
+>
+> +Chin-Ran Lo and +Amitkumar Karwar (added based on changes to
+> drivers/bluetooth/btmrvl_main.c)
+>
+> Could you please take a look at the original cover letter and comment
+> (or add others at Marvell who may be able to)? Is this a known issue
+> or a fix?
+>
+> >Since what you are proposing is a pretty heavy change that might has sid=
+e affects. For example the state machine for the mgmt interface has no conc=
+ept of a power down/up from the kernel. It is all triggered by bluetoothd.
+> >
+> > I am careful here since the whole power up/down path is already complic=
+ated enough.
+> >
+>
+> That sounds reasonable. I have landed this within ChromeOS so we can
+> test whether a) this improves stability enough and b) whether the
+> power off/on in the kernel has significant side effects. This will go
+> through our automated testing and dogfooding over the next few weeks
+> and hopefully identify those side-effects. I will re-raise this topic
+> with updates once we have more data.
+>
+> Also, in case it wasn't very clear, I put this behind a module param
+> that defaults to False because this is so heavy handed. We're only
+> using it on specific Chromebooks that are exhibiting the worst
+> behavior and not disabling it wholesale for all btmrvl controllers.
+>
+> Thanks
+> Abhishek
+>
+> > Regards
+> >
+> > Marcel
+> >
