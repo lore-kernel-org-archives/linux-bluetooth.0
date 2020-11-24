@@ -2,155 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB285C2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 18:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CADBC2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 18:16:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BE1B20757
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 18:11:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD3F5206D5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Nov 2020 18:16:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="keElOytw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iing8MJc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404233AbgKXSLq (ORCPT
+        id S2404106AbgKXSQp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Nov 2020 13:11:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49602 "EHLO
+        Tue, 24 Nov 2020 13:16:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404225AbgKXSLq (ORCPT
+        with ESMTP id S2404088AbgKXSQp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Nov 2020 13:11:46 -0500
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE3EC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 10:11:46 -0800 (PST)
-Received: by mail-vs1-xe43.google.com with SMTP id r14so11568904vsa.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 10:11:46 -0800 (PST)
+        Tue, 24 Nov 2020 13:16:45 -0500
+Received: from mail-vk1-xa44.google.com (mail-vk1-xa44.google.com [IPv6:2607:f8b0:4864:20::a44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48E4C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 10:16:44 -0800 (PST)
+Received: by mail-vk1-xa44.google.com with SMTP id v185so1775645vkf.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2020 10:16:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ouJWx2zn47zlu4B7Xfyb3QjpWbpG3sniI+fG+9qwz44=;
-        b=keElOytw+bW5u4OHHELAO6GvMZwm9P3rZG2D9PgVidraJ2wkVJ4XAxmgP7uk5Xhq7t
-         jugn8eA/idk5JUYzvj+SlC78RC97IpCahdJwy8AzwwMbiS5bcEXzFsDeqeV5abZ7Ru6T
-         emSPvBK30MPW19TJin6Lda9nq8+Oxl8zSGyAlemWhxOXlTcorC/ceiEP70sB7gmG6RN5
-         TEczYXEA/Tqqcr03KP82Q950UKgs5z/GoharONh7yZhdCzruV+M0r4k0MSkMwv1FPEnk
-         zbPk9etNMFykhbVZi3afEapbwtFn9csFyZ5YBUDuQEX388KfnRl1hauzgx2B2Igujb6d
-         rEMA==
+         :cc:content-transfer-encoding;
+        bh=H7YZt+SIVZ8fNuzxOL22q/NTOOeRlk0eFuJ0xh27rQw=;
+        b=iing8MJc1IzsGKQB+rPDQGbxz2pI4Hu0FazXqi9mtRhoLdrp09bkYI+LxCyzkr3qYv
+         e6G9Z+teCTXSle2dQXp5Wl5VZBoM30QTLNzPxGB4t4zxgxHEK+6jGnzMUf+2WmnUJOe2
+         7idc1JhxoP2nh6KItotQZT0sGkSb82WD6ZTB0DQ/hEDnHLpZ0evsT1XWn3T9m22bdASn
+         mKr8awFassQIBdhCueKtZ2EDXIKuOw/FWFfkZafrw6JT+aD74swKnqiqebfolUT5ngs4
+         v/X5NyQmgL2YCRSQg/XK+yREvZ6Ig3aXf6lBGQY+HctRgKlFx3L2ALl2rYbNvviHFMzf
+         2ozQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ouJWx2zn47zlu4B7Xfyb3QjpWbpG3sniI+fG+9qwz44=;
-        b=cNYMYtD4RYP3E3jgVPf7AaVZyYI1EhiYQ5QKL28GVVHcT3An2KB4G/5yAAMZBFTxcZ
-         YBkjPP3ZZfiT1JWzFyLJ9Flx18G1IiqL72VKAwErVPXtCzM550hj+ohvh8oFalH2uP+L
-         9aTXu71qZdVkLITRretHdTWoYg9TmJcnTbAYidzpKwtxPL3LlKyIlLYhqB6fuV9A9IU2
-         U4g9RKfneZrCQU+OsvQFcjjdrdj1d7sf5SKhNMRgcN0MMDOBRbeTHIdHgwcm1xb1RQBH
-         iAJggqixmypsb252754X90zQCaO6SsUiULnKIlGnY44dCQfauJZeY0B3inJH3cPxOL3U
-         XZjA==
-X-Gm-Message-State: AOAM532QPNTRnLsT1UZM47VTGK9Z2yXJ8kh86dc/mDFT79FNRK0TzmT7
-        rhSDoEfVOwlGMt44KBcVRDwSF5yDQ9sja/jvbvXMvMX8etorw4x1
-X-Google-Smtp-Source: ABdhPJy+hS/FIG91pYhATyBawd1c7DF5HOWh7ONR/zbRKCgSFSoucmfTn6eh5ncGH+6TuwmecDrA8VRByK38jlEKsuo=
-X-Received: by 2002:a67:fa1a:: with SMTP id i26mr5152293vsq.31.1606241505127;
- Tue, 24 Nov 2020 10:11:45 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=H7YZt+SIVZ8fNuzxOL22q/NTOOeRlk0eFuJ0xh27rQw=;
+        b=WpKgGjiDTem8Aq4gE+rkJTMYzDHOG+TicHD0C1TOvGNKrYveTA6NDzN1tJFheROCCs
+         iJt09KGdAjUG/YSU1HQfXNqTNQmqFh7vynudF755HOWeq1LM/0cTB7thuwCvezJHa4V4
+         lyFYhzfipwepSUlefcn9c6WEHdP+pUbYcGDagYRyDxpG1LNYCLAI7bAi7D/NwXCjN+5+
+         bbU2k4YcQLTA+dRf3nf+SSfVbxpSd6n2WR3f907uczjlsdBV4YCGVD4JPqKrjhNnR2ZM
+         DJPGHQ/gAjN7kjZSV9fmZ6pjpw5Dtrd67hPYglGfCnvXKymx+0pX4qKTCpWLrg+xfR6f
+         eGZA==
+X-Gm-Message-State: AOAM531Q3XAjCieY3yvOqlWQ0HkNQlCFuNrJDSy2xVowZFAMLt4uqDBy
+        OI6NHSYkwy4IgAr9e19Q9M0MIt8n8gsIApYUyCwrgbrcCFJDJA==
+X-Google-Smtp-Source: ABdhPJxcskeYst6Nf8PFKOIYR2tVoiK61sNlALZ76Vh4YwV7knbgmC0uW39jv/214TCQNxlwQs9mg5XWF/K2/NgqJT8=
+X-Received: by 2002:a1f:2817:: with SMTP id o23mr5284254vko.2.1606241803885;
+ Tue, 24 Nov 2020 10:16:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20201001230403.2445035-1-danielwinkler@google.com>
- <CAP2xMbtC0invbRT2q6LuamfEbE9ppMkRUO+jOisgtBG17JkrwA@mail.gmail.com>
- <CABBYNZJ65vXxeyJmZ_L_D+9pm7uDHo0+_ioHzMyh0q8sVmREsQ@mail.gmail.com>
- <CAP2xMbs4sUyap_-YAFA6=52Qj+_uxGww7LwmbWACVC0j0LvbLQ@mail.gmail.com>
- <CABBYNZ+0LW0sOPPe+QHWLn7XXdAjqKB3Prm21SyUQLeQqW=StA@mail.gmail.com>
- <CAP2xMbsJ6EQYbJvS=59Dpj83sugFGaP98Mq-1SgxrJ+aSqd4pA@mail.gmail.com> <CABBYNZL835FLHq3y_1_k0vyQEW2_teoqvkt=pPDjqENegTU4FQ@mail.gmail.com>
-In-Reply-To: <CABBYNZL835FLHq3y_1_k0vyQEW2_teoqvkt=pPDjqENegTU4FQ@mail.gmail.com>
+References: <20201029230623.3630069-1-danielwinkler@google.com>
+ <20201029160317.Bluez.v6.3.Iabfcf7ec8ac293130a7d903ee8094414256799b3@changeid>
+ <263DCED1-D5D0-4ABD-A6C9-5A4ACA45458E@holtmann.org>
+In-Reply-To: <263DCED1-D5D0-4ABD-A6C9-5A4ACA45458E@holtmann.org>
 From:   Daniel Winkler <danielwinkler@google.com>
-Date:   Tue, 24 Nov 2020 10:11:34 -0800
-Message-ID: <CAP2xMbsqvS__k5c0d+27miywwZ0oe968BhcPnxmY9YH7DvpsLA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/5] Bluetooth: Add new MGMT interface for advertising add
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+Date:   Tue, 24 Nov 2020 10:16:32 -0800
+Message-ID: <CAP2xMbstBAHK1Q35VEaeuhdobY6baRyKwcj=u68GDW=WTVmz=w@mail.gmail.com>
+Subject: Re: [Bluez PATCH v6 03/10] doc/mgmt-api: Update controller
+ capabilities MGMT command in mgmt-api
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         BlueZ <linux-bluetooth@vger.kernel.org>,
         chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello Marcel,
 
-Thank you again for the support on this issue. I have just provided a
-patch series here:
+As I understand, Luiz accepted this series already. I will upload a
+new patch to fix this wording, thanks for catching it!
 
-https://patchwork.kernel.org/project/bluetooth/list/?series=390411
-
-to include test coverage for the new APIs via mgmt-tester. In
-addition, as this coverage helped me find a minor bug in returning
-remaining adv data size in the MGMT response, I've submitted a fix in
-the kernel patch series. Please let me know if there is anything
-further I can provide.
-
-Thanks!
+Best,
 Daniel
 
-
-On Tue, Nov 3, 2020 at 1:25 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Mon, Nov 9, 2020 at 4:49 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Daniel,
 >
-> On Tue, Nov 3, 2020 at 9:42 AM Daniel Winkler <danielwinkler@google.com> wrote:
+> > This patch changes Read Security Info MGMT to be called Read Controller
+> > Capabilities Command
 > >
-> > Hello Luiz,
+> > ---
 > >
-> > Thank you for the information. It is good to know that this tool is
-> > actively used and that there is a way to skip existing flaky tests.
-> > Just for clarification, is this a requirement to land the kernel
-> > changes, i.e. should I prioritize adding these tests immediately to
-> > move the process forward? Or can we land the changes based on the
-> > testing I have already done and I'll work on these tests in parallel?
->
-> We used to require updates to mgmt-tester but it seems some of recent
-> command did not have a test yet, but if we intend to have the CI to
-> tests the kernel changes properly I think we should start to requiring
-> it some basic testing, obviously it will be hard to cover everything
-> that is affected by a new command but the basic formatting, etc, we
-> should be able to test, also tester supports the concept of 'not run'
-> which we can probably use for experimental commands.
->
-> > Thanks,
-> > Daniel
+> > Changes in v6: None
+> > Changes in v5: None
+> > Changes in v4:
+> > - mgmt-api: Move Controller Capabilities MGMT doc into new patch
+> > - mgmt-api: Tx Power range put into single capabilities entry
 > >
-> > On Thu, Oct 29, 2020 at 5:04 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Daniel,
-> > >
-> > > On Thu, Oct 29, 2020 at 3:25 PM Daniel Winkler <danielwinkler@google.com> wrote:
-> > > >
-> > > > Hi Luiz,
-> > > >
-> > > > Thank you for the feedback regarding mgmt-tester. I intended to use
-> > > > the tool, but found that it had a very high rate of test failure even
-> > > > before I started adding new tests. If you have a strong preference for
-> > > > its use, I can look into it again but it may take some time. These
-> > > > changes were tested with manual and automated functional testing on
-> > > > our end.
-> > > >
-> > > > Please let me know your thoughts.
-> > >
-> > > Total: 406, Passed: 358 (88.2%), Failed: 43, Not Run: 5
-> > >
-> > > Looks like there are some 43 tests failing, we will need to fix these
-> > > but it should prevent us to add new ones as well, you can use -p to
-> > > filter what tests to run if you want to avoid these for now.
+> > Changes in v3: None
+> > Changes in v2: None
+> >
+> > doc/mgmt-api.txt | 21 +++++++++++++++------
+> > 1 file changed, 15 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 7c899a8fe..1aa43d6c3 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -3110,19 +3110,19 @@ Set Wideband Speech Command
+> >                               Invalid Index
+> >
+> >
+> > -Read Security Information Command
+> > -=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +Read Controller Capabilities Command
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> >       Command Code:           0x0048
+> >       Controller Index:       <controller id>
+> >       Command Parameters:
+> > -     Return Parameters:      Security_Data_Length (2 Octets)
+> > -                             Security_Data (0-65535 Octets)
+> > +     Return Parameters:      Capabilities_Data_Length (2 Octets)
+> > +                             Capabilities_Data (0-65535 Octets)
+> >
+> > -     This command is used to retrieve the supported security features
+> > +     This command is used to retrieve the supported capabilities
+> >       by the controller or the host stack.
+> >
+> > -     The Security_Data_Length and Security_Data parameters provide
+> > +     The Capabilities_Data_Length and Capabilities_Data parameters pro=
+vide
+> >       a list of security settings, features and information. It uses
+> >       the same format as EIR_Data, but with the namespace defined here.
+> >
+> > @@ -3131,6 +3131,7 @@ Read Security Information Command
+> >               0x01            Flags
+> >               0x02            Max Encryption Key Size (BR/EDR)
+> >               0x03            Max Encryption Key Size (LE)
+> > +             0x04            Supported Tx Power (LE)
 >
+> make this =E2=80=9CSupported Min/Max TX Power=E2=80=9D. Otherwise looks g=
+ood and ready for Luiz to apply.
 >
+> Regards
 >
-> --
-> Luiz Augusto von Dentz
+> Marcel
+>
