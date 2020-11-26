@@ -2,258 +2,153 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC37C64E7B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 04:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2083EC56202
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 05:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DE65206B7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 04:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D232021741
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 05:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="STf4eE3p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHAJEab8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387659AbgKZEWv (ORCPT
+        id S2387732AbgKZFFd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Nov 2020 23:22:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56822 "EHLO
+        Thu, 26 Nov 2020 00:05:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387652AbgKZEWu (ORCPT
+        with ESMTP id S2387728AbgKZFFd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Nov 2020 23:22:50 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A7EC061A04
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 20:22:49 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id j138so1194894ybg.20
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 20:22:49 -0800 (PST)
+        Thu, 26 Nov 2020 00:05:33 -0500
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F20BC0613D4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 21:05:31 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id b144so602317qkc.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 21:05:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=OEmCYU2wE2pMwO9qaMpsDa79P/ofsNacQ+feLvvDdbE=;
-        b=STf4eE3pfgxCyhwWt+LTitCOCfInJE/KMsuIjgDAYgXLjvzcRY4SOzGthXqp/3C8j/
-         z7HYYHsz515hqxVJYKhZV40GWExlUAiqj3gEqwX7zD9ZLfV2JK2j+kfKZSeGozC2fOP+
-         LoUsE2GgSdEeyhZy2Oul1dhlRiCiKeH1J9c7AECPpJJ1fs+EIBy739iF0L1ew19s6JSH
-         xAu/7CCOjWTWexShnYk36/Na6oCf9Nig3N1JypGKkSTRcdZpLPSXbcqbUcXs8YYZ8srF
-         gUkk9hT5hnmp233/l8CON2TpVQdJUJxor57jmeY4ZB9xPFxmUt/1ax3KUz+JczXrWs2d
-         wJBw==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=klCsZeXYANQSsAQq31VwilFAQz/pHwQnM7OucL+ODfc=;
+        b=UHAJEab8LzewcalqWMsnL7NiQjlMa1Aej74MohQi1RlY2gIctmYSNebKb6VDCOojX4
+         xzKIYD16C67tfb9/2C/71/R/KMcaqeWfzQ6Jeu9y21ZerLrJOPaT5vMzZ0xcw5v8Ujj9
+         1pb1BsOe00XWQRZS7d5m3bjhFP9PWFARtzeIQvRDb35X5e1elHuBGsDxXwscUzEs8AsF
+         dHGbWGfPV8TUymK/9PkWSUCo6iiv3qzOXc69AnllPYA40I0XGi5lCVi2tZivO2PGy7h/
+         x6e2txjVryAtfcVcSmEvi3/qLhIj9iUWW45n9+raJhSGdgZ4WllKjTzxLQbMSc0b/suD
+         bzSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=OEmCYU2wE2pMwO9qaMpsDa79P/ofsNacQ+feLvvDdbE=;
-        b=jmXRuy7BKSk37+W2B8N4d+PscVnh6r94Mhxxj+z1dEdF3lDH9XVbu4n48To3tLllxI
-         58Y767qQDiUJOp+9PQD/RSnolh4TyzTt6xBNsoZbyml49WixUDiSjkfuX1yzjKrVzeQC
-         /CtqNQfptFjecY76SV1bUfm+iciS0zwpuvweKPq7zThakXVbC4qwljvbKKeLSDZYFxpF
-         y8QHvqV6pWdXjbhE0cq9ESPJBJ1ind/LmQJNGlM9vPdWyKhMvpDK8saaiX2JU82lucc3
-         HipccHp9pRwSnlOGfGnhhHOvC0EsARYcu689sNygi3nrcVFRkEIWxO8CjKIwVrYsTKWG
-         ze8w==
-X-Gm-Message-State: AOAM531+0pjPQyPRGrNO07nVtHYqwcTZzviDvt9/c7HupvNwww5+BTJU
-        sFJquhYnxk+Z4gB0NLJbGp7qRVHnI3veeNqBa/5IQY6FgDybl17tfnWc/8OoyQXzZLGvVVPpEcC
-        3jyXBGZVt2GK4CfP2WwQ1ReVw5RA9Sta9WKHMVErnYnvu+HwulAVxQ5DCsX6n6fXqKZzaje4Rbg
-        SDHO25xkrgyuk=
-X-Google-Smtp-Source: ABdhPJyJPvTdX6cnHg9r5S5byve52ylm8v9Tw9Lfek0Vg61lMmjC6V3sPbNP2HXv+g/NvXl6PEmtWuZF//PJomJGrg==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a25:6949:: with SMTP id
- e70mr1356451ybc.313.1606364568995; Wed, 25 Nov 2020 20:22:48 -0800 (PST)
-Date:   Thu, 26 Nov 2020 12:22:25 +0800
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=klCsZeXYANQSsAQq31VwilFAQz/pHwQnM7OucL+ODfc=;
+        b=l26PTNLOB6aV1EsX0V9zId7qiciWHD2LGqrsZpuEzbU6cyagwVcx4gk0Txvs8nL6pQ
+         Y9PWl1fVgsePPbjFkSOhht9/8bwk2+icM6ovddcfr4yz1qWMGvcysZjjgGC1vnJgnt1G
+         8nV0wuTQMOJnRxRIEtuCkXhGoYr2lLmY9TEqPQNOP348TGrmRupQPjia+YrxdxGPpXS3
+         42QJaQppaSaXT7putjvsdnwen1kx06uCk1qJJYA7Ubzj0P/wkdiKwjYNIC4NtRM6juz1
+         pfrOCWGXJoMeZCtEi3J5Nznh3/Z1Ky8EcfrMeMHcL3FVpfgmSy7bYbYzUwp1ddlIuf4s
+         OblA==
+X-Gm-Message-State: AOAM5328IYDXBXYIX1QB7FHIHDdB8mbdaNBbMI7/IDsT3kF0vJPFOC70
+        6TjlvumdcfAOLnUUlhj558ZAVm024wnGKQ==
+X-Google-Smtp-Source: ABdhPJwHO7FC9bsLLa5I1aIGpbcHRCX5KBZNImrK7h8+f+toNrsPaJ6PDbO4urvFreLNq4jSFckUdA==
+X-Received: by 2002:a37:a4c3:: with SMTP id n186mr1502866qke.495.1606367130765;
+        Wed, 25 Nov 2020 21:05:30 -0800 (PST)
+Received: from [172.17.0.2] ([52.179.180.48])
+        by smtp.gmail.com with ESMTPSA id z30sm1718139qtc.15.2020.11.25.21.05.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2020 21:05:30 -0800 (PST)
+Message-ID: <5fbf379a.1c69fb81.93ee3.79bc@mx.google.com>
+Date:   Wed, 25 Nov 2020 21:05:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7339228795111071932=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: [v11,1/5] Bluetooth: Interleave with allowlist scan
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20201126122109.v11.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-Message-Id: <20201126122109.v11.5.I756c1fecc03bcc0cd94400b4992cd7e743f4b3e2@changeid>
-Mime-Version: 1.0
 References: <20201126122109.v11.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
-X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v11 5/5] Bluetooth: Add toggle to switch off interleave scan
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     alainm@chromium.org, mcchou@chromium.org, mmandlik@chromium.org,
-        Howard Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add a configurable parameter to switch off the interleave
-scan feature.
+--===============7339228795111071932==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Howard Chung <howardchung@google.com>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
----
+This is automated email and please do not reply to this email!
 
-(no changes since v9)
+Dear submitter,
 
-Changes in v9:
-- Update and rename the macro TLV_GET_LE8
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=391285
 
-Changes in v7:
-- Fix bt_dev_warn arguemnt type warning
+---Test result---
 
-Changes in v6:
-- Set EnableAdvMonInterleaveScan to 1 byte long
+##############################
+Test: CheckPatch - FAIL
+Output:
+Bluetooth: Refactor read default sys config for various types
+CHECK: Macro argument '_param_name_' may be better as '(_param_name_)' to avoid precedence issues
+#35: FILE: net/bluetooth/mgmt_config.c:20:
++#define TLV_SET_U16(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		cpu_to_le16(hdev->_param_name_) \
++	}
 
-Changes in v4:
-- Set EnableAdvMonInterleaveScan default to Disable
-- Fix 80 chars limit in mgmt_config.c
+CHECK: Macro argument '_param_name_' may be better as '(_param_name_)' to avoid precedence issues
+#41: FILE: net/bluetooth/mgmt_config.c:26:
++#define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
++	{ \
++		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
++		cpu_to_le16(jiffies_to_msecs(hdev->_param_name_)) \
++	}
 
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         |  1 +
- net/bluetooth/hci_request.c      |  3 ++-
- net/bluetooth/mgmt_config.c      | 41 +++++++++++++++++++++++++-------
- 4 files changed, 37 insertions(+), 9 deletions(-)
+total: 0 errors, 0 warnings, 2 checks, 156 lines checked
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index cfede18709d8f..63c6d656564a1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -363,6 +363,7 @@ struct hci_dev {
- 	__u32		clock;
- 	__u16		advmon_allowlist_duration;
- 	__u16		advmon_no_filter_duration;
-+	__u8		enable_advmon_interleave_scan;
- 
- 	__u16		devid_source;
- 	__u16		devid_vendor;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 20506b31492d6..8cfcf43eb08fd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3594,6 +3594,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	hdev->advmon_allowlist_duration = 300;
- 	hdev->advmon_no_filter_duration = 500;
-+	hdev->enable_advmon_interleave_scan = 0x00;	/* Default to disable */
- 
- 	hdev->sniff_max_interval = 800;
- 	hdev->sniff_min_interval = 80;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 0c326e32e240c..d0d0fbbb3fa57 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1057,7 +1057,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 				      &own_addr_type))
- 		return;
- 
--	if (__hci_update_interleaved_scan(hdev))
-+	if (hdev->enable_advmon_interleave_scan &&
-+	    __hci_update_interleaved_scan(hdev))
- 		return;
- 
- 	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index 282fbf82f3192..1deb0ca7a9297 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -17,12 +17,24 @@
- 		__le16 value; \
- 	} __packed _param_name_
- 
-+#define HDEV_PARAM_U8(_param_name_) \
-+	struct {\
-+		struct mgmt_tlv entry; \
-+		__u8 value; \
-+	} __packed _param_name_
-+
- #define TLV_SET_U16(_param_code_, _param_name_) \
- 	{ \
- 		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
- 		cpu_to_le16(hdev->_param_name_) \
- 	}
- 
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] Bluetooth: Refactor read default sys config for various types" has style problems, please review.
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+Bluetooth: Add toggle to switch off interleave scan
+CHECK: Macro argument '_param_name_' may be better as '(_param_name_)' to avoid precedence issues
+#70: FILE: net/bluetooth/mgmt_config.c:32:
 +#define TLV_SET_U8(_param_code_, _param_name_) \
 +	{ \
 +		{ cpu_to_le16(_param_code_), sizeof(__u8) }, \
 +		hdev->_param_name_ \
 +	}
-+
- #define TLV_SET_U16_JIFFIES_TO_MSECS(_param_code_, _param_name_) \
- 	{ \
- 		{ cpu_to_le16(_param_code_), sizeof(__u16) }, \
-@@ -65,6 +77,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		HDEV_PARAM_U16(def_le_autoconnect_timeout);
- 		HDEV_PARAM_U16(advmon_allowlist_duration);
- 		HDEV_PARAM_U16(advmon_no_filter_duration);
-+		HDEV_PARAM_U8(enable_advmon_interleave_scan);
- 	} __packed rp = {
- 		TLV_SET_U16(0x0000, def_page_scan_type),
- 		TLV_SET_U16(0x0001, def_page_scan_int),
-@@ -97,6 +110,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 					     def_le_autoconnect_timeout),
- 		TLV_SET_U16(0x001d, advmon_allowlist_duration),
- 		TLV_SET_U16(0x001e, advmon_no_filter_duration),
-+		TLV_SET_U8(0x001f, enable_advmon_interleave_scan),
- 	};
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
-@@ -109,6 +123,7 @@ int read_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- #define TO_TLV(x)		((struct mgmt_tlv *)(x))
- #define TLV_GET_LE16(tlv)	le16_to_cpu(*((__le16 *)(TO_TLV(tlv)->value)))
-+#define TLV_GET_U8(tlv)		(*((__u8 *)(TO_TLV(tlv)->value)))
- 
- int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 			  u16 data_len)
-@@ -125,6 +140,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 	/* First pass to validate the tlv */
- 	while (buffer_left >= sizeof(struct mgmt_tlv)) {
- 		const u8 len = TO_TLV(buffer)->length;
-+		size_t exp_type_len;
- 		const u16 exp_len = sizeof(struct mgmt_tlv) +
- 				    len;
- 		const u16 type = le16_to_cpu(TO_TLV(buffer)->type);
-@@ -170,20 +186,26 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		case 0x001b:
- 		case 0x001d:
- 		case 0x001e:
--			if (len != sizeof(u16)) {
--				bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
--					    len, sizeof(u16), type);
--
--				return mgmt_cmd_status(sk, hdev->id,
--					MGMT_OP_SET_DEF_SYSTEM_CONFIG,
--					MGMT_STATUS_INVALID_PARAMS);
--			}
-+			exp_type_len = sizeof(u16);
-+			break;
-+		case 0x001f:
-+			exp_type_len = sizeof(u8);
- 			break;
- 		default:
-+			exp_type_len = 0;
- 			bt_dev_warn(hdev, "unsupported parameter %u", type);
- 			break;
- 		}
- 
-+		if (exp_type_len && len != exp_type_len) {
-+			bt_dev_warn(hdev, "invalid length %d, exp %zu for type %d",
-+				    len, exp_type_len, type);
-+
-+			return mgmt_cmd_status(sk, hdev->id,
-+				MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+				MGMT_STATUS_INVALID_PARAMS);
-+		}
-+
- 		buffer_left -= exp_len;
- 		buffer += exp_len;
- 	}
-@@ -289,6 +311,9 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
- 		case 0x0001e:
- 			hdev->advmon_no_filter_duration = TLV_GET_LE16(buffer);
- 			break;
-+		case 0x0001f:
-+			hdev->enable_advmon_interleave_scan = TLV_GET_U8(buffer);
-+			break;
- 		default:
- 			bt_dev_warn(hdev, "unsupported parameter %u", type);
- 			break;
--- 
-2.29.2.454.gaff20da3a2-goog
 
+total: 0 errors, 0 warnings, 1 checks, 118 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] Bluetooth: Add toggle to switch off interleave scan" has style problems, please review.
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7339228795111071932==--
