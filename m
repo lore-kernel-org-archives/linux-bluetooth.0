@@ -2,27 +2,27 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F25F6C63798
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 18:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BCFC63798
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 20:04:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1507221E9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 18:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 717FB21D91
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 20:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404018AbgKZSoH convert rfc822-to-8bit (ORCPT
+        id S2403941AbgKZUDt convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Nov 2020 13:44:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37770 "EHLO mail.kernel.org"
+        Thu, 26 Nov 2020 15:03:49 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59246 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403877AbgKZSoH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Nov 2020 13:44:07 -0500
+        id S1728118AbgKZUDt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Nov 2020 15:03:49 -0500
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 208965] not working bluetooth mouse low energy rtl8822ce
-Date:   Thu, 26 Nov 2020 18:44:06 +0000
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Thu, 26 Nov 2020 20:03:45 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -30,17 +30,17 @@ X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: steeve.mccauley@gmail.com
-X-Bugzilla-Status: NEW
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: yrds96@protonmail.com
+X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-208965-62941-C9USu8wXYZ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-208965-62941@https.bugzilla.kernel.org/>
-References: <bug-208965-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-rHKC4oCZbQ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -50,33 +50,53 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208965
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-Steeve McCauley (steeve.mccauley@gmail.com) changed:
+--- Comment #162 from Yuri Santos (yrds96@protonmail.com) ---
+(In reply to vinodmishra from comment #155)
+> (In reply to Flole from comment #154)
+> > (In reply to Alex from comment #86)
+> > > Hi Swyter,
+> > > 
+> > > I also tried your patch v2 and actually in my case see no difference with
+> > > the previous ones I tried (see my comments 55/56
+> > > https://bugzilla.kernel.org/show_bug.cgi?id=60824#c55 )
+> > > 
+> > > Linux recognizes the controller, but it's unusable:
+> > > 
+> > > Can't init device hci0: Invalid argument (22)
+> > > 
+> > > > HCI Event: Command Complete (0x0e) plen 4                               
+> > > >                                                                  #22
+> > [hci0]
+> > > > 11.191461
+> > >       Set Event Filter (0x03|0x0005) ncmd 1
+> > >         Status: Invalid HCI Command Parameters (0x12)
+> > > = Close Index: 00:1A:7D:DA:71:12                                          
+> > > [hci0] 11.191493
+> > > 
+> > > 
+> > > I've seen several people here have this issue, and I believe that comment
+> > 59
+> > > may be quite relevant here:
+> > > 
+> > > > Set Event fails, looking at hci_core.c the set filter and previous
+> calls
+> > > are
+> > > > made only if device supports BREDR, is there any way to tell device
+> > doesn't
+> > > > support, or patch this ?
+> > 
+> > I have the same device, and my fix was simply changing the #define that
+> > checks if a device supports BREDR to "false" (aka disabling BREDR support
+> > completely) and that solved it.
+> Thanks so much. 
+> Same device and same issue on Pi Zero. Changing the "#define
+> lmp_bredr_capable(dev)" in hci_core.h to return false did the trick.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |steeve.mccauley@gmail.com
-
---- Comment #39 from Steeve McCauley (steeve.mccauley@gmail.com) ---
-Also confirming that the patch works for the realtek 8761b usb bluetooth
-adaptor, on all 5.9.x kernels I've patched and tested, including some fedora
-kernels,
-
-   cd
-~/rpmbuild/BUILD/kernel-5.9.fc32/linux-5.9.8-100.fc32.x86_64/net/bluetooth/
-$ diff -u hci_core.c~ hci_core.c
---- hci_core.c~ 2020-11-17 16:36:11.387834274 -0500
-+++ hci_core.c  2020-11-26 06:35:22.422411928 -0500
-@@ -763,7 +763,7 @@
-                        hci_req_add(req, HCI_OP_LE_CLEAR_RESOLV_LIST, 0, NULL);
-                }
-
--               if (hdev->commands[35] & 0x40) {
-+               if (hdev->commands[35] & 0x04) {
-                        __le16 rpa_timeout = cpu_to_le16(hdev->rpa_timeout);
-
-                        /* Set RPA timeout */
+Could you provide more detailed information about how to do this? I'm trying to
+do the same thing but not sure which drivers i have to compile to apply this
+change.
 
 -- 
 You are receiving this mail because:
