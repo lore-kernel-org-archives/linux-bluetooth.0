@@ -2,155 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10D1C6379D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 00:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D6AC64E75
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 04:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6159D20DD4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 00:00:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48CA1206B7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Nov 2020 04:22:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IkVo0vBI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L5IGUI+F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728285AbgKZAAX (ORCPT
+        id S2387594AbgKZEWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Nov 2020 19:00:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44460 "EHLO
+        Wed, 25 Nov 2020 23:22:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728243AbgKZAAX (ORCPT
+        with ESMTP id S2387595AbgKZEWi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Nov 2020 19:00:23 -0500
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217BAC0613D4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 16:00:23 -0800 (PST)
-Received: by mail-ej1-x643.google.com with SMTP id hb22so34921ejb.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 16:00:23 -0800 (PST)
+        Wed, 25 Nov 2020 23:22:38 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EADBC061A04
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 20:22:38 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id u37so1214602ybi.15
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 20:22:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cp3XtvMYP1ONxD1/gH7wPTDyUI7+riu9vnsjYjRg5ws=;
-        b=IkVo0vBIiiWyfSkA/G5uKhHL2J9yjsRyR8ISwvcjhrASZ9PZhL8bAhoX8nnyz95/xw
-         YemSKdjwZa8tqbdyG+/GOwtHtFsrTiz+NRXpBiKNVYm612k0smKaSUQNBv0FqTKTr1Pa
-         FkbSQ1+miZ71XOdnhS1d9FvZFfOB/n4uW4nK4=
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=lXyh67vNMJMfjKfbnDtxJFjlSgopuz07QzIMmNfAPeg=;
+        b=L5IGUI+FZGUk7IRBh3HsJdYoxbrewNtuzP7m+REKeCVgqz7N0I0lrS0MsRMyoVpQa7
+         rUupJ6W/PyyIfTIZ7qIlWbyVS8w8cbIPMS+oRZCpAWC2iLsciHl5r9WKpslO7SEACbc4
+         +cAXXMLHoH+6j2qqnIFzYCljIaTWIEwhG8IrUCxNxmMhVrtzvLXTYXnDgu8B0TmmGBkS
+         r5G6DC5RhJF40jPvn9yJGPsJlAmcxvUw2JGJigdXGMvXIRuS1sj8B3ja0qwNI/ra7P8n
+         UOCqzTbjdQQ3O7qKaaj2pyWFnLRb5OTo/z1uiRGSroVVw8p2oDJyyhHfUsn7Ns54Le6T
+         T4Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cp3XtvMYP1ONxD1/gH7wPTDyUI7+riu9vnsjYjRg5ws=;
-        b=Z+30elR4gyFRR4gjMTngmNINJk1CW3ocKkUqQfCz1gbWte9ZUMV3tBkj5WiuVchVAm
-         gCB6jdSRuTxRnAJ2DWJgmmeTlJSdelzFqDw61slL/o9K1rnn478c3rvBI0+H7rdaRM8y
-         j4zwt5L4irjTm7CaOTM98vswhBc6I3QJjyBo7vXEbVymU0ZgLo3TPfjKYt4vSTFQZP7z
-         8LNq/DIKlwcdXySIEXpPLHebCGhnSXnFe5S6pzax6jZA1N7p0I63e76ABmoRiUdlmWEq
-         X1EihNsCFIjcWMPExoqpYTVhxQM349OL1ntmDT5azn1OG907hUoIMAniWxR9DX6aCv0F
-         xmUg==
-X-Gm-Message-State: AOAM530St+dhbMAx4NWtChZJmVt1LtohZha+qoCOVxYCaVSyZ7np39xG
-        InAXTPPLMgMa4kF77otRCal6XTu/z/1+0g==
-X-Google-Smtp-Source: ABdhPJxfTQLP/N0hX/BvudxSLJdz7tEohWVw6zQlC0GlOx5+9U00TPHZfxH5AveA4vrTPnrwaLfSoQ==
-X-Received: by 2002:a17:906:ae8d:: with SMTP id md13mr405321ejb.300.1606348821255;
-        Wed, 25 Nov 2020 16:00:21 -0800 (PST)
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com. [209.85.221.50])
-        by smtp.gmail.com with ESMTPSA id a10sm2181168edn.77.2020.11.25.16.00.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Nov 2020 16:00:20 -0800 (PST)
-Received: by mail-wr1-f50.google.com with SMTP id 23so185319wrc.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2020 16:00:19 -0800 (PST)
-X-Received: by 2002:adf:a451:: with SMTP id e17mr376051wra.99.1606348819469;
- Wed, 25 Nov 2020 16:00:19 -0800 (PST)
-MIME-Version: 1.0
-References: <20201124010906.340433-1-sonnysasaka@chromium.org> <92C0EFAB-EDF1-4EDB-ADE7-FF734928C8AE@holtmann.org>
-In-Reply-To: <92C0EFAB-EDF1-4EDB-ADE7-FF734928C8AE@holtmann.org>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Wed, 25 Nov 2020 16:00:07 -0800
-X-Gmail-Original-Message-ID: <CAO271m=geLEUjtPhFETfqsYTsxDQoe+=c3WeYPbDuNjwc+4idA@mail.gmail.com>
-Message-ID: <CAO271m=geLEUjtPhFETfqsYTsxDQoe+=c3WeYPbDuNjwc+4idA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Cancel Inquiry before Create Connection
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=lXyh67vNMJMfjKfbnDtxJFjlSgopuz07QzIMmNfAPeg=;
+        b=JD+A03DYyJwRCWEe7sFlF58/8EJ9gNNIHA1g2z2aMpYWuS+0dAJq4szwiltgQc0qdq
+         CpvRTRk+SyzqhQpvS1Wq0H/hYNHPcWUKsDb+qkp7rb4XcQdJuRoRjx5CeyeUcnIcCZyZ
+         smFZC95Tj0ZIwT/WCc6cxwFf1S5Qqfvi0A7zauU3u9srSJLe112kyuPT300ijSOPkppu
+         pUKr1uTyL9EAq09522GTfO5/reBG+Wjr/HJ3CtlGg7AN3UohGWWTuTCU1528tdJJCEXW
+         MhXsCApCBmP7dfWR8tre5wKYKcgFfy0u4VtQbjr2pHDdDHXI+FsLRSpjNI5DMmt92EWL
+         vQTQ==
+X-Gm-Message-State: AOAM531sbWq/JWno1HxAwclHuCaApnDaA7SliDphIa36Rcux4/DMQv4x
+        8h+/4lfPx5g91ddlg3yGLyH010Ll/HxRKn2g0o3weZ82PFZL9YN1k6zfA3nlk/rP4HlNSM84Ur3
+        Le2zol+eAXTx55wCNlUK+RjKJWkUHglahHfj7DwrIikoxCnAQ/ZpzjGxNeB+clA40WuF/qAFYWw
+        plw3WhtYB6TFI=
+X-Google-Smtp-Source: ABdhPJxyZQSIfJZ+DnwHrqeAOax2ApANcUZ22vtXQokHYy/tzbO6GP+SVqLbNOIjzllhmQis9p+wdv8Oao5L9x7YkA==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:a25:2845:: with SMTP id
+ o66mr1678470ybo.260.1606364557582; Wed, 25 Nov 2020 20:22:37 -0800 (PST)
+Date:   Thu, 26 Nov 2020 12:22:22 +0800
+In-Reply-To: <20201126122109.v11.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+Message-Id: <20201126122109.v11.2.I3774a8f0d748c7c6ec3402c4adcead32810c9164@changeid>
+Mime-Version: 1.0
+References: <20201126122109.v11.1.Ib75f58e90c477f9b82c5598f00c59f0e95a1a352@changeid>
+X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
+Subject: [PATCH v11 2/5] Bluetooth: Handle system suspend resume case
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     alainm@chromium.org, mcchou@chromium.org, mmandlik@chromium.org,
+        Howard Chung <howardchung@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+This patch adds code to handle the system suspension during interleave
+scan. The interleave scan will be canceled when the system is going to
+sleep, and will be restarted after waking up.
 
+Signed-off-by: Howard Chung <howardchung@google.com>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
 
-On Wed, Nov 25, 2020 at 6:43 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Sonny,
->
-> > Many controllers do not allow HCI Create Connection while it is doing
-> > Inquiry. This patch adds Inquiry Cancel before Create Connection in this
-> > case to allow the controller to do Create Connection. User space will be
-> > aware of this Inquiry cancellation and they may issue another discovery
-> > request afterwards.
-> >
-> > Sample Command Disallowed response of HCI Create Connection:
-> > < HCI Command: Inquiry (0x01|0x0001) plen 5
-> >        Access code: 0x9e8b33 (General Inquiry)
-> >        Length: 10.24s (0x08)
-> >        Num responses: 0
-> >> HCI Event: Command Status (0x0f) plen 4
-> >      Inquiry (0x01|0x0001) ncmd 2
-> >        Status: Success (0x00)
-> > < HCI Command: Create Connection (0x01|0x0005) plen 13
-> >        Address: XX:XX:XX:XX:XX:XX
-> >        Packet type: 0xcc18
-> >        Page scan repetition mode: R2 (0x02)
-> >        Page scan mode: Mandatory (0x00)
-> >        Clock offset: 0x0000
-> >        Role switch: Allow slave (0x01)
-> >> HCI Event: Command Status (0x0f) plen 4
-> >      Create Connection (0x01|0x0005) ncmd 1
-> >        Status: Success (0x00)
-> >> HCI Event: Connect Complete (0x03) plen 11
-> >        Status: Command Disallowed (0x0c)
-> >        Handle: 65535
-> >        Address: XX:XX:XX:XX:XX:XX
-> >        Link type: ACL (0x01)
-> >        Encryption: Disabled (0x00)
-> >
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> >
-> > ---
-> > net/bluetooth/hci_conn.c | 11 +++++++++++
-> > 1 file changed, 11 insertions(+)
-> >
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 4f1cd8063e720..b41ad08f8d411 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -233,6 +233,17 @@ static void hci_acl_create_connection(struct hci_conn *conn)
-> >       else
-> >               cp.role_switch = 0x00;
-> >
-> > +     /* Many controllers disallow HCI Create Connection while it is doing
-> > +      * HCI Inquiry. So we cancel the Inquiry first before issuing HCI Create
-> > +      * Connection. This may cause the MGMT discovering state to become false
-> > +      * without user space's request but it is okay since the MGMT Discovery
-> > +      * APIs do not promise that discovery should be done forever. Instead,
-> > +      * the user space monitors the status of MGMT discovering and it may
-> > +      * request for discovery again when this flag becomes false.
-> > +      */
-> > +     if (test_bit(HCI_INQUIRY, &hdev->flags))
-> > +             hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-> > +
->
-> while this seems acceptable, what happens when we have interleaved discovery where we toggle between BR/EDR inquiry and LE scanning. Are you sure we not better cancel the mgmt discovery completely.
-Only Inquiry is preventing Create Connection, so we don't need to
-overcomplicate it by stopping the mgmt discovery completely. In the
-case of interleaved discovery, the LE discovery will linger for a
-little bit before eventually being disabled and the situation restarts
-at a good state. Not perfect but simple, clean, and fixes the issue.
+(no changes since v5)
 
->
-> Regards
->
-> Marcel
->
+Changes in v5:
+- Remove the change in hci_req_config_le_suspend_scan
+
+ net/bluetooth/hci_request.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index d6bf1517ddaec..8addb94560013 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1294,8 +1294,10 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
+ 
+ 		/* Disable LE passive scan if enabled */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
++			cancel_interleave_scan(hdev);
+ 			hci_req_add_le_scan_disable(&req, false);
++		}
+ 
+ 		/* Mark task needing completion */
+ 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
+-- 
+2.29.2.454.gaff20da3a2-goog
+
