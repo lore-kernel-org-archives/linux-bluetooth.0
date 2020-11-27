@@ -2,89 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D3FC2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Nov 2020 09:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23AFC2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Nov 2020 12:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C5C720885
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Nov 2020 09:12:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="OyNeeJfd"
+	by mail.kernel.org (Postfix) with ESMTP id 73AB220B1F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Nov 2020 12:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgK0JLp (ORCPT
+        id S1728013AbgK0Mbu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Nov 2020 04:11:45 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:16904 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726721AbgK0JLo (ORCPT
+        Fri, 27 Nov 2020 07:31:50 -0500
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:58963 "EHLO
+        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725865AbgK0Mbu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Nov 2020 04:11:44 -0500
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20201127091141epoutp049f14931387ead4500cdec97a0cf1652a~LUmior4wo2982529825epoutp04P
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2020 09:11:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20201127091141epoutp049f14931387ead4500cdec97a0cf1652a~LUmior4wo2982529825epoutp04P
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1606468301;
-        bh=/jYo/SjQrZ8O8R+bunraAoL5kNrkkbCZjlUbY6DIYjo=;
-        h=Subject:Reply-To:From:To:Date:References:From;
-        b=OyNeeJfd8QekrvuiRRhRKvDTVMP5UNyoVQfsi4Waqkp0UoGeM91WxtHGr5GxtsCxr
-         fBXQJIvTExDG1d2OjqHp+pSAqY8q1wQP58TKa/0HBFUWo+qIwIq/EvfMMy48N4E/6T
-         599zu+UBdXwcmSqrY2UO1NW9zFnzoFiWOk+fNwSU=
-Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20201127091140epcas5p350a550877fac3b1b162f59c95e8d686b~LUmhkGiSM2702827028epcas5p37
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2020 09:11:40 +0000 (GMT)
-X-AuditID: b6c32a49-8d5ff70000013d42-12-5fc0c2cc8a3c
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C6.2E.15682.CC2C0CF5; Fri, 27 Nov 2020 18:11:40 +0900 (KST)
-Mime-Version: 1.0
-Subject: Support for LE Set/Read PHY APIs
-Reply-To: ayush.garg@samsung.com
-Sender: Ayush Garg <ayush.garg@samsung.com>
-From:   Ayush Garg <ayush.garg@samsung.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20201127090950epcms5p2af83accad82795ea00e1d1535e46327f@epcms5p2>
-Date:   Fri, 27 Nov 2020 14:39:50 +0530
-X-CMS-MailID: 20201127090950epcms5p2af83accad82795ea00e1d1535e46327f
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMIsWRmVeSWpSXmKPExsWy7bCmpu6ZQwfiDb6sEbSYc62P2YHR4/Mm
-        uQDGKC6blNSczLLUIn27BK6M5eeuMBfsZ65omjWDsYHxOVMXIyeHhICJxJwzKxlBbCGB3YwS
-        izYbdTFycPAKCEr83SEMEhYW0JTYermRDaJEQWLez92sEHFtiUdvpoONYQOqef3xC5gtIuAu
-        sWf/bUaI8bwSM9qfskDY0hLbl2+FiotK3Fz9lh3Gfn9sPlRcRKL13llmCFtQ4sHP3VBxKYk5
-        bXtZIexmRonuCUkQdg+jRMvVWgjbXOJ/91uwel4BX4kPS7+CzWERUJU4+3E/1A0uEg96X4D9
-        wiwgL7H97RxmkHeZge5fv0sfokRWYuqpdUwQJXwSvb+fMMG8smMejK0isWFVJzvMaR+PLYQ6
-        2UPi468tzJCgCpRYPOkg2wRGuVmIAJ2FZPEshMULGJlXMUqmFhTnpqcWmxYY5qWW6xUn5haX
-        5qXrJefnbmIEx7OW5w7Guw8+6B1iZOJgPMQowcGsJMLrLrw3Xog3JbGyKrUoP76oNCe1+BCj
-        NAeLkjiv0o8zcUIC6YklqdmpqQWpRTBZJg5OqQYmloOK1lvm/lSe3qsQJL9a5dHrdH+pPP9Z
-        P+f36234p3C6edHd+ZGT5Tit3xxkXR5yfvrnfu/7L3oiTVTXKwVJHit3fX/6Tuaxnc0ejzTq
-        /grd8hPNMFJapblF16/tnKFZuZ3PPUmJk/HHuEsl6xPPpDs6sImWHLqUdXHxVc3ysoX8qkU6
-        sbc/PzNLjZerrp/d9zV9zqLamgstPqc29L0y4z+7W+vQ54MHG8S/in0RNfi5yrb5Y12rX5K4
-        oUXplZ2C0at7fix5t3of71G+OxN/RSTsXXT5T8jF74pPUpfHLYzlWr2ynPvSiV92X51P/vyU
-        fsV2T+u5mXOfHnNfkStq8uLCzYu3Gr/u/SW7yDt9vRJLcUaioRZzUXEiAGC687xWAwAA
-X-CMS-RootMailID: 20201127090950epcms5p2af83accad82795ea00e1d1535e46327f
-References: <CGME20201127090950epcms5p2af83accad82795ea00e1d1535e46327f@epcms5p2>
+        Fri, 27 Nov 2020 07:31:50 -0500
+X-Originating-IP: 82.255.60.242
+Received: from [192.168.0.28] (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
+        (Authenticated sender: hadess@hadess.net)
+        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id 3D81D1BF207;
+        Fri, 27 Nov 2020 12:31:47 +0000 (UTC)
+Message-ID: <ec514dae04260d4ef78ce56f3e0f78d4e2fb094c.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v3 4/7] doc: Add Battery Provider API doc
+From:   Bastien Nocera <hadess@hadess.net>
+To:     Sonny Sasaka <sonnysasaka@chromium.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Date:   Fri, 27 Nov 2020 13:31:47 +0100
+In-Reply-To: <CAO271m=Bsz8NXtHzjAn5iYxMs0hxd17DW9QCUnXZACywTDVcvg@mail.gmail.com>
+References: <20201120205728.339325-1-sonnysasaka@chromium.org>
+         <20201120205728.339325-4-sonnysasaka@chromium.org>
+         <CABBYNZLsGs5KDC8kGY4ahfA1Bmdhz1XaR9kNRBKNxN7dTZoFHw@mail.gmail.com>
+         <CAO271m=Bsz8NXtHzjAn5iYxMs0hxd17DW9QCUnXZACywTDVcvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.1 (3.38.1-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-It seems that at present, there is no implementation of BT5.0 PHY based HCI commands - 'LE Set PHY' and 'LE READ PHY' to request controller to change connection specific PHY settings (2M PHY, coded PHY etc).
-Could you please tell if there is any plan or ongoing work to support the same.
-If not, Kindly suggest some flow on how can an application request the controller to set or read phy settings via kernel interface.
+On Tue, 2020-11-24 at 13:29 -0800, Sonny Sasaka wrote:
+> 
+> We need a convention to match the exposed object by the battery
+> provider and BlueZ's device. I am suggesting that the simplest
+> convention is to use the same path of the BlueZ's device object,
+> which
+> is easy to follow and implement by providers. Otherwise, we would
+> still need another convention to match them, but I think any other
+> convention is likely more complex to implement by battery providers.
+> Can you suggest an alternative convention to match the battery and
+> the
+> device?
 
-BR,
-Ayush Garg
+You should match on the interface being available, not the object
+path. 
+
+UPower does that, it just watches for ObjectManager signals, and checks
+whether the expected interface is available when a new object appears:
+https://gitlab.freedesktop.org/upower/upower/-/blob/master/src/linux/up-backend.c#L314-357
+
+There's no reason to care about the object path.
+
