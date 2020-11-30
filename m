@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F534C64E8A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 21:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C59FDC64E7B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 21:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1877E2085B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 21:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 633352085B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 21:57:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ghPlUwLw"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TC+yHFEM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730260AbgK3V5A (ORCPT
+        id S1730287AbgK3V5C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Nov 2020 16:57:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60938 "EHLO
+        Mon, 30 Nov 2020 16:57:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728372AbgK3V5A (ORCPT
+        with ESMTP id S1728372AbgK3V5C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Nov 2020 16:57:00 -0500
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68969C0613D4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 13:56:20 -0800 (PST)
-Received: by mail-pg1-x542.google.com with SMTP id w16so10901846pga.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 13:56:20 -0800 (PST)
+        Mon, 30 Nov 2020 16:57:02 -0500
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9DCC0613D6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 13:56:21 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id l4so4851032pgu.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 13:56:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kh50OcTzrFmgdURg93OTnhuU/F5aplwBjH9orxXDq7k=;
-        b=ghPlUwLwhw/pqp+QpWEuygRloPeUt3j1qvEcXJouJb/Cskxj8VkgsjZU3HmDzqvRFD
-         c2Tf8BqtxlRjG/kbwa8VSYKg/0al3aA8h3qicqRLvXBgH80gsbqL+xNYIAUKheYV/r1h
-         CNabFGmWM6fJxr76/TolDZWIJ1OjNbbyNBT08=
+        bh=2AOX3JjGk6r22Q8PnBEHUiCVd9fNzB32v3Zc3lXH8gg=;
+        b=TC+yHFEMsIGYXZCwq9Owx1ipBKK/M0OJtwBP2xNKscS9cvUKC1XSRhqCw2/tk+GrTH
+         LhNRVkJQxBaa09DEK7rRVo1IIOAVrFlXqGv5w/NHd0BxNiAuJ4GEFdPZ2Quch+hLxaQ1
+         mOP7zSLTV7TRVvGqm+j2OASEeLcyb8nPXX0Q0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kh50OcTzrFmgdURg93OTnhuU/F5aplwBjH9orxXDq7k=;
-        b=RJmeh9HFLTMTdmdRSnAGFfxysWxWzf6C1Usp4yzI3QZpHsa+kIehv5853xFRLJnQSv
-         TW4mgD4/1KMihOVMDveThifxfXYCk2/a/kekA4SpKKeqTEthJiFIVVGmNQmpi1qWeJ5A
-         nIiOPFFClIOknWtFVab+6JJH9Kf+or+H/zWWxGG+5Kf5cEVpsXG2rIKSvdjBBD5bapzj
-         0KpphpCWZNb3Zipje+B5d0eCr2acieODrcNgyd2ivIDshZRcHwiWxP/xC5p3ULdtWOcn
-         0IqxxQwqT6JqdDmt1r3C1F8EWgPn2D87h2uQXwWLh+uguf0BWDAWv9cDGaRp5sOP19VB
-         0tCQ==
-X-Gm-Message-State: AOAM532de55mKqhdTr5nSZbQrzTnW3h0NelKzAX+Z5ab4BGpM+XqzpvR
-        epyM79zzeXKvOcFsbmD4haIIa0T/Udbg3A==
-X-Google-Smtp-Source: ABdhPJxhy1Tu79xQDA18RNzq3gxB9EJ+zSwpAvZDR1bDNRUluulrDHOW/KUvjnP/yw/5qinW3vKSsA==
-X-Received: by 2002:aa7:9699:0:b029:18a:e057:c44 with SMTP id f25-20020aa796990000b029018ae0570c44mr20784523pfk.34.1606773379646;
-        Mon, 30 Nov 2020 13:56:19 -0800 (PST)
+        bh=2AOX3JjGk6r22Q8PnBEHUiCVd9fNzB32v3Zc3lXH8gg=;
+        b=DPMX14fNv7wLXmrgbWk1/1erKC0/oDCNP2Dej/5OojO5VMkx/0oqCYV93JO4BTUmIn
+         z3cSuJwfBufelVv4U9FimmiCbgmGOKocXRAu8w7FM/J9iC3wr3C62ZjsOawYddds5o1x
+         W6FMZe3tNmFYg0ntW8bu4qiUg4qLlTzP0eUFGhli98H3hByKhhc1ogqzgp9ZWce8IuPD
+         731ytlEZLmce1Whze3/o3/b7+lvvLX/3mRw7qVOrFEjcC5oSwglpzSllzKUt3JwnbeUM
+         zsyck5mDBw8Xnw86VTJ04WlHUG6UYkiQMOP4oTCX+lQStyvVcFYAfLjluj4sKhUS+b18
+         HVXA==
+X-Gm-Message-State: AOAM532VJsyEflh4GVoyF309BqKB0Dhe3VXIM7eSLx6B1xKYhNkPef48
+        FeGO8wGIp5dYDrjPhw3Ajnon0cUttvwYew==
+X-Google-Smtp-Source: ABdhPJzp2A+Q8g+HtjNfijpluup3LEFYVe5vj+kiT+gwmKSz0fj4UvBissMj68QWUiGeC4Iw9YabAA==
+X-Received: by 2002:a62:e204:0:b029:19a:9f74:3882 with SMTP id a4-20020a62e2040000b029019a9f743882mr19039852pfi.19.1606773380890;
+        Mon, 30 Nov 2020 13:56:20 -0800 (PST)
 Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id 23sm17476588pfx.210.2020.11.30.13.56.18
+        by smtp.gmail.com with ESMTPSA id 23sm17476588pfx.210.2020.11.30.13.56.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Nov 2020 13:56:19 -0800 (PST)
+        Mon, 30 Nov 2020 13:56:20 -0800 (PST)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [PATCH BlueZ v5 4/7] doc: Add Battery Provider API doc
-Date:   Mon, 30 Nov 2020 13:55:59 -0800
-Message-Id: <20201130215602.386545-4-sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ v5 5/7] test: Add test app for Battery Provider API
+Date:   Mon, 30 Nov 2020 13:56:00 -0800
+Message-Id: <20201130215602.386545-5-sonnysasaka@chromium.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201130215602.386545-1-sonnysasaka@chromium.org>
 References: <20201130215602.386545-1-sonnysasaka@chromium.org>
@@ -72,81 +72,254 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add the documentation of the Battery Provider which lets
-external clients feed battery information to BlueZ if they are able to
-decode battery reporting via any profile. BlueZ UI clients can then use
-the org.bluez.Battery1 API as a single source of battery information
-coming from many different profiles.
+The python test app simulates an application registering to BlueZ as a
+Battery Provider providing three fake batteries drained periodically.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 
 ---
- doc/battery-api.txt | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ test/example-battery-provider | 232 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 232 insertions(+)
+ create mode 100755 test/example-battery-provider
 
-diff --git a/doc/battery-api.txt b/doc/battery-api.txt
-index dc7dbeda2..9a6b4fd39 100644
---- a/doc/battery-api.txt
-+++ b/doc/battery-api.txt
-@@ -12,3 +12,58 @@ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
- Properties	byte Percentage [readonly]
- 
- 			The percentage of battery left as an unsigned 8-bit integer.
+diff --git a/test/example-battery-provider b/test/example-battery-provider
+new file mode 100755
+index 000000000..1522a5e07
+--- /dev/null
++++ b/test/example-battery-provider
+@@ -0,0 +1,232 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: LGPL-2.1-or-later
 +
-+		string Source [readonly, optional, experimental]
++import dbus
++import dbus.exceptions
++import dbus.mainloop.glib
++import dbus.service
 +
-+			Describes where the battery information comes from
-+			This property is informational only and may be useful
-+			for debugging purposes.
-+			Providers from BatteryProvider1 may make use of this
-+			property to indicate where the battery report comes from
-+			(e.g. "HFP 1.7", "HID", or the profile UUID).
++try:
++  from gi.repository import GObject
++except ImportError:
++  import gobject as GObject
++import sys
 +
++mainloop = None
++app = None
++bus = None
 +
-+Battery Provider Manager hierarchy
-+==================================
-+A battery provider starts by registering itself as a battery provider with the
-+RegisterBatteryProvider method passing an object path as the provider ID. Then,
-+it can start exposing org.bluez.BatteryProvider1 objects having the path
-+starting with the given provider ID. It can also remove objects at any time.
-+The objects and their properties exposed by battery providers will be reflected
-+on org.bluez.Battery1 interface.
++BLUEZ_SERVICE_NAME = 'org.bluez'
++DBUS_OM_IFACE =      'org.freedesktop.DBus.ObjectManager'
++DBUS_PROP_IFACE =    'org.freedesktop.DBus.Properties'
 +
-+BlueZ will stop monitoring these exposed and removed objects after
-+UnregisterBatteryProvider is called for that provider ID.
++BATTERY_PROVIDER_MANAGER_IFACE = 'org.bluez.BatteryProviderManager1'
++BATTERY_PROVIDER_IFACE = 'org.bluez.BatteryProvider1'
++BATTERY_PROVIDER_PATH = '/path/to/provider'
 +
-+Service		org.bluez
-+Interface	org.bluez.BatteryProviderManager1 [experimental]
-+Object path	/org/bluez/{hci0,hci1,...}
++BATTERY_PATH1 = '11_11_11_11_11_11'
++BATTERY_PATH2 = '22_22_22_22_22_22'
++BATTERY_PATH3 = '33_33_33_33_33_33'
 +
-+Methods		void RegisterBatteryProvider(object provider)
-+
-+			This registers a battery provider. A registered
-+			battery provider can then expose objects with
-+			org.bluez.BatteryProvider1 interface described below.
-+
-+		void UnregisterBatteryProvider(object provider)
-+
-+			This unregisters a battery provider. After
-+			unregistration, the BatteryProvider1 objects provided
-+			by this client are ignored by BlueZ.
++class InvalidArgsException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
 +
 +
-+Battery Provider hierarchy
-+==========================
++class Application(dbus.service.Object):
++    def __init__(self, bus):
++        self.path = BATTERY_PROVIDER_PATH
++        self.services = []
++        self.batteries = []
++        dbus.service.Object.__init__(self, bus, self.path)
 +
-+Service		<client D-Bus address>
-+Interface	org.bluez.BatteryProvider1 [experimental]
-+Object path	{provider_root}/{unique battery object path}
++    def get_path(self):
++        return dbus.ObjectPath(self.path)
 +
-+Properties	Objects provided on this interface contain the same properties
-+		as org.bluez.Battery1 interface. Additionally, this interface
-+		needs to have the Device property indicating the object path
-+		of the device this battery provides.
++    def add_battery(self, battery):
++        self.batteries.append(battery)
++        self.InterfacesAdded(battery.get_path(), battery.get_properties())
++        GObject.timeout_add(1000, drain_battery, battery)
 +
-+		object Device [readonly]
++    def remove_battery(self, battery):
++        self.batteries.remove(battery)
++        self.InterfacesRemoved(battery.get_path(), [BATTERY_PROVIDER_IFACE])
 +
-+			The object path of the device that has this battery.
++    @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
++    def GetManagedObjects(self):
++        response = {}
++        print('GetManagedObjects called')
++
++        for battery in self.batteries:
++            response[battery.get_path()] = battery.get_properties()
++
++        return response
++
++    @dbus.service.signal(DBUS_OM_IFACE, signature='oa{sa{sv}}')
++    def InterfacesAdded(self, object_path, interfaces_and_properties):
++        return
++
++    @dbus.service.signal(DBUS_OM_IFACE, signature='oas')
++    def InterfacesRemoved(self, object_path, interfaces):
++        return
++
++
++class Battery(dbus.service.Object):
++    """
++    org.bluez.BatteryProvider1 interface implementation
++    """
++    def __init__(self, bus, dev, percentage, source = None):
++        self.path = BATTERY_PROVIDER_PATH + '/dev_' + dev
++        self.dev_path = '/org/bluez/hci0/dev_' + dev
++        self.bus = bus
++        self.percentage = percentage
++        self.source = source
++        dbus.service.Object.__init__(self, bus, self.path)
++
++    def get_battery_properties(self):
++        properties = {}
++        if self.percentage != None:
++            properties['Percentage'] = dbus.Byte(self.percentage)
++        if self.source != None:
++            properties['Source'] = self.source
++        properties['Device'] = dbus.ObjectPath(self.dev_path)
++        return properties
++
++    def get_properties(self):
++        return { BATTERY_PROVIDER_IFACE: self.get_battery_properties() }
++
++    def get_path(self):
++        return dbus.ObjectPath(self.path)
++
++    def set_percentage(self, percentage):
++        if percentage < 0 or percentage > 100:
++            print('percentage not valid')
++            return
++
++        self.percentage = percentage
++        print('battery %s percentage %d' % (self.path, self.percentage))
++        self.PropertiesChanged(
++                BATTERY_PROVIDER_IFACE, self.get_battery_properties())
++
++    @dbus.service.method(DBUS_PROP_IFACE,
++                         in_signature='s',
++                         out_signature='a{sv}')
++    def GetAll(self, interface):
++        if interface != BATTERY_PROVIDER_IFACE:
++            raise InvalidArgsException()
++
++        return self.get_properties()[BATTERY_PROVIDER_IFACE]
++
++    @dbus.service.signal(DBUS_PROP_IFACE, signature='sa{sv}')
++    def PropertiesChanged(self, interface, properties):
++        return
++
++
++def add_late_battery():
++    app.add_battery(Battery(bus, BATTERY_PATH3, 70, 'Protocol 2'))
++
++
++def drain_battery(battery):
++    new_percentage = 100
++    if battery.percentage != None:
++        new_percentage = battery.percentage - 5
++        if new_percentage < 0:
++            new_percentage = 0
++
++    battery.set_percentage(new_percentage)
++
++    if new_percentage <= 0:
++        return False
++
++    return True
++
++def register_provider_cb():
++    print('Battery Provider registered')
++
++    # Battery added early right after RegisterBatteryProvider succeeds
++    app.add_battery(Battery(bus, BATTERY_PATH2, None))
++    # Battery added later
++    GObject.timeout_add(5000, add_late_battery)
++
++
++def register_provider_error_cb(error):
++    print('Failed to register Battery Provider: ' + str(error))
++    mainloop.quit()
++
++
++def find_manager(bus):
++    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
++                               DBUS_OM_IFACE)
++    objects = remote_om.GetManagedObjects()
++
++    for o, props in objects.items():
++        if BATTERY_PROVIDER_MANAGER_IFACE in props.keys():
++            return o
++
++    return None
++
++
++def unregister_provider_cb():
++    print('Battery Provider unregistered')
++
++
++def unregister_provider_error_cb(error):
++    print('Failed to unregister Battery Provider: ' + str(error))
++
++
++def unregister_battery_provider(battery_provider_manager):
++    battery_provider_manager.UnregisterBatteryProvider(BATTERY_PROVIDER_PATH,
++                                    reply_handler=unregister_provider_cb,
++                                    error_handler=unregister_provider_error_cb)
++
++
++def remove_battery(app, battery):
++    app.remove_battery(battery)
++
++
++"""
++Simulates an application registering to BlueZ as a Battery Provider providing
++fake batteries drained periodically.
++"""
++def main():
++    global mainloop, bus, app
++
++    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++    bus = dbus.SystemBus()
++
++    manager_path = find_manager(bus)
++    if not manager_path:
++        print('BatteryProviderManager1 interface not found')
++        return
++
++    print('BatteryProviderManager1 path = ', manager_path)
++
++    battery_provider_manager = dbus.Interface(
++            bus.get_object(BLUEZ_SERVICE_NAME, manager_path),
++            BATTERY_PROVIDER_MANAGER_IFACE)
++
++    app = Application(bus)
++
++    # Battery pre-added before RegisterBatteryProvider
++    battery1 = Battery(bus, BATTERY_PATH1, 87, 'Protocol 1')
++    app.add_battery(battery1)
++
++    mainloop = GObject.MainLoop()
++
++    print('Registering Battery Provider...')
++
++    battery_provider_manager.RegisterBatteryProvider(BATTERY_PROVIDER_PATH,
++                                    reply_handler=register_provider_cb,
++                                    error_handler=register_provider_error_cb)
++
++    # Unregister the Battery Provider after an arbitrary amount of time
++    GObject.timeout_add(
++            12000, unregister_battery_provider, battery_provider_manager)
++    # Simulate battery removal by a provider
++    GObject.timeout_add(8000, remove_battery, app, battery1)
++
++    mainloop.run()
++
++
++if __name__ == '__main__':
++    main()
 -- 
 2.26.2
 
