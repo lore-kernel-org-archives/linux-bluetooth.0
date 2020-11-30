@@ -2,124 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F653C5519F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 08:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A59C83012
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 17:04:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AC9520719
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 08:04:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uYlTszV/"
+	by mail.kernel.org (Postfix) with ESMTP id 579312073C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 17:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbgK3IEE (ORCPT
+        id S1729265AbgK3RD4 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Nov 2020 03:04:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbgK3IEE (ORCPT
+        Mon, 30 Nov 2020 12:03:56 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:36888 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727900AbgK3RDz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Nov 2020 03:04:04 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35071C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 00:03:18 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id z136so10836875iof.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 00:03:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=aQCdUmgMY9H1wD9Kfpo0icURwqwXsgsMuDCjtGN7i2c=;
-        b=uYlTszV/MbRyVgwRoDk6Ucli29SdoS2esnQDIpM79DOqvqfoNuwxgFNCqnDMU7UzNc
-         Euv6Ju2eQh6xjpCGTJTPRQ7D9DZSwKfg4DmKKi/6tOlroXMeRvGXnPEtRgRcav55irLL
-         69BICwIqi0789RgmWAa8VJERUp9jgZ+CfhyU6MMPDhsOhn6Cbd4uGDaGJhOn4QaCyWa7
-         d0JN8nvsI5srLQW63nBqFI4qGO6n3RtJDwxIFMMoABA9H3Uk2Tj1X+YfZ4v7TA20T1Kp
-         gHAhHJY4qv525z7foPJ8+1VYa3jj4tNN5s1DmENJYyk55vo7Hs0kzgCEHLKUYe4ZNwTn
-         aRLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=aQCdUmgMY9H1wD9Kfpo0icURwqwXsgsMuDCjtGN7i2c=;
-        b=jLTcn3BfYFwlu120UzWUG6voLspqM0qMQah5uEpEmq8t0CcrTxwJ/zOslLZogGxXss
-         nNXE7cAyKR4c1YA7n+vLUbe97LmqBzsTzMIudzqJJUTlUIAV39t74M31r5W4ycW3VlHL
-         d8m2CKr9eGrQEbkcNXZu9KvApyPx9Q8/U0OJj2IQttE60W3e/kwUBmJpOn+2bVjzU+Fl
-         D83AkGjLguqZ5RQWmdNOV6tvtWA4kTK5lmUkPDbUY0lXZbeyGTFqQZmqmWeYUNqin+1j
-         vfX0R8Bbx4pw1uxZ/e79zR7+EgUba+KXGNXH4EvN/gk0fnbFje8P6EG3TVGoF8dxlr5G
-         eTzQ==
-X-Gm-Message-State: AOAM532Me+uXgzFvAWg90gvzLWNjOgR+MFe9+xP4/neWRT/3vtw6E2nN
-        fa9vgEo+3ETwsaj422GhQPBKnA51Fco=
-X-Google-Smtp-Source: ABdhPJxaao/CnjKrP4hdrvxCPn3fN/9dB1PT8H/9CXtwHqHXvCmT/LgTCPGsyce3rBbsjeUp1d5KLQ==
-X-Received: by 2002:a05:6638:526:: with SMTP id j6mr7313592jar.1.1606723396889;
-        Mon, 30 Nov 2020 00:03:16 -0800 (PST)
-Received: from [172.17.0.2] ([40.75.89.216])
-        by smtp.gmail.com with ESMTPSA id q25sm11109581ili.34.2020.11.30.00.03.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Nov 2020 00:03:16 -0800 (PST)
-Message-ID: <5fc4a744.1c69fb81.1b7f4.4ea0@mx.google.com>
-Date:   Mon, 30 Nov 2020 00:03:16 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0762749573607725182=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, peter.tsao@mediatek.com
-Subject: RE: MTK mt7921 driver upstream
-Reply-To: linux-bluetooth@vger.kernel.org
+        Mon, 30 Nov 2020 12:03:55 -0500
+Received: from [172.20.10.2] (tmo-111-84.customers.d1-online.com [80.187.111.84])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3FCBCCED17;
+        Mon, 30 Nov 2020 18:10:26 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
+Subject: Re: [PATCH] MTK mt7921 driver upstream
+From:   Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20201130071655.31515-1-peter.tsao@mediatek.com>
+Date:   Mon, 30 Nov 2020 18:03:12 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>, mark-yw.chen@mediatek.com,
+        justin.tsai@mediatek.com, can.chen@mediatek.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BCEF6F87-2B01-49F6-9494-A08E75C9F1AD@holtmann.org>
 References: <20201130071655.31515-1-peter.tsao@mediatek.com>
+To:     peter.tsao@mediatek.com
+X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0762749573607725182==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Peter,
 
-This is automated email and please do not reply to this email!
+every patch needs a proper commit message.
 
-Dear submitter,
+> Signed-off-by: Peter Tsao <peter.tsao@mediatek.com>
+> ---
+> drivers/bluetooth/btmtk_buffer_mode.c         |  263 +
+> drivers/bluetooth/btmtk_main.c                | 5517 +++++++++++++++++
+> drivers/bluetooth/include/btmtk_buffer_mode.h |   78 +
+> drivers/bluetooth/include/btmtk_chip_if.h     |   30 +
+> drivers/bluetooth/include/btmtk_define.h      |  304 +
+> drivers/bluetooth/include/btmtk_drv.h         |  157 +
+> drivers/bluetooth/include/btmtk_main.h        |  587 ++
+> drivers/bluetooth/include/sdio/btmtk_sdio.h   |  147 +
+> drivers/bluetooth/include/uart/btmtk_uart.h   |   86 +
+> drivers/bluetooth/include/usb/btmtk_usb.h     |  100 +
+> drivers/bluetooth/sdio/btmtksdio.c            | 2004 ++++++
+> drivers/bluetooth/usb/btmtkusb.c              | 3218 ++++++++++
+> 12 files changed, 12491 insertions(+)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=393043
+The drivers/bluetooth/ is not your playground. Keep the structure flat.
 
----Test result---
+> create mode 100644 drivers/bluetooth/btmtk_buffer_mode.c
+> create mode 100644 drivers/bluetooth/btmtk_main.c
+> create mode 100644 drivers/bluetooth/include/btmtk_buffer_mode.h
+> create mode 100644 drivers/bluetooth/include/btmtk_chip_if.h
+> create mode 100644 drivers/bluetooth/include/btmtk_define.h
+> create mode 100644 drivers/bluetooth/include/btmtk_drv.h
+> create mode 100644 drivers/bluetooth/include/btmtk_main.h
+> create mode 100644 drivers/bluetooth/include/sdio/btmtk_sdio.h
+> create mode 100644 drivers/bluetooth/include/uart/btmtk_uart.h
+> create mode 100644 drivers/bluetooth/include/usb/btmtk_usb.h
+> create mode 100644 drivers/bluetooth/sdio/btmtksdio.c
+> create mode 100644 drivers/bluetooth/usb/btmtkusb.c
 
-##############################
-Test: CheckPatch - FAIL
-Output:
-MTK mt7921 driver upstream
-WARNING: Missing commit description - Add an appropriate one
+And this is too much in a single patch. Split this up.
 
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#9: 
-new file mode 100644
+This patch is not acceptable upstream in this form. Strip all your home grown debugging and duplicates out of the patch. And I am no longer accepting any line discipline drivers. So scrap that as well. Also any kind of snooping stuff is not needed since we have btmon.
 
-total: 0 errors, 2 warnings, 12491 lines checked
+In addition, what is wrong with the existing drivers?
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+Regards
 
-"[PATCH] MTK mt7921 driver upstream" has style problems, please review.
+Marcel
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuildK - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0762749573607725182==--
