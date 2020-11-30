@@ -5,67 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59237C64E90
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 22:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E740C83014
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 22:59:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E637E20725
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 22:59:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D193A20725
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Nov 2020 22:59:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IVnWNURy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ojl7aNqA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388784AbgK3W65 (ORCPT
+        id S2388840AbgK3W7P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Nov 2020 17:58:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42368 "EHLO
+        Mon, 30 Nov 2020 17:59:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388780AbgK3W64 (ORCPT
+        with ESMTP id S2388832AbgK3W7N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Nov 2020 17:58:56 -0500
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DC8CC061A4B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 14:57:53 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id n12so9503296qta.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 14:57:53 -0800 (PST)
+        Mon, 30 Nov 2020 17:59:13 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8FC5C061A52
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 14:57:56 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id x2so34510pjq.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Nov 2020 14:57:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=1eLB70/LoA1JAyrb2lCBaA7M2noAwc2Ppo14iel1jO4=;
-        b=IVnWNURySqY21sL04MVvJPfOk+APOINXesF2PUz/uH+sUy23zlAucl1SDd6BV2/weG
-         UN/+fDqbrsj8fXrpXh18tnD9xS9bGE0+Arg0nJsAgMXTJn5sayfhJbj3t1dw7ffF9p7j
-         PH7goQbaYpf6BdDKfs3gT4BCTuK9o1llE4iU5SDYZuUl9sRVhD+ERtFIfgw5F34LOvx3
-         935ocqPA1zj+sebyeyMfOcb6rD08vC9Dgnm1l1izLePhliQXYxPIjKPooKqBRRre2XkM
-         8QUN30kLWd854Vz3fYlrX12KDHJtUptA2zlCeoZIdiiXP0xqmgyGnYbk+rEFxBuBU1uv
-         hjjg==
+        bh=FvGdCQvtsLIcgfixpkP3r2CRGmCEa2HmkA2JzmSPXMY=;
+        b=ojl7aNqA8Ptfa8aIrENwPRdaWQ/Y5O8fPX99pD+4F6BG7c6nfRuL48ST+FhJMKicXN
+         43tJogJTaAlZp2W9baV/93Zkv/Xlvt13mxVqgN5WRnN1/OvoNvr4F5HeuxhQ8VwFoqM7
+         A7hqkz9Qs6rShYbZovr/N0pU/EI5GYozbBtjlKFAPbLM71RYNUfayGJ5De25lkqm94jL
+         IFupmRgFVol2CSZ1BfVwE+brzWBeKxyHkuGKl1Ni3RcaVXjFRh0DyGhCsfHg8RQiGN6S
+         XOCZVfYQNnstZSzpLFbCftUTZcUu+DwRsltMpp5P1oepjm8iz4sAK0w6AJTd2wLWtlmx
+         jrjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=1eLB70/LoA1JAyrb2lCBaA7M2noAwc2Ppo14iel1jO4=;
-        b=Sw4AThEYj0o541Vw0C4lakebVKcWIbjXXNRwoRSnmtY4e1ng43D7/vDazPQu4Cx+w6
-         SIZAB/pNcj2+73gdDMEB9KkW86MjztEmRgwxRdL1VHclmcop0C9InzqOvoefH1s+Dc+Y
-         9tdcK2+cB8tDVc3nTCmk60p6vPgfNC8sOZUG86l44svhLbH2XPaFb9rQ9BSJOH68pm0a
-         cr1cjCzjWrc6rxporTnaZ9gqvDhDbgwg4OQ3rpvB9cP9SaJzxCpjt+W1UVf7WpmKXoZv
-         9JimQsVkZsA7lBL/Lc9UJKdx3PZqCtqM65pvAsEhssLG5+CBcabUayrUh4TvUaSG2kP7
-         yPCg==
-X-Gm-Message-State: AOAM530z+H2d0HpkHb76TkbG8SUtm3T3F7tho5xZKDIQrRJnobIwlxr/
-        aOsJB5Iz4dkRvSEH7ea3f+th64nmEgfkPYimg0jr
-X-Google-Smtp-Source: ABdhPJyDckN6VCLqj9jew6vwG61BX27Ak0D5RGKwFth5yP+kFZDThAHRdgmctUeJ6hsfJMmVjmbyBXXQgywQcoimVplb
+        bh=FvGdCQvtsLIcgfixpkP3r2CRGmCEa2HmkA2JzmSPXMY=;
+        b=s/w5Lm2OYf5ydHXtMAGQmQpwnGu1K/VibZg5OP439yvJ3h2lxv157F2YmJVDlbCG5U
+         UnuOJF6z2NfI3fvlzY+fKkHlZnGNhKAJZSwyPT7E9vYkF5+K/k+2JziAKBznEGigm62i
+         c7/HQV7y37r2DJTaRBa7f5SRWBgaMRBTEGad/DMMA2298ahtvhYgbcM7uN0dlVA8x5f+
+         k3lWGaNRMiOojZaFRct8AWTQYs2u3M3IaV6sNF5ei0wB++RriGKJNxkJKYrEeJfZa6KD
+         T6+BN9KlFHOekjuhPGwb+cz3hDrFsHld3l9MQbaIbXt9xCauwY+NtvMnwmiMtV+QXCUN
+         DwGg==
+X-Gm-Message-State: AOAM5314l+w7iPYeUAXlRsq2Duu+4MBIy0CRfsBIdSNEV26i0/blFIEd
+        ji8w1naNU/JKvRGyc2O0uLmISAv08sp+jBw39d/p
+X-Google-Smtp-Source: ABdhPJxqQD3GtSSerFfyXaAjcIR/NA1ewcjQ3c6mi3GZFC3ZPZqXI9ik841w3u9IwHz3L7+21s54cosVLH4ZAaOm4P84
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:4e59])
- (user=danielwinkler job=sendgmr) by 2002:a05:6214:5cd:: with SMTP id
- t13mr25217023qvz.56.1606777072329; Mon, 30 Nov 2020 14:57:52 -0800 (PST)
-Date:   Mon, 30 Nov 2020 14:57:40 -0800
+ (user=danielwinkler job=sendgmr) by 2002:a62:2a8a:0:b029:18b:83c1:60af with
+ SMTP id q132-20020a622a8a0000b029018b83c160afmr21269591pfq.54.1606777076355;
+ Mon, 30 Nov 2020 14:57:56 -0800 (PST)
+Date:   Mon, 30 Nov 2020 14:57:42 -0800
 In-Reply-To: <20201130225744.3793244-1-danielwinkler@google.com>
-Message-Id: <20201130145609.v6.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
+Message-Id: <20201130145609.v6.3.I74255537fa99ed3c0025321008b361c6ad90a431@changeid>
 Mime-Version: 1.0
 References: <20201130225744.3793244-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v6 1/5] Bluetooth: Add helper to set adv data
+Subject: [PATCH v6 3/5] Bluetooth: Use intervals and tx power from mgmt cmds
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     marcel@holtmann.org
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -81,10 +82,17 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We wish to handle advertising data separately from advertising
-parameters in our new MGMT requests. This change adds a helper that
-allows the advertising data and scan response to be updated for an
-existing advertising instance.
+This patch takes the min/max intervals and tx power optionally provided
+in mgmt interface, stores them in the advertisement struct, and uses
+them when configuring the hci requests. While tx power is not used if
+extended advertising is unavailable, software rotation will use the min
+and max advertising intervals specified by the client.
+
+This change is validated manually by ensuring the min/max intervals are
+propagated to the controller on both hatch (extended advertising) and
+kukui (no extended advertising) chromebooks, and that tx power is
+propagated correctly on hatch. These tests are performed with multiple
+advertisements simultaneously.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Signed-off-by: Daniel Winkler <danielwinkler@google.com>
@@ -96,66 +104,171 @@ Changes in v4: None
 Changes in v3: None
 Changes in v2: None
 
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+ include/net/bluetooth/hci_core.h |  5 ++++-
+ net/bluetooth/hci_core.c         |  8 +++++---
+ net/bluetooth/hci_request.c      | 29 +++++++++++++++++++----------
+ net/bluetooth/mgmt.c             |  8 ++++++--
+ 4 files changed, 34 insertions(+), 16 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9873e1c8cd163b..300b3572d479e1 100644
+index 48d144ae8b57d6..ab168f46b6d909 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1291,6 +1291,9 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+@@ -230,6 +230,8 @@ struct adv_info {
+ 	__u16	scan_rsp_len;
+ 	__u8	scan_rsp_data[HCI_MAX_AD_LENGTH];
+ 	__s8	tx_power;
++	__u32   min_interval;
++	__u32   max_interval;
+ 	bdaddr_t	random_addr;
+ 	bool 		rpa_expired;
+ 	struct delayed_work	rpa_expired_cb;
+@@ -1292,7 +1294,8 @@ struct adv_info *hci_get_next_instance(struct hci_dev *hdev, u8 instance);
+ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
  			 u16 adv_data_len, u8 *adv_data,
  			 u16 scan_rsp_len, u8 *scan_rsp_data,
- 			 u16 timeout, u16 duration);
-+int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
-+			 u16 adv_data_len, u8 *adv_data,
-+			 u16 scan_rsp_len, u8 *scan_rsp_data);
- int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
- void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
- 
+-			 u16 timeout, u16 duration);
++			 u16 timeout, u16 duration, s8 tx_power,
++			 u32 min_interval, u32 max_interval);
+ int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
+ 			 u16 adv_data_len, u8 *adv_data,
+ 			 u16 scan_rsp_len, u8 *scan_rsp_data);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 502552d6e9aff3..35afb63514f38b 100644
+index 35afb63514f38b..3397fc706e87a1 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3005,6 +3005,37 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 	return 0;
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
-+			      u16 adv_data_len, u8 *adv_data,
-+			      u16 scan_rsp_len, u8 *scan_rsp_data)
-+{
-+	struct adv_info *adv_instance;
-+
-+	adv_instance = hci_find_adv_instance(hdev, instance);
-+
-+	/* If advertisement doesn't exist, we can't modify its data */
-+	if (!adv_instance)
-+		return -ENOENT;
-+
-+	if (adv_data_len) {
-+		memset(adv_instance->adv_data, 0,
-+		       sizeof(adv_instance->adv_data));
-+		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
-+		adv_instance->adv_data_len = adv_data_len;
-+	}
-+
-+	if (scan_rsp_len) {
-+		memset(adv_instance->scan_rsp_data, 0,
-+		       sizeof(adv_instance->scan_rsp_data));
-+		memcpy(adv_instance->scan_rsp_data,
-+		       scan_rsp_data, scan_rsp_len);
-+		adv_instance->scan_rsp_len = scan_rsp_len;
-+	}
-+
-+	return 0;
-+}
-+
- /* This function requires the caller holds hdev->lock */
- void hci_adv_monitors_clear(struct hci_dev *hdev)
+@@ -2951,7 +2951,8 @@ static void adv_instance_rpa_expired(struct work_struct *work)
+ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 			 u16 adv_data_len, u8 *adv_data,
+ 			 u16 scan_rsp_len, u8 *scan_rsp_data,
+-			 u16 timeout, u16 duration)
++			 u16 timeout, u16 duration, s8 tx_power,
++			 u32 min_interval, u32 max_interval)
  {
+ 	struct adv_info *adv_instance;
+ 
+@@ -2979,6 +2980,9 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 	adv_instance->flags = flags;
+ 	adv_instance->adv_data_len = adv_data_len;
+ 	adv_instance->scan_rsp_len = scan_rsp_len;
++	adv_instance->min_interval = min_interval;
++	adv_instance->max_interval = max_interval;
++	adv_instance->tx_power = tx_power;
+ 
+ 	if (adv_data_len)
+ 		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
+@@ -2995,8 +2999,6 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 	else
+ 		adv_instance->duration = duration;
+ 
+-	adv_instance->tx_power = HCI_TX_POWER_INVALID;
+-
+ 	INIT_DELAYED_WORK(&adv_instance->rpa_expired_cb,
+ 			  adv_instance_rpa_expired);
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 048d4db9d4ea53..4e31f39df96838 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1443,6 +1443,7 @@ static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
+ void __hci_req_enable_advertising(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
++	struct adv_info *adv_instance;
+ 	struct hci_cp_le_set_adv_param cp;
+ 	u8 own_addr_type, enable = 0x01;
+ 	bool connectable;
+@@ -1450,6 +1451,7 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 	u32 flags;
+ 
+ 	flags = get_adv_instance_flags(hdev, hdev->cur_adv_instance);
++	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
+ 
+ 	/* If the "connectable" instance flag was not set, then choose between
+ 	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
+@@ -1481,11 +1483,16 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	if (connectable) {
+-		cp.type = LE_ADV_IND;
+-
++	if (adv_instance) {
++		adv_min_interval = adv_instance->min_interval;
++		adv_max_interval = adv_instance->max_interval;
++	} else {
+ 		adv_min_interval = hdev->le_adv_min_interval;
+ 		adv_max_interval = hdev->le_adv_max_interval;
++	}
++
++	if (connectable) {
++		cp.type = LE_ADV_IND;
+ 	} else {
+ 		if (get_cur_adv_instance_scan_rsp_len(hdev))
+ 			cp.type = LE_ADV_SCAN_IND;
+@@ -1496,9 +1503,6 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 		    hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE)) {
+ 			adv_min_interval = DISCOV_LE_FAST_ADV_INT_MIN;
+ 			adv_max_interval = DISCOV_LE_FAST_ADV_INT_MAX;
+-		} else {
+-			adv_min_interval = hdev->le_adv_min_interval;
+-			adv_max_interval = hdev->le_adv_max_interval;
+ 		}
+ 	}
+ 
+@@ -2021,9 +2025,15 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	/* In ext adv set param interval is 3 octets */
+-	hci_cpu_to_le24(hdev->le_adv_min_interval, cp.min_interval);
+-	hci_cpu_to_le24(hdev->le_adv_max_interval, cp.max_interval);
++	if (adv_instance) {
++		hci_cpu_to_le24(adv_instance->min_interval, cp.min_interval);
++		hci_cpu_to_le24(adv_instance->max_interval, cp.max_interval);
++		cp.tx_power = adv_instance->tx_power;
++	} else {
++		hci_cpu_to_le24(hdev->le_adv_min_interval, cp.min_interval);
++		hci_cpu_to_le24(hdev->le_adv_max_interval, cp.max_interval);
++		cp.tx_power = HCI_ADV_TX_POWER_NO_PREFERENCE;
++	}
+ 
+ 	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
+ 
+@@ -2046,7 +2056,6 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+-	cp.tx_power = 127;
+ 	cp.handle = instance;
+ 
+ 	if (flags & MGMT_ADV_FLAG_SEC_2M) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ec6b520be368be..668a62c8181eb1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7533,7 +7533,10 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 				   cp->adv_data_len, cp->data,
+ 				   cp->scan_rsp_len,
+ 				   cp->data + cp->adv_data_len,
+-				   timeout, duration);
++				   timeout, duration,
++				   HCI_ADV_TX_POWER_NO_PREFERENCE,
++				   hdev->le_adv_min_interval,
++				   hdev->le_adv_max_interval);
+ 	if (err < 0) {
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				      MGMT_STATUS_FAILED);
+@@ -7741,7 +7744,8 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	/* Create advertising instance with no advertising or response data */
+ 	err = hci_add_adv_instance(hdev, cp->instance, flags,
+-				   0, NULL, 0, NULL, timeout, duration);
++				   0, NULL, 0, NULL, timeout, duration,
++				   tx_power, min_interval, max_interval);
+ 
+ 	if (err < 0) {
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
 -- 
 2.29.2.454.gaff20da3a2-goog
 
