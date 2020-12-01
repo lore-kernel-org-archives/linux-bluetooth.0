@@ -2,109 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5A6C64E7B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57797C64E7A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 20:34:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9084D2151B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:41:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDCED21741
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 20:34:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zj3gtqrX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VzSpAv7z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404311AbgLATlQ (ORCPT
+        id S2387666AbgLAUeY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Dec 2020 14:41:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
+        Tue, 1 Dec 2020 15:34:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404304AbgLATlP (ORCPT
+        with ESMTP id S2387657AbgLAUeV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Dec 2020 14:41:15 -0500
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AC8C0617A7
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Dec 2020 11:40:35 -0800 (PST)
-Received: by mail-pf1-x442.google.com with SMTP id 131so1790416pfb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 11:40:35 -0800 (PST)
+        Tue, 1 Dec 2020 15:34:21 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A604C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Dec 2020 12:33:41 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id u18so7088797lfd.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 12:33:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZMithT29S8jllD7+H9uldq/66FIvtbycuIS3MLZQIFI=;
-        b=Zj3gtqrXb83oqehxe1iIn9KtC1I6YXuo6SvZ597/m+MfZZ/e80P7QDMDndp+oZ4JND
-         Umn6QmSuofSVPrpn5YBhVJl8hFmjnFxliX1P3seM/A7b6ilqQhW6Ym8uHAqfJAbZkqQn
-         WXibjiv1+d8PQ5u7PdjMQgBQC/ffmkj7ty7EY=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nM6kC60+bd7jKDVA8K2nig5T606XGyoCcED6wCJX9z8=;
+        b=VzSpAv7zcv2S8+7NAlXUuEDmPfCxmE3BP44+Jyw1Hlnbic3eKZUkfBiVSyP2sss+MI
+         Ocmkm/Dp378/Gxd+Hyd+zihAMQMMYEkz52AVxirQqTLmB10E9OLyFFmTl7RDyhpguTix
+         faOwKK6NswmXAZ/U+VPTCmB4UlLmcQTrM7FrSwFSHQe2X8UPsHkHvlayV6io4LW44omc
+         DELXlCmeYdWyJoQ1ALbO/ZySRG5YVmJe1XPjHxZlAzjqnnhxQpmnlM0ceJYNsgao0iY0
+         F3d8xhoQ035FMAt8WSXiZK0TyUaTYtNr9g+LxTgFN1YVD4Cbv59XyvNohHkFIbCwl/lu
+         PRAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZMithT29S8jllD7+H9uldq/66FIvtbycuIS3MLZQIFI=;
-        b=CROQMfxVAMWgFkN8UhZVyj4henKh5gyWSZWGmiMGgzgppwHPHSQL/3XRWt9NZfaIP2
-         LTV7OjqCqzuXHkfammMZLKIia6Q1TCa8OE8JRNBLN4+P6SpMvQLHO/Ggexah+wjPfo5M
-         7L7e8DgZ985mUHQXLK40CugDc+zgtc+et3Hb9Gy87335S6Z7KgGTahjwbE430clKImbU
-         xSeKj4T0hg3FSUlyDGnK2TgO9yoQt+0bH31HE/oNWP+RLJwZTRKZdTma3XmZcefl6UBB
-         CqcuyunIKmMiZZVcpH2yAZ7LDeenlvZKCQIQ+rV+KVOfKRITCvpZNuTMhfJD95L/B5WT
-         Ygeg==
-X-Gm-Message-State: AOAM530mNQObHwz17iwHUaRxcFowi3TzGcuir29dY44Pw3+4c7F8USGc
-        /YcfmkN/dJSeAX4Pnn2inoc+z11tbhl0ag==
-X-Google-Smtp-Source: ABdhPJxQR+IaC2C8rXGbWpPJXZV/VNJzfPtseZtvFUXqxMsV8VAtge79HbaBaE0oUpoKiNUXNebXzA==
-X-Received: by 2002:a62:5e81:0:b029:197:baa5:1792 with SMTP id s123-20020a625e810000b0290197baa51792mr3916669pfb.80.1606851634831;
-        Tue, 01 Dec 2020 11:40:34 -0800 (PST)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id y19sm393529pge.15.2020.12.01.11.40.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Dec 2020 11:40:34 -0800 (PST)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
-Subject: [PATCH BlueZ] doc: Update battery API doc
-Date:   Tue,  1 Dec 2020 11:40:21 -0800
-Message-Id: <20201201194021.341363-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nM6kC60+bd7jKDVA8K2nig5T606XGyoCcED6wCJX9z8=;
+        b=gFYf5lGoFQTHN7xw2XgGQS4uJ97vmLj1zZ2PReI9IFvn+az8EOx6ftwOhAEGSGVOQu
+         AfmJzUpTatV6R3P6fxQRxEbmIkfecsgMi/VzWJtoW+MQFWBaFh8W+8yy0kwF0SzGUR4B
+         cC0HUDqH9yUPauLQpnLI2rKk1MXLUNUKjDBgmd+sJNO0UxyTvgH/hCZbfHftNConA88c
+         Le/LJyJCLIJPUp9vvhdmA4KAuTtEeMR/E8384TRo5fWebdifJcwdcoBQqtXgwbSEGjiI
+         jnhxxquaGOSXg4tep87IKh+x4ar+O1RogUSkLgFr+zqvIihJzjqExyOG31oOl00NyfUo
+         WKBQ==
+X-Gm-Message-State: AOAM532IQ5efKQrcP3WfZlfdOqfaT6kIeMSU+GCF9wXvfWAcEu8FeWee
+        sJku4UnmfVlFAq7GcVqXlcACUL2WaQjjY2TxXuqj5i1idQ0zfrZ+pzk=
+X-Google-Smtp-Source: ABdhPJxwgkc73p/c2cKoAxdfVM8rf8bPSY9XWuoSRuutIG+h+2UzwL2q+t1H8YdFmWMHneUpno8zWahOmDuT28cFWVg=
+X-Received: by 2002:a19:8883:: with SMTP id k125mr1970474lfd.10.1606854819421;
+ Tue, 01 Dec 2020 12:33:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201124224658.32605-1-rpigott@berkeley.edu> <5fbd9701.1c69fb81.12fae.4010@mx.google.com>
+ <CABBYNZ+PsG_8E_2j4_p7Qp==MyXKNnPOH=dGJc4T7wh18BNKvQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+PsG_8E_2j4_p7Qp==MyXKNnPOH=dGJc4T7wh18BNKvQ@mail.gmail.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Tue, 1 Dec 2020 15:33:27 -0500
+Message-ID: <CALWDO_Ug-VzXmrTOUmMKgQSqqVx-b_L5rekwnv53d4ynjzyfYg@mail.gmail.com>
+Subject: Re: [BlueZ] main.conf: use correct key for BREDR configuration
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Ronan Pigott <rpigott314@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- doc/battery-api.txt | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+Hi Luiz/Ronan,
 
-diff --git a/doc/battery-api.txt b/doc/battery-api.txt
-index 9a6b4fd39..ec7d593da 100644
---- a/doc/battery-api.txt
-+++ b/doc/battery-api.txt
-@@ -15,12 +15,10 @@ Properties	byte Percentage [readonly]
- 
- 		string Source [readonly, optional, experimental]
- 
--			Describes where the battery information comes from
--			This property is informational only and may be useful
--			for debugging purposes.
--			Providers from BatteryProvider1 may make use of this
--			property to indicate where the battery report comes from
--			(e.g. "HFP 1.7", "HID", or the profile UUID).
-+			Describes where the battery information comes from.
-+			Providers may provide the source information in the form
-+			of the profile UUID where the battery information is
-+			reported.
- 
- 
- Battery Provider Manager hierarchy
-@@ -61,8 +59,8 @@ Object path	{provider_root}/{unique battery object path}
- 
- Properties	Objects provided on this interface contain the same properties
- 		as org.bluez.Battery1 interface. Additionally, this interface
--		needs to have the Device property indicating the object path
--		of the device this battery provides.
-+		needs to have a Device property indicating the object path the
-+		battery information is provided for.
- 
- 		object Device [readonly]
- 
--- 
-2.26.2
+This appears to have been an incorrect fix since
+parse_mode_config(config, "BREDR", params, ARRAY_SIZE(params)); will
+attempt to read from the BREDR section.  My suggestion would be to
+update the group table entry instead:
 
+static const struct group_table {
+const char *name;
+const char **options;
+} valid_groups[] = {
+{ "General", supported_options },
+{ "BREDR", br_options },               //<------
+{ "LE", le_options },
+{ "Policy", policy_options },
+{ "GATT", gatt_options },
+{ "AVDTP", avdtp_options },
+{ }
+};
+
+Thanks,
+Alain
+
+
+On Tue, Nov 24, 2020 at 8:21 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Ronan,
+>
+> On Tue, Nov 24, 2020 at 4:07 PM <bluez.test.bot@gmail.com> wrote:
+> >
+> > This is automated email and please do not reply to this email!
+> >
+> > Dear submitter,
+> >
+> > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=390539
+> >
+> > ---Test result---
+> >
+> > ##############################
+> > Test: CheckPatch - PASS
+> >
+> > ##############################
+> > Test: CheckGitLint - PASS
+> >
+> > ##############################
+> > Test: CheckBuild - PASS
+> >
+> > ##############################
+> > Test: MakeCheck - PASS
+> >
+> >
+> >
+> > ---
+> > Regards,
+> > Linux Bluetooth
+>
+> Applied, thanks.
+>
+>
+> --
+> Luiz Augusto von Dentz
