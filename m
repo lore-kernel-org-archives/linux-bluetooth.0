@@ -2,97 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FA5C71155
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5A6C64E7B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:41:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBDC321741
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9084D2151B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 19:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UM5cmYq9"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zj3gtqrX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731248AbgLATP6 (ORCPT
+        id S2404311AbgLATlQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Dec 2020 14:15:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34178 "EHLO
+        Tue, 1 Dec 2020 14:41:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730229AbgLATP5 (ORCPT
+        with ESMTP id S2404304AbgLATlP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Dec 2020 14:15:57 -0500
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723E4C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Dec 2020 11:15:17 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id f23so6479790ejt.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 11:15:17 -0800 (PST)
+        Tue, 1 Dec 2020 14:41:15 -0500
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AC8C0617A7
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Dec 2020 11:40:35 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id 131so1790416pfb.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 11:40:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hGfjoc4Gq86fDKoTQFIv7ZlHkDfMOnYcGO62SfdlfA4=;
-        b=UM5cmYq9KdfJtYVwHreM5kluKF9vXgydsmcZJBk+IiPO419+VhAS4NBcMm48dY65/1
-         4vSFvjHCYxX0JNkREau3J51LgLs3jisO1E3stibFSx25czj3nhCkVpmy8isfB2EZMdMK
-         3BhqIFXHJn850Z24PlqCiMOe4+lwaFIKPCJjo=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZMithT29S8jllD7+H9uldq/66FIvtbycuIS3MLZQIFI=;
+        b=Zj3gtqrXb83oqehxe1iIn9KtC1I6YXuo6SvZ597/m+MfZZ/e80P7QDMDndp+oZ4JND
+         Umn6QmSuofSVPrpn5YBhVJl8hFmjnFxliX1P3seM/A7b6ilqQhW6Ym8uHAqfJAbZkqQn
+         WXibjiv1+d8PQ5u7PdjMQgBQC/ffmkj7ty7EY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hGfjoc4Gq86fDKoTQFIv7ZlHkDfMOnYcGO62SfdlfA4=;
-        b=LltK6l9zpnBVwR8cZ5rJ15gLS8Os7DLmWTSem2fFJxDiI+jq4VpGFyZ18GpOocjRMr
-         tjmw3FMD9CbGwsU+jZMOBWffRf1fSdWJnG/4T5o1CC8c/z7r65DAVQkweVNruK1rSSCy
-         fjfWudG1RiRPEIlkolN4xTRIZPx7JWNWZtFkQx+ui7yZtrdmdZyEy3sqbPb2FnmrMFeY
-         sceJarX8CETiR346CcnampjBYGLXEjm4GuGv6wH+VNSadbP5azhEzZcctzAqga5lXl3h
-         ap5IoBIKoaAn16B/E5fFw4W9aihIVwwVeQsYtjDcZishbdLLSQKb4ET5NnkJxWBErFvm
-         Au0g==
-X-Gm-Message-State: AOAM530yPKY6c4NFHStb2FgsCYC0vjPNkAwuUpZTiC6y10TsGYF8a0Fm
-        jOl6yJQ+YccvqleTaTYOmodpujD43fgDzQ==
-X-Google-Smtp-Source: ABdhPJzbqk5ybOVmdhVS/2ouv94PCQK+uyIat1WgsxOmZP7qCK0m6p3EivVGAobDX/Haux+0y1aljA==
-X-Received: by 2002:a17:906:ccc5:: with SMTP id ot5mr4515817ejb.248.1606850115831;
-        Tue, 01 Dec 2020 11:15:15 -0800 (PST)
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com. [209.85.221.52])
-        by smtp.gmail.com with ESMTPSA id e21sm327491edv.96.2020.12.01.11.15.14
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Dec 2020 11:15:14 -0800 (PST)
-Received: by mail-wr1-f52.google.com with SMTP id u12so4469918wrt.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 11:15:14 -0800 (PST)
-X-Received: by 2002:adf:a451:: with SMTP id e17mr5699071wra.99.1606850114053;
- Tue, 01 Dec 2020 11:15:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20201130215602.386545-1-sonnysasaka@chromium.org>
- <5fc5738c.1c69fb81.8e7df.5ba8@mx.google.com> <CABBYNZKGAujDpR3V4hRhsgSKO_UpYk9C1ge1w5rLg-jGFVc4pw@mail.gmail.com>
- <f2fbc270588a75ccebb8e14590b37b7c6bddab60.camel@hadess.net>
-In-Reply-To: <f2fbc270588a75ccebb8e14590b37b7c6bddab60.camel@hadess.net>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZMithT29S8jllD7+H9uldq/66FIvtbycuIS3MLZQIFI=;
+        b=CROQMfxVAMWgFkN8UhZVyj4henKh5gyWSZWGmiMGgzgppwHPHSQL/3XRWt9NZfaIP2
+         LTV7OjqCqzuXHkfammMZLKIia6Q1TCa8OE8JRNBLN4+P6SpMvQLHO/Ggexah+wjPfo5M
+         7L7e8DgZ985mUHQXLK40CugDc+zgtc+et3Hb9Gy87335S6Z7KgGTahjwbE430clKImbU
+         xSeKj4T0hg3FSUlyDGnK2TgO9yoQt+0bH31HE/oNWP+RLJwZTRKZdTma3XmZcefl6UBB
+         CqcuyunIKmMiZZVcpH2yAZ7LDeenlvZKCQIQ+rV+KVOfKRITCvpZNuTMhfJD95L/B5WT
+         Ygeg==
+X-Gm-Message-State: AOAM530mNQObHwz17iwHUaRxcFowi3TzGcuir29dY44Pw3+4c7F8USGc
+        /YcfmkN/dJSeAX4Pnn2inoc+z11tbhl0ag==
+X-Google-Smtp-Source: ABdhPJxQR+IaC2C8rXGbWpPJXZV/VNJzfPtseZtvFUXqxMsV8VAtge79HbaBaE0oUpoKiNUXNebXzA==
+X-Received: by 2002:a62:5e81:0:b029:197:baa5:1792 with SMTP id s123-20020a625e810000b0290197baa51792mr3916669pfb.80.1606851634831;
+        Tue, 01 Dec 2020 11:40:34 -0800 (PST)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
+        by smtp.gmail.com with ESMTPSA id y19sm393529pge.15.2020.12.01.11.40.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Dec 2020 11:40:34 -0800 (PST)
 From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Tue, 1 Dec 2020 11:15:02 -0800
-X-Gmail-Original-Message-ID: <CAO271mmD+MbWOScUXiFc2x0r0qOY+2yQF-39hbco4mK92qdpyw@mail.gmail.com>
-Message-ID: <CAO271mmD+MbWOScUXiFc2x0r0qOY+2yQF-39hbco4mK92qdpyw@mail.gmail.com>
-Subject: Re: [BlueZ,v5,1/7] battery: Add the internal Battery API
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] doc: Update battery API doc
+Date:   Tue,  1 Dec 2020 11:40:21 -0800
+Message-Id: <20201201194021.341363-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+---
+ doc/battery-api.txt | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-I will send a separate patch to update the doc.
+diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+index 9a6b4fd39..ec7d593da 100644
+--- a/doc/battery-api.txt
++++ b/doc/battery-api.txt
+@@ -15,12 +15,10 @@ Properties	byte Percentage [readonly]
+ 
+ 		string Source [readonly, optional, experimental]
+ 
+-			Describes where the battery information comes from
+-			This property is informational only and may be useful
+-			for debugging purposes.
+-			Providers from BatteryProvider1 may make use of this
+-			property to indicate where the battery report comes from
+-			(e.g. "HFP 1.7", "HID", or the profile UUID).
++			Describes where the battery information comes from.
++			Providers may provide the source information in the form
++			of the profile UUID where the battery information is
++			reported.
+ 
+ 
+ Battery Provider Manager hierarchy
+@@ -61,8 +59,8 @@ Object path	{provider_root}/{unique battery object path}
+ 
+ Properties	Objects provided on this interface contain the same properties
+ 		as org.bluez.Battery1 interface. Additionally, this interface
+-		needs to have the Device property indicating the object path
+-		of the device this battery provides.
++		needs to have a Device property indicating the object path the
++		battery information is provided for.
+ 
+ 		object Device [readonly]
+ 
+-- 
+2.26.2
 
-On Tue, Dec 1, 2020 at 8:29 AM Bastien Nocera <hadess@hadess.net> wrote:
->
-> On Mon, 2020-11-30 at 16:27 -0800, Luiz Augusto von Dentz wrote:
-> > Hi Sonny,
-> > <snip>
-> > Applied, thanks.
->
-> Missed it :/
-> Any chance you could update the org.bluez.BatteryProvider1 docs as per
-> my review?
->
-> Cheers
->
