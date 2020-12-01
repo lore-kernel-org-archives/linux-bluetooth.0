@@ -2,125 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0199C83014
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 10:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AE2C64E7B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 16:26:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B06302084C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 10:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C70CB206A5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Dec 2020 16:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729890AbgLAKbB (ORCPT
+        id S1726634AbgLAQ0E (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Dec 2020 05:31:01 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:49841 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726844AbgLAKa6 (ORCPT
+        Tue, 1 Dec 2020 11:26:04 -0500
+Received: from relay2-d.mail.gandi.net ([217.70.183.194]:57179 "EHLO
+        relay2-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725979AbgLAQ0D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Dec 2020 05:30:58 -0500
-Received: by mail-io1-f72.google.com with SMTP id v15so950927ioq.16
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Dec 2020 02:30:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=LnGh/kj+vjT8bBp6zIAdmGeuUMdRP3zSK+My+D46Z4Q=;
-        b=LWuGg879XZsGxhm67eN095zouHwxwbrUWyoyVoVd80fqV7oGc4Ee0dwNAvqwuJTQcx
-         SSnQVu8gJTYZK+9CPiQpS0ix3R1dN4pzvRIUe9fY1+rM2ETDSPqmtN/rvk0ADq9n202X
-         6pIHLy2D2Wm+9lCb28658/n2bgvgJF7ffW9lFVUIxJ8bgfk0IkmsWhUbWvE8/bx80TeV
-         SyKpImfDKdpjFXwXbt2u6PHW060/R4u1EI4GSCsv4AHMS5YM9zAGWjDfgD+npugz74U+
-         zKte1s0DxypOjpLThLaUVbotGkmRDSppnTaJ2znWlZ5Sw54vIkW0Gy23iGYCp/iJYuqS
-         QVyA==
-X-Gm-Message-State: AOAM532vZtZtIMLG9A59AEKS7GXCI/MWA2o437J/t71ajZpFhd0jU+QF
-        HpLIennlPGvnzBcHHqIO20GCr4on7ej6lbhMXtzQNO3Lh8Od
-X-Google-Smtp-Source: ABdhPJxM0XF90tKHRpoDQ7KGp3XQzHr8nrDlkeKx9eaEUgmXCymcKnpJeIfNMMFwNR4BQ4KCtjyldDA5iq5F5qn/y0RYvfwQ1EGH
-MIME-Version: 1.0
-X-Received: by 2002:a5e:841a:: with SMTP id h26mr282071ioj.54.1606818617777;
- Tue, 01 Dec 2020 02:30:17 -0800 (PST)
-Date:   Tue, 01 Dec 2020 02:30:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ee624105b5649cc7@google.com>
-Subject: KASAN: global-out-of-bounds Read in lock_sock_nested
-From:   syzbot <syzbot+92de81bbc21385b15723@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+        Tue, 1 Dec 2020 11:26:03 -0500
+X-Originating-IP: 82.255.60.242
+Received: from [192.168.0.28] (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
+        (Authenticated sender: hadess@hadess.net)
+        by relay2-d.mail.gandi.net (Postfix) with ESMTPSA id 52CC140004;
+        Tue,  1 Dec 2020 16:25:21 +0000 (UTC)
+Message-ID: <e82cef2e672e9b7f413341264f82d90c3c268cf3.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v5 4/7] doc: Add Battery Provider API doc
+From:   Bastien Nocera <hadess@hadess.net>
+To:     Sonny Sasaka <sonnysasaka@chromium.org>,
+        linux-bluetooth@vger.kernel.org
+Cc:     Miao-chen Chou <mcchou@chromium.org>
+Date:   Tue, 01 Dec 2020 17:25:20 +0100
+In-Reply-To: <20201130215602.386545-4-sonnysasaka@chromium.org>
+References: <20201130215602.386545-1-sonnysasaka@chromium.org>
+         <20201130215602.386545-4-sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.1 (3.38.1-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Mon, 2020-11-30 at 13:55 -0800, Sonny Sasaka wrote:
+> This patch add the documentation of the Battery Provider which lets
+> external clients feed battery information to BlueZ if they are able
+> to
+> decode battery reporting via any profile. BlueZ UI clients can then
+> use
+> the org.bluez.Battery1 API as a single source of battery information
+> coming from many different profiles.
+> 
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> 
+> ---
+>  doc/battery-api.txt | 55
+> +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/doc/battery-api.txt b/doc/battery-api.txt
+> index dc7dbeda2..9a6b4fd39 100644
+> --- a/doc/battery-api.txt
+> +++ b/doc/battery-api.txt
+> @@ -12,3 +12,58 @@ Object path  [variable
+> prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>  Properties     byte Percentage [readonly]
+>  
+>                         The percentage of battery left as an unsigned
+> 8-bit integer.
+> +
+> +               string Source [readonly, optional, experimental]
+> +
+> +                       Describes where the battery information comes
+> from
+> +                       This property is informational only and may
+> be useful
+> +                       for debugging purposes.
+> +                       Providers from BatteryProvider1 may make use
+> of this
+> +                       property to indicate where the battery report
+> comes from
+> +                       (e.g. "HFP 1.7", "HID", or the profile UUID).
+> +
+> +
+> +Battery Provider Manager hierarchy
+> +==================================
+> +A battery provider starts by registering itself as a battery
+> provider with the
+> +RegisterBatteryProvider method passing an object path as the
+> provider ID. Then,
+> +it can start exposing org.bluez.BatteryProvider1 objects having the
+> path
+> +starting with the given provider ID. It can also remove objects at
+> any time.
+> +The objects and their properties exposed by battery providers will
+> be reflected
+> +on org.bluez.Battery1 interface.
+> +
+> +BlueZ will stop monitoring these exposed and removed objects after
+> +UnregisterBatteryProvider is called for that provider ID.
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.BatteryProviderManager1 [experimental]
+> +Object path    /org/bluez/{hci0,hci1,...}
+> +
+> +Methods                void RegisterBatteryProvider(object provider)
+> +
+> +                       This registers a battery provider. A
+> registered
+> +                       battery provider can then expose objects with
+> +                       org.bluez.BatteryProvider1 interface
+> described below.
+> +
+> +               void UnregisterBatteryProvider(object provider)
+> +
+> +                       This unregisters a battery provider. After
+> +                       unregistration, the BatteryProvider1 objects
+> provided
+> +                       by this client are ignored by BlueZ.
+> +
+> +
+> +Battery Provider hierarchy
+> +==========================
+> +
+> +Service                <client D-Bus address>
+> +Interface      org.bluez.BatteryProvider1 [experimental]
+> +Object path    {provider_root}/{unique battery object path}
+> +
+> +Properties     Objects provided on this interface contain the same properties
+> +               as org.bluez.Battery1 interface. Additionally, this interface
+> +               needs to have the Device property indicating the object path
+> +               of the device this battery provides.
 
-syzbot found the following issue on:
+"this interface needs to have a Device property indicating the object
+path this battery information pertains to."
+or
+"this interface needs to have a Device property indicating the object
+path the battery information is provided for."
 
-HEAD commit:    d3d45f82 Merge tag 'pinctrl-v5.9-2' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15e6bca3900000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=89ab6a0c48f30b49
-dashboard link: https://syzkaller.appspot.com/bug?extid=92de81bbc21385b15723
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+92de81bbc21385b15723@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: global-out-of-bounds in instrument_atomic_read include/linux/instrumented.h:56 [inline]
-BUG: KASAN: global-out-of-bounds in test_bit include/asm-generic/bitops/instrumented-non-atomic.h:110 [inline]
-BUG: KASAN: global-out-of-bounds in __lock_acquire+0xfa0/0x5780 kernel/locking/lockdep.c:4411
-Read of size 8 at addr ffffffff890f9b18 by task kworker/1:0/17
-
-CPU: 1 PID: 17 Comm: kworker/1:0 Not tainted 5.9.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x198/0x1fd lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0x5/0x497 mm/kasan/report.c:383
- __kasan_report mm/kasan/report.c:513 [inline]
- kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
- check_memory_region_inline mm/kasan/generic.c:186 [inline]
- check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
- instrument_atomic_read include/linux/instrumented.h:56 [inline]
- test_bit include/asm-generic/bitops/instrumented-non-atomic.h:110 [inline]
- __lock_acquire+0xfa0/0x5780 kernel/locking/lockdep.c:4411
- lock_acquire+0x1f3/0xaf0 kernel/locking/lockdep.c:5029
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
- _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
- spin_lock_bh include/linux/spinlock.h:359 [inline]
- lock_sock_nested+0x3b/0x110 net/core/sock.c:3048
- l2cap_sock_teardown_cb+0x88/0x400 net/bluetooth/l2cap_sock.c:1520
- l2cap_chan_del+0xad/0x1300 net/bluetooth/l2cap_core.c:618
- l2cap_chan_close+0x118/0xb10 net/bluetooth/l2cap_core.c:823
- l2cap_chan_timeout+0x173/0x450 net/bluetooth/l2cap_core.c:436
- process_one_work+0x94c/0x1670 kernel/workqueue.c:2269
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2415
- kthread+0x3b5/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-
-The buggy address belongs to the variable:
- rtl8150_table+0x9f8/0x26e0
-
-Memory state around the buggy address:
- ffffffff890f9a00: 00 05 f9 f9 f9 f9 f9 f9 00 00 00 06 f9 f9 f9 f9
- ffffffff890f9a80: 00 00 05 f9 f9 f9 f9 f9 00 00 00 f9 f9 f9 f9 f9
->ffffffff890f9b00: 00 00 07 f9 f9 f9 f9 f9 00 00 00 02 f9 f9 f9 f9
-                            ^
- ffffffff890f9b80: 00 00 07 f9 f9 f9 f9 f9 00 00 f9 f9 f9 f9 f9 f9
- ffffffff890f9c00: 07 f9 f9 f9 f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9
-==================================================================
+> +
+> +               object Device [readonly]
+> +
+> +                       The object path of the device that has this
+> battery.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
