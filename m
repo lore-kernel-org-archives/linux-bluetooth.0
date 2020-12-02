@@ -2,101 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 275F7C83029
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Dec 2020 12:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A865FC64E7C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Dec 2020 13:46:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCBD72223F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Dec 2020 12:53:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F1AF208FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Dec 2020 13:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727151AbgLBMxM (ORCPT
+        id S1727990AbgLBNqY convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Dec 2020 07:53:12 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:54633 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbgLBMxM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Dec 2020 07:53:12 -0500
-Received: from orion.localdomain ([77.7.48.174]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1N6srH-1k75n72UEp-018Nq0; Wed, 02 Dec 2020 13:50:06 +0100
-From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     davem@davemloft.net, kuba@kernel.org, mareklindner@neomailbox.ch,
-        sw@simonwunderlich.de, a@unstable.cc, sven@narfation.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com, roopa@nvidia.com,
-        nikolay@nvidia.com, edumazet@google.com, kuznet@ms2.inr.ac.ru,
-        yoshfuji@linux-ipv6.org, jmaloy@redhat.com, ying.xue@windriver.com,
-        kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        john.fastabend@gmail.com, kpsingh@chromium.org,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
-Subject: [PATCH 1/7] net: 8021q: remove unneeded MODULE_VERSION() usage
-Date:   Wed,  2 Dec 2020 13:49:53 +0100
-Message-Id: <20201202124959.29209-1-info@metux.net>
-X-Mailer: git-send-email 2.11.0
-X-Provags-ID: V03:K1:14LCbfn7CIm5dANaBLGKWLgN3xQE4jDUCMo9evmbx9Co8uVlQ6w
- AJFD6ZJ02fqB/4hkD8UvpR4MIY+/p78jpG5aWRjgTooqf+IEH1eqCBcShQ2vV0dQpZD0PsW
- 05u5MlL8i5N7ZlPrZ7WXbFUNvvFZsQXgZIGpcP3ZrL1oewC6MVHvqtu//f0C4Yd8k+NfXYW
- VmowlQvXdv7smIRHA6edw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UEMJ2Q5iJaA=:yleuAQn1i2Rjq/ui4VdE+g
- jyh2pVLY6s01oGU46RcJlPLxSSX8L2w/MBwEmg20CK/7Y310Z8JlnqRGDpqOM2nJS5End/sP4
- /9Y1onXdJEthEHAa9BhU58Pusym8OBWDtyGF2XsodDUOCLKO8Al2CEIPKNwkS7PYWLzUetR1u
- 6d1JaWAKKnYd0bQb4e/+Rn24Bv8Hwjp283Oc/mJZgpdGd1YNZapCGRlUHnDPGMvLvbAQ4suoX
- K+qAXCsVWaWIdCkwo5qNVHF2IP7XbGZ74/fYL0MRsOi+/PZ9Ibn6yD2QQuUvJzs0/dmQvKbzv
- sAqugRZrYpsuSsj3PnTQPdjGB8zs3Qs8ObLlivdv6bthFn3+TxlFxmTZJ66mNuyYS4u/hwzBI
- cHIUHiSeDY4ksdHCmLz6WWwusj+S5xSj2/yUf7nw695XokUprP0W5b5CKP7Zw
+        Wed, 2 Dec 2020 08:46:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54816 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726186AbgLBNqY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Dec 2020 08:46:24 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 210453] New: rtl8822cu device : "Bluetooth : No device found"
+Date:   Wed, 02 Dec 2020 13:45:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: forum.viennet@free.fr
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-210453-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Remove MODULE_VERSION(), as it isn't needed at all: the only version
-making sense is the kernel version.
+https://bugzilla.kernel.org/show_bug.cgi?id=210453
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+            Bug ID: 210453
+           Summary: rtl8822cu device : "Bluetooth : No device found"
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.9.12 mainline
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: blocking
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: forum.viennet@free.fr
+        Regression: No
+
+Hi,
+
+The bluetooth with device rtl8822cu does not work with 5.9.12 mainline kernel
+(and all 5.9 kernel).
+
+Before it worked fine with 5.8.0 mainline kernel.
+
+A similar problem was solved for rl8822ce in 5.9.11 kernel by arch.
+Discussion here : https://bbs.archlinux.org/viewtopic.php?pid=1940003#p1940003
+
+I'm new here, so let me know what attachment you need.
+
+Thank you.
+
+meloli@Asus-A17:~$ sudo dmesg | grep -i bluetooth
+[ 1.476073] usb 5-1: Product: Bluetooth Radio
+[ 3.977975] Bluetooth: Core ver 2.22
+[ 3.978022] Bluetooth: HCI device and connection manager initialized
+[ 3.978030] Bluetooth: HCI socket layer initialized
+[ 3.978035] Bluetooth: L2CAP socket layer initialized
+[ 3.978043] Bluetooth: SCO socket layer initialized
+[ 4.002039] Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000c lmp_ver=0a
+lmp_subver=8822
+[ 4.003996] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[ 4.004001] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_fw.bin
+[ 4.006885] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_config.bin
+[ 4.007705] Bluetooth: hci0: RTL: cfg_sz 6, total sz 31422
+[ 4.283989] Bluetooth: hci0: RTL: fw version 0x09993aa1
+[ 4.933204] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[ 4.933207] Bluetooth: BNEP filters: protocol multicast
+[ 4.933214] Bluetooth: BNEP socket layer initialized
+[ 1422.650815] Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000c
+lmp_ver=0a lmp_subver=8822
+[ 1422.652695] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[ 1422.652725] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_fw.bin
+[ 1422.652877] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_config.bin
+[ 1422.653058] Bluetooth: hci0: RTL: cfg_sz 6, total sz 31422
+[ 1422.931399] Bluetooth: hci0: RTL: fw version 0x09993aa1
+[ 1632.862056] Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=0999
+lmp_ver=0a lmp_subver=3aa1
+[ 1632.862064] Bluetooth: hci0: RTL: unknown IC info, lmp subver 3aa1, hci rev
+0999, hci ver 000a
+[ 1632.862065] Bluetooth: hci0: RTL: assuming no firmware upload needed
+meloli@Asus-A17:~$ lsmod|grep blue
+bluetooth 647168 12 btrtl,btintel,btbcm,bnep,btusb
+ecdh_generic 16384 1 bluetooth
+
+meloli@Asus-A17:~$ lsusb
+Bus 006 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 005 Device 002: ID 13d3:3548 IMC Networks Bluetooth Radio
+Bus 005 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 004 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9
+G2
+Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 003 Device 003: ID 13d3:56a2 IMC Networks USB2.0 HD UVC WebCam
+Bus 003 Device 002: ID 046d:c52b Logitech, Inc. Unifying Receiver
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+meloli@Asus-A17:~$ rfkill list all
+1: phy0: Wireless LAN
+        Soft blocked: no
+        Hard blocked: no
+3: hci0: Bluetooth
+        Soft blocked: no
+        Hard blocked: no
 ---
- net/8021q/vlan.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ProblemType: Bug
+ApportVersion: 2.20.11-0ubuntu27.13
+Architecture: amd64
+CasperMD5CheckResult: skip
+CurrentDesktop: KDE
+DistroRelease: Ubuntu 20.04
+InstallationDate: Installed on 2020-09-18 (75 days ago)
+InstallationMedia: Kubuntu 20.04.1 LTS "Focal Fossa" - Release amd64 (20200731)
+NonfreeKernelModules: nvidia_modeset nvidia
+Package: linux (not installed)
+Tags: focal
+Uname: Linux 5.9.12-050912-generic x86_64
+UnreportableReason: The running kernel is not an Ubuntu kernel
+UpgradeStatus: No upgrade log present (probably fresh install)
+UserGroups: adm cdrom dip lp lpadmin lxd plugdev sambashare sudo vboxusers
+_MarkForUpload: True
 
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index f292e0267bb9..683e9e825b9e 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -36,15 +36,10 @@
- #include "vlan.h"
- #include "vlanproc.h"
- 
--#define DRV_VERSION "1.8"
--
- /* Global VLAN variables */
- 
- unsigned int vlan_net_id __read_mostly;
- 
--const char vlan_fullname[] = "802.1Q VLAN Support";
--const char vlan_version[] = DRV_VERSION;
--
- /* End of global variables definitions. */
- 
- static int vlan_group_prealloc_vid(struct vlan_group *vg,
-@@ -687,7 +682,7 @@ static int __init vlan_proto_init(void)
- {
- 	int err;
- 
--	pr_info("%s v%s\n", vlan_fullname, vlan_version);
-+	pr_info("802.1Q VLAN Support\n");
- 
- 	err = register_pernet_subsys(&vlan_net_ops);
- 	if (err < 0)
-@@ -743,4 +738,3 @@ module_init(vlan_proto_init);
- module_exit(vlan_cleanup_module);
- 
- MODULE_LICENSE("GPL");
--MODULE_VERSION(DRV_VERSION);
 -- 
-2.11.0
-
+You are receiving this mail because:
+You are the assignee for the bug.
