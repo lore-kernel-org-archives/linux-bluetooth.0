@@ -2,224 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B6AC64E8A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BA3C64E8A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FD0322241
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB53722245
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730439AbgLCMVL (ORCPT
+        id S1730120AbgLCMrx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 07:21:11 -0500
-Received: from alexa-out.qualcomm.com ([129.46.98.28]:3504 "EHLO
-        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbgLCMVL (ORCPT
+        Thu, 3 Dec 2020 07:47:53 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:53060 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726390AbgLCMrw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 07:21:11 -0500
-Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
-  by alexa-out.qualcomm.com with ESMTP; 03 Dec 2020 04:20:31 -0800
-X-QCInternal: smtphost
-Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
-  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 03 Dec 2020 04:20:28 -0800
-X-QCInternal: smtphost
-Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 03 Dec 2020 17:50:04 +0530
-Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
-        id 468701FE60; Thu,  3 Dec 2020 17:50:03 +0530 (IST)
-From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Subject: [PATCH v3] Bluetooth: hci_qca: Add support to read FW build version for WCN3991 BTSoC
-Date:   Thu,  3 Dec 2020 17:50:01 +0530
-Message-Id: <1606998001-17424-1-git-send-email-gubbaven@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Thu, 3 Dec 2020 07:47:52 -0500
+Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 03DFBCECFB;
+        Thu,  3 Dec 2020 13:54:19 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
+Subject: Re: [PATCH v6 0/5] Bluetooth: Add new MGMT interface for advertising
+ add
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20201130225744.3793244-1-danielwinkler@google.com>
+Date:   Thu, 3 Dec 2020 13:47:02 +0100
+Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7F86588C-4CB8-43C7-A6D0-25C9BF722C56@holtmann.org>
+References: <20201130225744.3793244-1-danielwinkler@google.com>
+To:     Daniel Winkler <danielwinkler@google.com>
+X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support to read FW build version from debugfs node.
-This info can be read from
-/sys/kernel/debug/bluetooth/hci0/ibs/fw_build_info
+Hi Daniel,
 
-Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
----
- drivers/bluetooth/btqca.c   | 48 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btqca.h   |  8 ++++++++
- drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++++
- 3 files changed, 90 insertions(+)
+> This patch series defines the new two-call MGMT interface for adding
+> new advertising instances. Similarly to the hci advertising commands, a
+> mgmt call to set parameters is expected to be first, followed by a mgmt
+> call to set advertising data/scan response. The members of the
+> parameters request are optional; the caller defines a "params" bitfield
+> in the structure that indicates which parameters were intentionally set,
+> and others are set to defaults.
+> 
+> The main feature here is the introduction of min/max parameters and tx
+> power that can be requested by the client. Min/max parameters will be
+> used both with and without extended advertising support, and tx power
+> will be used with extended advertising support. After a call to set
+> advertising parameters, the selected transmission power will be
+> propagated in the reponse to alert userspace to the actual power used.
+> 
+> Additionally, to inform userspace of the controller LE Tx power
+> capabilities for the client's benefit, this series also changes the
+> security info MGMT command to more flexibly contain other capabilities,
+> such as LE min and max tx power.
+> 
+> All changes have been tested on hatch (extended advertising) and kukui
+> (no extended advertising) chromebooks with manual testing verifying
+> correctness of parameters/data in btmon traces, and our automated test
+> suite of 25 single- and multi-advertising usage scenarios.
+> 
+> A separate patch series will add support in bluetoothd. Thanks in
+> advance for your feedback!
+> 
+> Daniel Winkler
+> 
+> 
+> Changes in v6:
+> - Only populate LE tx power range if controller reports it
+> 
+> Changes in v5:
+> - Ensure data/scan rsp length is returned for non-ext adv
+> 
+> Changes in v4:
+> - Add remaining data and scan response length to MGMT params response
+> - Moving optional params into 'flags' field of MGMT command
+> - Combine LE tx range into a single EIR field for MGMT capabilities cmd
+> 
+> Changes in v3:
+> - Adding selected tx power to adv params mgmt response, removing event
+> - Re-using security info MGMT command to carry controller capabilities
+> 
+> Changes in v2:
+> - Fixed sparse error in Capabilities MGMT command
+> 
+> Daniel Winkler (5):
+>  Bluetooth: Add helper to set adv data
+>  Bluetooth: Break add adv into two mgmt commands
+>  Bluetooth: Use intervals and tx power from mgmt cmds
+>  Bluetooth: Query LE tx power on startup
+>  Bluetooth: Change MGMT security info CMD to be more generic
+> 
+> include/net/bluetooth/hci.h      |   7 +
+> include/net/bluetooth/hci_core.h |  12 +-
+> include/net/bluetooth/mgmt.h     |  49 +++-
+> net/bluetooth/hci_core.c         |  47 +++-
+> net/bluetooth/hci_event.c        |  19 ++
+> net/bluetooth/hci_request.c      |  29 ++-
+> net/bluetooth/mgmt.c             | 430 +++++++++++++++++++++++++++++--
+> 7 files changed, 548 insertions(+), 45 deletions(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index f85a55a..660eea5 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -94,6 +94,54 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- }
- EXPORT_SYMBOL_GPL(qca_read_soc_version);
- 
-+int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build)
-+{
-+	struct sk_buff *skb;
-+	struct edl_event_hdr *edl;
-+	char cmd;
-+	int err = 0;
-+	int build_lbl_len;
-+
-+	bt_dev_dbg(hdev, "QCA read fw build info");
-+
-+	cmd = EDL_GET_BUILD_INFO_CMD;
-+	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
-+				&cmd, 0, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Reading QCA fw build info failed (%d)",
-+			   err);
-+		return err;
-+	}
-+
-+	edl = (struct edl_event_hdr *)(skb->data);
-+	if (!edl) {
-+		bt_dev_err(hdev, "QCA read fw build info with no header");
-+		err = -EILSEQ;
-+		goto out;
-+	}
-+
-+	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
-+	    edl->rtype != EDL_GET_BUILD_INFO_CMD) {
-+		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
-+			   edl->rtype);
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	build_lbl_len = edl->data[0];
-+	if (build_lbl_len <= QCA_FW_BUILD_VER_LEN - 2) {
-+		memcpy(fw_build, &edl->data[1], build_lbl_len);
-+		*(fw_build + build_lbl_len) = '\n';
-+		*(fw_build + build_lbl_len + 1) = '\0';
-+	}
-+
-+out:
-+	kfree_skb(skb);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(qca_read_fw_build_info);
-+
- static int qca_send_reset(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index e73b8f8..ac1b76a 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -11,6 +11,7 @@
- #define EDL_PATCH_CMD_LEN		(1)
- #define EDL_PATCH_VER_REQ_CMD		(0x19)
- #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
-+#define EDL_GET_BUILD_INFO_CMD		(0x20)
- #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
- #define MAX_SIZE_PER_TLV_SEGMENT	(243)
- #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
-@@ -154,6 +155,7 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
- 			 enum qca_btsoc_type);
- int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
-+int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build);
- static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
- {
- 	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
-@@ -195,4 +197,10 @@ static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static inline int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- #endif
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 4a96368..56616b0 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -180,6 +180,7 @@ struct qca_data {
- 	u64 rx_votes_off;
- 	u64 votes_on;
- 	u64 votes_off;
-+	u8 fw_build[QCA_FW_BUILD_VER_LEN];
- };
- 
- enum qca_speed_type {
-@@ -621,12 +622,33 @@ static int qca_open(struct hci_uart *hu)
- 	return 0;
- }
- 
-+static ssize_t fw_build_read(struct file *file, char __user *user_buf,
-+			     size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct qca_data *qca = hu->priv;
-+	u8 length = 0;
-+
-+	length = strlen(qca->fw_build);
-+
-+	return simple_read_from_buffer(user_buf, count, ppos, qca->fw_build,
-+				       length);
-+}
-+
-+static const struct file_operations fw_build_fops = {
-+	.open = simple_open,
-+	.read = fw_build_read,
-+};
-+
- static void qca_debugfs_init(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
- 	struct dentry *ibs_dir;
- 	umode_t mode;
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-+	int ret;
- 
- 	if (!hdev->debugfs)
- 		return;
-@@ -659,12 +681,24 @@ static void qca_debugfs_init(struct hci_dev *hdev)
- 	debugfs_create_u64("votes_off", mode, ibs_dir, &qca->votes_off);
- 	debugfs_create_u32("vote_on_ms", mode, ibs_dir, &qca->vote_on_ms);
- 	debugfs_create_u32("vote_off_ms", mode, ibs_dir, &qca->vote_off_ms);
-+	if (soc_type == QCA_WCN3991) {
-+		debugfs_create_file("fw_build_info", mode, ibs_dir, hdev,
-+				    &fw_build_fops);
-+	}
- 
- 	/* read/write */
- 	mode = 0644;
- 	debugfs_create_u32("wake_retrans", mode, ibs_dir, &qca->wake_retrans);
- 	debugfs_create_u32("tx_idle_delay", mode, ibs_dir,
- 			   &qca->tx_idle_delay);
-+
-+	if (soc_type == QCA_WCN3991) {
-+		/* get fw build info and log into debugfs fw_build_info */
-+		ret = qca_read_fw_build_info(hdev, qca->fw_build);
-+		if (ret < 0)
-+			bt_dev_err(hdev, "QCA read fw build info failed (%d)",
-+				   ret);
-+	}
- }
- 
- /* Flush protocol data */
--- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
-of Code Aurora Forum, hosted by The Linux Foundation
+I am having problem with patch 3/5 which does not apply cleanly against bluetooth-next. Can you please fix it and re-send. Thanks.
+
+Regards
+
+Marcel
 
