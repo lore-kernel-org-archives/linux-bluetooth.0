@@ -8,105 +8,112 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0F8C6369E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 03:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 988BDC71155
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 03:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88BAF21D91
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 03:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C52422203
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 03:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbgLCDrx (ORCPT
+        id S1726997AbgLCDry (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Dec 2020 22:47:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53768 "EHLO
+        Wed, 2 Dec 2020 22:47:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726734AbgLCDrx (ORCPT
+        with ESMTP id S1726734AbgLCDry (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Dec 2020 22:47:53 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBC4DC061A4D
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Dec 2020 19:47:12 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id b9so595075qvj.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Dec 2020 19:47:12 -0800 (PST)
+        Wed, 2 Dec 2020 22:47:54 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B163C061A4E
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Dec 2020 19:47:14 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x20so527670pfm.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Dec 2020 19:47:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=HrscAejiPtaiY78VeFUfBvygFWbXvuDCBIOPXXdZXXw=;
-        b=I3BAo+CQDMKenAVWONaVeKoFj1nJ8aUQrxRmmOyyVqjo3fUyRisox8QicXrdflSlgi
-         pj0JoLQcCO8uzVDf0/2AkNCXJZCmiuuBlEkYMTEcdNt8bFgu19xwhahc6mbSBEtPljI1
-         LNDstbXvDXDPWHnCRYk01L8IXshBRGBv70Nrov3QdFwU+Iq78XVekHgOVUUBOTSuejQG
-         fp18db2thE2YyZj6Z5xVzwige8Gob4S8mP1AJkPVFo9WLTMoCzxiKwy7PcYbOrKeGJTy
-         MNjZuhLJznYiN5K9cNrlYbsvJTIkIK9vkSo/y00Zw0t7rIze18FaImihp4BpNLNwkldO
-         K4dQ==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=jKE1fzmF+1i6YEqkOcdAvk/VjuKcJZEF7TWgZDzeRlo=;
+        b=eQy3b8dngbaYYpnvVxTCYLE9hUW+QkrA7SQzZYb30yFvT68rvfVNdT7ts+nG8TXreJ
+         il8TYEKPmu66eilJ/pF6ahJ05uASTldcOFhbqxEdeDb2V3FPKNh3TStWHCXS/2HKTpjs
+         /Zn15XA9z2GGdOnhteurrxluVI0SBF3uk6aGiRwd4JCD5RyuYcsf7t4ftNI234X3V4fP
+         zApXtoJgbhARyP2Lg1Wgx5kp8Za7CUgd1+Pci/znbbx/zSCGuExG7J1g99j8mCtLkvkA
+         W81CAz/XpUNniHCyHTcgKH7YADWqT7ebqqOJ8vn/jnV1rC3r/wEPPyGaG1we5BYNInvU
+         PDPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=HrscAejiPtaiY78VeFUfBvygFWbXvuDCBIOPXXdZXXw=;
-        b=ryjGQ/UuewtKZIZbfdxUdfjucP5H6ojog/5imlepVfhUoutucl/n8RPL5H0/q7kwdk
-         UOZB2fVIZ/uNFv3a0hBuGrR3UMAOpmlsHoCFrRa/OV7oybUQ9lAssIJpfhY5vkHKj/ld
-         Kn/XPA5CBbTqLWmgLI+E7PjSWQXlhEkFonRCgkQO/A4cW1zQzHBHJNnzfH4eKi6ob5mT
-         OMtL6mToEdkps/L+MDxVpMnA552pro+Yv2ICKnl3npGGyzs4Dk69sWVwbU6AM8z95s0f
-         vmU7rbwTl9yBlgZxxToL+GNGh346gbsgfzUYtchsxwgpgQgHVLDhKTqthbWp/hs2kpcB
-         PXTQ==
-X-Gm-Message-State: AOAM533w1+f2JHa69cpvp0tzfm475xFI/rD8Dpw3DU/Q4AQU7flnLU9v
-        gDqBxCAuzE4v88sHIowBu89xAIx/2UE6og==
-X-Google-Smtp-Source: ABdhPJwQE99oqfDhZPKnYQtUULcj/MQOJHllxKIaGoVXvwl4clroLnIkFH0bvTOeWF2rNMuOlTTleOEYEDxfag==
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=jKE1fzmF+1i6YEqkOcdAvk/VjuKcJZEF7TWgZDzeRlo=;
+        b=gsNjgqZe1VO+MxDDgCq6XcJp9QnZlP9iok3kRuyFoD7d7RVrTCzzEH38Z0i2Dr6LgY
+         LQfDijEYPKcbOafWXtmaSjeTGlywz7l83tW6e/me2MD14WlfbDb+np7pA7X9wuyaPZjK
+         FJrkOBlkKWXcnc/+tyIG5wwBqnIFsOJrfugwNvuSzd5l0VmsyrKiw7/P9b6HkCML4yRR
+         gMkAXs3xT0pLn8VQvHejBClXKZ26sxZQyqTMeQNaVr7Ld1zYeoNZ7u1/VH/lJW5ft9IP
+         S4Ws7Xyg7fXGr3r4Ax1s0zGcfhewOzD2P6KNfxASd27OWYAU/SjBBRwBfC8xYDVX21JE
+         8wOw==
+X-Gm-Message-State: AOAM533i5WTham4F+GFNifCAeLL8u8QhtodT0MwCv5DGbhgsrMNvCUus
+        Ta8idApTcM9zPKWNaK5380kj1pfgFYg+aw==
+X-Google-Smtp-Source: ABdhPJxl0kNDdZBJ1+zNs/Q9O2/dGDMzRElOnZAz2IbR3iY6/XM0MR+V17fL7d/EuLUquGeD1weybT6fcM6SPg==
 Sender: "mmandlik via sendgmr" <mmandlik@mmandlik.mtv.corp.google.com>
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f693:9fff:fef4:e50e])
- (user=mmandlik job=sendgmr) by 2002:a0c:bf44:: with SMTP id
- b4mr1322420qvj.30.1606967231782; Wed, 02 Dec 2020 19:47:11 -0800 (PST)
-Date:   Wed,  2 Dec 2020 19:46:51 -0800
-Message-Id: <20201202194547.bluez.v2.1.Idce75740a54d8a860450da8a7a21d55777c87ae9@changeid>
+ (user=mmandlik job=sendgmr) by 2002:a17:90a:17a4:: with SMTP id
+ q33mr507561pja.0.1606967233700; Wed, 02 Dec 2020 19:47:13 -0800 (PST)
+Date:   Wed,  2 Dec 2020 19:46:52 -0800
+In-Reply-To: <20201202194547.bluez.v2.1.Idce75740a54d8a860450da8a7a21d55777c87ae9@changeid>
+Message-Id: <20201202194547.bluez.v2.2.Ic1f25ec863fe218390cfbe5e5252f787a4475d3b@changeid>
 Mime-Version: 1.0
+References: <20201202194547.bluez.v2.1.Idce75740a54d8a860450da8a7a21d55777c87ae9@changeid>
 X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [bluez PATCH v2 1/2] adv_monitor: Register client app with app-root-path
+Subject: [bluez PATCH v2 2/2] client: Use correct root path for RegisterMonitor
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         Manish Mandlik <mmandlik@google.com>, sonnysasaka@chromium.org,
-        howardchung@google.com, mcchou@chromium.org
+        mcchou@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When a client app is registered with g_dbus_client_new(), bluez root
-path, i.e. "/", is used as the app root path and signal watches are
-added at that root path.
-
-Because of this, InterfacesAdded/InterfacesRemoved signals emitted by
-app - while creating/removing advertisement monitor objects at the
-app root path - are not received by bluetoothd.
-
-Use g_dbus_client_new_full() to register a client app with the correct
-app root path.
+Bluetoothctl uses "/" as the app root path. So, use the same
+app root path while invoking RegisterMonitor method. This will
+also ensure that InterfacesAdded/InterfacesRemoved signals are
+emitted on the correct app root path.
 
 Signed-off-by: Manish Mandlik <mmandlik@google.com>
 Reviewed-by: sonnysasaka@chromium.org
-Reviewed-by: howardchung@google.com
 Reviewed-by: mcchou@chromium.org
+
 ---
 
 Changes in v2:
-- updated the commit message and title
+- per discussion, discarded gdbus library changes and fixed bluetoothctl
+  code to use correct root path i.e. "/" while invoking RegisterMonitor
 
- src/adv_monitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ client/adv_monitor.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index fc058dbf1..a5bc61c48 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -775,7 +775,7 @@ static struct adv_monitor_app *app_create(DBusConnection *conn,
- 	app->manager = manager;
- 	app->reg = NULL;
+diff --git a/client/adv_monitor.c b/client/adv_monitor.c
+index 8e81857af..f62e9f444 100644
+--- a/client/adv_monitor.c
++++ b/client/adv_monitor.c
+@@ -270,7 +270,7 @@ void adv_monitor_remove_manager(DBusConnection *conn)
  
--	app->client = g_dbus_client_new(conn, sender, path);
-+	app->client = g_dbus_client_new_full(conn, sender, path, path);
- 	if (!app->client) {
- 		app_destroy(app);
- 		return NULL;
+ static void register_setup(DBusMessageIter *iter, void *user_data)
+ {
+-	const char *path = ADV_MONITOR_APP_PATH;
++	const char *path = "/";
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+ }
+@@ -293,7 +293,7 @@ static void register_reply(DBusMessage *message, void *user_data)
+ 
+ static void unregister_setup(DBusMessageIter *iter, void *user_data)
+ {
+-	const char *path = ADV_MONITOR_APP_PATH;
++	const char *path = "/";
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+ }
 -- 
 2.29.2.454.gaff20da3a2-goog
 
