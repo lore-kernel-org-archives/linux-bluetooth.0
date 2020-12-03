@@ -2,231 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C3FC64E8A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 10:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCD0C63777
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 10:38:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F14320705
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 10:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC5F72067B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 10:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388826AbgLCKbW (ORCPT
+        id S2388701AbgLCKiz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 05:31:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388276AbgLCKbV (ORCPT
+        Thu, 3 Dec 2020 05:38:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39946 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387757AbgLCKiz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 05:31:21 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D44C08ED7E
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 02:30:11 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id c9so2077365ybs.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 02:30:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=Uusy26fxweBxaYqTbY3aM4ThUJItFnRbtIun3wbJYAA=;
-        b=F6gxjT1zu2MhqGPp0OAKuwreTuhBbhBTKr7/SSXi8b/2w2/yQ2GQy2oWzpCU01GRWk
-         ot/9HuxJEaqIPZ1bdq1KvAKfwEDXymq9uoDBSMI7gAdL8JDS5D2rEZdqjBE0qSk+aed5
-         PnBb0H/XpMAe6Wo16zSM/BQHjwiPogGE+lakki6pUJCROIY0hjz6zi5wSBV65OV6erDP
-         lAedw0ob/Myt3sE0mTM/KU3MT09LmJm8Qzvx+bVEwKvOUaCCNWnU+DG8P3rOdhS1+VRi
-         7JNJ0VoF8EWci9eSexTEMFOEcX47dtl4XaBvsQwosSqAOIbia5McIh+6Z8vc/y1rTaSP
-         0uxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Uusy26fxweBxaYqTbY3aM4ThUJItFnRbtIun3wbJYAA=;
-        b=RsUunZUyToXeOS/+Lvgbc2FdKzuqHnsXweJJ4nPZX8hfAUmUPjdL2p6CQ4SNwP2D1t
-         EK7ZeXQbWmDbskrgJZ3BynIWy2PN6yI9IAKL4bb9Lqy1vtCrqnqzp2HQx8vPxwSbwJP8
-         hW/I2hZY8R/n4hC6fs6aIf9qW7COkC9N7mcPuGawEXrICC4gMEBxnPXJahLnmyw/KhV2
-         RKddvuldIkIdWApveV4A58GBtB6haqH4/OPu6+HYHAjghi7vD0Tz/rT/0wedHgQCYoI6
-         9d2NijcMMsUH6i4WB4j0FjpmAIvgnXMc+3RN+stJwNqpylOxvu03dW1suOZKE1yg2RpH
-         vXzg==
-X-Gm-Message-State: AOAM533GVrnex3rszCmTY/GfvIGxYapg8dGH+8cigxUmuaOnaCQGRo80
-        dMDgx/HV49Q2K9F5YG8eCew33VzwtbWdqJxz9n8+Z9Z4b32P5VWNA+eeiPAnaQKLwCwTHHUQ+E2
-        fLJe6NVUIhlyg6CqVbbYY2Qf/2XbCpTvDFCN4O/VKldfunlMTfcNkpFlKSZ8DUgKvwdm5kFZBOm
-        +h
-X-Google-Smtp-Source: ABdhPJxzCBzy9YNWRm7NhHb4c8ir/aZGj5PiFMWk6k3YtggbFw5zNyOFfYTyVvMerIzfVJVxuNXG7nez6yGH
-Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a25:c6d5:: with SMTP id
- k204mr3446133ybf.363.1606991410787; Thu, 03 Dec 2020 02:30:10 -0800 (PST)
-Date:   Thu,  3 Dec 2020 18:29:35 +0800
-In-Reply-To: <20201203102936.4049556-1-apusaka@google.com>
-Message-Id: <20201203182903.v1.5.I96e97067afe1635dbda036b881ba2a01f37cd343@changeid>
-Mime-Version: 1.0
-References: <20201203102936.4049556-1-apusaka@google.com>
-X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v1 5/5] Bluetooth: advmon offload MSFT handle filter enablement
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        Thu, 3 Dec 2020 05:38:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606991849;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MyamHgUbKq+2OGnoJyEP1GKo2QdhdprsiImjvaodW7o=;
+        b=VVpZHkilNQCLj+wsl3H9mq4x6O5ooDGqYRqZzVGrxgdgbv0faOucT8swX/KqP9kJfmMaXk
+        ZiTx+G1UcuVj/2wjXVUe3YYQiMuOuIQ4E/jeaqekrN8wX4+3DVFwdkjcz3H15cCd/z3RoL
+        P3JE1Fj5o8GXVjQYMoC7fKw4nI1oY7I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-bzPWhcs5MsqShulsk3epcg-1; Thu, 03 Dec 2020 05:37:26 -0500
+X-MC-Unique: bzPWhcs5MsqShulsk3epcg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3474080732C;
+        Thu,  3 Dec 2020 10:37:25 +0000 (UTC)
+Received: from x1.localdomain.com (ovpn-114-225.ams2.redhat.com [10.36.114.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18D2060BFA;
+        Thu,  3 Dec 2020 10:37:23 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 resend 0/1] Bluetooth: btusb: Fix detection of some fake CSR controllers with a bcdDevice val of 0x0134
+Date:   Thu,  3 Dec 2020 11:37:21 +0100
+Message-Id: <20201203103722.3745-1-hdegoede@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Hi Marcel,
 
-Implements the feature to disable/enable the filter used for
-advertising monitor on MSFT controller, effectively have the same
-effect as "remove all monitors" and "add all previously removed
-monitors".
+Here is a resend of a fix for a regression introduced by 
+commit cde1a8a99287 ("Bluetooth: btusb: Fix and detect most of the
+Chinese Bluetooth controllers"), which you have not picked up yet.
 
-This feature would be needed when suspending, where we would not want
-to get packets from anything outside the allowlist. Note that the
-integration with the suspending part is not included in this patch.
+Since this fixes a regression it would be good if this can get
+merged sooner rather then later. Can you please qeueu this up
+for merging?
 
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+Note at first I send this out as patch 1 of a series of 2 patches
+with fixes for fake CSR controllers. The 2nd patch is not a regression
+fix and is somewhat more involved. So I've split this pure bug-fix
+patch out as a standalone patch now, so that this can get merged ASAP.
 
----
+Regards,
 
- net/bluetooth/msft.c | 67 ++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/msft.h |  6 ++++
- 2 files changed, 73 insertions(+)
-
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index 7e33a85c3f1c..055cc5a260df 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -69,6 +69,17 @@ struct msft_rp_le_cancel_monitor_advertisement {
- 	__u8 sub_opcode;
- } __packed;
- 
-+#define MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE	0x05
-+struct msft_cp_le_set_advertisement_filter_enable {
-+	__u8 sub_opcode;
-+	__u8 enable;
-+} __packed;
-+
-+struct msft_rp_le_set_advertisement_filter_enable {
-+	__u8 status;
-+	__u8 sub_opcode;
-+} __packed;
-+
- struct msft_monitor_advertisement_handle_data {
- 	__u8  msft_handle;
- 	__u16 mgmt_handle;
-@@ -85,6 +96,7 @@ struct msft_data {
- 
- 	struct {
- 		u8 reregistering:1;
-+		u8 filter_enabled:1;
- 	} flags;
- };
- 
-@@ -193,6 +205,7 @@ void msft_do_open(struct hci_dev *hdev)
- 
- 	if (msft_monitor_supported(hdev)) {
- 		msft->flags.reregistering = true;
-+		msft_set_filter_enable(hdev, true);
- 		reregister_monitor_on_restart(hdev, 0);
- 	}
- }
-@@ -398,6 +411,40 @@ static void msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
- 	hci_remove_adv_monitor_complete(hdev, status);
- }
- 
-+static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
-+						       u8 status, u16 opcode,
-+						       struct sk_buff *skb)
-+{
-+	struct msft_cp_le_set_advertisement_filter_enable *cp;
-+	struct msft_rp_le_set_advertisement_filter_enable *rp;
-+	struct msft_data *msft = hdev->msft_data;
-+
-+	rp = (struct msft_rp_le_set_advertisement_filter_enable *)skb->data;
-+	if (skb->len < sizeof(*rp))
-+		return;
-+
-+	/* Error 0x0C would be returned if the filter enabled status is
-+	 * already set to whatever we were trying to set.
-+	 * Although the default state should be disabled, some controller set
-+	 * the initial value to enabled. Because there is no way to know the
-+	 * actual initial value before sending this command, here we also treat
-+	 * error 0x0C as success.
-+	 */
-+	if (status != 0x00 && status != 0x0C)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	cp = hci_sent_cmd_data(hdev, hdev->msft_opcode);
-+	msft->flags.filter_enabled = cp->enable;
-+
-+	if (status == 0x0C)
-+		bt_dev_warn(hdev, "MSFT filter_enable is already %s",
-+			    cp->enable ? "on" : "off");
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static bool msft_monitor_rssi_valid(struct adv_monitor *monitor)
- {
- 	struct adv_rssi_thresholds *r = &monitor->rssi;
-@@ -534,3 +581,23 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
- 
- 	return err;
- }
-+
-+int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
-+{
-+	struct msft_cp_le_set_advertisement_filter_enable cp;
-+	struct hci_request req;
-+	struct msft_data *msft = hdev->msft_data;
-+	int err;
-+
-+	if (!msft)
-+		return -EOPNOTSUPP;
-+
-+	cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
-+	cp.enable = enable;
-+
-+	hci_req_init(&req, hdev);
-+	hci_req_add(&req, hdev->msft_opcode, sizeof(cp), &cp);
-+	err = hci_req_run_skb(&req, msft_le_set_advertisement_filter_enable_cb);
-+
-+	return err;
-+}
-diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
-index 9f9a11f90b0c..44bee705c16d 100644
---- a/net/bluetooth/msft.h
-+++ b/net/bluetooth/msft.h
-@@ -20,6 +20,7 @@ __u64 msft_get_features(struct hci_dev *hdev);
- int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor);
- int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
- 			u16 handle);
-+int msft_set_filter_enable(struct hci_dev *hdev, bool enable);
- 
- #else
- 
-@@ -45,4 +46,9 @@ static inline bool msft_remove_monitor(struct hci_dev *hdev,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- #endif
--- 
-2.29.2.454.gaff20da3a2-goog
+Hans
 
