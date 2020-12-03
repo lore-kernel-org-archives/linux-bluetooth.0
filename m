@@ -2,160 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FE1C4361A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 20:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEED8C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 21:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FAE7207B8
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 20:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A19E207B0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 21:08:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731851AbgLCUQ2 (ORCPT
+        id S1726429AbgLCVIE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 15:16:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37670 "EHLO
+        Thu, 3 Dec 2020 16:08:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727352AbgLCUQ2 (ORCPT
+        with ESMTP id S1725885AbgLCVID (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 15:16:28 -0500
-Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0612FC061A51
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 12:15:48 -0800 (PST)
-Received: by mail-vs1-xe41.google.com with SMTP id j140so1993916vsd.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 12:15:47 -0800 (PST)
+        Thu, 3 Dec 2020 16:08:03 -0500
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AEC9C061A4F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 13:07:17 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id es6so1721276qvb.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 13:07:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dljsbllX4zS14a9ABWPEKmTQRtRoht1NPRssUTiAyy4=;
-        b=L5a8wPh1tL1h2GioK1Al+21eqCetCvtglnrAvuW3ad4BLTy3NKGlIK3lYDyfaGpB7N
-         Xx/g/4uxu0MTmoeRu3LtpuViypl4z27vp8bmMvA+OD+dCHKQjJCEdGUWhVk85Trt0Fif
-         /bmMv83xlnxPMWKmq0602S6xBBd1XXXqY146QB4AufTsnrmHvRjwiehOJvXr3d21IenO
-         QGeRszMr7QBrZLGzuU1pkPg2fjSMTk3Rmi4+Q6JCB2br51STYVq8hiVfV6AWnHotDavK
-         hcMk/wogLh6O1nvqyMCMVmdQWBoVey/uo86DS5d8xM2i8CDWibHHuDzcC+38OlnMRJJd
-         H/Hg==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=f8nh0/ZPp/YY1b8aaidMe4jGi04j6Kbg/losOiSzACY=;
+        b=hNrT4RdQcd5LLR0NvlYhG3oOS1L0SI/+eUFFzRjO/GL7ZLPyz8wf0dGK3B6leT+52b
+         mp2bejWnziXii4uvk4A2xrE6l0ubgWlWhcAvpxaAE48WI9qeaSorp874mme9RoxcFUKa
+         88o5yUcLZ+zvHAgR9kC8tDJICqYXUymdHnvGdAyNofBjK1rEsIWzxP5cwhjzTf4ZkcpC
+         i64MwR5lFsutyBp/TOPVrRzHWNjt8hrkse20TCpf4CEtxxc8i5hk6piH0tWX3nQwiIAE
+         XXtL5acWG9jJr6JsOwhQisR23Ug6gQxqDgB7JCog42Iukb7fnX2VaEyNooWUdylhBGy3
+         3uPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dljsbllX4zS14a9ABWPEKmTQRtRoht1NPRssUTiAyy4=;
-        b=f3lx6tQI126WZeHX1UT20wlYzs0FkfAaanxazb/VCfiba7Kn/vBz1PTRCDLkYin87C
-         1Ri0V0dD8/OHKQOf5uBEcyhGbAzxnVx1Xih9txsKPOofkzDQpJOc3QCRs6URMrVkLdJi
-         c/2Zhr2HHTcXNJ7JCj620lGzp5113lIlvBYiNVwKFjVXXaKUPJC2mdSNjtjVqvgpEzDv
-         crhUmZRA2YxndlZhjqNQq75IAOodcnGUEE23hH7HJyuObyjnXvmwpk9wdCxAAoi8gF9Q
-         oKTpAI9Z3Oh+QiB8W7AODR+urZUlzl8AxE4k3AYSmjCbhklhGFCUyUE75JY2knyvtEqr
-         sy9w==
-X-Gm-Message-State: AOAM533YjMUP9bNzWZtECOho0Qd2LVWxHBG3p3zo6MqYkdIaiIaT+jE7
-        c/3wGN3EtZrHcHsvW+rVfSGBrjdczCESNRF7mHr3Kg==
-X-Google-Smtp-Source: ABdhPJypT+JWP198y7byw9Fki6jKweG2BidS8xaLr/CG93yNMUjY0FwJJJlmRwOCWkDm6U5SmBZ0yhd6xJKIgEbblGI=
-X-Received: by 2002:a05:6102:126c:: with SMTP id q12mr1100738vsg.9.1607026547053;
- Thu, 03 Dec 2020 12:15:47 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=f8nh0/ZPp/YY1b8aaidMe4jGi04j6Kbg/losOiSzACY=;
+        b=G4al1fnY8GT+BlNy3h5wgQdcuUhfyP82UsNAOZ8FBnTQygr2b9UDZ0nFB0uHsTPrxq
+         FXxKDS2GUU/0gqHA9afDrx9U4rwpfTGX74k1CBUmfViYMQ94ujkSyYdqYw3chzfd/cvw
+         bhqJh1wKCkrt++8ltLtfrZe96H0Dni/V0JBsv9mBWLH4Bl8QCcYyB2gFH5ypgiPmA8zq
+         xJAibcmNi1mn7EhJFC/nqM68q9Ovau0W/AJLmrkxYExkR2nOmEP+81wJthV0Fy2jAdZJ
+         pSQKgu0YFDan+ysBHM0k2RW5thrtIq5Zg2qmd2rveOygeZ8O5cPE8hycQyHwSGOT5bCd
+         QG4Q==
+X-Gm-Message-State: AOAM531FAT937Hy3CvxB863/gntcs6cvivH4zG1VN2hTUkICPVRK/DXe
+        CHhOkBql7PYt3JBuCkrH0WnOGKwSBuU=
+X-Google-Smtp-Source: ABdhPJxy/vXMX+XBD6Z+9AyrknMfgq5uYJ3ccbopXRZt5bFhtwUl6p5HX7HfSoHlm53WeJ7daSipgA==
+X-Received: by 2002:ad4:5850:: with SMTP id de16mr1205533qvb.46.1607029636661;
+        Thu, 03 Dec 2020 13:07:16 -0800 (PST)
+Received: from [172.17.0.2] ([52.254.64.148])
+        by smtp.gmail.com with ESMTPSA id x22sm2432131qts.53.2020.12.03.13.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Dec 2020 13:07:16 -0800 (PST)
+Message-ID: <5fc95384.1c69fb81.8a3ca.8d2c@mx.google.com>
+Date:   Thu, 03 Dec 2020 13:07:16 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2912055730101084023=="
 MIME-Version: 1.0
-References: <20201130225744.3793244-1-danielwinkler@google.com> <7F86588C-4CB8-43C7-A6D0-25C9BF722C56@holtmann.org>
-In-Reply-To: <7F86588C-4CB8-43C7-A6D0-25C9BF722C56@holtmann.org>
-From:   Daniel Winkler <danielwinkler@google.com>
-Date:   Thu, 3 Dec 2020 12:15:35 -0800
-Message-ID: <CAP2xMbuQSbDSeRCQ9YmC_pg7oSvz9tZeuJw5O_FxwHU7OPa1OQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/5] Bluetooth: Add new MGMT interface for advertising add
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, danielwinkler@google.com
+Subject: RE: Bluetooth: Add new MGMT interface for advertising add
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201203121154.v7.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
+References: <20201203121154.v7.1.I5f4fa6a76fe81f977f78f06b7e68ff1c76c6bddf@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+--===============2912055730101084023==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I have just rebased onto bluetooth-next/master (commit
-e2e03d27190561976f2631c36337299645f7c1a2 from Dec 3) - oddly, I didn't
-have any conflicts in my rebase. Please let me know if the issue
-continues.
+This is automated email and please do not reply to this email!
 
-Thanks!
-Daniel
+Dear submitter,
 
-On Thu, Dec 3, 2020 at 4:47 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Daniel,
->
-> > This patch series defines the new two-call MGMT interface for adding
-> > new advertising instances. Similarly to the hci advertising commands, a
-> > mgmt call to set parameters is expected to be first, followed by a mgmt
-> > call to set advertising data/scan response. The members of the
-> > parameters request are optional; the caller defines a "params" bitfield
-> > in the structure that indicates which parameters were intentionally set,
-> > and others are set to defaults.
-> >
-> > The main feature here is the introduction of min/max parameters and tx
-> > power that can be requested by the client. Min/max parameters will be
-> > used both with and without extended advertising support, and tx power
-> > will be used with extended advertising support. After a call to set
-> > advertising parameters, the selected transmission power will be
-> > propagated in the reponse to alert userspace to the actual power used.
-> >
-> > Additionally, to inform userspace of the controller LE Tx power
-> > capabilities for the client's benefit, this series also changes the
-> > security info MGMT command to more flexibly contain other capabilities,
-> > such as LE min and max tx power.
-> >
-> > All changes have been tested on hatch (extended advertising) and kukui
-> > (no extended advertising) chromebooks with manual testing verifying
-> > correctness of parameters/data in btmon traces, and our automated test
-> > suite of 25 single- and multi-advertising usage scenarios.
-> >
-> > A separate patch series will add support in bluetoothd. Thanks in
-> > advance for your feedback!
-> >
-> > Daniel Winkler
-> >
-> >
-> > Changes in v6:
-> > - Only populate LE tx power range if controller reports it
-> >
-> > Changes in v5:
-> > - Ensure data/scan rsp length is returned for non-ext adv
-> >
-> > Changes in v4:
-> > - Add remaining data and scan response length to MGMT params response
-> > - Moving optional params into 'flags' field of MGMT command
-> > - Combine LE tx range into a single EIR field for MGMT capabilities cmd
-> >
-> > Changes in v3:
-> > - Adding selected tx power to adv params mgmt response, removing event
-> > - Re-using security info MGMT command to carry controller capabilities
-> >
-> > Changes in v2:
-> > - Fixed sparse error in Capabilities MGMT command
-> >
-> > Daniel Winkler (5):
-> >  Bluetooth: Add helper to set adv data
-> >  Bluetooth: Break add adv into two mgmt commands
-> >  Bluetooth: Use intervals and tx power from mgmt cmds
-> >  Bluetooth: Query LE tx power on startup
-> >  Bluetooth: Change MGMT security info CMD to be more generic
-> >
-> > include/net/bluetooth/hci.h      |   7 +
-> > include/net/bluetooth/hci_core.h |  12 +-
-> > include/net/bluetooth/mgmt.h     |  49 +++-
-> > net/bluetooth/hci_core.c         |  47 +++-
-> > net/bluetooth/hci_event.c        |  19 ++
-> > net/bluetooth/hci_request.c      |  29 ++-
-> > net/bluetooth/mgmt.c             | 430 +++++++++++++++++++++++++++++--
-> > 7 files changed, 548 insertions(+), 45 deletions(-)
->
-> I am having problem with patch 3/5 which does not apply cleanly against bluetooth-next. Can you please fix it and re-send. Thanks.
->
-> Regards
->
-> Marcel
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=395707
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuildK - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2912055730101084023==--
