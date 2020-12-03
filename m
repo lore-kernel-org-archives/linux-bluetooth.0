@@ -7,113 +7,59 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EDAC43211
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 14:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C2F6C001B2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 14:06:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 865F5206F6
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 14:04:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC066206F9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 14:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730605AbgLCOEQ convert rfc822-to-8bit (ORCPT
+        id S2436523AbgLCOGD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 09:04:16 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55853 "EHLO
+        Thu, 3 Dec 2020 09:06:03 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:57617 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730572AbgLCOEP (ORCPT
+        with ESMTP id S1727242AbgLCOGD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 09:04:15 -0500
+        Thu, 3 Dec 2020 09:06:03 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 90B33CECFD;
-        Thu,  3 Dec 2020 15:10:46 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8F5DDCECFD;
+        Thu,  3 Dec 2020 15:12:33 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [PATCH v1 1/5] Bluetooth: advmon offload MSFT add rssi support
+Subject: Re: [PATCH v1] Bluetooth: btusb: support download nvm with different
+ board id for wcn6855
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201203182903.v1.1.I92d2e2a87419730d60136680cbe27636baf94b15@changeid>
-Date:   Thu, 3 Dec 2020 15:03:31 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <20B6F2AD-1A60-4E3C-84C2-E3CB7294FABC@holtmann.org>
-References: <20201203102936.4049556-1-apusaka@google.com>
- <20201203182903.v1.1.I92d2e2a87419730d60136680cbe27636baf94b15@changeid>
-To:     Archie Pusaka <apusaka@google.com>
+In-Reply-To: <1606971434-23709-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Thu, 3 Dec 2020 15:05:19 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        mka@chromium.org, rjliao@codeaurora.org, tjiang@codeaurora.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <94C66D69-36C5-4D9B-979F-264A7B4F90AE@holtmann.org>
+References: <1606971434-23709-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Zijun,
 
-> MSFT needs rssi parameter for monitoring advertisement packet,
-> therefore we should supply them from mgmt.
+> we define many nvm files for wcn6855 btsoc and host driver
+> should find the correct nvm file based on board ID and then
+> download it.
 > 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Reviewed-by: Yun-Hao Chung <howardchung@google.com>
-
-I don’t need any Reviewed-by if they are not catching an obvious user API breakage.
-
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 > ---
-> 
-> include/net/bluetooth/hci_core.h | 9 +++++++++
-> include/net/bluetooth/mgmt.h     | 9 +++++++++
-> net/bluetooth/mgmt.c             | 8 ++++++++
-> 3 files changed, 26 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 9873e1c8cd16..42d446417817 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -246,8 +246,17 @@ struct adv_pattern {
-> 	__u8 value[HCI_MAX_AD_LENGTH];
-> };
-> 
-> +struct adv_rssi_thresholds {
-> +	__s8 low_threshold;
-> +	__s8 high_threshold;
-> +	__u16 low_threshold_timeout;
-> +	__u16 high_threshold_timeout;
-> +	__u8 sampling_period;
-> +};
-> +
-> struct adv_monitor {
-> 	struct list_head patterns;
-> +	struct adv_rssi_thresholds rssi;
-> 	bool		active;
-> 	__u16		handle;
-> };
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index d8367850e8cd..dc534837be0e 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -763,9 +763,18 @@ struct mgmt_adv_pattern {
-> 	__u8 value[31];
-> } __packed;
-> 
-> +struct mgmt_adv_rssi_thresholds {
-> +	__s8 high_threshold;
-> +	__le16 high_threshold_timeout;
-> +	__s8 low_threshold;
-> +	__le16 low_threshold_timeout;
-> +	__u8 sampling_period;
-> +} __packed;
-> +
-> #define MGMT_OP_ADD_ADV_PATTERNS_MONITOR	0x0052
-> struct mgmt_cp_add_adv_patterns_monitor {
-> 	__u8 pattern_count;
-> +	struct mgmt_adv_rssi_thresholds rssi;
-> 	struct mgmt_adv_pattern patterns[];
-> } __packed;
+> drivers/bluetooth/btusb.c | 19 ++++++++++++++++---
+> 1 file changed, 16 insertions(+), 3 deletions(-)
 
-This is something we can not do. It breaks an userspace facing API. Is the mgmt opcode 0x0052 in an already released kernel?
+patch has been applied to bluetooth-next tree.
 
 Regards
 
