@@ -2,107 +2,224 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2135CC63777
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B6AC64E8A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:21:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B78412086A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FD0322241
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 12:21:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728842AbgLCMBt (ORCPT
+        id S1730439AbgLCMVL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 07:01:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726874AbgLCMBs (ORCPT
+        Thu, 3 Dec 2020 07:21:11 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:3504 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726157AbgLCMVL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 07:01:48 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A67FC061A4D
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 04:01:08 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id y5so1779368iow.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 04:01:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=G92SSxSMPY9M5ZiNyqr6N6YUku52thhxX68E9AbbBpQ=;
-        b=ibmsDRC5jHJmy7VBCE/W4ip+o/c1C6iD5PCFTaZ2FBVjRRQ872AorhaqhHnn/fRm6a
-         8J6MCE2taSZmk2mXSwrnLKfFFZUoQL92Jkfeq5hJfM1flQMfr1Nsh7hKQhzyPaLJNJQw
-         xZ4zZHs2IfGfCWXIGju+k8YiFZwZpSzEB2g0WVfCenyQZ3Qhaz9LcUhVXKSueJ4FMXdj
-         NMRk9B6eO78Vhk+F+Tpr95EV5za6ZF0dPq7JRpKj778pq0xiMg51MtetfSJNPz6Dj2Z0
-         UhTh83WJipcJmml2ph/pKsNa1dMUQ5/li8dsBmLUgqqVYfxIVa5yHe/Du8oYxl3qQ4ld
-         njfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=G92SSxSMPY9M5ZiNyqr6N6YUku52thhxX68E9AbbBpQ=;
-        b=FJKIEzPr0zpdMRio1KDcNacOqZBQqfag0V0zKKQHZaRrVCiPSZ57IJuZlTA3vPhzZh
-         BGXvitOgr0FAkse35Sz1wbf/ZdfNMRwg5eDDVzTYyaYsZhI434qKnCde3MJOWhMINy+N
-         8FCgR3g9r2uvhLS9HOe7Vd3RxcM/LxxIV0vaebC6KmVLrhgvu9zSUgzHuZI8twHAtvmH
-         t3aM3zzDvIAaV2QVfvRBN2JFkzWAcAzT4KZAYZTzXO5Ad3Bq7cnW3AXPivxLNJ0mK9Cs
-         Aa3LwwpbzIzKRgarVBFHOFUVy1L63w/nnifP2Ey36IkqFhfhf7JVRaJRPjpvojPlD9Ea
-         z57A==
-X-Gm-Message-State: AOAM530NTK2vO+NrZgZHj8/Mdfu3vOqgm5c0gWEpy87qdZPzEmln8DXK
-        /4T8TUjWS+IGrmaWUDjcnwD4H+JwnU4=
-X-Google-Smtp-Source: ABdhPJz3h3GHO72iBjRapYDOw77CACoNKB0EL33d868LvQ9dMX7MemIBI22o8RqPcQmH+oG0GV0Cag==
-X-Received: by 2002:a6b:fd03:: with SMTP id c3mr2823486ioi.64.1606996867547;
-        Thu, 03 Dec 2020 04:01:07 -0800 (PST)
-Received: from [172.17.0.2] ([52.179.192.61])
-        by smtp.gmail.com with ESMTPSA id k4sm248373ioh.45.2020.12.03.04.01.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Dec 2020 04:01:07 -0800 (PST)
-Message-ID: <5fc8d383.1c69fb81.4dd2c.0f81@mx.google.com>
-Date:   Thu, 03 Dec 2020 04:01:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7640308464025752128=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
-Subject: RE: [v3] Bluetooth: btusb: Add workaround for remote-wakeup issues with Barrot 8041a02 fake CSR controllers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201203110944.49307-2-hdegoede@redhat.com>
-References: <20201203110944.49307-2-hdegoede@redhat.com>
+        Thu, 3 Dec 2020 07:21:11 -0500
+Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
+  by alexa-out.qualcomm.com with ESMTP; 03 Dec 2020 04:20:31 -0800
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 03 Dec 2020 04:20:28 -0800
+X-QCInternal: smtphost
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 03 Dec 2020 17:50:04 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id 468701FE60; Thu,  3 Dec 2020 17:50:03 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v3] Bluetooth: hci_qca: Add support to read FW build version for WCN3991 BTSoC
+Date:   Thu,  3 Dec 2020 17:50:01 +0530
+Message-Id: <1606998001-17424-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7640308464025752128==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Add support to read FW build version from debugfs node.
+This info can be read from
+/sys/kernel/debug/bluetooth/hci0/ibs/fw_build_info
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9Mzk1MzkxCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-UGF0Y2ggLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tH
-aXRMaW50IC0gRkFJTApPdXRwdXQ6CkJsdWV0b290aDogYnR1c2I6IEFkZCB3b3JrYXJvdW5kIGZv
-ciByZW1vdGUtd2FrZXVwIGlzc3VlcyB3aXRoIEJhcnJvdCA4MDQxYTAyIGZha2UgQ1NSIGNvbnRy
-b2xsZXJzCjE6IFQxIFRpdGxlIGV4Y2VlZHMgbWF4IGxlbmd0aCAoOTg+NzIpOiAiQmx1ZXRvb3Ro
-OiBidHVzYjogQWRkIHdvcmthcm91bmQgZm9yIHJlbW90ZS13YWtldXAgaXNzdWVzIHdpdGggQmFy
-cm90IDgwNDFhMDIgZmFrZSBDU1IgY29udHJvbGxlcnMiCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjClRlc3Q6IENoZWNrQnVpbGRLIC0gRkFJTApPdXRwdXQ6CmRyaXZlcnMvYmx1ZXRv
-b3RoL2J0dXNiLmM6IEluIGZ1bmN0aW9uIOKAmGJ0dXNiX3NldHVwX2NzcuKAmToKZHJpdmVycy9i
-bHVldG9vdGgvYnR1c2IuYzoxODkzOjc6IGVycm9yOiDigJhiY2REZXZpY2XigJkgdW5kZWNsYXJl
-ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4g4oCYZGV2aWNl4oCZ
-PwogMTg5MyB8ICAgaWYgKGJjZERldmljZSA9PSAweDg4OTEgJiYKICAgICAgfCAgICAgICBefn5+
-fn5+fn4KICAgICAgfCAgICAgICBkZXZpY2UKZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzoxODkz
-Ojc6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25j
-ZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluCmRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNi
-LmM6MTg5OToyMjogZXJyb3I6IOKAmGRhdGHigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRo
-aXMgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4g4oCYX2RhdGHigJk/CiAxODk5IHwgICAgcG1fcnVu
-dGltZV9hbGxvdygmZGF0YS0+dWRldi0+ZGV2KTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
-ICBefn5+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgX2RhdGEKbWFrZVsyXTogKioqIFtz
-Y3JpcHRzL01ha2VmaWxlLmJ1aWxkOjI4MzogZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iub10gRXJy
-b3IgMQptYWtlWzFdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NTAwOiBkcml2ZXJzL2Js
-dWV0b290aF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjE3OTk6IGRyaXZlcnNdIEVycm9y
-IDIKCgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c   | 48 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  8 ++++++++
+ drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+)
 
---===============7640308464025752128==--
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index f85a55a..660eea5 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -94,6 +94,54 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ }
+ EXPORT_SYMBOL_GPL(qca_read_soc_version);
+ 
++int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build)
++{
++	struct sk_buff *skb;
++	struct edl_event_hdr *edl;
++	char cmd;
++	int err = 0;
++	int build_lbl_len;
++
++	bt_dev_dbg(hdev, "QCA read fw build info");
++
++	cmd = EDL_GET_BUILD_INFO_CMD;
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++				&cmd, 0, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Reading QCA fw build info failed (%d)",
++			   err);
++		return err;
++	}
++
++	edl = (struct edl_event_hdr *)(skb->data);
++	if (!edl) {
++		bt_dev_err(hdev, "QCA read fw build info with no header");
++		err = -EILSEQ;
++		goto out;
++	}
++
++	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++	    edl->rtype != EDL_GET_BUILD_INFO_CMD) {
++		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
++			   edl->rtype);
++		err = -EIO;
++		goto out;
++	}
++
++	build_lbl_len = edl->data[0];
++	if (build_lbl_len <= QCA_FW_BUILD_VER_LEN - 2) {
++		memcpy(fw_build, &edl->data[1], build_lbl_len);
++		*(fw_build + build_lbl_len) = '\n';
++		*(fw_build + build_lbl_len + 1) = '\0';
++	}
++
++out:
++	kfree_skb(skb);
++	return err;
++}
++EXPORT_SYMBOL_GPL(qca_read_fw_build_info);
++
+ static int qca_send_reset(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index e73b8f8..ac1b76a 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -11,6 +11,7 @@
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
++#define EDL_GET_BUILD_INFO_CMD		(0x20)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+ #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+@@ -154,6 +155,7 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
++int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build);
+ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+ {
+ 	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
+@@ -195,4 +197,10 @@ static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static inline int qca_read_fw_build_info(struct hci_dev *hdev, u8 *fw_build)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4a96368..56616b0 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -180,6 +180,7 @@ struct qca_data {
+ 	u64 rx_votes_off;
+ 	u64 votes_on;
+ 	u64 votes_off;
++	u8 fw_build[QCA_FW_BUILD_VER_LEN];
+ };
+ 
+ enum qca_speed_type {
+@@ -621,12 +622,33 @@ static int qca_open(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
++static ssize_t fw_build_read(struct file *file, char __user *user_buf,
++			     size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct qca_data *qca = hu->priv;
++	u8 length = 0;
++
++	length = strlen(qca->fw_build);
++
++	return simple_read_from_buffer(user_buf, count, ppos, qca->fw_build,
++				       length);
++}
++
++static const struct file_operations fw_build_fops = {
++	.open = simple_open,
++	.read = fw_build_read,
++};
++
+ static void qca_debugfs_init(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+ 	struct dentry *ibs_dir;
+ 	umode_t mode;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	int ret;
+ 
+ 	if (!hdev->debugfs)
+ 		return;
+@@ -659,12 +681,24 @@ static void qca_debugfs_init(struct hci_dev *hdev)
+ 	debugfs_create_u64("votes_off", mode, ibs_dir, &qca->votes_off);
+ 	debugfs_create_u32("vote_on_ms", mode, ibs_dir, &qca->vote_on_ms);
+ 	debugfs_create_u32("vote_off_ms", mode, ibs_dir, &qca->vote_off_ms);
++	if (soc_type == QCA_WCN3991) {
++		debugfs_create_file("fw_build_info", mode, ibs_dir, hdev,
++				    &fw_build_fops);
++	}
+ 
+ 	/* read/write */
+ 	mode = 0644;
+ 	debugfs_create_u32("wake_retrans", mode, ibs_dir, &qca->wake_retrans);
+ 	debugfs_create_u32("tx_idle_delay", mode, ibs_dir,
+ 			   &qca->tx_idle_delay);
++
++	if (soc_type == QCA_WCN3991) {
++		/* get fw build info and log into debugfs fw_build_info */
++		ret = qca_read_fw_build_info(hdev, qca->fw_build);
++		if (ret < 0)
++			bt_dev_err(hdev, "QCA read fw build info failed (%d)",
++				   ret);
++	}
+ }
+ 
+ /* Flush protocol data */
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
+
