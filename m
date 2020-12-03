@@ -4,69 +4,119 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD97EC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 21:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD7BC4361B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 22:02:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 509B02223E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 21:59:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2074022285
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 22:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728129AbgLCV7p convert rfc822-to-8bit (ORCPT
+        id S1727966AbgLCWCb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 16:59:45 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:36472 "EHLO
+        Thu, 3 Dec 2020 17:02:31 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:32875 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727333AbgLCV7p (ORCPT
+        with ESMTP id S1726507AbgLCWCb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 16:59:45 -0500
+        Thu, 3 Dec 2020 17:02:31 -0500
 Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 21149CED05;
-        Thu,  3 Dec 2020 23:06:18 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 81C28CED05;
+        Thu,  3 Dec 2020 23:09:02 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [PATCH SBC] sbc_primitives: Fix build on non-x86 arch
+Subject: Re: [PATCH v7 0/5] Bluetooth: Add new MGMT interface for advertising
+ add
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201203212947.2680393-1-luiz.dentz@gmail.com>
-Date:   Thu, 3 Dec 2020 22:59:03 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <40EAFE51-E0D0-4D01-8602-FE9F2933AE76@holtmann.org>
-References: <20201203212947.2680393-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <20201203201252.807616-1-danielwinkler@google.com>
+Date:   Thu, 3 Dec 2020 23:01:47 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <772F4D82-B082-416E-BA35-A26E973970CF@holtmann.org>
+References: <20201203201252.807616-1-danielwinkler@google.com>
+To:     Daniel Winkler <danielwinkler@google.com>
 X-Mailer: Apple Mail (2.3654.20.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Daniel,
 
-> Check if SBC_BUILD_WITH_MMX_SUPPORT is defined otherwise
-> sbc_init_primitives_mmx will not be declared and
-> _builtin_cpu_supports(“mmx”)) likely fail:
+> This patch series defines the new two-call MGMT interface for adding
+> new advertising instances. Similarly to the hci advertising commands, a
+> mgmt call to set parameters is expected to be first, followed by a mgmt
+> call to set advertising data/scan response. The members of the
+> parameters request are optional; the caller defines a "params" bitfield
+> in the structure that indicates which parameters were intentionally set,
+> and others are set to defaults.
 > 
-> CC    sbc/sbc_primitives.lo
-> sbc/sbc_primitives.c: In function ‘sbc_init_primitives_x86’:
-> sbc/sbc_primitives.c:599:3: warning: implicit declaration of function
-> ‘sbc_init_primitives_mmx’; did you mean ‘sbc_init_primitives_x86’?
-> [-Wimplicit-function-declaration]
-> 599 |  sbc_init_primitives_mmx(state);
->   |  ^~~~~~~~~~~~~~~~~~~~~~~
->   |  sbc_init_primitives_x86
-> sbc/sbc_primitives.c: In function ‘sbc_init_primitives’:
-> sbc/sbc_primitives.c:598:6: error: hwcap ‘mmx’ is an invalid argument to
-> builtin ‘__builtin_cpu_supports’
-> 598 | if (__builtin_cpu_supports(“mmx”))
->   |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> make[1]: *** [Makefile:711: sbc/sbc_primitives.lo] Error 1
-> make: *** [Makefile:453: all] Error 2
-> ---
-> sbc/sbc_primitives.c     | 2 ++
-> sbc/sbc_primitives_mmx.c | 5 -----
-> 2 files changed, 2 insertions(+), 5 deletions(-)
+> The main feature here is the introduction of min/max parameters and tx
+> power that can be requested by the client. Min/max parameters will be
+> used both with and without extended advertising support, and tx power
+> will be used with extended advertising support. After a call to set
+> advertising parameters, the selected transmission power will be
+> propagated in the reponse to alert userspace to the actual power used.
+> 
+> Additionally, to inform userspace of the controller LE Tx power
+> capabilities for the client's benefit, this series also changes the
+> security info MGMT command to more flexibly contain other capabilities,
+> such as LE min and max tx power.
+> 
+> All changes have been tested on hatch (extended advertising) and kukui
+> (no extended advertising) chromebooks with manual testing verifying
+> correctness of parameters/data in btmon traces, and our automated test
+> suite of 25 single- and multi-advertising usage scenarios.
+> 
+> A separate patch series will add support in bluetoothd. Thanks in
+> advance for your feedback!
+> 
+> Daniel Winkler
+> 
+> 
+> Changes in v7:
+> - Rebase onto bluetooth-next/master
+> 
+> Changes in v6:
+> - Only populate LE tx power range if controller reports it
+> 
+> Changes in v5:
+> - Ensure data/scan rsp length is returned for non-ext adv
+> 
+> Changes in v4:
+> - Add remaining data and scan response length to MGMT params response
+> - Moving optional params into 'flags' field of MGMT command
+> - Combine LE tx range into a single EIR field for MGMT capabilities cmd
+> 
+> Changes in v3:
+> - Adding selected tx power to adv params mgmt response, removing event
+> - Re-using security info MGMT command to carry controller capabilities
+> 
+> Changes in v2:
+> - Fixed sparse error in Capabilities MGMT command
+> 
+> Daniel Winkler (5):
+>  Bluetooth: Add helper to set adv data
+>  Bluetooth: Break add adv into two mgmt commands
+>  Bluetooth: Use intervals and tx power from mgmt cmds
+>  Bluetooth: Query LE tx power on startup
+>  Bluetooth: Change MGMT security info CMD to be more generic
+> 
+> include/net/bluetooth/hci.h      |   7 +
+> include/net/bluetooth/hci_core.h |  12 +-
+> include/net/bluetooth/mgmt.h     |  49 +++-
+> net/bluetooth/hci_core.c         |  47 +++-
+> net/bluetooth/hci_event.c        |  19 ++
+> net/bluetooth/hci_request.c      |  29 ++-
+> net/bluetooth/mgmt.c             | 430 +++++++++++++++++++++++++++++--
+> 7 files changed, 548 insertions(+), 45 deletions(-)
 
-patch has been applied.
+all 5 patches have been applied to bluetooth-next tree.
 
 Regards
 
