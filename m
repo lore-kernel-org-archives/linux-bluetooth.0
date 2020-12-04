@@ -2,123 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD7BC4361B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 22:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84139C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:16:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2074022285
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Dec 2020 22:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34DDA22518
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727966AbgLCWCb (ORCPT
+        id S1727555AbgLDDQD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 17:02:31 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:32875 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726507AbgLCWCb (ORCPT
+        Thu, 3 Dec 2020 22:16:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727487AbgLDDQC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 17:02:31 -0500
-Received: from marcel-macbook.holtmann.net (unknown [37.83.193.87])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 81C28CED05;
-        Thu,  3 Dec 2020 23:09:02 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.20.0.2.21\))
-Subject: Re: [PATCH v7 0/5] Bluetooth: Add new MGMT interface for advertising
- add
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201203201252.807616-1-danielwinkler@google.com>
-Date:   Thu, 3 Dec 2020 23:01:47 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Thu, 3 Dec 2020 22:16:02 -0500
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F3FC061A52
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 19:15:16 -0800 (PST)
+Received: by mail-qt1-x84a.google.com with SMTP id n95so3365913qte.16
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 19:15:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=SqrSxY5uc4xcJqKSvQt8JkbosUVthJxwVLPagRQfa9k=;
+        b=ZtoCbhF83mH8woZoUdtLoCbWmJ69GR8ZSC7CbsMblk48Asr7dttdoLeBj4/QMHcxWC
+         n/WqQ0M6X4a2zQTPqqJbOUg5BMPeXthOn6YvhNjwvyYi2GhMIWsehNr3oF+HLQGUZFZB
+         U+lzRysW5d6Bynymlp1oBm2meut/MtnoCvChFGvdVZJyU8a9w9j2dDeYtajHCy87oXFu
+         GvkMsj5NHy8ahIki1cL7qxZWmwSWSyrYlw6lp97ts5Ok0cI8H2uPj7kgH4fCOHW1JM1i
+         PFbXWl/oPM2xYrfOMbpPSaeeDSvQoERuv9h4wdX8ygDYryoQ4aeeMleNgs0RqUjkS8E7
+         vSsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=SqrSxY5uc4xcJqKSvQt8JkbosUVthJxwVLPagRQfa9k=;
+        b=f7BnuKJh8YRZQfdxpjlpYz0YByXkzQ6luVX7ap3tUvScAarDlClHS0ij8VH/NQyk8e
+         70S4aDUWSQkxjFHB4rq90Rpfby6J70ZogCm4K2jd9RVn3ho8YtBEtYwEA4e+lBQ0kV5U
+         aospo35iarMPcZ8F7tcSz3SX3stN3RDR61AWi2xVfdyxEEtVAVNRnQtD6EJXkDOdBniX
+         X2XerYFevF+0YAH/07OcMRrNGZjA2dh6Th73Du/xtnE7T164avB4FRyN3698NI5OgbRl
+         5yFjEEIWmysskVrAioMW/Ljxg8iu1K5X7sPweeoHHa/sCQNF/CQtQZjJU6jGSXr2CZ30
+         5GXg==
+X-Gm-Message-State: AOAM5311D25L99QJThvbWVgYbFDCSjiYpdZr1BZvXHzDu0pj39MFF38Y
+        wBPp+Wrs7bgvm1aP31AAFYB8Kzv3GuTqDdTIk8KtC43Ltw5Sudlz60QsCFx4Q3CQ+WttLrsReVU
+        glg6Z2XBpNuWvONkbhfZG+eHmiLrMacd0KHK0y/D5qBWgHbukKlD0/EccGGmC4qcSl0tmhWBwXz
+        8DA64F10XEC+M=
+X-Google-Smtp-Source: ABdhPJw6pYkEPaXn6m8Sa+IEwWAZKLX13zrJN5JXeLuCA6Cr5L/HdyQWDCnm9EPigYwxBtnqeBX6CeiZcx6ZH0NoNg==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:ad4:4d84:: with SMTP id
+ cv4mr2903690qvb.14.1607051715532; Thu, 03 Dec 2020 19:15:15 -0800 (PST)
+Date:   Fri,  4 Dec 2020 11:14:31 +0800
+Message-Id: <20201204111038.v1.1.I4557a89427f61427e65d85bc51cca9e65607488e@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
+Subject: [PATCH v1] Bluetooth: Set missing suspend task bits
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     alainm@chromium.org, mmandlik@chromium.org, mcchou@chromium.org,
+        marcel@holtmann.org, abhishekpandit@chromium.org,
+        apusaka@chromium.org, Howard Chung <howardchung@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <772F4D82-B082-416E-BA35-A26E973970CF@holtmann.org>
-References: <20201203201252.807616-1-danielwinkler@google.com>
-To:     Daniel Winkler <danielwinkler@google.com>
-X-Mailer: Apple Mail (2.3654.20.0.2.21)
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-> This patch series defines the new two-call MGMT interface for adding
-> new advertising instances. Similarly to the hci advertising commands, a
-> mgmt call to set parameters is expected to be first, followed by a mgmt
-> call to set advertising data/scan response. The members of the
-> parameters request are optional; the caller defines a "params" bitfield
-> in the structure that indicates which parameters were intentionally set,
-> and others are set to defaults.
-> 
-> The main feature here is the introduction of min/max parameters and tx
-> power that can be requested by the client. Min/max parameters will be
-> used both with and without extended advertising support, and tx power
-> will be used with extended advertising support. After a call to set
-> advertising parameters, the selected transmission power will be
-> propagated in the reponse to alert userspace to the actual power used.
-> 
-> Additionally, to inform userspace of the controller LE Tx power
-> capabilities for the client's benefit, this series also changes the
-> security info MGMT command to more flexibly contain other capabilities,
-> such as LE min and max tx power.
-> 
-> All changes have been tested on hatch (extended advertising) and kukui
-> (no extended advertising) chromebooks with manual testing verifying
-> correctness of parameters/data in btmon traces, and our automated test
-> suite of 25 single- and multi-advertising usage scenarios.
-> 
-> A separate patch series will add support in bluetoothd. Thanks in
-> advance for your feedback!
-> 
-> Daniel Winkler
-> 
-> 
-> Changes in v7:
-> - Rebase onto bluetooth-next/master
-> 
-> Changes in v6:
-> - Only populate LE tx power range if controller reports it
-> 
-> Changes in v5:
-> - Ensure data/scan rsp length is returned for non-ext adv
-> 
-> Changes in v4:
-> - Add remaining data and scan response length to MGMT params response
-> - Moving optional params into 'flags' field of MGMT command
-> - Combine LE tx range into a single EIR field for MGMT capabilities cmd
-> 
-> Changes in v3:
-> - Adding selected tx power to adv params mgmt response, removing event
-> - Re-using security info MGMT command to carry controller capabilities
-> 
-> Changes in v2:
-> - Fixed sparse error in Capabilities MGMT command
-> 
-> Daniel Winkler (5):
->  Bluetooth: Add helper to set adv data
->  Bluetooth: Break add adv into two mgmt commands
->  Bluetooth: Use intervals and tx power from mgmt cmds
->  Bluetooth: Query LE tx power on startup
->  Bluetooth: Change MGMT security info CMD to be more generic
-> 
-> include/net/bluetooth/hci.h      |   7 +
-> include/net/bluetooth/hci_core.h |  12 +-
-> include/net/bluetooth/mgmt.h     |  49 +++-
-> net/bluetooth/hci_core.c         |  47 +++-
-> net/bluetooth/hci_event.c        |  19 ++
-> net/bluetooth/hci_request.c      |  29 ++-
-> net/bluetooth/mgmt.c             | 430 +++++++++++++++++++++++++++++--
-> 7 files changed, 548 insertions(+), 45 deletions(-)
+When suspending, mark SUSPEND_SCAN_ENABLE and SUSPEND_SCAN_DISABLE tasks
+correctly when either classic or le scanning is modified.
 
-all 5 patches have been applied to bluetooth-next tree.
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Howard Chung <howardchung@google.com>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+---
 
-Regards
+ net/bluetooth/hci_request.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Marcel
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 80dc451d6e124..71bffd7454720 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -707,6 +707,9 @@ void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
+ 		return;
+ 	}
+ 
++	if (hdev->suspended)
++		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
++
+ 	if (use_ext_scan(hdev)) {
+ 		struct hci_cp_le_set_ext_scan_enable cp;
+ 
+@@ -1159,6 +1162,11 @@ static void hci_req_set_event_filter(struct hci_request *req)
+ 		scan = SCAN_PAGE;
+ 	}
+ 
++	if (scan)
++		set_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
++	else
++		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
++
+ 	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ }
+ 
+-- 
+2.29.2.576.ga3fc446d84-goog
 
