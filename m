@@ -2,120 +2,225 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84139C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3E6C0018C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34DDA22518
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:16:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5864222513
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Dec 2020 03:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727555AbgLDDQD (ORCPT
+        id S1727487AbgLDD0W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Dec 2020 22:16:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
+        Thu, 3 Dec 2020 22:26:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727487AbgLDDQC (ORCPT
+        with ESMTP id S1726426AbgLDD0W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Dec 2020 22:16:02 -0500
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F3FC061A52
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 19:15:16 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id n95so3365913qte.16
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 19:15:16 -0800 (PST)
+        Thu, 3 Dec 2020 22:26:22 -0500
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE38C061A51
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Dec 2020 19:25:42 -0800 (PST)
+Received: by mail-lf1-x142.google.com with SMTP id z21so5753918lfe.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Dec 2020 19:25:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=SqrSxY5uc4xcJqKSvQt8JkbosUVthJxwVLPagRQfa9k=;
-        b=ZtoCbhF83mH8woZoUdtLoCbWmJ69GR8ZSC7CbsMblk48Asr7dttdoLeBj4/QMHcxWC
-         n/WqQ0M6X4a2zQTPqqJbOUg5BMPeXthOn6YvhNjwvyYi2GhMIWsehNr3oF+HLQGUZFZB
-         U+lzRysW5d6Bynymlp1oBm2meut/MtnoCvChFGvdVZJyU8a9w9j2dDeYtajHCy87oXFu
-         GvkMsj5NHy8ahIki1cL7qxZWmwSWSyrYlw6lp97ts5Ok0cI8H2uPj7kgH4fCOHW1JM1i
-         PFbXWl/oPM2xYrfOMbpPSaeeDSvQoERuv9h4wdX8ygDYryoQ4aeeMleNgs0RqUjkS8E7
-         vSsQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=mA1Wv1n0Daq3I8BlilK/8KwVWbxbDL4vk61Ftxly1uc=;
+        b=gRNwNNlw1U8QA2hmClwF+qjbC7oMNWBG1xNWtNAOYvIibzJ7OYQBJuykBpxfEeYLK6
+         QtudSIUg4vOTJ2JWxxKtR7Usjlq603GFH4qvSd994pr/xvSkrcIIn1x4XuGFIQQz69kj
+         qXDfUy4W1cOHXHBaILB5bfY0CxclHj+uoApkgJq2Egs2RFtWeaiKw72CreJobkwWMTUf
+         bC3Y7UKy68ccuf7V9BFbyPo0Zza47K+dhR1UYGvr1B2J8VlAx0Bm/QkXMBIRa+0D592l
+         SEIYbV99QIE943PmG+Osaq3okD/IQmoqa5oQOX8FxTVKfczqgXcXCrFuu4/GgvrUJPYC
+         LyCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=SqrSxY5uc4xcJqKSvQt8JkbosUVthJxwVLPagRQfa9k=;
-        b=f7BnuKJh8YRZQfdxpjlpYz0YByXkzQ6luVX7ap3tUvScAarDlClHS0ij8VH/NQyk8e
-         70S4aDUWSQkxjFHB4rq90Rpfby6J70ZogCm4K2jd9RVn3ho8YtBEtYwEA4e+lBQ0kV5U
-         aospo35iarMPcZ8F7tcSz3SX3stN3RDR61AWi2xVfdyxEEtVAVNRnQtD6EJXkDOdBniX
-         X2XerYFevF+0YAH/07OcMRrNGZjA2dh6Th73Du/xtnE7T164avB4FRyN3698NI5OgbRl
-         5yFjEEIWmysskVrAioMW/Ljxg8iu1K5X7sPweeoHHa/sCQNF/CQtQZjJU6jGSXr2CZ30
-         5GXg==
-X-Gm-Message-State: AOAM5311D25L99QJThvbWVgYbFDCSjiYpdZr1BZvXHzDu0pj39MFF38Y
-        wBPp+Wrs7bgvm1aP31AAFYB8Kzv3GuTqDdTIk8KtC43Ltw5Sudlz60QsCFx4Q3CQ+WttLrsReVU
-        glg6Z2XBpNuWvONkbhfZG+eHmiLrMacd0KHK0y/D5qBWgHbukKlD0/EccGGmC4qcSl0tmhWBwXz
-        8DA64F10XEC+M=
-X-Google-Smtp-Source: ABdhPJw6pYkEPaXn6m8Sa+IEwWAZKLX13zrJN5JXeLuCA6Cr5L/HdyQWDCnm9EPigYwxBtnqeBX6CeiZcx6ZH0NoNg==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:ad4:4d84:: with SMTP id
- cv4mr2903690qvb.14.1607051715532; Thu, 03 Dec 2020 19:15:15 -0800 (PST)
-Date:   Fri,  4 Dec 2020 11:14:31 +0800
-Message-Id: <20201204111038.v1.1.I4557a89427f61427e65d85bc51cca9e65607488e@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v1] Bluetooth: Set missing suspend task bits
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     alainm@chromium.org, mmandlik@chromium.org, mcchou@chromium.org,
-        marcel@holtmann.org, abhishekpandit@chromium.org,
-        apusaka@chromium.org, Howard Chung <howardchung@google.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=mA1Wv1n0Daq3I8BlilK/8KwVWbxbDL4vk61Ftxly1uc=;
+        b=BhClwU/Xp7NXsZTfEYP1cH4CyQMd1jzDQtpyKciUOp+S0wMmmmHdpB17H8toQPmJ2n
+         f26AKfuM8MimomYbJPVtj1Edm0DvUQi23pZskGh6Ep2pZoAFl0subFl3M2hDQp08fK+q
+         ZjKKn3PR8FWhNlzHxuDQIvGHIUzgSlw45f83/K/JCZUcyojTGgQbgoGKTmETyAddxIiQ
+         um121AWy9f/BXQigxhA8ehu/G7eGqjoRauvB6o4buM7+5dQ7WiuA05yf2uus8iqhJUJr
+         PHiwfkuXopZPi2uXy1DLA9NVN/xU2Oul28PZclhZkFZVQ6+pnDJ8QVHxuLs8A6OhliXL
+         PCAA==
+X-Gm-Message-State: AOAM53304hTKR+IqLjt7+W04vw2VH2b8DTRmx4FyoNz85jHflIS8O7d3
+        twrbbCk8+OURUevV9ryryXhXqsYA+X2WxO1+oyHRLFCVlDo5fJgh
+X-Google-Smtp-Source: ABdhPJyQn7zdhlYenIte2Cy4pidG0EtQXYrXdRBjQoj/p0aEQBmtulIwC9KYNy7Au8oZ47MyTXsBuo+dbvagHaT006E=
+X-Received: by 2002:a05:6512:338f:: with SMTP id h15mr2502528lfg.40.1607052340341;
+ Thu, 03 Dec 2020 19:25:40 -0800 (PST)
+MIME-Version: 1.0
+References: <20201203102936.4049556-1-apusaka@google.com> <20201203182903.v1.1.I92d2e2a87419730d60136680cbe27636baf94b15@changeid>
+ <20B6F2AD-1A60-4E3C-84C2-E3CB7294FABC@holtmann.org>
+In-Reply-To: <20B6F2AD-1A60-4E3C-84C2-E3CB7294FABC@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Fri, 4 Dec 2020 11:25:29 +0800
+Message-ID: <CAJQfnxHDThaJ58iFSpyq4bLopeuATvd+4fOR2AAgbNaabNSMuQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/5] Bluetooth: advmon offload MSFT add rssi support
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Yun-Hao Chung <howardchung@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Hi Marcel,
 
-When suspending, mark SUSPEND_SCAN_ENABLE and SUSPEND_SCAN_DISABLE tasks
-correctly when either classic or le scanning is modified.
+On Thu, 3 Dec 2020 at 22:03, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Archie,
+>
+> > MSFT needs rssi parameter for monitoring advertisement packet,
+> > therefore we should supply them from mgmt.
+> >
+> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+>
+> I don=E2=80=99t need any Reviewed-by if they are not catching an obvious =
+user API breakage.
+>
+> > ---
+> >
+> > include/net/bluetooth/hci_core.h | 9 +++++++++
+> > include/net/bluetooth/mgmt.h     | 9 +++++++++
+> > net/bluetooth/mgmt.c             | 8 ++++++++
+> > 3 files changed, 26 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
+ci_core.h
+> > index 9873e1c8cd16..42d446417817 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -246,8 +246,17 @@ struct adv_pattern {
+> >       __u8 value[HCI_MAX_AD_LENGTH];
+> > };
+> >
+> > +struct adv_rssi_thresholds {
+> > +     __s8 low_threshold;
+> > +     __s8 high_threshold;
+> > +     __u16 low_threshold_timeout;
+> > +     __u16 high_threshold_timeout;
+> > +     __u8 sampling_period;
+> > +};
+> > +
+> > struct adv_monitor {
+> >       struct list_head patterns;
+> > +     struct adv_rssi_thresholds rssi;
+> >       bool            active;
+> >       __u16           handle;
+> > };
+> > diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.=
+h
+> > index d8367850e8cd..dc534837be0e 100644
+> > --- a/include/net/bluetooth/mgmt.h
+> > +++ b/include/net/bluetooth/mgmt.h
+> > @@ -763,9 +763,18 @@ struct mgmt_adv_pattern {
+> >       __u8 value[31];
+> > } __packed;
+> >
+> > +struct mgmt_adv_rssi_thresholds {
+> > +     __s8 high_threshold;
+> > +     __le16 high_threshold_timeout;
+> > +     __s8 low_threshold;
+> > +     __le16 low_threshold_timeout;
+> > +     __u8 sampling_period;
+> > +} __packed;
+> > +
+> > #define MGMT_OP_ADD_ADV_PATTERNS_MONITOR      0x0052
+> > struct mgmt_cp_add_adv_patterns_monitor {
+> >       __u8 pattern_count;
+> > +     struct mgmt_adv_rssi_thresholds rssi;
+> >       struct mgmt_adv_pattern patterns[];
+> > } __packed;
+>
+> This is something we can not do. It breaks an userspace facing API. Is th=
+e mgmt opcode 0x0052 in an already released kernel?
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Howard Chung <howardchung@google.com>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
----
+Yes, the opcode does exist in an already released kernel.
 
- net/bluetooth/hci_request.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+The DBus method which accesses this API is put behind the experimental
+flag, therefore we expect they are flexible enough to support changes.
+Previously, we already had a discussion in an email thread with the
+title "Offload RSSI tracking to controller", and the outcome supports
+this change.
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 80dc451d6e124..71bffd7454720 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -707,6 +707,9 @@ void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
- 		return;
- 	}
- 
-+	if (hdev->suspended)
-+		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
-+
- 	if (use_ext_scan(hdev)) {
- 		struct hci_cp_le_set_ext_scan_enable cp;
- 
-@@ -1159,6 +1162,11 @@ static void hci_req_set_event_filter(struct hci_request *req)
- 		scan = SCAN_PAGE;
- 	}
- 
-+	if (scan)
-+		set_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
-+	else
-+		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
-+
- 	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- }
- 
--- 
-2.29.2.576.ga3fc446d84-goog
+Here is an excerpt of the discussion.
+On Thu, 1 Oct 2020 at 05:58, Miao-chen Chou <mcchou@google.com> wrote:
+>
+> Hi Luiz,
+>
+> Yes, the RSSI is included as a part of the Adv monitor API, and the RSSI =
+tracking is currently implemented (the patch series is still under review) =
+in bluetoothd and used by bluetoothctl (submenu advmon). As mentioned, we a=
+re planning to offload the RSSI tracking to the controller as well, so ther=
+e will be changes to the corresponding MGMT commands.
+> Thanks for your quick feedback!
+>
+> Regards,
+> Miao
+>
+> On Wed, Sep 30, 2020 at 2:00 PM Von Dentz, Luiz <luiz.von.dentz@intel.com=
+> wrote:
+>>
+>> Hi Miao,
+>>
+>> I do recall seeing these at D-Bus level, or perhaps it was in use by blu=
+etoothctl commands? Anyway since these are still experimental it should be =
+fine to change them.
+>> ________________________________
+>> From: Miao-chen Chou <mcchou@google.com>
+>> Sent: Wednesday, September 30, 2020 12:51 PM
+>> To: Holtmann, Marcel <marcel.holtmann@intel.com>; Von Dentz, Luiz <luiz.=
+von.dentz@intel.com>
+>> Cc: Alain Michaud <alainmichaud@google.com>; Yun-hao Chung <howardchung@=
+google.com>; Manish Mandlik <mmandlik@google.com>; Archie Pusaka <apusaka@g=
+oogle.com>
+>> Subject: Offload RSSI tracking to controller.
+>>
+>> Hi Luiz and Marcel,
+>>
+>> Going forward to 2020 Q4, we will be working on offloading the content f=
+iltering to the controllers based on controll's support of MSFT HCI extensi=
+on. In the meantime, we are planning to change the existing MGMT commands o=
+f Adv monitoring to allow the offloading of RSSI tracking shortly. Here is =
+a snippet of potential changes.
+>>
+>> +struct mgmt_adv_rssi_thresholds {
+>> +       __s8 high_rssi_threshold;
+>> +       u16 high_rssi_threshold_timeout;
+>> +       __s8 low_rssi_threshold;
+>> +       u16 high_rssi_threshold_timeout;
+>> +} __packed;
+>>
+>> struct mgmt_cp_add_adv_patterns_monitor {
+>>         u8 pattern_count;
+>> +        struct mgmt_adv_rssi_thresholds rssi_thresholds;
+>>         struct mgmt_adv_pattern patterns[];
+>> } __packed;
+>>
+>> Note that as suggested by you, the D-Bus Adv monitor API which accesses =
+these MGMT commands is currently hidden behind the experimental flag, so th=
+ey are still mutable. We'd like to hear your early feedback on changing the=
+ corresponding MGMT commands.
+>>
+>> Thanks,
+>> Miao
 
+Thanks,
+Archie
