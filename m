@@ -2,79 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9487C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Dec 2020 12:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671CAC4361A
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Dec 2020 18:30:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87BF323107
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Dec 2020 12:35:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 306B6229C4
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Dec 2020 18:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729239AbgLEKzD (ORCPT
+        id S1727894AbgLESaf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 5 Dec 2020 05:55:03 -0500
-Received: from smtprelay0063.hostedemail.com ([216.40.44.63]:44106 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728406AbgLEKxv (ORCPT
+        Sat, 5 Dec 2020 13:30:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43080 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727913AbgLESa3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 5 Dec 2020 05:53:51 -0500
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 6C27B18224D86;
-        Sat,  5 Dec 2020 10:51:48 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: edge87_1a0a959273cc
-X-Filterd-Recvd-Size: 2215
-Received: from XPS-9350.home (unknown [47.151.137.21])
-        (Authenticated sender: joe@perches.com)
-        by omf15.hostedemail.com (Postfix) with ESMTPA;
-        Sat,  5 Dec 2020 10:51:44 +0000 (UTC)
-Message-ID: <7779f4de8d70653fe0d92fd4821c32a71b6df436.camel@perches.com>
-Subject: Re: [PATCH 1/7] net: 8021q: remove unneeded MODULE_VERSION() usage
-From:   Joe Perches <joe@perches.com>
-To:     Jakub Kicinski <kuba@kernel.org>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>
-Cc:     linux-kernel@vger.kernel.org, davem@davemloft.net,
-        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
-        sven@narfation.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-        roopa@nvidia.com, nikolay@nvidia.com, edumazet@google.com,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jmaloy@redhat.com,
-        ying.xue@windriver.com, kafai@fb.com, songliubraving@fb.com,
-        yhs@fb.com, john.fastabend@gmail.com, kpsingh@chromium.org,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
-Date:   Sat, 05 Dec 2020 02:51:43 -0800
-In-Reply-To: <20201204160924.2e170514@kicinski-fedora-pc1c0hjn.DHCP.thefacebook.com>
-References: <20201202124959.29209-1-info@metux.net>
-         <20201204160924.2e170514@kicinski-fedora-pc1c0hjn.DHCP.thefacebook.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.38.1-1 
+        Sat, 5 Dec 2020 13:30:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607192941;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zBmQ0q6SyDIoUKz7lblD3IwikHfn8AQIR7fQR0CAKxg=;
+        b=iGuUvkg8yz5VRA7Fnu7gR4d3QDyr5CWWV8YFjQP9N3SMSMe/C8aHDDUtT/7UHpE4+/mpNg
+        hZU83KyuSpr7CLKMNAqub3RcWxgmkpVrjBGKH/B+jAYXHT8EkUPg4DRqO7d5kFiyc3zS/4
+        zJLIq3pVSesIJ9GMT0tIg6Oe0pODaLE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-D01sMfbUMTGJe0-4rBfhtA-1; Sat, 05 Dec 2020 10:02:04 -0500
+X-MC-Unique: D01sMfbUMTGJe0-4rBfhtA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9761B192D785;
+        Sat,  5 Dec 2020 15:02:03 +0000 (UTC)
+Received: from x1.localdomain.com (ovpn-112-32.ams2.redhat.com [10.36.112.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82FE25D6D5;
+        Sat,  5 Dec 2020 15:02:02 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 0/2] Bluetooth: btusb: Fake CSR dongle fixes
+Date:   Sat,  5 Dec 2020 16:01:59 +0100
+Message-Id: <20201205150201.5631-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 2020-12-04 at 16:09 -0800, Jakub Kicinski wrote:
-> On Wed,  2 Dec 2020 13:49:53 +0100 Enrico Weigelt, metux IT consult
-> wrote:
-> > Remove MODULE_VERSION(), as it isn't needed at all: the only version
-> > making sense is the kernel version.
-> > 
-> > Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
-> 
-> Thanks for the patches. Please drop the "metux IT consult" from the
-> addresses. The from space is supposed to be for your name.
+Hi All,
 
-If you _really_ want this superfluous 'metux IT consult' content in your
-signature, and I don't think you should, use parentheses around it.
+As requested here are my 2 btusb fake CSR dongle fixes as a series again
+because the second patch depends on the first patch.
 
-Enrico Weigelt (metux IT consult) <info@metux.net>
+Regards,
 
-Using a comma makes copy/paste into an email client think it's two addresses.
-
-
+Jans
 
