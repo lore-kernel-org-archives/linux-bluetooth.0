@@ -2,119 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A80C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 16:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F971C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 17:05:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EE6C23750
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 16:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1135723888
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 17:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726897AbgLGQAO (ORCPT
+        id S1727412AbgLGRFE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Dec 2020 11:00:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54304 "EHLO
+        Mon, 7 Dec 2020 12:05:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725822AbgLGQAN (ORCPT
+        with ESMTP id S1725939AbgLGRFE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Dec 2020 11:00:13 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665C1C06179C
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Dec 2020 07:59:33 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id p22so2201561edu.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Dec 2020 07:59:33 -0800 (PST)
+        Mon, 7 Dec 2020 12:05:04 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C461CC061749
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Dec 2020 09:04:23 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id y16so15793145ljk.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Dec 2020 09:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=uhasselt.be; s=google;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=UZH9E25yPj7aqS7+JVAZVZviJ+aDYZFEygt0FJaanx4=;
-        b=d2bvqtz837oRSL5J8h1PwhUAfkaC+o+qRDiRgYprdL8wW6jUIJftWAbA8U4cmHl6vi
-         +cbs8H/jhnIHSKnuq6mvXXJ2jBOAGbRWldxY9FtV5c2oAUMPQa/tiSBIkRkmLb161xeB
-         gmitOjycISZIhj5mJHClS2SAoMFr0Wkupo24s=
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=jGPJwRRnXv6HUwDi2/v5pS3LOQbataffNavfqIsZAQ0=;
+        b=SoPC2krBw3AmgnM5i3UFRlnWrbxJoLWBDNG6CAIJIIJ1ZzS493sf6xoxstUMNabzud
+         9CFR6GD4hhBepi2EKnqI3UEX01pob8IJf0ASv1nsM1LSRQyxX7ONL7O46aJGhMHlsQle
+         IoaG5jwq/CvpQmnlD9DvH+H7WHoAkcZlmlnR3ul4Jg/BvclAL9osvUBJdizEUy14GEE0
+         hkyt3NzOAuTVgoynuuNw1iBk0Yw+xjRECsifx2rQ7TnBeeINHDKj1JzG9e545Wrefiuu
+         vMZIbnMQsq/AkYqINJCS//R1W/PVsJFFOS+i3JIL/bje53tgyKt88DQm5uBHlUC+sl2P
+         oFmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=UZH9E25yPj7aqS7+JVAZVZviJ+aDYZFEygt0FJaanx4=;
-        b=h2YUqsZuxUTtihg4NteZf8U3Ry8NVL4Vu01YSUG5fCjY4jI9lACZ9bzWyPBhE+H37F
-         8VMS6BYbl4Lk0oHcddWBNZ1kN0R31gcZyRbAQQCE2VLnChfUyu0gbS1mVUUa4SHkDLNa
-         zlKCVj/ZtK/sKELs6LcRAhrGqgPOl++0f2gOLYGBOa53ez94NhLh5PSOvbkMuQghPdqP
-         TSMWimQFGcgBd9WwOIb8Qp/9E8csZKCSIpZYH55y8+KBShTffvqYoOX4LTOLDD949t7g
-         k1jy3nV3xGgs6lEdlkPoiKaSX5C6ZzRjaiVQKkZUqWRQS9FoAEXQIaLCZtmutVIYAbgv
-         pBTw==
-X-Gm-Message-State: AOAM533W99Kk7J9WzDW7M0cmR5Q6qg/PAPQ9cojWPIOstFPOaBwPv6A5
-        GaovUgox0nYc+I9n545JrdqKkLI+Zuu/3HCVEt8ZWyeKU00a4uNIzoph+574rBFcKd70cYFy5Zf
-        MDByzYE8WmdJfvo7vDH3mJJFFyJajBC5phyRXHZZbsPlMdl2q4rD+pDq2iEqY9XoF/hNt5q+qsN
-        MlajrcgwmTg5/N6oC9PGg=
-X-Google-Smtp-Source: ABdhPJw1c6RV8vwyNRzClZ04L2ZD/D1Q1IhhbAA5woYosTUSiCMPwtoAVpFfnMSWUAs1TnWYP/kLSQ==
-X-Received: by 2002:aa7:d54b:: with SMTP id u11mr20592414edr.341.1607356771696;
-        Mon, 07 Dec 2020 07:59:31 -0800 (PST)
-Received: from ?IPv6:2a02:1810:9506:e300:9b2:cc6c:58c0:e889? (ptr-4gz57ep9i94wldhvpmx.18120a2.ip6.access.telenet.be. [2a02:1810:9506:e300:9b2:cc6c:58c0:e889])
-        by smtp.gmail.com with ESMTPSA id d22sm13093960eja.72.2020.12.07.07.59.31
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 07:59:31 -0800 (PST)
-To:     linux-bluetooth@vger.kernel.org
-From:   Michel Van den Bergh <michel.vandenbergh@uhasselt.be>
-Subject: Bluetooth headset no longer working after upgrade to Ubuntu 20.04
-Message-ID: <f16ac221-6281-6725-6680-284d0a221a1d@uhasselt.be>
-Date:   Mon, 7 Dec 2020 16:59:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=jGPJwRRnXv6HUwDi2/v5pS3LOQbataffNavfqIsZAQ0=;
+        b=eI860JzElVyr53wxbON8Bd/R4xApS9MtJAeD6OGzuMGvrUP2IQS+CWdhbbDOogHebX
+         6UNoILzlx/6+JCG+aby56v6SM2WmHdaYPJSv0vE0VR7p9++UUzFcC0WR+uoe76vz3yjm
+         FpLJaXeo0f9zo7lNstOZrfOsFqniuVMf0UjtQYkL1G9PMH7GcNh035Rd8HblSmMVhCvj
+         NWLirgrhZwe34ggTQ1LZuND9bzXqRmipg23zPk4NYqenTLLIHhF5iQOCjK58WaiR0nZ2
+         KS61Q5cEz8Qj/KRwNnfu7wVibo2k+6CUZa7JKRbzuqsPrDGCnT6xrav7AsyvSXT2W1bh
+         E2wQ==
+X-Gm-Message-State: AOAM5332Y4sFPZ8Gi35J60/HSkqHAAseg53u69zqkWCxFOWBDrjd1W3U
+        qLow9IAW1BOkO/xLg3UtGr6O4yI+3WhuLWOuPw+bB6zwC7b+Hw==
+X-Google-Smtp-Source: ABdhPJy3RBBaNfv6nXkAh3FvHTJHB6gkcm3xPkmVKhqxE08O7X8eKVExDsGrNV/9nTv7AIbFwx/fxY2oaDKEKnJhlW8=
+X-Received: by 2002:a2e:804b:: with SMTP id p11mr8366384ljg.54.1607360662053;
+ Mon, 07 Dec 2020 09:04:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+From:   Lionel Jeanson <lionel.jeanson@gmail.com>
+Date:   Mon, 7 Dec 2020 18:04:10 +0100
+Message-ID: <CAMxp894ThdL9qxNz49561WrDj3XhWxpFMf+9afMD9WqMbSPBbw@mail.gmail.com>
+Subject: sixaxis patch proposal
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-My apologies. I posted this to the pulseaudio mailing list but now I 
-think it may be a bluetooth issue.
+Hi;
 
-I have a bluetooth headset JBC LIVE650BT. It worked perfectly with Ubuntu
-16.04. It currently works perfectly with an ipad.
+I'd like to propose the following patch to fix the following issue :
 
-On Ubuntu 20.04 I can pair with the device but then pulseaudio does not 
-see it.
+ - if an already paired PS3 DualShock is plugged to USB, while it is
+turned off (PS button wasn't pushed or no more battery for instance),
+then it's connection will be reset and it will have to be paired again
 
-The output of
+ - to fix this, I removed the device connection check
 
-$ bluetoothctl info <MAC>
+ - tested on Ubuntu 20.x (bluez-5.53 and bluez-5.55) and works fine in
+all cases.
 
-is
+Thank you;
+Lionel
 
-Device 45:63:61:53:08:39 (public)
-Name: JBL LIVE650BTNC-LE
-Alias: JBL LIVE650BTNC-LE
-Paired: yes
-Trusted: yes
-Blocked: no
-Connected: no
-LegacyPairing: no
-UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
-UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-UUID: Unknown (0000fe03-0000-1000-8000-00805f9b34fb)
-UUID: Google Inc. (0000fe2c-0000-1000-8000-00805f9b34fb)
-UUID: Vendor specific (55f80aef-d89f-41a4-9e36-0ffc88dc81ce)
-UUID: Vendor specific (65786365-6c70-6f69-6e74-2e636f6d0000)
-UUID: Vendor specific (66666666-6666-6666-6666-666666666666)
-UUID: Vendor specific (67a846ad-de3e-451b-a6d8-7b2899ca2370)
-UUID: Vendor specific (91c10d9c-aaef-42bd-b6d6-8a648c19213d)
-UUID: Vendor specific (fe59bfa8-7fe3-4a05-9d94-99fadc69faff)
-ManufacturerData Key: 0x0ecb
-ManufacturerData Value:
-   15 1f 00 43 d3                                   ...C.
-ServiceData Key: 0000fe2c-0000-1000-8000-00805f9b34fb
-ServiceData Value:
-   00 00                                            ..
-ServiceData Key: 0000fe03-0000-1000-8000-00805f9b34fb
-ServiceData Key: 0000fe26-0000-1000-8000-00805f9b34fb
-ServiceData Value:
-   13 02 f0
 
-AFAICT there is nothing in this output that suggests this is an audio
-device. Is this normal?
+
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index d693a86c0..ccede193e 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -337,7 +337,6 @@ static bool setup_device(int fd, const char *sysfs_path,
+        device = btd_adapter_find_device(adapter, &device_bdaddr,
+                                                        BDADDR_BREDR);
+        if (device != NULL &&
+-               btd_device_is_connected(device) &&
+                g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
+                                                (GCompareFunc)strcasecmp)) {
+                char device_addr[18];
