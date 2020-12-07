@@ -2,284 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39CEC4361B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 15:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A80C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 16:00:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78EF523716
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 15:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EE6C23750
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 16:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726214AbgLGPKA (ORCPT
+        id S1726897AbgLGQAO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Dec 2020 10:10:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
+        Mon, 7 Dec 2020 11:00:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbgLGPKA (ORCPT
+        with ESMTP id S1725822AbgLGQAN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Dec 2020 10:10:00 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F9DC061749;
-        Mon,  7 Dec 2020 07:09:20 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id m9so9122450pgb.4;
-        Mon, 07 Dec 2020 07:09:20 -0800 (PST)
+        Mon, 7 Dec 2020 11:00:13 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665C1C06179C
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Dec 2020 07:59:33 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id p22so2201561edu.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Dec 2020 07:59:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition;
-        bh=tOzVtXqH2yrWHxYYbEQsQ165KXiOY4/rdio2NcOF61Q=;
-        b=h/M+N/iJvfINxui6doCTnSk35ZV8UkZmLztZ4umaV9WjleYREqFS2JBi7AkadBS/40
-         okP4/C3a/7xD9z3D6Nv5GUOOxH+kEUtiFqYf6Y4ELpTXiNBlQqv1WxTa9Ho5XqE11wwh
-         ejzSw3bj/sWTdbynQVxnLJDoQdvNoxjULi8cMqcQM0mDgpo4JEalYY55BzJrfVmPftNg
-         rxN7hDgdZhLwWdXRa2BX9LKNxKmm4oPhkctu8nqsPfpToI6jgpqpkV8XkoIlu8P63qCw
-         Njqc9umxwcdfHHgOzv1Pxrhahh+ofv+bh+1QONjDy/kFn7Zv/sSuCphMGCsWonei15QQ
-         wBWw==
+        d=uhasselt.be; s=google;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=UZH9E25yPj7aqS7+JVAZVZviJ+aDYZFEygt0FJaanx4=;
+        b=d2bvqtz837oRSL5J8h1PwhUAfkaC+o+qRDiRgYprdL8wW6jUIJftWAbA8U4cmHl6vi
+         +cbs8H/jhnIHSKnuq6mvXXJ2jBOAGbRWldxY9FtV5c2oAUMPQa/tiSBIkRkmLb161xeB
+         gmitOjycISZIhj5mJHClS2SAoMFr0Wkupo24s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition;
-        bh=tOzVtXqH2yrWHxYYbEQsQ165KXiOY4/rdio2NcOF61Q=;
-        b=kFF0foACNIrmiP/0Dh8gGe4FrggnVRrUOcpKjFkoi/h3/mJY/Zu1CW+TZEaktj1moh
-         QVu7W0ha+cHB+Na9rGrb0j72ChWTszaHKnjPI/SsMgM8sz7PUY6g5PMKsfuitPF+PE0t
-         B50XkhJG83WdVOTt1tsxDalX75ABlAciBBbozOfFuKXJMmrykaznHtfhnI1rUFDQrDxc
-         eX3eDbeodE5con4/6qT4w6lWXG3Y+P1WP8ZWfhHWy0TfFfapw46YaXjsZTc8Py9GodPJ
-         htsyUUQj/H0HMcKLQpXfKmpY9RyOsThpG5SdEV71+okPDMkqkeinzhU9hUlebB77A3pK
-         Kl0w==
-X-Gm-Message-State: AOAM532DJDo7vhYWu+AahEtXMVXSAKSi+ZMUlS0DkRCssQwlrWvXVomD
-        9wnJ4FHFHWs7MTa8IuBN0oIZosf3UPK03PIg
-X-Google-Smtp-Source: ABdhPJxDhKE+JiBFzd82nVOKhI+8Me1QzBYWW6sqKKsGX+2LUXkyeX91NM4fMvu4EhOFtRsYHW3gaA==
-X-Received: by 2002:a05:6a00:170a:b029:19d:afca:4704 with SMTP id h10-20020a056a00170ab029019dafca4704mr16185047pfc.7.1607353759681;
-        Mon, 07 Dec 2020 07:09:19 -0800 (PST)
-Received: from localhost ([192.55.55.45])
-        by smtp.gmail.com with ESMTPSA id er23sm10930145pjb.12.2020.12.07.07.09.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 07:09:18 -0800 (PST)
-Date:   Mon, 7 Dec 2020 17:09:15 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2020-12-07
-Message-ID: <20201207150915.GA10957@johnypau-MOBL2.ger.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=UZH9E25yPj7aqS7+JVAZVZviJ+aDYZFEygt0FJaanx4=;
+        b=h2YUqsZuxUTtihg4NteZf8U3Ry8NVL4Vu01YSUG5fCjY4jI9lACZ9bzWyPBhE+H37F
+         8VMS6BYbl4Lk0oHcddWBNZ1kN0R31gcZyRbAQQCE2VLnChfUyu0gbS1mVUUa4SHkDLNa
+         zlKCVj/ZtK/sKELs6LcRAhrGqgPOl++0f2gOLYGBOa53ez94NhLh5PSOvbkMuQghPdqP
+         TSMWimQFGcgBd9WwOIb8Qp/9E8csZKCSIpZYH55y8+KBShTffvqYoOX4LTOLDD949t7g
+         k1jy3nV3xGgs6lEdlkPoiKaSX5C6ZzRjaiVQKkZUqWRQS9FoAEXQIaLCZtmutVIYAbgv
+         pBTw==
+X-Gm-Message-State: AOAM533W99Kk7J9WzDW7M0cmR5Q6qg/PAPQ9cojWPIOstFPOaBwPv6A5
+        GaovUgox0nYc+I9n545JrdqKkLI+Zuu/3HCVEt8ZWyeKU00a4uNIzoph+574rBFcKd70cYFy5Zf
+        MDByzYE8WmdJfvo7vDH3mJJFFyJajBC5phyRXHZZbsPlMdl2q4rD+pDq2iEqY9XoF/hNt5q+qsN
+        MlajrcgwmTg5/N6oC9PGg=
+X-Google-Smtp-Source: ABdhPJw1c6RV8vwyNRzClZ04L2ZD/D1Q1IhhbAA5woYosTUSiCMPwtoAVpFfnMSWUAs1TnWYP/kLSQ==
+X-Received: by 2002:aa7:d54b:: with SMTP id u11mr20592414edr.341.1607356771696;
+        Mon, 07 Dec 2020 07:59:31 -0800 (PST)
+Received: from ?IPv6:2a02:1810:9506:e300:9b2:cc6c:58c0:e889? (ptr-4gz57ep9i94wldhvpmx.18120a2.ip6.access.telenet.be. [2a02:1810:9506:e300:9b2:cc6c:58c0:e889])
+        by smtp.gmail.com with ESMTPSA id d22sm13093960eja.72.2020.12.07.07.59.31
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Dec 2020 07:59:31 -0800 (PST)
+To:     linux-bluetooth@vger.kernel.org
+From:   Michel Van den Bergh <michel.vandenbergh@uhasselt.be>
+Subject: Bluetooth headset no longer working after upgrade to Ubuntu 20.04
+Message-ID: <f16ac221-6281-6725-6680-284d0a221a1d@uhasselt.be>
+Date:   Mon, 7 Dec 2020 16:59:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+My apologies. I posted this to the pulseaudio mailing list but now I 
+think it may be a bluetooth issue.
 
---jI8keyz6grp/JLjh
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I have a bluetooth headset JBC LIVE650BT. It worked perfectly with Ubuntu
+16.04. It currently works perfectly with an ipad.
 
-Hi Dave, Jakub,
+On Ubuntu 20.04 I can pair with the device but then pulseaudio does not 
+see it.
 
-Here's the main bluetooth-next pull request for the 5.11 kernel.
+The output of
 
- - Updated Bluetooth entries in MAINTAINERS to include Luiz von Dentz
- - Added support for Realtek 8822CE and 8852A devices
- - Added support for MediaTek MT7615E device
- - Improved workarounds for fake CSR devices
- - Fix Bluetooth qualification test case L2CAP/COS/CFD/BV-14-C
- - Fixes for LL Privacy support
- - Enforce 16 byte encryption key size for FIPS security level
- - Added new mgmt commands for extended advertising support
- - Multiple other smaller fixes & improvements
+$ bluetoothctl info <MAC>
 
-Please let me know if there are any issues pulling. Thanks.
+is
 
-Johan
+Device 45:63:61:53:08:39 (public)
+Name: JBL LIVE650BTNC-LE
+Alias: JBL LIVE650BTNC-LE
+Paired: yes
+Trusted: yes
+Blocked: no
+Connected: no
+LegacyPairing: no
+UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: Unknown (0000fe03-0000-1000-8000-00805f9b34fb)
+UUID: Google Inc. (0000fe2c-0000-1000-8000-00805f9b34fb)
+UUID: Vendor specific (55f80aef-d89f-41a4-9e36-0ffc88dc81ce)
+UUID: Vendor specific (65786365-6c70-6f69-6e74-2e636f6d0000)
+UUID: Vendor specific (66666666-6666-6666-6666-666666666666)
+UUID: Vendor specific (67a846ad-de3e-451b-a6d8-7b2899ca2370)
+UUID: Vendor specific (91c10d9c-aaef-42bd-b6d6-8a648c19213d)
+UUID: Vendor specific (fe59bfa8-7fe3-4a05-9d94-99fadc69faff)
+ManufacturerData Key: 0x0ecb
+ManufacturerData Value:
+   15 1f 00 43 d3                                   ...C.
+ServiceData Key: 0000fe2c-0000-1000-8000-00805f9b34fb
+ServiceData Value:
+   00 00                                            ..
+ServiceData Key: 0000fe03-0000-1000-8000-00805f9b34fb
+ServiceData Key: 0000fe26-0000-1000-8000-00805f9b34fb
+ServiceData Value:
+   13 02 f0
 
----
-The following changes since commit bff6f1db91e330d7fba56f815cdbc412c75fe163:
-
-  stmmac: intel: change all EHL/TGL to auto detect phy addr (2020-11-07 16:=
-11:54 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
-
-for you to fetch changes up to 02be5f13aacba2100f1486d3ad16c26b6dede1ce:
-
-  MAINTAINERS: Update Bluetooth entries (2020-12-07 17:02:01 +0200)
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (2):
-      Bluetooth: btqca: Add valid le states quirk
-      Bluetooth: Set missing suspend task bits
-
-Anant Thazhemadam (2):
-      Bluetooth: hci_h5: close serdev device and free hu in h5_close
-      Bluetooth: hci_h5: fix memory leak in h5_close
-
-Anmol Karn (1):
-      Bluetooth: Fix null pointer dereference in hci_event_packet()
-
-Archie Pusaka (1):
-      Bluetooth: Enforce key size of 16 bytes on FIPS level
-
-Balakrishna Godavarthi (1):
-      Bluetooth: hci_qca: Enhance retry logic in qca_setup
-
-Cadel Watson (1):
-      Bluetooth: btusb: Support 0bda:c123 Realtek 8822CE device
-
-Chris Chiu (1):
-      Bluetooth: btusb: Add support for 13d3:3560 MediaTek MT7615E device
-
-Claire Chang (1):
-      Bluetooth: Move force_bredr_smp debugfs into hci_debugfs_create_bredr
-
-Colin Ian King (1):
-      Bluetooth: btrtl: fix incorrect skb allocation failure check
-
-Daniel Winkler (6):
-      Bluetooth: Resume advertising after LE connection
-      Bluetooth: Add helper to set adv data
-      Bluetooth: Break add adv into two mgmt commands
-      Bluetooth: Use intervals and tx power from mgmt cmds
-      Bluetooth: Query LE tx power on startup
-      Bluetooth: Change MGMT security info CMD to be more generic
-
-Edward Vear (1):
-      Bluetooth: Fix attempting to set RPA timeout when unsupported
-
-Hans de Goede (4):
-      Bluetooth: revert: hci_h5: close serdev device and free hu in h5_close
-      Bluetooth: hci_h5: Add OBDA0623 ACPI HID
-      Bluetooth: btusb: Fix detection of some fake CSR controllers with a b=
-cdDevice val of 0x0134
-      Bluetooth: btusb: Add workaround for remote-wakeup issues with Barrot=
- 8041a02 fake CSR controllers
-
-Howard Chung (6):
-      Bluetooth: Replace BT_DBG with bt_dev_dbg in HCI request
-      Bluetooth: Interleave with allowlist scan
-      Bluetooth: Handle system suspend resume case
-      Bluetooth: Handle active scan case
-      Bluetooth: Refactor read default sys config for various types
-      Bluetooth: Add toggle to switch off interleave scan
-
-Jimmy Wahlberg (1):
-      Bluetooth: Fix for Bluetooth SIG test L2CAP/COS/CFD/BV-14-C
-
-Jing Xiangfeng (2):
-      Bluetooth: btusb: Add the missed release_firmware() in btusb_mtk_setu=
-p_firmware()
-      Bluetooth: btmtksdio: Add the missed release_firmware() in mtk_setup_=
-firmware()
-
-Julian Pidancet (1):
-      Bluetooth: btusb: Add support for 1358:c123 Realtek 8822CE device
-
-Kai-Heng Feng (1):
-      Bluetooth: btrtl: Ask 8821C to drop old firmware
-
-Kiran K (5):
-      Bluetooth: btintel: Fix endianness issue for TLV version information
-      Bluetooth: btusb: Add *setup* function for new generation Intel contr=
-ollers
-      Bluetooth: btusb: Define a function to construct firmware filename
-      Bluetooth: btusb: Helper function to download firmware to Intel adapt=
-ers
-      Bluetooth: btusb: Map Typhoon peak controller to BTUSB_INTEL_NEWGEN
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: Fix not sending Set Extended Scan Response
-      Bluetooth: Rename get_adv_instance_scan_rsp
-
-Marcel Holtmann (2):
-      Bluetooth: Increment management interface revision
-      MAINTAINERS: Update Bluetooth entries
-
-Max Chou (3):
-      Bluetooth: btusb: Add the more support IDs for Realtek RTL8822CE
-      Bluetooth: btrtl: Refine the ic_id_table for clearer and more regular
-      Bluetooth: btusb: btrtl: Add support for RTL8852A
-
-Nigel Christian (1):
-      Bluetooth: hci_qca: resolve various warnings
-
-Ole Bj=F8rn Midtb=F8 (1):
-      Bluetooth: hidp: use correct wait queue when removing ctrl_wait
-
-Peilin Ye (1):
-      Bluetooth: Fix slab-out-of-bounds read in hci_le_direct_adv_report_ev=
-t()
-
-Reo Shiseki (1):
-      Bluetooth: fix typo in struct name
-
-Sathish Narasimman (1):
-      Bluetooth: Fix: LL PRivacy BLE device fails to connect
-
-Sergey Shtylyov (1):
-      Bluetooth: consolidate error paths in hci_phy_link_complete_evt()
-
-Tim Jiang (1):
-      Bluetooth: btusb: support download nvm with different board id for wc=
-n6855
-
-Venkata Lakshmi Narayana Gubba (2):
-      Bluetooth: hci_qca: Wait for timeout during suspend
-      Bluetooth: btqca: Use NVM files based on SoC ID for WCN3991
-
-Wei Yongjun (1):
-      Bluetooth: sco: Fix crash when using BT_SNDMTU/BT_RCVMTU option
-
-Xiaolei Wang (1):
-      Bluetooth: hci_ll: add a small delay for wl1271 enable bt_en
-
- MAINTAINERS                      |   6 +-
- drivers/bluetooth/btintel.c      |  21 +-
- drivers/bluetooth/btintel.h      |   6 +
- drivers/bluetooth/btmtksdio.c    |   2 +-
- drivers/bluetooth/btqca.c        |  36 ++--
- drivers/bluetooth/btqca.h        |  22 +-
- drivers/bluetooth/btrtl.c        | 123 ++++++-----
- drivers/bluetooth/btusb.c        | 421 +++++++++++++++++++++++++++++++++++=
-+-
- drivers/bluetooth/hci_h5.c       |   4 +
- drivers/bluetooth/hci_ll.c       |   1 +
- drivers/bluetooth/hci_qca.c      | 118 +++++++----
- include/net/bluetooth/hci.h      |   7 +
- include/net/bluetooth/hci_core.h |  23 ++-
- include/net/bluetooth/mgmt.h     |  53 ++++-
- net/bluetooth/hci_conn.c         |  12 +-
- net/bluetooth/hci_core.c         |  53 ++++-
- net/bluetooth/hci_debugfs.c      |  50 +++++
- net/bluetooth/hci_event.c        |  44 ++--
- net/bluetooth/hci_request.c      | 303 +++++++++++++++++++--------
- net/bluetooth/hci_request.h      |   2 +
- net/bluetooth/hidp/core.c        |   2 +-
- net/bluetooth/l2cap_core.c       |  10 +-
- net/bluetooth/mgmt.c             | 436 +++++++++++++++++++++++++++++++++++=
-+---
- net/bluetooth/mgmt_config.c      | 187 +++++++++++------
- net/bluetooth/sco.c              |   5 +
- net/bluetooth/smp.c              |  44 +---
- net/bluetooth/smp.h              |   2 +
- 27 files changed, 1623 insertions(+), 370 deletions(-)
-
---jI8keyz6grp/JLjh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCX85FmAAKCRAfyv3T9pQ3
-Kpz6AP9WVG5b8QbaF26+0lCHLc8mkjdcczDAE7cQaweW+q0vYgD6A0p9x3+3Iik1
-Y8NmIYsZxsER0xlBzAfZH/+ZvYaNjQs=
-=rYCF
------END PGP SIGNATURE-----
-
---jI8keyz6grp/JLjh--
+AFAICT there is nothing in this output that suggests this is an audio
+device. Is this normal?
