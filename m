@@ -2,125 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21537C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 19:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA48C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 19:57:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E22EC23428
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 19:11:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 821F421D7F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Dec 2020 19:57:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgLGTL1 (ORCPT
+        id S1726997AbgLGT5S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Dec 2020 14:11:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55946 "EHLO
+        Mon, 7 Dec 2020 14:57:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726592AbgLGTL1 (ORCPT
+        with ESMTP id S1726761AbgLGT5R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Dec 2020 14:11:27 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05362C061749
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Dec 2020 11:10:47 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id b9so10225246qtr.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Dec 2020 11:10:46 -0800 (PST)
+        Mon, 7 Dec 2020 14:57:17 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA6DC06179C
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Dec 2020 11:56:37 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id y23so383861wmi.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Dec 2020 11:56:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=mqx4CPoQiXYrRNXtm2F2Xh8ujhWV6FbuaZg8dPh6rzY=;
-        b=YVkRaT1orBRBmz5Cgx53VbWnRFACf9meN553cyGn+KT4KndwioqOXUa+CMVVmvWhPM
-         z0PvAflf7jT+l5HwyZgq+OBgI4U15gjRgdLEF0gAgzdO/mYVL6obuWZSpE6Kln/QfDUQ
-         wbtdu3pl6d0NUd9Rn11ac+beT7WYOQ99MF6gMkiPVKgJNVGMCSBZv1tguaSIoNUr0KQD
-         h4SvEb5VvoYZMBDxL7j85Q9ypVFseCJLHqNmGo5S9DaNP2//RUEW9/ZnjPbPhqiWw8Z0
-         UVY2Xe88sLwE28FxYJf/9BNl9mvmSkeurRGBAZWYBaOiXZd6uA3ZKcoKYm2cBGD6uFJi
-         aWlA==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=iQJLk4korq+Q3a0+AkzD0p7/FPQghlmc6y6vyTQzSj0=;
+        b=dfTiW6MPOrh3AAxP7QrDsqzHRkqaVNv/MtgzDWRv5iYp8ZzWdzVzYRc1954HzH18sA
+         9tSa0gXONdqP0LzwFGuXFyKYJ/12pQBx/alb/i9CJ5FxkIxeW9uvnZh7avlA2GNZ2NmO
+         Z0+TyR1L5JSdTt9p4hYkHLNSv7rBOKc6X4Bx0A6s1NGocU/W2MVQWhoB/4nikpUq8zho
+         qlzsUY1WvSsvZxjfCt3RvfAFBeH5UUa5hKqDbHcWLCBsUixmGAWAe2344+w/JuUkainH
+         YYWHZ1ZvF5xA4WK1RBIWfehVRArccLqHm/WZj7brXUoIbCa6sFTcL9wdM3CCcQsQx0N6
+         CH9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=mqx4CPoQiXYrRNXtm2F2Xh8ujhWV6FbuaZg8dPh6rzY=;
-        b=AV+d080MGMqCZs0DrqR5A84McUG6Gc0Okt+r50aMYUL78/t9yEbLfIYPTsaT3Ymv8C
-         XbFpNwVju3NScsom2FW/3kK1tIwJ6VgvZQEto/IfBw4l/mxYBGdmRsU1uHMCrl9b9Tk8
-         yx6mRbue6b96nH81aApONf2h4d3d4CWfxV3xSwESY8loA/ZDsW6CfoKcfhQc5TI7Eavn
-         xwfPpz5XSVmaJCGF6EufP2e3S6yI1tP7czoiW+H8vWqku/lXXzrQSziSH5kNhYARKSNM
-         /jmt2wqBM2gZ6mNGf6Csq6GXnB9Uuhn3Y6HP+A0p4AmXXN9BIKE37DyTTuxqjrTWTG8p
-         6SXQ==
-X-Gm-Message-State: AOAM531zSdLeYdXJEEk+0AUmOitjgRapizYNEmmQLvlbzAljg5s52D56
-        qP1C00lrNUCz2vaxQbfHo86tgEufFv7CxA==
-X-Google-Smtp-Source: ABdhPJzThPVMTH5Cg3+HrPmsDcXbPaCNNafgsBA11VfVBvzFt4XRjXA4WulUyp+zGGl+CGdiCmFKRg==
-X-Received: by 2002:aed:3103:: with SMTP id 3mr19967321qtg.105.1607368246019;
-        Mon, 07 Dec 2020 11:10:46 -0800 (PST)
-Received: from [172.17.0.2] ([20.185.65.145])
-        by smtp.gmail.com with ESMTPSA id e126sm12860983qkb.90.2020.12.07.11.10.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 11:10:45 -0800 (PST)
-Message-ID: <5fce7e35.1c69fb81.b8b8f.9b52@mx.google.com>
-Date:   Mon, 07 Dec 2020 11:10:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6376790585084481280=="
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=iQJLk4korq+Q3a0+AkzD0p7/FPQghlmc6y6vyTQzSj0=;
+        b=kAILR4rsj5lIEKoiMMRSLBKK4v7yPioRv/p5dr0F0CXaAxaAihMfL8uSXGQWBPm4nQ
+         GJuUAfPCAhrXXtuQd6AD0hkfykkFAuDx9+oF0R3IISdNwK8NiRuXLla3PFOzACHsSxPp
+         SwpaC+U+KaJeU22aUbA5lH3c946ZbWarBZ33tzmDzVndsJRBM58bDucERvPDRkpfmpO9
+         vcDyqsI/+OcH/8PyEu9ITA9y+R5cDriU61omF0sGCi9qVRYAcsYWJx0hslyds1apgueN
+         35O+o5yuwy/jXCk+fj8tUsN92V/+MNH4TC9rLdzK7OJ0qpceGLO3ZwxdUKFAr3+sj01q
+         ih+g==
+X-Gm-Message-State: AOAM533aZkYfSse8hpS35Kx5woMqDCPrhBNXO+eCjZ9YGIvaMmqWhBte
+        GK3bvdi0rkF20+sB92mVYgGmDenL3po=
+X-Google-Smtp-Source: ABdhPJz5dd49nkotnl722HWWiaa63XU6/HSPWl697VCA7vJfH2Wbkzpt9xyvHbPeumPs+mTh3N6brg==
+X-Received: by 2002:a7b:c157:: with SMTP id z23mr465106wmi.35.1607370995801;
+        Mon, 07 Dec 2020 11:56:35 -0800 (PST)
+Received: from ?IPv6:2003:ea:8f07:3b00:dcd:bf30:f72b:9f3a? (p200300ea8f073b000dcdbf30f72b9f3a.dip0.t-ipconnect.de. [2003:ea:8f07:3b00:dcd:bf30:f72b:9f3a])
+        by smtp.googlemail.com with ESMTPSA id y2sm381017wma.6.2020.12.07.11.56.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Dec 2020 11:56:35 -0800 (PST)
+To:     Kiran K <kiran.k@intel.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc:     BlueZ development <linux-bluetooth@vger.kernel.org>
+From:   Heiner Kallweit <hkallweit1@gmail.com>
+Subject: linux-next-2020-12-04: Failed to send firmware data (-38) with AX210
+Message-ID: <ece7cd5c-14ff-5a6d-29b5-c6a16b2638e8@gmail.com>
+Date:   Mon, 7 Dec 2020 20:56:29 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, encrypted.def@gmail.com
-Subject: RE: Bluetooth: smp: Fix biased random passkey generation
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201207174957.408-1-encrypted.def@gmail.com>
-References: <20201207174957.408-1-encrypted.def@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6376790585084481280==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+With an AX210 card I get "Failed to send firmware data (-38)" on linux-next
+from Dec 4th in case of a cold-boot after power-cycle.
 
-This is automated email and please do not reply to this email!
+"hk: bt code = 0x001f" is a private debug message to check which BT code
+is mapped to ENOSYS (-38). From what I found 0x1f is "Unspecified error".
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=397747
-
----Test result---
-
-##############################
-Test: CheckPatch - FAIL
-Output:
-Bluetooth: smp: Fix biased random passkey generation
-WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#6: 
-Since u32 range size is not a multiple of 1,000,000, current passkey generation logic is biased.
-
-total: 0 errors, 1 warnings, 0 checks, 10 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] Bluetooth: smp: Fix biased random passkey generation" has style problems, please review.
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+The second attempt to load the firmware is successful then.
 
 
-##############################
-Test: CheckGitLint - FAIL
-Output:
-Bluetooth: smp: Fix biased random passkey generation
-3: B1 Line exceeds max length (96>80): "Since u32 range size is not a multiple of 1,000,000, current passkey generation logic is biased."
-5: B1 Line exceeds max length (94>80): "Fixed this by adding a routine that selects passkey again if passkey is 4,200,000,000 or more."
+[    4.192718] Bluetooth: Core ver 2.22
+[    4.192756] Bluetooth: Starting self testing
+[    4.192785] Bluetooth: Finished self testing
+[    4.192937] Bluetooth: HCI device and connection manager initialized
+[    4.193067] Bluetooth: HCI socket layer initialized
+[    4.193108] Bluetooth: L2CAP socket layer initialized
+[    4.193195] Bluetooth: SCO socket layer initialized
+[    4.242342] Bluetooth: hci0: Device revision is 0
+[    4.242435] Bluetooth: hci0: Secure boot is enabled
+[    4.242495] Bluetooth: hci0: OTP lock is enabled
+[    4.242533] Bluetooth: hci0: API lock is enabled
+[    4.242570] Bluetooth: hci0: Debug lock is disabled
+[    4.242609] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    4.242657] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 build 38
+[    4.261977] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+[    4.855813] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    4.855873] Bluetooth: BNEP socket layer initialized
+[    5.819388] Bluetooth: hk: bt code = 0x001f
+[    5.819438] Bluetooth: hci0: Failed to send firmware data (-38)
+[    5.820069] Bluetooth: hci0: Intel reset sent to retry FW download
+[    6.362248] Bluetooth: hci0: Device revision is 0
+[    6.362384] Bluetooth: hci0: Secure boot is enabled
+[    6.362439] Bluetooth: hci0: OTP lock is enabled
+[    6.362551] Bluetooth: hci0: API lock is enabled
+[    6.362605] Bluetooth: hci0: Debug lock is disabled
+[    6.362660] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[    6.362726] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 build 38
+[    6.364508] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+[    9.020540] Bluetooth: hci0: Waiting for firmware download to complete
+[    9.021443] Bluetooth: hci0: Firmware loaded in 2599136 usecs
+[    9.022778] Bluetooth: hci0: Waiting for device to boot
+[    9.050099] Bluetooth: hci0: Device booted in 27723 usecs
+[    9.052633] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-0041-0041.ddc
+[    9.055224] Bluetooth: hci0: Applying Intel DDC parameters completed
+[    9.060184] Bluetooth: hci0: Firmware timestamp 2020.42 buildtype 1 build 15791
 
-
-##############################
-Test: CheckBuildK - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6376790585084481280==--
