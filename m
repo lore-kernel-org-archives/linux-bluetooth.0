@@ -2,128 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F972C47434
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DAEC4361B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 21:27:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C39B23A53
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:22:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AA7823B1A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 21:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731362AbgLHUQM (ORCPT
+        id S1729487AbgLHV1s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Dec 2020 15:16:12 -0500
-Received: from mail-ot1-f47.google.com ([209.85.210.47]:34346 "EHLO
-        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731073AbgLHUMu (ORCPT
+        Tue, 8 Dec 2020 16:27:48 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:40833 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726222AbgLHV1s (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Dec 2020 15:12:50 -0500
-Received: by mail-ot1-f47.google.com with SMTP id a109so1394571otc.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec 2020 12:11:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=VS4bztVO9Q6HyqZ0Bty9RN6srIW+1eE+z8XoORtfkRg=;
-        b=RRXA3+6EimiPunGCxMNxoPph8I3Kw2JKefKoltZLwQMv8J1r+qcWhxj/xFhIolRH44
-         HuQS43T36CN9SR3qmMEerghzuQ5IHNe0T7LZOXrxiMkhN/gvHd9VopiGrRQwGXweV6xv
-         dmOxhkCioFcNbgxB+srAXyKi3RtAR9QmR/8NHkSQAgr+f9OXXBG+tirBhw1iskoRdkSN
-         wONTO6hm+idW9SGqrILrVHfSom45GmBzQBqS/9ay9w4jCFDWMIoMa5UQvegoogfNl4no
-         ATXGt0LugDLAQicIG/zFCnSGR1+n68ebqAeCK6wBGPK1MFC6AEBVGKoyHEKxTHJFl7Yc
-         5nnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VS4bztVO9Q6HyqZ0Bty9RN6srIW+1eE+z8XoORtfkRg=;
-        b=UYPeTKAm1rPHcskRi3OktnAfTdN9Tx8V+vVI8CwIAK4OFQ/nA+UWl/r3Xy3ZRL4F0W
-         VyZSXspE1qGhlUO+gyLDI4pQRS15lKQrME0yhOVKuL7hcpFdVYvDEExTHvCPwFoTeSSq
-         kzX1VUB7wAeVZm6L/p+TATTzz7rzFD6YimKrcGQRuhkVyuIhrFAdIW33zdUBsk138KQM
-         BtKPfNbgFVJTqTu4iuzbUfXv0WyAxW6q0Y88Rh5ObmPYwu9zvOj4dLRrSULVwg5ZC+mZ
-         hPd95WrbxKXrBPh9SFiTvz0Ms9AAL5wwYlJ0vTFmJvXyZop79ykBA6dAqrsE2vPXs98J
-         JYsQ==
-X-Gm-Message-State: AOAM532r2xdYg3B04efmnZQDuLH3yx8h+bd0E3cyry6YlZO4VAT/bTJN
-        jAZXkkQ3K3mLdDzt1yDIAHCU0J0k+YAzOCK1d+V4vveGoLc=
-X-Google-Smtp-Source: ABdhPJy4U0gMP4wwUDoi2yF80NTancrIHwxoAAgDLQaFfrTGe64KDRZwnCUYSXV4+RVj70Kbu7z0BvipKeLxX9uXj24=
-X-Received: by 2002:a05:6830:1319:: with SMTP id p25mr18395605otq.240.1607453331125;
- Tue, 08 Dec 2020 10:48:51 -0800 (PST)
+        Tue, 8 Dec 2020 16:27:48 -0500
+Received: from [192.168.100.1] ([82.252.152.214]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MiIhU-1kGAsk2zZu-00fR0h for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec
+ 2020 22:25:16 +0100
+To:     linux-bluetooth@vger.kernel.org
+From:   Laurent Vivier <laurent@vivier.eu>
+Subject: Bluetooth printer connection error
+Message-ID: <3a6fa942-bec5-5e5f-391d-197d1c1eafa6@vivier.eu>
+Date:   Tue, 8 Dec 2020 22:25:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-References: <20201208172912.4352-1-hadess@hadess.net> <CABBYNZJNTDek+kKS5wtrr67Xx8DmFGvcV13cLSxULgJRa5N+3g@mail.gmail.com>
- <3fcd56e8b875fb3d4ed6d58ad150e4b054d875ca.camel@hadess.net>
-In-Reply-To: <3fcd56e8b875fb3d4ed6d58ad150e4b054d875ca.camel@hadess.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Dec 2020 10:48:39 -0800
-Message-ID: <CABBYNZKyndk8SG-xW=HYA7UZug==KtZfSmU=WHbgN1MC+DeM5A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Try harder to accept device not knowing options
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Florian Dollinger <dollinger.florian@gmx.de>,
-        "An, Tedd" <tedd.an@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:a3cy5OvoWr98REq5CVtd4QZc5axTjNCfJfU1hlqnYvQTaI4fude
+ QIibP/IK4xUQK9C7YAGk4xwyZRwy6sHRphKMxfXHaoYFsox3RhHkxcT+1vOU0qWBoDgoOJe
+ 6BPDIDnkn9rVZA4lB7NiNXPQxlo9GSZUpp/b8iInRJdpFzgBZjooHwaoVzDclU1h7hbVvn4
+ 2oKJWHaYNtuHq9hH3wPZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IDwZhaNGnIg=:4pSWZxR9lcW4m0sJTl3tK5
+ gt1G/g0jSeDW3fJauixYwWmAUtlcZm0X+KReE9rQpICVRWjLe45X2lfq7bNUpf14EDAjBWM+X
+ FmyswfMejRuhPMof9lK8eXl6n3NBiz372/zPlrWeCaAUWkUyUTXL0ZodvGMgaGtp/33TYCUi8
+ XUgoIw2NQtMp2wUfVkYQk6IA4ZphH7+Xe1a/IfUGwMWYbXSl1nqja+C+RkpPyL66WirJM9Z2A
+ 9gf9H7v7zrXbK6gIw9EFit4tRURFzzFsMx/f3SV0Rsfaoc10tTJGQCYGwvLmbwCVdHQkkljyL
+ ynUEYxvZpBv3JxafGmurSyDnQ0FcrG8D1wGLxP5ML2RRFjM12qWmBXfBYtIoDi8oBLHiWwMqG
+ dCEn2WcyQdb74X9z/iwxu/d7imcCzosQfP7YElp6nZT2p7JW6VaOP5JaOEgC2W+Ev4sldDlz3
+ GCjNAVZt9E7q5aeYfIzWBQzSUwELGWTeaiYu5y7U4yghkqGY2G5k
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi,
 
-On Tue, Dec 8, 2020 at 10:27 AM Bastien Nocera <hadess@hadess.net> wrote:
->
-> On Tue, 2020-12-08 at 10:09 -0800, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
-> >
-> > On Tue, Dec 8, 2020 at 9:36 AM Bastien Nocera <hadess@hadess.net>
-> > wrote:
-> > >
-> > > The current implementation of L2CAP options negotiation will
-> > > continue
-> > > the negotiation when a device responds with L2CAP_CONF_UNACCEPT
-> > > ("unaccepted
-> > > options"), but not when the device replies with L2CAP_CONF_UNKNOWN
-> > > ("unknown
-> > > options").
-> > >
-> > > Trying to continue the negotiation without ERTM support will allow
-> > > Bluetooth-capable XBox One controllers (notably models 1708 and
-> > > 1797)
-> > > to connect.
-> >
-> > While the bellow traces looks fine we need to confirm that it doesn't
-> > break the qualification tests e.g:
-> >
-> > L2CAP/COS/CFD/BV-14-C [Unknown Mandatory Options Request]
-> >
-> > =E2=80=A2 Test Purpose Verify that the IUT can give the appropriate err=
-or
-> > code
-> > when the Lower Tester proposes any number of unknown options where at
-> > least one is mandatory.
-> >
-> > Afaik it should be fine to continue with another round of
-> > configuration given that it only expects the error 0x0003, but we
-> > better confirm PTS doesn't expect a L2CAP Disconnect after it.
->
-> I have a Windows machine, and the PTS dongle. How do I set up the
-> qualification test and run it against the Linux machine before and
-> after the patch?
+TL;DR:
 
-@Tedd: Do we happen to autopts working with BlueZ for L2CAP tests? Or
-perhaps anything that Bastien can use as a reference to test his
-changes.
-@Batien: We would like to have autopts
-(https://github.com/intel/auto-pts) to handle the qualification but
-there is still some work pending in order to enable it to work with
-L2CAP. Ultimately we could even attempt to integrate autopts on CI to
-run it automatically, but in order to do that we need:
+I can pair my bluetooth printer but it fails to connect:
 
-1. We need to emulate the PTS dongle (USB emulator?)
-2. Run a Windows VM on CI, attach the emulated dongle to it and run
-PTS on top (not sure if github actions do allow this)
-3. Identify what tests need to run e.g. L2CAP changes should trigger
-only L2CAP tests
+  $ bluetoothctl connect DC:0D:30:90:23:C7
 
---=20
-Luiz Augusto von Dentz
+  Attempting to connect to DC:0D:30:90:23:C7
+  [CHG] Device DC:0D:30:90:23:C7 Connected: yes
+  [CHG] Device DC:0D:30:90:23:C7 ServicesResolved: yes
+  Failed to connect: org.bluez.Error.NotAvailable
+
+What do I need to add to my system to have this working?
+
+
+
+
+
+----------------------------------------------------------------------
+The full story:
+
+I cannot connect my bluetooth printer using "bluetoothctl connect" (I'm
+testing with git commitid b446ed8e8).
+
+1. Start the bluetooth printer
+2. bluetoothctl devices
+
+Device DC:0D:30:90:23:C7 Mr.in_M02
+...
+
+3. bluetoothctl info DC:0D:30:90:23:C7
+
+Device DC:0D:30:90:23:C7 (public)
+        Name: Mr.in_M02
+        Alias: Mr.in_M02
+        Class: 0x00040680
+        Icon: printer
+        Paired: no
+        Trusted: no
+        Blocked: no
+        Connected: no
+        LegacyPairing: yes
+        RSSI: -81
+
+4. bluetoothctl pair DC:0D:30:90:23:C7
+
+Attempting to pair with DC:0D:30:90:23:C7
+[CHG] Device DC:0D:30:90:23:C7 Connected: yes
+[CHG] Device DC:0D:30:90:23:C7 UUIDs: 00001101-0000-1000-8000-00805f9b34fb
+[CHG] Device DC:0D:30:90:23:C7 ServicesResolved: yes
+[CHG] Device DC:0D:30:90:23:C7 Paired: yes
+Pairing successful
+
+5. bluetoothctl info DC:0D:30:90:23:C7
+
+Device DC:0D:30:90:23:C7 (public)
+        Name: Mr.in_M02
+        Alias: Mr.in_M02
+        Class: 0x00040680
+        Icon: printer
+        Paired: yes
+        Trusted: no
+        Blocked: no
+        Connected: no
+        LegacyPairing: yes
+        UUID: Serial Port
+(00001101-0000-1000-8000-00805f9b34fb)
+
+
+6. bluetoothctl paired-devices
+
+Device DC:0D:30:90:23:C7 Mr.in_M02
+
+7. bluetoothctl connect DC:0D:30:90:23:C7
+
+Attempting to connect to DC:0D:30:90:23:C7
+[CHG] Device DC:0D:30:90:23:C7 Connected: yes
+[CHG] Device DC:0D:30:90:23:C7 ServicesResolved: yes
+Failed to connect: org.bluez.Error.NotAvailable
+
+If I use hcitool/rfcomm I can send data to the printer. It works fine in
+this case.
+
+$ hcitool scan
+Scanning ...
+        DC:0D:30:90:23:C7       Mr.in_M02
+
+$ sdptool  browse DC:0D:30:90:23:C7
+Browsing DC:0D:30:90:23:C7 ...
+
+$ sdptool records DC:0D:30:90:23:C7
+Service Name: SPP Dev
+Service RecHandle: 0x10001
+Service Class ID List:
+  "Serial Port" (0x1101)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+
+^C [the command hangs here]
+
+$ sudo rfcomm connect 0 DC:0D:30:90:23:C7
+Connected /dev/rfcomm0 to DC:0D:30:90:23:C7 on channel 1
+Press CTRL-C for hangup
+
+Thanks,
+Lauren
