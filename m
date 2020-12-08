@@ -2,128 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86456C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F972C47434
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:22:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AFB922285
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C39B23A53
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 20:22:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbgLHUSI (ORCPT
+        id S1731362AbgLHUQM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Dec 2020 15:18:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37260 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726562AbgLHURx (ORCPT
+        Tue, 8 Dec 2020 15:16:12 -0500
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:34346 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731073AbgLHUMu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Dec 2020 15:17:53 -0500
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E05BC0611E4
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Dec 2020 12:17:25 -0800 (PST)
-Received: by mail-oi1-x243.google.com with SMTP id f132so6313178oib.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec 2020 12:17:25 -0800 (PST)
+        Tue, 8 Dec 2020 15:12:50 -0500
+Received: by mail-ot1-f47.google.com with SMTP id a109so1394571otc.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec 2020 12:11:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E7gggLUMbx6m2RYhALGTMcNyeixCVDzYv2btApbrsK4=;
-        b=LqWooF1vkybc+/JA6fHSZU459MnEL0QKmValAHMou3esKj1nqSiTamS/K4zgB6PwcI
-         yPsGLOqnundK3Q4mGfAU6cgehDGLLd2agCchUSvkfvk47mhBgVTNX78LA0i1T/cu6Q+L
-         AfUSCNVDvv4UkJDdOJjR5LsL7dllXdCm0f3VVJ9XSRL7dcRGctk6LzpiDl6aqHD4kR/X
-         eoKrNTbITFp2egkP2Ja9/f3Pd+3bmERaagrp9pVqQ9+q9BzwuuiTjnfIqO4SOE6NmSTi
-         Bggu/q3tzYeqOXkdpB7S4umIxrxxNpM1q7Rlq1YG+YHIdknRczZtBXNLMLcJbdU4JwrT
-         Mx2A==
+         :cc:content-transfer-encoding;
+        bh=VS4bztVO9Q6HyqZ0Bty9RN6srIW+1eE+z8XoORtfkRg=;
+        b=RRXA3+6EimiPunGCxMNxoPph8I3Kw2JKefKoltZLwQMv8J1r+qcWhxj/xFhIolRH44
+         HuQS43T36CN9SR3qmMEerghzuQ5IHNe0T7LZOXrxiMkhN/gvHd9VopiGrRQwGXweV6xv
+         dmOxhkCioFcNbgxB+srAXyKi3RtAR9QmR/8NHkSQAgr+f9OXXBG+tirBhw1iskoRdkSN
+         wONTO6hm+idW9SGqrILrVHfSom45GmBzQBqS/9ay9w4jCFDWMIoMa5UQvegoogfNl4no
+         ATXGt0LugDLAQicIG/zFCnSGR1+n68ebqAeCK6wBGPK1MFC6AEBVGKoyHEKxTHJFl7Yc
+         5nnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E7gggLUMbx6m2RYhALGTMcNyeixCVDzYv2btApbrsK4=;
-        b=XirYj8PGnR7aqsZ6FVx4T0NfTP8PvS88hEFVRr60KSGMVMO21VnwNTvQFD93OzwmMy
-         uzBpihujiYcskLloMO7IKu4IzxzG9G/HGDn3a5ml1WlU1hnxv6tsFeVskRryXuYtLvvE
-         geGEu8+JNyKx+bVz/CJy8Kuna7CIXtT2bahn2/J3yTsQh4GLcbCzJcLHEkEBl+GYlIJ+
-         VvGgXl7cw7kx5Q7QQ5wgSOlx5pFkQtdwCXvmvolii0BWW5JsTOYOD34RyNt0e2iAevrx
-         DvK3so/o+vQHF3kYLNkK5eACUXxKCRsuNhuBwUdfS7agqEG6Nrczc2O4vHmU/zXLZKmt
-         J2hQ==
-X-Gm-Message-State: AOAM531Ql6bLd4vn49OWrYofET61aj9A4MUs+mPVVHkt3wraqXRHPJV/
-        FYvhPc5BMlxtDFZ8eLICdgScCFTVKzsQLdwpG/wg7wm7
-X-Google-Smtp-Source: ABdhPJwn7Qk9YS/n532Wr47xpNv+5Sne6mKGw09SdtMF8Bzuy+UJtuicIkT7xy/ntVkzpZwRuD4CdkTxD6Q5EYve3RA=
-X-Received: by 2002:aca:f456:: with SMTP id s83mr3815086oih.58.1607454181677;
- Tue, 08 Dec 2020 11:03:01 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=VS4bztVO9Q6HyqZ0Bty9RN6srIW+1eE+z8XoORtfkRg=;
+        b=UYPeTKAm1rPHcskRi3OktnAfTdN9Tx8V+vVI8CwIAK4OFQ/nA+UWl/r3Xy3ZRL4F0W
+         VyZSXspE1qGhlUO+gyLDI4pQRS15lKQrME0yhOVKuL7hcpFdVYvDEExTHvCPwFoTeSSq
+         kzX1VUB7wAeVZm6L/p+TATTzz7rzFD6YimKrcGQRuhkVyuIhrFAdIW33zdUBsk138KQM
+         BtKPfNbgFVJTqTu4iuzbUfXv0WyAxW6q0Y88Rh5ObmPYwu9zvOj4dLRrSULVwg5ZC+mZ
+         hPd95WrbxKXrBPh9SFiTvz0Ms9AAL5wwYlJ0vTFmJvXyZop79ykBA6dAqrsE2vPXs98J
+         JYsQ==
+X-Gm-Message-State: AOAM532r2xdYg3B04efmnZQDuLH3yx8h+bd0E3cyry6YlZO4VAT/bTJN
+        jAZXkkQ3K3mLdDzt1yDIAHCU0J0k+YAzOCK1d+V4vveGoLc=
+X-Google-Smtp-Source: ABdhPJy4U0gMP4wwUDoi2yF80NTancrIHwxoAAgDLQaFfrTGe64KDRZwnCUYSXV4+RVj70Kbu7z0BvipKeLxX9uXj24=
+X-Received: by 2002:a05:6830:1319:: with SMTP id p25mr18395605otq.240.1607453331125;
+ Tue, 08 Dec 2020 10:48:51 -0800 (PST)
 MIME-Version: 1.0
-References: <20201125075707.492685-1-tedd.an@intel.com> <5fbe16ba.1c69fb81.6e3a4.361c@mx.google.com>
-In-Reply-To: <5fbe16ba.1c69fb81.6e3a4.361c@mx.google.com>
+References: <20201208172912.4352-1-hadess@hadess.net> <CABBYNZJNTDek+kKS5wtrr67Xx8DmFGvcV13cLSxULgJRa5N+3g@mail.gmail.com>
+ <3fcd56e8b875fb3d4ed6d58ad150e4b054d875ca.camel@hadess.net>
+In-Reply-To: <3fcd56e8b875fb3d4ed6d58ad150e4b054d875ca.camel@hadess.net>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Dec 2020 11:02:50 -0800
-Message-ID: <CABBYNZ+_pFFOX=DrwPD1Gbj-7oTVjMLPscT3-VSygsDQbrgNPQ@mail.gmail.com>
-Subject: Re: doc: Fix qemu unable to mount root fs for test-runner
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     hj.tedd.an@gmail.com
+Date:   Tue, 8 Dec 2020 10:48:39 -0800
+Message-ID: <CABBYNZKyndk8SG-xW=HYA7UZug==KtZfSmU=WHbgN1MC+DeM5A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: Try harder to accept device not knowing options
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Florian Dollinger <dollinger.florian@gmx.de>,
+        "An, Tedd" <tedd.an@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Tedd,
 
-On Wed, Nov 25, 2020 at 12:38 AM <bluez.test.bot@gmail.com> wrote:
+On Tue, Dec 8, 2020 at 10:27 AM Bastien Nocera <hadess@hadess.net> wrote:
 >
-> This is automated email and please do not reply to this email!
+> On Tue, 2020-12-08 at 10:09 -0800, Luiz Augusto von Dentz wrote:
+> > Hi Bastien,
+> >
+> > On Tue, Dec 8, 2020 at 9:36 AM Bastien Nocera <hadess@hadess.net>
+> > wrote:
+> > >
+> > > The current implementation of L2CAP options negotiation will
+> > > continue
+> > > the negotiation when a device responds with L2CAP_CONF_UNACCEPT
+> > > ("unaccepted
+> > > options"), but not when the device replies with L2CAP_CONF_UNKNOWN
+> > > ("unknown
+> > > options").
+> > >
+> > > Trying to continue the negotiation without ERTM support will allow
+> > > Bluetooth-capable XBox One controllers (notably models 1708 and
+> > > 1797)
+> > > to connect.
+> >
+> > While the bellow traces looks fine we need to confirm that it doesn't
+> > break the qualification tests e.g:
+> >
+> > L2CAP/COS/CFD/BV-14-C [Unknown Mandatory Options Request]
+> >
+> > =E2=80=A2 Test Purpose Verify that the IUT can give the appropriate err=
+or
+> > code
+> > when the Lower Tester proposes any number of unknown options where at
+> > least one is mandatory.
+> >
+> > Afaik it should be fine to continue with another round of
+> > configuration given that it only expects the error 0x0003, but we
+> > better confirm PTS doesn't expect a L2CAP Disconnect after it.
 >
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=390729
->
-> ---Test result---
->
-> ##############################
-> Test: CheckPatch - FAIL
-> Output:
-> doc: Fix qemu unable to mount root fs for test-runner
-> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-> #9:
->  Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
->
-> - total: 0 errors, 1 warnings, 4 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> "[PATCH] doc: Fix qemu unable to mount root fs for test-runner" has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: CheckGitLint - FAIL
-> Output:
-> doc: Fix qemu unable to mount root fs for test-runner
-> 8: B1 Line exceeds max length (84>80): " Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1 04/01/2014"
-> 17: B1 Line exceeds max length (102>80): " Kernel Offset: 0x2a200000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbf)"
->
->
-> ##############################
-> Test: CheckBuild - PASS
->
-> ##############################
-> Test: MakeCheck - PASS
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+> I have a Windows machine, and the PTS dongle. How do I set up the
+> qualification test and run it against the Linux machine before and
+> after the patch?
 
-Applied, thanks.
+@Tedd: Do we happen to autopts working with BlueZ for L2CAP tests? Or
+perhaps anything that Bastien can use as a reference to test his
+changes.
+@Batien: We would like to have autopts
+(https://github.com/intel/auto-pts) to handle the qualification but
+there is still some work pending in order to enable it to work with
+L2CAP. Ultimately we could even attempt to integrate autopts on CI to
+run it automatically, but in order to do that we need:
 
--- 
+1. We need to emulate the PTS dongle (USB emulator?)
+2. Run a Windows VM on CI, attach the emulated dongle to it and run
+PTS on top (not sure if github actions do allow this)
+3. Identify what tests need to run e.g. L2CAP changes should trigger
+only L2CAP tests
+
+--=20
 Luiz Augusto von Dentz
