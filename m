@@ -2,102 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8E8C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 12:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB57BC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 13:55:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BCD4239D0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 12:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95E2323A53
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Dec 2020 13:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728416AbgLHM0e (ORCPT
+        id S1729505AbgLHNzN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Dec 2020 07:26:34 -0500
-Received: from so254-31.mailgun.net ([198.61.254.31]:21734 "EHLO
-        so254-31.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726697AbgLHM0d (ORCPT
+        Tue, 8 Dec 2020 08:55:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726338AbgLHNzM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Dec 2020 07:26:33 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1607430374; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=xwubYQmXFozrF3h5pSqCHE8wPqNs2HP3Fa3BhJgvhZ4=; b=v3txPADZcLNIPcRm8UnicnHCyZik051UXP6dmpyPnYZcQoYkx9PpU18D12m3eroIKJIdRWPI
- plI3usCAvA7or8CnMjbxncplh1HOsbCK+Yx5tf1KN2Q1s93lZRP6rumXQ49fp0nGoEJIrvV8
- /E4Uc74rODERF6oa0GQH+RKlEEQ=
-X-Mailgun-Sending-Ip: 198.61.254.31
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
- 5fcf70c756444c64458a7013 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 08 Dec 2020 12:25:43
- GMT
-Sender: sampnimm=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id CE299C433C6; Tue,  8 Dec 2020 12:25:42 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: sampnimm)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 33964C433CA;
-        Tue,  8 Dec 2020 12:25:42 +0000 (UTC)
+        Tue, 8 Dec 2020 08:55:12 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE1DC061749
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Dec 2020 05:54:26 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id 7so11949540qtp.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec 2020 05:54:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=gklq9BNqSi6x9am7/62V+7nL/IwS0V+jGDu6x3Dt83o=;
+        b=QZ8mt609gND9yBeUncsCLXtPwsQGcq8/VJy0drAXhy/CWNlt/vrXezccQ/0VpaQXAD
+         fqg2Crd/xfUbtPJjQ5FOwJY0kN4fkRiV5unf/kOVuEPZA/PpFFTGezCQ1iQZ0wuJncRV
+         3HG6BxrmKmgnH3dRRGPhW0VO65pLiBwUmPWIF0VKsD2CG0oSzU47J7/Bn0b/MitgxKir
+         T7uC1tNgeKWna8pCYsFwSOeWA9KSrNnq80oO2rxdCeOH+XloMECkE/ByKKOeJJdIlOrv
+         q0yxco7e1jYXbUfKrQQ3PY8FYmEG6zOcvpMlkv5OPicg5m8EmUNs1IrWW1qxY7IrMpWZ
+         7LAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=gklq9BNqSi6x9am7/62V+7nL/IwS0V+jGDu6x3Dt83o=;
+        b=EV0A0xhkK5W5Fxs2FcsPGlsOuxXxs5zqNQIY+SPLXhpLvuxOA7mNWS24IIHiEXfqGE
+         tDoFEG6FjlwRXpbxTjLoSEYcQwaEONN1fmJRCQPxJRTc11BVtQYSnMMYoBWl2DMz5kk4
+         ybfoa6CRykNJUcU+mS/hMg900IA/yQUz1GsNFLeS3lwQWwG5jKM04YazADnz4b98Q/VM
+         VAUFMFzyAprO1Y56TCx/q01VtbPlSMxp4kZxS5bcOKzfp764E/r+BSdCsxEMmeQAoXyV
+         LXb3PtrZmCyAIoIohTwnreEIB2w0l3sDwnd6E4nYg8tC3fXhyLmH6LzLEz3eD6V3yREH
+         yoiQ==
+X-Gm-Message-State: AOAM532/byKmZIebbB3t2sPBFNfpW/gCAJTUs/dBYlgG80Vk8UvXSxFD
+        3SSS1jZJde0lxFj6Tbcp02DWEPBMYVXFBw==
+X-Google-Smtp-Source: ABdhPJzYCExfvNphXo7UujoKn7KCD6YMZF/zWG7GYJQ6jzIL0BABik1moBcdkNSprcYDteSeNI+x3Q==
+X-Received: by 2002:aed:3865:: with SMTP id j92mr29134693qte.318.1607435665686;
+        Tue, 08 Dec 2020 05:54:25 -0800 (PST)
+Received: from [172.17.0.2] ([40.79.248.89])
+        by smtp.gmail.com with ESMTPSA id c7sm3015849qkm.99.2020.12.08.05.54.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Dec 2020 05:54:24 -0800 (PST)
+Message-ID: <5fcf8590.1c69fb81.6a592.2b12@mx.google.com>
+Date:   Tue, 08 Dec 2020 05:54:24 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5426501592712988690=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 08 Dec 2020 17:55:42 +0530
-From:   sampnimm@codeaurora.org
-List-Id: <linux-firmware.lore.kernel.org>
-To:     linux-firmware@kernel.org, jwboyer@kernel.org
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        hemantg@codeaurora.org, gubbaven@codeaurora.org,
-        abhishekpandit@chromium.org, bgodavar@codeaurora.org
-Subject: Request to Update WCN3991 FW files
-Message-ID: <d83f762bf0b5e27f624a57c17c9dc3db@codeaurora.org>
-X-Sender: sampnimm@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, gubbaven@codeaurora.org
+Subject: RE: [v4] Bluetooth: btqca: Add support to read FW build version for WCN3991 BTSoC
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1607428529-26629-1-git-send-email-gubbaven@codeaurora.org>
+References: <1607428529-26629-1-git-send-email-gubbaven@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Team,
+--===============5426501592712988690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-       Please include updated firmware bins for WCN3991.
-       Snapshot of pull request is as below, let me know if anything is 
-missing.
+This is automated email and please do not reply to this email!
 
->>>>> 	
+Dear submitter,
 
-The following changes since commit 
-7455a36066741a6e52fba65e04f6451b4cdfd9c4:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=398171
 
-   Merge branch 'guc_v49' of 
-git://anongit.freedesktop.org/drm/drm-firmware into main (2020-11-30 
-09:26:11 -0500)
+---Test result---
 
-are available in the git repository at:
+##############################
+Test: CheckPatch - PASS
 
-   https://github.com/sampnimm/linux-firmware-BT.git master
+##############################
+Test: CheckGitLint - PASS
 
-for you to fetch changes up to 1a08ec9262e943c1e50b1223e3feb5845936b5a6:
-
-   QCA : Updated firmware files for WCN3991 (2020-12-08 17:38:49 +0530)
-
-----------------------------------------------------------------
-sampnimm (1):
-       QCA : Updated firmware files for WCN3991
-
-  qca/crbtfw32.tlv | Bin 126892 -> 126772 bytes
-  qca/crnv32.bin   | Bin 5407 -> 5407 bytes
-  qca/crnv32u.bin  | Bin 5407 -> 5407 bytes
-  3 files changed, 0 insertions(+), 0 deletions(-)
-
-<<<<<
+##############################
+Test: CheckBuildK - PASS
 
 
-Thanks,
-Sampath
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5426501592712988690==--
