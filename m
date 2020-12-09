@@ -5,24 +5,24 @@ X-Spam-Level:
 X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334A1C2BB40
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 19:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B6CC19425
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 20:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 036DF23CD2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 19:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AE8F23A33
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 20:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387990AbgLITpX convert rfc822-to-8bit (ORCPT
+        id S2387642AbgLIU0H convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Dec 2020 14:45:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43826 "EHLO mail.kernel.org"
+        Wed, 9 Dec 2020 15:26:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37366 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387981AbgLITpQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Dec 2020 14:45:16 -0500
+        id S2388454AbgLIU0A (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Dec 2020 15:26:00 -0500
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 210275] Bluetooth stopped working on kernel 5.9
-Date:   Wed, 09 Dec 2020 19:44:33 +0000
+Date:   Wed, 09 Dec 2020 20:25:19 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -38,7 +38,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-210275-62941-aISzTurv7H@https.bugzilla.kernel.org/>
+Message-ID: <bug-210275-62941-Ct1Sfi5iio@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-210275-62941@https.bugzilla.kernel.org/>
 References: <bug-210275-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -52,13 +52,24 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=210275
 
---- Comment #6 from Francesco Chirico (francesco.kirico@gmail.com) ---
-(In reply to m11.1l1.f64 from comment #5)
-> Today’s update for the kernel fixed the issue!!
+--- Comment #7 from Francesco Chirico (francesco.kirico@gmail.com) ---
+(In reply to Francesco Chirico from comment #6)
+> (In reply to m11.1l1.f64 from comment #5)
+> > Today’s update for the kernel fixed the issue!!
+> 
+> Could you please tell what kernel version / package solved the problem?
+> In my case (Fedora 33) even latest kernel update (5.9.12-200.fc33.x86_64)
+> didn't solve the problem.
 
-Could you please tell what kernel version / package solved the problem?
-In my case (Fedora 33) even latest kernel update (5.9.12-200.fc33.x86_64)
-didn't solve the problem.
+Finally I figured out where the problem was.
+In my case I needed a file /etc/modprobe.d/btusb.conf with the following
+content:
+
+options btusb reset=0
+
+This solved the problem for me.
+I wonder why this file became suddenly so important (before I never needed it
+with the same dongle).
 
 -- 
 You are receiving this mail because:
