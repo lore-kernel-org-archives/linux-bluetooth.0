@@ -2,104 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC6AC4361B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 22:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC778C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 23:26:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48DE823CD4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 22:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA498238EB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 23:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388400AbgLIWBv (ORCPT
+        id S2388646AbgLIXZz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Dec 2020 17:01:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49968 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388362AbgLIWBv (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Dec 2020 17:01:51 -0500
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B953C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Dec 2020 14:01:11 -0800 (PST)
-Received: by mail-qk1-x72a.google.com with SMTP id w79so2918366qkb.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Dec 2020 14:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=H21DBpCPIuKW9rfza9WuY/SZnuc1RQaI4XSuVeSWHaM=;
-        b=mP3SdsLRskBOCW8fiJaa9BR3spnGYg7PKmWKD8Z+xulS4LLAdSBPxAm4i3Kakpnutm
-         E4ldJcL0PfCAcvYgzw7LHGZHuTgmTGcAOgGRKabvyRSeVF49RcVJCEKzpALeJ5GzGzph
-         85eSSOgR/h80pDensVcXb6PQ6YZqi56sNb9xlaaICiYrE4OP0OUVTPb6C2+D8/Zpq1fA
-         25hKjlc2sEn/y3bApTEJ0J7KKWSDQjvA0P8Kpj0mydCE9DLgfKL+/HnuJUBeZkZf8vSs
-         C3o7JNWgSmM7Zu+ewJq+BymwEDYMbepyhq1sxO5+QWHU+BMoQc1OSDylP/+zVHLDmlqI
-         UmtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=H21DBpCPIuKW9rfza9WuY/SZnuc1RQaI4XSuVeSWHaM=;
-        b=K7Qi8E5Hk3QHhfaTp/OVZYQSHQVnYRQhDArX8EYa6utAufoSWSKO0HuotYeVJflddn
-         z9IYuBxQV43M3GuwYU+k9Asgo1VRX9Sf20nyMQ1vFx8tg/+Wx8uXKTIKVKb3k3nPejxH
-         QrwiN+dcT+YcmeyXC7rYZx5KI/zj+xIG/LJtxs0uf5+tgBEMPorYoX1JbzKxDngnl9IF
-         EmmizE8IyKsTZb6RXiAbzRyW6m716lwdam1xq0IhN+WBtOfi4C5/hvARBs/rCuTTmTli
-         lMTwh9YsvvyileQvvzN7zM+I1AIQe4NrXtnX06p/XAfCBOO5o+bz35Tni8ZEJ1ITWU7u
-         HJnw==
-X-Gm-Message-State: AOAM531ZOW3NqRN4VRiGCQ4EapWpzVIh3iJu/Bb2UzvxYs91+foIw2MG
-        sSXoUYNG8AKwFFWaXCcEr05onxmaIM2GPg==
-X-Google-Smtp-Source: ABdhPJwQ5BFHIWs/uZuqka2fzZdhVORMT1yo80SJRIwK8b/ks0BpddA3Q0U+PrmaHxKEAveRXMTPhA==
-X-Received: by 2002:a37:8ec6:: with SMTP id q189mr5505123qkd.123.1607551270200;
-        Wed, 09 Dec 2020 14:01:10 -0800 (PST)
-Received: from [172.17.0.2] ([13.77.94.226])
-        by smtp.gmail.com with ESMTPSA id 187sm2225680qki.38.2020.12.09.14.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Dec 2020 14:01:09 -0800 (PST)
-Message-ID: <5fd14925.1c69fb81.ccf99.d23e@mx.google.com>
-Date:   Wed, 09 Dec 2020 14:01:09 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1171133294452574414=="
+        Wed, 9 Dec 2020 18:25:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55294 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727027AbgLIXZt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Dec 2020 18:25:49 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 210595] New: Gamepad Sony PLAYSTATION(R)3 Controller doesn't
+ pair
+Date:   Wed, 09 Dec 2020 23:25:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: orbea@riseup.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-210595-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
-Subject: RE: [v2] Bluetooth: Cancel Inquiry before Create Connection
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201209213514.99326-1-sonnysasaka@chromium.org>
-References: <20201209213514.99326-1-sonnysasaka@chromium.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1171133294452574414==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=210595
 
-This is automated email and please do not reply to this email!
+            Bug ID: 210595
+           Summary: Gamepad Sony PLAYSTATION(R)3 Controller doesn't pair
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.9.12
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: orbea@riseup.net
+        Regression: No
 
-Dear submitter,
+Created attachment 294065
+  --> https://bugzilla.kernel.org/attachment.cgi?id=294065&action=edit
+bluetoothd -n -d output
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=399287
+When using my official Dualshock3 gamepad with bluetooth it connects, but then
+never pairs.
 
----Test result---
+To pair it I did:
 
-##############################
-Test: CheckPatch - PASS
+power on
+agent on
+default-agent
+discoverable on
+pairable on
+scan on
 
-##############################
-Test: CheckGitLint - PASS
+Then plugged in the gamepad via the usb cable, entered 'yes' to the
+authorization request, unplugged it and pressed the power button on the
+gamepad.
 
-##############################
-Test: CheckBuildK - PASS
+The gamepad does work via the usb cable.
 
+I attached a log with the output of 'bluetoothd -n -d' and in dmesg the
+following is printed.
 
+[94204.623301] debugfs: File 'force_bredr_smp' in directory 'hci0' already
+present!
+[94374.029398] debugfs: File 'force_bredr_smp' in directory 'hci0' already
+present!
+[94418.059222] usb 1-1: new full-speed USB device number 29 using xhci_hcd
+[94418.209651] usb 1-1: New USB device found, idVendor=054c, idProduct=0268,
+bcdDevice= 1.00
+[94418.209656] usb 1-1: New USB device strings: Mfr=1, Product=2,
+SerialNumber=0
+[94418.209660] usb 1-1: Product: PLAYSTATION(R)3 Controller
+[94418.209662] usb 1-1: Manufacturer: Sony
+[94418.221403] input: Sony PLAYSTATION(R)3 Controller Motion Sensors as
+/devices/pci0000:00/0000:00:14.0/usb1/1-1/1-1:1.0/0003:054C:0268.0028/input/input98
+[94418.279353] input: Sony PLAYSTATION(R)3 Controller as
+/devices/pci0000:00/0000:00:14.0/usb1/1-1/1-1:1.0/0003:054C:0268.0028/input/input97
+[94418.280056] sony 0003:054C:0268.0028: input,hiddev98,hidraw4: USB HID v81.11
+Joystick [Sony PLAYSTATION(R)3 Controller] on usb-0000:00:14.0-1/input0
+[94426.300043] usb 1-1: USB disconnect, device number 29
+[94435.739401] sony 0005:054C:0268.0029: unknown main item tag 0x0
+[94440.855872] sony 0005:054C:0268.0029: Failed to set controller into
+operational mode
+[94440.856117] sony 0005:054C:0268.0029: hidraw4: BLUETOOTH HID v80.00 Joystick
+[Sony PLAYSTATION(R)3 Controller] on 5c:f3:70:9c:8f:d0
+[94440.856121] sony 0005:054C:0268.0029: failed to claim input
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1171133294452574414==--
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
