@@ -2,103 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8BCC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 01:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5443EC4167B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 01:14:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E282239FD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 01:01:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2184D23B6B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 01:14:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726358AbgLIBBf (ORCPT
+        id S1726474AbgLIBO1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Dec 2020 20:01:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53464 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726311AbgLIBBb (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Dec 2020 20:01:31 -0500
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9C4C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Dec 2020 17:00:45 -0800 (PST)
-Received: by mail-pl1-x642.google.com with SMTP id 4so49511plk.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Dec 2020 17:00:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u3YSqH1FiIVrSIBPKfpTCG/uhni00GyHzVDOAjTchBw=;
-        b=TCd+sqLJKgzH3YdAR1aQQlQDSFRyteDmiTBk9ZwNV5Au9xV70009L6+vyhTL5TKsep
-         oBOesgxlRQ2JmCEkoFgqUMtHfK8/O82z+PTfJD8FkXwhIkUJrVaEZR71pl4Ap9oU15fs
-         insmoGzWDlfD5CBzSYvgoqFM8gNm+ddxAz8hE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u3YSqH1FiIVrSIBPKfpTCG/uhni00GyHzVDOAjTchBw=;
-        b=NWlbIEqW2xLoapc1b/5OIlwFUi4ddISbnmCh0UKRPn41+JAgDRhmGx1+/MGcBeGBAm
-         vGCm6j3qKs944EOsCX/ayGxJA0++nksW8rvteSaGgT0LnpH0J7Z9kNEAiNL/CsPiVEUz
-         sGK2739ci6QH0yNrJnfU5YhfxRE1agcGjkTNzfmsx629lCwVB82P064axMGOX+OW3yhU
-         nfQ875sCW26TsWmLCYOy2IxkGiX/+Rm73o9SP2GHoRCY/BykizDIUopEmlCm1tQEKTXh
-         6Ah8v4kfRUNGWXhMO9+uFgmGb3zLNok4uhDeGwGTCvJwAPfG5zVIumWntjulIFA8rus1
-         JYbw==
-X-Gm-Message-State: AOAM533ayAqPG0fQZ1oRTfivRXcsp458b/K0IuJ3KKnn5fVSsAQwhdc6
-        lg9fguYI8TFOflRxU1oFaxRwmc352csAcA==
-X-Google-Smtp-Source: ABdhPJz0VfUJacp7OyGnCc7QalZUUur0ld+EM8Ce8MGFILdLYVJ0kMH5BGCRoCBqg1qUYotvUrVNAw==
-X-Received: by 2002:a17:902:82c8:b029:da:eead:94a0 with SMTP id u8-20020a17090282c8b02900daeead94a0mr83955plz.42.1607475644911;
-        Tue, 08 Dec 2020 17:00:44 -0800 (PST)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id 5sm28052pfw.12.2020.12.08.17.00.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Dec 2020 17:00:44 -0800 (PST)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Subject: [PATCH BlueZ 1/2] Revert "input/hog: Remove HID device after HoG device disconnects"
-Date:   Tue,  8 Dec 2020 17:00:29 -0800
-Message-Id: <20201209010030.342632-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+        Tue, 8 Dec 2020 20:14:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37866 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726307AbgLIBO1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Dec 2020 20:14:27 -0500
+Date:   Wed, 9 Dec 2020 02:13:36 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607476419;
+        bh=4A8yCWIxhznzmlI1ZPuNu4AS4l63xedVoBbtG2oxRU8=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kOqJnToMislpKdi65lyRTW3iZmg1MA/IKwdGlZMJI6lYPrenh1pJx13qV+qBo9rGr
+         yU2EoZAr4k6gkLeO2BdE8AxZMpUQUNuSFqbqVL3zSbpHOXwAJi9vIkQnvHtl3DP8KN
+         clxjxKOTIRGRGLupfvpraZQv1W5VA7lX/xSCNQA2+pa4M07nH/Fj8qnFa/jQZ+Yas6
+         rlzSwF0EMkpXp4DNkMovpvELBH0IFaepsu3ROleJZIUj1ZCsVk0ldzBZYlSdY6H70D
+         EbE+Zzz9vxO6zltwmGKaF1vS4ot+o2EtriQ4ggnAX+CpC5d3VW11WMaUb/5BuK7cBt
+         0LA4TxZohzHqA==
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Trent Piepho <tpiepho@gmail.com>
+Cc:     Joseph Hwang <josephsih@google.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: define HCI packet sizes of USB
+ Alts
+Message-ID: <20201209011336.4qdnnehnz3kdlqid@pali>
+References: <20200910060403.144524-1-josephsih@chromium.org>
+ <CAHFy418Ln9ONHGVhg513g0v+GxUZMDtLpe5NFONO3HuAZz=r7g@mail.gmail.com>
+ <20200923102215.hrfzl7c7q2omeiws@pali>
+ <9810329.nUPlyArG6x@zen.local>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <9810329.nUPlyArG6x@zen.local>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This reverts commit d6cafa1f0c3ea1989f8a580e52f418b0998a3552.
+On Tuesday 08 December 2020 15:04:29 Trent Piepho wrote:
+> On Wednesday, September 23, 2020 3:22:15 AM PST Pali Rohár wrote:
+> > On Monday 14 September 2020 20:18:27 Joseph Hwang wrote:
+> > > On Thu, Sep 10, 2020 at 4:18 PM Pali Rohár <pali@kernel.org> wrote:
+> > > > And this part of code which you write is Realtek specific.
+> > > 
+> > > We currently only have Intel and Realtek platforms to test with. If
+> > > making it generic without proper testing platforms is fine, I will
+> > > make it generic. Or do you think it might be better to make it
+> > > customized with particular vendors for now; and make it generic later
+> > > when it works well with sufficient vendors?
+> > 
+> > I understood that those packet size changes are generic to bluetooth
+> > specification and therefore it is not vendor specific code. Those packet
+> > sizes for me really seems to be USB specific.
+> > 
+> > Therefore it should apply for all vendors, not only for Realtek and
+> > Intel.
+> 
+> I have tried to test WBS with some different USB adapters.  So far, all use 
+> these packet sizes.  Tested were:
+> 
+> Broadcom BRCM20702A
+> Realtek RTL8167B
+> Realtek RTL8821C
+> CSR CSR8510 (probably fake)
+> 
+> In all cases, WBS works best with packet size of (USB packet size for alt mode 
+> selected) * 3 packets - 3 bytes HCI header.  None of these devices support alt 
+> 6 mode, where supposedly one packet is better, but I can find no BT adapter on 
+> which to test this.
+> 
+> > +static const int hci_packet_size_usb_alt[] = { 0, 24, 48, 72, 96, 144, 60};
+> 
+> Note that the packet sizes here are based on the max isoc packet length for 
+> the USB alt mode used, e.g. alt 1 is 9 bytes.  That value is only a 
+> "recommended" value from the bluetooth spec.  It seems like it would be more 
+> correct use (btusb_data*)->isoc_tx_ep->wMaxPacketSize to find the MTU.
 
-In commit d6cafa1f0c3e ("input/hog: Remove HID device after HoG device
-disconnects"), the bt_hog structure is destroyed in order to fix a bug
-where the UHID connection is not destroyed. This fix has the cost of
-increasing reconnection time because every reconnection would need to
-re-read the report map again. An improvement to this fix is, instead of
-removing the bt_hog structure, we can just destroy the UHID with
-UHID_DESTROY event and use the existing bt_hog structure to keep the
-cache of the report map to avoid re-reading the report map at
-reconnection.
+Yea, wMaxPacketSize looks like a candidate for determining MTU. Can we
+use it or are there any known issues with it?
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
+> > > [Issue 2] The btusb_work() is performed by a worker. There would be a
+> > > timing issue here if we let btusb_work() to do “hdev->sco_mtu =
+> > > hci_packet_size_usb_alt[i]” because there is no guarantee how soon the
+> > > btusb_work() can be finished and get “hdev->sco_mtu” value set
+> > > correctly. In order to avoid the potential race condition, I suggest
+> > > to determine air_mode in btusb_notify() before
+> > > schedule_work(&data->work) is executed so that “hdev->sco_mtu =
+> > > hci_packet_size_usb_alt[i]” is guaranteed to be performed when
+> > > btusb_notify() finished. In this way, hci_sync_conn_complete_evt() can
+> > > set conn->mtu correctly as described in [Issue 1] above.
+> 
+> Does this also give userspace a clear point at which to determine MTU setting, 
+> _before_ data is sent over SCO connection?  It will not work if sco_mtu is not 
+> valid until after userspace sends data to SCO connection with incorrect mtu.
 
----
- profiles/input/hog.c | 2 --
- 1 file changed, 2 deletions(-)
+IIRC connection is established after sync connection (SCO) complete
+event. And sending data is possible after connection is established. So
+based on these facts I think that userspace can determinate MTU settings
+prior sending data over SCO socket.
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 91de4c70f..d50b82321 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -207,8 +207,6 @@ static int hog_disconnect(struct btd_service *service)
- 	struct hog_device *dev = btd_service_get_user_data(service);
- 
- 	bt_hog_detach(dev->hog);
--	bt_hog_unref(dev->hog);
--	dev->hog = NULL;
- 
- 	btd_service_disconnecting_complete(service, 0);
- 
--- 
-2.26.2
-
+Anyway, to whole MTU issue for SCO there is a nice workaround which
+worked fine with more tested USB adapters and headsets. As SCO socket is
+synchronous and most bluetooth headsets have own clocks, you can
+synchronize sending packets to headsets based on time events when you
+received packets from other side and also send packets of same size as
+you received. I.e. for every received packet send own packet of the same
+size.
