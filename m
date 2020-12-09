@@ -2,140 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 817E0C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 21:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E98EC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 21:48:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3276323B6B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 21:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7E5723C44
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Dec 2020 21:48:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728298AbgLIVgD (ORCPT
+        id S2388322AbgLIVsb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Dec 2020 16:36:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729913AbgLIVgD (ORCPT
+        Wed, 9 Dec 2020 16:48:31 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:34285 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388305AbgLIVsb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Dec 2020 16:36:03 -0500
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47FFDC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Dec 2020 13:35:23 -0800 (PST)
-Received: by mail-pg1-x544.google.com with SMTP id w4so2114400pgg.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Dec 2020 13:35:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=uDAWdOWWyKeGk4mWjM6HOfEfDXxHr/N17SbEvzpH/ZY=;
-        b=Bfu3Q0nmcaPvORlVmD+gWHnnmpH5jHmeHwOgsnFXOf1xzmtm1jVwEo1kRsL9+1sjHU
-         /xcIkdMODPADj1/oPGLRhAFdnmzi/bQnFUgcHQTWw6RaPe1akRSSChZSYBqFNSbOAb7X
-         Kyqv8BQkH6kdZXol3X7QyXVJ4aWszggSFfgBQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=uDAWdOWWyKeGk4mWjM6HOfEfDXxHr/N17SbEvzpH/ZY=;
-        b=ajArtLtNNMpN7fdHM8+0leXwaF37axinBUdR83FDeNfvXjnytgeT+LjiOnJIJAfLnq
-         UfJjgFeG2NKOi5EMBIhmRYUYrfbaa6GWPkcV6e8gfIan7knLQzcZdFgvYXOH/obO4yto
-         dsN68Om0O5Z8g+ElCUJor+/gmz9XbTlLBmPupZswz1HoWcBcSRFOo/4y8Ad4RhWhebfI
-         NlRhdPXRtT/b6QPasZ1iOq975zu+zY5zQCu4xz2LUqdpy2hfbr9ZuUa38U0pGq/ztYE9
-         PESWuQ4p9I1s+mZo+5ilhrUzWS27C+va6uHaZ568J2lgTXKZdmKPaluGF/41KQKdCi0z
-         21YQ==
-X-Gm-Message-State: AOAM5311IdjR6ZhkRj0befD1Kic/vouYvh1epNDiRHxj8FUjHQwghNFX
-        0u8j3/2x0SP0ue+1rAF/A2nWYiIuODTgDQ==
-X-Google-Smtp-Source: ABdhPJxqKYn8TJnWrlfdzPVS8iM+l5XsJnvWzU/AaAiQqOFxMWTTyiiYPbox40fEAy/LYumaphtD+Q==
-X-Received: by 2002:a17:90b:1882:: with SMTP id mn2mr3998311pjb.236.1607549722542;
-        Wed, 09 Dec 2020 13:35:22 -0800 (PST)
-Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:4a0f:cfff:fe66:e60c])
-        by smtp.gmail.com with ESMTPSA id y21sm3869639pfr.90.2020.12.09.13.35.21
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Dec 2020 13:35:21 -0800 (PST)
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v2] Bluetooth: Cancel Inquiry before Create Connection
-Date:   Wed,  9 Dec 2020 13:35:14 -0800
-Message-Id: <20201209213514.99326-1-sonnysasaka@chromium.org>
-X-Mailer: git-send-email 2.26.2
+        Wed, 9 Dec 2020 16:48:31 -0500
+Received: from [192.168.100.1] ([82.252.152.214]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M4s8v-1koUKH0dh1-001z21; Wed, 09 Dec 2020 22:45:58 +0100
+From:   Laurent Vivier <laurent@vivier.eu>
+To:     Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+References: <3a6fa942-bec5-5e5f-391d-197d1c1eafa6@vivier.eu>
+ <e885258a0b9a3ba15640553e9f002cdfc89f4b79.camel@hadess.net>
+ <73236e71-781f-1dea-13d5-61fdc45d5e13@vivier.eu>
+ <0eeb1a4a1254d00b2d1a8f77133af4d16857b266.camel@hadess.net>
+ <ab6ae9d9-9104-5454-d93d-b734c0eb9eba@vivier.eu>
+ <50264b155ddf8b677125b87a703a628f76518457.camel@hadess.net>
+Subject: Re: Bluetooth printer connection error
+Message-ID: <8066fc64-5528-0952-e23a-49026bea39fc@vivier.eu>
+Date:   Wed, 9 Dec 2020 22:45:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
+In-Reply-To: <50264b155ddf8b677125b87a703a628f76518457.camel@hadess.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:/8PWwqtabsVgbgfwNGRDACVjYhZpdXk2pwKYsTOx4dvQiJfONQs
+ YTq3pGGVE8sqDsDm9cK1c5AuGR2FdaAsmBNxZEPlBcSe/fszXH2ISKCqOqiFKdjnLNgfzCO
+ zeIHveuUAwOVWAqD6Op3u/YR+9EITUABHMTti0qT47LotNTvKTE4dQjstZVuYRI1pss8iyM
+ BiQAY2ecFcu8R3MG0xWig==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pdhLs3Dhs8U=:FAL3hWG39sp+WDN3XMVZvf
+ QqXDfqCUA3Lq4fgu0k1JV9Wy+Zohkz/9b3kmaG8oAN3OPpUA8KI40MW1RvsRz02a2g6M0exPy
+ v8TYqisCJEppBYHeEwFKMZrRKu7pBRko0UaffbmkmHHedz9H/We/N6ZmpHkhobdF6dvCjzjPp
+ 1I+Q9y2Ija18rRbqeQdWQXwRuZPl8L6x6ic18WeXQE+fARYtiKRF3RuFKI94S6KmqHsRCRKHS
+ jDvQzPHuxBj/YHpmouFUBBcmRA7rhLFFwHiAWZlmV5Au1qh7zzIrm9DdMXNqRW9XhwHsGcOjK
+ RYX2g3eoutJ7Q+tS0KJ1F1GOIktUCLzQC92MqAW1VwGT7XL+FQ4MfUKTis5uXGwVqMejb33Lo
+ W7ezmPzUBOBXLux1m3hE75HY9CWFTQIqAZ1pHuJS1D4f9KN+F9cLEkbk8OKRBBoN56327Hwa/
+ aFFRBl7++w==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Many controllers do not allow HCI Create Connection while it is doing
-Inquiry. This patch adds Inquiry Cancel before Create Connection in this
-case to allow the controller to do Create Connection. User space will be
-aware of this Inquiry cancellation and they may issue another discovery
-request afterwards.
+Le 09/12/2020 à 21:27, Bastien Nocera a écrit :
+> On Wed, 2020-12-09 at 20:04 +0100, Laurent Vivier wrote:
+>> Le 09/12/2020 à 12:34, Bastien Nocera a écrit :
+>>> On Wed, 2020-12-09 at 12:14 +0100, Laurent Vivier wrote:
+>> ...
+>>>>> If the printer has uses the SPP or HCRP printing profiles, you
+>>>>> should
+>>>>> see it when using:
+>>>>> /usr/lib/cups/backend/bluetooth
+>>>>> without any arguments.
+>>>>
+>>>> As I don't see it once it is paired, I guess it is not using one
+>>>> of
+>>>> these profiles.
+>>>
+>>> I don't remember how this used to work, but you'll probably only
+>>> see
+>>> something if the printer is visible.
+>>>
+>>> You might be able to get the printer to work by adding:
+>>> bluetooth://DC0D309023C7
+>>> as a printer in the printer settings of your favourite desktop
+>>> environment, if it actually uses SPP.
+>>>
+>>> running the cups backend with:
+>>> /usr/lib/cups/backend/bluetooth --get-deviceid
+>>> bluetooth://DC0D309023C7
+>>>
+>>> should show you whether it can get autoconfigured for CUPS use.
+>>>
+>>
+>> Thank you Bastien, it's exactly what I needed to know.
+>>
+>> Correct me if I'm wrong but it seems there is a bug in the
+>> cups/bluetooth
+>> command:
+> 
+> Sigh. No, it's not a bug, it's just that the cups tool was never ported
+> from the bluez 4.x to the current bluez 5.x API...
+> 
+> Until that's ported (if ever, given the low number of Bluetooth
+> printers around...), you could try to extract the IEEE1284 ID using:
+> sdptool records DC:0D:30:90:23:C7
 
-Sample Command Disallowed response of HCI Create Connection:
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-        Access code: 0x9e8b33 (General Inquiry)
-        Length: 10.24s (0x08)
-        Num responses: 0
-> HCI Event: Command Status (0x0f) plen 4
-      Inquiry (0x01|0x0001) ncmd 2
-        Status: Success (0x00)
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-        Address: XX:XX:XX:XX:XX:XX
-        Packet type: 0xcc18
-        Page scan repetition mode: R2 (0x02)
-        Page scan mode: Mandatory (0x00)
-        Clock offset: 0x0000
-        Role switch: Allow slave (0x01)
-> HCI Event: Command Status (0x0f) plen 4
-      Create Connection (0x01|0x0005) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11
-        Status: Command Disallowed (0x0c)
-        Handle: 65535
-        Address: XX:XX:XX:XX:XX:XX
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
+$ sdptool records DC:0D:30:90:23:C7
+Service Name: SPP Dev
+Service RecHandle: 0x10001
+Service Class ID List:
+  "Serial Port" (0x1101)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+It doesn't seem to provide an IEEE1284 ID.
 
----
- net/bluetooth/hci_conn.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+> 
+> But I'm not certain that this working is necessary to actually try a
+> print. Have you tested that?
+> 
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4f1cd8063e720..23c0d77ea7370 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -203,6 +203,23 @@ static void hci_acl_create_connection(struct hci_conn *conn)
- 
- 	BT_DBG("hcon %p", conn);
- 
-+	/* Many controllers disallow HCI Create Connection while it is doing
-+	 * HCI Inquiry. So we cancel the Inquiry first before issuing HCI Create
-+	 * Connection. This may cause the MGMT discovering state to become false
-+	 * without user space's request but it is okay since the MGMT Discovery
-+	 * APIs do not promise that discovery should be done forever. Instead,
-+	 * the user space monitors the status of MGMT discovering and it may
-+	 * request for discovery again when this flag becomes false.
-+	 */
-+	if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-+		/* Put this connection to "pending" state so that it will be
-+		 * executed after the inquiry cancel command complete event.
-+		 */
-+		conn->state = BT_CONNECT2;
-+		hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+		return;
-+	}
-+
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
- 	conn->role = HCI_ROLE_MASTER;
--- 
-2.26.2
+Not sure what to do...
+
+If I try to add the printer using the GUI, it doesn't appear in the list and I cannot add it
+manually (Fedora 33/GNOME 3.38.2) in GUI.
+
+If I add it with the following command line:
+
+  lpadmin -p M02 -E -v bluetooth://DC0D309023C7 -P /usr/share/cups/model/Phomemo/Phomemo-M02.ppd.gz
+
+It doesn't print anything.
+
+But I had some selinux related error:
+
+setroubleshoot[13488]: SELinux interdit à bluetooth d'utiliser l'accès connect sur le
+bluetooth_socket Inconnu.Pour des messages SELinux exhaustifs, lancez sealert -l
+965e2270-948f-4791-93f0-3b856c162cea
+setroubleshoot[13488]: SELinux interdit à bluetooth d'utiliser l'accès connect sur le
+bluetooth_socket Inconnu.
+...
+
+So I ran:
+
+  ausearch -c "bluetooth" --raw | audit2allow -M my-bluetooth
+  semodule -X 300 -i my-bluetooth.pp
+
+And now what I have in the syslogs is:
+
+cupsd[1185]: REQUEST localhost - - "POST /printers/M02 HTTP/1.1" 200 499560 Print-Job successful-ok
+DC0D309023C7[14310]: sdp_send_req_w4_rsp: Error sending data:Permission denied
+DC0D309023C7[14310]: sdp_service_search_attr_req: Unexpected end of packet
+DC0D309023C7[14310]: sdp_send_req_w4_rsp: Error sending data:Permission denied
+DC0D309023C7[14310]: sdp_service_search_attr_req: Unexpected end of packet
+cupsd[1185]: Can\'t get service information
+DC0D309023C7[14310]: sdp_send_req_w4_rsp: Error sending data:Permission denied
+DC0D309023C7[14310]: sdp_service_search_attr_req: Unexpected end of packet
+
+Thanks,
+Laurent
 
