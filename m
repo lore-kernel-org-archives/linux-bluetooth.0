@@ -2,112 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5C3C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 00:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787C7C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 01:21:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55A0923CD1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 00:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FC7723B1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 01:21:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728759AbgLJAgR (ORCPT
+        id S1731987AbgLJBVE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Dec 2020 19:36:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56284 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727762AbgLJAgN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Dec 2020 19:36:13 -0500
-Date:   Thu, 10 Dec 2020 01:35:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607560531;
-        bh=wxKmgiGIrwLEcdTmpOgRsS6brQkIjR6i0roFhZgQd00=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eNhUlY1a89y3/hLwIfehqbBqFa3pnvos98n9uoPdX3KG4osuphOd1KVE12xrT15O2
-         kd83k+jRDX14bqBjhDrpip841n588IR8gGNhcPh96gLo68KvSZd66AoMMYBJ/eFouH
-         QAiQ5fEUYkRImAMY4MnWk8S+T9vjC2N01XgwmfDGZXxa/0YK2JTjKRhERwda9fPy9O
-         3w25Kdz3RPrNMfKsnc5WYtJSa80GU7wt6DR0laUS7ckdk2ZEKXGPmYPr8z2uaEqpfb
-         bj8or1L+5fzHh4gEowbkEgzE258pv48Ib1IcRORtjsjNHF4Ps9mBsU3+sGWb+TUhyX
-         CVnykaIzXbBNA==
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Trent Piepho <tpiepho@gmail.com>
-Cc:     Joseph Hwang <josephsih@google.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Wed, 9 Dec 2020 20:21:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731943AbgLJBVE (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Dec 2020 20:21:04 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFB7C0613CF;
+        Wed,  9 Dec 2020 17:20:24 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id x12so1453421plr.10;
+        Wed, 09 Dec 2020 17:20:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TnX3YC7/PBJ67zZPtWlNRRmtdbF2hw55/iK7zw29u2k=;
+        b=TD5SIHwzSQLGB7lAF6oefAYoP+OjXSSz3BPbsADRIAQE5tA2T5NRH1b5bcPivQTM1L
+         uBnrwPsw+Xqh2JVdZu9UUvyOh5P1QfxYga1Z8DF7lp+Y0fPksBj9gfx2llBnKYBpolV/
+         sfoRRvgO/pv0N/G5+10WZYGuEqeD+QekMJBsgeysWqGzpkIRuDI5RMuhhinP5+SLFBY8
+         5Y8tJuilUgaVOLEenUWIf1vNzD4VSc2cZ2EC49E9tJnLyzmCtOGkEOSyrHb092MpPWb0
+         y+ob186mvmvwJtp7SQhEbEHDKWY0XM39YusyZq8Gyfgsx2UEdDTO3/lyWZ9zHiubmkKw
+         02pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TnX3YC7/PBJ67zZPtWlNRRmtdbF2hw55/iK7zw29u2k=;
+        b=LafmFtBPCH3ljsKiq4haK4YeB2AxIViCg5x6/s06DE2ukjdA+qc7M1SMrfDSmRh9DR
+         eUuUhTCSmYYNQxxjUY5Fw8evHpHFQw2bIPbNwCminzdA4VEvitIzRdd1G1bIYv+don0f
+         J+kdW/5jqMU9JsHvg5d2ngP+4xifALe5R5XV+lFPIt4kVBN0M4uZ+DiCNu7Pfbfe+zHG
+         aZo+t12fOl9UoiTsviGasJmETWYhY3Z5xYy2QunYTU6N4dYm2cfDq6OCoXR9yPutRBsS
+         G8UkXQ7GkF0E8CtpPhpTCBfjpwtRfR/BMebtSjIywR7kje4N64LRoK+cUR1Wd9wc0JF4
+         4tIQ==
+X-Gm-Message-State: AOAM533pcFEFLvD6n/mD2F/uJsfq76APZvdHOWc9fc6mZ6wQdwEjmCSH
+        Eolw67K+ePvfXpiRqiKTmEi+Qmq6EZ+qyv7x
+X-Google-Smtp-Source: ABdhPJwwoTXnpLyWpnVPwDtbP/gj+3zMTxqPgMhRyppERxMeuSE1mXICo6iae5qDwp7Q7Ew/ooxaqg==
+X-Received: by 2002:a17:902:bd8d:b029:da:fcd1:664 with SMTP id q13-20020a170902bd8db02900dafcd10664mr4626692pls.30.1607563223347;
+        Wed, 09 Dec 2020 17:20:23 -0800 (PST)
+Received: from zen.local ([71.212.189.78])
+        by smtp.gmail.com with ESMTPSA id i123sm4138118pfb.28.2020.12.09.17.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Dec 2020 17:20:22 -0800 (PST)
+From:   Trent Piepho <tpiepho@gmail.com>
+To:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Hilda Wu <hildawu@realtek.com>,
+        Sathish Narasimman <sathish.narasimman@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Hsin-Yu Chao <hychao@chromium.org>,
+        Amit K Bag <amit.k.bag@intel.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        chromeos-bluetooth-upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: define HCI packet sizes of USB
- Alts
-Message-ID: <20201210003528.3pmaxvubiwegxmhl@pali>
-References: <20200910060403.144524-1-josephsih@chromium.org>
- <9810329.nUPlyArG6x@zen.local>
- <20201209011336.4qdnnehnz3kdlqid@pali>
- <5703442.lOV4Wx5bFT@zen.local>
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Trent Piepho <tpiepho@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Always fallback to alt 1 for WBS
+Date:   Wed,  9 Dec 2020 17:20:03 -0800
+Message-Id: <20201210012003.133000-1-tpiepho@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5703442.lOV4Wx5bFT@zen.local>
-User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wednesday 09 December 2020 16:19:39 Trent Piepho wrote:
-> On Tuesday, December 8, 2020 5:13:36 PM PST Pali Rohár wrote:
-> > On Tuesday 08 December 2020 15:04:29 Trent Piepho wrote:
-> > > Does this also give userspace a clear point at which to determine MTU 
-> setting, 
-> > > _before_ data is sent over SCO connection?  It will not work if sco_mtu 
-> is not 
-> > > valid until after userspace sends data to SCO connection with incorrect 
-> mtu.
-> > 
-> > IIRC connection is established after sync connection (SCO) complete
-> > event. And sending data is possible after connection is established. So
-> > based on these facts I think that userspace can determinate MTU settings
-> > prior sending data over SCO socket.
-> > 
-> > Anyway, to whole MTU issue for SCO there is a nice workaround which
-> > worked fine with more tested USB adapters and headsets. As SCO socket is
-> > synchronous and most bluetooth headsets have own clocks, you can
-> > synchronize sending packets to headsets based on time events when you
-> > received packets from other side and also send packets of same size as
-> > you received. I.e. for every received packet send own packet of the same
-> > size.
-> 
-> As I understand it, the RX side from the headset is not guaranteed, so in 
-> the TX only case this will not work and we still need to be told what MTU 
-> kernel has selected for the SCO link.
+When alt mode 6 is not available, fallback to the kernel <= 5.7 behavior
+of always using alt mode 1.
 
-I'm not sure if TX-only SCO link is possible. I always thought that SCO
-is synchronous bidirectional link.
+Prior to kernel 5.8, btusb would always use alt mode 1 for WBS (Wide
+Band Speech aka mSBC aka transparent SCO).  In commit baac6276c0a9
+("Bluetooth: btusb: handle mSBC audio over USB Endpoints") this
+was changed to use alt mode 6, which is the recommended mode in the
+Bluetooth spec (Specifications of the Bluetooth System, v5.0, Vol 4.B
+§2.2.1).  However, many if not most BT USB adapters do not support alt
+mode 6.  In fact, I have been unable to find any which do.
 
-As I said, this "workaround" is useful for classic bluetooth headsets
-and is it possible to use it immediately without any kernel changes.
+In kernel 5.8, this was changed to use alt mode 6, and if not available,
+use alt mode 0.  But mode 0 has a zero byte max packet length and can
+not possibly work.  It is just there as a zero-bandwidth dummy mode to
+work around a USB flaw that would prevent device enumeration if
+insufficient bandwidth were available for the lowest isoc mode
+supported.
 
-And I agree that kernel should tell userspace correct MTU value. And
-this should be fixed. "Workaround" is useful for immediate action to
-deliver at least something which works with most bluetooth headsets.
+In effect, WBS was broken for all USB-BT adapters that do not support
+alt 6, which appears to nearly all of them.
 
-> It seems also it would add some latency to start up, since it would be 
-> necessary to wait for packets to arrive before knowing what size packet to 
-> send.
+Then in commit 461f95f04f19 ("Bluetooth: btusb: USB alternate setting 1 for
+WBS") the 5.7 behavior was restored, but only for Realtek adapters.
 
-I think this startup latency is negligible in HFP profile where start
-needs non-trivial exchange of AT commands.
+I've tested a Broadcom BRCM20702A and CSR 8510 adapter, both work with
+the 5.7 behavior and do not with the 5.8.
 
-> Would timing based on matching TX to RX in the case of packet loss on RX 
-> side?
+So get rid of the Realtek specific flag and use the 5.7 behavior for all
+adapters as a fallback when alt 6 is not available.  This was the
+kernel's behavior prior to 5.8 and I can find no adapters for which it
+is not correct.  And even if there is an adapter for which this does not
+work, the current behavior would be to fall back to alt 0, which can not
+possibly work either, and so is no better.
 
-That is a good question for some research. I remember that e.g.
-pulseaudio used this technique for synchronizing bluetooth SCO RX and TX
-streams.
+Signed-off-by: Trent Piepho <tpiepho@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 03b83aa91277..1b690164ab5b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -506,7 +506,6 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ #define BTUSB_HW_RESET_ACTIVE	12
+ #define BTUSB_TX_WAIT_VND_EVT	13
+ #define BTUSB_WAKEUP_DISABLE	14
+-#define BTUSB_USE_ALT1_FOR_WBS	15
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -1736,15 +1735,12 @@ static void btusb_work(struct work_struct *work)
+ 				new_alts = data->sco_num;
+ 			}
+ 		} else if (data->air_mode == HCI_NOTIFY_ENABLE_SCO_TRANSP) {
+-			/* Check if Alt 6 is supported for Transparent audio */
+-			if (btusb_find_altsetting(data, 6)) {
+-				data->usb_alt6_packet_flow = true;
+-				new_alts = 6;
+-			} else if (test_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags)) {
+-				new_alts = 1;
+-			} else {
+-				bt_dev_err(hdev, "Device does not support ALT setting 6");
+-			}
++			/* Bluetooth USB spec recommends alt 6 (63 bytes), but
++			 * many adapters do not support it.  Alt 1 appears to
++			 * work for all adapters that do not have alt 6, and
++			 * which work with WBS at all.
++			 */
++			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
+ 		}
+ 
+ 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
+@@ -4548,10 +4544,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		 * (DEVICE_REMOTE_WAKEUP)
+ 		 */
+ 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
+-		if (btusb_find_altsetting(data, 1))
+-			set_bit(BTUSB_USE_ALT1_FOR_WBS, &data->flags);
+-		else
+-			bt_dev_err(hdev, "Device does not support ALT setting 1");
+ 	}
+ 
+ 	if (!reset)
+-- 
+2.26.2
+
