@@ -2,75 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037EFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 07:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D147EC4361B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 08:57:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 995D423D4D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 07:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9675323D98
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Dec 2020 08:57:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731962AbgLJH5u convert rfc822-to-8bit (ORCPT
+        id S1728600AbgLJI5Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Dec 2020 02:57:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53622 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729438AbgLJH5u (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Dec 2020 02:57:50 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 210595] Gamepad Sony PLAYSTATION(R)3 Controller doesn't pair
-Date:   Thu, 10 Dec 2020 07:57:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: szymon.janc@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-210595-62941-KuytvwFK3c@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-210595-62941@https.bugzilla.kernel.org/>
-References: <bug-210595-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 10 Dec 2020 03:57:25 -0500
+Received: from mail.persuitflow.com ([89.46.74.132]:35188 "EHLO
+        server1.mail.persuitflow.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728886AbgLJI5W (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Dec 2020 03:57:22 -0500
+Received: by server1.mail.persuitflow.com (Postfix, from userid 1001)
+        id AE2E0A3BB4; Thu, 10 Dec 2020 08:56:23 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=persuitflow.com;
+        s=mail; t=1607590593;
+        bh=LIG/EV9hZypKEB8e9JkxJFCirHVIBsQt3YrIS4TkXUA=;
+        h=Date:From:To:Subject:From;
+        b=p2GbzpGknqirSbhFxn2ddqqZrwxxsqwqLXvidbl9GF+7oxua3H8xrdVXITcsPGlSm
+         KwwMoLLUBSuSDNP2TUVgSa09BiOlxyUuv5xJRT/yamffelfyMF/KKZHoCo6NQGZdLE
+         UL0Q0WVdjmzrQxN7L+YrJqqpYfyS9+8ShkE7R9TcfeIcAClCDaQN8IxgVaHhrlHNqv
+         wPPxOFvk6Z3xIbmQrHwDFUHYMZ+eDczC2RXAsdGRtXt5KAntO6seTL6tZFJoHZeLmI
+         2S39SRe8H36xclmv02RV/rAlxYyoHfBL4smP06Fqbh83eOMBCPCStPJ6Zck9U0zhtz
+         kajmw8lJ5DCDw==
+Received: by mail.persuitflow.com for <linux-bluetooth@vger.kernel.org>; Thu, 10 Dec 2020 08:56:00 GMT
+Message-ID: <20201210074501-0.1.1x.8thd.0.pc405gnzhd@persuitflow.com>
+Date:   Thu, 10 Dec 2020 08:56:00 GMT
+From:   "Raquel Carvalho" <raquel.carvalho@persuitflow.com>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Desinfetante
+X-Mailer: mail.persuitflow.com
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210595
+Bom Dia,
 
-Szymon Janc (szymon.janc@gmail.com) changed:
+A demanda por desinfetantes eficazes que permitam a elimina=C3=A7=C3=A3o =
+de microrganismos prejudiciais =C3=A9 continuamente alta em todo o mundo.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |szymon.janc@gmail.com
+Expandir a oferta com uma gama profissional de produtos com atividade vir=
+icida e bactericida permite aumentar a posi=C3=A7=C3=A3o competitiva da e=
+mpresa e construir novas redes de vendas.
 
---- Comment #1 from Szymon Janc (szymon.janc@gmail.com) ---
-Hi,
+Diversificamos a linha de atacadistas e distribuidores com sabonetes, l=C3=
+=ADquidos e g=C3=A9is para desinfec=C3=A7=C3=A3o das m=C3=A3os e outros p=
+rodutos de limpeza, entre eles: g=C3=A9is de banho, shampoos e condiciona=
+dores de cabelo, al=C3=A9m de detergentes concentrados.
 
-AFAIR DS3 doesn't support pairing. You need to use sixaxis plugin in bluez and
-configure it via USB.
+Nossos parceiros de neg=C3=B3cios est=C3=A3o aumentando sua participa=C3=A7=
+=C3=A3o no mercado externo devido =C3=A0 crescente satisfa=C3=A7=C3=A3o d=
+o cliente e oferta diversificada.
 
-steps:
-make sure you DS3 is not connected over BT
-plug it via USB
-unplug
-press PS button
-authorize incoming bluetooth connection from BT
+O potencial de crescimento de nossas solu=C3=A7=C3=B5es resulta de pre=C3=
+=A7os acess=C3=ADveis, alto desempenho e versatilidade para se adaptar a =
+todos os tipos de pele.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+A extens=C3=A3o da gama de produtos proposta =C3=A9 um campo interessante=
+ para a coopera=C3=A7=C3=A3o?
+
+
+Cumprimentos,
+Raquel Carvalho
+Conselheiro do Cliente
