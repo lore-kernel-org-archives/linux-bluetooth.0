@@ -5,64 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D73E6C2BB48
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Dec 2020 08:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5689C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Dec 2020 08:35:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92A4D223D6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Dec 2020 08:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E103222B3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Dec 2020 08:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727178AbgLOIeO (ORCPT
+        id S1727210AbgLOIfG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Dec 2020 03:34:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43726 "EHLO
+        Tue, 15 Dec 2020 03:35:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727154AbgLOIeI (ORCPT
+        with ESMTP id S1726734AbgLOIey (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Dec 2020 03:34:08 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B830CC06179C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 00:33:52 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id t12so5970083qvj.19
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 00:33:52 -0800 (PST)
+        Tue, 15 Dec 2020 03:34:54 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40557C06179C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 00:34:14 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id x21so9861827pff.14
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 00:34:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=ysLBobFr8GxqKLoEfZPdZgTcru3jgCHsWlSFO8OjU38=;
-        b=N5VR7MbfJxCNGCNogcgMTpn6CzyKMwtvlCKGrrtM019WQeadJVs+vP/tV29M5YPkTc
-         XuUzL+youhQcFysYnUarIi/M2wwXZhD/y3vLKURw8yJBEUBObMbZMl5VjLzajhsZlG65
-         tLvOywB4NwxXr4DPa0Ffn3NPmzH4MkT8zwaO7pduq6DX8qnKLQwAfsrJ2g9mR0E9ZfJg
-         /3VAWa981wRQ8DYwUdb7BjiiuqPk6bwUhatCedBedLu7eCmsMi6X6SBvLcmvlbWkSaFK
-         OoS9tgDKVw4U2ITC5EzBpK4a1GnYkEmrWwSzKIYFB6B3SYV13UYi0MuNqdUu1b+FXP0C
-         UoKw==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=nbQS3g+yAVoRtuBXHwiD9CuWwggjm9hbbAVoCzZw1hI=;
+        b=cXKPE7KR/Ti+N7+hkYYXoS5uAL3/v2Iv4Wa6XJvDbN2QAFb/2X7/vLRKHgkcJYys41
+         ueGIAZmkooht+vsFI+LeizS/59YSie16RfGA/1BtDoJ1OiAVyXIKiobopytBLrSedHAK
+         ShaDQ88jAnJEk0bmLJMDqeCD7oaRk0v6IQ/ykds6el878RioabFEcOXxgLEYh+L/lbRz
+         ohHDXzrDRbz4AOZ3AqOGHSIVFHLWCvj0nhtwakmiG2odAKUjYu4jMy1ZXXujX315tlpf
+         IxnEO8XW7/k2j0Slo8jts38m55pIB1SIMUezHHMi4cmUefwRzGW6znZlw1m3pxmYrvYp
+         jJrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=ysLBobFr8GxqKLoEfZPdZgTcru3jgCHsWlSFO8OjU38=;
-        b=M60TcpiSYtK572ilKwJFXLTgArV23WtwxI9J/Lmjre6fKgY8Zehvkc8Xs5HJTM0LGV
-         GyzdTbj+0q9T+C4ZkiaGQZBxTnBTiYCubeDerJ/70NX/XNe7ZEKR3gThmwjouhFg2bHy
-         KNgfYwbskBe0DykAvGIA4PnDjDRZde3zITL9EAqT9A3XGJO79Hr4+g3ObhBAxGjzq+1m
-         kHw+eOlVTobGoYEPdPj1oH9eY45zlGypGfbgnedX/rao4bLTcsNJ2j775CHuC1w6qWPX
-         W6aJx4PRXW4/2pY6+UhAVzNgbs19LvNtESHpbO/GjsJX0Se1U4sFIMJfcMv/Tpw+93hY
-         3/lA==
-X-Gm-Message-State: AOAM533VJsbLKjzhqp3gMdBt41vhg6sX5hFUCFeEQLaOwskQxrpOkQ1n
-        izWhykGfgGr36zg3ZFaslAQSV/K0UjoDulmrSuptLLdkPofmY2TKcBD97qb97leZJ1Fb876s0Zs
-        S557zDb5NUkrHvmZLnbdo8nUoCfsNcCKBAVHiqLxKouPYJ2yCiOeCFbR/oR8u4UzGn2bqKXHMwZ
-        oT
-X-Google-Smtp-Source: ABdhPJxz94/yx2ndeHogN1gv4manFFqseEhHcX7N3lhfGikMLNoT8qK3xl8wAOI574TIk0C18sh5JAOXTm5e
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=nbQS3g+yAVoRtuBXHwiD9CuWwggjm9hbbAVoCzZw1hI=;
+        b=ndrlGXlTd/TRjB4SbbsKcqMHRdzPJxt1eFsChoYCwAY9xrdW4HDWptgImqEBxfw0vf
+         83SX+rqqaZz78F0fwDpH5kFK0ALbcfLkdy9kDt5Nw1xZb1KVSQ9tMl84GkfImxV4My2j
+         AbsEGfHajrKm8SqjQ+InLazHqhCzWjfcGtPLSobtq3kKxf4b5HVNbSTKuXsuamLN8DtB
+         Z/N/J4LYzbWWuKiiM4N9if9QBXJuhX2vnW/in066ZjB7W76Ff0HgqAkf9Qccak2RiSPl
+         Sybr5pRZhB6pTt9ceBW290eFLrw2w+Yt8QUJ9wWLgn2+MdbJKgv0HCeD4Qep5yuxaeBS
+         QbTA==
+X-Gm-Message-State: AOAM532WU9IJUama2qAw4KWTZTUh2NY1V8GkKkyXgK5YwU9aJfjsAlqy
+        kqV5tCsQ2xaJOMgRv1ggpmJutui/3TKveogMrPXzYzMrVAAby7ZTN9LjiWD8+mpvmSW38+sJoGR
+        +qyltKeU9ezwmXqOT8cSQWgcL69p0hMRCcfeoFOVG3uyWYe3/V7fpRvJPIbNZLWxoiIHryRZQEd
+        CX
+X-Google-Smtp-Source: ABdhPJwkUScw6ZgD2p9PP4iHPqqVVl+uL8kg9mweA+BeMvb2ZvgFTyu3mpaUMukEuoGF2ptNW40kMr7NLFVG
 Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a0c:e6c6:: with SMTP id
- l6mr36464380qvn.2.1608021231770; Tue, 15 Dec 2020 00:33:51 -0800 (PST)
-Date:   Tue, 15 Dec 2020 16:33:44 +0800
-Message-Id: <20201215163328.Bluez.v1.1.Iab784797733f28413e9de4f0d7fc0d4e1a00d9ef@changeid>
+ (user=apusaka job=sendgmr) by 2002:a17:90a:8b94:: with SMTP id
+ z20mr1462987pjn.1.1608021253112; Tue, 15 Dec 2020 00:34:13 -0800 (PST)
+Date:   Tue, 15 Dec 2020 16:33:47 +0800
+In-Reply-To: <20201215163328.Bluez.v1.1.Iab784797733f28413e9de4f0d7fc0d4e1a00d9ef@changeid>
+Message-Id: <20201215163328.Bluez.v1.2.I90bb4b25451e7f726fc2c8771cfe642b16312ce3@changeid>
 Mime-Version: 1.0
+References: <20201215163328.Bluez.v1.1.Iab784797733f28413e9de4f0d7fc0d4e1a00d9ef@changeid>
 X-Mailer: git-send-email 2.29.2.684.gfbc64c5ab5-goog
-Subject: [Bluez PATCH v1 1/2] doc/mgmt-api: Add opcode for adding
- advertisement monitor with RSSI
+Subject: [Bluez PATCH v1 2/2] lib/mgmt: Adding Add Adv Patterns Monitor RSSI opcode.
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -78,83 +80,42 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-This is to leverage the filtering by RSSI feature on those controllers
-which supports advertisement packet filtering. To avoid changing the
-existing API and breaking it, a new opcode is required.
+The new op is to utilize RSSI in advertisement monitor
 
 Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Yun-Hao Chung <howardchung@google.com>
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 ---
 
- doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ lib/mgmt.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 1aa43d6c3c..d5c7169630 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3800,6 +3800,58 @@ Add Extended Advertising Data Command
- 				Busy
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index f37f7e6540..1b8fcc0e10 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -738,6 +738,21 @@ struct mgmt_rp_add_ext_adv_data {
+ 	uint8_t	instance;
+ } __packed;
  
- 
-+Add Advertisement Patterns Monitor With RSSI Threshold Command
-+==============================================================
++struct mgmt_adv_rssi_thresholds {
++	int8_t   high_threshold;
++	uint16_t high_threshold_timeout;
++	int8_t   low_threshold;
++	uint16_t low_threshold_timeout;
++	uint8_t  sampling_period;
++} __packed;
 +
-+	Command Code:		0x0056
-+	Controller Index:	<controller id>
-+	Command Parameters:	Pattern_Count (1 Octet)
-+				RSSI_Data {
-+					High_Threshold (1 Octet)
-+					High_Threshold_Timer (2 Octets)
-+					Low_Threshold (1 Octet)
-+					Low_Threshold_Timer (2 Octets)
-+					Sampling_Period (1 Octet)
-+				}
-+				Pattern1 {
-+					AD_Type (1 Octet)
-+					Offset (1 Octet)
-+					Length (1 Octet)
-+					Value (31 Octets)
-+				}
-+				Pattern2 { }
-+				...
-+	Return Parameters:	Monitor_Handle (2 Octets)
++#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI	0x0056
++struct mgmt_cp_add_adv_patterns_monitor_rssi {
++	uint8_t pattern_count;
++	struct mgmt_adv_rssi_thresholds rssi;
++	struct mgmt_adv_pattern patterns[0];
++} __packed;
 +
-+	This command is essentially the same as Add Advertisement Patterns
-+	Monitor Command (0x0052), but with an additional RSSI parameters.
-+	As such, if the kernel supports advertisement filtering, then the
-+	advertisement data will be filtered in accordance with the set
-+	RSSI parameters. Otherwise, it would behave exactly the same as the
-+	Add Advertisement Patterns Monitor Command.
-+
-+	Devices would be considered "in-range" if the RSSI of the received adv
-+	packets are greater than High_Threshold dBm for High_Threshold_Timer
-+	seconds. Similarly, devices would be considered lost if no received
-+	adv have RSSI greater than Low_Threshold dBm for Low_Threshold_Timer
-+	seconds. Only adv packets of "in-range" device would be propagated.
-+
-+	The meaning of Sampling_Period is as follows:
-+		0x00	All adv packets from "in-range" devices would be
-+			propagated.
-+		0xFF	Only the first adv data of "in-range" devices would be
-+			propagated. If the device becomes lost, then the first
-+			data when it is found again will also be propagated.
-+		other	Advertisement data would be grouped into 100ms * N
-+			time period. Data in the same group will only be
-+			reported once, with the RSSI value being averaged out.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
- Command Complete Event
- ======================
- 
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
 -- 
 2.29.2.684.gfbc64c5ab5-goog
 
