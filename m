@@ -5,72 +5,71 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD4BC2BBCF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Dec 2020 04:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D915EC2BBD5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Dec 2020 04:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD6552311F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Dec 2020 04:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B34F023123
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Dec 2020 04:34:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725808AbgLPEee (ORCPT
+        id S1725837AbgLPEey (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Dec 2020 23:34:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33216 "EHLO
+        Tue, 15 Dec 2020 23:34:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725275AbgLPEee (ORCPT
+        with ESMTP id S1725821AbgLPEet (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Dec 2020 23:34:34 -0500
+        Tue, 15 Dec 2020 23:34:49 -0500
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B13C061282
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 20:33:45 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id 12so15831344qvk.23
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 20:33:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01481C0611CC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 20:33:57 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id i2so15824387qvb.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Dec 2020 20:33:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=sSGCRfIrajbqPNzfreTza6Lc9wD5ZtP8oZgretb/+DM=;
-        b=QbALSltyPlKo3C5JA8gjwQ2ySpq0sDuMLog44XD4EByGpYUQqk54jzJRDhPW0d6TzH
-         3RWwAa9gVycJaTa3g9OWGnOihqrUFYGkAII2qioKOfOf/WCtFxVJg8YAlm0a3YJbeE/6
-         o4uJZMUDZdUlfIbelKbZ2g0u3whBPUBYINEzrMxEJyCDEG8CE16wUuT4s/lyN/cg7Apw
-         rU2NMUYA3PbQrUpC2kALIXew2KyTQw/V1pyTRT75Ly4j1CnVwH0o+lPFl0ZSjKi/gILm
-         Tbv8QWc8O00WorA/5q4HfTvU4g7CPCZAlXJNJVgJfzWAo7pQwE9CUjdD7W3tEh1tt7GP
-         e7Sg==
+        bh=zeiKZe2SqMMcR1bNzfI2giJ/WilJHjruARqdlPkMIAQ=;
+        b=MaFdd1tjo3SHB+bbOm+MUoAo9lXKy4J3GaGC1Rz4H9/bE8tvpgph68BJrG6tJ+cCMC
+         MlgeObTbox0TQHGPzTSZ9tKSd95IG75r72sz8VEVYb4zh2v3WAjfY3H/IR2D7bEf8ppi
+         9bOQmGTqJs0ag3CzxxWW7NVDNeP8y771XCiI41bryYxSdOG6GbV35Z5CMMHfRQRGvnjZ
+         0SA0Y+C5VI+6QpUD8qrviEe1gKE6G6FxQadOpxycNGU5rsRRz9FIXd1rKLsUPJWeqjxX
+         RIHEPW8DsGHLxEDgPcLsdgGd5k6peRs5GWOcrckqGw2oWVGcrX3yYfWqRYZKgwqkQN7A
+         IQ7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=sSGCRfIrajbqPNzfreTza6Lc9wD5ZtP8oZgretb/+DM=;
-        b=sfx1WDzVROEbH6ehIq5v6G1KzeyVECXe7Ars3o0NKmHMB6MMQ8ZGfYKNUK06HT1qSb
-         oGg7mZYdE8fQdI6FylwX8SUXzK4ADOKvArU5IU0jOtSeF15a99/FOEFKM2aysOvTa1eh
-         cihkj0jWyD+LDNzEeR8QIYsBIVo8LHRNC5+eOf2ZY3b8QkONtGsWaLRlHz6T/UgPZlqU
-         o82OExdLZLGwXSQ/lvOO7gY3qDfb3FOuK4AQkqx1PuIyao3qD2ei1bRrj3idldzA/uO0
-         5IqJhxCck3GlxgszZw/VOavDQGMshcLVIppZjMzOOnxWzqHN+wn1gp1381UdVbZtd2Fa
-         SEFQ==
-X-Gm-Message-State: AOAM533vizg57V7aRm7zfW0SmSWST9gMevIY2wBhPjnuOrDMH3fmvjsX
-        jFHr71yMremyJBwpXmvFsUXUEAZEYhWvD+se8mg/GENgk8tGMkTf0jPcfvXgFMDbXLih6bzRN2V
-        MGVsVpwGE1F3ocMQp8bA8QCEvRhmLefzcLMFnhnJ4Lpxfpb6gaZhZJaoDkitzNYqmELdel6u4r9
-        FK
-X-Google-Smtp-Source: ABdhPJwJpg8BnPdyePZBsj6FDcUgi3uNiDlvoY5TbDfg6ei7ttK58yTCR5DAhGjvQH/J53kyspTVng0J7HF9
+        bh=zeiKZe2SqMMcR1bNzfI2giJ/WilJHjruARqdlPkMIAQ=;
+        b=P+g097EqVT9/jjfNL3G/oav9OhOe5D/YJcOAn5fIGzDvQOwOBBXqDebRF+YwRZMrev
+         VkQoE0q3p8SNhF8KpMv8e0RYRIUTRA/Oyv8B+Rhwf5yCB4ButeXi9AWQvOgGWJYlPQM8
+         upOWtLIXJs3e4oZT4ae/ZfjtrQMqNHW5gAKyoWHMwTZLrjwuJOIKoznM4F0+qWY2lJrV
+         T6yCOLk9Ya8PevV0MYv28fsxQ/Ypff6LFE9k/8rb0SFduXumgc9cba6DCzRQU6Um2N2Y
+         dKuOeLzLEBV14HTdq6QPA9Fyroia9DPuZeUEmEGS/yPjBn9IKz8j1xU2e8Byq8ZXcj3i
+         N4wQ==
+X-Gm-Message-State: AOAM533+fzC2DIGJR2r4qERsXbt19EM6nd6HbgUmjw1vm8+rYiTacVPX
+        mBE7Qqm8Dwo2vnxqts3UCzVarKeHpvbzmM+q5CKtQ1no+BP26O9V37a/1p5nl7mBiWcdkVP3ee2
+        6oDeOsFrorn1eXmSBLzCeNk1YQ4xHNIUHrOQcgL2V+sxIAa7QF9brG+cEniwcv66Co20n2CPlkA
+        SY
+X-Google-Smtp-Source: ABdhPJzF3GuTGyNLJlvtJ1BbMino6VbNfvzyS+xqU7whMjXK7OhAB3mAm98aQ+B0B64xMW2ohZPdTyBA9q+e
 Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a0c:f1ce:: with SMTP id
- u14mr20713675qvl.24.1608093224303; Tue, 15 Dec 2020 20:33:44 -0800 (PST)
-Date:   Wed, 16 Dec 2020 12:33:31 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:a905:: with SMTP id
+ y5mr15122583qva.55.1608093236079; Tue, 15 Dec 2020 20:33:56 -0800 (PST)
+Date:   Wed, 16 Dec 2020 12:33:34 +0800
 In-Reply-To: <20201216043335.2185278-1-apusaka@google.com>
-Message-Id: <20201216123317.v3.1.I92d2e2a87419730d60136680cbe27636baf94b15@changeid>
+Message-Id: <20201216123317.v3.4.I215b0904cb68d68ac780a0c75c06f7d12e6147b7@changeid>
 Mime-Version: 1.0
 References: <20201216043335.2185278-1-apusaka@google.com>
 X-Mailer: git-send-email 2.29.2.684.gfbc64c5ab5-goog
-Subject: [PATCH v3 1/5] Bluetooth: advmon offload MSFT add rssi support
+Subject: [PATCH v3 4/5] Bluetooth: advmon offload MSFT handle controller reset
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
 Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>,
         Yun-Hao Chung <howardchung@google.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -85,259 +84,177 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-MSFT needs rssi parameter for monitoring advertisement packet,
-therefore we should supply them from mgmt. This adds a new opcode
-to add advertisement monitor with rssi parameters.
+When the controller is powered off, the registered advertising monitor
+is removed from the controller. This patch handles the re-registration
+of those monitors when the power is on.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Yun-Hao Chung <howardchung@google.com>
 
 ---
 
-Changes in v3:
-* Flips the order of rssi and pattern_count on mgmt struct
+(no changes since v1)
 
-Changes in v2:
-* Add a new opcode instead of modifying an existing one
+ net/bluetooth/msft.c | 79 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 74 insertions(+), 5 deletions(-)
 
- include/net/bluetooth/hci_core.h |  9 +++
- include/net/bluetooth/mgmt.h     | 16 ++++++
- net/bluetooth/mgmt.c             | 99 ++++++++++++++++++++++++--------
- 3 files changed, 101 insertions(+), 23 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 677a8c50b2ad..8b7cf3620938 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -250,8 +250,17 @@ struct adv_pattern {
- 	__u8 value[HCI_MAX_AD_LENGTH];
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index f5aa0e3b1b9b..7e33a85c3f1c 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -82,8 +82,15 @@ struct msft_data {
+ 	struct list_head handle_map;
+ 	__u16 pending_add_handle;
+ 	__u16 pending_remove_handle;
++
++	struct {
++		u8 reregistering:1;
++	} flags;
  };
  
-+struct adv_rssi_thresholds {
-+	__s8 low_threshold;
-+	__s8 high_threshold;
-+	__u16 low_threshold_timeout;
-+	__u16 high_threshold_timeout;
-+	__u8 sampling_period;
-+};
++static int __msft_add_monitor_pattern(struct hci_dev *hdev,
++				      struct adv_monitor *monitor);
 +
- struct adv_monitor {
- 	struct list_head patterns;
-+	struct adv_rssi_thresholds rssi;
- 	bool		active;
- 	__u16		handle;
- };
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index f9a6638e20b3..9917b911a4fb 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -821,6 +821,22 @@ struct mgmt_rp_add_ext_adv_data {
- 	__u8	instance;
- } __packed;
+ bool msft_monitor_supported(struct hci_dev *hdev)
+ {
+ 	return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR);
+@@ -134,6 +141,35 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 	return false;
+ }
  
-+struct mgmt_adv_rssi_thresholds {
-+	__s8 high_threshold;
-+	__le16 high_threshold_timeout;
-+	__s8 low_threshold;
-+	__le16 low_threshold_timeout;
-+	__u8 sampling_period;
-+} __packed;
++/* This function requires the caller holds hdev->lock */
++static void reregister_monitor_on_restart(struct hci_dev *hdev, int handle)
++{
++	struct adv_monitor *monitor;
++	struct msft_data *msft = hdev->msft_data;
++	int err;
 +
-+#define MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI	0x0056
-+struct mgmt_cp_add_adv_patterns_monitor_rssi {
-+	struct mgmt_adv_rssi_thresholds rssi;
-+	__u8 pattern_count;
-+	struct mgmt_adv_pattern patterns[];
-+} __packed;
-+#define MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE	8
++	while (1) {
++		monitor = idr_get_next(&hdev->adv_monitors_idr, &handle);
++		if (!monitor) {
++			/* All monitors have been reregistered */
++			msft->flags.reregistering = false;
++			hci_update_background_scan(hdev);
++			return;
++		}
 +
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fa0f7a4a1d2f..cd574054aa39 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -124,6 +124,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_REMOVE_ADV_MONITOR,
- 	MGMT_OP_ADD_EXT_ADV_PARAMS,
- 	MGMT_OP_ADD_EXT_ADV_DATA,
-+	MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI,
- };
++		msft->pending_add_handle = (u16)handle;
++		err = __msft_add_monitor_pattern(hdev, monitor);
++
++		/* If success, we return and wait for monitor added callback */
++		if (!err)
++			return;
++
++		/* Otherwise remove the monitor and keep registering */
++		hci_free_adv_monitor(hdev, monitor);
++		handle++;
++	}
++}
++
+ void msft_do_open(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft;
+@@ -154,12 +190,18 @@ void msft_do_open(struct hci_dev *hdev)
  
- static const u16 mgmt_events[] = {
-@@ -4225,22 +4226,40 @@ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+ 	INIT_LIST_HEAD(&msft->handle_map);
+ 	hdev->msft_data = msft;
++
++	if (msft_monitor_supported(hdev)) {
++		msft->flags.reregistering = true;
++		reregister_monitor_on_restart(hdev, 0);
++	}
+ }
+ 
+ void msft_do_close(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft = hdev->msft_data;
+ 	struct msft_monitor_advertisement_handle_data *handle_data, *tmp;
++	struct adv_monitor *monitor;
+ 
+ 	if (!msft)
+ 		return;
+@@ -169,6 +211,12 @@ void msft_do_close(struct hci_dev *hdev)
+ 	hdev->msft_data = NULL;
+ 
+ 	list_for_each_entry_safe(handle_data, tmp, &msft->handle_map, list) {
++		monitor = idr_find(&hdev->adv_monitors_idr,
++				   handle_data->mgmt_handle);
++
++		if (monitor && monitor->state == ADV_MONITOR_STATE_OFFLOADED)
++			monitor->state = ADV_MONITOR_STATE_REGISTERED;
++
+ 		list_del(&handle_data->list);
+ 		kfree(handle_data);
+ 	}
+@@ -282,9 +330,15 @@ static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
+ 	if (status && monitor)
+ 		hci_free_adv_monitor(hdev, monitor);
+ 
++	/* If in restart/reregister sequence, keep registering. */
++	if (msft->flags.reregistering)
++		reregister_monitor_on_restart(hdev,
++					      msft->pending_add_handle + 1);
++
+ 	hci_dev_unlock(hdev);
+ 
+-	hci_add_adv_patterns_monitor_complete(hdev, status);
++	if (!msft->flags.reregistering)
++		hci_add_adv_patterns_monitor_complete(hdev, status);
+ }
+ 
+ static void msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
+@@ -374,7 +428,8 @@ static bool msft_monitor_pattern_valid(struct adv_monitor *monitor)
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+-int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
++static int __msft_add_monitor_pattern(struct hci_dev *hdev,
++				      struct adv_monitor *monitor)
+ {
+ 	struct msft_cp_le_monitor_advertisement *cp;
+ 	struct msft_le_monitor_advertisement_pattern_data *pattern_data;
+@@ -387,9 +442,6 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
+ 	u8 pattern_count = 0;
+ 	int err = 0;
+ 
+-	if (!msft)
+-		return -EOPNOTSUPP;
+-
+ 	if (!msft_monitor_pattern_valid(monitor))
+ 		return -EINVAL;
+ 
+@@ -434,6 +486,20 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
  	return err;
  }
  
--static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
--				    void *data, u16 len)
-+static int __add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
-+				      void *data, u16 len, u16 op)
- {
--	struct mgmt_cp_add_adv_patterns_monitor *cp = data;
-+	struct mgmt_cp_add_adv_patterns_monitor *cp = NULL;
-+	struct mgmt_cp_add_adv_patterns_monitor_rssi *cp_rssi = NULL;
- 	struct mgmt_rp_add_adv_patterns_monitor rp;
-+	struct mgmt_adv_rssi_thresholds *rssi = NULL;
-+	struct mgmt_adv_pattern *patterns = NULL;
- 	struct adv_monitor *m = NULL;
- 	struct adv_pattern *p = NULL;
- 	unsigned int mp_cnt = 0, prev_adv_monitors_cnt;
- 	__u8 cp_ofst = 0, cp_len = 0;
- 	int err, i;
-+	u8 pattern_count;
-+	u16 expected_len;
- 
- 	BT_DBG("request for %s", hdev->name);
- 
--	if (len <= sizeof(*cp) || cp->pattern_count == 0) {
--		err = mgmt_cmd_status(sk, hdev->id,
--				      MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+	if (op == MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI) {
-+		cp_rssi = data;
-+		pattern_count = cp_rssi->pattern_count;
-+		rssi = &cp_rssi->rssi;
-+		patterns = cp_rssi->patterns;
-+		expected_len = sizeof(*cp_rssi) +
-+			       pattern_count * sizeof(*patterns);
-+	} else {
-+		cp = data;
-+		pattern_count = cp->pattern_count;
-+		patterns = cp->patterns;
-+		expected_len = sizeof(*cp) + pattern_count * sizeof(*patterns);
-+	}
-+
-+	if (len != expected_len || pattern_count == 0) {
-+		err = mgmt_cmd_status(sk, hdev->id, op,
- 				      MGMT_STATUS_INVALID_PARAMS);
- 		goto failed;
- 	}
-@@ -4254,21 +4273,40 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 	INIT_LIST_HEAD(&m->patterns);
- 	m->active = false;
- 
--	for (i = 0; i < cp->pattern_count; i++) {
-+	if (rssi) {
-+		m->rssi.low_threshold = rssi->low_threshold;
-+		m->rssi.low_threshold_timeout =
-+		    __le16_to_cpu(rssi->low_threshold_timeout);
-+		m->rssi.high_threshold = rssi->high_threshold;
-+		m->rssi.high_threshold_timeout =
-+		    __le16_to_cpu(rssi->high_threshold_timeout);
-+		m->rssi.sampling_period = rssi->sampling_period;
-+	} else {
-+		/* Default values. These numbers are the least constricting
-+		 * parameters for MSFT API to work, so it behaves as if there
-+		 * are no rssi parameter to consider. May need to be changed
-+		 * if other API are to be supported.
-+		 */
-+		m->rssi.low_threshold = -127;
-+		m->rssi.low_threshold_timeout = 60;
-+		m->rssi.high_threshold = -127;
-+		m->rssi.high_threshold_timeout = 0;
-+		m->rssi.sampling_period = 0;
-+	}
-+
-+	for (i = 0; i < pattern_count; i++) {
- 		if (++mp_cnt > HCI_MAX_ADV_MONITOR_NUM_PATTERNS) {
--			err = mgmt_cmd_status(sk, hdev->id,
--					      MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+			err = mgmt_cmd_status(sk, hdev->id, op,
- 					      MGMT_STATUS_INVALID_PARAMS);
- 			goto failed;
- 		}
- 
--		cp_ofst = cp->patterns[i].offset;
--		cp_len = cp->patterns[i].length;
-+		cp_ofst = patterns[i].offset;
-+		cp_len = patterns[i].length;
- 		if (cp_ofst >= HCI_MAX_AD_LENGTH ||
- 		    cp_len > HCI_MAX_AD_LENGTH ||
- 		    (cp_ofst + cp_len) > HCI_MAX_AD_LENGTH) {
--			err = mgmt_cmd_status(sk, hdev->id,
--					      MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+			err = mgmt_cmd_status(sk, hdev->id, op,
- 					      MGMT_STATUS_INVALID_PARAMS);
- 			goto failed;
- 		}
-@@ -4279,18 +4317,17 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
- 
--		p->ad_type = cp->patterns[i].ad_type;
--		p->offset = cp->patterns[i].offset;
--		p->length = cp->patterns[i].length;
--		memcpy(p->value, cp->patterns[i].value, p->length);
-+		p->ad_type = patterns[i].ad_type;
-+		p->offset = patterns[i].offset;
-+		p->length = patterns[i].length;
-+		memcpy(p->value, patterns[i].value, p->length);
- 
- 		INIT_LIST_HEAD(&p->list);
- 		list_add(&p->list, &m->patterns);
- 	}
- 
--	if (mp_cnt != cp->pattern_count) {
--		err = mgmt_cmd_status(sk, hdev->id,
--				      MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+	if (mp_cnt != pattern_count) {
-+		err = mgmt_cmd_status(sk, hdev->id, op,
- 				      MGMT_STATUS_INVALID_PARAMS);
- 		goto failed;
- 	}
-@@ -4302,8 +4339,7 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 	err = hci_add_adv_monitor(hdev, m);
- 	if (err) {
- 		if (err == -ENOSPC) {
--			mgmt_cmd_status(sk, hdev->id,
--					MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+			mgmt_cmd_status(sk, hdev->id, op,
- 					MGMT_STATUS_NO_RESOURCES);
- 		}
- 		goto unlock;
-@@ -4316,7 +4352,7 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 
- 	rp.monitor_handle = cpu_to_le16(m->handle);
- 
--	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
-+	return mgmt_cmd_complete(sk, hdev->id, op,
- 				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
- 
- unlock:
-@@ -4327,6 +4363,20 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
-+static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
-+				    void *data, u16 len)
++/* This function requires the caller holds hdev->lock */
++int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
 +{
-+	return __add_adv_patterns_monitor(sk, hdev, data, len,
-+					  MGMT_OP_ADD_ADV_PATTERNS_MONITOR);
++	struct msft_data *msft = hdev->msft_data;
++
++	if (!msft)
++		return -EOPNOTSUPP;
++
++	if (msft->flags.reregistering)
++		return -EBUSY;
++
++	return __msft_add_monitor_pattern(hdev, monitor);
 +}
 +
-+static int add_adv_patterns_monitor_rssi(struct sock *sk, struct hci_dev *hdev,
-+					 void *data, u16 len)
-+{
-+	return __add_adv_patterns_monitor(sk, hdev, data, len,
-+					 MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI);
-+}
-+
- static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
- 			      void *data, u16 len)
- {
-@@ -8234,6 +8284,9 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_VAR_LEN },
- 	{ add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
- 						HCI_MGMT_VAR_LEN },
-+	{ add_adv_patterns_monitor_rssi,
-+				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
-+						HCI_MGMT_VAR_LEN },
- };
+ /* This function requires the caller holds hdev->lock */
+ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
+ 			u16 handle)
+@@ -447,6 +513,9 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
  
- void mgmt_index_added(struct hci_dev *hdev)
++	if (msft->flags.reregistering)
++		return -EBUSY;
++
+ 	handle_data = msft_find_handle_data(hdev, monitor->handle, true);
+ 
+ 	/* If no matched handle, just remove without telling controller */
 -- 
 2.29.2.684.gfbc64c5ab5-goog
 
