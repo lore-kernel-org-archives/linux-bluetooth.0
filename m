@@ -8,53 +8,53 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2364C2BBCF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 22:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D96C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 22:55:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96BCB23A54
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 22:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C65EE23A51
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 22:55:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732198AbgLQWyr (ORCPT
+        id S1732206AbgLQWy7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Dec 2020 17:54:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57868 "EHLO
+        Thu, 17 Dec 2020 17:54:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732168AbgLQWyp (ORCPT
+        with ESMTP id S1732199AbgLQWy7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Dec 2020 17:54:45 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9AEC061282
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 14:54:05 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id f14so231537pju.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 14:54:05 -0800 (PST)
+        Thu, 17 Dec 2020 17:54:59 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E30FC061248
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 14:54:16 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id f14so231787pju.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 14:54:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cI9MgmLeploorlaT6riPPJE9eXLVQcklnfEH1q+Fd9s=;
-        b=eeSPw9ZNCa3gp4C94BkDSwC79ilLWC9VXQd3Ibuzia9j0DGwW584pKr22PoidTVF9z
-         IRAQD1+yho+07aj/S+ueSUy2Srx3RJWkNfp315Kpj29Z1XiiWmPhh94vbkja4z+NKtX6
-         EJPgoUESQOiuv9BByERPEEj76aLTvRuUnA1OA=
+        bh=WZ5WSbQtPeUtU/i4otWMR2VgbaOPAzPCIHXFiOM9ruA=;
+        b=A4h3Z6nsqjvVlEDu1hHg5MAI22u3KUOUIPnpQOSsrM5dhduiWA2NQCdzkG5RU9pd4p
+         tG2KnEnBBJRLCTXyNEa9kQudxBa8ABQImvv+cQfKZB8e1d+x3Her/TfDqAdQ5CwMVwD0
+         ED9npRAn0QZZd7pRs9je6E3d1v3BeDX6eV4dI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cI9MgmLeploorlaT6riPPJE9eXLVQcklnfEH1q+Fd9s=;
-        b=H1Dg6WuPQ33bds/8EqWxvKCf+QyeczEnEUlOpk/9rJWzH7RrJHfk/mq7+A4Ycho+eL
-         4CqhB6nkC2el2rJy/Ox6fumAh1QcOsTu9XiZ0a0TBd/hOqCOCVFa9+Z24H9ua04f9YAx
-         9Q1oJ/SxOfabmARlTPZbZNzRhudf/2BVoF7NnjDAjztwzBrbM4+ytYmRajLcMAn1MLKO
-         7HTTvdd0XOJMonGh082r10agyOctcLI+K5yjzFtiVKsLJVSun2ItDlyq3+CJ3+b+myaY
-         hEbW0FFcfHE6cQ6wgxdAC62UCTqQiinMLF5humNdgj50yvhbYD8BYAvzkuGhFilLhAPF
-         rPLg==
-X-Gm-Message-State: AOAM532fcq52JAR4GmkdUpbNfe/70Ei2sad4rxbgaq/mU2sSZeZbzTB8
-        HUCfPxZdE85GhovftXW2J7I4JdfZV2O3Rg==
-X-Google-Smtp-Source: ABdhPJyAgs5zVEPDtjuG0Pl+XF2C1xuC0/BKGQDoZVn8MmxXYDfPKxSs/86+hI9EBSIiQQ03COSEfg==
-X-Received: by 2002:a17:90a:6a48:: with SMTP id d8mr1363057pjm.130.1608245644550;
-        Thu, 17 Dec 2020 14:54:04 -0800 (PST)
+        bh=WZ5WSbQtPeUtU/i4otWMR2VgbaOPAzPCIHXFiOM9ruA=;
+        b=CAD4DasUFGa8jDeZEpyF//RxJCdz5KywODh2yY+Sqv3leI5+AYkRE4XEmL38lcLO5M
+         hZfKyiczAW/jZ8ZfNbwAIbDElRn81SV+4XgC5irMdCi7X8zOhbomNINsI1Z6Ciaz2/E7
+         P12ImSTULQHJelQzfwnVRdwwW9ojIaLwmDUKBYns+DoknEY8R8dOvVTjjWaHwXQoMQ70
+         Zx8cdotDB3jprydG8ftbwK6f2sB+V4s+Vxjx58bMIMRWZj8A/nqHa+my+SqDx6CW20H1
+         //dCSFWB8Dv9FjPzz2EToGRTN0P5eBzahw3VnRatGW06OvDpOGD3Z0KfJcsx8FhEkx5M
+         Rhtw==
+X-Gm-Message-State: AOAM531iDGQ/qad9ooN3R0pMGnqGdRpBOzEcWPpGthpXL+rxXtS500lC
+        G2SI91hhcRj8mQzro2kcpddRTBpIa0pm6Q==
+X-Google-Smtp-Source: ABdhPJzsZ0rOvLccxWS60JFncVdyDGjlKad9nUpOq5XRfyzyvOUSIchietm1qp1JpAOTfisKkZvUww==
+X-Received: by 2002:a17:90a:1182:: with SMTP id e2mr1355532pja.152.1608245655911;
+        Thu, 17 Dec 2020 14:54:15 -0800 (PST)
 Received: from localhost ([2620:15c:202:201:de4a:3eff:fe75:1314])
-        by smtp.gmail.com with ESMTPSA id w200sm6776305pfc.14.2020.12.17.14.54.03
+        by smtp.gmail.com with ESMTPSA id s7sm5557907pju.37.2020.12.17.14.54.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Dec 2020 14:54:03 -0800 (PST)
+        Thu, 17 Dec 2020 14:54:15 -0800 (PST)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Alain Michaud <alainm@chromium.org>,
@@ -66,9 +66,9 @@ Cc:     Alain Michaud <alainm@chromium.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/4] Bluetooth: btqca: Enable MSFT extension for Qualcomm WCN399x
-Date:   Thu, 17 Dec 2020 14:53:17 -0800
-Message-Id: <20201217145149.v2.2.I188d99e738b39d9ef36110addbc227837d3c42a7@changeid>
+Subject: [PATCH v2 3/4] Bluetooth: btusb: Enable MSFT extension for Intel controllers
+Date:   Thu, 17 Dec 2020 14:53:19 -0800
+Message-Id: <20201217145149.v2.3.I84d6a963dbe3a014e8456943785b076344f659bf@changeid>
 X-Mailer: git-send-email 2.29.2.684.gfbc64c5ab5-goog
 In-Reply-To: <20201217145149.v2.1.Id9bc5434114de07512661f002cdc0ada8b3d6d02@changeid>
 References: <20201217145149.v2.1.Id9bc5434114de07512661f002cdc0ada8b3d6d02@changeid>
@@ -78,19 +78,20 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following Qualcomm WCN399x Bluetooth controllers support the
-Microsoft vendor extension and they are using 0xFD70 for VsMsftOpCode.
--WCN3990
--WCN3991
--WCN3998
+The Intel JeffersonPeak, HarrisonPeak and CyclonePeak Bluetooth
+controllers support the Microsoft vendor extension and they are using
+0xFC1E for VsMsftOpCode.
 
-< HCI Command: ogf 0x3f, ocf 0x0170, plen 1
-  00
-> HCI Event: 0x0e plen 18
-  01 70 FD 00 00 1F 00 00 00 00 00 00 00 04 4D 53 46 54
+< HCI Command: Vendor (0x3f|0x001e) plen 1
+        00
+> HCI Event: Command Complete (0x0e) plen 15
+      Vendor (0x3f|0x001e) ncmd 1
+        Status: Success (0x00)
+        00 3f 00 00 00 00 00 00 00 01 50
 
 The following test step was performed.
-- Boot the device with WCN3991 and verify INFO print in dmesg.
+- Boot the test devices with HarrisonPeak and verify INFO print in
+dmesg.
 
 Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
@@ -99,33 +100,24 @@ Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 
 (no changes since v1)
 
- drivers/bluetooth/btqca.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index f85a55add9be5..ab19963c83616 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -517,6 +517,19 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 			return err;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 03b83aa912779..25cfa47995a8a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2924,7 +2924,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * extension are using 0xFC1E for VsMsftOpCode.
+ 	 */
+ 	switch (ver.hw_variant) {
++	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* CcP */
+ 		hci_set_msft_opcode(hdev, 0xFC1E);
+ 		break;
  	}
- 
-+	/* WCN399x supports the Microsoft vendor extension with 0xFD70 as the
-+	 * VsMsftOpCode.
-+	 */
-+	switch (soc_type) {
-+	case QCA_WCN3990:
-+	case QCA_WCN3991:
-+	case QCA_WCN3998:
-+		hci_set_msft_opcode(hdev, 0xFD70);
-+		break;
-+	default:
-+		break;
-+	}
-+
- 	/* Perform HCI reset */
- 	err = qca_send_reset(hdev);
- 	if (err < 0) {
 -- 
 2.29.2.684.gfbc64c5ab5-goog
 
