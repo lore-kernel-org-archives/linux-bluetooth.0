@@ -2,278 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5EEC4361B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 08:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BEAC2BB40
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 11:08:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4791C2389B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 08:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 171C6238E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Dec 2020 11:08:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726416AbgLQIwg (ORCPT
+        id S1728017AbgLQLIA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Dec 2020 03:52:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40770 "EHLO
+        Thu, 17 Dec 2020 06:08:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbgLQIwf (ORCPT
+        with ESMTP id S1726354AbgLQLH7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Dec 2020 03:52:35 -0500
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8673C061794
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 00:51:55 -0800 (PST)
-Received: by mail-yb1-xb2d.google.com with SMTP id d37so723052ybi.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 00:51:55 -0800 (PST)
+        Thu, 17 Dec 2020 06:07:59 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C84C06138C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 03:07:18 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id u21so19751971qtw.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 03:07:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6Vrns0VVwrd94Z4cDfE+WffnPJsWO9dRUavLWPyn1Y8=;
-        b=CPqWRrItQ57gD9tBU9RdTzRY20IB9oWmlof5TGfZqKz60b5Y9aHY2Z3QJqdUJMYreg
-         vK8YwNX8Ot4/hkbCGvRaS2X3tlrfPWhEoAE15rIzk2GKtZvyXmbRyDwIuU3SyrClJVKH
-         9iTBHYjPwwtdnbtkVF52BnHozm8nVMZqTp0L2VqBnQmqFDokNwtwNNJVcgR38A5qqvtS
-         My5rHaP6JylTQNdffhuKCJGBYIXFKSwqTuxZXnd3/lb80MC3wxQEosdLJgcUn0YR1rxQ
-         VS5Re18VGUQszrUYpUevqgwFDWSrKew73oObcYjlBExdpnORrPsnOoiO5P2C/UGn194p
-         O8fg==
+         :cc;
+        bh=WpyJG39zsZR3QTEsxdeIZ6It7enzbMRWstsw8rPRonw=;
+        b=rFasmzLx8XfOzm6Y+FxLK6NecNAgN+nus0rsYJrLuW+hpzBD/G6Aut+1epJgd3Q9Y3
+         rI4U+FdwwtB+ydXf1iKiX2YBDEoIPOXfOjoxwDsLlRC+VSAaSRks/dwUdbna9h704pS/
+         d2A8hO4XsNEFJP5gOafW/aGB3cdf1Rucz2BtuT7meDa5VftF2vj6TKqvm/XuqnJdLo2v
+         rJfj5QslNlV2FdjWijrHD1hpkaEMpURVzu25lOoF97RlseM6vDkoBhuHL0zQ2qg3FJ/4
+         rLfN4/8uFirSkdP/MspVGyDZ3L7GXufno7ZA4RNMUzeNVlOatGeiFxvigK+pXnDBpG47
+         sfKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6Vrns0VVwrd94Z4cDfE+WffnPJsWO9dRUavLWPyn1Y8=;
-        b=j07jIa9Kzw4UR9CkEGXna0X9XoDjroSBvPWM1qeUP4vSHZauEY6vPwSUTyufA3sPxd
-         eWXvgaUGx0W0OWeC9920G1OhzciNyV41RRnJ/abqf+5KnNSED1SKNb4VtJowj/DYs0OQ
-         hcAHeQ2IAMpgoqXV4/pRxnn/fbM7FK/LkST9taFu/6QBUAzMYxOhY6agpxWEl8y3aJPQ
-         vod8pBE9dxnyZ9LOlA4IBNih5qT4mFyaY+EubHgO7T/q3rVIydDxwo19UoftG9uoAjeb
-         OXO89ODEh81qVPrWUSljDskQLwXJlr3TNvBCBfwt0qGXwIPQmHCVVNfpMOCY36+jWTgx
-         qV0A==
-X-Gm-Message-State: AOAM5338/4TcSnwOlaPNCeVzNhFxCFBrMnPcXzpM9hEs2PbFOsd6PjeQ
-        LHoQicWbScI4ngELHlPyBELFHGSbfKi4DoTALD1XFNXF/f8=
-X-Google-Smtp-Source: ABdhPJzWgzArCWpXFDY5FYnoVQcpZgfZWg6GqmA6ii6kEUXUm/ekCG6XOsFs+eXYP02hv5s1rKE69WCvcsvF3RUW62s=
-X-Received: by 2002:a25:d486:: with SMTP id m128mr55146584ybf.214.1608195114762;
- Thu, 17 Dec 2020 00:51:54 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=WpyJG39zsZR3QTEsxdeIZ6It7enzbMRWstsw8rPRonw=;
+        b=CGvbFNWOSHnqofLjAdTbpopGVviAour495Xs7rorsvm0fYQKQR1qbf5t1nK8Z834uA
+         BJ9RS2iu828WsMLDXVmwCOExZ+kmg0OURGXJJCVWen5scF6AUWtriX7l+HUSAMcUjPQA
+         Zoap0bfE2rfPFNAYKSxswj4DyumHyJDdSr9/1n4mNEb/q9hnTR+eftAZd3XysYuDgjtz
+         sGqchlwAu9uFo9ZSIpldgcRTDFRR+RQUr3UdWbuM7zOkiU46VFll0kYiFiGAsD7Zh3+A
+         f7Ef2H8Rv4yHpm6AlmLNuBz5I6XU9xYXCbAxCOv+DW/svac8JYL4UCmXfqUDCKyNc+xz
+         bSdQ==
+X-Gm-Message-State: AOAM533pBCPRVXHMbTA8t6dl3CV//jEnjGwylvev1HMEJTUYG+To2Evm
+        3UWoYbIl4Gr/bT7gAPv3dQVjNcD/rJhX4uexCb8vGQ==
+X-Google-Smtp-Source: ABdhPJwsy+Mk6kAd77qSP1iHQ1KvXJLnVTRVxCZaOziunZ7175tYz6+6XvAtQVR72glNqSkBWHZ8KadI0C3bjv0widA=
+X-Received: by 2002:ac8:5ac3:: with SMTP id d3mr47345365qtd.66.1608203237853;
+ Thu, 17 Dec 2020 03:07:17 -0800 (PST)
 MIME-Version: 1.0
-References: <CAO9gXyRLOk75wdTWO_cAu1e=w82H1b_fWB=hLpHcJYcv2MHQDg@mail.gmail.com>
- <BYAPR14MB288775932E88E9B5CDF3A653E6F80@BYAPR14MB2887.namprd14.prod.outlook.com>
-In-Reply-To: <BYAPR14MB288775932E88E9B5CDF3A653E6F80@BYAPR14MB2887.namprd14.prod.outlook.com>
-From:   C K <choongbeom@gmail.com>
-Date:   Thu, 17 Dec 2020 17:51:43 +0900
-Message-ID: <CAO9gXyS_9aB+ka4xp=QRA0fQ-utVfakTsnXtBvfwhzDio+UE6Q@mail.gmail.com>
-Subject: =?UTF-8?Q?Re=3A_BlueZ_=E2=80=9CPin_or_Key_missing=E2=80=9D_occurred_even_tho?=
-        =?UTF-8?Q?ugh_it_has_already_been_paired?=
-To:     Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <000000000000ab11c505abeb19f5@google.com> <0000000000004ea4fe05b68fa299@google.com>
+In-Reply-To: <0000000000004ea4fe05b68fa299@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Thu, 17 Dec 2020 12:07:06 +0100
+Message-ID: <CACT4Y+ZyAD1aJtTt0q1E=AmsTwnapjitit82+o-Gn2NyxDZNgQ@mail.gmail.com>
+Subject: Re: KASAN: use-after-free Write in __sco_sock_close
+To:     syzbot <syzbot+077eca30d3cb7c02b273@syzkaller.appspotmail.com>
+Cc:     anmol.karan123@gmail.com, coreteam@netfilter.org,
+        David Miller <davem@davemloft.net>,
+        "open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>,
+        Fox Chen <foxhlchen@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Patrick McHardy <kaber@trash.net>,
+        Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-media@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        mchehab@s-opensource.com, netdev <netdev@vger.kernel.org>,
+        NetFilter <netfilter-devel@vger.kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jamie,
-I'm very sorry for late reply. I was busy with other urgent works.
-
-Could you check this log?
-Why is "Removing temporary device..." happening?
-
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D first connection and pairing =
-with my android test app
-: connect -> bonded -> disconnect from app
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_ref() 0xfd1000: ref=3D1
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:register_agent() agent :1.49
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:unregister_agent() agent :1.49
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_disconnect() Agent :1.49 disconnected
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_destroy() agent :1.49
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_unref() 0xfd1000: ref=3D0
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_ref() 0xfd1000: ref=3D1
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:register_agent() agent :1.49
-Dec 17 07:35:38  bluetoothd[368]:
-../bluez-5.50/src/agent.c:add_default_agent() Default agent set to
-:1.49 /org/bluez/agent
-Dec 17 07:35:46  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:connected_callback() hci0 device
-5C:CB:99:7F:77:02 connected eir_len 0
-Dec 17 07:35:47  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:user_passkey_notify_callback() hci0
-5C:CB:99:7F:77:02
-Dec 17 07:35:47  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:user_passkey_notify_callback() passkey
-859060 entered 0
-Dec 17 07:35:47  bluetoothd[368]:
-../bluez-5.50/src/device.c:new_auth() Requesting agent authentication
-for 5C:CB:99:7F:77:02
-Dec 17 07:35:47  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_ref() 0xfd1000: ref=3D2
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:new_irk_callback() hci0 new IRK for
-5C:CB:99:7F:77:02 RPA 00:00:00:00:00:00
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:new_csrk_callback() hci0 new CSRK for
-5C:CB:99:7F:77:02 type 3
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:new_csrk_callback() hci0 new CSRK for
-5C:CB:99:7F:77:02 type 2
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:new_long_term_key_callback() hci0 new LTK
-for 5C:CB:99:7F:77:02 type 1 enc_size 16
-Dec 17 07:35:56  bluetoothd[368]: ../bluez-5.50/src/device.c:device_set_bon=
-ded()
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_bonding_complete() bonding (nil)
-status 0x00
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_unref() 0xfd1000: ref=3D1
-Dec 17 07:35:56  bluetoothd[368]: ../bluez-5.50/src/adapter.c:resume_discov=
-ery()
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:new_long_term_key_callback() hci0 new LTK
-for 5C:CB:99:7F:77:02 type 1 enc_size 16
-Dec 17 07:35:56  bluetoothd[368]: ../bluez-5.50/src/device.c:device_set_bon=
-ded()
-Dec 17 07:35:56  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_bonding_complete() bonding (nil)
-status 0x00
-Dec 17 07:35:56  bluetoothd[368]: ../bluez-5.50/src/adapter.c:resume_discov=
-ery()
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:dev_disconnected() Device
-5C:CB:99:7F:77:02 disconnected, reason 3
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:adapter_remove_connection()
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/plugins/policy.c:disconnect_cb() reason 3
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:bonding_attempt_complete() hci0 bdaddr
-5C:CB:99:7F:77:02 type 1 status 0xe
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_bonding_complete() bonding (nil)
-status 0x0e
-Dec 17 07:36:15  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_bonding_failed() status 14
-Dec 17 07:36:15  bluetoothd[368]: ../bluez-5.50/src/adapter.c:resume_discov=
-ery()
-Dec 17 07:36:36  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_disconnect() Agent :1.49 disconnected
-Dec 17 07:36:36  bluetoothd[368]:
-../bluez-5.50/src/agent.c:remove_default_agent() Default agent cleared
-Dec 17 07:36:36  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_destroy() agent :1.49
-Dec 17 07:36:36  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_unref() 0xfd1000: ref=3D0
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_ref() 0xfd2808: ref=3D1
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:register_agent() agent :1.51
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:unregister_agent() agent :1.51
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_disconnect() Agent :1.51 disconnected
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_destroy() agent :1.51
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_unref() 0xfd2808: ref=3D0
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D second connection : this device unp=
-aired unintentionally
-from the app system as soon as connected
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:agent_ref() 0xfd2808: ref=3D1
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:register_agent() agent :1.51
-Dec 17 07:36:37  bluetoothd[368]:
-../bluez-5.50/src/agent.c:add_default_agent() Default agent set to
-:1.51 /org/bluez/agent
-Dec 17 07:36:42  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:connected_callback() hci0 device
-4D:EE:4F:F1:6F:FD connected eir_len 0
-Dec 17 07:36:42  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_create() dst 4D:EE:4F:F1:6F:FD
-Dec 17 07:36:42  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_new() address 4D:EE:4F:F1:6F:FD
-Dec 17 07:36:42  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_new() Creating device
-/org/bluez/hci0/dev_4D_EE_4F_F1_6F_FD
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:dev_disconnected() Device
-4D:EE:4F:F1:6F:FD disconnected, reason 3
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:adapter_remove_connection()
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:adapter_remove_connection() Removing
-temporary device /org/bluez/hci0/dev_4D_EE_4F_F1_6F_FD
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_remove() Removing device
-/org/bluez/hci0/dev_4D_EE_4F_F1_6F_FD
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/device.c:btd_device_unref() Freeing device
-/org/bluez/hci0/dev_4D_EE_4F_F1_6F_FD
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/device.c:device_free() 0xff3058
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/plugins/policy.c:disconnect_cb() reason 3
-Dec 17 07:36:43  bluetoothd[368]:
-../bluez-5.50/src/adapter.c:bonding_attempt_complete() hci0 bdaddr
-4D:EE:4F:F1:6F:FD type 2 status 0xe
-Dec 17 07:36:43  bluetoothd[368]: ../bluez-5.50/src/adapter.c:resume_discov=
-ery()
-
-
-
-Thanks,
-Calvin
-
-2020=EB=85=84 11=EC=9B=94 27=EC=9D=BC (=EA=B8=88) =EC=98=A4=ED=9B=84 5:43, =
-Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=
-=84=B1:
+On Wed, Dec 16, 2020 at 8:15 AM syzbot
+<syzbot+077eca30d3cb7c02b273@syzkaller.appspotmail.com> wrote:
 >
-> Hi Calvin,
-> What type of address is it? If the device has a random resolvable address=
- then this means once the device has paired and exchanged IRK that regardle=
-ss of what random resolvable address the device uses, the other device will=
- always know what the device's true address is and will use the correct enc=
-ryption keys and details. If the device has a different random non-resolvab=
-le address or random static address which changes then you cannot match the=
-se against a pairing.
-> Thanks,
-> Jamie
+> syzbot suspects this issue was fixed by commit:
 >
-> -----Original Message-----
-> From: C K <choongbeom@gmail.com>
-> Sent: 27 November 2020 06:46
-> To: linux-bluetooth@vger.kernel.org
-> Subject: BlueZ =E2=80=9CPin or Key missing=E2=80=9D occurred even though =
-it has already been paired
+> commit 6dfccd13db2ff2b709ef60a50163925d477549aa
+> Author: Anmol Karn <anmol.karan123@gmail.com>
+> Date:   Wed Sep 30 14:18:13 2020 +0000
 >
-> EXTERNAL EMAIL: Be careful with attachments and links.
+>     Bluetooth: Fix null pointer dereference in hci_event_packet()
 >
-> Hello,
-> I have an issue with my bluez device.
-> I explained it on stackover flow.
-> Help me about this please.
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14cb845b500000
+> start commit:   47ec5303 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e0c783f658542f35
+> dashboard link: https://syzkaller.appspot.com/bug?extid=077eca30d3cb7c02b273
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165a89dc900000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=130a8c62900000
 >
-> https://stackoverflow.com/questions/65001891/bluez-pin-or-key-missing-occ=
-urred-even-though-it-has-already-been-paired
+> If the result looks correct, please mark the issue as fixed by replying with:
 >
+> #syz fix: Bluetooth: Fix null pointer dereference in hci_event_packet()
 >
-> Thanks,
-> Calvin
-> THIS MESSAGE, ANY ATTACHMENT(S), AND THE INFORMATION CONTAINED HEREIN MAY=
- BE PROPRIETARY TO LAIRD CONNECTIVITY, INC. AND/OR ANOTHER PARTY, AND MAY F=
-URTHER BE INTENDED TO BE KEPT CONFIDENTIAL. IF YOU ARE NOT THE INTENDED REC=
-IPIENT, PLEASE DELETE THE EMAIL AND ANY ATTACHMENTS, AND IMMEDIATELY NOTIFY=
- THE SENDER BY RETURN EMAIL. THIS MESSAGE AND ITS CONTENTS ARE THE PROPERTY=
- OF LAIRD CONNECTIVITY, INC. AND MAY NOT BE REPRODUCED OR USED WITHOUT THE =
-EXPRESS WRITTEN CONSENT OF LAIRD CONNECTIVITY, INC.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+#syz fix: Bluetooth: Fix null pointer dereference in hci_event_packet()
