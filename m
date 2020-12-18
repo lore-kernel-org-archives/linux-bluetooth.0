@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAEEC4361B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDDAC4361B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B30723B83
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1CC423B83
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726019AbgLRTHm (ORCPT
+        id S1726119AbgLRTHo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Dec 2020 14:07:42 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:41072 "EHLO
+        Fri, 18 Dec 2020 14:07:44 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:41076 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbgLRTHl (ORCPT
+        with ESMTP id S1725875AbgLRTHn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Dec 2020 14:07:41 -0500
+        Fri, 18 Dec 2020 14:07:43 -0500
 Received: from mail-ej1-f72.google.com ([209.85.218.72])
         by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.86_2)
         (envelope-from <dave.jones@canonical.com>)
-        id 1kqL5f-0004GJ-IB
-        for linux-bluetooth@vger.kernel.org; Fri, 18 Dec 2020 19:06:59 +0000
-Received: by mail-ej1-f72.google.com with SMTP id s17so1207903ejm.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 11:06:59 -0800 (PST)
+        id 1kqL5h-0004Gf-CC
+        for linux-bluetooth@vger.kernel.org; Fri, 18 Dec 2020 19:07:01 +0000
+Received: by mail-ej1-f72.google.com with SMTP id g18so1206599eje.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 11:07:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jx62sIYKnFhcgAdqyjVTawTLwOoFSw9tBfRQFyWi7nI=;
-        b=HpqLngmYOliP46JL7f4C0wxZzEE+friAh3GN8YxtSvqfqJ/DQkpNxuyqucwQ2IdNNC
-         U0SUFhPCSzeqNy6GAd0mo9bPvuCd2cAw5FYWElMqMcJ3RNB2QnDezyxlUDYHQbDNjBF8
-         HKT05LbzFOcjjzXm5oeIukUoFjODo6EqM9Og9DOLtnFIzOxIltvLPiYdRFY5XSd5KLtK
-         kDHCW1VRYwJmILG8c1Y8Rjyw/nOl5nJ9B0DKxp83PrLrruv/DF09ZvTNzhv0HPrjHbgy
-         IN4EPvwxxN6LbOccsAA0cBKdCkuM6pmOYV1487cF7ZQuAFztezEdao6bnTaD6VaT6crY
-         nTAw==
-X-Gm-Message-State: AOAM533J4u9XdcXoPd47M2jVoGfUfrcesmyBADcT0W/InKYXQBBBolz+
-        y4F9O/LTBAXLw5CdsHyFqUvFujFzMC0ieXyS0wUsFT6glIPANvALu3BQ1T+3RbIBotYk/eklvM8
-        4ThmLJSPbgw8xRf3qBwN6jbO9YgTip5+OzNr6YuqrfFohtA==
-X-Received: by 2002:a17:906:7fcd:: with SMTP id r13mr5575889ejs.242.1608318418952;
-        Fri, 18 Dec 2020 11:06:58 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx1SwuevLssLE71wYTes2YuLNBTYWmySzJ1eBwYokc8peD+EegjXE8K5ELxBC039EhzhXFHng==
-X-Received: by 2002:a17:906:7fcd:: with SMTP id r13mr5575866ejs.242.1608318418770;
-        Fri, 18 Dec 2020 11:06:58 -0800 (PST)
+        bh=UqcqvDi+qPxdzPKlcNaeMUK7kqd1L6r1MewrVt1IVxM=;
+        b=gtRBCOcH3W2Zz+zkNyPgGUGOOhYBlZYhFjkuJbchmJzCW5d/sGoeNZSVluFmPJU2Zu
+         LCeyZ22Cq7yanyTqf71b5p7ZpD6MtEQIk0CTPf+Wy3im75D07M4TI13SuhViwg3/1pwY
+         qO2ZuFmxXcsgr5nbynLovyU9CON95OPPykm+iZDPycwmU7YYpfDE8QF/8ANYNUdiJ5Hq
+         LGadTHxZZSh3fUOizCZWsCCT5CNvuaEqx23DXO3owfq4ICnLLfIxRgSIXAHfXoD/kuW3
+         ahMlWqL0KHCSn15TpxoOvlGb0/RhZnU/w318NR8smuk43Q9VMz0V3crgt8ZJOWp+Hcwq
+         4jLw==
+X-Gm-Message-State: AOAM530IUm1biGNpab8qe03x1oVo6B4++asGjvz7rTnRtrUtGrCiaVJy
+        AkZ9kFmRJ7FX0OLlngU+pNYmMhUsxTbrFHCizo0Tin7dJWNVSgYELtIu3DIkZmNNtY7rURmJIUO
+        NM40ltnAYG4KTraAG7fwpgAbUhb/j9yhTJ4HItPEdXGWBNg==
+X-Received: by 2002:a17:906:b082:: with SMTP id x2mr3622450ejy.100.1608318420720;
+        Fri, 18 Dec 2020 11:07:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwEnld/MxtusJ6fOsaH1FZ8gPdInwNC82ZuYIjQFTVuo80djpG0Ewx0WZz9UlU85oFVftaruQ==
+X-Received: by 2002:a17:906:b082:: with SMTP id x2mr3622432ejy.100.1608318420538;
+        Fri, 18 Dec 2020 11:07:00 -0800 (PST)
 Received: from localhost (waveform.plus.com. [80.229.34.140])
-        by smtp.gmail.com with ESMTPSA id zn5sm5943127ejb.111.2020.12.18.11.06.57
+        by smtp.gmail.com with ESMTPSA id ga11sm5884782ejb.34.2020.12.18.11.06.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Dec 2020 11:06:58 -0800 (PST)
+        Fri, 18 Dec 2020 11:06:59 -0800 (PST)
 From:   Dave Jones <dave.jones@canonical.com>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Dave Jones <dave.jones@canonical.com>
-Subject: [PATCH v1 2/3] bdaddr: Treat Cypress devices as Broadcom
-Date:   Fri, 18 Dec 2020 19:06:08 +0000
-Message-Id: <20201218190609.107898-3-dave.jones@canonical.com>
+Subject: [PATCH v1 3/3] hciattach: Enable loading BCM43xx firmware on RPi
+Date:   Fri, 18 Dec 2020 19:06:09 +0000
+Message-Id: <20201218190609.107898-4-dave.jones@canonical.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20201218190609.107898-1-dave.jones@canonical.com>
 References: <20201218190609.107898-1-dave.jones@canonical.com>
@@ -67,26 +67,42 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adds an entry to cause bdaddr to treat Cypress Semiconductor devices as
-Broadcom devices; Cypress (vendor ID 305) acquired Broadcom's (vendor ID
-15) wireless division in 2016.
+Corrects the location of the firmware from /etc/firmware to
+/lib/firmware, and disables setting the UART interface speed prior to
+loading the firmware. An already existing later call to
+bcm43xx_set_speed still sets the speed of the interface as requested.
+
+For certain bluetooth devices, in particular that on the Raspberry Pi
+400, setting the UART speed prior to loading the firmware causes the
+firmware load to fail.
 
 Signed-off-by: Dave Jones <dave.jones@canonical.com>
 ---
- tools/bdaddr.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/hciattach_bcm43xx.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/tools/bdaddr.c b/tools/bdaddr.c
-index bc0478d46..de17416e9 100644
---- a/tools/bdaddr.c
-+++ b/tools/bdaddr.c
-@@ -303,6 +303,7 @@ static struct {
- 	{ 48,		st_write_bd_addr,	generic_reset_device	},
- 	{ 57,		ericsson_write_bd_addr,	generic_reset_device	},
- 	{ 72,		mrvl_write_bd_addr,	generic_reset_device	},
-+	{ 305,		bcm_write_bd_addr,	generic_reset_device	},
- 	{ 65535,	NULL,			NULL			},
- };
+diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
+index dbb5a3fe3..ddf9b4037 100644
+--- a/tools/hciattach_bcm43xx.c
++++ b/tools/hciattach_bcm43xx.c
+@@ -31,7 +31,7 @@
+ #include "hciattach.h"
+ 
+ #ifndef FIRMWARE_DIR
+-#define FIRMWARE_DIR "/etc/firmware"
++#define FIRMWARE_DIR "/lib/firmware"
+ #endif
+ 
+ #define FW_EXT ".hcd"
+@@ -356,9 +356,6 @@ int bcm43xx_init(int fd, int def_speed, int speed, struct termios *ti,
+ 	if (bcm43xx_locate_patch(FIRMWARE_DIR, chip_name, fw_path)) {
+ 		fprintf(stderr, "Patch not found, continue anyway\n");
+ 	} else {
+-		if (bcm43xx_set_speed(fd, ti, speed))
+-			return -1;
+-
+ 		if (bcm43xx_load_firmware(fd, fw_path))
+ 			return -1;
  
 -- 
 2.27.0
