@@ -2,82 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48727C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F358EC4361B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:10:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FDBE23A9C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA2C323B88
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733262AbgLRTo0 (ORCPT
+        id S1727408AbgLRVKN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Dec 2020 14:44:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51986 "EHLO
+        Fri, 18 Dec 2020 16:10:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726177AbgLRToZ (ORCPT
+        with ESMTP id S1725966AbgLRVKN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Dec 2020 14:44:25 -0500
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E098C06138C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 11:43:45 -0800 (PST)
-Received: by mail-ot1-x32d.google.com with SMTP id i6so3039614otr.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 11:43:45 -0800 (PST)
+        Fri, 18 Dec 2020 16:10:13 -0500
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5D7C0617B0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 13:09:33 -0800 (PST)
+Received: by mail-ot1-x332.google.com with SMTP id 11so3220869oty.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 13:09:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ivK6+hl4hC7mdQNd1BEbN0CRPrfOGC4j2eRBw/PZi50=;
-        b=IW6Sdmf0knF/GZTvxghOvROF5XgXLrJs4IkvMF0mh5h5SGQx2VT1utGca+C8r3AKxl
-         5BchVXld6eT7234JCiNLsgJNjRKklCSacepsNXmtICqHv48ykZ611VzfkOFZLaa9PDkm
-         mDDzVG34/j1zHTZ5i4tJZb4ZruMvmiBAgXfcoI01r6LTMlC+FdRROdaLrujoZnXxsdX/
-         CVPPCd6o5DroNYu6OmzJCKvn40i8TsIuWz3tDevtmZUxsQVHRjiCzWJaXnt/zAXOb/pa
-         iL1aCQXk85A5+hBAxRFYBnrYb/+SSEQQMC63Y5xoIP9pprBBcdo28o6LSnm/nmuIh5rS
-         lhhA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=Zfd8/djKQOwIiogxS5QeYwlY6BofM+CQ2EvXamQ/B6g=;
+        b=d2Gv3BKUoIyjccjGUdelLQPVq044l9xAQI5W3xrak6esCBRKBGdVw+C3eKwz8h+X4w
+         z/tpF35p7l67s0aAUPC2BD/6KSMJckdBggjMwSqoGT2TFO/2R/zbKiSw9TGTLrZ7ADUM
+         cil117vr3s1Z4p/uxIGqosiX+0NtFzOUKR/bfnNIXiZucq5AyQaFkXNaMK9pwu+qNg4Z
+         PUtO3EwYjlwXFZ7iS4dFrg1IPbcWECrk8y80kYPq5XBkfbdDLRxAA1j5Djh96XQSvPFy
+         6g8fcm02+HVrBX8RXEKo/bMM8m/7K6Cg51XJnB64MfKEaoFKIoN3HZinoad7/7kz3a5q
+         ZXjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ivK6+hl4hC7mdQNd1BEbN0CRPrfOGC4j2eRBw/PZi50=;
-        b=TXJmHNTRYx2m2U6YGf+caIbYfES8/fUaFR1uyIRs1ILsTSYejsXWpPzZcDjToUn3mT
-         Y7vhje3RfIfJVhoqARjSzw+Zvng18ink/3n0euQ34P4yE2TTX1IEJRPx8gEhSD9UezIb
-         Cs0Slec74Q4RbJ90nZb9ICz4bzdzz2oRcLYXrTWyqQIflCczk3xXlNyvHQFmxo79IoYc
-         qzOD3FMtOA6+ZBqvu/iGFxmxfdt0BQs4ITMRZDqUgmW8IzRjZWjE1s4qAWOm9reBaYuY
-         dZrP1j2bu7qCs7b/qp5lm6zXrc2FUKwClVsyuEk2+rmgDqT8N2e4gyqeb8BvmVfXQy1Z
-         C+yQ==
-X-Gm-Message-State: AOAM530iBFUCbemgf8Iug5MU46cVPGFD8QDNh5D+qDf2B4ZfnwRGg+dw
-        gpayIdoybUFJYmOKLBJsfhon5DPona5rVU7+lLvLDVsj
-X-Google-Smtp-Source: ABdhPJxrWtC1bW+UV4vijqvAoN5XMcf+lZxSLKbfucU/hP3Br6LK00KXBrfSm/9HOMjL9DeUqNsPMnS8sxTRci58ThM=
-X-Received: by 2002:a9d:6f17:: with SMTP id n23mr4042661otq.371.1608320624784;
- Fri, 18 Dec 2020 11:43:44 -0800 (PST)
+         :message-id:subject:to;
+        bh=Zfd8/djKQOwIiogxS5QeYwlY6BofM+CQ2EvXamQ/B6g=;
+        b=B4JpQEr2WHrV83DxRS0kPD/yrWKPMUAhW3ZkMMUTDqtvxCQOyhssaopkVqKT/Mqs19
+         /DaT+0O2t5mzozdy6ybAC7G27JyoDagGOPBYe96WCXRbX24k9DzuH2EzPTdsIkDUPEUb
+         kYGq8bDONXugiTZbNVs6PS/f3v4TbSz7IHCJRWPytsXbyUpeduQ8xwg85fFcdyXbmTne
+         CUjE03yntVb60w+A7kgRpsdpp0Ys1zFfCbb4brTo6YN2vFGpuxExGzkRwyFJ8eXXE1as
+         CtlJ+rhrRnuPEUhKunaWGdJrFfbq0s+jEyQTSHKiTzJ6d1cVkGfBfosu2JTxAtIarGGD
+         W9Yw==
+X-Gm-Message-State: AOAM5327WWrieXxYbxG9mCOdVlFOgtygPUFO3uVCKJwNTfdsGY2bODxc
+        6RaJQHYdlyvYcenrwkn6+OU5oph+sRguBZfS7ct2wct9
+X-Google-Smtp-Source: ABdhPJzS2+rMV9o9hYHnli1G/f0P/RTuuHwFA21hfjFwb/S4PErNHhgEEv7ujS1t1X2/XgnMk8uLkkfdJ4aul+xaEL4=
+X-Received: by 2002:a9d:2035:: with SMTP id n50mr4176675ota.44.1608325772477;
+ Fri, 18 Dec 2020 13:09:32 -0800 (PST)
 MIME-Version: 1.0
-References: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
-In-Reply-To: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
+References: <20201218001351.1442784-1-luiz.dentz@gmail.com> <5fdc03c1.1c69fb81.f9b11.0baf@mx.google.com>
+In-Reply-To: <5fdc03c1.1c69fb81.f9b11.0baf@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 18 Dec 2020 11:43:32 -0800
-Message-ID: <CABBYNZKy4KXWqLdZu7C49jJ_nMbmBOdMjtM2_5OQg2ruUHUh_w@mail.gmail.com>
-Subject: Re: Default to HW mSBC on capable controllers ?
-To:     Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Fri, 18 Dec 2020 13:09:21 -0800
+Message-ID: <CABBYNZJhg=icC+LYv2Dzi8Dz5uBS7jVskYc30mu6zt8PaTUS7g@mail.gmail.com>
+Subject: Re: [v2,1/3] btdev: Add support for multiple connections
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joakim,
+Hi,
 
-On Fri, Dec 18, 2020 at 10:48 AM Joakim Tjernlund
-<Joakim.Tjernlund@infinera.com> wrote:
+On Thu, Dec 17, 2020 at 5:20 PM <bluez.test.bot@gmail.com> wrote:
 >
-> There seems to be quite a few USB controllers gaining the BTUSB_WIDEBAND_SPEECH which I guess means HW mSBC but currently there is no way to select this mode.
-> Any idea if one could patch the kernel to default to HW mSBC and user apps like bluealsa/pulseaudio would just use it automatically?
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=403877
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - PASS
+>
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-It is in our plan to support HW offloading, but that doesn't mean all
-platforms will be supported since that depends on the PCM lines being
-connected to BT controller in the first place.
+Pushed.
 
 -- 
 Luiz Augusto von Dentz
