@@ -2,157 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278E4C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 17:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30834C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED99923B7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 17:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD4CD23B83
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 19:07:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729057AbgLRRBg convert rfc822-to-8bit (ORCPT
+        id S1725843AbgLRTHi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Dec 2020 12:01:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53744 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725906AbgLRRBf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Dec 2020 12:01:35 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 210775] New: hci0 reset with multiple clients
-Date:   Fri, 18 Dec 2020 17:00:54 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: gnulux@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-210775-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 18 Dec 2020 14:07:38 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:41065 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725778AbgLRTHh (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Dec 2020 14:07:37 -0500
+Received: from mail-ed1-f70.google.com ([209.85.208.70])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <dave.jones@canonical.com>)
+        id 1kqL5c-0004Fs-0j
+        for linux-bluetooth@vger.kernel.org; Fri, 18 Dec 2020 19:06:56 +0000
+Received: by mail-ed1-f70.google.com with SMTP id cm4so1494127edb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 11:06:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hb878HLWQcakkKzB1vi2USbhdF350viU3WRjzlWIL04=;
+        b=RgGykoC8058eQZEBqzD4piYqYtGRlXuiMwJ0cIG75h5MSQ6dN1QM4xFlDh1jqYJh8P
+         InxyaCN2XrU9Pm3C+tWM2U0qwFzUFZnMGu5ZkILl2bE+4WsO7KDQEUpI9pDgpZcy4KHE
+         GdVp5f8N40L5xmqlZvM4L6UWyL/BvMatsMCwp4obASMpktH4ZZuiw6HghAK20Hd9ArJ1
+         6Ci88rKxCROB4w7z5ZgN3dz5s5oizmsr5o3jcZHHA9/o49txYzhUSdwVkO01diggNdcX
+         lZ2X9T2LB46MPnx2JS0KXJkY1Or1HBc5tFG8rYYdlEbs4z200vc1Qg0JDbjWw3QE4pon
+         ECPA==
+X-Gm-Message-State: AOAM5321S4roKOKI8s0wavInFTz1e2kwTYP3RvO2kXNBnU2JyJ8K58CA
+        ayS0lMUPb2SHeYBq9Cq7jTS3tMpQxs4JurRErbQLaIlI8xPWiNsnXYRLtAWl9aLSNSQXz9tzPEe
+        EZULGWRGgm+8kplfBu+GKN1abPyq61RitD+Gyeujr6Nu7mA==
+X-Received: by 2002:a50:8b22:: with SMTP id l31mr5944294edl.149.1608318415374;
+        Fri, 18 Dec 2020 11:06:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwgh3umpmdP5gzixgEhNZESznLg37VLkLvo2o/5uuMTarJFmMOYQmmEgvWh6jt8sxPV/t/7pQ==
+X-Received: by 2002:a50:8b22:: with SMTP id l31mr5944271edl.149.1608318415157;
+        Fri, 18 Dec 2020 11:06:55 -0800 (PST)
+Received: from localhost (waveform.plus.com. [80.229.34.140])
+        by smtp.gmail.com with ESMTPSA id e21sm25210073edv.96.2020.12.18.11.06.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Dec 2020 11:06:54 -0800 (PST)
+From:   Dave Jones <dave.jones@canonical.com>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Dave Jones <dave.jones@canonical.com>
+Subject: [PATCH v1 0/3] Support patches for Raspberry Pi boards
+Date:   Fri, 18 Dec 2020 19:06:06 +0000
+Message-Id: <20201218190609.107898-1-dave.jones@canonical.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210775
+These patches are derived from Raspbian's bluez variant and implement
+support for the Bluetooth modules found in the Raspberry Pi boards up to
+and including the Pi 400, and the two UARTs that can be used to
+communicate with them.
 
-            Bug ID: 210775
-           Summary: hci0 reset with multiple clients
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 4.14.79
-          Hardware: ARM
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: gnulux@gmail.com
-        Regression: No
+If these would be better submitted as individual threads, or as a single
+monolithic patch, please let me know - I'm happy to revise things!
 
-Created attachment 294217
-  --> https://bugzilla.kernel.org/attachment.cgi?id=294217&action=edit
-bluetoothd debug mode poutput
+Dave Jones (3):
+  hciattach: Add BCM43xx 3-wire variant
+  bdaddr: Treat Cypress devices as Broadcom
+  hciattach: Enable loading BCM43xx firmware on RPi
 
-Hi all
-
-
-I need support in bluez. 
-
-My configuration is : 
-
-Linux raspberry (stretch) 
-
-Kernel : 4.14.79
-
-Bluez: 5.43-2+rpt2+deb9u2
-
-
-lsusb: 
-
-us 001 Device 008: ID 0920:5550 Echelon Co. 
-
-Bus 001 Device 013: ID 04b4:f901 Cypress Semiconductor Corp.  ← bluetooth
-device
-
-Bus 001 Device 012: ID 072f:223e Advanced Card Systems, Ltd 
-
-Bus 001 Device 011: ID 1a40:0101 Terminus Technology Inc. Hub
-
-Bus 001 Device 006: ID 0424:ec00 Standard Microsystems Corp. SMSC9512/9514 Fast
-Ethernet Adapter
-
-Bus 001 Device 004: ID 0424:9514 Standard Microsystems Corp. SMC9514 Hub
-
-Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp. SMSC9512/9514 Fast
-Ethernet Adapter
-
-Bus 001 Device 002: ID 0424:9514 Standard Microsystems Corp. SMC9514 Hub
-
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-
-
-I ‘m running bluez 5.43 on raspbian  with an external usb bluetooth device (but
-i have the same behaviour with embedded bluetooth device  bcm43xx with uart) . 
-
-
-I’ve developed a server that initiates and establishes sessions with a client
-application  on a smartphone.  it works well but recently I noticed a weird
-issue . When the smartphone is connected and I connect another device or simply
-run gatttool -d 00:16:A4:4C:B9:37 -char-desc on my server , the hci0 device
-disappears then comes back again. My application on the server crash as it can
-no more access to the device
-
-
-In kern.log :
-
-
-Dec 18 12:33:56 box-121 kernel: [   37.927261] usb 1-1.4.1: usbfs: process 1083
-(node /opt/filln) did not claim interface 0 before use
-
-Dec 18 12:38:45 box-121 kernel: [  327.673582] Bluetooth: hci0 command 0x200c
-tx timeout
-
-Dec 18 12:38:47 box-121 kernel: [  328.908625] usb 1-1.4.4: USB disconnect,
-device number 9
-
-Dec 18 12:38:49 box-121 kernel: [  330.743618] usb 1-1.4.4: new full-speed USB
-device number 10 using dwc_otg
-
-Dec 18 12:38:49 box-121 kernel: [  330.898584] usb 1-1.4.4: New USB device
-found, idVendor=04b4, idProduct=f901
-
-Dec 18 12:38:49 box-121 kernel: [  330.898597] usb 1-1.4.4: New USB device
-strings: Mfr=1, Product=2, SerialNumber=3
-
-
-With bluetoothd in debug mode in attachement
-
-
-I’m wondering why I lose the device when another device tries to connect and
-discuss with my server. Any suggestions ?
+ tools/bdaddr.c            | 1 +
+ tools/hciattach.c         | 3 +++
+ tools/hciattach_bcm43xx.c | 5 +----
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
 -- 
-You may reply to this email to add a comment.
+2.27.0
 
-You are receiving this mail because:
-You are the assignee for the bug.
