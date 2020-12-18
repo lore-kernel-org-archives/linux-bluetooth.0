@@ -7,63 +7,54 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4D5C4361B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F877C2D0E4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:31:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EC5523B7B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:28:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D71423B7B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:31:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726171AbgLRV2U (ORCPT
+        id S1726439AbgLRVbR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Dec 2020 16:28:20 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:52708 "EHLO
+        Fri, 18 Dec 2020 16:31:17 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49498 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725813AbgLRV2U (ORCPT
+        with ESMTP id S1726202AbgLRVbQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Dec 2020 16:28:20 -0500
+        Fri, 18 Dec 2020 16:31:16 -0500
 Received: from marcel-macbook.holtmann.net (p4fefcdf9.dip0.t-ipconnect.de [79.239.205.249])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C0E83CED33;
-        Fri, 18 Dec 2020 22:34:55 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8050BCED31;
+        Fri, 18 Dec 2020 22:37:51 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH 1/1] Bluetooth: Remove hci_req_le_suspend_config
+Subject: Re: [PATCH v1] Bluetooth: btusb: add shutdown function for wcn6855
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201207161221.1.I94feef9a75a69b0d0c7038d975239ef3b1b93ee6@changeid>
-Date:   Fri, 18 Dec 2020 22:27:38 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
+In-Reply-To: <1608286331-15760-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Fri, 18 Dec 2020 22:30:34 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        Howard Chung <howardchung@google.com>
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, tjiang@codeaurora.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <C0715297-245B-45A7-A6FD-3A1A04710AD0@holtmann.org>
-References: <20201208001254.575890-1-abhishekpandit@chromium.org>
- <20201207161221.1.I94feef9a75a69b0d0c7038d975239ef3b1b93ee6@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Message-Id: <08490C74-3146-41E1-BB66-82FDA627E1E5@holtmann.org>
+References: <1608286331-15760-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.40.0.2.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Zijun,
 
-> Add a missing SUSPEND_SCAN_ENABLE in passive scan, remove the separate
-> function for configuring le scan during suspend and update the request
-> complete function to clear both enable and disable tasks.
+> we should send hci reset command before bt turn off, which can reset bt
+> firmware status.
 > 
-> Fixes: dce0a4be8054 ("Bluetooth: Set missing suspend task bits")
-> Reviewed-by: Alain Michaud <alainm@chromium.org>
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 > ---
-> 
-> net/bluetooth/hci_request.c | 25 ++++++++-----------------
-> 1 file changed, 8 insertions(+), 17 deletions(-)
+> drivers/bluetooth/btusb.c | 15 +++++++++++++++
+> 1 file changed, 15 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
