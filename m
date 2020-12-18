@@ -5,65 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE8DC4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A99C2BBCD
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 00:14:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0598123A5A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 00:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BED723A53
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 00:14:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732174AbgLRAOh (ORCPT
+        id S1732197AbgLRAOi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Dec 2020 19:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41924 "EHLO
+        Thu, 17 Dec 2020 19:14:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732074AbgLRAOg (ORCPT
+        with ESMTP id S1732074AbgLRAOh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Dec 2020 19:14:36 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46179C0617A7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 16:13:56 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id x18so440578pln.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 16:13:56 -0800 (PST)
+        Thu, 17 Dec 2020 19:14:37 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8D1C0617B0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 16:13:57 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id i7so213922pgc.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Dec 2020 16:13:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=wazaHWyIXISmPax9hPmGDPEyZT8jNKhTQuyaNtHgq+o=;
-        b=ML9lzuOr9Hm/7s0BpvPL8FLtz6YZT0xlPV3/wyGQkrMz1EJGKqLPDZLAqeM3KzKT9+
-         /i//peYT5bjb16T2L590SXhxL4LKUDpNRWwxtaZQ+8lJkU3g9BwkUgCO4UyWP50Lg6L5
-         GkYEy5t6yU1o8ANSdkYCTil77ZJ4bSjD+8fr+lUMVo6wR1THazZmwAfde8BZpeiZdO8B
-         O2vgp4IXK5zUQ6K4VF4yMRsd7Tm7mFMyB1Myv/f5kqat3A/de3Y9Ij1xTKN7sRVhVJVf
-         zBykjV3C0PA0V2vd24u81IstYFe3lS82aEc6M3WgS7r1Y4Ic5RLIPcGiwuVkDN2r5fD0
-         ZzdA==
+        bh=VTJIRYcgHwZbGRN6Peujt6xlrWJf6qiS7wBUgXNen2w=;
+        b=Kfa9IG4vZPfw/2JHQbnYjaCZ5v24OyQOeznpUXGMpF4XhzeMjuwxai8IraIkVtZc/M
+         8sVc8vZNpTte0BdU38JD4jN7Iw+8QUjPkVShG3LT1krnr5INMyVypgcipwhIMGNBs3iz
+         bxPkWfQgx+LicxcrztfFWTacGrzddUB70UUFcDUkpMEnkJJd5WmUYmT01xry2GSrjIBD
+         uNw6pbkh97qd4lzR42nmwjfugUGVrUemn0qmb8yVBtANcGC1LLyZNFSZeMhY+9tMBb9z
+         UrettFqHtj9aFB9lWk6vCRBjtmqI/anhC2AYFVfhX5l+GzYyljZTU0ph23lSYESbM3xT
+         OAbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wazaHWyIXISmPax9hPmGDPEyZT8jNKhTQuyaNtHgq+o=;
-        b=oZYGd19/JXpWB0onhh32nM3SQw13xNl7sAK2uPhEColrFagLR+Q0CjSf652eQ6IDu5
-         vCVku0EGxSNMhrYT8CgiJII5nxWNc4N6eTBR+gUrAcFIw9j0xf/DoM4oPKQq5e29sVT5
-         oxqZ1c5k86hUg5fHGCZunf+I/8LmejlS/0/lHpki/7cejwXNKs1gzZQCdf5bkhWmlPuf
-         OLYZ089n44SddMRchWI5lAO5xNosGcECnzymFDnaxyrdKOHI1MDyhdhJINj4CeLDxO8R
-         sGfIL8j7bJhHR4NhLEBu35oZ3ZsmeQIiHQPHU5QKTSyS3czOrvQQ/8LLpRvFOmyY7wLy
-         9ASQ==
-X-Gm-Message-State: AOAM532S+ZGLMuBnb8n1m6fyy6ygWLEti6lkFv3Rroqg8E7SM9kHuVqA
-        2Wj7lQPsPKHkSxYv3dOu6LACRhwKSPo=
-X-Google-Smtp-Source: ABdhPJzqlFwr5yED+dKh2iVMOdf6QS9BMZ0nz2SrOPQMGCcUMrSTLqw5LQzWuQH83aGiY4szh3w1fA==
-X-Received: by 2002:a17:90b:283:: with SMTP id az3mr1691720pjb.84.1608250435424;
-        Thu, 17 Dec 2020 16:13:55 -0800 (PST)
+        bh=VTJIRYcgHwZbGRN6Peujt6xlrWJf6qiS7wBUgXNen2w=;
+        b=A7KhD7Of46V1Jc7FVtMb9PDDUZ6WF4OihtXa2/F3JCul14K/U5RbpI0W0h/SLxJlD1
+         TitEYgV96HO81KoTrMz0S77L64NB4lcufhsg+YuNvtE/e0kX3lyMYlBItFc3Gsner2T0
+         GPiyiJgEI+L45APl31waJ0aSuj5dteeej4bOZbnHsUD0IqFeowvpJTU4VxWiMcPS1q8R
+         qb5LUQ7BU2VL7K6l7s1pEJapF6Bn3wVAV2vihI+2s8PMJO0XADqhaYyhdLjC4GT6D4YD
+         w4X8Damapc6wc48Arw+PnA5KtFH7HkLi8AlZ3A9aCp7pKhEFP6hxX/QzL70MAArhMFOR
+         BntQ==
+X-Gm-Message-State: AOAM5338skVNm4KGgb+o1sc7b8LxHa7nkL/2jqA7CM2ryZOhu/EBQpHS
+        q7r/7vE/2VDN30XqmPKnj8kYsB1G0cI=
+X-Google-Smtp-Source: ABdhPJwhvsSAPYIu79CGAA2sTkFr3v6NOGsnG7Hx25gZxF0n2qLWxAUKUzv6qQF4GaQGJD0V+jkrfw==
+X-Received: by 2002:a63:fb42:: with SMTP id w2mr1700388pgj.354.1608250436631;
+        Thu, 17 Dec 2020 16:13:56 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m77sm6428189pfd.105.2020.12.17.16.13.54
+        by smtp.gmail.com with ESMTPSA id m77sm6428189pfd.105.2020.12.17.16.13.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Dec 2020 16:13:54 -0800 (PST)
+        Thu, 17 Dec 2020 16:13:55 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] hciemu: Add support for multiple clients
-Date:   Thu, 17 Dec 2020 16:13:50 -0800
-Message-Id: <20201218001351.1442784-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/3] bthost: Add support for address types other then public
+Date:   Thu, 17 Dec 2020 16:13:51 -0800
+Message-Id: <20201218001351.1442784-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201218001351.1442784-1-luiz.dentz@gmail.com>
 References: <20201218001351.1442784-1-luiz.dentz@gmail.com>
@@ -75,419 +74,107 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for creating multiple clients (bthost).
+This properly initialize the address type according to the connection
+address.
 ---
- emulator/hciemu.c | 234 +++++++++++++++++++++++++++++++---------------
- emulator/hciemu.h |   6 ++
- 2 files changed, 163 insertions(+), 77 deletions(-)
+ emulator/bthost.c |  9 +++++++--
+ emulator/bthost.h |  5 +++--
+ emulator/smp.c    | 24 +++++++++++++++++++-----
+ 3 files changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 961de6359..a3ec44243 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -34,16 +34,20 @@
- #include "src/shared/queue.h"
- #include "emulator/hciemu.h"
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 3b42c0664..16934d35a 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -923,6 +923,7 @@ static void init_conn(struct bthost *bthost, uint16_t handle,
+ {
+ 	struct btconn *conn;
+ 	const uint8_t *ia, *ra;
++	uint8_t ia_type, ra_type;
  
-+struct hciemu_client {
-+	struct bthost *host;
-+	struct btdev *dev;
-+	guint start_source;
-+	guint host_source;
-+	guint source;
-+};
-+
- struct hciemu {
- 	int ref_count;
- 	enum btdev_type btdev_type;
--	struct bthost *host_stack;
--	struct btdev *master_dev;
--	struct btdev *client_dev;
--	guint host_source;
--	guint master_source;
--	guint client_source;
--	guint start_source;
-+	struct btdev *dev;
-+	struct queue *clients;
-+	guint source;
- 	struct queue *post_command_hooks;
- 	char bdaddr_str[18];
+ 	conn = malloc(sizeof(*conn));
+ 	if (!conn)
+@@ -939,14 +940,18 @@ static void init_conn(struct bthost *bthost, uint16_t handle,
  
-@@ -245,69 +249,123 @@ static bool create_vhci(struct hciemu *hciemu)
- 		return false;
+ 	if (bthost->conn_init) {
+ 		ia = bthost->bdaddr;
++		ia_type = addr_type;
+ 		ra = conn->bdaddr;
++		ra_type = conn->addr_type;
+ 	} else {
+ 		ia = conn->bdaddr;
++		ia_type = conn->addr_type;
+ 		ra = bthost->bdaddr;
++		ra_type = addr_type;
  	}
  
--	hciemu->master_dev = btdev;
-+	hciemu->dev = btdev;
+-	conn->smp_data = smp_conn_add(bthost->smp_data, handle, ia, ra,
+-						addr_type, bthost->conn_init);
++	conn->smp_data = smp_conn_add(bthost->smp_data, handle, ia, ia_type,
++					ra, ra_type, bthost->conn_init);
  
--	hciemu->master_source = create_source_btdev(fd, btdev);
-+	hciemu->source = create_source_btdev(fd, btdev);
+ 	if (bthost->new_conn_cb)
+ 		bthost->new_conn_cb(conn->handle, bthost->new_conn_data);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 77f17fd69..7e5286df3 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -142,8 +142,9 @@ void bthost_start(struct bthost *bthost);
  
- 	return true;
+ void *smp_start(struct bthost *bthost);
+ void smp_stop(void *smp_data);
+-void *smp_conn_add(void *smp_data, uint16_t handle, const uint8_t *ia,
+-			const uint8_t *ra, uint8_t addr_type, bool conn_init);
++void *smp_conn_add(void *smp_data, uint16_t handle,
++			const uint8_t *ia, uint8_t ia_type,
++			const uint8_t *ra, uint8_t ra_type, bool conn_init);
+ void smp_conn_del(void *conn_data);
+ void smp_conn_encrypted(void *conn_data, uint8_t encrypt);
+ void smp_data(void *conn_data, const void *data, uint16_t len);
+diff --git a/emulator/smp.c b/emulator/smp.c
+index db0065d7d..ec1baea04 100644
+--- a/emulator/smp.c
++++ b/emulator/smp.c
+@@ -834,8 +834,22 @@ void smp_conn_encrypted(void *conn_data, uint8_t encrypt)
+ 	distribute_keys(conn);
  }
  
-+struct hciemu_client *hciemu_get_client(struct hciemu *hciemu, int num)
+-void *smp_conn_add(void *smp_data, uint16_t handle, const uint8_t *ia,
+-			const uint8_t *ra, uint8_t addr_type, bool conn_init)
++static uint8_t type2hci(uint8_t addr_type)
 +{
-+	const struct queue_entry *entry;
-+
-+	if (!hciemu)
-+		return NULL;
-+
-+	for (entry = queue_get_entries(hciemu->clients); entry;
-+					entry = entry->next, num--) {
-+		if (!num)
-+			return entry->data;
++	switch (addr_type) {
++	case BDADDR_BREDR:
++	case BDADDR_LE_PUBLIC:
++		return LE_PUBLIC_ADDRESS;
++	case BDADDR_LE_RANDOM:
++		return LE_RANDOM_ADDRESS;
 +	}
 +
-+	return NULL;
++	return 0x00;
 +}
 +
-+struct bthost *hciemu_client_host(struct hciemu_client *client)
-+{
-+	if (!client)
-+		return NULL;
-+
-+	return client->host;
-+}
-+
- struct bthost *hciemu_client_get_host(struct hciemu *hciemu)
++void *smp_conn_add(void *smp_data, uint16_t handle,
++			const uint8_t *ia, uint8_t ia_type,
++			const uint8_t *ra, uint8_t ra_type, bool conn_init)
  {
-+	struct hciemu_client *client;
-+
- 	if (!hciemu)
- 		return NULL;
+ 	struct smp *smp = smp_data;
+ 	struct smp_conn *conn;
+@@ -848,11 +862,11 @@ void *smp_conn_add(void *smp_data, uint16_t handle, const uint8_t *ia,
  
--	return hciemu->host_stack;
-+	client = hciemu_get_client(hciemu, 0);
-+
-+	return hciemu_client_host(client);
- }
+ 	conn->smp = smp;
+ 	conn->handle = handle;
+-	conn->addr_type = addr_type;
+ 	conn->out = conn_init;
++	conn->addr_type = conn_init ? ia_type : ra_type;
  
--static bool create_stack(struct hciemu *hciemu)
-+static gboolean start_host(gpointer user_data)
- {
--	struct btdev *btdev;
--	struct bthost *bthost;
--	int sv[2];
-+	struct hciemu_client *client = user_data;
+-	conn->ia_type = LE_PUBLIC_ADDRESS;
+-	conn->ra_type = LE_PUBLIC_ADDRESS;
++	conn->ia_type = type2hci(ia_type);
++	conn->ra_type = type2hci(ra_type);
+ 	memcpy(conn->ia, ia, 6);
+ 	memcpy(conn->ra, ra, 6);
  
--	btdev = btdev_create(hciemu->btdev_type, 0x00);
--	if (!btdev)
--		return false;
-+	client->start_source = 0;
- 
--	bthost = bthost_create();
--	if (!bthost) {
--		btdev_destroy(btdev);
--		return false;
--	}
-+	bthost_start(client->host);
-+
-+	return FALSE;
-+}
- 
--	btdev_set_command_handler(btdev, client_command_callback, hciemu);
-+static void hciemu_client_destroy(void *data)
-+{
-+	struct hciemu_client *client = data;
- 
--	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
--								0, sv) < 0) {
--		bthost_destroy(bthost);
--		btdev_destroy(btdev);
--		return false;
--	}
-+	if (client->start_source)
-+		g_source_remove(client->start_source);
- 
--	hciemu->client_dev = btdev;
--	hciemu->host_stack = bthost;
-+	g_source_remove(client->host_source);
-+	g_source_remove(client->source);
- 
--	hciemu->client_source = create_source_btdev(sv[0], btdev);
--	hciemu->host_source = create_source_bthost(sv[1], bthost);
-+	bthost_destroy(client->host);
-+	btdev_destroy(client->dev);
- 
--	return true;
-+	free(client);
- }
- 
--static gboolean start_stack(gpointer user_data)
-+static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
-+							uint8_t id)
- {
--	struct hciemu *hciemu = user_data;
-+	struct hciemu_client *client;
-+	int sv[2];
- 
--	hciemu->start_source = 0;
-+	client = new0(struct hciemu_client, 1);
-+	if (!client)
-+		return NULL;
- 
--	bthost_start(hciemu->host_stack);
-+	client->dev = btdev_create(hciemu->btdev_type, id++);
-+	if (!client->dev) {
-+		free(client);
-+		return NULL;
-+	}
- 
--	return FALSE;
-+	client->host = bthost_create();
-+	if (!client->host) {
-+		btdev_destroy(client->dev);
-+		free(client);
-+		return NULL;
-+	}
-+
-+	btdev_set_command_handler(client->dev, client_command_callback, client);
-+
-+	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
-+								0, sv) < 0) {
-+		bthost_destroy(client->host);
-+		btdev_destroy(client->dev);
-+		return NULL;
-+	}
-+
-+	client->source = create_source_btdev(sv[0], client->dev);
-+	client->host_source = create_source_bthost(sv[1], client->host);
-+	client->start_source = g_idle_add(start_host, client);
-+
-+	return client;
- }
- 
--struct hciemu *hciemu_new(enum hciemu_type type)
-+struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
- {
-+
- 	struct hciemu *hciemu;
-+	int i;
-+
-+	if (!num)
-+		return NULL;
- 
- 	hciemu = new0(struct hciemu, 1);
- 	if (!hciemu)
-@@ -348,19 +406,27 @@ struct hciemu *hciemu_new(enum hciemu_type type)
- 		return NULL;
- 	}
- 
--	if (!create_stack(hciemu)) {
--		g_source_remove(hciemu->master_source);
--		btdev_destroy(hciemu->master_dev);
--		queue_destroy(hciemu->post_command_hooks, NULL);
--		free(hciemu);
--		return NULL;
--	}
-+	hciemu->clients = queue_new();
-+
-+	for (i = 0; i < num; i++) {
-+		struct hciemu_client *client = hciemu_client_new(hciemu, i);
- 
--	hciemu->start_source = g_idle_add(start_stack, hciemu);
-+		if (!client) {
-+			queue_destroy(hciemu->clients, hciemu_client_destroy);
-+			break;
-+		}
-+
-+		queue_push_tail(hciemu->clients, client);
-+	}
- 
- 	return hciemu_ref(hciemu);
- }
- 
-+struct hciemu *hciemu_new(enum hciemu_type type)
-+{
-+	return hciemu_new_num(type, 1);
-+}
-+
- struct hciemu *hciemu_ref(struct hciemu *hciemu)
- {
- 	if (!hciemu)
-@@ -380,17 +446,10 @@ void hciemu_unref(struct hciemu *hciemu)
- 		return;
- 
- 	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
-+	queue_destroy(hciemu->clients, hciemu_client_destroy);
- 
--	if (hciemu->start_source)
--		g_source_remove(hciemu->start_source);
--
--	g_source_remove(hciemu->host_source);
--	g_source_remove(hciemu->client_source);
--	g_source_remove(hciemu->master_source);
--
--	bthost_destroy(hciemu->host_stack);
--	btdev_destroy(hciemu->client_dev);
--	btdev_destroy(hciemu->master_dev);
-+	g_source_remove(hciemu->source);
-+	btdev_destroy(hciemu->dev);
- 
- 	free(hciemu);
- }
-@@ -419,6 +478,15 @@ static void btdev_client_debug(const char *str, void *user_data)
- 					"btdev[bthost]: %s", str);
- }
- 
-+static void hciemu_client_set_debug(void *data, void *user_data)
-+{
-+	struct hciemu_client *client = data;
-+	struct hciemu *hciemu = user_data;
-+
-+	btdev_set_debug(client->dev, btdev_client_debug, hciemu, NULL);
-+	bthost_set_debug(client->host, bthost_debug, hciemu, NULL);
-+}
-+
- bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
- 			void *user_data, hciemu_destroy_func_t destroy)
- {
-@@ -432,9 +500,9 @@ bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
- 	hciemu->debug_destroy = destroy;
- 	hciemu->debug_data = user_data;
- 
--	btdev_set_debug(hciemu->master_dev, btdev_master_debug, hciemu, NULL);
--	btdev_set_debug(hciemu->client_dev, btdev_client_debug, hciemu, NULL);
--	bthost_set_debug(hciemu->host_stack, bthost_debug, hciemu, NULL);
-+	btdev_set_debug(hciemu->dev, btdev_master_debug, hciemu, NULL);
-+
-+	queue_foreach(hciemu->clients, hciemu_client_set_debug, hciemu);
- 
- 	return true;
- }
-@@ -443,10 +511,10 @@ const char *hciemu_get_address(struct hciemu *hciemu)
- {
- 	const uint8_t *addr;
- 
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return NULL;
- 
--	addr = btdev_get_bdaddr(hciemu->master_dev);
-+	addr = btdev_get_bdaddr(hciemu->dev);
- 	sprintf(hciemu->bdaddr_str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
- 			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
- 	return hciemu->bdaddr_str;
-@@ -454,50 +522,62 @@ const char *hciemu_get_address(struct hciemu *hciemu)
- 
- uint8_t *hciemu_get_features(struct hciemu *hciemu)
- {
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return NULL;
- 
--	return btdev_get_features(hciemu->master_dev);
-+	return btdev_get_features(hciemu->dev);
- }
- 
- const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
- {
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return NULL;
- 
--	return btdev_get_bdaddr(hciemu->master_dev);
-+	return btdev_get_bdaddr(hciemu->dev);
-+}
-+
-+const uint8_t *hciemu_client_bdaddr(struct hciemu_client *client)
-+{
-+	if (!client)
-+		return NULL;
-+
-+	return btdev_get_bdaddr(client->dev);
- }
- 
- const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
- {
--	if (!hciemu || !hciemu->client_dev)
-+	struct hciemu_client *client;
-+
-+	if (!hciemu)
- 		return NULL;
- 
--	return btdev_get_bdaddr(hciemu->client_dev);
-+	client = hciemu_get_client(hciemu, 0);
-+
-+	return hciemu_client_bdaddr(client);
- }
- 
- uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
- {
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return 0;
- 
--	return btdev_get_scan_enable(hciemu->master_dev);
-+	return btdev_get_scan_enable(hciemu->dev);
- }
- 
- uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
- {
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return 0;
- 
--	return btdev_get_le_scan_enable(hciemu->master_dev);
-+	return btdev_get_le_scan_enable(hciemu->dev);
- }
- 
- void hciemu_set_master_le_states(struct hciemu *hciemu, const uint8_t *le_states)
- {
--	if (!hciemu || !hciemu->master_dev)
-+	if (!hciemu || !hciemu->dev)
- 		return;
- 
--	btdev_set_le_states(hciemu->master_dev, le_states);
-+	btdev_set_le_states(hciemu->dev, le_states);
- }
- 
- bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
-@@ -559,7 +639,7 @@ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
- 		return -1;
- 	}
- 
--	return btdev_add_hook(hciemu->master_dev, hook_type, opcode, function,
-+	return btdev_add_hook(hciemu->dev, hook_type, opcode, function,
- 								user_data);
- }
- 
-@@ -588,5 +668,5 @@ bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
- 		return false;
- 	}
- 
--	return btdev_del_hook(hciemu->master_dev, hook_type, opcode);
-+	return btdev_del_hook(hciemu->dev, hook_type, opcode);
- }
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index d0708277d..8bf2d070e 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -12,6 +12,7 @@
- #include <stdint.h>
- 
- struct hciemu;
-+struct hciemu_client;
- 
- enum hciemu_type {
- 	HCIEMU_TYPE_BREDRLE,
-@@ -30,10 +31,15 @@ enum hciemu_hook_type {
- };
- 
- struct hciemu *hciemu_new(enum hciemu_type type);
-+struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num);
- 
- struct hciemu *hciemu_ref(struct hciemu *hciemu);
- void hciemu_unref(struct hciemu *hciemu);
- 
-+struct hciemu_client *hciemu_get_client(struct hciemu *hciemu, int num);
-+struct bthost *hciemu_client_host(struct hciemu_client *client);
-+const uint8_t *hciemu_client_bdaddr(struct hciemu_client *client);
-+
- typedef void (*hciemu_debug_func_t)(const char *str, void *user_data);
- typedef void (*hciemu_destroy_func_t)(void *user_data);
- bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
 -- 
 2.26.2
 
