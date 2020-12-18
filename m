@@ -7,54 +7,73 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F877C2D0E4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA6AC3526B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:32:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D71423B7B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A355923BCB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Dec 2020 21:32:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbgLRVbR (ORCPT
+        id S1725938AbgLRVcW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Dec 2020 16:31:17 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:49498 "EHLO
+        Fri, 18 Dec 2020 16:32:22 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:50487 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbgLRVbQ (ORCPT
+        with ESMTP id S1725817AbgLRVcW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Dec 2020 16:31:16 -0500
+        Fri, 18 Dec 2020 16:32:22 -0500
 Received: from marcel-macbook.holtmann.net (p4fefcdf9.dip0.t-ipconnect.de [79.239.205.249])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8050BCED31;
-        Fri, 18 Dec 2020 22:37:51 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 248DECED31;
+        Fri, 18 Dec 2020 22:38:57 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH v1] Bluetooth: btusb: add shutdown function for wcn6855
+Subject: Re: [PATCH] Bluetooth: Pause service discovery for suspend
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1608286331-15760-1-git-send-email-zijuhu@codeaurora.org>
-Date:   Fri, 18 Dec 2020 22:30:34 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, tjiang@codeaurora.org
+In-Reply-To: <20201217150346.1.If6feff48e17a881af9cb55526db7f53bf0db40f1@changeid>
+Date:   Fri, 18 Dec 2020 22:31:39 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Content-Transfer-Encoding: 7bit
-Message-Id: <08490C74-3146-41E1-BB66-82FDA627E1E5@holtmann.org>
-References: <1608286331-15760-1-git-send-email-zijuhu@codeaurora.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
+Message-Id: <E127EABD-FBE2-49E3-910D-6BF922E94EFF@holtmann.org>
+References: <20201217150346.1.If6feff48e17a881af9cb55526db7f53bf0db40f1@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3654.40.0.2.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Abhishek,
 
-> we should send hci reset command before bt turn off, which can reset bt
-> firmware status.
+> Just like MGMT_OP_START_DISCOVERY, we should reject
+> MGMT_OP_START_SERVICE_DISCOVERY with MGMT_STATUS_BUSY when we are paused
+> for suspend.
 > 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
-> drivers/bluetooth/btusb.c | 15 +++++++++++++++
-> 1 file changed, 15 insertions(+)
+> On ChromeOS, we started getting reports of scanning failing after
+> resuming from suspend. The root cause was that Start Service Discovery
+> was being called while discovery was supposed to be paused for suspend
+> and it was screwing up some internal state. Adding this check
+> immediately fixed it.
+> 
+> The fix was tested by doing the following:
+> * Set Discovery Filter ({'transport': 'auto'})
+> * Start Discovery
+> * Suspend
+> * Resume
+> * Check the Discovering property
+> 
+> Without the fix, this test failed when checking the Discovering
+> property above.
+> 
+> net/bluetooth/mgmt.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
