@@ -2,144 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 677F2C0018C
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Dec 2020 07:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58244C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Dec 2020 10:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B0C223BE2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Dec 2020 07:57:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A34A23BDE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Dec 2020 10:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbgLSH4u (ORCPT
+        id S1726466AbgLSKpy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Dec 2020 02:56:50 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:55702 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbgLSH4t (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Dec 2020 02:56:49 -0500
-Received: by mail-il1-f199.google.com with SMTP id c13so4389206ilg.22
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Dec 2020 23:56:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=s7h6mFvDc/Ce4O+16ifiHi7SJvQ+hFCpQ5/hLq9F0WE=;
-        b=sBU+RXNjKl5HewzgzmcP8S93tO2yEwjrVapYuQGihI4RV4/CylVFZrRwr1+ny9TVUv
-         jfCPcx93524fjl+k3+I6NMwpVpyHHjD5yBprsadf1oFK9vURGTX8XYnyMAp5iI/jg5tw
-         ZhLj5ZGUfsaYkg5STusXmCQFfKkgLlfrqqY9SqfB+51JfHJfL6aO9KUDsej5+LYZMgeM
-         T7DpxP5cS2fPqfKRekk2Hg59v+TL8sBW1ASOOt04OFUbgsTad8qQz8ps1KlHJ4cTsFyo
-         ppdbBv2C7g8zvhxcJm6ZiTKKSoVC2h6bh/5beM5qf12SvNQCOmXvqTS7V78iKLWX4h9q
-         staw==
-X-Gm-Message-State: AOAM5322t5BuiBIn8bBvFOuyCwnwe3iCHSOqpK/GOMmqV8ucMqTf2goW
-        q1rB2edckdPEtw6X698FHD8n/QpT4sZiigIpGrO33NDfwCAn
-X-Google-Smtp-Source: ABdhPJyL6kaL6yC7lhDapNwEFM/IpUCqIzxIKUgqIy+Z9+eiXOgO14e7Ej7292RRBChagRerhZVj6Ug9ir22pzfgCemOP0usSCWv
+        Sat, 19 Dec 2020 05:45:54 -0500
+Received: from mga11.intel.com ([192.55.52.93]:28261 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726439AbgLSKpy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 19 Dec 2020 05:45:54 -0500
+IronPort-SDR: 7MS+ff1CpOEFku6uXZD5bPpdxrky1S6cIBXLpoC7QA2JYVd3+zornSfdgEshrGx/QmBKS4fclc
+ 2zlZr8BZ4cBA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9839"; a="172059695"
+X-IronPort-AV: E=Sophos;i="5.78,433,1599548400"; 
+   d="scan'208";a="172059695"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2020 02:45:13 -0800
+IronPort-SDR: xeJLHuR1lr3hPcS5tMP4BhHi1/nnVs9pUXmwFsZDFxBG2SMTVn5VJ5guZgnN6f3hFFE4HYklnz
+ MkJIT9oeHDyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,433,1599548400"; 
+   d="scan'208";a="414613831"
+Received: from lkp-server02.sh.intel.com (HELO c4fb2a2464e8) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 19 Dec 2020 02:45:12 -0800
+Received: from kbuild by c4fb2a2464e8 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1kqZjb-0000iJ-NZ; Sat, 19 Dec 2020 10:45:11 +0000
+Date:   Sat, 19 Dec 2020 18:44:19 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 89e65975fea5c25706e8cc3a89f9f97b20fc45ad
+Message-ID: <5fddd983.ECKsfoyYkRvnh0wF%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-X-Received: by 2002:a92:c206:: with SMTP id j6mr7819867ilo.189.1608364568409;
- Fri, 18 Dec 2020 23:56:08 -0800 (PST)
-Date:   Fri, 18 Dec 2020 23:56:08 -0800
-In-Reply-To: <000000000000e2852705ac9cfd73@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c4fd0405b6cc8e53@google.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in lock_sock_nested
-From:   syzbot <syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git  master
+branch HEAD: 89e65975fea5c25706e8cc3a89f9f97b20fc45ad  Bluetooth: Cancel Inquiry before Create Connection
 
-HEAD commit:    a409ed15 Merge tag 'gpio-v5.11-1' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=174778a7500000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=20efebc728efc8ff
-dashboard link: https://syzkaller.appspot.com/bug?extid=9a0875bc1b2ca466b484
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10a4445b500000
+elapsed time: 720m
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com
+configs tested: 124
+configs skipped: 2
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in __lock_acquire+0x3da6/0x54b0 kernel/locking/lockdep.c:4702
-Read of size 8 at addr ffff88801938c0a0 by task kworker/1:1/34
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-CPU: 1 PID: 34 Comm: kworker/1:1 Not tainted 5.10.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x107/0x163 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0xae/0x497 mm/kasan/report.c:385
- __kasan_report mm/kasan/report.c:545 [inline]
- kasan_report.cold+0x1f/0x37 mm/kasan/report.c:562
- __lock_acquire+0x3da6/0x54b0 kernel/locking/lockdep.c:4702
- lock_acquire kernel/locking/lockdep.c:5437 [inline]
- lock_acquire+0x29d/0x750 kernel/locking/lockdep.c:5402
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
- _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
- spin_lock_bh include/linux/spinlock.h:359 [inline]
- lock_sock_nested+0x3b/0x110 net/core/sock.c:3049
- l2cap_sock_teardown_cb+0xa1/0x660 net/bluetooth/l2cap_sock.c:1520
- l2cap_chan_del+0xbc/0xaa0 net/bluetooth/l2cap_core.c:618
- l2cap_chan_close+0x1bc/0xaf0 net/bluetooth/l2cap_core.c:823
- l2cap_chan_timeout+0x17e/0x2f0 net/bluetooth/l2cap_core.c:436
- process_one_work+0x98d/0x1630 kernel/workqueue.c:2275
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
- kthread+0x3b1/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+parisc                              defconfig
+sh                               allmodconfig
+powerpc                 mpc8560_ads_defconfig
+sh                   secureedge5410_defconfig
+powerpc                   motionpro_defconfig
+parisc                           alldefconfig
+arm                           omap1_defconfig
+mips                            e55_defconfig
+powerpc                      ep88xc_defconfig
+xtensa                    xip_kc705_defconfig
+alpha                               defconfig
+powerpc                      ppc40x_defconfig
+powerpc                 mpc834x_mds_defconfig
+arm                           sama5_defconfig
+powerpc                    klondike_defconfig
+riscv                            alldefconfig
+arm                           viper_defconfig
+arm                         orion5x_defconfig
+arm                         shannon_defconfig
+ia64                                defconfig
+mips                      maltasmvp_defconfig
+arm                            zeus_defconfig
+sh                            titan_defconfig
+powerpc                           allnoconfig
+um                           x86_64_defconfig
+c6x                        evmc6678_defconfig
+sh                        edosk7760_defconfig
+powerpc                     asp8347_defconfig
+mips                       lemote2f_defconfig
+arm                          pxa3xx_defconfig
+arm                         at91_dt_defconfig
+mips                     cu1000-neo_defconfig
+powerpc                     sequoia_defconfig
+arm                     davinci_all_defconfig
+arm                       mainstone_defconfig
+m68k                        mvme16x_defconfig
+sh                           se7343_defconfig
+powerpc               mpc834x_itxgp_defconfig
+powerpc                     sbc8548_defconfig
+mips                    maltaup_xpa_defconfig
+powerpc                 canyonlands_defconfig
+m68k                                defconfig
+arm                        spear3xx_defconfig
+sh                          urquell_defconfig
+sh                          rsk7264_defconfig
+mips                       capcella_defconfig
+xtensa                  nommu_kc705_defconfig
+m68k                         apollo_defconfig
+sh                         apsh4a3a_defconfig
+arm                          tango4_defconfig
+mips                  decstation_64_defconfig
+i386                             alldefconfig
+mips                      fuloong2e_defconfig
+riscv                               defconfig
+arm                            mps2_defconfig
+ia64                             allmodconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+c6x                              allyesconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                               tinyconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+x86_64               randconfig-a003-20201217
+x86_64               randconfig-a006-20201217
+x86_64               randconfig-a002-20201217
+x86_64               randconfig-a005-20201217
+x86_64               randconfig-a004-20201217
+x86_64               randconfig-a001-20201217
+i386                 randconfig-a001-20201217
+i386                 randconfig-a004-20201217
+i386                 randconfig-a003-20201217
+i386                 randconfig-a002-20201217
+i386                 randconfig-a006-20201217
+i386                 randconfig-a005-20201217
+i386                 randconfig-a014-20201217
+i386                 randconfig-a013-20201217
+i386                 randconfig-a012-20201217
+i386                 randconfig-a011-20201217
+i386                 randconfig-a015-20201217
+i386                 randconfig-a016-20201217
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                                   rhel
+x86_64                           allyesconfig
+x86_64                    rhel-7.6-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                      rhel-8.3-kbuiltin
+x86_64                                  kexec
 
-Allocated by task 11222:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:48
- kasan_set_track mm/kasan/common.c:56 [inline]
- __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:461
- __do_kmalloc mm/slab.c:3659 [inline]
- __kmalloc+0x18b/0x340 mm/slab.c:3668
- kmalloc include/linux/slab.h:557 [inline]
- kzalloc include/linux/slab.h:682 [inline]
- tomoyo_get_name+0x22b/0x4c0 security/tomoyo/memory.c:173
- tomoyo_parse_name_union+0xbc/0x160 security/tomoyo/util.c:260
- tomoyo_update_path_acl security/tomoyo/file.c:395 [inline]
- tomoyo_write_file+0x4c0/0x7f0 security/tomoyo/file.c:1022
- tomoyo_write_domain2+0x116/0x1d0 security/tomoyo/common.c:1152
- tomoyo_add_entry security/tomoyo/common.c:2042 [inline]
- tomoyo_supervisor+0xbee/0xf20 security/tomoyo/common.c:2103
- tomoyo_audit_path_log security/tomoyo/file.c:168 [inline]
- tomoyo_path_permission security/tomoyo/file.c:587 [inline]
- tomoyo_path_permission+0x270/0x3a0 security/tomoyo/file.c:573
- tomoyo_path_perm+0x37c/0x3f0 security/tomoyo/file.c:838
- tomoyo_path_symlink+0x94/0xe0 security/tomoyo/tomoyo.c:200
- security_path_symlink+0xdf/0x150 security/security.c:1111
- do_symlinkat+0x123/0x2c0 fs/namei.c:3985
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
+clang tested configs:
+x86_64               randconfig-a016-20201217
+x86_64               randconfig-a012-20201217
+x86_64               randconfig-a013-20201217
+x86_64               randconfig-a015-20201217
+x86_64               randconfig-a014-20201217
+x86_64               randconfig-a011-20201217
 
-The buggy address belongs to the object at ffff88801938c000
- which belongs to the cache kmalloc-128 of size 128
-The buggy address is located 32 bytes to the right of
- 128-byte region [ffff88801938c000, ffff88801938c080)
-The buggy address belongs to the page:
-page:00000000b7b67fec refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1938c
-flags: 0xfff00000000200(slab)
-raw: 00fff00000000200 ffffea00004e6508 ffffea0000a5cf48 ffff888010840400
-raw: 0000000000000000 ffff88801938c000 0000000100000010 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff88801938bf80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88801938c000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff88801938c080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                               ^
- ffff88801938c100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff88801938c180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
