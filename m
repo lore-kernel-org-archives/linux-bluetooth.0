@@ -2,100 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 138C2C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A45E7C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:06:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A352023139
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:04:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 497282310D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726061AbgLVKD4 (ORCPT
+        id S1726330AbgLVKGB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 05:03:56 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:51412 "EHLO
+        Tue, 22 Dec 2020 05:06:01 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:51857 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgLVKD4 (ORCPT
+        with ESMTP id S1726232AbgLVKGA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 05:03:56 -0500
+        Tue, 22 Dec 2020 05:06:00 -0500
 Received: from mac-pro.holtmann.net (p4ff9fbc9.dip0.t-ipconnect.de [79.249.251.201])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E165FCED1D;
-        Tue, 22 Dec 2020 11:10:31 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 456E2CED09;
+        Tue, 22 Dec 2020 11:12:37 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH v3 4/5] Bluetooth: advmon offload MSFT handle controller
- reset
+Subject: Re: Default to HW mSBC on capable controllers ?
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJQfnxHrvnsLRDHNFWAN9uPJmWiTpE6x4YAmgs77KO6QQBFW7w@mail.gmail.com>
-Date:   Tue, 22 Dec 2020 11:03:13 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Transfer-Encoding: 7bit
-Message-Id: <8EB5497C-1D36-42B5-946C-3CC60D6F98CB@holtmann.org>
-References: <20201216043335.2185278-1-apusaka@google.com>
- <20201216123317.v3.4.I215b0904cb68d68ac780a0c75c06f7d12e6147b7@changeid>
- <73E2D097-F8D4-4BFA-8EC1-C04B079F1BFC@holtmann.org>
- <CAJQfnxHrvnsLRDHNFWAN9uPJmWiTpE6x4YAmgs77KO6QQBFW7w@mail.gmail.com>
-To:     Archie Pusaka <apusaka@google.com>
+In-Reply-To: <20201222092100.ru5inf45v55qoa4m@pali>
+Date:   Tue, 22 Dec 2020 11:05:19 +0100
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Joakim Tjernlund <Joakim.Tjernlund@infinera.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BC13598F-C074-4CB3-B24E-10A6E0CF84DB@holtmann.org>
+References: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
+ <CABBYNZKy4KXWqLdZu7C49jJ_nMbmBOdMjtM2_5OQg2ruUHUh_w@mail.gmail.com>
+ <20201221211437.4s27cl6t4v27sugh@pali>
+ <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
+ <20201222092100.ru5inf45v55qoa4m@pali>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 X-Mailer: Apple Mail (2.3654.40.0.2.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Pali,
 
->>> When the controller is powered off, the registered advertising monitor
->>> is removed from the controller. This patch handles the re-registration
->>> of those monitors when the power is on.
+>>>>> There seems to be quite a few USB controllers gaining the BTUSB_WIDEBAND_SPEECH which I guess means HW mSBC but currently there is no way to select this mode.
+>>>>> Any idea if one could patch the kernel to default to HW mSBC and user apps like bluealsa/pulseaudio would just use it automatically?
+>>>> 
+>>>> It is in our plan to support HW offloading, but that doesn't mean all
+>>>> platforms will be supported since that depends on the PCM lines being
+>>>> connected to BT controller in the first place.
 >>> 
->>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
->>> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
->>> Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+>>> Dedicated PCM lines are used in embedded world and maybe also still in
+>>> some mobile segment. I remember that e.g. Nokia N900 had this setup. And
+>>> it was quite crazy how it was finally configured... but it worked!
 >>> 
->>> ---
+>>> But this is nothing for classic x86 laptops with USB bluetooth
+>>> controllers on classic intel bluetooth+wifi mPCIe cards where SCO
+>>> traffic is routed via HCI (over USB). And not via dedicated PCM pins.
+>>> Moreover I think there are not any mainstream laptop which have PCM pins
+>>> on mPCIe slots usable for such bluetooth mPCIe cards.
 >>> 
->>> (no changes since v1)
+>>> For classic desktop / laptop it is needed to deal with fact that SCO
+>>> audio is routed via HCI (like A2DP) and therefore support for Enhanced
+>>> Setup Synchronous Connection HCI command.
 >>> 
->>> net/bluetooth/msft.c | 79 +++++++++++++++++++++++++++++++++++++++++---
->>> 1 file changed, 74 insertions(+), 5 deletions(-)
->>> 
->>> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
->>> index f5aa0e3b1b9b..7e33a85c3f1c 100644
->>> --- a/net/bluetooth/msft.c
->>> +++ b/net/bluetooth/msft.c
->>> @@ -82,8 +82,15 @@ struct msft_data {
->>>      struct list_head handle_map;
->>>      __u16 pending_add_handle;
->>>      __u16 pending_remove_handle;
->>> +
->>> +     struct {
->>> +             u8 reregistering:1;
->>> +     } flags;
->>> };
+>>> AFAIK even for routing SCO over PCM when mSBC hw encoder is used,
+>>> Enhanced Setup Synchronous Connection HCI command is required.
 >> 
->> hmmm. Do you have bigger plans with this struct? I would just skip it.
->> 
-> This struct is also used in patch 5/5 to store the "enabled" status of
-> the filter.
-> Suspend/resume would need to enable/disable the filter, but it is not
-> yet implemented in this patch series.
+>> So you are saying that we should do PCM over HCI and that would
+>> actually work (meaning we have enough bandwidth)?
+> 
+> This is something which needs to be tested. And without full
+> implementation (with control of all parameters) we cannot say YES or NO.
+> 
+> And if you are aware of bandwidth, Enhanced Setup Synchronous Connection
+> HCI command allows you to use also software based CVSD codec. Meaning
+> that CVSD encoding/decoding can be done by application and therefore
+> decreasing amount of data to transfer to bluetooth adapter.
+> 
+> As I said this command is needed also if you want to use mSBC hw encoder
+> over PCM, so I think usage of Enhanced Setup Synchronous Connection HCI
+> command always have benefits to implement it (I have unfinished and
+> untested implementation).
 
-just do it without the nested structs. I think you are overdoing it here.
+CVSD is an air codec only. Controller<->Host is PCM in that case. Only with mSBC you have both air codec and Controller<->Host running with mSBC.
 
 Regards
 
 Marcel
+
 
