@@ -2,135 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E18DC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 20:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75208C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 20:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7201522AB9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 20:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30A6C22573
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 20:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727358AbgLVUrp (ORCPT
+        id S1727543AbgLVU7v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 15:47:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41356 "EHLO
+        Tue, 22 Dec 2020 15:59:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726289AbgLVUrj (ORCPT
+        with ESMTP id S1726991AbgLVU7v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 15:47:39 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51931C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 12:46:59 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id y19so34916516lfa.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 12:46:59 -0800 (PST)
+        Tue, 22 Dec 2020 15:59:51 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA44C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 12:59:10 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id 2so9903960qtt.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 12:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=teenage.engineering; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=H3EsGL2fam75a2jlwlny2/e3OBkaF8vgepjjLJUFQWE=;
-        b=hT/JGjaGpdyuf9jbNnHf+SgbTCgoV74wgl2F8km1zjfuEG5sJCMSriyiBF9kGk30F0
-         s9lIak2fmY/uYc4C0rBXEzuAOsdh6kRrFIW1M4un77s8mOyc+ElL5ILoxlaBLQ+QJNPb
-         NHcAtZn3teziiM1bDxJz2XzRROSsH53i/xWZw=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=TvTJMCPgq6k/vEFGUSRtC3cgIV6LXj2faA/RiguonYQ=;
+        b=hyqHeoxHygvfha42cnraGbVbLTn23SJUFI6NbYKePyx7epxMuWezxBUs3xfJ9NKgII
+         NwNDrdYlE2LWFBCFTdBn+Vx7AyKlVetrfqyuPkmf4e95bQo25FyiOzGfGwXe9Vq39hR1
+         5u6sFa7yB4tPDkkCzeAOBhJzr8na4kdcbf0YSPqiAuITpNq4Qj3BXKW0MnseaxwUGInU
+         UZwH1vrn06UCH3d4JAeuytZnx4F8oorHW/V/mnn6u2FC5tlJ79crsWDn+Z5foAS1vkqH
+         r3dAWKLmKPUjbMiZCXS/egSU4j1u53NyqteOogv69wzLPbHPdYrhR8QGLmAkLG350WQu
+         wbNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=H3EsGL2fam75a2jlwlny2/e3OBkaF8vgepjjLJUFQWE=;
-        b=I7WxNj/3f2w2jI+9ak4p9JOkcvFhij3Za3mxkiMPMV+7EEu9j97cQ8let9ZhioMzLT
-         7DiIHqkCvWd9M4t3SMW2tpbAPPomY4I8Ws87OHlhaPRpOmDoW3y11oXwq8YoyOAy5B7J
-         nMXB8C3rlLSlO6cD/8IDHw8wY4Es1w3abzqunxcVWGVfnQICE24FSIGI1n8PgZq6N3It
-         I1ZtIap+omm5WnJYQdf6g3WrzziSh0CD/3MYLCH0OnGhiDDDYGY73EKxXJtfITQKd/WQ
-         RSNOhJkc9NUN7Cj+SVSnB2ylnNYl6JOnTIr6YOv2jECGbCoSNAvzPnmyUmd3B4WOTFk2
-         LV9w==
-X-Gm-Message-State: AOAM530NwRpYEhdBri5KVZjrDRcEMci4kF8G7yGfo8t+MFfhVaZPZqYW
-        W/YppKVGO7zeT9yhujglzAiseLkWMR4o0wE=
-X-Google-Smtp-Source: ABdhPJzB2cCJbBezFfVqnafTtdE+GvIC5L1bEa4jFWacyla0fS0ruK+kDqsC3iuSIqnVX+dTBufP9A==
-X-Received: by 2002:a05:651c:206:: with SMTP id y6mr11033583ljn.234.1608670017414;
-        Tue, 22 Dec 2020 12:46:57 -0800 (PST)
-Received: from localhost.localdomain (host-95-192-210-115.mobileonline.telia.com. [95.192.210.115])
-        by smtp.gmail.com with ESMTPSA id a15sm2809119lfo.299.2020.12.22.12.46.56
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=TvTJMCPgq6k/vEFGUSRtC3cgIV6LXj2faA/RiguonYQ=;
+        b=WPuhrEVn+CcSfk9j+AoGOnC3mKchrnwwJmvTI7BEZzOkh5rrSs+VQmJOOiwMs/gNBg
+         hz6Zm5DfdDOm5XmCKbj72A/M8iP0Cs7MFhSTwyA/lue/25ngKvnkEtYMLfEXug7R7w1l
+         7U/wNUybyqmWcdlFaSVq1z9Z9soPcKBl3T3xfUKrviu2p4PAGFcD41jUMZJb4EYoNVxN
+         iaa6eVyHyJfhp9nZAw5cHr2qGjYf/E76LSXeeefjDPcTDfOxN87Pe1MppUppfciRmS6/
+         rwuN2uybuQ46V0Ky6TC3JaVOhAg0sYn0omvMPgzGHixsrFDoXlOAtwW/2TrVgG4ClR1L
+         2q1A==
+X-Gm-Message-State: AOAM532DJbQGBrVSn8suCyuMic65LsH5t04x1Qmh/atpnH+pY8e1apZw
+        CKvcIyR7Z2WVUD4MRS1yzSZTzDiEPFshaQ==
+X-Google-Smtp-Source: ABdhPJwqnCU9NFiS0INl2GRBs/vgm9FVL3zoyduBt9Zozy2e+2Jk19iXh7Y5Yk8v7Wo0DcOu5aZMxg==
+X-Received: by 2002:ac8:58d1:: with SMTP id u17mr22859536qta.158.1608670749253;
+        Tue, 22 Dec 2020 12:59:09 -0800 (PST)
+Received: from [172.17.0.2] ([13.68.81.134])
+        by smtp.gmail.com with ESMTPSA id s65sm3174626qkh.91.2020.12.22.12.59.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 12:46:56 -0800 (PST)
-From:   Jacob Siverskog <jacob@teenage.engineering>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Jacob Siverskog <jacob@teenage.engineering>
-Subject: [PATCH BlueZ] btmon: fix buffer bound checks
-Date:   Tue, 22 Dec 2020 21:45:47 +0100
-Message-Id: <20201222204547.27839-1-jacob@teenage.engineering>
-X-Mailer: git-send-email 2.29.2
+        Tue, 22 Dec 2020 12:59:08 -0800 (PST)
+Message-ID: <5fe25e1c.1c69fb81.113cd.5f32@mx.google.com>
+Date:   Tue, 22 Dec 2020 12:59:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4185996215083936032=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jacob@teenage.engineering
+Subject: RE: [BlueZ] btmon: fix buffer bound checks
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201222204547.27839-1-jacob@teenage.engineering>
+References: <20201222204547.27839-1-jacob@teenage.engineering>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-index_list is of size MAX_INDEX - correct the checks that is meant to
-catch out-of-bounds access.
+--===============4185996215083936032==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=405519
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- monitor/packet.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index c8c835d53..c91b91e2b 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3879,7 +3879,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 		index_current = index;
- 	}
- 
--	if (index != HCI_DEV_NONE && index > MAX_INDEX) {
-+	if (index != HCI_DEV_NONE && index >= MAX_INDEX) {
- 		print_field("Invalid index (%d)", index);
- 		return;
- 	}
-@@ -11133,7 +11133,7 @@ void packet_hci_command(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	char extra_str[25], vendor_str[150];
- 	int i;
- 
--	if (index > MAX_INDEX) {
-+	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
- 		return;
- 	}
-@@ -11240,7 +11240,7 @@ void packet_hci_event(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	char extra_str[25];
- 	int i;
- 
--	if (index > MAX_INDEX) {
-+	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
- 		return;
- 	}
-@@ -11320,7 +11320,7 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint8_t flags = acl_flags(handle);
- 	char handle_str[16], extra_str[32];
- 
--	if (index > MAX_INDEX) {
-+	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
- 		return;
- 	}
-@@ -11369,7 +11369,7 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint8_t flags = acl_flags(handle);
- 	char handle_str[16], extra_str[32];
- 
--	if (index > MAX_INDEX) {
-+	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
- 		return;
- 	}
-@@ -11416,7 +11416,7 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	uint8_t flags = acl_flags(handle);
- 	char handle_str[16], extra_str[32];
- 
--	if (index > MAX_INDEX) {
-+	if (index >= MAX_INDEX) {
- 		print_field("Invalid index (%d).", index);
- 		return;
- 	}
--- 
-2.29.2
 
+--===============4185996215083936032==--
