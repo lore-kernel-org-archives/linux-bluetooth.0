@@ -2,137 +2,181 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F79DC4332B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 13:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C09C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 15:58:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D81923130
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 13:46:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FB19221FA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 15:58:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727379AbgLVNqk (ORCPT
+        id S1726973AbgLVP6Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 08:46:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726903AbgLVNqj (ORCPT
+        Tue, 22 Dec 2020 10:58:25 -0500
+Received: from atl4mhfb03.myregisteredsite.com ([209.17.115.119]:44826 "EHLO
+        atl4mhfb03.myregisteredsite.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726832AbgLVP6Z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 08:46:39 -0500
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D888C0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 05:45:59 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id 22so11806441qkf.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 05:45:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/5TyytyswBQGu7GUx8DkF7u3fghInrxbTyT7G6bgA/0=;
-        b=VuYVT7cVopqb769AQGFyHqznidYjmwUy0E4zeWgxDm4UWuBPoMr7FGORYjYLDfNd0G
-         LqJVeV3QODvOpdHk6deEE1z4pz3C1FUXSqlVcJFS5dZusYtwxxHNIByoxleBQdXj2ORE
-         7QtVKOcLs/MibSW7b4SD30Y/apgIGPtDzYRqyFd32NP6N4RSOuPa0PmX/2g4fw/lhztX
-         8ip9/j66jTB+HyG5bQ8CtsLTLwMB3mI0oGUpIDg2ZCavVKPxFS67ATYpn5A2bYUtCGPU
-         Jv3IdkEQPwApPMT5kfxvdB6mXLIPLaU2A3Gmizzm3teMhE6EBDt0Nmh3Y7MmE6zuA36f
-         foqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/5TyytyswBQGu7GUx8DkF7u3fghInrxbTyT7G6bgA/0=;
-        b=sZ8+IjlbZn4J/2V+T4+nRky4TQyYLX90Cp7qPxMXL2tjCD8w4nzcY7jHZYYLDuY+W2
-         G5nyBAWEKUIBH/Js/yAzmZykvku2SFD2USYmhkwGOaGRGsKECZAbNakqEXhFSlvNwJ/8
-         O/xPdC6wiiyWJHf62vSD0Lhkaa1Zobs7d4r4hANrfP1977HBqEMoa331NlCkoNn2FXbw
-         zXdaXJTRHm/5rX1vgcAaLYa7OhuBrFuZY20VNWPVHGSLwkxNt6sYF8Gkae6UKYlWU4uC
-         bMFWDPQ79OKn29xF6bBQk2umADEqL+ySEJT4kkI1g+5EmM9Bg4OIWLUaezg7/y3Gyb+e
-         G73A==
-X-Gm-Message-State: AOAM532C5QzNKDnQk05dbEg4oc5ilkK6Ot0Ti6HsbfGlr7f3GDG/HWZU
-        A5fAa8vNSkGgKDRpXilygCPCpCSS1OXEgA==
-X-Google-Smtp-Source: ABdhPJwrjyc7c6A50KHoT1i69+G/zHt5OA9byRHEQ+qpUM3CD+q4r75dvEYoyVh0cFponwLpFz2TXg==
-X-Received: by 2002:ae9:e909:: with SMTP id x9mr21621533qkf.166.1608644757909;
-        Tue, 22 Dec 2020 05:45:57 -0800 (PST)
-Received: from [172.17.0.2] ([20.49.29.60])
-        by smtp.gmail.com with ESMTPSA id h125sm12709732qkc.36.2020.12.22.05.45.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 05:45:57 -0800 (PST)
-Message-ID: <5fe1f895.1c69fb81.10313.13dc@mx.google.com>
-Date:   Tue, 22 Dec 2020 05:45:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1229872126571861639=="
+        Tue, 22 Dec 2020 10:58:25 -0500
+Received: from jax4mhob14.registeredsite.com (jax4mhob14.registeredsite.com [64.69.218.102])
+        by atl4mhfb03.myregisteredsite.com (8.14.4/8.14.4) with ESMTP id 0BMFvhsd006484
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 10:57:43 -0500
+Received: from mailpod.hostingplatform.com ([10.30.71.85])
+        by jax4mhob14.registeredsite.com (8.14.4/8.14.4) with ESMTP id 0BMFv0Vt187796
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 10:57:01 -0500
+Received: (qmail 134632 invoked by uid 0); 22 Dec 2020 15:57:00 -0000
+X-TCPREMOTEIP: 208.85.15.155
+X-Authenticated-UID: sbrown@opensat.com
+Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
+  by 0 with ESMTPA; 22 Dec 2020 15:57:00 -0000
+Received: from localhost (localhost [127.0.0.1])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id D20E815403CC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 10:56:59 -0500 (EST)
+X-Virus-Scanned: Debian amavisd-new at ewol.com
+Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
+        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id fsWKIsKAbu6U for <linux-bluetooth@vger.kernel.org>;
+        Tue, 22 Dec 2020 10:56:57 -0500 (EST)
+Received: from w7.lan (w7.lan [192.168.1.9])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id BD33215401A9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 10:56:57 -0500 (EST)
+Message-ID: <cf925daf120458a23798be054865d1e39068f7b5.camel@ewol.com>
+Subject: mesh: call to Publish triggers apparent output loop in
+ mesh/mesh-io-generic.c
+From:   Steve Brown <sbrown@ewol.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 22 Dec 2020 10:56:57 -0500
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.1-1 
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: RE: doc/mgmt-api.txt: Introduce Set Runtime Firmware command
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201222124651.101063-1-marcel@holtmann.org>
-References: <20201222124651.101063-1-marcel@holtmann.org>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1229872126571861639==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Publish functions as expected, but results in continuous, very heavy
+HCI traffic (~every .7ms per btmon log). I don't think it's my
+application as the problem persists after the application disconnects
+from dbus and exits.
 
-This is automated email and please do not reply to this email!
+The calls to LE Set Adv Param all fail. Prior to the Publish call, LE
+Set Param calls succeed. The only difference I can see is the failing
+ones have an interval of 50ms and the ones that succeed have 100ms. A
+successful one is appended.
 
-Dear submitter,
+I'm at current Bluez head (65231892cd). The platform is a rpi4. 
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=405289
+Below is a pretty normal looking meshd log, a btmon dump and some more
+normal looking dbus traffic.
 
----Test result---
+Steve
 
-##############################
-Test: CheckPatch - FAIL
-Output:
-doc/mgmt-api.txt: Introduce Set Runtime Firmware command
-WARNING:TYPO_SPELLING: 'firwmare' may be misspelled - perhaps 'firmware'?
-#37: FILE: doc/mgmt-api.txt:3166:
-+		some sort of runtime firmware. Only in the firwmare name
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/node.c:publish_call() Publish
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/mesh-config-json.c:mesh_config_write_seq_number() Seq Cache: 210 -> 274
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 6e
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.692 Used App Key: dae814b7da47ab8c992fcc03a60c100b
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.692 Clr Rx: 820200030064
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/net.c:send_seg() segN 0 segment 0 seg_off 0
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.692 Clr-Net Tx: 00080000d10001c0006eaaffbb7633799725e9d600000000
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.693 RX: Network [enc] :: 7eb235f367ed0172ca7d0345f4a1d9ce42d116f80ab00b0e
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.693 RX: Network [clr] :: 7e080000d10001c0006eaaffbb7633799725e9d6
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.715 RX: Network [enc] :: 7e6e7c8a337f4355f2921b9d8fd3e7eb3a866af261fc46d1
+Dec 22 09:22:56 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46976.715 RX: Network [clr] :: 7e070000d10001c0006eaaffbb7633799725e9d6
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46977.097 RX: Network [enc] :: 7e3a351647d646ec107415b165540e1057fdc9847c
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46977.097 RX: Network [clr] :: 7e0a00007d010000016e8961a6de509fb1
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/net.c:msg_in_cache() Add 0100 + 00007d + 6e8961a6
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/net.c:packet_received() RX: Network 0100 -> 0001 : TTL 0x0a : IV : 00000000 SEQ 0x00007d
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/net.c:packet_received() RX: App 0x0100 -> 0x0001 : TTL 0x0a : SEQ 0x00007d
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 6e
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46977.097 Used App Key: dae814b7da47ab8c992fcc03a60c100b
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/util.c:print_packet() 46977.097 Clr Rx: 820400
+Dec 22 09:22:57 mesh0 bluetooth-meshd[38760]: mesh/model.c:send_msg_rcvd() Send "MessageReceived"
+============================================================================================================================
+btmon output after Publish call:
 
-WARNING:TYPO_SPELLING: 'charaters' may be misspelled - perhaps 'characters'?
-#38: FILE: doc/mgmt-api.txt:3167:
-+		happens to exceed the 255 charaters, the shortened type
+< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15                                                          #1756 [hci0] 60.253779
+        Min advertising interval: 50.000 msec (0x0050)
+        Max advertising interval: 50.000 msec (0x0050)
+        Type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+        Own address type: Random (0x01)
+        Direct address type: Public (0x00)
+        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Channel map: 37, 38, 39 (0x07)
+        Filter policy: Allow Scan Request from White List Only, Allow Connect Request from White List Only (0x03)
+> HCI Event: Command Complete (0x0e) plen 4                                                                                 #1757 [hci0] 60.254089
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
+< HCI Command: LE Set Advertising Data (0x08|0x0008) plen 32                                                                #1758 [hci0] 60.254304
+        Length: 26
+        Mesh Data: 7eb235f367ed0172ca7d0345f4a1d9ce42d116f80ab00b0e
+          IVI: 0
+          NID: 0x7e
+        b2 35 f3 67 ed 01 72 ca 7d 03 45 f4 a1 d9 ce 42  .5.g..r.}.E....B
+        d1 16 f8 0a b0 0b 0e                             .......
+> HCI Event: Command Complete (0x0e) plen 4                                                                                 #1759 [hci0] 60.254686
+      LE Set Advertising Data (0x08|0x0008) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1                                                                 #1760 [hci0] 60.254874
+        Advertising: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                                                                                 #1761 [hci0] 60.255170
+      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1                                                                 #1762 [hci0] 60.302847
+        Advertising: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                                                                                 #1763 [hci0] 60.303586
+      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15                                                          #1764 [hci0] 60.303744
+        Min advertising interval: 50.000 msec (0x0050)
+        Max advertising interval: 50.000 msec (0x0050)
+        Type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+        Own address type: Random (0x01)
+        Direct address type: Public (0x00)
+        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Channel map: 37, 38, 39 (0x07)
+        Filter policy: Allow Scan Request from White List Only, Allow Connect Request from White List Only (0x03)
+> HCI Event: Command Complete (0x0e) plen 4                                                                                 #1765 [hci0] 60.304053
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+                                                                                                              
+=====================================================================================================
+dbus-monitor output
 
-WARNING:TYPO_SPELLING: 'firwmare' may be misspelled - perhaps 'firmware'?
-#91: FILE: doc/mgmt-api.txt:3910:
-+	When the support for runtime firwmare configuration is indicated
+method call time=1608649585.797421 sender=:1.223 -> destination=org.bluez.mesh serial=21 path=/org/bluez/mesh/nodeb3f28276086958109ac1e2cbd76fbf7e; interface=org.bluez.mesh.Node1; member=Publish
+   object path "/com/silvair/sample/element0"
+   uint16 4097
+   array [
+   ]
+   array of bytes [
+      82 02 00 03 00 64
+   ]
+method return time=1608649585.798741 sender=:1.221 -> destination=:1.223 serial=29 reply_serial=21
+method call time=1608649586.337429 sender=:1.221 -> destination=:1.223 serial=30 path=/com/silvair/sample/element0; interface=org.bluez.mesh.Element1; member=MessageReceived
+   uint16 256
+   uint16 1
+   variant       uint16 1
+   array of bytes [
+      82 04 00
+   ]
 
-- total: 0 errors, 3 warnings, 110 lines checked
+===================================================================================
+Successful LE Set Adv Param
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] doc/mgmt-api.txt: Introduce Set Runtime Firmware command" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - FAIL
-Output:
-doc/mgmt-api.txt: Introduce Set Runtime Firmware command
-3: B6 Body message is missing
-
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
+< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15                                                                 #90 [hci0] 6.392018
+        Min advertising interval: 100.000 msec (0x00a0)
+        Max advertising interval: 100.000 msec (0x00a0)
+        Type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+        Own address type: Random (0x01)
+        Direct address type: Public (0x00)
+        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Channel map: 37, 38, 39 (0x07)
+        Filter policy: Allow Scan Request from White List Only, Allow Connect Request from White List Only (0x03)
+> HCI Event: Command Complete (0x0e) plen 4                                                                                        #91 [hci0] 6.392399
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+        Status: Success (0x00)
 
 
---===============1229872126571861639==--
+
+
