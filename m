@@ -2,101 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB3EC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC67FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 11:05:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE71A2311D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 10:32:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79CEE23105
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 11:05:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726513AbgLVKcd (ORCPT
+        id S1726423AbgLVLFI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 05:32:33 -0500
-Received: from smtprelay0236.hostedemail.com ([216.40.44.236]:57638 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725985AbgLVKcc (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 05:32:32 -0500
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay08.hostedemail.com (Postfix) with ESMTP id 98DC7182CF665;
-        Tue, 22 Dec 2020 10:31:51 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: limit40_2008c822745f
-X-Filterd-Recvd-Size: 2725
-Received: from XPS-9350.home (unknown [47.151.137.21])
-        (Authenticated sender: joe@perches.com)
-        by omf18.hostedemail.com (Postfix) with ESMTPA;
-        Tue, 22 Dec 2020 10:31:50 +0000 (UTC)
-Message-ID: <45b260bfe6a3d3c11c48e76dd5de7fa40665154c.camel@perches.com>
-Subject: [PATCH] Bluetooth: btusb: Remove duplicate newlines from logging
-From:   Joe Perches <joe@perches.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Date:   Tue, 22 Dec 2020 02:31:49 -0800
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.38.1-1 
+        Tue, 22 Dec 2020 06:05:08 -0500
+Received: from out0.migadu.com ([94.23.1.103]:49062 "EHLO out0.migadu.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726361AbgLVLFI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Dec 2020 06:05:08 -0500
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=devup.no; s=default;
+        t=1608635066;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8XWxI92P/e5vzE9vPZncpOlp2+6dRY+CLEei5JItwyw=;
+        b=tr9yhWu6PB0YPSErj1uozxDUXTAO6Tlb7RD7+1oiCNYD0Y6DWYkqeS5xtrCFTecteRWxQi
+        ccdDgO9uKMMSmbs4e4ac5fTZGQuN0byaGsLrcFnzOY1L+0c8KgHuQ3eV7uRsOOZgnZSplc
+        Vz1k30NOlvsUnGeeAmFQZ7t5RxnFBUI=
+From:   Marius Bakke <marius@devup.no>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        linux-bluetooth@vger.kernel.org, Marius Bakke <marius@gnu.org>
+Subject: [PATCH v3] sbc_primitives: Fix build on non-x86.
+Message-Id: <20201222110424.19368-1-marius@devup.no>
+In-Reply-To: <CABBYNZJ1PGCTVEon28vBN0apNjne2r5NgHY8e1WDtDML+4aeEw@mail.gmail.com>
+References: <CABBYNZJ1PGCTVEon28vBN0apNjne2r5NgHY8e1WDtDML+4aeEw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: marius@devup.no
+Date:   Tue, 22 Dec 2020 11:04:26 GMT
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The bt_dev_<level> macros already append a newline.
+From: Marius Bakke <marius@gnu.org>
 
-Signed-off-by: Joe Perches <joe@perches.com>
+Don't call __builtin_cpu_init unless targeting i386 or x86_64.
+Otherwise we get an error at link time:
+
+  CC       sbc/sbc_primitives.lo
+sbc/sbc_primitives.c: In function ‘sbc_init_primitives_x86’:
+sbc/sbc_primitives.c:596:2: warning: implicit declaration of function ‘__builtin_cpu_init’; did you mean ‘__builtin_irint’? [-Wimplicit-function-declaration]
+[...]
+  CCLD     src/sbcdec
+ld: sbc/.libs/libsbc-private.a(sbc_primitives.o): in function `sbc_init_primitives':
+sbc_primitives.c:(.text+0x3a30): undefined reference to `__builtin_cpu_init'
 ---
+ sbc/sbc_primitives.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The "No memory" message could be removed as bt_skb_alloc already does
-a dump_stack() on allocation failure.
-
- drivers/bluetooth/btusb.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b630a1d54c02..9ff920de8d26 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1899,7 +1899,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 		    le16_to_cpu(rp->lmp_subver) == 0x1012 &&
- 		    le16_to_cpu(rp->hci_rev) == 0x0810 &&
- 		    le16_to_cpu(rp->hci_ver) == BLUETOOTH_VER_4_0) {
--			bt_dev_warn(hdev, "CSR: detected a fake CSR dongle using a Barrot 8041a02 chip, this chip is very buggy and may have issues\n");
-+			bt_dev_warn(hdev, "CSR: detected a fake CSR dongle using a Barrot 8041a02 chip, this chip is very buggy and may have issues");
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 97a75be..09c214a 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -593,6 +593,7 @@ static int sbc_calc_scalefactors_j(
  
- 			pm_runtime_allow(&data->udev->dev);
+ static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
+ {
++#if defined(__x86_64__) || defined(__i386__)
+ 	__builtin_cpu_init();
  
-@@ -1907,7 +1907,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 			if (ret >= 0)
- 				msleep(200);
- 			else
--				bt_dev_err(hdev, "Failed to suspend the device for Barrot 8041a02 receive-issue workaround\n");
-+				bt_dev_err(hdev, "Failed to suspend the device for Barrot 8041a02 receive-issue workaround");
+ #ifdef SBC_BUILD_WITH_MMX_SUPPORT
+@@ -604,6 +605,7 @@ static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
+ 	if (__builtin_cpu_supports("sse4.2"))
+ 		sbc_init_primitives_sse(state);
+ #endif
++#endif
+ }
  
- 			pm_runtime_forbid(&data->udev->dev);
- 
-@@ -3724,7 +3724,7 @@ static int marvell_config_oob_wake(struct hci_dev *hdev)
- 
- 	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
- 	if (!skb) {
--		bt_dev_err(hdev, "%s: No memory\n", __func__);
-+		bt_dev_err(hdev, "%s: No memory", __func__);
- 		return -ENOMEM;
- 	}
- 
-@@ -3733,7 +3733,7 @@ static int marvell_config_oob_wake(struct hci_dev *hdev)
- 
- 	ret = btusb_send_frame(hdev, skb);
- 	if (ret) {
--		bt_dev_err(hdev, "%s: configuration failed\n", __func__);
-+		bt_dev_err(hdev, "%s: configuration failed", __func__);
- 		kfree_skb(skb);
- 		return ret;
- 	}
+ /*
+-- 
+2.29.2
 
