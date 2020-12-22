@@ -2,124 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6765FC433E9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 03:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16597C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 09:21:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2876822B2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 03:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D802B2310D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 09:21:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbgLVD1i (ORCPT
+        id S1725818AbgLVJVp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Dec 2020 22:27:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgLVD1h (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Dec 2020 22:27:37 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1ABC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 19:26:56 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id m25so28584559lfc.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 19:26:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3DuYh69TS1gggLotCn6ERQcD55cxnc82V29wS9VHcJs=;
-        b=WdJDWBFZxJ1uV3TfY51XO/idtHjYEIQPxRxDXv6oiW9yM6d7H70ZTkUAINBtJEzQHa
-         vJS8JXiyFU76yxGYTeo8/QLRtGgsyUzN5GQzt5Lbe6xnNEQ/POe9PIjNdi2qqsjzyxJp
-         YragRbGE+erGUY/5wZsROIPbKDen6IicXMsxDkCD0q4jx2fuJSuQNqJ7Co3ZTAg4P6lC
-         DU/t21uYsSJXoKdqxbf0r2x/2enmPhpop4f+5Q2rDUx+E96cspGugwxSjmvuA9RsLPM4
-         l1E4GrOj7hrOFWKM2OU5O/97vCKDQg4M7Cch3HQ9jlaDypfKHokibzBoeIv7Gukxs5/Z
-         OY0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3DuYh69TS1gggLotCn6ERQcD55cxnc82V29wS9VHcJs=;
-        b=X1s7lxmdbKQIO77lv3BBbqHzKKNm1Eo+IO9EzHqJaLyzlEEMKRs2TuFjYa5aykBwpD
-         hZKKc10FUmerCZ/ZJ2grei95F/HqYnBzgP+/gMAejMw2nAOjkDvpKgMya9s+juw2MrDj
-         LytDbpMIXGDaPquEzyHfOBqoUmHPZ8HVmUEAUkdFgiK8zdoeP0ymIdVrJJR12yFLSoy5
-         g5Oumgjg0RxMfhC2ayNnNYuCCovxUNaFq8ZFxyNxkj2cJf5IYJcA02bwGl6IvZ3uWXfE
-         GPl2e6BYpqwuF6vYvaZHUKLDoD1mBt9/ac3y0/Dt7i3dd9noIN3WPt1OukqwB8gm3DsH
-         BUqA==
-X-Gm-Message-State: AOAM532qMBgYW1gn5Pj+EfZ42pABLN6wUrZ4/5ALuyap1Z1RVKIp7SJF
-        /cdhFR0Z0vcngx6WtnGSljyV63ApOeXxtlSyvnin6g==
-X-Google-Smtp-Source: ABdhPJyydnV50sAF97g4pkHQR5JB1TgCTbhsPNMp+KFO7FBqrNHPukIGxBtqgi+y+1PLSGMSyPHdJvYMBUw1iSbyhzs=
-X-Received: by 2002:a2e:9053:: with SMTP id n19mr5967972ljg.283.1608607615185;
- Mon, 21 Dec 2020 19:26:55 -0800 (PST)
+        Tue, 22 Dec 2020 04:21:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52082 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725785AbgLVJVo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Dec 2020 04:21:44 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5A07422B2B;
+        Tue, 22 Dec 2020 09:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608628863;
+        bh=yMJEj3ZhsaLj8upgAVhZt+H13wDW0F9GcOh7VvZZ1Xs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WceDHc8ow/FXk4vIovz2muh4bJ7S0oHUkBdJFGHzgU46dtEZkyPEV8S/p/yg0cdqs
+         TJqwgwa5wQyc2AAR7UMQNe+jl6mOYJMtcJT1huhSIgj3nCyXdsT7N4XSzZl/eBz+1x
+         b7rvzoNhXTHKASLAt5nw1R3gIbp30GXR1oaDB8uwJYAktOQdUDkXx/ESrpQ8LLlUqS
+         u/PO7kdfWZQSICs3spTitEoeRnkFv/qSDgKkIc//bquBnY7T7VUgYfHaBSqeEw0vOM
+         90P6W20DCvuV2zEN+oDXOj0q6+mmAey3E7EZGv6OqSe+VdEPPdK+hieF/l4Th++LU1
+         BKMZ/Wplf5UBQ==
+Received: by pali.im (Postfix)
+        id 06CFC848; Tue, 22 Dec 2020 10:21:00 +0100 (CET)
+Date:   Tue, 22 Dec 2020 10:21:00 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Joakim Tjernlund <Joakim.Tjernlund@infinera.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Default to HW mSBC on capable controllers ?
+Message-ID: <20201222092100.ru5inf45v55qoa4m@pali>
+References: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
+ <CABBYNZKy4KXWqLdZu7C49jJ_nMbmBOdMjtM2_5OQg2ruUHUh_w@mail.gmail.com>
+ <20201221211437.4s27cl6t4v27sugh@pali>
+ <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20201216043335.2185278-1-apusaka@google.com> <20201216123317.v3.4.I215b0904cb68d68ac780a0c75c06f7d12e6147b7@changeid>
- <73E2D097-F8D4-4BFA-8EC1-C04B079F1BFC@holtmann.org>
-In-Reply-To: <73E2D097-F8D4-4BFA-8EC1-C04B079F1BFC@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 22 Dec 2020 11:26:44 +0800
-Message-ID: <CAJQfnxHrvnsLRDHNFWAN9uPJmWiTpE6x4YAmgs77KO6QQBFW7w@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] Bluetooth: advmon offload MSFT handle controller reset
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hello!
 
-On Mon, 21 Dec 2020 at 17:12, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Archie,
->
-> > When the controller is powered off, the registered advertising monitor
-> > is removed from the controller. This patch handles the re-registration
-> > of those monitors when the power is on.
+On Monday 21 December 2020 17:54:56 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+> 
+> On Mon, Dec 21, 2020 at 1:14 PM Pali Rohár <pali@kernel.org> wrote:
 > >
-> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> > Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+> > On Friday 18 December 2020 11:43:32 Luiz Augusto von Dentz wrote:
+> > > Hi Joakim,
+> > >
+> > > On Fri, Dec 18, 2020 at 10:48 AM Joakim Tjernlund
+> > > <Joakim.Tjernlund@infinera.com> wrote:
+> > > >
+> > > > There seems to be quite a few USB controllers gaining the BTUSB_WIDEBAND_SPEECH which I guess means HW mSBC but currently there is no way to select this mode.
+> > > > Any idea if one could patch the kernel to default to HW mSBC and user apps like bluealsa/pulseaudio would just use it automatically?
+> > >
+> > > It is in our plan to support HW offloading, but that doesn't mean all
+> > > platforms will be supported since that depends on the PCM lines being
+> > > connected to BT controller in the first place.
 > >
-> > ---
+> > Dedicated PCM lines are used in embedded world and maybe also still in
+> > some mobile segment. I remember that e.g. Nokia N900 had this setup. And
+> > it was quite crazy how it was finally configured... but it worked!
 > >
-> > (no changes since v1)
+> > But this is nothing for classic x86 laptops with USB bluetooth
+> > controllers on classic intel bluetooth+wifi mPCIe cards where SCO
+> > traffic is routed via HCI (over USB). And not via dedicated PCM pins.
+> > Moreover I think there are not any mainstream laptop which have PCM pins
+> > on mPCIe slots usable for such bluetooth mPCIe cards.
 > >
-> > net/bluetooth/msft.c | 79 +++++++++++++++++++++++++++++++++++++++++---
-> > 1 file changed, 74 insertions(+), 5 deletions(-)
+> > For classic desktop / laptop it is needed to deal with fact that SCO
+> > audio is routed via HCI (like A2DP) and therefore support for Enhanced
+> > Setup Synchronous Connection HCI command.
 > >
-> > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-> > index f5aa0e3b1b9b..7e33a85c3f1c 100644
-> > --- a/net/bluetooth/msft.c
-> > +++ b/net/bluetooth/msft.c
-> > @@ -82,8 +82,15 @@ struct msft_data {
-> >       struct list_head handle_map;
-> >       __u16 pending_add_handle;
-> >       __u16 pending_remove_handle;
-> > +
-> > +     struct {
-> > +             u8 reregistering:1;
-> > +     } flags;
-> > };
->
-> hmmm. Do you have bigger plans with this struct? I would just skip it.
->
-This struct is also used in patch 5/5 to store the "enabled" status of
-the filter.
-Suspend/resume would need to enable/disable the filter, but it is not
-yet implemented in this patch series.
+> > AFAIK even for routing SCO over PCM when mSBC hw encoder is used,
+> > Enhanced Setup Synchronous Connection HCI command is required.
+> 
+> So you are saying that we should do PCM over HCI and that would
+> actually work (meaning we have enough bandwidth)?
 
-Thanks,
-Archie
+This is something which needs to be tested. And without full
+implementation (with control of all parameters) we cannot say YES or NO.
+
+And if you are aware of bandwidth, Enhanced Setup Synchronous Connection
+HCI command allows you to use also software based CVSD codec. Meaning
+that CVSD encoding/decoding can be done by application and therefore
+decreasing amount of data to transfer to bluetooth adapter.
+
+As I said this command is needed also if you want to use mSBC hw encoder
+over PCM, so I think usage of Enhanced Setup Synchronous Connection HCI
+command always have benefits to implement it (I have unfinished and
+untested implementation).
+
+> From power point of
+> view this makes very little sense imo, since all the cycle we save on
+> no encoding we probably lose with more data to transmit, so are we
+> looking into use HW encoder just to fix the quality of codec?
+
+That is a good question if power consumption would be increased or
+decreased. Anyway, hw encoding may be able to achieve lower latency. So
+I rather do not drop it prematurely without any tests.
+
+And another important thing, not all bluetooth adapters are USB based,
+there are adapters connected over UART and SDIO. And every bus can
+behave differently. USB is domain of laptops, UART can be found on
+raspberry pi which is also heavily used. SDIO bluetooth is less used but
+I have there at least device on which is running mainline kernel (5.10)
+and has SDIO bluetooth.
