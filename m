@@ -2,122 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20774C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 01:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6765FC433E9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 03:27:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA6C122B3B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 01:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2876822B2D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 03:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725910AbgLVB63 (ORCPT
+        id S1726144AbgLVD1i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Dec 2020 20:58:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37312 "EHLO
+        Mon, 21 Dec 2020 22:27:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgLVB63 (ORCPT
+        with ESMTP id S1725783AbgLVD1h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Dec 2020 20:58:29 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AC7C061282
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 17:57:48 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id d203so13326889oia.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 17:57:48 -0800 (PST)
+        Mon, 21 Dec 2020 22:27:37 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1ABC0613D6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 19:26:56 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id m25so28584559lfc.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 19:26:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tEzG8mU/H/GM0H8Bs5Y0ZZ3bxMatpry/ISQJUr41xBo=;
-        b=W/E00IDM9UcYOJl/2na6TDAoOzDjSmGKKR8y0sUw6eWgo3eESHPUwkNmg5pD5d/XMb
-         vLMzN4s9HvZ5pgcE9PogP7BzocoHX2wCKEjnfOiW69vl7UX+n+DEcLEIyAN/bAoGEzJZ
-         XR09BIzNdTcIyx7TXarz42leUm80K8geAVhOkLrZOz/deNhOGX75bjKzah5Hl4hYYu/P
-         C3kVO0mDU4Qqz75CzDbGQBoOFkb5Gz6xi9fqBstaScBVs1HU168y1A1lvKHH6pElsGLt
-         iA4OYdbnMXx37CxANwW/vD+5VlWZJWKuRgFq17JAGk/2e56mE6x/K92e96Wytl5TuME9
-         cFWg==
+         :cc;
+        bh=3DuYh69TS1gggLotCn6ERQcD55cxnc82V29wS9VHcJs=;
+        b=WdJDWBFZxJ1uV3TfY51XO/idtHjYEIQPxRxDXv6oiW9yM6d7H70ZTkUAINBtJEzQHa
+         vJS8JXiyFU76yxGYTeo8/QLRtGgsyUzN5GQzt5Lbe6xnNEQ/POe9PIjNdi2qqsjzyxJp
+         YragRbGE+erGUY/5wZsROIPbKDen6IicXMsxDkCD0q4jx2fuJSuQNqJ7Co3ZTAg4P6lC
+         DU/t21uYsSJXoKdqxbf0r2x/2enmPhpop4f+5Q2rDUx+E96cspGugwxSjmvuA9RsLPM4
+         l1E4GrOj7hrOFWKM2OU5O/97vCKDQg4M7Cch3HQ9jlaDypfKHokibzBoeIv7Gukxs5/Z
+         OY0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tEzG8mU/H/GM0H8Bs5Y0ZZ3bxMatpry/ISQJUr41xBo=;
-        b=lX2eheJb1IBxxpZ1HtLTi938RIcWzs77eksUPwlYDln1AIaPbDR+TpLFHENpfpxrJP
-         z/weM29DWikdvyaVU8pEJw+HraFO26Lbl4STdIhMLFZDmHG1QjLy1OgTG/RIjSZpwqwG
-         yEMZBbM/Z7wmrsMygsDMX8Snxvb0g1ubQIRIA3Tg1oEfRwHspt/ve5t7Z6irLr63/xQr
-         bf7XnwrACtCTnxTEsJyjRh8L7Z6e9QMvMPB0ukXVh03jM+ACKj6lSPkRR4/lgefDXoKl
-         9PahQ9pARESHxw1Pc2Co3eE06LvFOXfDZv7QKWngn72J0uekDo8sjtL+GFttq155ChOJ
-         b7ow==
-X-Gm-Message-State: AOAM533xhClf0vQnHOJ/XaM5c0O0VRBorqCsMzXYJstmbczb/DSzOIbg
-        Va5NCRtX8PL7kF5wZbiEVVgKFM0yzUoiP9Qzmk0AQhSm
-X-Google-Smtp-Source: ABdhPJynIQP0wG9THXi4eVJN4yIDJsFq8tImoucT87wlkdvti0XqJmEy7Oj3j0WpYJKTRyJZwd4f2yEMz1f9v+kgrL8=
-X-Received: by 2002:aca:1917:: with SMTP id l23mr12991794oii.64.1608602268424;
- Mon, 21 Dec 2020 17:57:48 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=3DuYh69TS1gggLotCn6ERQcD55cxnc82V29wS9VHcJs=;
+        b=X1s7lxmdbKQIO77lv3BBbqHzKKNm1Eo+IO9EzHqJaLyzlEEMKRs2TuFjYa5aykBwpD
+         hZKKc10FUmerCZ/ZJ2grei95F/HqYnBzgP+/gMAejMw2nAOjkDvpKgMya9s+juw2MrDj
+         LytDbpMIXGDaPquEzyHfOBqoUmHPZ8HVmUEAUkdFgiK8zdoeP0ymIdVrJJR12yFLSoy5
+         g5Oumgjg0RxMfhC2ayNnNYuCCovxUNaFq8ZFxyNxkj2cJf5IYJcA02bwGl6IvZ3uWXfE
+         GPl2e6BYpqwuF6vYvaZHUKLDoD1mBt9/ac3y0/Dt7i3dd9noIN3WPt1OukqwB8gm3DsH
+         BUqA==
+X-Gm-Message-State: AOAM532qMBgYW1gn5Pj+EfZ42pABLN6wUrZ4/5ALuyap1Z1RVKIp7SJF
+        /cdhFR0Z0vcngx6WtnGSljyV63ApOeXxtlSyvnin6g==
+X-Google-Smtp-Source: ABdhPJyydnV50sAF97g4pkHQR5JB1TgCTbhsPNMp+KFO7FBqrNHPukIGxBtqgi+y+1PLSGMSyPHdJvYMBUw1iSbyhzs=
+X-Received: by 2002:a2e:9053:: with SMTP id n19mr5967972ljg.283.1608607615185;
+ Mon, 21 Dec 2020 19:26:55 -0800 (PST)
 MIME-Version: 1.0
-References: <PH0PR11MB51269918A2B84A3120EBD8E4D3C00@PH0PR11MB5126.namprd11.prod.outlook.com>
- <20201221184114.1300-1-marius@gnu.org>
-In-Reply-To: <20201221184114.1300-1-marius@gnu.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 21 Dec 2020 17:57:37 -0800
-Message-ID: <CABBYNZJ1PGCTVEon28vBN0apNjne2r5NgHY8e1WDtDML+4aeEw@mail.gmail.com>
-Subject: Re: [PATCH v2] sbc_primitives: Fix build on non-x86.
-To:     marius@gnu.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marius Bakke <marius@devup.no>
+References: <20201216043335.2185278-1-apusaka@google.com> <20201216123317.v3.4.I215b0904cb68d68ac780a0c75c06f7d12e6147b7@changeid>
+ <73E2D097-F8D4-4BFA-8EC1-C04B079F1BFC@holtmann.org>
+In-Reply-To: <73E2D097-F8D4-4BFA-8EC1-C04B079F1BFC@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Tue, 22 Dec 2020 11:26:44 +0800
+Message-ID: <CAJQfnxHrvnsLRDHNFWAN9uPJmWiTpE6x4YAmgs77KO6QQBFW7w@mail.gmail.com>
+Subject: Re: [PATCH v3 4/5] Bluetooth: advmon offload MSFT handle controller reset
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Yun-Hao Chung <howardchung@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marius,
+Hi Marcel,
 
-On Mon, Dec 21, 2020 at 10:45 AM <marius@gnu.org> wrote:
+On Mon, 21 Dec 2020 at 17:12, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> From: Marius Bakke <marius@devup.no>
+> Hi Archie,
 >
-> Don't call __builtin_cpu_init unless targeting i386 or x86_64.
-> Otherwise we get an error at link time:
+> > When the controller is powered off, the registered advertising monitor
+> > is removed from the controller. This patch handles the re-registration
+> > of those monitors when the power is on.
+> >
+> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > Reviewed-by: Yun-Hao Chung <howardchung@google.com>
+> >
+> > ---
+> >
+> > (no changes since v1)
+> >
+> > net/bluetooth/msft.c | 79 +++++++++++++++++++++++++++++++++++++++++---
+> > 1 file changed, 74 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> > index f5aa0e3b1b9b..7e33a85c3f1c 100644
+> > --- a/net/bluetooth/msft.c
+> > +++ b/net/bluetooth/msft.c
+> > @@ -82,8 +82,15 @@ struct msft_data {
+> >       struct list_head handle_map;
+> >       __u16 pending_add_handle;
+> >       __u16 pending_remove_handle;
+> > +
+> > +     struct {
+> > +             u8 reregistering:1;
+> > +     } flags;
+> > };
 >
->   CC       sbc/sbc_primitives.lo
-> sbc/sbc_primitives.c: In function =E2=80=98sbc_init_primitives_x86=E2=80=
-=99:
-> sbc/sbc_primitives.c:596:2: warning: implicit declaration of function =E2=
-=80=98__builtin_cpu_init=E2=80=99; did you mean =E2=80=98__builtin_irint=E2=
-=80=99? [-Wimplicit-function-declaration]
-> [...]
->   CCLD     src/sbcdec
-> ld: sbc/.libs/libsbc-private.a(sbc_primitives.o): in function `sbc_init_p=
-rimitives':
-> sbc_primitives.c:(.text+0x3a30): undefined reference to `__builtin_cpu_in=
-it'
-> ---
->  sbc/sbc_primitives.c | 2 ++
->  1 file changed, 2 insertions(+)
+> hmmm. Do you have bigger plans with this struct? I would just skip it.
 >
-> diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-> index 97a75be..d8e166a 100644
-> --- a/sbc/sbc_primitives.c
-> +++ b/sbc/sbc_primitives.c
-> @@ -593,7 +593,9 @@ static int sbc_calc_scalefactors_j(
->
->  static void sbc_init_primitives_x86(struct sbc_encoder_state *state)
->  {
-> +#if defined(__x86_64__) || defined(__i386__)
->         __builtin_cpu_init();
+This struct is also used in patch 5/5 to store the "enabled" status of
+the filter.
+Suspend/resume would need to enable/disable the filter, but it is not
+yet implemented in this patch series.
 
-I would probably have the entire function under the #if here.
-
-> +#endif
->
->  #ifdef SBC_BUILD_WITH_MMX_SUPPORT
->         if (__builtin_cpu_supports("mmx"))
-> --
-> 2.29.2
->
-
-
---=20
-Luiz Augusto von Dentz
+Thanks,
+Archie
