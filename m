@@ -7,238 +7,111 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08503C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Dec 2020 23:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 595CFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 01:55:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4A9822AED
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Dec 2020 23:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 225EA22A83
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 01:55:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbgLUXmo (ORCPT
+        id S1725998AbgLVBzs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Dec 2020 18:42:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44692 "EHLO
+        Mon, 21 Dec 2020 20:55:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725881AbgLUXmn (ORCPT
+        with ESMTP id S1725780AbgLVBzs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Dec 2020 18:42:43 -0500
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72E1C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 15:42:03 -0800 (PST)
-Received: by mail-qv1-xf2c.google.com with SMTP id 4so5272965qvh.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 15:42:03 -0800 (PST)
+        Mon, 21 Dec 2020 20:55:48 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFFD4C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 17:55:07 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id q25so13262983oij.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Dec 2020 17:55:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Ed16FIvb0jNPL1Xpyo7AQSNNI6DK983ulBqliW51yXE=;
-        b=Ld0d+dC/WhOLkvoZkFn+wWklkbmTsAKfILT3wc/iez3sDk2eZpMDqm9yqciT+WZ0Mj
-         758GuXgv8sobKk0rAb+YZfCogSawBdHE9MaVeaA1t/Y5IJbP8FgLw17LQ+oWBi9bXZ78
-         tlS3hs9CGMQZ0edGFWRoiAmcNwV1o0jibjJ7hYn3Kn1gL8E3Zu14N+w/c0RAWFJUe8yK
-         IT+Ooo09+QRVyV0cfPxy8e6lSWksjfXsquA2Kp+1a1PmLeX3S5cJ7myxTUz6rN9snT2P
-         IcJSctKbcMUtenhcr4X70Rizsv2va0+7lJ+P8SaCu6D35XFW6kQY8LULKYvsgSAnRq0K
-         djyA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=EEJ9XDEDxh32XxCT/9b3NAcSNe+PSiQul44bfGmlkRU=;
+        b=AR2cg79zchew2H3/ClYxVtztROrvesbovCjLjZiBWGrvDU1/9Z4is08ZdRxgisBb4T
+         ohEGb/GZz1Xl5wBdsxGaOjKqZCYgvNpMRWFLn+N23aQhq30ejsYupXjH2yfTaVMOAZ95
+         wP1R8icYVS3+jTPFckhlSGcrZzQiqIlLmJE6leWV4KImVlmAWiaD9K85bKzePxxHQ4e/
+         Vlreb+l7bR+nZuqnXiNIaVTTPhMh76ExSErRlAO8rHO5p+T3g9k437HIqbS6Z5N0LVvN
+         /lOslhsvdSx1NsgWH8SSUDlKXs/ZQsrgAQwkbxfcPSoNpHdwG92iy1KbdZkQvn14KL1s
+         ATpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Ed16FIvb0jNPL1Xpyo7AQSNNI6DK983ulBqliW51yXE=;
-        b=Od2y5AWfQzu4b1KgJbkOZx7bcMd23vyXMya74odlb0GbNiQzU3aNT9WJp/xJ/D4OoC
-         WyB7yAZIpFoj6w+I42S8sMQ3ahc1KsHcQTgS3Xt+zKrQzqiifI/4mF63x7vwVtg04LL5
-         0Cs+ibW2y54dsNA9jkpt09rouQb3pZmO+H3viYnrr7kuuQS0Hmmla7lqORK3f6cJphDg
-         DIANC5t+cBWmWUepEM6GkuAlkeAhwRzp536k83Y3lbkrJM2rlbijKqIuGUH4/gQKRp3s
-         kj0aLf/j5XTmRVB3tvbXTLsIdXLwR0yTv5vNbiAWaM+Vv5MyolaPrI2XgyWCpAX3QgYv
-         USuw==
-X-Gm-Message-State: AOAM531ig8BO+N4zKRLF+6peLz0a2bOhI/ilTsoO+cDdU4u/kSvWjiJC
-        qtv66mWg/GtnS2bETXXvE9OFTJ1dusSczw==
-X-Google-Smtp-Source: ABdhPJxcG4IqFuM4C/y3xGkTZAGQb5PZ7t3EkF2L2t3V4PDmEPEII286uAMQ5HHzxB6zOpzTvgzeQQ==
-X-Received: by 2002:a0c:f991:: with SMTP id t17mr19349357qvn.6.1608594122699;
-        Mon, 21 Dec 2020 15:42:02 -0800 (PST)
-Received: from [172.17.0.2] ([40.79.66.247])
-        by smtp.gmail.com with ESMTPSA id 102sm10838059qtg.45.2020.12.21.15.42.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Dec 2020 15:42:02 -0800 (PST)
-Message-ID: <5fe132ca.1c69fb81.982f9.47c3@mx.google.com>
-Date:   Mon, 21 Dec 2020 15:42:02 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5940953984446061014=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=EEJ9XDEDxh32XxCT/9b3NAcSNe+PSiQul44bfGmlkRU=;
+        b=NPa67205GBok54kH9mohrzFsa0OAqwiitBu3d6d/4Gb/9FLjJwoERAj5VaJpDJsXjG
+         pPX40qideqNvNseuKl/GXL4FmKps1unjK0iM7oZqEjJwo3qUXta5O2P7k2Jml1sR6mrx
+         GwCzcCQEt4Ip6Yrd3OrX/NeRhaASzy2gFIYPgZwe7kut2WoMVzaNP2QouPmkAJMLuMEl
+         4a6AkMiiiDLCRuum7uPNdpZG8z6tv7iXFkfki8OUqcVi0fL73e1+c9CttawUkMPDEGRx
+         mVgJGdorUqzYue8hlVxDqG15Mmm7K45cLd/FnyrXD3obS50RrhCmkX5rozj3w9zogFfV
+         frxw==
+X-Gm-Message-State: AOAM531pJGtWa14JPKXga5TG5BfBa9UJUbS3JD1PwbPbg+ednK6iLAd3
+        rY5jJqPB7hzMQr9ZXsJK8ojjfAmewMqxX4IEaNQ=
+X-Google-Smtp-Source: ABdhPJzVQbMvtLYMMm8JiJrbVMJOlz6uzdri9QtVnlYnJfVRjgc13YlNYMlANUNJ8CYdbgx50Y8H0alAw4cAH+J2Rfk=
+X-Received: by 2002:aca:f456:: with SMTP id s83mr12845702oih.58.1608602107332;
+ Mon, 21 Dec 2020 17:55:07 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/4] lib: Add definitions for ISO socket
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201221230140.2100824-1-luiz.dentz@gmail.com>
-References: <20201221230140.2100824-1-luiz.dentz@gmail.com>
+References: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
+ <CABBYNZKy4KXWqLdZu7C49jJ_nMbmBOdMjtM2_5OQg2ruUHUh_w@mail.gmail.com> <20201221211437.4s27cl6t4v27sugh@pali>
+In-Reply-To: <20201221211437.4s27cl6t4v27sugh@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 21 Dec 2020 17:54:56 -0800
+Message-ID: <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
+Subject: Re: Default to HW mSBC on capable controllers ?
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc:     Joakim Tjernlund <Joakim.Tjernlund@infinera.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5940953984446061014==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pali,
 
-This is automated email and please do not reply to this email!
+On Mon, Dec 21, 2020 at 1:14 PM Pali Roh=C3=A1r <pali@kernel.org> wrote:
+>
+> On Friday 18 December 2020 11:43:32 Luiz Augusto von Dentz wrote:
+> > Hi Joakim,
+> >
+> > On Fri, Dec 18, 2020 at 10:48 AM Joakim Tjernlund
+> > <Joakim.Tjernlund@infinera.com> wrote:
+> > >
+> > > There seems to be quite a few USB controllers gaining the BTUSB_WIDEB=
+AND_SPEECH which I guess means HW mSBC but currently there is no way to sel=
+ect this mode.
+> > > Any idea if one could patch the kernel to default to HW mSBC and user=
+ apps like bluealsa/pulseaudio would just use it automatically?
+> >
+> > It is in our plan to support HW offloading, but that doesn't mean all
+> > platforms will be supported since that depends on the PCM lines being
+> > connected to BT controller in the first place.
+>
+> Dedicated PCM lines are used in embedded world and maybe also still in
+> some mobile segment. I remember that e.g. Nokia N900 had this setup. And
+> it was quite crazy how it was finally configured... but it worked!
+>
+> But this is nothing for classic x86 laptops with USB bluetooth
+> controllers on classic intel bluetooth+wifi mPCIe cards where SCO
+> traffic is routed via HCI (over USB). And not via dedicated PCM pins.
+> Moreover I think there are not any mainstream laptop which have PCM pins
+> on mPCIe slots usable for such bluetooth mPCIe cards.
+>
+> For classic desktop / laptop it is needed to deal with fact that SCO
+> audio is routed via HCI (like A2DP) and therefore support for Enhanced
+> Setup Synchronous Connection HCI command.
+>
+> AFAIK even for routing SCO over PCM when mSBC hw encoder is used,
+> Enhanced Setup Synchronous Connection HCI command is required.
 
-Dear submitter,
+So you are saying that we should do PCM over HCI and that would
+actually work (meaning we have enough bandwidth)? From power point of
+view this makes very little sense imo, since all the cycle we save on
+no encoding we probably lose with more data to transmit, so are we
+looking into use HW encoder just to fix the quality of codec?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=405035
-
----Test result---
-
-##############################
-Test: CheckPatch - FAIL
-Output:
-lib: Add definitions for ISO socket
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#55: FILE: lib/iso.h:1:
-+/*
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#73: FILE: lib/iso.h:19:
-+ *  along with this program; if not, write to the Free Software$
-
-ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
-#74: FILE: lib/iso.h:20:
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA$
-
-- total: 2 errors, 1 warnings, 81 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] lib: Add definitions for ISO socket" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-tools: Add isotest tool
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#91: FILE: tools/isotest.c:55:
-+static int defer_setup = 0;
-
-ERROR:GLOBAL_INITIALISERS: do not initialise globals to NULL
-#93: FILE: tools/isotest.c:57:
-+struct bt_iso_qos *iso_qos = NULL;
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#271: FILE: tools/isotest.c:235:
-+		syslog(LOG_ERR,"Can not listen on the socket: %s (%d)",
- 		              ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#276: FILE: tools/isotest.c:240:
-+	syslog(LOG_INFO,"Waiting for connection ...");
- 	               ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#284: FILE: tools/isotest.c:248:
-+			syslog(LOG_ERR,"Accept failed: %s (%d)",
- 			              ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#337: FILE: tools/isotest.c:301:
-+	syslog(LOG_INFO,"Receiving ...");
- 	               ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#353: FILE: tools/isotest.c:317:
-+	struct timeval tv_beg,tv_end,tv_diff;
- 	                     ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#353: FILE: tools/isotest.c:317:
-+	struct timeval tv_beg,tv_end,tv_diff;
- 	                            ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#399: FILE: tools/isotest.c:363:
-+		syslog(LOG_INFO,"%ld bytes in %.2f sec speed %.2f kb/s", total,
- 		               ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#409: FILE: tools/isotest.c:373:
-+	syslog(LOG_INFO,"Opening %s ...", filename);
- 	               ^
-
-ERROR:SPACING: space required after that ',' (ctx:VxV)
-#455: FILE: tools/isotest.c:419:
-+	syslog(LOG_INFO,"Sending ...");
- 	               ^
-
-ERROR:SPACING: space required before the open brace '{'
-#519: FILE: tools/isotest.c:483:
-+		for (i = 0; i < 10; i++){
-
-ERROR:SPACING: space prohibited before that ',' (ctx:WxV)
-#661: FILE: tools/isotest.c:625:
-+int main(int argc ,char *argv[])
-                   ^
-
-ERROR:SPACING: space required after that ',' (ctx:WxV)
-#661: FILE: tools/isotest.c:625:
-+int main(int argc ,char *argv[])
-                   ^
-
-ERROR:SPACING: space required before the open parenthesis '('
-#683: FILE: tools/isotest.c:647:
-+		switch(opt) {
-
-WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
-#797: FILE: tools/isotest.c:761:
-+		/* Fallthrough */
-
-- total: 15 errors, 1 warnings, 862 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] tools: Add isotest tool" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-btio: Add support for ISO sockets
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#52: FILE: btio/btio.c:781:
-+		int error = -errno;
-+		ERROR_FAILED(err, "sco_bind", errno);
-
-- total: 0 errors, 1 warnings, 419 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] btio: Add support for ISO sockets" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - FAIL
-Output:
-lib: Add definitions for ISO socket
-3: B6 Body message is missing
-
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5940953984446061014==--
+--=20
+Luiz Augusto von Dentz
