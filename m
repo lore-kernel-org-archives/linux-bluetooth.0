@@ -2,105 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA25C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 06:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E6AC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 07:54:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EA6F20449
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 06:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6573220729
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 07:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727310AbgLWGWu (ORCPT
+        id S1727749AbgLWHy3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Dec 2020 01:22:50 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55596 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726969AbgLWGWu (ORCPT
+        Wed, 23 Dec 2020 02:54:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59032 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727050AbgLWHy2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Dec 2020 01:22:50 -0500
-Received: from [172.20.10.2] (tmo-108-60.customers.d1-online.com [80.187.108.60])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 63BB2CECD2;
-        Wed, 23 Dec 2020 07:29:25 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH] Bluetooth: btrtl: Add null check in setup
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20201222184753.1.I9438ef1f79fa1132e74c67b489123291080b9a8c@changeid>
-Date:   Wed, 23 Dec 2020 07:22:06 +0100
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Daniel Winkler <danielwinkler@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <2CD614F7-0E7D-4BC2-AF81-50A1962DC760@holtmann.org>
-References: <20201222184753.1.I9438ef1f79fa1132e74c67b489123291080b9a8c@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3654.40.0.2.32)
+        Wed, 23 Dec 2020 02:54:28 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA3CC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 23:53:47 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id o19so38106100lfo.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 23:53:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nvds22pi5MEw2ZW5T62SoKKKSYY5H17iYaJRDS7x/JU=;
+        b=GIj0NMVn5UTSkYHLvII8fk4jEq5p05+ATlhU62PIA+F1ybnyOk1b3tBMfVpr/6yoqk
+         reRUyHTyyMEDIBbvIZ3KFLjNn+lF3VqECY8xyc0QvXVqT9cCBcsf8b33oSAKAaHjOkb0
+         E8khP48aJSRGaruivF8F+i4AxGcnsMESKBM6Un8yqSWeMWqX1R8hThrtEahNbb334mOh
+         5LkTS6DAezkk9jcOg9GQPf0G++WiFu7RGWwNla5PidbeT7QwW1Jn3GQccmZKWLJzveDr
+         KGnSQphSrkJvQC5Tm3kd1lyWH8Rs6h99HXVMobLtKd9pSO4ikP9eQMecytgoiCuN1HW0
+         xvpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nvds22pi5MEw2ZW5T62SoKKKSYY5H17iYaJRDS7x/JU=;
+        b=RBO4+Kt5R59hjtuwOaq7rmkMnJeil43Yc/dWfdjwwsU4PkVMYQfzXb95CIAXb0jno9
+         eN3FVhjRKUGJfIteB7Os00JwdHBB5rvMEoaqtAJ4hIKDC9PX4xDIRxJkZ8vNYbVvQyy3
+         ynwMxWsjfaXoC4b1Eea3a/c+dQMg0u1DeqAZIK+FvD8jxtg0RFEies13pgO/Qr4WpLWs
+         H3XaaV/GfqzFbe8eAOHoIgnCc+7cEYwv3yayxazA+YgMGzUGPrrL2O7Go4W9JT09yd/2
+         nZAXRlvxpFiq959NTcMAhB4TJ6apTVTvNhio4yusQWzd79qky3hyqfCokZCiJLrh8BZD
+         LmCA==
+X-Gm-Message-State: AOAM533Pncmzb+vjD6Zl+Uj30Mth3wyi1gximuet+UL9yNwhvfAOrR2o
+        OwN+n1mRWlZnF+nvATpPG8NU5lZ9ng4jJzZ6SR4=
+X-Google-Smtp-Source: ABdhPJycYUgarBrIXvDXRjMmcVBNDiwNreZuzeLULCObDYSVBLm0omAaJksPIUVEpb6m5SC89e5l/yXF63C7FhlA2uQ=
+X-Received: by 2002:ac2:4946:: with SMTP id o6mr9760013lfi.412.1608710026498;
+ Tue, 22 Dec 2020 23:53:46 -0800 (PST)
+MIME-Version: 1.0
+References: <CAG17S_Oy_N_YPo6x5pmZ05p4MqH_gDUrRS0TR3ydQVG9BvmYEw@mail.gmail.com>
+In-Reply-To: <CAG17S_Oy_N_YPo6x5pmZ05p4MqH_gDUrRS0TR3ydQVG9BvmYEw@mail.gmail.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Wed, 23 Dec 2020 07:53:34 +0000
+Message-ID: <CAAu3APaGmCAA8JGKgFcg4wzJLT4y05BhvYu6uA05COdvEyauow@mail.gmail.com>
+Subject: Re: Request for help with btmgmt
+To:     KeithG <ys3al35l@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hello Keith,
 
-> btrtl_dev->ic_info is only available from the controller on cold boot
-> (the lmp subversion matches the device model and this is used to look up
-> the ic_info). On warm boots (firmware already loaded),
-> btrtl_dev->ic_info is null.
-> 
-> Fixes: 05672a2c14a4 (Bluetooth: btrtl: Enable central-peripheral role)
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
-> 
-> drivers/bluetooth/btrtl.c | 23 +++++++++++++----------
-> 1 file changed, 13 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 1abf6a4d672734f..978f3c773856b05 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -719,16 +719,19 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
-> 	 */
-> 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> 
-> -	/* Enable central-peripheral role (able to create new connections with
-> -	 * an existing connection in slave role).
-> -	 */
-> -	switch (btrtl_dev->ic_info->lmp_subver) {
-> -	case RTL_ROM_LMP_8822B:
-> -		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-> -		break;
-> -	default:
-> -		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
-> -		break;
-> +	if (btrtl_dev->ic_info) {
-> +		/* Enable central-peripheral role (able to create new
-> +		 * connections with an existing connection in slave role).
-> +		 */
-> +		switch (btrtl_dev->ic_info->lmp_subver) {
-> +		case RTL_ROM_LMP_8822B:
-> +			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-> +			break;
-> +		default:
-> +			rtl_dev_dbg(hdev,
-> +				    "Central-peripheral role not enabled.");
-> +			break;
-> +		}
-> 	}
+On Wed, 23 Dec 2020 at 00:34, KeithG <ys3al35l@gmail.com> wrote:
+>
+> I am developing a RPi based audio player. We are trying to add
+> bluetooth capability to this player. We use alsa and not pulse-audio,
+> so we need a bit more granular info to get it to run. I have written a
+> script which is designed to be triggered by udev when a BT device is
+> added or removed. This script will then use bluetoothctl to get the
+> capabilities of the device and also add or remove it from a dynamic
+> database list of MACs in redis. I have a simple script working as I
+> want from the cli. The key command I am using is 'btmgmt con' which is
+> the only command I have found that tells me what MACs are currently
+> connected. I can run this command from the command line as root. I can
+> set the setuid bit of btmgmt and also get it to run as a user (http in
+> this case). I cannot, ever, get this command to run when triggered
+> from udev. I get no response and no error.
+>
+> 1) Why is this particular command (query attached BT MACs) not part of
+> bluetoothctl?  Is there a security issue?
+> 2) Why can I not run 'btmgmt con' in a script (bash or php) triggered
+> by udev when the device is added or removed?
+> 3) is there a 'better way' for me to know what device MAC addresses
+> are attached? I have not found another simple way to get this info.
+>
+> What I am doing in the script is: if an audio source is attached, I
+> want to run a bluealsa-aplay service. When an audio sink is attached,
+> I want to re-set my audio output to the bluealsa device. If it is not
+> an audio device, I do not care, but do keep track of what is attached
+> in my database so that the next time the script runs that it is not
+> queried and is 'known'.
+>
+> Thanks for the help.
+>
+> Keith
 
+I would suggest that the D-Bus API would be a more appropriate way to
+get the information you want.
 
-	if (!btrtl_dev->ic_info)
-		goto done;
+The "get managed objects" functionality is a good way to iterate
+through all the devices that BlueZ knows about.
+There are examples at:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/bluezutils.py
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/list-devices
 
-> 
-> 	btrtl_free(btrtl_dev);
+The D-Bus API also allows your code to execute callbacks when a device
+is added or its connection state changes.
+This is done with the InterfacesAdded and PropertiesChanged signals.
 
-Regards
+If you are going to use Python I would suggest the
+https://pypi.org/project/pydbus/ library is a more "Pythonic" set of
+D-Bus bindings.
 
-Marcel
+The API is documented at:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc
 
+Regards,
+Barry
