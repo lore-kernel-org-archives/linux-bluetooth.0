@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E388C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70913C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:35:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B7412333D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48D062245C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:35:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730608AbgLWCZs (ORCPT
+        id S1730272AbgLWCel (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 21:25:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55386 "EHLO mail.kernel.org"
+        Tue, 22 Dec 2020 21:34:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51348 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730595AbgLWCZq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:25:46 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 726272256F;
-        Wed, 23 Dec 2020 02:25:30 +0000 (UTC)
+        id S1730310AbgLWCYr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:24:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EAC5C2313F;
+        Wed, 23 Dec 2020 02:24:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608690331;
+        s=k20201202; t=1608690271;
         bh=zPXB7wyDekSdccQ22KuAKpHqjNfCvVWvWNbp+TJu9ME=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IV9V+T6VslvwJxRN5XfdWjFa6z+Xxt3XDSUF4YiIjmWZyC+B3bYl6/TfbzCxIRfvC
-         2Iyqmgn3S9EU/fqvXmB5hOy8rG/ZJnGvesmJLULD1yXQOOND+9bWwUDH4BKYXini+I
-         CqfQgXdUVB/F5N4CDpJV4aMcZIA9J4lEIFYKtB00El4WFRmfou+xlujvYux7id8qCL
-         z2fRPHvo2MxrMZKJbRG310Vzg5f71vg1KUNNJBfRkAJqHcRO9i1bTwLCNMWXmUgCxq
-         9bHFcThY9stbyRQh2Sj31pD82d/lh8I0AhQOgyEab1lDBTqwQbh7Cdi2Xp3rl7Z5kC
-         voXxUH2StF40g==
+        b=MZ5aUR0rAsSfRo8SOQHlctmJxjRJrYyLGjxZ6O6LeKFhT52EWa6yNxCoI0NerhXEp
+         5KzE+cEwUoIuZe9u9qJshnLMBYe2K+KcjAnodiIxarxnm6hmZwk7BkoTD/CMnA6SV0
+         hRe0E9qzE1glYxxdqXsTDB1iLkH7sH7mSRgOZiytnoP0TP+TR0bWQ5s4w0cvG5a2io
+         O0ZUNOrYE/j7dnvZjiB6z5fEGSYGS9Z4yvNWjnag1IX9DrcvimIFF73j7n1dRz/QjQ
+         QnLoEnaW//vMvk8+x9Qg8yOVJ17ttK6eMtnRr/++xOFSdAze00Nez/s3a2dtfvZ74O
+         GYrXqITujVrBw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     =?UTF-8?q?Ole=20Bj=C3=B8rn=20Midtb=C3=B8?= <omidtbo@cisco.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 11/38] Bluetooth: hidp: use correct wait queue when removing ctrl_wait
-Date:   Tue, 22 Dec 2020 21:24:49 -0500
-Message-Id: <20201223022516.2794471-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 12/48] Bluetooth: hidp: use correct wait queue when removing ctrl_wait
+Date:   Tue, 22 Dec 2020 21:23:40 -0500
+Message-Id: <20201223022417.2794032-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201223022516.2794471-1-sashal@kernel.org>
-References: <20201223022516.2794471-1-sashal@kernel.org>
+In-Reply-To: <20201223022417.2794032-1-sashal@kernel.org>
+References: <20201223022417.2794032-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
