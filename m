@@ -2,230 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467CCC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93463C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:33:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0902322AAC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:27:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EA5B20691
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725994AbgLWA1c (ORCPT
+        id S1725912AbgLWAdk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 19:27:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
+        Tue, 22 Dec 2020 19:33:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725931AbgLWA1c (ORCPT
+        with ESMTP id S1725833AbgLWAdj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 19:27:32 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 303ADC061793
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:26:52 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id i5so1399273pgo.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:26:52 -0800 (PST)
+        Tue, 22 Dec 2020 19:33:39 -0500
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D0AC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:32:59 -0800 (PST)
+Received: by mail-ot1-x336.google.com with SMTP id 11so13586309oty.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=C2pZOr5Pj/yxGUKqlwUvnOKWDpBqQvQqPWcy7JPxuP8=;
-        b=p+JSTCVwq0H1WaVkb+hLCURtHdzs/HeuRdNHRkMfRtCvwzpTx0X4x5KJoKe0cadYw+
-         2/AwGSOvGhdOQN9bitP8Or+7taV9hx8XPI2RMhP6+3kvpeaRkO8dREtvKOmPg2USCfHe
-         B9l+fP6tv53B/BqGvF8uMqXzYW9Lz9sqHCYasrUUzhCO/2MNXJ1aXNq/6X0H4Ssf1SbF
-         3GpbhPuYefcWADl+OfIAlJynoS5qAd9dY86kjIhqxLQCpA7v6rEhWbE02w4dc7hXirEB
-         04PFeLyuvL3eBHgmGMCf3ZRoyTiLcmLpK0A3kZ+9VMHa9p6z0G1stvrKBYVSntmZBN83
-         H9Bg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=AczVIt4rKkWxgHRY6Pli8wC1ntZ5Dqn8zf7cOqXQQQs=;
+        b=eTXEe+vryKI2hg5CdxG9B0j75ov2iTKbHi8dE5/C6QDmG1Vv1r0J9YojpLoIOHquUu
+         DYOjPyTITFiPokNitvAB1AoouAbwkUGjy2Gc+thFuNuhcouR5iBLmS/zE9enYSI38Nta
+         /uaP95h82H706CzNP9KG+bre7u6UjArjbZJjOE9QWMvX6fwldLwXsAoxR8m8/YqGF2JM
+         YKTCSejs5qch2bammUloGrqt50+AvUoXx0+449yMJdYilFD+aVxBrkGNwxE0axIgVcOK
+         mI7ui6WfKf65IVqb7EjcONOawVzjc435OMrcaUg+KIEc4sQnGbxaE3FFyyFP2cAJbbvh
+         s+OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=C2pZOr5Pj/yxGUKqlwUvnOKWDpBqQvQqPWcy7JPxuP8=;
-        b=qo4mVS6xTY49s5xhN5oLO3sz3UnTlK4cZQVwdS2M/A7nc9msWkob76Y7siCLoBU0ZB
-         rL39sxfqLn3uKEb4XRogGm5EbSbfTn1GHzhII/0OoZi/SPoTcZyGJ3wTyTfkIlbCceTu
-         szFc7JepO9zRS5JOBevQ3X9IK2D7CgIJCAKFKAYWF0gPN92X9AmGheQlW56xdMDvO7NF
-         WWFNrfb3u7Qf1mM2947ZgO6NOjdFT7lq6RqxsOj7swk3utFrn0iU/3OK+OeI5pDufyeh
-         zS05AIySOAWpXoLUAsZWDVTFNZPex6L/jI+OS+2GgL2mVQ8zdQQxbKAekYjFR6WA/jt4
-         EjQA==
-X-Gm-Message-State: AOAM530cQNmoGick6r9dBRzY/Wo8tCYgkZHTJe0krKi63PTv1cRFOngp
-        /z4hGa9T+6CjF79MitKCqULt+6liJYY=
-X-Google-Smtp-Source: ABdhPJzkJpQmRvk8haYUac10trSgJrx0LmVz8CJJb7WO7mK64ZYUpfi1/Y+2zMmKPyWnS/rTq0DxrA==
-X-Received: by 2002:a63:5924:: with SMTP id n36mr10555382pgb.9.1608683211397;
-        Tue, 22 Dec 2020 16:26:51 -0800 (PST)
-Received: from localhost.localdomain (c-73-164-224-32.hsd1.or.comcast.net. [73.164.224.32])
-        by smtp.gmail.com with ESMTPSA id 8sm5505566pfz.93.2020.12.22.16.26.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 16:26:50 -0800 (PST)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-X-Google-Original-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     danielwinkler@google.com, tedd.an@intel.com
-Subject: [PATCH 3/3] tools/mgmt-tester: Adds new test data with updated tx power
-Date:   Tue, 22 Dec 2020 16:26:33 -0800
-Message-Id: <20201223002633.187612-3-tedd.an@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201223002633.187612-1-tedd.an@intel.com>
-References: <20201223002633.187612-1-tedd.an@intel.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=AczVIt4rKkWxgHRY6Pli8wC1ntZ5Dqn8zf7cOqXQQQs=;
+        b=ZJo+HPqc6sDT69esP5MPQfTnBIcLgzjdh19LrxN+6UCKl/9ByylmMEVCWWpiMVpP4z
+         7vwWqkK3mRsL99tkkQC5G5Im6z6iiZs/tDpg1hEhtXOKD+56tOQpcDciDHlTGrI4ckhc
+         uw0oCkxJ8iTeD8VeKW9QUhuyCUBA0xnA/3PQc9ZCVfC0K8S3n9+8xkui2nuaWL4GkrOc
+         FWIAedIUQ6Rh9IadAwpvO9kavaG1Fndq6a5k0mXTd/QY7SDdprM+f6Hu9dyn5UNCiUte
+         1iV1NP+11fg9JS/XehBCqQovfNf+lsxzNRX3tUNDskOd3b6IWoxngZ6VX8hy0yX0Cvgw
+         fsTQ==
+X-Gm-Message-State: AOAM530BHvDx32Mvh01MHjO99uqLR4i+ca6RJ8GtS3hXyIasiLNL8Pdl
+        O+4sQDlxr1ac3h3s7KOftmzsXz4lhc3QeepdLZARlIGQzoo=
+X-Google-Smtp-Source: ABdhPJx/ebVN7eoD1idt8NjGs3PPUhAem/A5oRa/F5UPJzRkEb6nHJU96yxM7YgKets50ANjB29s4iE3z3Twnk84LoE=
+X-Received: by 2002:a9d:664f:: with SMTP id q15mr17011389otm.40.1608683578729;
+ Tue, 22 Dec 2020 16:32:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   KeithG <ys3al35l@gmail.com>
+Date:   Tue, 22 Dec 2020 18:32:48 -0600
+Message-ID: <CAG17S_Oy_N_YPo6x5pmZ05p4MqH_gDUrRS0TR3ydQVG9BvmYEw@mail.gmail.com>
+Subject: Request for help with btmgmt
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds new test data for the ext advertising test cases that
-presets the advertising parameter and toggles the connectable flags.
+I am developing a RPi based audio player. We are trying to add
+bluetooth capability to this player. We use alsa and not pulse-audio,
+so we need a bit more granular info to get it to run. I have written a
+script which is designed to be triggered by udev when a BT device is
+added or removed. This script will then use bluetoothctl to get the
+capabilities of the device and also add or remove it from a dynamic
+database list of MACs in redis. I have a simple script working as I
+want from the cli. The key command I am using is 'btmgmt con' which is
+the only command I have found that tells me what MACs are currently
+connected. I can run this command from the command line as root. I can
+set the setuid bit of btmgmt and also get it to run as a user (http in
+this case). I cannot, ever, get this command to run when triggered
+from udev. I get no response and no error.
 
-When the adv instance is created, it updates the default tx power with
-the value read from the controller. After toggling the connectable flag,
-the host uses the tx_power stored in the adv list cache, which is the
-value read from the controller, instead of the default tx power
-value(127).
----
- tools/mgmt-tester.c | 88 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 80 insertions(+), 8 deletions(-)
+1) Why is this particular command (query attached BT MACs) not part of
+bluetoothctl?  Is there a security issue?
+2) Why can I not run 'btmgmt con' in a script (bash or php) triggered
+by udev when the device is added or removed?
+3) is there a 'better way' for me to know what device MAC addresses
+are attached? I have not found another simple way to get this info.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index d9d7b3430..fe73a6d89 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -7592,6 +7592,24 @@ static const struct generic_data add_ext_advertising_success_15 = {
- 	.expect_hci_len = sizeof(set_connectable_on_ext_adv_param),
- };
- 
-+static uint8_t preset_connectable_on_ext_adv_param[] = {
-+	0x01,					/* Handle */
-+	0x13, 0x00,				/* Event type */
-+	0x00, 0x08, 0x00,			/* min_interval */
-+	0x00, 0x08, 0x00,			/* max_interval */
-+	0x07,					/* channel_map */
-+	0x00,					/* own_addr_type */
-+	0x00,					/* peer_addr_type */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* peer_addr */
-+	0x00,					/* filter_policy */
-+	0x00,					/* Tx power */
-+	0x01,					/* Primary PHY */
-+	0x00,					/* primary adv max skip */
-+	0x01,					/* Secondary PHY */
-+	0x00,					/* adv sid*/
-+	0x00,					/* Scan req notification */
-+};
-+
- static const struct generic_data add_ext_advertising_success_16 = {
- 	.send_opcode = MGMT_OP_SET_CONNECTABLE,
- 	.send_param = set_connectable_on_param,
-@@ -7600,8 +7618,26 @@ static const struct generic_data add_ext_advertising_success_16 = {
- 	.expect_param = set_connectable_settings_param_3,
- 	.expect_len = sizeof(set_connectable_settings_param_3),
- 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
--	.expect_hci_param = set_connectable_on_ext_adv_param,
--	.expect_hci_len = sizeof(set_connectable_on_ext_adv_param),
-+	.expect_hci_param = preset_connectable_on_ext_adv_param,
-+	.expect_hci_len = sizeof(preset_connectable_on_ext_adv_param),
-+};
-+
-+static uint8_t preset_connectable_off_ext_adv_param[] = {
-+	0x01,					/* Handle */
-+	0x10, 0x00,				/* Event type */
-+	0x00, 0x08, 0x00,			/* min_interval */
-+	0x00, 0x08, 0x00,			/* max_interval */
-+	0x07,					/* channel_map */
-+	0x01,					/* own_addr_type */
-+	0x00,					/* peer_addr_type */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* peer_addr */
-+	0x00,					/* filter_policy */
-+	0x00,					/* Tx power */
-+	0x01,					/* Primary PHY */
-+	0x00,					/* primary adv max skip */
-+	0x01,					/* Secondary PHY */
-+	0x00,					/* adv sid*/
-+	0x00,					/* Scan req notification */
- };
- 
- static const struct generic_data add_ext_advertising_success_17 = {
-@@ -7612,8 +7648,8 @@ static const struct generic_data add_ext_advertising_success_17 = {
- 	.expect_param = set_le_settings_param_2,
- 	.expect_len = sizeof(set_le_settings_param_2),
- 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
--	.expect_hci_param = set_connectable_off_ext_adv_param,
--	.expect_hci_len = sizeof(set_connectable_off_ext_adv_param),
-+	.expect_hci_param = preset_connectable_off_ext_adv_param,
-+	.expect_hci_len = sizeof(preset_connectable_off_ext_adv_param),
- };
- 
- static const struct generic_data add_ext_advertising_le_off = {
-@@ -8240,6 +8276,24 @@ static void setup_add_advertising_1m(const void *test_data)
- 						NULL, NULL);
- }
- 
-+static uint8_t preset_connectable_on_ext_pdu_adv_param[] = {
-+	0x01,					/* Handle */
-+	0x01, 0x00,				/* Event type */
-+	0x00, 0x08, 0x00,			/* min_interval */
-+	0x00, 0x08, 0x00,			/* max_interval */
-+	0x07,					/* channel_map */
-+	0x00,					/* own_addr_type */
-+	0x00,					/* peer_addr_type */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* peer_addr */
-+	0x00,					/* filter_policy */
-+	0x00,					/* Tx power */
-+	0x01,					/* Primary PHY */
-+	0x00,					/* primary adv max skip */
-+	0x01,					/* Secondary PHY */
-+	0x00,					/* adv sid*/
-+	0x00,					/* Scan req notification */
-+};
-+
- static const struct generic_data add_ext_advertising_conn_on_1m = {
- 	.send_opcode = MGMT_OP_SET_CONNECTABLE,
- 	.send_param = set_connectable_on_param,
-@@ -8248,8 +8302,8 @@ static const struct generic_data add_ext_advertising_conn_on_1m = {
- 	.expect_param = set_connectable_settings_param_3,
- 	.expect_len = sizeof(set_connectable_settings_param_3),
- 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
--	.expect_hci_param = set_connectable_on_ext_pdu_adv_param,
--	.expect_hci_len = sizeof(set_connectable_on_ext_pdu_adv_param),
-+	.expect_hci_param = preset_connectable_on_ext_pdu_adv_param,
-+	.expect_hci_len = sizeof(preset_connectable_on_ext_pdu_adv_param),
- };
- 
- static void setup_add_advertising_connectable_1m(const void *test_data)
-@@ -8282,6 +8336,24 @@ static void setup_add_advertising_connectable_1m(const void *test_data)
- 						NULL, NULL);
- }
- 
-+static uint8_t preset_connectable_off_ext_1m_adv_param[] = {
-+	0x01,					/* Handle */
-+	0x00, 0x00,				/* Event type */
-+	0x00, 0x08, 0x00,			/* min_interval */
-+	0x00, 0x08, 0x00,			/* max_interval */
-+	0x07,					/* channel_map */
-+	0x01,					/* own_addr_type */
-+	0x00,					/* peer_addr_type */
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* peer_addr */
-+	0x00,					/* filter_policy */
-+	0x00,					/* Tx power */
-+	0x01,					/* Primary PHY */
-+	0x00,					/* primary adv max skip */
-+	0x01,					/* Secondary PHY */
-+	0x00,					/* adv sid*/
-+	0x00,					/* Scan req notification */
-+};
-+
- static const struct generic_data add_ext_advertising_conn_off_1m = {
- 	.send_opcode = MGMT_OP_SET_CONNECTABLE,
- 	.send_param = set_connectable_off_param,
-@@ -8290,8 +8362,8 @@ static const struct generic_data add_ext_advertising_conn_off_1m = {
- 	.expect_param = set_le_settings_param_2,
- 	.expect_len = sizeof(set_le_settings_param_2),
- 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
--	.expect_hci_param = set_connectable_off_ext_1m_adv_param,
--	.expect_hci_len = sizeof(set_connectable_off_ext_1m_adv_param),
-+	.expect_hci_param = preset_connectable_off_ext_1m_adv_param,
-+	.expect_hci_len = sizeof(preset_connectable_off_ext_1m_adv_param),
- };
- 
- static const uint8_t get_phy_param[] = {
--- 
-2.25.1
+What I am doing in the script is: if an audio source is attached, I
+want to run a bluealsa-aplay service. When an audio sink is attached,
+I want to re-set my audio output to the bluealsa device. If it is not
+an audio device, I do not care, but do keep track of what is attached
+in my database so that the next time the script runs that it is not
+queried and is 'known'.
 
+Thanks for the help.
+
+Keith
