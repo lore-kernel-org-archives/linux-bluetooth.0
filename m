@@ -2,104 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE914C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 21:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1305FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:27:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1C6122AAF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Dec 2020 21:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5D7E22A83
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:27:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727610AbgLVVYy (ORCPT
+        id S1725961AbgLWA1a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 16:24:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47126 "EHLO
+        Tue, 22 Dec 2020 19:27:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727071AbgLVVYy (ORCPT
+        with ESMTP id S1725931AbgLWA1a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 16:24:54 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B66CC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 13:24:14 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id a109so13248243otc.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 13:24:14 -0800 (PST)
+        Tue, 22 Dec 2020 19:27:30 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5162FC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:26:50 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id 11so9382824pfu.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:26:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yDeH2EyE3QYGPcn75Ulnfm0MAO3kSqjwbZe0nKe92qk=;
-        b=Vdpa8pWWnyRLdcljBV/Jcm5bzK36TeOnY4jEafGoP2UJlDNwYXI/Vmj+IgE7RanJ1K
-         8m8dJOCdj00+T2Q4iex3u6PwX3Cy9xG+nEC7iuKuUzXqlUOSUtB8CEAc+RF40u8HD9hB
-         5PUc8X8Bse1aahK/WofvnjVNc/cBtpmiFSvgk/BkTbJeLiRV/50BVHPfqEQfpdoAyb7+
-         obcFPLjAw8x+5g82n7ybB+pZCcnV+FrdDqIDjET9Oazl7EJ46VaVqk73KTpXX9tbCEJu
-         JgxZyZA4rya1Uey3noGXloFjYZOOMR/5KQXuU3ZTe2MCe6dH8DU45E1wUz2fv93fyC9O
-         0sMw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WhaJfM0GPYUTenVkreTx0tBcGxFFAiF25O5tAuWQsQU=;
+        b=SdmY1tJPlN/ofE50370H3+X/nFeKxw62qKNyktex4cPIjQ/5QM1y7EfxK+WTINlRG/
+         LwM1n8ZSqPSYo2cq0g9yozXbQuWDecWFkRcQWAL2TfsrqLIgz0gluUkUVkoVNFO0GmoM
+         vQZzIE/PRkjB0nCpqonNvpsBAVhe+EtHgic5VFjlL2OCTdrIgZi9+r/br0ht5OjCszlt
+         dmeh2ckr4xBGGFEvW+inx5IUCHAbYJVGxuN52wqWVWquEM6EBniRsjVv88N5dSKqX+me
+         SYP3yYsVdqhhbKeH39On/W8moM9ovDmluHM0wZBLGdZZnzo73OyzJGJSjG0GVKXvOiOI
+         cIMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yDeH2EyE3QYGPcn75Ulnfm0MAO3kSqjwbZe0nKe92qk=;
-        b=I+CSLZ36IztMKab1W/Xcy3j/05d2FF9F+kjElUmT9X0070kiuvocr2HUwcuRCoSRxm
-         T9aHbV2ZTiGvIXLnuuvesHvTbA4Wxmzby6H/qegVsDDDRZvYfzmXX5ZpLsPR5TjQg/kT
-         s1OYAUsZGsgxXn1Pzxf2H4w7d7WGrjNpJWqfswBXdgdU1oEY3Fgeh8KmPD8dnCnfpDYA
-         T2fK7wzKGpbaqHALl6FAftIvU2j4yY611JxC/9sOzQUbKsW2745wg19V6uFzNoHkx4ng
-         IcfhzA6UuC3hXPeem3C2EZR8oZFbBipJvjuS6Tb4NACHlSxwDzQOOAlSE5gS+U8xm1jl
-         TxxQ==
-X-Gm-Message-State: AOAM531QTEiJkdo/C/Jw1y48gNrZGSbMdleHQe0vzv98HCWb8abu/idU
-        ZRhLhUykpaD1NvkLO5rPcysSgUUc3O7xRRlz8b2QdQeM
-X-Google-Smtp-Source: ABdhPJyTm+59FcA8K2VdktQP4QF5AcSMDADEh7U78n54YCn6hoIsODGBFn6H80I9H1nILXJGKqBLdOn+sCZn3PEmRiM=
-X-Received: by 2002:a9d:6f17:: with SMTP id n23mr17349091otq.371.1608672253603;
- Tue, 22 Dec 2020 13:24:13 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WhaJfM0GPYUTenVkreTx0tBcGxFFAiF25O5tAuWQsQU=;
+        b=XjUUEtn/NMuaK86Hu3LkGeyfEfrBwmy2SpFO0TAkaCQJEKHpW5J68pElDeSq1lzTYT
+         uaJ/srkzYLnXyj/X1SuxonUxYEb5CFDT6PjQ6hWXiizMwnruKmpaLOX9jraqI+dZI/wc
+         zzKqW8psxUZUDBSGXDQaFUVWylyTwuKm0ihVR7mFm84a+FU5pwI+GcmY1HlO/39Akz8N
+         b2qutXCAbDUt6BW3+KELJYG2i8VejI/PI1Q/yalWCPdAwAj8nRYnp0Ff8CMiuQXahBxD
+         Y0k2kC8LGPLkKPudnWl5gRuH0ktmxSLfNadE0nJx3ith9byS8sfuUAmX7z9h2/LOu2hx
+         Ue2g==
+X-Gm-Message-State: AOAM532BHYd+l3XQz/HRzY8VRvkWsWXlLvLdjDMgm9XsNft82s2tNcfT
+        l3PuUTZ4/kMuFfR7EvXeebUj/JNsF2E=
+X-Google-Smtp-Source: ABdhPJyJbN2AlCMCvtEkV+yMithIu5RZYt40pjxhscJUOR6SFf7NWva0itv0SKi3ypANGrOwoGesHg==
+X-Received: by 2002:a63:dc44:: with SMTP id f4mr22067642pgj.281.1608683209758;
+        Tue, 22 Dec 2020 16:26:49 -0800 (PST)
+Received: from localhost.localdomain (c-73-164-224-32.hsd1.or.comcast.net. [73.164.224.32])
+        by smtp.gmail.com with ESMTPSA id 8sm5505566pfz.93.2020.12.22.16.26.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Dec 2020 16:26:48 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+X-Google-Original-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     danielwinkler@google.com, tedd.an@intel.com
+Subject: [PATCH 1/3] tools/mgmt-tester: Update sample data for adv features
+Date:   Tue, 22 Dec 2020 16:26:31 -0800
+Message-Id: <20201223002633.187612-1-tedd.an@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20201222204547.27839-1-jacob@teenage.engineering> <5fe25e1c.1c69fb81.113cd.5f32@mx.google.com>
-In-Reply-To: <5fe25e1c.1c69fb81.113cd.5f32@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 22 Dec 2020 13:24:02 -0800
-Message-ID: <CABBYNZLe39BOJ6f+gLPK_D3B6KTRcg06e=w_apRaKxJBh3fV0g@mail.gmail.com>
-Subject: Re: [BlueZ] btmon: fix buffer bound checks
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     jacob@teenage.engineering
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+This patch updates the expected sample data for advertising feature to
+include the changes for tx power.
+---
+ tools/mgmt-tester.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On Tue, Dec 22, 2020 at 1:02 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=405519
->
-> ---Test result---
->
-> ##############################
-> Test: CheckPatch - PASS
->
-> ##############################
-> Test: CheckGitLint - PASS
->
-> ##############################
-> Test: CheckBuild - PASS
->
-> ##############################
-> Test: MakeCheck - PASS
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
-
-Applied, thanks.
-
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index bef506134..d9d7b3430 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -4162,7 +4162,7 @@ static const struct generic_data read_adv_features_invalid_index_test = {
+ };
+ 
+ static const uint8_t read_adv_features_rsp_1[] =  {
+-	0x7f, 0x00, 0x00, 0x00,	/* supported flags */
++	0x7f, 0xf0, 0x00, 0x00,	/* supported flags */
+ 	0x1f,			/* max_adv_data_len */
+ 	0x1f,			/* max_scan_rsp_len */
+ 	0x05,			/* max_instances */
+@@ -4177,7 +4177,7 @@ static const struct generic_data read_adv_features_success_1 = {
+ };
+ 
+ static const uint8_t read_adv_features_rsp_2[] =  {
+-	0x7f, 0x00, 0x00, 0x00,	/* supported flags */
++	0x7f, 0xf0, 0x00, 0x00,	/* supported flags */
+ 	0x1f,			/* max_adv_data_len */
+ 	0x1f,			/* max_scan_rsp_len */
+ 	0x05,			/* max_instances */
+@@ -7137,7 +7137,7 @@ static const struct generic_data set_appearance_success = {
+ };
+ 
+ static const uint8_t read_adv_features_rsp_3[] =  {
+-	0xff, 0x0f, 0x00, 0x00,	/* supported flags */
++	0xff, 0xff, 0x00, 0x00,	/* supported flags */
+ 	0x1f,			/* max_adv_data_len */
+ 	0x1f,			/* max_scan_rsp_len */
+ 	0x01,			/* max_instances */
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
