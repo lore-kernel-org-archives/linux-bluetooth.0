@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCB0C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 03:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70416C43331
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 03:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C976820705
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 03:04:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EB76207B5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 03:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731176AbgLWDD7 (ORCPT
+        id S1731279AbgLWDHz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 22:03:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45430 "EHLO mail.kernel.org"
+        Tue, 22 Dec 2020 22:07:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46336 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728625AbgLWCT1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:19:27 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8A43C23384;
-        Wed, 23 Dec 2020 02:18:47 +0000 (UTC)
+        id S1728310AbgLWCSu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:18:50 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 90136233F7;
+        Wed, 23 Dec 2020 02:17:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608689928;
-        bh=T/VZIlNzE9W1wJeFx/Oo2JyFg8ywD/lUvkfv0SXgFmg=;
+        s=k20201202; t=1608689866;
+        bh=W3vxPzrl62JzvhaiVgfG6IiQpFYH0EJhKMheBix5Vso=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZmvrS862fNjHDSPjFbR5fiMq/9Bol++ABZ0lFkA/hG4WcWkUrpeOHKlTvJUmNTNiC
-         ssUAAwu0Q4tDqiIrpHeAhtsKYSQA7xfSeFTYPKfs3DpaXR/VLL94lSgW1Gy8jMCqPX
-         W4cb94VcdeO77Se9VLdHmrms4cirYp/O+P1CDCDbz3TUTzgtKHBHxaHIFYXdwLrmgS
-         8fcmriB8N7/Tey4rgDdewIabddIkhW8rzNgo65jH4of2jQXP29ep6/aD5r3Mza2Znr
-         syErjhIBIH0jOkwrIujI6SadzRD35R+mJvOrYRRcwkVhOUEJ/V51xV5k7nZNu8JEOs
-         ae1bd78iGwgkg==
+        b=Diz42vopnhdGsWNDutvuvjAaXa2gBY/02S3dPYnEb8dCN/H/DLMrNnPVSzB6/bNOY
+         AIydxX5pWp0798Xxiwr40J3RA6vH5A9lmJbA11fZOs+mt8WbIE+HGJlCfOQkh3WFb1
+         qe8AYrFfSRU7F4+f6FVEJ+P3IQ2AkvRZvAc2lDnnX+BbB7V0T4B8PclZvn8wqNSPJQ
+         9YTI46Z3QmVIluu7sABcB48D650jQk4yIq4WgERiL/4xgv5gYoxriRGEwfNmqgnyzO
+         XNVnYLYsJYuBlLRxWX2haCmYwYRVaxDILZ1Uk5BKZIl8w8+8z30s47SwN9YWnj+cmS
+         eXVF8b/MR6k6A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     =?UTF-8?q?Ole=20Bj=C3=B8rn=20Midtb=C3=B8?= <omidtbo@cisco.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 027/130] Bluetooth: hidp: use correct wait queue when removing ctrl_wait
-Date:   Tue, 22 Dec 2020 21:16:30 -0500
-Message-Id: <20201223021813.2791612-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 061/217] Bluetooth: hidp: use correct wait queue when removing ctrl_wait
+Date:   Tue, 22 Dec 2020 21:13:50 -0500
+Message-Id: <20201223021626.2790791-61-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201223021813.2791612-1-sashal@kernel.org>
-References: <20201223021813.2791612-1-sashal@kernel.org>
+In-Reply-To: <20201223021626.2790791-1-sashal@kernel.org>
+References: <20201223021626.2790791-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -107,7 +107,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index bef84b95e2c47..ac98e3b37ab47 100644
+index 3b4fa27a44e64..0db48c8126623 100644
 --- a/net/bluetooth/hidp/core.c
 +++ b/net/bluetooth/hidp/core.c
 @@ -1290,7 +1290,7 @@ static int hidp_session_thread(void *arg)
