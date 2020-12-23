@@ -2,124 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E64CC43332
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5488C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 331A622A83
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A551723333
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 02:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729780AbgLWCtO (ORCPT
+        id S1731020AbgLWCtc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 21:49:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728249AbgLWCtN (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:49:13 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F000AC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 18:48:31 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id s15so3989573plr.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 18:48:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6wxceAbHrG+QCjBzTytmyNX2D15zjk1S0lgoPggdlJc=;
-        b=mJOdDEe6UetRm0FbrBpFf2xHVLf9wFF/j4376J4i6So9hVah1v5R4rDg7qUy3j3vD9
-         9H9wl12ICipiVBDq+Fft7KzhW9xg56dFK509tgIj38MupYLLquSZoD2030QkWZhl8BpO
-         +l8KJ4D+0re54622aMPmL4KHPLK5UoCMOlG34=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6wxceAbHrG+QCjBzTytmyNX2D15zjk1S0lgoPggdlJc=;
-        b=cD0nNepbBmTa2UKfR0ohDqNMtXMgittKH2XKTABxyaBVuB+lZaHn4mk2QMeeRHl63b
-         Ja4Kh8+ej1t/Ep3Mn/98q2hHpX5/Ww0ZneiufWKPT/LV3gb/3RipAwwyKQ5sBHX5/V4i
-         b0bsn+fBR7kbHNfpxEXm0dBWhT9i/UzkyNlYDL6+Zq67G1MgnRZM7eRj/7/rtFyMbcU9
-         2swZwIlI9uFeMSRmYyIFaXMODtWUOpmTQOsKVt098M2N1SCvEDx4siUxY8vb8mFaj+v2
-         QaQp0DMLs6tHsinh5FW0V/YkdCSfiKKeoCLqZAaRN/04fGhfxKGooLyiJCnIHidqtXT9
-         Mb1g==
-X-Gm-Message-State: AOAM531xq12+aFjnhWMU7wrSlsJl01P7wdWoP/HD+pXQ81gQEOpTMsv1
-        cRhFEemIYouJ6qhJFyShnBVpxw==
-X-Google-Smtp-Source: ABdhPJzF9RZeNCMANXrHlY53rXD4WdbfrHMtZS7GERUgLYC8iaBNClRJod251v2CIVdnaNYa6n6Oxg==
-X-Received: by 2002:a17:90a:6604:: with SMTP id l4mr24693719pjj.119.1608691711404;
-        Tue, 22 Dec 2020 18:48:31 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id t36sm20149913pfg.55.2020.12.22.18.48.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Dec 2020 18:48:30 -0800 (PST)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Daniel Winkler <danielwinkler@google.com>,
-        linux-kernel@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: btrtl: Add null check in setup
-Date:   Tue, 22 Dec 2020 18:48:24 -0800
-Message-Id: <20201222184753.1.I9438ef1f79fa1132e74c67b489123291080b9a8c@changeid>
-X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
+        Tue, 22 Dec 2020 21:49:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728344AbgLWCWE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:22:04 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DEBCA225AC;
+        Wed, 23 Dec 2020 02:21:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608690107;
+        bh=MsgXBX36RNXbJaTgxGZ5gH+/E7pwOkfeIXDe8IMOq9k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Ru9UE8mS9aYdkcWECJc7J89W1Ze6S7qe1PrR5PP0OjdVBkXqteVckN/UP5I73C4mI
+         AhocqPkYErCuaVHHoDxZC8mmnS05lFZPvMio5MipMdZK1Dibu/okXscNKVL0RJX1P+
+         ITDIzy2G64qAVU18kFBjmwJKJ7gNjbXhM5hxkOGZiEq1f5P4UTfYDGQ3uJcbZTDXDZ
+         zCWQefoyxHoj4nu2ufGErQxzDiBd92YYdcAnJtScM/rfz55OmOxW8Tl693ex2iI98T
+         PoxlgPdCPyaw9XbcMg1r1nmcxyQjXttKuNZLF66jeM4LX3X5TOUZ+rHu8ZMRqu0K1d
+         8MdBN12mZN5CA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 36/87] Bluetooth: hci_h5: Add OBDA0623 ACPI HID
+Date:   Tue, 22 Dec 2020 21:20:12 -0500
+Message-Id: <20201223022103.2792705-36-sashal@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20201223022103.2792705-1-sashal@kernel.org>
+References: <20201223022103.2792705-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-btrtl_dev->ic_info is only available from the controller on cold boot
-(the lmp subversion matches the device model and this is used to look up
-the ic_info). On warm boots (firmware already loaded),
-btrtl_dev->ic_info is null.
+From: Hans de Goede <hdegoede@redhat.com>
 
-Fixes: 05672a2c14a4 (Bluetooth: btrtl: Enable central-peripheral role)
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+[ Upstream commit e524f252c42fc4f2bc4a2c3f99fe8659af5576a8 ]
+
+Add OBDA0623 ACPI HID to the acpi_device_id table. This HID is used
+for the RTL8723BS Bluetooth part on the Acer Switch 10E SW3-016.
+
+BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1665610
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
+ drivers/bluetooth/hci_h5.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/bluetooth/btrtl.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 1abf6a4d672734f..978f3c773856b05 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -719,16 +719,19 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 
--	/* Enable central-peripheral role (able to create new connections with
--	 * an existing connection in slave role).
--	 */
--	switch (btrtl_dev->ic_info->lmp_subver) {
--	case RTL_ROM_LMP_8822B:
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--		break;
--	default:
--		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
--		break;
-+	if (btrtl_dev->ic_info) {
-+		/* Enable central-peripheral role (able to create new
-+		 * connections with an existing connection in slave role).
-+		 */
-+		switch (btrtl_dev->ic_info->lmp_subver) {
-+		case RTL_ROM_LMP_8822B:
-+			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+			break;
-+		default:
-+			rtl_dev_dbg(hdev,
-+				    "Central-peripheral role not enabled.");
-+			break;
-+		}
- 	}
- 
- 	btrtl_free(btrtl_dev);
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 5a68cd4dd71cb..702aa08c6395f 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -928,6 +928,7 @@ static struct h5_vnd rtl_vnd = {
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id h5_acpi_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
++	{ "OBDA0623", (kernel_ulong_t)&rtl_vnd },
+ 	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
+ #endif
+ 	{ },
 -- 
-2.29.2.729.g45daf8777d-goog
+2.27.0
 
