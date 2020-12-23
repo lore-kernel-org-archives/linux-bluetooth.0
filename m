@@ -7,89 +7,102 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93463C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CD7C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 01:26:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EA5B20691
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 00:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62A1A224BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Dec 2020 01:26:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbgLWAdk (ORCPT
+        id S1726275AbgLWB0I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Dec 2020 19:33:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47840 "EHLO
+        Tue, 22 Dec 2020 20:26:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725833AbgLWAdj (ORCPT
+        with ESMTP id S1725931AbgLWB0H (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Dec 2020 19:33:39 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D0AC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:32:59 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id 11so13586309oty.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 16:32:59 -0800 (PST)
+        Tue, 22 Dec 2020 20:26:07 -0500
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D356C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 17:25:27 -0800 (PST)
+Received: by mail-qv1-xf36.google.com with SMTP id bd6so6913587qvb.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Dec 2020 17:25:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=AczVIt4rKkWxgHRY6Pli8wC1ntZ5Dqn8zf7cOqXQQQs=;
-        b=eTXEe+vryKI2hg5CdxG9B0j75ov2iTKbHi8dE5/C6QDmG1Vv1r0J9YojpLoIOHquUu
-         DYOjPyTITFiPokNitvAB1AoouAbwkUGjy2Gc+thFuNuhcouR5iBLmS/zE9enYSI38Nta
-         /uaP95h82H706CzNP9KG+bre7u6UjArjbZJjOE9QWMvX6fwldLwXsAoxR8m8/YqGF2JM
-         YKTCSejs5qch2bammUloGrqt50+AvUoXx0+449yMJdYilFD+aVxBrkGNwxE0axIgVcOK
-         mI7ui6WfKf65IVqb7EjcONOawVzjc435OMrcaUg+KIEc4sQnGbxaE3FFyyFP2cAJbbvh
-         s+OA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=8La0G01PE7fdhNttetHO6j51Pu6hO4cgpXreRnf/RXc=;
+        b=JCf7DcllOBuIqKSC9DpC2TSkDvj21lRQMUHnA+a0CFFgt78Z1GM2QyxDnyoqx1nDzA
+         ngWMdLeaVZQnRFubv7swrj+ZVIRW55dtuMB0VTk05a40TfZzYEpH/m2irTU4VknwLC7w
+         4LRe+rhZttMMD9g3YuUK0LYA+QujnWYaYxmqdH8iqCG123fI70kxbICt3wMRT32zk3JM
+         PGs4tfbclfPh6Ezr+6DrIi3nzemQS0tsJfZHsM+SGjjsWwrvGYGghvWSaR4zIRQGO80d
+         K5YAbB9JTLyY3cJr3u3iwdpjtPVijuQ9W1SVQLHUOF/58Zgyzrxg3/D+DheU1JLLSJ0N
+         XF+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=AczVIt4rKkWxgHRY6Pli8wC1ntZ5Dqn8zf7cOqXQQQs=;
-        b=ZJo+HPqc6sDT69esP5MPQfTnBIcLgzjdh19LrxN+6UCKl/9ByylmMEVCWWpiMVpP4z
-         7vwWqkK3mRsL99tkkQC5G5Im6z6iiZs/tDpg1hEhtXOKD+56tOQpcDciDHlTGrI4ckhc
-         uw0oCkxJ8iTeD8VeKW9QUhuyCUBA0xnA/3PQc9ZCVfC0K8S3n9+8xkui2nuaWL4GkrOc
-         FWIAedIUQ6Rh9IadAwpvO9kavaG1Fndq6a5k0mXTd/QY7SDdprM+f6Hu9dyn5UNCiUte
-         1iV1NP+11fg9JS/XehBCqQovfNf+lsxzNRX3tUNDskOd3b6IWoxngZ6VX8hy0yX0Cvgw
-         fsTQ==
-X-Gm-Message-State: AOAM530BHvDx32Mvh01MHjO99uqLR4i+ca6RJ8GtS3hXyIasiLNL8Pdl
-        O+4sQDlxr1ac3h3s7KOftmzsXz4lhc3QeepdLZARlIGQzoo=
-X-Google-Smtp-Source: ABdhPJx/ebVN7eoD1idt8NjGs3PPUhAem/A5oRa/F5UPJzRkEb6nHJU96yxM7YgKets50ANjB29s4iE3z3Twnk84LoE=
-X-Received: by 2002:a9d:664f:: with SMTP id q15mr17011389otm.40.1608683578729;
- Tue, 22 Dec 2020 16:32:58 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=8La0G01PE7fdhNttetHO6j51Pu6hO4cgpXreRnf/RXc=;
+        b=piO++QRwfDw3e2fkuWbCMISJL3lesDfUfn0iF8Rf09R7rHSpgMiyRdkF/LeBmSvgsV
+         Aq62QiZAVdKZhPNyno77Y1hg2o9m7oEC0clqsenMM13drPI4BH/T2S+4tpPRvKCFBTW1
+         y9pBHA9mQVrjwqV9exgha6ILO7OnVsqWUqR9ATEqwVLC8BdqorVRPhgfUUSHgafbFpEW
+         WA7pBxXVq0ti+GRwaEY10f3j5IIxs4tvy7wZ8xkXu2gg7iHCs9c5iIO2yrPpNvnYS8Yq
+         z3cSrQl+3bl4QXAZngeSqLmWOq3908IoWgN0oS+M6zcyhS8M376FYaARpUkjuBTqDUJ3
+         3dSA==
+X-Gm-Message-State: AOAM532QEB5OHaADTgFcuaKAAIgnxL2oFahs06rgft3MLbNKuIrWrQQ7
+        WzXkWUemBGFqmiSPDkZOcKUREZbPoiyoDw==
+X-Google-Smtp-Source: ABdhPJwItRO13Zmdg22GpHB7UcEv7z6Bu3Fpv9z0M7Je/7kUN/eL5EEOyARaa4Hfk95Lg0KOTXag+Q==
+X-Received: by 2002:a05:6214:184a:: with SMTP id d10mr24741280qvy.41.1608686726188;
+        Tue, 22 Dec 2020 17:25:26 -0800 (PST)
+Received: from [172.17.0.2] ([20.186.46.92])
+        by smtp.gmail.com with ESMTPSA id z40sm9169355qtz.81.2020.12.22.17.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Dec 2020 17:25:25 -0800 (PST)
+Message-ID: <5fe29c85.1c69fb81.c9750.b446@mx.google.com>
+Date:   Tue, 22 Dec 2020 17:25:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0960001453487779475=="
 MIME-Version: 1.0
-From:   KeithG <ys3al35l@gmail.com>
-Date:   Tue, 22 Dec 2020 18:32:48 -0600
-Message-ID: <CAG17S_Oy_N_YPo6x5pmZ05p4MqH_gDUrRS0TR3ydQVG9BvmYEw@mail.gmail.com>
-Subject: Request for help with btmgmt
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [1/3] tools/mgmt-tester: Update sample data for adv features
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20201223002633.187612-1-tedd.an@intel.com>
+References: <20201223002633.187612-1-tedd.an@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I am developing a RPi based audio player. We are trying to add
-bluetooth capability to this player. We use alsa and not pulse-audio,
-so we need a bit more granular info to get it to run. I have written a
-script which is designed to be triggered by udev when a BT device is
-added or removed. This script will then use bluetoothctl to get the
-capabilities of the device and also add or remove it from a dynamic
-database list of MACs in redis. I have a simple script working as I
-want from the cli. The key command I am using is 'btmgmt con' which is
-the only command I have found that tells me what MACs are currently
-connected. I can run this command from the command line as root. I can
-set the setuid bit of btmgmt and also get it to run as a user (http in
-this case). I cannot, ever, get this command to run when triggered
-from udev. I get no response and no error.
+--===============0960001453487779475==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-1) Why is this particular command (query attached BT MACs) not part of
-bluetoothctl?  Is there a security issue?
-2) Why can I not run 'btmgmt con' in a script (bash or php) triggered
-by udev when the device is added or removed?
-3) is there a 'better way' for me to know what device MAC addresses
-are attached? I have not found another simple way to get this info.
+This is automated email and please do not reply to this email!
 
-What I am doing in the script is: if an audio source is attached, I
-want to run a bluealsa-aplay service. When an audio sink is attached,
-I want to re-set my audio output to the bluealsa device. If it is not
-an audio device, I do not care, but do keep track of what is attached
-in my database so that the next time the script runs that it is not
-queried and is 'known'.
+Dear submitter,
 
-Thanks for the help.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=405549
 
-Keith
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0960001453487779475==--
