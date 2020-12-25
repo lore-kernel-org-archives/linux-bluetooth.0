@@ -2,501 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E406C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Dec 2020 17:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BD9C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Dec 2020 21:12:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4683A20897
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Dec 2020 17:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D232022255
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Dec 2020 21:11:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbgLYRlv (ORCPT
+        id S1726686AbgLYUdT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Dec 2020 12:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52800 "EHLO
+        Fri, 25 Dec 2020 15:33:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725953AbgLYRlu (ORCPT
+        with ESMTP id S1726506AbgLYUdT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Dec 2020 12:41:50 -0500
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04202C061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Dec 2020 09:41:09 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id 6so6835201ejz.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Dec 2020 09:41:09 -0800 (PST)
+        Fri, 25 Dec 2020 15:33:19 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C7BC061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Dec 2020 12:32:39 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id d20so4443326otl.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Dec 2020 12:32:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:subject:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=TevzAjFhVAongxb1yvjgsFot88GtN4ApJfBbSQezJAg=;
-        b=ae14RbSvnIj+0JsM+47rRU3HYSzZwDW8D9MN857PXaSVkDUNJ7ggfDbc6zny81W6uu
-         dKgifOSm8+4dZ8e8NwEO5nw4nbiJjcBVzpHCrCq4UYX6IQBp5TlYqkPnb4DXJbw+Z7wR
-         t6/SJeR0LSoihp/c0xKsIcMmDZl+E6clqdDZ0+Hhi9/gi8lTU2vbySqDWHHm+41wtARW
-         cSpUxStQMwYtyCQ0tueYECDClQupVQffqkvgHMmtr70fbWrYyfDMNbGkrsUyS1sISXBn
-         zzWTcv59LKy9ObGDQGiqIZQIvHnBWqc3AgmXl7OH+kOLdRDCDRiqC8vPGjdA7E1dIwZI
-         ZtZw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IjQcd2H3mHQ8IPa8tQ5kDw7zy6LluBe8VOLHE+DMLkU=;
+        b=bbj7sqCoGqHKy9byDmc1EbOEpPTtDQ1dtq7jp0usASaBGV99ye5Y4V/BmX7RhHoEyx
+         eiTXmNKZl1oiTPV8qoIRlKu9hCGiTb5FYWe/BCPxjt8tblQlt0Ff/BmMTY6+gcGWambo
+         +z8m1njb9feUnfP3IvGF0u0Jj+jHXvw/yzm9J4mMqF2JaCngBww7PUDx/snVUhny0yCb
+         0M5VUp8ZyuGSiumutVG4IoLb4xqof/wivg6GkcBArnFsYo6RIJWmSX1k82SMvJoKQ3ns
+         suQ9BCUIMp6tMyXNTtzv9CYBuKhekZYcen+f7L7noEkhrKHN9UCB9dd/e+Wuo47c4H9A
+         u96A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TevzAjFhVAongxb1yvjgsFot88GtN4ApJfBbSQezJAg=;
-        b=kue65dcwAQPKD6M/2roC163LAtOiDpDKPZWuf88t9l5WhyAZpj0v2Kr9yBsZipVPUE
-         ID1yYajFD7na1HVrLGUGnvCSki4eXbN0BgqjHchHkuhHPstQiK+txolraYA2OS04rAlD
-         7nZE2Af/zqsmW+fKPhKb7x1hBb8FS91idCCTGD+LqcosE03d9pCt5tTzP3k32iKQOFQE
-         Dl2UlOlL3Q7jVx2h0jDbbr9zyW49Wr3hj61V72p/oklTS8xw6w1gOKDctgZ4vS48qDoH
-         zpYNw5dFbQhOA2042KRhfVGNL1UQMuoqN7JHjf++TMUNFlq9y1CNp2YoqtL4JpnbIPQH
-         bjEw==
-X-Gm-Message-State: AOAM531NB002ALPTJfKeBtnim55YyLJMqaZnOUrhf1MmtT8+sydxUT05
-        EbBbgEvbjCHUierPPPGvo2PLyTMENS8=
-X-Google-Smtp-Source: ABdhPJyWjyCmWeTi1gPN2XMRAskDzl/aF3v72zw/if2xH71vRwbdubFHJasA2DbqCe1wPKISWCmsZw==
-X-Received: by 2002:a17:906:52c1:: with SMTP id w1mr19467183ejn.214.1608918066654;
-        Fri, 25 Dec 2020 09:41:06 -0800 (PST)
-Received: from ?IPv6:2a02:908:1982:45e0:523f:96f4:62fb:8f1? ([2a02:908:1982:45e0:523f:96f4:62fb:8f1])
-        by smtp.googlemail.com with ESMTPSA id x17sm22638585edq.77.2020.12.25.09.41.05
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Dec 2020 09:41:05 -0800 (PST)
-From:   Julian Sikorski <belegdol@gmail.com>
-Subject: Re: Bluetooth connection disconnects every few minutes
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <67077b05-dc49-3a97-c83f-4090f1cc7cea@gmail.com>
- <phdhvi$sdh$1@blaine.gmane.org>
- <8e41e2ae-bef4-d479-9706-49fd214081a6@chini.tk>
- <phdpkn$q3q$1@blaine.gmane.org> <pht30d$27m$1@blaine.gmane.org>
- <53d57478-4b61-65a4-7f09-b7e473cc613a@chini.tk>
- <305017ee-6420-3c44-7842-14776c37207d@gmail.com>
- <12fa0585-c993-0685-ac76-27d96d539ca2@gmail.com>
- <9a633975-704c-1a00-3f9f-b93a499947c2@gmail.com>
- <8bf4641f-4d3e-faf4-f53a-c571b97d9be4@gmail.com>
- <2bd00ced-f685-9048-5a10-a20028595086@gmail.com>
- <CABBYNZ+ZqS1LHVjLwt3mQvmFi1y7ogf_Tstvu70-XnDVT3nAAA@mail.gmail.com>
- <21f3b905-566c-00a0-e576-f47ae13019a6@gmail.com>
- <727b6dfa-b666-9cc3-1e5f-2715700d38f6@gmail.com>
- <cf2f6ebd-d8a0-a2ee-6935-564c27d3b884@gmail.com>
- <34a556d7-d49e-6daa-a746-bdd57d8b2c51@gmail.com>
-Message-ID: <32ddfa5d-bc34-2e50-9e70-cf29dfcdcc29@gmail.com>
-Date:   Fri, 25 Dec 2020 18:41:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IjQcd2H3mHQ8IPa8tQ5kDw7zy6LluBe8VOLHE+DMLkU=;
+        b=iA5N0MTjixv1m7ToF0+yK7uMCwio7p5vk6Kt3/o/aUSIZVfKiejhJ5FZmjgQqgCgzV
+         fE84X7N4tJoHL0iY1OA6iRF9jzunHagbRrK6NI7rloKWk06Di6+IXPbDghf5QwP8F7Lb
+         Qan5l6sLs8BpbchkPgvk/39HAEwvsaMDX+4MD4onp5i4b4i/xHzwlIzC/S/bbeR9qOFr
+         0Rf1e0sDzBEBPcHq6JuIKEEp1fTttA0EXR9DPP8cxjGnhv1mhKHf065tJraPgEI0EGjp
+         /KqM2fqt9T6zGAI9cm9fT5c042DM+8w+pkwaaGpr0EfCp2nBKdCs+O3J2IdX8eZDNoMR
+         bYJQ==
+X-Gm-Message-State: AOAM530N5gt/1hyjiIw9WXiqBgdL4NxFNmwPeoJlxQtOnnNFm1Vcloi8
+        nO5XHXHKd7MxRrXRaNoiU1/QcJXMVOWv7wsj/ZdG7Qzs
+X-Google-Smtp-Source: ABdhPJzAwDzN9PoqrV9jVmKQIJRan3zA6hnMMWPP8q0jAIdqZ7Gpyb8I3PJD1+g3I/Wng2MTcKnfb1GftwjkhkJmcQk=
+X-Received: by 2002:a9d:6255:: with SMTP id i21mr26611022otk.346.1608928357692;
+ Fri, 25 Dec 2020 12:32:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <34a556d7-d49e-6daa-a746-bdd57d8b2c51@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <CAG17S_Oy_N_YPo6x5pmZ05p4MqH_gDUrRS0TR3ydQVG9BvmYEw@mail.gmail.com>
+ <CAAu3APaGmCAA8JGKgFcg4wzJLT4y05BhvYu6uA05COdvEyauow@mail.gmail.com>
+In-Reply-To: <CAAu3APaGmCAA8JGKgFcg4wzJLT4y05BhvYu6uA05COdvEyauow@mail.gmail.com>
+From:   KeithG <ys3al35l@gmail.com>
+Date:   Fri, 25 Dec 2020 14:32:26 -0600
+Message-ID: <CAG17S_Mq+fMy6gGU-dXaNpsNkbqP47YskYJV7SE7mNUtbz=CYg@mail.gmail.com>
+Subject: Re: Request for help with btmgmt
+To:     Barry Byford <31baz66@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-W dniu 21.12.2020 o 18:26, Julian Sikorski pisze:
-> W dniu 02.11.2020 o 20:40, Julian Sikorski pisze:
->> W dniu 05.09.2020 o 15:05, Julian Sikorski pisze:
->>> W dniu 02.09.2020 o 07:58, Julian Sikorski pisze:
->>>> W dniu 02.09.2020 o 01:14, Luiz Augusto von Dentz pisze:
->>>>> Hi Julian,
->>>>>
->>>>> On Tue, Sep 1, 2020 at 1:42 PM Julian Sikorski 
->>>>> <belegdol-Re5JQEeQqe8AvxtiuMwx3w-XMD5yJDbdMReXY1tMh2IBg-XMD5yJDbdMReXY1tMh2IBg@public.gmane.org> 
->>>>> wrote:
->>>>>>
->>>>>> W dniu 01.09.2020 o 22:10, Julian Sikorski pisze:
->>>>>>> W dniu 12.08.2018 o 17:49, Julian Sikorski pisze:
->>>>>>>> W dniu 01.08.2018 o 19:46, Julian Sikorski pisze:
->>>>>>>>> W dniu 09.07.2018 o 18:51, Julian Sikorski pisze:
->>>>>>>>>> W dniu 08.07.2018 o 19:46, Georg Chini pisze:
->>>>>>>>>>> On 08.07.2018 15:21, Julian Sikorski wrote:
->>>>>>>>>>>> W dniu 02.07.2018 o 20:09, Julian Sikorski pisze:
->>>>>>>>>>>>> W dniu 02.07.2018 o 18:04, Georg Chini pisze:
->>>>>>>>>>>>>> On 02.07.2018 17:58, Julian Sikorski wrote:
->>>>>>>>>>>>>>> W dniu 29.06.2018 o 21:47, Julian Sikorski pisze:
->>>>>>>>>>>>>>>> Hi list,
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> I have noticed that the bluetooth connection between my 
->>>>>>>>>>>>>>>> laptop (Intel
->>>>>>>>>>>>>>>> 7260) and my headphones (Sennheiser Momentum Wirelless) 
->>>>>>>>>>>>>>>> is very
->>>>>>>>>>>>>>>> unreliable. While under Windows 10 devices stay 
->>>>>>>>>>>>>>>> connected for
->>>>>>>>>>>>>>>> hours on
->>>>>>>>>>>>>>>> end, under Fedora 28 the connection is lost every few 
->>>>>>>>>>>>>>>> minutes at
->>>>>>>>>>>>>>>> most.
->>>>>>>>>>>>>>>> Often the connection will be reestablished only to be 
->>>>>>>>>>>>>>>> lost again.
->>>>>>>>>>>>>>>> bluetoothd shows messages like:
->>>>>>>>>>>>>>>>
->>>>>>>>>>>
->>>>>>>>>>>>>>>> I am not sure where to look further. Does it look like 
->>>>>>>>>>>>>>>> an issue with
->>>>>>>>>>>>>>>> pulseaudio, or a deeper problem with linux bluetooth 
->>>>>>>>>>>>>>>> stack? Thanks
->>>>>>>>>>>>>>>> for
->>>>>>>>>>>>>>>> your input in advance!
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Best regards,
->>>>>>>>>>>>>>>> Julian
->>>>>>>>>>>>>>> This is what is logged by pulseaudio at the time the 
->>>>>>>>>>>>>>> connection is
->>>>>>>>>>>>>>> lost:
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> ( 118.064|  34.694) I: [bluetooth] 
->>>>>>>>>>>>>>> module-bluez5-device.c: FD error:
->>>>>>>>>>>>>>> POLLERR POLLHUP
->>>>>>>>>>>>>>> ( 118.064|   0.000) I: [bluetooth] bluez5-util.c: Transport
->>>>>>>>>>>>>>> /org/bluez/hci0/dev_00_1B_66_81_8D_76/fd27 auto-released 
->>>>>>>>>>>>>>> by BlueZ or
->>>>>>>>>>>>>>> already released
->>>>>>>>>>>>>>> ( 118.064|   0.000) I: [pulseaudio] backend-native.c: 
->>>>>>>>>>>>>>> Lost RFCOMM
->>>>>>>>>>>>>>> connection.
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>   From what you are writing, it looks to me as if the 
->>>>>>>>>>>>>> issue is in the
->>>>>>>>>>>>>> USB
->>>>>>>>>>>>>> stack and the BT dongle keeps disconnecting/connecting. 
->>>>>>>>>>>>>> Have you
->>>>>>>>>>>>>> tried another dongle?
->>>>>>>>>>>>> Hi,
->>>>>>>>>>>>>
->>>>>>>>>>>>> I unfortunately do not own any other dongles. I tried 
->>>>>>>>>>>>> getting some
->>>>>>>>>>>>> useful info with btmon but the log seems flooded with way 
->>>>>>>>>>>>> too many
->>>>>>>>>>>>> messages to make anything out.
->>>>>>>>>>>>>
->>>>>>>>>>>> Hi Georg,
->>>>>>>>>>>>
->>>>>>>>>>>> it looks like the problem is more related to how the dongle 
->>>>>>>>>>>> interacts
->>>>>>>>>>>> with this specific headphone model. I have recently bought 
->>>>>>>>>>>> another one
->>>>>>>>>>>> for running (AfterShokz Trekz Air) and it works perfectly, 
->>>>>>>>>>>> connecting
->>>>>>>>>>>> automatically, staying connected and even switching profiles
->>>>>>>>>>>> automatically without issues so far.
->>>>>>>>>>>> The hci0: last event is not cmd complete (0x0f) message 
->>>>>>>>>>>> seems harmless
->>>>>>>>>>>> as it spams the dmesg output regardless of the device 
->>>>>>>>>>>> connected (and
->>>>>>>>>>>> also when no device is connected at all.
->>>>>>>>>>>> It appears that whatever is happening it makes the dongle 
->>>>>>>>>>>> reconnect:
->>>>>>>>>>>>
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] usb 2-1.4: USB disconnect, device 
->>>>>>>>>>>> number 6
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] usb 2-1.4: new full-speed USB 
->>>>>>>>>>>> device number 7
->>>>>>>>>>>> using ehci-pci
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] usb 2-1.4: New USB device found,
->>>>>>>>>>>> idVendor=8087, idProduct=07dc, bcdDevice= 0.01
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] usb 2-1.4: New USB device 
->>>>>>>>>>>> strings: Mfr=0,
->>>>>>>>>>>> Product=0, SerialNumber=0
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] Bluetooth: hci0: read Intel version:
->>>>>>>>>>>> 3707100180012d0d2a
->>>>>>>>>>>> [nie lip  8 15:14:12 2018] Bluetooth: hci0: Intel device is 
->>>>>>>>>>>> already
->>>>>>>>>>>> patched. patch num: 2a
->>>>>>>>>>>>
->>>>>>>>>>>> Where would you recommend to look for reasons for this 
->>>>>>>>>>>> behaviour? btmon?
->>>>>>>>>>>> Thank you for the pointers!
->>>>>>>>>>>>
->>>>>>>>>>>> Best regards,
->>>>>>>>>>>> Julian
->>>>>>>>>>>>
->>>>>>>>>>>>
->>>>>>>>>>> Hi Julian,
->>>>>>>>>>>
->>>>>>>>>>> sorry, I have no further ideas. Maybe Luiz can help you to 
->>>>>>>>>>> investigate.
->>>>>>>>>>> To me it looks like the headphone is sending something that 
->>>>>>>>>>> makes the
->>>>>>>>>>> dongle reset.
->>>>>>>>>>>
->>>>>>>>>>> Regards
->>>>>>>>>>>              Georg
->>>>>>>>>>
->>>>>>>>>> Hi Georg,
->>>>>>>>>>
->>>>>>>>>> no worries - hopefully Luiz will find some time to look into 
->>>>>>>>>> this.
->>>>>>>>>> In the meantime I have been getting acquainted with btmon. I have
->>>>>>>>>> managed to pinpoint the exact moment during which sound stops 
->>>>>>>>>> coming
->>>>>>>>>> through the headphones and starts coming through the laptop 
->>>>>>>>>> speakers. In
->>>>>>>>>> the below testcase, it happens at 18:42:58:
->>>>>>>>>>
->>>>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>>>                                #1825 [hci0] 18:42:58.908586
->>>>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>>>                                #1826 [hci0] 18:42:58.928877
->>>>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>>>> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
->>>>>>>>>>                             {0x0002} [hci0] 18:43:00.653578
->>>>>>>>>>          Class: 0x000000
->>>>>>>>>>            Major class: Miscellaneous
->>>>>>>>>>            Minor class: 0x00
->>>>>>>>>> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
->>>>>>>>>>                             {0x0001} [hci0] 18:43:00.653578
->>>>>>>>>>          Class: 0x000000
->>>>>>>>>>            Major class: Miscellaneous
->>>>>>>>>>            Minor class: 0x00
->>>>>>>>>> @ MGMT Event: New Settings (0x0006) plen 4
->>>>>>>>>>                             {0x0002} [hci0] 18:43:00.653609
->>>>>>>>>>          Current settings: 0x00000ada
->>>>>>>>>>            Connectable
->>>>>>>>>>            Discoverable
->>>>>>>>>>            Bondable
->>>>>>>>>>            Secure Simple Pairing
->>>>>>>>>>            BR/EDR
->>>>>>>>>>            Low Energy
->>>>>>>>>>            Secure Connections
->>>>>>>>>> @ MGMT Event: New Settings (0x0006) plen 4
->>>>>>>>>>                             {0x0001} [hci0] 18:43:00.653609
->>>>>>>>>>          Current settings: 0x00000ada
->>>>>>>>>>            Connectable
->>>>>>>>>>            Discoverable
->>>>>>>>>>            Bondable
->>>>>>>>>>            Secure Simple Pairing
->>>>>>>>>>            BR/EDR
->>>>>>>>>>            Low Energy
->>>>>>>>>>            Secure Connections
->>>>>>>>>> = bluetoothd: Unable to get io data for Headset Voice gateway:
->>>>>>>>>> getpeername: Transport endpoint is not connected.. 
->>>>>>>>>> 18:43:00.654133
->>>>>>>>>> = Close Index: 7C:5C:F8:B2:DF:08
->>>>>>>>>>                                      [hci0] 18:43:00.678348
->>>>>>>>>> @ MGMT Event: Index Removed (0x0005) plen 0
->>>>>>>>>>                             {0x0002} [hci0] 18:43:00.678372
->>>>>>>>>> @ MGMT Event: Index Removed (0x0005) plen 0
->>>>>>>>>>                             {0x0001} [hci0] 18:43:00.678372
->>>>>>>>>> = Delete Index: 7C:5C:F8:B2:DF:08
->>>>>>>>>>                                      [hci0] 18:43:00.678377
->>>>>>>>>> = bluetoothd: Endpoint unregistered: sender=:1.1492
->>>>>>>>>> path=/MediaEndpoint/A2DPSource
->>>>>>>>>> 18:43:00.678966
->>>>>>>>>> = bluetoothd: Endpoint unregistered: sender=:1.1492
->>>>>>>>>> path=/MediaEndpoint/A2DPSink
->>>>>>>>>> 18:43:00.678984
->>>>>>>>>>
->>>>>>>>>> I am copying linux-bluetooth, maybe someone there will have an 
->>>>>>>>>> idea as
->>>>>>>>>> well. Thank you for all your help in advance!
->>>>>>>>>>
->>>>>>>>>> Best regards,
->>>>>>>>>> Julian
->>>>>>>>>
->>>>>>>>> Hi all,
->>>>>>>>>
->>>>>>>>> I tried to get more information using hcidump, but it does not 
->>>>>>>>> appear
->>>>>>>>> very interesting. I am attaching it here just in case. The last 
->>>>>>>>> entry
->>>>>>>>> appearing - command complete (read encryption key size) - 
->>>>>>>>> appears upon
->>>>>>>>> successful connection, not when the connection is dropped. How 
->>>>>>>>> else
->>>>>>>>> could I try to figure out what is being sent at the time of
->>>>>>>>> disconnection? Thank you!
->>>>>>>>>
->>>>>>>>> Best regards,
->>>>>>>>> Julian
->>>>>>>>
->>>>>>>> Hi list,
->>>>>>>>
->>>>>>>> I just realised I never attached the full btmon dump. Here it 
->>>>>>>> goes, the
->>>>>>>> connection drops at 17:32:04:
->>>>>>>>
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1340 [hci0] 17:32:04.774611
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>>>>                                #1341 [hci0] 17:32:04.783175
->>>>>>>>          Num handles: 1
->>>>>>>>          Handle: 256
->>>>>>>>          Count: 1
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1342 [hci0] 17:32:04.794981
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>>>>                                #1343 [hci0] 17:32:04.803054
->>>>>>>>          Num handles: 1
->>>>>>>>          Handle: 256
->>>>>>>>          Count: 1
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1344 [hci0] 17:32:04.815326
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>>>>                                #1345 [hci0] 17:32:04.823198
->>>>>>>>          Num handles: 1
->>>>>>>>          Handle: 256
->>>>>>>>          Count: 1
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1346 [hci0] 17:32:04.835578
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1347 [hci0] 17:32:04.856093
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1348 [hci0] 17:32:04.876186
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1349 [hci0] 17:32:04.896454
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>> < ACL Data TX: Handle 256 flags 0x02 dlen 850
->>>>>>>>                                #1350 [hci0] 17:32:04.916869
->>>>>>>>        Channel: 450 len 846 [PSM 25 mode 0] {chan 2}
->>>>>>>> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
->>>>>>>>                             {0x0002} [hci0] 17:32:06.637019
->>>>>>>>          Class: 0x000000
->>>>>>>>            Major class: Miscellaneous
->>>>>>>>            Minor class: 0x00
->>>>>>>> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
->>>>>>>>                             {0x0001} [hci0] 17:32:06.637019
->>>>>>>>          Class: 0x000000
->>>>>>>>            Major class: Miscellaneous
->>>>>>>>            Minor class: 0x00
->>>>>>>> @ MGMT Event: New Settings (0x0006) plen 4
->>>>>>>>                             {0x0002} [hci0] 17:32:06.637034
->>>>>>>>          Current settings: 0x00000ada
->>>>>>>>            Connectable
->>>>>>>>            Discoverable
->>>>>>>>            Bondable
->>>>>>>>            Secure Simple Pairing
->>>>>>>>            BR/EDR
->>>>>>>>            Low Energy
->>>>>>>>            Secure Connections
->>>>>>>> @ MGMT Event: New Settings (0x0006) plen 4
->>>>>>>>                             {0x0001} [hci0] 17:32:06.637034
->>>>>>>>          Current settings: 0x00000ada
->>>>>>>>            Connectable
->>>>>>>>            Discoverable
->>>>>>>>            Bondable
->>>>>>>>            Secure Simple Pairing
->>>>>>>>            BR/EDR
->>>>>>>>            Low Energy
->>>>>>>>            Secure Connections
->>>>>>>> = Close Index: 7C:5C:F8:B2:DF:08
->>>>>>>>                                      [hci0] 17:32:06.654087
->>>>>>>> @ MGMT Event: Index Removed (0x0005) plen 0
->>>>>>>>                             {0x0002} [hci0] 17:32:06.654114
->>>>>>>> @ MGMT Event: Index Removed (0x0005) plen 0
->>>>>>>>                             {0x0001} [hci0] 17:32:06.654114
->>>>>>>> = Delete Index: 7C:5C:F8:B2:DF:08
->>>>>>>>                                      [hci0] 17:32:06.654120
->>>>>>>> = bluetoothd: Unable to get io data for Headset Voice gateway:
->>>>>>>> getpeername: Transport endpoint is not connected..   
->>>>>>>> 17:32:06.654352
->>>>>>>> = bluetoothd: Endpoint unregistered: sender=:1.750
->>>>>>>> path=/MediaEndpoint/A2DPSource
->>>>>>>> 17:32:06.654796
->>>>>>>> = bluetoothd: Endpoint unregistered: sender=:1.750
->>>>>>>> path=/MediaEndpoint/A2DPSink
->>>>>>>> 17:32:06.654836
->>>>>>>>
->>>>>>>> I tried sending the btmon capture as attachment but it appears 
->>>>>>>> to be too
->>>>>>>> large for the list, so I uploaded it here instead:
->>>>>>>>
->>>>>>>> https://belegdol.fedorapeople.org/btmon-aug.log
->>>>>
->>>>> Is this perhaps related to https://github.com/bluez/bluez/issues/18,
->>>>> we have a fix already applied upstream for it.
->>>>>
->>>>
->>>> Hi Luiz,
->>>>
->>>> it looks like a different issue. I tried both passing --noplugin=avrcp
->>>> and applying the two patches mentioned in the github issue to Fedora
->>>> RPM, neither helped. I am attaching a new btmon capture in case
->>>> something changed. In this one the disconnect happens after #371.
->>>>
->>>> Best regards,
->>>> Julian
->>> Hi Luiz,
->>>
->>> I have now tested the same headset (Sennheiser Momentum Wireless aka 
->>> M2 AEBT) with another machine, this time a desktop equipped with 
->>> Intel 3168NGW dongle. With this machine everything appears to be 
->>> working flawlessly, with no disconnection happening for several 
->>> minutes. I have uploaded the btmon log to my dropbox as it is too 
->>> large to attach here:
->>> https://www.dropbox.com/s/ttetss50jqlvi35/m2-aebt-desktop.zip?dl=0
->>> Hopefully there is something in the log indicating as to why the 
->>> headset keeps disconnecting from the laptop. The laptop is equipped 
->>> with Intel 7260 dongle.
->>>
->>> Best regards,
->>> Julian
->>>
->>>
->> The problem is still happening with kernel-5.8.17, bluez-5.55 and 
->> Fedora 33. Latest log is attached, the disconnect happens after #1023.
->> I tried deleting ~/.config/pulse as a hail mary attempt, but it did 
->> not help either.
->>
->> Best regards,
->> Julian
->>
-> It is still broken with kernel-5.9.15. The strange thing is that every 
-> now and again if the stars align just right, the connection is stable. 
-> Is there a way of making btmon even more verbose so that I can see what 
-> is going on?
-> My wild guess is that the stability of the connection has something to 
-> do with which profile (A2DP or HSP) gets activated first. Can this be 
-> controlled somehow?
-> 
-> Best regards,
-> Julian
+Barry,
 
-This could be just an impression, but it appears that the A2DP 
-connection can be rendered stable if I quickly switch PA to HSP/HFP and 
-back to A2DP after the initial connection before the connection is 
-dropped. btmon capture of this attempt (it is too big to attach here):
-https://www.dropbox.com/s/ozi0q1ucb32eovd/btmon-working.log?dl=0.
+Thanks for the help. I will look into it. I fear it may be a bit 'up
+hill' for me.
 
-Best regards,
-Julian
->>>>>>>> Best regards,
->>>>>>>> Julian
->>>>>>>>
->>>>>>>
->>>>>>> Hi all,
->>>>>>>
->>>>>>> I have tried the headset again with kernel-5.8.4, bluez-5.54 and
->>>>>>> pulseaudio-13.99.1. The situation has unfortunately not improved 
->>>>>>> in the
->>>>>>> last two years.
->>>>>>> I am attaching the btmon capture of two connection attempts:
->>>>>>> - the first connects and then almost immediately disconnects
->>>>>>> - the second never succeeds
->>>>>>> Does the capture provide any information as to why the connection is
->>>>>>> failing? If I can provide any more data, please let me know. Thanks!
->>>>>>>
->>>>>>> Best regards,
->>>>>>> Julian
->>>>>>>
->>>>>> If I am not mistaken, the disconnect happens right after #636
->>>>>>
->>>>>> Best regards,
->>>>>> Julian
->>>>>
->>>>>
->>>>>
->>>>
->>>
->>>
->>
-> 
-> 
+Can you shed any light as to why:
+1) bluetoothctl does not have a command to list the currently connected devices?
+2) why btmgmt cannot be run except from the command line? Not even
+'btmgmt info' can be run from a script. If it runs, I cannot tell as
+no output is ever generated and no error is ever listed in the
+journal.
 
+Keith
 
-
+On Wed, Dec 23, 2020 at 1:53 AM Barry Byford <31baz66@gmail.com> wrote:
+>
+> Hello Keith,
+>
+> On Wed, 23 Dec 2020 at 00:34, KeithG <ys3al35l@gmail.com> wrote:
+> >
+> > I am developing a RPi based audio player. We are trying to add
+> > bluetooth capability to this player. We use alsa and not pulse-audio,
+> > so we need a bit more granular info to get it to run. I have written a
+> > script which is designed to be triggered by udev when a BT device is
+> > added or removed. This script will then use bluetoothctl to get the
+> > capabilities of the device and also add or remove it from a dynamic
+> > database list of MACs in redis. I have a simple script working as I
+> > want from the cli. The key command I am using is 'btmgmt con' which is
+> > the only command I have found that tells me what MACs are currently
+> > connected. I can run this command from the command line as root. I can
+> > set the setuid bit of btmgmt and also get it to run as a user (http in
+> > this case). I cannot, ever, get this command to run when triggered
+> > from udev. I get no response and no error.
+> >
+> > 1) Why is this particular command (query attached BT MACs) not part of
+> > bluetoothctl?  Is there a security issue?
+> > 2) Why can I not run 'btmgmt con' in a script (bash or php) triggered
+> > by udev when the device is added or removed?
+> > 3) is there a 'better way' for me to know what device MAC addresses
+> > are attached? I have not found another simple way to get this info.
+> >
+> > What I am doing in the script is: if an audio source is attached, I
+> > want to run a bluealsa-aplay service. When an audio sink is attached,
+> > I want to re-set my audio output to the bluealsa device. If it is not
+> > an audio device, I do not care, but do keep track of what is attached
+> > in my database so that the next time the script runs that it is not
+> > queried and is 'known'.
+> >
+> > Thanks for the help.
+> >
+> > Keith
+>
+> I would suggest that the D-Bus API would be a more appropriate way to
+> get the information you want.
+>
+> The "get managed objects" functionality is a good way to iterate
+> through all the devices that BlueZ knows about.
+> There are examples at:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/bluezutils.py
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/list-devices
+>
+> The D-Bus API also allows your code to execute callbacks when a device
+> is added or its connection state changes.
+> This is done with the InterfacesAdded and PropertiesChanged signals.
+>
+> If you are going to use Python I would suggest the
+> https://pypi.org/project/pydbus/ library is a more "Pythonic" set of
+> D-Bus bindings.
+>
+> The API is documented at:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc
+>
+> Regards,
+> Barry
