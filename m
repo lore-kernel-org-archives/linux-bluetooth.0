@@ -2,160 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B96C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Dec 2020 20:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAB4C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Dec 2020 03:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE15A21E92
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Dec 2020 20:18:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 964A621D95
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Dec 2020 03:14:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbgLZUSH convert rfc822-to-8bit (ORCPT
+        id S1726256AbgL0DOC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Dec 2020 15:18:07 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:50120 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725927AbgLZUSH (ORCPT
+        Sat, 26 Dec 2020 22:14:02 -0500
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:44531 "EHLO
+        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726024AbgL0DOC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Dec 2020 15:18:07 -0500
-Received: from marcel-macbook.holtmann.net (p4ff9f924.dip0.t-ipconnect.de [79.249.249.36])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 955D2CED2F;
-        Sat, 26 Dec 2020 21:24:43 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH 1/1] [Add support Mediatek mt7921U]
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <292c69c1038242d5b0d03fb7b4675555@mtkmbs08n1.mediatek.inc>
-Date:   Sat, 26 Dec 2020 21:17:24 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Wang <Sean.Wang@mediatek.com>,
-        =?utf-8?B?IlBldGVyIFRzYW8gKOabueePhuW9sCki?= 
-        <Peter.Tsao@mediatek.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5925338F-C8E3-4FDE-9477-256EC2363C49@holtmann.org>
-References: <20201222150527.22904-1-Mark-YW.Chen@mediatek.com>
- <06C876AD-8232-418E-B3CB-96B88579BAF7@holtmann.org>
- <292c69c1038242d5b0d03fb7b4675555@mtkmbs08n1.mediatek.inc>
-To:     =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>
-X-Mailer: Apple Mail (2.3654.40.0.2.32)
+        Sat, 26 Dec 2020 22:14:02 -0500
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailout.west.internal (Postfix) with ESMTP id 6052F864
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Dec 2020 22:12:56 -0500 (EST)
+Received: from imap6 ([10.202.2.56])
+  by compute2.internal (MEProxy); Sat, 26 Dec 2020 22:12:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kode54.net; h=
+        mime-version:message-id:date:from:to:subject:content-type; s=
+        fm2; bh=Sqg6xhuI3FJYBvYXktRNdcBtMhsmYgzm99qWgxD7h9c=; b=JwfApTyP
+        3x8GJ8BIwLRxJVZJ0XZuSR4b4Of+u8+y48VQw4CMQUnY7m/Dj8V59XNZuiWg7gPL
+        1khoyWRJ8IVfVBONCK/AzPz9Djov1i0fJ+pX5T9z/WuihNvs4iGmWyY+84LZf0sP
+        1UGVXzM4BQxR02V0CFJ46vmk/hgHor1esXQQ4bQS1ocegnjmg7OrJKUiJDfzGpj5
+        kSw6Btpo4UHcOHTjBPOXgMd3UJBh7qUvNs3HLlUnc8iYLm3IUsPeGEe91nGFRsKg
+        2zjfexfJy6mUAg7VFjdejfwaeh/oHUXGyBbBJIBDCk9ZVmGoXr5zYMitPFeV+UPV
+        sNuxwzCoIwPpkA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=content-type:date:from:message-id
+        :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
+        :x-me-sender:x-sasl-enc; s=fm1; bh=Sqg6xhuI3FJYBvYXktRNdcBtMhsmY
+        gzm99qWgxD7h9c=; b=SHtHYeb5EnpYBkgbu3kpq1fOgVy1UAomAK9yp585P1EA1
+        +2mtnuteyWy3a/OkYzmffuLm39ZwbXCNKcpBxhDtr/7ds3p0HPO7U7cX1g3035x8
+        4BMZvd/IF1LBNXJcDZa+lOipbGnsoDEt7ay4XxqLLE4ytHT2lAncgawROcDMgecj
+        igVil/dh4FzWfWG3xpYUDw3fsX3tG712ZTMyIX1B4j4eNUwFLP6d5cROQGnkDLZE
+        U78qmdeTpEqTarQkJXfziIJRIhCsrRGLHR/dj0xJf2ouys9gW6fLqA3qi2MSXYXW
+        m1Kq0Zf/NG3MdfJJQKyC0pymKOgI7LQFkay2jk0vA==
+X-ME-Sender: <xms:t_vnX1TFuPh5uQfzR-xT7GwkBFtvMNs7fy0qICTkDmtzroCFw-GWXA>
+    <xme:t_vnX-yYW_GYds5KTOaC0wGHwV9xF3h2FNvD0f6Z6z0luV9NdWLUslAfjTzTxKXYY
+    y5E1XkBUCgxavjVMuE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdduiedgheejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefofgggkfffhffvufgtsehttdertd
+    erredtnecuhfhrohhmpedfvehhrhhishhtohhphhgvrhcuhghilhhlihgrmhcuufhnohif
+    hhhilhhlfdcuoegthhhrihhssehkohguvgehgedrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleduvddtteduhedvuefhhfehkeetlefhjeefvddtffdugfeikedtueetgeffgfehnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhrhhish
+    eskhhouggvheegrdhnvght
+X-ME-Proxy: <xmx:t_vnX618VKjpyD2GSJ4q9h8_I_85okNYX__iJTgH6xRWd-Bu_HKsjw>
+    <xmx:t_vnX9DvW87jLkL1lpkaYzI6AIvH7yTr2DgALsfnf_boDfirSLnsVA>
+    <xmx:t_vnX-i_nSa6AGtdV5LQhfZvdwIA6osTnqAq47DkT-r1NPJwkgsQOg>
+    <xmx:uPvnX5sG1Q_xN6WKwBLl0_XmI_z7ziWGgQTgvzvEqUPMvwgit7nWBw>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 0D1731400A1; Sat, 26 Dec 2020 22:13:01 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.3.1-61-gb52c239-fm-20201210.001-gb52c2396
+Mime-Version: 1.0
+Message-Id: <f2e0ca7e-4ffa-4e39-bd46-e0f70d23567e@www.fastmail.com>
+Date:   Sat, 26 Dec 2020 19:12:32 -0800
+From:   "Christopher William Snowhill" <chris@kode54.net>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix initializing response id after clearing struct
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mark,
+Looks like this was missed when patching the source to clear the structures throughout, causing this one instance to clear the struct after the response id is assigned.
 
-> Thanks for your suggestions, I will remove the duplicate definitions and functions.
-> 
-> Firstly, we will add the support of enabling MT7921U in btusb.c
-> Secondary, we will discuss the driver architecture with you.
-> Finally, we update the common part and hif part for MT7921.
-> 
-> I have a couple questions for driver architecture.
-> 1. Global dev.
-> 2. Unify common part.
-> 3. HIF part (usb/sdio/pcie/uart)
->> 
->>> This patch adds the support of enabling MT7921U, it's USB-based
->>> Bluetooth function.
->>> 
->>> There are some component in the Mediatek driver.
->>> 1. Btmtk_main: it's common code for Mediatek devices,
->>>  such as firmware download, chip initialization,
->>>  state machine handling and etc.
->>> 2. Btmtkusb: it's for usb interface,
->>>  such as usb endpoint enumeration, urb handling and etc.
->>> 
->>> Firstly, we update the common part and usb part for MT7921U.
->>> Secondly, we will add the support MT7921S, it's SDIO-based device.
->>> Finally, we will add the procedure to support uart/pcie interfaces.
->> 
->> create a btmtk.[ch] module like the other vendors did if it makes sense.
->> Otherwise just skip that part for now and get btmtkusb.c driver working. You
->> can later unify between all 3 transports.
->> 
->> I would do the latter since it would first make sense to really see where the
->> common parts are. And I have to be frank, this driver needs massive cleanup. I
->> am not going to accept this tons of copy-and-paste left and right.
->> 
->> Please provide the content of /sys/kernel/debug/usb/devices in the commit
->> message.
->> 
->>> +/* To support dynamic mount of interface can be probed */
->>> +static int btmtk_intf_num = BT_MCU_MINIMUM_INTERFACE_NUM;
->>> +/* To allow g_bdev being sized from btmtk_intf_num setting */
->>> +static struct btmtk_dev **g_bdev;
->> 
->> NO. Period. No global dev instances.
-> 
-> [Global dev.]
-> The global dev is for our state machine that design for error recovery, such as chip reset, memory dump and etc.
-> We must to make sure state machine transition that is the same flow for each interfaces (usb/sdio/pcie/uart).
-> [Mediatek driver]
-> -> Create a dev before interface probe.
-> [Linux kernel Bluetooth driver]
-> -> Create a dev in interface probe (btusb_probe).
-> 
-> May we create a global dev before interface probe?
+This is in regard to Message ID <20200806181714.3216076-1-luiz.dentz@gmail.com>,
+subject: [PATCH 1/4] Bluetooth: A2MP: Fix not initializing all members
 
-No. Please design things properly. Non of the drivers have global devices.
+I must apologize for not noticing this sooner, as I remember reading the articles linking to this patch several months ago. Either it slipped my mind, or I failed to notice it then. Apparently, nobody else noticed it, either, so I guess it's just not that obvious.
 
->>> +
->>> +/**
->>> + * Kernel Module init/exit Functions
->>> + */
->>> +static int __init main_driver_init(void)
->>> +{
->>> +	int ret = 0;
->>> +	int i;
->>> +
->>> +	/* Mediatek Driver Version */
->>> +	BTMTK_INFO("%s: MTK BT Driver Version : %s", __func__, VERSION);
->>> +
->>> +	ret = main_init();
->>> +	if (ret < 0)
->>> +		return ret;
->>> +
->>> +	for (i = 0; i < btmtk_intf_num; i++)
->>> +		btmtk_set_chip_state(g_bdev[i], BTMTK_STATE_DISCONNECT);
->>> +
->>> +	ret = btmtk_cif_register();
->>> +	if (ret < 0) {
->>> +		BTMTK_ERR("*** USB registration failed(%d)! ***", ret);
->>> +		main_exit();
->>> +		return ret;
->>> +	}
->>> +
->>> +	BTMTK_INFO("%s: Done", __func__);
->>> +	return ret;
->>> +}
->> 
->> NO. Period. Use module_usb_driver() and if you need anything more, you are
->> doing something wrong.
-> 
-> We would like to unify state machine, dev allocate, hif_hook and hif_register.
-> [Unify Common Part]: btmtk_main
-> State machine: Mediatek chip error recovery
-> Dev allocate: Bluetooth dev.
-> Mediatek chip-related behavior: Firmware download.
-> HCI device-related: hci register, open, close and send_frame.
-> 
-> [HIF Part] : btmtkusb/btmtksdio/btmtkuart
-> hif_hook (cif interface): read/write register, open/close, chip reset and etc.
-> hif_register (cif register): hif registration-related, such as usb_register/sdio_register_driver.
-> 
-> May we use the driver architecture?
+---
+ net/bluetooth/a2mp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-You can do that, but then first start with the existing btmtksdio and btmtkuart drivers to show me how you want to design it. You still have to design it cleanly.
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index da7fd7c8c2dc0..7a1e0b785f459 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -381,10 +381,11 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	hdev = hci_dev_get(req->id);
+ 	if (!hdev || hdev->amp_type == AMP_TYPE_BREDR || tmp) {
+ 		struct a2mp_amp_assoc_rsp rsp;
+-		rsp.id = req->id;
+ 
+ 		memset(&rsp, 0, sizeof(rsp));
+ 
++		rsp.id = req->id;
++
+ 		if (tmp) {
+ 			rsp.status = A2MP_STATUS_COLLISION_OCCURED;
+ 			amp_mgr_put(tmp);
