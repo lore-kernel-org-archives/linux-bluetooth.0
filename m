@@ -2,226 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7D7C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4640C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:43:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6067A2242A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:06:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E1CE229C4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:43:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbgL1KFz (ORCPT
+        id S1727202AbgL1Knb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Dec 2020 05:05:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49072 "EHLO
+        Mon, 28 Dec 2020 05:43:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727158AbgL1KFz (ORCPT
+        with ESMTP id S1726958AbgL1Knb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Dec 2020 05:05:55 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7384C061796
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:05:14 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id b123so17494313ybh.17
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:05:14 -0800 (PST)
+        Mon, 28 Dec 2020 05:43:31 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA46C061798
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:42:51 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id r17so9078450ilo.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:42:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=HzQbJfLng4nTdocg+2ktdAuB1zoBAkZF5kF7IpbEKGg=;
-        b=JFv7fBgaq2FthsbHpLKlyMQuO8rHJYScMzqQ91tz8I6KSsD/AUq2zp7jq+DS4YrK2x
-         VhCZBkcUBmDkwSFpCvlv8Z+5UvmfHol3BtD/hiitIpoBwq182vzsrgLC0XotTTwiU4Xa
-         h2FNZ2EsRI3ipwcopE5SrML1Z85vAqsuKG8Mcz6KdXTww32Nb3EEjQteFSxcATh7MJKA
-         BvAlfzKQhI6ZgSrcl/fzJFMUOhxb+5/wdCLuxlE9lrPhyMsjyDrW2mmyha7fa+zyMAeO
-         x/d9r+tbTwSW+MlnksTXwEqJOXw08NIb0fdzZYHvulP3VXzkXJWy/LWkZtofCNX+JSZr
-         XAKg==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ESvq7JDM0AwglaYauxg9ODpqV9v4QxfRybd8x5hURkg=;
+        b=lOvWcQzaw8w6ghkH0mK9T4R4X26UsTDZBLcilKORUKYqEuJ0wxg5gbsd24FtTBGSjO
+         DIYcvfVBS17DAhJixSQ2OMadZBi9y++mJr2thbylANoyPky6d9FBdkbtAQeQMnMyBqsd
+         /lwNVMWm/cHxXP92N6gvgQofzvjUTS4w+8doLPE9whiX2DABUDLXb5aE82mYmFkpYwXu
+         t9T8opR4wLSgCMDmuX2WAiFldsQrgYdoat1ueKW2U5h0frW7g0wES8DVPg1rezeUs6D7
+         60bBEuhd+KUTPDLN8IgwQ/ElVkaOl1nAaFFuE4jD4SydUjkHedp88zvutXuQZWWnW04h
+         jsTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=HzQbJfLng4nTdocg+2ktdAuB1zoBAkZF5kF7IpbEKGg=;
-        b=FED/qxZkIO/TqLILzSWBl11a8g8BoJQvT5e/s6QCw59gZyLkvxMNn/8aGPU1EwWpWQ
-         59EVuHUz42UG21CXjFDamGTBdhG4OaHzeXgS+ssrGxvIHjEYBPxPY8Ij1Pl4t9p+MxUZ
-         hUu3WxPBiQMB9gr7h+8kJJXPsyqp1IybQ8L0bT+LW5G17rfgV3+SOoJ16tKJnHf9X3GE
-         86RK5DO0T1hKjbM6HJF6efkuNUaeFkvfnMZp4sSrxJOMiRWlYqryAo/DYdSBg4SpWt7F
-         QH4+62EKY0159fYTzf9Y1/MqgZfKo9E2e7P4JzpyC+hHAGT1V7GO0cyUEQvNZT5TB4ul
-         YNjQ==
-X-Gm-Message-State: AOAM530LLCzONH+Xn7/PA1MhB2fzYRZzcelPDVGwicNM6cBrY4JTTw9V
-        Y9dfYlbo3QAId7PiovECwuFjRYBrAiueWQCHhL3GeYOy1bMlyg9XOEYgzPEJ5m3sVQSov7Nj/S4
-        hMGMRpQ334aejn8FGXIW04dMK+NnFdCfowkbwl9opwfQKZTd+5+5qQxEpjCgLeM/BhQII2Z779i
-        LewfK4gyd+fWg=
-X-Google-Smtp-Source: ABdhPJxtTDmy/GlTIyOHtSfqTwPQxLQCcFwEQyMGPqNajBooiBUuGea09h/o4QgW7L+cmbrCcj2A007GUpaJ55SzBg==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a25:2643:: with SMTP id
- m64mr66305216ybm.221.1609149913965; Mon, 28 Dec 2020 02:05:13 -0800 (PST)
-Date:   Mon, 28 Dec 2020 18:04:57 +0800
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ESvq7JDM0AwglaYauxg9ODpqV9v4QxfRybd8x5hURkg=;
+        b=Lx6bAvSTmYcMoPQifq6FNNz7srNm1EHGCae/0IlGzahLIx8u4Ma2sEHA9jOk9DM2St
+         qMcwhYHOOGtR48pHyHDIIlF2rda7E4CRmg1RrpUEBH/naTUqcoAJM8cEEOBMLFXirRv3
+         LaGQ7ZZCo2IeTCRv4vv42FHu0uYMoNlRHWZnWR8tWm5K4M5vgmpEqXouaEFa+9DECRiG
+         X1EWBP9584EEnp0vG8XJeg6IFIKtwYBBgDBV1ZtYDz+n4fGooH4uLxFIn+aT/ybipYsR
+         /ZcHbKnxJ8ldrov2bdd//7fzdwqhu+68vmbETzYIvw0hRPlB/Gqg6tKSSw0urKPQ/rkL
+         Pryg==
+X-Gm-Message-State: AOAM533DqBCmrtbzGFlA8TT1ysAVUH1cqdcUOiEIQ973qrge1wY+Rx/0
+        HDGCfZYOCLtUE6lD65vpcHGwJgoqFYE=
+X-Google-Smtp-Source: ABdhPJxpdLwrEPT5pbjj2fpRU+mI/M1t3vB/iUiHaDIzgjbz782OR4LDyRZdz9JisfLj3ovQiSMZew==
+X-Received: by 2002:a92:c6c3:: with SMTP id v3mr43161060ilm.281.1609152170347;
+        Mon, 28 Dec 2020 02:42:50 -0800 (PST)
+Received: from [172.17.0.2] ([137.116.58.25])
+        by smtp.gmail.com with ESMTPSA id o11sm27067038ilt.23.2020.12.28.02.42.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Dec 2020 02:42:49 -0800 (PST)
+Message-ID: <5fe9b6a9.1c69fb81.948f8.694f@mx.google.com>
+Date:   Mon, 28 Dec 2020 02:42:49 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4355444511963207314=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: [Bluez,v2,1/4] shared/mgmt: Add supports of parsing mgmt tlv list
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
-Message-Id: <20201228180429.Bluez.v2.3.Idca009971ca95228a3fa7232ef648f18ff64d185@changeid>
-Mime-Version: 1.0
 References: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
-X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [Bluez PATCH v2 3/4] btmgmt: Add command set-sysconfig
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        luiz.dentz@gmail.com
-Cc:     mcchou@chromium.org, mmandlik@chromium.org, apusaka@chromium.org,
-        Howard Chung <howardchung@google.com>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add command set-sysconfig in btmgmt
+--===============4355444511963207314==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Example usage:
-[mgmt]# set-sysconfig -h
-Parameters:
-        -v <type:length:value>...
-e.g.:
-        set-sysconfig -v 001a:2:1234 001f:1:00
-[mgmt]# set-sysconfig -v 8:2:abcd 1:02:0100 0016:2:0600
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDA2NzA5CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+UGF0Y2ggLSBGQUlMCk91dHB1dDoKYnRtZ210OiBBZGQgY29tbWFuZCBzZXQtc3lzY29uZmlnCldB
+Uk5JTkc6TkFLRURfU1NDQU5GOiB1bmNoZWNrZWQgc3NjYW5mIHJldHVybiB2YWx1ZQojNDI6IEZJ
+TEU6IHRvb2xzL2J0bWdtdC5jOjE4MTg6CisJCWlmICghc3NjYW5mKGlucHV0ICsgaSAqIDIsICIl
+MmhoeCIsICZ2YWx1ZVtpXSkpCisJCQlyZXR1cm4gZmFsc2U7CgotIHRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBv
+cnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxs
+eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
+Y2UuCgoiW1BBVENIXSBidG1nbXQ6IEFkZCBjb21tYW5kIHNldC1zeXNjb25maWciIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczog
+Q09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5H
+RVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQTElUX1NUUklORyBTU0NBTkZfVE9f
+S1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBw
+bGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBD
+aGVja0dpdExpbnQgLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
+Q2hlY2tCdWlsZCAtIEZBSUwKT3V0cHV0Ogp0b29scy9idG1nbXQuYzogSW4gZnVuY3Rpb24g4oCY
+cmVhZF9zeXNjb25maWdfcnNw4oCZOgp0b29scy9idG1nbXQuYzoxNzY5OjE5OiBlcnJvcjogdW51
+c2VkIHZhcmlhYmxlIOKAmGVudHJ54oCZIFstV2Vycm9yPXVudXNlZC12YXJpYWJsZV0KIDE3Njkg
+fCAgc3RydWN0IG1nbXRfdGx2ICplbnRyeTsKICAgICAgfCAgICAgICAgICAgICAgICAgICBefn5+
+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiog
+W01ha2VmaWxlOjY3OTI6IHRvb2xzL2J0bWdtdC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZp
+bGU6NDAyMzogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRl
+c3Q6IE1ha2VDaGVjayAtIFNLSVBQRUQKT3V0cHV0OgpjaGVja2J1aWxkIG5vdCBzdWNjZXNzCgoK
+Ci0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
-Reviewed-by: apusaka@chromium.org
----
-
-Changes in v2:
-- Replace hard tabs with soft tabs in commit messages
-
- tools/btmgmt.c | 109 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
-
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index c766de862a12..4cc94efe3f1a 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -1799,6 +1799,113 @@ static void cmd_read_sysconfig(int argc, char **argv)
- 	}
- }
- 
-+static bool parse_mgmt_tlv(const char *input, uint16_t *type, uint8_t *length,
-+								uint8_t *value)
-+{
-+	int i, value_starting_pos;
-+
-+	if (sscanf(input, "%4hx:%1hhu:%n", type, length,
-+						&value_starting_pos) < 2) {
-+		return false;
-+	}
-+
-+	input += value_starting_pos;
-+
-+	if (*length * 2 != strlen(input))
-+		return false;
-+
-+	for (i = 0; i < *length; i++) {
-+		if (!sscanf(input + i * 2, "%2hhx", &value[i]))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void set_sysconfig_rsp(uint8_t status, uint16_t len, const void *param,
-+								void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Could not set default system configuration with status "
-+				"0x%02x (%s)", status, mgmt_errstr(status));
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	print("Set default system configuration success");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static bool set_sysconfig(int argc, char **argv)
-+{
-+	struct mgmt_tlv_list *tlv_list = NULL;
-+	int i;
-+	uint16_t index, type;
-+	uint8_t length;
-+	uint8_t value[256] = {};
-+	bool success = false;
-+
-+	index = mgmt_index;
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	tlv_list = mgmt_tlv_list_new();
-+	if (!tlv_list) {
-+		error("tlv_list failed to init");
-+		goto failed;
-+	}
-+
-+	for (i = 0; i < argc; i++) {
-+		if (!parse_mgmt_tlv(argv[i], &type, &length, value)) {
-+			error("failed to parse");
-+			goto failed;
-+		}
-+
-+		if (!mgmt_tlv_add(tlv_list, type, length, value)) {
-+			error("failed to add");
-+			goto failed;
-+		}
-+	}
-+
-+	if (!mgmt_send_tlv(mgmt, MGMT_OP_SET_DEF_SYSTEM_CONFIG, index,
-+				tlv_list, set_sysconfig_rsp, NULL, NULL)) {
-+		error("Failed to send \"Set Default System Configuration\""
-+								" command");
-+		goto failed;
-+	}
-+
-+	success = true;
-+
-+failed:
-+	if (tlv_list)
-+		mgmt_tlv_list_free(tlv_list);
-+
-+	return success;
-+}
-+
-+static void set_sysconfig_usage(void)
-+{
-+	bt_shell_usage();
-+	print("Parameters:\n\t-v <type:length:value>...\n"
-+		"e.g.:\n\tset-sysconfig -v 001a:2:1234 001f:1:00");
-+}
-+
-+static void cmd_set_sysconfig(int argc, char **argv)
-+{
-+	bool success = false;
-+
-+	if (strcasecmp(argv[1], "-v") == 0 && argc > 2) {
-+		argc -= 2;
-+		argv += 2;
-+		success = set_sysconfig(argc, argv);
-+	}
-+
-+	if (!success) {
-+		set_sysconfig_usage();
-+		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+}
-+
- static void auto_power_enable_rsp(uint8_t status, uint16_t len,
- 					const void *param, void *user_data)
- {
-@@ -5079,6 +5186,8 @@ static const struct bt_shell_menu main_menu = {
- 		cmd_exp_debug,		"Set debug feature"		},
- 	{ "read-sysconfig",	NULL,
- 		cmd_read_sysconfig,	"Read System Configuration"	},
-+	{ "set-sysconfig",	"<-v|-h> [options...]",
-+		cmd_set_sysconfig,	"Set System Configuration"	},
- 	{} },
- };
- 
--- 
-2.29.2.729.g45daf8777d-goog
-
+--===============4355444511963207314==--
