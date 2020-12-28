@@ -2,129 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FCAC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 07:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D569C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:06:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5BB9207D1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 07:09:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D0D122A84
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:06:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgL1HJT (ORCPT
+        id S1727138AbgL1KFw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Dec 2020 02:09:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
+        Mon, 28 Dec 2020 05:05:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726247AbgL1HJT (ORCPT
+        with ESMTP id S1727094AbgL1KFv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Dec 2020 02:09:19 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6788C061794
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Dec 2020 23:08:38 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id q1so8720924ilt.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Dec 2020 23:08:38 -0800 (PST)
+        Mon, 28 Dec 2020 05:05:51 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE6CC061795
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:05:11 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id x74so7762228qkb.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:05:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=aKr2WBK7mJDblrKHQzH/8XWXaNMwwW9MHEv1iJl3unY=;
-        b=iXWDr86lti0VKx26E0ttv4wMyr6PuLsN0eMO1ZyQ/iK6S3rwpJ9hyT2/5rORKGzvKo
-         nmX+EDCl/QpWiwT1nyLeywLtMHJAXuqZvmWiPJp8Lv3QnNeIpElOuzUN4f7QTb/5WIin
-         2PapnE0oq3+SHT3OecG5hxcaD9xT+Zn4hCoLWSfL6/ml6WXbZB4Kf9Px3CqLR05Opg84
-         gq2n02BONqs2FQPEYpkz8LCdnqvRcuuhFMJfO90umlT7Fe4XpHD034fRFTM7GVeRWe+t
-         L2ptB4AHt01CwF9/OF28QuSKbLAxSXuByF9T5BpqTZ6fNZcRaYC04GtBQR5fEVlgnOft
-         dxFw==
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=J2n6YIvt4zqJQtx4TNVo84THrt9CDungO41tQh0sK+g=;
+        b=F3FHdEawCo80i2i9MW7UY5w4rH0BhVxOBWmGcGwr7NOny587TsXw2RuT+FnXcUk8jv
+         2Y9rwuIqJP0nNKGsb7ZetXh5iD9vn5VHS+2LtLUGwY7+iLi2Pkjv5NLTTYZSDat42+qz
+         8+KW+bY9AiTaI3hyf1FH+WGcW8I9lRezgGEKTE0RWYfj5j5V3KIIkiZHSIkf3BLy66VX
+         2YVi2prnZhuFtu4g0bQ+d1gOx8b6E0yJYntkLjnkqtYaXY8H/fOCTB/a0HhYZJmVoZHw
+         P1Lrym+G/GPWv9Q9NsGqIOt2fRl2jc7dwxQ62J/EQvBPR2tAvdvgCmnIBRTFSyFFNIk9
+         CbYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=aKr2WBK7mJDblrKHQzH/8XWXaNMwwW9MHEv1iJl3unY=;
-        b=gOZjV+CNdhlcH9PmkkoHjeov1OzSh+8071iNZpyBxs/20dA6HfDbnDWFtCZO4ptwMm
-         +fczh4kLwha3Lel79vS71Nk+W0jaeuM0uQhCih4iNGNuLIkrUuclrYVHFtO6/L/bll/u
-         WzCAGx0qxhlm5RxZZhsqqLMrwN9ouJLUB8giLR3pdxxdxy4gJ2ikcx02PmXhZ+qpLzhD
-         Nk769VJjGj3xPTz/1NOOpXvkxNWjewd57n3yAJaJjbQJKGsBpRJrF3gvI8yrngAAjj0l
-         bmNqd1IKDcnq+8kbPtxt/DeLKaCpwxHHGM0M+syjch52Nl634ElDz2a3EV71QQdKeTmw
-         ON7w==
-X-Gm-Message-State: AOAM533VXmml/Ts6w67aVvoPCbChmCMuYsbSykWA7S+J0i4CWnc3xm2n
-        ZlUYkzV0R5EFGU1KtjU+aVH59Lefpas=
-X-Google-Smtp-Source: ABdhPJwdH6eylJryxB1XJtEpp+pUN8tz3ZJ3Tjb7I3rSlNtGBHDetfW9YGd7ZBBElFOf3M4oJfDFzA==
-X-Received: by 2002:a05:6e02:102f:: with SMTP id o15mr42745151ilj.142.1609139317814;
-        Sun, 27 Dec 2020 23:08:37 -0800 (PST)
-Received: from [172.17.0.2] ([20.185.34.75])
-        by smtp.gmail.com with ESMTPSA id p3sm32316138iol.35.2020.12.27.23.08.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Dec 2020 23:08:37 -0800 (PST)
-Message-ID: <5fe98475.1c69fb81.ff497.15c4@mx.google.com>
-Date:   Sun, 27 Dec 2020 23:08:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8907483464826495419=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v1,1/4] shared/mgmt: Add supports of parsing mgmt tlv list
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201228144543.Bluez.v1.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
-References: <20201228144543.Bluez.v1.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=J2n6YIvt4zqJQtx4TNVo84THrt9CDungO41tQh0sK+g=;
+        b=FkWCnucbW67iYIZx4Vs6sDQzGQ4dB2N4HvElHUxuHv6PJo+50WH+KcPfqnqg2VFYXh
+         F15S26Lo9N7sKNmxy0siSVu6qLW/DnreW6PieqP3jsnrNiQmWedT7uEupQfxa+RtvCve
+         t7ZIqodBp1HifcPC+ZGFuaUKJgHoz8Zk7YKy9M+mG257kz/2H5i9PVJ8nLDfuwpURfd0
+         efVV9lAMFNqpwuMBztXKrys3Xs8LzYVHLqnSL8PtUKWrbJgVdYfsiWz3TWTQuXSVoo7w
+         2AP5MQBPZijJhya4PsV3QEHHtSGsommESHQoOt2d1rHBwX8NDRmJ3tPLFuJjmUydUmDR
+         6Fbg==
+X-Gm-Message-State: AOAM532EWXiCPvUfkuYSj1+6PCoj701MnvVVzz2vlxOHoGXY0sr1Gu2Q
+        5ptwE73SViFM/OiQnMpHylaPDV5L4FkLa9LoLRgldtZkRVsKD0K5D7QrZjjGS3VrJB11T4Upcqy
+        ggI7ET9IerxOUOHQMa/bRIADRp6bdQE7+LdFkCM9RLW3PmkhFG68g4HHC9N9wsXNWiB0A3IUqCj
+        sJub7VhMqkrwg=
+X-Google-Smtp-Source: ABdhPJwn/CXbEm2cIsswgkwQk5B3SLAVfXIkFYtlpwYfDPzUIdmQGekZo86ZUhwwJr8JIiYGmCzbeGOY7BmnUjBZ1Q==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:a0c:fd8f:: with SMTP id
+ p15mr37474076qvr.48.1609149910290; Mon, 28 Dec 2020 02:05:10 -0800 (PST)
+Date:   Mon, 28 Dec 2020 18:04:56 +0800
+In-Reply-To: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+Message-Id: <20201228180429.Bluez.v2.2.I0c07c297925f838138b42674ab244572e6ea361b@changeid>
+Mime-Version: 1.0
+References: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
+Subject: [Bluez PATCH v2 2/4] btmgmt: Add command read-sysconfig
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        luiz.dentz@gmail.com
+Cc:     mcchou@chromium.org, mmandlik@chromium.org, apusaka@chromium.org,
+        Howard Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8907483464826495419==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Add command read-sysconfig in btmgmt
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDA2NjU5CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-UGF0Y2ggLSBGQUlMCk91dHB1dDoKYnRtZ210OiBBZGQgY29tbWFuZCBzZXQtc3lzY29uZmlnCldB
-Uk5JTkc6TkFLRURfU1NDQU5GOiB1bmNoZWNrZWQgc3NjYW5mIHJldHVybiB2YWx1ZQojNDI6IEZJ
-TEU6IHRvb2xzL2J0bWdtdC5jOjE4MTg6CisJCWlmICghc3NjYW5mKGlucHV0ICsgaSAqIDIsICIl
-MmhoeCIsICZ2YWx1ZVtpXSkpCisJCQlyZXR1cm4gZmFsc2U7CgotIHRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBv
-cnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxs
-eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
-Y2UuCgoiW1BBVENIXSBidG1nbXQ6IEFkZCBjb21tYW5kIHNldC1zeXNjb25maWciIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczog
-Q09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5H
-RVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQTElUX1NUUklORyBTU0NBTkZfVE9f
-S1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBw
-bGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBD
-aGVja0dpdExpbnQgLSBGQUlMCk91dHB1dDoKYnRtZ210OiBBZGQgY29tbWFuZCBzZXQtc3lzY29u
-ZmlnCjg6IEIzIExpbmUgY29udGFpbnMgaGFyZCB0YWIgY2hhcmFjdGVycyAoXHQpOiAiCS12IDx0
-eXBlOmxlbmd0aDp2YWx1ZT4uLi4iCjEwOiBCMyBMaW5lIGNvbnRhaW5zIGhhcmQgdGFiIGNoYXJh
-Y3RlcnMgKFx0KTogIglzZXQtc3lzY29uZmlnIC12IDAwMWE6MjoxMjM0IDAwMWY6MTowMCIKCgoj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tCdWlsZCAtIEZBSUwKT3V0
-cHV0OgpzcmMvc2hhcmVkL21nbXQuYzogSW4gZnVuY3Rpb24g4oCYbWdtdF90bHZfbGlzdF9mcmVl
-4oCZOgpzcmMvc2hhcmVkL21nbXQuYzo1OTg6Mzc6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDIg
-b2Yg4oCYcXVldWVfZGVzdHJveeKAmSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1X
-ZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgNTk4IHwgIHF1ZXVlX2Rlc3Ryb3ko
-dGx2X2xpc3QtPnRsdl9xdWV1ZSwgbWdtdF90bHZfZnJlZSk7CiAgICAgIHwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fgogICAgICB8ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB2b2lkICgqKShzdHJ1Y3QgbWdtdF90bHYgKikKSW4gZmlsZSBpbmNsdWRl
-ZCBmcm9tIHNyYy9zaGFyZWQvbWdtdC5jOjI1OgouL3NyYy9zaGFyZWQvcXVldWUuaDoyMzo2Mjog
-bm90ZTogZXhwZWN0ZWQg4oCYcXVldWVfZGVzdHJveV9mdW5jX3TigJkge2FrYSDigJh2b2lkICgq
-KSh2b2lkICop4oCZfSBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSDigJh2b2lkICgqKShzdHJ1Y3Qg
-bWdtdF90bHYgKinigJkKICAgMjMgfCB2b2lkIHF1ZXVlX2Rlc3Ryb3koc3RydWN0IHF1ZXVlICpx
-dWV1ZSwgcXVldWVfZGVzdHJveV9mdW5jX3QgZGVzdHJveSk7CiAgICAgIHwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+fn5+fl5+fn5+fn4K
-c3JjL3NoYXJlZC9tZ210LmM6IEluIGZ1bmN0aW9uIOKAmG1nbXRfdGx2X2xpc3RfbG9hZF9mcm9t
-X2J1ZuKAmToKc3JjL3NoYXJlZC9tZ210LmM6NjQxOjI4OiBlcnJvcjogaW5pdGlhbGl6YXRpb24g
-b2Yg4oCYc3RydWN0IG1nbXRfdGx2ICrigJkgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBl
-IOKAmGNvbnN0IHVpbnQ4X3QgKuKAmSB7YWthIOKAmGNvbnN0IHVuc2lnbmVkIGNoYXIgKuKAmX0g
-Wy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgNjQxIHwgICBzdHJ1Y3QgbWdt
-dF90bHYgKmVudHJ5ID0gY3VyOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+
-fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiog
-W01ha2VmaWxlOjY4MDg6IHNyYy9zaGFyZWQvbWdtdC5sb10gRXJyb3IgMQptYWtlOiAqKiogW01h
-a2VmaWxlOjQwMjM6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IwpUZXN0OiBNYWtlQ2hlY2sgLSBTS0lQUEVECk91dHB1dDoKY2hlY2tidWlsZCBub3Qgc3VjY2Vz
-cwoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+Example usage:
+localhost ~ # btmgmt
+[mgmt]# read-sysconfig
+Type: 0x0000    Length: 02      Value: 0000
+Type: 0x0001    Length: 02      Value: 0008
+...
+Type: 0x001f    Length: 01      Value: 01
 
---===============8907483464826495419==--
+Reviewed-by: apusaka@chromium.org
+---
+
+(no changes since v1)
+
+ tools/btmgmt.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 2f7cb2efcc38..c766de862a12 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1752,6 +1752,53 @@ static void cmd_exp_debug(int argc, char **argv)
+ 	}
+ }
+ 
++static void print_mgmt_tlv(void *data, void *user_data)
++{
++	const struct mgmt_tlv *entry = data;
++	char buf[256];
++
++	bin2hex(entry->value, entry->length, buf, sizeof(buf));
++	print("Type: 0x%04x\tLength: %02hhu\tValue: %s", entry->type,
++							entry->length, buf);
++}
++
++static void read_sysconfig_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	struct mgmt_tlv_list *tlv_list;
++	struct mgmt_tlv *entry;
++
++	if (status != 0) {
++		error("Read system configuration failed with status "
++				"0x%02x (%s)", status, mgmt_errstr(status));
++		return;
++	}
++
++	tlv_list = mgmt_tlv_list_load_from_buf(param, len);
++	if (!tlv_list) {
++		error("Unable to parse response of read system configuration");
++		return;
++	}
++
++	mgmt_tlv_list_foreach(tlv_list, print_mgmt_tlv, NULL);
++	mgmt_tlv_list_free(tlv_list);
++}
++
++static void cmd_read_sysconfig(int argc, char **argv)
++{
++	uint16_t index;
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (!mgmt_send(mgmt, MGMT_OP_READ_DEF_SYSTEM_CONFIG, index,
++			0, NULL, read_sysconfig_rsp, NULL, NULL)) {
++		error("Unable to send read system configuration cmd");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
+ static void auto_power_enable_rsp(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+@@ -5030,6 +5077,8 @@ static const struct bt_shell_menu main_menu = {
+ 		cmd_expinfo,		"Show experimental features"	},
+ 	{ "exp-debug",		"<on/off>",
+ 		cmd_exp_debug,		"Set debug feature"		},
++	{ "read-sysconfig",	NULL,
++		cmd_read_sysconfig,	"Read System Configuration"	},
+ 	{} },
+ };
+ 
+-- 
+2.29.2.729.g45daf8777d-goog
+
