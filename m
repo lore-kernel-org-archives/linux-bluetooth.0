@@ -2,109 +2,183 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4640C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA99C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E1CE229C4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 10:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E08EE229C5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727202AbgL1Knb (ORCPT
+        id S1727211AbgL1LUH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Dec 2020 05:43:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726958AbgL1Knb (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Dec 2020 05:43:31 -0500
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA46C061798
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:42:51 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id r17so9078450ilo.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Dec 2020 02:42:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ESvq7JDM0AwglaYauxg9ODpqV9v4QxfRybd8x5hURkg=;
-        b=lOvWcQzaw8w6ghkH0mK9T4R4X26UsTDZBLcilKORUKYqEuJ0wxg5gbsd24FtTBGSjO
-         DIYcvfVBS17DAhJixSQ2OMadZBi9y++mJr2thbylANoyPky6d9FBdkbtAQeQMnMyBqsd
-         /lwNVMWm/cHxXP92N6gvgQofzvjUTS4w+8doLPE9whiX2DABUDLXb5aE82mYmFkpYwXu
-         t9T8opR4wLSgCMDmuX2WAiFldsQrgYdoat1ueKW2U5h0frW7g0wES8DVPg1rezeUs6D7
-         60bBEuhd+KUTPDLN8IgwQ/ElVkaOl1nAaFFuE4jD4SydUjkHedp88zvutXuQZWWnW04h
-         jsTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ESvq7JDM0AwglaYauxg9ODpqV9v4QxfRybd8x5hURkg=;
-        b=Lx6bAvSTmYcMoPQifq6FNNz7srNm1EHGCae/0IlGzahLIx8u4Ma2sEHA9jOk9DM2St
-         qMcwhYHOOGtR48pHyHDIIlF2rda7E4CRmg1RrpUEBH/naTUqcoAJM8cEEOBMLFXirRv3
-         LaGQ7ZZCo2IeTCRv4vv42FHu0uYMoNlRHWZnWR8tWm5K4M5vgmpEqXouaEFa+9DECRiG
-         X1EWBP9584EEnp0vG8XJeg6IFIKtwYBBgDBV1ZtYDz+n4fGooH4uLxFIn+aT/ybipYsR
-         /ZcHbKnxJ8ldrov2bdd//7fzdwqhu+68vmbETzYIvw0hRPlB/Gqg6tKSSw0urKPQ/rkL
-         Pryg==
-X-Gm-Message-State: AOAM533DqBCmrtbzGFlA8TT1ysAVUH1cqdcUOiEIQ973qrge1wY+Rx/0
-        HDGCfZYOCLtUE6lD65vpcHGwJgoqFYE=
-X-Google-Smtp-Source: ABdhPJxpdLwrEPT5pbjj2fpRU+mI/M1t3vB/iUiHaDIzgjbz782OR4LDyRZdz9JisfLj3ovQiSMZew==
-X-Received: by 2002:a92:c6c3:: with SMTP id v3mr43161060ilm.281.1609152170347;
-        Mon, 28 Dec 2020 02:42:50 -0800 (PST)
-Received: from [172.17.0.2] ([137.116.58.25])
-        by smtp.gmail.com with ESMTPSA id o11sm27067038ilt.23.2020.12.28.02.42.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Dec 2020 02:42:49 -0800 (PST)
-Message-ID: <5fe9b6a9.1c69fb81.948f8.694f@mx.google.com>
-Date:   Mon, 28 Dec 2020 02:42:49 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4355444511963207314=="
+        Mon, 28 Dec 2020 06:20:07 -0500
+Received: from mga14.intel.com ([192.55.52.115]:24242 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727165AbgL1LUH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 28 Dec 2020 06:20:07 -0500
+IronPort-SDR: 8rhgHyekVflehZBTn8ucPom17YfKFK6NliuvA8D2w2denru0qyz247EdYoytDsCmtKZCiZdr+F
+ EiowGraPwp0g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9847"; a="175596482"
+X-IronPort-AV: E=Sophos;i="5.78,455,1599548400"; 
+   d="scan'208";a="175596482"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2020 03:19:25 -0800
+IronPort-SDR: iuVco1mT4U0AUopvKj9Lj5oDWgWbxmkx9Bjv1L2/RZmlUQ1JllkWn2a+M02TscbTxL2nw8On6d
+ 3R2NufVXM/Sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,455,1599548400"; 
+   d="scan'208";a="494288419"
+Received: from lkp-server02.sh.intel.com (HELO 4242b19f17ef) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 28 Dec 2020 03:19:23 -0800
+Received: from kbuild by 4242b19f17ef with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1ktqYc-0002sv-Qi; Mon, 28 Dec 2020 11:19:22 +0000
+Date:   Mon, 28 Dec 2020 19:18:34 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ a5687c644015a097304a2e47476c0ecab2065734
+Message-ID: <5fe9bf0a.YV9VArVOOZ2REnSR%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v2,1/4] shared/mgmt: Add supports of parsing mgmt tlv list
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
-References: <20201228180429.Bluez.v2.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4355444511963207314==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git  master
+branch HEAD: a5687c644015a097304a2e47476c0ecab2065734  Bluetooth: Fix initializing response id after clearing struct
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDA2NzA5CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-UGF0Y2ggLSBGQUlMCk91dHB1dDoKYnRtZ210OiBBZGQgY29tbWFuZCBzZXQtc3lzY29uZmlnCldB
-Uk5JTkc6TkFLRURfU1NDQU5GOiB1bmNoZWNrZWQgc3NjYW5mIHJldHVybiB2YWx1ZQojNDI6IEZJ
-TEU6IHRvb2xzL2J0bWdtdC5jOjE4MTg6CisJCWlmICghc3NjYW5mKGlucHV0ICsgaSAqIDIsICIl
-MmhoeCIsICZ2YWx1ZVtpXSkpCisJCQlyZXR1cm4gZmFsc2U7CgotIHRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBv
-cnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxs
-eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
-Y2UuCgoiW1BBVENIXSBidG1nbXQ6IEFkZCBjb21tYW5kIHNldC1zeXNjb25maWciIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczog
-Q09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5H
-RVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQTElUX1NUUklORyBTU0NBTkZfVE9f
-S1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBw
-bGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBD
-aGVja0dpdExpbnQgLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
-Q2hlY2tCdWlsZCAtIEZBSUwKT3V0cHV0Ogp0b29scy9idG1nbXQuYzogSW4gZnVuY3Rpb24g4oCY
-cmVhZF9zeXNjb25maWdfcnNw4oCZOgp0b29scy9idG1nbXQuYzoxNzY5OjE5OiBlcnJvcjogdW51
-c2VkIHZhcmlhYmxlIOKAmGVudHJ54oCZIFstV2Vycm9yPXVudXNlZC12YXJpYWJsZV0KIDE3Njkg
-fCAgc3RydWN0IG1nbXRfdGx2ICplbnRyeTsKICAgICAgfCAgICAgICAgICAgICAgICAgICBefn5+
-fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiog
-W01ha2VmaWxlOjY3OTI6IHRvb2xzL2J0bWdtdC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZp
-bGU6NDAyMzogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRl
-c3Q6IE1ha2VDaGVjayAtIFNLSVBQRUQKT3V0cHV0OgpjaGVja2J1aWxkIG5vdCBzdWNjZXNzCgoK
-Ci0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+elapsed time: 721m
 
---===============4355444511963207314==--
+configs tested: 113
+configs skipped: 3
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+arm                     davinci_all_defconfig
+m68k                          sun3x_defconfig
+arm                            xcep_defconfig
+m68k                       m5275evb_defconfig
+arm                         s5pv210_defconfig
+arm                         mv78xx0_defconfig
+mips                  maltasmvp_eva_defconfig
+mips                         db1xxx_defconfig
+arc                         haps_hs_defconfig
+arm                          badge4_defconfig
+powerpc                  mpc866_ads_defconfig
+xtensa                         virt_defconfig
+powerpc                 mpc8540_ads_defconfig
+arm                            hisi_defconfig
+m68k                        mvme147_defconfig
+sh                         ecovec24_defconfig
+mips                malta_kvm_guest_defconfig
+arm                         s3c6400_defconfig
+mips                            ar7_defconfig
+m68k                         amcore_defconfig
+alpha                            allyesconfig
+h8300                    h8300h-sim_defconfig
+arm                             mxs_defconfig
+arm                        vexpress_defconfig
+arm                        magician_defconfig
+mips                        nlm_xlp_defconfig
+m68k                             alldefconfig
+xtensa                    xip_kc705_defconfig
+ia64                        generic_defconfig
+ia64                          tiger_defconfig
+powerpc                     kilauea_defconfig
+arm                      jornada720_defconfig
+ia64                             allmodconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+c6x                              allyesconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                               tinyconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+x86_64               randconfig-a001-20201227
+x86_64               randconfig-a006-20201227
+x86_64               randconfig-a004-20201227
+x86_64               randconfig-a002-20201227
+x86_64               randconfig-a003-20201227
+x86_64               randconfig-a005-20201227
+i386                 randconfig-a005-20201228
+i386                 randconfig-a002-20201228
+i386                 randconfig-a004-20201228
+i386                 randconfig-a006-20201228
+i386                 randconfig-a003-20201228
+i386                 randconfig-a001-20201228
+i386                 randconfig-a002-20201227
+i386                 randconfig-a005-20201227
+i386                 randconfig-a006-20201227
+i386                 randconfig-a004-20201227
+i386                 randconfig-a003-20201227
+i386                 randconfig-a001-20201227
+i386                 randconfig-a011-20201227
+i386                 randconfig-a016-20201227
+i386                 randconfig-a012-20201227
+i386                 randconfig-a014-20201227
+i386                 randconfig-a015-20201227
+i386                 randconfig-a013-20201227
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                                   rhel
+x86_64                           allyesconfig
+x86_64                    rhel-7.6-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                      rhel-8.3-kbuiltin
+x86_64                                  kexec
+
+clang tested configs:
+x86_64               randconfig-a015-20201227
+x86_64               randconfig-a014-20201227
+x86_64               randconfig-a016-20201227
+x86_64               randconfig-a012-20201227
+x86_64               randconfig-a013-20201227
+x86_64               randconfig-a011-20201227
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
