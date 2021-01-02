@@ -2,76 +2,72 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 669F6C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Jan 2021 13:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F09C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Jan 2021 21:08:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25737224D4
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Jan 2021 13:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 988EB20799
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Jan 2021 21:08:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbhABNoI convert rfc822-to-8bit (ORCPT
+        id S1726688AbhABVI4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 2 Jan 2021 08:44:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39594 "EHLO mail.kernel.org"
+        Sat, 2 Jan 2021 16:08:56 -0500
+Received: from hoster906.com ([192.252.156.27]:37672 "EHLO hoster906.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726567AbhABNoI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 2 Jan 2021 08:44:08 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 943F122482
-        for <linux-bluetooth@vger.kernel.org>; Sat,  2 Jan 2021 13:43:27 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204765] debugfs: File 'le_min_key_size' in directory 'hci0'
- already present!
-Date:   Sat, 02 Jan 2021 13:43:27 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: icegood1980@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-204765-62941-lvxcvjHdJj@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204765-62941@https.bugzilla.kernel.org/>
-References: <bug-204765-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726667AbhABVI4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 2 Jan 2021 16:08:56 -0500
+X-Greylist: delayed 401 seconds by postgrey-1.27 at vger.kernel.org; Sat, 02 Jan 2021 16:08:56 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=to:cc
+        :from:subject:message-id:date:mime-version:content-type
+        :content-transfer-encoding; s=dkim; bh=K8q68xQQSXiYwsSP43gMggwEN
+        j8BGJGBq82V1Izl4DU=; b=D7/HLt71fMNNNeoTSt/pU+u/QS7A/ZL5y26yEUZbA
+        Idl91XWWxUuO/ixH7s3i8SVnpy6vvhVe8VF1oN+hjLs2Xa5VCwXrEuhuWGzlzkpr
+        YXai/hYoFw/dMOR05wdSWbetmLlnwXmgbAbKo6oOOfDrmbiedSDsbmw6JIRddiKt
+        ig=
+Received: (qmail 35826 invoked by uid 503); 2 Jan 2021 21:01:34 -0000
+Received: from unknown (HELO ?192.168.254.79?) (mike@mnmoran.org@40.134.89.129)
+  by hoster906.com with ESMTPA; 2 Jan 2021 21:01:34 -0000
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     "Gix, Brian" <brian.gix@intel.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+From:   "Michael N. Moran" <mike@mnmoran.org>
+Subject: mesh: Key Refresh procedure does not finalize AppKeys
+Message-ID: <1a29717a-5c89-37d3-7fdb-dceeae33bee5@mnmoran.org>
+Date:   Sat, 2 Jan 2021 16:01:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204765
+Greetings meshers,
 
-Sergey Ivanov (icegood1980@gmail.com) changed:
+I am testing a BlueZ mesh configuration client that performs the Key Refresh procedure.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |icegood1980@gmail.com
+Key Refresh works splendidly for NetKeys.
 
---- Comment #13 from Sergey Ivanov (icegood1980@gmail.com) ---
-Hi all. I don't see why only 5.11 fixes this. As for me I see such an issue
-after BT was off and there was the sleep of laptop. 
+Key Refresh also works well for AppKeys located on actual remote nodes.
 
-debugfs: File 'force_bredr_smp' in directory 'hci0' already present!
+However, when updating the AppKeys for (what I will call) "virtual"[1] (those nodes that execute on the same host as the configuration client), the final transition back to Phase 0 doesn't take effect after returning to Phase 0 unless I restart bluetooth-meshd.
 
-uname -a
-Linux ice-ubuntu 5.8.0-34-generic #37-Ubuntu SMP Thu Dec 10 18:01:14 UTC 2020
-x86_64 x86_64 x86_64 GNU/Linux
+Apparently, the persistence/data-base is updated correctly since the proper state is restored after a restart of the daemon.
 
--- 
-You may reply to this email to add a comment.
+I suspect that somewhere in the path that begins in mesh/net.c with the function key_refresh_finish() there should be a place where the app_keys are iterated, updating the state of those AppKeys that belong to the subnet and have been updated. The update would involve copying the new_key to the "old" key field.
 
-You are receiving this mail because:
-You are the assignee for the bug.
+I am using a relatively new version of BlueZ, and the lastest version of key_refresh_finish() looks unchanged.
+
+Am I missing something?
+
+Thanks,
+mike
+
+[1] I use the term "virtual" to avoid confusion with the term "local" that is used in the documentation to refer to something else that is not clearly defined to me.
+
