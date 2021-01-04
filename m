@@ -2,107 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.3 required=3.0 tests=BAYES_05,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C53C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 04:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3095FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 07:01:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B30F20E65
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 04:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 029C52087E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 07:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727354AbhADESU (ORCPT
+        id S1726148AbhADHBC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Jan 2021 23:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49530 "EHLO
+        Mon, 4 Jan 2021 02:01:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726333AbhADESU (ORCPT
+        with ESMTP id S1726163AbhADHBC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Jan 2021 23:18:20 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B4EC061574
-        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Jan 2021 20:17:40 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id z20so17759160qtq.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Jan 2021 20:17:39 -0800 (PST)
+        Mon, 4 Jan 2021 02:01:02 -0500
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D3DC061574
+        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Jan 2021 23:00:21 -0800 (PST)
+Received: by mail-oi1-x234.google.com with SMTP id s75so31167644oih.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Jan 2021 23:00:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=T4ysV+qI8vqepY/aTmbEx6Rt00p4H03uGABobfQ1ooc=;
-        b=vePFMRj6ywoj87asrVfHOHW03Mj2s9Y/R9dRMEAXTEyKTvewFgUHwQ9zPC399i6BzM
-         GWhr2NI/8AnfKF1DU/JUxU9L/gYSCzSvW3NWN7+JO7m73JXS/buM+1zsy0cjflfGjv/W
-         Ip8g7FxxJ1JRRM4Z1nf6qInSmFyO12BG7Hpkgkag88lI8FeYLICq1rXJlU6ER+/N6Y4p
-         8WGtRriEkplublj495IgS6O0lQmZnI+ayL2gJxeDREoqoGv2O1bL1ps/LbKfZ84svTfh
-         CjDIyuhAryxH7T/qQn5VR6I8zHKxxI9qDKBws0jsdqPmekDHTDCqRb6mT+lNbo15Q5Mp
-         6zXA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xEeTa/tdTuj74rAp0JUEZzKZpJ8GXzxWZznq1l+7qTo=;
+        b=MGo/84otoGIWGPyjGTuNl30Oh2y1eq3jcuq6s07t68UR25p57bhM3l5lXn8akTXaWn
+         Z4uVg7JdxkVsbOCfmqX8Dtay5sK9bhR7/aHEREpuYumtcEtZRREfVSPdxIdklM54L/ZY
+         dv1Ek01vuENobrB86T5VEXAfc2kS/WnVLh97pYb01ODA6NgJpyZ1+2w1hgnfnjTHySco
+         YcOPwpAwVFFnqMH9ac9oSirGSsQKwoNcfWyyw2SKSWLxY8xY3cPDxFHGqvb5+wlKY++o
+         sUMr4IYKX3cKCPj3fdHHpkFiQ0aneSOfZ8/O5rzsDu4RmFyaLqtLNyARu9ybKKZ6BQCL
+         HHjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=T4ysV+qI8vqepY/aTmbEx6Rt00p4H03uGABobfQ1ooc=;
-        b=VvHb28a0gdQE2DBFwWGJ5hCAVdZunkoLp2969tMgs7xZxak6UpL/G9qqIjD3r3GDLn
-         YsUQm0iCqrf3L/KVbYj6bCfKwFnOmvA+Q1j9NoN1l1MIp97IXglKYZXrIhDcJ61SmUdo
-         YmG4hFJNTqQ6v0qitJ5pORgoIwV/5c4+jpU13uHnvbtdjuilgRsMu216sUzRWwOjev5g
-         iP6MleAVD4LiMQiFJa7xPGZix9CYMkzCMwsbaiD8TKv9tBKsvIGZY4/YQygRd1jF+4zf
-         xgL5AAq1h+gzOThZAteOEK4RzkNrSzD8ULwF/QqQG38DWFsyFKhlZZOTG/zzQKRahKOT
-         /9RQ==
-X-Gm-Message-State: AOAM532fZ/wMuw/0tqJ865n4LtOdSuLGwMJvsiUx9wea4kihAQt3qilJ
-        BQz0ZLoZRRs0VuZk5DdsRetbEZequ7nKaQ==
-X-Google-Smtp-Source: ABdhPJwx+TEsml3STG5/lzj60bCJfByaixwDYN1LeGk+eBp4CsqSKkQYrpuwE4HezVaYIfYqtpcIeQ==
-X-Received: by 2002:ac8:4cc1:: with SMTP id l1mr69577467qtv.128.1609733859140;
-        Sun, 03 Jan 2021 20:17:39 -0800 (PST)
-Received: from [172.17.0.2] ([104.208.246.75])
-        by smtp.gmail.com with ESMTPSA id y15sm36619438qto.51.2021.01.03.20.17.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Jan 2021 20:17:38 -0800 (PST)
-Message-ID: <5ff296e2.1c69fb81.42099.675b@mx.google.com>
-Date:   Sun, 03 Jan 2021 20:17:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8190719256635124096=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xEeTa/tdTuj74rAp0JUEZzKZpJ8GXzxWZznq1l+7qTo=;
+        b=Cqmh50AZrAFuV+tWStj+T0xLb3KCSTPT7CG15GTrecRjaNc0cyfj1RQA/wS4v6jPmc
+         lfPYtmdtO9oHPk8UyZ0SDNpTuXBawgvezgQQ0e/yFYRl6GdL+8yaW8vSVdii5BIk4OQd
+         QsQHvAMmNNqiTs3H0rb5ZuYt8VYSg/UrEWb6LeZz7ksafp7JYEE78S3RKXY7C9ukyw8r
+         o3B6/VERTNLsc5/Q39jMgeYWof390goZZNDSdrI3GGlWDbvfUTWUPc9McdK8zQx2ztRp
+         3XDowWd8EpPwRxl34pfXFGCGyTFh0Q6bSAgl5wtN7jL4Nf0zAfbXjVpJ00tM7i20Dhii
+         pkag==
+X-Gm-Message-State: AOAM532CLZNFPHW5BgRIBiOhvviJuiQSzwMSjpc1hRDpdL3mN8YpJiIc
+        kDUnHhxeyPdmni7I/zNvPHVe4LnvIBeQUoVlFks=
+X-Google-Smtp-Source: ABdhPJyYXjc23xx0JKoLgKw9Bku+acUF88J6gD3XM6cNenazu6psi/BlylkO19PndK04luU7O+dJwvHHsgZ47RDMZuU=
+X-Received: by 2002:aca:1917:: with SMTP id l23mr16941567oii.64.1609743621235;
+ Sun, 03 Jan 2021 23:00:21 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mike@mnmoran.org
-Subject: RE: [BlueZ,v2] mesh: Update AppKeys on transition to Phase 0
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210104034837.640081-1-mike@mnmoran.org>
-References: <20210104034837.640081-1-mike@mnmoran.org>
+References: <20201228193351.Bluez.v3.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+ <20201228193351.Bluez.v3.4.I43884adadc00a5095dd03d2261a71dc2ba80d986@changeid>
+In-Reply-To: <20201228193351.Bluez.v3.4.I43884adadc00a5095dd03d2261a71dc2ba80d986@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sun, 3 Jan 2021 23:00:10 -0800
+Message-ID: <CABBYNZJdy2iL8gezxd6gOwkSUtxTr3VQvrVehU7ec1GV3twxXw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 4/4] shared/mgmt: Fix memory leak in mgmt_tlv_list
+To:     Howard Chung <howardchung@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8190719256635124096==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Howard,
 
-This is automated email and please do not reply to this email!
+On Mon, Dec 28, 2020 at 3:34 AM Howard Chung <howardchung@google.com> wrote:
+>
+> This patch freed the mgmt_tlv properly in mgmt_tlv_list_free.
+>
+> Reviewed-by: apusaka@chromium.org
+> Reviewed-by: mcchou@chromium.org
+> ---
+>
+> (no changes since v2)
+>
+> Changes in v2:
+> - Fix incompatible pointer type error of mgmt_tlv_free
+>
+>  src/shared/mgmt.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+> index dc8107846668..0d0c957709d7 100644
+> --- a/src/shared/mgmt.c
+> +++ b/src/shared/mgmt.c
+> @@ -588,14 +588,15 @@ static struct mgmt_tlv *mgmt_tlv_new(uint16_t type, uint8_t length,
+>         return entry;
+>  }
+>
+> -static void mgmt_tlv_free(struct mgmt_tlv *entry)
+> +static void mgmt_tlv_free(void *data)
+>  {
+> +       struct mgmt_tlv *entry = data;
+>         free(entry);
+>  }
+>
+>  void mgmt_tlv_list_free(struct mgmt_tlv_list *tlv_list)
+>  {
+> -       queue_destroy(tlv_list->tlv_queue, NULL);
+> +       queue_destroy(tlv_list->tlv_queue, mgmt_tlv_free);
 
-Dear submitter,
+It might be better to just pass free directly instead of mgmt_tlv_free
+since all it does currently is call free anyway.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=408415
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
+>         free(tlv_list);
+>  }
+>
+> --
+> 2.29.2.729.g45daf8777d-goog
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8190719256635124096==--
+-- 
+Luiz Augusto von Dentz
