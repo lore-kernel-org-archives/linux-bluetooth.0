@@ -2,163 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.3 required=3.0 tests=BAYES_05,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9123C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 03:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C53C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 04:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9950A2087E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 03:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B30F20E65
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jan 2021 04:18:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727412AbhADDtY (ORCPT
+        id S1727354AbhADESU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Jan 2021 22:49:24 -0500
-Received: from hoster906.com ([192.252.156.27]:53706 "EHLO hoster906.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725840AbhADDtY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Jan 2021 22:49:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=from:to
-        :cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=dkim; bh=g7n4CLz/nkU/yTp3y+J39Wgtr
-        QtFbid2ADi5NsEapSg=; b=mvAL+PDKhK8HUR4d3tpqlI54IlTK6TrZ1ERzu/FEa
-        okFc6qTxeoMHvqA2V6YiLwABoIwCTLThZTpOuyp8HU3j1uN96RcfUJQ0gBBKVGtf
-        kC053qi5sIv5SRX1x9RF2cn01698/IJrgOjbXQg6i3YfLxr9A3DEGPedz5jUZAkt
-        Jo=
-Received: (qmail 2951 invoked by uid 503); 4 Jan 2021 03:48:42 -0000
-Received: from unknown (HELO knuckle.Home) (mike@mnmoran.org@40.134.89.129)
-  by hoster906.com with ESMTPA; 4 Jan 2021 03:48:42 -0000
-From:   "Michael N. Moran" <mike@mnmoran.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, inga.stotland@intel.com,
-        "Michael N. Moran" <mike@mnmoran.org>
-Subject: [PATCH BlueZ v2] mesh: Update AppKeys on transition to Phase 0
-Date:   Sun,  3 Jan 2021 22:48:37 -0500
-Message-Id: <20210104034837.640081-1-mike@mnmoran.org>
-X-Mailer: git-send-email 2.26.2
+        Sun, 3 Jan 2021 23:18:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726333AbhADESU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 3 Jan 2021 23:18:20 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B4EC061574
+        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Jan 2021 20:17:40 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id z20so17759160qtq.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Jan 2021 20:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=T4ysV+qI8vqepY/aTmbEx6Rt00p4H03uGABobfQ1ooc=;
+        b=vePFMRj6ywoj87asrVfHOHW03Mj2s9Y/R9dRMEAXTEyKTvewFgUHwQ9zPC399i6BzM
+         GWhr2NI/8AnfKF1DU/JUxU9L/gYSCzSvW3NWN7+JO7m73JXS/buM+1zsy0cjflfGjv/W
+         Ip8g7FxxJ1JRRM4Z1nf6qInSmFyO12BG7Hpkgkag88lI8FeYLICq1rXJlU6ER+/N6Y4p
+         8WGtRriEkplublj495IgS6O0lQmZnI+ayL2gJxeDREoqoGv2O1bL1ps/LbKfZ84svTfh
+         CjDIyuhAryxH7T/qQn5VR6I8zHKxxI9qDKBws0jsdqPmekDHTDCqRb6mT+lNbo15Q5Mp
+         6zXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=T4ysV+qI8vqepY/aTmbEx6Rt00p4H03uGABobfQ1ooc=;
+        b=VvHb28a0gdQE2DBFwWGJ5hCAVdZunkoLp2969tMgs7xZxak6UpL/G9qqIjD3r3GDLn
+         YsUQm0iCqrf3L/KVbYj6bCfKwFnOmvA+Q1j9NoN1l1MIp97IXglKYZXrIhDcJ61SmUdo
+         YmG4hFJNTqQ6v0qitJ5pORgoIwV/5c4+jpU13uHnvbtdjuilgRsMu216sUzRWwOjev5g
+         iP6MleAVD4LiMQiFJa7xPGZix9CYMkzCMwsbaiD8TKv9tBKsvIGZY4/YQygRd1jF+4zf
+         xgL5AAq1h+gzOThZAteOEK4RzkNrSzD8ULwF/QqQG38DWFsyFKhlZZOTG/zzQKRahKOT
+         /9RQ==
+X-Gm-Message-State: AOAM532fZ/wMuw/0tqJ865n4LtOdSuLGwMJvsiUx9wea4kihAQt3qilJ
+        BQz0ZLoZRRs0VuZk5DdsRetbEZequ7nKaQ==
+X-Google-Smtp-Source: ABdhPJwx+TEsml3STG5/lzj60bCJfByaixwDYN1LeGk+eBp4CsqSKkQYrpuwE4HezVaYIfYqtpcIeQ==
+X-Received: by 2002:ac8:4cc1:: with SMTP id l1mr69577467qtv.128.1609733859140;
+        Sun, 03 Jan 2021 20:17:39 -0800 (PST)
+Received: from [172.17.0.2] ([104.208.246.75])
+        by smtp.gmail.com with ESMTPSA id y15sm36619438qto.51.2021.01.03.20.17.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Jan 2021 20:17:38 -0800 (PST)
+Message-ID: <5ff296e2.1c69fb81.42099.675b@mx.google.com>
+Date:   Sun, 03 Jan 2021 20:17:38 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8190719256635124096=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, mike@mnmoran.org
+Subject: RE: [BlueZ,v2] mesh: Update AppKeys on transition to Phase 0
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210104034837.640081-1-mike@mnmoran.org>
+References: <20210104034837.640081-1-mike@mnmoran.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-At the end of the mesh Key Refresh procedure when a subnet
-transitions to Phase 0, local AppKeys that were updated were
-not updating until the bluetooth-meshd daemon was restarted.
+--===============8190719256635124096==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch iterates the AppKeys at the end of mesh Key Refresh
-when the subnet transitions to Phase 0, setting the new state
-of each updated AppKey.
+This is automated email and please do not reply to this email!
 
-********* v2 ************
+Dear submitter,
 
-This version incorporates recommendations from Brian Gix
-creating a public function appkey_finalize(); and adding
-new APP_AID_INVALID constant to replace the use of 0xFF
-as an indication that the new_key_aid field is invalid.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=408415
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
 
 
 ---
- mesh/appkey.c    | 33 +++++++++++++++++++++++++++++++--
- mesh/appkey.h    |  1 +
- mesh/mesh-defs.h |  1 +
- mesh/net.c       |  2 ++
- 4 files changed, 35 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 549f5a80d..5088a1812 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -50,11 +50,40 @@ static bool match_bound_key(const void *a, const void *b)
- 	return key->net_idx == idx;
- }
- 
-+static void finalize_key(void *a, void *b)
-+{
-+	struct mesh_app_key *key = a;
-+	uint16_t net_idx = L_PTR_TO_UINT(b);
-+
-+	if (key->net_idx != net_idx)
-+		return;
-+
-+	if (key->new_key_aid == APP_AID_INVALID)
-+		return;
-+
-+	key->key_aid = key->new_key_aid;
-+
-+	key->new_key_aid = APP_AID_INVALID;
-+
-+	memcpy(key->key, key->new_key, 16);
-+}
-+
-+void appkey_finalize(struct mesh_net *net, uint16_t net_idx)
-+{
-+	struct l_queue *app_keys;
-+
-+	app_keys = mesh_net_get_app_keys(net);
-+	if (!app_keys)
-+		return;
-+
-+	l_queue_foreach(app_keys, finalize_key, L_UINT_TO_PTR(net_idx));
-+}
-+
- static struct mesh_app_key *app_key_new(void)
- {
- 	struct mesh_app_key *key = l_new(struct mesh_app_key, 1);
- 
--	key->new_key_aid = 0xFF;
-+	key->new_key_aid = APP_AID_INVALID;
- 	return key;
- }
- 
-@@ -146,7 +175,7 @@ const uint8_t *appkey_get_key(struct mesh_net *net, uint16_t app_idx,
- 		return app_key->key;
- 	}
- 
--	if (app_key->new_key_aid == NET_NID_INVALID)
-+	if (app_key->new_key_aid == APP_AID_INVALID)
- 		return NULL;
- 
- 	*key_aid = app_key->new_key_aid;
-diff --git a/mesh/appkey.h b/mesh/appkey.h
-index 3bb70445b..6688d87fb 100644
---- a/mesh/appkey.h
-+++ b/mesh/appkey.h
-@@ -16,6 +16,7 @@ struct mesh_app_key;
- bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 				uint8_t *key_value, uint8_t *new_key_value);
- void appkey_key_free(void *data);
-+void appkey_finalize(struct mesh_net *net, uint16_t net_idx);
- const uint8_t *appkey_get_key(struct mesh_net *net, uint16_t app_idx,
- 							uint8_t *key_id);
- int appkey_get_key_idx(struct mesh_app_key *app_key,
-diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
-index 43bdf5aab..25ce0126c 100644
---- a/mesh/mesh-defs.h
-+++ b/mesh/mesh-defs.h
-@@ -100,6 +100,7 @@
- 
- #define NET_IDX_MAX		0x0fff
- #define APP_IDX_MAX		0x0fff
-+#define APP_AID_INVALID	0xff
- 
- #define APP_IDX_MASK		0x0fff
- #define APP_IDX_DEV_REMOTE	0x6fff
-diff --git a/mesh/net.c b/mesh/net.c
-index b24cdba77..9624cd058 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2600,6 +2600,8 @@ static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
- 
- 	l_queue_foreach(net->friends, frnd_kr_phase3, net);
- 
-+	appkey_finalize(net, idx);
-+
- 	if (!mesh_config_net_key_set_phase(node_config_get(net->node), idx,
- 							KEY_REFRESH_PHASE_NONE))
- 		return MESH_STATUS_STORAGE_FAIL;
--- 
-2.26.2
 
+--===============8190719256635124096==--
