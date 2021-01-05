@@ -2,195 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6377C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 18:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 737FDC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 18:44:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A738722D57
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 18:34:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35EB222D04
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 18:44:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728978AbhAESea (ORCPT
+        id S1728457AbhAESok (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jan 2021 13:34:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38940 "EHLO
+        Tue, 5 Jan 2021 13:44:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726671AbhAESe3 (ORCPT
+        with ESMTP id S1727261AbhAESok (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jan 2021 13:34:29 -0500
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53AEBC061793
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jan 2021 10:33:37 -0800 (PST)
-Received: by mail-ot1-x32b.google.com with SMTP id 11so592901oty.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jan 2021 10:33:37 -0800 (PST)
+        Tue, 5 Jan 2021 13:44:40 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0026C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jan 2021 10:43:59 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id 15so603481oix.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jan 2021 10:43:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gDywb7B7VVpsBi9sZoz2XFTneDOyRxDKxwR01v6jv0I=;
-        b=L+p68mhJ3y3jjxTQnTZd5zrAmHE7KjNSPsE98hyWLsKRe2AnzoeMlLb6KCATgNnD+5
-         uGEsqtA5OvL2Gdi1i05flTuJrsQX/pbjyXJnPFz2mv7w+m8sVoA4OTJjEPYkaGMLFUty
-         PD0oAh3+b4NO5h7zi7NvmM76SkVYfnbqXgXG67Rl9wDM/SENiUCUsQdKKXrlkiLlz5cj
-         y+1psfur87HPwUyeKR5T8EkoqOZi8TdTa/MsFzgLhfLO7Es3XoAnEOCNe7ruQhHaCTcQ
-         OhoG8PfXQK6Nf7QfMT1hsu1HDRdOcubTtIsvRlhJe6G0dqdGW9Lhdjqe+750Mc9qMqK2
-         s8Ig==
+        bh=hxmL8pWXF+dgOFsihR4V/k9s75zjdHZ/h0Cl3G9DqFE=;
+        b=V9euizrbky/6al7XYusZfWG8ADeiCgjPJOQ7Gr/YjR7O/e3pQ7uhC3bYJ5bVWLF7/+
+         DRCm5OwumgPqHzkwDqQawroJ+2wQijK3zIMONoQ0JfK4MFuBOmTBI8TJWVfNo+vHJPmf
+         X8bagsMC4GLTQV35rAg4jV6O5vrqCKUb+D8fpVQPWDW2Km0uTrRXlXa/MMGDAu3Z04Px
+         3AdRrNVb5XuyiZwn7P7iu3UVk0MOi1MoCxDnq+Qd+9M7TOB1M1j/9p7eom4ccGFfp5oz
+         FN7WMM6jPzMYm9oPhJz1iT+CEtcQOKefz2ophPpLqBlKIbB7HSCcDxvdDVxQ1whTjOUe
+         VQQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gDywb7B7VVpsBi9sZoz2XFTneDOyRxDKxwR01v6jv0I=;
-        b=B6wsrXGvTMKUnsEg/14lsW3Ny+PMl9yr0lSx3N5rYPL1AYOlGi/StfGUWvJAby3AyA
-         sVqlpfV5f0YClMZCK9vgpj8PYWWq0UCBnOfCaxLzu9FfysmS2OfOU8I5f6s4/UZBxCRJ
-         sKGhNK5Tx3YbW7J0Es4jiYNNBjGun2aCDNnUTyNueA9m+B2NTyMc/wdkn0syJ09N/kvQ
-         AR0oEiRCtk+VXlfP7KIN9grJXZf5npyEgd8onGhSvaSXkL4FXxPxzIduO02z7gFQAeoO
-         mYhFAyASXnLG3hCj4WS3+6wMDUJ4R12gOCo0wr8sLlcmdlVQcSbJhVN0TQ8et3YBaAUj
-         eg5g==
-X-Gm-Message-State: AOAM533ckbMbelOyXcsVlbClZx6XjAz5tMgscq+/idzKwOGzGttYc0vx
-        OyVbbGwp1wk5VjiAJj8BcErmHoL7F4wTtAKfvZJTwWHo
-X-Google-Smtp-Source: ABdhPJwLSVvRrsebc27Lyb6MEvrJJW2glORmyljpZ/WufgdkA1AxcMeVlJMKSTwbf6yA60k7XdnakSg7LFGqvg2MDrI=
-X-Received: by 2002:a05:6830:1319:: with SMTP id p25mr620621otq.240.1609871616638;
- Tue, 05 Jan 2021 10:33:36 -0800 (PST)
+        bh=hxmL8pWXF+dgOFsihR4V/k9s75zjdHZ/h0Cl3G9DqFE=;
+        b=sT8Vyf8/gdSoxgm8Z4lFDsb6bLO8qCTveyRqrfO4rWjkEI/R9YvuDL2d9JQfFnsE1x
+         9OqckuyAHQ2/iHv4n27MsjkK6LHQdYaF3El70Q3g4IN+UQ3ubcsMncDo1klAAu1fYbXd
+         h2iCFCRl1lJUdE2xWQmeowP3WBVGKDf2k4ImvTat3rnUVL5lh3s8PQPC3uu3vJnRpkKv
+         dcSyKAWDIcdWPj17d5j5o4Cd/IGz5AfBz1e3tpuqBO6ILrjOktm9yZdHnF+xRGxotnpT
+         xAN90ZLWwjmF0kfVx6b45+tzyhFXOKdMI7+KiaHM6Llex9UW3+Bepz6TEhsx7cTCt4JF
+         LVOA==
+X-Gm-Message-State: AOAM533vJk6RJ7smkatfLUyvzv66adb9mrimaLUy69LDiCYG+HRepu0M
+        WxBKEwW3TbBXkJoqRS0vhLAVOmCPhvlkB9kCLADtDfMf
+X-Google-Smtp-Source: ABdhPJxE1cZ3lm7u0oCqplPgMVdjCi+Fiasn6nCREUjtJq3tjcNrZvbU4QXYXyxAmmF/VYRzhzQdYfC2xxz9dewBZqI=
+X-Received: by 2002:aca:f456:: with SMTP id s83mr710941oih.58.1609872239001;
+ Tue, 05 Jan 2021 10:43:59 -0800 (PST)
 MIME-Version: 1.0
-References: <20201229143408.Bluez.v1.1.I7978a075910600058245dc6891c614cf4c7b004e@changeid>
- <CABBYNZJ8HOLJv6HFCCp1AYMw79nu7rpkQdmLLJR=uvC5CRH03w@mail.gmail.com>
- <CABBYNZL1TuDtSmyYxwK6uCLk8fm8U2jwxPi0aERsoUgAATeL0A@mail.gmail.com> <CAJQfnxGrfKJhCBCVD6kgLHnb4hgspUQPtJ0nSipO2kUOv3bSYQ@mail.gmail.com>
-In-Reply-To: <CAJQfnxGrfKJhCBCVD6kgLHnb4hgspUQPtJ0nSipO2kUOv3bSYQ@mail.gmail.com>
+References: <20210105111219.Bluez.v4.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+ <5ff3e8b4.1c69fb81.827b.74bf@mx.google.com>
+In-Reply-To: <5ff3e8b4.1c69fb81.827b.74bf@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 5 Jan 2021 10:33:25 -0800
-Message-ID: <CABBYNZ+ScBp9QbR3ikMzxCyDaUo9PpNo2uaJZzy3ATp35pp=Kg@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] adapter: Don't remove device if adapter is
- powered off
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
+Date:   Tue, 5 Jan 2021 10:43:48 -0800
+Message-ID: <CABBYNZL87cMLjEZOeVM+dmdh8noVgxN3hQBzKosKYKRjOEQm8Q@mail.gmail.com>
+Subject: Re: [Bluez,v4,1/4] shared/mgmt: Add supports of parsing mgmt tlv list
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yun-hao Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Howard,
 
-On Mon, Jan 4, 2021 at 7:17 PM Archie Pusaka <apusaka@google.com> wrote:
+On Mon, Jan 4, 2021 at 8:22 PM <bluez.test.bot@gmail.com> wrote:
 >
-> Hi Luiz,
+> This is automated email and please do not reply to this email!
 >
-> Sorry for being unclear.
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=409009
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - FAIL
+> Output:
+> btmgmt: Add command set-sysconfig
+> WARNING:NAKED_SSCANF: unchecked sscanf return value
+> #42: FILE: tools/btmgmt.c:1817:
+> +               if (!sscanf(input + i * 2, "%2hhx", &value[i]))
+> +                       return false;
+>
+> - total: 0 errors, 1 warnings, 121 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> "[PATCH] btmgmt: Add command set-sysconfig" has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
 >
 >
-> On Tue, 5 Jan 2021 at 03:17, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Mon, Jan 4, 2021 at 11:09 AM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > > On Mon, Dec 28, 2020 at 10:34 PM Archie Pusaka <apusaka@google.com> wrote:
-> > > >
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > If adapter is powered off when a device is being removed, there is a
-> > > > possibility that the kernel couldn't clean the device's information,
-> > > > for example the pairing information. This causes the kernel to
-> > > > disagree with the user space about whether the device is paired.
-> > > >
-> > > > Therefore, to avoid discrepancy we must not proceed to remove the
-> > > > device within the user space as well.
-> > >
-> > > This sounds like we have a bug in the kernel, aren't we calling
-> > > btd_adapter_remove_bonding or is that failing if the adapter is not
-> > > powered? Hmm it does like it:
-> > >
-> > > This command can only be used when the controller is powered.
-> > >
-> > > > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-> > > > ---
-> > > >
-> > > >  src/adapter.c | 8 ++++++++
-> > > >  1 file changed, 8 insertions(+)
-> > > >
-> > > > diff --git a/src/adapter.c b/src/adapter.c
-> > > > index ec6a6a64c5..a2abc46706 100644
-> > > > --- a/src/adapter.c
-> > > > +++ b/src/adapter.c
-> > > > @@ -1238,6 +1238,14 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
-> > > >  {
-> > > >         GList *l;
-> > > >
-> > > > +       /* Test if adapter is or will be powered off.
-> > > > +        * This is to prevent removing the device information only on user
-> > > > +        * space, but failing to do so on the kernel.
-> > > > +        */
-> > > > +       if (!(adapter->current_settings & MGMT_SETTING_POWERED) ||
-> > > > +                       (adapter->pending_settings & MGMT_SETTING_POWERED))
-> > > > +               return;
-> > >
-> > > We might need to return an error here so we can reply with an error on
-> > > Adapter.RemoveDevice.
-> >
-> Should be unnecessary due to the check you mentioned below.
+> ##############################
+> Test: CheckGitLint - PASS
 >
-> > After some investigation it looks like there is already a similar check:
-> >
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/adapter.c#n3238
-> >
-> > That perhaps needs to updated or perhaps this is the result of the
-> > device being set to temporary which sets a timer to remove the device
-> > and then in the meantime the adapter is powered off? In that case
-> > perhaps we should clean up the devices set as temporary.
-> >
-> The problem occurs when the device is paired and is currently
-> connected, then Adapter.RemoveDevice is called. This would make us
-> disconnect the device first before actually removing the device.
-> During this disconnection phase, there is a chance the adapter is
-> powered off.
+> ##############################
+> Test: CheckBuild - PASS
 >
-> If this happens, we would still attempt to remove the device anyway.
-> No problem on the user space, but it will fail on the kernel side (as
-> per the API, it requires adapter to be on). The check you mentioned is
-> unfortunately not executed during this phase.
+> ##############################
+> Test: MakeCheck - PASS
 >
-> About the timer, I didn't have the exact issue you described, but this
-> version of patch might have other problems with it, because the timer
-> would still be running when we do the early return from
-> btd_adapter_remove_device. Although nothing will happen if the timer
-> runs out when the power is still off (we would just do the early
-> return again), but it might be unpleasant if the adapter is re-powered
-> and the timer kicks off to remove the device.
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-Right, Id guess if RemoveDevice is called and either way we end up
-powering off the adapter I suppose we want the device removed either
-way thus why I suggested cleaning up the temporary devices before
-powering down.
-
-> > > >         adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
-> > > >
-> > > >         adapter->devices = g_slist_remove(adapter->devices, dev);
-> > > > --
-> > > > 2.29.2.729.g45daf8777d-goog
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Thanks,
-> Archie
-
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
