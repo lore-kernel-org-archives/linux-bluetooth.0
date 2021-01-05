@@ -8,61 +8,64 @@ X-Spam-Status: No, score=-26.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA9AC433E9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D8EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:14:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84C4D22573
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 225C422573
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:14:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbhAEDNs (ORCPT
+        id S1728137AbhAEDNw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Jan 2021 22:13:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
+        Mon, 4 Jan 2021 22:13:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727716AbhAEDNs (ORCPT
+        with ESMTP id S1727716AbhAEDNw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Jan 2021 22:13:48 -0500
+        Mon, 4 Jan 2021 22:13:52 -0500
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2237C061795
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jan 2021 19:13:07 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id e74so54552235ybh.19
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Jan 2021 19:13:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2255C061796
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jan 2021 19:13:11 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id w17so54437542ybl.15
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Jan 2021 19:13:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=KK6nLKsHQCELPyl1S4Arx6g2G/0sGXXhy1Tvx8l1irY=;
-        b=EChvkFSH+/hC+LmKY5AT1KfK/ubaXNHvTiNyATxvqZn9i3i0Dh68FkTCeWxMt8yOqq
-         bwupUDv2ffRc/rXg71wfzSZ73UybK6xnBDYzvAl7nlY2Pt2Oz97ZJhRvng1VVwOGzl3B
-         jFIo8sLeLP77aEm+vclJtv253n0L5D4Bv4Zd9qEZmuoHUtdmle/Jvj7bsmJYtcVfc5I4
-         /7fPlrmQtDCpd9tY4L+FGtUjcdGhSBC99334dNCedbFGybRrIuo+DQNegPDuEJuBWT7F
-         ebwTfESJ/woD9EZc45tBhecEgKaJ1v/puD4JnVh9F13HR2zS0++82O5oLwuxCFh446DI
-         Jv9w==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=kiatny/Rcuc64s8UOi4ZGZPPONmshKs7gN1XYmzrd+4=;
+        b=jo1eR4vPYZMe3ZOptORJvRBF5xJMnOlvUUTU+nPSw3tGe/t1vsxEnudXODbd5Jq111
+         eYTLanXBvjdd8pFxCKYn21R61OeCkJXSXo8n9TZBxOPSZkeloCBGwZTG4m3PdtaxUdY2
+         SQ9DYVYwPfviurVY1THCg2LXkGnkrsDoaSYoikJvd9Le9o1AdCLPNwXLcy1LE8op4oOo
+         iP9APGtWxzGinTPqCc9b5EelOa0dt4MfVbpwj6WXH9NZMvpUHdNmfkSJ79LFjKYOZWGq
+         md/cOygS6i5YfXdxH0+hSjXOm2vzBikXSD2mwZ3cmvMEjwSvYnXbJtB7TgLLT7ZizKPP
+         TNPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=KK6nLKsHQCELPyl1S4Arx6g2G/0sGXXhy1Tvx8l1irY=;
-        b=E3+BpDZaRPjpVElFIBfhC2FMG+UsfUjGJgIwWGUqt5QBnuvRWguWPAhY/WBdV/9KOK
-         nN56XpNL8GaIVd9m2qWGxm9A/6Ek5H8towVrEfgBB0DQxHYikQVVOUfwsyv/YsdXpkNf
-         7Cev7IHi5UzQM1PtDjesN1faVFMt8doriX9pKYIfQ3UTMsORsC4Yagz/yVcC+t1fLdjh
-         lMTc0JY3vxK3MYxm3xHNnKl4CKqNGuz87JttCn8qqLwkgEpM3G+9XYEUmeYcs+r9KCiQ
-         sKxuss8glVpCkq1U7IuOlHqKi5xllnJ4jv9MOkQFaPfBPCU2vScF7vHerU3qDz8VRMEV
-         wASQ==
-X-Gm-Message-State: AOAM530nvIJBuJlwwYeXwsxVczQ1E2SDiZUWDrHxxaLH0IbkfvkARYtt
-        2Y9XmLs5R+P4yFz3pIgDbNXt9T+FYChvterPvhoWRprpvqMZb4DMPXKSIbnt7eOX9H7sqIlNaq6
-        YERbepf4nQWj2KN1c7tqYyCPy2tv3EVD9UxfgwYPsQUk9gjcUjZ9Ah29msO9a8hpCNf7EpeHgnK
-        0p59gRQf0cOsw=
-X-Google-Smtp-Source: ABdhPJzRAqawhiQH5pKQ1pXiRfTUqx3sBnZlUvk8Y7/25yqJj7VyxmR6nRSZ780oyca/1YNvZGZNdrfUqvcz4e5bVA==
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=kiatny/Rcuc64s8UOi4ZGZPPONmshKs7gN1XYmzrd+4=;
+        b=pkwgPIbMUbAfBQosSiTO6lN3KPMt5e4Tx6oDJuw7KldRCmwwqR7ZKDOTitKM8JPciq
+         TjvDunrEmIRHOFpXExgvFo7t3O7BnO46H7kHHEfMTlInpsUfcFXSkJT7PLqMUSoNObvH
+         gEsFY9LfDFdy7RreOvSR7v4frMI9+lhY7avhYibqqD1C6YY+6UuUhHGfph++jlhk/YzL
+         d7Icx/uPowGDLVj68QKAumfvuApU+1MmOswAG5QyS336Ymdbtmce3koUjuUGiFxKWgcB
+         sLadbJlaTLyGcGBaIqS38ciwSJqsO0KuRGo2J4YVfVO0VSlH7qmGI8O+0pO30c9CXqMg
+         npTA==
+X-Gm-Message-State: AOAM530K6THQ7KgcmBH/GtQ4eH8FwDHPAEooWXChjE5Ym5nKI0jbpAxS
+        YrpNj3ny92sC6w3cvRpVcQC/TS857cfjK87/i9PIk/DgHX8KdyrMef9b8fYc4zdstqW1dxx7kJV
+        /E25DfcgbHgLRwMduC9SOyZJgAZM0JrdVwZPbtmup2no2pyCL69VzUiPOOQUKFzwcfLZ5ZuNTbK
+        XE6DWEG0cDh5I=
+X-Google-Smtp-Source: ABdhPJxX6CLYQ+8iEUs6Zpd6S0eVqdWTf1WjnEerpfU1r8y8AKGYdjYxzZzP937IYZtGll0mFsVtKA39SNQTd2VrYg==
 Sender: "howardchung via sendgmr" 
         <howardchung@howardchung-p920.tpe.corp.google.com>
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
- (user=howardchung job=sendgmr) by 2002:a25:7789:: with SMTP id
- s131mr111959638ybc.212.1609816386998; Mon, 04 Jan 2021 19:13:06 -0800 (PST)
-Date:   Tue,  5 Jan 2021 11:12:54 +0800
-Message-Id: <20210105111219.Bluez.v4.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+ (user=howardchung job=sendgmr) by 2002:a25:2c58:: with SMTP id
+ s85mr110965846ybs.366.1609816391125; Mon, 04 Jan 2021 19:13:11 -0800 (PST)
+Date:   Tue,  5 Jan 2021 11:12:55 +0800
+In-Reply-To: <20210105111219.Bluez.v4.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+Message-Id: <20210105111219.Bluez.v4.2.I0c07c297925f838138b42674ab244572e6ea361b@changeid>
 Mime-Version: 1.0
+References: <20210105111219.Bluez.v4.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
 X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [Bluez PATCH v4 1/4] shared/mgmt: Add supports of parsing mgmt tlv list
+Subject: [Bluez PATCH v4 2/4] btmgmt: Add command read-sysconfig
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         luiz.dentz@gmail.com
@@ -73,94 +76,93 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Response from Read System Default Configuration is a list of mgmt_tlv,
-which requires further processing to get the values of each parameters.
+Add command read-sysconfig in btmgmt
 
-This adds APIs for parsing response into mgmt_tlv_list, retrieving
-parameter from mgmt_tlv_list.
+Example usage:
+localhost ~ # btmgmt
+[mgmt]# read-sysconfig
+Type: 0x0000    Length: 02      Value: 0000
+Type: 0x0001    Length: 02      Value: 0008
+...
+Type: 0x001f    Length: 01      Value: 01
 
 Reviewed-by: apusaka@chromium.org
 ---
 
-Changes in v4:
-- Simply use free instead of mgmt_tlv_free
+(no changes since v3)
 
 Changes in v3:
-- Fix CheckBuild error
+- Removed unused variable in read_sysconfig_rsp
 
-Changes in v2:
-- Fix incompatible pointer type error in mgmt_tlv_list_load_from_buf
+ tools/btmgmt.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
- src/shared/mgmt.c | 38 ++++++++++++++++++++++++++++++++++++++
- src/shared/mgmt.h |  6 ++++++
- 2 files changed, 44 insertions(+)
-
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 9ea9974f5535..dc8107846668 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -626,6 +626,44 @@ static void mgmt_tlv_to_buf(void *data, void *user_data)
- 	*buf_ptr += entry_size;
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 2f7cb2efcc38..7d83d3ee6bd5 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1752,6 +1752,52 @@ static void cmd_exp_debug(int argc, char **argv)
+ 	}
  }
  
-+struct mgmt_tlv_list *mgmt_tlv_list_load_from_buf(const uint8_t *buf,
-+								uint16_t len)
++static void print_mgmt_tlv(void *data, void *user_data)
++{
++	const struct mgmt_tlv *entry = data;
++	char buf[256];
++
++	bin2hex(entry->value, entry->length, buf, sizeof(buf));
++	print("Type: 0x%04x\tLength: %02hhu\tValue: %s", entry->type,
++							entry->length, buf);
++}
++
++static void read_sysconfig_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
 +{
 +	struct mgmt_tlv_list *tlv_list;
-+	const uint8_t *cur = buf;
 +
-+	if (!len || !buf)
-+		return NULL;
-+
-+	tlv_list = mgmt_tlv_list_new();
-+
-+	while (cur < buf + len) {
-+		struct mgmt_tlv *entry = (struct mgmt_tlv *)cur;
-+
-+		cur += sizeof(*entry) + entry->length;
-+		if (cur > buf + len)
-+			goto failed;
-+
-+		if (!mgmt_tlv_add(tlv_list, entry->type, entry->length,
-+								entry->value)) {
-+			goto failed;
-+		}
++	if (status != 0) {
++		error("Read system configuration failed with status "
++				"0x%02x (%s)", status, mgmt_errstr(status));
++		return;
 +	}
 +
-+	return tlv_list;
-+failed:
++	tlv_list = mgmt_tlv_list_load_from_buf(param, len);
++	if (!tlv_list) {
++		error("Unable to parse response of read system configuration");
++		return;
++	}
++
++	mgmt_tlv_list_foreach(tlv_list, print_mgmt_tlv, NULL);
 +	mgmt_tlv_list_free(tlv_list);
-+
-+	return NULL;
 +}
 +
-+void mgmt_tlv_list_foreach(struct mgmt_tlv_list *tlv_list,
-+				mgmt_tlv_list_foreach_func_t callback,
-+				void *user_data)
++static void cmd_read_sysconfig(int argc, char **argv)
 +{
-+	queue_foreach(tlv_list->tlv_queue, callback, user_data);
++	uint16_t index;
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (!mgmt_send(mgmt, MGMT_OP_READ_DEF_SYSTEM_CONFIG, index,
++			0, NULL, read_sysconfig_rsp, NULL, NULL)) {
++		error("Unable to send read system configuration cmd");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +}
 +
- unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				struct mgmt_tlv_list *tlv_list,
- 				mgmt_request_func_t callback,
-diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
-index 319beb62f9eb..808bf4c7ff09 100644
---- a/src/shared/mgmt.h
-+++ b/src/shared/mgmt.h
-@@ -41,6 +41,12 @@ bool mgmt_tlv_add(struct mgmt_tlv_list *tlv_list, uint16_t type, uint8_t length,
- #define mgmt_tlv_add_fixed(_list, _type, _value) \
- 	mgmt_tlv_add(_list, _type, sizeof(*(_value)), _value)
+ static void auto_power_enable_rsp(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+@@ -5030,6 +5076,8 @@ static const struct bt_shell_menu main_menu = {
+ 		cmd_expinfo,		"Show experimental features"	},
+ 	{ "exp-debug",		"<on/off>",
+ 		cmd_exp_debug,		"Set debug feature"		},
++	{ "read-sysconfig",	NULL,
++		cmd_read_sysconfig,	"Read System Configuration"	},
+ 	{} },
+ };
  
-+struct mgmt_tlv_list *mgmt_tlv_list_load_from_buf(const uint8_t *buf,
-+								uint16_t len);
-+typedef void (*mgmt_tlv_list_foreach_func_t)(void *data, void *user_data);
-+void mgmt_tlv_list_foreach(struct mgmt_tlv_list *tlv_list,
-+				mgmt_tlv_list_foreach_func_t callback,
-+				void *user_data);
- unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				struct mgmt_tlv_list *tlv_list,
- 				mgmt_request_func_t callback,
 -- 
 2.29.2.729.g45daf8777d-goog
 
