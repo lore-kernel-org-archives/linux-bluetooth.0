@@ -2,101 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B52AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA9AC433E9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:13:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B11722581
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84C4D22573
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jan 2021 03:13:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728591AbhAEDAR (ORCPT
+        id S1728091AbhAEDNs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Jan 2021 22:00:17 -0500
-Received: from mga12.intel.com ([192.55.52.136]:64928 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728503AbhAEDAR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Jan 2021 22:00:17 -0500
-IronPort-SDR: GJZjZZakrBEiLZIC9klgW77ysSmArJRIqNmYN6C/Ng9diLKxGVS3gVWP2e1zCEl9xT5uaGx1x+
- WtMaH7RaVtNA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9854"; a="156236219"
-X-IronPort-AV: E=Sophos;i="5.78,475,1599548400"; 
-   d="scan'208";a="156236219"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2021 18:59:35 -0800
-IronPort-SDR: tIM/Ul19jwA+2FAeW2CLL/XCF29SkyPy/y+NYUNgde/IpqdI4fuDPX9ysXwI8XsBDQyUz8VzKi
- k5NkVysvl4Aw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,475,1599548400"; 
-   d="scan'208";a="386821444"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga007.jf.intel.com with ESMTP; 04 Jan 2021 18:59:34 -0800
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btusb: Add support for GarfieldPeak controller
-Date:   Tue,  5 Jan 2021 08:32:29 +0530
-Message-Id: <20210105030229.4239-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 4 Jan 2021 22:13:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727716AbhAEDNs (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 4 Jan 2021 22:13:48 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2237C061795
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jan 2021 19:13:07 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id e74so54552235ybh.19
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Jan 2021 19:13:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=KK6nLKsHQCELPyl1S4Arx6g2G/0sGXXhy1Tvx8l1irY=;
+        b=EChvkFSH+/hC+LmKY5AT1KfK/ubaXNHvTiNyATxvqZn9i3i0Dh68FkTCeWxMt8yOqq
+         bwupUDv2ffRc/rXg71wfzSZ73UybK6xnBDYzvAl7nlY2Pt2Oz97ZJhRvng1VVwOGzl3B
+         jFIo8sLeLP77aEm+vclJtv253n0L5D4Bv4Zd9qEZmuoHUtdmle/Jvj7bsmJYtcVfc5I4
+         /7fPlrmQtDCpd9tY4L+FGtUjcdGhSBC99334dNCedbFGybRrIuo+DQNegPDuEJuBWT7F
+         ebwTfESJ/woD9EZc45tBhecEgKaJ1v/puD4JnVh9F13HR2zS0++82O5oLwuxCFh446DI
+         Jv9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=KK6nLKsHQCELPyl1S4Arx6g2G/0sGXXhy1Tvx8l1irY=;
+        b=E3+BpDZaRPjpVElFIBfhC2FMG+UsfUjGJgIwWGUqt5QBnuvRWguWPAhY/WBdV/9KOK
+         nN56XpNL8GaIVd9m2qWGxm9A/6Ek5H8towVrEfgBB0DQxHYikQVVOUfwsyv/YsdXpkNf
+         7Cev7IHi5UzQM1PtDjesN1faVFMt8doriX9pKYIfQ3UTMsORsC4Yagz/yVcC+t1fLdjh
+         lMTc0JY3vxK3MYxm3xHNnKl4CKqNGuz87JttCn8qqLwkgEpM3G+9XYEUmeYcs+r9KCiQ
+         sKxuss8glVpCkq1U7IuOlHqKi5xllnJ4jv9MOkQFaPfBPCU2vScF7vHerU3qDz8VRMEV
+         wASQ==
+X-Gm-Message-State: AOAM530nvIJBuJlwwYeXwsxVczQ1E2SDiZUWDrHxxaLH0IbkfvkARYtt
+        2Y9XmLs5R+P4yFz3pIgDbNXt9T+FYChvterPvhoWRprpvqMZb4DMPXKSIbnt7eOX9H7sqIlNaq6
+        YERbepf4nQWj2KN1c7tqYyCPy2tv3EVD9UxfgwYPsQUk9gjcUjZ9Ah29msO9a8hpCNf7EpeHgnK
+        0p59gRQf0cOsw=
+X-Google-Smtp-Source: ABdhPJzRAqawhiQH5pKQ1pXiRfTUqx3sBnZlUvk8Y7/25yqJj7VyxmR6nRSZ780oyca/1YNvZGZNdrfUqvcz4e5bVA==
+Sender: "howardchung via sendgmr" 
+        <howardchung@howardchung-p920.tpe.corp.google.com>
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:f693:9fff:fef4:4e45])
+ (user=howardchung job=sendgmr) by 2002:a25:7789:: with SMTP id
+ s131mr111959638ybc.212.1609816386998; Mon, 04 Jan 2021 19:13:06 -0800 (PST)
+Date:   Tue,  5 Jan 2021 11:12:54 +0800
+Message-Id: <20210105111219.Bluez.v4.1.Ie32770d0eed2e7739ce9d17d920766fb6aee8583@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
+Subject: [Bluez PATCH v4 1/4] shared/mgmt: Add supports of parsing mgmt tlv list
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        luiz.dentz@gmail.com
+Cc:     mcchou@chromium.org, apusaka@chromium.org, mmandlik@chromium.org,
+        Howard Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-VID:PID -> 8087:0033
+Response from Read System Default Configuration is a list of mgmt_tlv,
+which requires further processing to get the values of each parameters.
 
-cat /sys/kernel/debug/usb/devices:
+This adds APIs for parsing response into mgmt_tlv_list, retrieving
+parameter from mgmt_tlv_list.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0033 Rev= 0.00
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Reviewed-by: apusaka@chromium.org
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9ff920de8d26..b14102fba601 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -368,6 +368,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEWGEN |
- 						     BTUSB_WIDEBAND_SPEECH},
-+	{ USB_DEVICE(0x8087, 0x0033), .driver_info = BTUSB_INTEL_NEWGEN |
-+						     BTUSB_WIDEBAND_SPEECH},
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+Changes in v4:
+- Simply use free instead of mgmt_tlv_free
+
+Changes in v3:
+- Fix CheckBuild error
+
+Changes in v2:
+- Fix incompatible pointer type error in mgmt_tlv_list_load_from_buf
+
+ src/shared/mgmt.c | 38 ++++++++++++++++++++++++++++++++++++++
+ src/shared/mgmt.h |  6 ++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 9ea9974f5535..dc8107846668 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -626,6 +626,44 @@ static void mgmt_tlv_to_buf(void *data, void *user_data)
+ 	*buf_ptr += entry_size;
+ }
+ 
++struct mgmt_tlv_list *mgmt_tlv_list_load_from_buf(const uint8_t *buf,
++								uint16_t len)
++{
++	struct mgmt_tlv_list *tlv_list;
++	const uint8_t *cur = buf;
++
++	if (!len || !buf)
++		return NULL;
++
++	tlv_list = mgmt_tlv_list_new();
++
++	while (cur < buf + len) {
++		struct mgmt_tlv *entry = (struct mgmt_tlv *)cur;
++
++		cur += sizeof(*entry) + entry->length;
++		if (cur > buf + len)
++			goto failed;
++
++		if (!mgmt_tlv_add(tlv_list, entry->type, entry->length,
++								entry->value)) {
++			goto failed;
++		}
++	}
++
++	return tlv_list;
++failed:
++	mgmt_tlv_list_free(tlv_list);
++
++	return NULL;
++}
++
++void mgmt_tlv_list_foreach(struct mgmt_tlv_list *tlv_list,
++				mgmt_tlv_list_foreach_func_t callback,
++				void *user_data)
++{
++	queue_foreach(tlv_list->tlv_queue, callback, user_data);
++}
++
+ unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				struct mgmt_tlv_list *tlv_list,
+ 				mgmt_request_func_t callback,
+diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+index 319beb62f9eb..808bf4c7ff09 100644
+--- a/src/shared/mgmt.h
++++ b/src/shared/mgmt.h
+@@ -41,6 +41,12 @@ bool mgmt_tlv_add(struct mgmt_tlv_list *tlv_list, uint16_t type, uint8_t length,
+ #define mgmt_tlv_add_fixed(_list, _type, _value) \
+ 	mgmt_tlv_add(_list, _type, sizeof(*(_value)), _value)
+ 
++struct mgmt_tlv_list *mgmt_tlv_list_load_from_buf(const uint8_t *buf,
++								uint16_t len);
++typedef void (*mgmt_tlv_list_foreach_func_t)(void *data, void *user_data);
++void mgmt_tlv_list_foreach(struct mgmt_tlv_list *tlv_list,
++				mgmt_tlv_list_foreach_func_t callback,
++				void *user_data);
+ unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				struct mgmt_tlv_list *tlv_list,
+ 				mgmt_request_func_t callback,
 -- 
-2.17.1
+2.29.2.729.g45daf8777d-goog
 
