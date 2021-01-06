@@ -2,88 +2,156 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C05C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 16:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3365C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 18:25:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 554EC23132
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 16:43:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A12B123133
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 18:25:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727475AbhAFQnO (ORCPT
+        id S1726074AbhAFSZ1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Jan 2021 11:43:14 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:58563 "EHLO
-        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726661AbhAFQnO (ORCPT
+        Wed, 6 Jan 2021 13:25:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbhAFSZ1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Jan 2021 11:43:14 -0500
-X-Originating-IP: 82.255.60.242
-Received: from [192.168.1.150] (lns-bzn-39-82-255-60-242.adsl.proxad.net [82.255.60.242])
-        (Authenticated sender: hadess@hadess.net)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 22AD9FF806;
-        Wed,  6 Jan 2021 16:42:31 +0000 (UTC)
-Message-ID: <20346dac6bd4c7fa6642b5516d89fdb275ed4990.camel@hadess.net>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Try harder to accept device not
- knowing options
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Florian Dollinger <dollinger.florian@gmx.de>
-Date:   Wed, 06 Jan 2021 17:42:31 +0100
-In-Reply-To: <CABBYNZJNTDek+kKS5wtrr67Xx8DmFGvcV13cLSxULgJRa5N+3g@mail.gmail.com>
-References: <20201208172912.4352-1-hadess@hadess.net>
-         <CABBYNZJNTDek+kKS5wtrr67Xx8DmFGvcV13cLSxULgJRa5N+3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.2 (3.38.2-1.fc33) 
+        Wed, 6 Jan 2021 13:25:27 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DF9C06134C
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jan 2021 10:24:47 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id 11so3821547oty.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Jan 2021 10:24:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Bu9H0suo47TzgQ20iNCXea4xr1Hbw2bLgxg2UBMBMGA=;
+        b=bgG/rq81QvcFYjc4ifFMvSc6ChG7phnBn4g5TKuh5Z/4kfxmt9CPJwMUoqZMKjpR2B
+         xm0O/TtqEe63Vh98ftlhRsUJshKduKbeM6JF+ReFWP5Z2LAr8aVTKKc84OW8EpNA8hfr
+         3P/84II9T73Sq+8Yqe0umBMuuONXjauTftW/GO9PYicze/qCYLgCSzCGgvDMc1a0xq26
+         P5OdHWH/XSFI0bSTnXbjDB9m32xNqYCr+RvbmT8RpPRpjlHetv15VhytBSQ0bqA6XfQJ
+         o8RJnRmww43VWTV/LPYiDPWlzBQbr0J6aw3WO7l0MP+kucnC+hXjUXEPhKkTlVjTJV8q
+         xNcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Bu9H0suo47TzgQ20iNCXea4xr1Hbw2bLgxg2UBMBMGA=;
+        b=EJfTDqetXCtZH5yez5RmNf3efpgWqGMUjObczcnPxo9qp3d1FZDImdg2cpkq+HJRCj
+         MeIBnvIFAAJvIVCNQ641IYIKtFHPdnUL2p3xubegy5wq/yjt7NhaccyqZZUmVdekNWNx
+         /QH8HIG4ye+Zp8nxLN1pJSM37xZau9JBL3vRnndZslHhdVu2Bcw1EWK4rxjRVeVXqbKW
+         l5ZG+VWmeAppgS36Zk4C3krnv5ryuTywJApnU/+CIZKvtTySP9WM4QVgmpHuxgWn5q4g
+         R8CIYr+Dh1Ok7PE6nJpwgNJ3cV0ubRTu0yrMCqH6zYBUC3RSJKBZuYmVpKzvuGP/2Y+s
+         RmkQ==
+X-Gm-Message-State: AOAM530NWvB+5gWwGIVD7ErT0PtmKjm2AaPacCWmiDN5HBUw8S7YFXaN
+        ae1S+sal3FgatMzKQVADbmYG/DiT3zaEJ1d4Aw11qU9K
+X-Google-Smtp-Source: ABdhPJy2O34i6961jkWvukTpR8vn6fJZYlBmcgGL/t5WHuVn1717T5OIMT5YSE7PZ+HAUQxXe7PnwBAX7XNMd603xV0=
+X-Received: by 2002:a9d:2035:: with SMTP id n50mr3992335ota.44.1609957486220;
+ Wed, 06 Jan 2021 10:24:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210106172647.Bluez.v1.1.If4056891c866780eba7b210887c6db468b8b55e9@changeid>
+In-Reply-To: <20210106172647.Bluez.v1.1.If4056891c866780eba7b210887c6db468b8b55e9@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 6 Jan 2021 10:24:35 -0800
+Message-ID: <CABBYNZK6fZ=rFqbhZeKC2ftoBdwrpZAeR_Pp2-4CYLB8hXzLDg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] adapter: Remove temporary devices before power off
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 2020-12-08 at 10:09 -0800, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Tue, Dec 8, 2020 at 9:36 AM Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > 
-> > The current implementation of L2CAP options negotiation will
-> > continue
-> > the negotiation when a device responds with L2CAP_CONF_UNACCEPT
-> > ("unaccepted
-> > options"), but not when the device replies with L2CAP_CONF_UNKNOWN
-> > ("unknown
-> > options").
-> > 
-> > Trying to continue the negotiation without ERTM support will allow
-> > Bluetooth-capable XBox One controllers (notably models 1708 and
-> > 1797)
-> > to connect.
-> 
-> While the bellow traces looks fine we need to confirm that it doesn't
-> break the qualification tests e.g:
-> 
-> L2CAP/COS/CFD/BV-14-C [Unknown Mandatory Options Request]
-> 
-> • Test Purpose Verify that the IUT can give the appropriate error
-> code
-> when the Lower Tester proposes any number of unknown options where at
-> least one is mandatory.
-> 
-> Afaik it should be fine to continue with another round of
-> configuration given that it only expects the error 0x0003, but we
-> better confirm PTS doesn't expect a L2CAP Disconnect after it.
+Hi Archie,
 
-I tested this today using Fedora's kernel-5.11.0-0.rc2.114.fc34:
-https://koji.fedoraproject.org/koji/buildinfo?buildID=1664670
-And a local build using the same source kernel with this patch on top.
+On Wed, Jan 6, 2021 at 1:27 AM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> If adapter is powered off when a currently connected device is
+> being removed, there is a possibility that we haven't finish waiting
+> for the disconnection but the adapter is already powered down.
+>
+> When this happens, the kernel would fail to clean the device's
+> information, for example the pairing information. This causes
+> disagreement between the user space and the kernel about whether the
+> device is already paired, because the device is successfully removed
+> from the user space's perspective.
+>
+> This patch enforces the removal of such devices before allowing the
+> adapter to power off.
+> ---
+>
+>  src/adapter.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index ec6a6a64c5..92d1cb2232 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -517,6 +517,7 @@ static void adapter_stop(struct btd_adapter *adapter);
+>  static void trigger_passive_scanning(struct btd_adapter *adapter);
+>  static bool set_mode(struct btd_adapter *adapter, uint16_t opcode,
+>                                                         uint8_t mode);
+> +static void remove_temporary_devices(struct btd_adapter *adapter);
 
-Both managed to pass the test without any problems.
+I would have the function above declared just before the first user
+that way we don't have to use a forward declaration like above.
 
-I'll send the results of the test privately to you and Marcel.
+>  static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+>  {
+> @@ -622,6 +623,8 @@ static bool set_mode(struct btd_adapter *adapter, uint16_t opcode,
+>         switch (mode) {
+>         case MGMT_OP_SET_POWERED:
+>                 setting = MGMT_SETTING_POWERED;
+> +               if (!mode)
+> +                       remove_temporary_devices(adapter);
+>                 break;
+>         case MGMT_OP_SET_CONNECTABLE:
+>                 setting = MGMT_SETTING_CONNECTABLE;
+> @@ -2888,8 +2891,10 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+>                 param = &mode;
+>                 len = sizeof(mode);
+>
+> -               if (!mode)
+> +               if (!mode) {
+>                         clear_discoverable(adapter);
+> +                       remove_temporary_devices(adapter);
+> +               }
+>
+>                 break;
+>         case MGMT_SETTING_DISCOVERABLE:
+> @@ -5304,6 +5309,19 @@ static void remove_discovery_list(struct btd_adapter *adapter)
+>         adapter->discovery_list = NULL;
+>  }
+>
+> +static void remove_temporary_devices(struct btd_adapter *adapter)
+> +{
+> +       GSList *l, *next;
+> +
+> +       for (l = adapter->devices; l; l = next) {
+> +               struct btd_device *dev = l->data;
+> +
+> +               next = g_slist_next(l);
+> +               if (device_is_temporary(dev))
+> +                       btd_adapter_remove_device(adapter, dev);
+> +       }
+> +}
+> +
+>  static void adapter_free(gpointer user_data)
+>  {
+>         struct btd_adapter *adapter = user_data;
+> --
+> 2.29.2.729.g45daf8777d-goog
+>
 
-Cheers
 
+-- 
+Luiz Augusto von Dentz
