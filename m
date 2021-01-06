@@ -2,69 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 708C1C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 00:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6A4C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 00:56:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2432B22242
+	by mail.kernel.org (Postfix) with ESMTP id 0088B22242
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 00:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbhAFA4j (ORCPT
+        id S1726394AbhAFA4k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jan 2021 19:56:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42382 "EHLO
+        Tue, 5 Jan 2021 19:56:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
         with ESMTP id S1726062AbhAFA4j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 5 Jan 2021 19:56:39 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A278BC061793
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jan 2021 16:55:58 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id e2so1052172pgi.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jan 2021 16:55:58 -0800 (PST)
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F97DC061796
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jan 2021 16:55:59 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id n10so1027590pgl.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jan 2021 16:55:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=rKYGtymZx7brSXP4yeuoji7IJWqAYlxnjFNuzYzug4Y=;
-        b=b0Cql2sjuN66apLKOeFnJHYPSZ3QjbRR8YQrKgDbcV1JMwalGxzcVPA+LTTthieCdu
-         cW7ekLzp/frjaPeCGxbmD7L0X0f3AIWVReTcWAL9mL7lhI84MwphGtjKlx4MnRXZd3YY
-         CvpGdAi3fbS1Yw1deho1rYsp9kvIrZabdc2RlDr7HUTSv2gVBwzQWCVNF+zlT1ob9wxs
-         wY5r3hiPciu/CAu1pq/KVEPP3Av6Nv+nxKB0sqM8rmu5HnGdwfdRbwk7A9VA0plXKgJm
-         0SQ/jMDMVLs0YW+a9ZrgHyKphOK6JNhY5Q6Dxqzt683FJYowyu3KVgwUeBndTxPgW4oO
-         rgyg==
+        bh=pNpY0c8f+E8GPcj4dhFQrX/MOC9P9C26OqCPtI+siss=;
+        b=pgfjgFLa18tXfy3IvGKhxsegwSAYUZDZz8osfC2NQSWjaRBnqqSyjiFtSBvpf4jY+Y
+         buQptqGvBDmTZ0Nl1O750LUkQ1xU7VQ20rZmL8mc+cAqTh18siNMRu5v1qd0d8r9wG7E
+         HeGswQxf+d6WqZGizFh4FfoGxnae6g5gTIM7TKp8BY+zF4lwVB67abb1jRyH/Mhw65j2
+         Vvuqzn994CgEAI6/ci9+HBU7Utfhf4crStkcb0imTgesAfFwkzERLKKM3FNCf8Rr6KmR
+         3fPkvv7/17+c5v1SWLPvEYZMr7WOW3Jf4AB5mScHuscfD9XLydRAsarTE2JOcvoUqhb3
+         Pe+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rKYGtymZx7brSXP4yeuoji7IJWqAYlxnjFNuzYzug4Y=;
-        b=O/sK5RtuwMcFDPSwFMt5fcC/f3sUPM5TK8FGWscQxXmwSB0SeAadhUxz6zXPFoUYDa
-         JQQJklUUqOfT1xcNlqSq3ofDYQ7uc463l+aUOE8JjV2VQw6bFcpoRhIZH+OJd4y7b+h+
-         qikJ6c/gU+/9p+FOGYfzdZghKhdpVt0AWID3Ajqyw9plsfANVDq3B48ioi1orVRTcQXY
-         yLe30WmKS0w6Zs6TwrSS+UVIAW7FgPBGWn8TT0rfEKUbEpzj+c6iWcT4hfspcTAA8xO0
-         IKfTVVN4Ca2I8apKFknLBUgPNlaLVIhwPbE0j6o+rQRj5jvedso9IV7uI0I5wN9NqgcK
-         ffVw==
-X-Gm-Message-State: AOAM532xIX+zS6JAxE/TU8d7tBnyC0ccL5pXY3A9y8ZH8MILBSf9HeFq
-        lg8bmr7TnEagChfUFd/T9BNVPYsZh6g=
-X-Google-Smtp-Source: ABdhPJwII4BAHaiVzmLfAShWqnCJhtTiPptBsGCnvURmKtalRkWSfMFjpNJOINcQuSbdYpVCEckuvg==
-X-Received: by 2002:a63:dc06:: with SMTP id s6mr1750726pgg.358.1609894557879;
-        Tue, 05 Jan 2021 16:55:57 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=pNpY0c8f+E8GPcj4dhFQrX/MOC9P9C26OqCPtI+siss=;
+        b=LWpSOMRFe4GDBr2PsHkWasz8oVOibWvn8N7i3QZRgohryZ3b9vb6y3COoyHXPuM+tb
+         taAHZJFnmokjJbq+uzAQmuDoH2PFvhhOitqSdGxGDvH4WiAqMMTQF3UFBk33e6qvnqeX
+         iMKz0pWnFFUC3oIK/ViZK+wi7RlTk+obs0N29wOgqDA47n+PO+m6zVa8JOlzDvpZB8/V
+         ko21EXSsZWly9kUJRdEnxaxs18CoQGwX1V4siJ39gHUuK21KizJURpkoZ0h4RJ5TOzdB
+         trtfiydFqBfxkdgRHmyYDO+SuYgCOqeEudM6kH2Iz7ZVYy3NrJT84ePBglY+l/dNXw7h
+         IHCw==
+X-Gm-Message-State: AOAM532eWw0cAD2vIsMHSU6gWtA3nVyebpgqKhEvtcSQgc047abVh8/d
+        ht3sDRD0yAjvCTFFHE9HdTn0RDFjYEk=
+X-Google-Smtp-Source: ABdhPJyibt0qS1TTA8/Evxfx6k16q5ZS+vUibPfrEIpJKVGcnxlbQ2KaPRwTYdv9TI7QmHUncfcNhg==
+X-Received: by 2002:a63:f21:: with SMTP id e33mr1849640pgl.84.1609894558852;
+        Tue, 05 Jan 2021 16:55:58 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x28sm485439pff.182.2021.01.05.16.55.57
+        by smtp.gmail.com with ESMTPSA id x28sm485439pff.182.2021.01.05.16.55.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jan 2021 16:55:57 -0800 (PST)
+        Tue, 05 Jan 2021 16:55:58 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/gatt-db: Introduce gatt_db_attribute_set_fixed_length
-Date:   Tue,  5 Jan 2021 16:55:55 -0800
-Message-Id: <20210106005556.3550549-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] gatt: Make use of gatt_db_attribute_set_fixed_length
+Date:   Tue,  5 Jan 2021 16:55:56 -0800
+Message-Id: <20210106005556.3550549-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210106005556.3550549-1-luiz.dentz@gmail.com>
+References: <20210106005556.3550549-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -73,142 +75,148 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables user to inform if an attribute has a fixed length so it can
-automatically perform bounds checking.
+This makes use of gatt_db_attribute_set_fixed_length so the database is
+aware of the length of the values and perform bounds checking.
 ---
- src/shared/gatt-db.c | 68 ++++++++++++++++++++++++++++++++++++--------
- src/shared/gatt-db.h |  3 ++
- 2 files changed, 59 insertions(+), 12 deletions(-)
+ src/gatt-database.c | 36 ++++++++++++++++--------------------
+ 1 file changed, 16 insertions(+), 20 deletions(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 54e64d0e0..8bff4d37a 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1836,6 +1836,38 @@ static uint8_t attribute_authorize(struct gatt_db_attribute *attrib,
- 	return db->authorize(attrib, opcode, att, db->authorize_data);
- }
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index f2d7b5821..b7d2bea1d 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -161,12 +161,14 @@ struct notify {
+ 	void *user_data;
+ };
  
-+bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
-+						uint16_t len)
-+{
-+	struct gatt_db_service *service;
++#define CLI_FEAT_SIZE 1
 +
-+	if (!attrib)
-+		return false;
-+
-+	service = attrib->service;
-+
-+	/* Don't allow overwriting length of service attribute */
-+	if (attrib->service->attributes[0] == attrib)
-+		return false;
-+
-+	/* If attribute is a characteristic declaration ajust to its value */
-+	if (!bt_uuid_cmp(&characteristic_uuid, &attrib->uuid)) {
-+		int i;
-+
-+		/* Start from the attribute following the value handle */
-+		for (i = 0; i < service->num_handles; i++) {
-+			if (service->attributes[i] == attrib) {
-+				attrib = service->attributes[i + 1];
-+				break;
-+			}
-+		}
-+	}
-+
-+	attrib->value_len = len;
-+
-+	return true;
-+}
-+
- bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
- 				uint8_t opcode, struct bt_att *att,
- 				gatt_db_attribute_read_t func, void *user_data)
-@@ -1845,6 +1877,12 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
- 	if (!attrib || !func)
- 		return false;
+ struct device_state {
+ 	struct btd_gatt_database *db;
+ 	bdaddr_t bdaddr;
+ 	uint8_t bdaddr_type;
+ 	unsigned int disc_id;
+-	uint8_t cli_feat[1];
++	uint8_t cli_feat[CLI_FEAT_SIZE];
+ 	bool change_aware;
+ 	bool out_of_sync;
+ 	struct queue *ccc_states;
+@@ -688,18 +690,12 @@ static void gap_appearance_read_cb(struct gatt_db_attribute *attrib,
  
-+	/* Check boundaries if value_len is set */
-+	if (attrib->value_len && offset > attrib->value_len) {
-+		func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_data);
-+		return true;
-+	}
-+
- 	if (attrib->read_func) {
- 		struct pending_read *p;
- 		uint8_t err;
-@@ -1870,12 +1908,6 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
- 		return true;
- 	}
+ 	dev_class = btd_adapter_get_class(database->adapter);
  
--	/* Check boundary if value is stored in the db */
--	if (offset > attrib->value_len) {
--		func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_data);
--		return true;
+-	if (offset > 2) {
+-		error = BT_ATT_ERROR_INVALID_OFFSET;
+-		goto done;
 -	}
 -
- 	/* Guard against invalid access if offset equals to value length */
- 	value = offset == attrib->value_len ? NULL : &attrib->value[offset];
+ 	appearance[0] = dev_class & 0x00ff;
+ 	appearance[1] = (dev_class >> 8) & 0x001f;
  
-@@ -1930,19 +1962,31 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
- 					gatt_db_attribute_write_t func,
- 					void *user_data)
- {
-+	uint8_t err = 0;
-+
- 	if (!attrib || !func)
- 		return false;
+ 	len -= offset;
+ 	value = len ? &appearance[offset] : NULL;
  
- 	if (attrib->write_func) {
- 		struct pending_write *p;
--		uint8_t err;
- 
--		err = attribute_authorize(attrib, opcode, att);
--		if (err) {
--			func(attrib, err, user_data);
--			return true;
-+		/* Check boundaries if value_len is set */
-+		if (attrib->value_len) {
-+			if (offset > attrib->value_len) {
-+				err = BT_ATT_ERROR_INVALID_OFFSET;
-+				goto done;
-+			}
-+
-+			if (offset + len > attrib->value_len) {
-+				err = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-+				goto done;
-+			}
- 		}
- 
-+		err = attribute_authorize(attrib, opcode, att);
-+		if (err)
-+			goto done;
-+
- 		p = new0(struct pending_write, 1);
- 		p->attrib = attrib;
- 		p->id = ++attrib->write_id;
-@@ -1983,7 +2027,7 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
- 	memcpy(&attrib->value[offset], value, len);
- 
- done:
--	func(attrib, 0, user_data);
-+	func(attrib, err, user_data);
- 
- 	return true;
+-done:
+ 	gatt_db_attribute_read_result(attrib, id, error, value, len);
  }
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index a0da33065..321a2aba6 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -241,6 +241,9 @@ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
- uint32_t
- gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib);
  
-+bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
-+						uint16_t len);
+@@ -820,7 +816,7 @@ static void database_add_record(struct btd_gatt_database *database,
+ static void populate_gap_service(struct btd_gatt_database *database)
+ {
+ 	bt_uuid_t uuid;
+-	struct gatt_db_attribute *service;
++	struct gatt_db_attribute *service, *attrib;
+ 
+ 	/* Add the GAP service */
+ 	bt_uuid16_create(&uuid, UUID_GAP);
+@@ -839,10 +835,12 @@ static void populate_gap_service(struct btd_gatt_database *database)
+ 	 * Device Appearance characteristic.
+ 	 */
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
+-	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
++	attrib = gatt_db_service_add_characteristic(service, &uuid,
++							BT_ATT_PERM_READ,
+ 							BT_GATT_CHRC_PROP_READ,
+ 							gap_appearance_read_cb,
+ 							NULL, database);
++	gatt_db_attribute_set_fixed_length(attrib, 2);
+ 
+ 	gatt_db_service_set_active(service, true);
+ 
+@@ -865,11 +863,6 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+ 
+ 	DBG("CCC read called for handle: 0x%04x", handle);
+ 
+-	if (offset) {
+-		ecode = BT_ATT_ERROR_INVALID_OFFSET;
+-		goto done;
+-	}
+-
+ 	ccc = get_ccc_state(database, att, handle);
+ 	if (!ccc) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+@@ -1046,6 +1039,8 @@ service_add_ccc(struct gatt_db_attribute *service,
+ 		return NULL;
+ 	}
+ 
++	gatt_db_attribute_set_fixed_length(ccc, 2);
 +
- typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
- 						int err, const uint8_t *value,
- 						size_t length, void *user_data);
+ 	ccc_cb->handle = gatt_db_attribute_get_handle(ccc);
+ 	ccc_cb->callback = write_callback;
+ 	ccc_cb->destroy = destroy;
+@@ -1075,11 +1070,6 @@ static void cli_feat_read_cb(struct gatt_db_attribute *attrib,
+ 		goto done;
+ 	}
+ 
+-	if (offset >= sizeof(state->cli_feat)) {
+-		ecode = BT_ATT_ERROR_INVALID_OFFSET;
+-		goto done;
+-	}
+-
+ 	len = sizeof(state->cli_feat) - offset;
+ 	value = len ? &state->cli_feat[offset] : NULL;
+ 
+@@ -1208,6 +1198,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 				cli_feat_read_cb, cli_feat_write_cb,
+ 				database);
+ 
++	gatt_db_attribute_set_fixed_length(database->cli_feat, CLI_FEAT_SIZE);
+ 
+ 	/* Only expose database hash chrc if supported */
+ 	if (gatt_db_hash_support(database->db)) {
+@@ -1215,6 +1206,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 		database->db_hash = gatt_db_service_add_characteristic(service,
+ 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
+ 				db_hash_read_cb, NULL, database);
++		gatt_db_attribute_set_fixed_length(database->db_hash, 16);
+ 	}
+ 
+ 	/* Only enable EATT if there is a socket listening */
+@@ -1223,6 +1215,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 		database->eatt = gatt_db_service_add_characteristic(service,
+ 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
+ 				server_feat_read_cb, NULL, database);
++		gatt_db_attribute_set_fixed_length(database->eatt, 1);
+ 	}
+ 
+ 	gatt_db_service_set_active(service, true);
+@@ -1254,12 +1247,15 @@ static void populate_devinfo_service(struct btd_gatt_database *database)
+ 	service = gatt_db_add_service(database->db, &uuid, true, 3);
+ 
+ 	if (btd_opts.did_source > 0) {
++		struct gatt_db_attribute *attrib;
++
+ 		bt_uuid16_create(&uuid, GATT_CHARAC_PNP_ID);
+-		gatt_db_service_add_characteristic(service, &uuid,
++		attrib = gatt_db_service_add_characteristic(service, &uuid,
+ 						BT_ATT_PERM_READ,
+ 						BT_GATT_CHRC_PROP_READ,
+ 						device_info_read_pnp_id_cb,
+ 						NULL, database);
++		gatt_db_attribute_set_fixed_length(attrib, 7);
+ 	}
+ 
+ 	gatt_db_service_set_active(service, true);
 -- 
 2.26.2
 
