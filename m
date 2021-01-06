@@ -2,126 +2,167 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE62C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 19:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A7EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 19:06:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D28223124
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 19:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F9823125
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jan 2021 19:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726572AbhAFTC6 (ORCPT
+        id S1726666AbhAFTGG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Jan 2021 14:02:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43476 "EHLO
+        Wed, 6 Jan 2021 14:06:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726407AbhAFTC6 (ORCPT
+        with ESMTP id S1726509AbhAFTGG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Jan 2021 14:02:58 -0500
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD94BC06134C
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jan 2021 11:02:17 -0800 (PST)
-Received: by mail-vs1-xe2a.google.com with SMTP id e15so2346571vsa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Jan 2021 11:02:17 -0800 (PST)
+        Wed, 6 Jan 2021 14:06:06 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74C5C061575
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jan 2021 11:05:25 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id s19so1001132oos.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Jan 2021 11:05:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yswo6jacExdlkQbOinSMm6fgWM1NkYxIWMNj1LlTB1I=;
-        b=RnkDDsR0z9Z5wWLGVPWkTkBQiKOqS6Q7/BLqFzVzCxMVmh/DXKvFcz08kdCo3i4ai9
-         GzPnnMYlMNZizxRHLlBmPDrT1B9l1rdwLwL2NYaQHTHb7aEU5wVSwlWIdM0lJj1bQJQn
-         hOXcPHheu6WOR0uxsKAOheR/2rY1ShFJ/CBqg=
+        bh=P4DKvJGFEQ1hqyU+GKgsU1Prw0/8glwg6MDsxnHB6kU=;
+        b=R67V3ltlI9SyFkWSmrtdHOrc43bJDomsyMBv+yzI9N0C5vMrRqztldFZtvbnYLCA6G
+         N0rv04c/K5pOly/9VzsmuS1iLxtW3K7Tyl8Zwab8DOPMBcf61fphKBQtVyVRcpUT0Az5
+         AevD08SVzr+viP/TCtSSw9MmJz8wwXk6PCrlhSRa25nceuuCCQEEPjfE6c0mU2FFya1M
+         dS7NVmRQEcNGuxld4X4Wdvqjg25s9gDim2SVBv/JO4bvHYRwwi7HEQ2s9KBllxKG9VaG
+         RTams1TpGPNgnIMaFnmVmRE5/h2Rvv00L9+/NELOAv3kiWiQOYCqDjnRWkxnAJGHXZhV
+         ajkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yswo6jacExdlkQbOinSMm6fgWM1NkYxIWMNj1LlTB1I=;
-        b=B0gMOM+3fTNG9W75q8MN1dE/+BhW5BZL/z+gu4kKqBet84nJ61sl0fLJHneU32/Ckg
-         /v6ptmFmVbfzTkAq4YtuowpvdXj4zKWVgRoTdqwfj6+qb5GzXtdejR403AxGiurY0bjJ
-         JQS6Sa9gRK2r05POaMmiK6paldI7OS4RTdqZAdpAfCSLutqN5XthyjnVzz1PM35UcMwP
-         kC/4k9DPfkRUCpdEL+AxA+L9HHUE0OFxPDTWjs9SaUKDThPByZ8fiiHZrRnU/yAMtF4G
-         vhJGXda/8+vqUN6QO7xYfsXIYaM8Dhp7gIU0BE8Q5k6zq1hGLU2CwDvZAKOa4uS1FZQH
-         1deg==
-X-Gm-Message-State: AOAM531YON6GXHPYGZyY8SWMbaRagj7bIvXIqDt6luTCNJ18WEb7TiHa
-        FUgxWDx5gNeaJfU26ZUu/LjB3THqjQxtSgIFYxqT4g==
-X-Google-Smtp-Source: ABdhPJwVHCGFO3PeF07THo8lpVOwBsIItaNZ01CnRC/fCY330JxsUv6miRFK8JP1wTVirNvi0K7N75X4JfdyZIuHy+A=
-X-Received: by 2002:a67:c983:: with SMTP id y3mr4363240vsk.59.1609959736237;
- Wed, 06 Jan 2021 11:02:16 -0800 (PST)
+        bh=P4DKvJGFEQ1hqyU+GKgsU1Prw0/8glwg6MDsxnHB6kU=;
+        b=KQYdcAllyNeaPKtF9tvBVshrNUmX//H3gx0x8LIaSGWjkpeUxqXedIAT1UDGMTvZ4R
+         a4m7kSZwN2DymKB7H2n9rpjYgDFBy+vHJOB5/3VXZtcbscVpcAck51xpgurbj22L6+xH
+         M8FtlROf2kJwTuAztmI0/ks1fnyjJ++OoTLly/wztARPVEbwyTJZ484YCW5nDNXJoKcw
+         hAz09VEVLpR+dEoMBsoZN0xWHtWDpScKrZfp9g7oK27u++IpL2aDkBHE/Op1RSMHU73d
+         r6iKHPuGM00hDWpXC96Y9fGiWlc/on+aSNPxWUM8zRPMZ53CsAxW3BX2tKvFbY3sbG+x
+         o3pQ==
+X-Gm-Message-State: AOAM531NRW6U6fYl6rgjAkBTnn0osiXYq+drtSU6LBRijEcPHul3meZV
+        nODJAuqPVPGC5XftxLzmFPvnC0L7aLm5kFkR4tY=
+X-Google-Smtp-Source: ABdhPJwmkhpeX1547IWx1p3buxgztW44Ni5w+rxgrJeVY8FO1XUNLr5kdhz3+1LpjYE5RbGw1lA09PDj3toiovyA/Ks=
+X-Received: by 2002:a4a:896e:: with SMTP id g43mr3820708ooi.24.1609959924515;
+ Wed, 06 Jan 2021 11:05:24 -0800 (PST)
 MIME-Version: 1.0
-References: <VI1PR04MB496003E449FB10B12959ADC292D00@VI1PR04MB4960.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR04MB496003E449FB10B12959ADC292D00@VI1PR04MB4960.eurprd04.prod.outlook.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Wed, 6 Jan 2021 11:02:04 -0800
-Message-ID: <CANFp7mXtX4H=tQ5usRiOXRBzfuQORc6-MCznbjmsMBRAQMo36w@mail.gmail.com>
-Subject: Re: BT large file transfer failed when do suspend/resume test
-To:     Sherry Sun <sherry.sun@nxp.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+References: <20210106172647.Bluez.v1.1.If4056891c866780eba7b210887c6db468b8b55e9@changeid>
+ <CABBYNZK6fZ=rFqbhZeKC2ftoBdwrpZAeR_Pp2-4CYLB8hXzLDg@mail.gmail.com>
+In-Reply-To: <CABBYNZK6fZ=rFqbhZeKC2ftoBdwrpZAeR_Pp2-4CYLB8hXzLDg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 6 Jan 2021 11:05:13 -0800
+Message-ID: <CABBYNZKH+iUPyU6QRjkoe6-R7cAFptmooSvOqO1f=jds=1VJSg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] adapter: Remove temporary devices before power off
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sherry,
+Hi Archie,
 
-On Wed, Jan 6, 2021 at 5:40 AM Sherry Sun <sherry.sun@nxp.com> wrote:
+On Wed, Jan 6, 2021 at 10:24 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hi Abhishek,
+> Hi Archie,
 >
-> I want to ask you some questions about your patch: Bluetooth: Handle BR/EDR devices during suspend. (https://patchwork.kernel.org/project/bluetooth/patch/20200311085359.RFC.v6.2.Icc7c35e1cabf10f8a383a009694987520f1d1b35@changeid/)
+> On Wed, Jan 6, 2021 at 1:27 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > If adapter is powered off when a currently connected device is
+> > being removed, there is a possibility that we haven't finish waiting
+> > for the disconnection but the adapter is already powered down.
+> >
+> > When this happens, the kernel would fail to clean the device's
+> > information, for example the pairing information. This causes
+> > disagreement between the user space and the kernel about whether the
+> > device is already paired, because the device is successfully removed
+> > from the user space's perspective.
+> >
+> > This patch enforces the removal of such devices before allowing the
+> > adapter to power off.
+> > ---
+> >
+> >  src/adapter.c | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index ec6a6a64c5..92d1cb2232 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -517,6 +517,7 @@ static void adapter_stop(struct btd_adapter *adapter);
+> >  static void trigger_passive_scanning(struct btd_adapter *adapter);
+> >  static bool set_mode(struct btd_adapter *adapter, uint16_t opcode,
+> >                                                         uint8_t mode);
+> > +static void remove_temporary_devices(struct btd_adapter *adapter);
 >
-> Platform: L5.10 + Bluez5.55 + Marvell BT chip
+> I would have the function above declared just before the first user
+> that way we don't have to use a forward declaration like above.
 >
-> Background: Our test team usually try suspend/resume test when transferring large file through BT, to see if the file transfer can be continued after suspend/resume. It can works well before L5.10
-> But we found on L5.10, the BT connection lost if we try to suspend/resume, so the file transfer(through OBEX Object Push) shows failed. Then we found your patches when debugging.
+> >  static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+> >  {
+> > @@ -622,6 +623,8 @@ static bool set_mode(struct btd_adapter *adapter, uint16_t opcode,
+> >         switch (mode) {
+> >         case MGMT_OP_SET_POWERED:
+> >                 setting = MGMT_SETTING_POWERED;
+> > +               if (!mode)
+> > +                       remove_temporary_devices(adapter);
+> >                 break;
+> >         case MGMT_OP_SET_CONNECTABLE:
+> >                 setting = MGMT_SETTING_CONNECTABLE;
+> > @@ -2888,8 +2891,10 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+> >                 param = &mode;
+> >                 len = sizeof(mode);
+> >
+> > -               if (!mode)
+> > +               if (!mode) {
+> >                         clear_discoverable(adapter);
+> > +                       remove_temporary_devices(adapter);
+> > +               }
+> >
+> >                 break;
+> >         case MGMT_SETTING_DISCOVERABLE:
+> > @@ -5304,6 +5309,19 @@ static void remove_discovery_list(struct btd_adapter *adapter)
+> >         adapter->discovery_list = NULL;
+> >  }
+> >
+> > +static void remove_temporary_devices(struct btd_adapter *adapter)
+> > +{
+> > +       GSList *l, *next;
+> > +
+> > +       for (l = adapter->devices; l; l = next) {
+> > +               struct btd_device *dev = l->data;
+> > +
+> > +               next = g_slist_next(l);
+> > +               if (device_is_temporary(dev))
+> > +                       btd_adapter_remove_device(adapter, dev);
+> > +       }
+> > +}
+> > +
+> >  static void adapter_free(gpointer user_data)
+> >  {
+> >         struct btd_adapter *adapter = user_data;
+> > --
+> > 2.29.2.729.g45daf8777d-goog
+> >
 >
-> Questions:
-> 1. Before L5.10, kernel always keep BT connected during suspend/resume. So why we need to disconnect all the BT devices when system suspend now?
-
-Bluetooth has often been a source of spurious wakes in the past. Using
-rfkill or masking the wake interrupt were used in the past to make
-this more reliable but this was resulting in instability on the
-controller (controller needs to drop traffic if host is asleep and
-there's no clean way to do that).
-
-The new suspend behavior is the following:
-- All devices get disconnected during suspend.
-- Only HID devices can wake the device from suspend (i.e. Remote
-Wake). The BT controller will be configured to scan (page scan and/or
-LE passive scan) based on currently paired devices. If the device is
-not configured for wakeup (i.e. power/wakeup in sysfs is "disabled"),
-we will not configure this scanning either (see the hdev->prevent_wake
-implementation in btusb for an example)
-- On resume, devices that support a2dp-sink will be automatically reconnected
-
-This results in more reliable behavior from Bluetooth around suspend
-while allowing Remote Wake to work properly.
-
-> 2. I found that the device been disconnected due to suspend won't been auto-connected after resume, shouldn't we get the BT device auto-connected after resume like wifi devices done?
-
-We do this currently only for Bluetooth headphones (reconnect on
-a2dp-sink service). I'm not familiar with Obex so I don't know if this
-would work for that as well. I did send up a patch making reconnect on
-resume configurable based on service uuid that may be relevant to
-this: https://patchwork.kernel.org/project/bluetooth/patch/20201207154903.bluez.1.I3e043a481273442748bcff0728b2f0e208017cd2@changeid/
-
-> 3. For the large file transfer, if the BT been disconnected during suspend, the transfer will fail, do we have any methods to avoid this issue?
-
-If you have an active transfer, does it make sense to be suspending?
-Perhaps you should hold a wakelock while a transfer is ongoing.
-I am not sure how Obex and other services should behave here so I will
-defer to Luiz and Marcel's opinion on this topic.
-
 >
-> I'm new to Bluetooth, there are many things I don't understand, looking forward to your answer, and thanks for now!
->
-> Best regards
-> Sherry sun
->
+> --
+> Luiz Augusto von Dentz
 
-Thanks
-Abhishek
+Applied, thanks. I went ahead and did the changes myself.
+
+-- 
+Luiz Augusto von Dentz
