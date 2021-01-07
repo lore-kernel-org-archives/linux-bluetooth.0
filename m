@@ -2,65 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BF9C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jan 2021 02:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F21AC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jan 2021 02:50:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B04322EBF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jan 2021 02:22:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D506F22D75
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jan 2021 02:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbhAGCWZ (ORCPT
+        id S1726298AbhAGCuG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Jan 2021 21:22:25 -0500
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:48583 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726703AbhAGCWX (ORCPT
+        Wed, 6 Jan 2021 21:50:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbhAGCuF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Jan 2021 21:22:23 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UKxLfZz_1609986086;
-Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UKxLfZz_1609986086)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 07 Jan 2021 10:21:39 +0800
-From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Subject: [PATCH] net/bluetooth: WARNING: adv_channel_map_fops should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-Date:   Thu,  7 Jan 2021 10:21:11 +0800
-Message-Id: <1609986071-117076-1-git-send-email-abaci-bugfix@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 6 Jan 2021 21:50:05 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E72B9C0612EF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jan 2021 18:49:24 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id 14so4083931ilq.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Jan 2021 18:49:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=nQy4SmSX4/stJ5XIZxhwYZgikzu4gKd1zN01awRvrw8=;
+        b=tb3pOwOti5yqclmyfzXEPt3jd8t42tAJCBghTQ2o9JCC3Ae33IVZnXmR2ipJtcDu9w
+         R9r5M4Vu4RgZyPdfwJUZ8IWC5wz4VXFOpAGlIMhyeHNidf5sJRCsnm0RTb4x0bkFpb+x
+         +W1qoJo98GJXFU4YffHDVRgCKN9W8KOcSHQgtp5iil7gaPqwCFeh3SA/zzgUOzPr0e6g
+         +dgQEZzYU+5kIUAA2ybf5l/p807cpiLOXejICGy9J6NSe4TYkTYIOR5J4XaXkN4/0Cay
+         +uonNGND+WSNPrOhMf66oQVNWbL5momfVTo1micK3pPRSfXIGn5IHOEoq3dtjRR1bHr5
+         taSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=nQy4SmSX4/stJ5XIZxhwYZgikzu4gKd1zN01awRvrw8=;
+        b=bg+ehZxDbFmW/q4v3DHZf02+ALBirAfn9SQsxQQ/BGi000Jm3j4CRTXa+ePRbt0nxe
+         YqMTIR13DAWEm9c/XjJHXQaXJjR9ZDqyz8dEPVvXK9nuyJ2vO/oXEIY3Xkb3AKoXxC75
+         8Zu5vIn4nEuelfQT85V1YYjAbIn3DZxiPPqURtqe+MfogYq0kF+xU+vc7eK/e1gfS0AS
+         VdfIEKgY+okx1UdxsUqaLgV69mDVWdakURYvtcpjlVgNlvtR6x+mBsngTn1U7A5iCQBn
+         J2CIgU4lzDVQoT/7wcvBVwRWc1wZ/xWao/eI454vvHfxcKqTjhSa/S7Hk0gnZb587orF
+         WI8g==
+X-Gm-Message-State: AOAM533QpVDM5lmTK7vCQZfbr1JT7MSgktXLeXXrR0UJYR1/P2VDGlG2
+        nNYo55URhHb4pF15Dl3ZP9rudbDdb8E=
+X-Google-Smtp-Source: ABdhPJzJQpATvUPlBBvJDlXAIzkX5tIeq5NZLfCX9eL/o/0LDgDfmBfzZA4QcEaNSEhUr8S3t1DrNA==
+X-Received: by 2002:a92:180b:: with SMTP id 11mr7267878ily.30.1609987764207;
+        Wed, 06 Jan 2021 18:49:24 -0800 (PST)
+Received: from [172.17.0.2] ([40.79.23.203])
+        by smtp.gmail.com with ESMTPSA id k9sm1871542iob.13.2021.01.06.18.49.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jan 2021 18:49:23 -0800 (PST)
+Message-ID: <5ff676b3.1c69fb81.8a2b4.8179@mx.google.com>
+Date:   Wed, 06 Jan 2021 18:49:23 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7437572887555693300=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] shared/gatt-server: Fix not accepting multiple requests
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210107014811.3812318-1-luiz.dentz@gmail.com>
+References: <20210107014811.3812318-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-adv_channel_map_fops is used in the debug file, we use
-DEFINE_DEBUGFS_ATTRIBUTE replaces DEFINE_SIMPLE_ATTRIBUTE,
-more clear and intuitive.
+--===============7437572887555693300==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Reported-by: Abaci <abaci@linux.alibaba.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=410281
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- net/bluetooth/hci_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 4626e02..1b67cd3 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -981,7 +981,7 @@ static int adv_channel_map_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- 			adv_channel_map_set, "%llu\n");
- 
- static int adv_min_interval_set(void *data, u64 val)
--- 
-1.8.3.1
 
+--===============7437572887555693300==--
