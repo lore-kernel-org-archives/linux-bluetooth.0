@@ -2,98 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-1.3 required=3.0 tests=BAYES_05,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F2DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 19:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C64C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 19:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84F6323A9A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 19:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45C3E23A9B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 19:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728722AbhAHTFI (ORCPT
+        id S1728863AbhAHTWR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Jan 2021 14:05:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41378 "EHLO
+        Fri, 8 Jan 2021 14:22:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726735AbhAHTFI (ORCPT
+        with ESMTP id S1728732AbhAHTWR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Jan 2021 14:05:08 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7F2C0612EA
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Jan 2021 11:04:28 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id w1so5962113pjc.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Jan 2021 11:04:28 -0800 (PST)
+        Fri, 8 Jan 2021 14:22:17 -0500
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8B0C061380
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Jan 2021 11:21:36 -0800 (PST)
+Received: by mail-qv1-xf2c.google.com with SMTP id d11so4784944qvo.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Jan 2021 11:21:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=JEXWlJdDePFBm/HsaJp0B5wQRXw/bAWWRY47hJSwmwk=;
-        b=KLexHvVY0383JlMSJNnkPezS+SR1yWpXuKVSBwNiKwzFzGG/AHJLsvAEI1G7OJmQt8
-         Hl+O3YmwYWlN/ZLb7sl+Bn+97JKHnQgAopIeY46x806OcuRfmxg2n2WVk0uYmHMYTB5a
-         PdtOd+KtUwWvgu741MfYal/pdeMA8oQqBYTMQu8+XfhM3HveaEv2eb5ukI2lg6Y5Op3F
-         XAOklcoZlFiChacATw+7AiljOh5vT+nCg/JJvvInXUeF/+xsfSni3wEbDldHKq7dgOBp
-         SkeKLZmbdevuqkl23CbSSGhlr72Pi1umz/vbrk9QpZvY94oWLxmfX0qmCCc1JK3pF+Po
-         JwdA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=6WtoCclTruRLHF4aUfp/V/ahEJPvILTlWBZsc1WWMgk=;
+        b=ZYKiS2BOpjtmPx88M0BIgXfXOzTAsiguoHWLwiI4f9reJq5UQ/k/mG8/q/vT2evfaN
+         D8NQoMpyShfgRRVcftg16LLDoQz1yzLyZs6F96QEJYgGgIJ2QDDzsth6Lmn9rnJEuoaO
+         nAuFU95tZOgPt0q4v/AKrr8Ltyigv5gIfth8l2Q4dtKw3BPXIfXZFnydjcD0LwoOwZwW
+         8cNkv/QJ2qXP4UGsQomTfFxd8PeOeET2sCE/OZky4C5NJrX/GaTqum899E51eYHPb71i
+         k6UaPbDQ2Y2DPXbA+Cv+AYL8HFauwkEtNexD0QZvPbMl/l0nHF48dFQ3lNFGx1LiQZfJ
+         lT9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=JEXWlJdDePFBm/HsaJp0B5wQRXw/bAWWRY47hJSwmwk=;
-        b=Z6HCjszByIW3XMWhgB8ve7IKaArOjjqcQupz9Nx1DDOGHuh4N1TGBbph8bw7VMIpBX
-         Y0tdHjhm5RA2Dqu54JAZMjDVEKxkbHTAhCgzXho20pOsK2b3HbThjwnAQvuNh59NaxnJ
-         DFmSUmS9hoS43AO9/2Otnx4o1kQJrhS+UFpfC6E4EGxaI9qdq+efiEfzD+CMqMdtR7xp
-         VuAfnYiemjhXDRC3Fu53oXRHdooAz0KPg29MIQLwwJnFKcnm4KSActHdDVGqpfn4Idcb
-         L6jYykAToQXbtAH5CY9a63shNR+bnF1wkRw+cUrCxtFz26nwgDJwb9CVdRmX1njYBgUi
-         aQsA==
-X-Gm-Message-State: AOAM533aPXgg8AxhR7Uw656LEdn6X+WwU0d7xDwK5C8t21J1s9CgPfs7
-        4+iMXRVvd2CzmGIvTmkrEa6+3RnqYJU=
-X-Google-Smtp-Source: ABdhPJxwavj9U0H9T6x8HUb4Nue73n+QewA0Py3/Q+A9cgajk8kQ43CbRSNvko3nwfQZw+ts3lBAdw==
-X-Received: by 2002:a17:90a:f683:: with SMTP id cl3mr5237598pjb.136.1610132667528;
-        Fri, 08 Jan 2021 11:04:27 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g16sm9304181pfh.187.2021.01.08.11.04.26
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=6WtoCclTruRLHF4aUfp/V/ahEJPvILTlWBZsc1WWMgk=;
+        b=dpoM2WtHv9VQBh1tRmJUhs4ivPccE8PJZBu9jyCmgUpwzd1g7xpyWFrFpRdQn9dKdj
+         WBvoy4rstolmxCf+r8PT9TzFPoEecAnOM4AFwKNlCxAibDUVTylUkM0PBoTp2EBxoRVW
+         EJXdcJM4SXOv2gvRFBeH3rtt9OHXNXQiA/QzCnBJoYUyXnAwKwivKOpwF5U7+rirMamd
+         k6gV5g6pEUNXGHFjh/f1mYWEBarU/W1D7YkfXvOAd3BWRZpb+9+EBjqeXqw+iQINAoFR
+         IdkI70A5HQhLdPGgXApj086wHt6ZhDNBkhi9E7cSBa31/yHi/0yqWyQL4Y0CQq8pAJfI
+         s1yw==
+X-Gm-Message-State: AOAM531BPmg7rJ6qL63eC+KCjp5Fgv9MuCMlnxxsRb0MginFZA21kRNP
+        X2pGcpFq/kASRuiCGAb75T3Z5fBfG2dEgA==
+X-Google-Smtp-Source: ABdhPJw+ef+88GzERfMicvxQLIRb96GxBGs6D3Xbf+zziFKZyZLka5CwnoHsRnub90FqvXjMniTqEQ==
+X-Received: by 2002:ad4:5188:: with SMTP id b8mr8213120qvp.55.1610133695809;
+        Fri, 08 Jan 2021 11:21:35 -0800 (PST)
+Received: from [172.17.0.2] ([40.75.82.200])
+        by smtp.gmail.com with ESMTPSA id o5sm4917922qti.47.2021.01.08.11.21.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 11:04:26 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] device: Enable ATT layer debugging
-Date:   Fri,  8 Jan 2021 11:04:23 -0800
-Message-Id: <20210108190423.4185474-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.26.2
+        Fri, 08 Jan 2021 11:21:35 -0800 (PST)
+Message-ID: <5ff8b0bf.1c69fb81.b8c6.f40c@mx.google.com>
+Date:   Fri, 08 Jan 2021 11:21:35 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1235213214285160350=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/3] util: Introduce util_debug_va
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20210108190423.4185474-1-luiz.dentz@gmail.com>
 References: <20210108190423.4185474-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1235213214285160350==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This uses bt_att_set_debug to enable ATT debugging which is useful for
-detecting error such as an ATT transaction timing out.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=411447
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- src/device.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/device.c b/src/device.c
-index 2e97876ec..fe885aa64 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5336,6 +5336,8 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 
- 	bt_att_ref(dev->att);
- 
-+	bt_att_set_debug(dev->att, BT_ATT_DEBUG, gatt_debug, NULL, NULL);
-+
- 	dev->att_disconn_id = bt_att_register_disconnect(dev->att,
- 						att_disconnected_cb, dev, NULL);
- 	bt_att_set_close_on_unref(dev->att, true);
--- 
-2.26.2
 
+--===============1235213214285160350==--
