@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49731C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 21:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A1AC433E9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 21:16:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C8E923A9B
+	by mail.kernel.org (Postfix) with ESMTP id B18E423A9B
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jan 2021 21:16:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729614AbhAHVP7 (ORCPT
+        id S1729616AbhAHVQA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Jan 2021 16:15:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33608 "EHLO
+        Fri, 8 Jan 2021 16:16:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729606AbhAHVP6 (ORCPT
+        with ESMTP id S1729486AbhAHVP7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Jan 2021 16:15:58 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C72E7C061793
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Jan 2021 13:15:17 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id b5so6902804pjl.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Jan 2021 13:15:17 -0800 (PST)
+        Fri, 8 Jan 2021 16:15:59 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE37C061796
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Jan 2021 13:15:18 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id c13so4338131pfi.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Jan 2021 13:15:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=JEXWlJdDePFBm/HsaJp0B5wQRXw/bAWWRY47hJSwmwk=;
-        b=aVqkssl8SOQPvp8wTGTwTEDaW2fcPgFHKle6CEVwCykstkoauJBEK7EoGXcfqQgv08
-         qtKkj+5gYRDjprZA2V8Agj5QvPK/QeGBe7WKE73pyx7NqwGJp27fXd2FDFB7jk0qy8/N
-         P+PnRiEKClnpqAjCl+DtyDvS+pMY45i+BXMU3fTVABO5dsFfg0WHsg7PQ/ecQ0CVqk+Y
-         duAC6xS0LaencojiL63AVKZO4CFvs9T8c1rGCBEamnUAHvsBG3pWXpV5LYPyEAwKZHst
-         /xxqeqphpfYPz9gjWsCCGwS6T5jXKhS+nBv/nV7Bq52KnxZE0+NWpfnm6TjWGDfY8+Gp
-         10ag==
+        bh=od4kyhO8B6Ups457tn7S8TzdwrA5OCwrTrq+s7sYrME=;
+        b=GxdykE+DobF8eM8ACQxN9PmHumAZSVLOx9hWOAb2gns+cz5CLvfCZR/PXoHzJdjpxs
+         oX/lxp1lRn9SriuKCwk3C5Jfb0xzeFkkbnh4L2lJlvLUN7imshrOjF4qgmFunahSNMtp
+         rVLi6bjIYla+kpw6tMmbkUK+rWuVInyaFspPHTTjvEMd4t9OpwFswP4abjEbqmHTIu6R
+         A/CjPYwud8j1ghxYAaHEvHPn1gWswHe0k6St7LtHYpOrtTv0ynEOwkK5wMpTcSwSxbwd
+         v9LPQEYCSG+Jhk0K6HASUBNLOsmH/VSyzbSIEpxKXC9MT3yxMnflO2CUGMQcrum4nuVk
+         PPdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=JEXWlJdDePFBm/HsaJp0B5wQRXw/bAWWRY47hJSwmwk=;
-        b=LhYpeFPGL6SduyY4JjThj4iayK4zcG0fll8GyCQTbDjAs9sQiS6BE2UXKC5HKO+0gY
-         kz+2X+vpLzOZDRn9D+TMgz3Wipy2XK2YTNjwmW0iY1FpRDUtYeKjkMEmyreDNLuns2kS
-         C2KXODbGvpk0t8KYepCiAwE3ZI3XroL85DPt6RXG0+XA/G/CxV6p08HDdcxEJmL+y/hE
-         ZIiKmEkglD2b329LvTiuFKqodiU2DAYj3wIN3J/blMUn/KYK0PXwrn0z7fWDHRvMRDXj
-         vLU/pzePgUnx/BLsw1yuiHu2GOzP2l/HNdLBBByas0qhPLBZEkeZNF5mCuQphs4lmDGL
-         BCww==
-X-Gm-Message-State: AOAM530ebGffsFDBHZP8qPgV4maoDfJB4vxTj62mSxvmYLNKawAGCZvi
-        XJj1ThKVAtkcsoeqO3/XO8/sjsayVsA=
-X-Google-Smtp-Source: ABdhPJyM1zlkQtHqgGeBjMPsTlB5iO5hsX68FOGD/oIFRuTWeA+ld2WLin+4iv88w6fpNOOiLa/U4Q==
-X-Received: by 2002:a17:902:6807:b029:db:f60f:52f7 with SMTP id h7-20020a1709026807b02900dbf60f52f7mr5752345plk.54.1610140517167;
-        Fri, 08 Jan 2021 13:15:17 -0800 (PST)
+        bh=od4kyhO8B6Ups457tn7S8TzdwrA5OCwrTrq+s7sYrME=;
+        b=qSQgAibaqfxWaotpNrovQ0SG1HnpXDoTo1HHZPwEBxABxxRbIgigfKrIuxIdOmgvo4
+         ulsgflRYReD+XYka0lh6qBgiR5dO/Fcz4pp9cLmfKGiieRJ1jay/QQCNcuHtUy9Ugd7b
+         HVd2s/vRSWFdeJm9c1Q5X7kzKzu9oMnXA9OJMl6PH7k+7HHxfQ6c/Rmov9gGwjwDxQD8
+         7A1lUJOMENXHGpQ0ur1d0lA91QRJvz7mesxfNcAE25rmK1J9tlm1hnz/ii1rrEBsYe6r
+         Dkg1l5EfZ6c9MW6diLr+OP0mPZgx+LUkWdYF46E4WpAYmerCB/qc4F3qPcOcxMr/XALr
+         Q7/g==
+X-Gm-Message-State: AOAM530ul9vnk/1x/QZxD27v7kBF4qH1ThHRj/CiBCCIDbfcRgY/n5qZ
+        ZkvATAxXlDkyGM0m1D7mYWON6g/j4xk=
+X-Google-Smtp-Source: ABdhPJzh6Umwc27pthbMvB82TT1WzZ1cnsD2FTgMhU2DmS4KbgYWrR4okhhuj9sTRFy/IG1IpEFk9Q==
+X-Received: by 2002:a63:4c09:: with SMTP id z9mr9102333pga.260.1610140518117;
+        Fri, 08 Jan 2021 13:15:18 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 21sm9721699pfx.84.2021.01.08.13.15.16
+        by smtp.gmail.com with ESMTPSA id 21sm9721699pfx.84.2021.01.08.13.15.17
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 13:15:16 -0800 (PST)
+        Fri, 08 Jan 2021 13:15:17 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] device: Enable ATT layer debugging
-Date:   Fri,  8 Jan 2021 13:15:12 -0800
-Message-Id: <20210108211513.5180-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] gatt: Fix assuming service changed has been subscribed
+Date:   Fri,  8 Jan 2021 13:15:13 -0800
+Message-Id: <20210108211513.5180-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210108211513.5180-1-luiz.dentz@gmail.com>
 References: <20210108211513.5180-1-luiz.dentz@gmail.com>
@@ -75,25 +75,56 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses bt_att_set_debug to enable ATT debugging which is useful for
-detecting error such as an ATT transaction timing out.
+Unfortunately assuming service changed has been subscribed may cause
+indication to time out in some peripherals (Logitech M720 Triathlon, Mx
+Anywhere 2, Lenovo Mice N700, RAPOO BleMouse and Microsoft Designer
+Mouse) even though the expect actually mandates that the client responds
+with confirmation these peripherals just ignores it completely which
+leads them to be disconnected whenever bluetoothd is restarted or the
+system reboots.
 ---
- src/device.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/device.c        | 11 ++---------
+ src/gatt-database.c |  2 +-
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 2e97876ec..fe885aa64 100644
+index fe885aa64..af13badfc 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -5336,6 +5336,8 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+@@ -5831,18 +5831,11 @@ void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
+ 	key_file = g_key_file_new();
+ 	g_key_file_load_from_file(key_file, filename, 0, NULL);
  
- 	bt_att_ref(dev->att);
+-	/*
+-	 * If there is no "ServiceChanged" section we may be loading data from
+-	 * old version which did not persist Service Changed CCC values. Let's
+-	 * check if we are bonded and assume indications were enabled by peer
+-	 * in such case - it should have done this anyway.
+-	 */
+ 	if (!g_key_file_has_group(key_file, "ServiceChanged")) {
+ 		if (ccc_le)
+-			*ccc_le = device->le_state.bonded ? 0x0002 : 0x0000;
++			*ccc_le = 0x0000;
+ 		if (ccc_bredr)
+-			*ccc_bredr = device->bredr_state.bonded ?
+-							0x0002 : 0x0000;
++			*ccc_bredr = 0x0000;
+ 		g_key_file_free(key_file);
+ 		return;
+ 	}
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index b7d2bea1d..d99604826 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -333,7 +333,7 @@ static void att_disconnected(int err, void *user_data)
+ 		handle = gatt_db_attribute_get_handle(state->db->svc_chngd_ccc);
  
-+	bt_att_set_debug(dev->att, BT_ATT_DEBUG, gatt_debug, NULL, NULL);
-+
- 	dev->att_disconn_id = bt_att_register_disconnect(dev->att,
- 						att_disconnected_cb, dev, NULL);
- 	bt_att_set_close_on_unref(dev->att, true);
+ 		ccc = find_ccc_state(state, handle);
+-		if (ccc)
++		if (ccc && ccc->value)
+ 			device_store_svc_chng_ccc(device, state->bdaddr_type,
+ 								ccc->value);
+ 
 -- 
 2.26.2
 
