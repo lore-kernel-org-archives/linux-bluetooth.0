@@ -2,100 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1818BC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jan 2021 14:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B84C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jan 2021 17:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB64D2343E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jan 2021 14:47:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D3B12343E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jan 2021 17:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727155AbhAMOrf (ORCPT
+        id S1728196AbhAMR7O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Jan 2021 09:47:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49306 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727102AbhAMOre (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Jan 2021 09:47:34 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EFF9F2313C;
-        Wed, 13 Jan 2021 14:46:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610549214;
-        bh=v3aPVJ0p5J6rEfv3CEEw4tRh4E/LPzgmRGFcuL2kKEE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Tj25B7uNYGL8MLzqUZemjmtSGfvCHofR4tkXex27AtZ41mpr3KrXlV/bQ6Auea94Q
-         RaLZudxXTNKBOL+6wI1SjYo5/NvrkEfdjhRPGTeHOyX7hay5Y5R+Soj3l71hA4ml84
-         ZNomrd6/RNyKWZeVarDicsMolN6yhyAzFn0btUnzWLeI+XUTSSVU8QUlbqadrUcG+a
-         JJlCzfuITmQx9H9XxTcs2PLPDeNh2ShFiEHA8QIvuzKHWu0DH+0sxs6lHHoe7W9u8i
-         tMQitHMAH3jtXC115DCS4yP731sxWxypjtLb8KyTtORXkj1F57u09Mwd4We4Av2rXO
-         yNCyC+t9k6ORg==
-Received: by pali.im (Postfix)
-        id 97C5076D; Wed, 13 Jan 2021 15:46:51 +0100 (CET)
-Date:   Wed, 13 Jan 2021 15:46:51 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Joakim Tjernlund <Joakim.Tjernlund@infinera.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Default to HW mSBC on capable controllers ?
-Message-ID: <20210113144651.opemzlelw3baccm6@pali>
-References: <CY4PR1001MB2389075CC44E480B446535E5F4C30@CY4PR1001MB2389.namprd10.prod.outlook.com>
- <CABBYNZKy4KXWqLdZu7C49jJ_nMbmBOdMjtM2_5OQg2ruUHUh_w@mail.gmail.com>
- <20201221211437.4s27cl6t4v27sugh@pali>
- <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
+        Wed, 13 Jan 2021 12:59:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54490 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728104AbhAMR7O (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Jan 2021 12:59:14 -0500
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B106FC061575
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 09:58:33 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id j20so2727445otq.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 09:58:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eR5pLpF31nyF2RL94MPNBabFabWRzUk5zmDvQPxiel4=;
+        b=OgS6gtaxi0gC93w+7gnaWyKXJw7Um+4hdCOmTgsPkZQo6i9thqqOcSMLOrgLUHAXRQ
+         paHc6dpK7k4HvyjPKOs1dFbV9wklCxhJFgrSdrvBCSfr+ovtg1u4+fSvkGJwDvvnMVbQ
+         4INaylUNjG8OKxWLL91QAT+dgnVF6U1GoMR0bjRR9o4jnEgM7kDxsz0SboC4mNTz88/N
+         z68DMQ8kXafyJteBWZvTUqINQXROaguo03l7r0hIhgtTGbni3iqQUB6tm9hVmPQTXhN2
+         Cnc742DaWbMs/yV662rpXkTzPf+tv8K9c7bDhYlEpThUp5loXUumNylbN5KJ632tozSO
+         dCbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eR5pLpF31nyF2RL94MPNBabFabWRzUk5zmDvQPxiel4=;
+        b=trfsJA5909IKza4qHGuXhaEcRpmYyrQTK2M1WwlffEg1fdk66+Ff8P2kaNTeZJcf4x
+         WIp7sVywrpDNZvZ5p47AJiDW8N13Oam9/u8cKE4O397tEWNZJS/FTkY+pvIaueTp3t4x
+         XfWAZ5pbKmhRF9aPsqGjEdkVvWe7tFLQlf2mvwUdVsx907OuBZGjgp2lliSeT3ef5j37
+         2s7IcIeupgWJNJc+Z+Qxh9zpftOVjcBywDCGQR99LoGioOdnq9y0CyNiP3hYYoCD/i6M
+         XbG6sWWeDABO/iewWUaqkAI3rT54wVrKBfCvk4EaagGePqvpp0cjf5QJ42lE0SWlPojd
+         9+rQ==
+X-Gm-Message-State: AOAM533ZG8LEeNUgY25bcXhu9MAMvXUfvyIDphK8twtsuzxDygKaBPHy
+        RiD+E3l8uJt5pK1xp4ExHIfh0t5LuR/iGd713mQ=
+X-Google-Smtp-Source: ABdhPJwQSTR2eWzl1Yq9TfMrnFDmduFfCOFd/hvDB6daFHfzbJdNyqBleAEhKhQXKLOGdA4C9G1056VvRIGo3ZntiuE=
+X-Received: by 2002:a05:6830:157:: with SMTP id j23mr2109374otp.240.1610560713002;
+ Wed, 13 Jan 2021 09:58:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+tGt4Duf=aYzWPG0OSATj0ZN6oQeFmvw=Un_JVK9C_rQ@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+References: <20210113094905.2787919-1-apusaka@google.com>
+In-Reply-To: <20210113094905.2787919-1-apusaka@google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 13 Jan 2021 09:58:22 -0800
+Message-ID: <CABBYNZK322MeXgUbDBoctamaQDYSJFELp=0s3ODeqssCkY_szw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2 0/5] Support advertising monitor add pattern with
+ RSSI opcode
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Monday 21 December 2020 17:54:56 Luiz Augusto von Dentz wrote:
-> Hi Pali,
-> 
-> On Mon, Dec 21, 2020 at 1:14 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > On Friday 18 December 2020 11:43:32 Luiz Augusto von Dentz wrote:
-> > > Hi Joakim,
-> > >
-> > > On Fri, Dec 18, 2020 at 10:48 AM Joakim Tjernlund
-> > > <Joakim.Tjernlund@infinera.com> wrote:
-> > > >
-> > > > There seems to be quite a few USB controllers gaining the BTUSB_WIDEBAND_SPEECH which I guess means HW mSBC but currently there is no way to select this mode.
-> > > > Any idea if one could patch the kernel to default to HW mSBC and user apps like bluealsa/pulseaudio would just use it automatically?
-> > >
-> > > It is in our plan to support HW offloading, but that doesn't mean all
-> > > platforms will be supported since that depends on the PCM lines being
-> > > connected to BT controller in the first place.
-> >
-> > Dedicated PCM lines are used in embedded world and maybe also still in
-> > some mobile segment. I remember that e.g. Nokia N900 had this setup. And
-> > it was quite crazy how it was finally configured... but it worked!
-> >
-> > But this is nothing for classic x86 laptops with USB bluetooth
-> > controllers on classic intel bluetooth+wifi mPCIe cards where SCO
-> > traffic is routed via HCI (over USB). And not via dedicated PCM pins.
-> > Moreover I think there are not any mainstream laptop which have PCM pins
-> > on mPCIe slots usable for such bluetooth mPCIe cards.
-> >
-> > For classic desktop / laptop it is needed to deal with fact that SCO
-> > audio is routed via HCI (like A2DP) and therefore support for Enhanced
-> > Setup Synchronous Connection HCI command.
-> >
-> > AFAIK even for routing SCO over PCM when mSBC hw encoder is used,
-> > Enhanced Setup Synchronous Connection HCI command is required.
-> 
-> So you are saying that we should do PCM over HCI and that would
-> actually work (meaning we have enough bandwidth)? From power point of
-> view this makes very little sense imo, since all the cycle we save on
-> no encoding we probably lose with more data to transmit
+Hi Archie,
 
-I do not think so that this applies to all setups. And even if you have
-truth then at least CPU usage would be lower and CPU can be used for
-additional work. So I do not think that usage of HW encoder/decoder
-makes very little sense. In any case it can offload work from CPU.
+On Wed, Jan 13, 2021 at 1:49 AM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> Hi linux-bluetooth,
+>
+> This series of patches adds a new MGMT command for adding a monitor
+> with RSSI parameter. Changes are focused on passing parameters to
+> the kernel via btmgmt and bluetoothctl.
+>
+> PTAL and thanks for your feedback!
+> Archie
+>
+> Changes in v2:
+> Remove trailing period and fix order of mgmt parameter
+>
+> Archie Pusaka (5):
+>   lib/mgmt: Adding Add Adv Patterns Monitor RSSI opcode
+>   src/adv_monitor: add monitor with rssi support for mgmt
+>   btmgmt: advmon add rssi support
+>   bluetoothctl: advmon rssi support for mgmt
+>   monitor: Decode add advmon with RSSI parameter
+>
+>  client/adv_monitor.c |  90 ++++++++++++------------
+>  client/adv_monitor.h |   1 +
+>  client/main.c        |  29 ++++----
+>  lib/mgmt.h           |  15 ++++
+>  monitor/packet.c     |  43 ++++++++++--
+>  src/adv_monitor.c    | 143 +++++++++++++++++++++++++++++---------
+>  tools/btmgmt.c       | 160 ++++++++++++++++++++++++++++++++++++-------
+>  7 files changed, 357 insertions(+), 124 deletions(-)
+>
+> --
+> 2.30.0.284.gd98b1dd5eaa7-goog
+
+While this changes seems fine I was going to suggest we split
+RSSIThresholdsAndTimers to just RSSI and Timer so one don't have to
+set the entire struct if there are not interested in setting a custom
+RSSI and/or Timer, the advantage is the user can just omit one or the
+other and the daemon will take care of filling in the missing fields
+with defaults for the MGMT command. Also we probably just use plain
+int16, int16 and uint16, uint16 so we don't use () around it meaning
+they are not wrapped as a struct which makes it simpler to parse and
+construct.
+
+-- 
+Luiz Augusto von Dentz
