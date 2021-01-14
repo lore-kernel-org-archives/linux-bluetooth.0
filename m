@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B2EC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 10:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57F6C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 11:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA6E923A33
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 10:00:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D7FF23A50
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 11:22:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728304AbhANJ7o (ORCPT
+        id S1726482AbhANLWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jan 2021 04:59:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34954 "EHLO
+        Thu, 14 Jan 2021 06:22:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727906AbhANJ7m (ORCPT
+        with ESMTP id S1726008AbhANLWj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jan 2021 04:59:42 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6700CC061573;
-        Thu, 14 Jan 2021 01:59:03 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id j13so2917067pjz.3;
-        Thu, 14 Jan 2021 01:59:03 -0800 (PST)
+        Thu, 14 Jan 2021 06:22:39 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413DCC061757;
+        Thu, 14 Jan 2021 03:21:53 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id s15so2744962plr.9;
+        Thu, 14 Jan 2021 03:21:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=rLBzwlf8KBkW1DZlLF9GkNc0sIjNTFqLeUdb09RmAqE=;
-        b=SI+5KCpdIIA+vpcGjqLojJqks95heRRt8JglLCenKIRLbWBRwNrd3f4IL4va8gITod
-         Rqvm5pwP7AJXLoVmw7qv4s/47JX/F5GldSQ89HgxRlFHmRv2rD2XEuonUT22DMsQFsGX
-         apvS6J+Vni+I2+drdEbzPoOxvJEUOp3RdsAAREpoKfnI2q5aG/G6zJKZwx/Iw7+XOrxO
-         ImsQe8iVJSPVdrzwIOZmeZ6815hooqP0RvYJeYdj/r1Bx/ABb8WEfOM1tTgUEQjUMZHW
-         94VoAtbU2NPU/O8f3zsTWtA3PWkXG/7JWAWpEsSqZgadYnA04LwG34LiekW6ttI93vSI
-         L3dQ==
+        bh=h8f1dMYtlAZ7DKjOr3TKBIWJ2EYKtUHiop2OPGodnrM=;
+        b=N2pe0hWLkweig/TIpI/BIsd7BwLqXlQVpISWt/j8+V0nWKVEmdztH/dX6nr/uEQm4m
+         JcbEery26j2IL7kTQ8zoCBBHut2RmWyC+DWEWihyqOkMFLxfUq7hlJ4CIJQMqddRuWWi
+         qZb4tmkf6MN0SoAtpSRkVfntN0G0JeqgqgHvrAqldQgVjIN/FIncRZK/pNtVMaC2Au1Y
+         onaua4uQCP46CM9gNyWFyET5EeuzUuxbF2JX2huJWfhRVHlfh3kogs5qf+HjgJzHxxgZ
+         yOvFE/R3jgwraMxxIiKG+MSbxzV7VWpy6i3Nsa5sSFEvSFos4aqqGK+CeLkKWc98q1QI
+         ZJ0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=rLBzwlf8KBkW1DZlLF9GkNc0sIjNTFqLeUdb09RmAqE=;
-        b=fnnYHYyjNjGdFZziz9uDeWwL2And0OyjkdJKDjFiiZ2D8CreCHLVO1jOoGvELk1zif
-         Vfyq26/g1tkFVHPZxvXxxrLu2SLvzVyfDqwWT1pNhRpHCK5fNN8x3EdJi24RcQwDNZiY
-         WJdt+EI24u885ZzDS83onuDDUBkucGDTWMnAUrLiZh3la6EHsxqQQLKSmox9/qu+6WAW
-         AoyZfEGE9OppkPLQ3DN3qlWH5Lhwydu6jCAlF+P9UY+LyMHUBKWSWag7VzGHsu9h3bW1
-         XYgYuxlnhPPDGw2QkriCVSys+bHey4o6x3ViRnhzv1ACcZNX/J3N7Z9tSJv/cvrrO1qd
-         s/Lw==
-X-Gm-Message-State: AOAM532m3S9axKUZ6qwRc9LYLPwgOAIexgeWK33uGSigA8n8Bqm7SwgL
-        +Hf50mmLAfsT/XcUMZD3fHPETp9Dk1A=
-X-Google-Smtp-Source: ABdhPJz0SGBjrjifzRJmyB+WZRJUpQk5USuqf81S9cZEdd18n+6UVo0RA/aluPP9Oj8WFiaYOZvKXQ==
-X-Received: by 2002:a17:90b:490c:: with SMTP id kr12mr4191801pjb.227.1610618342943;
-        Thu, 14 Jan 2021 01:59:02 -0800 (PST)
+        bh=h8f1dMYtlAZ7DKjOr3TKBIWJ2EYKtUHiop2OPGodnrM=;
+        b=HdkU3DS0gdgudSZlpPr17EP6tDCwggr/C/OFNwuDpbfLsdvbLHLhR9gIls0MeT2DDK
+         ETGHKnXzAhqroNur2XO4qoyjM3hmjuKm991IY9+d27NidpAOHKV6wOBHG7/bP5p1XrzO
+         +aeUSb61J+zeErJNxp8VBQj6s66vQJjVXGWmW0K3E/9EMjoshpAgoW5yZxVeeqrFM2fu
+         E2P4CIwa+MAlkAFh+D7FIY4FdYBZhLiltHlgK3ZD0A9xtHydfKe/17maUFxX7mGblnGc
+         ZHyYqz5aGngxZ77alrUcm6lWc/3DgCOTTsHqM3+83HujFq0QHWasqW7S8cOuGQX/syyU
+         NP2g==
+X-Gm-Message-State: AOAM533iNFMvykzlfCxJ6hL0AObDN7SRGsvhFAxi+y9wrasi4+oToj5h
+        nC2Q+cw26oWenG8jGqRhGDU=
+X-Google-Smtp-Source: ABdhPJyHTsn9QIm3/8CFcMQLLZccRnAy21ueeVqO9bY4W0TP7K8wvMxouIBFQ7ocPseWkS6He+ANDQ==
+X-Received: by 2002:a17:902:be02:b029:da:c6c9:c9db with SMTP id r2-20020a170902be02b02900dac6c9c9dbmr7038693pls.69.1610623312699;
+        Thu, 14 Jan 2021 03:21:52 -0800 (PST)
 Received: from cosmos ([103.113.142.250])
-        by smtp.gmail.com with ESMTPSA id w200sm4896023pfc.14.2021.01.14.01.58.59
+        by smtp.gmail.com with ESMTPSA id w2sm5225593pfj.110.2021.01.14.03.21.49
         (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 14 Jan 2021 01:59:02 -0800 (PST)
-Date:   Thu, 14 Jan 2021 15:28:57 +0530
+        Thu, 14 Jan 2021 03:21:52 -0800 (PST)
+Date:   Thu, 14 Jan 2021 16:51:47 +0530
 From:   Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
 Cc:     davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: fix memory leak on suspend and resume
-Message-ID: <20210114095853.GA1650@cosmos>
+Subject: [PATCH v2] Bluetooth: btusb: fix memory leak on suspend and resume
+Message-ID: <20210114112143.GA1318@cosmos>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -186,7 +186,7 @@ Signed-off-by: Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9d2c9a1c552f..29c88dbbc3fe 100644
+index 9d2c9a1c552f..1c793e6eb92a 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
 @@ -3566,7 +3566,8 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
@@ -195,7 +195,7 @@ index 9d2c9a1c552f..29c88dbbc3fe 100644
  	/* Suspend notifier should only act on events when powered. */
 -	if (!hdev_is_powered(hdev))
 +	if (!hdev_is_powered(hdev) ||
-+	    !hci_dev_test_flag(hdev, HCI_UNREGISTER))
++	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
  		goto done;
  
  	if (action == PM_SUSPEND_PREPARE) {
