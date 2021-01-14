@@ -2,97 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6D6C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 13:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A0EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 17:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4521722226
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 13:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D67B623A50
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 17:00:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727571AbhANNOX (ORCPT
+        id S1726461AbhANQ7s convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jan 2021 08:14:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725991AbhANNOX (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jan 2021 08:14:23 -0500
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC16C061757
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jan 2021 05:13:42 -0800 (PST)
-Received: from ramsan.of.borg ([84.195.186.194])
-        by albert.telenet-ops.be with bizsmtp
-        id GdDc240094C55Sk06dDcRQ; Thu, 14 Jan 2021 14:13:40 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1l02RT-003YlL-HL; Thu, 14 Jan 2021 14:13:35 +0100
-Received: from geert by rox.of.borg with local (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1l02RT-009NQ3-3Z; Thu, 14 Jan 2021 14:13:35 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jiri Kosina <trivial@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>
-Cc:     Brian Norris <briannorris@chromium.org>,
-        Rajat Jain <rajatja@google.com>, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Rob Herring <robh@kernel.org>
-Subject: [PATCH v5 trivial/resend] dt-bindings: net: btusb: DT fix s/interrupt-name/interrupt-names/
-Date:   Thu, 14 Jan 2021 14:13:33 +0100
-Message-Id: <20210114131333.2234932-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.25.1
+        Thu, 14 Jan 2021 11:59:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53344 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726043AbhANQ7s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 14 Jan 2021 11:59:48 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 1D8EE23B4B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jan 2021 16:59:08 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 203535] Bluetooth: command tx timeout with Intel Corporation
+ Wireless 7260 in A2DP mode
+Date:   Thu, 14 Jan 2021 16:59:07 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: iam@valdikss.org.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203535-62941-5fB2uXQckE@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203535-62941@https.bugzilla.kernel.org/>
+References: <bug-203535-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The standard DT property name is "interrupt-names".
+https://bugzilla.kernel.org/show_bug.cgi?id=203535
 
-Fixes: fd913ef7ce619467 ("Bluetooth: btusb: Add out-of-band wakeup support")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Acked-by: Rob Herring <robh@kernel.org>
-Reviewed-by: Brian Norris <briannorris@chromium.org>
-Acked-by: Rajat Jain <rajatja@google.com>
----
-Who takes this patch, before it celebrates its 4th birthday?
+--- Comment #11 from ValdikSS (iam@valdikss.org.ru) ---
+(In reply to Leonid Kalmaev from comment #10)
 
-v5:
-  - Add Reviewed-by, Acked-by,
+> Hi. This does not work for some reason in the case of sleep. After waking up
+> from sleep in powertop I see a good state again. Can you advise on more
+> options for this to work correctly?
 
-v4:
-  - Add Acked-by,
+It seems there's a bug (or a feature) in kernel, which switches the devices in
+power save mode after suspend, without triggering UDEV events. Here's what tlp
+developer says: https://github.com/linrunner/TLP/issues/545
 
-v3:
-  - New.
----
- Documentation/devicetree/bindings/net/btusb.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>Imho the kernel never issued udev new device events for existing devices after
+>resume. You may look into it yourself by enabling TLP's trace mode with
+>TLP_DEBUG="run udev usb".
 
-diff --git a/Documentation/devicetree/bindings/net/btusb.txt b/Documentation/devicetree/bindings/net/btusb.txt
-index b1ad6ee68e909318..c51dd99dc0d3cb73 100644
---- a/Documentation/devicetree/bindings/net/btusb.txt
-+++ b/Documentation/devicetree/bindings/net/btusb.txt
-@@ -38,7 +38,7 @@ Following example uses irq pin number 3 of gpio0 for out of band wake-on-bt:
- 	compatible = "usb1286,204e";
- 	reg = <1>;
- 	interrupt-parent = <&gpio0>;
--	interrupt-name = "wakeup";
-+	interrupt-names = "wakeup";
- 	interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-     };
- };
+I use tlp software, with bluetooth module powersave blacklist configured and
+patch which is mentioned in the URL above applied (`set_usb_suspend 0 auto` in
+tlp resume handler)
+
 -- 
-2.25.1
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.
