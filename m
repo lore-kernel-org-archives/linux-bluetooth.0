@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9896BC433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7270C43381
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:46:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 589F8239FF
+	by mail.kernel.org (Postfix) with ESMTP id 9A96B23A01
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbhANHp7 (ORCPT
+        id S1727454AbhANHqG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jan 2021 02:45:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34498 "EHLO
+        Thu, 14 Jan 2021 02:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726510AbhANHp6 (ORCPT
+        with ESMTP id S1726510AbhANHqF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jan 2021 02:45:58 -0500
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDED8C06179F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:17 -0800 (PST)
-Received: by mail-qk1-x749.google.com with SMTP id q3so3834185qkq.21
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:17 -0800 (PST)
+        Thu, 14 Jan 2021 02:46:05 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96CBC0617A2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:21 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id 189so3858281qko.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=RqtDsIXvMfTgeVjAs/e5jncwDRdMDC1iNm2WoYsej+A=;
-        b=YSv+A4lgROGhRhIh5VZM5gMco3MIvpgdgmtqxWC/8hhRcz0FcUAMQ3RVdSr3/sHg4c
-         uFYlpgkRmjXcnuOPXWBk2ymAvViKgejzJIjDJtNP6mGgM8jk+PJxVZHl2j+DdfsT8JYO
-         rWUfGkHiEXAis97XoZc/dKjNmn8prVGokpARU1W102JEY/aP0XgWu50UBNvMGyqjkdxk
-         guyDFClmOF9de9dFR4y6l3OGqMQXhWhLflTuH8V7dAClvBClZxfOfuWiNGLKi80WyxnU
-         MqFnywHFwUT1v0cumR88BD3KVT1HjdTBlD35phMEP4vKrxDvwUbS2w8muz3pn2jL2pvQ
-         /d/g==
+        bh=OGW7rgUGsPRtCb6jnMzgjukWrsHDtKnOgPORzmMgErA=;
+        b=U3eDCy3n6jeIM/URNUyNlrN7VvGtlrUzZ03i+DWc1Wu9rebqYZoiwsTRXo2meBxjeg
+         43qcv3Q/LVYZi//FqqNeOYLOs03q1NCH2Vt+Xw1QlbwgEnur0eOFIRlP9sJZorEAlsDH
+         b0QaxTk7mBuMgDdHlmMVlM4lqcdrsTTKE2RRcvOteauAui5hi4KOBRk1hi4F3WHeWfVZ
+         privw3NFNCUGndStR3fr2r0Dy5m0qdxxUpEQmW3DT9seAQzKhQnhwt00o7KvztIt430L
+         ojw5Y4gxYv5v+eGCx+TnHh8aaoWdDdw8kxc0DXYT2yOqdBarCNDegFsv3KWstODUTQBP
+         bF4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=RqtDsIXvMfTgeVjAs/e5jncwDRdMDC1iNm2WoYsej+A=;
-        b=XWk5edRPQQh7zojF06SEGJ4o8BxJheyzlgILB1ZR7BjN7vUJXBpfkCh7g4tjuA4yC6
-         KNe9KHGEbludw2tWCQ+FduquxnGGjsyMJDoTHXeHgPqCRQPTrnOR3cGGgUhnQTAbau3j
-         ZTCL983dXkBhAjJuOTGbrAXU9XqHbctL0bFNf6hlEQ0NlRbhEp9lMrTEY9inPSkm7gsW
-         0N48VI2CLeZX5ihYrmM+orrJ30ZR+jtETDuXUEOXl6HQopYkkglZ6YlA4gGKp9zwsPg3
-         YmUohRse3VBadSxIbMGhRchljYuSWhiUQ0grC/7qznqccoiLJ7QJLkqKyD+AeNkhCFFb
-         QGDA==
-X-Gm-Message-State: AOAM53187wUg3eDVLTsgwndHrZ2ll/MVLapNj1EJlikXWiSHf4b0bPqO
-        hixc5LtsueUQkUbyRj1h7wuQk5wvTq8bqHKbm+UPBnMFPolVKwE5RG/U1MAcIvpEkP0J708a38Z
-        NcL418c2T3cWw7nM/r0rWkerWqwIp9D2JWgaDpL8tyZhVC5i5Mt47vKtv6n76tm7G3LDGsUKvxN
-        0X
-X-Google-Smtp-Source: ABdhPJy0CY2NxE+oMdbFyPythggpBXPt4hCtDfWlailAbALxaJbCpnSVySE4NGU2rvL4vyV7lhehe9XN1ZP+
+        bh=OGW7rgUGsPRtCb6jnMzgjukWrsHDtKnOgPORzmMgErA=;
+        b=JG+A2aQNkn74LIBYGpZGpbkh5fi8tq2ga85VhX2h+sxnBOR6RDOAbX0/AJQJsPdBsf
+         9Q/mSFPXMNxSEfmy2DcpAMjqCS1rXtpWGa0EkU3jLRY/oANXnSblQEBgkgBN74vlTi70
+         OCKtYnCec6aR4yRrMfmAwZEg9uMvTdFPB6z8tUPSU6S/vHHssxG7C/owen0dDzZUMq9M
+         LqzIDbyvJedN2FlP+qLR/d+DSYOigKyARDomJvyKJD0QDLXYENJOa3OcKfdTD+IOR7YA
+         GbHFjnQUbGc5Xy/g7mRYqC7odt6T6GuJRD9z3ghbtKrK24Mj4nkfsZhAae6sF2ihYNxn
+         D77Q==
+X-Gm-Message-State: AOAM533aT6xFbtstVlpwh4QIWD0caXt1hk6R5f9YQVBoA/BES68gGM2P
+        Ugbbfy6YhwLBsRqFDdgneu6Brqr5GFqAfisAlNolfDb6+6tVVhZSiWme/PKR1QBMueRErXJPxLr
+        d9/2f4Ej4fRCTUvsh30X7DU0vongJgIeSl3AVq0tUnEIEviScAI14QmenHGRJtVMF/NiCoDSp2F
+        ww
+X-Google-Smtp-Source: ABdhPJx5dptIyX8uWilrWflL7+WDTEjw/PYj90vFSzhgZjsdpjBTLBsz0UcxfjfH3ktySks19sPhHIRffz3z
 Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a25:ad93:: with SMTP id
- z19mr8592954ybi.486.1610610317009; Wed, 13 Jan 2021 23:45:17 -0800 (PST)
-Date:   Thu, 14 Jan 2021 15:44:56 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6214:1583:: with SMTP id
+ m3mr5813421qvw.48.1610610320798; Wed, 13 Jan 2021 23:45:20 -0800 (PST)
+Date:   Thu, 14 Jan 2021 15:44:57 +0800
 In-Reply-To: <20210114074458.3399055-1-apusaka@google.com>
-Message-Id: <20210114154405.Bluez.v3.3.I16fa24fb791fe886f6723373772b644783b3ab92@changeid>
+Message-Id: <20210114154405.Bluez.v3.4.I20391efb1b5a40cd2b0cb6069d88b7fb9f7ed66b@changeid>
 Mime-Version: 1.0
 References: <20210114074458.3399055-1-apusaka@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [Bluez PATCH v3 3/5] btmgmt: advmon add rssi support
+Subject: [Bluez PATCH v3 4/5] bluetoothctl: advmon rssi support for mgmt
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -84,223 +84,318 @@ monitor advertisement according to some RSSI criteria.
 Reviewed-by: Yun-Hao Chung <howardchung@google.com>
 ---
 
-(no changes since v1)
+Changes in v3:
+* split the struct RSSIThresholdsAndTimers
 
- tools/btmgmt.c | 160 +++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 134 insertions(+), 26 deletions(-)
+ client/adv_monitor.c | 162 ++++++++++++++++++++++++++-----------------
+ client/adv_monitor.h |   1 +
+ client/main.c        |  29 ++++----
+ 3 files changed, 113 insertions(+), 79 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index c0e55f58e6..383e7199e4 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -4858,64 +4858,169 @@ static bool str2pattern(struct mgmt_adv_pattern *pattern, const char *str)
- 	return true;
- }
+diff --git a/client/adv_monitor.c b/client/adv_monitor.c
+index f62e9f4442..37faf1edfa 100644
+--- a/client/adv_monitor.c
++++ b/client/adv_monitor.c
+@@ -30,9 +30,10 @@
  
--static void advmon_add_usage(void)
-+static struct option add_monitor_rssi_options[] = {
-+	{ "help",		0, 0, 'h' },
-+	{ "high-threshold",	1, 0, 'R' },
-+	{ "low-threshold",	1, 0, 'r' },
-+	{ "high-timeout",	1, 0, 'T' },
-+	{ "low-timeout",	1, 0, 't' },
-+	{ "sampling",		1, 0, 's' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+static void advmon_add_pattern_usage(void)
-+{
-+	bt_shell_usage();
-+	print("patterns format:\n"
-+		"\t<ad_type:offset:pattern> [patterns]\n"
-+		"e.g.:\n"
-+		"\tadd-pattern 0:1:c504 ff:a:9a55beef");
-+}
-+
-+static void advmon_add_pattern_rssi_usage(void)
- {
- 	bt_shell_usage();
--	print("Monitor Types:\n\t-p <ad_type:offset:pattern>..."
--		"\tPattern Monitor\ne.g.:\n\tadd -p 0:1:c504 1:a:9a55beef");
-+	print("RSSI options:\n"
-+		"\t -R, --high-threshold <dBm>  "
-+			"RSSI high threshold. Default: -70\n"
-+		"\t -r, --low-threshold <dBm>   "
-+			"RSSI low threshold. Default: -50\n"
-+		"\t -T, --high-timeout <s>      "
-+			"RSSI high threshold duration. Default: 0\n"
-+		"\t -t, --low-timeout <s>       "
-+			"RSSI low threshold duration. Default: 5\n"
-+		"\t -s, --sampling <N * 100ms>  "
-+			"RSSI sampling period. Default: 0\n"
-+		"patterns format:\n"
-+		"\t<ad_type:offset:pattern> [patterns]\n"
-+		"e.g.:\n"
-+		"\tadd-pattern-rssi -R 0xb2 -r -102 0:1:c504 ff:a:9a55beef");
- }
- 
--static bool advmon_add_pattern(int argc, char **argv)
-+static void cmd_advmon_add_pattern(int argc, char **argv)
- {
-+	bool success = true;
- 	uint16_t index;
- 	int i, cp_len;
- 	struct mgmt_cp_add_adv_monitor *cp = NULL;
--	bool success = false;
- 
--	index = mgmt_index;
--	if (index == MGMT_INDEX_NONE)
--		index = 0;
-+	if (!strcmp(argv[1], "-h"))
-+		goto done;
- 
--	cp_len = sizeof(struct mgmt_cp_add_adv_monitor) +
--			argc * sizeof(struct mgmt_adv_pattern);
-+	argc -= 1;
-+	argv += 1;
- 
-+	cp_len = sizeof(*cp) + argc * sizeof(struct mgmt_adv_pattern);
- 	cp = malloc0(cp_len);
- 	cp->pattern_count = argc;
- 
- 	for (i = 0; i < argc; i++) {
- 		if (!str2pattern(&cp->patterns[i], argv[i])) {
- 			error("Failed to parse monitor patterns.");
-+			success = false;
- 			goto done;
- 		}
- 	}
- 
--	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR, index, cp_len,
--					cp, advmon_add_rsp, NULL, NULL)) {
--		error("Unable to send \"Add Advertising Monitor\" command");
-+	index = mgmt_index;
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR, index,
-+				cp_len, cp, advmon_add_rsp, NULL, NULL)) {
-+		error("Unable to send Add Advertising Monitor command");
-+		success = false;
- 		goto done;
- 	}
- 
--	success = true;
-+	free(cp);
-+	return;
- 
- done:
- 	free(cp);
--	return success;
-+	advmon_add_pattern_usage();
-+	bt_shell_noninteractive_quit(success ? EXIT_SUCCESS : EXIT_FAILURE);
- }
- 
--static void cmd_advmon_add(int argc, char **argv)
-+static void cmd_advmon_add_pattern_rssi(int argc, char **argv)
- {
--	bool success = false;
-+	bool success = true;
-+	int opt;
-+	int8_t rssi_low = -70;
-+	int8_t rssi_high = -50;
-+	uint16_t rssi_low_timeout = 5;
-+	uint16_t rssi_high_timeout = 0;
-+	uint8_t rssi_sampling_period = 0;
-+	uint16_t index;
-+	int i, cp_len;
-+	struct mgmt_cp_add_adv_patterns_monitor_rssi *cp = NULL;
- 
--	if (strcasecmp(argv[1], "-p") == 0 && argc > 2) {
--		argc -= 2;
--		argv += 2;
--		success = advmon_add_pattern(argc, argv);
-+	while ((opt = getopt_long(argc, argv, "+hr:R:t:T:s:",
-+				add_monitor_rssi_options, NULL)) != -1) {
-+		switch (opt) {
-+		case 'h':
-+			goto done;
-+		case 'r':
-+			rssi_low = strtol(optarg, NULL, 0);
-+			break;
-+		case 'R':
-+			rssi_high = strtol(optarg, NULL, 0);
-+			break;
-+		case 't':
-+			rssi_low_timeout = strtol(optarg, NULL, 0);
-+			break;
-+		case 'T':
-+			rssi_high_timeout = strtol(optarg, NULL, 0);
-+			break;
-+		case 's':
-+			rssi_sampling_period = strtol(optarg, NULL, 0);
-+			break;
-+		default:
-+			success = false;
-+			goto done;
-+		}
- 	}
- 
--	if (!success) {
--		advmon_add_usage();
--		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	argc -= optind;
-+	argv += optind;
-+	optind = 0;
-+
-+	cp_len = sizeof(*cp) + argc * sizeof(struct mgmt_adv_pattern);
-+	cp = malloc0(cp_len);
-+	cp->pattern_count = argc;
-+	cp->rssi.high_threshold = rssi_high;
-+	cp->rssi.low_threshold = rssi_low;
-+	cp->rssi.high_threshold_timeout = htobs(rssi_high_timeout);
-+	cp->rssi.low_threshold_timeout = htobs(rssi_low_timeout);
-+	cp->rssi.sampling_period = rssi_sampling_period;
-+
-+	for (i = 0; i < argc; i++) {
-+		if (!str2pattern(&cp->patterns[i], argv[i])) {
-+			error("Failed to parse monitor patterns.");
-+			success = false;
-+			goto done;
-+		}
-+	}
-+
-+	index = mgmt_index;
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI, index,
-+				cp_len, cp, advmon_add_rsp, NULL, NULL)) {
-+		error("Unable to send Add Advertising Monitor RSSI command");
-+		success = false;
-+		goto done;
- 	}
-+
-+	free(cp);
-+	return;
-+
-+done:
-+	free(cp);
-+	optind = 0;
-+	advmon_add_pattern_rssi_usage();
-+	bt_shell_noninteractive_quit(success ? EXIT_SUCCESS : EXIT_FAILURE);
- }
- 
- static void advmon_remove_rsp(uint8_t status, uint16_t len, const void *param,
-@@ -5037,8 +5142,11 @@ static const struct bt_shell_menu monitor_menu = {
- 					"features"			},
- 	{ "remove",		"<handle>",
- 		cmd_advmon_remove,	"Remove advertisement monitor "	},
--	{ "add",		"<-p|-h> [options...]",
--		cmd_advmon_add,		"Add advertisement monitor"	},
-+	{ "add-pattern",	"[-h] <patterns>",
-+		cmd_advmon_add_pattern,	"Add advertisement monitor pattern" },
-+	{ "add-pattern-rssi",	"[options] <patterns>",
-+		cmd_advmon_add_pattern_rssi,
-+		"Add advertisement monitor pattern with RSSI options"    },
- 	{ } },
+ struct rssi_setting {
+ 	int16_t high_threshold;
+-	uint16_t high_timer;
++	uint16_t high_timeout;
+ 	int16_t low_threshold;
+-	uint16_t low_timer;
++	uint16_t low_timeout;
++	uint16_t sampling_period;
  };
  
+ struct pattern {
+@@ -131,24 +132,58 @@ static gboolean get_type(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
+-static gboolean get_rssi(const GDBusPropertyTable *property,
++static gboolean get_low_threshold(const GDBusPropertyTable *property,
+ 				DBusMessageIter *iter, void *user_data)
+ {
+ 	struct adv_monitor *adv_monitor = user_data;
+ 	struct rssi_setting *rssi = adv_monitor->rssi;
+-	DBusMessageIter data_iter;
+ 
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT,
+-							NULL, &data_iter);
+-	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_INT16,
+-							&rssi->high_threshold);
+-	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_UINT16,
+-							&rssi->high_timer);
+-	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_INT16,
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16,
+ 							&rssi->low_threshold);
+-	dbus_message_iter_append_basic(&data_iter, DBUS_TYPE_UINT16,
+-							&rssi->low_timer);
+-	dbus_message_iter_close_container(iter, &data_iter);
++	return TRUE;
++}
++
++static gboolean get_high_threshold(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	struct adv_monitor *adv_monitor = user_data;
++	struct rssi_setting *rssi = adv_monitor->rssi;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16,
++							&rssi->high_threshold);
++	return TRUE;
++}
++
++static gboolean get_low_timeout(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	struct adv_monitor *adv_monitor = user_data;
++	struct rssi_setting *rssi = adv_monitor->rssi;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
++							&rssi->low_timeout);
++	return TRUE;
++}
++
++static gboolean get_high_timeout(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	struct adv_monitor *adv_monitor = user_data;
++	struct rssi_setting *rssi = adv_monitor->rssi;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
++							&rssi->high_timeout);
++	return TRUE;
++}
++
++static gboolean get_sampling_period(const GDBusPropertyTable *property,
++				DBusMessageIter *iter, void *user_data)
++{
++	struct adv_monitor *adv_monitor = user_data;
++	struct rssi_setting *rssi = adv_monitor->rssi;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
++							&rssi->sampling_period);
+ 	return TRUE;
+ }
+ 
+@@ -212,7 +247,11 @@ static gboolean pattern_exists(const GDBusPropertyTable *property, void *data)
+ 
+ static const GDBusPropertyTable adv_monitor_props[] = {
+ 	{ "Type", "s", get_type },
+-	{ "RSSIThresholdsAndTimers", "(nqnq)", get_rssi, NULL, rssi_exists },
++	{ "RSSILowThreshold", "n", get_low_threshold, NULL, rssi_exists },
++	{ "RSSIHighThreshold", "n", get_high_threshold, NULL, rssi_exists },
++	{ "RSSILowTimeout", "q", get_low_timeout, NULL, rssi_exists },
++	{ "RSSIHighTimeout", "q", get_high_timeout, NULL, rssi_exists },
++	{ "RSSISamplingPeriod", "q", get_sampling_period, NULL, rssi_exists },
+ 	{ "Patterns", "a(yyay)", get_patterns, NULL, pattern_exists },
+ 	{ }
+ };
+@@ -376,56 +415,51 @@ static uint8_t str2bytearray(char *str, uint8_t *arr)
+ 	return arr_len;
+ }
+ 
+-static void parse_rssi_value_pair(char *value_pair, int *low, int *high)
+-{
+-	char *val1, *val2;
+-	bool flag = value_pair[0] == ',';
+-
+-	val1 = strtok(value_pair, ",");
+-
+-	if (!val1)
+-		return;
+-
+-	val2 = strtok(NULL, ",");
+-
+-	if (!val2) {
+-		if (!flag)
+-			*low = atoi(val1);
+-		else
+-			*high = atoi(val1);
+-	} else {
+-		*low = atoi(val1);
+-		*high = atoi(val2);
+-	}
+-}
+-
+-static struct rssi_setting *parse_rssi(char *range, char *timeout)
++static struct rssi_setting *parse_rssi(char *params)
+ {
+ 	struct rssi_setting *rssi;
+-	int high_threshold, low_threshold, high_timer, low_timer;
+-
+-	high_threshold = RSSI_DEFAULT_HIGH_THRESHOLD;
+-	low_threshold = RSSI_DEFAULT_LOW_THRESHOLD;
+-	high_timer = RSSI_DEFAULT_HIGH_TIMEOUT;
+-	low_timer = RSSI_DEFAULT_LOW_TIMEOUT;
++	char *split, *endptr;
++	int i;
++	int values[5] = {RSSI_DEFAULT_LOW_THRESHOLD,
++			RSSI_DEFAULT_HIGH_THRESHOLD,
++			RSSI_DEFAULT_LOW_TIMEOUT,
++			RSSI_DEFAULT_HIGH_TIMEOUT,
++			RSSI_DEFAULT_SAMPLING_PERIOD};
++
++	for (i = 0; i < 5; i++) {
++		if (!params) /* Params too short */
++			goto bad_format;
++
++		split = strsep(&params, ",");
++		if (*split != '\0') {
++			values[i] = strtol(split, &endptr, 0);
++			if (*endptr != '\0') /* Conversion failed */
++				goto bad_format;
++		} /* Otherwise no parsing needed - use default */
++	}
+ 
+-	parse_rssi_value_pair(range, &low_threshold, &high_threshold);
+-	parse_rssi_value_pair(timeout, &low_timer, &high_timer);
++	if (params) /* There are trailing unused params */
++		goto bad_format;
+ 
+ 	rssi = g_malloc0(sizeof(struct rssi_setting));
+-
+ 	if (!rssi) {
+-		bt_shell_printf("Failed to allocate rssi_setting");
++		bt_shell_printf("Failed to allocate rssi_setting\n");
+ 		bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		return NULL;
+ 	}
+ 
+-	rssi->high_threshold = high_threshold;
+-	rssi->high_timer = high_timer;
+-	rssi->low_threshold = low_threshold;
+-	rssi->low_timer = low_timer;
++	rssi->low_threshold = values[0];
++	rssi->high_threshold = values[1];
++	rssi->low_timeout = values[2];
++	rssi->high_timeout = values[3];
++	rssi->sampling_period = values[4];
+ 
+ 	return rssi;
++
++bad_format:
++	bt_shell_printf("Failed to parse RSSI\n");
++	bt_shell_noninteractive_quit(EXIT_FAILURE);
++	return NULL;
+ }
+ 
+ static struct pattern *parse_pattern(char *parameter_list[])
+@@ -435,7 +469,7 @@ static struct pattern *parse_pattern(char *parameter_list[])
+ 	pat = g_malloc0(sizeof(struct pattern));
+ 
+ 	if (!pat) {
+-		bt_shell_printf("Failed to allocate pattern");
++		bt_shell_printf("Failed to allocate pattern\n");
+ 		bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		return NULL;
+ 	}
+@@ -531,12 +565,14 @@ static void print_adv_monitor(struct adv_monitor *adv_monitor)
+ 		bt_shell_printf("\trssi:\n");
+ 		bt_shell_printf("\t\thigh threshold: %hd\n",
+ 					adv_monitor->rssi->high_threshold);
+-		bt_shell_printf("\t\thigh threshold timer: %hu\n",
+-					adv_monitor->rssi->high_timer);
++		bt_shell_printf("\t\thigh threshold timeout: %hu\n",
++					adv_monitor->rssi->high_timeout);
+ 		bt_shell_printf("\t\tlow threshold: %hd\n",
+ 					adv_monitor->rssi->low_threshold);
+-		bt_shell_printf("\t\tlow threshold timer: %hu\n",
+-					adv_monitor->rssi->low_timer);
++		bt_shell_printf("\t\tlow threshold timeout: %hu\n",
++					adv_monitor->rssi->low_timeout);
++		bt_shell_printf("\t\tsampling period: %hu\n",
++					adv_monitor->rssi->sampling_period);
+ 	}
+ 
+ 	if (adv_monitor->patterns) {
+@@ -572,15 +608,15 @@ void adv_monitor_add_monitor(DBusConnection *conn, char *type,
+ 	while (find_adv_monitor_with_idx(adv_mon_idx))
+ 		adv_mon_idx += 1;
+ 
+-	if (rssi_enabled == FALSE)
++	if (rssi_enabled == FALSE) {
+ 		rssi = NULL;
+-	else {
+-		rssi = parse_rssi(argv[1], argv[2]);
++	} else {
++		rssi = parse_rssi(argv[1]);
+ 		if (rssi == NULL)
+ 			return;
+ 
+-		argv += 2;
+-		argc -= 2;
++		argv += 1;
++		argc -= 1;
+ 	}
+ 
+ 	patterns = parse_patterns(argv+1, argc-1);
+diff --git a/client/adv_monitor.h b/client/adv_monitor.h
+index dd6f615799..2bdc447265 100644
+--- a/client/adv_monitor.h
++++ b/client/adv_monitor.h
+@@ -12,6 +12,7 @@
+ #define RSSI_DEFAULT_LOW_THRESHOLD -70
+ #define RSSI_DEFAULT_HIGH_TIMEOUT 10
+ #define RSSI_DEFAULT_LOW_TIMEOUT 5
++#define RSSI_DEFAULT_SAMPLING_PERIOD 0
+ 
+ void adv_monitor_add_manager(DBusConnection *conn, GDBusProxy *proxy);
+ void adv_monitor_remove_manager(DBusConnection *conn);
+diff --git a/client/main.c b/client/main.c
+index 9403f1af6e..5d84e7cd54 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2709,26 +2709,23 @@ static void cmd_ad_clear(int argc, char *argv[])
+ 
+ static void print_add_or_pattern_with_rssi_usage(void)
+ {
+-	bt_shell_printf("rssi-range format:\n"
+-			"\t<low-rssi>,<high-rssi>\n"
+-			"\tBoth parameters can be skipped, in that case the\n"
+-			"\tparamter will be set to its pre-defined value\n");
+-	bt_shell_printf("\tPre-defined low-rssi,high-rssi: %d,%d\n",
+-						RSSI_DEFAULT_LOW_THRESHOLD,
+-						RSSI_DEFAULT_HIGH_THRESHOLD);
+-	bt_shell_printf("timeout format:\n"
+-			"\t<low-rssi>,<high-rssi>\n"
+-			"\tBoth parameters can be skipped, in that case the\n"
+-			"\tparamter will be set to its pre-defined value\n");
+-	bt_shell_printf("\tPre-defined low-timeout,high-timeout: %d,%d\n",
+-						RSSI_DEFAULT_LOW_TIMEOUT,
++	bt_shell_printf("rssi format:\n"
++			"\t<low-rssi>,<high-rssi>,<low-rssi-timeout>,"
++					"<high-rssi-timeout>,<sampling>\n"
++			"\tAll parameters can be skipped, in that case they\n"
++			"\twill be set to pre-defined values, which are:\n");
++	bt_shell_printf("\t\tlow-rssi: %d\n", RSSI_DEFAULT_LOW_THRESHOLD);
++	bt_shell_printf("\t\thigh-rssi: %d\n", RSSI_DEFAULT_HIGH_THRESHOLD);
++	bt_shell_printf("\t\tlow-rssi-timeout: %d\n", RSSI_DEFAULT_LOW_TIMEOUT);
++	bt_shell_printf("\t\thigh-rssi-timeout: %d\n",
+ 						RSSI_DEFAULT_HIGH_TIMEOUT);
++	bt_shell_printf("\t\tsampling: %d\n", RSSI_DEFAULT_SAMPLING_PERIOD);
+ 	bt_shell_printf("pattern format:\n"
+ 			"\t<start_position> <ad_data_type> <content_of_pattern>\n");
+ 	bt_shell_printf("e.g.\n"
+-			"\tadd-or-pattern-rssi -10, ,10 1 2 01ab55\n");
++			"\tadd-or-pattern-rssi -10,,,10,0 1 2 01ab55\n");
+ 	bt_shell_printf("or\n"
+-			"\tadd-or-pattern-rssi -50,-30 , 1 2 01ab55 3 4 23cd66\n");
++			"\tadd-or-pattern-rssi -50,-30,,, 1 2 01ab55 3 4 23cd66\n");
+ }
+ 
+ static void print_add_or_pattern_usage(void)
+@@ -2826,7 +2823,7 @@ static const struct bt_shell_menu advertise_monitor_menu = {
+ 	.name = "monitor",
+ 	.desc = "Advertisement Monitor Options Submenu",
+ 	.entries = {
+-	{ "add-or-pattern-rssi", "<rssi-range=low,high> <timeout=low,high> "
++	{ "add-or-pattern-rssi", "<rssi=low,high,low-time,high-time,sampling> "
+ 				"[patterns=pattern1 pattern2 ...]",
+ 				cmd_adv_monitor_add_or_monitor_with_rssi,
+ 				"Add 'or pattern' type monitor with RSSI "
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
