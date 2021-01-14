@@ -2,188 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87423C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:49:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58570239E7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CC32239EC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jan 2021 07:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727155AbhANHqM (ORCPT
+        id S1727211AbhANHtv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jan 2021 02:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        Thu, 14 Jan 2021 02:49:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726677AbhANHqM (ORCPT
+        with ESMTP id S1726121AbhANHtv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jan 2021 02:46:12 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1858C061575
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:25 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id e4so2875956pfc.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:45:25 -0800 (PST)
+        Thu, 14 Jan 2021 02:49:51 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6270CC061575
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:49:09 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id w26so5402147ljo.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jan 2021 23:49:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=69dxCVVjaN2iiNcGWmlNnDuTGnT+BWOF10dDA+3unhM=;
-        b=dexVhgJYEz0IY+hwsqqfuoUhMsogwUrGGn37UnXciia/4s1r5TbsbPx+ntU52MvlkO
-         qXUQaxZz+QstyRlW6r8zJQHOvnN9BVsi87ubi2LDnecgAyKHnD+eOYUMemdXqJSOwFs7
-         jJavsjckRI4TyVjtdZlSRhyVK+64m25as9GRUxstVA1NuXFF347Gwm85+4iAlawfgrlA
-         REu+vRxU3rf2L7iw1sWweqOfTZm2fo4Xdd1aC6WmyCaud8iQtybL3nT5hkgmi6n13v3w
-         iotgxjGYNzOmLtoXG/U/pTGkwsTA2GFy1wpMTslaPTyR24TcGSnW2BSWWgrTgBsFgpvj
-         2uGg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m/H33qH15cZSLT3IensLDd2f85ErYSiwxMG3rgZ/rX8=;
+        b=EkyA2FzOG0XPF4oZ6JitaiV6oq6Lkx5gmH7zChf3DxvnJH8KYQ/1pEn5wPFaGeRbmu
+         vLVwmzYxi7IY84lLKErbsb2CPXP0N+f0H5n9ayc5mNoTuXwPex3IPKtr0QduaLi8fu2H
+         GVJ/rEWLgRPWozZ5G5IM6y/GvL3u/9vw7vGWBlmtnc5eJz8Zxotu6hccdfw3wNrtnOZa
+         E6OvzpKDN9Nw2b1924KqKVjXOwnDIrn7ri+GyvEogN2VB450Y5daIFHBYy4/3ygP8nMW
+         ijA34FDPoSt8r6rdrf1UebvS3yGaM+kBkuROlOIUBOejOfZaY4um4JDNwPywZ5IVPEqb
+         IkrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=69dxCVVjaN2iiNcGWmlNnDuTGnT+BWOF10dDA+3unhM=;
-        b=rOmT3s5tVvnezd2y7Hu1Yf5D+YZuUw2R6jX0pAi3yoJvWmWfud9Xv1UNa10p35c6kF
-         VxYF8e8X88LSQQ9e9x/6RoWbzd6OO2g4LlnbKtSUvPz9yryInQ+gNOxYmkZU6M90X8xW
-         gzg8tdkaC53jicKoSKz1SHKhW1kTdchbAG/3TiBdz+ffC6PrEe7sc9UNetTqtwCiGBo1
-         ibmrqVPYYBQGimHRSZbr4wYry4sOzzO2aSoIqiDJqQandHKJ1HfhVDKeffbpuJFXEwIO
-         DsWebHE/7ZHFpPMfqPEwAyNi0lOKltlg+ADJTJh6P5ryAU3n/gAZPD1QftcxAKSVTgU0
-         PSow==
-X-Gm-Message-State: AOAM53162QTz/nCyHxpTUe7pYdjxrtE6tzOwPLZhwORERxI2gFVC/T8K
-        bTs1f2eTZlGGSNKmDJH4r89jXiATNEmwA0MUODcWib2gVHkd2190jHxXCoXnRdWgPpWJP0S9Utt
-        1Axi8vRrGOkcjeDbodFbMwqR8AMs2yM/HS8POJ5pMuEGQWSB2y8ymwBQX7PjPSjjohtgep3thUp
-        vL
-X-Google-Smtp-Source: ABdhPJyS7VRbsmAQY3MzRYOFCOPG8o9bgoV/zP+i1eePKEbZG+sYcbB+e0QY9gXuBmv61NpZuflJgT8oR3Lc
-Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a17:90a:8b94:: with SMTP id
- z20mr401843pjn.1.1610610324766; Wed, 13 Jan 2021 23:45:24 -0800 (PST)
-Date:   Thu, 14 Jan 2021 15:44:58 +0800
-In-Reply-To: <20210114074458.3399055-1-apusaka@google.com>
-Message-Id: <20210114154405.Bluez.v3.5.I0777ec8d6a8874f4d0308d1568aac8c33b04803c@changeid>
-Mime-Version: 1.0
-References: <20210114074458.3399055-1-apusaka@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [Bluez PATCH v3 5/5] monitor: Decode add advmon with RSSI parameter
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m/H33qH15cZSLT3IensLDd2f85ErYSiwxMG3rgZ/rX8=;
+        b=sgB9DihtOxYCejqdA2nJxaRjdJWOhXE4mNrgRya5hrq3yAhiAj7wCdfUrvRkjN7v1T
+         GHxNvZkoBCWTXxtgGXC0sHh/+pCGcVmr70fMmV8CeUYtcce+/I0pRqIBWIhmgMt1Ihvh
+         O8XueDEcmTNixT6xuLZKrTyC95sP4QxcjmnEPrH+3WMluC2o6ps3J/LBtwpJnK9C6ILK
+         aadfQlq4TnWpFAKMywntSakHyDXKqcgOWw0y7lPYADn+a/yUDajXVH8Nio+jtBV/f/wd
+         0qhSoe9MLi4nGFTbe1sJrW3rzXGog9tFwXxKc1Jmj5TUVl+w1d6MQKoO7dFwg+Kg4tCy
+         VvhQ==
+X-Gm-Message-State: AOAM531rmcwnFaE0e0WFLCHVkmqfYyiMEafTSYAvoZG2YiIiDmlrRpI3
+        eie0izGAvfdgROOSDlXpf2cKCcoS/pGhWqjiWnGwYFJs61ZnLQ==
+X-Google-Smtp-Source: ABdhPJyhZubU0XzDRmjHFHJiZmqoN+N1UlabMjkDNJrHO13p08YzJW8nUx+rZ3ZgeTpxmdvTKXz32JCin+wPdu1a4Cg=
+X-Received: by 2002:a2e:b166:: with SMTP id a6mr2468095ljm.100.1610610547669;
+ Wed, 13 Jan 2021 23:49:07 -0800 (PST)
+MIME-Version: 1.0
+References: <20210113094905.2787919-1-apusaka@google.com> <CABBYNZK322MeXgUbDBoctamaQDYSJFELp=0s3ODeqssCkY_szw@mail.gmail.com>
+In-Reply-To: <CABBYNZK322MeXgUbDBoctamaQDYSJFELp=0s3ODeqssCkY_szw@mail.gmail.com>
 From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Yun-Hao Chung <howardchung@google.com>
+Date:   Thu, 14 Jan 2021 15:48:56 +0800
+Message-ID: <CAJQfnxFkrvgegQ5cThXh2QtP8b=mxT9FHPfc_UOkZhT6+SLO+Q@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2 0/5] Support advertising monitor add pattern with
+ RSSI opcode
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Hi Luiz,
 
-Add support for MGMT command of add advertisement monitor with RSSI
-parameter (0x0056).
+I submitted v3 to incorporate your suggestions. Tell me what you think!
 
-@ MGMT Command: Add Advertisement.. (0x0056) plen 76  {0x0003}
-        RSSI data:
-          high threshold: 1 dBm
-          high timeout: 0 seconds
-          low threshold: -2 dBm
-          low timeout: 3 seconds
-          sampling: just once (0xFF)
-        Number of patterns: 2
-          Pattern 1:
-            AD type: 0
-            Offset: 1
-            Length: 2
-            Value : c504
-          Pattern 2:
-            AD type: 255
-            Offset: 10
-            Length: 4
-            Value : 9a55beef
+Thanks,
+Archie
 
-Reviewed-by: Yun-Hao Chung <howardchung@google.com>
----
-
-(no changes since v1)
-
- monitor/packet.c | 43 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
-
-diff --git a/monitor/packet.c b/monitor/packet.c
-index c91b91e2b2..fcd698d92a 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -13261,18 +13261,22 @@ static void mgmt_print_adv_monitor_patterns(const void *data, uint8_t len)
- 
- 	/* Reference: struct mgmt_adv_pattern in lib/mgmt.h. */
- 	while (data_idx + 34 <= len) {
--		uint8_t ad_type = get_u8(data + data_idx);
--		uint8_t offset = get_u8(data + data_idx + 1);
--		uint8_t length = get_u8(data + data_idx + 2);
-+		uint8_t ad_type = get_u8(data);
-+		uint8_t offset = get_u8(data + 1);
-+		uint8_t length = get_u8(data + 2);
- 
- 		print_field("  Pattern %d:", pattern_idx);
- 		print_field("    AD type: %d", ad_type);
- 		print_field("    Offset: %d", offset);
- 		print_field("    Length: %d", length);
--		print_hex_field("    Value ", data + data_idx + 3, 31);
-+		if (length <= 31)
-+			print_hex_field("    Value ", data + 3, length);
-+		else
-+			print_text(COLOR_ERROR, "    invalid length");
- 
- 		pattern_idx += 1;
- 		data_idx += 34;
-+		data += 34;
- 	}
- }
- 
-@@ -13284,6 +13288,33 @@ static void mgmt_add_adv_monitor_patterns_cmd(const void *data, uint16_t size)
- 	mgmt_print_adv_monitor_patterns(data + 1, size - 1);
- }
- 
-+static void mgmt_add_adv_monitor_patterns_rssi_cmd(const void *data,
-+								uint16_t size)
-+{
-+	int8_t high_rssi = get_s8(data);
-+	uint16_t high_rssi_timeout = get_le16(data + 1);
-+	int8_t low_rssi = get_s8(data + 3);
-+	uint16_t low_rssi_timeout = get_le16(data + 4);
-+	uint8_t sampling_period = get_u8(data + 6);
-+	uint8_t pattern_count = get_u8(data + 7);
-+
-+	print_field("RSSI data:");
-+	print_field("  high threshold: %d dBm", high_rssi);
-+	print_field("  high timeout: %d seconds", high_rssi_timeout);
-+	print_field("  low threshold: %d dBm", low_rssi);
-+	print_field("  low timeout: %d seconds", low_rssi_timeout);
-+
-+	if (sampling_period == 0)
-+		print_field("  sampling: propagate all (0x00)");
-+	else if (sampling_period == 0xff)
-+		print_field("  sampling: just once (0xFF)");
-+	else
-+		print_field("  sampling: every %d ms", 100 * sampling_period);
-+
-+	print_field("Number of patterns: %d", pattern_count);
-+	mgmt_print_adv_monitor_patterns(data + 8, size - 8);
-+}
-+
- static void mgmt_add_adv_monitor_patterns_rsp(const void *data, uint16_t size)
- {
- 	uint16_t handle = get_le16(data);
-@@ -13553,6 +13584,10 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x0055, "Add Ext Adv Data",
- 				mgmt_add_ext_adv_data_cmd, 3, false,
- 				mgmt_add_ext_adv_data_rsp, 1, true },
-+	{ 0x0056, "Add Advertisement Monitor With RSSI",
-+				mgmt_add_adv_monitor_patterns_rssi_cmd, 8,
-+									false,
-+				mgmt_add_adv_monitor_patterns_rsp, 2, true},
- 	{ }
- };
- 
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
-
+On Thu, 14 Jan 2021 at 01:58, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Wed, Jan 13, 2021 at 1:49 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > Hi linux-bluetooth,
+> >
+> > This series of patches adds a new MGMT command for adding a monitor
+> > with RSSI parameter. Changes are focused on passing parameters to
+> > the kernel via btmgmt and bluetoothctl.
+> >
+> > PTAL and thanks for your feedback!
+> > Archie
+> >
+> > Changes in v2:
+> > Remove trailing period and fix order of mgmt parameter
+> >
+> > Archie Pusaka (5):
+> >   lib/mgmt: Adding Add Adv Patterns Monitor RSSI opcode
+> >   src/adv_monitor: add monitor with rssi support for mgmt
+> >   btmgmt: advmon add rssi support
+> >   bluetoothctl: advmon rssi support for mgmt
+> >   monitor: Decode add advmon with RSSI parameter
+> >
+> >  client/adv_monitor.c |  90 ++++++++++++------------
+> >  client/adv_monitor.h |   1 +
+> >  client/main.c        |  29 ++++----
+> >  lib/mgmt.h           |  15 ++++
+> >  monitor/packet.c     |  43 ++++++++++--
+> >  src/adv_monitor.c    | 143 +++++++++++++++++++++++++++++---------
+> >  tools/btmgmt.c       | 160 ++++++++++++++++++++++++++++++++++++-------
+> >  7 files changed, 357 insertions(+), 124 deletions(-)
+> >
+> > --
+> > 2.30.0.284.gd98b1dd5eaa7-goog
+>
+> While this changes seems fine I was going to suggest we split
+> RSSIThresholdsAndTimers to just RSSI and Timer so one don't have to
+> set the entire struct if there are not interested in setting a custom
+> RSSI and/or Timer, the advantage is the user can just omit one or the
+> other and the daemon will take care of filling in the missing fields
+> with defaults for the MGMT command. Also we probably just use plain
+> int16, int16 and uint16, uint16 so we don't use () around it meaning
+> they are not wrapped as a struct which makes it simpler to parse and
+> construct.
+>
+> --
+> Luiz Augusto von Dentz
