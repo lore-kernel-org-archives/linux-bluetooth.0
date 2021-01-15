@@ -2,246 +2,353 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF56C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 13:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C3EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 17:44:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E7722336F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 13:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 843D121D7A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 17:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729011AbhAONiP (ORCPT
+        id S1726765AbhAORoc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 08:38:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
+        Fri, 15 Jan 2021 12:44:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728292AbhAONiP (ORCPT
+        with ESMTP id S1726309AbhAORoc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 08:38:15 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9551C061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 05:37:34 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id 143so11557445qke.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 05:37:34 -0800 (PST)
+        Fri, 15 Jan 2021 12:44:32 -0500
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2F7C0613C1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 09:43:51 -0800 (PST)
+Received: by mail-ua1-x935.google.com with SMTP id p2so3157773uac.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 09:43:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=TBlBdQJ86JPc/guKjRV9q8O9d76RgBF0bTjIfHLiVec=;
-        b=CsFO4Q7AArKgjg0QiejrAczb95aX/78s99iBVIbl5KMgzK/3ypuXO1UY+r8nRezQCW
-         djVGBnnHIxpU2BnUjF9gynhWwj3UqYA8MElqeI/PrDGhCmUYakJsJ2jiTnXezT4XcjH/
-         wYHLQ+OzR3MSOTiniAfvnO8NNqic6w0I5yBJwgE66HSysz4hTx+9E9QcJCSBYW7Yopv0
-         8tZZeekXpGSGVmewt3RVBWjMTPsxahhBCkyPVtjRFblXgldqdqXZiBTd04l62GWT4rQs
-         vD4SUtMdGAHDN8HrBmtYRlkF4/XWk9+uXR5gPqk8oFTIsftsj6ADREf3Rqpi9LOo0MgX
-         BfLQ==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UxoZCfC1SWiNAA5reRQtLNYH8XkIlRxb26unjVUak6o=;
+        b=kmK+HUIdLYzuVGfvyg3UMZdTpO0a5/1QjAEcwjeAXspmOYXQ9VpxaFDn68KhZ0lv5C
+         g++3hy8ikcPD+Sy9yuqU8v1MYJecCms8KnVN8ed1lA1TrVk/c67Jkq2US752yNJYxhxK
+         qV+q57r4FZMj92wf+oCU+BCmG3a6i7/PK7zCU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=TBlBdQJ86JPc/guKjRV9q8O9d76RgBF0bTjIfHLiVec=;
-        b=F04nOb0WbBMrqpV4iDwV/SDliXi1uv95YLjJ8SHf1VE8wAC2s5+uero9aP2oLLNzQO
-         G4vOFLIKj1ETrp0CHUy56GCUEXcUH4cR1wHNlCggFmKsB1211eYxXcw+nNSC71XHHimI
-         oQj5YOc6q8e+0CwXYbiGXiHTFwKdqVyva0Ry8fWY4QWmLVOfMWKRKHwR2UPH5srjnqqA
-         k275zbW2fehP9M7meoYv2JwpP1UpmJFiMb85FUjpDa5gvSDlCROHjQcvH6X/+CDWKlkf
-         M7AS/sbH676q6y1P11uDgsJjoBd4FKTKhD5bf/teZFMHgGTeCC9AwrvLHUUBK7ihSolI
-         t0NA==
-X-Gm-Message-State: AOAM532inppuI0Ju5xXzZn7nDa5eeal0xSW0WLf2i83WKhq7Gd6lnldw
-        44Y1kx9++2at/jDtPdWhYcz1iDuGUVs=
-X-Google-Smtp-Source: ABdhPJyjuE1FFeWXpO0UIjn/HjIMgEGTqCqPNX0K6wtcAaTMCsf3OAgbQWmbPk4zKcLdXzSQBfCHMg==
-X-Received: by 2002:a37:52c1:: with SMTP id g184mr12315940qkb.364.1610717853881;
-        Fri, 15 Jan 2021 05:37:33 -0800 (PST)
-Received: from [172.17.0.2] ([40.123.45.137])
-        by smtp.gmail.com with ESMTPSA id a16sm4415220qta.69.2021.01.15.05.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jan 2021 05:37:33 -0800 (PST)
-Message-ID: <60019a9d.1c69fb81.9fa78.c8eb@mx.google.com>
-Date:   Fri, 15 Jan 2021 05:37:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3963502624742989879=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UxoZCfC1SWiNAA5reRQtLNYH8XkIlRxb26unjVUak6o=;
+        b=DiQbs6keF9HfGCcc3QJMtNOtWCmHUQG3qFYLDopyGCImQsuTHE4H80Cc5RdfhGSSxt
+         UBHYyF7KGDotVDe0LzrzlLLCoDJT7xxjeIi0RjYwfxf0lTxO3O9E4V8++SZfWBibJLBW
+         cy4gNOBTojrTDGtnEixRCrV4iawJF+4zkz0UNA+MHPvnJZG6/MPmDzScx1FmaVHbg3Ud
+         zi1fta9CBOTf8KXTw27jIC4HOO/329YWenqNgwh6cw3X3l6vQGLqi3anFim5J2LA6iub
+         GPYXMRUjCri+qgV3SijEI/wBdjekdORunk/KuMTAm280TjzS8nUj0Gh0AC8fdZyKr8x1
+         YReA==
+X-Gm-Message-State: AOAM5324HcId9AzR0CwiJ1hPTYKuDLFLKPfDrJrmHDMsevyFVWvVQLPZ
+        onp5XGHz2Gx7fV+Bd7X3QtUBelr9WiSC7yebyvRqGg==
+X-Google-Smtp-Source: ABdhPJxp7l0zTZscpHiiJ4sQ3GDR/IdKQh/JWv75MSj4DvXnGCOJRE5SeN1xr2HxVNCH6HK5ES/EQ5zcYEzgwadTjgk=
+X-Received: by 2002:a9f:21f8:: with SMTP id 111mr10449890uac.115.1610732630680;
+ Fri, 15 Jan 2021 09:43:50 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez] gatt: Use the same crypto instance for each device
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
-References: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
+References: <20210113232858.1181251-1-luiz.dentz@gmail.com>
+ <CABBYNZLxaHOvQR-TP3-nXFw8UHBSpjcLRbkCrXAkVfSyt7uQSQ@mail.gmail.com>
+ <CANFp7mXT=umUbxJ=UgjvYK1XLbGOB2UUEns2e6NpqTMxhf19zg@mail.gmail.com>
+ <CABBYNZ+vTRiZ4ayEO=2bn+tqztwnL_L3=o9NPPKs7vQicC6rkg@mail.gmail.com>
+ <CABBYNZLcgi8D1qU2jyO5Q_UBN47OfppvLEAU=FMi2qZFNqyKWQ@mail.gmail.com>
+ <CANFp7mW1HujD4gH8F0+mySZvGXRox4nFqF+W4-TAC7eSB4WTgQ@mail.gmail.com>
+ <CAJQfnxG8RiWDCxEWOwQ_W27mvE=aBPAT8rgQYee395Y+Z1dGhQ@mail.gmail.com>
+ <CABBYNZJph-N_s6CZ41duk3_sLWAv0hC+jsUkXyXvRrrzUGL+BQ@mail.gmail.com> <CAJQfnxGgWN6G=NE84KBaVxT1no-j9QuReE6rS6vdP9rZEgZ9Mg@mail.gmail.com>
+In-Reply-To: <CAJQfnxGgWN6G=NE84KBaVxT1no-j9QuReE6rS6vdP9rZEgZ9Mg@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Fri, 15 Jan 2021 09:43:39 -0800
+Message-ID: <CANFp7mUiZdCwsZfn1TA27fREWLMngELXYQNKercxEa8P6kK2cw@mail.gmail.com>
+Subject: Re: [RESEND 1/2] Bluetooth: btusb: Add support for queuing during
+ polling interval
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Alain Michaud <alainmichaud@google.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3963502624742989879==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Luiz,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDE1NDA3CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-UGF0Y2ggLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tH
-aXRMaW50IC0gUEFTUwoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
-QnVpbGQgLSBGQUlMCk91dHB1dDoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0
-dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6MTc6MTk6IGVycm9yOiByZWR1bmRhbnQg
-cmVkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fbmV34oCZIFstV2Vycm9yPXJlZHVuZGFudC1k
-ZWNsc10KICAgMTcgfCBzdHJ1Y3QgYnRfY3J5cHRvICpidF9jcnlwdG9fbmV3KHZvaWQpOwogICAg
-ICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
-IC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAgICAgICAgICAgZnJvbSBzcmMvc2hh
-cmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjE3OjE5OiBub3RlOiBwcmV2
-aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fbmV34oCZIHdhcyBoZXJlCiAgIDE3IHwg
-c3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX25ldyh2b2lkKTsKICAgICAgfCAgICAgICAgICAg
-ICAgICAgICBefn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dh
-dHQtZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjE5OjE5OiBlcnJvcjogcmVkdW5kYW50
-IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3JlZuKAmSBbLVdlcnJvcj1yZWR1bmRhbnQt
-ZGVjbHNdCiAgIDE5IHwgc3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX3JlZihzdHJ1Y3QgYnRf
-Y3J5cHRvICpjcnlwdG8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4K
-SW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAg
-ICAgICAgICAgZnJvbSBzcmMvc2hhcmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0
-by5oOjE5OjE5OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fcmVm
-4oCZIHdhcyBoZXJlCiAgIDE5IHwgc3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX3JlZihzdHJ1
-Y3QgYnRfY3J5cHRvICpjcnlwdG8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+
-fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3Ny
-Yy9zaGFyZWQvY3J5cHRvLmg6MjA6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9m
-IOKAmGJ0X2NyeXB0b191bnJlZuKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDIwIHwg
-dm9pZCBidF9jcnlwdG9fdW5yZWYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvKTsKICAgICAgfCAg
-ICAgIF5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dh
-dHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0
-OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6MjA6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24g
-b2Yg4oCYYnRfY3J5cHRvX3VucmVm4oCZIHdhcyBoZXJlCiAgIDIwIHwgdm9pZCBidF9jcnlwdG9f
-dW5yZWYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvKTsKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+
-fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3Jj
-L3NoYXJlZC9jcnlwdG8uaDoyMjo2OiBlcnJvcjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg
-4oCYYnRfY3J5cHRvX3JhbmRvbV9ieXRlc+KAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAg
-IDIyIHwgYm9vbCBidF9jcnlwdG9fcmFuZG9tX2J5dGVzKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0
-bywKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBm
-cm9tIC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAgICAgICAgICAgZnJvbSBzcmMv
-c2hhcmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjIyOjY6IG5vdGU6IHBy
-ZXZpb3VzIGRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19yYW5kb21fYnl0ZXPigJkgd2FzIGhl
-cmUKICAgMjIgfCBib29sIGJ0X2NyeXB0b19yYW5kb21fYnl0ZXMoc3RydWN0IGJ0X2NyeXB0byAq
-Y3J5cHRvLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1
-ZGVkIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoy
-NTo2OiBlcnJvcjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2XigJkg
-Wy1XZXJyb3I9cmVkdW5kYW50LWRlY2xzXQogICAyNSB8IGJvb2wgYnRfY3J5cHRvX2Uoc3RydWN0
-IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtleVsxNl0sCiAgICAgIHwgICAgICBe
-fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDox
-MSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9z
-aGFyZWQvY3J5cHRvLmg6MjU6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRf
-Y3J5cHRvX2XigJkgd2FzIGhlcmUKICAgMjUgfCBib29sIGJ0X2NyeXB0b19lKHN0cnVjdCBidF9j
-cnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAgICB8ICAgICAgXn5+fn5+
-fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3Ny
-Yy9zaGFyZWQvY3J5cHRvLmg6Mjc6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9m
-IOKAmGJ0X2NyeXB0b19haOKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDI3IHwgYm9v
-bCBidF9jcnlwdG9fYWgoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtb
-MTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3Ny
-Yy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9n
-YXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoyNzo2OiBub3RlOiBwcmV2aW91cyBk
-ZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fYWjigJkgd2FzIGhlcmUKICAgMjcgfCBib29sIGJ0
-X2NyeXB0b19haChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga1sxNl0s
-CiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFy
-ZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mjk6NjogZXJyb3I6IHJlZHVu
-ZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19jMeKAmSBbLVdlcnJvcj1yZWR1bmRh
-bnQtZGVjbHNdCiAgIDI5IHwgYm9vbCBidF9jcnlwdG9fYzEoc3RydWN0IGJ0X2NyeXB0byAqY3J5
-cHRvLCBjb25zdCB1aW50OF90IGtbMTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZp
-bGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAg
-ICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoy
-OTo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fYzHigJkgd2Fz
-IGhlcmUKICAgMjkgfCBib29sIGJ0X2NyeXB0b19jMShzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8s
-IGNvbnN0IHVpbnQ4X3Qga1sxNl0sCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRv
-Lmg6MzQ6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19z
-MeKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM0IHwgYm9vbCBidF9jcnlwdG9fczEo
-c3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtbMTZdLAogICAgICB8ICAg
-ICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1k
-Yi5oOjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4v
-c3JjL3NoYXJlZC9jcnlwdG8uaDozNDo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDi
-gJhidF9jcnlwdG9fczHigJkgd2FzIGhlcmUKICAgMzQgfCBib29sIGJ0X2NyeXB0b19zMShzdHJ1
-Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga1sxNl0sCiAgICAgIHwgICAgICBe
-fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1
-OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mzc6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0
-aW9uIG9mIOKAmGJ0X2NyeXB0b19mNOKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM3
-IHwgYm9vbCBidF9jcnlwdG9fZjQoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHVb
-MzJdLCB1aW50OF90IHZbMzJdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5j
-bHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAgICAgIGZy
-b20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDozNzo2OiBu
-b3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fZjTigJkgd2FzIGhlcmUK
-ICAgMzcgfCBib29sIGJ0X2NyeXB0b19mNChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIHVpbnQ4
-X3QgdVszMl0sIHVpbnQ4X3QgdlszMl0sCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmls
-ZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5
-cHRvLmg6Mzk6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0
-b19mNeKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM5IHwgYm9vbCBidF9jcnlwdG9f
-ZjUoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHdbMzJdLCB1aW50OF90IG4xWzE2
-XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMv
-c2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0
-dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mzk6Njogbm90ZTogcHJldmlvdXMgZGVj
-bGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2Y14oCZIHdhcyBoZXJlCiAgIDM5IHwgYm9vbCBidF9j
-cnlwdG9fZjUoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHdbMzJdLCB1aW50OF90
-IG4xWzE2XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
-c3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDo0Mjo2OiBlcnJv
-cjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2Y24oCZIFstV2Vycm9y
-PXJlZHVuZGFudC1kZWNsc10KICAgNDIgfCBib29sIGJ0X2NyeXB0b19mNihzdHJ1Y3QgYnRfY3J5
-cHRvICpjcnlwdG8sIHVpbnQ4X3Qgd1sxNl0sIHVpbnQ4X3QgbjFbMTZdLAogICAgICB8ICAgICAg
-Xn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5o
-OjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3Jj
-L3NoYXJlZC9jcnlwdG8uaDo0Mjo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhi
-dF9jcnlwdG9fZjbigJkgd2FzIGhlcmUKICAgNDIgfCBib29sIGJ0X2NyeXB0b19mNihzdHJ1Y3Qg
-YnRfY3J5cHRvICpjcnlwdG8sIHVpbnQ4X3Qgd1sxNl0sIHVpbnQ4X3QgbjFbMTZdLAogICAgICB8
-ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dhdHQt
-ZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjQ1OjY6IGVycm9yOiByZWR1bmRhbnQgcmVk
-ZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fZzLigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRlY2xz
-XQogICA0NSB8IGJvb2wgYnRfY3J5cHRvX2cyKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgdWlu
-dDhfdCB1WzMyXSwgdWludDhfdCB2WzMyXSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBm
-aWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAg
-ICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6
-NDU6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2cy4oCZIHdh
-cyBoZXJlCiAgIDQ1IHwgYm9vbCBidF9jcnlwdG9fZzIoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRv
-LCB1aW50OF90IHVbMzJdLCB1aW50OF90IHZbMzJdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+
-CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dhdHQtZGIuYzoyNToKLi9zcmMvc2hh
-cmVkL2NyeXB0by5oOjQ3OjY6IGVycm9yOiByZWR1bmRhbnQgcmVkZWNsYXJhdGlvbiBvZiDigJhi
-dF9jcnlwdG9faDbigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRlY2xzXQogICA0NyB8IGJvb2wgYnRf
-Y3J5cHRvX2g2KHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCB3WzE2XSwK
-ICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hh
-cmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1k
-Yi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NDc6Njogbm90ZTogcHJldmlvdXMgZGVjbGFy
-YXRpb24gb2Yg4oCYYnRfY3J5cHRvX2g24oCZIHdhcyBoZXJlCiAgIDQ3IHwgYm9vbCBidF9jcnlw
-dG9faDYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IHdbMTZdLAogICAg
-ICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dh
-dHQtZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjQ5OjY6IGVycm9yOiByZWR1bmRhbnQg
-cmVkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fc2lnbl9hdHTigJkgWy1XZXJyb3I9cmVkdW5k
-YW50LWRlY2xzXQogICA0OSB8IGJvb2wgYnRfY3J5cHRvX3NpZ25fYXR0KHN0cnVjdCBidF9jcnlw
-dG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+
-fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjEx
-LAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3No
-YXJlZC9jcnlwdG8uaDo0OTo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9j
-cnlwdG9fc2lnbl9hdHTigJkgd2FzIGhlcmUKICAgNDkgfCBib29sIGJ0X2NyeXB0b19zaWduX2F0
-dChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga2V5WzE2XSwKICAgICAg
-fCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJl
-ZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDo1Mjo2OiBlcnJvcjogcmVkdW5k
-YW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbuKAmSBbLVdl
-cnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDUyIHwgYm9vbCBidF9jcnlwdG9fdmVyaWZ5X2F0dF9z
-aWduKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAg
-ICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
-Li9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFy
-ZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NTI6Njogbm90ZTogcHJldmlv
-dXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbuKAmSB3YXMgaGVy
-ZQogICA1MiB8IGJvb2wgYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbihzdHJ1Y3QgYnRfY3J5cHRv
-ICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga2V5WzE2XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5j
-OjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NTQ6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xh
-cmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19nYXR0X2hhc2jigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRl
-Y2xzXQogICA1NCB8IGJvb2wgYnRfY3J5cHRvX2dhdHRfaGFzaChzdHJ1Y3QgYnRfY3J5cHRvICpj
-cnlwdG8sIHN0cnVjdCBpb3ZlYyAqaW92LAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAg
-ICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5
-cHRvLmg6NTQ6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2dh
-dHRfaGFzaOKAmSB3YXMgaGVyZQogICA1NCB8IGJvb2wgYnRfY3J5cHRvX2dhdHRfaGFzaChzdHJ1
-Y3QgYnRfY3J5cHRvICpjcnlwdG8sIHN0cnVjdCBpb3ZlYyAqaW92LAogICAgICB8ICAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
-cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjY4MDg6IHNyYy9zaGFyZWQvZ2F0dC1kYi5sb10gRXJy
-b3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQwMjM6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBTS0lQUEVECk91dHB1dDoKY2hl
-Y2tidWlsZCBub3Qgc3VjY2VzcwoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+I think only one patch was sent out last time. Looking back through
+patchworks, I only see 1 email in that series:
+https://patchwork.kernel.org/project/bluetooth/list/?series=&submitter=&state=&q=Bluetooth%3A+btusb%3A+Add+support+for+queuing+during+polling+interval&archive=both&delegate=
 
---===============3963502624742989879==--
+Abhishek
+
+On Thu, Jan 14, 2021 at 11:05 PM Archie Pusaka <apusaka@google.com> wrote:
+>
+> Hi Luiz,
+> I don't think we have tested the second patch yet.
+>
+> Hi Abhishek,
+> Do you have context on this?
+>
+> On Thu, 14 Jan 2021 at 11:57, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This makes btusb to queue ACL and events during a polling interval
+> > by using of a delayed work, with the interval working as a time window
+> > where frames received from different endpoints are considered to be
+> > arrived at same time and then attempt to resolve potential conflics by
+> > processing the events ahead of ACL packets.
+> >
+> > It worth noting though that priorizing events over ACL data may result
+> > in inverting the order compared to how they appeared over the air, for
+> > instance there may be packets received before a disconnect event that
+> > will be discarded and unencrypted packets received before encryption
+> > change which would considered encrypted, because of these potential
+> > changes on the order the support for queuing during the polling
+> > interval is not enabled by default so platforms have the following
+> > means to enable it:
+> >
+> > At build-time:
+> >
+> >     CONFIG_BT_HCIBTUSB_INTERVAL=y
+> >
+> > At runtime with use of module option:
+> >
+> >     enable_interval
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Tested-by: Archie Pusaka <apusaka@chromium.org>
+>
+> > ---
+> >  drivers/bluetooth/Kconfig |  7 ++++
+> >  drivers/bluetooth/btusb.c | 88 ++++++++++++++++++++++++++++++++++-----
+> >  2 files changed, 84 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> > index 4e73a531b377..2f20a853d946 100644
+> > --- a/drivers/bluetooth/Kconfig
+> > +++ b/drivers/bluetooth/Kconfig
+> > @@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
+> >           This can be overridden by passing btusb.enable_autosuspend=[y|n]
+> >           on the kernel commandline.
+> >
+> > +config BT_HCIBTUSB_INTERVAL
+> > +       bool "Enable notification of USB polling interval"
+> > +       depends on BT_HCIBTUSB
+> > +       help
+> > +         Say Y here to enable notification of USB polling interval for
+> > +         Bluetooth USB devices by default.
+> > +
+> >  config BT_HCIBTUSB_BCM
+> >         bool "Broadcom protocol support"
+> >         depends on BT_HCIBTUSB
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index b14102fba601..38cb5448fc69 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -30,7 +30,7 @@
+> >  static bool disable_scofix;
+> >  static bool force_scofix;
+> >  static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+> > -
+> > +static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
+> >  static bool reset = true;
+> >
+> >  static struct usb_driver btusb_driver;
+> > @@ -519,8 +519,12 @@ struct btusb_data {
+> >
+> >         unsigned long flags;
+> >
+> > -       struct work_struct work;
+> > -       struct work_struct waker;
+> > +       struct work_struct  work;
+> > +       struct work_struct  waker;
+> > +       struct delayed_work rx_work;
+> > +
+> > +       struct sk_buff_head acl_q;
+> > +       struct sk_buff_head evt_q;
+> >
+> >         struct usb_anchor deferred;
+> >         struct usb_anchor tx_anchor;
+> > @@ -557,7 +561,7 @@ struct btusb_data {
+> >         int isoc_altsetting;
+> >         int suspend_count;
+> >
+> > -       int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
+> > +       int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
+> >         int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+> >
+> >         int (*setup_on_usb)(struct hci_dev *hdev);
+> > @@ -707,7 +711,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+> >
+> >                 if (!hci_skb_expect(skb)) {
+> >                         /* Complete frame */
+> > -                       data->recv_event(data->hdev, skb);
+> > +                       data->recv_event(data, skb);
+> >                         skb = NULL;
+> >                 }
+> >         }
+> > @@ -718,6 +722,25 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+> >         return err;
+> >  }
+> >
+> > +static int btusb_rx_queue(struct btusb_data *data, struct sk_buff *skb,
+> > +                         struct sk_buff_head *queue, unsigned int interval)
+> > +{
+> > +       skb_queue_tail(queue, skb);
+> > +
+> > +       schedule_delayed_work(&data->rx_work, interval);
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
+> > +{
+> > +       if (!enable_interval)
+> > +               return hci_recv_frame(data->hdev, skb);
+> > +
+> > +       /* TODO: Calculate polling interval based on endpoint bInterval? */
+> > +       return btusb_rx_queue(data, skb, &data->acl_q, msecs_to_jiffies(1));
+> > +}
+> > +
+> >  static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> >  {
+> >         struct sk_buff *skb;
+> > @@ -765,7 +788,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> >
+> >                 if (!hci_skb_expect(skb)) {
+> >                         /* Complete frame */
+> > -                       hci_recv_frame(data->hdev, skb);
+> > +                       btusb_recv_acl(data, skb);
+> >                         skb = NULL;
+> >                 }
+> >         }
+> > @@ -1383,9 +1406,13 @@ static int btusb_close(struct hci_dev *hdev)
+> >
+> >         BT_DBG("%s", hdev->name);
+> >
+> > +       cancel_delayed_work(&data->rx_work);
+> >         cancel_work_sync(&data->work);
+> >         cancel_work_sync(&data->waker);
+> >
+> > +       skb_queue_purge(&data->acl_q);
+> > +       skb_queue_purge(&data->evt_q);
+> > +
+> >         clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> >         clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+> >         clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+> > @@ -1417,6 +1444,11 @@ static int btusb_flush(struct hci_dev *hdev)
+> >
+> >         BT_DBG("%s", hdev->name);
+> >
+> > +       cancel_delayed_work(&data->rx_work);
+> > +
+> > +       skb_queue_purge(&data->acl_q);
+> > +       skb_queue_purge(&data->evt_q);
+> > +
+> >         usb_kill_anchored_urbs(&data->tx_anchor);
+> >         btusb_free_frags(data);
+> >
+> > @@ -1769,6 +1801,25 @@ static void btusb_waker(struct work_struct *work)
+> >         usb_autopm_put_interface(data->intf);
+> >  }
+> >
+> > +static void btusb_rx_dequeue(struct btusb_data *data,
+> > +                            struct sk_buff_head *queue)
+> > +{
+> > +       struct sk_buff *skb;
+> > +
+> > +       while ((skb = skb_dequeue(queue)))
+> > +               hci_recv_frame(data->hdev, skb);
+> > +}
+> > +
+> > +static void btusb_rx_work(struct work_struct *work)
+> > +{
+> > +       struct btusb_data *data = container_of(work, struct btusb_data,
+> > +                                              rx_work.work);
+> > +
+> > +       /* Process HCI event packets so states changes are synchronized first */
+> > +       btusb_rx_dequeue(data, &data->evt_q);
+> > +       btusb_rx_dequeue(data, &data->acl_q);
+> > +}
+> > +
+> >  static int btusb_setup_bcm92035(struct hci_dev *hdev)
+> >  {
+> >         struct sk_buff *skb;
+> > @@ -2304,10 +2355,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
+> >                 wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
+> >  }
+> >
+> > -static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> > +static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
+> >  {
+> > -       struct btusb_data *data = hci_get_drvdata(hdev);
+> > -
+> >         if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
+> >                 struct hci_event_hdr *hdr = (void *)skb->data;
+> >
+> > @@ -2336,7 +2385,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> >                 }
+> >         }
+> >
+> > -       return hci_recv_frame(hdev, skb);
+> > +       return hci_recv_frame(data->hdev, skb);
+> >  }
+> >
+> >  static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> > @@ -4279,6 +4328,15 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
+> >         return 0;
+> >  }
+> >
+> > +static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
+> > +{
+> > +       if (!enable_interval)
+> > +               return hci_recv_frame(data->hdev, skb);
+> > +
+> > +       /* Don't delay event processing */
+> > +       return btusb_rx_queue(data, skb, &data->evt_q, 0);
+> > +}
+> > +
+> >  static int btusb_probe(struct usb_interface *intf,
+> >                        const struct usb_device_id *id)
+> >  {
+> > @@ -4362,6 +4420,11 @@ static int btusb_probe(struct usb_interface *intf,
+> >
+> >         INIT_WORK(&data->work, btusb_work);
+> >         INIT_WORK(&data->waker, btusb_waker);
+> > +       INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
+> > +
+> > +       skb_queue_head_init(&data->acl_q);
+> > +       skb_queue_head_init(&data->evt_q);
+> > +
+> >         init_usb_anchor(&data->deferred);
+> >         init_usb_anchor(&data->tx_anchor);
+> >         spin_lock_init(&data->txlock);
+> > @@ -4378,7 +4441,7 @@ static int btusb_probe(struct usb_interface *intf,
+> >                 data->recv_bulk = btusb_recv_bulk_intel;
+> >                 set_bit(BTUSB_BOOTLOADER, &data->flags);
+> >         } else {
+> > -               data->recv_event = hci_recv_frame;
+> > +               data->recv_event = btusb_recv_evt;
+> >                 data->recv_bulk = btusb_recv_bulk;
+> >         }
+> >
+> > @@ -4867,6 +4930,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+> >  module_param(enable_autosuspend, bool, 0644);
+> >  MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+> >
+> > +module_param(enable_interval, bool, 0644);
+> > +MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
+> > +
+> >  module_param(reset, bool, 0644);
+> >  MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+> >
+> > --
+> > 2.26.2
+> >
+>
+> Thanks,
+> Archie
