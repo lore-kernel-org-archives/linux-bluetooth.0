@@ -2,121 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D619C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AC1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:57:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1D6123A58
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F16FB23A56
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733159AbhAOT5Q (ORCPT
+        id S2387494AbhAOT5s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 14:57:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
+        Fri, 15 Jan 2021 14:57:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727278AbhAOT5P (ORCPT
+        with ESMTP id S1733119AbhAOT5r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 14:57:15 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145CDC061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:56:35 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id v19so2495998ooj.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:56:35 -0800 (PST)
+        Fri, 15 Jan 2021 14:57:47 -0500
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF8DCC0613C1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:57:06 -0800 (PST)
+Received: by mail-ot1-x329.google.com with SMTP id i6so9719674otr.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:57:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=owFLotVNuMaogh9faUg74MewN0Se3wOF0nDvmklFUzo=;
-        b=k5XQwo68/izz/LwYjAegDr91PDu/Vrxpa1umVgflzQF2tlKcXxB5axTDq7Fmnh0YOG
-         rZAlDPF+870kxk5H6wMlaS5DyN/otL2U48jyGIt7tQ9dQLumOq1MVhz4JRWrhXyui6ER
-         6VRJfbhMS+hg3RbuzmqM5bzGKRke4VK4Zf9RsoBRBR5f8VcxPS0ybtnxmgMw9f5C1Cov
-         0qF6RBpI6Tur99mh7qPGCCP7/yR0a5qPhVUz0Fe2ZZ2FkTmstDwkcwoCCVAJRn8ar2Ia
-         t9iwmxw6FtRDx+yVMlevs3OKwfgHlSS0CwLFMM4Y+4g4yjlSjMmplkOyBOiaO4DPWOsj
-         TQxg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=PgeIwV3UrXHM04K5UHiSCEzQNZzbtqNfT0QwH1DtNQ8=;
+        b=O/9wzlDmoMGh1WD/NElA7oAwS77YFzJb93l2R3WuyjpXeuyd2drW8LEZJCkJ4/B6Sv
+         tvee9Zw4UeP9tUEwqj3cFibdMoVTzNwGhSwKO0gBUPMzkpUAOGVOODUPeJa8dhRLA0AI
+         RM7NuLlEMlMGos4OHIqgB4kwTjVmtM/BgjPwAJyKpDiJBRvwfn/95Azwxf7h8sQLXhiN
+         q8xR+ujRGVbJejz0495dYcZ2qaNphF/Sx9Dq7D6zlhmcy+usJ+kKhzoLaurrkABNRgcA
+         c4h2MCB1M6GjYbhbejpJ8MBWbLEo/5pKC2nCyorRTQd2ydrMRU5PeK2TZra+op1ahGV2
+         uImQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=owFLotVNuMaogh9faUg74MewN0Se3wOF0nDvmklFUzo=;
-        b=AXR79a4eBpnfZ2UtpcUizp63AVchtNjeYEhYgVJzuwEs6mXq5ZA0z46ouz31wmhC6v
-         CK3AMNwFN4250R+drf2cf4Y64crb/pDUITxICOlU4ucd70BQ9IITGBpjwiUn1BhNBayS
-         eg+ZyAmTk9T1/OG5isoL0zVsCmSkdRj7M731mSORUPZ5E5ucTkGyK1746mfZz9/x83q7
-         KbUy+zvUiwZj23ZC6fwkoqc8di+gvgDy/+StcufjUe60DQFMcDBYD6XFgzGKGmbNdtjm
-         IIBKterC+8cE6jmWyBczwRaFM6fIOVp/3JR6dsbHXD7r02tecfbLOeXip6WuxEsCcAQK
-         Qz3Q==
-X-Gm-Message-State: AOAM532HA9oBFvOwEsxzNgEryxby/jT8rcTvah4DNNRghH22bcBpiV76
-        eYA8v0kdfIdaTAPI7yZGlNyn50LOw+fXpR/2+czJ6llL
-X-Google-Smtp-Source: ABdhPJyF52wYTHIpYOyeiofDY1X/gwQqHzE/KZFLOJ9c8tms94NWwsvhH1Tz33IKPf11SJhduXp8V5N2PzGf4Io0BsQ=
-X-Received: by 2002:a05:6820:22c:: with SMTP id j12mr9626203oob.65.1610740594174;
- Fri, 15 Jan 2021 11:56:34 -0800 (PST)
+         :message-id:subject:to;
+        bh=PgeIwV3UrXHM04K5UHiSCEzQNZzbtqNfT0QwH1DtNQ8=;
+        b=iiQi7G+8oBKFuHs76zSuzvA2E/W4oR0HFxG5HjcKjRSlSM6xi+KEAxQOtCAAw1VgJF
+         rBYtht/s6vfoCbnsqiFeebCndI0KuAN2BFWPUz9VNcw6GzcLnWEyihzduon6LtMX58Y0
+         MypDF7MKoxuI71X3XsaKJR07s/eSgpVUQbh6hPTjzcAnAmme+E3zoK3TJGTnqiDDue2q
+         L5IZf6X86TNHpxS2YAdnT9AjA8BBCBhHEncrGQYSZ2HppnGxHN3NBb4jvnLS9R6GLSs5
+         z6ZaqrDRfnPol3cL0KbwXNIMaVGkuHS53pIH9wivTvZ14AL2gJHy+Oz5vIQQg3Y1ls5F
+         w1xQ==
+X-Gm-Message-State: AOAM530r/WcO5TJHGyJN5vvYYM2fdvSo087H9+fHX1sbVOZHe3W/S378
+        wfoiZH5ZH7l1bY/+llRLEX0hbCGMAbZFM24KH18fQ69o
+X-Google-Smtp-Source: ABdhPJxXtGPx5s8obks2meBrGVtBh1drV39oSsBQgYWnHM2+B87AvsDw/44HFP/Xy3i5F4OSAtMp04sOwH6PGrdiq8M=
+X-Received: by 2002:a9d:2035:: with SMTP id n50mr9175104ota.44.1610740626032;
+ Fri, 15 Jan 2021 11:57:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20210115115036.3973761-1-apusaka@google.com>
-In-Reply-To: <20210115115036.3973761-1-apusaka@google.com>
+References: <20210115190229.186479-1-luiz.dentz@gmail.com> <6001e9de.1c69fb81.f24b7.335f@mx.google.com>
+In-Reply-To: <6001e9de.1c69fb81.f24b7.335f@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 15 Jan 2021 11:55:57 -0800
-Message-ID: <CABBYNZJUEh5mdTVFpdw6hVNrc-ALWK4JFEZOQFtm1z=r=P7Yig@mail.gmail.com>
-Subject: Re: [Bluez PATCH v4 0/6] Support advertising monitor add pattern with
- RSSI opcode
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Fri, 15 Jan 2021 11:56:55 -0800
+Message-ID: <CABBYNZJpvLGY=tetYc2WsBp-JFP+Lb2KdBRQtL8E5=MRUZ-aZA@mail.gmail.com>
+Subject: Re: [BlueZ] shared/crypto: Transform bt_cryto in a singleton
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi,
 
-On Fri, Jan 15, 2021 at 3:51 AM Archie Pusaka <apusaka@google.com> wrote:
+On Fri, Jan 15, 2021 at 11:15 AM <bluez.test.bot@gmail.com> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
+> This is automated email and please do not reply to this email!
 >
-> Hi linux-bluetooth,
+> Dear submitter,
 >
-> This series of patches adds a new MGMT command for adding a monitor
-> with RSSI parameter. Changes are focused on passing parameters to
-> the kernel via btmgmt and bluetoothctl.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=415727
 >
-> PTAL and thanks for your feedback!
-> Archie
+> ---Test result---
 >
-> Changes in v4:
-> * split the add-or-pattern-rssi command
-> * update doc
+> ##############################
+> Test: CheckPatch - PASS
 >
-> Changes in v3:
-> * split the struct RSSIThresholdsAndTimers
+> ##############################
+> Test: CheckGitLint - PASS
 >
-> Changes in v2:
-> * Remove trailing period and fix order of mgmt parameter
+> ##############################
+> Test: CheckBuild - PASS
 >
-> Archie Pusaka (6):
->   lib/mgmt: Adding Add Adv Patterns Monitor RSSI opcode
->   doc/advmon-api: Introduce sampling period property
->   src/adv_monitor: add monitor with rssi support for mgmt
->   btmgmt: advmon add rssi support
->   bluetoothctl: advmon rssi support for mgmt
->   monitor: Decode add advmon with RSSI parameter
+> ##############################
+> Test: MakeCheck - PASS
 >
->  client/adv_monitor.c              | 258 +++++++++++++++++++----------
->  client/adv_monitor.h              |  11 +-
->  client/main.c                     |  72 ++++----
->  doc/advertisement-monitor-api.txt |  78 ++++++---
->  lib/mgmt.h                        |  15 ++
->  monitor/packet.c                  |  43 ++++-
->  src/adv_monitor.c                 | 267 +++++++++++++++++++-----------
->  tools/btmgmt.c                    | 160 +++++++++++++++---
->  8 files changed, 625 insertions(+), 279 deletions(-)
 >
-> --
-> 2.30.0.296.g2bfb1c46d8-goog
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-Applied, thanks.
+Pushed.
 
 -- 
 Luiz Augusto von Dentz
