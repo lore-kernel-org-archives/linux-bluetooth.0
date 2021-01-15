@@ -2,346 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A59C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 07:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A46C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 11:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 843E422A84
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 07:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AE862371F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 11:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731275AbhAOHGM (ORCPT
+        id S1728072AbhAOLvx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 02:06:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53454 "EHLO
+        Fri, 15 Jan 2021 06:51:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728668AbhAOHGM (ORCPT
+        with ESMTP id S1726642AbhAOLvx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 02:06:12 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F47C061575
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jan 2021 23:05:31 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id l9so6120743ejx.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jan 2021 23:05:31 -0800 (PST)
+        Fri, 15 Jan 2021 06:51:53 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CF1DC0613C1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 03:51:12 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id u17so7661955qku.17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 03:51:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zyNAtLcfZE8gGxM4GvU7KJ+8KcOovALN79jS6cR+TKo=;
-        b=ncG0XjvD+mL7uxodQALOoU/qnfofvtztEoGKqbY1/nb14Ke8P85VqrSC+fxi8mujPC
-         2e6c5BRybLZ9olsuTpbgZTx1ku+d7E/66azoA/FPrCOMDt1n+eYLGvt035DE10xwincX
-         cf+kApob4Grpm0LQCPXFfWQ7pwI4e2Uxuznj1tznzQ/+tSycNomWtUT5HinFt/4eIPLW
-         EXyBqaqlUaf/wLImzDzhr83PgWHjMN/cnD1sE0XK5xHANsCTodHSETXymxLAVkchy5su
-         Rp5txGSUdtltYr73DJ7unzqU9sNsuLqPmV8NiqA9oqGulEq8uxryl2JNzCmjHhWjKfbM
-         YBXw==
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=IFpe3dn8pstixEZLhn7ancheEqYMrAoPdvBifxwYKOY=;
+        b=GJ6ETI/Iw/TsohHtvzQ3llmu5ytcvnVsYc+026idRoHu6u1ITZiBqnoXLpm6oC3PV8
+         x9XzuZFqKVBp4BaVtBOUek8M8WFIc9uFJYjxKlO0NoGCLa820QEKrRQBWXh55FKP8to+
+         lCirHlhsTBvbA5lTtMxAlephkJRDXqE8aq3Srqd5Yznz6Tls8eAU+efza3DPdV8s31P1
+         D4o94PPSS3/3Jhdcow+hX+0BUmCP4yTihmOcFNjXISmzXSxP2DD7j8kOOHEl/VasgBNh
+         uZjAwwX9xCVx56vrBkmxSKc4+w83NXzPvrpsp31lzLClAym1zwVJS5eBAZZiemUH+g9O
+         VgKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zyNAtLcfZE8gGxM4GvU7KJ+8KcOovALN79jS6cR+TKo=;
-        b=JFkzrUZybw88RALH67FU+9JzTaO7uvJt5ki1Dqe/FRPEddXKyx9vPE3Vb64luoY7RX
-         269dn294CCc1YhQ0FXMivb/amjsjblZtn+G6fAamTW25f9lbN7OfeiOkxRCkn/Cvaq1Q
-         ob1NPOB0EXwMGZZ28frET9Yt1kWYWLpMT7kt0xX1l1B190O9SVP7zrJsV3O60JPQsU4f
-         jjAl1O/RpopkvDNW9MAjMGVbxlwv9qjinhS4NdyvuroxDE4q+o7MvNj6D3+kcsz971GH
-         PdX/uH5xndOMF2TKVq5ZEIr5wvKAEiVBJNrDkr3iBCoKQFiatXwZedfG0E4kX9ox1uwq
-         vwYw==
-X-Gm-Message-State: AOAM5312FdBjJHwanZxVIM1sEomlPVtnThhCVhcmSRNHkMTRtkwaIFma
-        qV5XwADzlflFrXCkWhyy8K1tQ7cy0rP6aQr9X1zH/w==
-X-Google-Smtp-Source: ABdhPJysmuQM3kFtry1fiI7dI6/e5MgNpFtw2j3y0aHbOAkKKyK1xD6PAZZrHQz5VN4uGHF5bnLRA4rczVWPq54HQlU=
-X-Received: by 2002:a17:907:20d5:: with SMTP id qq21mr803728ejb.340.1610694330125;
- Thu, 14 Jan 2021 23:05:30 -0800 (PST)
-MIME-Version: 1.0
-References: <20210113232858.1181251-1-luiz.dentz@gmail.com>
- <CABBYNZLxaHOvQR-TP3-nXFw8UHBSpjcLRbkCrXAkVfSyt7uQSQ@mail.gmail.com>
- <CANFp7mXT=umUbxJ=UgjvYK1XLbGOB2UUEns2e6NpqTMxhf19zg@mail.gmail.com>
- <CABBYNZ+vTRiZ4ayEO=2bn+tqztwnL_L3=o9NPPKs7vQicC6rkg@mail.gmail.com>
- <CABBYNZLcgi8D1qU2jyO5Q_UBN47OfppvLEAU=FMi2qZFNqyKWQ@mail.gmail.com>
- <CANFp7mW1HujD4gH8F0+mySZvGXRox4nFqF+W4-TAC7eSB4WTgQ@mail.gmail.com>
- <CAJQfnxG8RiWDCxEWOwQ_W27mvE=aBPAT8rgQYee395Y+Z1dGhQ@mail.gmail.com> <CABBYNZJph-N_s6CZ41duk3_sLWAv0hC+jsUkXyXvRrrzUGL+BQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJph-N_s6CZ41duk3_sLWAv0hC+jsUkXyXvRrrzUGL+BQ@mail.gmail.com>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=IFpe3dn8pstixEZLhn7ancheEqYMrAoPdvBifxwYKOY=;
+        b=RQ7FDV5Y9ear/EYDNIgzaL8uoluMrTqmPo69l+hZXXX5SOIwG5WrqgcanpjC6CcAsl
+         uco3WzyBeJcoLw1vW2IBHN4iiLEezo+uCvIMs9LLLVgCAts8WU739EkWNpw138O725GC
+         XVGJ99GDbNwHcLWlneT23yLWch6MEAdrC6MYLrZrQw25bpu/XPCJdkNF5iIbAJxSR9H7
+         YOvR88DZn9d00GGXxJmGkPQTDFP8FPOAtR8/W0smID31ED3B4D7fr38hLukznLzHaBc+
+         8fuWQyhWA+PYIKxIqMEYic34+/x1lhqpikRrH95p4qToYSBzcBCfiNNgjHKOyQZIqe/A
+         QGuQ==
+X-Gm-Message-State: AOAM532ullau2JDdqY45Sf8TskJBuzCh/rW1iHZXQ/SPeCO25jjj1iAC
+        J+2StpNwavLnsqZzQttZZLuP7b+OvzkfBtGmcaueecg4O8eHvpZERLfPEh8nQkH0o6dfaqyFxKu
+        HXP6yyYXpoc73VKrPD7Qu9So/zIcmVQBG7AuUDTueVTytXrHHTI/iO0I84XcyPDxftBJU2W1ZFI
+        D8
+X-Google-Smtp-Source: ABdhPJzk/Psx6oI8RStTwkS+0vffw4wdN3PZI6egRXIPn7BG+plvfEx2CUs7ZqF+7edy+TrBNuCASAhFxeve
+Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
+ (user=apusaka job=sendgmr) by 2002:a0c:fb0d:: with SMTP id
+ c13mr11707031qvp.1.1610711471767; Fri, 15 Jan 2021 03:51:11 -0800 (PST)
+Date:   Fri, 15 Jan 2021 19:50:32 +0800
+Message-Id: <20210115115036.3973761-1-apusaka@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.296.g2bfb1c46d8-goog
+Subject: [Bluez PATCH v4 0/6] Support advertising monitor add pattern with
+ RSSI opcode
 From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 15 Jan 2021 15:05:19 +0800
-Message-ID: <CAJQfnxGgWN6G=NE84KBaVxT1no-j9QuReE6rS6vdP9rZEgZ9Mg@mail.gmail.com>
-Subject: Re: [RESEND 1/2] Bluetooth: btusb: Add support for queuing during
- polling interval
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Alain Michaud <alainmichaud@google.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
-I don't think we have tested the second patch yet.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Hi Abhishek,
-Do you have context on this?
+Hi linux-bluetooth,
 
-On Thu, 14 Jan 2021 at 11:57, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This makes btusb to queue ACL and events during a polling interval
-> by using of a delayed work, with the interval working as a time window
-> where frames received from different endpoints are considered to be
-> arrived at same time and then attempt to resolve potential conflics by
-> processing the events ahead of ACL packets.
->
-> It worth noting though that priorizing events over ACL data may result
-> in inverting the order compared to how they appeared over the air, for
-> instance there may be packets received before a disconnect event that
-> will be discarded and unencrypted packets received before encryption
-> change which would considered encrypted, because of these potential
-> changes on the order the support for queuing during the polling
-> interval is not enabled by default so platforms have the following
-> means to enable it:
->
-> At build-time:
->
->     CONFIG_BT_HCIBTUSB_INTERVAL=y
->
-> At runtime with use of module option:
->
->     enable_interval
->
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This series of patches adds a new MGMT command for adding a monitor
+with RSSI parameter. Changes are focused on passing parameters to
+the kernel via btmgmt and bluetoothctl.
 
-Tested-by: Archie Pusaka <apusaka@chromium.org>
-
-> ---
->  drivers/bluetooth/Kconfig |  7 ++++
->  drivers/bluetooth/btusb.c | 88 ++++++++++++++++++++++++++++++++++-----
->  2 files changed, 84 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 4e73a531b377..2f20a853d946 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
->           This can be overridden by passing btusb.enable_autosuspend=[y|n]
->           on the kernel commandline.
->
-> +config BT_HCIBTUSB_INTERVAL
-> +       bool "Enable notification of USB polling interval"
-> +       depends on BT_HCIBTUSB
-> +       help
-> +         Say Y here to enable notification of USB polling interval for
-> +         Bluetooth USB devices by default.
-> +
->  config BT_HCIBTUSB_BCM
->         bool "Broadcom protocol support"
->         depends on BT_HCIBTUSB
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index b14102fba601..38cb5448fc69 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -30,7 +30,7 @@
->  static bool disable_scofix;
->  static bool force_scofix;
->  static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
-> -
-> +static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
->  static bool reset = true;
->
->  static struct usb_driver btusb_driver;
-> @@ -519,8 +519,12 @@ struct btusb_data {
->
->         unsigned long flags;
->
-> -       struct work_struct work;
-> -       struct work_struct waker;
-> +       struct work_struct  work;
-> +       struct work_struct  waker;
-> +       struct delayed_work rx_work;
-> +
-> +       struct sk_buff_head acl_q;
-> +       struct sk_buff_head evt_q;
->
->         struct usb_anchor deferred;
->         struct usb_anchor tx_anchor;
-> @@ -557,7 +561,7 @@ struct btusb_data {
->         int isoc_altsetting;
->         int suspend_count;
->
-> -       int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
-> +       int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
->         int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
->
->         int (*setup_on_usb)(struct hci_dev *hdev);
-> @@ -707,7 +711,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
->
->                 if (!hci_skb_expect(skb)) {
->                         /* Complete frame */
-> -                       data->recv_event(data->hdev, skb);
-> +                       data->recv_event(data, skb);
->                         skb = NULL;
->                 }
->         }
-> @@ -718,6 +722,25 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
->         return err;
->  }
->
-> +static int btusb_rx_queue(struct btusb_data *data, struct sk_buff *skb,
-> +                         struct sk_buff_head *queue, unsigned int interval)
-> +{
-> +       skb_queue_tail(queue, skb);
-> +
-> +       schedule_delayed_work(&data->rx_work, interval);
-> +
-> +       return 0;
-> +}
-> +
-> +static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
-> +{
-> +       if (!enable_interval)
-> +               return hci_recv_frame(data->hdev, skb);
-> +
-> +       /* TODO: Calculate polling interval based on endpoint bInterval? */
-> +       return btusb_rx_queue(data, skb, &data->acl_q, msecs_to_jiffies(1));
-> +}
-> +
->  static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
->  {
->         struct sk_buff *skb;
-> @@ -765,7 +788,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
->
->                 if (!hci_skb_expect(skb)) {
->                         /* Complete frame */
-> -                       hci_recv_frame(data->hdev, skb);
-> +                       btusb_recv_acl(data, skb);
->                         skb = NULL;
->                 }
->         }
-> @@ -1383,9 +1406,13 @@ static int btusb_close(struct hci_dev *hdev)
->
->         BT_DBG("%s", hdev->name);
->
-> +       cancel_delayed_work(&data->rx_work);
->         cancel_work_sync(&data->work);
->         cancel_work_sync(&data->waker);
->
-> +       skb_queue_purge(&data->acl_q);
-> +       skb_queue_purge(&data->evt_q);
-> +
->         clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
->         clear_bit(BTUSB_BULK_RUNNING, &data->flags);
->         clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-> @@ -1417,6 +1444,11 @@ static int btusb_flush(struct hci_dev *hdev)
->
->         BT_DBG("%s", hdev->name);
->
-> +       cancel_delayed_work(&data->rx_work);
-> +
-> +       skb_queue_purge(&data->acl_q);
-> +       skb_queue_purge(&data->evt_q);
-> +
->         usb_kill_anchored_urbs(&data->tx_anchor);
->         btusb_free_frags(data);
->
-> @@ -1769,6 +1801,25 @@ static void btusb_waker(struct work_struct *work)
->         usb_autopm_put_interface(data->intf);
->  }
->
-> +static void btusb_rx_dequeue(struct btusb_data *data,
-> +                            struct sk_buff_head *queue)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       while ((skb = skb_dequeue(queue)))
-> +               hci_recv_frame(data->hdev, skb);
-> +}
-> +
-> +static void btusb_rx_work(struct work_struct *work)
-> +{
-> +       struct btusb_data *data = container_of(work, struct btusb_data,
-> +                                              rx_work.work);
-> +
-> +       /* Process HCI event packets so states changes are synchronized first */
-> +       btusb_rx_dequeue(data, &data->evt_q);
-> +       btusb_rx_dequeue(data, &data->acl_q);
-> +}
-> +
->  static int btusb_setup_bcm92035(struct hci_dev *hdev)
->  {
->         struct sk_buff *skb;
-> @@ -2304,10 +2355,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
->                 wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
->  }
->
-> -static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-> +static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
->  {
-> -       struct btusb_data *data = hci_get_drvdata(hdev);
-> -
->         if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
->                 struct hci_event_hdr *hdr = (void *)skb->data;
->
-> @@ -2336,7 +2385,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
->                 }
->         }
->
-> -       return hci_recv_frame(hdev, skb);
-> +       return hci_recv_frame(data->hdev, skb);
->  }
->
->  static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
-> @@ -4279,6 +4328,15 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
->         return 0;
->  }
->
-> +static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
-> +{
-> +       if (!enable_interval)
-> +               return hci_recv_frame(data->hdev, skb);
-> +
-> +       /* Don't delay event processing */
-> +       return btusb_rx_queue(data, skb, &data->evt_q, 0);
-> +}
-> +
->  static int btusb_probe(struct usb_interface *intf,
->                        const struct usb_device_id *id)
->  {
-> @@ -4362,6 +4420,11 @@ static int btusb_probe(struct usb_interface *intf,
->
->         INIT_WORK(&data->work, btusb_work);
->         INIT_WORK(&data->waker, btusb_waker);
-> +       INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
-> +
-> +       skb_queue_head_init(&data->acl_q);
-> +       skb_queue_head_init(&data->evt_q);
-> +
->         init_usb_anchor(&data->deferred);
->         init_usb_anchor(&data->tx_anchor);
->         spin_lock_init(&data->txlock);
-> @@ -4378,7 +4441,7 @@ static int btusb_probe(struct usb_interface *intf,
->                 data->recv_bulk = btusb_recv_bulk_intel;
->                 set_bit(BTUSB_BOOTLOADER, &data->flags);
->         } else {
-> -               data->recv_event = hci_recv_frame;
-> +               data->recv_event = btusb_recv_evt;
->                 data->recv_bulk = btusb_recv_bulk;
->         }
->
-> @@ -4867,6 +4930,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
->  module_param(enable_autosuspend, bool, 0644);
->  MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
->
-> +module_param(enable_interval, bool, 0644);
-> +MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
-> +
->  module_param(reset, bool, 0644);
->  MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
->
-> --
-> 2.26.2
->
-
-Thanks,
+PTAL and thanks for your feedback!
 Archie
+
+Changes in v4:
+* split the add-or-pattern-rssi command
+* update doc
+
+Changes in v3:
+* split the struct RSSIThresholdsAndTimers
+
+Changes in v2:
+* Remove trailing period and fix order of mgmt parameter
+
+Archie Pusaka (6):
+  lib/mgmt: Adding Add Adv Patterns Monitor RSSI opcode
+  doc/advmon-api: Introduce sampling period property
+  src/adv_monitor: add monitor with rssi support for mgmt
+  btmgmt: advmon add rssi support
+  bluetoothctl: advmon rssi support for mgmt
+  monitor: Decode add advmon with RSSI parameter
+
+ client/adv_monitor.c              | 258 +++++++++++++++++++----------
+ client/adv_monitor.h              |  11 +-
+ client/main.c                     |  72 ++++----
+ doc/advertisement-monitor-api.txt |  78 ++++++---
+ lib/mgmt.h                        |  15 ++
+ monitor/packet.c                  |  43 ++++-
+ src/adv_monitor.c                 | 267 +++++++++++++++++++-----------
+ tools/btmgmt.c                    | 160 +++++++++++++++---
+ 8 files changed, 625 insertions(+), 279 deletions(-)
+
+-- 
+2.30.0.296.g2bfb1c46d8-goog
+
