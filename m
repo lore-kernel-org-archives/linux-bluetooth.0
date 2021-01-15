@@ -2,353 +2,329 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C3EC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 17:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C11C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 18:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 843D121D7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 17:44:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0889923A59
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 18:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbhAORoc (ORCPT
+        id S2387566AbhAOSkh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 12:44:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
+        Fri, 15 Jan 2021 13:40:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726309AbhAORoc (ORCPT
+        with ESMTP id S1729075AbhAOSkg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 12:44:32 -0500
-Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2F7C0613C1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 09:43:51 -0800 (PST)
-Received: by mail-ua1-x935.google.com with SMTP id p2so3157773uac.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 09:43:51 -0800 (PST)
+        Fri, 15 Jan 2021 13:40:36 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A43FC061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 10:39:56 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id x13so9461556oto.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 10:39:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=UxoZCfC1SWiNAA5reRQtLNYH8XkIlRxb26unjVUak6o=;
-        b=kmK+HUIdLYzuVGfvyg3UMZdTpO0a5/1QjAEcwjeAXspmOYXQ9VpxaFDn68KhZ0lv5C
-         g++3hy8ikcPD+Sy9yuqU8v1MYJecCms8KnVN8ed1lA1TrVk/c67Jkq2US752yNJYxhxK
-         qV+q57r4FZMj92wf+oCU+BCmG3a6i7/PK7zCU=
+        bh=eE93672g5PMvqo46HDJ1+HDLo6SnVN8+wPd9hGYY3so=;
+        b=bzf/cydckembGQpo46o99+ex7p5aaSGO2wC+9SSFsj3C8Zog0Qefm/mCHyoaLHoZrn
+         Furt1x09A7tWv/To+RdnyBkJ2zLFvAeU+qkgP/Bijdj+bT5rWOzq+gGsST9IEPu4oUw1
+         3gGMFviMlxvG3Ybvt8xlvheoWT6gd4YFoDWv6g255iYrZsAt9YcBeJTjbXLLrh5kMIwA
+         iZ8DaL8ikXNshFYbkbnpiUga468IsoQ+fQTTRWXRtI1niHwEoXIPXxvArcZrr/xQBEea
+         lH2itqoaApoVeQoH6dwbzUtrRLZxkZ6ouYYbieJvVBtgY6sYNQcnm9F+3uGDF/VAGlB+
+         tpng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=UxoZCfC1SWiNAA5reRQtLNYH8XkIlRxb26unjVUak6o=;
-        b=DiQbs6keF9HfGCcc3QJMtNOtWCmHUQG3qFYLDopyGCImQsuTHE4H80Cc5RdfhGSSxt
-         UBHYyF7KGDotVDe0LzrzlLLCoDJT7xxjeIi0RjYwfxf0lTxO3O9E4V8++SZfWBibJLBW
-         cy4gNOBTojrTDGtnEixRCrV4iawJF+4zkz0UNA+MHPvnJZG6/MPmDzScx1FmaVHbg3Ud
-         zi1fta9CBOTf8KXTw27jIC4HOO/329YWenqNgwh6cw3X3l6vQGLqi3anFim5J2LA6iub
-         GPYXMRUjCri+qgV3SijEI/wBdjekdORunk/KuMTAm280TjzS8nUj0Gh0AC8fdZyKr8x1
-         YReA==
-X-Gm-Message-State: AOAM5324HcId9AzR0CwiJ1hPTYKuDLFLKPfDrJrmHDMsevyFVWvVQLPZ
-        onp5XGHz2Gx7fV+Bd7X3QtUBelr9WiSC7yebyvRqGg==
-X-Google-Smtp-Source: ABdhPJxp7l0zTZscpHiiJ4sQ3GDR/IdKQh/JWv75MSj4DvXnGCOJRE5SeN1xr2HxVNCH6HK5ES/EQ5zcYEzgwadTjgk=
-X-Received: by 2002:a9f:21f8:: with SMTP id 111mr10449890uac.115.1610732630680;
- Fri, 15 Jan 2021 09:43:50 -0800 (PST)
+        bh=eE93672g5PMvqo46HDJ1+HDLo6SnVN8+wPd9hGYY3so=;
+        b=BWTwu2bYO62jly0PPN8BOwU2fJ8CncACGyYBJLPPM+jRjUR++964v9s9fWJfAGHw5k
+         mpVy59NtK1y2Nb/h+4K01ch29yJB7nWUWMfvnIWCOIYbyVTDTcQgYmCSXdwgpz4bosGJ
+         gmWZCYkuPY2LxIrih96ZJJBLBbHnTUZ5U1IRamUjGXphpzhG2nCdPQd//DqkjsEs34ly
+         luzZ4uz4sl0p9zd/0RGvYHs2xZwOpBHY0vylUkcgQKNn+pPU+9GcUQc4eGGtevnmvJdX
+         M6rsJecEiIeWcSELBl5QfBP5QiCUCj0V/FVvddZm/cyVfa34DOPxclbHjyXQF3VXmADJ
+         qBNA==
+X-Gm-Message-State: AOAM5309aJQXISLfet9dVDn0zv32C3RoVh1Tkt4qDh4IbThWgTQMR/Hu
+        UhU3WuromipUy8ewj0C54UtXOvdKOdM0uSGEY64=
+X-Google-Smtp-Source: ABdhPJxDAu7YNN9AmXQ5xoDQdx5E3pLJPtnOj1Vt/9Ue2oafpleqbevGJOsYHWKhB2+KTnVKfmnEe+0pOu1CTL4sVC8=
+X-Received: by 2002:a9d:6f17:: with SMTP id n23mr9358296otq.371.1610735995891;
+ Fri, 15 Jan 2021 10:39:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20210113232858.1181251-1-luiz.dentz@gmail.com>
- <CABBYNZLxaHOvQR-TP3-nXFw8UHBSpjcLRbkCrXAkVfSyt7uQSQ@mail.gmail.com>
- <CANFp7mXT=umUbxJ=UgjvYK1XLbGOB2UUEns2e6NpqTMxhf19zg@mail.gmail.com>
- <CABBYNZ+vTRiZ4ayEO=2bn+tqztwnL_L3=o9NPPKs7vQicC6rkg@mail.gmail.com>
- <CABBYNZLcgi8D1qU2jyO5Q_UBN47OfppvLEAU=FMi2qZFNqyKWQ@mail.gmail.com>
- <CANFp7mW1HujD4gH8F0+mySZvGXRox4nFqF+W4-TAC7eSB4WTgQ@mail.gmail.com>
- <CAJQfnxG8RiWDCxEWOwQ_W27mvE=aBPAT8rgQYee395Y+Z1dGhQ@mail.gmail.com>
- <CABBYNZJph-N_s6CZ41duk3_sLWAv0hC+jsUkXyXvRrrzUGL+BQ@mail.gmail.com> <CAJQfnxGgWN6G=NE84KBaVxT1no-j9QuReE6rS6vdP9rZEgZ9Mg@mail.gmail.com>
-In-Reply-To: <CAJQfnxGgWN6G=NE84KBaVxT1no-j9QuReE6rS6vdP9rZEgZ9Mg@mail.gmail.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Fri, 15 Jan 2021 09:43:39 -0800
-Message-ID: <CANFp7mUiZdCwsZfn1TA27fREWLMngELXYQNKercxEa8P6kK2cw@mail.gmail.com>
-Subject: Re: [RESEND 1/2] Bluetooth: btusb: Add support for queuing during
- polling interval
+References: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
+In-Reply-To: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 15 Jan 2021 10:39:45 -0800
+Message-ID: <CABBYNZJbbt_5bF_M_3qs0qKaJnxj-wBWrFg4Vo6ZkNHeJNfxkQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH] gatt: Use the same crypto instance for each device
 To:     Archie Pusaka <apusaka@google.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Alain Michaud <alainmichaud@google.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Archie,
 
-I think only one patch was sent out last time. Looking back through
-patchworks, I only see 1 email in that series:
-https://patchwork.kernel.org/project/bluetooth/list/?series=&submitter=&state=&q=Bluetooth%3A+btusb%3A+Add+support+for+queuing+during+polling+interval&archive=both&delegate=
+On Fri, Jan 15, 2021 at 4:25 AM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> Every time a device is found, BlueZ would need to open 3 socket
+> connections for crypto. On a noisy environment where there is a lot
+> of advertising devices, we could hit the max opened file limit. As
+> a result, connection to the device would fail until the temporary
+> devices are removed due to temporary timer timeouts.
+>
+> This patch store a crypto instance in adapter and reuse the same
+> crypto instance for each device.
 
-Abhishek
+I think we are better off transforming bt_crypto in a singleton.
 
-On Thu, Jan 14, 2021 at 11:05 PM Archie Pusaka <apusaka@google.com> wrote:
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> ---
+> Hi BlueZ maintainers,
 >
-> Hi Luiz,
-> I don't think we have tested the second patch yet.
+> Is there a reason to have more than one crypto instance? If not,
+> we could just have a singleton and a getter get_crypto_instance()
+> which would instantiate a crypto object if it doesn't exist, in lieu
+> of bt_crypto_new().
 >
-> Hi Abhishek,
-> Do you have context on this?
+>  android/gatt.c        |  2 +-
+>  peripheral/gatt.c     |  4 ++--
+>  src/adapter.c         | 12 ++++++++++++
+>  src/adapter.h         |  2 ++
+>  src/device.c          |  2 +-
+>  src/gatt-database.c   |  2 +-
+>  src/shared/gatt-db.c  |  9 +++++++--
+>  src/shared/gatt-db.h  |  4 +++-
+>  tools/btgatt-client.c |  2 +-
+>  tools/btgatt-server.c |  2 +-
+>  unit/test-gatt.c      |  4 ++--
+>  11 files changed, 33 insertions(+), 12 deletions(-)
 >
-> On Thu, 14 Jan 2021 at 11:57, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This makes btusb to queue ACL and events during a polling interval
-> > by using of a delayed work, with the interval working as a time window
-> > where frames received from different endpoints are considered to be
-> > arrived at same time and then attempt to resolve potential conflics by
-> > processing the events ahead of ACL packets.
-> >
-> > It worth noting though that priorizing events over ACL data may result
-> > in inverting the order compared to how they appeared over the air, for
-> > instance there may be packets received before a disconnect event that
-> > will be discarded and unencrypted packets received before encryption
-> > change which would considered encrypted, because of these potential
-> > changes on the order the support for queuing during the polling
-> > interval is not enabled by default so platforms have the following
-> > means to enable it:
-> >
-> > At build-time:
-> >
-> >     CONFIG_BT_HCIBTUSB_INTERVAL=y
-> >
-> > At runtime with use of module option:
-> >
-> >     enable_interval
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> diff --git a/android/gatt.c b/android/gatt.c
+> index a8a0c488b0..d00c4adf2c 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -7234,7 +7234,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+>         app_connections = queue_new();
+>         listen_apps = queue_new();
+>         services_sdp = queue_new();
+> -       gatt_db = gatt_db_new();
+> +       gatt_db = gatt_db_new(NULL);
 >
-> Tested-by: Archie Pusaka <apusaka@chromium.org>
+>         if (!gatt_db) {
+>                 error("gatt: Failed to allocate memory for database");
+> diff --git a/peripheral/gatt.c b/peripheral/gatt.c
+> index ff1354cb48..1991ec7d4b 100644
+> --- a/peripheral/gatt.c
+> +++ b/peripheral/gatt.c
+> @@ -261,7 +261,7 @@ void gatt_server_start(void)
+>                 return;
+>         }
 >
-> > ---
-> >  drivers/bluetooth/Kconfig |  7 ++++
-> >  drivers/bluetooth/btusb.c | 88 ++++++++++++++++++++++++++++++++++-----
-> >  2 files changed, 84 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> > index 4e73a531b377..2f20a853d946 100644
-> > --- a/drivers/bluetooth/Kconfig
-> > +++ b/drivers/bluetooth/Kconfig
-> > @@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
-> >           This can be overridden by passing btusb.enable_autosuspend=[y|n]
-> >           on the kernel commandline.
-> >
-> > +config BT_HCIBTUSB_INTERVAL
-> > +       bool "Enable notification of USB polling interval"
-> > +       depends on BT_HCIBTUSB
-> > +       help
-> > +         Say Y here to enable notification of USB polling interval for
-> > +         Bluetooth USB devices by default.
-> > +
-> >  config BT_HCIBTUSB_BCM
-> >         bool "Broadcom protocol support"
-> >         depends on BT_HCIBTUSB
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index b14102fba601..38cb5448fc69 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -30,7 +30,7 @@
-> >  static bool disable_scofix;
-> >  static bool force_scofix;
-> >  static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
-> > -
-> > +static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
-> >  static bool reset = true;
-> >
-> >  static struct usb_driver btusb_driver;
-> > @@ -519,8 +519,12 @@ struct btusb_data {
-> >
-> >         unsigned long flags;
-> >
-> > -       struct work_struct work;
-> > -       struct work_struct waker;
-> > +       struct work_struct  work;
-> > +       struct work_struct  waker;
-> > +       struct delayed_work rx_work;
-> > +
-> > +       struct sk_buff_head acl_q;
-> > +       struct sk_buff_head evt_q;
-> >
-> >         struct usb_anchor deferred;
-> >         struct usb_anchor tx_anchor;
-> > @@ -557,7 +561,7 @@ struct btusb_data {
-> >         int isoc_altsetting;
-> >         int suspend_count;
-> >
-> > -       int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
-> > +       int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
-> >         int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
-> >
-> >         int (*setup_on_usb)(struct hci_dev *hdev);
-> > @@ -707,7 +711,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
-> >
-> >                 if (!hci_skb_expect(skb)) {
-> >                         /* Complete frame */
-> > -                       data->recv_event(data->hdev, skb);
-> > +                       data->recv_event(data, skb);
-> >                         skb = NULL;
-> >                 }
-> >         }
-> > @@ -718,6 +722,25 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
-> >         return err;
-> >  }
-> >
-> > +static int btusb_rx_queue(struct btusb_data *data, struct sk_buff *skb,
-> > +                         struct sk_buff_head *queue, unsigned int interval)
-> > +{
-> > +       skb_queue_tail(queue, skb);
-> > +
-> > +       schedule_delayed_work(&data->rx_work, interval);
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
-> > +{
-> > +       if (!enable_interval)
-> > +               return hci_recv_frame(data->hdev, skb);
-> > +
-> > +       /* TODO: Calculate polling interval based on endpoint bInterval? */
-> > +       return btusb_rx_queue(data, skb, &data->acl_q, msecs_to_jiffies(1));
-> > +}
-> > +
-> >  static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
-> >  {
-> >         struct sk_buff *skb;
-> > @@ -765,7 +788,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
-> >
-> >                 if (!hci_skb_expect(skb)) {
-> >                         /* Complete frame */
-> > -                       hci_recv_frame(data->hdev, skb);
-> > +                       btusb_recv_acl(data, skb);
-> >                         skb = NULL;
-> >                 }
-> >         }
-> > @@ -1383,9 +1406,13 @@ static int btusb_close(struct hci_dev *hdev)
-> >
-> >         BT_DBG("%s", hdev->name);
-> >
-> > +       cancel_delayed_work(&data->rx_work);
-> >         cancel_work_sync(&data->work);
-> >         cancel_work_sync(&data->waker);
-> >
-> > +       skb_queue_purge(&data->acl_q);
-> > +       skb_queue_purge(&data->evt_q);
-> > +
-> >         clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> >         clear_bit(BTUSB_BULK_RUNNING, &data->flags);
-> >         clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-> > @@ -1417,6 +1444,11 @@ static int btusb_flush(struct hci_dev *hdev)
-> >
-> >         BT_DBG("%s", hdev->name);
-> >
-> > +       cancel_delayed_work(&data->rx_work);
-> > +
-> > +       skb_queue_purge(&data->acl_q);
-> > +       skb_queue_purge(&data->evt_q);
-> > +
-> >         usb_kill_anchored_urbs(&data->tx_anchor);
-> >         btusb_free_frags(data);
-> >
-> > @@ -1769,6 +1801,25 @@ static void btusb_waker(struct work_struct *work)
-> >         usb_autopm_put_interface(data->intf);
-> >  }
-> >
-> > +static void btusb_rx_dequeue(struct btusb_data *data,
-> > +                            struct sk_buff_head *queue)
-> > +{
-> > +       struct sk_buff *skb;
-> > +
-> > +       while ((skb = skb_dequeue(queue)))
-> > +               hci_recv_frame(data->hdev, skb);
-> > +}
-> > +
-> > +static void btusb_rx_work(struct work_struct *work)
-> > +{
-> > +       struct btusb_data *data = container_of(work, struct btusb_data,
-> > +                                              rx_work.work);
-> > +
-> > +       /* Process HCI event packets so states changes are synchronized first */
-> > +       btusb_rx_dequeue(data, &data->evt_q);
-> > +       btusb_rx_dequeue(data, &data->acl_q);
-> > +}
-> > +
-> >  static int btusb_setup_bcm92035(struct hci_dev *hdev)
-> >  {
-> >         struct sk_buff *skb;
-> > @@ -2304,10 +2355,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
-> >                 wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
-> >  }
-> >
-> > -static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-> > +static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
-> >  {
-> > -       struct btusb_data *data = hci_get_drvdata(hdev);
-> > -
-> >         if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
-> >                 struct hci_event_hdr *hdr = (void *)skb->data;
-> >
-> > @@ -2336,7 +2385,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-> >                 }
-> >         }
-> >
-> > -       return hci_recv_frame(hdev, skb);
-> > +       return hci_recv_frame(data->hdev, skb);
-> >  }
-> >
-> >  static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
-> > @@ -4279,6 +4328,15 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
-> >         return 0;
-> >  }
-> >
-> > +static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
-> > +{
-> > +       if (!enable_interval)
-> > +               return hci_recv_frame(data->hdev, skb);
-> > +
-> > +       /* Don't delay event processing */
-> > +       return btusb_rx_queue(data, skb, &data->evt_q, 0);
-> > +}
-> > +
-> >  static int btusb_probe(struct usb_interface *intf,
-> >                        const struct usb_device_id *id)
-> >  {
-> > @@ -4362,6 +4420,11 @@ static int btusb_probe(struct usb_interface *intf,
-> >
-> >         INIT_WORK(&data->work, btusb_work);
-> >         INIT_WORK(&data->waker, btusb_waker);
-> > +       INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
-> > +
-> > +       skb_queue_head_init(&data->acl_q);
-> > +       skb_queue_head_init(&data->evt_q);
-> > +
-> >         init_usb_anchor(&data->deferred);
-> >         init_usb_anchor(&data->tx_anchor);
-> >         spin_lock_init(&data->txlock);
-> > @@ -4378,7 +4441,7 @@ static int btusb_probe(struct usb_interface *intf,
-> >                 data->recv_bulk = btusb_recv_bulk_intel;
-> >                 set_bit(BTUSB_BOOTLOADER, &data->flags);
-> >         } else {
-> > -               data->recv_event = hci_recv_frame;
-> > +               data->recv_event = btusb_recv_evt;
-> >                 data->recv_bulk = btusb_recv_bulk;
-> >         }
-> >
-> > @@ -4867,6 +4930,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
-> >  module_param(enable_autosuspend, bool, 0644);
-> >  MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
-> >
-> > +module_param(enable_interval, bool, 0644);
-> > +MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
-> > +
-> >  module_param(reset, bool, 0644);
-> >  MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
-> >
-> > --
-> > 2.26.2
-> >
+> -       gatt_db = gatt_db_new();
+> +       gatt_db = gatt_db_new(NULL);
+>         if (!gatt_db) {
+>                 close(att_fd);
+>                 att_fd = -1;
+> @@ -271,7 +271,7 @@ void gatt_server_start(void)
+>         populate_gap_service(gatt_db);
+>         populate_devinfo_service(gatt_db);
 >
-> Thanks,
-> Archie
+> -       gatt_cache = gatt_db_new();
+> +       gatt_cache = gatt_db_new(NULL);
+>
+>         conn_list = queue_new();
+>         if (!conn_list) {
+> diff --git a/src/adapter.c b/src/adapter.c
+> index c1f976323e..794fe1045d 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -46,6 +46,7 @@
+>  #include "src/shared/queue.h"
+>  #include "src/shared/att.h"
+>  #include "src/shared/gatt-db.h"
+> +#include "src/shared/crypto.h"
+>
+>  #include "btio/btio.h"
+>  #include "btd.h"
+> @@ -281,6 +282,8 @@ struct btd_adapter {
+>         bool is_default;                /* true if adapter is default one */
+>
+>         bool le_simult_roles_supported;
+> +
+> +       struct bt_crypto *crypto;
+>  };
+>
+>  typedef enum {
+> @@ -5376,6 +5379,8 @@ static void adapter_free(gpointer user_data)
+>
+>         g_slist_free(adapter->connections);
+>
+> +       bt_crypto_unref(adapter->crypto);
+> +
+>         g_free(adapter->path);
+>         g_free(adapter->name);
+>         g_free(adapter->short_name);
+> @@ -6321,6 +6326,8 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
+>
+>         adapter->auths = g_queue_new();
+>
+> +       adapter->crypto = bt_crypto_new();
+> +
+>         return btd_adapter_ref(adapter);
+>  }
+>
+> @@ -9917,3 +9924,8 @@ bool btd_has_kernel_features(uint32_t features)
+>  {
+>         return (kernel_features & features) ? true : false;
+>  }
+> +
+> +struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter)
+> +{
+> +       return adapter->crypto;
+> +}
+> diff --git a/src/adapter.h b/src/adapter.h
+> index 60b5e3bcca..2c7f06493a 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -240,3 +240,5 @@ enum kernel_features {
+>  };
+>
+>  bool btd_has_kernel_features(uint32_t feature);
+> +
+> +struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter);
+> diff --git a/src/device.c b/src/device.c
+> index af13badfc8..0cf7423cce 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4047,7 +4047,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+>
+>         device->tx_power = 127;
+>
+> -       device->db = gatt_db_new();
+> +       device->db = gatt_db_new(btd_adapter_get_crypto(adapter));
+>         if (!device->db) {
+>                 g_free(device);
+>                 return NULL;
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index d99604826e..2024fdd5d2 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -3623,7 +3623,7 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
+>
+>         database = new0(struct btd_gatt_database, 1);
+>         database->adapter = btd_adapter_ref(adapter);
+> -       database->db = gatt_db_new();
+> +       database->db = gatt_db_new(btd_adapter_get_crypto(adapter));
+>         database->records = queue_new();
+>         database->device_states = queue_new();
+>         database->apps = queue_new();
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 8bff4d37aa..d616c17e47 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -235,12 +235,17 @@ struct gatt_db *gatt_db_ref(struct gatt_db *db)
+>         return db;
+>  }
+>
+> -struct gatt_db *gatt_db_new(void)
+> +struct gatt_db *gatt_db_new(struct bt_crypto *crypto)
+>  {
+>         struct gatt_db *db;
+>
+>         db = new0(struct gatt_db, 1);
+> -       db->crypto = bt_crypto_new();
+> +
+> +       if (crypto)
+> +               db->crypto = bt_crypto_ref(crypto);
+> +       else
+> +               db->crypto = bt_crypto_new();
+> +
+>         db->services = queue_new();
+>         db->notify_list = queue_new();
+>         db->next_handle = 0x0001;
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 321a2aba61..1dac1af4fe 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -8,10 +8,12 @@
+>   *
+>   */
+>
+> +#include "src/shared/crypto.h"
+> +
+>  struct gatt_db;
+>  struct gatt_db_attribute;
+>
+> -struct gatt_db *gatt_db_new(void);
+> +struct gatt_db *gatt_db_new(struct bt_crypto *crypto);
+>
+>  struct gatt_db *gatt_db_ref(struct gatt_db *db);
+>  void gatt_db_unref(struct gatt_db *db);
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+> index 8c9365aa2c..945e24d6f8 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -197,7 +197,7 @@ static struct client *client_create(int fd, uint16_t mtu)
+>         }
+>
+>         cli->fd = fd;
+> -       cli->db = gatt_db_new();
+> +       cli->db = gatt_db_new(NULL);
+>         if (!cli->db) {
+>                 fprintf(stderr, "Failed to create GATT database\n");
+>                 bt_att_unref(cli->att);
+> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+> index 000145a3db..50004acee5 100644
+> --- a/tools/btgatt-server.c
+> +++ b/tools/btgatt-server.c
+> @@ -569,7 +569,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+>         server->device_name[name_len] = '\0';
+>
+>         server->fd = fd;
+> -       server->db = gatt_db_new();
+> +       server->db = gatt_db_new(NULL);
+>         if (!server->db) {
+>                 fprintf(stderr, "Failed to create GATT database\n");
+>                 goto fail;
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 4aa87d09c4..1916ace6c7 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -674,7 +674,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>                                                 "bt_gatt_server:", NULL);
+>                 break;
+>         case CLIENT:
+> -               context->client_db = gatt_db_new();
+> +               context->client_db = gatt_db_new(NULL);
+>                 g_assert(context->client_db);
+>
+>                 context->client = bt_gatt_client_new(context->client_db,
+> @@ -1363,7 +1363,7 @@ struct att_handle_spec {
+>
+>  static struct gatt_db *make_db(const struct att_handle_spec *spec)
+>  {
+> -       struct gatt_db *db = gatt_db_new();
+> +       struct gatt_db *db = gatt_db_new(NULL);
+>         struct gatt_db_attribute *att, *include_att;
+>         bt_uuid_t uuid;
+>
+> --
+> 2.30.0.296.g2bfb1c46d8-goog
+>
+
+
+-- 
+Luiz Augusto von Dentz
