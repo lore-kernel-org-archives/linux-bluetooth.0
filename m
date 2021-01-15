@@ -2,329 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C11C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 18:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A23C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:03:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0889923A59
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 18:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F7F123A5E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 19:03:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387566AbhAOSkh (ORCPT
+        id S1728163AbhAOTDM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 13:40:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33920 "EHLO
+        Fri, 15 Jan 2021 14:03:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729075AbhAOSkg (ORCPT
+        with ESMTP id S1726809AbhAOTDM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 13:40:36 -0500
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A43FC061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 10:39:56 -0800 (PST)
-Received: by mail-ot1-x32a.google.com with SMTP id x13so9461556oto.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 10:39:56 -0800 (PST)
+        Fri, 15 Jan 2021 14:03:12 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06639C061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:02:32 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id m5so5731085pjv.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 11:02:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eE93672g5PMvqo46HDJ1+HDLo6SnVN8+wPd9hGYY3so=;
-        b=bzf/cydckembGQpo46o99+ex7p5aaSGO2wC+9SSFsj3C8Zog0Qefm/mCHyoaLHoZrn
-         Furt1x09A7tWv/To+RdnyBkJ2zLFvAeU+qkgP/Bijdj+bT5rWOzq+gGsST9IEPu4oUw1
-         3gGMFviMlxvG3Ybvt8xlvheoWT6gd4YFoDWv6g255iYrZsAt9YcBeJTjbXLLrh5kMIwA
-         iZ8DaL8ikXNshFYbkbnpiUga468IsoQ+fQTTRWXRtI1niHwEoXIPXxvArcZrr/xQBEea
-         lH2itqoaApoVeQoH6dwbzUtrRLZxkZ6ouYYbieJvVBtgY6sYNQcnm9F+3uGDF/VAGlB+
-         tpng==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jjvBFssmeont608t6ctJ3wMgKudazNhucp1oQMK34ds=;
+        b=rJZEGhoDSb32xKDMfGOULCNV/964hg5jHJMMy7wJlKG735mLPhZC9A7ryaXXDRqtFD
+         NkqmAgvzG7wblhOSXmreR7RIJ68BfS91hFHCwhgbWdHzPtCbeF4FvemmbCK3ta7p3TBp
+         Fw0WvvBco6KKLUHLv8nhWAJW3fk/WtuvhR6CjF74c4CJGDD8+8f0lCTJjV9Ee8ebWBYO
+         2myifnkRbLnw6upaspOze/byJpSdri0k6S6re5tf4INFa5Na4loxEV2qxK5edxCZKom2
+         +ZbZ+ukZlkYG73gQhYiVamg77YYCthwBg3ZDqzxPEzRVHyxgPIHvPI8xd9+/wmrmYS8s
+         wJCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eE93672g5PMvqo46HDJ1+HDLo6SnVN8+wPd9hGYY3so=;
-        b=BWTwu2bYO62jly0PPN8BOwU2fJ8CncACGyYBJLPPM+jRjUR++964v9s9fWJfAGHw5k
-         mpVy59NtK1y2Nb/h+4K01ch29yJB7nWUWMfvnIWCOIYbyVTDTcQgYmCSXdwgpz4bosGJ
-         gmWZCYkuPY2LxIrih96ZJJBLBbHnTUZ5U1IRamUjGXphpzhG2nCdPQd//DqkjsEs34ly
-         luzZ4uz4sl0p9zd/0RGvYHs2xZwOpBHY0vylUkcgQKNn+pPU+9GcUQc4eGGtevnmvJdX
-         M6rsJecEiIeWcSELBl5QfBP5QiCUCj0V/FVvddZm/cyVfa34DOPxclbHjyXQF3VXmADJ
-         qBNA==
-X-Gm-Message-State: AOAM5309aJQXISLfet9dVDn0zv32C3RoVh1Tkt4qDh4IbThWgTQMR/Hu
-        UhU3WuromipUy8ewj0C54UtXOvdKOdM0uSGEY64=
-X-Google-Smtp-Source: ABdhPJxDAu7YNN9AmXQ5xoDQdx5E3pLJPtnOj1Vt/9Ue2oafpleqbevGJOsYHWKhB2+KTnVKfmnEe+0pOu1CTL4sVC8=
-X-Received: by 2002:a9d:6f17:: with SMTP id n23mr9358296otq.371.1610735995891;
- Fri, 15 Jan 2021 10:39:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
-In-Reply-To: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jjvBFssmeont608t6ctJ3wMgKudazNhucp1oQMK34ds=;
+        b=qA0rUHj9un/bKu+9xPaEQrC+wjtHjs18wltAkSj0uKoz3YQXSUPIPegZeKAOe+iQme
+         SV00Cdg4DbMO28iVAo7nv9XGLyl/ZI8bNs2R9P5lHBxvLYl6j/XVXUVwzRh+1rmvhJco
+         bhBtIlGVd4hQ6Ln8ggJbnVKiihjuUUCS0daZ3gqmGOvySPzPUM4ciP+THlNoA9jcpZZg
+         U6XjshaCrfX5YZfJ8GZN0XyvAgIwBcGwqMb4JzYeW5Bb+R3vujaT6yRH7pkMYH5SXhll
+         HUd1WY0OsfPLtADeKkiSFm1eFxwHk+WbTiQpVDZpJPiX1AekPIMgRI7VzzPcmuaIkgCu
+         zIrA==
+X-Gm-Message-State: AOAM53280Ll4fEELLHJaS8sz9axbD1MqIKKjBJoE20S8DQn9Ruvtq9kz
+        OiVOONAh7D0qKxLlFmTobepfICtR6QY=
+X-Google-Smtp-Source: ABdhPJwLmXjiIG8B1L3sNwPTgKKGc6nurO0zI8XE+uS+AOjiRcupx9SjyIRWcvip8kh3NWSLs/3zLw==
+X-Received: by 2002:a17:902:8bc8:b029:dc:36d4:fba8 with SMTP id r8-20020a1709028bc8b02900dc36d4fba8mr13890072plo.82.1610737351297;
+        Fri, 15 Jan 2021 11:02:31 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id l3sm5008491pjz.27.2021.01.15.11.02.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jan 2021 11:02:30 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 15 Jan 2021 10:39:45 -0800
-Message-ID: <CABBYNZJbbt_5bF_M_3qs0qKaJnxj-wBWrFg4Vo6ZkNHeJNfxkQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH] gatt: Use the same crypto instance for each device
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/crypto: Transform bt_cryto in a singleton
+Date:   Fri, 15 Jan 2021 11:02:29 -0800
+Message-Id: <20210115190229.186479-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jan 15, 2021 at 4:25 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> Every time a device is found, BlueZ would need to open 3 socket
-> connections for crypto. On a noisy environment where there is a lot
-> of advertising devices, we could hit the max opened file limit. As
-> a result, connection to the device would fail until the temporary
-> devices are removed due to temporary timer timeouts.
->
-> This patch store a crypto instance in adapter and reuse the same
-> crypto instance for each device.
+This makes bt_crypto always return the same instance thus avoiding the
+problem of having multiple PF sockets opened which may hit the file
+descriptor limit.
+---
+ src/shared/crypto.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
-I think we are better off transforming bt_crypto in a singleton.
-
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> ---
-> Hi BlueZ maintainers,
->
-> Is there a reason to have more than one crypto instance? If not,
-> we could just have a singleton and a getter get_crypto_instance()
-> which would instantiate a crypto object if it doesn't exist, in lieu
-> of bt_crypto_new().
->
->  android/gatt.c        |  2 +-
->  peripheral/gatt.c     |  4 ++--
->  src/adapter.c         | 12 ++++++++++++
->  src/adapter.h         |  2 ++
->  src/device.c          |  2 +-
->  src/gatt-database.c   |  2 +-
->  src/shared/gatt-db.c  |  9 +++++++--
->  src/shared/gatt-db.h  |  4 +++-
->  tools/btgatt-client.c |  2 +-
->  tools/btgatt-server.c |  2 +-
->  unit/test-gatt.c      |  4 ++--
->  11 files changed, 33 insertions(+), 12 deletions(-)
->
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a8a0c488b0..d00c4adf2c 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -7234,7 +7234,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
->         app_connections = queue_new();
->         listen_apps = queue_new();
->         services_sdp = queue_new();
-> -       gatt_db = gatt_db_new();
-> +       gatt_db = gatt_db_new(NULL);
->
->         if (!gatt_db) {
->                 error("gatt: Failed to allocate memory for database");
-> diff --git a/peripheral/gatt.c b/peripheral/gatt.c
-> index ff1354cb48..1991ec7d4b 100644
-> --- a/peripheral/gatt.c
-> +++ b/peripheral/gatt.c
-> @@ -261,7 +261,7 @@ void gatt_server_start(void)
->                 return;
->         }
->
-> -       gatt_db = gatt_db_new();
-> +       gatt_db = gatt_db_new(NULL);
->         if (!gatt_db) {
->                 close(att_fd);
->                 att_fd = -1;
-> @@ -271,7 +271,7 @@ void gatt_server_start(void)
->         populate_gap_service(gatt_db);
->         populate_devinfo_service(gatt_db);
->
-> -       gatt_cache = gatt_db_new();
-> +       gatt_cache = gatt_db_new(NULL);
->
->         conn_list = queue_new();
->         if (!conn_list) {
-> diff --git a/src/adapter.c b/src/adapter.c
-> index c1f976323e..794fe1045d 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -46,6 +46,7 @@
->  #include "src/shared/queue.h"
->  #include "src/shared/att.h"
->  #include "src/shared/gatt-db.h"
-> +#include "src/shared/crypto.h"
->
->  #include "btio/btio.h"
->  #include "btd.h"
-> @@ -281,6 +282,8 @@ struct btd_adapter {
->         bool is_default;                /* true if adapter is default one */
->
->         bool le_simult_roles_supported;
-> +
-> +       struct bt_crypto *crypto;
->  };
->
->  typedef enum {
-> @@ -5376,6 +5379,8 @@ static void adapter_free(gpointer user_data)
->
->         g_slist_free(adapter->connections);
->
-> +       bt_crypto_unref(adapter->crypto);
-> +
->         g_free(adapter->path);
->         g_free(adapter->name);
->         g_free(adapter->short_name);
-> @@ -6321,6 +6326,8 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
->
->         adapter->auths = g_queue_new();
->
-> +       adapter->crypto = bt_crypto_new();
-> +
->         return btd_adapter_ref(adapter);
->  }
->
-> @@ -9917,3 +9924,8 @@ bool btd_has_kernel_features(uint32_t features)
->  {
->         return (kernel_features & features) ? true : false;
->  }
-> +
-> +struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter)
-> +{
-> +       return adapter->crypto;
-> +}
-> diff --git a/src/adapter.h b/src/adapter.h
-> index 60b5e3bcca..2c7f06493a 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -240,3 +240,5 @@ enum kernel_features {
->  };
->
->  bool btd_has_kernel_features(uint32_t feature);
-> +
-> +struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter);
-> diff --git a/src/device.c b/src/device.c
-> index af13badfc8..0cf7423cce 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4047,7 +4047,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
->
->         device->tx_power = 127;
->
-> -       device->db = gatt_db_new();
-> +       device->db = gatt_db_new(btd_adapter_get_crypto(adapter));
->         if (!device->db) {
->                 g_free(device);
->                 return NULL;
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index d99604826e..2024fdd5d2 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -3623,7 +3623,7 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
->
->         database = new0(struct btd_gatt_database, 1);
->         database->adapter = btd_adapter_ref(adapter);
-> -       database->db = gatt_db_new();
-> +       database->db = gatt_db_new(btd_adapter_get_crypto(adapter));
->         database->records = queue_new();
->         database->device_states = queue_new();
->         database->apps = queue_new();
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 8bff4d37aa..d616c17e47 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -235,12 +235,17 @@ struct gatt_db *gatt_db_ref(struct gatt_db *db)
->         return db;
->  }
->
-> -struct gatt_db *gatt_db_new(void)
-> +struct gatt_db *gatt_db_new(struct bt_crypto *crypto)
->  {
->         struct gatt_db *db;
->
->         db = new0(struct gatt_db, 1);
-> -       db->crypto = bt_crypto_new();
-> +
-> +       if (crypto)
-> +               db->crypto = bt_crypto_ref(crypto);
-> +       else
-> +               db->crypto = bt_crypto_new();
-> +
->         db->services = queue_new();
->         db->notify_list = queue_new();
->         db->next_handle = 0x0001;
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index 321a2aba61..1dac1af4fe 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -8,10 +8,12 @@
->   *
->   */
->
-> +#include "src/shared/crypto.h"
-> +
->  struct gatt_db;
->  struct gatt_db_attribute;
->
-> -struct gatt_db *gatt_db_new(void);
-> +struct gatt_db *gatt_db_new(struct bt_crypto *crypto);
->
->  struct gatt_db *gatt_db_ref(struct gatt_db *db);
->  void gatt_db_unref(struct gatt_db *db);
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-> index 8c9365aa2c..945e24d6f8 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -197,7 +197,7 @@ static struct client *client_create(int fd, uint16_t mtu)
->         }
->
->         cli->fd = fd;
-> -       cli->db = gatt_db_new();
-> +       cli->db = gatt_db_new(NULL);
->         if (!cli->db) {
->                 fprintf(stderr, "Failed to create GATT database\n");
->                 bt_att_unref(cli->att);
-> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-> index 000145a3db..50004acee5 100644
-> --- a/tools/btgatt-server.c
-> +++ b/tools/btgatt-server.c
-> @@ -569,7 +569,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
->         server->device_name[name_len] = '\0';
->
->         server->fd = fd;
-> -       server->db = gatt_db_new();
-> +       server->db = gatt_db_new(NULL);
->         if (!server->db) {
->                 fprintf(stderr, "Failed to create GATT database\n");
->                 goto fail;
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 4aa87d09c4..1916ace6c7 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -674,7 +674,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->                                                 "bt_gatt_server:", NULL);
->                 break;
->         case CLIENT:
-> -               context->client_db = gatt_db_new();
-> +               context->client_db = gatt_db_new(NULL);
->                 g_assert(context->client_db);
->
->                 context->client = bt_gatt_client_new(context->client_db,
-> @@ -1363,7 +1363,7 @@ struct att_handle_spec {
->
->  static struct gatt_db *make_db(const struct att_handle_spec *spec)
->  {
-> -       struct gatt_db *db = gatt_db_new();
-> +       struct gatt_db *db = gatt_db_new(NULL);
->         struct gatt_db_attribute *att, *include_att;
->         bt_uuid_t uuid;
->
-> --
-> 2.30.0.296.g2bfb1c46d8-goog
->
-
-
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index 6d14903e4..d5efa416d 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -126,34 +126,40 @@ static int cmac_aes_setup(void)
+ 	return fd;
+ }
+ 
++static struct bt_crypto *singleton;
++
+ struct bt_crypto *bt_crypto_new(void)
+ {
+-	struct bt_crypto *crypto;
++	if (singleton)
++		return bt_crypto_ref(singleton);
+ 
+-	crypto = new0(struct bt_crypto, 1);
++	singleton = new0(struct bt_crypto, 1);
+ 
+-	crypto->ecb_aes = ecb_aes_setup();
+-	if (crypto->ecb_aes < 0) {
+-		free(crypto);
++	singleton->ecb_aes = ecb_aes_setup();
++	if (singleton->ecb_aes < 0) {
++		free(singleton);
++		singleton = NULL;
+ 		return NULL;
+ 	}
+ 
+-	crypto->urandom = urandom_setup();
+-	if (crypto->urandom < 0) {
+-		close(crypto->ecb_aes);
+-		free(crypto);
++	singleton->urandom = urandom_setup();
++	if (singleton->urandom < 0) {
++		close(singleton->ecb_aes);
++		free(singleton);
++		singleton = NULL;
+ 		return NULL;
+ 	}
+ 
+-	crypto->cmac_aes = cmac_aes_setup();
+-	if (crypto->cmac_aes < 0) {
+-		close(crypto->urandom);
+-		close(crypto->ecb_aes);
+-		free(crypto);
++	singleton->cmac_aes = cmac_aes_setup();
++	if (singleton->cmac_aes < 0) {
++		close(singleton->urandom);
++		close(singleton->ecb_aes);
++		free(singleton);
++		singleton = NULL;
+ 		return NULL;
+ 	}
+ 
+-	return bt_crypto_ref(crypto);
++	return bt_crypto_ref(singleton);
+ }
+ 
+ struct bt_crypto *bt_crypto_ref(struct bt_crypto *crypto)
+@@ -179,6 +185,7 @@ void bt_crypto_unref(struct bt_crypto *crypto)
+ 	close(crypto->cmac_aes);
+ 
+ 	free(crypto);
++	singleton = NULL;
+ }
+ 
+ bool bt_crypto_random_bytes(struct bt_crypto *crypto,
 -- 
-Luiz Augusto von Dentz
+2.26.2
+
