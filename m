@@ -2,321 +2,246 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C856CC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 12:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF56C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 13:38:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 927912371F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 12:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E7722336F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Jan 2021 13:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727700AbhAOM0X (ORCPT
+        id S1729011AbhAONiP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Jan 2021 07:26:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37478 "EHLO
+        Fri, 15 Jan 2021 08:38:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728631AbhAOM0W (ORCPT
+        with ESMTP id S1728292AbhAONiP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Jan 2021 07:26:22 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F6CC06179B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 04:25:19 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id n76so5409079ybg.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 04:25:19 -0800 (PST)
+        Fri, 15 Jan 2021 08:38:15 -0500
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9551C061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 05:37:34 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id 143so11557445qke.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Jan 2021 05:37:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=TM0u4SZ4j8qIp62RWv0SArv9vIibP2vMp20ShGDIKi8=;
-        b=bTEYsL7hYW4mNzN1L7wu5RDxKz57l66JOnglas/RVXmZNEq31iql2FfYkNKAlQhoNT
-         W0RSDr1jtLyLgq6olu9w88advYiNcDzNiUOyA10lW946LolhUi/7DM019DvKj5ibhkpg
-         0j/nkXb34OtoIHMKU8o+h+tqL9fOspjol9n4L2M589iXyuPD5I/tV572/b6RL4JpCMPR
-         NTHYaKWy+ypdqZ6fH3INraHmb6/AdAq+4koX6dN7OKupztNRj+qp+FUGwb4f+5iqXAtz
-         IBo632SjmQuRZLA7ZK7HzIoAsmXerVw7jn4mKEC6Of7qVUb7cjkEZWPA2UTvu7pAO2AP
-         NFOw==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=TBlBdQJ86JPc/guKjRV9q8O9d76RgBF0bTjIfHLiVec=;
+        b=CsFO4Q7AArKgjg0QiejrAczb95aX/78s99iBVIbl5KMgzK/3ypuXO1UY+r8nRezQCW
+         djVGBnnHIxpU2BnUjF9gynhWwj3UqYA8MElqeI/PrDGhCmUYakJsJ2jiTnXezT4XcjH/
+         wYHLQ+OzR3MSOTiniAfvnO8NNqic6w0I5yBJwgE66HSysz4hTx+9E9QcJCSBYW7Yopv0
+         8tZZeekXpGSGVmewt3RVBWjMTPsxahhBCkyPVtjRFblXgldqdqXZiBTd04l62GWT4rQs
+         vD4SUtMdGAHDN8HrBmtYRlkF4/XWk9+uXR5gPqk8oFTIsftsj6ADREf3Rqpi9LOo0MgX
+         BfLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=TM0u4SZ4j8qIp62RWv0SArv9vIibP2vMp20ShGDIKi8=;
-        b=XnbV0+qs7rbG+TIDvVbuMVuECfpikW/IbAxnXZnGU2eQ4XKCrUHwgQT/s7tAuDunxN
-         UhntoYAPsiUXB9Ey7BKDiDPB5lGjk/xKnzBj+K/k1A7OaidSo6RFU73uDP9zys6TY+wB
-         OSNoOCudmYWARd+EXDA3hxsoI7gR7vCpJqeFR/jWA5qtFDhpeJsDNl9OHi1Y2/DRTaFF
-         ejk9y9biUA0vfaFgQbRmBRI0cH7qzZ/+MZklQ0gWK+DEJUfLnCf6FTD0ZtsdiD5a+Ay3
-         2Pl5DNtyR3AKuc601WIw/b4G5iYvqwHvD6/D0zTCNWk3z8t+HX5/GAJVLWS0ExR39XEs
-         de+w==
-X-Gm-Message-State: AOAM531Fd1PHqknmoH1wqsLegypbiGgSwdQcUyzWHMQPCGLCwBfmtIbw
-        YnSE0lspRYMZRw0fqN/SJZlR4WlW5MRtbIXqppuZWn2tJuJtjMW9nDGsSclp266fxk0ljj7tH+V
-        SbM6PR3BOi818jErglVJOUXzYHOxQnIXYIKX4G4454UL72CVZWhvo7Vgi4LyZGYZxNWX4JxCpF4
-        Ld
-X-Google-Smtp-Source: ABdhPJwaxG1X3YpyLwORv0QSVW1PQMbONofVww3ik1Gw0qdhdwwGabJTLIJ/BWt/gA2I1iCVJR/8UoYA3XdJ
-Sender: "apusaka via sendgmr" <apusaka@apusaka-p920.tpe.corp.google.com>
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f693:9fff:fef4:2347])
- (user=apusaka job=sendgmr) by 2002:a25:4905:: with SMTP id
- w5mr18239436yba.498.1610713518870; Fri, 15 Jan 2021 04:25:18 -0800 (PST)
-Date:   Fri, 15 Jan 2021 20:25:13 +0800
-Message-Id: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.296.g2bfb1c46d8-goog
-Subject: [Bluez PATCH] gatt: Use the same crypto instance for each device
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=TBlBdQJ86JPc/guKjRV9q8O9d76RgBF0bTjIfHLiVec=;
+        b=F04nOb0WbBMrqpV4iDwV/SDliXi1uv95YLjJ8SHf1VE8wAC2s5+uero9aP2oLLNzQO
+         G4vOFLIKj1ETrp0CHUy56GCUEXcUH4cR1wHNlCggFmKsB1211eYxXcw+nNSC71XHHimI
+         oQj5YOc6q8e+0CwXYbiGXiHTFwKdqVyva0Ry8fWY4QWmLVOfMWKRKHwR2UPH5srjnqqA
+         k275zbW2fehP9M7meoYv2JwpP1UpmJFiMb85FUjpDa5gvSDlCROHjQcvH6X/+CDWKlkf
+         M7AS/sbH676q6y1P11uDgsJjoBd4FKTKhD5bf/teZFMHgGTeCC9AwrvLHUUBK7ihSolI
+         t0NA==
+X-Gm-Message-State: AOAM532inppuI0Ju5xXzZn7nDa5eeal0xSW0WLf2i83WKhq7Gd6lnldw
+        44Y1kx9++2at/jDtPdWhYcz1iDuGUVs=
+X-Google-Smtp-Source: ABdhPJyjuE1FFeWXpO0UIjn/HjIMgEGTqCqPNX0K6wtcAaTMCsf3OAgbQWmbPk4zKcLdXzSQBfCHMg==
+X-Received: by 2002:a37:52c1:: with SMTP id g184mr12315940qkb.364.1610717853881;
+        Fri, 15 Jan 2021 05:37:33 -0800 (PST)
+Received: from [172.17.0.2] ([40.123.45.137])
+        by smtp.gmail.com with ESMTPSA id a16sm4415220qta.69.2021.01.15.05.37.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jan 2021 05:37:33 -0800 (PST)
+Message-ID: <60019a9d.1c69fb81.9fa78.c8eb@mx.google.com>
+Date:   Fri, 15 Jan 2021 05:37:33 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3963502624742989879=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [Bluez] gatt: Use the same crypto instance for each device
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
+References: <20210115202432.Bluez.1.I608cbc9e4ad3ffb910de766da79c0f418ab1ba35@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============3963502624742989879==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Every time a device is found, BlueZ would need to open 3 socket
-connections for crypto. On a noisy environment where there is a lot
-of advertising devices, we could hit the max opened file limit. As
-a result, connection to the device would fail until the temporary
-devices are removed due to temporary timer timeouts.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDE1NDA3CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+UGF0Y2ggLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tH
+aXRMaW50IC0gUEFTUwoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+QnVpbGQgLSBGQUlMCk91dHB1dDoKSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0
+dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6MTc6MTk6IGVycm9yOiByZWR1bmRhbnQg
+cmVkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fbmV34oCZIFstV2Vycm9yPXJlZHVuZGFudC1k
+ZWNsc10KICAgMTcgfCBzdHJ1Y3QgYnRfY3J5cHRvICpidF9jcnlwdG9fbmV3KHZvaWQpOwogICAg
+ICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
+IC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAgICAgICAgICAgZnJvbSBzcmMvc2hh
+cmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjE3OjE5OiBub3RlOiBwcmV2
+aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fbmV34oCZIHdhcyBoZXJlCiAgIDE3IHwg
+c3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX25ldyh2b2lkKTsKICAgICAgfCAgICAgICAgICAg
+ICAgICAgICBefn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dh
+dHQtZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjE5OjE5OiBlcnJvcjogcmVkdW5kYW50
+IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3JlZuKAmSBbLVdlcnJvcj1yZWR1bmRhbnQt
+ZGVjbHNdCiAgIDE5IHwgc3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX3JlZihzdHJ1Y3QgYnRf
+Y3J5cHRvICpjcnlwdG8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4K
+SW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAg
+ICAgICAgICAgZnJvbSBzcmMvc2hhcmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0
+by5oOjE5OjE5OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fcmVm
+4oCZIHdhcyBoZXJlCiAgIDE5IHwgc3RydWN0IGJ0X2NyeXB0byAqYnRfY3J5cHRvX3JlZihzdHJ1
+Y3QgYnRfY3J5cHRvICpjcnlwdG8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+
+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3Ny
+Yy9zaGFyZWQvY3J5cHRvLmg6MjA6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9m
+IOKAmGJ0X2NyeXB0b191bnJlZuKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDIwIHwg
+dm9pZCBidF9jcnlwdG9fdW5yZWYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvKTsKICAgICAgfCAg
+ICAgIF5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dh
+dHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0
+OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6MjA6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24g
+b2Yg4oCYYnRfY3J5cHRvX3VucmVm4oCZIHdhcyBoZXJlCiAgIDIwIHwgdm9pZCBidF9jcnlwdG9f
+dW5yZWYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvKTsKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+
+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3Jj
+L3NoYXJlZC9jcnlwdG8uaDoyMjo2OiBlcnJvcjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg
+4oCYYnRfY3J5cHRvX3JhbmRvbV9ieXRlc+KAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAg
+IDIyIHwgYm9vbCBidF9jcnlwdG9fcmFuZG9tX2J5dGVzKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0
+bywKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBm
+cm9tIC4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6MTEsCiAgICAgICAgICAgICAgICAgZnJvbSBzcmMv
+c2hhcmVkL2dhdHQtZGIuYzoyNDoKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjIyOjY6IG5vdGU6IHBy
+ZXZpb3VzIGRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19yYW5kb21fYnl0ZXPigJkgd2FzIGhl
+cmUKICAgMjIgfCBib29sIGJ0X2NyeXB0b19yYW5kb21fYnl0ZXMoc3RydWN0IGJ0X2NyeXB0byAq
+Y3J5cHRvLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoy
+NTo2OiBlcnJvcjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2XigJkg
+Wy1XZXJyb3I9cmVkdW5kYW50LWRlY2xzXQogICAyNSB8IGJvb2wgYnRfY3J5cHRvX2Uoc3RydWN0
+IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtleVsxNl0sCiAgICAgIHwgICAgICBe
+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDox
+MSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9z
+aGFyZWQvY3J5cHRvLmg6MjU6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRf
+Y3J5cHRvX2XigJkgd2FzIGhlcmUKICAgMjUgfCBib29sIGJ0X2NyeXB0b19lKHN0cnVjdCBidF9j
+cnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAgICB8ICAgICAgXn5+fn5+
+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3Ny
+Yy9zaGFyZWQvY3J5cHRvLmg6Mjc6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9m
+IOKAmGJ0X2NyeXB0b19haOKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDI3IHwgYm9v
+bCBidF9jcnlwdG9fYWgoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtb
+MTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3Ny
+Yy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9n
+YXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoyNzo2OiBub3RlOiBwcmV2aW91cyBk
+ZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fYWjigJkgd2FzIGhlcmUKICAgMjcgfCBib29sIGJ0
+X2NyeXB0b19haChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga1sxNl0s
+CiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFy
+ZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mjk6NjogZXJyb3I6IHJlZHVu
+ZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19jMeKAmSBbLVdlcnJvcj1yZWR1bmRh
+bnQtZGVjbHNdCiAgIDI5IHwgYm9vbCBidF9jcnlwdG9fYzEoc3RydWN0IGJ0X2NyeXB0byAqY3J5
+cHRvLCBjb25zdCB1aW50OF90IGtbMTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZp
+bGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAg
+ICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDoy
+OTo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fYzHigJkgd2Fz
+IGhlcmUKICAgMjkgfCBib29sIGJ0X2NyeXB0b19jMShzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8s
+IGNvbnN0IHVpbnQ4X3Qga1sxNl0sCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmlsZSBp
+bmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5cHRv
+Lmg6MzQ6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19z
+MeKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM0IHwgYm9vbCBidF9jcnlwdG9fczEo
+c3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IGtbMTZdLAogICAgICB8ICAg
+ICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1k
+Yi5oOjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4v
+c3JjL3NoYXJlZC9jcnlwdG8uaDozNDo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDi
+gJhidF9jcnlwdG9fczHigJkgd2FzIGhlcmUKICAgMzQgfCBib29sIGJ0X2NyeXB0b19zMShzdHJ1
+Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga1sxNl0sCiAgICAgIHwgICAgICBe
+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1
+OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mzc6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0
+aW9uIG9mIOKAmGJ0X2NyeXB0b19mNOKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM3
+IHwgYm9vbCBidF9jcnlwdG9fZjQoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHVb
+MzJdLCB1aW50OF90IHZbMzJdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5j
+bHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjExLAogICAgICAgICAgICAgICAgIGZy
+b20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDozNzo2OiBu
+b3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fZjTigJkgd2FzIGhlcmUK
+ICAgMzcgfCBib29sIGJ0X2NyeXB0b19mNChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIHVpbnQ4
+X3QgdVszMl0sIHVpbnQ4X3QgdlszMl0sCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn4KSW4gZmls
+ZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI1OgouL3NyYy9zaGFyZWQvY3J5
+cHRvLmg6Mzk6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xhcmF0aW9uIG9mIOKAmGJ0X2NyeXB0
+b19mNeKAmSBbLVdlcnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDM5IHwgYm9vbCBidF9jcnlwdG9f
+ZjUoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHdbMzJdLCB1aW50OF90IG4xWzE2
+XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMv
+c2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0
+dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6Mzk6Njogbm90ZTogcHJldmlvdXMgZGVj
+bGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2Y14oCZIHdhcyBoZXJlCiAgIDM5IHwgYm9vbCBidF9j
+cnlwdG9fZjUoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCB1aW50OF90IHdbMzJdLCB1aW50OF90
+IG4xWzE2XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
+c3JjL3NoYXJlZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDo0Mjo2OiBlcnJv
+cjogcmVkdW5kYW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2Y24oCZIFstV2Vycm9y
+PXJlZHVuZGFudC1kZWNsc10KICAgNDIgfCBib29sIGJ0X2NyeXB0b19mNihzdHJ1Y3QgYnRfY3J5
+cHRvICpjcnlwdG8sIHVpbnQ4X3Qgd1sxNl0sIHVpbnQ4X3QgbjFbMTZdLAogICAgICB8ICAgICAg
+Xn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5o
+OjExLAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3Jj
+L3NoYXJlZC9jcnlwdG8uaDo0Mjo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhi
+dF9jcnlwdG9fZjbigJkgd2FzIGhlcmUKICAgNDIgfCBib29sIGJ0X2NyeXB0b19mNihzdHJ1Y3Qg
+YnRfY3J5cHRvICpjcnlwdG8sIHVpbnQ4X3Qgd1sxNl0sIHVpbnQ4X3QgbjFbMTZdLAogICAgICB8
+ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dhdHQt
+ZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjQ1OjY6IGVycm9yOiByZWR1bmRhbnQgcmVk
+ZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fZzLigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRlY2xz
+XQogICA0NSB8IGJvb2wgYnRfY3J5cHRvX2cyKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgdWlu
+dDhfdCB1WzMyXSwgdWludDhfdCB2WzMyXSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBm
+aWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAg
+ICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6
+NDU6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2cy4oCZIHdh
+cyBoZXJlCiAgIDQ1IHwgYm9vbCBidF9jcnlwdG9fZzIoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRv
+LCB1aW50OF90IHVbMzJdLCB1aW50OF90IHZbMzJdLAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+
+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dhdHQtZGIuYzoyNToKLi9zcmMvc2hh
+cmVkL2NyeXB0by5oOjQ3OjY6IGVycm9yOiByZWR1bmRhbnQgcmVkZWNsYXJhdGlvbiBvZiDigJhi
+dF9jcnlwdG9faDbigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRlY2xzXQogICA0NyB8IGJvb2wgYnRf
+Y3J5cHRvX2g2KHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCB3WzE2XSwK
+ICAgICAgfCAgICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hh
+cmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1k
+Yi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NDc6Njogbm90ZTogcHJldmlvdXMgZGVjbGFy
+YXRpb24gb2Yg4oCYYnRfY3J5cHRvX2g24oCZIHdhcyBoZXJlCiAgIDQ3IHwgYm9vbCBidF9jcnlw
+dG9faDYoc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvLCBjb25zdCB1aW50OF90IHdbMTZdLAogICAg
+ICB8ICAgICAgXn5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2dh
+dHQtZGIuYzoyNToKLi9zcmMvc2hhcmVkL2NyeXB0by5oOjQ5OjY6IGVycm9yOiByZWR1bmRhbnQg
+cmVkZWNsYXJhdGlvbiBvZiDigJhidF9jcnlwdG9fc2lnbl9hdHTigJkgWy1XZXJyb3I9cmVkdW5k
+YW50LWRlY2xzXQogICA0OSB8IGJvb2wgYnRfY3J5cHRvX3NpZ25fYXR0KHN0cnVjdCBidF9jcnlw
+dG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAgICB8ICAgICAgXn5+fn5+fn5+
+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjEx
+LAogICAgICAgICAgICAgICAgIGZyb20gc3JjL3NoYXJlZC9nYXR0LWRiLmM6MjQ6Ci4vc3JjL3No
+YXJlZC9jcnlwdG8uaDo0OTo2OiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhidF9j
+cnlwdG9fc2lnbl9hdHTigJkgd2FzIGhlcmUKICAgNDkgfCBib29sIGJ0X2NyeXB0b19zaWduX2F0
+dChzdHJ1Y3QgYnRfY3J5cHRvICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga2V5WzE2XSwKICAgICAg
+fCAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJl
+ZC9nYXR0LWRiLmM6MjU6Ci4vc3JjL3NoYXJlZC9jcnlwdG8uaDo1Mjo2OiBlcnJvcjogcmVkdW5k
+YW50IHJlZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbuKAmSBbLVdl
+cnJvcj1yZWR1bmRhbnQtZGVjbHNdCiAgIDUyIHwgYm9vbCBidF9jcnlwdG9fdmVyaWZ5X2F0dF9z
+aWduKHN0cnVjdCBidF9jcnlwdG8gKmNyeXB0bywgY29uc3QgdWludDhfdCBrZXlbMTZdLAogICAg
+ICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
+Li9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAgICAgICAgICAgICBmcm9tIHNyYy9zaGFy
+ZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NTI6Njogbm90ZTogcHJldmlv
+dXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbuKAmSB3YXMgaGVy
+ZQogICA1MiB8IGJvb2wgYnRfY3J5cHRvX3ZlcmlmeV9hdHRfc2lnbihzdHJ1Y3QgYnRfY3J5cHRv
+ICpjcnlwdG8sIGNvbnN0IHVpbnQ4X3Qga2V5WzE2XSwKICAgICAgfCAgICAgIF5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5j
+OjI1OgouL3NyYy9zaGFyZWQvY3J5cHRvLmg6NTQ6NjogZXJyb3I6IHJlZHVuZGFudCByZWRlY2xh
+cmF0aW9uIG9mIOKAmGJ0X2NyeXB0b19nYXR0X2hhc2jigJkgWy1XZXJyb3I9cmVkdW5kYW50LWRl
+Y2xzXQogICA1NCB8IGJvb2wgYnRfY3J5cHRvX2dhdHRfaGFzaChzdHJ1Y3QgYnRfY3J5cHRvICpj
+cnlwdG8sIHN0cnVjdCBpb3ZlYyAqaW92LAogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDoxMSwKICAgICAg
+ICAgICAgICAgICBmcm9tIHNyYy9zaGFyZWQvZ2F0dC1kYi5jOjI0OgouL3NyYy9zaGFyZWQvY3J5
+cHRvLmg6NTQ6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gb2Yg4oCYYnRfY3J5cHRvX2dh
+dHRfaGFzaOKAmSB3YXMgaGVyZQogICA1NCB8IGJvb2wgYnRfY3J5cHRvX2dhdHRfaGFzaChzdHJ1
+Y3QgYnRfY3J5cHRvICpjcnlwdG8sIHN0cnVjdCBpb3ZlYyAqaW92LAogICAgICB8ICAgICAgXn5+
+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
+cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjY4MDg6IHNyYy9zaGFyZWQvZ2F0dC1kYi5sb10gRXJy
+b3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQwMjM6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBTS0lQUEVECk91dHB1dDoKY2hl
+Y2tidWlsZCBub3Qgc3VjY2VzcwoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-This patch store a crypto instance in adapter and reuse the same
-crypto instance for each device.
-
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
----
-Hi BlueZ maintainers,
-
-Is there a reason to have more than one crypto instance? If not,
-we could just have a singleton and a getter get_crypto_instance()
-which would instantiate a crypto object if it doesn't exist, in lieu
-of bt_crypto_new().
-
- android/gatt.c        |  2 +-
- peripheral/gatt.c     |  4 ++--
- src/adapter.c         | 12 ++++++++++++
- src/adapter.h         |  2 ++
- src/device.c          |  2 +-
- src/gatt-database.c   |  2 +-
- src/shared/gatt-db.c  |  9 +++++++--
- src/shared/gatt-db.h  |  4 +++-
- tools/btgatt-client.c |  2 +-
- tools/btgatt-server.c |  2 +-
- unit/test-gatt.c      |  4 ++--
- 11 files changed, 33 insertions(+), 12 deletions(-)
-
-diff --git a/android/gatt.c b/android/gatt.c
-index a8a0c488b0..d00c4adf2c 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -7234,7 +7234,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	app_connections = queue_new();
- 	listen_apps = queue_new();
- 	services_sdp = queue_new();
--	gatt_db = gatt_db_new();
-+	gatt_db = gatt_db_new(NULL);
- 
- 	if (!gatt_db) {
- 		error("gatt: Failed to allocate memory for database");
-diff --git a/peripheral/gatt.c b/peripheral/gatt.c
-index ff1354cb48..1991ec7d4b 100644
---- a/peripheral/gatt.c
-+++ b/peripheral/gatt.c
-@@ -261,7 +261,7 @@ void gatt_server_start(void)
- 		return;
- 	}
- 
--	gatt_db = gatt_db_new();
-+	gatt_db = gatt_db_new(NULL);
- 	if (!gatt_db) {
- 		close(att_fd);
- 		att_fd = -1;
-@@ -271,7 +271,7 @@ void gatt_server_start(void)
- 	populate_gap_service(gatt_db);
- 	populate_devinfo_service(gatt_db);
- 
--	gatt_cache = gatt_db_new();
-+	gatt_cache = gatt_db_new(NULL);
- 
- 	conn_list = queue_new();
- 	if (!conn_list) {
-diff --git a/src/adapter.c b/src/adapter.c
-index c1f976323e..794fe1045d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -46,6 +46,7 @@
- #include "src/shared/queue.h"
- #include "src/shared/att.h"
- #include "src/shared/gatt-db.h"
-+#include "src/shared/crypto.h"
- 
- #include "btio/btio.h"
- #include "btd.h"
-@@ -281,6 +282,8 @@ struct btd_adapter {
- 	bool is_default;		/* true if adapter is default one */
- 
- 	bool le_simult_roles_supported;
-+
-+	struct bt_crypto *crypto;
- };
- 
- typedef enum {
-@@ -5376,6 +5379,8 @@ static void adapter_free(gpointer user_data)
- 
- 	g_slist_free(adapter->connections);
- 
-+	bt_crypto_unref(adapter->crypto);
-+
- 	g_free(adapter->path);
- 	g_free(adapter->name);
- 	g_free(adapter->short_name);
-@@ -6321,6 +6326,8 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
- 
- 	adapter->auths = g_queue_new();
- 
-+	adapter->crypto = bt_crypto_new();
-+
- 	return btd_adapter_ref(adapter);
- }
- 
-@@ -9917,3 +9924,8 @@ bool btd_has_kernel_features(uint32_t features)
- {
- 	return (kernel_features & features) ? true : false;
- }
-+
-+struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter)
-+{
-+	return adapter->crypto;
-+}
-diff --git a/src/adapter.h b/src/adapter.h
-index 60b5e3bcca..2c7f06493a 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -240,3 +240,5 @@ enum kernel_features {
- };
- 
- bool btd_has_kernel_features(uint32_t feature);
-+
-+struct bt_crypto *btd_adapter_get_crypto(struct btd_adapter *adapter);
-diff --git a/src/device.c b/src/device.c
-index af13badfc8..0cf7423cce 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4047,7 +4047,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
- 
- 	device->tx_power = 127;
- 
--	device->db = gatt_db_new();
-+	device->db = gatt_db_new(btd_adapter_get_crypto(adapter));
- 	if (!device->db) {
- 		g_free(device);
- 		return NULL;
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index d99604826e..2024fdd5d2 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -3623,7 +3623,7 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 
- 	database = new0(struct btd_gatt_database, 1);
- 	database->adapter = btd_adapter_ref(adapter);
--	database->db = gatt_db_new();
-+	database->db = gatt_db_new(btd_adapter_get_crypto(adapter));
- 	database->records = queue_new();
- 	database->device_states = queue_new();
- 	database->apps = queue_new();
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8bff4d37aa..d616c17e47 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -235,12 +235,17 @@ struct gatt_db *gatt_db_ref(struct gatt_db *db)
- 	return db;
- }
- 
--struct gatt_db *gatt_db_new(void)
-+struct gatt_db *gatt_db_new(struct bt_crypto *crypto)
- {
- 	struct gatt_db *db;
- 
- 	db = new0(struct gatt_db, 1);
--	db->crypto = bt_crypto_new();
-+
-+	if (crypto)
-+		db->crypto = bt_crypto_ref(crypto);
-+	else
-+		db->crypto = bt_crypto_new();
-+
- 	db->services = queue_new();
- 	db->notify_list = queue_new();
- 	db->next_handle = 0x0001;
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 321a2aba61..1dac1af4fe 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -8,10 +8,12 @@
-  *
-  */
- 
-+#include "src/shared/crypto.h"
-+
- struct gatt_db;
- struct gatt_db_attribute;
- 
--struct gatt_db *gatt_db_new(void);
-+struct gatt_db *gatt_db_new(struct bt_crypto *crypto);
- 
- struct gatt_db *gatt_db_ref(struct gatt_db *db);
- void gatt_db_unref(struct gatt_db *db);
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 8c9365aa2c..945e24d6f8 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -197,7 +197,7 @@ static struct client *client_create(int fd, uint16_t mtu)
- 	}
- 
- 	cli->fd = fd;
--	cli->db = gatt_db_new();
-+	cli->db = gatt_db_new(NULL);
- 	if (!cli->db) {
- 		fprintf(stderr, "Failed to create GATT database\n");
- 		bt_att_unref(cli->att);
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 000145a3db..50004acee5 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -569,7 +569,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
- 	server->device_name[name_len] = '\0';
- 
- 	server->fd = fd;
--	server->db = gatt_db_new();
-+	server->db = gatt_db_new(NULL);
- 	if (!server->db) {
- 		fprintf(stderr, "Failed to create GATT database\n");
- 		goto fail;
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 4aa87d09c4..1916ace6c7 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -674,7 +674,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 						"bt_gatt_server:", NULL);
- 		break;
- 	case CLIENT:
--		context->client_db = gatt_db_new();
-+		context->client_db = gatt_db_new(NULL);
- 		g_assert(context->client_db);
- 
- 		context->client = bt_gatt_client_new(context->client_db,
-@@ -1363,7 +1363,7 @@ struct att_handle_spec {
- 
- static struct gatt_db *make_db(const struct att_handle_spec *spec)
- {
--	struct gatt_db *db = gatt_db_new();
-+	struct gatt_db *db = gatt_db_new(NULL);
- 	struct gatt_db_attribute *att, *include_att;
- 	bt_uuid_t uuid;
- 
--- 
-2.30.0.296.g2bfb1c46d8-goog
-
+--===============3963502624742989879==--
