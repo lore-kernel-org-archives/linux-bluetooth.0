@@ -2,162 +2,147 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A0BC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 05:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF63C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 06:23:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EA002223E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 05:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8501D230FF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 06:23:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729933AbhASFn6 (ORCPT
+        id S1728713AbhASGXi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Jan 2021 00:43:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387893AbhASEmi (ORCPT
+        Tue, 19 Jan 2021 01:23:38 -0500
+Received: from rtits2.realtek.com ([211.75.126.72]:46193 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726834AbhASFoJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Jan 2021 23:42:38 -0500
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0668DC061575
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Jan 2021 20:41:13 -0800 (PST)
-Received: by mail-vs1-xe2f.google.com with SMTP id n18so2929725vsa.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Jan 2021 20:41:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yxguhV1s8HV3uAUmVwAP9veGFogzAl9hGJElFs8+sg8=;
-        b=hxGX2VCaRgK3TvZZyA8vqpQ2j6H0o61h6RRTo9JBmAzOhsbRmzDyNPj1THO/XvyUNQ
-         rIMldKA4xhJw2A9RBASR1qcsG6gfaASGhm8dBLi+aEDbMDosMn+2u7d2KMvIKGpALrza
-         bIgHYeCTjKR+g0Pv+pvm5pjtV8YVXUl1Mfsmw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yxguhV1s8HV3uAUmVwAP9veGFogzAl9hGJElFs8+sg8=;
-        b=WvYDFSXoJLNJlE9LjaejSD3GFnYL1DbgpHOm/9qKAcZj+DqO6y25CYmSB5Sdt4p+Do
-         2aPyhQZfzevxu4pScKs1wUE1TJ4kIiLPvteg6r0iAKntrJHjxnPxkXvPRLuTT51+GrRO
-         aZ+wdUqyazA0o0eELS/oWJDEtRyXispv0t4ZOnshuO4dp2KGYshGb7Ugq7iJXefxvCID
-         ClZmUkp9saFwHmx7LJcJdfxF4HZLD/kAoHn1LyQ/yaIWTLqSK0U+mYwyYXpBiok698q4
-         JmCCr6DD4Ee07QBbvoFeD8+vLs2oYMKmPv7tSMWzvVtysaINd/IEAvItNVUJ/jS9pAir
-         HJEg==
-X-Gm-Message-State: AOAM531vhguIPfJjX6XwoEYlN1AteR924muzsR3BXzdQoPEwnMZQcFQJ
-        71JrtX/sgECN4UySClhQD0PSsDVPIlsOyFI04s/IoA==
-X-Google-Smtp-Source: ABdhPJxA8jB0M5xWXyVXiqZcPqj9OdGAv+PXrO558oWbMQsvIBtm4qP2VW4HqOedGoX/qqA1bnUWBUcg3z2XrMGSKF4=
-X-Received: by 2002:a05:6102:66a:: with SMTP id z10mr1655865vsf.53.1611031272168;
- Mon, 18 Jan 2021 20:41:12 -0800 (PST)
-MIME-Version: 1.0
-References: <20210118112827.6192-1-max.chou@realtek.com>
-In-Reply-To: <20210118112827.6192-1-max.chou@realtek.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 18 Jan 2021 20:41:00 -0800
-Message-ID: <CANFp7mVrUCyhs3jaNLC6fbOQGxfG4kgVQ69rKyS6urBM54SWKg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btrtl: Enable WBS for the specific Realtek devices
-To:     max.chou@realtek.com
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Tue, 19 Jan 2021 00:44:09 -0500
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 10J5hBLW1027910, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmbs01.realtek.com.tw[172.21.6.94])
+        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 10J5hBLW1027910
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Tue, 19 Jan 2021 13:43:11 +0800
+Received: from RTEXMB06.realtek.com.tw (172.21.6.99) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 19 Jan 2021 13:43:11 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXMB06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2044.4; Tue, 19 Jan 2021 13:43:10 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::d4dd:5c6:e3c2:8a2f]) by
+ RTEXMBS03.realtek.com.tw ([fe80::d4dd:5c6:e3c2:8a2f%2]) with mapi id
+ 15.01.2106.006; Tue, 19 Jan 2021 13:43:10 +0800
+From:   Max Chou <max.chou@realtek.com>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+CC:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Bluez mailing list <linux-bluetooth@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Alex Lu <alex_lu@realsil.com.cn>, hildawu@realtek.com,
-        kidman@realtek.com, Shyh-In Hwang <josephsih@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
+        Hilda Wu <hildawu@realtek.com>, KidmanLee <kidman@realtek.com>,
+        Shyh-In Hwang <josephsih@chromium.org>
+Subject: RE: [PATCH] Bluetooth: btrtl: Enable WBS for the specific Realtek devices
+Thread-Topic: [PATCH] Bluetooth: btrtl: Enable WBS for the specific Realtek
+ devices
+Thread-Index: AQHW7Y0N00LzEnEOeEKqwsYoCEgNkqot2VsAgACW49A=
+Date:   Tue, 19 Jan 2021 05:43:10 +0000
+Message-ID: <f013444cfe874ac99140068f23ca031c@realtek.com>
+References: <20210118112827.6192-1-max.chou@realtek.com>
+ <CANFp7mVrUCyhs3jaNLC6fbOQGxfG4kgVQ69rKyS6urBM54SWKg@mail.gmail.com>
+In-Reply-To: <CANFp7mVrUCyhs3jaNLC6fbOQGxfG4kgVQ69rKyS6urBM54SWKg@mail.gmail.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.132.163]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
-
-On Mon, Jan 18, 2021 at 3:28 AM <max.chou@realtek.com> wrote:
->
-> From: Max Chou <max.chou@realtek.com>
->
-> By this change, it will enable WBS supported on the specific Realtek BT
-> devices, such as RTL8822C and RTL8852A.
-> In the future, it's able to maintain what the Realtek devices support WBS
-> here.
->
-> Tested-by: Hilda Wu <hildawu@realtek.com>
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> ---
->  drivers/bluetooth/btrtl.c | 26 +++++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 24f03a1f8d57..835819c47ae6 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -38,6 +38,19 @@
->         .hci_ver = (hciv), \
->         .hci_bus = (bus)
->
-> +enum  btrtl_chip_id {
-> +       CHIP_ID_8723A,          /* index  0 for RTL8723A*/
-> +       CHIP_ID_8723B,          /* index  1 for RTL8723B*/
-> +       CHIP_ID_8821A,          /* index  2 for RTL8821A*/
-> +       CHIP_ID_8761A,          /* index  3 for RTL8761A*/
-> +       CHIP_ID_8822B = 8,      /* index  8 for RTL8822B */
-> +       CHIP_ID_8723D,          /* index  9 for RTL8723D */
-> +       CHIP_ID_8821C,          /* index 10 for RTL8821C */
-> +       CHIP_ID_8822C = 13,     /* index 13 for RTL8822C */
-> +       CHIP_ID_8761B,          /* index 14 for RTL8761B */
-> +       CHIP_ID_8852A = 18,     /* index 18 for RTL8852A */
-> +};
-> +
->  struct id_table {
->         __u16 match_flags;
->         __u16 lmp_subver;
-> @@ -58,6 +71,7 @@ struct btrtl_device_info {
->         u8 *cfg_data;
->         int cfg_len;
->         bool drop_fw;
-> +       int project_id;
->  };
->
->  static const struct id_table ic_id_table[] = {
-> @@ -307,8 +321,10 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
->
->         /* Find project_id in table */
->         for (i = 0; i < ARRAY_SIZE(project_id_to_lmp_subver); i++) {
-> -               if (project_id == project_id_to_lmp_subver[i].id)
-> +               if (project_id == project_id_to_lmp_subver[i].id) {
-> +                       btrtl_dev->project_id = project_id;
->                         break;
-> +               }
->         }
->
->         if (i >= ARRAY_SIZE(project_id_to_lmp_subver)) {
-> @@ -725,12 +741,16 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
->         /* Enable central-peripheral role (able to create new connections with
->          * an existing connection in slave role).
->          */
-> -       switch (btrtl_dev->ic_info->lmp_subver) {
-> -       case RTL_ROM_LMP_8822B:
-> +       /* Enable WBS supported for the specific Realtek devices. */
-> +       switch (btrtl_dev->project_id) {
-> +       case CHIP_ID_8822C:
-> +       case CHIP_ID_8852A:
->                 set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-> +               set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
->                 break;
->         default:
->                 rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
-> +               rtl_dev_dbg(hdev, "WBS supported not enabled.");
->                 break;
->         }
-
-There is a null-check on btrtl_dev->ic_info right above this switch
-statement (https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=b649813eadbc062d8682f7a20aa025275707dd1f).
-Is this still necessary with this change? (Sorry, I missed this during
-our previous review).
-
->
-> --
-> 2.17.1
->
-
-Abhishek
+SGkhIEFiaGlzaGVrLA0KTXkgYmFkISBJIHNob3VsZCBjaGVjayB0aGUgY29kZSBiYXNlIGlzIHRo
+ZSBsYXRlc3QgYW5kIGZvbGxvdyBpdC4NCkknbGwgc3VibWl0IHRoZSB2MiBwYXRjaC4gVGhhbmtz
+IGZvciB5b3VyIHJldmlldy4NCg0KDQpCUnMsDQpNYXgNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdl
+LS0tLS0NCkZyb206IEFiaGlzaGVrIFBhbmRpdC1TdWJlZGkgPGFiaGlzaGVrcGFuZGl0QGNocm9t
+aXVtLm9yZz4gDQpTZW50OiBUdWVzZGF5LCBKYW51YXJ5IDE5LCAyMDIxIDEyOjQxIFBNDQpUbzog
+TWF4IENob3UgPG1heC5jaG91QHJlYWx0ZWsuY29tPg0KQ2M6IE1hcmNlbCBIb2x0bWFubiA8bWFy
+Y2VsQGhvbHRtYW5uLm9yZz47IEpvaGFuIEhlZGJlcmcgPGpvaGFuLmhlZGJlcmdAZ21haWwuY29t
+PjsgTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8bHVpei5kZW50ekBnbWFpbC5jb20+OyBCbHVleiBt
+YWlsaW5nIGxpc3QgPGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+OyBMS01MIDxsaW51
+eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPjsgYWxleF9sdUByZWFsc2lsLmNvbS5jbjsgSGlsZGEg
+V3UgPGhpbGRhd3VAcmVhbHRlay5jb20+OyBLaWRtYW5MZWUgPGtpZG1hbkByZWFsdGVrLmNvbT47
+IFNoeWgtSW4gSHdhbmcgPGpvc2VwaHNpaEBjaHJvbWl1bS5vcmc+DQpTdWJqZWN0OiBSZTogW1BB
+VENIXSBCbHVldG9vdGg6IGJ0cnRsOiBFbmFibGUgV0JTIGZvciB0aGUgc3BlY2lmaWMgUmVhbHRl
+ayBkZXZpY2VzDQoNCkhpIE1heCwNCg0KT24gTW9uLCBKYW4gMTgsIDIwMjEgYXQgMzoyOCBBTSA8
+bWF4LmNob3VAcmVhbHRlay5jb20+IHdyb3RlOg0KPg0KPiBGcm9tOiBNYXggQ2hvdSA8bWF4LmNo
+b3VAcmVhbHRlay5jb20+DQo+DQo+IEJ5IHRoaXMgY2hhbmdlLCBpdCB3aWxsIGVuYWJsZSBXQlMg
+c3VwcG9ydGVkIG9uIHRoZSBzcGVjaWZpYyBSZWFsdGVrIA0KPiBCVCBkZXZpY2VzLCBzdWNoIGFz
+IFJUTDg4MjJDIGFuZCBSVEw4ODUyQS4NCj4gSW4gdGhlIGZ1dHVyZSwgaXQncyBhYmxlIHRvIG1h
+aW50YWluIHdoYXQgdGhlIFJlYWx0ZWsgZGV2aWNlcyBzdXBwb3J0IA0KPiBXQlMgaGVyZS4NCj4N
+Cj4gVGVzdGVkLWJ5OiBIaWxkYSBXdSA8aGlsZGF3dUByZWFsdGVrLmNvbT4NCj4gU2lnbmVkLW9m
+Zi1ieTogTWF4IENob3UgPG1heC5jaG91QHJlYWx0ZWsuY29tPg0KPiAtLS0NCj4gIGRyaXZlcnMv
+Ymx1ZXRvb3RoL2J0cnRsLmMgfCAyNiArKysrKysrKysrKysrKysrKysrKysrKy0tLQ0KPiAgMSBm
+aWxlIGNoYW5nZWQsIDIzIGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYg
+LS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHJ0bC5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnRy
+dGwuYyANCj4gaW5kZXggMjRmMDNhMWY4ZDU3Li44MzU4MTljNDdhZTYgMTAwNjQ0DQo+IC0tLSBh
+L2RyaXZlcnMvYmx1ZXRvb3RoL2J0cnRsLmMNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnRy
+dGwuYw0KPiBAQCAtMzgsNiArMzgsMTkgQEANCj4gICAgICAgICAuaGNpX3ZlciA9IChoY2l2KSwg
+XA0KPiAgICAgICAgIC5oY2lfYnVzID0gKGJ1cykNCj4NCj4gK2VudW0gIGJ0cnRsX2NoaXBfaWQg
+ew0KPiArICAgICAgIENISVBfSURfODcyM0EsICAgICAgICAgIC8qIGluZGV4ICAwIGZvciBSVEw4
+NzIzQSovDQo+ICsgICAgICAgQ0hJUF9JRF84NzIzQiwgICAgICAgICAgLyogaW5kZXggIDEgZm9y
+IFJUTDg3MjNCKi8NCj4gKyAgICAgICBDSElQX0lEXzg4MjFBLCAgICAgICAgICAvKiBpbmRleCAg
+MiBmb3IgUlRMODgyMUEqLw0KPiArICAgICAgIENISVBfSURfODc2MUEsICAgICAgICAgIC8qIGlu
+ZGV4ICAzIGZvciBSVEw4NzYxQSovDQo+ICsgICAgICAgQ0hJUF9JRF84ODIyQiA9IDgsICAgICAg
+LyogaW5kZXggIDggZm9yIFJUTDg4MjJCICovDQo+ICsgICAgICAgQ0hJUF9JRF84NzIzRCwgICAg
+ICAgICAgLyogaW5kZXggIDkgZm9yIFJUTDg3MjNEICovDQo+ICsgICAgICAgQ0hJUF9JRF84ODIx
+QywgICAgICAgICAgLyogaW5kZXggMTAgZm9yIFJUTDg4MjFDICovDQo+ICsgICAgICAgQ0hJUF9J
+RF84ODIyQyA9IDEzLCAgICAgLyogaW5kZXggMTMgZm9yIFJUTDg4MjJDICovDQo+ICsgICAgICAg
+Q0hJUF9JRF84NzYxQiwgICAgICAgICAgLyogaW5kZXggMTQgZm9yIFJUTDg3NjFCICovDQo+ICsg
+ICAgICAgQ0hJUF9JRF84ODUyQSA9IDE4LCAgICAgLyogaW5kZXggMTggZm9yIFJUTDg4NTJBICov
+DQo+ICt9Ow0KPiArDQo+ICBzdHJ1Y3QgaWRfdGFibGUgew0KPiAgICAgICAgIF9fdTE2IG1hdGNo
+X2ZsYWdzOw0KPiAgICAgICAgIF9fdTE2IGxtcF9zdWJ2ZXI7DQo+IEBAIC01OCw2ICs3MSw3IEBA
+IHN0cnVjdCBidHJ0bF9kZXZpY2VfaW5mbyB7DQo+ICAgICAgICAgdTggKmNmZ19kYXRhOw0KPiAg
+ICAgICAgIGludCBjZmdfbGVuOw0KPiAgICAgICAgIGJvb2wgZHJvcF9mdzsNCj4gKyAgICAgICBp
+bnQgcHJvamVjdF9pZDsNCj4gIH07DQo+DQo+ICBzdGF0aWMgY29uc3Qgc3RydWN0IGlkX3RhYmxl
+IGljX2lkX3RhYmxlW10gPSB7IEBAIC0zMDcsOCArMzIxLDEwIEBAIA0KPiBzdGF0aWMgaW50IHJ0
+bGJ0X3BhcnNlX2Zpcm13YXJlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPg0KPiAgICAgICAgIC8q
+IEZpbmQgcHJvamVjdF9pZCBpbiB0YWJsZSAqLw0KPiAgICAgICAgIGZvciAoaSA9IDA7IGkgPCBB
+UlJBWV9TSVpFKHByb2plY3RfaWRfdG9fbG1wX3N1YnZlcik7IGkrKykgew0KPiAtICAgICAgICAg
+ICAgICAgaWYgKHByb2plY3RfaWQgPT0gcHJvamVjdF9pZF90b19sbXBfc3VidmVyW2ldLmlkKQ0K
+PiArICAgICAgICAgICAgICAgaWYgKHByb2plY3RfaWQgPT0gcHJvamVjdF9pZF90b19sbXBfc3Vi
+dmVyW2ldLmlkKSB7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGJ0cnRsX2Rldi0+cHJvamVj
+dF9pZCA9IHByb2plY3RfaWQ7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiAr
+ICAgICAgICAgICAgICAgfQ0KPiAgICAgICAgIH0NCj4NCj4gICAgICAgICBpZiAoaSA+PSBBUlJB
+WV9TSVpFKHByb2plY3RfaWRfdG9fbG1wX3N1YnZlcikpIHsgQEAgLTcyNSwxMiANCj4gKzc0MSwx
+NiBAQCBpbnQgYnRydGxfc2V0dXBfcmVhbHRlayhzdHJ1Y3QgaGNpX2RldiAqaGRldikNCj4gICAg
+ICAgICAvKiBFbmFibGUgY2VudHJhbC1wZXJpcGhlcmFsIHJvbGUgKGFibGUgdG8gY3JlYXRlIG5l
+dyBjb25uZWN0aW9ucyB3aXRoDQo+ICAgICAgICAgICogYW4gZXhpc3RpbmcgY29ubmVjdGlvbiBp
+biBzbGF2ZSByb2xlKS4NCj4gICAgICAgICAgKi8NCj4gLSAgICAgICBzd2l0Y2ggKGJ0cnRsX2Rl
+di0+aWNfaW5mby0+bG1wX3N1YnZlcikgew0KPiAtICAgICAgIGNhc2UgUlRMX1JPTV9MTVBfODgy
+MkI6DQo+ICsgICAgICAgLyogRW5hYmxlIFdCUyBzdXBwb3J0ZWQgZm9yIHRoZSBzcGVjaWZpYyBS
+ZWFsdGVrIGRldmljZXMuICovDQo+ICsgICAgICAgc3dpdGNoIChidHJ0bF9kZXYtPnByb2plY3Rf
+aWQpIHsNCj4gKyAgICAgICBjYXNlIENISVBfSURfODgyMkM6DQo+ICsgICAgICAgY2FzZSBDSElQ
+X0lEXzg4NTJBOg0KPiAgICAgICAgICAgICAgICAgc2V0X2JpdChIQ0lfUVVJUktfVkFMSURfTEVf
+U1RBVEVTLCAmaGRldi0+cXVpcmtzKTsNCj4gKyAgICAgICAgICAgICAgIHNldF9iaXQoSENJX1FV
+SVJLX1dJREVCQU5EX1NQRUVDSF9TVVBQT1JURUQsIA0KPiArICZoZGV2LT5xdWlya3MpOw0KPiAg
+ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAgZGVmYXVsdDoNCj4gICAgICAgICAgICAg
+ICAgIHJ0bF9kZXZfZGJnKGhkZXYsICJDZW50cmFsLXBlcmlwaGVyYWwgcm9sZSBub3QgDQo+IGVu
+YWJsZWQuIik7DQo+ICsgICAgICAgICAgICAgICBydGxfZGV2X2RiZyhoZGV2LCAiV0JTIHN1cHBv
+cnRlZCBub3QgZW5hYmxlZC4iKTsNCj4gICAgICAgICAgICAgICAgIGJyZWFrOw0KPiAgICAgICAg
+IH0NCg0KVGhlcmUgaXMgYSBudWxsLWNoZWNrIG9uIGJ0cnRsX2Rldi0+aWNfaW5mbyByaWdodCBh
+Ym92ZSB0aGlzIHN3aXRjaCBzdGF0ZW1lbnQgKGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3Nj
+bS9saW51eC9rZXJuZWwvZ2l0L2JsdWV0b290aC9ibHVldG9vdGgtbmV4dC5naXQvY29tbWl0Lz9p
+ZD1iNjQ5ODEzZWFkYmMwNjJkODY4MmY3YTIwYWEwMjUyNzU3MDdkZDFmKS4NCklzIHRoaXMgc3Rp
+bGwgbmVjZXNzYXJ5IHdpdGggdGhpcyBjaGFuZ2U/IChTb3JyeSwgSSBtaXNzZWQgdGhpcyBkdXJp
+bmcgb3VyIHByZXZpb3VzIHJldmlldykuDQoNCj4NCj4gLS0NCj4gMi4xNy4xDQo+DQoNCkFiaGlz
+aGVrDQoNCi0tLS0tLVBsZWFzZSBjb25zaWRlciB0aGUgZW52aXJvbm1lbnQgYmVmb3JlIHByaW50
+aW5nIHRoaXMgZS1tYWlsLg0K
