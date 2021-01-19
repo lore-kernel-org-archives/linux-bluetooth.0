@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D616AC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 20:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC51C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 21:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88F562310B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 20:44:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0349722DD3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Jan 2021 21:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730379AbhASUoa (ORCPT
+        id S1730238AbhASVFH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Jan 2021 15:44:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
+        Tue, 19 Jan 2021 16:05:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730331AbhASUoF (ORCPT
+        with ESMTP id S1729145AbhASUo6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Jan 2021 15:44:05 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C19C0613C1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jan 2021 12:43:25 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id p15so694200pjv.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jan 2021 12:43:25 -0800 (PST)
+        Tue, 19 Jan 2021 15:44:58 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35F3C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jan 2021 12:43:26 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id g3so11233906plp.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jan 2021 12:43:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2KPL8bz/DsmwTeTaJ4A3VI/judTjbMrQhWrVgCOV11c=;
-        b=GTbi5NVABmar6gXKJ2rGY5w0Kaoyj6OX4eP8CdhOHzJWUoLXhcRZajGg/NE8jsrund
-         mq55GrutSYVzE7mKJG3Vk0oF/L/8KWQqzgxAwirtgJdLbmCGvLLrOXv1NrdfazU5Ihsq
-         dOwiEDoKR9IKQNWfMGxKvkkPwmHW/cBYIhA7I=
+        bh=wsfZjzlNzJXVW++ya1lrDyULLQkDWoVC/E0GTcKu51k=;
+        b=ee5dAIFBSCWqkpeMwwe2Q5AQnVcdwExjk+0JJ3ZY+5vKlD4PfmYwhdrvPq/3nzGkjR
+         LWEEGlR9t/jobNVnioo1lLPJU0fh4gTUoxxhwIfxlkvGErJrLnnpcNQjkagpKDQ+A9m8
+         HMxNfCi+2xn+EHNLyh2/v80Q0KfGHp1adQqA0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2KPL8bz/DsmwTeTaJ4A3VI/judTjbMrQhWrVgCOV11c=;
-        b=P83UCSBsh+hxFGL/d+Tn/HabYNR6Cyr7UIYs/YEZJG6oJVOiS36PnizWjhKv9xJMMB
-         QU99lgTciFdZoeIkLimMRhdngoM5bbR15KDwBBisV3R4jhejFTNhWdsjZFiYU1ggGj1p
-         iEvZOILecY25pu75e/3RQJPCNwACaNBej7odKpomdiKi9SODvOy8oatZPT4ewFR0VKsO
-         LnnULbU+vOapUZCyJt2zMuBsyt38Tkq6loLAhCirRAoGd96cMo2XA6gqRARVJVRIRmMY
-         TQ5LzaFWhLpC+WRABljA28ijBFyDJl+dta971FhnfLOJlyEMyEwg9JZpfu6vTxNY2Qr8
-         5wgg==
-X-Gm-Message-State: AOAM530xvVIIdA0MGpPOrCnEKMLcboEQ1k4RPOxM2QqYXkS1zy8Mc0TX
-        21KsQM46HmF7DKqhUpkvowyCAw==
-X-Google-Smtp-Source: ABdhPJz71RGGjKYuVOHERmx7xaJriybr2/w8Dr7ETf2Zs6/LYn1K4HSQCGy/aYohUgYfBSWAh5n9+w==
-X-Received: by 2002:a17:903:1c2:b029:de:ad0a:2dbf with SMTP id e2-20020a17090301c2b02900dead0a2dbfmr6620147plh.44.1611089004824;
-        Tue, 19 Jan 2021 12:43:24 -0800 (PST)
+        bh=wsfZjzlNzJXVW++ya1lrDyULLQkDWoVC/E0GTcKu51k=;
+        b=m34EMf74FDWtv4kepT1tQuvIdDDf57cmrG1EHT8EsGGnium+D0m/+O8lghP8zhDz4d
+         s0+GRwiZpYCfUPqLcZRfDwHy3DKfrslJgjeDBIo20/6zNFFqJbwnbgrLnvcRPsqy810K
+         9wBlJ258xpipyqRd5rdsXi+aPB9NANyRT7NUZ/W+p7RhwTsH9Rufyj2wrzXdVgS1/fOm
+         BI4L8sFB7DwXA4Q+u4+Isl+szYhHtq9aKz3hJWKDLkH4t5dZPuI5sjOIkAC/eW1FFRtt
+         ZuuwkTHmTtC8i9SwbtqoLvpA0zzmBTmsHk6hi1Wec7hcggJFZIQFcv2qT3y9ARI9AGrt
+         YXyQ==
+X-Gm-Message-State: AOAM532gWRJgi3valKj580PNNkO9GAKejxHNl+/2K7fb7rKp0kz8w5ys
+        Lnq1toMqOfvc6h3LjrGerGgspQ==
+X-Google-Smtp-Source: ABdhPJydbVhkgkAOI+VFO4e2Os6eSIgJINtaIF/pQjNKUmVP045sHTczGR+2I740dosNO1DABMG8qw==
+X-Received: by 2002:a17:902:ec06:b029:de:67a0:989d with SMTP id l6-20020a170902ec06b02900de67a0989dmr6506516pld.53.1611089006265;
+        Tue, 19 Jan 2021 12:43:26 -0800 (PST)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:7220:84ff:fe09:2b94])
-        by smtp.gmail.com with ESMTPSA id x15sm13835pfa.80.2021.01.19.12.43.23
+        by smtp.gmail.com with ESMTPSA id x15sm13835pfa.80.2021.01.19.12.43.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jan 2021 12:43:24 -0800 (PST)
+        Tue, 19 Jan 2021 12:43:25 -0800 (PST)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org, mcchou@chromium.org,
         michaelfsun@google.com, linux-bluetooth@vger.kernel.org,
         apusaka@chromium.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: btusb: Trigger gpio reset quicker
-Date:   Tue, 19 Jan 2021 12:43:13 -0800
-Message-Id: <20210119124258.2.I52cc5d2b62fdeb5f3c5249d41f3631ae25d8dc71@changeid>
+Subject: [PATCH 3/3] Bluetooth: btusb: Expose reset gpio to debugfs
+Date:   Tue, 19 Jan 2021 12:43:14 -0800
+Message-Id: <20210119124258.3.I7c6ae9b637f9a77f6e6f2e4256c6a0232476be43@changeid>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
 In-Reply-To: <20210119204315.2611811-1-abhishekpandit@chromium.org>
 References: <20210119204315.2611811-1-abhishekpandit@chromium.org>
@@ -76,35 +75,87 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Currently, btusb will only trigger gpio reset during cmd_timeout after
-5 commands fail. This number is arbitrarily large and can result in
-resets taking longer to occur than necessary.
-
-Reduce this number to 3, which was chosen as a recommended value by
-Intel (their firmware allow two commands in flight so they recommend
-resetting on the third failed command).
+If btusb has a reset gpio, expose it to userspace so we can toggle the
+reset gpio directly. This is useful for testing and error recovery.
 
 Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Daniel Winkler <danielwinkler@google.com>
 ---
 
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 46 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 03341e6cbf3ed..880e9cd4ee713 100644
+index 880e9cd4ee713..702be1871ed88 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -578,7 +578,7 @@ static void btusb_gpio_cmd_timeout(struct hci_dev *hdev)
+@@ -6,6 +6,7 @@
+  *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
+  */
+ 
++#include <linux/debugfs.h>
+ #include <linux/dmi.h>
+ #include <linux/module.h>
+ #include <linux/usb.h>
+@@ -574,6 +575,46 @@ static void btusb_toggle_gpio(struct gpio_desc *desc, unsigned int duration)
+ 	gpiod_set_value_cansleep(desc, 0);
+ }
+ 
++#ifdef CONFIG_DEBUG_FS
++static ssize_t btusb_debugfs_has_reset_gpio(struct file *file,
++					    char __user *user_buf,
++					    size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	char buf[3];
++
++	buf[0] = data->reset_gpio ? 'Y' : 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t btusb_debugfs_reset_gpio(struct file *file,
++					const char __user *user_buf,
++					size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	if (!data->reset_gpio)
++		return -EOPNOTSUPP;
++
++	bt_dev_warn(hdev, "Debugfs triggering HW reset via gpio");
++	btusb_toggle_gpio(data->reset_gpio, data->reset_duration_ms);
++
++	return count;
++}
++
++static const struct file_operations reset_gpio_fops = {
++	.open		= simple_open,
++	.read		= btusb_debugfs_has_reset_gpio,
++	.write		= btusb_debugfs_reset_gpio,
++	.llseek		= default_llseek,
++};
++#endif
++
+ static void btusb_gpio_cmd_timeout(struct hci_dev *hdev)
  {
  	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -4625,6 +4666,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (err < 0)
+ 		goto out_free_dev;
  
--	if (++data->cmd_timeout_cnt < 5)
-+	if (++data->cmd_timeout_cnt < 3)
- 		return;
++#ifdef CONFIG_DEBUG_FS
++	debugfs_create_file("toggle_hw_reset", 0644, hdev->debugfs, hdev,
++			    &reset_gpio_fops);
++#endif
++
+ 	usb_set_intfdata(intf, data);
  
- 	if (!data->reset_gpio) {
+ 	return 0;
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
