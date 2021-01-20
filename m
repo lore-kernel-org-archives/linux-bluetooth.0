@@ -2,228 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35E2C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 07:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BC7C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 08:54:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9908A23159
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 07:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A798422C9E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 08:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbhATHOC (ORCPT
+        id S1727742AbhATIyB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jan 2021 02:14:02 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:56736 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726423AbhATHN6 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jan 2021 02:13:58 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UMJ.w4A_1611126765;
-Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UMJ.w4A_1611126765)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 20 Jan 2021 15:12:50 +0800
-From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Subject: [PATCH] net/bluetooth:  Fix the follow coccicheck warnings
-Date:   Wed, 20 Jan 2021 15:12:44 +0800
-Message-Id: <1611126764-34416-1-git-send-email-abaci-bugfix@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 20 Jan 2021 03:54:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58938 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726167AbhATIxd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Jan 2021 03:53:33 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 8D31D23357
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jan 2021 08:52:26 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Wed, 20 Jan 2021 08:52:23 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: er.krali@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-dvGTZWEjnT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-./net/bluetooth/hci_debugfs.c: WARNING: sniff_min_interval_fops
-should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Reported-by: Abaci Robot<abaci@linux.alibaba.com>
----
- net/bluetooth/hci_debugfs.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+er.krali@gmail.com changed:
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 4626e02..65cad9f 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -237,7 +237,7 @@ static int conn_info_min_age_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
- 			conn_info_min_age_set, "%llu\n");
- 
- static int conn_info_max_age_set(void *data, u64 val)
-@@ -265,7 +265,7 @@ static int conn_info_max_age_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
- 			conn_info_max_age_set, "%llu\n");
- 
- static ssize_t use_debug_keys_read(struct file *file, char __user *user_buf,
-@@ -419,7 +419,7 @@ static int voice_setting_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(voice_setting_fops, voice_setting_get,
- 			NULL, "0x%4.4llx\n");
- 
- static ssize_t ssp_debug_mode_read(struct file *file, char __user *user_buf,
-@@ -476,7 +476,7 @@ static int min_encrypt_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(min_encrypt_key_size_fops,
-+DEFINE_DEBUGFS_ATTRIBUTE(min_encrypt_key_size_fops,
- 			min_encrypt_key_size_get,
- 			min_encrypt_key_size_set, "%llu\n");
- 
-@@ -491,7 +491,7 @@ static int auto_accept_delay_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
- 			auto_accept_delay_set, "%llu\n");
- 
- static ssize_t force_bredr_smp_read(struct file *file,
-@@ -558,7 +558,7 @@ static int idle_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
- 			idle_timeout_set, "%llu\n");
- 
- static int sniff_min_interval_set(void *data, u64 val)
-@@ -586,7 +586,7 @@ static int sniff_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
- 			sniff_min_interval_set, "%llu\n");
- 
- static int sniff_max_interval_set(void *data, u64 val)
-@@ -614,7 +614,7 @@ static int sniff_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
- 			sniff_max_interval_set, "%llu\n");
- 
- void hci_debugfs_create_bredr(struct hci_dev *hdev)
-@@ -706,7 +706,7 @@ static int rpa_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
- 			rpa_timeout_set, "%llu\n");
- 
- static int random_address_show(struct seq_file *f, void *p)
-@@ -869,7 +869,7 @@ static int conn_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
- 			conn_min_interval_set, "%llu\n");
- 
- static int conn_max_interval_set(void *data, u64 val)
-@@ -897,7 +897,7 @@ static int conn_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
- 			conn_max_interval_set, "%llu\n");
- 
- static int conn_latency_set(void *data, u64 val)
-@@ -925,7 +925,7 @@ static int conn_latency_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_latency_fops, conn_latency_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_latency_fops, conn_latency_get,
- 			conn_latency_set, "%llu\n");
- 
- static int supervision_timeout_set(void *data, u64 val)
-@@ -953,7 +953,7 @@ static int supervision_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
- 			supervision_timeout_set, "%llu\n");
- 
- static int adv_channel_map_set(void *data, u64 val)
-@@ -981,7 +981,7 @@ static int adv_channel_map_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- 			adv_channel_map_set, "%llu\n");
- 
- static int adv_min_interval_set(void *data, u64 val)
-@@ -1009,7 +1009,7 @@ static int adv_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
- 			adv_min_interval_set, "%llu\n");
- 
- static int adv_max_interval_set(void *data, u64 val)
-@@ -1037,7 +1037,7 @@ static int adv_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
- 			adv_max_interval_set, "%llu\n");
- 
- static int min_key_size_set(void *data, u64 val)
-@@ -1065,7 +1065,7 @@ static int min_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(min_key_size_fops, min_key_size_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
- 			min_key_size_set, "%llu\n");
- 
- static int max_key_size_set(void *data, u64 val)
-@@ -1093,7 +1093,7 @@ static int max_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(max_key_size_fops, max_key_size_get,
-+DEFINE_DEBUGFS_ATTRIBUTE(max_key_size_fops, max_key_size_get,
- 			max_key_size_set, "%llu\n");
- 
- static int auth_payload_timeout_set(void *data, u64 val)
-@@ -1121,7 +1121,7 @@ static int auth_payload_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
-+DEFINE_DEBUGFS_ATTRIBUTE(auth_payload_timeout_fops,
- 			auth_payload_timeout_get,
- 			auth_payload_timeout_set, "%llu\n");
- 
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |er.krali@gmail.com
+
+--- Comment #165 from er.krali@gmail.com ---
+(In reply to Yuri Santos from comment #164)
+> (In reply to vinodmishra from comment #155)
+> > (In reply to Flole from comment #154)
+
+[snip]
+
+> > Thanks so much. 
+> > Same device and same issue on Pi Zero. Changing the "#define
+> > lmp_bredr_capable(dev)" in hci_core.h to return false did the trick.
+> 
+> Thanks, i did that. Seems to have a advance, but still not working as
+> expected.
+> 
+> 
+> Info and logs:
+> 
+> https://gist.github.com/Yrds/5c2d610c86facc9b1f0522a6509e9e23
+
+I can report some success here using the solution proposed here:
+
+https://askubuntu.com/a/1304723
+
+IOW, disabling the "clear event filter" step altogether in hci_core.c (lines
+around 296-297).
+
+Perhaps this could be added as another quirk, but that's sadly beyond my
+ability.
+
+For reference, here's the data of my model (Bluetooth 5.0, bcdDevice 8891) :
+
+    Features: 0xbf 0x3e 0x4d 0xfa 0xdb 0x3d 0x7b 0xc7
+    HCI Version: 5.0 (0x9) HCI Revision: 0x810
+    LMP Version: 5.0 (0x9) LMP Subversion: 0x2312
+    Manufacturer: Cambridge Silicon Radio (10)
+
+  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
+  idProduct          0x0001 Bluetooth Dongle (HCI mode)
+  bcdDevice           88.91
+  iManufacturer           0 
+  iProduct                2 BT DONGLE10
+
+I have tried pairing a couple of devices and it has worked so far.
+
+Hopefully a cleaner version of this hack will be able to get into the official
+kernel.
+
 -- 
-1.8.3.1
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.
