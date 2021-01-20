@@ -2,99 +2,228 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63191C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 05:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35E2C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 07:14:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D86623110
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 05:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9908A23159
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jan 2021 07:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbhATFKg (ORCPT
+        id S1727122AbhATHOC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jan 2021 00:10:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44300 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729463AbhATFE7 (ORCPT
+        Wed, 20 Jan 2021 02:14:02 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:56736 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726423AbhATHN6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jan 2021 00:04:59 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304C8C061757;
-        Tue, 19 Jan 2021 21:04:19 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id p185so7126926ybg.8;
-        Tue, 19 Jan 2021 21:04:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=2QNIuDgC5vixuFYsnYmkXpiIls3XVH0dL8gRb6T6ZM8=;
-        b=e82rsUdK/Y6ddR2zdT0kKv+G5OkLEYU8hrRAuzTOyZtpI7dYQYG5a3NrceAxX+cN47
-         0fyB2JO34Al//LuvpGWC4iN0rKS0fg4e49AjsLEr5+owB0+HNZDVdP66piFAb4Oo8hVW
-         6dZ8/oarGX8fJBTCxsNILesPJzVJDxu2QSo8l7jrQdDHvF8mqb05HsqD0Y3HCXcy3TEU
-         +aFBnqU40O86yhLvpfWEmwjzSHSHKmMyaXwxcb2tnCeAHfQ6Ijxl54lXrAUDd5fIFJBe
-         JAQGgyD+MHAi5GsA05Cuv5Vk1+WMNvKZuetseoYwjUDrCoDQvKuTbaQzxLXggdr+0BTo
-         CoZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=2QNIuDgC5vixuFYsnYmkXpiIls3XVH0dL8gRb6T6ZM8=;
-        b=tJ3/+q2z+D9ukuclBG1dWTs4kafKv2Dli8fJ6AOK4ytemlJULGPXkvJE+kOhv+zeVQ
-         +6hfYOTfcwoByz87tz+3pwgfnh0kjya1OTwkRNTZylX/5Wj2v85J1pg/HR10YyJlq0vT
-         vuDKRFZbM9+9PwtWLCo+4CX9pchh3LXomSygOxroTW1x1ARvAs8749MQzKCpYCCdzJ9Y
-         hPq/djostG8WGwBci7hhiU6uUuWN9P7UjsY+IRjmcFWc+6ljWPrEY8EERS4JAsEMQS+n
-         wYj93WktKrsmUVHddEHFHoktMIpB2Z+IshZWl1K2rUDJG/mvxrebw2e2iFDWPdN7TrFn
-         Qb2w==
-X-Gm-Message-State: AOAM530TuVjAbQqvR8zJI6Iz+fejnZc7QXqEDQJTiPssEHvTBrZY/D+w
-        xNKtCJZeFARl5Cd28XXg7hgIy2nawxTAAsOrr9u0beBRQGbFHvJ7
-X-Google-Smtp-Source: ABdhPJw9L4jaPxHZP4K8kMNUE01qQydu5uD2hO4uP6LuilAByXP0GeO/QqZRx0Vjpg4sRBkNv16ghzPTXhJK2IiebTo=
-X-Received: by 2002:a25:cf12:: with SMTP id f18mr11243168ybg.18.1611119058511;
- Tue, 19 Jan 2021 21:04:18 -0800 (PST)
-MIME-Version: 1.0
-From:   =?UTF-8?B?5oWV5Yas5Lqu?= <mudongliangabcd@gmail.com>
-Date:   Wed, 20 Jan 2021 13:03:52 +0800
-Message-ID: <CAD-N9QVWNK=SPgT0mc81_UqbSV57aQ+x-s=iz9PnjQWNc5bG6A@mail.gmail.com>
-Subject: "WARNING: locking bug in finish_task_switch" and "WARNING: locking
- bug in finish_lock_switch" should share the same root cause
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-        netdev@vger.kernel.org,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 20 Jan 2021 02:13:58 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UMJ.w4A_1611126765;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UMJ.w4A_1611126765)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 20 Jan 2021 15:12:50 +0800
+From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+Subject: [PATCH] net/bluetooth:  Fix the follow coccicheck warnings
+Date:   Wed, 20 Jan 2021 15:12:44 +0800
+Message-Id: <1611126764-34416-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear kernel developers,
+./net/bluetooth/hci_debugfs.c: WARNING: sniff_min_interval_fops
+should be defined with DEFINE_DEBUGFS_ATTRIBUTE
 
-I found that on the syzbot dashboard, =E2=80=9CWARNING: locking bug in
-finish_task_switch=E2=80=9D[1] and
-"WARNING: locking bug in finish_lock_switch"[2] should share the same
-root cause.
+Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+Reported-by: Abaci Robot<abaci@linux.alibaba.com>
+---
+ net/bluetooth/hci_debugfs.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-The reasons for the above statement:
-1) the stack trace is the same, and this title difference is due to
-the inline property of "finish_lock_switch";
-2) their PoCs are the same as each other;
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 4626e02..65cad9f 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -237,7 +237,7 @@ static int conn_info_min_age_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
++DEFINE_DEBUGFS_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
+ 			conn_info_min_age_set, "%llu\n");
+ 
+ static int conn_info_max_age_set(void *data, u64 val)
+@@ -265,7 +265,7 @@ static int conn_info_max_age_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
++DEFINE_DEBUGFS_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
+ 			conn_info_max_age_set, "%llu\n");
+ 
+ static ssize_t use_debug_keys_read(struct file *file, char __user *user_buf,
+@@ -419,7 +419,7 @@ static int voice_setting_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
++DEFINE_DEBUGFS_ATTRIBUTE(voice_setting_fops, voice_setting_get,
+ 			NULL, "0x%4.4llx\n");
+ 
+ static ssize_t ssp_debug_mode_read(struct file *file, char __user *user_buf,
+@@ -476,7 +476,7 @@ static int min_encrypt_key_size_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(min_encrypt_key_size_fops,
++DEFINE_DEBUGFS_ATTRIBUTE(min_encrypt_key_size_fops,
+ 			min_encrypt_key_size_get,
+ 			min_encrypt_key_size_set, "%llu\n");
+ 
+@@ -491,7 +491,7 @@ static int auto_accept_delay_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
++DEFINE_DEBUGFS_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+ 			auto_accept_delay_set, "%llu\n");
+ 
+ static ssize_t force_bredr_smp_read(struct file *file,
+@@ -558,7 +558,7 @@ static int idle_timeout_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
++DEFINE_DEBUGFS_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
+ 			idle_timeout_set, "%llu\n");
+ 
+ static int sniff_min_interval_set(void *data, u64 val)
+@@ -586,7 +586,7 @@ static int sniff_min_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
+ 			sniff_min_interval_set, "%llu\n");
+ 
+ static int sniff_max_interval_set(void *data, u64 val)
+@@ -614,7 +614,7 @@ static int sniff_max_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
+ 			sniff_max_interval_set, "%llu\n");
+ 
+ void hci_debugfs_create_bredr(struct hci_dev *hdev)
+@@ -706,7 +706,7 @@ static int rpa_timeout_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
++DEFINE_DEBUGFS_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
+ 			rpa_timeout_set, "%llu\n");
+ 
+ static int random_address_show(struct seq_file *f, void *p)
+@@ -869,7 +869,7 @@ static int conn_min_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
+ 			conn_min_interval_set, "%llu\n");
+ 
+ static int conn_max_interval_set(void *data, u64 val)
+@@ -897,7 +897,7 @@ static int conn_max_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
+ 			conn_max_interval_set, "%llu\n");
+ 
+ static int conn_latency_set(void *data, u64 val)
+@@ -925,7 +925,7 @@ static int conn_latency_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(conn_latency_fops, conn_latency_get,
++DEFINE_DEBUGFS_ATTRIBUTE(conn_latency_fops, conn_latency_get,
+ 			conn_latency_set, "%llu\n");
+ 
+ static int supervision_timeout_set(void *data, u64 val)
+@@ -953,7 +953,7 @@ static int supervision_timeout_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
++DEFINE_DEBUGFS_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
+ 			supervision_timeout_set, "%llu\n");
+ 
+ static int adv_channel_map_set(void *data, u64 val)
+@@ -981,7 +981,7 @@ static int adv_channel_map_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
++DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
+ 			adv_channel_map_set, "%llu\n");
+ 
+ static int adv_min_interval_set(void *data, u64 val)
+@@ -1009,7 +1009,7 @@ static int adv_min_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
+ 			adv_min_interval_set, "%llu\n");
+ 
+ static int adv_max_interval_set(void *data, u64 val)
+@@ -1037,7 +1037,7 @@ static int adv_max_interval_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
++DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
+ 			adv_max_interval_set, "%llu\n");
+ 
+ static int min_key_size_set(void *data, u64 val)
+@@ -1065,7 +1065,7 @@ static int min_key_size_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(min_key_size_fops, min_key_size_get,
++DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
+ 			min_key_size_set, "%llu\n");
+ 
+ static int max_key_size_set(void *data, u64 val)
+@@ -1093,7 +1093,7 @@ static int max_key_size_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(max_key_size_fops, max_key_size_get,
++DEFINE_DEBUGFS_ATTRIBUTE(max_key_size_fops, max_key_size_get,
+ 			max_key_size_set, "%llu\n");
+ 
+ static int auth_payload_timeout_set(void *data, u64 val)
+@@ -1121,7 +1121,7 @@ static int auth_payload_timeout_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
++DEFINE_DEBUGFS_ATTRIBUTE(auth_payload_timeout_fops,
+ 			auth_payload_timeout_get,
+ 			auth_payload_timeout_set, "%llu\n");
+ 
+-- 
+1.8.3.1
 
-If you can have any issues with this statement or our information is
-useful to you, please let us know. Thanks very much.
-
-[1] WARNING: locking bug in finish_task_switch -
-https://syzkaller.appspot.com/bug?id=3Dfff3de4144dc949f632cb91af9b12f9c2f30=
-9894
-[2] WARNING: locking bug in finish_lock_switch -
-https://syzkaller.appspot.com/bug?id=3Dc7f3ee17ec2ac6f27e0c72f2a90eabc3c4e1=
-d998
-
---
-My best regards to you.
-
-     No System Is Safe!
-     Dongliang Mu
