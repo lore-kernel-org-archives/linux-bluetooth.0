@@ -2,85 +2,73 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22724C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB07C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:59:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7FBE2396D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 578BD239D3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727429AbhAUIOo (ORCPT
+        id S1728237AbhAUI6I convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jan 2021 03:14:44 -0500
-Received: from m12-12.163.com ([220.181.12.12]:33444 "EHLO m12-12.163.com"
+        Thu, 21 Jan 2021 03:58:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35040 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727393AbhAUIOd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jan 2021 03:14:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=ujwu2jhAKdseHeYdwe
-        bRz68PXQCswbggcNQ1+Mquy+U=; b=FrvZQz9/padfrDZ2aAG0AOswdOGb5LSvjE
-        wm17EDxVe0/z5Tx4KU4VF/V1JpqZLcFDbOzztP51jjgWND7dCDxbXVDRejQDh8l+
-        EnoXwvEPEObb6NTpG3MzGaKv8fc2yfaNxYWKhrcRuz5q1jURNbrXm4/QxeAC1oMV
-        oSg+8lfFc=
-Received: from localhost.localdomain (unknown [119.3.119.20])
-        by smtp8 (Coremail) with SMTP id DMCowAAnZ8MINwlg68ZdNA--.63399S4;
-        Thu, 21 Jan 2021 16:10:52 +0800 (CST)
-From:   Pan Bian <bianpan2016@163.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andre Guedes <andre.guedes@openbossa.org>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Pan Bian <bianpan2016@163.com>
-Subject: [PATCH] Bluetooth: Put HCI device if inquiry procedure interrupts
-Date:   Thu, 21 Jan 2021 00:10:45 -0800
-Message-Id: <20210121081045.38121-1-bianpan2016@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: DMCowAAnZ8MINwlg68ZdNA--.63399S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWrur48Gr48uFWkAr13GF18AFb_yoWfGFc_ua
-        ykZayfWr45Ga45Jr12vFW3Zw1j93yfCrn3Gw1IqFWUKryDWr1DJFn3Wrn8CFyfWwsrCrW3
-        ZrsruFWavw1fGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbNeoUUUUUU==
-X-Originating-IP: [119.3.119.20]
-X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBZAwhclQHMD9WnAAAst
+        id S1728369AbhAUI5i (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Jan 2021 03:57:38 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 652EC22473
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 08:56:58 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
+ 0x31010000
+Date:   Thu, 21 Jan 2021 08:56:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: BxOxSxS@protonmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-210681-62941-kkLKlurNXd@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
+References: <bug-210681-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Jump to the label done to decrement the reference count of HCI device
-hdev on path that the Inquiry procedure is interrupted.
+https://bugzilla.kernel.org/show_bug.cgi?id=210681
 
-Fixes: 3e13fa1e1fab ("Bluetooth: Fix hci_inquiry ioctl usage")
-Signed-off-by: Pan Bian <bianpan2016@163.com>
----
- net/bluetooth/hci_core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+--- Comment #17 from BxOxSxS@protonmail.com ---
+(In reply to jefferson from comment #16)
+> Install the kernel
+> https://mirror.netzspielplatz.de/manjaro/packages/pool/overlay/linux419-4.19.
+> 169-1-x86_64.pkg.tar.zst $ sudo pacman -U linux419-4.19.169-1-x86_64
+> .pkg.tar.zst and reconfigure grub.cfg $ sudo grub-mkconfig -o
+> /boot/grub/grub.cfg. This kernel works well.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9d2c9a1c552f..9f8573131b97 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1362,8 +1362,10 @@ int hci_inquiry(void __user *arg)
- 		 * cleared). If it is interrupted by a signal, return -EINTR.
- 		 */
- 		if (wait_on_bit(&hdev->flags, HCI_INQUIRY,
--				TASK_INTERRUPTIBLE))
--			return -EINTR;
-+				TASK_INTERRUPTIBLE)) {
-+			err = -EINTR;
-+			goto done;
-+		}
- 	}
- 
- 	/* for unlimited number of responses we will use buffer with
+All kernel below 5.10 works well. You dont need to use 419, you can use eg 5.9.
+Also if you are using manjaro you can just use MHWD or pacman -S to manage
+kernels
+
 -- 
-2.17.1
+You may reply to this email to add a comment.
 
-
+You are receiving this mail because:
+You are the assignee for the bug.
