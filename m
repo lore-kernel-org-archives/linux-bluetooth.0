@@ -2,73 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB07C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DD8C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 13:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 578BD239D3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 08:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66F7823A21
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jan 2021 13:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728237AbhAUI6I convert rfc822-to-8bit (ORCPT
+        id S1730084AbhAUNOI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jan 2021 03:58:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35040 "EHLO mail.kernel.org"
+        Thu, 21 Jan 2021 08:14:08 -0500
+Received: from m12-14.163.com ([220.181.12.14]:46912 "EHLO m12-14.163.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728369AbhAUI5i (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jan 2021 03:57:38 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 652EC22473
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 08:56:58 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
- 0x31010000
-Date:   Thu, 21 Jan 2021 08:56:57 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: BxOxSxS@protonmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-210681-62941-kkLKlurNXd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
-References: <bug-210681-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        id S1731713AbhAUNNR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Jan 2021 08:13:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id; bh=xUdecuC7vvbq3Zw4lX
+        6slIDn9RFCjzwmGVMWNixg2e4=; b=PKUKUNGQ8XeHyTK85add9f8bwp0+gxdQ7T
+        AEsepw3akoxRkbpQCCSyQltQgB2ZLKsty4fsQem0BPIjySmYDVC/Dp//KftLT48E
+        gQQZLncr3qUAcS0+f3+1PG4eNBycKxdZwJxIeJUfrCk28XFu2yBMEzmsKV1gDacO
+        lbHyogPpk=
+Received: from localhost.localdomain (unknown [119.3.119.20])
+        by smtp10 (Coremail) with SMTP id DsCowABHk3t9Lglgt_V9hA--.20648S4;
+        Thu, 21 Jan 2021 15:34:25 +0800 (CST)
+From:   Pan Bian <bianpan2016@163.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+        Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Pan Bian <bianpan2016@163.com>
+Subject: [PATCH] Bluetooth: drop HCI device reference before return
+Date:   Wed, 20 Jan 2021 23:34:19 -0800
+Message-Id: <20210121073419.14219-1-bianpan2016@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: DsCowABHk3t9Lglgt_V9hA--.20648S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWrur4DtrWUCryDKFy3uryfZwb_yoWxKFc_uF
+        47urZ3ur48ta1Yq3y0kFZa9r1xJrs3Xan3WwnIgrW3X3sxGr45Jr4xurn8Gr1xWw4DCry7
+        ZF4kXFy5Aw48WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU5oGQDUUUUU==
+X-Originating-IP: [119.3.119.20]
+X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBUQIhclaD9tmcKQAAsP
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=210681
+Call hci_dev_put() to decrement reference count of HCI device hdev if
+fails to duplicate memory.
 
---- Comment #17 from BxOxSxS@protonmail.com ---
-(In reply to jefferson from comment #16)
-> Install the kernel
-> https://mirror.netzspielplatz.de/manjaro/packages/pool/overlay/linux419-4.19.
-> 169-1-x86_64.pkg.tar.zst $ sudo pacman -U linux419-4.19.169-1-x86_64
-> .pkg.tar.zst and reconfigure grub.cfg $ sudo grub-mkconfig -o
-> /boot/grub/grub.cfg. This kernel works well.
+Fixes: 0b26ab9dce74 ("Bluetooth: AMP: Handle Accept phylink command status evt")
+Signed-off-by: Pan Bian <bianpan2016@163.com>
+---
+ net/bluetooth/a2mp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-All kernel below 5.10 works well. You dont need to use 419, you can use eg 5.9.
-Also if you are using manjaro you can just use MHWD or pacman -S to manage
-kernels
-
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index da7fd7c8c2dc..5974fd828c35 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -512,6 +512,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		assoc = kmemdup(req->amp_assoc, assoc_len, GFP_KERNEL);
+ 		if (!assoc) {
+ 			amp_ctrl_put(ctrl);
++			hci_dev_put(hdev);
+ 			return -ENOMEM;
+ 		}
+ 
 -- 
-You may reply to this email to add a comment.
+2.17.1
 
-You are receiving this mail because:
-You are the assignee for the bug.
+
