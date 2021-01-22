@@ -2,151 +2,205 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB333C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 00:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74702C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 00:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77D3122D50
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 00:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2613820769
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 00:40:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726013AbhAVAht (ORCPT
+        id S1726288AbhAVAjV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jan 2021 19:37:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42634 "EHLO
+        Thu, 21 Jan 2021 19:39:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725827AbhAVAhs (ORCPT
+        with ESMTP id S1726179AbhAVAjT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jan 2021 19:37:48 -0500
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549E9C06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 16:37:07 -0800 (PST)
-Received: by mail-ot1-x329.google.com with SMTP id i30so3536833ota.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 16:37:07 -0800 (PST)
+        Thu, 21 Jan 2021 19:39:19 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52F0C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 16:38:38 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id b8so2247547plh.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 16:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=u5i56K0I7ZdhnCIYqtGHUbHZDBLfP42ZPr3xc2gKRjE=;
-        b=PN2YgnEd8nEjRWPNBHOlt6JDRyFhvIrMojpWgcRDjq78bjJ61qFmX/r8b7VjODXInT
-         SoWlRddNmDZWZhHjrZi9X6eZaIcAebH1hh4s0HpH8PB7NEyJr9ZHtjlPPbwlsiWoD5Sy
-         f7InGFqR2/Rc0jag+V0ncCYQ8EgO4x2DmJXdxxGUHnVv3F9VrTnDzQXThWvlMjjPO1pi
-         qwLKD3jwGWjky3/xMx8BV0eHWtcU37WvU3jbJeUqfXSf9cKpW1Y5415TE+Ff4ldu1nuJ
-         bUduFA5W0Pdcq//5nls8IxxRhPuTPdM00W+N41DcTjRnNPLBGcUP7SCCpFAiBjGVP5WZ
-         NvWw==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xh1gmsKFWqh2VoIalRTQmYePy1aGr3dxBm/jAkXBTsw=;
+        b=hwa2iqD7fBSPMtdhB4EdzPigbnt85mQMK4OVGbEbf8G5BlI0jGOX8rKWgsbePzGttC
+         ksuUsgXw8IOGKLfZLPtR5kGlmzqjOro/PdUrTXzIdnDckDuCQ+nX4qRUvN0e2Irp3Y0N
+         OLxGz9Md0SNATKVa+aI8oIvyfe+x5waV9ZnFA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=u5i56K0I7ZdhnCIYqtGHUbHZDBLfP42ZPr3xc2gKRjE=;
-        b=lcHQxJxtRdvoWJEM8SGx2aPY2QQ7PT0qqvXwmi5IwTxoYcggZT3QdILQp2dUEiqB3J
-         o5OKqB6cGJTrHkScOZK88ZoZge1A4Ud5cYPPgJF2Kkqmg9IiBIPBydL8Bi0b+k/jonS6
-         GBwxDIS+rUfeHy6fhvZ0R6ZG6fJPrAr+4YmcTg4LlMqOuoGn9SqO9xGoSp/bh6E1/FTt
-         NTgjiueh8Oalmq09HJ/1/91tWTbeVmFwmzl/rwrdueSZXV1/SnXs+TzNn6CUEsDBwDHJ
-         37hOsiAosTP8Hl4xLmDz5fGT5D1n0CCKGtqn3NBlh2LhfIvj09rkoiIksVsOXi2wHhQP
-         AXmg==
-X-Gm-Message-State: AOAM530mdpRX3IwIJ7p9cH/Z6aWCrcIa4yH6fORfLR8npIEBw+4+i36u
-        VTJq7hEW6KUO0DMq+hQNs6KjLmb59+YUBI7VQ58=
-X-Google-Smtp-Source: ABdhPJzdkIFxRnyuq6DVYtlwFWfDpl2+kDvxelwkVxlXK1PBNvGsUx2ITAhBXF2SNEtGHLpfHaSs4dpXLjKRpnP30+c=
-X-Received: by 2002:a05:6830:157:: with SMTP id j23mr1430413otp.240.1611275826358;
- Thu, 21 Jan 2021 16:37:06 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xh1gmsKFWqh2VoIalRTQmYePy1aGr3dxBm/jAkXBTsw=;
+        b=LvoGdXTAb4FvLOCQZ7NlUpcI97woZMGXilM8A9vVbWx5ksHivbr2pKJ3IlZnQB1/46
+         Bx4mmpzulQ0kFjYmvuq5gGvuAVxX49PBohkWFWd9/JlIzeRaJskyeES+9tkKlpv9JaG0
+         oLs3yF+yDn89nRDdjQcyQyL1p6kHeUM9Fr54bCuyQI4GLBaTVKp1/Zgj2NpIwl9xMulS
+         b+YQ4I9eQPoyPBZh7xFlX9sEwFB5oharv/gL6qXKgozxd41hvQ0/zLgwL7sxmsJzDKs3
+         /u+56FN/xlvYOJheZ4IqOzzOJfRvQNL8SILtlmZRNqA7d4JhpBg+lGYPgsjW7vRVxzT4
+         IOuA==
+X-Gm-Message-State: AOAM532f9jVDUUsaqP9VOzcV/+x61IjnzByl2AugP5WA8T3Nuz8ujKYS
+        Ufp8Aja2r1Uvy99NJLmWgOY7Bi0rttXVIQ==
+X-Google-Smtp-Source: ABdhPJxSYzoJR4l9sMfwnZXfHq76mqi1xMgOQos7evHsHnU9pdPCM1MFVwNVPWK+iytYEMqQ9vy2pQ==
+X-Received: by 2002:a17:90a:4a08:: with SMTP id e8mr2225150pjh.149.1611275917811;
+        Thu, 21 Jan 2021 16:38:37 -0800 (PST)
+Received: from localhost ([2620:15c:202:201:6c51:e165:670c:baed])
+        by smtp.gmail.com with ESMTPSA id 36sm6702694pgr.56.2021.01.21.16.38.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Jan 2021 16:38:36 -0800 (PST)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: Keep MSFT ext info throughout ahci_dev's life cycle
+Date:   Thu, 21 Jan 2021 16:38:31 -0800
+Message-Id: <20210121163801.v3.1.Id9bc5434114de07512661f002cdc0ada8b3d6d02@changeid>
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
 MIME-Version: 1.0
-References: <20210122001326.14263-1-sonnysasaka@chromium.org> <20210122001326.14263-2-sonnysasaka@chromium.org>
-In-Reply-To: <20210122001326.14263-2-sonnysasaka@chromium.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 21 Jan 2021 16:36:55 -0800
-Message-ID: <CABBYNZJs_rzBSHOjvqg5F4u6gxX7LcNUc77KtzHEr5L7Y5Zd-A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 2/2] input/hog: Do not create UHID if report map
- is broken
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+This moves msft_do_close() from hci_dev_do_close() to
+hci_unregister_dev() to avoid clearing MSFT extension info. This also
+avoids retrieving MSFT info upon every msft_do_open() if MSFT extension
+has been initialized.
 
-On Thu, Jan 21, 2021 at 4:18 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
->
-> The report map in the cache could be dirty, for example when reading a
-> report map from peer was cancelled, we should be able to detect it and
-> not try to create UHID. Instead we will read it again from the peer.
+The following test steps were performed.
+(1) boot the test device and verify the MSFT support debug log in syslog
+(2) restart bluetoothd and verify msft_do_close() doesn't get invoked
 
-Don't we clean the cache if it had failed? Or you meant to say the
-read long procedure was not complete so we got just part of the report
-map? In that case we should have failed, also if we need to protect
-uhid from malformed report map, which sounds like a kernel bug, then
-we should at least have it inside bt_uhid instance so we can at least
-attempt to have some unit testing done with broken report maps.
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+---
+Hi Maintainers,
 
-> ---
->  profiles/input/hog-lib.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
->
-> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> index 089f42826..d6a3bda4d 100644
-> --- a/profiles/input/hog-lib.c
-> +++ b/profiles/input/hog-lib.c
-> @@ -946,7 +946,7 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
->         struct uhid_event ev;
->         ssize_t vlen = report_map_len;
->         char itemstr[20]; /* 5x3 (data) + 4 (continuation) + 1 (null) */
-> -       int i, err;
-> +       int i, err, collection_depth = 0;
->         GError *gerr = NULL;
->
->         DBG("Report MAP:");
-> @@ -960,6 +960,14 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
->                         if (!long_item && (value[i] & 0xfc) == 0x84)
->                                 hog->has_report_id = TRUE;
->
-> +                       // Start Collection
-> +                       if (value[i] == 0xa1)
-> +                               collection_depth++;
-> +
-> +                       // End Collection
-> +                       if (value[i] == 0xc0)
-> +                               collection_depth--;
-> +
->                         DBG("\t%s", item2string(itemstr, &value[i], ilen));
->
->                         i += ilen;
-> @@ -968,10 +976,15 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
->
->                         /* Just print remaining items at once and break */
->                         DBG("\t%s", item2string(itemstr, &value[i], vlen - i));
-> -                       break;
-> +                       return;
->                 }
->         }
->
-> +       if (collection_depth != 0) {
-> +               error("Report Map error: unbalanced collection");
-> +               return;
-> +       }
-> +
->         /* create uHID device */
->         memset(&ev, 0, sizeof(ev));
->         ev.type = UHID_CREATE;
-> @@ -1365,7 +1378,9 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
->                          * UHID to optimize reconnection.
->                          */
->                         uhid_create(hog, report_map.value, report_map.length);
-> -               } else {
-> +               }
-> +
-> +               if (!hog->uhid_created) {
->                         read_char(hog, hog->attrib, value_handle,
->                                                 report_map_read_cb, hog);
->                 }
-> --
-> 2.29.2
->
+This patch fixes the life cycle of MSFT HCI extension. The current
+symmetric calls to msft_do{open,close} in hci_dev_do_{open,close} cause
+incorrect MSFT features during bluetoothd start-up. After the kernel
+powers on the controller to register the hci_dev, it performs
+hci_dev_do_close() which call msft_do_close() and MSFT data gets wiped
+out. And then during the startup of bluetoothd, Adv Monitor Manager
+relies on reading the MSFT features from the kernel to present the
+feature set of the controller to D-Bus clients. However, the power state
+of the controller is off during the init of D-Bus interfaces. As a
+result, invalid MSFT features are returned by the kernel, since it was
+previously wiped out due to hci_dev_do_close().
 
+And here is the trace (for case 1 above) that I captured without this
+change.
 
+2021-01-15T01:34:43.800155Z INFO kernel: [    2.754911] Bluetooth:
+hci_power_on() @@ call hci_dev_do_open
+2021-01-15T01:34:45.145025Z INFO kernel: [    4.272376] Bluetooth:
+hci_dev_do_open() @@ call msft_do_open
+2021-01-15T01:34:45.145050Z INFO kernel: [    4.272382] Bluetooth:
+msft_do_open() @@
+2021-01-15T01:34:45.146020Z INFO kernel: [    4.273139] Bluetooth:
+read_supported_features() @@ features 000000000000003f
+2021-01-15T01:34:47.176410Z INFO kernel: [    6.303439] Bluetooth:
+hci_power_off() @@ call hci_dev_do_close
+2021-01-15T01:34:47.189020Z INFO kernel: [    6.316152] Bluetooth:
+hci_dev_do_close() @@ call msft_do_close
+2021-01-15T01:34:47.189032Z INFO kernel: [    6.316158] Bluetooth:
+msft_do_close() @@
+2021-01-15T01:34:47.957401Z INFO bluetoothd[2591]: Bluetooth daemon 5.54
+// skip some logs here
+2021-01-15T01:34:48.004066Z INFO bluetoothd[2591]: Bluetooth
+management interface 1.14 initialized
+2021-01-15T01:34:48.167703Z INFO bluetoothd[2591]: @@ call
+btd_adv_monitor_manager_create
+2021-01-15T01:34:48.167832Z INFO bluetoothd[2591]: @@ call
+MGMT_OP_READ_ADV_MONITOR_FEATURES
+2021-01-15T01:34:48.167886Z INFO bluetoothd[2591]: Battery Provider
+Manager created
+2021-01-15T01:34:48.171924Z INFO bluetoothd[2591]: @@ features
+supported_features 00000000 enabled_features 00000000
+2021-01-15T01:34:48.172088Z INFO kernel: [    7.299305] Bluetooth:
+hci_power_on() @@ call hci_dev_do_open
+2021-01-15T01:34:48.172083Z INFO bluetoothd[2591]: Adv Monitor Manager
+created with supported features:0x00000000, enabled
+features:0x00000000, max number of supported monitors:32, max number
+of supported patterns:16
+2021-01-15T01:34:48.207800Z INFO bluetoothd[2591]: Endpoint
+registered: sender=:1.52 path=/org/chromium/Cras/Bluetooth/A2DPSource
+2021-01-15T01:34:48.212522Z INFO bluetoothd[2591]: Player registered:
+sender=:1.52 path=/org/chromium/Cras/Bluetooth/DefaultPlayer
+2021-01-15T01:34:48.214813Z INFO bluetoothd[2591]: BlueZ log level is set
+to 1
+2021-01-15T01:34:48.230035Z INFO kernel: [    7.357118] Bluetooth:
+hci_dev_do_open() @@ call msft_do_open
+2021-01-15T01:34:48.230063Z INFO kernel: [    7.357124] Bluetooth:
+msft_do_open() @@
+2021-01-15T01:34:48.231027Z INFO kernel: [    7.358131] Bluetooth:
+read_supported_features() @@ features 000000000000003f
+2021-01-15T01:34:48.248967Z INFO bluetoothd[2591]: adapter
+/org/bluez/hci0 has been enabled
+2021-01-15T01:34:49.176198Z INFO bluetoothd[2591]: adapter
+/org/bluez/hci0 set power to 1
+
+Regards,
+Chrome OS Bluetooth team
+
+Changes in v3:
+- Remove the accepted commits from the series
+
+ net/bluetooth/hci_core.c | 4 ++--
+ net/bluetooth/msft.c     | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index eeafed2efc0da..8056f0d4ae172 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1764,8 +1764,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
+ 
+-	msft_do_close(hdev);
+-
+ 	if (hdev->flush)
+ 		hdev->flush(hdev);
+ 
+@@ -3844,6 +3842,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	unregister_pm_notifier(&hdev->suspend_notifier);
+ 	cancel_work_sync(&hdev->suspend_prepare);
+ 
++	msft_do_close(hdev);
++
+ 	hci_dev_do_close(hdev);
+ 
+ 	if (!test_bit(HCI_INIT, &hdev->flags) &&
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 8579bfeb28364..34769898858ef 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -75,7 +75,8 @@ void msft_do_open(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft;
+ 
+-	if (hdev->msft_opcode == HCI_OP_NOP)
++	/* Skip if opcode is not supported or MSFT has been initiatlized */
++	if (hdev->msft_opcode == HCI_OP_NOP || hdev->msft_data)
+ 		return;
+ 
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
 -- 
-Luiz Augusto von Dentz
+2.30.0.280.ga3ce27912f-goog
+
