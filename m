@@ -2,107 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=BAYES_05,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8697BC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 01:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC69EC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 02:00:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 331EF239EE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 01:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68AAA239D4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 02:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726431AbhAVB6t (ORCPT
+        id S1726633AbhAVCAl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jan 2021 20:58:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbhAVB6s (ORCPT
+        Thu, 21 Jan 2021 21:00:41 -0500
+Received: from rtits2.realtek.com ([211.75.126.72]:58081 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726044AbhAVCAj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jan 2021 20:58:48 -0500
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADD3C06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 17:58:08 -0800 (PST)
-Received: by mail-qv1-xf35.google.com with SMTP id l14so1988839qvh.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jan 2021 17:58:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=QxHTpCzjVyT1iSkHDnZVDWSaYQGvbA8qlbg83/CE9c4=;
-        b=hvnDlQE4Yiky/dqtWVc+lLAEbBSK6CbizMIRk/mObI4n1Frq3WAGhCCUnLh5VCGVNK
-         scN2SOGuOiNP3BofBpYv6X0NHKc094hucFjOJ/Wd03s9y5DNp7HB6rziU3CPIEo7mJ7U
-         mPrfcjBicGaGWcECXBmVhp6cCNyaEx0LYohPHAdOBVzm8HPFMUjvIwet1y286x6j36xW
-         FZvdEiUUBJoJBbOvxkPvzgwhV8RCedugviExcqaO0hG50xJs5Hex6H/Ir5HOUZCuLhdW
-         7zWuCgKeK0QPot3bN2Cv1lnThh24oM7uywYPB9jzQ7n2sVuObOPNnPXd1neoF5NFmlZo
-         wOgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=QxHTpCzjVyT1iSkHDnZVDWSaYQGvbA8qlbg83/CE9c4=;
-        b=dw9oZAxkUD4IqbSrOfH43vlzT9w8yT3/J1Da/V+DPo0Z4G2pSejznimTnGTYniHiYu
-         i4B6Vpyy+JM0FhAD/dCWOhapV/evIaGOtmVGl8FFHfB4V8LakzdRGMZJBT2Bw7ZIqp5p
-         MeXyK16NQYg1nCwuVi1743cZtPqQJPVqn8Vl4cCAltYI8GTEmkVnYTyDlAv0vJoj+15S
-         YfPiMK1FuHIBmulD6dnxl11vOrx8g6YFR3Z0lje6P/zmqWr7gEKAhRT3UD7K8bjfvfLp
-         YsAzhU6usa1S+g8HlIcfAldh81pY//g9veVaXAaAcvLEC+72Jrxg+ZgvwqwVTdLDiaEQ
-         hmug==
-X-Gm-Message-State: AOAM531DNvs47uM05iPeL+1w9Yhsb0HJ3rROfXRcaq8O9pYqxkaO2K+a
-        lNnJX1Pe/VFG+dIllGdPZipRRADtG8w=
-X-Google-Smtp-Source: ABdhPJzRJJKDxOKtnUz1B22iAgvhetOaUz9DjVwVLmrQ7VoFfci2WMZqFJ+8++mpCH8Afno5b/RvSQ==
-X-Received: by 2002:a0c:ac43:: with SMTP id m3mr2313679qvb.37.1611280687476;
-        Thu, 21 Jan 2021 17:58:07 -0800 (PST)
-Received: from [172.17.0.2] ([52.251.91.58])
-        by smtp.gmail.com with ESMTPSA id j188sm1119722qke.67.2021.01.21.17.58.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jan 2021 17:58:06 -0800 (PST)
-Message-ID: <600a312e.1c69fb81.17e4f.687d@mx.google.com>
-Date:   Thu, 21 Jan 2021 17:58:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6051377308529981109=="
+        Thu, 21 Jan 2021 21:00:39 -0500
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 10M1xjpwF000404, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmbs03.realtek.com.tw[172.21.6.96])
+        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 10M1xjpwF000404
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Fri, 22 Jan 2021 09:59:45 +0800
+Received: from localhost.localdomain (172.21.132.186) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 22 Jan 2021 09:59:45 +0800
+From:   <max.chou@realtek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
+        <kidman@realtek.com>, <max.chou@realtek.com>,
+        <abhishekpandit@chromium.org>, <josephsih@chromium.org>
+Subject: [PATCH v3] Bluetooth: btrtl: Enable WBS for the specific Realtek devices
+Date:   Fri, 22 Jan 2021 09:59:38 +0800
+Message-ID: <20210122015938.964-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
-Subject: RE: [BlueZ,v2,1/2] input/hog: Fix double registering report value callbacks
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210122001326.14263-1-sonnysasaka@chromium.org>
-References: <20210122001326.14263-1-sonnysasaka@chromium.org>
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.186]
+X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6051377308529981109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Max Chou <max.chou@realtek.com>
 
-This is automated email and please do not reply to this email!
+By this change, it will enable WBS supported on the specific Realtek BT
+devices, such as RTL8822C and RTL8852A.
+In the future, it's able to maintain what the Realtek devices support WBS
+here.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=419555
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
+Tested-by: Hilda Wu <hildawu@realtek.com>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 
 ---
-Regards,
-Linux Bluetooth
+change in v3
+ -remove the null check due to unnecessary
+---
+ drivers/bluetooth/btrtl.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 24f03a1f8d57..a21d6abc93c4 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -38,6 +38,19 @@
+ 	.hci_ver = (hciv), \
+ 	.hci_bus = (bus)
+ 
++enum  btrtl_chip_id {
++	CHIP_ID_8723A,		/* index  0 for RTL8723A*/
++	CHIP_ID_8723B,		/* index  1 for RTL8723B*/
++	CHIP_ID_8821A,		/* index  2 for RTL8821A*/
++	CHIP_ID_8761A,		/* index  3 for RTL8761A*/
++	CHIP_ID_8822B = 8,	/* index  8 for RTL8822B */
++	CHIP_ID_8723D,		/* index  9 for RTL8723D */
++	CHIP_ID_8821C,		/* index 10 for RTL8821C */
++	CHIP_ID_8822C = 13,	/* index 13 for RTL8822C */
++	CHIP_ID_8761B,		/* index 14 for RTL8761B */
++	CHIP_ID_8852A = 18,	/* index 18 for RTL8852A */
++};
++
+ struct id_table {
+ 	__u16 match_flags;
+ 	__u16 lmp_subver;
+@@ -58,6 +71,7 @@ struct btrtl_device_info {
+ 	u8 *cfg_data;
+ 	int cfg_len;
+ 	bool drop_fw;
++	int project_id;
+ };
+ 
+ static const struct id_table ic_id_table[] = {
+@@ -307,8 +321,10 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 
+ 	/* Find project_id in table */
+ 	for (i = 0; i < ARRAY_SIZE(project_id_to_lmp_subver); i++) {
+-		if (project_id == project_id_to_lmp_subver[i].id)
++		if (project_id == project_id_to_lmp_subver[i].id) {
++			btrtl_dev->project_id = project_id;
+ 			break;
++		}
+ 	}
+ 
+ 	if (i >= ARRAY_SIZE(project_id_to_lmp_subver)) {
+@@ -719,18 +735,19 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 	 */
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
+-	if (!btrtl_dev->ic_info)
+-		goto done;
+-
+ 	/* Enable central-peripheral role (able to create new connections with
+ 	 * an existing connection in slave role).
+ 	 */
+-	switch (btrtl_dev->ic_info->lmp_subver) {
+-	case RTL_ROM_LMP_8822B:
++	/* Enable WBS supported for the specific Realtek devices. */
++	switch (btrtl_dev->project_id) {
++	case CHIP_ID_8822C:
++	case CHIP_ID_8852A:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 		break;
+ 	default:
+ 		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
++		rtl_dev_dbg(hdev, "WBS supported not enabled.");
+ 		break;
+ 	}
+ 
+-- 
+2.17.1
 
---===============6051377308529981109==--
