@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E327C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 15:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8202BC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 16:21:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50FF7221FF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 15:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 492E62343E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jan 2021 16:21:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728902AbhAVPzj convert rfc822-to-8bit (ORCPT
+        id S1729582AbhAVQUy convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jan 2021 10:55:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56922 "EHLO mail.kernel.org"
+        Fri, 22 Jan 2021 11:20:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35826 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729235AbhAVPvr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jan 2021 10:51:47 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id B502223A9A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jan 2021 15:51:02 +0000 (UTC)
+        id S1729535AbhAVQUD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Jan 2021 11:20:03 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 4C3B123A60
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jan 2021 16:19:23 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Fri, 22 Jan 2021 15:50:59 +0000
+Date:   Fri, 22 Jan 2021 16:19:20 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -34,14 +34,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: mirh@protonmail.ch
+X-Bugzilla-Who: jwrdegoede@fedoraproject.org
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-zib3uo7LGw@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-0VLQC6nCzN@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -55,17 +55,31 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
---- Comment #168 from mirh (mirh@protonmail.ch) ---
-Uh. Actually, now that you make me check my journal logs (unfortunately the old
-computer is no longer with me).. It was using uhci_hcd indeed. 
+--- Comment #169 from Hans de Goede (jwrdegoede@fedoraproject.org) ---
+Ah, so your old PC was that old, ok. So there are basically 4 generations of
+USB controllers which are relevant here:
 
-https://www.intel.com/content/dam/doc/datasheet/i-o-controller-hub-7-datasheet.pdf#page=46
+1. The first USB-2 capable Intel PCs use UHCI for USB-1, and EHCI for USB-2.
+Ports directly on the motherboard are automatically muxed to the UHCI/EHCI
+controller depending on device speed (and some BT dongles are USB1).
 
-Not sure if due to some advanced switcheroo logic, or just out of luckily
-plugging it in inside the right port. 
+When a USB-2 hub is plugged into this generation and then an USB-1 device
+plugged into the HUB, then the USB-1 device will be handled by the EHCI
+controller. If you still have your old PC you can check if the BT USB adapter
+you are using perhaps dislikes being routed through the TT (transaction
+translator) of a hub, but putting an USB-2.0 hub in between.
 
-That could also explain why the damn adapter is still glitchy even when I plug
-it in my other A50M netbook with all USB 2.0 ports.
+2. Later USB-2 capable Intel PCs dropped the UHCI controllers (and the muxing
+of ports) instead integrating a USB-2 hub with the EHCI controller(s)
+
+3. The first USB-3 capable motherboards had a combinationn of USB-3 ports
+connected to a XHCI controller and also had some EHCI controllers. Also the
+USB-3 ports could be muxed to the EHCI controller (loosing USB-3 support) for
+use with operating systems which do not support the XHCI controller. With the
+1st gen the ports were actually muxed to the EHCI by default IIRC.
+
+4. Current PCs often only have a XHCI controller which serves both the USB-3
+and USB-2 ports of the PC.
 
 -- 
 You may reply to this email to add a comment.
